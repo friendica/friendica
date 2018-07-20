@@ -26,7 +26,7 @@ class DBStructure
 	 */
 	public static function convertToInnoDB() {
 		$r = q("SELECT `TABLE_NAME` FROM `information_schema`.`tables` WHERE `engine` = 'MyISAM' AND `table_schema` = '%s'",
-			dbesc(dba::database_name()));
+			dbesc(DBA::database_name()));
 
 		if (!DBM::is_result($r)) {
 			echo L10n::t('There are no tables on MyISAM.')."\n";
@@ -37,7 +37,7 @@ class DBStructure
 			$sql = sprintf("ALTER TABLE `%s` engine=InnoDB;", dbesc($table['TABLE_NAME']));
 			echo $sql."\n";
 
-			$result = dba::e($sql);
+			$result = DBA::e($sql);
 			if (!DBM::is_result($result)) {
 				self::printUpdateError($sql);
 			}
@@ -189,7 +189,7 @@ class DBStructure
 	 */
 	private static function printUpdateError($message) {
 		echo L10n::t("\nError %d occurred during database update:\n%s\n",
-			dba::errorNo(), dba::errorMessage());
+			DBA::errorNo(), DBA::errorMessage());
 
 		return L10n::t('Errors encountered performing database changes: ').$message.EOL;
 	}
@@ -236,8 +236,8 @@ class DBStructure
 		}
 
 		// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
-		if ((version_compare(dba::server_info(), '5.7.4') >= 0) &&
-			!(strpos(dba::server_info(), 'MariaDB') !== false)) {
+		if ((version_compare(DBA::server_info(), '5.7.4') >= 0) &&
+			!(strpos(DBA::server_info(), 'MariaDB') !== false)) {
 			$ignore = '';
 		} else {
 			$ignore = ' IGNORE';
@@ -322,8 +322,8 @@ class DBStructure
 							$parameters['comment'] = "";
 						}
 
-						$current_field_definition = dba::clean_query(implode(",", $field_definition));
-						$new_field_definition = dba::clean_query(implode(",", $parameters));
+						$current_field_definition = DBA::clean_query(implode(",", $field_definition));
+						$new_field_definition = DBA::clean_query(implode(",", $parameters));
 						if ($current_field_definition != $new_field_definition) {
 							$sql2 = self::modifyTableField($fieldname, $parameters);
 							if ($sql3 == "") {
@@ -460,7 +460,7 @@ class DBStructure
 						if ($ignore != "") {
 							echo "SET session old_alter_table=0;\n";
 						} else {
-							echo "INSERT INTO `".$temp_name."` SELECT ".dba::any_value_fallback($field_list)." FROM `".$name."`".$group_by.";\n";
+							echo "INSERT INTO `".$temp_name."` SELECT ".DBA::any_value_fallback($field_list)." FROM `".$name."`".$group_by.";\n";
 							echo "DROP TABLE `".$name."`;\n";
 							echo "RENAME TABLE `".$temp_name."` TO `".$name."`;\n";
 						}
@@ -475,15 +475,15 @@ class DBStructure
 					// Ensure index conversion to unique removes duplicates
 					if ($is_unique && ($temp_name != $name)) {
 						if ($ignore != "") {
-							dba::e("SET session old_alter_table=1;");
+							DBA::e("SET session old_alter_table=1;");
 						} else {
-							$r = dba::e("DROP TABLE IF EXISTS `".$temp_name."`;");
+							$r = DBA::e("DROP TABLE IF EXISTS `".$temp_name."`;");
 							if (!DBM::is_result($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 
-							$r = dba::e("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
+							$r = DBA::e("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
 							if (!DBM::is_result($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
@@ -491,25 +491,25 @@ class DBStructure
 						}
 					}
 
-					$r = dba::e($sql3);
+					$r = DBA::e($sql3);
 					if (!DBM::is_result($r)) {
 						$errors .= self::printUpdateError($sql3);
 					}
 					if ($is_unique && ($temp_name != $name)) {
 						if ($ignore != "") {
-							dba::e("SET session old_alter_table=0;");
+							DBA::e("SET session old_alter_table=0;");
 						} else {
-							$r = dba::e("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
+							$r = DBA::e("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
 							if (!DBM::is_result($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
-							$r = dba::e("DROP TABLE `".$name."`;");
+							$r = DBA::e("DROP TABLE `".$name."`;");
 							if (!DBM::is_result($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
-							$r = dba::e("RENAME TABLE `".$temp_name."` TO `".$name."`;");
+							$r = DBA::e("RENAME TABLE `".$temp_name."` TO `".$name."`;");
 							if (!DBM::is_result($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
@@ -606,7 +606,7 @@ class DBStructure
 		}
 
 		if ($action) {
-			$r = dba::e($sql);
+			$r = DBA::e($sql);
 		}
 
 		return $r;

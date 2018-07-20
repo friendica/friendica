@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Salmon;
 
@@ -39,7 +39,7 @@ function xrd_init(App $a)
 		$name = substr($local, 0, strpos($local, '@'));
 	}
 
-	$user = dba::selectFirst('user', [], ['nickname' => $name]);
+	$user = DBA::selectFirst('user', [], ['nickname' => $name]);
 	if (!DBM::is_result($user)) {
 		killme();
 	}

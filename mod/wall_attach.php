@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Mimetype;
@@ -130,7 +130,7 @@ function wall_attach_post(App $a) {
 		'filesize' => $filesize, 'data' => $filedata, 'created' => $created, 'edited' => $created,
 		'allow_cid' => '<' . $page_owner_cid . '>', 'allow_gid' => '','deny_cid' => '', 'deny_gid' => ''];
 
-	$r = dba::insert('attach', $fields);
+	$r = DBA::insert('attach', $fields);
 
 	@unlink($src);
 

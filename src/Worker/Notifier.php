@@ -8,7 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -65,7 +65,7 @@ class Notifier
 
 		if ($cmd == Delivery::MAIL) {
 			$normal_mode = false;
-			$message = dba::selectFirst('mail', ['uid', 'contact-id'], ['id' => $item_id]);
+			$message = DBA::selectFirst('mail', ['uid', 'contact-id'], ['id' => $item_id]);
 			if (!DBM::is_result($message)) {
 				return;
 			}
@@ -73,7 +73,7 @@ class Notifier
 			$recipients[] = $message['contact-id'];
 		} elseif ($cmd == Delivery::SUGGESTION) {
 			$normal_mode = false;
-			$suggest = dba::selectFirst('fsuggest', ['uid', 'cid'], ['id' => $item_id]);
+			$suggest = DBA::selectFirst('fsuggest', ['uid', 'cid'], ['id' => $item_id]);
 			if (!DBM::is_result($suggest)) {
 				return;
 			}
@@ -223,7 +223,7 @@ class Notifier
 
 				$fields = ['forum', 'prv'];
 				$condition = ['id' => $target_item['contact-id']];
-				$contact = dba::selectFirst('contact', $fields, $condition);
+				$contact = DBA::selectFirst('contact', $fields, $condition);
 				if (!DBM::is_result($contact)) {
 					// Should never happen
 					return false;
@@ -343,14 +343,14 @@ class Notifier
 				logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent['author-id']." - Owner: ".$thr_parent['owner-id'], LOGGER_DEBUG);
 
 				// Send a salmon to the parent author
-				$probed_contact = dba::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['author-id']]);
+				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['author-id']]);
 				if (DBM::is_result($probed_contact) && !empty($probed_contact["notify"])) {
 					logger('Notify parent author '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 				}
 
 				// Send a salmon to the parent owner
-				$probed_contact = dba::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['owner-id']]);
+				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['owner-id']]);
 				if (DBM::is_result($probed_contact) && !empty($probed_contact["notify"])) {
 					logger('Notify parent owner '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
@@ -407,8 +407,8 @@ class Notifier
 			if (!empty($networks)) {
 				$condition['network'] = $networks;
 			}
-			$contacts = dba::select('contact', ['id', 'url', 'network'], $condition);
-			$r = dba::inArray($contacts);
+			$contacts = DBA::select('contact', ['id', 'url', 'network'], $condition);
+			$r = DBA::inArray($contacts);
 		}
 
 		// delivery loop
@@ -458,7 +458,7 @@ class Notifier
 
 			$condition = ['network' => NETWORK_DFRN, 'uid' => $owner['uid'], 'blocked' => false,
 				'pending' => false, 'archive' => false, 'rel' => [CONTACT_IS_FOLLOWER, CONTACT_IS_FRIEND]];
-			$r2 = dba::inArray(dba::select('contact', ['id', 'name', 'network'], $condition));
+			$r2 = DBA::inArray(DBA::select('contact', ['id', 'name', 'network'], $condition));
 
 			$r = array_merge($r2, $r1);
 

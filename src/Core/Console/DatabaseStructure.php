@@ -3,7 +3,7 @@
 namespace Friendica\Core\Console;
 
 use Friendica\Core;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use RuntimeException;
 
@@ -58,7 +58,7 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		if (!dba::connected()) {
+		if (!DBA::connected()) {
 			throw new RuntimeException('Unable to connect to database');
 		}
 

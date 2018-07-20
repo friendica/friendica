@@ -3,7 +3,7 @@
 namespace Friendica\Core\Console;
 
 use Friendica\Core\Protocol;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Network\Probe;
 use RuntimeException;
@@ -81,9 +81,9 @@ HELP;
 		}
 
 		$nurl = normalise_link($net['url']);
-		$contact = dba::selectFirst("contact", ["id"], ["nurl" => $nurl, "uid" => 0]);
+		$contact = DBA::selectFirst("contact", ["id"], ["nurl" => $nurl, "uid" => 0]);
 		if (DBM::is_result($contact)) {
-			dba::update("contact", ["hidden" => true], ["id" => $contact["id"]]);
+			DBA::update("contact", ["hidden" => true], ["id" => $contact["id"]]);
 			$this->out('NOTICE: The account should be silenced from the global community page');
 		} else {
 			throw new RuntimeException('NOTICE: Could not find any entry for this URL (' . $nurl . ')');

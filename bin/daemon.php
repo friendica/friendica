@@ -10,7 +10,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 
 // Ensure that daemon.php is executed from the base path of the installation
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
@@ -114,7 +114,7 @@ if (!$foreground) {
 	// fclose(STDOUT); // file descriptors as we
 	// fclose(STDERR); // are running as a daemon.
 
-	dba::disconnect();
+	DBA::disconnect();
 
 	register_shutdown_function('shutdown');
 
@@ -155,7 +155,7 @@ while (true) {
 	if ($do_cron) {
 		// We force a reconnect of the database connection.
 		// This is done to ensure that the connection don't get lost over time.
-		dba::reconnect();
+		DBA::reconnect();
 
 		$last_cron = time();
 	}

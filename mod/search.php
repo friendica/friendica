@@ -10,7 +10,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Item;
 
@@ -69,11 +69,11 @@ function search_init(App $a) {
 				dbesc($search)
 			);
 			if (!DBM::is_result($r)) {
-				dba::insert('search', ['uid' => local_user(), 'term' => $search]);
+				DBA::insert('search', ['uid' => local_user(), 'term' => $search]);
 			}
 		}
 		if (x($_GET,'remove') && $search) {
-			dba::delete('search', ['uid' => local_user(), 'term' => $search]);
+			DBA::delete('search', ['uid' => local_user(), 'term' => $search]);
 		}
 
 		/// @todo Check if there is a case at all that "aside" is prefilled here
@@ -210,13 +210,13 @@ function search_content(App $a) {
 			local_user(), TERM_OBJ_POST, TERM_HASHTAG, $search];
 		$params = ['order' => ['created' => true],
 			'limit' => [$a->pager['start'], $a->pager['itemspage']]];
-		$terms = dba::select('term', ['oid'], $condition, $params);
+		$terms = DBA::select('term', ['oid'], $condition, $params);
 
 		$itemids = [];
-		while ($term = dba::fetch($terms)) {
+		while ($term = DBA::fetch($terms)) {
 			$itemids[] = $term['oid'];
 		}
-		dba::close($terms);
+		DBA::close($terms);
 
 		if (!empty($itemids)) {
 			$params = ['order' => ['id' => true]];

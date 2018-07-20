@@ -8,7 +8,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\PushSubscriber;
 use Friendica\Model\Queue as QueueModel;
@@ -36,7 +36,7 @@ class Queue
 			// Handling the pubsubhubbub requests
 			PushSubscriber::requeue();
 
-			$r = dba::inArray(dba::p("SELECT `id` FROM `queue` WHERE `next` < UTC_TIMESTAMP() ORDER BY `batch`, `cid`"));
+			$r = DBA::inArray(DBA::p("SELECT `id` FROM `queue` WHERE `next` < UTC_TIMESTAMP() ORDER BY `batch`, `cid`"));
 
 			Addon::callHooks('queue_predeliver', $r);
 
@@ -52,12 +52,12 @@ class Queue
 
 
 		// delivering
-		$q_item = dba::selectFirst('queue', [], ['id' => $queue_id]);
+		$q_item = DBA::selectFirst('queue', [], ['id' => $queue_id]);
 		if (!DBM::is_result($q_item)) {
 			return;
 		}
 
-		$contact = dba::selectFirst('contact', [], ['id' => $q_item['cid']]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $q_item['cid']]);
 		if (!DBM::is_result($contact)) {
 			QueueModel::removeItem($q_item['id']);
 			return;
@@ -97,7 +97,7 @@ class Queue
 			}
 		}
 
-		$user = dba::selectFirst('user', [], ['uid' => $contact['uid']]);
+		$user = DBA::selectFirst('user', [], ['uid' => $contact['uid']]);
 		if (!DBM::is_result($user)) {
 			QueueModel::removeItem($q_item['id']);
 			return;

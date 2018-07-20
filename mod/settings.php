@@ -14,7 +14,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -150,7 +150,7 @@ function settings_post(App $a)
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
 
 		$key = $_POST['remove'];
-		dba::delete('tokens', ['id' => $key, 'uid' => local_user()]);
+		DBA::delete('tokens', ['id' => $key, 'uid' => local_user()]);
 		goaway(System::baseUrl(true)."/settings/oauth/");
 		return;
 	}
@@ -241,12 +241,12 @@ function settings_post(App $a)
 					intval(local_user())
 				);
 				if (!DBM::is_result($r)) {
-					dba::insert('mailacct', ['uid' => local_user()]);
+					DBA::insert('mailacct', ['uid' => local_user()]);
 				}
 				if (strlen($mail_pass)) {
 					$pass = '';
 					openssl_public_encrypt($mail_pass, $pass, $a->user['pubkey']);
-					dba::update('mailacct', ['pass' => bin2hex($pass)], ['uid' => local_user()]);
+					DBA::update('mailacct', ['pass' => bin2hex($pass)], ['uid' => local_user()]);
 				}
 				$r = q("UPDATE `mailacct` SET `server` = '%s', `port` = %d, `ssltype` = '%s', `user` = '%s',
 					`action` = %d, `movetofolder` = '%s',
@@ -706,7 +706,7 @@ function settings_content(App $a)
 		if (($a->argc > 3) && ($a->argv[2] === 'delete')) {
 			check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth', 't');
 
-			dba::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
+			DBA::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
 			goaway(System::baseUrl(true)."/settings/oauth/");
 			return;
 		}
@@ -989,7 +989,7 @@ function settings_content(App $a)
 	 * ACCOUNT SETTINGS
 	 */
 
-	$profile = dba::selectFirst('profile', [], ['is-default' => true, 'uid' => local_user()]);
+	$profile = DBA::selectFirst('profile', [], ['is-default' => true, 'uid' => local_user()]);
 	if (!DBM::is_result($profile)) {
 		notice(L10n::t('Unable to find your profile. Please contact your admin.') . EOL);
 		return;

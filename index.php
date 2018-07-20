@@ -17,7 +17,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
@@ -94,7 +94,7 @@ if (!$a->is_backend()) {
  */
 if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
 	// we haven't loaded user data yet, but we need user language
-	$user = dba::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
+	$user = DBA::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 	$_SESSION['language'] = $lang;
 	if (DBM::is_result($user)) {
 		$_SESSION['language'] = $user['language'];

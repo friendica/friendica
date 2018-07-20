@@ -9,7 +9,7 @@ use Friendica\Content\Widget;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -83,7 +83,7 @@ function directory_content(App $a)
 	$publish = (Config::get('system', 'publish_all') ? '' : " AND `publish` = 1 " );
 
 
-	$cnt = dba::fetch_first("SELECT COUNT(*) AS `total` FROM `profile`
+	$cnt = DBA::fetch_first("SELECT COUNT(*) AS `total` FROM `profile`
 				LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `is-default` $publish AND NOT `user`.`blocked` AND NOT `user`.`account_removed` $sql_extra");
 	if (DBM::is_result($cnt)) {
@@ -94,7 +94,7 @@ function directory_content(App $a)
 
 	$limit = intval($a->pager['start'])."," . intval($a->pager['itemspage']);
 
-	$r = dba::p("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`, `user`.`timezone` , `user`.`page-flags`,
+	$r = DBA::p("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`, `user`.`timezone` , `user`.`page-flags`,
 			`contact`.`addr`, `contact`.`url` AS profile_url FROM `profile`
 			LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 			LEFT JOIN `contact` ON `contact`.`uid` = `user`.`uid`
@@ -108,7 +108,7 @@ function directory_content(App $a)
 			$photo = 'photo';
 		}
 
-		while ($rr = dba::fetch($r)) {
+		while ($rr = DBA::fetch($r)) {
 			$itemurl= '';
 
 			$itemurl = (($rr['addr'] != "") ? $rr['addr'] : $rr['profile_url']);
@@ -196,7 +196,7 @@ function directory_content(App $a)
 
 			$entries[] = $arr['entry'];
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		$tpl = get_markup_template('directory_header.tpl');
 

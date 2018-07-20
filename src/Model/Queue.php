@@ -5,7 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\Core\Config;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 
@@ -19,7 +19,7 @@ class Queue
 	public static function updateTime($id)
 	{
 		logger('queue: requeue item ' . $id);
-		$queue = dba::selectFirst('queue', ['retrial'], ['id' => $id]);
+		$queue = DBA::selectFirst('queue', ['retrial'], ['id' => $id]);
 		if (!DBM::is_result($queue)) {
 			return;
 		}
@@ -34,7 +34,7 @@ class Queue
 		$delay = (($retrial + 3) ** 4) + (rand(1, 30) * ($retrial + 1));
 		$next = DateTimeFormat::utc('now + ' . $delay . ' seconds');
 
-		dba::update('queue', ['last' => DateTimeFormat::utcNow(), 'retrial' => $retrial + 1, 'next' => $next], ['id' => $id]);
+		DBA::update('queue', ['last' => DateTimeFormat::utcNow(), 'retrial' => $retrial + 1, 'next' => $next], ['id' => $id]);
 	}
 
 	/**
@@ -43,7 +43,7 @@ class Queue
 	public static function removeItem($id)
 	{
 		logger('queue: remove queue item ' . $id);
-		dba::delete('queue', ['id' => $id]);
+		DBA::delete('queue', ['id' => $id]);
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Queue
 			}
 		}
 
-		dba::insert('queue', [
+		DBA::insert('queue', [
 			'cid'     => $cid,
 			'network' => $network,
 			'guid'     => $guid,

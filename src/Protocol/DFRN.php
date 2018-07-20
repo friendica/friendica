@@ -18,7 +18,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
@@ -952,7 +952,7 @@ class DFRN
 		$conversation_uri = $conversation_href;
 
 		if (isset($parent_item)) {
-			$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $item['parent-uri']]);
+			$conversation = DBA::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $item['parent-uri']]);
 			if (DBM::is_result($conversation)) {
 				if ($conversation['conversation-uri'] != '') {
 					$conversation_uri = $conversation['conversation-uri'];
@@ -1401,7 +1401,7 @@ class DFRN
 			if (empty($contact['addr'])) {
 				logger('Empty contact handle for ' . $contact['id'] . ' - ' . $contact['url'] . ' - trying to update it.');
 				if (Contact::updateFromProbe($contact['id'])) {
-					$new_contact = dba::selectFirst('contact', ['addr'], ['id' => $contact['id']]);
+					$new_contact = DBA::selectFirst('contact', ['addr'], ['id' => $contact['id']]);
 					$contact['addr'] = $new_contact['addr'];
 				}
 
@@ -1543,7 +1543,7 @@ class DFRN
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
 		$condition = ["`uid` = ? AND `nurl` = ? AND `network` != ?",
 			$importer["importer_uid"], normalise_link($author["link"]), NETWORK_STATUSNET];
-		$contact_old = dba::selectFirst('contact', $fields, $condition);
+		$contact_old = DBA::selectFirst('contact', $fields, $condition);
 
 		if (DBM::is_result($contact_old)) {
 			$author["contact-id"] = $contact_old["id"];
@@ -1855,7 +1855,7 @@ class DFRN
 		$msg["seen"] = 0;
 		$msg["replied"] = 0;
 
-		dba::insert('mail', $msg);
+		DBA::insert('mail', $msg);
 
 		// send notifications.
 		/// @TODO Arange this mess
@@ -2074,7 +2074,7 @@ class DFRN
 			'url' => $relocate["url"], 'nurl' => normalise_link($relocate["url"]),
 			'addr' => $relocate["addr"], 'connect' => $relocate["addr"],
 			'notify' => $relocate["notify"], 'server_url' => $relocate["server_url"]];
-		dba::update('gcontact', $fields, ['nurl' => normalise_link($old["url"])]);
+		DBA::update('gcontact', $fields, ['nurl' => normalise_link($old["url"])]);
 
 		// Update the contact table. We try to find every entry.
 		$fields = ['name' => $relocate["name"], 'avatar' => $relocate["avatar"],
@@ -2084,7 +2084,7 @@ class DFRN
 			'poll' => $relocate["poll"], 'site-pubkey' => $relocate["sitepubkey"]];
 		$condition = ["(`id` = ?) OR (`nurl` = ?)", $importer["id"], normalise_link($old["url"])];
 
-		dba::update('contact', $fields, $condition);
+		DBA::update('contact', $fields, $condition);
 
 		Contact::updateAvatar($relocate["avatar"], $importer["importer_uid"], $importer["id"], true);
 
@@ -2228,7 +2228,7 @@ class DFRN
 			}
 
 			if ($Blink && link_compare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
-				$author = dba::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
+				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
 				// send a notification
 				notification(
@@ -2851,16 +2851,16 @@ class DFRN
 			$accounttype = intval(XML::getFirstNodeValue($xpath, "/atom:feed/dfrn:account_type/text()"));
 
 			if ($accounttype != $importer["contact-type"]) {
-				dba::update('contact', ['contact-type' => $accounttype], ['id' => $importer["id"]]);
+				DBA::update('contact', ['contact-type' => $accounttype], ['id' => $importer["id"]]);
 			}
 			// A forum contact can either have set "forum" or "prv" - but not both
 			if (($accounttype == ACCOUNT_TYPE_COMMUNITY) && (($forum != $importer["forum"]) || ($forum == $importer["prv"]))) {
 				$condition = ['(`forum` != ? OR `prv` != ?) AND `id` = ?', $forum, !$forum, $importer["id"]];
-				dba::update('contact', ['forum' => $forum, 'prv' => !$forum], $condition);
+				DBA::update('contact', ['forum' => $forum, 'prv' => !$forum], $condition);
 			}
 		} elseif ($forum != $importer["forum"]) { // Deprecated since 3.5.1
 			$condition = ['`forum` != ? AND `id` = ?', $forum, $importer["id"]];
-			dba::update('contact', ['forum' => $forum], $condition);
+			DBA::update('contact', ['forum' => $forum], $condition);
 		}
 
 
@@ -2988,7 +2988,7 @@ class DFRN
 
 			$sec = random_string();
 
-			dba::insert('profile_check', ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id, 'sec' => $sec, 'expire' => time() + 45]);
+			DBA::insert('profile_check', ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id, 'sec' => $sec, 'expire' => time() + 45]);
 
 			$url = curPageURL();
 

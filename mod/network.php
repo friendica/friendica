@@ -15,7 +15,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -41,13 +41,13 @@ function network_init(App $a)
 	}
 
 	if (x($_GET, 'save')) {
-		$exists = dba::exists('search', ['uid' => local_user(), 'term' => $search]);
+		$exists = DBA::exists('search', ['uid' => local_user(), 'term' => $search]);
 		if (!$exists) {
-			dba::insert('search', ['uid' => local_user(), 'term' => $search]);
+			DBA::insert('search', ['uid' => local_user(), 'term' => $search]);
 		}
 	}
 	if (x($_GET, 'remove')) {
-		dba::delete('search', ['uid' => local_user(), 'term' => $search]);
+		DBA::delete('search', ['uid' => local_user(), 'term' => $search]);
 	}
 
 	$is_a_date_query = false;
@@ -182,10 +182,10 @@ function saved_searches($search)
 
 	$o = '';
 
-	$terms = dba::select('search', ['id', 'term'], ['uid' => local_user()]);
+	$terms = DBA::select('search', ['id', 'term'], ['uid' => local_user()]);
 	$saved = [];
 
-	while ($rr = dba::fetch($terms)) {
+	while ($rr = DBA::fetch($terms)) {
 		$saved[] = [
 			'id'          => $rr['id'],
 			'term'        => $rr['term'],
@@ -317,7 +317,7 @@ function networkSetSeen($condition)
 		return;
 	}
 
-	$unseen = dba::exists('item', $condition);
+	$unseen = DBA::exists('item', $condition);
 
 	if ($unseen) {
 		$r = Item::update(['unseen' => false], $condition);
@@ -442,13 +442,13 @@ function networkFlatView(App $a, $update = 0)
 		$condition = ["`term` = ? AND `otype` = ? AND `type` = ? AND `uid` = ?",
 			$file, TERM_OBJ_POST, TERM_FILE, local_user()];
 		$params = ['order' => ['tid' => true], 'limit' => [$a->pager['start'], $a->pager['itemspage']]];
-		$result = dba::select('term', ['oid'], $condition);
+		$result = DBA::select('term', ['oid'], $condition);
 
 		$posts = [];
-		while ($term = dba::fetch($result)) {
+		while ($term = DBA::fetch($result)) {
 			$posts[] = $term['oid'];
 		}
-		dba::close($terms);
+		DBA::close($terms);
 
 		$condition = ['uid' => local_user(), 'id' => $posts];
 	} else {
@@ -525,10 +525,10 @@ function networkThreadedView(App $a, $update, $parent)
 	}
 
 	if ($nets) {
-		$r = dba::select('contact', ['id'], ['uid' => local_user(), 'network' => $nets], ['self' => false]);
+		$r = DBA::select('contact', ['id'], ['uid' => local_user(), 'network' => $nets], ['self' => false]);
 
 		$str = '';
-		while ($rr = dba::fetch($r)) {
+		while ($rr = DBA::fetch($r)) {
 			$str .= '<' . $rr['id'] . '>';
 		}
 		if (strlen($str)) {
@@ -556,7 +556,7 @@ function networkThreadedView(App $a, $update, $parent)
 		if ($cid) {
 			// If $cid belongs to a communitity forum or a privat goup,.add a mention to the status editor
 			$condition = ["`id` = ? AND (`forum` OR `prv`)", $cid];
-			$contact = dba::selectFirst('contact', ['addr', 'nick'], $condition);
+			$contact = DBA::selectFirst('contact', ['addr', 'nick'], $condition);
 			if (DBM::is_result($contact)) {
 				if ($contact['addr'] != '') {
 					$content = '!' . $contact['addr'];
@@ -609,7 +609,7 @@ function networkThreadedView(App $a, $update, $parent)
 	$sql_tag_nets = (($nets) ? sprintf(" AND `item`.`network` = '%s' ", dbesc($nets)) : '');
 
 	if ($gid) {
-		$group = dba::selectFirst('group', ['name'], ['id' => $gid, 'uid' => local_user()]);
+		$group = DBA::selectFirst('group', ['name'], ['id' => $gid, 'uid' => local_user()]);
 		if (!DBM::is_result($group)) {
 			if ($update) {
 				killme();
@@ -625,7 +625,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$contact_str_self = '';
 
 			$contact_str = implode(',', $contacts);
-			$self = dba::selectFirst('contact', ['id'], ['uid' => local_user(), 'self' => true]);
+			$self = DBA::selectFirst('contact', ['id'], ['uid' => local_user(), 'self' => true]);
 			if (DBM::is_result($self)) {
 				$contact_str_self = $self['id'];
 			}
@@ -645,7 +645,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$fields = ['id', 'name', 'network', 'writable', 'nurl',
 			'forum', 'prv', 'contact-type', 'addr', 'thumb', 'location'];
 		$condition = ["`id` = ? AND (NOT `blocked` OR `pending`)", $cid];
-		$contact = dba::selectFirst('contact', $fields, $condition);
+		$contact = DBA::selectFirst('contact', $fields, $condition);
 		if (DBM::is_result($contact)) {
 			$sql_extra = " AND " . $sql_table . ".`contact-id` = " . intval($cid);
 
@@ -835,7 +835,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$top_limit = DateTimeFormat::utcNow();
 		}
 
-		$items = dba::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date`, `author`.`url` AS `author-link` FROM `item`
+		$items = DBA::p("SELECT `item`.`parent-uri` AS `uri`, 0 AS `item_id`, `item`.$ordering AS `order_date`, `author`.`url` AS `author-link` FROM `item`
 			STRAIGHT_JOIN (SELECT `oid` FROM `term` WHERE `term` IN
 				(SELECT SUBSTR(`term`, 2) FROM `search` WHERE `uid` = ? AND `term` LIKE '#%') AND `otype` = ? AND `type` = ? AND `uid` = 0) AS `term`
 			ON `item`.`id` = `term`.`oid`
@@ -845,7 +845,7 @@ function networkThreadedView(App $a, $update, $parent)
 			local_user(), TERM_OBJ_POST, TERM_HASHTAG,
 			$top_limit, $bottom_limit);
 
-		$data = dba::inArray($items);
+		$data = DBA::inArray($items);
 
 		if (count($data) > 0) {
 			$tag_top_limit = current($data)['order_date'];
@@ -862,7 +862,7 @@ function networkThreadedView(App $a, $update, $parent)
 				// Don't show hash tag posts from blocked or ignored contacts
 				$condition = ["`nurl` = ? AND `uid` = ? AND (`blocked` OR `readonly`)",
 					normalise_link($item['author-link']), local_user()];
-				if (!dba::exists('contact', $condition)) {
+				if (!DBA::exists('contact', $condition)) {
 					$s[$item['uri']] = $item;
 				}
 			}

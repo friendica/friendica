@@ -5,7 +5,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
@@ -44,7 +44,7 @@ class Magic extends BaseModule
 			goaway($dest);
 		}
 
-		$contact = dba::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
+		$contact = DBA::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
 
 		// Redirect if the contact is already authenticated on this site.
 		if (!empty($a->contact) && array_key_exists('id', $a->contact) && strpos($contact['nurl'], normalise_link(self::getApp()->get_baseurl())) !== false) {

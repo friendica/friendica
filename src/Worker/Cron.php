@@ -8,7 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 
@@ -102,11 +102,11 @@ class Cron
 		if (Config::get('system', 'last_cron_hourly', 0) + 3600 < time()) {
 
 			// Delete all done workerqueue entries
-			dba::delete('workerqueue', ['`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 1 HOUR']);
+			DBA::delete('workerqueue', ['`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 1 HOUR']);
 
 			// Optimizing this table only last seconds
 			if (Config::get('system', 'optimize_workerqueue', false)) {
-				dba::e("OPTIMIZE TABLE `workerqueue`");
+				DBA::e("OPTIMIZE TABLE `workerqueue`");
 			}
 
 			Config::set('system', 'last_cron_hourly', time());

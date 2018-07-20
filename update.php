@@ -5,7 +5,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -152,16 +152,16 @@ function update_1203() {
 
 function update_1244() {
 	// Sets legacy_password for all legacy hashes
-	dba::update('user', ['legacy_password' => true], ['SUBSTR(password, 1, 4) != "$2y$"']);
+	DBA::update('user', ['legacy_password' => true], ['SUBSTR(password, 1, 4) != "$2y$"']);
 
 	// All legacy hashes are re-hashed using the new secure hashing function
-	$stmt = dba::select('user', ['uid', 'password'], ['legacy_password' => true]);
-	while($user = dba::fetch($stmt)) {
-		dba::update('user', ['password' => User::hashPassword($user['password'])], ['uid' => $user['uid']]);
+	$stmt = DBA::select('user', ['uid', 'password'], ['legacy_password' => true]);
+	while($user = DBA::fetch($stmt)) {
+		DBA::update('user', ['password' => User::hashPassword($user['password'])], ['uid' => $user['uid']]);
 	}
 
 	// Logged in users are forcibly logged out
-	dba::delete('session', ['1 = 1']);
+	DBA::delete('session', ['1 = 1']);
 
 	return UPDATE_SUCCESS;
 }
@@ -180,7 +180,7 @@ function update_1245() {
 
 function update_1247() {
 	// Removing hooks with the old name
-	dba::e("DELETE FROM `hook`
+	DBA::e("DELETE FROM `hook`
 WHERE `hook` LIKE 'plugin_%'");
 
 	// Make sure we install the new renamed ones
@@ -191,9 +191,9 @@ function update_1260() {
 	Config::set('system', 'maintenance', 1);
 	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating author-id and owner-id in item and thread table. ', DBM::date().' '.date('e')));
 
-	$items = dba::p("SELECT `id`, `owner-link`, `owner-name`, `owner-avatar`, `network` FROM `item`
+	$items = DBA::p("SELECT `id`, `owner-link`, `owner-name`, `owner-avatar`, `network` FROM `item`
 		WHERE `owner-id` = 0 AND `owner-link` != ''");
-	while ($item = dba::fetch($items)) {
+	while ($item = DBA::fetch($items)) {
 		$contact = ['url' => $item['owner-link'], 'name' => $item['owner-name'],
 			'photo' => $item['owner-avatar'], 'network' => $item['network']];
 		$cid = Contact::getIdForURL($item['owner-link'], 0, false, $contact);
@@ -202,14 +202,14 @@ function update_1260() {
 		}
 		Item::update(['owner-id' => $cid], ['id' => $item['id']]);
 	}
-	dba::close($items);
+	DBA::close($items);
 
-	dba::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
+	DBA::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
 		SET `thread`.`owner-id` = `item`.`owner-id` WHERE `thread`.`owner-id` = 0");
 
-	$items = dba::p("SELECT `id`, `author-link`, `author-name`, `author-avatar`, `network` FROM `item`
+	$items = DBA::p("SELECT `id`, `author-link`, `author-name`, `author-avatar`, `network` FROM `item`
 		WHERE `author-id` = 0 AND `author-link` != ''");
-	while ($item = dba::fetch($items)) {
+	while ($item = DBA::fetch($items)) {
 		$contact = ['url' => $item['author-link'], 'name' => $item['author-name'],
 			'photo' => $item['author-avatar'], 'network' => $item['network']];
 		$cid = Contact::getIdForURL($item['author-link'], 0, false, $contact);
@@ -218,9 +218,9 @@ function update_1260() {
 		}
 		Item::update(['author-id' => $cid], ['id' => $item['id']]);
 	}
-	dba::close($items);
+	DBA::close($items);
 
-	dba::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
+	DBA::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
 		SET `thread`.`author-id` = `item`.`author-id` WHERE `thread`.`author-id` = 0");
 
 	Config::set('system', 'maintenance', 0);
@@ -229,7 +229,7 @@ function update_1260() {
 
 function update_1261() {
 	// This fixes the results of an issue in the develop branch of 2018-05.
-	dba::update('contact', ['blocked' => false, 'pending' => false], ['uid' => 0, 'blocked' => true, 'pending' => true]);
+	DBA::update('contact', ['blocked' => false, 'pending' => false], ['uid' => 0, 'blocked' => true, 'pending' => true]);
 	return UPDATE_SUCCESS;
 }
 

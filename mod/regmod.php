@@ -8,7 +8,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 use Friendica\Module\Login;
@@ -89,8 +89,8 @@ function user_deny($hash)
 		intval($register[0]['uid'])
 	);
 
-	dba::delete('user', ['uid' => $register[0]['uid']]);
-	dba::delete('register', ['hash' => $register[0]['hash']]);
+	DBA::delete('user', ['uid' => $register[0]['uid']]);
+	DBA::delete('register', ['hash' => $register[0]['hash']]);
 
 	notice(L10n::t('Registration revoked for %s', $user[0]['username']) . EOL);
 	return true;

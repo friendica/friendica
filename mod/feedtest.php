@@ -6,7 +6,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Protocol\Feed;
 use Friendica\Util\Network;
@@ -26,11 +26,11 @@ function feedtest_content(App $a)
 	if (!empty($_REQUEST['url'])) {
 		$url = $_REQUEST['url'];
 
-		$importer = dba::selectFirst('user', [], ['uid' => local_user()]);
+		$importer = DBA::selectFirst('user', [], ['uid' => local_user()]);
 
 		$contact_id = Contact::getIdForURL($url, local_user(), true);
 
-		$contact = dba::selectFirst('contact', [], ['id' => $contact_id]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 
 		$ret = Network::curl($contact['poll']);
 		$xml = $ret['body'];

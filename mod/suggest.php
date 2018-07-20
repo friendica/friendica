@@ -8,7 +8,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -46,7 +46,7 @@ function suggest_init(App $a) {
 		}
 		// Now check how the user responded to the confirmation query
 		if (!$_REQUEST['canceled']) {
-			dba::insert('gcign', ['uid' => local_user(), 'gcid' => $_GET['ignore']]);
+			DBA::insert('gcign', ['uid' => local_user(), 'gcid' => $_GET['ignore']]);
 		}
 	}
 

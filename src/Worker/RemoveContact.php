@@ -5,7 +5,7 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 
 require_once 'include/dba.php';
 
@@ -13,12 +13,12 @@ class RemoveContact {
 	public static function execute($id) {
 
 		// Only delete if the contact doesn't exist (anymore)
-		$r = dba::exists('contact', ['id' => $id]);
+		$r = DBA::exists('contact', ['id' => $id]);
 		if ($r) {
 			return;
 		}
 
 		// Now we delete all the depending table entries
-		dba::delete('contact', ['id' => $id]);
+		DBA::delete('contact', ['id' => $id]);
 	}
 }

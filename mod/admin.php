@@ -14,7 +14,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
@@ -472,14 +472,14 @@ function admin_page_contactblock(App $a)
 {
 	$condition = ['uid' => 0, 'blocked' => true];
 
-	$total = dba::count('contact', $condition);
+	$total = DBA::count('contact', $condition);
 
 	$a->set_pager_total($total);
 	$a->set_pager_itemspage(30);
 
-	$statement = dba::select('contact', [], $condition, ['limit' => [$a->pager['start'], $a->pager['itemspage']]]);
+	$statement = DBA::select('contact', [], $condition, ['limit' => [$a->pager['start'], $a->pager['itemspage']]]);
 
-	$contacts = dba::inArray($statement);
+	$contacts = DBA::inArray($statement);
 
 	$t = get_markup_template('admin/contactblock.tpl');
 	$o = replace_macros($t, [
@@ -781,8 +781,8 @@ function admin_page_queue(App $a)
 function admin_page_workerqueue(App $a)
 {
 	// get jobs from the workerqueue table
-	$statement = dba::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
-	$r = dba::inArray($statement);
+	$statement = DBA::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
+	$r = DBA::inArray($statement);
 
 	for($i = 0; $i < count($r); $i++) {
 		$r[$i]['parameter'] = stripslashes(implode(': ', explode('","', $r[$i]['parameter'])));
@@ -817,7 +817,7 @@ function admin_page_workerqueue(App $a)
 function admin_page_summary(App $a)
 {
 	// are there MyISAM tables in the DB? If so, trigger a warning message
-	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1", dbesc(dba::database_name()));
+	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1", dbesc(DBA::database_name()));
 	$showwarning = false;
 	$warningtext = [];
 	if (DBM::is_result($r)) {
@@ -963,7 +963,7 @@ function admin_page_site_post(App $a)
 			$r = q("UPDATE %s SET %s;", $table_name, $upds);
 
 			if (!DBM::is_result($r)) {
-				notice("Failed updating '$table_name': " . dba::errorMessage());
+				notice("Failed updating '$table_name': " . DBA::errorMessage());
 				goaway('admin/site');
 			}
 		}
@@ -1731,7 +1731,7 @@ function admin_page_users(App $a)
 {
 	if ($a->argc > 2) {
 		$uid = $a->argv[3];
-		$user = dba::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
+		$user = DBA::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
 		if (!DBM::is_result($user)) {
 			notice('User not found' . EOL);
 			goaway('admin/users');

@@ -36,7 +36,7 @@ namespace Friendica\Util;
 
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 
@@ -71,7 +71,7 @@ class ExAuth
 	{
 		while (!feof(STDIN)) {
 			// Quit if the database connection went down
-			if (!dba::connected()) {
+			if (!DBA::connected()) {
 				$this->writeLog(LOG_ERR, 'the database connection went down');
 				return;
 			}
@@ -144,7 +144,7 @@ class ExAuth
 		// Does the hostname match? So we try directly
 		if ($a->get_hostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal user check for ' . $sUser . '@' . $aCommand[2]);
-			$found = dba::exists('user', ['nickname' => $sUser]);
+			$found = DBA::exists('user', ['nickname' => $sUser]);
 		} else {
 			$found = false;
 		}
@@ -225,7 +225,7 @@ class ExAuth
 		if ($a->get_hostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
-			$aUser = dba::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);
+			$aUser = DBA::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);
 			if (DBM::is_result($aUser)) {
 				$uid = $aUser['uid'];
 				$success = User::authenticate($aUser, $aCommand[3]);

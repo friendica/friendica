@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -38,14 +38,14 @@ function common_content(App $a)
 	}
 
 	if ($cmd === 'loc' && $cid) {
-		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
 
 		if (DBM::is_result($contact)) {
 			$a->page['aside'] = "";
 			Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 		}
 	} else {
-		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
 
 		if (DBM::is_result($contact)) {
 			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"), [
@@ -66,11 +66,11 @@ function common_content(App $a)
 	}
 
 	if (!$cid && Profile::getMyURL()) {
-		$contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['id'], ['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $uid]);
 		if (DBM::is_result($contact)) {
 			$cid = $contact['id'];
 		} else {
-			$gcontact = dba::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
+			$gcontact = DBA::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
 			if (DBM::is_result($gcontact)) {
 				$zcid = $gcontact['id'];
 			}

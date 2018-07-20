@@ -3,7 +3,7 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Lock\DatabaseLockDriver;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 
 class DatabaseLockDriverTest extends LockTest
 {
@@ -14,7 +14,7 @@ class DatabaseLockDriverTest extends LockTest
 
 	public function tearDown()
 	{
-		dba::delete('locks', [ 'id > 0']);
+		DBA::delete('locks', [ 'id > 0']);
 		parent::tearDown();
 	}
 }

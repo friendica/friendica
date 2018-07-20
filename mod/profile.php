@@ -12,7 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
@@ -347,7 +347,7 @@ function profile_content(App $a, $update = 0)
 
 
 	if ($is_owner) {
-		$unseen = dba::exists('item', ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+		$unseen = DBA::exists('item', ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		if ($unseen) {
 			$r = Item::update(['unseen' => false],
 					['wall' => true, 'unseen' => true, 'uid' => local_user()]);

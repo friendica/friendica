@@ -13,7 +13,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -78,7 +78,7 @@ class OStatus
 			$condition = ["`uid` = ? AND `alias` = ? AND `network` != ? AND `rel` IN (?, ?)",
 					$importer["uid"], $aliaslink, NETWORK_STATUSNET,
 					CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
-			$contact = dba::selectFirst('contact', [], $condition);
+			$contact = DBA::selectFirst('contact', [], $condition);
 		}
 
 		if (!DBM::is_result($contact) && $author["author-link"] != '') {
@@ -89,14 +89,14 @@ class OStatus
 			$condition = ["`uid` = ? AND `nurl` IN (?, ?) AND `network` != ? AND `rel` IN (?, ?)",
 					$importer["uid"], normalise_link($author["author-link"]), normalise_link($aliaslink),
 					NETWORK_STATUSNET, CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
-			$contact = dba::selectFirst('contact', [], $condition);
+			$contact = DBA::selectFirst('contact', [], $condition);
 		}
 
 		if (!DBM::is_result($contact) && ($addr != '')) {
 			$condition = ["`uid` = ? AND `addr` = ? AND `network` != ? AND `rel` IN (?, ?)",
 					$importer["uid"], $addr, NETWORK_STATUSNET,
 					CONTACT_IS_SHARING, CONTACT_IS_FRIEND];
-			$contact = dba::selectFirst('contact', [], $condition);
+			$contact = DBA::selectFirst('contact', [], $condition);
 		}
 
 		if (DBM::is_result($contact)) {
@@ -182,7 +182,7 @@ class OStatus
 
 			$contact['name-date'] = DateTimeFormat::utcNow();
 
-			dba::update('contact', $contact, ['id' => $contact["id"]], $current);
+			DBA::update('contact', $contact, ['id' => $contact["id"]], $current);
 
 			if (!empty($author["author-avatar"]) && ($author["author-avatar"] != $current['avatar'])) {
 				logger("Update profile picture for contact ".$contact["id"], LOGGER_DEBUG);
@@ -194,7 +194,7 @@ class OStatus
 
 			if ($cid) {
 				$fields = ['url', 'nurl', 'name', 'nick', 'alias', 'about', 'location'];
-				$old_contact = dba::selectFirst('contact', $fields, ['id' => $cid]);
+				$old_contact = DBA::selectFirst('contact', $fields, ['id' => $cid]);
 
 				// Update it with the current values
 				$fields = ['url' => $author["author-link"], 'name' => $contact["name"],
@@ -203,7 +203,7 @@ class OStatus
 						'about' => $contact["about"], 'location' => $contact["location"],
 						'success_update' => DateTimeFormat::utcNow(), 'last-update' => DateTimeFormat::utcNow()];
 
-				dba::update('contact', $fields, ['id' => $cid], $old_contact);
+				DBA::update('contact', $fields, ['id' => $cid], $old_contact);
 
 				// Update the avatar
 				if (!empty($author["author-avatar"])) {
@@ -834,9 +834,9 @@ class OStatus
 			$conv_data['source'] = $doc2->saveXML();
 
 			$condition = ['item-uri' => $conv_data['uri'],'protocol' => PROTOCOL_OSTATUS_FEED];
-			if (dba::exists('conversation', $condition)) {
+			if (DBA::exists('conversation', $condition)) {
 				logger('Delete deprecated entry for URI '.$conv_data['uri'], LOGGER_DEBUG);
-				dba::delete('conversation', ['item-uri' => $conv_data['uri']]);
+				DBA::delete('conversation', ['item-uri' => $conv_data['uri']]);
 			}
 
 			logger('Store conversation data for uri '.$conv_data['uri'], LOGGER_DEBUG);
@@ -858,7 +858,7 @@ class OStatus
 	private static function fetchSelf($self, &$item)
 	{
 		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $self, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
-		if (dba::exists('conversation', $condition)) {
+		if (DBA::exists('conversation', $condition)) {
 			logger('Conversation '.$item['uri'].' is already stored.', LOGGER_DEBUG);
 			return;
 		}
@@ -893,7 +893,7 @@ class OStatus
 	private static function fetchRelated($related, $related_uri, $importer)
 	{
 		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $related_uri, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
-		$conversation = dba::selectFirst('conversation', ['source', 'protocol'], $condition);
+		$conversation = DBA::selectFirst('conversation', ['source', 'protocol'], $condition);
 		if (DBM::is_result($conversation)) {
 			$stored = true;
 			$xml = $conversation['source'];
@@ -903,7 +903,7 @@ class OStatus
 			}
 			if ($conversation['protocol'] == PROTOCOL_OSTATUS_SALMON) {
 				logger('Delete invalid cached XML for URI '.$related_uri, LOGGER_DEBUG);
-				dba::delete('conversation', ['item-uri' => $related_uri]);
+				DBA::delete('conversation', ['item-uri' => $related_uri]);
 			}
 		}
 
@@ -973,7 +973,7 @@ class OStatus
 		// Finally we take the data that we fetched from "ostatus:conversation"
 		if ($xml == '') {
 			$condition = ['item-uri' => $related_uri, 'protocol' => PROTOCOL_SPLITTED_CONV];
-			$conversation = dba::selectFirst('conversation', ['source'], $condition);
+			$conversation = DBA::selectFirst('conversation', ['source'], $condition);
 			if (DBM::is_result($conversation)) {
 				$stored = true;
 				logger('Got cached XML from conversation for URI '.$related_uri, LOGGER_DEBUG);
@@ -1300,7 +1300,7 @@ class OStatus
 		if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
 			$condition = ['uid' => $owner['uid'], 'self' => false, 'pending' => false,
 					'archive' => false, 'hidden' => false, 'blocked' => false];
-			$members = dba::count('contact', $condition);
+			$members = DBA::count('contact', $condition);
 			XML::addElement($doc, $root, "statusnet:group_info", "", ["member_count" => $members]);
 		}
 
@@ -1401,7 +1401,7 @@ class OStatus
 	 */
 	private static function addAuthor($doc, $owner, $show_profile = true)
 	{
-		$profile = dba::selectFirst('profile', ['homepage', 'publish'], ['uid' => $owner['uid'], 'is-default' => true]);
+		$profile = DBA::selectFirst('profile', ['homepage', 'publish'], ['uid' => $owner['uid'], 'is-default' => true]);
 		$author = $doc->createElement("author");
 		XML::addElement($doc, $author, "id", $owner["url"]);
 		if ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY) {
@@ -1981,7 +1981,7 @@ class OStatus
 			$conversation_uri = $conversation_href;
 
 			if (isset($parent_item)) {
-				$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $parent_item]);
+				$conversation = DBA::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $parent_item]);
 				if (DBM::is_result($conversation)) {
 					if ($conversation['conversation-uri'] != '') {
 						$conversation_uri = $conversation['conversation-uri'];
@@ -2022,7 +2022,7 @@ class OStatus
 
 		foreach ($mentioned as $mention) {
 			$condition = ['uid' => $owner['uid'], 'nurl' => normalise_link($mention)];
-			$contact = dba::selectFirst('contact', ['forum', 'prv', 'self', 'contact-type'], $condition);
+			$contact = DBA::selectFirst('contact', ['forum', 'prv', 'self', 'contact-type'], $condition);
 			if ($contact["forum"] || $contact["prv"] || ($owner['contact-type'] == ACCOUNT_TYPE_COMMUNITY) ||
 				($contact['self'] && ($owner['account-type'] == ACCOUNT_TYPE_COMMUNITY))) {
 				XML::addElement($doc, $entry, "link", "",

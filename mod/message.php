@@ -10,7 +10,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
@@ -150,7 +150,7 @@ function message_content(App $a)
 
 		$cmd = $a->argv[1];
 		if ($cmd === 'drop') {
-			if (dba::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
+			if (DBA::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
 				info(L10n::t('Message deleted.') . EOL);
 			}
 
@@ -165,7 +165,7 @@ function message_content(App $a)
 				$parent = $r[0]['parent-uri'];
 				$convid = $r[0]['convid'];
 
-				if (dba::delete('mail', ['parent-uri' => $parent, 'uid' => local_user()])) {
+				if (DBA::delete('mail', ['parent-uri' => $parent, 'uid' => local_user()])) {
 					info(L10n::t('Conversation removed.') . EOL);
 				}
 			}

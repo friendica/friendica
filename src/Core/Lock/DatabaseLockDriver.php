@@ -3,7 +3,7 @@
 namespace Friendica\Core\Lock;
 
 use Friendica\Core\Cache;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 
@@ -21,8 +21,8 @@ class DatabaseLockDriver extends AbstractLockDriver
 		$start = time();
 
 		do {
-			dba::lock('locks');
-			$lock = dba::selectFirst('locks', ['locked', 'pid'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
+			DBA::lock('locks');
+			$lock = DBA::selectFirst('locks', ['locked', 'pid'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
 
 			if (DBM::is_result($lock)) {
 				if ($lock['locked']) {
@@ -32,16 +32,16 @@ class DatabaseLockDriver extends AbstractLockDriver
 					}
 				}
 				if (!$lock['locked']) {
-					dba::update('locks', ['locked' => true, 'pid' => getmypid(), 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')], ['name' => $key]);
+					DBA::update('locks', ['locked' => true, 'pid' => getmypid(), 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')], ['name' => $key]);
 					$got_lock = true;
 				}
 			} else {
-				dba::insert('locks', ['name' => $key, 'locked' => true, 'pid' => getmypid(), 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')]);
+				DBA::insert('locks', ['name' => $key, 'locked' => true, 'pid' => getmypid(), 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')]);
 				$got_lock = true;
 				$this->markAcquire($key);
 			}
 
-			dba::unlock();
+			DBA::unlock();
 
 			if (!$got_lock && ($timeout > 0)) {
 				usleep(rand(100000, 2000000));
@@ -56,7 +56,7 @@ class DatabaseLockDriver extends AbstractLockDriver
 	 */
 	public function releaseLock($key)
 	{
-		dba::delete('locks', ['name' => $key, 'pid' => getmypid()]);
+		DBA::delete('locks', ['name' => $key, 'pid' => getmypid()]);
 
 		$this->markRelease($key);
 
@@ -68,7 +68,7 @@ class DatabaseLockDriver extends AbstractLockDriver
 	 */
 	public function releaseAll()
 	{
-		dba::delete('locks', ['pid' => getmypid()]);
+		DBA::delete('locks', ['pid' => getmypid()]);
 
 		$this->acquiredLocks = [];
 	}
@@ -78,7 +78,7 @@ class DatabaseLockDriver extends AbstractLockDriver
 	 */
 	public function isLocked($key)
 	{
-		$lock = dba::selectFirst('locks', ['locked'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
+		$lock = DBA::selectFirst('locks', ['locked'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
 
 		if (DBM::is_result($lock)) {
 			return $lock['locked'] !== false;

@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -30,7 +30,7 @@ function unfollow_post(App $a)
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
 			$uid, CONTACT_IS_FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
-	$contact = dba::selectFirst('contact', [], $condition);
+	$contact = DBA::selectFirst('contact', [], $condition);
 
 	if (!DBM::is_result($contact)) {
 		notice(L10n::t("Contact wasn't found or can't be unfollowed."));
@@ -44,7 +44,7 @@ function unfollow_post(App $a)
 				Contact::terminateFriendship($r[0], $contact);
 			}
 		}
-		dba::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
+		DBA::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
 
 		info(L10n::t('Contact unfollowed').EOL);
 		goaway(System::baseUrl().'/contacts/'.$contact['id']);
@@ -69,7 +69,7 @@ function unfollow_content(App $a)
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
 			local_user(), CONTACT_IS_FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
-	$contact = dba::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
+	$contact = DBA::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 
 	if (!DBM::is_result($contact)) {
 		notice(L10n::t("You aren't a friend of this contact.").EOL);

@@ -5,7 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -111,8 +111,8 @@ class L10n extends BaseObject
 
 		$a->strings = [];
 		// load enabled addons strings
-		$addons = dba::select('addon', ['name'], ['installed' => true]);
-		while ($p = dba::fetch($addons)) {
+		$addons = DBA::select('addon', ['name'], ['installed' => true]);
+		while ($p = DBA::fetch($addons)) {
 			$name = $p['name'];
 			if (file_exists("addon/$name/lang/$lang/strings.php")) {
 				include "addon/$name/lang/$lang/strings.php";

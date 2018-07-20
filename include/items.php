@@ -9,7 +9,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Item;
 use Friendica\Protocol\DFRN;
@@ -304,7 +304,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 	logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
 
 	if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
-		dba::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
+		DBA::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
 	}
 
 	Network::post($url, $params);

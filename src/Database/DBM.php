@@ -64,7 +64,7 @@ class DBM
 		}
 
 		if (is_object($array)) {
-			return dba::num_rows($array) > 0;
+			return DBA::num_rows($array) > 0;
 		}
 
 		return (is_array($array) && (count($array) > 0));

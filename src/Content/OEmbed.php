@@ -15,7 +15,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -63,7 +63,7 @@ class OEmbed
 		$a = get_app();
 
 		$condition = ['url' => normalise_link($embedurl), 'maxwidth' => $a->videowidth];
-		$oembed = dba::selectFirst('oembed', ['content'], $condition);
+		$oembed = DBA::selectFirst('oembed', ['content'], $condition);
 		if (DBM::is_result($oembed)) {
 			$txt = $oembed["content"];
 		} else {
@@ -110,7 +110,7 @@ class OEmbed
 			} else { //save in cache
 				$j = json_decode($txt);
 				if (!empty($j->type) && $j->type != "error") {
-					dba::insert('oembed', [
+					DBA::insert('oembed', [
 						'url' => normalise_link($embedurl),
 						'maxwidth' => $a->videowidth,
 						'content' => $txt,

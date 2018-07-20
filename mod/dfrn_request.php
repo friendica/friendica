@@ -16,7 +16,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -262,9 +262,9 @@ function dfrn_request_post(App $a)
 		if (DBM::is_result($r)) {
 			foreach ($r as $rr) {
 				if (!$rr['rel']) {
-					dba::delete('contact', ['id' => $rr['cid'], 'self' => false]);
+					DBA::delete('contact', ['id' => $rr['cid'], 'self' => false]);
 				}
-				dba::delete('intro', ['id' => $rr['iid']]);
+				DBA::delete('intro', ['id' => $rr['iid']]);
 			}
 		}
 

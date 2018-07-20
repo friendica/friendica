@@ -8,7 +8,7 @@ use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Database\PostUpdate;
 use Friendica\Model\Contact;
@@ -109,18 +109,18 @@ class CronJobs
 	{
 		// expire any expired regular accounts. Don't expire forums.
 		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", NULL_DATE];
-		dba::update('user', ['account_expired' => true], $condition);
+		DBA::update('user', ['account_expired' => true], $condition);
 
 		// Remove any freshly expired account
-		$users = dba::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
-		while ($user = dba::fetch($users)) {
+		$users = DBA::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
+		while ($user = DBA::fetch($users)) {
 			User::remove($user['uid']);
 		}
 
 		// delete user records for recently removed accounts
-		$users = dba::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
-		while ($user = dba::fetch($users)) {
-			dba::delete('user', ['uid' => $user['uid']]);
+		$users = DBA::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
+		while ($user = DBA::fetch($users)) {
+			DBA::delete('user', ['uid' => $user['uid']]);
 		}
 	}
 
@@ -165,14 +165,14 @@ class CronJobs
 				$cachetime = PROXY_DEFAULT_TIME;
 			}
 			$condition = ['`uid` = 0 AND `resource-id` LIKE "pic:%" AND `created` < NOW() - INTERVAL ? SECOND', $cachetime];
-			dba::delete('photo', $condition);
+			DBA::delete('photo', $condition);
 		}
 
 		// Delete the cached OEmbed entries that are older than three month
-		dba::delete('oembed', ["`created` < NOW() - INTERVAL 3 MONTH"]);
+		DBA::delete('oembed', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Delete the cached "parse_url" entries that are older than three month
-		dba::delete('parsed_url', ["`created` < NOW() - INTERVAL 3 MONTH"]);
+		DBA::delete('parsed_url', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Maximum table size in megabyte
 		$max_tablesize = intval(Config::get('system', 'optimize_max_tablesize')) * 1000000;

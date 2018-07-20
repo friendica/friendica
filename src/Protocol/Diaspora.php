@@ -18,7 +18,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -76,32 +76,32 @@ class Diaspora
 			}
 
 			// Servers that want to get all content
-			$servers = dba::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'all']);
-			while ($server = dba::fetch($servers)) {
+			$servers = DBA::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'all']);
+			while ($server = DBA::fetch($servers)) {
 				$serverlist[$server['url']] = $server['url'];
 			}
 
 			// All tags of the current post
 			$condition = ['otype' => TERM_OBJ_POST, 'type' => TERM_HASHTAG, 'oid' => $parent['parent']];
-			$tags = dba::select('term', ['term'], $condition);
+			$tags = DBA::select('term', ['term'], $condition);
 			$taglist = [];
-			while ($tag = dba::fetch($tags)) {
+			while ($tag = DBA::fetch($tags)) {
 				$taglist[] = $tag['term'];
 			}
 
 			// All servers who wants content with this tag
 			$tagserverlist = [];
 			if (!empty($taglist)) {
-				$tagserver = dba::select('gserver-tag', ['gserver-id'], ['tag' => $taglist]);
-				while ($server = dba::fetch($tagserver)) {
+				$tagserver = DBA::select('gserver-tag', ['gserver-id'], ['tag' => $taglist]);
+				while ($server = DBA::fetch($tagserver)) {
 					$tagserverlist[] = $server['gserver-id'];
 				}
 			}
 
 			// All adresses with the given id
 			if (!empty($tagserverlist)) {
-				$servers = dba::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'tags', 'id' => $tagserverlist]);
-				while ($server = dba::fetch($servers)) {
+				$servers = DBA::select('gserver', ['url'], ['relay-subscribe' => true, 'relay-scope' => 'tags', 'id' => $tagserverlist]);
+				while ($server = DBA::fetch($servers)) {
 					$serverlist[$server['url']] = $server['url'];
 				}
 			}
@@ -146,7 +146,7 @@ class Diaspora
 		// Fetch the relay contact
 		$condition = ['uid' => 0, 'nurl' => normalise_link($server_url),
 			'contact-type' => ACCOUNT_TYPE_RELAY];
-		$contact = dba::selectFirst('contact', $fields, $condition);
+		$contact = DBA::selectFirst('contact', $fields, $condition);
 
 		if (DBM::is_result($contact)) {
 			if ($contact['archive'] || $contact['blocked']) {
@@ -156,7 +156,7 @@ class Diaspora
 		} else {
 			self::setRelayContact($server_url);
 
-			$contact = dba::selectFirst('contact', $fields, $condition);
+			$contact = DBA::selectFirst('contact', $fields, $condition);
 			if (DBM::is_result($contact)) {
 				return $contact;
 			}
@@ -186,11 +186,11 @@ class Diaspora
 		$condition = ['uid' => 0, 'nurl' => normalise_link($server_url),
 			'contact-type' => ACCOUNT_TYPE_RELAY];
 
-		if (dba::exists('contact', $condition)) {
+		if (DBA::exists('contact', $condition)) {
 			unset($fields['created']);
 		}
 
-		dba::update('contact', $fields, $condition, true);
+		DBA::update('contact', $fields, $condition, true);
 	}
 
 	/**
@@ -207,13 +207,13 @@ class Diaspora
 	 */
 	public static function participantsForThread($thread, array $contacts)
 	{
-		$r = dba::p("SELECT `contact`.`batch`, `contact`.`id`, `contact`.`name`, `contact`.`network`,
+		$r = DBA::p("SELECT `contact`.`batch`, `contact`.`id`, `contact`.`name`, `contact`.`network`,
 				`fcontact`.`batch` AS `fbatch`, `fcontact`.`network` AS `fnetwork` FROM `participation`
 				INNER JOIN `contact` ON `contact`.`id` = `participation`.`cid`
 				INNER JOIN `fcontact` ON `fcontact`.`id` = `participation`.`fid`
 				WHERE `participation`.`iid` = ?", $thread);
 
-		while ($contact = dba::fetch($r)) {
+		while ($contact = DBA::fetch($r)) {
 			if (!empty($contact['fnetwork'])) {
 				$contact['network'] = $contact['fnetwork'];
 			}
@@ -235,7 +235,7 @@ class Diaspora
 				$contacts[] = $contact;
 			}
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		return $contacts;
 	}
@@ -899,7 +899,7 @@ class Diaspora
 	{
 		$update = false;
 
-		$person = dba::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+		$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
 		if (DBM::is_result($person)) {
 			logger("In cache " . print_r($person, true), LOGGER_DEBUG);
 
@@ -924,7 +924,7 @@ class Diaspora
 				self::updateFContact($r);
 
 				// Fetch the updated or added contact
-				$person = dba::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+				$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
 				if (!DBM::is_result($person)) {
 					$person = $r;
 				}
@@ -951,7 +951,7 @@ class Diaspora
 
 		$condition = ['url' => $arr["url"], 'network' => $arr["network"]];
 
-		dba::update('fcontact', $fields, $condition, true);
+		DBA::update('fcontact', $fields, $condition, true);
 	}
 
 	/**
@@ -1425,7 +1425,7 @@ class Diaspora
 	private static function authorContactByUrl($def_contact, $person, $uid)
 	{
 		$condition = ['nurl' => normalise_link($person["url"]), 'uid' => $uid];
-		$contact = dba::selectFirst('contact', ['id', 'network'], $condition);
+		$contact = DBA::selectFirst('contact', ['id', 'network'], $condition);
 		if (DBM::is_result($contact)) {
 			$cid = $contact["id"];
 			$network = $contact["network"];
@@ -1532,7 +1532,7 @@ class Diaspora
 				'notify' => $data['notify'], 'poll' => $data['poll'],
 				'network' => $data['network']];
 
-		dba::update('contact', $fields, ['addr' => $old_handle]);
+		DBA::update('contact', $fields, ['addr' => $old_handle]);
 
 		$fields = ['url' => $data['url'], 'nurl' => normalise_link($data['url']),
 				'name' => $data['name'], 'nick' => $data['nick'],
@@ -1540,7 +1540,7 @@ class Diaspora
 				'notify' => $data['notify'], 'photo' => $data['photo'],
 				'server_url' => $data['baseurl'], 'network' => $data['network']];
 
-		dba::update('gcontact', $fields, ['addr' => $old_handle]);
+		DBA::update('gcontact', $fields, ['addr' => $old_handle]);
 
 		logger('Contacts are updated.');
 
@@ -1558,12 +1558,12 @@ class Diaspora
 	{
 		$author = notags(unxmlify($data->author));
 
-		$contacts = dba::select('contact', ['id'], ['addr' => $author]);
-		while ($contact = dba::fetch($contacts)) {
+		$contacts = DBA::select('contact', ['id'], ['addr' => $author]);
+		while ($contact = DBA::fetch($contacts)) {
 			Contact::remove($contact["id"]);
 		}
 
-		dba::delete('gcontact', ['addr' => $author]);
+		DBA::delete('gcontact', ['addr' => $author]);
 
 		logger('Removed contacts for ' . $author);
 
@@ -1631,7 +1631,7 @@ class Diaspora
 		$item = Item::selectFirst(['uid'], ['origin' => true, 'guid' => $guid]);
 		if (DBM::is_result($item)) {
 			logger("Found user ".$item['uid']." as owner of item ".$guid, LOGGER_DEBUG);
-			$contact = dba::selectFirst('contact', [], ['self' => true, 'uid' => $item['uid']]);
+			$contact = DBA::selectFirst('contact', [], ['self' => true, 'uid' => $item['uid']]);
 			if (DBM::is_result($contact)) {
 				return $contact;
 			}
@@ -1797,7 +1797,7 @@ class Diaspora
 
 		$person = self::personByHandle($msg_author);
 
-		dba::lock('mail');
+		DBA::lock('mail');
 
 		$r = q(
 			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
@@ -1828,9 +1828,9 @@ class Diaspora
 			dbesc($msg_created_at)
 		);
 
-		dba::unlock();
+		DBA::unlock();
 
-		dba::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
+		DBA::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
 
 		notification(
 			[
@@ -2084,7 +2084,7 @@ class Diaspora
 
 		$body = self::replacePeopleGuid($body, $person["url"]);
 
-		dba::lock('mail');
+		DBA::lock('mail');
 
 		$r = q(
 			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
@@ -2115,9 +2115,9 @@ class Diaspora
 			dbesc($created_at)
 		);
 
-		dba::unlock();
+		DBA::unlock();
 
-		dba::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
+		DBA::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $conversation["id"]]);
 		return true;
 	}
 
@@ -2162,8 +2162,8 @@ class Diaspora
 
 		logger('Received participation for ID: '.$item['id'].' - Contact: '.$contact_id.' - Server: '.$server, LOGGER_DEBUG);
 
-		if (!dba::exists('participation', ['iid' => $item['id'], 'server' => $server])) {
-			dba::insert('participation', ['iid' => $item['id'], 'cid' => $contact_id, 'fid' => $person['id'], 'server' => $server]);
+		if (!DBA::exists('participation', ['iid' => $item['id'], 'server' => $server])) {
+			DBA::insert('participation', ['iid' => $item['id'], 'cid' => $contact_id, 'fid' => $person['id'], 'server' => $server]);
 		}
 
 		// Send all existing comments and likes to the requesting server
@@ -2180,7 +2180,7 @@ class Diaspora
 			logger("Send ".$cmd." for item ".$comment['id']." to contact ".$contact_id, LOGGER_DEBUG);
 			Worker::add(PRIORITY_HIGH, 'Delivery', $cmd, $comment['id'], $contact_id);
 		}
-		dba::close($comments);
+		DBA::close($comments);
 
 		return true;
 	}
@@ -2291,7 +2291,7 @@ class Diaspora
 			$fields['bd'] = $birthday;
 		}
 
-		dba::update('contact', $fields, ['id' => $contact['id']]);
+		DBA::update('contact', $fields, ['id' => $contact['id']]);
 
 		$gcontact = ["url" => $contact["url"], "network" => NETWORK_DIASPORA, "generation" => 2,
 					"photo" => $image_url, "name" => $name, "location" => $location,
@@ -2320,7 +2320,7 @@ class Diaspora
 		$a = get_app();
 
 		if ($contact["rel"] == CONTACT_IS_SHARING) {
-			dba::update(
+			DBA::update(
 				'contact',
 				['rel' => CONTACT_IS_FRIEND, 'writable' => true],
 				['id' => $contact["id"], 'uid' => $importer["uid"]]
@@ -3213,7 +3213,7 @@ class Diaspora
 		// If the item belongs to a user, we take this user id.
 		if ($item['uid'] == 0) {
 			$condition = ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false];
-			$first_user = dba::selectFirst('user', ['uid'], $condition);
+			$first_user = DBA::selectFirst('user', ['uid'], $condition);
 			$owner = User::getOwnerDataById($first_user['uid']);
 		} else {
 			$owner = User::getOwnerDataById($item['uid']);
@@ -4200,7 +4200,7 @@ class Diaspora
 		 * Now store the signature more flexible to dynamically support new fields.
 		 * This will break Diaspora compatibility with Friendica versions prior to 3.5.
 		 */
-		dba::insert('sign', ['iid' => $post_id, 'signed_text' => json_encode($message)]);
+		DBA::insert('sign', ['iid' => $post_id, 'signed_text' => json_encode($message)]);
 
 		logger('Stored diaspora like signature');
 		return true;
@@ -4236,7 +4236,7 @@ class Diaspora
 		 * Now store the signature more flexible to dynamically support new fields.
 		 * This will break Diaspora compatibility with Friendica versions prior to 3.5.
 		 */
-		dba::insert('sign', ['iid' => $message_id, 'signed_text' => json_encode($message)]);
+		DBA::insert('sign', ['iid' => $message_id, 'signed_text' => json_encode($message)]);
 
 		logger('Stored diaspora comment signature');
 		return true;

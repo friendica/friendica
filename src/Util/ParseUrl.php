@@ -9,7 +9,7 @@ use DOMDocument;
 use DOMXPath;
 use Friendica\Content\OEmbed;
 use Friendica\Core\Addon;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Object\Image;
 
 require_once 'include/dba.php';
@@ -47,7 +47,7 @@ class ParseUrl
 			return false;
 		}
 
-		$parsed_url = dba::selectFirst('parsed_url', ['content'],
+		$parsed_url = DBA::selectFirst('parsed_url', ['content'],
 			['url' => normalise_link($url), 'guessing' => !$no_guessing, 'oembed' => $do_oembed]
 		);
 		if (!empty($parsed_url['content'])) {
@@ -57,7 +57,7 @@ class ParseUrl
 
 		$data = self::getSiteinfo($url, $no_guessing, $do_oembed);
 
-		dba::insert(
+		DBA::insert(
 			'parsed_url',
 			[
 				'url' => normalise_link($url), 'guessing' => !$no_guessing,

@@ -5,7 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/dba.php';
@@ -30,13 +30,13 @@ class Process extends BaseObject
 			$pid = getmypid();
 		}
 
-		dba::transaction();
+		DBA::transaction();
 
-		if (!dba::exists('process', ['pid' => $pid])) {
-			$return = dba::insert('process', ['pid' => $pid, 'command' => $command, 'created' => DateTimeFormat::utcNow()]);
+		if (!DBA::exists('process', ['pid' => $pid])) {
+			$return = DBA::insert('process', ['pid' => $pid, 'command' => $command, 'created' => DateTimeFormat::utcNow()]);
 		}
 
-		dba::commit();
+		DBA::commit();
 
 		return $return;
 	}
@@ -53,7 +53,7 @@ class Process extends BaseObject
 			$pid = getmypid();
 		}
 
-		return dba::delete('process', ['pid' => $pid]);
+		return DBA::delete('process', ['pid' => $pid]);
 	}
 
 	/**
@@ -61,15 +61,15 @@ class Process extends BaseObject
 	 */
 	public static function deleteInactive()
 	{
-		dba::transaction();
+		DBA::transaction();
 
-		$processes = dba::select('process', ['pid']);
-		while($process = dba::fetch($processes)) {
+		$processes = DBA::select('process', ['pid']);
+		while($process = DBA::fetch($processes)) {
 			if (!posix_kill($process['pid'], 0)) {
 				self::deleteByPid($process['pid']);
 			}
 		}
 
-		dba::commit();
+		DBA::commit();
 	}
 }

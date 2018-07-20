@@ -10,7 +10,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -203,7 +203,7 @@ function dirfind_content(App $a, $prefix = "") {
 				if ($jj->cid > 0) {
 					$connlnk = "";
 					$conntxt = "";
-					$contact = dba::selectFirst('contact', [], ['id' => $jj->cid]);
+					$contact = DBA::selectFirst('contact', [], ['id' => $jj->cid]);
 					if (DBM::is_result($contact)) {
 						$photo_menu = Contact::photoMenu($contact);
 						$details = _contact_detail_for_template($contact);

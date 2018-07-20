@@ -8,7 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -47,7 +47,7 @@ class OnePoll
 
 		$d = DateTimeFormat::utcNow();
 
-		$contact = dba::selectFirst('contact', [], ['id' => $contact_id]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		if (!DBM::is_result($contact)) {
 			logger('Contact not found or cannot be used.');
 			return;
@@ -118,7 +118,7 @@ class OnePoll
 				logger("Skipping probably dead contact ".$contact['url']);
 
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
 			}
 
@@ -127,7 +127,7 @@ class OnePoll
 				logger('Contact is marked dead');
 
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
 			} else {
 				Contact::unmarkForArchival($contact);
@@ -138,7 +138,7 @@ class OnePoll
 			logger('Ignore public contacts');
 
 			// set the last-update so we don't keep polling
-			dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+			DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 			return;
 		}
 
@@ -150,7 +150,7 @@ class OnePoll
 			logger('No self contact for user '.$importer_uid);
 
 			// set the last-update so we don't keep polling
-			dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+			DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 			return;
 		}
 
@@ -175,7 +175,7 @@ class OnePoll
 
 			if (!intval($contact['writable'])) {
 				$fields = ['writable' => true];
-				dba::update('contact', $fields, ['id' => $contact['id']]);
+				DBA::update('contact', $fields, ['id' => $contact['id']]);
 			}
 
 			$url = $contact['poll'] . '?dfrn_id=' . $idtosend
@@ -187,7 +187,7 @@ class OnePoll
 
 			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);
 				return;
 			}
@@ -243,13 +243,13 @@ class OnePoll
 
 			if ((intval($res->status) != 0) || !strlen($res->challenge) || !strlen($res->dfrn_id)) {
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
 			}
 
 			if (((float)$res->dfrn_version > 2.21) && ($contact['poco'] == '')) {
 				$fields = ['poco' => str_replace('/profile/', '/poco/', $contact['url'])];
-				dba::update('contact', $fields, ['id' => $contact['id']]);
+				DBA::update('contact', $fields, ['id' => $contact['id']]);
 			}
 
 			$postvars = [];
@@ -278,7 +278,7 @@ class OnePoll
 				logger('ID did not decode: ' . $contact['id'] . ' orig: ' . $orig_id . ' final: ' . $final_dfrn_id);
 
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);
 				return;
 			}
@@ -306,14 +306,14 @@ class OnePoll
 
 			if ($stat_writeable != $contact['writable']) {
 				$fields = ['writable' => $stat_writeable];
-				dba::update('contact', $fields, ['id' => $contact['id']]);
+				DBA::update('contact', $fields, ['id' => $contact['id']]);
 			}
 
 			// Are we allowed to import from this person?
 
 			if ($contact['rel'] == CONTACT_IS_FOLLOWER || $contact['blocked']) {
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
 			}
 
@@ -323,7 +323,7 @@ class OnePoll
 
 			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);
 				return;
 			}
@@ -337,7 +337,7 @@ class OnePoll
 			$mail_disabled = ((function_exists('imap_open') && (! Config::get('system', 'imap_disabled'))) ? 0 : 1);
 			if ($mail_disabled) {
 				// set the last-update so we don't keep polling
-				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
+				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);
 				return;
 			}
@@ -345,10 +345,10 @@ class OnePoll
 			logger("Mail: Enabled", LOGGER_DEBUG);
 
 			$mbox = null;
-			$user = dba::selectFirst('user', ['prvkey'], ['uid' => $importer_uid]);
+			$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $importer_uid]);
 
 			$condition = ["`server` != '' AND `uid` = ?", $importer_uid];
-			$mailconf = dba::selectFirst('mailacct', [], $condition);
+			$mailconf = DBA::selectFirst('mailacct', [], $condition);
 			if (DBM::is_result($user) && DBM::is_result($mailconf)) {
 				$mailbox = Email::constructMailboxName($mailconf);
 				$password = '';
@@ -358,7 +358,7 @@ class OnePoll
 				logger("Mail: Connect to " . $mailconf['user']);
 				if ($mbox) {
 					$fields = ['last_check' => DateTimeFormat::utcNow()];
-					dba::update('mailacct', $fields, ['id' => $mailconf['id']]);
+					DBA::update('mailacct', $fields, ['id' => $mailconf['id']]);
 					logger("Mail: Connected to " . $mailconf['user']);
 				} else {
 					logger("Mail: Connection error ".$mailconf['user']." ".print_r(imap_errors(), true));
@@ -620,17 +620,17 @@ class OnePoll
 			$updated = DateTimeFormat::utcNow();
 
 			self::updateContact($contact, ['last-update' => $updated, 'success_update' => $updated]);
-			dba::update('gcontact', ['last_contact' => $updated], ['nurl' => $contact['nurl']]);
+			DBA::update('gcontact', ['last_contact' => $updated], ['nurl' => $contact['nurl']]);
 			Contact::unmarkForArchival($contact);
 		} elseif (in_array($contact["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_FEED])) {
 			$updated = DateTimeFormat::utcNow();
 
 			self::updateContact($contact, ['last-update' => $updated, 'failure_update' => $updated]);
-			dba::update('gcontact', ['last_failure' => $updated], ['nurl' => $contact['nurl']]);
+			DBA::update('gcontact', ['last_failure' => $updated], ['nurl' => $contact['nurl']]);
 			Contact::markForArchival($contact);
 		} else {
 			$updated = DateTimeFormat::utcNow();
-			dba::update('contact', ['last-update' => $updated], ['id' => $contact['id']]);
+			DBA::update('contact', ['last-update' => $updated], ['id' => $contact['id']]);
 		}
 
 		return;
@@ -653,7 +653,7 @@ class OnePoll
 	 */
 	private static function updateContact($contact, $fields)
 	{
-		dba::update('contact', $fields, ['id' => $contact['id']]);
-		dba::update('contact', $fields, ['uid' => 0, 'nurl' => $contact['nurl']]);
+		DBA::update('contact', $fields, ['id' => $contact['id']]);
+		DBA::update('contact', $fields, ['uid' => 0, 'nurl' => $contact['nurl']]);
 	}
 }

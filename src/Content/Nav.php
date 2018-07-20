@@ -10,7 +10,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 
@@ -105,7 +105,7 @@ class Nav
 			$nav['usermenu'][] = ['notes/', L10n::t('Personal notes'), '', L10n::t('Your personal notes')];
 
 			// user info
-			$contact = dba::selectFirst('contact', ['micro'], ['uid' => $a->user['uid'], 'self' => true]);
+			$contact = DBA::selectFirst('contact', ['micro'], ['uid' => $a->user['uid'], 'self' => true]);
 			$userinfo = [
 				'icon' => (DBM::is_result($contact) ? $a->remove_baseurl($contact['micro']) : 'images/person-48.jpg'),
 				'name' => $a->user['username'],

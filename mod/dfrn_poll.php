@@ -8,7 +8,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Module\Login;
 use Friendica\Protocol\DFRN;
@@ -143,7 +143,7 @@ function dfrn_poll_init(App $a)
 
 	if ($type === 'profile-check' && $dfrn_version < 2.2) {
 		if ((strlen($challenge)) && (strlen($sec))) {
-			dba::delete('profile_check', ["`expire` < ?", time()]);
+			DBA::delete('profile_check', ["`expire` < ?", time()]);
 			$r = q("SELECT * FROM `profile_check` WHERE `sec` = '%s' ORDER BY `expire` DESC LIMIT 1",
 				dbesc($sec)
 			);
@@ -208,7 +208,7 @@ function dfrn_poll_init(App $a)
 					break;
 			}
 
-			dba::delete('profile_check', ["`expire` < ?", time()]);
+			DBA::delete('profile_check', ["`expire` < ?", time()]);
 			$r = q("SELECT * FROM `profile_check` WHERE `dfrn_id` = '%s' ORDER BY `expire` DESC",
 				dbesc($dfrn_id));
 			if (DBM::is_result($r)) {
@@ -235,7 +235,7 @@ function dfrn_poll_post(App $a)
 		if (strlen($challenge) && strlen($sec)) {
 			logger('dfrn_poll: POST: profile-check');
 
-			dba::delete('profile_check', ["`expire` < ?", time()]);
+			DBA::delete('profile_check', ["`expire` < ?", time()]);
 			$r = q("SELECT * FROM `profile_check` WHERE `sec` = '%s' ORDER BY `expire` DESC LIMIT 1",
 				dbesc($sec)
 			);
@@ -308,7 +308,7 @@ function dfrn_poll_post(App $a)
 	$type = $r[0]['type'];
 	$last_update = $r[0]['last_update'];
 
-	dba::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
+	DBA::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
 
 	$sql_extra = '';
 	switch ($direction) {
@@ -413,7 +413,7 @@ function dfrn_poll_content(App $a)
 
 		$status = 0;
 
-		dba::delete('challenge', ["`expire` < ?", time()]);
+		DBA::delete('challenge', ["`expire` < ?", time()]);
 
 		if ($type !== 'profile') {
 			$r = q("INSERT INTO `challenge` ( `challenge`, `dfrn-id`, `expire` , `type`, `last_update` )

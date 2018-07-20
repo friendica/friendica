@@ -21,7 +21,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -67,7 +67,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			return;
 		}
 
-		$user = dba::selectFirst('user', [], ['uid' => $uid]);
+		$user = DBA::selectFirst('user', [], ['uid' => $uid]);
 		if (!DBM::is_result($user)) {
 			notice(L10n::t('Profile not found.') . EOL);
 			return;
@@ -280,13 +280,13 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			}
 
 			if (($status == 0) && $intro_id) {
-				$intro = dba::selectFirst('intro', ['note'], ['id' => $intro_id]);
+				$intro = DBA::selectFirst('intro', ['note'], ['id' => $intro_id]);
 				if (DBM::is_result($intro)) {
-					dba::update('contact', ['reason' => $intro['note']], ['id' => $contact_id]);
+					DBA::update('contact', ['reason' => $intro['note']], ['id' => $contact_id]);
 				}
 
 				// Success. Delete the notification.
-				dba::delete('intro', ['id' => $intro_id]);
+				DBA::delete('intro', ['id' => $intro_id]);
 			}
 
 			if ($status != 0) {
@@ -358,7 +358,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				}
 			}
 
-			dba::delete('intro', ['id' => $intro_id]);
+			DBA::delete('intro', ['id' => $intro_id]);
 
 			$r = q("UPDATE `contact` SET `name-date` = '%s',
 				`uri-date` = '%s',
@@ -391,7 +391,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		// reload contact info
-		$contact = dba::selectFirst('contact', [], ['id' => $contact_id]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
 			if (DBM::is_result($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
 				$ret = Diaspora::sendShare($user, $contact);
@@ -443,7 +443,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		// Find our user's account
-		$user = dba::selectFirst('user', [], ['nickname' => $node]);
+		$user = DBA::selectFirst('user', [], ['nickname' => $node]);
 		if (!DBM::is_result($user)) {
 			$message = L10n::t('No user record found for \'%s\' ', $node);
 			System::xmlExit(3, $message); // failure
@@ -471,7 +471,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			// NOTREACHED
 		}
 
-		$contact = dba::selectFirst('contact', [], ['url' => $decrypted_source_url, 'uid' => $local_uid]);
+		$contact = DBA::selectFirst('contact', [], ['url' => $decrypted_source_url, 'uid' => $local_uid]);
 		if (!DBM::is_result($contact)) {
 			if (strstr($decrypted_source_url, 'http:')) {
 				$newurl = str_replace('http:', 'https:', $decrypted_source_url);
@@ -479,7 +479,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				$newurl = str_replace('https:', 'http:', $decrypted_source_url);
 			}
 
-			$contact = dba::selectFirst('contact', [], ['url' => $newurl, 'uid' => $local_uid]);
+			$contact = DBA::selectFirst('contact', [], ['url' => $newurl, 'uid' => $local_uid]);
 			if (!DBM::is_result($contact)) {
 				// this is either a bogus confirmation (?) or we deleted the original introduction.
 				$message = L10n::t('Contact record was not found for you on our site.');
@@ -511,7 +511,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$dfrn_pubkey = $public_key;
 		}
 
-		if (dba::exists('contact', ['dfrn-id' => $decrypted_dfrn_id])) {
+		if (DBA::exists('contact', ['dfrn-id' => $decrypted_dfrn_id])) {
 			$message = L10n::t('The ID provided by your system is a duplicate on our system. It should work if you try again.');
 			System::xmlExit(1, $message); // Birthday paradox - duplicate dfrn-id
 			// NOTREACHED
@@ -537,7 +537,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		}
 
 		// We're good but now we have to scrape the profile photo and send notifications.
-		$contact = dba::selectFirst('contact', ['photo'], ['id' => $dfrn_record]);
+		$contact = DBA::selectFirst('contact', ['photo'], ['id' => $dfrn_record]);
 		if (DBM::is_result($contact)) {
 			$photo = $contact['photo'];
 		} else {

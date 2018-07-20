@@ -8,7 +8,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
@@ -50,7 +50,7 @@ function notification($params)
 	$sender_email = $a->getSenderEmailAddress();
 
 	if ($params['type'] != SYSTEM_EMAIL) {
-		$user = dba::selectFirst('user', ['nickname', 'page-flags'],
+		$user = DBA::selectFirst('user', ['nickname', 'page-flags'],
 			['uid' => $params['uid']]);
 
 		// There is no need to create notifications for forum accounts
@@ -107,7 +107,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_COMMENT) {
-		$thread = dba::selectFirst('thread', ['ignored'], ['iid' => $parent_id]);
+		$thread = DBA::selectFirst('thread', ['ignored'], ['iid' => $parent_id]);
 		if (DBM::is_result($thread) && $thread["ignored"]) {
 			logger("Thread ".$parent_id." will be ignored", LOGGER_DEBUG);
 			return;
@@ -506,7 +506,7 @@ function notification($params)
 		);
 		if ($p && (count($p) > 1)) {
 			for ($d = 1; $d < count($p); $d ++) {
-				dba::delete('notify', ['id' => $p[$d]['id']]);
+				DBA::delete('notify', ['id' => $p[$d]['id']]);
 			}
 
 			// only continue on if we stored the first one
@@ -666,13 +666,13 @@ function notification($params)
  */
 function check_user_notification($itemid) {
 	// fetch all users in the thread
-	$users = dba::p("SELECT DISTINCT(`contact`.`uid`) FROM `item`
+	$users = DBA::p("SELECT DISTINCT(`contact`.`uid`) FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` != 0
 			WHERE `parent` IN (SELECT `parent` FROM `item` WHERE `id`=?)", $itemid);
-	while ($user = dba::fetch($users)) {
+	while ($user = DBA::fetch($users)) {
 		check_item_notification($itemid, $user['uid']);
 	}
-	dba::close($users);
+	DBA::close($users);
 }
 
 /**
@@ -689,12 +689,12 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$profiles = $notification_data["profiles"];
 
 	$fields = ['notify-flags', 'language', 'username', 'email', 'nickname'];
-	$user = dba::selectFirst('user', $fields, ['uid' => $uid]);
+	$user = DBA::selectFirst('user', $fields, ['uid' => $uid]);
 	if (!DBM::is_result($user)) {
 		return false;
 	}
 
-	$owner = dba::selectFirst('contact', ['url'], ['self' => true, 'uid' => $uid]);
+	$owner = DBA::selectFirst('contact', ['url'], ['self' => true, 'uid' => $uid]);
 	if (!DBM::is_result($owner)) {
 		return false;
 	}
@@ -727,17 +727,17 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	$profiles = $profiles2;
 
-	$ret = dba::select('contact', ['id'], ['uid' => 0, 'nurl' => $profiles]);
+	$ret = DBA::select('contact', ['id'], ['uid' => 0, 'nurl' => $profiles]);
 
 	$contacts = [];
 
-	while ($contact = dba::fetch($ret)) {
+	while ($contact = DBA::fetch($ret)) {
 		$contacts[] = $contact['id'];
 	}
 
 	$contact_list = implode(',', $contacts);
 
-	dba::close($ret);
+	DBA::close($ret);
 
 	// Only act if it is a "real" post
 	// We need the additional check for the "local_profile" because of mixed situations on connector networks
@@ -767,7 +767,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	if ($item["parent-uri"] === $item["uri"]) {
 		// Send a notification for every new post?
-		$send_notification = dba::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true]);
+		$send_notification = DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true]);
 
 		if (!$send_notification) {
 			$tags = q("SELECT `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` = %d AND `uid` = %d",
@@ -776,7 +776,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 			if (DBM::is_result($tags)) {
 				foreach ($tags AS $tag) {
 					$condition = ['nurl' => normalise_link($tag["url"]), 'uid' => $uid, 'notify_new_posts' => true];
-					$r = dba::exists('contact', $condition);
+					$r = DBA::exists('contact', $condition);
 					if ($r) {
 						$send_notification = true;
 					}

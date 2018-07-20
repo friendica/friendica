@@ -5,7 +5,7 @@
 
 use Friendica\App;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 
@@ -45,7 +45,7 @@ function noscrape_init(App $a)
 	$keywords = str_replace(['#',',',' ',',,'], ['',' ',',',','], $keywords);
 	$keywords = explode(',', $keywords);
 
-	$contactPhoto = dba::selectFirst('contact', ['photo'], ['self' => true, 'uid' => $a->profile['uid']]);
+	$contactPhoto = DBA::selectFirst('contact', ['photo'], ['self' => true, 'uid' => $a->profile['uid']]);
 
 	$json_info['fn'] = $a->profile['name'];
 	$json_info['photo'] = $contactPhoto["photo"];
@@ -74,13 +74,13 @@ function noscrape_init(App $a)
 	// We display the last activity (post or login), reduced to year and week number
 	$last_active = 0;
 	$condition = ['uid' => $a->profile['uid'], 'self' => true];
-	$contact = dba::selectFirst('contact', ['last-item'], $condition);
+	$contact = DBA::selectFirst('contact', ['last-item'], $condition);
 	if (DBM::is_result($contact)) {
 		$last_active = strtotime($contact['last-item']);
 	}
 
 	$condition = ['uid' => $a->profile['uid']];
-	$user = dba::selectFirst('user', ['login_date'], $condition);
+	$user = DBA::selectFirst('user', ['login_date'], $condition);
 	if (DBM::is_result($user)) {
 		if ($last_active < strtotime($user['login_date'])) {
 			$last_active = strtotime($user['login_date']);

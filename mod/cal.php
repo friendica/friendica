@@ -13,7 +13,7 @@ use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
@@ -37,7 +37,7 @@ function cal_init(App $a)
 
 	if ($a->argc > 1) {
 		$nick = $a->argv[1];
-		$user = dba::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
+		$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
 		if (!DBM::is_result($user)) {
 			return;
 		}

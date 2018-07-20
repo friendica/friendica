@@ -4,7 +4,7 @@
  */
 namespace Friendica\Model;
 
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once "include/dba.php";
@@ -53,7 +53,7 @@ class Conversation
 			}
 
 			$fields = ['item-uri', 'reply-to-uri', 'conversation-uri', 'conversation-href', 'protocol', 'source'];
-			$old_conv = dba::selectFirst('conversation', $fields, ['item-uri' => $conversation['item-uri']]);
+			$old_conv = DBA::selectFirst('conversation', $fields, ['item-uri' => $conversation['item-uri']]);
 			if (DBM::is_result($old_conv)) {
 				// Don't update when only the source has changed.
 				// Only do this when there had been no source before.
@@ -65,11 +65,11 @@ class Conversation
 					unset($conversation['protocol']);
 					unset($conversation['source']);
 				}
-				if (!dba::update('conversation', $conversation, ['item-uri' => $conversation['item-uri']], $old_conv)) {
+				if (!DBA::update('conversation', $conversation, ['item-uri' => $conversation['item-uri']], $old_conv)) {
 					logger('Conversation: update for '.$conversation['item-uri'].' from '.$old_conv['protocol'].' to '.$conversation['protocol'].' failed', LOGGER_DEBUG);
 				}
 			} else {
-				if (!dba::insert('conversation', $conversation, true)) {
+				if (!DBA::insert('conversation', $conversation, true)) {
 					logger('Conversation: insert for '.$conversation['item-uri'].' (protocol '.$conversation['protocol'].') failed', LOGGER_DEBUG);
 				}
 			}

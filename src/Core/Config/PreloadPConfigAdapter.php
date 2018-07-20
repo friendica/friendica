@@ -4,7 +4,7 @@ namespace Friendica\Core\Config;
 
 use Exception;
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -35,11 +35,11 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 			return;
 		}
 
-		$pconfigs = dba::select('pconfig', ['cat', 'v', 'k'], ['uid' => $uid]);
-		while ($pconfig = dba::fetch($pconfigs)) {
+		$pconfigs = DBA::select('pconfig', ['cat', 'v', 'k'], ['uid' => $uid]);
+		while ($pconfig = DBA::fetch($pconfigs)) {
 			self::getApp()->setPConfigValue($uid, $pconfig['cat'], $pconfig['k'], $pconfig['v']);
 		}
-		dba::close($pconfigs);
+		DBA::close($pconfigs);
 
 		$this->config_loaded = true;
 	}
@@ -51,7 +51,7 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		}
 
 		if ($refresh) {
-			$config = dba::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
+			$config = DBA::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
 			if (DBM::is_result($config)) {
 				self::getApp()->setPConfigValue($uid, $cat, $k, $config['v']);
 			} else {
@@ -83,7 +83,7 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		// manage array value
 		$dbvalue = is_array($value) ? serialize($value) : $value;
 
-		$result = dba::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $k], true);
+		$result = DBA::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $k], true);
 		if (!$result) {
 			throw new Exception('Unable to store config value in [' . $uid . '][' . $cat . '][' . $k . ']');
 		}
@@ -99,7 +99,7 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 
 		self::getApp()->deletePConfigValue($uid, $cat, $k);
 
-		$result = dba::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
+		$result = DBA::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
 
 		return $result;
 	}

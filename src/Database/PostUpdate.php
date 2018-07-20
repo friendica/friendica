@@ -124,7 +124,7 @@ class PostUpdate
 
 		// Check if the first step is done (Setting "author-id" and "owner-id" in the item table)
 		$fields = ['author-link', 'author-name', 'author-avatar', 'owner-link', 'owner-name', 'owner-avatar', 'network', 'uid'];
-		$r = dba::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
+		$r = DBA::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
 		if (!$r) {
 			// Are there unfinished entries in the thread table?
 			$r = q("SELECT COUNT(*) AS `total` FROM `thread`
@@ -180,7 +180,7 @@ class PostUpdate
 			if ($owner_id == 0) {
 				$owner_id = -1;
 			}
-			dba::update('item', ['author-id' => $author_id, 'owner-id' => $owner_id], ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'owner-link' => $item['owner-link'], 'author-id' => 0, 'owner-id' => 0]);
+			DBA::update('item', ['author-id' => $author_id, 'owner-id' => $owner_id], ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'owner-link' => $item['owner-link'], 'author-id' => 0, 'owner-id' => 0]);
 		}
 
 		logger("Updated items", LOGGER_DEBUG);
@@ -212,7 +212,7 @@ class PostUpdate
 		}
 		foreach ($r as $user) {
 			if (!empty($user["lastitem_date"]) && ($user["lastitem_date"] > $user["last-item"])) {
-				dba::update('contact', ['last-item' => $user['lastitem_date']], ['id' => $user['id']]);
+				DBA::update('contact', ['last-item' => $user['lastitem_date']], ['id' => $user['id']]);
 			}
 		}
 
@@ -282,7 +282,7 @@ class PostUpdate
 
 			++$rows;
 		}
-		dba::close($items);
+		DBA::close($items);
 
 		Config::set("system", "post_update_version_1279_id", $id);
 

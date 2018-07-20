@@ -5,7 +5,7 @@
 
 namespace Friendica\Test;
 
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use PHPUnit\DbUnit\DataSet\YamlDataSet;
 use PHPUnit\DbUnit\TestCaseTrait;
 use PHPUnit\Framework\TestCase;
@@ -32,11 +32,11 @@ abstract class DatabaseTest extends TestCase
 	 */
 	protected function getConnection()
 	{
-		if (!dba::connected()) {
+		if (!DBA::connected()) {
 			$this->markTestSkipped('Could not connect to the database.');
 		}
 
-		return $this->createDefaultDBConnection(dba::get_db(), getenv('MYSQL_DATABASE'));
+		return $this->createDefaultDBConnection(DBA::get_db(), getenv('MYSQL_DATABASE'));
 	}
 
 	/**

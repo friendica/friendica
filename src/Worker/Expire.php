@@ -10,7 +10,7 @@ use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Item;
 
@@ -30,44 +30,44 @@ class Expire
 			logger('Delete expired items', LOGGER_DEBUG);
 			// physically remove anything that has been deleted for more than two months
 			$condition = ["`deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY"];
-			$rows = dba::select('item', ['id', 'iaid', 'icid', 'psid'],  $condition);
-			while ($row = dba::fetch($rows)) {
-				dba::delete('item', ['id' => $row['id']]);
-				if (!empty($row['iaid']) && !dba::exists('item', ['iaid' => $row['iaid']])) {
-					dba::delete('item-activity', ['id' => $row['iaid']]);
+			$rows = DBA::select('item', ['id', 'iaid', 'icid', 'psid'],  $condition);
+			while ($row = DBA::fetch($rows)) {
+				DBA::delete('item', ['id' => $row['id']]);
+				if (!empty($row['iaid']) && !DBA::exists('item', ['iaid' => $row['iaid']])) {
+					DBA::delete('item-activity', ['id' => $row['iaid']]);
 				}
-				if (!empty($row['icid']) && !dba::exists('item', ['icid' => $row['icid']])) {
-					dba::delete('item-content', ['id' => $row['icid']]);
+				if (!empty($row['icid']) && !DBA::exists('item', ['icid' => $row['icid']])) {
+					DBA::delete('item-content', ['id' => $row['icid']]);
 				}
 				// When the permission set will be used in photo and events as well.
 				// this query here needs to be extended.
-				if (!empty($row['psid']) && !dba::exists('item', ['psid' => $row['psid']])) {
-					dba::delete('permissionset', ['id' => $row['psid']]);
+				if (!empty($row['psid']) && !DBA::exists('item', ['psid' => $row['psid']])) {
+					DBA::delete('permissionset', ['id' => $row['psid']]);
 				}
 			}
-			dba::close($rows);
+			DBA::close($rows);
 
 			// Normally we shouldn't have orphaned data at all.
 			// If we do have some, then we have to check why.
 			logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
 			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`iaid` = `item-activity`.`id`)"];
-			dba::delete('item-activity', $condition);
-			logger('Orphaned item activities deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
+			DBA::delete('item-activity', $condition);
+			logger('Orphaned item activities deleted: ' . DBA::affected_rows(), LOGGER_DEBUG);
 
 			logger('Deleting orphaned item content - start', LOGGER_DEBUG);
 			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`icid` = `item-content`.`id`)"];
-			dba::delete('item-content', $condition);
-			logger('Orphaned item content deleted: ' . dba::affected_rows(), LOGGER_DEBUG);
+			DBA::delete('item-content', $condition);
+			logger('Orphaned item content deleted: ' . DBA::affected_rows(), LOGGER_DEBUG);
 
 			// make this optional as it could have a performance impact on large sites
 			if (intval(Config::get('system', 'optimize_items'))) {
-				dba::e("OPTIMIZE TABLE `item`");
+				DBA::e("OPTIMIZE TABLE `item`");
 			}
 
 			logger('Delete expired items - done', LOGGER_DEBUG);
 			return;
 		} elseif (intval($param) > 0) {
-			$user = dba::selectFirst('user', ['uid', 'username', 'expire'], ['uid' => $param]);
+			$user = DBA::selectFirst('user', ['uid', 'username', 'expire'], ['uid' => $param]);
 			if (DBM::is_result($user)) {
 				logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
 				Item::expire($user['uid'], $user['expire']);
@@ -89,13 +89,13 @@ class Expire
 		Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 				'Expire', 'delete');
 
-		$r = dba::p("SELECT `uid`, `username` FROM `user` WHERE `expire` != 0");
-		while ($row = dba::fetch($r)) {
+		$r = DBA::p("SELECT `uid`, `username` FROM `user` WHERE `expire` != 0");
+		while ($row = DBA::fetch($r)) {
 			logger('Calling expiry for user '.$row['uid'].' ('.$row['username'].')', LOGGER_DEBUG);
 			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'Expire', (int)$row['uid']);
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		logger('expire: calling hooks');
 

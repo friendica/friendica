@@ -12,7 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -829,7 +829,7 @@ function item_photo_menu($item) {
 	$network = '';
 	$rel = 0;
 	$condition = ['uid' => local_user(), 'nurl' => normalise_link($item['author-link'])];
-	$contact = dba::selectFirst('contact', ['id', 'network', 'rel'], $condition);
+	$contact = DBA::selectFirst('contact', ['id', 'network', 'rel'], $condition);
 	if (DBM::is_result($contact)) {
 		$cid = $contact['id'];
 		$network = $contact['network'];

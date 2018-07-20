@@ -13,7 +13,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -1350,7 +1350,7 @@ function photos_content(App $a)
 			$link_item = Item::selectFirst([], ['id' => $linked_items[0]['id']]);
 
 			$condition = ["`parent` = ? AND `parent` != `id`",  $link_item['parent']];
-			$a->set_pager_total(dba::count('item', $condition));
+			$a->set_pager_total(DBA::count('item', $condition));
 
 			$params = ['order' => ['id'], 'limit' => [$a->pager['start'], $a->pager['itemspage']]];
 			$result = Item::selectForUser($link_item['uid'], [], $condition, $params);

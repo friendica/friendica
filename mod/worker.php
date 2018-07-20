@@ -6,7 +6,7 @@
 
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 function worker_init()
@@ -44,7 +44,7 @@ function worker_init()
 
 		$fields = ['executed' => DateTimeFormat::utcNow(), 'pid' => getmypid(), 'done' => false];
 		$condition =  ['id' => $r[0]["id"], 'pid' => 0];
-		if (dba::update('workerqueue', $fields, $condition)) {
+		if (DBA::update('workerqueue', $fields, $condition)) {
 			Worker::execute($r[0]);
 		}
 	}

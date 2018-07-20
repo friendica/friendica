@@ -7,7 +7,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
@@ -150,7 +150,7 @@ function proxy_init(App $a) {
 	$valid = true;
 	$photo = null;
 	if (!$direct_cache && ($cachefile == '')) {
-		$photo = dba::selectFirst('photo', ['data', 'desc'], ['resource-id' => $urlhash]);
+		$photo = DBA::selectFirst('photo', ['data', 'desc'], ['resource-id' => $urlhash]);
 		if (DBM::is_result($photo)) {
 			$img_str = $photo['data'];
 			$mime = $photo['desc'];
@@ -193,7 +193,7 @@ function proxy_init(App $a) {
 				'filename' => basename($_REQUEST['url']), 'type' => '', 'album' => '', 'height' => imagesy($image), 'width' => imagesx($image),
 				'datasize' => 0, 'data' => $img_str, 'scale' => 100, 'profile' => 0,
 				'allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '', 'desc' => $mime];
-			dba::insert('photo', $fields);
+			DBA::insert('photo', $fields);
 		} else {
 			$Image = new Image($img_str, $mime);
 			if ($Image->isValid() && !$direct_cache && ($cachefile == '')) {

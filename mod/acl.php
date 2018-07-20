@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -264,7 +264,7 @@ function acl_content(App $a)
 		while ($author = Item::fetch($authors)) {
 			$item_authors[$author['author-link']] = $author['author-link'];
 		}
-		dba::close($authors);
+		DBA::close($authors);
 
 		foreach ($item_authors as $author) {
 			if (in_array($author, $known_contacts)) {

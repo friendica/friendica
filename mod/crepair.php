@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -21,7 +21,7 @@ function crepair_init(App $a)
 
 	$contact = null;
 	if (($a->argc == 2) && intval($a->argv[1])) {
-		$contact = dba::selectFirst('contact', [], ['uid' => local_user(), 'id' => $a->argv[1]]);
+		$contact = DBA::selectFirst('contact', [], ['uid' => local_user(), 'id' => $a->argv[1]]);
 	}
 
 	if (!x($a->page, 'aside')) {
@@ -44,7 +44,7 @@ function crepair_post(App $a)
 
 	$contact = null;
 	if ($cid) {
-		$contact = dba::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
 	}
 
 	if (!DBM::is_result($contact)) {
@@ -105,7 +105,7 @@ function crepair_content(App $a)
 
 		$contact = null;
 	if ($cid) {
-		$contact = dba::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
 	}
 
 	if (!DBM::is_result($contact)) {

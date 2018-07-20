@@ -2,7 +2,7 @@
 namespace Friendica\Core\Config;
 
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -22,9 +22,9 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 	{
 		$a = self::getApp();
 
-		$pconfigs = dba::select('pconfig', ['v', 'k'], ['cat' => $cat, 'uid' => $uid]);
+		$pconfigs = DBA::select('pconfig', ['v', 'k'], ['cat' => $cat, 'uid' => $uid]);
 		if (DBM::is_result($pconfigs)) {
-			while ($pconfig = dba::fetch($pconfigs)) {
+			while ($pconfig = DBA::fetch($pconfigs)) {
 				$k = $pconfig['k'];
 
 				self::getApp()->setPConfigValue($uid, $cat, $k, $pconfig['v']);
@@ -35,7 +35,7 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 			// Negative caching
 			$a->config[$uid][$cat] = "!<unset>!";
 		}
-		dba::close($pconfigs);
+		DBA::close($pconfigs);
 	}
 
 	public function get($uid, $cat, $k, $default_value = null, $refresh = false)
@@ -58,7 +58,7 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 			}
 		}
 
-		$pconfig = dba::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
+		$pconfig = DBA::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
 		if (DBM::is_result($pconfig)) {
 			$val = (preg_match("|^a:[0-9]+:{.*}$|s", $pconfig['v']) ? unserialize($pconfig['v']) : $pconfig['v']);
 
@@ -94,7 +94,7 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		$result = dba::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $k], true);
+		$result = DBA::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $k], true);
 
 		if ($result) {
 			$this->in_db[$uid][$cat][$k] = true;
@@ -111,7 +111,7 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 			unset($this->in_db[$uid][$cat][$k]);
 		}
 
-		$result = dba::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
+		$result = DBA::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $k]);
 
 		return $result;
 	}

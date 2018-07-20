@@ -4,7 +4,7 @@ namespace Friendica\Core\Console;
 
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 use RuntimeException;
@@ -64,7 +64,7 @@ HELP;
 
 		$nick = $this->getArgument(0);
 
-		$user = dba::selectFirst('user', ['uid'], ['nickname' => $nick]);
+		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nick]);
 		if (!DBM::is_result($user)) {
 			throw new RuntimeException(L10n::t('User not found'));
 		}

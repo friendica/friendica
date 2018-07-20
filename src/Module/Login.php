@@ -9,7 +9,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -135,7 +135,7 @@ class Login extends BaseModule
 					throw new Exception(L10n::t('Login failed.'));
 				}
 			} else {
-				$record = dba::selectFirst('user', [],
+				$record = DBA::selectFirst('user', [],
 					['uid' => User::getIdFromPasswordAuthentication($username, $password)]
 				);
 			}
@@ -176,7 +176,7 @@ class Login extends BaseModule
 			$data = json_decode($_COOKIE["Friendica"]);
 			if (isset($data->uid)) {
 
-				$user = dba::selectFirst('user', [],
+				$user = DBA::selectFirst('user', [],
 					[
 						'uid'             => $data->uid,
 						'blocked'         => false,
@@ -231,7 +231,7 @@ class Login extends BaseModule
 					goaway(self::getApp()->get_baseurl());
 				}
 
-				$user = dba::selectFirst('user', [],
+				$user = DBA::selectFirst('user', [],
 					[
 						'uid'             => $_SESSION['uid'],
 						'blocked'         => false,

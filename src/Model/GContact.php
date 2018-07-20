@@ -10,7 +10,7 @@ use Exception;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
@@ -60,7 +60,7 @@ class GContact
 
 		$search .= "%";
 
-		$results = dba::p("SELECT `nurl` FROM `gcontact`
+		$results = DBA::p("SELECT `nurl` FROM `gcontact`
 			WHERE NOT `hide` AND `network` IN (?, ?, ?) AND
 				((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
 				(`addr` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?) $extra_sql
@@ -69,7 +69,7 @@ class GContact
 		);
 
 		$gcontacts = [];
-		while ($result = dba::fetch($results)) {
+		while ($result = DBA::fetch($results)) {
 			$urlparts = parse_url($result["nurl"]);
 
 			// Ignore results that look strange.
@@ -237,8 +237,8 @@ class GContact
 
 			if ($alternate && ($gcontact['network'] == NETWORK_OSTATUS)) {
 				// Delete the old entry - if it exists
-				if (dba::exists('gcontact', ['nurl' => normalise_link($orig_profile)])) {
-					dba::delete('gcontact', ['nurl' => normalise_link($orig_profile)]);
+				if (DBA::exists('gcontact', ['nurl' => normalise_link($orig_profile)])) {
+					DBA::delete('gcontact', ['nurl' => normalise_link($orig_profile)]);
 				}
 			}
 		}
@@ -688,7 +688,7 @@ class GContact
 			$contact["url"] = self::cleanContactUrl($contact["url"]);
 		}
 
-		dba::lock('gcontact');
+		DBA::lock('gcontact');
 		$r = q(
 			"SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
 			dbesc(normalise_link($contact["url"]))
@@ -735,7 +735,7 @@ class GContact
 				$doprobing = in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""]);
 			}
 		}
-		dba::unlock();
+		DBA::unlock();
 
 		if ($doprobing) {
 			logger("Last Contact: ". $last_contact_str." - Last Failure: ".$last_failure_str." - Checking: ".$contact["url"], LOGGER_DEBUG);
@@ -871,13 +871,13 @@ class GContact
 					'generation' => $contact['generation'], 'updated' => $contact['updated'],
 					'server_url' => $contact['server_url'], 'connect' => $contact['connect']];
 
-			dba::update('gcontact', $updated, $condition, $fields);
+			DBA::update('gcontact', $updated, $condition, $fields);
 
 			// Now update the contact entry with the user id "0" as well.
 			// This is used for the shadow copies of public items.
 			/// @todo Check if we really should do this.
 			// The quality of the gcontact table is mostly lower than the public contact
-			$public_contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
+			$public_contact = DBA::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
 			if (DBM::is_result($public_contact)) {
 				logger("Update public contact ".$public_contact["id"], LOGGER_DEBUG);
 
@@ -887,7 +887,7 @@ class GContact
 						'network', 'bd', 'gender',
 						'keywords', 'alias', 'contact-type',
 						'url', 'location', 'about'];
-				$old_contact = dba::selectFirst('contact', $fields, ['id' => $public_contact["id"]]);
+				$old_contact = DBA::selectFirst('contact', $fields, ['id' => $public_contact["id"]]);
 
 				// Update it with the current values
 				$fields = ['name' => $contact['name'], 'nick' => $contact['nick'],
@@ -903,7 +903,7 @@ class GContact
 				}
 
 
-				dba::update('contact', $fields, ['id' => $public_contact["id"]], $old_contact);
+				DBA::update('contact', $fields, ['id' => $public_contact["id"]], $old_contact);
 			}
 		}
 

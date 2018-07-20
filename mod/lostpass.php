@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -24,7 +24,7 @@ function lostpass_post(App $a)
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` = 1 AND `blocked` = 0', $loginame, $loginame];
-	$user = dba::selectFirst('user', ['uid', 'username', 'email'], $condition);
+	$user = DBA::selectFirst('user', ['uid', 'username', 'email'], $condition);
 	if (!DBM::is_result($user)) {
 		notice(L10n::t('No valid account found.') . EOL);
 		goaway(System::baseUrl());
@@ -36,7 +36,7 @@ function lostpass_post(App $a)
 		'pwdreset' => $pwdreset_token,
 		'pwdreset_time' => DateTimeFormat::utcNow()
 	];
-	$result = dba::update('user', $fields, ['uid' => $user['uid']]);
+	$result = DBA::update('user', $fields, ['uid' => $user['uid']]);
 	if ($result) {
 		info(L10n::t('Password reset request issued. Check your email.') . EOL);
 	}
@@ -86,7 +86,7 @@ function lostpass_content(App $a)
 	if ($a->argc > 1) {
 		$pwdreset_token = $a->argv[1];
 
-		$user = dba::selectFirst('user', ['uid', 'username', 'email', 'pwdreset_time'], ['pwdreset' => $pwdreset_token]);
+		$user = DBA::selectFirst('user', ['uid', 'username', 'email', 'pwdreset_time'], ['pwdreset' => $pwdreset_token]);
 		if (!DBM::is_result($user)) {
 			notice(L10n::t("Request could not be verified. \x28You may have previously submitted it.\x29 Password reset failed."));
 
@@ -99,7 +99,7 @@ function lostpass_content(App $a)
 				'pwdreset' => null,
 				'pwdreset_time' => null
 			];
-			dba::update('user', $fields, ['uid' => $user['uid']]);
+			DBA::update('user', $fields, ['uid' => $user['uid']]);
 
 			notice(L10n::t('Request has expired, please make a new one.'));
 

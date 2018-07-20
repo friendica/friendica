@@ -8,7 +8,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Group;
 use Friendica\Util\DateTimeFormat;
@@ -100,7 +100,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	$master_record = $a->user;
 
 	if ((x($_SESSION, 'submanage')) && intval($_SESSION['submanage'])) {
-		$user = dba::selectFirst('user', [], ['uid' => $_SESSION['submanage']]);
+		$user = DBA::selectFirst('user', [], ['uid' => $_SESSION['submanage']]);
 		if (DBM::is_result($user)) {
 			$master_record = $user;
 		}
@@ -113,38 +113,38 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 				'nickname' => $master_record['nickname']]];
 
 		// Then add all the children
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
 		if (DBM::is_result($r)) {
-			$a->identities = array_merge($a->identities, dba::inArray($r));
+			$a->identities = array_merge($a->identities, DBA::inArray($r));
 		}
 	} else {
 		// Just ensure that the array is always defined
 		$a->identities = [];
 
 		// First entry is our parent
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['uid' => $master_record['parent-uid'], 'account_removed' => false]);
 		if (DBM::is_result($r)) {
-			$a->identities = dba::inArray($r);
+			$a->identities = DBA::inArray($r);
 		}
 
 		// Then add all siblings
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['parent-uid' => $master_record['parent-uid'], 'account_removed' => false]);
 		if (DBM::is_result($r)) {
-			$a->identities = array_merge($a->identities, dba::inArray($r));
+			$a->identities = array_merge($a->identities, DBA::inArray($r));
 		}
 	}
 
-	$r = dba::p("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
+	$r = DBA::p("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
 		FROM `manage`
 		INNER JOIN `user` ON `manage`.`mid` = `user`.`uid`
 		WHERE `user`.`account_removed` = 0 AND `manage`.`uid` = ?",
 		$master_record['uid']
 	);
 	if (DBM::is_result($r)) {
-		$a->identities = array_merge($a->identities, dba::inArray($r));
+		$a->identities = array_merge($a->identities, DBA::inArray($r));
 	}
 
 	if ($login_initial) {
@@ -154,7 +154,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		logger('auth_identities refresh: ' . print_r($a->identities, true), LOGGER_DEBUG);
 	}
 
-	$contact = dba::selectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => true]);
+	$contact = DBA::selectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => true]);
 	if (DBM::is_result($contact)) {
 		$a->contact = $contact;
 		$a->cid = $contact['id'];
@@ -164,10 +164,10 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] . '"');
 
 	if ($login_initial || $login_refresh) {
-		dba::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
+		DBA::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
 
 		// Set the login date for all identities of the user
-		dba::update('user', ['login_date' => DateTimeFormat::utcNow()],
+		DBA::update('user', ['login_date' => DateTimeFormat::utcNow()],
 			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
 	}
 

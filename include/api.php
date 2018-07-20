@@ -19,7 +19,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -231,7 +231,7 @@ function api_login(App $a)
 	} else {
 		$user_id = User::authenticate(trim($user), trim($password));
 		if ($user_id !== false) {
-			$record = dba::selectFirst('user', [], ['uid' => $user_id]);
+			$record = DBA::selectFirst('user', [], ['uid' => $user_id]);
 		}
 	}
 
@@ -499,7 +499,7 @@ function api_rss_extra(App $a, $arr, $user_info)
  */
 function api_unique_id_to_nurl($id)
 {
-	$r = dba::selectFirst('contact', ['nurl'], ['id' => $id]);
+	$r = DBA::selectFirst('contact', ['nurl'], ['id' => $id]);
 
 	if (DBM::is_result($r)) {
 		return $r["nurl"];
@@ -696,8 +696,8 @@ function api_get_user(App $a, $contact_id = null)
 			$uinfo[0]['network'] = NETWORK_DFRN;
 		}
 
-		$usr = dba::selectFirst('user', ['default-location'], ['uid' => api_user()]);
-		$profile = dba::selectFirst('profile', ['about'], ['uid' => api_user(), 'is-default' => true]);
+		$usr = DBA::selectFirst('user', ['default-location'], ['uid' => api_user()]);
+		$profile = DBA::selectFirst('profile', ['about'], ['uid' => api_user(), 'is-default' => true]);
 	}
 	$countitems = 0;
 	$countfriends = 0;
@@ -770,7 +770,7 @@ function api_get_user(App $a, $contact_id = null)
 
 	// If this is a local user and it uses Frio, we can get its color preferences.
 	if ($ret['self']) {
-		$theme_info = dba::selectFirst('user', ['theme'], ['uid' => $ret['uid']]);
+		$theme_info = DBA::selectFirst('user', ['theme'], ['uid' => $ret['uid']]);
 		if ($theme_info['theme'] === 'frio') {
 			$schema = PConfig::get($ret['uid'], 'frio', 'schema');
 
@@ -1131,7 +1131,7 @@ function api_statuses_update($type)
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60);
 
 			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_day = dba::count('item', $condition);
+			$posts_day = DBA::count('item', $condition);
 
 			if ($posts_day > $throttle_day) {
 				logger('Daily posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -1145,7 +1145,7 @@ function api_statuses_update($type)
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*7);
 
 			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_week = dba::count('item', $condition);
+			$posts_week = DBA::count('item', $condition);
 
 			if ($posts_week > $throttle_week) {
 				logger('Weekly posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -1159,7 +1159,7 @@ function api_statuses_update($type)
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*30);
 
 			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_month = dba::count('item', $condition);
+			$posts_month = DBA::count('item', $condition);
 
 			if ($posts_month > $throttle_month) {
 				logger('Monthly posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -2768,7 +2768,7 @@ function api_format_items_activities(&$item, $type = "json")
 		}
 	}
 
-	dba::close($ret);
+	DBA::close($ret);
 
 	if ($type == "xml") {
 		$xml_activities = [];
@@ -3048,7 +3048,7 @@ function api_lists_ownerships($type)
 	$user_info = api_get_user($a);
 	$uid = $user_info['uid'];
 
-	$groups = dba::select('group', [], ['deleted' => 0, 'uid' => $uid]);
+	$groups = DBA::select('group', [], ['deleted' => 0, 'uid' => $uid]);
 
 	// loop through all groups
 	$lists = [];
@@ -3867,7 +3867,7 @@ function api_fr_photoalbum_delete($type)
 	}
 
 	// now let's delete all photos from the album
-	$result = dba::delete('photo', ['uid' => api_user(), 'album' => $album]);
+	$result = DBA::delete('photo', ['uid' => api_user(), 'album' => $album]);
 
 	// return success of deletion or error message
 	if ($result) {
@@ -3901,11 +3901,11 @@ function api_fr_photoalbum_update($type)
 		throw new BadRequestException("no new albumname specified");
 	}
 	// check if album is existing
-	if (!dba::exists('photo', ['uid' => api_user(), 'album' => $album])) {
+	if (!DBA::exists('photo', ['uid' => api_user(), 'album' => $album])) {
 		throw new BadRequestException("album not available");
 	}
 	// now let's update all photos to the albumname
-	$result = dba::update('photo', ['album' => $album_new], ['uid' => api_user(), 'album' => $album]);
+	$result = DBA::update('photo', ['album' => $album_new], ['uid' => api_user(), 'album' => $album]);
 
 	// return success of updating or error message
 	if ($result) {
@@ -4139,7 +4139,7 @@ function api_fr_photo_delete($type)
 		throw new BadRequestException("photo not available");
 	}
 	// now we can perform on the deletion of the photo
-	$result = dba::delete('photo', ['uid' => api_user(), 'resource-id' => $photo_id]);
+	$result = DBA::delete('photo', ['uid' => api_user(), 'resource-id' => $photo_id]);
 
 	// return success of deletion or error message
 	if ($result) {
@@ -4212,7 +4212,7 @@ function api_account_update_profile_image($type)
 
 	// check if specified profile id is valid
 	if ($profile_id != 0) {
-		$profile = dba::selectFirst('profile', ['is-default'], ['uid' => api_user(), 'id' => $profile_id]);
+		$profile = DBA::selectFirst('profile', ['is-default'], ['uid' => api_user(), 'id' => $profile_id]);
 		// error message if specified profile id is not in database
 		if (!DBM::is_result($profile)) {
 			throw new BadRequestException("profile_id not available");
@@ -4249,11 +4249,11 @@ function api_account_update_profile_image($type)
 	// change specified profile or all profiles to the new resource-id
 	if ($is_default_profile) {
 		$condition = ["`profile` AND `resource-id` != ? AND `uid` = ?", $data['photo']['id'], api_user()];
-		dba::update('photo', ['profile' => false], $condition);
+		DBA::update('photo', ['profile' => false], $condition);
 	} else {
 		$fields = ['photo' => System::baseUrl() . '/photo/' . $data['photo']['id'] . '-4.' . $filetype,
 			'thumb' => System::baseUrl() . '/photo/' . $data['photo']['id'] . '-5.' . $filetype];
-		dba::update('profile', $fields, ['id' => $_REQUEST['profile'], 'uid' => api_user()]);
+		DBA::update('profile', $fields, ['id' => $_REQUEST['profile'], 'uid' => api_user()]);
 	}
 
 	Contact::updateSelfFromUserID(api_user(), true);
@@ -4298,16 +4298,16 @@ function api_account_update_profile($type)
 	$api_user = api_get_user(get_app());
 
 	if (!empty($_POST['name'])) {
-		dba::update('profile', ['name' => $_POST['name']], ['uid' => $local_user]);
-		dba::update('user', ['username' => $_POST['name']], ['uid' => $local_user]);
-		dba::update('contact', ['name' => $_POST['name']], ['uid' => $local_user, 'self' => 1]);
-		dba::update('contact', ['name' => $_POST['name']], ['id' => $api_user['id']]);
+		DBA::update('profile', ['name' => $_POST['name']], ['uid' => $local_user]);
+		DBA::update('user', ['username' => $_POST['name']], ['uid' => $local_user]);
+		DBA::update('contact', ['name' => $_POST['name']], ['uid' => $local_user, 'self' => 1]);
+		DBA::update('contact', ['name' => $_POST['name']], ['id' => $api_user['id']]);
 	}
 
 	if (isset($_POST['description'])) {
-		dba::update('profile', ['about' => $_POST['description']], ['uid' => $local_user]);
-		dba::update('contact', ['about' => $_POST['description']], ['uid' => $local_user, 'self' => 1]);
-		dba::update('contact', ['about' => $_POST['description']], ['id' => $api_user['id']]);
+		DBA::update('profile', ['about' => $_POST['description']], ['uid' => $local_user]);
+		DBA::update('contact', ['about' => $_POST['description']], ['uid' => $local_user, 'self' => 1]);
+		DBA::update('contact', ['about' => $_POST['description']], ['id' => $api_user['id']]);
 	}
 
 	Worker::add(PRIORITY_LOW, 'ProfileUpdate', $local_user);
@@ -4701,7 +4701,7 @@ function api_friendica_remoteauth()
 
 	// traditional DFRN
 
-	$contact = dba::selectFirst('contact', [], ['uid' => api_user(), 'nurl' => $c_url]);
+	$contact = DBA::selectFirst('contact', [], ['uid' => api_user(), 'nurl' => $c_url]);
 
 	if (!DBM::is_result($contact) || ($contact['network'] !== NETWORK_DFRN)) {
 		throw new BadRequestException("Unknown contact");
@@ -4724,7 +4724,7 @@ function api_friendica_remoteauth()
 
 	$fields = ['uid' => api_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id,
 		'sec' => $sec, 'expire' => time() + 45];
-	dba::insert('profile_check', $fields);
+	DBA::insert('profile_check', $fields);
 
 	logger($contact['name'] . ' ' . $sec, LOGGER_DEBUG);
 	$dest = ($url ? '&destination_url=' . $url : '');
@@ -5252,7 +5252,7 @@ function api_lists_destroy($type)
 	}
 
 	// get data of the specified group id
-	$group = dba::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
+	$group = DBA::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
 	// error message if specified gid is not in database
 	if (!$group) {
 		throw new BadRequestException('gid not available');
@@ -5506,7 +5506,7 @@ function api_lists_update($type)
 	}
 
 	// get data of the specified group id
-	$group = dba::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
+	$group = DBA::selectFirst('group', [], ['uid' => $uid, 'id' => $gid]);
 	// error message if specified gid is not in database
 	if (!$group) {
 		throw new BadRequestException('gid not available');
@@ -5676,13 +5676,13 @@ function api_friendica_direct_messages_setseen($type)
 	}
 
 	// error message if specified id is not in database
-	if (!dba::exists('mail', ['id' => $id, 'uid' => $uid])) {
+	if (!DBA::exists('mail', ['id' => $id, 'uid' => $uid])) {
 		$answer = ['result' => 'error', 'message' => 'message id not in database'];
 		return api_format_data("direct_messages_setseen", $type, ['$result' => $answer]);
 	}
 
 	// update seen indicator
-	$result = dba::update('mail', ['seen' => true], ['id' => $id]);
+	$result = DBA::update('mail', ['seen' => true], ['id' => $id]);
 
 	if ($result) {
 		// return success
@@ -5852,7 +5852,7 @@ api_register_func('api/friendica/profile/show', 'api_friendica_profile_show', tr
  */
 function api_saved_searches_list($type)
 {
-	$terms = dba::select('search', ['id', 'term'], ['uid' => local_user()]);
+	$terms = DBA::select('search', ['id', 'term'], ['uid' => local_user()]);
 
 	$result = [];
 	while ($term = $terms->fetch()) {
@@ -5866,7 +5866,7 @@ function api_saved_searches_list($type)
 		];
 	}
 
-	dba::close($terms);
+	DBA::close($terms);
 
 	return api_format_data("terms", $type, ['terms' => $result]);
 }

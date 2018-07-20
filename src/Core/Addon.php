@@ -5,7 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\App;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -24,7 +24,7 @@ class Addon
 	public static function uninstall($addon)
 	{
 		logger("Addons: uninstalling " . $addon);
-		dba::delete('addon', ['name' => $addon]);
+		DBA::delete('addon', ['name' => $addon]);
 
 		@include_once('addon/' . $addon . '/' . $addon . '.php');
 		if (function_exists($addon . '_uninstall')) {
@@ -55,7 +55,7 @@ class Addon
 
 			$addon_admin = (function_exists($addon."_addon_admin") ? 1 : 0);
 
-			dba::insert('addon', ['name' => $addon, 'installed' => true,
+			DBA::insert('addon', ['name' => $addon, 'installed' => true,
 						'timestamp' => $t, 'plugin_admin' => $addon_admin]);
 
 			// we can add the following with the previous SQL
@@ -63,7 +63,7 @@ class Addon
 			// This way the system won't fall over dead during the update.
 
 			if (file_exists('addon/' . $addon . '/.hidden')) {
-				dba::update('addon', ['hidden' => true], ['name' => $addon]);
+				DBA::update('addon', ['hidden' => true], ['name' => $addon]);
 			}
 			return true;
 		} else {
@@ -79,9 +79,9 @@ class Addon
 	{
 		$addons = Config::get('system', 'addon');
 		if (strlen($addons)) {
-			$r = dba::select('addon', [], ['installed' => 1]);
+			$r = DBA::select('addon', [], ['installed' => 1]);
 			if (DBM::is_result($r)) {
-				$installed = dba::inArray($r);
+				$installed = DBA::inArray($r);
 			} else {
 				$installed = [];
 			}
@@ -108,7 +108,7 @@ class Addon
 									$func = $addon . '_install';
 									$func();
 								}
-								dba::update('addon', ['timestamp' => $t], ['id' => $i['id']]);
+								DBA::update('addon', ['timestamp' => $t], ['id' => $i['id']]);
 							}
 						}
 					}
@@ -125,7 +125,7 @@ class Addon
 	 */
 	public static function isEnabled($addon)
 	{
-		return dba::exists('addon', ['installed' => true, 'name' => $addon]);
+		return DBA::exists('addon', ['installed' => true, 'name' => $addon]);
 	}
 
 
@@ -141,12 +141,12 @@ class Addon
 	public static function registerHook($hook, $file, $function, $priority = 0)
 	{
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
-		$exists = dba::exists('hook', $condition);
+		$exists = DBA::exists('hook', $condition);
 		if ($exists) {
 			return true;
 		}
 
-		$r = dba::insert('hook', ['hook' => $hook, 'file' => $file, 'function' => $function, 'priority' => $priority]);
+		$r = DBA::insert('hook', ['hook' => $hook, 'file' => $file, 'function' => $function, 'priority' => $priority]);
 
 		return $r;
 	}
@@ -162,7 +162,7 @@ class Addon
 	public static function unregisterHook($hook, $file, $function)
 	{
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
-		$r = dba::delete('hook', $condition);
+		$r = DBA::delete('hook', $condition);
 		return $r;
 	}
 
@@ -173,15 +173,15 @@ class Addon
 	{
 		$a = get_app();
 		$a->hooks = [];
-		$r = dba::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
+		$r = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
 
-		while ($rr = dba::fetch($r)) {
+		while ($rr = DBA::fetch($r)) {
 			if (! array_key_exists($rr['hook'], $a->hooks)) {
 				$a->hooks[$rr['hook']] = [];
 			}
 			$a->hooks[$rr['hook']][] = [$rr['file'],$rr['function']];
 		}
-		dba::close($r);
+		DBA::close($r);
 	}
 
 	/**
@@ -245,7 +245,7 @@ class Addon
 		} else {
 			// remove orphan hooks
 			$condition = ['hook' => $name, 'file' => $hook[0], 'function' => $hook[1]];
-			dba::delete('hook', $condition, ['cascade' => false]);
+			DBA::delete('hook', $condition, ['cascade' => false]);
 		}
 	}
 

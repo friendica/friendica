@@ -10,7 +10,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'boot.php';
@@ -490,13 +490,13 @@ class App
 
 		$this->mode |= App::MODE_LOCALCONFIGPRESENT;
 
-		if (!dba::connected()) {
+		if (!DBA::connected()) {
 			return;
 		}
 
 		$this->mode |= App::MODE_DBAVAILABLE;
 
-		if (dba::fetch_first("SHOW TABLES LIKE 'config'") === false) {
+		if (DBA::fetch_first("SHOW TABLES LIKE 'config'") === false) {
 			return;
 		}
 
@@ -511,7 +511,7 @@ class App
 
 	public function loadDatabase()
 	{
-		if (dba::connected()) {
+		if (DBA::connected()) {
 			return;
 		}
 
@@ -542,7 +542,7 @@ class App
 
 		$stamp1 = microtime(true);
 
-		dba::connect($db_host, $db_user, $db_pass, $db_data, $charset);
+		DBA::connect($db_host, $db_user, $db_pass, $db_data, $charset);
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
 
 		$this->save_timestamp($stamp1, 'network');
@@ -1383,7 +1383,7 @@ class App
 		if ($this->profile_uid && ($this->profile_uid != local_user())) {
 			// Allow folks to override user themes and always use their own on their own site.
 			// This works only if the user is on the same server
-			$user = dba::selectFirst('user', ['theme'], ['uid' => $this->profile_uid]);
+			$user = DBA::selectFirst('user', ['theme'], ['uid' => $this->profile_uid]);
 			if (DBM::is_result($user) && !PConfig::get(local_user(), 'system', 'always_my_theme')) {
 				$page_theme = $user['theme'];
 			}

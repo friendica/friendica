@@ -5,7 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -29,12 +29,12 @@ class PermissionSet extends BaseObject
 			'deny_cid' => self::sortPermissions(defaults($postarray, 'deny_cid', '')),
 			'deny_gid' => self::sortPermissions(defaults($postarray, 'deny_gid', ''))];
 
-		$set = dba::selectFirst('permissionset', ['id'], $condition);
+		$set = DBA::selectFirst('permissionset', ['id'], $condition);
 
 		if (!DBM::is_result($set)) {
-			dba::insert('permissionset', $condition, true);
+			DBA::insert('permissionset', $condition, true);
 
-			$set = dba::selectFirst('permissionset', ['id'], $condition);
+			$set = DBA::selectFirst('permissionset', ['id'], $condition);
 		}
 		return $set['id'];
 	}

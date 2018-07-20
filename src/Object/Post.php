@@ -11,7 +11,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -264,7 +264,7 @@ class Post extends BaseObject
 					'starred'   => L10n::t('starred'),
 				];
 
-				$thread = dba::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
+				$thread = DBA::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
 				if (DBM::is_result($thread)) {
 					$ignore = [
 						'do'        => L10n::t("ignore thread"),

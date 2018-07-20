@@ -8,7 +8,7 @@ namespace Friendica\Content\Widget;
 
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -38,7 +38,7 @@ class TagCloud
 		$o = '';
 		$r = self::tagadelic($uid, $count, $owner_id, $flags, $type);
 		if (count($r)) {
-			$contact = dba::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
+			$contact = DBA::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
 			$url = System::removedBaseUrl($contact['url']);
 
 			foreach ($r as $rr) {
@@ -88,7 +88,7 @@ class TagCloud
 		}
 
 		// Fetch tags
-		$r = dba::p("SELECT `term`, COUNT(`term`) AS `total` FROM `term`
+		$r = DBA::p("SELECT `term`, COUNT(`term`) AS `total` FROM `term`
 			LEFT JOIN `item` ON `term`.`oid` = `item`.`id`
 			WHERE `term`.`uid` = ? AND `term`.`type` = ?
 			AND `term`.`otype` = ?

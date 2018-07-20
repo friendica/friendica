@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 
@@ -39,7 +39,7 @@ function removeme_post(App $a)
 	// send email to admins
 	$admin_mails = explode(",", str_replace(" ", "", Config::get('config', 'admin_email')));
 	foreach ($admin_mails as $mail) {
-		$admin = dba::selectFirst('user', ['uid', 'language', 'email'], ['email' => $mail]);
+		$admin = DBA::selectFirst('user', ['uid', 'language', 'email'], ['email' => $mail]);
 		if (!DBM::is_result($admin)) {
 			continue;
 		}

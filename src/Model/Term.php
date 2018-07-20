@@ -5,7 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'boot.php';
@@ -18,8 +18,8 @@ class Term
 	{
 		$tag_text = '';
 		$condition = ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]];
-		$tags = dba::select('term', [], $condition);
-		while ($tag = dba::fetch($tags)) {
+		$tags = DBA::select('term', [], $condition);
+		while ($tag = DBA::fetch($tags)) {
 			if ($tag_text != '') {
 				$tag_text .= ',';
 			}
@@ -38,8 +38,8 @@ class Term
 	{
 		$file_text = '';
 		$condition = ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_FILE, TERM_CATEGORY]];
-		$tags = dba::select('term', [], $condition);
-		while ($tag = dba::fetch($tags)) {
+		$tags = DBA::select('term', [], $condition);
+		while ($tag = DBA::fetch($tags)) {
 			if ($tag['type'] == TERM_CATEGORY) {
 				$file_text .= '<' . $tag['term'] . '>';
 			} else {
@@ -66,7 +66,7 @@ class Term
 		$message['tag'] = $tags;
 
 		// Clean up all tags
-		dba::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]]);
+		DBA::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]]);
 
 		if ($message['deleted']) {
 			return;
@@ -128,12 +128,12 @@ class Term
 
 			if ($message['uid'] == 0) {
 				$global = true;
-				dba::update('term', ['global' => true], ['otype' => TERM_OBJ_POST, 'guid' => $message['guid']]);
+				DBA::update('term', ['global' => true], ['otype' => TERM_OBJ_POST, 'guid' => $message['guid']]);
 			} else {
-				$global = dba::exists('term', ['uid' => 0, 'otype' => TERM_OBJ_POST, 'guid' => $message['guid']]);
+				$global = DBA::exists('term', ['uid' => 0, 'otype' => TERM_OBJ_POST, 'guid' => $message['guid']]);
 			}
 
-			dba::insert('term', [
+			DBA::insert('term', [
 				'uid'      => $message['uid'],
 				'oid'      => $itemid,
 				'otype'    => TERM_OBJ_POST,
@@ -152,8 +152,8 @@ class Term
 				foreach ($users AS $user) {
 					if ($user['uid'] == $message['uid']) {
 						/// @todo This function is called frim Item::update - so we mustn't call that function here
-						dba::update('item', ['mention' => true], ['id' => $itemid]);
-						dba::update('thread', ['mention' => true], ['iid' => $message['parent']]);
+						DBA::update('item', ['mention' => true], ['id' => $itemid]);
+						DBA::update('thread', ['mention' => true], ['iid' => $message['parent']]);
 					}
 				}
 			}
@@ -172,7 +172,7 @@ class Term
 		}
 
 		// Clean up all tags
-		dba::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_FILE, TERM_CATEGORY]]);
+		DBA::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_FILE, TERM_CATEGORY]]);
 
 		if ($message["deleted"]) {
 			return;
@@ -182,7 +182,7 @@ class Term
 
 		if (preg_match_all("/\[(.*?)\]/ism", $message["file"], $files)) {
 			foreach ($files[1] as $file) {
-				dba::insert('term', [
+				DBA::insert('term', [
 					'uid' => $message["uid"],
 					'oid' => $itemid,
 					'otype' => TERM_OBJ_POST,
@@ -194,7 +194,7 @@ class Term
 
 		if (preg_match_all("/\<(.*?)\>/ism", $message["file"], $files)) {
 			foreach ($files[1] as $file) {
-				dba::insert('term', [
+				DBA::insert('term', [
 					'uid' => $message["uid"],
 					'oid' => $itemid,
 					'otype' => TERM_OBJ_POST,
@@ -222,14 +222,14 @@ class Term
 
 		$searchpath = System::baseUrl() . "/search?tag=";
 
-		$taglist = dba::select(
+		$taglist = DBA::select(
 			'term',
 			['type', 'term', 'url'],
 			["`otype` = ? AND `oid` = ? AND `type` IN (?, ?)", TERM_OBJ_POST, $item['id'], TERM_HASHTAG, TERM_MENTION],
 			['order' => ['tid']]
 		);
 
-		while ($tag = dba::fetch($taglist)) {
+		while ($tag = DBA::fetch($taglist)) {
 			if ($tag["url"] == "") {
 				$tag["url"] = $searchpath . $tag["term"];
 			}
@@ -254,7 +254,7 @@ class Term
 
 			$return['tags'][] = $prefix . "<a href=\"" . $tag["url"] . "\" target=\"_blank\">" . $tag["term"] . "</a>";
 		}
-		dba::close($taglist);
+		DBA::close($taglist);
 
 		return $return;
 	}

@@ -15,7 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
@@ -89,7 +89,7 @@ class Profile
 	 */
 	public static function load(App $a, $nickname, $profile = 0, array $profiledata = [], $show_connect = true)
 	{
-		$user = dba::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
+		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
 		if (!DBM::is_result($user) && empty($profiledata)) {
 			logger('profile error: ' . $a->query_string, LOGGER_DEBUG);
@@ -198,7 +198,7 @@ class Profile
 		if (remote_user() && count($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $uid) {
-					$contact = dba::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
+					$contact = DBA::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
 					if (DBM::is_result($contact)) {
 						$profile_id = $contact['profile-id'];
 					}
@@ -210,7 +210,7 @@ class Profile
 		$profile = null;
 
 		if ($profile_id) {
-			$profile = dba::fetch_first(
+			$profile = DBA::fetch_first(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` AS `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
 					`profile`.`uid` AS `profile_uid`, `profile`.*,
@@ -224,7 +224,7 @@ class Profile
 			);
 		}
 		if (!DBM::is_result($profile)) {
-			$profile = dba::fetch_first(
+			$profile = DBA::fetch_first(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` as `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
 					`profile`.`uid` AS `profile_uid`, `profile`.*,
@@ -312,7 +312,7 @@ class Profile
 				$profile_url = normalise_link(System::baseUrl() . '/profile/' . $profile['nickname']);
 			}
 
-			if (dba::exists('contact', ['pending' => false, 'uid' => local_user(), 'nurl' => $profile_url])) {
+			if (DBA::exists('contact', ['pending' => false, 'uid' => local_user(), 'nurl' => $profile_url])) {
 				$connect = false;
 			}
 		}
@@ -547,7 +547,7 @@ class Profile
 		$cachekey = 'get_birthdays:' . local_user();
 		$r = Cache::get($cachekey);
 		if (is_null($r)) {
-			$s = dba::p(
+			$s = DBA::p(
 				"SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
 				INNER JOIN `contact` ON `contact`.`id` = `event`.`cid`
 				WHERE `event`.`uid` = ? AND `type` = 'birthday' AND `start` < ? AND `finish` > ?
@@ -557,7 +557,7 @@ class Profile
 				DateTimeFormat::utcNow()
 			);
 			if (DBM::is_result($s)) {
-				$r = dba::inArray($s);
+				$r = DBA::inArray($s);
 				Cache::set($cachekey, $r, CACHE_HOUR);
 			}
 		}
@@ -633,7 +633,7 @@ class Profile
 		$bd_format = L10n::t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
-		$s = dba::p(
+		$s = DBA::p(
 			"SELECT `event`.*
 			FROM `event`
 			INNER JOIN `item`
@@ -661,7 +661,7 @@ class Profile
 		if (DBM::is_result($s)) {
 			$istoday = false;
 
-			while ($rr = dba::fetch($s)) {
+			while ($rr = DBA::fetch($s)) {
 				if (strlen($rr['name'])) {
 					$total ++;
 				}
@@ -698,7 +698,7 @@ class Profile
 
 				$r[] = $rr;
 			}
-			dba::close($s);
+			DBA::close($s);
 			$classtoday = (($istoday) ? 'event-today' : '');
 		}
 		$tpl = get_markup_template('events_reminder.tpl');
@@ -1025,7 +1025,7 @@ class Profile
 					return;
 				}
 
-				$contact = dba::selectFirst('contact',['id', 'url'], ['id' => $cid]);
+				$contact = DBA::selectFirst('contact',['id', 'url'], ['id' => $cid]);
 
 				if (DBM::is_result($contact) && remote_user() && remote_user() == $contact['id']) {
 					// The visitor is already authenticated.
@@ -1081,7 +1081,7 @@ class Profile
 			return;
 		}
 
-		$visitor = dba::selectFirst('contact', [], ['id' => $cid]);
+		$visitor = DBA::selectFirst('contact', [], ['id' => $cid]);
 
 		// Authenticate the visitor.
 		$_SESSION['authenticated'] = 1;

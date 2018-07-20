@@ -4,7 +4,7 @@ namespace Friendica\Core\Config;
 
 use Exception;
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -31,11 +31,11 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 			return;
 		}
 
-		$configs = dba::select('config', ['cat', 'v', 'k']);
-		while ($config = dba::fetch($configs)) {
+		$configs = DBA::select('config', ['cat', 'v', 'k']);
+		while ($config = DBA::fetch($configs)) {
 			self::getApp()->setConfigValue($config['cat'], $config['k'], $config['v']);
 		}
-		dba::close($configs);
+		DBA::close($configs);
 
 		$this->config_loaded = true;
 	}
@@ -43,7 +43,7 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 	public function get($cat, $k, $default_value = null, $refresh = false)
 	{
 		if ($refresh) {
-			$config = dba::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
+			$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
 			if (DBM::is_result($config)) {
 				self::getApp()->setConfigValue($cat, $k, $config['v']);
 			}
@@ -70,7 +70,7 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 		// manage array value
 		$dbvalue = is_array($value) ? serialize($value) : $value;
 
-		$result = dba::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
+		$result = DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
 		if (!$result) {
 			throw new Exception('Unable to store config value in [' . $cat . '][' . $k . ']');
 		}
@@ -82,7 +82,7 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 	{
 		self::getApp()->deleteConfigValue($cat, $k);
 
-		$result = dba::delete('config', ['cat' => $cat, 'k' => $k]);
+		$result = DBA::delete('config', ['cat' => $cat, 'k' => $k]);
 
 		return $result;
 	}

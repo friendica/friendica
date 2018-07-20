@@ -10,7 +10,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
@@ -41,14 +41,14 @@ class Photo
 	 */
 	public static function store(Image $Image, $uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '', $desc = '')
 	{
-		$photo = dba::selectFirst('photo', ['guid'], ["`resource-id` = ? AND `guid` != ?", $rid, '']);
+		$photo = DBA::selectFirst('photo', ['guid'], ["`resource-id` = ? AND `guid` != ?", $rid, '']);
 		if (DBM::is_result($photo)) {
 			$guid = $photo['guid'];
 		} else {
 			$guid = System::createGUID();
 		}
 
-		$existing_photo = dba::selectFirst('photo', ['id'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
+		$existing_photo = DBA::selectFirst('photo', ['id'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
 
 		$fields = [
 			'uid' => $uid,
@@ -74,9 +74,9 @@ class Photo
 		];
 
 		if (DBM::is_result($existing_photo)) {
-			$r = dba::update('photo', $fields, ['id' => $existing_photo['id']]);
+			$r = DBA::update('photo', $fields, ['id' => $existing_photo['id']]);
 		} else {
-			$r = dba::insert('photo', $fields);
+			$r = DBA::insert('photo', $fields);
 		}
 
 		return $r;
@@ -94,7 +94,7 @@ class Photo
 		$thumb = '';
 		$micro = '';
 
-		$photo = dba::selectFirst(
+		$photo = DBA::selectFirst(
 			'photo', ['resource-id'], ['uid' => $uid, 'contact-id' => $cid, 'scale' => 4, 'album' => 'Contact Photos']
 		);
 		if (x($photo['resource-id'])) {

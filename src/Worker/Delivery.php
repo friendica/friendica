@@ -8,7 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -39,14 +39,14 @@ class Delivery extends BaseObject
 		$public_message = false;
 
 		if ($cmd == self::MAIL) {
-			$target_item = dba::selectFirst('mail', [], ['id' => $item_id]);
+			$target_item = DBA::selectFirst('mail', [], ['id' => $item_id]);
 			if (!DBM::is_result($target_item)) {
 				return;
 			}
 			$uid = $target_item['uid'];
 			$items = [];
 		} elseif ($cmd == self::SUGGESTION) {
-			$target_item = dba::selectFirst('fsuggest', [], ['id' => $item_id]);
+			$target_item = DBA::selectFirst('fsuggest', [], ['id' => $item_id]);
 			if (!DBM::is_result($target_item)) {
 				return;
 			}
@@ -74,7 +74,7 @@ class Delivery extends BaseObject
 				}
 				$items[] = $item;
 			}
-			dba::close($itemdata);
+			DBA::close($itemdata);
 
 			$uid = $target_item['contact-uid'];
 
@@ -138,7 +138,7 @@ class Delivery extends BaseObject
 		}
 
 		// We don't deliver our items to blocked or pending contacts, and not to ourselves either
-		$contact = dba::selectFirst('contact', [],
+		$contact = DBA::selectFirst('contact', [],
 			['id' => $contact_id, 'blocked' => false, 'pending' => false, 'self' => false]
 		);
 		if (!DBM::is_result($contact)) {
@@ -210,7 +210,7 @@ class Delivery extends BaseObject
 		} elseif ($cmd == self::SUGGESTION) {
 			$item = $target_item;
 			$atom = DFRN::fsuggest($item, $owner);
-			dba::delete('fsuggest', ['id' => $item['id']]);
+			DBA::delete('fsuggest', ['id' => $item['id']]);
 		} elseif ($cmd == self::RELOCATION) {
 			$atom = DFRN::relocate($owner, $owner['uid']);
 		} elseif ($followup) {
@@ -237,7 +237,7 @@ class Delivery extends BaseObject
 
 		if (link_compare($basepath, System::baseUrl())) {
 			$condition = ['nurl' => normalise_link($contact['url']), 'self' => true];
-			$target_self = dba::selectFirst('contact', ['uid'], $condition);
+			$target_self = DBA::selectFirst('contact', ['uid'], $condition);
 			if (!DBM::is_result($target_self)) {
 				return;
 			}
@@ -254,7 +254,7 @@ class Delivery extends BaseObject
 			}
 
 			// We now have some contact, so we fetch it
-			$target_importer = dba::fetch_first("SELECT *, `name` as `senderName`
+			$target_importer = DBA::fetch_first("SELECT *, `name` as `senderName`
 							FROM `contact`
 							WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 							$cid);
@@ -264,7 +264,7 @@ class Delivery extends BaseObject
 				return;
 			}
 
-			$user = dba::selectFirst('user', [], ['uid' => $target_uid]);
+			$user = DBA::selectFirst('user', [], ['uid' => $target_uid]);
 
 			$target_importer = array_merge($target_importer, $user);
 
@@ -404,7 +404,7 @@ class Delivery extends BaseObject
 			return;
 		}
 
-		$local_user = dba::selectFirst('user', [], ['uid' => $owner['uid']]);
+		$local_user = DBA::selectFirst('user', [], ['uid' => $owner['uid']]);
 		if (!DBM::is_result($local_user)) {
 			return;
 		}
@@ -412,7 +412,7 @@ class Delivery extends BaseObject
 		logger('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
 
 		$reply_to = '';
-		$mailacct = dba::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);
+		$mailacct = DBA::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);
 		if (DBM::is_result($mailacct) && !empty($mailacct['reply_to'])) {
 			$reply_to = $mailacct['reply_to'];
 		}

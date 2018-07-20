@@ -4,7 +4,7 @@ namespace Friendica\Core\Console;
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use RuntimeException;
 
 /**
@@ -61,12 +61,12 @@ HELP;
 		}
 
 		$nurl = normalise_link($this->getArgument(0));
-		if (!dba::exists('contact', ['nurl' => $nurl, 'archive' => false])) {
+		if (!DBA::exists('contact', ['nurl' => $nurl, 'archive' => false])) {
 			throw new RuntimeException(L10n::t('Could not find any unarchived contact entry for this URL (%s)', $nurl));
 		}
-		if (dba::update('contact', ['archive' => true], ['nurl' => $nurl])) {
+		if (DBA::update('contact', ['archive' => true], ['nurl' => $nurl])) {
 			$condition = ["`cid` IN (SELECT `id` FROM `contact` WHERE `archive`)"];
-			dba::delete('queue', $condition);
+			DBA::delete('queue', $condition);
 			$this->out(L10n::t('The contact entries have been archived'));
 		} else {
 			throw new RuntimeException('The contact archival failed.');

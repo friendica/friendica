@@ -11,7 +11,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 
@@ -47,7 +47,7 @@ function hovercard_content()
 	$cid = 0;
 	if (strpos($profileurl, 'redir/') === 0) {
 		$cid = intval(substr($profileurl, 6));
-		$remote_contact = dba::selectFirst('contact', ['nurl'], ['id' => $cid]);
+		$remote_contact = DBA::selectFirst('contact', ['nurl'], ['id' => $cid]);
 		$profileurl = defaults($remote_contact, 'nurl', '');
 	}
 

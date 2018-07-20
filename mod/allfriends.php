@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -35,7 +35,7 @@ function allfriends_content(App $a)
 
 	$uid = $a->user['uid'];
 
-	$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => local_user()]);
 
 	if (!DBM::is_result($contact)) {
 		return;

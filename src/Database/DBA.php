@@ -17,7 +17,7 @@ use PDOStatement;
  *
  * This class is for the low level database stuff that does driver specific things.
  */
-class dba
+class DBA
 {
 	public static $connected = false;
 

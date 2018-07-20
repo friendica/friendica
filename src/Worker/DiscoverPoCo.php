@@ -7,7 +7,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
@@ -160,7 +160,7 @@ class DiscoverPoCo
 
 			$urlparts = parse_url($user["url"]);
 			if (!isset($urlparts["scheme"])) {
-				dba::update('gcontact', ['network' => NETWORK_PHANTOM],
+				DBA::update('gcontact', ['network' => NETWORK_PHANTOM],
 					['nurl' => normalise_link($user["url"])]);
 				continue;
 			 }
@@ -173,7 +173,7 @@ class DiscoverPoCo
 						"identi.ca" => NETWORK_PUMPIO,
 						"alpha.app.net" => NETWORK_APPNET];
 
-				dba::update('gcontact', ['network' => $networks[$urlparts["host"]]],
+				DBA::update('gcontact', ['network' => $networks[$urlparts["host"]]],
 					['nurl' => normalise_link($user["url"])]);
 				continue;
 			}
@@ -196,7 +196,7 @@ class DiscoverPoCo
 					return;
 				}
 			} else {
-				dba::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
+				DBA::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
 					['nurl' => normalise_link($user["url"])]);
 			}
 

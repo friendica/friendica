@@ -9,7 +9,7 @@ use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 function community_init(App $a)
@@ -190,7 +190,7 @@ function community_content(App $a, $update = 0)
 function community_getitems($start, $itemspage, $content)
 {
 	if ($content == 'local') {
-		$r = dba::p("SELECT `item`.`uri`, `author`.`url` AS `author-link` FROM `thread`
+		$r = DBA::p("SELECT `item`.`uri`, `author`.`url` AS `author-link` FROM `thread`
 			INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND NOT `user`.`hidewall`
 			INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 			INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
@@ -198,14 +198,14 @@ function community_getitems($start, $itemspage, $content)
 			AND NOT `thread`.`private` AND `thread`.`wall` AND `thread`.`origin`
 			ORDER BY `thread`.`commented` DESC LIMIT " . intval($start) . ", " . intval($itemspage)
 		);
-		return dba::inArray($r);
+		return DBA::inArray($r);
 	} elseif ($content == 'global') {
-		$r = dba::p("SELECT `uri` FROM `thread`
+		$r = DBA::p("SELECT `uri` FROM `thread`
 				INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 				INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
 				WHERE `thread`.`uid` = 0 AND NOT `author`.`hidden` AND NOT `author`.`blocked`
 				ORDER BY `thread`.`commented` DESC LIMIT " . intval($start) . ", " . intval($itemspage));
-		return dba::inArray($r);
+		return DBA::inArray($r);
 	}
 
 	// Should never happen

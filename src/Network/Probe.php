@@ -13,7 +13,7 @@ use DOMDocument;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Profile;
 use Friendica\Protocol\Email;
@@ -415,7 +415,7 @@ class Probe
 
 				$condition = ['nurl' => normalise_link($data["url"])];
 
-				$old_fields = dba::selectFirst('gcontact', $fieldnames, $condition);
+				$old_fields = DBA::selectFirst('gcontact', $fieldnames, $condition);
 
 				// When the gcontact doesn't exist, the value "true" will trigger an insert.
 				// In difference to the public contacts we want to have every contact
@@ -428,7 +428,7 @@ class Probe
 					$fields['created'] = DateTimeFormat::utcNow();
 				}
 
-				dba::update('gcontact', $fields, $condition, $old_fields);
+				DBA::update('gcontact', $fields, $condition, $old_fields);
 
 				$fields = ['name' => $data['name'],
 						'nick' => $data['nick'],
@@ -466,13 +466,13 @@ class Probe
 				// This won't trigger an insert. This is intended, since we only need
 				// public contacts for everyone we store items from.
 				// We don't need to store every contact on the planet.
-				$old_fields = dba::selectFirst('contact', $fieldnames, $condition);
+				$old_fields = DBA::selectFirst('contact', $fieldnames, $condition);
 
 				$fields['name-date'] = DateTimeFormat::utcNow();
 				$fields['uri-date'] = DateTimeFormat::utcNow();
 				$fields['success_update'] = DateTimeFormat::utcNow();
 
-				dba::update('contact', $fields, $condition, $old_fields);
+				DBA::update('contact', $fields, $condition, $old_fields);
 			}
 		}
 

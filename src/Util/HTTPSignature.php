@@ -6,7 +6,7 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Config;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 /**
@@ -179,9 +179,9 @@ class HTTPSignature
 	private static function getActivitypubKey($id)
 	{
 		if (strpos($id, 'acct:') === 0) {
-			$contact = dba::selectFirst('contact', ['pubkey'], ['uid' => 0, 'addr' => str_replace('acct:', '', $id)]);
+			$contact = DBA::selectFirst('contact', ['pubkey'], ['uid' => 0, 'addr' => str_replace('acct:', '', $id)]);
 		} else {
-			$contact = dba::selectFirst('contact', ['pubkey'], ['id' => $id, 'network' => 'activitypub']);
+			$contact = DBA::selectFirst('contact', ['pubkey'], ['id' => $id, 'network' => 'activitypub']);
 		}
 
 		if (DBM::is_result($contact)) {

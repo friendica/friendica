@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\User;
 
@@ -34,7 +34,7 @@ function delegate_post(App $a)
 	$parent_password = defaults($_POST, 'parent_password', '');
 
 	if ($parent_uid != 0) {
-		$user = dba::selectFirst('user', ['nickname'], ['uid' => $parent_uid]);
+		$user = DBA::selectFirst('user', ['nickname'], ['uid' => $parent_uid]);
 		if (!DBM::is_result($user)) {
 			notice(L10n::t('Parent user not found.') . EOL);
 			return;
@@ -47,7 +47,7 @@ function delegate_post(App $a)
 		}
 	}
 
-	dba::update('user', ['parent-uid' => $parent_uid], ['uid' => local_user()]);
+	DBA::update('user', ['parent-uid' => $parent_uid], ['uid' => local_user()]);
 }
 
 function delegate_content(App $a)
@@ -65,14 +65,14 @@ function delegate_content(App $a)
 
 		$user_id = $a->argv[2];
 
-		$user = dba::selectFirst('user', ['nickname'], ['uid' => $user_id]);
+		$user = DBA::selectFirst('user', ['nickname'], ['uid' => $user_id]);
 		if (DBM::is_result($user)) {
 			$condition = [
 				'uid' => local_user(),
 				'nurl' => normalise_link(System::baseUrl() . '/profile/' . $user['nickname'])
 			];
-			if (dba::exists('contact', $condition)) {
-				dba::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
+			if (DBA::exists('contact', $condition)) {
+				DBA::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
 			}
 		}
 		goaway(System::baseUrl() . '/delegate');
@@ -84,7 +84,7 @@ function delegate_content(App $a)
 			goaway(System::baseUrl() . '/delegate');
 		}
 
-		dba::delete('manage', ['uid' => $a->argv[2], 'mid' => local_user()]);
+		DBA::delete('manage', ['uid' => $a->argv[2], 'mid' => local_user()]);
 		goaway(System::baseUrl() . '/delegate');
 	}
 
@@ -136,19 +136,19 @@ function delegate_content(App $a)
 
 	settings_init($a);
 
-	$user = dba::selectFirst('user', ['parent-uid', 'email'], ['uid' => local_user()]);
+	$user = DBA::selectFirst('user', ['parent-uid', 'email'], ['uid' => local_user()]);
 
 	$parent_user = null;
 
 	if (DBM::is_result($user)) {
-		if (!dba::exists('user', ['parent-uid' => local_user()])) {
+		if (!DBA::exists('user', ['parent-uid' => local_user()])) {
 			$parent_uid = $user['parent-uid'];
 			$parents = [0 => L10n::t('No parent user')];
 
 			$fields = ['uid', 'username', 'nickname'];
 			$condition = ['email' => $user['email'], 'verified' => true, 'blocked' => false, 'parent-uid' => 0];
-			$parent_users = dba::select('user', $fields, $condition);
-			while ($parent = dba::fetch($parent_users)) {
+			$parent_users = DBA::select('user', $fields, $condition);
+			while ($parent = DBA::fetch($parent_users)) {
 				if ($parent['uid'] != local_user()) {
 					$parents[$parent['uid']] = sprintf('%s (%s)', $parent['username'], $parent['nickname']);
 				}

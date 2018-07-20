@@ -12,7 +12,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -42,7 +42,7 @@ function contacts_init(App $a)
 	$contact = null;
 	if ((($a->argc == 2) && intval($a->argv[1])) || (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts"))) {
 		$contact_id = intval($a->argv[1]);
-		$contact = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
 	}
 
 	if (DBM::is_result($contact)) {
@@ -181,7 +181,7 @@ function contacts_post(App $a)
 		return;
 	}
 
-	if (!dba::exists('contact', ['id' => $contact_id, 'uid' => local_user()])) {
+	if (!DBA::exists('contact', ['id' => $contact_id, 'uid' => local_user()])) {
 		notice(L10n::t('Could not access contact record.') . EOL);
 		goaway('contacts');
 		return; // NOTREACHED
@@ -191,7 +191,7 @@ function contacts_post(App $a)
 
 	$profile_id = intval($_POST['profile-assign']);
 	if ($profile_id) {
-		if (!dba::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
+		if (!DBA::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
 			notice(L10n::t('Could not locate selected profile.') . EOL);
 			return;
 		}
@@ -231,7 +231,7 @@ function contacts_post(App $a)
 		notice(L10n::t('Failed to update contact record.') . EOL);
 	}
 
-	$contact = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
 	if (DBM::is_result($contact)) {
 		$a->data['contact'] = $contact;
 	}
@@ -243,7 +243,7 @@ function contacts_post(App $a)
 
 function _contact_update($contact_id)
 {
-	$contact = dba::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
 	if (!DBM::is_result($contact)) {
 		return;
 	}
@@ -264,7 +264,7 @@ function _contact_update($contact_id)
 
 function _contact_update_profile($contact_id)
 {
-	$contact = dba::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
 	if (!DBM::is_result($contact)) {
 		return;
 	}
@@ -396,7 +396,7 @@ function contacts_content(App $a)
 
 		$cmd = $a->argv[2];
 
-		$orig_record = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user(), 'self' => false]);
+		$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user(), 'self' => false]);
 		if (!DBM::is_result($orig_record)) {
 			notice(L10n::t('Could not access contact record.') . EOL);
 			goaway('contacts');
@@ -910,7 +910,7 @@ function contact_posts($a, $contact_id)
 {
 	$o = contacts_tab($a, $contact_id, 1);
 
-	$contact = dba::selectFirst('contact', ['url'], ['id' => $contact_id]);
+	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id]);
 	if (DBM::is_result($contact)) {
 		$a->page['aside'] = "";
 		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));

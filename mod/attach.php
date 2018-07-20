@@ -5,7 +5,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -22,7 +22,7 @@ function attach_init(App $a)
 
 	// Check for existence, which will also provide us the owner uid
 
-	$r = dba::selectFirst('attach', [], ['id' => $item_id]);
+	$r = DBA::selectFirst('attach', [], ['id' => $item_id]);
 	if (!DBM::is_result($r)) {
 		notice(L10n::t('Item was not found.'). EOL);
 		return;

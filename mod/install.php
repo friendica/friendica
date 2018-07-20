@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Install;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\Temporal;
 
@@ -53,7 +53,7 @@ function install_post(App $a) {
 			$phpath = notags(trim($_POST['phpath']));
 
 			require_once("include/dba.php");
-			if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata)) {
+			if (!DBA::connect($dbhost, $dbuser, $dbpass, $dbdata)) {
 				$a->data['db_conn_failed'] = true;
 			}
 
@@ -71,7 +71,7 @@ function install_post(App $a) {
 			$adminmail = notags(trim($_POST['adminmail']));
 
 			// connect to db
-			dba::connect($dbhost, $dbuser, $dbpass, $dbdata);
+			DBA::connect($dbhost, $dbuser, $dbpass, $dbdata);
 
 			Install::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail);
 
@@ -112,7 +112,7 @@ function install_content(App $a) {
 		$db_return_text .= $txt;
 	}
 
-	if (dba::$connected) {
+	if (DBA::$connected) {
 		$r = q("SELECT COUNT(*) as `total` FROM `user`");
 		if (DBM::is_result($r) && $r[0]['total']) {
 			$tpl = get_markup_template('install.tpl');

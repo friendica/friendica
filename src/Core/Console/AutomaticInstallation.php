@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Install;
 use Friendica\Core\Theme;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use RuntimeException;
 
 require_once 'mod/install.php';
@@ -155,7 +155,7 @@ HELP;
 		);
 
 
-		if (!dba::connect($db_host, $db_user, $db_pass, $db_data)) {
+		if (!DBA::connect($db_host, $db_user, $db_pass, $db_data)) {
 			$result['status'] = false;
 			$result['help'] = 'Failed, please check your MySQL settings and credentials.';
 		}

@@ -13,7 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -123,7 +123,7 @@ function profiles_init(App $a) {
 		$r1[0]['net-publish'] = 0;
 		$r1[0]['profile-name'] = dbesc($name);
 
-		dba::insert('profile', $r1[0]);
+		DBA::insert('profile', $r1[0]);
 
 		$r3 = q("SELECT `id` FROM `profile` WHERE `uid` = %d AND `profile-name` = '%s' LIMIT 1",
 			intval(local_user()),

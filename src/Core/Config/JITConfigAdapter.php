@@ -2,7 +2,7 @@
 namespace Friendica\Core\Config;
 
 use Friendica\BaseObject;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 
 require_once 'include/dba.php';
@@ -27,8 +27,8 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			return;
 		}
 
-		$configs = dba::select('config', ['v', 'k'], ['cat' => $cat]);
-		while ($config = dba::fetch($configs)) {
+		$configs = DBA::select('config', ['v', 'k'], ['cat' => $cat]);
+		while ($config = DBA::fetch($configs)) {
 			$k = $config['k'];
 
 			self::getApp()->setConfigValue($cat, $k, $config['v']);
@@ -38,7 +38,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 				$this->in_db[$cat][$k] = true;
 			}
 		}
-		dba::close($configs);
+		DBA::close($configs);
 	}
 
 	public function get($cat, $k, $default_value = null, $refresh = false)
@@ -56,7 +56,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			}
 		}
 
-		$config = dba::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
+		$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
 		if (DBM::is_result($config)) {
 			// manage array value
 			$value = (preg_match("|^a:[0-9]+:{.*}$|s", $config['v']) ? unserialize($config['v']) : $config['v']);
@@ -115,7 +115,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		$result = dba::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
+		$result = DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
 
 		if ($result) {
 			$this->in_db[$cat][$k] = true;
@@ -131,7 +131,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			unset($this->in_db[$cat][$k]);
 		}
 
-		$result = dba::delete('config', ['cat' => $cat, 'k' => $k]);
+		$result = DBA::delete('config', ['cat' => $cat, 'k' => $k]);
 
 		return $result;
 	}

@@ -11,7 +11,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
@@ -213,7 +213,7 @@ class Event extends BaseObject
 			return;
 		}
 
-		dba::delete('event', ['id' => $event_id]);
+		DBA::delete('event', ['id' => $event_id]);
 		logger("Deleted event ".$event_id, LOGGER_DEBUG);
 	}
 
@@ -261,12 +261,12 @@ class Event extends BaseObject
 			$conditions['self'] = true;
 		}
 
-		$contact = dba::selectFirst('contact', [], $conditions);
+		$contact = DBA::selectFirst('contact', [], $conditions);
 
 		// Existing event being modified.
 		if ($event['id']) {
 			// has the event actually changed?
-			$existing_event = dba::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
+			$existing_event = DBA::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
 			if (!DBM::is_result($existing_event) || ($existing_event['edited'] === $event['edited'])) {
 
 				$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
@@ -286,7 +286,7 @@ class Event extends BaseObject
 				'nofinish' => $event['nofinish'],
 			];
 
-			dba::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
+			DBA::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
 
 			$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 			if (DBM::is_result($item)) {
@@ -307,9 +307,9 @@ class Event extends BaseObject
 			$event['guid'] = System::createGUID(32);
 
 			// New event. Store it.
-			dba::insert('event', $event);
+			DBA::insert('event', $event);
 
-			$event['id'] = dba::lastInsertId();
+			$event['id'] = DBA::lastInsertId();
 
 			$item_arr = [];
 
@@ -737,9 +737,9 @@ class Event extends BaseObject
 			$conditions += ['allow_cid' => '', 'allow_gid' => ''];
 		}
 
-		$events = dba::select('event', $fields, $conditions);
+		$events = DBA::select('event', $fields, $conditions);
 		if (DBM::is_result($events)) {
-			$return = dba::inArray($events);
+			$return = DBA::inArray($events);
 		}
 
 		return $return;
@@ -761,7 +761,7 @@ class Event extends BaseObject
 	{
 		$process = false;
 
-		$user = dba::selectFirst('user', ['timezone'], ['uid' => $uid]);
+		$user = DBA::selectFirst('user', ['timezone'], ['uid' => $uid]);
 		if (DBM::is_result($user)) {
 			$timezone = $user['timezone'];
 		}

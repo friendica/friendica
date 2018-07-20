@@ -5,7 +5,7 @@
  */
 namespace Friendica\Model;
 
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Util\DateTimeFormat;
 
@@ -33,7 +33,7 @@ class OpenWebAuthToken
 			"meta" => $meta,
 			"created" => DateTimeFormat::utcNow()
 		];
-		return dba::insert("openwebauth-token", $fields);
+		return DBA::insert("openwebauth-token", $fields);
 	}
 
 	/**
@@ -49,9 +49,9 @@ class OpenWebAuthToken
 	{
 		$condition = ["type" => $type, "uid" => $uid, "token" => $token];
 
-		$entry = dba::selectFirst("openwebauth-token", ["id", "meta"], $condition);
+		$entry = DBA::selectFirst("openwebauth-token", ["id", "meta"], $condition);
 		if (DBM::is_result($entry)) {
-			dba::delete("openwebauth-token", ["id" => $entry["id"]]);
+			DBA::delete("openwebauth-token", ["id" => $entry["id"]]);
 
 			return $entry["meta"];
 		}
@@ -67,7 +67,7 @@ class OpenWebAuthToken
 	public static function purge($type, $interval)
 	{
 		$condition = ["`type` = ? AND `created` < ?", $type, DateTimeFormat::utcNow() . " - INTERVAL " . $interval];
-		dba::delete("openwebauth-token", $condition);
+		DBA::delete("openwebauth-token", $condition);
 	}
 
 }

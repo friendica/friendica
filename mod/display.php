@@ -11,7 +11,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -87,7 +87,7 @@ function display_init(App $a)
 		$nickname = str_replace(normalise_link(System::baseUrl())."/profile/", "", normalise_link($profiledata["url"]));
 
 		if (($nickname != $a->user["nickname"])) {
-			$profile = dba::fetch_first("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
+			$profile = DBA::fetch_first("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
 				INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` INNER JOIN `user` ON `profile`.`uid` = `user`.`uid`
 				WHERE `user`.`nickname` = ? AND `profile`.`is-default` AND `contact`.`self` LIMIT 1",
 				$nickname
@@ -106,7 +106,7 @@ function display_init(App $a)
 
 function display_fetchauthor($a, $item)
 {
-	$author = dba::selectFirst('contact', ['name', 'nick', 'photo', 'network', 'url'], ['id' => $item['author-id']]);
+	$author = DBA::selectFirst('contact', ['name', 'nick', 'photo', 'network', 'url'], ['id' => $item['author-id']]);
 
 	$profiledata = [];
 	$profiledata['uid'] = -1;
@@ -248,7 +248,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	}
 
 	// We are displaying an "alternate" link if that post was public. See issue 2864
-	$is_public = dba::exists('item', ['id' => $item_id, 'private' => [0, 2]]);
+	$is_public = DBA::exists('item', ['id' => $item_id, 'private' => [0, 2]]);
 	if ($is_public) {
 		// For the atom feed the nickname doesn't matter at all, we only need the item id.
 		$alternate = System::baseUrl().'/display/feed-item/'.$item_id.'.atom';
@@ -280,7 +280,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 
 	if ($contact_id) {
 		$groups = Group::getIdsByContactId($contact_id);
-		$remote_contact = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => $a->profile['uid']]);
+		$remote_contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => $a->profile['uid']]);
 		if (DBM::is_result($remote_contact)) {
 			$contact = $remote_contact;
 			$is_remote_contact = true;
@@ -294,7 +294,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		}
 	}
 
-	$page_contact = dba::selectFirst('contact', [], ['self' => true, 'uid' => $a->profile['uid']]);
+	$page_contact = DBA::selectFirst('contact', [], ['self' => true, 'uid' => $a->profile['uid']]);
 	if (DBM::is_result($page_contact)) {
 		$a->page_contact = $page_contact;
 	}
@@ -325,7 +325,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 
 	if (local_user() && (local_user() == $a->profile['uid'])) {
 		$condition = ['parent-uri' => $item_parent_uri, 'uid' => local_user(), 'unseen' => true];
-		$unseen = dba::exists('item', $condition);
+		$unseen = DBA::exists('item', $condition);
 	} else {
 		$unseen = false;
 	}

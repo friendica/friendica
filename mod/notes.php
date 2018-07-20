@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Core\L10n;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -74,7 +74,7 @@ function notes_content(App $a, $update = false)
 		while ($rr = Item::fetch($r)) {
 			$parents_arr[] = $rr['id'];
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		$condition = ['uid' => local_user(), 'parent' => $parents_arr];
 		$result = Item::selectForUser(local_user(), [], $condition);

@@ -10,7 +10,7 @@
 namespace Friendica\Network;
 
 use Friendica\Core\Config;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use OAuthConsumer;
 use OAuthDataStore;
@@ -42,8 +42,8 @@ class FKOAuthDataStore extends OAuthDataStore
 	{
 		logger(__function__ . ":" . $consumer_key);
 
-		$s = dba::select('clients', ['client_id', 'pw', 'redirect_uri'], ['client_id' => $consumer_key]);
-		$r = dba::inArray($s);
+		$s = DBA::select('clients', ['client_id', 'pw', 'redirect_uri'], ['client_id' => $consumer_key]);
+		$r = DBA::inArray($s);
 
 		if (DBM::is_result($r)) {
 			return new OAuthConsumer($r[0]['client_id'], $r[0]['pw'], $r[0]['redirect_uri']);
@@ -62,8 +62,8 @@ class FKOAuthDataStore extends OAuthDataStore
 	{
 		logger(__function__ . ":" . $consumer . ", " . $token_type . ", " . $token);
 
-		$s = dba::select('tokens', ['id', 'secret', 'scope', 'expires', 'uid'], ['client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token]);
-		$r = dba::inArray($s);
+		$s = DBA::select('tokens', ['id', 'secret', 'scope', 'expires', 'uid'], ['client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token]);
+		$r = DBA::inArray($s);
 
 		if (DBM::is_result($r)) {
 			$ot = new OAuthToken($r[0]['id'], $r[0]['secret']);
@@ -85,7 +85,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function lookup_nonce($consumer, $token, $nonce, $timestamp)
 	{
-		$token = dba::selectFirst('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp]);
+		$token = DBA::selectFirst('tokens', ['id', 'secret'], ['client_id' => $consumer->key, 'id' => $nonce, 'expires' => $timestamp]);
 		if (DBM::is_result($token)) {
 			return new OAuthToken($token['id'], $token['secret']);
 		}
@@ -110,7 +110,7 @@ class FKOAuthDataStore extends OAuthDataStore
 			$k = $consumer;
 		}
 
-		$r = dba::insert(
+		$r = DBA::insert(
 			'tokens',
 			[
 				'id' => $key,
@@ -151,7 +151,7 @@ class FKOAuthDataStore extends OAuthDataStore
 		if (is_null($verifier) || ($uverifier !== false)) {
 			$key = self::genToken();
 			$sec = self::genToken();
-			$r = dba::insert(
+			$r = DBA::insert(
 				'tokens',
 				[
 					'id' => $key,
@@ -167,7 +167,7 @@ class FKOAuthDataStore extends OAuthDataStore
 			}
 		}
 
-		dba::delete('tokens', ['id' => $token->key]);
+		DBA::delete('tokens', ['id' => $token->key]);
 
 		if (!is_null($ret) && !is_null($uverifier)) {
 			Config::delete("oauth", $verifier);

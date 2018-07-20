@@ -6,7 +6,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\OpenWebAuthToken;
@@ -50,7 +50,7 @@ class Owa extends BaseModule
 						$fields    = ['id', 'url', 'addr', 'pubkey'];
 						$condition = ['id' => $cid];
 
-						$contact = dba::selectFirst('contact', $fields, $condition);
+						$contact = DBA::selectFirst('contact', $fields, $condition);
 
 						if (DBM::is_result($contact)) {
 							// Try to verify the signed header with the public key of the contact record

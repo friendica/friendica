@@ -9,7 +9,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Protocol\DFRN;
@@ -27,7 +27,7 @@ function dfrn_notify_post(App $a) {
 		if (is_object($data)) {
 			$nick = defaults($a->argv, 1, '');
 
-			$user = dba::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
+			$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
 			if (!DBM::is_result($user)) {
 				System::httpExit(500);
 			}
@@ -63,12 +63,12 @@ function dfrn_notify_post(App $a) {
 		$dfrn_id = substr($dfrn_id, 2);
 	}
 
-	if (!dba::exists('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge])) {
+	if (!DBA::exists('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge])) {
 		logger('could not match challenge to dfrn_id ' . $dfrn_id . ' challenge=' . $challenge);
 		System::xmlExit(3, 'Could not match challenge');
 	}
 
-	dba::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
+	DBA::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
 
 	// find the local user who owns this relationship.
 
@@ -121,7 +121,7 @@ function dfrn_notify_post(App $a) {
 	if ((($writable != (-1)) && ($writable != $importer['writable'])) || ($importer['forum'] != $forum) || ($importer['prv'] != $prv)) {
 		$fields = ['writable' => ($writable == (-1)) ? $importer['writable'] : $writable,
 			'forum' => $forum, 'prv' => $prv];
-		dba::update('contact', $fields, ['id' => $importer['id']]);
+		DBA::update('contact', $fields, ['id' => $importer['id']]);
 
 		if ($writable != (-1)) {
 			$importer['writable'] = $writable;
@@ -213,7 +213,7 @@ function dfrn_dispatch_public($postdata)
 	}
 
 	// We now have some contact, so we fetch it
-	$importer = dba::fetch_first("SELECT *, `name` as `senderName`
+	$importer = DBA::fetch_first("SELECT *, `name` as `senderName`
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$contact['id']);
@@ -252,7 +252,7 @@ function dfrn_dispatch_private($user, $postdata)
 	}
 
 	// We now have some contact, so we fetch it
-	$importer = dba::fetch_first("SELECT *, `name` as `senderName`
+	$importer = DBA::fetch_first("SELECT *, `name` as `senderName`
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$cid);
@@ -302,11 +302,11 @@ function dfrn_notify_content(App $a) {
 
 		$status = 0;
 
-		dba::delete('challenge', ["`expire` < ?", time()]);
+		DBA::delete('challenge', ["`expire` < ?", time()]);
 
 		$fields = ['challenge' => $hash, 'dfrn-id' => $dfrn_id, 'expire' => time() + 90,
 			'type' => $type, 'last_update' => $last_update];
-		dba::insert('challenge', $fields);
+		DBA::insert('challenge', $fields);
 
 		logger('challenge=' . $hash, LOGGER_DATA);
 

@@ -23,7 +23,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -146,7 +146,7 @@ function item_post(App $a) {
 
 	// Check for multiple posts with the same message id (when the post was created via API)
 	if (($message_id != '') && ($profile_uid != 0)) {
-		if (dba::exists('item', ['uri' => $message_id, 'uid' => $profile_uid])) {
+		if (DBA::exists('item', ['uri' => $message_id, 'uid' => $profile_uid])) {
 			logger("Message with URI ".$message_id." already exists for user ".$profile_uid, LOGGER_DEBUG);
 			return;
 		}
@@ -174,7 +174,7 @@ function item_post(App $a) {
 		$orig_post = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 	}
 
-	$user = dba::selectFirst('user', [], ['uid' => $profile_uid]);
+	$user = DBA::selectFirst('user', [], ['uid' => $profile_uid]);
 
 	if (!DBM::is_result($user) && !$parent) {
 		return;
@@ -268,7 +268,7 @@ function item_post(App $a) {
 		// if using the API, we won't see pubmail_enable - figure out if it should be set
 		if ($api_source && $profile_uid && $profile_uid == local_user() && !$private) {
 			if (function_exists('imap_open') && !Config::get('system', 'imap_disabled')) {
-				$pubmail_enabled = dba::exists('mailacct', ["`uid` = ? AND `server` != ? AND `pubmail`", local_user(), '']);
+				$pubmail_enabled = DBA::exists('mailacct', ["`uid` = ? AND `server` != ? AND `pubmail`", local_user(), '']);
 			}
 		}
 
@@ -305,7 +305,7 @@ function item_post(App $a) {
 
 	if (local_user() && ((local_user() == $profile_uid) || $allow_comment)) {
 		$self = true;
-		$author = dba::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
+		$author = DBA::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
 	} elseif (remote_user()) {
 		if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $v) {
@@ -316,7 +316,7 @@ function item_post(App $a) {
 			}
 		}
 		if ($contact_id) {
-			$author = dba::selectFirst('contact', [], ['id' => $contact_id]);
+			$author = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		}
 	}
 
@@ -328,7 +328,7 @@ function item_post(App $a) {
 	if ($profile_uid == local_user() || $allow_comment) {
 		$contact_record = $author;
 	} else {
-		$contact_record = dba::selectFirst('contact', [], ['uid' => $profile_uid, 'self' => true]);
+		$contact_record = DBA::selectFirst('contact', [], ['uid' => $profile_uid, 'self' => true]);
 	}
 
 	// Look for any tags and linkify them
@@ -458,14 +458,14 @@ function item_post(App $a) {
 
 				$condition = ['allow_cid' => $srch, 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '',
 						'resource-id' => $image_uri, 'uid' => $profile_uid];
-				if (!dba::exists('photo', $condition)) {
+				if (!DBA::exists('photo', $condition)) {
 					continue;
 				}
 
 				$fields = ['allow_cid' => $str_contact_allow, 'allow_gid' => $str_group_allow,
 						'deny_cid' => $str_contact_deny, 'deny_gid' => $str_group_deny];
 				$condition = ['resource-id' => $image_uri, 'uid' => $profile_uid, 'album' => L10n::t('Wall Photos')];
-				dba::update('photo', $fields, $condition);
+				DBA::update('photo', $fields, $condition);
 			}
 		}
 	}
@@ -486,14 +486,14 @@ function item_post(App $a) {
 
 				$condition = ['allow_cid' => $srch, 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '',
 						'id' => $attach];
-				if (!dba::exists('attach', $condition)) {
+				if (!DBA::exists('attach', $condition)) {
 					continue;
 				}
 
 				$fields = ['allow_cid' => $str_contact_allow, 'allow_gid' => $str_group_allow,
 						'deny_cid' => $str_contact_deny, 'deny_gid' => $str_group_deny];
 				$condition = ['id' => $attach];
-				dba::update('attach', $fields, $condition);
+				DBA::update('attach', $fields, $condition);
 			}
 		}
 	}
@@ -536,7 +536,7 @@ function item_post(App $a) {
 	if (preg_match_all('/(\[attachment\]([0-9]+)\[\/attachment\])/',$body,$match)) {
 		foreach ($match[2] as $mtch) {
 			$fields = ['id', 'filename', 'filesize', 'filetype'];
-			$attachment = dba::selectFirst('attach', $fields, ['id' => $mtch]);
+			$attachment = DBA::selectFirst('attach', $fields, ['id' => $mtch]);
 			if (DBM::is_result($attachment)) {
 				if (strlen($attachments)) {
 					$attachments .= ',';
@@ -636,7 +636,7 @@ function item_post(App $a) {
 	// This field is for storing the raw conversation data
 	$datarray['protocol'] = PROTOCOL_DFRN;
 
-	$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $datarray['parent-uri']]);
+	$conversation = DBA::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $datarray['parent-uri']]);
 	if (DBM::is_result($conversation)) {
 		if ($conversation['conversation-uri'] != '') {
 			$datarray['conversation-uri'] = $conversation['conversation-uri'];
@@ -960,32 +960,32 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			if (strrpos($name, '+')) {
 				// Is it in format @nick+number?
 				$tagcid = intval(substr($name, strrpos($name, '+') + 1));
-				$contact = dba::selectFirst('contact', $fields, ['id' => $tagcid, 'uid' => $profile_uid]);
+				$contact = DBA::selectFirst('contact', $fields, ['id' => $tagcid, 'uid' => $profile_uid]);
 			}
 
 			// select someone by nick or attag in the current network
 			if (!DBM::is_result($contact) && ($network != "")) {
 				$condition = ["(`nick` = ? OR `attag` = ?) AND `network` = ? AND `uid` = ?",
 						$name, $name, $network, $profile_uid];
-				$contact = dba::selectFirst('contact', $fields, $condition);
+				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
 
 			//select someone by name in the current network
 			if (!DBM::is_result($contact) && ($network != "")) {
 				$condition = ['name' => $name, 'network' => $network, 'uid' => $profile_uid];
-				$contact = dba::selectFirst('contact', $fields, $condition);
+				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
 
 			// select someone by nick or attag in any network
 			if (!DBM::is_result($contact)) {
 				$condition = ["(`nick` = ? OR `attag` = ?) AND `uid` = ?", $name, $name, $profile_uid];
-				$contact = dba::selectFirst('contact', $fields, $condition);
+				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
 
 			// select someone by name in any network
 			if (!DBM::is_result($contact)) {
 				$condition = ['name' => $name, 'uid' => $profile_uid];
-				$contact = dba::selectFirst('contact', $fields, $condition);
+				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
 		}
 

@@ -1,10 +1,10 @@
 <?php
 
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 
 function dbesc($str) {
-	if (dba::$connected) {
-		return(dba::escape($str));
+	if (DBA::$connected) {
+		return(DBA::escape($str));
 	} else {
 		return(str_replace("'","\\'",$str));
 	}
@@ -24,24 +24,24 @@ function q($sql) {
 	$args = func_get_args();
 	unset($args[0]);
 
-	if (!dba::$connected) {
+	if (!DBA::$connected) {
 		return false;
 	}
 
-	$sql = dba::clean_query($sql);
-	$sql = dba::any_value_fallback($sql);
+	$sql = DBA::clean_query($sql);
+	$sql = DBA::any_value_fallback($sql);
 
 	$stmt = @vsprintf($sql, $args);
 
-	$ret = dba::p($stmt);
+	$ret = DBA::p($stmt);
 
 	if (is_bool($ret)) {
 		return $ret;
 	}
 
-	$columns = dba::columnCount($ret);
+	$columns = DBA::columnCount($ret);
 
-	$data = dba::inArray($ret);
+	$data = DBA::inArray($ret);
 
 	if ((count($data) == 0) && ($columns == 0)) {
 		return true;

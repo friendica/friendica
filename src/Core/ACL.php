@@ -8,7 +8,7 @@ namespace Friendica\Core;
 
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
-use Friendica\Database\dba;
+use Friendica\Database\DBA;
 use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -100,13 +100,13 @@ class ACL extends BaseObject
 			$o .= "<select name=\"{$selname}[]\" id=\"$selclass\" class=\"$selclass\" multiple=\"multiple\" size=\"" . $x['size'] . "$\" $tabindex >\r\n";
 		}
 
-		$stmt = dba::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
+		$stmt = DBA::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
 			WHERE `uid` = ? AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			$sql_extra
 			ORDER BY `name` ASC ", intval(local_user())
 		);
 
-		$contacts = dba::inArray($stmt);
+		$contacts = DBA::inArray($stmt);
 
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
@@ -165,13 +165,13 @@ class ACL extends BaseObject
 
 		$o .= "<select name=\"$selname\" id=\"$selclass\" class=\"$selclass\" size=\"$size\"$tabindex_attr$hidepreselected>\r\n";
 
-		$stmt = dba::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
+		$stmt = DBA::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
 			WHERE `uid` = ? AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			$sql_extra
 			ORDER BY `name` ASC ", intval(local_user())
 		);
 
-		$contacts = dba::inArray($stmt);
+		$contacts = DBA::inArray($stmt);
 
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
@@ -273,7 +273,7 @@ class ACL extends BaseObject
 			$pubmail_enabled = false;
 
 			if (!$imap_disabled) {
-				$mailacct = dba::selectFirst('mailacct', ['pubmail'], ['`uid` = ? AND `server` != ""', local_user()]);
+				$mailacct = DBA::selectFirst('mailacct', ['pubmail'], ['`uid` = ? AND `server` != ""', local_user()]);
 				if (DBM::is_result($mailacct)) {
 					$mail_enabled = true;
 					$pubmail_enabled = !empty($mailacct['pubmail']);
