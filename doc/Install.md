@@ -135,6 +135,10 @@ For more information during the installation, you can use this command line opti
 
     bin/console autoinstall -v
 
+### Prepare .htaccess file
+
+Copy .htaccess-dist to .htaccess (be careful under stupid M$ Windows) to have working mod-rewrite again. If you have installed Friendica into a sub directory, like /friendica/ set this path in RewriteBase accordingly.
+
 ### Set up the worker
 
 Set up a cron job or scheduled task to run the worker once every 5-10 minutes in order to perform background processing.

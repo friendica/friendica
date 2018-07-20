@@ -66,3 +66,6 @@ venv/
 #ignore addons directory
 /addons
 /addon
+
+#ignore .htaccess
+.htaccess
