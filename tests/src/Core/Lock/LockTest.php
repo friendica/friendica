@@ -2,6 +2,7 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
+use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Test\DatabaseTest;
 
@@ -20,7 +21,7 @@ abstract class LockTest extends DatabaseTest
 		$this->instance = $this->getInstance();
 
 		// Reusable App object
-		$this->app = \Friendica\BaseObject::getApp();
+		$this->app = BaseObject::getApp();
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');

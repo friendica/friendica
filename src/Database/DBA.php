@@ -644,6 +644,10 @@ class DBA
 
 		$fields = [];
 
+		if (is_null($condition) || empty($condition)) {
+			return DBStructure::existsTable($table);
+		}
+
 		reset($condition);
 		$first_key = key($condition);
 		if (!is_int($first_key)) {

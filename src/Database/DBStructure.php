@@ -684,6 +684,142 @@ class DBStructure
 		return $sql;
 	}
 
+	/**
+	 * 	Check if a table exists
+	 *
+	 * @param string $table Table name
+	 *
+	 * @return boolean Does the table exist?
+	 */
+	public static function existsTable($table)
+	{
+		if (empty($table)) {
+			return false;
+		}
+
+		$table = DBA::escape($table);
+
+		$sql = "SHOW TABLES LIKE '" . $table . "';";
+
+		$stmt = DBA::p($sql);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = (DBA::num_rows($stmt) > 0);
+		}
+
+		DBA::close($stmt);
+
+		return $retval;
+	}
+
+	/**
+	 * 	Check if the columns of the table exists
+	 *
+	 * @param string $table   Table name
+	 * @param array  $columns Columns to check ( Syntax: [ $col1, $col2, .. ] )
+	 *
+	 * @return boolean Does the table exist?
+	 */
+	public static function existsColumn($table, $columns = []) {
+		if (empty($table)) {
+			return false;
+		}
+
+		if (is_null($columns) || empty($columns)) {
+			return self::existsTable($table);
+		}
+
+		$table = DBA::escape($table);
+
+		foreach ($columns AS $column) {
+			$sql = "SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "';";
+
+			$stmt = DBA::p($sql);
+
+			if (is_bool($stmt)) {
+				$retval = $stmt;
+			} else {
+				$retval = (DBA::num_rows($stmt) > 0);
+			}
+
+			DBA::close($stmt);
+
+			if (!$retval) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	const RENAME_COLUMN = 0;
+	const RENAME_PRIMARY_KEY = 1;
+
+	/**
+	 * Renames columns or the primary key of a table
+	 * @todo You cannot rename a primary key if "auto increment" is set
+	 *
+	 * @param string $table    Table name
+	 * @param array  $columns  Columns Syntax for Rename: [ $old1 => [ $new1, $type1 ], $old2 => [ $new2, $type2 ], ... ] )
+	 *                                 Syntax for Primary Key: [ $col1, $col2, ...] )
+	 * @param int    $type     The type of renaming (Default is Column)
+	 *
+	 * @return boolean Was the renaming successful?
+	 *
+	 */
+	public static function rename($table, $columns, $type = self::RENAME_COLUMN) {
+		if (empty($table) || empty($columns)) {
+			return false;
+		}
+
+		if (!is_array($columns)) {
+			return false;
+		}
+
+		$table = DBA::escape($table);
+
+		$sql = "ALTER TABLE `" . $table . "`";
+		switch ($type) {
+			case self::RENAME_COLUMN:
+				if (!self::existsColumn($table, array_keys($columns))) {
+					return false;
+				}
+				$sql .= implode(',', array_map(
+					function ($to, $from) {
+						return " CHANGE `" . $from . "` `" . $to[0] . "` " . $to[1];
+					},
+					$columns,
+					array_keys($columns)
+				));
+				break;
+			case self::RENAME_PRIMARY_KEY:
+				if (!self::existsColumn($table, $columns)) {
+					return false;
+				}
+				$sql .= " DROP PRIMARY KEY, ADD PRIMARY KEY(`" . implode('`, `', $columns) . "`)";
+				break;
+			default:
+				return false;
+		}
+
+		$sql .= ";";
+
+		print $sql . "\n";
+		$stmt = DBA::p($sql);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = true;
+		}
+
+		DBA::close($stmt);
+
+		return $retval;
+	}
+
 	public static function definition() {
 		$database = [];
 
