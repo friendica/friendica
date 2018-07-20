@@ -37,6 +37,9 @@ class DBStructureTest extends DatabaseTest
 		$this->assertFalse(DBStructure::existsColumn('config', ['k', 'nonsense']));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testRename() {
 		$fromColumn = 'k';
 		$toColumn = 'key';
@@ -52,6 +55,9 @@ class DBStructureTest extends DatabaseTest
 		$this->assertFalse(DBStructure::existsColumn('config', [ $toColumn ]));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testChangePrimaryKey() {
 		$oldID = 'client_id';
 		$newID = 'pw';
