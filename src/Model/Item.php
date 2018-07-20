@@ -1204,6 +1204,17 @@ class Item extends BaseObject
 		return $contact_id;
 	}
 
+	// This function will finally cover most of the preparation functionality in mod/item.php
+	public static function prepare(&$item)
+	{
+		$data = BBCode::getAttachmentData($item['body']);
+		if ((preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $item['body'], $match, PREG_SET_ORDER) || isset($data["type"]))
+			&& ($posttype != Item::PT_PERSONAL_NOTE)) {
+			$posttype = Item::PT_PAGE;
+			$objecttype = ACTIVITY_OBJ_BOOKMARK;
+		}
+	}
+
 	public static function insert($item, $force_parent = false, $notify = false, $dontcache = false)
 	{
 		$a = get_app();

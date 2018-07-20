@@ -1003,7 +1003,7 @@ class PortableContact
 		// Quit if there is a timeout.
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
 		if (DBM::is_result($gserver) && ($orig_server_url == $server_url) &&
-			(!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT))) {
+			(!empty($serverret["errno"]) && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT))) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
@@ -1018,7 +1018,7 @@ class PortableContact
 			$serverret = Network::curl($server_url."/.well-known/host-meta", false, $redirects, ['timeout' => 20]);
 
 			// Quit if there is a timeout
-			if (!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			if (!empty($serverret["errno"]) && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 				dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 				return false;

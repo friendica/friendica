@@ -185,7 +185,7 @@ class OnePoll
 
 			$ret = Network::curl($url);
 
-			if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				// set the last-update so we don't keep polling
 				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);
@@ -321,7 +321,7 @@ class OnePoll
 			$ret = Network::curl($contact['poll'], false, $redirects, ['cookiejar' => $cookiejar]);
 			unlink($cookiejar);
 
-			if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				// set the last-update so we don't keep polling
 				dba::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				Contact::markForArchival($contact);

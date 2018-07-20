@@ -258,6 +258,11 @@ class ACL extends BaseObject
 	 */
 	public static function getFullSelectorHTML(array $user = null, $show_jotnets = false)
 	{
+
+		if (empty($user['uid'])) {
+			return '';
+		}
+
 		$perms = self::getDefaultUserPermissions($user);
 
 		$jotnets = '';

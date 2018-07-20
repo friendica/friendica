@@ -119,7 +119,7 @@ class Probe
 
 		if (!is_object($xrd)) {
 			$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
-			if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				logger("Probing timeout for ".$url, LOGGER_DEBUG);
 				return false;
 			}
@@ -731,7 +731,7 @@ class Probe
 		$redirects = 0;
 
 		$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
-		if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$data = $ret['body'];
@@ -798,7 +798,7 @@ class Probe
 	private static function pollNoscrape($noscrape_url, $data)
 	{
 		$ret = Network::curl($noscrape_url);
-		if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$content = $ret['body'];
@@ -1036,7 +1036,7 @@ class Probe
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
 		$ret = Network::curl($hcard_url);
-		if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$content = $ret['body'];
@@ -1283,7 +1283,7 @@ class Probe
 						}
 					} elseif (normalise_link($pubkey) == 'http://') {
 						$ret = Network::curl($pubkey);
-						if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+						if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 							return false;
 						}
 						$pubkey = $ret['body'];
@@ -1315,7 +1315,7 @@ class Probe
 
 		// Fetch all additional data from the feed
 		$ret = Network::curl($data["poll"]);
-		if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$feed = $ret['body'];
@@ -1525,7 +1525,7 @@ class Probe
 	private static function feed($url, $probe = true)
 	{
 		$ret = Network::curl($url);
-		if (!$ret["success"] && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$feed = $ret['body'];

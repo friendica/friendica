@@ -1189,7 +1189,7 @@ class DFRN
 
 		$ret = Network::curl($url);
 
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			Contact::markForArchival($contact);
 			return -2; // timed out
 		}
