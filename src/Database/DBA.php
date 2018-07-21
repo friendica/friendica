@@ -44,6 +44,7 @@ class DBA
 	public static function connect($serveraddr, $user, $pass, $db, $charset = null)
 	{
 		if (!is_null(self::$connection) && self::connected()) {
+			/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 			return true;
 		}
 
@@ -91,6 +92,7 @@ class DBA
 				self::$connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 				self::$connected = true;
 			} catch (PDOException $e) {
+				/// @TODO At least log exception, don't ignore it!
 			}
 		}
 
@@ -127,6 +129,7 @@ class DBA
 	public static function disconnect()
 	{
 		if (is_null(self::$connection)) {
+			/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 			return;
 		}
 
@@ -154,6 +157,7 @@ class DBA
 	/**
 	 * Return the database object.
 	 * @return PDO|mysqli
+	 * @TODO Maybe not expose this "internal" field?
 	 */
 	public static function getConnection()
 	{
@@ -251,15 +255,12 @@ class DBA
 	}
 
 	public static function escape($str) {
-		if (self::$connected) {
-			switch (self::$driver) {
-				case 'pdo':
-					return substr(@self::$connection->quote($str, PDO::PARAM_STR), 1, -1);
-				case 'mysqli':
-					return @self::$connection->real_escape_string($str);
-			}
-		} else {
-			return str_replace("'", "\\'", $str);
+		switch (self::$driver) {
+			case 'pdo':
+				return substr(@self::$connection->quote($str, PDO::PARAM_STR), 1, -1);
+
+			case 'mysqli':
+				return @self::$connection->real_escape_string($str);
 		}
 	}
 
@@ -267,6 +268,7 @@ class DBA
 		$connected = false;
 
 		if (is_null(self::$connection)) {
+			/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 			return false;
 		}
 
@@ -927,6 +929,7 @@ class DBA
 	 */
 	public static function transaction() {
 		if (!self::performCommit()) {
+			/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 			return false;
 		}
 
@@ -936,11 +939,13 @@ class DBA
 					break;
 				}
 				if (!self::$connection->beginTransaction()) {
+					/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 					return false;
 				}
 				break;
 			case 'mysqli':
 				if (!self::$connection->begin_transaction()) {
+					/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 					return false;
 				}
 				break;
@@ -955,6 +960,7 @@ class DBA
 		switch (self::$driver) {
 			case 'pdo':
 				if (!self::$connection->inTransaction()) {
+					/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 					return true;
 				}
 				return self::$connection->commit();
@@ -988,6 +994,7 @@ class DBA
 		switch (self::$driver) {
 			case 'pdo':
 				if (!self::$connection->inTransaction()) {
+					/// @TODO Shouldn't we better prevent this incorrect invocation rather than failing silently?
 					$ret = true;
 					break;
 				}
