@@ -93,7 +93,13 @@ class DBA
 
 		if (!self::$connected && class_exists('\mysqli')) {
 			self::$driver = 'mysqli';
-			self::$db = @new mysqli($server, $user, $pass, $db, $port);
+
+			if ($port > 0) {
+				self::$db = @new mysqli($server, $user, $pass, $db, $port);
+			} else {
+				self::$db = @new mysqli($server, $user, $pass, $db);
+			}
+
 			if (!mysqli_connect_errno()) {
 				self::$connected = true;
 
