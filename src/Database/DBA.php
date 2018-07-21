@@ -51,7 +51,7 @@ class DBA
 		self::$db_name = $db;
 		self::$db_charset = $charset;
 
-		$port = 3306;
+		$port = false;
 		$serveraddr = trim($serveraddr);
 
 		$serverdata = explode(':', $serveraddr);
@@ -75,7 +75,7 @@ class DBA
 			self::$driver = 'pdo';
 			$connect = "mysql:host=".$server.";dbname=".$db;
 
-			if (isset($port)) {
+			if ($port > 0) {
 				$connect .= ";port=".$port;
 			}
 
