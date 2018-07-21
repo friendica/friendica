@@ -246,3 +246,20 @@ function update_1278() {
 
 	return UPDATE_SUCCESS;
 }
+
+function pre_update_1280() {
+	Config::set('system', 'maintenance', 1);
+	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating workerqueue and process table. ', DateTimeFormat::utcNow(), 'e'));
+
+	if (DBStructure::existsTable('workerqueue') && DBStructure::existsColumn('workerqueue', [ 'pid' ])) {
+		DBStructure::rename('workerqueue', ['pid' => [ 'process_id', 'int unsigned' ]]);
+	}
+
+	if (DBStructure::existsTable('process') && DBStructure::existsColumn('process', [ 'pid' ])) {
+		DBStructure::rename('process', ['pid' => [ 'id', 'int unsigned not null auto_increment comment \'Global Unique ID\'' ]]);
+	}
+
+	Config::set('system', 'maintenance', 0);
+
+	return UPDATE_SUCCESS;
+}
