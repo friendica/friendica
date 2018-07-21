@@ -787,7 +787,7 @@ function admin_page_workerqueue(App $a)
 	for($i = 0; $i < count($r); $i++) {
 		$r[$i]['parameter'] = implode(json_decode($r[$i]['parameter']), ': ');
 	}
-	
+
 	$t = get_markup_template('admin/workerqueue.tpl');
 	return replace_macros($t, [
 		'$title' => L10n::t('Administration'),
