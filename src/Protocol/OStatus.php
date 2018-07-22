@@ -219,6 +219,8 @@ class OStatus
 			$gcid = GContact::update($contact);
 
 			GContact::link($gcid, $contact["uid"], $contact["id"]);
+		} else {
+			$contact = null;
 		}
 
 		return $author;
