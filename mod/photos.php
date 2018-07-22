@@ -704,13 +704,14 @@ function photos_post(App $a)
 		dbesc($album),
 		intval($page_owner_uid)
 	);
+
 	if (!DBM::is_result($r) || ($album == L10n::t('Profile Photos'))) {
 		$visible = 1;
 	} else {
 		$visible = 0;
 	}
 
-	if (x($_REQUEST, 'not_visible') && $_REQUEST['not_visible'] !== 'false') {
+	if (!empty($_REQUEST['not_visible']) && $_REQUEST['not_visible'] !== 'false') {
 		$visible = 0;
 	}
 
