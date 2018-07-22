@@ -915,6 +915,11 @@ class GContact
 			intval($uid)
 		);
 
+		if (!DBM::is_result($r)) {
+			logger('Cannot find user with uid=' . $uid, LOGGER_NORMAL);
+			return false;
+		}
+
 		$location = Profile::formatLocation(
 			["locality" => $r[0]["locality"], "region" => $r[0]["region"], "country-name" => $r[0]["country-name"]]
 		);
