@@ -164,17 +164,17 @@ function photos_post(App $a)
 					break;
 				}
 			}
-		}
 
-		if ($contact_id) {
-			$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
-				intval($contact_id),
-				intval($page_owner_uid)
-			);
+			if ($contact_id > 0) {
+				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
+					intval($contact_id),
+					intval($page_owner_uid)
+				);
 
-			if (DBA::isResult($r)) {
-				$can_post = true;
-				$visitor = $contact_id;
+				if (DBM::isResult($r)) {
+					$can_post = true;
+					$visitor = $contact_id;
+				}
 			}
 		}
 	}
@@ -204,6 +204,7 @@ function photos_post(App $a)
 			DBA::escape($album),
 			intval($page_owner_uid)
 		);
+
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Album not found.') . EOL);
 			goaway($_SESSION['photo_return']);
@@ -253,6 +254,7 @@ function photos_post(App $a)
 					'$confirm_name' => 'dropalbum', // Needed so that confirmation will bring us back into this if statement
 					'$cancel' => L10n::t('Cancel'),
 				]);
+
 				$a->error = 1; // Set $a->error so the other module functions don't execute
 				return;
 			}
@@ -273,6 +275,7 @@ function photos_post(App $a)
 					DBA::escape($album)
 				);
 			}
+
 			if (DBA::isResult($r)) {
 				foreach ($r as $rr) {
 					$res[] = "'" . DBA::escape($rr['rid']) . "'" ;
@@ -313,6 +316,7 @@ function photos_post(App $a)
 		// Check if we should do HTML-based delete confirmation
 		if (!empty($_REQUEST['confirm'])) {
 			$drop_url = $a->query_string;
+
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 				'$method' => 'post',
 				'$message' => L10n::t('Do you really want to delete this photo?'),
@@ -322,6 +326,7 @@ function photos_post(App $a)
 				'$confirm_name' => 'delete', // Needed so that confirmation will bring us back into this if statement
 				'$cancel' => L10n::t('Cancel'),
 			]);
+
 			$a->error = 1; // Set $a->error so the other module functions don't execute
 			return;
 		}
@@ -434,6 +439,7 @@ function photos_post(App $a)
 			DBA::escape($resource_id),
 			intval($page_owner_uid)
 		);
+
 		if (DBA::isResult($p)) {
 			$ext = $phototypes[$p[0]['type']];
 			$r = q("UPDATE `photo` SET `desc` = '%s', `album` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s' WHERE `resource-id` = '%s' AND `uid` = %d",
@@ -521,28 +527,35 @@ function photos_post(App $a)
 					if (strpos($tag, '@') === 0) {
 						$profile = '';
 						$name = substr($tag,1);
+
 						if ((strpos($name, '@')) || (strpos($name, 'http://'))) {
 							$newname = $name;
 							$links = @Probe::lrdd($name);
+
 							if (count($links)) {
 								foreach ($links as $link) {
 									if ($link['@attributes']['rel'] === 'http://webfinger.net/rel/profile-page') {
 										$profile = $link['@attributes']['href'];
 									}
+
 									if ($link['@attributes']['rel'] === 'salmon') {
 										$salmon = '$url:' . str_replace(',', '%sc', $link['@attributes']['href']);
+
 										if (strlen($inform)) {
 											$inform .= ',';
 										}
+
 										$inform .= $salmon;
 									}
 								}
 							}
+
 							$taginfo[] = [$newname, $profile, $salmon];
 						} else {
 							$newname = $name;
 							$alias = '';
 							$tagcid = 0;
+
 							if (strrpos($newname, '+')) {
 								$tagcid = intval(substr($newname, strrpos($newname, '+') + 1));
 							}
@@ -574,6 +587,7 @@ function photos_post(App $a)
 							if (DBA::isResult($r)) {
 								$newname = $r[0]['name'];
 								$profile = $r[0]['url'];
+
 								$notify = 'cid:' . $r[0]['id'];
 								if (strlen($inform)) {
 									$inform .= ',';
@@ -581,15 +595,18 @@ function photos_post(App $a)
 								$inform .= $notify;
 							}
 						}
+
 						if ($profile) {
 							if (substr($notify, 0, 4) === 'cid:') {
 								$taginfo[] = [$newname, $profile, $notify, $r[0], '@[url=' . str_replace(',','%2c',$profile) . ']' . $newname . '[/url]'];
 							} else {
 								$taginfo[] = [$newname, $profile, $notify, null, $str_tags .= '@[url=' . $profile . ']' . $newname . '[/url]'];
 							}
+
 							if (strlen($str_tags)) {
 								$str_tags .= ',';
 							}
+
 							$profile = str_replace(',', '%2c', $profile);
 							$str_tags .= '@[url='.$profile.']'.$newname.'[/url]';
 						}
@@ -622,6 +639,7 @@ function photos_post(App $a)
 					$best = 2;
 					break;
 				}
+
 				if (intval($scales['scale']) == 4) {
 					$best = 4;
 					break;
