@@ -25,7 +25,6 @@ function profile_photo_init(App $a)
 
 function profile_photo_post(App $a)
 {
-
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
@@ -33,7 +32,7 @@ function profile_photo_post(App $a)
 
 	check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
 
-	if ((x($_POST, 'cropfinal')) && ($_POST['cropfinal'] == 1)) {
+	if (!empty($_POST['cropfinal']) && $_POST['cropfinal'] == 1) {
 
 		// unless proven otherwise
 		$is_default_profile = 1;
@@ -42,7 +41,10 @@ function profile_photo_post(App $a)
 			$r = q("select id, `is-default` from profile where id = %d and uid = %d limit 1", intval($_REQUEST['profile']),
 				intval(local_user())
 			);
-			if (DBM::is_result($r) && (!intval($r[0]['is-default']))) $is_default_profile = 0;
+
+			if (DBM::is_result($r) && (!intval($r[0]['is-default']))) {
+				$is_default_profile = 0;
+			}
 		}
 
 
@@ -184,21 +186,25 @@ function profile_photo_content(App $a)
 
 	$imagecrop = [];
 
-	if ($a->argv[1] == 'use' && $a->argc >= 3) {
-//		check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
+	if (isset($a->argv[1]) && $a->argv[1] == 'use' && $a->argc >= 3) {
+		// check_form_security_token_redirectOnErr('/profile_photo', 'profile_photo');
 
 		$resource_id = $a->argv[2];
 		//die(":".local_user());
 		$r = q("SELECT * FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s' ORDER BY `scale` ASC", intval(local_user()),
 			dbesc($resource_id)
 		);
+
 		if (!DBM::is_result($r)) {
 			notice(L10n::t('Permission denied.') . EOL);
 			return;
 		}
+
 		$havescale = false;
 		foreach ($r as $rr) {
-			if ($rr['scale'] == 5) $havescale = true;
+			if ($rr['scale'] == 5) {
+				$havescale = true;
+			}
 		}
 
 		// set an already uloaded photo as profile photo
@@ -230,7 +236,6 @@ function profile_photo_content(App $a)
 		intval(local_user())
 	);
 
-
 	if (empty($imagecrop)) {
 		$tpl = get_markup_template('profile_photo.tpl');
 
@@ -254,7 +259,7 @@ function profile_photo_content(App $a)
 		$o = replace_macros($tpl,
 			[
 			'$filename'  => $filename,
-			'$profile'   => intval($_REQUEST['profile']),
+			'$profile'   => (isset($_REQUEST['profile']) ? intval($_REQUEST['profile']) : 0),
 			'$resource'  => $imagecrop['hash'] . '-' . $imagecrop['resolution'],
 			'$image_url' => System::baseUrl() . '/photo/' . $filename,
 			'$title'     => L10n::t('Crop Image'),
@@ -268,23 +273,23 @@ function profile_photo_content(App $a)
 	return; // NOTREACHED
 }
 
-function profile_photo_crop_ui_head(App $a, Image $Image)
+function profile_photo_crop_ui_head(App $a, Image $image)
 {
 	$max_length = Config::get('system', 'max_image_length');
 	if (!$max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
 	}
 	if ($max_length > 0) {
-		$Image->scaleDown($max_length);
+		$image->scaleDown($max_length);
 	}
 
-	$width = $Image->getWidth();
-	$height = $Image->getHeight();
+	$width = $image->getWidth();
+	$height = $image->getHeight();
 
 	if ($width < 175 || $height < 175) {
-		$Image->scaleUp(200);
-		$width = $Image->getWidth();
-		$height = $Image->getHeight();
+		$image->scaleUp(200);
+		$width = $image->getWidth();
+		$height = $image->getHeight();
 	}
 
 	$hash = Photo::newResource();
@@ -293,7 +298,7 @@ function profile_photo_crop_ui_head(App $a, Image $Image)
 	$smallest = 0;
 	$filename = '';
 
-	$r = Photo::store($Image, local_user(), 0, $hash, $filename, L10n::t('Profile Photos'), 0);
+	$r = Photo::store($image, local_user(), 0, $hash, $filename, L10n::t('Profile Photos'), 0);
 
 	if ($r) {
 		info(L10n::t('Image uploaded successfully.') . EOL);
@@ -302,8 +307,8 @@ function profile_photo_crop_ui_head(App $a, Image $Image)
 	}
 
 	if ($width > 640 || $height > 640) {
-		$Image->scaleDown(640);
-		$r = Photo::store($Image, local_user(), 0, $hash, $filename, L10n::t('Profile Photos'), 1);
+		$image->scaleDown(640);
+		$r = Photo::store($image, local_user(), 0, $hash, $filename, L10n::t('Profile Photos'), 1);
 
 		if ($r === false) {
 			notice(L10n::t('Image size reduction [%s] failed.', "640") . EOL);
@@ -318,7 +323,7 @@ function profile_photo_crop_ui_head(App $a, Image $Image)
 	$imagecrop = [
 		'hash'       => $hash,
 		'resolution' => $smallest,
-		'ext'        => $Image->getExt(),
+		'ext'        => $image->getExt(),
 	];
 
 	return $imagecrop;

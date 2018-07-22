@@ -216,7 +216,7 @@ class Contact extends BaseObject
 		$update = false;
 
 		foreach ($fields as $field => $content) {
-			if ($self[$field] != $content) {
+			if (isset($self[$field]) && $self[$field] != $content) {
 				$update = true;
 			}
 		}
