@@ -68,7 +68,10 @@ function notes_content(App $a, $update = false)
 		'limit' => [$a->pager['start'], $a->pager['itemspage']]];
 	$r = Item::selectForUser(local_user(), ['id'], $condition, $params);
 
+	$count = 0;
+
 	if (DBM::is_result($r)) {
+		$count = count($r);
 		$parents_arr = [];
 
 		while ($rr = Item::fetch($r)) {
@@ -78,12 +81,14 @@ function notes_content(App $a, $update = false)
 
 		$condition = ['uid' => local_user(), 'parent' => $parents_arr];
 		$result = Item::selectForUser(local_user(), [], $condition);
+
 		if (DBM::is_result($result)) {
 			$items = conv_sort(Item::inArray($result), 'commented');
 			$o .= conversation($a, $items, 'notes', $update);
 		}
 	}
 
-	$o .= alt_pager($a, count($r));
+	$o .= alt_pager($a, $count);
+
 	return $o;
 }
