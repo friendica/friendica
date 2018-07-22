@@ -922,7 +922,7 @@ function photos_content(App $a)
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
 
-	if (!x($a->data,'user')) {
+	if (!isset($a->data['user'])) {
 		notice(L10n::t('No photos selected') . EOL);
 		return;
 	}
@@ -1611,6 +1611,7 @@ function photos_content(App $a)
 		dbesc('Contact Photos'),
 		dbesc(L10n::t('Contact Photos'))
 	);
+
 	if (DBM::is_result($r)) {
 		$a->set_pager_total(count($r));
 		$a->set_pager_itemspage(20);
