@@ -52,7 +52,7 @@ class OStatus
 	 *
 	 * @return array Array of author related entries for the item
 	 */
-	private static function fetchAuthor($xpath, $context, $importer, &$contact, $onlyfetch)
+	private static function fetchAuthor(DOMXPath $xpath, $context, array $importer, array &$contact, $onlyfetch)
 	{
 		$author = [];
 		$author["author-link"] = XML::getFirstNodeValue($xpath, 'atom:author/atom:uri/text()', $context);
@@ -232,7 +232,7 @@ class OStatus
 	 *
 	 * @return array Array of author related entries for the item
 	 */
-	public static function salmonAuthor($xml, $importer)
+	public static function salmonAuthor($xml, array $importer)
 	{
 		if ($xml == "") {
 			return;
@@ -286,7 +286,7 @@ class OStatus
 	 * @param string $hub      Called by reference, returns the fetched hub data
 	 * @return void
 	 */
-	public static function import($xml, $importer, &$contact, &$hub)
+	public static function import($xml, array $importer, array &$contact, &$hub)
 	{
 		self::process($xml, $importer, $contact, $hub);
 	}
@@ -303,7 +303,7 @@ class OStatus
 	 *
 	 * @return boolean Could the XML be processed?
 	 */
-	private static function process($xml, $importer, &$contact, &$hub, $stored = false, $initialize = true)
+	private static function process($xml, array $importer, array &$contact, &$hub, $stored = false, $initialize = true)
 	{
 		if ($initialize) {
 			self::$itemlist = [];
@@ -540,10 +540,11 @@ class OStatus
 	}
 
 	/**
-	 * @param object $item item
+	 * Removes notice item from database
+	 * @param array $item item
 	 * @return void
 	 */
-	private static function deleteNotice($item)
+	private static function deleteNotice(array $item)
 	{
 		$condition = ['uid' => $item['uid'], 'author-id' => $item['author-id'], 'uri' => $item['uri']];
 		if (!Item::exists($condition)) {
@@ -565,7 +566,7 @@ class OStatus
 	 * @param array  $importer user record of the importing user
 	 * @return void
 	 */
-	private static function processPost($xpath, $entry, &$item, $importer)
+	private static function processPost(DOMXPath $xpath, $entry, array &$item, array $importer)
 	{
 		$item["body"] = HTML::toBBCode(XML::getFirstNodeValue($xpath, 'atom:content/text()', $entry));
 		$item["object-type"] = XML::getFirstNodeValue($xpath, 'activity:object-type/text()', $entry);
@@ -855,7 +856,7 @@ class OStatus
 	 * @param array  $item The item array
 	 * @return void
 	 */
-	private static function fetchSelf($self, &$item)
+	private static function fetchSelf($self, array &$item)
 	{
 		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $self, PROTOCOL_DFRN, PROTOCOL_OSTATUS_SALMON];
 		if (DBA::exists('conversation', $condition)) {
@@ -999,7 +1000,7 @@ class OStatus
 	 *
 	 * @return array with data from links
 	 */
-	private static function processRepeatedItem($xpath, $entry, &$item, $importer)
+	private static function processRepeatedItem(DOMXPath $xpath, $entry, array &$item, array $importer)
 	{
 		$activityobjects = $xpath->query('activity:object', $entry)->item(0);
 
@@ -1056,7 +1057,7 @@ class OStatus
 	 *
 	 * @return array with data from the links
 	 */
-	private static function processLinks($links, &$item)
+	private static function processLinks($links, array &$item)
 	{
 		$link_data = ['add_body' => '', 'self' => ''];
 
@@ -1158,7 +1159,7 @@ class OStatus
 	 *
 	 * @return string The guid if the post is a reshare
 	 */
-	private static function getResharedGuid($item)
+	private static function getResharedGuid(array $item)
 	{
 		$body = trim($item["body"]);
 
@@ -1239,7 +1240,7 @@ class OStatus
 	 *
 	 * @return object header root element
 	 */
-	private static function addHeader($doc, $owner, $filter)
+	private static function addHeader(DOMDocument $doc, array $owner, $filter)
 	{
 		$a = get_app();
 
@@ -1315,7 +1316,7 @@ class OStatus
 	 * @param object $nick nick
 	 * @return void
 	 */
-	public static function hublinks($doc, $root, $nick)
+	public static function hublinks(DOMDocument $doc, $root, $nick)
 	{
 		$h = System::baseUrl() . '/pubsubhubbub/'.$nick;
 		XML::addElement($doc, $root, "link", "", ["href" => $h, "rel" => "hub"]);
@@ -1329,7 +1330,7 @@ class OStatus
 	 * @param array  $item Data of the item that is to be posted
 	 * @return void
 	 */
-	private static function getAttachment($doc, $root, $item)
+	private static function getAttachment(DOMDocument $doc, $root, $item)
 	{
 		$o = "";
 		$siteinfo = BBCode::getAttachedData($item["body"]);
@@ -1396,10 +1397,11 @@ class OStatus
 	 *
 	 * @param object $doc   XML document
 	 * @param array  $owner Contact data of the poster
+	 * @param bool   $show_profile Whether to show profile
 	 *
 	 * @return object author element
 	 */
-	private static function addAuthor($doc, $owner, $show_profile = true)
+	private static function addAuthor(DOMDocument $doc, array $owner, $show_profile = true)
 	{
 		$profile = DBA::selectFirst('profile', ['homepage', 'publish'], ['uid' => $owner['uid'], 'is-default' => true]);
 		$author = $doc->createElement("author");
@@ -1482,9 +1484,9 @@ class OStatus
 	 *
 	 * @return string activity
 	 */
-	private static function constructVerb($item)
+	private static function constructVerb(array $item)
 	{
-		if ($item['verb']) {
+		if (!empty($item['verb'])) {
 			return $item['verb'];
 		}
 
@@ -1498,7 +1500,7 @@ class OStatus
 	 *
 	 * @return string Object type
 	 */
-	private static function constructObjecttype($item)
+	private static function constructObjecttype(array $item)
 	{
 		if (in_array($item['object-type'], [ACTIVITY_OBJ_NOTE, ACTIVITY_OBJ_COMMENT]))
 			return $item['object-type'];
@@ -1515,7 +1517,7 @@ class OStatus
 	 *
 	 * @return object Entry element
 	 */
-	private static function entry($doc, $item, $owner, $toplevel = false)
+	private static function entry(DOMDocument $doc, array $item, array $owner, $toplevel = false)
 	{
 		$xml = null;
 
@@ -1545,7 +1547,7 @@ class OStatus
 	 *
 	 * @return object Source element
 	 */
-	private static function sourceEntry($doc, $contact)
+	private static function sourceEntry(DOMDocument $doc, array $contact)
 	{
 		$source = $doc->createElement("source");
 		XML::addElement($doc, $source, "id", $contact["poll"]);
@@ -1566,7 +1568,7 @@ class OStatus
 	 *
 	 * @return array Contact array
 	 */
-	private static function contactEntry($url, $owner)
+	private static function contactEntry($url, array $owner)
 	{
 		$r = q(
 			"SELECT * FROM `contact` WHERE `nurl` = '%s' AND `uid` IN (0, %d) ORDER BY `uid` DESC LIMIT 1",
@@ -1621,7 +1623,7 @@ class OStatus
 	 *
 	 * @return object Entry element
 	 */
-	private static function reshareEntry($doc, $item, $owner, $repeated_guid, $toplevel)
+	private static function reshareEntry(DOMDocument $doc, array $item, array $owner, $repeated_guid, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (normalise_link($item["author-link"]) != normalise_link($owner["url"]))) {
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
@@ -1685,7 +1687,7 @@ class OStatus
 	 *
 	 * @return object Entry element with "like"
 	 */
-	private static function likeEntry($doc, $item, $owner, $toplevel)
+	private static function likeEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (normalise_link($item["author-link"]) != normalise_link($owner["url"]))) {
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
@@ -1720,7 +1722,7 @@ class OStatus
 	 *
 	 * @return object author element
 	 */
-	private static function addPersonObject($doc, $owner, $contact)
+	private static function addPersonObject(DOMDocument $doc, array $owner, array $contact)
 	{
 		$object = $doc->createElement("activity:object");
 		XML::addElement($doc, $object, "activity:object-type", ACTIVITY_OBJ_PERSON);
@@ -1766,7 +1768,7 @@ class OStatus
 	 *
 	 * @return object Entry element
 	 */
-	private static function followEntry($doc, $item, $owner, $toplevel)
+	private static function followEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
 		$item["id"] = $item["parent"] = 0;
 		$item["created"] = $item["edited"] = date("c");
@@ -1831,7 +1833,7 @@ class OStatus
 	 *
 	 * @return object Entry element
 	 */
-	private static function noteEntry($doc, $item, $owner, $toplevel)
+	private static function noteEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (normalise_link($item["author-link"]) != normalise_link($owner["url"]))) {
 			logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
@@ -1858,7 +1860,7 @@ class OStatus
 	 *
 	 * @return string The title for the element
 	 */
-	private static function entryHeader($doc, &$entry, $owner, $item, $toplevel)
+	private static function entryHeader(DOMDocument $doc, &$entry, array $owner, array $item, $toplevel)
 	{
 		/// @todo Check if this title stuff is really needed (I guess not)
 		if (!$toplevel) {
@@ -1902,7 +1904,7 @@ class OStatus
 	 * @param bool   $complete Add the "status_net" element?
 	 * @return void
 	 */
-	private static function entryContent($doc, $entry, $item, $owner, $title, $verb = "", $complete = true)
+	private static function entryContent(DOMDocument $doc, $entry, array $item, array $owner, $title, $verb = "", $complete = true)
 	{
 		if ($verb == "") {
 			$verb = self::constructVerb($item);
@@ -1945,7 +1947,7 @@ class OStatus
 	 * @param bool   $complete default true
 	 * @return void
 	 */
-	private static function entryFooter($doc, $entry, array $item, array $owner, $complete = true)
+	private static function entryFooter(DOMDocument $doc, $entry, array $item, array $owner, $complete = true)
 	{
 		$mentioned = [];
 
@@ -2199,7 +2201,7 @@ class OStatus
 	 *
 	 * @return string XML for the salmon
 	 */
-	public static function salmon($item, $owner)
+	public static function salmon(array $item, array $owner)
 	{
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
