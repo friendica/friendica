@@ -922,7 +922,7 @@ function photos_content(App $a)
 	require_once 'include/security.php';
 	require_once 'include/conversation.php';
 
-	if (!isset($a->data['user'])) {
+	if (empty($a->data['user'])) {
 		notice(L10n::t('No photos selected') . EOL);
 		return;
 	}
