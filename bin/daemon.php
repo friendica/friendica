@@ -11,7 +11,12 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Util\Argument;
+
+// Get options
+$shortopts  = '';
+$shortopts .= 'f';
+$longopts = [ 'foreground' ];
+$options = getopt($shortopts, $longopts);
 
 // Ensure that daemon.php is executed from the base path of the installation
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
@@ -56,7 +61,7 @@ if (in_array("status", $_SERVER["argv"])) {
 	$mode = "status";
 }
 
-$foreground = Argument::get('foreground', $_SERVER["argv"], false, 'boolean');
+$foreground = array_key_exists('f', $options) || array_key_exists('foreground', $options);
 
 if (!isset($mode)) {
 	die("Please use either 'start', 'stop' or 'status'.\n");

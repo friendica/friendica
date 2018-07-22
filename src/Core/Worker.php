@@ -1010,9 +1010,9 @@ class Worker
 	 */
 	public static function spawnWorker($do_cron = false)
 	{
-		$command = "bin/worker.php";
+		$command = 'bin/worker.php';
 
-		$args[] = [ "cron" => $do_cron ];
+		$args[] = [ 'cron' => $do_cron ];
 
 		get_app()->proc_run($command, $args);
 

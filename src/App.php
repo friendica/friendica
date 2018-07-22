@@ -1117,6 +1117,12 @@ class App
 		return false;
 	}
 
+	/**
+	 * Executes a child process with 'proc_open'
+	 *
+	 * @param string $command The command to execute
+	 * @param array  $args    Arguments to pass to the command ( [ 'key' => value, 'key2' => value2, ... ]
+	 */
 	public function proc_run($command, $args)
 	{
 		if (!function_exists('proc_open')) {
@@ -1125,7 +1131,18 @@ class App
 
 		$cmdline = $this->getConfigValue('config', 'php_path', 'php') . $command;
 
-		Argument::setArgs($cmdline, $args);
+		foreach ($args as $key => $value) {
+			if (!is_null($value) && is_bool($value) && !$value) {
+				continue;
+			}
+
+			$cmdline .= ' --' . $key;
+			if (!is_null($value) && !is_bool($value)) {
+				$cmdline .= ' ' . $value;
+			}
+		}
+
+		$cmdline = escapeshellarg($cmdline);
 
 		if ($this->min_memory_reached()) {
 			return;

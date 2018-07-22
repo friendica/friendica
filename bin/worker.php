@@ -9,7 +9,12 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Util\Argument;
+
+// Get options
+$shortopts  = '';
+$shortopts .= 'sc';
+$longopts = [ 'spawn', 'cron' ];
+$options = getopt($shortopts, $longopts);
 
 // Ensure that worker.php is executed from the base path of the installation
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
@@ -41,14 +46,14 @@ $a->set_baseurl(Config::get('system', 'url'));
 
 Addon::loadHooks();
 
-$spawn = Argument::get('spawn',$_SERVER["argc"], false, 'boolean');
+$spawn = array_key_exists('s', $options) || array_key_exists('spawn', $options);
 
 if ($spawn) {
 	Worker::spawnWorker();
 	killme();
 }
 
-$run_cron = Argument::get('cron',$_SERVER["argc"], false, 'boolean');
+$run_cron = array_key_exists('c', $options) || array_key_exists('cron', $options);
 
 Worker::processQueue($run_cron);
 
