@@ -12,7 +12,6 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBM;
-use Friendica\Util\Argument;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
