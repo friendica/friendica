@@ -17,9 +17,9 @@ if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
 	if (substr($directory, 0, 1) != "/") {
-		$directory = $_SERVER["PWD"]."/".$directory;
+		$directory = $_SERVER["PWD"] . "/" . $directory;
 	}
-	$directory = realpath($directory."/..");
+	$directory = realpath($directory . "/..");
 
 	chdir($directory);
 }
@@ -65,7 +65,11 @@ if (empty($_SERVER["argv"][0])) {
 	die("Unexpected script behaviour. This message should never occur.\n");
 }
 
-$pid = @file_get_contents($pidfile);
+$pid = null;
+
+if (is_readable($pidfile)) {
+	$pid = intval(file_get_contents($pidfile));
+}
 
 if (empty($pid) && in_array($mode, ["stop", "status"])) {
 	Config::set('system', 'worker_daemon_mode', false);
