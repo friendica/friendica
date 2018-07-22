@@ -1012,9 +1012,7 @@ class Worker
 	{
 		$command = "bin/worker.php";
 
-		if ($do_cron) {
-			$args[] = "cron";
-		}
+		$args[] = [ "cron" => $do_cron ];
 
 		get_app()->proc_run($command, $args);
 
