@@ -402,6 +402,7 @@ class NotificationsManager extends BaseObject
 		$fields = ['id', 'parent', 'verb', 'author-name', 'unseen', 'author-link', 'author-avatar', 'contact-avatar',
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid'];
 		$params = ['order' => ['created' => true], 'limit' => [$start, $limit]];
+
 		$items = Item::selectForUser(local_user(), $fields, $condition, $params);
 
 		if (DBM::is_result($items)) {
@@ -439,12 +440,13 @@ class NotificationsManager extends BaseObject
 		}
 
 		$r = q(
-			"SELECT `id`, `url`, `photo`, `msg`, `date`, `seen` FROM `notify`
+			"SELECT `id`, `url`, `photo`, `msg`, `date`, `seen`, `verb` FROM `notify`
 				WHERE `uid` = %d $sql_seen ORDER BY `date` DESC LIMIT %d, %d ",
 			intval(local_user()),
 			intval($start),
 			intval($limit)
 		);
+
 		if (DBM::is_result($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
@@ -487,6 +489,7 @@ class NotificationsManager extends BaseObject
 		$fields = ['id', 'parent', 'verb', 'author-name', 'unseen', 'author-link', 'author-avatar', 'contact-avatar',
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid'];
 		$params = ['order' => ['created' => true], 'limit' => [$start, $limit]];
+
 		$items = Item::selectForUser(local_user(), $fields, $condition, $params);
 
 		if (DBM::is_result($items)) {
