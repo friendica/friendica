@@ -12,7 +12,6 @@ use mysqli;
 use PDO;
 use PDOException;
 use PDOStatement;
-use mysqli;
 
 /**
  * @class MySQL database class
