@@ -12,6 +12,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBM;
+use Friendica\Util\Argument;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -1116,19 +1117,15 @@ class App
 		return false;
 	}
 
-	public function proc_run($args)
+	public function proc_run($command, $args)
 	{
 		if (!function_exists('proc_open')) {
 			return;
 		}
 
-		array_unshift($args, $this->getConfigValue('config', 'php_path', 'php'));
+		$cmdline = $this->getConfigValue('config', 'php_path', 'php') . $command;
 
-		for ($x = 0; $x < count($args); $x ++) {
-			$args[$x] = escapeshellarg($args[$x]);
-		}
-
-		$cmdline = implode(' ', $args);
+		Argument::setArgs($cmdline, $args);
 
 		if ($this->min_memory_reached()) {
 			return;

@@ -1010,13 +1010,13 @@ class Worker
 	 */
 	public static function spawnWorker($do_cron = false)
 	{
-		$args = ["bin/worker.php"];
+		$command = "bin/worker.php";
 
-		if (!$do_cron) {
-			$args[] = "no_cron";
+		if ($do_cron) {
+			$args[] = "cron";
 		}
 
-		get_app()->proc_run($args);
+		get_app()->proc_run($command, $args);
 
 		// after spawning we have to remove the flag.
 		if (Config::get('system', 'worker_daemon_mode', false)) {
