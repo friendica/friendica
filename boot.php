@@ -768,16 +768,20 @@ function run_update_function($x, $prefix)
 			return false;
 		} else {
 			Config::set('database', $funcname, 'success');
-			if (isset($post_update)) {
+
+			if ($prefix == 'update') {
 				Config::set('system', 'build', $x);
 			}
+
 			return true;
 		}
 	} else {
 		Config::set('database', $funcname, 'success');
-		if (isset($post_update)) {
+
+		if ($prefix == 'update') {
 			Config::set('system', 'build', $x);
 		}
+
 		return true;
 	}
 }
