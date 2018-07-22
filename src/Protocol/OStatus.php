@@ -303,7 +303,7 @@ class OStatus
 	 *
 	 * @return boolean Could the XML be processed?
 	 */
-	private static function process($xml, array $importer, array &$contact, &$hub, $stored = false, $initialize = true)
+	private static function process($xml, array $importer, array &$contact = null, &$hub, $stored = false, $initialize = true)
 	{
 		if ($initialize) {
 			self::$itemlist = [];
