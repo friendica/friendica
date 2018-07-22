@@ -916,7 +916,7 @@ class GContact
 		);
 
 		if (!DBM::is_result($r)) {
-			logger('Cannot find user with uid=' . $uid, LOGGER_NORMAL);
+			logger('Cannot find user with uid=' . $uid, LOGGER_INFO);
 			return false;
 		}
 
