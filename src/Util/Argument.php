@@ -66,7 +66,7 @@ class Argument
 			return;
 		}
 
-		$args .= '--' . $key;
+		$args .= ' --' . $key;
 
 		if (!is_bool($value)) {
 			$args .= ' ' . ((string)$value);
