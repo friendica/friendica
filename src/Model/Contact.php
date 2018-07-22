@@ -1526,7 +1526,9 @@ class Contact extends BaseObject
 				$item['guid'] = '';
 				$item['tag'] = '';
 				$item['attach'] = '';
+
 				$slap = OStatus::salmon($item, $owner);
+
 				if (!empty($contact['notify'])) {
 					Salmon::slapper($owner, $contact['notify'], $slap);
 				}
@@ -1540,7 +1542,15 @@ class Contact extends BaseObject
 		return $result;
 	}
 
-	public static function updateSslPolicy($contact, $new_policy)
+	/**
+	 * @brief Updated contact's SSL policy
+	 *
+	 * @param array  $contact Contact array
+	 * @param string $new_policy New policy, valid: self,full
+	 *
+	 * @return array Contact array with updated values
+	 */
+	public static function updateSslPolicy(array $contact, $new_policy)
 	{
 		$ssl_changed = false;
 		if ((intval($new_policy) == SSL_POLICY_SELFSIGN || $new_policy === 'self') && strstr($contact['url'], 'https:')) {
