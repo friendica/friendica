@@ -51,7 +51,7 @@ class DBA
 		self::$db_name = $db;
 		self::$db_charset = $charset;
 
-		$port = false;
+		$port = 0;
 		$serveraddr = trim($serveraddr);
 
 		$serverdata = explode(':', $serveraddr);
