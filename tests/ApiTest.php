@@ -5,6 +5,7 @@
 
 namespace Friendica\Test;
 
+use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
@@ -28,7 +29,7 @@ class ApiTest extends DatabaseTest
 		parent::setUp();
 
 		// Reusable App object
-		$this->app = \Friendica\BaseObject::getApp();
+		$this->app = BaseObject::getApp();
 
 		// User data that the test database is populated with
 		$this->selfUser = [
