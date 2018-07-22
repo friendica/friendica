@@ -2764,6 +2764,10 @@ class Diaspora
 			return false;
 		}
 
+		if (!$contact) {
+			$contact = [];
+		}
+
 		logger("Got retraction for ".$target_type.", sender ".$sender." and user ".$importer["uid"], LOGGER_DEBUG);
 
 		switch ($target_type) {
