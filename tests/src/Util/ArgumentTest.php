@@ -87,7 +87,7 @@ class ArgumentTest extends TestCase
 
 		Argument::set($args, $key, $value);
 
-		$this->assertEquals('--key value', $args);
+		$this->assertEquals(' --key value', $args);
 	}
 
 	/**
@@ -98,7 +98,7 @@ class ArgumentTest extends TestCase
 
 		Argument::setArgs($testArg, $args);
 
-		$this->assertEquals('--key value --key2 --key4 12', $testArg);
+		$this->assertEquals(' --key value --key2 --key4 12', $testArg);
 	}
 
 	/**
