@@ -524,7 +524,7 @@ $LOGGER_LEVELS = [];
  * @param string $msg
  * @param int $level
  */
-function logger($msg, $level = 1) {
+function logger($msg, $level = LOGGER_INFO) {
 	$a = get_app();
 	global $LOGGER_LEVELS;
 
@@ -595,7 +595,7 @@ function logger($msg, $level = 1) {
  * @param string $msg
  * @param int $level
  */
-function dlogger($msg, $level = 1) {
+function dlogger($msg, $level = LOGGER_INFO) {
 	$a = get_app();
 
 	$logfile = Config::get('system', 'dlogfile');
