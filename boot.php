@@ -113,11 +113,12 @@ define('SSL_POLICY_SELFSIGN',     2);
  * log levels
  * @{
  */
-define('LOGGER_NORMAL',          0);
-define('LOGGER_TRACE',           1);
-define('LOGGER_DEBUG',           2);
-define('LOGGER_DATA',            3);
-define('LOGGER_ALL',             4);
+define('LOGGER_WARNING',         0);
+define('LOGGER_INFO',            1);
+define('LOGGER_TRACE',           2);
+define('LOGGER_DEBUG',           3);
+define('LOGGER_DATA',            4);
+define('LOGGER_ALL',             5);
 /* @}*/
 
 /**

@@ -2356,11 +2356,12 @@ function admin_page_logs_post(App $a)
 function admin_page_logs(App $a)
 {
 	$log_choices = [
-		LOGGER_NORMAL	=> 'Normal',
-		LOGGER_TRACE	=> 'Trace',
-		LOGGER_DEBUG	=> 'Debug',
-		LOGGER_DATA	=> 'Data',
-		LOGGER_ALL	=> 'All'
+		LOGGER_WARNING => 'Warning',
+		LOGGER_INFO    => 'Info',
+		LOGGER_TRACE   => 'Trace',
+		LOGGER_DEBUG   => 'Debug',
+		LOGGER_DATA    => 'Data',
+		LOGGER_ALL     => 'All'
 	];
 
 	if (ini_get('log_errors')) {

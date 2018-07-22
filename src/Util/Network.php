@@ -220,7 +220,7 @@ class Network
 		}
 
 		if (curl_errno($ch) !== CURLE_OK) {
-			logger('error fetching ' . $url . ': ' . curl_error($ch), LOGGER_NORMAL);
+			logger('error fetching ' . $url . ': ' . curl_error($ch), LOGGER_INFO);
 		}
 
 		$ret['errno'] = curl_errno($ch);

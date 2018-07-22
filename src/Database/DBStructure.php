@@ -61,7 +61,7 @@ class DBStructure
 
 		// No valid result?
 		if (!DBM::is_result($adminlist)) {
-			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_NORMAL);
+			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_INFO);
 
 			// Don't continue
 			return;

@@ -134,7 +134,7 @@ class DFRN
 		);
 
 		if (! DBM::is_result($r)) {
-			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_NORMAL);
+			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_WARNING);
 			killme();
 		}
 
@@ -170,7 +170,7 @@ class DFRN
 			);
 
 			if (! DBM::is_result($r)) {
-				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_NORMAL);
+				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_WARNING);
 				killme();
 			}
 

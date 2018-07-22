@@ -513,7 +513,8 @@ $LOGGER_LEVELS = [];
  * @brief Logs the given message at the given log level
  *
  * log levels:
- * LOGGER_NORMAL (default)
+ * LOGGER_WARNING
+ * LOGGER_INFO (default)
  * LOGGER_TRACE
  * LOGGER_DEBUG
  * LOGGER_DATA
@@ -523,7 +524,7 @@ $LOGGER_LEVELS = [];
  * @param string $msg
  * @param int $level
  */
-function logger($msg, $level = 0) {
+function logger($msg, $level = 1) {
 	$a = get_app();
 	global $LOGGER_LEVELS;
 
@@ -583,7 +584,8 @@ function logger($msg, $level = 0) {
  * personally without background noise
  *
  * log levels:
- * LOGGER_NORMAL (default)
+ * LOGGER_WARNING
+ * LOGGER_INFO (default)
  * LOGGER_TRACE
  * LOGGER_DEBUG
  * LOGGER_DATA
@@ -593,7 +595,7 @@ function logger($msg, $level = 0) {
  * @param string $msg
  * @param int $level
  */
-function dlogger($msg, $level = 0) {
+function dlogger($msg, $level = 1) {
 	$a = get_app();
 
 	$logfile = Config::get('system', 'dlogfile');
