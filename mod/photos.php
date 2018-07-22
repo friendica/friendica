@@ -348,15 +348,16 @@ function photos_post(App $a)
 	}
 
 	if ($a->argc > 2 && (x($_POST, 'desc') !== false || x($_POST, 'newtag') !== false || x($_POST, 'albname') !== false)) {
-		$desc        = x($_POST, 'desc')      ? notags(trim($_POST['desc']))      : '';
-		$rawtags     = x($_POST, 'newtag')    ? notags(trim($_POST['newtag']))    : '';
-		$item_id     = x($_POST, 'item_id')   ? intval($_POST['item_id'])         : 0;
-		$albname     = x($_POST, 'albname')   ? notags(trim($_POST['albname']))   : '';
-		$origaname   = x($_POST, 'origaname') ? notags(trim($_POST['origaname'])) : '';
-		$str_group_allow   = perms2str($_POST['group_allow']);
-		$str_contact_allow = perms2str($_POST['contact_allow']);
-		$str_group_deny    = perms2str($_POST['group_deny']);
-		$str_contact_deny  = perms2str($_POST['contact_deny']);
+		$desc        = !empty($_POST['desc'])      ? notags(trim($_POST['desc']))      : '';
+		$rawtags     = !empty($_POST['newtag'])    ? notags(trim($_POST['newtag']))    : '';
+		$item_id     = !empty($_POST['item_id'])   ? intval($_POST['item_id'])         : 0;
+		$albname     = !empty($_POST['albname'])   ? notags(trim($_POST['albname']))   : '';
+		$origaname   = !empty($_POST['origaname']) ? notags(trim($_POST['origaname'])) : '';
+
+		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
+		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
+		$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
+		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 		$resource_id = $a->argv[2];
 
