@@ -124,7 +124,8 @@ function events_post(App $a) {
 	$c = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1",
 		intval(local_user())
 	);
-	if (count($c)) {
+
+	if (DBA::isResult($c)) {
 		$self = $c[0]['id'];
 	} else {
 		$self = 0;
@@ -132,10 +133,10 @@ function events_post(App $a) {
 
 
 	if ($share) {
-		$str_group_allow   = perms2str($_POST['group_allow']);
-		$str_contact_allow = perms2str($_POST['contact_allow']);
-		$str_group_deny    = perms2str($_POST['group_deny']);
-		$str_contact_deny  = perms2str($_POST['contact_deny']);
+		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
+		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
+		$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
+		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 		// Undo the pseudo-contact of self, since there are real contacts now
 		if (strpos($str_contact_allow, '<' . $self . '>') !== false ) {
