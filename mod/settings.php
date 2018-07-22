@@ -527,10 +527,10 @@ function settings_post(App $a)
 		date_default_timezone_set($timezone);
 	}
 
-	$str_group_allow   = perms2str(defaults($_POST, 'group_allow'  , ''));
-	$str_contact_allow = perms2str(defaults($_POST, 'contact_allow', ''));
-	$str_group_deny    = perms2str(defaults($_POST, 'group_deny'   , ''));
-	$str_contact_deny  = perms2str(defaults($_POST, 'contact_deny' , ''));
+	$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
+	$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
+	$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
+	$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 	$openidserver = $a->user['openidserver'];
 	//$openid = normalise_openid($openid);
