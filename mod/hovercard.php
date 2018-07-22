@@ -65,6 +65,8 @@ function hovercard_content()
 	// Get the photo_menu - the menu if possible contact actions
 	if (local_user()) {
 		$actions = Contact::photoMenu($contact);
+	} else {
+		$actions = [];
 	}
 
 	// Move the contact data to the profile array so we can deliver it to

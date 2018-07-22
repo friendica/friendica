@@ -1218,9 +1218,16 @@ class DFRN
 
 		$res = XML::parseString($xml);
 
-		if ((intval($res->status) != 0) || !strlen($res->challenge) || !strlen($res->dfrn_id)) {
+		if (!is_object($res) || (intval($res->status) != 0) || !strlen($res->challenge) || !strlen($res->dfrn_id)) {
 			Contact::markForArchival($contact);
-			return ($res->status ? $res->status : 3);
+
+			if (empty($res->status)) {
+				$status = 3;
+			} else {
+				$status = $res->status;
+			}
+
+			return $status;
 		}
 
 		$postvars     = [];

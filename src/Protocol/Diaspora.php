@@ -1040,46 +1040,26 @@ class Diaspora
 	 */
 	private static function contactByHandle($uid, $handle)
 	{
-		// First do a direct search on the contact table
-		$r = q(
-			"SELECT * FROM `contact` WHERE `uid` = %d AND `addr` = '%s' LIMIT 1",
-			intval($uid),
-			dbesc($handle)
-		);
-
-		if (DBM::is_result($r)) {
-			return $r[0];
-		} else {
-			/*
-			 * We haven't found it?
-			 * We use another function for it that will possibly create a contact entry.
-			 */
-			$cid = Contact::getIdForURL($handle, $uid);
-
-			if ($cid > 0) {
-				/// @TODO Contact retrieval should be encapsulated into an "entity" class like `Contact`
-				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1", intval($cid));
-
-				if (DBM::is_result($r)) {
-					return $r[0];
-				}
-			}
+		$cid = Contact::getIdForURL($handle, $uid);
+		if (!$cid) {
+			$handle_parts = explode("@", $handle);
+			$nurl_sql = "%%://" . $handle_parts[1] . "%%/profile/" . $handle_parts[0];
+			$cid = Contact::getIdForURL($nurl_sql, $uid);
 		}
 
-		$handle_parts = explode("@", $handle);
-		$nurl_sql = "%%://".$handle_parts[1]."%%/profile/".$handle_parts[0];
-		$r = q(
-			"SELECT * FROM `contact` WHERE `network` = '%s' AND `uid` = %d AND `nurl` LIKE '%s' LIMIT 1",
-			dbesc(NETWORK_DFRN),
-			intval($uid),
-			dbesc($nurl_sql)
-		);
-		if (DBM::is_result($r)) {
-			return $r[0];
+		if (!$cid) {
+			logger("Haven't found a contact for user " . $uid . " and handle " . $handle, LOGGER_DEBUG);
+			return false;
 		}
 
-		logger("Haven't found contact for user ".$uid." and handle ".$handle, LOGGER_DEBUG);
-		return false;
+		$contact = dba::selectFirst('contact', [], ['id' => $cid]);
+		if (!DBM::is_result($contact)) {
+			// This here shouldn't happen at all
+			logger("Haven't found a contact for user " . $uid . " and handle " . $handle, LOGGER_DEBUG);
+			return false;
+		}
+
+		return $contact;
 	}
 
 	/**
@@ -1147,7 +1127,9 @@ class Diaspora
 		if (!$contact) {
 			logger("A Contact for handle ".$handle." and user ".$importer["uid"]." was not found");
 			// If a contact isn't found, we accept it anyway if it is a comment
-			if ($is_comment) {
+			if ($is_comment && ($importer["uid"] != 0)) {
+				return self::contactByHandle(0, $handle);
+			} elseif ($is_comment) {
 				return $importer;
 			} else {
 				return false;
@@ -1268,6 +1250,11 @@ class Diaspora
 	private static function storeByGuid($guid, $server, $uid = 0)
 	{
 		$serverparts = parse_url($server);
+
+		if (empty($serverparts["host"]) || empty($serverparts["scheme"])) {
+			return false;
+		}
+
 		$server = $serverparts["scheme"]."://".$serverparts["host"];
 
 		logger("Trying to fetch item ".$guid." from ".$server, LOGGER_DEBUG);

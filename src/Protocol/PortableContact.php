@@ -1229,19 +1229,25 @@ class PortableContact
 
 						$site_name = $data->site->name;
 
-						$data->site->closed = self::toBoolean($data->site->closed);
+						$private = false;
+						$inviteonly = false;
+						$closed = false;
+
+						if (!empty($data->site->closed)) {
+							$closed = self::toBoolean($data->site->closed);
+						}
 
 						if (!empty($data->site->private)) {
-							$data->site->private = self::toBoolean($data->site->private);
+							$private = self::toBoolean($data->site->private);
 						}
 
 						if (!empty($data->site->inviteonly)) {
-							$data->site->inviteonly = self::toBoolean($data->site->inviteonly);
+							$inviteonly = self::toBoolean($data->site->inviteonly);
 						}
 
-						if (!$data->site->closed && !$data->site->private and $data->site->inviteonly) {
+						if (!$closed && !$private and $inviteonly) {
 							$register_policy = REGISTER_APPROVE;
-						} elseif (!$data->site->closed && !$data->site->private) {
+						} elseif (!$closed && !$private) {
 							$register_policy = REGISTER_OPEN;
 						} else {
 							$register_policy = REGISTER_CLOSED;
@@ -1649,7 +1655,7 @@ class PortableContact
 		}
 		$last_update = date("c", time() - (60 * 60 * 24 * $requery_days));
 
-		$r = q("SELECT `id`, `url`, `network` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `poco` != '' AND `last_poco_query` < '%s' ORDER BY RAND()", dbesc($last_update));
+		$r = q("SELECT `id`, `url`, `nurl`, `network` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `poco` != '' AND `last_poco_query` < '%s' ORDER BY RAND()", dbesc($last_update));
 		if (DBM::is_result($r)) {
 			foreach ($r as $server) {
 				if (!self::checkServer($server["url"], $server["network"])) {

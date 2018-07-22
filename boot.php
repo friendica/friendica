@@ -1103,7 +1103,7 @@ function explode_querystring($query)
 function curPageURL()
 {
 	$pageURL = 'http';
-	if ($_SERVER["HTTPS"] == "on") {
+	if (!empty($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
 		$pageURL .= "s";
 	}
 
