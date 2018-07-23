@@ -996,6 +996,7 @@ aside .widget,
     margin-bottom: 20px;
     padding: 10px;
     font-size: 13px;
+    overflow: auto;
 }
 aside .widget h3,
 .nav-container .widget h3 {
