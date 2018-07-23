@@ -785,7 +785,8 @@ function admin_page_workerqueue(App $a)
 	$r = DBA::toArray($statement);
 
 	for($i = 0; $i < count($r); $i++) {
-		$r[$i]['parameter'] = implode(json_decode($r[$i]['parameter']), ': ');
+		// fix GH-5469. ref: src/Core/Worker.php:217
+		$r[$i]['parameter'] = implode(json_decode($r[$i]['parameter'], true), ': ');
 	}
 
 	$t = get_markup_template('admin/workerqueue.tpl');
