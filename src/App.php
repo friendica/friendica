@@ -1128,7 +1128,7 @@ class App
 			return;
 		}
 
-		$cmdline = $this->getConfigValue('config', 'php_path', 'php') . $command;
+		$cmdline = $this->getConfigValue('config', 'php_path', 'php') . ' ' . $command;
 
 		foreach ($args as $key => $value) {
 			if (!is_null($value) && is_bool($value) && !$value) {
