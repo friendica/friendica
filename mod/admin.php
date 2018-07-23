@@ -1807,25 +1807,23 @@ function admin_page_users(App $a)
 	$adminlist = explode(",", str_replace(" ", "", Config::get('config', 'admin_email')));
 	$_setup_users = function ($e) use ($adminlist) {
 		$page_types = [
-			PAGE_NORMAL => L10n::t('Normal Account Page'),
-			PAGE_SOAPBOX => L10n::t('Soapbox Page'),
+			PAGE_NORMAL    => L10n::t('Normal Account Page'),
+			PAGE_SOAPBOX   => L10n::t('Soapbox Page'),
 			PAGE_COMMUNITY => L10n::t('Public Forum'),
-			PAGE_FREELOVE => L10n::t('Automatic Friend Page'),
-			PAGE_PRVGROUP => L10n::t('Private Forum')
+			PAGE_FREELOVE  => L10n::t('Automatic Friend Page'),
+			PAGE_PRVGROUP  => L10n::t('Private Forum')
 		];
 		$account_types = [
-			ACCOUNT_TYPE_PERSON => L10n::t('Personal Page'),
+			ACCOUNT_TYPE_PERSON       => L10n::t('Personal Page'),
 			ACCOUNT_TYPE_ORGANISATION => L10n::t('Organisation Page'),
-			ACCOUNT_TYPE_NEWS => L10n::t('News Page'),
-			ACCOUNT_TYPE_COMMUNITY => L10n::t('Community Forum')
+			ACCOUNT_TYPE_NEWS         => L10n::t('News Page'),
+			ACCOUNT_TYPE_COMMUNITY    => L10n::t('Community Forum')
 		];
 
-
-
-		$e['page-flags-raw'] = $e['page-flags'];
+		$e['page_flags_raw'] = $e['page-flags'];
 		$e['page-flags'] = $page_types[$e['page-flags']];
 
-		$e['account-type-raw'] = ($e['page_flags_raw'] == 0) ? $e['account-type'] : -1;
+		$e['account_type_raw'] = ($e['page_flags_raw'] == 0) ? $e['account-type'] : -1;
 		$e['account-type'] = ($e['page_flags_raw'] == 0) ? $account_types[$e['account-type']] : "";
 
 		$e['register_date'] = Temporal::getRelativeDate($e['register_date']);
@@ -1834,8 +1832,10 @@ function admin_page_users(App $a)
 		$e['is_admin'] = in_array($e['email'], $adminlist);
 		$e['is_deletable'] = (intval($e['uid']) != local_user());
 		$e['deleted'] = ($e['account_removed'] ? Temporal::getRelativeDate($e['account_expires_on']) : False);
+
 		return $e;
 	};
+
 	$users = array_map($_setup_users, $users);
 
 
