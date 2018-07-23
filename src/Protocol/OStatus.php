@@ -288,7 +288,7 @@ class OStatus
 	 * @param string $hub      Called by reference, returns the fetched hub data
 	 * @return void
 	 */
-	public static function import($xml, array $importer, array &$contact, &$hub)
+	public static function import($xml, array $importer, array &$contact = null, &$hub)
 	{
 		self::process($xml, $importer, $contact, $hub);
 	}
@@ -1703,6 +1703,10 @@ class OStatus
 		$as_object = $doc->createElement("activity:object");
 
 		$parent = Item::selectFirst([], ['uri' => $item["thr-parent"], 'uid' => $item["uid"]]);
+
+		if (!$parent) {
+			$parent = [];
+		}
 
 		XML::addElement($doc, $as_object, "activity:object-type", self::constructObjecttype($parent));
 
