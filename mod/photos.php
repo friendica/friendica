@@ -119,13 +119,15 @@ function photos_init(App $a) {
 		}
 
 
-		if (!x($a->page, 'aside')) {
+		if (empty($a->page['aside'])) {
 			$a->page['aside'] = '';
 		}
+
 		$a->page['aside'] .= $vcard_widget;
 		$a->page['aside'] .= $photo_albums_widget;
 
 		$tpl = get_markup_template("photos_head.tpl");
+
 		$a->page['htmlhead'] .= replace_macros($tpl,[
 			'$ispublic' => L10n::t('everybody')
 		]);
@@ -150,26 +152,27 @@ function photos_post(App $a)
 
 	if (local_user() && (local_user() == $page_owner_uid)) {
 		$can_post = true;
-	} else {
-		if ($community_page && remote_user()) {
-			$contact_id = 0;
-			if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
-				foreach ($_SESSION['remote'] as $v) {
-					if ($v['uid'] == $page_owner_uid) {
-						$contact_id = $v['cid'];
-						break;
-					}
+	} elseif ($community_page && remote_user()) {
+		$contact_id = 0;
+
+		if (!empty($_SESSION['remote']) && is_array($_SESSION['remote'])) {
+			foreach ($_SESSION['remote'] as $v) {
+				if ($v['uid'] == $page_owner_uid) {
+					$contact_id = $v['cid'];
+					break;
 				}
 			}
-			if ($contact_id) {
-				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
-					intval($contact_id),
-					intval($page_owner_uid)
-				);
-				if (DBM::is_result($r)) {
-					$can_post = true;
-					$visitor = $contact_id;
-				}
+		}
+
+		if ($contact_id) {
+			$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
+				intval($contact_id),
+				intval($page_owner_uid)
+			);
+
+			if (DBM::is_result($r)) {
+				$can_post = true;
+				$visitor = $contact_id;
 			}
 		}
 	}
@@ -232,11 +235,13 @@ function photos_post(App $a)
 
 		if ($_POST['dropalbum'] == L10n::t('Delete Album')) {
 			// Check if we should do HTML-based delete confirmation
-			if (x($_REQUEST, 'confirm')) {
+			if (!empty($_REQUEST['confirm'])) {
 				$drop_url = $a->query_string;
+
 				$extra_inputs = [
 					['name' => 'albumname', 'value' => $_POST['albumname']],
 				];
+
 				$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 					'$method' => 'post',
 					'$message' => L10n::t('Do you really want to delete this photo album and all its photos?'),
@@ -295,7 +300,7 @@ function photos_post(App $a)
 
 
 	// Check if the user has responded to a delete confirmation query for a single photo
-	if ($a->argc > 2 && x($_REQUEST, 'canceled')) {
+	if ($a->argc > 2 && !empty($_REQUEST['canceled'])) {
 		goaway($_SESSION['photo_return']);
 	}
 
@@ -304,7 +309,7 @@ function photos_post(App $a)
 		// same as above but remove single photo
 
 		// Check if we should do HTML-based delete confirmation
-		if (x($_REQUEST, 'confirm')) {
+		if (!empty($_REQUEST['confirm'])) {
 			$drop_url = $a->query_string;
 			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
 				'$method' => 'post',
@@ -331,6 +336,7 @@ function photos_post(App $a)
 				dbesc($a->argv[2])
 			);
 		}
+
 		if (DBM::is_result($r)) {
 			q("DELETE FROM `photo` WHERE `uid` = %d AND `resource-id` = '%s'",
 				intval($page_owner_uid),
@@ -347,7 +353,7 @@ function photos_post(App $a)
 		return; // NOTREACHED
 	}
 
-	if ($a->argc > 2 && (x($_POST, 'desc') !== false || x($_POST, 'newtag') !== false || x($_POST, 'albname') !== false)) {
+	if ($a->argc > 2 && (!empty($_POST['desc']) || !empty($_POST['newtag']) || !empty($_POST['albname']) !== false)) {
 		$desc        = !empty($_POST['desc'])      ? notags(trim($_POST['desc']))      : '';
 		$rawtags     = !empty($_POST['newtag'])    ? notags(trim($_POST['newtag']))    : '';
 		$item_id     = !empty($_POST['item_id'])   ? intval($_POST['item_id'])         : 0;
@@ -365,25 +371,26 @@ function photos_post(App $a)
 			$albname = DateTimeFormat::localNow('Y');
 		}
 
-		if (x($_POST,'rotate') !== false &&
-		   (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
+		if (!empty($_POST['rotate']) && (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
 			logger('rotate');
 
 			$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 0 LIMIT 1",
 				dbesc($resource_id),
 				intval($page_owner_uid)
 			);
-			if (DBM::is_result($r)) {
-				$Image = new Image($r[0]['data'], $r[0]['type']);
-				if ($Image->isValid()) {
-					$rotate_deg = ((intval($_POST['rotate']) == 1) ? 270 : 90);
-					$Image->rotate($rotate_deg);
 
-					$width  = $Image->getWidth();
-					$height = $Image->getHeight();
+			if (DBM::is_result($r)) {
+				$image = new Image($r[0]['data'], $r[0]['type']);
+
+				if ($image->isValid()) {
+					$rotate_deg = ((intval($_POST['rotate']) == 1) ? 270 : 90);
+					$image->rotate($rotate_deg);
+
+					$width  = $image->getWidth();
+					$height = $image->getHeight();
 
 					$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 0",
-						dbesc($Image->asString()),
+						dbesc($image->asString()),
 						intval($height),
 						intval($width),
 						dbesc($resource_id),
@@ -391,12 +398,12 @@ function photos_post(App $a)
 					);
 
 					if ($width > 640 || $height > 640) {
-						$Image->scaleDown(640);
-						$width  = $Image->getWidth();
-						$height = $Image->getHeight();
+						$image->scaleDown(640);
+						$width  = $image->getWidth();
+						$height = $image->getHeight();
 
 						$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 1",
-							dbesc($Image->asString()),
+							dbesc($image->asString()),
 							intval($height),
 							intval($width),
 							dbesc($resource_id),
@@ -405,12 +412,12 @@ function photos_post(App $a)
 					}
 
 					if ($width > 320 || $height > 320) {
-						$Image->scaleDown(320);
-						$width  = $Image->getWidth();
-						$height = $Image->getHeight();
+						$image->scaleDown(320);
+						$width  = $image->getWidth();
+						$height = $image->getHeight();
 
 						$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 2",
-							dbesc($Image->asString()),
+							dbesc($image->asString()),
 							intval($height),
 							intval($width),
 							dbesc($resource_id),
@@ -679,8 +686,8 @@ function photos_post(App $a)
 	Addon::callHooks('photo_post_init', $_POST);
 
 	// Determine the album to use
-	$album    = x($_REQUEST, 'album') ? notags(trim($_REQUEST['album'])) : '';
-	$newalbum = x($_REQUEST, 'newalbum') ? notags(trim($_REQUEST['newalbum'])) : '';
+	$album    = !empty($_REQUEST['album'])    ? notags(trim($_REQUEST['album']))    : '';
+	$newalbum = !empty($_REQUEST['newalbum']) ? notags(trim($_REQUEST['newalbum'])) : '';
 
 	logger('mod/photos.php: photos_post(): album= ' . $album . ' newalbum= ' . $newalbum , LOGGER_DEBUG);
 
@@ -729,7 +736,7 @@ function photos_post(App $a)
 
 	Addon::callHooks('photo_post_file', $ret);
 
-	if (x($ret, 'src') && x($ret, 'filesize')) {
+	if (!empty($ret['src']) && !empty($ret['filesize'])) {
 		$src      = $ret['src'];
 		$filename = $ret['filename'];
 		$filesize = $ret['filesize'];
@@ -797,9 +804,9 @@ function photos_post(App $a)
 
 	$imagedata = @file_get_contents($src);
 
-	$Image = new Image($imagedata, $type);
+	$image = new Image($imagedata, $type);
 
-	if (!$Image->isValid()) {
+	if (!$image->isValid()) {
 		logger('mod/photos.php: photos_post(): unable to process image' , LOGGER_DEBUG);
 		notice(L10n::t('Unable to process image.') . EOL);
 		@unlink($src);
@@ -808,7 +815,7 @@ function photos_post(App $a)
 		killme();
 	}
 
-	$exif = $Image->orient($src);
+	$exif = $image->orient($src);
 	@unlink($src);
 
 	$max_length = Config::get('system', 'max_image_length');
@@ -816,17 +823,17 @@ function photos_post(App $a)
 		$max_length = MAX_IMAGE_LENGTH;
 	}
 	if ($max_length > 0) {
-		$Image->scaleDown($max_length);
+		$image->scaleDown($max_length);
 	}
 
-	$width  = $Image->getWidth();
-	$height = $Image->getHeight();
+	$width  = $image->getWidth();
+	$height = $image->getHeight();
 
 	$smallest = 0;
 
 	$photo_hash = Photo::newResource();
 
-	$r = Photo::store($Image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 0 , 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
+	$r = Photo::store($image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 0 , 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
 
 	if (!$r) {
 		logger('mod/photos.php: photos_post(): image store failed', LOGGER_DEBUG);
@@ -835,14 +842,14 @@ function photos_post(App $a)
 	}
 
 	if ($width > 640 || $height > 640) {
-		$Image->scaleDown(640);
-		Photo::store($Image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 1, 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
+		$image->scaleDown(640);
+		Photo::store($image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 1, 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
 		$smallest = 1;
 	}
 
 	if ($width > 320 || $height > 320) {
-		$Image->scaleDown(320);
-		Photo::store($Image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 2, 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
+		$image->scaleDown(320);
+		Photo::store($image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 2, 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
 		$smallest = 2;
 	}
 
@@ -883,7 +890,7 @@ function photos_post(App $a)
 	$arr['origin']        = 1;
 
 	$arr['body']          = '[url=' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo_hash . ']'
-				. '[img]' . System::baseUrl() . "/photo/{$photo_hash}-{$smallest}.".$Image->getExt() . '[/img]'
+				. '[img]' . System::baseUrl() . "/photo/{$photo_hash}-{$smallest}.".$image->getExt() . '[/img]'
 				. '[/url]';
 
 	$item_id = Item::insert($arr);
@@ -1475,10 +1482,11 @@ function photos_content(App $a)
 					builtin_activity_puller($item, $conv_responses);
 				}
 
-				if (x($conv_responses['like'], $link_item['uri'])) {
+				if (!empty($conv_responses['like'][$link_item['uri']])) {
 					$like = format_like($conv_responses['like'][$link_item['uri']], $conv_responses['like'][$link_item['uri'] . '-l'], 'like', $link_item['id']);
 				}
-				if (x($conv_responses['dislike'], $link_item['uri'])) {
+
+				if (!empty($conv_responses['dislike'][$link_item['uri']])) {
 					$dislike = format_like($conv_responses['dislike'][$link_item['uri']], $conv_responses['dislike'][$link_item['uri'] . '-l'], 'dislike', $link_item['id']);
 				}
 
@@ -1647,16 +1655,16 @@ function photos_content(App $a)
 			$name_e = $rr['album'];
 
 			$photos[] = [
-				'id'		=> $rr['id'],
-				'twist'		=> ' ' . ($twist ? 'rotleft' : 'rotright') . rand(2,4),
-				'link'  	=> 'photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
-				'title' 	=> L10n::t('View Photo'),
-				'src'     	=> 'photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.' . $ext,
-				'alt'     	=> $alt_e,
-				'album'	=> [
-					'link'  => 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
-					'name'  => $name_e,
-					'alt'   => L10n::t('View Album'),
+				'id'    => $rr['id'],
+				'twist' => ' ' . ($twist ? 'rotleft' : 'rotright') . rand(2,4),
+				'link'  => 'photos/' . $a->data['user']['nickname'] . '/image/' . $rr['resource-id'],
+				'title' => L10n::t('View Photo'),
+				'src'   => 'photo/' . $rr['resource-id'] . '-' . ((($rr['scale']) == 6) ? 4 : $rr['scale']) . '.' . $ext,
+				'alt'   => $alt_e,
+				'album' => [
+					'link' => 'photos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
+					'name' => $name_e,
+					'alt'  => L10n::t('View Album'),
 				],
 
 			];
