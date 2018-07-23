@@ -117,7 +117,6 @@ function photos_init(App $a) {
 			]);
 		}
 
-
 		if (empty($a->page['aside'])) {
 			$a->page['aside'] = '';
 		}
