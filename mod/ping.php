@@ -17,6 +17,7 @@ use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
+use Friendica\Model\Process;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
@@ -124,7 +125,7 @@ function ping_init(App $a)
 				header("Content-type: text/xml");
 				echo XML::fromArray($data, $xml);
 			}
-			killme();
+			Process::stop(Process::STOP_EXIT);
 		}
 
 		$notifs = ping_get_notifications(local_user());

@@ -57,6 +57,22 @@ class Process extends BaseObject
 	}
 
 	/**
+	 * Checks inactive processes based on the same parent (to avoid checking processes of other nodes)
+	 *
+	 * @param int $id The ID of the process
+	 *
+	 * @return bool Returns true if the process is inactive
+	 */
+	public static function checkInactive($id) {
+		$entry = dba::selectFirst('process', ['pid'], ['id' => $id, 'parent' => self::$instance->parent]);
+		if (DBM::is_result($entry)) {
+			return !posix_kill($entry["pid"], 0);
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Clean the process table of inactive physical processes
 	 */
 	public static function deleteInactive()

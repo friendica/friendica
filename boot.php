@@ -34,6 +34,7 @@ use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Model\Process;
 
 require_once 'include/text.php';
 
@@ -846,10 +847,12 @@ function check_addons(App $a)
 /**
  * @brief Used to end the current process, after saving session state.
  * @deprecated
+ *
+ * Use
  */
 function killme()
 {
-	exit();
+	Process::stop(Process::STOP_EXIT);
 }
 
 /**
@@ -864,7 +867,7 @@ function goaway($path)
 	}
 
 	header("Location: $url");
-	killme();
+	Process::stop(Process::STOP_EXIT);
 }
 
 /**

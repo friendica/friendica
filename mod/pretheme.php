@@ -2,6 +2,7 @@
 
 use Friendica\App;
 use Friendica\Core\Theme;
+use Friendica\Model\Process;
 
 function pretheme_init(App $a) {
 
@@ -21,5 +22,5 @@ function pretheme_init(App $a) {
 		echo json_encode(['img' => Theme::getScreenshot($theme), 'desc' => $desc, 'version' => $version, 'credits' => $credits]);
 	}
 
-	killme();
+	Process::stop(Process::STOP_EXIT);
 }
