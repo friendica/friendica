@@ -307,7 +307,7 @@ class Event extends BaseObject
 
 			Addon::callHooks('event_updated', $event['id']);
 		} else {
-			$event['guid'] = System::createGUID(32);
+			$event['guid']  = defaults($arr, 'guid', System::createGUID(32));
 
 			// New event. Store it.
 			DBA::insert('event', $event);
@@ -321,6 +321,7 @@ class Event extends BaseObject
 			$item_arr['uri']           = $event['uri'];
 			$item_arr['parent-uri']    = $event['uri'];
 			$item_arr['guid']          = $event['guid'];
+			$item_arr['plink']         = defaults($arr, 'plink', '');
 			$item_arr['post-type']     = Item::PT_EVENT;
 			$item_arr['wall']          = $event['cid'] ? 0 : 1;
 			$item_arr['contact-id']    = $contact['id'];
