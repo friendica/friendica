@@ -170,7 +170,7 @@ function photos_post(App $a)
 					intval($page_owner_uid)
 				);
 
-				if (DBM::isResult($r)) {
+				if (DBA::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}
