@@ -994,7 +994,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 		}
 
 		// Check if $contact has been successfully loaded
-		if (is_array($contact)) {
+		if (DBA::isResult($contact)) {
 			if (strlen($inform) && (isset($contact["notify"]) || isset($contact["id"]))) {
 				$inform .= ',';
 			}
@@ -1008,6 +1008,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$profile = $contact["url"];
 			$alias   = $contact["alias"];
 			$newname = $contact["nick"];
+
 			if (($newname == "") || (($contact["network"] != NETWORK_OSTATUS) && ($contact["network"] != NETWORK_TWITTER)
 				&& ($contact["network"] != NETWORK_STATUSNET) && ($contact["network"] != NETWORK_APPNET))) {
 				$newname = $contact["name"];
