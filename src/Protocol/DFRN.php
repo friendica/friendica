@@ -2642,7 +2642,7 @@ class DFRN
 					$ev["edited"]  = $item["edited"];
 					$ev["private"] = $item["private"];
 					$ev["guid"]    = $item["guid"];
-					$ev["plink"]    = $item["plink"];
+					$ev["plink"]   = $item["plink"];
 
 					$r = q(
 						"SELECT `id` FROM `event` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
