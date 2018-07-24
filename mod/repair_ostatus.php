@@ -29,8 +29,8 @@ function repair_ostatus_content(App $a) {
                 `uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)",
                 intval($uid),
                 DBA::escape(NETWORK_OSTATUS),
-                intval(CONTACT_IS_FRIEND),
-                intval(CONTACT_IS_SHARING));
+                intval(Contact::CONTACT_IS_FRIEND),
+                intval(Contact::CONTACT_IS_SHARING));
 
 	if (!$r)
 		return($o.L10n::t("Error"));
@@ -43,8 +43,8 @@ function repair_ostatus_content(App $a) {
 		LIMIT %d, 1",
                 intval($uid),
                 DBA::escape(NETWORK_OSTATUS),
-                intval(CONTACT_IS_FRIEND),
-                intval(CONTACT_IS_SHARING), $counter++);
+                intval(Contact::CONTACT_IS_FRIEND),
+                intval(Contact::CONTACT_IS_SHARING), $counter++);
 
 	if (!$r) {
 		$o .= L10n::t("Done");

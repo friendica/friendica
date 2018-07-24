@@ -424,7 +424,7 @@ class Delivery extends BaseObject
 
 		// only expose our real email address to true friends
 
-		if (($contact['rel'] == CONTACT_IS_FRIEND) && !$contact['blocked']) {
+		if (($contact['rel'] == Contact::CONTACT_IS_FRIEND) && !$contact['blocked']) {
 			if ($reply_to) {
 				$headers  = 'From: ' . Email::encodeHeader($local_user['username'],'UTF-8') . ' <' . $reply_to.'>' . "\n";
 				$headers .= 'Sender: ' . $local_user['email'] . "\n";

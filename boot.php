@@ -153,19 +153,6 @@ define('REGISTER_OPEN',          2);
 */
 
 /**
- * @name Contact_is
- *
- * Relationship types
- * @{
- */
-define('CONTACT_IS_FOLLOWER', 1);
-define('CONTACT_IS_SHARING',  2);
-define('CONTACT_IS_FRIEND',   3);
-/**
- *  @}
- */
-
-/**
  * @name Update
  *
  * DB update return values

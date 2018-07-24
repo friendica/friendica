@@ -68,7 +68,7 @@ class OnePoll
 		}
 
 		// Diaspora users, archived users and followers are only checked if they still exist.
-		if ($contact['archive'] || ($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == CONTACT_IS_FOLLOWER)) {
+		if ($contact['archive'] || ($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::CONTACT_IS_FOLLOWER)) {
 			$last_updated = PortableContact::lastUpdated($contact["url"], true);
 			$updated = DateTimeFormat::utcNow();
 			if ($last_updated) {
@@ -296,7 +296,7 @@ class OnePoll
 			// Will only do this once per notify-enabled OStatus contact
 			// or if relationship changes
 
-			$stat_writeable = ((($contact['notify']) && ($contact['rel'] == CONTACT_IS_FOLLOWER || $contact['rel'] == CONTACT_IS_FRIEND)) ? 1 : 0);
+			$stat_writeable = ((($contact['notify']) && ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER || $contact['rel'] == Contact::CONTACT_IS_FRIEND)) ? 1 : 0);
 
 			// Contacts from OStatus are always writable
 			if ($contact['network'] === NETWORK_OSTATUS) {
@@ -310,7 +310,7 @@ class OnePoll
 
 			// Are we allowed to import from this person?
 
-			if ($contact['rel'] == CONTACT_IS_FOLLOWER || $contact['blocked']) {
+			if ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER || $contact['blocked']) {
 				// set the last-update so we don't keep polling
 				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
@@ -602,7 +602,7 @@ class OnePoll
 
 			logger("Contact ".$contact['id']." returned hub: ".$hub." Network: ".$contact['network']." Relation: ".$contact['rel']." Update: ".$hub_update);
 
-			if (strlen($hub) && $hub_update && (($contact['rel'] != CONTACT_IS_FOLLOWER) || $contact['network'] == NETWORK_FEED)) {
+			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::CONTACT_IS_FOLLOWER) || $contact['network'] == NETWORK_FEED)) {
 				logger('hub ' . $hubmode . ' : ' . $hub . ' contact name : ' . $contact['name'] . ' local user : ' . $importer['name']);
 				$hubs = explode(',', $hub);
 				if (count($hubs)) {

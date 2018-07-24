@@ -776,8 +776,8 @@ function networkThreadedView(App $a, $update, $parent)
 			AND NOT `item`.`moderated` AND $sql_extra4
 			$sql_extra3 $sql_extra $sql_range $sql_nets
 			ORDER BY `order_date` DESC LIMIT 100",
-			intval(CONTACT_IS_SHARING),
-			intval(CONTACT_IS_FRIEND),
+			intval(Contact::CONTACT_IS_SHARING),
+			intval(Contact::CONTACT_IS_FRIEND),
 			intval(local_user()),
 			intval(local_user())
 		);
@@ -796,8 +796,8 @@ function networkThreadedView(App $a, $update, $parent)
 			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
 			$sql_extra2 $sql_extra3 $sql_range $sql_extra $sql_nets
 			ORDER BY `order_date` DESC $pager_sql",
-			intval(CONTACT_IS_SHARING),
-			intval(CONTACT_IS_FRIEND),
+			intval(Contact::CONTACT_IS_SHARING),
+			intval(Contact::CONTACT_IS_FRIEND),
 			intval(local_user()),
 			intval(local_user())
 		);

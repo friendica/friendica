@@ -16,6 +16,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -340,14 +341,14 @@ class Profile
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `id` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
 					intval(remote_user()),
-					intval(CONTACT_IS_FRIEND)
+					intval(Contact::CONTACT_IS_FRIEND)
 				);
 			} else {
 				$r = q(
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
 					DBA::escape(normalise_link(self::getMyURL())),
-					intval(CONTACT_IS_FRIEND)
+					intval(Contact::CONTACT_IS_FRIEND)
 				);
 			}
 			if ($r) {

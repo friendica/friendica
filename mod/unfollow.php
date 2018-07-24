@@ -27,7 +27,7 @@ function unfollow_post(App $a)
 	$return_url = $_SESSION['return_url'];
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
-			$uid, CONTACT_IS_FRIEND, normalise_link($url),
+			$uid, Contact::CONTACT_IS_FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
 	$contact = DBA::selectFirst('contact', [], $condition);
 
@@ -43,7 +43,7 @@ function unfollow_post(App $a)
 				Contact::terminateFriendship($r[0], $contact);
 			}
 		}
-		DBA::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
+		DBA::update('contact', ['rel' => Contact::CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
 
 		info(L10n::t('Contact unfollowed').EOL);
 		goaway(System::baseUrl().'/contacts/'.$contact['id']);
@@ -66,7 +66,7 @@ function unfollow_content(App $a)
 	$submit = L10n::t('Submit Request');
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
-			local_user(), CONTACT_IS_FRIEND, normalise_link($url),
+			local_user(), Contact::CONTACT_IS_FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
 	$contact = DBA::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 

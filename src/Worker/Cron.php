@@ -9,6 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/dba.php';
@@ -221,7 +222,7 @@ class Cron
 			}
 
 			// Check Diaspora contacts or followers once a week
-			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == CONTACT_IS_FOLLOWER)) {
+			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::CONTACT_IS_FOLLOWER)) {
 				$contact['priority'] = 4;
 			}
 

@@ -177,7 +177,7 @@ class Diaspora
 			'name' => 'relay', 'nick' => 'relay',
 			'url' => $server_url, 'network' => NETWORK_DIASPORA,
 			'batch' => $server_url . '/receive/public',
-			'rel' => CONTACT_IS_FOLLOWER, 'blocked' => false,
+			'rel' => Contact::CONTACT_IS_FOLLOWER, 'blocked' => false,
 			'pending' => false, 'writable' => true];
 
 		$fields = array_merge($fields, $network_fields);
@@ -1079,14 +1079,14 @@ class Diaspora
 		 */
 		// It is deactivated by now, due to side effects. See issue https://github.com/friendica/friendica/pull/4033
 		// It is not removed by now. Possibly the code is needed?
-		//if (!$is_comment && $contact["rel"] == CONTACT_IS_FOLLOWER && in_array($importer["page-flags"], array(PAGE_FREELOVE))) {
+		//if (!$is_comment && $contact["rel"] == Contact::CONTACT_IS_FOLLOWER && in_array($importer["page-flags"], array(PAGE_FREELOVE))) {
 		//	dba::update(
 		//		'contact',
-		//		array('rel' => CONTACT_IS_FRIEND, 'writable' => true),
+		//		array('rel' => Contact::CONTACT_IS_FRIEND, 'writable' => true),
 		//		array('id' => $contact["id"], 'uid' => $contact["uid"])
 		//	);
 		//
-		//	$contact["rel"] = CONTACT_IS_FRIEND;
+		//	$contact["rel"] = Contact::CONTACT_IS_FRIEND;
 		//	logger("defining user ".$contact["nick"]." as friend");
 		//}
 
@@ -1095,11 +1095,11 @@ class Diaspora
 			// Maybe blocked, don't accept.
 			return false;
 			// We are following this person?
-		} elseif (($contact["rel"] == CONTACT_IS_SHARING) || ($contact["rel"] == CONTACT_IS_FRIEND)) {
+		} elseif (($contact["rel"] == Contact::CONTACT_IS_SHARING) || ($contact["rel"] == Contact::CONTACT_IS_FRIEND)) {
 			// Yes, then it is fine.
 			return true;
 			// Is it a post to a community?
-		} elseif (($contact["rel"] == CONTACT_IS_FOLLOWER) && in_array($importer["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
+		} elseif (($contact["rel"] == Contact::CONTACT_IS_FOLLOWER) && in_array($importer["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
 			// That's good
 			return true;
 			// Is the message a global user or a comment?
@@ -2305,10 +2305,10 @@ class Diaspora
 	{
 		$a = get_app();
 
-		if ($contact["rel"] == CONTACT_IS_SHARING) {
+		if ($contact["rel"] == Contact::CONTACT_IS_SHARING) {
 			DBA::update(
 				'contact',
-				['rel' => CONTACT_IS_FRIEND, 'writable' => true],
+				['rel' => Contact::CONTACT_IS_FRIEND, 'writable' => true],
 				['id' => $contact["id"], 'uid' => $importer["uid"]]
 			);
 		}
@@ -2359,7 +2359,7 @@ class Diaspora
 
 				// If we are now friends, we are sending a share message.
 				// Normally we needn't to do so, but the first message could have been vanished.
-				if (in_array($contact["rel"], [CONTACT_IS_FRIEND])) {
+				if (in_array($contact["rel"], [Contact::CONTACT_IS_FRIEND])) {
 					$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval($importer["uid"]));
 					if ($u) {
 						logger("Sending share message to author ".$author." - Contact: ".$contact["id"]." - User: ".$importer["uid"], LOGGER_DEBUG);
@@ -2455,16 +2455,16 @@ class Diaspora
 
 			Contact::updateAvatar($contact_record["photo"], $importer["uid"], $contact_record["id"]);
 
-			// technically they are sharing with us (CONTACT_IS_SHARING),
+			// technically they are sharing with us (Contact::CONTACT_IS_SHARING),
 			// but if our page-type is PAGE_COMMUNITY or PAGE_SOAPBOX
 			// we are going to change the relationship and make them a follower.
 
 			if (($importer["page-flags"] == PAGE_FREELOVE) && $sharing && $following) {
-				$new_relation = CONTACT_IS_FRIEND;
+				$new_relation = Contact::CONTACT_IS_FRIEND;
 			} elseif (($importer["page-flags"] == PAGE_FREELOVE) && $sharing) {
-				$new_relation = CONTACT_IS_SHARING;
+				$new_relation = Contact::CONTACT_IS_SHARING;
 			} else {
-				$new_relation = CONTACT_IS_FOLLOWER;
+				$new_relation = Contact::CONTACT_IS_FOLLOWER;
 			}
 
 			$r = q(
@@ -3269,13 +3269,15 @@ class Diaspora
 
 		/*
 		switch ($contact["rel"]) {
-			case CONTACT_IS_FRIEND:
+			case Contact::CONTACT_IS_FRIEND:
 				$following = true;
 				$sharing = true;
-			case CONTACT_IS_SHARING:
+
+			case Contact::CONTACT_IS_SHARING:
 				$following = false;
 				$sharing = true;
-			case CONTACT_IS_FOLLOWER:
+
+			case Contact::CONTACT_IS_FOLLOWER:
 				$following = true;
 				$sharing = false;
 		}
@@ -4131,7 +4133,7 @@ class Diaspora
 				AND `uid` = %d AND `rel` != %d",
 				DBA::escape(NETWORK_DIASPORA),
 				intval($uid),
-				intval(CONTACT_IS_SHARING)
+				intval(Contact::CONTACT_IS_SHARING)
 			);
 		}
 

@@ -31,6 +31,19 @@ require_once 'include/text.php';
 class Contact extends BaseObject
 {
 	/**
+	 * @name Contact_is
+	 *
+	 * Relationship types
+	 * @{
+	 */
+	const CONTACT_IS_FOLLOWER = 1;
+	const CONTACT_IS_SHARING  = 2;
+	const CONTACT_IS_FRIEND   = 3;
+	/**
+	 * @}
+	 */
+
+	/**
 	 * @brief Returns a list of contacts belonging in a group
 	 *
 	 * @param int $gid
@@ -849,7 +862,7 @@ class Contact extends BaseObject
 				'about'     => $data["about"],
 				'network'   => $data["network"],
 				'pubkey'    => $data["pubkey"],
-				'rel'       => CONTACT_IS_SHARING,
+				'rel'       => self::CONTACT_IS_SHARING,
 				'priority'  => $data["priority"],
 				'batch'     => $data["batch"],
 				'request'   => $data["request"],
@@ -1374,12 +1387,12 @@ class Contact extends BaseObject
 
 		if (DBA::isResult($r)) {
 			// update contact
-			$new_relation = (($r[0]['rel'] == CONTACT_IS_FOLLOWER) ? CONTACT_IS_FRIEND : CONTACT_IS_SHARING);
+			$new_relation = (($r[0]['rel'] == self::CONTACT_IS_FOLLOWER) ? self::CONTACT_IS_FRIEND : self::CONTACT_IS_SHARING);
 
 			$fields = ['rel' => $new_relation, 'subhub' => $subhub, 'readonly' => false];
 			DBA::update('contact', $fields, ['id' => $r[0]['id']]);
 		} else {
-			$new_relation = ((in_array($ret['network'], [NETWORK_MAIL])) ? CONTACT_IS_FRIEND : CONTACT_IS_SHARING);
+			$new_relation = ((in_array($ret['network'], [NETWORK_MAIL])) ? self::CONTACT_IS_FRIEND : self::CONTACT_IS_SHARING);
 
 			// create contact record
 			DBA::insert('contact', [
@@ -1500,9 +1513,9 @@ class Contact extends BaseObject
 		}
 
 		if (is_array($contact)) {
-			if (($contact['rel'] == CONTACT_IS_SHARING)
-				|| ($sharing && $contact['rel'] == CONTACT_IS_FOLLOWER)) {
-				DBA::update('contact', ['rel' => CONTACT_IS_FRIEND, 'writable' => true],
+			if (($contact['rel'] == self::CONTACT_IS_SHARING)
+				|| ($sharing && $contact['rel'] == self::CONTACT_IS_FOLLOWER)) {
+				DBA::update('contact', ['rel' => self::CONTACT_IS_FRIEND, 'writable' => true],
 						['id' => $contact['id'], 'uid' => $importer['uid']]);
 			}
 			// send email notification to owner?
@@ -1524,7 +1537,7 @@ class Contact extends BaseObject
 				DBA::escape($nick),
 				DBA::escape($photo),
 				DBA::escape(NETWORK_OSTATUS),
-				intval(CONTACT_IS_FOLLOWER)
+				intval(self::CONTACT_IS_FOLLOWER)
 			);
 
 			$contact_record = [
@@ -1580,19 +1593,19 @@ class Contact extends BaseObject
 		}
 	}
 
-	public static function removeFollower($importer, $contact, array $datarray = [], $item = "") {
-
-		if (($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_SHARING)) {
-			DBA::update('contact', ['rel' => CONTACT_IS_SHARING], ['id' => $contact['id']]);
+	public static function removeFollower($importer, $contact, array $datarray = [], $item = "")
+	{
+		if (($contact['rel'] == self::CONTACT_IS_FRIEND) || ($contact['rel'] == self::CONTACT_IS_SHARING)) {
+			DBA::update('contact', ['rel' => self::CONTACT_IS_SHARING], ['id' => $contact['id']]);
 		} else {
 			Contact::remove($contact['id']);
 		}
 	}
 
-	public static function removeSharer($importer, $contact, array $datarray = [], $item = "") {
-
-		if (($contact['rel'] == CONTACT_IS_FRIEND) || ($contact['rel'] == CONTACT_IS_FOLLOWER)) {
-			DBA::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
+	public static function removeSharer($importer, $contact, array $datarray = [], $item = "")
+	{
+		if (($contact['rel'] == self::CONTACT_IS_FRIEND) || ($contact['rel'] == self::CONTACT_IS_FOLLOWER)) {
+			DBA::update('contact', ['rel' => self::CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
 		} else {
 			Contact::remove($contact['id']);
 		}

@@ -753,7 +753,7 @@ function api_get_user(App $a, $contact_id = null)
 		'contributors_enabled' => false,
 		'is_translator' => false,
 		'is_translation_enabled' => false,
-		'following' => (($uinfo[0]['rel'] == CONTACT_IS_FOLLOWER) || ($uinfo[0]['rel'] == CONTACT_IS_FRIEND)),
+		'following' => (($uinfo[0]['rel'] == Contact::CONTACT_IS_FOLLOWER) || ($uinfo[0]['rel'] == Contact::CONTACT_IS_FRIEND)),
 		'follow_request_sent' => false,
 		'statusnet_blocking' => false,
 		'notifications' => false,
@@ -3186,9 +3186,9 @@ function api_statuses_f($qtype)
 
 	$sql_extra = '';
 	if ($qtype == 'friends') {
-		$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_SHARING), intval(CONTACT_IS_FRIEND));
+		$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(Contact::CONTACT_IS_SHARING), intval(Contact::CONTACT_IS_FRIEND));
 	} elseif ($qtype == 'followers') {
-		$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(CONTACT_IS_FOLLOWER), intval(CONTACT_IS_FRIEND));
+		$sql_extra = sprintf(" AND ( `rel` = %d OR `rel` = %d ) ", intval(Contact::CONTACT_IS_FOLLOWER), intval(Contact::CONTACT_IS_FRIEND));
 	}
 
 	// friends and followers only for self

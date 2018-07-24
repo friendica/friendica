@@ -514,18 +514,21 @@ function contacts_content(App $a)
 		$dir_icon = '';
 		$relation_text = '';
 		switch ($contact['rel']) {
-			case CONTACT_IS_FRIEND:
+			case Contact::CONTACT_IS_FRIEND:
 				$dir_icon = 'images/lrarrow.gif';
 				$relation_text = L10n::t('You are mutual friends with %s');
 				break;
-			case CONTACT_IS_FOLLOWER;
+
+			case Contact::CONTACT_IS_FOLLOWER;
 				$dir_icon = 'images/larrow.gif';
 				$relation_text = L10n::t('You are sharing with %s');
 				break;
-			case CONTACT_IS_SHARING;
+
+			case Contact::CONTACT_IS_SHARING;
 				$dir_icon = 'images/rarrow.gif';
 				$relation_text = L10n::t('%s is sharing with you');
 				break;
+
 			default:
 				break;
 		}
@@ -590,10 +593,10 @@ function contacts_content(App $a)
 		$follow = '';
 		$follow_text = '';
 		if (in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
-			if ($contact['rel'] == CONTACT_IS_FOLLOWER) {
+			if ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER) {
 				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Connect/Follow");
-			} elseif ($contact['rel'] == CONTACT_IS_FRIEND) {
+			} elseif ($contact['rel'] == Contact::CONTACT_IS_FRIEND) {
 				$follow = System::baseUrl(true) . "/unfollow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Disconnect/Unfollow");
 			}
@@ -781,7 +784,7 @@ function contacts_content(App $a)
 		$sql_extra .= sprintf(" AND network = '%s' ", DBA::escape($nets));
 	}
 
-	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
+	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= Contact::CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 		WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
@@ -905,11 +908,12 @@ function contacts_tab($a, $contact_id, $active_tab)
 	return $tab_str;
 }
 
-function contact_posts($a, $contact_id)
+function contact_posts(App $a, $contact_id)
 {
 	$o = contacts_tab($a, $contact_id, 1);
 
 	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id]);
+
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
 		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
@@ -919,28 +923,33 @@ function contact_posts($a, $contact_id)
 	return $o;
 }
 
-function _contact_detail_for_template($rr)
+function _contact_detail_for_template(array $rr)
 {
 	$dir_icon = '';
 	$alt_text = '';
+
 	switch ($rr['rel']) {
-		case CONTACT_IS_FRIEND:
+		case Contact::CONTACT_IS_FRIEND:
 			$dir_icon = 'images/lrarrow.gif';
 			$alt_text = L10n::t('Mutual Friendship');
 			break;
-		case CONTACT_IS_FOLLOWER;
+
+		case Contact::CONTACT_IS_FOLLOWER;
 			$dir_icon = 'images/larrow.gif';
 			$alt_text = L10n::t('is a fan of yours');
 			break;
-		case CONTACT_IS_SHARING;
+
+		case Contact::CONTACT_IS_SHARING;
 			$dir_icon = 'images/rarrow.gif';
 			$alt_text = L10n::t('you are a fan of');
 			break;
+
 		default:
 			break;
 	}
 
 	$url = Contact::magicLink($rr['url']);
+
 	if (strpos($url, 'redir/') === 0) {
 		$sparkle = ' class="sparkle" ';
 	} else {
