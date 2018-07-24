@@ -274,6 +274,7 @@ function videos_content(App $a)
 	// perhaps they're visiting - but not a community page, so they wouldn't have write access
 	if (remote_user() && (!$visitor)) {
 		$contact_id = 0;
+
 		if (!empty($_SESSION['remote'])) {
 			foreach($_SESSION['remote'] as $v) {
 				if($v['uid'] == $owner_uid) {
