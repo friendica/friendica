@@ -1,8 +1,8 @@
-<div id='adminpage'>
+<div id="adminpage">
 	<h1>{{$title}} - {{$page}} ({{$count}})</h1>
 	
 	<p>{{$info}}</p>
-	<table class='table'>
+	<table class="table">
 		<tr>
 			<th>{{$id_header}}</th>
 			<th>{{$to_header}}</th>
