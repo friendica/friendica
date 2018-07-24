@@ -309,6 +309,10 @@ class Delivery extends BaseObject
 		} else {
 			// The message could not be delivered. We mark the contact as "dead"
 			Contact::markForArchival($contact);
+
+			// Transmit via Diaspora when all other methods (legacy DFRN and new one) are failing.
+			// This is a fallback for systems that don't know the new methods.
+			self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 		}
 	}
 
