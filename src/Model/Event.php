@@ -34,14 +34,18 @@ class Event extends BaseObject
 		$bd_format = L10n::t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8 AM.
 
 		$event_start = day_translate(
-			$event['adjust'] ?
+			!empty($event['adjust']) ?
 			DateTimeFormat::local($event['start'], $bd_format) : DateTimeFormat::utc($event['start'], $bd_format)
 		);
 
-		$event_end = day_translate(
-			$event['adjust'] ?
-			DateTimeFormat::local($event['finish'], $bd_format) : DateTimeFormat::utc($event['finish'], $bd_format)
-		);
+		if (!empty($event['finish'])) {
+			$event_end = day_translate(
+				!empty($event['adjust']) ?
+				DateTimeFormat::local($event['finish'], $bd_format) : DateTimeFormat::utc($event['finish'], $bd_format)
+			);
+		} else {
+			$event_end = '';
+		}
 
 		if ($simple) {
 			$o = "<h3>" . BBCode::convert($event['summary'], false, $simple) . "</h3>";
@@ -66,7 +70,7 @@ class Event extends BaseObject
 		$o .= '<div class="summary event-summary">' . BBCode::convert($event['summary'], false, $simple) . '</div>' . "\r\n";
 
 		$o .= '<div class="event-start"><span class="event-label">' . L10n::t('Starts:') . '</span>&nbsp;<span class="dtstart" title="'
-			. DateTimeFormat::utc($event['start'], (($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
+			. DateTimeFormat::utc($event['start'], (!empty($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
 			. '" >' . $event_start
 			. '</span></div>' . "\r\n";
 
@@ -863,6 +867,11 @@ class Event extends BaseObject
 			if (substr($dtstart_title, 0, 10) === substr($dtend_title, 0, 10)) {
 				$same_date = true;
 			}
+		} else {
+			$dtend_title = '';
+			$dtend_dt = '';
+			$end_time = '';
+			$end_short = '';
 		}
 
 		// Format the event location.

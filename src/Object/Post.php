@@ -14,6 +14,7 @@ use Friendica\Core\PConfig;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Term;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -336,13 +337,15 @@ class Post extends BaseObject
 			unset($buttons["like"]);
 		}
 
+		$tags = Term::populateTagsFromItem($item);
+
 		$tmp_item = [
 			'template'        => $this->getTemplate(),
 			'type'            => implode("", array_slice(explode("/", $item['verb']), -1)),
 			'suppress_tags'   => Config::get('system', 'suppress_tags'),
-			'tags'            => $item['tags'],
-			'hashtags'        => $item['hashtags'],
-			'mentions'        => $item['mentions'],
+			'tags'            => $tags['tags'],
+			'hashtags'        => $tags['hashtags'],
+			'mentions'        => $tags['mentions'],
 			'txt_cats'        => L10n::t('Categories:'),
 			'txt_folders'     => L10n::t('Filed under:'),
 			'has_cats'        => ((count($categories)) ? 'true' : ''),
