@@ -308,6 +308,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		if ($network === Protocol::DFRN) {
 			$new_relation = Contact::FOLLOWER;
+
 			if (($relation == Contact::SHARING) || ($duplex)) {
 				$new_relation = Contact::FRIEND;
 			}
@@ -550,6 +551,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		logger('dfrn_confirm: request - photos imported');
 
 		$new_relation = Contact::SHARING;
+
 		if (($relation == Contact::FOLLOWER) || ($duplex)) {
 			$new_relation = Contact::FRIEND;
 		}

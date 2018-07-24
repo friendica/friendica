@@ -444,25 +444,30 @@ class Delivery extends BaseObject
 			if (($target_item["thr-parent"] != "") && ($target_item["thr-parent"] != $target_item["parent-uri"])) {
 				$headers .= " <".Email::iri2msgid($target_item["thr-parent"]).">";
 			}
+
 			$headers .= "\n";
 
 			if (empty($target_item['title'])) {
 				$condition = ['uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
 				$title = Item::selectFirst(['title'], $condition);
+
 				if (DBA::isResult($title) && ($title['title'] != '')) {
 					$subject = $title['title'];
 				} else {
 					$condition = ['parent-uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
 					$title = Item::selectFirst(['title'], $condition);
+
 					if (DBA::isResult($title) && ($title['title'] != '')) {
 						$subject = $title['title'];
 					}
 				}
 			}
+
 			if (strncasecmp($subject, 'RE:', 3)) {
 				$subject = 'Re: ' . $subject;
 			}
 		}
+
 		Email::send($addr, $subject, $headers, $target_item);
 	}
 }

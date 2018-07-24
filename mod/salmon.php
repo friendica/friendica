@@ -153,11 +153,14 @@ function salmon_post(App $a, $xml = '') {
 		DBA::escape(normalise_link($author_link)),
 		intval($importer['uid'])
 	);
-	if (! DBA::isResult($r)) {
+
+	if (!DBA::isResult($r)) {
 		logger('Author ' . $author_link . ' unknown to user ' . $importer['uid'] . '.');
-		if(PConfig::get($importer['uid'],'system','ostatus_autofriend')) {
+
+		if (PConfig::get($importer['uid'],'system','ostatus_autofriend')) {
 			$result = Contact::createFromProbe($importer['uid'], $author_link);
-			if($result['success']) {
+
+			if ($result['success']) {
 				$r = q("SELECT * FROM `contact` WHERE `network` = '%s' AND ( `url` = '%s' OR `alias` = '%s')
 					AND `uid` = %d LIMIT 1",
 					DBA::escape(Protocol::OSTATUS),

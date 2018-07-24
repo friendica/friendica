@@ -33,8 +33,9 @@ function repair_ostatus_content(App $a) {
                 intval(Contact::FRIEND),
                 intval(Contact::SHARING));
 
-	if (!$r)
-		return($o.L10n::t("Error"));
+	if (!DBA::isResult($r)) {
+		return $o . L10n::t("Error"));
+	}
 
 	$total = $r[0]["total"];
 
@@ -47,7 +48,7 @@ function repair_ostatus_content(App $a) {
                 intval(Contact::FRIEND),
                 intval(Contact::SHARING), $counter++);
 
-	if (!$r) {
+	if (!DBA::isResult($r)) {
 		$o .= L10n::t("Done");
 		return $o;
 	}

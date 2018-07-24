@@ -607,12 +607,15 @@ class OnePoll
 			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::FOLLOWER) || $contact['network'] == Protocol::FEED)) {
 				logger('hub ' . $hubmode . ' : ' . $hub . ' contact name : ' . $contact['name'] . ' local user : ' . $importer['name']);
 				$hubs = explode(',', $hub);
+
 				if (count($hubs)) {
 					foreach ($hubs as $h) {
 						$h = trim($h);
+
 						if (!strlen($h)) {
 							continue;
 						}
+
 						subscribe_to_hub($h, $importer, $contact, $hubmode);
 					}
 				}
@@ -652,7 +655,7 @@ class OnePoll
 	 * @param array $contact The personal contact entry
 	 * @param array $fields The fields that are updated
 	 */
-	private static function updateContact($contact, $fields)
+	private static function updateContact(array $contact, array $fields)
 	{
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
 		DBA::update('contact', $fields, ['uid' => 0, 'nurl' => $contact['nurl']]);
