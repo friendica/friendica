@@ -24,7 +24,7 @@ function videos_init(App $a)
 		DFRN::autoRedir($a, $a->argv[1]);
 	}
 
-	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
+	if ((Config::get('system', 'block_public')) && (!local_user()) && (!remote_user())) {
 		return;
 	}
 
@@ -69,7 +69,7 @@ function videos_init(App $a)
 		if(count($albums)) {
 			$a->data['albums'] = $albums;
 
-			$albums_visible = ((intval($a->data['user']['hidewall']) && (! local_user()) && (! remote_user())) ? false : true);
+			$albums_visible = ((intval($a->data['user']['hidewall']) && (!local_user()) && (!remote_user())) ? false : true);
 
 			if($albums_visible) {
 				$o .= '<div id="sidebar-photos-albums" class="widget">';
@@ -81,7 +81,7 @@ function videos_init(App $a)
 					// don't show contact photos. We once translated this name, but then you could still access it under
 					// a different language setting. Now we store the name in English and check in English (and translated for legacy albums).
 
-					if((! strlen($album['album'])) || ($album['album'] === 'Contact Photos') || ($album['album'] === L10n::t('Contact Photos')))
+					if((!strlen($album['album'])) || ($album['album'] === 'Contact Photos') || ($album['album'] === L10n::t('Contact Photos')))
 						continue;
 					$o .= '<li>' . '<a href="photos/' . $a->argv[1] . '/album/' . bin2hex($album['album']) . '" >' . $album['album'] . '</a></li>';
 				}
@@ -194,7 +194,7 @@ function videos_content(App $a)
 	// videos/name/video/xxxxx/edit
 
 
-	if ((Config::get('system','block_public')) && (! local_user()) && (! remote_user())) {
+	if ((Config::get('system', 'block_public')) && (!local_user()) && (!remote_user())) {
 		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
@@ -272,7 +272,7 @@ function videos_content(App $a)
 	$groups = [];
 
 	// perhaps they're visiting - but not a community page, so they wouldn't have write access
-	if (remote_user() && (! $visitor)) {
+	if (remote_user() && (!$visitor)) {
 		$contact_id = 0;
 		if (!empty($_SESSION['remote'])) {
 			foreach($_SESSION['remote'] as $v) {
@@ -302,7 +302,7 @@ function videos_content(App $a)
 		$contact = $a->contact;
 	}
 
-	if ($a->data['user']['hidewall'] && (local_user() != $owner_uid) && (! $remote_contact)) {
+	if ($a->data['user']['hidewall'] && (local_user() != $owner_uid) && (!$remote_contact)) {
 		notice(L10n::t('Access to this item is restricted.') . EOL);
 		return;
 	}
