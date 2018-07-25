@@ -22,6 +22,11 @@ class PermissionSet extends BaseObject
 	 */
 	public static function fetchIDForPost(&$postarray)
 	{
+		if (is_null($postarray['allow_cid']) || is_null($postarray['allow_gid'])
+			|| is_null($postarray['deny_cid']) || is_null($postarray['deny_gid'])) {
+			return null;
+		}
+
 		$condition = ['uid' => $postarray['uid'],
 			'allow_cid' => self::sortPermissions(defaults($postarray, 'allow_cid', '')),
 			'allow_gid' => self::sortPermissions(defaults($postarray, 'allow_gid', '')),
