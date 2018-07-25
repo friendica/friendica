@@ -44,8 +44,8 @@ function lockview_content(App $a) {
 	}
 
 
-	if (($item['private'] == 1) && !empty($item['allow_cid']) && !empty($item['allow_gid'])
-		&& !empty($item['deny_cid']) && !empty($item['deny_gid'])) {
+	if (($item['private'] == 1) && empty($item['allow_cid']) && empty($item['allow_gid'])
+		&& empty($item['deny_cid']) && empty($item['deny_gid'])) {
 
 		echo L10n::t('Remote privacy information not available.') . '<br />';
 		killme();
