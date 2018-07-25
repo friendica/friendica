@@ -34,7 +34,7 @@ function repair_ostatus_content(App $a) {
                 intval(Contact::SHARING));
 
 	if (!DBA::isResult($r)) {
-		return $o . L10n::t("Error"));
+		return $o . L10n::t("Error");
 	}
 
 	$total = $r[0]["total"];
