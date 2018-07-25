@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1279
+-- DB_UPDATE_VERSION 1280
 -- ------------------------------------------
 
 
@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_eventid` (`uid`,`event-id`),
 	 INDEX `icid` (`icid`),
 	 INDEX `iaid` (`iaid`),
-	 INDEX `psid` (`psid`)
+	 INDEX `psid_wall` (`psid`,`wall`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Structure for all posts';
 
 --
