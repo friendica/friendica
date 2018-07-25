@@ -1115,11 +1115,11 @@ aside .vcard #profile-photo-wrapper.crop-preview {
     padding: 0;
 }
 aside .vcard .profile-header {
-    margin-bottom: 20px;
+    padding: 5px 0px 5px 0px;
 }
 aside .vcard .fn {
-    font-size: 20px;
     font-weight: bold;
+    padding: 5px 0px 5px 0px;
 }
 aside .vcard .p-addr {
     font-style: italic;
@@ -1139,9 +1139,10 @@ aside .xmpp {
 aside .vcard .icon {
     display: table-cell;
     padding-right: 10px;
+    width: 30px;
 }
 #profile-extra-links {
-    margin-bottom: 20px;
+    overflow: auto;
 }
 aside .vcard #dfrn-request-link-button,
 aside .vcard #wallmessage-link-botton {
@@ -1513,6 +1514,9 @@ section #jotOpen {
 .tread-wrapper .media {
     overflow: visible;
     word-wrap: break-word;
+}
+aside .panel-body {
+    padding: 0px;
 }
 
 /* Thread hover effects */
