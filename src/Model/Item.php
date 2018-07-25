@@ -513,9 +513,8 @@ class Item extends BaseObject
 
 		$fields['item'] = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
 			'contact-id', 'owner-id', 'author-id', 'type', 'wall', 'gravity', 'extid',
-			'created', 'edited', 'commented', 'received', 'changed',
-			'resource-id', 'event-id', 'tag', 'attach', 'post-type',
-			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid',
+			'created', 'edited', 'commented', 'received', 'changed', 'psid',
+			'resource-id', 'event-id', 'tag', 'attach', 'post-type', 'file',
 			'private', 'pubmail', 'moderated', 'visible', 'starred', 'bookmark',
 			'unseen', 'deleted', 'origin', 'forum_mode', 'mention', 'global',
 			'id' => 'item_id', 'network', 'icid', 'iaid', 'id' => 'internal-iid',
@@ -527,6 +526,8 @@ class Item extends BaseObject
 		$fields['item-content'] = array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST);
 
 		$fields['item-delivery-data'] = self::DELIVERY_DATA_FIELDLIST;
+
+		$fields['permissionset'] = ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'];
 
 		$fields['author'] = ['url' => 'author-link', 'name' => 'author-name',
 			'thumb' => 'author-avatar', 'nick' => 'author-nick', 'network' => 'author-network'];
@@ -639,6 +640,10 @@ class Item extends BaseObject
 
 		if (strpos($sql_commands, "`item-delivery-data`.") !== false) {
 			$joins .= " LEFT JOIN `item-delivery-data` ON `item-delivery-data`.`iid` = `item`.`id`";
+		}
+
+		if (strpos($sql_commands, "`permissionset`.") !== false) {
+			$joins .= " LEFT JOIN `permissionset` ON `permissionset`.`id` = `item`.`psid`";
 		}
 
 		if ((strpos($sql_commands, "`parent-item`.") !== false) || (strpos($sql_commands, "`parent-author`.") !== false)) {
