@@ -1653,8 +1653,7 @@ class Item extends BaseObject
 			$files = '';
 		}
 
-		// Creates the permission set
-		// Currently we only store the data but don't using it
+		// Creates or assigns the permission set
 		$item['psid'] = PermissionSet::fetchIDForPost($item);
 
 		// We are doing this outside of the transaction to avoid timing problems

@@ -20,8 +20,13 @@ class PermissionSet extends BaseObject
 	 * @param array $postarray The array from an item, picture or event post
 	 * @return id
 	 */
-	public static function fetchIDForPost($postarray)
+	public static function fetchIDForPost(&$postarray)
 	{
+		if (is_null($postarray['allow_cid']) || is_null($postarray['allow_gid'])
+			|| is_null($postarray['deny_cid']) || is_null($postarray['deny_gid'])) {
+			return null;
+		}
+
 		$condition = ['uid' => $postarray['uid'],
 			'allow_cid' => self::sortPermissions(defaults($postarray, 'allow_cid', '')),
 			'allow_gid' => self::sortPermissions(defaults($postarray, 'allow_gid', '')),
@@ -35,6 +40,13 @@ class PermissionSet extends BaseObject
 
 			$set = DBA::selectFirst('permissionset', ['id'], $condition);
 		}
+
+
+		$postarray['allow_cid'] = null;
+		$postarray['allow_gid'] = null;
+		$postarray['deny_cid'] = null;
+		$postarray['deny_gid'] = null;
+
 		return $set['id'];
 	}
 

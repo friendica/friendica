@@ -262,7 +262,8 @@ class PostUpdate
 				$item['owner-id'] = Contact::getIdForURL($item["owner-link"], 0, false, $default);
 			}
 
-			if (empty($item['psid'])) {
+			if (!is_null($item['allow_cid']) && !is_null($item['allow_gid'])
+				&& !is_null($item['deny_cid']) && !is_null($item['deny_gid'])) {
 				$item['psid'] = PermissionSet::fetchIDForPost($item);
 			}
 
