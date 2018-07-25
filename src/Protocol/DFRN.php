@@ -896,7 +896,7 @@ class DFRN
 			$entry->setAttribute("xmlns:statusnet", NAMESPACE_STATUSNET);
 		}
 
-		if ($item['allow_cid'] || $item['allow_gid'] || $item['deny_cid'] || $item['deny_gid']) {
+		if ($item['private']) {
 			$body = Item::fixPrivatePhotos($item['body'], $owner['uid'], $item, $cid);
 		} else {
 			$body = $item['body'];
@@ -990,8 +990,8 @@ class DFRN
 			XML::addElement($doc, $entry, "georss:point", $item['coord']);
 		}
 
-		if (($item['private']) || strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid'])) {
-			XML::addElement($doc, $entry, "dfrn:private", (($item['private']) ? $item['private'] : 1));
+		if ($item['private']) {
+			XML::addElement($doc, $entry, "dfrn:private", ($item['private'] ? $item['private'] : 1));
 		}
 
 		if ($item['extid']) {
