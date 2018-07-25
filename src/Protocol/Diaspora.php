@@ -1081,11 +1081,11 @@ class Diaspora
 		//if (!$is_comment && $contact["rel"] == Contact::FOLLOWER && in_array($importer["page-flags"], array(Contact::PAGE_FREELOVE))) {
 		//	DBA::update(
 		//		'contact',
-		//		array('rel' => Contact::CONTACT_IS_FRIEND, 'writable' => true),
+		//		array('rel' => Contact::FRIEND, 'writable' => true),
 		//		array('id' => $contact["id"], 'uid' => $contact["uid"])
 		//	);
 		//
-		//	$contact["rel"] = Contact::CONTACT_IS_FRIEND;
+		//	$contact["rel"] = Contact::FRIEND;
 		//	logger("defining user ".$contact["nick"]." as friend");
 		//}
 
