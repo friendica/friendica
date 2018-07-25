@@ -45,25 +45,27 @@ function wall_attach_post(App $a) {
 	$page_owner_nick  = $r[0]['nickname'];
 	$community_page   = (($r[0]['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
 
-	if((local_user()) && (local_user() == $page_owner_uid))
+	if ((local_user()) && (local_user() == $page_owner_uid)) {
 		$can_post = true;
-	else {
-		if($community_page && remote_user()) {
+	} else {
+		if ($community_page && remote_user()) {
 			$contact_id = 0;
-			if(is_array($_SESSION['remote'])) {
-				foreach($_SESSION['remote'] as $v) {
-					if($v['uid'] == $page_owner_uid) {
+
+			if (is_array($_SESSION['remote'])) {
+				foreach ($_SESSION['remote'] as $v) {
+					if ($v['uid'] == $page_owner_uid) {
 						$contact_id = $v['cid'];
 						break;
 					}
 				}
 			}
-			if($contact_id) {
 
+			if($contact_id > 0) {
 				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
+
 				if (DBA::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
@@ -71,6 +73,7 @@ function wall_attach_post(App $a) {
 			}
 		}
 	}
+
 	if(! $can_post) {
 		if ($r_json) {
 			echo json_encode(['error'=>L10n::t('Permission denied.')]);

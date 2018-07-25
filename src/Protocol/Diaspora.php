@@ -2425,10 +2425,11 @@ class Diaspora
 
 			Contact::updateAvatar($contact_record["photo"], $importer["uid"], $contact_record["id"]);
 
-			// technically they are sharing with us (Contact::SHARING),
-			// but if our page-type is PAGE_COMMUNITY or PAGE_SOAPBOX
-			// we are going to change the relationship and make them a follower.
-
+			/*
+			 * technically they are sharing with us (Contact::SHARING),
+			 * but if our page-type is Profile::PAGE_COMMUNITY or Profile::PAGE_SOAPBOX
+			 * we are going to change the relationship and make them a follower.
+			 */
 			if (($importer["page-flags"] == Contact::PAGE_FREELOVE) && $sharing && $following) {
 				$new_relation = Contact::FRIEND;
 			} elseif (($importer["page-flags"] == Contact::PAGE_FREELOVE) && $sharing) {

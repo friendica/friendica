@@ -8,6 +8,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 

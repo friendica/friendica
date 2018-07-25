@@ -1330,6 +1330,7 @@ class DFRN
 					$key = openssl_random_pseudo_bytes(16);
 					$data = self::aesEncrypt($postvars['data'], $key);
 					break;
+
 				default:
 					logger("rino: invalid requested version '$rino_remote_version'");
 					Contact::markForArchival($contact);

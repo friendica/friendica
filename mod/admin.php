@@ -18,6 +18,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 use Friendica\Module\Tos;

@@ -11,6 +11,7 @@ use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
 
