@@ -604,7 +604,7 @@ class Diaspora
 			return false;
 		}
 
-		$importer = ["uid" => 0, "page-flags" => PAGE_FREELOVE];
+		$importer = ["uid" => 0, "page-flags" => Profile::PAGE_FREELOVE];
 		$success = self::dispatch($importer, $msg, $fields);
 
 		return $success;
@@ -1079,7 +1079,7 @@ class Diaspora
 		 */
 		// It is deactivated by now, due to side effects. See issue https://github.com/friendica/friendica/pull/4033
 		// It is not removed by now. Possibly the code is needed?
-		//if (!$is_comment && $contact["rel"] == Contact::FOLLOWER && in_array($importer["page-flags"], array(PAGE_FREELOVE))) {
+		//if (!$is_comment && $contact["rel"] == Contact::FOLLOWER && in_array($importer["page-flags"], array(Profile::PAGE_FREELOVE))) {
 		//	dba::update(
 		//		'contact',
 		//		array('rel' => Contact::FRIEND, 'writable' => true),
@@ -1099,7 +1099,7 @@ class Diaspora
 			// Yes, then it is fine.
 			return true;
 			// Is it a post to a community?
-		} elseif (($contact["rel"] == Contact::FOLLOWER) && in_array($importer["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
+		} elseif (($contact["rel"] == Contact::FOLLOWER) && in_array($importer["page-flags"], [Profile::PAGE_COMMUNITY, Profile::PAGE_PRVGROUP])) {
 			// That's good
 			return true;
 			// Is the message a global user or a comment?
@@ -2374,7 +2374,7 @@ class Diaspora
 			}
 		}
 
-		if (!$following && $sharing && in_array($importer["page-flags"], [PAGE_SOAPBOX, PAGE_NORMAL])) {
+		if (!$following && $sharing && in_array($importer["page-flags"], [Profile::PAGE_SOAPBOX, Profile::PAGE_NORMAL])) {
 			logger("Author ".$author." wants to share with us - but doesn't want to listen. Request is ignored.", LOGGER_DEBUG);
 			return false;
 		} elseif (!$following && !$sharing) {
@@ -2432,7 +2432,7 @@ class Diaspora
 
 		Contact::updateAvatar($ret["photo"], $importer['uid'], $contact_record["id"], true);
 
-		if (in_array($importer["page-flags"], [PAGE_NORMAL, PAGE_PRVGROUP])) {
+		if (in_array($importer["page-flags"], [Profile::PAGE_NORMAL, Profile::PAGE_PRVGROUP])) {
 			logger("Sending intra message for author ".$author.".", LOGGER_DEBUG);
 
 			$hash = random_string().(string)time();   // Generate a confirm_key
@@ -2459,9 +2459,9 @@ class Diaspora
 			// but if our page-type is PAGE_COMMUNITY or PAGE_SOAPBOX
 			// we are going to change the relationship and make them a follower.
 
-			if (($importer["page-flags"] == PAGE_FREELOVE) && $sharing && $following) {
+			if (($importer["page-flags"] == Profile::PAGE_FREELOVE) && $sharing && $following) {
 				$new_relation = Contact::FRIEND;
-			} elseif (($importer["page-flags"] == PAGE_FREELOVE) && $sharing) {
+			} elseif (($importer["page-flags"] == Profile::PAGE_FREELOVE) && $sharing) {
 				$new_relation = Contact::SHARING;
 			} else {
 				$new_relation = Contact::FOLLOWER;

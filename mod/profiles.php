@@ -550,7 +550,7 @@ function profiles_content(App $a) {
 		]);
 
 		$personal_account = !(in_array($a->user["page-flags"],
-					[PAGE_COMMUNITY, PAGE_PRVGROUP]));
+					[Profile::PAGE_COMMUNITY, Profile::PAGE_PRVGROUP]));
 
 		$detailled_profile = (PConfig::get(local_user(), 'system', 'detailled_profile') AND $personal_account);
 

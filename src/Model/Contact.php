@@ -12,6 +12,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;

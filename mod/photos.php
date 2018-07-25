@@ -147,7 +147,7 @@ function photos_post(App $a)
 	$visitor   = 0;
 
 	$page_owner_uid = $a->data['user']['uid'];
-	$community_page = $a->data['user']['page-flags'] == PAGE_COMMUNITY;
+	$community_page = $a->data['user']['page-flags'] == Profile::PAGE_COMMUNITY;
 
 	if (local_user() && (local_user() == $page_owner_uid)) {
 		$can_post = true;
@@ -964,7 +964,7 @@ function photos_content(App $a)
 
 	$owner_uid = $a->data['user']['uid'];
 
-	$community_page = (($a->data['user']['page-flags'] == PAGE_COMMUNITY) ? true : false);
+	$community_page = (($a->data['user']['page-flags'] == Profile::PAGE_COMMUNITY) ? true : false);
 
 	if (local_user() && (local_user() == $owner_uid)) {
 		$can_post = true;

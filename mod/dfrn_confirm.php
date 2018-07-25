@@ -25,6 +25,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
+use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\Crypto;
@@ -201,11 +202,11 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				$params['duplex'] = 1;
 			}
 
-			if ($user['page-flags'] == PAGE_COMMUNITY) {
+			if ($user['page-flags'] == Profile::PAGE_COMMUNITY) {
 				$params['page'] = 1;
 			}
 
-			if ($user['page-flags'] == PAGE_PRVGROUP) {
+			if ($user['page-flags'] == Profile::PAGE_PRVGROUP) {
 				$params['page'] = 2;
 			}
 
