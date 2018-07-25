@@ -11,6 +11,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Group;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Model\PermissionSet;
 
 /**
  * @brief Calculate the hash that is needed for the "Friendica" cookie
@@ -341,12 +342,7 @@ function item_permissions_sql($owner_id, $remote_verified = false, $groups = nul
 	 *
 	 * default permissions - anonymous user
 	 */
-	$sql = " AND `item`.allow_cid = ''
-			 AND `item`.allow_gid = ''
-			 AND `item`.deny_cid  = ''
-			 AND `item`.deny_gid  = ''
-			 AND `item`.private != 1
-	";
+	$sql = " AND NOT `item`.`private`";
 
 	// Profile owner - everything is visible
 	if ($local_user && ($local_user == $owner_id)) {
@@ -359,37 +355,15 @@ function item_permissions_sql($owner_id, $remote_verified = false, $groups = nul
 		 * If pre-verified, the caller is expected to have already
 		 * done this and passed the groups into this function.
 		 */
-		if (!$remote_verified) {
-			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
-				intval($remote_user),
-				intval($owner_id)
-			);
-			if (DBA::isResult($r)) {
-				$remote_verified = true;
-				$groups = Group::getIdsByContactId($remote_user);
-			}
+		$set = PermissionSet::get($owner_id, $remote_user, $groups);
+
+		if (!empty($set)) {
+			$sql_set = " OR (`item`.`private` IN (1,2) AND `item`.`wall` AND `item`.`psid` IN (" . implode(',', $set) . "))";
+		} else {
+			$sql_set = '';
 		}
-		if ($remote_verified) {
 
-			$gs = '<<>>'; // should be impossible to match
-
-			if (is_array($groups) && count($groups)) {
-				foreach ($groups as $g) {
-					$gs .= '|<' . intval($g) . '>';
-				}
-			}
-
-			$sql = sprintf(
-				" AND ( `item`.private = 0 OR ( `item`.private in (1,2) AND `item`.`wall` = 1
-				  AND ( NOT (`item`.deny_cid REGEXP '<%d>' OR `item`.deny_gid REGEXP '%s')
-				  AND ( `item`.allow_cid REGEXP '<%d>' OR `item`.allow_gid REGEXP '%s' OR ( `item`.allow_cid = '' AND `item`.allow_gid = '')))))
-				",
-				intval($remote_user),
-				DBA::escape($gs),
-				intval($remote_user),
-				DBA::escape($gs)
-			);
-		}
+		$sql = " AND (NOT `item`.`private`" . $sql_set . ")";
 	}
 
 	return $sql;

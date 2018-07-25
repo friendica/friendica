@@ -1392,7 +1392,7 @@ class DBStructure
 						"uid_eventid" => ["uid","event-id"],
 						"icid" => ["icid"],
 						"iaid" => ["iaid"],
-						"psid" => ["psid"],
+						"psid_wall" => ["psid", "wall"],
 						]
 				];
 		$database["item-activity"] = [
