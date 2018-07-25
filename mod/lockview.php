@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\Model\Item;
 
 function lockview_content(App $a) {
 
@@ -17,31 +18,34 @@ function lockview_content(App $a) {
 		$item_id = (($a->argc > 2) ? intval($a->argv[2]) : 0);
 	}
 
-	if(! $item_id)
+	if (!$item_id)
 		killme();
 
 	if (!in_array($type, ['item','photo','event']))
 		killme();
 
-	$r = q("SELECT * FROM `%s` WHERE `id` = %d LIMIT 1",
-		DBA::escape($type),
-		intval($item_id)
-	);
-	if (! DBA::isResult($r)) {
+	$fields = ['uid', 'private', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'];
+	$condition = ['id' => $item_id];
+	if ($type != 'item') {
+		$item = DBA::selectFirst($type, $fields, $condition);
+	} else {
+		$item = Item::selectFirst($fields, $condition);
+	}
+
+	if (!DBA::isResult($item)) {
 		killme();
 	}
-	$item = $r[0];
 
 	Addon::callHooks('lockview_content', $item);
 
-	if($item['uid'] != local_user()) {
+	if ($item['uid'] != local_user()) {
 		echo L10n::t('Remote privacy information not available.') . '<br />';
 		killme();
 	}
 
 
-	if(($item['private'] == 1) && (! strlen($item['allow_cid'])) && (! strlen($item['allow_gid']))
-		&& (! strlen($item['deny_cid'])) && (! strlen($item['deny_gid']))) {
+	if (($item['private'] == 1) && !empty($item['allow_cid']) && !empty($item['allow_gid'])
+		&& !empty($item['deny_cid']) && !empty($item['deny_gid'])) {
 
 		echo L10n::t('Remote privacy information not available.') . '<br />';
 		killme();
@@ -55,7 +59,7 @@ function lockview_content(App $a) {
 	$o = L10n::t('Visible to:') . '<br />';
 	$l = [];
 
-	if(count($allowed_groups)) {
+	if (count($allowed_groups)) {
 		$r = q("SELECT `name` FROM `group` WHERE `id` IN ( %s )",
 			DBA::escape(implode(', ', $allowed_groups))
 		);
@@ -63,7 +67,7 @@ function lockview_content(App $a) {
 			foreach($r as $rr)
 				$l[] = '<b>' . $rr['name'] . '</b>';
 	}
-	if(count($allowed_users)) {
+	if (count($allowed_users)) {
 		$r = q("SELECT `name` FROM `contact` WHERE `id` IN ( %s )",
 			DBA::escape(implode(', ',$allowed_users))
 		);
@@ -73,7 +77,7 @@ function lockview_content(App $a) {
 
 	}
 
-	if(count($deny_groups)) {
+	if (count($deny_groups)) {
 		$r = q("SELECT `name` FROM `group` WHERE `id` IN ( %s )",
 			DBA::escape(implode(', ', $deny_groups))
 		);
@@ -81,7 +85,7 @@ function lockview_content(App $a) {
 			foreach($r as $rr)
 				$l[] = '<b><strike>' . $rr['name'] . '</strike></b>';
 	}
-	if(count($deny_users)) {
+	if (count($deny_users)) {
 		$r = q("SELECT `name` FROM `contact` WHERE `id` IN ( %s )",
 			DBA::escape(implode(', ',$deny_users))
 		);
