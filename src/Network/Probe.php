@@ -14,6 +14,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
@@ -447,7 +448,7 @@ class Probe
 						'pubkey' => $data['pubkey'],
 						'priority' => $data['priority'],
 						'writable' => true,
-						'rel' => CONTACT_IS_SHARING];
+						'rel' => Contact::SHARING];
 
 				$fieldnames = [];
 

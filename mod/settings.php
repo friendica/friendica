@@ -60,6 +60,13 @@ function settings_init(App $a)
 		],
 	];
 
+	$tabs[] =	[
+		'label'	=> L10n::t('Profiles'),
+		'url' 	=> 'profiles',
+		'selected'	=> (($a->argc == 1) && ($a->argv[0] === 'profiles')?'active':''),
+		'accesskey' => 'p',
+	];
+
 	if (Feature::get()) {
 		$tabs[] =	[
 					'label'	=> L10n::t('Additional features'),

@@ -75,7 +75,7 @@ class ACL extends BaseObject
 		$sql_extra = '';
 
 		if (!empty($x['mutual'])) {
-			$sql_extra .= sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
+			$sql_extra .= sprintf(" AND `rel` = %d ", intval(Contact::FRIEND));
 		}
 
 		if (!empty($x['exclude'])) {
@@ -151,7 +151,7 @@ class ACL extends BaseObject
 
 		// When used for private messages, we limit correspondence to mutual DFRN/Friendica friends and the selector
 		// to one recipient. By default our selector allows multiple selects amongst all contacts.
-		$sql_extra = sprintf(" AND `rel` = %d ", intval(CONTACT_IS_FRIEND));
+		$sql_extra = sprintf(" AND `rel` = %d ", intval(Contact::FRIEND));
 		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", NETWORK_DFRN, NETWORK_DIASPORA);
 
 		$tabindex_attr = !empty($tabindex) ? ' tabindex="' . intval($tabindex) . '"' : '';

@@ -44,7 +44,7 @@ function item_post(App $a) {
 
 	$uid = local_user();
 
-	if (x($_REQUEST, 'dropitems')) {
+	if (!empty($_REQUEST['dropitems'])) {
 		$arr_drop = explode(',', $_REQUEST['dropitems']);
 		drop_items($arr_drop);
 		$json = ['success' => 1];
@@ -54,11 +54,11 @@ function item_post(App $a) {
 
 	Addon::callHooks('post_local_start', $_REQUEST);
 
-	logger('postvars ' . print_r($_REQUEST,true), LOGGER_DATA);
+	logger('postvars ' . print_r($_REQUEST, true), LOGGER_DATA);
 
 	$api_source = defaults($_REQUEST, 'api_source', false);
 
-	$message_id = ((x($_REQUEST, 'message_id') && $api_source) ? strip_tags($_REQUEST['message_id']) : '');
+	$message_id = ((!empty($_REQUEST['message_id']) && $api_source) ? strip_tags($_REQUEST['message_id']) : '');
 
 	$return_path = defaults($_REQUEST, 'return', '');
 	$preview = intval(defaults($_REQUEST, 'preview', 0));
@@ -68,8 +68,8 @@ function item_post(App $a) {
 	 * Note that we have to ignore previews, otherwise nothing will post
 	 * after it's been previewed
 	 */
-	if (!$preview && x($_REQUEST, 'post_id_random')) {
-		if (x($_SESSION, 'post-random') && $_SESSION['post-random'] == $_REQUEST['post_id_random']) {
+	if (!$preview && !empty($_REQUEST['post_id_random'])) {
+		if (!empty($_SESSION['post-random']) && $_SESSION['post-random'] == $_REQUEST['post_id_random']) {
 			logger("item post: duplicate post", LOGGER_DEBUG);
 			item_post_return(System::baseUrl(), $api_source, $return_path);
 		} else {
@@ -102,7 +102,6 @@ function item_post(App $a) {
 
 		// if this isn't the real parent of the conversation, find it
 		if (DBA::isResult($parent_item)) {
-
 			// The URI and the contact is taken from the direct parent which needn't to be the top parent
 			$thr_parent_uri = $parent_item['uri'];
 			$thr_parent_contact = Contact::getDetailsByURL($parent_item["author-link"]);
@@ -114,7 +113,7 @@ function item_post(App $a) {
 
 		if (!DBA::isResult($parent_item)) {
 			notice(L10n::t('Unable to locate original post.') . EOL);
-			if (x($_REQUEST, 'return')) {
+			if (!empty($_REQUEST['return'])) {
 				goaway($return_path);
 			}
 			killme();
@@ -158,7 +157,7 @@ function item_post(App $a) {
 	if (!can_write_wall($profile_uid) && !$allow_comment) {
 		notice(L10n::t('Permission denied.') . EOL) ;
 
-		if (x($_REQUEST, 'return')) {
+		if (!empty($_REQUEST['return'])) {
 			goaway($return_path);
 		}
 
@@ -276,7 +275,7 @@ function item_post(App $a) {
 				killme();
 			}
 			info(L10n::t('Empty post discarded.') . EOL);
-			if (x($_REQUEST, 'return')) {
+			if (!empty($_REQUEST['return'])) {
 				goaway($return_path);
 			}
 			killme();
@@ -306,7 +305,7 @@ function item_post(App $a) {
 		$self = true;
 		$author = DBA::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
 	} elseif (remote_user()) {
-		if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
+		if (!empty($_SESSION['remote']) && is_array($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $v) {
 				if ($v['uid'] == $profile_uid) {
 					$contact_id = $v['cid'];
@@ -673,14 +672,14 @@ function item_post(App $a) {
 
 	Addon::callHooks('post_local',$datarray);
 
-	if (x($datarray, 'cancel')) {
+	if (!empty($datarray['cancel'])) {
 		logger('mod_item: post cancelled by addon.');
 		if ($return_path) {
 			goaway($return_path);
 		}
 
 		$json = ['cancel' => 1];
-		if (x($_REQUEST, 'jsreload') && strlen($_REQUEST['jsreload'])) {
+		if (!empty($_REQUEST['jsreload']) && strlen($_REQUEST['jsreload'])) {
 			$json['reload'] = System::baseUrl() . '/' . $_REQUEST['jsreload'];
 		}
 
@@ -710,7 +709,7 @@ function item_post(App $a) {
 		// update filetags in pconfig
 		file_tag_update_pconfig($uid,$categories_old,$categories_new,'category');
 
-		if (x($_REQUEST, 'return') && strlen($return_path)) {
+		if (!empty($_REQUEST['return']) && strlen($return_path)) {
 			logger('return: ' . $return_path);
 			goaway($return_path);
 		}
@@ -835,7 +834,8 @@ function item_post(App $a) {
 	// NOTREACHED
 }
 
-function item_post_return($baseurl, $api_source, $return_path) {
+function item_post_return($baseurl, $api_source, $return_path)
+{
 	// figure out how to return, depending on from whence we came
 
 	if ($api_source) {
@@ -847,20 +847,18 @@ function item_post_return($baseurl, $api_source, $return_path) {
 	}
 
 	$json = ['success' => 1];
-	if (x($_REQUEST, 'jsreload') && strlen($_REQUEST['jsreload'])) {
+	if (!empty($_REQUEST['jsreload']) && strlen($_REQUEST['jsreload'])) {
 		$json['reload'] = $baseurl . '/' . $_REQUEST['jsreload'];
 	}
 
-	logger('post_json: ' . print_r($json,true), LOGGER_DEBUG);
+	logger('post_json: ' . print_r($json, true), LOGGER_DEBUG);
 
 	echo json_encode($json);
 	killme();
 }
 
-
-
-function item_content(App $a) {
-
+function item_content(App $a)
+{
 	if (!local_user() && !remote_user()) {
 		return;
 	}
@@ -868,18 +866,21 @@ function item_content(App $a) {
 	require_once 'include/security.php';
 
 	$o = '';
+
 	if (($a->argc == 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		if (is_ajax()) {
 			$o = Item::deleteForUser(['id' => $a->argv[2]], local_user());
 		} else {
 			$o = drop_item($a->argv[2]);
 		}
+
 		if (is_ajax()) {
 			// ajax return: [<item id>, 0 (no perm) | <owner id>]
 			echo json_encode([intval($a->argv[2]), intval($o)]);
 			killme();
 		}
 	}
+
 	return $o;
 }
 
@@ -920,12 +921,15 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$pattern = "/[@!]\[url\=(.*?)\](.*?)\[\/url\]/ism";
 			if (preg_match($pattern, $tag, $matches)) {
 				$data = Contact::getDetailsByURL($matches[1]);
+
 				if ($data["alias"] != "") {
 					$newtag = '@[url=' . $data["alias"] . ']' . $data["nick"] . '[/url]';
+
 					if (!stripos($str_tags, '[url=' . $data["alias"] . ']')) {
 						if (strlen($str_tags)) {
 							$str_tags .= ',';
 						}
+
 						$str_tags .= $newtag;
 					}
 				}
@@ -933,6 +937,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 
 			return $replaced;
 		}
+
 		$stat = false;
 		//get the person's name
 		$name = substr($tag, 1);
@@ -954,7 +959,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$contact = Contact::getDetailsByAddr($name);
 		} else {
 			$contact = false;
-			$fields = ['id', 'url', 'nick', 'name', 'alias', 'network'];
+			$fields = ['id', 'url', 'nick', 'name', 'alias', 'network', 'forum', 'prv'];
 
 			if (strrpos($name, '+')) {
 				// Is it in format @nick+number?
@@ -988,7 +993,8 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			}
 		}
 
-		if ($contact) {
+		// Check if $contact has been successfully loaded
+		if (DBA::isResult($contact)) {
 			if (strlen($inform) && (isset($contact["notify"]) || isset($contact["id"]))) {
 				$inform .= ',';
 			}
@@ -1002,6 +1008,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$profile = $contact["url"];
 			$alias   = $contact["alias"];
 			$newname = $contact["nick"];
+
 			if (($newname == "") || (($contact["network"] != NETWORK_OSTATUS) && ($contact["network"] != NETWORK_TWITTER)
 				&& ($contact["network"] != NETWORK_STATUSNET) && ($contact["network"] != NETWORK_APPNET))) {
 				$newname = $contact["name"];

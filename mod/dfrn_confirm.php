@@ -305,12 +305,12 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		logger('dfrn_confirm: confirm - imported photos');
 
 		if ($network === NETWORK_DFRN) {
-			$new_relation = CONTACT_IS_FOLLOWER;
-			if (($relation == CONTACT_IS_SHARING) || ($duplex)) {
-				$new_relation = CONTACT_IS_FRIEND;
+			$new_relation = Contact::FOLLOWER;
+			if (($relation == Contact::SHARING) || ($duplex)) {
+				$new_relation = Contact::FRIEND;
 			}
 
-			if (($relation == CONTACT_IS_SHARING) && ($duplex)) {
+			if (($relation == Contact::SHARING) && ($duplex)) {
 				$duplex = 0;
 			}
 
@@ -347,12 +347,12 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			if ($network === NETWORK_DIASPORA) {
 				if ($duplex) {
-					$new_relation = CONTACT_IS_FRIEND;
+					$new_relation = Contact::FRIEND;
 				} else {
-					$new_relation = CONTACT_IS_FOLLOWER;
+					$new_relation = Contact::FOLLOWER;
 				}
 
-				if ($new_relation != CONTACT_IS_FOLLOWER) {
+				if ($new_relation != Contact::FOLLOWER) {
 					$writable = 1;
 				}
 			}
@@ -391,7 +391,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		// reload contact info
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
-		if ((isset($new_relation) && $new_relation == CONTACT_IS_FRIEND)) {
+		if ((isset($new_relation) && $new_relation == Contact::FRIEND)) {
 			if (DBA::isResult($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
 				$ret = Diaspora::sendShare($user, $contact);
 				logger('share returns: ' . $ret);
@@ -547,12 +547,12 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		logger('dfrn_confirm: request - photos imported');
 
-		$new_relation = CONTACT_IS_SHARING;
-		if (($relation == CONTACT_IS_FOLLOWER) || ($duplex)) {
-			$new_relation = CONTACT_IS_FRIEND;
+		$new_relation = Contact::SHARING;
+		if (($relation == Contact::FOLLOWER) || ($duplex)) {
+			$new_relation = Contact::FRIEND;
 		}
 
-		if (($relation == CONTACT_IS_FOLLOWER) && ($duplex)) {
+		if (($relation == Contact::FOLLOWER) && ($duplex)) {
 			$duplex = 0;
 		}
 
@@ -598,7 +598,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$combined = $r[0];
 
 			if ($combined['notify-flags'] & NOTIFY_CONFIRM) {
-				$mutual = ($new_relation == CONTACT_IS_FRIEND);
+				$mutual = ($new_relation == Contact::FRIEND);
 				notification([
 					'type'         => NOTIFY_CONFIRM,
 					'notify_flags' => $combined['notify-flags'],

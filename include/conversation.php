@@ -866,7 +866,7 @@ function item_photo_menu($item) {
 			$menu[L10n::t("Poke")] = $poke_link;
 		}
 
-		if ((($cid == 0) || ($rel == CONTACT_IS_FOLLOWER)) &&
+		if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
 			in_array($item['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA])) {
 			$menu[L10n::t('Connect/Follow')] = 'follow?url=' . urlencode($item['author-link']);
 		}

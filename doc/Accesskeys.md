@@ -79,6 +79,7 @@ General
 ../settings
 ---------
 * o - Account
+* p - Profiles
 * t - Additional features
 * w - Social Networks
 * l - Addons

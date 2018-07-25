@@ -48,7 +48,7 @@ if ($a->isMaxProcessesReached() || $a->isMaxLoadReached()) {
 	System::httpExit(503, ['title' => 'Error 503 - Service Temporarily Unavailable', 'description' => 'System is currently overloaded. Please try again later.']);
 }
 
-if ($a->isInstallMode()) {
+if (!$a->isInstallMode()) {
 	if (Config::get('system', 'force_ssl') && ($a->get_scheme() == "http")
 		&& (intval(Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL)
 		&& (substr(System::baseUrl(), 0, 8) == "https://")

@@ -442,7 +442,7 @@ class Notifier
 					AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch`",
 					DBA::escape(NETWORK_DIASPORA),
 					intval($owner['uid']),
-					intval(CONTACT_IS_SHARING)
+					intval(Contact::SHARING)
 				);
 
 				// Fetch the participation list
@@ -456,7 +456,8 @@ class Notifier
 			}
 
 			$condition = ['network' => NETWORK_DFRN, 'uid' => $owner['uid'], 'blocked' => false,
-				'pending' => false, 'archive' => false, 'rel' => [CONTACT_IS_FOLLOWER, CONTACT_IS_FRIEND]];
+				'pending' => false, 'archive' => false, 'rel' => [Contact::FOLLOWER, Contact::FRIEND]];
+
 			$r2 = DBA::toArray(DBA::select('contact', ['id', 'name', 'network'], $condition));
 
 			$r = array_merge($r2, $r1);

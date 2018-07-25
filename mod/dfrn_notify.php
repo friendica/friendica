@@ -375,7 +375,7 @@ function dfrn_notify_content(App $a) {
 			$rino = $rino_remote;
 		}
 
-		if (($r[0]['rel'] && ($r[0]['rel'] != CONTACT_IS_SHARING)) || ($r[0]['page-flags'] == PAGE_COMMUNITY)) {
+		if (($r[0]['rel'] && ($r[0]['rel'] != Contact::SHARING)) || ($r[0]['page-flags'] == PAGE_COMMUNITY)) {
 			$perm = 'rw';
 		} else {
 			$perm = 'r';

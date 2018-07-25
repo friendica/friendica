@@ -171,7 +171,7 @@ function salmon_post(App $a, $xml = '') {
 	// Have we ignored the person?
 	// If so we can not accept this post.
 
-	//if((DBA::isResult($r)) && (($r[0]['readonly']) || ($r[0]['rel'] == CONTACT_IS_FOLLOWER) || ($r[0]['blocked']))) {
+	//if((DBA::isResult($r)) && (($r[0]['readonly']) || ($r[0]['rel'] == Contact::FOLLOWER) || ($r[0]['blocked']))) {
 	if (DBA::isResult($r) && $r[0]['blocked']) {
 		logger('Ignoring this author.');
 		System::httpExit(202);

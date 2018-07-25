@@ -9,6 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Model\PermissionSet;
@@ -242,8 +243,8 @@ function can_write_wall($owner)
 				AND `user`.`blockwall` = 0 AND `readonly` = 0  AND ( `contact`.`rel` IN ( %d , %d ) OR `user`.`page-flags` = %d ) LIMIT 1",
 				intval($owner),
 				intval($cid),
-				intval(CONTACT_IS_SHARING),
-				intval(CONTACT_IS_FRIEND),
+				intval(Contact::SHARING),
+				intval(Contact::FRIEND),
 				intval(PAGE_COMMUNITY)
 			);
 

@@ -309,7 +309,7 @@ function dfrn_request_post(App $a)
 				if (strlen($ret[0]['issued-id'])) {
 					notice(L10n::t('You have already introduced yourself here.') . EOL);
 					return;
-				} elseif ($ret[0]['rel'] == CONTACT_IS_FRIEND) {
+				} elseif ($ret[0]['rel'] == Contact::FRIEND) {
 					notice(L10n::t('Apparently you are already friends with %s.', $a->profile['name']) . EOL);
 					return;
 				} else {
