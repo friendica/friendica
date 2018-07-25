@@ -65,7 +65,7 @@ function follow_content(App $a)
 	$r = q("SELECT `pending` FROM `contact` WHERE `uid` = %d AND ((`rel` != %d) OR (`network` = '%s')) AND
 		(`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s') AND
 		`network` != '%s' LIMIT 1",
-		intval(local_user()), DBA::escape(Contact::CONTACT_IS_FOLLOWER), DBA::escape(NETWORK_DFRN), DBA::escape(normalise_link($url)),
+		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(NETWORK_DFRN), DBA::escape(normalise_link($url)),
 		DBA::escape(normalise_link($url)), DBA::escape($url), DBA::escape(NETWORK_STATUSNET));
 
 	if ($r) {

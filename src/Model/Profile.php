@@ -341,14 +341,14 @@ class Profile
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `id` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
 					intval(remote_user()),
-					intval(Contact::CONTACT_IS_FRIEND)
+					intval(Contact::FRIEND)
 				);
 			} else {
 				$r = q(
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
 					DBA::escape(normalise_link(self::getMyURL())),
-					intval(Contact::CONTACT_IS_FRIEND)
+					intval(Contact::FRIEND)
 				);
 			}
 			if ($r) {

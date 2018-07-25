@@ -114,7 +114,7 @@ function pubsub_post(App $a)
 		}
 	}
 
-	if (!in_array($contact['rel'], [Contact::CONTACT_IS_SHARING, Contact::CONTACT_IS_FRIEND]) && ($contact['network'] != NETWORK_FEED)) {
+	if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) && ($contact['network'] != NETWORK_FEED)) {
 		logger('Contact ' . $contact['id'] . ' is not expected to share with us - ignored.');
 		hub_post_return();
 	}

@@ -68,9 +68,10 @@ class OnePoll
 		}
 
 		// Diaspora users, archived users and followers are only checked if they still exist.
-		if ($contact['archive'] || ($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::CONTACT_IS_FOLLOWER)) {
+		if ($contact['archive'] || ($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
 			$last_updated = PortableContact::lastUpdated($contact["url"], true);
 			$updated = DateTimeFormat::utcNow();
+
 			if ($last_updated) {
 				logger('Contact '.$contact['id'].' had last update on '.$last_updated, LOGGER_DEBUG);
 
@@ -87,6 +88,7 @@ class OnePoll
 				Contact::markForArchival($contact);
 				logger('Contact '.$contact['id'].' is marked for archival', LOGGER_DEBUG);
 			}
+
 			return;
 		}
 
@@ -197,7 +199,6 @@ class OnePoll
 
 			logger('handshake with url ' . $url . ' returns xml: ' . $handshake_xml, LOGGER_DATA);
 
-
 			if (!strlen($handshake_xml) || ($html_code >= 400) || !$html_code) {
 				logger("$url appears to be dead - marking for death ");
 
@@ -296,7 +297,7 @@ class OnePoll
 			// Will only do this once per notify-enabled OStatus contact
 			// or if relationship changes
 
-			$stat_writeable = ((($contact['notify']) && ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER || $contact['rel'] == Contact::CONTACT_IS_FRIEND)) ? 1 : 0);
+			$stat_writeable = ((($contact['notify']) && ($contact['rel'] == Contact::FOLLOWER || $contact['rel'] == Contact::FRIEND)) ? 1 : 0);
 
 			// Contacts from OStatus are always writable
 			if ($contact['network'] === NETWORK_OSTATUS) {
@@ -310,7 +311,7 @@ class OnePoll
 
 			// Are we allowed to import from this person?
 
-			if ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER || $contact['blocked']) {
+			if ($contact['rel'] == Contact::FOLLOWER || $contact['blocked']) {
 				// set the last-update so we don't keep polling
 				DBA::update('contact', ['last-update' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 				return;
@@ -330,7 +331,6 @@ class OnePoll
 			$xml = $ret['body'];
 
 		} elseif ($contact['network'] === NETWORK_MAIL) {
-
 			logger("Mail: Fetching for ".$contact['addr'], LOGGER_DEBUG);
 
 			$mail_disabled = ((function_exists('imap_open') && (! Config::get('system', 'imap_disabled'))) ? 0 : 1);
@@ -371,6 +371,7 @@ class OnePoll
 					logger("Mail: Parsing ".count($msgs)." mails from ".$contact['addr']." for ".$mailconf['user'], LOGGER_DEBUG);
 
 					$metas = Email::messageMeta($mbox, implode(',', $msgs));
+
 					if (count($metas) != count($msgs)) {
 						logger("for " . $mailconf['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas", LOGGER_DEBUG);
 					} else {
@@ -602,7 +603,7 @@ class OnePoll
 
 			logger("Contact ".$contact['id']." returned hub: ".$hub." Network: ".$contact['network']." Relation: ".$contact['rel']." Update: ".$hub_update);
 
-			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::CONTACT_IS_FOLLOWER) || $contact['network'] == NETWORK_FEED)) {
+			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::FOLLOWER) || $contact['network'] == NETWORK_FEED)) {
 				logger('hub ' . $hubmode . ' : ' . $hub . ' contact name : ' . $contact['name'] . ' local user : ' . $importer['name']);
 				$hubs = explode(',', $hub);
 				if (count($hubs)) {

@@ -514,17 +514,17 @@ function contacts_content(App $a)
 		$dir_icon = '';
 		$relation_text = '';
 		switch ($contact['rel']) {
-			case Contact::CONTACT_IS_FRIEND:
+			case Contact::FRIEND:
 				$dir_icon = 'images/lrarrow.gif';
 				$relation_text = L10n::t('You are mutual friends with %s');
 				break;
 
-			case Contact::CONTACT_IS_FOLLOWER;
+			case Contact::FOLLOWER;
 				$dir_icon = 'images/larrow.gif';
 				$relation_text = L10n::t('You are sharing with %s');
 				break;
 
-			case Contact::CONTACT_IS_SHARING;
+			case Contact::SHARING;
 				$dir_icon = 'images/rarrow.gif';
 				$relation_text = L10n::t('%s is sharing with you');
 				break;
@@ -593,10 +593,10 @@ function contacts_content(App $a)
 		$follow = '';
 		$follow_text = '';
 		if (in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
-			if ($contact['rel'] == Contact::CONTACT_IS_FOLLOWER) {
+			if ($contact['rel'] == Contact::FOLLOWER) {
 				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Connect/Follow");
-			} elseif ($contact['rel'] == Contact::CONTACT_IS_FRIEND) {
+			} elseif ($contact['rel'] == Contact::FRIEND) {
 				$follow = System::baseUrl(true) . "/unfollow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Disconnect/Unfollow");
 			}
@@ -784,7 +784,7 @@ function contacts_content(App $a)
 		$sql_extra .= sprintf(" AND network = '%s' ", DBA::escape($nets));
 	}
 
-	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= Contact::CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
+	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= Contact::FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 		WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
@@ -929,17 +929,17 @@ function _contact_detail_for_template(array $rr)
 	$alt_text = '';
 
 	switch ($rr['rel']) {
-		case Contact::CONTACT_IS_FRIEND:
+		case Contact::FRIEND:
 			$dir_icon = 'images/lrarrow.gif';
 			$alt_text = L10n::t('Mutual Friendship');
 			break;
 
-		case Contact::CONTACT_IS_FOLLOWER;
+		case Contact::FOLLOWER;
 			$dir_icon = 'images/larrow.gif';
 			$alt_text = L10n::t('is a fan of yours');
 			break;
 
-		case Contact::CONTACT_IS_SHARING;
+		case Contact::SHARING;
 			$dir_icon = 'images/rarrow.gif';
 			$alt_text = L10n::t('you are a fan of');
 			break;

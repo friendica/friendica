@@ -448,7 +448,7 @@ class Probe
 						'pubkey' => $data['pubkey'],
 						'priority' => $data['priority'],
 						'writable' => true,
-						'rel' => Contact::CONTACT_IS_SHARING];
+						'rel' => Contact::SHARING];
 
 				$fieldnames = [];
 

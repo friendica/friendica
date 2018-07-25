@@ -168,10 +168,10 @@ define('UPDATE_FAILED',  1);
  * @name page/profile types
  *
  * PAGE_NORMAL is a typical personal profile account
- * PAGE_SOAPBOX automatically approves all friend requests as CONTACT_IS_SHARING, (readonly)
- * PAGE_COMMUNITY automatically approves all friend requests as CONTACT_IS_SHARING, but with
+ * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
+ * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
  *      write access to wall and comments (no email and not included in page owner's ACL lists)
- * PAGE_FREELOVE automatically approves all friend requests as full friends (CONTACT_IS_FRIEND).
+ * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
  *
  * @{
  */

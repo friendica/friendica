@@ -601,7 +601,7 @@ class Item extends BaseObject
 				STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = $master_table.`author-id` AND NOT `author`.`blocked`
 				STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = $master_table.`owner-id` AND NOT `owner`.`blocked`
 				LEFT JOIN `user-item` ON `user-item`.`iid` = $master_table_key AND `user-item`.`uid` = %d",
-				Contact::CONTACT_IS_SHARING, Contact::CONTACT_IS_FRIEND, GRAVITY_PARENT, intval($uid));
+				Contact::SHARING, Contact::FRIEND, GRAVITY_PARENT, intval($uid));
 		} else {
 			if (strpos($sql_commands, "`contact`.") !== false) {
 				$joins .= "LEFT JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`";
@@ -2026,7 +2026,7 @@ class Item extends BaseObject
 		$users = [];
 
 		$condition = ["`nurl` IN (SELECT `nurl` FROM `contact` WHERE `id` = ?) AND `uid` != 0 AND NOT `blocked` AND `rel` IN (?, ?)",
-			$parent['owner-id'], Contact::CONTACT_IS_SHARING,  Contact::CONTACT_IS_FRIEND];
+			$parent['owner-id'], Contact::SHARING,  Contact::FRIEND];
 
 		$contacts = DBA::select('contact', ['uid'], $condition);
 

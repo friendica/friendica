@@ -1260,7 +1260,7 @@ class DFRN
 
 		if (($contact['duplex'] && strlen($contact['pubkey']))
 			|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-			|| ($contact['rel'] == Contact::CONTACT_IS_SHARING && strlen($contact['pubkey']))
+			|| ($contact['rel'] == Contact::SHARING && strlen($contact['pubkey']))
 		) {
 			openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 			openssl_public_decrypt($challenge, $postvars['challenge'], $contact['pubkey']);
@@ -1288,7 +1288,7 @@ class DFRN
 			$postvars['dissolve'] = '1';
 		}
 
-		if ((($contact['rel']) && ($contact['rel'] != Contact::CONTACT_IS_SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
+		if ((($contact['rel']) && ($contact['rel'] != Contact::SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 			$postvars['data'] = $atom;
 			$postvars['perm'] = 'rw';
 		} else {
@@ -1323,7 +1323,7 @@ class DFRN
 			if ($dfrn_version >= 2.1) {
 				if (($contact['duplex'] && strlen($contact['pubkey']))
 					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-					|| ($contact['rel'] == Contact::CONTACT_IS_SHARING && strlen($contact['pubkey']))
+					|| ($contact['rel'] == Contact::SHARING && strlen($contact['pubkey']))
 				) {
 					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey']);
 				} else {
@@ -2712,7 +2712,7 @@ class DFRN
 				$item["owner-id"] = Contact::getIdForURL($importer["url"], 0);
 			}
 
-			if (($importer["rel"] == Contact::CONTACT_IS_FOLLOWER) && (!self::tgroupCheck($importer["importer_uid"], $item))) {
+			if (($importer["rel"] == Contact::FOLLOWER) && (!self::tgroupCheck($importer["importer_uid"], $item))) {
 				logger("Contact ".$importer["id"]." is only follower and tgroup check was negative.", LOGGER_DEBUG);
 				return;
 			}

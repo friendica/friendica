@@ -242,8 +242,8 @@ function can_write_wall($owner)
 				AND `user`.`blockwall` = 0 AND `readonly` = 0  AND ( `contact`.`rel` IN ( %d , %d ) OR `user`.`page-flags` = %d ) LIMIT 1",
 				intval($owner),
 				intval($cid),
-				intval(Contact::CONTACT_IS_SHARING),
-				intval(Contact::CONTACT_IS_FRIEND),
+				intval(Contact::SHARING),
+				intval(Contact::FRIEND),
 				intval(PAGE_COMMUNITY)
 			);
 

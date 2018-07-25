@@ -222,7 +222,7 @@ class Cron
 			}
 
 			// Check Diaspora contacts or followers once a week
-			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::CONTACT_IS_FOLLOWER)) {
+			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
 				$contact['priority'] = 4;
 			}
 
