@@ -957,6 +957,7 @@ class PortableContact
 			if ($last_contact < NULL_DATE) {
 				$last_contact = NULL_DATE;
 			}
+
 			if ($last_failure < NULL_DATE) {
 				$last_failure = NULL_DATE;
 			}
@@ -1031,6 +1032,7 @@ class PortableContact
 			if (!empty($serverret["debug"]) && !in_array($serverret["debug"]["http_code"], ["403", "404"])) {
 				$failure = true;
 			}
+
 			$possible_failure = true;
 		}
 
@@ -1051,19 +1053,23 @@ class PortableContact
 		// Look for poco
 		if (!$failure) {
 			$serverret = Network::curl($server_url."/poco");
+
 			if ($serverret["success"]) {
 				$data = json_decode($serverret["body"]);
+
 				if (isset($data->totalResults)) {
 					$registered_users = $data->totalResults;
 					$poco = $server_url."/poco";
 					$server = self::detectPocoData($data);
-					if ($server) {
+
+					if (!empty($server)) {
 						$platform = $server['platform'];
 						$network = $server['network'];
 						$version = '';
 						$site_name = '';
 					}
 				}
+
 				// There are servers out there who don't return 404 on a failure
 				// We have to be sure that don't misunderstand this
 				if (is_null($data)) {
@@ -1082,7 +1088,8 @@ class PortableContact
 				$failure = true;
 			} else {
 				$server = self::detectServerType($serverret["body"]);
-				if ($server) {
+
+				if (!empty($server)) {
 					$platform = $server['platform'];
 					$network = $server['network'];
 					$version = $server['version'];
@@ -1090,9 +1097,11 @@ class PortableContact
 				}
 
 				$lines = explode("\n", $serverret["header"]);
+
 				if (count($lines)) {
 					foreach ($lines as $line) {
 						$line = trim($line);
+
 						if (stristr($line, 'X-Diaspora-Version:')) {
 							$platform = "Diaspora";
 							$version = trim(str_replace("X-Diaspora-Version:", "", $line));
@@ -1116,6 +1125,7 @@ class PortableContact
 			// Will also return data for Friendica and GNU Social - but it will be overwritten later
 			// The "not implemented" is a special treatment for really, really old Friendica versions
 			$serverret = Network::curl($server_url."/api/statusnet/version.json");
+
 			if ($serverret["success"] && ($serverret["body"] != '{"error":"not implemented"}') &&
 				($serverret["body"] != '') && (strlen($serverret["body"]) < 30)) {
 				$platform = "StatusNet";
@@ -1127,6 +1137,7 @@ class PortableContact
 
 			// Test for GNU Social
 			$serverret = Network::curl($server_url."/api/gnusocial/version.json");
+
 			if ($serverret["success"] && ($serverret["body"] != '{"error":"not implemented"}') &&
 				($serverret["body"] != '') && (strlen($serverret["body"]) < 30)) {
 				$platform = "GNU Social";
@@ -1139,6 +1150,7 @@ class PortableContact
 			// Test for Mastodon
 			$orig_version = $version;
 			$serverret = Network::curl($server_url."/api/v1/instance");
+
 			if ($serverret["success"] && ($serverret["body"] != '')) {
 				$data = json_decode($serverret["body"]);
 
@@ -1149,10 +1161,12 @@ class PortableContact
 					$info = $data->description;
 					$network = NETWORK_OSTATUS;
 				}
+
 				if (!empty($data->stats->user_count)) {
 					$registered_users = $data->stats->user_count;
 				}
 			}
+
 			if (strstr($orig_version.$version, 'Pleroma')) {
 				$platform = 'Pleroma';
 				$version = trim(str_replace('Pleroma', '', $version));
@@ -1162,27 +1176,34 @@ class PortableContact
 		if (!$failure) {
 			// Test for Hubzilla and Red
 			$serverret = Network::curl($server_url."/siteinfo.json");
+
 			if ($serverret["success"]) {
 				$data = json_decode($serverret["body"]);
+
 				if (isset($data->url)) {
 					$platform = $data->platform;
 					$version = $data->version;
 					$network = NETWORK_DIASPORA;
 				}
+
 				if (!empty($data->site_name)) {
 					$site_name = $data->site_name;
 				}
+
 				if (!empty($data->channels_total)) {
 					$registered_users = $data->channels_total;
 				}
+
 				if (!empty($data->register_policy)) {
 					switch ($data->register_policy) {
 						case "REGISTER_OPEN":
 							$register_policy = REGISTER_OPEN;
 							break;
+
 						case "REGISTER_APPROVE":
 							$register_policy = REGISTER_APPROVE;
 							break;
+
 						case "REGISTER_CLOSED":
 						default:
 							$register_policy = REGISTER_CLOSED;
@@ -1192,24 +1213,29 @@ class PortableContact
 			} else {
 				// Test for Hubzilla, Redmatrix or Friendica
 				$serverret = Network::curl($server_url."/api/statusnet/config.json");
+
 				if ($serverret["success"]) {
 					$data = json_decode($serverret["body"]);
+
 					if (isset($data->site->server)) {
 						if (isset($data->site->platform)) {
 							$platform = $data->site->platform->PLATFORM_NAME;
 							$version = $data->site->platform->STD_VERSION;
 							$network = NETWORK_DIASPORA;
 						}
+
 						if (isset($data->site->BlaBlaNet)) {
 							$platform = $data->site->BlaBlaNet->PLATFORM_NAME;
 							$version = $data->site->BlaBlaNet->STD_VERSION;
 							$network = NETWORK_DIASPORA;
 						}
+
 						if (isset($data->site->hubzilla)) {
 							$platform = $data->site->hubzilla->PLATFORM_NAME;
 							$version = $data->site->hubzilla->RED_VERSION;
 							$network = NETWORK_DIASPORA;
 						}
+
 						if (isset($data->site->redmatrix)) {
 							if (isset($data->site->redmatrix->PLATFORM_NAME)) {
 								$platform = $data->site->redmatrix->PLATFORM_NAME;
@@ -1220,6 +1246,7 @@ class PortableContact
 							$version = $data->site->redmatrix->RED_VERSION;
 							$network = NETWORK_DIASPORA;
 						}
+
 						if (isset($data->site->friendica)) {
 							$platform = $data->site->friendica->FRIENDICA_PLATFORM;
 							$version = $data->site->friendica->FRIENDICA_VERSION;
@@ -1292,7 +1319,8 @@ class PortableContact
 		// Query nodeinfo. Working for (at least) Diaspora and Friendica.
 		if (!$failure) {
 			$server = self::fetchNodeinfo($server_url);
-			if ($server) {
+
+			if (!empty($server)) {
 				$register_policy = $server['register_policy'];
 
 				if (isset($server['platform'])) {
@@ -1335,10 +1363,13 @@ class PortableContact
 					if (!empty($data->no_scrape_url)) {
 						$noscrape = $data->no_scrape_url;
 					}
+
 					$version = $data->version;
+
 					if (!empty($data->site_name)) {
 						$site_name = $data->site_name;
 					}
+
 					$info = $data->info;
 					$register_policy = constant($data->register_policy);
 					$platform = $data->platform;
@@ -1410,16 +1441,19 @@ class PortableContact
 		logger("Discover relay data for server " . $server_url, LOGGER_DEBUG);
 
 		$serverret = Network::curl($server_url."/.well-known/x-social-relay");
+
 		if (!$serverret["success"]) {
 			return;
 		}
 
 		$data = json_decode($serverret['body']);
+
 		if (!is_object($data)) {
 			return;
 		}
 
 		$gserver = DBA::selectFirst('gserver', ['id', 'relay-subscribe', 'relay-scope'], ['nurl' => normalise_link($server_url)]);
+
 		if (!DBA::isResult($gserver)) {
 			return;
 		}
@@ -1430,6 +1464,7 @@ class PortableContact
 		}
 
 		DBA::delete('gserver-tag', ['gserver-id' => $gserver['id']]);
+
 		if ($data->scope == 'tags') {
 			// Avoid duplicates
 			$tags = [];
@@ -1497,9 +1532,11 @@ class PortableContact
 	private static function fetchServerlist($poco)
 	{
 		$serverret = Network::curl($poco."/@server");
+
 		if (!$serverret["success"]) {
 			return;
 		}
+
 		$serverlist = json_decode($serverret['body']);
 
 		if (!is_array($serverlist)) {
@@ -1510,6 +1547,7 @@ class PortableContact
 			$server_url = str_replace("/index.php", "", $server->url);
 
 			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", DBA::escape(normalise_link($server_url)));
+
 			if (!DBA::isResult($r)) {
 				logger("Call server check for server ".$server_url, LOGGER_DEBUG);
 				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $server_url);
@@ -1523,6 +1561,7 @@ class PortableContact
 
 		if ($last) {
 			$next = $last + (24 * 60 * 60);
+
 			if ($next > time()) {
 				return;
 			}
@@ -1531,7 +1570,7 @@ class PortableContact
 		// Discover Friendica, Hubzilla and Diaspora servers
 		$serverdata = Network::fetchUrl("http://the-federation.info/pods.json");
 
-		if ($serverdata) {
+		if (!empty($serverdata)) {
 			$servers = json_decode($serverdata);
 
 			if (!empty($servers->pods)) {
@@ -1544,12 +1583,15 @@ class PortableContact
 		// Disvover Mastodon servers
 		if (!Config::get('system', 'ostatus_disabled')) {
 			$accesstoken = Config::get('system', 'instances_social_key');
+
 			if (!empty($accesstoken)) {
 				$api = 'https://instances.social/api/1.0/instances/list?count=0';
 				$header = ['Authorization: Bearer '.$accesstoken];
 				$serverdata = Network::curl($api, false, $redirects, ['headers' => $header]);
+
 				if ($serverdata['success']) {
 					$servers = json_decode($serverdata['body']);
+
 					foreach ($servers->instances as $server) {
 						$url = (is_null($server->https_score) ? 'http' : 'https').'://'.$server->name;
 						Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $url);
@@ -1579,6 +1621,7 @@ class PortableContact
 	public static function discoverSingleServer($id)
 	{
 		$r = q("SELECT `poco`, `nurl`, `url`, `network` FROM `gserver` WHERE `id` = %d", intval($id));
+
 		if (!DBA::isResult($r)) {
 			return false;
 		}
@@ -1589,11 +1632,12 @@ class PortableContact
 		self::fetchServerlist($server["poco"]);
 
 		// Fetch all users from the other server
-		$url = $server["poco"]."/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
+		$url = $server["poco"] . "/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
 
-		logger("Fetch all users from the server ".$server["url"], LOGGER_DEBUG);
+		logger("Fetch all users from the server " . $server["url"], LOGGER_DEBUG);
 
 		$retdata = Network::curl($url);
+
 		if ($retdata["success"]) {
 			$data = json_decode($retdata["body"]);
 
@@ -1601,6 +1645,7 @@ class PortableContact
 
 			if (Config::get('system', 'poco_discovery') > 1) {
 				$timeframe = Config::get('system', 'poco_discovery_since');
+
 				if ($timeframe == 0) {
 					$timeframe = 30;
 				}
@@ -1613,13 +1658,14 @@ class PortableContact
 				$success = false;
 
 				$retdata = Network::curl($url);
+
 				if ($retdata["success"]) {
-					logger("Fetch all global contacts from the server ".$server["nurl"], LOGGER_DEBUG);
+					logger("Fetch all global contacts from the server " . $server["nurl"], LOGGER_DEBUG);
 					$success = self::discoverServer(json_decode($retdata["body"]));
 				}
 
 				if (!$success && (Config::get('system', 'poco_discovery') > 2)) {
-					logger("Fetch contacts from users of the server ".$server["nurl"], LOGGER_DEBUG);
+					logger("Fetch contacts from users of the server " . $server["nurl"], LOGGER_DEBUG);
 					self::discoverServerUsers($data, $server);
 				}
 			}
@@ -1652,6 +1698,7 @@ class PortableContact
 		if ($requery_days == 0) {
 			$requery_days = 7;
 		}
+
 		$last_update = date('c', time() - (60 * 60 * 24 * $requery_days));
 
 		$gservers = q("SELECT `id`, `url`, `nurl`, `network`
@@ -1661,6 +1708,7 @@ class PortableContact
 			AND `last_poco_query` < '%s'
 			ORDER BY RAND()", DBA::escape($last_update)
 		);
+
 		if (DBA::isResult($gservers)) {
 			foreach ($gservers as $gserver) {
 				if (!self::checkServer($gserver['url'], $gserver['network'])) {
@@ -1680,14 +1728,15 @@ class PortableContact
 		}
 	}
 
-	private static function discoverServerUsers($data, $server)
+	private static function discoverServerUsers(array $data, array $server)
 	{
-		if (!isset($data->entry)) {
+		if (!isset($data['entry'])) {
 			return;
 		}
 
-		foreach ($data->entry as $entry) {
+		foreach ($data['entry'] as $entry) {
 			$username = '';
+
 			if (isset($entry->urls)) {
 				foreach ($entry->urls as $url) {
 					if ($url->type == 'profile') {
@@ -1697,6 +1746,7 @@ class PortableContact
 					}
 				}
 			}
+
 			if ($username != '') {
 				logger('Fetch contacts for the user ' . $username . ' from the server ' . $server['nurl'], LOGGER_DEBUG);
 
@@ -1704,22 +1754,23 @@ class PortableContact
 				$url = $server['poco'] . '/' . $username . '/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation';
 
 				$retdata = Network::curl($url);
-				if ($retdata['success']) {
+
+				if (!empty($retdata['success'])) {
 					self::discoverServer(json_decode($retdata['body']), 3);
 				}
 			}
 		}
 	}
 
-	private static function discoverServer($data, $default_generation = 0)
+	private static function discoverServer(array $data, $default_generation = 0)
 	{
-		if (!isset($data->entry) || !count($data->entry)) {
+		if (empty($data['entry'])) {
 			return false;
 		}
 
 		$success = false;
 
-		foreach ($data->entry as $entry) {
+		foreach ($data['entry'] as $entry) {
 			$profile_url = '';
 			$profile_photo = '';
 			$connect_url = '';
