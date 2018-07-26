@@ -238,7 +238,7 @@ class PostUpdate
 		$fields = array_merge(Item::MIXED_CONTENT_FIELDLIST, ['network', 'author-id', 'owner-id', 'tag', 'file',
 			'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link', 'id',
 			'uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid', 'post-type', 'bookmark', 'type',
-			'inform']);
+			'inform', 'postopts', 'icid']);
 
 		$start_id = $id;
 		$rows = 0;
@@ -262,9 +262,13 @@ class PostUpdate
 				$item['owner-id'] = Contact::getIdForURL($item["owner-link"], 0, false, $default);
 			}
 
-			if (!is_null($item['allow_cid']) && !is_null($item['allow_gid'])
-				&& !is_null($item['deny_cid']) && !is_null($item['deny_gid'])) {
+			if (empty($item['psid'])) {
 				$item['psid'] = PermissionSet::fetchIDForPost($item);
+			} else {
+				$item['allow_cid'] = null;
+				$item['allow_gid'] = null;
+				$item['deny_cid'] = null;
+				$item['deny_gid'] = null;
 			}
 
 			if ($item['post-type'] == 0) {
@@ -276,6 +280,13 @@ class PostUpdate
 					$item['post-type'] = Item::PT_PAGE;
 				}
 			}
+
+			self::createLanguage($item);
+
+			if (!empty($item['icid']) && !empty($item['language'])) {
+				DBA::update('item-content', ['language' => $item['language']], ['id' => $item['icid']]);
+			}
+			unset($item['language']);
 
 			Item::update($item, ['id' => $id]);
 
@@ -294,5 +305,47 @@ class PostUpdate
 		}
 
 		return false;
+	}
+
+	private static function createLanguage(&$item)
+	{
+		if (empty($item['postopts'])) {
+			return;
+		}
+
+		$opts = explode(',', $item['postopts']);
+
+		$postopts = [];
+
+		foreach ($opts as $opt) {
+			if (strstr($opt, 'lang=')) {
+				$language = substr($opt, 5);
+			} else {
+				$postopts[] = $opt;
+			}
+		}
+
+		if (empty($language)) {
+			return;
+		}
+
+		if (!empty($postopts)) {
+			$item['postopts'] = implode(',', $postopts);
+		} else {
+			$item['postopts'] = null;
+		}
+
+		$lang_pairs = explode(':', $language);
+
+		$lang_arr = [];
+
+		foreach ($lang_pairs as $pair) {
+			$lang_pair_arr = explode(';', $pair);
+			if (count($lang_pair_arr) == 2) {
+				$lang_arr[$lang_pair_arr[0]] = $lang_pair_arr[1];
+			}
+		}
+
+		$item['language'] = json_encode($lang_arr);
 	}
 }
