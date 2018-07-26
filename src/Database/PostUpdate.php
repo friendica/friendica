@@ -300,6 +300,20 @@ class PostUpdate
 		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
+			// Set all deprecated fields to "null" if they contain an empty string
+			$nullfields = ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'postopts', 'inform', 'type',
+				'bookmark', 'file', 'location', 'coord', 'tag', 'plink', 'title', 'content-warning',
+				'body', 'app', 'verb', 'object-type', 'object', 'target-type', 'target',
+				'author-name', 'author-link', 'author-avatar', 'owner-name', 'owner-link', 'owner-avatar',
+				'rendered-hash', 'rendered-html'];
+			foreach ($nullfields as $field) {
+				$fields = [$field => null];
+				$condition = [$field => ''];
+				logger("Setting '" . $field . "' to null if empty.", LOGGER_DEBUG);
+				// Important: This has to be a "DBA::update", not a "Item::update"
+				DBA::update('item', $fields, $condition);
+			}
+
 			Config::set("system", "post_update_version", 1279);
 			logger("Done", LOGGER_DEBUG);
 			return true;
