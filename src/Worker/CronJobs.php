@@ -14,6 +14,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Protocol\PortableContact;
 use Friendica\Database\PostUpdate;
 
@@ -159,9 +160,11 @@ class CronJobs
 			clear_cache($a->get_basepath(), $a->get_basepath() . "/proxy");
 
 			$cachetime = Config::get('system', 'proxy_cache_time');
+
 			if (!$cachetime) {
-				$cachetime = PROXY_DEFAULT_TIME;
+				$cachetime = Proxy::DEFAULT_TIME;
 			}
+
 			$condition = ['`uid` = 0 AND `resource-id` LIKE "pic:%" AND `created` < NOW() - INTERVAL ? SECOND', $cachetime];
 			DBA::delete('photo', $condition);
 		}

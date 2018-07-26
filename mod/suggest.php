@@ -11,6 +11,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Network\Proxy;
 
 function suggest_init(App $a) {
 	if (! local_user()) {
@@ -51,11 +52,10 @@ function suggest_init(App $a) {
 
 }
 
-function suggest_content(App $a) {
-
-	require_once("mod/proxy.php");
-
+function suggest_content(App $a)
+{
 	$o = '';
+
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
@@ -91,7 +91,7 @@ function suggest_content(App $a) {
 			'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $rr['url']),
 			'img_hover' => $rr['url'],
 			'name' => $contact_details['name'],
-			'thumb' => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
+			'thumb' => Proxy::proxifyUrl($contact_details['thumb'], false, Proxy::SIZE_THUMB),
 			'details'       => $contact_details['location'],
 			'tags'          => $contact_details['keywords'],
 			'about'         => $contact_details['about'],

@@ -19,8 +19,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-
-require_once "mod/proxy.php";
+use Friendica\Network\Proxy;
 
 function vier_init(App $a)
 {
@@ -154,7 +153,7 @@ function vier_community_info()
 				$entry = replace_macros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => 'follow/?url='.urlencode($rr['url']),
-					'$photo' => proxy_url($rr['photo'], false, PROXY_SIZE_MICRO),
+					'$photo' => Proxy::proxifyUrl($rr['photo'], false, Proxy::SIZE_MICRO),
 					'$alt_text' => $rr['name'],
 				]);
 				$aside['$comunity_profiles_items'][] = $entry;
@@ -237,7 +236,7 @@ function vier_community_info()
 					'name'         => $contact['name'],
 					'cid'          => $contact['id'],
 					'selected'     => $selected,
-					'micro'        => System::removedBaseUrl(proxy_url($contact['micro'], false, PROXY_SIZE_MICRO)),
+					'micro'        => System::removedBaseUrl(Proxy::proxifyUrl($contact['micro'], false, Proxy::SIZE_MICRO)),
 					'id'           => ++$id,
 				];
 				$entries[] = $entry;

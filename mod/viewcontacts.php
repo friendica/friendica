@@ -10,6 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Network\Proxy;
 
 function viewcontacts_init(App $a)
 {
@@ -39,8 +40,6 @@ function viewcontacts_init(App $a)
 
 function viewcontacts_content(App $a)
 {
-	require_once("mod/proxy.php");
-
 	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
 		notice(L10n::t('Public access denied.') . EOL);
 		return;
@@ -102,7 +101,7 @@ function viewcontacts_content(App $a)
 			'id' => $rr['id'],
 			'img_hover' => L10n::t('Visit %s\'s profile [%s]', $contact_details['name'], $rr['url']),
 			'photo_menu' => Contact::photoMenu($rr),
-			'thumb' => proxy_url($contact_details['thumb'], false, PROXY_SIZE_THUMB),
+			'thumb' => Proxy::proxifyUrl($contact_details['thumb'], false, Proxy::SIZE_THUMB),
 			'name' => htmlentities(substr($contact_details['name'], 0, 20)),
 			'username' => htmlentities($contact_details['name']),
 			'details'       => $contact_details['location'],

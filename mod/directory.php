@@ -12,6 +12,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Network\Proxy;
 
 function directory_init(App $a)
 {
@@ -35,8 +36,6 @@ function directory_post(App $a)
 
 function directory_content(App $a)
 {
-	require_once("mod/proxy.php");
-
 	if ((Config::get('system', 'block_public') && !local_user() && !remote_user())
 		|| (Config::get('system', 'block_local_dir') && !local_user() && !remote_user())
 	) {
@@ -165,7 +164,7 @@ function directory_content(App $a)
 				'id'           => $rr['id'],
 				'url'          => $profile_link,
 				'itemurl'      => $itemurl,
-				'thumb'        => proxy_url($rr[$photo], false, PROXY_SIZE_THUMB),
+				'thumb'        => Proxy::proxifyUrl($rr[$photo], false, Proxy::SIZE_THUMB),
 				'img_hover'    => $rr['name'],
 				'name'         => $rr['name'],
 				'details'      => $details,

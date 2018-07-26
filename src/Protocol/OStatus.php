@@ -20,6 +20,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -30,7 +31,6 @@ require_once 'include/items.php';
 require_once 'mod/share.php';
 require_once 'include/enotify.php';
 require_once 'include/api.php';
-require_once 'mod/proxy.php';
 
 /**
  * @brief This class contain functions for the OStatus protocol
@@ -1214,7 +1214,7 @@ class OStatus
 			}
 
 			// Is it a remote picture? Then make a smaller preview here
-			$preview = proxy_url($preview, false, PROXY_SIZE_SMALL);
+			$preview = Proxy::proxifyUrl($preview, false, Proxy::SIZE_SMALL);
 
 			// Is it a local picture? Then make it smaller here
 			$preview = str_replace(["-0.jpg", "-0.png"], ["-2.jpg", "-2.png"], $preview);

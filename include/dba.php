@@ -11,6 +11,7 @@ use Friendica\Database\DBA;
  *
  * @param $args Query parameters (1 to N parameters of different types)
  * @return array|bool Query array
+ * @deprecated
  */
 function q($sql) {
 	$args = func_get_args();

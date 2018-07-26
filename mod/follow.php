@@ -9,6 +9,7 @@ use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Database\DBA;
 
 function follow_post(App $a)
@@ -144,7 +145,7 @@ function follow_content(App $a)
 
 	$o = replace_macros($tpl, [
 		'$header'        => htmlentities($header),
-		//'$photo' => proxy_url($ret['photo'], false, PROXY_SIZE_SMALL),
+		//'$photo'         => Proxy::proxifyUrl($ret['photo'], false, Proxy::SIZE_SMALL),
 		'$desc'          => '',
 		'$pls_answer'    => L10n::t('Please answer the following:'),
 		'$does_know_you' => ['knowyou', L10n::t('Does %s know you?', $ret['name']), false, '', [L10n::t('No'), L10n::t('Yes')]],

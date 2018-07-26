@@ -14,6 +14,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Network\Proxy;
 
 function hovercard_init(App $a)
 {
@@ -96,7 +97,7 @@ function hovercard_content()
 		'name'     => $contact['name'],
 		'nick'     => $contact['nick'],
 		'addr'     => defaults($contact, 'addr', $contact['url']),
-		'thumb'    => proxy_url($contact['thumb'], false, PROXY_SIZE_THUMB),
+		'thumb'    => Proxy::proxifyUrl($contact['thumb'], false, Proxy::SIZE_THUMB),
 		'url'      => Contact::magicLink($contact['url']),
 		'nurl'     => $contact['nurl'], // We additionally store the nurl as identifier
 		'location' => $contact['location'],

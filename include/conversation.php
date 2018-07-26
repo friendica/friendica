@@ -17,6 +17,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Term;
+use Friendica\Network\Proxy;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Util\DateTimeFormat;
@@ -407,7 +408,6 @@ function visible_activity($item) {
  *
  */
 function conversation(App $a, array $items, $mode, $update, $preview = false, $order = 'commented', $uid = 0) {
-	require_once 'mod/proxy.php';
 
 	$ssl_state = ((local_user()) ? true : false);
 
@@ -418,8 +418,10 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 
 	if (local_user()) {
 		$str_blocked = PConfig::get(local_user(), 'system', 'blocked');
+
 		if ($str_blocked) {
 			$arr_blocked = explode(',', $str_blocked);
+
 			for ($x = 0; $x < count($arr_blocked); $x ++) {
 				$arr_blocked[$x] = trim($arr_blocked[$x]);
 			}
@@ -477,6 +479,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 		}
 	} elseif ($mode === 'notes') {
 		$profile_owner = local_user();
+
 		if (!$update) {
 			$live_update_div = '<div id="live-notes"></div>' . "\r\n"
 				. "<script> var profile_uid = " . local_user()
@@ -484,6 +487,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 		}
 	} elseif ($mode === 'display') {
 		$profile_owner = $a->profile['uid'];
+
 		if (!$update) {
 			$live_update_div = '<div id="live-display"></div>' . "\r\n"
 				. "<script> var profile_uid = " . defaults($_SESSION, 'uid', 0) . ";"
@@ -492,6 +496,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 	} elseif ($mode === 'community') {
 		$items = conversation_add_children($items, true, $order, $uid);
 		$profile_owner = 0;
+
 		if (!$update) {
 			$live_update_div = '<div id="live-community"></div>' . "\r\n"
 				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 10)
@@ -523,7 +528,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 
 	$page_template = get_markup_template("conversation.tpl");
 
-	if ($items && count($items)) {
+	if (!empty($items)) {
 		if ($mode === 'community') {
 			$writable = true;
 		} else {
@@ -645,7 +650,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					'name' => $profile_name_e,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
-					'thumb' => System::removedBaseUrl(proxy_url($item['author-avatar'], false, PROXY_SIZE_THUMB)),
+					'thumb' => System::removedBaseUrl(Proxy::proxifyUrl($item['author-avatar'], false, Proxy::SIZE_THUMB)),
 					'title' => $title_e,
 					'body' => $body_e,
 					'tags' => $tags_e,
@@ -664,7 +669,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					'indent' => '',
 					'owner_name' => $owner_name_e,
 					'owner_url' => $owner_url,
-					'owner_photo' => System::removedBaseUrl(proxy_url($item['owner-avatar'], false, PROXY_SIZE_THUMB)),
+					'owner_photo' => System::removedBaseUrl(Proxy::proxifyUrl($item['owner-avatar'], false, Proxy::SIZE_THUMB)),
 					'plink' => get_plink($item),
 					'edpost' => false,
 					'isstarred' => $isstarred,

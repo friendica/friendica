@@ -18,9 +18,8 @@ use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Util\DateTimeFormat;
-
-require_once 'mod/proxy.php';
 
 function contacts_init(App $a)
 {
@@ -970,7 +969,7 @@ function _contact_detail_for_template(array $rr)
 		'id' => $rr['id'],
 		'alt_text' => $alt_text,
 		'dir_icon' => $dir_icon,
-		'thumb' => proxy_url($rr['thumb'], false, PROXY_SIZE_THUMB),
+		'thumb' => Proxy::proxifyUrl($rr['thumb'], false, Proxy::SIZE_THUMB),
 		'name' => htmlentities($rr['name']),
 		'username' => htmlentities($rr['name']),
 		'account_type' => Contact::getAccountType($rr),

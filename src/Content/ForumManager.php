@@ -10,6 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Network\Proxy;
 
 require_once 'include/dba.php';
 
@@ -110,7 +111,7 @@ class ForumManager
 					'name' => $contact['name'],
 					'cid' => $contact['id'],
 					'selected' 	=> $selected,
-					'micro' => System::removedBaseUrl(proxy_url($contact['micro'], false, PROXY_SIZE_MICRO)),
+					'micro' => System::removedBaseUrl(Proxy::proxifyUrl($contact['micro'], false, Proxy::SIZE_MICRO)),
 					'id' => ++$id,
 				];
 				$entries[] = $entry;

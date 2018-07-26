@@ -21,6 +21,7 @@ use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
+use Friendica\Network\Proxy;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/conversation.php';
@@ -652,7 +653,7 @@ function networkThreadedView(App $a, $update, $parent)
 				'id' => 'network',
 				'name' => htmlentities($contact['name']),
 				'itemurl' => defaults($contact, 'addr', $contact['nurl']),
-				'thumb' => proxy_url($contact['thumb'], false, PROXY_SIZE_THUMB),
+				'thumb' => Proxy::proxifyUrl($contact['thumb'], false, Proxy::SIZE_THUMB),
 				'details' => $contact['location'],
 			];
 

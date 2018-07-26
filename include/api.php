@@ -36,6 +36,7 @@ use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\NotImplementedException;
 use Friendica\Network\HTTPException\TooManyRequestsException;
 use Friendica\Network\HTTPException\UnauthorizedException;
+use Friendica\Network\Proxy;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
@@ -47,7 +48,6 @@ require_once 'mod/share.php';
 require_once 'mod/item.php';
 require_once 'include/security.php';
 require_once 'mod/wall_upload.php';
-require_once 'mod/proxy.php';
 
 define('API_METHOD_ANY', '*');
 define('API_METHOD_GET', 'GET');
@@ -2518,7 +2518,7 @@ function api_get_entitities(&$text, $bbcode)
 		preg_match_all("/\[img](.*?)\[\/img\]/ism", $bbcode, $images);
 
 		foreach ($images[1] as $image) {
-			$replace = proxy_url($image);
+			$replace = Proxy::proxifyUrl($image);
 			$text = str_replace($image, $replace, $text);
 		}
 		return [];
@@ -2627,7 +2627,7 @@ function api_get_entitities(&$text, $bbcode)
 				// If image cache is activated, then use the following sizes:
 				// thumb  (150), small (340), medium (600) and large (1024)
 				if (!Config::get("system", "proxy_disabled")) {
-					$media_url = proxy_url($url);
+					$media_url = Proxy::proxifyUrl($url);
 
 					$sizes = [];
 					$scale = Image::getScalingDimensions($image[0], $image[1], 150);

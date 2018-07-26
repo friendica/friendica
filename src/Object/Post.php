@@ -15,6 +15,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
+use Friendica\Network\Proxy;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -112,8 +113,6 @@ class Post extends BaseObject
 	 */
 	public function getTemplateData($conv_responses, $thread_level = 1)
 	{
-		require_once "mod/proxy.php";
-
 		$result = [];
 
 		$a = self::getApp();
@@ -150,6 +149,7 @@ class Post extends BaseObject
 			|| strlen($item['deny_cid']) || strlen($item['deny_gid']))))
 			? L10n::t('Private Message')
 			: false);
+
 		$shareable = in_array($conv->getProfileOwner(), [0, local_user()]) && $item['private'] != 1;
 
 		if (local_user() && link_compare($a->contact['url'], $item['author-link'])) {
@@ -367,7 +367,7 @@ class Post extends BaseObject
 			'profile_url'     => $profile_link,
 			'item_photo_menu' => item_photo_menu($item),
 			'name'            => $name_e,
-			'thumb'           => $a->remove_baseurl(proxy_url($item['author-avatar'], false, PROXY_SIZE_THUMB)),
+			'thumb'           => $a->remove_baseurl(Proxy::proxifyUrl($item['author-avatar'], false, Proxy::SIZE_THUMB)),
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
 			'title'           => $title_e,
@@ -380,7 +380,7 @@ class Post extends BaseObject
 			'indent'          => $indent,
 			'shiny'           => $shiny,
 			'owner_url'       => $this->getOwnerUrl(),
-			'owner_photo'     => $a->remove_baseurl(proxy_url($item['owner-avatar'], false, PROXY_SIZE_THUMB)),
+			'owner_photo'     => $a->remove_baseurl(Proxy::proxifyUrl($item['owner-avatar'], false, Proxy::SIZE_THUMB)),
 			'owner_name'      => htmlentities($owner_name_e),
 			'plink'           => get_plink($item),
 			'edpost'          => Feature::isEnabled($conv->getProfileOwner(), 'edit_posts') ? $edpost : '',

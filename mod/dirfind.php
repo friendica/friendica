@@ -14,6 +14,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\Network;
 
@@ -226,7 +227,7 @@ function dirfind_content(App $a, $prefix = "") {
 					'url' => Contact::magicLink($jj->url),
 					'itemurl' => $itemurl,
 					'name' => htmlentities($jj->name),
-					'thumb' => proxy_url($jj->photo, false, PROXY_SIZE_THUMB),
+					'thumb' => Proxy::proxifyUrl($jj->photo, false, Proxy::SIZE_THUMB),
 					'img_hover' => $jj->tags,
 					'conntxt' => $conntxt,
 					'connlnk' => $connlnk,
