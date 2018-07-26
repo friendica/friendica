@@ -16,6 +16,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\Proxy as ProxyUtils;
 

@@ -19,6 +19,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 

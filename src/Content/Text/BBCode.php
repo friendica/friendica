@@ -20,6 +20,7 @@ use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Network\Probe;
+use Friendica\Network\Proxy;
 use Friendica\Object\Image;
 use Friendica\Util\Map;
 use Friendica\Util\Network;

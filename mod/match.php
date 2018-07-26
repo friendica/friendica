@@ -10,6 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Network\Proxy;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 

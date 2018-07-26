@@ -36,6 +36,7 @@ use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\NotImplementedException;
 use Friendica\Network\HTTPException\TooManyRequestsException;
 use Friendica\Network\HTTPException\UnauthorizedException;
+use Friendica\Network\Proxy;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;

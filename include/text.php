@@ -18,6 +18,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
+use Friendica\Network\Proxy;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
