@@ -32,7 +32,7 @@ link if your cert is self-signed).
 	- Apache with mod-rewrite enabled and "Options All" so you can use a
 local .htaccess file
 
-	- PHP 5.6+ (PHP 7 recommended for performance).
+	- PHP 5.6.1+ (PHP 7 recommended for performance).
 
 		- PHP *command line* access with register_argc_argv set to true in the
 php.ini file [or see 'poormancron' in section 8]
@@ -85,7 +85,7 @@ Clone the addon repository (separately):
 
     git clone https://github.com/friendica/friendica-addons.git -b master addon
 
-If you copy the directory tree to your webserver, make sure that you also 
+If you copy the directory tree to your webserver, make sure that you also
 copy .htaccess - as "dot" files are often hidden and aren't normally copied.
 
 If you want to use the development version of Friendica you can switch to
@@ -106,8 +106,8 @@ password, database name).
     - Please check the additional notes if running on MySQ 5.7.17 or newer
 
 4. If you know in advance that it will be impossible for the web server to
-write or create files in your web directory, create an empty file called
-.htconfig.php and make it writable by the web server.
+write or create files in the config/ subfolder, create an empty file called
+local.ini.php and make it writable by the web server.
 
 5. Visit your website with a web browser and follow the instructions. Please
 note any error messages and correct these before continuing.
@@ -121,9 +121,9 @@ so in the host name setting for the database.
 
 6. *If* the automated installation fails for any reason, check the following:
 
-	- ".htconfig.php" exists
-		If not, edit htconfig.php and change system settings. Rename
-to .htconfig.php
+	- "config/local.ini.php" exists
+		If not, edit local-sample.ini.php and change system settings. Rename
+to local.ini.php
 	-  Database is populated.
 		If not, import the contents of "database.sql" with phpmyadmin
 or mysql command line
@@ -132,7 +132,7 @@ or mysql command line
 Registration errors should all be recoverable automatically.
 If you get any *critical* failure at this point, it generally indicates the
 database was not installed correctly. You might wish to move/rename
-.htconfig.php to another name and empty (called 'dropping') the database
+local.ini.php to another name and empty (called 'dropping') the database
 tables, so that you can start fresh.
 
 ****************************************************************************
@@ -177,7 +177,7 @@ Bad things will happen. Let there be a hardware failure, a corrupted
 database or whatever you can think of. So once the installation of your
 Friendica node is done, you should make yoursef a backup plan.
 
-The most important file is the `.htconfig.php` file in the base directory.
+The most important file is the `config/local.ini.php` file in the base directory.
 As it stores all your data, you should also have a recent dump of your
 Friendica database at hand, should you have to recover your node.
 
@@ -274,21 +274,21 @@ Windows).
 
 
 #####################################################################
-- If you are unable to write the file .htconfig.php during installation
+- If you are unable to write the file config/local.ini.php during installation
 due to permissions issues:
 #####################################################################
 
 	create an empty file with that name and give it world-write permission.
 For Linux:
 
-% touch .htconfig.php
-% chmod 777 .htconfig.php
+% touch config/local.ini.php
+% chmod 664 config/local.ini.php
 
 Retry the installation. As soon as the database has been created,
 
 ******* this is important *********
 
-% chmod 755 .htconfig.php
+% chmod 644 config/local.ini.php
 
 #####################################################################
 - Some configurations with "suhosin" security are configured without
@@ -327,11 +327,11 @@ After a while I noticed, that bin/worker.php calls further php script via
 proc_open. These scripts themselves also use proc_open and fail, because they
 are NOT called with -d suhosin.executor.func.blacklist=none.
 
-So the simple solution is to put the correct parameters into .htconfig.php:
- // Location of PHP command line processor
- $a->config['php_path'] = '/usr/bin/php -d suhosin.executor.func.blacklist=none
--d suhosin.executor.eval.blacklist=none';
+So the simple solution is to put the correct parameters into config/local.ini.php:
 
+[config]
+; Location of PHP command line processor
+php_path = "/usr/bin/php -d suhosin.executor.func.blacklist=none -d suhosin.executor.eval.blacklist=none"
 
 This is obvious as soon as you notice that the friendica-cron uses proc_open to
 execute php-scripts that also use proc_open, but it took me quite some time to

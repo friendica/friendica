@@ -28,7 +28,7 @@ Requirements
 ---
 
 * Apache mit einer aktiverten mod-rewrite-Funktion und dem Eintrag "Options All", so dass du die lokale .htaccess-Datei nutzen kannst
-* PHP  5.6+ (PHP 7 ist aufgrund der Performance empfohlen)
+* PHP  5.6.1+ (PHP 7 ist aufgrund der Performance empfohlen)
   * PHP *Kommandozeilen*-Zugang mit register_argc_argv auf "true" gesetzt in der php.ini-Datei
   * Curl, GD, PDO, MySQLi, xml, zip und OpenSSL-Erweiterung
   * Das POSIX Modul muss aktiviert sein ([CentOS, RHEL](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) haben dies z.B. deaktiviert)
@@ -56,7 +56,7 @@ Stelle sicher, dass der Ordner *view/smarty3* existiert and von dem Webserver-Be
     mkdir view/smarty3
     chmod 775 view/smarty3
 
-Falls Addons installiert werden sollen: Gehe in den Friendica-Ordner 
+Falls Addons installiert werden sollen: Gehe in den Friendica-Ordner
 
     cd mywebsite
 
@@ -98,19 +98,19 @@ Starte MySQL dann neu und es sollte klappen.
 
 ### Option A: Der manuelle Installer
 
-Besuche deine Webseite mit deinem Browser und befolge die Anleitung. 
+Besuche deine Webseite mit deinem Browser und befolge die Anleitung.
 Bitte beachte jeden Fehler und korrigiere diese, bevor du fortfährst.
 
 Falls du einen Port für die Datenbankverbindung angeben musst, kannst du diesen in der Host-Eingabe Zeile angeben.
 
 *Wenn* die manuelle Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
-* ".htconfig.php" existiert ... wenn nicht, bearbeite die „htconfig.php“ und ändere die Systemeinstellungen. Benenne sie um in „.htconfig.php".
+* "config/local.ini.php" existiert ... wenn nicht, bearbeite die „config/local-sample.ini.php“ und ändere die Systemeinstellungen. Benenne sie um in „config/local.ini.php".
 * die Datenbank beinhaltet Daten. ... wenn nicht, importiere den Inhalt der Datei "database.sql" mit phpmyadmin oder per mysql-Kommandozeile.
 
 Besuche deine Seite an diesem Punkt wieder und registriere deinen persönlichen Account.
 Alle Registrierungsprobleme sollten automatisch behebbar sein.
 Wenn du irgendwelche **kritischen** Fehler zu diesen Zeitpunkt erhalten solltest, deutet das darauf hin, dass die Datenbank nicht korrekt installiert wurde.
-Du kannst bei Bedarf die Datei .htconfig.php verschieben/umbenennen und die Datenbank leeren (als „Dropping“ bezeichnet), so dass du mit einem sauberen System neu starten kannst.
+Du kannst bei Bedarf die Datei config/local.ini.php verschieben/umbenennen und die Datenbank leeren (als „Dropping“ bezeichnet), so dass du mit einem sauberen System neu starten kannst.
 
 ### Option B: Starte das manuelle Installationsscript
 
@@ -127,8 +127,8 @@ Oder falls du alle optionalen Checks ausfürehn lassen möchtest, benutze diese 
     bin/console autoinstall -a
 
 *Wenn* die automatisierte Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
-* Existiert die `.htconfig.php`? Falls ja, wird die automatisierte Installation nicht gestartet.
-* Sind Einstellungen in der `.htconfig.php` korrekt? Falls nicht, bitte bearbeite diese Datei erneut.
+* Existiert die `config/local.ini.php`? Falls ja, wird die automatisierte Installation nicht gestartet.
+* Sind Einstellungen in der `config/local.ini.php` korrekt? Falls nicht, bitte bearbeite diese Datei erneut.
 * Ist die leere MySQL-Datenbank erstellt? Falls nicht, erstelle diese.
 
 Für mehr Informationen kannst du diese Option verwenden:
@@ -137,7 +137,7 @@ Für mehr Informationen kannst du diese Option verwenden:
 
 ### Einen Worker einrichten
 
-Erstelle einen Cron job oder einen regelmäßigen Task, um den Poller alle 5-10 Minuten im Hintergrund ablaufen zu lassen. 
+Erstelle einen Cron job oder einen regelmäßigen Task, um den Poller alle 5-10 Minuten im Hintergrund ablaufen zu lassen.
 Beispiel:
 
     cd /base/directory; /path/to/php bin/worker.php
@@ -160,5 +160,5 @@ Es werden schlimme Dinge geschehen.
 Sei es nun ein Hardwareversagen oder eine kaputte Datenbank.
 Deshalb solltest du dir, nachdem die Installation deines Friendica Knotens abgeschlossen ist, einen Backup Plan erstellen.
 
-Die wichtigste Datei ist die `.htconfig.php` im Stammverzeichnis deiner Friendica Installation.
+Die wichtigste Datei ist die `config/local.ini.php` im Stammverzeichnis deiner Friendica Installation.
 Und da alle Daten in der Datenbank gespeichert werden, solltest du einen nicht all zu alten Dump der Friendica Datenbank zur Hand haben, solltest du deinen Knoten wieder herstellen müssen.

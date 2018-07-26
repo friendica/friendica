@@ -4,9 +4,11 @@
  */
 namespace Friendica\Database;
 
-use dba;
+use Exception;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Util\DateTimeFormat;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -25,19 +27,19 @@ class DBStructure
 	 */
 	public static function convertToInnoDB() {
 		$r = q("SELECT `TABLE_NAME` FROM `information_schema`.`tables` WHERE `engine` = 'MyISAM' AND `table_schema` = '%s'",
-			dbesc(dba::database_name()));
+			DBA::escape(DBA::databaseName()));
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			echo L10n::t('There are no tables on MyISAM.')."\n";
 			return;
 		}
 
 		foreach ($r AS $table) {
-			$sql = sprintf("ALTER TABLE `%s` engine=InnoDB;", dbesc($table['TABLE_NAME']));
+			$sql = sprintf("ALTER TABLE `%s` engine=InnoDB;", DBA::escape($table['TABLE_NAME']));
 			echo $sql."\n";
 
-			$result = dba::e($sql);
-			if (!DBM::is_result($result)) {
+			$result = DBA::e($sql);
+			if (!DBA::isResult($result)) {
 				self::printUpdateError($sql);
 			}
 		}
@@ -53,14 +55,14 @@ class DBStructure
 		$a = get_app();
 
 		//send the administrators an e-mail
-		$admin_mail_list = "'".implode("','", array_map(dbesc, explode(",", str_replace(" ", "", $a->config['admin_email']))))."'";
+		$admin_mail_list = "'".implode("','", array_map(['Friendica\Database\DBA', 'escape'], explode(",", str_replace(" ", "", Config::get('config', 'admin_email')))))."'";
 		$adminlist = q("SELECT uid, language, email FROM user WHERE email IN (%s)",
 			$admin_mail_list
 		);
 
 		// No valid result?
-		if (!DBM::is_result($adminlist)) {
-			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_NORMAL);
+		if (!DBA::isResult($adminlist)) {
+			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_INFO);
 
 			// Don't continue
 			return;
@@ -103,7 +105,7 @@ class DBStructure
 
 		$table_status = q("SHOW TABLE STATUS WHERE `name` = '%s'", $table);
 
-		if (DBM::is_result($table_status)) {
+		if (DBA::isResult($table_status)) {
 			$table_status = $table_status[0];
 		} else {
 			$table_status = [];
@@ -112,7 +114,7 @@ class DBStructure
 		$fielddata = [];
 		$indexdata = [];
 
-		if (DBM::is_result($indexes)) {
+		if (DBA::isResult($indexes)) {
 			foreach ($indexes AS $index) {
 				if ($index['Key_name'] != 'PRIMARY' && $index['Non_unique'] == '0' && !isset($indexdata[$index["Key_name"]])) {
 					$indexdata[$index["Key_name"]] = ['UNIQUE'];
@@ -127,7 +129,7 @@ class DBStructure
 				$indexdata[$index["Key_name"]][] = $column;
 			}
 		}
-		if (DBM::is_result($structures)) {
+		if (DBA::isResult($structures)) {
 			foreach ($structures AS $field) {
 				// Replace the default size values so that we don't have to define them
 				$search = ['tinyint(1)', 'tinyint(3) unsigned', 'tinyint(4)', 'smallint(5) unsigned', 'smallint(6)', 'mediumint(8) unsigned', 'mediumint(9)', 'bigint(20)', 'int(10) unsigned', 'int(11)'];
@@ -152,7 +154,7 @@ class DBStructure
 				}
 			}
 		}
-		if (DBM::is_result($full_columns)) {
+		if (DBA::isResult($full_columns)) {
 			foreach ($full_columns AS $column) {
 				$fielddata[$column["Field"]]["Collation"] = $column["Collation"];
 				$fielddata[$column["Field"]]["comment"] = $column["Comment"];
@@ -188,7 +190,7 @@ class DBStructure
 	 */
 	private static function printUpdateError($message) {
 		echo L10n::t("\nError %d occurred during database update:\n%s\n",
-			dba::errorNo(), dba::errorMessage());
+			DBA::errorNo(), DBA::errorMessage());
 
 		return L10n::t('Errors encountered performing database changes: ').$message.EOL;
 	}
@@ -206,7 +208,7 @@ class DBStructure
 	public static function update($verbose, $action, $install = false, array $tables = null, array $definition = null) {
 		if ($action && !$install) {
 			Config::set('system', 'maintenance', 1);
-			Config::set('system', 'maintenance_reason', L10n::t('%s: Database update', DBM::date().' '.date('e')));
+			Config::set('system', 'maintenance_reason', L10n::t('%s: Database update', DateTimeFormat::utcNow().' '.date('e')));
 		}
 
 		$errors = '';
@@ -220,7 +222,7 @@ class DBStructure
 			$tables = q("SHOW TABLES");
 		}
 
-		if (DBM::is_result($tables)) {
+		if (DBA::isResult($tables)) {
 			foreach ($tables AS $table) {
 				$table = current($table);
 
@@ -235,8 +237,8 @@ class DBStructure
 		}
 
 		// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
-		if ((version_compare(dba::server_info(), '5.7.4') >= 0) &&
-			!(strpos(dba::server_info(), 'MariaDB') !== false)) {
+		if ((version_compare(DBA::serverInfo(), '5.7.4') >= 0) &&
+			!(strpos(DBA::serverInfo(), 'MariaDB') !== false)) {
 			$ignore = '';
 		} else {
 			$ignore = ' IGNORE';
@@ -251,7 +253,7 @@ class DBStructure
 			$temp_name = $name;
 			if (!isset($database[$name])) {
 				$r = self::createTable($name, $structure, $verbose, $action);
-				if (!DBM::is_result($r)) {
+				if (!DBA::isResult($r)) {
 					$errors .= self::printUpdateError($name);
 				}
 				$is_new_table = true;
@@ -321,8 +323,8 @@ class DBStructure
 							$parameters['comment'] = "";
 						}
 
-						$current_field_definition = dba::clean_query(implode(",", $field_definition));
-						$new_field_definition = dba::clean_query(implode(",", $parameters));
+						$current_field_definition = DBA::cleanQuery(implode(",", $field_definition));
+						$new_field_definition = DBA::cleanQuery(implode(",", $parameters));
 						if ($current_field_definition != $new_field_definition) {
 							$sql2 = self::modifyTableField($fieldname, $parameters);
 							if ($sql3 == "") {
@@ -367,7 +369,7 @@ class DBStructure
 
 				if (isset($database[$name]["table_status"]["Comment"])) {
 					if ($database[$name]["table_status"]["Comment"] != $structure['comment']) {
-						$sql2 = "COMMENT = '".dbesc($structure['comment'])."'";
+						$sql2 = "COMMENT = '".DBA::escape($structure['comment'])."'";
 
 						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
@@ -379,7 +381,7 @@ class DBStructure
 
 				if (isset($database[$name]["table_status"]["Engine"]) && isset($structure['engine'])) {
 					if ($database[$name]["table_status"]["Engine"] != $structure['engine']) {
-						$sql2 = "ENGINE = '".dbesc($structure['engine'])."'";
+						$sql2 = "ENGINE = '".DBA::escape($structure['engine'])."'";
 
 						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `".$temp_name."` ".$sql2;
@@ -459,7 +461,7 @@ class DBStructure
 						if ($ignore != "") {
 							echo "SET session old_alter_table=0;\n";
 						} else {
-							echo "INSERT INTO `".$temp_name."` SELECT ".dba::any_value_fallback($field_list)." FROM `".$name."`".$group_by.";\n";
+							echo "INSERT INTO `".$temp_name."` SELECT ".DBA::anyValueFallback($field_list)." FROM `".$name."`".$group_by.";\n";
 							echo "DROP TABLE `".$name."`;\n";
 							echo "RENAME TABLE `".$temp_name."` TO `".$name."`;\n";
 						}
@@ -468,48 +470,48 @@ class DBStructure
 
 				if ($action) {
 					if (!$install) {
-						Config::set('system', 'maintenance_reason', L10n::t('%s: updating %s table.', DBM::date().' '.date('e'), $name));
+						Config::set('system', 'maintenance_reason', L10n::t('%s: updating %s table.', DateTimeFormat::utcNow().' '.date('e'), $name));
 					}
 
 					// Ensure index conversion to unique removes duplicates
 					if ($is_unique && ($temp_name != $name)) {
 						if ($ignore != "") {
-							dba::e("SET session old_alter_table=1;");
+							DBA::e("SET session old_alter_table=1;");
 						} else {
-							$r = dba::e("DROP TABLE IF EXISTS `".$temp_name."`;");
-							if (!DBM::is_result($r)) {
+							$r = DBA::e("DROP TABLE IF EXISTS `".$temp_name."`;");
+							if (!DBA::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 
-							$r = dba::e("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
-							if (!DBM::is_result($r)) {
+							$r = DBA::e("CREATE TABLE `".$temp_name."` LIKE `".$name."`;");
+							if (!DBA::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
 						}
 					}
 
-					$r = dba::e($sql3);
-					if (!DBM::is_result($r)) {
+					$r = DBA::e($sql3);
+					if (!DBA::isResult($r)) {
 						$errors .= self::printUpdateError($sql3);
 					}
 					if ($is_unique && ($temp_name != $name)) {
 						if ($ignore != "") {
-							dba::e("SET session old_alter_table=0;");
+							DBA::e("SET session old_alter_table=0;");
 						} else {
-							$r = dba::e("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
-							if (!DBM::is_result($r)) {
+							$r = DBA::e("INSERT INTO `".$temp_name."` SELECT ".$field_list." FROM `".$name."`".$group_by.";");
+							if (!DBA::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
-							$r = dba::e("DROP TABLE `".$name."`;");
-							if (!DBM::is_result($r)) {
+							$r = DBA::e("DROP TABLE `".$name."`;");
+							if (!DBA::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
-							$r = dba::e("RENAME TABLE `".$temp_name."` TO `".$name."`;");
-							if (!DBM::is_result($r)) {
+							$r = DBA::e("RENAME TABLE `".$temp_name."` TO `".$name."`;");
+							if (!DBA::isResult($r)) {
 								$errors .= self::printUpdateError($sql3);
 								return $errors;
 							}
@@ -556,7 +558,7 @@ class DBStructure
 		}
 
 		if (isset($parameters["comment"])) {
-			$fieldstruct .= " COMMENT '".dbesc($parameters["comment"])."'";
+			$fieldstruct .= " COMMENT '".DBA::escape($parameters["comment"])."'";
 		}
 
 		/*if (($parameters["primary"] != "") && $create)
@@ -573,7 +575,7 @@ class DBStructure
 		$sql_rows = [];
 		$primary_keys = [];
 		foreach ($structure["fields"] AS $fieldname => $field) {
-			$sql_rows[] = "`".dbesc($fieldname)."` ".self::FieldCommand($field);
+			$sql_rows[] = "`".DBA::escape($fieldname)."` ".self::FieldCommand($field);
 			if (x($field,'primary') && $field['primary']!='') {
 				$primary_keys[] = $fieldname;
 			}
@@ -593,43 +595,43 @@ class DBStructure
 		}
 
 		if (isset($structure["comment"])) {
-			$comment = " COMMENT='" . dbesc($structure["comment"]) . "'";
+			$comment = " COMMENT='" . DBA::escape($structure["comment"]) . "'";
 		}
 
 		$sql = implode(",\n\t", $sql_rows);
 
-		$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", dbesc($name)).$sql.
+		$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", DBA::escape($name)).$sql.
 				"\n)" . $engine . " DEFAULT COLLATE utf8mb4_general_ci" . $comment;
 		if ($verbose) {
 			echo $sql.";\n";
 		}
 
 		if ($action) {
-			$r = dba::e($sql);
+			$r = DBA::e($sql);
 		}
 
 		return $r;
 	}
 
 	private static function addTableField($fieldname, $parameters) {
-		$sql = sprintf("ADD `%s` %s", dbesc($fieldname), self::FieldCommand($parameters));
+		$sql = sprintf("ADD `%s` %s", DBA::escape($fieldname), self::FieldCommand($parameters));
 		return($sql);
 	}
 
 	private static function modifyTableField($fieldname, $parameters) {
-		$sql = sprintf("MODIFY `%s` %s", dbesc($fieldname), self::FieldCommand($parameters, false));
+		$sql = sprintf("MODIFY `%s` %s", DBA::escape($fieldname), self::FieldCommand($parameters, false));
 		return($sql);
 	}
 
 	private static function dropIndex($indexname) {
-		$sql = sprintf("DROP INDEX `%s`", dbesc($indexname));
+		$sql = sprintf("DROP INDEX `%s`", DBA::escape($indexname));
 		return($sql);
 	}
 
 	private static function createIndex($indexname, $fieldnames, $method = "ADD") {
 		$method = strtoupper(trim($method));
 		if ($method!="" && $method!="ADD") {
-			throw new \Exception("Invalid parameter 'method' in self::createIndex(): '$method'");
+			throw new Exception("Invalid parameter 'method' in self::createIndex(): '$method'");
 		}
 
 		if ($fieldnames[0] == "UNIQUE") {
@@ -644,9 +646,9 @@ class DBStructure
 			}
 
 			if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches)) {
-				$names .= "`".dbesc($matches[1])."`(".intval($matches[2]).")";
+				$names .= "`".DBA::escape($matches[1])."`(".intval($matches[2]).")";
 			} else {
-				$names .= "`".dbesc($fieldname)."`";
+				$names .= "`".DBA::escape($fieldname)."`";
 			}
 		}
 
@@ -655,7 +657,7 @@ class DBStructure
 		}
 
 
-		$sql = sprintf("%s INDEX `%s` (%s)", $method, dbesc($indexname), $names);
+		$sql = sprintf("%s INDEX `%s` (%s)", $method, DBA::escape($indexname), $names);
 		return($sql);
 	}
 
@@ -673,14 +675,149 @@ class DBStructure
 			}
 
 			if (preg_match('|(.+)\((\d+)\)|', $fieldname, $matches)) {
-				$names .= "`".dbesc($matches[1])."`";
+				$names .= "`".DBA::escape($matches[1])."`";
 			} else {
-				$names .= "`".dbesc($fieldname)."`";
+				$names .= "`".DBA::escape($fieldname)."`";
 			}
 		}
 
 		$sql = sprintf(" GROUP BY %s", $names);
 		return $sql;
+	}
+
+	/**
+	 * 	Check if a table exists
+	 *
+	 * @param string $table Table name
+	 *
+	 * @return boolean Does the table exist?
+	 */
+	public static function existsTable($table)
+	{
+		if (empty($table)) {
+			return false;
+		}
+
+		$table = DBA::escape($table);
+
+		$sql = "SHOW TABLES LIKE '" . $table . "';";
+
+		$stmt = DBA::p($sql);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = (DBA::numRows($stmt) > 0);
+		}
+
+		DBA::close($stmt);
+
+		return $retval;
+	}
+
+	/**
+	 * 	Check if the columns of the table exists
+	 *
+	 * @param string $table   Table name
+	 * @param array  $columns Columns to check ( Syntax: [ $col1, $col2, .. ] )
+	 *
+	 * @return boolean Does the table exist?
+	 */
+	public static function existsColumn($table, $columns = []) {
+		if (empty($table)) {
+			return false;
+		}
+
+		if (is_null($columns) || empty($columns)) {
+			return self::existsTable($table);
+		}
+
+		$table = DBA::escape($table);
+
+		foreach ($columns AS $column) {
+			$sql = "SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "';";
+
+			$stmt = DBA::p($sql);
+
+			if (is_bool($stmt)) {
+				$retval = $stmt;
+			} else {
+				$retval = (DBA::numRows($stmt) > 0);
+			}
+
+			DBA::close($stmt);
+
+			if (!$retval) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	const RENAME_COLUMN = 0;
+	const RENAME_PRIMARY_KEY = 1;
+
+	/**
+	 * Renames columns or the primary key of a table
+	 * @todo You cannot rename a primary key if "auto increment" is set
+	 *
+	 * @param string $table    Table name
+	 * @param array  $columns  Columns Syntax for Rename: [ $old1 => [ $new1, $type1 ], $old2 => [ $new2, $type2 ], ... ] )
+	 *                                 Syntax for Primary Key: [ $col1, $col2, ...] )
+	 * @param int    $type     The type of renaming (Default is Column)
+	 *
+	 * @return boolean Was the renaming successful?
+	 *
+	 */
+	public static function rename($table, $columns, $type = self::RENAME_COLUMN) {
+		if (empty($table) || empty($columns)) {
+			return false;
+		}
+
+		if (!is_array($columns)) {
+			return false;
+		}
+
+		$table = DBA::escape($table);
+
+		$sql = "ALTER TABLE `" . $table . "`";
+		switch ($type) {
+			case self::RENAME_COLUMN:
+				if (!self::existsColumn($table, array_keys($columns))) {
+					return false;
+				}
+				$sql .= implode(',', array_map(
+					function ($to, $from) {
+						return " CHANGE `" . $from . "` `" . $to[0] . "` " . $to[1];
+					},
+					$columns,
+					array_keys($columns)
+				));
+				break;
+			case self::RENAME_PRIMARY_KEY:
+				if (!self::existsColumn($table, $columns)) {
+					return false;
+				}
+				$sql .= " DROP PRIMARY KEY, ADD PRIMARY KEY(`" . implode('`, `', $columns) . "`)";
+				break;
+			default:
+				return false;
+		}
+
+		$sql .= ";";
+
+		$stmt = DBA::p($sql);
+
+		if (is_bool($stmt)) {
+			$retval = $stmt;
+		} else {
+			$retval = true;
+		}
+
+		DBA::close($stmt);
+
+		return $retval;
 	}
 
 	public static function definition() {
@@ -1191,20 +1328,18 @@ class DBStructure
 						"mention" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "The owner of this item was mentioned in it"],
 						"forum_mode" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 						"psid" => ["type" => "int unsigned", "relation" => ["permissionset" => "id"], "comment" => "ID of the permission set of this post"],
-						// User specific fields. Should possible be replaced with something different
-						// Possibly we could move some of these fields into the thread table
-						"allow_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed contact.id '<19><78>'"],
-						"allow_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of allowed groups"],
-						"deny_cid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied contact.id"],
-						"deny_gid" => ["type" => "mediumtext", "comment" => "Access Control - list of denied groups"],
-						"postopts" => ["type" => "text", "comment" => "External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery"],
-						"inform" => ["type" => "mediumtext", "comment" => "Additional receivers of this post"],
-						// It is to be decided whether these fields belong to the user or the structure
+						// It has to be decided whether these fields belong to the user or the structure
 						"resource-id" => ["type" => "varchar(32)", "not null" => "1", "default" => "", "comment" => "Used to link other tables to items, it identifies the linked resource (e.g. photo) and if set must also set resource_type"],
 						"event-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "relation" => ["event" => "id"], "comment" => "Used to link to the event.id"],
-						// Will be replaced by the "attach" table
+						// Could possibly be replaced by the "attach" table?
 						"attach" => ["type" => "mediumtext", "comment" => "JSON structure representing attachments to this item"],
 						// Deprecated fields. Will be removed in upcoming versions
+						"allow_cid" => ["type" => "mediumtext", "comment" => "Deprecated"],
+						"allow_gid" => ["type" => "mediumtext", "comment" => "Deprecated"],
+						"deny_cid" => ["type" => "mediumtext", "comment" => "Deprecated"],
+						"deny_gid" => ["type" => "mediumtext", "comment" => "Deprecated"],
+						"postopts" => ["type" => "text", "comment" => "Deprecated"],
+						"inform" => ["type" => "mediumtext", "comment" => "Deprecated"],
 						"type" => ["type" => "varchar(20)", "comment" => "Deprecated"],
 						"bookmark" => ["type" => "boolean", "comment" => "Deprecated"],
 						"file" => ["type" => "mediumtext", "comment" => "Deprecated"],
@@ -1256,7 +1391,7 @@ class DBStructure
 						"uid_eventid" => ["uid","event-id"],
 						"icid" => ["icid"],
 						"iaid" => ["iaid"],
-						"psid" => ["psid"],
+						"psid_wall" => ["psid", "wall"],
 						]
 				];
 		$database["item-activity"] = [
@@ -1299,6 +1434,17 @@ class DBStructure
 						"PRIMARY" => ["id"],
 						"uri-plink-hash" => ["UNIQUE", "uri-plink-hash"],
 						"uri" => ["uri(191)"],
+						]
+				];
+		$database["item-delivery-data"] = [
+				"comment" => "Delivery data for items",
+				"fields" => [
+						"iid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "relation" => ["item" => "id"], "comment" => "Item id"],
+						"postopts" => ["type" => "text", "comment" => "External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery"],
+						"inform" => ["type" => "mediumtext", "comment" => "Additional receivers of the linked item"],
+						],
+				"indexes" => [
+						"PRIMARY" => ["iid"],
 						]
 				];
 		$database["locks"] = [
@@ -1931,7 +2077,7 @@ class DBStructure
 						]
 				];
 
-		\Friendica\Core\Addon::callHooks('dbstructure_definition', $database);
+		Addon::callHooks('dbstructure_definition', $database);
 
 		return $database;
 	}

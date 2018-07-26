@@ -11,12 +11,12 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Term;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'include/text.php';
@@ -180,7 +180,7 @@ class Post extends BaseObject
 			/// @todo This shouldn't be done as query here, but better during the data creation.
 			// it is now done here, since during the RC phase we shouldn't make to intense changes.
 			$parent = Item::selectFirst(['origin'], ['id' => $item['parent']]);
-			if (DBM::is_result($parent)) {
+			if (DBA::isResult($parent)) {
 				$origin = $parent['origin'];
 			}
 		}
@@ -264,8 +264,8 @@ class Post extends BaseObject
 					'starred'   => L10n::t('starred'),
 				];
 
-				$thread = dba::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
-				if (DBM::is_result($thread)) {
+				$thread = DBA::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
+				if (DBA::isResult($thread)) {
 					$ignore = [
 						'do'        => L10n::t("ignore thread"),
 						'undo'      => L10n::t("unignore thread"),
@@ -337,13 +337,15 @@ class Post extends BaseObject
 			unset($buttons["like"]);
 		}
 
+		$tags = Term::populateTagsFromItem($item);
+
 		$tmp_item = [
 			'template'        => $this->getTemplate(),
 			'type'            => implode("", array_slice(explode("/", $item['verb']), -1)),
 			'suppress_tags'   => Config::get('system', 'suppress_tags'),
-			'tags'            => $item['tags'],
-			'hashtags'        => $item['hashtags'],
-			'mentions'        => $item['mentions'],
+			'tags'            => $tags['tags'],
+			'hashtags'        => $tags['hashtags'],
+			'mentions'        => $tags['mentions'],
 			'txt_cats'        => L10n::t('Categories:'),
 			'txt_folders'     => L10n::t('Filed under:'),
 			'has_cats'        => ((count($categories)) ? 'true' : ''),

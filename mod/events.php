@@ -11,7 +11,7 @@ use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -124,7 +124,8 @@ function events_post(App $a) {
 	$c = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1",
 		intval(local_user())
 	);
-	if (count($c)) {
+
+	if (DBA::isResult($c)) {
 		$self = $c[0]['id'];
 	} else {
 		$self = 0;
@@ -132,10 +133,10 @@ function events_post(App $a) {
 
 
 	if ($share) {
-		$str_group_allow   = perms2str($_POST['group_allow']);
-		$str_contact_allow = perms2str($_POST['contact_allow']);
-		$str_group_deny    = perms2str($_POST['group_deny']);
-		$str_contact_deny  = perms2str($_POST['contact_deny']);
+		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
+		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
+		$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
+		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 		// Undo the pseudo-contact of self, since there are real contacts now
 		if (strpos($str_contact_allow, '<' . $self . '>') !== false ) {
@@ -346,7 +347,7 @@ function events_content(App $a) {
 
 		$links = [];
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
@@ -359,7 +360,7 @@ function events_content(App $a) {
 		$events = [];
 
 		// transform the event in a usable array
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$r = Event::sortByDate($r);
 			$events = Event::prepareListForTemplate($r);
 		}
@@ -417,7 +418,7 @@ function events_content(App $a) {
 			intval($event_id),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$orig_event = $r[0];
 		}
 	}
@@ -545,7 +546,7 @@ function events_content(App $a) {
 		$ev = Event::getListById(local_user(), $event_id);
 
 		// Delete only real events (no birthdays)
-		if (DBM::is_result($ev) && $ev[0]['type'] == 'event') {
+		if (DBA::isResult($ev) && $ev[0]['type'] == 'event') {
 			$del = Item::deleteForUser(['id' => $ev[0]['itemid']], local_user());
 		}
 

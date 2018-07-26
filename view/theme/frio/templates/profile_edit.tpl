@@ -10,14 +10,15 @@
 					<i class="fa fa-angle-down"  aria-hidden="true"></i>&nbsp;{{$profile_action}}
 				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-edit-links-dropdown">
-					<li role="presentation"><a role="menuitem" href="profile_photo" id="profile-photo_upload-link" title="{{$profpic|escape:'html'}}"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$profpic}}</a></li>
-					<li role="presentation"><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" title="{{$profpic|escape:'html'}}" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$profpic}}</button></li>
+					<li role="presentation"><a role="menuitem" href="{{$profpiclink}}" id="profile-photo_upload-link" title="{{$profpic|escape:'html'}}"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$profpic}}</a></li>
+					<li role="presentation"><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" title="{{$lbl_profile_photo|escape:'html'}}" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$lbl_profile_photo}}</button></li>
 					{{if ! $is_default}}
 					<li role="presentation" class="nav-item"><a role="menuitem" href="profperm/{{$profile_id}}" id="profile-edit-visibility-link" title="{{$editvis}}"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;{{$editvis}}</a>
 					</li>
 					{{/if}}
 					<li role="presentation" class="divider"></li>
 					<li role="presentation"><a role="menuitem" href="profile/{{$profile_id}}/view?tab=profile" id="profile-edit-view-link" title="{{$viewprof|escape:'html'}}">{{$viewprof}}</a></li>
+					<li role="presentation"><a role="menuitem" href="profiles" id="profile-edit-view-link" title="{{$viewallprof|escape:'html'}}">{{$viewallprof}}</a></li>
 					{{if $profile_clone_link}}
 					<li role="presentation" class="divider"></li>
 					<li role="presentation"><a role="menuitem" href="{{$profile_clone_link}}" id="profile-edit-clone-link" title="{{$cr_prof|escape:'html'}}">{{$cl_prof}}</a></li>

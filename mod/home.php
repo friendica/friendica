@@ -36,7 +36,7 @@ function home_content(App $a) {
 	}
 
 	$customhome = false;
-	$defaultheader = '<h1>'.((x($a->config,'sitename')) ? L10n::t("Welcome to %s", $a->config['sitename']) : "").'</h1>';
+	$defaultheader = '<h1>' . (Config::get('config', 'sitename') ? L10n::t('Welcome to %s', Config::get('config', 'sitename')) : '') . '</h1>';
 
 	$homefilepath = $a->basepath . "/home.html";
 	$cssfilepath = $a->basepath . "/home.css";
@@ -45,9 +45,9 @@ function home_content(App $a) {
 		if (file_exists($cssfilepath)) {
 			$a->page['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="'.System::baseUrl().'/home.css'.'" media="all" />';
 		}
-	} 
+	}
 
-	$login = Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
+	$login = Login::form($a->query_string, intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED ? 0 : 1);
 
 	$content = '';
 	Addon::callHooks("home_content",$content);

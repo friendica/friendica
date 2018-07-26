@@ -3,7 +3,9 @@
 namespace Friendica\Core\Console;
 
 use Friendica\Core;
+use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use RuntimeException;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -56,12 +58,8 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		require_once '.htconfig.php';
-		$result = \dba::connect($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-
-		if (!$result) {
-			throw new \RuntimeException('Unable to connect to database');
+		if (!DBA::connected()) {
+			throw new RuntimeException('Unable to connect to database');
 		}
 
 		Core\Config::load();
@@ -71,8 +69,6 @@ HELP;
 				$output = DBStructure::update(true, false);
 				break;
 			case "update":
-				$output = DBStructure::update(true, true);
-
 				$build = Core\Config::get('system', 'build');
 				if (empty($build)) {
 					Core\Config::set('system', 'build', DB_UPDATE_VERSION);
@@ -82,9 +78,19 @@ HELP;
 				$stored = intval($build);
 				$current = intval(DB_UPDATE_VERSION);
 
-				// run any left update_nnnn functions in update.php
+				// run the pre_update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
-					$r = run_update_function($x);
+					$r = run_update_function($x, 'pre_update');
+					if (!$r) {
+						break;
+					}
+				}
+
+				$output = DBStructure::update(true, true);
+
+				// run the update_nnnn functions in update.php
+				for ($x = $stored; $x < $current; $x ++) {
+					$r = run_update_function($x, 'update');
 					if (!$r) {
 						break;
 					}

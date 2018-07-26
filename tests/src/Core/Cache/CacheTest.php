@@ -2,7 +2,6 @@
 
 namespace Friendica\Test\src\Core\Cache;
 
-use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Test\DatabaseTest;
 use Friendica\Util\DateTimeFormat;
@@ -18,13 +17,11 @@ abstract class CacheTest extends DatabaseTest
 
 	protected function setUp()
 	{
-		global $a;
 		parent::setUp();
 		$this->instance = $this->getInstance();
 
 		// Reusable App object
-		$this->app = new App(__DIR__.'/../');
-		$a = $this->app;
+		$this->app = \Friendica\BaseObject::getApp();
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');
@@ -34,6 +31,9 @@ abstract class CacheTest extends DatabaseTest
 		Config::set('system', 'theme', 'system_theme');
 	}
 
+	/**
+	 * @small
+	 */
 	function testSimple() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -59,6 +59,9 @@ abstract class CacheTest extends DatabaseTest
 		$this->assertNull($this->instance->get('value1'));
 	}
 
+	/**
+	 * @small
+	 */
 	function testClear() {
 		$value = 'ipsum lorum';
 		$this->instance->set('1_value1', $value . '1');
@@ -93,6 +96,9 @@ abstract class CacheTest extends DatabaseTest
 		]);
 	}
 
+	/**
+	 * @medium
+	 */
 	function testTTL() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -106,6 +112,9 @@ abstract class CacheTest extends DatabaseTest
 		$this->assertNull($this->instance->get('value1'));
 	}
 
+	/**
+	 * @small
+	 */
 	function testDifferentTypesInCache() {
 		// String test
 		$value = "foobar";

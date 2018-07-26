@@ -4,21 +4,20 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
-use Friendica\Model\User;
 use Friendica\Model\PushSubscriber;
+use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
 use Friendica\Protocol\Salmon;
-use Friendica\Worker\Delivery;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'include/items.php';
@@ -48,9 +47,11 @@ require_once 'include/items.php';
  * and ITEM_ID is the id of the item in the database that needs to be sent to others.
  */
 
-class Notifier {
-	public static function execute($cmd, $item_id) {
-		global $a;
+class Notifier
+{
+	public static function execute($cmd, $item_id)
+	{
+		$a = BaseObject::getApp();
 
 		logger('notifier: invoked: '.$cmd.': '.$item_id, LOGGER_DEBUG);
 
@@ -63,16 +64,16 @@ class Notifier {
 
 		if ($cmd == Delivery::MAIL) {
 			$normal_mode = false;
-			$message = dba::selectFirst('mail', ['uid', 'contact-id'], ['id' => $item_id]);
-			if (!DBM::is_result($message)) {
+			$message = DBA::selectFirst('mail', ['uid', 'contact-id'], ['id' => $item_id]);
+			if (!DBA::isResult($message)) {
 				return;
 			}
 			$uid = $message['uid'];
 			$recipients[] = $message['contact-id'];
 		} elseif ($cmd == Delivery::SUGGESTION) {
 			$normal_mode = false;
-			$suggest = dba::selectFirst('fsuggest', ['uid', 'cid'], ['id' => $item_id]);
-			if (!DBM::is_result($suggest)) {
+			$suggest = DBA::selectFirst('fsuggest', ['uid', 'cid'], ['id' => $item_id]);
+			if (!DBA::isResult($suggest)) {
 				return;
 			}
 			$uid = $suggest['uid'];
@@ -108,7 +109,7 @@ class Notifier {
 			$condition = ['id' => $item_id, 'visible' => true, 'moderated' => false];
 			$target_item = Item::selectFirst([], $condition);
 
-			if (!DBM::is_result($target_item) || !intval($target_item['parent'])) {
+			if (!DBA::isResult($target_item) || !intval($target_item['parent'])) {
 				return;
 			}
 
@@ -120,7 +121,7 @@ class Notifier {
 			$params = ['order' => ['id']];
 			$ret = Item::select([], $condition, $params);
 
-			if (!DBM::is_result($ret)) {
+			if (!DBA::isResult($ret)) {
 				return;
 			}
 
@@ -221,8 +222,8 @@ class Notifier {
 
 				$fields = ['forum', 'prv'];
 				$condition = ['id' => $target_item['contact-id']];
-				$contact = dba::selectFirst('contact', $fields, $condition);
-				if (!DBM::is_result($contact)) {
+				$contact = DBA::selectFirst('contact', $fields, $condition);
+				if (!DBA::isResult($contact)) {
 					// Should never happen
 					return false;
 				}
@@ -237,7 +238,7 @@ class Notifier {
 				// local followup to remote post
 				$followup = true;
 				$public_message = false; // not public
-				$conversant_str = dbesc($parent['contact-id']);
+				$conversant_str = DBA::escape($parent['contact-id']);
 				$recipients = [$parent['contact-id']];
 				$recipients_followup  = [$parent['contact-id']];
 
@@ -257,9 +258,9 @@ class Notifier {
 						// Currently it is work at progress
 						$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `network` = '%s' AND NOT `blocked` AND NOT `pending` AND NOT `archive`",
 							intval($uid),
-							dbesc(NETWORK_DFRN)
+							DBA::escape(NETWORK_DFRN)
 						);
-						if (DBM::is_result($r)) {
+						if (DBA::isResult($r)) {
 							foreach ($r as $rr) {
 								$recipients_followup[] = $rr['id'];
 							}
@@ -330,7 +331,7 @@ class Notifier {
 				$deny = array_unique(array_merge($deny_people,$deny_groups));
 				$recipients = array_diff($recipients,$deny);
 
-				$conversant_str = dbesc(implode(', ',$conversants));
+				$conversant_str = DBA::escape(implode(', ',$conversants));
 			}
 
 			// If the thread parent is OStatus then do some magic to distribute the messages.
@@ -341,15 +342,15 @@ class Notifier {
 				logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent['author-id']." - Owner: ".$thr_parent['owner-id'], LOGGER_DEBUG);
 
 				// Send a salmon to the parent author
-				$probed_contact = dba::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['author-id']]);
-				if (DBM::is_result($probed_contact) && !empty($probed_contact["notify"])) {
+				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['author-id']]);
+				if (DBA::isResult($probed_contact) && !empty($probed_contact["notify"])) {
 					logger('Notify parent author '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 				}
 
 				// Send a salmon to the parent owner
-				$probed_contact = dba::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['owner-id']]);
-				if (DBM::is_result($probed_contact) && !empty($probed_contact["notify"])) {
+				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['owner-id']]);
+				if (DBA::isResult($probed_contact) && !empty($probed_contact["notify"])) {
 					logger('Notify parent owner '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 				}
@@ -384,9 +385,9 @@ class Notifier {
 				&& intval($target_item['pubmail'])) {
 				$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `network` = '%s'",
 					intval($uid),
-					dbesc(NETWORK_MAIL)
+					DBA::escape(NETWORK_MAIL)
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					foreach ($r as $rr) {
 						$recipients[] = $rr['id'];
 					}
@@ -405,12 +406,12 @@ class Notifier {
 			if (!empty($networks)) {
 				$condition['network'] = $networks;
 			}
-			$contacts = dba::select('contact', ['id', 'url', 'network'], $condition);
-			$r = dba::inArray($contacts);
+			$contacts = DBA::select('contact', ['id', 'url', 'network'], $condition);
+			$r = DBA::toArray($contacts);
 		}
 
 		// delivery loop
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r as $contact) {
 				logger("Deliver ".$item_id." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
@@ -439,9 +440,9 @@ class Notifier {
 				$r1 = q("SELECT `batch`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`name`) AS `name`, ANY_VALUE(`network`) AS `network`
 					FROM `contact` WHERE `network` = '%s' AND `batch` != ''
 					AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch`",
-					dbesc(NETWORK_DIASPORA),
+					DBA::escape(NETWORK_DIASPORA),
 					intval($owner['uid']),
-					intval(CONTACT_IS_SHARING)
+					intval(Contact::SHARING)
 				);
 
 				// Fetch the participation list
@@ -455,12 +456,13 @@ class Notifier {
 			}
 
 			$condition = ['network' => NETWORK_DFRN, 'uid' => $owner['uid'], 'blocked' => false,
-				'pending' => false, 'archive' => false, 'rel' => [CONTACT_IS_FOLLOWER, CONTACT_IS_FRIEND]];
-			$r2 = dba::inArray(dba::select('contact', ['id', 'name', 'network'], $condition));
+				'pending' => false, 'archive' => false, 'rel' => [Contact::FOLLOWER, Contact::FRIEND]];
+
+			$r2 = DBA::toArray(DBA::select('contact', ['id', 'name', 'network'], $condition));
 
 			$r = array_merge($r2, $r1);
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
 
 				foreach ($r as $rr) {

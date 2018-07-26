@@ -2,10 +2,11 @@
 /**
  * @file mod/delegate.php
  */
+
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\User;
 
 require_once 'mod/settings.php';
@@ -32,8 +33,8 @@ function delegate_post(App $a)
 	$parent_password = defaults($_POST, 'parent_password', '');
 
 	if ($parent_uid != 0) {
-		$user = dba::selectFirst('user', ['nickname'], ['uid' => $parent_uid]);
-		if (!DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', ['nickname'], ['uid' => $parent_uid]);
+		if (!DBA::isResult($user)) {
 			notice(L10n::t('Parent user not found.') . EOL);
 			return;
 		}
@@ -45,7 +46,7 @@ function delegate_post(App $a)
 		}
 	}
 
-	dba::update('user', ['parent-uid' => $parent_uid], ['uid' => local_user()]);
+	DBA::update('user', ['parent-uid' => $parent_uid], ['uid' => local_user()]);
 }
 
 function delegate_content(App $a)
@@ -63,14 +64,14 @@ function delegate_content(App $a)
 
 		$user_id = $a->argv[2];
 
-		$user = dba::selectFirst('user', ['nickname'], ['uid' => $user_id]);
-		if (DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', ['nickname'], ['uid' => $user_id]);
+		if (DBA::isResult($user)) {
 			$condition = [
 				'uid' => local_user(),
 				'nurl' => normalise_link(System::baseUrl() . '/profile/' . $user['nickname'])
 			];
-			if (dba::exists('contact', $condition)) {
-				dba::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
+			if (DBA::exists('contact', $condition)) {
+				DBA::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
 			}
 		}
 		goaway(System::baseUrl() . '/delegate');
@@ -82,7 +83,7 @@ function delegate_content(App $a)
 			goaway(System::baseUrl() . '/delegate');
 		}
 
-		dba::delete('manage', ['uid' => $a->argv[2], 'mid' => local_user()]);
+		DBA::delete('manage', ['uid' => $a->argv[2], 'mid' => local_user()]);
 		goaway(System::baseUrl() . '/delegate');
 	}
 
@@ -91,7 +92,7 @@ function delegate_content(App $a)
 	$r = q("SELECT * FROM `user` WHERE `uid` IN (SELECT `uid` FROM `manage` WHERE `mid` = %d)",
 		intval(local_user())
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$delegates = $r;
 	}
 
@@ -109,21 +110,21 @@ function delegate_content(App $a)
 		AND SUBSTRING_INDEX(`nurl`, '/', 3) = '%s'
 		AND `uid` = %d
 		AND `network` = '%s' ",
-		dbesc(normalise_link(System::baseUrl())),
+		DBA::escape(normalise_link(System::baseUrl())),
 		intval(local_user()),
-		dbesc(NETWORK_DFRN)
+		DBA::escape(NETWORK_DFRN)
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$nicknames = [];
 		foreach ($r as $rr) {
-			$nicknames[] = "'" . dbesc(basename($rr['nurl'])) . "'";
+			$nicknames[] = "'" . DBA::escape(basename($rr['nurl'])) . "'";
 		}
 
 		$nicks = implode(',', $nicknames);
 
 		// get user records for all potential page delegates who are not already delegates or managers
 		$r = q("SELECT `uid`, `username`, `nickname` FROM `user` WHERE `nickname` IN ($nicks)");
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r as $rr) {
 				if (!in_array($rr['uid'], $uids)) {
 					$potentials[] = $rr;
@@ -134,19 +135,19 @@ function delegate_content(App $a)
 
 	settings_init($a);
 
-	$user = dba::selectFirst('user', ['parent-uid', 'email'], ['uid' => local_user()]);
+	$user = DBA::selectFirst('user', ['parent-uid', 'email'], ['uid' => local_user()]);
 
 	$parent_user = null;
 
-	if (DBM::is_result($user)) {
-		if (!dba::exists('user', ['parent-uid' => local_user()])) {
+	if (DBA::isResult($user)) {
+		if (!DBA::exists('user', ['parent-uid' => local_user()])) {
 			$parent_uid = $user['parent-uid'];
 			$parents = [0 => L10n::t('No parent user')];
 
 			$fields = ['uid', 'username', 'nickname'];
 			$condition = ['email' => $user['email'], 'verified' => true, 'blocked' => false, 'parent-uid' => 0];
-			$parent_users = dba::select('user', $fields, $condition);
-			while ($parent = dba::fetch($parent_users)) {
+			$parent_users = DBA::select('user', $fields, $condition);
+			while ($parent = DBA::fetch($parent_users)) {
 				if ($parent['uid'] != local_user()) {
 					$parents[$parent['uid']] = sprintf('%s (%s)', $parent['username'], $parent['nickname']);
 				}

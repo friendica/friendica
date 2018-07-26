@@ -2,15 +2,15 @@
 /**
  * @file mod/suggest.php
  */
+
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-use Friendica\Model\Profile;
 
 function suggest_init(App $a) {
 	if (! local_user()) {
@@ -45,7 +45,7 @@ function suggest_init(App $a) {
 		}
 		// Now check how the user responded to the confirmation query
 		if (!$_REQUEST['canceled']) {
-			dba::insert('gcign', ['uid' => local_user(), 'gcid' => $_GET['ignore']]);
+			DBA::insert('gcign', ['uid' => local_user(), 'gcid' => $_GET['ignore']]);
 		}
 	}
 
@@ -69,7 +69,7 @@ function suggest_content(App $a) {
 
 	$r = GContact::suggestionQuery(local_user());
 
-	if (! DBM::is_result($r)) {
+	if (! DBA::isResult($r)) {
 		$o .= L10n::t('No suggestions available. If this is a new site, please try again in 24 hours.');
 		return $o;
 	}

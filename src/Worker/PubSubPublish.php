@@ -5,17 +5,17 @@
 
 namespace Friendica\Worker;
 
-use Friendica\App;
+use Friendica\BaseObject;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
+use Friendica\Model\PushSubscriber;
 use Friendica\Protocol\OStatus;
 use Friendica\Util\Network;
-use Friendica\Model\PushSubscriber;
-use dba;
 
 require_once 'include/items.php';
 
-class PubSubPublish {
+class PubSubPublish
+{
 	public static function execute($pubsubpublish_id = 0)
 	{
 		if ($pubsubpublish_id == 0) {
@@ -25,11 +25,12 @@ class PubSubPublish {
 		self::publish($pubsubpublish_id);
 	}
 
-	private static function publish($id) {
-		global $a;
+	private static function publish($id)
+	{
+		$a = BaseObject::getApp();
 
-		$subscriber = dba::selectFirst('push_subscriber', [], ['id' => $id]);
-		if (!DBM::is_result($subscriber)) {
+		$subscriber = DBA::selectFirst('push_subscriber', [], ['id' => $id]);
+		if (!DBA::isResult($subscriber)) {
 			return;
 		}
 

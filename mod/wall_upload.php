@@ -12,7 +12,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
 
@@ -30,10 +30,10 @@ function wall_upload_post(App $a, $desktopmode = true)
 				INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`
 				WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0
 				AND `contact`.`self` = 1 LIMIT 1",
-				dbesc($nick)
+				DBA::escape($nick)
 			);
 
-			if (!DBM::is_result($r)) {
+			if (!DBA::isResult($r)) {
 				if ($r_json) {
 					echo json_encode(['error' => L10n::t('Invalid request.')]);
 					killme();
@@ -46,7 +46,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 				INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`
 				WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0
 				AND `contact`.`self` = 1 LIMIT 1",
-				dbesc($user_info['screen_name'])
+				DBA::escape($user_info['screen_name'])
 			);
 		}
 	} else {
@@ -89,7 +89,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}

@@ -9,7 +9,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Util\Network;
 
 class Directory
@@ -48,7 +48,7 @@ class Directory
 				WHERE `contact`.`self` AND `profile`.`net-publish` AND `profile`.`is-default` AND
 					NOT `user`.`account_expired` AND `user`.`verified`");
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r AS $user) {
 				Worker::add(PRIORITY_LOW, 'Directory', $user['url']);
 			}

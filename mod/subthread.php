@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 require_once 'include/security.php';
@@ -25,7 +25,7 @@ function subthread_content(App $a) {
 	$condition = ["`parent` = ? OR `parent-uri` = ? AND `parent` = `id`", $item_id, $item_id];
 	$item = Item::selectFirst([], $condition);
 
-	if (empty($item_id) || !DBM::is_result($item)) {
+	if (empty($item_id) || !DBA::isResult($item)) {
 		logger('subthread: no item ' . $item_id);
 		return;
 	}
@@ -44,7 +44,7 @@ function subthread_content(App $a) {
 			intval($item['contact-id']),
 			intval($item['uid'])
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return;
 		}
 		if (!$r[0]['self']) {
@@ -60,7 +60,7 @@ function subthread_content(App $a) {
 		intval($owner_uid)
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$owner = $r[0];
 	}
 
@@ -84,7 +84,7 @@ function subthread_content(App $a) {
 			intval($owner_uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$contact = $r[0];
 		}
 	}

@@ -6,16 +6,14 @@
  */
 namespace Friendica\Protocol;
 
-use Friendica\Database\DBM;
-use Friendica\Core\System;
-use Friendica\Model\Item;
-use Friendica\Util\Network;
-use Friendica\Content\Text\HTML;
-use Friendica\Util\XML;
-
-use dba;
 use DOMDocument;
 use DOMXPath;
+use Friendica\Content\Text\HTML;
+use Friendica\Core\System;
+use Friendica\Database\DBA;
+use Friendica\Model\Item;
+use Friendica\Util\Network;
+use Friendica\Util\XML;
 
 require_once 'include/dba.php';
 require_once 'include/items.php';
@@ -248,7 +246,7 @@ class Feed {
 				$condition = ["`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
 					$importer["uid"], $item["uri"], NETWORK_FEED, NETWORK_DFRN];
 				$previous = Item::selectFirst(['id'], $condition);
-				if (DBM::is_result($previous)) {
+				if (DBA::isResult($previous)) {
 					logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
 					continue;
 				}

@@ -2,7 +2,7 @@
 
 use Friendica\App;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function msearch_post(App $a) {
 
@@ -15,21 +15,21 @@ function msearch_post(App $a) {
 		killme();
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 AND `user`.`hidewall` = 0 AND MATCH `pub_keywords` AGAINST ('%s') ",
-		dbesc($search)
+		DBA::escape($search)
 	);
 
-	if (DBM::is_result($r))
+	if (DBA::isResult($r))
 		$total = $r[0]['total'];
 
 	$results = [];
 
 	$r = q("SELECT `pub_keywords`, `username`, `nickname`, `user`.`uid` FROM `user` LEFT JOIN `profile` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 AND `user`.`hidewall` = 0 AND MATCH `pub_keywords` AGAINST ('%s') LIMIT %d , %d ",
-		dbesc($search),
+		DBA::escape($search),
 		intval($startrec),
 		intval($perpage)
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach($r as $rr)
 			$results[] = [
 				'name' => $rr['name'],

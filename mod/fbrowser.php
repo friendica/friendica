@@ -8,6 +8,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Database\DBA;
 use Friendica\Object\Image;
 
 /**
@@ -39,8 +40,8 @@ function fbrowser_content(App $a)
 			if ($a->argc==2) {
 				$albums = q("SELECT distinct(`album`) AS `album` FROM `photo` WHERE `uid` = %d AND `album` != '%s' AND `album` != '%s' ",
 					intval(local_user()),
-					dbesc('Contact Photos'),
-					dbesc(L10n::t('Contact Photos'))
+					DBA::escape('Contact Photos'),
+					DBA::escape(L10n::t('Contact Photos'))
 				);
 
 				function _map_folder1($el)
@@ -54,7 +55,7 @@ function fbrowser_content(App $a)
 			$album = "";
 			if ($a->argc==3) {
 				$album = hex2bin($a->argv[2]);
-				$sql_extra = sprintf("AND `album` = '%s' ", dbesc($album));
+				$sql_extra = sprintf("AND `album` = '%s' ", DBA::escape($album));
 				$sql_extra2 = "";
 				$path[]=[$a->argv[2], $album];
 			}
@@ -64,8 +65,8 @@ function fbrowser_content(App $a)
 					FROM `photo` WHERE `uid` = %d $sql_extra AND `album` != '%s' AND `album` != '%s'
 					GROUP BY `resource-id` $sql_extra2",
 				intval(local_user()),
-				dbesc('Contact Photos'),
-				dbesc(L10n::t('Contact Photos'))
+				DBA::escape('Contact Photos'),
+				DBA::escape(L10n::t('Contact Photos'))
 			);
 
 			function _map_files1($rr)
@@ -77,7 +78,7 @@ function fbrowser_content(App $a)
 
 				// Take the largest picture that is smaller or equal 640 pixels
 				$p = q("SELECT `scale` FROM `photo` WHERE `resource-id` = '%s' AND `height` <= 640 AND `width` <= 640 ORDER BY `resource-id`, `scale` LIMIT 1",
-					dbesc($rr['resource-id']));
+					DBA::escape($rr['resource-id']));
 				if ($p) {
 					$scale = $p[0]["scale"];
 				} else {

@@ -12,7 +12,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
@@ -41,10 +41,10 @@ function contacts_init(App $a)
 	$contact = null;
 	if ((($a->argc == 2) && intval($a->argv[1])) || (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts"))) {
 		$contact_id = intval($a->argv[1]);
-		$contact = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
 	}
 
-	if (DBM::is_result($contact)) {
+	if (DBA::isResult($contact)) {
 		if ($contact['self']) {
 			if (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts")) {
 				goaway('profile/' . $contact['nick']);
@@ -180,7 +180,7 @@ function contacts_post(App $a)
 		return;
 	}
 
-	if (!dba::exists('contact', ['id' => $contact_id, 'uid' => local_user()])) {
+	if (!DBA::exists('contact', ['id' => $contact_id, 'uid' => local_user()])) {
 		notice(L10n::t('Could not access contact record.') . EOL);
 		goaway('contacts');
 		return; // NOTREACHED
@@ -190,7 +190,7 @@ function contacts_post(App $a)
 
 	$profile_id = intval($_POST['profile-assign']);
 	if ($profile_id) {
-		if (!dba::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
+		if (!DBA::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
 			notice(L10n::t('Could not locate selected profile.') . EOL);
 			return;
 		}
@@ -216,22 +216,22 @@ function contacts_post(App $a)
 		`ffi_keyword_blacklist` = '%s' WHERE `id` = %d AND `uid` = %d",
 		intval($profile_id),
 		intval($priority),
-		dbesc($info),
+		DBA::escape($info),
 		intval($hidden),
 		intval($notify),
 		intval($fetch_further_information),
-		dbesc($ffi_keyword_blacklist),
+		DBA::escape($ffi_keyword_blacklist),
 		intval($contact_id),
 		intval(local_user())
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		info(L10n::t('Contact updated.') . EOL);
 	} else {
 		notice(L10n::t('Failed to update contact record.') . EOL);
 	}
 
-	$contact = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
-	if (DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+	if (DBA::isResult($contact)) {
 		$a->data['contact'] = $contact;
 	}
 
@@ -242,8 +242,8 @@ function contacts_post(App $a)
 
 function _contact_update($contact_id)
 {
-	$contact = dba::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
-	if (!DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+	if (!DBA::isResult($contact)) {
 		return;
 	}
 
@@ -263,8 +263,8 @@ function _contact_update($contact_id)
 
 function _contact_update_profile($contact_id)
 {
-	$contact = dba::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
-	if (!DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+	if (!DBA::isResult($contact)) {
 		return;
 	}
 
@@ -308,7 +308,7 @@ function _contact_update_profile($contact_id)
 			$query .= ", ";
 		}
 
-		$query .= "`" . $key . "` = '" . dbesc($value) . "'";
+		$query .= "`" . $key . "` = '" . DBA::escape($value) . "'";
 	}
 
 	if ($query == "") {
@@ -335,7 +335,7 @@ function _contact_block($contact_id, $orig_record)
 		intval($contact_id),
 		intval(local_user())
 	);
-	return DBM::is_result($r);
+	return DBA::isResult($r);
 }
 
 function _contact_ignore($contact_id, $orig_record)
@@ -346,7 +346,7 @@ function _contact_ignore($contact_id, $orig_record)
 		intval($contact_id),
 		intval(local_user())
 	);
-	return DBM::is_result($r);
+	return DBA::isResult($r);
 }
 
 function _contact_archive($contact_id, $orig_record)
@@ -357,7 +357,7 @@ function _contact_archive($contact_id, $orig_record)
 		intval($contact_id),
 		intval(local_user())
 	);
-	return DBM::is_result($r);
+	return DBA::isResult($r);
 }
 
 function _contact_drop($orig_record)
@@ -368,7 +368,7 @@ function _contact_drop($orig_record)
 		WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 		intval($a->user['uid'])
 	);
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		return;
 	}
 
@@ -395,8 +395,8 @@ function contacts_content(App $a)
 
 		$cmd = $a->argv[2];
 
-		$orig_record = dba::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user(), 'self' => false]);
-		if (!DBM::is_result($orig_record)) {
+		$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user(), 'self' => false]);
+		if (!DBA::isResult($orig_record)) {
 			notice(L10n::t('Could not access contact record.') . EOL);
 			goaway('contacts');
 			return; // NOTREACHED
@@ -514,18 +514,21 @@ function contacts_content(App $a)
 		$dir_icon = '';
 		$relation_text = '';
 		switch ($contact['rel']) {
-			case CONTACT_IS_FRIEND:
+			case Contact::FRIEND:
 				$dir_icon = 'images/lrarrow.gif';
 				$relation_text = L10n::t('You are mutual friends with %s');
 				break;
-			case CONTACT_IS_FOLLOWER;
+
+			case Contact::FOLLOWER;
 				$dir_icon = 'images/larrow.gif';
 				$relation_text = L10n::t('You are sharing with %s');
 				break;
-			case CONTACT_IS_SHARING;
+
+			case Contact::SHARING;
 				$dir_icon = 'images/rarrow.gif';
 				$relation_text = L10n::t('%s is sharing with you');
 				break;
+
 			default:
 				break;
 		}
@@ -590,10 +593,10 @@ function contacts_content(App $a)
 		$follow = '';
 		$follow_text = '';
 		if (in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
-			if ($contact['rel'] == CONTACT_IS_FOLLOWER) {
+			if ($contact['rel'] == Contact::FOLLOWER) {
 				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Connect/Follow");
-			} elseif ($contact['rel'] == CONTACT_IS_FRIEND) {
+			} elseif ($contact['rel'] == Contact::FRIEND) {
 				$follow = System::baseUrl(true) . "/unfollow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Disconnect/Unfollow");
 			}
@@ -773,21 +776,21 @@ function contacts_content(App $a)
 	if ($search) {
 		$searching = true;
 		$search_hdr = $search;
-		$search_txt = dbesc(protect_sprintf(preg_quote($search)));
+		$search_txt = DBA::escape(protect_sprintf(preg_quote($search)));
 		$sql_extra .= " AND (name REGEXP '$search_txt' OR url REGEXP '$search_txt'  OR nick REGEXP '$search_txt') ";
 	}
 
 	if ($nets) {
-		$sql_extra .= sprintf(" AND network = '%s' ", dbesc($nets));
+		$sql_extra .= sprintf(" AND network = '%s' ", DBA::escape($nets));
 	}
 
-	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= CONTACT_IS_FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
+	$sql_extra2 = ((($sort_type > 0) && ($sort_type <= Contact::FRIEND)) ? sprintf(" AND `rel` = %d ", intval($sort_type)) : '');
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 		WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
 		intval($_SESSION['uid'])
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$a->set_pager_total($r[0]['total']);
 		$total = $r[0]['total'];
 	}
@@ -801,7 +804,7 @@ function contacts_content(App $a)
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$contacts[] = _contact_detail_for_template($rr);
 		}
@@ -905,12 +908,13 @@ function contacts_tab($a, $contact_id, $active_tab)
 	return $tab_str;
 }
 
-function contact_posts($a, $contact_id)
+function contact_posts(App $a, $contact_id)
 {
 	$o = contacts_tab($a, $contact_id, 1);
 
-	$contact = dba::selectFirst('contact', ['url'], ['id' => $contact_id]);
-	if (DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id]);
+
+	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
 		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 		$o .= Contact::getPostsFromUrl($contact["url"]);
@@ -919,28 +923,33 @@ function contact_posts($a, $contact_id)
 	return $o;
 }
 
-function _contact_detail_for_template($rr)
+function _contact_detail_for_template(array $rr)
 {
 	$dir_icon = '';
 	$alt_text = '';
+
 	switch ($rr['rel']) {
-		case CONTACT_IS_FRIEND:
+		case Contact::FRIEND:
 			$dir_icon = 'images/lrarrow.gif';
 			$alt_text = L10n::t('Mutual Friendship');
 			break;
-		case CONTACT_IS_FOLLOWER;
+
+		case Contact::FOLLOWER;
 			$dir_icon = 'images/larrow.gif';
 			$alt_text = L10n::t('is a fan of yours');
 			break;
-		case CONTACT_IS_SHARING;
+
+		case Contact::SHARING;
 			$dir_icon = 'images/rarrow.gif';
 			$alt_text = L10n::t('you are a fan of');
 			break;
+
 		default:
 			break;
 	}
 
 	$url = Contact::magicLink($rr['url']);
+
 	if (strpos($url, 'redir/') === 0) {
 		$sparkle = ' class="sparkle" ';
 	} else {

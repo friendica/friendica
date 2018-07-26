@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function openid_content(App $a) {
 
@@ -41,10 +41,10 @@ function openid_content(App $a) {
 				AND `blocked` = 0 AND `account_expired` = 0
 				AND `account_removed` = 0 AND `verified` = 1
 				LIMIT 1",
-				dbesc($authid), dbesc(normalise_openid($authid))
+				DBA::escape($authid), DBA::escape(normalise_openid($authid))
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 
 				// successful OpenID login
 
@@ -62,7 +62,7 @@ function openid_content(App $a) {
 			// Successful OpenID login - but we can't match it to an existing account.
 			// New registration?
 
-			if ($a->config['register_policy'] == REGISTER_CLOSED) {
+			if (intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED) {
 				notice(L10n::t('Account not found and OpenID registration is not permitted on this site.') . EOL);
 				goaway(System::baseUrl());
 			}

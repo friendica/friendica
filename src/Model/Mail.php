@@ -8,10 +8,9 @@ namespace Friendica\Model;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -40,8 +39,8 @@ class Mail
 			$subject = L10n::t('[no subject]');
 		}
 
-		$me = dba::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
-		$contact = dba::selectFirst('contact', [], ['id' => $recipient, 'uid' => local_user()]);
+		$me = DBA::selectFirst('contact', [], ['uid' => local_user(), 'self' => true]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $recipient, 'uid' => local_user()]);
 
 		if (!(count($me) && (count($contact)))) {
 			return -2;
@@ -59,10 +58,10 @@ class Mail
 			$reply = true;
 			$r = q("SELECT `convid` FROM `mail` WHERE `uid` = %d AND (`uri` = '%s' OR `parent-uri` = '%s') LIMIT 1",
 				intval(local_user()),
-				dbesc($replyto),
-				dbesc($replyto)
+				DBA::escape($replyto),
+				DBA::escape($replyto)
 			);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$convid = $r[0]['convid'];
 			}
 		}
@@ -84,8 +83,8 @@ class Mail
 			$fields = ['uid' => local_user(), 'guid' => $conv_guid, 'creator' => $sender_handle,
 				'created' => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
 				'subject' => $subject, 'recips' => $handles];
-			if (dba::insert('conv', $fields)) {
-				$convid = dba::lastInsertId();
+			if (DBA::insert('conv', $fields)) {
+				$convid = DBA::lastInsertId();
 			}
 		}
 
@@ -99,7 +98,7 @@ class Mail
 		}
 
 		$post_id = null;
-		$success = dba::insert(
+		$success = DBA::insert(
 			'mail',
 			[
 				'uid' => local_user(),
@@ -121,7 +120,7 @@ class Mail
 		);
 
 		if ($success) {
-			$post_id = dba::lastInsertId();
+			$post_id = DBA::lastInsertId();
 		}
 
 		/**
@@ -145,7 +144,7 @@ class Mail
 					}
 					$image_uri = substr($image, strrpos($image, '/') + 1);
 					$image_uri = substr($image_uri, 0, strpos($image_uri, '-'));
-					dba::update('photo', ['allow-cid' => '<' . $recipient . '>'], ['resource-id' => $image_uri, 'album' => 'Wall Photos', 'uid' => local_user()]);
+					DBA::update('photo', ['allow-cid' => '<' . $recipient . '>'], ['resource-id' => $image_uri, 'album' => 'Wall Photos', 'uid' => local_user()]);
 				}
 			}
 		}
@@ -198,8 +197,8 @@ class Mail
 		$fields = ['uid' => $recipient['uid'], 'guid' => $conv_guid, 'creator' => $sender_handle,
 			'created' => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
 			'subject' => $subject, 'recips' => $handles];
-		if (dba::insert('conv', $fields)) {
-			$convid = dba::lastInsertId();
+		if (DBA::insert('conv', $fields)) {
+			$convid = DBA::lastInsertId();
 		}
 
 		if (!$convid) {
@@ -207,7 +206,7 @@ class Mail
 			return -4;
 		}
 
-		dba::insert(
+		DBA::insert(
 			'mail',
 			[
 				'uid' => $recipient['uid'],

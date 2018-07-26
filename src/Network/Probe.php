@@ -9,21 +9,20 @@ namespace Friendica\Network;
  * @brief Functions for probing URL
  */
 
-use Friendica\App;
-use Friendica\Core\System;
+use DOMDocument;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
+use Friendica\Core\System;
+use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
 use Friendica\Util\Crypto;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
-use Friendica\Util\DateTimeFormat;
-use dba;
-use DOMXPath;
-use DOMDocument;
+use DomXPath;
 
 require_once 'include/dba.php';
 
@@ -120,7 +119,7 @@ class Probe
 
 		if (!is_object($xrd)) {
 			$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
-			if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+			if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				logger("Probing timeout for ".$url, LOGGER_DEBUG);
 				return false;
 			}
@@ -412,11 +411,11 @@ class Probe
 					}
 				}
 
-				$fields['updated'] = DBM::date();
+				$fields['updated'] = DateTimeFormat::utcNow();
 
 				$condition = ['nurl' => normalise_link($data["url"])];
 
-				$old_fields = dba::selectFirst('gcontact', $fieldnames, $condition);
+				$old_fields = DBA::selectFirst('gcontact', $fieldnames, $condition);
 
 				// When the gcontact doesn't exist, the value "true" will trigger an insert.
 				// In difference to the public contacts we want to have every contact
@@ -429,7 +428,7 @@ class Probe
 					$fields['created'] = DateTimeFormat::utcNow();
 				}
 
-				dba::update('gcontact', $fields, $condition, $old_fields);
+				DBA::update('gcontact', $fields, $condition, $old_fields);
 
 				$fields = ['name' => $data['name'],
 						'nick' => $data['nick'],
@@ -449,7 +448,7 @@ class Probe
 						'pubkey' => $data['pubkey'],
 						'priority' => $data['priority'],
 						'writable' => true,
-						'rel' => CONTACT_IS_SHARING];
+						'rel' => Contact::SHARING];
 
 				$fieldnames = [];
 
@@ -467,13 +466,13 @@ class Probe
 				// This won't trigger an insert. This is intended, since we only need
 				// public contacts for everyone we store items from.
 				// We don't need to store every contact on the planet.
-				$old_fields = dba::selectFirst('contact', $fieldnames, $condition);
+				$old_fields = DBA::selectFirst('contact', $fieldnames, $condition);
 
 				$fields['name-date'] = DateTimeFormat::utcNow();
 				$fields['uri-date'] = DateTimeFormat::utcNow();
 				$fields['success_update'] = DateTimeFormat::utcNow();
 
-				dba::update('contact', $fields, $condition, $old_fields);
+				DBA::update('contact', $fields, $condition, $old_fields);
 			}
 		}
 
@@ -732,7 +731,7 @@ class Probe
 		$redirects = 0;
 
 		$ret = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$data = $ret['body'];
@@ -799,7 +798,7 @@ class Probe
 	private static function pollNoscrape($noscrape_url, $data)
 	{
 		$ret = Network::curl($noscrape_url);
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$content = $ret['body'];
@@ -1037,7 +1036,7 @@ class Probe
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
 		$ret = Network::curl($hcard_url);
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$content = $ret['body'];
@@ -1284,7 +1283,7 @@ class Probe
 						}
 					} elseif (normalise_link($pubkey) == 'http://') {
 						$ret = Network::curl($pubkey);
-						if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+						if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 							return false;
 						}
 						$pubkey = $ret['body'];
@@ -1316,7 +1315,7 @@ class Probe
 
 		// Fetch all additional data from the feed
 		$ret = Network::curl($data["poll"]);
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$feed = $ret['body'];
@@ -1526,7 +1525,7 @@ class Probe
 	private static function feed($url, $probe = true)
 	{
 		$ret = Network::curl($url);
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			return false;
 		}
 		$feed = $ret['body'];
@@ -1599,7 +1598,7 @@ class Probe
 
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if (DBM::is_result($x) && DBM::is_result($r)) {
+		if (DBA::isResult($x) && DBA::isResult($r)) {
 			$mailbox = Email::constructMailboxName($r[0]);
 			$password = '';
 			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);

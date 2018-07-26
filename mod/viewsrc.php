@@ -4,7 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 function viewsrc_content(App $a)
@@ -25,7 +25,7 @@ function viewsrc_content(App $a)
 
 	$item = Item::selectFirst(['body'], ['uid' => local_user(), 'id' => $item_id]);
 
-	if (DBM::is_result($item)) {
+	if (DBA::isResult($item)) {
 		if (is_ajax()) {
 			echo str_replace("\n", '<br />', $item['body']);
 			killme();

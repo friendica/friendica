@@ -26,7 +26,7 @@ if (!isset($minimal)) {
 		<script  type="text/javascript">var baseurl = "<?php echo System::baseUrl(); ?>";</script>
 		<script type="text/javascript">var frio = "<?php echo 'view/theme/frio'; ?>";</script>
 <?php
-		$basepath = $a->path ? "/" . $a->path . "/" : "/";
+		$basepath = $a->urlpath ? "/" . $a->urlpath . "/" : "/";
 		$frio = "view/theme/frio";
 
 		// Because we use minimal for modals the header and the included js stuff should be only loaded

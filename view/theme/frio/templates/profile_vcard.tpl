@@ -1,24 +1,25 @@
 <div class="vcard h-card widget">
 
-	{{if $profile.picdate}}
-		<div id="profile-photo-wrapper" class="thumbnail"><a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}?rev={{$profile.picdate}}" alt="{{$profile.name}}" /></a>
-	{{else}}
-		<div id="profile-photo-wrapper" class="thumbnail"><a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" /></a>
-	{{/if}}
-			<div class="tool visible-lg visible-md">
+	<div id="profile-photo-wrapper">
+		{{if $profile.picdate}}
+		<a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}?rev={{$profile.picdate}}" alt="{{$profile.name}}" /></a>
+		{{else}}
+		<a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" /></a>
+		{{/if}}
 
+		<div class="tool visible-lg visible-md">
 			{{if $profile.edit}}
-				<div class="action">
-					<a class="" href="{{$profile.edit.0}}" title="{{$profile.edit.3}}"><i class="fa fa-pencil-square-o"></i></a>
-				</div>
+			<div class="action">
+				<a class="" href="{{$profile.edit.0}}" title="{{$profile.edit.3}}"><i class="fa fa-pencil-square-o"></i></a>
+			</div>
 			{{else}}
 				{{if $profile.menu}}
-					<div class="profile-edit-side-div"><a class="profile-edit-side-link icon edit" title="{{$editprofile}}" href="profiles" ></a></div>
+				<div class="profile-edit-side-div"><a class="profile-edit-side-link icon edit" title="{{$editprofile}}" href="profiles" ></a></div>
 				{{/if}}
 			{{/if}}
-			</div>
-
 		</div>
+
+	</div>
 
 	{{* The short information which will appended to the second navbar by scrollspy *}}
 	<div id="vcard-short-info-wrapper" style="display: none;">
@@ -36,7 +37,7 @@
 
 	<div class="panel-body">
 		<div class="profile-header">
-			<div class="fn p-name">{{$profile.name}}</div>
+			<h3 class="fn p-name">{{$profile.name}}</h3>
 
 			{{if $profile.addr}}<div class="p-addr">{{$profile.addr}}</div>{{/if}}
 
@@ -44,54 +45,53 @@
 		</div>
 
 		<div id="profile-extra-links">
-				{{if $connect}}
-					<div id="dfrn-request-link-button">
-					{{if $remoteconnect}}
-						<a id="dfrn-request-link" class="btn btn-primary btn-sm" href="{{$remoteconnect}}">
-							<span class=""><i class="fa fa-user-plus"></i></span>
-							<span class="">{{$connect}}</span>
-						</a>
-					{{else}}
-						<a id="dfrn-request-link" class="btn btn-labeled btn-primary btn-sm" href="dfrn_request/{{$profile.nickname}}">
-							<span class=""><i class="fa fa-user-plus"></i></span>
-							<span class="">{{$connect}}</span>
-						</a>
-					{{/if}}
-					</div>
+			{{if $connect}}
+			<div id="dfrn-request-link-button">
+				{{if $remoteconnect}}
+				<a id="dfrn-request-link" class="btn btn-primary btn-sm" href="{{$remoteconnect}}">
+					<span class=""><i class="fa fa-user-plus"></i></span>
+					<span class="">{{$connect}}</span>
+				</a>
+				{{else}}
+				<a id="dfrn-request-link" class="btn btn-labeled btn-primary btn-sm" href="dfrn_request/{{$profile.nickname}}">
+					<span class=""><i class="fa fa-user-plus"></i></span>
+					<span class="">{{$connect}}</span>
+				</a>
 				{{/if}}
-				{{if $wallmessage}}
-				<div id="wallmessage-link-botton">
-					<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary btn-sm" onclick="openWallMessage('{{$wallmessage_link}}')">
-						<span class=""><i class="fa fa-envelope"></i></span>
-						<span class="">{{$wallmessage}}</span>
-					</button>
-				</div>
-				{{/if}}
-
+			</div>
+			{{/if}}
+			{{if $wallmessage}}
+			<div id="wallmessage-link-botton">
+				<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary btn-sm" onclick="openWallMessage('{{$wallmessage_link}}')">
+					<span class=""><i class="fa fa-envelope"></i></span>
+					<span class="">{{$wallmessage}}</span>
+				</button>
+			</div>
+			{{/if}}
 		</div>
 
 		<div class="clear"></div>
 
 		{{if $location}}
-			<div class="location detail">
-				<span class="location-label icon"><i class="fa fa-map-marker"></i></span>
-				<span class="adr">
-					{{if $profile.address}}<span class="street-address p-street-address">{{$profile.address}}</span>{{/if}}
-					<span class="city-state-zip">
-						<span class="locality p-locality">{{$profile.locality}}</span>{{if $profile.locality}}, {{/if}}
-						<span class="region p-region">{{$profile.region}}</span>
-						<span class="postal-code p-postal-code">{{$profile.postal_code}}</span>
-					</span>
-					{{if $profile.country_name}}<span class="country-name p-country-name">{{$profile.country_name}}</span>{{/if}}
+		<div class="location detail">
+			<span class="location-label icon"><i class="fa fa-map-marker"></i></span>
+			<span class="adr">
+				{{if $profile.address}}<span class="street-address p-street-address">{{$profile.address}}</span>{{/if}}
+				<span class="city-state-zip">
+					<span class="locality p-locality">{{$profile.locality}}</span>{{if $profile.locality}}, {{/if}}
+					<span class="region p-region">{{$profile.region}}</span>
+					<span class="postal-code p-postal-code">{{$profile.postal_code}}</span>
 				</span>
-			</div>
+				{{if $profile.country_name}}<span class="country-name p-country-name">{{$profile.country_name}}</span>{{/if}}
+			</span>
+		</div>
 		{{/if}}
 
 		{{if $profile.xmpp}}
-			<div class="xmpp">
-				<span class="xmpp-label icon"><i class="fa fa-comments"></i></span>
-				<span class="xmpp-data">{{$profile.xmpp}}</span>
-			</div>
+		<div class="xmpp">
+			<span class="xmpp-label icon"><i class="fa fa-comments"></i></span>
+			<span class="xmpp-data">{{$profile.xmpp}}</span>
+		</div>
 		{{/if}}
 
 		{{if $gender}}
@@ -125,7 +125,6 @@
 
 		{{include file="diaspora_vcard.tpl"}}
 	</div>
-
 </div>
 
 {{if $contact_block}}

@@ -8,18 +8,23 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
+use Friendica\Database\DBA;
+
+// Get options
+$shortopts = 'f';
+$longopts = ['foreground'];
+$options = getopt($shortopts, $longopts);
 
 // Ensure that daemon.php is executed from the base path of the installation
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
 	if (substr($directory, 0, 1) != "/") {
-		$directory = $_SERVER["PWD"]."/".$directory;
+		$directory = $_SERVER["PWD"] . "/" . $directory;
 	}
-	$directory = realpath($directory."/..");
+	$directory = realpath($directory . "/..");
 
 	chdir($directory);
 }
@@ -28,17 +33,20 @@ require_once "boot.php";
 require_once "include/dba.php";
 
 $a = new App(dirname(__DIR__));
-BaseObject::setApp($a);
 
-require_once ".htconfig.php";
-dba::connect($db_host, $db_user, $db_pass, $db_data);
+if ($a->isInstallMode()) {
+	die("Friendica isn't properly installed yet.\n");
+}
 
 Config::load();
 
-if (!isset($pidfile)) {
-	die('Please specify a pid file in the variable $pidfile in the .htconfig.php. For example:'."\n".
-		'$pidfile = "/path/to/daemon.pid";'."\n");
+if (empty(Config::get('system', 'pidfile'))) {
+	die('Please set system.pidfile in config/local.ini.php. For example:'."\n".
+		'[system]'."\n".
+		'pidfile = /path/to/daemon.pid'."\n");
 }
+
+$pidfile = Config::get('system', 'pidfile');
 
 if (in_array("start", $_SERVER["argv"])) {
 	$mode = "start";
@@ -52,7 +60,7 @@ if (in_array("status", $_SERVER["argv"])) {
 	$mode = "status";
 }
 
-$foreground = in_array("--foreground", $_SERVER["argv"]);
+$foreground = array_key_exists('f', $options) || array_key_exists('foreground', $options);
 
 if (!isset($mode)) {
 	die("Please use either 'start', 'stop' or 'status'.\n");
@@ -62,7 +70,11 @@ if (empty($_SERVER["argv"][0])) {
 	die("Unexpected script behaviour. This message should never occur.\n");
 }
 
-$pid = @file_get_contents($pidfile);
+$pid = null;
+
+if (is_readable($pidfile)) {
+	$pid = intval(file_get_contents($pidfile));
+}
 
 if (empty($pid) && in_array($mode, ["stop", "status"])) {
 	Config::set('system', 'worker_daemon_mode', false);
@@ -111,7 +123,7 @@ if (!$foreground) {
 	// fclose(STDOUT); // file descriptors as we
 	// fclose(STDERR); // are running as a daemon.
 
-	dba::disconnect();
+	DBA::disconnect();
 
 	register_shutdown_function('shutdown');
 
@@ -127,10 +139,8 @@ if (!$foreground) {
 	file_put_contents($pidfile, $pid);
 
 	// We lose the database connection upon forking
-	dba::connect($db_host, $db_user, $db_pass, $db_data);
+	$a->loadDatabase();
 }
-
-unset($db_host, $db_user, $db_pass, $db_data);
 
 Config::set('system', 'worker_daemon_mode', true);
 
@@ -154,7 +164,7 @@ while (true) {
 	if ($do_cron) {
 		// We force a reconnect of the database connection.
 		// This is done to ensure that the connection don't get lost over time.
-		dba::reconnect();
+		DBA::reconnect();
 
 		$last_cron = time();
 	}

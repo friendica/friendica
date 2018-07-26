@@ -9,7 +9,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Feed;
@@ -263,9 +263,9 @@ function consume_feed($xml, $importer, $contact, &$hub, $datedir = 0, $pass = 0)
 			FROM `contact`
 			LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
 			WHERE `contact`.`id` = %d AND `user`.`uid` = %d",
-			dbesc($contact["id"]), dbesc($importer["uid"])
+			DBA::escape($contact["id"]), DBA::escape($importer["uid"])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			logger("Now import the DFRN feed");
 			DFRN::import($xml, $r[0], true);
 			return;
@@ -289,7 +289,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 	 * through the direct Diaspora protocol. If we try and use
 	 * the feed, we'll get duplicates. So don't.
 	 */
-	if ((!DBM::is_result($r)) || $contact['network'] === NETWORK_DIASPORA) {
+	if ((!DBA::isResult($r)) || $contact['network'] === NETWORK_DIASPORA) {
 		return;
 	}
 
@@ -303,7 +303,7 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 	logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
 
 	if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
-		dba::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
+		DBA::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
 	}
 
 	Network::post($url, $params);
@@ -340,7 +340,7 @@ function drop_item($id) {
 	$fields = ['id', 'uid', 'contact-id', 'deleted'];
 	$item = Item::selectFirstForUser(local_user(), $fields, ['id' => $id]);
 
-	if (!DBM::is_result($item)) {
+	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
 		goaway(System::baseUrl() . '/' . $_SESSION['return_url']);
 	}
@@ -461,7 +461,7 @@ function posted_date_widget($url, $uid, $wall) {
 
 	$ret = list_post_dates($uid, $wall);
 
-	if (!DBM::is_result($ret)) {
+	if (!DBA::isResult($ret)) {
 		return $o;
 	}
 

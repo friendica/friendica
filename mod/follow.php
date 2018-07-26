@@ -9,7 +9,7 @@ use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function follow_post(App $a)
 {
@@ -19,7 +19,7 @@ function follow_post(App $a)
 		// NOTREACHED
 	}
 
-	if ($_REQUEST['cancel']) {
+	if (isset($_REQUEST['cancel'])) {
 		goaway($_SESSION['return_url']);
 	}
 
@@ -65,8 +65,8 @@ function follow_content(App $a)
 	$r = q("SELECT `pending` FROM `contact` WHERE `uid` = %d AND ((`rel` != %d) OR (`network` = '%s')) AND
 		(`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s') AND
 		`network` != '%s' LIMIT 1",
-		intval(local_user()), dbesc(CONTACT_IS_FOLLOWER), dbesc(NETWORK_DFRN), dbesc(normalise_link($url)),
-		dbesc(normalise_link($url)), dbesc($url), dbesc(NETWORK_STATUSNET));
+		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(NETWORK_DFRN), DBA::escape(normalise_link($url)),
+		DBA::escape(normalise_link($url)), DBA::escape($url), DBA::escape(NETWORK_STATUSNET));
 
 	if ($r) {
 		if ($r[0]['pending']) {
@@ -104,7 +104,7 @@ function follow_content(App $a)
 		$ret['url'] = $ret['addr'];
 	}
 
-	if (($ret['network'] === NETWORK_DFRN) && !DBM::is_result($r)) {
+	if (($ret['network'] === NETWORK_DFRN) && !DBA::isResult($r)) {
 		$request = $ret['request'];
 		$tpl = get_markup_template('dfrn_request.tpl');
 	} else {
@@ -166,10 +166,13 @@ function follow_content(App $a)
 		'$url_label'     => L10n::t('Profile URL'),
 		'$myaddr'        => $myaddr,
 		'$request'       => $request,
-		/*'$location'      => Friendica\Content\Text\BBCode::::convert($r[0]['location']),
+		/*
+		 * @TODO commented out?
+		'$location'      => Friendica\Content\Text\BBCode::::convert($r[0]['location']),
 		'$location_label'=> L10n::t('Location:'),
 		'$about'         => Friendica\Content\Text\BBCode::::convert($r[0]['about'], false, false),
-		'$about_label'   => L10n::t('About:'),*/
+		'$about_label'   => L10n::t('About:'),
+		*/
 		'$keywords'      => $r[0]['keywords'],
 		'$keywords_label'=> L10n::t('Tags:')
 	]);

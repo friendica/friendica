@@ -11,7 +11,7 @@ use Friendica\Core\UserImport;
 
 function uimport_post(App $a)
 {
-	switch ($a->config['register_policy']) {
+	switch (Config::get('config', 'register_policy')) {
 		case REGISTER_OPEN:
 			$blocked = 0;
 			$verified = 1;
@@ -42,7 +42,7 @@ function uimport_post(App $a)
 
 function uimport_content(App $a) {
 
-	if ((!local_user()) && ($a->config['register_policy'] == REGISTER_CLOSED)) {
+	if ((!local_user()) && (intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED)) {
 		notice("Permission denied." . EOL);
 		return;
 	}

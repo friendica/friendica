@@ -6,16 +6,13 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
-use Friendica\Util\Crypto;
-use Friendica\Util\HTTPHeaders;
-use dba;
+use Friendica\Database\DBA;
 
 /**
  * @brief Implements HTTP Signatures per draft-cavage-http-signatures-07.
  *
  * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/Zotlabs/Web/HTTPSig.php
- * 
+ *
  * @see https://tools.ietf.org/html/draft-cavage-http-signatures-07
  */
 
@@ -26,13 +23,13 @@ class HTTPSignature
 	 *
 	 * Disabled until Friendica's ActivityPub implementation
 	 * is ready.
-	 * 
+	 *
 	 * @see https://tools.ietf.org/html/rfc5843
 	 *
 	 * @param string  $body The value to create the digest for
 	 * @param boolean $set  (optional, default true)
 	 *   If set send a Digest HTTP header
-	 * 
+	 *
 	 * @return string The generated digest of $body
 	 */
 //	public static function generateDigest($body, $set = true)
@@ -174,19 +171,19 @@ class HTTPSignature
 
 	/**
 	 * Fetch the public key for Activity Pub contact.
-	 * 
+	 *
 	 * @param string|int The identifier (contact addr or contact ID).
 	 * @return string|boolean The public key or false on failure.
 	 */
 	private static function getActivitypubKey($id)
 	{
 		if (strpos($id, 'acct:') === 0) {
-			$contact = dba::selectFirst('contact', ['pubkey'], ['uid' => 0, 'addr' => str_replace('acct:', '', $id)]);
+			$contact = DBA::selectFirst('contact', ['pubkey'], ['uid' => 0, 'addr' => str_replace('acct:', '', $id)]);
 		} else {
-			$contact = dba::selectFirst('contact', ['pubkey'], ['id' => $id, 'network' => 'activitypub']);
+			$contact = DBA::selectFirst('contact', ['pubkey'], ['id' => $id, 'network' => 'activitypub']);
 		}
 
-		if (DBM::is_result($contact)) {
+		if (DBA::isResult($contact)) {
 			return $contact['pubkey'];
 		}
 
@@ -222,7 +219,7 @@ class HTTPSignature
 	 * @param string  $alg (optional, default 'sha256')
 	 * @param string  $crypt_key (optional, default null)
 	 * @param string  $crypt_algo (optional, default 'aes256ctr')
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function createSig($request, $head, $prvkey, $keyid = 'Key', $send_headers = false, $auth = false, $alg = 'sha256', $crypt_key = null, $crypt_algo = 'aes256ctr')
@@ -285,7 +282,7 @@ class HTTPSignature
 	 * @param array  $head
 	 * @param string $prvkey
 	 * @param string $alg (optional) default 'sha256'
-	 * 
+	 *
 	 * @return array
 	 */
 	private static function sign($request, $head, $prvkey, $alg = 'sha256')
@@ -315,7 +312,7 @@ class HTTPSignature
 
 		$ret['headers']   = $fields;
 		$ret['signature'] = $sig;
-	
+
 		return $ret;
 	}
 
@@ -367,7 +364,7 @@ class HTTPSignature
 	 *
 	 * @param string $header
 	 * @param string $prvkey (optional), if not set use site private key
-	 * 
+	 *
 	 * @return array|string associative array, empty string if failue
 	 *   - \e string \b iv
 	 *   - \e string \b key

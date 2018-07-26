@@ -14,7 +14,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
@@ -26,14 +26,12 @@ use Friendica\Util\Temporal;
 function get_theme_config_file($theme)
 {
 	$a = get_app();
-	if (!empty($a->theme_info['extends'])) {
-		$base_theme = $a->theme_info['extends'];
-	}
+	$base_theme = defaults($a->theme_info, 'extends');
 
 	if (file_exists("view/theme/$theme/config.php")) {
 		return "view/theme/$theme/config.php";
 	}
-	if (!empty($base_theme) && file_exists("view/theme/$base_theme/config.php")) {
+	if ($base_theme && file_exists("view/theme/$base_theme/config.php")) {
 		return "view/theme/$base_theme/config.php";
 	}
 	return null;
@@ -60,6 +58,13 @@ function settings_init(App $a)
 			'selected'	=>  (($a->argc == 1) && ($a->argv[0] === 'settings')?'active':''),
 			'accesskey' => 'o',
 		],
+	];
+
+	$tabs[] =	[
+		'label'	=> L10n::t('Profiles'),
+		'url' 	=> 'profiles',
+		'selected'	=> (($a->argc == 1) && ($a->argv[0] === 'profiles')?'active':''),
+		'accesskey' => 'p',
 	];
 
 	if (Feature::get()) {
@@ -151,7 +156,7 @@ function settings_post(App $a)
 		check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth');
 
 		$key = $_POST['remove'];
-		dba::delete('tokens', ['id' => $key, 'uid' => local_user()]);
+		DBA::delete('tokens', ['id' => $key, 'uid' => local_user()]);
 		goaway(System::baseUrl(true)."/settings/oauth/");
 		return;
 	}
@@ -177,23 +182,23 @@ function settings_post(App $a)
 							icon='%s',
 							uid=%d
 						WHERE client_id='%s'",
-					dbesc($key),
-					dbesc($secret),
-					dbesc($name),
-					dbesc($redirect),
-					dbesc($icon),
+					DBA::escape($key),
+					DBA::escape($secret),
+					DBA::escape($name),
+					DBA::escape($redirect),
+					DBA::escape($icon),
 					local_user(),
-					dbesc($key)
+					DBA::escape($key)
 				);
 			} else {
 				q("INSERT INTO clients
 							(client_id, pw, name, redirect_uri, icon, uid)
 						VALUES ('%s', '%s', '%s', '%s', '%s',%d)",
-					dbesc($key),
-					dbesc($secret),
-					dbesc($name),
-					dbesc($redirect),
-					dbesc($icon),
+					DBA::escape($key),
+					DBA::escape($secret),
+					DBA::escape($name),
+					DBA::escape($redirect),
+					DBA::escape($icon),
 					local_user()
 				);
 			}
@@ -241,24 +246,24 @@ function settings_post(App $a)
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
 				);
-				if (!DBM::is_result($r)) {
-					dba::insert('mailacct', ['uid' => local_user()]);
+				if (!DBA::isResult($r)) {
+					DBA::insert('mailacct', ['uid' => local_user()]);
 				}
 				if (strlen($mail_pass)) {
 					$pass = '';
 					openssl_public_encrypt($mail_pass, $pass, $a->user['pubkey']);
-					dba::update('mailacct', ['pass' => bin2hex($pass)], ['uid' => local_user()]);
+					DBA::update('mailacct', ['pass' => bin2hex($pass)], ['uid' => local_user()]);
 				}
 				$r = q("UPDATE `mailacct` SET `server` = '%s', `port` = %d, `ssltype` = '%s', `user` = '%s',
 					`action` = %d, `movetofolder` = '%s',
 					`mailbox` = 'INBOX', `reply_to` = '%s', `pubmail` = %d WHERE `uid` = %d",
-					dbesc($mail_server),
+					DBA::escape($mail_server),
 					intval($mail_port),
-					dbesc($mail_ssl),
-					dbesc($mail_user),
+					DBA::escape($mail_ssl),
+					DBA::escape($mail_user),
 					intval($mail_action),
-					dbesc($mail_movetofolder),
-					dbesc($mail_replyto),
+					DBA::escape($mail_movetofolder),
+					DBA::escape($mail_replyto),
 					intval($mail_pubmail),
 					intval(local_user())
 				);
@@ -266,7 +271,7 @@ function settings_post(App $a)
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$eacct = $r[0];
 					$mb = Email::constructMailboxName($eacct);
 
@@ -358,7 +363,7 @@ function settings_post(App $a)
 		Theme::install($theme);
 
 		$r = q("UPDATE `user` SET `theme` = '%s' WHERE `uid` = %d",
-				dbesc($theme),
+				DBA::escape($theme),
 				intval(local_user())
 		);
 
@@ -405,7 +410,7 @@ function settings_post(App $a)
 
 		if (!$err) {
 			$result = User::updatePassword(local_user(), $newpass);
-			if (DBM::is_result($result)) {
+			if (DBA::isResult($result)) {
 				info(L10n::t('Password changed.') . EOL);
 			} else {
 				notice(L10n::t('Password update failed. Please try again.') . EOL);
@@ -511,9 +516,8 @@ function settings_post(App $a)
 			$err .= L10n::t('Invalid email.');
 		}
 		//  ensure new email is not the admin mail
-		//if ((x($a->config, 'admin_email')) && (strcasecmp($email, $a->config['admin_email']) == 0)) {
-		if (x($a->config, 'admin_email')) {
-			$adminlist = explode(",", str_replace(" ", "", strtolower($a->config['admin_email'])));
+		if (Config::get('config', 'admin_email')) {
+			$adminlist = explode(",", str_replace(" ", "", strtolower(Config::get('config', 'admin_email'))));
 			if (in_array(strtolower($email), $adminlist)) {
 				$err .= L10n::t('Cannot change to that email.');
 				$email = $a->user['email'];
@@ -530,10 +534,10 @@ function settings_post(App $a)
 		date_default_timezone_set($timezone);
 	}
 
-	$str_group_allow   = perms2str($_POST['group_allow']);
-	$str_contact_allow = perms2str($_POST['contact_allow']);
-	$str_group_deny    = perms2str($_POST['group_deny']);
-	$str_contact_deny  = perms2str($_POST['contact_deny']);
+	$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
+	$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
+	$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
+	$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 	$openidserver = $a->user['openidserver'];
 	//$openid = normalise_openid($openid);
@@ -582,32 +586,32 @@ function settings_post(App $a)
 				`def_gid` = %d, `blockwall` = %d, `hidewall` = %d, `blocktags` = %d,
 				`unkmail` = %d, `cntunkmail` = %d, `language` = '%s'
 			WHERE `uid` = %d",
-			dbesc($username),
-			dbesc($email),
-			dbesc($openid),
-			dbesc($timezone),
-			dbesc($str_contact_allow),
-			dbesc($str_group_allow),
-			dbesc($str_contact_deny),
-			dbesc($str_group_deny),
+			DBA::escape($username),
+			DBA::escape($email),
+			DBA::escape($openid),
+			DBA::escape($timezone),
+			DBA::escape($str_contact_allow),
+			DBA::escape($str_group_allow),
+			DBA::escape($str_contact_deny),
+			DBA::escape($str_group_deny),
 			intval($notify),
 			intval($page_flags),
 			intval($account_type),
-			dbesc($defloc),
+			DBA::escape($defloc),
 			intval($allow_location),
 			intval($maxreq),
 			intval($expire),
-			dbesc($openidserver),
+			DBA::escape($openidserver),
 			intval($def_gid),
 			intval($blockwall),
 			intval($hidewall),
 			intval($blocktags),
 			intval($unkmail),
 			intval($cntunkmail),
-			dbesc($language),
+			DBA::escape($language),
 			intval(local_user())
 	);
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		info(L10n::t('Settings updated.') . EOL);
 	}
 
@@ -621,7 +625,7 @@ function settings_post(App $a)
 		`hide-friends` = %d
 		WHERE `is-default` = 1 AND `uid` = %d",
 		intval($publish),
-		dbesc($username),
+		DBA::escape($username),
 		intval($net_publish),
 		intval($hide_friends),
 		intval(local_user())
@@ -681,10 +685,10 @@ function settings_content(App $a)
 
 		if (($a->argc > 3) && ($a->argv[2] === 'edit')) {
 			$r = q("SELECT * FROM clients WHERE client_id='%s' AND uid=%d",
-					dbesc($a->argv[3]),
+					DBA::escape($a->argv[3]),
 					local_user());
 
-			if (!DBM::is_result($r)) {
+			if (!DBA::isResult($r)) {
 				notice(L10n::t("You can't edit this application."));
 				return;
 			}
@@ -708,12 +712,12 @@ function settings_content(App $a)
 		if (($a->argc > 3) && ($a->argv[2] === 'delete')) {
 			check_form_security_token_redirectOnErr('/settings/oauth', 'settings_oauth', 't');
 
-			dba::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
+			DBA::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
 			goaway(System::baseUrl(true)."/settings/oauth/");
 			return;
 		}
 
-		/// @TODO validate result with DBM::is_result()
+		/// @TODO validate result with DBA::isResult()
 		$r = q("SELECT clients.*, tokens.id as oauth_token, (clients.uid=%d) AS my
 				FROM clients
 				LEFT JOIN tokens ON clients.client_id=tokens.client_id
@@ -742,7 +746,7 @@ function settings_content(App $a)
 		$settings_addons = "";
 
 		$r = q("SELECT * FROM `hook` WHERE `hook` = 'addon_settings' ");
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			$settings_addons = L10n::t('No Addon settings configured');
 		}
 
@@ -815,15 +819,15 @@ function settings_content(App $a)
 			$r = null;
 		}
 
-		$mail_server       = ((DBM::is_result($r)) ? $r[0]['server'] : '');
-		$mail_port         = ((DBM::is_result($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
-		$mail_ssl          = ((DBM::is_result($r)) ? $r[0]['ssltype'] : '');
-		$mail_user         = ((DBM::is_result($r)) ? $r[0]['user'] : '');
-		$mail_replyto      = ((DBM::is_result($r)) ? $r[0]['reply_to'] : '');
-		$mail_pubmail      = ((DBM::is_result($r)) ? $r[0]['pubmail'] : 0);
-		$mail_action       = ((DBM::is_result($r)) ? $r[0]['action'] : 0);
-		$mail_movetofolder = ((DBM::is_result($r)) ? $r[0]['movetofolder'] : '');
-		$mail_chk          = ((DBM::is_result($r)) ? $r[0]['last_check'] : NULL_DATE);
+		$mail_server       = ((DBA::isResult($r)) ? $r[0]['server'] : '');
+		$mail_port         = ((DBA::isResult($r) && intval($r[0]['port'])) ? intval($r[0]['port']) : '');
+		$mail_ssl          = ((DBA::isResult($r)) ? $r[0]['ssltype'] : '');
+		$mail_user         = ((DBA::isResult($r)) ? $r[0]['user'] : '');
+		$mail_replyto      = ((DBA::isResult($r)) ? $r[0]['reply_to'] : '');
+		$mail_pubmail      = ((DBA::isResult($r)) ? $r[0]['pubmail'] : 0);
+		$mail_action       = ((DBA::isResult($r)) ? $r[0]['action'] : 0);
+		$mail_movetofolder = ((DBA::isResult($r)) ? $r[0]['movetofolder'] : '');
+		$mail_chk          = ((DBA::isResult($r)) ? $r[0]['last_check'] : NULL_DATE);
 
 
 		$tpl = get_markup_template('settings/connectors.tpl');
@@ -991,8 +995,8 @@ function settings_content(App $a)
 	 * ACCOUNT SETTINGS
 	 */
 
-	$profile = dba::selectFirst('profile', [], ['is-default' => true, 'uid' => local_user()]);
-	if (!DBM::is_result($profile)) {
+	$profile = DBA::selectFirst('profile', [], ['is-default' => true, 'uid' => local_user()]);
+	if (!DBA::isResult($profile)) {
 		notice(L10n::t('Unable to find your profile. Please contact your admin.') . EOL);
 		return;
 	}

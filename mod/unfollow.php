@@ -2,10 +2,11 @@
 /**
  * @file mod/unfollow.php
  */
+
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 
@@ -26,11 +27,11 @@ function unfollow_post(App $a)
 	$return_url = $_SESSION['return_url'];
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
-			$uid, CONTACT_IS_FRIEND, normalise_link($url),
+			$uid, Contact::FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
-	$contact = dba::selectFirst('contact', [], $condition);
+	$contact = DBA::selectFirst('contact', [], $condition);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		notice(L10n::t("Contact wasn't found or can't be unfollowed."));
 	} else {
 		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN])) {
@@ -38,11 +39,11 @@ function unfollow_post(App $a)
 				WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($uid)
 			);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				Contact::terminateFriendship($r[0], $contact);
 			}
 		}
-		dba::update('contact', ['rel' => CONTACT_IS_FOLLOWER], ['id' => $contact['id']]);
+		DBA::update('contact', ['rel' => Contact::FOLLOWER], ['id' => $contact['id']]);
 
 		info(L10n::t('Contact unfollowed').EOL);
 		goaway(System::baseUrl().'/contacts/'.$contact['id']);
@@ -65,11 +66,11 @@ function unfollow_content(App $a)
 	$submit = L10n::t('Submit Request');
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
-			local_user(), CONTACT_IS_FRIEND, normalise_link($url),
+			local_user(), Contact::FRIEND, normalise_link($url),
 			normalise_link($url), $url, NETWORK_STATUSNET];
-	$contact = dba::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
+	$contact = DBA::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't a friend of this contact.").EOL);
 		$submit = "";
 		// NOTREACHED

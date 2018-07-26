@@ -4,16 +4,15 @@
  */
 namespace Friendica\Module;
 
+use Exception;
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use dba;
-use Exception;
 use LightOpenID;
 
 require_once 'boot.php';
@@ -43,7 +42,7 @@ class Login extends BaseModule
 			goaway(self::getApp()->get_baseurl());
 		}
 
-		return self::form(self::getApp()->get_baseurl(), $a->config['register_policy'] != REGISTER_CLOSED);
+		return self::form(self::getApp()->get_baseurl(), intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED);
 	}
 
 	public static function post()
@@ -135,7 +134,7 @@ class Login extends BaseModule
 					throw new Exception(L10n::t('Login failed.'));
 				}
 			} else {
-				$record = dba::selectFirst('user', [],
+				$record = DBA::selectFirst('user', [],
 					['uid' => User::getIdFromPasswordAuthentication($username, $password)]
 				);
 			}
@@ -176,7 +175,7 @@ class Login extends BaseModule
 			$data = json_decode($_COOKIE["Friendica"]);
 			if (isset($data->uid)) {
 
-				$user = dba::selectFirst('user', [],
+				$user = DBA::selectFirst('user', [],
 					[
 						'uid'             => $data->uid,
 						'blocked'         => false,
@@ -185,7 +184,7 @@ class Login extends BaseModule
 						'verified'        => true,
 					]
 				);
-				if (DBM::is_result($user)) {
+				if (DBA::isResult($user)) {
 					if ($data->hash != cookie_hash($user)) {
 						logger("Hash for user " . $data->uid . " doesn't fit.");
 						nuke_session();
@@ -215,7 +214,7 @@ class Login extends BaseModule
 				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
 					intval($_SESSION['visitor_id'])
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					self::getApp()->contact = $r[0];
 				}
 			}
@@ -231,7 +230,7 @@ class Login extends BaseModule
 					goaway(self::getApp()->get_baseurl());
 				}
 
-				$user = dba::selectFirst('user', [],
+				$user = DBA::selectFirst('user', [],
 					[
 						'uid'             => $_SESSION['uid'],
 						'blocked'         => false,
@@ -240,7 +239,7 @@ class Login extends BaseModule
 						'verified'        => true,
 					]
 				);
-				if (!DBM::is_result($user)) {
+				if (!DBA::isResult($user)) {
 					nuke_session();
 					goaway(self::getApp()->get_baseurl());
 				}
@@ -266,7 +265,7 @@ class Login extends BaseModule
 	 * @param string $return_url The url relative to the base the user should be sent
 	 *							 back to after login completes
 	 * @param bool $register If $register == true provide a registration link.
-	 *						 This will most always depend on the value of $a->config['register_policy'].
+	 *						 This will most always depend on the value of config.register_policy.
 	 * @param array $hiddens  optional
 	 *
 	 * @return string Returns the complete html for inserting into the page

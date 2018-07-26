@@ -19,6 +19,9 @@ abstract class MemoryCacheTest extends CacheTest
 		}
 	}
 
+	/**
+	 * @small
+	 */
 	function testCompareSet() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -33,6 +36,9 @@ abstract class MemoryCacheTest extends CacheTest
 		$this->assertEquals($newValue, $received, 'Value not overwritten by compareSet');
 	}
 
+	/**
+	 * @small
+	 */
 	function testNegativeCompareSet() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -48,6 +54,9 @@ abstract class MemoryCacheTest extends CacheTest
 		$this->assertEquals($value, $received, 'Value was wrongly overwritten by any other value');
 	}
 
+	/**
+	 * @small
+	 */
 	function testCompareDelete() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -59,6 +68,9 @@ abstract class MemoryCacheTest extends CacheTest
 		$this->assertNull($this->instance->get('value1'), 'Value was not deleted by compareDelete');
 	}
 
+	/**
+	 * @small
+	 */
 	function testNegativeCompareDelete() {
 		$this->assertNull($this->instance->get('value1'));
 
@@ -73,6 +85,9 @@ abstract class MemoryCacheTest extends CacheTest
 		$this->assertNull($this->instance->get('value1'), 'Value was wrongly NOT deleted by compareDelete');
 	}
 
+	/**
+	 * @small
+	 */
 	function testAdd() {
 		$this->assertNull($this->instance->get('value1'));
 

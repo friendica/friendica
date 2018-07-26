@@ -15,16 +15,12 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Model\OpenWebAuthToken;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Temporal;
-use dba;
-
-use InvalidArgumentException;
 
 require_once 'include/dba.php';
 require_once 'mod/proxy.php';
@@ -93,9 +89,9 @@ class Profile
 	 */
 	public static function load(App $a, $nickname, $profile = 0, array $profiledata = [], $show_connect = true)
 	{
-		$user = dba::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
+		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
-		if (!DBM::is_result($user) && empty($profiledata)) {
+		if (!DBA::isResult($user) && empty($profiledata)) {
 			logger('profile error: ' . $a->query_string, LOGGER_DEBUG);
 			notice(L10n::t('Requested account is not available.') . EOL);
 			$a->error = 404;
@@ -106,7 +102,7 @@ class Profile
 			// Add profile data to sidebar
 			$a->page['aside'] .= self::sidebar($profiledata, true, $show_connect);
 
-			if (!DBM::is_result($user)) {
+			if (!DBA::isResult($user)) {
 				return;
 			}
 		}
@@ -138,7 +134,7 @@ class Profile
 		$a->profile['mobile-theme'] = PConfig::get($a->profile['profile_uid'], 'system', 'mobile_theme');
 		$a->profile['network'] = NETWORK_DFRN;
 
-		$a->page['title'] = $a->profile['name'] . ' @ ' . $a->config['sitename'];
+		$a->page['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
 
 		if (!$profiledata && !PConfig::get(local_user(), 'system', 'always_my_theme')) {
 			$_SESSION['theme'] = $a->profile['theme'];
@@ -202,8 +198,8 @@ class Profile
 		if (remote_user() && count($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $uid) {
-					$contact = dba::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
-					if (DBM::is_result($contact)) {
+					$contact = DBA::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
+					if (DBA::isResult($contact)) {
 						$profile_id = $contact['profile-id'];
 					}
 					break;
@@ -214,7 +210,7 @@ class Profile
 		$profile = null;
 
 		if ($profile_id) {
-			$profile = dba::fetch_first(
+			$profile = DBA::fetchFirst(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` AS `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
 					`profile`.`uid` AS `profile_uid`, `profile`.*,
@@ -227,8 +223,8 @@ class Profile
 				intval($profile_id)
 			);
 		}
-		if (!DBM::is_result($profile)) {
-			$profile = dba::fetch_first(
+		if (!DBA::isResult($profile)) {
+			$profile = DBA::fetchFirst(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` as `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
 					`profile`.`uid` AS `profile_uid`, `profile`.*,
@@ -316,7 +312,7 @@ class Profile
 				$profile_url = normalise_link(System::baseUrl() . '/profile/' . $profile['nickname']);
 			}
 
-			if (dba::exists('contact', ['pending' => false, 'uid' => local_user(), 'nurl' => $profile_url])) {
+			if (DBA::exists('contact', ['pending' => false, 'uid' => local_user(), 'nurl' => $profile_url])) {
 				$connect = false;
 			}
 		}
@@ -345,14 +341,14 @@ class Profile
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `id` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
 					intval(remote_user()),
-					intval(CONTACT_IS_FRIEND)
+					intval(Contact::FRIEND)
 				);
 			} else {
 				$r = q(
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
-					dbesc(normalise_link(self::getMyURL())),
-					intval(CONTACT_IS_FRIEND)
+					DBA::escape(normalise_link(self::getMyURL())),
+					intval(Contact::FRIEND)
 				);
 			}
 			if ($r) {
@@ -379,7 +375,7 @@ class Profile
 				'entries' => [],
 			];
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				foreach ($r as $rr) {
 					$profile['menu']['entries'][] = [
 						'photo' => $rr['thumb'],
@@ -457,7 +453,7 @@ class Profile
 					"SELECT `gcontact`.`updated` FROM `contact` INNER JOIN `gcontact` WHERE `gcontact`.`nurl` = `contact`.`nurl` AND `self` AND `uid` = %d LIMIT 1",
 					intval($a->profile['uid'])
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$updated = date('c', strtotime($r[0]['updated']));
 				}
 
@@ -468,11 +464,11 @@ class Profile
 						AND NOT `hidden` AND NOT `archive`
 						AND `network` IN ('%s', '%s', '%s', '')",
 					intval($profile['uid']),
-					dbesc(NETWORK_DFRN),
-					dbesc(NETWORK_DIASPORA),
-					dbesc(NETWORK_OSTATUS)
+					DBA::escape(NETWORK_DFRN),
+					DBA::escape(NETWORK_DIASPORA),
+					DBA::escape(NETWORK_OSTATUS)
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$contacts = intval($r[0]['total']);
 				}
 			}
@@ -551,7 +547,7 @@ class Profile
 		$cachekey = 'get_birthdays:' . local_user();
 		$r = Cache::get($cachekey);
 		if (is_null($r)) {
-			$s = dba::p(
+			$s = DBA::p(
 				"SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
 				INNER JOIN `contact` ON `contact`.`id` = `event`.`cid`
 				WHERE `event`.`uid` = ? AND `type` = 'birthday' AND `start` < ? AND `finish` > ?
@@ -560,15 +556,15 @@ class Profile
 				DateTimeFormat::utc('now + 6 days'),
 				DateTimeFormat::utcNow()
 			);
-			if (DBM::is_result($s)) {
-				$r = dba::inArray($s);
+			if (DBA::isResult($s)) {
+				$r = DBA::toArray($s);
 				Cache::set($cachekey, $r, CACHE_HOUR);
 			}
 		}
 
 		$total = 0;
 		$classtoday = '';
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$now = strtotime('now');
 			$cids = [];
 
@@ -637,7 +633,7 @@ class Profile
 		$bd_format = L10n::t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
-		$s = dba::p(
+		$s = DBA::p(
 			"SELECT `event`.*
 			FROM `event`
 			INNER JOIN `item`
@@ -662,10 +658,10 @@ class Profile
 
 		$r = [];
 
-		if (DBM::is_result($s)) {
+		if (DBA::isResult($s)) {
 			$istoday = false;
 
-			while ($rr = dba::fetch($s)) {
+			while ($rr = DBA::fetch($s)) {
 				if (strlen($rr['name'])) {
 					$total ++;
 				}
@@ -702,7 +698,7 @@ class Profile
 
 				$r[] = $rr;
 			}
-			dba::close($s);
+			DBA::close($s);
 			$classtoday = (($istoday) ? 'event-today' : '');
 		}
 		$tpl = get_markup_template('events_reminder.tpl');
@@ -1029,9 +1025,9 @@ class Profile
 					return;
 				}
 
-				$contact = dba::selectFirst('contact',['id', 'url'], ['id' => $cid]);
+				$contact = DBA::selectFirst('contact',['id', 'url'], ['id' => $cid]);
 
-				if (DBM::is_result($contact) && remote_user() && remote_user() == $contact['id']) {
+				if (DBA::isResult($contact) && remote_user() && remote_user() == $contact['id']) {
 					// The visitor is already authenticated.
 					return;
 				}
@@ -1085,7 +1081,7 @@ class Profile
 			return;
 		}
 
-		$visitor = dba::selectFirst('contact', [], ['id' => $cid]);
+		$visitor = DBA::selectFirst('contact', [], ['id' => $cid]);
 
 		// Authenticate the visitor.
 		$_SESSION['authenticated'] = 1;

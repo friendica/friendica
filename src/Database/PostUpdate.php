@@ -5,11 +5,9 @@
 namespace Friendica\Database;
 
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\PermissionSet;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -32,7 +30,7 @@ class PostUpdate
 		if (!self::update1206()) {
 			return;
 		}
-		if (!self::update1278()) {
+		if (!self::update1279()) {
 			return;
 		}
 	}
@@ -72,13 +70,11 @@ class PostUpdate
 				AND `item`.`visible` AND NOT `item`.`private`
 				AND NOT `item`.`deleted` AND NOT `item`.`moderated`
 				AND `item`.`network` IN ('%s', '%s', '%s', '')
-				AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = ''
-				AND `item`.`deny_cid` = '' AND `item`.`deny_gid` = ''
 				AND NOT `item`.`global`";
 
 		$r = q($query1.$query2.$query3."  ORDER BY `item`.`id` LIMIT 1",
 			intval($start_id), intval($end_id),
-			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS));
+			DBA::escape(NETWORK_DFRN), DBA::escape(NETWORK_DIASPORA), DBA::escape(NETWORK_OSTATUS));
 		if (!$r) {
 			Config::set("system", "post_update_version", 1194);
 			logger("Update is done", LOGGER_DEBUG);
@@ -92,7 +88,7 @@ class PostUpdate
 
 		$r = q($query1.$query2.$query3."  ORDER BY `item`.`id` LIMIT 1000,1",
 			intval($start_id), intval($end_id),
-			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS));
+			DBA::escape(NETWORK_DFRN), DBA::escape(NETWORK_DIASPORA), DBA::escape(NETWORK_OSTATUS));
 		if ($r) {
 			$pos_id = $r[0]["id"];
 		} else {
@@ -102,7 +98,7 @@ class PostUpdate
 
 		q("UPDATE `item` ".$query2." SET `item`.`global` = 1 ".$query3,
 			intval($start_id), intval($pos_id),
-			dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA), dbesc(NETWORK_OSTATUS));
+			DBA::escape(NETWORK_DFRN), DBA::escape(NETWORK_DIASPORA), DBA::escape(NETWORK_OSTATUS));
 
 		logger("Done", LOGGER_DEBUG);
 	}
@@ -126,7 +122,7 @@ class PostUpdate
 
 		// Check if the first step is done (Setting "author-id" and "owner-id" in the item table)
 		$fields = ['author-link', 'author-name', 'author-avatar', 'owner-link', 'owner-name', 'owner-avatar', 'network', 'uid'];
-		$r = dba::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
+		$r = DBA::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
 		if (!$r) {
 			// Are there unfinished entries in the thread table?
 			$r = q("SELECT COUNT(*) AS `total` FROM `thread`
@@ -148,7 +144,7 @@ class PostUpdate
 					(`thread`.`uid` IN (SELECT `uid` from `user`) OR `thread`.`uid` = 0)");
 
 			logger("Updated threads", LOGGER_DEBUG);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				Config::set("system", "post_update_version", 1198);
 				logger("Done", LOGGER_DEBUG);
 				return true;
@@ -182,7 +178,7 @@ class PostUpdate
 			if ($owner_id == 0) {
 				$owner_id = -1;
 			}
-			dba::update('item', ['author-id' => $author_id, 'owner-id' => $owner_id], ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'owner-link' => $item['owner-link'], 'author-id' => 0, 'owner-id' => 0]);
+			DBA::update('item', ['author-id' => $author_id, 'owner-id' => $owner_id], ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'owner-link' => $item['owner-link'], 'author-id' => 0, 'owner-id' => 0]);
 		}
 
 		logger("Updated items", LOGGER_DEBUG);
@@ -209,12 +205,12 @@ class PostUpdate
 			FROM `user`
 			INNER JOIN `contact` ON `contact`.`uid` = `user`.`uid` AND `contact`.`self`");
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return false;
 		}
 		foreach ($r as $user) {
 			if (!empty($user["lastitem_date"]) && ($user["lastitem_date"] > $user["last-item"])) {
-				dba::update('contact', ['last-item' => $user['lastitem_date']], ['id' => $user['id']]);
+				DBA::update('contact', ['last-item' => $user['lastitem_date']], ['id' => $user['id']]);
 			}
 		}
 
@@ -228,20 +224,21 @@ class PostUpdate
 	 *
 	 * @return bool "true" when the job is done
 	 */
-	private static function update1278()
+	private static function update1279()
 	{
 		// Was the script completed?
-		if (Config::get("system", "post_update_version") >= 1278) {
+		if (Config::get("system", "post_update_version") >= 1279) {
 			return true;
 		}
 
-		$id = Config::get("system", "post_update_version_1278_id", 0);
+		$id = Config::get("system", "post_update_version_1279_id", 0);
 
 		logger("Start from item " . $id, LOGGER_DEBUG);
 
 		$fields = array_merge(Item::MIXED_CONTENT_FIELDLIST, ['network', 'author-id', 'owner-id', 'tag', 'file',
 			'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link', 'id',
-			'uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid', 'post-type', 'bookmark', 'type']);
+			'uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'psid', 'post-type', 'bookmark', 'type',
+			'inform', 'postopts', 'icid']);
 
 		$start_id = $id;
 		$rows = 0;
@@ -265,8 +262,14 @@ class PostUpdate
 				$item['owner-id'] = Contact::getIdForURL($item["owner-link"], 0, false, $default);
 			}
 
-			if (empty($item['psid'])) {
+			if (!is_null($item['allow_cid']) && !is_null($item['allow_gid'])
+				&& !is_null($item['deny_cid']) && !is_null($item['deny_gid'])) {
 				$item['psid'] = PermissionSet::fetchIDForPost($item);
+			} else {
+				$item['allow_cid'] = null;
+				$item['allow_gid'] = null;
+				$item['deny_cid'] = null;
+				$item['deny_gid'] = null;
 			}
 
 			if ($item['post-type'] == 0) {
@@ -279,22 +282,85 @@ class PostUpdate
 				}
 			}
 
+			self::createLanguage($item);
+
+			if (!empty($item['icid']) && !empty($item['language'])) {
+				DBA::update('item-content', ['language' => $item['language']], ['id' => $item['icid']]);
+			}
+			unset($item['language']);
+
 			Item::update($item, ['id' => $id]);
 
 			++$rows;
 		}
-		dba::close($items);
+		DBA::close($items);
 
-		Config::set("system", "post_update_version_1278_id", $id);
+		Config::set("system", "post_update_version_1279_id", $id);
 
 		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
-			Config::set("system", "post_update_version", 1278);
+			// Set all deprecated fields to "null" if they contain an empty string
+			$nullfields = ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'postopts', 'inform', 'type',
+				'bookmark', 'file', 'location', 'coord', 'tag', 'plink', 'title', 'content-warning',
+				'body', 'app', 'verb', 'object-type', 'object', 'target-type', 'target',
+				'author-name', 'author-link', 'author-avatar', 'owner-name', 'owner-link', 'owner-avatar',
+				'rendered-hash', 'rendered-html'];
+			foreach ($nullfields as $field) {
+				$fields = [$field => null];
+				$condition = [$field => ''];
+				logger("Setting '" . $field . "' to null if empty.", LOGGER_DEBUG);
+				// Important: This has to be a "DBA::update", not a "Item::update"
+				DBA::update('item', $fields, $condition);
+			}
+
+			Config::set("system", "post_update_version", 1279);
 			logger("Done", LOGGER_DEBUG);
 			return true;
 		}
 
 		return false;
+	}
+
+	private static function createLanguage(&$item)
+	{
+		if (empty($item['postopts'])) {
+			return;
+		}
+
+		$opts = explode(',', $item['postopts']);
+
+		$postopts = [];
+
+		foreach ($opts as $opt) {
+			if (strstr($opt, 'lang=')) {
+				$language = substr($opt, 5);
+			} else {
+				$postopts[] = $opt;
+			}
+		}
+
+		if (empty($language)) {
+			return;
+		}
+
+		if (!empty($postopts)) {
+			$item['postopts'] = implode(',', $postopts);
+		} else {
+			$item['postopts'] = null;
+		}
+
+		$lang_pairs = explode(':', $language);
+
+		$lang_arr = [];
+
+		foreach ($lang_pairs as $pair) {
+			$lang_pair_arr = explode(';', $pair);
+			if (count($lang_pair_arr) == 2) {
+				$lang_arr[$lang_pair_arr[0]] = $lang_pair_arr[1];
+			}
+		}
+
+		$item['language'] = json_encode($lang_arr);
 	}
 }

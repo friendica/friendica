@@ -33,8 +33,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
-use Friendica\Core\Config;
 use Friendica\Util\ExAuth;
 
 if (sizeof($_SERVER["argv"]) == 0) {
@@ -55,12 +53,8 @@ require_once "boot.php";
 require_once "include/dba.php";
 
 $a = new App(dirname(__DIR__));
-BaseObject::setApp($a);
 
-@include ".htconfig.php";
-dba::connect($db_host, $db_user, $db_pass, $db_data);
-unset($db_host, $db_user, $db_pass, $db_data);
-
-$oAuth = new ExAuth();
-
-$oAuth->readStdin();
+if ($a->mode === App::MODE_NORMAL) {
+	$oAuth = new ExAuth();
+	$oAuth->readStdin();
+}

@@ -14,7 +14,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -471,14 +471,14 @@ function admin_page_contactblock(App $a)
 {
 	$condition = ['uid' => 0, 'blocked' => true];
 
-	$total = dba::count('contact', $condition);
+	$total = DBA::count('contact', $condition);
 
 	$a->set_pager_total($total);
 	$a->set_pager_itemspage(30);
 
-	$statement = dba::select('contact', [], $condition, ['limit' => [$a->pager['start'], $a->pager['itemspage']]]);
+	$statement = DBA::select('contact', [], $condition, ['limit' => [$a->pager['start'], $a->pager['itemspage']]]);
 
-	$contacts = dba::inArray($statement);
+	$contacts = DBA::toArray($statement);
 
 	$t = get_markup_template('admin/contactblock.tpl');
 	$o = replace_macros($t, [
@@ -780,8 +780,13 @@ function admin_page_queue(App $a)
 function admin_page_workerqueue(App $a)
 {
 	// get jobs from the workerqueue table
-	$statement = dba::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
-	$r = dba::inArray($statement);
+	$statement = DBA::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
+	$r = DBA::toArray($statement);
+
+	for($i = 0; $i < count($r); $i++) {
+		// fix GH-5469. ref: src/Core/Worker.php:217
+		$r[$i]['parameter'] = implode(json_decode($r[$i]['parameter'], true), ': ');
+	}
 
 	$t = get_markup_template('admin/workerqueue.tpl');
 	return replace_macros($t, [
@@ -811,10 +816,10 @@ function admin_page_workerqueue(App $a)
 function admin_page_summary(App $a)
 {
 	// are there MyISAM tables in the DB? If so, trigger a warning message
-	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1", dbesc(dba::database_name()));
+	$r = q("SELECT `engine` FROM `information_schema`.`tables` WHERE `engine` = 'myisam' AND `table_schema` = '%s' LIMIT 1", DBA::escape(DBA::databaseName()));
 	$showwarning = false;
 	$warningtext = [];
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$showwarning = true;
 		$warningtext[] = L10n::t('Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />', 'https://dev.mysql.com/doc/refman/5.7/en/converting-tables-to-innodb.html');
 	}
@@ -843,6 +848,12 @@ function admin_page_summary(App $a)
 	} elseif ((strtotime(DateTimeFormat::utcNow()) - strtotime($last_worker_call)) > 60 * 60) {
 		$showwarning = true;
 		$warningtext[] = L10n::t('The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings.', $last_worker_call);
+	}
+
+	// Legacy config file warning
+	if (file_exists('.htconfig.php')) {
+		$showwarning = true;
+		$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.ini.php, please copy config/local-sample.ini.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', $a->get_baseurl() . '/help/Config');
 	}
 
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
@@ -938,10 +949,8 @@ function admin_page_site_post(App $a)
 
 		function update_table($table_name, $fields, $old_url, $new_url)
 		{
-			global $a;
-
-			$dbold = dbesc($old_url);
-			$dbnew = dbesc($new_url);
+			$dbold = DBA::escape($old_url);
+			$dbnew = DBA::escape($new_url);
 
 			$upd = [];
 			foreach ($fields as $f) {
@@ -952,8 +961,8 @@ function admin_page_site_post(App $a)
 
 			$r = q("UPDATE %s SET %s;", $table_name, $upds);
 
-			if (!DBM::is_result($r)) {
-				notice("Failed updating '$table_name': " . dba::errorMessage());
+			if (!DBA::isResult($r)) {
+				notice("Failed updating '$table_name': " . DBA::errorMessage());
 				goaway('admin/site');
 			}
 		}
@@ -1378,8 +1387,8 @@ function admin_page_site(App $a)
 		"develop" => L10n::t("check the development version")
 	];
 
-	if ($a->config['hostname'] == "") {
-		$a->config['hostname'] = $a->get_hostname();
+	if (empty(Config::get('config', 'hostname'))) {
+		Config::set('config', 'hostname', $a->get_hostname());
 	}
 	$diaspora_able = ($a->get_path() == "");
 
@@ -1388,8 +1397,6 @@ function admin_page_site(App $a)
 	if ($optimize_max_tablesize <= 0) {
 		$optimize_max_tablesize = -1;
 	}
-	// Default list of forbidden names, classic role names from RFC 2142
-	$default_forbidden_nicknames = 'info, marketing, sales, support, abuse, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, root, sysop';
 
 	$t = get_markup_template('admin/site.tpl');
 	return replace_macros($t, [
@@ -1408,9 +1415,9 @@ function admin_page_site(App $a)
 		'$relocate' => L10n::t('Relocate - WARNING: advanced function. Could make this server unreachable.'),
 		'$baseurl' => System::baseUrl(true),
 		// name, label, value, help string, extra data...
-		'$sitename' 		=> ['sitename', L10n::t("Site name"), $a->config['sitename'],''],
-		'$hostname' 		=> ['hostname', L10n::t("Host name"), $a->config['hostname'], ""],
-		'$sender_email'		=> ['sender_email', L10n::t("Sender Email"), $a->config['sender_email'], L10n::t("The email address your server shall use to send notification emails from."), "", "", "email"],
+		'$sitename' 		=> ['sitename', L10n::t("Site name"), Config::get('config', 'sitename'),''],
+		'$hostname' 		=> ['hostname', L10n::t("Host name"), Config::get('config', 'hostname'), ""],
+		'$sender_email'		=> ['sender_email', L10n::t("Sender Email"), Config::get('config', 'sender_email'), L10n::t("The email address your server shall use to send notification emails from."), "", "", "email"],
 		'$banner'		=> ['banner', L10n::t("Banner/Logo"), $banner, ""],
 		'$shortcut_icon'	=> ['shortcut_icon', L10n::t("Shortcut icon"), Config::get('system','shortcut_icon'),  L10n::t("Link to an icon that will be used for browsers.")],
 		'$touch_icon'		=> ['touch_icon', L10n::t("Touch icon"), Config::get('system','touch_icon'),  L10n::t("Link to an icon that will be used for tablets and mobiles.")],
@@ -1426,10 +1433,10 @@ function admin_page_site(App $a)
 		'$maximagelength'	=> ['maximagelength', L10n::t("Maximum image length"), Config::get('system','max_image_length'), L10n::t("Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.")],
 		'$jpegimagequality'	=> ['jpegimagequality', L10n::t("JPEG image quality"), Config::get('system','jpeg_quality'), L10n::t("Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.")],
 
-		'$register_policy'	=> ['register_policy', L10n::t("Register policy"), $a->config['register_policy'], "", $register_choices],
+		'$register_policy'	=> ['register_policy', L10n::t("Register policy"), Config::get('config', 'register_policy'), "", $register_choices],
 		'$daily_registrations'	=> ['max_daily_registrations', L10n::t("Maximum Daily Registrations"), Config::get('system', 'max_daily_registrations'), L10n::t("If registration is permitted above, this sets the maximum number of new user registrations to accept per day.  If register is set to closed, this setting has no effect.")],
-		'$register_text'	=> ['register_text', L10n::t("Register text"), $a->config['register_text'], L10n::t("Will be displayed prominently on the registration page. You can use BBCode here.")],
-		'$forbidden_nicknames' => ['forbidden_nicknames', L10n::t('Forbidden Nicknames'), Config::get('system', 'forbidden_nicknames', $default_forbidden_nicknames), L10n::t('Comma separated list of nicknames that are forbidden from registration. Preset is a list of role names according RFC 2142.')],
+		'$register_text'	=> ['register_text', L10n::t("Register text"), Config::get('config', 'register_text'), L10n::t("Will be displayed prominently on the registration page. You can use BBCode here.")],
+		'$forbidden_nicknames' => ['forbidden_nicknames', L10n::t('Forbidden Nicknames'), Config::get('system', 'forbidden_nicknames'), L10n::t('Comma separated list of nicknames that are forbidden from registration. Preset is a list of role names according RFC 2142.')],
 		'$abandon_days'		=> ['abandon_days', L10n::t('Accounts abandoned after x days'), Config::get('system','account_abandon_days'), L10n::t('Will not waste system resources polling external sites for abandonded accounts. Enter 0 for no time limit.')],
 		'$allowed_sites'	=> ['allowed_sites', L10n::t("Allowed friend domains"), Config::get('system','allowed_sites'), L10n::t("Comma separated list of domains which are allowed to establish friendships with this site. Wildcards are accepted. Empty to allow any domains")],
 		'$allowed_email'	=> ['allowed_email', L10n::t("Allowed email domains"), Config::get('system','allowed_email'), L10n::t("Comma separated list of domains which are allowed in email addresses for registrations to this site. Wildcards are accepted. Empty to allow any domains")],
@@ -1574,7 +1581,7 @@ function admin_page_dbsync(App $a)
 	$failed = [];
 	$r = q("SELECT `k`, `v` FROM `config` WHERE `cat` = 'database' ");
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$upd = intval(substr($rr['k'], 7));
 			if ($upd < 1139 || $rr['v'] === 'success') {
@@ -1666,13 +1673,13 @@ function admin_page_users_post(App $a)
 
 			Thank you and welcome to %4$s.'));
 
-		$preamble = sprintf($preamble, $user['username'], $a->config['sitename']);
-		$body = sprintf($body, System::baseUrl(), $user['email'], $result['password'], $a->config['sitename']);
+		$preamble = sprintf($preamble, $user['username'], Config::get('config', 'sitename'));
+		$body = sprintf($body, System::baseUrl(), $user['email'], $result['password'], Config::get('config', 'sitename'));
 
 		notification([
 			'type' => SYSTEM_EMAIL,
 			'to_email' => $user['email'],
-			'subject' => L10n::t('Registration details for %s', $a->config['sitename']),
+			'subject' => L10n::t('Registration details for %s', Config::get('config', 'sitename')),
 			'preamble' => $preamble,
 			'body' => $body]);
 	}
@@ -1723,8 +1730,8 @@ function admin_page_users(App $a)
 {
 	if ($a->argc > 2) {
 		$uid = $a->argv[3];
-		$user = dba::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
-		if (!DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
+		if (!DBA::isResult($user)) {
 			notice('User not found' . EOL);
 			goaway('admin/users');
 			return ''; // NOTREACHED
@@ -1797,39 +1804,38 @@ function admin_page_users(App $a)
 				ORDER BY $sql_order $sql_order_direction LIMIT %d, %d", intval($a->pager['start']), intval($a->pager['itemspage'])
 	);
 
-	$adminlist = explode(",", str_replace(" ", "", $a->config['admin_email']));
+	$adminlist = explode(",", str_replace(" ", "", Config::get('config', 'admin_email')));
 	$_setup_users = function ($e) use ($adminlist) {
 		$page_types = [
-			PAGE_NORMAL => L10n::t('Normal Account Page'),
-			PAGE_SOAPBOX => L10n::t('Soapbox Page'),
+			PAGE_NORMAL    => L10n::t('Normal Account Page'),
+			PAGE_SOAPBOX   => L10n::t('Soapbox Page'),
 			PAGE_COMMUNITY => L10n::t('Public Forum'),
-			PAGE_FREELOVE => L10n::t('Automatic Friend Page'),
-			PAGE_PRVGROUP => L10n::t('Private Forum')
+			PAGE_FREELOVE  => L10n::t('Automatic Friend Page'),
+			PAGE_PRVGROUP  => L10n::t('Private Forum')
 		];
 		$account_types = [
-			ACCOUNT_TYPE_PERSON => L10n::t('Personal Page'),
+			ACCOUNT_TYPE_PERSON       => L10n::t('Personal Page'),
 			ACCOUNT_TYPE_ORGANISATION => L10n::t('Organisation Page'),
-			ACCOUNT_TYPE_NEWS => L10n::t('News Page'),
-			ACCOUNT_TYPE_COMMUNITY => L10n::t('Community Forum')
+			ACCOUNT_TYPE_NEWS         => L10n::t('News Page'),
+			ACCOUNT_TYPE_COMMUNITY    => L10n::t('Community Forum')
 		];
 
-
-
-		$e['page-flags-raw'] = $e['page-flags'];
+		$e['page_flags_raw'] = $e['page-flags'];
 		$e['page-flags'] = $page_types[$e['page-flags']];
 
-		$e['account-type-raw'] = ($e['page_flags_raw'] == 0) ? $e['account-type'] : -1;
+		$e['account_type_raw'] = ($e['page_flags_raw'] == 0) ? $e['account-type'] : -1;
 		$e['account-type'] = ($e['page_flags_raw'] == 0) ? $account_types[$e['account-type']] : "";
 
 		$e['register_date'] = Temporal::getRelativeDate($e['register_date']);
 		$e['login_date'] = Temporal::getRelativeDate($e['login_date']);
 		$e['lastitem_date'] = Temporal::getRelativeDate($e['lastitem_date']);
-		//$e['is_admin'] = ($e['email'] === $a->config['admin_email']);
 		$e['is_admin'] = in_array($e['email'], $adminlist);
 		$e['is_deletable'] = (intval($e['uid']) != local_user());
 		$e['deleted'] = ($e['account_removed'] ? Temporal::getRelativeDate($e['account_expires_on']) : False);
+
 		return $e;
 	};
+
 	$users = array_map($_setup_users, $users);
 
 
@@ -2350,11 +2356,12 @@ function admin_page_logs_post(App $a)
 function admin_page_logs(App $a)
 {
 	$log_choices = [
-		LOGGER_NORMAL	=> 'Normal',
-		LOGGER_TRACE	=> 'Trace',
-		LOGGER_DEBUG	=> 'Debug',
-		LOGGER_DATA	=> 'Data',
-		LOGGER_ALL	=> 'All'
+		LOGGER_WARNING => 'Warning',
+		LOGGER_INFO    => 'Info',
+		LOGGER_TRACE   => 'Trace',
+		LOGGER_DEBUG   => 'Debug',
+		LOGGER_DATA    => 'Data',
+		LOGGER_ALL     => 'All'
 	];
 
 	if (ini_get('log_errors')) {
@@ -2378,7 +2385,7 @@ function admin_page_logs(App $a)
 		'$loglevel' => ['loglevel', L10n::t("Log level"), Config::get('system', 'loglevel'), "", $log_choices],
 		'$form_security_token' => get_form_security_token("admin_logs"),
 		'$phpheader' => L10n::t("PHP logging"),
-		'$phphint' => L10n::t("To enable logging of PHP errors and warnings you can add the following to the .htconfig.php file of your installation. The filename set in the 'error_log' line is relative to the friendica top-level directory and must be writeable by the web server. The option '1' for 'log_errors' and 'display_errors' is to enable these options, set to '0' to disable them."),
+		'$phphint' => L10n::t("To temporarily enable logging of PHP errors and warnings you can prepend the following to the index.php file of your installation. The filename set in the 'error_log' line is relative to the friendica top-level directory and must be writeable by the web server. The option '1' for 'log_errors' and 'display_errors' is to enable these options, set to '0' to disable them."),
 		'$phplogcode' => "error_reporting(E_ERROR | E_WARNING | E_PARSE);\nini_set('error_log','php.out');\nini_set('log_errors','1');\nini_set('display_errors', '1');",
 		'$phplogenabled' => $phplogenabled,
 	]);

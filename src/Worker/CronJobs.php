@@ -5,17 +5,16 @@
 namespace Friendica\Worker;
 
 use Friendica\App;
+use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
-use Friendica\Database\PostUpdate;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'mod/nodeinfo.php';
@@ -24,7 +23,7 @@ class CronJobs
 {
 	public static function execute($command = '')
 	{
-		global $a;
+		$a = BaseObject::getApp();
 
 		// No parameter set? So return
 		if ($command == '') {
@@ -92,7 +91,7 @@ class CronJobs
 	private static function updatePhotoAlbums()
 	{
 		$r = q("SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed`");
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return;
 		}
 
@@ -108,18 +107,18 @@ class CronJobs
 	{
 		// expire any expired regular accounts. Don't expire forums.
 		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", NULL_DATE];
-		dba::update('user', ['account_expired' => true], $condition);
+		DBA::update('user', ['account_expired' => true], $condition);
 
 		// Remove any freshly expired account
-		$users = dba::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
-		while ($user = dba::fetch($users)) {
+		$users = DBA::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
+		while ($user = DBA::fetch($users)) {
 			User::remove($user['uid']);
 		}
 
 		// delete user records for recently removed accounts
-		$users = dba::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
-		while ($user = dba::fetch($users)) {
-			dba::delete('user', ['uid' => $user['uid']]);
+		$users = DBA::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
+		while ($user = DBA::fetch($users)) {
+			DBA::delete('user', ['uid' => $user['uid']]);
 		}
 	}
 
@@ -164,14 +163,14 @@ class CronJobs
 				$cachetime = PROXY_DEFAULT_TIME;
 			}
 			$condition = ['`uid` = 0 AND `resource-id` LIKE "pic:%" AND `created` < NOW() - INTERVAL ? SECOND', $cachetime];
-			dba::delete('photo', $condition);
+			DBA::delete('photo', $condition);
 		}
 
 		// Delete the cached OEmbed entries that are older than three month
-		dba::delete('oembed', ["`created` < NOW() - INTERVAL 3 MONTH"]);
+		DBA::delete('oembed', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Delete the cached "parse_url" entries that are older than three month
-		dba::delete('parsed_url', ["`created` < NOW() - INTERVAL 3 MONTH"]);
+		DBA::delete('parsed_url', ["`created` < NOW() - INTERVAL 3 MONTH"]);
 
 		// Maximum table size in megabyte
 		$max_tablesize = intval(Config::get('system', 'optimize_max_tablesize')) * 1000000;
@@ -211,7 +210,7 @@ class CronJobs
 
 				// So optimize it
 				logger("Optimize Table " . $table["Name"], LOGGER_DEBUG);
-				q("OPTIMIZE TABLE `%s`", dbesc($table["Name"]));
+				q("OPTIMIZE TABLE `%s`", DBA::escape($table["Name"]));
 			}
 		}
 
@@ -229,8 +228,8 @@ class CronJobs
 
 		$r = q("SELECT `id`, `url` FROM `contact`
 			WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
-				ORDER BY RAND() LIMIT 50", dbesc(NETWORK_DIASPORA));
-		if (!DBM::is_result($r)) {
+				ORDER BY RAND() LIMIT 50", DBA::escape(NETWORK_DIASPORA));
+		if (!DBA::isResult($r)) {
 			return;
 		}
 
@@ -251,7 +250,7 @@ class CronJobs
 
 			logger("Repair contact " . $contact["id"] . " " . $contact["url"], LOGGER_DEBUG);
 			q("UPDATE `contact` SET `batch` = '%s', `notify` = '%s', `poll` = '%s', pubkey = '%s' WHERE `id` = %d",
-				dbesc($data["batch"]), dbesc($data["notify"]), dbesc($data["poll"]), dbesc($data["pubkey"]),
+				DBA::escape($data["batch"]), DBA::escape($data["notify"]), DBA::escape($data["poll"]), DBA::escape($data["pubkey"]),
 				intval($contact["id"]));
 		}
 	}
@@ -265,7 +264,7 @@ class CronJobs
 		// Sometimes there seem to be issues where the "self" contact vanishes.
 		// We haven't found the origin of the problem by now.
 		$r = q("SELECT `uid` FROM `user` WHERE NOT EXISTS (SELECT `uid` FROM `contact` WHERE `contact`.`uid` = `user`.`uid` AND `contact`.`self`)");
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r AS $user) {
 				logger('Create missing self contact for user ' . $user['uid']);
 				Contact::createSelfFromUserId($user['uid']);
@@ -281,7 +280,7 @@ class CronJobs
 
 		// Update the global contacts for local users
 		$r = q("SELECT `uid` FROM `user` WHERE `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`");
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r AS $user) {
 				GContact::updateForUser($user["uid"]);
 			}

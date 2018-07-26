@@ -5,9 +5,8 @@
 namespace Friendica\Model;
 
 use Friendica\Core\Config;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -19,8 +18,8 @@ class Queue
 	public static function updateTime($id)
 	{
 		logger('queue: requeue item ' . $id);
-		$queue = dba::selectFirst('queue', ['retrial'], ['id' => $id]);
-		if (!DBM::is_result($queue)) {
+		$queue = DBA::selectFirst('queue', ['retrial'], ['id' => $id]);
+		if (!DBA::isResult($queue)) {
 			return;
 		}
 
@@ -34,7 +33,7 @@ class Queue
 		$delay = (($retrial + 3) ** 4) + (rand(1, 30) * ($retrial + 1));
 		$next = DateTimeFormat::utc('now + ' . $delay . ' seconds');
 
-		dba::update('queue', ['last' => DateTimeFormat::utcNow(), 'retrial' => $retrial + 1, 'next' => $next], ['id' => $id]);
+		DBA::update('queue', ['last' => DateTimeFormat::utcNow(), 'retrial' => $retrial + 1, 'next' => $next], ['id' => $id]);
 	}
 
 	/**
@@ -43,7 +42,7 @@ class Queue
 	public static function removeItem($id)
 	{
 		logger('queue: remove queue item ' . $id);
-		dba::delete('queue', ['id' => $id]);
+		DBA::delete('queue', ['id' => $id]);
 	}
 
 	/**
@@ -61,7 +60,7 @@ class Queue
 			intval($cid)
 		);
 
-		$was_delayed = DBM::is_result($r);
+		$was_delayed = DBA::isResult($r);
 
 		// We set "term-date" to a current date if the communication has problems.
 		// If the communication works again we reset this value.
@@ -69,7 +68,7 @@ class Queue
 			$r = q("SELECT `term-date` FROM `contact` WHERE `id` = %d AND `term-date` <= '1000-01-01' LIMIT 1",
 				intval($cid)
 			);
-			$was_delayed = !DBM::is_result($r);
+			$was_delayed = !DBA::isResult($r);
 		}
 
 		return $was_delayed;
@@ -99,7 +98,7 @@ class Queue
 			intval($cid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			if ($batch &&  ($r[0]['total'] > $batch_queue)) {
 				logger('too many queued items for batch server ' . $cid . ' - discarding message');
 				return;
@@ -109,7 +108,7 @@ class Queue
 			}
 		}
 
-		dba::insert('queue', [
+		DBA::insert('queue', [
 			'cid'     => $cid,
 			'network' => $network,
 			'guid'     => $guid,

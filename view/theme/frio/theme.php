@@ -15,7 +15,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 
 $frio = 'view/theme/frio';
@@ -231,7 +231,7 @@ function frio_remote_nav($a, &$nav)
 		// user info
 		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self`", intval($a->user['uid']));
 
-		$r[0]['photo'] = (DBM::is_result($r) ? $a->remove_baseurl($r[0]['micro']) : 'images/person-48.jpg');
+		$r[0]['photo'] = (DBA::isResult($r) ? $a->remove_baseurl($r[0]['micro']) : 'images/person-48.jpg');
 		$r[0]['name'] = $a->user['username'];
 	} elseif (!local_user() && remote_user()) {
 		$r = q("SELECT `name`, `nick`, `micro` AS `photo` FROM `contact` WHERE `id` = %d", intval(remote_user()));
@@ -239,15 +239,15 @@ function frio_remote_nav($a, &$nav)
 	} elseif (Profile::getMyURL()) {
 		$r = q("SELECT `name`, `nick`, `photo` FROM `gcontact`
 				WHERE `addr` = '%s' AND `network` = 'dfrn'",
-			dbesc($webbie));
+			DBA::escape($webbie));
 		$nav['remote'] = L10n::t('Visitor');
 	} else {
 		$r = false;
 	}
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$nav['userinfo'] = [
-			'icon' => (DBM::is_result($r) ? $r[0]['photo'] : 'images/person-48.jpg'),
+			'icon' => (DBA::isResult($r) ? $r[0]['photo'] : 'images/person-48.jpg'),
 			'name' => $r[0]['name'],
 		];
 	}
@@ -268,7 +268,7 @@ function frio_remote_nav($a, &$nav)
 		$nav['messages'] = [$server_url . '/message', L10n::t('Messages'), '', L10n::t('Private mail')];
 		$nav['settings'] = [$server_url . '/settings', L10n::t('Settings'), '', L10n::t('Account settings')];
 		$nav['contacts'] = [$server_url . '/contacts', L10n::t('Contacts'), '', L10n::t('Manage/edit friends and contacts')];
-		$nav['sitename'] = $a->config['sitename'];
+		$nav['sitename'] = Config::get('config', 'sitename');
 	}
 }
 
@@ -299,18 +299,18 @@ function frio_acl_lookup(App $a, &$results)
 
 	$sql_extra = '';
 	if ($results['search']) {
-		$search_txt = dbesc(protect_sprintf(preg_quote($results['search'])));
-		$sql_extra .= " AND (`attag` LIKE '%%" . dbesc($search_txt) . "%%' OR `name` LIKE '%%" . dbesc($search_txt) . "%%' OR `nick` LIKE '%%" . dbesc($search_txt) . "%%') ";
+		$search_txt = DBA::escape(protect_sprintf(preg_quote($results['search'])));
+		$sql_extra .= " AND (`attag` LIKE '%%" . $search_txt . "%%' OR `name` LIKE '%%" . $search_txt . "%%' OR `nick` LIKE '%%" . $search_txt . "%%') ";
 	}
 
 	if ($nets) {
-		$sql_extra .= sprintf(" AND network = '%s' ", dbesc($nets));
+		$sql_extra .= sprintf(" AND network = '%s' ", DBA::escape($nets));
 	}
 
 	$total = 0;
 	$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 		WHERE `uid` = %d AND NOT `self` AND NOT `pending` $sql_extra ", intval($_SESSION['uid']));
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$total = $r[0]['total'];
 	}
 
@@ -322,7 +322,7 @@ function frio_acl_lookup(App $a, &$results)
 
 	$contacts = [];
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$contacts[] = _contact_detail_for_template($rr);
 		}

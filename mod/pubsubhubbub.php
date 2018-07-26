@@ -3,9 +3,9 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
-use Friendica\Util\Network;
+use Friendica\Database\DBA;
 use Friendica\Model\PushSubscriber;
+use Friendica\Util\Network;
 
 function post_var($name) {
 	return (x($_POST, $name)) ? notags(trim($_POST[$name])) : '';
@@ -63,8 +63,8 @@ function pubsubhubbub_init(App $a) {
 
 		// fetch user from database given the nickname
 		$condition = ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false];
-		$owner = dba::selectFirst('user', ['uid', 'hidewall'], $condition);
-		if (!DBM::is_result($owner)) {
+		$owner = DBA::selectFirst('user', ['uid', 'hidewall'], $condition);
+		if (!DBA::isResult($owner)) {
 			logger('Local account not found: ' . $nick . ' - topic: ' . $hub_topic . ' - callback: ' . $hub_callback);
 			System::httpExit(404);
 		}
@@ -78,8 +78,8 @@ function pubsubhubbub_init(App $a) {
 		// get corresponding row from contact table
 		$condition = ['uid' => $owner['uid'], 'blocked' => false,
 			'pending' => false, 'self' => true];
-		$contact = dba::selectFirst('contact', ['poll'], $condition);
-		if (!DBM::is_result($contact)) {
+		$contact = DBA::selectFirst('contact', ['poll'], $condition);
+		if (!DBA::isResult($contact)) {
 			logger('Self contact for user ' . $owner['uid'] . ' not found.');
 			System::httpExit(404);
 		}

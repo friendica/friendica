@@ -7,15 +7,15 @@ namespace Friendica\Worker;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use dba;
 
-class DiscoverPoCo {
+class DiscoverPoCo
+{
 	/// @todo Clean up this mess of a parameter hell and split it in several classes
 	public static function execute($command = '', $param1 = '', $param2 = '', $param3 = '', $param4 = '')
 	{
@@ -118,7 +118,7 @@ class DiscoverPoCo {
 	private static function updateServer() {
 		$r = q("SELECT `url`, `created`, `last_failure`, `last_contact` FROM `gserver` ORDER BY rand()");
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return;
 		}
 
@@ -147,8 +147,8 @@ class DiscoverPoCo {
 				WHERE `last_contact` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 					`last_failure` < UTC_TIMESTAMP - INTERVAL 1 MONTH AND
 					`network` IN ('%s', '%s', '%s', '%s', '') ORDER BY rand()",
-				dbesc(NETWORK_DFRN), dbesc(NETWORK_DIASPORA),
-				dbesc(NETWORK_OSTATUS), dbesc(NETWORK_FEED));
+				DBA::escape(NETWORK_DFRN), DBA::escape(NETWORK_DIASPORA),
+				DBA::escape(NETWORK_OSTATUS), DBA::escape(NETWORK_FEED));
 
 		if (!$users) {
 			return;
@@ -159,7 +159,7 @@ class DiscoverPoCo {
 
 			$urlparts = parse_url($user["url"]);
 			if (!isset($urlparts["scheme"])) {
-				dba::update('gcontact', ['network' => NETWORK_PHANTOM],
+				DBA::update('gcontact', ['network' => NETWORK_PHANTOM],
 					['nurl' => normalise_link($user["url"])]);
 				continue;
 			 }
@@ -172,7 +172,7 @@ class DiscoverPoCo {
 						"identi.ca" => NETWORK_PUMPIO,
 						"alpha.app.net" => NETWORK_APPNET];
 
-				dba::update('gcontact', ['network' => $networks[$urlparts["host"]]],
+				DBA::update('gcontact', ['network' => $networks[$urlparts["host"]]],
 					['nurl' => normalise_link($user["url"])]);
 				continue;
 			}
@@ -195,7 +195,7 @@ class DiscoverPoCo {
 					return;
 				}
 			} else {
-				dba::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
+				DBA::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
 					['nurl' => normalise_link($user["url"])]);
 			}
 
@@ -224,7 +224,7 @@ class DiscoverPoCo {
 			foreach ($j->results as $jj) {
 				// Check if the contact already exists
 				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", normalise_link($jj->url));
-				if (DBM::is_result($exists)) {
+				if (DBA::isResult($exists)) {
 					logger("Profile ".$jj->url." already exists (".$search.")", LOGGER_DEBUG);
 
 					if (($exists[0]["last_contact"] < $exists[0]["last_failure"]) &&
@@ -275,8 +275,6 @@ class DiscoverPoCo {
 		// Currently disabled, since the service isn't available anymore.
 		// It is not removed since I hope that there will be a successor.
 		return false;
-
-		$a = get_app();
 
 		$url = "http://gstools.org/api/users_search/".urlencode($search);
 

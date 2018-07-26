@@ -2,6 +2,7 @@
 /**
  * @file mod/dirfind.php
  */
+
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
@@ -9,12 +10,12 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\Network;
-use Friendica\Database\DBM;
 
 require_once 'mod/contacts.php';
 
@@ -111,15 +112,15 @@ function dirfind_content(App $a, $prefix = "") {
 
 			$search2 = "%".$search."%";
 
-			/// @TODO These 2 SELECTs are not checked on validity with DBM::is_result()
+			/// @TODO These 2 SELECTs are not checked on validity with DBA::isResult()
 			$count = q("SELECT count(*) AS `total` FROM `gcontact`
 					WHERE NOT `hide` AND `network` IN ('%s', '%s', '%s') AND
 						((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
 						(`url` LIKE '%s' OR `name` LIKE '%s' OR `location` LIKE '%s' OR
 						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql",
-					dbesc(NETWORK_DFRN), dbesc($ostatus), dbesc($diaspora),
-					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
-					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)));
+					DBA::escape(NETWORK_DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
+					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
+					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)));
 
 			$results = q("SELECT `nurl`
 					FROM `gcontact`
@@ -129,9 +130,9 @@ function dirfind_content(App $a, $prefix = "") {
 						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql
 						GROUP BY `nurl`
 						ORDER BY `updated` DESC LIMIT %d, %d",
-					dbesc(NETWORK_DFRN), dbesc($ostatus), dbesc($diaspora),
-					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
-					dbesc(escape_tags($search2)), dbesc(escape_tags($search2)), dbesc(escape_tags($search2)),
+					DBA::escape(NETWORK_DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
+					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
+					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
 					intval($startrec), intval($perpage));
 			$j = new stdClass();
 			$j->total = $count[0]["total"];
@@ -201,8 +202,8 @@ function dirfind_content(App $a, $prefix = "") {
 				if ($jj->cid > 0) {
 					$connlnk = "";
 					$conntxt = "";
-					$contact = dba::selectFirst('contact', [], ['id' => $jj->cid]);
-					if (DBM::is_result($contact)) {
+					$contact = DBA::selectFirst('contact', [], ['id' => $jj->cid]);
+					if (DBA::isResult($contact)) {
 						$photo_menu = Contact::photoMenu($contact);
 						$details = _contact_detail_for_template($contact);
 						$alt_text = $details['alt_text'];

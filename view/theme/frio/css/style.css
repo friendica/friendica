@@ -217,7 +217,7 @@ a.btn:hover {
     font-size: 12px;
 }
 .btn-primary {
-    background: $nav_bg;
+    background: $nav_bg !important;
     color: $btn_primary_color !important;
 }
 .btn-primary:hover, .btn-primary:focus {
@@ -996,6 +996,7 @@ aside .widget,
     margin-bottom: 20px;
     padding: 10px;
     font-size: 13px;
+    overflow: auto;
 }
 aside .widget h3,
 .nav-container .widget h3 {
@@ -1114,11 +1115,11 @@ aside .vcard #profile-photo-wrapper.crop-preview {
     padding: 0;
 }
 aside .vcard .profile-header {
-    margin-bottom: 20px;
+    padding: 5px 0px 5px 0px;
 }
 aside .vcard .fn {
-    font-size: 20px;
     font-weight: bold;
+    padding: 5px 0px 5px 0px;
 }
 aside .vcard .p-addr {
     font-style: italic;
@@ -1138,9 +1139,10 @@ aside .xmpp {
 aside .vcard .icon {
     display: table-cell;
     padding-right: 10px;
+    width: 30px;
 }
 #profile-extra-links {
-    margin-bottom: 20px;
+    overflow: auto;
 }
 aside .vcard #dfrn-request-link-button,
 aside .vcard #wallmessage-link-botton {
@@ -1235,17 +1237,19 @@ div#sidebar-group-list {
 .group-edit-tool {
     color: #555;
 }
-aside #group-sidebar .group-edit-tool,
-aside #saved-search-list .savedsearchdrop {
-    opacity: 0.1;
-    transition: all 0.25s ease-in-out;
-}
-aside #group-sidebar .group-edit-tool:hover,
-aside #saved-search-list .saved-search-li:hover .savedsearchdrop {
+
+.faded-icon {
     color: #555;
-    opacity: 0.8;
-    transition: all 0.25s ease-in-out;
+    opacity: 0.3;
+    transition: all 0.1s ease-in-out;
 }
+.faded-icon:hover {
+    opacity: 1;
+}
+.icon-padding {
+    margin-left: 20px;
+}
+
 aside #group-sidebar .sidebar-group-li .group-edit-tool:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop:hover {
     opacity: 1;
@@ -1510,6 +1514,9 @@ section #jotOpen {
 .tread-wrapper .media {
     overflow: visible;
     word-wrap: break-word;
+}
+aside .panel-body {
+    padding: 0px;
 }
 
 /* Thread hover effects */
@@ -2470,6 +2477,13 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* photos */
+#photo-album-edit-name-label {
+    width: 100%;
+}
+.photo-album-edit-name {
+    width: 60%;
+}
+
 .photo-album-actions {
     margin-bottom: 10px;
 }
@@ -3256,6 +3270,50 @@ section .profile-match-wrapper {
 .mod-home.is-not-singleuser .login-panel-content,
 .mod-login .login-panel-content {
     background-color: rgba(255,255,255,.85);
+}
+
+.qq-upload-button {
+    background: $nav_bg !important;
+    color: $btn_primary_color !important;
+    float: none;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    border-radius: 3px;
+    outline: 0!important;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    color: inherit;
+    width: 100% !important;
+}
+
+.qq-upload-drop-area {
+    background: white !important;
+    float: none;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    border-radius: 3px;
+    outline: 0!important;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    color: inherit;
+    width: 100% !important;
+    display: block !important;
+    position: relative !important;
+    border: black 1px dashed !important;
+    margin-bottom: 5px !important;
+    margin-top: 15px !important;
 }
 
 /* Medium devices (desktops, 992px and up) */

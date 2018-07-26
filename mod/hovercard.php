@@ -7,12 +7,13 @@
  * Author: Rabuzarus <https://github.com/rabuzarus>
  * License: GNU AFFERO GENERAL PUBLIC LICENSE (Version 3)
  */
+
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-use Friendica\Model\Profile;
 
 function hovercard_init(App $a)
 {
@@ -46,7 +47,7 @@ function hovercard_content()
 	$cid = 0;
 	if (strpos($profileurl, 'redir/') === 0) {
 		$cid = intval(substr($profileurl, 6));
-		$remote_contact = dba::selectFirst('contact', ['nurl'], ['id' => $cid]);
+		$remote_contact = DBA::selectFirst('contact', ['nurl'], ['id' => $cid]);
 		$profileurl = defaults($remote_contact, 'nurl', '');
 	}
 
@@ -64,6 +65,8 @@ function hovercard_content()
 	// Get the photo_menu - the menu if possible contact actions
 	if (local_user()) {
 		$actions = Contact::photoMenu($contact);
+	} else {
+		$actions = [];
 	}
 
 	// Move the contact data to the profile array so we can deliver it to

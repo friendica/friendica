@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Mimetype;
 
@@ -18,9 +18,9 @@ function wall_attach_post(App $a) {
 	if($a->argc > 1) {
 		$nick = $a->argv[1];
 		$r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
-			dbesc($nick)
+			DBA::escape($nick)
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBA::isResult($r)) {
 			if ($r_json) {
 				echo json_encode(['error'=>L10n::t('Invalid request.')]);
 				killme();
@@ -63,7 +63,7 @@ function wall_attach_post(App $a) {
 					intval($contact_id),
 					intval($page_owner_uid)
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$can_post = true;
 					$visitor = $contact_id;
 				}
@@ -129,7 +129,7 @@ function wall_attach_post(App $a) {
 		'filesize' => $filesize, 'data' => $filedata, 'created' => $created, 'edited' => $created,
 		'allow_cid' => '<' . $page_owner_cid . '>', 'allow_gid' => '','deny_cid' => '', 'deny_gid' => ''];
 
-	$r = dba::insert('attach', $fields);
+	$r = DBA::insert('attach', $fields);
 
 	@unlink($src);
 
@@ -145,11 +145,11 @@ function wall_attach_post(App $a) {
 
 	$r = q("SELECT `id` FROM `attach` WHERE `uid` = %d AND `created` = '%s' AND `hash` = '%s' LIMIT 1",
 		intval($page_owner_uid),
-		dbesc($created),
-		dbesc($hash)
+		DBA::escape($created),
+		DBA::escape($hash)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBA::isResult($r)) {
 		$msg = L10n::t('File upload failed.');
 		if ($r_json) {
 			echo json_encode(['error'=>$msg]);

@@ -13,7 +13,7 @@ use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Group;
@@ -36,8 +36,8 @@ function cal_init(App $a)
 
 	if ($a->argc > 1) {
 		$nick = $a->argv[1];
-		$user = dba::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
-		if (!DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
+		if (!DBA::isResult($user)) {
 			return;
 		}
 
@@ -131,7 +131,7 @@ function cal_content(App $a)
 			intval($contact_id),
 			intval($a->profile['profile_uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$remote_contact = true;
 		}
 	}
@@ -229,7 +229,7 @@ function cal_content(App $a)
 
 		$links = [];
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');

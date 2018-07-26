@@ -18,7 +18,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 require_once 'include/security.php';
@@ -61,7 +61,7 @@ function poke_init(App $a) {
 		intval($uid)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		logger('poke: no contact ' . $contact_id);
 		return;
 	}
@@ -73,7 +73,7 @@ function poke_init(App $a) {
 		$condition = ['id' => $parent, 'parent' => $parent, 'uid' => $uid];
 		$item = Item::selectFirst($fields, $condition);
 
-		if (DBM::is_result($item)) {
+		if (DBA::isResult($item)) {
 			$parent_uri = $item['uri'];
 			$private    = $item['private'];
 			$allow_cid  = $item['allow_cid'];
@@ -154,7 +154,7 @@ function poke_content(App $a) {
 			intval($_GET['c']),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$name = $item['name'];
 			$id = $item['id'];
 		}

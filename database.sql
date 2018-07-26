@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1278
+-- DB_UPDATE_VERSION 1280
 -- ------------------------------------------
 
 
@@ -487,15 +487,15 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`mention` boolean NOT NULL DEFAULT '0' COMMENT 'The owner of this item was mentioned in it',
 	`forum_mode` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`psid` int unsigned COMMENT 'ID of the permission set of this post',
-	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
-	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
-	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
-	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
-	`postopts` text COMMENT 'External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery',
-	`inform` mediumtext COMMENT 'Additional receivers of this post',
 	`resource-id` varchar(32) NOT NULL DEFAULT '' COMMENT 'Used to link other tables to items, it identifies the linked resource (e.g. photo) and if set must also set resource_type',
 	`event-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'Used to link to the event.id',
 	`attach` mediumtext COMMENT 'JSON structure representing attachments to this item',
+	`allow_cid` mediumtext COMMENT 'Deprecated',
+	`allow_gid` mediumtext COMMENT 'Deprecated',
+	`deny_cid` mediumtext COMMENT 'Deprecated',
+	`deny_gid` mediumtext COMMENT 'Deprecated',
+	`postopts` text COMMENT 'Deprecated',
+	`inform` mediumtext COMMENT 'Deprecated',
 	`type` varchar(20) COMMENT 'Deprecated',
 	`bookmark` boolean COMMENT 'Deprecated',
 	`file` mediumtext COMMENT 'Deprecated',
@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 	 INDEX `uid_eventid` (`uid`,`event-id`),
 	 INDEX `icid` (`icid`),
 	 INDEX `iaid` (`iaid`),
-	 INDEX `psid` (`psid`)
+	 INDEX `psid_wall` (`psid`,`wall`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Structure for all posts';
 
 --
@@ -587,6 +587,16 @@ CREATE TABLE IF NOT EXISTS `item-content` (
 	 UNIQUE INDEX `uri-plink-hash` (`uri-plink-hash`),
 	 INDEX `uri` (`uri`(191))
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Content for all posts';
+
+--
+-- TABLE item-delivery-data
+--
+CREATE TABLE IF NOT EXISTS `item-delivery-data` (
+	`iid` int unsigned NOT NULL COMMENT 'Item id',
+	`postopts` text COMMENT 'External post connectors add their network name to this comma-separated string to identify that they should be delivered to these networks during delivery',
+	`inform` mediumtext COMMENT 'Additional receivers of the linked item',
+	 PRIMARY KEY(`iid`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Delivery data for items';
 
 --
 -- TABLE locks

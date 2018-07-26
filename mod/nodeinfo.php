@@ -7,8 +7,9 @@
 
 use Friendica\App;
 use Friendica\Core\Addon;
-use Friendica\Core\System;
 use Friendica\Core\Config;
+use Friendica\Core\System;
+use Friendica\Database\DBA;
 use Friendica\Util\Network;
 require_once 'include/dba.php';
 
@@ -61,9 +62,9 @@ function nodeinfo_init(App $a) {
 
 	$nodeinfo['usage'] = [];
 
-	$nodeinfo['openRegistrations'] = ($a->config['register_policy'] != 0);
+	$nodeinfo['openRegistrations'] = intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED;
 
-	$nodeinfo['metadata'] = ['nodeName' => $a->config['sitename']];
+	$nodeinfo['metadata'] = ['nodeName' => Config::get('config', 'sitename')];
 
 	if (Config::get('system', 'nodeinfo')) {
 
@@ -214,11 +215,11 @@ function nodeinfo_cron() {
 		logger('total_users: ' . $total_users . '/' . $active_users_halfyear. '/' . $active_users_monthly, LOGGER_DEBUG);
 	}
 
-	$local_posts = dba::count('thread', ["`wall` AND NOT `deleted` AND `uid` != 0"]);
+	$local_posts = DBA::count('thread', ["`wall` AND NOT `deleted` AND `uid` != 0"]);
 	Config::set('nodeinfo', 'local_posts', $local_posts);
 	logger('local_posts: ' . $local_posts, LOGGER_DEBUG);
 
-	$local_comments = dba::count('item', ["`origin` AND `id` != `parent` AND NOT `deleted` AND `uid` != 0"]);
+	$local_comments = DBA::count('item', ["`origin` AND `id` != `parent` AND NOT `deleted` AND `uid` != 0"]);
 	Config::set('nodeinfo', 'local_comments', $local_comments);
 	logger('local_comments: ' . $local_comments, LOGGER_DEBUG);
 

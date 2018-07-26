@@ -3,8 +3,9 @@
 namespace Friendica\Core\Console;
 
 use Friendica\Core\Protocol;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Network\Probe;
+use RuntimeException;
 
 require_once 'include/text.php';
 
@@ -64,12 +65,8 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		require_once '.htconfig.php';
-		$result = \dba::connect($db_host, $db_user, $db_pass, $db_data);
-		unset($db_host, $db_user, $db_pass, $db_data);
-
-		if (!$result) {
-			throw new \RuntimeException('Unable to connect to database');
+		if ($a->isInstallMode()) {
+			throw new RuntimeException('Database isn\'t ready or populated yet');
 		}
 
 		/**
@@ -79,16 +76,16 @@ HELP;
 		 * */
 		$net = Probe::uri($this->getArgument(0));
 		if (in_array($net['network'], [Protocol::PHANTOM, Protocol::MAIL])) {
-			throw new \RuntimeException('This account seems not to exist.');
+			throw new RuntimeException('This account seems not to exist.');
 		}
 
 		$nurl = normalise_link($net['url']);
-		$contact = \dba::selectFirst("contact", ["id"], ["nurl" => $nurl, "uid" => 0]);
-		if (DBM::is_result($contact)) {
-			\dba::update("contact", ["hidden" => true], ["id" => $contact["id"]]);
+		$contact = DBA::selectFirst("contact", ["id"], ["nurl" => $nurl, "uid" => 0]);
+		if (DBA::isResult($contact)) {
+			DBA::update("contact", ["hidden" => true], ["id" => $contact["id"]]);
 			$this->out('NOTICE: The account should be silenced from the global community page');
 		} else {
-			throw new \RuntimeException('NOTICE: Could not find any entry for this URL (' . $nurl . ')');
+			throw new RuntimeException('NOTICE: Could not find any entry for this URL (' . $nurl . ')');
 		}
 
 		return 0;

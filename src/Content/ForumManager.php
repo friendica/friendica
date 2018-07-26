@@ -5,13 +5,11 @@
  */
 namespace Friendica\Content;
 
-use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Database\DBM;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -46,7 +44,7 @@ class ForumManager
 			$select = '(`forum` OR `prv`)';
 		}
 
-		$contacts = dba::p(
+		$contacts = DBA::p(
 			"SELECT `contact`.`id`, `contact`.`url`, `contact`.`name`, `contact`.`micro`, `contact`.`thumb`
 			FROM `contact`
 				WHERE `network`= 'dfrn' AND $select AND `uid` = ?
@@ -60,7 +58,7 @@ class ForumManager
 			return($forumlist);
 		}
 
-		while ($contact = dba::fetch($contacts)) {
+		while ($contact = DBA::fetch($contacts)) {
 			$forumlist[] = [
 				'url'	=> $contact['url'],
 				'name'	=> $contact['name'],
@@ -69,7 +67,7 @@ class ForumManager
 				'thumb' => $contact['thumb'],
 			];
 		}
-		dba::close($contacts);
+		DBA::close($contacts);
 
 		return($forumlist);
 	}
@@ -100,7 +98,7 @@ class ForumManager
 		$total = count($contacts);
 		$visible_forums = 10;
 
-		if (DBM::is_result($contacts)) {
+		if (DBA::isResult($contacts)) {
 			$id = 0;
 
 			foreach ($contacts as $contact) {

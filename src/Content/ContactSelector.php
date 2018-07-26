@@ -6,9 +6,7 @@ namespace Friendica\Content;
 
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
-use Friendica\Protocol\Diaspora;
-use dba;
+use Friendica\Database\DBA;
 
 /**
  * @brief ContactSelector class
@@ -27,10 +25,10 @@ class ContactSelector
 
 		$o .= "<select id=\"contact-profile-selector\" class=\"form-control\" $disabled name=\"profile-assign\" >\r\n";
 
-		$s = dba::select('profile', ['id', 'profile-name', 'is-default'], ['uid' => $_SESSION['uid']]);
-		$r = dba::inArray($s);
+		$s = DBA::select('profile', ['id', 'profile-name', 'is-default'], ['uid' => $_SESSION['uid']]);
+		$r = DBA::toArray($s);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r as $rr) {
 				$selected = (($rr['id'] == $current || ($current == 0 && $rr['is-default'] == 1)) ? " selected=\"selected\" " : "");
 				$o .= "<option value=\"{$rr['id']}\" $selected >{$rr['profile-name']}</option>\r\n";
@@ -103,11 +101,11 @@ class ContactSelector
 		$networkname = str_replace($search, $replace, $s);
 
 		if ((in_array($s, [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) && ($profile != "")) {
-			$r = dba::fetch_first("SELECT `gserver`.`platform` FROM `gcontact`
+			$r = DBA::fetchFirst("SELECT `gserver`.`platform` FROM `gcontact`
 					INNER JOIN `gserver` ON `gserver`.`nurl` = `gcontact`.`server_url`
 					WHERE `gcontact`.`nurl` = ? AND `platform` != ''", normalise_link($profile));
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$networkname = $r['platform'];
 			}
 		}

@@ -5,9 +5,8 @@
  */
 namespace Friendica\Model;
 
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
-use dba;
 
 /**
  * Methods to deal with entries of the 'openwebauth-token' table.
@@ -16,12 +15,12 @@ class OpenWebAuthToken
 {
 	/**
 	 * Create an entry in the 'openwebauth-token' table.
-	 * 
+	 *
 	 * @param string $type   Verify type.
 	 * @param int    $uid    The user ID.
 	 * @param string $token
 	 * @param string $meta
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public static function create($type, $uid, $token, $meta)
@@ -33,25 +32,25 @@ class OpenWebAuthToken
 			"meta" => $meta,
 			"created" => DateTimeFormat::utcNow()
 		];
-		return dba::insert("openwebauth-token", $fields);
+		return DBA::insert("openwebauth-token", $fields);
 	}
 
 	/**
 	 * Get the "meta" field of an entry in the openwebauth-token table.
-	 * 
+	 *
 	 * @param string $type   Verify type.
 	 * @param int    $uid    The user ID.
 	 * @param string $token
-	 * 
+	 *
 	 * @return string|boolean The meta enry or false if not found.
 	 */
 	public static function getMeta($type, $uid, $token)
 	{
 		$condition = ["type" => $type, "uid" => $uid, "token" => $token];
 
-		$entry = dba::selectFirst("openwebauth-token", ["id", "meta"], $condition);
-		if (DBM::is_result($entry)) {
-			dba::delete("openwebauth-token", ["id" => $entry["id"]]);
+		$entry = DBA::selectFirst("openwebauth-token", ["id", "meta"], $condition);
+		if (DBA::isResult($entry)) {
+			DBA::delete("openwebauth-token", ["id" => $entry["id"]]);
 
 			return $entry["meta"];
 		}
@@ -60,14 +59,14 @@ class OpenWebAuthToken
 
 	/**
 	 * Purge entries of a verify-type older than interval.
-	 * 
+	 *
 	 * @param string $type     Verify type.
 	 * @param string $interval SQL compatible time interval
 	 */
 	public static function purge($type, $interval)
 	{
 		$condition = ["`type` = ? AND `created` < ?", $type, DateTimeFormat::utcNow() . " - INTERVAL " . $interval];
-		dba::delete("openwebauth-token", $condition);
+		DBA::delete("openwebauth-token", $condition);
 	}
 
 }

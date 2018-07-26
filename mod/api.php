@@ -5,7 +5,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Module\Login;
 
 require_once 'include/api.php';
@@ -20,9 +20,9 @@ function oauth_get_client($request)
 	$r = q("SELECT `clients`.*
 			FROM `clients`, `tokens`
 			WHERE `clients`.`client_id`=`tokens`.`client_id`
-			AND `tokens`.`id`='%s' AND `tokens`.`scope`='request'", dbesc($token));
+			AND `tokens`.`id`='%s' AND `tokens`.`scope`='request'", DBA::escape($token));
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		return null;
 	}
 

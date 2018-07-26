@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 require_once "include/text.php";
 
@@ -23,7 +23,7 @@ function manage_post(App $a) {
 		$r = q("select * from user where uid = %d limit 1",
 			intval($_SESSION['submanage'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$uid = intval($r[0]['uid']);
 			$orig_record = $r[0];
 		}
@@ -43,7 +43,7 @@ function manage_post(App $a) {
 	$limited_id = 0;
 	$original_id = $uid;
 
-	if (DBM::is_result($submanage)) {
+	if (DBA::isResult($submanage)) {
 		foreach ($submanage as $m) {
 			if ($identity == $m['mid']) {
 				$limited_id = $m['mid'];
@@ -60,33 +60,33 @@ function manage_post(App $a) {
 		// Check if the target user is one of our children
 		$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `parent-uid` = %d LIMIT 1",
 			intval($identity),
-			dbesc($orig_record['uid'])
+			DBA::escape($orig_record['uid'])
 		);
 
 		// Check if the target user is one of our siblings
-		if (!DBM::is_result($r) && ($orig_record['parent-uid'] != 0)) {
+		if (!DBA::isResult($r) && ($orig_record['parent-uid'] != 0)) {
 			$r = q("SELECT * FROM `user` WHERE `uid` = %d AND `parent-uid` = %d LIMIT 1",
 				intval($identity),
-				dbesc($orig_record['parent-uid'])
+				DBA::escape($orig_record['parent-uid'])
 			);
 		}
 
 		// Check if it's our parent
-		if (!DBM::is_result($r) && ($orig_record['parent-uid'] != 0) && ($orig_record['parent-uid'] == $identity)) {
+		if (!DBA::isResult($r) && ($orig_record['parent-uid'] != 0) && ($orig_record['parent-uid'] == $identity)) {
 			$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 				intval($identity)
 			);
 		}
 
 		// Finally check if it's out own user
-		if (!DBM::is_result($r) && ($orig_record['uid'] != 0) && ($orig_record['uid'] == $identity)) {
+		if (!DBA::isResult($r) && ($orig_record['uid'] != 0) && ($orig_record['uid'] == $identity)) {
 			$r = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 				intval($identity)
 			);
 		}
 	}
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		return;
 	}
 
@@ -143,7 +143,7 @@ function manage_content(App $a) {
 	//getting additinal information for each identity
 	foreach ($identities as $key=>$id) {
 		$thumb = q("SELECT `thumb` FROM `contact` WHERE `uid` = '%s' AND `self` = 1",
-			dbesc($id['uid'])
+			DBA::escape($id['uid'])
 		);
 
 		$identities[$key]['thumb'] = $thumb[0]['thumb'];
@@ -155,21 +155,21 @@ function manage_content(App $a) {
 		$r = q("SELECT DISTINCT(`parent`) FROM `notify` WHERE `uid` = %d AND NOT `seen` AND NOT (`type` IN (%d, %d))",
 			intval($id['uid']), intval(NOTIFY_INTRO), intval(NOTIFY_MAIL));
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$notifications = sizeof($r);
 		}
 
 		$r = q("SELECT DISTINCT(`convid`) FROM `mail` WHERE `uid` = %d AND NOT `seen`",
 			intval($id['uid']));
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$notifications = $notifications + sizeof($r);
 		}
 
 		$r = q("SELECT COUNT(*) AS `introductions` FROM `intro` WHERE NOT `blocked` AND NOT `ignore` AND `uid` = %d",
 			intval($id['uid']));
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$notifications = $notifications + $r[0]["introductions"];
 		}
 

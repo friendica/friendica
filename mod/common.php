@@ -2,10 +2,11 @@
 /**
  * @file include/common.php
  */
+
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
@@ -36,16 +37,16 @@ function common_content(App $a)
 	}
 
 	if ($cmd === 'loc' && $cid) {
-		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
 
-		if (DBM::is_result($contact)) {
+		if (DBA::isResult($contact)) {
 			$a->page['aside'] = "";
 			Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 		}
 	} else {
-		$contact = dba::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
 
-		if (DBM::is_result($contact)) {
+		if (DBA::isResult($contact)) {
 			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"), [
 				'$name' => htmlentities($contact['name']),
 				'$photo' => $contact['photo'],
@@ -59,17 +60,17 @@ function common_content(App $a)
 		}
 	}
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		return;
 	}
 
 	if (!$cid && Profile::getMyURL()) {
-		$contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $uid]);
-		if (DBM::is_result($contact)) {
+		$contact = DBA::selectFirst('contact', ['id'], ['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $uid]);
+		if (DBA::isResult($contact)) {
 			$cid = $contact['id'];
 		} else {
-			$gcontact = dba::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
-			if (DBM::is_result($gcontact)) {
+			$gcontact = DBA::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
+			if (DBA::isResult($gcontact)) {
 				$zcid = $gcontact['id'];
 			}
 		}
@@ -98,7 +99,7 @@ function common_content(App $a)
 		$r = GContact::commonFriendsZcid($uid, $zcid, $a->pager['start'], $a->pager['itemspage']);
 	}
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		return $o;
 	}
 

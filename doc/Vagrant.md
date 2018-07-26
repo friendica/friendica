@@ -42,7 +42,7 @@ This will not delete the virtual machine.
 9. To ultimately delete the virtual machine run
 
         $> vagrant destroy
-        $> rm /vagrant/.htconfig.php
+        $> rm /vagrant/config/local.ini.php
 
 to make sure that you can start from scratch with another "vagrant up".
 
@@ -53,6 +53,6 @@ You will then have the following accounts to login:
   * friendica1, password friendica1
   * friendica2, password friendica2 and so on until friendica5
   * friendica1 is connected to all others. friendica1 has two groups: group1 with friendica2 and friendica4, group2 with friendica3 and friendica5.
-  * friendica2 and friendica3 are conntected. friendica4 and friendica5 are connected. 
+  * friendica2 and friendica3 are conntected. friendica4 and friendica5 are connected.
 
 For further documentation of vagrant, please see [the vagrant*docs*](https://docs.vagrantup.com/v2/).

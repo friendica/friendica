@@ -197,14 +197,14 @@ If you are searching for new themes, you can find them at [Friendica-Themes.com]
 <a name="adminaccount1"></a>
 ### I've changed my email address now the admin panel is gone?
 
-Have a look into your <tt>.htconfig.php</tt> and fix your email address there.
+Have a look into your <tt>config/local.ini.php</tt> and fix your email address there.
 
 <a name="adminaccount2"></a>
 ### Can there be more then one admin for a node?
 
 Yes.
 You just have to list more then one email address in the
-<tt>.htconfig.php</tt> file.
+<tt>config/local.ini.php</tt> file.
 The listed emails need to be separated by a comma.
 
 <a name="dbupdate">

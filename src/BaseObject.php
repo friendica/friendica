@@ -24,11 +24,9 @@ class BaseObject
 	 */
 	public static function getApp()
 	{
-		if (self::$app) {
-			return self::$app;
+		if (empty(self::$app)) {
+			self::$app = new App(dirname(__DIR__));
 		}
-
-		self::$app = get_app();
 
 		return self::$app;
 	}
@@ -40,7 +38,7 @@ class BaseObject
 	 *
 	 * @return void
 	 */
-	public static function setApp($app)
+	public static function setApp(App $app)
 	{
 		self::$app = $app;
 	}

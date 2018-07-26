@@ -2,10 +2,11 @@
 /**
  * @file mod/crepair.php
  */
+
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 
@@ -19,14 +20,14 @@ function crepair_init(App $a)
 
 	$contact = null;
 	if (($a->argc == 2) && intval($a->argv[1])) {
-		$contact = dba::selectFirst('contact', [], ['uid' => local_user(), 'id' => $a->argv[1]]);
+		$contact = DBA::selectFirst('contact', [], ['uid' => local_user(), 'id' => $a->argv[1]]);
 	}
 
 	if (!x($a->page, 'aside')) {
 		$a->page['aside'] = '';
 	}
 
-	if (DBM::is_result($contact)) {
+	if (DBA::isResult($contact)) {
 		$a->data['contact'] = $contact;
 		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 	}
@@ -42,10 +43,10 @@ function crepair_post(App $a)
 
 	$contact = null;
 	if ($cid) {
-		$contact = dba::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
 	}
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		return;
 	}
 
@@ -63,15 +64,15 @@ function crepair_post(App $a)
 
 	$r = q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `url` = '%s', `nurl` = '%s', `request` = '%s', `confirm` = '%s', `notify` = '%s', `poll` = '%s', `attag` = '%s' , `remote_self` = %d
 		WHERE `id` = %d AND `uid` = %d",
-		dbesc($name),
-		dbesc($nick),
-		dbesc($url),
-		dbesc($nurl),
-		dbesc($request),
-		dbesc($confirm),
-		dbesc($notify),
-		dbesc($poll),
-		dbesc($attag),
+		DBA::escape($name),
+		DBA::escape($nick),
+		DBA::escape($url),
+		DBA::escape($nurl),
+		DBA::escape($request),
+		DBA::escape($confirm),
+		DBA::escape($notify),
+		DBA::escape($poll),
+		DBA::escape($attag),
 		intval($remote_self),
 		intval($contact['id']),
 		local_user()
@@ -103,10 +104,10 @@ function crepair_content(App $a)
 
 		$contact = null;
 	if ($cid) {
-		$contact = dba::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
 	}
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		notice(L10n::t('Contact not found.') . EOL);
 		return;
 	}

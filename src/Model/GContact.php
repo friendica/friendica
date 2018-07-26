@@ -6,18 +6,15 @@
  */
 namespace Friendica\Model;
 
+use Exception;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
-use Friendica\Model\Contact;
-use Friendica\Model\Profile;
+use Friendica\Database\DBA;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use dba;
-use Exception;
 
 require_once 'include/dba.php';
 
@@ -62,7 +59,7 @@ class GContact
 
 		$search .= "%";
 
-		$results = dba::p("SELECT `nurl` FROM `gcontact`
+		$results = DBA::p("SELECT `nurl` FROM `gcontact`
 			WHERE NOT `hide` AND `network` IN (?, ?, ?) AND
 				((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
 				(`addr` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?) $extra_sql
@@ -71,7 +68,7 @@ class GContact
 		);
 
 		$gcontacts = [];
-		while ($result = dba::fetch($results)) {
+		while ($result = DBA::fetch($results)) {
 			$urlparts = parse_url($result["nurl"]);
 
 			// Ignore results that look strange.
@@ -108,19 +105,19 @@ class GContact
 			intval($zcid)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			q(
 				"INSERT INTO `glink` (`cid`, `uid`, `gcid`, `zcid`, `updated`) VALUES (%d, %d, %d, %d, '%s') ",
 				intval($cid),
 				intval($uid),
 				intval($gcid),
 				intval($zcid),
-				dbesc(DateTimeFormat::utcNow())
+				DBA::escape(DateTimeFormat::utcNow())
 			);
 		} else {
 			q(
 				"UPDATE `glink` SET `updated` = '%s' WHERE `cid` = %d AND `uid` = %d AND `gcid` = %d AND `zcid` = %d",
-				dbesc(DateTimeFormat::utcNow()),
+				DBA::escape(DateTimeFormat::utcNow()),
 				intval($cid),
 				intval($uid),
 				intval($gcid),
@@ -179,21 +176,21 @@ class GContact
 		if (!isset($gcontact['network'])) {
 			$r = q(
 				"SELECT `network` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' AND `network` != '' AND `network` != '%s' LIMIT 1",
-				dbesc(normalise_link($gcontact['url'])),
-				dbesc(NETWORK_STATUSNET)
+				DBA::escape(normalise_link($gcontact['url'])),
+				DBA::escape(NETWORK_STATUSNET)
 			);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$gcontact['network'] = $r[0]["network"];
 			}
 
 			if (($gcontact['network'] == "") || ($gcontact['network'] == NETWORK_OSTATUS)) {
 				$r = q(
 					"SELECT `network`, `url` FROM `contact` WHERE `uid` = 0 AND `alias` IN ('%s', '%s') AND `network` != '' AND `network` != '%s' LIMIT 1",
-					dbesc($gcontact['url']),
-					dbesc(normalise_link($gcontact['url'])),
-					dbesc(NETWORK_STATUSNET)
+					DBA::escape($gcontact['url']),
+					DBA::escape(normalise_link($gcontact['url'])),
+					DBA::escape(NETWORK_STATUSNET)
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$gcontact['network'] = $r[0]["network"];
 				}
 			}
@@ -204,10 +201,10 @@ class GContact
 
 		$x = q(
 			"SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-			dbesc(normalise_link($gcontact['url']))
+			DBA::escape(normalise_link($gcontact['url']))
 		);
 
-		if (DBM::is_result($x)) {
+		if (DBA::isResult($x)) {
 			if (!isset($gcontact['network']) && ($x[0]["network"] != NETWORK_STATUSNET)) {
 				$gcontact['network'] = $x[0]["network"];
 			}
@@ -239,8 +236,8 @@ class GContact
 
 			if ($alternate && ($gcontact['network'] == NETWORK_OSTATUS)) {
 				// Delete the old entry - if it exists
-				if (dba::exists('gcontact', ['nurl' => normalise_link($orig_profile)])) {
-					dba::delete('gcontact', ['nurl' => normalise_link($orig_profile)]);
+				if (DBA::exists('gcontact', ['nurl' => normalise_link($orig_profile)])) {
+					DBA::delete('gcontact', ['nurl' => normalise_link($orig_profile)]);
 				}
 			}
 		}
@@ -292,7 +289,7 @@ class GContact
 		);
 
 		// logger("countCommonFriends: $uid $cid {$r[0]['total']}");
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $r[0]['total'];
 		}
 		return 0;
@@ -314,7 +311,7 @@ class GContact
 			intval($uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -355,7 +352,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBA::isResult()
 		return $r;
 	}
 
@@ -387,7 +384,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBA::isResult()
 		return $r;
 	}
 
@@ -407,7 +404,7 @@ class GContact
 			intval($uid)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $r[0]['total'];
 		}
 
@@ -438,7 +435,7 @@ class GContact
 			intval($limit)
 		);
 
-		/// @TODO Check all calling-findings of this function if they properly use DBM::is_result()
+		/// @TODO Check all calling-findings of this function if they properly use DBA::isResult()
 		return $r;
 	}
 
@@ -492,13 +489,13 @@ class GContact
 			intval($uid),
 			intval($uid),
 			intval($uid),
-			dbesc(NULL_DATE),
+			DBA::escape(NULL_DATE),
 			$sql_network,
 			intval($start),
 			intval($limit)
 		);
 
-		if (DBM::is_result($r) && count($r) >= ($limit -1)) {
+		if (DBA::isResult($r) && count($r) >= ($limit -1)) {
 			/*
 			* Uncommented because the result of the queries are to big to store it in the cache.
 			* We need to decide if we want to change the db column type or if we want to delete it.
@@ -521,7 +518,7 @@ class GContact
 			intval($uid),
 			intval($uid),
 			intval($uid),
-			dbesc(NULL_DATE),
+			DBA::escape(NULL_DATE),
 			$sql_network,
 			intval($start),
 			intval($limit)
@@ -583,11 +580,11 @@ class GContact
 		// Query your contacts from Friendica and Redmatrix/Hubzilla for their contacts
 		$r = q(
 			"SELECT DISTINCT(`poco`) AS `poco` FROM `contact` WHERE `network` IN ('%s', '%s')",
-			dbesc(NETWORK_DFRN),
-			dbesc(NETWORK_DIASPORA)
+			DBA::escape(NETWORK_DFRN),
+			DBA::escape(NETWORK_DIASPORA)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			foreach ($r as $rr) {
 				$base = substr($rr['poco'], 0, strrpos($rr['poco'], '/'));
 				if (! in_array($base, $done)) {
@@ -690,13 +687,13 @@ class GContact
 			$contact["url"] = self::cleanContactUrl($contact["url"]);
 		}
 
-		dba::lock('gcontact');
+		DBA::lock('gcontact');
 		$r = q(
 			"SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-			dbesc(normalise_link($contact["url"]))
+			DBA::escape(normalise_link($contact["url"]))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$gcontact_id = $r[0]["id"];
 
 			// Update every 90 days
@@ -711,33 +708,33 @@ class GContact
 			q(
 				"INSERT INTO `gcontact` (`name`, `nick`, `addr` , `network`, `url`, `nurl`, `photo`, `created`, `updated`, `location`, `about`, `hide`, `generation`)
 				VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d)",
-				dbesc($contact["name"]),
-				dbesc($contact["nick"]),
-				dbesc($contact["addr"]),
-				dbesc($contact["network"]),
-				dbesc($contact["url"]),
-				dbesc(normalise_link($contact["url"])),
-				dbesc($contact["photo"]),
-				dbesc(DateTimeFormat::utcNow()),
-				dbesc(DateTimeFormat::utcNow()),
-				dbesc($contact["location"]),
-				dbesc($contact["about"]),
+				DBA::escape($contact["name"]),
+				DBA::escape($contact["nick"]),
+				DBA::escape($contact["addr"]),
+				DBA::escape($contact["network"]),
+				DBA::escape($contact["url"]),
+				DBA::escape(normalise_link($contact["url"])),
+				DBA::escape($contact["photo"]),
+				DBA::escape(DateTimeFormat::utcNow()),
+				DBA::escape(DateTimeFormat::utcNow()),
+				DBA::escape($contact["location"]),
+				DBA::escape($contact["about"]),
 				intval($contact["hide"]),
 				intval($contact["generation"])
 			);
 
 			$r = q(
 				"SELECT `id`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 2",
-				dbesc(normalise_link($contact["url"]))
+				DBA::escape(normalise_link($contact["url"]))
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$gcontact_id = $r[0]["id"];
 
 				$doprobing = in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""]);
 			}
 		}
-		dba::unlock();
+		DBA::unlock();
 
 		if ($doprobing) {
 			logger("Last Contact: ". $last_contact_str." - Last Failure: ".$last_failure_str." - Checking: ".$contact["url"], LOGGER_DEBUG);
@@ -817,7 +814,7 @@ class GContact
 		self::fixAlternateContactAddress($contact);
 
 		if (!isset($contact["updated"])) {
-			$contact["updated"] = DBM::date();
+			$contact["updated"] = DateTimeFormat::utcNow();
 		}
 
 		if ($contact["network"] == NETWORK_TWITTER) {
@@ -860,7 +857,7 @@ class GContact
 			logger("Update gcontact for ".$contact["url"], LOGGER_DEBUG);
 			$condition = ['`nurl` = ? AND (`generation` = 0 OR `generation` >= ?)',
 					normalise_link($contact["url"]), $contact["generation"]];
-			$contact["updated"] = DBM::date($contact["updated"]);
+			$contact["updated"] = DateTimeFormat::utc($contact["updated"]);
 
 			$updated = ['photo' => $contact['photo'], 'name' => $contact['name'],
 					'nick' => $contact['nick'], 'addr' => $contact['addr'],
@@ -873,14 +870,14 @@ class GContact
 					'generation' => $contact['generation'], 'updated' => $contact['updated'],
 					'server_url' => $contact['server_url'], 'connect' => $contact['connect']];
 
-			dba::update('gcontact', $updated, $condition, $fields);
+			DBA::update('gcontact', $updated, $condition, $fields);
 
 			// Now update the contact entry with the user id "0" as well.
 			// This is used for the shadow copies of public items.
 			/// @todo Check if we really should do this.
 			// The quality of the gcontact table is mostly lower than the public contact
-			$public_contact = dba::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
-			if (DBM::is_result($public_contact)) {
+			$public_contact = DBA::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
+			if (DBA::isResult($public_contact)) {
 				logger("Update public contact ".$public_contact["id"], LOGGER_DEBUG);
 
 				Contact::updateAvatar($contact["photo"], 0, $public_contact["id"]);
@@ -889,7 +886,7 @@ class GContact
 						'network', 'bd', 'gender',
 						'keywords', 'alias', 'contact-type',
 						'url', 'location', 'about'];
-				$old_contact = dba::selectFirst('contact', $fields, ['id' => $public_contact["id"]]);
+				$old_contact = DBA::selectFirst('contact', $fields, ['id' => $public_contact["id"]]);
 
 				// Update it with the current values
 				$fields = ['name' => $contact['name'], 'nick' => $contact['nick'],
@@ -905,7 +902,7 @@ class GContact
 				}
 
 
-				dba::update('contact', $fields, ['id' => $public_contact["id"]], $old_contact);
+				DBA::update('contact', $fields, ['id' => $public_contact["id"]], $old_contact);
 			}
 		}
 
@@ -1051,17 +1048,17 @@ class GContact
 
 		$r = q(
 			"SELECT `nurl`, `url` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `network` = '%s' AND `last_poco_query` < '%s' ORDER BY RAND() LIMIT 5",
-			dbesc(NETWORK_OSTATUS),
-			dbesc($last_update)
+			DBA::escape(NETWORK_OSTATUS),
+			DBA::escape($last_update)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return;
 		}
 
 		foreach ($r as $server) {
 			self::fetchGsUsers($server["url"]);
-			q("UPDATE `gserver` SET `last_poco_query` = '%s' WHERE `nurl` = '%s'", dbesc(DateTimeFormat::utcNow()), dbesc($server["nurl"]));
+			q("UPDATE `gserver` SET `last_poco_query` = '%s' WHERE `nurl` = '%s'", DBA::escape(DateTimeFormat::utcNow()), DBA::escape($server["nurl"]));
 		}
 	}
 
@@ -1075,10 +1072,10 @@ class GContact
 					AND `last_contact` >= `last_failure`
 					AND `updated` > UTC_TIMESTAMP - INTERVAL 1 MONTH
 				ORDER BY rand() LIMIT 1",
-			dbesc(NETWORK_DFRN)
+			DBA::escape(NETWORK_DFRN)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return dirname($r[0]['url']);
 		}
 

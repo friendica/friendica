@@ -9,17 +9,12 @@ namespace Friendica\Core;
 use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\L10n;
-use Friendica\Core\PConfig;
-use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Model\Profile;
 use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -71,7 +66,7 @@ class NotificationsManager extends BaseObject
 		$filter_str = [];
 		$filter_sql = "";
 		foreach ($filter as $column => $value) {
-			$filter_str[] = sprintf("`%s` = '%s'", $column, dbesc($value));
+			$filter_str[] = sprintf("`%s` = '%s'", $column, DBA::escape($value));
 		}
 		if (count($filter_str) > 0) {
 			$filter_sql = "AND " . implode(" AND ", $filter_str);
@@ -101,7 +96,7 @@ class NotificationsManager extends BaseObject
 			intval(local_user())
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $this->_set_extra($r);
 		}
 
@@ -121,7 +116,7 @@ class NotificationsManager extends BaseObject
 			intval($id),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $this->_set_extra($r)[0];
 		}
 		return null;
@@ -139,9 +134,9 @@ class NotificationsManager extends BaseObject
 		return q(
 			"UPDATE `notify` SET `seen` = %d WHERE (`link` = '%s' OR (`parent` != 0 AND `parent` = %d AND `otype` = '%s')) AND `uid` = %d",
 			intval($seen),
-			dbesc($note['link']),
+			DBA::escape($note['link']),
 			intval($note['parent']),
-			dbesc($note['otype']),
+			DBA::escape($note['otype']),
 			intval(local_user())
 		);
 	}
@@ -224,12 +219,12 @@ class NotificationsManager extends BaseObject
 	 * 	string 'ago' => T relative date of the notification
 	 * 	bool 'seen' => Is the notification marked as "seen"
 	 */
-	private function formatNotifs($notifs, $ident = "")
+	private function formatNotifs(array $notifs, $ident = "")
 	{
 		$notif = [];
 		$arr = [];
 
-		if (DBM::is_result($notifs)) {
+		if (DBA::isResult($notifs)) {
 			foreach ($notifs as $it) {
 				// Because we use different db tables for the notification query
 				// we have sometimes $it['unseen'] and sometimes $it['seen].
@@ -407,9 +402,10 @@ class NotificationsManager extends BaseObject
 		$fields = ['id', 'parent', 'verb', 'author-name', 'unseen', 'author-link', 'author-avatar', 'contact-avatar',
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid'];
 		$params = ['order' => ['created' => true], 'limit' => [$start, $limit]];
+
 		$items = Item::selectForUser(local_user(), $fields, $condition, $params);
 
-		if (DBM::is_result($items)) {
+		if (DBA::isResult($items)) {
 			$notifs = $this->formatNotifs(Item::inArray($items), $ident);
 		}
 
@@ -444,13 +440,14 @@ class NotificationsManager extends BaseObject
 		}
 
 		$r = q(
-			"SELECT `id`, `url`, `photo`, `msg`, `date`, `seen` FROM `notify`
+			"SELECT `id`, `url`, `photo`, `msg`, `date`, `seen`, `verb` FROM `notify`
 				WHERE `uid` = %d $sql_seen ORDER BY `date` DESC LIMIT %d, %d ",
 			intval(local_user()),
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+
+		if (DBA::isResult($r)) {
 			$notifs = $this->formatNotifs($r, $ident);
 		}
 
@@ -492,9 +489,10 @@ class NotificationsManager extends BaseObject
 		$fields = ['id', 'parent', 'verb', 'author-name', 'unseen', 'author-link', 'author-avatar', 'contact-avatar',
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid'];
 		$params = ['order' => ['created' => true], 'limit' => [$start, $limit]];
+
 		$items = Item::selectForUser(local_user(), $fields, $condition, $params);
 
-		if (DBM::is_result($items)) {
+		if (DBA::isResult($items)) {
 			$notifs = $this->formatNotifs(Item::inArray($items), $ident);
 		}
 
@@ -534,7 +532,7 @@ class NotificationsManager extends BaseObject
 		$params = ['order' => ['created' => true], 'limit' => [$start, $limit]];
 		$items = Item::selectForUser(local_user(), $fields, $condition, $params);
 
-		if (DBM::is_result($items)) {
+		if (DBA::isResult($items)) {
 			$notifs = $this->formatNotifs(Item::inArray($items), $ident);
 		}
 
@@ -586,7 +584,7 @@ class NotificationsManager extends BaseObject
 			intval($start),
 			intval($limit)
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$notifs = $this->formatIntros($r);
 		}
 
@@ -613,7 +611,7 @@ class NotificationsManager extends BaseObject
 			// We have to distinguish between these two because they use different data.
 			// Contact suggestions
 			if ($it['fid']) {
-				$return_addr = bin2hex(self::getApp()->user['nickname'] . '@' . self::getApp()->get_hostname() . ((self::getApp()->path) ? '/' . self::getApp()->path : ''));
+				$return_addr = bin2hex(self::getApp()->user['nickname'] . '@' . self::getApp()->get_hostname() . ((self::getApp()->urlpath) ? '/' . self::getApp()->urlpath : ''));
 
 				$intro = [
 					'label' => 'friend_suggestion',

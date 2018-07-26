@@ -2,10 +2,11 @@
 /**
  * @file mod/xrd.php
  */
+
 use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Protocol\Salmon;
 
 function xrd_init(App $a)
@@ -37,8 +38,8 @@ function xrd_init(App $a)
 		$name = substr($local, 0, strpos($local, '@'));
 	}
 
-	$user = dba::selectFirst('user', [], ['nickname' => $name]);
-	if (!DBM::is_result($user)) {
+	$user = DBA::selectFirst('user', [], ['nickname' => $name]);
+	if (!DBA::isResult($user)) {
 		killme();
 	}
 

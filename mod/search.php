@@ -2,6 +2,7 @@
 /**
  * @file mod/search.php
  */
+
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
@@ -9,7 +10,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 require_once 'include/security.php';
@@ -28,7 +29,7 @@ function search_saved_searches() {
 		intval(local_user())
 	);
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$saved = [];
 		foreach ($r as $rr) {
 			$saved[] = [
@@ -64,14 +65,14 @@ function search_init(App $a) {
 		if (x($_GET,'save') && $search) {
 			$r = q("SELECT * FROM `search` WHERE `uid` = %d AND `term` = '%s' LIMIT 1",
 				intval(local_user()),
-				dbesc($search)
+				DBA::escape($search)
 			);
-			if (!DBM::is_result($r)) {
-				dba::insert('search', ['uid' => local_user(), 'term' => $search]);
+			if (!DBA::isResult($r)) {
+				DBA::insert('search', ['uid' => local_user(), 'term' => $search]);
 			}
 		}
 		if (x($_GET,'remove') && $search) {
-			dba::delete('search', ['uid' => local_user(), 'term' => $search]);
+			DBA::delete('search', ['uid' => local_user(), 'term' => $search]);
 		}
 
 		/// @todo Check if there is a case at all that "aside" is prefilled here
@@ -208,13 +209,13 @@ function search_content(App $a) {
 			local_user(), TERM_OBJ_POST, TERM_HASHTAG, $search];
 		$params = ['order' => ['created' => true],
 			'limit' => [$a->pager['start'], $a->pager['itemspage']]];
-		$terms = dba::select('term', ['oid'], $condition, $params);
+		$terms = DBA::select('term', ['oid'], $condition, $params);
 
 		$itemids = [];
-		while ($term = dba::fetch($terms)) {
+		while ($term = DBA::fetch($terms)) {
 			$itemids[] = $term['oid'];
 		}
-		dba::close($terms);
+		DBA::close($terms);
 
 		if (!empty($itemids)) {
 			$params = ['order' => ['id' => true]];
@@ -235,7 +236,7 @@ function search_content(App $a) {
 		$r = Item::inArray($items);
 	}
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		info(L10n::t('No results.') . EOL);
 		return $o;
 	}

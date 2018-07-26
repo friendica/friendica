@@ -27,7 +27,7 @@ Requirements
 ---
 
 * Apache with mod-rewrite enabled and "Options All" so you can use a local .htaccess file
-* PHP 5.6+ (PHP 7 is recommended for performance)
+* PHP 5.6.1+ (PHP 7 is recommended for performance)
   * PHP *command line* access with register_argc_argv set to true in the php.ini file
   * Curl, GD, PDO, MySQLi, hash, xml, zip and OpenSSL extensions
   * The POSIX module of PHP needs to be activated (e.g. [RHEL, CentOS](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) have disabled it)
@@ -100,19 +100,20 @@ If you need to specify a port for the connection to the database, you can do so 
 
 *If* the manual installation fails for any reason, check the following:
 
-* Does ".htconfig.php" exist? If not, edit htconfig.php and change the system settings. Rename to .htconfig.php
-* Is the database is populated? If not, import the contents of "database.sql" with phpmyadmin or the mysql command line.
+* Does "config/local.ini.php" exist? If not, edit config/local-sample.ini.php and change the system settings.
+* Rename to `config/local.ini.php`.
+* Is the database is populated? If not, import the contents of `database.sql` with phpmyadmin or the mysql command line.
 
 At this point visit your website again, and register your personal account.
 Registration errors should all be recoverable automatically.
 If you get any *critical* failure at this point, it generally indicates the database was not installed correctly.
-You might wish to move/rename .htconfig.php to another name and empty (called 'dropping') the database tables, so that you can start fresh.
+You might wish to move/rename `config/local.ini.php` to another name and empty (called 'dropping') the database tables, so that you can start fresh.
 
 ### Option B: Run the automatic install script
 
 Open the file htconfig.php in the main Friendica directory with a text editor.
 Remove the `die('...');` line and edit the lines to suit your installation (MySQL, language, theme etc.).
-Then save the file (do not rename it). 
+Then save the file (do not rename it).
 
 Navigate to the main Friendica directory and execute the following command:
 
@@ -126,13 +127,23 @@ At this point visit your website again, and register your personal account.
 
 *If* the automatic installation fails for any reason, check the following:
 
-* Does ".htconfig.php" already exist? If yes, the automatic installation won't start
+* Does "config/local.ini.php" already exist? If yes, the automatic installation won't start
 * Are the settings inside "htconfig.php" correct? If not, edit the file again.
 * Is the empty MySQL-database created? If not, create it.
 
 For more information during the installation, you can use this command line option
 
     bin/console autoinstall -v
+
+### Prepare .htaccess file
+
+Copy .htaccess-dist to .htaccess (be careful under Windows) to have working mod-rewrite again. If you have installed Friendica into a sub directory, like /friendica/ set this path in RewriteBase accordingly.
+
+Example:
+
+    cp .htacces-dist .htaccess
+
+*Note*: Do **not** rename the .htaccess-dist file as it is tracked by GIT and renaming will cause a dirty working directory.
 
 ### Set up the worker
 
@@ -162,5 +173,5 @@ Bad things will happen.
 Let there be a hardware failure, a corrupted database or whatever you can think of.
 So once the installation of your Friendica node is done, you should make yourself a backup plan.
 
-The most important file is the `.htconfig.php` file in the base directory.
+The most important file is the `config/local.ini.php` file.
 As it stores all your data, you should also have a recent dump of your Friendica database at hand, should you have to recover your node.

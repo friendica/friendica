@@ -4,7 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 function starred_init(App $a) {
@@ -22,7 +22,7 @@ function starred_init(App $a) {
 	}
 
 	$item = Item::selectFirstForUser(local_user(), ['starred'], ['uid' => local_user(), 'id' => $message_id]);
-	if (!DBM::is_result($item)) {
+	if (!DBA::isResult($item)) {
 		killme();
 	}
 

@@ -7,13 +7,13 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function notice_init(App $a)
 {
 	$id = $a->argv[1];
 	$r = q("SELECT `user`.`nickname` FROM `user` LEFT JOIN `item` ON `item`.`uid` = `user`.`uid` WHERE `item`.`id` = %d", intval($id));
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$nick = $r[0]['nickname'];
 		$url = System::baseUrl() . "/display/$nick/$id";
 		goaway($url);

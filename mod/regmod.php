@@ -2,12 +2,13 @@
 /**
  * @file mod/regmod.php
  */
+
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 
@@ -18,11 +19,11 @@ function user_allow($hash)
 	$a = get_app();
 
 	$register = q("SELECT * FROM `register` WHERE `hash` = '%s' LIMIT 1",
-		dbesc($hash)
+		DBA::escape($hash)
 	);
 
 
-	if (!DBM::is_result($register)) {
+	if (!DBA::isResult($register)) {
 		return false;
 	}
 
@@ -30,12 +31,12 @@ function user_allow($hash)
 		intval($register[0]['uid'])
 	);
 
-	if (!DBM::is_result($user)) {
+	if (!DBA::isResult($user)) {
 		killme();
 	}
 
 	$r = q("DELETE FROM `register` WHERE `hash` = '%s'",
-		dbesc($register[0]['hash'])
+		DBA::escape($register[0]['hash'])
 	);
 
 
@@ -46,7 +47,7 @@ function user_allow($hash)
 	$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `is-default` = 1",
 		intval($user[0]['uid'])
 	);
-	if (DBM::is_result($r) && $r[0]['net-publish']) {
+	if (DBA::isResult($r) && $r[0]['net-publish']) {
 		$url = System::baseUrl() . '/profile/' . $user[0]['nickname'];
 		if ($url && strlen(Config::get('system', 'directory'))) {
 			Worker::add(PRIORITY_LOW, "Directory", $url);
@@ -57,7 +58,7 @@ function user_allow($hash)
 
 	$res = User::sendRegisterOpenEmail(
 		$user[0]['email'],
-		$a->config['sitename'],
+		Config::get('config', 'sitename'),
 		System::baseUrl(),
 		$user[0]['username'],
 		$register[0]['password']);
@@ -76,10 +77,10 @@ function user_allow($hash)
 function user_deny($hash)
 {
 	$register = q("SELECT * FROM `register` WHERE `hash` = '%s' LIMIT 1",
-		dbesc($hash)
+		DBA::escape($hash)
 	);
 
-	if (!DBM::is_result($register)) {
+	if (!DBA::isResult($register)) {
 		return false;
 	}
 
@@ -87,8 +88,8 @@ function user_deny($hash)
 		intval($register[0]['uid'])
 	);
 
-	dba::delete('user', ['uid' => $register[0]['uid']]);
-	dba::delete('register', ['hash' => $register[0]['hash']]);
+	DBA::delete('user', ['uid' => $register[0]['uid']]);
+	DBA::delete('register', ['hash' => $register[0]['hash']]);
 
 	notice(L10n::t('Registration revoked for %s', $user[0]['username']) . EOL);
 	return true;
@@ -96,11 +97,9 @@ function user_deny($hash)
 
 function regmod_content(App $a)
 {
-	global $lang;
-
 	if (!local_user()) {
 		info(L10n::t('Please login.') . EOL);
-		$o = '<br /><br />' . Login::form($a->query_string, $a->config['register_policy'] == REGISTER_CLOSED ? 0 : 1);
+		$o = '<br /><br />' . Login::form($a->query_string, intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED ? 0 : 1);
 		return $o;
 	}
 

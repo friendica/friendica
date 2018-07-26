@@ -57,7 +57,7 @@ interface IPConfigAdapter
 	 * @param string $k     The configuration key to set
 	 * @param string $value The value to store
 	 *
-	 * @return mixed Stored $value or false
+	 * @return bool Operation success
 	 */
 	public function set($uid, $cat, $k, $value);
 

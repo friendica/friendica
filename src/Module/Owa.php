@@ -6,23 +6,21 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\OpenWebAuthToken;
 use Friendica\Util\HTTPSignature;
 
-use dba;
-
 /**
  * @brief OpenWebAuth verifier and token generator
- * 
+ *
  * See https://macgirvin.com/wiki/mike/OpenWebAuth/Home
  * Requests to this endpoint should be signed using HTTP Signatures
  * using the 'Authorization: Signature' authentication method
  * If the signature verifies a token is returned.
  *
  * This token may be exchanged for an authenticated cookie.
- * 
+ *
  * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/Zotlabs/Module/Owa.php
  */
 class Owa extends BaseModule
@@ -51,9 +49,9 @@ class Owa extends BaseModule
 						$fields    = ['id', 'url', 'addr', 'pubkey'];
 						$condition = ['id' => $cid];
 
-						$contact = dba::selectFirst('contact', $fields, $condition);
+						$contact = DBA::selectFirst('contact', $fields, $condition);
 
-						if (DBM::is_result($contact)) {
+						if (DBA::isResult($contact)) {
 							// Try to verify the signed header with the public key of the contact record
 							// we have found.
 							$verified = HTTPSignature::verify('', $contact['pubkey']);

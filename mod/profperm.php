@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 
 function profperm_init(App $a)
@@ -47,11 +47,11 @@ function profperm_content(App $a) {
 	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
 		$r = q("SELECT `id` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `self` = 0
 			AND `network` = '%s' AND `id` = %d AND `uid` = %d LIMIT 1",
-			dbesc(NETWORK_DFRN),
+			DBA::escape(NETWORK_DFRN),
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (DBM::is_result($r))
+		if (DBA::isResult($r))
 			$change = intval($a->argv[2]);
 	}
 
@@ -61,7 +61,7 @@ function profperm_content(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBM::is_result($r)) {
+		if (! DBA::isResult($r)) {
 			notice(L10n::t('Invalid profile identifier.') . EOL );
 			return;
 		}
@@ -73,7 +73,7 @@ function profperm_content(App $a) {
 		);
 
 		$ingroup = [];
-		if (DBM::is_result($r))
+		if (DBA::isResult($r))
 			foreach($r as $member)
 				$ingroup[] = $member['id'];
 
@@ -103,7 +103,7 @@ function profperm_content(App $a) {
 			$members = $r;
 
 			$ingroup = [];
-			if (DBM::is_result($r))
+			if (DBA::isResult($r))
 				foreach($r as $member)
 					$ingroup[] = $member['id'];
 		}
@@ -144,10 +144,10 @@ function profperm_content(App $a) {
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `blocked` = 0 and `pending` = 0 and `self` = 0
 			AND `network` = '%s' ORDER BY `name` ASC",
 			intval(local_user()),
-			dbesc(NETWORK_DFRN)
+			DBA::escape(NETWORK_DFRN)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$textmode = (($switchtotext && (count($r) > $switchtotext)) ? true : false);
 			foreach($r as $member) {
 				if(! in_array($member['id'],$ingroup)) {

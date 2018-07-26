@@ -9,21 +9,19 @@
 
 namespace Friendica\Protocol;
 
+use DOMDocument;
+use DOMXPath;
+use Exception;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use Friendica\Protocol\Diaspora;
 use Friendica\Util\XML;
-use dba;
-use DOMDocument;
-use DOMXPath;
-use Exception;
 
 require_once 'include/dba.php';
 
@@ -68,8 +66,8 @@ class PortableContact
 
 		if ($cid) {
 			if (!$url || !$uid) {
-				$contact = dba::selectFirst('contact', ['poco', 'uid'], ['id' => $cid]);
-				if (DBM::is_result($contact)) {
+				$contact = DBA::selectFirst('contact', ['poco', 'uid'], ['id' => $cid]);
+				if (DBA::isResult($contact)) {
 					$url = $contact['poco'];
 					$uid = $contact['uid'];
 				}
@@ -205,7 +203,7 @@ class PortableContact
 		logger("load: loaded $total entries", LOGGER_DEBUG);
 
 		$condition = ["`cid` = ? AND `uid` = ? AND `zcid` = ? AND `updated` < UTC_TIMESTAMP - INTERVAL 2 DAY", $cid, $uid, $zcid];
-		dba::delete('glink', $condition);
+		DBA::delete('glink', $condition);
 	}
 
 	public static function reachable($profile, $server = "", $network = "", $force = false)
@@ -283,10 +281,10 @@ class PortableContact
 
 		$r = q(
 			"SELECT `id` FROM `gserver` WHERE `nurl` = '%s' AND `last_contact` > `last_failure`",
-			dbesc(normalise_link($server_url))
+			DBA::escape(normalise_link($server_url))
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return $server_url;
 		}
 
@@ -308,10 +306,10 @@ class PortableContact
 	{
 		$gcontacts = q(
 			"SELECT * FROM `gcontact` WHERE `nurl` = '%s'",
-			dbesc(normalise_link($profile))
+			DBA::escape(normalise_link($profile))
 		);
 
-		if (!DBM::is_result($gcontacts)) {
+		if (!DBA::isResult($gcontacts)) {
 			return false;
 		}
 
@@ -343,7 +341,7 @@ class PortableContact
 			if (!self::checkServer($server_url, $gcontacts[0]["network"], $force)) {
 				if ($force) {
 					$fields = ['last_failure' => DateTimeFormat::utcNow()];
-					dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+					DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 				}
 
 				logger("Profile ".$profile.": Server ".$server_url." wasn't reachable.", LOGGER_DEBUG);
@@ -355,7 +353,7 @@ class PortableContact
 		if (in_array($gcontacts[0]["network"], ["", NETWORK_FEED])) {
 			$server = q(
 				"SELECT `network` FROM `gserver` WHERE `nurl` = '%s' AND `network` != ''",
-				dbesc(normalise_link($server_url))
+				DBA::escape(normalise_link($server_url))
 			);
 
 			if ($server) {
@@ -368,7 +366,7 @@ class PortableContact
 		// noscrape is really fast so we don't cache the call.
 		if (($server_url != "") && ($gcontacts[0]["nick"] != "")) {
 			//  Use noscrape if possible
-			$server = q("SELECT `noscrape`, `network` FROM `gserver` WHERE `nurl` = '%s' AND `noscrape` != ''", dbesc(normalise_link($server_url)));
+			$server = q("SELECT `noscrape`, `network` FROM `gserver` WHERE `nurl` = '%s' AND `noscrape` != ''", DBA::escape(normalise_link($server_url)));
 
 			if ($server) {
 				$noscraperet = Network::curl($server[0]["noscrape"]."/".$gcontacts[0]["nick"]);
@@ -424,7 +422,7 @@ class PortableContact
 
 						if (!empty($noscrape["updated"])) {
 							$fields = ['last_contact' => DateTimeFormat::utcNow()];
-							dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+							DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 							logger("Profile ".$profile." was last updated at ".$noscrape["updated"]." (noscrape)", LOGGER_DEBUG);
 
@@ -452,7 +450,7 @@ class PortableContact
 			&& (normalise_link($profile) != normalise_link($data["url"]))
 		) {
 			// Delete the old entry
-			dba::delete('gcontact', ['nurl' => normalise_link($profile)]);
+			DBA::delete('gcontact', ['nurl' => normalise_link($profile)]);
 
 			$gcontact = array_merge($gcontacts[0], $data);
 
@@ -473,7 +471,7 @@ class PortableContact
 
 		if (($data["poll"] == "") || (in_array($data["network"], [NETWORK_FEED, NETWORK_PHANTOM]))) {
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
-			dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+			DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 			logger("Profile ".$profile." wasn't reachable (profile)", LOGGER_DEBUG);
 			return false;
@@ -489,7 +487,7 @@ class PortableContact
 
 		if (!$feedret["success"]) {
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
-			dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+			DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 			logger("Profile ".$profile." wasn't reachable (no feed)", LOGGER_DEBUG);
 			return false;
@@ -531,11 +529,11 @@ class PortableContact
 			$fields['updated'] = $last_updated;
 		}
 
-		dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+		DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
 		if (($gcontacts[0]["generation"] == 0)) {
 			$fields = ['generation' => 9];
-			dba::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
+			DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 		}
 
 		logger("Profile ".$profile." was last updated at ".$last_updated, LOGGER_DEBUG);
@@ -931,12 +929,12 @@ class PortableContact
 			return false;
 		}
 
-		$gserver = dba::selectFirst('gserver', [], ['nurl' => normalise_link($server_url)]);
-		if (DBM::is_result($gserver)) {
+		$gserver = DBA::selectFirst('gserver', [], ['nurl' => normalise_link($server_url)]);
+		if (DBA::isResult($gserver)) {
 			if ($gserver["created"] <= NULL_DATE) {
 				$fields = ['created' => DateTimeFormat::utcNow()];
 				$condition = ['nurl' => normalise_link($server_url)];
-				dba::update('gserver', $fields, $condition);
+				DBA::update('gserver', $fields, $condition);
 			}
 			$poco = $gserver["poco"];
 			$noscrape = $gserver["noscrape"];
@@ -990,7 +988,7 @@ class PortableContact
 		// Mastodon uses the "@" for user profiles.
 		// But this can be misunderstood.
 		if (parse_url($server_url, PHP_URL_USER) != '') {
-			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
+			DBA::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
 		}
 
@@ -1003,10 +1001,10 @@ class PortableContact
 
 		// Quit if there is a timeout.
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
-		if (DBM::is_result($gserver) && ($orig_server_url == $server_url) &&
-			(!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT))) {
+		if (DBA::isResult($gserver) && ($orig_server_url == $server_url) &&
+			(!empty($serverret["errno"]) && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT))) {
 			logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
-			dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
+			DBA::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 			return false;
 		}
 
@@ -1019,9 +1017,9 @@ class PortableContact
 			$serverret = Network::curl($server_url."/.well-known/host-meta", false, $redirects, ['timeout' => 20]);
 
 			// Quit if there is a timeout
-			if (!$serverret["success"] && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
+			if (!empty($serverret["errno"]) && ($serverret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 				logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
-				dba::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
+				DBA::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => normalise_link($server_url)]);
 				return false;
 			}
 
@@ -1047,7 +1045,7 @@ class PortableContact
 
 		if (!$failure) {
 			// This will be too low, but better than no value at all.
-			$registered_users = dba::count('gcontact', ['server_url' => normalise_link($server_url)]);
+			$registered_users = DBA::count('gcontact', ['server_url' => normalise_link($server_url)]);
 		}
 
 		// Look for poco
@@ -1230,19 +1228,25 @@ class PortableContact
 
 						$site_name = $data->site->name;
 
-						$data->site->closed = self::toBoolean($data->site->closed);
+						$private = false;
+						$inviteonly = false;
+						$closed = false;
+
+						if (!empty($data->site->closed)) {
+							$closed = self::toBoolean($data->site->closed);
+						}
 
 						if (!empty($data->site->private)) {
-							$data->site->private = self::toBoolean($data->site->private);
+							$private = self::toBoolean($data->site->private);
 						}
 
 						if (!empty($data->site->inviteonly)) {
-							$data->site->inviteonly = self::toBoolean($data->site->inviteonly);
+							$inviteonly = self::toBoolean($data->site->inviteonly);
 						}
 
-						if (!$data->site->closed && !$data->site->private and $data->site->inviteonly) {
+						if (!$closed && !$private and $inviteonly) {
 							$register_policy = REGISTER_APPROVE;
-						} elseif (!$data->site->closed && !$data->site->private) {
+						} elseif (!$closed && !$private) {
 							$register_policy = REGISTER_OPEN;
 						} else {
 							$register_policy = REGISTER_CLOSED;
@@ -1366,7 +1370,7 @@ class PortableContact
 		}
 
 		// Check again if the server exists
-		$found = dba::exists('gserver', ['nurl' => normalise_link($server_url)]);
+		$found = DBA::exists('gserver', ['nurl' => normalise_link($server_url)]);
 
 		$version = strip_tags($version);
 		$site_name = strip_tags($site_name);
@@ -1380,11 +1384,11 @@ class PortableContact
 				'last_contact' => $last_contact, 'last_failure' => $last_failure];
 
 		if ($found) {
-			dba::update('gserver', $fields, ['nurl' => normalise_link($server_url)]);
+			DBA::update('gserver', $fields, ['nurl' => normalise_link($server_url)]);
 		} elseif (!$failure) {
 			$fields['nurl'] = normalise_link($server_url);
 			$fields['created'] = DateTimeFormat::utcNow();
-			dba::insert('gserver', $fields);
+			DBA::insert('gserver', $fields);
 		}
 
 		if (!$failure && in_array($fields['network'], [NETWORK_DFRN, NETWORK_DIASPORA])) {
@@ -1415,17 +1419,17 @@ class PortableContact
 			return;
 		}
 
-		$gserver = dba::selectFirst('gserver', ['id', 'relay-subscribe', 'relay-scope'], ['nurl' => normalise_link($server_url)]);
-		if (!DBM::is_result($gserver)) {
+		$gserver = DBA::selectFirst('gserver', ['id', 'relay-subscribe', 'relay-scope'], ['nurl' => normalise_link($server_url)]);
+		if (!DBA::isResult($gserver)) {
 			return;
 		}
 
 		if (($gserver['relay-subscribe'] != $data->subscribe) || ($gserver['relay-scope'] != $data->scope)) {
 			$fields = ['relay-subscribe' => $data->subscribe, 'relay-scope' => $data->scope];
-			dba::update('gserver', $fields, ['id' => $gserver['id']]);
+			DBA::update('gserver', $fields, ['id' => $gserver['id']]);
 		}
 
-		dba::delete('gserver-tag', ['gserver-id' => $gserver['id']]);
+		DBA::delete('gserver-tag', ['gserver-id' => $gserver['id']]);
 		if ($data->scope == 'tags') {
 			// Avoid duplicates
 			$tags = [];
@@ -1435,7 +1439,7 @@ class PortableContact
 			}
 
 			foreach ($tags as $tag) {
-				dba::insert('gserver-tag', ['gserver-id' => $gserver['id'], 'tag' => $tag], true);
+				DBA::insert('gserver-tag', ['gserver-id' => $gserver['id'], 'tag' => $tag], true);
 			}
 		}
 
@@ -1473,12 +1477,12 @@ class PortableContact
 			WHERE `network` IN ('%s', '%s', '%s') AND `last_contact` > `last_failure`
 			ORDER BY `last_contact`
 			LIMIT 1000",
-			dbesc(NETWORK_DFRN),
-			dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_OSTATUS)
+			DBA::escape(NETWORK_DFRN),
+			DBA::escape(NETWORK_DIASPORA),
+			DBA::escape(NETWORK_OSTATUS)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return false;
 		}
 
@@ -1505,8 +1509,8 @@ class PortableContact
 		foreach ($serverlist as $server) {
 			$server_url = str_replace("/index.php", "", $server->url);
 
-			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", dbesc(normalise_link($server_url)));
-			if (!DBM::is_result($r)) {
+			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", DBA::escape(normalise_link($server_url)));
+			if (!DBA::isResult($r)) {
 				logger("Call server check for server ".$server_url, LOGGER_DEBUG);
 				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $server_url);
 			}
@@ -1575,7 +1579,7 @@ class PortableContact
 	public static function discoverSingleServer($id)
 	{
 		$r = q("SELECT `poco`, `nurl`, `url`, `network` FROM `gserver` WHERE `id` = %d", intval($id));
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return false;
 		}
 
@@ -1621,7 +1625,7 @@ class PortableContact
 			}
 
 			$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
-			dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
+			DBA::update('gserver', $fields, ['nurl' => $server["nurl"]]);
 
 			return true;
 		} else {
@@ -1630,7 +1634,7 @@ class PortableContact
 
 			// If we couldn't reach the server, we will try it some time later
 			$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
-			dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
+			DBA::update('gserver', $fields, ['nurl' => $server["nurl"]]);
 
 			return false;
 		}
@@ -1643,27 +1647,33 @@ class PortableContact
 
 		$no_of_queries = 5;
 
-		$requery_days = intval(Config::get("system", "poco_requery_days"));
+		$requery_days = intval(Config::get('system', 'poco_requery_days'));
 
 		if ($requery_days == 0) {
 			$requery_days = 7;
 		}
-		$last_update = date("c", time() - (60 * 60 * 24 * $requery_days));
+		$last_update = date('c', time() - (60 * 60 * 24 * $requery_days));
 
-		$r = q("SELECT `id`, `url`, `network` FROM `gserver` WHERE `last_contact` >= `last_failure` AND `poco` != '' AND `last_poco_query` < '%s' ORDER BY RAND()", dbesc($last_update));
-		if (DBM::is_result($r)) {
-			foreach ($r as $server) {
-				if (!self::checkServer($server["url"], $server["network"])) {
+		$gservers = q("SELECT `id`, `url`, `nurl`, `network`
+			FROM `gserver`
+			WHERE `last_contact` >= `last_failure`
+			AND `poco` != ''
+			AND `last_poco_query` < '%s'
+			ORDER BY RAND()", DBA::escape($last_update)
+		);
+		if (DBA::isResult($gservers)) {
+			foreach ($gservers as $gserver) {
+				if (!self::checkServer($gserver['url'], $gserver['network'])) {
 					// The server is not reachable? Okay, then we will try it later
 					$fields = ['last_poco_query' => DateTimeFormat::utcNow()];
-					dba::update('gserver', $fields, ['nurl' => $server["nurl"]]);
+					DBA::update('gserver', $fields, ['nurl' => $gserver['nurl']]);
 					continue;
 				}
 
-				logger('Update directory from server '.$server['url'].' with ID '.$server['id'], LOGGER_DEBUG);
-				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "update_server_directory", (int)$server['id']);
+				logger('Update directory from server ' . $gserver['url'] . ' with ID ' . $gserver['id'], LOGGER_DEBUG);
+				Worker::add(PRIORITY_LOW, 'DiscoverPoCo', 'update_server_directory', (int) $gserver['id']);
 
-				if (!$complete && (--$no_of_queries == 0)) {
+				if (!$complete && ( --$no_of_queries == 0)) {
 					break;
 				}
 			}
@@ -1677,25 +1687,25 @@ class PortableContact
 		}
 
 		foreach ($data->entry as $entry) {
-			$username = "";
+			$username = '';
 			if (isset($entry->urls)) {
 				foreach ($entry->urls as $url) {
 					if ($url->type == 'profile') {
 						$profile_url = $url->value;
-						$urlparts = parse_url($profile_url);
-						$username = end(explode("/", $urlparts["path"]));
+						$path_array = explode('/', parse_url($profile_url, PHP_URL_PATH));
+						$username = end($path_array);
 					}
 				}
 			}
-			if ($username != "") {
-				logger("Fetch contacts for the user ".$username." from the server ".$server["nurl"], LOGGER_DEBUG);
+			if ($username != '') {
+				logger('Fetch contacts for the user ' . $username . ' from the server ' . $server['nurl'], LOGGER_DEBUG);
 
 				// Fetch all contacts from a given user from the other server
-				$url = $server["poco"]."/".$username."/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
+				$url = $server['poco'] . '/' . $username . '/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation';
 
 				$retdata = Network::curl($url);
-				if ($retdata["success"]) {
-					self::discoverServer(json_decode($retdata["body"]), 3);
+				if ($retdata['success']) {
+					self::discoverServer(json_decode($retdata['body']), 3);
 				}
 			}
 		}

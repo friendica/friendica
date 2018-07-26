@@ -13,7 +13,9 @@
 
 				<h4 class="media-heading">{{$from_name}}</h4>
 				<div class="mail-list-subject"><a href="message/{{$id}}">{{$subject}}</a></div>
-				<a href="message/dropconv/{{$id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="close pull-right" onmouseover="imgbright(this);" onmouseout="imgdull(this);" >&times;</a>
+				<a href="message/dropconv/{{$id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="pull-right" onmouseover="imgbright(this);" onmouseout="imgdull(this);">
+				<i class="faded-icon fa fa-trash"></i>
+				</a>
 				<p class="text-muted">{{$count}}</p>
 			</div>
 

@@ -1,9 +1,8 @@
 <?php
 namespace Friendica\Core\Config;
 
-use dba;
 use Friendica\BaseObject;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 require_once 'include/dba.php';
 
@@ -27,8 +26,8 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			return;
 		}
 
-		$configs = dba::select('config', ['v', 'k'], ['cat' => $cat]);
-		while ($config = dba::fetch($configs)) {
+		$configs = DBA::select('config', ['v', 'k'], ['cat' => $cat]);
+		while ($config = DBA::fetch($configs)) {
 			$k = $config['k'];
 
 			self::getApp()->setConfigValue($cat, $k, $config['v']);
@@ -38,7 +37,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 				$this->in_db[$cat][$k] = true;
 			}
 		}
-		dba::close($configs);
+		DBA::close($configs);
 	}
 
 	public function get($cat, $k, $default_value = null, $refresh = false)
@@ -56,8 +55,8 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			}
 		}
 
-		$config = dba::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
-		if (DBM::is_result($config)) {
+		$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $k]);
+		if (DBA::isResult($config)) {
 			// manage array value
 			$value = (preg_match("|^a:[0-9]+:{.*}$|s", $config['v']) ? unserialize($config['v']) : $config['v']);
 
@@ -66,11 +65,17 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			$this->in_db[$cat][$k] = true;
 			return $value;
 		} elseif (isset($a->config[$cat][$k])) {
-			// Assign the value (mostly) from the .htconfig.php to the cache
+			// Assign the value (mostly) from config/local.ini.php file to the cache
 			$this->cache[$cat][$k] = $a->config[$cat][$k];
 			$this->in_db[$cat][$k] = false;
 
 			return $a->config[$cat][$k];
+		} elseif (isset($a->config[$k])) {
+			// Assign the value (mostly) from config/local.ini.php file to the cache
+			$this->cache[$k] = $a->config[$k];
+			$this->in_db[$k] = false;
+
+			return $a->config[$k];
 		}
 
 		$this->cache[$cat][$k] = '!<unset>!';
@@ -90,6 +95,13 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 
 		$stored = $this->get($cat, $k, null, true);
 
+		if (!isset($this->in_db[$cat])) {
+			$this->in_db[$cat] = [];
+		}
+		if (!isset($this->in_db[$cat][$k])) {
+			$this->in_db[$cat] = false;
+		}
+
 		if (($stored === $dbvalue) && $this->in_db[$cat][$k]) {
 			return true;
 		}
@@ -102,11 +114,10 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $dbvalue);
 
-		$result = dba::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
+		$result = DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $k], true);
 
 		if ($result) {
 			$this->in_db[$cat][$k] = true;
-			return $value;
 		}
 
 		return $result;
@@ -119,7 +130,7 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 			unset($this->in_db[$cat][$k]);
 		}
 
-		$result = dba::delete('config', ['cat' => $cat, 'k' => $k]);
+		$result = DBA::delete('config', ['cat' => $cat, 'k' => $k]);
 
 		return $result;
 	}

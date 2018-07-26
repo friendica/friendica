@@ -323,6 +323,9 @@ Called before calling PHP's `mail()`.
 - **body**
 - **headers**
 
+### load_config
+Called during `App` initialization to allow addons to load their own configuration file(s) with `App::loadConfigFile()`.
+
 ### nav_info
 Called after the navigational menu is build in `include/nav.php`.
 `$b` is an array containing `$nav` from `include/nav.php`.
@@ -564,6 +567,10 @@ Here is a complete list of all hook callbacks with file locations (as of 01-Apr-
 ### src/Render/FriendicaSmartyEngine.php
 
     Addon::callHooks("template_vars", $arr);
+
+### src/App.php
+
+    Addon::callHooks('load_config');
 
 ### src/Model/Item.php
 

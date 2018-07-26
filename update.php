@@ -2,13 +2,14 @@
 
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
-use Friendica\Core\L10n;
+use Friendica\Util\DateTimeFormat;
 
 require_once 'include/dba.php';
 
@@ -32,6 +33,8 @@ require_once 'include/dba.php';
  * 1. Create a function "update_4712()" here in the update.php
  * 2. Apply the needed structural changes in src/Database/DBStructure.php
  * 3. Set DB_UPDATE_VERSION in boot.php to 4712.
+ *
+ * If you need to run a script before the database update, name the function "pre_update_4712()"
  */
 
 function update_1178() {
@@ -46,10 +49,10 @@ function update_1178() {
 		$profile["pub_keywords"] = profile_clean_keywords($profile["pub_keywords"]);
 
 		$r = q("UPDATE `contact` SET `about` = '%s', `location` = '%s', `keywords` = '%s', `gender` = '%s' WHERE `self` AND `uid` = %d",
-				dbesc($profile["about"]),
-				dbesc($profile["locality"]),
-				dbesc($profile["pub_keywords"]),
-				dbesc($profile["gender"]),
+				DBA::escape($profile["about"]),
+				DBA::escape($profile["locality"]),
+				DBA::escape($profile["pub_keywords"]),
+				DBA::escape($profile["gender"]),
 				intval($profile["uid"])
 			);
 	}
@@ -109,11 +112,11 @@ function update_1191() {
 
 	// select old formlist addon entries
 	$r = q("SELECT `uid`, `cat`, `k`, `v` FROM `pconfig` WHERE `cat` = '%s' ",
-		dbesc('forumlist')
+		DBA::escape('forumlist')
 	);
 
 	// convert old forumlist addon entries in new config entries
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$uid = $rr['uid'];
 			$family = $rr['cat'];
@@ -146,21 +149,21 @@ function update_1191() {
 
 function update_1203() {
 	$r = q("UPDATE `user` SET `account-type` = %d WHERE `page-flags` IN (%d, %d)",
-		dbesc(ACCOUNT_TYPE_COMMUNITY), dbesc(PAGE_COMMUNITY), dbesc(PAGE_PRVGROUP));
+		DBA::escape(ACCOUNT_TYPE_COMMUNITY), DBA::escape(PAGE_COMMUNITY), DBA::escape(PAGE_PRVGROUP));
 }
 
 function update_1244() {
 	// Sets legacy_password for all legacy hashes
-	dba::update('user', ['legacy_password' => true], ['SUBSTR(password, 1, 4) != "$2y$"']);
+	DBA::update('user', ['legacy_password' => true], ['SUBSTR(password, 1, 4) != "$2y$"']);
 
 	// All legacy hashes are re-hashed using the new secure hashing function
-	$stmt = dba::select('user', ['uid', 'password'], ['legacy_password' => true]);
-	while($user = dba::fetch($stmt)) {
-		dba::update('user', ['password' => User::hashPassword($user['password'])], ['uid' => $user['uid']]);
+	$stmt = DBA::select('user', ['uid', 'password'], ['legacy_password' => true]);
+	while($user = DBA::fetch($stmt)) {
+		DBA::update('user', ['password' => User::hashPassword($user['password'])], ['uid' => $user['uid']]);
 	}
 
 	// Logged in users are forcibly logged out
-	dba::delete('session', ['1 = 1']);
+	DBA::delete('session', ['1 = 1']);
 
 	return UPDATE_SUCCESS;
 }
@@ -179,7 +182,7 @@ function update_1245() {
 
 function update_1247() {
 	// Removing hooks with the old name
-	dba::e("DELETE FROM `hook`
+	DBA::e("DELETE FROM `hook`
 WHERE `hook` LIKE 'plugin_%'");
 
 	// Make sure we install the new renamed ones
@@ -188,11 +191,11 @@ WHERE `hook` LIKE 'plugin_%'");
 
 function update_1260() {
 	Config::set('system', 'maintenance', 1);
-	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating author-id and owner-id in item and thread table. ', DBM::date().' '.date('e')));
+	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating author-id and owner-id in item and thread table. ', DateTimeFormat::utcNow().' '.date('e')));
 
-	$items = dba::p("SELECT `id`, `owner-link`, `owner-name`, `owner-avatar`, `network` FROM `item`
+	$items = DBA::p("SELECT `id`, `owner-link`, `owner-name`, `owner-avatar`, `network` FROM `item`
 		WHERE `owner-id` = 0 AND `owner-link` != ''");
-	while ($item = dba::fetch($items)) {
+	while ($item = DBA::fetch($items)) {
 		$contact = ['url' => $item['owner-link'], 'name' => $item['owner-name'],
 			'photo' => $item['owner-avatar'], 'network' => $item['network']];
 		$cid = Contact::getIdForURL($item['owner-link'], 0, false, $contact);
@@ -201,14 +204,14 @@ function update_1260() {
 		}
 		Item::update(['owner-id' => $cid], ['id' => $item['id']]);
 	}
-	dba::close($items);
+	DBA::close($items);
 
-	dba::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
+	DBA::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
 		SET `thread`.`owner-id` = `item`.`owner-id` WHERE `thread`.`owner-id` = 0");
 
-	$items = dba::p("SELECT `id`, `author-link`, `author-name`, `author-avatar`, `network` FROM `item`
+	$items = DBA::p("SELECT `id`, `author-link`, `author-name`, `author-avatar`, `network` FROM `item`
 		WHERE `author-id` = 0 AND `author-link` != ''");
-	while ($item = dba::fetch($items)) {
+	while ($item = DBA::fetch($items)) {
 		$contact = ['url' => $item['author-link'], 'name' => $item['author-name'],
 			'photo' => $item['author-avatar'], 'network' => $item['network']];
 		$cid = Contact::getIdForURL($item['author-link'], 0, false, $contact);
@@ -217,9 +220,9 @@ function update_1260() {
 		}
 		Item::update(['author-id' => $cid], ['id' => $item['id']]);
 	}
-	dba::close($items);
+	DBA::close($items);
 
-	dba::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
+	DBA::e("UPDATE `thread` INNER JOIN `item` ON `thread`.`iid` = `item`.`id`
 		SET `thread`.`author-id` = `item`.`author-id` WHERE `thread`.`author-id` = 0");
 
 	Config::set('system', 'maintenance', 0);
@@ -228,7 +231,19 @@ function update_1260() {
 
 function update_1261() {
 	// This fixes the results of an issue in the develop branch of 2018-05.
-	dba::update('contact', ['blocked' => false, 'pending' => false], ['uid' => 0, 'blocked' => true, 'pending' => true]);
+	DBA::update('contact', ['blocked' => false, 'pending' => false], ['uid' => 0, 'blocked' => true, 'pending' => true]);
+	return UPDATE_SUCCESS;
+}
+
+function update_1278() {
+	Config::set('system', 'maintenance', 1);
+	Config::set('system', 'maintenance_reason', L10n::t('%s: Updating post-type.', DateTimeFormat::utcNow().' '.date('e')));
+
+	Item::update(['post-type' => Item::PT_PAGE], ['bookmark' => true]);
+	Item::update(['post-type' => Item::PT_PERSONAL_NOTE], ['type' => 'note']);
+
+	Config::set('system', 'maintenance', 0);
+
 	return UPDATE_SUCCESS;
 }
 

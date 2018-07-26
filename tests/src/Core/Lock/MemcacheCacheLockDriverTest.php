@@ -7,6 +7,9 @@ namespace Friendica\Test\src\Core\Lock;
 use Friendica\Core\Cache\CacheDriverFactory;
 use Friendica\Core\Lock\CacheLockDriver;
 
+/**
+ * @requires extension Memcache
+ */
 class MemcacheCacheLockDriverTest extends LockTest
 {
 	/**
@@ -16,25 +19,13 @@ class MemcacheCacheLockDriverTest extends LockTest
 
 	protected function getInstance()
 	{
-		if (class_exists('Memcache')) {
-			try {
-				$this->cache = CacheDriverFactory::create('memcache');
-			} catch (\Exception $exception) {
-				print "Memcache - TestCase failed: " . $exception->getMessage();
-				throw new \Exception();
-			}
-			return new CacheLockDriver($this->cache);
-		} else {
-			$this->markTestSkipped('Memcache driver isn\'t available');
-			return null;
-		}
+		$this->cache = CacheDriverFactory::create('memcache');
+		return new CacheLockDriver($this->cache);
 	}
 
 	public function tearDown()
 	{
-		if (class_exists('Memcache')) {
-			$this->cache->clear();
-		}
+		$this->cache->clear();
 		parent::tearDown();
 	}
 }

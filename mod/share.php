@@ -1,7 +1,7 @@
 <?php
 
 use Friendica\App;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 function share_init(App $a) {
@@ -15,7 +15,7 @@ function share_init(App $a) {
 		'guid', 'created', 'plink', 'title'];
 	$item = Item::selectFirst($fields, ['id' => $post_id]);
 
-	if (!DBM::is_result($item) || $item['private'] == 1) {
+	if (!DBA::isResult($item) || $item['private'] == 1) {
 		killme();
 	}
 

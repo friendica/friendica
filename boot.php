@@ -29,7 +29,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -41,7 +41,7 @@ define('FRIENDICA_PLATFORM',     'Friendica');
 define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
 define('FRIENDICA_VERSION',      '2018.08-dev');
 define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1278);
+define('DB_UPDATE_VERSION',      1280);
 define('NEW_UPDATE_ROUTINE_VERSION', 1170);
 
 /**
@@ -64,15 +64,13 @@ define('EOL',                    "<br />\r\n");
  * @brief Image storage quality.
  *
  * Lower numbers save space at cost of image detail.
- * For ease of upgrade, please do not change here. Change jpeg quality with
- * $a->config['system']['jpeg_quality'] = n;
- * in .htconfig.php, where n is netween 1 and 100, and with very poor results
- * below about 50
+ * For ease of upgrade, please do not change here. Set [system] jpegquality = n in config/local.ini.php,
+ * where n is between 1 and 100, and with very poor results below about 50
  */
 define('JPEG_QUALITY',            100);
 
 /**
- * $a->config['system']['png_quality'] from 0 (uncompressed) to 9
+ * [system] png_quality = n where is between 0 (uncompressed) to 9
  */
 define('PNG_QUALITY',             8);
 
@@ -83,9 +81,10 @@ define('PNG_QUALITY',             8);
  * this length (on the longest side, the other side will be scaled appropriately).
  * Modify this value using
  *
- *    $a->config['system']['max_image_length'] = n;
+ * [system]
+ * max_image_length = n;
  *
- * in .htconfig.php
+ * in config/local.ini.php
  *
  * If you don't want to set a maximum length, set to -1. The default value is
  * defined by 'MAX_IMAGE_LENGTH' below.
@@ -114,11 +113,12 @@ define('SSL_POLICY_SELFSIGN',     2);
  * log levels
  * @{
  */
-define('LOGGER_NORMAL',          0);
-define('LOGGER_TRACE',           1);
-define('LOGGER_DEBUG',           2);
-define('LOGGER_DATA',            3);
-define('LOGGER_ALL',             4);
+define('LOGGER_WARNING',         0);
+define('LOGGER_INFO',            1);
+define('LOGGER_TRACE',           2);
+define('LOGGER_DEBUG',           3);
+define('LOGGER_DATA',            4);
+define('LOGGER_ALL',             5);
 /* @}*/
 
 /**
@@ -153,19 +153,6 @@ define('REGISTER_OPEN',          2);
 */
 
 /**
- * @name Contact_is
- *
- * Relationship types
- * @{
- */
-define('CONTACT_IS_FOLLOWER', 1);
-define('CONTACT_IS_SHARING',  2);
-define('CONTACT_IS_FRIEND',   3);
-/**
- *  @}
- */
-
-/**
  * @name Update
  *
  * DB update return values
@@ -181,10 +168,10 @@ define('UPDATE_FAILED',  1);
  * @name page/profile types
  *
  * PAGE_NORMAL is a typical personal profile account
- * PAGE_SOAPBOX automatically approves all friend requests as CONTACT_IS_SHARING, (readonly)
- * PAGE_COMMUNITY automatically approves all friend requests as CONTACT_IS_SHARING, but with
+ * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
+ * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
  *      write access to wall and comments (no email and not included in page owner's ACL lists)
- * PAGE_FREELOVE automatically approves all friend requests as full friends (CONTACT_IS_FRIEND).
+ * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
  *
  * @{
  */
@@ -509,14 +496,7 @@ if (!defined('CURLE_OPERATION_TIMEDOUT')) {
  */
 function get_app()
 {
-	global $a;
-
-	if (empty($a)) {
-		$a = new App(dirname(__DIR__));
-		BaseObject::setApp($a);
-	}
-
-	return $a;
+	return BaseObject::getApp();
 }
 
 /**
@@ -711,10 +691,17 @@ function update_db()
 				return;
 			}
 
+			// run the pre_update_nnnn functions in update.php
+			for ($x = $stored + 1; $x <= $current; $x++) {
+				$r = run_update_function($x, 'pre_update');
+				if (!$r) {
+					break;
+				}
+			}
+
 			Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, time());
 
-			// run update routine
-			// it update the structure in one call
+			// update the structure in one call
 			$retval = DBStructure::update(false, true);
 			if ($retval) {
 				DBStructure::updateFail(
@@ -726,9 +713,9 @@ function update_db()
 				Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, 'success');
 			}
 
-			// run any left update_nnnn functions in update.php
+			// run the update_nnnn functions in update.php
 			for ($x = $stored + 1; $x <= $current; $x++) {
-				$r = run_update_function($x);
+				$r = run_update_function($x, 'update');
 				if (!$r) {
 					break;
 				}
@@ -739,9 +726,11 @@ function update_db()
 	return;
 }
 
-function run_update_function($x)
+function run_update_function($x, $prefix)
 {
-	if (function_exists('update_' . $x)) {
+	$funcname = $prefix . '_' . $x;
+
+	if (function_exists($funcname)) {
 		// There could be a lot of processes running or about to run.
 		// We want exactly one process to run the update command.
 		// So store the fact that we're taking responsibility
@@ -749,16 +738,14 @@ function run_update_function($x)
 		// If the update fails or times-out completely you may need to
 		// delete the config entry to try again.
 
-		$t = Config::get('database', 'update_' . $x);
+		$t = Config::get('database', $funcname);
 		if (!is_null($t)) {
 			return false;
 		}
-		Config::set('database', 'update_' . $x, time());
+		Config::set('database', $funcname, time());
 
 		// call the specific update
-
-		$func = 'update_' . $x;
-		$retval = $func();
+		$retval = $funcname();
 
 		if ($retval) {
 			//send the administrator an e-mail
@@ -768,13 +755,21 @@ function run_update_function($x)
 			);
 			return false;
 		} else {
-			Config::set('database', 'update_' . $x, 'success');
-			Config::set('system', 'build', $x);
+			Config::set('database', $funcname, 'success');
+
+			if ($prefix == 'update') {
+				Config::set('system', 'build', $x);
+			}
+
 			return true;
 		}
 	} else {
-		Config::set('database', 'update_' . $x, 'success');
-		Config::set('system', 'build', $x);
+		Config::set('database', $funcname, 'success');
+
+		if ($prefix == 'update') {
+			Config::set('system', 'build', $x);
+		}
+
 		return true;
 	}
 }
@@ -782,7 +777,7 @@ function run_update_function($x)
 /**
  * @brief Synchronise addons:
  *
- * $a->config['system']['addon'] contains a comma-separated list of names
+ * system.addon contains a comma-separated list of names
  * of addons which are used on this system.
  * Go through the database list of already installed addons, and if we have
  * an entry, but it isn't in the config list, call the uninstall procedure
@@ -795,7 +790,7 @@ function run_update_function($x)
 function check_addons(App $a)
 {
 	$r = q("SELECT * FROM `addon` WHERE `installed` = 1");
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		$installed = $r;
 	} else {
 		$installed = [];
@@ -965,17 +960,6 @@ function info($s)
 	}
 }
 
-/**
- * @brief Wrapper around config to limit the text length of an incoming message
- *
- * @return int
- */
-function get_max_import_size()
-{
-	$a = get_app();
-	return (x($a->config, 'max_import_size') ? $a->config['max_import_size'] : 0);
-}
-
 function feed_birthday($uid, $tz)
 {
 	/**
@@ -1005,7 +989,7 @@ function feed_birthday($uid, $tz)
 		intval($uid)
 	);
 
-	if (DBM::is_result($p)) {
+	if (DBA::isResult($p)) {
 		$tmp_dob = substr($p[0]['dob'], 5);
 		if (intval($tmp_dob)) {
 			$y = DateTimeFormat::timezoneNow($tz, 'Y');
@@ -1031,14 +1015,11 @@ function is_site_admin()
 {
 	$a = get_app();
 
-	$adminlist = explode(",", str_replace(" ", "", $a->config['admin_email']));
+	$admin_email = Config::get('config', 'admin_email');
 
-	//if(local_user() && x($a->user,'email') && x($a->config,'admin_email') && ($a->user['email'] === $a->config['admin_email']))
-	/// @TODO This if() + 2 returns can be shrinked into one return
-	if (local_user() && x($a->user, 'email') && x($a->config, 'admin_email') && in_array($a->user['email'], $adminlist)) {
-		return true;
-	}
-	return false;
+	$adminlist = explode(',', str_replace(' ', '', $admin_email));
+
+	return local_user() && $admin_email && in_array(defaults($a->user, 'email', ''), $adminlist);
 }
 
 /**
@@ -1114,7 +1095,7 @@ function explode_querystring($query)
 function curPageURL()
 {
 	$pageURL = 'http';
-	if ($_SERVER["HTTPS"] == "on") {
+	if (!empty($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
 		$pageURL .= "s";
 	}
 

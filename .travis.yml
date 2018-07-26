@@ -1,6 +1,6 @@
 ---
 language: php
-## Friendica supports PHP version >= 5.6
+## Friendica supports PHP version >= 5.6.1
 php:
  - 5.6
  - 7.0
@@ -17,7 +17,9 @@ env:
 install:
  - composer install
 before_script:
+ - cp config/local-sample.ini.php config/local.ini.php
  - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
  - mysql -utravis test < database.sql
  - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+

@@ -8,7 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Queue;
@@ -16,7 +16,6 @@ use Friendica\Model\User;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
-use dba;
 
 require_once 'include/items.php';
 
@@ -39,15 +38,15 @@ class Delivery extends BaseObject
 		$public_message = false;
 
 		if ($cmd == self::MAIL) {
-			$target_item = dba::selectFirst('mail', [], ['id' => $item_id]);
-			if (!DBM::is_result($target_item)) {
+			$target_item = DBA::selectFirst('mail', [], ['id' => $item_id]);
+			if (!DBA::isResult($target_item)) {
 				return;
 			}
 			$uid = $target_item['uid'];
 			$items = [];
 		} elseif ($cmd == self::SUGGESTION) {
-			$target_item = dba::selectFirst('fsuggest', [], ['id' => $item_id]);
-			if (!DBM::is_result($target_item)) {
+			$target_item = DBA::selectFirst('fsuggest', [], ['id' => $item_id]);
+			if (!DBA::isResult($target_item)) {
 				return;
 			}
 			$uid = $target_item['uid'];
@@ -55,7 +54,7 @@ class Delivery extends BaseObject
 			$uid = $item_id;
 		} else {
 			$item = Item::selectFirst(['parent'], ['id' => $item_id]);
-			if (!DBM::is_result($item) || empty($item['parent'])) {
+			if (!DBA::isResult($item) || empty($item['parent'])) {
 				return;
 			}
 			$parent_id = intval($item['parent']);
@@ -74,7 +73,7 @@ class Delivery extends BaseObject
 				}
 				$items[] = $item;
 			}
-			dba::close($itemdata);
+			DBA::close($itemdata);
 
 			$uid = $target_item['contact-uid'];
 
@@ -133,15 +132,15 @@ class Delivery extends BaseObject
 		}
 
 		$owner = User::getOwnerDataById($uid);
-		if (!DBM::is_result($owner)) {
+		if (!DBA::isResult($owner)) {
 			return;
 		}
 
 		// We don't deliver our items to blocked or pending contacts, and not to ourselves either
-		$contact = dba::selectFirst('contact', [],
+		$contact = DBA::selectFirst('contact', [],
 			['id' => $contact_id, 'blocked' => false, 'pending' => false, 'self' => false]
 		);
-		if (!DBM::is_result($contact)) {
+		if (!DBA::isResult($contact)) {
 			return;
 		}
 
@@ -210,7 +209,7 @@ class Delivery extends BaseObject
 		} elseif ($cmd == self::SUGGESTION) {
 			$item = $target_item;
 			$atom = DFRN::fsuggest($item, $owner);
-			dba::delete('fsuggest', ['id' => $item['id']]);
+			DBA::delete('fsuggest', ['id' => $item['id']]);
 		} elseif ($cmd == self::RELOCATION) {
 			$atom = DFRN::relocate($owner, $owner['uid']);
 		} elseif ($followup) {
@@ -237,8 +236,8 @@ class Delivery extends BaseObject
 
 		if (link_compare($basepath, System::baseUrl())) {
 			$condition = ['nurl' => normalise_link($contact['url']), 'self' => true];
-			$target_self = dba::selectFirst('contact', ['uid'], $condition);
-			if (!DBM::is_result($target_self)) {
+			$target_self = DBA::selectFirst('contact', ['uid'], $condition);
+			if (!DBA::isResult($target_self)) {
 				return;
 			}
 			$target_uid = $target_self['uid'];
@@ -254,17 +253,17 @@ class Delivery extends BaseObject
 			}
 
 			// We now have some contact, so we fetch it
-			$target_importer = dba::fetch_first("SELECT *, `name` as `senderName`
+			$target_importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
 							FROM `contact`
 							WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 							$cid);
 
 			// This should never fail
-			if (!DBM::is_result($target_importer)) {
+			if (!DBA::isResult($target_importer)) {
 				return;
 			}
 
-			$user = dba::selectFirst('user', [], ['uid' => $target_uid]);
+			$user = DBA::selectFirst('user', [], ['uid' => $target_uid]);
 
 			$target_importer = array_merge($target_importer, $user);
 
@@ -310,6 +309,10 @@ class Delivery extends BaseObject
 		} else {
 			// The message could not be delivered. We mark the contact as "dead"
 			Contact::markForArchival($contact);
+
+			// Transmit via Diaspora when all other methods (legacy DFRN and new one) are failing.
+			// This is a fallback for systems that don't know the new methods.
+			self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 		}
 	}
 
@@ -404,16 +407,16 @@ class Delivery extends BaseObject
 			return;
 		}
 
-		$local_user = dba::selectFirst('user', [], ['uid' => $owner['uid']]);
-		if (!DBM::is_result($local_user)) {
+		$local_user = DBA::selectFirst('user', [], ['uid' => $owner['uid']]);
+		if (!DBA::isResult($local_user)) {
 			return;
 		}
 
 		logger('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
 
 		$reply_to = '';
-		$mailacct = dba::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);
-		if (DBM::is_result($mailacct) && !empty($mailacct['reply_to'])) {
+		$mailacct = DBA::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);
+		if (DBA::isResult($mailacct) && !empty($mailacct['reply_to'])) {
 			$reply_to = $mailacct['reply_to'];
 		}
 
@@ -421,7 +424,7 @@ class Delivery extends BaseObject
 
 		// only expose our real email address to true friends
 
-		if (($contact['rel'] == CONTACT_IS_FRIEND) && !$contact['blocked']) {
+		if (($contact['rel'] == Contact::FRIEND) && !$contact['blocked']) {
 			if ($reply_to) {
 				$headers  = 'From: ' . Email::encodeHeader($local_user['username'],'UTF-8') . ' <' . $reply_to.'>' . "\n";
 				$headers .= 'Sender: ' . $local_user['email'] . "\n";
@@ -446,12 +449,12 @@ class Delivery extends BaseObject
 			if (empty($target_item['title'])) {
 				$condition = ['uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
 				$title = Item::selectFirst(['title'], $condition);
-				if (DBM::is_result($title) && ($title['title'] != '')) {
+				if (DBA::isResult($title) && ($title['title'] != '')) {
 					$subject = $title['title'];
 				} else {
 					$condition = ['parent-uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
 					$title = Item::selectFirst(['title'], $condition);
-					if (DBM::is_result($title) && ($title['title'] != '')) {
+					if (DBA::isResult($title) && ($title['title'] != '')) {
 						$subject = $title['title'];
 					}
 				}

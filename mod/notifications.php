@@ -3,13 +3,14 @@
  * @file mod/notifications.php
  * @brief The notifications module
  */
+
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function notifications_post(App $a)
 {
@@ -24,9 +25,9 @@ function notifications_post(App $a)
 	}
 
 	if ($request_id) {
-		$intro = dba::selectFirst('intro', ['id', 'contact-id', 'fid'], ['id' => $request_id, 'uid' => local_user()]);
+		$intro = DBA::selectFirst('intro', ['id', 'contact-id', 'fid'], ['id' => $request_id, 'uid' => local_user()]);
 
-		if (DBM::is_result($intro)) {
+		if (DBA::isResult($intro)) {
 			$intro_id = $intro['id'];
 			$contact_id = $intro['contact-id'];
 		} else {
@@ -40,20 +41,20 @@ function notifications_post(App $a)
 		$fid = $intro['fid'];
 
 		if ($_POST['submit'] == L10n::t('Discard')) {
-			dba::delete('intro', ['id' => $intro_id]);
+			DBA::delete('intro', ['id' => $intro_id]);
 
 			if (!$fid) {
 				// The check for blocked and pending is in case the friendship was already approved
 				// and we just want to get rid of the now pointless notification
 				$condition = ['id' => $contact_id, 'uid' => local_user(),
 					'self' => false, 'blocked' => true, 'pending' => true];
-				dba::delete('contact', $condition);
+				DBA::delete('contact', $condition);
 			}
 			goaway('notifications/intros');
 		}
 
 		if ($_POST['submit'] == L10n::t('Ignore')) {
-			dba::update('intro', ['ignore' => true], ['id' => $intro_id]);
+			DBA::update('intro', ['ignore' => true], ['id' => $intro_id]);
 			goaway('notifications/intros');
 		}
 	}

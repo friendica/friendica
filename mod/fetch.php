@@ -10,7 +10,7 @@ use Friendica\Protocol\Diaspora;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Util\XML;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function fetch_init(App $a)
 {
@@ -27,10 +27,10 @@ function fetch_init(App $a)
 		'event-id', 'resource-id', 'author-link', 'owner-link', 'attach'];
 	$condition = ['wall' => true, 'private' => false, 'guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
 	$item = Item::selectFirst($fields, $condition);
-	if (!DBM::is_result($item)) {
+	if (!DBA::isResult($item)) {
 		$condition = ['guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
 		$item = Item::selectFirst(['author-link'], $condition);
-		if (DBM::is_result($item)) {
+		if (DBA::isResult($item)) {
 			$parts = parse_url($item["author-link"]);
 			$host = $parts["scheme"]."://".$parts["host"];
 

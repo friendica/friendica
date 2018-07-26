@@ -1,7 +1,8 @@
 <?php
 
 use Friendica\App;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Protocol\OStatus;
 
 require_once('include/security.php');
@@ -43,8 +44,8 @@ function pubsub_init(App $a)
 
 		$subscribe = (($hub_mode === 'subscribe') ? 1 : 0);
 
-		$owner = dba::selectFirst('user', ['uid'], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
-		if (!DBM::is_result($owner)) {
+		$owner = DBA::selectFirst('user', ['uid'], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
+		if (!DBA::isResult($owner)) {
 			logger('Local account not found: ' . $nick);
 			hub_return(false, '');
 		}
@@ -55,8 +56,8 @@ function pubsub_init(App $a)
 			$condition['hub-verify'] = $hub_verify;
 		}
 
-		$contact = dba::selectFirst('contact', ['id', 'poll'], $condition);
-		if (!DBM::is_result($contact)) {
+		$contact = DBA::selectFirst('contact', ['id', 'poll'], $condition);
+		if (!DBA::isResult($contact)) {
 			logger('Contact ' . $contact_id . ' not found.');
 			hub_return(false, '');
 		}
@@ -75,7 +76,7 @@ function pubsub_init(App $a)
 		}
 
 		if (!empty($hub_mode)) {
-			dba::update('contact', ['subhub' => $subscribe], ['id' => $contact['id']]);
+			DBA::update('contact', ['subhub' => $subscribe], ['id' => $contact['id']]);
 			logger($hub_mode . ' success for contact ' . $contact_id . '.');
 		}
  		hub_return(true, $hub_challenge);
@@ -92,28 +93,28 @@ function pubsub_post(App $a)
 	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
 
-	$importer = dba::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
-	if (!DBM::is_result($importer)) {
+	$importer = DBA::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
+	if (!DBA::isResult($importer)) {
 		hub_post_return();
 	}
 
 	$condition = ['id' => $contact_id, 'uid' => $importer['uid'], 'subhub' => true, 'blocked' => false];
-	$contact = dba::selectFirst('contact', [], $condition);
+	$contact = DBA::selectFirst('contact', [], $condition);
 
-	if (!DBM::is_result($contact)) {
+	if (!DBA::isResult($contact)) {
 		$author = OStatus::salmonAuthor($xml, $importer);
 		if (!empty($author['contact-id'])) {
 			$condition = ['id' => $author['contact-id'], 'uid' => $importer['uid'], 'subhub' => true, 'blocked' => false];
-			$contact = dba::selectFirst('contact', [], $condition);
+			$contact = DBA::selectFirst('contact', [], $condition);
 			logger('No record for ' . $nick .' with contact id ' . $contact_id . ' - using '.$author['contact-id'].' instead.');
 		}
-		if (!DBM::is_result($contact)) {
+		if (!DBA::isResult($contact)) {
 			logger('Contact ' . $author["author-link"] . ' (' . $contact_id . ') for user ' . $nick . " wasn't found - ignored. XML: " . $xml);
 			hub_post_return();
 		}
 	}
 
-	if (!in_array($contact['rel'], [CONTACT_IS_SHARING, CONTACT_IS_FRIEND]) && ($contact['network'] != NETWORK_FEED)) {
+	if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) && ($contact['network'] != NETWORK_FEED)) {
 		logger('Contact ' . $contact['id'] . ' is not expected to share with us - ignored.');
 		hub_post_return();
 	}

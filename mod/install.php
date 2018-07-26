@@ -4,10 +4,10 @@
  */
 
 use Friendica\App;
-use Friendica\Core\L10n;
 use Friendica\Core\Install;
+use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Util\Temporal;
 
 $install_wizard_pass = 1;
@@ -22,7 +22,8 @@ function install_init(App $a) {
 
 	// We overwrite current theme css, because during install we could not have a working mod_rewrite
 	// so we could not have a css at all. Here we set a static css file for the install procedure pages
-	$a->config['system']['theme'] = "../install";
+
+	$a->setConfigValue('system', 'value', '../install');
 	$a->theme['stylesheet'] = System::baseUrl()."/view/install/style.css";
 
 	Install::setInstallMode();
@@ -51,7 +52,7 @@ function install_post(App $a) {
 			$phpath = notags(trim($_POST['phpath']));
 
 			require_once("include/dba.php");
-			if (!dba::connect($dbhost, $dbuser, $dbpass, $dbdata)) {
+			if (!DBA::connect($dbhost, $dbuser, $dbpass, $dbdata)) {
 				$a->data['db_conn_failed'] = true;
 			}
 
@@ -67,12 +68,11 @@ function install_post(App $a) {
 			$timezone = notags(trim($_POST['timezone']));
 			$language = notags(trim($_POST['language']));
 			$adminmail = notags(trim($_POST['adminmail']));
-			$rino = 1;
 
 			// connect to db
-			dba::connect($dbhost, $dbuser, $dbpass, $dbdata);
+			DBA::connect($dbhost, $dbuser, $dbpass, $dbdata);
 
-			Install::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail, $rino);
+			Install::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail);
 
 			return;
 		break;
@@ -111,9 +111,9 @@ function install_content(App $a) {
 		$db_return_text .= $txt;
 	}
 
-	if (dba::$connected) {
+	if (DBA::$connected) {
 		$r = q("SELECT COUNT(*) as `total` FROM `user`");
-		if (DBM::is_result($r) && $r[0]['total']) {
+		if (DBA::isResult($r) && $r[0]['total']) {
 			$tpl = get_markup_template('install.tpl');
 			return replace_macros($tpl, [
 				'$title' => $install_title,
@@ -140,9 +140,7 @@ function install_content(App $a) {
 	switch ($install_wizard_pass) {
 		case 1: { // System check
 
-			if (x($_POST, 'phpath')) {
-				$phpath = notags(trim($_POST['phpath']));
-			}
+			$phpath = defaults($_POST, 'phpath', 'php');
 
 			list($checks, $checkspassed) = Install::check($phpath);
 
@@ -163,13 +161,12 @@ function install_content(App $a) {
 
 		case 2: { // Database config
 
-			$dbhost = ((x($_POST, 'dbhost')) ? notags(trim($_POST['dbhost'])) : 'localhost');
-			$dbuser = notags(trim($_POST['dbuser']));
-			$dbpass = notags(trim($_POST['dbpass']));
-			$dbdata = notags(trim($_POST['dbdata']));
-			$phpath = notags(trim($_POST['phpath']));
-
-			$adminmail = notags(trim($_POST['adminmail']));
+			$dbhost    = notags(trim(defaults($_POST, 'dbhost'   , 'localhost')));
+			$dbuser    = notags(trim(defaults($_POST, 'dbuser'   , ''         )));
+			$dbpass    = notags(trim(defaults($_POST, 'dbpass'   , ''         )));
+			$dbdata    = notags(trim(defaults($_POST, 'dbdata'   , ''         )));
+			$phpath    = notags(trim(defaults($_POST, 'phpath'   , ''         )));
+			$adminmail = notags(trim(defaults($_POST, 'adminmail', ''         )));
 
 			$tpl = get_markup_template('install_db.tpl');
 			$o .= replace_macros($tpl, [
@@ -187,8 +184,6 @@ function install_content(App $a) {
 				'$dbdata' => ['dbdata', L10n::t('Database Name'), $dbdata, '', 'required'],
 				'$adminmail' => ['adminmail', L10n::t('Site administrator email address'), $adminmail, L10n::t('Your account email address must match this in order to use the web admin panel.'), 'required', 'autofocus', 'email'],
 
-
-
 				'$lbl_10' => L10n::t('Please select a default timezone for your website'),
 
 				'$baseurl' => System::baseUrl(),
@@ -196,7 +191,6 @@ function install_content(App $a) {
 				'$phpath' => $phpath,
 
 				'$submit' => L10n::t('Submit'),
-
 			]);
 			return $o;
 		}; break;
@@ -245,7 +239,7 @@ function install_content(App $a) {
 
 function manual_config(App $a) {
 	$data = htmlentities($a->data['txt'],ENT_COMPAT, 'UTF-8');
-	$o = L10n::t('The database configuration file ".htconfig.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
+	$o = L10n::t('The database configuration file "config/local.ini.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.');
 	$o .= "<textarea rows=\"24\" cols=\"80\" >$data</textarea>";
 	return $o;
 }

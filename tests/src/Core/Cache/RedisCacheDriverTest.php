@@ -6,6 +6,9 @@ namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\CacheDriverFactory;
 
+/**
+ * @requires extension redis
+ */
 class RedisCacheDriverTest extends MemoryCacheTest
 {
 	/**
@@ -15,25 +18,13 @@ class RedisCacheDriverTest extends MemoryCacheTest
 
 	protected function getInstance()
 	{
-		if (class_exists('Redis')) {
-			try {
-				$this->cache = CacheDriverFactory::create('redis');
-			} catch (\Exception $exception) {
-				print "Redis - TestCase failed: " . $exception->getMessage();
-				throw new \Exception();
-			}
-			return $this->cache;
-		} else {
-			$this->markTestSkipped('Redis driver isn\'t available');
-			return null;
-		}
+		$this->cache = CacheDriverFactory::create('redis');
+		return $this->cache;
 	}
 
 	public function tearDown()
 	{
-		if (class_exists('Redis')) {
-			$this->cache->clear(false);
-		}
+		$this->cache->clear(false);
 		parent::tearDown();
 	}
 }

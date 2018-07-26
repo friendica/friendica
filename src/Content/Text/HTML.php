@@ -549,8 +549,6 @@ class HTML
 
 	public static function toPlaintext($html, $wraplength = 75, $compact = false)
 	{
-		global $lang;
-
 		$message = str_replace("\r", "", $html);
 
 		$doc = new DOMDocument();

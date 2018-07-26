@@ -2,10 +2,9 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-use Friendica\App;
+use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Test\DatabaseTest;
-use PHPUnit\Framework\TestCase;
 
 abstract class LockTest extends DatabaseTest
 {
@@ -18,13 +17,11 @@ abstract class LockTest extends DatabaseTest
 
 	protected function setUp()
 	{
-		global $a;
 		parent::setUp();
 		$this->instance = $this->getInstance();
 
 		// Reusable App object
-		$this->app = new App(__DIR__.'/../');
-		$a = $this->app;
+		$this->app = BaseObject::getApp();
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');
@@ -34,12 +31,18 @@ abstract class LockTest extends DatabaseTest
 		Config::set('system', 'theme', 'system_theme');
 	}
 
+	/**
+	 * @small
+	 */
 	public function testLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->assertFalse($this->instance->isLocked('bar'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testDoubleLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
@@ -47,6 +50,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertTrue($this->instance->acquireLock('foo', 1));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseLock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->assertTrue($this->instance->isLocked('foo'));
@@ -54,6 +60,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('foo'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseAll() {
 		$this->instance->acquireLock('foo', 1);
 		$this->instance->acquireLock('bar', 1);
@@ -70,6 +79,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('nice'));
 	}
 
+	/**
+	 * @small
+	 */
 	public function testReleaseAfterUnlock() {
 		$this->instance->acquireLock('foo', 1);
 		$this->instance->acquireLock('bar', 1);
@@ -87,6 +99,9 @@ abstract class LockTest extends DatabaseTest
 		$this->assertFalse($this->instance->isLocked('nice'));
 	}
 
+	/**
+	 * @medium
+	 */
 	function testLockTTL() {
 
 		// TODO [nupplaphil] - Because of the Datetime-Utils for the database, we have to wait a FULL second between the checks to invalidate the db-locks/cache

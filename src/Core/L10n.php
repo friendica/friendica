@@ -4,8 +4,8 @@
  */
 namespace Friendica\Core;
 
-use Friendica\Core\Config;
-use dba;
+use Friendica\BaseObject;
+use Friendica\Database\DBA;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -14,7 +14,7 @@ require_once 'include/dba.php';
  * Provide Languange, Translation, and Localisation functions to the application
  * Localisation can be referred to by the numeronym L10N (as in: "L", followed by ten more letters, and then "N").
  */
-class L10n
+class L10n extends BaseObject
 {
 	/**
 	 * @brief get the prefered language from the HTTP_ACCEPT_LANGUAGE header
@@ -62,11 +62,11 @@ class L10n
 	 */
 	public static function pushLang($language)
 	{
-		global $lang, $a;
+		$a = self::getApp();
 
-		$a->langsave = $lang;
+		$a->langsave = Config::get('system', 'language');
 
-		if ($language === $lang) {
+		if ($language === $a->langsave) {
 			return;
 		}
 
@@ -75,7 +75,7 @@ class L10n
 		}
 		$a->strings = [];
 		self::loadTranslationTable($language);
-		$lang = $language;
+		Config::set('system', 'language', $language);
 	}
 
 	/**
@@ -83,9 +83,9 @@ class L10n
 	 */
 	public static function popLang()
 	{
-		global $lang, $a;
+		$a = self::getApp();
 
-		if ($lang === $a->langsave) {
+		if (Config::get('system', 'language') === $a->langsave) {
 			return;
 		}
 
@@ -95,7 +95,7 @@ class L10n
 			$a->strings = [];
 		}
 
-		$lang = $a->langsave;
+		Config::set('system', 'language', $a->langsave);
 	}
 
 	/**
@@ -107,12 +107,12 @@ class L10n
 	 */
 	public static function loadTranslationTable($lang)
 	{
-		$a = get_app();
+		$a = self::getApp();
 
 		$a->strings = [];
 		// load enabled addons strings
-		$addons = dba::select('addon', ['name'], ['installed' => true]);
-		while ($p = dba::fetch($addons)) {
+		$addons = DBA::select('addon', ['name'], ['installed' => true]);
+		while ($p = DBA::fetch($addons)) {
 			$name = $p['name'];
 			if (file_exists("addon/$name/lang/$lang/strings.php")) {
 				include "addon/$name/lang/$lang/strings.php";
@@ -142,7 +142,7 @@ class L10n
 	 */
 	public static function t($s, ...$vars)
 	{
-		$a = get_app();
+		$a = self::getApp();
 
 		if (empty($s)) {
 			return '';
@@ -173,7 +173,6 @@ class L10n
 	 * - L10n::tt('Like', 'Likes', $count)
 	 * - L10n::tt("%s user deleted", "%s users deleted", count($users))
 	 *
-	 * @global type $lang
 	 * @param string $singular
 	 * @param string $plural
 	 * @param int $count
@@ -181,10 +180,9 @@ class L10n
 	 */
 	public static function tt($singular, $plural, $count)
 	{
-		global $lang;
-		$a = get_app();
+		$lang = Config::get('system', 'language');
 
-		if (x($a->strings, $singular)) {
+		if (!empty($a->strings[$singular])) {
 			$t = $a->strings[$singular];
 			if (is_array($t)) {
 				$plural_function = 'string_plural_select_' . str_replace('-', '_', $lang);

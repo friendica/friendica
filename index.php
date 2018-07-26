@@ -9,7 +9,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -18,23 +17,17 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
 
 require_once 'boot.php';
 
 $a = new App(__DIR__);
-BaseObject::setApp($a);
 
 // We assume that the index.php is called by a frontend process
 // The value is set to "true" by default in boot.php
 $a->backend = false;
-
-// Only load config if found, don't suppress errors
-if (!$a->mode == App::MODE_INSTALL) {
-	include ".htconfig.php";
-}
 
 /**
  * Try to open the database;
@@ -42,27 +35,20 @@ if (!$a->mode == App::MODE_INSTALL) {
 
 require_once "include/dba.php";
 
-if (!$a->mode == App::MODE_INSTALL) {
-	$result = dba::connect($db_host, $db_user, $db_pass, $db_data);
-	unset($db_host, $db_user, $db_pass, $db_data);
+// Missing DB connection: ERROR
+if ($a->mode & App::MODE_LOCALCONFIGPRESENT && !($a->mode & App::MODE_DBAVAILABLE)) {
+	System::httpExit(500, ['title' => 'Error 500 - Internal Server Error', 'description' => 'Apologies but the website is unavailable at the moment.']);
+}
 
-	if (!$result) {
-		System::unavailable();
-	}
+// Max Load Average reached: ERROR
+if ($a->isMaxProcessesReached() || $a->isMaxLoadReached()) {
+	header('Retry-After: 120');
+	header('Refresh: 120; url=' . System::baseUrl() . "/" . $a->query_string);
 
-	/**
-	 * Load configs from db. Overwrite configs from .htconfig.php
-	 */
+	System::httpExit(503, ['title' => 'Error 503 - Service Temporarily Unavailable', 'description' => 'System is currently overloaded. Please try again later.']);
+}
 
-	Config::load();
-
-	if ($a->max_processes_reached() || $a->maxload_reached()) {
-		header($_SERVER["SERVER_PROTOCOL"] . ' 503 Service Temporarily Unavailable');
-		header('Retry-After: 120');
-		header('Refresh: 120; url=' . System::baseUrl() . "/" . $a->query_string);
-		die("System is currently unavailable. Please try again later");
-	}
-
+if (!$a->isInstallMode()) {
 	if (Config::get('system', 'force_ssl') && ($a->get_scheme() == "http")
 		&& (intval(Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL)
 		&& (substr(System::baseUrl(), 0, 8) == "https://")
@@ -76,8 +62,6 @@ if (!$a->mode == App::MODE_INSTALL) {
 	Session::init();
 	Addon::loadHooks();
 	Addon::callHooks('init_1');
-
-	$a->checkMaintenanceMode();
 }
 
 $lang = L10n::getBrowserLanguage();
@@ -109,9 +93,9 @@ if (!$a->is_backend()) {
  */
 if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
 	// we haven't loaded user data yet, but we need user language
-	$user = dba::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
+	$user = DBA::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 	$_SESSION['language'] = $lang;
-	if (DBM::is_result($user)) {
+	if (DBA::isResult($user)) {
 		$_SESSION['language'] = $user['language'];
 	}
 }
@@ -183,9 +167,9 @@ $_SESSION['last_updated'] = defaults($_SESSION, 'last_updated', []);
 
 // in install mode, any url loads install module
 // but we need "view" module for stylesheet
-if ($a->mode == App::MODE_INSTALL && $a->module!="view") {
+if ($a->isInstallMode() && $a->module!="view") {
 	$a->module = 'install';
-} elseif ($a->mode == App::MODE_MAINTENANCE && $a->module!="view") {
+} elseif (!($a->mode & App::MODE_MAINTENANCEDISABLED) && $a->module != "view") {
 	$a->module = 'maintenance';
 } else {
 	check_url($a);

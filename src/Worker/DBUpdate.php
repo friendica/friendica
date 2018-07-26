@@ -7,9 +7,11 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Config;
 
-class DBUpdate {
-	public static function execute() {
-		$a = get_app();
+class DBUpdate
+{
+	public static function execute()
+	{
+		$a = \Friendica\BaseObject::getApp();
 
 		// We are deleting the latest dbupdate entry.
 		// This is done to avoid endless loops because the update was interupted.

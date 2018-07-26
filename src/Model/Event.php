@@ -5,15 +5,13 @@
 
 namespace Friendica\Model;
 
-use dba;
 use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
-use Friendica\Model\Item;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 
@@ -36,14 +34,18 @@ class Event extends BaseObject
 		$bd_format = L10n::t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8 AM.
 
 		$event_start = day_translate(
-			$event['adjust'] ?
+			!empty($event['adjust']) ?
 			DateTimeFormat::local($event['start'], $bd_format) : DateTimeFormat::utc($event['start'], $bd_format)
 		);
 
-		$event_end = day_translate(
-			$event['adjust'] ?
-			DateTimeFormat::local($event['finish'], $bd_format) : DateTimeFormat::utc($event['finish'], $bd_format)
-		);
+		if (!empty($event['finish'])) {
+			$event_end = day_translate(
+				!empty($event['adjust']) ?
+				DateTimeFormat::local($event['finish'], $bd_format) : DateTimeFormat::utc($event['finish'], $bd_format)
+			);
+		} else {
+			$event_end = '';
+		}
 
 		if ($simple) {
 			$o = "<h3>" . BBCode::convert($event['summary'], false, $simple) . "</h3>";
@@ -68,7 +70,7 @@ class Event extends BaseObject
 		$o .= '<div class="summary event-summary">' . BBCode::convert($event['summary'], false, $simple) . '</div>' . "\r\n";
 
 		$o .= '<div class="event-start"><span class="event-label">' . L10n::t('Starts:') . '</span>&nbsp;<span class="dtstart" title="'
-			. DateTimeFormat::utc($event['start'], (($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
+			. DateTimeFormat::utc($event['start'], (!empty($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
 			. '" >' . $event_start
 			. '</span></div>' . "\r\n";
 
@@ -214,7 +216,7 @@ class Event extends BaseObject
 			return;
 		}
 
-		dba::delete('event', ['id' => $event_id]);
+		DBA::delete('event', ['id' => $event_id]);
 		logger("Deleted event ".$event_id, LOGGER_DEBUG);
 	}
 
@@ -262,17 +264,17 @@ class Event extends BaseObject
 			$conditions['self'] = true;
 		}
 
-		$contact = dba::selectFirst('contact', [], $conditions);
+		$contact = DBA::selectFirst('contact', [], $conditions);
 
 		// Existing event being modified.
 		if ($event['id']) {
 			// has the event actually changed?
-			$existing_event = dba::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
-			if (!DBM::is_result($existing_event) || ($existing_event['edited'] === $event['edited'])) {
+			$existing_event = DBA::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
+			if (!DBA::isResult($existing_event) || ($existing_event['edited'] === $event['edited'])) {
 
 				$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 
-				return DBM::is_result($item) ? $item['id'] : 0;
+				return DBA::isResult($item) ? $item['id'] : 0;
 			}
 
 			$updated_fields = [
@@ -287,10 +289,10 @@ class Event extends BaseObject
 				'nofinish' => $event['nofinish'],
 			];
 
-			dba::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
+			DBA::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
 
 			$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
-			if (DBM::is_result($item)) {
+			if (DBA::isResult($item)) {
 				$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($event['uri']) . '</id>';
 				$object .= '<content>' . xmlify(self::getBBCode($event)) . '</content>';
 				$object .= '</object>' . "\n";
@@ -305,12 +307,12 @@ class Event extends BaseObject
 
 			Addon::callHooks('event_updated', $event['id']);
 		} else {
-			$event['guid'] = System::createGUID(32);
+			$event['guid']  = defaults($arr, 'guid', System::createGUID(32));
 
 			// New event. Store it.
-			dba::insert('event', $event);
+			DBA::insert('event', $event);
 
-			$event['id'] = dba::lastInsertId();
+			$event['id'] = DBA::lastInsertId();
 
 			$item_arr = [];
 
@@ -319,6 +321,7 @@ class Event extends BaseObject
 			$item_arr['uri']           = $event['uri'];
 			$item_arr['parent-uri']    = $event['uri'];
 			$item_arr['guid']          = $event['guid'];
+			$item_arr['plink']         = defaults($arr, 'plink', '');
 			$item_arr['post-type']     = Item::PT_EVENT;
 			$item_arr['wall']          = $event['cid'] ? 0 : 1;
 			$item_arr['contact-id']    = $contact['id'];
@@ -471,7 +474,7 @@ class Event extends BaseObject
 			intval($event_id)
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$return = self::removeDuplicates($r);
 		}
 
@@ -512,15 +515,15 @@ class Event extends BaseObject
 				$sql_extra ",
 				intval($owner_uid),
 				intval($event_params["ignore"]),
-				dbesc($event_params["start"]),
-				dbesc($event_params["start"]),
-				dbesc($event_params["finish"]),
-				dbesc($event_params["adjust_start"]),
-				dbesc($event_params["adjust_start"]),
-				dbesc($event_params["adjust_finish"])
+				DBA::escape($event_params["start"]),
+				DBA::escape($event_params["start"]),
+				DBA::escape($event_params["finish"]),
+				DBA::escape($event_params["adjust_start"]),
+				DBA::escape($event_params["adjust_start"]),
+				DBA::escape($event_params["adjust_finish"])
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$return = self::removeDuplicates($r);
 		}
 
@@ -541,7 +544,7 @@ class Event extends BaseObject
 		$fmt = L10n::t('l, F j');
 		foreach ($event_result as $event) {
 			$item = Item::selectFirst(['plink', 'author-name', 'author-avatar', 'author-link'], ['id' => $event['itemid']]);
-			if (DBM::is_result($item)) {
+			if (DBA::isResult($item)) {
 				$event = array_merge($event, $item);
 			}
 
@@ -738,9 +741,9 @@ class Event extends BaseObject
 			$conditions += ['allow_cid' => '', 'allow_gid' => ''];
 		}
 
-		$events = dba::select('event', $fields, $conditions);
-		if (DBM::is_result($events)) {
-			$return = dba::inArray($events);
+		$events = DBA::select('event', $fields, $conditions);
+		if (DBA::isResult($events)) {
+			$return = DBA::toArray($events);
 		}
 
 		return $return;
@@ -762,8 +765,8 @@ class Event extends BaseObject
 	{
 		$process = false;
 
-		$user = dba::selectFirst('user', ['timezone'], ['uid' => $uid]);
-		if (DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', ['timezone'], ['uid' => $uid]);
+		if (DBA::isResult($user)) {
 			$timezone = $user['timezone'];
 		}
 
@@ -865,6 +868,11 @@ class Event extends BaseObject
 			if (substr($dtstart_title, 0, 10) === substr($dtend_title, 0, 10)) {
 				$same_date = true;
 			}
+		} else {
+			$dtend_title = '';
+			$dtend_dt = '';
+			$end_time = '';
+			$end_short = '';
 		}
 
 		// Format the event location.

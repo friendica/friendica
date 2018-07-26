@@ -2,12 +2,13 @@
 /**
  * @file mod/notes.php
  */
+
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
-use Friendica\Model\Profile;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
+use Friendica\Model\Profile;
 
 function notes_init(App $a)
 {
@@ -66,22 +67,27 @@ function notes_content(App $a, $update = false)
 		'limit' => [$a->pager['start'], $a->pager['itemspage']]];
 	$r = Item::selectForUser(local_user(), ['id'], $condition, $params);
 
-	if (DBM::is_result($r)) {
+	$count = 0;
+
+	if (DBA::isResult($r)) {
+		$count = count($r);
 		$parents_arr = [];
 
 		while ($rr = Item::fetch($r)) {
 			$parents_arr[] = $rr['id'];
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		$condition = ['uid' => local_user(), 'parent' => $parents_arr];
 		$result = Item::selectForUser(local_user(), [], $condition);
-		if (DBM::is_result($result)) {
+
+		if (DBA::isResult($result)) {
 			$items = conv_sort(Item::inArray($result), 'commented');
 			$o .= conversation($a, $items, 'notes', $update);
 		}
 	}
 
-	$o .= alt_pager($a, count($r));
+	$o .= alt_pager($a, $count);
+
 	return $o;
 }

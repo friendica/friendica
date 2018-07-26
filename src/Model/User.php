@@ -6,22 +6,18 @@
 namespace Friendica\Model;
 
 use DivineOmega\PasswordExposed\PasswordStatus;
+use Exception;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
-use Friendica\Model\Contact;
-use Friendica\Model\Group;
-use Friendica\Model\Photo;
+use Friendica\Database\DBA;
 use Friendica\Object\Image;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use dba;
-use Exception;
 use LightOpenID;
 use function password_exposed;
 
@@ -41,7 +37,7 @@ class User
 	 * @return boolean|array
 	 */
 	public static function getOwnerDataById($uid) {
-		$r = dba::fetch_first("SELECT
+		$r = DBA::fetchFirst("SELECT
 			`contact`.*,
 			`user`.`prvkey` AS `uprvkey`,
 			`user`.`timezone`,
@@ -59,7 +55,7 @@ class User
 			LIMIT 1",
 			$uid
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return false;
 		}
 		return $r;
@@ -73,8 +69,8 @@ class User
 	 */
 	public static function getOwnerDataByNick($nick)
 	{
-		$user = dba::selectFirst('user', ['uid'], ['nickname' => $nick]);
-		if (!DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nick]);
+		if (!DBA::isResult($user)) {
 			return false;
 		}
 		return self::getOwnerDataById($user['uid']);
@@ -100,9 +96,9 @@ class User
 			return $default_group;
 		}
 
-		$user = dba::selectFirst('user', ['def_gid'], ['uid' => $uid]);
+		$user = DBA::selectFirst('user', ['def_gid'], ['uid' => $uid]);
 
-		if (DBM::is_result($user)) {
+		if (DBA::isResult($user)) {
 			$default_group = $user["def_gid"];
 		}
 
@@ -201,7 +197,7 @@ class User
 			}
 		} elseif (is_int($user_info) || is_string($user_info)) {
 			if (is_int($user_info)) {
-				$user = dba::selectFirst('user', ['uid', 'password', 'legacy_password'],
+				$user = DBA::selectFirst('user', ['uid', 'password', 'legacy_password'],
 					[
 						'uid' => $user_info,
 						'blocked' => 0,
@@ -215,10 +211,10 @@ class User
 				$condition = ["(`email` = ? OR `username` = ? OR `nickname` = ?)
 					AND NOT `blocked` AND NOT `account_expired` AND NOT `account_removed` AND `verified`",
 					$user_info, $user_info, $user_info];
-				$user = dba::selectFirst('user', $fields, $condition);
+				$user = DBA::selectFirst('user', $fields, $condition);
 			}
 
-			if (!DBM::is_result($user)) {
+			if (!DBA::isResult($user)) {
 				throw new Exception(L10n::t('User not found'));
 			}
 		}
@@ -301,7 +297,7 @@ class User
 			'pwdreset_time' => null,
 			'legacy_password' => false
 		];
-		return dba::update('user', $fields, ['uid' => $uid]);
+		return DBA::update('user', $fields, ['uid' => $uid]);
 	}
 
 	/**
@@ -317,16 +313,19 @@ class User
 	public static function isNicknameBlocked($nickname)
 	{
 		$forbidden_nicknames = Config::get('system', 'forbidden_nicknames', '');
+
 		// if the config variable is empty return false
-		if (!x($forbidden_nicknames)) {
+		if (empty($forbidden_nicknames)) {
 			return false;
 		}
+
 		// check if the nickname is in the list of blocked nicknames
 		$forbidden = explode(',', $forbidden_nicknames);
 		$forbidden = array_map('trim', $forbidden);
 		if (in_array(strtolower($nickname), $forbidden)) {
 			return true;
 		}
+
 		// else return false
 		return false;
 	}
@@ -355,20 +354,20 @@ class User
 		$using_invites = Config::get('system', 'invitation_only');
 		$num_invites   = Config::get('system', 'number_invites');
 
-		$invite_id  = x($data, 'invite_id')  ? notags(trim($data['invite_id']))  : '';
-		$username   = x($data, 'username')   ? notags(trim($data['username']))   : '';
-		$nickname   = x($data, 'nickname')   ? notags(trim($data['nickname']))   : '';
-		$email      = x($data, 'email')      ? notags(trim($data['email']))      : '';
-		$openid_url = x($data, 'openid_url') ? notags(trim($data['openid_url'])) : '';
-		$photo      = x($data, 'photo')      ? notags(trim($data['photo']))      : '';
-		$password   = x($data, 'password')   ? trim($data['password'])           : '';
-		$password1  = x($data, 'password1')  ? trim($data['password1'])          : '';
-		$confirm    = x($data, 'confirm')    ? trim($data['confirm'])            : '';
-		$blocked    = x($data, 'blocked')    ? intval($data['blocked'])          : 0;
-		$verified   = x($data, 'verified')   ? intval($data['verified'])         : 0;
-		$language   = x($data, 'language')   ? notags(trim($data['language'])) : 'en';
+		$invite_id  = !empty($data['invite_id'])  ? notags(trim($data['invite_id']))  : '';
+		$username   = !empty($data['username'])   ? notags(trim($data['username']))   : '';
+		$nickname   = !empty($data['nickname'])   ? notags(trim($data['nickname']))   : '';
+		$email      = !empty($data['email'])      ? notags(trim($data['email']))      : '';
+		$openid_url = !empty($data['openid_url']) ? notags(trim($data['openid_url'])) : '';
+		$photo      = !empty($data['photo'])      ? notags(trim($data['photo']))      : '';
+		$password   = !empty($data['password'])   ? trim($data['password'])           : '';
+		$password1  = !empty($data['password1'])  ? trim($data['password1'])          : '';
+		$confirm    = !empty($data['confirm'])    ? trim($data['confirm'])            : '';
+		$blocked    = !empty($data['blocked'])    ? intval($data['blocked'])          : 0;
+		$verified   = !empty($data['verified'])   ? intval($data['verified'])         : 0;
+		$language   = !empty($data['language'])   ? notags(trim($data['language']))   : 'en';
 
-		$publish = x($data, 'profile_publish_reg') && intval($data['profile_publish_reg']) ? 1 : 0;
+		$publish = !empty($data['profile_publish_reg']) && intval($data['profile_publish_reg']) ? 1 : 0;
 		$netpublish = strlen(Config::get('system', 'directory')) ? $publish : 0;
 
 		if ($password1 != $confirm) {
@@ -382,12 +381,12 @@ class User
 				throw new Exception(L10n::t('An invitation is required.'));
 			}
 
-			if (!dba::exists('register', ['hash' => $invite_id])) {
+			if (!DBA::exists('register', ['hash' => $invite_id])) {
 				throw new Exception(L10n::t('Invitation could not be verified.'));
 			}
 		}
 
-		if (!x($username) || !x($email) || !x($nickname)) {
+		if (empty($username) || empty($email) || empty($nickname)) {
 			if ($openid_url) {
 				if (!Network::isUrlValid($openid_url)) {
 					throw new Exception(L10n::t('Invalid OpenID url'));
@@ -448,14 +447,14 @@ class User
 			throw new Exception(L10n::t('The nickname was blocked from registration by the nodes admin.'));
 		}
 
-		if (Config::get('system', 'block_extended_register', false) && dba::exists('user', ['email' => $email])) {
+		if (Config::get('system', 'block_extended_register', false) && DBA::exists('user', ['email' => $email])) {
 			throw new Exception(L10n::t('Cannot use that email.'));
 		}
 
 		// Disallow somebody creating an account using openid that uses the admin email address,
 		// since openid bypasses email verification. We'll allow it if there is not yet an admin account.
-		if (x($a->config, 'admin_email') && strlen($openid_url)) {
-			$adminlist = explode(',', str_replace(' ', '', strtolower($a->config['admin_email'])));
+		if (Config::get('config', 'admin_email') && strlen($openid_url)) {
+			$adminlist = explode(',', str_replace(' ', '', strtolower(Config::get('config', 'admin_email'))));
 			if (in_array(strtolower($email), $adminlist)) {
 				throw new Exception(L10n::t('Cannot use that email.'));
 			}
@@ -468,8 +467,8 @@ class User
 		}
 
 		// Check existing and deleted accounts for this nickname.
-		if (dba::exists('user', ['nickname' => $nickname])
-			|| dba::exists('userd', ['username' => $nickname])
+		if (DBA::exists('user', ['nickname' => $nickname])
+			|| DBA::exists('userd', ['username' => $nickname])
 		) {
 			throw new Exception(L10n::t('Nickname is already registered. Please choose another.'));
 		}
@@ -492,7 +491,7 @@ class User
 		$sprvkey = $sres['prvkey'];
 		$spubkey = $sres['pubkey'];
 
-		$insert_result = dba::insert('user', [
+		$insert_result = DBA::insert('user', [
 			'guid'     => generate_user_guid(),
 			'username' => $username,
 			'password' => $new_password_encoded,
@@ -512,8 +511,8 @@ class User
 		]);
 
 		if ($insert_result) {
-			$uid = dba::lastInsertId();
-			$user = dba::selectFirst('user', [], ['uid' => $uid]);
+			$uid = DBA::lastInsertId();
+			$user = DBA::selectFirst('user', [], ['uid' => $uid]);
 		} else {
 			throw new Exception(L10n::t('An error occurred during registration. Please try again.'));
 		}
@@ -524,14 +523,14 @@ class User
 
 		// if somebody clicked submit twice very quickly, they could end up with two accounts
 		// due to race condition. Remove this one.
-		$user_count = dba::count('user', ['nickname' => $nickname]);
+		$user_count = DBA::count('user', ['nickname' => $nickname]);
 		if ($user_count > 1) {
-			dba::delete('user', ['uid' => $uid]);
+			DBA::delete('user', ['uid' => $uid]);
 
 			throw new Exception(L10n::t('Nickname is already registered. Please choose another.'));
 		}
 
-		$insert_result = dba::insert('profile', [
+		$insert_result = DBA::insert('profile', [
 			'uid' => $uid,
 			'name' => $username,
 			'photo' => System::baseUrl() . "/photo/profile/{$uid}.jpg",
@@ -542,14 +541,14 @@ class User
 			'profile-name' => L10n::t('default')
 		]);
 		if (!$insert_result) {
-			dba::delete('user', ['uid' => $uid]);
+			DBA::delete('user', ['uid' => $uid]);
 
 			throw new Exception(L10n::t('An error occurred creating your default profile. Please try again.'));
 		}
 
 		// Create the self contact
 		if (!Contact::createSelfFromUserId($uid)) {
-			dba::delete('user', ['uid' => $uid]);
+			DBA::delete('user', ['uid' => $uid]);
 
 			throw new Exception(L10n::t('An error occurred creating your self contact. Please try again.'));
 		}
@@ -558,7 +557,7 @@ class User
 		// right away as a default group for new contacts.
 		$def_gid = Group::create($uid, L10n::t('Friends'));
 		if (!$def_gid) {
-			dba::delete('user', ['uid' => $uid]);
+			DBA::delete('user', ['uid' => $uid]);
 
 			throw new Exception(L10n::t('An error occurred creating your default contact group. Please try again.'));
 		}
@@ -568,7 +567,7 @@ class User
 			$fields['allow_gid'] = '<' . $def_gid . '>';
 		}
 
-		dba::update('user', $fields, ['uid' => $uid]);
+		DBA::update('user', $fields, ['uid' => $uid]);
 
 		// if we have no OpenID photo try to look up an avatar
 		if (!strlen($photo)) {
@@ -613,7 +612,7 @@ class User
 				}
 
 				if (!$photo_failure) {
-					dba::update('photo', ['profile' => 1], ['resource-id' => $hash]);
+					DBA::update('photo', ['profile' => 1], ['resource-id' => $hash]);
 				}
 			}
 		}
@@ -717,16 +716,16 @@ class User
 
 		logger('Removing user: ' . $uid);
 
-		$user = dba::selectFirst('user', [], ['uid' => $uid]);
+		$user = DBA::selectFirst('user', [], ['uid' => $uid]);
 
 		Addon::callHooks('remove_user', $user);
 
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.
-		dba::insert('userd', ['username' => $user['nickname']]);
+		DBA::insert('userd', ['username' => $user['nickname']]);
 
 		// The user and related data will be deleted in "cron_expire_and_remove_users" (cronjobs.php)
-		dba::update('user', ['account_removed' => true, 'account_expires_on' => DateTimeFormat::utcNow()], ['uid' => $uid]);
+		DBA::update('user', ['account_removed' => true, 'account_expires_on' => DateTimeFormat::utcNow()], ['uid' => $uid]);
 		Worker::add(PRIORITY_HIGH, "Notifier", "removeme", $uid);
 
 		// Send an update to the directory

@@ -12,10 +12,11 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Model\Profile;
 use Friendica\Model\Item;
+use Friendica\Model\Profile;
+use Friendica\Model\Term;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Util\DateTimeFormat;
@@ -134,7 +135,7 @@ function localize_item(&$item)
 
 		$fields = ['author-link', 'author-name', 'verb', 'object-type', 'resource-id', 'body', 'plink'];
 		$obj = Item::selectFirst($fields, ['uri' => $item['parent-uri']]);
-		if (!DBM::is_result($obj)) {
+		if (!DBA::isResult($obj)) {
 			return;
 		}
 
@@ -265,7 +266,7 @@ function localize_item(&$item)
 		$fields = ['author-id', 'author-link', 'author-name', 'author-network',
 			'verb', 'object-type', 'resource-id', 'body', 'plink'];
 		$obj = Item::selectFirst($fields, ['uri' => $item['parent-uri']]);
-		if (!DBM::is_result($obj)) {
+		if (!DBA::isResult($obj)) {
 			return;
 		}
 
@@ -320,7 +321,7 @@ function localize_item(&$item)
 		if (strlen($obj->id)) {
 			$fields = ['author-link', 'author-name', 'plink'];
 			$target = Item::selectFirst($fields, ['uri' => $obj->id, 'uid' => $item['uid']]);
-			if (DBM::is_result($target) && $target['plink']) {
+			if (DBA::isResult($target) && $target['plink']) {
 				$Bname = $target['author-name'];
 				$Blink = $target['author-link'];
 				$A = '[url=' . Contact::magicLink($Alink) . ']' . $Aname . '[/url]';
@@ -578,7 +579,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					$profile_name = $item['author-link'];
 				}
 
-				$tags = \Friendica\Model\Term::populateTagsFromItem($item);
+				$tags = Term::populateTagsFromItem($item);
 
 				$author = ['uid' => 0, 'id' => $item['author-id'],
 					'network' => $item['author-network'], 'url' => $item['author-link']];
@@ -827,8 +828,8 @@ function item_photo_menu($item) {
 	$network = '';
 	$rel = 0;
 	$condition = ['uid' => local_user(), 'nurl' => normalise_link($item['author-link'])];
-	$contact = dba::selectFirst('contact', ['id', 'network', 'rel'], $condition);
-	if (DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', ['id', 'network', 'rel'], $condition);
+	if (DBA::isResult($contact)) {
 		$cid = $contact['id'];
 		$network = $contact['network'];
 		$rel = $contact['rel'];
@@ -865,7 +866,7 @@ function item_photo_menu($item) {
 			$menu[L10n::t("Poke")] = $poke_link;
 		}
 
-		if ((($cid == 0) || ($rel == CONTACT_IS_FOLLOWER)) &&
+		if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
 			in_array($item['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA])) {
 			$menu[L10n::t('Connect/Follow')] = 'follow?url=' . urlencode($item['author-link']);
 		}

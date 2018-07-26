@@ -10,11 +10,10 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use dba;
 
 require_once 'include/dba.php';
 
@@ -41,14 +40,14 @@ class Photo
 	 */
 	public static function store(Image $Image, $uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '', $desc = '')
 	{
-		$photo = dba::selectFirst('photo', ['guid'], ["`resource-id` = ? AND `guid` != ?", $rid, '']);
-		if (DBM::is_result($photo)) {
+		$photo = DBA::selectFirst('photo', ['guid'], ["`resource-id` = ? AND `guid` != ?", $rid, '']);
+		if (DBA::isResult($photo)) {
 			$guid = $photo['guid'];
 		} else {
 			$guid = System::createGUID();
 		}
 
-		$existing_photo = dba::selectFirst('photo', ['id'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
+		$existing_photo = DBA::selectFirst('photo', ['id'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
 
 		$fields = [
 			'uid' => $uid,
@@ -73,10 +72,10 @@ class Photo
 			'desc' => $desc
 		];
 
-		if (DBM::is_result($existing_photo)) {
-			$r = dba::update('photo', $fields, ['id' => $existing_photo['id']]);
+		if (DBA::isResult($existing_photo)) {
+			$r = DBA::update('photo', $fields, ['id' => $existing_photo['id']]);
 		} else {
-			$r = dba::insert('photo', $fields);
+			$r = DBA::insert('photo', $fields);
 		}
 
 		return $r;
@@ -94,7 +93,7 @@ class Photo
 		$thumb = '';
 		$micro = '';
 
-		$photo = dba::selectFirst(
+		$photo = DBA::selectFirst(
 			'photo', ['resource-id'], ['uid' => $uid, 'contact-id' => $cid, 'scale' => 4, 'album' => 'Contact Photos']
 		);
 		if (x($photo['resource-id'])) {
@@ -240,8 +239,8 @@ class Photo
 					WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra
 					GROUP BY `album` ORDER BY `created` DESC",
 					intval($uid),
-					dbesc('Contact Photos'),
-					dbesc(L10n::t('Contact Photos'))
+					DBA::escape('Contact Photos'),
+					DBA::escape(L10n::t('Contact Photos'))
 				);
 			} else {
 				// This query doesn't do the count and is much faster
@@ -249,8 +248,8 @@ class Photo
 					FROM `photo` USE INDEX (`uid_album_scale_created`)
 					WHERE `uid` = %d  AND `album` != '%s' AND `album` != '%s' $sql_extra",
 					intval($uid),
-					dbesc('Contact Photos'),
-					dbesc(L10n::t('Contact Photos'))
+					DBA::escape('Contact Photos'),
+					DBA::escape(L10n::t('Contact Photos'))
 				);
 			}
 			Cache::set($key, $albums, CACHE_DAY);

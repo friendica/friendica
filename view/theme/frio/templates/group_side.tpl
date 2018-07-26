@@ -2,12 +2,12 @@
 	<div id="sidebar-group-header">
 	<h3>{{$title}}</h3>
 	{{if ! $newgroup}}
-	<a class="group-edit-tool pull-right" href="{{$grouppage}}">
-	<i class="faded-icon fa fa-pencil" aria-hidden="true"></i><span class="sr-only">{{$editgroupstext}}</span>
+	<a class="group-edit-tool pull-right" href="{{$grouppage}}" data-toggle="tooltip" title="{{$editgroupstext}}">
+	<i class="faded-icon fa fa-pencil" aria-hidden="true"></i>
 	</a>
 	{{else}}
-	<a class="group-edit-tool pull-right" id="sidebar-new-group" onclick="javascript:$('#group-new-form').fadeIn('fast');">
-	<i class="faded-icon fa fa-plus" aria-hidden="true"></i><span class="sr-only">{{$createtext}}</span>
+	<a class="group-edit-tool pull-right" id="sidebar-new-group" onclick="javascript:$('#group-new-form').fadeIn('fast');" data-toggle="tooltip" title="{{$createtext}}">
+	<i class="faded-icon fa fa-plus" aria-hidden="true"></i>
 	</a>
 	<form id="group-new-form" action="group/new" method="post" style="display:none;">
 		<div class="form-group">
@@ -38,8 +38,8 @@
 					{{/if}}
 					{{if $group.edit}}
 						{{* if the group is editable show a little pencil for editing *}}
-						<a id="edit-sidebar-group-element-{{$group.id}}" class="group-edit-tool pull-right" href="{{$group.edit.href}}" title="{{$edittext}}">
-							<i class="faded-icon fa fa-pencil" aria-hidden="true"></i><span class="sr-only">{{$edittext}}</span>
+						<a id="edit-sidebar-group-element-{{$group.id}}" class="group-edit-tool pull-right" href="{{$group.edit.href}}" data-toggle="tooltip" title="{{$edittext}}">
+							<i class="faded-icon fa fa-pencil" aria-hidden="true"></i>
 						</a>
 					{{/if}}
 					<a id="sidebar-group-element-{{$group.id}}" class="sidebar-group-element" href="{{$group.href}}">{{$group.text}}</a>

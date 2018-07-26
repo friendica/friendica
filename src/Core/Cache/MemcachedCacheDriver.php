@@ -22,6 +22,16 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 	 */
 	private $memcached;
 
+	/**
+	 * Due to limitations of the INI format, the expected configuration for Memcached servers is the following:
+	 * array {
+	 *   0 => "hostname, port(, weight)",
+	 *   1 => ...
+	 * }
+	 *
+	 * @param array $memcached_hosts
+	 * @throws \Exception
+	 */
 	public function __construct(array $memcached_hosts)
 	{
 		if (!class_exists('Memcached', false)) {
@@ -29,6 +39,12 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 		}
 
 		$this->memcached = new Memcached();
+
+		array_walk($memcached_hosts, function (&$value) {
+			if (is_string($value)) {
+				$value = array_map('trim', explode(',', $value));
+			}
+		});
 
 		$this->memcached->addServers($memcached_hosts);
 

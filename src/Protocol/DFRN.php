@@ -8,6 +8,8 @@
  */
 namespace Friendica\Protocol;
 
+use DOMDocument;
+use DOMXPath;
 use Friendica\App;
 use Friendica\Content\OEmbed;
 use Friendica\Content\Text\BBCode;
@@ -16,25 +18,20 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
+use Friendica\Model\PermissionSet;
 use Friendica\Model\User;
 use Friendica\Object\Image;
-use Friendica\Protocol\OStatus;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
-use Friendica\Protocol\Diaspora;
-use dba;
-use DOMDocument;
-use DOMXPath;
 use HTMLPurifier;
 use HTMLPurifier_Config;
 
@@ -127,16 +124,16 @@ class DFRN
 
 		// default permissions - anonymous user
 
-		$sql_extra = " AND `item`.`allow_cid` = '' AND `item`.`allow_gid` = '' AND `item`.`deny_cid`  = '' AND `item`.`deny_gid`  = '' ";
+		$sql_extra = " AND NOT `item`.`private` ";
 
 		$r = q(
 			"SELECT `contact`.*, `user`.`nickname`, `user`.`timezone`, `user`.`page-flags`, `user`.`account-type`
 			FROM `contact` INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`
 			WHERE `contact`.`self` AND `user`.`nickname` = '%s' LIMIT 1",
-			dbesc($owner_nick)
+			DBA::escape($owner_nick)
 		);
 
-		if (! DBM::is_result($r)) {
+		if (! DBA::isResult($r)) {
 			logger(sprintf('No contact found for nickname=%d', $owner_nick), LOGGER_WARNING);
 			killme();
 		}
@@ -151,15 +148,15 @@ class DFRN
 			$sql_extra = '';
 			switch ($direction) {
 				case (-1):
-					$sql_extra = sprintf(" AND `issued-id` = '%s' ", dbesc($dfrn_id));
+					$sql_extra = sprintf(" AND `issued-id` = '%s' ", DBA::escape($dfrn_id));
 					$my_id = $dfrn_id;
 					break;
 				case 0:
-					$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+					$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 					$my_id = '1:' . $dfrn_id;
 					break;
 				case 1:
-					$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+					$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 					$my_id = '0:' . $dfrn_id;
 					break;
 				default:
@@ -172,37 +169,21 @@ class DFRN
 				intval($owner_id)
 			);
 
-			if (! DBM::is_result($r)) {
+			if (! DBA::isResult($r)) {
 				logger(sprintf('No contact found for uid=%d', $owner_id), LOGGER_WARNING);
 				killme();
 			}
 
 			$contact = $r[0];
 			include_once 'include/security.php';
-			$groups = Group::getIdsByContactId($contact['id']);
 
-			if (count($groups)) {
-				for ($x = 0; $x < count($groups); $x ++) {
-					$groups[$x] = '<' . intval($groups[$x]) . '>' ;
-				}
+			$set = PermissionSet::get($owner_id, $contact['id']);
 
-				$gs = implode('|', $groups);
+			if (!empty($set)) {
+				$sql_extra = " AND `item`.`psid` IN (" . implode(',', $set) .")";
 			} else {
-				$gs = '<<>>' ; // Impossible to match
+				$sql_extra = " AND NOT `item`.`private`";
 			}
-
-			$sql_extra = sprintf(
-				"
-				AND ( `allow_cid` = '' OR     `allow_cid` REGEXP '<%d>' )
-				AND ( `deny_cid`  = '' OR NOT `deny_cid`  REGEXP '<%d>' )
-				AND ( `allow_gid` = '' OR     `allow_gid` REGEXP '%s' )
-				AND ( `deny_gid`  = '' OR NOT `deny_gid`  REGEXP '%s')
-			",
-				intval($contact['id']),
-				intval($contact['id']),
-				dbesc($gs),
-				dbesc($gs)
-			);
 		}
 
 		if ($public_feed) {
@@ -218,7 +199,7 @@ class DFRN
 		if (isset($category)) {
 			$sql_post_table = sprintf(
 				"INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				dbesc(protect_sprintf($category)),
+				DBA::escape(protect_sprintf($category)),
 				intval(TERM_OBJ_POST),
 				intval(TERM_CATEGORY),
 				intval($owner_id)
@@ -240,8 +221,8 @@ class DFRN
 			$sql_extra
 			ORDER BY `item`.`parent` ".$sort.", `item`.`created` ASC LIMIT 0, 300",
 			intval($owner_id),
-			dbesc($check_date),
-			dbesc($sort)
+			DBA::escape($check_date),
+			DBA::escape($sort)
 		);
 
 		$ids = [];
@@ -281,7 +262,7 @@ class DFRN
 		/// @TODO This hook can't work anymore
 		//	Addon::callHooks('atom_feed', $atom);
 
-		if (!DBM::is_result($items) || $onlyheader) {
+		if (!DBA::isResult($items) || $onlyheader) {
 			$atom = trim($doc->saveXML());
 
 			Addon::callHooks('atom_feed_end', $atom);
@@ -336,7 +317,7 @@ class DFRN
 
 		$ret = Item::select(Item::DELIVER_FIELDLIST, $condition);
 		$items = Item::inArray($ret);
-		if (!DBM::is_result($items)) {
+		if (!DBA::isResult($items)) {
 			killme();
 		}
 
@@ -602,7 +583,7 @@ class DFRN
 				WHERE (`hidewall` OR NOT `net-publish`) AND `user`.`uid` = %d",
 			intval($owner['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$hidewall = true;
 		} else {
 			$hidewall = false;
@@ -661,7 +642,7 @@ class DFRN
 				WHERE `profile`.`is-default` AND NOT `user`.`hidewall` AND `user`.`uid` = %d",
 			intval($owner['uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$profile = $r[0];
 
 			XML::addElement($doc, $author, "poco:displayName", $profile["name"]);
@@ -915,7 +896,7 @@ class DFRN
 			$entry->setAttribute("xmlns:statusnet", NAMESPACE_STATUSNET);
 		}
 
-		if ($item['allow_cid'] || $item['allow_gid'] || $item['deny_cid'] || $item['deny_gid']) {
+		if ($item['private']) {
 			$body = Item::fixPrivatePhotos($item['body'], $owner['uid'], $item, $cid);
 		} else {
 			$body = $item['body'];
@@ -955,8 +936,8 @@ class DFRN
 		$conversation_uri = $conversation_href;
 
 		if (isset($parent_item)) {
-			$conversation = dba::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $item['parent-uri']]);
-			if (DBM::is_result($conversation)) {
+			$conversation = DBA::selectFirst('conversation', ['conversation-uri', 'conversation-href'], ['item-uri' => $item['parent-uri']]);
+			if (DBA::isResult($conversation)) {
 				if ($conversation['conversation-uri'] != '') {
 					$conversation_uri = $conversation['conversation-uri'];
 				}
@@ -1009,8 +990,8 @@ class DFRN
 			XML::addElement($doc, $entry, "georss:point", $item['coord']);
 		}
 
-		if (($item['private']) || strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid'])) {
-			XML::addElement($doc, $entry, "dfrn:private", (($item['private']) ? $item['private'] : 1));
+		if ($item['private']) {
+			XML::addElement($doc, $entry, "dfrn:private", ($item['private'] ? $item['private'] : 1));
 		}
 
 		if ($item['extid']) {
@@ -1077,10 +1058,10 @@ class DFRN
 			$r = q(
 				"SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
 				intval($owner["uid"]),
-				dbesc(normalise_link($mention))
+				DBA::escape(normalise_link($mention))
 			);
 
-			if (DBM::is_result($r) && ($r[0]["forum"] || $r[0]["prv"])) {
+			if (DBA::isResult($r) && ($r[0]["forum"] || $r[0]["prv"])) {
 				XML::addElement(
 					$doc,
 					$entry,
@@ -1192,7 +1173,7 @@ class DFRN
 
 		$ret = Network::curl($url);
 
-		if ($ret['errno'] == CURLE_OPERATION_TIMEDOUT) {
+		if (!empty($ret["errno"]) && ($ret['errno'] == CURLE_OPERATION_TIMEDOUT)) {
 			Contact::markForArchival($contact);
 			return -2; // timed out
 		}
@@ -1221,9 +1202,16 @@ class DFRN
 
 		$res = XML::parseString($xml);
 
-		if ((intval($res->status) != 0) || !strlen($res->challenge) || !strlen($res->dfrn_id)) {
+		if (!is_object($res) || (intval($res->status) != 0) || !strlen($res->challenge) || !strlen($res->dfrn_id)) {
 			Contact::markForArchival($contact);
-			return ($res->status ? $res->status : 3);
+
+			if (empty($res->status)) {
+				$status = 3;
+			} else {
+				$status = $res->status;
+			}
+
+			return $status;
 		}
 
 		$postvars     = [];
@@ -1257,7 +1245,7 @@ class DFRN
 
 		if (($contact['duplex'] && strlen($contact['pubkey']))
 			|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-			|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))
+			|| ($contact['rel'] == Contact::SHARING && strlen($contact['pubkey']))
 		) {
 			openssl_public_decrypt($sent_dfrn_id, $final_dfrn_id, $contact['pubkey']);
 			openssl_public_decrypt($challenge, $postvars['challenge'], $contact['pubkey']);
@@ -1285,7 +1273,7 @@ class DFRN
 			$postvars['dissolve'] = '1';
 		}
 
-		if ((($contact['rel']) && ($contact['rel'] != CONTACT_IS_SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
+		if ((($contact['rel']) && ($contact['rel'] != Contact::SHARING) && (! $contact['blocked'])) || ($owner['page-flags'] == PAGE_COMMUNITY)) {
 			$postvars['data'] = $atom;
 			$postvars['perm'] = 'rw';
 		} else {
@@ -1320,7 +1308,7 @@ class DFRN
 			if ($dfrn_version >= 2.1) {
 				if (($contact['duplex'] && strlen($contact['pubkey']))
 					|| ($owner['page-flags'] == PAGE_COMMUNITY && strlen($contact['pubkey']))
-					|| ($contact['rel'] == CONTACT_IS_SHARING && strlen($contact['pubkey']))
+					|| ($contact['rel'] == Contact::SHARING && strlen($contact['pubkey']))
 				) {
 					openssl_public_encrypt($key, $postvars['key'], $contact['pubkey']);
 				} else {
@@ -1404,7 +1392,7 @@ class DFRN
 			if (empty($contact['addr'])) {
 				logger('Empty contact handle for ' . $contact['id'] . ' - ' . $contact['url'] . ' - trying to update it.');
 				if (Contact::updateFromProbe($contact['id'])) {
-					$new_contact = dba::selectFirst('contact', ['addr'], ['id' => $contact['id']]);
+					$new_contact = DBA::selectFirst('contact', ['addr'], ['id' => $contact['id']]);
 					$contact['addr'] = $new_contact['addr'];
 				}
 
@@ -1495,11 +1483,11 @@ class DFRN
 			"SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
 			intval($contact['uid']),
 			intval($contact['id']),
-			dbesc(DateTimeFormat::utc($birthday)),
-			dbesc('birthday')
+			DBA::escape(DateTimeFormat::utc($birthday)),
+			DBA::escape('birthday')
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return;
 		}
 
@@ -1513,13 +1501,13 @@ class DFRN
 			VALUES ( %d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s') ",
 			intval($contact['uid']),
 			intval($contact['id']),
-			dbesc(DateTimeFormat::utcNow()),
-			dbesc(DateTimeFormat::utcNow()),
-			dbesc(DateTimeFormat::utc($birthday)),
-			dbesc(DateTimeFormat::utc($birthday . ' + 1 day ')),
-			dbesc($bdtext),
-			dbesc($bdtext2),
-			dbesc('birthday')
+			DBA::escape(DateTimeFormat::utcNow()),
+			DBA::escape(DateTimeFormat::utcNow()),
+			DBA::escape(DateTimeFormat::utc($birthday)),
+			DBA::escape(DateTimeFormat::utc($birthday . ' + 1 day ')),
+			DBA::escape($bdtext),
+			DBA::escape($bdtext2),
+			DBA::escape('birthday')
 		);
 	}
 
@@ -1546,9 +1534,9 @@ class DFRN
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
 		$condition = ["`uid` = ? AND `nurl` = ? AND `network` != ?",
 			$importer["importer_uid"], normalise_link($author["link"]), NETWORK_STATUSNET];
-		$contact_old = dba::selectFirst('contact', $fields, $condition);
+		$contact_old = DBA::selectFirst('contact', $fields, $condition);
 
-		if (DBM::is_result($contact_old)) {
+		if (DBA::isResult($contact_old)) {
 			$author["contact-id"] = $contact_old["id"];
 			$author["network"] = $contact_old["network"];
 		} else {
@@ -1591,7 +1579,7 @@ class DFRN
 			$author["avatar"] = current($avatarlist);
 		}
 
-		if (DBM::is_result($contact_old) && !$onlyfetch) {
+		if (DBA::isResult($contact_old) && !$onlyfetch) {
 			logger("Check if contact details for contact " . $contact_old["id"] . " (" . $contact_old["nick"] . ") have to be updated.", LOGGER_DEBUG);
 
 			$poco = ["url" => $contact_old["url"]];
@@ -1741,11 +1729,11 @@ class DFRN
 					`addr` = '%s', `keywords` = '%s', `bdyear` = '%s', `bd` = '%s', `hidden` = %d,
 					`xmpp` = '%s', `name-date`  = '%s', `uri-date` = '%s'
 					WHERE `id` = %d AND `network` = '%s'",
-					dbesc($contact["name"]), dbesc($contact["nick"]), dbesc($contact["about"]),	dbesc($contact["location"]),
-					dbesc($contact["addr"]), dbesc($contact["keywords"]), dbesc($contact["bdyear"]),
-					dbesc($contact["bd"]), intval($contact["hidden"]), dbesc($contact["xmpp"]),
-					dbesc(DBM::date($contact["name-date"])), dbesc(DBM::date($contact["uri-date"])),
-					intval($contact["id"]),	dbesc($contact["network"])
+					DBA::escape($contact["name"]), DBA::escape($contact["nick"]), DBA::escape($contact["about"]),	DBA::escape($contact["location"]),
+					DBA::escape($contact["addr"]), DBA::escape($contact["keywords"]), DBA::escape($contact["bdyear"]),
+					DBA::escape($contact["bd"]), intval($contact["hidden"]), DBA::escape($contact["xmpp"]),
+					DBA::escape(DateTimeFormat::utc($contact["name-date"])), DBA::escape(DateTimeFormat::utc($contact["uri-date"])),
+					intval($contact["id"]),	DBA::escape($contact["network"])
 				);
 			}
 
@@ -1858,7 +1846,7 @@ class DFRN
 		$msg["seen"] = 0;
 		$msg["replied"] = 0;
 
-		dba::insert('mail', $msg);
+		DBA::insert('mail', $msg);
 
 		// send notifications.
 		/// @TODO Arange this mess
@@ -1911,8 +1899,8 @@ class DFRN
 
 		$r = q(
 			"SELECT `id` FROM `contact` WHERE `name` = '%s' AND `nurl` = '%s' AND `uid` = %d LIMIT 1",
-			dbesc($suggest["name"]),
-			dbesc(normalise_link($suggest["url"])),
+			DBA::escape($suggest["name"]),
+			DBA::escape(normalise_link($suggest["url"])),
 			intval($suggest["uid"])
 		);
 
@@ -1923,7 +1911,7 @@ class DFRN
 		 *
 		 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 		 */
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			return false;
 		}
 
@@ -1932,11 +1920,11 @@ class DFRN
 		$fid = 0;
 		$r = q(
 			"SELECT `id` FROM `fcontact` WHERE `url` = '%s' AND `name` = '%s' AND `request` = '%s' LIMIT 1",
-			dbesc($suggest["url"]),
-			dbesc($suggest["name"]),
-			dbesc($suggest["request"])
+			DBA::escape($suggest["url"]),
+			DBA::escape($suggest["name"]),
+			DBA::escape($suggest["request"])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$fid = $r[0]["id"];
 
 			// OK, we do. Do we already have an introduction for this person ?
@@ -1953,32 +1941,32 @@ class DFRN
 			 *
 			 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 			 */
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				return false;
 			}
 		}
 		if (!$fid) {
 			$r = q(
 				"INSERT INTO `fcontact` (`name`,`url`,`photo`,`request`) VALUES ('%s', '%s', '%s', '%s')",
-				dbesc($suggest["name"]),
-				dbesc($suggest["url"]),
-				dbesc($suggest["photo"]),
-				dbesc($suggest["request"])
+				DBA::escape($suggest["name"]),
+				DBA::escape($suggest["url"]),
+				DBA::escape($suggest["photo"]),
+				DBA::escape($suggest["request"])
 			);
 		}
 		$r = q(
 			"SELECT `id` FROM `fcontact` WHERE `url` = '%s' AND `name` = '%s' AND `request` = '%s' LIMIT 1",
-			dbesc($suggest["url"]),
-			dbesc($suggest["name"]),
-			dbesc($suggest["request"])
+			DBA::escape($suggest["url"]),
+			DBA::escape($suggest["name"]),
+			DBA::escape($suggest["request"])
 		);
 
 		/*
 		 * If no record in fcontact is found, below INSERT statement will not
 		 * link an introduction to it.
 		 */
-		if (!DBM::is_result($r)) {
-			// database record did not get created. Quietly give up.
+		if (!DBA::isResult($r)) {
+			// Database record did not get created. Quietly give up.
 			killme();
 		}
 
@@ -1992,9 +1980,9 @@ class DFRN
 			intval($suggest["uid"]),
 			intval($fid),
 			intval($suggest["cid"]),
-			dbesc($suggest["body"]),
-			dbesc($hash),
-			dbesc(DateTimeFormat::utcNow()),
+			DBA::escape($suggest["body"]),
+			DBA::escape($hash),
+			DBA::escape(DateTimeFormat::utcNow()),
 			intval(0)
 		);
 
@@ -2058,12 +2046,12 @@ class DFRN
 
 		// update contact
 		$r = q(
-			"SELECT `photo`, `url` FROM `contact` WHERE `id` = %d AND `uid` = %d;",
+			"SELECT `photo`, `url` FROM `contact` WHERE `id` = %d AND `uid` = %d",
 			intval($importer["id"]),
 			intval($importer["importer_uid"])
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			logger("Query failed to execute, no result returned in " . __FUNCTION__);
 			return false;
 		}
@@ -2077,7 +2065,7 @@ class DFRN
 			'url' => $relocate["url"], 'nurl' => normalise_link($relocate["url"]),
 			'addr' => $relocate["addr"], 'connect' => $relocate["addr"],
 			'notify' => $relocate["notify"], 'server_url' => $relocate["server_url"]];
-		dba::update('gcontact', $fields, ['nurl' => normalise_link($old["url"])]);
+		DBA::update('gcontact', $fields, ['nurl' => normalise_link($old["url"])]);
 
 		// Update the contact table. We try to find every entry.
 		$fields = ['name' => $relocate["name"], 'avatar' => $relocate["avatar"],
@@ -2087,7 +2075,7 @@ class DFRN
 			'poll' => $relocate["poll"], 'site-pubkey' => $relocate["sitepubkey"]];
 		$condition = ["(`id` = ?) OR (`nurl` = ?)", $importer["id"], normalise_link($old["url"])];
 
-		dba::update('contact', $fields, $condition);
+		DBA::update('contact', $fields, $condition);
 
 		Contact::updateAvatar($relocate["avatar"], $importer["importer_uid"], $importer["id"], true);
 
@@ -2161,7 +2149,7 @@ class DFRN
 			$is_a_remote_action = false;
 
 			$parent = Item::selectFirst(['parent-uri'], ['uri' => $item["parent-uri"]]);
-			if (DBM::is_result($parent)) {
+			if (DBA::isResult($parent)) {
 				$r = q(
 					"SELECT `item`.`forum_mode`, `item`.`wall` FROM `item`
 					INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
@@ -2169,12 +2157,12 @@ class DFRN
 					AND `item`.`uid` = %d
 					$sql_extra
 					LIMIT 1",
-					dbesc($parent["parent-uri"]),
-					dbesc($parent["parent-uri"]),
-					dbesc($parent["parent-uri"]),
+					DBA::escape($parent["parent-uri"]),
+					DBA::escape($parent["parent-uri"]),
+					DBA::escape($parent["parent-uri"]),
 					intval($importer["importer_uid"])
 				);
-				if (DBM::is_result($r)) {
+				if (DBA::isResult($r)) {
 					$is_a_remote_action = true;
 				}
 			}
@@ -2231,7 +2219,7 @@ class DFRN
 			}
 
 			if ($Blink && link_compare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
-				$author = dba::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
+				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
 				// send a notification
 				notification(
@@ -2332,7 +2320,8 @@ class DFRN
 
 				if ($xt->type == ACTIVITY_OBJ_NOTE) {
 					$item_tag = Item::selectFirst(['id', 'tag'], ['uri' => $xt->id, 'uid' => $importer["importer_uid"]]);
-					if (!DBM::is_result($item_tag)) {
+
+					if (!DBA::isResult($item_tag)) {
 						logger("Query failed to execute, no result returned in " . __FUNCTION__);
 						return false;
 					}
@@ -2423,7 +2412,7 @@ class DFRN
 			['uri' => $item["uri"], 'uid' => $importer["importer_uid"]]
 		);
 		// Is there an existing item?
-		if (DBM::is_result($current) && !self::isEditedTimestampNewer($current, $item)) {
+		if (DBA::isResult($current) && !self::isEditedTimestampNewer($current, $item)) {
 			logger("Item ".$item["uri"]." (".$item['edited'].") already existed.", LOGGER_DEBUG);
 			return;
 		}
@@ -2638,13 +2627,14 @@ class DFRN
 					$ev["edited"]  = $item["edited"];
 					$ev["private"] = $item["private"];
 					$ev["guid"]    = $item["guid"];
+					$ev["plink"]   = $item["plink"];
 
 					$r = q(
 						"SELECT `id` FROM `event` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
-						dbesc($item["uri"]),
+						DBA::escape($item["uri"]),
 						intval($importer["importer_uid"])
 					);
-					if (DBM::is_result($r)) {
+					if (DBA::isResult($r)) {
 						$ev["id"] = $r[0]["id"];
 					}
 
@@ -2668,7 +2658,7 @@ class DFRN
 
 
 		// Update content if 'updated' changes
-		if (DBM::is_result($current)) {
+		if (DBA::isResult($current)) {
 			if (self::updateContent($current, $item, $importer, $entrytype)) {
 				logger("Item ".$item["uri"]." was updated.", LOGGER_DEBUG);
 			} else {
@@ -2707,7 +2697,7 @@ class DFRN
 				$item["owner-id"] = Contact::getIdForURL($importer["url"], 0);
 			}
 
-			if (($importer["rel"] == CONTACT_IS_FOLLOWER) && (!self::tgroupCheck($importer["importer_uid"], $item))) {
+			if (($importer["rel"] == Contact::FOLLOWER) && (!self::tgroupCheck($importer["importer_uid"], $item))) {
 				logger("Contact ".$importer["id"]." is only follower and tgroup check was negative.", LOGGER_DEBUG);
 				return;
 			}
@@ -2760,7 +2750,7 @@ class DFRN
 
 		$condition = ['uri' => $uri, 'uid' => $importer["importer_uid"]];
 		$item = Item::selectFirst(['id', 'parent', 'contact-id', 'file', 'deleted'], $condition);
-		if (!DBM::is_result($item)) {
+		if (!DBA::isResult($item)) {
 			logger("Item with uri " . $uri . " for user " . $importer["importer_uid"] . " wasn't found.", LOGGER_DEBUG);
 			return;
 		}
@@ -2853,16 +2843,16 @@ class DFRN
 			$accounttype = intval(XML::getFirstNodeValue($xpath, "/atom:feed/dfrn:account_type/text()"));
 
 			if ($accounttype != $importer["contact-type"]) {
-				dba::update('contact', ['contact-type' => $accounttype], ['id' => $importer["id"]]);
+				DBA::update('contact', ['contact-type' => $accounttype], ['id' => $importer["id"]]);
 			}
 			// A forum contact can either have set "forum" or "prv" - but not both
 			if (($accounttype == ACCOUNT_TYPE_COMMUNITY) && (($forum != $importer["forum"]) || ($forum == $importer["prv"]))) {
 				$condition = ['(`forum` != ? OR `prv` != ?) AND `id` = ?', $forum, !$forum, $importer["id"]];
-				dba::update('contact', ['forum' => $forum, 'prv' => !$forum], $condition);
+				DBA::update('contact', ['forum' => $forum, 'prv' => !$forum], $condition);
 			}
 		} elseif ($forum != $importer["forum"]) { // Deprecated since 3.5.1
 			$condition = ['`forum` != ? AND `id` = ?', $forum, $importer["id"]];
-			dba::update('contact', ['forum' => $forum], $condition);
+			DBA::update('contact', ['forum' => $forum], $condition);
 		}
 
 
@@ -2948,23 +2938,23 @@ class DFRN
 			/// @todo Why is there a query for "url" *and* "nurl"? Especially this normalising is strange.
 			$r = q("SELECT `id` FROM `contact` WHERE `uid` = (SELECT `uid` FROM `user` WHERE `nickname` = '%s' LIMIT 1)
 					AND `nick` = '%s' AND NOT `self` AND (`url` LIKE '%%%s%%' OR `nurl` LIKE '%%%s%%') AND NOT `blocked` AND NOT `pending` LIMIT 1",
-				dbesc($contact_nick),
-				dbesc($a->user['nickname']),
-				dbesc($baseurl),
-				dbesc($nurl)
+				DBA::escape($contact_nick),
+				DBA::escape($a->user['nickname']),
+				DBA::escape($baseurl),
+				DBA::escape($nurl)
 			);
-			if ((! DBM::is_result($r)) || $r[0]['id'] == remote_user()) {
+			if ((! DBA::isResult($r)) || $r[0]['id'] == remote_user()) {
 				return;
 			}
 
 			$r = q("SELECT * FROM contact WHERE nick = '%s'
 					AND network = '%s' AND uid = %d  AND url LIKE '%%%s%%' LIMIT 1",
-				dbesc($contact_nick),
-				dbesc(NETWORK_DFRN),
+				DBA::escape($contact_nick),
+				DBA::escape(NETWORK_DFRN),
 				intval(local_user()),
-				dbesc($baseurl)
+				DBA::escape($baseurl)
 			);
-			if (! DBM::is_result($r)) {
+			if (! DBA::isResult($r)) {
 				return;
 			}
 
@@ -2990,7 +2980,7 @@ class DFRN
 
 			$sec = random_string();
 
-			dba::insert('profile_check', ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id, 'sec' => $sec, 'expire' => time() + 45]);
+			DBA::insert('profile_check', ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id, 'sec' => $sec, 'expire' => time() + 45]);
 
 			$url = curPageURL();
 
@@ -3031,7 +3021,7 @@ class DFRN
 		$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($uid)
 		);
-		if (!DBM::is_result($u)) {
+		if (!DBA::isResult($u)) {
 			return false;
 		}
 

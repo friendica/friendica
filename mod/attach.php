@@ -2,9 +2,10 @@
 /**
  * @file mod/attach.php
  */
+
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 require_once 'include/dba.php';
 require_once 'include/security.php';
@@ -20,8 +21,8 @@ function attach_init(App $a)
 
 	// Check for existence, which will also provide us the owner uid
 
-	$r = dba::selectFirst('attach', [], ['id' => $item_id]);
-	if (!DBM::is_result($r)) {
+	$r = DBA::selectFirst('attach', [], ['id' => $item_id]);
+	if (!DBA::isResult($r)) {
 		notice(L10n::t('Item was not found.'). EOL);
 		return;
 	}
@@ -31,10 +32,10 @@ function attach_init(App $a)
 	// Now we'll see if we can access the attachment
 
 	$r = q("SELECT * FROM `attach` WHERE `id` = '%d' $sql_extra LIMIT 1",
-		dbesc($item_id)
+		DBA::escape($item_id)
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}

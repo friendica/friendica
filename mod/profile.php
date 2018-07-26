@@ -12,7 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -30,7 +30,7 @@ function profile_init(App $a)
 		$which = htmlspecialchars($a->argv[1]);
 	} else {
 		$r = q("SELECT `nickname` FROM `user` WHERE `blocked` = 0 AND `account_expired` = 0 AND `account_removed` = 0 AND `verified` = 1 ORDER BY RAND() LIMIT 1");
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			goaway(System::baseUrl() . '/profile/' . $r[0]['nickname']);
 		} else {
 			logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
@@ -79,7 +79,7 @@ function profile_init(App $a)
 	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/" title="' . L10n::t('%s\'s posts', $a->profile['username']) . '"/>' . "\r\n";
 	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/comments" title="' . L10n::t('%s\'s comments', $a->profile['username']) . '"/>' . "\r\n";
 	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/feed/' . $which . '/activity" title="' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\r\n";
-	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->get_hostname() . ($a->path ? '/' . $a->path : ''));
+	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->get_hostname() . ($a->urlpath ? '/' . $a->urlpath : ''));
 	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . System::baseUrl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
 	header('Link: <' . System::baseUrl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 
@@ -154,7 +154,7 @@ function profile_content(App $a, $update = 0)
 			intval($contact_id),
 			intval($a->profile['profile_uid'])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$contact = $r[0];
 			$remote_contact = true;
 		}
@@ -249,7 +249,7 @@ function profile_content(App $a, $update = 0)
 			intval($a->profile['profile_uid']), intval(GRAVITY_ACTIVITY)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			return '';
 		}
 	} else {
@@ -257,19 +257,19 @@ function profile_content(App $a, $update = 0)
 
 		if (x($category)) {
 			$sql_post_table = sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				dbesc(protect_sprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
+				DBA::escape(protect_sprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
 		}
 
 		if (x($hashtags)) {
 			$sql_post_table .= sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				dbesc(protect_sprintf($hashtags)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG), intval($a->profile['profile_uid']));
+				DBA::escape(protect_sprintf($hashtags)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG), intval($a->profile['profile_uid']));
 		}
 
 		if ($datequery) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", dbesc(DateTimeFormat::convert($datequery, 'UTC', date_default_timezone_get()))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", DBA::escape(DateTimeFormat::convert($datequery, 'UTC', date_default_timezone_get()))));
 		}
 		if ($datequery2) {
-			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", dbesc(DateTimeFormat::convert($datequery2, 'UTC', date_default_timezone_get()))));
+			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", DBA::escape(DateTimeFormat::convert($datequery2, 'UTC', date_default_timezone_get()))));
 		}
 
 		// Belongs the profile page to a forum?
@@ -280,7 +280,7 @@ function profile_content(App $a, $update = 0)
 			intval(PAGE_PRVGROUP)
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
 		} else {
 			$sql_extra3 = "";
@@ -327,7 +327,7 @@ function profile_content(App $a, $update = 0)
 	// search for new items (update routine)
 	$_SESSION['last_updated'][$last_updated_key] = time();
 
-	if (DBM::is_result($r)) {
+	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$parents_arr[] = $rr['item_id'];
 		}
@@ -346,7 +346,7 @@ function profile_content(App $a, $update = 0)
 
 
 	if ($is_owner) {
-		$unseen = dba::exists('item', ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+		$unseen = DBA::exists('item', ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		if ($unseen) {
 			$r = Item::update(['unseen' => false],
 					['wall' => true, 'unseen' => true, 'uid' => local_user()]);

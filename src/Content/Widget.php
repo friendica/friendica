@@ -11,11 +11,10 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-use dba;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
@@ -143,18 +142,18 @@ class Widget
 
 		$extra_sql = self::unavailableNetworks();
 
-		$r = dba::p("SELECT DISTINCT(`network`) FROM `contact` WHERE `uid` = ? AND `network` != '' $extra_sql ORDER BY `network`",
+		$r = DBA::p("SELECT DISTINCT(`network`) FROM `contact` WHERE `uid` = ? AND `network` != '' $extra_sql ORDER BY `network`",
 			local_user()
 		);
 
 		$nets = array();
-		while ($rr = dba::fetch($r)) {
+		while ($rr = DBA::fetch($r)) {
 			/// @TODO If 'network' is not there, this triggers an E_NOTICE
 			if ($rr['network']) {
 				$nets[] = array('ref' => $rr['network'], 'name' => ContactSelector::networkToName($rr['network']), 'selected' => (($selected == $rr['network']) ? 'selected' : '' ));
 			}
 		}
-		dba::close($r);
+		DBA::close($r);
 
 		if (count($nets) < 2) {
 			return '';
@@ -275,13 +274,13 @@ class Widget
 
 		if (!$cid) {
 			if (Profile::getMyURL()) {
-				$contact = dba::selectFirst('contact', ['id'],
+				$contact = DBA::selectFirst('contact', ['id'],
 						['nurl' => normalise_link(Profile::getMyURL()), 'uid' => $profile_uid]);
-				if (DBM::is_result($contact)) {
+				if (DBA::isResult($contact)) {
 					$cid = $contact['id'];
 				} else {
-					$gcontact = dba::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
-					if (DBM::is_result($gcontact)) {
+					$gcontact = DBA::selectFirst('gcontact', ['id'], ['nurl' => normalise_link(Profile::getMyURL())]);
+					if (DBA::isResult($gcontact)) {
 						$zcid = $gcontact['id'];
 					}
 				}

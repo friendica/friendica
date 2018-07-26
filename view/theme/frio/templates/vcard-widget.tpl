@@ -1,10 +1,12 @@
+<div class="vcard h-card widget">
 
-<div class="vcard widget h-card">
-	{{if $url}}
-		<div id="profile-photo-wrapper" class="thumbnail"><a class="u-url" href="{{$url}}"><img class="vcard-photo photo u-photo" src="{{$photo}}" alt="{{$name}}" /></a></div>
-	{{else}}
-		<div id="profile-photo-wrapper" class="thumbnail"><img class="vcard-photo photo u-photo" src="{{$photo}}" alt="{{$name}}" /></div>
-	{{/if}}
+	<div id="profile-photo-wrapper">
+		{{if $url}}
+		<a href="{{$url}}"><img class="photo u-photo" src="{{$photo}}" alt="{{$name}}" /></a>
+		{{else}}
+		<img class="photo u-photo" src="{{$photo}}" alt="{{$name}}" />
+		{{/if}}
+	</div>
 
 	{{* The short information which will appended to the second navbar by scrollspy *}}
 	<div id="vcard-short-info-wrapper" style="display: none;">
@@ -21,12 +23,14 @@
 	</div>
 
 	<div class="panel-body">
-		<div class="fn p-name">{{$name}}</div>
+		<h3 class="fn p-name">{{$name}}</h3>
+
 		{{if $addr}}<div class="p-addr">{{$addr}}</div>{{/if}}
+
 		{{if $pdesc}}<div class="title">{{$pdesc}}</div>{{/if}}
 
 		{{if $account_type}}<div class="account-type">{{$account_type}}</div>{{/if}}
+
 		{{if $network_name}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$network_name}}</dd></dl>{{/if}}
-		<div id="profile-vcard-break"></div>
 	</div>
 </div>

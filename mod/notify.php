@@ -8,7 +8,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Module\Login;
 use Friendica\Util\Temporal;
@@ -64,7 +64,7 @@ function notify_content(App $a)
 	$not_tpl = get_markup_template('notify.tpl');
 
 	$r = $nm->getAll(['seen'=>0]);
-	if (DBM::is_result($r) > 0) {
+	if (DBA::isResult($r) > 0) {
 		foreach ($r as $it) {
 			$notif_content .= replace_macros($not_tpl, [
 				'$item_link' => System::baseUrl(true).'/notify/view/'. $it['id'],

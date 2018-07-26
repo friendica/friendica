@@ -3,10 +3,12 @@
 namespace Friendica\Core\Console;
 
 use Asika\SimpleConsole\Console;
-use dba;
 use Friendica\App;
+use Friendica\Core\Config;
 use Friendica\Core\Install;
 use Friendica\Core\Theme;
+use Friendica\Database\DBA;
+use RuntimeException;
 
 require_once 'mod/install.php';
 require_once 'include/dba.php';
@@ -18,8 +20,8 @@ class AutomaticInstallation extends Console
 		return <<<HELP
 Installation - Install Friendica automatically
 Synopsis
-	bin/console autoinstall [-h|--help|-?] [-v] [-a] 
-	
+	bin/console autoinstall [-h|--help|-?] [-v] [-a]
+
 Description
     Installs Friendica with data based on the htconfig.php file
 
@@ -62,7 +64,7 @@ HELP;
 		$errorMessage = $this->extractErrors($checkResults['basic']);
 
 		if ($errorMessage !== '') {
-			throw new \RuntimeException($errorMessage);
+			throw new RuntimeException($errorMessage);
 		}
 
 		$this->out(" Complete!\n\n");
@@ -75,7 +77,7 @@ HELP;
 		$errorMessage = $this->extractErrors($checkResults['db']);
 
 		if ($errorMessage !== '') {
-			throw new \RuntimeException($errorMessage);
+			throw new RuntimeException($errorMessage);
 		}
 
 		$this->out(" Complete!\n\n");
@@ -86,15 +88,15 @@ HELP;
 		$checkResults['data'] = Install::installDatabaseStructure();
 
 		if ($checkResults['data'] !== '') {
-			throw new \RuntimeException("ERROR: DB Database creation error. Is the DB empty?\n");
+			throw new RuntimeException("ERROR: DB Database creation error. Is the DB empty?\n");
 		}
 
 		$this->out(" Complete!\n\n");
 
 		// Install theme
 		$this->out("Installing theme\n");
-		if (!empty($a->config['system']['theme'])) {
-			Theme::install($a->config['system']['theme']);
+		if (!empty(Config::get('system', 'theme'))) {
+			Theme::install(Config::get('system', 'theme'));
 			$this->out(" Complete\n\n");
 		} else {
 			$this->out(" Theme setting is empty. Please check the file htconfig.php\n\n");
@@ -103,7 +105,7 @@ HELP;
 		// Copy config file
 		$this->out("Saving config file...\n");
 		if ($config_file != '.htconfig.php' && !copy($config_file, '.htconfig.php')) {
-			throw new \RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to '.htconfig.php' manually.\n");
+			throw new RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to '.htconfig.php' manually.\n");
 		}
 		$this->out(" Complete!\n\n");
 		$this->out("\nInstallation is finished\n");
@@ -121,14 +123,14 @@ HELP;
 
 		Install::checkFunctions($checks);
 		Install::checkImagick($checks);
-		Install::checkHtConfig($checks);
+		Install::checkLocalIni($checks);
 		Install::checkSmarty3($checks);
 		Install::checkKeys($checks);
 
-		if (!empty($app->config['php_path'])) {
-			Install::checkPHP($app->config['php_path'], $checks);
+		if (!empty(Config::get('config', 'php_path'))) {
+			Install::checkPHP(Config::get('config', 'php_path'), $checks);
 		} else {
-			throw new \RuntimeException(" ERROR: The php_path is not set in the config. Please check the file .htconfig.php.\n");
+			throw new RuntimeException(" ERROR: The php_path is not set in the config.\n");
 		}
 
 		$this->out(" NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.\n");
@@ -153,7 +155,7 @@ HELP;
 		);
 
 
-		if (!dba::connect($db_host, $db_user, $db_pass, $db_data)) {
+		if (!DBA::connect($db_host, $db_user, $db_pass, $db_data)) {
 			$result['status'] = false;
 			$result['help'] = 'Failed, please check your MySQL settings and credentials.';
 		}

@@ -1,7 +1,7 @@
 <?php
 
 use Friendica\App;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 
 function modexp_init(App $a) {
 
@@ -10,10 +10,10 @@ function modexp_init(App $a) {
 
 	$nick = $a->argv[1];
 	$r = q("SELECT `spubkey` FROM `user` WHERE `nickname` = '%s' LIMIT 1",
-			dbesc($nick)
+			DBA::escape($nick)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBA::isResult($r)) {
 		killme();
 	}
 

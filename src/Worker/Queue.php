@@ -8,15 +8,14 @@ use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
-use Friendica\Model\Queue as QueueModel;
+use Friendica\Database\DBA;
 use Friendica\Model\PushSubscriber;
+use Friendica\Model\Queue as QueueModel;
 use Friendica\Model\User;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\PortableContact;
 use Friendica\Protocol\Salmon;
-use dba;
 
 require_once 'include/dba.php';
 require_once 'include/items.php';
@@ -25,8 +24,6 @@ class Queue
 {
 	public static function execute($queue_id = 0)
 	{
-		global $a;
-
 		$cachekey_deadguy = 'queue_run:deadguy:';
 		$cachekey_server = 'queue_run:server:';
 
@@ -38,11 +35,11 @@ class Queue
 			// Handling the pubsubhubbub requests
 			PushSubscriber::requeue();
 
-			$r = dba::inArray(dba::p("SELECT `id` FROM `queue` WHERE `next` < UTC_TIMESTAMP() ORDER BY `batch`, `cid`"));
+			$r = DBA::toArray(DBA::p("SELECT `id` FROM `queue` WHERE `next` < UTC_TIMESTAMP() ORDER BY `batch`, `cid`"));
 
 			Addon::callHooks('queue_predeliver', $r);
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				foreach ($r as $q_item) {
 					logger('Call queue for id ' . $q_item['id']);
 					Worker::add(['priority' => PRIORITY_LOW, 'dont_fork' => true], "Queue", (int) $q_item['id']);
@@ -54,13 +51,13 @@ class Queue
 
 
 		// delivering
-		$q_item = dba::selectFirst('queue', [], ['id' => $queue_id]);
-		if (!DBM::is_result($q_item)) {
+		$q_item = DBA::selectFirst('queue', [], ['id' => $queue_id]);
+		if (!DBA::isResult($q_item)) {
 			return;
 		}
 
-		$contact = dba::selectFirst('contact', [], ['id' => $q_item['cid']]);
-		if (!DBM::is_result($contact)) {
+		$contact = DBA::selectFirst('contact', [], ['id' => $q_item['cid']]);
+		if (!DBA::isResult($contact)) {
 			QueueModel::removeItem($q_item['id']);
 			return;
 		}
@@ -99,8 +96,8 @@ class Queue
 			}
 		}
 
-		$user = dba::selectFirst('user', [], ['uid' => $contact['uid']]);
-		if (!DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', [], ['uid' => $contact['uid']]);
+		if (!DBA::isResult($user)) {
 			QueueModel::removeItem($q_item['id']);
 			return;
 		}

@@ -5,7 +5,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Mail;
 use Friendica\Model\Profile;
 
@@ -26,10 +26,10 @@ function wallmessage_post(App $a) {
 	}
 
 	$r = q("select * from user where nickname = '%s' limit 1",
-		dbesc($recipient)
+		DBA::escape($recipient)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBA::isResult($r)) {
 		logger('wallmessage: no recipient');
 		return;
 	}
@@ -88,10 +88,10 @@ function wallmessage_content(App $a) {
 	}
 
 	$r = q("select * from user where nickname = '%s' limit 1",
-		dbesc($recipient)
+		DBA::escape($recipient)
 	);
 
-	if (! DBM::is_result($r)) {
+	if (! DBA::isResult($r)) {
 		notice(L10n::t('No recipient.') . EOL);
 		logger('wallmessage: no recipient');
 		return;

@@ -9,7 +9,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
@@ -26,8 +26,8 @@ function dfrn_notify_post(App $a) {
 		if (is_object($data)) {
 			$nick = defaults($a->argv, 1, '');
 
-			$user = dba::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
-			if (!DBM::is_result($user)) {
+			$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
+			if (!DBA::isResult($user)) {
 				System::httpExit(500);
 			}
 			dfrn_dispatch_private($user, $postdata);
@@ -62,25 +62,25 @@ function dfrn_notify_post(App $a) {
 		$dfrn_id = substr($dfrn_id, 2);
 	}
 
-	if (!dba::exists('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge])) {
+	if (!DBA::exists('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge])) {
 		logger('could not match challenge to dfrn_id ' . $dfrn_id . ' challenge=' . $challenge);
 		System::xmlExit(3, 'Could not match challenge');
 	}
 
-	dba::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
+	DBA::delete('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge]);
 
 	// find the local user who owns this relationship.
 
 	$sql_extra = '';
 	switch ($direction) {
 		case (-1):
-			$sql_extra = sprintf(" AND ( `issued-id` = '%s' OR `dfrn-id` = '%s' ) ", dbesc($dfrn_id), dbesc($dfrn_id));
+			$sql_extra = sprintf(" AND ( `issued-id` = '%s' OR `dfrn-id` = '%s' ) ", DBA::escape($dfrn_id), DBA::escape($dfrn_id));
 			break;
 		case 0:
-			$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+			$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 			break;
 		case 1:
-			$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+			$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 			break;
 		default:
 			System::xmlExit(3, 'Invalid direction');
@@ -104,10 +104,10 @@ function dfrn_notify_post(App $a) {
 			LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
 			WHERE `contact`.`blocked` = 0 AND `contact`.`pending` = 0
 				AND `user`.`nickname` = '%s' AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $sql_extra LIMIT 1",
-		dbesc($a->argv[1])
+		DBA::escape($a->argv[1])
 	);
 
-	if (!DBM::is_result($r)) {
+	if (!DBA::isResult($r)) {
 		logger('contact not found for dfrn_id ' . $dfrn_id);
 		System::xmlExit(3, 'Contact not found');
 		//NOTREACHED
@@ -120,7 +120,7 @@ function dfrn_notify_post(App $a) {
 	if ((($writable != (-1)) && ($writable != $importer['writable'])) || ($importer['forum'] != $forum) || ($importer['prv'] != $prv)) {
 		$fields = ['writable' => ($writable == (-1)) ? $importer['writable'] : $writable,
 			'forum' => $forum, 'prv' => $prv];
-		dba::update('contact', $fields, ['id' => $importer['id']]);
+		DBA::update('contact', $fields, ['id' => $importer['id']]);
 
 		if ($writable != (-1)) {
 			$importer['writable'] = $writable;
@@ -212,7 +212,7 @@ function dfrn_dispatch_public($postdata)
 	}
 
 	// We now have some contact, so we fetch it
-	$importer = dba::fetch_first("SELECT *, `name` as `senderName`
+	$importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$contact['id']);
@@ -220,7 +220,7 @@ function dfrn_dispatch_public($postdata)
 	$importer['importer_uid']  = 0;
 
 	// This should never fail
-	if (!DBM::is_result($importer)) {
+	if (!DBA::isResult($importer)) {
 		logger('Contact not found for address ' . $msg['author']);
 		System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 	}
@@ -251,13 +251,13 @@ function dfrn_dispatch_private($user, $postdata)
 	}
 
 	// We now have some contact, so we fetch it
-	$importer = dba::fetch_first("SELECT *, `name` as `senderName`
+	$importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$cid);
 
 	// This should never fail
-	if (!DBM::is_result($importer)) {
+	if (!DBA::isResult($importer)) {
 		logger('Contact not found for address ' . $msg['author']);
 		System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 	}
@@ -301,26 +301,26 @@ function dfrn_notify_content(App $a) {
 
 		$status = 0;
 
-		dba::delete('challenge', ["`expire` < ?", time()]);
+		DBA::delete('challenge', ["`expire` < ?", time()]);
 
 		$fields = ['challenge' => $hash, 'dfrn-id' => $dfrn_id, 'expire' => time() + 90,
 			'type' => $type, 'last_update' => $last_update];
-		dba::insert('challenge', $fields);
+		DBA::insert('challenge', $fields);
 
 		logger('challenge=' . $hash, LOGGER_DATA);
 
 		$sql_extra = '';
 		switch($direction) {
 			case (-1):
-				$sql_extra = sprintf(" AND (`issued-id` = '%s' OR `dfrn-id` = '%s') ", dbesc($dfrn_id), dbesc($dfrn_id));
+				$sql_extra = sprintf(" AND (`issued-id` = '%s' OR `dfrn-id` = '%s') ", DBA::escape($dfrn_id), DBA::escape($dfrn_id));
 				$my_id = $dfrn_id;
 				break;
 			case 0:
-				$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+				$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 				$my_id = '1:' . $dfrn_id;
 				break;
 			case 1:
-				$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", dbesc($dfrn_id));
+				$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
@@ -331,10 +331,10 @@ function dfrn_notify_content(App $a) {
 		$r = q("SELECT `contact`.*, `user`.`nickname`, `user`.`page-flags` FROM `contact` LEFT JOIN `user` ON `user`.`uid` = `contact`.`uid`
 				WHERE `contact`.`blocked` = 0 AND `contact`.`pending` = 0 AND `user`.`nickname` = '%s'
 				AND `user`.`account_expired` = 0 AND `user`.`account_removed` = 0 $sql_extra LIMIT 1",
-				dbesc($a->argv[1])
+				DBA::escape($a->argv[1])
 		);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			logger('No user data found for ' . $a->argv[1] . ' - SQL: ' . $sql_extra);
 			killme();
 		}
@@ -375,7 +375,7 @@ function dfrn_notify_content(App $a) {
 			$rino = $rino_remote;
 		}
 
-		if (($r[0]['rel'] && ($r[0]['rel'] != CONTACT_IS_SHARING)) || ($r[0]['page-flags'] == PAGE_COMMUNITY)) {
+		if (($r[0]['rel'] && ($r[0]['rel'] != Contact::SHARING)) || ($r[0]['page-flags'] == PAGE_COMMUNITY)) {
 			$perm = 'rw';
 		} else {
 			$perm = 'r';

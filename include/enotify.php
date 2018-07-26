@@ -8,10 +8,10 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
+use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
-use Friendica\Model\Item;
 
 /**
  * @brief Creates a notification entry and possibly sends a mail
@@ -33,11 +33,11 @@ function notification($params)
 	$product = FRIENDICA_PLATFORM;
 	$siteurl = System::baseUrl(true);
 	$thanks = L10n::t('Thank You,');
-	$sitename = $a->config['sitename'];
-	if (empty($a->config['admin_name'])) {
-		$site_admin = L10n::t('%s Administrator', $sitename);
+	$sitename = Config::get('config', 'sitename');
+	if (Config::get('config', 'admin_name')) {
+		$site_admin = L10n::t('%1$s, %2$s Administrator', Config::get('config', 'admin_name'), $sitename);
 	} else {
-		$site_admin = L10n::t('%1$s, %2$s Administrator', $a->config['admin_name'], $sitename);
+		$site_admin = L10n::t('%s Administrator', $sitename);
 	}
 
 	$sender_name = $sitename;
@@ -49,11 +49,11 @@ function notification($params)
 	$sender_email = $a->getSenderEmailAddress();
 
 	if ($params['type'] != SYSTEM_EMAIL) {
-		$user = dba::selectFirst('user', ['nickname', 'page-flags'],
+		$user = DBA::selectFirst('user', ['nickname', 'page-flags'],
 			['uid' => $params['uid']]);
 
 		// There is no need to create notifications for forum accounts
-		if (!DBM::is_result($user) || in_array($user["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
+		if (!DBA::isResult($user) || in_array($user["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
 			return;
 		}
 	}
@@ -106,8 +106,8 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_COMMENT) {
-		$thread = dba::selectFirst('thread', ['ignored'], ['iid' => $parent_id]);
-		if (DBM::is_result($thread) && $thread["ignored"]) {
+		$thread = DBA::selectFirst('thread', ['ignored'], ['iid' => $parent_id]);
+		if (DBA::isResult($thread) && $thread["ignored"]) {
 			logger("Thread ".$parent_id." will be ignored", LOGGER_DEBUG);
 			return;
 		}
@@ -118,7 +118,7 @@ function notification($params)
 			intval(NOTIFY_TAGSELF),
 			intval(NOTIFY_COMMENT),
 			intval(NOTIFY_SHARE),
-			dbesc($params['link']),
+			DBA::escape($params['link']),
 			intval($params['uid'])
 		);
 		if ($p && count($p)) {
@@ -155,7 +155,7 @@ function notification($params)
 		}
 
 		// "your post"
-		if (DBM::is_result($item) && $item['owner-id'] == $item['author-id'] && $item['wall']) {
+		if (DBA::isResult($item) && $item['owner-id'] == $item['author-id'] && $item['wall']) {
 			$dest_str = L10n::t('%1$s commented on [url=%2$s]your %3$s[/url]',
 				'[url='.$params['source_link'].']'.$params['source_name'].'[/url]',
 				$itemlink,
@@ -436,8 +436,8 @@ function notification($params)
 			$dups = false;
 			$hash = random_string();
 			$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' LIMIT 1",
-				dbesc($hash));
-			if (DBM::is_result($r)) {
+				DBA::escape($hash));
+			if (DBA::isResult($r)) {
 				$dups = true;
 			}
 		} while ($dups == true);
@@ -469,23 +469,23 @@ function notification($params)
 		// create notification entry in DB
 		q("INSERT INTO `notify` (`hash`, `name`, `url`, `photo`, `date`, `uid`, `link`, `iid`, `parent`, `type`, `verb`, `otype`, `name_cache`)
 			values('%s', '%s', '%s', '%s', '%s', %d, '%s', %d, %d, %d, '%s', '%s', '%s')",
-			dbesc($datarray['hash']),
-			dbesc($datarray['name']),
-			dbesc($datarray['url']),
-			dbesc($datarray['photo']),
-			dbesc($datarray['date']),
+			DBA::escape($datarray['hash']),
+			DBA::escape($datarray['name']),
+			DBA::escape($datarray['url']),
+			DBA::escape($datarray['photo']),
+			DBA::escape($datarray['date']),
 			intval($datarray['uid']),
-			dbesc($datarray['link']),
+			DBA::escape($datarray['link']),
 			intval($datarray['iid']),
 			intval($datarray['parent']),
 			intval($datarray['type']),
-			dbesc($datarray['verb']),
-			dbesc($datarray['otype']),
-			dbesc($datarray["name_cache"])
+			DBA::escape($datarray['verb']),
+			DBA::escape($datarray['otype']),
+			DBA::escape($datarray["name_cache"])
 		);
 
 		$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' AND `uid` = %d LIMIT 1",
-			dbesc($hash),
+			DBA::escape($hash),
 			intval($params['uid'])
 		);
 		if ($r) {
@@ -500,12 +500,12 @@ function notification($params)
 		$p = q("SELECT `id` FROM `notify` WHERE `type` IN (%d, %d) AND `link` = '%s' AND `uid` = %d ORDER BY `id`",
 			intval(NOTIFY_TAGSELF),
 			intval(NOTIFY_COMMENT),
-			dbesc($params['link']),
+			DBA::escape($params['link']),
 			intval($params['uid'])
 		);
 		if ($p && (count($p) > 1)) {
 			for ($d = 1; $d < count($p); $d ++) {
-				dba::delete('notify', ['id' => $p[$d]['id']]);
+				DBA::delete('notify', ['id' => $p[$d]['id']]);
 			}
 
 			// only continue on if we stored the first one
@@ -519,8 +519,8 @@ function notification($params)
 		$msg = replace_macros($epreamble, ['$itemlink' => $itemlink]);
 		$msg_cache = format_notification_message($datarray['name_cache'], strip_tags(BBCode::convert($msg)));
 		q("UPDATE `notify` SET `msg` = '%s', `msg_cache` = '%s' WHERE `id` = %d AND `uid` = %d",
-			dbesc($msg),
-			dbesc($msg_cache),
+			DBA::escape($msg),
+			DBA::escape($msg_cache),
 			intval($notify_id),
 			intval($params['uid'])
 		);
@@ -665,13 +665,13 @@ function notification($params)
  */
 function check_user_notification($itemid) {
 	// fetch all users in the thread
-	$users = dba::p("SELECT DISTINCT(`contact`.`uid`) FROM `item`
+	$users = DBA::p("SELECT DISTINCT(`contact`.`uid`) FROM `item`
 			INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id` AND `contact`.`uid` != 0
 			WHERE `parent` IN (SELECT `parent` FROM `item` WHERE `id`=?)", $itemid);
-	while ($user = dba::fetch($users)) {
+	while ($user = DBA::fetch($users)) {
 		check_item_notification($itemid, $user['uid']);
 	}
-	dba::close($users);
+	DBA::close($users);
 }
 
 /**
@@ -679,7 +679,7 @@ function check_user_notification($itemid) {
  *
  * @param int $itemid ID of the item for which the check should be done
  * @param int $uid User ID
- * @param str $defaulttype (Optional) Forces a notification with this type.
+ * @param string $defaulttype (Optional) Forces a notification with this type.
  */
 function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$notification_data = ["uid" => $uid, "profiles" => []];
@@ -688,13 +688,13 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 	$profiles = $notification_data["profiles"];
 
 	$fields = ['notify-flags', 'language', 'username', 'email', 'nickname'];
-	$user = dba::selectFirst('user', $fields, ['uid' => $uid]);
-	if (!DBM::is_result($user)) {
+	$user = DBA::selectFirst('user', $fields, ['uid' => $uid]);
+	if (!DBA::isResult($user)) {
 		return false;
 	}
 
-	$owner = dba::selectFirst('contact', ['url'], ['self' => true, 'uid' => $uid]);
-	if (!DBM::is_result($owner)) {
+	$owner = DBA::selectFirst('contact', ['url'], ['self' => true, 'uid' => $uid]);
+	if (!DBA::isResult($owner)) {
 		return false;
 	}
 
@@ -726,17 +726,17 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	$profiles = $profiles2;
 
-	$ret = dba::select('contact', ['id'], ['uid' => 0, 'nurl' => $profiles]);
+	$ret = DBA::select('contact', ['id'], ['uid' => 0, 'nurl' => $profiles]);
 
 	$contacts = [];
 
-	while ($contact = dba::fetch($ret)) {
+	while ($contact = DBA::fetch($ret)) {
 		$contacts[] = $contact['id'];
 	}
 
 	$contact_list = implode(',', $contacts);
 
-	dba::close($ret);
+	DBA::close($ret);
 
 	// Only act if it is a "real" post
 	// We need the additional check for the "local_profile" because of mixed situations on connector networks
@@ -745,7 +745,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 		'guid', 'parent-uri', 'uri', 'contact-id', 'network'];
 	$condition = ['id' => $itemid, 'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]];
 	$item = Item::selectFirst($fields, $condition);
-	if (!DBM::is_result($item) || in_array($item['author-id'], $contacts)) {
+	if (!DBA::isResult($item) || in_array($item['author-id'], $contacts)) {
 		return;
 	}
 
@@ -766,16 +766,16 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	if ($item["parent-uri"] === $item["uri"]) {
 		// Send a notification for every new post?
-		$send_notification = dba::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true]);
+		$send_notification = DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true]);
 
 		if (!$send_notification) {
 			$tags = q("SELECT `url` FROM `term` WHERE `otype` = %d AND `oid` = %d AND `type` = %d AND `uid` = %d",
 				intval(TERM_OBJ_POST), intval($itemid), intval(TERM_MENTION), intval($uid));
 
-			if (DBM::is_result($tags)) {
+			if (DBA::isResult($tags)) {
 				foreach ($tags AS $tag) {
 					$condition = ['nurl' => normalise_link($tag["url"]), 'uid' => $uid, 'notify_new_posts' => true];
-					$r = dba::exists('contact', $condition);
+					$r = DBA::exists('contact', $condition);
 					if ($r) {
 						$send_notification = true;
 					}

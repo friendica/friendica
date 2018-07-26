@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
 function tagrm_post(App $a)
@@ -24,7 +24,7 @@ function tagrm_post(App $a)
 	$item_id = (x($_POST,'item') ? intval($_POST['item'])               : 0);
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
-	if (!DBM::is_result($item)) {
+	if (!DBA::isResult($item)) {
 		goaway(System::baseUrl() . '/' . $_SESSION['photo_return']);
 	}
 
@@ -64,7 +64,7 @@ function tagrm_content(App $a)
 	}
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
-	if (!DBM::is_result($item)) {
+	if (!DBA::isResult($item)) {
 		goaway(System::baseUrl() . '/' . $_SESSION['photo_return']);
 	}
 

@@ -1,7 +1,7 @@
 <?php
 
 use Friendica\App;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 
@@ -17,7 +17,7 @@ function contactgroup_content(App $a)
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$change = intval($a->argv[2]);
 		}
 	}
@@ -27,7 +27,7 @@ function contactgroup_content(App $a)
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			killme();
 		}
 

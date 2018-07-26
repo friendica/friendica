@@ -10,7 +10,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
 use Friendica\Util\DateTimeFormat;
@@ -108,8 +108,23 @@ function message_content(App $a)
 	$myprofile = System::baseUrl() . '/profile/' . $a->user['nickname'];
 
 	$tpl = get_markup_template('mail_head.tpl');
+	if ($a->argc > 1 && $a->argv[1] == 'new') {
+		$button = [
+			'label' => L10n::t('Discard'),
+			'url' => '/message',
+			'sel' => 'close',
+		];
+	} else {
+		$button = [
+			'label' => L10n::t('New Message'),
+			'url' => '/message/new',
+			'sel' => 'new',
+			'accesskey' => 'm',
+		];
+	}
 	$header = replace_macros($tpl, [
 		'$messages' => L10n::t('Messages'),
+		'$button' => $button,
 	]);
 
 	if (($a->argc == 3) && ($a->argv[1] === 'drop' || $a->argv[1] === 'dropconv')) {
@@ -149,7 +164,7 @@ function message_content(App $a)
 
 		$cmd = $a->argv[1];
 		if ($cmd === 'drop') {
-			if (dba::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
+			if (DBA::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
 				info(L10n::t('Message deleted.') . EOL);
 			}
 
@@ -160,11 +175,11 @@ function message_content(App $a)
 				intval($a->argv[2]),
 				intval(local_user())
 			);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$parent = $r[0]['parent-uri'];
 				$convid = $r[0]['convid'];
 
-				if (dba::delete('mail', ['parent-uri' => $parent, 'uid' => local_user()])) {
+				if (DBA::delete('mail', ['parent-uri' => $parent, 'uid' => local_user()])) {
 					info(L10n::t('Conversation removed.') . EOL);
 				}
 			}
@@ -199,21 +214,21 @@ function message_content(App $a)
 				intval(local_user()),
 				intval($a->argv[2])
 			);
-			if (!DBM::is_result($r)) {
+			if (!DBA::isResult($r)) {
 				$r = q("SELECT `name`, `url`, `id` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' LIMIT 1",
 					intval(local_user()),
-					dbesc(normalise_link(base64_decode($a->argv[2])))
+					DBA::escape(normalise_link(base64_decode($a->argv[2])))
 				);
 			}
 
-			if (!DBM::is_result($r)) {
+			if (!DBA::isResult($r)) {
 				$r = q("SELECT `name`, `url`, `id` FROM `contact` WHERE `uid` = %d AND `addr` = '%s' LIMIT 1",
 					intval(local_user()),
-					dbesc(base64_decode($a->argv[2]))
+					DBA::escape(base64_decode($a->argv[2]))
 				);
 			}
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$prename = $r[0]['name'];
 				$preurl = $r[0]['url'];
 				$preid = $r[0]['id'];
@@ -264,13 +279,13 @@ function message_content(App $a)
 			intval(local_user())
 		);
 
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$a->set_pager_total($r[0]['total']);
 		}
 
 		$r = get_messages(local_user(), $a->pager['start'], $a->pager['itemspage']);
 
-		if (!DBM::is_result($r)) {
+		if (!DBA::isResult($r)) {
 			info(L10n::t('No messages.') . EOL);
 			return $o;
 		}
@@ -292,14 +307,14 @@ function message_content(App $a)
 			intval(local_user()),
 			intval($a->argv[1])
 		);
-		if (DBM::is_result($r)) {
+		if (DBA::isResult($r)) {
 			$contact_id = $r[0]['contact-id'];
 			$convid = $r[0]['convid'];
 
-			$sql_extra = sprintf(" and `mail`.`parent-uri` = '%s' ", dbesc($r[0]['parent-uri']));
+			$sql_extra = sprintf(" and `mail`.`parent-uri` = '%s' ", DBA::escape($r[0]['parent-uri']));
 			if ($convid)
 				$sql_extra = sprintf(" and ( `mail`.`parent-uri` = '%s' OR `mail`.`convid` = '%d' ) ",
-					dbesc($r[0]['parent-uri']),
+					DBA::escape($r[0]['parent-uri']),
 					intval($convid)
 				);
 
@@ -311,13 +326,13 @@ function message_content(App $a)
 		} else {
 			$messages = false;
 		}
-		if (!DBM::is_result($messages)) {
+		if (!DBA::isResult($messages)) {
 			notice(L10n::t('Message not available.') . EOL);
 			return $o;
 		}
 
 		$r = q("UPDATE `mail` SET `seen` = 1 WHERE `parent-uri` = '%s' AND `uid` = %d",
-			dbesc($r[0]['parent-uri']),
+			DBA::escape($r[0]['parent-uri']),
 			intval(local_user())
 		);
 

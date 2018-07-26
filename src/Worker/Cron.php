@@ -4,18 +4,21 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
-use dba;
 
 require_once 'include/dba.php';
 
-Class Cron {
-	public static function execute($parameter = '', $generation = 0) {
-		global $a;
+class Cron
+{
+	public static function execute($parameter = '', $generation = 0)
+	{
+		$a = BaseObject::getApp();
 
 		// Poll contacts with specific parameters
 		if (!empty($parameter)) {
@@ -99,14 +102,21 @@ Class Cron {
 		if (Config::get('system', 'last_cron_hourly', 0) + 3600 < time()) {
 
 			// Delete all done workerqueue entries
-			dba::delete('workerqueue', ['`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 1 HOUR']);
+			DBA::delete('workerqueue', ['`done` AND `executed` < UTC_TIMESTAMP() - INTERVAL 1 HOUR']);
 
 			// Optimizing this table only last seconds
 			if (Config::get('system', 'optimize_workerqueue', false)) {
-				dba::e("OPTIMIZE TABLE `workerqueue`");
+				DBA::e("OPTIMIZE TABLE `workerqueue`");
 			}
 
 			Config::set('system', 'last_cron_hourly', time());
+		}
+
+		// Ensure to have a .htaccess file.
+		// this is a precaution for systems that update automatically
+		$basepath = $a->get_basepath();
+		if (!file_exists($basepath . '/.htaccess')) {
+			copy($basepath . '/.htaccess-dist', $basepath . '/.htaccess');
 		}
 
 		// Poll contacts
@@ -178,14 +188,14 @@ Class Cron {
 					AND `contact`.`network` IN ('%s', '%s', '%s', '%s', '%s') $sql_extra
 					AND NOT `contact`.`self` AND NOT `contact`.`blocked`
 				WHERE NOT `user`.`account_expired` AND NOT `user`.`account_removed` $abandon_sql",
-			dbesc(NETWORK_DFRN),
-			dbesc(NETWORK_OSTATUS),
-			dbesc(NETWORK_DIASPORA),
-			dbesc(NETWORK_FEED),
-			dbesc(NETWORK_MAIL)
+			DBA::escape(NETWORK_DFRN),
+			DBA::escape(NETWORK_OSTATUS),
+			DBA::escape(NETWORK_DIASPORA),
+			DBA::escape(NETWORK_FEED),
+			DBA::escape(NETWORK_MAIL)
 		);
 
-		if (!DBM::is_result($contacts)) {
+		if (!DBA::isResult($contacts)) {
 			return;
 		}
 
@@ -212,7 +222,7 @@ Class Cron {
 			}
 
 			// Check Diaspora contacts or followers once a week
-			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == CONTACT_IS_FOLLOWER)) {
+			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
 				$contact['priority'] = 4;
 			}
 

@@ -83,7 +83,7 @@ def fix_element(element):
 			element += ldelim + parts[first+1].rstrip('}') + rdelim
 		else:
 			# This takes care of elements where the filename is a path, e.g. {{ inc file.tpl }}
-			element += parts[first+1].rstrip('}') 
+			element += parts[first+1].rstrip('}')
 
 		element += '"'
 
@@ -205,7 +205,7 @@ try:
 except getopt.GetoptError:
 	help(sys.argv[0])
 	sys.exit(2)
-	
+
 
 if path == '':
 	path = raw_input('Path to template folder to convert: ')
@@ -220,7 +220,7 @@ if not os.path.exists(outpath):
 
 files = os.listdir(path)
 for a_file in files:
-	if a_file == 'htconfig.tpl':
+	if a_file == 'local.ini.tpl':
 		php_tpl = True
 	else:
 		php_tpl = False

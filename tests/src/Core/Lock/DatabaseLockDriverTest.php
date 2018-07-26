@@ -2,12 +2,8 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-use dba;
 use Friendica\Core\Lock\DatabaseLockDriver;
-use Friendica\Database\DBStructure;
-use PHPUnit\DbUnit\DataSet\YamlDataSet;
-use PHPUnit\DbUnit\TestCaseTrait;
-use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
+use Friendica\Database\DBA;
 
 class DatabaseLockDriverTest extends LockTest
 {
@@ -18,7 +14,7 @@ class DatabaseLockDriverTest extends LockTest
 
 	public function tearDown()
 	{
-		dba::delete('locks', [ 'id > 0']);
+		DBA::delete('locks', [ 'id > 0']);
 		parent::tearDown();
 	}
 }

@@ -5,14 +5,9 @@
 namespace Friendica\Core;
 
 use Friendica\App;
-use Friendica\Core\L10n;
-use Friendica\Core\System;
-use Friendica\Core\PConfig;
-use Friendica\Core\Worker;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
-use dba;
 
 require_once "include/dba.php";
 
@@ -29,7 +24,7 @@ class UserImport
 			return 1;
 		}
 
-		return dba::lastInsertId();
+		return DBA::lastInsertId();
 	}
 
 	/**
@@ -40,7 +35,7 @@ class UserImport
 	 */
 	private static function checkCols($table, &$arr)
 	{
-		$query = sprintf("SHOW COLUMNS IN `%s`", dbesc($table));
+		$query = sprintf("SHOW COLUMNS IN `%s`", DBA::escape($table));
 		logger("uimport: $query", LOGGER_DEBUG);
 		$r = q($query);
 		$tcols = [];
@@ -69,8 +64,8 @@ class UserImport
 		}
 
 		self::checkCols($table, $arr);
-		$cols = implode("`,`", array_map('dbesc', array_keys($arr)));
-		$vals = implode("','", array_map('dbesc', array_values($arr)));
+		$cols = implode("`,`", array_map(['Friendica\Database\DBA', 'escape'], array_keys($arr)));
+		$vals = implode("','", array_map(['Friendica\Database\DBA', 'escape'], array_values($arr)));
 		$query = "INSERT INTO `$table` (`$cols`) VALUES ('$vals')";
 		logger("uimport: $query", LOGGER_TRACE);
 
@@ -113,8 +108,8 @@ class UserImport
 
 		// check for username
 		// check if username matches deleted account
-		if (dba::exists('user', ['nickname' => $account['user']['nickname']])
-			|| dba::exists('userd', ['username' => $account['user']['nickname']])) {
+		if (DBA::exists('user', ['nickname' => $account['user']['nickname']])
+			|| DBA::exists('userd', ['username' => $account['user']['nickname']])) {
 			notice(L10n::t("User '%s' already exists on this server!", $account['user']['nickname']));
 			return;
 		}
@@ -147,7 +142,7 @@ class UserImport
 		// import user
 		$r = self::dbImportAssoc('user', $account['user']);
 		if ($r === false) {
-			logger("uimport:insert user : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+			logger("uimport:insert user : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 			notice(L10n::t("User creation error"));
 			return;
 		}
@@ -165,9 +160,9 @@ class UserImport
 			$profile['uid'] = $newuid;
 			$r = self::dbImportAssoc('profile', $profile);
 			if ($r === false) {
-				logger("uimport:insert profile " . $profile['profile-name'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+				logger("uimport:insert profile " . $profile['profile-name'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 				info(L10n::t("User profile creation error"));
-				dba::delete('user', ['uid' => $newuid]);
+				DBA::delete('user', ['uid' => $newuid]);
 				return;
 			}
 		}
@@ -203,7 +198,7 @@ class UserImport
 			$contact['uid'] = $newuid;
 			$r = self::dbImportAssoc('contact', $contact);
 			if ($r === false) {
-				logger("uimport:insert contact " . $contact['nick'] . "," . $contact['network'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+				logger("uimport:insert contact " . $contact['nick'] . "," . $contact['network'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 				$errorcount++;
 			} else {
 				$contact['newid'] = self::lastInsertId();
@@ -217,7 +212,7 @@ class UserImport
 			$group['uid'] = $newuid;
 			$r = self::dbImportAssoc('group', $group);
 			if ($r === false) {
-				logger("uimport:insert group " . $group['name'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+				logger("uimport:insert group " . $group['name'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 			} else {
 				$group['newid'] = self::lastInsertId();
 			}
@@ -242,7 +237,7 @@ class UserImport
 			if ($import == 2) {
 				$r = self::dbImportAssoc('group_member', $group_member);
 				if ($r === false) {
-					logger("uimport:insert group member " . $group_member['id'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+					logger("uimport:insert group member " . $group_member['id'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 				}
 			}
 		}
@@ -260,7 +255,7 @@ class UserImport
 			);
 
 			if ($r === false) {
-				logger("uimport:insert photo " . $photo['resource-id'] . "," . $photo['scale'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+				logger("uimport:insert photo " . $photo['resource-id'] . "," . $photo['scale'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 			}
 		}
 
@@ -268,7 +263,7 @@ class UserImport
 			$pconfig['uid'] = $newuid;
 			$r = self::dbImportAssoc('pconfig', $pconfig);
 			if ($r === false) {
-				logger("uimport:insert pconfig " . $pconfig['id'] . " : ERROR : " . dba::errorMessage(), LOGGER_NORMAL);
+				logger("uimport:insert pconfig " . $pconfig['id'] . " : ERROR : " . DBA::errorMessage(), LOGGER_INFO);
 			}
 		}
 

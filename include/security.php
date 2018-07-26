@@ -8,9 +8,11 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
-use Friendica\Database\DBM;
+use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Model\PermissionSet;
 
 /**
  * @brief Calculate the hash that is needed for the "Friendica" cookie
@@ -99,8 +101,8 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	$master_record = $a->user;
 
 	if ((x($_SESSION, 'submanage')) && intval($_SESSION['submanage'])) {
-		$user = dba::selectFirst('user', [], ['uid' => $_SESSION['submanage']]);
-		if (DBM::is_result($user)) {
+		$user = DBA::selectFirst('user', [], ['uid' => $_SESSION['submanage']]);
+		if (DBA::isResult($user)) {
 			$master_record = $user;
 		}
 	}
@@ -112,38 +114,38 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 				'nickname' => $master_record['nickname']]];
 
 		// Then add all the children
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
-		if (DBM::is_result($r)) {
-			$a->identities = array_merge($a->identities, dba::inArray($r));
+		if (DBA::isResult($r)) {
+			$a->identities = array_merge($a->identities, DBA::toArray($r));
 		}
 	} else {
 		// Just ensure that the array is always defined
 		$a->identities = [];
 
 		// First entry is our parent
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['uid' => $master_record['parent-uid'], 'account_removed' => false]);
-		if (DBM::is_result($r)) {
-			$a->identities = dba::inArray($r);
+		if (DBA::isResult($r)) {
+			$a->identities = DBA::toArray($r);
 		}
 
 		// Then add all siblings
-		$r = dba::select('user', ['uid', 'username', 'nickname'],
+		$r = DBA::select('user', ['uid', 'username', 'nickname'],
 			['parent-uid' => $master_record['parent-uid'], 'account_removed' => false]);
-		if (DBM::is_result($r)) {
-			$a->identities = array_merge($a->identities, dba::inArray($r));
+		if (DBA::isResult($r)) {
+			$a->identities = array_merge($a->identities, DBA::toArray($r));
 		}
 	}
 
-	$r = dba::p("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
+	$r = DBA::p("SELECT `user`.`uid`, `user`.`username`, `user`.`nickname`
 		FROM `manage`
 		INNER JOIN `user` ON `manage`.`mid` = `user`.`uid`
 		WHERE `user`.`account_removed` = 0 AND `manage`.`uid` = ?",
 		$master_record['uid']
 	);
-	if (DBM::is_result($r)) {
-		$a->identities = array_merge($a->identities, dba::inArray($r));
+	if (DBA::isResult($r)) {
+		$a->identities = array_merge($a->identities, DBA::toArray($r));
 	}
 
 	if ($login_initial) {
@@ -153,8 +155,8 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		logger('auth_identities refresh: ' . print_r($a->identities, true), LOGGER_DEBUG);
 	}
 
-	$contact = dba::selectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => true]);
-	if (DBM::is_result($contact)) {
+	$contact = DBA::selectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => true]);
+	if (DBA::isResult($contact)) {
 		$a->contact = $contact;
 		$a->cid = $contact['id'];
 		$_SESSION['cid'] = $a->cid;
@@ -163,20 +165,22 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 	header('X-Account-Management-Status: active; name="' . $a->user['username'] . '"; id="' . $a->user['nickname'] . '"');
 
 	if ($login_initial || $login_refresh) {
-		dba::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
+		DBA::update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $_SESSION['uid']]);
 
 		// Set the login date for all identities of the user
-		dba::update('user', ['login_date' => DateTimeFormat::utcNow()],
+		DBA::update('user', ['login_date' => DateTimeFormat::utcNow()],
 			['parent-uid' => $master_record['uid'], 'account_removed' => false]);
 	}
 
 	if ($login_initial) {
-		// If the user specified to remember the authentication, then set a cookie
-		// that expires after one week (the default is when the browser is closed).
-		// The cookie will be renewed automatically.
-		// The week ensures that sessions will expire after some inactivity.
+		/*
+		 * If the user specified to remember the authentication, then set a cookie
+		 * that expires after one week (the default is when the browser is closed).
+		 * The cookie will be renewed automatically.
+		 * The week ensures that sessions will expire after some inactivity.
+		 */
 		if ($_SESSION['remember']) {
-			logger('Injecting cookie for remembered user ' . $_SESSION['remember_user']['nickname']);
+			logger('Injecting cookie for remembered user ' . $a->user['nickname']);
 			new_cookie(604800, $user_record);
 			unset($_SESSION['remember']);
 		}
@@ -239,12 +243,12 @@ function can_write_wall($owner)
 				AND `user`.`blockwall` = 0 AND `readonly` = 0  AND ( `contact`.`rel` IN ( %d , %d ) OR `user`.`page-flags` = %d ) LIMIT 1",
 				intval($owner),
 				intval($cid),
-				intval(CONTACT_IS_SHARING),
-				intval(CONTACT_IS_FRIEND),
+				intval(Contact::SHARING),
+				intval(Contact::FRIEND),
 				intval(PAGE_COMMUNITY)
 			);
 
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$verified = 2;
 				return true;
 			} else {
@@ -299,7 +303,7 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null)
 				intval($remote_user),
 				intval($owner_id)
 			);
-			if (DBM::is_result($r)) {
+			if (DBA::isResult($r)) {
 				$remote_verified = true;
 				$groups = Group::getIdsByContactId($remote_user);
 			}
@@ -320,9 +324,9 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null)
 				  )
 				",
 				intval($remote_user),
-				dbesc($gs),
+				DBA::escape($gs),
 				intval($remote_user),
-				dbesc($gs)
+				DBA::escape($gs)
 			);
 		}
 	}
@@ -339,12 +343,7 @@ function item_permissions_sql($owner_id, $remote_verified = false, $groups = nul
 	 *
 	 * default permissions - anonymous user
 	 */
-	$sql = " AND `item`.allow_cid = ''
-			 AND `item`.allow_gid = ''
-			 AND `item`.deny_cid  = ''
-			 AND `item`.deny_gid  = ''
-			 AND `item`.private != 1
-	";
+	$sql = " AND NOT `item`.`private`";
 
 	// Profile owner - everything is visible
 	if ($local_user && ($local_user == $owner_id)) {
@@ -357,37 +356,15 @@ function item_permissions_sql($owner_id, $remote_verified = false, $groups = nul
 		 * If pre-verified, the caller is expected to have already
 		 * done this and passed the groups into this function.
 		 */
-		if (!$remote_verified) {
-			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
-				intval($remote_user),
-				intval($owner_id)
-			);
-			if (DBM::is_result($r)) {
-				$remote_verified = true;
-				$groups = Group::getIdsByContactId($remote_user);
-			}
+		$set = PermissionSet::get($owner_id, $remote_user, $groups);
+
+		if (!empty($set)) {
+			$sql_set = " OR (`item`.`private` IN (1,2) AND `item`.`wall` AND `item`.`psid` IN (" . implode(',', $set) . "))";
+		} else {
+			$sql_set = '';
 		}
-		if ($remote_verified) {
 
-			$gs = '<<>>'; // should be impossible to match
-
-			if (is_array($groups) && count($groups)) {
-				foreach ($groups as $g) {
-					$gs .= '|<' . intval($g) . '>';
-				}
-			}
-
-			$sql = sprintf(
-				" AND ( `item`.private = 0 OR ( `item`.private in (1,2) AND `item`.`wall` = 1
-				  AND ( NOT (`item`.deny_cid REGEXP '<%d>' OR `item`.deny_gid REGEXP '%s')
-				  AND ( `item`.allow_cid REGEXP '<%d>' OR `item`.allow_gid REGEXP '%s' OR ( `item`.allow_cid = '' AND `item`.allow_gid = '')))))
-				",
-				intval($remote_user),
-				dbesc($gs),
-				intval($remote_user),
-				dbesc($gs)
-			);
-		}
+		$sql = " AND (NOT `item`.`private`" . $sql_set . ")";
 	}
 
 	return $sql;

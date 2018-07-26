@@ -1,12 +1,26 @@
 ---
 # Empty these tables
 cache:
-config:
 conversation:
 pconfig:
 photo:
 workerqueue:
 mail:
+
+# Base test config to avoid notice messages
+config:
+    -
+        cat: system
+        k: url
+        v: http://localhost
+    -
+        cat: system
+        k: hostname
+        v: localhost
+    -
+        cat: system
+        k: worker_dont_fork
+        v: 1
 
 # Populate tables with test data
 user:
