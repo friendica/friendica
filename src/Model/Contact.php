@@ -32,6 +32,27 @@ require_once 'include/text.php';
 class Contact extends BaseObject
 {
 	/**
+	 * @name page/profile types
+	 *
+	 * PAGE_NORMAL is a typical personal profile account
+	 * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
+	 * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
+	 *      write access to wall and comments (no email and not included in page owner's ACL lists)
+	 * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
+	 *
+	 * @{
+	 */
+	const PAGE_NORMAL    = 0;
+	const PAGE_SOAPBOX   = 1;
+	const PAGE_COMMUNITY = 2;
+	const PAGE_FREELOVE  = 3;
+	const PAGE_BLOG      = 4;
+	const PAGE_PRVGROUP  = 5;
+	/**
+	 * @}
+	 */
+
+	/**
 	 * @name Contact_is
 	 *
 	 * Relationship types
@@ -213,8 +234,8 @@ class Contact extends BaseObject
 			$fields['micro'] = System::baseUrl() . '/images/person-48.jpg';
 		}
 
-		$fields['forum'] = $user['page-flags'] == Profile::PAGE_COMMUNITY;
-		$fields['prv'] = $user['page-flags'] == Profile::PAGE_PRVGROUP;
+		$fields['forum'] = $user['page-flags'] == self::PAGE_COMMUNITY;
+		$fields['prv'] = $user['page-flags'] == self::PAGE_PRVGROUP;
 
 		// it seems as if ported accounts can have wrong values, so we make sure that now everything is fine.
 		$fields['url'] = System::baseUrl() . '/profile/' . $user['nickname'];
@@ -1072,10 +1093,10 @@ class Contact extends BaseObject
 	{
 		// There are several fields that indicate that the contact or user is a forum
 		// "page-flags" is a field in the user table,
-		// "forum" and "prv" are used in the contact table. They stand for Profile::PAGE_COMMUNITY and Profile::PAGE_PRVGROUP.
-		// "community" is used in the gcontact table and is true if the contact is Profile::PAGE_COMMUNITY or Profile::PAGE_PRVGROUP.
-		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == Profile::PAGE_COMMUNITY))
-			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == Profile::PAGE_PRVGROUP))
+		// "forum" and "prv" are used in the contact table. They stand for self::PAGE_COMMUNITY and self::PAGE_PRVGROUP.
+		// "community" is used in the gcontact table and is true if the contact is self::PAGE_COMMUNITY or self::PAGE_PRVGROUP.
+		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == self::PAGE_COMMUNITY))
+			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == self::PAGE_PRVGROUP))
 			|| (isset($contact['forum']) && intval($contact['forum']))
 			|| (isset($contact['prv']) && intval($contact['prv']))
 			|| (isset($contact['community']) && intval($contact['community']))
@@ -1554,7 +1575,7 @@ class Contact extends BaseObject
 			/// @TODO Encapsulate this into a function/method
 			$fields = ['uid', 'username', 'email', 'page-flags', 'notify-flags', 'language'];
 			$user = DBA::selectFirst('user', $fields, ['uid' => $importer['uid']]);
-			if (DBA::isResult($user) && !in_array($user['page-flags'], [Profile::PAGE_SOAPBOX, Profile::PAGE_FREELOVE, Profile::PAGE_COMMUNITY])) {
+			if (DBA::isResult($user) && !in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
 				// create notification
 				$hash = random_string();
 
@@ -1567,7 +1588,7 @@ class Contact extends BaseObject
 				Group::addMember(User::getDefaultGroup($importer['uid'], $contact_record["network"]), $contact_record['id']);
 
 				if (($user['notify-flags'] & NOTIFY_INTRO) &&
-					in_array($user['page-flags'], [Profile::PAGE_NORMAL])) {
+					in_array($user['page-flags'], [self::PAGE_NORMAL])) {
 
 					notification([
 						'type'         => NOTIFY_INTRO,
@@ -1576,7 +1597,7 @@ class Contact extends BaseObject
 						'to_name'      => $user['username'],
 						'to_email'     => $user['email'],
 						'uid'          => $user['uid'],
-						'link'		   => System::baseUrl() . '/notifications/intro',
+						'link'         => System::baseUrl() . '/notifications/intro',
 						'source_name'  => ((strlen(stripslashes($contact_record['name']))) ? stripslashes($contact_record['name']) : L10n::t('[Name Withheld]')),
 						'source_link'  => $contact_record['url'],
 						'source_photo' => $contact_record['photo'],
@@ -1585,7 +1606,7 @@ class Contact extends BaseObject
 					]);
 
 				}
-			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [Profile::PAGE_SOAPBOX, Profile::PAGE_FREELOVE, Profile::PAGE_COMMUNITY])) {
+			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
 				q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
 						intval($importer['uid']),
 						DBA::escape($url)

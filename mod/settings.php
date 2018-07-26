@@ -18,7 +18,6 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
-use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Protocol\Email;
 use Friendica\Util\Network;
@@ -482,14 +481,14 @@ function settings_post(App $a)
 	}
 
 	// Adjust the page flag if the account type doesn't fit to the page flag.
-	if (($account_type == ACCOUNT_TYPE_PERSON) && !in_array($page_flags, [Profile::PAGE_NORMAL, Profile::PAGE_SOAPBOX, Profile::PAGE_FREELOVE])) {
-		$page_flags = Profile::PAGE_NORMAL;
-	} elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) && !in_array($page_flags, [Profile::PAGE_SOAPBOX])) {
-		$page_flags = Profile::PAGE_SOAPBOX;
-	} elseif (($account_type == ACCOUNT_TYPE_NEWS) && !in_array($page_flags, [Profile::PAGE_SOAPBOX])) {
-		$page_flags = Profile::PAGE_SOAPBOX;
-	} elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) && !in_array($page_flags, [Profile::PAGE_COMMUNITY, Profile::PAGE_PRVGROUP])) {
-		$page_flags = Profile::PAGE_COMMUNITY;
+	if (($account_type == ACCOUNT_TYPE_PERSON) && !in_array($page_flags, [Contact::PAGE_NORMAL, Contact::PAGE_SOAPBOX, Contact::PAGE_FREELOVE])) {
+		$page_flags = Contact::PAGE_NORMAL;
+	} elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
+		$page_flags = Contact::PAGE_SOAPBOX;
+	} elseif (($account_type == ACCOUNT_TYPE_NEWS) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
+		$page_flags = Contact::PAGE_SOAPBOX;
+	} elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) && !in_array($page_flags, [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP])) {
+		$page_flags = Contact::PAGE_COMMUNITY;
 	}
 
 	$email_changed = false;
@@ -566,7 +565,7 @@ function settings_post(App $a)
 	PConfig::set(local_user(), 'system', 'email_textonly', $email_textonly);
 	PConfig::set(local_user(), 'system', 'detailed_notif', $detailed_notif);
 
-	if ($page_flags == Profile::PAGE_PRVGROUP) {
+	if ($page_flags == Contact::PAGE_PRVGROUP) {
 		$hidewall = 1;
 		if (!$str_contact_allow && !$str_group_allow && !$str_contact_deny && !$str_group_deny) {
 			if ($def_gid) {
@@ -1030,7 +1029,7 @@ function settings_content(App $a)
 
 	// Set the account type to "Community" when the page is a community page but the account type doesn't fit
 	// This is only happening on the first visit after the update
-	if (in_array($a->user['page-flags'], [Profile::PAGE_COMMUNITY, Profile::PAGE_PRVGROUP]) &&
+	if (in_array($a->user['page-flags'], [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP]) &&
 		($a->user['account-type'] != ACCOUNT_TYPE_COMMUNITY))
 		$a->user['account-type'] = ACCOUNT_TYPE_COMMUNITY;
 
@@ -1062,25 +1061,25 @@ function settings_content(App $a)
 									L10n::t('Account for community discussions.'),
 									($a->user['account-type'] == ACCOUNT_TYPE_COMMUNITY)],
 
-		'$page_normal'		=> ['page-flags', L10n::t('Normal Account Page'), Profile::PAGE_NORMAL,
+		'$page_normal'		=> ['page-flags', L10n::t('Normal Account Page'), Contact::PAGE_NORMAL,
 									L10n::t('Account for a regular personal profile that requires manual approval of "Friends" and "Followers".'),
-									($a->user['page-flags'] == Profile::PAGE_NORMAL)],
+									($a->user['page-flags'] == Contact::PAGE_NORMAL)],
 
-		'$page_soapbox' 	=> ['page-flags', L10n::t('Soapbox Page'), Profile::PAGE_SOAPBOX,
+		'$page_soapbox' 	=> ['page-flags', L10n::t('Soapbox Page'), Contact::PAGE_SOAPBOX,
 									L10n::t('Account for a public profile that automatically approves contact requests as "Followers".'),
-									($a->user['page-flags'] == Profile::PAGE_SOAPBOX)],
+									($a->user['page-flags'] == Contact::PAGE_SOAPBOX)],
 
-		'$page_community'	=> ['page-flags', L10n::t('Public Forum'), Profile::PAGE_COMMUNITY,
+		'$page_community'	=> ['page-flags', L10n::t('Public Forum'), Contact::PAGE_COMMUNITY,
 									L10n::t('Automatically approves all contact requests.'),
-									($a->user['page-flags'] == Profile::PAGE_COMMUNITY)],
+									($a->user['page-flags'] == Contact::PAGE_COMMUNITY)],
 
-		'$page_freelove' 	=> ['page-flags', L10n::t('Automatic Friend Page'), Profile::PAGE_FREELOVE,
+		'$page_freelove' 	=> ['page-flags', L10n::t('Automatic Friend Page'), Contact::PAGE_FREELOVE,
 									L10n::t('Account for a popular profile that automatically approves contact requests as "Friends".'),
-									($a->user['page-flags'] == Profile::PAGE_FREELOVE)],
+									($a->user['page-flags'] == Contact::PAGE_FREELOVE)],
 
-		'$page_prvgroup' 	=> ['page-flags', L10n::t('Private Forum [Experimental]'), Profile::PAGE_PRVGROUP,
+		'$page_prvgroup' 	=> ['page-flags', L10n::t('Private Forum [Experimental]'), Contact::PAGE_PRVGROUP,
 									L10n::t('Requires manual approval of contact requests.'),
-									($a->user['page-flags'] == Profile::PAGE_PRVGROUP)],
+									($a->user['page-flags'] == Contact::PAGE_PRVGROUP)],
 
 
 	]);

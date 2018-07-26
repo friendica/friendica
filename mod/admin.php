@@ -18,7 +18,6 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 use Friendica\Module\Tos;
@@ -1808,11 +1807,11 @@ function admin_page_users(App $a)
 	$adminlist = explode(",", str_replace(" ", "", Config::get('config', 'admin_email')));
 	$_setup_users = function ($e) use ($adminlist) {
 		$page_types = [
-			Profile::PAGE_NORMAL    => L10n::t('Normal Account Page'),
-			Profile::PAGE_SOAPBOX   => L10n::t('Soapbox Page'),
-			Profile::PAGE_COMMUNITY => L10n::t('Public Forum'),
-			Profile::PAGE_FREELOVE  => L10n::t('Automatic Friend Page'),
-			Profile::PAGE_PRVGROUP  => L10n::t('Private Forum')
+			Contact::PAGE_NORMAL    => L10n::t('Normal Account Page'),
+			Contact::PAGE_SOAPBOX   => L10n::t('Soapbox Page'),
+			Contact::PAGE_COMMUNITY => L10n::t('Public Forum'),
+			Contact::PAGE_FREELOVE  => L10n::t('Automatic Friend Page'),
+			Contact::PAGE_PRVGROUP  => L10n::t('Private Forum')
 		];
 		$account_types = [
 			ACCOUNT_TYPE_PERSON       => L10n::t('Personal Page'),

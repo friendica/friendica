@@ -13,8 +13,8 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Photo;
-use Friendica\Model\Profile;
 use Friendica\Object\Image;
 
 function wall_upload_post(App $a, $desktopmode = true)
@@ -67,7 +67,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 	$page_owner_uid   = $r[0]['uid'];
 	$default_cid      = $r[0]['id'];
 	$page_owner_nick  = $r[0]['nickname'];
-	$community_page   = (($r[0]['page-flags'] == Profile::PAGE_COMMUNITY) ? true : false);
+	$community_page   = (($r[0]['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
 
 	if ((local_user()) && (local_user() == $page_owner_uid)) {
 		$can_post = true;

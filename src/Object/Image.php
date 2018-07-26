@@ -11,8 +11,8 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Photo;
-use Friendica\Model\Profile;
 use Friendica\Util\Network;
 use Exception;
 use Imagick;
@@ -897,7 +897,7 @@ class Image
 
 		/// @TODO
 		/// $default_cid      = $r[0]['id'];
-		/// $community_page   = (($r[0]['page-flags'] == Profile::PAGE_COMMUNITY) ? true : false);
+		/// $community_page   = (($r[0]['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
 
 		if ((strlen($imagedata) == 0) && ($url == "")) {
 			logger("No image data and no url provided", LOGGER_DEBUG);

@@ -546,7 +546,7 @@ function dfrn_request_content(App $a)
 			$auto_confirm = false;
 
 			if (DBA::isResult($r)) {
-				if ($r[0]['page-flags'] != Profile::PAGE_NORMAL && $r[0]['page-flags'] != Profile::PAGE_PRVGROUP) {
+				if ($r[0]['page-flags'] != Contact::PAGE_NORMAL && $r[0]['page-flags'] != Contact::PAGE_PRVGROUP) {
 					$auto_confirm = true;
 				}
 
@@ -574,7 +574,7 @@ function dfrn_request_content(App $a)
 						'node'     => $r[0]['nickname'],
 						'dfrn_id'  => $r[0]['issued-id'],
 						'intro_id' => $intro[0]['id'],
-						'duplex'   => (($r[0]['page-flags'] == Profile::PAGE_FREELOVE) ? 1 : 0),
+						'duplex'   => (($r[0]['page-flags'] == Contact::PAGE_FREELOVE) ? 1 : 0),
 					];
 					dfrn_confirm_post($a, $handsfree);
 				}
@@ -626,7 +626,7 @@ function dfrn_request_content(App $a)
 		 * because nobody is going to read the comments and
 		 * it doesn't matter if they know you or not.
 		 */
-		if ($a->profile['page-flags'] == Profile::PAGE_NORMAL) {
+		if ($a->profile['page-flags'] == Contact::PAGE_NORMAL) {
 			$tpl = get_markup_template('dfrn_request.tpl');
 		} else {
 			$tpl = get_markup_template('auto_request.tpl');
