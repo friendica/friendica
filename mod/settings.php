@@ -18,7 +18,6 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
-use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Protocol\Email;
 use Friendica\Util\Network;

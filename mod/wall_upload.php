@@ -15,7 +15,6 @@ use Friendica\Core\Config;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
-use Friendica\Model\Profile;
 use Friendica\Object\Image;
 
 function wall_upload_post(App $a, $desktopmode = true)

@@ -26,7 +26,6 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
-use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\Crypto;

@@ -30,27 +30,6 @@ require_once 'include/dba.php';
 class Profile
 {
 	/**
-	 * @name page/profile types
-	 *
-	 * PAGE_NORMAL is a typical personal profile account
-	 * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
-	 * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
-	 *      write access to wall and comments (no email and not included in page owner's ACL lists)
-	 * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
-	 *
-	 * @{
-	 */
-	const PAGE_NORMAL    = 0;
-	const PAGE_SOAPBOX   = 1;
-	const PAGE_COMMUNITY = 2;
-	const PAGE_FREELOVE  = 3;
-	const PAGE_BLOG      = 4;
-	const PAGE_PRVGROUP  = 5;
-	/**
-	 * @}
-	 */
-
-	/**
 	 * @brief Returns a formatted location string from the given profile array
 	 *
 	 * @param array $profile Profile array (Generated from the "profile" table)

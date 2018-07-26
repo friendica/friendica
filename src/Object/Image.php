@@ -13,7 +13,6 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
-use Friendica\Model\Profile;
 use Friendica\Util\Network;
 use Exception;
 use Imagick;
