@@ -34,6 +34,13 @@ class Proxy
 	const SIZE_LARGE  = 'large';
 
 	/**
+	 * Application instance
+	 *
+	 * @var \Friendica\App
+	 */
+	private static $a = null;
+
+	/**
 	 * Accepted extensions
 	 *
 	 * @var array
