@@ -481,13 +481,13 @@ function settings_post(App $a)
 	}
 
 	// Adjust the page flag if the account type doesn't fit to the page flag.
-	if (($account_type == ACCOUNT_TYPE_PERSON) && !in_array($page_flags, [Contact::PAGE_NORMAL, Contact::PAGE_SOAPBOX, Contact::PAGE_FREELOVE])) {
+	if (($account_type == Contact::ACCOUNT_TYPE_PERSON) && !in_array($page_flags, [Contact::PAGE_NORMAL, Contact::PAGE_SOAPBOX, Contact::PAGE_FREELOVE])) {
 		$page_flags = Contact::PAGE_NORMAL;
-	} elseif (($account_type == ACCOUNT_TYPE_ORGANISATION) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
+	} elseif (($account_type == Contact::ACCOUNT_TYPE_ORGANISATION) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
 		$page_flags = Contact::PAGE_SOAPBOX;
-	} elseif (($account_type == ACCOUNT_TYPE_NEWS) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
+	} elseif (($account_type == Contact::ACCOUNT_TYPE_NEWS) && !in_array($page_flags, [Contact::PAGE_SOAPBOX])) {
 		$page_flags = Contact::PAGE_SOAPBOX;
-	} elseif (($account_type == ACCOUNT_TYPE_COMMUNITY) && !in_array($page_flags, [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP])) {
+	} elseif (($account_type == Contact::ACCOUNT_TYPE_COMMUNITY) && !in_array($page_flags, [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP])) {
 		$page_flags = Contact::PAGE_COMMUNITY;
 	}
 
@@ -1030,8 +1030,8 @@ function settings_content(App $a)
 	// Set the account type to "Community" when the page is a community page but the account type doesn't fit
 	// This is only happening on the first visit after the update
 	if (in_array($a->user['page-flags'], [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP]) &&
-		($a->user['account-type'] != ACCOUNT_TYPE_COMMUNITY))
-		$a->user['account-type'] = ACCOUNT_TYPE_COMMUNITY;
+		($a->user['account-type'] != Contact::ACCOUNT_TYPE_COMMUNITY))
+		$a->user['account-type'] = Contact::ACCOUNT_TYPE_COMMUNITY;
 
 	$pageset_tpl = get_markup_template('settings/pagetypes.tpl');
 
@@ -1040,26 +1040,26 @@ function settings_content(App $a)
 		'$user' 		=> L10n::t("Personal Page Subtypes"),
 		'$community'		=> L10n::t("Community Forum Subtypes"),
 		'$account_type'		=> $a->user['account-type'],
-		'$type_person'		=> ACCOUNT_TYPE_PERSON,
-		'$type_organisation' 	=> ACCOUNT_TYPE_ORGANISATION,
-		'$type_news'		=> ACCOUNT_TYPE_NEWS,
-		'$type_community' 	=> ACCOUNT_TYPE_COMMUNITY,
+		'$type_person'		=> Contact::ACCOUNT_TYPE_PERSON,
+		'$type_organisation' 	=> Contact::ACCOUNT_TYPE_ORGANISATION,
+		'$type_news'		=> Contact::ACCOUNT_TYPE_NEWS,
+		'$type_community' 	=> Contact::ACCOUNT_TYPE_COMMUNITY,
 
-		'$account_person' 	=> ['account-type', L10n::t('Personal Page'), ACCOUNT_TYPE_PERSON,
+		'$account_person' 	=> ['account-type', L10n::t('Personal Page'), Contact::ACCOUNT_TYPE_PERSON,
 									L10n::t('Account for a personal profile.'),
-									($a->user['account-type'] == ACCOUNT_TYPE_PERSON)],
+									($a->user['account-type'] == Contact::ACCOUNT_TYPE_PERSON)],
 
-		'$account_organisation'	=> ['account-type', L10n::t('Organisation Page'), ACCOUNT_TYPE_ORGANISATION,
+		'$account_organisation'	=> ['account-type', L10n::t('Organisation Page'), Contact::ACCOUNT_TYPE_ORGANISATION,
 									L10n::t('Account for an organisation that automatically approves contact requests as "Followers".'),
-									($a->user['account-type'] == ACCOUNT_TYPE_ORGANISATION)],
+									($a->user['account-type'] == Contact::ACCOUNT_TYPE_ORGANISATION)],
 
-		'$account_news'		=> ['account-type', L10n::t('News Page'), ACCOUNT_TYPE_NEWS,
+		'$account_news'		=> ['account-type', L10n::t('News Page'), Contact::ACCOUNT_TYPE_NEWS,
 									L10n::t('Account for a news reflector that automatically approves contact requests as "Followers".'),
-									($a->user['account-type'] == ACCOUNT_TYPE_NEWS)],
+									($a->user['account-type'] == Contact::ACCOUNT_TYPE_NEWS)],
 
-		'$account_community' 	=> ['account-type', L10n::t('Community Forum'), ACCOUNT_TYPE_COMMUNITY,
+		'$account_community' 	=> ['account-type', L10n::t('Community Forum'), Contact::ACCOUNT_TYPE_COMMUNITY,
 									L10n::t('Account for community discussions.'),
-									($a->user['account-type'] == ACCOUNT_TYPE_COMMUNITY)],
+									($a->user['account-type'] == Contact::ACCOUNT_TYPE_COMMUNITY)],
 
 		'$page_normal'		=> ['page-flags', L10n::t('Normal Account Page'), Contact::PAGE_NORMAL,
 									L10n::t('Account for a regular personal profile that requires manual approval of "Friends" and "Followers".'),

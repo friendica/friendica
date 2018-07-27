@@ -53,6 +53,34 @@ class Contact extends BaseObject
 	 */
 
 	/**
+	 * @name account types
+	 *
+	 * ACCOUNT_TYPE_PERSON - the account belongs to a person
+	 *	Associated page types: PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE
+	 *
+	 * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
+	 *	Associated page type: PAGE_SOAPBOX
+	 *
+	 * ACCOUNT_TYPE_NEWS - the account is a news reflector
+	 *	Associated page type: PAGE_SOAPBOX
+	 *
+	 * ACCOUNT_TYPE_COMMUNITY - the account is community forum
+	 *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
+	 *
+	 * ACCOUNT_TYPE_RELAY - the account is a relay
+	 *      This will only be assigned to contacts, not to user accounts
+	 * @{
+	 */
+	define('ACCOUNT_TYPE_PERSON',      0);
+	define('ACCOUNT_TYPE_ORGANISATION', 1);
+	define('ACCOUNT_TYPE_NEWS',        2);
+	define('ACCOUNT_TYPE_COMMUNITY',   3);
+	define('ACCOUNT_TYPE_RELAY',       4);
+	/**
+	 * @}
+	 */
+
+	/**
 	 * @name Contact_is
 	 *
 	 * Relationship types
@@ -74,6 +102,7 @@ class Contact extends BaseObject
 	public static function getByGroupId($gid)
 	{
 		$return = [];
+
 		if (intval($gid)) {
 			$stmt = DBA::p('SELECT `group_member`.`contact-id`, `contact`.*
 				FROM `contact`
@@ -88,6 +117,7 @@ class Contact extends BaseObject
 				$gid,
 				local_user()
 			);
+
 			if (DBA::isResult($stmt)) {
 				$return = DBA::toArray($stmt);
 			}
@@ -396,7 +426,7 @@ class Contact extends BaseObject
 		}
 
 		if (!empty($contact['batch'])) {
-			$condition = ['batch' => $contact['batch'], 'contact-type' => ACCOUNT_TYPE_RELAY];
+			$condition = ['batch' => $contact['batch'], 'contact-type' => self::ACCOUNT_TYPE_RELAY];
 			DBA::update('contact', $fields, $condition);
 		}
 	}
@@ -1064,7 +1094,7 @@ class Contact extends BaseObject
 
 		$author_id = intval($r[0]["author-id"]);
 
-		$contact = ($r[0]["contact-type"] == ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
+		$contact = ($r[0]["contact-type"] == self::ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
 
 		$condition = ["`$contact` = ? AND `gravity` IN (?, ?) AND " . $sql,
 			$author_id, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
@@ -1101,9 +1131,9 @@ class Contact extends BaseObject
 			|| (isset($contact['prv']) && intval($contact['prv']))
 			|| (isset($contact['community']) && intval($contact['community']))
 		) {
-			$type = ACCOUNT_TYPE_COMMUNITY;
+			$type = self::ACCOUNT_TYPE_COMMUNITY;
 		} else {
-			$type = ACCOUNT_TYPE_PERSON;
+			$type = self::ACCOUNT_TYPE_PERSON;
 		}
 
 		// The "contact-type" (contact table) and "account-type" (user table) are more general then the chaos from above.
@@ -1116,15 +1146,18 @@ class Contact extends BaseObject
 		}
 
 		switch ($type) {
-			case ACCOUNT_TYPE_ORGANISATION:
+			case self::ACCOUNT_TYPE_ORGANISATION:
 				$account_type = L10n::t("Organisation");
 				break;
-			case ACCOUNT_TYPE_NEWS:
+
+			case self::ACCOUNT_TYPE_NEWS:
 				$account_type = L10n::t('News');
 				break;
-			case ACCOUNT_TYPE_COMMUNITY:
+
+			case self::ACCOUNT_TYPE_COMMUNITY:
 				$account_type = L10n::t("Forum");
 				break;
+
 			default:
 				$account_type = "";
 				break;
@@ -1773,5 +1806,5 @@ class Contact extends BaseObject
 		}
 
 		return $redirect;
-        }
+	}
 }

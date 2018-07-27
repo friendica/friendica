@@ -1814,10 +1814,10 @@ function admin_page_users(App $a)
 			Contact::PAGE_PRVGROUP  => L10n::t('Private Forum')
 		];
 		$account_types = [
-			ACCOUNT_TYPE_PERSON       => L10n::t('Personal Page'),
-			ACCOUNT_TYPE_ORGANISATION => L10n::t('Organisation Page'),
-			ACCOUNT_TYPE_NEWS         => L10n::t('News Page'),
-			ACCOUNT_TYPE_COMMUNITY    => L10n::t('Community Forum')
+			Contact::ACCOUNT_TYPE_PERSON       => L10n::t('Personal Page'),
+			Contact::ACCOUNT_TYPE_ORGANISATION => L10n::t('Organisation Page'),
+			Contact::ACCOUNT_TYPE_NEWS         => L10n::t('News Page'),
+			Contact::ACCOUNT_TYPE_COMMUNITY    => L10n::t('Community Forum')
 		];
 
 		$e['page_flags_raw'] = $e['page-flags'];

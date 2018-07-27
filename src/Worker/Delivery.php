@@ -277,7 +277,7 @@ class Delivery extends BaseObject
 		// Se we transmit with the new method and via Diaspora as a fallback
 		if (!empty($items) && (($items[0]['uid'] == 0) || ($contact['uid'] == 0))) {
 			// Transmit in public if it's a relay post
-			$public_dfrn = ($contact['contact-type'] == ACCOUNT_TYPE_RELAY);
+			$public_dfrn = ($contact['contact-type'] == Contact::ACCOUNT_TYPE_RELAY);
 
 			$deliver_status = DFRN::transmit($owner, $contact, $atom, $public_dfrn);
 
@@ -331,7 +331,7 @@ class Delivery extends BaseObject
 	private static function deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
 	{
 		// We don't treat Forum posts as "wall-to-wall" to be able to post them via Diaspora
-		$walltowall = $top_level && ($owner['id'] != $items[0]['contact-id']) & ($owner['account-type'] != ACCOUNT_TYPE_COMMUNITY);
+		$walltowall = $top_level && ($owner['id'] != $items[0]['contact-id']) & ($owner['account-type'] != Contact::ACCOUNT_TYPE_COMMUNITY);
 
 		if ($public_message) {
 			$loc = 'public batch ' . $contact['batch'];

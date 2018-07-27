@@ -144,7 +144,7 @@ class Diaspora
 
 		// Fetch the relay contact
 		$condition = ['uid' => 0, 'nurl' => normalise_link($server_url),
-			'contact-type' => ACCOUNT_TYPE_RELAY];
+			'contact-type' => Contact::ACCOUNT_TYPE_RELAY];
 		$contact = DBA::selectFirst('contact', $fields, $condition);
 
 		if (DBA::isResult($contact)) {
@@ -183,7 +183,7 @@ class Diaspora
 		$fields = array_merge($fields, $network_fields);
 
 		$condition = ['uid' => 0, 'nurl' => normalise_link($server_url),
-			'contact-type' => ACCOUNT_TYPE_RELAY];
+			'contact-type' => Contact::ACCOUNT_TYPE_RELAY];
 
 		if (DBA::exists('contact', $condition)) {
 			unset($fields['created']);
@@ -3105,7 +3105,7 @@ class Diaspora
 		logger("transmit: ".$logid."-".$guid." to ".$dest_url." returns: ".$return_code);
 
 		if (!$return_code || (($return_code == 503) && (stristr($a->get_curl_headers(), "retry-after")))) {
-			if (!$no_queue && ($contact['contact-type'] != ACCOUNT_TYPE_RELAY)) {
+			if (!$no_queue && ($contact['contact-type'] != Contact::ACCOUNT_TYPE_RELAY)) {
 				logger("queue message");
 				// queue message for redelivery
 				Queue::add($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch, $guid);

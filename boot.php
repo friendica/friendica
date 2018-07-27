@@ -165,34 +165,6 @@ define('UPDATE_FAILED',  1);
  */
 
 /**
- * @name account types
- *
- * ACCOUNT_TYPE_PERSON - the account belongs to a person
- *	Associated page types: PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE
- *
- * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
- *	Associated page type: PAGE_SOAPBOX
- *
- * ACCOUNT_TYPE_NEWS - the account is a news reflector
- *	Associated page type: PAGE_SOAPBOX
- *
- * ACCOUNT_TYPE_COMMUNITY - the account is community forum
- *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
- *
- * ACCOUNT_TYPE_RELAY - the account is a relay
- *      This will only be assigned to contacts, not to user accounts
- * @{
- */
-define('ACCOUNT_TYPE_PERSON',      0);
-define('ACCOUNT_TYPE_ORGANISATION', 1);
-define('ACCOUNT_TYPE_NEWS',        2);
-define('ACCOUNT_TYPE_COMMUNITY',   3);
-define('ACCOUNT_TYPE_RELAY',       4);
-/**
- * @}
- */
-
-/**
  * @name CP
  *
  * Type of the community page
