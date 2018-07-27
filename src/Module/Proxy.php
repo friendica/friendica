@@ -35,13 +35,6 @@ class Proxy extends BaseModule
 	const SIZE_LARGE  = 'large';
 
 	/**
-	 * Application instance
-	 *
-	 * @var \Friendica\App
-	 */
-	private static $a = null;
-
-	/**
 	 * Accepted extensions
 	 *
 	 * @var array
@@ -64,7 +57,7 @@ class Proxy extends BaseModule
 	public static function init()
 	{
 		// Set application instance here
-		self::$a = self::getApp();
+		$a = self::getApp();
 
 		/*
 		 * Pictures are stored in one of the following ways:
@@ -100,7 +93,7 @@ class Proxy extends BaseModule
 		$thumb = false;
 		$size = 1024;
 		$sizetype = '';
-		$basepath = self::$a->get_basepath();
+		$basepath = $a->get_basepath();
 
 		// If the cache path isn't there, try to create it
 		if (!is_dir($basepath . '/proxy') && is_writable($basepath)) {
@@ -111,16 +104,16 @@ class Proxy extends BaseModule
 		$direct_cache = (is_dir($basepath . '/proxy') && is_writable($basepath . '/proxy'));
 
 		// Look for filename in the arguments
-		if ((isset(self::$a->argv[1]) || isset(self::$a->argv[2]) || isset(self::$a->argv[3])) && !isset($_REQUEST['url'])) {
-			if (isset(self::$a->argv[3])) {
-				$url = self::$a->argv[3];
-			} elseif (isset(self::$a->argv[2])) {
-				$url = self::$a->argv[2];
+		if ((isset($a->argv[1]) || isset($a->argv[2]) || isset($a->argv[3])) && !isset($_REQUEST['url'])) {
+			if (isset($a->argv[3])) {
+				$url = $a->argv[3];
+			} elseif (isset($a->argv[2])) {
+				$url = $a->argv[2];
 			} else {
-				$url = self::$a->argv[1];
+				$url = $a->argv[1];
 			}
 
-			if (isset(self::$a->argv[3]) && (self::$a->argv[3] == 'thumb')) {
+			if (isset($a->argv[3]) && ($a->argv[3] == 'thumb')) {
 				$size = 200;
 			}
 
@@ -221,7 +214,7 @@ class Proxy extends BaseModule
 			unlink($tempfile);
 
 			// If there is an error then return a blank image
-			if ((substr(self::$a->get_curl_code(), 0, 1) == '4') || (!$img_str)) {
+			if ((substr($a->get_curl_code(), 0, 1) == '4') || (!$img_str)) {
 				$img_str = file_get_contents('images/blank.png');
 				$mime = 'image/png';
 				$cachefile = ''; // Clear the cachefile so that the dummy isn't stored
@@ -310,6 +303,9 @@ class Proxy extends BaseModule
 	 */
 	public static function proxifyUrl($url, $writemode = false, $size = '')
 	{
+		// Get application instance
+		$a = self::getApp();
+
 		// Trim URL first
 		$url = trim($url);
 
@@ -334,7 +330,7 @@ class Proxy extends BaseModule
 		$url = html_entity_decode($url, ENT_NOQUOTES, 'utf-8');
 
 		// Creating a sub directory to reduce the amount of files in the cache directory
-		$basepath = self::$a->get_basepath() . '/proxy';
+		$basepath = $a->get_basepath() . '/proxy';
 
 		$shortpath = hash('md5', $url);
 		$longpath = substr($shortpath, 0, 2);
