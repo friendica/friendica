@@ -71,11 +71,11 @@ class Contact extends BaseObject
 	 *      This will only be assigned to contacts, not to user accounts
 	 * @{
 	 */
-	define('ACCOUNT_TYPE_PERSON',      0);
-	define('ACCOUNT_TYPE_ORGANISATION', 1);
-	define('ACCOUNT_TYPE_NEWS',        2);
-	define('ACCOUNT_TYPE_COMMUNITY',   3);
-	define('ACCOUNT_TYPE_RELAY',       4);
+	const ACCOUNT_TYPE_PERSON,       0;
+	const ACCOUNT_TYPE_ORGANISATION, 1;
+	const ACCOUNT_TYPE_NEWS,         2;
+	const ACCOUNT_TYPE_COMMUNITY,    3;
+	const ACCOUNT_TYPE_RELAY,        4;
 	/**
 	 * @}
 	 */
