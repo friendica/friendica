@@ -9,8 +9,8 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Module\Proxy;
 use Friendica\Network\Probe;
-use Friendica\Network\Proxy;
 use Friendica\Database\DBA;
 use Friendica\Util\Proxy as ProxyUtils;
 
