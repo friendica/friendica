@@ -14,7 +14,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 
 function hovercard_init(App $a)
 {

@@ -11,7 +11,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 
 function suggest_init(App $a) {
 	if (! local_user()) {

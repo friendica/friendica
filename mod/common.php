@@ -10,7 +10,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 
 require_once 'include/dba.php';
 require_once 'mod/contacts.php';

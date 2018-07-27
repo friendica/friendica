@@ -21,7 +21,7 @@ use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 use Friendica\Util\DateTimeFormat;
 
 require_once 'include/conversation.php';

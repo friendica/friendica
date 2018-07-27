@@ -17,8 +17,8 @@ use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\Profile;
+use Friendica\Module\Proxy;
 use Friendica\Network\Probe;
-use Friendica\Network\Proxy;
 use Friendica\Util\DateTimeFormat;
 
 function contacts_init(App $a)

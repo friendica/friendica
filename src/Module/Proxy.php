@@ -3,9 +3,10 @@
  * @file src/Module/Proxy.php
  * @brief Based upon "Privacy Image Cache" by Tobias Hößl <https://github.com/CatoTH/>
  */
-namespace Friendica\Network;
+namespace Friendica\Module;
 
 use Friendica\App;
+use Friendica\BaseModule;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -16,7 +17,7 @@ use Friendica\Util\Network;
 
 require_once 'include/security.php';
 
-class Proxy
+class Proxy extends BaseModule
 {
 
 	/**
@@ -60,10 +61,10 @@ class Proxy
 	 *
 	 * @param \Friendica\App $app Application instance
 	 */
-	public static function init(App $a)
+	public static function init()
 	{
 		// Set application instance here
-		self::$a = $a;
+		self::$a = self::getApp();
 
 		/*
 		 * Pictures are stored in one of the following ways:

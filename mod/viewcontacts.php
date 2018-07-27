@@ -10,7 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 
 function viewcontacts_init(App $a)
 {

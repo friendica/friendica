@@ -9,7 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Network\Proxy;
+use Friendica\Module\Proxy;
 
 require_once 'include/dba.php';
 
