@@ -979,7 +979,8 @@ class Item extends BaseObject
 		// locate item to be deleted
 		$fields = ['id', 'uri', 'uid', 'parent', 'parent-uri', 'origin',
 			'deleted', 'file', 'resource-id', 'event-id', 'attach',
-			'verb', 'object-type', 'object', 'target', 'contact-id'];
+			'verb', 'object-type', 'object', 'target', 'contact-id',
+			'icid', 'iaid', 'psid'];
 		$item = self::selectFirst($fields, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
 			logger('Item with ID ' . $item_id . " hasn't been found.", LOGGER_DEBUG);
@@ -1042,11 +1043,7 @@ class Item extends BaseObject
 		self::deleteTagsFromItem($item);
 
 		// Set the item to "deleted"
-		// This erasing of item content is superfluous for items with a matching item-content.
-		// But for the next time we will still have old content in the item table.
-		$item_fields = ['deleted' => true, 'edited' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow(),
-			'body' => '', 'title' => '', 'content-warning' => '', 'rendered-hash' => '', 'rendered-html' => '',
-			'object' => '', 'target' => '', 'tag' => '', 'postopts' => '', 'attach' => '', 'file' => ''];
+		$item_fields = ['deleted' => true, 'edited' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()];
 		DBA::update('item', $item_fields, ['id' => $item['id']]);
 
 		Term::insertFromTagFieldByItemId($item['id'], '');
@@ -1058,6 +1055,18 @@ class Item extends BaseObject
 		}
 
 		DBA::delete('item-delivery-data', ['iid' => $item['id']]);
+
+		if (!empty($item['iaid']) && !DBA::exists('item', ['iaid' => $item['iaid'], 'deleted' => false])) {
+			DBA::delete('item-activity', ['id' => $item['iaid']]);
+		}
+		if (!empty($item['icid']) && !DBA::exists('item', ['icid' => $item['icid'], 'deleted' => false])) {
+			DBA::delete('item-content', ['id' => $item['icid']]);
+		}
+		// When the permission set will be used in photo and events as well,
+		// this query here needs to be extended.
+		if (!empty($item['psid']) && !DBA::exists('item', ['psid' => $item['psid'], 'deleted' => false])) {
+			DBA::delete('permissionset', ['id' => $item['psid']]);
+		}
 
 		// If it's the parent of a comment thread, kill all the kids
 		if ($item['id'] == $item['parent']) {
