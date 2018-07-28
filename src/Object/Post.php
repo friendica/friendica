@@ -15,8 +15,8 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
-use Friendica\Module\Proxy;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\ProxyUtils;
 use Friendica\Util\Temporal;
 
 require_once 'include/dba.php';
@@ -367,7 +367,7 @@ class Post extends BaseObject
 			'profile_url'     => $profile_link,
 			'item_photo_menu' => item_photo_menu($item),
 			'name'            => $name_e,
-			'thumb'           => $a->remove_baseurl(Proxy::proxifyUrl($item['author-avatar'], false, Proxy::SIZE_THUMB)),
+			'thumb'           => $a->remove_baseurl(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
 			'title'           => $title_e,
@@ -380,7 +380,7 @@ class Post extends BaseObject
 			'indent'          => $indent,
 			'shiny'           => $shiny,
 			'owner_url'       => $this->getOwnerUrl(),
-			'owner_photo'     => $a->remove_baseurl(Proxy::proxifyUrl($item['owner-avatar'], false, Proxy::SIZE_THUMB)),
+			'owner_photo'     => $a->remove_baseurl(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'owner_name'      => htmlentities($owner_name_e),
 			'plink'           => get_plink($item),
 			'edpost'          => Feature::isEnabled($conv->getProfileOwner(), 'edit_posts') ? $edpost : '',

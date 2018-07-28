@@ -17,10 +17,10 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
-use Friendica\Module\Proxy;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
+use Friendica\Util\ProxyUtils;
 
 require_once "include/conversation.php";
 
@@ -858,7 +858,7 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 		'$click' => defaults($contact, 'click', ''),
 		'$class' => $class,
 		'$url' => $url,
-		'$photo' => Proxy::proxifyUrl($contact['thumb'], false, Proxy::SIZE_THUMB),
+		'$photo' => ProxyUtils::proxifyUrl($contact['thumb'], false, ProxyUtils::SIZE_THUMB),
 		'$name' => $contact['name'],
 		'title' => $contact['name'] . ' [' . $contact['addr'] . ']',
 		'$parkle' => $sparkle,

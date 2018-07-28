@@ -12,8 +12,8 @@ use Friendica\Content\Text\HTML;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Module\Proxy;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\ProxyUtils;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 
@@ -244,7 +244,7 @@ class NotificationsManager extends BaseObject
 					case 'system':
 						$default_item_label = 'notify';
 						$default_item_link = System::baseUrl(true) . '/notify/view/' . $it['id'];
-						$default_item_image = Proxy::proxifyUrl($it['photo'], false, Proxy::SIZE_MICRO);
+						$default_item_image = ProxyUtils::proxifyUrl($it['photo'], false, ProxyUtils::SIZE_MICRO);
 						$default_item_url = $it['url'];
 						$default_item_text = strip_tags(BBCode::convert($it['msg']));
 						$default_item_when = DateTimeFormat::local($it['date'], 'r');
@@ -254,7 +254,7 @@ class NotificationsManager extends BaseObject
 					case 'home':
 						$default_item_label = 'comment';
 						$default_item_link = System::baseUrl(true) . '/display/' . $it['parent-guid'];
-						$default_item_image = Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO);
+						$default_item_image = ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO);
 						$default_item_url = $it['author-link'];
 						$default_item_text = L10n::t("%s commented on %s's post", $it['author-name'], $it['parent-author-name']);
 						$default_item_when = DateTimeFormat::local($it['created'], 'r');
@@ -264,7 +264,7 @@ class NotificationsManager extends BaseObject
 					default:
 						$default_item_label = (($it['id'] == $it['parent']) ? 'post' : 'comment');
 						$default_item_link = System::baseUrl(true) . '/display/' . $it['parent-guid'];
-						$default_item_image = Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO);
+						$default_item_image = ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO);
 						$default_item_url = $it['author-link'];
 						$default_item_text = (($it['id'] == $it['parent'])
 									? L10n::t("%s created a new post", $it['author-name'])
@@ -279,7 +279,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'like',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s liked %s's post", $it['author-name'], $it['parent-author-name']),
 							'when' => $default_item_when,
@@ -292,7 +292,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'dislike',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s disliked %s's post", $it['author-name'], $it['parent-author-name']),
 							'when' => $default_item_when,
@@ -305,7 +305,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'attend',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s is attending %s's event", $it['author-name'], $it['parent-author-name']),
 							'when' => $default_item_when,
@@ -318,7 +318,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'attendno',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s is not attending %s's event", $it['author-name'], $it['parent-author-name']),
 							'when' => $default_item_when,
@@ -331,7 +331,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'attendmaybe',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s may attend %s's event", $it['author-name'], $it['parent-author-name']),
 							'when' => $default_item_when,
@@ -348,7 +348,7 @@ class NotificationsManager extends BaseObject
 						$notif = [
 							'label' => 'friend',
 							'link' => System::baseUrl(true) . '/display/' . $it['parent-guid'],
-							'image' => Proxy::proxifyUrl($it['author-avatar'], false, Proxy::SIZE_MICRO),
+							'image' => ProxyUtils::proxifyUrl($it['author-avatar'], false, ProxyUtils::SIZE_MICRO),
 							'url' => $it['author-link'],
 							'text' => L10n::t("%s is now friends with %s", $it['author-name'], $it['fname']),
 							'when' => $default_item_when,
@@ -623,7 +623,7 @@ class NotificationsManager extends BaseObject
 					'madeby_zrl' => Contact::magicLink($it['url']),
 					'madeby_addr' => $it['addr'],
 					'contact_id' => $it['contact-id'],
-					'photo' => ((x($it, 'fphoto')) ? Proxy::proxifyUrl($it['fphoto'], false, Proxy::SIZE_SMALL) : "images/person-175.jpg"),
+					'photo' => ((x($it, 'fphoto')) ? ProxyUtils::proxifyUrl($it['fphoto'], false, ProxyUtils::SIZE_SMALL) : "images/person-175.jpg"),
 					'name' => $it['fname'],
 					'url' => $it['furl'],
 					'zrl' => Contact::magicLink($it['furl']),
@@ -651,7 +651,7 @@ class NotificationsManager extends BaseObject
 					'uid' => $_SESSION['uid'],
 					'intro_id' => $it['intro_id'],
 					'contact_id' => $it['contact-id'],
-					'photo' => ((x($it, 'photo')) ? Proxy::proxifyUrl($it['photo'], false, Proxy::SIZE_SMALL) : "images/person-175.jpg"),
+					'photo' => ((x($it, 'photo')) ? ProxyUtils::proxifyUrl($it['photo'], false, ProxyUtils::SIZE_SMALL) : "images/person-175.jpg"),
 					'name' => $it['name'],
 					'location' => BBCode::convert($it['glocation'], false),
 					'about' => BBCode::convert($it['gabout'], false),

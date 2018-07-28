@@ -20,10 +20,10 @@ use Friendica\Model\GContact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
-use Friendica\Module\Proxy;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
+use Friendica\Util\ProxyUtils;
 use Friendica\Util\XML;
 
 require_once 'include/dba.php';
@@ -1214,7 +1214,7 @@ class OStatus
 			}
 
 			// Is it a remote picture? Then make a smaller preview here
-			$preview = Proxy::proxifyUrl($preview, false, Proxy::SIZE_SMALL);
+			$preview = ProxyUtils::proxifyUrl($preview, false, ProxyUtils::SIZE_SMALL);
 
 			// Is it a local picture? Then make it smaller here
 			$preview = str_replace(["-0.jpg", "-0.png"], ["-2.jpg", "-2.png"], $preview);

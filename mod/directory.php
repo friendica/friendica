@@ -12,7 +12,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Module\Proxy;
+use Friendica\Util\ProxyUtils;
 
 function directory_init(App $a)
 {
@@ -164,7 +164,7 @@ function directory_content(App $a)
 				'id'           => $rr['id'],
 				'url'          => $profile_link,
 				'itemurl'      => $itemurl,
-				'thumb'        => Proxy::proxifyUrl($rr[$photo], false, Proxy::SIZE_THUMB),
+				'thumb'        => ProxyUtils::proxifyUrl($rr[$photo], false, ProxyUtils::SIZE_THUMB),
 				'img_hover'    => $rr['name'],
 				'name'         => $rr['name'],
 				'details'      => $details,

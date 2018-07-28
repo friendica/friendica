@@ -19,12 +19,12 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
-use Friendica\Module\Proxy;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
+use Friendica\Util\ProxyUtils;
 use League\HTMLToMarkdown\HtmlConverter;
 
 class BBCode extends BaseObject
@@ -360,7 +360,7 @@ class BBCode extends BaseObject
 	{
 		// Only send proxied pictures to API and for internal display
 		if (in_array($simplehtml, [false, 2])) {
-			return Proxy::proxifyUrl($image);
+			return ProxyUtils::proxifyUrl($image);
 		} else {
 			return $image;
 		}
@@ -1032,7 +1032,7 @@ class BBCode extends BaseObject
 				} else {
 					$text = trim($share[1]) . "\n";
 
-					$avatar = Proxy::proxifyUrl($avatar, false, Proxy::SIZE_THUMB);
+					$avatar = ProxyUtils::proxifyUrl($avatar, false, ProxyUtils::SIZE_THUMB);
 
 					$tpl = get_markup_template('shared_content.tpl');
 					$text .= replace_macros($tpl, [

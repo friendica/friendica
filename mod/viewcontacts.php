@@ -10,7 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Module\Proxy;
+use Friendica\Util\ProxyUtils;
 
 function viewcontacts_init(App $a)
 {
@@ -101,7 +101,7 @@ function viewcontacts_content(App $a)
 			'id' => $rr['id'],
 			'img_hover' => L10n::t('Visit %s\'s profile [%s]', $contact_details['name'], $rr['url']),
 			'photo_menu' => Contact::photoMenu($rr),
-			'thumb' => Proxy::proxifyUrl($contact_details['thumb'], false, Proxy::SIZE_THUMB),
+			'thumb' => ProxyUtils::proxifyUrl($contact_details['thumb'], false, ProxyUtils::SIZE_THUMB),
 			'name' => htmlentities(substr($contact_details['name'], 0, 20)),
 			'username' => htmlentities($contact_details['name']),
 			'details'       => $contact_details['location'],

@@ -17,10 +17,10 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Term;
-use Friendica\Module\Proxy;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\ProxyUtils;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 
@@ -650,7 +650,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					'name' => $profile_name_e,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
-					'thumb' => System::removedBaseUrl(Proxy::proxifyUrl($item['author-avatar'], false, Proxy::SIZE_THUMB)),
+					'thumb' => System::removedBaseUrl(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'title' => $title_e,
 					'body' => $body_e,
 					'tags' => $tags_e,
@@ -669,7 +669,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					'indent' => '',
 					'owner_name' => $owner_name_e,
 					'owner_url' => $owner_url,
-					'owner_photo' => System::removedBaseUrl(Proxy::proxifyUrl($item['owner-avatar'], false, Proxy::SIZE_THUMB)),
+					'owner_photo' => System::removedBaseUrl(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'plink' => get_plink($item),
 					'edpost' => false,
 					'isstarred' => $isstarred,

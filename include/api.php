@@ -26,7 +26,6 @@ use Friendica\Model\Item;
 use Friendica\Model\Mail;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
-use Friendica\Module\Proxy;
 use Friendica\Network\FKOAuth1;
 use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\BadRequestException;
@@ -41,6 +40,7 @@ use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
+use Friendica\Util\ProxyUtils;
 use Friendica\Util\XML;
 
 require_once 'include/conversation.php';
@@ -2518,7 +2518,7 @@ function api_get_entitities(&$text, $bbcode)
 		preg_match_all("/\[img](.*?)\[\/img\]/ism", $bbcode, $images);
 
 		foreach ($images[1] as $image) {
-			$replace = Proxy::proxifyUrl($image);
+			$replace = ProxyUtils::proxifyUrl($image);
 			$text = str_replace($image, $replace, $text);
 		}
 		return [];
@@ -2627,7 +2627,7 @@ function api_get_entitities(&$text, $bbcode)
 				// If image cache is activated, then use the following sizes:
 				// thumb  (150), small (340), medium (600) and large (1024)
 				if (!Config::get("system", "proxy_disabled")) {
-					$media_url = Proxy::proxifyUrl($url);
+					$media_url = ProxyUtils::proxifyUrl($url);
 
 					$sizes = [];
 					$scale = Image::getScalingDimensions($image[0], $image[1], 150);

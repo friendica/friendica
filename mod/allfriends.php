@@ -11,7 +11,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
-use Friendica\Module\Proxy;
+use Friendica\Util\ProxyUtils;
 
 require_once 'include/dba.php';
 require_once 'mod/contacts.php';
@@ -81,7 +81,7 @@ function allfriends_content(App $a)
 			'url'          => $rr['url'],
 			'itemurl'      => defaults($contact_details, 'addr', $rr['url']),
 			'name'         => htmlentities($contact_details['name']),
-			'thumb'        => Proxy::proxifyUrl($contact_details['thumb'], false, Proxy::SIZE_THUMB),
+			'thumb'        => ProxyUtils::proxifyUrl($contact_details['thumb'], false, ProxyUtils::SIZE_THUMB),
 			'img_hover'    => htmlentities($contact_details['name']),
 			'details'      => $contact_details['location'],
 			'tags'         => $contact_details['keywords'],

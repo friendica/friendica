@@ -9,7 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Module\Proxy;
+use Friendica\Util\ProxyUtils;
 
 require_once 'include/dba.php';
 
@@ -192,7 +192,7 @@ function acl_content(App $a)
 		$contacts = [];
 		foreach ($r as $g) {
 			$contacts[] = [
-				'photo'   => Proxy::proxifyUrl($g['photo'], false, Proxy::SIZE_MICRO),
+				'photo'   => ProxyUtils::proxifyUrl($g['photo'], false, ProxyUtils::SIZE_MICRO),
 				'name'    => $g['name'],
 				'nick'    => defaults($g, 'addr', $g['url']),
 				'network' => $g['network'],
@@ -214,7 +214,7 @@ function acl_content(App $a)
 		foreach ($r as $g) {
 			$entry = [
 				'type'    => 'c',
-				'photo'   => Proxy::proxifyUrl($g['micro'], false, Proxy::SIZE_MICRO),
+				'photo'   => ProxyUtils::proxifyUrl($g['micro'], false, ProxyUtils::SIZE_MICRO),
 				'name'    => htmlentities($g['name']),
 				'id'      => intval($g['id']),
 				'network' => $g['network'],
@@ -275,7 +275,7 @@ function acl_content(App $a)
 			if (count($contact) > 0) {
 				$unknown_contacts[] = [
 					'type'    => 'c',
-					'photo'   => Proxy::proxifyUrl($contact['micro'], false, Proxy::SIZE_MICRO),
+					'photo'   => ProxyUtils::proxifyUrl($contact['micro'], false, ProxyUtils::SIZE_MICRO),
 					'name'    => htmlentities($contact['name']),
 					'id'      => intval($contact['cid']),
 					'network' => $contact['network'],

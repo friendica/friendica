@@ -10,8 +10,8 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Module\Proxy;
 use Friendica\Util\Network;
+use Friendica\Util\ProxyUtils;
 
 require_once 'include/text.php';
 
@@ -100,7 +100,7 @@ function match_content(App $a)
 						'tags'          => $contact_details['keywords'],
 						'about'         => $contact_details['about'],
 						'account_type'  => Contact::getAccountType($contact_details),
-						'thumb' => Proxy::proxifyUrl($jj->photo, false, Proxy::SIZE_THUMB),
+						'thumb' => ProxyUtils::proxifyUrl($jj->photo, false, ProxyUtils::SIZE_THUMB),
 						'inttxt' => ' ' . L10n::t('is interested in:'),
 						'conntxt' => L10n::t('Connect'),
 						'connlnk' => $connlnk,
