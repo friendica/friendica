@@ -14,6 +14,7 @@ use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
+use Friendica\Util\ProxyUtils;
 
 require_once 'include/security.php';
 
@@ -267,10 +268,10 @@ class Proxy extends BaseModule
 		 * Otherwise write in cachefile
 		 */
 		if ($valid && $direct_cache) {
-			file_put_contents($basepath . '/proxy/' . self::proxifyUrl($_REQUEST['url'], true), $img_str_orig);
+			file_put_contents($basepath . '/proxy/' . ProxyUtils::proxifyUrl($_REQUEST['url'], true), $img_str_orig);
 
 			if ($sizetype != '') {
-				file_put_contents($basepath . '/proxy/' . self::proxifyUrl($_REQUEST['url'], true) . $sizetype, $img_str);
+				file_put_contents($basepath . '/proxy/' . ProxyUtils::proxifyUrl($_REQUEST['url'], true) . $sizetype, $img_str);
 			}
 		} elseif ($cachefile != '') {
 			file_put_contents($cachefile, $img_str_orig);
