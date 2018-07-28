@@ -15,6 +15,7 @@ use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
+use Friendica\Database\PostUpdate;
 
 require_once 'include/dba.php';
 require_once 'mod/nodeinfo.php';
