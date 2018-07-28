@@ -43,6 +43,13 @@ class ProxyUtils
 	];
 
 	/**
+	 * @brief Private constructor
+	 */
+	private function __construct () {
+		// No instances from utilities classes
+	}
+
+	/**
 	 * @brief Transform a remote URL into a local one.
 	 *
 	 * This function only performs the URL replacement on http URL and if the
