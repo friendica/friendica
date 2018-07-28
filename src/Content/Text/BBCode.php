@@ -19,7 +19,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
-use Friendica\Module\Proxy;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Util\Map;

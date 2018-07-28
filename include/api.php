@@ -26,7 +26,6 @@ use Friendica\Model\Item;
 use Friendica\Model\Mail;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
-use Friendica\Module\Proxy;
 use Friendica\Network\FKOAuth1;
 use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\BadRequestException;

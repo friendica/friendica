@@ -13,7 +13,8 @@ use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Util\Proxy as ProxyUtils;
 
-function suggest_init(App $a) {
+function suggest_init(App $a)
+{
 	if (! local_user()) {
 		return;
 	}
