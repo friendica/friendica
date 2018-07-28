@@ -1544,7 +1544,7 @@ class PortableContact
 		}
 
 		foreach ($serverlist as $server) {
-			$server_url = str_replace("/index.php", "", $server['url'];
+			$server_url = str_replace("/index.php", "", $server['url']);
 
 			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", DBA::escape(normalise_link($server_url)));
 
