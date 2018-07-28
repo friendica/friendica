@@ -13,6 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -53,7 +54,7 @@ function profile_init(App $a)
 	$blocked   = !local_user() && !remote_user() && Config::get('system', 'block_public');
 	$userblock = !local_user() && !remote_user() && $a->profile['hidewall'];
 
-	if (x($a->profile, 'page-flags') && $a->profile['page-flags'] == PAGE_COMMUNITY) {
+	if (x($a->profile, 'page-flags') && $a->profile['page-flags'] == Contact::PAGE_COMMUNITY) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
 	}
 
@@ -191,7 +192,7 @@ function profile_content(App $a, $update = 0)
 
 		$o .= Widget::commonFriendsVisitor($a->profile['profile_uid']);
 
-		$commpage = $a->profile['page-flags'] == PAGE_COMMUNITY;
+		$commpage = $a->profile['page-flags'] == Contact::PAGE_COMMUNITY;
 		$commvisitor = $commpage && $remote_contact;
 
 		$a->page['aside'] .= posted_date_widget(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'], true);
@@ -276,8 +277,8 @@ function profile_content(App $a, $update = 0)
 		// If not then we can improve the performance with an additional condition
 		$r = q("SELECT `uid` FROM `user` WHERE `uid` = %d AND `page-flags` IN (%d, %d)",
 			intval($a->profile['profile_uid']),
-			intval(PAGE_COMMUNITY),
-			intval(PAGE_PRVGROUP)
+			intval(Contact::PAGE_COMMUNITY),
+			intval(Contact::PAGE_PRVGROUP)
 		);
 
 		if (!DBA::isResult($r)) {

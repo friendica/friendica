@@ -201,11 +201,11 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				$params['duplex'] = 1;
 			}
 
-			if ($user['page-flags'] == PAGE_COMMUNITY) {
+			if ($user['page-flags'] == Contact::PAGE_COMMUNITY) {
 				$params['page'] = 1;
 			}
 
-			if ($user['page-flags'] == PAGE_PRVGROUP) {
+			if ($user['page-flags'] == Contact::PAGE_PRVGROUP) {
 				$params['page'] = 2;
 			}
 

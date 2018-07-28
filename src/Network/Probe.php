@@ -398,7 +398,7 @@ class Probe
 				// This doesn't cover the case when a community isn't a community anymore
 				if (!empty($data['community']) && $data['community']) {
 					$fields['community'] = $data['community'];
-					$fields['contact-type'] = ACCOUNT_TYPE_COMMUNITY;
+					$fields['contact-type'] = Contact::ACCOUNT_TYPE_COMMUNITY;
 				}
 
 				$fieldnames = [];

@@ -12,6 +12,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
@@ -30,6 +31,55 @@ require_once 'include/text.php';
  */
 class Contact extends BaseObject
 {
+	/**
+	 * @name page/profile types
+	 *
+	 * PAGE_NORMAL is a typical personal profile account
+	 * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
+	 * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
+	 *      write access to wall and comments (no email and not included in page owner's ACL lists)
+	 * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
+	 *
+	 * @{
+	 */
+	const PAGE_NORMAL    = 0;
+	const PAGE_SOAPBOX   = 1;
+	const PAGE_COMMUNITY = 2;
+	const PAGE_FREELOVE  = 3;
+	const PAGE_BLOG      = 4;
+	const PAGE_PRVGROUP  = 5;
+	/**
+	 * @}
+	 */
+
+	/**
+	 * @name account types
+	 *
+	 * ACCOUNT_TYPE_PERSON - the account belongs to a person
+	 *	Associated page types: PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE
+	 *
+	 * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
+	 *	Associated page type: PAGE_SOAPBOX
+	 *
+	 * ACCOUNT_TYPE_NEWS - the account is a news reflector
+	 *	Associated page type: PAGE_SOAPBOX
+	 *
+	 * ACCOUNT_TYPE_COMMUNITY - the account is community forum
+	 *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
+	 *
+	 * ACCOUNT_TYPE_RELAY - the account is a relay
+	 *      This will only be assigned to contacts, not to user accounts
+	 * @{
+	 */
+	const ACCOUNT_TYPE_PERSON =       0;
+	const ACCOUNT_TYPE_ORGANISATION = 1;
+	const ACCOUNT_TYPE_NEWS =         2;
+	const ACCOUNT_TYPE_COMMUNITY =    3;
+	const ACCOUNT_TYPE_RELAY =        4;
+	/**
+	 * @}
+	 */
+
 	/**
 	 * @name Contact_is
 	 *
@@ -52,6 +102,7 @@ class Contact extends BaseObject
 	public static function getByGroupId($gid)
 	{
 		$return = [];
+
 		if (intval($gid)) {
 			$stmt = DBA::p('SELECT `group_member`.`contact-id`, `contact`.*
 				FROM `contact`
@@ -66,6 +117,7 @@ class Contact extends BaseObject
 				$gid,
 				local_user()
 			);
+
 			if (DBA::isResult($stmt)) {
 				$return = DBA::toArray($stmt);
 			}
@@ -212,8 +264,8 @@ class Contact extends BaseObject
 			$fields['micro'] = System::baseUrl() . '/images/person-48.jpg';
 		}
 
-		$fields['forum'] = $user['page-flags'] == PAGE_COMMUNITY;
-		$fields['prv'] = $user['page-flags'] == PAGE_PRVGROUP;
+		$fields['forum'] = $user['page-flags'] == self::PAGE_COMMUNITY;
+		$fields['prv'] = $user['page-flags'] == self::PAGE_PRVGROUP;
 
 		// it seems as if ported accounts can have wrong values, so we make sure that now everything is fine.
 		$fields['url'] = System::baseUrl() . '/profile/' . $user['nickname'];
@@ -374,7 +426,7 @@ class Contact extends BaseObject
 		}
 
 		if (!empty($contact['batch'])) {
-			$condition = ['batch' => $contact['batch'], 'contact-type' => ACCOUNT_TYPE_RELAY];
+			$condition = ['batch' => $contact['batch'], 'contact-type' => self::ACCOUNT_TYPE_RELAY];
 			DBA::update('contact', $fields, $condition);
 		}
 	}
@@ -1042,7 +1094,7 @@ class Contact extends BaseObject
 
 		$author_id = intval($r[0]["author-id"]);
 
-		$contact = ($r[0]["contact-type"] == ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
+		$contact = ($r[0]["contact-type"] == self::ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
 
 		$condition = ["`$contact` = ? AND `gravity` IN (?, ?) AND " . $sql,
 			$author_id, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
@@ -1071,17 +1123,17 @@ class Contact extends BaseObject
 	{
 		// There are several fields that indicate that the contact or user is a forum
 		// "page-flags" is a field in the user table,
-		// "forum" and "prv" are used in the contact table. They stand for PAGE_COMMUNITY and PAGE_PRVGROUP.
-		// "community" is used in the gcontact table and is true if the contact is PAGE_COMMUNITY or PAGE_PRVGROUP.
-		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_COMMUNITY))
-			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == PAGE_PRVGROUP))
+		// "forum" and "prv" are used in the contact table. They stand for self::PAGE_COMMUNITY and self::PAGE_PRVGROUP.
+		// "community" is used in the gcontact table and is true if the contact is self::PAGE_COMMUNITY or self::PAGE_PRVGROUP.
+		if ((isset($contact['page-flags']) && (intval($contact['page-flags']) == self::PAGE_COMMUNITY))
+			|| (isset($contact['page-flags']) && (intval($contact['page-flags']) == self::PAGE_PRVGROUP))
 			|| (isset($contact['forum']) && intval($contact['forum']))
 			|| (isset($contact['prv']) && intval($contact['prv']))
 			|| (isset($contact['community']) && intval($contact['community']))
 		) {
-			$type = ACCOUNT_TYPE_COMMUNITY;
+			$type = self::ACCOUNT_TYPE_COMMUNITY;
 		} else {
-			$type = ACCOUNT_TYPE_PERSON;
+			$type = self::ACCOUNT_TYPE_PERSON;
 		}
 
 		// The "contact-type" (contact table) and "account-type" (user table) are more general then the chaos from above.
@@ -1094,15 +1146,18 @@ class Contact extends BaseObject
 		}
 
 		switch ($type) {
-			case ACCOUNT_TYPE_ORGANISATION:
+			case self::ACCOUNT_TYPE_ORGANISATION:
 				$account_type = L10n::t("Organisation");
 				break;
-			case ACCOUNT_TYPE_NEWS:
+
+			case self::ACCOUNT_TYPE_NEWS:
 				$account_type = L10n::t('News');
 				break;
-			case ACCOUNT_TYPE_COMMUNITY:
+
+			case self::ACCOUNT_TYPE_COMMUNITY:
 				$account_type = L10n::t("Forum");
 				break;
+
 			default:
 				$account_type = "";
 				break;
@@ -1553,7 +1608,7 @@ class Contact extends BaseObject
 			/// @TODO Encapsulate this into a function/method
 			$fields = ['uid', 'username', 'email', 'page-flags', 'notify-flags', 'language'];
 			$user = DBA::selectFirst('user', $fields, ['uid' => $importer['uid']]);
-			if (DBA::isResult($user) && !in_array($user['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
+			if (DBA::isResult($user) && !in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
 				// create notification
 				$hash = random_string();
 
@@ -1566,7 +1621,7 @@ class Contact extends BaseObject
 				Group::addMember(User::getDefaultGroup($importer['uid'], $contact_record["network"]), $contact_record['id']);
 
 				if (($user['notify-flags'] & NOTIFY_INTRO) &&
-					in_array($user['page-flags'], [PAGE_NORMAL])) {
+					in_array($user['page-flags'], [self::PAGE_NORMAL])) {
 
 					notification([
 						'type'         => NOTIFY_INTRO,
@@ -1575,7 +1630,7 @@ class Contact extends BaseObject
 						'to_name'      => $user['username'],
 						'to_email'     => $user['email'],
 						'uid'          => $user['uid'],
-						'link'		   => System::baseUrl() . '/notifications/intro',
+						'link'         => System::baseUrl() . '/notifications/intro',
 						'source_name'  => ((strlen(stripslashes($contact_record['name']))) ? stripslashes($contact_record['name']) : L10n::t('[Name Withheld]')),
 						'source_link'  => $contact_record['url'],
 						'source_photo' => $contact_record['photo'],
@@ -1584,7 +1639,7 @@ class Contact extends BaseObject
 					]);
 
 				}
-			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [PAGE_SOAPBOX, PAGE_FREELOVE, PAGE_COMMUNITY])) {
+			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
 				q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
 						intval($importer['uid']),
 						DBA::escape($url)
@@ -1751,5 +1806,5 @@ class Contact extends BaseObject
 		}
 
 		return $redirect;
-        }
+	}
 }

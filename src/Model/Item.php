@@ -2473,8 +2473,8 @@ class Item extends BaseObject
 			return;
 		}
 
-		$community_page = (($user['page-flags'] == PAGE_COMMUNITY) ? true : false);
-		$prvgroup = (($user['page-flags'] == PAGE_PRVGROUP) ? true : false);
+		$community_page = (($user['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
+		$prvgroup = (($user['page-flags'] == Contact::PAGE_PRVGROUP) ? true : false);
 
 		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {

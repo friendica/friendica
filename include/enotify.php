@@ -9,6 +9,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
@@ -53,7 +54,7 @@ function notification($params)
 			['uid' => $params['uid']]);
 
 		// There is no need to create notifications for forum accounts
-		if (!DBA::isResult($user) || in_array($user["page-flags"], [PAGE_COMMUNITY, PAGE_PRVGROUP])) {
+		if (!DBA::isResult($user) || in_array($user["page-flags"], [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP])) {
 			return;
 		}
 	}

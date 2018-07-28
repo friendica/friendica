@@ -23,14 +23,16 @@
 	</div>
 
 	<div class="panel-body">
-		<h3 class="fn p-name">{{$name}}</h3>
+		<div class="profile-header">
+			<h3 class="fn p-name">{{$name}}</h3>
 
-		{{if $addr}}<div class="p-addr">{{$addr}}</div>{{/if}}
+			{{if $addr}}<div class="p-addr">{{$addr}}</div>{{/if}}
 
-		{{if $pdesc}}<div class="title">{{$pdesc}}</div>{{/if}}
+			{{if $pdesc}}<div class="title">{{$pdesc}}</div>{{/if}}
 
-		{{if $account_type}}<div class="account-type">{{$account_type}}</div>{{/if}}
+			{{if $account_type}}<div class="account-type">{{$account_type}}</div>{{/if}}
 
-		{{if $network_name}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$network_name}}</dd></dl>{{/if}}
+			{{if $network_name}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$network_name}}</dd></dl>{{/if}}
+		</div>
 	</div>
 </div>

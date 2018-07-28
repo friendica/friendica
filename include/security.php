@@ -245,7 +245,7 @@ function can_write_wall($owner)
 				intval($cid),
 				intval(Contact::SHARING),
 				intval(Contact::FRIEND),
-				intval(PAGE_COMMUNITY)
+				intval(Contact::PAGE_COMMUNITY)
 			);
 
 			if (DBA::isResult($r)) {

@@ -8,6 +8,7 @@
  */
 namespace Friendica\Core;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Core\Config;
 
@@ -30,7 +31,7 @@ class Config extends BaseObject
 	public static function init()
 	{
 		// Database isn't ready or populated yet
-		if (!(self::getApp()->mode & \Friendica\App::MODE_DBCONFIGAVAILABLE)) {
+		if (!(self::getApp()->mode & App::MODE_DBCONFIGAVAILABLE)) {
 			return;
 		}
 
@@ -54,7 +55,7 @@ class Config extends BaseObject
 	public static function load($family = "config")
 	{
 		// Database isn't ready or populated yet
-		if (!(self::getApp()->mode & \Friendica\App::MODE_DBCONFIGAVAILABLE)) {
+		if (!(self::getApp()->mode & App::MODE_DBCONFIGAVAILABLE)) {
 			return;
 		}
 
@@ -87,7 +88,7 @@ class Config extends BaseObject
 	public static function get($family, $key, $default_value = null, $refresh = false)
 	{
 		// Database isn't ready or populated yet, fallback to file config
-		if (!(self::getApp()->mode & \Friendica\App::MODE_DBCONFIGAVAILABLE)) {
+		if (!(self::getApp()->mode & App::MODE_DBCONFIGAVAILABLE)) {
 			return self::getApp()->getConfigValue($family, $key, $default_value);
 		}
 
@@ -115,7 +116,7 @@ class Config extends BaseObject
 	public static function set($family, $key, $value)
 	{
 		// Database isn't ready or populated yet
-		if (!(self::getApp()->mode & \Friendica\App::MODE_DBCONFIGAVAILABLE)) {
+		if (!(self::getApp()->mode & App::MODE_DBCONFIGAVAILABLE)) {
 			return false;
 		}
 
@@ -140,7 +141,7 @@ class Config extends BaseObject
 	public static function delete($family, $key)
 	{
 		// Database isn't ready or populated yet
-		if (!(self::getApp()->mode & \Friendica\App::MODE_DBCONFIGAVAILABLE)) {
+		if (!(self::getApp()->mode & App::MODE_DBCONFIGAVAILABLE)) {
 			return false;
 		}
 

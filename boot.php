@@ -165,55 +165,6 @@ define('UPDATE_FAILED',  1);
  */
 
 /**
- * @name page/profile types
- *
- * PAGE_NORMAL is a typical personal profile account
- * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
- * PAGE_COMMUNITY automatically approves all friend requests as Contact::SHARING, but with
- *      write access to wall and comments (no email and not included in page owner's ACL lists)
- * PAGE_FREELOVE automatically approves all friend requests as full friends (Contact::FRIEND).
- *
- * @{
- */
-define('PAGE_NORMAL',            0);
-define('PAGE_SOAPBOX',           1);
-define('PAGE_COMMUNITY',         2);
-define('PAGE_FREELOVE',          3);
-define('PAGE_BLOG',              4);
-define('PAGE_PRVGROUP',          5);
-/**
- * @}
- */
-
-/**
- * @name account types
- *
- * ACCOUNT_TYPE_PERSON - the account belongs to a person
- *	Associated page types: PAGE_NORMAL, PAGE_SOAPBOX, PAGE_FREELOVE
- *
- * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
- *	Associated page type: PAGE_SOAPBOX
- *
- * ACCOUNT_TYPE_NEWS - the account is a news reflector
- *	Associated page type: PAGE_SOAPBOX
- *
- * ACCOUNT_TYPE_COMMUNITY - the account is community forum
- *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
- *
- * ACCOUNT_TYPE_RELAY - the account is a relay
- *      This will only be assigned to contacts, not to user accounts
- * @{
- */
-define('ACCOUNT_TYPE_PERSON',      0);
-define('ACCOUNT_TYPE_ORGANISATION', 1);
-define('ACCOUNT_TYPE_NEWS',        2);
-define('ACCOUNT_TYPE_COMMUNITY',   3);
-define('ACCOUNT_TYPE_RELAY',       4);
-/**
- * @}
- */
-
-/**
  * @name CP
  *
  * Type of the community page

@@ -9,6 +9,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\PushSubscriber;
 use Friendica\Model\Queue as QueueModel;
 use Friendica\Model\User;
@@ -136,7 +137,7 @@ class Queue
 				$deliver_status = Diaspora::transmit($owner, $contact, $data, $public, true, 'Queue:' . $q_item['id'], true);
 
 				if ((($deliver_status >= 200) && ($deliver_status <= 299)) ||
-					($contact['contact-type'] == ACCOUNT_TYPE_RELAY)) {
+					($contact['contact-type'] == Contact::ACCOUNT_TYPE_RELAY)) {
 					QueueModel::removeItem($q_item['id']);
 				} else {
 					QueueModel::updateTime($q_item['id']);

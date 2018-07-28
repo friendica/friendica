@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 
 function noscrape_init(App $a)
@@ -30,7 +31,7 @@ function noscrape_init(App $a)
 		'guid'     => $a->profile['guid'],
 		'key'      => $a->profile['pubkey'],
 		'homepage' => System::baseUrl()."/profile/{$which}",
-		'comm'     => ($a->profile['account-type'] == ACCOUNT_TYPE_COMMUNITY),
+		'comm'     => ($a->profile['account-type'] == Contact::ACCOUNT_TYPE_COMMUNITY),
 	];
 
 	if (!$a->profile['net-publish'] || $a->profile['hidewall']) {

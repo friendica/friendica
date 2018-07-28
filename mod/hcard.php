@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 
 function hcard_init(App $a)
@@ -28,7 +29,7 @@ function hcard_init(App $a)
 
 	Profile::load($a, $which, $profile);
 
-	if ((x($a->profile, 'page-flags')) && ($a->profile['page-flags'] == PAGE_COMMUNITY)) {
+	if ((x($a->profile, 'page-flags')) && ($a->profile['page-flags'] == Contact::PAGE_COMMUNITY)) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
 	}
 	if (x($a->profile, 'openidserver')) {
