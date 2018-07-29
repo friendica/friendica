@@ -84,7 +84,7 @@ function add_page_info_data(array $data, $no_photos = false)
 	$hashtags = "";
 	if (isset($data["keywords"]) && count($data["keywords"])) {
 		$hashtags = "\n";
-		foreach ($data["keywords"] AS $keyword) {
+		foreach ($data["keywords"] as $keyword) {
 			/// @TODO make a positive list of allowed characters
 			$hashtag = str_replace([" ", "+", "/", ".", "#", "'", "’", "`", "(", ")", "„", "“"],
 						["", "", "", "", "", "", "", "", "", "", "", ""], $keyword);
@@ -112,7 +112,7 @@ function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklis
 	if (($keyword_blacklist != "") && isset($data["keywords"])) {
 		$list = explode(", ", $keyword_blacklist);
 
-		foreach ($list AS $keyword) {
+		foreach ($list as $keyword) {
 			$keyword = trim($keyword);
 
 			$index = array_search($keyword, $data["keywords"]);
@@ -131,7 +131,7 @@ function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blackl
 
 	$tags = "";
 	if (isset($data["keywords"]) && count($data["keywords"])) {
-		foreach ($data["keywords"] AS $keyword) {
+		foreach ($data["keywords"] as $keyword) {
 			$hashtag = str_replace([" ", "+", "/", ".", "#", "'"],
 				["", "", "", "", "", ""], $keyword);
 
@@ -272,6 +272,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 			WHERE `contact`.`id` = %d AND `user`.`uid` = %d",
 			DBA::escape($contact["id"]), DBA::escape($importer["uid"])
 		);
+
 		if (DBA::isResult($r)) {
 			logger("Now import the DFRN feed");
 			DFRN::import($xml, $r[0], true);
