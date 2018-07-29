@@ -68,7 +68,7 @@ class ArraysTest extends TestCase
 	}
 
 	/**
-	 * @brief Tests if a multi-dim array and an empty delimiter returns the expected string.
+	 * @brief Tests if a 2-dim array and an empty delimiter returns the expected string.
 	 */
 	public function testEmptyMultiArray2EmptyDelimiter()
 	{
@@ -77,7 +77,7 @@ class ArraysTest extends TestCase
 	}
 
 	/**
-	 * @brief Tests if a multi-dim array and an empty delimiter returns the expected string.
+	 * @brief Tests if a 2-dim array and an empty delimiter returns the expected string.
 	 */
 	public function testEmptyMulti2Array2EmptyDelimiter()
 	{
@@ -86,7 +86,7 @@ class ArraysTest extends TestCase
 	}
 
 	/**
-	 * @brief Tests if a multi-dim array and a non-empty delimiter returns the expected string.
+	 * @brief Tests if a 2-dim array and a non-empty delimiter returns the expected string.
 	 */
 	public function testEmptyMultiArray2NonEmptyDelimiter()
 	{
@@ -95,11 +95,20 @@ class ArraysTest extends TestCase
 	}
 
 	/**
-	 * @brief Tests if a multi-dim array and a non-empty delimiter returns the expected string.
+	 * @brief Tests if a 2-dim array and a non-empty delimiter returns the expected string.
 	 */
 	public function testEmptyMulti2Array2NonEmptyDelimiter()
 	{
 		$str = Arrays::recursiveImplode([[1], [2]], ',');
 		$this->assertSame($str, '{1},{2}');
+	}
+
+	/**
+	 * @brief Tests if a 3-dim array and a non-empty delimiter returns the expected string.
+	 */
+	public function testEmptyMulti3Array2NonEmptyDelimiter()
+	{
+		$str = Arrays::recursiveImplode([[1], [2, [3]]], ',');
+		$this->assertSame($str, '{1},{2,{3}}');
 	}
 }
