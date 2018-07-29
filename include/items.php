@@ -3,6 +3,7 @@
  * @file include/items.php
  */
 
+use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -23,7 +24,8 @@ require_once 'include/text.php';
 require_once 'mod/share.php';
 require_once 'include/enotify.php';
 
-function add_page_info_data($data, $no_photos = false) {
+function add_page_info_data(array $data, $no_photos = false)
+{
 	Addon::callHooks('page_info_data', $data);
 
 	// It maybe is a rich content, but if it does have everything that a link has,
@@ -93,8 +95,8 @@ function add_page_info_data($data, $no_photos = false) {
 	return "\n".$text.$hashtags;
 }
 
-function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklist = "") {
-
+function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklist = "")
+{
 	$data = ParseUrl::getSiteinfoCached($url, true);
 
 	if ($photo != "") {
@@ -109,8 +111,10 @@ function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklis
 
 	if (($keyword_blacklist != "") && isset($data["keywords"])) {
 		$list = explode(", ", $keyword_blacklist);
+
 		foreach ($list AS $keyword) {
 			$keyword = trim($keyword);
+
 			$index = array_search($keyword, $data["keywords"]);
 			if ($index !== false) {
 				unset($data["keywords"][$index]);
@@ -121,7 +125,8 @@ function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklis
 	return $data;
 }
 
-function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blacklist = "") {
+function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blacklist = "")
+{
 	$data = query_page_info($url, $photo, $keywords, $keyword_blacklist);
 
 	$tags = "";
@@ -141,7 +146,8 @@ function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blackl
 	return $tags;
 }
 
-function add_page_info($url, $no_photos = false, $photo = "", $keywords = false, $keyword_blacklist = "") {
+function add_page_info($url, $no_photos = false, $photo = "", $keywords = false, $keyword_blacklist = "")
+{
 	$data = query_page_info($url, $photo, $keywords, $keyword_blacklist);
 
 	$text = add_page_info_data($data, $no_photos);
@@ -149,8 +155,8 @@ function add_page_info($url, $no_photos = false, $photo = "", $keywords = false,
 	return $text;
 }
 
-function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
-
+function add_page_info_to_body($body, $texturl = false, $no_photos = false)
+{
 	logger('add_page_info_to_body: fetch page info for body ' . $body, LOGGER_DEBUG);
 
 	$URLSearchString = "^\[\]";
@@ -227,10 +233,9 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false) {
  * model where comments can have sub-threads. That would require some massive sorting
  * to get all the feed items into a mostly linear ordering, and might still require
  * recursion.
- *
- * @TODO find proper type-hints
  */
-function consume_feed($xml, $importer, $contact, &$hub, $datedir = 0, $pass = 0) {
+function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0, $pass = 0)
+{
 	if ($contact['network'] === NETWORK_OSTATUS) {
 		if ($pass < 2) {
 			// Test - remove before flight
@@ -239,6 +244,7 @@ function consume_feed($xml, $importer, $contact, &$hub, $datedir = 0, $pass = 0)
 			logger("Consume OStatus messages ", LOGGER_DEBUG);
 			OStatus::import($xml, $importer, $contact, $hub);
 		}
+
 		return;
 	}
 
@@ -247,6 +253,7 @@ function consume_feed($xml, $importer, $contact, &$hub, $datedir = 0, $pass = 0)
 			logger("Consume feeds", LOGGER_DEBUG);
 			Feed::import($xml, $importer, $contact, $hub);
 		}
+
 		return;
 	}
 
@@ -273,12 +280,12 @@ function consume_feed($xml, $importer, $contact, &$hub, $datedir = 0, $pass = 0)
 	}
 }
 
-function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
-
-	$a = get_app();
+function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'subscribe')
+{
+	$a = BaseObject::getApp();
 	$r = null;
 
-	if (is_array($importer)) {
+	if (!empty($importer)) {
 		$r = q("SELECT `nickname` FROM `user` WHERE `uid` = %d LIMIT 1",
 			intval($importer['uid'])
 		);
@@ -314,26 +321,28 @@ function subscribe_to_hub($url, $importer, $contact, $hubmode = 'subscribe') {
 
 }
 
-/// @TODO type-hint is array
-function drop_items($items) {
+function drop_items(array $items)
+{
 	$uid = 0;
 
 	if (!local_user() && !remote_user()) {
 		return;
 	}
 
-	if (count($items)) {
+	if (!empty($items)) {
 		foreach ($items as $item) {
 			$owner = Item::deleteForUser(['id' => $item], local_user());
-			if ($owner && !$uid)
+
+			if ($owner && !$uid) {
 				$uid = $owner;
+			}
 		}
 	}
 }
 
-function drop_item($id) {
-
-	$a = get_app();
+function drop_item($id)
+{
+	$a = BaseObject::getApp();
 
 	// locate item to be deleted
 
@@ -353,7 +362,7 @@ function drop_item($id) {
 
 	// check if logged in user is either the author or owner of this item
 
-	if (is_array($_SESSION['remote'])) {
+	if (!empty($_SESSION['remote'])) {
 		foreach ($_SESSION['remote'] as $visitor) {
 			if ($visitor['uid'] == $item['uid'] && $visitor['cid'] == $item['contact-id']) {
 				$contact_id = $visitor['cid'];
@@ -369,6 +378,7 @@ function drop_item($id) {
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
 			$inputs = [];
+
 			foreach ($query['args'] as $arg) {
 				if (strpos($arg, 'confirm=') === false) {
 					$arg_parts = explode('=', $arg);
@@ -404,7 +414,8 @@ function drop_item($id) {
 }
 
 /* arrange the list in years */
-function list_post_dates($uid, $wall) {
+function list_post_dates($uid, $wall)
+{
 	$dnow = DateTimeFormat::localNow('Y-m-d');
 
 	$dthen = Item::firstPostDate($uid, $wall);
@@ -440,7 +451,8 @@ function list_post_dates($uid, $wall) {
 	return $ret;
 }
 
-function posted_date_widget($url, $uid, $wall) {
+function posted_date_widget($url, $uid, $wall)
+{
 	$o = '';
 
 	if (!Feature::isEnabled($uid, 'archives')) {
@@ -454,10 +466,7 @@ function posted_date_widget($url, $uid, $wall) {
 		return $o;
 	*/
 
-	$visible_years = PConfig::get($uid,'system','archive_visible_years');
-	if (!$visible_years) {
-		$visible_years = 5;
-	}
+	$visible_years = PConfig::get($uid, 'system', 'archive_visible_years', 5);
 
 	$ret = list_post_dates($uid, $wall);
 
