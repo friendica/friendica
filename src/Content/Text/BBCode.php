@@ -585,7 +585,7 @@ class BBCode extends BaseObject
 					$return .= sprintf('<h4><a href="%s">%s</a></h4>', $data['url'], $data['title']);
 				}
 
-				if ($data["description"] != "" && $data["description"] != $data["title"]) {
+				if (!empty($data["description"]) && $data["description"] != $data["title"]) {
 					// Sanitize the HTML by converting it to BBCode
 					$bbcode = HTML::toBBCode($data["description"]);
 					$return .= sprintf('<blockquote>%s</blockquote>', trim(self::convert($bbcode)));

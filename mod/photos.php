@@ -123,7 +123,10 @@ function photos_init(App $a) {
 		}
 
 		$a->page['aside'] .= $vcard_widget;
-		$a->page['aside'] .= $photo_albums_widget;
+
+		if (!empty($photo_albums_widget)) {
+			$a->page['aside'] .= $photo_albums_widget;
+		}
 
 		$tpl = get_markup_template("photos_head.tpl");
 

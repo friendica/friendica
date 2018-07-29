@@ -311,7 +311,12 @@ class Addon
 			foreach ($ll as $l) {
 				$l = trim($l, "\t\n\r */");
 				if ($l != "") {
-					list($type, $v) = array_map("trim", explode(":", $l, 2));
+					$addon_info = array_map("trim", explode(":", $l, 2));
+					if (count($addon_info) < 2) {
+						continue;
+					}
+
+					list($type, $v) = $addon_info;
 					$type = strtolower($type);
 					if ($type == "author" || $type == "maintainer") {
 						$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
