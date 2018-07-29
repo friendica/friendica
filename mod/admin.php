@@ -21,6 +21,7 @@ use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 use Friendica\Module\Tos;
+use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -783,9 +784,9 @@ function admin_page_workerqueue(App $a)
 	$statement = DBA::select('workerqueue', ['id', 'parameter', 'created', 'priority'], ['done' => 0], ['order'=> ['priority']]);
 	$r = DBA::toArray($statement);
 
-	for($i = 0; $i < count($r); $i++) {
+	foreach ($r as $key => $rr) {
 		// fix GH-5469. ref: src/Core/Worker.php:217
-		$r[$i]['parameter'] = implode(json_decode($r[$i]['parameter'], true), ': ');
+		$r[$key]['parameter'] = Arrays::recursiveImplode(json_decode($rr['parameter'], true), ': ');
 	}
 
 	$t = get_markup_template('admin/workerqueue.tpl');
