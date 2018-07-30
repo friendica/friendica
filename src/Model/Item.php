@@ -2887,9 +2887,9 @@ class Item extends BaseObject
 				continue;
 			} elseif (!$expire_starred && intval($item['starred'])) {
 				continue;
-			} elseif (!$expire_notes && $item['type'] == 'note') {
+			} elseif (!$expire_notes && (($item['type'] == 'note') || ($item['post-type'] == Item::PT_PERSONAL_NOTE))) {
 				continue;
-			} elseif (!$expire_items && $item['type'] != 'note') {
+			} elseif (!$expire_items && ($item['type'] != 'note') && ($item['post-type'] != Item::PT_PERSONAL_NOTE)) {
 				continue;
 			}
 

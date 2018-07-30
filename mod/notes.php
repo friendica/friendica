@@ -59,7 +59,7 @@ function notes_content(App $a, $update = false)
 	}
 
 	$condition = ['uid' => local_user(), 'post-type' => Item::PT_PERSONAL_NOTE, 'gravity' => GRAVITY_PARENT,
-		'wall' => false, 'allow_cid' => '<' . $a->contact['id'] . '>', 'contact-id'=> $a->contact['id']];
+		'wall' => false, 'contact-id'=> $a->contact['id']];
 
 	$a->set_pager_itemspage(40);
 
