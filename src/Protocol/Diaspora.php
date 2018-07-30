@@ -1374,6 +1374,10 @@ class Diaspora
 		$item = Item::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
+			if (!isset($contact["url"])) {
+				logger('Missing URL: ' . System::callstack() . ' - ' . json_encode($contact));
+			}
+
 			$result = self::storeByGuid($guid, $contact["url"], $uid);
 
 			if (!$result) {

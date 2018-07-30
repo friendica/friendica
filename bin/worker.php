@@ -9,6 +9,7 @@ use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
+use Friendica\Core\L10n;
 
 // Get options
 $shortopts = 'sn';
@@ -32,6 +33,9 @@ require_once "boot.php";
 $a = new App(dirname(__DIR__));
 
 Config::load();
+
+$lang = L10n::getBrowserLanguage();
+L10n::loadTranslationTable($lang);
 
 // Check the database structure and possibly fixes it
 check_db(true);

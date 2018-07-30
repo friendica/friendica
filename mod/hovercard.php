@@ -54,10 +54,32 @@ function hovercard_content()
 	$contact = [];
 	// if it's the url containing https it should be converted to http
 	$nurl = normalise_link(GContact::cleanContactUrl($profileurl));
-	if ($nurl) {
-		// Search for contact data
+	if (!$nurl) {
+		return;
+	}
+
+	// Search for contact data
+	// Look if the local user has got the contact
+	if (local_user()) {
+		$contact = Contact::getDetailsByURL($nurl, local_user());
+	}
+
+	// If not then check the global user
+	if (!count($contact)) {
 		$contact = Contact::getDetailsByURL($nurl);
 	}
+
+	// Feeds url could have been destroyed through "cleanContactUrl", so we now use the original url
+	if (!count($contact) && local_user()) {
+		$nurl = normalise_link($profileurl);
+		$contact = Contact::getDetailsByURL($nurl, local_user());
+	}
+
+	if (!count($contact)) {
+		$nurl = normalise_link($profileurl);
+		$contact = Contact::getDetailsByURL($nurl);
+	}
+
 	if (!count($contact)) {
 		return;
 	}
