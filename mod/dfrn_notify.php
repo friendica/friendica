@@ -213,6 +213,14 @@ function dfrn_dispatch_public($postdata)
 
 	// We now have some contact, so we fetch it
 	$importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
+					'' AS `uprvkey`,
+					'UTC' AS `timezone`,
+					'' AS `nickname`,
+					'' AS `sprvkey`,
+					'' AS `spubkey`,
+					0 AS `page-flags`,
+					0 AS `account-type`,
+					0 AS `prvnets`
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$contact['id']);

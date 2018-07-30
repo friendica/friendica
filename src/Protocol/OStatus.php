@@ -1610,6 +1610,8 @@ class OStatus
 			$contact["alias"] = $contact["url"];
 		}
 
+		$contact['account-type'] = $owner['account-type'];
+
 		return $contact;
 	}
 
@@ -1640,7 +1642,6 @@ class OStatus
 		}
 
 		$contact = self::contactEntry($repeated_item['author-link'], $owner);
-		$contact['account-type'] = $contact['contact-type'];
 
 		$title = $owner["nick"]." repeated a notice by ".$contact["nick"];
 
