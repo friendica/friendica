@@ -1638,7 +1638,7 @@ class PortableContact
 
 		$retdata = Network::curl($url);
 
-		if ($retdata["success"]) {
+		if ($retdata["success"] && !empty($retdata["body"])) {
 			$data = json_decode($retdata["body"], true);
 
 			self::discoverServer($data, 2);
@@ -1659,7 +1659,7 @@ class PortableContact
 
 				$retdata = Network::curl($url);
 
-				if ($retdata["success"]) {
+				if ($retdata["success"] && !empty($retdata["body"])) {
 					logger("Fetch all global contacts from the server " . $server["nurl"], LOGGER_DEBUG);
 					$success = self::discoverServer(json_decode($retdata["body"], true));
 				}
