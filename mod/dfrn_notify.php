@@ -212,7 +212,8 @@ function dfrn_dispatch_public($postdata)
 	}
 
 	// We now have some contact, so we fetch it
-	$importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
+	$importer = DBA::fetchFirst("SELECT *, `name` as `senderName`,
+					0 AS `importer_uid`,
 					'' AS `uprvkey`,
 					'UTC' AS `timezone`,
 					'' AS `nickname`,
@@ -224,8 +225,6 @@ function dfrn_dispatch_public($postdata)
 					FROM `contact`
 					WHERE NOT `blocked` AND `id` = ? LIMIT 1",
 					$contact['id']);
-
-	$importer['importer_uid']  = 0;
 
 	// This should never fail
 	if (!DBA::isResult($importer)) {
