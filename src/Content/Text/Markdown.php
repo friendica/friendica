@@ -53,6 +53,10 @@ class Markdown extends BaseObject
 
 		$data = Contact::getDetailsByAddr($match[2]);
 
+		if (empty($data)) {
+			return;
+		}
+
 		$name = $match[1];
 
 		if ($name == '') {

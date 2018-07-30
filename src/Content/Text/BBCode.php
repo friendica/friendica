@@ -627,15 +627,15 @@ class BBCode extends BaseObject
 		}
 
 		// If the link already is included in the post, don't add it again
-		if (($data["url"] != "") && strpos($data["text"], $data["url"])) {
+		if (!empty($data["url"]) && strpos($data["text"], $data["url"])) {
 			return $data["text"] . $data["after"];
 		}
 
 		$text = $data["text"];
 
-		if (($data["url"] != "") && ($data["title"] != "")) {
+		if (!empty($data["url"]) && ($data["title"] != "")) {
 			$text .= "\n[url=" . $data["url"] . "]" . $data["title"] . "[/url]";
-		} elseif (($data["url"] != "")) {
+		} elseif (!empty($data["url"])) {
 			$text .= "\n[url]" . $data["url"] . "[/url]";
 		}
 

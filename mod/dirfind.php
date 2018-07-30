@@ -211,7 +211,7 @@ function dirfind_content(App $a, $prefix = "") {
 						$photo_menu = [];
 					}
 				} else {
-					$connlnk = System::baseUrl().'/follow/?url='.(($jj->connect) ? $jj->connect : $jj->url);
+					$connlnk = System::baseUrl().'/follow/?url='.(!empty($jj->connect) ? $jj->connect : $jj->url);
 					$conntxt = L10n::t('Connect');
 					$photo_menu = [
 						'profile' => [L10n::t("View Profile"), Contact::magicLink($jj->url)],

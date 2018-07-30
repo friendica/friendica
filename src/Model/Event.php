@@ -76,12 +76,14 @@ class Event extends BaseObject
 
 		if (!$event['nofinish']) {
 			$o .= '<div class="event-end" ><span class="event-label">' . L10n::t('Finishes:') . '</span>&nbsp;<span class="dtend" title="'
-				. DateTimeFormat::utc($event['finish'], (($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
+				. DateTimeFormat::utc($event['finish'], (!empty($event['adjust']) ? DateTimeFormat::ATOM : 'Y-m-d\TH:i:s'))
 				. '" >' . $event_end
 				. '</span></div>' . "\r\n";
 		}
 
-		$o .= '<div class="description event-description">' . BBCode::convert($event['desc'], false, $simple) . '</div>' . "\r\n";
+		if (!empty($event['desc'])) {
+			$o .= '<div class="description event-description">' . BBCode::convert($event['desc'], false, $simple) . '</div>' . "\r\n";
+		}
 
 		if (strlen($event['location'])) {
 			$o .= '<div class="event-location"><span class="event-label">' . L10n::t('Location:') . '</span>&nbsp;<span class="location">'
