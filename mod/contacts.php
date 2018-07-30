@@ -188,7 +188,7 @@ function contacts_post(App $a)
 
 	Addon::callHooks('contact_edit_post', $_POST);
 
-	$profile_id = intval($_POST['profile-assign']);
+	$profile_id = intval(defaults($_POST, 'profile-assign', 0));
 	if ($profile_id) {
 		if (!DBA::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
 			notice(L10n::t('Could not locate selected profile.') . EOL);
@@ -200,11 +200,11 @@ function contacts_post(App $a)
 
 	$notify = intval($_POST['notify']);
 
-	$fetch_further_information = intval($_POST['fetch_further_information']);
+	$fetch_further_information = intval(defaults($_POST, 'fetch_further_information', 0));
 
-	$ffi_keyword_blacklist = escape_tags(trim($_POST['ffi_keyword_blacklist']));
+	$ffi_keyword_blacklist = escape_tags(trim(defaults($_POST, 'ffi_keyword_blacklist', '')));
 
-	$priority = intval($_POST['poll']);
+	$priority = intval(defaults($_POST, 'poll', 0));
 	if ($priority > 5 || $priority < 0) {
 		$priority = 0;
 	}
