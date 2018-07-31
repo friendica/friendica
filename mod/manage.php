@@ -132,7 +132,7 @@ function manage_content(App $a) {
 		return;
 	}
 
-	if ($_GET['identity']) {
+	if (!empty($_GET['identity'])) {
 		$_POST['identity'] = $_GET['identity'];
 		manage_post($a);
 		return;

@@ -199,7 +199,7 @@ class Profile
 	 */
 	public static function getByNickname($nickname, $uid = 0, $profile_id = 0)
 	{
-		if (remote_user() && count($_SESSION['remote'])) {
+		if (remote_user() && !empty($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $uid) {
 					$contact = DBA::selectFirst('contact', ['profile-id'], ['id' => $visitor['cid']]);
@@ -293,7 +293,7 @@ class Profile
 		$connect = $profile['uid'] != local_user() ? L10n::t('Connect') : false;
 
 		// don't show connect link to authenticated visitors either
-		if (remote_user() && count($_SESSION['remote'])) {
+		if (remote_user() && !empty($_SESSION['remote'])) {
 			foreach ($_SESSION['remote'] as $visitor) {
 				if ($visitor['uid'] == $profile['uid']) {
 					$connect = false;

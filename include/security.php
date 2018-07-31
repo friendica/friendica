@@ -179,7 +179,7 @@ function authenticate_success($user_record, $login_initial = false, $interactive
 		 * The cookie will be renewed automatically.
 		 * The week ensures that sessions will expire after some inactivity.
 		 */
-		if ($_SESSION['remember']) {
+		if (!empty($_SESSION['remember'])) {
 			logger('Injecting cookie for remembered user ' . $a->user['nickname']);
 			new_cookie(604800, $user_record);
 			unset($_SESSION['remember']);
@@ -225,7 +225,7 @@ function can_write_wall($owner)
 		} else {
 			$cid = 0;
 
-			if (is_array($_SESSION['remote'])) {
+			if (!empty($_SESSION['remote'])) {
 				foreach ($_SESSION['remote'] as $visitor) {
 					if ($visitor['uid'] == $owner) {
 						$cid = $visitor['cid'];

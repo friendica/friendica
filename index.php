@@ -100,7 +100,7 @@ if (x($_SESSION, 'authenticated') && !x($_SESSION, 'language')) {
 	}
 }
 
-if ((x($_SESSION, 'language')) && ($_SESSION['language'] !== $lang)) {
+if (x($_SESSION, 'language') && ($_SESSION['language'] !== $lang)) {
 	$lang = $_SESSION['language'];
 	L10n::loadTranslationTable($lang);
 }
