@@ -146,7 +146,7 @@ function add_page_info($url, $no_photos = false, $photo = "", $keywords = false,
 
 	$text = '';
 
-	if (is_array($data) {
+	if (is_array($data)) {
 		$text = add_page_info_data($data, $no_photos);
 	}
 
