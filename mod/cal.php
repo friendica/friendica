@@ -28,7 +28,7 @@ function cal_init(App $a)
 		DFRN::autoRedir($a, $a->argv[1]);
 	}
 
-	if ((Config::get('system', 'block_public')) && (!local_user()) && (!remote_user())) {
+	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 		return;
 	}
 
@@ -84,13 +84,20 @@ function cal_content(App $a)
 	// get the translation strings for the callendar
 	$i18n = Event::getStrings();
 
+	if (!empty($a->data['user'])) {
+		$nickname = $a->data['user']['nickname'];
+	} else {
+		$nickname = '';
+	}
+
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
 		'$baseurl' => System::baseUrl(),
-		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$modparams' => 2,
+		'$module_url' => '/cal/' . $nickname,
 		'$i18n' => $i18n,
 	]);
+
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl, [
@@ -100,7 +107,7 @@ function cal_content(App $a)
 	$mode = 'view';
 	$y = 0;
 	$m = 0;
-	$ignored = ((x($_REQUEST, 'ignored')) ? intval($_REQUEST['ignored']) : 0);
+	$ignored = (x($_REQUEST, 'ignored') ? intval($_REQUEST['ignored']) : 0);
 
 	$format = 'ical';
 	if ($a->argc == 4 && $a->argv[2] == 'export') {
@@ -111,9 +118,13 @@ function cal_content(App $a)
 	// Setup permissions structures
 	$remote_contact = false;
 	$contact_id = 0;
+	$owner_uid = 0;
+	$nick = '';
 
-	$owner_uid = $a->data['user']['uid'];
-	$nick = $a->data['user']['nickname'];
+	if (!empty($a->data['user'])) {
+		$owner_uid = $a->data['user']['uid'];
+		$nick = $a->data['user']['nickname'];
+	}
 
 	if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
 		foreach ($_SESSION['remote'] as $v) {
@@ -138,7 +149,7 @@ function cal_content(App $a)
 
 	$is_owner = local_user() == $a->profile['profile_uid'];
 
-	if ($a->profile['hidewall'] && (!$is_owner) && (!$remote_contact)) {
+	if ($a->profile['hidewall'] && !$is_owner && !$remote_contact) {
 		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
@@ -149,7 +160,11 @@ function cal_content(App $a)
 	$sql_extra = " AND `event`.`cid` = 0 " . $sql_perms;
 
 	// get the tab navigation bar
-	$tabs = Profile::getTabs($a, false, $a->data['user']['nickname']);
+	if (!empty($a->data['user'])) {
+		$tabs = Profile::getTabs($a, false, $a->data['user']['nickname']);
+	} else {
+		$tabs = '';
+	}
 
 	// The view mode part is similiar to /mod/events.php
 	if ($mode == 'view') {
@@ -293,7 +308,7 @@ function cal_content(App $a)
 	}
 
 	if ($mode == 'export') {
-		if (!(intval($owner_uid))) {
+		if (!intval($owner_uid)) {
 			notice(L10n::t('User not found'));
 			return;
 		}

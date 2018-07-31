@@ -4089,7 +4089,7 @@ class Diaspora
 				$arr = explode(' ', $profile['pub_keywords']);
 				if (count($arr)) {
 					for ($x = 0; $x < 5; $x ++) {
-						if (trim($arr[$x])) {
+						if (!empty($arr[$x])) {
 							$tags .= '#'. trim($arr[$x]) .' ';
 						}
 					}

@@ -339,6 +339,11 @@ class Contact extends BaseObject
 			$item = [];
 			$item['verb'] = NAMESPACE_OSTATUS . "/unfollow";
 			$item['follow'] = $contact["url"];
+			$item['body'] = '';
+			$item['title'] = '';
+			$item['guid'] = '';
+			$item['tag'] = '';
+			$item['attach'] = '';
 			$slap = OStatus::salmon($item, $user);
 
 			if (!empty($contact['notify'])) {
@@ -1505,6 +1510,11 @@ class Contact extends BaseObject
 				$item = [];
 				$item['verb'] = ACTIVITY_FOLLOW;
 				$item['follow'] = $contact["url"];
+				$item['body'] = '';
+				$item['title'] = '';
+				$item['guid'] = '';
+				$item['tag'] = '';
+				$item['attach'] = '';
 				$slap = OStatus::salmon($item, $r[0]);
 				if (!empty($contact['notify'])) {
 					Salmon::slapper($r[0], $contact['notify'], $slap);
