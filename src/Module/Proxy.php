@@ -25,33 +25,6 @@ class Proxy extends BaseModule
 {
 
 	/**
-	 * Default time to keep images in proxy storage
-	 */
-	const DEFAULT_TIME = 86400; // 1 Day
-
-	/**
-	 * Sizes constants
-	 */
-	const SIZE_MICRO  = 'micro';
-	const SIZE_THUMB  = 'thumb';
-	const SIZE_SMALL  = 'small';
-	const SIZE_MEDIUM = 'medium';
-	const SIZE_LARGE  = 'large';
-
-	/**
-	 * Accepted extensions
-	 *
-	 * @var array
-	 * @todo Make this configurable?
-	 */
-	private static $extensions = [
-		'jpg',
-		'jpeg',
-		'gif',
-		'png',
-	];
-
-	/**
 	 * @brief Initializer method for this class.
 	 *
 	 * Sets application instance and checks if /proxy/ path is writable.
@@ -86,7 +59,7 @@ class Proxy extends BaseModule
 			}
 
 			/// @TODO Stop here?
-			killme();
+			exit();
 		}
 
 		if (function_exists('header_remove')) {
@@ -184,7 +157,7 @@ class Proxy extends BaseModule
 				}
 
 				echo $img_str;
-				killme();
+				exit();
 			}
 		} else {
 			$cachefile = '';
@@ -289,7 +262,7 @@ class Proxy extends BaseModule
 
 		echo $img_str;
 
-		killme();
+		exit();
 	}
 
 }
