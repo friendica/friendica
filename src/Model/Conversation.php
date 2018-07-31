@@ -40,6 +40,7 @@ class Conversation
 			if (isset($arr['parent-uri']) && ($arr['parent-uri'] != $arr['uri'])) {
 				$conversation['reply-to-uri'] = $arr['parent-uri'];
 			}
+
 			if (isset($arr['thr-parent']) && ($arr['thr-parent'] != $arr['uri'])) {
 				$conversation['reply-to-uri'] = $arr['thr-parent'];
 			}
