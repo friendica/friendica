@@ -19,7 +19,7 @@ use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\XML;
 
 require_once 'include/enotify.php';

@@ -23,7 +23,7 @@ use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\XML;
 
 require_once 'include/dba.php';

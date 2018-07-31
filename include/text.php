@@ -20,7 +20,7 @@ use Friendica\Model\Item;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 
 require_once "include/conversation.php";
 

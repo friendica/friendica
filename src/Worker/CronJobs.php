@@ -16,7 +16,7 @@ use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 
 require_once 'include/dba.php';
 require_once 'mod/nodeinfo.php';

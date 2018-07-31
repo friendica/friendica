@@ -10,9 +10,9 @@ use Friendica\Core\System;
 require_once 'include/security.php';
 
 /**
- * @brief Proxy utilities
+ * @brief Proxy utilities class
  */
-class ProxyUtils
+class Proxy
 {
 
 	/**

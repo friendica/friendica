@@ -24,7 +24,7 @@ use Friendica\Object\Image;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use League\HTMLToMarkdown\HtmlConverter;
 
 class BBCode extends BaseObject

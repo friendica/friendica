@@ -14,7 +14,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Temporal;
 
 require_once 'include/conversation.php';

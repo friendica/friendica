@@ -40,7 +40,7 @@ use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\XML;
 
 require_once 'include/conversation.php';

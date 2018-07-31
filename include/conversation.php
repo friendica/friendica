@@ -20,7 +20,7 @@ use Friendica\Model\Term;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
 

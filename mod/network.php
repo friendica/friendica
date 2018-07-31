@@ -22,7 +22,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 
 require_once 'include/conversation.php';
 require_once 'include/items.php';

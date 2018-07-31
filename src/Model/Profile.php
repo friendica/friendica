@@ -20,7 +20,7 @@ use Friendica\Model\Contact;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Temporal;
 
 require_once 'include/dba.php';

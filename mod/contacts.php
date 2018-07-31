@@ -19,7 +19,7 @@ use Friendica\Model\Group;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\ProxyUtils;
+use Friendica\Util\Proxy as ProxyUtils;
 
 function contacts_init(App $a)
 {
