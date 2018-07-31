@@ -12,6 +12,7 @@ namespace Friendica\Network;
 use DOMDocument;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -362,20 +363,20 @@ class Probe
 		}
 
 		if (empty($data["network"])) {
-			$data["network"] = NETWORK_PHANTOM;
+			$data["network"] = Protocol::PHANTOM;
 		}
 
 		$data = self::rearrangeData($data);
 
 		// Only store into the cache if the value seems to be valid
-		if (!in_array($data['network'], [NETWORK_PHANTOM, NETWORK_MAIL])) {
+		if (!in_array($data['network'], [Protocol::PHANTOM, Protocol::MAIL])) {
 			Cache::set("Probe::uri:".$network.":".$uri, $data, CACHE_DAY);
 
 			/// @todo temporary fix - we need a real contact update function that updates only changing fields
 			/// The biggest problem is the avatar picture that could have a reduced image size.
 			/// It should only be updated if the existing picture isn't existing anymore.
 			/// We only update the contact when it is no probing for a specific network.
-			if (($data['network'] != NETWORK_FEED)
+			if (($data['network'] != Protocol::FEED)
 				&& ($network == "")
 				&& $data["name"]
 				&& $data["nick"]
@@ -568,7 +569,7 @@ class Probe
 			}
 
 			if ($host == 'twitter.com') {
-				return ["network" => NETWORK_TWITTER];
+				return ["network" => Protocol::TWITTER];
 			}
 			$lrdd = self::hostMeta($host);
 
@@ -599,7 +600,7 @@ class Probe
 				return self::mail($uri, $uid);
 			}
 
-			if ($network == NETWORK_MAIL) {
+			if ($network == Protocol::MAIL) {
 				return self::mail($uri, $uid);
 			}
 			// Remove "acct:" from the URI
@@ -609,7 +610,7 @@ class Probe
 			$nick = substr($uri, 0, strpos($uri, '@'));
 
 			if (strpos($uri, '@twitter.com')) {
-				return ["network" => NETWORK_TWITTER];
+				return ["network" => Protocol::TWITTER];
 			}
 			$lrdd = self::hostMeta($host);
 
@@ -670,19 +671,19 @@ class Probe
 
 		logger("Probing ".$uri, LOGGER_DEBUG);
 
-		if (in_array($network, ["", NETWORK_DFRN])) {
+		if (in_array($network, ["", Protocol::DFRN])) {
 			$result = self::dfrn($webfinger);
 		}
-		if ((!$result && ($network == "")) || ($network == NETWORK_DIASPORA)) {
+		if ((!$result && ($network == "")) || ($network == Protocol::DIASPORA)) {
 			$result = self::diaspora($webfinger);
 		}
-		if ((!$result && ($network == "")) || ($network == NETWORK_OSTATUS)) {
+		if ((!$result && ($network == "")) || ($network == Protocol::OSTATUS)) {
 			$result = self::ostatus($webfinger);
 		}
-		if ((!$result && ($network == "")) || ($network == NETWORK_PUMPIO)) {
+		if ((!$result && ($network == "")) || ($network == Protocol::PUMPIO)) {
 			$result = self::pumpio($webfinger, $addr);
 		}
-		if ((!$result && ($network == "")) || ($network == NETWORK_FEED)) {
+		if ((!$result && ($network == "")) || ($network == Protocol::FEED)) {
 			$result = self::feed($uri);
 		} else {
 			// We overwrite the detected nick with our try if the previois routines hadn't detected it.
@@ -697,7 +698,7 @@ class Probe
 		}
 
 		if (empty($result["network"])) {
-			$result["network"] = NETWORK_PHANTOM;
+			$result["network"] = Protocol::PHANTOM;
 		}
 
 		if (empty($result["url"])) {
@@ -960,7 +961,7 @@ class Probe
 		$data = [];
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == NAMESPACE_DFRN) && ($link["href"] != "")) {
-				$data["network"] = NETWORK_DFRN;
+				$data["network"] = Protocol::DFRN;
 			} elseif (($link["rel"] == NAMESPACE_FEED) && ($link["href"] != "")) {
 				$data["poll"] = $link["href"];
 			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") && ($link["type"] == "text/html") && ($link["href"] != "")) {
@@ -1215,7 +1216,7 @@ class Probe
 			&& isset($data["pubkey"])
 			&& ($hcard_url != "")
 		) {
-			$data["network"] = NETWORK_DIASPORA;
+			$data["network"] = Protocol::DIASPORA;
 
 			// The Diaspora handle must always be lowercase
 			if (!empty($data["addr"])) {
@@ -1302,7 +1303,7 @@ class Probe
 			&& isset($data["poll"])
 			&& isset($data["url"])
 		) {
-			$data["network"] = NETWORK_OSTATUS;
+			$data["network"] = Protocol::OSTATUS;
 		} else {
 			return false;
 		}
@@ -1446,7 +1447,7 @@ class Probe
 			// So we unset all data that isn't used at the moment
 			unset($data["dialback"]);
 
-			$data["network"] = NETWORK_PUMPIO;
+			$data["network"] = Protocol::PUMPIO;
 		} else {
 			return false;
 		}
@@ -1569,7 +1570,7 @@ class Probe
 			$data["baseurl"] = $data["url"];
 		}
 
-		$data["network"] = NETWORK_FEED;
+		$data["network"] = Protocol::FEED;
 
 		return $data;
 	}
@@ -1619,7 +1620,7 @@ class Probe
 
 		$data = [];
 		$data["addr"]    = $uri;
-		$data["network"] = NETWORK_MAIL;
+		$data["network"] = Protocol::MAIL;
 		$data["name"]    = substr($uri, 0, strpos($uri, '@'));
 		$data["nick"]    = $data["name"];
 		$data["photo"]   = Network::lookupAvatarByEmail($uri);

@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 
@@ -30,7 +31,7 @@ function profperm_content(App $a) {
 	}
 
 
-	if($a->argc < 2) {
+	if ($a->argc < 2) {
 		notice(L10n::t('Invalid profile identifier.') . EOL );
 		return;
 	}
@@ -47,16 +48,18 @@ function profperm_content(App $a) {
 	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
 		$r = q("SELECT `id` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `self` = 0
 			AND `network` = '%s' AND `id` = %d AND `uid` = %d LIMIT 1",
-			DBA::escape(NETWORK_DFRN),
+			DBA::escape(Protocol::DFRN),
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		if (DBA::isResult($r))
+
+		if (DBA::isResult($r)) {
 			$change = intval($a->argv[2]);
+		}
 	}
 
 
-	if(($a->argc > 1) && (intval($a->argv[1]))) {
+	if (($a->argc > 1) && (intval($a->argv[1]))) {
 		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
@@ -144,7 +147,7 @@ function profperm_content(App $a) {
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `blocked` = 0 and `pending` = 0 and `self` = 0
 			AND `network` = '%s' ORDER BY `name` ASC",
 			intval(local_user()),
-			DBA::escape(NETWORK_DFRN)
+			DBA::escape(Protocol::DFRN)
 		);
 
 		if (DBA::isResult($r)) {

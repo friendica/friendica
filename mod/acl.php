@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -84,8 +85,8 @@ function acl_content(App $a)
 				AND `success_update` >= `failure_update`
 				AND `network` IN ('%s', '%s') $sql_extra2",
 			intval(local_user()),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA)
 		);
 		$contact_count = (int) $r[0]['c'];
 	} elseif ($type == 'a') {
@@ -143,8 +144,8 @@ function acl_content(App $a)
 				$sql_extra2
 				ORDER BY `name` ASC ",
 			intval(local_user()),
-			DBA::escape(NETWORK_OSTATUS),
-			DBA::escape(NETWORK_STATUSNET)
+			DBA::escape(Protocol::OSTATUS),
+			DBA::escape(Protocol::STATUSNET)
 		);
 	} elseif ($type == 'c') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
@@ -153,7 +154,7 @@ function acl_content(App $a)
 				$sql_extra2
 				ORDER BY `name` ASC ",
 			intval(local_user()),
-			DBA::escape(NETWORK_STATUSNET)
+			DBA::escape(Protocol::STATUSNET)
 		);
 	} elseif ($type == 'f') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`
@@ -163,7 +164,7 @@ function acl_content(App $a)
 				$sql_extra2
 				ORDER BY `name` ASC ",
 			intval(local_user()),
-			DBA::escape(NETWORK_STATUSNET)
+			DBA::escape(Protocol::STATUSNET)
 		);
 	} elseif ($type == 'm') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr` FROM `contact`
@@ -172,8 +173,8 @@ function acl_content(App $a)
 				$sql_extra2
 				ORDER BY `name` ASC ",
 			intval(local_user()),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA)
 		);
 	} elseif ($type == 'a') {
 		$r = q("SELECT `id`, `name`, `nick`, `micro`, `network`, `url`, `attag`, `addr`, `forum`, `prv` FROM `contact`

@@ -8,6 +8,7 @@ namespace Friendica\Core;
 
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -46,18 +47,21 @@ class ACL extends BaseObject
 
 		switch (defaults($options, 'networks', Protocol::PHANTOM)) {
 			case 'DFRN_ONLY':
-				$networks = [NETWORK_DFRN];
+				$networks = [Protocol::DFRN];
 				break;
+
 			case 'PRIVATE':
-				$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
+				$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA];
 				break;
+
 			case 'TWO_WAY':
 				if (!empty($a->user['prvnets'])) {
-					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
+					$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA];
 				} else {
-					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA, NETWORK_OSTATUS];
+					$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA, Protocol::OSTATUS];
 				}
 				break;
+
 			default: /// @TODO Maybe log this call?
 				break;
 		}
@@ -148,7 +152,7 @@ class ACL extends BaseObject
 		// When used for private messages, we limit correspondence to mutual DFRN/Friendica friends and the selector
 		// to one recipient. By default our selector allows multiple selects amongst all contacts.
 		$sql_extra = sprintf(" AND `rel` = %d ", intval(Contact::FRIEND));
-		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", NETWORK_DFRN, NETWORK_DIASPORA);
+		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", Protocol::DFRN, Protocol::DIASPORA);
 
 		$tabindex_attr = !empty($tabindex) ? ' tabindex="' . intval($tabindex) . '"' : '';
 

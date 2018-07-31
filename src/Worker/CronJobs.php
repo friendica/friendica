@@ -8,6 +8,7 @@ use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
 use Friendica\Model\Contact;
@@ -231,12 +232,12 @@ class CronJobs
 
 		$r = q("SELECT `id`, `url` FROM `contact`
 			WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
-				ORDER BY RAND() LIMIT 50", DBA::escape(NETWORK_DIASPORA));
+				ORDER BY RAND() LIMIT 50", DBA::escape(Protocol::DIASPORA));
 		if (!DBA::isResult($r)) {
 			return;
 		}
 
-		foreach ($r AS $contact) {
+		foreach ($r as $contact) {
 			// Quit the loop after 3 minutes
 			if (time() > ($starttime + 180)) {
 				return;
@@ -247,7 +248,7 @@ class CronJobs
 			}
 
 			$data = Probe::uri($contact["url"]);
-			if ($data["network"] != NETWORK_DIASPORA) {
+			if ($data["network"] != Protocol::DIASPORA) {
 				continue;
 			}
 

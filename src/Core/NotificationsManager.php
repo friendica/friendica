@@ -9,6 +9,7 @@ namespace Friendica\Core;
 use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -235,7 +236,7 @@ class NotificationsManager extends BaseObject
 				}
 
 				// For feed items we use the user's contact, since the avatar is mostly self choosen.
-				if (!empty($it['network']) && $it['network'] == NETWORK_FEED) {
+				if (!empty($it['network']) && $it['network'] == Protocol::FEED) {
 					$it['author-avatar'] = $it['contact-avatar'];
 				}
 
@@ -639,14 +640,14 @@ class NotificationsManager extends BaseObject
 				$it = $this->getMissingIntroData($it);
 
 				// Don't show these data until you are connected. Diaspora is doing the same.
-				if ($it['gnetwork'] === NETWORK_DIASPORA) {
+				if ($it['gnetwork'] === Protocol::DIASPORA) {
 					$it['glocation'] = "";
 					$it['gabout'] = "";
 					$it['ggender'] = "";
 				}
 				$intro = [
-					'label' => (($it['network'] !== NETWORK_OSTATUS) ? 'friend_request' : 'follower'),
-					'notify_type' => (($it['network'] !== NETWORK_OSTATUS) ? L10n::t('Friend/Connect Request') : L10n::t('New Follower')),
+					'label' => (($it['network'] !== Protocol::OSTATUS) ? 'friend_request' : 'follower'),
+					'notify_type' => (($it['network'] !== Protocol::OSTATUS) ? L10n::t('Friend/Connect Request') : L10n::t('New Follower')),
 					'dfrn_id' => $it['issued-id'],
 					'uid' => $_SESSION['uid'],
 					'intro_id' => $it['intro_id'],

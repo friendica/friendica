@@ -7,6 +7,7 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -156,23 +157,23 @@ class Delivery extends BaseObject
 
 		// Transmit via Diaspora if the thread had started as Diaspora post
 		// This is done since the uri wouldn't match (Diaspora doesn't transmit it)
-		if (isset($parent) && ($parent['network'] == NETWORK_DIASPORA) && ($contact['network'] == NETWORK_DFRN)) {
-			$contact['network'] = NETWORK_DIASPORA;
+		if (isset($parent) && ($parent['network'] == Protocol::DIASPORA) && ($contact['network'] == Protocol::DFRN)) {
+			$contact['network'] = Protocol::DIASPORA;
 		}
 
 		logger("Delivering " . $cmd . " followup=$followup - via network " . $contact['network']);
 
 		switch ($contact['network']) {
 
-			case NETWORK_DFRN:
+			case Protocol::DFRN:
 				self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 				break;
 
-			case NETWORK_DIASPORA:
+			case Protocol::DIASPORA:
 				self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 				break;
 
-			case NETWORK_OSTATUS:
+			case Protocol::OSTATUS:
 				// Do not send to otatus if we are not configured to send to public networks
 				if ($owner['prvnets']) {
 					break;
@@ -185,7 +186,7 @@ class Delivery extends BaseObject
 				// This is done in "notifier.php" (See "url_recipients" and "push_notify")
 				break;
 
-			case NETWORK_MAIL:
+			case Protocol::MAIL:
 				self::deliverMail($cmd, $contact, $owner, $target_item);
 				break;
 
@@ -316,7 +317,7 @@ class Delivery extends BaseObject
 
 		if ($deliver_status < 0) {
 			logger('Delivery failed: queuing message ' . $target_item["guid"] );
-			Queue::add($contact['id'], NETWORK_DFRN, $atom, false, $target_item['guid']);
+			Queue::add($contact['id'], Protocol::DFRN, $atom, false, $target_item['guid']);
 		}
 
 		if (($deliver_status >= 200) && ($deliver_status <= 299)) {

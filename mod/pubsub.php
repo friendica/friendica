@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Protocol\OStatus;
@@ -114,14 +115,14 @@ function pubsub_post(App $a)
 		}
 	}
 
-	if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) && ($contact['network'] != NETWORK_FEED)) {
+	if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) && ($contact['network'] != Protocol::FEED)) {
 		logger('Contact ' . $contact['id'] . ' is not expected to share with us - ignored.');
 		hub_post_return();
 	}
 
 	// We import feeds from OStatus, Friendica and ATOM/RSS.
 	/// @todo Check if Friendica posts really arrive here - otherwise we can discard some stuff
-	if (!in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DFRN, NETWORK_FEED])) {
+	if (!in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN, Protocol::FEED])) {
 		hub_post_return();
 	}
 
@@ -130,7 +131,7 @@ function pubsub_post(App $a)
 	consume_feed($xml, $importer, $contact, $feedhub);
 
 	// do it a second time for DFRN so that any children find their parents.
-	if ($contact['network'] === NETWORK_DFRN) {
+	if ($contact['network'] === Protocol::DFRN) {
 		consume_feed($xml, $importer, $contact, $feedhub);
 	}
 

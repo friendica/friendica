@@ -16,6 +16,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -176,7 +177,7 @@ class Diaspora
 	{
 		$fields = ['created' => DateTimeFormat::utcNow(),
 			'name' => 'relay', 'nick' => 'relay',
-			'url' => $server_url, 'network' => NETWORK_DIASPORA,
+			'url' => $server_url, 'network' => Protocol::DIASPORA,
 			'batch' => $server_url . '/receive/public',
 			'rel' => Contact::FOLLOWER, 'blocked' => false,
 			'pending' => false, 'writable' => true];
@@ -899,7 +900,7 @@ class Diaspora
 	{
 		$update = false;
 
-		$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+		$person = DBA::selectFirst('fcontact', [], ['network' => Protocol::DIASPORA, 'addr' => $handle]);
 		if (DBA::isResult($person)) {
 			logger("In cache " . print_r($person, true), LOGGER_DEBUG);
 
@@ -916,15 +917,15 @@ class Diaspora
 
 		if (!DBA::isResult($person) || $update) {
 			logger("create or refresh", LOGGER_DEBUG);
-			$r = Probe::uri($handle, NETWORK_DIASPORA);
+			$r = Probe::uri($handle, Protocol::DIASPORA);
 
 			// Note that Friendica contacts will return a "Diaspora person"
 			// if Diaspora connectivity is enabled on their server
-			if ($r && ($r["network"] === NETWORK_DIASPORA)) {
+			if ($r && ($r["network"] === Protocol::DIASPORA)) {
 				self::updateFContact($r);
 
 				// Fetch the updated or added contact
-				$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+				$person = DBA::selectFirst('fcontact', [], ['network' => Protocol::DIASPORA, 'addr' => $handle]);
 				if (!DBA::isResult($person)) {
 					$person = $r;
 				}
@@ -1017,7 +1018,7 @@ class Diaspora
 
 		$r = q(
 			"SELECT `url` FROM `fcontact` WHERE `url` != '' AND `network` = '%s' AND `guid` = '%s'",
-			DBA::escape(NETWORK_DIASPORA),
+			DBA::escape(Protocol::DIASPORA),
 			DBA::escape($fcontact_guid)
 		);
 
@@ -1419,7 +1420,7 @@ class Diaspora
 			$network = $contact["network"];
 		} else {
 			$cid = $def_contact["id"];
-			$network = NETWORK_DIASPORA;
+			$network = Protocol::DIASPORA;
 		}
 
 		return ["cid" => $cid, "network" => $network];
@@ -1459,7 +1460,7 @@ class Diaspora
 			}
 		}
 
-		if ($contact["network"] == NETWORK_DFRN) {
+		if ($contact["network"] == Protocol::DFRN) {
 			return str_replace("/profile/" . $contact["nick"] . "/", "/display/" . $guid, $contact["url"] . "/");
 		}
 
@@ -1509,7 +1510,7 @@ class Diaspora
 
 		// change the technical stuff in contact and gcontact
 		$data = Probe::uri($new_handle);
-		if ($data['network'] == NETWORK_PHANTOM) {
+		if ($data['network'] == Protocol::PHANTOM) {
 			logger('Account for '.$new_handle." couldn't be probed.");
 			return false;
 		}
@@ -2281,7 +2282,7 @@ class Diaspora
 
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
 
-		$gcontact = ["url" => $contact["url"], "network" => NETWORK_DIASPORA, "generation" => 2,
+		$gcontact = ["url" => $contact["url"], "network" => Protocol::DIASPORA, "generation" => 2,
 					"photo" => $image_url, "name" => $name, "location" => $location,
 					"about" => $about, "birthday" => $birthday, "gender" => $gender,
 					"addr" => $author, "nick" => $nick, "keywords" => $keywords,
@@ -2392,7 +2393,7 @@ class Diaspora
 
 		$ret = self::personByHandle($author);
 
-		if (!$ret || ($ret["network"] != NETWORK_DIASPORA)) {
+		if (!$ret || ($ret["network"] != Protocol::DIASPORA)) {
 			logger("Cannot resolve diaspora handle ".$author." for ".$recipient);
 			return false;
 		}
@@ -2617,7 +2618,7 @@ class Diaspora
 
 		$datarray["uid"] = $importer["uid"];
 		$datarray["contact-id"] = $contact["id"];
-		$datarray["network"]  = NETWORK_DIASPORA;
+		$datarray["network"]  = Protocol::DIASPORA;
 
 		$datarray["author-link"] = $contact["url"];
 		$datarray["author-id"] = Contact::getIdForURL($contact["url"], 0);
@@ -2845,7 +2846,7 @@ class Diaspora
 
 		$datarray["uid"] = $importer["uid"];
 		$datarray["contact-id"] = $contact["id"];
-		$datarray["network"] = NETWORK_DIASPORA;
+		$datarray["network"] = Protocol::DIASPORA;
 
 		$datarray["author-link"] = $contact["url"];
 		$datarray["author-id"] = Contact::getIdForURL($contact["url"], 0);
@@ -3110,7 +3111,7 @@ class Diaspora
 			if (!$no_queue && ($contact['contact-type'] != Contact::ACCOUNT_TYPE_RELAY)) {
 				logger("queue message");
 				// queue message for redelivery
-				Queue::add($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
+				Queue::add($contact["id"], Protocol::DIASPORA, $envelope, $public_batch, $guid);
 			}
 
 			// The message could not be delivered. We mark the contact as "dead"
@@ -3167,7 +3168,7 @@ class Diaspora
 		$envelope = self::buildMessage($msg, $owner, $contact, $owner['uprvkey'], $contact['pubkey'], $public_batch);
 
 		if ($spool) {
-			Queue::add($contact['id'], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
+			Queue::add($contact['id'], Protocol::DIASPORA, $envelope, $public_batch, $guid);
 			return true;
 		} else {
 			$return_code = self::transmit($owner, $contact, $envelope, $public_batch, false, $guid);
@@ -3358,7 +3359,7 @@ class Diaspora
 		}
 
 		if (($guid != "") && $complete) {
-			$condition = ['guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
+			$condition = ['guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 			$item = Item::selectFirst(['contact-id'], $condition);
 			if (DBA::isResult($item)) {
 				$ret= [];
@@ -4133,7 +4134,7 @@ class Diaspora
 			$recips = q(
 				"SELECT `id`,`name`,`network`,`pubkey`,`notify` FROM `contact` WHERE `network` = '%s'
 				AND `uid` = %d AND `rel` != %d",
-				DBA::escape(NETWORK_DIASPORA),
+				DBA::escape(Protocol::DIASPORA),
 				intval($uid),
 				intval(Contact::SHARING)
 			);

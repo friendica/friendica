@@ -94,7 +94,7 @@ function display_init(App $a)
 			if (DBA::isResult($profile)) {
 				$profiledata = $profile;
 			}
-			$profiledata["network"] = NETWORK_DFRN;
+			$profiledata["network"] = Protocol::DFRN;
 		} else {
 			$profiledata = [];
 		}
@@ -177,10 +177,10 @@ function display_fetchauthor($a, $item)
 	$profiledata["photo"] = System::removedBaseUrl($profiledata["photo"]);
 
 	if (local_user()) {
-		if (in_array($profiledata["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+		if (in_array($profiledata["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 			$profiledata["remoteconnect"] = System::baseUrl()."/follow?url=".urlencode($profiledata["url"]);
 		}
-	} elseif ($profiledata["network"] == NETWORK_DFRN) {
+	} elseif ($profiledata["network"] == Protocol::DFRN) {
 		$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"]);
 		$profiledata["remoteconnect"] = $connect;
 	}

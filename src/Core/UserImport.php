@@ -5,6 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\App;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
@@ -182,12 +183,12 @@ class UserImport
 				$contact["avatar-date"] = NULL_DATE;
 
 				switch ($contact['network']) {
-					case NETWORK_DFRN:
-					case NETWORK_DIASPORA:
+					case Protocol::DFRN:
+					case Protocol::DIASPORA:
 						//  send relocate message (below)
 						break;
-					case NETWORK_FEED:
-					case NETWORK_MAIL:
+					case Protocol::FEED:
+					case Protocol::MAIL:
 						// Nothing to do
 						break;
 					default:

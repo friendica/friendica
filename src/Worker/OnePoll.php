@@ -8,6 +8,7 @@ use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -68,7 +69,7 @@ class OnePoll
 		}
 
 		// Diaspora users, archived users and followers are only checked if they still exist.
-		if ($contact['archive'] || ($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
+		if ($contact['archive'] || ($contact["network"] == Protocol::DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
 			$last_updated = PortableContact::lastUpdated($contact["url"], true);
 			$updated = DateTimeFormat::utcNow();
 
@@ -114,7 +115,7 @@ class OnePoll
 		);
 
 		// Update the contact entry
-		if (($contact['network'] === NETWORK_OSTATUS) || ($contact['network'] === NETWORK_DIASPORA) || ($contact['network'] === NETWORK_DFRN)) {
+		if (($contact['network'] === Protocol::OSTATUS) || ($contact['network'] === Protocol::DIASPORA) || ($contact['network'] === Protocol::DFRN)) {
 			if (!PortableContact::reachable($contact['url'])) {
 				logger("Skipping probably dead contact ".$contact['url']);
 
@@ -160,7 +161,7 @@ class OnePoll
 
 		logger("poll: ({$contact['network']}-{$contact['id']}) IMPORTER: {$importer['name']}, CONTACT: {$contact['name']}");
 
-		if ($contact['network'] === NETWORK_DFRN) {
+		if ($contact['network'] === Protocol::DFRN) {
 			$idtosend = $orig_id = (($contact['dfrn-id']) ? $contact['dfrn-id'] : $contact['issued-id']);
 			if (intval($contact['duplex']) && $contact['dfrn-id']) {
 				$idtosend = '0:' . $orig_id;
@@ -289,9 +290,9 @@ class OnePoll
 
 			$xml = Network::post($contact['poll'], $postvars);
 
-		} elseif (($contact['network'] === NETWORK_OSTATUS)
-			|| ($contact['network'] === NETWORK_DIASPORA)
-			|| ($contact['network'] === NETWORK_FEED)) {
+		} elseif (($contact['network'] === Protocol::OSTATUS)
+			|| ($contact['network'] === Protocol::DIASPORA)
+			|| ($contact['network'] === Protocol::FEED)) {
 
 			// Upgrading DB fields from an older Friendica version
 			// Will only do this once per notify-enabled OStatus contact
@@ -300,7 +301,7 @@ class OnePoll
 			$stat_writeable = ((($contact['notify']) && ($contact['rel'] == Contact::FOLLOWER || $contact['rel'] == Contact::FRIEND)) ? 1 : 0);
 
 			// Contacts from OStatus are always writable
-			if ($contact['network'] === NETWORK_OSTATUS) {
+			if ($contact['network'] === Protocol::OSTATUS) {
 				$stat_writeable = 1;
 			}
 
@@ -330,7 +331,7 @@ class OnePoll
 
 			$xml = $ret['body'];
 
-		} elseif ($contact['network'] === NETWORK_MAIL) {
+		} elseif ($contact['network'] === Protocol::MAIL) {
 			logger("Mail: Fetching for ".$contact['addr'], LOGGER_DEBUG);
 
 			$mail_disabled = ((function_exists('imap_open') && (! Config::get('system', 'imap_disabled'))) ? 0 : 1);
@@ -383,7 +384,7 @@ class OnePoll
 							$datarray = [];
 							$datarray['verb'] = ACTIVITY_POST;
 							$datarray['object-type'] = ACTIVITY_OBJ_NOTE;
-							$datarray['network'] = NETWORK_MAIL;
+							$datarray['network'] = Protocol::MAIL;
 							// $meta = Email::messageMeta($mbox, $msg_uid);
 
 							$datarray['uri'] = Email::msgid2iri(trim($meta->message_id, '<>'));
@@ -472,7 +473,7 @@ class OnePoll
 
 							// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 							if (empty($datarray['parent-uri']) && $reply) {
-								$condition = ['title' => $datarray['title'], 'uid' => importer_uid, 'network' => NETWORK_MAIL];
+								$condition = ['title' => $datarray['title'], 'uid' => importer_uid, 'network' => Protocol::MAIL];
 								$params = ['order' => ['created' => true]];
 								$parent = Item::selectFirst(['parent-uri'], $condition, $params);
 								if (DBA::isResult($parent)) {
@@ -529,7 +530,7 @@ class OnePoll
 							if ($datarray['parent-uri'] === $datarray['uri']) {
 								$datarray['private'] = 1;
 							}
-							if (($contact['network'] === NETWORK_MAIL) && (!PConfig::get($importer_uid, 'system', 'allow_public_email_replies'))) {
+							if (($contact['network'] === Protocol::MAIL) && (!PConfig::get($importer_uid, 'system', 'allow_public_email_replies'))) {
 								$datarray['private'] = 1;
 								$datarray['allow_cid'] = '<' . $contact['id'] . '>';
 							}
@@ -584,16 +585,16 @@ class OnePoll
 			consume_feed($xml, $importer, $contact, $hub);
 
 			// do it a second time for DFRN so that any children find their parents.
-			if ($contact['network'] === NETWORK_DFRN) {
+			if ($contact['network'] === Protocol::DFRN) {
 				consume_feed($xml, $importer, $contact, $hub);
 			}
 
 			$hubmode = 'subscribe';
-			if ($contact['network'] === NETWORK_DFRN || $contact['blocked']) {
+			if ($contact['network'] === Protocol::DFRN || $contact['blocked']) {
 				$hubmode = 'unsubscribe';
 			}
 
-			if (($contact['network'] === NETWORK_OSTATUS ||  $contact['network'] == NETWORK_FEED) && (! $contact['hub-verify'])) {
+			if (($contact['network'] === Protocol::OSTATUS ||  $contact['network'] == Protocol::FEED) && (! $contact['hub-verify'])) {
 				$hub_update = true;
 			}
 
@@ -603,7 +604,7 @@ class OnePoll
 
 			logger("Contact ".$contact['id']." returned hub: ".$hub." Network: ".$contact['network']." Relation: ".$contact['rel']." Update: ".$hub_update);
 
-			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::FOLLOWER) || $contact['network'] == NETWORK_FEED)) {
+			if (strlen($hub) && $hub_update && (($contact['rel'] != Contact::FOLLOWER) || $contact['network'] == Protocol::FEED)) {
 				logger('hub ' . $hubmode . ' : ' . $hub . ' contact name : ' . $contact['name'] . ' local user : ' . $importer['name']);
 				$hubs = explode(',', $hub);
 				if (count($hubs)) {
@@ -622,7 +623,7 @@ class OnePoll
 			self::updateContact($contact, ['last-update' => $updated, 'success_update' => $updated]);
 			DBA::update('gcontact', ['last_contact' => $updated], ['nurl' => $contact['nurl']]);
 			Contact::unmarkForArchival($contact);
-		} elseif (in_array($contact["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_FEED])) {
+		} elseif (in_array($contact["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, Protocol::FEED])) {
 			$updated = DateTimeFormat::utcNow();
 
 			self::updateContact($contact, ['last-update' => $updated, 'failure_update' => $updated]);

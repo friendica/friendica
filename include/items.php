@@ -9,6 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -240,7 +241,7 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false)
  */
 function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0, $pass = 0)
 {
-	if ($contact['network'] === NETWORK_OSTATUS) {
+	if ($contact['network'] === Protocol::OSTATUS) {
 		if ($pass < 2) {
 			// Test - remove before flight
 			//$tempfile = tempnam(get_temppath(), "ostatus2");
@@ -252,7 +253,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 		return;
 	}
 
-	if ($contact['network'] === NETWORK_FEED) {
+	if ($contact['network'] === Protocol::FEED) {
 		if ($pass < 2) {
 			logger("Consume feeds", LOGGER_DEBUG);
 			Feed::import($xml, $importer, $contact, $hub);
@@ -261,7 +262,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 		return;
 	}
 
-	if ($contact['network'] === NETWORK_DFRN) {
+	if ($contact['network'] === Protocol::DFRN) {
 		logger("Consume DFRN messages", LOGGER_DEBUG);
 
 		$r = q("SELECT `contact`.*, `contact`.`uid` AS `importer_uid`,
@@ -301,7 +302,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 	 * through the direct Diaspora protocol. If we try and use
 	 * the feed, we'll get duplicates. So don't.
 	 */
-	if ((!DBA::isResult($r)) || $contact['network'] === NETWORK_DIASPORA) {
+	if ((!DBA::isResult($r)) || $contact['network'] === Protocol::DIASPORA) {
 		return;
 	}
 

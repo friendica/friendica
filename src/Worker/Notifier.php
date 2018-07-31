@@ -7,6 +7,7 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -103,7 +104,7 @@ class Notifier
 			$uid = $item_id;
 
 			$recipients_relocate = q("SELECT * FROM `contact` WHERE `uid` = %d AND NOT `self` AND `network` IN ('%s', '%s')",
-						intval($uid), NETWORK_DFRN, NETWORK_DIASPORA);
+						intval($uid), Protocol::DFRN, Protocol::DIASPORA);
 		} else {
 			// find ancestors
 			$condition = ['id' => $item_id, 'visible' => true, 'moderated' => false];
@@ -250,15 +251,15 @@ class Notifier
 						$target_item['deny_cid'].$target_item['deny_gid']) == 0))
 					$push_notify = true;
 
-				if (($thr_parent && ($thr_parent['network'] == NETWORK_OSTATUS)) || ($parent['network'] == NETWORK_OSTATUS)) {
+				if (($thr_parent && ($thr_parent['network'] == Protocol::OSTATUS)) || ($parent['network'] == Protocol::OSTATUS)) {
 					$push_notify = true;
 
-					if ($parent["network"] == NETWORK_OSTATUS) {
+					if ($parent["network"] == Protocol::OSTATUS) {
 						// Distribute the message to the DFRN contacts as if this wasn't a followup since OStatus can't relay comments
 						// Currently it is work at progress
 						$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `network` = '%s' AND NOT `blocked` AND NOT `pending` AND NOT `archive`",
 							intval($uid),
-							DBA::escape(NETWORK_DFRN)
+							DBA::escape(Protocol::DFRN)
 						);
 						if (DBA::isResult($r)) {
 							foreach ($r as $rr) {
@@ -336,7 +337,7 @@ class Notifier
 
 			// If the thread parent is OStatus then do some magic to distribute the messages.
 			// We have not only to look at the parent, since it could be a Friendica thread.
-			if (($thr_parent && ($thr_parent['network'] == NETWORK_OSTATUS)) || ($parent['network'] == NETWORK_OSTATUS)) {
+			if (($thr_parent && ($thr_parent['network'] == Protocol::OSTATUS)) || ($parent['network'] == Protocol::OSTATUS)) {
 				$diaspora_delivery = false;
 
 				logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent['author-id']." - Owner: ".$thr_parent['owner-id'], LOGGER_DEBUG);
@@ -370,9 +371,9 @@ class Notifier
 				}
 
 				// It only makes sense to distribute answers to OStatus messages to Friendica and OStatus - but not Diaspora
-				$networks = [NETWORK_OSTATUS, NETWORK_DFRN];
+				$networks = [Protocol::OSTATUS, Protocol::DFRN];
 			} else {
-				$networks = [NETWORK_OSTATUS, NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_MAIL];
+				$networks = [Protocol::OSTATUS, Protocol::DFRN, Protocol::DIASPORA, Protocol::MAIL];
 			}
 		} else {
 			$public_message = false;
@@ -385,7 +386,7 @@ class Notifier
 				&& intval($target_item['pubmail'])) {
 				$r = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `network` = '%s'",
 					intval($uid),
-					DBA::escape(NETWORK_MAIL)
+					DBA::escape(Protocol::MAIL)
 				);
 				if (DBA::isResult($r)) {
 					foreach ($r as $rr) {
@@ -440,7 +441,7 @@ class Notifier
 				$r1 = q("SELECT `batch`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`name`) AS `name`, ANY_VALUE(`network`) AS `network`
 					FROM `contact` WHERE `network` = '%s' AND `batch` != ''
 					AND `uid` = %d AND `rel` != %d AND NOT `blocked` AND NOT `pending` AND NOT `archive` GROUP BY `batch`",
-					DBA::escape(NETWORK_DIASPORA),
+					DBA::escape(Protocol::DIASPORA),
 					intval($owner['uid']),
 					intval(Contact::SHARING)
 				);
@@ -455,7 +456,7 @@ class Notifier
 				}
 			}
 
-			$condition = ['network' => NETWORK_DFRN, 'uid' => $owner['uid'], 'blocked' => false,
+			$condition = ['network' => Protocol::DFRN, 'uid' => $owner['uid'], 'blocked' => false,
 				'pending' => false, 'archive' => false, 'rel' => [Contact::FOLLOWER, Contact::FRIEND]];
 
 			$r2 = DBA::toArray(DBA::select('contact', ['id', 'name', 'network'], $condition));
@@ -469,7 +470,7 @@ class Notifier
 					// except for Diaspora batch jobs
 					// Don't deliver to folks who have already been delivered to
 
-					if (($rr['network'] !== NETWORK_DIASPORA) && (in_array($rr['id'], $conversants))) {
+					if (($rr['network'] !== Protocol::DIASPORA) && (in_array($rr['id'], $conversants))) {
 						logger('notifier: already delivered id=' . $rr['id']);
 						continue;
 					}

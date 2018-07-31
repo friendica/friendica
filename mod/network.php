@@ -14,6 +14,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -664,7 +665,7 @@ function networkThreadedView(App $a, $update, $parent)
 				'id' => 'network',
 			]) . $o;
 
-			if ($contact['network'] === NETWORK_OSTATUS && $contact['writable'] && !PConfig::get(local_user(),'system','nowarn_insecure')) {
+			if ($contact['network'] === Protocol::OSTATUS && $contact['writable'] && !PConfig::get(local_user(),'system','nowarn_insecure')) {
 				notice(L10n::t('Private messages to this person are at risk of public disclosure.') . EOL);
 			}
 		} else {
@@ -805,7 +806,7 @@ function networkThreadedView(App $a, $update, $parent)
 	}
 
 	// Only show it when unfiltered (no groups, no networks, ...)
-	if (in_array($nets, ['', NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS]) && (strlen($sql_extra . $sql_extra2 . $sql_extra3) == 0)) {
+	if (in_array($nets, ['', Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]) && (strlen($sql_extra . $sql_extra2 . $sql_extra3) == 0)) {
 		if (DBA::isResult($r)) {
 			$top_limit = current($r)['order_date'];
 			$bottom_limit = end($r)['order_date'];

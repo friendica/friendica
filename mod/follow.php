@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -66,8 +67,8 @@ function follow_content(App $a)
 	$r = q("SELECT `pending` FROM `contact` WHERE `uid` = %d AND ((`rel` != %d) OR (`network` = '%s')) AND
 		(`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s') AND
 		`network` != '%s' LIMIT 1",
-		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(NETWORK_DFRN), DBA::escape(normalise_link($url)),
-		DBA::escape(normalise_link($url)), DBA::escape($url), DBA::escape(NETWORK_STATUSNET));
+		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(Protocol::DFRN), DBA::escape(normalise_link($url)),
+		DBA::escape(normalise_link($url)), DBA::escape($url), DBA::escape(Protocol::STATUSNET));
 
 	if ($r) {
 		if ($r[0]['pending']) {
@@ -80,32 +81,32 @@ function follow_content(App $a)
 
 	$ret = Probe::uri($url);
 
-	if (($ret['network'] == NETWORK_DIASPORA) && !Config::get('system', 'diaspora_enabled')) {
+	if (($ret['network'] == Protocol::DIASPORA) && !Config::get('system', 'diaspora_enabled')) {
 		notice(L10n::t("Diaspora support isn't enabled. Contact can't be added."));
 		$submit = '';
 		//goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	if (($ret['network'] == NETWORK_OSTATUS) && Config::get('system', 'ostatus_disabled')) {
+	if (($ret['network'] == Protocol::OSTATUS) && Config::get('system', 'ostatus_disabled')) {
 		notice(L10n::t("OStatus support is disabled. Contact can't be added."));
 		$submit = '';
 		//goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	if ($ret['network'] == NETWORK_PHANTOM) {
+	if ($ret['network'] == Protocol::PHANTOM) {
 		notice(L10n::t("The network type couldn't be detected. Contact can't be added."));
 		$submit = '';
 		//goaway($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
-	if ($ret['network'] == NETWORK_MAIL) {
+	if ($ret['network'] == Protocol::MAIL) {
 		$ret['url'] = $ret['addr'];
 	}
 
-	if (($ret['network'] === NETWORK_DFRN) && !DBA::isResult($r)) {
+	if (($ret['network'] === Protocol::DFRN) && !DBA::isResult($r)) {
 		$request = $ret['request'];
 		$tpl = get_markup_template('dfrn_request.tpl');
 	} else {
@@ -136,7 +137,7 @@ function follow_content(App $a)
 		$gcontact_id = $r[0]['id'];
 	}
 
-	if ($ret['network'] === NETWORK_DIASPORA) {
+	if ($ret['network'] === Protocol::DIASPORA) {
 		$r[0]['location'] = '';
 		$r[0]['about'] = '';
 	}

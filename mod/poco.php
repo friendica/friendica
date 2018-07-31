@@ -8,6 +8,7 @@ use Friendica\App;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Protocol\PortableContact;
@@ -89,9 +90,9 @@ function poco_init(App $a) {
 	if ($global) {
 		$contacts = q("SELECT count(*) AS `total` FROM `gcontact` WHERE `updated` >= '%s' AND `updated` >= `last_failure` AND NOT `hide` AND `network` IN ('%s', '%s', '%s')",
 			DBA::escape($update_limit),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS)
 		);
 	} elseif ($system_mode) {
 		$contacts = q("SELECT count(*) AS `total` FROM `contact` WHERE `self` = 1
@@ -101,10 +102,10 @@ function poco_init(App $a) {
 			AND (`success_update` >= `failure_update` OR `last-item` >= `failure_update`)
 			AND `network` IN ('%s', '%s', '%s', '%s') $sql_extra",
 			intval($user['uid']),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS),
-			DBA::escape(NETWORK_STATUSNET)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS),
+			DBA::escape(Protocol::STATUSNET)
 		);
 	}
 	if (DBA::isResult($contacts)) {
@@ -124,9 +125,9 @@ function poco_init(App $a) {
 		$contacts = q("SELECT * FROM `gcontact` WHERE `updated` > '%s' AND NOT `hide` AND `network` IN ('%s', '%s', '%s') AND `updated` > `last_failure`
 			ORDER BY `updated` DESC LIMIT %d, %d",
 			DBA::escape($update_limit),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS),
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS),
 			intval($startIndex),
 			intval($itemsPerPage)
 		);
@@ -148,10 +149,10 @@ function poco_init(App $a) {
 			AND (`success_update` >= `failure_update` OR `last-item` >= `failure_update`)
 			AND `network` IN ('%s', '%s', '%s', '%s') $sql_extra LIMIT %d, %d",
 			intval($user['uid']),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS),
-			DBA::escape(NETWORK_STATUSNET),
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS),
+			DBA::escape(Protocol::STATUSNET),
 			intval($startIndex),
 			intval($itemsPerPage)
 		);
@@ -257,7 +258,7 @@ function poco_init(App $a) {
 				}
 
 				// Non connected persons can only see the keywords of a Diaspora account
-				if ($contact['network'] == NETWORK_DIASPORA) {
+				if ($contact['network'] == Protocol::DIASPORA) {
 					$contact['location'] = "";
 					$about = "";
 					$contact['gender'] = "";
@@ -284,7 +285,7 @@ function poco_init(App $a) {
 				}
 				if ($fields_ret['urls']) {
 					$entry['urls'] = [['value' => $contact['url'], 'type' => 'profile']];
-					if ($contact['addr'] && ($contact['network'] !== NETWORK_MAIL)) {
+					if ($contact['addr'] && ($contact['network'] !== Protocol::MAIL)) {
 						$entry['urls'][] = ['value' => 'acct:' . $contact['addr'], 'type' => 'webfinger'];
 					}
 				}
@@ -314,11 +315,11 @@ function poco_init(App $a) {
 				}
 				if ($fields_ret['network']) {
 					$entry['network'] = $contact['network'];
-					if ($entry['network'] == NETWORK_STATUSNET) {
-						$entry['network'] = NETWORK_OSTATUS;
+					if ($entry['network'] == Protocol::STATUSNET) {
+						$entry['network'] = Protocol::OSTATUS;
 					}
 					if (($entry['network'] == "") && ($contact['self'])) {
-						$entry['network'] = NETWORK_DFRN;
+						$entry['network'] = Protocol::DFRN;
 					}
 				}
 				if ($fields_ret['tags']) {

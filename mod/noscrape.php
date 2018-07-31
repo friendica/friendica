@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -62,9 +63,9 @@ function noscrape_init(App $a)
 		$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `blocked` = 0 and `pending` = 0 AND `hidden` = 0 AND `archive` = 0
 				AND `network` IN ('%s', '%s', '%s', '')",
 			intval($a->profile['uid']),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS)
 		);
 		if (DBA::isResult($r)) {
 			$json_info["contacts"] = intval($r[0]['total']);

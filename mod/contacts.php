@@ -10,6 +10,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -54,7 +55,7 @@ function contacts_init(App $a)
 
 		$a->data['contact'] = $contact;
 
-		if (($a->data['contact']['network'] != "") && ($a->data['contact']['network'] != NETWORK_DFRN)) {
+		if (($a->data['contact']['network'] != "") && ($a->data['contact']['network'] != Protocol::DFRN)) {
 			$networkname = format_network_name($a->data['contact']['network'], $a->data['contact']['url']);
 		} else {
 			$networkname = '';
@@ -248,7 +249,7 @@ function _contact_update($contact_id)
 
 	$uid = $contact["uid"];
 
-	if ($contact["network"] == NETWORK_OSTATUS) {
+	if ($contact["network"] == Protocol::OSTATUS) {
 		$result = Contact::createFromProbe($uid, $contact["url"], false, $contact["network"]);
 
 		if ($result['success']) {
@@ -272,7 +273,7 @@ function _contact_update_profile($contact_id)
 	$data = Probe::uri($contact["url"], "", 0, false);
 
 	// "Feed" or "Unknown" is mostly a sign of communication problems
-	if ((in_array($data["network"], [NETWORK_FEED, NETWORK_PHANTOM])) && ($data["network"] != $contact["network"])) {
+	if ((in_array($data["network"], [Protocol::FEED, Protocol::PHANTOM])) && ($data["network"] != $contact["network"])) {
 		return;
 	}
 
@@ -280,7 +281,7 @@ function _contact_update_profile($contact_id)
 		"poco", "network", "alias"];
 	$update = [];
 
-	if ($data["network"] == NETWORK_OSTATUS) {
+	if ($data["network"] == Protocol::OSTATUS) {
 		$result = Contact::createFromProbe($uid, $data["url"], false);
 
 		if ($result['success']) {
@@ -532,7 +533,7 @@ function contacts_content(App $a)
 				break;
 		}
 
-		if (!in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA])) {
+		if (!in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA])) {
 			$relation_text = "";
 		}
 
@@ -552,9 +553,9 @@ function contacts_content(App $a)
 		if ($contact['last-update'] > NULL_DATE) {
 			$last_update .= ' ' . (($contact['last-update'] <= $contact['success_update']) ? L10n::t("\x28Update was successful\x29") : L10n::t("\x28Update was not successful\x29"));
 		}
-		$lblsuggest = (($contact['network'] === NETWORK_DFRN) ? L10n::t('Suggest friends') : '');
+		$lblsuggest = (($contact['network'] === Protocol::DFRN) ? L10n::t('Suggest friends') : '');
 
-		$poll_enabled = in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_FEED, NETWORK_MAIL]);
+		$poll_enabled = in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL]);
 
 		$nettype = L10n::t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact["url"]));
 
@@ -564,7 +565,7 @@ function contacts_content(App $a)
 		$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
 
 		$fetch_further_information = null;
-		if ($contact['network'] == NETWORK_FEED) {
+		if ($contact['network'] == Protocol::FEED) {
 			$fetch_further_information = [
 				'fetch_further_information',
 				L10n::t('Fetch further information for feeds'),
@@ -579,19 +580,19 @@ function contacts_content(App $a)
 		}
 
 		$poll_interval = null;
-		if (in_array($contact['network'], [NETWORK_FEED, NETWORK_MAIL])) {
+		if (in_array($contact['network'], [Protocol::FEED, Protocol::MAIL])) {
 			$poll_interval = ContactSelector::pollInterval($contact['priority'], (!$poll_enabled));
 		}
 
 		$profile_select = null;
-		if ($contact['network'] == NETWORK_DFRN) {
-			$profile_select = ContactSelector::profileAssign($contact['profile-id'], (($contact['network'] !== NETWORK_DFRN) ? true : false));
+		if ($contact['network'] == Protocol::DFRN) {
+			$profile_select = ContactSelector::profileAssign($contact['profile-id'], (($contact['network'] !== Protocol::DFRN) ? true : false));
 		}
 
 		/// @todo Only show the following link with DFRN when the remote version supports it
 		$follow = '';
 		$follow_text = '';
-		if (in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
+		if (in_array($contact['network'], [Protocol::DIASPORA, Protocol::OSTATUS, Protocol::DFRN])) {
 			if ($contact['rel'] == Contact::FOLLOWER) {
 				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Connect/Follow");
@@ -637,7 +638,7 @@ function contacts_content(App $a)
 			'$contact_id' => $contact['id'],
 			'$block_text' => (($contact['blocked']) ? L10n::t('Unblock') : L10n::t('Block') ),
 			'$ignore_text' => (($contact['readonly']) ? L10n::t('Unignore') : L10n::t('Ignore') ),
-			'$insecure' => (($contact['network'] !== NETWORK_DFRN && $contact['network'] !== NETWORK_MAIL && $contact['network'] !== NETWORK_DIASPORA) ? $insecure : ''),
+			'$insecure' => (($contact['network'] !== Protocol::DFRN && $contact['network'] !== Protocol::MAIL && $contact['network'] !== Protocol::DIASPORA) ? $insecure : ''),
 			'$info' => $contact['info'],
 			'$cinfo' => ['info', '', $contact['info'], ''],
 			'$blocked' => (($contact['blocked']) ? L10n::t('Currently blocked') : ''),
@@ -991,11 +992,11 @@ function _contact_detail_for_template(array $rr)
  */
 function contact_actions($contact)
 {
-	$poll_enabled = in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_FEED, NETWORK_MAIL]);
+	$poll_enabled = in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL]);
 	$contact_actions = [];
 
 	// Provide friend suggestion only for Friendica contacts
-	if ($contact['network'] === NETWORK_DFRN) {
+	if ($contact['network'] === Protocol::DFRN) {
 		$contact_actions['suggest'] = [
 			'label' => L10n::t('Suggest friends'),
 			'url'   => 'fsuggest/' . $contact['id'],

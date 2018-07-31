@@ -13,6 +13,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -136,7 +137,7 @@ class Profile
 		$a->profile_uid = $pdata['profile_uid'];
 
 		$a->profile['mobile-theme'] = PConfig::get($a->profile['profile_uid'], 'system', 'mobile_theme');
-		$a->profile['network'] = NETWORK_DFRN;
+		$a->profile['network'] = Protocol::DFRN;
 
 		$a->page['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
 
@@ -280,7 +281,7 @@ class Profile
 
 		$profile['picdate'] = urlencode(defaults($profile, 'picdate', ''));
 
-		if (($profile['network'] != '') && ($profile['network'] != NETWORK_DFRN)) {
+		if (($profile['network'] != '') && ($profile['network'] != Protocol::DFRN)) {
 			$profile['network_name'] = format_network_name($profile['network'], $profile['url']);
 		} else {
 			$profile['network_name'] = '';
@@ -321,7 +322,7 @@ class Profile
 			}
 		}
 
-		if ($connect && ($profile['network'] != NETWORK_DFRN) && !isset($profile['remoteconnect'])) {
+		if ($connect && ($profile['network'] != Protocol::DFRN) && !isset($profile['remoteconnect'])) {
 			$connect = false;
 		}
 
@@ -330,7 +331,7 @@ class Profile
 			$remoteconnect = $profile['remoteconnect'];
 		}
 
-		if ($connect && ($profile['network'] == NETWORK_DFRN) && !isset($remoteconnect)) {
+		if ($connect && ($profile['network'] == Protocol::DFRN) && !isset($remoteconnect)) {
 			$subscribe_feed = L10n::t('Atom feed');
 		} else {
 			$subscribe_feed = false;
@@ -469,9 +470,9 @@ class Profile
 						AND NOT `hidden` AND NOT `archive`
 						AND `network` IN ('%s', '%s', '%s', '')",
 					intval($profile['uid']),
-					DBA::escape(NETWORK_DFRN),
-					DBA::escape(NETWORK_DIASPORA),
-					DBA::escape(NETWORK_OSTATUS)
+					DBA::escape(Protocol::DFRN),
+					DBA::escape(Protocol::DIASPORA),
+					DBA::escape(Protocol::OSTATUS)
 				);
 				if (DBA::isResult($r)) {
 					$contacts = intval($r[0]['total']);
@@ -1014,7 +1015,7 @@ class Profile
 				$urlparts = parse_url($my_url);
 
 				$result = Cache::get('gprobe:' . $urlparts['host']);
-				if ((!is_null($result)) && (in_array($result['network'], [NETWORK_FEED, NETWORK_PHANTOM]))) {
+				if ((!is_null($result)) && (in_array($result['network'], [Protocol::FEED, Protocol::PHANTOM]))) {
 					logger('DDoS attempt detected for ' . $urlparts['host'] . ' by ' . $_SERVER['REMOTE_ADDR'] . '. server data: ' . print_r($_SERVER, true), LOGGER_DEBUG);
 					return;
 				}

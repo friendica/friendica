@@ -12,6 +12,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -75,7 +76,7 @@ class OStatus
 		$contact = null;
 		if ($aliaslink != '') {
 			$condition = ["`uid` = ? AND `alias` = ? AND `network` != ? AND `rel` IN (?, ?)",
-					$importer["uid"], $aliaslink, NETWORK_STATUSNET,
+					$importer["uid"], $aliaslink, Protocol::STATUSNET,
 					Contact::SHARING, Contact::FRIEND];
 			$contact = DBA::selectFirst('contact', [], $condition);
 		}
@@ -87,13 +88,13 @@ class OStatus
 
 			$condition = ["`uid` = ? AND `nurl` IN (?, ?) AND `network` != ? AND `rel` IN (?, ?)",
 					$importer["uid"], normalise_link($author["author-link"]), normalise_link($aliaslink),
-					NETWORK_STATUSNET, Contact::SHARING, Contact::FRIEND];
+					Protocol::STATUSNET, Contact::SHARING, Contact::FRIEND];
 			$contact = DBA::selectFirst('contact', [], $condition);
 		}
 
 		if (!DBA::isResult($contact) && ($addr != '')) {
 			$condition = ["`uid` = ? AND `addr` = ? AND `network` != ? AND `rel` IN (?, ?)",
-					$importer["uid"], $addr, NETWORK_STATUSNET,
+					$importer["uid"], $addr, Protocol::STATUSNET,
 					Contact::SHARING, Contact::FRIEND];
 			$contact = DBA::selectFirst('contact', [], $condition);
 		}
@@ -135,7 +136,7 @@ class OStatus
 		$author["owner-id"] = $author["author-id"];
 
 		// Only update the contacts if it is an OStatus contact
-		if (DBA::isResult($contact) && ($contact['id'] > 0) && !$onlyfetch && ($contact["network"] == NETWORK_OSTATUS)) {
+		if (DBA::isResult($contact) && ($contact['id'] > 0) && !$onlyfetch && ($contact["network"] == Protocol::OSTATUS)) {
 
 			// Update contact data
 			$current = $contact;
@@ -345,7 +346,7 @@ class OStatus
 
 		$header = [];
 		$header["uid"] = $importer["uid"];
-		$header["network"] = NETWORK_OSTATUS;
+		$header["network"] = Protocol::OSTATUS;
 		$header["wall"] = 0;
 		$header["origin"] = 0;
 		$header["gravity"] = GRAVITY_COMMENT;
@@ -799,7 +800,7 @@ class OStatus
 			$conv_data = [];
 
 			$conv_data['protocol'] = Conversation::PARCEL_SPLIT_CONVERSATION;
-			$conv_data['network'] = NETWORK_OSTATUS;
+			$conv_data['network'] = Protocol::OSTATUS;
 			$conv_data['uri'] = XML::getFirstNodeValue($xpath, 'atom:id/text()', $entry);
 
 			$inreplyto = $xpath->query('thr:in-reply-to', $entry);
@@ -1647,7 +1648,7 @@ class OStatus
 		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
 
 		$condition = ['uid' => $owner["uid"], 'guid' => $repeated_guid, 'private' => false,
-			'network' => [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS]];
+			'network' => [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]];
 		$repeated_item = Item::selectFirst([], $condition);
 		if (!DBA::isResult($repeated_item)) {
 			return false;
@@ -1745,7 +1746,7 @@ class OStatus
 		$object = $doc->createElement("activity:object");
 		XML::addElement($doc, $object, "activity:object-type", ACTIVITY_OBJ_PERSON);
 
-		if ($contact['network'] == NETWORK_PHANTOM) {
+		if ($contact['network'] == Protocol::PHANTOM) {
 			XML::addElement($doc, $object, "id", $contact['url']);
 			return $object;
 		}
@@ -2161,7 +2162,7 @@ class OStatus
 
 		$condition = ["`uid` = ? AND `created` > ? AND NOT `deleted`
 			AND NOT `private` AND `visible` AND `wall` AND `parent-network` IN (?, ?)",
-			$owner["uid"], $check_date, NETWORK_OSTATUS, NETWORK_DFRN];
+			$owner["uid"], $check_date, Protocol::OSTATUS, Protocol::DFRN];
 
 		if ($filter === 'comments') {
 			$condition[0] .= " AND `object-type` = ? ";

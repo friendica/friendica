@@ -11,6 +11,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -88,7 +89,7 @@ class User
 	{
 		$default_group = 0;
 
-		if ($network == NETWORK_OSTATUS) {
+		if ($network == Protocol::OSTATUS) {
 			$default_group = PConfig::get($uid, "ostatus", "default_group");
 		}
 

@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -28,7 +29,7 @@ function repair_ostatus_content(App $a) {
         $r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE
                 `uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)",
                 intval($uid),
-                DBA::escape(NETWORK_OSTATUS),
+                DBA::escape(Protocol::OSTATUS),
                 intval(Contact::FRIEND),
                 intval(Contact::SHARING));
 
@@ -42,7 +43,7 @@ function repair_ostatus_content(App $a) {
 		ORDER BY `url`
 		LIMIT %d, 1",
                 intval($uid),
-                DBA::escape(NETWORK_OSTATUS),
+                DBA::escape(Protocol::OSTATUS),
                 intval(Contact::FRIEND),
                 intval(Contact::SHARING), $counter++);
 

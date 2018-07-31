@@ -6,6 +6,7 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Cache;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\GContact;
 use Friendica\Network\Probe;
@@ -31,7 +32,7 @@ class GProbe {
 
 			$result = Cache::get("gprobe:".$urlparts["host"]);
 			if (!is_null($result)) {
-				if (in_array($result["network"], [NETWORK_FEED, NETWORK_PHANTOM])) {
+				if (in_array($result["network"], [Protocol::FEED, Protocol::PHANTOM])) {
 					logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 					return;
 				}
@@ -43,7 +44,7 @@ class GProbe {
 				Cache::set("gprobe:".$urlparts["host"], $arr);
 			}
 
-			if (!in_array($arr["network"], [NETWORK_FEED, NETWORK_PHANTOM])) {
+			if (!in_array($arr["network"], [Protocol::FEED, Protocol::PHANTOM])) {
 				GContact::update($arr);
 			}
 
@@ -54,7 +55,7 @@ class GProbe {
 		}
 		if (DBA::isResult($r)) {
 			// Check for accessibility and do a poco discovery
-			if (PortableContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == NETWORK_DFRN)) {
+			if (PortableContact::lastUpdated($r[0]['url'], true) && ($r[0]["network"] == Protocol::DFRN)) {
 				PortableContact::loadWorker(0, 0, $r[0]['id'], str_replace('/profile/', '/poco/', $r[0]['url']));
 			}
 		}

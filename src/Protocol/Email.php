@@ -5,6 +5,7 @@
 namespace Friendica\Protocol;
 
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Protocol;
 
 /**
  * @brief Email class
@@ -308,7 +309,7 @@ class Email
 	}
 
 	/**
-	 * Function send is used by NETWORK_EMAIL and NETWORK_EMAIL2 code
+	 * Function send is used by Protocol::EMAIL and Protocol::EMAIL2 code
 	 * (not to notify the user, but to send items to email contacts)
 	 *
 	 * @param string $addr    address

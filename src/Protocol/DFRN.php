@@ -17,6 +17,7 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -272,7 +273,7 @@ class DFRN
 
 		foreach ($items as $item) {
 			// prevent private email from leaking.
-			if ($item['network'] == NETWORK_MAIL) {
+			if ($item['network'] == Protocol::MAIL) {
 				continue;
 			}
 
@@ -1533,7 +1534,7 @@ class DFRN
 		$fields = ['id', 'uid', 'url', 'network', 'avatar-date', 'avatar', 'name-date', 'uri-date', 'addr',
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
 		$condition = ["`uid` = ? AND `nurl` = ? AND `network` != ?",
-			$importer["importer_uid"], normalise_link($author["link"]), NETWORK_STATUSNET];
+			$importer["importer_uid"], normalise_link($author["link"]), Protocol::STATUSNET];
 		$contact_old = DBA::selectFirst('contact', $fields, $condition);
 
 		if (DBA::isResult($contact_old)) {
@@ -2822,7 +2823,7 @@ class DFRN
 
 		$header = [];
 		$header["uid"] = $importer["importer_uid"];
-		$header["network"] = NETWORK_DFRN;
+		$header["network"] = Protocol::DFRN;
 		$header["wall"] = 0;
 		$header["origin"] = 0;
 		$header["contact-id"] = $importer["id"];
@@ -2956,7 +2957,7 @@ class DFRN
 			$r = q("SELECT * FROM contact WHERE nick = '%s'
 					AND network = '%s' AND uid = %d  AND url LIKE '%%%s%%' LIMIT 1",
 				DBA::escape($contact_nick),
-				DBA::escape(NETWORK_DFRN),
+				DBA::escape(Protocol::DFRN),
 				intval(local_user()),
 				DBA::escape($baseurl)
 			);

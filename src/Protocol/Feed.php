@@ -9,6 +9,7 @@ namespace Friendica\Protocol;
 use DOMDocument;
 use DOMXPath;
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -187,7 +188,7 @@ class Feed {
 
 		$header = [];
 		$header["uid"] = $importer["uid"];
-		$header["network"] = NETWORK_FEED;
+		$header["network"] = Protocol::FEED;
 		$header["wall"] = 0;
 		$header["origin"] = 0;
 		$header["gravity"] = GRAVITY_PARENT;
@@ -244,7 +245,7 @@ class Feed {
 
 			if (!$simulate) {
 				$condition = ["`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
-					$importer["uid"], $item["uri"], NETWORK_FEED, NETWORK_DFRN];
+					$importer["uid"], $item["uri"], Protocol::FEED, Protocol::DFRN];
 				$previous = Item::selectFirst(['id'], $condition);
 				if (DBA::isResult($previous)) {
 					logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);

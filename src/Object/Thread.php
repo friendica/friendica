@@ -5,6 +5,7 @@
 namespace Friendica\Object;
 
 use Friendica\BaseObject;
+use Friendica\Core\Protocol;
 use Friendica\Object\Post;
 
 require_once 'boot.php';
@@ -143,7 +144,7 @@ class Thread extends BaseObject
 		/*
 		 * Only add will be displayed
 		 */
-		if ($item->getDataValue('network') === NETWORK_MAIL && local_user() != $item->getDataValue('uid')) {
+		if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {
 			logger('[WARN] Conversation::addThread : Thread is a mail ('. $item->getId() .').', LOGGER_DEBUG);
 			return false;
 		}
@@ -176,7 +177,7 @@ class Thread extends BaseObject
 		$i = 0;
 
 		foreach ($this->parents as $item) {
-			if ($item->getDataValue('network') === NETWORK_MAIL && local_user() != $item->getDataValue('uid')) {
+			if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {
 				continue;
 			}
 

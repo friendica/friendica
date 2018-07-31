@@ -692,7 +692,7 @@ function api_get_user(App $a, $contact_id = null)
 
 	if ($uinfo[0]['self']) {
 		if ($uinfo[0]['network'] == "") {
-			$uinfo[0]['network'] = NETWORK_DFRN;
+			$uinfo[0]['network'] = Protocol::DFRN;
 		}
 
 		$usr = DBA::selectFirst('user', ['default-location'], ['uid' => api_user()]);
@@ -4702,7 +4702,7 @@ function api_friendica_remoteauth()
 
 	$contact = DBA::selectFirst('contact', [], ['uid' => api_user(), 'nurl' => $c_url]);
 
-	if (!DBA::isResult($contact) || ($contact['network'] !== NETWORK_DFRN)) {
+	if (!DBA::isResult($contact) || ($contact['network'] !== Protocol::DFRN)) {
 		throw new BadRequestException("Unknown contact");
 	}
 

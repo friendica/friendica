@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -28,13 +29,13 @@ function unfollow_post(App $a)
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
 			$uid, Contact::FRIEND, normalise_link($url),
-			normalise_link($url), $url, NETWORK_STATUSNET];
+			normalise_link($url), $url, Protocol::STATUSNET];
 	$contact = DBA::selectFirst('contact', [], $condition);
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("Contact wasn't found or can't be unfollowed."));
 	} else {
-		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN])) {
+		if (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DIASPORA, Protocol::DFRN])) {
 			$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
 				WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
 				intval($uid)
@@ -67,7 +68,8 @@ function unfollow_content(App $a)
 
 	$condition = ["`uid` = ? AND `rel` = ? AND (`nurl` = ? OR `alias` = ? OR `alias` = ?) AND `network` != ?",
 			local_user(), Contact::FRIEND, normalise_link($url),
-			normalise_link($url), $url, NETWORK_STATUSNET];
+			normalise_link($url), $url, Protocol::STATUSNET];
+
 	$contact = DBA::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 
 	if (!DBA::isResult($contact)) {
@@ -76,7 +78,7 @@ function unfollow_content(App $a)
 		// NOTREACHED
 	}
 
-	if (!in_array($contact['network'], [NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_DFRN])) {
+	if (!in_array($contact['network'], [Protocol::DIASPORA, Protocol::OSTATUS, Protocol::DFRN])) {
 		notice(L10n::t("Unfollowing is currently not supported by your network.").EOL);
 		$submit = "";
 		// NOTREACHED
