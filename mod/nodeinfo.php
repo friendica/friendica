@@ -74,20 +74,11 @@ function nodeinfo_init(App $a) {
 		$nodeinfo['usage']['localPosts'] = (int)Config::get('nodeinfo', 'local_posts');
 		$nodeinfo['usage']['localComments'] = (int)Config::get('nodeinfo', 'local_comments');
 
-		if (Addon::isEnabled('appnet')) {
-			$nodeinfo['services']['inbound'][] = 'appnet';
-		}
-		if (Addon::isEnabled('appnet') || Addon::isEnabled('buffer')) {
-			$nodeinfo['services']['outbound'][] = 'appnet';
-		}
 		if (Addon::isEnabled('blogger')) {
 			$nodeinfo['services']['outbound'][] = 'blogger';
 		}
 		if (Addon::isEnabled('dwpost')) {
 			$nodeinfo['services']['outbound'][] = 'dreamwidth';
-		}
-		if (Addon::isEnabled('fbpost') || Addon::isEnabled('buffer')) {
-			$nodeinfo['services']['outbound'][] = 'facebook';
 		}
 		if (Addon::isEnabled('statusnet')) {
 			$nodeinfo['services']['inbound'][] = 'gnusocial';
