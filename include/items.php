@@ -144,7 +144,11 @@ function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blackl
 function add_page_info($url, $no_photos = false, $photo = "", $keywords = false, $keyword_blacklist = "") {
 	$data = query_page_info($url, $photo, $keywords, $keyword_blacklist);
 
-	$text = add_page_info_data($data, $no_photos);
+	$text = '';
+
+	if (is_array($data) {
+		$text = add_page_info_data($data, $no_photos);
+	}
 
 	return $text;
 }
