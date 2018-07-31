@@ -59,7 +59,7 @@ class Delivery extends BaseObject
 			}
 			$parent_id = intval($item['parent']);
 
-			$condition = ['id' => [$item_id, $parent_id], 'visible' => true, 'moderated' => false];
+			$condition = ['id' => [$item_id, $parent_id], 'moderated' => false];
 			$params = ['order' => ['id']];
 			$itemdata = Item::select([], $condition, $params);
 
@@ -74,6 +74,16 @@ class Delivery extends BaseObject
 				$items[] = $item;
 			}
 			DBA::close($itemdata);
+
+			if (empty($target_item)) {
+				logger('Item ' . $item_id . "wasn't found. Quitting here.");
+				return;
+			}
+
+			if (empty($parent)) {
+				logger('Parent ' . $parent_id . ' for item ' . $item_id . "wasn't found. Quitting here.");
+				return;
+			}
 
 			$uid = $target_item['contact-uid'];
 

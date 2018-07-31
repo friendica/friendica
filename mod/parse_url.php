@@ -24,21 +24,21 @@ function parse_url_content(App $a) {
 
 	$br = "\n";
 
-	if (x($_GET,"binurl")) {
+	if (!empty($_GET["binurl"])) {
 		$url = trim(hex2bin($_GET["binurl"]));
 	} else {
 		$url = trim($_GET["url"]);
 	}
 
-	if ($_GET["title"]) {
+	if (!empty($_GET["title"])) {
 		$title = strip_tags(trim($_GET["title"]));
 	}
 
-	if ($_GET["description"]) {
+	if (!empty($_GET["description"])) {
 		$text = strip_tags(trim($_GET["description"]));
 	}
 
-	if ($_GET["tags"]) {
+	if (!empty($_GET["tags"])) {
 		$arr_tags = ParseUrl::convertTagsToArray($_GET["tags"]);
 		if (count($arr_tags)) {
 			$str_tags = $br . implode(" ", $arr_tags) . $br;
@@ -103,9 +103,9 @@ function parse_url_content(App $a) {
 		killme();
 	}
 
-	// If there is allready some content information submitted we don't
+	// If there is already some content information submitted we don't
 	// need to parse the url for content.
-	if ($url && $title && $text) {
+	if (!empty($url) && !empty($title) && !empty($text)) {
 
 		$title = str_replace(["\r","\n"],["",""],$title);
 

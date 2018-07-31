@@ -350,6 +350,10 @@ class OStatus
 		$header["origin"] = 0;
 		$header["gravity"] = GRAVITY_COMMENT;
 
+		if (!is_object($doc->firstChild)) {
+			return false;
+		}
+
 		$first_child = $doc->firstChild->tagName;
 
 		if ($first_child == "feed") {

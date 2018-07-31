@@ -2422,13 +2422,17 @@ class DFRN
 
 		$owner_unknown = (isset($owner["contact-unknown"]) && $owner["contact-unknown"]);
 
+		$item["owner-name"] = $owner["name"];
 		$item["owner-link"] = $owner["link"];
+		$item["owner-avatar"] = $owner["avatar"];
 		$item["owner-id"] = Contact::getIdForURL($owner["link"], 0);
 
 		// fetch the author
 		$author = self::fetchauthor($xpath, $entry, $importer, "atom:author", true);
 
+		$item["author-name"] = $author["name"];
 		$item["author-link"] = $author["link"];
+		$item["author-avatar"] = $author["avatar"];
 		$item["author-id"] = Contact::getIdForURL($author["link"], 0);
 
 		$item["title"] = XML::getFirstNodeValue($xpath, "atom:title/text()", $entry);
