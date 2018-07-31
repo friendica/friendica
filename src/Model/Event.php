@@ -48,9 +48,13 @@ class Event extends BaseObject
 		}
 
 		if ($simple) {
-			$o = "<h3>" . BBCode::convert($event['summary'], false, $simple) . "</h3>";
+			if (!empty($event['summary'])) {
+				$o = "<h3>" . BBCode::convert($event['summary'], false, $simple) . "</h3>";
+			}
 
-			$o .= "<div>" . BBCode::convert($event['desc'], false, $simple) . "</div>";
+			if (!empty($event['desc'])) {
+				$o .= "<div>" . BBCode::convert($event['desc'], false, $simple) . "</div>";
+			}
 
 			$o .= "<h4>" . L10n::t('Starts:') . "</h4><p>" . $event_start . "</p>";
 

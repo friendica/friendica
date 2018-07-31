@@ -1848,6 +1848,8 @@ class DFRN
 
 		DBA::insert('mail', $msg);
 
+		$msg["id"] = DBA::lastInsertId();
+
 		// send notifications.
 		/// @TODO Arange this mess
 		$notif_params = [

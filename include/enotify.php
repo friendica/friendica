@@ -95,6 +95,7 @@ function notification($params)
 
 	if ($params['type'] == NOTIFY_MAIL) {
 		$itemlink = $siteurl.'/message/'.$params['item']['id'];
+		$params["link"] = $itemlink;
 
 		$subject = L10n::t('[Friendica:Notify] New mail received at %s', $sitename);
 

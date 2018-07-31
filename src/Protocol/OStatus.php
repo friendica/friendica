@@ -1356,7 +1356,7 @@ class OStatus
 						"href" => $siteinfo["url"],
 						"type" => "text/html; charset=UTF-8",
 						"length" => "",
-						"title" => $siteinfo["title"]];
+						"title" => defaults($siteinfo, "title", $siteinfo["url"])];
 				XML::addElement($doc, $root, "link", "", $attributes);
 				break;
 			default:

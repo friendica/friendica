@@ -705,6 +705,10 @@ class GContact
 				$doprobing = (((time() - $last_contact) > (90 * 86400)) && ((time() - $last_failure) > (90 * 86400)));
 			}
 		} else {
+			$contact['location'] = defaults($contact, 'location', '');
+			$contact['about'] = defaults($contact, 'about', '');
+			$contact['generation'] = defaults($contact, 'generation', 0);
+
 			q(
 				"INSERT INTO `gcontact` (`name`, `nick`, `addr` , `network`, `url`, `nurl`, `photo`, `created`, `updated`, `location`, `about`, `hide`, `generation`)
 				VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d)",
