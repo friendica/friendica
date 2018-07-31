@@ -2855,7 +2855,7 @@ class Item extends BaseObject
 			$condition[] = $days;
 		}
 
-		$items = self::select(['file', 'resource-id', 'starred', 'type', 'id'], $condition);
+		$items = self::select(['file', 'resource-id', 'starred', 'type', 'id', 'post-type'], $condition);
 
 		if (!DBA::isResult($items)) {
 			return;
