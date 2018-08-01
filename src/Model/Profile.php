@@ -666,11 +666,11 @@ class Profile
 			$istoday = false;
 
 			while ($rr = DBA::fetch($s)) {
-				if (strlen($rr['name'])) {
+				if (strlen($rr['summary'])) {
 					$total ++;
 				}
 
-				$strt = DateTimeFormat::convert($rr['start'], $rr['convert'] ? $a->timezone : 'UTC', 'UTC', 'Y-m-d');
+				$strt = DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC', 'UTC', 'Y-m-d');
 				if ($strt === DateTimeFormat::timezoneNow($a->timezone, 'Y-m-d')) {
 					$istoday = true;
 				}
@@ -686,7 +686,7 @@ class Profile
 					$description = L10n::t('[No description]');
 				}
 
-				$strt = DateTimeFormat::convert($rr['start'], $rr['convert'] ? $a->timezone : 'UTC');
+				$strt = DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC');
 
 				if (substr($strt, 0, 10) < DateTimeFormat::timezoneNow($a->timezone, 'Y-m-d')) {
 					continue;
