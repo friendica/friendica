@@ -1568,7 +1568,7 @@ class Contact extends BaseObject
 			return;
 		}
 
-		$fields = ['url', 'name', 'nick', 'photo'];
+		$fields = ['url', 'name', 'nick', 'photo', 'network'];
 		$pub_contact = DBA::selectFirst('contact', $fields, ['id' => $datarray['author-id']]);
 		if (!DBA::isResult($pub_contact)) {
 			// Should never happen
