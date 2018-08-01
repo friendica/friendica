@@ -20,7 +20,7 @@ function viewcontacts_init(App $a)
 	}
 
 	if ($a->argc < 2) {
-		System::httpExit(403);
+		System::httpExit(403, ["title" => L10n::t('Access denied.')]);
 	}
 
 	Nav::setSelected('home');
