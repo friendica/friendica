@@ -86,7 +86,7 @@ class BBCode extends BaseObject
 					$post["url"] = $matches[1];
 					$post["title"] = $matches[2];
 				}
-				if (($post["url"] == "") && (in_array($post["type"], ["link", "video"]))
+				if (!empty($post["url"] == "") && (in_array($post["type"], ["link", "video"]))
 					&& preg_match("/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", $attacheddata, $matches)) {
 					$post["url"] = $matches[1];
 				}
@@ -609,7 +609,7 @@ class BBCode extends BaseObject
 		if (!$data) {
 			return $Text;
 		} elseif ($nolink) {
-			return $data["text"] . $data["after"];
+			return $data["text"] . defaults($data, 'after', '');
 		}
 
 		$title = htmlentities(defaults($data, 'title', ''), ENT_QUOTES, 'UTF-8', false);
@@ -632,7 +632,7 @@ class BBCode extends BaseObject
 
 		$text = $data["text"];
 
-		if (!empty($data["url"]) && ($data["title"] != "")) {
+		if (!empty($data["url"]) && !empty($data["title"])) {
 			$text .= "\n[url=" . $data["url"] . "]" . $data["title"] . "[/url]";
 		} elseif (!empty($data["url"])) {
 			$text .= "\n[url]" . $data["url"] . "[/url]";

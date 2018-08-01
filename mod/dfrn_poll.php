@@ -32,7 +32,8 @@ function dfrn_poll_init(App $a)
 	$quiet			 = x($_GET, 'quiet');
 
 	// Possibly it is an OStatus compatible server that requests a user feed
-	if (($a->argc > 1) && ($dfrn_id == '') && !strstr($_SERVER["HTTP_USER_AGENT"], 'Friendica')) {
+	$user_agent = defaults($_SERVER, 'HTTP_USER_AGENT', '');
+	if (($a->argc > 1) && ($dfrn_id == '') && !strstr($user_agent, 'Friendica')) {
 		$nickname = $a->argv[1];
 		header("Content-type: application/atom+xml");
 		echo OStatus::feed($nickname, $last_update, 10);

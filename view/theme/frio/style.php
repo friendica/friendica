@@ -110,6 +110,7 @@ if (empty($login_bg_image) && empty($login_bg_color)) {
 	$login_bg_image = 'img/login_bg.jpg';
 }
 $login_bg_color   = (empty($login_bg_color)   ? '#ededed'      : $login_bg_color);
+$login_bg_image   = (empty($login_bg_image)   ? ''             : $login_bg_image);
 
 $contentbg_transp = ((isset($contentbg_transp) && $contentbg_transp != '') ? $contentbg_transp : 100);
 

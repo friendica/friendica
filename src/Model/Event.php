@@ -89,7 +89,7 @@ class Event extends BaseObject
 			$o .= '<div class="description event-description">' . BBCode::convert($event['desc'], false, $simple) . '</div>' . "\r\n";
 		}
 
-		if (strlen($event['location'])) {
+		if (!empty($event['location'])) {
 			$o .= '<div class="event-location"><span class="event-label">' . L10n::t('Location:') . '</span>&nbsp;<span class="location">'
 				. BBCode::convert($event['location'], false, $simple)
 				. '</span></div>' . "\r\n";

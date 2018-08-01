@@ -946,7 +946,7 @@ class Probe
 
 		// This logging is for temporarily debugging reasons
 		if (!isset($data["poco"])) {
-			logger('POCO not defined for ' . profile_link, LOGGER_DEBUG);
+			logger('POCO not defined for ' . $profile_link, LOGGER_DEBUG);
 		}
 
 		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
@@ -1603,14 +1603,16 @@ class Probe
 
 		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
 
-		if (DBA::isResult($x) && DBA::isResult($r)) {
-			$mailbox = Email::constructMailboxName($r[0]);
-			$password = '';
-			openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
-			$mbox = Email::connect($mailbox, $r[0]['user'], $password);
-			if (!$mbox) {
-				return false;
-			}
+		if (!DBA::isResult($x) || !DBA::isResult($r)) {
+			return false;
+		}
+
+		$mailbox = Email::constructMailboxName($r[0]);
+		$password = '';
+		openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
+		$mbox = Email::connect($mailbox, $r[0]['user'], $password);
+		if (!$mbox) {
+			return false;
 		}
 
 		$msgs = Email::poll($mbox, $uri);

@@ -1563,19 +1563,23 @@ class Contact extends BaseObject
 	}
 
 	public static function addRelationship($importer, $contact, $datarray, $item, $sharing = false) {
-		$url = notags(trim($datarray['author-link']));
-		$name = notags(trim($datarray['author-name']));
-		$photo = notags(trim($datarray['author-avatar']));
-		$nick = '';
-
-		if (is_object($item)) {
-			$rawtag = $item->get_item_tags(NAMESPACE_ACTIVITY,'actor');
-			if ($rawtag && $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data']) {
-				$nick = $rawtag[0]['child'][NAMESPACE_POCO]['preferredUsername'][0]['data'];
-			}
-		} else {
-			$nick = $item;
+		// Should always be set
+		if (empty($datarray['author-id'])) {
+			return;
 		}
+
+		$fields = ['url', 'name', 'nick', 'photo'];
+		$pub_contact = DBA::selectFirst('contact', $fields, ['id' => $$datarray['author-id']]);
+		if (!DBA::isResult($pub_contact)) {
+			// Should never happen
+			return;
+		}
+
+		$url = $pub_contact['url'];
+		$name = $pub_contact['name'];
+		$photo = $pub_contact['photo'];
+		$nick = $pub_contact['nick'];
+		$network = $pub_contact['network'];
 
 		if (is_array($contact)) {
 			if (($contact['rel'] == self::SHARING)
@@ -1601,13 +1605,13 @@ class Contact extends BaseObject
 				DBA::escape($name),
 				DBA::escape($nick),
 				DBA::escape($photo),
-				DBA::escape(NETWORK_OSTATUS),
+				DBA::escape($network),
 				intval(self::FOLLOWER)
 			);
 
 			$contact_record = [
 				'id' => DBA::lastInsertId(),
-				'network' => NETWORK_OSTATUS,
+				'network' => $network,
 				'name' => $name,
 				'url' => $url,
 				'photo' => $photo
