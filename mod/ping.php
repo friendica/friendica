@@ -347,7 +347,7 @@ function ping_init(App $a)
 
 		if (DBA::isResult($notifs)) {
 			// Are the nofications called from the regular process or via the friendica app?
-			$regularnotifications = (intval($_GET['uid']) && intval($_GET['_']));
+			$regularnotifications = (!empty($_GET['uid']) && !empty($_GET['_']));
 
 			foreach ($notifs as $notif) {
 				if ($a->is_friendica_app() || !$regularnotifications) {
