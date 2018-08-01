@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-07-19 06:28+0200\n"
-"PO-Revision-Date: 2018-07-22 10:03+0000\n"
+"PO-Revision-Date: 2018-07-31 17:48+0000\n"
 "Last-Translator: Aditoo\n"
 "Language-Team: Czech (http://www.transifex.com/Friendica/friendica/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -472,7 +472,7 @@ msgstr[3] "Neúčastní se"
 #: include/conversation.php:1480 src/Content/ContactSelector.php:125
 msgid "Undecided"
 msgid_plural "Undecided"
-msgstr[0] "Nerozhotnut"
+msgstr[0] "Nerozhodnut"
 msgstr[1] "Nerozhodnutí"
 msgstr[2] "Nerozhodnutých"
 msgstr[3] "Nerozhodnuti"
@@ -918,7 +918,7 @@ msgstr "Žádné kontakty"
 msgid "%d Contact"
 msgid_plural "%d Contacts"
 msgstr[0] "%d kontakt"
-msgstr[1] "%d kontaktů"
+msgstr[1] "%d kontakty"
 msgstr[2] "%d kontaktů"
 msgstr[3] "%d kontaktů"
 
@@ -1012,80 +1012,80 @@ msgstr "odmítnul/a"
 
 #: include/text.php:970 mod/settings.php:934 src/Model/Event.php:379
 msgid "Monday"
-msgstr "Pondělí"
+msgstr "pondělí"
 
 #: include/text.php:970 src/Model/Event.php:380
 msgid "Tuesday"
-msgstr "Úterý"
+msgstr "úterý"
 
 #: include/text.php:970 src/Model/Event.php:381
 msgid "Wednesday"
-msgstr "Středa"
+msgstr "středa"
 
 #: include/text.php:970 src/Model/Event.php:382
 msgid "Thursday"
-msgstr "Čtvrtek"
+msgstr "čtvrtek"
 
 #: include/text.php:970 src/Model/Event.php:383
 msgid "Friday"
-msgstr "Pátek"
+msgstr "pátek"
 
 #: include/text.php:970 src/Model/Event.php:384
 msgid "Saturday"
-msgstr "Sobota"
+msgstr "sobota"
 
 #: include/text.php:970 mod/settings.php:934 src/Model/Event.php:378
 msgid "Sunday"
-msgstr "Neděle"
+msgstr "neděle"
 
 #: include/text.php:974 src/Model/Event.php:399
 msgid "January"
-msgstr "Ledna"
+msgstr "ledna"
 
 #: include/text.php:974 src/Model/Event.php:400
 msgid "February"
-msgstr "Února"
+msgstr "února"
 
 #: include/text.php:974 src/Model/Event.php:401
 msgid "March"
-msgstr "Března"
+msgstr "března"
 
 #: include/text.php:974 src/Model/Event.php:402
 msgid "April"
-msgstr "Dubna"
+msgstr "dubna"
 
 #: include/text.php:974 include/text.php:991 src/Model/Event.php:390
 #: src/Model/Event.php:403
 msgid "May"
-msgstr "Května"
+msgstr "května"
 
 #: include/text.php:974 src/Model/Event.php:404
 msgid "June"
-msgstr "Června"
+msgstr "června"
 
 #: include/text.php:974 src/Model/Event.php:405
 msgid "July"
-msgstr "Července"
+msgstr "července"
 
 #: include/text.php:974 src/Model/Event.php:406
 msgid "August"
-msgstr "Srpna"
+msgstr "srpna"
 
 #: include/text.php:974 src/Model/Event.php:407
 msgid "September"
-msgstr "Září"
+msgstr "září"
 
 #: include/text.php:974 src/Model/Event.php:408
 msgid "October"
-msgstr "Října"
+msgstr "října"
 
 #: include/text.php:974 src/Model/Event.php:409
 msgid "November"
-msgstr "Listopadu"
+msgstr "listopadu"
 
 #: include/text.php:974 src/Model/Event.php:410
 msgid "December"
-msgstr "Prosinec"
+msgstr "prosince"
 
 #: include/text.php:988 src/Model/Event.php:371
 msgid "Mon"
@@ -1178,7 +1178,7 @@ msgstr "Zobrazit na separátní stránce"
 
 #: include/text.php:1414
 msgid "view on separate page"
-msgstr "Zobrazit na separátní stránce"
+msgstr "zobrazit na separátní stránce"
 
 #: include/text.php:1419 include/text.php:1426 src/Model/Event.php:597
 msgid "link to source"
@@ -1532,7 +1532,7 @@ msgstr "Odeslat"
 
 #: mod/localtime.php:19 src/Model/Event.php:36 src/Model/Event.php:817
 msgid "l F d, Y \\@ g:i A"
-msgstr "l F d, Y \\@ g:i A"
+msgstr "l d. F, Y v g:i A"
 
 #: mod/localtime.php:33
 msgid "Time Conversion"
@@ -1736,7 +1736,7 @@ msgstr "měsíc"
 #: mod/cal.php:282 mod/events.php:402 src/Util/Temporal.php:305
 #: src/Model/Event.php:414
 msgid "week"
-msgstr "týdnem"
+msgstr "týden"
 
 #: mod/cal.php:283 mod/events.php:403 src/Util/Temporal.php:306
 #: src/Model/Event.php:415
@@ -2071,7 +2071,7 @@ msgstr "Přezdívka účtu"
 
 #: mod/crepair.php:160
 msgid "@Tagname - overrides Name/Nickname"
-msgstr "@Tagname - upřednostněno před Jménem/Přezdívkou"
+msgstr "@jménoštítku- upřednostněno před jménem/přezdívkou"
 
 #: mod/crepair.php:161
 msgid "Account URL"
@@ -2083,7 +2083,7 @@ msgstr "Žádost o přátelství URL"
 
 #: mod/crepair.php:163
 msgid "Friend Confirm URL"
-msgstr "URL adresa potvrzení přátelství"
+msgstr "URL adresa pro potvrzení přátelství"
 
 #: mod/crepair.php:164
 msgid "Notification Endpoint URL"
@@ -2470,7 +2470,7 @@ msgstr "Kdo: (pokud je možné)"
 
 #: mod/profiles.php:622
 msgid "Examples: cathy123, Cathy Williams, cathy@example.com"
-msgstr "Příklady: jan123, Jan Novák, jan@seznam.cz"
+msgstr "Příklady: jan123, Jan Novák, jan@priklad.cz"
 
 #: mod/profiles.php:623
 msgid "Since [date]:"
@@ -2637,7 +2637,7 @@ msgstr "skrytá kopie: e-mailové adresy"
 
 #: mod/editpost.php:127 src/Core/ACL.php:316
 msgid "Example: bob@example.com, mary@example.com"
-msgstr "Příklad: bob@example.com, mary@example.com"
+msgstr "Příklad: jan@priklad.cz, lucie@priklad.cz"
 
 #: mod/match.php:48
 msgid "No keywords to match. Please add keywords to your default profile."
@@ -3751,7 +3751,7 @@ msgstr "Přidat štítek"
 #: mod/photos.php:1400
 msgid ""
 "Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
-msgstr "Příklad: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping"
+msgstr "Příklad: @jan, @Lucie_Nováková, @jakub@priklad.cz, #Morava, #taboreni"
 
 #: mod/photos.php:1401
 msgid "Do not rotate"
@@ -3817,7 +3817,7 @@ msgstr "Nepřihlášení uživatelé mohou vyhledávat pouze jednou za minutu."
 #: mod/search.php:245
 #, php-format
 msgid "Items tagged with: %s"
-msgstr "Položky označené jako: %s"
+msgstr "Položky označené štítkem: %s"
 
 #: mod/subthread.php:113
 #, php-format
@@ -3963,7 +3963,7 @@ msgstr "Vlastnosti doplňků"
 
 #: mod/admin.php:226
 msgid "User registrations waiting for confirmation"
-msgstr "Registrace uživatele čeká na potvrzení"
+msgstr "Registrace uživatelů čekající na potvrzení"
 
 #: mod/admin.php:307 mod/admin.php:369 mod/admin.php:486 mod/admin.php:528
 #: mod/admin.php:720 mod/admin.php:755 mod/admin.php:793 mod/admin.php:893
@@ -4107,7 +4107,7 @@ msgstr "Nelze nalézt žádnou položku v kontaktech pro tuto URL adresu (%s)"
 msgid "%s contact unblocked"
 msgid_plural "%s contacts unblocked"
 msgstr[0] "%s kontakt odblokován"
-msgstr[1] "%skontakty odblokovány"
+msgstr[1] "%s kontakty odblokovány"
 msgstr[2] "%s kontaktů odblokováno"
 msgstr[3] "%s kontaktů odblokováno"
 
@@ -4177,7 +4177,7 @@ msgid ""
 "You need to know the GUID of the item. You can find it e.g. by looking at "
 "the display URL. The last part of http://example.com/display/123456 is the "
 "GUID, here 123456."
-msgstr "Budete muset znát číslo GUID položky. Můžete jej najít např. v adrese URL. Poslední část adresy http://example.com/display/123456 je GUID, v tomto případě 123456"
+msgstr "Budete muset znát číslo GUID položky. Můžete jej najít např. v adrese URL. Poslední část adresy http://priklad.cz/display/123456 je GUID, v tomto případě 123456"
 
 #: mod/admin.php:533
 msgid "GUID"
@@ -4360,7 +4360,7 @@ msgstr "Aktivní doplňky"
 
 #: mod/admin.php:935
 msgid "Can not parse base url. Must have at least <scheme>://<domain>"
-msgstr "Nelze zpracovat výchozí url adresu. Musí obsahovat alespoň <schéma>://<doméma>"
+msgstr "Nelze zpracovat výchozí url adresu. Musí obsahovat alespoň <scheme>://<domain>"
 
 #: mod/admin.php:1268
 msgid "Site settings updated."
@@ -4900,7 +4900,7 @@ msgstr "Poskytnout zabudovanou kompatibilitu sitě Diaspora."
 
 #: mod/admin.php:1465
 msgid "Only allow Friendica contacts"
-msgstr "Povolit pouze Friendica kontakty"
+msgstr "Povolit pouze kontakty z Friendica"
 
 #: mod/admin.php:1465
 msgid ""
@@ -5426,17 +5426,17 @@ msgstr[3] "%s uživatelů smazáno"
 #: mod/admin.php:1745
 #, php-format
 msgid "User '%s' deleted"
-msgstr "Uživatel '%s' smazán"
+msgstr "Uživatel \"%s\" smazán"
 
 #: mod/admin.php:1753
 #, php-format
 msgid "User '%s' unblocked"
-msgstr "Uživatel '%s' odblokován"
+msgstr "Uživatel \"%s\" odblokován"
 
 #: mod/admin.php:1753
 #, php-format
 msgid "User '%s' blocked"
-msgstr "Uživatel '%s' blokován"
+msgstr "Uživatel \"%s\" zablokován"
 
 #: mod/admin.php:1810 mod/settings.php:1057
 msgid "Normal Account Page"
@@ -5497,15 +5497,15 @@ msgstr "Typ"
 
 #: mod/admin.php:1873
 msgid "Add User"
-msgstr "Přidat Uživatele"
+msgstr "Přidat uživatele"
 
 #: mod/admin.php:1875
 msgid "User registrations waiting for confirm"
-msgstr "Registrace uživatele čeká na potvrzení"
+msgstr "Registrace uživatelů čekající na potvrzení"
 
 #: mod/admin.php:1876
 msgid "User waiting for permanent deletion"
-msgstr "Uživatel čeká na trvalé smazání"
+msgstr "Uživatel čekající na trvalé smazání"
 
 #: mod/admin.php:1877
 msgid "Request date"
@@ -5543,13 +5543,13 @@ msgstr "Smazán od"
 msgid ""
 "Selected users will be deleted!\\n\\nEverything these users had posted on "
 "this site will be permanently deleted!\\n\\nAre you sure?"
-msgstr "Vybraní uživatelé budou smazáni!\\n\\n Vše, co tito uživatelé na těchto stránkách vytvořili, bude trvale odstraněno!\\n\\n Opravdu pokračovat?"
+msgstr "Vybraní uživatelé budou smazáni!\\n\\n Vše, co tito uživatelé na těchto stránkách vytvořili, bude trvale odstraněno!\\n\\nOpravdu chcete pokračovat?"
 
 #: mod/admin.php:1896
 msgid ""
 "The user {0} will be deleted!\\n\\nEverything this user has posted on this "
 "site will be permanently deleted!\\n\\nAre you sure?"
-msgstr "Uživatel {0} bude smazán!\\n\\n Vše, co tento uživatel na těchto stránkách vytvořil, bude trvale odstraněno!\\n\\n Opravdu pokračovat?"
+msgstr "Uživatel {0} bude smazán!\\n\\n Vše, co tento uživatel na těchto stránkách vytvořil, bude trvale odstraněno!\\n\\n Opravdu chcete pokračovat?"
 
 #: mod/admin.php:1906
 msgid "Name of the new user."
@@ -6056,7 +6056,7 @@ msgstr "Databázový konfigurační soubor \"config/local.ini.php\" nemohl být 
 
 #: mod/install.php:259
 msgid "<h1>What next</h1>"
-msgstr "<h1>Co dál<h1>"
+msgstr "<h1>Co dál</h1>"
 
 #: mod/install.php:260
 msgid ""
@@ -6101,7 +6101,7 @@ msgid_plural "%d messages sent."
 msgstr[0] "%d zpráva odeslána."
 msgstr[1] "%d zprávy odeslány."
 msgstr[2] "%d zpráv odesláno."
-msgstr[3] "%d zprávy odeslány."
+msgstr[3] "%d zpráv odesláno."
 
 #: mod/invite.php:122
 msgid "You have no more invitations available"
@@ -6638,7 +6638,7 @@ msgstr "Nastavení e-mailu aktualizována."
 
 #: mod/settings.php:299
 msgid "Features updated"
-msgstr "Aktualizované funkčnosti"
+msgstr "Funkce aktualizovány"
 
 #: mod/settings.php:372
 msgid "Relocate message has been send to your contacts"
@@ -6756,7 +6756,7 @@ msgstr "Nastavení doplňků"
 
 #: mod/settings.php:773
 msgid "Additional Features"
-msgstr "Další Funkčnosti"
+msgstr "Další funkce"
 
 #: mod/settings.php:796 src/Content/ContactSelector.php:83
 msgid "Diaspora"
@@ -7698,7 +7698,7 @@ msgstr "Zadejte jméno nebo zájmy"
 
 #: view/theme/vier/theme.php:204 src/Content/Widget.php:62
 msgid "Examples: Robert Morgenstein, Fishing"
-msgstr "Příklady: Robert Morgenstein, rybaření"
+msgstr "Příklady: Josef Dvořák, rybaření"
 
 #: view/theme/vier/theme.php:207 src/Content/Widget.php:65
 msgid "Similar Interests"
@@ -8107,15 +8107,15 @@ msgstr "méně než před sekundou"
 
 #: src/Util/Temporal.php:303
 msgid "year"
-msgstr "rok"
+msgstr "rokem"
 
 #: src/Util/Temporal.php:303
 msgid "years"
-msgstr "let"
+msgstr "lety"
 
 #: src/Util/Temporal.php:304
 msgid "months"
-msgstr "měsíců"
+msgstr "měsíci"
 
 #: src/Util/Temporal.php:305
 msgid "weeks"
@@ -8123,27 +8123,27 @@ msgstr "týdny"
 
 #: src/Util/Temporal.php:306
 msgid "days"
-msgstr "dnů"
+msgstr "dny"
 
 #: src/Util/Temporal.php:307
 msgid "hour"
-msgstr "hodina"
+msgstr "hodinou"
 
 #: src/Util/Temporal.php:307
 msgid "hours"
-msgstr "hodin"
+msgstr "hodinami"
 
 #: src/Util/Temporal.php:308
 msgid "minute"
-msgstr "minuta"
+msgstr "minutou"
 
 #: src/Util/Temporal.php:308
 msgid "minutes"
-msgstr "minut"
+msgstr "minutami"
 
 #: src/Util/Temporal.php:309
 msgid "second"
-msgstr "sekunda"
+msgstr "sekundou"
 
 #: src/Util/Temporal.php:309
 msgid "seconds"
@@ -8721,7 +8721,7 @@ msgstr "Zadejte adresu nebo umístění webu"
 
 #: src/Content/Widget.php:35
 msgid "Example: bob@example.com, http://example.com/barbara"
-msgstr "Příklad: jan@příklad.cz, http://příklad.cz/jana"
+msgstr "Příklad: jan@priklad.cz, http://priklad.cz/lucie"
 
 #: src/Content/Widget.php:53
 #, php-format
@@ -8960,7 +8960,7 @@ msgstr "Žádné události k zobrazení"
 
 #: src/Model/Event.php:541
 msgid "l, F j"
-msgstr "l, F j"
+msgstr "l, j. F"
 
 #: src/Model/Event.php:569
 msgid "Edit event"
@@ -9127,11 +9127,11 @@ msgstr "Spravovat/upravit profily"
 
 #: src/Model/Profile.php:548 src/Model/Profile.php:637
 msgid "g A l F d"
-msgstr "g A l F d"
+msgstr "g A, l d. F"
 
 #: src/Model/Profile.php:549
 msgid "F d"
-msgstr "F d"
+msgstr "d. F"
 
 #: src/Model/Profile.php:602 src/Model/Profile.php:699
 msgid "[today]"
@@ -9401,11 +9401,11 @@ msgstr "sleduje"
 #: src/Protocol/OStatus.php:1803
 #, php-format
 msgid "%s stopped following %s."
-msgstr "%s přestal sledovat %s."
+msgstr "%s přestal/a sledovat uživatele %s."
 
 #: src/Protocol/OStatus.php:1804
 msgid "stopped following"
-msgstr "přestal sledovat"
+msgstr "přestal/a sledovat"
 
 #: src/Worker/Delivery.php:420
 msgid "(no subject)"
