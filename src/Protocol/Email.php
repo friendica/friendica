@@ -25,6 +25,16 @@ class Email
 
 		$mbox = @imap_open($mailbox, $username, $password);
 
+		$errors = imap_errors();
+		if (!empty($errors)) {
+			logger('IMAP Errors occured: ' . json_encode($errors));
+		}
+
+		$alerts = imap_alerts();
+		if (!empty($alerts)) {
+			logger('IMAP Alerts occured: ' . json_encode($alerts));
+		}
+
 		return $mbox;
 	}
 

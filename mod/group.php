@@ -22,7 +22,7 @@ function group_init(App $a) {
 
 function group_post(App $a) {
 
-	if (! local_user()) {
+	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
@@ -45,21 +45,21 @@ function group_post(App $a) {
 		return; // NOTREACHED
 	}
 
-	if (($a->argc == 2) && (intval($a->argv[1]))) {
+	if (($a->argc == 2) && intval($a->argv[1])) {
 		check_form_security_token_redirectOnErr('/group', 'group_edit');
 
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBA::isResult($r)) {
+		if (!DBA::isResult($r)) {
 			notice(L10n::t('Group not found.') . EOL);
 			goaway(System::baseUrl() . '/contacts');
 			return; // NOTREACHED
 		}
 		$group = $r[0];
 		$groupname = notags(trim($_POST['groupname']));
-		if ((strlen($groupname))  && ($groupname != $group['name'])) {
+		if (strlen($groupname) && ($groupname != $group['name'])) {
 			$r = q("UPDATE `group` SET `name` = '%s' WHERE `uid` = %d AND `id` = %d",
 				DBA::escape($groupname),
 				intval(local_user()),
@@ -79,13 +79,13 @@ function group_post(App $a) {
 function group_content(App $a) {
 	$change = false;
 
-	if (! local_user()) {
+	if (!local_user()) {
 		notice(L10n::t('Permission denied') . EOL);
 		return;
 	}
 
 	// Switch to text mode interface if we have more than 'n' contacts or group members
-	
+
 	if ($a->argc == 1) {
 		goaway(System::baseUrl() . '/contacts');
 	}
@@ -113,11 +113,13 @@ function group_content(App $a) {
 
 	}
 
+	$nogroup = false;
+
 	if (($a->argc == 2) && ($a->argv[1] === 'none')) {
 		require_once 'mod/contacts.php';
 
 		$id = -1;
-		$nogroup = True;
+		$nogroup = true;
 		$group = [
 			'id' => $id,
 			'name' => L10n::t('Contacts not in any group'),
@@ -173,7 +175,7 @@ function group_content(App $a) {
 		}
 	}
 
-	if (($a->argc > 1) && (intval($a->argv[1]))) {
+	if (($a->argc > 1) && intval($a->argv[1])) {
 		require_once 'mod/contacts.php';
 
 		$r = q("SELECT * FROM `group` WHERE `id` = %d AND `uid` = %d AND `deleted` = 0 LIMIT 1",
@@ -181,7 +183,7 @@ function group_content(App $a) {
 			intval(local_user())
 		);
 
-		if (! DBA::isResult($r)) {
+		if (!DBA::isResult($r)) {
 			notice(L10n::t('Group not found.') . EOL);
 			goaway(System::baseUrl() . '/contacts');
 		}
@@ -234,7 +236,7 @@ function group_content(App $a) {
 
 	}
 
-	if (! isset($group)) {
+	if (!isset($group)) {
 		return;
 	}
 
@@ -279,7 +281,7 @@ function group_content(App $a) {
 	if (DBA::isResult($r)) {
 		// Format the data of the contacts who aren't in the contact group
 		foreach ($r as $member) {
-			if (! in_array($member['id'], $preselected)) {
+			if (!in_array($member['id'], $preselected)) {
 				$entry = _contact_detail_for_template($member);
 				$entry['label'] = 'contacts';
 				if (!$nogroup)
