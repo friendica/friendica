@@ -944,6 +944,11 @@ class Probe
 		$prof_data["fn"]           = $data["name"];
 		$prof_data["key"]          = $data["pubkey"];
 
+		// This logging is for temporarily debugging reasons
+		if (!isset($data["poco"])) {
+			logger('POCO not defined for ' . profile_link, LOGGER_DEBUG);
+		}
+
 		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;

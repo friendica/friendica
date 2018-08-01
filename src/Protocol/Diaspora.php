@@ -1374,15 +1374,12 @@ class Diaspora
 		$item = Item::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
-			if (!isset($contact["url"])) {
-				logger('Missing URL: ' . System::callstack() . ' - ' . json_encode($contact));
-			}
+			$person = self::personByHandle($author);
+			$result = self::storeByGuid($guid, $person["url"], $uid);
 
-			$result = self::storeByGuid($guid, $contact["url"], $uid);
-
-			if (!$result) {
-				$person = self::personByHandle($author);
-				$result = self::storeByGuid($guid, $person["url"], $uid);
+			// We don't have an url for items that arrived at the public dispatcher
+			if (!$result && !empty($contact["url"])) {
+				$result = self::storeByGuid($guid, $contact["url"], $uid);
 			}
 
 			if ($result) {
