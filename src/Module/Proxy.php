@@ -139,7 +139,7 @@ class Proxy extends BaseModule
 			$cachefile = get_cachefile(hash('md5', $_REQUEST['url']));
 			if ($cachefile != '' && file_exists($cachefile)) {
 				$img_str = file_get_contents($cachefile);
-				$mime = image_type_to_mime_type(exif_imagetype($cachefile));
+				$mime = mime_content_type($cachefile);
 
 				header('Content-type: ' . $mime);
 				header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
@@ -187,7 +187,7 @@ class Proxy extends BaseModule
 
 			$tempfile = tempnam(get_temppath(), 'cache');
 			file_put_contents($tempfile, $img_str);
-			$mime = image_type_to_mime_type(exif_imagetype($tempfile));
+			$mime = mime_content_type($tempfile);
 			unlink($tempfile);
 
 			// If there is an error then return a blank image

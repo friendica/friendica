@@ -108,7 +108,7 @@ function ping_init(App $a)
 
 	if (local_user()) {
 		// Different login session than the page that is calling us.
-		if (intval($_GET['uid']) && intval($_GET['uid']) != local_user()) {
+		if (!empty($_GET['uid']) && intval($_GET['uid']) != local_user()) {
 			$data = ['result' => ['invalid' => 1]];
 
 			if ($format == 'json') {
