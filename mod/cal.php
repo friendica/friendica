@@ -32,47 +32,49 @@ function cal_init(App $a)
 		return;
 	}
 
+	if ($a->argc < 2) {
+		System::httpExit(403);
+	}
+
 	Nav::setSelected('events');
 
-	if ($a->argc > 1) {
-		$nick = $a->argv[1];
-		$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
-		if (!DBA::isResult($user)) {
-			return;
-		}
-
-		$a->data['user'] = $user;
-		$a->profile_uid = $user['uid'];
-
-		// if it's a json request abort here becaus we don't
-		// need the widget data
-		if (!empty($a->argv[2]) && ($a->argv[2] === 'json')) {
-			return;
-		}
-
-		$profile = Profile::getByNickname($nick, $a->profile_uid);
-
-		$account_type = Contact::getAccountType($profile);
-
-		$tpl = get_markup_template("vcard-widget.tpl");
-
-		$vcard_widget = replace_macros($tpl, [
-			'$name' => $profile['name'],
-			'$photo' => $profile['photo'],
-			'$addr' => (($profile['addr'] != "") ? $profile['addr'] : ""),
-			'$account_type' => $account_type,
-			'$pdesc' => (($profile['pdesc'] != "") ? $profile['pdesc'] : ""),
-		]);
-
-		$cal_widget = Widget\CalendarExport::getHTML();
-
-		if (!x($a->page, 'aside')) {
-			$a->page['aside'] = '';
-		}
-
-		$a->page['aside'] .= $vcard_widget;
-		$a->page['aside'] .= $cal_widget;
+	$nick = $a->argv[1];
+	$user = DBA::selectFirst('user', [], ['nickname' => $nick, 'blocked' => false]);
+	if (!DBA::isResult($user)) {
+		return;
 	}
+
+	$a->data['user'] = $user;
+	$a->profile_uid = $user['uid'];
+
+	// if it's a json request abort here becaus we don't
+	// need the widget data
+	if (!empty($a->argv[2]) && ($a->argv[2] === 'json')) {
+		return;
+	}
+
+	$profile = Profile::getByNickname($nick, $a->profile_uid);
+
+	$account_type = Contact::getAccountType($profile);
+
+	$tpl = get_markup_template("vcard-widget.tpl");
+
+	$vcard_widget = replace_macros($tpl, [
+		'$name' => $profile['name'],
+		'$photo' => $profile['photo'],
+		'$addr' => (($profile['addr'] != "") ? $profile['addr'] : ""),
+		'$account_type' => $account_type,
+		'$pdesc' => (($profile['pdesc'] != "") ? $profile['pdesc'] : ""),
+	]);
+
+	$cal_widget = Widget\CalendarExport::getHTML();
+
+	if (!x($a->page, 'aside')) {
+		$a->page['aside'] = '';
+	}
+
+	$a->page['aside'] .= $vcard_widget;
+	$a->page['aside'] .= $cal_widget;
 
 	return;
 }
@@ -84,17 +86,11 @@ function cal_content(App $a)
 	// get the translation strings for the callendar
 	$i18n = Event::getStrings();
 
-	if (!empty($a->data['user'])) {
-		$nickname = $a->data['user']['nickname'];
-	} else {
-		$nickname = '';
-	}
-
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
 		'$baseurl' => System::baseUrl(),
 		'$modparams' => 2,
-		'$module_url' => '/cal/' . $nickname,
+		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$i18n' => $i18n,
 	]);
 
@@ -118,13 +114,9 @@ function cal_content(App $a)
 	// Setup permissions structures
 	$remote_contact = false;
 	$contact_id = 0;
-	$owner_uid = 0;
-	$nick = '';
 
-	if (!empty($a->data['user'])) {
-		$owner_uid = $a->data['user']['uid'];
-		$nick = $a->data['user']['nickname'];
-	}
+	$owner_uid = $a->data['user']['uid'];
+	$nick = $a->data['user']['nickname'];
 
 	if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
 		foreach ($_SESSION['remote'] as $v) {
@@ -160,11 +152,7 @@ function cal_content(App $a)
 	$sql_extra = " AND `event`.`cid` = 0 " . $sql_perms;
 
 	// get the tab navigation bar
-	if (!empty($a->data['user'])) {
-		$tabs = Profile::getTabs($a, false, $a->data['user']['nickname']);
-	} else {
-		$tabs = '';
-	}
+	$tabs = Profile::getTabs($a, false, $a->data['user']['nickname']);
 
 	// The view mode part is similiar to /mod/events.php
 	if ($mode == 'view') {
@@ -315,7 +303,7 @@ function cal_content(App $a)
 
 		// Test permissions
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
-		if (((local_user() !== intval($owner_uid))) && !Feature::isEnabled($owner_uid, "export_calendar")) {
+		if ((local_user() !== intval($owner_uid)) && !Feature::isEnabled($owner_uid, "export_calendar")) {
 			notice(L10n::t('Permission denied.') . EOL);
 			goaway('cal/' . $nick);
 		}

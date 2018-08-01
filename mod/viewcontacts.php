@@ -11,36 +11,39 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Util\Proxy as ProxyUtils;
+use Friendica\Core\System;
 
 function viewcontacts_init(App $a)
 {
-	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
+	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 		return;
+	}
+
+	if ($a->argc < 2) {
+		System::httpExit(403);
 	}
 
 	Nav::setSelected('home');
 
-	if ($a->argc > 1) {
-		$nick = $a->argv[1];
-		$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `blocked` = 0 LIMIT 1",
-			DBA::escape($nick)
-		);
+	$nick = $a->argv[1];
+	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `blocked` = 0 LIMIT 1",
+		DBA::escape($nick)
+	);
 
-		if (! DBA::isResult($r)) {
-			return;
-		}
-
-		$a->data['user'] = $r[0];
-		$a->profile_uid = $r[0]['uid'];
-		$is_owner = (local_user() && (local_user() == $a->profile_uid));
-
-		Profile::load($a, $a->argv[1]);
+	if (!DBA::isResult($r)) {
+		return;
 	}
+
+	$a->data['user'] = $r[0];
+	$a->profile_uid = $r[0]['uid'];
+	$is_owner = (local_user() && (local_user() == $a->profile_uid));
+
+	Profile::load($a, $a->argv[1]);
 }
 
 function viewcontacts_content(App $a)
 {
-	if ((Config::get('system', 'block_public')) && (! local_user()) && (! remote_user())) {
+	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
@@ -52,7 +55,7 @@ function viewcontacts_content(App $a)
 	// tabs
 	$o .= Profile::getTabs($a, $is_owner, $a->data['user']['nickname']);
 
-	if (((! count($a->profile)) || ($a->profile['hide-friends']))) {
+	if (!count($a->profile) || $a->profile['hide-friends']) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return $o;
 	}
@@ -122,7 +125,6 @@ function viewcontacts_content(App $a)
 		'$contacts' => $contacts,
 		'$paginate' => paginate($a),
 	]);
-
 
 	return $o;
 }
