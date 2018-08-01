@@ -659,6 +659,10 @@ class PortableContact
 		$nodeinfo2_url = '';
 
 		foreach ($nodeinfo['links'] as $link) {
+			if (!is_array($link) || empty($link['rel'])) {
+				logger('Invalid nodeinfo format for ' . $server_url, LOGGER_DEBUG);
+				continue;
+			}
 			if ($link['rel'] == 'http://nodeinfo.diaspora.software/ns/schema/1.0') {
 				$nodeinfo1_url = $link['href'];
 			} elseif ($link['rel'] == 'http://nodeinfo.diaspora.software/ns/schema/2.0') {
