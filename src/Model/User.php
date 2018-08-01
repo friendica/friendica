@@ -729,7 +729,8 @@ class User
 		Worker::add(PRIORITY_HIGH, "Notifier", "removeme", $uid);
 
 		// Send an update to the directory
-		Worker::add(PRIORITY_LOW, "Directory", $user['url']);
+		$self = DBA::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
+		Worker::add(PRIORITY_LOW, "Directory", $self['url']);
 
 		if ($uid == local_user()) {
 			unset($_SESSION['authenticated']);
