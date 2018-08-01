@@ -89,11 +89,10 @@ function cal_content(App $a)
 	$htpl = get_markup_template('event_head.tpl');
 	$a->page['htmlhead'] .= replace_macros($htpl, [
 		'$baseurl' => System::baseUrl(),
-		'$modparams' => 2,
 		'$module_url' => '/cal/' . $a->data['user']['nickname'],
+		'$modparams' => 2,
 		'$i18n' => $i18n,
 	]);
-
 
 	$etpl = get_markup_template('event_end.tpl');
 	$a->page['end'] .= replace_macros($etpl, [
