@@ -76,6 +76,8 @@ function directory_content(App $a)
 				(`profile`.`education` LIKE '%$search%') OR
 				(`profile`.`pub_keywords` LIKE '%$search%') OR
 				(`profile`.`prv_keywords` LIKE '%$search%'))";
+	} else {
+		$sql_extra = '';
 	}
 
 	$publish = (Config::get('system', 'publish_all') ? '' : " AND `publish` = 1 " );
@@ -147,6 +149,8 @@ function directory_content(App $a)
 				|| (x($profile, 'country-name') == 1)
 			) {
 				$location = L10n::t('Location:');
+			} else {
+				$location = '';
 			}
 
 			$gender   = ((x($profile, 'gender')   == 1) ? L10n::t('Gender:')   : false);
