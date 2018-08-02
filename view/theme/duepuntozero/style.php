@@ -19,6 +19,8 @@ if (!x($colorset)) {
 	$colorset = $s_colorset;
 }
 
+$setcss = '';
+
 if ($colorset) {
 	if ($colorset == 'greenzero') {
 		$setcss = file_get_contents('view/theme/duepuntozero/deriv/greenzero.css');
@@ -27,7 +29,7 @@ if ($colorset) {
 	if ($colorset == 'purplezero') {
 		$setcss = file_get_contents('view/theme/duepuntozero/deriv/purplezero.css');
 	}
-	
+
 	if ($colorset == 'easterbunny') {
 		$setcss = file_get_contents('view/theme/duepuntozero/deriv/easterbunny.css');
 	}
