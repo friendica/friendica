@@ -27,6 +27,11 @@ function notification($params)
 {
 	$a = get_app();
 
+	// Temporary logging for finding the origin
+	if (!isset($params['language']) || !isset($params['uid'])) {
+		logger('Missing parameters.' . System::callstack());
+	}
+
 	// from here on everything is in the recipients language
 	L10n::pushLang($params['language']);
 

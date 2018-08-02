@@ -422,7 +422,7 @@ function dfrn_request_post(App $a)
 					intval($uid),
 					intval($contact_record['id']),
 					((x($_POST,'knowyou') && ($_POST['knowyou'] == 1)) ? 1 : 0),
-					DBA::escape(notags(trim($_POST['dfrn-request-message']))),
+					DBA::escape(notags(trim(defaults($_POST, 'dfrn-request-message', '')))),
 					DBA::escape($hash),
 					DBA::escape(DateTimeFormat::utcNow())
 				);
