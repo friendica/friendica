@@ -494,10 +494,11 @@ class Network
 
 		$h = substr($addr, strpos($addr, '@') + 1);
 
-		if (($h) && (dns_get_record($h, DNS_A + DNS_MX) || filter_var($h, FILTER_VALIDATE_IP) )) {
+		// Concerning the @ see here: https://stackoverflow.com/questions/36280957/dns-get-record-a-temporary-server-error-occurred
+		if ($h && (@dns_get_record($h, DNS_A + DNS_MX) || filter_var($h, FILTER_VALIDATE_IP) )) {
 			return true;
 		}
-		if (($h) && dns_get_record($h, DNS_CNAME + DNS_MX)) {
+		if ($h && @dns_get_record($h, DNS_CNAME + DNS_MX)) {
 			return true;
 		}
 		return false;

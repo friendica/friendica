@@ -1645,7 +1645,9 @@ class PortableContact
 		if ($retdata["success"] && !empty($retdata["body"])) {
 			$data = json_decode($retdata["body"], true);
 
-			self::discoverServer($data, 2);
+			if (!empty($data)) {
+				self::discoverServer($data, 2);
+			}
 
 			if (Config::get('system', 'poco_discovery') > 1) {
 				$timeframe = Config::get('system', 'poco_discovery_since');
@@ -1665,7 +1667,11 @@ class PortableContact
 
 				if ($retdata["success"] && !empty($retdata["body"])) {
 					logger("Fetch all global contacts from the server " . $server["nurl"], LOGGER_DEBUG);
-					$success = self::discoverServer(json_decode($retdata["body"], true));
+					$data = json_decode($retdata["body"], true);
+
+					if (!empty($data)) {
+						$success = self::discoverServer($data);
+					}
 				}
 
 				if (!$success && (Config::get('system', 'poco_discovery') > 2)) {
@@ -1760,7 +1766,11 @@ class PortableContact
 				$retdata = Network::curl($url);
 
 				if (!empty($retdata['success'])) {
-					self::discoverServer(json_decode($retdata['body'], true), 3);
+					$data = json_decode($retdata["body"], true);
+
+					if (!empty($data)) {
+						self::discoverServer($data, 3);
+					}
 				}
 			}
 		}
