@@ -133,8 +133,8 @@ function dfrn_request_post(App $a)
 
 					// Create a contact record on our site for the other person
 					$r = q("INSERT INTO `contact` ( `uid`, `created`,`url`, `nurl`, `addr`, `name`, `nick`, `photo`, `site-pubkey`,
-						`request`, `confirm`, `notify`, `poll`, `poco`, `network`, `aes_allow`, `hidden`, `blocked`, `pending`)
-						VALUES ( %d, '%s', '%s', '%s', '%s', '%s' , '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d)",
+						`request`, `confirm`, `notify`, `poll`, `network`, `aes_allow`, `hidden`, `blocked`, `pending`)
+						VALUES ( %d, '%s', '%s', '%s', '%s', '%s' , '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d)",
 						intval(local_user()),
 						DateTimeFormat::utcNow(),
 						DBA::escape($dfrn_url),
@@ -148,7 +148,6 @@ function dfrn_request_post(App $a)
 						$parms['dfrn-confirm'],
 						$parms['dfrn-notify'],
 						$parms['dfrn-poll'],
-						$parms['dfrn-poco'],
 						DBA::escape(NETWORK_DFRN),
 						intval($aes_allow),
 						intval($hidden),
@@ -373,8 +372,8 @@ function dfrn_request_post(App $a)
 
 				DBA::escapeArray($parms);
 				$r = q("INSERT INTO `contact` ( `uid`, `created`, `url`, `nurl`, `addr`, `name`, `nick`, `issued-id`, `photo`, `site-pubkey`,
-					`request`, `confirm`, `notify`, `poll`, `poco`, `network`, `blocked`, `pending` )
-					VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d )",
+					`request`, `confirm`, `notify`, `poll`, `network`, `blocked`, `pending` )
+					VALUES ( %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d )",
 					intval($uid),
 					DBA::escape(DateTimeFormat::utcNow()),
 					$parms['url'],
@@ -389,7 +388,6 @@ function dfrn_request_post(App $a)
 					$parms['dfrn-confirm'],
 					$parms['dfrn-notify'],
 					$parms['dfrn-poll'],
-					$parms['dfrn-poco'],
 					DBA::escape(NETWORK_DFRN),
 					intval($blocked),
 					intval($pending)

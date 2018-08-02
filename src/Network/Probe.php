@@ -925,7 +925,6 @@ class Probe
 			|| !isset($data["confirm"])
 			|| !isset($data["request"])
 			|| !isset($data["poll"])
-			|| !isset($data["poco"])
 			|| !isset($data["name"])
 			|| !isset($data["photo"])
 		) {
@@ -939,15 +938,9 @@ class Probe
 		$prof_data["dfrn-confirm"] = $data["confirm"];
 		$prof_data["dfrn-notify"]  = $data["notify"];
 		$prof_data["dfrn-poll"]    = $data["poll"];
-		$prof_data["dfrn-poco"]    = $data["poco"];
 		$prof_data["photo"]        = $data["photo"];
 		$prof_data["fn"]           = $data["name"];
 		$prof_data["key"]          = $data["pubkey"];
-
-		// This logging is for temporarily debugging reasons
-		if (!isset($data["poco"])) {
-			logger('POCO not defined for ' . $profile_link . ' - ' . System::callstack(), LOGGER_DEBUG);
-		}
 
 		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
