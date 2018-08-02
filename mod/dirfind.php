@@ -45,6 +45,8 @@ function dirfind_content(App $a, $prefix = "") {
 
 	$search = $prefix.notags(trim($_REQUEST['search']));
 
+	$header = '';
+
 	if (strpos($search,'@') === 0) {
 		$search = substr($search,1);
 		$header = L10n::t('People Search - %s', $search);

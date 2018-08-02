@@ -74,6 +74,8 @@ function suggest_content(App $a)
 		return $o;
 	}
 
+	$id = 0;
+
 	foreach ($r as $rr) {
 
 		$connlnk = System::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
