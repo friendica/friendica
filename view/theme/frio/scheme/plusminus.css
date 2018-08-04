@@ -26,9 +26,12 @@ aside .widget, .form-control, .panel, .nav-container, .wall-item-content, .e-con
 }
 
 #topbar-first #nav-notifications-menu li.notify-unseen {
-
     border-left: 3px solid #f3fcfd;
     background-color: antiquewhite;
+}
+
+#topbar-first #nav-notifications-menu li.notif-entry {
+    padding: 0px;
 }
 
 .birthday-notice {
@@ -102,3 +105,4 @@ aside .widget, .form-control, .panel, .nav-container, .wall-item-content, .e-con
 .wall-spacer {
     height: 0px;
 }
+
