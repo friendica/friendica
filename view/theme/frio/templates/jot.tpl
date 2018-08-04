@@ -70,6 +70,7 @@
 
 					{{* The hidden input fields which submit important values with the post *}}
 					<input type="hidden" name="jot" value="{{$jot}}" />
+					<input type="hidden" name="wall" value="{{$wall}}" />
 					<input type="hidden" name="post_type" value="{{$posttype}}" />
 					<input type="hidden" name="profile_uid" value="{{$profile_uid}}" />
 					<input type="hidden" name="return" value="{{$return_path}}" />
