@@ -471,10 +471,13 @@
 			"id": {"type": "int unsigned", "not null": "1", "extra": "auto_increment", "primary": "1", "relation": {"thread": "iid"}},
 			"guid": {"type": "varchar(255)", "not null": "1", "default": "", "comment": "A unique identifier for this item"},
 			"uri": {"type": "varchar(255)", "not null": "1", "default": "", "comment": ""},
+			"uri-id": {"type": "int unsigned", "relation": {"item-uri": "id"}, "comment": "Id of the item-uri table entry that contains the item uri"},
 			"uri-hash": {"type": "varchar(80)", "not null": "1", "default": "", "comment": "RIPEMD-128 hash from uri"},
 			"parent": {"type": "int unsigned", "not null": "1", "default": "0", "relation": {"item": "id"}, "comment": "item.id of the parent to this item if it is a reply of some form; otherwise this must be set to the id of this item"},
 			"parent-uri": {"type": "varchar(255)", "not null": "1", "default": "", "comment": "uri of the parent to this item"},
+			"parent-uri-id": {"type": "int unsigned", "relation": {"item-uri": "id"}, "comment": "Id of the item-uri table that contains the parent uri"},
 			"thr-parent": {"type": "varchar(255)", "not null": "1", "default": "", "comment": "If the parent of this item is not the top-level item in the conversation, the uri of the immediate parent; otherwise set to parent-uri"},
+			"thr-parent-id": {"type": "int unsigned", "relation": {"item-uri": "id"}, "comment": "Id of the item-uri table that contains the thread parent uri"},
 			"created": {"type": "datetime", "not null": "1", "default": "0001-01-01 00:00:00", "comment": "Creation timestamp."},
 			"edited": {"type": "datetime", "not null": "1", "default": "0001-01-01 00:00:00", "comment": "Date of last edit (default is created)"},
 			"commented": {"type": "datetime", "not null": "1", "default": "0001-01-01 00:00:00", "comment": "Date of last comment/reply to this item"},
@@ -571,6 +574,7 @@
 		"fields": {
 			"id": {"type": "int unsigned", "not null": "1", "extra": "auto_increment", "primary": "1", "relation": {"thread": "iid"}},
 			"uri": {"type": "varchar(255)", "comment": ""},
+			"uri-id": {"type": "int unsigned", "relation": {"item-uri": "id"}, "comment": "Id of the item-uri table entry that contains the item uri"},
 			"uri-hash": {"type": "varchar(80)", "not null": "1", "default": "", "comment": "RIPEMD-128 hash from uri"},
 			"activity": {"type": "smallint unsigned", "not null": "1", "default": "0", "comment": ""}
 		},
@@ -585,6 +589,7 @@
 		"fields": {
 			"id": {"type": "int unsigned", "not null": "1", "extra": "auto_increment", "primary": "1", "relation": {"thread": "iid"}},
 			"uri": {"type": "varchar(255)", "comment": ""},
+			"uri-id": {"type": "int unsigned", "relation": {"item-uri": "id"}, "comment": "Id of the item-uri table entry that contains the item uri"},
 			"uri-plink-hash": {"type": "varchar(80)", "not null": "1", "default": "", "comment": "RIPEMD-128 hash from uri"},
 			"title": {"type": "varchar(255)", "not null": "1", "default": "", "comment": "item title"},
 			"content-warning": {"type": "varchar(255)", "not null": "1", "default": "", "comment": ""},
@@ -617,6 +622,19 @@
 		},
 		"indexes": {
 			"PRIMARY": ["iid"]
+		}
+	},
+	"item-uri": {
+		"comment": "URI and GUID for items",
+                "fields": {
+			"id": {"type": "int unsigned", "not null": "1", "extra": "auto_increment", "primary": "1", "comment": ""},
+			"uri": {"type": "varbinary(255)", "not null": "1", "comment": "URI of an item"},
+			"guid": {"type": "varbinary(255)", "comment": "A unique identifier for an item"}
+		},
+		"indexes": {
+			"PRIMARY": ["id"],
+			"uri": ["UNIQUE", "uri"],
+			"guid": ["UNIQUE", "guid"]
 		}
 	},
 	"locks": {
