@@ -135,7 +135,13 @@ function item_post(App $a) {
 	$app         = strip_tags(defaults($_REQUEST, 'source', ''));
 	$extid       = strip_tags(defaults($_REQUEST, 'extid', ''));
 	$object      = defaults($_REQUEST, 'object', '');
-	$wall        = intval(defaults($_REQUEST, 'wall', 1));
+
+	// Don't use "defaults" here. It would turn 0 to 1
+	if (!isset($_REQUEST['wall'])) {
+		$wall = 1;
+	} else {
+		$wall = $_REQUEST['wall'];
+	}
 
 	// Ensure that the user id in a thread always stay the same
 	if (!is_null($parent_user) && in_array($parent_user, [local_user(), 0])) {
@@ -560,7 +566,12 @@ function item_post(App $a) {
 	// even if the post arrived via API we are considering that it
 	// originated on this site by default for determining relayability.
 
-	$origin = intval(defaults($_REQUEST, 'origin', 1));
+	// Don't use "defaults" here. It would turn 0 to 1
+	if (!isset($_REQUEST['origin'])) {
+		$origin = 1;
+	} else {
+		$origin = $_REQUEST['origin'];
+	}
 
 	$notify_type = ($parent ? 'comment-new' : 'wall-new');
 

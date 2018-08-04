@@ -1058,7 +1058,12 @@ class DBA
 
 		$commands[$key] = ['table' => $table, 'conditions' => $conditions];
 
-		$cascade = defaults($options, 'cascade', true);
+		// Don't use "defaults" here, since it would set "false" to "true"
+		if (isset($options['cascade'])) {
+			$cascade = $options['cascade'];
+		} else {
+			$cascade = true;
+		}
 
 		// To speed up the whole process we cache the table relations
 		if ($cascade && count(self::$relation) == 0) {
