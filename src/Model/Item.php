@@ -1066,7 +1066,7 @@ class Item extends BaseObject
 		// When the permission set will be used in photo and events as well,
 		// this query here needs to be extended.
 		if (!empty($item['psid']) && !DBA::exists('item', ['psid' => $item['psid'], 'deleted' => false])) {
-			DBA::delete('permissionset', ['id' => $item['psid']]);
+			DBA::delete('permissionset', ['id' => $item['psid']], ['cascade' => false]);
 		}
 
 		// If it's the parent of a comment thread, kill all the kids
