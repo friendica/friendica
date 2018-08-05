@@ -28,7 +28,7 @@ class ItemURI extends BaseObject
 
 		$itemuri = DBA::selectFirst('item-uri', ['id'], ['uri' => $fields['uri']]);
 
-		if (!$itemuri::isResult($itemuri)) {
+		if (!DBA::isResult($itemuri)) {
 			// This shouldn't happen
 			return null;
 		}
@@ -45,9 +45,9 @@ class ItemURI extends BaseObject
 	 */
 	public static function getIdByURI($uri)
 	{
-		$itemuri = DBA::selectFirst('item-uri', ['id'], ['uri' => $fields['uri']]);
+		$itemuri = DBA::selectFirst('item-uri', ['id'], ['uri' => $uri]);
 
-		if (!$itemuri::isResult($itemuri)) {
+		if (!DBA::isResult($itemuri)) {
 			return self::insert(['uri' => $uri]);
 		}
 

@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1280
+-- DB_UPDATE_VERSION 1281
 -- ------------------------------------------
 
 
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `conv` (
 -- TABLE conversation
 --
 CREATE TABLE IF NOT EXISTS `conversation` (
-	`item-uri` varbinary(255) NOT NULL COMMENT 'URI of the item',
+	`item-uri` varbinary(255) NOT NULL COMMENT 'Original URI of the item - unrelated to the table with the same name',
 	`reply-to-uri` varbinary(255) NOT NULL DEFAULT '' COMMENT 'URI to which this item is a reply',
 	`conversation-uri` varbinary(255) NOT NULL DEFAULT '' COMMENT 'GNU Social conversation URI',
 	`conversation-href` varbinary(255) NOT NULL DEFAULT '' COMMENT 'GNU Social conversation link',
@@ -455,10 +455,13 @@ CREATE TABLE IF NOT EXISTS `item` (
 	`id` int unsigned NOT NULL auto_increment,
 	`guid` varchar(255) NOT NULL DEFAULT '' COMMENT 'A unique identifier for this item',
 	`uri` varchar(255) NOT NULL DEFAULT '' COMMENT '',
+	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`uri-hash` varchar(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-128 hash from uri',
 	`parent` int unsigned NOT NULL DEFAULT 0 COMMENT 'item.id of the parent to this item if it is a reply of some form; otherwise this must be set to the id of this item',
 	`parent-uri` varchar(255) NOT NULL DEFAULT '' COMMENT 'uri of the parent to this item',
+	`parent-uri-id` int unsigned COMMENT 'Id of the item-uri table that contains the parent uri',
 	`thr-parent` varchar(255) NOT NULL DEFAULT '' COMMENT 'If the parent of this item is not the top-level item in the conversation, the uri of the immediate parent; otherwise set to parent-uri',
+	`thr-parent-id` int unsigned COMMENT 'Id of the item-uri table that contains the thread parent uri',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Creation timestamp.',
 	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of last edit (default is created)',
 	`commented` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of last comment/reply to this item',
@@ -554,6 +557,7 @@ CREATE TABLE IF NOT EXISTS `item` (
 CREATE TABLE IF NOT EXISTS `item-activity` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) COMMENT '',
+	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`uri-hash` varchar(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-128 hash from uri',
 	`activity` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	 PRIMARY KEY(`id`),
@@ -567,6 +571,7 @@ CREATE TABLE IF NOT EXISTS `item-activity` (
 CREATE TABLE IF NOT EXISTS `item-content` (
 	`id` int unsigned NOT NULL auto_increment,
 	`uri` varchar(255) COMMENT '',
+	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`uri-plink-hash` varchar(80) NOT NULL DEFAULT '' COMMENT 'RIPEMD-128 hash from uri',
 	`title` varchar(255) NOT NULL DEFAULT '' COMMENT 'item title',
 	`content-warning` varchar(255) NOT NULL DEFAULT '' COMMENT '',
@@ -597,6 +602,18 @@ CREATE TABLE IF NOT EXISTS `item-delivery-data` (
 	`inform` mediumtext COMMENT 'Additional receivers of the linked item',
 	 PRIMARY KEY(`iid`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Delivery data for items';
+
+--
+-- TABLE item-uri
+--
+CREATE TABLE IF NOT EXISTS `item-uri` (
+	`id` int unsigned NOT NULL auto_increment,
+	`uri` varbinary(255) NOT NULL COMMENT 'URI of an item',
+	`guid` varbinary(255) COMMENT 'A unique identifier for an item',
+	 PRIMARY KEY(`id`),
+	 UNIQUE INDEX `uri` (`uri`),
+	 INDEX `guid` (`guid`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='URI and GUID for items';
 
 --
 -- TABLE locks

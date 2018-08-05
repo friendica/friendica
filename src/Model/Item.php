@@ -17,6 +17,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\PermissionSet;
+use Friendica\Model\ItemURI;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
@@ -1253,6 +1254,9 @@ class Item extends BaseObject
 		$item['guid'] = self::guid($item, $notify);
 		$item['uri'] = notags(trim(defaults($item, 'uri', self::newURI($item['uid'], $item['guid']))));
 
+		// Store URI data
+		$item['uri-id'] = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);
+
 		// Store conversation data
 		$item = Conversation::insert($item);
 
@@ -1564,6 +1568,9 @@ class Item extends BaseObject
 				$parent_deleted = 0;
 			}
 		}
+
+		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
+		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
 
 		$condition = ["`uri` = ? AND `network` IN (?, ?) AND `uid` = ?",
 			$item['uri'], $item['network'], NETWORK_DFRN, $item['uid']];
