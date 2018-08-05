@@ -140,6 +140,8 @@ class App
 	 * @brief App constructor.
 	 *
 	 * @param string $basepath Path to the app base folder
+	 *
+	 * @throws Exception if the Basepath is not usable
 	 */
 	public function __construct($basepath)
 	{

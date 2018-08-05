@@ -4,28 +4,18 @@
  */
 namespace Friendica\Core;
 
+use DOMDocument;
+use Exception;
 use Friendica\BaseObject;
-use Friendica\App;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;
 use Friendica\Util\Network;
-
-use Exception;
-use DOMDocument;
 
 /**
  * Contains methods for installation purpose of Friendica
  */
 class Install extends BaseObject
 {
-	/**
-	 * Sets the install-mode for further methods
-	 */
-	public static function setInstallMode()
-	{
-		self::getApp()->mode = App::MODE_INSTALL;
-	}
-
 	/**
 	 * Checks the current installation environment. There are optional and mandatory checks.
 	 *
@@ -78,9 +68,8 @@ class Install extends BaseObject
 	 * @param string 	$timezone 	Timezone of the Friendica Installaton (e.g. 'Europe/Berlin')
 	 * @param string 	$language 	2-letter ISO 639-1 code (eg. 'en')
 	 * @param string 	$adminmail 	Mail-Adress of the administrator
-	 * @param int 		$rino		Rino-enabled (1 = true, 0 = false)
 	 */
-	public static function install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail)
+	public static function createConfig($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail)
 	{
 		$tpl = get_markup_template('local.ini.tpl');
 		$txt = replace_macros($tpl,[
@@ -96,17 +85,10 @@ class Install extends BaseObject
 		]);
 
 		$result = file_put_contents('config/local.ini.php', $txt);
-		if (! $result) {
+		if (!$result) {
 			self::getApp()->data['txt'] = $txt;
 		}
 
-		$errors = self::installDatabaseStructure();
-
-		if ($errors) {
-			self::getApp()->data['db_failed'] = $errors;
-		} else {
-			self::getApp()->data['db_installed'] = true;
-		}
 	}
 
 	/**
@@ -142,7 +124,7 @@ class Install extends BaseObject
 	 * @param string $phpath Optional. The Path to the PHP-Binary
 	 * @param array $checks The list of all checks (by-ref parameter!)
 	 */
-	public static function checkPHP(&$phpath, &$checks)
+	public static function checkPHP($phpath, &$checks)
 	{
 		$passed = $passed2 = $passed3 = false;
 		if (strlen($phpath)) {

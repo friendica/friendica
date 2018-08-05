@@ -72,7 +72,20 @@ function install_post(App $a) {
 			// connect to db
 			DBA::connect($dbhost, $dbuser, $dbpass, $dbdata);
 
-			Install::install($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail);
+			$errors = Install::createConfig($urlpath, $dbhost, $dbuser, $dbpass, $dbdata, $phpath, $timezone, $language, $adminmail);
+
+			if ($errors) {
+				$a->data['db_failed'] = $errors;
+				return;
+			}
+
+			$errors = Install::installDatabaseStructure();
+
+			if ($errors) {
+				$a->data['db_failed'] = $errors;
+			} else {
+				$a->data['db_installed'] = true;
+			}
 
 			return;
 		break;
