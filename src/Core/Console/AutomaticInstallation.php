@@ -173,10 +173,9 @@ HELP;
 			Theme::install(Config::get('system', 'theme'));
 			$this->out(" Complete\n\n");
 		} else {
-			$this->out(" Theme setting is empty. Please check the file htconfig.php\n\n");
+			$this->out(" Theme setting is empty. Please check the file 'config/local.ini.php'\n\n");
 		}
 
-		$this->out(" Complete!\n\n");
 		$this->out("\nInstallation is finished\n");
 
 		return 0;

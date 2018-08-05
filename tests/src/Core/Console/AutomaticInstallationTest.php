@@ -22,14 +22,7 @@ class AutomaticInstallationTest extends TestCase
 			$this->markTestSkipped('Please set the MYSQL_* environment variables to your test database credentials.');
 		}
 
-		$this->db_host = getenv('MYSQL_HOST');
-		$this->db_port = (!empty(getenv('MYSQL_PORT'))) ? getenv('MYSQL_PORT') : '3306';
-		$this->db_user = getenv('MYSQL_USERNAME');
-		$this->db_pass = getenv('MYSQL_PASSWORD');
-		$this->db_data = getenv('MYSQL_DATABASE');
-
-		$this->db_cmd = 'MYSQL_PWD=' . $this->db_pass . ' mysql -u' . $this->db_user . ' -h' . $this->db_host . ' -P' . $this->db_port . ' ';
-
+		$this->updateCredentials();
 		$this->resetFriendica();
 	}
 
@@ -38,6 +31,16 @@ class AutomaticInstallationTest extends TestCase
 		parent::tearDown();
 
 		$this->resetFriendica();
+	}
+
+	private	function updateCredentials() {
+		$this->db_host = getenv('MYSQL_HOST');
+		$this->db_port = (!empty(getenv('MYSQL_PORT'))) ? getenv('MYSQL_PORT') : '3306';
+		$this->db_user = getenv('MYSQL_USERNAME');
+		$this->db_pass = getenv('MYSQL_PASSWORD');
+		$this->db_data = getenv('MYSQL_DATABASE');
+
+		$this->db_cmd = 'MYSQL_PWD=' . $this->db_pass . ' mysql -u' . $this->db_user . ' -h' . $this->db_host . ' -P' . $this->db_port . ' ';
 	}
 
 	private function resetFriendica() {
@@ -60,6 +63,15 @@ class AutomaticInstallationTest extends TestCase
 
 	private function assertFinished($txt) {
 		$finished = "Installation is finished\n\n";
+		$length = strlen($finished );
+
+		$lasttext = substr($txt, -$length);
+
+		$this->assertEquals($finished, $lasttext);
+	}
+
+	private function assertStuckDB($txt) {
+		$finished = "Checking database...\n\n";
 		$length = strlen($finished );
 
 		$lasttext = substr($txt, -$length);
@@ -112,8 +124,9 @@ CONF;
 		$cmd = escapeshellcmd("php bin/console.php autoinstall -f 'config/local.ini.php'");
 		$txt = shell_exec($cmd);
 
-		$this->assertFinished($txt);
+		$this->updateCredentials();
 
+		$this->assertFinished($txt);
 	}
 
 	/**
@@ -126,6 +139,8 @@ CONF;
 
 		$cmd = escapeshellcmd("php bin/console.php autoinstall --saveenv");
 		$txt = shell_exec($cmd);
+
+		$this->updateCredentials();
 
 		$this->assertFinished($txt);
 
@@ -149,6 +164,8 @@ CONF;
 
 		$cmd = escapeshellcmd("php bin/console.php autoinstall");
 		$txt = shell_exec($cmd);
+
+		$this->updateCredentials();
 
 		$this->assertFinished($txt);
 
@@ -178,6 +195,8 @@ CONF;
 		$cmd = escapeshellcmd("php bin/console.php autoinstall " . $args);
 		$txt = shell_exec($cmd);
 
+		$this->updateCredentials();
+
 		$this->assertFinished($txt);
 
 		$this->assertConfig('database', 'hostname', $this->db_host);
@@ -187,5 +206,17 @@ CONF;
 		$this->assertConfig('config', 'admin_email', 'admin@friendica.local');
 		$this->assertConfig('system', 'default_timezone', 'Europe/Berlin');
 		$this->assertConfig('system', 'language', 'de');
+	}
+
+	public function testNoDatabaseConnection() {
+		$this->assertTrue(putenv('MYSQL_USERNAME='));
+		$this->assertTrue(putenv('MYSQ_PASSWORD='));
+
+		$cmd = escapeshellcmd("php bin/console.php autoinstall");
+		$txt = shell_exec($cmd);
+
+		$this->updateCredentials();
+
+		$this->assertStuckDB($txt);
 	}
 }
