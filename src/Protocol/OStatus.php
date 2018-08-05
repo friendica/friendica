@@ -1007,26 +1007,26 @@ class OStatus
 	 */
 	private static function processRepeatedItem(DOMXPath $xpath, $entry, array &$item, array $importer)
 	{
-		$activityobjects = $xpath->query('activity:object', $entry)->item(0);
+		$activityobject = $xpath->query('activity:object', $entry)->item(0);
 
-		if (!is_object($activityobjects)) {
+		if (!is_object($activityobject)) {
 			return [];
 		}
 
 		$link_data = [];
 
-		$orig_uri = XML::getFirstNodeValue($xpath, 'atom:id/text()', $activityobjects);
+		$orig_uri = XML::getFirstNodeValue($xpath, 'atom:id/text()', $activityobject);
 
-		$links = $xpath->query("atom:link", $activityobjects);
+		$links = $xpath->query("atom:link", $activityobject);
 		if ($links) {
 			$link_data = self::processLinks($links, $item);
 		}
 
-		$orig_body = XML::getFirstNodeValue($xpath, 'atom:content/text()', $activityobjects);
-		$orig_created = XML::getFirstNodeValue($xpath, 'atom:published/text()', $activityobjects);
-		$orig_edited = XML::getFirstNodeValue($xpath, 'atom:updated/text()', $activityobjects);
+		$orig_body = XML::getFirstNodeValue($xpath, 'atom:content/text()', $activityobject);
+		$orig_created = XML::getFirstNodeValue($xpath, 'atom:published/text()', $activityobject);
+		$orig_edited = XML::getFirstNodeValue($xpath, 'atom:updated/text()', $activityobject);
 
-		$orig_author = self::fetchAuthor($xpath, $activityobjects, $importer, $dummy, false);
+		$orig_author = self::fetchAuthor($xpath, $activityobject, $importer, $dummy, false);
 
 		$item["author-name"] = $orig_author["author-name"];
 		$item["author-link"] = $orig_author["author-link"];
@@ -1038,11 +1038,19 @@ class OStatus
 
 		$item["uri"] = $orig_uri;
 
-		$item["verb"] = XML::getFirstNodeValue($xpath, 'activity:verb/text()', $activityobjects);
+		$item["verb"] = XML::getFirstNodeValue($xpath, 'activity:verb/text()', $activityobject);
 
-		$item["object-type"] = XML::getFirstNodeValue($xpath, 'activity:object-type/text()', $activityobjects);
+		$item["object-type"] = XML::getFirstNodeValue($xpath, 'activity:object-type/text()', $activityobject);
 
-		$inreplyto = $xpath->query('thr:in-reply-to', $activityobjects);
+		// Mastodon Content Warning
+		if (($item["verb"] == ACTIVITY_POST) && $xpath->evaluate('boolean(atom:summary)', $activityobject)) {
+			$clear_text = XML::getFirstNodeValue($xpath, 'atom:summary/text()', $activityobject);
+			if (!empty($clear_text)) {
+				$item['content-warning'] = HTML::toBBCode($clear_text);
+			}
+		}
+
+		$inreplyto = $xpath->query('thr:in-reply-to', $activityobject);
 		if (is_object($inreplyto->item(0))) {
 			foreach ($inreplyto->item(0)->attributes as $attributes) {
 				if ($attributes->name == "ref") {

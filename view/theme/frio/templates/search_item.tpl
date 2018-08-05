@@ -117,10 +117,7 @@
 				</h5>
 			</div>
 
-			<div class="clearfix"></div>
-
-			<hr />
-
+			<hr class="clearfix" />
 
 			{{* item content *}}
 			<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">

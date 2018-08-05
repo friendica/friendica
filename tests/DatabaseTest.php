@@ -32,6 +32,10 @@ abstract class DatabaseTest extends TestCase
 	 */
 	protected function getConnection()
 	{
+		if (!getenv('MYSQL_DATABASE')) {
+			$this->markTestSkipped('Please set the MYSQL_* environment variables to your test database credentials.');
+		}
+
 		if (!DBA::connected()) {
 			$this->markTestSkipped('Could not connect to the database.');
 		}

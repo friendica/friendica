@@ -239,10 +239,12 @@ as the value of $top_child_total (this is done at the end of this file)
 		</div>
 		{{/if}}
 
-		<div class="clearfix"></div>
-
 		{{* Insert Line to seperate item header and item content visually *}}
-		{{if $item.thread_level==1}}<hr />{{/if}}
+		{{if $item.thread_level==1}}
+		<hr class="clearfix" />
+		{{else}}
+		<div class="clearfix"></div>
+		{{/if}}
 
 		{{* item content *}}
 		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">

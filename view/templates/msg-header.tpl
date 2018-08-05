@@ -49,5 +49,10 @@
 		}
 	}
 
+	function addeditortext(data) {
+		var currentText = $("#prvmail-text").val();
+		$("#prvmail-text").val(currentText + data);
+	}
+
 </script>
 

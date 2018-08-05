@@ -1057,10 +1057,10 @@ class Item extends BaseObject
 		DBA::delete('item-delivery-data', ['iid' => $item['id']]);
 
 		if (!empty($item['iaid']) && !DBA::exists('item', ['iaid' => $item['iaid'], 'deleted' => false])) {
-			DBA::delete('item-activity', ['id' => $item['iaid']]);
+			DBA::delete('item-activity', ['id' => $item['iaid']], ['cascade' => false]);
 		}
 		if (!empty($item['icid']) && !DBA::exists('item', ['icid' => $item['icid'], 'deleted' => false])) {
-			DBA::delete('item-content', ['id' => $item['icid']]);
+			DBA::delete('item-content', ['id' => $item['icid']], ['cascade' => false]);
 		}
 		// When the permission set will be used in photo and events as well,
 		// this query here needs to be extended.
@@ -3032,15 +3032,7 @@ class Item extends BaseObject
 
 		// If it exists, mark it as deleted
 		if (DBA::isResult($like_item)) {
-			// Already voted, undo it
-			$fields = ['deleted' => true, 'unseen' => true, 'changed' => DateTimeFormat::utcNow()];
-			/// @todo Consider using self::update - but before doing so, check the side effects
-			DBA::update('item', $fields, ['id' => $like_item['id']]);
-
-			// Clean up the Diaspora signatures for this like
-			DBA::delete('sign', ['iid' => $like_item['id']]);
-
-			Worker::add(PRIORITY_HIGH, "Notifier", "like", $like_item['id']);
+			self::deleteById($like_item['id']);
 
 			if (!$event_verb_flag || $like_item['verb'] == $activity) {
 				return true;
