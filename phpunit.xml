@@ -7,4 +7,23 @@
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
+	<!-- Filters for Code Coverage -->
+	<filter>
+		<whitelist>
+			<directory suffix=".php">.</directory>
+			<exclude>
+				<directory suffix=".php">config/</directory>
+				<directory suffix=".php">doc/</directory>
+				<directory suffix=".php">images/</directory>
+				<directory suffix=".php">library/</directory>
+				<directory suffix=".php">spec/</directory>
+				<directory suffix=".php">tests/</directory>
+				<directory suffix=".php">util/</directory>
+				<directory suffix=".php">view/</directory>
+			</exclude>
+		</whitelist>
+	</filter>
+	<logging>
+		<log type="coverage-clover" target="clover.xml" />
+	</logging>
 </phpunit>
