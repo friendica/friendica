@@ -34,7 +34,7 @@ Options
     -v           Show more debug information.
     -a           All setup checks are required (except .htaccess)
     -f|--file    prepared config file (e.g. "config/local.ini.php" itself) which will override every other config option - except the environment variables)
-    -s|--saveenv Save the environment variables to the file (if environment variables is used)
+    -s|--savedb  Save the DB credentials to the file (if environment variables is used)
     -h|--dbhost  The host of the mysql database (env MYSQL_HOST)
     -p|--dbport  The port of the mysql database (env MYSQL_PORT)
     -d|--dbdata  The name of the mysql database (env MYSQL_DATABASE)
@@ -100,17 +100,17 @@ HELP;
 			// load the app first (for the template engine)
 			$a = BaseObject::getApp();
 
-			$save_env = $this->getOption(['s', 'saveenv'], false);
+			$save_db = $this->getOption(['s', 'savedb'], false);
 
-			$db_host = $this->getOption(['h', 'dbhost'], ($save_env) ? getenv('MYSQL_HOST') : '');
-			$db_port = $this->getOption(['p', 'dbport'], ($save_env) ? getenv('MYSQL_PORT') : null);
-			$db_data = $this->getOption(['d', 'dbdata'], ($save_env) ? getenv('MYSQL_DATABASE') : '');
-			$db_user = $this->getOption(['U', 'dbuser'], ($save_env) ? getenv('MYSQL_USER') . getenv('MYSQL_USERNAME') : '');
-			$db_pass = $this->getOption(['P', 'dbpass'], ($save_env) ? getenv('MYSQL_PASSWORD') : '');
-			$php_path = $this->getOption(['b', 'phppath'], ($save_env) ? getenv('FRIENDICA_PHP_PATH') : '');
-			$admin_mail = $this->getOption(['A', 'admin'], ($save_env) ? getenv('FRIENDICA_ADMIN_MAIL') : '');
-			$tz = $this->getOption(['T', 'tz'], ($save_env) ? getenv('FRIENDICA_TZ') : '');
-			$lang = $this->getOption(['L', 'lang'], ($save_env) ? getenv('FRIENDICA_LANG') : '');
+			$db_host = $this->getOption(['h', 'dbhost'], ($save_db) ? getenv('MYSQL_HOST') : '');
+			$db_port = $this->getOption(['p', 'dbport'], ($save_db) ? getenv('MYSQL_PORT') : null);
+			$db_data = $this->getOption(['d', 'dbdata'], ($save_db) ? getenv('MYSQL_DATABASE') : '');
+			$db_user = $this->getOption(['U', 'dbuser'], ($save_db) ? getenv('MYSQL_USER') . getenv('MYSQL_USERNAME') : '');
+			$db_pass = $this->getOption(['P', 'dbpass'], ($save_db) ? getenv('MYSQL_PASSWORD') : '');
+			$php_path = $this->getOption(['b', 'phppath'], (!empty('FRIENDICA_PHP_PATH')) ? getenv('FRIENDICA_PHP_PATH') : '');
+			$admin_mail = $this->getOption(['A', 'admin'], (!empty('FRIENDICA_ADMIN_MAIL')) ? getenv('FRIENDICA_ADMIN_MAIL') : '');
+			$tz = $this->getOption(['T', 'tz'], (!empty('FRIENDICA_TZ')) ? getenv('FRIENDICA_TZ') : '');
+			$lang = $this->getOption(['L', 'lang'], (!empty('FRIENDICA_LANG')) ? getenv('FRIENDICA_LANG') : '');
 
 			// creating config file
 			$this->out("Creating config file...\n");

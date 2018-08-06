@@ -132,7 +132,7 @@ CONF;
 		$this->assertTrue(putenv('FRIENDICA_TZ=Europe/Berlin'));
 		$this->assertTrue(putenv('FRIENDICA_LANG=de'));
 
-		$cmd = escapeshellcmd("php bin/console.php autoinstall --saveenv");
+		$cmd = escapeshellcmd("php bin/console.php autoinstall --savedb");
 		$txt = shell_exec($cmd);
 
 		$this->assertFinished($txt);
@@ -162,9 +162,9 @@ CONF;
 		$this->assertConfig('database', 'hostname', '');
 		$this->assertConfig('database', 'username', '');
 		$this->assertConfig('database', 'database', '');
-		$this->assertConfig('config', 'admin_email', '');
-		$this->assertConfig('system', 'default_timezone', '');
-		$this->assertConfig('system', 'language', '');
+		$this->assertConfig('config', 'admin_email', 'admin@friendica.local');
+		$this->assertConfig('system', 'default_timezone', 'Europe/Berlin');
+		$this->assertConfig('system', 'language', 'de');
 	}
 
 	/**
