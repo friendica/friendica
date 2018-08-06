@@ -7,6 +7,7 @@ namespace Friendica\Database;
 use Friendica\Core\Config;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\ItemURI;
 use Friendica\Model\PermissionSet;
 use Friendica\Database\DBA;
 
@@ -32,6 +33,9 @@ class PostUpdate
 			return;
 		}
 		if (!self::update1279()) {
+			return;
+		}
+		if (!self::update1281()) {
 			return;
 		}
 	}
@@ -362,5 +366,82 @@ class PostUpdate
 		}
 
 		$item['language'] = json_encode($lang_arr);
+	}
+
+	/**
+	 * @brief update item-uri data. Prerequisite for the next item structure update.
+	 *
+	 * @return bool "true" when the job is done
+	 */
+	private static function update1281()
+	{
+		// Was the script completed?
+		if (Config::get("system", "post_update_version") >= 1281) {
+			return true;
+		}
+
+		$id = Config::get("system", "post_update_version_1281_id", 0);
+
+		logger("Start from item " . $id, LOGGER_DEBUG);
+
+		$fields = ['id', 'guid', 'uri', 'uri-id', 'parent-uri', 'parent-uri-id', 'thr-parent', 'thr-parent-id'];
+
+		$start_id = $id;
+		$rows = 0;
+		$condition = ["`id` > ?", $id];
+		$params = ['order' => ['id'], 'limit' => 10000];
+		$items = DBA::select('item', $fields, $condition, $params);
+		while ($item = DBA::fetch($items)) {
+			$id = $item['id'];
+
+			if (empty($item['uri'])) {
+				// Should not happen
+				continue;
+			} elseif (empty($item['uri-id'])) {
+				$item['uri-id'] = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);
+			}
+
+			if (empty($item['parent-uri'])) {
+				$item['parent-uri-id'] = $item['uri-id'];
+			} elseif (empty($item['parent-uri-id'])) {
+				$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
+			}
+
+			// Very old items don't have this field
+			if (empty($item['thr-parent'])) {
+				$item['thr-parent-id'] = $item['parent-uri-id'];
+			} elseif (empty($item['thr-parent-id'])) {
+				$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
+			}
+
+			unset($item['id']);
+			unset($item['guid']);
+			unset($item['uri']);
+			unset($item['parent-uri']);
+			unset($item['thr-parent']);
+
+			DBA::update('item', $item, ['id' => $id]);
+
+			++$rows;
+		}
+		DBA::close($items);
+
+		Config::set("system", "post_update_version_1281_id", $id);
+
+		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
+
+		if ($start_id == $id) {
+			logger("Updating item-uri in item-activity", LOGGER_DEBUG);
+			DBA::e("UPDATE `item-activity` INNER JOIN `item-uri` ON `item-uri`.`uri` = `item-activity`.`uri` SET `item-activity`.`uri-id` = `item-uri`.`id` WHERE `item-activity`.`uri-id` IS NULL");
+
+			logger("Updating item-uri in item-content", LOGGER_DEBUG);
+			DBA::e("UPDATE `item-content` INNER JOIN `item-uri` ON `item-uri`.`uri` = `item-content`.`uri` SET `item-content`.`uri-id` = `item-uri`.`id` WHERE `item-content`.`uri-id` IS NULL");
+
+			Config::set("system", "post_update_version", 1281);
+			logger("Done", LOGGER_DEBUG);
+			return true;
+		}
+
+		return false;
 	}
 }

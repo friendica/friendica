@@ -75,7 +75,8 @@ function friendica_content(App $a)
 {
 	$o = '<h1>Friendica</h1>' . PHP_EOL;
 	$o .= '<p>';
-	$o .= L10n::t('This is Friendica, version') . ' <strong>' . FRIENDICA_VERSION . '</strong> ';
+	$o .= L10n::t('This is Friendica, version') . ' <strong>' . FRIENDICA_VERSION .
+		' (' . DB_UPDATE_VERSION . '/' . Config::get("system", "post_update_version") . ') </strong> ';
 	$o .= L10n::t('running at web location') . ' ' . System::baseUrl();
 	$o .= '</p>' . PHP_EOL;
 

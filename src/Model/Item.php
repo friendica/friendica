@@ -1888,7 +1888,7 @@ class Item extends BaseObject
 		}
 
 		$fields = ['uri' => $item['uri'], 'activity' => $activity_index,
-			'uri-hash' => $item['uri-hash']];
+			'uri-hash' => $item['uri-hash'], 'uri-id' => $item['uri-id']];
 
 		// We just remove everything that is content
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
@@ -1927,7 +1927,8 @@ class Item extends BaseObject
 	 */
 	private static function insertContent(&$item)
 	{
-		$fields = ['uri' => $item['uri'], 'uri-plink-hash' => $item['uri-hash']];
+		$fields = ['uri' => $item['uri'], 'uri-plink-hash' => $item['uri-hash'],
+			'uri-id' => $item['uri-id']];
 
 		foreach (array_merge(self::CONTENT_FIELDLIST, self::MIXED_CONTENT_FIELDLIST) as $field) {
 			if (isset($item[$field])) {
