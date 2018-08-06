@@ -275,6 +275,12 @@ class Delivery extends BaseObject
 
 			$user = DBA::selectFirst('user', [], ['uid' => $target_uid]);
 
+			// This should also never fail
+			if (!DBA::isResult($user)) {
+				logger('No user found for uid ' . $target_uid);
+				return;
+			}
+
 			$target_importer = array_merge($target_importer, $user);
 
 			// Set the user id. This is important if this is a public contact

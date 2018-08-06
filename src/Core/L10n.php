@@ -180,6 +180,8 @@ class L10n extends BaseObject
 	 */
 	public static function tt($singular, $plural, $count)
 	{
+		$a = self::getApp();
+
 		$lang = Config::get('system', 'language');
 
 		if (!empty($a->strings[$singular])) {
