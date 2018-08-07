@@ -73,9 +73,6 @@ class ItemContent extends BaseObject
 				case 7:
 					$abstract = Text\BBCode::getAbstract($item['body'], NETWORK_STATUSNET);
 					break;
-				case 6:
-					$abstract = Text\BBCode::getAbstract($item['body'], NETWORK_APPNET);
-					break;
 				default: // We don't know the exact target.
 					// We fetch an abstract since there is a posting limit.
 					if ($limit > 0) {

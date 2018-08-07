@@ -1003,9 +1003,6 @@ class BBCode extends BaseObject
 			case 5:
 				$text = $preshare . html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . ' ' . $userid_compact . ": <br />" . $share[3];
 				break;
-			case 6: // app.net
-				$text = $preshare . "&gt;&gt; @" . $userid_compact . ": <br />" . $share[3];
-				break;
 			case 7: // statusnet/GNU Social
 				$text = $preshare . html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . " @" . $userid_compact . ": " . $share[3];
 				break;
@@ -1193,7 +1190,7 @@ class BBCode extends BaseObject
 	 * - 3: Used before converting to Markdown in bb2diaspora.php
 	 * - 4: Used for WordPress, Libertree (before Markdown), pump.io and tumblr
 	 * - 5: Unused
-	 * - 6: Used for Appnet
+	 * - 6: Unused
 	 * - 7: Used for dfrn, OStatus
 	 * - 8: Used for WP backlink text setting
 	 *

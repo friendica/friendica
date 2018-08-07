@@ -1022,7 +1022,7 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$newname = $contact["nick"];
 
 			if (($newname == "") || (($contact["network"] != NETWORK_OSTATUS) && ($contact["network"] != NETWORK_TWITTER)
-				&& ($contact["network"] != NETWORK_STATUSNET) && ($contact["network"] != NETWORK_APPNET))) {
+				&& ($contact["network"] != NETWORK_STATUSNET))) {
 				$newname = $contact["name"];
 			}
 		}

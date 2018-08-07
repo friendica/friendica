@@ -202,7 +202,6 @@ define('NETWORK_PUMPIO'   , Protocol::PUMPIO);    // pump.io
 define('NETWORK_TWITTER'  , Protocol::TWITTER);   // Twitter
 define('NETWORK_DIASPORA2', Protocol::DIASPORA2); // Diaspora connector
 define('NETWORK_STATUSNET', Protocol::STATUSNET); // Statusnet connector
-define('NETWORK_APPNET'   , Protocol::APPNET);    // app.net - Dead protocol
 define('NETWORK_NEWS'     , Protocol::NEWS);      // Network News Transfer Protocol - Currently unsupported
 define('NETWORK_ICALENDAR', Protocol::ICALENDAR); // iCalendar - Currently unsupported
 define('NETWORK_PNUT'     , Protocol::PNUT);      // pnut.io - Currently unsupported
@@ -232,7 +231,6 @@ $netgroup_ids = [
 	NETWORK_TWITTER  => (-14),
 	NETWORK_DIASPORA2 => (-15),
 	NETWORK_STATUSNET => (-16),
-	NETWORK_APPNET    => (-17),
 	NETWORK_NEWS      => (-18),
 	NETWORK_ICALENDAR => (-19),
 	NETWORK_PNUT      => (-20),
