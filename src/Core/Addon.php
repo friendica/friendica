@@ -139,6 +139,8 @@ class Addon
 	 */
 	public static function registerHook($hook, $file, $function, $priority = 0)
 	{
+		$file = str_replace(get_app()->get_basepath() . DIRECTORY_SEPARATOR, '', $file);
+
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
 		$exists = DBA::exists('hook', $condition);
 		if ($exists) {
@@ -160,7 +162,13 @@ class Addon
 	 */
 	public static function unregisterHook($hook, $file, $function)
 	{
+		$relative_file = str_replace(get_app()->get_basepath() . DIRECTORY_SEPARATOR, '', $file);
+
+		// This here is only needed for fixing a problem that existed on the develop branch
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
+		DBA::delete('hook', $condition);
+
+		$condition = ['hook' => $hook, 'file' => $relative_file, 'function' => $function];
 		$r = DBA::delete('hook', $condition);
 		return $r;
 	}
