@@ -164,13 +164,8 @@ class DiscoverPoCo
 				continue;
 			 }
 
-			if (in_array($urlparts["host"], ["www.facebook.com", "facebook.com", "twitter.com",
-								"identi.ca", "alpha.app.net"])) {
-				$networks = ["www.facebook.com" => NETWORK_FACEBOOK,
-						"facebook.com" => NETWORK_FACEBOOK,
-						"twitter.com" => NETWORK_TWITTER,
-						"identi.ca" => NETWORK_PUMPIO,
-						"alpha.app.net" => NETWORK_APPNET];
+			if (in_array($urlparts["host"], ["twitter.com", "identi.ca"])) {
+				$networks = ["twitter.com" => NETWORK_TWITTER, "identi.ca" => NETWORK_PUMPIO];
 
 				DBA::update('gcontact', ['network' => $networks[$urlparts["host"]]],
 					['nurl' => normalise_link($user["url"])]);

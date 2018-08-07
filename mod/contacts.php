@@ -637,7 +637,7 @@ function contacts_content(App $a)
 			'$contact_id' => $contact['id'],
 			'$block_text' => (($contact['blocked']) ? L10n::t('Unblock') : L10n::t('Block') ),
 			'$ignore_text' => (($contact['readonly']) ? L10n::t('Unignore') : L10n::t('Ignore') ),
-			'$insecure' => (($contact['network'] !== NETWORK_DFRN && $contact['network'] !== NETWORK_MAIL && $contact['network'] !== NETWORK_FACEBOOK && $contact['network'] !== NETWORK_DIASPORA) ? $insecure : ''),
+			'$insecure' => (($contact['network'] !== NETWORK_DFRN && $contact['network'] !== NETWORK_MAIL && $contact['network'] !== NETWORK_DIASPORA) ? $insecure : ''),
 			'$info' => $contact['info'],
 			'$cinfo' => ['info', '', $contact['info'], ''],
 			'$blocked' => (($contact['blocked']) ? L10n::t('Currently blocked') : ''),

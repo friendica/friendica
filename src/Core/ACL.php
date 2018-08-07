@@ -49,17 +49,13 @@ class ACL extends BaseObject
 				$networks = [NETWORK_DFRN];
 				break;
 			case 'PRIVATE':
-				if (!empty($a->user['prvnets'])) {
-					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
-				} else {
-					$networks = [NETWORK_DFRN, NETWORK_FACEBOOK, NETWORK_MAIL, NETWORK_DIASPORA];
-				}
+				$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
 				break;
 			case 'TWO_WAY':
 				if (!empty($a->user['prvnets'])) {
 					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
 				} else {
-					$networks = [NETWORK_DFRN, NETWORK_FACEBOOK, NETWORK_MAIL, NETWORK_DIASPORA, NETWORK_OSTATUS];
+					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA, NETWORK_OSTATUS];
 				}
 				break;
 			default: /// @TODO Maybe log this call?

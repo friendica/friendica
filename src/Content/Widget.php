@@ -81,14 +81,6 @@ class Widget
 	{
 		$networks = array();
 
-		if (!Addon::isEnabled("appnet")) {
-			$networks[] = NETWORK_APPNET;
-		}
-
-		if (!Addon::isEnabled("fbpost") && !Addon::isEnabled("facebook")) {
-			$networks[] = NETWORK_FACEBOOK;
-		}
-
 		if (!Addon::isEnabled("statusnet")) {
 			$networks[] = NETWORK_STATUSNET;
 		}

@@ -79,7 +79,6 @@ class ContactSelector
 			NETWORK_FEED     => L10n::t('RSS/Atom'),
 			NETWORK_MAIL     => L10n::t('Email'),
 			NETWORK_DIASPORA => L10n::t('Diaspora'),
-			NETWORK_FACEBOOK => L10n::t('Facebook'),
 			NETWORK_ZOT      => L10n::t('Zot!'),
 			NETWORK_LINKEDIN => L10n::t('LinkedIn'),
 			NETWORK_XMPP     => L10n::t('XMPP/IM'),
@@ -89,8 +88,7 @@ class ContactSelector
 			NETWORK_TWITTER  => L10n::t('Twitter'),
 			NETWORK_DIASPORA2 => L10n::t('Diaspora Connector'),
 			NETWORK_STATUSNET => L10n::t('GNU Social Connector'),
-			NETWORK_PNUT      => L10n::t('pnut'),
-			NETWORK_APPNET => L10n::t('App.net')
+			NETWORK_PNUT      => L10n::t('pnut')
 		];
 
 		Addon::callHooks('network_to_name', $nets);

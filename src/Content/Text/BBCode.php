@@ -1012,7 +1012,7 @@ class BBCode extends BaseObject
 			case 8: // twitter
 				$text = $preshare . "RT @" . $userid_compact . ": " . $share[3];
 				break;
-			case 9: // Google+/Facebook
+			case 9: // Google+
 				$text = $preshare . html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8') . ' ' . $userid_compact . ": <br />" . $share[3];
 
 				if ($link != "") {
@@ -1189,7 +1189,7 @@ class BBCode extends BaseObject
 	 * Simple HTML values meaning:
 	 * - 0: Friendica display
 	 * - 1: Unused
-	 * - 2: Used for Facebook, Google+, Windows Phone push, Friendica API
+	 * - 2: Used for Google+, Windows Phone push, Friendica API
 	 * - 3: Used before converting to Markdown in bb2diaspora.php
 	 * - 4: Used for WordPress, Libertree (before Markdown), pump.io and tumblr
 	 * - 5: Unused

@@ -151,7 +151,7 @@ class GContact
 			throw new Exception("This (".$gcontact['url'].") doesn't seem to be an url.");
 		}
 
-		if (in_array($urlparts["host"],	["www.facebook.com", "facebook.com", "twitter.com", "identi.ca", "alpha.app.net"])) {
+		if (in_array($urlparts["host"],	["twitter.com", "identi.ca"])) {
 			throw new Exception('Contact from a non federated network ignored. ('.$gcontact['url'].')');
 		}
 

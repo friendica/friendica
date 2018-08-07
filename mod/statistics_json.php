@@ -32,7 +32,6 @@ function statistics_json_init(App $a) {
 	$statistics["services"]["blogger"] = Addon::isEnabled("blogger");
 	$statistics["services"]["buffer"] = Addon::isEnabled("buffer");
 	$statistics["services"]["dreamwidth"] = Addon::isEnabled("dwpost");
-	$statistics["services"]["facebook"] = Addon::isEnabled("fbpost");
 	$statistics["services"]["gnusocial"] = Addon::isEnabled("statusnet");
 	$statistics["services"]["googleplus"] = Addon::isEnabled("gpluspost");
 	$statistics["services"]["libertree"] = Addon::isEnabled("libertree");
@@ -46,7 +45,6 @@ function statistics_json_init(App $a) {
 	$statistics["blogger"] = $statistics["services"]["blogger"];
 	$statistics["buffer"] = $statistics["services"]["buffer"];
 	$statistics["dreamwidth"] = $statistics["services"]["dreamwidth"];
-	$statistics["facebook"] = $statistics["services"]["facebook"];
 	$statistics["gnusocial"] = $statistics["services"]["gnusocial"];
 	$statistics["googleplus"] = $statistics["services"]["googleplus"];
 	$statistics["libertree"] = $statistics["services"]["libertree"];
