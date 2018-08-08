@@ -483,7 +483,7 @@ class Item extends BaseObject
 
 		$fields = self::fieldlist($selected, $usermode);
 
-		$fields['thread'] = ['ignored', 'iid'];
+		$fields['thread'] = ['mention', 'ignored', 'iid'];
 
 		$threadfields = ['thread' => ['iid', 'uid', 'contact-id', 'owner-id', 'author-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'wall', 'private',
