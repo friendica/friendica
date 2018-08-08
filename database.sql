@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1281
+-- DB_UPDATE_VERSION 1282
 -- ------------------------------------------
 
 
@@ -1180,6 +1180,7 @@ CREATE TABLE IF NOT EXISTS `user-item` (
 	`iid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Item id',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'User id',
 	`hidden` boolean NOT NULL DEFAULT '0' COMMENT 'Marker to hide an item from the user',
+	`ignored` boolean COMMENT 'Ignore this thread if set',
 	 PRIMARY KEY(`uid`,`iid`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='User specific item data';
 

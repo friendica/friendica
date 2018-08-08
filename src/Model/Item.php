@@ -230,12 +230,17 @@ class Item extends BaseObject
 			}
 		}
 
+		if (array_key_exists('ignored', $row) && !is_null($row['internal-user-ignored'])) {
+			$row['ignored'] = $row['internal-user-ignored'];
+		}
+
 		// Remove internal fields
 		unset($row['internal-activity']);
 		unset($row['internal-network']);
 		unset($row['internal-iid']);
 		unset($row['internal-iaid']);
 		unset($row['internal-icid']);
+		unset($row['internal-user-ignored']);
 
 		return $row;
 	}
@@ -369,7 +374,7 @@ class Item extends BaseObject
 			$usermode = true;
 		}
 
-		$fields = self::fieldlist($selected);
+		$fields = self::fieldlist($selected, $usermode);
 
 		$select_fields = self::constructSelectFields($fields, $selected);
 
@@ -476,7 +481,9 @@ class Item extends BaseObject
 			$usermode = true;
 		}
 
-		$fields = self::fieldlist($selected);
+		$fields = self::fieldlist($selected, $usermode);
+
+		$fields['thread'] = ['ignored', 'iid'];
 
 		$threadfields = ['thread' => ['iid', 'uid', 'contact-id', 'owner-id', 'author-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'wall', 'private',
@@ -510,7 +517,7 @@ class Item extends BaseObject
 	 *
 	 * @return array field list
 	 */
-	private static function fieldlist($selected)
+	private static function fieldlist($selected, $usermode)
 	{
 		$fields = [];
 
@@ -523,6 +530,10 @@ class Item extends BaseObject
 			'id' => 'item_id', 'network', 'icid', 'iaid', 'id' => 'internal-iid',
 			'network' => 'internal-network', 'icid' => 'internal-icid',
 			'iaid' => 'internal-iaid'];
+
+		if ($usermode) {
+			$fields['user-item'] = ['ignored' => 'internal-user-ignored'];
+		}
 
 		$fields['item-activity'] = ['activity', 'activity' => 'internal-activity'];
 
@@ -679,6 +690,10 @@ class Item extends BaseObject
 
 		if (in_array('verb', $selected)) {
 			$selected[] = 'internal-activity';
+		}
+
+		if (in_array('ignored', $selected)) {
+			$selected[] = 'internal-user-ignored';
 		}
 
 		$selection = [];

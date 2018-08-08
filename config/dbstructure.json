@@ -1229,7 +1229,8 @@
 		"fields": {
 			"iid": {"type": "int unsigned", "not null": "1", "default": "0", "primary": "1", "relation": {"item": "id"}, "comment": "Item id"},
 			"uid": {"type": "mediumint unsigned", "not null": "1", "default": "0", "primary": "1", "relation": {"user": "uid"}, "comment": "User id"},
-			"hidden": {"type": "boolean", "not null": "1", "default": "0", "comment": "Marker to hide an item from the user"}
+			"hidden": {"type": "boolean", "not null": "1", "default": "0", "comment": "Marker to hide an item from the user"},
+			"ignored": {"type": "boolean", "comment": "Ignore this thread if set"}
 		},
 		"indexes": {
 			"PRIMARY": ["uid", "iid"]

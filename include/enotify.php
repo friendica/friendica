@@ -117,7 +117,7 @@ function notification($params)
 	}
 
 	if ($params['type'] == NOTIFY_COMMENT) {
-		$thread = DBA::selectFirst('thread', ['ignored'], ['iid' => $parent_id]);
+		$thread = Item::selectFirstThreadForUser($params['uid'] ,['ignored'], ['iid' => $parent_id]);
 		if (DBA::isResult($thread) && $thread["ignored"]) {
 			logger("Thread ".$parent_id." will be ignored", LOGGER_DEBUG);
 			return;

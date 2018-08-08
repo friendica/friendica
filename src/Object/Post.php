@@ -252,6 +252,18 @@ class Post extends BaseObject
 		$tagger = '';
 
 		if ($this->isToplevel()) {
+			$thread = Item::selectFirstThreadForUser(local_user(), ['ignored'], ['iid' => $item['id']]);
+			if (DBA::isResult($thread)) {
+				$ignore = [
+					'do'        => L10n::t("ignore thread"),
+					'undo'      => L10n::t("unignore thread"),
+					'toggle'    => L10n::t("toggle ignore status"),
+					'classdo'   => $thread['ignored'] ? "hidden" : "",
+					'classundo' => $thread['ignored'] ? "" : "hidden",
+					'ignored'   => L10n::t('ignored'),
+				];
+			}
+
 			if ($conv->getProfileOwner() == local_user() && ($item['uid'] != 0)) {
 				$isstarred = (($item['starred']) ? "starred" : "unstarred");
 
@@ -263,18 +275,6 @@ class Post extends BaseObject
 					'classundo' => $item['starred'] ? "" : "hidden",
 					'starred'   => L10n::t('starred'),
 				];
-
-				$thread = DBA::selectFirst('thread', ['ignored'], ['uid' => $item['uid'], 'iid' => $item['id']]);
-				if (DBA::isResult($thread)) {
-					$ignore = [
-						'do'        => L10n::t("ignore thread"),
-						'undo'      => L10n::t("unignore thread"),
-						'toggle'    => L10n::t("toggle ignore status"),
-						'classdo'   => $thread['ignored'] ? "hidden" : "",
-						'classundo' => $thread['ignored'] ? "" : "hidden",
-						'ignored'   => L10n::t('ignored'),
-					];
-				}
 
 				if (Feature::isEnabled($conv->getProfileOwner(), 'commtag')) {
 					$tagger = [
