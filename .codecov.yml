@@ -27,7 +27,6 @@ flags:
   backend:
     paths:
       - mod/
-      - mods/
       - include/
   binary:
     paths:
