@@ -1,2 +1,37 @@
 codecov:
   branch: develop
+
+comment: off
+
+coverage:
+  status:
+    patch:
+      default: off
+      source:
+        target: 80%
+        flags: source
+      backend:
+        target: 80%
+        flags: backend
+    project:
+      default: off
+      source:
+        flags: source
+      backend:
+        flags: backend
+
+flags:
+  source:
+    paths:
+      - src/
+  backend:
+    paths:
+      - mod/
+      - mods/
+      - include/
+  binary:
+    paths:
+      - bin/
+  tests:
+    paths:
+      - tests/
