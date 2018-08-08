@@ -117,7 +117,9 @@
 				</h5>
 			</div>
 
-			<hr class="clearfix" />
+			<div class="clearfix"></div>
+
+			<hr />
 
 			{{* item content *}}
 			<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">
@@ -135,8 +137,7 @@
 
 			<!-- TODO -->
 			<div class="wall-item-bottom">
-				<div class="wall-item-links">
-				</div>
+				<div class="wall-item-links"></div>
 				<div class="wall-item-tags">
 			{{if !$item.suppress_tags}}
 				{{foreach $item.hashtags as $tag}}
