@@ -1115,7 +1115,7 @@ aside .vcard #profile-photo-wrapper.crop-preview {
     padding: 0;
 }
 aside .vcard .profile-header {
-    padding: 5px 0px 5px 0px;
+    padding: 5px 0px 20px 0px;
 }
 aside .vcard .fn {
     font-weight: bold;
