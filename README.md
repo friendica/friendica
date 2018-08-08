@@ -1,6 +1,5 @@
 Friendica Social Communications Server
 ======================================
-[![codecov](https://codecov.io/gh/friendica/friendica/branch/master/graph/badge.svg)](https://codecov.io/gh/friendica/friendica)
 
 Welcome to the free social web.
 
