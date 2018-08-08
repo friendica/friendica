@@ -230,7 +230,7 @@ class Item extends BaseObject
 			}
 		}
 
-		if (array_key_exists('ignored', $row) && !is_null($row['internal-user-ignored'])) {
+		if (array_key_exists('ignored', $row) && array_key_exists('internal-user-ignored', $row) && !is_null($row['internal-user-ignored'])) {
 			$row['ignored'] = $row['internal-user-ignored'];
 		}
 
