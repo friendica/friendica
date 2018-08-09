@@ -1703,7 +1703,7 @@ $a->strings["Number of daily wall messages for %s exceeded. Message failed."] = 
 $a->strings["Unable to check your home location."] = "Nie można sprawdzić twojej lokalizacji.";
 $a->strings["No recipient."] = "Brak odbiorcy.";
 $a->strings["If you wish for %s to respond, please check that the privacy settings on your site allow private mail from unknown senders."] = "Jeśli chcesz %s odpowiedzieć, sprawdź, czy ustawienia prywatności w Twojej witrynie zezwalają na prywatne wiadomości od nieznanych nadawców.";
-$a->strings["This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s."] = "To jest wersja Friendica, %s która działa w lokalizacji internetowej %s. Wersja bazy danych to %s wersja po aktualizacji%s.";
+$a->strings["This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s."] = "To jest wersja Friendica, %s która działa w lokalizacji internetowej %s. Wersja bazy danych to %s wersja po aktualizacji %s.";
 $a->strings["Please visit <a href=\"https://friendi.ca\">Friendi.ca</a> to learn more about the Friendica project."] = "Odwiedź stronę <a href=\"https://friendi.ca\">Friendi.ca</a> aby dowiedzieć się więcej o projekcie Friendica.";
 $a->strings["Bug reports and issues: please visit"] = "Raporty o błędach i problemy: odwiedź stronę";
 $a->strings["the bugtracker at github"] = "bugtracker na github";
