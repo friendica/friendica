@@ -180,37 +180,6 @@ define('CP_USERS_AND_GLOBAL',       2);
  */
 
 /**
- * @name Network constants
- * @deprecated since version 3.6
- * @see Protocol
- *
- * Network and protocol family types
- * @{
- */
-define('NETWORK_DFRN'     , Protocol::DFRN);      // Friendica, Mistpark, other DFRN implementations
-define('NETWORK_ZOT'      , Protocol::ZOT);       // Zot! - Currently unsupported
-define('NETWORK_OSTATUS'  , Protocol::OSTATUS);   // GNU-social, Pleroma, Mastodon, other OStatus implementations
-define('NETWORK_FEED'     , Protocol::FEED);      // RSS/Atom feeds with no known "post/notify" protocol
-define('NETWORK_DIASPORA' , Protocol::DIASPORA);  // Diaspora
-define('NETWORK_MAIL'     , Protocol::MAIL);      // IMAP/POP
-define('NETWORK_FACEBOOK' , Protocol::FACEBOOK);  // Facebook API
-define('NETWORK_LINKEDIN' , Protocol::LINKEDIN);  // LinkedIn
-define('NETWORK_XMPP'     , Protocol::XMPP);      // XMPP - Currently unsupported
-define('NETWORK_MYSPACE'  , Protocol::MYSPACE);   // MySpace - Currently unsupported
-define('NETWORK_GPLUS'    , Protocol::GPLUS);     // Google+
-define('NETWORK_PUMPIO'   , Protocol::PUMPIO);    // pump.io
-define('NETWORK_TWITTER'  , Protocol::TWITTER);   // Twitter
-define('NETWORK_DIASPORA2', Protocol::DIASPORA2); // Diaspora connector
-define('NETWORK_STATUSNET', Protocol::STATUSNET); // Statusnet connector
-define('NETWORK_NEWS'     , Protocol::NEWS);      // Network News Transfer Protocol - Currently unsupported
-define('NETWORK_ICALENDAR', Protocol::ICALENDAR); // iCalendar - Currently unsupported
-define('NETWORK_PNUT'     , Protocol::PNUT);      // pnut.io - Currently unsupported
-define('NETWORK_PHANTOM'  , Protocol::PHANTOM);   // Place holder
-/**
- * @}
- */
-
-/**
  * These numbers are used in stored permissions
  * and existing allocations MUST NEVER BE CHANGED
  * OR RE-ASSIGNED! You may only add to them.
