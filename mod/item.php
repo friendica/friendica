@@ -394,12 +394,12 @@ function item_post(App $a) {
 				$tagged[] = $tag;
 			}
 			// When the forum is private or the forum is addressed with a "!" make the post private
-			if (is_array($success['contact']) && ($success['contact']['prv'] || ($tag_type == '!'))) {
+			if (is_array($success['contact']) && (!empty($success['contact']['prv']) || ($tag_type == '!'))) {
 				$private_forum = $success['contact']['prv'];
 				$only_to_forum = ($tag_type == '!');
 				$private_id = $success['contact']['id'];
 				$forum_contact = $success['contact'];
-			} elseif (is_array($success['contact']) && $success['contact']['forum'] &&
+			} elseif (is_array($success['contact']) && !empty($success['contact']['forum']) &&
 				($str_contact_allow == '<' . $success['contact']['id'] . '>')) {
 				$private_forum = false;
 				$only_to_forum = true;
