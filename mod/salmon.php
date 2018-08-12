@@ -157,7 +157,7 @@ function salmon_post(App $a, $xml = '') {
 	if (!DBA::isResult($r)) {
 		logger('Author ' . $author_link . ' unknown to user ' . $importer['uid'] . '.');
 
-		if (PConfig::get($importer['uid'],'system','ostatus_autofriend')) {
+		if (PConfig::get($importer['uid'], 'system', 'ostatus_autofriend')) {
 			$result = Contact::createFromProbe($importer['uid'], $author_link);
 
 			if ($result['success']) {
