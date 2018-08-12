@@ -26,27 +26,27 @@ function repair_ostatus_content(App $a) {
 
 	$counter = intval($_REQUEST['counter']);
 
-        $r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE
-                `uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)",
-                intval($uid),
-                DBA::escape(Protocol::OSTATUS),
-                intval(Contact::FRIEND),
-                intval(Contact::SHARING));
+	$r = q("SELECT COUNT(*) AS `total` FROM `contact` WHERE
+	`uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)",
+		intval($uid),
+		DBA::escape(Protocol::OSTATUS),
+		intval(Contact::FRIEND),
+		intval(Contact::SHARING));
 
 	if (!DBA::isResult($r)) {
-		return $o . L10n::t("Error");
+		return ($o . L10n::t("Error"));
 	}
 
 	$total = $r[0]["total"];
 
-        $r = q("SELECT `url` FROM `contact` WHERE
-                `uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)
+	$r = q("SELECT `url` FROM `contact` WHERE
+		`uid` = %d AND `network` = '%s' AND `rel` IN (%d, %d)
 		ORDER BY `url`
 		LIMIT %d, 1",
-                intval($uid),
-                DBA::escape(Protocol::OSTATUS),
-                intval(Contact::FRIEND),
-                intval(Contact::SHARING), $counter++);
+		intval($uid),
+		DBA::escape(Protocol::OSTATUS),
+		intval(Contact::FRIEND),
+		intval(Contact::SHARING), $counter++);
 
 	if (!DBA::isResult($r)) {
 		$o .= L10n::t("Done");
