@@ -163,17 +163,17 @@ function photos_post(App $a)
 					break;
 				}
 			}
+		}
 
-			if ($contact_id > 0) {
-				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
-					intval($contact_id),
-					intval($page_owner_uid)
-				);
+		if ($contact_id > 0) {
+			$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
+				intval($contact_id),
+				intval($page_owner_uid)
+			);
 
-				if (DBA::isResult($r)) {
-					$can_post = true;
-					$visitor = $contact_id;
-				}
+			if (DBA::isResult($r)) {
+				$can_post = true;
+				$visitor = $contact_id;
 			}
 		}
 	}
