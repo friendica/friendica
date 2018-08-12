@@ -71,9 +71,11 @@ class User
 	public static function getOwnerDataByNick($nick)
 	{
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nick]);
+
 		if (!DBA::isResult($user)) {
 			return false;
 		}
+
 		return self::getOwnerDataById($user['uid']);
 	}
 

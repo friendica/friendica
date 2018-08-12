@@ -79,6 +79,7 @@ function photos_init(App $a) {
 
 		if ($albums) {
 			$a->data['albums'] = $albums;
+
 			if ($albums_visible) {
 				$ret['success'] = true;
 			}
