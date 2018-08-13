@@ -225,7 +225,7 @@ header('ETag: "' . $etag . '"');
 header('Last-Modified: ' . $modified);
 
 // Only send the CSS file if it was changed.
-if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) || isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
+if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
 	$cached_etag = str_replace(['"', '-gzip'], ['', ''],
 				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
