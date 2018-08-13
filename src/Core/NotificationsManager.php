@@ -165,39 +165,41 @@ class NotificationsManager extends BaseObject
 	 */
 	public function getTabs()
 	{
+		$selected = defaults(self::getApp()->argv, 1, '');
+
 		$tabs = [
 			[
 				'label' => L10n::t('System'),
 				'url'   => 'notifications/system',
-				'sel'   => ((self::getApp()->argv[1] == 'system') ? 'active' : ''),
+				'sel'   => (($selected == 'system') ? 'active' : ''),
 				'id'    => 'system-tab',
 				'accesskey' => 'y',
 			],
 			[
 				'label' => L10n::t('Network'),
 				'url'   => 'notifications/network',
-				'sel'   => ((self::getApp()->argv[1] == 'network') ? 'active' : ''),
+				'sel'   => (($selected == 'network') ? 'active' : ''),
 				'id'    => 'network-tab',
 				'accesskey' => 'w',
 			],
 			[
 				'label' => L10n::t('Personal'),
 				'url'   => 'notifications/personal',
-				'sel'   => ((self::getApp()->argv[1] == 'personal') ? 'active' : ''),
+				'sel'   => (($selected == 'personal') ? 'active' : ''),
 				'id'    => 'personal-tab',
 				'accesskey' => 'r',
 			],
 			[
 				'label' => L10n::t('Home'),
 				'url'   => 'notifications/home',
-				'sel'   => ((self::getApp()->argv[1] == 'home') ? 'active' : ''),
+				'sel'   => (($selected == 'home') ? 'active' : ''),
 				'id'    => 'home-tab',
 				'accesskey' => 'h',
 			],
 			[
 				'label' => L10n::t('Introductions'),
 				'url'   => 'notifications/intros',
-				'sel'   => ((self::getApp()->argv[1] == 'intros') ? 'active' : ''),
+				'sel'   => (($selected == 'intros') ? 'active' : ''),
 				'id'    => 'intro-tab',
 				'accesskey' => 'i',
 			],
