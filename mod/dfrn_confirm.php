@@ -247,6 +247,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			if (stristr($res, "<status") === false) {
 				// wrong xml! stop here!
+				logger('Unexpected response posting to ' . $dfrn_confirm);
 				notice(L10n::t('Unexpected response from remote site: ') . EOL . htmlspecialchars($res) . EOL);
 				return;
 			}

@@ -224,7 +224,7 @@ function cal_content(App $a)
 
 		// get events by id or by date
 		if ($event_params['event_id']) {
-			$r = Event::getListById($owner_uid, $event_params['event-id'], $sql_extra);
+			$r = Event::getListById($owner_uid, $event_params['event_id'], $sql_extra);
 		} else {
 			$r = Event::getListByDate($owner_uid, $event_params, $sql_extra);
 		}
