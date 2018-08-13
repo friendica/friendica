@@ -46,7 +46,11 @@ function get_scheme_info($scheme)
 		foreach ($ll as $l) {
 			$l = trim($l, "\t\n\r */");
 			if ($l != '') {
-				list($k, $v) = array_map('trim', explode(':', $l, 2));
+				$values = array_map('trim', explode(':', $l, 2));
+				if (count($values) < 2) {
+					continue;
+				}
+				list($k, $v) = $values;
 				$k = strtolower($k);
 				if ($k == 'author') {
 					$r = preg_match('|([^<]+)<([^>]+)>|', $v, $m);
