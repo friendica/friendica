@@ -225,7 +225,7 @@ header('ETag: "' . $etag . '"');
 header('Last-Modified: ' . $modified);
 
 // Only send the CSS file if it was changed.
-/// @todo Check if this works at all (possibly clients are sending only the one or the other header)
+/// @todo Check if this works at all (possibly clients are sending only the one or the other header) - compare with mod/photo.php
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
 	$cached_etag = str_replace(['"', '-gzip'], ['', ''],
