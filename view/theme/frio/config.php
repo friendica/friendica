@@ -15,14 +15,14 @@ function theme_post(App $a)
 	}
 
 	if (isset($_POST['frio-settings-submit'])) {
-		PConfig::set(local_user(), 'frio', 'scheme',           defaults($_POST, 'frio_scheme', null));
-		PConfig::set(local_user(), 'frio', 'nav_bg',           defaults($_POST, 'frio_nav_bg', null));
-		PConfig::set(local_user(), 'frio', 'nav_icon_color',   defaults($_POST, 'frio_nav_icon_color', null));
-		PConfig::set(local_user(), 'frio', 'link_color',       defaults($_POST, 'frio_link_color', null));
-		PConfig::set(local_user(), 'frio', 'background_color', defaults($_POST, 'frio_background_color', null));
-		PConfig::set(local_user(), 'frio', 'contentbg_transp', defaults($_POST, 'frio_contentbg_transp', null));
-		PConfig::set(local_user(), 'frio', 'background_image', defaults($_POST, 'frio_background_image', null));
-		PConfig::set(local_user(), 'frio', 'bg_image_option',  defaults($_POST, 'frio_bg_image_option', null));
+		PConfig::set(local_user(), 'frio', 'scheme',           defaults($_POST, 'frio_scheme'));
+		PConfig::set(local_user(), 'frio', 'nav_bg',           defaults($_POST, 'frio_nav_bg'));
+		PConfig::set(local_user(), 'frio', 'nav_icon_color',   defaults($_POST, 'frio_nav_icon_color'));
+		PConfig::set(local_user(), 'frio', 'link_color',       defaults($_POST, 'frio_link_color'));
+		PConfig::set(local_user(), 'frio', 'background_color', defaults($_POST, 'frio_background_color'));
+		PConfig::set(local_user(), 'frio', 'contentbg_transp', defaults($_POST, 'frio_contentbg_transp'));
+		PConfig::set(local_user(), 'frio', 'background_image', defaults($_POST, 'frio_background_image'));
+		PConfig::set(local_user(), 'frio', 'bg_image_option',  defaults($_POST, 'frio_bg_image_option'));
 		PConfig::set(local_user(), 'frio', 'css_modified',     time());
 	}
 }
