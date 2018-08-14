@@ -3,7 +3,7 @@
 {{* "live-photos" is needed for js autoupdate *}}
 <div id="live-photos"></div>
 
-<div id="photo-view-{{$id}}" class="general-content-wrapper">
+<div id="photo-view-{{$id}}" class="generic-page-wrapper">
 	<h3><a href="{{$album.0}}">{{$album.1}}</a></h3>
 
 	<div id="photo-edit-link-wrap">
@@ -53,7 +53,7 @@
 		<div id="photo-like-div">
 			{{$likebuttons}}
 			{{$like}}
-			{{$dislike}}	
+			{{$dislike}}
 		</div>
 		{{/if}}
 		<hr>
