@@ -1351,13 +1351,15 @@ class OStatus
 
 		switch ($siteinfo["type"]) {
 			case 'photo':
-				$imgdata = Image::getInfoFromURL($siteinfo["image"]);
-				if ($imgdata) {
-					$attributes = ["rel" => "enclosure",
-							"href" => $siteinfo["image"],
-							"type" => $imgdata["mime"],
-							"length" => intval($imgdata["size"])];
-					XML::addElement($doc, $root, "link", "", $attributes);
+				if (!empty($siteinfo["image"])) {
+					$imgdata = Image::getInfoFromURL($siteinfo["image"]);
+					if ($imgdata) {
+						$attributes = ["rel" => "enclosure",
+								"href" => $siteinfo["image"],
+								"type" => $imgdata["mime"],
+								"length" => intval($imgdata["size"])];
+						XML::addElement($doc, $root, "link", "", $attributes);
+					}
 				}
 				break;
 			case 'video':
