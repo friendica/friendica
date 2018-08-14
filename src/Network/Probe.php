@@ -232,7 +232,7 @@ class Probe
 
 		if (!$lrdd) {
 			$parts = @parse_url($uri);
-			if (!$parts) {
+			if (!$parts || empty($parts["host"]) || empty($parts["path"])) {
 				return [];
 			}
 
