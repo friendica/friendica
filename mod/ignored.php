@@ -51,6 +51,6 @@ function ignored_init(App $a)
 
 	// the json doesn't really matter, it will either be 0 or 1
 
-	echo json_encode($ignored);
+	echo json_encode((int)$ignored);
 	killme();
 }
