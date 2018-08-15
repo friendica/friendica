@@ -7,8 +7,6 @@ use Friendica\Model\Item;
 
 function ignored_init(App $a)
 {
-	$ignored = 0;
-
 	if (!local_user()) {
 		killme();
 	}
@@ -26,9 +24,8 @@ function ignored_init(App $a)
 		killme();
 	}
 
-	if (!$thread['ignored']) {
-		$ignored = true;
-	}
+	// Numeric values are needed for the json output further below
+	$ignored = ($thread['ignored'] ? 0 : 1);
 
 	if ($thread['uid'] != 0) {
 		DBA::update('thread', ['ignored' => $ignored], ['iid' => $message_id]);
@@ -51,6 +48,6 @@ function ignored_init(App $a)
 
 	// the json doesn't really matter, it will either be 0 or 1
 
-	echo json_encode((int)$ignored);
+	echo json_encode($ignored);
 	killme();
 }
