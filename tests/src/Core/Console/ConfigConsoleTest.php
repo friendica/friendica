@@ -6,6 +6,7 @@ use Friendica\Database\DBA;
 
 /**
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class ConfigConsoleTest extends ConsoleTest
 {
