@@ -5,23 +5,13 @@
 	<div id="photos-usage-message">{{$usage}}</div>
 
 	<form action="photos/{{$nickname}}" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
-		<div id="photos-upload-new-wrapper" >
-			<div id="photos-upload-newalbum-div">
-				<label id="photos-upload-newalbum-text" for="photos-upload-newalbum" >{{$newalbum}}</label>
-			</div>
-			<input class="form-control" id="photos-upload-newalbum" type="text" name="newalbum" />
-		</div>
-		<div id="photos-upload-new-end"></div>
+		<div id="photos-upload-div" class="form-group">
+			<label id="photos-upload-text" for="photos-upload-newalbum" >{{$newalbum}}</label>
 
-		<div id="photos-upload-exist-wrapper">
-			<div id="photos-upload-existing-album-div">
-				<label id="photos-upload-existing-album-text" for="photos-upload-album-select">{{$existalbumtext}}</label>
-			</div>
-			<select class="form-control" id="photos-upload-album-select" name="album" size="4">
-				{{$albumselect}}
-			</select>
+			<input id="photos-upload-album-select" class="form-control" placeholder="{{$existalbumtext}}" list="dl-photo-upload" type="text" name="album" size="4">
+			<datalist id="dl-photo-upload">{{$albumselect}}</datalist>
 		</div>
-		<div id="photos-upload-exist-end"></div>
+		<div id="photos-upload-end" class="clearfix"></div>
 
 		<div id="photos-upload-noshare-div" class="photos-upload-noshare-div pull-left" >
 			<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked/>
