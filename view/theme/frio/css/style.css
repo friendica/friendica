@@ -375,7 +375,7 @@ header #banner {
     left:49%;
     right: 49%;
     z-index: 1040;
-    margin-top: 14px;
+    margin-top: 12.5px;
     text-align: center;
     text-shadow: 1px 1px 2px rgba(0,0,0,.5);
     font-size: 14px;
@@ -479,7 +479,7 @@ nav.navbar .nav>li>a:focus{
     border-radius: 3px;
 }
 #topbar-first .nav>.account .dropdown-toggle {
-    padding: 10px 5px 0px;
+    padding: 8px 5px 0px;
     line-height: 1.1em;
     text-align: left
 }
@@ -714,7 +714,7 @@ nav.navbar a, nav.navbar .btn-link {
 /* Nav Search */
 #topbar-first #search-box .navbar-form {
     margin: 0px;
-    padding: 10px 15px;
+    padding: 12px 12px;
 }
 #search-mobile .navbar-form {
     margin: 0;
