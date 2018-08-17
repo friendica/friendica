@@ -599,7 +599,7 @@ class BBCode extends BaseObject
 			}
 		}
 
-		return trim($data["text"] . ' ' . $return . ' ' . $data["after"]);
+		return trim(defaults($data, 'text', '') . ' ' . $return . ' ' . defaults($data, 'after', ''));
 	}
 
 	public static function removeShareInformation($Text, $plaintext = false, $nolink = false)

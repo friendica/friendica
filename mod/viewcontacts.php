@@ -17,7 +17,7 @@ use Friendica\Core\System;
 function viewcontacts_init(App $a)
 {
 	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
-		return;
+		System::httpExit(403, ["title" => L10n::t('Access denied.')]);
 	}
 
 	if ($a->argc < 2) {
@@ -32,7 +32,7 @@ function viewcontacts_init(App $a)
 	);
 
 	if (!DBA::isResult($r)) {
-		return;
+		System::httpExit(404, ["title" => L10n::t('Page not found.')]);
 	}
 
 	$a->data['user'] = $r[0];

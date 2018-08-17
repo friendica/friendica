@@ -133,6 +133,10 @@ function notifications_content(App $a)
 
 	$notif_tpl = get_markup_template('notifications.tpl');
 
+	if (!isset($notifs['ident'])) {
+		logger('Missing data in notifs: ' . System::callstack(20), LOGGER_DEBUG);
+	}
+
 	// Process the data for template creation
 	if ($notifs['ident'] === 'introductions') {
 		$sugg = get_markup_template('suggestions.tpl');

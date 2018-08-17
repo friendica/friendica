@@ -366,7 +366,7 @@ class Contact extends BaseObject
 	{
 
 		if (!isset($contact['url'])) {
-			logger('Empty contact. ' . System::callstack(10), LOGGER_DEBUG);
+			logger('Empty contact: ' . json_encode($contact) . ' - ' . System::callstack(20), LOGGER_DEBUG);
 		}
 
 		// Contact already archived or "self" contact? => nothing to do
