@@ -7,6 +7,7 @@ use Friendica\Database\DBA;
 /**
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
+ * @requires PHP 7.0
  */
 class ConfigConsoleTest extends ConsoleTest
 {
@@ -65,7 +66,7 @@ Options: array (
   'v' => 1,
 )
 Command: config
-Executable: /vagrant/tests/src/Core/Console/ConfigConsoleTest.php
+Executable: {$this->app->basepath}/tests/src/Core/Console/ConfigConsoleTest.php
 Class: Friendica\Core\Console\Config
 Arguments: array (
   0 => 'test',
