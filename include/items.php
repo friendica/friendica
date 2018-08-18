@@ -288,25 +288,30 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 
 function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'subscribe')
 {
-	$a = BaseObject::getApp();
-	$r = null;
-
-	if (!empty($importer)) {
-		$r = q("SELECT `nickname` FROM `user` WHERE `uid` = %d LIMIT 1",
-			intval($importer['uid'])
-		);
-	}
-
 	/*
 	 * Diaspora has different message-ids in feeds than they do
 	 * through the direct Diaspora protocol. If we try and use
 	 * the feed, we'll get duplicates. So don't.
 	 */
-	if ((!DBA::isResult($r)) || $contact['network'] === Protocol::DIASPORA) {
+	if ($contact['network'] === Protocol::DIASPORA) {
 		return;
 	}
 
-	$push_url = System::baseUrl() . '/pubsub/' . $r[0]['nickname'] . '/' . $contact['id'];
+	// Without an importer we don't have a user id - so we quit
+	if (empty($importer)) {
+		return;
+	}
+
+	$a = BaseObject::getApp();
+
+	$user = DBA::selectFirst('user', ['nickname'], ['uid' => $importer['uid']]);
+
+	// No user, no nickname, we quit
+	if (!DBA::isResult($user)) {
+		return;
+	}
+
+	$push_url = System::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
 
 	// Use a single verify token, even if multiple hubs
 	$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : random_string());

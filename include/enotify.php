@@ -125,14 +125,9 @@ function notification($params)
 
 		// Check to see if there was already a tag notify or comment notify for this post.
 		// If so don't create a second notification
-		$p = q("SELECT `id` FROM `notify` WHERE `type` IN (%d, %d, %d) AND `link` = '%s' AND `uid` = %d LIMIT 1",
-			intval(NOTIFY_TAGSELF),
-			intval(NOTIFY_COMMENT),
-			intval(NOTIFY_SHARE),
-			DBA::escape($params['link']),
-			intval($params['uid'])
-		);
-		if ($p && count($p)) {
+		$condition = ['type' => [NOTIFY_TAGSELF, NOTIFY_COMMENT, NOTIFY_SHARE],
+			'link' => $params['link'], 'uid' => $params['uid']];
+		if (DBA::exists('notify', $condition)) {
 			L10n::popLang();
 			return;
 		}
@@ -446,9 +441,7 @@ function notification($params)
 		do {
 			$dups = false;
 			$hash = random_string();
-			$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' LIMIT 1",
-				DBA::escape($hash));
-			if (DBA::isResult($r)) {
+			if (DBA::exists('notify', ['hash' => $hash])) {
 				$dups = true;
 			}
 		} while ($dups == true);
@@ -478,33 +471,14 @@ function notification($params)
 		}
 
 		// create notification entry in DB
-		q("INSERT INTO `notify` (`hash`, `name`, `url`, `photo`, `date`, `uid`, `link`, `iid`, `parent`, `type`, `verb`, `otype`, `name_cache`)
-			values('%s', '%s', '%s', '%s', '%s', %d, '%s', %d, %d, %d, '%s', '%s', '%s')",
-			DBA::escape($datarray['hash']),
-			DBA::escape($datarray['name']),
-			DBA::escape($datarray['url']),
-			DBA::escape($datarray['photo']),
-			DBA::escape($datarray['date']),
-			intval($datarray['uid']),
-			DBA::escape($datarray['link']),
-			intval($datarray['iid']),
-			intval($datarray['parent']),
-			intval($datarray['type']),
-			DBA::escape($datarray['verb']),
-			DBA::escape($datarray['otype']),
-			DBA::escape($datarray["name_cache"])
-		);
+		$fields = ['hash' => $datarray['hash'], 'name' => $datarray['name'], 'url' => $datarray['url'],
+			'photo' => $datarray['photo'], 'date' => $datarray['date'], 'uid' => $datarray['uid'],
+			'link' => $datarray['link'], 'iid' => $datarray['iid'], 'parent' => $datarray['parent'],
+			'type' => $datarray['type'], 'verb' => $datarray['verb'], 'otype' => $datarray['otype'],
+			'name_cache' => $datarray["name_cache"]];
+		DBA::insert('notify', $fields);
 
-		$r = q("SELECT `id` FROM `notify` WHERE `hash` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($hash),
-			intval($params['uid'])
-		);
-		if ($r) {
-			$notify_id = $r[0]['id'];
-		} else {
-			L10n::popLang();
-			return False;
-		}
+		$notify_id = DBA::lastInsertId();
 
 		// we seem to have a lot of duplicate comment notifications due to race conditions, mostly from forums
 		// After we've stored everything, look again to see if there are any duplicates and if so remove them
@@ -529,12 +503,10 @@ function notification($params)
 		$itemlink = System::baseUrl().'/notify/view/'.$notify_id;
 		$msg = replace_macros($epreamble, ['$itemlink' => $itemlink]);
 		$msg_cache = format_notification_message($datarray['name_cache'], strip_tags(BBCode::convert($msg)));
-		q("UPDATE `notify` SET `msg` = '%s', `msg_cache` = '%s' WHERE `id` = %d AND `uid` = %d",
-			DBA::escape($msg),
-			DBA::escape($msg_cache),
-			intval($notify_id),
-			intval($params['uid'])
-		);
+
+		$fields = ['msg' => $msg, 'msg_cache' => $msg_cache];
+		$condition = ['id' => $notify_id, 'uid' => $params['uid']];
+		DBA::update('notify', $fields, $condition);
 	}
 
 	// send email notification if notification preferences permit
@@ -548,21 +520,12 @@ function notification($params)
 			$id_for_parent = $params['parent']."@".$hostname;
 
 			// Is this the first email notification for this parent item and user?
-
-			$r = q("SELECT `id` FROM `notify-threads` WHERE `master-parent-item` = %d AND `receiver-uid` = %d LIMIT 1",
-				intval($params['parent']),
-				intval($params['uid']));
-
-			// If so, create the record of it and use a message-id smtp header.
-
-			if (!$r) {
+			if (!DBA::exists('notify-threads', ['master-parent-item' => $params['parent'], 'receiver-uid' => $params['uid']])) {
 				logger("notify_id:".intval($notify_id).", parent: ".intval($params['parent'])."uid: ".intval($params['uid']), LOGGER_DEBUG);
-				q("INSERT INTO `notify-threads` (`notify-id`, `master-parent-item`, `receiver-uid`, `parent-item`)
-					values(%d, %d, %d, %d)",
-					intval($notify_id),
-					intval($params['parent']),
-					intval($params['uid']),
-					0);
+
+				$fields = ['notify-id' => $notify_id, 'master-parent-item' => $params['parent'],
+					'receiver-uid' => $params['uid'], 'parent-item' => 0];
+				DBA::insert('notify-threads', $fields);
 
 				$additional_mail_header .= "Message-ID: <${id_for_parent}>\n";
 				$log_msg = "include/enotify: No previous notification found for this parent:\n".
@@ -571,7 +534,7 @@ function notification($params)
 			} else {
 				// If not, just "follow" the thread.
 				$additional_mail_header .= "References: <${id_for_parent}>\nIn-Reply-To: <${id_for_parent}>\n";
-				logger("There's already a notification for this parent:\n".print_r($r, true), LOGGER_DEBUG);
+				logger("There's already a notification for this parent.", LOGGER_DEBUG);
 			}
 		}
 
