@@ -1914,30 +1914,20 @@ class DFRN
 		// Do we already have an fcontact record for this person?
 
 		$fid = 0;
-		$r = q(
-			"SELECT `id` FROM `fcontact` WHERE `url` = '%s' AND `name` = '%s' AND `request` = '%s' LIMIT 1",
-			DBA::escape($suggest["url"]),
-			DBA::escape($suggest["name"]),
-			DBA::escape($suggest["request"])
-		);
-		if (DBA::isResult($r)) {
-			$fid = $r[0]["id"];
+		$condition = ['url' => $suggest["url"], 'name' => $suggest["name"], 'request' => $suggest["request"]];
+		$fcontact = DBA::selectFirst('fcontact', ['id'], $condition);
+		if (DBA::isResult($fcontact)) {
+			$fid = $fcontact["id"];
 
 			// OK, we do. Do we already have an introduction for this person?
-			$r = q(
-				"SELECT `id` FROM `intro` WHERE `uid` = %d AND `fid` = %d LIMIT 1",
-				intval($suggest["uid"]),
-				intval($fid)
-			);
-
-			/*
-			 * The valid result means the friend we're about to send a friend
-			 * suggestion already has them in their contact, which means no further
-			 * action is required.
-			 *
-			 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
-			 */
-			if (DBA::isResult($r)) {
+			if (DBA::exists('intro', ['uid' => $suggest["uid"], 'fid' => $fid])) {
+				/*
+				 * The valid result means the friend we're about to send a friend
+				 * suggestion already has them in their contact, which means no further
+				 * action is required.
+				 *
+				 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
+				 */
 				return false;
 			}
 		}
@@ -1950,18 +1940,15 @@ class DFRN
 				DBA::escape($suggest["request"])
 			);
 		}
-		$r = q(
-			"SELECT `id` FROM `fcontact` WHERE `url` = '%s' AND `name` = '%s' AND `request` = '%s' LIMIT 1",
-			DBA::escape($suggest["url"]),
-			DBA::escape($suggest["name"]),
-			DBA::escape($suggest["request"])
-		);
+
+		$condition = ['url' => $suggest["url"], 'name' => $suggest["name"], 'request' => $suggest["request"]];
+		$fcontact = DBA::selectFirst('fcontact', ['id'], $condition);
 
 		/*
 		 * If no record in fcontact is found, below INSERT statement will not
 		 * link an introduction to it.
 		 */
-		if (!DBA::isResult($r)) {
+		if (!DBA::isResult($fcontact)) {
 			// Database record did not get created. Quietly give up.
 			killme();
 		}
@@ -2629,13 +2616,10 @@ class DFRN
 					$ev["guid"]    = $item["guid"];
 					$ev["plink"]   = $item["plink"];
 
-					$r = q(
-						"SELECT `id` FROM `event` WHERE `uri` = '%s' AND `uid` = %d LIMIT 1",
-						DBA::escape($item["uri"]),
-						intval($importer["importer_uid"])
-					);
-					if (DBA::isResult($r)) {
-						$ev["id"] = $r[0]["id"];
+					$condition = ['uri' => $item["uri"], 'uid' => $importer["importer_uid"]];
+					$event = DBA::selectFirst('event', ['id'], $condition);
+					if (DBA::isResult($event)) {
+						$ev["id"] = $event["id"];
 					}
 
 					$event_id = Event::store($ev);
