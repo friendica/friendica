@@ -1386,22 +1386,14 @@ class Contact extends BaseObject
 		// the poll url is more reliable than the profile url, as we may have
 		// indirect links or webfinger links
 
-		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `poll` IN ('%s', '%s') AND `network` = '%s' AND NOT `pending` LIMIT 1",
-			intval($uid),
-			DBA::escape($ret['poll']),
-			DBA::escape(normalise_link($ret['poll'])),
-			DBA::escape($ret['network'])
-		);
-
-		if (!DBA::isResult($r)) {
-			$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' AND NOT `pending` LIMIT 1",
-				intval($uid),
-				DBA::escape(normalise_link($url)),
-				DBA::escape($ret['network'])
-			);
+		$condition = ['uid' => $uid, 'poll' => [$ret['poll'], normalise_link($ret['poll'])], 'network' => $ret['network'], 'pending' => false];
+		$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
+		if (!DBA::isResult($contact)) {
+			$condition = ['uid' => $uid, 'nurl' => normalise_link($url), 'network' => $ret['network'], 'pending' => false];
+			$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
 		}
 
-		if (($ret['network'] === Protocol::DFRN) && !DBA::isResult($r)) {
+		if (($ret['network'] === Protocol::DFRN) && !DBA::isResult($contact)) {
 			if ($interactive) {
 				if (strlen($a->urlpath)) {
 					$myaddr = bin2hex(System::baseUrl() . '/profile/' . $a->user['nickname']);
@@ -1463,14 +1455,14 @@ class Contact extends BaseObject
 			$writeable = 1;
 		}
 
-		if (DBA::isResult($r)) {
+		if (DBA::isResult($contact)) {
 			// update contact
-			$new_relation = (($r[0]['rel'] == self::FOLLOWER) ? self::FRIEND : self::SHARING);
+			$new_relation = (($contact['rel'] == self::FOLLOWER) ? self::FRIEND : self::SHARING);
 
 			$fields = ['rel' => $new_relation, 'subhub' => $subhub, 'readonly' => false];
-			DBA::update('contact', $fields, ['id' => $r[0]['id']]);
+			DBA::update('contact', $fields, ['id' => $contact['id']]);
 		} else {
-			$new_relation = ((in_array($ret['network'], [Protocol::MAIL])) ? self::FRIEND : self::SHARING);
+			$new_relation = (in_array($ret['network'], [Protocol::MAIL]) ? self::FRIEND : self::SHARING);
 
 			// create contact record
 			DBA::insert('contact', [
@@ -1517,12 +1509,9 @@ class Contact extends BaseObject
 
 		Worker::add(PRIORITY_HIGH, "OnePoll", $contact_id, "force");
 
-		$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
-			intval($uid)
-		);
+		$owner = User::getOwnerDataById($uid);
 
-		if (DBA::isResult($r)) {
+		if (DBA::isResult($owner)) {
 			if (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN])) {
 				// create a follow slap
 				$item = [];
@@ -1533,9 +1522,9 @@ class Contact extends BaseObject
 				$item['guid'] = '';
 				$item['tag'] = '';
 				$item['attach'] = '';
-				$slap = OStatus::salmon($item, $r[0]);
+				$slap = OStatus::salmon($item, $owner);
 				if (!empty($contact['notify'])) {
-					Salmon::slapper($r[0], $contact['notify'], $slap);
+					Salmon::slapper($owner, $contact['notify'], $slap);
 				}
 			} elseif ($contact['network'] == Protocol::DIASPORA) {
 				$ret = Diaspora::sendShare($a->user, $contact);
@@ -1672,10 +1661,8 @@ class Contact extends BaseObject
 
 				}
 			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
-				q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
-						intval($importer['uid']),
-						DBA::escape($url)
-				);
+				$condition = ['uid' => $importer['uid'], 'url' => $url, 'pending' => true];
+				DBA::update('contact', ['pending' => false], $condition);
 			}
 		}
 	}
@@ -1724,10 +1711,9 @@ class Contact extends BaseObject
 				 */
 
 				// Check for duplicates
-				$s = q("SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
-					intval($rr['uid']), intval($rr['id']), DBA::escape(DateTimeFormat::utc($nextbd)), DBA::escape('birthday'));
-
-				if (DBA::isResult($s)) {
+				$condition = ['uid' => $rr['uid'], 'cid' => $rr['id'],
+					'start' => DateTimeFormat::utc($nextbd), 'type' => 'birthday'];
+				if (DBA::exists('event', $condition)) {
 					continue;
 				}
 
@@ -1740,7 +1726,6 @@ class Contact extends BaseObject
 					DBA::escape(DateTimeFormat::utc($nextbd . ' + 1 day ')), DBA::escape($bdtext), DBA::escape($bdtext2), DBA::escape('birthday'),
 					intval(0)
 				);
-
 
 				// update bdyear
 				q("UPDATE `contact` SET `bdyear` = '%s', `bd` = '%s' WHERE `uid` = %d AND `id` = %d", DBA::escape(substr($nextbd, 0, 4)),
