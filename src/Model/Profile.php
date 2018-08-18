@@ -653,7 +653,8 @@ class Profile
 
 			while ($rr = DBA::fetch($s)) {
 				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => public_contact(),
-					'verb' => [ACTIVITY_ATTEND, ACTIVITY_ATTENDMAYBE], 'visible' => true, 'deleted' => false];
+					'activity' => [Item::activityToIndex(ACTIVITY_ATTEND), Item::activityToIndex(ACTIVITY_ATTENDMAYBE)],
+					'visible' => true, 'deleted' => false];
 				if (!Item::exists($condition)) {
 					continue;
 				}

@@ -111,7 +111,7 @@ class Item extends BaseObject
 	 * @param string $activity activity string
 	 * @return integer Activity index
 	 */
-	private static function activityToIndex($activity)
+	public static function activityToIndex($activity)
 	{
 		$index = array_search($activity, self::ACTIVITIES);
 
