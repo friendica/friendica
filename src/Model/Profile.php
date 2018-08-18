@@ -124,12 +124,10 @@ class Profile
 		// fetch user tags if this isn't the default profile
 
 		if (!$pdata['is-default']) {
-			$x = q(
-				"SELECT `pub_keywords` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
-				intval($pdata['profile_uid'])
-			);
-			if ($x && count($x)) {
-				$pdata['pub_keywords'] = $x[0]['pub_keywords'];
+			$condition = ['uid' => $pdata['profile_uid'], 'is-default' => true];
+			$profile = DBA::selectFirst('profile', ['pub_keywords'], $condition);
+			if (DBA::isResult($profile)) {
+				$pdata['pub_keywords'] = $profile['pub_keywords'];
 			}
 		}
 

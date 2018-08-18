@@ -98,33 +98,8 @@ class GContact
 			return;
 		}
 
-		$r = q(
-			"SELECT * FROM `glink` WHERE `cid` = %d AND `uid` = %d AND `gcid` = %d AND `zcid` = %d LIMIT 1",
-			intval($cid),
-			intval($uid),
-			intval($gcid),
-			intval($zcid)
-		);
-
-		if (!DBA::isResult($r)) {
-			q(
-				"INSERT INTO `glink` (`cid`, `uid`, `gcid`, `zcid`, `updated`) VALUES (%d, %d, %d, %d, '%s') ",
-				intval($cid),
-				intval($uid),
-				intval($gcid),
-				intval($zcid),
-				DBA::escape(DateTimeFormat::utcNow())
-			);
-		} else {
-			q(
-				"UPDATE `glink` SET `updated` = '%s' WHERE `cid` = %d AND `uid` = %d AND `gcid` = %d AND `zcid` = %d",
-				DBA::escape(DateTimeFormat::utcNow()),
-				intval($cid),
-				intval($uid),
-				intval($gcid),
-				intval($zcid)
-			);
-		}
+		$condition = ['cid' => $cid, 'uid' => $uid, 'gcid' => $gcid, 'zcid' => $zcid];
+		DBA::update('glink', ['updated' => DateTimeFormat::utcNow()], $condition, true);
 	}
 
 	/**
@@ -175,24 +150,19 @@ class GContact
 		}
 
 		if (!isset($gcontact['network'])) {
-			$r = q(
-				"SELECT `network` FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' AND `network` != '' AND `network` != '%s' LIMIT 1",
-				DBA::escape(normalise_link($gcontact['url'])),
-				DBA::escape(Protocol::STATUSNET)
-			);
-			if (DBA::isResult($r)) {
-				$gcontact['network'] = $r[0]["network"];
+			$condition = ["`uid` = 0 AND `nurl` = ? AND `network` != '' AND `network` != ?",
+				normalise_link($gcontact['url']), Protocol::STATUSNET];
+			$contact = DBA::selectFirst('contact', ['network'], $condition);
+			if (DBA::isResult($contact)) {
+				$gcontact['network'] = $contact["network"];
 			}
 
 			if (($gcontact['network'] == "") || ($gcontact['network'] == Protocol::OSTATUS)) {
-				$r = q(
-					"SELECT `network`, `url` FROM `contact` WHERE `uid` = 0 AND `alias` IN ('%s', '%s') AND `network` != '' AND `network` != '%s' LIMIT 1",
-					DBA::escape($gcontact['url']),
-					DBA::escape(normalise_link($gcontact['url'])),
-					DBA::escape(Protocol::STATUSNET)
-				);
-				if (DBA::isResult($r)) {
-					$gcontact['network'] = $r[0]["network"];
+				$condition = ["`uid` = 0 AND `alias` IN (?, ?) AND `network` != '' AND `network` != ?",
+					$gcontact['url'], normalise_link($gcontact['url']), Protocol::STATUSNET];
+				$contact = DBA::selectFirst('contact', ['network'], $condition);
+				if (DBA::isResult($contact)) {
+					$gcontact['network'] = $contact["network"];
 				}
 			}
 		}
@@ -200,23 +170,20 @@ class GContact
 		$gcontact['server_url'] = '';
 		$gcontact['network'] = '';
 
-		$x = q(
-			"SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-			DBA::escape(normalise_link($gcontact['url']))
-		);
-
-		if (DBA::isResult($x)) {
-			if (!isset($gcontact['network']) && ($x[0]["network"] != Protocol::STATUSNET)) {
-				$gcontact['network'] = $x[0]["network"];
+		$fields = ['network', 'updated', 'server_url', 'url', 'addr'];
+		$gcnt = DBA::selectFirst('gcontact', $fields, ['nurl' => normalise_link($gcontact['url'])]);
+		if (DBA::isResult($gcnt)) {
+			if (!isset($gcontact['network']) && ($gcnt["network"] != Protocol::STATUSNET)) {
+				$gcontact['network'] = $gcnt["network"];
 			}
 			if ($gcontact['updated'] <= NULL_DATE) {
-				$gcontact['updated'] = $x[0]["updated"];
+				$gcontact['updated'] = $gcnt["updated"];
 			}
-			if (!isset($gcontact['server_url']) && (normalise_link($x[0]["server_url"]) != normalise_link($x[0]["url"]))) {
-				$gcontact['server_url'] = $x[0]["server_url"];
+			if (!isset($gcontact['server_url']) && (normalise_link($gcnt["server_url"]) != normalise_link($gcnt["url"]))) {
+				$gcontact['server_url'] = $gcnt["server_url"];
 			}
 			if (!isset($gcontact['addr'])) {
-				$gcontact['addr'] = $x[0]["addr"];
+				$gcontact['addr'] = $gcnt["addr"];
 			}
 		}
 
@@ -689,20 +656,17 @@ class GContact
 		}
 
 		DBA::lock('gcontact');
-		$r = q(
-			"SELECT `id`, `last_contact`, `last_failure`, `network` FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-			DBA::escape(normalise_link($contact["url"]))
-		);
-
-		if (DBA::isResult($r)) {
-			$gcontact_id = $r[0]["id"];
+		$fields = ['id', 'last_contact', 'last_failure', 'network'];
+		$gcnt = DBA::selectFirst('gcontact', $fields, ['nurl' => normalise_link($contact["url"])]);
+		if (DBA::isResult($gcnt)) {
+			$gcontact_id = $gcnt["id"];
 
 			// Update every 90 days
-			if (in_array($r[0]["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""])) {
-				$last_failure_str = $r[0]["last_failure"];
-				$last_failure = strtotime($r[0]["last_failure"]);
-				$last_contact_str = $r[0]["last_contact"];
-				$last_contact = strtotime($r[0]["last_contact"]);
+			if (in_array($gcnt["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""])) {
+				$last_failure_str = $gcnt["last_failure"];
+				$last_failure = strtotime($gcnt["last_failure"]);
+				$last_contact_str = $gcnt["last_contact"];
+				$last_contact = strtotime($gcnt["last_contact"]);
 				$doprobing = (((time() - $last_contact) > (90 * 86400)) && ((time() - $last_failure) > (90 * 86400)));
 			}
 		} else {
@@ -728,15 +692,11 @@ class GContact
 				intval($contact["generation"])
 			);
 
-			$r = q(
-				"SELECT `id`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 2",
-				DBA::escape(normalise_link($contact["url"]))
-			);
-
-			if (DBA::isResult($r)) {
-				$gcontact_id = $r[0]["id"];
-
-				$doprobing = in_array($r[0]["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""]);
+			$condition = ['nurl' => normalise_link($contact["url"])];
+			$cnt = DBA::selectFirst('gcontact', ['id', 'network'], $condition, ['order' => ['id']]);
+			if (DBA::isResult($cnt)) {
+				$gcontact_id = $cnt["id"];
+				$doprobing = in_array($cnt["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""]);
 			}
 		}
 		DBA::unlock();
