@@ -5830,11 +5830,11 @@ function api_friendica_profile_show($type)
 	}
 
 	// return settings, authenticated user and profiles data
-	$self = q("SELECT `nurl` FROM `contact` WHERE `uid`= %d AND `self` LIMIT 1", intval(api_user()));
+	$self = DBA::selectFirst('contact', ['nurl'], ['uid' => api_user(), 'self' => true]);
 
 	$result = ['multi_profiles' => $multi_profiles ? true : false,
 					'global_dir' => $directory,
-					'friendica_owner' => api_get_user($a, $self[0]['nurl']),
+					'friendica_owner' => api_get_user($a, $self['nurl']),
 					'profiles' => $profiles];
 	return api_format_data("friendica_profiles", $type, ['$result' => $result]);
 }
