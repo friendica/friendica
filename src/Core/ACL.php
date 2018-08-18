@@ -296,10 +296,10 @@ class ACL extends BaseObject
 			'$showall' => L10n::t('Visible to everybody'),
 			'$show' => L10n::t('show'),
 			'$hide' => L10n::t('don\'t show'),
-			'$allowcid' => json_encode($default_permissions['allow_cid']),
-			'$allowgid' => json_encode($default_permissions['allow_gid']),
-			'$denycid' => json_encode($default_permissions['deny_cid']),
-			'$denygid' => json_encode($default_permissions['deny_gid']),
+			'$allowcid' => json_encode(defaults($default_permissions, 'allow_cid', '')),
+			'$allowgid' => json_encode(defaults($default_permissions, 'allow_gid', '')),
+			'$denycid' => json_encode(defaults($default_permissions, 'deny_cid', '')),
+			'$denygid' => json_encode(defaults($default_permissions, 'deny_gid', '')),
 			'$networks' => $show_jotnets,
 			'$emailcc' => L10n::t('CC: email addresses'),
 			'$emtitle' => L10n::t('Example: bob@example.com, mary@example.com'),
@@ -324,7 +324,7 @@ class ACL extends BaseObject
 	 */
 	public static function contactAutocomplete($search, $mode)
 	{
-		if ((Config::get('system', 'block_public')) && (!local_user()) && (!remote_user())) {
+		if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 			return [];
 		}
 
