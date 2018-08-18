@@ -1595,18 +1595,19 @@ class Probe
 			return false;
 		}
 
-		$x = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($uid));
+		$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $uid]);
 
-		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1", intval($uid));
+		$condition = ["`uid` = ? AND `server` != ''", $uid];
+		$mailacct = DBA::selectFirst('mailacct', ['pass', 'user'], $condition);
 
-		if (!DBA::isResult($x) || !DBA::isResult($r)) {
+		if (!DBA::isResult($user) || !DBA::isResult($mailacct)) {
 			return false;
 		}
 
-		$mailbox = Email::constructMailboxName($r[0]);
+		$mailbox = Email::constructMailboxName($mailacct);
 		$password = '';
-		openssl_private_decrypt(hex2bin($r[0]['pass']), $password, $x[0]['prvkey']);
-		$mbox = Email::connect($mailbox, $r[0]['user'], $password);
+		openssl_private_decrypt(hex2bin($mailacct['pass']), $password, $user['prvkey']);
+		$mbox = Email::connect($mailbox, $mailacct['user'], $password);
 		if (!$mbox) {
 			return false;
 		}
@@ -1659,7 +1660,6 @@ class Probe
 		if (!empty($mbox)) {
 			imap_close($mbox);
 		}
-
 		return $data;
 	}
 

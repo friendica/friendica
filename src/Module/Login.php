@@ -211,11 +211,9 @@ class Login extends BaseModule
 
 		if (isset($_SESSION) && x($_SESSION, 'authenticated')) {
 			if (x($_SESSION, 'visitor_id') && !x($_SESSION, 'uid')) {
-				$r = q("SELECT * FROM `contact` WHERE `id` = %d LIMIT 1",
-					intval($_SESSION['visitor_id'])
-				);
-				if (DBA::isResult($r)) {
-					self::getApp()->contact = $r[0];
+				$contact = DBA::selectFirst('contact', [], ['id' => $_SESSION['visitor_id']]);
+				if (DBA::isResult($contact)) {
+					self::getApp()->contact = $contact;
 				}
 			}
 
