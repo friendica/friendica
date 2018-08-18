@@ -1056,13 +1056,10 @@ class DFRN
 		}
 
 		foreach ($mentioned as $mention) {
-			$r = q(
-				"SELECT `forum`, `prv` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
-				intval($owner["uid"]),
-				DBA::escape(normalise_link($mention))
-			);
+			$condition = ['uid' => $owner["uid"], 'nurl' => normalise_link($mention)];
+			$contact = DBA::selectFirst('contact', ['forum', 'prv'], $condition);
 
-			if (DBA::isResult($r) && ($r[0]["forum"] || $r[0]["prv"])) {
+			if (DBA::isResult($contact) && ($contact["forum"] || $contact["prv"])) {
 				XML::addElement(
 					$doc,
 					$entry,
@@ -1232,14 +1229,11 @@ class DFRN
 		$final_dfrn_id = '';
 
 		if ($perm) {
-			if ((($perm == 'rw') && (! intval($contact['writable'])))
-				|| (($perm == 'r') && (intval($contact['writable'])))
+			if ((($perm == 'rw') && !intval($contact['writable']))
+				|| (($perm == 'r') && intval($contact['writable']))
 			) {
-				q(
-					"update contact set writable = %d where id = %d",
-					intval(($perm == 'rw') ? 1 : 0),
-					intval($contact['id'])
-				);
+				DBA::update('contact', ['writable' => ($perm == 'rw')], ['id' => $contact['id']]);
+
 				$contact['writable'] = (string) 1 - intval($contact['writable']);
 			}
 		}
@@ -1940,7 +1934,7 @@ class DFRN
 		if (DBA::isResult($r)) {
 			$fid = $r[0]["id"];
 
-			// OK, we do. Do we already have an introduction for this person ?
+			// OK, we do. Do we already have an introduction for this person?
 			$r = q(
 				"SELECT `id` FROM `intro` WHERE `uid` = %d AND `fid` = %d LIMIT 1",
 				intval($suggest["uid"]),
@@ -3035,23 +3029,21 @@ class DFRN
 			return false;
 		}
 
-		$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
-			intval($uid)
-		);
-		if (!DBA::isResult($u)) {
+		$user = DBA::selectFirst('user', ['page-flags', 'nickname'], ['uid' => $uid]);
+		if (!DBA::isResult($user)) {
 			return false;
 		}
 
-		$community_page = ($u[0]['page-flags'] == Contact::PAGE_COMMUNITY);
-		$prvgroup = ($u[0]['page-flags'] == Contact::PAGE_PRVGROUP);
+		$community_page = ($user['page-flags'] == Contact::PAGE_COMMUNITY);
+		$prvgroup = ($user['page-flags'] == Contact::PAGE_PRVGROUP);
 
-		$link = normalise_link(System::baseUrl() . '/profile/' . $u[0]['nickname']);
+		$link = normalise_link(System::baseUrl() . '/profile/' . $user['nickname']);
 
 		/*
 		 * Diaspora uses their own hardwired link URL in @-tags
 		 * instead of the one we supply with webfinger
 		 */
-		$dlink = normalise_link(System::baseUrl() . '/u/' . $u[0]['nickname']);
+		$dlink = normalise_link(System::baseUrl() . '/u/' . $user['nickname']);
 
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {

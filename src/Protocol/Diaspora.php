@@ -970,13 +970,10 @@ class Diaspora
 		logger("contact id is ".$contact_id." - pcontact id is ".$pcontact_id, LOGGER_DEBUG);
 
 		if ($pcontact_id != 0) {
-			$r = q(
-				"SELECT `addr` FROM `contact` WHERE `id` = %d AND `addr` != ''",
-				intval($pcontact_id)
-			);
+			$contact = DBA::selectFirst('contact', ['addr'], ['id' => $pcontact_id]);
 
-			if (DBA::isResult($r)) {
-				return strtolower($r[0]["addr"]);
+			if (DBA::isResult($contact) && !empty($contact["addr"])) {
+				return strtolower($contact["addr"]);
 			}
 		}
 
