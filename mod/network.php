@@ -771,7 +771,7 @@ function networkThreadedView(App $a, $update, $parent)
 			FROM `item` $sql_post_table
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
-				AND (`item`.`parent-uri` != `item`.`uri`
+				AND (`item`.`gravity` != %d
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
 			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
@@ -780,6 +780,7 @@ function networkThreadedView(App $a, $update, $parent)
 			AND NOT `item`.`moderated` AND $sql_extra4
 			$sql_extra3 $sql_extra $sql_range $sql_nets
 			ORDER BY `order_date` DESC LIMIT 100",
+			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
 			intval(local_user()),
@@ -791,7 +792,7 @@ function networkThreadedView(App $a, $update, $parent)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
 				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			STRAIGHT_JOIN `item` ON `item`.`id` = `thread`.`iid`
-				AND (`item`.`parent-uri` != `item`.`uri`
+				AND (`item`.`gravity` != %d
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
 			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
@@ -800,6 +801,7 @@ function networkThreadedView(App $a, $update, $parent)
 			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
 			$sql_extra2 $sql_extra3 $sql_range $sql_extra $sql_nets
 			ORDER BY `order_date` DESC $pager_sql",
+			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
 			intval(local_user()),
