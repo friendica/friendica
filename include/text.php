@@ -1459,26 +1459,6 @@ function return_bytes($size_str) {
 	}
 }
 
-
-/**
- * @return string
- */
-function generate_user_guid() {
-	$found = true;
-	do {
-		$guid = System::createGUID(32);
-		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
-			DBA::escape($guid)
-		);
-		if (!DBA::isResult($x)) {
-			$found = false;
-		}
-	} while ($found == true);
-
-	return $guid;
-}
-
-
 /**
  * @param string $s
  * @param boolean $strip_padding
