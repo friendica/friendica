@@ -1597,12 +1597,9 @@ class OStatus
 		}
 
 		if (!DBA::isResult($r)) {
-			$r = q(
-				"SELECT * FROM `gcontact` WHERE `nurl` = '%s' LIMIT 1",
-				DBA::escape(normalise_link($url))
-			);
+			$gcontact = DBA::selectFirst('gcontact', [], ['nurl' => normalise_link($url)]);
 			if (DBA::isResult($r)) {
-				$contact = $r[0];
+				$contact = $gcontact;
 				$contact["uid"] = -1;
 				$contact["success_update"] = $contact["updated"];
 			}
@@ -1803,14 +1800,11 @@ class OStatus
 			$item['follow'] = $contact['alias'];
 		}
 
-		$r = q(
-			"SELECT `id` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s'",
-			intval($owner['uid']),
-			DBA::escape(normalise_link($contact["url"]))
-		);
+		$condition = ['uid' => $owner['uid'], 'nurl' => normalise_link($contact["url"])];
+		$user_contact = DBA::selectFirst('contact', ['id'], $condition);
 
-		if (DBA::isResult($r)) {
-			$connect_id = $r[0]['id'];
+		if (DBA::isResult($user_contact)) {
+			$connect_id = $user_contact['id'];
 		} else {
 			$connect_id = 0;
 		}
