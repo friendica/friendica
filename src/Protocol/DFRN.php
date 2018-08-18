@@ -1474,15 +1474,9 @@ class DFRN
 	private static function birthdayEvent($contact, $birthday)
 	{
 		// Check for duplicates
-		$r = q(
-			"SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
-			intval($contact['uid']),
-			intval($contact['id']),
-			DBA::escape(DateTimeFormat::utc($birthday)),
-			DBA::escape('birthday')
-		);
-
-		if (DBA::isResult($r)) {
+		$condition = ['uid' => $contact['uid'], 'cid' => $contact['id'],
+			'start' => DateTimeFormat::utc($birthday), 'type' => 'birthday'];
+		if (DBA::exists('event', $condition)) {
 			return;
 		}
 
@@ -1904,13 +1898,6 @@ class DFRN
 
 		// Does our member already have a friend matching this description?
 
-		$r = q(
-			"SELECT `id` FROM `contact` WHERE `name` = '%s' AND `nurl` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($suggest["name"]),
-			DBA::escape(normalise_link($suggest["url"])),
-			intval($suggest["uid"])
-		);
-
 		/*
 		 * The valid result means the friend we're about to send a friend
 		 * suggestion already has them in their contact, which means no further
@@ -1918,7 +1905,9 @@ class DFRN
 		 *
 		 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 		 */
-		if (DBA::isResult($r)) {
+		$condition = ['name' => $suggest["name"], 'nurl' => normalise_link($suggest["url"]),
+			'uid' => $suggest["uid"]];
+		if (DBA::exists('contact', $condition)) {
 			return false;
 		}
 
