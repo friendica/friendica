@@ -1689,11 +1689,14 @@ function admin_page_users_post(App $a)
 		$body = sprintf($body, System::baseUrl(), $user['email'], $result['password'], Config::get('config', 'sitename'));
 
 		notification([
-			'type' => SYSTEM_EMAIL,
+			'type'     => SYSTEM_EMAIL,
+			'language' => $user['language'],
+			'to_name'  => $user['username'],
 			'to_email' => $user['email'],
-			'subject' => L10n::t('Registration details for %s', Config::get('config', 'sitename')),
+			'uid'      => $user['uid'],
+			'subject'  => L10n::t('Registration details for %s', Config::get('config', 'sitename')),
 			'preamble' => $preamble,
-			'body' => $body]);
+			'body'     => $body]);
 	}
 
 	if (x($_POST, 'page_users_block')) {
