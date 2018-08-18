@@ -418,9 +418,9 @@ function networkFlatView(App $a, $update = 0)
 			'allow_location' => $a->user['allow_location'],
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
-			'lockstate' => (((is_array($a->user) &&
-			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
-			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'lockstate' => (is_array($a->user) &&
+			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
+			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
 			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
@@ -574,9 +574,9 @@ function networkThreadedView(App $a, $update, $parent)
 			'allow_location' => $a->user['allow_location'],
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
-			'lockstate' => ((($gid) || ($cid) || ($nets) || (is_array($a->user) &&
-			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
-			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'lockstate' => ($gid || $cid || $nets || (is_array($a->user) &&
+			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
+			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid']))) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
 			'acl' => ACL::getFullSelectorHTML($a->user, true, $default_permissions),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
