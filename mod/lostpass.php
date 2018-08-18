@@ -23,7 +23,7 @@ function lostpass_post(App $a)
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` = 1 AND `blocked` = 0', $loginame, $loginame];
-	$user = DBA::selectFirst('user', ['uid', 'username', 'email'], $condition);
+	$user = DBA::selectFirst('user', ['uid', 'username', 'email', 'language'], $condition);
 	if (!DBA::isResult($user)) {
 		notice(L10n::t('No valid account found.') . EOL);
 		goaway(System::baseUrl());
@@ -69,6 +69,8 @@ function lostpass_post(App $a)
 
 	notification([
 		'type'     => SYSTEM_EMAIL,
+		'language' => $user['language'],
+		'to_name'  => $user['username'],
 		'to_email' => $user['email'],
 		'uid'      => $user['uid'],
 		'subject'  => L10n::t('Password reset requested at %s', $sitename),
@@ -85,7 +87,7 @@ function lostpass_content(App $a)
 	if ($a->argc > 1) {
 		$pwdreset_token = $a->argv[1];
 
-		$user = DBA::selectFirst('user', ['uid', 'username', 'email', 'pwdreset_time'], ['pwdreset' => $pwdreset_token]);
+		$user = DBA::selectFirst('user', ['uid', 'username', 'email', 'pwdreset_time', 'language'], ['pwdreset' => $pwdreset_token]);
 		if (!DBA::isResult($user)) {
 			notice(L10n::t("Request could not be verified. \x28You may have previously submitted it.\x29 Password reset failed."));
 
@@ -165,6 +167,8 @@ function lostpass_generate_password($user)
 
 		notification([
 			'type'     => SYSTEM_EMAIL,
+			'language' => $user['language'],
+			'to_name'  => $user['username'],
 			'to_email' => $user['email'],
 			'uid'      => $user['uid'],
 			'subject'  => L10n::t('Your password has been changed at %s', $sitename),
