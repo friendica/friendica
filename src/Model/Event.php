@@ -550,9 +550,12 @@ class Event extends BaseObject
 		$fmt = L10n::t('l, F j');
 		foreach ($event_result as $event) {
 			$item = Item::selectFirst(['plink', 'author-name', 'author-avatar', 'author-link'], ['id' => $event['itemid']]);
-			if (DBA::isResult($item)) {
-				$event = array_merge($event, $item);
+			if (!DBA::isResult($item)) {
+				// Using default values when no item had been found
+				$item = ['plink' => '', 'author-name' => '', 'author-avatar' => '', 'author-link' => ''];
 			}
+
+			$event = array_merge($event, $item);
 
 			$start = $event['adjust'] ? DateTimeFormat::local($event['start'], 'c')  : DateTimeFormat::utc($event['start'], 'c');
 			$j     = $event['adjust'] ? DateTimeFormat::local($event['start'], 'j')  : DateTimeFormat::utc($event['start'], 'j');

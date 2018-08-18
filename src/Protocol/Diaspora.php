@@ -1785,12 +1785,7 @@ class Diaspora
 
 		DBA::lock('mail');
 
-		$r = q(
-			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($msg_guid),
-			intval($importer["uid"])
-		);
-		if (DBA::isResult($r)) {
+		if (DBA::exists('mail', ['guid' => $msg_guid, 'uid' => $importer["uid"]])) {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
 			return false;
 		}
@@ -1865,16 +1860,8 @@ class Diaspora
 			return false;
 		}
 
-		$conversation = null;
-
-		$c = q(
-			"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-			intval($importer["uid"]),
-			DBA::escape($guid)
-		);
-		if ($c)
-			$conversation = $c[0];
-		else {
+		$conversation = DBA::selectFirst('conv', [], ['uid' => $importer["uid"], 'guid' => $guid]);
+		if (!DBA::isResult($conversation)) {
 			$r = q(
 				"INSERT INTO `conv` (`uid`, `guid`, `creator`, `created`, `updated`, `subject`, `recips`)
 				VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s')",
@@ -1887,15 +1874,7 @@ class Diaspora
 				DBA::escape($participants)
 			);
 			if ($r) {
-				$c = q(
-					"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-					intval($importer["uid"]),
-					DBA::escape($guid)
-				);
-			}
-
-			if ($c) {
-				$conversation = $c[0];
+				$conversation = DBA::selectFirst('conv', [], ['uid' => $importer["uid"], 'guid' => $guid]);
 			}
 		}
 		if (!$conversation) {
@@ -2046,14 +2025,10 @@ class Diaspora
 
 		$conversation = null;
 
-		$c = q(
-			"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-			intval($importer["uid"]),
-			DBA::escape($conversation_guid)
-		);
-		if ($c) {
-			$conversation = $c[0];
-		} else {
+		$condition = ['uid' => $importer["uid"], 'guid' => $conversation_guid];
+		$conversation = DBA::selectFirst('conv', [], $condition);
+
+		if (!DBA::isResult($conversation)) {
 			logger("conversation not available.");
 			return false;
 		}
@@ -2072,12 +2047,7 @@ class Diaspora
 
 		DBA::lock('mail');
 
-		$r = q(
-			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($guid),
-			intval($importer["uid"])
-		);
-		if (DBA::isResult($r)) {
+		if (DBA::exists('mail', ['guid' => $guid, 'uid' => $importer["uid"]])) {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
 			return false;
 		}
