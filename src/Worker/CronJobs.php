@@ -275,10 +275,6 @@ class CronJobs
 			}
 		}
 
-		// Set the parent if it wasn't set. (Shouldn't happen - but does sometimes)
-		// This call is very "cheap" so we can do it at any time without a problem
-		q("UPDATE `item` INNER JOIN `item` AS `parent` ON `parent`.`uri` = `item`.`parent-uri` AND `parent`.`uid` = `item`.`uid` SET `item`.`parent` = `parent`.`id` WHERE `item`.`parent` = 0");
-
 		// There was an issue where the nick vanishes from the contact table
 		q("UPDATE `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid` SET `nick` = `nickname` WHERE `self` AND `nick`=''");
 

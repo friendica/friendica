@@ -641,37 +641,25 @@ class Profile
 		$bd_format = L10n::t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
-		$s = DBA::p(
-			"SELECT `event`.*
-			FROM `event`
-			INNER JOIN `item`
-				ON `item`.`uid` = `event`.`uid`
-				AND `item`.`parent-uri` = `event`.`uri`
-			WHERE `event`.`uid` = ?
-			AND `event`.`type` != 'birthday'
-			AND `event`.`start` < ?
-			AND `event`.`start` >= ?
-			AND `item`.`author-id` = ?
-			AND (`item`.`verb` = ? OR `item`.`verb` = ?)
-			AND `item`.`visible`
-			AND NOT `item`.`deleted`
-			ORDER BY  `event`.`start` ASC",
-			local_user(),
-			DateTimeFormat::utc('now + 7 days'),
-			DateTimeFormat::utc('now - 1 days'),
-			public_contact(),
-			ACTIVITY_ATTEND,
-			ACTIVITY_ATTENDMAYBE
-		);
+		$condition = ["`uid` = ? AND `type` != 'birthday' AND `start` < ? AND `start` >= ?",
+			local_user(), DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days')];
+		$s = DBA::select('event', [], $condition, ['order' => ['start']]);
 
 		$r = [];
 
 		if (DBA::isResult($s)) {
 			$istoday = false;
+			$total = 0;
 
 			while ($rr = DBA::fetch($s)) {
+				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => public_contact(),
+					'verb' => [ACTIVITY_ATTEND, ACTIVITY_ATTENDMAYBE], 'visible' => true, 'deleted' => false];
+				if (!Item::exists($condition)) {
+					continue;
+				}
+
 				if (strlen($rr['summary'])) {
-					$total ++;
+					$total++;
 				}
 
 				$strt = DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC', 'UTC', 'Y-m-d');
