@@ -40,15 +40,12 @@ function subthread_content(App $a) {
 
 	if (!$item['wall']) {
 		// The top level post may have been written by somebody on another system
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($item['contact-id']),
-			intval($item['uid'])
-		);
-		if (!DBA::isResult($r)) {
+		$contact = DBA::selectFirst('contact', [], ['id' => $item['contact-id'], 'uid' => $item['uid']]);
+		if (!DBA::isResult($contact)) {
 			return;
 		}
-		if (!$r[0]['self']) {
-			$remote_owner = $r[0];
+		if (!$contact['self']) {
+			$remote_owner = $contact;
 		}
 	}
 
@@ -79,17 +76,10 @@ function subthread_content(App $a) {
 	if (local_user() && (local_user() == $owner_uid)) {
 		$contact = $owner;
 	} else {
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($_SESSION['visitor_id']),
-			intval($owner_uid)
-		);
-
-		if (DBA::isResult($r)) {
-			$contact = $r[0];
+		$contact = DBA::selectFirst('contact', [], ['id' => $_SESSION['visitor_id'], 'uid' => $owner_uid]);
+		if (!DBA::isResult($contact)) {
+			return;
 		}
-	}
-	if (!$contact) {
-		return;
 	}
 
 	$uri = Item::newURI($owner_uid);
