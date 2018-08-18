@@ -94,11 +94,11 @@ function match_content(App $a)
 
 					$entry = [
 						'url' => Contact::magicLink($jj->url),
-						'itemurl' => (($contact_details['addr'] != "") ? $contact_details['addr'] : $jj->url),
+						'itemurl' => defaults($contact_details, 'addr', $jj->url),
 						'name' => $jj->name,
-						'details'       => $contact_details['location'],
-						'tags'          => $contact_details['keywords'],
-						'about'         => $contact_details['about'],
+						'details'       => defaults($contact_details, 'location', ''),
+						'tags'          => defaults($contact_details, 'keywords', ''),
+						'about'         => defaults($contact_details, 'about', ''),
 						'account_type'  => Contact::getAccountType($contact_details),
 						'thumb' => ProxyUtils::proxifyUrl($jj->photo, false, ProxyUtils::SIZE_THUMB),
 						'inttxt' => ' ' . L10n::t('is interested in:'),

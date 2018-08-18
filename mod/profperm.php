@@ -12,7 +12,7 @@ use Friendica\Model\Profile;
 
 function profperm_init(App $a)
 {
-	if (! local_user()) {
+	if (!local_user()) {
 		return;
 	}
 
@@ -25,7 +25,7 @@ function profperm_init(App $a)
 
 function profperm_content(App $a) {
 
-	if (! local_user()) {
+	if (!local_user()) {
 		notice(L10n::t('Permission denied') . EOL);
 		return;
 	}
@@ -45,7 +45,7 @@ function profperm_content(App $a) {
 		$switchtotext = Config::get('system','groupedit_image_limit', 400);
 	}
 
-	if(($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
+	if (($a->argc > 2) && intval($a->argv[1]) && intval($a->argv[2])) {
 		$r = q("SELECT `id` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `self` = 0
 			AND `network` = '%s' AND `id` = %d AND `uid` = %d LIMIT 1",
 			DBA::escape(Protocol::DFRN),
@@ -64,7 +64,7 @@ function profperm_content(App $a) {
 			intval($a->argv[1]),
 			intval(local_user())
 		);
-		if (! DBA::isResult($r)) {
+		if (!DBA::isResult($r)) {
 			notice(L10n::t('Invalid profile identifier.') . EOL );
 			return;
 		}
@@ -82,8 +82,8 @@ function profperm_content(App $a) {
 
 		$members = $r;
 
-		if($change) {
-			if(in_array($change,$ingroup)) {
+		if (!empty($change)) {
+			if (in_array($change,$ingroup)) {
 				q("UPDATE `contact` SET `profile-id` = 0 WHERE `id` = %d AND `uid` = %d",
 					intval($change),
 					intval(local_user())
@@ -120,7 +120,7 @@ function profperm_content(App $a) {
 	}
 
 	$o .= '<div id="prof-update-wrapper">';
-	if($change)
+	if (!empty($change))
 		$o = '';
 
 	$o .= '<div id="prof-members-title">';
@@ -131,7 +131,7 @@ function profperm_content(App $a) {
 	$textmode = (($switchtotext && (count($members) > $switchtotext)) ? true : false);
 
 	foreach($members as $member) {
-		if($member['url']) {
+		if ($member['url']) {
 			$member['click'] = 'profChangeMember(' . $profile['id'] . ',' . $member['id'] . '); return true;';
 			$o .= micropro($member,true,'mpprof', $textmode);
 		}
@@ -153,7 +153,7 @@ function profperm_content(App $a) {
 		if (DBA::isResult($r)) {
 			$textmode = (($switchtotext && (count($r) > $switchtotext)) ? true : false);
 			foreach($r as $member) {
-				if(! in_array($member['id'],$ingroup)) {
+				if (!in_array($member['id'],$ingroup)) {
 					$member['click'] = 'profChangeMember(' . $profile['id'] . ',' . $member['id'] . '); return true;';
 					$o .= micropro($member,true,'mpprof',$textmode);
 				}
@@ -162,7 +162,7 @@ function profperm_content(App $a) {
 
 		$o .= '</div><div id="prof-all-contacts-end"></div>';
 
-	if($change) {
+	if (!empty($change)) {
 		echo $o;
 		killme();
 	}

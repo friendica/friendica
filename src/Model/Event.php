@@ -62,7 +62,7 @@ class Event extends BaseObject
 				$o .= "<h4>" . L10n::t('Finishes:') . "</h4><p>" . $event_end . "</p>";
 			}
 
-			if (strlen($event['location'])) {
+			if (!empty($event['location'])) {
 				$o .= "<h4>" . L10n::t('Location:') . "</h4><p>" . BBCode::convert($event['location'], false, $simple) . "</p>";
 			}
 
