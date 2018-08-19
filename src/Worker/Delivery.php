@@ -263,29 +263,12 @@ class Delivery extends BaseObject
 				}
 			}
 
-			// We now have some contact, so we fetch it
-			$target_importer = DBA::fetchFirst("SELECT *, `name` as `senderName`
-							FROM `contact`
-							WHERE NOT `blocked` AND `id` = ? LIMIT 1",
-							$cid);
-
-			// This should never fail
-			if (!DBA::isResult($target_importer)) {
+			$target_importer = DFRN::getImporter($cid, $target_uid);
+			if (empty($target_importer)) {
+				// This should never happen
 				return;
 			}
 
-			$user = DBA::selectFirst('user', [], ['uid' => $target_uid]);
-
-			// This should also never fail
-			if (!DBA::isResult($user)) {
-				logger('No user found for uid ' . $target_uid);
-				return;
-			}
-
-			$target_importer = array_merge($target_importer, $user);
-
-			// Set the user id. This is important if this is a public contact
-			$target_importer['importer_uid']  = $target_uid;
 			DFRN::import($atom, $target_importer);
 			return;
 		}

@@ -53,6 +53,45 @@ class DFRN
 	const REPLY_RC = 2;	// Reply that will be relayed
 
 	/**
+	 * @brief Generates an array of contact and user for DFRN imports
+	 *
+	 * This array contains not only the receiver but also the sender of the message.
+	 *
+	 * @param integer $cid Contact id
+	 * @param integer $uid User id
+	 *
+	 * @return array importer
+	 */
+	public static function getImporter($cid, $uid = 0)
+	{
+		$condition = ['id' => $cid, 'blocked' => false, 'pending' => false];
+		$contact = DBA::selectFirst('contact', [], $condition);
+		if (!DBA::isResult($contact)) {
+			return [];
+		}
+
+		$contact['cpubkey'] = $contact['pubkey'];
+		$contact['cprvkey'] = $contact['prvkey'];
+		$contact['senderName'] = $contact['name'];
+
+		if ($uid != 0) {
+			$condition = ['uid' => $uid, 'account_expired' => false, 'account_removed' => false];
+			$user = DBA::selectFirst('user', [], $condition);
+			if (!DBA::isResult($user)) {
+				return [];
+			}
+
+			$user['importer_uid']  = $user['uid'];
+		} else {
+			$user = ['importer_uid' => 0, 'uprvkey' => '', 'timezone' => 'UTC',
+				'nickname' => '', 'sprvkey' => '', 'spubkey' => '',
+				'page-flags' => 0, 'account-type' => 0, 'prvnets' => 0];
+		}
+
+		return array_merge($contact, $user);
+	}
+
+	/**
 	 * @brief Generates the atom entries for delivery.php
 	 *
 	 * This function is used whenever content is transmitted via DFRN.

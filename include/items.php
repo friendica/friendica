@@ -264,23 +264,10 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 
 	if ($contact['network'] === Protocol::DFRN) {
 		logger("Consume DFRN messages", LOGGER_DEBUG);
-
-		$r = q("SELECT `contact`.*, `contact`.`uid` AS `importer_uid`,
-					`contact`.`pubkey` AS `cpubkey`,
-					`contact`.`prvkey` AS `cprvkey`,
-					`contact`.`thumb` AS `thumb`,
-					`contact`.`url` as `url`,
-					`contact`.`name` as `senderName`,
-					`user`.*
-			FROM `contact`
-			LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `contact`.`id` = %d AND `user`.`uid` = %d",
-			DBA::escape($contact["id"]), DBA::escape($importer["uid"])
-		);
-
-		if (DBA::isResult($r)) {
+		$dfrn_importer = DFRN::getImporter($contact["id"], $importer["uid"]);
+		if (!empty($dfrn_importer)) {
 			logger("Now import the DFRN feed");
-			DFRN::import($xml, $r[0], true);
+			DFRN::import($xml, $dfrn_importer, true);
 			return;
 		}
 	}
