@@ -4341,7 +4341,7 @@ function check_acl_input($acl_string)
 		$cid = str_replace("<", "", $cid);
 		$cid = str_replace(">", "", $cid);
 		$condition = ['id' => $cid, 'uid' => api_user()];
-		$contact_not_found = !DBA::exists('contact', $condition);
+		$contact_not_found |= !DBA::exists('contact', $condition);
 	}
 	return $contact_not_found;
 }
