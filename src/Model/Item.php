@@ -3177,8 +3177,7 @@ class Item extends BaseObject
 			return;
 		}
 
-		// Using dba::delete at this time could delete the associated item entries
-		$result = DBA::e("DELETE FROM `thread` WHERE `iid` = ?", $itemid);
+		$result = DBA::delete('thread', ['iid' => $itemid], ['cascade' => false]);
 
 		logger("deleteThread: Deleted thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
 
