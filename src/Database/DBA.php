@@ -1459,7 +1459,7 @@ class DBA
 
 		$limit_string = '';
 		if (isset($params['limit']) && is_int($params['limit'])) {
-			$limit_string = " LIMIT " . $params['limit'];
+			$limit_string = " LIMIT " . intval($params['limit']);
 		}
 
 		if (isset($params['limit']) && is_array($params['limit'])) {

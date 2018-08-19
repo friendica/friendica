@@ -474,6 +474,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 		$profile_owner = $a->profile['profile_uid'];
 
 		if (!$update) {
+			$items = conversation_add_children($items, false, $order, $uid);
 			$tab = 'posts';
 			if (x($_GET, 'tab')) {
 				$tab = notags(trim($_GET['tab']));

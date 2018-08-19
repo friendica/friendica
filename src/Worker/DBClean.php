@@ -84,7 +84,7 @@ class DBClean {
 			$r = DBA::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
 						NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
 						`received` < UTC_TIMESTAMP() - INTERVAL ? DAY AND `id` >= ?
-					ORDER BY `id` LIMIT ".intval($limit), $days_unclaimed, $last_id);
+					ORDER BY `id` LIMIT ?", $days_unclaimed, $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found global item orphans: ".$count);
@@ -106,7 +106,7 @@ class DBClean {
 			logger("Deleting items without parents. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `id` FROM `item`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` AS `i` WHERE `item`.`parent` = `i`.`id`)
-					AND `id` >= ? ORDER BY `id` LIMIT ".intval($limit), $last_id);
+					AND `id` >= ? ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found item orphans without parents: ".$count);
@@ -132,7 +132,7 @@ class DBClean {
 			logger("Deleting orphaned data from thread table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid` FROM `thread`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `thread`.`iid`) AND `iid` >= ?
-					ORDER BY `iid` LIMIT ".intval($limit), $last_id);
+					ORDER BY `iid` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found thread orphans: ".$count);
@@ -158,7 +158,7 @@ class DBClean {
 			logger("Deleting orphaned data from notify table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid`, `id` FROM `notify`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `notify`.`iid`) AND `id` >= ?
-					ORDER BY `id` LIMIT ".intval($limit), $last_id);
+					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found notify orphans: ".$count);
@@ -184,7 +184,7 @@ class DBClean {
 			logger("Deleting orphaned data from notify-threads table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `id` FROM `notify-threads`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `notify-threads`.`master-parent-item`) AND `id` >= ?
-					ORDER BY `id` LIMIT ".intval($limit), $last_id);
+					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found notify-threads orphans: ".$count);
@@ -210,7 +210,7 @@ class DBClean {
 			logger("Deleting orphaned data from sign table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid`, `id` FROM `sign`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `sign`.`iid`) AND `id` >= ?
-					ORDER BY `id` LIMIT ".intval($limit), $last_id);
+					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found sign orphans: ".$count);
@@ -236,7 +236,7 @@ class DBClean {
 			logger("Deleting orphaned data from term table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `oid`, `tid` FROM `term`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `term`.`oid`) AND `tid` >= ?
-					ORDER BY `tid` LIMIT ".intval($limit), $last_id);
+					ORDER BY `tid` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found term orphans: ".$count);
@@ -303,7 +303,7 @@ class DBClean {
 			$r = DBA::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
 						NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
 						`received` < UTC_TIMESTAMP() - INTERVAL 90 DAY AND `id` >= ? AND `id` <= ?
-					ORDER BY `id` LIMIT ".intval($limit), $last_id, $till_id);
+					ORDER BY `id` LIMIT ?", $last_id, $till_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found global item entries from expired threads: ".$count);
@@ -326,7 +326,7 @@ class DBClean {
 			logger("Deleting old conversations. Last created: ".$last_id);
 			$r = DBA::p("SELECT `received`, `item-uri` FROM `conversation`
 					WHERE `received` < UTC_TIMESTAMP() - INTERVAL ? DAY
-					ORDER BY `received` LIMIT ".intval($limit), $days);
+					ORDER BY `received` LIMIT ?", $days, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
 				logger("found old conversations: ".$count);

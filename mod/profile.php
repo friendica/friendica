@@ -23,7 +23,7 @@ use Friendica\Util\DateTimeFormat;
 
 function profile_init(App $a)
 {
-	if (!x($a->page, 'aside')) {
+	if (empty($a->page['aside'])) {
 		$a->page['aside'] = '';
 	}
 
@@ -54,15 +54,15 @@ function profile_init(App $a)
 	$blocked   = !local_user() && !remote_user() && Config::get('system', 'block_public');
 	$userblock = !local_user() && !remote_user() && $a->profile['hidewall'];
 
-	if (x($a->profile, 'page-flags') && $a->profile['page-flags'] == Contact::PAGE_COMMUNITY) {
+	if (!empty($a->profile['page-flags']) && $a->profile['page-flags'] == Contact::PAGE_COMMUNITY) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
 	}
 
-	if (x($a->profile, 'openidserver')) {
+	if (!empty($a->profile['openidserver'])) {
 		$a->page['htmlhead'] .= '<link rel="openid.server" href="' . $a->profile['openidserver'] . '" />' . "\r\n";
 	}
 
-	if (x($a->profile, 'openid')) {
+	if (!empty($a->profile['openid'])) {
 		$delegate = strstr($a->profile['openid'], '://') ? $a->profile['openid'] : 'https://' . $a->profile['openid'];
 		$a->page['htmlhead'] .= '<link rel="openid.delegate" href="' . $delegate . '" />' . "\r\n";
 	}
@@ -109,7 +109,7 @@ function profile_content(App $a, $update = 0)
 		}
 	}
 
-	if (!x($category)) {
+	if (empty($category)) {
 		$category = defaults($_GET, 'category', '');
 	}
 
@@ -140,7 +140,7 @@ function profile_content(App $a, $update = 0)
 
 	$contact_id = 0;
 
-	if (x($_SESSION, 'remote') && is_array($_SESSION['remote'])) {
+	if (!empty($_SESSION['remote'])) {
 		foreach ($_SESSION['remote'] as $v) {
 			if ($v['uid'] == $a->profile['profile_uid']) {
 				$contact_id = $v['cid'];
@@ -171,14 +171,14 @@ function profile_content(App $a, $update = 0)
 	$is_owner = local_user() == $a->profile['profile_uid'];
 	$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . remote_user();
 
-	if (x($a->profile, 'hidewall') && !$is_owner && !$remote_contact) {
+	if (!empty($a->profile['hidewall']) && !$is_owner && !$remote_contact) {
 		notice(L10n::t('Access to this profile has been restricted.') . EOL);
 		return;
 	}
 
 	if (!$update) {
 		$tab = false;
-		if (x($_GET, 'tab')) {
+		if (!empty($_GET['tab'])) {
 			$tab = notags(trim($_GET['tab']));
 		}
 
@@ -196,7 +196,7 @@ function profile_content(App $a, $update = 0)
 		$commvisitor = $commpage && $remote_contact;
 
 		$a->page['aside'] .= posted_date_widget(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'], true);
-		$a->page['aside'] .= Widget::categories(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], (x($category) ? xmlify($category) : ''));
+		$a->page['aside'] .= Widget::categories(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], (!empty($category) ? xmlify($category) : ''));
 		$a->page['aside'] .= Widget::tagCloud();
 
 		if (can_write_wall($a->profile['profile_uid'])) {
@@ -227,7 +227,7 @@ function profile_content(App $a, $update = 0)
 	$sql_extra2 = '';
 
 	if ($update) {
-		$last_updated = (x($_SESSION['last_updated'], $last_updated_key) ? $_SESSION['last_updated'][$last_updated_key] : 0);
+		$last_updated = (!empty($_SESSION['last_updated'][$last_updated_key]) ? $_SESSION['last_updated'][$last_updated_key] : 0);
 
 		// If the page user is the owner of the page we should query for unseen
 		// items. Otherwise use a timestamp of the last succesful update request.
@@ -238,7 +238,7 @@ function profile_content(App $a, $update = 0)
 			$sql_extra4 = " AND `item`.`received` > '" . $gmupdate . "'";
 		}
 
-		$r = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
+		$items = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
 			WHERE `item`.`uid` = %d AND `item`.`visible` AND
@@ -250,38 +250,33 @@ function profile_content(App $a, $update = 0)
 			intval($a->profile['profile_uid']), intval(GRAVITY_ACTIVITY)
 		);
 
-		if (!DBA::isResult($r)) {
+		if (!DBA::isResult($items)) {
 			return '';
 		}
 	} else {
 		$sql_post_table = "";
 
-		if (x($category)) {
+		if (!empty($category)) {
 			$sql_post_table = sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
 				DBA::escape(protect_sprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
 		}
 
-		if (x($hashtags)) {
+		if (!empty($hashtags)) {
 			$sql_post_table .= sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
 				DBA::escape(protect_sprintf($hashtags)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG), intval($a->profile['profile_uid']));
 		}
 
-		if ($datequery) {
+		if (!empty($datequery)) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` <= '%s' ", DBA::escape(DateTimeFormat::convert($datequery, 'UTC', date_default_timezone_get()))));
 		}
-		if ($datequery2) {
+		if (!empty($datequery2)) {
 			$sql_extra2 .= protect_sprintf(sprintf(" AND `thread`.`created` >= '%s' ", DBA::escape(DateTimeFormat::convert($datequery2, 'UTC', date_default_timezone_get()))));
 		}
 
-		// Belongs the profile page to a forum?
+		// Does the profile page belong to a forum?
 		// If not then we can improve the performance with an additional condition
-		$r = q("SELECT `uid` FROM `user` WHERE `uid` = %d AND `page-flags` IN (%d, %d)",
-			intval($a->profile['profile_uid']),
-			intval(Contact::PAGE_COMMUNITY),
-			intval(Contact::PAGE_PRVGROUP)
-		);
-
-		if (!DBA::isResult($r)) {
+		$condition = ['uid' => $a->profile['profile_uid'], 'page-flags' => [Contact::PAGE_COMMUNITY, Contact::PAGE_PRVGROUP]];
+		if (!DBA::exists('user', $condition)) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
 		} else {
 			$sql_extra3 = "";
@@ -305,7 +300,7 @@ function profile_content(App $a, $update = 0)
 
 		$pager_sql = sprintf(" LIMIT %d, %d ", intval($a->pager['start']), intval($a->pager['itemspage']));
 
-		$r = q("SELECT `thread`.`iid` AS `item_id`, `thread`.`network` AS `item_network`
+		$items = q("SELECT `item`.`uri`
 			FROM `thread`
 			STRAIGHT_JOIN `item` ON `item`.`id` = `thread`.`iid`
 			$sql_post_table
@@ -321,30 +316,14 @@ function profile_content(App $a, $update = 0)
 		);
 	}
 
-	$parents_arr = [];
-	$parents_str = '';
-
 	// Set a time stamp for this page. We will make use of it when we
 	// search for new items (update routine)
 	$_SESSION['last_updated'][$last_updated_key] = time();
-
-	if (DBA::isResult($r)) {
-		foreach ($r as $rr) {
-			$parents_arr[] = $rr['item_id'];
-		}
-
-		$condition = ['uid' => $a->profile['profile_uid'], 'parent' => $parents_arr];
-		$result = Item::selectForUser($a->profile['profile_uid'], [], $condition);
-		$items = conv_sort(Item::inArray($result), 'created');
-	} else {
-		$items = [];
-	}
 
 	if ($is_owner && !$update && !Config::get('theme', 'hide_eventlist')) {
 		$o .= Profile::getBirthdays();
 		$o .= Profile::getEventsReminderHTML();
 	}
-
 
 	if ($is_owner) {
 		$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);

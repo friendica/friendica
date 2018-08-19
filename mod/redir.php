@@ -80,7 +80,7 @@ function redir_init(App $a) {
 		}
 
 		// Doing remote auth with dfrn.
-		if (local_user()&& (!empty($contact['dfrn-id']) || !empty($contact['issued-id']))) {
+		if (local_user() && (!empty($contact['dfrn-id']) || !empty($contact['issued-id']))) {
 			$dfrn_id = $orig_id = (($contact['issued-id']) ? $contact['issued-id'] : $contact['dfrn-id']);
 
 			if ($contact['duplex'] && $contact['issued-id']) {
