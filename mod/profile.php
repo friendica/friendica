@@ -238,7 +238,7 @@ function profile_content(App $a, $update = 0)
 			$sql_extra4 = " AND `item`.`received` > '" . $gmupdate . "'";
 		}
 
-		$items = q("SELECT distinct(parent) AS `item_id`, `item`.`network` AS `item_network`, `item`.`created`
+		$r = q("SELECT `parent`
 			FROM `item` INNER JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 			AND NOT `contact`.`blocked` AND NOT `contact`.`pending`
 			WHERE `item`.`uid` = %d AND `item`.`visible` AND
@@ -250,9 +250,17 @@ function profile_content(App $a, $update = 0)
 			intval($a->profile['profile_uid']), intval(GRAVITY_ACTIVITY)
 		);
 
-		if (!DBA::isResult($items)) {
+		if (!DBA::isResult($r)) {
 			return '';
 		}
+
+		foreach ($r as $rr) {
+			$parents_arr[] = $rr['parent'];
+		}
+
+		$condition = ['uid' => $a->profile['profile_uid'], 'parent' => $parents_arr];
+		$result = Item::selectForUser($a->profile['profile_uid'], [], $condition);
+		$items = conv_sort(Item::inArray($result), 'created');
 	} else {
 		$sql_post_table = "";
 
