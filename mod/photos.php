@@ -1093,6 +1093,12 @@ function photos_content(App $a)
 			'$albumselect' => $albumselect,
 			'$permissions' => L10n::t('Permissions'),
 			'$aclselect' => $aclselect_e,
+			'$lockstate' => is_array($a->user)
+					&& (strlen($a->user['allow_cid'])
+						|| strlen($a->user['allow_gid'])
+						|| strlen($a->user['deny_cid'])
+						|| strlen($a->user['deny_gid'])
+					) ? 'lock' : 'unlock',
 			'$alt_uploader' => $ret['addon_text'],
 			'$default_upload_box' => ($ret['default_upload'] ? $default_upload_box : ''),
 			'$default_upload_submit' => ($ret['default_upload'] ? $default_upload_submit : ''),

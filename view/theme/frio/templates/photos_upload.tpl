@@ -13,31 +13,60 @@
 		</div>
 		<div id="photos-upload-end" class="clearfix"></div>
 
-		<div id="photos-upload-noshare-div" class="photos-upload-noshare-div pull-left" >
+		<div id="photos-upload-noshare-div" class="photos-upload-noshare-div checkbox pull-left" >
 			<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked/>
 			<label id="photos-upload-noshare-text" for="photos-upload-noshare" >{{$nosharetext}}</label>
 		</div>
 
-		<div id="photos-upload-perms" class="photos-upload-perms pull-right" >
-			<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button popupbox" />
-				<span id="jot-perms-icon" class="icon {{$lockstate}}" ></span>{{$permissions}}
-			</a>
-		</div>
-		<div id="photos-upload-perms-end" class="clear"></div>
+		{{if $alt_uploader}}
+			<div id="photos-upload-perms" class="pull-right">
+				<button class="btn btn-default btn-sm" data-toggle="modal" data-target="#aclModal" onclick="return false;">
+					<i id="jot-perms-icon" class="fa {{$lockstate}}"></i> {{$permissions}}
+				</button>
+			</div>
+			<div class="clearfix"></div>
 
-		<div style="display: none;">
-			<div id="photos-upload-permissions-wrapper">
+			<div id="photos-upload-spacer"></div>
+
+			{{$alt_uploader}}
+		{{/if}}
+
+
+		{{if $default_upload_submit}}
+			<div class="clearfix"></div>
+
+			<div id="photos-upload-spacer"></div>
+
+			<div id="photos-upload-submit-wrapper">
+				{{$default_upload_box}}
+
+				<div id="photos-upload-perms" class="btn-group pull-right">
+					<button class="btn btn-default" data-toggle="modal" data-target="#aclModal" onclick="return false;">
+						<i id="jot-perms-icon" class="fa {{$lockstate}}"></i> 
+					</button>
+					{{$default_upload_submit}}
+				</div>
+			</div>
+			<div class="clearfix"></div>
+		{{/if}}
+
+		<div class="photos-upload-end"></div>
+	</form>
+</div>
+
+{{* The modal for advanced-expire *}}
+<div id="aclModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header" class="modal-header">
+				<button id="modal-cloase" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 id="modal-title" class="modal-title">{{$permissions}}</h4>
+			</div>
+			<div id = "photos-upload-permissions-wrapper" class="modal-body">
 				{{$aclselect}}
 			</div>
 		</div>
-
-		<div id="photos-upload-spacer"></div>
-
-		{{$alt_uploader}}
-
-		{{$default_upload_box}}
-		{{$default_upload_submit}}
-
-		<div class="photos-upload-end" ></div>
-	</form>
+	</div>
 </div>

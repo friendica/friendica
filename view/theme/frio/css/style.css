@@ -1410,6 +1410,15 @@ section #jotOpen {
     color: #fff;
 }
 
+.fa.lock:before {
+    font-family: FontAwesome;
+    content: "\f023";
+}
+.fa.unlock:before {
+    font-family: FontAwesome;
+    content: "\f09c";
+}
+
 /* Filebrowser */
 .fbrowser .breadcrumb {
     margin-bottom: 0px;
