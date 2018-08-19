@@ -37,36 +37,36 @@
 
 			<div id="photos-upload-spacer"></div>
 
-			<div id="photos-upload-submit-wrapper">
-				{{$default_upload_box}}
-
+			<div class="photos-upload-wrapper">
 				<div id="photos-upload-perms" class="btn-group pull-right">
 					<button class="btn btn-default" data-toggle="modal" data-target="#aclModal" onclick="return false;">
 						<i id="jot-perms-icon" class="fa {{$lockstate}}"></i> 
 					</button>
+
 					{{$default_upload_submit}}
 				</div>
+				{{$default_upload_box}}
 			</div>
 			<div class="clearfix"></div>
 		{{/if}}
 
-		<div class="photos-upload-end"></div>
-	</form>
-</div>
+		<div class="photos-upload-end" class="clearfix"></div>
 
-{{* The modal for advanced-expire *}}
-<div id="aclModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header" class="modal-header">
-				<button id="modal-cloase" type="button" class="close" data-dismiss="modal" aria-hidden="true">
-					&times;
-				</button>
-				<h4 id="modal-title" class="modal-title">{{$permissions}}</h4>
-			</div>
-			<div id = "photos-upload-permissions-wrapper" class="modal-body">
-				{{$aclselect}}
+		{{* The modal for advanced-expire *}}
+		<div id="aclModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" class="modal-header">
+						<button id="modal-close" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 id="modal-title" class="modal-title">{{$permissions}}</h4>
+					</div>
+					<div id="photos-upload-permissions-wrapper" class="modal-body">
+						{{$aclselect}}
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
+	</form>
 </div>

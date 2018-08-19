@@ -12,7 +12,7 @@ $(document).ready(function(){
 		// with AjaxUpload.
 		$(".fbrowser").remove();
 		// Remove the AjaxUpload element.
-		$("[name=userfile]").parent().remove();
+		$(".ajaxbutton-wrapper").remove();
 	});
 
 	// Clear bs modal on close.

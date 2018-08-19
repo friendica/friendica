@@ -380,7 +380,8 @@
                 'cursor' : 'pointer'
             });            
 
-            var div = document.createElement("div");                        
+            var div = document.createElement("div");
+            div.setAttribute('class', 'ajaxbutton-wrapper');
             addStyles(div, {
                 'display' : 'block',
                 'position' : 'absolute',

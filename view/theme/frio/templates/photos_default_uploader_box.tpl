@@ -1,2 +1,1 @@
-
-<input id="photos-upload-choose" class="pull-left" type="file" name="userfile" />
+<input id="photos-upload-choose" type="file" name="userfile" />
