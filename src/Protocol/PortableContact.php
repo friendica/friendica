@@ -14,6 +14,7 @@ use DOMXPath;
 use Exception;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\GContact;
@@ -228,7 +229,7 @@ class PortableContact
 			$friendica = preg_replace("=(https?://)(.*)/profile/(.*)=ism", "$1$2", $profile);
 			if ($friendica != $profile) {
 				$server_url = $friendica;
-				$network = NETWORK_DFRN;
+				$network = Protocol::DFRN;
 			}
 		}
 
@@ -236,7 +237,7 @@ class PortableContact
 			$diaspora = preg_replace("=(https?://)(.*)/u/(.*)=ism", "$1$2", $profile);
 			if ($diaspora != $profile) {
 				$server_url = $diaspora;
-				$network = NETWORK_DIASPORA;
+				$network = Protocol::DIASPORA;
 			}
 		}
 
@@ -244,7 +245,7 @@ class PortableContact
 			$red = preg_replace("=(https?://)(.*)/channel/(.*)=ism", "$1$2", $profile);
 			if ($red != $profile) {
 				$server_url = $red;
-				$network = NETWORK_DIASPORA;
+				$network = Protocol::DIASPORA;
 			}
 		}
 
@@ -253,7 +254,7 @@ class PortableContact
 			$mastodon = preg_replace("=(https?://)(.*)/users/(.*)=ism", "$1$2", $profile);
 			if ($mastodon != $profile) {
 				$server_url = $mastodon;
-				$network = NETWORK_OSTATUS;
+				$network = Protocol::OSTATUS;
 			}
 		}
 
@@ -262,7 +263,7 @@ class PortableContact
 			$ostatus = preg_replace("=(https?://)(.*)/user/(.*)=ism", "$1$2", $profile);
 			if ($ostatus != $profile) {
 				$server_url = $ostatus;
-				$network = NETWORK_OSTATUS;
+				$network = Protocol::OSTATUS;
 			}
 		}
 
@@ -271,7 +272,7 @@ class PortableContact
 			$base = preg_replace("=(https?://)(.*?)/(.*)=ism", "$1$2", $profile);
 			if ($base != $profile) {
 				$server_url = $base;
-				$network = NETWORK_PHANTOM;
+				$network = Protocol::PHANTOM;
 			}
 		}
 
@@ -332,7 +333,7 @@ class PortableContact
 			$server_url = normalise_link(self::detectServer($profile));
 		}
 
-		if (!in_array($gcontacts[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_FEED, NETWORK_OSTATUS, ""])) {
+		if (!in_array($gcontacts[0]["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::FEED, Protocol::OSTATUS, ""])) {
 			logger("Profile ".$profile.": Network type ".$gcontacts[0]["network"]." can't be checked", LOGGER_DEBUG);
 			return false;
 		}
@@ -350,7 +351,7 @@ class PortableContact
 			$contact['server_url'] = $server_url;
 		}
 
-		if (in_array($gcontacts[0]["network"], ["", NETWORK_FEED])) {
+		if (in_array($gcontacts[0]["network"], ["", Protocol::FEED])) {
 			$server = q(
 				"SELECT `network` FROM `gserver` WHERE `nurl` = '%s' AND `network` != ''",
 				DBA::escape(normalise_link($server_url))
@@ -445,7 +446,7 @@ class PortableContact
 
 		// Is the profile link the alternate OStatus link notation? (http://domain.tld/user/4711)
 		// Then check the other link and delete this one
-		if (($data["network"] == NETWORK_OSTATUS) && self::alternateOStatusUrl($profile)
+		if (($data["network"] == Protocol::OSTATUS) && self::alternateOStatusUrl($profile)
 			&& (normalise_link($profile) == normalise_link($data["alias"]))
 			&& (normalise_link($profile) != normalise_link($data["url"]))
 		) {
@@ -469,7 +470,7 @@ class PortableContact
 			return false;
 		}
 
-		if (($data["poll"] == "") || (in_array($data["network"], [NETWORK_FEED, NETWORK_PHANTOM]))) {
+		if (($data["poll"] == "") || (in_array($data["network"], [Protocol::FEED, Protocol::PHANTOM]))) {
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			DBA::update('gcontact', $fields, ['nurl' => normalise_link($profile)]);
 
@@ -629,7 +630,7 @@ class PortableContact
 			if ($url['type'] == 'zot') {
 				$server = [];
 				$server["platform"] = 'Hubzilla';
-				$server["network"] = NETWORK_DIASPORA;
+				$server["network"] = Protocol::DIASPORA;
 				return $server;
 			}
 		}
@@ -757,13 +758,13 @@ class PortableContact
 		}
 
 		if ($gnusocial) {
-			$server['network'] = NETWORK_OSTATUS;
+			$server['network'] = Protocol::OSTATUS;
 		}
 		if ($diaspora) {
-			$server['network'] = NETWORK_DIASPORA;
+			$server['network'] = Protocol::DIASPORA;
 		}
 		if ($friendica) {
-			$server['network'] = NETWORK_DFRN;
+			$server['network'] = Protocol::DFRN;
 		}
 
 		if (!$server) {
@@ -838,11 +839,11 @@ class PortableContact
 		}
 
 		if ($gnusocial) {
-			$server['network'] = NETWORK_OSTATUS;
+			$server['network'] = Protocol::OSTATUS;
 		} elseif ($diaspora) {
-			$server['network'] = NETWORK_DIASPORA;
+			$server['network'] = Protocol::DIASPORA;
 		} elseif ($friendica) {
-			$server['network'] = NETWORK_DFRN;
+			$server['network'] = Protocol::DFRN;
 		}
 
 		if (empty($server)) {
@@ -883,7 +884,7 @@ class PortableContact
 						$server = [];
 						$server["platform"] = $version_part[0];
 						$server["version"] = $version_part[1];
-						$server["network"] = NETWORK_DFRN;
+						$server["network"] = Protocol::DFRN;
 					}
 				}
 			}
@@ -903,7 +904,7 @@ class PortableContact
 					$server = [];
 					$server["platform"] = $attr['content'];
 					$server["version"] = "";
-					$server["network"] = NETWORK_DIASPORA;
+					$server["network"] = Protocol::DIASPORA;
 				}
 			}
 		}
@@ -1106,14 +1107,14 @@ class PortableContact
 							$platform = "Diaspora";
 							$version = trim(str_replace("X-Diaspora-Version:", "", $line));
 							$version = trim(str_replace("x-diaspora-version:", "", $version));
-							$network = NETWORK_DIASPORA;
+							$network = Protocol::DIASPORA;
 							$versionparts = explode("-", $version);
 							$version = $versionparts[0];
 						}
 
 						if (stristr($line, 'Server: Mastodon')) {
 							$platform = "Mastodon";
-							$network = NETWORK_OSTATUS;
+							$network = Protocol::OSTATUS;
 						}
 					}
 				}
@@ -1132,7 +1133,7 @@ class PortableContact
 				// Remove junk that some GNU Social servers return
 				$version = str_replace(chr(239).chr(187).chr(191), "", $serverret["body"]);
 				$version = trim($version, '"');
-				$network = NETWORK_OSTATUS;
+				$network = Protocol::OSTATUS;
 			}
 
 			// Test for GNU Social
@@ -1144,7 +1145,7 @@ class PortableContact
 				// Remove junk that some GNU Social servers return
 				$version = str_replace(chr(239) . chr(187) . chr(191), "", $serverret["body"]);
 				$version = trim($version, '"');
-				$network = NETWORK_OSTATUS;
+				$network = Protocol::OSTATUS;
 			}
 
 			// Test for Mastodon
@@ -1159,7 +1160,7 @@ class PortableContact
 					$version = $data['version'];
 					$site_name = $data['title'];
 					$info = $data['description'];
-					$network = NETWORK_OSTATUS;
+					$network = Protocol::OSTATUS;
 				}
 
 				if (!empty($data['stats']['user_count'])) {
@@ -1183,7 +1184,7 @@ class PortableContact
 				if (isset($data['url'])) {
 					$platform = $data['platform'];
 					$version = $data['version'];
-					$network = NETWORK_DIASPORA;
+					$network = Protocol::DIASPORA;
 				}
 
 				if (!empty($data['site_name'])) {
@@ -1221,19 +1222,19 @@ class PortableContact
 						if (isset($data['site']['platform'])) {
 							$platform = $data['site']['platform']['PLATFORM_NAME'];
 							$version = $data['site']['platform']['STD_VERSION'];
-							$network = NETWORK_DIASPORA;
+							$network = Protocol::DIASPORA;
 						}
 
 						if (isset($data['site']['BlaBlaNet'])) {
 							$platform = $data['site']['BlaBlaNet']['PLATFORM_NAME'];
 							$version = $data['site']['BlaBlaNet']['STD_VERSION'];
-							$network = NETWORK_DIASPORA;
+							$network = Protocol::DIASPORA;
 						}
 
 						if (isset($data['site']['hubzilla'])) {
 							$platform = $data['site']['hubzilla']['PLATFORM_NAME'];
 							$version = $data['site']['hubzilla']['RED_VERSION'];
-							$network = NETWORK_DIASPORA;
+							$network = Protocol::DIASPORA;
 						}
 
 						if (isset($data['site']['redmatrix'])) {
@@ -1244,13 +1245,13 @@ class PortableContact
 							}
 
 							$version = $data['site']['redmatrix']['RED_VERSION'];
-							$network = NETWORK_DIASPORA;
+							$network = Protocol::DIASPORA;
 						}
 
 						if (isset($data['site']['friendica'])) {
 							$platform = $data['site']['friendica']['FRIENDICA_PLATFORM'];
 							$version = $data['site']['friendica']['FRIENDICA_VERSION'];
-							$network = NETWORK_DFRN;
+							$network = Protocol::DFRN;
 						}
 
 						$site_name = $data['site']['name'];
@@ -1306,7 +1307,7 @@ class PortableContact
 				}
 
 				if ($platform == "Diaspora") {
-					$network = NETWORK_DIASPORA;
+					$network = Protocol::DIASPORA;
 				}
 
 				if (!empty($data['registrations_open']) && $data['registrations_open']) {
@@ -1348,7 +1349,7 @@ class PortableContact
 
 		// Check for noscrape
 		// Friendica servers could be detected as OStatus servers
-		if (!$failure && in_array($network, [NETWORK_DFRN, NETWORK_OSTATUS])) {
+		if (!$failure && in_array($network, [Protocol::DFRN, Protocol::OSTATUS])) {
 			$serverret = Network::curl($server_url . "/friendica/json");
 
 			if (!$serverret["success"]) {
@@ -1359,7 +1360,7 @@ class PortableContact
 				$data = json_decode($serverret["body"], true);
 
 				if (isset($data['version'])) {
-					$network = NETWORK_DFRN;
+					$network = Protocol::DFRN;
 
 					if (!empty($data['no_scrape_url'])) {
 						$noscrape = $data['no_scrape_url'];
@@ -1423,7 +1424,7 @@ class PortableContact
 			DBA::insert('gserver', $fields);
 		}
 
-		if (!$failure && in_array($fields['network'], [NETWORK_DFRN, NETWORK_DIASPORA])) {
+		if (!$failure && in_array($fields['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
 			self::discoverRelay($server_url);
 		}
 
@@ -1471,7 +1472,7 @@ class PortableContact
 			$tags = [];
 			foreach ($data['tags'] as $tag) {
 				$tag = mb_strtolower($tag);
-				if (count($tag) < 100) {
+				if (strlen($tag) < 100) {
 					$tags[$tag] = $tag;
 				}
 			}
@@ -1485,7 +1486,7 @@ class PortableContact
 		$fields = [];
 		if (isset($data['protocols'])) {
 			if (isset($data['protocols']['diaspora'])) {
-				$fields['network'] = NETWORK_DIASPORA;
+				$fields['network'] = Protocol::DIASPORA;
 
 				if (isset($data['protocols']['diaspora']['receive'])) {
 					$fields['batch'] = $data['protocols']['diaspora']['receive'];
@@ -1495,7 +1496,7 @@ class PortableContact
 			}
 
 			if (isset($data['protocols']['dfrn'])) {
-				$fields['network'] = NETWORK_DFRN;
+				$fields['network'] = Protocol::DFRN;
 
 				if (isset($data['protocols']['dfrn']['receive'])) {
 					$fields['batch'] = $data['protocols']['dfrn']['receive'];
@@ -1518,9 +1519,9 @@ class PortableContact
 			WHERE `network` IN ('%s', '%s', '%s') AND `last_contact` > `last_failure`
 			ORDER BY `last_contact`
 			LIMIT 1000",
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_OSTATUS)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::OSTATUS)
 		);
 
 		if (!DBA::isResult($r)) {

@@ -9,6 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -146,7 +147,7 @@ class Contact extends BaseObject
 				AND `contact`.`notify` != ""',
 				$gid,
 				local_user(),
-				NETWORK_OSTATUS
+				Protocol::OSTATUS
 			);
 			$return = $contacts['count'];
 		}
@@ -313,15 +314,10 @@ class Contact extends BaseObject
 			return;
 		}
 
-		$archive = PConfig::get($contact['uid'], 'system', 'archive_removed_contacts');
-		if ($archive) {
-			DBA::update('contact', ['archive' => true, 'network' => 'none', 'writable' => false], ['id' => $id]);
-			return;
-		}
+		// Archive the contact
+		DBA::update('contact', ['archive' => true, 'network' => Protocol::PHANTOM], ['id' => $id]);
 
-		DBA::delete('contact', ['id' => $id]);
-
-		// Delete the rest in the background
+		// Delete it in the background
 		Worker::add(PRIORITY_LOW, 'RemoveContact', $id);
 	}
 
@@ -334,7 +330,7 @@ class Contact extends BaseObject
 	 */
 	public static function terminateFriendship(array $user, array $contact)
 	{
-		if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DFRN])) {
+		if (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN])) {
 			// create an unfollow slap
 			$item = [];
 			$item['verb'] = NAMESPACE_OSTATUS . "/unfollow";
@@ -349,7 +345,7 @@ class Contact extends BaseObject
 			if (!empty($contact['notify'])) {
 				Salmon::slapper($user, $contact['notify'], $slap);
 			}
-		} elseif ($contact['network'] == NETWORK_DIASPORA) {
+		} elseif ($contact['network'] == Protocol::DIASPORA) {
 			Diaspora::sendUnshare($user, $contact);
 		}
 	}
@@ -368,6 +364,11 @@ class Contact extends BaseObject
 	 */
 	public static function markForArchival(array $contact)
 	{
+
+		if (!isset($contact['url'])) {
+			logger('Empty contact: ' . json_encode($contact) . ' - ' . System::callstack(20), LOGGER_DEBUG);
+		}
+
 		// Contact already archived or "self" contact? => nothing to do
 		if ($contact['archive'] || $contact['self']) {
 			return;
@@ -508,7 +509,7 @@ class Contact extends BaseObject
 			// If there is more than one entry we filter out the connector networks
 			if (count($r) > 1) {
 				foreach ($r as $id => $result) {
-					if ($result["network"] == NETWORK_STATUSNET) {
+					if ($result["network"] == Protocol::STATUSNET) {
 						unset($r[$id]);
 					}
 				}
@@ -562,13 +563,13 @@ class Contact extends BaseObject
 		}
 
 		if ((empty($profile["addr"]) || empty($profile["name"])) && (defaults($profile, "gid", 0) != 0)
-			&& in_array($profile["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])
+			&& in_array($profile["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])
 		) {
 			Worker::add(PRIORITY_LOW, "UpdateGContact", $profile["gid"]);
 		}
 
 		// Show contact details of Diaspora contacts only if connected
-		if ((defaults($profile, "cid", 0) == 0) && (defaults($profile, "network", "") == NETWORK_DIASPORA)) {
+		if ((defaults($profile, "cid", 0) == 0) && (defaults($profile, "network", "") == Protocol::DIASPORA)) {
 			$profile["location"] = "";
 			$profile["about"] = "";
 			$profile["gender"] = "";
@@ -687,7 +688,7 @@ class Contact extends BaseObject
 		}
 
 		$sparkle = false;
-		if (($contact['network'] === NETWORK_DFRN) && !$contact['self']) {
+		if (($contact['network'] === Protocol::DFRN) && !$contact['self']) {
 			$sparkle = true;
 			$profile_link = System::baseUrl() . '/redir/' . $contact['id'];
 		} else {
@@ -704,11 +705,11 @@ class Contact extends BaseObject
 			$profile_link = $profile_link . '?url=profile';
 		}
 
-		if (in_array($contact['network'], [NETWORK_DFRN, NETWORK_DIASPORA]) && !$contact['self']) {
+		if (in_array($contact['network'], [Protocol::DFRN, Protocol::DIASPORA]) && !$contact['self']) {
 			$pm_url = System::baseUrl() . '/message/new/' . $contact['id'];
 		}
 
-		if (($contact['network'] == NETWORK_DFRN) && !$contact['self']) {
+		if (($contact['network'] == Protocol::DFRN) && !$contact['self']) {
 			$poke_link = System::baseUrl() . '/poke/?f=&c=' . $contact['id'];
 		}
 
@@ -869,7 +870,7 @@ class Contact extends BaseObject
 		}
 
 		// Last try in gcontact for unsupported networks
-		if (!in_array($data["network"], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_PUMPIO, NETWORK_MAIL, NETWORK_FEED])) {
+		if (!in_array($data["network"], [Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA, Protocol::PUMPIO, Protocol::MAIL, Protocol::FEED])) {
 			if ($uid != 0) {
 				return 0;
 			}
@@ -1108,7 +1109,7 @@ class Contact extends BaseObject
 			return '';
 		}
 
-		if (in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""])) {
+		if (in_array($r[0]["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""])) {
 			$sql = "(`item`.`uid` = 0 OR (`item`.`uid` = ? AND NOT `item`.`global`))";
 		} else {
 			$sql = "`item`.`uid` = ?";
@@ -1385,22 +1386,14 @@ class Contact extends BaseObject
 		// the poll url is more reliable than the profile url, as we may have
 		// indirect links or webfinger links
 
-		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `poll` IN ('%s', '%s') AND `network` = '%s' AND NOT `pending` LIMIT 1",
-			intval($uid),
-			DBA::escape($ret['poll']),
-			DBA::escape(normalise_link($ret['poll'])),
-			DBA::escape($ret['network'])
-		);
-
-		if (!DBA::isResult($r)) {
-			$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `network` = '%s' AND NOT `pending` LIMIT 1",
-				intval($uid),
-				DBA::escape(normalise_link($url)),
-				DBA::escape($ret['network'])
-			);
+		$condition = ['uid' => $uid, 'poll' => [$ret['poll'], normalise_link($ret['poll'])], 'network' => $ret['network'], 'pending' => false];
+		$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
+		if (!DBA::isResult($contact)) {
+			$condition = ['uid' => $uid, 'nurl' => normalise_link($url), 'network' => $ret['network'], 'pending' => false];
+			$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
 		}
 
-		if (($ret['network'] === NETWORK_DFRN) && !DBA::isResult($r)) {
+		if (($ret['network'] === Protocol::DFRN) && !DBA::isResult($contact)) {
 			if ($interactive) {
 				if (strlen($a->urlpath)) {
 					$myaddr = bin2hex(System::baseUrl() . '/profile/' . $a->user['nickname']);
@@ -1412,14 +1405,14 @@ class Contact extends BaseObject
 
 				// NOTREACHED
 			}
-		} elseif (Config::get('system', 'dfrn_only') && ($ret['network'] != NETWORK_DFRN)) {
+		} elseif (Config::get('system', 'dfrn_only') && ($ret['network'] != Protocol::DFRN)) {
 			$result['message'] = L10n::t('This site is not configured to allow communications with other networks.') . EOL;
 			$result['message'] != L10n::t('No compatible communication protocols or feeds were discovered.') . EOL;
 			return $result;
 		}
 
 		// This extra param just confuses things, remove it
-		if ($ret['network'] === NETWORK_DIASPORA) {
+		if ($ret['network'] === Protocol::DIASPORA) {
 			$ret['url'] = str_replace('?absolute=true', '', $ret['url']);
 		}
 
@@ -1443,7 +1436,7 @@ class Contact extends BaseObject
 			return $result;
 		}
 
-		if ($ret['network'] === NETWORK_OSTATUS && Config::get('system', 'ostatus_disabled')) {
+		if ($ret['network'] === Protocol::OSTATUS && Config::get('system', 'ostatus_disabled')) {
 			$result['message'] .= L10n::t('The profile address specified belongs to a network which has been disabled on this site.') . EOL;
 			$ret['notify'] = '';
 		}
@@ -1452,24 +1445,24 @@ class Contact extends BaseObject
 			$result['message'] .= L10n::t('Limited profile. This person will be unable to receive direct/personal notifications from you.') . EOL;
 		}
 
-		$writeable = ((($ret['network'] === NETWORK_OSTATUS) && ($ret['notify'])) ? 1 : 0);
+		$writeable = ((($ret['network'] === Protocol::OSTATUS) && ($ret['notify'])) ? 1 : 0);
 
-		$subhub = (($ret['network'] === NETWORK_OSTATUS) ? true : false);
+		$subhub = (($ret['network'] === Protocol::OSTATUS) ? true : false);
 
-		$hidden = (($ret['network'] === NETWORK_MAIL) ? 1 : 0);
+		$hidden = (($ret['network'] === Protocol::MAIL) ? 1 : 0);
 
-		if (in_array($ret['network'], [NETWORK_MAIL, NETWORK_DIASPORA])) {
+		if (in_array($ret['network'], [Protocol::MAIL, Protocol::DIASPORA])) {
 			$writeable = 1;
 		}
 
-		if (DBA::isResult($r)) {
+		if (DBA::isResult($contact)) {
 			// update contact
-			$new_relation = (($r[0]['rel'] == self::FOLLOWER) ? self::FRIEND : self::SHARING);
+			$new_relation = (($contact['rel'] == self::FOLLOWER) ? self::FRIEND : self::SHARING);
 
 			$fields = ['rel' => $new_relation, 'subhub' => $subhub, 'readonly' => false];
-			DBA::update('contact', $fields, ['id' => $r[0]['id']]);
+			DBA::update('contact', $fields, ['id' => $contact['id']]);
 		} else {
-			$new_relation = ((in_array($ret['network'], [NETWORK_MAIL])) ? self::FRIEND : self::SHARING);
+			$new_relation = (in_array($ret['network'], [Protocol::MAIL]) ? self::FRIEND : self::SHARING);
 
 			// create contact record
 			DBA::insert('contact', [
@@ -1516,13 +1509,10 @@ class Contact extends BaseObject
 
 		Worker::add(PRIORITY_HIGH, "OnePoll", $contact_id, "force");
 
-		$r = q("SELECT `contact`.*, `user`.* FROM `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `user`.`uid` = %d AND `contact`.`self` LIMIT 1",
-			intval($uid)
-		);
+		$owner = User::getOwnerDataById($uid);
 
-		if (DBA::isResult($r)) {
-			if (in_array($contact['network'], [NETWORK_OSTATUS, NETWORK_DFRN])) {
+		if (DBA::isResult($owner)) {
+			if (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN])) {
 				// create a follow slap
 				$item = [];
 				$item['verb'] = ACTIVITY_FOLLOW;
@@ -1532,11 +1522,11 @@ class Contact extends BaseObject
 				$item['guid'] = '';
 				$item['tag'] = '';
 				$item['attach'] = '';
-				$slap = OStatus::salmon($item, $r[0]);
+				$slap = OStatus::salmon($item, $owner);
 				if (!empty($contact['notify'])) {
-					Salmon::slapper($r[0], $contact['notify'], $slap);
+					Salmon::slapper($owner, $contact['notify'], $slap);
 				}
-			} elseif ($contact['network'] == NETWORK_DIASPORA) {
+			} elseif ($contact['network'] == Protocol::DIASPORA) {
 				$ret = Diaspora::sendShare($a->user, $contact);
 				logger('share returns: ' . $ret);
 			}
@@ -1671,10 +1661,8 @@ class Contact extends BaseObject
 
 				}
 			} elseif (DBA::isResult($user) && in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
-				q("UPDATE `contact` SET `pending` = 0 WHERE `uid` = %d AND `url` = '%s' AND `pending` LIMIT 1",
-						intval($importer['uid']),
-						DBA::escape($url)
-				);
+				$condition = ['uid' => $importer['uid'], 'url' => $url, 'pending' => true];
+				DBA::update('contact', ['pending' => false], $condition);
 			}
 		}
 	}
@@ -1723,10 +1711,9 @@ class Contact extends BaseObject
 				 */
 
 				// Check for duplicates
-				$s = q("SELECT `id` FROM `event` WHERE `uid` = %d AND `cid` = %d AND `start` = '%s' AND `type` = '%s' LIMIT 1",
-					intval($rr['uid']), intval($rr['id']), DBA::escape(DateTimeFormat::utc($nextbd)), DBA::escape('birthday'));
-
-				if (DBA::isResult($s)) {
+				$condition = ['uid' => $rr['uid'], 'cid' => $rr['id'],
+					'start' => DateTimeFormat::utc($nextbd), 'type' => 'birthday'];
+				if (DBA::exists('event', $condition)) {
 					continue;
 				}
 
@@ -1739,7 +1726,6 @@ class Contact extends BaseObject
 					DBA::escape(DateTimeFormat::utc($nextbd . ' + 1 day ')), DBA::escape($bdtext), DBA::escape($bdtext2), DBA::escape('birthday'),
 					intval(0)
 				);
-
 
 				// update bdyear
 				q("UPDATE `contact` SET `bdyear` = '%s', `bd` = '%s' WHERE `uid` = %d AND `id` = %d", DBA::escape(substr($nextbd, 0, 4)),
@@ -1817,7 +1803,7 @@ class Contact extends BaseObject
 	 */
 	public static function magicLinkbyContact($contact, $url = '')
 	{
-		if ($contact['network'] != NETWORK_DFRN) {
+		if ($contact['network'] != Protocol::DFRN) {
 			return $url ?: $contact['url']; // Equivalent to ($url != '') ? $url : $contact['url'];
 		}
 

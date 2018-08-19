@@ -9,6 +9,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 
@@ -132,6 +133,10 @@ function notifications_content(App $a)
 
 	$notif_tpl = get_markup_template('notifications.tpl');
 
+	if (!isset($notifs['ident'])) {
+		logger('Missing data in notifs: ' . System::callstack(20), LOGGER_DEBUG);
+	}
+
 	// Process the data for template creation
 	if ($notifs['ident'] === 'introductions') {
 		$sugg = get_markup_template('suggestions.tpl');
@@ -181,8 +186,8 @@ function notifications_content(App $a)
 
 				// Normal connection requests
 				default:
-					$friend_selected = (($it['network'] !== NETWORK_OSTATUS) ? ' checked="checked" ' : ' disabled ');
-					$fan_selected = (($it['network'] === NETWORK_OSTATUS) ? ' checked="checked" disabled ' : '');
+					$friend_selected = (($it['network'] !== Protocol::OSTATUS) ? ' checked="checked" ' : ' disabled ');
+					$fan_selected = (($it['network'] === Protocol::OSTATUS) ? ' checked="checked" disabled ' : '');
 					$dfrn_tpl = get_markup_template('netfriend.tpl');
 
 					$knowyou   = '';
@@ -192,8 +197,8 @@ function notifications_content(App $a)
 					$helptext2 = '';
 					$helptext3 = '';
 
-					if ($it['network'] === NETWORK_DFRN || $it['network'] === NETWORK_DIASPORA) {
-						if ($it['network'] === NETWORK_DFRN) {
+					if ($it['network'] === Protocol::DFRN || $it['network'] === Protocol::DIASPORA) {
+						if ($it['network'] === Protocol::DFRN) {
 							$lbl_knowyou = L10n::t('Claims to be known to you: ');
 							$knowyou = (($it['knowyou']) ? L10n::t('yes') : L10n::t('no'));
 							$helptext = L10n::t('Shall your connection be bidirectional or not?');
@@ -215,7 +220,7 @@ function notifications_content(App $a)
 						'$approve_as2' => $helptext2,
 						'$approve_as3' => $helptext3,
 						'$as_friend' => L10n::t('Friend'),
-						'$as_fan' => (($it['network'] == NETWORK_DIASPORA) ? L10n::t('Sharer') : L10n::t('Subscriber'))
+						'$as_fan' => (($it['network'] == Protocol::DIASPORA) ? L10n::t('Sharer') : L10n::t('Subscriber'))
 					]);
 
 					$header = $it["name"];
@@ -226,7 +231,7 @@ function notifications_content(App $a)
 
 					$header .= " (".ContactSelector::networkToName($it['network'], $it['url']).")";
 
-					if ($it['network'] != NETWORK_DIASPORA) {
+					if ($it['network'] != Protocol::DIASPORA) {
 						$discard = L10n::t('Discard');
 					} else {
 						$discard = '';

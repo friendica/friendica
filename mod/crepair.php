@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -122,17 +123,17 @@ function crepair_content(App $a)
 	// Disable remote self for everything except feeds.
 	// There is an issue when you repeat an item from maybe twitter and you got comments from friendica and twitter
 	// Problem is, you couldn't reply to both networks.
-	if (!in_array($contact['network'], [NETWORK_FEED, NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_TWITTER])) {
+	if (!in_array($contact['network'], [Protocol::FEED, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER])) {
 		$allow_remote_self = false;
 	}
 
-	if ($contact['network'] == NETWORK_FEED) {
+	if ($contact['network'] == Protocol::FEED) {
 		$remote_self_options = ['0' => L10n::t('No mirroring'), '1' => L10n::t('Mirror as forwarded posting'), '2' => L10n::t('Mirror as my own posting')];
 	} else {
 		$remote_self_options = ['0' => L10n::t('No mirroring'), '2' => L10n::t('Mirror as my own posting')];
 	}
 
-	$update_profile = in_array($contact['network'], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS]);
+	$update_profile = in_array($contact['network'], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]);
 
 	$tab_str = contacts_tab($a, $contact['id'], 5);
 

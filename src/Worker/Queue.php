@@ -7,6 +7,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -110,7 +111,7 @@ class Queue
 		$deliver_status = 0;
 
 		switch ($contact['network']) {
-			case NETWORK_DFRN:
+			case Protocol::DFRN:
 				logger('queue: dfrndelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = DFRN::deliver($owner, $contact, $data);
 
@@ -121,7 +122,8 @@ class Queue
 					Cache::set($cachekey_deadguy . $contact['notify'], true, CACHE_MINUTE);
 				}
 				break;
-			case NETWORK_OSTATUS:
+
+			case Protocol::OSTATUS:
 				logger('queue: slapdelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = Salmon::slapper($owner, $contact['notify'], $data);
 
@@ -132,7 +134,8 @@ class Queue
 					QueueModel::removeItem($q_item['id']);
 				}
 				break;
-			case NETWORK_DIASPORA:
+
+			case Protocol::DIASPORA:
 				logger('queue: diaspora_delivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = Diaspora::transmit($owner, $contact, $data, $public, true, 'Queue:' . $q_item['id'], true);
 

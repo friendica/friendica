@@ -13,6 +13,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -123,12 +124,10 @@ class Profile
 		// fetch user tags if this isn't the default profile
 
 		if (!$pdata['is-default']) {
-			$x = q(
-				"SELECT `pub_keywords` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
-				intval($pdata['profile_uid'])
-			);
-			if ($x && count($x)) {
-				$pdata['pub_keywords'] = $x[0]['pub_keywords'];
+			$condition = ['uid' => $pdata['profile_uid'], 'is-default' => true];
+			$profile = DBA::selectFirst('profile', ['pub_keywords'], $condition);
+			if (DBA::isResult($profile)) {
+				$pdata['pub_keywords'] = $profile['pub_keywords'];
 			}
 		}
 
@@ -136,7 +135,7 @@ class Profile
 		$a->profile_uid = $pdata['profile_uid'];
 
 		$a->profile['mobile-theme'] = PConfig::get($a->profile['profile_uid'], 'system', 'mobile_theme');
-		$a->profile['network'] = NETWORK_DFRN;
+		$a->profile['network'] = Protocol::DFRN;
 
 		$a->page['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
 
@@ -280,7 +279,7 @@ class Profile
 
 		$profile['picdate'] = urlencode(defaults($profile, 'picdate', ''));
 
-		if (($profile['network'] != '') && ($profile['network'] != NETWORK_DFRN)) {
+		if (($profile['network'] != '') && ($profile['network'] != Protocol::DFRN)) {
 			$profile['network_name'] = format_network_name($profile['network'], $profile['url']);
 		} else {
 			$profile['network_name'] = '';
@@ -321,7 +320,7 @@ class Profile
 			}
 		}
 
-		if ($connect && ($profile['network'] != NETWORK_DFRN) && !isset($profile['remoteconnect'])) {
+		if ($connect && ($profile['network'] != Protocol::DFRN) && !isset($profile['remoteconnect'])) {
 			$connect = false;
 		}
 
@@ -330,7 +329,7 @@ class Profile
 			$remoteconnect = $profile['remoteconnect'];
 		}
 
-		if ($connect && ($profile['network'] == NETWORK_DFRN) && !isset($remoteconnect)) {
+		if ($connect && ($profile['network'] == Protocol::DFRN) && !isset($remoteconnect)) {
 			$subscribe_feed = L10n::t('Atom feed');
 		} else {
 			$subscribe_feed = false;
@@ -471,9 +470,9 @@ class Profile
 						AND NOT `hidden` AND NOT `archive`
 						AND `network` IN ('%s', '%s', '%s', '')",
 					intval($profile['uid']),
-					DBA::escape(NETWORK_DFRN),
-					DBA::escape(NETWORK_DIASPORA),
-					DBA::escape(NETWORK_OSTATUS)
+					DBA::escape(Protocol::DFRN),
+					DBA::escape(Protocol::DIASPORA),
+					DBA::escape(Protocol::OSTATUS)
 				);
 				if (DBA::isResult($r)) {
 					$contacts = intval($r[0]['total']);
@@ -640,37 +639,26 @@ class Profile
 		$bd_format = L10n::t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
-		$s = DBA::p(
-			"SELECT `event`.*
-			FROM `event`
-			INNER JOIN `item`
-				ON `item`.`uid` = `event`.`uid`
-				AND `item`.`parent-uri` = `event`.`uri`
-			WHERE `event`.`uid` = ?
-			AND `event`.`type` != 'birthday'
-			AND `event`.`start` < ?
-			AND `event`.`start` >= ?
-			AND `item`.`author-id` = ?
-			AND (`item`.`verb` = ? OR `item`.`verb` = ?)
-			AND `item`.`visible`
-			AND NOT `item`.`deleted`
-			ORDER BY  `event`.`start` ASC",
-			local_user(),
-			DateTimeFormat::utc('now + 7 days'),
-			DateTimeFormat::utc('now - 1 days'),
-			public_contact(),
-			ACTIVITY_ATTEND,
-			ACTIVITY_ATTENDMAYBE
-		);
+		$condition = ["`uid` = ? AND `type` != 'birthday' AND `start` < ? AND `start` >= ?",
+			local_user(), DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utc('now - 1 days')];
+		$s = DBA::select('event', [], $condition, ['order' => ['start']]);
 
 		$r = [];
 
 		if (DBA::isResult($s)) {
 			$istoday = false;
+			$total = 0;
 
 			while ($rr = DBA::fetch($s)) {
+				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => public_contact(),
+					'activity' => [Item::activityToIndex(ACTIVITY_ATTEND), Item::activityToIndex(ACTIVITY_ATTENDMAYBE)],
+					'visible' => true, 'deleted' => false];
+				if (!Item::exists($condition)) {
+					continue;
+				}
+
 				if (strlen($rr['summary'])) {
-					$total ++;
+					$total++;
 				}
 
 				$strt = DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC', 'UTC', 'Y-m-d');
@@ -1016,7 +1004,7 @@ class Profile
 				$urlparts = parse_url($my_url);
 
 				$result = Cache::get('gprobe:' . $urlparts['host']);
-				if ((!is_null($result)) && (in_array($result['network'], [NETWORK_FEED, NETWORK_PHANTOM]))) {
+				if ((!is_null($result)) && (in_array($result['network'], [Protocol::FEED, Protocol::PHANTOM]))) {
 					logger('DDoS attempt detected for ' . $urlparts['host'] . ' by ' . $_SERVER['REMOTE_ADDR'] . '. server data: ' . print_r($_SERVER, true), LOGGER_DEBUG);
 					return;
 				}

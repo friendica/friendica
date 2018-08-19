@@ -42,9 +42,6 @@ function ACL(backend_url, preset, automention, is_mobile){
 	/* add/remove mentions  */
 	this.element = $("#profile-jot-text");
 	this.htmlelm = this.element.get()[0];
-
-	/* startup! */
-	this.get(0,100);
 }
 
 ACL.prototype.remove_mention = function(id) {
@@ -344,7 +341,7 @@ ACL.prototype.populate = function(data){
 
 /**
  * @brief Deselect previous selected contact.
- * 
+ *
  * @param {int} id The contact ID.
  * @returns {void}
  */

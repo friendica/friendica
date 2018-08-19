@@ -365,6 +365,7 @@ function videos_content(App $a)
 	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
 			$alt_e = $rr['filename'];
+			/// @todo The album isn't part of the above query. This seems to be some unfinished code that needs to be reworked completely.
 			$name_e = $rr['album'];
 
 			$videos[] = [

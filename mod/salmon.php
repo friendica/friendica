@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -145,8 +146,8 @@ function salmon_post(App $a, $xml = '') {
 	$r = q("SELECT * FROM `contact` WHERE `network` IN ('%s', '%s')
 						AND (`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s')
 						AND `uid` = %d LIMIT 1",
-		DBA::escape(NETWORK_OSTATUS),
-		DBA::escape(NETWORK_DFRN),
+		DBA::escape(Protocol::OSTATUS),
+		DBA::escape(Protocol::DFRN),
 		DBA::escape(normalise_link($author_link)),
 		DBA::escape($author_link),
 		DBA::escape(normalise_link($author_link)),
@@ -159,7 +160,7 @@ function salmon_post(App $a, $xml = '') {
 			if($result['success']) {
 				$r = q("SELECT * FROM `contact` WHERE `network` = '%s' AND ( `url` = '%s' OR `alias` = '%s')
 					AND `uid` = %d LIMIT 1",
-					DBA::escape(NETWORK_OSTATUS),
+					DBA::escape(Protocol::OSTATUS),
 					DBA::escape($author_link),
 					DBA::escape($author_link),
 					intval($importer['uid'])

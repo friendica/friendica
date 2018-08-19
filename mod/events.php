@@ -483,7 +483,7 @@ function events_content(App $a) {
 		$perms = ACL::getDefaultUserPermissions($orig_event);
 
 		if ($mode === 'new' || $mode === 'copy') {
-			$acl = ($cid ? '' : ACL::getFullSelectorHTML(x($orig_event) ? $orig_event : $a->user));
+			$acl = ($cid ? '' : ACL::getFullSelectorHTML($a->user, false, $orig_event));
 		}
 
 		// If we copy an old event, we need to remove the ID and URI

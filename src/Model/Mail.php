@@ -56,13 +56,11 @@ class Mail
 
 		if (strlen($replyto)) {
 			$reply = true;
-			$r = q("SELECT `convid` FROM `mail` WHERE `uid` = %d AND (`uri` = '%s' OR `parent-uri` = '%s') LIMIT 1",
-				intval(local_user()),
-				DBA::escape($replyto),
-				DBA::escape($replyto)
-			);
-			if (DBA::isResult($r)) {
-				$convid = $r[0]['convid'];
+			$condition = ["`uid` = ? AND (`uri` = ? OR `parent-uri` = ?)",
+				local_user(), $replyto, $replyto];
+			$mail = DBA::selectFirst('mail', ['convid'], $condition);
+			if (DBA::isResult($mail)) {
+				$convid = $mail['convid'];
 			}
 		}
 

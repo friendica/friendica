@@ -631,37 +631,37 @@ function api_get_user(App $a, $contact_id = null)
 
 	// if the contact wasn't found, fetch it from the contacts with uid = 0
 	if (!DBA::isResult($uinfo)) {
-		$r = [];
-
-		if ($url != "") {
-			$r = q("SELECT * FROM `contact` WHERE `uid` = 0 AND `nurl` = '%s' LIMIT 1", DBA::escape(normalise_link($url)));
+		if ($url == "") {
+			throw new BadRequestException("User not found.");
 		}
 
-		if (DBA::isResult($r)) {
-			$network_name = ContactSelector::networkToName($r[0]['network'], $r[0]['url']);
+		$contact = DBA::selectFirst('contact', [], ['uid' => 0, 'nurl' => normalise_link($url)]);
+
+		if (DBA::isResult($contact)) {
+			$network_name = ContactSelector::networkToName($contact['network'], $contact['url']);
 
 			// If no nick where given, extract it from the address
-			if (($r[0]['nick'] == "") || ($r[0]['name'] == $r[0]['nick'])) {
-				$r[0]['nick'] = api_get_nick($r[0]["url"]);
+			if (($contact['nick'] == "") || ($contact['name'] == $contact['nick'])) {
+				$contact['nick'] = api_get_nick($contact["url"]);
 			}
 
 			$ret = [
-				'id' => $r[0]["id"],
-				'id_str' => (string) $r[0]["id"],
-				'name' => $r[0]["name"],
-				'screen_name' => (($r[0]['nick']) ? $r[0]['nick'] : $r[0]['name']),
-				'location' => ($r[0]["location"] != "") ? $r[0]["location"] : $network_name,
-				'description' => $r[0]["about"],
-				'profile_image_url' => $r[0]["micro"],
-				'profile_image_url_https' => $r[0]["micro"],
-				'profile_image_url_profile_size' => $r[0]["thumb"],
-				'profile_image_url_large' => $r[0]["photo"],
-				'url' => $r[0]["url"],
+				'id' => $contact["id"],
+				'id_str' => (string) $contact["id"],
+				'name' => $contact["name"],
+				'screen_name' => (($contact['nick']) ? $contact['nick'] : $contact['name']),
+				'location' => ($contact["location"] != "") ? $contact["location"] : $network_name,
+				'description' => $contact["about"],
+				'profile_image_url' => $contact["micro"],
+				'profile_image_url_https' => $contact["micro"],
+				'profile_image_url_profile_size' => $contact["thumb"],
+				'profile_image_url_large' => $contact["photo"],
+				'url' => $contact["url"],
 				'protected' => false,
 				'followers_count' => 0,
 				'friends_count' => 0,
 				'listed_count' => 0,
-				'created_at' => api_date($r[0]["created"]),
+				'created_at' => api_date($contact["created"]),
 				'favourites_count' => 0,
 				'utc_offset' => 0,
 				'time_zone' => 'UTC',
@@ -676,12 +676,12 @@ function api_get_user(App $a, $contact_id = null)
 				'follow_request_sent' => false,
 				'statusnet_blocking' => false,
 				'notifications' => false,
-				'statusnet_profile_url' => $r[0]["url"],
+				'statusnet_profile_url' => $contact["url"],
 				'uid' => 0,
-				'cid' => Contact::getIdForURL($r[0]["url"], api_user(), true),
-				'pid' => Contact::getIdForURL($r[0]["url"], 0, true),
+				'cid' => Contact::getIdForURL($contact["url"], api_user(), true),
+				'pid' => Contact::getIdForURL($contact["url"], 0, true),
 				'self' => 0,
-				'network' => $r[0]["network"],
+				'network' => $contact["network"],
 			];
 
 			return $ret;
@@ -692,7 +692,7 @@ function api_get_user(App $a, $contact_id = null)
 
 	if ($uinfo[0]['self']) {
 		if ($uinfo[0]['network'] == "") {
-			$uinfo[0]['network'] = NETWORK_DFRN;
+			$uinfo[0]['network'] = Protocol::DFRN;
 		}
 
 		$usr = DBA::selectFirst('user', ['default-location'], ['uid' => api_user()]);
@@ -4340,12 +4340,8 @@ function check_acl_input($acl_string)
 	foreach ($cid_array as $cid) {
 		$cid = str_replace("<", "", $cid);
 		$cid = str_replace(">", "", $cid);
-		$contact = q(
-			"SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d",
-			intval($cid),
-			intval(api_user())
-		);
-		$contact_not_found |= !DBA::isResult($contact);
+		$condition = ['id' => $cid, 'uid' => api_user()];
+		$contact_not_found |= !DBA::exists('contact', $condition);
 	}
 	return $contact_not_found;
 }
@@ -4527,7 +4523,7 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 {
 	// get data about the api authenticated user
 	$uri = Item::newURI(intval(api_user()));
-	$owner_record = q("SELECT * FROM `contact` WHERE `uid`= %d AND `self` LIMIT 1", intval(api_user()));
+	$owner_record = DBA::selectFirst('contact', [], ['uid' => api_user(), 'self' => true]);
 
 	$arr = [];
 	$arr['guid']          = System::createGUID(32);
@@ -4537,13 +4533,13 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 	$arr['type']          = 'photo';
 	$arr['wall']          = 1;
 	$arr['resource-id']   = $hash;
-	$arr['contact-id']    = $owner_record[0]['id'];
-	$arr['owner-name']    = $owner_record[0]['name'];
-	$arr['owner-link']    = $owner_record[0]['url'];
-	$arr['owner-avatar']  = $owner_record[0]['thumb'];
-	$arr['author-name']   = $owner_record[0]['name'];
-	$arr['author-link']   = $owner_record[0]['url'];
-	$arr['author-avatar'] = $owner_record[0]['thumb'];
+	$arr['contact-id']    = $owner_record['id'];
+	$arr['owner-name']    = $owner_record['name'];
+	$arr['owner-link']    = $owner_record['url'];
+	$arr['owner-avatar']  = $owner_record['thumb'];
+	$arr['author-name']   = $owner_record['name'];
+	$arr['author-link']   = $owner_record['url'];
+	$arr['author-avatar'] = $owner_record['thumb'];
 	$arr['title']         = "";
 	$arr['allow_cid']     = $allow_cid;
 	$arr['allow_gid']     = $allow_gid;
@@ -4559,7 +4555,7 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 			];
 
 	// adds link to the thumbnail scale photo
-	$arr['body'] = '[url=' . System::baseUrl() . '/photos/' . $owner_record[0]['nick'] . '/image/' . $hash . ']'
+	$arr['body'] = '[url=' . System::baseUrl() . '/photos/' . $owner_record['nick'] . '/image/' . $hash . ']'
 				. '[img]' . System::baseUrl() . '/photo/' . $hash . '-' . "2" . '.'. $typetoext[$filetype] . '[/img]'
 				. '[/url]';
 
@@ -4702,7 +4698,7 @@ function api_friendica_remoteauth()
 
 	$contact = DBA::selectFirst('contact', [], ['uid' => api_user(), 'nurl' => $c_url]);
 
-	if (!DBA::isResult($contact) || ($contact['network'] !== NETWORK_DFRN)) {
+	if (!DBA::isResult($contact) || ($contact['network'] !== Protocol::DFRN)) {
 		throw new BadRequestException("Unknown contact");
 	}
 
@@ -5635,7 +5631,7 @@ function api_friendica_notification_seen($type)
 	if ($note['otype']=='item') {
 		// would be really better with an ItemsManager and $im->getByID() :-P
 		$item = Item::selectFirstForUser(api_user(), [], ['id' => $note['iid'], 'uid' => api_user()]);
-		if (DBA::isResult($$item)) {
+		if (DBA::isResult($item)) {
 			// we found the item, return it to the user
 			$ret = api_format_items([$item], $user_info, false, $type);
 			$data = ['status' => $ret];
@@ -5812,7 +5808,7 @@ function api_friendica_profile_show($type)
 		$nurls = q(
 			"SELECT `id`, `nurl` FROM `contact` WHERE `uid`= %d AND `profile-id` = %d",
 			intval(api_user()),
-			intval($rr['profile_id'])
+			intval($rr['id'])
 		);
 
 		foreach ($nurls as $nurl) {
@@ -5830,11 +5826,11 @@ function api_friendica_profile_show($type)
 	}
 
 	// return settings, authenticated user and profiles data
-	$self = q("SELECT `nurl` FROM `contact` WHERE `uid`= %d AND `self` LIMIT 1", intval(api_user()));
+	$self = DBA::selectFirst('contact', ['nurl'], ['uid' => api_user(), 'self' => true]);
 
 	$result = ['multi_profiles' => $multi_profiles ? true : false,
 					'global_dir' => $directory,
-					'friendica_owner' => api_get_user($a, $self[0]['nurl']),
+					'friendica_owner' => api_get_user($a, $self['nurl']),
 					'profiles' => $profiles];
 	return api_format_data("friendica_profiles", $type, ['$result' => $result]);
 }

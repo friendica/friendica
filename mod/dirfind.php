@@ -8,6 +8,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -53,7 +54,7 @@ function dirfind_content(App $a, $prefix = "") {
 		if ((valid_email($search) && Network::isEmailDomainValid($search)) ||
 			(substr(normalise_link($search), 0, 7) == "http://")) {
 			$user_data = Probe::uri($search);
-			$discover_user = (in_array($user_data["network"], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA]));
+			$discover_user = (in_array($user_data["network"], [Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA]));
 		}
 	}
 
@@ -102,15 +103,15 @@ function dirfind_content(App $a, $prefix = "") {
 			$startrec = (($a->pager['page']) * $perpage) - $perpage;
 
 			if (Config::get('system','diaspora_enabled')) {
-				$diaspora = NETWORK_DIASPORA;
+				$diaspora = Protocol::DIASPORA;
 			} else {
-				$diaspora = NETWORK_DFRN;
+				$diaspora = Protocol::DFRN;
 			}
 
 			if (!Config::get('system','ostatus_disabled')) {
-				$ostatus = NETWORK_OSTATUS;
+				$ostatus = Protocol::OSTATUS;
 			} else {
-				$ostatus = NETWORK_DFRN;
+				$ostatus = Protocol::DFRN;
 			}
 
 			$search2 = "%".$search."%";
@@ -121,7 +122,7 @@ function dirfind_content(App $a, $prefix = "") {
 						((`last_contact` >= `last_failure`) OR (`updated` >= `last_failure`)) AND
 						(`url` LIKE '%s' OR `name` LIKE '%s' OR `location` LIKE '%s' OR
 						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql",
-					DBA::escape(NETWORK_DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
+					DBA::escape(Protocol::DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
 					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
 					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)));
 
@@ -133,7 +134,7 @@ function dirfind_content(App $a, $prefix = "") {
 						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql
 						GROUP BY `nurl`
 						ORDER BY `updated` DESC LIMIT %d, %d",
-					DBA::escape(NETWORK_DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
+					DBA::escape(Protocol::DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
 					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
 					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
 					intval($startrec), intval($perpage));

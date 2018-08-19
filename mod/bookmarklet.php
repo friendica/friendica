@@ -26,7 +26,7 @@ function bookmarklet_content(App $a)
 		return $o;
 	}
 
-	$referer = normalise_link($_SERVER["HTTP_REFERER"]);
+	$referer = normalise_link(defaults($_SERVER, 'HTTP_REFERER', ''));
 	$page = normalise_link(System::baseUrl() . "/bookmarklet");
 
 	if (!strstr($referer, $page)) {
@@ -43,7 +43,7 @@ function bookmarklet_content(App $a)
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
-			'title' => trim($_REQUEST["title"], "*"),
+			'title' => trim(defaults($_REQUEST, 'title', ''), "*"),
 			'content' => $content
 		];
 		$o = status_editor($a, $x, 0, false);

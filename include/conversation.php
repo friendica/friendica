@@ -11,6 +11,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -411,7 +412,8 @@ function conv_get_blocklist()
 	$blocklist = [];
 
 	foreach (explode(',', $str_blocked) as $entry) {
-		$cid = Contact::getIdForURL(trim($entry), 0, true);
+		// The 4th parameter guarantees that there always will be a public contact entry
+		$cid = Contact::getIdForURL(trim($entry), 0, true, ['url' => trim($entry)]);
 		if (!empty($cid)) {
 			$blocklist[] = $cid;
 		}
@@ -542,7 +544,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 		if ($mode === 'community') {
 			$writable = true;
 		} else {
-			$writable = ($items[0]['uid'] == 0) && in_array($items[0]['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN]);
+			$writable = ($items[0]['uid'] == 0) && in_array($items[0]['network'], [Protocol::OSTATUS, Protocol::DIASPORA, Protocol::DFRN]);
 		}
 
 		if (!local_user()) {
@@ -575,7 +577,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 				$sparkle     = '';
 
 				// prevent private email from leaking.
-				if ($item['network'] === NETWORK_MAIL && local_user() != $item['uid']) {
+				if ($item['network'] === Protocol::MAIL && local_user() != $item['uid']) {
 					continue;
 				}
 
@@ -713,7 +715,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 				builtin_activity_puller($item, $conv_responses);
 
 				// Only add what is visible
-				if ($item['network'] === NETWORK_MAIL && local_user() != $item['uid']) {
+				if ($item['network'] === Protocol::MAIL && local_user() != $item['uid']) {
 					continue;
 				}
 
@@ -793,7 +795,7 @@ function conversation_add_children(array $parents, $block_authors, $order, $uid)
 
 	foreach ($items as $index => $item) {
 		if ($item['uid'] == 0) {
-			$items[$index]['writable'] = in_array($item['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN]);
+			$items[$index]['writable'] = in_array($item['network'], [Protocol::OSTATUS, Protocol::DIASPORA, Protocol::DFRN]);
 		}
 	}
 
@@ -842,7 +844,7 @@ function item_photo_menu($item) {
 		$contact_url = 'contacts/' . $cid;
 		$posts_link = 'contacts/' . $cid . '/posts';
 
-		if (in_array($network, [NETWORK_DFRN, NETWORK_DIASPORA])) {
+		if (in_array($network, [Protocol::DFRN, Protocol::DIASPORA])) {
 			$pm_url = 'message/new/' . $cid;
 		}
 	}
@@ -858,12 +860,12 @@ function item_photo_menu($item) {
 			L10n::t('Send PM') => $pm_url
 		];
 
-		if ($network == NETWORK_DFRN) {
+		if ($network == Protocol::DFRN) {
 			$menu[L10n::t("Poke")] = $poke_link;
 		}
 
 		if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
-			in_array($item['network'], [NETWORK_DFRN, NETWORK_OSTATUS, NETWORK_DIASPORA])) {
+			in_array($item['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA])) {
 			$menu[L10n::t('Connect/Follow')] = 'follow?url=' . urlencode($item['author-link']);
 		}
 	} else {

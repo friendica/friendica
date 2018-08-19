@@ -2,6 +2,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -31,7 +32,7 @@ function redir_init(App $a) {
 
 		$contact_url = $contact['url'];
 
-		if ($contact['network'] !== NETWORK_DFRN // Authentication isn't supported for non DFRN contacts.
+		if ($contact['network'] !== Protocol::DFRN // Authentication isn't supported for non DFRN contacts.
 			|| (!local_user() && !remote_user()) // Visitors (not logged in or not remotes) can't authenticate.
 			|| (!empty($a->contact['id']) && $a->contact['id'] == $cid)) // Local user is already authenticated.
 		{

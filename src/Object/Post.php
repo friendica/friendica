@@ -11,6 +11,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -84,14 +85,14 @@ class Post extends BaseObject
 		if (!empty($data['children'])) {
 			foreach ($data['children'] as $item) {
 				// Only add will be displayed
-				if ($item['network'] === NETWORK_MAIL && local_user() != $item['uid']) {
+				if ($item['network'] === Protocol::MAIL && local_user() != $item['uid']) {
 					continue;
 				} elseif (!visible_activity($item)) {
 					continue;
 				}
 
 				// You can always comment on Diaspora and OStatus items
-				if (in_array($item['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA]) && (local_user() == $item['uid'])) {
+				if (in_array($item['network'], [Protocol::OSTATUS, Protocol::DIASPORA]) && (local_user() == $item['uid'])) {
 					$item['writable'] = true;
 				}
 
@@ -323,17 +324,17 @@ class Post extends BaseObject
 		$owner_name_e = $this->getOwnerName();
 
 		// Disable features that aren't available in several networks
-		if (!in_array($item["network"], [NETWORK_DFRN, NETWORK_DIASPORA]) && isset($buttons["dislike"])) {
+		if (!in_array($item["network"], [Protocol::DFRN, Protocol::DIASPORA]) && isset($buttons["dislike"])) {
 			unset($buttons["dislike"]);
 			$isevent = false;
 			$tagger = '';
 		}
 
-		if (($item["network"] == NETWORK_FEED) && isset($buttons["like"])) {
+		if (($item["network"] == Protocol::FEED) && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
-		if (($item["network"] == NETWORK_MAIL) && isset($buttons["like"])) {
+		if (($item["network"] == Protocol::MAIL) && isset($buttons["like"])) {
 			unset($buttons["like"]);
 		}
 
@@ -489,7 +490,7 @@ class Post extends BaseObject
 		/*
 		 * Only add what will be displayed
 		 */
-		if ($item->getDataValue('network') === NETWORK_MAIL && local_user() != $item->getDataValue('uid')) {
+		if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {
 			return false;
 		} elseif (activity_match($item->getDataValue('verb'), ACTIVITY_LIKE) || activity_match($item->getDataValue('verb'), ACTIVITY_DISLIKE)) {
 			return false;

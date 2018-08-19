@@ -10,6 +10,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -83,27 +84,27 @@ class Widget
 		$networks = ['face', 'apdn'];
 
 		if (!Addon::isEnabled("statusnet")) {
-			$networks[] = NETWORK_STATUSNET;
+			$networks[] = Protocol::STATUSNET;
 		}
 
 		if (!Addon::isEnabled("pumpio")) {
-			$networks[] = NETWORK_PUMPIO;
+			$networks[] = Protocol::PUMPIO;
 		}
 
 		if (!Addon::isEnabled("twitter")) {
-			$networks[] = NETWORK_TWITTER;
+			$networks[] = Protocol::TWITTER;
 		}
 
 		if (Config::get("system", "ostatus_disabled")) {
-			$networks[] = NETWORK_OSTATUS;
+			$networks[] = Protocol::OSTATUS;
 		}
 
 		if (!Config::get("system", "diaspora_enabled")) {
-			$networks[] = NETWORK_DIASPORA;
+			$networks[] = Protocol::DIASPORA;
 		}
 
 		if (!Addon::isEnabled("pnut")) {
-			$networks[] = NETWORK_PNUT;
+			$networks[] = Protocol::PNUT;
 		}
 
 		if (!sizeof($networks)) {

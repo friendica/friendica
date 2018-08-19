@@ -1414,7 +1414,7 @@ function photos_content(App $a)
 
 			$album_e = $ph[0]['album'];
 			$caption_e = $ph[0]['desc'];
-			$aclselect_e = ACL::getFullSelectorHTML($ph[0]);
+			$aclselect_e = ACL::getFullSelectorHTML($a->user, false, $ph[0]);
 
 			$edit = replace_macros($edit_tpl, [
 				'$id' => $ph[0]['id'],

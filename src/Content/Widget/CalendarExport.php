@@ -27,6 +27,10 @@ class CalendarExport
 	public static function getHTML() {
 		$a = get_app();
 
+		if (empty($a->data['user'])) {
+			return;
+		}
+
 		$owner_uid = $a->data['user']['uid'];
 
 		// The permission testing is a little bit tricky because we have to respect many cases.

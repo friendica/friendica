@@ -7,6 +7,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
@@ -16,7 +17,7 @@ use Friendica\Core\System;
 function viewcontacts_init(App $a)
 {
 	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
-		return;
+		System::httpExit(403, ["title" => L10n::t('Access denied.')]);
 	}
 
 	if ($a->argc < 2) {
@@ -31,7 +32,7 @@ function viewcontacts_init(App $a)
 	);
 
 	if (!DBA::isResult($r)) {
-		return;
+		System::httpExit(404, ["title" => L10n::t('Page not found.')]);
 	}
 
 	$a->data['user'] = $r[0];
@@ -65,9 +66,9 @@ function viewcontacts_content(App $a)
 			AND NOT `hidden` AND NOT `archive`
 			AND `network` IN ('%s', '%s', '%s')",
 		intval($a->profile['uid']),
-		DBA::escape(NETWORK_DFRN),
-		DBA::escape(NETWORK_DIASPORA),
-		DBA::escape(NETWORK_OSTATUS)
+		DBA::escape(Protocol::DFRN),
+		DBA::escape(Protocol::DIASPORA),
+		DBA::escape(Protocol::OSTATUS)
 	);
 	if (DBA::isResult($r)) {
 		$a->set_pager_total($r[0]['total']);
@@ -79,9 +80,9 @@ function viewcontacts_content(App $a)
 			AND `network` IN ('%s', '%s', '%s')
 		ORDER BY `name` ASC LIMIT %d, %d",
 		intval($a->profile['uid']),
-		DBA::escape(NETWORK_DFRN),
-		DBA::escape(NETWORK_DIASPORA),
-		DBA::escape(NETWORK_OSTATUS),
+		DBA::escape(Protocol::DFRN),
+		DBA::escape(Protocol::DIASPORA),
+		DBA::escape(Protocol::OSTATUS),
 		intval($a->pager['start']),
 		intval($a->pager['itemspage'])
 	);

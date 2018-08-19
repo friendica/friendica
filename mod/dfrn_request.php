@@ -15,6 +15,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -148,7 +149,7 @@ function dfrn_request_post(App $a)
 						$parms['dfrn-confirm'],
 						$parms['dfrn-notify'],
 						$parms['dfrn-poll'],
-						DBA::escape(NETWORK_DFRN),
+						DBA::escape(Protocol::DFRN),
 						intval($aes_allow),
 						intval($hidden),
 						intval($blocked),
@@ -287,18 +288,18 @@ function dfrn_request_post(App $a)
 			// Every time we detect the remote subscription we define this as OStatus.
 			// We do this even if it is not OStatus.
 			// we only need to pass this through another section of the code.
-			if ($network != NETWORK_DIASPORA) {
-				$network = NETWORK_OSTATUS;
+			if ($network != Protocol::DIASPORA) {
+				$network = Protocol::OSTATUS;
 			}
 
 			$url = substr($url, 5);
 		} else {
-			$network = NETWORK_DFRN;
+			$network = Protocol::DFRN;
 		}
 
 		logger('dfrn_request: url: ' . $url . ',network=' . $network, LOGGER_DEBUG);
 
-		if ($network === NETWORK_DFRN) {
+		if ($network === Protocol::DFRN) {
 			$ret = q("SELECT * FROM `contact` WHERE `uid` = %d AND `url` = '%s' AND `self` = 0 LIMIT 1",
 				intval($uid),
 				DBA::escape($url)
@@ -388,7 +389,7 @@ function dfrn_request_post(App $a)
 					$parms['dfrn-confirm'],
 					$parms['dfrn-notify'],
 					$parms['dfrn-poll'],
-					DBA::escape(NETWORK_DFRN),
+					DBA::escape(Protocol::DFRN),
 					intval($blocked),
 					intval($pending)
 				);
@@ -441,15 +442,15 @@ function dfrn_request_post(App $a)
 				. (($aes_allow) ? "&aes_allow=1" : "")
 			);
 			// NOTREACHED
-			// END $network === NETWORK_DFRN
-		} elseif (($network != NETWORK_PHANTOM) && ($url != "")) {
+			// END $network === Protocol::DFRN
+		} elseif (($network != Protocol::PHANTOM) && ($url != "")) {
 
 			/* Substitute our user's feed URL into $url template
 			 * Send the subscriber home to subscribe
 			 */
 			// Diaspora needs the uri in the format user@domain.tld
 			// Diaspora will support the remote subscription in a future version
-			if ($network == NETWORK_DIASPORA) {
+			if ($network == Protocol::DIASPORA) {
 				$uri = $nickname . '@' . $a->get_hostname();
 
 				if ($a->get_path()) {
@@ -464,7 +465,7 @@ function dfrn_request_post(App $a)
 			$url = str_replace('{uri}', $uri, $url);
 			goaway($url);
 			// NOTREACHED
-			// END $network != NETWORK_PHANTOM
+			// END $network != Protocol::PHANTOM
 		} else {
 			notice(L10n::t("Remote subscription can't be done for your network. Please subscribe directly on your system.") . EOL);
 			return;

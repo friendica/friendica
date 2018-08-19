@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Network\Probe;
@@ -72,8 +73,8 @@ function ostatus_subscribe_content(App $a) {
 	$o .= "<p>".$counter."/".$total.": ".$url;
 
 	$data = Probe::uri($url);
-	if ($data["network"] == NETWORK_OSTATUS) {
-		$result = Contact::createFromProbe($uid, $url, true, NETWORK_OSTATUS);
+	if ($data["network"] == Protocol::OSTATUS) {
+		$result = Contact::createFromProbe($uid, $url, true, Protocol::OSTATUS);
 		if ($result["success"]) {
 			$o .= " - ".L10n::t("success");
 		} else {

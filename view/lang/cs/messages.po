@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-08-07 09:58+0200\n"
-"PO-Revision-Date: 2018-08-10 04:16+0000\n"
+"PO-Revision-Date: 2018-08-16 10:31+0000\n"
 "Last-Translator: Aditoo\n"
 "Language-Team: Czech (http://www.transifex.com/Friendica/friendica/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -171,7 +171,7 @@ msgstr "Vyplněn pod:"
 #: include/conversation.php:667 src/Object/Post.php:375
 #, php-format
 msgid "%s from %s"
-msgstr "%s od %s"
+msgstr "%s z %s"
 
 #: include/conversation.php:682
 msgid "View in context"
@@ -363,11 +363,11 @@ msgstr "Sdílet"
 #: include/conversation.php:1137 mod/editpost.php:101 mod/message.php:261
 #: mod/message.php:428 mod/wallmessage.php:143
 msgid "Upload photo"
-msgstr "Nahrát fotografii"
+msgstr "Nahrát fotku"
 
 #: include/conversation.php:1138 mod/editpost.php:102
 msgid "upload photo"
-msgstr "nahrát fotky"
+msgstr "nahrát fotku"
 
 #: include/conversation.php:1139 mod/editpost.php:103
 msgid "Attach file"
@@ -375,7 +375,7 @@ msgstr "Přiložit soubor"
 
 #: include/conversation.php:1140 mod/editpost.php:104
 msgid "attach file"
-msgstr "přidat soubor"
+msgstr "přiložit soubor"
 
 #: include/conversation.php:1141 mod/editpost.php:105 mod/message.php:262
 #: mod/message.php:429 mod/wallmessage.php:144
@@ -388,7 +388,7 @@ msgstr "webový odkaz"
 
 #: include/conversation.php:1143 mod/editpost.php:107
 msgid "Insert video link"
-msgstr "Zadejte odkaz na video"
+msgstr "Vložit odkaz na video"
 
 #: include/conversation.php:1144 mod/editpost.php:108
 msgid "video link"
@@ -396,7 +396,7 @@ msgstr "odkaz na video"
 
 #: include/conversation.php:1145 mod/editpost.php:109
 msgid "Insert audio link"
-msgstr "Zadejte odkaz na zvukový záznam"
+msgstr "Vložit odkaz na audio"
 
 #: include/conversation.php:1146 mod/editpost.php:110
 msgid "audio link"
@@ -404,27 +404,27 @@ msgstr "odkaz na audio"
 
 #: include/conversation.php:1147 mod/editpost.php:111
 msgid "Set your location"
-msgstr "Nastavte vaši polohu"
+msgstr "Nastavit vaši polohu"
 
 #: include/conversation.php:1148 mod/editpost.php:112
 msgid "set location"
-msgstr "nastavit místo"
+msgstr "nastavit polohu"
 
 #: include/conversation.php:1149 mod/editpost.php:113
 msgid "Clear browser location"
-msgstr "Odstranit adresu v prohlížeči"
+msgstr "Vymazat polohu v prohlížeči"
 
 #: include/conversation.php:1150 mod/editpost.php:114
 msgid "clear location"
-msgstr "vymazat místo"
+msgstr "vymazat polohu"
 
 #: include/conversation.php:1152 mod/editpost.php:129
 msgid "Set title"
-msgstr "Nastavit titulek"
+msgstr "Nastavit nadpis"
 
 #: include/conversation.php:1154 mod/editpost.php:131
 msgid "Categories (comma-separated list)"
-msgstr "Kategorie (čárkou oddělený seznam)"
+msgstr "Kategorie (seznam, oddělujte čárkou)"
 
 #: include/conversation.php:1156 mod/editpost.php:116
 msgid "Permission settings"
@@ -721,7 +721,7 @@ msgstr "Jméno:"
 
 #: include/enotify.php:327
 msgid "Photo:"
-msgstr "Foto:"
+msgstr "Fotka:"
 
 #: include/enotify.php:330
 #, php-format
@@ -730,17 +730,17 @@ msgstr "Prosím navštivte %s pro schválení či zamítnutí doporučení."
 
 #: include/enotify.php:338 include/enotify.php:353
 msgid "[Friendica:Notify] Connection accepted"
-msgstr "[Friendica:Oznámení] Spojení akceptováno"
+msgstr "[Friendica:Oznámení] Spojení přijato"
 
 #: include/enotify.php:340 include/enotify.php:355
 #, php-format
 msgid "'%1$s' has accepted your connection request at %2$s"
-msgstr "\"%1$s\" akceptoval/a Váš požadavek na spojení na %2$s"
+msgstr "\"%1$s\" přijal/a Váš požadavek na spojení na %2$s"
 
 #: include/enotify.php:341 include/enotify.php:356
 #, php-format
 msgid "%2$s has accepted your [url=%1$s]connection request[/url]."
-msgstr "%2$s akceptoval/a Váš [url=%1$s]požadavek na spojení[/url]."
+msgstr "%2$s přijal/a Váš [url=%1$s]požadavek na spojení[/url]."
 
 #: include/enotify.php:346
 msgid ""
@@ -864,7 +864,7 @@ msgstr "Vítejte "
 
 #: include/security.php:84
 msgid "Please upload a profile photo."
-msgstr "Prosím nahrajte profilovou fotografii"
+msgstr "Prosím nahrajte profilovou fotku."
 
 #: include/security.php:86
 msgid "Welcome back "
@@ -1295,18 +1295,18 @@ msgstr "Profil"
 
 #: mod/newmember.php:26 mod/profile_photo.php:246 mod/profiles.php:598
 msgid "Upload Profile Photo"
-msgstr "Nahrát profilovou fotografii"
+msgstr "Nahrát profilovou fotku"
 
 #: mod/newmember.php:26
 msgid ""
 "Upload a profile photo if you have not done so already. Studies have shown "
 "that people with real photos of themselves are ten times more likely to make"
 " friends than people who do not."
-msgstr "Nahrajte si svou profilovou fotku, pokud jste tak již neučinili. Studie ukázaly, že lidé se skutečnými fotografiemi mají desetkrát častěji přátele než lidé, kteří nemají."
+msgstr "Nahrajte si svou profilovou fotku, pokud jste tak již neučinil/a. Studie ukázaly, že lidé se skutečnými fotkami mají desetkrát častěji přátele než lidé, kteří nemají."
 
 #: mod/newmember.php:27
 msgid "Edit Your Profile"
-msgstr "Editujte Váš profil"
+msgstr "Upravte si svůj profil"
 
 #: mod/newmember.php:27
 msgid ""
@@ -2125,7 +2125,7 @@ msgstr "Vaše databáze stále běží s tabulkami MyISAM. Měl/a byste změnit 
 msgid ""
 "There is a new version of Friendica available for download. Your current "
 "version is %1$s, upstream version is %2$s"
-msgstr "Je dostupná ke stažení nová verze Friendica. Vaše aktuální verze je %1$s, upstreamová verze je%2$s"
+msgstr "Je dostupná ke stažení nová verze Friendica. Vaše aktuální verze je %1$s, upstreamová verze je %2$s"
 
 #: mod/admin.php:842
 msgid ""
@@ -2281,7 +2281,7 @@ msgstr "Otevřená"
 
 #: mod/admin.php:1380
 msgid "No SSL policy, links will track page SSL state"
-msgstr "Žádná SSL politika, odkazy budou následovat stránky SSL stav"
+msgstr "Žádná SSL politika, odkazy budou následovat SSL stav stránky"
 
 #: mod/admin.php:1381
 msgid "Force all links to use SSL"
@@ -2399,7 +2399,7 @@ msgstr "Systémový jazyk"
 
 #: mod/admin.php:1427
 msgid "System theme"
-msgstr "Grafická šablona systému "
+msgstr "Motiv systému "
 
 #: mod/admin.php:1427
 msgid ""
@@ -2435,13 +2435,13 @@ msgstr "Vynutit SSL pro všechny ne-SSL žádosti - Upozornění: na některých
 
 #: mod/admin.php:1431
 msgid "Hide help entry from navigation menu"
-msgstr "skrýt nápovědu z navigačního menu"
+msgstr "Skrýt nápovědu z navigačního menu"
 
 #: mod/admin.php:1431
 msgid ""
 "Hides the menu entry for the Help pages from the navigation menu. You can "
 "still access it calling /help directly."
-msgstr "Skryje menu ze stránek Nápověda z navigačního menu. Nápovědu můžete stále zobrazit přímo zadáním /help."
+msgstr "Skryje z navigačního menu položku pro stránky nápovědy. Nápovědu můžete stále zobrazit přímo zadáním /help."
 
 #: mod/admin.php:1432
 msgid "Single user instance"
@@ -2640,7 +2640,7 @@ msgid ""
 "of the image. This means that contacts who receive posts containing private "
 "photos will have to authenticate and load each image, which may take a "
 "while."
-msgstr "Nereplikovat lokální soukromé fotografie v příspěvcích s přidáním kopie obrázku. To znamená, že kontakty, které obdrží příspěvek obsahující soukromé fotografie se budou muset přihlásit a načíst každý obrázek, což může zabrat nějaký čas."
+msgstr "Nenahrazovat lokální soukromé fotky v příspěvcích vloženou kopií obrázku. To znamená, že kontakty, které obdrží příspěvek obsahující soukromé fotky, budou muset autentikovat a načíst každý obrázek, což může zabrat nějaký čas."
 
 #: mod/admin.php:1453
 msgid "Explicit Content"
@@ -3518,13 +3518,13 @@ msgstr "Povolit ladění"
 
 #: mod/admin.php:2386
 msgid "Log file"
-msgstr "Soubor s logem"
+msgstr "Soubor se záznamem"
 
 #: mod/admin.php:2386
 msgid ""
 "Must be writable by web server. Relative to your Friendica top-level "
 "directory."
-msgstr "Musí být editovatelné web serverem. Relativní cesta k vašemu kořenovému adresáři Friendica"
+msgstr "Musí být zapisovatelný webovým serverem. Relativní cesta k Vašemu kořenovému adresáři Friendica."
 
 #: mod/admin.php:2387
 msgid "Log level"
@@ -3703,11 +3703,11 @@ msgstr "Není k dispozici."
 
 #: mod/community.php:81
 msgid "Local Community"
-msgstr "Lokální komunita"
+msgstr "Místní komunita"
 
 #: mod/community.php:84
 msgid "Posts from local users on this server"
-msgstr "Příspěvky od lokálních uživatelů na tomto serveru"
+msgstr "Příspěvky od místních uživatelů na tomto serveru"
 
 #: mod/community.php:92
 msgid "Global Community"
@@ -3805,7 +3805,7 @@ msgstr "Sdílíte s uživatelem %s"
 #: mod/contacts.php:528
 #, php-format
 msgid "%s is sharing with you"
-msgstr "uživatel %s sdílí s vámi"
+msgstr "%s s Vámi sdílí"
 
 #: mod/contacts.php:548
 msgid "Private communications are not available for this contact."
@@ -3888,7 +3888,7 @@ msgstr "Jejich osobní poznámka"
 
 #: mod/contacts.php:617
 msgid "Edit contact notes"
-msgstr "Editovat poznámky kontaktu"
+msgstr "Upravit poznámky kontaktu"
 
 #: mod/contacts.php:620 mod/contacts.php:966 mod/viewcontacts.php:105
 #, php-format
@@ -3956,7 +3956,7 @@ msgstr "Skrýt tento kontakt před ostatními"
 #: mod/contacts.php:647
 msgid ""
 "Replies/likes to your public posts <strong>may</strong> still be visible"
-msgstr "Odpovědi/lajky na Vaše veřejné příspěvky <strong>mohou být</strong> stále viditelné"
+msgstr "Odpovědi/oblíbení na Vaše veřejné příspěvky <strong>mohou být</strong> stále viditelné"
 
 #: mod/contacts.php:648
 msgid "Notification for new posts"
@@ -3980,7 +3980,7 @@ msgstr "Čárkou oddělený seznam klíčových slov, které by neměly být př
 #: mod/notifications.php:248 src/Model/Event.php:66 src/Model/Event.php:93
 #: src/Model/Event.php:430 src/Model/Event.php:912 src/Model/Profile.php:415
 msgid "Location:"
-msgstr "Místo:"
+msgstr "Poloha:"
 
 #: mod/contacts.php:663 src/Model/Profile.php:422
 msgid "XMPP:"
@@ -4135,7 +4135,7 @@ msgstr "Nastavte Vaši polohu"
 
 #: mod/contacts.php:967
 msgid "Edit contact"
-msgstr "Editovat kontakt"
+msgstr "Upravit kontakt"
 
 #: mod/contacts.php:1021
 msgid "Toggle Blocked status"
@@ -4192,7 +4192,7 @@ msgstr "Zrcadlit jako mé vlastní příspěvky"
 
 #: mod/crepair.php:145
 msgid "Return to contact editor"
-msgstr "Návrat k editoru kontaktu"
+msgstr "Zpět k editoru kontaktu"
 
 #: mod/crepair.php:147
 msgid "Refetch contact data"
@@ -4234,15 +4234,15 @@ msgstr "URL adresa pro potvrzení přátelství"
 
 #: mod/crepair.php:165
 msgid "Notification Endpoint URL"
-msgstr "Notifikační URL adresa"
+msgstr "URL adresa koncového bodu oznámení"
 
 #: mod/crepair.php:166
 msgid "Poll/Feed URL"
-msgstr "Poll/Feed URL adresa"
+msgstr "URL adresa poll/feed"
 
 #: mod/crepair.php:167
 msgid "New photo from this URL"
-msgstr "Nové foto z této URL adresy"
+msgstr "Nová fotka z této URL adresy"
 
 #: mod/delegate.php:38
 msgid "Parent user not found."
@@ -4343,7 +4343,7 @@ msgstr "Vzdálený server oznámil:"
 
 #: mod/dfrn_confirm.php:389
 msgid "Unable to set contact photo."
-msgstr "Nelze nastavit fotografii kontaktu."
+msgstr "Nelze nastavit fotku kontaktu."
 
 #: mod/dfrn_confirm.php:447
 #, php-format
@@ -4405,7 +4405,7 @@ msgstr "Varování: umístění profilu nemá žádné identifikovatelné jméno
 
 #: mod/dfrn_request.php:118 mod/dfrn_request.php:359
 msgid "Warning: profile location has no profile photo."
-msgstr "Varování: umístění profilu nemá žádnou profilovou fotografii."
+msgstr "Varování: umístění profilu nemá žádnou profilovou fotku."
 
 #: mod/dfrn_request.php:122 mod/dfrn_request.php:363
 #, php-format
@@ -4699,14 +4699,14 @@ msgstr "Událost odstraněna"
 #: mod/fbrowser.php:35 view/theme/frio/theme.php:261 src/Content/Nav.php:102
 #: src/Model/Profile.php:900
 msgid "Photos"
-msgstr "Fotografie"
+msgstr "Fotky"
 
 #: mod/fbrowser.php:44 mod/fbrowser.php:69 mod/photos.php:198
 #: mod/photos.php:1058 mod/photos.php:1145 mod/photos.php:1162
 #: mod/photos.php:1622 mod/photos.php:1637 src/Model/Photo.php:243
 #: src/Model/Photo.php:252
 msgid "Contact Photos"
-msgstr "Fotogalerie kontaktu"
+msgstr "Fotky kontaktu"
 
 #: mod/fbrowser.php:106 mod/fbrowser.php:137 mod/profile_photo.php:247
 msgid "Upload"
@@ -5065,16 +5065,16 @@ msgstr "Vaše zpráva:"
 msgid ""
 "You are cordially invited to join me and other close friends on Friendica - "
 "and help us to create a better social web."
-msgstr "Jste srdečně pozván/a se připojit ke mně a k mým blízkým přátelům na Friendica - a pomoci nám vytvořit lepší sociální web."
+msgstr "Jsi srdečně pozván/a se připojit ke mně a k mým blízkým přátelům na Friendica - a pomoci nám vytvořit lepší sociální web."
 
 #: mod/invite.php:152
 msgid "You will need to supply this invitation code: $invite_code"
-msgstr "Budete muset zadat kód této pozvánky: $invite_code"
+msgstr "Budeš muset zadat tento pozvánkový kód: $invite_code"
 
 #: mod/invite.php:152
 msgid ""
 "Once you have registered, please connect with me via my profile page at:"
-msgstr "Jakmile se zaregistrujete, prosím spojte se se mnou přes mou profilovu stránku na:"
+msgstr "Jakmile se zaregistruješ, prosím spoj se se mnou přes mou profilovu stránku na:"
 
 #: mod/invite.php:154
 msgid ""
@@ -5093,14 +5093,14 @@ msgstr "Prázdný příspěvek odstraněn."
 #: mod/item.php:472 mod/wall_upload.php:240 src/Object/Image.php:966
 #: src/Object/Image.php:982 src/Object/Image.php:990 src/Object/Image.php:1015
 msgid "Wall Photos"
-msgstr "Fotografie na zdi"
+msgstr "Fotky na zdi"
 
 #: mod/item.php:808
 #, php-format
 msgid ""
 "This message was sent to you by %s, a member of the Friendica social "
 "network."
-msgstr "Tato zpráva vám byla zaslána od %s, člena sociální sítě Friendica."
+msgstr "Tuto zprávu Vám poslal/a %s, člen sociální sítě Friendica."
 
 #: mod/item.php:810
 #, php-format
@@ -5116,7 +5116,7 @@ msgstr "Pokud nechcete dostávat tyto zprávy, kontaktujte prosím odesilatele o
 #: mod/item.php:815
 #, php-format
 msgid "%s posted an update."
-msgstr "%s poslal aktualizaci."
+msgstr "%s poslal/a aktualizaci."
 
 #: mod/lockview.php:42 mod/lockview.php:50
 msgid "Remote privacy information not available."
@@ -5553,21 +5553,21 @@ msgstr "Má Vaše spojení být obousměrné, nebo ne?"
 msgid ""
 "Accepting %s as a friend allows %s to subscribe to your posts, and you will "
 "also receive updates from them in your news feed."
-msgstr "Přijetí %s jako přítele dovolí %s odebírat Vaše příspěvky a Vy budete také přijímat aktualizace od nich ve Vašem kanále."
+msgstr "Přijetí uživatele %s jako přítele dovolí uživateli %s odebírat Vaše příspěvky a Vy budete také přijímat aktualizace od něj ve Vašem kanále."
 
 #: mod/notifications.php:201
 #, php-format
 msgid ""
 "Accepting %s as a subscriber allows them to subscribe to your posts, but you"
 " will not receive updates from them in your news feed."
-msgstr "Přijetí %s jako odběratele jim dovolí odebírat Vaše příspěvky, ale nebudete od nich přijímat aktualizace ve Vašem kanále."
+msgstr "Přijetí uživatele %s jako odběratele mu dovolí odebírat Vaše příspěvky, ale nebudete od něj přijímat aktualizace ve Vašem kanále."
 
 #: mod/notifications.php:206
 #, php-format
 msgid ""
 "Accepting %s as a sharer allows them to subscribe to your posts, but you "
 "will not receive updates from them in your news feed."
-msgstr "Přijetí %s jako sdílejícího jim dovolí odebírat Vaše příspěvky, ale nebudete od nich přijímat aktualizace ve Vašem kanále."
+msgstr "Přijetí uživatele %s jako sdílejícího mu dovolí odebírat Vaše příspěvky, ale nebudete od něj přijímat aktualizace ve Vašem kanále."
 
 #: mod/notifications.php:217
 msgid "Friend"
@@ -5625,11 +5625,11 @@ msgstr "Fotoalba"
 
 #: mod/photos.php:112 mod/photos.php:1678
 msgid "Recent Photos"
-msgstr "Aktuální fotografie"
+msgstr "Nedávné fotky"
 
 #: mod/photos.php:115 mod/photos.php:1206 mod/photos.php:1680
 msgid "Upload New Photos"
-msgstr "Nahrát nové fotografie"
+msgstr "Nahrát nové fotky"
 
 #: mod/photos.php:134 mod/settings.php:51
 msgid "everybody"
@@ -5649,24 +5649,24 @@ msgstr "Smazat album"
 
 #: mod/photos.php:249
 msgid "Do you really want to delete this photo album and all its photos?"
-msgstr "Opravdu chcete smazat toto foto album a všechny jeho fotografie?"
+msgstr "Opravdu chcete smazat toto fotoalbum a všechny jeho fotky?"
 
 #: mod/photos.php:309 mod/photos.php:320 mod/photos.php:1423
 msgid "Delete Photo"
-msgstr "Smazat fotografii"
+msgstr "Smazat fotku"
 
 #: mod/photos.php:318
 msgid "Do you really want to delete this photo?"
-msgstr "Opravdu chcete smazat tuto fotografii?"
+msgstr "Opravdu chcete smazat tuto fotku?"
 
 #: mod/photos.php:661
 msgid "a photo"
-msgstr "fotografie"
+msgstr "fotce"
 
 #: mod/photos.php:661
 #, php-format
 msgid "%1$s was tagged in %2$s by %3$s"
-msgstr "%1$s byl označen v %2$s uživatelem %3$s"
+msgstr "%1$s byl označen ve %2$s uživatelem %3$s"
 
 #: mod/photos.php:758 mod/photos.php:761 mod/photos.php:790
 #: mod/profile_photo.php:151 mod/wall_upload.php:195
@@ -5702,7 +5702,7 @@ msgstr "Nahrání obrázku selhalo."
 
 #: mod/photos.php:935
 msgid "No photos selected"
-msgstr "Není vybrána žádná fotografie"
+msgstr "Není vybrána žádná fotka"
 
 #: mod/photos.php:1032 mod/videos.php:306
 msgid "Access to this item is restricted."
@@ -5710,7 +5710,7 @@ msgstr "Přístup k této položce je omezen."
 
 #: mod/photos.php:1086
 msgid "Upload Photos"
-msgstr "Nahrání fotografií "
+msgstr "Nahrát fotky"
 
 #: mod/photos.php:1090 mod/photos.php:1152
 msgid "New album name: "
@@ -5734,7 +5734,7 @@ msgstr "Zobrazit v Kontaktech"
 
 #: mod/photos.php:1163
 msgid "Edit Album"
-msgstr "Edituj album"
+msgstr "Upravit album"
 
 #: mod/photos.php:1168
 msgid "Show Newest First"
@@ -5746,7 +5746,7 @@ msgstr "Zobrazit nejprve nejstarší:"
 
 #: mod/photos.php:1191 mod/photos.php:1663
 msgid "View Photo"
-msgstr "Zobraz fotografii"
+msgstr "Zobrazit fotku"
 
 #: mod/photos.php:1232
 msgid "Permission denied. Access to this item may be restricted."
@@ -5754,19 +5754,19 @@ msgstr "Oprávnění bylo zamítnuto. Přístup k této položce může být ome
 
 #: mod/photos.php:1234
 msgid "Photo not available"
-msgstr "Fotografie není k dispozici"
+msgstr "Fotka není k dispozici"
 
 #: mod/photos.php:1303
 msgid "View photo"
-msgstr "Zobrazit obrázek"
+msgstr "Zobrazit fotku"
 
 #: mod/photos.php:1303
 msgid "Edit photo"
-msgstr "Editovat fotografii"
+msgstr "Upravit fotku"
 
 #: mod/photos.php:1304
 msgid "Use as profile photo"
-msgstr "Použít jako profilovou fotografii"
+msgstr "Použít jako profilovou fotku"
 
 #: mod/photos.php:1310 src/Object/Post.php:150
 msgid "Private Message"
@@ -5840,7 +5840,7 @@ msgstr "{0} chce být Vaším přítelem"
 
 #: mod/ping.php:305
 msgid "{0} sent you a message"
-msgstr "{0} vám poslal zprávu"
+msgstr "{0} vám poslal/a zprávu"
 
 #: mod/ping.php:321
 msgid "{0} requested registration"
@@ -5873,12 +5873,12 @@ msgstr "Požadovaný profil není dostupný."
 #: mod/profile.php:79 mod/profile.php:82 src/Protocol/OStatus.php:1274
 #, php-format
 msgid "%s's timeline"
-msgstr "Časová osa %s"
+msgstr "Časová osa uživatele %s"
 
 #: mod/profile.php:80 src/Protocol/OStatus.php:1275
 #, php-format
 msgid "%s's posts"
-msgstr "Příspěvky %s"
+msgstr "Příspěvky uživatele %s"
 
 #: mod/profile.php:81 src/Protocol/OStatus.php:1276
 #, php-format
@@ -5899,7 +5899,7 @@ msgstr "Nepodařilo se snížit velikost obrázku [%s]."
 msgid ""
 "Shift-reload the page or clear browser cache if the new photo does not "
 "display immediately."
-msgstr "Znovu načtěte stránku (Shift+F5) nebo vymažte cache prohlížeče, pokud se nové fotografie nezobrazí okamžitě."
+msgstr "Znovu načtěte stránku (Shift+F5) nebo vymažte cache prohlížeče, pokud se nová fotka nezobrazí okamžitě."
 
 #: mod/profile_photo.php:132
 msgid "Unable to process image"
@@ -5935,7 +5935,7 @@ msgstr "Prosím, ořízněte tento obrázek pro optimální zobrazení."
 
 #: mod/profile_photo.php:267
 msgid "Done Editing"
-msgstr "Editace dokončena"
+msgstr "Upravování dokončeno"
 
 #: mod/profile_photo.php:303
 msgid "Image uploaded successfully."
@@ -6003,7 +6003,7 @@ msgstr "Zájmy"
 
 #: mod/profiles.php:398 mod/profiles.php:589
 msgid "Location"
-msgstr "Umístění"
+msgstr "Poloha"
 
 #: mod/profiles.php:481
 msgid "Profile updated."
@@ -6031,7 +6031,7 @@ msgstr "Upravit podrobnosti profilu "
 
 #: mod/profiles.php:578
 msgid "Change Profile Photo"
-msgstr "Změna Profilové fotky"
+msgstr "Změnit profilovou fotku"
 
 #: mod/profiles.php:580
 msgid "View this profile"
@@ -6099,7 +6099,7 @@ msgstr "Sexuální preference:"
 
 #: mod/profiles.php:602
 msgid "Example: fishing photography software"
-msgstr "Příklad: fishing photography software"
+msgstr "Příklad: rybaření fotografování software"
 
 #: mod/profiles.php:607
 msgid "Profile Name:"
@@ -6231,7 +6231,7 @@ msgstr "Koníčky/zájmy"
 
 #: mod/profiles.php:640
 msgid "Love/romance"
-msgstr "Láska/romance"
+msgstr "Láska/romantika"
 
 #: mod/profiles.php:641
 msgid "Work/employment"
@@ -6255,11 +6255,11 @@ msgstr "viditelné pro všechny"
 
 #: mod/profiles.php:683
 msgid "Edit/Manage Profiles"
-msgstr "Upravit/Spravovat profily"
+msgstr "Upravit/spravovat profily"
 
 #: mod/profiles.php:684 src/Model/Profile.php:377 src/Model/Profile.php:399
 msgid "Change profile photo"
-msgstr "Změnit profilovou fotografii"
+msgstr "Změnit profilovou fotku"
 
 #: mod/profiles.php:685 src/Model/Profile.php:378
 msgid "Create New Profile"
@@ -6291,7 +6291,7 @@ msgstr "Registrace úspěšná. Zkontrolujte prosím svůj e-mail pro další in
 msgid ""
 "Failed to send email message. Here your accout details:<br> login: %s<br> "
 "password: %s<br><br>You can change your password after login."
-msgstr "Nepovedlo se odeslat emailovou zprávu. Zde jsou detaily Vašeho účtu:<br> přihlášení: %s<br> heslo: %s<br><br>Své heslo si můžete změnit po přihlášení."
+msgstr "Nepovedlo se odeslat emailovou zprávu. Zde jsou detaily Vašeho účtu:<br> přihlašovací jméno: %s<br> heslo: %s<br><br>Své heslo si můžete změnit po přihlášení."
 
 #: mod/register.php:110
 msgid "Registration successful."
@@ -6585,7 +6585,7 @@ msgstr "URL ikony"
 
 #: mod/settings.php:692
 msgid "You can't edit this application."
-msgstr "Nemůžete editovat tuto aplikaci."
+msgstr "Nemůžete upravit tuto aplikaci."
 
 #: mod/settings.php:733
 msgid "Connected Apps"
@@ -7078,7 +7078,7 @@ msgstr "Expirovat příspěvky s hvězdou:"
 
 #: mod/settings.php:1156
 msgid "Expire photos:"
-msgstr "Expirovat fotografie:"
+msgstr "Expirovat fotky:"
 
 #: mod/settings.php:1157
 msgid "Only expire posts by others:"
@@ -7136,11 +7136,11 @@ msgstr "Nastavte jazyk, který máme používat pro rozhraní Friendica a pro po
 
 #: mod/settings.php:1208
 msgid "Default Post Location:"
-msgstr "Výchozí umístění příspěvků:"
+msgstr "Výchozí poloha příspěvků:"
 
 #: mod/settings.php:1209
 msgid "Use Browser Location:"
-msgstr "Používat umístění dle prohlížeče:"
+msgstr "Používat polohu dle prohlížeče:"
 
 #: mod/settings.php:1212
 msgid "Security and Privacy Settings"
@@ -7260,7 +7260,7 @@ msgstr "Přemístit"
 msgid ""
 "If you have moved this profile from another server, and some of your "
 "contacts don't receive your updates, try pushing this button."
-msgstr "Pokud jste přemístil tento profil z jiného serveru a nějaký z vašich kontaktů nedostává Vaše aktualizace, zkuste stisknout toto tlačítko."
+msgstr "Pokud jste přemístil/a tento profil z jiného serveru a nějaký z vašich kontaktů nedostává Vaše aktualizace, zkuste stisknout toto tlačítko."
 
 #: mod/settings.php:1273
 msgid "Resend relocate message to contacts"
@@ -7320,7 +7320,7 @@ msgid ""
 "Export your accout info, contacts and all your items as json. Could be a "
 "very big file, and could take a lot of time. Use this to make a full backup "
 "of your account (photos are not exported)"
-msgstr "Exportujte své informace k účtu, kontakty a vše své položky jako json. To může být velmi velký soubor a může to zabrat spoustu času. Tuto funkci použijte pro úplnou zálohu svého účtu(fotografie se neexportují)"
+msgstr "Exportujte své informace o účtu, kontakty a všechny své položky jako JSON. To může být velmi velký soubor a může to zabrat spoustu času. Tuto funkci použijte pro úplnou zálohu svého účtu (fotky se neexportují)"
 
 #: mod/unfollow.php:35
 msgid "Contact wasn't found or can't be unfollowed."
@@ -7392,7 +7392,7 @@ msgstr "Došlo k překročení maximálního počtu zpráv na zeď během jednoh
 
 #: mod/wallmessage.php:60
 msgid "Unable to check your home location."
-msgstr "Nebylo možné zjistit umístění Vašeho domova."
+msgstr "Nebylo možné zjistit polohu Vašeho domova."
 
 #: mod/wallmessage.php:86 mod/wallmessage.php:95
 msgid "No recipient."
@@ -7410,7 +7410,7 @@ msgstr "Pokud si přejete, aby uživatel %s mohl odpovědět, ověřte si zda-li
 msgid ""
 "This is Friendica, version %s that is running at the web location %s. The "
 "database version is %s, the post update version is %s."
-msgstr "Tohle je Friendica, verze %s, běžící na vebové adrese %s. Verze databáze je %s, verze post update je %s."
+msgstr "Tohle je Friendica, verze %s, běžící na webové adrese %s. Verze databáze je %s, verze post update je %s."
 
 #: mod/friendica.php:84
 msgid ""
@@ -8172,7 +8172,7 @@ msgstr "zobrazit v plné velikosti"
 #: src/Content/Text/BBCode.php:853 src/Content/Text/BBCode.php:1629
 #: src/Content/Text/BBCode.php:1630
 msgid "Image/photo"
-msgstr "Obrázek/fotografie"
+msgstr "Obrázek/fotka"
 
 #: src/Content/Text/BBCode.php:991
 #, php-format
@@ -8221,13 +8221,13 @@ msgstr "Schopnost vytvořit vícenásobné profily"
 
 #: src/Content/Feature.php:82
 msgid "Photo Location"
-msgstr "Umístění fotky"
+msgstr "Poloha fotky"
 
 #: src/Content/Feature.php:82
 msgid ""
 "Photo metadata is normally stripped. This extracts the location (if present)"
 " prior to stripping metadata and links it to a map."
-msgstr "Metadata fotek jsou normálně odebrána. Tato funkce před odebrání metadat extrahuje umístění (pokud je k dispozici) a propojí jej s mapou."
+msgstr "Metadata fotek jsou normálně odebrána. Tato funkce před odebrání metadat extrahuje polohu (pokud je k dispozici) a propojí jej s mapou."
 
 #: src/Content/Feature.php:83
 msgid "Export Public Calendar"
@@ -8400,11 +8400,11 @@ msgstr "Ukázat návštěvníkům veřejná komunitní fóra na stránce pokroč
 
 #: src/Content/Feature.php:128
 msgid "Tag Cloud"
-msgstr "Tag cloud"
+msgstr "Štítkový oblak"
 
 #: src/Content/Feature.php:128
 msgid "Provide a personal tag cloud on your profile page"
-msgstr "Poskytnout na Vaší profilové stránce osobní \"tag cloud\""
+msgstr "Poskytne na Vaší profilové stránce osobní \"štítkový oblak\""
 
 #: src/Content/Feature.php:129
 msgid "Display Membership Date"
@@ -8536,7 +8536,7 @@ msgstr "Hermafrodit"
 
 #: src/Content/ContactSelector.php:123
 msgid "Neuter"
-msgstr "Neutrální"
+msgstr "Střední rod"
 
 #: src/Content/ContactSelector.php:123
 msgid "Non-specific"
@@ -9054,7 +9054,7 @@ msgstr "l, j. F"
 
 #: src/Model/Event.php:578
 msgid "Edit event"
-msgstr "Editovat událost"
+msgstr "Upravit událost"
 
 #: src/Model/Event.php:579
 msgid "Duplicate event"
@@ -9097,11 +9097,11 @@ msgstr "Všichni"
 
 #: src/Model/Group.php:393
 msgid "edit"
-msgstr "editovat"
+msgstr "upravit"
 
 #: src/Model/Group.php:417
 msgid "Edit group"
-msgstr "Editovat skupinu"
+msgstr "Upravit skupinu"
 
 #: src/Model/Group.php:420
 msgid "Create a new group"
@@ -9495,7 +9495,7 @@ msgstr "ochrana soukromí"
 
 #: src/Object/Post.php:129
 msgid "This entry was edited"
-msgstr "Tento záznam byl editován"
+msgstr "Tato položka byla upravena"
 
 #: src/Object/Post.php:189
 msgid "Delete globally"

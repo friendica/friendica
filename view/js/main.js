@@ -302,7 +302,12 @@ $(function() {
 		$('#nav-notifications-menu').perfectScrollbar('update');
 	});
 
-	NavUpdate();
+	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
+	window.addEventListener("load", function(){
+		NavUpdate();
+		acl.get(0, 100);
+	});
+
 	// Allow folks to stop the ajax page updates with the pause/break key
 	$(document).keydown(function(event) {
 		if (event.keyCode == '8') {

@@ -6,6 +6,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
@@ -28,13 +29,13 @@ class UpdateGContact
 			return;
 		}
 
-		if (!in_array($r[0]["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+		if (!in_array($r[0]["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 			return;
 		}
 
 		$data = Probe::uri($r[0]["url"]);
 
-		if (!in_array($data["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+		if (!in_array($data["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 			if ($r[0]["server_url"] != "") {
 				PortableContact::checkServer($r[0]["server_url"], $r[0]["network"]);
 			}

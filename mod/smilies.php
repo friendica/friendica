@@ -13,7 +13,7 @@ use Friendica\Core\System;
 function smilies_content(App $a)
 {
 	$smilies = Smilies::getList();
-	if ($a->argv[1] === "json") {
+	if (!empty($a->argv[1]) && ($a->argv[1] === "json")) {
 		$results = [];
 		for ($i = 0; $i < count($smilies['texts']); $i++) {
 			$results[] = ['text' => $smilies['texts'][$i], 'icon' => $smilies['icons'][$i]];

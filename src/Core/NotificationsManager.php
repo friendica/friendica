@@ -9,6 +9,7 @@ namespace Friendica\Core;
 use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -164,39 +165,41 @@ class NotificationsManager extends BaseObject
 	 */
 	public function getTabs()
 	{
+		$selected = defaults(self::getApp()->argv, 1, '');
+
 		$tabs = [
 			[
 				'label' => L10n::t('System'),
 				'url'   => 'notifications/system',
-				'sel'   => ((self::getApp()->argv[1] == 'system') ? 'active' : ''),
+				'sel'   => (($selected == 'system') ? 'active' : ''),
 				'id'    => 'system-tab',
 				'accesskey' => 'y',
 			],
 			[
 				'label' => L10n::t('Network'),
 				'url'   => 'notifications/network',
-				'sel'   => ((self::getApp()->argv[1] == 'network') ? 'active' : ''),
+				'sel'   => (($selected == 'network') ? 'active' : ''),
 				'id'    => 'network-tab',
 				'accesskey' => 'w',
 			],
 			[
 				'label' => L10n::t('Personal'),
 				'url'   => 'notifications/personal',
-				'sel'   => ((self::getApp()->argv[1] == 'personal') ? 'active' : ''),
+				'sel'   => (($selected == 'personal') ? 'active' : ''),
 				'id'    => 'personal-tab',
 				'accesskey' => 'r',
 			],
 			[
 				'label' => L10n::t('Home'),
 				'url'   => 'notifications/home',
-				'sel'   => ((self::getApp()->argv[1] == 'home') ? 'active' : ''),
+				'sel'   => (($selected == 'home') ? 'active' : ''),
 				'id'    => 'home-tab',
 				'accesskey' => 'h',
 			],
 			[
 				'label' => L10n::t('Introductions'),
 				'url'   => 'notifications/intros',
-				'sel'   => ((self::getApp()->argv[1] == 'intros') ? 'active' : ''),
+				'sel'   => (($selected == 'intros') ? 'active' : ''),
 				'id'    => 'intro-tab',
 				'accesskey' => 'i',
 			],
@@ -235,7 +238,7 @@ class NotificationsManager extends BaseObject
 				}
 
 				// For feed items we use the user's contact, since the avatar is mostly self choosen.
-				if (!empty($it['network']) && $it['network'] == NETWORK_FEED) {
+				if (!empty($it['network']) && $it['network'] == Protocol::FEED) {
 					$it['author-avatar'] = $it['contact-avatar'];
 				}
 
@@ -639,14 +642,14 @@ class NotificationsManager extends BaseObject
 				$it = $this->getMissingIntroData($it);
 
 				// Don't show these data until you are connected. Diaspora is doing the same.
-				if ($it['gnetwork'] === NETWORK_DIASPORA) {
+				if ($it['gnetwork'] === Protocol::DIASPORA) {
 					$it['glocation'] = "";
 					$it['gabout'] = "";
 					$it['ggender'] = "";
 				}
 				$intro = [
-					'label' => (($it['network'] !== NETWORK_OSTATUS) ? 'friend_request' : 'follower'),
-					'notify_type' => (($it['network'] !== NETWORK_OSTATUS) ? L10n::t('Friend/Connect Request') : L10n::t('New Follower')),
+					'label' => (($it['network'] !== Protocol::OSTATUS) ? 'friend_request' : 'follower'),
+					'notify_type' => (($it['network'] !== Protocol::OSTATUS) ? L10n::t('Friend/Connect Request') : L10n::t('New Follower')),
 					'dfrn_id' => $it['issued-id'],
 					'uid' => $_SESSION['uid'],
 					'intro_id' => $it['intro_id'],

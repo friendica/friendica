@@ -8,6 +8,7 @@ use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
 use Friendica\Model\Contact;
@@ -231,12 +232,12 @@ class CronJobs
 
 		$r = q("SELECT `id`, `url` FROM `contact`
 			WHERE `network` = '%s' AND (`batch` = '' OR `notify` = '' OR `poll` = '' OR pubkey = '')
-				ORDER BY RAND() LIMIT 50", DBA::escape(NETWORK_DIASPORA));
+				ORDER BY RAND() LIMIT 50", DBA::escape(Protocol::DIASPORA));
 		if (!DBA::isResult($r)) {
 			return;
 		}
 
-		foreach ($r AS $contact) {
+		foreach ($r as $contact) {
 			// Quit the loop after 3 minutes
 			if (time() > ($starttime + 180)) {
 				return;
@@ -247,7 +248,7 @@ class CronJobs
 			}
 
 			$data = Probe::uri($contact["url"]);
-			if ($data["network"] != NETWORK_DIASPORA) {
+			if ($data["network"] != Protocol::DIASPORA) {
 				continue;
 			}
 
@@ -273,10 +274,6 @@ class CronJobs
 				Contact::createSelfFromUserId($user['uid']);
 			}
 		}
-
-		// Set the parent if it wasn't set. (Shouldn't happen - but does sometimes)
-		// This call is very "cheap" so we can do it at any time without a problem
-		q("UPDATE `item` INNER JOIN `item` AS `parent` ON `parent`.`uri` = `item`.`parent-uri` AND `parent`.`uid` = `item`.`uid` SET `item`.`parent` = `parent`.`id` WHERE `item`.`parent` = 0");
 
 		// There was an issue where the nick vanishes from the contact table
 		q("UPDATE `contact` INNER JOIN `user` ON `contact`.`uid` = `user`.`uid` SET `nick` = `nickname` WHERE `self` AND `nick`=''");

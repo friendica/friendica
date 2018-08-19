@@ -4,8 +4,8 @@
 
 	{{* The link to create a new event *}}
 	<div class="pull-right" id="new-event-link">
-		<button type="button" class="btn-link" onclick="addToModal('{{$new_event.0}}')" title="{{$new_event.1}}" data-toggle="tooltip">
-			<i class="faded-icon fa fa-plus"></i>
+		<button type="button" class="btn-link page-action faded-icon" onclick="addToModal('{{$new_event.0}}')" title="{{$new_event.1}}" data-toggle="tooltip">
+			<i class="fa fa-plus"></i>
 		</button>
 	</div>
 

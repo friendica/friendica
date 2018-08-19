@@ -16,6 +16,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -176,7 +177,7 @@ class Diaspora
 	{
 		$fields = ['created' => DateTimeFormat::utcNow(),
 			'name' => 'relay', 'nick' => 'relay',
-			'url' => $server_url, 'network' => NETWORK_DIASPORA,
+			'url' => $server_url, 'network' => Protocol::DIASPORA,
 			'batch' => $server_url . '/receive/public',
 			'rel' => Contact::FOLLOWER, 'blocked' => false,
 			'pending' => false, 'writable' => true];
@@ -899,7 +900,7 @@ class Diaspora
 	{
 		$update = false;
 
-		$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+		$person = DBA::selectFirst('fcontact', [], ['network' => Protocol::DIASPORA, 'addr' => $handle]);
 		if (DBA::isResult($person)) {
 			logger("In cache " . print_r($person, true), LOGGER_DEBUG);
 
@@ -916,15 +917,15 @@ class Diaspora
 
 		if (!DBA::isResult($person) || $update) {
 			logger("create or refresh", LOGGER_DEBUG);
-			$r = Probe::uri($handle, NETWORK_DIASPORA);
+			$r = Probe::uri($handle, Protocol::DIASPORA);
 
 			// Note that Friendica contacts will return a "Diaspora person"
 			// if Diaspora connectivity is enabled on their server
-			if ($r && ($r["network"] === NETWORK_DIASPORA)) {
+			if ($r && ($r["network"] === Protocol::DIASPORA)) {
 				self::updateFContact($r);
 
 				// Fetch the updated or added contact
-				$person = DBA::selectFirst('fcontact', [], ['network' => NETWORK_DIASPORA, 'addr' => $handle]);
+				$person = DBA::selectFirst('fcontact', [], ['network' => Protocol::DIASPORA, 'addr' => $handle]);
 				if (!DBA::isResult($person)) {
 					$person = $r;
 				}
@@ -969,13 +970,10 @@ class Diaspora
 		logger("contact id is ".$contact_id." - pcontact id is ".$pcontact_id, LOGGER_DEBUG);
 
 		if ($pcontact_id != 0) {
-			$r = q(
-				"SELECT `addr` FROM `contact` WHERE `id` = %d AND `addr` != ''",
-				intval($pcontact_id)
-			);
+			$contact = DBA::selectFirst('contact', ['addr'], ['id' => $pcontact_id]);
 
-			if (DBA::isResult($r)) {
-				return strtolower($r[0]["addr"]);
+			if (DBA::isResult($contact) && !empty($contact["addr"])) {
+				return strtolower($contact["addr"]);
 			}
 		}
 
@@ -1017,7 +1015,7 @@ class Diaspora
 
 		$r = q(
 			"SELECT `url` FROM `fcontact` WHERE `url` != '' AND `network` = '%s' AND `guid` = '%s'",
-			DBA::escape(NETWORK_DIASPORA),
+			DBA::escape(Protocol::DIASPORA),
 			DBA::escape($fcontact_guid)
 		);
 
@@ -1419,7 +1417,7 @@ class Diaspora
 			$network = $contact["network"];
 		} else {
 			$cid = $def_contact["id"];
-			$network = NETWORK_DIASPORA;
+			$network = Protocol::DIASPORA;
 		}
 
 		return ["cid" => $cid, "network" => $network];
@@ -1459,7 +1457,7 @@ class Diaspora
 			}
 		}
 
-		if ($contact["network"] == NETWORK_DFRN) {
+		if ($contact["network"] == Protocol::DFRN) {
 			return str_replace("/profile/" . $contact["nick"] . "/", "/display/" . $guid, $contact["url"] . "/");
 		}
 
@@ -1509,7 +1507,7 @@ class Diaspora
 
 		// change the technical stuff in contact and gcontact
 		$data = Probe::uri($new_handle);
-		if ($data['network'] == NETWORK_PHANTOM) {
+		if ($data['network'] == Protocol::PHANTOM) {
 			logger('Account for '.$new_handle." couldn't be probed.");
 			return false;
 		}
@@ -1787,12 +1785,7 @@ class Diaspora
 
 		DBA::lock('mail');
 
-		$r = q(
-			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($msg_guid),
-			intval($importer["uid"])
-		);
-		if (DBA::isResult($r)) {
+		if (DBA::exists('mail', ['guid' => $msg_guid, 'uid' => $importer["uid"]])) {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
 			return false;
 		}
@@ -1867,16 +1860,8 @@ class Diaspora
 			return false;
 		}
 
-		$conversation = null;
-
-		$c = q(
-			"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-			intval($importer["uid"]),
-			DBA::escape($guid)
-		);
-		if ($c)
-			$conversation = $c[0];
-		else {
+		$conversation = DBA::selectFirst('conv', [], ['uid' => $importer["uid"], 'guid' => $guid]);
+		if (!DBA::isResult($conversation)) {
 			$r = q(
 				"INSERT INTO `conv` (`uid`, `guid`, `creator`, `created`, `updated`, `subject`, `recips`)
 				VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s')",
@@ -1889,15 +1874,7 @@ class Diaspora
 				DBA::escape($participants)
 			);
 			if ($r) {
-				$c = q(
-					"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-					intval($importer["uid"]),
-					DBA::escape($guid)
-				);
-			}
-
-			if ($c) {
-				$conversation = $c[0];
+				$conversation = DBA::selectFirst('conv', [], ['uid' => $importer["uid"], 'guid' => $guid]);
 			}
 		}
 		if (!$conversation) {
@@ -2048,14 +2025,10 @@ class Diaspora
 
 		$conversation = null;
 
-		$c = q(
-			"SELECT * FROM `conv` WHERE `uid` = %d AND `guid` = '%s' LIMIT 1",
-			intval($importer["uid"]),
-			DBA::escape($conversation_guid)
-		);
-		if ($c) {
-			$conversation = $c[0];
-		} else {
+		$condition = ['uid' => $importer["uid"], 'guid' => $conversation_guid];
+		$conversation = DBA::selectFirst('conv', [], $condition);
+
+		if (!DBA::isResult($conversation)) {
 			logger("conversation not available.");
 			return false;
 		}
@@ -2074,12 +2047,7 @@ class Diaspora
 
 		DBA::lock('mail');
 
-		$r = q(
-			"SELECT `id` FROM `mail` WHERE `guid` = '%s' AND `uid` = %d LIMIT 1",
-			DBA::escape($guid),
-			intval($importer["uid"])
-		);
-		if (DBA::isResult($r)) {
+		if (DBA::exists('mail', ['guid' => $guid, 'uid' => $importer["uid"]])) {
 			logger("duplicate message already delivered.", LOGGER_DEBUG);
 			return false;
 		}
@@ -2281,7 +2249,7 @@ class Diaspora
 
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
 
-		$gcontact = ["url" => $contact["url"], "network" => NETWORK_DIASPORA, "generation" => 2,
+		$gcontact = ["url" => $contact["url"], "network" => Protocol::DIASPORA, "generation" => 2,
 					"photo" => $image_url, "name" => $name, "location" => $location,
 					"about" => $about, "birthday" => $birthday, "gender" => $gender,
 					"addr" => $author, "nick" => $nick, "keywords" => $keywords,
@@ -2362,10 +2330,10 @@ class Diaspora
 				// If we are now friends, we are sending a share message.
 				// Normally we needn't to do so, but the first message could have been vanished.
 				if (in_array($contact["rel"], [Contact::FRIEND])) {
-					$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval($importer["uid"]));
-					if ($u) {
+					$user = DBA::selectFirst('user', [], ['uid' => $importer["uid"]]);
+					if (DBA::isResult($user)) {
 						logger("Sending share message to author ".$author." - Contact: ".$contact["id"]." - User: ".$importer["uid"], LOGGER_DEBUG);
-						$ret = self::sendShare($u[0], $contact);
+						$ret = self::sendShare($user, $contact);
 					}
 				}
 				return true;
@@ -2392,7 +2360,7 @@ class Diaspora
 
 		$ret = self::personByHandle($author);
 
-		if (!$ret || ($ret["network"] != NETWORK_DIASPORA)) {
+		if (!$ret || ($ret["network"] != Protocol::DIASPORA)) {
 			logger("Cannot resolve diaspora handle ".$author." for ".$recipient);
 			return false;
 		}
@@ -2484,10 +2452,10 @@ class Diaspora
 				intval($contact_record["id"])
 			);
 
-			$u = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", intval($importer["uid"]));
-			if ($u) {
+			$user = DBA::selectFirst('user', [], ['uid' => $importer["uid"]]);
+			if (DBA::isResult($user)) {
 				logger("Sending share message (Relation: ".$new_relation.") to author ".$author." - Contact: ".$contact_record["id"]." - User: ".$importer["uid"], LOGGER_DEBUG);
-				$ret = self::sendShare($u[0], $contact_record);
+				$ret = self::sendShare($user, $contact_record);
 
 				// Send the profile data, maybe it weren't transmitted before
 				self::sendProfile($importer["uid"], [$contact_record]);
@@ -2617,7 +2585,7 @@ class Diaspora
 
 		$datarray["uid"] = $importer["uid"];
 		$datarray["contact-id"] = $contact["id"];
-		$datarray["network"]  = NETWORK_DIASPORA;
+		$datarray["network"]  = Protocol::DIASPORA;
 
 		$datarray["author-link"] = $contact["url"];
 		$datarray["author-id"] = Contact::getIdForURL($contact["url"], 0);
@@ -2845,7 +2813,7 @@ class Diaspora
 
 		$datarray["uid"] = $importer["uid"];
 		$datarray["contact-id"] = $contact["id"];
-		$datarray["network"] = NETWORK_DIASPORA;
+		$datarray["network"] = Protocol::DIASPORA;
 
 		$datarray["author-link"] = $contact["url"];
 		$datarray["author-id"] = Contact::getIdForURL($contact["url"], 0);
@@ -3110,7 +3078,7 @@ class Diaspora
 			if (!$no_queue && ($contact['contact-type'] != Contact::ACCOUNT_TYPE_RELAY)) {
 				logger("queue message");
 				// queue message for redelivery
-				Queue::add($contact["id"], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
+				Queue::add($contact["id"], Protocol::DIASPORA, $envelope, $public_batch, $guid);
 			}
 
 			// The message could not be delivered. We mark the contact as "dead"
@@ -3167,7 +3135,7 @@ class Diaspora
 		$envelope = self::buildMessage($msg, $owner, $contact, $owner['uprvkey'], $contact['pubkey'], $public_batch);
 
 		if ($spool) {
-			Queue::add($contact['id'], NETWORK_DIASPORA, $envelope, $public_batch, $guid);
+			Queue::add($contact['id'], Protocol::DIASPORA, $envelope, $public_batch, $guid);
 			return true;
 		} else {
 			$return_code = self::transmit($owner, $contact, $envelope, $public_batch, false, $guid);
@@ -3358,7 +3326,7 @@ class Diaspora
 		}
 
 		if (($guid != "") && $complete) {
-			$condition = ['guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
+			$condition = ['guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 			$item = Item::selectFirst(['contact-id'], $condition);
 			if (DBA::isResult($item)) {
 				$ret= [];
@@ -3829,18 +3797,12 @@ class Diaspora
 		logger("Got relayable data ".$type." for item ".$item["guid"]." (".$item["id"].")", LOGGER_DEBUG);
 
 		// fetch the original signature
-
-		$r = q(
-			"SELECT `signed_text`, `signature`, `signer` FROM `sign` WHERE `iid` = %d LIMIT 1",
-			intval($item["id"])
-		);
-
-		if (!$r) {
+		$fields = ['signed_text', 'signature', 'signer'];
+		$signature = DBA::selectFirst('sign', $fields, ['iid' => $item["id"]]);
+		if (!DBA::isResult($signature)) {
 			logger("Couldn't fetch signatur for item ".$item["guid"]." (".$item["id"].")", LOGGER_DEBUG);
 			return false;
 		}
-
-		$signature = $r[0];
 
 		// Old way - is used by the internal Friendica functions
 		/// @todo Change all signatur storing functions to the new format
@@ -3922,17 +3884,11 @@ class Diaspora
 	{
 		$myaddr = self::myHandle($owner);
 
-		$r = q(
-			"SELECT * FROM `conv` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($item["convid"]),
-			intval($item["uid"])
-		);
-
-		if (!DBA::isResult($r)) {
+		$cnv = DBA::selectFirst('conv', [], ['id' => $item["convid"], 'uid' => $item["uid"]]);
+		if (!DBA::isResult($cnv)) {
 			logger("conversation not found.");
 			return;
 		}
-		$cnv = $r[0];
 
 		$conv = [
 			"author" => $cnv["creator"],
@@ -4133,7 +4089,7 @@ class Diaspora
 			$recips = q(
 				"SELECT `id`,`name`,`network`,`pubkey`,`notify` FROM `contact` WHERE `network` = '%s'
 				AND `uid` = %d AND `rel` != %d",
-				DBA::escape(NETWORK_DIASPORA),
+				DBA::escape(Protocol::DIASPORA),
 				intval($uid),
 				intval(Contact::SHARING)
 			);
@@ -4167,12 +4123,12 @@ class Diaspora
 			return false;
 		}
 
-		$r = q("SELECT `prvkey` FROM `user` WHERE `uid` = %d LIMIT 1", intval($contact['uid']));
-		if (!DBA::isResult($r)) {
+		$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $contact["uid"]]);
+		if (!DBA::isResult($user)) {
 			return false;
 		}
 
-		$contact["uprvkey"] = $r[0]['prvkey'];
+		$contact["uprvkey"] = $user['prvkey'];
 
 		$item = Item::selectFirst([], ['id' => $post_id]);
 		if (!DBA::isResult($item)) {

@@ -14,6 +14,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -317,7 +318,7 @@ function networkSetSeen($condition)
 		return;
 	}
 
-	$unseen = DBA::exists('item', $condition);
+	$unseen = Item::exists($condition);
 
 	if ($unseen) {
 		$r = Item::update(['unseen' => false], $condition);
@@ -417,9 +418,9 @@ function networkFlatView(App $a, $update = 0)
 			'allow_location' => $a->user['allow_location'],
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
-			'lockstate' => (((is_array($a->user) &&
-			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
-			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'lockstate' => (is_array($a->user) &&
+			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
+			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
 			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
@@ -448,7 +449,7 @@ function networkFlatView(App $a, $update = 0)
 		while ($term = DBA::fetch($result)) {
 			$posts[] = $term['oid'];
 		}
-		DBA::close($terms);
+		DBA::close($result);
 
 		$condition = ['uid' => local_user(), 'id' => $posts];
 	} else {
@@ -495,6 +496,8 @@ function networkThreadedView(App $a, $update, $parent)
 
 	$gid = 0;
 
+	$default_permissions = [];
+
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
 			if (is_a_date_arg($a->argv[$x])) {
@@ -506,7 +509,7 @@ function networkThreadedView(App $a, $update, $parent)
 				}
 			} elseif (intval($a->argv[$x])) {
 				$gid = intval($a->argv[$x]);
-				$def_acl = ['allow_gid' => '<' . $gid . '>'];
+				$default_permissions = ['allow_gid' => '<' . $gid . '>'];
 			}
 		}
 	}
@@ -521,7 +524,7 @@ function networkThreadedView(App $a, $update, $parent)
 	$nets  =        defaults($_GET, 'nets' , '');
 
 	if ($cid) {
-		$def_acl = ['allow_cid' => '<' . intval($cid) . '>'];
+		$default_permissions = ['allow_cid' => '<' . intval($cid) . '>'];
 	}
 
 	if ($nets) {
@@ -532,7 +535,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$str .= '<' . $rr['id'] . '>';
 		}
 		if (strlen($str)) {
-			$def_acl = ['allow_cid' => $str];
+			$default_permissions = ['allow_cid' => $str];
 		}
 	}
 
@@ -571,11 +574,11 @@ function networkThreadedView(App $a, $update, $parent)
 			'allow_location' => $a->user['allow_location'],
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
-			'lockstate' => ((($gid) || ($cid) || ($nets) || (is_array($a->user) &&
-			((strlen($a->user['allow_cid'])) || (strlen($a->user['allow_gid'])) ||
-			(strlen($a->user['deny_cid'])) || (strlen($a->user['deny_gid']))))) ? 'lock' : 'unlock'),
+			'lockstate' => ($gid || $cid || $nets || (is_array($a->user) &&
+			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
+			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid']))) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
-			'acl' => ACL::getFullSelectorHTML((($gid || $cid || $nets) ? $def_acl : $a->user), true),
+			'acl' => ACL::getFullSelectorHTML($a->user, true, $default_permissions),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -664,7 +667,7 @@ function networkThreadedView(App $a, $update, $parent)
 				'id' => 'network',
 			]) . $o;
 
-			if ($contact['network'] === NETWORK_OSTATUS && $contact['writable'] && !PConfig::get(local_user(),'system','nowarn_insecure')) {
+			if ($contact['network'] === Protocol::OSTATUS && $contact['writable'] && !PConfig::get(local_user(),'system','nowarn_insecure')) {
 				notice(L10n::t('Private messages to this person are at risk of public disclosure.') . EOL);
 			}
 		} else {
@@ -768,7 +771,7 @@ function networkThreadedView(App $a, $update, $parent)
 			FROM `item` $sql_post_table
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `item`.`contact-id`
 				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
-				AND (`item`.`parent-uri` != `item`.`uri`
+				AND (`item`.`gravity` != %d
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
 			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
@@ -777,6 +780,7 @@ function networkThreadedView(App $a, $update, $parent)
 			AND NOT `item`.`moderated` AND $sql_extra4
 			$sql_extra3 $sql_extra $sql_range $sql_nets
 			ORDER BY `order_date` DESC LIMIT 100",
+			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
 			intval(local_user()),
@@ -788,7 +792,7 @@ function networkThreadedView(App $a, $update, $parent)
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `thread`.`contact-id`
 				AND (NOT `contact`.`blocked` OR `contact`.`pending`)
 			STRAIGHT_JOIN `item` ON `item`.`id` = `thread`.`iid`
-				AND (`item`.`parent-uri` != `item`.`uri`
+				AND (`item`.`gravity` != %d
 					OR `contact`.`uid` = `item`.`uid` AND `contact`.`self`
 					OR `contact`.`rel` IN (%d, %d) AND NOT `contact`.`readonly`)
 			LEFT JOIN `user-item` ON `user-item`.`iid` = `item`.`id` AND `user-item`.`uid` = %d
@@ -797,6 +801,7 @@ function networkThreadedView(App $a, $update, $parent)
 			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
 			$sql_extra2 $sql_extra3 $sql_range $sql_extra $sql_nets
 			ORDER BY `order_date` DESC $pager_sql",
+			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
 			intval(local_user()),
@@ -805,7 +810,7 @@ function networkThreadedView(App $a, $update, $parent)
 	}
 
 	// Only show it when unfiltered (no groups, no networks, ...)
-	if (in_array($nets, ['', NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS]) && (strlen($sql_extra . $sql_extra2 . $sql_extra3) == 0)) {
+	if (in_array($nets, ['', Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]) && (strlen($sql_extra . $sql_extra2 . $sql_extra3) == 0)) {
 		if (DBA::isResult($r)) {
 			$top_limit = current($r)['order_date'];
 			$bottom_limit = end($r)['order_date'];

@@ -7,6 +7,7 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -188,11 +189,11 @@ class Cron
 					AND `contact`.`network` IN ('%s', '%s', '%s', '%s', '%s') $sql_extra
 					AND NOT `contact`.`self` AND NOT `contact`.`blocked`
 				WHERE NOT `user`.`account_expired` AND NOT `user`.`account_removed` $abandon_sql",
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_OSTATUS),
-			DBA::escape(NETWORK_DIASPORA),
-			DBA::escape(NETWORK_FEED),
-			DBA::escape(NETWORK_MAIL)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::OSTATUS),
+			DBA::escape(Protocol::DIASPORA),
+			DBA::escape(Protocol::FEED),
+			DBA::escape(Protocol::MAIL)
 		);
 
 		if (!DBA::isResult($contacts)) {
@@ -206,11 +207,11 @@ class Cron
 			}
 
 			// Friendica and OStatus are checked once a day
-			if (in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS])) {
+			if (in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS])) {
 				$contact['priority'] = 2;
 			}
 
-			if ($contact['subhub'] && in_array($contact['network'], [NETWORK_DFRN, NETWORK_OSTATUS])) {
+			if ($contact['subhub'] && in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS])) {
 				/*
 				 * We should be getting everything via a hub. But just to be sure, let's check once a day.
 				 * (You can make this more or less frequent if desired by setting 'pushpoll_frequency' appropriately)
@@ -222,7 +223,7 @@ class Cron
 			}
 
 			// Check Diaspora contacts or followers once a week
-			if (($contact["network"] == NETWORK_DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
+			if (($contact["network"] == Protocol::DIASPORA) || ($contact["rel"] == Contact::FOLLOWER)) {
 				$contact['priority'] = 4;
 			}
 
@@ -277,7 +278,7 @@ class Cron
 				}
 			}
 
-			if (($contact['network'] == NETWORK_FEED) && ($contact['priority'] <= 3)) {
+			if (($contact['network'] == Protocol::FEED) && ($contact['priority'] <= 3)) {
 				$priority = PRIORITY_MEDIUM;
 			} elseif ($contact['archive']) {
 				$priority = PRIORITY_NEGLIGIBLE;

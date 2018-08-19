@@ -12,6 +12,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -755,9 +756,9 @@ function contact_block() {
 				AND NOT `pending` AND NOT `hidden` AND NOT `archive`
 				AND `network` IN ('%s', '%s', '%s')",
 			intval($a->profile['uid']),
-			DBA::escape(NETWORK_DFRN),
-			DBA::escape(NETWORK_OSTATUS),
-			DBA::escape(NETWORK_DIASPORA)
+			DBA::escape(Protocol::DFRN),
+			DBA::escape(Protocol::OSTATUS),
+			DBA::escape(Protocol::DIASPORA)
 	);
 	if (DBA::isResult($r)) {
 		$total = intval($r[0]['total']);
@@ -773,9 +774,9 @@ function contact_block() {
 					AND `network` IN ('%s', '%s', '%s')
 				ORDER BY RAND() LIMIT %d",
 				intval($a->profile['uid']),
-				DBA::escape(NETWORK_DFRN),
-				DBA::escape(NETWORK_OSTATUS),
-				DBA::escape(NETWORK_DIASPORA),
+				DBA::escape(Protocol::DFRN),
+				DBA::escape(Protocol::OSTATUS),
+				DBA::escape(Protocol::DIASPORA),
 				intval($shown)
 		);
 		if (DBA::isResult($r)) {
@@ -1039,7 +1040,7 @@ function redir_private_images($a, &$item)
 				continue;
 			}
 
-			if ((local_user() == $item['uid']) && ($item['private'] == 1) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == NETWORK_DFRN)) {
+			if ((local_user() == $item['uid']) && ($item['private'] == 1) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == Protocol::DFRN)) {
 				$img_url = 'redir?f=1&quiet=1&url=' . urlencode($mtch[1]) . '&conurl=' . urlencode($item['author-link']);
 				$item['body'] = str_replace($mtch[0], '[img]' . $img_url . '[/img]', $item['body']);
 			}
@@ -1457,26 +1458,6 @@ function return_bytes($size_str) {
 		default: return $size_str;
 	}
 }
-
-
-/**
- * @return string
- */
-function generate_user_guid() {
-	$found = true;
-	do {
-		$guid = System::createGUID(32);
-		$x = q("SELECT `uid` FROM `user` WHERE `guid` = '%s' LIMIT 1",
-			DBA::escape($guid)
-		);
-		if (!DBA::isResult($x)) {
-			$found = false;
-		}
-	} while ($found == true);
-
-	return $guid;
-}
-
 
 /**
  * @param string $s

@@ -6,6 +6,7 @@ namespace Friendica\Content;
 
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 
 /**
@@ -74,21 +75,21 @@ class ContactSelector
 	public static function networkToName($s, $profile = "")
 	{
 		$nets = [
-			NETWORK_DFRN     => L10n::t('Friendica'),
-			NETWORK_OSTATUS  => L10n::t('OStatus'),
-			NETWORK_FEED     => L10n::t('RSS/Atom'),
-			NETWORK_MAIL     => L10n::t('Email'),
-			NETWORK_DIASPORA => L10n::t('Diaspora'),
-			NETWORK_ZOT      => L10n::t('Zot!'),
-			NETWORK_LINKEDIN => L10n::t('LinkedIn'),
-			NETWORK_XMPP     => L10n::t('XMPP/IM'),
-			NETWORK_MYSPACE  => L10n::t('MySpace'),
-			NETWORK_GPLUS    => L10n::t('Google+'),
-			NETWORK_PUMPIO   => L10n::t('pump.io'),
-			NETWORK_TWITTER  => L10n::t('Twitter'),
-			NETWORK_DIASPORA2 => L10n::t('Diaspora Connector'),
-			NETWORK_STATUSNET => L10n::t('GNU Social Connector'),
-			NETWORK_PNUT      => L10n::t('pnut')
+			Protocol::DFRN      => L10n::t('Friendica'),
+			Protocol::OSTATUS   => L10n::t('OStatus'),
+			Protocol::FEED      => L10n::t('RSS/Atom'),
+			Protocol::MAIL      => L10n::t('Email'),
+			Protocol::DIASPORA  => L10n::t('Diaspora'),
+			Protocol::ZOT       => L10n::t('Zot!'),
+			Protocol::LINKEDIN  => L10n::t('LinkedIn'),
+			Protocol::XMPP      => L10n::t('XMPP/IM'),
+			Protocol::MYSPACE   => L10n::t('MySpace'),
+			Protocol::GPLUS     => L10n::t('Google+'),
+			Protocol::PUMPIO    => L10n::t('pump.io'),
+			Protocol::TWITTER   => L10n::t('Twitter'),
+			Protocol::DIASPORA2 => L10n::t('Diaspora Connector'),
+			Protocol::STATUSNET => L10n::t('GNU Social Connector'),
+			Protocol::PNUT      => L10n::t('pnut'),
 		];
 
 		Addon::callHooks('network_to_name', $nets);
@@ -98,7 +99,7 @@ class ContactSelector
 
 		$networkname = str_replace($search, $replace, $s);
 
-		if ((in_array($s, [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) && ($profile != "")) {
+		if ((in_array($s, [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) && ($profile != "")) {
 			$r = DBA::fetchFirst("SELECT `gserver`.`platform` FROM `gcontact`
 					INNER JOIN `gserver` ON `gserver`.`nurl` = `gcontact`.`server_url`
 					WHERE `gcontact`.`nurl` = ? AND `platform` != ''", normalise_link($profile));

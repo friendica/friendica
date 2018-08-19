@@ -180,62 +180,31 @@ define('CP_USERS_AND_GLOBAL',       2);
  */
 
 /**
- * @name Network constants
- * @deprecated since version 3.6
- * @see Protocol
- *
- * Network and protocol family types
- * @{
- */
-define('NETWORK_DFRN'     , Protocol::DFRN);      // Friendica, Mistpark, other DFRN implementations
-define('NETWORK_ZOT'      , Protocol::ZOT);       // Zot! - Currently unsupported
-define('NETWORK_OSTATUS'  , Protocol::OSTATUS);   // GNU-social, Pleroma, Mastodon, other OStatus implementations
-define('NETWORK_FEED'     , Protocol::FEED);      // RSS/Atom feeds with no known "post/notify" protocol
-define('NETWORK_DIASPORA' , Protocol::DIASPORA);  // Diaspora
-define('NETWORK_MAIL'     , Protocol::MAIL);      // IMAP/POP
-define('NETWORK_FACEBOOK' , Protocol::FACEBOOK);  // Facebook API
-define('NETWORK_LINKEDIN' , Protocol::LINKEDIN);  // LinkedIn
-define('NETWORK_XMPP'     , Protocol::XMPP);      // XMPP - Currently unsupported
-define('NETWORK_MYSPACE'  , Protocol::MYSPACE);   // MySpace - Currently unsupported
-define('NETWORK_GPLUS'    , Protocol::GPLUS);     // Google+
-define('NETWORK_PUMPIO'   , Protocol::PUMPIO);    // pump.io
-define('NETWORK_TWITTER'  , Protocol::TWITTER);   // Twitter
-define('NETWORK_DIASPORA2', Protocol::DIASPORA2); // Diaspora connector
-define('NETWORK_STATUSNET', Protocol::STATUSNET); // Statusnet connector
-define('NETWORK_NEWS'     , Protocol::NEWS);      // Network News Transfer Protocol - Currently unsupported
-define('NETWORK_ICALENDAR', Protocol::ICALENDAR); // iCalendar - Currently unsupported
-define('NETWORK_PNUT'     , Protocol::PNUT);      // pnut.io - Currently unsupported
-define('NETWORK_PHANTOM'  , Protocol::PHANTOM);   // Place holder
-/**
- * @}
- */
-
-/**
  * These numbers are used in stored permissions
  * and existing allocations MUST NEVER BE CHANGED
  * OR RE-ASSIGNED! You may only add to them.
  */
 $netgroup_ids = [
-	NETWORK_DFRN     => (-1),
-	NETWORK_ZOT      => (-2),
-	NETWORK_OSTATUS  => (-3),
-	NETWORK_FEED     => (-4),
-	NETWORK_DIASPORA => (-5),
-	NETWORK_MAIL     => (-6),
-	NETWORK_FACEBOOK => (-8),
-	NETWORK_LINKEDIN => (-9),
-	NETWORK_XMPP     => (-10),
-	NETWORK_MYSPACE  => (-11),
-	NETWORK_GPLUS    => (-12),
-	NETWORK_PUMPIO   => (-13),
-	NETWORK_TWITTER  => (-14),
-	NETWORK_DIASPORA2 => (-15),
-	NETWORK_STATUSNET => (-16),
-	NETWORK_NEWS      => (-18),
-	NETWORK_ICALENDAR => (-19),
-	NETWORK_PNUT      => (-20),
+	Protocol::DFRN     => (-1),
+	Protocol::ZOT      => (-2),
+	Protocol::OSTATUS  => (-3),
+	Protocol::FEED     => (-4),
+	Protocol::DIASPORA => (-5),
+	Protocol::MAIL     => (-6),
+	Protocol::FACEBOOK => (-8),
+	Protocol::LINKEDIN => (-9),
+	Protocol::XMPP     => (-10),
+	Protocol::MYSPACE  => (-11),
+	Protocol::GPLUS    => (-12),
+	Protocol::PUMPIO   => (-13),
+	Protocol::TWITTER  => (-14),
+	Protocol::DIASPORA2 => (-15),
+	Protocol::STATUSNET => (-16),
+	Protocol::NEWS      => (-18),
+	Protocol::ICALENDAR => (-19),
+	Protocol::PNUT      => (-20),
 
-	NETWORK_PHANTOM  => (-127),
+	Protocol::PHANTOM  => (-127),
 ];
 
 /**
@@ -914,13 +883,9 @@ function feed_birthday($uid, $tz)
 		$tz = 'UTC';
 	}
 
-	$p = q(
-		"SELECT `dob` FROM `profile` WHERE `is-default` = 1 AND `uid` = %d LIMIT 1",
-		intval($uid)
-	);
-
-	if (DBA::isResult($p)) {
-		$tmp_dob = substr($p[0]['dob'], 5);
+	$profile = DBA::selectFirst('profile', ['dob'], ['is-default' => true, 'uid' => $uid]);
+	if (DBA::isResult($profile)) {
+		$tmp_dob = substr($profile['dob'], 5);
 		if (intval($tmp_dob)) {
 			$y = DateTimeFormat::timezoneNow($tz, 'Y');
 			$bd = $y . '-' . $tmp_dob . ' 00:00';

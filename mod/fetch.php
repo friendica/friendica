@@ -5,6 +5,7 @@ This file is part of the Diaspora protocol. It is used for fetching single publi
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Protocol\Diaspora;
 use Friendica\Model\Item;
@@ -25,10 +26,10 @@ function fetch_init(App $a)
 	// Fetch the item
 	$fields = ['uid', 'title', 'body', 'guid', 'contact-id', 'private', 'created', 'app', 'location', 'coord', 'network',
 		'event-id', 'resource-id', 'author-link', 'owner-link', 'attach'];
-	$condition = ['wall' => true, 'private' => false, 'guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
+	$condition = ['wall' => true, 'private' => false, 'guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 	$item = Item::selectFirst($fields, $condition);
 	if (!DBA::isResult($item)) {
-		$condition = ['guid' => $guid, 'network' => [NETWORK_DFRN, NETWORK_DIASPORA]];
+		$condition = ['guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 		$item = Item::selectFirst(['author-link'], $condition);
 		if (DBA::isResult($item)) {
 			$parts = parse_url($item["author-link"]);

@@ -20,6 +20,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -136,13 +137,13 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		$dfrn_confirm = $contact['confirm'];
 		$aes_allow    = $contact['aes_allow'];
 
-		$network = ((strlen($contact['issued-id'])) ? NETWORK_DFRN : NETWORK_OSTATUS);
+		$network = ((strlen($contact['issued-id'])) ? Protocol::DFRN : Protocol::OSTATUS);
 
 		if ($contact['network']) {
 			$network = $contact['network'];
 		}
 
-		if ($network === NETWORK_DFRN) {
+		if ($network === Protocol::DFRN) {
 			/*
 			 * Generate a key pair for all further communications with this person.
 			 * We have a keypair for every contact, and a site key for unknown people.
@@ -246,6 +247,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			if (stristr($res, "<status") === false) {
 				// wrong xml! stop here!
+				logger('Unexpected response posting to ' . $dfrn_confirm);
 				notice(L10n::t('Unexpected response from remote site: ') . EOL . htmlspecialchars($res) . EOL);
 				return;
 			}
@@ -304,7 +306,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		logger('dfrn_confirm: confirm - imported photos');
 
-		if ($network === NETWORK_DFRN) {
+		if ($network === Protocol::DFRN) {
 			$new_relation = Contact::FOLLOWER;
 			if (($relation == Contact::SHARING) || ($duplex)) {
 				$new_relation = Contact::FRIEND;
@@ -328,12 +330,12 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				DBA::escape(DateTimeFormat::utcNow()),
 				intval($duplex),
 				intval($hidden),
-				DBA::escape(NETWORK_DFRN),
+				DBA::escape(Protocol::DFRN),
 				intval($contact_id)
 			);
 		} else {
-			// $network !== NETWORK_DFRN
-			$network = defaults($contact, 'network', NETWORK_OSTATUS);
+			// $network !== Protocol::DFRN
+			$network = defaults($contact, 'network', Protocol::OSTATUS);
 
 			$arr = Probe::uri($contact['url']);
 
@@ -345,7 +347,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$new_relation = $contact['rel'];
 			$writable = $contact['writable'];
 
-			if ($network === NETWORK_DIASPORA) {
+			if ($network === Protocol::DIASPORA) {
 				if ($duplex) {
 					$new_relation = Contact::FRIEND;
 				} else {
@@ -392,7 +394,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// reload contact info
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		if ((isset($new_relation) && $new_relation == Contact::FRIEND)) {
-			if (DBA::isResult($contact) && ($contact['network'] === NETWORK_DIASPORA)) {
+			if (DBA::isResult($contact) && ($contact['network'] === Protocol::DIASPORA)) {
 				$ret = Diaspora::sendShare($user, $contact);
 				logger('share returns: ' . $ret);
 			}
@@ -573,7 +575,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			intval($duplex),
 			intval($forum),
 			intval($prv),
-			DBA::escape(NETWORK_DFRN),
+			DBA::escape(Protocol::DFRN),
 			intval($dfrn_record)
 		);
 		if (!DBA::isResult($r)) {	// indicates schema is messed up or total db failure

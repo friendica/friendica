@@ -94,7 +94,7 @@ function display_init(App $a)
 			if (DBA::isResult($profile)) {
 				$profiledata = $profile;
 			}
-			$profiledata["network"] = NETWORK_DFRN;
+			$profiledata["network"] = Protocol::DFRN;
 		} else {
 			$profiledata = [];
 		}
@@ -177,10 +177,10 @@ function display_fetchauthor($a, $item)
 	$profiledata["photo"] = System::removedBaseUrl($profiledata["photo"]);
 
 	if (local_user()) {
-		if (in_array($profiledata["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+		if (in_array($profiledata["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 			$profiledata["remoteconnect"] = System::baseUrl()."/follow?url=".urlencode($profiledata["url"]);
 		}
-	} elseif ($profiledata["network"] == NETWORK_DFRN) {
+	} elseif ($profiledata["network"] == Protocol::DFRN) {
 		$connect = str_replace("/profile/", "/dfrn_request/", $profiledata["url"]);
 		$profiledata["remoteconnect"] = $connect;
 	}
@@ -247,7 +247,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	}
 
 	// We are displaying an "alternate" link if that post was public. See issue 2864
-	$is_public = DBA::exists('item', ['id' => $item_id, 'private' => [0, 2]]);
+	$is_public = Item::exists(['id' => $item_id, 'private' => [0, 2]]);
 	if ($is_public) {
 		// For the atom feed the nickname doesn't matter at all, we only need the item id.
 		$alternate = System::baseUrl().'/display/feed-item/'.$item_id.'.atom';
@@ -324,7 +324,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 
 	if (local_user() && (local_user() == $a->profile['uid'])) {
 		$condition = ['parent-uri' => $item_parent_uri, 'uid' => local_user(), 'unseen' => true];
-		$unseen = DBA::exists('item', $condition);
+		$unseen = Item::exists($condition);
 	} else {
 		$unseen = false;
 	}

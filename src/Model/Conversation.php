@@ -5,6 +5,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
@@ -32,8 +33,8 @@ class Conversation
 	 */
 	public static function insert(array $arr)
 	{
-		if (in_array(defaults($arr, 'network', NETWORK_PHANTOM),
-				[NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, NETWORK_TWITTER]) && !empty($arr['uri'])) {
+		if (in_array(defaults($arr, 'network', Protocol::PHANTOM),
+				[Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, Protocol::TWITTER]) && !empty($arr['uri'])) {
 			$conversation = ['item-uri' => $arr['uri'], 'received' => DateTimeFormat::utcNow()];
 
 			if (isset($arr['parent-uri']) && ($arr['parent-uri'] != $arr['uri'])) {

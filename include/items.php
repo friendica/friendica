@@ -9,6 +9,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -240,7 +241,7 @@ function add_page_info_to_body($body, $texturl = false, $no_photos = false)
  */
 function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0, $pass = 0)
 {
-	if ($contact['network'] === NETWORK_OSTATUS) {
+	if ($contact['network'] === Protocol::OSTATUS) {
 		if ($pass < 2) {
 			// Test - remove before flight
 			//$tempfile = tempnam(get_temppath(), "ostatus2");
@@ -252,7 +253,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 		return;
 	}
 
-	if ($contact['network'] === NETWORK_FEED) {
+	if ($contact['network'] === Protocol::FEED) {
 		if ($pass < 2) {
 			logger("Consume feeds", LOGGER_DEBUG);
 			Feed::import($xml, $importer, $contact, $hub);
@@ -261,25 +262,12 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 		return;
 	}
 
-	if ($contact['network'] === NETWORK_DFRN) {
+	if ($contact['network'] === Protocol::DFRN) {
 		logger("Consume DFRN messages", LOGGER_DEBUG);
-
-		$r = q("SELECT `contact`.*, `contact`.`uid` AS `importer_uid`,
-					`contact`.`pubkey` AS `cpubkey`,
-					`contact`.`prvkey` AS `cprvkey`,
-					`contact`.`thumb` AS `thumb`,
-					`contact`.`url` as `url`,
-					`contact`.`name` as `senderName`,
-					`user`.*
-			FROM `contact`
-			LEFT JOIN `user` ON `contact`.`uid` = `user`.`uid`
-			WHERE `contact`.`id` = %d AND `user`.`uid` = %d",
-			DBA::escape($contact["id"]), DBA::escape($importer["uid"])
-		);
-
-		if (DBA::isResult($r)) {
+		$dfrn_importer = DFRN::getImporter($contact["id"], $importer["uid"]);
+		if (!empty($dfrn_importer)) {
 			logger("Now import the DFRN feed");
-			DFRN::import($xml, $r[0], true);
+			DFRN::import($xml, $dfrn_importer, true);
 			return;
 		}
 	}
@@ -287,25 +275,30 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 
 function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'subscribe')
 {
-	$a = BaseObject::getApp();
-	$r = null;
-
-	if (!empty($importer)) {
-		$r = q("SELECT `nickname` FROM `user` WHERE `uid` = %d LIMIT 1",
-			intval($importer['uid'])
-		);
-	}
-
 	/*
 	 * Diaspora has different message-ids in feeds than they do
 	 * through the direct Diaspora protocol. If we try and use
 	 * the feed, we'll get duplicates. So don't.
 	 */
-	if ((!DBA::isResult($r)) || $contact['network'] === NETWORK_DIASPORA) {
+	if ($contact['network'] === Protocol::DIASPORA) {
 		return;
 	}
 
-	$push_url = System::baseUrl() . '/pubsub/' . $r[0]['nickname'] . '/' . $contact['id'];
+	// Without an importer we don't have a user id - so we quit
+	if (empty($importer)) {
+		return;
+	}
+
+	$a = BaseObject::getApp();
+
+	$user = DBA::selectFirst('user', ['nickname'], ['uid' => $importer['uid']]);
+
+	// No user, no nickname, we quit
+	if (!DBA::isResult($user)) {
+		return;
+	}
+
+	$push_url = System::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
 
 	// Use a single verify token, even if multiple hubs
 	$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : random_string());

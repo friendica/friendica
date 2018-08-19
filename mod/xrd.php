@@ -12,6 +12,10 @@ use Friendica\Protocol\Salmon;
 function xrd_init(App $a)
 {
 	if ($a->argv[0] == 'xrd') {
+		if (empty($_GET['uri'])) {
+			killme();
+		}
+
 		$uri = urldecode(notags(trim($_GET['uri'])));
 		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/jrd+json') {
 			$mode = 'json';
@@ -19,6 +23,10 @@ function xrd_init(App $a)
 			$mode = 'xml';
 		}
 	} else {
+		if (empty($_GET['resource'])) {
+			killme();
+		}
+
 		$uri = urldecode(notags(trim($_GET['resource'])));
 		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/xrd+xml') {
 			$mode = 'xml';

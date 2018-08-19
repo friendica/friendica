@@ -12,6 +12,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Lock;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -79,7 +80,7 @@ class Item extends BaseObject
 	// All fields in the item table
 	const ITEM_FIELDLIST = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
 			'contact-id', 'type', 'wall', 'gravity', 'extid', 'icid', 'iaid', 'psid',
-			'created', 'edited', 'commented', 'received', 'changed', 'verb',
+			'uri-hash', 'created', 'edited', 'commented', 'received', 'changed', 'verb',
 			'postopts', 'plink', 'resource-id', 'event-id', 'tag', 'attach', 'inform',
 			'file', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'post-type',
 			'private', 'pubmail', 'moderated', 'visible', 'starred', 'bookmark',
@@ -110,7 +111,7 @@ class Item extends BaseObject
 	 * @param string $activity activity string
 	 * @return integer Activity index
 	 */
-	private static function activityToIndex($activity)
+	public static function activityToIndex($activity)
 	{
 		$index = array_search($activity, self::ACTIVITIES);
 
@@ -175,7 +176,7 @@ class Item extends BaseObject
 
 		// We can always comment on posts from these networks
 		if (array_key_exists('writable', $row) &&
-			in_array($row['internal-network'], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS])) {
+			in_array($row['internal-network'], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 			$row['writable'] = true;
 		}
 
@@ -523,7 +524,7 @@ class Item extends BaseObject
 
 		$fields['item'] = ['id', 'uid', 'parent', 'uri', 'parent-uri', 'thr-parent', 'guid',
 			'contact-id', 'owner-id', 'author-id', 'type', 'wall', 'gravity', 'extid',
-			'created', 'edited', 'commented', 'received', 'changed', 'psid',
+			'created', 'edited', 'commented', 'received', 'changed', 'psid', 'uri-hash',
 			'resource-id', 'event-id', 'tag', 'attach', 'post-type', 'file',
 			'private', 'pubmail', 'moderated', 'visible', 'starred', 'bookmark',
 			'unseen', 'deleted', 'origin', 'forum_mode', 'mention', 'global',
@@ -949,8 +950,8 @@ class Item extends BaseObject
 	 */
 	public static function delete($condition, $priority = PRIORITY_HIGH)
 	{
-		$items = DBA::select('item', ['id'], $condition);
-		while ($item = DBA::fetch($items)) {
+		$items = self::select(['id'], $condition);
+		while ($item = self::fetch($items)) {
 			self::deleteById($item['id'], $priority);
 		}
 		DBA::close($items);
@@ -968,8 +969,8 @@ class Item extends BaseObject
 			return;
 		}
 
-		$items = DBA::select('item', ['id', 'uid'], $condition);
-		while ($item = DBA::fetch($items)) {
+		$items = self::select(['id', 'uid'], $condition);
+		while ($item = self::fetch($items)) {
 			// "Deleting" global items just means hiding them
 			if ($item['uid'] == 0) {
 				DBA::update('user-item', ['hidden' => true], ['iid' => $item['id'], 'uid' => $uid], true);
@@ -1072,15 +1073,15 @@ class Item extends BaseObject
 
 		DBA::delete('item-delivery-data', ['iid' => $item['id']]);
 
-		if (!empty($item['iaid']) && !DBA::exists('item', ['iaid' => $item['iaid'], 'deleted' => false])) {
+		if (!empty($item['iaid']) && !self::exists(['iaid' => $item['iaid'], 'deleted' => false])) {
 			DBA::delete('item-activity', ['id' => $item['iaid']], ['cascade' => false]);
 		}
-		if (!empty($item['icid']) && !DBA::exists('item', ['icid' => $item['icid'], 'deleted' => false])) {
+		if (!empty($item['icid']) && !self::exists(['icid' => $item['icid'], 'deleted' => false])) {
 			DBA::delete('item-content', ['id' => $item['icid']], ['cascade' => false]);
 		}
 		// When the permission set will be used in photo and events as well,
 		// this query here needs to be extended.
-		if (!empty($item['psid']) && !DBA::exists('item', ['psid' => $item['psid'], 'deleted' => false])) {
+		if (!empty($item['psid']) && !self::exists(['psid' => $item['psid'], 'deleted' => false])) {
 			DBA::delete('permissionset', ['id' => $item['psid']], ['cascade' => false]);
 		}
 
@@ -1254,7 +1255,7 @@ class Item extends BaseObject
 		if ($notify) {
 			$item['wall'] = 1;
 			$item['origin'] = 1;
-			$item['network'] = NETWORK_DFRN;
+			$item['network'] = Protocol::DFRN;
 			$item['protocol'] = Conversation::PARCEL_DFRN;
 
 			if (is_int($notify)) {
@@ -1263,7 +1264,7 @@ class Item extends BaseObject
 				$priority = PRIORITY_HIGH;
 			}
 		} else {
-			$item['network'] = trim(defaults($item, 'network', NETWORK_PHANTOM));
+			$item['network'] = trim(defaults($item, 'network', Protocol::PHANTOM));
 		}
 
 		$item['guid'] = self::guid($item, $notify);
@@ -1296,7 +1297,7 @@ class Item extends BaseObject
 
 		// Converting the plink
 		/// @TODO Check if this is really still needed
-		if ($item['network'] == NETWORK_OSTATUS) {
+		if ($item['network'] == Protocol::OSTATUS) {
 			if (isset($item['plink'])) {
 				$item['plink'] = OStatus::convertHref($item['plink']);
 			} elseif (isset($item['uri'])) {
@@ -1343,10 +1344,10 @@ class Item extends BaseObject
 		 * We have to check several networks since Friendica posts could be repeated
 		 * via OStatus (maybe Diasporsa as well)
 		 */
-		if (in_array($item['network'], [NETWORK_DIASPORA, NETWORK_DFRN, NETWORK_OSTATUS, ""])) {
+		if (in_array($item['network'], [Protocol::DIASPORA, Protocol::DFRN, Protocol::OSTATUS, ""])) {
 			$condition = ["`uri` = ? AND `uid` = ? AND `network` IN (?, ?, ?)",
 				trim($item['uri']), $item['uid'],
-				NETWORK_DIASPORA, NETWORK_DFRN, NETWORK_OSTATUS];
+				Protocol::DIASPORA, Protocol::DFRN, Protocol::OSTATUS];
 			$existing = self::selectFirst(['id', 'network'], $condition);
 			if (DBA::isResult($existing)) {
 				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
@@ -1359,7 +1360,7 @@ class Item extends BaseObject
 		}
 
 		// Ensure to always have the same creation date.
-		$existing = DBA::selectfirst('item', ['created', 'uri-hash'], ['uri' => $item['uri']]);
+		$existing = self::selectfirst(['created', 'uri-hash'], ['uri' => $item['uri']]);
 		if (DBA::isResult($existing)) {
 			$item['created'] = $existing['created'];
 			$item['uri-hash'] = $existing['uri-hash'];
@@ -1462,10 +1463,10 @@ class Item extends BaseObject
 		unset($item['owner-name']);
 		unset($item['owner-avatar']);
 
-		if ($item['network'] == NETWORK_PHANTOM) {
+		if ($item['network'] == Protocol::PHANTOM) {
 			logger('Missing network. Called by: '.System::callstack(), LOGGER_DEBUG);
 
-			$item['network'] = NETWORK_DFRN;
+			$item['network'] = Protocol::DFRN;
 			logger("Set network to " . $item["network"] . " for " . $item["uri"], LOGGER_DEBUG);
 		}
 
@@ -1588,14 +1589,14 @@ class Item extends BaseObject
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
 
 		$condition = ["`uri` = ? AND `network` IN (?, ?) AND `uid` = ?",
-			$item['uri'], $item['network'], NETWORK_DFRN, $item['uid']];
+			$item['uri'], $item['network'], Protocol::DFRN, $item['uid']];
 		if (self::exists($condition)) {
 			logger('duplicated item with the same uri found. '.print_r($item,true));
 			return 0;
 		}
 
 		// On Friendica and Diaspora the GUID is unique
-		if (in_array($item['network'], [NETWORK_DFRN, NETWORK_DIASPORA])) {
+		if (in_array($item['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
 			$condition = ['guid' => $item['guid'], 'uid' => $item['uid']];
 			if (self::exists($condition)) {
 				logger('duplicated item with the same guid found. '.print_r($item,true));
@@ -1616,7 +1617,7 @@ class Item extends BaseObject
 			$item["global"] = true;
 
 			// Set the global flag on all items if this was a global item entry
-			DBA::update('item', ['global' => true], ['uri' => $item["uri"]]);
+			self::update(['global' => true], ['uri' => $item["uri"]]);
 		} else {
 			$item["global"] = self::exists(['uid' => 0, 'uri' => $item["uri"]]);
 		}
@@ -1767,7 +1768,7 @@ class Item extends BaseObject
 		}
 
 		// Set parent id
-		DBA::update('item', ['parent' => $parent_id], ['id' => $current_post]);
+		self::update(['parent' => $parent_id], ['id' => $current_post]);
 
 		$item['id'] = $current_post;
 		$item['parent'] = $parent_id;
@@ -1775,9 +1776,9 @@ class Item extends BaseObject
 		// update the commented timestamp on the parent
 		// Only update "commented" if it is really a comment
 		if (($item['gravity'] != GRAVITY_ACTIVITY) || !Config::get("system", "like_no_comment")) {
-			DBA::update('item', ['commented' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()], ['id' => $parent_id]);
+			self::update(['commented' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()], ['id' => $parent_id]);
 		} else {
-			DBA::update('item', ['changed' => DateTimeFormat::utcNow()], ['id' => $parent_id]);
+			self::update(['changed' => DateTimeFormat::utcNow()], ['id' => $parent_id]);
 		}
 
 		if ($dsprsig) {
@@ -2044,7 +2045,7 @@ class Item extends BaseObject
 
 		// Only distribute public items from native networks
 		$condition = ['id' => $itemid, 'uid' => 0,
-			'network' => [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""],
+			'network' => [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""],
 			'visible' => true, 'deleted' => false, 'moderated' => false, 'private' => false];
 		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
 		if (!DBA::isResult($item)) {
@@ -2075,7 +2076,7 @@ class Item extends BaseObject
 
 		if ($item['uri'] != $item['parent-uri']) {
 			$parents = self::select(['uid', 'origin'], ["`uri` = ? AND `uid` != 0", $item['parent-uri']]);
-			while ($parent = DBA::fetch($parents)) {
+			while ($parent = self::fetch($parents)) {
 				$users[$parent['uid']] = $parent['uid'];
 				if ($parent['origin'] && !$origin) {
 					$origin_uid = $parent['uid'];
@@ -2166,7 +2167,7 @@ class Item extends BaseObject
 		}
 
 		// is it an entry from a connector? Only add an entry for natively connected networks
-		if (!in_array($item["network"], [NETWORK_DFRN, NETWORK_DIASPORA, NETWORK_OSTATUS, ""])) {
+		if (!in_array($item["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""])) {
 			return;
 		}
 
@@ -2256,7 +2257,7 @@ class Item extends BaseObject
 
 		// If this was a comment to a Diaspora post we don't get our comment back.
 		// This means that we have to distribute the comment by ourselves.
-		if ($origin && self::exists(['id' => $parent, 'network' => NETWORK_DIASPORA])) {
+		if ($origin && self::exists(['id' => $parent, 'network' => Protocol::DIASPORA])) {
 			self::distribute($public_shadow);
 		}
 	}
@@ -2355,7 +2356,7 @@ class Item extends BaseObject
 		$update = (!$arr['private'] && ((defaults($arr, 'author-link', '') === defaults($arr, 'owner-link', '')) || ($arr["parent-uri"] === $arr["uri"])));
 
 		// Is it a forum? Then we don't care about the rules from above
-		if (!$update && ($arr["network"] == NETWORK_DFRN) && ($arr["parent-uri"] === $arr["uri"])) {
+		if (!$update && ($arr["network"] == Protocol::DFRN) && ($arr["parent-uri"] === $arr["uri"])) {
 			if (DBA::exists('contact', ['id' => $arr['contact-id'], 'forum' => true])) {
 				$update = true;
 			}
@@ -2455,6 +2456,12 @@ class Item extends BaseObject
 		}
 	}
 
+	/**
+	 * This function is only used for the old Friendica app on Android that doesn't like paths with guid
+	 * @param string $guid item guid
+	 * @param int    $uid  user id
+	 * @return array with id and nick of the item with the given guid
+	 */
 	public static function getIdAndNickByGuid($guid, $uid = 0)
 	{
 		$nick = "";
@@ -2466,26 +2473,28 @@ class Item extends BaseObject
 
 		// Does the given user have this item?
 		if ($uid) {
-			$item = DBA::fetchFirst("SELECT `item`.`id`, `user`.`nickname` FROM `item`
-				INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
-				WHERE `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
-					AND `item`.`guid` = ? AND `item`.`uid` = ?", $guid, $uid);
+			$item = self::selectFirst(['id'], ['guid' => $guid, 'uid' => $uid]);
 			if (DBA::isResult($item)) {
-				$id = $item["id"];
-				$nick = $item["nickname"];
+				$user = DBA::selectFirst('user', ['nickname'], ['uid' => $uid]);
+				if (!DBA::isResult($user)) {
+					return;
+				}
+				$id = $item['id'];
+				$nick = $user['nickname'];
 			}
 		}
 
 		// Or is it anywhere on the server?
 		if ($nick == "") {
-			$item = DBA::fetchFirst("SELECT `item`.`id`, `user`.`nickname` FROM `item`
-				INNER JOIN `user` ON `user`.`uid` = `item`.`uid`
-				WHERE `item`.`visible` AND NOT `item`.`deleted` AND NOT `item`.`moderated`
-					AND NOT `item`.`private` AND `item`.`wall`
-					AND `item`.`guid` = ?", $guid);
+			$condition = ["`guid` = ? AND `uid` != 0", $guid];
+			$item = self::selectFirst(['id', 'uid'], $condition);
 			if (DBA::isResult($item)) {
-				$id = $item["id"];
-				$nick = $item["nickname"];
+				$user = DBA::selectFirst('user', ['nickname'], ['uid' => $item['uid']]);
+				if (!DBA::isResult($user)) {
+					return;
+				}
+				$id = $item['id'];
+				$nick = $user['nickname'];
 			}
 		}
 		return ["nick" => $nick, "id" => $id];
@@ -2573,12 +2582,13 @@ class Item extends BaseObject
 
 		$private = ($user['allow_cid'] || $user['allow_gid'] || $user['deny_cid'] || $user['deny_gid']) ? 1 : 0;
 
+		$psid = PermissionSet::fetchIDForPost($user);
+
 		$forum_mode = ($prvgroup ? 2 : 1);
 
 		$fields = ['wall' => true, 'origin' => true, 'forum_mode' => $forum_mode, 'contact-id' => $self['id'],
-			'owner-id' => $owner_id, 'owner-link' => $self['url'], 'private' => $private, 'allow_cid' => $user['allow_cid'],
-			'allow_gid' => $user['allow_gid'], 'deny_cid' => $user['deny_cid'], 'deny_gid' => $user['deny_gid']];
-		DBA::update('item', $fields, ['id' => $item_id]);
+			'owner-id' => $owner_id, 'private' => $private, 'psid' => $psid];
+		self::update($fields, ['id' => $item_id]);
 
 		self::updateThread($item_id);
 
@@ -2594,7 +2604,7 @@ class Item extends BaseObject
 		}
 
 		// Prevent the forwarding of posts that are forwarded
-		if (!empty($datarray["extid"]) && ($datarray["extid"] == NETWORK_DFRN)) {
+		if (!empty($datarray["extid"]) && ($datarray["extid"] == Protocol::DFRN)) {
 			logger('Already forwarded', LOGGER_DEBUG);
 			return false;
 		}
@@ -2611,7 +2621,7 @@ class Item extends BaseObject
 			return false;
 		}
 
-		if (($contact['network'] != NETWORK_FEED) && $datarray['private']) {
+		if (($contact['network'] != Protocol::FEED) && $datarray['private']) {
 			logger('Not public', LOGGER_DEBUG);
 			return false;
 		}
@@ -2640,13 +2650,13 @@ class Item extends BaseObject
 				unset($datarray['author-id']);
 			}
 
-			if ($contact['network'] != NETWORK_FEED) {
+			if ($contact['network'] != Protocol::FEED) {
 				$datarray["guid"] = System::createGUID(32);
 				unset($datarray["plink"]);
 				$datarray["uri"] = self::newURI($contact['uid'], $datarray["guid"]);
 				$datarray["parent-uri"] = $datarray["uri"];
 				$datarray["thr-parent"] = $datarray["uri"];
-				$datarray["extid"] = NETWORK_DFRN;
+				$datarray["extid"] = Protocol::DFRN;
 				$urlpart = parse_url($datarray2['author-link']);
 				$datarray["app"] = $urlpart["host"];
 			} else {
@@ -2654,7 +2664,7 @@ class Item extends BaseObject
 			}
 		}
 
-		if ($contact['network'] != NETWORK_FEED) {
+		if ($contact['network'] != Protocol::FEED) {
 			// Store the original post
 			$result = self::insert($datarray2, false, false);
 			logger('remote-self post original item - Contact '.$contact['url'].' return '.$result.' Item '.print_r($datarray2, true), LOGGER_DEBUG);
@@ -3076,7 +3086,7 @@ class Item extends BaseObject
 			'contact-id'    => $item_contact_id,
 			'wall'          => $item['wall'],
 			'origin'        => 1,
-			'network'       => NETWORK_DFRN,
+			'network'       => Protocol::DFRN,
 			'gravity'       => GRAVITY_ACTIVITY,
 			'parent'        => $item['id'],
 			'parent-uri'    => $item['uri'],
@@ -3173,8 +3183,7 @@ class Item extends BaseObject
 			return;
 		}
 
-		// Using dba::delete at this time could delete the associated item entries
-		$result = DBA::e("DELETE FROM `thread` WHERE `iid` = ?", $itemid);
+		$result = DBA::delete('thread', ['iid' => $itemid], ['cascade' => false]);
 
 		logger("deleteThread: Deleted thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
 

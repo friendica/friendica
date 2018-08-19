@@ -8,6 +8,7 @@ namespace Friendica\Core;
 
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
+use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -46,18 +47,21 @@ class ACL extends BaseObject
 
 		switch (defaults($options, 'networks', Protocol::PHANTOM)) {
 			case 'DFRN_ONLY':
-				$networks = [NETWORK_DFRN];
+				$networks = [Protocol::DFRN];
 				break;
+
 			case 'PRIVATE':
-				$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
+				$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA];
 				break;
+
 			case 'TWO_WAY':
 				if (!empty($a->user['prvnets'])) {
-					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA];
+					$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA];
 				} else {
-					$networks = [NETWORK_DFRN, NETWORK_MAIL, NETWORK_DIASPORA, NETWORK_OSTATUS];
+					$networks = [Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA, Protocol::OSTATUS];
 				}
 				break;
+
 			default: /// @TODO Maybe log this call?
 				break;
 		}
@@ -148,7 +152,7 @@ class ACL extends BaseObject
 		// When used for private messages, we limit correspondence to mutual DFRN/Friendica friends and the selector
 		// to one recipient. By default our selector allows multiple selects amongst all contacts.
 		$sql_extra = sprintf(" AND `rel` = %d ", intval(Contact::FRIEND));
-		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", NETWORK_DFRN, NETWORK_DIASPORA);
+		$sql_extra .= sprintf(" AND `network` IN ('%s' , '%s') ", Protocol::DFRN, Protocol::DIASPORA);
 
 		$tabindex_attr = !empty($tabindex) ? ' tabindex="' . intval($tabindex) . '"' : '';
 
@@ -247,18 +251,17 @@ class ACL extends BaseObject
 	/**
 	 * Return the full jot ACL selector HTML
 	 *
-	 * @param array $user
+	 * @param array $user                User array
+	 * @param array $default_permissions Static defaults permission array: ['allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '']
 	 * @param bool  $show_jotnets
 	 * @return string
 	 */
-	public static function getFullSelectorHTML(array $user = null, $show_jotnets = false)
+	public static function getFullSelectorHTML(array $user, $show_jotnets = false, array $default_permissions = [])
 	{
-
-		if (empty($user['uid'])) {
-			return '';
+		// Defaults user permissions
+		if (empty($default_permissions)) {
+			$default_permissions = self::getDefaultUserPermissions($user);
 		}
-
-		$perms = self::getDefaultUserPermissions($user);
 
 		$jotnets = '';
 		if ($show_jotnets) {
@@ -275,7 +278,7 @@ class ACL extends BaseObject
 				}
 			}
 
-			if (empty($user['hidewall'])) {
+			if (empty($default_permissions['hidewall'])) {
 				if ($mail_enabled) {
 					$selected = $pubmail_enabled ? ' checked="checked"' : '';
 					$jotnets .= '<div class="profile-jot-net"><input type="checkbox" name="pubmail_enable"' . $selected . ' value="1" /> ' . L10n::t("Post to Email") . '</div>';
@@ -293,10 +296,10 @@ class ACL extends BaseObject
 			'$showall' => L10n::t('Visible to everybody'),
 			'$show' => L10n::t('show'),
 			'$hide' => L10n::t('don\'t show'),
-			'$allowcid' => json_encode($perms['allow_cid']),
-			'$allowgid' => json_encode($perms['allow_gid']),
-			'$denycid' => json_encode($perms['deny_cid']),
-			'$denygid' => json_encode($perms['deny_gid']),
+			'$allowcid' => json_encode(defaults($default_permissions, 'allow_cid', '')),
+			'$allowgid' => json_encode(defaults($default_permissions, 'allow_gid', '')),
+			'$denycid' => json_encode(defaults($default_permissions, 'deny_cid', '')),
+			'$denygid' => json_encode(defaults($default_permissions, 'deny_gid', '')),
 			'$networks' => $show_jotnets,
 			'$emailcc' => L10n::t('CC: email addresses'),
 			'$emtitle' => L10n::t('Example: bob@example.com, mary@example.com'),
@@ -321,7 +324,7 @@ class ACL extends BaseObject
 	 */
 	public static function contactAutocomplete($search, $mode)
 	{
-		if ((Config::get('system', 'block_public')) && (!local_user()) && (!remote_user())) {
+		if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
 			return [];
 		}
 

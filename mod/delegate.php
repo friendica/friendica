@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
@@ -112,7 +113,7 @@ function delegate_content(App $a)
 		AND `network` = '%s' ",
 		DBA::escape(normalise_link(System::baseUrl())),
 		intval(local_user()),
-		DBA::escape(NETWORK_DFRN)
+		DBA::escape(Protocol::DFRN)
 	);
 	if (DBA::isResult($r)) {
 		$nicknames = [];

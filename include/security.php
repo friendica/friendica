@@ -299,11 +299,7 @@ function permissions_sql($owner_id, $remote_verified = false, $groups = null)
 		 */
 
 		if (!$remote_verified) {
-			$r = q("SELECT id FROM contact WHERE id = %d AND uid = %d AND blocked = 0 LIMIT 1",
-				intval($remote_user),
-				intval($owner_id)
-			);
-			if (DBA::isResult($r)) {
+			if (DBA::exists('contact', ['id' => $remote_user, 'uid' => $owner_id, 'blocked' => false])) {
 				$remote_verified = true;
 				$groups = Group::getIdsByContactId($remote_user);
 			}

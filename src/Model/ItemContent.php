@@ -9,6 +9,7 @@ namespace Friendica\Model;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Core\PConfig;
+use Friendica\Core\Protocol;
 
 require_once 'boot.php';
 require_once 'include/items.php';
@@ -68,11 +69,13 @@ class ItemContent extends BaseObject
 		} else {// Try to guess the correct target network
 			switch ($htmlmode) {
 				case 8:
-					$abstract = Text\BBCode::getAbstract($item['body'], NETWORK_TWITTER);
+					$abstract = Text\BBCode::getAbstract($item['body'], Protocol::TWITTER);
 					break;
+
 				case 7:
-					$abstract = Text\BBCode::getAbstract($item['body'], NETWORK_STATUSNET);
+					$abstract = Text\BBCode::getAbstract($item['body'], Protocol::STATUSNET);
 					break;
+
 				default: // We don't know the exact target.
 					// We fetch an abstract since there is a posting limit.
 					if ($limit > 0) {

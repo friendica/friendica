@@ -21,6 +21,7 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -151,14 +152,14 @@ function item_post(App $a) {
 
 	// Check for multiple posts with the same message id (when the post was created via API)
 	if (($message_id != '') && ($profile_uid != 0)) {
-		if (DBA::exists('item', ['uri' => $message_id, 'uid' => $profile_uid])) {
+		if (Item::exists(['uri' => $message_id, 'uid' => $profile_uid])) {
 			logger("Message with URI ".$message_id." already exists for user ".$profile_uid, LOGGER_DEBUG);
 			return;
 		}
 	}
 
 	// Allow commenting if it is an answer to a public post
-	$allow_comment = local_user() && ($profile_uid == 0) && $parent && in_array($parent_item['network'], [NETWORK_OSTATUS, NETWORK_DIASPORA, NETWORK_DFRN]);
+	$allow_comment = local_user() && ($profile_uid == 0) && $parent && in_array($parent_item['network'], [Protocol::OSTATUS, Protocol::DIASPORA, Protocol::DFRN]);
 
 	// Now check that valid personal details have been provided
 	if (!can_write_wall($profile_uid) && !$allow_comment) {
@@ -238,7 +239,7 @@ function item_post(App $a) {
 		$verb              =      notags(trim(defaults($_REQUEST, 'verb'    , '')));
 		$emailcc           =      notags(trim(defaults($_REQUEST, 'emailcc' , '')));
 		$body              = escape_tags(trim(defaults($_REQUEST, 'body'    , '')));
-		$network           =      notags(trim(defaults($_REQUEST, 'network' , NETWORK_DFRN)));
+		$network           =      notags(trim(defaults($_REQUEST, 'network' , Protocol::DFRN)));
 		$guid              =      System::createGUID(32);
 
 		$postopts = defaults($_REQUEST, 'postopts', '');
@@ -253,8 +254,8 @@ function item_post(App $a) {
 
 		if ($parent_item) {
 			// for non native networks use the network of the original post as network of the item
-			if (($parent_item['network'] != NETWORK_DIASPORA)
-				&& ($parent_item['network'] != NETWORK_OSTATUS)
+			if (($parent_item['network'] != Protocol::DIASPORA)
+				&& ($parent_item['network'] != Protocol::OSTATUS)
 				&& ($network == "")) {
 				$network = $parent_item['network'];
 			}
@@ -344,14 +345,14 @@ function item_post(App $a) {
 
 	// Add a tag if the parent contact is from OStatus (This will notify them during delivery)
 	if ($parent) {
-		if ($thr_parent_contact['network'] == NETWORK_OSTATUS) {
+		if ($thr_parent_contact['network'] == Protocol::OSTATUS) {
 			$contact = '@[url=' . $thr_parent_contact['url'] . ']' . $thr_parent_contact['nick'] . '[/url]';
 			if (!stripos(implode($tags), '[url=' . $thr_parent_contact['url'] . ']')) {
 				$tags[] = $contact;
 			}
 		}
 
-		if ($parent_contact['network'] == NETWORK_OSTATUS) {
+		if ($parent_contact['network'] == Protocol::OSTATUS) {
 			$contact = '@[url=' . $parent_contact['url'] . ']' . $parent_contact['nick'] . '[/url]';
 			if (!stripos(implode($tags), '[url=' . $parent_contact['url'] . ']')) {
 				$tags[] = $contact;
@@ -394,12 +395,12 @@ function item_post(App $a) {
 				$tagged[] = $tag;
 			}
 			// When the forum is private or the forum is addressed with a "!" make the post private
-			if (is_array($success['contact']) && ($success['contact']['prv'] || ($tag_type == '!'))) {
+			if (is_array($success['contact']) && (!empty($success['contact']['prv']) || ($tag_type == '!'))) {
 				$private_forum = $success['contact']['prv'];
 				$only_to_forum = ($tag_type == '!');
 				$private_id = $success['contact']['id'];
 				$forum_contact = $success['contact'];
-			} elseif (is_array($success['contact']) && $success['contact']['forum'] &&
+			} elseif (is_array($success['contact']) && !empty($success['contact']['forum']) &&
 				($str_contact_allow == '<' . $success['contact']['id'] . '>')) {
 				$private_forum = false;
 				$only_to_forum = true;
@@ -559,7 +560,7 @@ function item_post(App $a) {
 	}
 
 	if ($network == "") {
-		$network = NETWORK_DFRN;
+		$network = Protocol::DFRN;
 	}
 
 	$gravity = ($parent ? GRAVITY_COMMENT : GRAVITY_PARENT);
@@ -674,7 +675,7 @@ function item_post(App $a) {
 		// doesn't have an ID.
 		$datarray["id"] = -1;
 		$datarray["item_id"] = -1;
-		$datarray["author-network"] = NETWORK_DFRN;
+		$datarray["author-network"] = Protocol::DFRN;
 
 		$o = conversation($a,[array_merge($contact_record,$datarray)],'search', false, true);
 		logger('preview: ' . $o);
@@ -1021,8 +1022,8 @@ function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $n
 			$alias   = $contact["alias"];
 			$newname = $contact["nick"];
 
-			if (($newname == "") || (($contact["network"] != NETWORK_OSTATUS) && ($contact["network"] != NETWORK_TWITTER)
-				&& ($contact["network"] != NETWORK_STATUSNET))) {
+			if (($newname == "") || (($contact["network"] != Protocol::OSTATUS) && ($contact["network"] != Protocol::TWITTER)
+				&& ($contact["network"] != Protocol::STATUSNET))) {
 				$newname = $contact["name"];
 			}
 		}
