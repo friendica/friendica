@@ -280,7 +280,7 @@ function dfrn_notify_content(App $a) {
 
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $a->argv[1]]);
 		if (!DBA::isResult($user)) {
-			logger('User not found for nickname ' . $$a->argv[1]);
+			logger('User not found for nickname ' . $a->argv[1]);
 			killme();
 		}
 
