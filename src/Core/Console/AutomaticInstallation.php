@@ -34,7 +34,7 @@ Options
     -v                     Show more debug information.
     -a                     All setup checks are required (except .htaccess)
     -f|--file <config>     prepared config file (e.g. "config/local.ini.php" itself) which will override every other config option - except the environment variables)
-    -s|--savedb  Save the DB credentials to the file (if environment variables is used)
+    -s|--savedb            Save the DB credentials to the file (if environment variables is used)
     -h|--dbhost <host>     The host of the mysql database (env MYSQL_HOST)
     -p|--dbport <port>     The port of the mysql database (env MYSQL_PORT)
     -d|--dbdata <database> The name of the mysql database (env MYSQL_DATABASE)
