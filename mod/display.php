@@ -333,12 +333,13 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		return '';
 	}
 
-	$condition = ["`item`.`parent-uri` = (SELECT `parent-uri` FROM `item` WHERE `id` = ?)
-		AND `item`.`uid` IN (0, ?) " . $sql_extra, $item_id, local_user()];
-	$params = ['order' => ['uid', 'parent' => true, 'gravity', 'id']];
-	$items_obj = Item::selectForUser(local_user(), [], $condition, $params);
+	$condition = ["`id` = ? AND `item`.`uid` IN (0, ?) " . $sql_extra, $item_id, local_user()];
+	$fields = ['parent-uri', 'body', 'title', 'author-name', 'author-avatar', 'plink'];
+	$item = Item::selectFirstForUser(local_user(), $fields, $condition);
 
-	if (!DBA::isResult($items_obj)) {
+	$item['uri'] = $item['parent-uri'];
+
+	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
 		return $o;
 	}
@@ -348,20 +349,18 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		Item::update(['unseen' => false], $condition);
 	}
 
-	$items = Item::inArray($items_obj);
-	$conversation_items = conv_sort($items, "`commented`");
-
 	if (!$update) {
 		$o .= "<script> var netargs = '?f=&item_id=" . $item_id . "'; </script>";
 	}
-	$o .= conversation($a, $conversation_items, 'display', $update_uid, false, 'commented', local_user());
+
+	$o .= conversation($a, [$item], 'display', $update_uid, false, 'commented', local_user());
 
 	// Preparing the meta header
-	$description = trim(HTML::toPlaintext(BBCode::convert($items[0]["body"], false), 0, true));
-	$title = trim(HTML::toPlaintext(BBCode::convert($items[0]["title"], false), 0, true));
-	$author_name = $items[0]["author-name"];
+	$description = trim(HTML::toPlaintext(BBCode::convert($item["body"], false), 0, true));
+	$title = trim(HTML::toPlaintext(BBCode::convert($item["title"], false), 0, true));
+	$author_name = $item["author-name"];
 
-	$image = $a->remove_baseurl($items[0]["author-avatar"]);
+	$image = $a->remove_baseurl($item["author-avatar"]);
 
 	if ($title == "") {
 		$title = $author_name;
@@ -393,7 +392,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$a->page['htmlhead'] .= '<meta name="twitter:title" content="'.$title.'" />'."\n";
 	$a->page['htmlhead'] .= '<meta name="twitter:description" content="'.$description.'" />'."\n";
 	$a->page['htmlhead'] .= '<meta name="twitter:image" content="'.System::baseUrl().'/'.$image.'" />'."\n";
-	$a->page['htmlhead'] .= '<meta name="twitter:url" content="'.$items[0]["plink"].'" />'."\n";
+	$a->page['htmlhead'] .= '<meta name="twitter:url" content="'.$item["plink"].'" />'."\n";
 
 	// Dublin Core
 	$a->page['htmlhead'] .= '<meta name="DC.title" content="'.$title.'" />'."\n";
@@ -403,7 +402,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$a->page['htmlhead'] .= '<meta property="og:type" content="website" />'."\n";
 	$a->page['htmlhead'] .= '<meta property="og:title" content="'.$title.'" />'."\n";
 	$a->page['htmlhead'] .= '<meta property="og:image" content="'.System::baseUrl().'/'.$image.'" />'."\n";
-	$a->page['htmlhead'] .= '<meta property="og:url" content="'.$items[0]["plink"].'" />'."\n";
+	$a->page['htmlhead'] .= '<meta property="og:url" content="'.$item["plink"].'" />'."\n";
 	$a->page['htmlhead'] .= '<meta property="og:description" content="'.$description.'" />'."\n";
 	$a->page['htmlhead'] .= '<meta name="og:article:author" content="'.$author_name.'" />'."\n";
 	// article:tag

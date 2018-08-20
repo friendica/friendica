@@ -499,6 +499,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 				. "; var netargs = '/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
 		}
 	} elseif ($mode === 'display') {
+		$items = conversation_add_children($items, false, $order, $uid);
 		$profile_owner = $a->profile['uid'];
 
 		if (!$update) {
