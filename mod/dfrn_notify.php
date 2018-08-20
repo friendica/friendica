@@ -71,7 +71,7 @@ function dfrn_notify_post(App $a) {
 
 	$user = DBA::selectFirst('user', ['uid'], ['nickname' => $a->argv[1]]);
 	if (!DBA::isResult($user)) {
-		logger('User not found for nickname ' . $$a->argv[1]);
+		logger('User not found for nickname ' . $a->argv[1]);
 		System::xmlExit(3, 'User not found');
 	}
 
