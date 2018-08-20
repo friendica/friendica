@@ -30,25 +30,25 @@ Notes
     Not checking .htaccess/URL-Rewrite during CLI installation.
 
 Options
-    -h|--help|-? Show help information
-    -v           Show more debug information.
-    -a           All setup checks are required (except .htaccess)
-    -f|--file    prepared config file (e.g. "config/local.ini.php" itself) which will override every other config option - except the environment variables)
+    -h|--help|-?           Show help information
+    -v                     Show more debug information.
+    -a                     All setup checks are required (except .htaccess)
+    -f|--file <config>     prepared config file (e.g. "config/local.ini.php" itself) which will override every other config option - except the environment variables)
     -s|--savedb  Save the DB credentials to the file (if environment variables is used)
-    -h|--dbhost  The host of the mysql database (env MYSQL_HOST)
-    -p|--dbport  The port of the mysql database (env MYSQL_PORT)
-    -d|--dbdata  The name of the mysql database (env MYSQL_DATABASE)
-    -U|--dbuser  The username of the mysql database login (env MYSQL_USER or MYSQL_USERNAME)
-    -P|--dbpass  The password of the mysql database login (env MYSQL_PASSWORD)
-    -b|--phppath The path of the PHP binary (env FRIENDICA_PHP_PATH) 
-    -A|--admin   The admin email address of Friendica (env FRIENDICA_ADMIN_MAIL)
-    -T|--tz      The timezone of Friendica (env FRIENDICA_TZ)
-    -L|--lang    The language of Friendica (env FRIENDICA_LANG)
+    -h|--dbhost <host>     The host of the mysql database (env MYSQL_HOST)
+    -p|--dbport <port>     The port of the mysql database (env MYSQL_PORT)
+    -d|--dbdata <database> The name of the mysql database (env MYSQL_DATABASE)
+    -U|--dbuser <username> The username of the mysql database login (env MYSQL_USER or MYSQL_USERNAME)
+    -P|--dbpass <password> The password of the mysql database login (env MYSQL_PASSWORD)
+    -b|--phppath <path>    The path of the PHP binary (env FRIENDICA_PHP_PATH) 
+    -A|--admin <mail>      The admin email address of Friendica (env FRIENDICA_ADMIN_MAIL)
+    -T|--tz <timezone>     The timezone of Friendica (env FRIENDICA_TZ)
+    -L|--lang <language>   The language of Friendica (env FRIENDICA_LANG)
  
 Environment variables
    MYSQL_HOST                  The host of the mysql database (mandatory if mysql and environment is used)
    MYSQL_PORT                  The port of the mysql database
-   MYSQL_USERNAME|MYSQL_USER   The username of the mysql database login (USERNAME is for mysql, USER for mariadb)
+   MYSQL_USERNAME|MYSQL_USER   The username of the mysql database login (MYSQL_USERNAME is for mysql, MYSQL_USER for mariadb)
    MYSQL_PASSWORD              The password of the mysql database login
    MYSQL_DATABASE              The name of the mysql database
    FRIENDICA_PHP_PATH          The path of the PHP binary
