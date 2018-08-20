@@ -49,7 +49,7 @@ default_timezone = UTC
 
 ; directory (String)
 ; URL of the global directory.
-directory = https://dir.friendi.social
+directory = https://dir.friendica.social
 
 ; forbidden_nicknames (Comma-separated list)
 ; Prevents users from registering the specified nicknames on this node.
