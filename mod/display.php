@@ -337,12 +337,12 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$fields = ['parent-uri', 'body', 'title', 'author-name', 'author-avatar', 'plink'];
 	$item = Item::selectFirstForUser(local_user(), $fields, $condition);
 
-	$item['uri'] = $item['parent-uri'];
-
 	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
 		return $o;
 	}
+
+	$item['uri'] = $item['parent-uri'];
 
 	if ($unseen) {
 		$condition = ['parent-uri' => $item_parent_uri, 'uid' => local_user(), 'unseen' => true];
