@@ -10,6 +10,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 
 function community_init(App $a)
 {
@@ -33,6 +34,25 @@ function community_content(App $a, $update = 0)
 	if ($page_style == CP_NO_INTERNAL_COMMUNITY) {
 		notice(L10n::t('Access denied.') . EOL);
 		return;
+	}
+
+	$accounttype = -1;
+
+	if ($a->argc > 2) {
+		switch ($a->argv[2]) {
+			case 'person':
+				$accounttype = Contact::ACCOUNT_TYPE_PERSON;
+				break;
+			case 'organisation':
+				$accounttype = Contact::ACCOUNT_TYPE_ORGANISATION;
+				break;
+			case 'news':
+				$accounttype = Contact::ACCOUNT_TYPE_NEWS;
+				break;
+			case 'community':
+				$accounttype = Contact::ACCOUNT_TYPE_COMMUNITY;
+				break;
+		}
 	}
 
 	if ($a->argc > 1) {
@@ -135,7 +155,7 @@ function community_content(App $a, $update = 0)
 
 	$a->set_pager_itemspage($itemspage_network);
 
-	$r = community_getitems($a->pager['start'], $a->pager['itemspage'], $content);
+	$r = community_getitems($a->pager['start'], $a->pager['itemspage'], $content, $accounttype);
 
 	if (!DBA::isResult($r)) {
 		info(L10n::t('No results.') . EOL);
@@ -164,7 +184,7 @@ function community_content(App $a, $update = 0)
 				}
 			}
 			if (count($s) < $a->pager['itemspage']) {
-				$r = community_getitems($a->pager['start'] + ($count * $a->pager['itemspage']), $a->pager['itemspage'], $content);
+				$r = community_getitems($a->pager['start'] + ($count * $a->pager['itemspage']), $a->pager['itemspage'], $content, $accounttype);
 			}
 		} while ((count($s) < $a->pager['itemspage']) && ( ++$count < 50) && (count($r) > 0));
 	} else {
@@ -186,23 +206,40 @@ function community_content(App $a, $update = 0)
 	]);
 }
 
-function community_getitems($start, $itemspage, $content)
+function community_getitems($start, $itemspage, $content, $accounttype)
 {
 	if ($content == 'local') {
+		if ($accounttype >= 0) {
+			$sql_accounttype = " AND `user`.`account-type` = ?";
+			$values = [$accounttype, $start, $itemspage];
+		} else {
+			$sql_accounttype = "";
+			$values = [$start, $itemspage];
+		}
+
 		$r = DBA::p("SELECT `item`.`uri`, `author`.`url` AS `author-link` FROM `thread`
 			INNER JOIN `user` ON `user`.`uid` = `thread`.`uid` AND NOT `user`.`hidewall`
 			INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 			INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
 			WHERE `thread`.`visible` AND NOT `thread`.`deleted` AND NOT `thread`.`moderated`
-			AND NOT `thread`.`private` AND `thread`.`wall` AND `thread`.`origin`
-			ORDER BY `thread`.`commented` DESC LIMIT ?, ?", $start, $itemspage);
+			AND NOT `thread`.`private` AND `thread`.`wall` AND `thread`.`origin` $sql_accounttype
+			ORDER BY `thread`.`commented` DESC LIMIT ?, ?", $values);
 		return DBA::toArray($r);
 	} elseif ($content == 'global') {
+		if ($accounttype >= 0) {
+			$sql_accounttype = " AND `owner`.`contact-type` = ?";
+			$values = [$accounttype, $start, $itemspage];
+		} else {
+			$sql_accounttype = "";
+			$values = [$start, $itemspage];
+		}
+
 		$r = DBA::p("SELECT `uri` FROM `thread`
 				INNER JOIN `item` ON `item`.`id` = `thread`.`iid`
 				INNER JOIN `contact` AS `author` ON `author`.`id`=`item`.`author-id`
-				WHERE `thread`.`uid` = 0 AND NOT `author`.`hidden` AND NOT `author`.`blocked`
-				ORDER BY `thread`.`commented` DESC LIMIT ?, ?", $start, $itemspage);
+				INNER JOIN `contact` AS `owner` ON `owner`.`id`=`item`.`owner-id`
+				WHERE `thread`.`uid` = 0 AND NOT `author`.`hidden` AND NOT `author`.`blocked` $sql_accounttype
+				ORDER BY `thread`.`commented` DESC LIMIT ?, ?", $values);
 		return DBA::toArray($r);
 	}
 
