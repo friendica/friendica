@@ -2888,6 +2888,7 @@ function api_format_items($r, $user_info, $filter_user = false, $type = "json")
 			'favorited' => $item['starred'] ? true : false,
 			'user' =>  $status_user ,
 			'friendica_owner' => $owner_user,
+			'friendica_private' => $item['private'] == 1,
 			//'entities' => NULL,
 			'statusnet_html' => $converted["html"],
 			'statusnet_conversation_id' => $item['parent'],
