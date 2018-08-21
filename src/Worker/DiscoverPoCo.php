@@ -216,7 +216,7 @@ class DiscoverPoCo
 		$x = Network::fetchUrl(get_server()."/lsearch?p=1&n=500&search=".urlencode($search));
 		$j = json_decode($x);
 
-		if (count($j->results)) {
+		if (!empty($j->results)) {
 			foreach ($j->results as $jj) {
 				// Check if the contact already exists
 				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", normalise_link($jj->url));
