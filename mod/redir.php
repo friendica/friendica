@@ -23,7 +23,7 @@ function redir_init(App $a) {
 	}
 
 	if (!empty($cid)) {
-		$fields = ['id', 'uid', 'nurl', 'url', 'addr', 'name', 'network', 'poll', 'issued-id', 'dfrn-id', 'duplex'];
+		$fields = ['id', 'uid', 'nurl', 'url', 'addr', 'name', 'network', 'poll', 'issued-id', 'dfrn-id', 'duplex', 'pending'];
 		$contact = DBA::selectFirst('contact', $fields, ['id' => $cid, 'uid' => [0, local_user()]]);
 		if (!DBA::isResult($contact)) {
 			notice(L10n::t('Contact not found.'));
@@ -80,7 +80,7 @@ function redir_init(App $a) {
 		}
 
 		// Doing remote auth with dfrn.
-		if (local_user() && (!empty($contact['dfrn-id']) || !empty($contact['issued-id']))) {
+		if (local_user() && (!empty($contact['dfrn-id']) || !empty($contact['issued-id'])) && empty($contact['pending'])) {
 			$dfrn_id = $orig_id = (($contact['issued-id']) ? $contact['issued-id'] : $contact['dfrn-id']);
 
 			if ($contact['duplex'] && $contact['issued-id']) {
