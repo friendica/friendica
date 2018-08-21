@@ -364,8 +364,13 @@ class Contact extends BaseObject
 	 */
 	public static function markForArchival(array $contact)
 	{
-
-		if (!isset($contact['url'])) {
+		if (!isset($contact['url']) && !empty($contact['id'])) {
+			$fields = ['id', 'url', 'archive', 'self', 'term-date'];
+			$contact = DBA::selectFirst('contact', [], ['id' => $contact['id']]);
+			if (!DBA::isResult($contact)) {
+				return;
+			}
+		} elseif (!isset($contact['url'])) {
 			logger('Empty contact: ' . json_encode($contact) . ' - ' . System::callstack(20), LOGGER_DEBUG);
 		}
 
@@ -376,10 +381,7 @@ class Contact extends BaseObject
 
 		if ($contact['term-date'] <= NULL_DATE) {
 			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
-
-			if ($contact['url'] != '') {
-				DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', normalise_link($contact['url']), NULL_DATE]);
-			}
+			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', normalise_link($contact['url']), NULL_DATE]);
 		} else {
 			/* @todo
 			 * We really should send a notification to the owner after 2-3 weeks
@@ -397,10 +399,7 @@ class Contact extends BaseObject
 				 * the whole process over again.
 				 */
 				DBA::update('contact', ['archive' => 1], ['id' => $contact['id']]);
-
-				if ($contact['url'] != '') {
-					DBA::update('contact', ['archive' => 1], ['nurl' => normalise_link($contact['url']), 'self' => false]);
-				}
+				DBA::update('contact', ['archive' => 1], ['nurl' => normalise_link($contact['url']), 'self' => false]);
 			}
 		}
 	}
@@ -423,13 +422,18 @@ class Contact extends BaseObject
 			return;
 		}
 
+		if (!isset($contact['url']) && !empty($contact['id'])) {
+			$fields = ['id', 'url', 'batch'];
+			$contact = DBA::selectFirst('contact', [], ['id' => $contact['id']]);
+			if (!DBA::isResult($contact)) {
+				return;
+			}
+		}
+
 		// It's a miracle. Our dead contact has inexplicably come back to life.
 		$fields = ['term-date' => NULL_DATE, 'archive' => false];
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
-
-		if (!empty($contact['url'])) {
-			DBA::update('contact', $fields, ['nurl' => normalise_link($contact['url'])]);
-		}
+		DBA::update('contact', $fields, ['nurl' => normalise_link($contact['url'])]);
 
 		if (!empty($contact['batch'])) {
 			$condition = ['batch' => $contact['batch'], 'contact-type' => self::ACCOUNT_TYPE_RELAY];
