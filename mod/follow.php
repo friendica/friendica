@@ -16,9 +16,7 @@ use Friendica\Util\Proxy as ProxyUtils;
 function follow_post(App $a)
 {
 	if (!local_user()) {
-		notice(L10n::t('Permission denied.'));
-		goaway($_SESSION['return_url']);
-		// NOTREACHED
+		System::httpExit(403, ['title' => L10n::t('Access denied.')]);
 	}
 
 	if (isset($_REQUEST['cancel'])) {

@@ -933,7 +933,12 @@ class Probe
 		}
 
 		$prof_data = [];
-		$prof_data["addr"]         = $data["addr"];
+
+		// The "addr" is not always part of the fetched data
+		if (!empty($data["addr"])) {
+			$prof_data["addr"] = $data["addr"];
+		}
+
 		$prof_data["nick"]         = $data["nick"];
 		$prof_data["dfrn-request"] = $data["request"];
 		$prof_data["dfrn-confirm"] = $data["confirm"];
