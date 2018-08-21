@@ -371,7 +371,7 @@ function drop_item($id)
 
 	if ((local_user() == $item['uid']) || $contact_id) {
 		// Check if we should do HTML-based delete confirmation
-		if ($_REQUEST['confirm']) {
+		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
 			$query = explode_querystring($a->query_string);
@@ -395,7 +395,7 @@ function drop_item($id)
 			]);
 		}
 		// Now check how the user responded to the confirmation query
-		if ($_REQUEST['canceled']) {
+		if (!empty($_REQUEST['canceled'])) {
 			goaway(System::baseUrl() . '/' . $_SESSION['return_url']);
 		}
 

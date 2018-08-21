@@ -344,6 +344,10 @@ class NotificationsManager extends BaseObject
 						break;
 
 					case ACTIVITY_FRIEND:
+						if (!isset($it['object'])) {
+							logger('Incomplete data: ' . json_encode($it) . ' - ' . System::callstack(20), LOGGER_DEBUG);
+						}
+
 						$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 						$obj = XML::parseString($xmlhead . $it['object']);
 						$it['fname'] = $obj->title;

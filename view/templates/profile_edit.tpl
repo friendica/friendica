@@ -439,8 +439,10 @@
         <input type="hidden" name="religion" id="profile-edit-religion" value="{{$religion.2}}" />
         <input type="hidden" id="likes-jot-text" name="likes" value="{{$likes.2}}" />
         <input type="hidden" id="dislikes-jot-text" name="dislikes" value="{{$dislikes.2}}" />
+        <input type="hidden" name="marital" id="profile-edit-marital" value="{{$marital.2}}" />
         <input type="hidden" name="with" id="profile-edit-with" value="{{$with.2}}" />
         <input type="hidden" name="howlong" id="profile-edit-howlong" value="{{$howlong.2}}" />
+        <input type="hidden" name="sexual" id="profile-edit-sexual" value="{{$sexual.2}}" />
         <input type="hidden" id="romance-jot-text" name="romance" value="{{$romance.2}}" />
         <input type="hidden" id="work-jot-text" name="work" value="{{$work.2}}" />
         <input type="hidden" id="education-jot-text" name="education" value="{{$education.2}}" />
