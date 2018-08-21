@@ -36,7 +36,7 @@ function community_content(App $a, $update = 0)
 		return;
 	}
 
-	$accounttype = -1;
+	$accounttype = null;
 
 	if ($a->argc > 2) {
 		switch ($a->argv[2]) {
@@ -209,7 +209,7 @@ function community_content(App $a, $update = 0)
 function community_getitems($start, $itemspage, $content, $accounttype)
 {
 	if ($content == 'local') {
-		if ($accounttype >= 0) {
+		if (!is_null($accounttype)) {
 			$sql_accounttype = " AND `user`.`account-type` = ?";
 			$values = [$accounttype, $start, $itemspage];
 		} else {
@@ -226,7 +226,7 @@ function community_getitems($start, $itemspage, $content, $accounttype)
 			ORDER BY `thread`.`commented` DESC LIMIT ?, ?", $values);
 		return DBA::toArray($r);
 	} elseif ($content == 'global') {
-		if ($accounttype >= 0) {
+		if (!is_null($accounttype)) {
 			$sql_accounttype = " AND `owner`.`contact-type` = ?";
 			$values = [$accounttype, $start, $itemspage];
 		} else {
