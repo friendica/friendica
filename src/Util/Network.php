@@ -716,7 +716,7 @@ class Network
 		$url = self::stripTrackingQueryParams($url);
 
 		if ($depth > 10) {
-			return($url);
+			return $url;
 		}
 
 		$url = trim($url, "'");
@@ -739,16 +739,14 @@ class Network
 		$a->save_timestamp($stamp1, "network");
 
 		if ($http_code == 0) {
-			return($url);
+			return $url;
 		}
 
-		if ((($curl_info['http_code'] == "301") || ($curl_info['http_code'] == "302"))
-			&& (($curl_info['redirect_url'] != "") || ($curl_info['location'] != ""))
-		) {
-			if ($curl_info['redirect_url'] != "") {
-				return(self::finalUrl($curl_info['redirect_url'], ++$depth, $fetchbody));
-			} else {
-				return(self::finalUrl($curl_info['location'], ++$depth, $fetchbody));
+		if (in_array($http_code, ['301', '302'])) {
+			if (!empty($curl_info['redirect_url'])) {
+				return self::finalUrl($curl_info['redirect_url'], ++$depth, $fetchbody);
+			} elseif (!empty($curl_info['location'])) {
+				return self::finalUrl($curl_info['location'], ++$depth, $fetchbody);
 			}
 		}
 
@@ -759,12 +757,12 @@ class Network
 
 		// if the file is too large then exit
 		if ($curl_info["download_content_length"] > 1000000) {
-			return($url);
+			return $url;
 		}
 
 		// if it isn't a HTML file then exit
-		if (($curl_info["content_type"] != "") && !strstr(strtolower($curl_info["content_type"]), "html")) {
-			return($url);
+		if (!empty($curl_info["content_type"]) && !strstr(strtolower($curl_info["content_type"]), "html")) {
+			return $url;
 		}
 
 		$stamp1 = microtime(true);
@@ -783,7 +781,7 @@ class Network
 		$a->save_timestamp($stamp1, "network");
 
 		if (trim($body) == "") {
-			return($url);
+			return $url;
 		}
 
 		// Check for redirect in meta elements
@@ -806,7 +804,7 @@ class Network
 				$pathinfo = explode(";", $path);
 				foreach ($pathinfo as $value) {
 					if (substr(strtolower($value), 0, 4) == "url=") {
-						return(self::finalUrl(substr($value, 4), ++$depth));
+						return self::finalUrl(substr($value, 4), ++$depth);
 					}
 				}
 			}
