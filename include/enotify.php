@@ -32,6 +32,20 @@ function notification($params)
 		logger('Missing parameters.' . System::callstack());
 	}
 
+	// Ensure that the important fields are set at any time
+	$fields = ['notify-flags', 'language', 'username', 'email'];
+	$user = DBA::selectFirst('user', $fields, ['uid' => $params['uid']]);
+
+	if (!DBA::isResult($user)) {
+		logger('Unknown user ' . $params['uid']);
+		return;
+	}
+
+	$params['notify_flags'] = defaults($params, 'notify_flags', $user['notify-flags']);
+	$params['language'] = defaults($params, 'language', $user['language']);
+	$params['to_name'] = defaults($params, 'to_name', $user['username']);
+	$params['to_email'] = defaults($params, 'to_email', $user['email']);
+
 	// from here on everything is in the recipients language
 	L10n::pushLang($params['language']);
 
@@ -661,7 +675,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 	$profiles = $notification_data["profiles"];
 
-	$fields = ['notify-flags', 'language', 'username', 'email', 'nickname'];
+	$fields = ['nickname'];
 	$user = DBA::selectFirst('user', $fields, ['uid' => $uid]);
 	if (!DBA::isResult($user)) {
 		return false;
@@ -724,10 +738,6 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 	// Generate the notification array
 	$params = [];
 	$params["uid"] = $uid;
-	$params["notify_flags"] = $user["notify-flags"];
-	$params["language"] = $user["language"];
-	$params["to_name"] = $user["username"];
-	$params["to_email"] = $user["email"];
 	$params["item"] = $item;
 	$params["parent"] = $item["parent"];
 	$params["link"] = System::baseUrl().'/display/'.urlencode($item["guid"]);
