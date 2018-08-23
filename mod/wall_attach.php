@@ -16,24 +16,25 @@ function wall_attach_post(App $a) {
 
 	$r_json = (x($_GET,'response') && $_GET['response']=='json');
 
-	if($a->argc > 1) {
+	if ($a->argc > 1) {
 		$nick = $a->argv[1];
 		$r = q("SELECT `user`.*, `contact`.`id` FROM `user` LEFT JOIN `contact` on `user`.`uid` = `contact`.`uid`  WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0 and `contact`.`self` = 1 LIMIT 1",
 			DBA::escape($nick)
 		);
+
 		if (! DBA::isResult($r)) {
 			if ($r_json) {
-				echo json_encode(['error'=>L10n::t('Invalid request.')]);
+				echo json_encode(['error' => L10n::t('Invalid request.')]);
 				killme();
 			}
 			return;
-	}
-
+		}
 	} else {
 		if ($r_json) {
-			echo json_encode(['error'=>L10n::t('Invalid request.')]);
+			echo json_encode(['error' => L10n::t('Invalid request.')]);
 			killme();
 		}
+
 		return;
 	}
 
@@ -60,7 +61,7 @@ function wall_attach_post(App $a) {
 				}
 			}
 
-			if($contact_id > 0) {
+			if ($contact_id > 0) {
 				$r = q("SELECT `uid` FROM `contact` WHERE `blocked` = 0 AND `pending` = 0 AND `id` = %d AND `uid` = %d LIMIT 1",
 					intval($contact_id),
 					intval($page_owner_uid)
@@ -74,18 +75,18 @@ function wall_attach_post(App $a) {
 		}
 	}
 
-	if(! $can_post) {
+	if (! $can_post) {
 		if ($r_json) {
-			echo json_encode(['error'=>L10n::t('Permission denied.')]);
+			echo json_encode(['error' => L10n::t('Permission denied.')]);
 			killme();
 		}
 		notice(L10n::t('Permission denied.') . EOL );
 		killme();
 	}
 
-	if(! x($_FILES,'userfile')) {
+	if (! x($_FILES,'userfile')) {
 		if ($r_json) {
-			echo json_encode(['error'=>L10n::t('Invalid request.')]);
+			echo json_encode(['error' => L10n::t('Invalid request.')]);
 		}
 		killme();
 	}
@@ -102,23 +103,23 @@ function wall_attach_post(App $a) {
 	 * Then Filesize gets <= 0.
 	 */
 
-	if($filesize <=0) {
+	if ($filesize <= 0) {
 		$msg = L10n::t('Sorry, maybe your upload is bigger than the PHP configuration allows') . EOL .(L10n::t('Or - did you try to upload an empty file?'));
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(['error' => $msg]);
 		} else {
-			notice( $msg. EOL );
+			notice($msg . EOL);
 		}
 		@unlink($src);
 		killme();
 	}
 
-	if(($maxfilesize) && ($filesize > $maxfilesize)) {
+	if ($maxfilesize && $filesize > $maxfilesize) {
 		$msg = L10n::t('File exceeds size limit of %s', formatBytes($maxfilesize));
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(['error' => $msg]);
 		} else {
-			echo  $msg. EOL ;
+			echo $msg . EOL ;
 		}
 		@unlink($src);
 		killme();
@@ -137,12 +138,12 @@ function wall_attach_post(App $a) {
 
 	@unlink($src);
 
-	if(! $r) {
+	if (! $r) {
 		$msg =  L10n::t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(['error' => $msg]);
 		} else {
-			echo  $msg. EOL ;
+			echo $msg . EOL ;
 		}
 		killme();
 	}
@@ -156,15 +157,15 @@ function wall_attach_post(App $a) {
 	if (! DBA::isResult($r)) {
 		$msg = L10n::t('File upload failed.');
 		if ($r_json) {
-			echo json_encode(['error'=>$msg]);
+			echo json_encode(['error' => $msg]);
 		} else {
-			echo  $msg. EOL ;
+			echo $msg . EOL ;
 		}
 		killme();
 	}
 
 	if ($r_json) {
-		echo json_encode(['ok'=>true]);
+		echo json_encode(['ok' => true]);
 		killme();
 	}
 
