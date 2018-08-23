@@ -636,6 +636,73 @@ Friendica doesn't allow showing the friends of other users.
 
 ---
 
+### Return values for statuses/* api calls
+
+Returned status object is conform to GNU Social/Twitter api.
+
+Friendica adds some addictional fields:
+
+- owner: a user object, it's the owner of the item.
+- private: boolean, true if the item is marked as private
+- activities: map with activities related to the item. Every activity is a list of user objects.
+
+This properties are prefixed with "friendica_" in JSON responses and namespaced under "http://friendi.ca/schema/api/1/" in XML responses
+
+JSON:
+
+```json
+[
+	{
+		// ...
+		'friendica_owner' : {
+			// user object
+		},
+		'friendica_private' : true,
+		'friendica_activities': {
+			'like': [
+				{
+					// user object 
+				},
+				// ...
+			],
+			'dislike': [],
+			'attendyes': [],
+			'attendno': [],
+			'attendmaybe': []
+		}
+	},
+	// ...
+]
+```
+
+XML:
+
+```xml
+<statuses xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" xmlns:friendica="http://friendi.ca/schema/api/1/" xmlns:georss="http://www.georss.org/georss">
+  <status>
+	<!-- ... -->
+	<friendica:owner><!-- user object --></friendica:owner>
+	<friendica:private>true</friendica:private>
+	<friendica:activities>
+		<friendica:like>
+		<user>
+			<!-- user object -->
+		</user>
+		<!-- ... --->
+		</friendica:like>
+		<friendica:dislike/>
+		<friendica:attendyes/>
+		<friendica:attendno/>
+		<friendica:attendmaybe/>
+	</friendica:activities>	
+	</status>
+	<!-- ... -->
+</statuses>
+```
+
+
+---
+
 ### statusnet/config (*)
 
 ---
