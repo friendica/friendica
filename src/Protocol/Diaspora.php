@@ -1050,7 +1050,7 @@ class Diaspora
 			return false;
 		}
 
-		$contact = dba::selectFirst('contact', [], ['id' => $cid]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
 			// This here shouldn't happen at all
 			logger("Haven't found a contact for user " . $uid . " and handle " . $handle, LOGGER_DEBUG);
@@ -1079,7 +1079,7 @@ class Diaspora
 		// It is deactivated by now, due to side effects. See issue https://github.com/friendica/friendica/pull/4033
 		// It is not removed by now. Possibly the code is needed?
 		//if (!$is_comment && $contact["rel"] == Contact::FOLLOWER && in_array($importer["page-flags"], array(Contact::PAGE_FREELOVE))) {
-		//	dba::update(
+		//	DBA::update(
 		//		'contact',
 		//		array('rel' => Contact::FRIEND, 'writable' => true),
 		//		array('id' => $contact["id"], 'uid' => $contact["uid"])

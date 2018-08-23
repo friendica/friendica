@@ -372,7 +372,7 @@ class DBA
 	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
 	 *
 	 * Please only use it with complicated queries.
-	 * For all regular queries please use dba::select or dba::exists
+	 * For all regular queries please use DBA::select or DBA::exists
 	 *
 	 * @param string $sql SQL statement
 	 * @return bool|object statement object or result object
@@ -590,7 +590,7 @@ class DBA
 	/**
 	 * @brief Executes a prepared statement like UPDATE or INSERT that doesn't return data
 	 *
-	 * Please use dba::delete, dba::insert, dba::update, ... instead
+	 * Please use DBA::delete, DBA::insert, DBA::update, ... instead
 	 *
 	 * @param string $sql SQL statement
 	 * @return boolean Was the query successfull? False is returned only if an error occurred
@@ -685,7 +685,7 @@ class DBA
 	/**
 	 * Fetches the first row
 	 *
-	 * Please use dba::selectFirst or dba::exists whenever this is possible.
+	 * Please use DBA::selectFirst or DBA::exists whenever this is possible.
 	 *
 	 * @brief Fetches the first row
 	 * @param string $sql SQL statement
@@ -1303,7 +1303,7 @@ class DBA
 	 *
 	 * $params = array("order" => array("id", "received" => true), "limit" => 10);
 	 *
-	 * $data = dba::select($table, $fields, $condition, $params);
+	 * $data = DBA::select($table, $fields, $condition, $params);
 	 */
 	public static function select($table, array $fields = [], array $condition = [], array $params = [])
 	{
@@ -1345,7 +1345,7 @@ class DBA
 	 * or:
 	 * $condition = ["`uid` = ? AND `network` IN (?, ?)", 1, 'dfrn', 'dspr'];
 	 *
-	 * $count = dba::count($table, $condition);
+	 * $count = DBA::count($table, $condition);
 	 */
 	public static function count($table, array $condition = [])
 	{
@@ -1399,7 +1399,7 @@ class DBA
 						/* Workaround for MySQL Bug #64791.
 						 * Never mix data types inside any IN() condition.
 						 * In case of mixed types, cast all as string.
-						 * Logic needs to be consistent with dba::p() data types.
+						 * Logic needs to be consistent with DBA::p() data types.
 						 */
 						$is_int = false;
 						$is_alpha = false;
@@ -1530,7 +1530,7 @@ class DBA
 			case 'mysqli':
 				// MySQLi offers both a mysqli_stmt and a mysqli_result class.
 				// We should be careful not to assume the object type of $stmt
-				// because dba::p() has been able to return both types.
+				// because DBA::p() has been able to return both types.
 				if ($stmt instanceof mysqli_stmt) {
 					$stmt->free_result();
 					$ret = $stmt->close();

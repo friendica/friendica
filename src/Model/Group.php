@@ -289,7 +289,8 @@ class Group extends BaseObject
 					INNER JOIN `gcontact` ON `gcontact`.`nurl` = `contact`.`nurl`
 				WHERE ' . $condition;
 			$param_arr = array_merge([$sql], $group_ids);
-			$stmt = call_user_func_array('dba::p', $param_arr);
+			/// @todo ugly!
+			$stmt = call_user_func_array('DBA::p', $param_arr);
 		} else {
 			$condition_array = array_merge([$condition], $group_ids);
 			$stmt = DBA::select('group_member', ['contact-id'], $condition_array);

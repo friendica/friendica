@@ -65,7 +65,7 @@ class System extends BaseObject
 		while ($func = array_pop($trace)) {
 			if (!empty($func['class'])) {
 				// Don't show multiple calls from the "dba" class to show the essential parts of the callstack
-				if ((($previous['class'] != $func['class']) || ($func['class'] != 'dba')) && ($previous['function'] != 'q')) {
+				if ((($previous['class'] != $func['class']) || ($func['class'] != 'Friendica\Database\DBA')) && ($previous['function'] != 'q')) {
 					$classparts = explode("\\", $func['class']);
 					$callstack[] = array_pop($classparts).'::'.$func['function'];
 					$previous = $func;

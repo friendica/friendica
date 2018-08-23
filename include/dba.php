@@ -5,9 +5,9 @@ use Friendica\Database\DBA;
 /**
  * @brief execute SQL query with printf style args - deprecated
  *
- * Please use the dba:: functions instead:
- * dba::select, dba::exists, dba::insert
- * dba::delete, dba::update, dba::p, dba::e
+ * Please use the DBA:: functions instead:
+ * DBA::select, DBA::exists, DBA::insert
+ * DBA::delete, DBA::update, DBA::p, DBA::e
  *
  * @param $args Query parameters (1 to N parameters of different types)
  * @return array|bool Query array
