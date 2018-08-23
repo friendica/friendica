@@ -273,37 +273,25 @@ class Group extends BaseObject
 	 *
 	 * @param array $group_ids
 	 * @param boolean $check_dead
-	 * @param boolean $use_gcontact
 	 * @return array
 	 */
-	public static function expand($group_ids, $check_dead = false, $use_gcontact = false)
+	public static function expand($group_ids, $check_dead = false)
 	{
 		if (!is_array($group_ids) || !count($group_ids)) {
 			return [];
 		}
 
-		$condition = '`gid` IN (' . substr(str_repeat("?, ", count($group_ids)), 0, -2) . ')';
-		if ($use_gcontact) {
-			$sql = 'SELECT `gcontact`.`id` AS `contact-id` FROM `group_member`
-					INNER JOIN `contact` ON `contact`.`id` = `group_member`.`contact-id`
-					INNER JOIN `gcontact` ON `gcontact`.`nurl` = `contact`.`nurl`
-				WHERE ' . $condition;
-			$param_arr = array_merge([$sql], $group_ids);
-			/// @todo ugly!
-			$stmt = call_user_func_array('DBA::p', $param_arr);
-		} else {
-			$condition_array = array_merge([$condition], $group_ids);
-			$stmt = DBA::select('group_member', ['contact-id'], $condition_array);
-		}
+		$stmt = DBA::select('group_member', ['contact-id'], ['gid' => $group_ids]);
 
 		$return = [];
 		while($group_member = DBA::fetch($stmt)) {
 			$return[] = $group_member['contact-id'];
 		}
 
-		if ($check_dead && !$use_gcontact) {
+		if ($check_dead) {
 			Contact::pruneUnavailable($return);
 		}
+
 		return $return;
 	}
 
