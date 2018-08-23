@@ -19,7 +19,6 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\PermissionSet;
 use Friendica\Model\ItemURI;
-use Friendica\Model\Profile;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
