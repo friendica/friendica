@@ -510,7 +510,7 @@ function notification($params)
 	}
 
 	// send email notification if notification preferences permit
-	if ((!empty($params['notify_flags']) & intval($params['type']))
+	if ((intval($params['notify_flags']) & intval($params['type']))
 		|| $params['type'] == NOTIFY_SYSTEM
 		|| $params['type'] == SYSTEM_EMAIL) {
 
