@@ -42,6 +42,10 @@ function contacts_init(App $a)
 	if ((($a->argc == 2) && intval($a->argv[1])) || (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts"))) {
 		$contact_id = intval($a->argv[1]);
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+
+		if (!DBA::isResult($contact)) {
+			$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => 0]);
+		}
 	}
 
 	if (DBA::isResult($contact)) {
@@ -87,7 +91,9 @@ function contacts_init(App $a)
 		$findpeople_widget = Widget::findPeople();
 	}
 
-	$groups_widget = Group::sidebarWidget('contacts', 'group', 'full', 'everyone', $contact_id);
+	if ($contact['uid'] != 0) {
+		$groups_widget = Group::sidebarWidget('contacts', 'group', 'full', 'everyone', $contact_id);
+	}
 
 	$a->page['aside'] .= replace_macros(get_markup_template("contacts-widget-sidebar.tpl"), [
 		'$vcard_widget' => $vcard_widget,
@@ -381,20 +387,20 @@ function contacts_content(App $a)
 
 		$cmd = $a->argv[2];
 
-		$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user(), 'self' => false]);
+		$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => [0, local_user()], 'self' => false]);
 		if (!DBA::isResult($orig_record)) {
 			notice(L10n::t('Could not access contact record.') . EOL);
 			goaway('contacts');
 			return; // NOTREACHED
 		}
 
-		if ($cmd === 'update') {
+		if ($cmd === 'update' && ($orig_record['uid'] != 0)) {
 			_contact_update($contact_id);
 			goaway('contacts/' . $contact_id);
 			// NOTREACHED
 		}
 
-		if ($cmd === 'updateprofile') {
+		if ($cmd === 'updateprofile' && ($orig_record['uid'] != 0)) {
 			_contact_update_profile($contact_id);
 			goaway('crepair/' . $contact_id);
 			// NOTREACHED
@@ -420,7 +426,7 @@ function contacts_content(App $a)
 			return; // NOTREACHED
 		}
 
-		if ($cmd === 'archive') {
+		if ($cmd === 'archive' && ($orig_record['uid'] != 0)) {
 			$r = _contact_archive($contact_id, $orig_record);
 			if ($r) {
 				$archived = (($orig_record['archive']) ? 0 : 1);
@@ -431,7 +437,7 @@ function contacts_content(App $a)
 			return; // NOTREACHED
 		}
 
-		if ($cmd === 'drop') {
+		if ($cmd === 'drop' && ($orig_record['uid'] != 0)) {
 			// Check if we should do HTML-based delete confirmation
 			if (x($_REQUEST, 'confirm')) {
 				// <form> can't take arguments in its "action" parameter
@@ -520,6 +526,10 @@ function contacts_content(App $a)
 				break;
 		}
 
+		if ($contact['uid'] == 0) {
+			$relation_text = '';
+		}
+
 		if (!in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA])) {
 			$relation_text = "";
 		}
@@ -589,17 +599,32 @@ function contacts_content(App $a)
 			}
 		}
 
+		if ($contact['uid'] == 0) {
+			$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
+			$follow_text = L10n::t("Connect/Follow");
+		}
+
 		// Load contactact related actions like hide, suggest, delete and others
 		$contact_actions = contact_actions($contact);
+
+		if ($contact['uid'] != 0) {
+			$lbl_vis1 = L10n::t('Profile Visibility');
+			$lbl_info1 = L10n::t('Contact Information / Notes');
+			$contact_settings_label = L10n::t('Contact Settings');
+		} else {
+			$lbl_vis1 = null;
+			$lbl_info1 = null;
+			$contact_settings_label = null;
+		}
 
 		$tpl = get_markup_template("contact_edit.tpl");
 		$o .= replace_macros($tpl, [
 			'$header' => L10n::t("Contact"),
 			'$tab_str' => $tab_str,
 			'$submit' => L10n::t('Submit'),
-			'$lbl_vis1' => L10n::t('Profile Visibility'),
+			'$lbl_vis1' => $lbl_vis1,
 			'$lbl_vis2' => L10n::t('Please choose the profile you would like to display to %s when viewing your profile securely.', $contact['name']),
-			'$lbl_info1' => L10n::t('Contact Information / Notes'),
+			'$lbl_info1' => $lbl_info1,
 			'$lbl_info2' => L10n::t('Their personal note'),
 			'$reason' => trim(notags($contact['reason'])),
 			'$infedit' => L10n::t('Edit contact notes'),
@@ -656,7 +681,7 @@ function contacts_content(App $a)
 			'$contact_action_button' => L10n::t("Actions"),
 			'$contact_actions' => $contact_actions,
 			'$contact_status' => L10n::t("Status"),
-			'$contact_settings_label' => L10n::t('Contact Settings'),
+			'$contact_settings_label' => $contact_settings_label,
 			'$contact_profile_label' => L10n::t("Profile"),
 		]);
 
@@ -883,13 +908,15 @@ function contacts_tab($a, $contact_id, $active_tab)
 		];
 	}
 
-	$tabs[] = ['label' => L10n::t('Advanced'),
-		'url'   => 'crepair/' . $contact_id,
-		'sel'   => (($active_tab == 5) ? 'active' : ''),
-		'title' => L10n::t('Advanced Contact Settings'),
-		'id'    => 'advanced-tab',
-		'accesskey' => 'r'
-	];
+	if ($contact['uid'] != 0) {
+		$tabs[] = ['label' => L10n::t('Advanced'),
+			'url'   => 'crepair/' . $contact_id,
+			'sel'   => (($active_tab == 5) ? 'active' : ''),
+			'title' => L10n::t('Advanced Contact Settings'),
+			'id'    => 'advanced-tab',
+			'accesskey' => 'r'
+		];
+	}
 
 	$tab_tpl = get_markup_template('common_tabs.tpl');
 	$tab_str = replace_macros($tab_tpl, ['$tabs' => $tabs]);
@@ -1021,21 +1048,23 @@ function contact_actions($contact)
 		'id'    => 'toggle-ignore',
 	];
 
-	$contact_actions['archive'] = [
-		'label' => (intval($contact['archive']) ? L10n::t('Unarchive') : L10n::t('Archive') ),
-		'url'   => 'contacts/' . $contact['id'] . '/archive',
-		'title' => L10n::t('Toggle Archive status'),
-		'sel'   => (intval($contact['archive']) ? 'active' : ''),
-		'id'    => 'toggle-archive',
-	];
+	if ($contact['uid'] != 0) {
+		$contact_actions['archive'] = [
+			'label' => (intval($contact['archive']) ? L10n::t('Unarchive') : L10n::t('Archive') ),
+			'url'   => 'contacts/' . $contact['id'] . '/archive',
+			'title' => L10n::t('Toggle Archive status'),
+			'sel'   => (intval($contact['archive']) ? 'active' : ''),
+			'id'    => 'toggle-archive',
+		];
 
-	$contact_actions['delete'] = [
-		'label' => L10n::t('Delete'),
-		'url'   => 'contacts/' . $contact['id'] . '/drop',
-		'title' => L10n::t('Delete contact'),
-		'sel'   => '',
-		'id'    => 'delete',
-	];
+		$contact_actions['delete'] = [
+			'label' => L10n::t('Delete'),
+			'url'   => 'contacts/' . $contact['id'] . '/drop',
+			'title' => L10n::t('Delete contact'),
+			'sel'   => '',
+			'id'    => 'delete',
+		];
+	}
 
 	return $contact_actions;
 }

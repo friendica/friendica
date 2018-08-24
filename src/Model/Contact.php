@@ -883,15 +883,6 @@ class Contact extends BaseObject
 			$contact_own = DBA::selectFirst('contact', [], ['nurl' => $contact['nurl'], 'network' => $contact['network'], 'uid' => $uid]);
 			if (DBA::isResult($contact_own)) {
 				return self::photoMenu($contact_own, $uid);
-			} else {
-				$profile_link = self::magicLink($contact['url']);
-				$connlnk = 'follow/?url=' . $contact['url'];
-				$menu = [
-					'profile' => [L10n::t('View Profile'), $profile_link, true],
-					'follow' => [L10n::t('Connect/Follow'), $connlnk, true]
-				];
-
-				return $menu;
 			}
 		}
 
@@ -933,16 +924,26 @@ class Contact extends BaseObject
 		 * Menu array:
 		 * "name" => [ "Label", "link", (bool)Should the link opened in a new tab? ]
 		 */
-		$menu = [
-			'status'  => [L10n::t("View Status")  , $status_link      , true],
-			'profile' => [L10n::t("View Profile") , $profile_link     , true],
-			'photos'  => [L10n::t("View Photos")  , $photos_link      , true],
-			'network' => [L10n::t("Network Posts"), $posts_link       , false],
-			'edit'    => [L10n::t("View Contact") , $contact_url      , false],
-			'drop'    => [L10n::t("Drop Contact") , $contact_drop_link, false],
-			'pm'      => [L10n::t("Send PM")      , $pm_url           , false],
-			'poke'    => [L10n::t("Poke")         , $poke_link        , false],
-		];
+		if (empty($contact['uid'])) {
+			$connlnk = 'follow/?url=' . $contact['url'];
+			$menu = [
+				'profile' => [L10n::t('View Profile'),   $profile_link, true],
+				'network' => [L10n::t('Network Posts'),  $posts_link,   false],
+				'edit'    => [L10n::t('View Contact'),   $contact_url,  false],
+				'follow'  => [L10n::t('Connect/Follow'), $connlnk,      true],
+			];
+		} else {
+			$menu = [
+				'status'  => [L10n::t('View Status'),   $status_link,       true],
+				'profile' => [L10n::t('View Profile'),  $profile_link,      true],
+				'photos'  => [L10n::t('View Photos'),   $photos_link,       true],
+				'network' => [L10n::t('Network Posts'), $posts_link,        false],
+				'edit'    => [L10n::t('View Contact'),  $contact_url,       false],
+				'drop'    => [L10n::t('Drop Contact'),  $contact_drop_link, false],
+				'pm'      => [L10n::t('Send PM'),       $pm_url,            false],
+				'poke'    => [L10n::t('Poke'),          $poke_link,         false],
+			];
+		}
 
 		$args = ['contact' => $contact, 'menu' => &$menu];
 

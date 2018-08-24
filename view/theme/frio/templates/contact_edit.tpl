@@ -26,8 +26,8 @@
 							{{/if}}
 							<li role="presentation"><a role="menuitem" href="{{$contact_actions.block.url}}" title="{{$contact_actions.block.title}}">{{$contact_actions.block.label}}</a></li>
 							<li role="presentation"><a role="menuitem" href="{{$contact_actions.ignore.url}}" title="{{$contact_actions.ignore.title}}">{{$contact_actions.ignore.label}}</a></li>
-							<li role="presentation"><a role="menuitem" href="{{$contact_actions.archive.url}}" title="{{$contact_actions.archive.title}}">{{$contact_actions.archive.label}}</a></li>
-							<li role="presentation"><button role="menuitem" type="button" class="btn-link" title="{{$contact_actions.delete.title}}" onclick="addToModal('{{$contact_actions.delete.url}}?confirm=1');">{{$contact_actions.delete.label}}</button></li>
+							{{if $contact_actions.archive.url}}<li role="presentation"><a role="menuitem" href="{{$contact_actions.archive.url}}" title="{{$contact_actions.archive.title}}">{{$contact_actions.archive.label}}</a></li>{{/if}}
+							{{if $contact_actions.delete.url}}<li role="presentation"><button role="menuitem" type="button" class="btn-link" title="{{$contact_actions.delete.title}}" onclick="addToModal('{{$contact_actions.delete.url}}?confirm=1');">{{$contact_actions.delete.label}}</button></li>{{/if}}
 						</ul>
 					</li>
 				</ul>
@@ -119,6 +119,7 @@
 						<div class="clear"></div>
 					</div>
 
+					{{if $contact_settings_label}}
 					<div class="panel">
 						<div class="section-subtitle-wrapper" role="tab" id="contact-edit-settings">
 							<h4>
@@ -146,7 +147,9 @@
 							</div>
 						</div>
 					</div>
+					{{/if}}
 
+					{{if $lbl_info1}}
 					<div class="panel">
 						<div class="section-subtitle-wrapper" role="tab" id="contact-edit-info">
 							<h4>
@@ -172,7 +175,8 @@
 							</div>
 						</div>
 					</div>
-
+					{{/if}}
+					{{if $lbl_vis1}}
 					<div class="panel">
 						<div class="section-subtitle-wrapper" role="tab" id="contact-edit-profile-select">
 							<h4>
@@ -200,7 +204,7 @@
 							</div>
 						</div>
 					</div>
-
+					{{/if}}
 				</div>
 
 			</form>{{* End of the form *}}
