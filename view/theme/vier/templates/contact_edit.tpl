@@ -21,8 +21,8 @@
 							<li class="divider"></li>
 							<li role="menuitem"><a  href="#" title="{{$contact_actions.block.title}}" onclick="window.location.href='{{$contact_actions.block.url}}'; return false;">{{$contact_actions.block.label}}</a></li>
 							<li role="menuitem"><a  href="#" title="{{$contact_actions.ignore.title}}" onclick="window.location.href='{{$contact_actions.ignore.url}}'; return false;">{{$contact_actions.ignore.label}}</a></li>
-							<li role="menuitem"><a  href="#" title="{{$contact_actions.archive.title}}" onclick="window.location.href='{{$contact_actions.archive.url}}'; return false;">{{$contact_actions.archive.label}}</a></li>
-							<li role="menuitem"><a  href="{{$contact_actions.delete.url}}" title="{{$contact_actions.delete.title}}" onclick="return confirmDelete();">{{$contact_actions.delete.label}}</a></li>
+							{{if $contact_actions.archive.url}}<li role="menuitem"><a  href="#" title="{{$contact_actions.archive.title}}" onclick="window.location.href='{{$contact_actions.archive.url}}'; return false;">{{$contact_actions.archive.label}}</a></li>{{/if}}
+							{{if $contact_actions.delete.url}}<li role="menuitem"><a  href="{{$contact_actions.delete.url}}" title="{{$contact_actions.delete.title}}" onclick="return confirmDelete();">{{$contact_actions.delete.label}}</a></li>{{/if}}
 						</ul>
 					</div>
 
@@ -64,6 +64,7 @@
 
 			<hr />
 
+			{{if $contact_settings_label}}
 			<h4 id="contact-edit-settings-label" class="fakelink" onclick="openClose('contact-edit-settings')">{{$contact_settings_label}}</h4>
 			<div id="contact-edit-settings">
 				<input type="hidden" name="contact_id" value="{{$contact_id}}">
@@ -99,8 +100,8 @@
 					<div id="contact-edit-profile-select-end"></div>
 				{{/if}}
 			</div>
-
 			<input class="contact-edit-submit" type="submit" name="submit" value="{{$submit|escape:'html'}}" />
+			{{/if}}
 
 			<div class="contact-edit-submit-end clearfix"></div>
 
