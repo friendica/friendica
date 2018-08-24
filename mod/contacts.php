@@ -131,16 +131,12 @@ function contacts_batch_actions(App $a)
 			$count_actions++;
 		}
 		if (x($_POST, 'contacts_batch_block')) {
-			$r = _contact_block($contact_id, $orig_record);
-			if ($r) {
-				$count_actions++;
-			}
+			_contact_block($contact_id);
+			$count_actions++;
 		}
 		if (x($_POST, 'contacts_batch_ignore')) {
-			$r = _contact_ignore($contact_id, $orig_record);
-			if ($r) {
-				$count_actions++;
-			}
+			_contact_ignore($contact_id);
+			$count_actions++;
 		}
 		if (x($_POST, 'contacts_batch_archive')) {
 			$r = _contact_archive($contact_id, $orig_record);
@@ -327,26 +323,16 @@ function _contact_update_profile($contact_id)
 	GContact::updateFromProbe($data["url"]);
 }
 
-function _contact_block($contact_id, $orig_record)
+function _contact_block($contact_id)
 {
-	$blocked = (($orig_record['blocked']) ? 0 : 1);
-	$r = q("UPDATE `contact` SET `blocked` = %d WHERE `id` = %d AND `uid` = %d",
-		intval($blocked),
-		intval($contact_id),
-		intval(local_user())
-	);
-	return DBA::isResult($r);
+	$blocked = !Contact::getBlocked($contact_id, local_user());
+	Contact::setBlocked($contact_id, local_user(), $blocked);
 }
 
-function _contact_ignore($contact_id, $orig_record)
+function _contact_ignore($contact_id)
 {
-	$readonly = (($orig_record['readonly']) ? 0 : 1);
-	$r = q("UPDATE `contact` SET `readonly` = %d WHERE `id` = %d AND `uid` = %d",
-		intval($readonly),
-		intval($contact_id),
-		intval(local_user())
-	);
-	return DBA::isResult($r);
+	$ignored = !Contact::getIgnored($contact_id, local_user());
+	Contact::setIgnored($contact_id, local_user(), $ignored);
 }
 
 function _contact_archive($contact_id, $orig_record)
@@ -415,22 +401,20 @@ function contacts_content(App $a)
 		}
 
 		if ($cmd === 'block') {
-			$r = _contact_block($contact_id, $orig_record);
-			if ($r) {
-				$blocked = (($orig_record['blocked']) ? 0 : 1);
-				info((($blocked) ? L10n::t('Contact has been blocked') : L10n::t('Contact has been unblocked')) . EOL);
-			}
+			_contact_block($contact_id);
+
+			$blocked = Contact::getBlocked($contact_id, local_user());
+			info(($blocked ? L10n::t('Contact has been blocked') : L10n::t('Contact has been unblocked')) . EOL);
 
 			goaway('contacts/' . $contact_id);
 			return; // NOTREACHED
 		}
 
 		if ($cmd === 'ignore') {
-			$r = _contact_ignore($contact_id, $orig_record);
-			if ($r) {
-				$readonly = (($orig_record['readonly']) ? 0 : 1);
-				info((($readonly) ? L10n::t('Contact has been ignored') : L10n::t('Contact has been unignored')) . EOL);
-			}
+			_contact_ignore($contact_id);
+
+			$ignored = Contact::getIgnored($contact_id, local_user());
+			info(($ignored ? L10n::t('Contact has been ignored') : L10n::t('Contact has been unignored')) . EOL);
 
 			goaway('contacts/' . $contact_id);
 			return; // NOTREACHED
@@ -510,6 +494,9 @@ function contacts_content(App $a)
 		$a->page['end'] .= replace_macros(get_markup_template('contact_end.tpl'), [
 			'$baseurl' => System::baseUrl(true),
 		]);
+
+		$contact['blocked'] = Contact::getBlocked($contact['id'], local_user());
+		$contact['readonly'] = Contact::getIgnored($contact['id'], local_user());
 
 		$dir_icon = '';
 		$relation_text = '';
@@ -806,6 +793,8 @@ function contacts_content(App $a)
 	);
 	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
+			$rr['blocked'] = Contact::getBlocked($rr['id'], local_user());
+			$rr['readonly'] = Contact::getIgnored($rr['id'], local_user());
 			$contacts[] = _contact_detail_for_template($rr);
 		}
 	}

@@ -1224,6 +1224,19 @@
 			"username": ["username(32)"]
 		}
 	},
+	"user-contact": {
+		"comment": "User specific public contact data",
+		"fields": {
+			"cid": {"type": "int unsigned", "not null": "1", "default": "0", "primary": "1", "relation": {"contact": "id"}, "comment": "Contact id of the linked public contact"},
+			"uid": {"type": "mediumint unsigned", "not null": "1", "default": "0", "primary": "1", "relation": {"user": "uid"}, "comment": "User id"},
+			"blocked": {"type": "boolean", "comment": "Contact is completely blocked for this user"},
+			"ignored": {"type": "boolean", "comment": "Posts from this contact are ignored"},
+			"collapsed": {"type": "boolean", "comment": "Posts from this contact are collapsed"}
+		},
+		"indexes": {
+			"PRIMARY": ["uid", "cid"]
+		}
+	},
 	"user-item": {
 		"comment": "User specific item data",
 		"fields": {

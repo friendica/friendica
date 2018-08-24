@@ -95,6 +95,210 @@ class Contact extends BaseObject
 	 */
 
 	/**
+	 * @brief Returns the contact id for the user and the public contact id for a given contact id
+	 *
+	 * @param int $cid Either public contact id or user's contact id
+	 * @param int $uid User ID
+	 *
+	 * @return array with public and user's contact id
+	 */
+	private static function getPublicAndUserContacID($cid, $uid)
+	{
+		if (empty($uid) || empty($cid)) {
+			return [];
+		}
+
+		$contact = DBA::selectFirst('contact', ['id', 'uid', 'url'], ['id' => $cid]);
+		if (!DBA::isResult($contact)) {
+			return [];
+		}
+
+		// We quit when the user id don't match the user id of the provided contact
+		if (($contact['uid'] != $uid) && ($contact['uid'] != 0)) {
+			return [];
+		}
+
+		if ($contact['uid'] != 0) {
+			$pcid = Contact::getIdForURL($contact['url'], 0, true, ['url' => $contact['url']]);
+			if (empty($pcid)) {
+				return [];
+			}
+			$ucid = $contact['id'];
+		} else {
+			$pcid = $contact['id'];
+			$ucid = Contact::getIdForURL($contact['url'], $uid, true);
+		}
+
+		return ['public' => $pcid, 'user' => $ucid];
+	}
+
+	/**
+	 * @brief Block contact id for user id
+	 *
+	 * @param int     $cid     Either public contact id or user's contact id
+	 * @param int     $uid     User ID
+	 * @param boolean $blocked Is the contact blocked or unblocked?
+	 */
+	public static function setBlocked($cid, $uid, $blocked)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		if ($cdata['user'] != 0) {
+			DBA::update('contact', ['blocked' => $blocked], ['id' => $cdata['user'], 'pending' => false]);
+		}
+
+		DBA::update('user-contact', ['blocked' => $blocked], ['cid' => $cdata['public'], 'uid' => $uid], true);
+	}
+
+	/**
+	 * @brief Returns "block" state for contact id and user id
+	 *
+	 * @param int $cid Either public contact id or user's contact id
+	 * @param int $uid User ID
+	 *
+	 * @return boolean is the contact id blocked for the given user?
+	 */
+	public static function getBlocked($cid, $uid)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		$public_blocked = false;
+
+		if (!empty($cdata['public'])) {
+			$public_contact = DBA::selectFirst('user-contact', ['blocked'], ['cid' => $cdata['public'], 'uid' => $uid]);
+			if (DBA::isResult($public_contact)) {
+				$public_blocked = $public_contact['blocked'];
+			}
+		}
+
+		$user_blocked = $public_blocked;
+
+		if (!empty($cdata['user'])) {
+			$user_contact = DBA::selectFirst('contact', ['blocked'], ['id' => $cdata['user'], 'pending' => false]);
+			if (DBA::isResult($user_contact)) {
+				$user_blocked = $user_contact['blocked'];
+			}
+		}
+
+		if ($user_blocked != $public_blocked) {
+			DBA::update('user-contact', ['blocked' => $user_blocked], ['cid' => $cdata['public'], 'uid' => $uid], true);
+		}
+
+		return $user_blocked;
+	}
+
+	/**
+	 * @brief Ignore contact id for user id
+	 *
+	 * @param int     $cid     Either public contact id or user's contact id
+	 * @param int     $uid     User ID
+	 * @param boolean $ignored Is the contact ignored or unignored?
+	 */
+	public static function setIgnored($cid, $uid, $ignored)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		if ($cdata['user'] != 0) {
+			DBA::update('contact', ['readonly' => $ignored], ['id' => $cdata['user'], 'pending' => false]);
+		}
+
+		DBA::update('user-contact', ['ignored' => $ignored], ['cid' => $cdata['public'], 'uid' => $uid], true);
+	}
+
+	/**
+	 * @brief Returns "ignore" state for contact id and user id
+	 *
+	 * @param int $cid Either public contact id or user's contact id
+	 * @param int $uid User ID
+	 *
+	 * @return boolean is the contact id ignored for the given user?
+	 */
+	public static function getIgnored($cid, $uid)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		$public_ignored = false;
+
+		if (!empty($cdata['public'])) {
+			$public_contact = DBA::selectFirst('user-contact', ['ignored'], ['cid' => $cdata['public'], 'uid' => $uid]);
+			if (DBA::isResult($public_contact)) {
+				$public_ignored = $public_contact['ignored'];
+			}
+		}
+
+		$user_ignored = $public_ignored;
+
+		if (!empty($cdata['user'])) {
+			$user_contact = DBA::selectFirst('contact', ['readonly'], ['id' => $cdata['user'], 'pending' => false]);
+			if (DBA::isResult($user_contact)) {
+				$user_ignored = $user_contact['readonly'];
+			}
+		}
+
+		if ($user_ignored != $public_ignored) {
+			DBA::update('user-contact', ['ignored' => $user_ignored], ['cid' => $cdata['public'], 'uid' => $uid], true);
+		}
+
+		return $user_ignored;
+	}
+
+	/**
+	 * @brief Set "collapsed" for contact id and user id
+	 *
+	 * @param int     $cid       Either public contact id or user's contact id
+	 * @param int     $uid       User ID
+	 * @param boolean $collapsed are the contact's posts collapsed or uncollapsed?
+	 */
+	public static function setCollapsed($cid, $uid, $collapsed)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		DBA::update('user-contact', ['collapsed' => $collapsed], ['cid' => $cdata['public'], 'uid' => $uid], true);
+	}
+
+	/**
+	 * @brief Returns "collapsed" state for contact id and user id
+	 *
+	 * @param int $cid Either public contact id or user's contact id
+	 * @param int $uid User ID
+	 *
+	 * @return boolean is the contact id blocked for the given user?
+	 */
+	public static function getCollapsed($cid, $uid)
+	{
+		$cdata = self::getPublicAndUserContacID($cid, $uid);
+		if (empty($cdata)) {
+			return;
+		}
+
+		$collapsed = false;
+
+		if (!empty($cdata['public'])) {
+			$public_contact = DBA::selectFirst('user-contact', ['collapsed'], ['cid' => $cdata['public'], 'uid' => $uid]);
+			if (DBA::isResult($public_contact)) {
+				$collapsed = $public_contact['collapsed'];
+			}
+		}
+
+		return $collapsed;
+	}
+
+	/**
 	 * @brief Returns a list of contacts belonging in a group
 	 *
 	 * @param int $gid

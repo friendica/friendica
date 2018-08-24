@@ -584,7 +584,13 @@ class Item extends BaseObject
 		} else {
 			$master_table = "`item`";
 		}
-		return "$master_table.`visible` AND NOT $master_table.`deleted` AND NOT $master_table.`moderated` AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`) ";
+		return sprintf("$master_table.`visible` AND NOT $master_table.`deleted` AND NOT $master_table.`moderated`
+			AND (`user-item`.`hidden` IS NULL OR NOT `user-item`.`hidden`)
+			AND (`user-author`.`blocked` IS NULL OR NOT `user-author`.`blocked`)
+			AND (`user-author`.`ignored` IS NULL OR NOT `user-author`.`ignored` OR `item`.`gravity` != %d)
+			AND (`user-owner`.`blocked` IS NULL OR NOT `user-owner`.`blocked`)
+			AND (`user-owner`.`ignored` IS NULL OR NOT `user-owner`.`ignored` OR `item`.`gravity` != %d) ",
+			GRAVITY_PARENT, GRAVITY_PARENT);
 	}
 
 	/**
@@ -615,8 +621,10 @@ class Item extends BaseObject
 				OR `contact`.`self` OR `item`.`gravity` != %d OR `contact`.`uid` = 0)
 				STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = $master_table.`author-id` AND NOT `author`.`blocked`
 				STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = $master_table.`owner-id` AND NOT `owner`.`blocked`
-				LEFT JOIN `user-item` ON `user-item`.`iid` = $master_table_key AND `user-item`.`uid` = %d",
-				Contact::SHARING, Contact::FRIEND, GRAVITY_PARENT, intval($uid));
+				LEFT JOIN `user-item` ON `user-item`.`iid` = $master_table_key AND `user-item`.`uid` = %d
+				LEFT JOIN `user-contact` AS `user-author` ON `user-author`.`cid` = $master_table.`author-id` AND `user-author`.`uid` = %d
+				LEFT JOIN `user-contact` AS `user-owner` ON `user-owner`.`cid` = $master_table.`owner-id` AND `user-owner`.`uid` = %d",
+				Contact::SHARING, Contact::FRIEND, GRAVITY_PARENT, intval($uid), intval($uid), intval($uid));
 		} else {
 			if (strpos($sql_commands, "`contact`.") !== false) {
 				$joins .= "LEFT JOIN `contact` ON `contact`.`id` = $master_table.`contact-id`";

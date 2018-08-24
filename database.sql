@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2018.08-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1282
+-- DB_UPDATE_VERSION 1283
 -- ------------------------------------------
 
 
@@ -1172,6 +1172,18 @@ CREATE TABLE IF NOT EXISTS `userd` (
 	 PRIMARY KEY(`id`),
 	 INDEX `username` (`username`(32))
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Deleted usernames';
+
+--
+-- TABLE user-contact
+--
+CREATE TABLE IF NOT EXISTS `user-contact` (
+	`cid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Contact id of the linked public contact',
+	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'User id',
+	`blocked` boolean COMMENT 'Contact is completely blocked for this user',
+	`ignored` boolean COMMENT 'Posts from this contact are ignored',
+	`collapsed` boolean COMMENT 'Posts from this contact are collapsed',
+	 PRIMARY KEY(`uid`,`cid`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='User specific public contact data';
 
 --
 -- TABLE user-item
