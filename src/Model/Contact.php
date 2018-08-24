@@ -279,7 +279,7 @@ class Contact extends BaseObject
 	 *
 	 * @return boolean is the contact id blocked for the given user?
 	 */
-	public static function getCollapsed($cid, $uid)
+	public static function isCollapsedByUser($cid, $uid)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
