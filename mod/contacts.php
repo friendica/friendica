@@ -325,14 +325,14 @@ function _contact_update_profile($contact_id)
 
 function _contact_block($contact_id)
 {
-	$blocked = !Contact::getBlocked($contact_id, local_user());
-	Contact::setBlocked($contact_id, local_user(), $blocked);
+	$blocked = !Contact::isBlockedByUser($contact_id, local_user());
+	Contact::setBlockedForUser($contact_id, local_user(), $blocked);
 }
 
 function _contact_ignore($contact_id)
 {
-	$ignored = !Contact::getIgnored($contact_id, local_user());
-	Contact::setIgnored($contact_id, local_user(), $ignored);
+	$ignored = !Contact::isIgnoredByUser($contact_id, local_user());
+	Contact::setIgnoredForUser($contact_id, local_user(), $ignored);
 }
 
 function _contact_archive($contact_id, $orig_record)
@@ -403,7 +403,7 @@ function contacts_content(App $a)
 		if ($cmd === 'block') {
 			_contact_block($contact_id);
 
-			$blocked = Contact::getBlocked($contact_id, local_user());
+			$blocked = Contact::isBlockedByUser($contact_id, local_user());
 			info(($blocked ? L10n::t('Contact has been blocked') : L10n::t('Contact has been unblocked')) . EOL);
 
 			goaway('contacts/' . $contact_id);
@@ -413,7 +413,7 @@ function contacts_content(App $a)
 		if ($cmd === 'ignore') {
 			_contact_ignore($contact_id);
 
-			$ignored = Contact::getIgnored($contact_id, local_user());
+			$ignored = Contact::isIgnoredByUser($contact_id, local_user());
 			info(($ignored ? L10n::t('Contact has been ignored') : L10n::t('Contact has been unignored')) . EOL);
 
 			goaway('contacts/' . $contact_id);
@@ -495,8 +495,8 @@ function contacts_content(App $a)
 			'$baseurl' => System::baseUrl(true),
 		]);
 
-		$contact['blocked'] = Contact::getBlocked($contact['id'], local_user());
-		$contact['readonly'] = Contact::getIgnored($contact['id'], local_user());
+		$contact['blocked'] = Contact::isBlockedByUser($contact['id'], local_user());
+		$contact['readonly'] = Contact::isIgnoredByUser($contact['id'], local_user());
 
 		$dir_icon = '';
 		$relation_text = '';
@@ -793,8 +793,8 @@ function contacts_content(App $a)
 	);
 	if (DBA::isResult($r)) {
 		foreach ($r as $rr) {
-			$rr['blocked'] = Contact::getBlocked($rr['id'], local_user());
-			$rr['readonly'] = Contact::getIgnored($rr['id'], local_user());
+			$rr['blocked'] = Contact::isBlockedByUser($rr['id'], local_user());
+			$rr['readonly'] = Contact::isIgnoredByUser($rr['id'], local_user());
 			$contacts[] = _contact_detail_for_template($rr);
 		}
 	}

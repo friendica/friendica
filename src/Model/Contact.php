@@ -139,7 +139,7 @@ class Contact extends BaseObject
 	 * @param int     $uid     User ID
 	 * @param boolean $blocked Is the contact blocked or unblocked?
 	 */
-	public static function setBlocked($cid, $uid, $blocked)
+	public static function setBlockedForUser($cid, $uid, $blocked)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
@@ -161,7 +161,7 @@ class Contact extends BaseObject
 	 *
 	 * @return boolean is the contact id blocked for the given user?
 	 */
-	public static function getBlocked($cid, $uid)
+	public static function isBlockedByUser($cid, $uid)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
@@ -200,7 +200,7 @@ class Contact extends BaseObject
 	 * @param int     $uid     User ID
 	 * @param boolean $ignored Is the contact ignored or unignored?
 	 */
-	public static function setIgnored($cid, $uid, $ignored)
+	public static function setIgnoredForUser($cid, $uid, $ignored)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
@@ -222,7 +222,7 @@ class Contact extends BaseObject
 	 *
 	 * @return boolean is the contact id ignored for the given user?
 	 */
-	public static function getIgnored($cid, $uid)
+	public static function isIgnoredByUser($cid, $uid)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
@@ -261,7 +261,7 @@ class Contact extends BaseObject
 	 * @param int     $uid       User ID
 	 * @param boolean $collapsed are the contact's posts collapsed or uncollapsed?
 	 */
-	public static function setCollapsed($cid, $uid, $collapsed)
+	public static function setCollapsedForUser($cid, $uid, $collapsed)
 	{
 		$cdata = self::getPublicAndUserContacID($cid, $uid);
 		if (empty($cdata)) {
