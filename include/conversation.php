@@ -521,12 +521,11 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 		$items = conversation_add_children($items, true, $order, $uid);
 		$profile_owner = 0;
 
-		/// @todo Adding the whole update mechanism
-		//if (!$update) {
-		//	$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
-		//		. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 10)
-		//		."/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
-		//}
+		if (!$update) {
+			$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
+				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 9)
+				."/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+		}
 	} elseif ($mode === 'search') {
 		$live_update_div = '<div id="live-search"></div>' . "\r\n";
 	}

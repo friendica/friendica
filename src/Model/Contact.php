@@ -1301,7 +1301,7 @@ class Contact extends BaseObject
 	 *
 	 * @return string posts in HTML
 	 */
-	public static function getPostsFromUrl($contact_url, $thread_mode = false)
+	public static function getPostsFromUrl($contact_url, $thread_mode = false, $update = 0)
 	{
 		$a = self::getApp();
 
@@ -1344,7 +1344,7 @@ class Contact extends BaseObject
 
 			$items = Item::inArray($r);
 
-			$o = conversation($a, $items, 'contacts', false);
+			$o = conversation($a, $items, 'contacts', $update);
 		} else {
 			$r = Item::selectForUser(local_user(), [], $condition, $params);
 
@@ -1353,7 +1353,9 @@ class Contact extends BaseObject
 			$o = conversation($a, $items, 'contact-posts', false);
 		}
 
-		$o .= alt_pager($a, count($items));
+		if (!$update) {
+			$o .= alt_pager($a, count($items));
+		}
 
 		return $o;
 	}

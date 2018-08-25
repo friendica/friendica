@@ -371,7 +371,7 @@ function _contact_drop($orig_record)
 	Contact::remove($orig_record['id']);
 }
 
-function contacts_content(App $a)
+function contacts_content(App $a, $update = 0)
 {
 	$sort_type = 0;
 	$o = '';
@@ -490,7 +490,7 @@ function contacts_content(App $a)
 			return contact_posts($a, $contact_id);
 		}
 		if ($cmd === 'conversations') {
-			return contact_conversations($a, $contact_id);
+			return contact_conversations($a, $contact_id, $update);
 		}
 	}
 
@@ -938,34 +938,38 @@ function contacts_tab($a, $contact, $active_tab)
 	return $tab_str;
 }
 
-function contact_conversations(App $a, $contact_id)
+function contact_conversations(App $a, $contact_id, $update)
 {
 	$o = '';
 
-	// We need the editor here to be able to reshare an item.
-	if (local_user()) {
-		$x = [
-			'is_owner' => true,
-			'allow_location' => $a->user['allow_location'],
-			'default_location' => $a->user['default-location'],
-			'nickname' => $a->user['nickname'],
-			'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-			'acl' => ACL::getFullSelectorHTML($a->user, true),
-			'bang' => '',
-			'visitor' => 'block',
-			'profile_uid' => local_user(),
-		];
-		$o = status_editor($a, $x, 0, true);
+	if (!$update) {
+		// We need the editor here to be able to reshare an item.
+		if (local_user()) {
+			$x = [
+				'is_owner' => true,
+				'allow_location' => $a->user['allow_location'],
+				'default_location' => $a->user['default-location'],
+				'nickname' => $a->user['nickname'],
+				'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
+				'acl' => ACL::getFullSelectorHTML($a->user, true),
+				'bang' => '',
+				'visitor' => 'block',
+				'profile_uid' => local_user(),
+			];
+			$o = status_editor($a, $x, 0, true);
+		}
 	}
 
 	$contact = DBA::selectFirst('contact', ['uid', 'url', 'id'], ['id' => $contact_id]);
 
-	$o .= contacts_tab($a, $contact, 1);
+	if (!$update) {
+		$o .= contacts_tab($a, $contact, 1);
+	}
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
 		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
-		$o .= Contact::getPostsFromUrl($contact["url"], true);
+		$o .= Contact::getPostsFromUrl($contact["url"], true, $update);
 	}
 
 	return $o;
