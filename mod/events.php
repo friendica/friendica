@@ -542,13 +542,11 @@ function events_content(App $a) {
 
 	// Remove an event from the calendar and its related items
 	if ($mode === 'drop' && $event_id) {
-		$del = 0;
-
 		$ev = Event::getListById(local_user(), $event_id);
 
 		// Delete only real events (no birthdays)
 		if (DBA::isResult($ev) && $ev[0]['type'] == 'event') {
-			$del = Item::deleteForUser(['id' => $ev[0]['itemid']], local_user());
+			Item::deleteForUser(['id' => $ev[0]['itemid']], local_user());
 		}
 
 		if (Item::exists(['id' => $ev[0]['itemid']])) {
