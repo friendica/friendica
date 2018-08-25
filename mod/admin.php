@@ -24,6 +24,7 @@ use Friendica\Module\Tos;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
+use Friendica\Util\Network;
 
 require_once 'include/enotify.php';
 require_once 'include/text.php';
@@ -866,6 +867,14 @@ function admin_page_summary(App $a)
 	if (file_exists('.htconfig.php')) {
 		$showwarning = true;
 		$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.ini.php, please copy config/local-sample.ini.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', $a->get_baseurl() . '/help/Config');
+	}
+
+	// Check server vitality
+	if (!admin_page_server_vital()) {
+		$showwarning = true;
+		$well_known = $a->get_baseurl() . '/.well-known/host-meta';
+		$warningtext[] = L10n::t('<a href="%s">%s</a> is not reachable on your system. This is a servere configuration issue that prevents the communication.. See <a href="%s">the installation page</a> for help.',
+			$well_known, $well_known, $a->get_baseurl() . '/help/Install');
 	}
 
 	$r = q("SELECT `page-flags`, COUNT(`uid`) AS `count` FROM `user` GROUP BY `page-flags`");
@@ -2543,4 +2552,11 @@ function admin_page_features(App $a)
 
 		return $o;
 	}
+}
+
+function admin_page_server_vital()
+{
+	// Fetch the host-meta to check if this really is a vital server
+	$serverret = Network::curl(System::baseUrl() . '/.well-known/host-meta');
+	return $serverret["success"];
 }
