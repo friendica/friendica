@@ -21,6 +21,7 @@ use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
+use Friendica\Core\ACL;
 
 function contacts_init(App $a)
 {
@@ -39,7 +40,7 @@ function contacts_init(App $a)
 
 	$contact_id = null;
 	$contact = null;
-	if ((($a->argc == 2) && intval($a->argv[1])) || (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts"))) {
+	if ((($a->argc == 2) && intval($a->argv[1])) || (($a->argc == 3) && intval($a->argv[1]) && in_array($a->argv[2], ['posts', 'conversations']))) {
 		$contact_id = intval($a->argv[1]);
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
 
@@ -50,7 +51,7 @@ function contacts_init(App $a)
 
 	if (DBA::isResult($contact)) {
 		if ($contact['self']) {
-			if (($a->argc == 3) && intval($a->argv[1]) && ($a->argv[2] == "posts")) {
+			if (($a->argc == 3) && intval($a->argv[1]) && in_array($a->argv[2], ['posts', 'conversations'])) {
 				goaway('profile/' . $contact['nick']);
 			} else {
 				goaway('profile/' . $contact['nick'] . '?tab=profile');
@@ -488,6 +489,9 @@ function contacts_content(App $a)
 		if ($cmd === 'posts') {
 			return contact_posts($a, $contact_id);
 		}
+		if ($cmd === 'conversations') {
+			return contact_conversations($a, $contact_id);
+		}
 	}
 
 	$_SESSION['return_url'] = $a->query_string;
@@ -559,7 +563,7 @@ function contacts_content(App $a)
 		$nettype = L10n::t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact["url"]));
 
 		// tabs
-		$tab_str = contacts_tab($a, $contact_id, 2, $contact);
+		$tab_str = contacts_tab($a, $contact_id, 3, $contact);
 
 		$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
 
@@ -871,16 +875,24 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	$tabs = [
 		[
 			'label' => L10n::t('Status'),
-			'url'   => "contacts/" . $contact_id . "/posts",
+			'url'   => "contacts/" . $contact_id . "/conversations",
 			'sel'   => (($active_tab == 1) ? 'active' : ''),
-			'title' => L10n::t('Status Messages and Posts'),
+			'title' => L10n::t('Conversations started by this contact'),
 			'id'    => 'status-tab',
 			'accesskey' => 'm',
 		],
 		[
+			'label' => L10n::t('Posts and Comments'),
+			'url'   => "contacts/" . $contact_id . "/posts",
+			'sel'   => (($active_tab == 2) ? 'active' : ''),
+			'title' => L10n::t('Status Messages and Posts'),
+			'id'    => 'posts-tab',
+			'accesskey' => 'p',
+		],
+		[
 			'label' => L10n::t('Profile'),
 			'url'   => "contacts/" . $contact_id,
-			'sel'   => (($active_tab == 2) ? 'active' : ''),
+			'sel'   => (($active_tab == 3) ? 'active' : ''),
 			'title' => L10n::t('Profile Details'),
 			'id'    => 'profile-tab',
 			'accesskey' => 'o',
@@ -892,7 +904,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	if ($x) {
 		$tabs[] = ['label' => L10n::t('Contacts'),
 			'url'   => "allfriends/" . $contact_id,
-			'sel'   => (($active_tab == 3) ? 'active' : ''),
+			'sel'   => (($active_tab == 4) ? 'active' : ''),
 			'title' => L10n::t('View all contacts'),
 			'id'    => 'allfriends-tab',
 			'accesskey' => 't'];
@@ -903,7 +915,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	if ($common) {
 		$tabs[] = ['label' => L10n::t('Common Friends'),
 			'url'   => "common/loc/" . local_user() . "/" . $contact_id,
-			'sel'   => (($active_tab == 4) ? 'active' : ''),
+			'sel'   => (($active_tab == 5) ? 'active' : ''),
 			'title' => L10n::t('View all common friends'),
 			'id'    => 'common-loc-tab',
 			'accesskey' => 'd'
@@ -913,7 +925,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	if (!empty($contact['uid'])) {
 		$tabs[] = ['label' => L10n::t('Advanced'),
 			'url'   => 'crepair/' . $contact_id,
-			'sel'   => (($active_tab == 5) ? 'active' : ''),
+			'sel'   => (($active_tab == 6) ? 'active' : ''),
 			'title' => L10n::t('Advanced Contact Settings'),
 			'id'    => 'advanced-tab',
 			'accesskey' => 'r'
@@ -926,11 +938,44 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	return $tab_str;
 }
 
+function contact_conversations(App $a, $contact_id)
+{
+	$o = '';
+
+	// We need the editor here to be able to reshare an item.
+	if (local_user()) {
+		$x = [
+			'is_owner' => true,
+			'allow_location' => $a->user['allow_location'],
+			'default_location' => $a->user['default-location'],
+			'nickname' => $a->user['nickname'],
+			'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
+			'acl' => ACL::getFullSelectorHTML($a->user, true),
+			'bang' => '',
+			'visitor' => 'block',
+			'profile_uid' => local_user(),
+		];
+		$o = status_editor($a, $x, 0, true);
+	}
+
+	$contact = DBA::selectFirst('contact', ['uid', 'url'], ['id' => $contact_id]);
+
+	$o .= contacts_tab($a, $contact_id, 1, $contact);
+
+	if (DBA::isResult($contact)) {
+		$a->page['aside'] = "";
+		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
+		$o .= Contact::getPostsFromUrl($contact["url"], true);
+	}
+
+	return $o;
+}
+
 function contact_posts(App $a, $contact_id)
 {
 	$contact = DBA::selectFirst('contact', ['uid', 'url'], ['id' => $contact_id]);
 
-	$o = contacts_tab($a, $contact_id, 1, $contact);
+	$o = contacts_tab($a, $contact_id, 2, $contact);
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";

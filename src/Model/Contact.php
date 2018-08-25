@@ -914,7 +914,7 @@ class Contact extends BaseObject
 
 		$contact_url = System::baseUrl() . '/contacts/' . $contact['id'];
 
-		$posts_link = System::baseUrl() . '/contacts/' . $contact['id'] . '/posts';
+		$posts_link = System::baseUrl() . '/contacts/' . $contact['id'] . '/conversations';
 
 		if (!$contact['self']) {
 			$contact_drop_link = System::baseUrl() . '/contacts/' . $contact['id'] . '/drop?confirm=1';
@@ -1301,7 +1301,7 @@ class Contact extends BaseObject
 	 *
 	 * @return string posts in HTML
 	 */
-	public static function getPostsFromUrl($contact_url)
+	public static function getPostsFromUrl($contact_url, $thread_mode = false)
 	{
 		$a = self::getApp();
 
@@ -1328,15 +1328,30 @@ class Contact extends BaseObject
 
 		$contact = ($r[0]["contact-type"] == self::ACCOUNT_TYPE_COMMUNITY ? 'owner-id' : 'author-id');
 
-		$condition = ["`$contact` = ? AND `gravity` IN (?, ?) AND " . $sql,
-			$author_id, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
+		if ($thread_mode) {
+			$condition = ["`$contact` = ? AND `gravity` = ? AND " . $sql,
+				$author_id, GRAVITY_PARENT, local_user()];
+		} else {
+			$condition = ["`$contact` = ? AND `gravity` IN (?, ?) AND " . $sql,
+				$author_id, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
+		}
+
 		$params = ['order' => ['created' => true],
 			'limit' => [$a->pager['start'], $a->pager['itemspage']]];
-		$r = Item::selectForUser(local_user(), [], $condition, $params);
 
-		$items = Item::inArray($r);
+		if ($thread_mode) {
+			$r = Item::selectThreadForUser(local_user(), ['uri'], $condition, $params);
 
-		$o = conversation($a, $items, 'contact-posts', false);
+			$items = Item::inArray($r);
+
+			$o = conversation($a, $items, 'network', false);
+		} else {
+			$r = Item::selectForUser(local_user(), [], $condition, $params);
+
+			$items = Item::inArray($r);
+
+			$o = conversation($a, $items, 'contact-posts', false);
+		}
 
 		$o .= alt_pager($a, count($items));
 
