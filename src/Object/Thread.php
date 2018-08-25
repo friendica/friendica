@@ -71,6 +71,10 @@ class Thread extends BaseObject
 				$this->profile_owner = 0;
 				$this->writable = $writable;
 				break;
+			case 'contacts':
+				$this->profile_owner = 0;
+				$this->writable = $writable;
+				break;
 			default:
 				logger('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').', LOGGER_DEBUG);
 				return false;

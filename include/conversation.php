@@ -517,6 +517,15 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 10)
 				."/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
 		}
+	} elseif ($mode === 'contacts') {
+		$items = conversation_add_children($items, true, $order, $uid);
+		$profile_owner = 0;
+
+		if (!$update) {
+			$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
+				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 10)
+				."/?f='; var profile_page = " . $a->pager['page'] . "; </script>\r\n";
+		}
 	} elseif ($mode === 'search') {
 		$live_update_div = '<div id="live-search"></div>' . "\r\n";
 	}
@@ -544,7 +553,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 	$page_template = get_markup_template("conversation.tpl");
 
 	if (!empty($items)) {
-		if ($mode === 'community') {
+		if (in_array($mode, ['community', 'contacts'])) {
 			$writable = true;
 		} else {
 			$writable = ($items[0]['uid'] == 0) && in_array($items[0]['network'], [Protocol::OSTATUS, Protocol::DIASPORA, Protocol::DFRN]);
