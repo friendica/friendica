@@ -873,7 +873,7 @@ function admin_page_summary(App $a)
 	if (!admin_page_server_vital()) {
 		$showwarning = true;
 		$well_known = $a->get_baseurl() . '/.well-known/host-meta';
-		$warningtext[] = L10n::t('<a href="%s">%s</a> is not reachable on your system. This is a servere configuration issue that prevents the communication. See <a href="%s">the installation page</a> for help.',
+		$warningtext[] = L10n::t('<a href="%s">%s</a> is not reachable on your system. This is a servere configuration issue that prevents communication. See <a href="%s">the installation page</a> for help.',
 			$well_known, $well_known, $a->get_baseurl() . '/help/Install');
 	}
 
