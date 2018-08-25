@@ -120,6 +120,12 @@ class CronJobs
 		// delete user records for recently removed accounts
 		$users = DBA::select('user', ['uid'], ["`account_removed` AND `account_expires_on` < UTC_TIMESTAMP() - INTERVAL 3 DAY"]);
 		while ($user = DBA::fetch($users)) {
+			// Delete the contacts of this user
+			$self = DBA::selectFirst('contact', ['nurl'], ['self' => true, 'uid' => $user['uid']]);
+			if (DBA::isResult($self)) {
+				DBA::delete('contact', ['nurl' => $self['nurl'], 'self' => false]);
+			}
+
 			DBA::delete('user', ['uid' => $user['uid']]);
 		}
 	}
