@@ -563,7 +563,7 @@ function contacts_content(App $a)
 		$nettype = L10n::t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact["url"]));
 
 		// tabs
-		$tab_str = contacts_tab($a, $contact_id, 3, $contact);
+		$tab_str = contacts_tab($a, $contact, 3);
 
 		$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
 
@@ -864,18 +864,18 @@ function contacts_content(App $a)
  * Available Pages are 'Status', 'Profile', 'Contacts' and 'Common Friends'
  *
  * @param App $a
- * @param int $contact_id The ID of the contact
+ * @param array $contact The contact array
  * @param int $active_tab 1 if tab should be marked as active
  *
  * @return string
  */
-function contacts_tab($a, $contact_id, $active_tab, $contact)
+function contacts_tab($a, $contact, $active_tab)
 {
 	// tabs
 	$tabs = [
 		[
 			'label' => L10n::t('Status'),
-			'url'   => "contacts/" . $contact_id . "/conversations",
+			'url'   => "contacts/" . $contact['id'] . "/conversations",
 			'sel'   => (($active_tab == 1) ? 'active' : ''),
 			'title' => L10n::t('Conversations started by this contact'),
 			'id'    => 'status-tab',
@@ -883,7 +883,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 		],
 		[
 			'label' => L10n::t('Posts and Comments'),
-			'url'   => "contacts/" . $contact_id . "/posts",
+			'url'   => "contacts/" . $contact['id'] . "/posts",
 			'sel'   => (($active_tab == 2) ? 'active' : ''),
 			'title' => L10n::t('Status Messages and Posts'),
 			'id'    => 'posts-tab',
@@ -891,7 +891,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 		],
 		[
 			'label' => L10n::t('Profile'),
-			'url'   => "contacts/" . $contact_id,
+			'url'   => "contacts/" . $contact['id'],
 			'sel'   => (($active_tab == 3) ? 'active' : ''),
 			'title' => L10n::t('Profile Details'),
 			'id'    => 'profile-tab',
@@ -900,10 +900,10 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	];
 
 	// Show this tab only if there is visible friend list
-	$x = GContact::countAllFriends(local_user(), $contact_id);
+	$x = GContact::countAllFriends(local_user(), $contact['id']);
 	if ($x) {
 		$tabs[] = ['label' => L10n::t('Contacts'),
-			'url'   => "allfriends/" . $contact_id,
+			'url'   => "allfriends/" . $contact['id'],
 			'sel'   => (($active_tab == 4) ? 'active' : ''),
 			'title' => L10n::t('View all contacts'),
 			'id'    => 'allfriends-tab',
@@ -911,10 +911,10 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 	}
 
 	// Show this tab only if there is visible common friend list
-	$common = GContact::countCommonFriends(local_user(), $contact_id);
+	$common = GContact::countCommonFriends(local_user(), $contact['id']);
 	if ($common) {
 		$tabs[] = ['label' => L10n::t('Common Friends'),
-			'url'   => "common/loc/" . local_user() . "/" . $contact_id,
+			'url'   => "common/loc/" . local_user() . "/" . $contact['id'],
 			'sel'   => (($active_tab == 5) ? 'active' : ''),
 			'title' => L10n::t('View all common friends'),
 			'id'    => 'common-loc-tab',
@@ -924,7 +924,7 @@ function contacts_tab($a, $contact_id, $active_tab, $contact)
 
 	if (!empty($contact['uid'])) {
 		$tabs[] = ['label' => L10n::t('Advanced'),
-			'url'   => 'crepair/' . $contact_id,
+			'url'   => 'crepair/' . $contact['id'],
 			'sel'   => (($active_tab == 6) ? 'active' : ''),
 			'title' => L10n::t('Advanced Contact Settings'),
 			'id'    => 'advanced-tab',
@@ -958,9 +958,9 @@ function contact_conversations(App $a, $contact_id)
 		$o = status_editor($a, $x, 0, true);
 	}
 
-	$contact = DBA::selectFirst('contact', ['uid', 'url'], ['id' => $contact_id]);
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'id'], ['id' => $contact_id]);
 
-	$o .= contacts_tab($a, $contact_id, 1, $contact);
+	$o .= contacts_tab($a, $contact, 1);
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
@@ -973,9 +973,9 @@ function contact_conversations(App $a, $contact_id)
 
 function contact_posts(App $a, $contact_id)
 {
-	$contact = DBA::selectFirst('contact', ['uid', 'url'], ['id' => $contact_id]);
+	$contact = DBA::selectFirst('contact', ['uid', 'url', 'id'], ['id' => $contact_id]);
 
-	$o = contacts_tab($a, $contact_id, 2, $contact);
+	$o = contacts_tab($a, $contact, 2);
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";

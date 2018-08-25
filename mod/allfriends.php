@@ -35,7 +35,7 @@ function allfriends_content(App $a)
 
 	$uid = $a->user['uid'];
 
-	$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['id' => $cid, 'uid' => local_user()]);
 
 	if (!DBA::isResult($contact)) {
 		return;
@@ -96,7 +96,7 @@ function allfriends_content(App $a)
 		$entries[] = $entry;
 	}
 
-	$tab_str = contacts_tab($a, $cid, 3);
+	$tab_str = contacts_tab($a, $contact, 4);
 
 	$tpl = get_markup_template('viewcontact_template.tpl');
 

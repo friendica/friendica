@@ -38,14 +38,14 @@ function common_content(App $a)
 	}
 
 	if ($cmd === 'loc' && $cid) {
-		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['id' => $cid, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['id' => $cid, 'uid' => $uid]);
 
 		if (DBA::isResult($contact)) {
 			$a->page['aside'] = "";
 			Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
 		}
 	} else {
-		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo'], ['self' => true, 'uid' => $uid]);
+		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['self' => true, 'uid' => $uid]);
 
 		if (DBA::isResult($contact)) {
 			$vcard_widget = replace_macros(get_markup_template("vcard-widget.tpl"), [
@@ -137,7 +137,7 @@ function common_content(App $a)
 	$title = '';
 	$tab_str = '';
 	if ($cmd === 'loc' && $cid && local_user() == $uid) {
-		$tab_str = contacts_tab($a, $cid, 4);
+		$tab_str = contacts_tab($a, $contact, 4);
 	} else {
 		$title = L10n::t('Common Friends');
 	}

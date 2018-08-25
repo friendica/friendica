@@ -103,7 +103,7 @@ function crepair_content(App $a)
 
 	$cid = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
-		$contact = null;
+	$contact = null;
 	if ($cid) {
 		$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'uid' => local_user()]);
 	}
@@ -135,7 +135,7 @@ function crepair_content(App $a)
 
 	$update_profile = in_array($contact['network'], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]);
 
-	$tab_str = contacts_tab($a, $contact['id'], 5);
+	$tab_str = contacts_tab($a, $contact, 5);
 
 	$tpl = get_markup_template('crepair.tpl');
 	$o = replace_macros($tpl, [
