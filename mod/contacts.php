@@ -968,7 +968,16 @@ function contact_conversations(App $a, $contact_id, $update)
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
-		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
+
+		$profiledata = Contact::getDetailsByURL($contact["url"]);
+
+		if (local_user()) {
+			if (in_array($profiledata["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
+				$profiledata["remoteconnect"] = System::baseUrl()."/follow?url=".urlencode($profiledata["url"]);
+			}
+		}
+
+		Profile::load($a, "", 0, $profiledata, true);
 		$o .= Contact::getPostsFromUrl($contact["url"], true, $update);
 	}
 
@@ -983,7 +992,16 @@ function contact_posts(App $a, $contact_id)
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";
-		Profile::load($a, "", 0, Contact::getDetailsByURL($contact["url"]));
+
+		$profiledata = Contact::getDetailsByURL($contact["url"]);
+
+		if (local_user()) {
+			if (in_array($profiledata["network"], [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
+				$profiledata["remoteconnect"] = System::baseUrl()."/follow?url=".urlencode($profiledata["url"]);
+			}
+		}
+
+		Profile::load($a, "", 0, $profiledata, true);
 		$o .= Contact::getPostsFromUrl($contact["url"]);
 	}
 
