@@ -150,8 +150,18 @@ function frio_item_photo_menu(App $a, &$arr)
 function frio_contact_photo_menu(App $a, &$args)
 {
 	$cid = $args['contact']['id'];
-	$pokelink = $args['menu']['poke'][1];
-	$pmlink = $args['menu']['pm'][1];
+
+	if (!empty($args['menu']['poke'])) {
+		$pokelink = $args['menu']['poke'][1];
+	} else {
+		$pokelink = '';
+	}
+
+	if (!empty($args['menu']['poke'])) {
+		$pmlink = $args['menu']['pm'][1];
+	} else {
+		$pmlink = '';
+	}
 
 	// Set the the indicator for opening the status, profile and photo pages
 	// in a new tab to false if the contact a dfrn (friendica) contact

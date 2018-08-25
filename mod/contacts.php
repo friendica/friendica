@@ -93,6 +93,8 @@ function contacts_init(App $a)
 
 	if ($contact['uid'] != 0) {
 		$groups_widget = Group::sidebarWidget('contacts', 'group', 'full', 'everyone', $contact_id);
+	} else {
+		$groups_widget = null;
 	}
 
 	$a->page['aside'] .= replace_macros(get_markup_template("contacts-widget-sidebar.tpl"), [
@@ -557,7 +559,7 @@ function contacts_content(App $a)
 		$nettype = L10n::t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact["url"]));
 
 		// tabs
-		$tab_str = contacts_tab($a, $contact_id, 2);
+		$tab_str = contacts_tab($a, $contact_id, 2, $contact);
 
 		$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
 
@@ -590,12 +592,12 @@ function contacts_content(App $a)
 		$follow = '';
 		$follow_text = '';
 		if (in_array($contact['network'], [Protocol::DIASPORA, Protocol::OSTATUS, Protocol::DFRN])) {
-			if ($contact['rel'] == Contact::FOLLOWER) {
-				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
-				$follow_text = L10n::t("Connect/Follow");
-			} elseif ($contact['rel'] == Contact::FRIEND) {
+			if (in_array($contact['rel'], [Contact::FRIEND, Contact::SHARING])) {
 				$follow = System::baseUrl(true) . "/unfollow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Disconnect/Unfollow");
+			} else {
+				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
+				$follow_text = L10n::t("Connect/Follow");
 			}
 		}
 
@@ -863,7 +865,7 @@ function contacts_content(App $a)
  *
  * @return string
  */
-function contacts_tab($a, $contact_id, $active_tab)
+function contacts_tab($a, $contact_id, $active_tab, $contact)
 {
 	// tabs
 	$tabs = [
@@ -908,7 +910,7 @@ function contacts_tab($a, $contact_id, $active_tab)
 		];
 	}
 
-	if ($contact['uid'] != 0) {
+	if (!empty($contact['uid'])) {
 		$tabs[] = ['label' => L10n::t('Advanced'),
 			'url'   => 'crepair/' . $contact_id,
 			'sel'   => (($active_tab == 5) ? 'active' : ''),
@@ -926,9 +928,9 @@ function contacts_tab($a, $contact_id, $active_tab)
 
 function contact_posts(App $a, $contact_id)
 {
-	$o = contacts_tab($a, $contact_id, 1);
+	$contact = DBA::selectFirst('contact', ['uid', 'url'], ['id' => $contact_id]);
 
-	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id]);
+	$o = contacts_tab($a, $contact_id, 1, $contact);
 
 	if (DBA::isResult($contact)) {
 		$a->page['aside'] = "";

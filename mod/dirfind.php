@@ -85,6 +85,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 			$contact = Contact::getDetailsByURL($user_data["url"], local_user());
 			$objresult->cid = $contact["cid"];
+			$objresult->pcid = $contact["zid"];
 
 			$j->results[] = $objresult;
 
@@ -163,6 +164,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 				$objresult = new stdClass();
 				$objresult->cid = $result["cid"];
+				$objresult->pcid = $result["zid"];
 				$objresult->name = $result["name"];
 				$objresult->addr = $result["addr"];
 				$objresult->url = $result["url"];
@@ -217,10 +219,16 @@ function dirfind_content(App $a, $prefix = "") {
 				} else {
 					$connlnk = System::baseUrl().'/follow/?url='.(!empty($jj->connect) ? $jj->connect : $jj->url);
 					$conntxt = L10n::t('Connect');
-					$photo_menu = [
-						'profile' => [L10n::t("View Profile"), Contact::magicLink($jj->url)],
-						'follow' => [L10n::t("Connect/Follow"), $connlnk]
-					];
+
+					$contact = DBA::selectFirst('contact', [], ['id' => $jj->pcid]);
+					if (DBA::isResult($contact)) {
+						$photo_menu = Contact::photoMenu($contact);
+					} else {
+						$photo_menu = [];
+					}
+
+					$photo_menu['profile'] = [L10n::t("View Profile"), Contact::magicLink($jj->url)];
+					$photo_menu['follow'] = [L10n::t("Connect/Follow"), $connlnk];
 				}
 
 				$jj->photo = str_replace("http:///photo/", get_server()."/photo/", $jj->photo);
