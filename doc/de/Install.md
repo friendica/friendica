@@ -112,28 +112,87 @@ Alle Registrierungsprobleme sollten automatisch behebbar sein.
 Wenn du irgendwelche **kritischen** Fehler zu diesen Zeitpunkt erhalten solltest, deutet das darauf hin, dass die Datenbank nicht korrekt installiert wurde.
 Du kannst bei Bedarf die Datei config/local.ini.php verschieben/umbenennen und die Datenbank leeren (als „Dropping“ bezeichnet), so dass du mit einem sauberen System neu starten kannst.
 
-### Option B: Starte das manuelle Installationsscript
+### Option B: Starte das automatische Installationsscript
 
-Öffne die Datei htconfig.php im Friendica-Hauptordner mit einem Text-Editor.
-Entferne die `die('...');` Zeile und bearbeite die Einstellungen so, das sie zu deinem System passen (MySQL, Sprache, Theme etc.).
-Dann speichere die Datei (jedoch nicht umbenennen).
+Es existieren folgende Varianten zur automatischen Installation von Friendica:
+-	Eine vorgefertigte Konfigurationsdatei erstellen (z.B. `prepared.ini.php`)
+-	Verwendung von Umgebungsvariablen (z.B. `MYSQL_HOST`)
+-	Verwendung von Optionen (z.B. `--dbhost <host>`)
 
-Gehe in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
-
-    bin/console autoinstall
-
-Oder falls du alle optionalen Checks ausfürehn lassen möchtest, benutze diese Option:
-
-    bin/console autoinstall -a
-
-*Wenn* die automatisierte Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
-* Existiert die `config/local.ini.php`? Falls ja, wird die automatisierte Installation nicht gestartet.
-* Sind Einstellungen in der `config/local.ini.php` korrekt? Falls nicht, bitte bearbeite diese Datei erneut.
-* Ist die leere MySQL-Datenbank erstellt? Falls nicht, erstelle diese.
+Umgebungsvariablen und Optionen können auch kombiniert werden.
+Dabei ist jedoch darauf zu achten, dass etwaige Optionen immer die zugehörigen Umgebungsvariablen überschreiben.
 
 Für mehr Informationen kannst du diese Option verwenden:
 
     bin/console autoinstall -v
+
+Falls du alle optionalen Checks ausfürehn lassen möchtest, benutze diese Option:
+
+    bin/console autoinstall -a
+
+*Wenn* die automatisierte Installation aus irgendeinem Grund fehlschlägt, dann prüfe das Folgende:
+*	Existiert die `config/local.ini.php`? Falls ja, wird die automatisierte Installation nicht gestartet.
+*	Sind Einstellungen in der `config/local.ini.php` korrekt? Falls nicht, bitte bearbeite diese Datei erneut.
+*	Ist die leere MySQL-Datenbank erstellt? Falls nicht, erstelle diese.
+
+#### B.1: Konfigurationsdatei
+
+Für diese Variante muss ein Konfigurationsdatei bereits vor der Installation fertig definiert sein (z.B. [local-sample.ini.php](config/local-sample.ini.php).
+
+Gehe im Anschluss in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
+
+    bin/console autoinstall -f <prepared.ini.php>
+
+#### B.2: Umgebungsvariablen
+
+Es existieren Zwei Arten von Umgebungsvariablen in Friendica:
+-	Jene, die auch im normalen Betrieb verwendet werden können (derzeit ausschließlich **Datenbank Einstellungen**)
+-	Jene, die nur während der Installation verwedent werden können (im normalen Betrieb werden sie ignoriert)
+
+Umgebungsvariablen können auch durch adäquate Optionen (z.B. `--dbhost <hostname>`)übersteuert werden.
+
+**Datenbank Einstellungen**
+
+Nur wenn die Option `--savedb` gesetzt ist, werden diese Umgebungsvariablen auch in `config/local.ini.php` gespeichert!
+
+-	`MYSQL_HOST` Der Host der MySQL/MariaDB Datenbank
+-	`MYSQL_PORT` Der Port der MySQL/MariaDB Datenbank
+-	`MYSQL_USERNAME` Der Benutzername des MySQL Datenbanklogins (MySql - Variante)
+-	`MYSQL_USER` Der Benutzername des MariaDB Datenbanklogins (MariaDB-Variante)
+-	`MYSQL_PASSWORD` Das Passwort der MySQL/MariaDB Datenbanklogins
+-	`MYSQL_DATABASE` Der Name der MySQL/MariaDB Datenbank
+
+**Friendica Einstellungen**
+
+Diese Umgebungsvariablen können nicht während des normalen Friendica Betriebs verwendet werden.
+Sie werden stattdessen direkt in `config/local.ini.php` gespeichert.
+
+-	`FRIENDICA_PHP_PATH` Der Pfad zur PHP-Datei
+-	`FRIENDICA_ADMIN_MAIL` Die Admin E-Mail Adresse dieses Friendica Knotens (wird auch für den Admin-Zugang benötigt)
+-	`FRIENDICA_TZ` Die Zeitzone von Friendica
+-	`FRIENDICA_LANG` Die Sprache von Friendica
+
+Gehe im Anschluss in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
+
+    bin/console autoinstall [--savedb]
+    
+#### B.3: Optionen
+
+Alle Optionen werden in `config/local.ini.php` gespeichert und überschreiben etwaige, zugehörige Umgebungsvariablen.
+
+-	`-H|--dbhost <host>` Der Host der MySQL/MariaDB Datenbank (env `MYSQL_HOST`)
+-	`-p|--dbport <port>` Der Port der MySQL/MariaDB Datenbank (env `MYSQL_PORT`)
+-	`-U|--dbuser <username>` Der Benutzername des MySQL/MariaDB Datenbanklogins (env `MYSQL_USER` or `MYSQL_USERNAME`)
+-	`-P|--dbpass <password>` Das Passwort der MySQL/MariaDB Datenbanklogins (env `MYSQL_PASSWORD`)
+-	`-d|--dbdata <database>` Der Name der MySQL/MariaDB Datenbank (env `MYSQL_DATABASE`)
+-	`-b|--phppath <path>` Der Pfad zur PHP-Datei (env `FRIENDICA_PHP_PATH`)
+-	`-A|--admin <mail>` Die Admin E-Mail Adresse dieses Friendica Knotens (env `FRIENDICA_ADMIN_MAIL`)
+-	`-T|--tz <timezone>` Die Zeitzone von Friendica (env `FRIENDICA_TZ`)
+-	`-L|--land <language>` Die Sprache von Friendica (env `FRIENDICA_LANG`)
+
+Gehe in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
+
+    bin/console autoinstall [options]
 
 ### Einen Worker einrichten
 

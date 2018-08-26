@@ -128,8 +128,9 @@ If you wish to include all optional checks, use `-a` like this statement:
     
 *If* the automatic installation fails for any reason, check the following:
 
-* Does "config/local.ini.php" already exist? If yes, the automatic installation won't start
-* Is the empty MySQL-database created? If not, create it.
+*	Does `config/local.ini.php` already exist? If yes, the automatic installation won't start
+*	Are the options in the `config/local.ini.php` correct? If not, edit them directly.
+*	Is the empty MySQL-database created? If not, create it.
 
 #### B.1: Config file
 
@@ -151,7 +152,7 @@ You can use the options during installation too and skip some of the environment
 
 if you don't use the option `--savedb` during installation, the DB credentials will **not** be saved in the `config/local.ini.php`.
 
--	`MYSQL_HOST` The host of the mysql/mariadb database (mandatory if mysql and environment is used)
+-	`MYSQL_HOST` The host of the mysql/mariadb database
 -	`MYSQL_PORT` The port of the mysql/mariadb database
 -	`MYSQL_USERNAME` The username of the mysql database login (used for mysql)
 -	`MYSQL_USER` The username of the mysql database login (used for mariadb)
@@ -178,13 +179,17 @@ All options will be saved in the `config/local.ini.php` and are overruling the a
 
 -	`-H|--dbhost <host>` The host of the mysql/mariadb database (env `MYSQL_HOST`)
 -	`-p|--dbport <port>` The port of the mysql/mariadb database (env `MYSQL_PORT`)
--	`-d|--dbdate <database>` The name of the mysql/mariadb database (env `MYSQL_DATABASE`)
 -	`-U|--dbuser <username>` The username of the mysql/mariadb database login (env `MYSQL_USER` or `MYSQL_USERNAME`)
 -	`-P|--dbpass <password>` The password of the mysql/mariadb database login (env `MYSQL_PASSWORD`)
+-	`-d|--dbdata <database>` The name of the mysql/mariadb database (env `MYSQL_DATABASE`)
 -	`-b|--phppath <path>` The path of the PHP binary (env `FRIENDICA_PHP_PATH`)
 -	`-A|--admin <mail>` The admin email address of Friendica (env `FRIENDICA_ADMIN_MAIL`)
 -	`-T|--tz <timezone>` The timezone of Friendica (env `FRIENDICA_TZ`)
 -	`-L|--land <language>` The language of Friendica (env `FRIENDICA_LANG`)
+
+Navigate to the main Friendica directory and execute the following command:
+
+    bin/console autoinstall [options]
 
 ### Prepare .htaccess file
 
