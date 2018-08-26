@@ -26,8 +26,6 @@ function install_init(App $a) {
 	$a->setConfigValue('system', 'value', '../install');
 	$a->theme['stylesheet'] = System::baseUrl()."/view/install/style.css";
 
-	Install::setInstallMode();
-
 	global $install_wizard_pass;
 	if (x($_POST, 'pass')) {
 		$install_wizard_pass = intval($_POST['pass']);
