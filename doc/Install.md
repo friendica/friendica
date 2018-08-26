@@ -111,29 +111,80 @@ You might wish to move/rename `config/local.ini.php` to another name and empty (
 
 ### Option B: Run the automatic install script
 
-Open the file htconfig.php in the main Friendica directory with a text editor.
-Remove the `die('...');` line and edit the lines to suit your installation (MySQL, language, theme etc.).
-Then save the file (do not rename it).
+You have the following options to automatically install Friendica:
+-	creating a prepared config file (f.e. `prepared.ini.php`)
+-	using environment variables (f.e. `MYSQL_HOST`)
+-	using options (f.e. `--dbhost <host>`)
 
-Navigate to the main Friendica directory and execute the following command:
-
-    bin/console autoinstall
-
-Or if you wish to include all optional checks, execute this statement instead:
-
-    bin/console autoinstall -a
-
-At this point visit your website again, and register your personal account.
-
-*If* the automatic installation fails for any reason, check the following:
-
-* Does "config/local.ini.php" already exist? If yes, the automatic installation won't start
-* Are the settings inside "htconfig.php" correct? If not, edit the file again.
-* Is the empty MySQL-database created? If not, create it.
+You can combine environment variables and options, but be aware that options are prioritized over environment variables. 
 
 For more information during the installation, you can use this command line option
 
     bin/console autoinstall -v
+
+If you wish to include all optional checks, use `-a` like this statement:
+
+    bin/console autoinstall -a
+    
+*If* the automatic installation fails for any reason, check the following:
+
+* Does "config/local.ini.php" already exist? If yes, the automatic installation won't start
+* Is the empty MySQL-database created? If not, create it.
+
+#### B.1: Config file
+
+You can use a prepared config file like [local-sample.ini.php](config/local-sample.ini.php).
+
+Navigate to the main Friendica directory and execute the following command:
+
+    bin/console autoinstall -f <prepared.ini.php>
+    
+#### B.2: Environment variables
+
+There are two types of environment variables.
+-	those you can use in normal mode too (Currently just **database credentials**)
+-	those you can only use during installation (because Friendica will normally ignore it)
+
+You can use the options during installation too and skip some of the environment variables.
+
+**Database credentials**
+
+if you don't use the option `--savedb` during installation, the DB credentials will **not** be saved in the `config/local.ini.php`.
+
+-	`MYSQL_HOST` The host of the mysql/mariadb database (mandatory if mysql and environment is used)
+-	`MYSQL_PORT` The port of the mysql/mariadb database
+-	`MYSQL_USERNAME` The username of the mysql database login (used for mysql)
+-	`MYSQL_USER` The username of the mysql database login (used for mariadb)
+-	`MYSQL_PASSWORD` The password of the mysql/mariadb database login
+-	`MYSQL_DATABASE` The name of the mysql/mariadb database
+
+**Friendica settings**
+
+This variables wont be used at normal Friendica runtime.
+Instead, they get saved into `config/local.ini.php`. 
+
+-	`FRIENDICA_PHP_PATH` The path of the PHP binary
+-	`FRIENDICA_ADMIN_MAIL` The admin email address of Friendica (this email will be used for admin access)
+-	`FRIENDICA_TZ` The timezone of Friendica
+-	`FRIENDICA_LANG` The langauge of Friendica
+
+Navigate to the main Friendica directory and execute the following command:
+
+    bin/console autoinstall [--savedb]
+
+#### B.3: Execution options
+
+All options will be saved in the `config/local.ini.php` and are overruling the associated environment variables.
+
+-	`-H|--dbhost <host>` The host of the mysql/mariadb database (env `MYSQL_HOST`)
+-	`-p|--dbport <port>` The port of the mysql/mariadb database (env `MYSQL_PORT`)
+-	`-d|--dbdate <database>` The name of the mysql/mariadb database (env `MYSQL_DATABASE`)
+-	`-U|--dbuser <username>` The username of the mysql/mariadb database login (env `MYSQL_USER` or `MYSQL_USERNAME`)
+-	`-P|--dbpass <password>` The password of the mysql/mariadb database login (env `MYSQL_PASSWORD`)
+-	`-b|--phppath <path>` The path of the PHP binary (env `FRIENDICA_PHP_PATH`)
+-	`-A|--admin <mail>` The admin email address of Friendica (env `FRIENDICA_ADMIN_MAIL`)
+-	`-T|--tz <timezone>` The timezone of Friendica (env `FRIENDICA_TZ`)
+-	`-L|--land <language>` The language of Friendica (env `FRIENDICA_LANG`)
 
 ### Prepare .htaccess file
 

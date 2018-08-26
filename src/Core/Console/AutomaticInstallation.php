@@ -35,11 +35,11 @@ Options
     -a                     All setup checks are required (except .htaccess)
     -f|--file <config>     prepared config file (e.g. "config/local.ini.php" itself) which will override every other config option - except the environment variables)
     -s|--savedb            Save the DB credentials to the file (if environment variables is used)
-    -h|--dbhost <host>     The host of the mysql database (env MYSQL_HOST)
-    -p|--dbport <port>     The port of the mysql database (env MYSQL_PORT)
-    -d|--dbdata <database> The name of the mysql database (env MYSQL_DATABASE)
-    -U|--dbuser <username> The username of the mysql database login (env MYSQL_USER or MYSQL_USERNAME)
-    -P|--dbpass <password> The password of the mysql database login (env MYSQL_PASSWORD)
+    -H|--dbhost <host>     The host of the mysql/mariadb database (env MYSQL_HOST)
+    -p|--dbport <port>     The port of the mysql/mariadb database (env MYSQL_PORT)
+    -d|--dbdata <database> The name of the mysql/mariadb database (env MYSQL_DATABASE)
+    -U|--dbuser <username> The username of the mysql/mariadb database login (env MYSQL_USER or MYSQL_USERNAME)
+    -P|--dbpass <password> The password of the mysql/mariadb database login (env MYSQL_PASSWORD)
     -b|--phppath <path>    The path of the PHP binary (env FRIENDICA_PHP_PATH) 
     -A|--admin <mail>      The admin email address of Friendica (env FRIENDICA_ADMIN_MAIL)
     -T|--tz <timezone>     The timezone of Friendica (env FRIENDICA_TZ)
@@ -98,7 +98,7 @@ HELP;
 
 			$save_db = $this->getOption(['s', 'savedb'], false);
 
-			$db_host = $this->getOption(['h', 'dbhost'], ($save_db) ? getenv('MYSQL_HOST') : '');
+			$db_host = $this->getOption(['H', 'dbhost'], ($save_db) ? getenv('MYSQL_HOST') : '');
 			$db_port = $this->getOption(['p', 'dbport'], ($save_db) ? getenv('MYSQL_PORT') : null);
 			$db_data = $this->getOption(['d', 'dbdata'], ($save_db) ? getenv('MYSQL_DATABASE') : '');
 			$db_user = $this->getOption(['U', 'dbuser'], ($save_db) ? getenv('MYSQL_USER') . getenv('MYSQL_USERNAME') : '');
