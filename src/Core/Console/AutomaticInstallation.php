@@ -46,13 +46,13 @@ Options
     -L|--lang <language>   The language of Friendica (env FRIENDICA_LANG)
  
 Environment variables
-   MYSQL_HOST                  The host of the mysql database (mandatory if mysql and environment is used)
-   MYSQL_PORT                  The port of the mysql database
-   MYSQL_USERNAME|MYSQL_USER   The username of the mysql database login (MYSQL_USERNAME is for mysql, MYSQL_USER for mariadb)
-   MYSQL_PASSWORD              The password of the mysql database login
-   MYSQL_DATABASE              The name of the mysql database
+   MYSQL_HOST                  The host of the mysql/mariadb database (mandatory if mysql and environment is used)
+   MYSQL_PORT                  The port of the mysql/mariadb database
+   MYSQL_USERNAME|MYSQL_USER   The username of the mysql/mariadb database login (MYSQL_USERNAME is for mysql, MYSQL_USER for mariadb)
+   MYSQL_PASSWORD              The password of the mysql/mariadb database login
+   MYSQL_DATABASE              The name of the mysql/mariadb database
    FRIENDICA_PHP_PATH          The path of the PHP binary
-   FRIENDICA_ADMIN_MAIL        The admin email address of Friendica
+   FRIENDICA_ADMIN_MAIL        The admin email address of Friendica (this email will be used for admin access)
    FRIENDICA_TZ                The timezone of Friendica
    FRIENDICA_LANG              The langauge of Friendica
    
@@ -74,20 +74,19 @@ HELP;
 		// Initialise the app
 		$this->out("Initializing setup...\n");
 
+		$a = BaseObject::getApp();
+
 		// if a config file is set,
 		$config_file = $this->getOption(['f', 'file']);
 
 		if (!empty($config_file)) {
-			if ($config_file != 'config/local.ini.php') {
+			if ($config_file != 'config' . DIRECTORY_SEPARATOR . 'local.ini.php') {
 				// Copy config file
 				$this->out("Copying config file...\n");
-				if (!copy($config_file, 'config/local.ini.php')) {
-					throw new RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to 'config/local.ini.php' manually.\n");
+				if (!copy($config_file, $a->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php')) {
+					throw new RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to '$a->basepath" . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "local.ini.php' manually.\n");
 				}
 			}
-
-			// load the app after copying the file
-			$a = BaseObject::getApp();
 
 			$db_host = $a->getConfigValue('database', 'hostname');
 			$db_user = $a->getConfigValue('database', 'username');
@@ -96,9 +95,6 @@ HELP;
 		} else {
 			// Creating config file
 			$this->out("Creating config file...\n");
-
-			// load the app first (for the template engine)
-			$a = BaseObject::getApp();
 
 			$save_db = $this->getOption(['s', 'savedb'], false);
 
@@ -112,12 +108,9 @@ HELP;
 			$tz = $this->getOption(['T', 'tz'], (!empty('FRIENDICA_TZ')) ? getenv('FRIENDICA_TZ') : '');
 			$lang = $this->getOption(['L', 'lang'], (!empty('FRIENDICA_LANG')) ? getenv('FRIENDICA_LANG') : '');
 
-			// creating config file
-			$this->out("Creating config file...\n");
-
 			Install::createConfig(
 				$php_path,
-				$db_host,
+				((!empty($db_port)) ? $db_host . ':' . $db_port : $db_host),
 				$db_user,
 				$db_pass,
 				$db_data,

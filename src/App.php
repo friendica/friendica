@@ -174,40 +174,7 @@ class App
 		$this->callstack['rendering'] = [];
 		$this->callstack['parser'] = [];
 
-		// The order of the following calls is important to ensure proper initialization
-		$this->loadConfigFiles();
-
-		$this->loadDatabase();
-
-		$this->determineMode();
-
-		$this->determineUrlPath();
-
-		Config::load();
-
-		if ($this->mode & self::MODE_DBAVAILABLE) {
-			Core\Addon::loadHooks();
-
-			$this->loadAddonConfig();
-		}
-
-		$this->loadDefaultTimezone();
-
-		$this->page = [
-			'aside' => '',
-			'bottom' => '',
-			'content' => '',
-			'end' => '',
-			'footer' => '',
-			'htmlhead' => '',
-			'nav' => '',
-			'page_title' => '',
-			'right_aside' => '',
-			'template' => '',
-			'title' => ''
-		];
-
-		$this->process_id = System::processID('log');
+		$this->reload();
 
 		set_time_limit(0);
 
@@ -312,6 +279,47 @@ class App
 
 		// Register template engines
 		$this->register_template_engine('Friendica\Render\FriendicaSmartyEngine');
+	}
+
+	/**
+	 * Reloads the whole app instance
+	 */
+	public function reload()
+	{
+		// The order of the following calls is important to ensure proper initialization
+		$this->loadConfigFiles();
+
+		$this->loadDatabase();
+
+		$this->determineMode();
+
+		$this->determineUrlPath();
+
+		Config::load();
+
+		if ($this->mode & self::MODE_DBAVAILABLE) {
+			Core\Addon::loadHooks();
+
+			$this->loadAddonConfig();
+		}
+
+		$this->loadDefaultTimezone();
+
+		$this->page = [
+			'aside' => '',
+			'bottom' => '',
+			'content' => '',
+			'end' => '',
+			'footer' => '',
+			'htmlhead' => '',
+			'nav' => '',
+			'page_title' => '',
+			'right_aside' => '',
+			'template' => '',
+			'title' => ''
+		];
+
+		$this->process_id = System::processID('log');
 	}
 
 	/**

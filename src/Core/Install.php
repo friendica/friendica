@@ -84,11 +84,12 @@ class Install extends BaseObject
 			'$adminmail' => $adminmail,
 		]);
 
-		$result = file_put_contents('config/local.ini.php', $txt);
-		if (!$result) {
-			self::getApp()->data['txt'] = $txt;
-		}
+		$app = self::getApp();
 
+		$result = file_put_contents($app->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php', $txt);
+		if (!$result) {
+			$app->data['txt'] = $txt;
+		}
 	}
 
 	/**

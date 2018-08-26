@@ -19,12 +19,12 @@ class ConfigConsoleTest extends ConsoleTest
 	}
 
 	private function assertGet($family, $key, $value) {
-		$config = $this->execute([__FILE__, 'config', $family, $key]);
+		$config = $this->execute(['config', $family, $key]);
 		$this->assertEquals($family . "." . $key . " => " . $value . "\n", $config);
 	}
 
 	private function assertSet($family, $key, $value) {
-		$config = $this->execute([__FILE__, 'config', $family, $key, $value]);
+		$config = $this->execute(['config', $family, $key, $value]);
 		$this->assertEquals($family . "." . $key . " <= " . $value . "\n", $config);
 	}
 
@@ -41,13 +41,13 @@ class ConfigConsoleTest extends ConsoleTest
 		$testArray = [1, 2, 3];
 		DBA::insert('config', ['cat' => 'config', 'k' => 'test', 'v' => serialize($testArray)]);
 
-		$txt = $this->execute([__FILE__, 'config', 'config', 'test', 'now']);
+		$txt = $this->execute(['config', 'config', 'test', 'now']);
 
 		$this->assertEquals("[Error] config.test is an array and can't be set using this command.\n", $txt);
 	}
 
 	function testTooManyArguments() {
-		$txt = $this->execute([__FILE__, 'config', 'config', 'test', 'it', 'now']);
+		$txt = $this->execute(['config', 'config', 'test', 'it', 'now']);
 		$assertion = '[Warning] Too many arguments';
 		$firstline = substr($txt, 0, strlen($assertion));
 
@@ -56,8 +56,9 @@ class ConfigConsoleTest extends ConsoleTest
 
 	function testVerbose() {
 		$this->assertSet('test', 'it', 'now');
+		$executable = $this->getExecutablePath();
 		$assertion = <<<CONF
-Executable: {$this->app->basepath}/tests/src/Core/Console/ConfigConsoleTest.php
+Executable: {$executable}
 Arguments: array (
   0 => 'config',
   1 => 'test',
@@ -66,7 +67,7 @@ Options: array (
   'v' => 1,
 )
 Command: config
-Executable: {$this->app->basepath}/tests/src/Core/Console/ConfigConsoleTest.php
+Executable: {$executable}
 Class: Friendica\Core\Console\Config
 Arguments: array (
   0 => 'test',
@@ -78,7 +79,7 @@ Options: array (
 it => now
 
 CONF;
-		$txt = $this->execute([__FILE__, 'config', 'test', '-v']);
+		$txt = $this->execute(['config', 'test', '-v']);
 
 		$this->assertEquals($assertion, $txt);
 	}
