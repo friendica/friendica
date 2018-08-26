@@ -49,7 +49,7 @@ class Widget
 		if (Config::get('system', 'invitation_only')) {
 			$x = PConfig::get(local_user(), 'system', 'invites_remaining');
 			if ($x || is_site_admin()) {
-				$a->page['aside'] .= '<div class="side-link" id="side-invite-remain">'
+				$a->page['aside'] .= '<div class="side-link widget" id="side-invite-remain">'
 					. L10n::tt('%d invitation available', '%d invitations available', $x)
 					. '</div>';
 			}
