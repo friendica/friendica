@@ -9,7 +9,7 @@ How to move your account between servers
 * Go to "Settings" -> "[Export personal data](uexport)"
 * Click on "Export account" to save your account data.
 * **Save the file in a secure place!** It contains your details, your contacts, groups, and personal settings. It also contains your secret keys to authenticate yourself to your contacts.
-* Go to your new server, and open *http://newserver.com/uimport* (there is not a direct link to this page at the moment).
+* Go to your new server, and open *http://newserver.com/uimport* (there is not a direct link to this page at the moment). Please consider that this is only possible on servers with open registration. On other systems only the administrator can add accounts with an uploaded file.
 * Do NOT create a new account prior to importing your old settings - uimport should be used *instead* of register.
 * Load your saved account file and click "Import".
 * After the move, the account on the old server will not work reliably anymore, and should be not used.
