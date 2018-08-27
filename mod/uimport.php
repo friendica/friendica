@@ -11,39 +11,21 @@ use Friendica\Core\UserImport;
 
 function uimport_post(App $a)
 {
-	switch (Config::get('config', 'register_policy')) {
-		case REGISTER_OPEN:
-			$blocked = 0;
-			$verified = 1;
-			break;
-
-		case REGISTER_APPROVE:
-			$blocked = 1;
-			$verified = 0;
-			break;
-
-		default:
-		case REGISTER_CLOSED:
-			if ((!x($_SESSION, 'authenticated') && (!x($_SESSION, 'administrator')))) {
-				notice(L10n::t('Permission denied.') . EOL);
-				return;
-			}
-			$blocked = 1;
-			$verified = 0;
-			break;
+	if ((Config::get('config', 'register_policy') != REGISTER_OPEN) && !is_site_admin()) {
+		notice(L10n::t('Permission denied.') . EOL);
+		return;
 	}
 
-	if (x($_FILES, 'accountfile')) {
-		/// @TODO Pass $blocked / $verified, send email to admin on REGISTER_APPROVE
+	if (!empty($_FILES['accountfile'])) {
 		UserImport::importAccount($a, $_FILES['accountfile']);
 		return;
 	}
 }
 
-function uimport_content(App $a) {
-
-	if ((!local_user()) && (intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED)) {
-		notice("Permission denied." . EOL);
+function uimport_content(App $a)
+{
+	if ((Config::get('config', 'register_policy') != REGISTER_OPEN) && !is_site_admin()) {
+		notice(L10n::t('User imports on closed servers can only be done by an administrator.') . EOL);
 		return;
 	}
 
