@@ -229,12 +229,11 @@ function localize_item(&$item)
 		$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 
 		$obj = XML::parseString($xmlhead.$item['object']);
-		$links = XML::parseString($xmlhead."<links>".unxmlify($obj->link)."</links>");
 
 		$Bname = $obj->title;
 		$Blink = "";
 		$Bphoto = "";
-		foreach ($links->link as $l) {
+		foreach ($obj->link as $l) {
 			$atts = $l->attributes();
 			switch ($atts['rel']) {
 				case "alternate": $Blink = $atts['href'];
