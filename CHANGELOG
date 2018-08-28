@@ -68,14 +68,34 @@ Version 2018.08 (2018-xx-xx) [v2018-08-28]
     The .htaccess file is not part of the git repository anymore [annando, Quix0r]
 
   Friendica Addons:
-    Update to the translations (CS, EN-US, ZH-CN) [translation teams]
-    General update to use the new item class  [annando, tobiasd]
-    langfilter: Fixed a problem with default values of the filtered languages [tobiasd]
-    superblock: Fixed a bug that prevented the addon to block accounts [annando]
+    Update to the translations (CS, DE, EN-US, NL, PL, ZH-CN) [translation teams]
+    General update to adopt changes in core  [annando, MrPetovan, Quix0r, tobiasd]
+    advancedcontentfilter:
+      Enhancement to the error handling [MrPetovan]
+      Honor the CSP settings [MrPetovan]
+    blockem:
+      Enhancement of the settings [AlfredSK]
+    buffer:
+      support for app.net removed [annando]
+    js_upload:
+      Enhancement of the album name handling [rabuzarus]
+      Enhancement to the wording of the labels [astifter]
+    langfilter:
+      Fixed a problem with default values of the filtered languages [tobiasd]
+    libravatar:
+      The service wont shutdown, so we can keep the addon
+    superblock:
+      Fixed a bug that prevented the addon to block accounts [annando]
+      Enhancements of the settings [AlfredSK]
+    twitter:
+      Prevent empty quotes from being created [annando]
+      Fixed a problem with reshares from remote_self contacts [annando]
+      Changed URL display after link expansion [MrPetovan]
+      Fixed a problem with EXIF handling [MrPetovan]
     added addons:
       mastodoncustomemojis [MrPetovan]
     deprecated addons:
-      retriver
+      notimeline, retriver, remote_permissions, widgets
 
   Directory:
     Enhancements of the health summary [andyhee]
