@@ -253,6 +253,12 @@ class PostUpdate
 		$condition = ["`id` > ?", $id];
 		$params = ['order' => ['id'], 'limit' => 10000];
 		$items = Item::select($fields, $condition, $params);
+
+		if (DBA::errorNo() != 0) {
+			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			return false;
+		}
+
 		while ($item = Item::fetch($items)) {
 			$id = $item['id'];
 
@@ -394,6 +400,12 @@ class PostUpdate
 		$condition = ["`id` > ?", $id];
 		$params = ['order' => ['id'], 'limit' => 10000];
 		$items = DBA::select('item', $fields, $condition, $params);
+
+		if (DBA::errorNo() != 0) {
+			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			return false;
+		}
+
 		while ($item = DBA::fetch($items)) {
 			$id = $item['id'];
 
