@@ -2252,6 +2252,11 @@ class DFRN
 			if ($Blink && link_compare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
 				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
+				$item['id'] = $posted_id;
+
+				$parent = Item::selectFirst(['id'], ['uri' => $item['parent-uri'], 'uid' => $importer["importer_uid"]]);
+				$item["parent"] = $parent['id'];
+
 				// send a notification
 				notification(
 					[

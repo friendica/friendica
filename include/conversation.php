@@ -231,8 +231,9 @@ function localize_item(&$item)
 		$obj = XML::parseString($xmlhead.$item['object']);
 
 		$Bname = $obj->title;
-		$Blink = "";
+		$Blink = $obj->id;
 		$Bphoto = "";
+
 		foreach ($obj->link as $l) {
 			$atts = $l->attributes();
 			switch ($atts['rel']) {
