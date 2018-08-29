@@ -23,7 +23,7 @@ class PostUpdate extends \Asika\SimpleConsole\Console
         protected function getHelp()
         {
                 $help = <<<HELP
-console postupdate - Does database post updates
+console postupdate - Performs database post updates
 Usage
         bin/console postupdate [-h|--help|-?] [--reset <version>]
 
