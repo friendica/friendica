@@ -87,9 +87,10 @@ class Contact extends BaseObject
 	 * Relationship types
 	 * @{
 	 */
-	const FOLLOWER = 1;
-	const SHARING  = 2;
-	const FRIEND   = 3;
+	const ACQUAINTANCE = 0;
+	const FOLLOWER     = 1;
+	const SHARING      = 2;
+	const FRIEND       = 3;
 	/**
 	 * @}
 	 */
