@@ -181,12 +181,12 @@ class ParseUrl
 			$charset = trim(trim(trim(array_pop($matches)), ';,'));
 		}
 
-		if ($charset == '') {
-			$charset = 'utf-8';
-		}
-
-		if (($charset != '') && (strtoupper($charset) != 'UTF-8')) {
+		if ($charset && strtoupper($charset) != 'UTF-8') {
 			logger('detected charset ' . $charset, LOGGER_DEBUG);
+
+			// See https://github.com/friendica/friendica/issues/5470#issuecomment-418351211
+			$charset = str_replace('latin-1', 'latin1', $charset);
+
 			$body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 		}
 
