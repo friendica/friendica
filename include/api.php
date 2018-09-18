@@ -652,7 +652,7 @@ function api_get_user(App $a, $contact_id = null)
 			$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
 			$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
 			if(!$hide_friends) {
-				$friends_count = DBA::columCount('contact', ['id'], ['uid' => $contact_uid]);
+				$friends_count = DBA::columnCount('contact', ['id'], ['uid' => $contact_uid]);
 			}
 			else {
 				$friends_count = 0;
@@ -716,7 +716,7 @@ function api_get_user(App $a, $contact_id = null)
 	$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
 	$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
 	if(!$hide_friends) {
-		$countfriends = DBA::columCount('contact', ['id'], ['uid' => $contact_uid]);
+		$countfriends = DBA::columnCount('contact', ['id'], ['uid' => $contact_uid]);
 	}
 	else {
 		$countfriends = 0;
