@@ -649,13 +649,21 @@ function api_get_user(App $a, $contact_id = null)
 			}
 
 			// Check if user hides the contactlist
-			$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
-			$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
-			if(!$hide_friends) {
-				$friends_count = DBA::columnCount('contact', ['id'], ['uid' => $contact_uid]);
+			$r = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
+			if(!DBA::isResult($r) {
+				throw new BadRequestException("User ".$contact['nick']." not found.");
+			}
+			$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
+			if(!DBA::isResult($r2)) {
+				throw new BadRequestException("Profile not found");
+				
+			}
+
+			if(!$hide_friends['hide_friends']) {
+				$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
 			}
 			else {
-				$friends_count = 0;
+				$countfriends = 0;
 			}
 
 			$ret = [
@@ -713,14 +721,23 @@ function api_get_user(App $a, $contact_id = null)
 	}
 	
 	// Check if user hides the contactlist
-	$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
-	$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
-	if(!$hide_friends) {
-		$countfriends = DBA::columnCount('contact', ['id'], ['uid' => $contact_uid]);
+	$r = DBA::selectFirst('user', ['uid'], ['nickname' => $uinfo[0]['nick']]);
+	if(!DBA::isResult($r) {
+		throw new BadRequestException("User ".$uinfo[0]['nick']." not found.");
+	}
+	$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
+	if(!DBA::isResult($r2)) {
+		throw new BadRequestException("Profile not found");
+		
+	}
+
+	if(!$hide_friends['hide_friends']) {
+		$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
 	}
 	else {
 		$countfriends = 0;
 	}
+
 
 	$countitems = 0;
 	$countfollowers = 0;
