@@ -648,6 +648,16 @@ function api_get_user(App $a, $contact_id = null)
 				$contact['nick'] = api_get_nick($contact["url"]);
 			}
 
+			// Check if user hides the contactlist
+			$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
+			$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
+			if(!$hide_friends) {
+				$friends_count = DBA::columCount('contact', ['id'], ['uid' => $contact_uid]);
+			}
+			else {
+				$friends_count = 0;
+			}
+
 			$ret = [
 				'id' => $contact["id"],
 				'id_str' => (string) $contact["id"],
@@ -662,7 +672,7 @@ function api_get_user(App $a, $contact_id = null)
 				'url' => $contact["url"],
 				'protected' => false,
 				'followers_count' => 0,
-				'friends_count' => 0,
+				'friends_count' => $friends_count ,
 				'listed_count' => 0,
 				'created_at' => api_date($contact["created"]),
 				'favourites_count' => 0,
