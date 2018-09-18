@@ -659,7 +659,7 @@ function api_get_user(App $a, $contact_id = null)
 				
 			}
 
-			if(!$hide_friends['hide_friends']) {
+			if(!$r2['hide_friends']) {
 				$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
 			}
 			else {
@@ -731,7 +731,7 @@ function api_get_user(App $a, $contact_id = null)
 		
 	}
 
-	if(!$hide_friends['hide_friends']) {
+	if(!$r2['hide_friends']) {
 		$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
 	}
 	else {
