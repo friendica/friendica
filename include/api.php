@@ -727,11 +727,10 @@ function api_get_user(App $a, $contact_id = null)
 	}
 	$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
 	if(!DBA::isResult($r2)) {
-		throw new BadRequestException("Profile not found");
-		
+		throw new BadRequestException("Profile not found");		
 	}
 
-	if(!$r2['hide_friends']) {
+	if(!$r2['hide-friends']) {
 		$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
 	}
 	else {
