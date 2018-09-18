@@ -711,8 +711,18 @@ function api_get_user(App $a, $contact_id = null)
 		$usr = DBA::selectFirst('user', ['default-location'], ['uid' => api_user()]);
 		$profile = DBA::selectFirst('profile', ['about'], ['uid' => api_user(), 'is-default' => true]);
 	}
+	
+	// Check if user hides the contactlist
+	$contact_uid = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
+	$hide_friends = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $contact_uid]);
+	if(!$hide_friends) {
+		$countfriends = DBA::columCount('contact', ['id'], ['uid' => $contact_uid]);
+	}
+	else {
+		$countfriends = 0;
+	}
+
 	$countitems = 0;
-	$countfriends = 0;
 	$countfollowers = 0;
 	$starred = 0;
 
