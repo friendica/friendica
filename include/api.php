@@ -650,7 +650,7 @@ function api_get_user(App $a, $contact_id = null)
 
 			// Check if user hides the contactlist
 			$r = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
-			if(!DBA::isResult($r) {
+			if(!DBA::isResult($r)) {
 				throw new BadRequestException("User ".$contact['nick']." not found.");
 			}
 			$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
@@ -722,7 +722,7 @@ function api_get_user(App $a, $contact_id = null)
 	
 	// Check if user hides the contactlist
 	$r = DBA::selectFirst('user', ['uid'], ['nickname' => $uinfo[0]['nick']]);
-	if(!DBA::isResult($r) {
+	if(!DBA::isResult($r)) {
 		throw new BadRequestException("User ".$uinfo[0]['nick']." not found.");
 	}
 	$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
