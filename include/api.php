@@ -648,24 +648,6 @@ function api_get_user(App $a, $contact_id = null)
 				$contact['nick'] = api_get_nick($contact["url"]);
 			}
 
-			// Check if user hides the contactlist
-			$r = DBA::selectFirst('user', ['uid'], ['nickname' => $contact['nick']]);
-			if(!DBA::isResult($r)) {
-				throw new BadRequestException("User ".$contact['nick']." not found.");
-			}
-			$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
-			if(!DBA::isResult($r2)) {
-				throw new BadRequestException("Profile not found");
-				
-			}
-
-			if(!$r2['hide-friends']) {
-				$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
-			}
-			else {
-				$countfriends = 0;
-			}
-
 			$ret = [
 				'id' => $contact["id"],
 				'id_str' => (string) $contact["id"],
@@ -680,7 +662,7 @@ function api_get_user(App $a, $contact_id = null)
 				'url' => $contact["url"],
 				'protected' => false,
 				'followers_count' => 0,
-				'friends_count' => $countfriends ,
+				'friends_count' => 0,
 				'listed_count' => 0,
 				'created_at' => api_date($contact["created"]),
 				'favourites_count' => 0,
@@ -719,26 +701,8 @@ function api_get_user(App $a, $contact_id = null)
 		$usr = DBA::selectFirst('user', ['default-location'], ['uid' => api_user()]);
 		$profile = DBA::selectFirst('profile', ['about'], ['uid' => api_user(), 'is-default' => true]);
 	}
-	
-	// Check if user hides the contactlist
-	$r = DBA::selectFirst('user', ['uid'], ['nickname' => $uinfo[0]['nick']]);
-	if(!DBA::isResult($r)) {
-		throw new BadRequestException("User ".$uinfo[0]['nick']." not found.");
-	}
-	$r2 = DBA::selectFirst('profile', ['hide-friends'], ['uid' => $r['uid']]);
-	if(!DBA::isResult($r2)) {
-		throw new BadRequestException("Profile not found");		
-	}
-
-	if(!$r2['hide-friends']) {
-		$countfriends = DBA::count('contact', ['uid' => $r['uid'], 'self' => 0]);
-	}
-	else {
-		$countfriends = 0;
-	}
-
-
 	$countitems = 0;
+	$countfriends = 0;
 	$countfollowers = 0;
 	$starred = 0;
 
@@ -3664,84 +3628,6 @@ function api_direct_messages_destroy($type)
 
 /// @TODO move to top of file or somewhere better
 api_register_func('api/direct_messages/destroy', 'api_direct_messages_destroy', true, API_METHOD_DELETE);
-
-/**
- * Unfollow Contact
- *
- * @brief unfollow contact 
- *
- * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
- * @return string|array
- * @see https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy.html
- */
-function api_friendships_destroy($type)
-{
-	$uid = api_user();
-
-	if ($uid === false) {
-		throw new ForbiddenException();
-	}
-
-	$contact_id = defaults($_REQUEST, 'user_id');
-
-	if (empty($contact_id)) {
-		logger("No user_id specified", LOGGER_DEBUG);
-		throw new BadRequestException("no user_id specified");
-	}
-
-	// Get Contact by given id
-	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id, 'uid' => 0, 'self' => false]);
-
-	if(!DBA::isResult($contact)) {
-		logger("No contact found for ID" . $contact_id, LOGGER_DEBUG);
-		throw new NotFoundException("no contact found to given ID");
-	}
-
-	$url = $contact["url"];
-
-	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
-			$uid, Contact::SHARING, Contact::FRIEND, normalise_link($url),
-			normalise_link($url), $url];
-	$contact = DBA::selectFirst('contact', [], $condition);
-
-	if (!DBA::isResult($contact)) {
-		logger("Not following Contact", LOGGER_DEBUG);
-		throw new NotFoundException("Not following Contact");
-	}
-
-	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
-		logger("Not supported", LOGGER_DEBUG);
-		throw new ExpectationFailedException("Not supported");
-	}
-
-	$dissolve = ($contact['rel'] == Contact::SHARING);
-
-	$owner = User::getOwnerDataById($uid);
-	if ($owner) {
-		Contact::terminateFriendship($owner, $contact, $dissolve);
-	}
-	else {
-		logger("No owner found", LOGGER_DEBUG);
-		throw new NotFoundException("Error Processing Request");
-	}
-
-	// Sharing-only contacts get deleted as there no relationship any more
-	if ($dissolve) {
-		Contact::remove($contact['id']);
-	} else {
-		DBA::update('contact', ['rel' => Contact::FOLLOWER], ['id' => $contact['id']]);
-	}
-
-	// "uid" and "self" are only needed for some internal stuff, so remove it from here
-	unset($contact["uid"]);
-	unset($contact["self"]);
-
-	// Set screen_name since Twidere requests it
-	$contact["screen_name"] = $contact["nick"];
-
-	return api_format_data("friendships-destroy", $type, ['user' => $contact]);
-}
-api_register_func('api/friendships/destroy', 'api_friendships_destroy', true, API_METHOD_POST);
 
 /**
  *
