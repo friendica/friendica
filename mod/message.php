@@ -92,7 +92,6 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-
 		goaway(System::baseUrl() . '/' . $a->cmd . '/' . $ret);
 	}
 }
