@@ -95,7 +95,7 @@ function editpost_content(App $a)
 
 	$o .= replace_macros($tpl, [
 		'$is_edit' => true,
-		'$return_path' => $_SESSION['return_url'],
+		'$return_path' => $_SERVER['HTTP_REFERER'] ,
 		'$action' => 'item',
 		'$share' => L10n::t('Save'),
 		'$upload' => L10n::t('Upload photo'),
