@@ -1,4 +1,4 @@
-Version 2018.09 (2018-xx-xx) [v2018-09-19]
+Version 2018.09 (2018-09-23)
   Friendica Core:
     Update to the translation (CS, DE, EN-US, FI, IT, NL, PL, ZH-CN) [translation teams]
     Update to the documentation [Aditoo17, annando, astifter, rebeka-catalina, fabrixxm, M-arcus, microgroove, nupplaphil, tobiasd]
@@ -32,13 +32,13 @@ Version 2018.09 (2018-xx-xx) [v2018-09-19]
     Fixed a bug in the daemon mode of the background worker [annando]
     Fixed a bug in the frio theme that contact filtering [rabuzarus]
     Fixed a bug that mangled the display of some additional smileys [abanink]
-    Fixed a bug in generating registration mails [MrPetovan]
+    Fixed a bug in generating registration mails [MrPetovan 
     Fixed a bug that caused blank re-share bodies [MrPetovon]
     Fixed a bug in the API handling of private mails [fabrixxm]
     Fixed a bug when calling the mail() function [miqrogroove]
     Fixed a bug that caused deleted accounts being displayed in the local directory [miqrogroove]
     Fixed a bug when checking the domain of an email address [VVelox]
-    Fixed a bug that prevented re-shares from Twitter to be shown as this [annando]
+    Fixed a bug that prevented re-shares from Twitter to be shown as this [annando 
     Fixed a bug that caused broken profile links [miqrogroove]
     Fixed a bug that caused content from unknown accounts appearing in the timeline [annando]
     Fixed a bug with the ignoring and blocking of contacts [annando]
@@ -58,6 +58,7 @@ Version 2018.09 (2018-xx-xx) [v2018-09-19]
     Fixed a bug with wrong dates in importing some Atom feeds [annando]
     Fixed forum exclusive distribution of postings using the !notation [annando]
     Fixed a bug that lead to empty notifications [MrPetovan]
+    Fixed a problem that could sometimes prevent the execution of the relocation [annando]
     Fixed a bug with the handling of images in postings over the connectors [annando]
     Added conversation cleanup configuration [miqrogroove]
     Added support of the usage of internal diaspora links to accounts [annando]
@@ -80,7 +81,7 @@ Version 2018.09 (2018-xx-xx) [v2018-09-19]
 
   Friendica Addons:
     Update to the translations (CS, DE, EN-US, NL, PL, ZH-CN) [translation teams]
-    General update to adopt changes in core  [annando, MrPetovan, Quix0r, tobiasd]
+    General update to adopt changes in core [annando, MrPetovan, Quix0r, tobiasd]
     advancedcontentfilter:
       Enhancement to the error handling [MrPetovan]
       Honour the CSP settings [MrPetovan]
@@ -126,7 +127,7 @@ Version 2018.09 (2018-xx-xx) [v2018-09-19]
     5321, 5322, 5330, 5333, 5341, 5365, 5405, 5407, 5411, 5423, 5432,
     5434, 5436, 5443, 5455, 5464, 5467, 5469, 5486, 5496, 5497, 5514,
     5539, 5524, 5541, 5544, 5550, 5564, 5566, 5605, 5630, 5638, 5651,
-    5653, 5660, 5670, 5691, 5733, 5745
+    5653, 5660, 5670, 5691, 5733, 5745, 5768
 
 Version 2018.05 (2018-06-01)
   Friendica Core:
