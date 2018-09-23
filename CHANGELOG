@@ -32,7 +32,7 @@ Version 2018.09 (2018-09-23)
     Fixed a bug in the daemon mode of the background worker [annando]
     Fixed a bug in the frio theme that contact filtering [rabuzarus]
     Fixed a bug that mangled the display of some additional smileys [abanink]
-    Fixed a bug in generating registration mails [MrPetovan 
+    Fixed a bug in generating registration mails [MrPetovan] 
     Fixed a bug that caused blank re-share bodies [MrPetovon]
     Fixed a bug in the API handling of private mails [fabrixxm]
     Fixed a bug when calling the mail() function [miqrogroove]
