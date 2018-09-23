@@ -38,7 +38,7 @@ Version 2018.09 (2018-09-23)
     Fixed a bug when calling the mail() function [miqrogroove]
     Fixed a bug that caused deleted accounts being displayed in the local directory [miqrogroove]
     Fixed a bug when checking the domain of an email address [VVelox]
-    Fixed a bug that prevented re-shares from Twitter to be shown as this [annando 
+    Fixed a bug that prevented re-shares from Twitter to be shown as this [annando] 
     Fixed a bug that caused broken profile links [miqrogroove]
     Fixed a bug that caused content from unknown accounts appearing in the timeline [annando]
     Fixed a bug with the ignoring and blocking of contacts [annando]
