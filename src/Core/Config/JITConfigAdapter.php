@@ -11,7 +11,7 @@ require_once 'include/dba.php';
  *
  * Default Config Adapter. Provides the best performance for pages loading few configuration variables.
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class JITConfigAdapter extends BaseObject implements IConfigAdapter
 {

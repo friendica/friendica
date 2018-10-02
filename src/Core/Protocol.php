@@ -9,31 +9,37 @@ use Friendica\Util\Network;
 /**
  * Manage compatibility with federated networks
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Protocol
 {
-	const DFRN      = 'dfrn';    // Friendica, Mistpark, other DFRN implementations
-	const DIASPORA  = 'dspr';    // Diaspora
-	const DIASPORA2 = 'dspc';    // Diaspora connector
-	const STATUSNET = 'stac';    // Statusnet connector
-	const OSTATUS   = 'stat';    // GNU-social, Pleroma, Mastodon, other OStatus implementations
-	const FEED      = 'feed';    // RSS/Atom feeds with no known "post/notify" protocol
-	const MAIL      = 'mail';    // IMAP/POP
-	const XMPP      = 'xmpp';    // XMPP - Currently unsupported
+	// Native support
+	const ACTIVITYPUB = 'apub';    // ActivityPub
+	const DFRN        = 'dfrn';    // Friendica, Mistpark, other DFRN implementations
+	const DIASPORA    = 'dspr';    // Diaspora
+	const FEED        = 'feed';    // RSS/Atom feeds with no known "post/notify" protocol
+	const MAIL        = 'mail';    // IMAP/POP
+	const OSTATUS     = 'stat';    // GNU-social, Pleroma, Mastodon, other OStatus implementations
 
-	const FACEBOOK  = 'face';    // Facebook API
-	const LINKEDIN  = 'lnkd';    // LinkedIn
-	const MYSPACE   = 'mysp';    // MySpace - Currently unsupported
-	const GPLUS     = 'goog';    // Google+
-	const PUMPIO    = 'pump';    // pump.io
-	const TWITTER   = 'twit';    // Twitter
+	const NATIVE_SUPPORT = [self::DFRN, self::DIASPORA, self::OSTATUS, self::FEED, self::MAIL, self::ACTIVITYPUB];
+
+	// Supported through a connector
 	const APPNET    = 'apdn';    // app.net - Dead protocol
+	const DIASPORA2 = 'dspc';    // Diaspora connector
+	const FACEBOOK  = 'face';    // Facebook API
+	const GPLUS     = 'goog';    // Google+
+	const LINKEDIN  = 'lnkd';    // LinkedIn
+	const PUMPIO    = 'pump';    // pump.io
+	const STATUSNET = 'stac';    // Statusnet connector
+	const TWITTER   = 'twit';    // Twitter
 
-	const NEWS      = 'nntp';    // Network News Transfer Protocol - Currently unsupported
-	const ICALENDAR = 'ical';    // iCalendar - Currently unsupported
-	const PNUT      = 'pnut';    // pnut.io - Currently unsupported
-	const ZOT       = 'zot!';    // Zot! - Currently unsupported
+	// Currently unsupported
+	const ICALENDAR = 'ical';    // iCalendar
+	const MYSPACE   = 'mysp';    // MySpace
+	const NEWS      = 'nntp';    // Network News Transfer Protocol
+	const PNUT      = 'pnut';    // pnut.io
+	const XMPP      = 'xmpp';    // XMPP
+	const ZOT       = 'zot!';    // Zot!
 
 	const PHANTOM   = 'unkn';    // Place holder
 

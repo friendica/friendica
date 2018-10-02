@@ -37,8 +37,8 @@ require_once 'include/text.php';
  *   set to the value of the last parameter. (e.g. "system loglevel 0" will
  *   disable logging)
  *
- * @author Tobias Diekershoff
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Config extends \Asika\SimpleConsole\Console
 {

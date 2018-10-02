@@ -292,8 +292,10 @@ class Delivery extends BaseObject
 				self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 				return;
 			}
-		} else {
+		} elseif ($cmd != self::RELOCATION) {
 			$deliver_status = DFRN::deliver($owner, $contact, $atom);
+		} else {
+			$deliver_status = DFRN::deliver($owner, $contact, $atom, false, true);
 		}
 
 		logger('Delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);

@@ -14,7 +14,7 @@ require_once 'include/security.php';
 /**
  * Logout module
  *
- * @author Hypolite Petovan mrpetovan@gmail.com
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Logout extends BaseModule
 {

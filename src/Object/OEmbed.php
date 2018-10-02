@@ -7,7 +7,7 @@ namespace Friendica\Object;
  *
  * @see https://oembed.com/#section2.3
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class OEmbed
 {

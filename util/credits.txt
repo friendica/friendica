@@ -5,6 +5,7 @@ Adam Clark
 Adam Jurkiewicz
 Adam Magness
 Aditoo
+Aditoo17
 AgnesElisa
 Albert
 Alberto Díaz Tormo
@@ -99,6 +100,7 @@ hoergen
 Hubert Kościański
 Hypolite Petovan
 Ilmari
+ImgBotApp
 irhen
 Jak
 Jakob
@@ -161,6 +163,7 @@ Pascal Deklerck
 Pavel Morozov
 PerigGouanvic
 peturisfeld
+Philipp
 Philipp Holzer
 Pierre Rudloff
 Piotr Blonkowski
@@ -195,6 +198,7 @@ Simó Albert i Beltran
 soko1
 St John Karp
 Stanislav N.
+Steffen K9
 StefOfficiel
 Sveinn í Felli
 Sven Anders
@@ -211,6 +215,7 @@ thorsten23
 Tino
 Tobias Diekershoff
 Tobias Hößl
+tomacat
 tomamplius
 tomtom84
 Tony Baldwin
@@ -221,6 +226,7 @@ Tubuntu
 Tupambae.org
 U-SOUND\mike
 ufic
+Unknown
 Vasudev Kamath
 Vasya Novikov
 vislav

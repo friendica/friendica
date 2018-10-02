@@ -13,7 +13,7 @@ require_once 'include/text.php';
 /**
  * SessionHandler using Friendica Cache
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class CacheSessionHandler extends BaseObject implements SessionHandlerInterface
 {

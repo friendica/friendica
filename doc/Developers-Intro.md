@@ -33,7 +33,7 @@ If you don't want to translate the UI, or it is already done to your satisfactio
 Are you good at designing things?
 If you have seen Friendica you probably have ideas to improve it, haven't you?
 
-* If you would like to work with us on enhancing the user interface, please join the [UX Watchdogs forum](https://fc.oscp.info/profile/ux-watchdogs)
+* If you would like to work with us on enhancing the user interface, please join the [forum for Friendica development](https://forum.friendi.ca/profile/developers).
 * Make plans for a better Friendica interface design and share them with us.
 * Tell us if you are able to realize your ideas or what kind of help you need.
 	We can't promise we have the right skills in the group but we'll try.

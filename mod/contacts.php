@@ -47,6 +47,11 @@ function contacts_init(App $a)
 		if (!DBA::isResult($contact)) {
 			$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => 0]);
 		}
+
+		// Don't display contacts that are about to be deleted
+		if ($contact['network'] == Protocol::PHANTOM) {
+			$contact = false;
+		}
 	}
 
 	if (DBA::isResult($contact)) {
@@ -112,20 +117,15 @@ function contacts_init(App $a)
 		'$baseurl' => System::baseUrl(true),
 		'$base' => $base
 	]);
-
-	$tpl = get_markup_template("contacts-end.tpl");
-	$a->page['end'] .= replace_macros($tpl, [
-		'$baseurl' => System::baseUrl(true),
-		'$base' => $base
-	]);
 }
 
 function contacts_batch_actions(App $a)
 {
-	$contacts_id = $_POST['contact_batch'];
-	if (!is_array($contacts_id)) {
+	if (empty($_POST['contact_batch']) || !is_array($_POST['contact_batch'])) {
 		return;
 	}
+
+	$contacts_id = $_POST['contact_batch'];
 
 	$orig_records = q("SELECT * FROM `contact` WHERE `id` IN (%s) AND `uid` = %d AND `self` = 0",
 		implode(",", $contacts_id),
@@ -367,7 +367,7 @@ function _contact_drop($orig_record)
 		return;
 	}
 
-	Contact::terminateFriendship($r[0], $orig_record);
+	Contact::terminateFriendship($r[0], $orig_record, true);
 	Contact::remove($orig_record['id']);
 }
 
@@ -503,9 +503,6 @@ function contacts_content(App $a, $update = 0)
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('contact_head.tpl'), [
 			'$baseurl' => System::baseUrl(true),
 		]);
-		$a->page['end'] .= replace_macros(get_markup_template('contact_end.tpl'), [
-			'$baseurl' => System::baseUrl(true),
-		]);
 
 		$contact['blocked'] = Contact::isBlockedByUser($contact['id'], local_user());
 		$contact['readonly'] = Contact::isIgnoredByUser($contact['id'], local_user());
@@ -595,17 +592,12 @@ function contacts_content(App $a, $update = 0)
 		/// @todo Only show the following link with DFRN when the remote version supports it
 		$follow = '';
 		$follow_text = '';
-		if (in_array($contact['network'], [Protocol::DIASPORA, Protocol::OSTATUS, Protocol::DFRN])) {
-			if (in_array($contact['rel'], [Contact::FRIEND, Contact::SHARING])) {
+		if (in_array($contact['rel'], [Contact::FRIEND, Contact::SHARING])) {
+			if (in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 				$follow = System::baseUrl(true) . "/unfollow?url=" . urlencode($contact["url"]);
 				$follow_text = L10n::t("Disconnect/Unfollow");
-			} else {
-				$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
-				$follow_text = L10n::t("Connect/Follow");
 			}
-		}
-
-		if ($contact['uid'] == 0) {
+		} else {
 			$follow = System::baseUrl(true) . "/follow?url=" . urlencode($contact["url"]);
 			$follow_text = L10n::t("Connect/Follow");
 		}
@@ -722,6 +714,8 @@ function contacts_content(App $a, $update = 0)
 	} else {
 		$sql_extra = " AND `blocked` = 0 ";
 	}
+
+	$sql_extra .= sprintf(" AND `network` != '%s' ", Protocol::PHANTOM);
 
 	$search = x($_GET, 'search') ? notags(trim($_GET['search'])) : '';
 	$nets   = x($_GET, 'nets'  ) ? notags(trim($_GET['nets']))   : '';

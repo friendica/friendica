@@ -70,8 +70,11 @@ function notes_content(App $a, $update = false)
 	$count = 0;
 
 	if (DBA::isResult($r)) {
-		$count = count($r);
-		$o .= conversation($a, DBA::toArray($r), 'notes', $update);
+		$notes = DBA::toArray($r);
+
+		$count = count($notes);
+
+		$o .= conversation($a, $notes, 'notes', $update);
 	}
 
 	$o .= alt_pager($a, $count);

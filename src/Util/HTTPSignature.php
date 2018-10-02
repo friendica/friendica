@@ -125,6 +125,8 @@ class HTTPSignature
 			$key = $key($sig_block['keyId']);
 		}
 
+		logger('Got keyID ' . $sig_block['keyId']);
+
 		// We don't use Activity Pub at the moment.
 //		if (!$key) {
 //			$result['signer'] = $sig_block['keyId'];

@@ -46,12 +46,6 @@ function message_init(App $a)
 		'$baseurl' => System::baseUrl(true),
 		'$base' => $base
 	]);
-
-	$end_tpl = get_markup_template('message-end.tpl');
-	$a->page['end'] .= replace_macros($end_tpl, [
-		'$baseurl' => System::baseUrl(true),
-		'$base' => $base
-	]);
 }
 
 function message_post(App $a)
@@ -92,7 +86,7 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-		goaway($_SESSION['return_url']);
+		goaway($a->cmd . '/' . $ret);
 	}
 }
 
@@ -194,13 +188,6 @@ function message_content(App $a)
 
 		$tpl = get_markup_template('msg-header.tpl');
 		$a->page['htmlhead'] .= replace_macros($tpl, [
-			'$baseurl' => System::baseUrl(true),
-			'$nickname' => $a->user['nickname'],
-			'$linkurl' => L10n::t('Please enter a link URL:')
-		]);
-
-		$tpl = get_markup_template('msg-end.tpl');
-		$a->page['end'] .= replace_macros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => L10n::t('Please enter a link URL:')
@@ -344,13 +331,6 @@ function message_content(App $a)
 			'$linkurl' => L10n::t('Please enter a link URL:')
 		]);
 
-		$tpl = get_markup_template('msg-end.tpl');
-		$a->page['end'] .= replace_macros($tpl, [
-			'$baseurl' => System::baseUrl(true),
-			'$nickname' => $a->user['nickname'],
-			'$linkurl' => L10n::t('Please enter a link URL:')
-		]);
-
 		$mails = [];
 		$seen = 0;
 		$unknown = false;
@@ -488,7 +468,7 @@ function render_messages(array $msg, $t)
 			'$id' => $rr['id'],
 			'$from_name' => $participants,
 			'$from_url' => Contact::magicLink($rr['url']),
-			'$from_addr' => $contact['addr'],
+			'$from_addr' => defaults($contact, 'addr', ''),
 			'$sparkle' => ' sparkle',
 			'$from_photo' => ProxyUtils::proxifyUrl($from_photo, false, ProxyUtils::SIZE_THUMB),
 			'$subject' => $subject_e,

@@ -12,6 +12,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 
@@ -588,6 +589,12 @@ class Event extends BaseObject
 				list($title, $_trash) = explode("<br", BBCode::convert($event['desc']), 2);
 				$title = strip_tags(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
 			}
+
+			$author_link = $event['author-link'];
+			$plink       = $event['plink'];
+
+			$event['author-link'] = Contact::magicLink($author_link);
+			$event['plink']       = Contact::magicLink($author_link, $plink);
 
 			$html = self::getHTML($event);
 			$event['desc']     = BBCode::convert($event['desc']);

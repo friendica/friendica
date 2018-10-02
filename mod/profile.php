@@ -333,7 +333,7 @@ function profile_content(App $a, $update = 0)
 		}
 	}
 
-	$o .= conversation($a, $items, 'profile', $update, false, 'commented', local_user());
+	$o .= conversation($a, $items, 'profile', $update, false, 'created', local_user());
 
 	if (!$update) {
 		$o .= alt_pager($a, count($items));

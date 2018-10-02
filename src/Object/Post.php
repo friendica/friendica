@@ -157,7 +157,7 @@ class Post extends BaseObject
 			if ($item["event-id"] != 0) {
 				$edpost = ["events/event/" . $item['event-id'], L10n::t("Edit")];
 			} else {
-				$edpost = ["editpost/" . $item['id'], L10n::t("Edit")];
+				$edpost = ["editpost/" . $item['id'] . "/" . base64_encode($a->cmd), L10n::t("Edit")];
 			}
 			$dropping = in_array($item['uid'], [0, local_user()]);
 		} else {

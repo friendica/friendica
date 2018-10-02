@@ -792,7 +792,7 @@ class Image
 
 			try {
 				if (function_exists("getimagesizefromstring")) {
-					$data = getimagesizefromstring($img_str);
+					$data = @getimagesizefromstring($img_str);
 				} else {
 					$tempfile = tempnam(get_temppath(), "cache");
 

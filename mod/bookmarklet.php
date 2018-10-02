@@ -30,6 +30,10 @@ function bookmarklet_content(App $a)
 	$page = normalise_link(System::baseUrl() . "/bookmarklet");
 
 	if (!strstr($referer, $page)) {
+		if (empty($_REQUEST["url"])) {
+			System::httpExit(400, ["title" => L10n::t('Bad Request')]);
+		}
+
 		$content = add_page_info($_REQUEST["url"]);
 
 		$x = [

@@ -1157,9 +1157,9 @@ class PortableContact
 
 				if (isset($data['version'])) {
 					$platform = "Mastodon";
-					$version = $data['version'];
-					$site_name = $data['title'];
-					$info = $data['description'];
+					$version = defaults($data, 'version', '');
+					$site_name = defaults($data, 'title', '');
+					$info = defaults($data, 'description', '');
 					$network = Protocol::OSTATUS;
 				}
 

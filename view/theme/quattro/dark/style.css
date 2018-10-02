@@ -469,7 +469,7 @@ blockquote {
   margin-left: 1em;
   border-left: 1em solid #e6e6e6;
 }
-code {
+pre code {
   font-family: Courier, monospace;
   white-space: pre;
   display: block;

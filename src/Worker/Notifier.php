@@ -96,7 +96,7 @@ class Notifier
 				return;
 			}
 			foreach ($r as $contact) {
-				Contact::terminateFriendship($user, $contact);
+				Contact::terminateFriendship($user, $contact, true);
 			}
 			return;
 		} elseif ($cmd == Delivery::RELOCATION) {
@@ -217,24 +217,16 @@ class Notifier
 			}
 
 			// Special treatment for forum posts
-			if (($target_item['author-id'] != $target_item['owner-id']) &&
-				($owner['id'] != $target_item['contact-id']) &&
-				($target_item['uri'] === $target_item['parent-uri'])) {
-
-				$fields = ['forum', 'prv'];
-				$condition = ['id' => $target_item['contact-id']];
-				$contact = DBA::selectFirst('contact', $fields, $condition);
-				if (!DBA::isResult($contact)) {
-					// Should never happen
-					return false;
-				}
-
-				// Is the post from a forum?
-				if ($contact['forum'] || $contact['prv']) {
-					$relay_to_owner = true;
-					$direct_forum_delivery = true;
-				}
+			if (self::isForumPost($target_item, $owner)) {
+				$relay_to_owner = true;
+				$direct_forum_delivery = true;
 			}
+
+			// Avoid that comments in a forum thread are sent to OStatus
+			if (self::isForumPost($parent, $owner)) {
+				$direct_forum_delivery = true;
+			}
+
 			if ($relay_to_owner) {
 				// local followup to remote post
 				$followup = true;
@@ -503,5 +495,24 @@ class Notifier
 		Addon::callHooks('notifier_end',$target_item);
 
 		return;
+	}
+
+	private static function isForumPost($item, $owner) {
+		if (($item['author-id'] == $item['owner-id']) ||
+			($owner['id'] == $item['contact-id']) ||
+			($item['uri'] != $item['parent-uri'])) {
+			return false;
+		}
+
+		$fields = ['forum', 'prv'];
+		$condition = ['id' => $item['contact-id']];
+		$contact = DBA::selectFirst('contact', $fields, $condition);
+		if (!DBA::isResult($contact)) {
+			// Should never happen
+			return false;
+		}
+
+		// Is the post from a forum?
+		return ($contact['forum'] || $contact['prv']);
 	}
 }

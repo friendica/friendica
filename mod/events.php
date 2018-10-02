@@ -20,7 +20,8 @@ use Friendica\Util\Temporal;
 
 require_once 'include/items.php';
 
-function events_init(App $a) {
+function events_init(App $a)
+{
 	if (!local_user()) {
 		return;
 	}
@@ -42,7 +43,8 @@ function events_init(App $a) {
 	return;
 }
 
-function events_post(App $a) {
+function events_post(App $a)
+{
 
 	logger('post: ' . print_r($_REQUEST, true), LOGGER_DATA);
 
@@ -50,15 +52,15 @@ function events_post(App $a) {
 		return;
 	}
 
-	$event_id = (x($_POST, 'event_id') ? intval($_POST['event_id']) : 0);
-	$cid = (x($_POST, 'cid') ? intval($_POST['cid']) : 0);
+	$event_id = !empty($_POST['event_id']) ? intval($_POST['event_id']) : 0;
+	$cid = !empty($_POST['cid']) ? intval($_POST['cid']) : 0;
 	$uid = local_user();
 
-	$start_text  = escape_tags($_REQUEST['start_text']);
-	$finish_text = escape_tags($_REQUEST['finish_text']);
+	$start_text  = escape_tags(defaults($_REQUEST, 'start_text', ''));
+	$finish_text = escape_tags(defaults($_REQUEST, 'finish_text', ''));
 
-	$adjust   = intval($_POST['adjust']);
-	$nofinish = intval($_POST['nofinish']);
+	$adjust   = intval(defaults($_POST, 'adjust', 0));
+	$nofinish = intval(defaults($_POST, 'nofinish', 0));
 
 	// The default setting for the `private` field in event_store() is false, so mirror that
 	$private_event = false;
@@ -91,9 +93,9 @@ function events_post(App $a) {
 	// and we'll waste a bunch of time responding to it. Time that
 	// could've been spent doing something else.
 
-	$summary  = escape_tags(trim($_POST['summary']));
-	$desc     = escape_tags(trim($_POST['desc']));
-	$location = escape_tags(trim($_POST['location']));
+	$summary  = escape_tags(trim(defaults($_POST, 'summary', '')));
+	$desc     = escape_tags(trim(defaults($_POST, 'desc', '')));
+	$location = escape_tags(trim(defaults($_POST, 'location', '')));
 	$type     = 'event';
 
 	$action = ($event_id == '') ? 'new' : "event/" . $event_id;
@@ -117,7 +119,7 @@ function events_post(App $a) {
 		goaway($onerror_url);
 	}
 
-	$share = (intval($_POST['share']) ? intval($_POST['share']) : 0);
+	$share = intval(defaults($_POST, 'share', 0));
 
 	$c = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1",
 		intval(local_user())
@@ -137,7 +139,7 @@ function events_post(App $a) {
 		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
 
 		// Undo the pseudo-contact of self, since there are real contacts now
-		if (strpos($str_contact_allow, '<' . $self . '>') !== false ) {
+		if (strpos($str_contact_allow, '<' . $self . '>') !== false) {
 			$str_contact_allow = str_replace('<' . $self . '>', '', $str_contact_allow);
 		}
 		// Make sure to set the `private` field as true. This is necessary to
@@ -187,8 +189,8 @@ function events_post(App $a) {
 	goaway($_SESSION['return_url']);
 }
 
-function events_content(App $a) {
-
+function events_content(App $a)
+{
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
@@ -229,11 +231,6 @@ function events_content(App $a) {
 		'$i18n' => $i18n,
 	]);
 
-	$etpl = get_markup_template('event_end.tpl');
-	$a->page['end'] .= replace_macros($etpl, [
-		'$baseurl' => System::baseUrl(),
-	]);
-
 	$o = '';
 	$tabs = '';
 	// tabs
@@ -244,7 +241,7 @@ function events_content(App $a) {
 	$mode = 'view';
 	$y = 0;
 	$m = 0;
-	$ignored = (x($_REQUEST, 'ignored') ? intval($_REQUEST['ignored']) : 0);
+	$ignored = !empty($_REQUEST['ignored']) ? intval($_REQUEST['ignored']) : 0;
 
 	if ($a->argc > 1) {
 		if ($a->argc > 2 && $a->argv[1] == 'event') {
@@ -272,7 +269,6 @@ function events_content(App $a) {
 
 	// The view mode part is similiar to /mod/cal.php
 	if ($mode == 'view') {
-
 		$thisyear  = DateTimeFormat::localNow('Y');
 		$thismonth = DateTimeFormat::localNow('m');
 		if (!$y) {
@@ -312,10 +308,10 @@ function events_content(App $a) {
 		$finish = sprintf('%d-%d-%d %d:%d:%d', $y, $m, $dim, 23, 59, 59);
 
 		if ($a->argc > 1 && $a->argv[1] === 'json') {
-			if (x($_GET, 'start')) {
-				$start  = $_GET['start'];
+			if (!empty($_GET['start'])) {
+				$start = $_GET['start'];
 			}
-			if (x($_GET, 'end'))   {
+			if (!empty($_GET['end'])) {
 				$finish = $_GET['end'];
 			}
 		}
@@ -349,7 +345,7 @@ function events_content(App $a) {
 			$r = Event::sortByDate($r);
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
-				if (!x($links,$j)) {
+				if (empty($links[$j])) {
 					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
 				}
 			}
@@ -363,12 +359,12 @@ function events_content(App $a) {
 			$events = Event::prepareListForTemplate($r);
 		}
 
-		if ($a->argc > 1 && $a->argv[1] === 'json'){
+		if ($a->argc > 1 && $a->argv[1] === 'json') {
 			echo json_encode($events);
 			killme();
 		}
 
-		if (x($_GET, 'id')) {
+		if (!empty($_GET['id'])) {
 			$tpl = get_markup_template("event.tpl");
 		} else {
 			$tpl = get_markup_template("events_js.tpl");
@@ -378,7 +374,7 @@ function events_content(App $a) {
 		foreach ($events as $key => $event) {
 			$event_item = [];
 			foreach ($event['item'] as $k => $v) {
-				$k = str_replace('-' ,'_', $k);
+				$k = str_replace('-', '_', $k);
 				$event_item[$k] = $v;
 			}
 			$events[$key]['item'] = $event_item;
@@ -403,7 +399,7 @@ function events_content(App $a) {
 			'$list'  => L10n::t('list'),
 		]);
 
-		if (x($_GET, 'id')) {
+		if (!empty($_GET['id'])) {
 			echo $o;
 			killme();
 		}
@@ -428,41 +424,45 @@ function events_content(App $a) {
 		}
 
 		// In case of an error the browser is redirected back here, with these parameters filled in with the previous values
-		if (x($_REQUEST, 'nofinish'))    {$orig_event['nofinish']    = $_REQUEST['nofinish'];}
-		if (x($_REQUEST, 'adjust'))      {$orig_event['adjust']      = $_REQUEST['adjust'];}
-		if (x($_REQUEST, 'summary'))     {$orig_event['summary']     = $_REQUEST['summary'];}
-		if (x($_REQUEST, 'description')) {$orig_event['description'] = $_REQUEST['description'];}
-		if (x($_REQUEST, 'location'))    {$orig_event['location']    = $_REQUEST['location'];}
-		if (x($_REQUEST, 'start'))       {$orig_event['start']       = $_REQUEST['start'];}
-		if (x($_REQUEST, 'finish'))      {$orig_event['finish']      = $_REQUEST['finish'];}
-		if (x($_REQUEST,'finish')) $orig_event['finish'] = $_REQUEST['finish'];
+		if (!empty($_REQUEST['nofinish']))    {$orig_event['nofinish']    = $_REQUEST['nofinish'];}
+		if (!empty($_REQUEST['adjust']))      {$orig_event['adjust']      = $_REQUEST['adjust'];}
+		if (!empty($_REQUEST['summary']))     {$orig_event['summary']     = $_REQUEST['summary'];}
+		if (!empty($_REQUEST['description'])) {$orig_event['description'] = $_REQUEST['description'];}
+		if (!empty($_REQUEST['location']))    {$orig_event['location']    = $_REQUEST['location'];}
+		if (!empty($_REQUEST['start']))       {$orig_event['start']       = $_REQUEST['start'];}
+		if (!empty($_REQUEST['finish']))      {$orig_event['finish']      = $_REQUEST['finish'];}
 
-		$n_checked = ((x($orig_event) && $orig_event['nofinish']) ? ' checked="checked" ' : '');
-		$a_checked = ((x($orig_event) && $orig_event['adjust'])   ? ' checked="checked" ' : '');
+		$n_checked = (!empty($orig_event['nofinish']) ? ' checked="checked" ' : '');
+		$a_checked = (!empty($orig_event['adjust'])   ? ' checked="checked" ' : '');
 
-		$t_orig = (x($orig_event) ? $orig_event['summary']  : '');
-		$d_orig = (x($orig_event) ? $orig_event['desc']     : '');
-		$l_orig = (x($orig_event) ? $orig_event['location'] : '');
-		$eid    = (x($orig_event) ? $orig_event['id']       : 0);
-		$cid    = (x($orig_event) ? $orig_event['cid']      : 0);
-		$uri    = (x($orig_event) ? $orig_event['uri']      : '');
+		$t_orig = !empty($orig_event) ? $orig_event['summary']  : '';
+		$d_orig = !empty($orig_event) ? $orig_event['desc']     : '';
+		$l_orig = !empty($orig_event) ? $orig_event['location'] : '';
+		$eid = !empty($orig_event) ? $orig_event['id']  : 0;
+		$cid = !empty($orig_event) ? $orig_event['cid'] : 0;
+		$uri = !empty($orig_event) ? $orig_event['uri'] : '';
 
 		$sh_disabled = '';
-		$sh_checked  = '';
+		$sh_checked = '';
 
-		if (x($orig_event)) {
-			$sh_checked = (($orig_event['allow_cid'] === '<' . local_user() . '>' && !$orig_event['allow_gid'] && !$orig_event['deny_cid'] && !$orig_event['deny_gid']) ? '' : ' checked="checked" ');
+		if (!empty($orig_event)
+			&& ($orig_event['allow_cid'] !== '<' . local_user() . '>'
+			|| $orig_event['allow_gid']
+			|| $orig_event['deny_cid']
+			|| $orig_event['deny_gid']))
+		{
+			$sh_checked = ' checked="checked" ';
 		}
 
 		if ($cid || $mode === 'edit') {
 			$sh_disabled = 'disabled="disabled"';
 		}
 
-		$sdt = (x($orig_event) ? $orig_event['start']  : 'now');
-		$fdt = (x($orig_event) ? $orig_event['finish'] : 'now');
+		$sdt = !empty($orig_event) ? $orig_event['start']  : 'now';
+		$fdt = !empty($orig_event) ? $orig_event['finish'] : 'now';
 
 		$tz = date_default_timezone_get();
-		if (x($orig_event)) {
+		if (!empty($orig_event)) {
 			$tz = ($orig_event['adjust'] ? date_default_timezone_get() : 'UTC');
 		}
 
@@ -470,20 +470,22 @@ function events_content(App $a) {
 		$smonth = DateTimeFormat::convert($sdt, $tz, 'UTC', 'm');
 		$sday   = DateTimeFormat::convert($sdt, $tz, 'UTC', 'd');
 
-		$shour   = (x($orig_event) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'H') : '00');
-		$sminute = (x($orig_event) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'i') : '00');
+		$shour   = !empty($orig_event) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'H') : '00';
+		$sminute = !empty($orig_event) ? DateTimeFormat::convert($sdt, $tz, 'UTC', 'i') : '00';
 
 		$fyear  = DateTimeFormat::convert($fdt, $tz, 'UTC', 'Y');
 		$fmonth = DateTimeFormat::convert($fdt, $tz, 'UTC', 'm');
 		$fday   = DateTimeFormat::convert($fdt, $tz, 'UTC', 'd');
 
-		$fhour   = (x($orig_event) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'H') : '00');
-		$fminute = (x($orig_event) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00');
+		$fhour   = !empty($orig_event) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'H') : '00';
+		$fminute = !empty($orig_event) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00';
 
 		$perms = ACL::getDefaultUserPermissions($orig_event);
 
-		if ($mode === 'new' || $mode === 'copy') {
-			$acl = ($cid ? '' : ACL::getFullSelectorHTML($a->user, false, $orig_event));
+		if (!$cid && in_array($mode, ['new', 'copy'])) {
+			$acl = ACL::getFullSelectorHTML($a->user, false, $orig_event);
+		} else {
+			$acl = '';
 		}
 
 		// If we copy an old event, we need to remove the ID and URI
@@ -495,7 +497,7 @@ function events_content(App $a) {
 
 		$tpl = get_markup_template('event_form.tpl');
 
-		$o .= replace_macros($tpl,[
+		$o .= replace_macros($tpl, [
 			'$post' => System::baseUrl() . '/events',
 			'$eid'  => $eid,
 			'$cid'  => $cid,
@@ -509,11 +511,31 @@ function events_content(App $a) {
 			'$title' => L10n::t('Event details'),
 			'$desc' => L10n::t('Starting date and Title are required.'),
 			'$s_text' => L10n::t('Event Starts:') . ' <span class="required" title="' . L10n::t('Required') . '">*</span>',
-			'$s_dsel' => Temporal::getDateTimeField(new DateTime(), DateTime::createFromFormat('Y', $syear+5), DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"), L10n::t('Event Starts:'), 'start_text', true, true, '', '', true),
+			'$s_dsel' => Temporal::getDateTimeField(
+				new DateTime(),
+				DateTime::createFromFormat('Y', $syear+5),
+				DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"),
+				L10n::t('Event Starts:'),
+				'start_text',
+				true,
+				true,
+				'',
+				'',
+				true
+			),
 			'$n_text' => L10n::t('Finish date/time is not known or not relevant'),
 			'$n_checked' => $n_checked,
 			'$f_text' => L10n::t('Event Finishes:'),
-			'$f_dsel' => Temporal::getDateTimeField(new DateTime(), DateTime::createFromFormat('Y', $fyear+5), DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"), L10n::t('Event Finishes:'), 'finish_text', true, true, 'start_text'),
+			'$f_dsel' => Temporal::getDateTimeField(
+				new DateTime(),
+				DateTime::createFromFormat('Y', $fyear+5),
+				DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"),
+				L10n::t('Event Finishes:'),
+				'finish_text',
+				true,
+				true,
+				'start_text'
+			),
 			'$a_text' => L10n::t('Adjust for viewer timezone'),
 			'$a_checked' => $a_checked,
 			'$d_text' => L10n::t('Description:'),
@@ -534,7 +556,6 @@ function events_content(App $a) {
 			'$basic' => L10n::t('Basic'),
 			'$advanced' => L10n::t('Advanced'),
 			'$permissions' => L10n::t('Permissions'),
-
 		]);
 
 		return $o;

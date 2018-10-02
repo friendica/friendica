@@ -33,7 +33,7 @@
 
 	<ul id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 				<li>
-					<button type="button" class="btn-link icon bb-img" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="input">
+					<button type="button" class="btn-link icon bb-img" style="cursor: pointer;" title="{{$edimg|escape:'html'}}" data-role="insert-formatting" data-comment=" " data-bbcode="imgprv" data-id="input">
 						<i class="fa fa-picture-o" aria-hidden="true"></i>
 					</button>
 				</li>

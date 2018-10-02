@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 2018.08-dev (The Tazmans Flax-lily)
+-- Friendica 2018.12-dev (The Tazmans Flax-lily)
 -- DB_UPDATE_VERSION 1283
 -- ------------------------------------------
 

@@ -7,14 +7,11 @@
 <link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.min.css" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/perfect-scrollbar/css/perfect-scrollbar.min.css" type="text/css" media="screen" />
-<link rel="stylesheet" href="vendor/pear/text_highlighter/sample.css" type="text/css" media="screen" />
 
-<link rel="stylesheet" type="text/css" href="{{$stylesheet}}" media="all" />
+{{foreach $stylesheets as $stylesheetUrl}}
+<link rel="stylesheet" href="{{$stylesheetUrl}}" type="text/css" media="screen" />
+{{/foreach}}
 
-<!--
-<link rel="shortcut icon" href="images/friendica-32.png" />
-<link rel="apple-touch-icon" href="images/friendica-128.png"/>
--->
 <link rel="shortcut icon" href="{{$shortcut_icon}}" />
 <link rel="apple-touch-icon" href="{{$touch_icon}}"/>
 
@@ -45,12 +42,6 @@
 <script type="text/javascript" src="view/asset/imagesloaded/imagesloaded.pkgd.min.js"></script>
 <script type="text/javascript" src="view/js/acl.js" ></script>
 <script type="text/javascript" src="view/asset/base64/base64.min.js" ></script>
-<script type="text/javascript" src="view/js/addon-hooks.js" ></script>
-{{if is_array($addon_hooks)}}
-{{foreach $addon_hooks as $addon_hook}}
-<script type="text/javascript" src="addon/{{$addon_hook}}/{{$addon_hook}}.js"></script>
-{{/foreach}}
-{{/if}}
 <script type="text/javascript" src="view/js/main.js" ></script>
 <script>
 

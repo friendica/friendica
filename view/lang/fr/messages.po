@@ -8,7 +8,7 @@
 # Damien Goutte-Gattat <damien+transifex@incenp.org>, 2015-2016
 # Damien Goutte-Gattat <damien+transifex@incenp.org>, 2015
 # Domovoy <domovoy@errlock.org>, 2012
-# Hypolite Petovan <mrpetovan@gmail.com>, 2016
+# Hypolite Petovan <hypolite@mrpetovan.com>, 2016
 # Jak <inactive+Jak@transifex.com>, 2014
 # Lionel Triay <zapimax38@free.fr>, 2013
 # Thecross, 2017

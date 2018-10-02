@@ -271,9 +271,14 @@ class Feed {
 			}
 			$updated = XML::getFirstNodeValue($xpath, 'atom:updated/text()', $entry);
 
-			if (empty($updated)) {
+			if (empty($updated) && !empty($published)) {
 				$updated = $published;
 			}
+
+			if (empty($published) && !empty($updated)) {
+				$published = $updated;
+			}
+
 			if ($published != "") {
 				$item["created"] = $published;
 			}

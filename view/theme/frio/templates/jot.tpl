@@ -93,6 +93,10 @@
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
+						<li role="presentation"><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormattingToPost('u');"><i class="fa fa-underline"></i></button></li>
+						<li role="presentation"><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="fa fa-italic"></i></button></li>
+						<li role="presentation"><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="fa fa-bold"></i></button></li>
+						<li role="presentation"><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="fa fa-quote-left"></i></button></li>
 						<li role="presentation"><button type="button" class="btn-link" id="profile-link"  ondragenter="return linkdropper(event);" ondragover="return linkdropper(event);" ondrop="linkdrop(event);" onclick="jotGetLink();" title="{{$weblink}}"><i class="fa fa-link"></i></button></li>
 						<li role="presentation"><button type="button" class="btn-link" id="profile-video" onclick="jotVideoURL();" title="{{$video}}"><i class="fa fa-film" aria-hidden="true"></i></button></li>
 						<li role="presentation"><button type="button" class="btn-link" id="profile-audio" onclick="jotAudioURL();" title="{{$audio}}"><i class="fa fa-music" aria-hidden="true"></i></button></li>
@@ -118,6 +122,13 @@
 				</div>
 
 				<div id="jot-preview-content" class="minimize" aria-labelledby="jot-preview-lnk" role="tabpanel" aria-hidden="true"></div>
+
+				<div id="jot-preview-share" class="minimize" aria-labelledby="jot-preview-lnk" role="tabpanel" aria-hidden="true">
+					<ul id="profile-jot-preview-submit-wrapper" class="jothidden nav nav-pills">
+						<li role="presentation" class="pull-right"><button class="btn btn-primary" type="submit" id="profile-jot-peview-submit" name="submit" ><i class="fa fa-slideshare fa-fw" aria-hidden="true"></i> {{$share}}</button></li>
+					</ul>
+				</div>
+
 			</form>
 
 			<div id="jot-fbrowser-wrapper" class="minimize" aria-labelledby="jot-browser-link" role="tabpanel" aria-hidden="true"></div>

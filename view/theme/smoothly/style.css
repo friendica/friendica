@@ -1860,7 +1860,7 @@ blockquote.shared_content {
 
 #item-delete-selected-icon {}
 
-code {
+pre code {
 	font-family: Courier, monospace;
 	display: block;
 	overflow: auto;
@@ -2024,7 +2024,7 @@ code {
 	float: right;
 }
 
-.wall-item-body code {
+.wall-item-body pre code {
 	font-family: Courier, monospace;
 	display: block;
 	overflow: auto;

@@ -39,7 +39,7 @@ require_once 'include/items.php';
 
 function item_post(App $a) {
 	if (!local_user() && !remote_user()) {
-		return;
+		return 0;
 	}
 
 	require_once 'include/security.php';
@@ -154,7 +154,7 @@ function item_post(App $a) {
 	if (($message_id != '') && ($profile_uid != 0)) {
 		if (Item::exists(['uri' => $message_id, 'uid' => $profile_uid])) {
 			logger("Message with URI ".$message_id." already exists for user ".$profile_uid, LOGGER_DEBUG);
-			return;
+			return 0;
 		}
 	}
 
@@ -183,7 +183,7 @@ function item_post(App $a) {
 	$user = DBA::selectFirst('user', [], ['uid' => $profile_uid]);
 
 	if (!DBA::isResult($user) && !$parent) {
-		return;
+		return 0;
 	}
 
 	$categories = '';
@@ -842,6 +842,10 @@ function item_post(App $a) {
 	Worker::add(PRIORITY_HIGH, "Notifier", $notify_type, $post_id);
 
 	logger('post_complete');
+
+	if ($api_source) {
+		return $post_id;
+	}
 
 	item_post_return(System::baseUrl(), $api_source, $return_path);
 	// NOTREACHED

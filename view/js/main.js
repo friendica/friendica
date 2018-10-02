@@ -81,6 +81,11 @@ $(function() {
 			Dialog.doImageBrowser("comment", id);
 			return;
 		}
+
+		if (bbcode == "imgprv") {
+			bbcode = "img";
+		}
+
 		insertFormatting(bbcode, id);
 	});
 
@@ -305,7 +310,9 @@ $(function() {
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
 	window.addEventListener("load", function(){
 		NavUpdate();
-		acl.get(0, 100);
+		if (typeof acl !== 'undefined') {
+			acl.get(0, 100);
+		}
 	});
 
 	// Allow folks to stop the ajax page updates with the pause/break key
@@ -478,14 +485,12 @@ function liveUpdate(src) {
 		$('.wall-item-body', data).imagesLoaded(function() {
 			updateConvItems(data);
 
+			document.dispatchEvent(new Event('postprocess_liveupdate'));
+
 			// Update the scroll position.
 			$(window).scrollTop($(window).scrollTop() + $("section").height() - orgHeight);
 		});
-
-		callAddonHooks("postprocess_liveupdate");
-
 	});
-
 }
 
 function imgbright(node) {
@@ -669,6 +674,7 @@ function preview_post() {
 			if (data.preview) {
 				$("#jot-preview-content").html(data.preview);
 				$("#jot-preview-content" + " a").click(function() {return false;});
+				document.dispatchEvent(new Event('postprocess_liveupdate'));
 			}
 		},
 		"json"
@@ -735,6 +741,8 @@ function loadScrollContent() {
 		} else {
 			$("#scroll-end").fadeIn('normal');
 		}
+
+		document.dispatchEvent(new Event('postprocess_liveupdate'));
 	});
 }
 

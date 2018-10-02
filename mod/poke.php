@@ -24,18 +24,19 @@ use Friendica\Model\Item;
 require_once 'include/security.php';
 require_once 'include/items.php';
 
-function poke_init(App $a) {
-
+function poke_init(App $a)
+{
 	if (!local_user()) {
 		return;
 	}
 
 	$uid = local_user();
-	$verb = notags(trim($_GET['verb']));
 
-	if (!$verb) {
+	if (empty($_GET['verb'])) {
 		return;
 	}
+
+	$verb = notags(trim($_GET['verb']));
 
 	$verbs = get_poke_verbs();
 
@@ -99,7 +100,7 @@ function poke_init(App $a) {
 	$arr['guid']          = System::createGUID(32);
 	$arr['uid']           = $uid;
 	$arr['uri']           = $uri;
-	$arr['parent-uri']    = ($parent_uri ? $parent_uri : $uri);
+	$arr['parent-uri']    = (!empty($parent_uri) ? $parent_uri : $uri);
 	$arr['wall']          = 1;
 	$arr['contact-id']    = $poster['id'];
 	$arr['owner-name']    = $poster['name'];
@@ -121,7 +122,7 @@ function poke_init(App $a) {
 	$arr['origin']        = 1;
 	$arr['body']          = '[url=' . $poster['url'] . ']' . $poster['name'] . '[/url]' . ' ' . L10n::t($verbs[$verb][0]) . ' ' . '[url=' . $target['url'] . ']' . $target['name'] . '[/url]';
 
-	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $target['name'] . '</title><id>' . System::baseUrl() . '/contact/' . $target['id'] . '</id>';
+	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $target['name'] . '</title><id>' . $target['url'] . '</id>';
 	$arr['object'] .= '<link>' . xmlify('<link rel="alternate" type="text/html" href="' . $target['url'] . '" />' . "\n");
 
 	$arr['object'] .= xmlify('<link rel="photo" type="image/jpeg" href="' . $target['photo'] . '" />' . "\n");
@@ -137,10 +138,8 @@ function poke_init(App $a) {
 	return;
 }
 
-
-
-function poke_content(App $a) {
-
+function poke_content(App $a)
+{
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
@@ -149,17 +148,17 @@ function poke_content(App $a) {
 	$name = '';
 	$id = '';
 
-	if (intval($_GET['c'])) {
-		$r = q("SELECT `id`,`name` FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($_GET['c']),
-			intval(local_user())
-		);
-		if (DBA::isResult($r)) {
-			$name = $item['name'];
-			$id = $item['id'];
-		}
+	if (empty($_GET['c'])) {
+		return;
 	}
 
+	$contact = DBA::selectFirst('contact', ['id', 'name'], ['id' => $_GET['c'], 'uid' => local_user()]);
+	if (!DBA::isResult($contact)) {
+		return;
+	}
+
+	$name = $contact['name'];
+	$id = $contact['id'];
 
 	$base = System::baseUrl();
 

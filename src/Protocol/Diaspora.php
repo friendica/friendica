@@ -365,15 +365,16 @@ class Diaspora
 	/**
 	 * @brief: Decodes incoming Diaspora message in the new format
 	 *
-	 * @param array  $importer Array of the importer user
-	 * @param string $raw      raw post message
+	 * @param array   $importer Array of the importer user
+	 * @param string  $raw      raw post message
+	 * @param boolean $no_exit  Don't do an http exit on error
 	 *
 	 * @return array
 	 * 'message' -> decoded Diaspora XML message
 	 * 'author' -> author diaspora handle
 	 * 'key' -> author public key (converted to pkcs#8)
 	 */
-	public static function decodeRaw(array $importer, $raw)
+	public static function decodeRaw(array $importer, $raw, $no_exit = false)
 	{
 		$data = json_decode($raw);
 
@@ -388,7 +389,11 @@ class Diaspora
 
 			if (!is_object($j_outer_key_bundle)) {
 				logger('Outer Salmon did not verify. Discarding.');
-				System::httpExit(400);
+				if ($no_exit) {
+					return false;
+				} else {
+					System::httpExit(400);
+				}
 			}
 
 			$outer_iv = base64_decode($j_outer_key_bundle->iv);
@@ -403,7 +408,11 @@ class Diaspora
 
 		if (!is_object($basedom)) {
 			logger('Received data does not seem to be an XML. Discarding. '.$xml);
-			System::httpExit(400);
+			if ($no_exit) {
+				return false;
+			} else {
+				System::httpExit(400);
+			}
 		}
 
 		$base = $basedom->children(NAMESPACE_SALMON_ME);
@@ -425,19 +434,31 @@ class Diaspora
 		$author_addr = base64_decode($key_id);
 		if ($author_addr == '') {
 			logger('No author could be decoded. Discarding. Message: ' . $xml);
-			System::httpExit(400);
+			if ($no_exit) {
+				return false;
+			} else {
+				System::httpExit(400);
+			}
 		}
 
 		$key = self::key($author_addr);
 		if ($key == '') {
 			logger("Couldn't get a key for handle " . $author_addr . ". Discarding.");
-			System::httpExit(400);
+			if ($no_exit) {
+				return false;
+			} else {
+				System::httpExit(400);
+			}
 		}
 
 		$verify = Crypto::rsaVerify($signed_data, $signature, $key);
 		if (!$verify) {
 			logger('Message did not verify. Discarding.');
-			System::httpExit(400);
+			if ($no_exit) {
+				return false;
+			} else {
+				System::httpExit(400);
+			}
 		}
 
 		return ['message' => (string)base64url_decode($base->data),
@@ -3475,7 +3496,7 @@ class Diaspora
 
 		$myaddr = self::myHandle($owner);
 
-		$public = (($item["private"]) ? "false" : "true");
+		$public = ($item["private"] ? "false" : "true");
 
 		$created = DateTimeFormat::utc($item["created"], DateTimeFormat::ATOM);
 

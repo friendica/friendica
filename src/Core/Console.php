@@ -5,7 +5,7 @@ namespace Friendica\Core;
 /**
  * Description of Console
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Console extends \Asika\SimpleConsole\Console
 {

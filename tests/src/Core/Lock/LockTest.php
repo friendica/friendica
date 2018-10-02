@@ -19,6 +19,7 @@ abstract class LockTest extends DatabaseTest
 	{
 		parent::setUp();
 		$this->instance = $this->getInstance();
+		$this->instance->releaseAll();
 
 		// Reusable App object
 		$this->app = BaseObject::getApp();
@@ -31,11 +32,18 @@ abstract class LockTest extends DatabaseTest
 		Config::set('system', 'theme', 'system_theme');
 	}
 
+	protected function tearDown()
+	{
+		parent::tearDown();
+		$this->instance->releaseAll();
+	}
+
 	/**
 	 * @small
 	 */
 	public function testLock() {
-		$this->instance->acquireLock('foo', 1);
+		$this->assertFalse($this->instance->isLocked('foo'));
+		$this->assertTrue($this->instance->acquireLock('foo', 1));
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->assertFalse($this->instance->isLocked('bar'));
 	}
@@ -44,7 +52,8 @@ abstract class LockTest extends DatabaseTest
 	 * @small
 	 */
 	public function testDoubleLock() {
-		$this->instance->acquireLock('foo', 1);
+		$this->assertFalse($this->instance->isLocked('foo'));
+		$this->assertTrue($this->instance->acquireLock('foo', 1));
 		$this->assertTrue($this->instance->isLocked('foo'));
 		// We already locked it
 		$this->assertTrue($this->instance->acquireLock('foo', 1));
@@ -54,7 +63,8 @@ abstract class LockTest extends DatabaseTest
 	 * @small
 	 */
 	public function testReleaseLock() {
-		$this->instance->acquireLock('foo', 1);
+		$this->assertFalse($this->instance->isLocked('foo'));
+		$this->assertTrue($this->instance->acquireLock('foo', 1));
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->instance->releaseLock('foo');
 		$this->assertFalse($this->instance->isLocked('foo'));
@@ -64,9 +74,9 @@ abstract class LockTest extends DatabaseTest
 	 * @small
 	 */
 	public function testReleaseAll() {
-		$this->instance->acquireLock('foo', 1);
-		$this->instance->acquireLock('bar', 1);
-		$this->instance->acquireLock('nice', 1);
+		$this->assertTrue($this->instance->acquireLock('foo', 1));
+		$this->assertTrue($this->instance->acquireLock('bar', 1));
+		$this->assertTrue($this->instance->acquireLock('nice', 1));
 
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->assertTrue($this->instance->isLocked('bar'));
@@ -83,9 +93,12 @@ abstract class LockTest extends DatabaseTest
 	 * @small
 	 */
 	public function testReleaseAfterUnlock() {
-		$this->instance->acquireLock('foo', 1);
-		$this->instance->acquireLock('bar', 1);
-		$this->instance->acquireLock('nice', 1);
+		$this->assertFalse($this->instance->isLocked('foo'));
+		$this->assertFalse($this->instance->isLocked('bar'));
+		$this->assertFalse($this->instance->isLocked('nice'));
+		$this->assertTrue($this->instance->acquireLock('foo', 1));
+		$this->assertTrue($this->instance->acquireLock('bar', 1));
+		$this->assertTrue($this->instance->acquireLock('nice', 1));
 
 		$this->instance->releaseLock('foo');
 
@@ -103,10 +116,12 @@ abstract class LockTest extends DatabaseTest
 	 * @medium
 	 */
 	function testLockTTL() {
+		$this->assertFalse($this->instance->isLocked('foo'));
+		$this->assertFalse($this->instance->isLocked('bar'));
 
 		// TODO [nupplaphil] - Because of the Datetime-Utils for the database, we have to wait a FULL second between the checks to invalidate the db-locks/cache
-		$this->instance->acquireLock('foo', 1, 1);
-		$this->instance->acquireLock('bar', 1, 3);
+		$this->assertTrue($this->instance->acquireLock('foo', 2, 1));
+		$this->assertTrue($this->instance->acquireLock('bar', 2, 3));
 
 		$this->assertTrue($this->instance->isLocked('foo'));
 		$this->assertTrue($this->instance->isLocked('bar'));

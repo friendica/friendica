@@ -49,7 +49,7 @@ class Emailer
 				.rand(10000, 99999);
 
 		// generate a multipart/alternative message header
-		$messageHeader = $params['additionalMailHeader'] .
+		$messageHeader = defaults($params, 'additionalMailHeader', '') .
 						"From: $fromName <{$params['fromEmail']}>\n" .
 						"Reply-To: $fromName <{$params['replyTo']}>\n" .
 						"MIME-Version: 1.0\n" .

@@ -9,7 +9,7 @@ use Smarty;
 /**
  * Friendica extension of the Smarty3 template engine
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class FriendicaSmarty extends Smarty
 {

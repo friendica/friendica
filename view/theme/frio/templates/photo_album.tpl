@@ -12,9 +12,9 @@
 
 		{{if $edit}}
 		<span class="icon-padding"> </span>
-		<a id="album-edit-link" class="page-action faded-icon" href="{{$edit.1}}" title="{{$edit.0}}" data-toggle="tooltip">
+		<button id="album-edit-link" class="btn-link page-action faded-icon" type="button" data-modal-url="{{$edit.1}}" title="{{$edit.0}}" data-toggle="tooltip">
 			<i class="fa fa-pencil"></i>
-		</a>
+		</button>
 		{{/if}}
 
 		{{if ! $noorder}}

@@ -6,7 +6,7 @@ namespace Friendica\Core\Console;
  * Tired of chasing typos and finding them after a commit.
  * Run this and quickly see if we've got any parse errors in our application files.
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Typo extends \Asika\SimpleConsole\Console
 {

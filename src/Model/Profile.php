@@ -361,7 +361,7 @@ class Profile
 			if ($r) {
 				$remote_url = $r[0]['url'];
 				$message_path = preg_replace('=(.*)/profile/(.*)=ism', '$1/message/new/', $remote_url);
-				$wallmessage_link = $message_path . base64_encode($profile['addr']);
+				$wallmessage_link = $message_path . base64_encode(defaults($profile, 'addr', ''));
 			} else if (!empty($profile['nickname'])) {
 				$wallmessage_link = 'wallmessage/' . $profile['nickname'];
 			}
@@ -492,7 +492,7 @@ class Profile
 
 		if (isset($p['address'])) {
 			$p['address'] = BBCode::convert($p['address']);
-		} else {
+		} elseif (isset($p['location'])) {
 			$p['address'] = BBCode::convert($p['location']);
 		}
 

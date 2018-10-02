@@ -1191,9 +1191,6 @@ function prepare_body(array &$item, $attach = false, $is_preview = false)
 				$a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), [
 					'$baseurl' => System::baseUrl(),
 				]);
-				$a->page['end'] .= replace_macros(get_markup_template('videos_end.tpl'), [
-					'$baseurl' => System::baseUrl(),
-				]);
 			}
 
 			$url_parts = explode('/', $the_url);
@@ -1910,59 +1907,4 @@ function format_network_name($network, $url = 0) {
 
 		return $network_name;
 	}
-}
-
-/**
- * @brief Syntax based code highlighting for popular languages.
- * @param string $s Code block
- * @param string $lang Programming language
- * @return string Formated html
- */
-function text_highlight($s, $lang) {
-	if ($lang === 'js') {
-		$lang = 'javascript';
-	}
-
-	if ($lang === 'bash') {
-		$lang = 'sh';
-	}
-
-	// @TODO: Replace Text_Highlighter_Renderer_Html by scrivo/highlight.php
-
-	// Autoload the library to make constants available
-	class_exists('Text_Highlighter_Renderer_Html');
-
-	$options = [
-		'numbers' => HL_NUMBERS_LI,
-		'tabsize' => 4,
-	];
-
-	$tag_added = false;
-	$s = trim(html_entity_decode($s, ENT_COMPAT));
-	$s = str_replace('    ', "\t", $s);
-
-	/*
-	 * The highlighter library insists on an opening php tag for php code blocks. If
-	 * it isn't present, nothing is highlighted. So we're going to see if it's present.
-	 * If not, we'll add it, and then quietly remove it after we get the processed output back.
-	 */
-	if ($lang === 'php' && strpos($s, '<?php') !== 0) {
-		$s = '<?php' . "\n" . $s;
-		$tag_added = true;
-	}
-
-	$renderer = new Text_Highlighter_Renderer_Html($options);
-	$factory = new Text_Highlighter();
-	$hl = $factory->factory($lang);
-	$hl->setRenderer($renderer);
-	$o = $hl->highlight($s);
-	$o = str_replace("\n", '', $o);
-
-	if ($tag_added) {
-		$b = substr($o, 0, strpos($o, '<li>'));
-		$e = substr($o, strpos($o, '</li>'));
-		$o = $b . $e;
-	}
-
-	return '<code>' . $o . '</code>';
 }

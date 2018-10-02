@@ -53,6 +53,11 @@ class ArrayCache extends AbstractCacheDriver implements IMemoryCacheDriver
 	 */
 	public function clear($outdated = true)
 	{
+		// Array doesn't support TTL so just don't delete something
+		if ($outdated) {
+			return true;
+		}
+
 		$this->cachedData = [];
 		return true;
 	}

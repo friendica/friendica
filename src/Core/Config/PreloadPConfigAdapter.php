@@ -13,7 +13,7 @@ require_once 'include/dba.php';
  *
  * Minimizes the number of database queries to retrieve configuration values at the cost of memory.
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 {

@@ -11,7 +11,7 @@ use Friendica\Core\Session\DatabaseSessionHandler;
 /**
  * High-level Session service class
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Session
 {

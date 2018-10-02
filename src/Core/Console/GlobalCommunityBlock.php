@@ -13,8 +13,8 @@ use Friendica\Model\Contact;
  *
  * License: AGPLv3 or later, same as Friendica
  *
- * @author Tobias Diekershoff <mrpetovan@gmail.com>
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class GlobalCommunityBlock extends \Asika\SimpleConsole\Console
 {

@@ -44,7 +44,7 @@ function dirfind_content(App $a, $prefix = "") {
 
 	$local = Config::get('system','poco_local_search');
 
-	$search = $prefix.notags(trim($_REQUEST['search']));
+	$search = $prefix.notags(trim(defaults($_REQUEST, 'search', '')));
 
 	$header = '';
 

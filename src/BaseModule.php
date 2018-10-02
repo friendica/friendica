@@ -9,7 +9,7 @@ namespace Friendica;
  * The filename of the module in src/Module needs to match the class name
  * exactly to make the module available.
  *
- * @author Hypolite Petovan mrpetovan@gmail.com
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 abstract class BaseModule extends BaseObject
 {

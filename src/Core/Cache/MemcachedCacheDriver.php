@@ -10,7 +10,7 @@ use Memcached;
 /**
  * Memcached Cache Driver
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDriver
 {

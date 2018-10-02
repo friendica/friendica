@@ -27,9 +27,6 @@ class PostUpdate
 		if (!self::update1194()) {
 			return false;
 		}
-		if (!self::update1198()) {
-			return false;
-		}
 		if (!self::update1206()) {
 			return false;
 		}
@@ -112,88 +109,6 @@ class PostUpdate
 	}
 
 	/**
-	 * @brief set the author-id and owner-id in all item entries
-	 *
-	 * This job has to be started multiple times until all entries are set.
-	 * It isn't started in the update function since it would consume too much time and can be done in the background.
-	 *
-	 * @return bool "true" when the job is done
-	 */
-	private static function update1198()
-	{
-		// Was the script completed?
-		if (Config::get("system", "post_update_version") >= 1198) {
-			return true;
-		}
-
-		logger("Start", LOGGER_DEBUG);
-
-		// Check if the first step is done (Setting "author-id" and "owner-id" in the item table)
-		$fields = ['author-link', 'author-name', 'author-avatar', 'owner-link', 'owner-name', 'owner-avatar', 'network', 'uid'];
-		$r = DBA::select('item', $fields, ['author-id' => 0, 'owner-id' => 0], ['limit' => 1000]);
-		if (!$r) {
-			// Are there unfinished entries in the thread table?
-			$r = q("SELECT COUNT(*) AS `total` FROM `thread`
-				INNER JOIN `item` ON `item`.`id` =`thread`.`iid`
-				WHERE `thread`.`author-id` = 0 AND `thread`.`owner-id` = 0 AND
-					(`thread`.`uid` IN (SELECT `uid` from `user`) OR `thread`.`uid` = 0)");
-
-			if ($r && ($r[0]["total"] == 0)) {
-				Config::set("system", "post_update_version", 1198);
-				logger("Done", LOGGER_DEBUG);
-				return true;
-			}
-
-			// Update the thread table from the item table
-			$r = q("UPDATE `thread` INNER JOIN `item` ON `item`.`id`=`thread`.`iid`
-					SET `thread`.`author-id` = `item`.`author-id`,
-					`thread`.`owner-id` = `item`.`owner-id`
-				WHERE `thread`.`author-id` = 0 AND `thread`.`owner-id` = 0 AND
-					(`thread`.`uid` IN (SELECT `uid` from `user`) OR `thread`.`uid` = 0)");
-
-			logger("Updated threads", LOGGER_DEBUG);
-			if (DBA::isResult($r)) {
-				Config::set("system", "post_update_version", 1198);
-				logger("Done", LOGGER_DEBUG);
-				return true;
-			}
-			return false;
-		}
-
-		logger("Query done", LOGGER_DEBUG);
-
-		$item_arr = [];
-		foreach ($r as $item) {
-			$index = $item["author-link"]."-".$item["owner-link"]."-".$item["uid"];
-			$item_arr[$index] = ["author-link" => $item["author-link"],
-							"owner-link" => $item["owner-link"],
-							"uid" => $item["uid"]];
-		}
-
-		// Set the "author-id" and "owner-id" in the item table and add a new public contact entry if needed
-		foreach ($item_arr as $item) {
-			$default = ['url' => $item['author-link'], 'name' => $item['author-name'],
-				'photo' => $item['author-avatar'], 'network' => $item['network']];
-			$author_id = Contact::getIdForURL($item["author-link"], 0, false, $default);
-
-			$default = ['url' => $item['owner-link'], 'name' => $item['owner-name'],
-				'photo' => $item['owner-avatar'], 'network' => $item['network']];
-			$owner_id = Contact::getIdForURL($item["owner-link"], 0, false, $default);
-
-			if ($author_id == 0) {
-				$author_id = -1;
-			}
-			if ($owner_id == 0) {
-				$owner_id = -1;
-			}
-			DBA::update('item', ['author-id' => $author_id, 'owner-id' => $owner_id], ['uid' => $item['uid'], 'author-link' => $item['author-link'], 'owner-link' => $item['owner-link'], 'author-id' => 0, 'owner-id' => 0]);
-		}
-
-		logger("Updated items", LOGGER_DEBUG);
-		return false;
-	}
-
-	/**
 	 * @brief update the "last-item" field in the "self" contact
 	 *
 	 * This field avoids cost intensive calls in the admin panel and in "nodeinfo"
@@ -253,6 +168,12 @@ class PostUpdate
 		$condition = ["`id` > ?", $id];
 		$params = ['order' => ['id'], 'limit' => 10000];
 		$items = Item::select($fields, $condition, $params);
+
+		if (DBA::errorNo() != 0) {
+			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			return false;
+		}
+
 		while ($item = Item::fetch($items)) {
 			$id = $item['id'];
 
@@ -394,6 +315,12 @@ class PostUpdate
 		$condition = ["`id` > ?", $id];
 		$params = ['order' => ['id'], 'limit' => 10000];
 		$items = DBA::select('item', $fields, $condition, $params);
+
+		if (DBA::errorNo() != 0) {
+			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			return false;
+		}
+
 		while ($item = DBA::fetch($items)) {
 			$id = $item['id'];
 

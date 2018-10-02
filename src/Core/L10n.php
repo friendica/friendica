@@ -183,6 +183,10 @@ class L10n extends BaseObject
 	{
 		$a = self::getApp();
 
+		if (!is_numeric($count)) {
+			logger('Non numeric count called by ' . System::callstack(20));
+		}
+
 		$lang = Config::get('system', 'language');
 
 		if (!empty($a->strings[$singular])) {

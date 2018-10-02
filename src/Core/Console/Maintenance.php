@@ -10,7 +10,7 @@ require_once 'include/dba.php';
 /**
  * @brief Sets maintenance mode for this node
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Maintenance extends \Asika\SimpleConsole\Console
 {

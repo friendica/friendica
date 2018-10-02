@@ -96,9 +96,6 @@ blockquote {
     max-height: 0px !important;
     overflow: hidden !important;
 }
-code {
-    white-space: pre-wrap;
-}
 
 /**
  * mobile aside
@@ -1065,9 +1062,6 @@ aside > #datebrowse-sidebar .posted-date-selector-months > ul > li:hover{
 }
 
 /* help page widget */
-aside > .help-content-wrapper code, .help-aside-wrapper code {
-    display: inline
-}
 aside > .help-aside-wrapper p strong:first-child {
     display: block;
     margin: 1em 0 0em;

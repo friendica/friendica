@@ -22,7 +22,7 @@ namespace Friendica\Core\Console;
  * This is done for all files, so, in the end removing one file leads to a working doc build.
  *
  * @author Alexander Kampmann
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class DocBloxErrorChecker extends \Asika\SimpleConsole\Console
 {

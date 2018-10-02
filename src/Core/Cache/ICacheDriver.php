@@ -7,7 +7,7 @@ use Friendica\Core\Cache;
 /**
  * Cache Driver Interface
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 interface ICacheDriver
 {

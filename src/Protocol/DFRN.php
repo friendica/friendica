@@ -81,7 +81,8 @@ class DFRN
 				return [];
 			}
 
-			$user['importer_uid']  = $user['uid'];
+			$user['importer_uid'] = $user['uid'];
+			$user['uprvkey'] = $user['prvkey'];
 		} else {
 			$user = ['importer_uid' => 0, 'uprvkey' => '', 'timezone' => 'UTC',
 				'nickname' => '', 'sprvkey' => '', 'spubkey' => '',
@@ -1163,15 +1164,17 @@ class DFRN
 	 * @return int Deliver status. Negative values mean an error.
 	 * @todo Add array type-hint for $owner, $contact
 	 */
-	public static function deliver($owner, $contact, $atom, $dissolve = false)
+	public static function deliver($owner, $contact, $atom, $dissolve = false, $legacy_transport = false)
 	{
 		$a = get_app();
 
 		// At first try the Diaspora transport layer
-		$ret = self::transmit($owner, $contact, $atom);
-		if ($ret >= 200) {
-			logger('Delivery via Diaspora transport layer was successful with status ' . $ret);
-			return $ret;
+		if (!$dissolve && !$legacy_transport) {
+			$ret = self::transmit($owner, $contact, $atom);
+			if ($ret >= 200) {
+				logger('Delivery via Diaspora transport layer was successful with status ' . $ret);
+				return $ret;
+			}
 		}
 
 		$idtosend = $orig_id = (($contact['dfrn-id']) ? $contact['dfrn-id'] : $contact['issued-id']);
@@ -2252,6 +2255,11 @@ class DFRN
 			if ($Blink && link_compare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
 				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
+				$item['id'] = $posted_id;
+
+				$parent = Item::selectFirst(['id'], ['uri' => $item['parent-uri'], 'uid' => $importer["importer_uid"]]);
+				$item["parent"] = $parent['id'];
+
 				// send a notification
 				notification(
 					[
@@ -2402,8 +2410,11 @@ class DFRN
 						break;
 					case "enclosure":
 						$enclosure = $href;
-						if (strlen($item["attach"])) {
+
+						if (!empty($item["attach"])) {
 							$item["attach"] .= ",";
+						} else {
+							$item["attach"] = "";
 						}
 
 						$item["attach"] .= '[attach]href="' . $href . '" length="' . $length . '" type="' . $type . '" title="' . $title . '"[/attach]';

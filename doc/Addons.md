@@ -67,55 +67,67 @@ $b can be called anything you like.
 This is information specific to the hook currently being processed, and generally contains information that is being immediately processed or acted on that you can use, display, or alter.
 Remember to declare it with `&` if you wish to alter it.
 
-## JavaScript addon hooks
+## Global stylesheets
 
-### PHP part
-
-Make sure your JavaScript addon file (addon/*addon_name*/*addon_name*.js) is listed in the document response.
-
-In your addon install function, add:
+If your addon requires adding a stylesheet on all pages of Friendica, add the following hook:
 
 ```php
-Addon::registerHook('template_vars', __FILE__, '<addon_name>_template_vars');
-```
-
-In your addon uninstall function, add:
-
-```php
-Addon::unregisterHook('template_vars', __FILE__, '<addon_name>_template_vars');
-```
-
-Then, add your addon name to the *addon_hooks* template variable array:
-
-```php
-function <addon_name>_template_vars($a, &$arr)
+function <addon>_install()
 {
-	if (!array_key_exists('addon_hooks', $arr['vars']))
-	{
-		$arr['vars']['addon_hooks'] = array();
-	}
-	$arr['vars']['addon_hooks'][] = "<addon_name>";
+	Addon::registerHook('head', __FILE__, '<addon>_head');
+	...
+}
+
+
+function <addon>_head(App $a)
+{
+	$a->registerStylesheet(__DIR__ . '/relative/path/to/addon/stylesheet.css');
 }
 ```
 
-### JavaScript part
+`__DIR__` is the folder path of your addon.
 
-Register your addon hooks in file `addon/*addon_name*/*addon_name*.js`.
+## JavaScript
+
+### Global scripts
+
+If your addon requires adding a script on all pages of Friendica, add the following hook:
+
+
+```php
+function <addon>_install()
+{
+	Addon::registerHook('footer', __FILE__, '<addon>_footer');
+	...
+}
+
+function <addon>_footer(App $a)
+{
+	$a->registerFooterScript(__DIR__ . '/relative/path/to/addon/script.js');
+}
+```
+
+`__DIR__` is the folder path of your addon.
+
+### JavaScript hooks
+
+The main Friendica script provides hooks via events dispatched on the `document` property.
+In your Javascript file included as described above, add your event listener like this:
 
 ```js
-Addon_registerHook(type, hookfnstr);
+document.addEventListener(name, callback);
 ```
 
-*type* is the name of the hook and corresponds to a known Friendica JavaScript hook.
-*hookfnstr* is the name of your JavaScript function to execute.
+- *name* is the name of the hook and corresponds to a known Friendica JavaScript hook.
+- *callback* is a JavaScript anonymous function to execute.
 
-No arguments are provided to your JavaScript callback function. Example:
+More info about Javascript event listeners: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
 
-```javascript
-function myhook_function() {
+#### Current JavaScript hooks
 
-}
-```
+##### postprocess_liveupdate
+Called at the end of the live update process (XmlHttpRequest) and on a post preview.
+No additional data is provided.
 
 ## Modules
 
@@ -260,6 +272,11 @@ Called after conversion of bbcode to HTML.
 Called after tag conversion of HTML to bbcode (e.g. remote message posting)
 `$b` is a string converted text
 
+### head
+Called when building the `<head>` sections.
+Stylesheets should be registered using this hook.
+`$b` is an HTML string of the `<head>` tag.
+
 ### page_header
 Called after building the page navigation section.
 `$b` is a string HTML of nav region.
@@ -293,6 +310,11 @@ No hook data.
 ### page_end
 Called after HTML content functions have completed.
 `$b` is (string) HTML of content div.
+
+### footer
+Called after HTML content functions have completed.
+Deferred Javascript files should be registered using this hook.
+`$b` is (string) HTML of footer div/element.
 
 ### avatar_lookup
 Called when looking up the avatar. `$b` is an array:
@@ -389,14 +411,9 @@ Hook data:
     visitor => array with the contact record of the visitor
     url => the query string
 
-## Current JavaScript hooks
-
-### postprocess_liveupdate
-Called at the end of the live update process (XmlHttpRequest)
-
 ## Complete list of hook callbacks
 
-Here is a complete list of all hook callbacks with file locations (as of 01-Apr-2018). Please see the source for details of any hooks not documented above.
+Here is a complete list of all hook callbacks with file locations (as of 24-Sep-2018). Please see the source for details of any hooks not documented above.
 
 ### index.php
 
@@ -571,6 +588,8 @@ Here is a complete list of all hook callbacks with file locations (as of 01-Apr-
 ### src/App.php
 
     Addon::callHooks('load_config');
+    Addon::callHooks('head');
+    Addon::callHooks('footer');
 
 ### src/Model/Item.php
 
@@ -704,4 +723,4 @@ Here is a complete list of all hook callbacks with file locations (as of 01-Apr-
 
 ### view/js/main.js
 
-    callAddonHooks("postprocess_liveupdate");
+    document.dispatchEvent(new Event('postprocess_liveupdate'));

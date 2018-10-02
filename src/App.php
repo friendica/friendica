@@ -87,6 +87,41 @@ class App
 	public $force_max_items = 0;
 	public $theme_events_in_profile = true;
 
+	public $stylesheets = [];
+	public $footerScripts = [];
+
+	/**
+	 * Register a stylesheet file path to be included in the <head> tag of every page.
+	 * Inclusion is done in App->initHead().
+	 * The path can be absolute or relative to the Friendica installation base folder.
+	 *
+	 * @see App->initHead()
+	 *
+	 * @param string $path
+	 */
+	public function registerStylesheet($path)
+	{
+		$url = str_replace($this->get_basepath() . DIRECTORY_SEPARATOR, '', $path);
+
+		$this->stylesheets[] = trim($url, '/');
+	}
+
+	/**
+	 * Register a javascript file path to be included in the <footer> tag of every page.
+	 * Inclusion is done in App->initFooter().
+	 * The path can be absolute or relative to the Friendica installation base folder.
+	 *
+	 * @see App->initFooter()
+	 *
+	 * @param string $path
+	 */
+	public function registerFooterScript($path)
+	{
+		$url = str_replace($this->get_basepath() . DIRECTORY_SEPARATOR, '', $path);
+
+		$this->footerScripts[] = trim($url, '/');
+	}
+
 	/**
 	 * @brief An array for all theme-controllable parameters
 	 *
@@ -300,7 +335,6 @@ class App
 			'aside' => '',
 			'bottom' => '',
 			'content' => '',
-			'end' => '',
 			'footer' => '',
 			'htmlhead' => '',
 			'nav' => '',
@@ -363,13 +397,13 @@ class App
 		}
 
 		if (file_exists($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php')) {
-			$this->loadConfigFile($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php');
+			$this->loadConfigFile($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php', true);
 		}
 	}
 
 	/**
 	 * Tries to load the specified configuration file into the App->config array.
-	 * Overwrites previously set values.
+	 * Doesn't overwrite previously set values by default to prevent default config files to supersede DB Config.
 	 *
 	 * The config format is INI and the template for configuration files is the following:
 	 *
@@ -382,9 +416,10 @@ class App
 	 * // Keep this line
 	 *
 	 * @param type $filepath
+	 * @param bool $overwrite Force value overwrite if the config key already exists
 	 * @throws Exception
 	 */
-	public function loadConfigFile($filepath)
+	public function loadConfigFile($filepath, $overwrite = false)
 	{
 		if (!file_exists($filepath)) {
 			throw new Exception('Error parsing non-existent config file ' . $filepath);
@@ -400,7 +435,11 @@ class App
 
 		foreach ($config as $category => $values) {
 			foreach ($values as $key => $value) {
-				$this->setConfigValue($category, $key, $value);
+				if ($overwrite) {
+					$this->setConfigValue($category, $key, $value);
+				} else {
+					$this->setDefaultConfigValue($category, $key, $value);
+				}
 			}
 		}
 	}
@@ -418,7 +457,7 @@ class App
 
 		// Load the local addon config file to overwritten default addon config values
 		if (file_exists($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'addon.ini.php')) {
-			$this->loadConfigFile($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'addon.ini.php');
+			$this->loadConfigFile($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'addon.ini.php', true);
 		}
 	}
 
@@ -747,7 +786,17 @@ class App
 		$this->pager['start'] = ($this->pager['page'] * $this->pager['itemspage']) - $this->pager['itemspage'];
 	}
 
-	public function init_pagehead()
+	/**
+	 * Initializes App->page['htmlhead'].
+	 *
+	 * Includes:
+	 * - Page title
+	 * - Favicons
+	 * - Registered stylesheets (through App->registerStylesheet())
+	 * - Infinite scroll data
+	 * - head.tpl template
+	 */
+	public function initHead()
 	{
 		$interval = ((local_user()) ? PConfig::get(local_user(), 'system', 'update_interval') : 40000);
 
@@ -768,23 +817,13 @@ class App
 			$this->page['title'] = $this->config['sitename'];
 		}
 
-		/* put the head template at the beginning of page['htmlhead']
-		 * since the code added by the modules frequently depends on it
-		 * being first
-		 */
-		if (!isset($this->page['htmlhead'])) {
-			$this->page['htmlhead'] = '';
+		if (!empty($this->theme['stylesheet'])) {
+			$stylesheet = $this->theme['stylesheet'];
+		} else {
+			$stylesheet = $this->getCurrentThemeStylesheetPath();
 		}
 
-		// If we're using Smarty, then doing replace_macros() will replace
-		// any unrecognized variables with a blank string. Since we delay
-		// replacing $stylesheet until later, we need to replace it now
-		// with another variable name
-		if ($this->theme['template_engine'] === 'smarty3') {
-			$stylesheet = $this->get_template_ldelim('smarty3') . '$stylesheet' . $this->get_template_rdelim('smarty3');
-		} else {
-			$stylesheet = '$stylesheet';
-		}
+		$this->registerStylesheet($stylesheet);
 
 		$shortcut_icon = Config::get('system', 'shortcut_icon');
 		if ($shortcut_icon == '') {
@@ -797,9 +836,15 @@ class App
 		}
 
 		// get data wich is needed for infinite scroll on the network page
-		$invinite_scroll = infinite_scroll_data($this->module);
+		$infinite_scroll = infinite_scroll_data($this->module);
+
+		Core\Addon::callHooks('head', $this->page['htmlhead']);
 
 		$tpl = get_markup_template('head.tpl');
+		/* put the head template at the beginning of page['htmlhead']
+		 * since the code added by the modules frequently depends on it
+		 * being first
+		 */
 		$this->page['htmlhead'] = replace_macros($tpl, [
 			'$baseurl'         => $this->get_baseurl(),
 			'$local_user'      => local_user(),
@@ -810,21 +855,56 @@ class App
 			'$update_interval' => $interval,
 			'$shortcut_icon'   => $shortcut_icon,
 			'$touch_icon'      => $touch_icon,
-			'$stylesheet'      => $stylesheet,
-			'$infinite_scroll' => $invinite_scroll,
+			'$infinite_scroll' => $infinite_scroll,
 			'$block_public'    => intval(Config::get('system', 'block_public')),
+			'$stylesheets'     => $this->stylesheets,
 		]) . $this->page['htmlhead'];
 	}
 
-	public function init_page_end()
+	/**
+	 * Initializes App->page['footer'].
+	 *
+	 * Includes:
+	 * - Javascript homebase
+	 * - Mobile toggle link
+	 * - Registered footer scripts (through App->registerFooterScript())
+	 * - footer.tpl template
+	 */
+	public function initFooter()
 	{
-		if (!isset($this->page['end'])) {
-			$this->page['end'] = '';
+		// If you're just visiting, let javascript take you home
+		if (!empty($_SESSION['visitor_home'])) {
+			$homebase = $_SESSION['visitor_home'];
+		} elseif (local_user()) {
+			$homebase = 'profile/' . $this->user['nickname'];
 		}
-		$tpl = get_markup_template('end.tpl');
-		$this->page['end'] = replace_macros($tpl, [
-			'$baseurl' => $this->get_baseurl()
-		]) . $this->page['end'];
+
+		if (isset($homebase)) {
+			$this->page['footer'] .= '<script>var homebase="' . $homebase . '";</script>' . "\n";
+		}
+
+		/*
+		 * Add a "toggle mobile" link if we're using a mobile device
+		 */
+		if ($this->is_mobile || $this->is_tablet) {
+			if (isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
+				$link = 'toggle_mobile?address=' . curPageURL();
+			} else {
+				$link = 'toggle_mobile?off=1&address=' . curPageURL();
+			}
+			$this->page['footer'] .= replace_macros(get_markup_template("toggle_mobile_footer.tpl"), [
+				'$toggle_link' => $link,
+				'$toggle_text' => Core\L10n::t('toggle mobile')
+			]);
+		}
+
+		Core\Addon::callHooks('footer', $this->page['footer']);
+
+		$tpl = get_markup_template('footer.tpl');
+		$this->page['footer'] = replace_macros($tpl, [
+			'$baseurl' => $this->get_baseurl(),
+			'$footerScripts' => $this->footerScripts,
+		]) . $this->page['footer'];
 	}
 
 	public function set_curl_code($code)
@@ -1088,7 +1168,11 @@ class App
 
 		$meminfo = [];
 		foreach ($memdata as $line) {
-			list($key, $val) = explode(':', $line);
+			$data = explode(':', $line);
+			if (count($data) != 2) {
+				continue;
+			}
+			list($key, $val) = $data;
 			$meminfo[$key] = (int) trim(str_replace('kB', '', $val));
 			$meminfo[$key] = (int) ($meminfo[$key] / 1024);
 		}
@@ -1252,6 +1336,20 @@ class App
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Sets a default value in the config cache. Ignores already existing keys.
+	 *
+	 * @param string $cat Config category
+	 * @param string $k   Config key
+	 * @param mixed  $v   Default value to set
+	 */
+	private function setDefaultConfigValue($cat, $k, $v)
+	{
+		if (!isset($this->config[$cat][$k])) {
+			$this->setConfigValue($cat, $k, $v);
+		}
 	}
 
 	/**

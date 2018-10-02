@@ -188,13 +188,24 @@ function loadModalTitle() {
 	}
 }
 
-// This function loads html content from a friendica page
-// into a modal.
-function addToModal(url) {
+
+/**
+ * This function loads html content from a friendica page into a modal.
+ * 
+ * @param {string} url The url with html content.
+ * @param {string} id The ID of a html element (can be undefined).
+ * @returns {void}
+ */
+function addToModal(url, id) {
 	var char = qOrAmp(url);
 
 	url = url + char + 'mode=none';
 	var modal = $('#modal').modal();
+
+	// Only search for an element if we have an ID.
+	if (typeof id !== "undefined") {
+		url = url + " div#" + id;
+	}
 
 	modal
 		.find('#modal-body')
@@ -215,7 +226,7 @@ function addToModal(url) {
 		});
 }
 
-// Add a element (by it's id) to a bootstrap modal.
+// Add an element (by its id) to a bootstrap modal.
 function addElmToModal(id) {
 	var elm = $(id).html();
 	var modal = $('#modal').modal();
@@ -332,6 +343,8 @@ function toggleJotNav (elm) {
 	// For some some tab panels we need to execute other js functions.
 	if (tabpanel === "jot-preview-content") {
 		preview_post();
+		// Make Share button visivle in preview
+		$('#jot-preview-share').removeClass("minimize").attr("aria-hidden" ,"false");
 	} else if (tabpanel === "jot-fbrowser-wrapper") {
 		$(function() {
 			Dialog.showJot();

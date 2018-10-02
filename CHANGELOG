@@ -1,3 +1,134 @@
+Version 2018.09 (2018-09-23)
+  Friendica Core:
+    Update to the translation (CS, DE, EN-US, FI, IT, NL, PL, ZH-CN) [translation teams]
+    Update to the documentation [Aditoo17, annando, astifter, rebeka-catalina, fabrixxm, M-arcus, microgroove, nupplaphil, tobiasd]
+    Enhancements to the database structure, handling and documentation [abanink, Angristan, annando, miqrogroove, tobiasd]
+    Enhancements of unit testing [abanink, nupplaphil, rudloff]
+    Enhancements to labelling of UI elements [andyhee, tobiasd]
+    Enhancements to the background workers [annando, miqrogroove, rabuzarus]
+    Enhancements to the PHP7.2 compatibility [annando, miqrogroove, MrPetovan]
+    Enhancements to the content filter [MrPetovan]
+    Enhancements to the hooks provided for addons [abanink]
+    Enhancements to the interaction with public postings [annando]
+    Enhancements to the config storage [frabrixxm]
+    Enhancements to the themes (frio, quattro, smoothly, vier) [annando, astifter, hoergen, MrPetovan, rabuzarus, tobiasd]
+    Enhancements to the handling of locks [nupplaphil]
+    Enhancements to the redis integration [nupplaphil]
+    Enhancements to the admin panel [JeroenED, tobiasd]
+    Enhancements to the user import process [annando]
+    Enhancements to the display of invitation information [JeroenED]
+    Enhancements to the automatic installation process [nupplaphil]
+    Enhancements to the contact group UI [annando, astifter]
+    Enhancements to the call of JS [hypolite]
+    Enhancements to the storage of items in the database [annando]
+    Enhancements to the process of changing relationships [annando]
+    Enhancements to the OEmbed of data [MrPetovan]
+    Fixed various PHP notice occurrences [annando, MrPetovan]
+    Fixed a bug that could lead to the display of posts from deleted accounts on the community page for a short period [annando]
+    Fixed a bug that prevented email notification to be send out [annando]
+    Fixed a bug in database optimisation [annando]
+    Fixed a bug during removing contacts [annando]
+    Fixed a bug in the tag-cloud widget [annando]
+    Fixed a bug in the daemon mode of the background worker [annando]
+    Fixed a bug in the frio theme that contact filtering [rabuzarus]
+    Fixed a bug that mangled the display of some additional smileys [abanink]
+    Fixed a bug in generating registration mails [MrPetovan] 
+    Fixed a bug that caused blank re-share bodies [MrPetovon]
+    Fixed a bug in the API handling of private mails [fabrixxm]
+    Fixed a bug when calling the mail() function [miqrogroove]
+    Fixed a bug that caused deleted accounts being displayed in the local directory [miqrogroove]
+    Fixed a bug when checking the domain of an email address [VVelox]
+    Fixed a bug that prevented re-shares from Twitter to be shown as this [annando] 
+    Fixed a bug that caused broken profile links [miqrogroove]
+    Fixed a bug that caused content from unknown accounts appearing in the timeline [annando]
+    Fixed a bug with the ignoring and blocking of contacts [annando]
+    Fixed a bug with showing hidden contacts in some places [annando]
+    Fixed a bug that prevented the deletion of events by contacts [annando]
+    Fixed a bug that prevented email contacts from being added [annando]
+    Fixed a bug in the notification/seen API call [fabrixxm]
+    Fixed a bug that prevented a refresh after un-/ignoring a conversation [annando]
+    Fixed a bug in the handling of some language translations [anndno]
+    Fixed a bug in the hook handling [annando]
+    Fixed the handling of too long tags [annando]
+    Fixed a bug that prevented the unliking of dis-/likes [annando]
+    Fixed bugs with the handling of private nodes [annando]
+    Fixed a bug in the session initialisation [annando]
+    Fixed bugs in the execution of the background processes [annando, Quix0r]
+    Fixed a problem with the notification page [MrPetovan]
+    Fixed a bug with wrong dates in importing some Atom feeds [annando]
+    Fixed forum exclusive distribution of postings using the !notation [annando]
+    Fixed a bug that lead to empty notifications [MrPetovan]
+    Fixed a problem that could sometimes prevent the execution of the relocation [annando]
+    Fixed a bug with the handling of images in postings over the connectors [annando]
+    Added conversation cleanup configuration [miqrogroove]
+    Added support of the usage of internal diaspora links to accounts [annando]
+    Added the possibility for admins to block certain nicknames (e.g. role names) [tobiasd]
+    Added the generation of system guid [nupplaphil]
+    Added the possibility for admins to mark a node for explicit content [tobiasd]
+    Added filter by account type to the community page [annando]
+    Added private flag to API results [fabrixxm]
+    Added post update checks to the console utility [annando]
+    Added codecov analysis [nupplaphil]
+    Added access-keys to the frio theme [tobiasd]
+    Added the profile settings to the user settings [tobiasd]
+    General code refactoring and beautification work [annando, MrPetovan, Quix0r, tobiasd]
+    Fixation of the position on the network page when new posts arrive [rabuzarus]
+    Ported OpenWebAuth from Hubzilla [annando, rabuzarus]
+    Removed hard coded syntax highlighting from code blocks [MrPetovan]
+    Removed (temporarily) the possibility to add pictures to private messages [annando]
+    New INI style config file format in /config [MrPetovan, tobiasd]
+    The .htaccess file is not part of the git repository anymore [annando, Quix0r]
+
+  Friendica Addons:
+    Update to the translations (CS, DE, EN-US, NL, PL, ZH-CN) [translation teams]
+    General update to adopt changes in core [annando, MrPetovan, Quix0r, tobiasd]
+    advancedcontentfilter:
+      Enhancement to the error handling [MrPetovan]
+      Honour the CSP settings [MrPetovan]
+      Fixed translation problems [annando]
+    blockem:
+      Enhancement of the settings [AlfredSK]
+    buffer:
+      support for app.net removed [annando]
+    js_upload:
+      Enhancement of the album name handling [rabuzarus]
+      Enhancement to the wording of the labels [astifter]
+    langfilter:
+      Fixed a problem with default values of the filtered languages [tobiasd]
+    libravatar:
+      The service wont shutdown, so we can keep the addon [tobiasd]
+    pumpio:
+      Fixed a problem that prevented new connections [annando]
+    superblock:
+      Fixed a bug that prevented the addon to block accounts [annando]
+      Enhancements of the settings [AlfredSK]
+    twitter:
+      Use rich text for quote tweets [MrPetovan]
+      Prevent empty quotes from being created [annando]
+      Fixed a problem with re-shares from remote_self contacts [annando]
+      Changed URL display after link expansion [MrPetovan]
+      Fixed a problem with EXIF handling [MrPetovan]
+    added addons:
+      mastodoncustomemojis [MrPetovan]
+    deprecated addons:
+      notimeline, retriver, remote_permissions, widgets
+
+  Directory:
+    Enhancements of the health summary [andyhee]
+    Enhancements of the PHP7 compatibility [MrPetovan]
+
+  Closed Issues:
+     901, 1034, 1074, 1303, 1308, 1391, 1490, 1470, 1559, 2093, 2337,
+    2340, 2381, 2396, 2675, 3291, 3299, 3493, 3501, 3535, 3643, 3840,
+    4148, 4419, 4475, 4507, 4655, 4659, 4710, 4726, 4739, 4753, 4814,
+    4830, 4868, 4889, 4923, 4971, 4950, 4985, 5066, 5099, 5137, 5148,
+    5158, 5168, 5188, 5202, 5211, 5222, 5233, 5243, 5247, 5252, 5257,
+    5260, 5262, 5268, 5274, 5275, 5276, 5278, 5298, 5318, 5319, 5320,
+    5321, 5322, 5330, 5333, 5341, 5365, 5405, 5407, 5411, 5423, 5432,
+    5434, 5436, 5443, 5455, 5464, 5467, 5469, 5486, 5496, 5497, 5514,
+    5539, 5524, 5541, 5544, 5550, 5564, 5566, 5605, 5630, 5638, 5651,
+    5653, 5660, 5670, 5691, 5733, 5745, 5768
+
 Version 2018.05 (2018-06-01)
   Friendica Core:
     Update to the translations (DE, EN-GB, EN-US, FI, IS, IT, NL, PL, RU, ZN CH) [translation teams]

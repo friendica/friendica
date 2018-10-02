@@ -61,7 +61,7 @@ Friendica - Dokumentation und Ressourcen
 **Externe Ressourcen**
 
 * [Haupt-Webseite](https://friendi.ca)
-* [Deutsches Friendica-Wiki](http://wiki.toktan.org/doku.php)
+* [Deutsches Friendica-Wiki](https://friendica-wiki.de)
 * Support Kanäle
   * [Friendica Support Forum](https://forum.friendi.ca/~helpers)
   * [Mailing Listen Archiv](http://mailman.friendi.ca/mailman/listinfo/support-friendi.ca) zum Abonnieren der Liste eine E-Mail an ``support-request(at)friendi.ca?subject=subscribe`` senden

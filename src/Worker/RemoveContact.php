@@ -13,8 +13,8 @@ require_once 'include/dba.php';
 class RemoveContact {
 	public static function execute($id) {
 
-		// Only delete if the contact is archived
-		$condition = ['archive' => true, 'network' => Protocol::PHANTOM, 'id' => $id];
+		// Only delete if the contact is to be deleted
+		$condition = ['network' => Protocol::PHANTOM, 'id' => $id];
 		$r = DBA::exists('contact', $condition);
 		if (!DBA::isResult($r)) {
 			return;

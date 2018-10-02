@@ -17,7 +17,7 @@ use Friendica\Util\Network;
 /**
  * Handle ACL management and display
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class ACL extends BaseObject
 {

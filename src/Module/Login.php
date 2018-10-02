@@ -22,7 +22,7 @@ require_once 'include/text.php';
 /**
  * Login module
  *
- * @author Hypolite Petovan mrpetovan@gmail.com
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Login extends BaseModule
 {

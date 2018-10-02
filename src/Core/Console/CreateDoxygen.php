@@ -5,7 +5,7 @@ namespace Friendica\Core\Console;
 /**
  * Description of CreateDoxygen
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class CreateDoxygen extends \Asika\SimpleConsole\Console
 {

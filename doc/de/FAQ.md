@@ -180,7 +180,7 @@ Hier ist eine Liste von Clients bei denen dies möglich ist, bzw. die speziell f
 <a name="help"></a>
 ### Wo finde ich Hilfe?
 
-Wenn Du Probleme mit Deiner Friendica-Seite hast, dann kannst Du die Community in der [Friendica-Support-Gruppe](https://forum.friendi.ca/profile/helpers) oder im [deutschen Friendica-Support-Forum](http://toktan.org/profile/wiki) fragen oder Dir das [deutsche Wiki](http://wiki.toktan.org/doku.php) anschauen.
+Wenn Du Probleme mit Deiner Friendica-Seite hast, dann kannst Du die Community in der [Friendica-Support-Gruppe](https://forum.friendi.ca/profile/helpers) fragen oder Dir das [deutsche Wiki](https://friendica-wiki.de/) anschauen.
 Wenn Du Deinen Account nicht nutzen kannst, kannst Du entweder einen [Testaccount](https://tryfriendica.de) bzw. einen Account auf einer öffentlichen Seite ([Liste](https://dir.friendica.social/servers)) nutzen.
 
 Wenn du dir keinen weiteren Friendica Account einrichten willst, kannst du auch gerne über einen der folgenden alternativen Kanäle Hilfe suchen:

@@ -4,7 +4,7 @@ namespace Friendica\Core\Config;
 
 /**
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 interface IConfigAdapter
 {

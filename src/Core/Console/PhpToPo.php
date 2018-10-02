@@ -5,7 +5,7 @@ namespace Friendica\Core\Console;
 /**
  * Read a strings.php file and create messages.po in the same directory
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class PhpToPo extends \Asika\SimpleConsole\Console
 {

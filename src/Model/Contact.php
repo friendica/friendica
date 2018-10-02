@@ -17,6 +17,7 @@ use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Diaspora;
+use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
 use Friendica\Protocol\PortableContact;
 use Friendica\Protocol\Salmon;
@@ -528,13 +529,16 @@ class Contact extends BaseObject
 	/**
 	 * @brief Sends an unfriend message. Does not remove the contact
 	 *
-	 * @param array $user    User unfriending
-	 * @param array $contact Contact unfriended
+	 * @param array   $user     User unfriending
+	 * @param array   $contact  Contact unfriended
+	 * @param boolean $dissolve Remove the contact on the remote side
 	 * @return void
 	 */
-	public static function terminateFriendship(array $user, array $contact)
+	public static function terminateFriendship(array $user, array $contact, $dissolve = false)
 	{
-		if (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN])) {
+		if (($contact['network'] == Protocol::DFRN) && $dissolve) {
+			DFRN::deliver($user, $contact, 'placeholder', true);
+		} elseif (in_array($contact['network'], [Protocol::OSTATUS, Protocol::DFRN])) {
 			// create an unfollow slap
 			$item = [];
 			$item['verb'] = NAMESPACE_OSTATUS . "/unfollow";
@@ -1076,6 +1080,11 @@ class Contact extends BaseObject
 
 		if (empty($data)) {
 			$data = Probe::uri($url, "", $uid);
+
+			// Ensure that there is a gserver entry
+			if (!empty($data['baseurl']) && ($data['network'] != Protocol::PHANTOM)) {
+				PortableContact::checkServer($data['baseurl']);
+			}
 		}
 
 		// Last try in gcontact for unsupported networks

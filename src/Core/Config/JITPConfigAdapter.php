@@ -11,7 +11,7 @@ require_once 'include/dba.php';
  *
  * Default PConfig Adapter. Provides the best performance for pages loading few configuration variables.
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 {

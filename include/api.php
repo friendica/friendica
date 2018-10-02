@@ -581,7 +581,10 @@ function api_get_user(App $a, $contact_id = null)
 	if (is_null($user) && ($a->argc > (count($called_api) - 1)) && (count($called_api) > 0)) {
 		$argid = count($called_api);
 		if (!empty($a->argv[$argid])) {
-			list($user, $null) = explode(".", $a->argv[$argid]);
+			$data = explode(".", $a->argv[$argid]);
+			if (count($data) > 1) {
+				list($user, $null) = $data;
+			}
 		}
 		if (is_numeric($user)) {
 			$user = DBA::escape(api_unique_id_to_nurl(intval($user)));
@@ -816,7 +819,7 @@ function api_item_get_user(App $a, $item)
 	$status_user["protected"] = defaults($item, 'private', 0);
 
 	if (defaults($item, 'thr-parent', '') == defaults($item, 'uri', '')) {
-		$owner_user = api_get_user($a, defaults($item, 'author-id', null));
+		$owner_user = api_get_user($a, defaults($item, 'owner-id', null));
 	} else {
 		$owner_user = $status_user;
 	}
@@ -1056,10 +1059,10 @@ function api_statuses_mediap($type)
 
 	// now that we have the img url in bbcode we can add it to the status and insert the wall item.
 	$_REQUEST['body'] = $txt . "\n\n" . '[url=' . $picture["albumpage"] . '][img]' . $picture["preview"] . "[/img][/url]";
-	item_post($a);
+	$item_id = item_post($a);
 
-	// this should output the last post (the one we just posted).
-	return api_status_show($type);
+	// output the post that we just posted.
+	return api_status_show($type, $item_id);
 }
 
 /// @TODO move this to top of file or somewhere better!
@@ -1075,7 +1078,6 @@ api_register_func('api/statuses/mediap', 'api_statuses_mediap', true, API_METHOD
  */
 function api_statuses_update($type)
 {
-
 	$a = get_app();
 
 	if (api_user() === false) {
@@ -1129,8 +1131,8 @@ function api_statuses_update($type)
 		if ($throttle_day > 0) {
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60);
 
-			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_day = DBA::count('item', $condition);
+			$condition = ["`uid` = ? AND `wall` AND `created` > ?", api_user(), $datefrom];
+			$posts_day = DBA::count('thread', $condition);
 
 			if ($posts_day > $throttle_day) {
 				logger('Daily posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -1143,8 +1145,8 @@ function api_statuses_update($type)
 		if ($throttle_week > 0) {
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*7);
 
-			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_week = DBA::count('item', $condition);
+			$condition = ["`uid` = ? AND `wall` AND `created` > ?", api_user(), $datefrom];
+			$posts_week = DBA::count('thread', $condition);
 
 			if ($posts_week > $throttle_week) {
 				logger('Weekly posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -1157,8 +1159,8 @@ function api_statuses_update($type)
 		if ($throttle_month > 0) {
 			$datefrom = date(DateTimeFormat::MYSQL, time() - 24*60*60*30);
 
-			$condition = ["`uid` = ? AND `wall` AND `created` > ? AND `id` = `parent`", api_user(), $datefrom];
-			$posts_month = DBA::count('item', $condition);
+			$condition = ["`uid` = ? AND `wall` AND `created` > ?", api_user(), $datefrom];
+			$posts_month = DBA::count('thread', $condition);
 
 			if ($posts_month > $throttle_month) {
 				logger('Monthly posting limit reached for user '.api_user(), LOGGER_DEBUG);
@@ -1200,10 +1202,10 @@ function api_statuses_update($type)
 	}
 
 	// call out normal post function
-	item_post($a);
+	$item_id = item_post($a);
 
-	// this should output the last post (the one we just posted).
-	return api_status_show($type);
+	// output the post that we just posted.
+	return api_status_show($type, $item_id);
 }
 
 /// @TODO move to top of file or somewhere better
@@ -1260,7 +1262,7 @@ api_register_func('api/media/upload', 'api_media_upload', true, API_METHOD_POST)
  *
  * @return array|string
  */
-function api_status_show($type)
+function api_status_show($type, $item_id = 0)
 {
 	$a = get_app();
 
@@ -1274,9 +1276,14 @@ function api_status_show($type)
 		$privacy_sql = "";
 	}
 
-	// get last public wall message
-	$condition = ['owner-id' => $user_info['pid'], 'uid' => api_user(),
-		'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]];
+	if (!empty($item_id)) {
+		// Get the item with the given id
+		$condition = ['id' => $item_id];
+	} else {
+		// get last public wall message
+		$condition = ['owner-id' => $user_info['pid'], 'uid' => api_user(),
+			'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]];
+	}
 	$lastwall = Item::selectFirst(Item::ITEM_FIELDLIST, $condition, ['order' => ['id' => true]]);
 
 	if (DBA::isResult($lastwall)) {
@@ -1993,14 +2000,14 @@ function api_statuses_repeat($type)
 			$_REQUEST["source"] = api_source();
 		}
 
-		item_post($a);
+		$item_id = item_post($a);
 	} else {
 		throw new ForbiddenException();
 	}
 
-	// this should output the last post (the one we just posted).
+	// output the post that we just posted.
 	$called_api = [];
-	return api_status_show($type);
+	return api_status_show($type, $item_id);
 }
 
 /// @TODO move to top of file or somewhere better
@@ -2344,7 +2351,7 @@ function api_format_messages($item, $recipient, $sender)
 	// standard meta information
 	$ret = [
 		'id'                    => $item['id'],
-		'sender_id'             => $sender['id'] ,
+		'sender_id'             => $sender['id'],
 		'text'                  => "",
 		'recipient_id'          => $recipient['id'],
 		'created_at'            => api_date(defaults($item, 'created', DateTimeFormat::utcNow())),
@@ -2725,7 +2732,7 @@ function api_contactlink_to_array($txt)
  * 			likes => int count,
  * 			dislikes => int count
  */
-function api_format_items_activities(&$item, $type = "json")
+function api_format_items_activities($item, $type = "json")
 {
 	$a = get_app();
 
@@ -2740,13 +2747,13 @@ function api_format_items_activities(&$item, $type = "json")
 	$condition = ['uid' => $item['uid'], 'thr-parent' => $item['uri']];
 	$ret = Item::selectForUser($item['uid'], ['author-id', 'verb'], $condition);
 
-	while ($item = Item::fetch($ret)) {
+	while ($parent_item = Item::fetch($ret)) {
 		// not used as result should be structured like other user data
 		//builtin_activity_puller($i, $activities);
 
 		// get user data and add it to the array of the activity
-		$user = api_get_user($a, $item['author-id']);
-		switch ($item['verb']) {
+		$user = api_get_user($a, $parent_item['author-id']);
+		switch ($parent_item['verb']) {
 			case ACTIVITY_LIKE:
 				$activities['like'][] = $user;
 				break;
@@ -2886,7 +2893,7 @@ function api_format_items($r, $user_info, $filter_user = false, $type = "json")
 			'in_reply_to_screen_name' => $in_reply_to['screen_name'],
 			$geo => null,
 			'favorited' => $item['starred'] ? true : false,
-			'user' =>  $status_user ,
+			'user' =>  $status_user,
 			'friendica_owner' => $owner_user,
 			'friendica_private' => $item['private'] == 1,
 			//'entities' => NULL,
@@ -3394,7 +3401,7 @@ api_register_func('api/statusnet/version', 'api_statusnet_version', false);
  */
 function api_ff_ids($type)
 {
-	if (! api_user()) {
+	if (!api_user()) {
 		throw new ForbiddenException();
 	}
 
@@ -3621,6 +3628,84 @@ function api_direct_messages_destroy($type)
 
 /// @TODO move to top of file or somewhere better
 api_register_func('api/direct_messages/destroy', 'api_direct_messages_destroy', true, API_METHOD_DELETE);
+
+/**
+ * Unfollow Contact
+ *
+ * @brief unfollow contact 
+ *
+ * @param string $type Known types are 'atom', 'rss', 'xml' and 'json'
+ * @return string|array
+ * @see https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/post-friendships-destroy.html
+ */
+function api_friendships_destroy($type)
+{
+	$uid = api_user();
+
+	if ($uid === false) {
+		throw new ForbiddenException();
+	}
+
+	$contact_id = defaults($_REQUEST, 'user_id');
+
+	if (empty($contact_id)) {
+		logger("No user_id specified", LOGGER_DEBUG);
+		throw new BadRequestException("no user_id specified");
+	}
+
+	// Get Contact by given id
+	$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id, 'uid' => 0, 'self' => false]);
+
+	if(!DBA::isResult($contact)) {
+		logger("No contact found for ID" . $contact_id, LOGGER_DEBUG);
+		throw new NotFoundException("no contact found to given ID");
+	}
+
+	$url = $contact["url"];
+
+	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
+			$uid, Contact::SHARING, Contact::FRIEND, normalise_link($url),
+			normalise_link($url), $url];
+	$contact = DBA::selectFirst('contact', [], $condition);
+
+	if (!DBA::isResult($contact)) {
+		logger("Not following Contact", LOGGER_DEBUG);
+		throw new NotFoundException("Not following Contact");
+	}
+
+	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
+		logger("Not supported", LOGGER_DEBUG);
+		throw new ExpectationFailedException("Not supported");
+	}
+
+	$dissolve = ($contact['rel'] == Contact::SHARING);
+
+	$owner = User::getOwnerDataById($uid);
+	if ($owner) {
+		Contact::terminateFriendship($owner, $contact, $dissolve);
+	}
+	else {
+		logger("No owner found", LOGGER_DEBUG);
+		throw new NotFoundException("Error Processing Request");
+	}
+
+	// Sharing-only contacts get deleted as there no relationship any more
+	if ($dissolve) {
+		Contact::remove($contact['id']);
+	} else {
+		DBA::update('contact', ['rel' => Contact::FOLLOWER], ['id' => $contact['id']]);
+	}
+
+	// "uid" and "self" are only needed for some internal stuff, so remove it from here
+	unset($contact["uid"]);
+	unset($contact["self"]);
+
+	// Set screen_name since Twidere requests it
+	$contact["screen_name"] = $contact["nick"];
+
+	return api_format_data("friendships-destroy", $type, ['user' => $contact]);
+}
+api_register_func('api/friendships/destroy', 'api_friendships_destroy', true, API_METHOD_POST);
 
 /**
  *
@@ -4396,7 +4481,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 	if ($filetype == "") {
 		$filetype=Image::guessType($filename);
 	}
-	$imagedata = getimagesize($src);
+	$imagedata = @getimagesize($src);
 	if ($imagedata) {
 		$filetype = $imagedata['mime'];
 	}
@@ -4420,7 +4505,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 	// create Photo instance with the data of the image
 	$imagedata = @file_get_contents($src);
 	$Image = new Image($imagedata, $filetype);
-	if (! $Image->isValid()) {
+	if (!$Image->isValid()) {
 		throw new InternalServerErrorException("unable to process image data");
 	}
 
@@ -4430,7 +4515,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 
 	// check max length of images on server
 	$max_length = Config::get('system', 'max_image_length');
-	if (! $max_length) {
+	if (!$max_length) {
 		$max_length = MAX_IMAGE_LENGTH;
 	}
 	if ($max_length > 0) {
@@ -4448,13 +4533,13 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		logger("photo upload: starting new photo upload", LOGGER_DEBUG);
 
 		$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 0, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-		if (! $r) {
+		if (!$r) {
 			logger("photo upload: image upload with scale 0 (original size) failed");
 		}
 		if ($width > 640 || $height > 640) {
 			$Image->scaleDown(640);
 			$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 1, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r) {
+			if (!$r) {
 				logger("photo upload: image upload with scale 1 (640x640) failed");
 			}
 		}
@@ -4462,7 +4547,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		if ($width > 320 || $height > 320) {
 			$Image->scaleDown(320);
 			$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 2, 0, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r) {
+			if (!$r) {
 				logger("photo upload: image upload with scale 2 (320x320) failed");
 			}
 		}
@@ -4474,7 +4559,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		if ($width > 175 || $height > 175) {
 			$Image->scaleDown(175);
 			$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 4, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r) {
+			if (!$r) {
 				logger("photo upload: profile image upload with scale 4 (175x175) failed");
 			}
 		}
@@ -4482,7 +4567,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		if ($width > 80 || $height > 80) {
 			$Image->scaleDown(80);
 			$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 5, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r) {
+			if (!$r) {
 				logger("photo upload: profile image upload with scale 5 (80x80) failed");
 			}
 		}
@@ -4490,7 +4575,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 		if ($width > 48 || $height > 48) {
 			$Image->scaleDown(48);
 			$r = Photo::store($Image, local_user(), $visitor, $hash, $filename, $album, 6, $profile, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $desc);
-			if (! $r) {
+			if (!$r) {
 				logger("photo upload: profile image upload with scale 6 (48x48) failed");
 			}
 		}
@@ -4742,8 +4827,18 @@ function api_share_as_retweet(&$item)
 {
 	$body = trim($item["body"]);
 
-	if (Diaspora::isReshare($body, false)===false) {
-		return false;
+	if (Diaspora::isReshare($body, false) === false) {
+		if ($item['author-id'] == $item['owner-id']) {
+			return false;
+		} else {
+			// Reshares from OStatus, ActivityPub and Twitter
+			$reshared_item = $item;
+			$reshared_item['owner-id'] = $reshared_item['author-id'];
+			$reshared_item['owner-link'] = $reshared_item['author-link'];
+			$reshared_item['owner-name'] = $reshared_item['author-name'];
+			$reshared_item['owner-avatar'] = $reshared_item['author-avatar'];
+			return $reshared_item;
+		}
 	}
 
 	/// @TODO "$1" should maybe mean '$1' ?

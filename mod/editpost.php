@@ -21,10 +21,16 @@ function editpost_content(App $a)
 	}
 
 	$post_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
+	$return_url = (($a->argc > 2) ? base64_decode($a->argv[2]) : '');
 
 	if (!$post_id) {
 		notice(L10n::t('Item not found') . EOL);
 		return;
+	}
+
+	// Fallback to SESSION return_path
+	if (empty($return_url)) {
+		$return_url = $_SESSION['return_url'];
 	}
 
 	$fields = ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
@@ -50,15 +56,6 @@ function editpost_content(App $a)
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']
 	]);
-
-	$tpl = get_markup_template('jot-end.tpl');
-	$a->page['end'] .= replace_macros($tpl, [
-		'$baseurl' => System::baseUrl(),
-		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
-		'$geotag' => $geotag,
-		'$nickname' => $a->user['nickname']
-	]);
-
 
 	$tpl = get_markup_template("jot.tpl");
 
@@ -95,7 +92,7 @@ function editpost_content(App $a)
 
 	$o .= replace_macros($tpl, [
 		'$is_edit' => true,
-		'$return_path' => $_SESSION['return_url'],
+		'$return_path' => $return_url,
 		'$action' => 'item',
 		'$share' => L10n::t('Save'),
 		'$upload' => L10n::t('Upload photo'),

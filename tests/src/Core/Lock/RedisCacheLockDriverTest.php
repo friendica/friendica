@@ -3,7 +3,6 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-
 use Friendica\Core\Cache\CacheDriverFactory;
 use Friendica\Core\Lock\CacheLockDriver;
 
@@ -12,21 +11,9 @@ use Friendica\Core\Lock\CacheLockDriver;
  */
 class RedisCacheLockDriverTest extends LockTest
 {
-	/**
-	 * @var \Friendica\Core\Cache\IMemoryCacheDriver
-	 */
-	private $cache;
-
 	protected function getInstance()
 	{
-		$this->cache = CacheDriverFactory::create('redis');
-		return new CacheLockDriver($this->cache);
+		return new CacheLockDriver(CacheDriverFactory::create('redis'));
 
-	}
-
-	public function tearDown()
-	{
-		$this->cache->clear();
-		parent::tearDown();
 	}
 }

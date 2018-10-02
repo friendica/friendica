@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	// Go to the permissions tab if the checkbox is checked.
 	$('body').on("click", "#id_share", function() {
-		if ($('#id_share').is(':checked') && !( $('#id_share').attr("disabled"))) { 
+		if ($('#id_share').is(':checked') && !( $('#id_share').attr("disabled"))) {
 			$('#acl-wrapper').show();
 			$("a#event-perms-lnk").parent("li").show();
 			toggleEventNav("a#event-perms-lnk");
@@ -54,20 +54,19 @@ $(document).ready(function() {
 	// without page reloading (e.g. closing an old modal and open a new modal).
 	// Otherwise we wouldn't get the ACL data.
 	/// @todo: Try to implement some kind of ACL reloading in acl.js.
-	if (typeof acl !== "undefined") {
-		var eventPerms = document.getElementById('event-edit-form');
 
-		acl = new ACL(
-			baseurl + "/acl",
-			[
-				eventPerms.dataset.allow_cid,
-				eventPerms.dataset.allow_gid,
-				eventPerms.dataset.deny_cid,
-				eventPerms.dataset.deny_gid
-			]
-		);
-	}
+	var eventPerms = document.getElementById('event-edit-form');
 
+	acl = new ACL(
+		baseurl + "/acl",
+		[
+			JSON.parse(eventPerms.dataset.allow_cid),
+			JSON.parse(eventPerms.dataset.allow_gid),
+			JSON.parse(eventPerms.dataset.deny_cid),
+			JSON.parse(eventPerms.dataset.deny_gid)
+		]
+	);
+	acl.get(0, 100);
 });
 
 // Load the html of the actual event and incect the output to the
@@ -81,7 +80,7 @@ function doEventPreview() {
 }
 
 
-// The following functions show/hide the specific event-edit content 
+// The following functions show/hide the specific event-edit content
 // in dependence of the selected nav.
 function eventAclActive() {
 	$("#event-edit-wrapper, #event-preview, #event-desc-wrapper").hide();

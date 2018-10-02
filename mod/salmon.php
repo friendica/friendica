@@ -41,14 +41,14 @@ function salmon_post(App $a, $xml = '') {
 	$base = null;
 
 	// figure out where in the DOM tree our data is hiding
-	if($dom->provenance->data)
+	if (!empty($dom->provenance->data))
 		$base = $dom->provenance;
-	elseif($dom->env->data)
+	elseif (!empty($dom->env->data))
 		$base = $dom->env;
-	elseif($dom->data)
+	elseif (!empty($dom->data))
 		$base = $dom;
 
-	if(! $base) {
+	if (empty($base)) {
 		logger('unable to locate salmon data in xml ');
 		System::httpExit(400);
 	}

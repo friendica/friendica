@@ -41,7 +41,7 @@ img { border :0px; }
 	width: 384px;
 }
 
-code {
+pre code {
 	font-family: Courier, monospace;
 	white-space: pre;
 	display: block;

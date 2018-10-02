@@ -74,6 +74,16 @@ class OStatus
 		$author["contact-id"] = $contact["id"];
 
 		$contact = null;
+
+/*
+		This here would be better, but we would get problems with contacts from the statusnet addon
+		This is kept here as a reminder for the future
+
+		$cid = Contact::getIdForURL($author["author-link"], $importer["uid"]);
+		if ($cid) {
+			$contact = DBA::selectFirst('contact', [], ['id' => $cid]);
+		}
+*/
 		if ($aliaslink != '') {
 			$condition = ["`uid` = ? AND `alias` = ? AND `network` != ? AND `rel` IN (?, ?)",
 					$importer["uid"], $aliaslink, Protocol::STATUSNET,
@@ -219,7 +229,7 @@ class OStatus
 			$gcid = GContact::update($contact);
 
 			GContact::link($gcid, $contact["uid"], $contact["id"]);
-		} else {
+		} elseif ($contact["network"] != Protocol::DFRN) {
 			$contact = null;
 		}
 
@@ -312,7 +322,7 @@ class OStatus
 			self::$conv_list = [];
 		}
 
-		logger("Import OStatus message", LOGGER_DEBUG);
+		logger('Import OStatus message for user ' . $importer['uid'], LOGGER_DEBUG);
 
 		if ($xml == "") {
 			return false;
@@ -351,7 +361,7 @@ class OStatus
 		$header["origin"] = 0;
 		$header["gravity"] = GRAVITY_COMMENT;
 
-		if (!is_object($doc->firstChild)) {
+		if (!is_object($doc->firstChild) || empty($doc->firstChild->tagName)) {
 			return false;
 		}
 

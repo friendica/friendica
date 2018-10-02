@@ -20,7 +20,7 @@ use Friendica\Protocol\OStatus;
  *
  * @brief Provides public Atom feeds
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Feed extends BaseModule
 {

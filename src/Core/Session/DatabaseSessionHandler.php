@@ -14,7 +14,7 @@ require_once 'include/text.php';
 /**
  * SessionHandler using database
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class DatabaseSessionHandler extends BaseObject implements SessionHandlerInterface
 {

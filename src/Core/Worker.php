@@ -117,12 +117,14 @@ class Worker
 				// Count active workers and compare them with a maximum value that depends on the load
 				if (self::tooMuchWorkers()) {
 					logger('Active worker limit reached, quitting.', LOGGER_DEBUG);
+					Lock::release('worker');
 					return;
 				}
 
 				// Check free memory
 				if ($a->min_memory_reached()) {
 					logger('Memory limit reached, quitting.', LOGGER_DEBUG);
+					Lock::release('worker');
 					return;
 				}
 				Lock::release('worker');

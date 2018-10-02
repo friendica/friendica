@@ -3388,7 +3388,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiShareAsRetweet()
 	{
-		$item = ['body' => ''];
+		$item = ['body' => '', 'author-id' => 1, 'owner-id' => 1];
 		$result = api_share_as_retweet($item);
 		$this->assertFalse($result);
 	}

@@ -317,7 +317,6 @@ function profile_photo_crop_ui_head(App $a, Image $image)
 	}
 
 	$a->page['htmlhead'] .= replace_macros(get_markup_template("crophead.tpl"), []);
-	$a->page['end'] .= replace_macros(get_markup_template("cropend.tpl"), []);
 
 	$imagecrop = [
 		'hash'       => $hash,

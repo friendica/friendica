@@ -19,8 +19,8 @@ require_once 'include/text.php';
  *
  * License: AGPLv3 or later, same as Friendica
  *
- * @author Tobias Diekershoff
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class GlobalCommunitySilence extends \Asika\SimpleConsole\Console
 {

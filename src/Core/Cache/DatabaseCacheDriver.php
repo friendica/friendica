@@ -9,7 +9,7 @@ use Friendica\Util\DateTimeFormat;
 /**
  * Database Cache Driver
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class DatabaseCacheDriver extends AbstractCacheDriver implements ICacheDriver
 {

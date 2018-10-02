@@ -81,18 +81,32 @@ abstract class CacheTest extends DatabaseTest
 			'3_value1' => $this->instance->get('3_value1'),
 		]);
 
-		$this->assertTrue($this->instance->clear(false));
+		$this->assertTrue($this->instance->clear());
 
 		$this->assertEquals([
-			'1_value1' => null,
-			'1_value2' => null,
-			'2_value1' => null,
-			'3_value1' => null,
+			'1_value1' => 'ipsum lorum1',
+			'1_value2' => 'ipsum lorum2',
+			'2_value1' => 'ipsum lorum3',
+			'3_value1' => 'ipsum lorum4',
 		], [
 			'1_value1' => $this->instance->get('1_value1'),
 			'1_value2' => $this->instance->get('1_value2'),
 			'2_value1' => $this->instance->get('2_value1'),
 			'3_value1' => $this->instance->get('3_value1'),
+		]);
+
+		$this->assertTrue($this->instance->clear(false));
+
+		$this->assertEquals([
+			'1_value1' => null,
+			'1_value2' => null,
+			'2_value3' => null,
+			'3_value4' => null,
+		], [
+			'1_value1' => $this->instance->get('1_value1'),
+			'1_value2' => $this->instance->get('1_value2'),
+			'2_value3' => $this->instance->get('2_value3'),
+			'3_value4' => $this->instance->get('3_value4'),
 		]);
 	}
 

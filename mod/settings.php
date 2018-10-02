@@ -982,11 +982,6 @@ function settings_content(App $a)
 			'$theme_config' => $theme_config,
 		]);
 
-		$tpl = get_markup_template('settings/display_end.tpl');
-		$a->page['end'] .= replace_macros($tpl, [
-			'$theme'	=> ['theme', L10n::t('Display Theme:'), $theme_selected, '', $themes]
-		]);
-
 		return $o;
 	}
 

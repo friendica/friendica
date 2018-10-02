@@ -10,7 +10,7 @@ use Redis;
 /**
  * Redis Cache Driver. This driver is based on Memcache driver
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  * @author Roland Haeder <roland@mxchange.org>
  */
 class RedisCacheDriver extends AbstractCacheDriver implements IMemoryCacheDriver

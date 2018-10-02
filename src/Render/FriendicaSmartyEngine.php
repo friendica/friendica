@@ -9,7 +9,7 @@ use Friendica\Core\Addon;
 /**
  * Smarty implementation of the Friendica template engine interface
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class FriendicaSmartyEngine implements ITemplateEngine
 {

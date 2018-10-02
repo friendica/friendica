@@ -510,16 +510,17 @@ function ping_get_notifications($uid)
  * @brief Backward-compatible XML formatting for ping.php output
  * @deprecated
  *
- * @param array $data          The initial ping data array
- * @param int   $sysnotify     Number of unseen system notifications
- * @param array $notifs        Complete list of notification
- * @param array $sysmsgs       List of system notice messages
- * @param array $sysmsgs_info  List of system info messages
- * @param int   $groups_unseen Number of unseen group items
- * @param int   $forums_unseen Number of unseen forum items
+ * @param array $data            The initial ping data array
+ * @param int   $sysnotify_count Number of unseen system notifications
+ * @param array $notifs          Complete list of notification
+ * @param array $sysmsgs         List of system notice messages
+ * @param array $sysmsgs_info    List of system info messages
+ * @param int   $groups_unseen   Number of unseen group items
+ * @param int   $forums_unseen   Number of unseen forum items
+ *
  * @return array XML-transform ready data array
  */
-function ping_format_xml_data($data, $sysnotify, $notifs, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen)
+function ping_format_xml_data($data, $sysnotify_count, $notifs, $sysmsgs, $sysmsgs_info, $groups_unseen, $forums_unseen)
 {
 	$notifications = [];
 	foreach ($notifs as $key => $notif) {

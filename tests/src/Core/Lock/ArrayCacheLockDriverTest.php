@@ -8,21 +8,9 @@ use Friendica\Core\Lock\CacheLockDriver;
 
 class ArrayCacheLockDriverTest extends LockTest
 {
-	/**
-	 * @var \Friendica\Core\Cache\IMemoryCacheDriver
-	 */
-	private $cache;
-
 	protected function getInstance()
 	{
-		$this->cache = new ArrayCache();
-		return new CacheLockDriver($this->cache);
-	}
-
-	public function tearDown()
-	{
-		$this->cache->clear();
-		parent::tearDown();
+		return new CacheLockDriver(new ArrayCache());
 	}
 
 	public function testLockTTL()

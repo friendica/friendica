@@ -527,9 +527,6 @@ function profiles_content(App $a) {
 		$a->page['htmlhead'] .= replace_macros(get_markup_template('profed_head.tpl'), [
 			'$baseurl' => System::baseUrl(true),
 		]);
-		$a->page['end'] .= replace_macros(get_markup_template('profed_end.tpl'), [
-			'$baseurl' => System::baseUrl(true),
-		]);
 
 		$opt_tpl = get_markup_template("profile-hide-friends.tpl");
 		$hide_friends = replace_macros($opt_tpl,[

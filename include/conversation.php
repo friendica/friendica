@@ -229,12 +229,12 @@ function localize_item(&$item)
 		$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 
 		$obj = XML::parseString($xmlhead.$item['object']);
-		$links = XML::parseString($xmlhead."<links>".unxmlify($obj->link)."</links>");
 
 		$Bname = $obj->title;
-		$Blink = "";
+		$Blink = $obj->id;
 		$Bphoto = "";
-		foreach ($links->link as $l) {
+
+		foreach ($obj->link as $l) {
 			$atts = $l->attributes();
 			switch ($atts['rel']) {
 				case "alternate": $Blink = $atts['href'];
@@ -1091,21 +1091,6 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		'$delitems'  => L10n::t("Delete item\x28s\x29?")
 	]);
 
-	$tpl = get_markup_template('jot-end.tpl');
-	$a->page['end'] .= replace_macros($tpl, [
-		'$newpost'   => 'true',
-		'$baseurl'   => System::baseUrl(true),
-		'$geotag'    => $geotag,
-		'$nickname'  => $x['nickname'],
-		'$ispublic'  => L10n::t('Visible to <strong>everybody</strong>'),
-		'$linkurl'   => L10n::t('Please enter a link URL:'),
-		'$vidurl'    => L10n::t("Please enter a video link/URL:"),
-		'$audurl'    => L10n::t("Please enter an audio link/URL:"),
-		'$term'      => L10n::t('Tag term:'),
-		'$fileas'    => L10n::t('Save to Folder:'),
-		'$whereareu' => L10n::t('Where are you right now?')
-	]);
-
 	$jotplugins = '';
 	Addon::callHooks('jot_tool', $jotplugins);
 
@@ -1454,7 +1439,7 @@ function get_responses(array $conv_responses, array $response_verbs, $ob, array 
 	$ret = [];
 	foreach ($response_verbs as $v) {
 		$ret[$v] = [];
-		$ret[$v]['count'] = defaults($conv_responses[$v], $item['uri'], '');
+		$ret[$v]['count'] = defaults($conv_responses[$v], $item['uri'], 0);
 		$ret[$v]['list']  = defaults($conv_responses[$v], $item['uri'] . '-l', []);
 		$ret[$v]['self']  = defaults($conv_responses[$v], $item['uri'] . '-self', '0');
 		if (count($ret[$v]['list']) > MAX_LIKERS) {

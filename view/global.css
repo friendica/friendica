@@ -247,15 +247,7 @@ span.oembed, h4 {
   margin: 0px 0px 0px 0px;
 }
 
-code {
-  display: block;
-  background-color: #eee;
-  color: #666;
-  padding: 1em;
-  font-size: 0.85em;
-  font-family: monospace;
-}
-key {
+code, key {
   display: inline;
   background-color: #eee;
   color: #666;

@@ -11,9 +11,9 @@ require_once 'boot.php';
 require_once 'include/dba.php';
 
 /**
- * @brief Does database updates from the command line
+ * @brief Performs database updates from the command line
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class DatabaseStructure extends \Asika\SimpleConsole\Console
 {
@@ -22,7 +22,7 @@ class DatabaseStructure extends \Asika\SimpleConsole\Console
 	protected function getHelp()
 	{
 		$help = <<<HELP
-console dbstructure - Does database updates
+console dbstructure - Performs database updates
 Usage
 	bin/console dbstructure <command> [-h|--help|-?] [-v]
 

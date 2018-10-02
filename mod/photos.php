@@ -212,7 +212,7 @@ function photos_post(App $a)
 		}
 
 		// Check if the user has responded to a delete confirmation query
-		if ($_REQUEST['canceled']) {
+		if (!empty($_REQUEST['canceled'])) {
 			goaway($_SESSION['photo_return']);
 		}
 
@@ -762,12 +762,14 @@ function photos_post(App $a)
 		$filesize = $ret['filesize'];
 		$type     = $ret['type'];
 		$error    = UPLOAD_ERR_OK;
-	} else {
+	} elseif (!empty($_FILES['userfile'])) {
 		$src      = $_FILES['userfile']['tmp_name'];
 		$filename = basename($_FILES['userfile']['name']);
 		$filesize = intval($_FILES['userfile']['size']);
 		$type     = $_FILES['userfile']['type'];
 		$error    = $_FILES['userfile']['error'];
+	} else {
+		$error    = UPLOAD_ERR_NO_FILE;
 	}
 
 	if ($error !== UPLOAD_ERR_OK) {
@@ -1633,7 +1635,7 @@ function photos_content(App $a)
 			'$paginate' => $paginate,
 		]);
 
-		$a->page['htmlhead'] .= "\n" . '<meta name="twitter:card" content="photo" />' . "\n";
+		$a->page['htmlhead'] .= "\n" . '<meta name="twitter:card" content="summary_large_image" />' . "\n";
 		$a->page['htmlhead'] .= '<meta name="twitter:title" content="' . $photo["album"] . '" />' . "\n";
 		$a->page['htmlhead'] .= '<meta name="twitter:image" content="' . $photo["href"] . '" />' . "\n";
 		$a->page['htmlhead'] .= '<meta name="twitter:image:width" content="' . $photo["width"] . '" />' . "\n";

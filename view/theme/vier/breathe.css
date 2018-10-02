@@ -14,7 +14,7 @@ header #banner #logo-text {
   border-bottom: none !important;
 }
 
-code {
+pre code {
   border: none;
   border-radius: 5px;
 }

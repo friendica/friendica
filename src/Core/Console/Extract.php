@@ -8,7 +8,7 @@ namespace Friendica\Core\Console;
  *
  * Outputs a PHP file with language strings used by Friendica
  *
- * @author Hypolite Petovan <mrpetovan@gmail.com>
+ * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Extract extends \Asika\SimpleConsole\Console
 {

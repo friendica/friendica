@@ -72,7 +72,8 @@ function add_page_info_data(array $data, $no_photos = false)
 		$text .= " title='".$data["title"]."'";
 	}
 
-	if (!empty($data["images"])) {
+	// Only embedd a picture link when it seems to be a valid picture ("width" is set)
+	if (!empty($data["images"]) && !empty($data["images"][0]["width"])) {
 		$preview = str_replace(["[", "]"], ["&#91;", "&#93;"], htmlentities($data["images"][0]["src"], ENT_QUOTES, 'UTF-8', false));
 		// if the preview picture is larger than 500 pixels then show it in a larger mode
 		// But only, if the picture isn't higher than large (To prevent huge posts)

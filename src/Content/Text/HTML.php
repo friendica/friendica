@@ -11,6 +11,7 @@ use DOMXPath;
 use Friendica\Core\Addon;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
+use League\HTMLToMarkdown\HtmlConverter;
 
 class HTML
 {
@@ -122,7 +123,7 @@ class HTML
 		// Removing code blocks before the whitespace removal processing below
 		$codeblocks = [];
 		$message = preg_replace_callback(
-			'#<pre><code(?: class="([^"]*)")?>(.*)</code></pre>#iUs',
+			'#<pre><code(?: class="language-([^"]*)")?>(.*)</code></pre>#iUs',
 			function ($matches) use (&$codeblocks) {
 				$return = '[codeblock-' . count($codeblocks) . ']';
 
@@ -131,7 +132,7 @@ class HTML
 					$prefix = '[code=' . $matches[1] . ']';
 				}
 
-				$codeblocks[] = $prefix . trim($matches[2]) . '[/code]';
+				$codeblocks[] = $prefix . PHP_EOL . trim($matches[2]) . PHP_EOL . '[/code]';
 				return $return;
 			},
 			$message
@@ -671,5 +672,20 @@ class HTML
 		$message = self::quoteLevel(trim($message), $wraplength);
 
 		return trim($message);
+	}
+
+	/**
+	 * Converts provided HTML code to Markdown. The hardwrap parameter maximizes
+	 * compatibility with Diaspora in spite of the Markdown standards.
+	 *
+	 * @param string $html
+	 * @return string
+	 */
+	public static function toMarkdown($html)
+	{
+		$converter = new HtmlConverter(['hard_break' => true]);
+		$markdown = $converter->convert($html);
+
+		return $markdown;
 	}
 }

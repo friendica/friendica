@@ -105,12 +105,6 @@ function videos_init(App $a)
 		$a->page['htmlhead'] .= replace_macros($tpl,[
 			'$baseurl' => System::baseUrl(),
 		]);
-
-		$tpl = get_markup_template("videos_end.tpl");
-		$a->page['end'] .= replace_macros($tpl,[
-			'$baseurl' => System::baseUrl(),
-		]);
-
 	}
 
 	return;
@@ -367,11 +361,12 @@ function videos_content(App $a)
 		foreach ($r as $rr) {
 			$alt_e = $rr['filename'];
 			/// @todo The album isn't part of the above query. This seems to be some unfinished code that needs to be reworked completely.
+			$rr['album'] = '';
 			$name_e = $rr['album'];
 
 			$videos[] = [
 				'id'       => $rr['id'],
-				'link'     => System::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['resource-id'],
+				'link'     => System::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['hash'],
 				'title'    => L10n::t('View Video'),
 				'src'      => System::baseUrl() . '/attach/' . $rr['id'] . '?attachment=0',
 				'alt'      => $alt_e,

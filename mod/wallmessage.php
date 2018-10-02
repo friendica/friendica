@@ -120,13 +120,6 @@ function wallmessage_content(App $a) {
 		'$linkurl' => L10n::t('Please enter a link URL:')
 	]);
 
-	$tpl = get_markup_template('wallmsg-end.tpl');
-	$a->page['end'] .= replace_macros($tpl, [
-		'$baseurl' => System::baseUrl(true),
-		'$nickname' => $user['nickname'],
-		'$linkurl' => L10n::t('Please enter a link URL:')
-	]);
-
 	$tpl = get_markup_template('wallmessage.tpl');
 	$o = replace_macros($tpl, [
 		'$header' => L10n::t('Send Private Message'),

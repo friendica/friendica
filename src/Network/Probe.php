@@ -967,23 +967,23 @@ class Probe
 		$hcard_url = "";
 		$data = [];
 		foreach ($webfinger["links"] as $link) {
-			if (($link["rel"] == NAMESPACE_DFRN) && ($link["href"] != "")) {
+			if (($link["rel"] == NAMESPACE_DFRN) && !empty($link["href"])) {
 				$data["network"] = Protocol::DFRN;
-			} elseif (($link["rel"] == NAMESPACE_FEED) && ($link["href"] != "")) {
+			} elseif (($link["rel"] == NAMESPACE_FEED) && !empty($link["href"])) {
 				$data["poll"] = $link["href"];
-			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") && ($link["type"] == "text/html") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") && (defaults($link, "type", "") == "text/html") && !empty($link["href"])) {
 				$data["url"] = $link["href"];
-			} elseif (($link["rel"] == "http://microformats.org/profile/hcard") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://microformats.org/profile/hcard") && !empty($link["href"])) {
 				$hcard_url = $link["href"];
-			} elseif (($link["rel"] == NAMESPACE_POCO) && ($link["href"] != "")) {
+			} elseif (($link["rel"] == NAMESPACE_POCO) && !empty($link["href"])) {
 				$data["poco"] = $link["href"];
-			} elseif (($link["rel"] == "http://webfinger.net/rel/avatar") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://webfinger.net/rel/avatar") && !empty($link["href"])) {
 				$data["photo"] = $link["href"];
-			} elseif (($link["rel"] == "http://joindiaspora.com/seed_location") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://joindiaspora.com/seed_location") && !empty($link["href"])) {
 				$data["baseurl"] = trim($link["href"], '/');
-			} elseif (($link["rel"] == "http://joindiaspora.com/guid") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://joindiaspora.com/guid") && !empty($link["href"])) {
 				$data["guid"] = $link["href"];
-			} elseif (($link["rel"] == "diaspora-public-key") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "diaspora-public-key") && !empty($link["href"])) {
 				$data["pubkey"] = base64_decode($link["href"]);
 
 				//if (strstr($data["pubkey"], 'RSA ') || ($link["type"] == "RSA"))
@@ -1170,21 +1170,21 @@ class Probe
 		$hcard_url = "";
 		$data = [];
 		foreach ($webfinger["links"] as $link) {
-			if (($link["rel"] == "http://microformats.org/profile/hcard") && ($link["href"] != "")) {
+			if (($link["rel"] == "http://microformats.org/profile/hcard") && !empty($link["href"])) {
 				$hcard_url = $link["href"];
-			} elseif (($link["rel"] == "http://joindiaspora.com/seed_location") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://joindiaspora.com/seed_location") && !empty($link["href"])) {
 				$data["baseurl"] = trim($link["href"], '/');
-			} elseif (($link["rel"] == "http://joindiaspora.com/guid") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://joindiaspora.com/guid") && !empty($link["href"])) {
 				$data["guid"] = $link["href"];
-			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") && ($link["type"] == "text/html") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "http://webfinger.net/rel/profile-page") && (defaults($link, "type", "") == "text/html") && !empty($link["href"])) {
 				$data["url"] = $link["href"];
-			} elseif (($link["rel"] == NAMESPACE_FEED) && ($link["href"] != "")) {
+			} elseif (($link["rel"] == NAMESPACE_FEED) && !empty($link["href"])) {
 				$data["poll"] = $link["href"];
-			} elseif (($link["rel"] == NAMESPACE_POCO) && ($link["href"] != "")) {
+			} elseif (($link["rel"] == NAMESPACE_POCO) && !empty($link["href"])) {
 				$data["poco"] = $link["href"];
-			} elseif (($link["rel"] == "salmon") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "salmon") && !empty($link["href"])) {
 				$data["notify"] = $link["href"];
-			} elseif (($link["rel"] == "diaspora-public-key") && ($link["href"] != "")) {
+			} elseif (($link["rel"] == "diaspora-public-key") && !empty($link["href"])) {
 				$data["pubkey"] = base64_decode($link["href"]);
 
 				//if (strstr($data["pubkey"], 'RSA ') || ($link["type"] == "RSA"))
@@ -1272,15 +1272,15 @@ class Probe
 		if (is_array($webfinger["links"])) {
 			foreach ($webfinger["links"] as $link) {
 				if (($link["rel"] == "http://webfinger.net/rel/profile-page")
-					&& ($link["type"] == "text/html")
+					&& (defaults($link, "type", "") == "text/html")
 					&& ($link["href"] != "")
 				) {
 					$data["url"] = $link["href"];
-				} elseif (($link["rel"] == "salmon") && ($link["href"] != "")) {
+				} elseif (($link["rel"] == "salmon") && !empty($link["href"])) {
 					$data["notify"] = $link["href"];
-				} elseif (($link["rel"] == NAMESPACE_FEED) && ($link["href"] != "")) {
+				} elseif (($link["rel"] == NAMESPACE_FEED) && !empty($link["href"])) {
 					$data["poll"] = $link["href"];
-				} elseif (($link["rel"] == "magic-public-key") && ($link["href"] != "")) {
+				} elseif (($link["rel"] == "magic-public-key") && !empty($link["href"])) {
 					$pubkey = $link["href"];
 
 					if (substr($pubkey, 0, 5) === 'data:') {
@@ -1436,7 +1436,7 @@ class Probe
 		$data = [];
 		foreach ($webfinger["links"] as $link) {
 			if (($link["rel"] == "http://webfinger.net/rel/profile-page")
-				&& ($link["type"] == "text/html")
+				&& (defaults($link, "type", "") == "text/html")
 				&& ($link["href"] != "")
 			) {
 				$data["url"] = $link["href"];
