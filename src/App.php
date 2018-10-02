@@ -36,15 +36,7 @@ class App
 	const MODE_DBCONFIGAVAILABLE = 4;
 	const MODE_MAINTENANCEDISABLED = 8;
 
-	/**
-	 * @deprecated since version 2008.08 Use App->isInstallMode() instead to check for install mode.
-	 */
-	const MODE_INSTALL = 0;
-
-	/**
-	 * @deprecated since version 2008.08 Use the precise mode constant to check for a specific capability instead.
-	 */
-	const MODE_NORMAL = App::MODE_LOCALCONFIGPRESENT | App::MODE_DBAVAILABLE | App::MODE_DBCONFIGAVAILABLE | App::MODE_MAINTENANCEDISABLED;
+	private $mode = 0;
 
 	public $module_loaded = false;
 	public $module_class = null;
@@ -67,7 +59,6 @@ class App
 	public $argv;
 	public $argc;
 	public $module;
-	public $mode = App::MODE_INSTALL;
 	public $strings;
 	public $basepath;
 	public $urlpath;
@@ -297,7 +288,7 @@ class App
 
 		Config::load();
 
-		if ($this->mode & self::MODE_DBAVAILABLE) {
+		if ($this->hasMode(self::MODE_DBAVAILABLE)) {
 			Core\Addon::loadHooks();
 
 			$this->loadAddonConfig();
@@ -557,6 +548,17 @@ class App
 		$this->save_timestamp($stamp1, 'network');
 	}
 
+	/***
+	 * Checks if a given mode is set for Freindica
+	 *
+	 * @param integer $appMode one of the APP:: Mode
+	 *
+	 * @return boolean  true , if the mode is set
+	 */
+	public function hasMode($appMode) {
+		return $this->mode & $appMode;
+	}
+
 	/**
 	 * Install mode is when the local config file is missing or the DB schema hasn't been installed yet.
 	 *
@@ -564,7 +566,19 @@ class App
 	 */
 	public function isInstallMode()
 	{
-		return !($this->mode & App::MODE_LOCALCONFIGPRESENT) || !($this->mode & App::MODE_DBCONFIGAVAILABLE);
+		return !$this->hasMode(App::MODE_LOCALCONFIGPRESENT) || !$this->hasMode(App::MODE_DBCONFIGAVAILABLE);
+	}
+
+	/**
+	 * Normal mode is when local config is set, the DB is set up and the maintenance mode is off
+	 *
+	 * @return bool
+	 */
+	public function isNormalMode() {
+		return $this->hasMode(App::MODE_LOCALCONFIGPRESENT) &&
+			$this->hasMode(App::MODE_DBAVAILABLE) &&
+			$this->hasMode(App::MODE_DBCONFIGAVAILABLE) &&
+			$this->hasMode(App::MODE_MAINTENANCEDISABLED);
 	}
 
 	/**
