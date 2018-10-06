@@ -103,7 +103,7 @@ function redir_init(App $a) {
 			$dest = (!empty($url) ? '&destination_url=' . $url : '');
 
 			goaway($contact['poll'] . '?dfrn_id=' . $dfrn_id
-				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet);
+				. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version') . '&type=profile&sec=' . $sec . $dest . $quiet);
 		}
 
 		$url = $url != '' ? $url : $contact_url;

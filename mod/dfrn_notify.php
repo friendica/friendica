@@ -363,7 +363,7 @@ function dfrn_notify_content(App $a) {
 		echo '<?xml version="1.0" encoding="UTF-8"?>' . "\r\n"
 			. '<dfrn_notify>' . "\r\n"
 			. "\t" . '<status>' . $status . '</status>' . "\r\n"
-			. "\t" . '<dfrn_version>' . DFRN_PROTOCOL_VERSION . '</dfrn_version>' . "\r\n"
+			. "\t" . '<dfrn_version>' . Config::get('system', 'dfrn_protocol_version') . '</dfrn_version>' . "\r\n"
 			. "\t" . '<rino>' . $rino . '</rino>' . "\r\n"
 			. "\t" . '<perm>' . $perm . '</perm>' . "\r\n"
 			. "\t" . '<dfrn_id>' . $encrypted_id . '</dfrn_id>' . "\r\n"

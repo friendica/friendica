@@ -3360,10 +3360,10 @@ function api_statusnet_config($type)
 			'private' => $private, 'textlimit' => $textlimit, 'sslserver' => $sslserver, 'ssl' => $ssl,
 			'shorturllength' => '30',
 			'friendica' => [
-					'FRIENDICA_PLATFORM' => FRIENDICA_PLATFORM,
-					'FRIENDICA_VERSION' => FRIENDICA_VERSION,
-					'DFRN_PROTOCOL_VERSION' => DFRN_PROTOCOL_VERSION,
-					'DB_UPDATE_VERSION' => DB_UPDATE_VERSION
+					'FRIENDICA_PLATFORM' => Config::get('system', 'friendica_platform'),
+					'FRIENDICA_VERSION' => Config::get('system', 'friendica_version'),
+					'DFRN_PROTOCOL_VERSION' => Config::get('system', 'dfrn_protocol_version'),
+					'DB_UPDATE_VERSION' => Config::get('system', 'db_update_version')
 					]
 		],
 	];
@@ -4811,7 +4811,7 @@ function api_friendica_remoteauth()
 	$dest = ($url ? '&destination_url=' . $url : '');
 	goaway(
 		$contact['poll'] . '?dfrn_id=' . $dfrn_id
-		. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
+		. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version')
 		. '&type=profile&sec=' . $sec . $dest
 	);
 }

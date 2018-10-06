@@ -37,13 +37,6 @@ use Friendica\Util\DateTimeFormat;
 
 require_once 'include/text.php';
 
-define('FRIENDICA_PLATFORM',     'Friendica');
-define('FRIENDICA_CODENAME',     'The Tazmans Flax-lily');
-define('FRIENDICA_VERSION',      '2018.12-dev');
-define('DFRN_PROTOCOL_VERSION',  '2.23');
-define('DB_UPDATE_VERSION',      1284);
-define('NEW_UPDATE_ROUTINE_VERSION', 1170);
-
 /**
  * @brief Constants for the database update check
  */
@@ -521,18 +514,20 @@ function is_ajax()
 function check_db($via_worker)
 {
 	$build = Config::get('system', 'build');
+	$db_update_version = Config::get('system', 'db_update_version');
+	$new_update_routine_version = Config::get('system', 'new_update_routine_version');
 
 	if (empty($build)) {
-		Config::set('system', 'build', DB_UPDATE_VERSION - 1);
-		$build = DB_UPDATE_VERSION - 1;
+		Config::set('system', 'build', $db_update_version - 1);
+		$build = $db_update_version - 1;
 	}
 
 	// We don't support upgrading from very old versions anymore
-	if ($build < NEW_UPDATE_ROUTINE_VERSION) {
+	if ($build < $new_update_routine_version) {
 		die('You try to update from a version prior to database version 1170. The direct upgrade path is not supported. Please update to version 3.5.4 before updating to this version.');
 	}
 
-	if ($build < DB_UPDATE_VERSION) {
+	if ($build < Config::get('system', 'db_update_version')) {
 		// When we cannot execute the database update via the worker, we will do it directly
 		if (!Worker::add(PRIORITY_CRITICAL, 'DBUpdate') && $via_worker) {
 			update_db();
@@ -570,22 +565,23 @@ function check_url(App $a)
 function update_db()
 {
 	$build = Config::get('system', 'build');
+	$db_update_version = Config::get('system', 'db_update_version');
 
-	if (empty($build) || ($build > DB_UPDATE_VERSION)) {
-		$build = DB_UPDATE_VERSION - 1;
+	if (empty($build) || ($build > $db_update_version)) {
+		$build = $db_update_version- 1;
 		Config::set('system', 'build', $build);
 	}
 
-	if ($build != DB_UPDATE_VERSION) {
+	if ($build != $db_update_version) {
 		require_once 'update.php';
 
 		$stored = intval($build);
-		$current = intval(DB_UPDATE_VERSION);
+		$current = intval($db_update_version);
 		if ($stored < $current) {
 			Config::load('database');
 
 			// Compare the current structure with the defined structure
-			$t = Config::get('database', 'dbupdate_' . DB_UPDATE_VERSION);
+			$t = Config::get('database', 'dbupdate_' . $db_update_version);
 			if (!is_null($t)) {
 				return;
 			}
@@ -598,18 +594,18 @@ function update_db()
 				}
 			}
 
-			Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, time());
+			Config::set('database', 'dbupdate_' . $db_update_version, time());
 
 			// update the structure in one call
 			$retval = DBStructure::update(false, true);
 			if ($retval) {
 				DBStructure::updateFail(
-					DB_UPDATE_VERSION,
+					$db_update_version,
 					$retval
 				);
 				return;
 			} else {
-				Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, 'success');
+				Config::set('database', 'dbupdate_' . $db_update_version, 'success');
 			}
 
 			// run the update_nnnn functions in update.php

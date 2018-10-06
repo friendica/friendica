@@ -181,7 +181,7 @@ class OnePoll
 			}
 
 			$url = $contact['poll'] . '?dfrn_id=' . $idtosend
-				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
+				. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version')
 				. '&type=data&last_update=' . $last_update
 				. '&perm=' . $perm ;
 
@@ -285,7 +285,7 @@ class OnePoll
 			}
 
 			$postvars['dfrn_id'] = $idtosend;
-			$postvars['dfrn_version'] = DFRN_PROTOCOL_VERSION;
+			$postvars['dfrn_version'] = Config::get('system', 'dfrn_protocol_version');
 			$postvars['perm'] = 'rw';
 
 			$xml = Network::post($contact['poll'], $postvars);

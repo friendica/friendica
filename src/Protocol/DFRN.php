@@ -563,8 +563,8 @@ class DFRN
 		XML::addElement($doc, $root, "id", System::baseUrl()."/profile/".$owner["nick"]);
 		XML::addElement($doc, $root, "title", $owner["name"]);
 
-		$attributes = ["uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION."-".DB_UPDATE_VERSION];
-		XML::addElement($doc, $root, "generator", FRIENDICA_PLATFORM, $attributes);
+		$attributes = ["uri" => "https://friendi.ca", "version" => Config::get('system', 'friendica_version') . "-" . Config::get('system', 'db_update_version')];
+		XML::addElement($doc, $root, "generator", Config::get('system', 'friendica_platform'), $attributes);
 
 		$attributes = ["rel" => "license", "href" => "http://creativecommons.org/licenses/by/3.0/"];
 		XML::addElement($doc, $root, "link", "", $attributes);
@@ -1207,7 +1207,7 @@ class DFRN
 				break;
 		}
 
-		$url = $contact['notify'] . '&dfrn_id=' . $idtosend . '&dfrn_version=' . DFRN_PROTOCOL_VERSION . (($rino) ? '&rino='.$rino : '');
+		$url = $contact['notify'] . '&dfrn_id=' . $idtosend . '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version') . (($rino) ? '&rino='.$rino : '');
 
 		logger('dfrn_deliver: ' . $url);
 
@@ -1305,7 +1305,7 @@ class DFRN
 		}
 
 		$postvars['dfrn_id']      = $idtosend;
-		$postvars['dfrn_version'] = DFRN_PROTOCOL_VERSION;
+		$postvars['dfrn_version'] = Config::get('system', 'dfrn_protocol_version');
 		if ($dissolve) {
 			$postvars['dissolve'] = '1';
 		}
@@ -3036,7 +3036,7 @@ class DFRN
 			logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
 			$dest = (($url) ? '&destination_url=' . $url : '');
 			goaway($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
-				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest);
+				. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version') . '&type=profile&sec=' . $sec . $dest);
 		}
 
 		return;

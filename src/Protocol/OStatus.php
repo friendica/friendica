@@ -1287,8 +1287,8 @@ class OStatus
 			case 'comments': $title = L10n::t('%s\'s comments', $owner['name']); break;
 		}
 
-		$attributes = ["uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION . "-" . DB_UPDATE_VERSION];
-		XML::addElement($doc, $root, "generator", FRIENDICA_PLATFORM, $attributes);
+		$attributes = ["uri" => "https://friendi.ca", "version" => Config::get('system', 'friendica_version') . "-" . Config::get('system', 'db_update_version')];
+		XML::addElement($doc, $root, "generator", Config::get('system', 'friendica_platform'), $attributes);
 		XML::addElement($doc, $root, "id", System::baseUrl() . "/profile/" . $owner["nick"]);
 		XML::addElement($doc, $root, "title", $title);
 		XML::addElement($doc, $root, "subtitle", sprintf("Updates from %s on %s", $owner["name"], Config::get('config', 'sitename')));

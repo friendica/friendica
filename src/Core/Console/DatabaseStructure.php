@@ -70,13 +70,14 @@ HELP;
 				break;
 			case "update":
 				$build = Core\Config::get('system', 'build');
+				$db_update_version = Core\Config::get('system', 'db_update_version');
 				if (empty($build)) {
-					Core\Config::set('system', 'build', DB_UPDATE_VERSION);
-					$build = DB_UPDATE_VERSION;
+					Core\Config::set('system', 'build', $db_update_version);
+					$build = $db_update_version;
 				}
 
 				$stored = intval($build);
-				$current = intval(DB_UPDATE_VERSION);
+				$current = intval($db_update_version);
 
 				// run the pre_update_nnnn functions in update.php
 				for ($x = $stored; $x < $current; $x ++) {
@@ -96,7 +97,7 @@ HELP;
 					}
 				}
 
-				Core\Config::set('system', 'build', DB_UPDATE_VERSION);
+				Core\Config::set('system', 'build', $db_update_version);
 				break;
 			case "dumpsql":
 				ob_start();

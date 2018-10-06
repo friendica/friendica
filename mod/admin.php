@@ -725,7 +725,7 @@ function admin_page_federation(App $a)
 		'$hint' => $hint,
 		'$autoactive' => Config::get('system', 'poco_completion'),
 		'$counts' => $counts,
-		'$version' => FRIENDICA_VERSION,
+		'$version' => Config::get('system', 'friendica_version'),
 		'$legendtext' => L10n::t('Currently this node is aware of %d nodes with %d registered users from the following platforms:', $total, $users),
 		'$baseurl' => System::baseUrl(),
 	]);
@@ -840,8 +840,8 @@ function admin_page_summary(App $a)
 	// the local version of Friendica. Check is opt-in, source may be master or devel branch
 	if (Config::get('system', 'check_new_version_url', 'none') != 'none') {
 		$gitversion = Config::get('system', 'git_friendica_version');
-		if (version_compare(FRIENDICA_VERSION, $gitversion) < 0) {
-			$warningtext[] = L10n::t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', FRIENDICA_VERSION, $gitversion);
+		if (version_compare(Config::get('system', 'friendica_version'), $gitversion) < 0) {
+			$warningtext[] = L10n::t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', Config::get('system', 'friendica_version'), $gitversion);
 			$showwarning = true;
 		}
 	}
@@ -926,10 +926,10 @@ function admin_page_summary(App $a)
 		'$users' => [L10n::t('Registered users'), $users],
 		'$accounts' => $accounts,
 		'$pending' => [L10n::t('Pending registrations'), $pending],
-		'$version' => [L10n::t('Version'), FRIENDICA_VERSION],
+		'$version' => [L10n::t('Version'), Config::get('system', 'friendica_version')],
 		'$baseurl' => System::baseUrl(),
-		'$platform' => FRIENDICA_PLATFORM,
-		'$codename' => FRIENDICA_CODENAME,
+		'$platform' => Config::get('system', 'friendica_platform'),
+		'$codename' => Config::get('system', 'friendica_codename'),
 		'$build' => Config::get('system', 'build'),
 		'$addons' => [L10n::t('Active addons'), $a->addons],
 		'$serversettings' => $server_settings,
@@ -1575,10 +1575,10 @@ function admin_page_dbsync(App $a)
 	if (($a->argc > 2) && (intval($a->argv[2]) || ($a->argv[2] === 'check'))) {
 		$retval = DBStructure::update(false, true);
 		if ($retval === '') {
-			$o .= L10n::t("Database structure update %s was successfully applied.", DB_UPDATE_VERSION) . "<br />";
-			Config::set('database', 'dbupdate_' . DB_UPDATE_VERSION, 'success');
+			$o .= L10n::t("Database structure update %s was successfully applied.", Config::get('system', 'db_update_version')) . "<br />";
+			Config::set('database', 'dbupdate_' . Config::get('system', 'db_update_version'), 'success');
 		} else {
-			$o .= L10n::t("Executing of database structure update %s failed with error: %s", DB_UPDATE_VERSION, $retval) . "<br />";
+			$o .= L10n::t("Executing of database structure update %s failed with error: %s", Config::get('system', 'db_update_version'), $retval) . "<br />";
 		}
 		if ($a->argv[2] === 'check') {
 			return $o;

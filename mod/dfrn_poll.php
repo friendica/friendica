@@ -491,7 +491,7 @@ function dfrn_poll_content(App $a)
 				$s = Network::fetchUrl($r[0]['poll']
 					. '?dfrn_id=' . $encrypted_id
 					. '&type=profile-check'
-					. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
+					. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version')
 					. '&challenge=' . $challenge
 					. '&sec=' . $sec
 				);
@@ -499,7 +499,7 @@ function dfrn_poll_content(App $a)
 				$s = Network::post($r[0]['poll'], [
 					'dfrn_id' => $encrypted_id,
 					'type' => 'profile-check',
-					'dfrn_version' => DFRN_PROTOCOL_VERSION,
+					'dfrn_version' => Config::get('system', 'dfrn_protocol_version'),
 					'challenge' => $challenge,
 					'sec' => $sec
 				]);
@@ -568,7 +568,7 @@ function dfrn_poll_content(App $a)
 			echo '<?xml version="1.0" encoding="UTF-8"?>' . "\r\n"
 				. '<dfrn_poll>' . "\r\n"
 				. "\t" . '<status>' . $status . '</status>' . "\r\n"
-				. "\t" . '<dfrn_version>' . DFRN_PROTOCOL_VERSION . '</dfrn_version>' . "\r\n"
+				. "\t" . '<dfrn_version>' . Config::get('system', 'dfrn_protocol_version') . '</dfrn_version>' . "\r\n"
 				. "\t" . '<dfrn_id>' . $encrypted_id . '</dfrn_id>' . "\r\n"
 				. "\t" . '<challenge>' . $challenge . '</challenge>' . "\r\n"
 				. '</dfrn_poll>' . "\r\n";

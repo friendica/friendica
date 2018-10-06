@@ -466,7 +466,7 @@ if (isset($_GET["mode"]) && ($_GET["mode"] == "raw")) {
 $page    = $a->page;
 $profile = $a->profile;
 
-header("X-Friendica-Version: " . FRIENDICA_VERSION);
+header("X-Friendica-Version: " . Config::get('system', 'friendica_version'));
 header("Content-type: text/html; charset=utf-8");
 
 if (Config::get('system', 'hsts') && (Config::get('system', 'ssl_policy') == SSL_POLICY_FULL)) {

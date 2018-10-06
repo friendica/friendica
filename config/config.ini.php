@@ -50,6 +50,18 @@ php_path = php
 
 [system]
 
+; global friendica information
+friendica_platform = Friendica
+friendica_codename = The Tazmans Flax-lily
+friendica_version = 2018.12-dev
+
+; DRRN protocol version
+dfrn_protocol_version = 2.23
+
+; Update information
+db_update_version = 1284;
+new_update_routine_version = 1170
+
 ; allowed_link_protocols (Array)
 ; Allowed protocols in links URLs, add at your own risk. http is always allowed.
 allowed_link_protocols[0] = ftp
