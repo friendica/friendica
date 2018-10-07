@@ -17,6 +17,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
+use Friendica\Module\Login;
 
 require_once 'include/items.php';
 
@@ -193,7 +194,7 @@ function events_content(App $a)
 {
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		return;
+		return Login::form();
 	}
 
 	if ($a->argc == 1) {

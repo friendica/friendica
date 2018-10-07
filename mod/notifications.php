@@ -12,6 +12,7 @@ use Friendica\Core\NotificationsManager;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Module\Login;
 
 function notifications_post(App $a)
 {
@@ -65,7 +66,7 @@ function notifications_content(App $a)
 {
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		return;
+		return Login::form();
 	}
 
 	$page = defaults($_REQUEST, 'page', 1);
