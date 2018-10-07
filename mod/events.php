@@ -17,7 +17,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use Friendica\Model\Login;
+use Friendica\Module\Login;
 
 require_once 'include/items.php';
 

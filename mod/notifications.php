@@ -12,7 +12,7 @@ use Friendica\Core\NotificationsManager;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\Model\Login;
+use Friendica\Module\Login;
 
 function notifications_post(App $a)
 {

@@ -22,6 +22,7 @@ use Friendica\Model\User;
 use Friendica\Protocol\Email;
 use Friendica\Util\Network;
 use Friendica\Util\Temporal;
+use Friendica\Module\Login;
 
 function get_theme_config_file($theme)
 {
@@ -658,7 +659,7 @@ function settings_content(App $a)
 
 	if (!local_user()) {
 		//notice(L10n::t('Permission denied.') . EOL);
-		return;
+		return Login::form();
 	}
 
 	if (x($_SESSION, 'submanage') && intval($_SESSION['submanage'])) {
