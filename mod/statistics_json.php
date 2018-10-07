@@ -18,8 +18,8 @@ function statistics_json_init(App $a) {
 
 	$statistics = [
 		"name" => Config::get('config', 'sitename'),
-		"network" => FRIENDICA_PLATFORM,
-		"version" => FRIENDICA_VERSION . "-" . DB_UPDATE_VERSION,
+		"network" => Config::get('system', 'friendica_platform'),
+		"version" => Config::get('system', 'friendica_version') . "-" . Config::get('system', 'db_update_version'),
 		"registrations_open" => intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED,
 		"total_users" => Config::get('nodeinfo', 'total_users'),
 		"active_users_halfyear" => Config::get('nodeinfo', 'active_users_halfyear'),

@@ -50,7 +50,7 @@ function notification($params)
 	L10n::pushLang($params['language']);
 
 	$banner = L10n::t('Friendica Notification');
-	$product = FRIENDICA_PLATFORM;
+	$product = Config::get('system', 'friendica_platform');
 	$siteurl = System::baseUrl(true);
 	$thanks = L10n::t('Thank You,');
 	$sitename = Config::get('config', 'sitename');
@@ -90,8 +90,8 @@ function notification($params)
 	$additional_mail_header .= "Precedence: list\n";
 	$additional_mail_header .= "X-Friendica-Host: ".$hostname."\n";
 	$additional_mail_header .= "X-Friendica-Account: <".$nickname."@".$hostname.">\n";
-	$additional_mail_header .= "X-Friendica-Platform: ".FRIENDICA_PLATFORM."\n";
-	$additional_mail_header .= "X-Friendica-Version: ".FRIENDICA_VERSION."\n";
+	$additional_mail_header .= "X-Friendica-Platform: " . Config::get('system', 'friendica_platform') . "\n";
+	$additional_mail_header .= "X-Friendica-Version: ".Config::get('system', 'friendica_version')."\n";
 	$additional_mail_header .= "List-ID: <notification.".$hostname.">\n";
 	$additional_mail_header .= "List-Archive: <".System::baseUrl()."/notifications/system>\n";
 

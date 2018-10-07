@@ -15,7 +15,7 @@ class DBUpdate
 
 		// We are deleting the latest dbupdate entry.
 		// This is done to avoid endless loops because the update was interupted.
-		Config::delete('database', 'dbupdate_'.DB_UPDATE_VERSION);
+		Config::delete('database', 'dbupdate_' . Config::get('system', 'db_update_version'));
 
 		update_db($a);
 	}

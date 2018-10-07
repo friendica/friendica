@@ -411,6 +411,54 @@ class App
 				$this->setConfigValue('system', 'language', $lang);
 				unset($lang);
 			}
+
+			if (isset($friendica_platform)) {
+				$this->setConfigValue('system', 'friendica_platform', $friendica_platform);
+				unset($friendica_platform);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'friendica_platform', 'Friendica');
+			}
+
+			if (isset($friendica_codename)) {
+				$this->setConfigValue('system', 'friendica_codename', $friendica_codename);
+				unset($friendica_codename);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'friendica_codename', 'The Tazmans Flax-lily');
+			}
+
+			if (isset($friendica_version)) {
+				$this->setConfigValue('system', 'friendica_version', $friendica_version);
+				unset($friendica_version);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'friendica_version', '2018.12-dev');
+			}
+
+			if (isset($dfrn_protocol_version)) {
+				$this->setConfigValue('system', 'dfrn_protocol_version', $dfrn_protocol_version);
+				unset($dfrn_protocol_version);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'dfrn_protocol_version', '2.23');
+			}
+
+			if (isset($db_update_version)) {
+				$this->setConfigValue('system', '$db_update_version', $db_update_version);
+				unset($db_update_version);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'db_update_version', '1284');
+			}
+
+			if (isset($new_update_routine_version)) {
+				$this->setConfigValue('system', 'new_update_routine_version', $new_update_routine_version);
+				unset($db_update_version);
+			} else {
+				// Default value until 2018.12-dev
+				$this->setConfigValue('system', 'new_update_routine_version', '1170');
+			}
 		}
 
 		if (file_exists($this->basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.ini.php')) {
@@ -793,7 +841,7 @@ class App
 		$this->page['htmlhead'] = replace_macros($tpl, [
 			'$baseurl'         => $this->get_baseurl(),
 			'$local_user'      => local_user(),
-			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
+			'$generator'       => 'Friendica' . ' ' . Config::get('system', 'friendica_version'),
 			'$delitem'         => L10n::t('Delete this item?'),
 			'$showmore'        => L10n::t('show more'),
 			'$showfewer'       => L10n::t('show fewer'),
@@ -1005,10 +1053,10 @@ class App
 	public function get_useragent()
 	{
 		return
-			FRIENDICA_PLATFORM . " '" .
-			FRIENDICA_CODENAME . "' " .
-			FRIENDICA_VERSION . '-' .
-			DB_UPDATE_VERSION . '; ' .
+			Config::get('system', 'friendica_platform') . " '" .
+			Config::get('system', 'friendica_codename') . "' " .
+			Config::get('system', 'friendica_version') . '-' .
+			Config::get('system', 'db_update_version')  . '; ' .
 			$this->get_baseurl();
 	}
 

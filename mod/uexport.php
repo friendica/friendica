@@ -117,8 +117,8 @@ function uexport_account($a) {
 	);
 
 	$output = [
-		'version' => FRIENDICA_VERSION,
-		'schema' => DB_UPDATE_VERSION,
+		'version' => Config::get('system', 'friendica_version'),
+		'schema' => Config::get('system', 'db_update_version'),
 		'baseurl' => System::baseUrl(),
 		'user' => $user,
 		'contact' => $contact,

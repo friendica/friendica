@@ -437,7 +437,7 @@ function dfrn_request_post(App $a)
 			$aes_allow = ((function_exists('openssl_encrypt')) ? 1 : 0);
 
 			goaway($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
-				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
+				. '&dfrn_version=' . Config::get('system', 'dfrn_protocol_version')
 				. '&confirm_key=' . $hash
 				. (($aes_allow) ? "&aes_allow=1" : "")
 			);

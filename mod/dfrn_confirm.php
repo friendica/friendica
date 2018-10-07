@@ -198,7 +198,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				$params['public_key'] = bin2hex(openssl_encrypt($public_key, 'AES-256-CBC', $src_aes_key));
 			}
 
-			$params['dfrn_version'] = DFRN_PROTOCOL_VERSION;
+			$params['dfrn_version'] = Config::get('system', 'dfrn_protocol_version');
 			if ($duplex == 1) {
 				$params['duplex'] = 1;
 			}

@@ -168,8 +168,10 @@ class DBStructure
 		$database = self::definition();
 
 		echo "-- ------------------------------------------\n";
-		echo "-- ".FRIENDICA_PLATFORM." ".FRIENDICA_VERSION." (".FRIENDICA_CODENAME,")\n";
-		echo "-- DB_UPDATE_VERSION ".DB_UPDATE_VERSION."\n";
+		echo "-- " . Config::get('system', 'friendica_platform');
+		echo " " . Config::get('system', 'friendica_version');
+		echo " (" . Config::get('system', 'friendica_codename') . ")\n";
+		echo "-- DB_UPDATE_VERSION " . Config::get('system', 'db_update_version') . "\n";
 		echo "-- ------------------------------------------\n\n\n";
 		foreach ($database AS $name => $structure) {
 			echo "--\n";

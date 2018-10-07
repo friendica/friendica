@@ -37,7 +37,7 @@ function nodeinfo_init(App $a) {
 
 	$nodeinfo = [];
 	$nodeinfo['version'] = '1.0';
-	$nodeinfo['software'] = ['name' => 'friendica', 'version' => FRIENDICA_VERSION.'-'.DB_UPDATE_VERSION];
+	$nodeinfo['software'] = ['name' => 'friendica', 'version' => Config::get('system', 'friendica_version') . '-'  . Config::get('system', 'db_update_version')];
 
 	$nodeinfo['protocols'] = [];
 	$nodeinfo['protocols']['inbound'] = [];

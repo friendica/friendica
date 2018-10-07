@@ -49,8 +49,9 @@ case "$MODE" in
 		FINDSTARTDIR="."
 		# skip addon folder
 		FINDOPTS="( -wholename */addon -or -wholename */addons -or -wholename */addons-extra -or -wholename */smarty3 ) -prune -o"
-		
-		F9KVERSION=$(sed -n "s/.*'FRIENDICA_VERSION'.*'\([0-9.]*\)'.*/\1/p" ./boot.php);
+
+		# TODO this regex doesn't work (neither with 'define()' nor as INI Setting in 'local.ini.php')
+		F9KVERSION=$(sed -n "s/.*'friendica_version'.*'\([0-9.]*\)'.*/\1/p" ./confgi/local.ini.php);
 		echo "Friendica version $F9KVERSION"
 	;;
 esac

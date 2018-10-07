@@ -76,7 +76,7 @@ HELP;
 		$command = null;
 
 		if ($this->getOption('version')) {
-			$this->out('Friendica Console version ' . FRIENDICA_VERSION);
+			$this->out('Friendica Console version ' . Config::get('system', 'friendica_version'));
 
 			return 0;
 		} elseif ((count($this->options) === 0 || $this->getOption($this->customHelpOptions) === true || $this->getOption($this->customHelpOptions) === 1) && count($this->args) === 0

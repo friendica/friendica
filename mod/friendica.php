@@ -54,14 +54,14 @@ function friendica_init(App $a)
 		}
 
 		$data = [
-			'version'         => FRIENDICA_VERSION,
+			'version'         => Config::get('system', 'friendica_version'),
 			'url'             => System::baseUrl(),
 			'addons'          => $visible_addons,
 			'locked_features' => $locked_features,
 			'register_policy' => $register_policy[intval(Config::get('config', 'register_policy'))],
 			'admin'           => $admin,
 			'site_name'       => Config::get('config', 'sitename'),
-			'platform'        => FRIENDICA_PLATFORM,
+			'platform'        => Config::get('system', 'friendica_platform'),
 			'info'            => Config::get('config', 'info'),
 			'no_scrape_url'   => System::baseUrl().'/noscrape'
 		];
@@ -76,7 +76,7 @@ function friendica_content(App $a)
 	$o = '<h1>Friendica</h1>' . PHP_EOL;
 	$o .= '<p>';
 	$o .= L10n::t('This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s.',
-		'<strong>' . FRIENDICA_VERSION . '</strong>', System::baseUrl(), '<strong>' . DB_UPDATE_VERSION . '</strong>',
+		'<strong>' . Config::get('system', 'friendica_version') . '</strong>', System::baseUrl(), '<strong>' . Config::get('system', 'db_update_version') . '</strong>',
 		'<strong>' . Config::get("system", "post_update_version") . '</strong>');
 	$o .= '</p>' . PHP_EOL;
 
