@@ -47,7 +47,10 @@ class Login extends BaseModule
 
 	public static function post()
 	{
+		$return_url = $_SESSION['return_url'];
 		session_unset();
+		$_SESSION['return_url'] = $return_url;
+		
 		// OpenId Login
 		if (
 			empty($_POST['password'])

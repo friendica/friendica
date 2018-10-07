@@ -20,6 +20,7 @@ use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
+use Friendica\Module\Login;
 
 function profiles_init(App $a) {
 
@@ -509,7 +510,7 @@ function profiles_content(App $a) {
 
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		return;
+		return Login::form();
 	}
 
 	$o = '';

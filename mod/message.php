@@ -16,6 +16,7 @@ use Friendica\Model\Mail;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Temporal;
+use Friendica\Module\Login;
 
 require_once 'include/conversation.php';
 
@@ -97,7 +98,7 @@ function message_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		return;
+		return Login::form();
 	}
 
 	$myprofile = System::baseUrl() . '/profile/' . $a->user['nickname'];
