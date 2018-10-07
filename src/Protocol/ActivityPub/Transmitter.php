@@ -798,36 +798,6 @@ class Transmitter
 	}
 
 	/**
-	 * Transmits a contact suggestion to a given inbox
-	 *
-	 * @param integer $uid User ID
-	 * @param string $inbox Target inbox
-	 * @param integer $suggestion_id Suggestion ID
-	 */
-	public static function sendContactSuggestion($uid, $inbox, $suggestion_id)
-	{
-		$owner = User::getOwnerDataById($uid);
-		$profile = APContact::getByURL($owner['url']);
-
-		$suggestion = DBA::selectFirst('fsuggest', ['url', 'note', 'created'], ['id' => $suggestion_id]);
-
-		$data = ['@context' => 'https://www.w3.org/ns/activitystreams',
-			'id' => System::baseUrl() . '/activity/' . System::createGUID(),
-			'type' => 'Announce',
-			'actor' => $owner['url'],
-			'object' => $suggestion['url'],
-			'content' => $suggestion['note'],
-			'published' => DateTimeFormat::utc($suggestion['created'] . '+00:00', DateTimeFormat::ATOM),
-			'to' => [ActivityPub::PUBLIC_COLLECTION],
-			'cc' => []];
-
-		$signed = LDSignature::sign($data, $owner);
-
-		logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
-		HTTPSignature::transmit($signed, $inbox, $uid);
-	}
-
-	/**
 	 * Transmits a profile deletion to a given inbox
 	 *
 	 * @param integer $uid User ID
