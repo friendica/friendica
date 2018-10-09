@@ -371,6 +371,10 @@ class Receiver
 			}
 
 			foreach ($receiver_list as $receiver) {
+				if (empty($receiver)) {
+					continue;
+				}
+
 				if ($receiver == self::PUBLIC_COLLECTION) {
 					$receivers['uid:0'] = 0;
 				}
