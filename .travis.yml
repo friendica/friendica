@@ -7,6 +7,9 @@ php:
  - 7.1
  - 7.2
 
+sudo: false
+dist: trusty
+
 services:
  - mysql
  - redis-server
