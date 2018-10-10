@@ -8,6 +8,7 @@ php:
  - 7.2
 
 sudo: required
+dist: trusty
 
 services:
  - mysql
