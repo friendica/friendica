@@ -82,7 +82,7 @@ function admin_post(App $a)
 					if ($a->isAjax()) {
 						return;
 					}
-					goaway('admin/');
+					$a->redirect('admin/');
 					return;
 				}
 
@@ -135,7 +135,7 @@ function admin_post(App $a)
 		}
 	}
 
-	goaway($return_path);
+	$a->redirect($return_path);
 	return; // NOTREACHED
 }
 
@@ -340,7 +340,7 @@ function admin_page_tos_post(App $a)
 	Config::set('system', 'tosprivstatement', $displayprivstatement);
 	Config::set('system', 'tostext', $tostext);
 
-	goaway('admin/tos');
+	$a->redirect('admin/tos');
 
 	return; // NOTREACHED
 }
@@ -429,7 +429,7 @@ function admin_page_blocklist_post(App $a)
 		Config::set('system', 'blocklist', $blocklist);
 		info(L10n::t('Site blocklist updated.') . EOL);
 	}
-	goaway('admin/blocklist');
+	$a->redirect('admin/blocklist');
 
 	return; // NOTREACHED
 }
@@ -461,7 +461,7 @@ function admin_page_contactblock_post(App $a)
 		}
 		notice(L10n::tt("%s contact unblocked", "%s contacts unblocked", count($contacts)));
 	}
-	goaway('admin/contactblock');
+	$a->redirect('admin/contactblock');
 	return; // NOTREACHED
 }
 
@@ -569,7 +569,7 @@ function admin_page_deleteitem_post(App $a)
 	}
 
 	info(L10n::t('Item marked for deletion.') . EOL);
-	goaway('admin/deleteitem');
+	$a->redirect('admin/deleteitem');
 	return; // NOTREACHED
 }
 
@@ -965,7 +965,7 @@ function admin_page_site_post(App $a)
 		$parsed = @parse_url($new_url);
 		if (!is_array($parsed) || !x($parsed, 'host') || !x($parsed, 'scheme')) {
 			notice(L10n::t("Can not parse base url. Must have at least <scheme>://<domain>"));
-			goaway('admin/site');
+			$a->redirect('admin/site');
 		}
 
 		/* steps:
@@ -995,7 +995,7 @@ function admin_page_site_post(App $a)
 
 			if (!DBA::isResult($r)) {
 				notice("Failed updating '$table_name': " . DBA::errorMessage());
-				goaway('admin/site');
+				$a->redirect('admin/site');
 			}
 		}
 		// update tables
@@ -1024,7 +1024,7 @@ function admin_page_site_post(App $a)
 
 		info("Relocation started. Could take a while to complete.");
 
-		goaway('admin/site');
+		$a->redirect('admin/site');
 	}
 	// end relocate
 
@@ -1298,7 +1298,7 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'rino_encrypt', $rino);
 
 	info(L10n::t('Site settings updated.') . EOL);
-	goaway('admin/site');
+	$a->redirect('admin/site');
 	return; // NOTREACHED
 }
 
@@ -1570,7 +1570,7 @@ function admin_page_dbsync(App $a)
 			Config::set('system', 'build', intval($curr) + 1);
 		}
 		info(L10n::t('Update has been marked successful') . EOL);
-		goaway('admin/dbsync');
+		$a->redirect('admin/dbsync');
 	}
 
 	if (($a->argc > 2) && (intval($a->argv[2]) || ($a->argv[2] === 'check'))) {
@@ -1745,7 +1745,7 @@ function admin_page_users_post(App $a)
 			user_deny($hash);
 		}
 	}
-	goaway('admin/users');
+	$a->redirect('admin/users');
 	return; // NOTREACHED
 }
 
@@ -1768,7 +1768,7 @@ function admin_page_users(App $a)
 		$user = DBA::selectFirst('user', ['username', 'blocked'], ['uid' => $uid]);
 		if (!DBA::isResult($user)) {
 			notice('User not found' . EOL);
-			goaway('admin/users');
+			$a->redirect('admin/users');
 			return ''; // NOTREACHED
 		}
 		switch ($a->argv[2]) {
@@ -1788,7 +1788,7 @@ function admin_page_users(App $a)
 				notice(sprintf(($user['blocked'] ? L10n::t("User '%s' unblocked") : L10n::t("User '%s' blocked")), $user['username']) . EOL);
 				break;
 		}
-		goaway('admin/users');
+		$a->redirect('admin/users');
 		return ''; // NOTREACHED
 	}
 
@@ -1986,7 +1986,7 @@ function admin_page_addons(App $a)
 				info(L10n::t("Addon %s enabled.", $addon));
 			}
 			Config::set("system", "addon", implode(", ", $a->addons));
-			goaway('admin/addons');
+			$a->redirect('admin/addons');
 			return ''; // NOTREACHED
 		}
 
@@ -2020,7 +2020,7 @@ function admin_page_addons(App $a)
 			'$page' => L10n::t('Addons'),
 			'$toggle' => L10n::t('Toggle'),
 			'$settings' => L10n::t('Settings'),
-			'$baseurl' => System::baseUrl(true),
+			'$baseurl' => $a->getBaseURL(true),
 
 			'$addon' => $addon,
 			'$status' => $status,
@@ -2042,10 +2042,10 @@ function admin_page_addons(App $a)
 	 * List addons
 	 */
 	if (x($_GET, "a") && $_GET['a'] == "r") {
-		BaseModule::checkFormSecurityTokenRedirectOnError(System::baseUrl() . '/admin/addons', 'admin_themes', 't');
+		BaseModule::checkFormSecurityTokenRedirectOnError($a->getBaseURL() . '/admin/addons', 'admin_themes', 't');
 		Addon::reload();
 		info("Addons reloaded");
-		goaway(System::baseUrl() . '/admin/addons');
+		$a->redirect('admin/addons');
 	}
 
 	$addons = [];
@@ -2235,7 +2235,7 @@ function admin_page_themes(App $a)
 			}
 
 			Config::set('system', 'allowed_themes', $s);
-			goaway('admin/themes');
+			$a->redirect('admin/themes');
 			return ''; // NOTREACHED
 		}
 
@@ -2316,7 +2316,7 @@ function admin_page_themes(App $a)
 			}
 		}
 		info("Themes reloaded");
-		goaway(System::baseUrl() . '/admin/themes');
+		$a->redirect('admin/themes');
 	}
 
 	/*
@@ -2365,7 +2365,7 @@ function admin_page_logs_post(App $a)
 	}
 
 	info(L10n::t("Log settings updated."));
-	goaway('admin/logs');
+	$a->redirect('admin/logs');
 	return; // NOTREACHED
 }
 
@@ -2513,7 +2513,7 @@ function admin_page_features_post(App $a)
 		}
 	}
 
-	goaway('admin/features');
+	$a->redirect('admin/features');
 	return; // NOTREACHED
 }
 

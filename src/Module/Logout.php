@@ -8,6 +8,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Addon;
 use Friendica\Core\Authentication;
 use Friendica\Core\L10n;
+use Friendica\Core\System;
 
 require_once 'boot.php';
 
@@ -26,6 +27,6 @@ class Logout extends BaseModule
 		Addon::callHooks("logging_out");
 		Authentication::deleteSession();
 		info(L10n::t('Logged out.') . EOL);
-		goaway(self::getApp()->getBaseURL());
+		self::getApp()->redirect();
 	}
 }

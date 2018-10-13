@@ -27,7 +27,7 @@ function redir_init(App $a) {
 		$contact = DBA::selectFirst('contact', $fields, ['id' => $cid, 'uid' => [0, local_user()]]);
 		if (!DBA::isResult($contact)) {
 			notice(L10n::t('Contact not found.'));
-			goaway(System::baseUrl());
+			$a->redirect();
 		}
 
 		$contact_url = $contact['url'];
@@ -36,7 +36,7 @@ function redir_init(App $a) {
 			|| (!local_user() && !remote_user()) // Visitors (not logged in or not remotes) can't authenticate.
 			|| (!empty($a->contact['id']) && $a->contact['id'] == $cid)) // Local user is already authenticated.
 		{
-			goaway($url != '' ? $url : $contact_url);
+			$a->redirect($url != '' ? $url : $contact_url);
 		}
 
 		if ($contact['uid'] == 0 && local_user()) {
@@ -52,7 +52,7 @@ function redir_init(App $a) {
 				// Local user is already authenticated.
 				$target_url = $url != '' ? $url : $contact_url;
 				logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
-				goaway($target_url);
+				$a->redirect($target_url);
 			}
 		}
 
@@ -73,7 +73,7 @@ function redir_init(App $a) {
 						// Remote user is already authenticated.
 						$target_url = $url != '' ? $url : $contact_url;
 						logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
-						goaway($target_url);
+						$a->redirect($target_url);
 					}
 				}
 			}
@@ -102,7 +102,7 @@ function redir_init(App $a) {
 
 			$dest = (!empty($url) ? '&destination_url=' . $url : '');
 
-			goaway($contact['poll'] . '?dfrn_id=' . $dfrn_id
+			$a->redirect($contact['poll'] . '?dfrn_id=' . $dfrn_id
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet);
 		}
 
@@ -121,9 +121,9 @@ function redir_init(App $a) {
 		}
 
 		logger('redirecting to ' . $url, LOGGER_DEBUG);
-		goaway($url);
+		$a->redirect($url);
 	}
 
 	notice(L10n::t('Contact not found.'));
-	goaway(System::baseUrl());
+	$a->redirect();
 }

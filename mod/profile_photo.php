@@ -135,7 +135,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		goaway($url);
+		$a->redirect($url);
 		return; // NOTREACHED
 	}
 
@@ -168,7 +168,7 @@ function profile_photo_post(App $a)
 	@unlink($src);
 
 	$imagecrop = profile_photo_crop_ui_head($a, $ph);
-	goaway(System::baseUrl() . '/profile_photo/use/' . $imagecrop['hash']);
+	$a->redirect('profile_photo/use/' . $imagecrop['hash']);
 }
 
 function profile_photo_content(App $a)
@@ -225,7 +225,7 @@ function profile_photo_content(App $a)
 				Worker::add(PRIORITY_LOW, "Directory", $url);
 			}
 
-			goaway(System::baseUrl() . '/profile/' . $a->user['nickname']);
+			$a->redirect('profile/' . $a->user['nickname']);
 			return; // NOTREACHED
 		}
 		$ph = new Image($r[0]['data'], $r[0]['type']);

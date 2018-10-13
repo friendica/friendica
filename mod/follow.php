@@ -20,7 +20,7 @@ function follow_post(App $a)
 	}
 
 	if (isset($_REQUEST['cancel'])) {
-		goaway('contacts');
+		$a->redirect('contacts');
 	}
 
 	$uid = local_user();
@@ -37,14 +37,14 @@ function follow_post(App $a)
 		if ($result['message']) {
 			notice($result['message']);
 		}
-		goaway($return_url);
+		$a->redirect($return_url);
 	} elseif ($result['cid']) {
-		goaway('contact/' . $result['cid']);
+		$a->redirect('contact/' . $result['cid']);
 	}
 
 	info(L10n::t('The contact could not be added.'));
 
-	goaway($return_url);
+	$a->redirect($return_url);
 	// NOTREACHED
 }
 
@@ -54,7 +54,7 @@ function follow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		goaway($return_url);
+		$a->redirect($return_url);
 		// NOTREACHED
 	}
 
@@ -74,7 +74,7 @@ function follow_content(App $a)
 		if ($r[0]['pending']) {
 			notice(L10n::t('You already added this contact.'));
 			$submit = '';
-			//goaway($_SESSION['return_url']);
+			//$a->redirect($_SESSION['return_url']);
 			// NOTREACHED
 		}
 	}
@@ -84,21 +84,21 @@ function follow_content(App $a)
 	if (($ret['network'] == Protocol::DIASPORA) && !Config::get('system', 'diaspora_enabled')) {
 		notice(L10n::t("Diaspora support isn't enabled. Contact can't be added."));
 		$submit = '';
-		//goaway($_SESSION['return_url']);
+		//$a->redirect($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
 	if (($ret['network'] == Protocol::OSTATUS) && Config::get('system', 'ostatus_disabled')) {
 		notice(L10n::t("OStatus support is disabled. Contact can't be added."));
 		$submit = '';
-		//goaway($_SESSION['return_url']);
+		//$a->redirect($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
 	if ($ret['network'] == Protocol::PHANTOM) {
 		notice(L10n::t("The network type couldn't be detected. Contact can't be added."));
 		$submit = '';
-		//goaway($_SESSION['return_url']);
+		//$a->redirect($_SESSION['return_url']);
 		// NOTREACHED
 	}
 
@@ -118,7 +118,7 @@ function follow_content(App $a)
 
 	if (!$r) {
 		notice(L10n::t('Permission denied.'));
-		goaway($return_url);
+		$a->redirect($return_url);
 		// NOTREACHED
 	}
 

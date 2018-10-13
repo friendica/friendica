@@ -14,7 +14,7 @@ function openid_content(App $a) {
 
 	$noid = Config::get('system','no_openid');
 	if($noid)
-		goaway(System::baseUrl());
+		$a->redirect();
 
 	logger('mod_openid ' . print_r($_REQUEST,true), LOGGER_DATA);
 
@@ -28,7 +28,7 @@ function openid_content(App $a) {
 
 			if(! strlen($authid)) {
 				logger(L10n::t('OpenID protocol error. No ID returned.') . EOL);
-				goaway(System::baseUrl());
+				$a->redirect();
 			}
 
 			// NOTE: we search both for normalised and non-normalised form of $authid
@@ -56,7 +56,7 @@ function openid_content(App $a) {
 				// just in case there was no return url set
 				// and we fell through
 
-				goaway(System::baseUrl());
+				$a->redirect();
 			}
 
 			// Successful OpenID login - but we can't match it to an existing account.
@@ -64,7 +64,7 @@ function openid_content(App $a) {
 
 			if (intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED) {
 				notice(L10n::t('Account not found and OpenID registration is not permitted on this site.') . EOL);
-				goaway(System::baseUrl());
+				$a->redirect();
 			}
 
 			unset($_SESSION['register']);
@@ -108,12 +108,12 @@ function openid_content(App $a) {
 
 			$args .= '&openid_url=' . urlencode(notags(trim($authid)));
 
-			goaway(System::baseUrl() . '/register?' . $args);
+			$a->redirect('register?' . $args);
 
 			// NOTREACHED
 		}
 	}
 	notice(L10n::t('Login failed.') . EOL);
-	goaway(System::baseUrl());
+	$a->redirect();
 	// NOTREACHED
 }

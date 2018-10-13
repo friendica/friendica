@@ -38,12 +38,12 @@ function group_post(App $a) {
 			info(L10n::t('Group created.') . EOL);
 			$r = Model\Group::getIdByName(local_user(), $name);
 			if ($r) {
-				goaway(System::baseUrl() . '/group/' . $r);
+				$a->redirect('group/' . $r);
 			}
 		} else {
 			notice(L10n::t('Could not create group.') . EOL);
 		}
-		goaway(System::baseUrl() . '/group');
+		$a->redirect('group');
 		return; // NOTREACHED
 	}
 
@@ -56,7 +56,7 @@ function group_post(App $a) {
 		);
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Group not found.') . EOL);
-			goaway(System::baseUrl() . '/contact');
+			$a->redirect('contact');
 			return; // NOTREACHED
 		}
 		$group = $r[0];
@@ -88,7 +88,7 @@ function group_content(App $a) {
 
 	// With no group number provided we jump to the unassigned contacts as a starting point
 	if ($a->argc == 1) {
-		goaway('group/none');
+		$a->redirect('group/none');
 	}
 
 	// Switch to text mode interface if we have more than 'n' contacts or group members
@@ -159,7 +159,7 @@ function group_content(App $a) {
 				notice(L10n::t('Unable to remove group.') . EOL);
 			}
 		}
-		goaway(System::baseUrl() . '/group');
+		$a->redirect('group');
 		// NOTREACHED
 	}
 
@@ -183,7 +183,7 @@ function group_content(App $a) {
 
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Group not found.') . EOL);
-			goaway(System::baseUrl() . '/contact');
+			$a->redirect('contact');
 		}
 
 		$group = $r[0];

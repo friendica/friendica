@@ -14,8 +14,8 @@ function toggle_mobile_init(App $a) {
 	if (isset($_GET['address'])) {
 		$address = $_GET['address'];
 	} else {
-		$address = System::baseUrl();
+		$address = '';
 	}
 
-	goaway($address);
+	$a->redirect($address);
 }

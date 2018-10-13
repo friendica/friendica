@@ -38,7 +38,7 @@ function profiles_init(App $a) {
 		);
 		if (! DBA::isResult($r)) {
 			notice(L10n::t('Profile not found.') . EOL);
-			goaway('profiles');
+			$a->redirect('profiles');
 			return; // NOTREACHED
 		}
 
@@ -59,7 +59,7 @@ function profiles_init(App $a) {
 			info(L10n::t('Profile deleted.').EOL);
 		}
 
-		goaway('profiles');
+		$a->redirect('profiles');
 		return; // NOTREACHED
 	}
 
@@ -93,10 +93,10 @@ function profiles_init(App $a) {
 
 		info(L10n::t('New profile created.') . EOL);
 		if (DBA::isResult($r3) && count($r3) == 1) {
-			goaway('profiles/' . $r3[0]['id']);
+			$a->redirect('profiles/' . $r3[0]['id']);
 		}
 
-		goaway('profiles');
+		$a->redirect('profiles');
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'clone')) {
@@ -132,10 +132,10 @@ function profiles_init(App $a) {
 		);
 		info(L10n::t('New profile created.') . EOL);
 		if ((DBA::isResult($r3)) && (count($r3) == 1)) {
-			goaway('profiles/'.$r3[0]['id']);
+			$a->redirect('profiles/'.$r3[0]['id']);
 		}
 
-		goaway('profiles');
+		$a->redirect('profiles');
 
 		return; // NOTREACHED
 	}
@@ -654,7 +654,7 @@ function profiles_content(App $a) {
 			);
 			if (DBA::isResult($r)) {
 				//Go to the default profile.
-				goaway('profiles/' . $r[0]['id']);
+				$a->redirect('profiles/' . $r[0]['id']);
 			}
 		}
 

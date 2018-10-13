@@ -301,7 +301,7 @@ function cal_content(App $a)
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
 		if ((local_user() !== intval($owner_uid)) && !Feature::isEnabled($owner_uid, "export_calendar")) {
 			notice(L10n::t('Permission denied.') . EOL);
-			goaway('cal/' . $nick);
+			$a->redirect('cal/' . $nick);
 		}
 
 		// Get the export data by uid
@@ -322,7 +322,7 @@ function cal_content(App $a)
 				$return_path = "cal/" . $nick;
 			}
 
-			goaway($return_path);
+			$a->redirect($return_path);
 		}
 
 		// If nothing went wrong we can echo the export content

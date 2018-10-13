@@ -15,7 +15,7 @@ function ostatus_subscribe_content(App $a) {
 
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		goaway('/ostatus_subscribe');
+		$a->redirect('ostatus_subscribe');
 		// NOTREACHED
 	}
 

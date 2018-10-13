@@ -62,7 +62,7 @@ function dfrn_request_post(App $a)
 	}
 
 	if (x($_POST, 'cancel')) {
-		goaway(System::baseUrl());
+		$a->redirect();
 	}
 
 	/*
@@ -173,9 +173,9 @@ function dfrn_request_post(App $a)
 						Contact::updateAvatar($photo, local_user(), $r[0]["id"], true);
 					}
 
-					$forwardurl = System::baseUrl() . "/contact/" . $r[0]['id'];
+					$forwardurl = "contact/" . $r[0]['id'];
 				} else {
-					$forwardurl = System::baseUrl() . "/contact";
+					$forwardurl = "contact";
 				}
 
 				// Allow the blocked remote notification to complete
@@ -188,14 +188,14 @@ function dfrn_request_post(App $a)
 				}
 
 				// (ignore reply, nothing we can do it failed)
-				goaway($forwardurl);
+				$a->redirect($forwardurl);
 				return; // NOTREACHED
 			}
 		}
 
 		// invalid/bogus request
 		notice(L10n::t('Unrecoverable protocol error.') . EOL);
-		goaway(System::baseUrl());
+		$a->redirect();
 		return; // NOTREACHED
 	}
 
@@ -331,19 +331,19 @@ function dfrn_request_post(App $a)
 				$url = Network::isUrlValid($url);
 				if (!$url) {
 					notice(L10n::t('Invalid profile URL.') . EOL);
-					goaway(System::baseUrl() . '/' . $a->cmd);
+					$a->redirect($a->cmd);
 					return; // NOTREACHED
 				}
 
 				if (!Network::isUrlAllowed($url)) {
 					notice(L10n::t('Disallowed profile URL.') . EOL);
-					goaway(System::baseUrl() . '/' . $a->cmd);
+					$a->redirect($a->cmd);
 					return; // NOTREACHED
 				}
 
 				if (Network::isUrlBlocked($url)) {
 					notice(L10n::t('Blocked domain') . EOL);
-					goaway(System::baseUrl() . '/' . $a->cmd);
+					$a->redirect($a->cmd);
 					return; // NOTREACHED
 				}
 
@@ -351,7 +351,7 @@ function dfrn_request_post(App $a)
 
 				if (!count($parms)) {
 					notice(L10n::t('Profile location is not valid or does not contain profile information.') . EOL);
-					goaway(System::baseUrl() . '/' . $a->cmd);
+					$a->redirect($a->cmd);
 				} else {
 					if (!x($parms, 'fn')) {
 						notice(L10n::t('Warning: profile location has no identifiable owner name.') . EOL);
@@ -436,7 +436,7 @@ function dfrn_request_post(App $a)
 			$dfrn_url = bin2hex(System::baseUrl() . '/profile/' . $nickname);
 			$aes_allow = ((function_exists('openssl_encrypt')) ? 1 : 0);
 
-			goaway($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
+			$a->redirect($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
 				. '&confirm_key=' . $hash
 				. (($aes_allow) ? "&aes_allow=1" : "")
@@ -459,11 +459,11 @@ function dfrn_request_post(App $a)
 
 				$uri = urlencode($uri);
 			} else {
-				$uri = System::baseUrl() . '/profile/' . $nickname;
+				$uri = 'profile/' . $nickname;
 			}
 
 			$url = str_replace('{uri}', $uri, $url);
-			goaway($url);
+			$a->redirect($url);
 			// NOTREACHED
 			// END $network != Protocol::PHANTOM
 		} else {

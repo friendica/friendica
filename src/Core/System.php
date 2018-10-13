@@ -239,7 +239,6 @@ class System extends BaseObject
 	/// @todo Move the following functions from boot.php
 	/*
 	function killme()
-	function goaway($s)
 	function local_user()
 	function public_contact()
 	function remote_user()

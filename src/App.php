@@ -1985,4 +1985,22 @@ class App
 		/// @TODO Looks unsafe (remote-inclusion), is maybe not but Core\Theme::getPathForFile() uses file_exists() but does not escape anything
 		require_once $template;
 	}
+
+	/**
+	 * Redirects to another URL and exits this process.
+	 *
+	 * @param string $toUrl The destination URL (Default is empty, which is the default page of the Friendica node)
+	 * @param bool $ssl if true, base URL will try to get called with https:// (works just for relative paths)
+	 */
+	public function redirect($toUrl = '', $ssl = false)
+	{
+		if (strstr(normalise_link($toUrl), 'http://')) {
+			$redirectTo = $toUrl;
+		} else {
+			$redirectTo = self::getApp()->getBaseURL($ssl) . '/' . ltrim($toUrl, '/');
+		}
+
+		header("Location: $redirectTo");
+		exit();
+	}
 }

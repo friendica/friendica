@@ -69,7 +69,7 @@ function wallmessage_post(App $a) {
 			info(L10n::t('Message sent.') . EOL);
 	}
 
-	goaway('profile/'.$user['nickname']);
+	$a->redirect('profile/'.$user['nickname']);
 }
 
 

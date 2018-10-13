@@ -24,5 +24,5 @@ function nogroup_content(App $a)
 		return '';
 	}
 
-	goaway(System::baseUrl() . '/group/none');
+	$a->redirect('group/none');
 }

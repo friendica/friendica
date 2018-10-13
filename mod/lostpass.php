@@ -19,14 +19,14 @@ function lostpass_post(App $a)
 {
 	$loginame = notags(trim($_POST['login-name']));
 	if (!$loginame) {
-		goaway(System::baseUrl());
+		$a->redirect();
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` = 1 AND `blocked` = 0', $loginame, $loginame];
 	$user = DBA::selectFirst('user', ['uid', 'username', 'email', 'language'], $condition);
 	if (!DBA::isResult($user)) {
 		notice(L10n::t('No valid account found.') . EOL);
-		goaway(System::baseUrl());
+		$a->redirect();
 	}
 
 	$pwdreset_token = autoname(12) . mt_rand(1000, 9999);
@@ -78,7 +78,7 @@ function lostpass_post(App $a)
 		'body'     => $body
 	]);
 
-	goaway(System::baseUrl());
+	$a->redirect();
 }
 
 function lostpass_content(App $a)

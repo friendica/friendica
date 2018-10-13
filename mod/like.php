@@ -28,7 +28,7 @@ function like_content(App $a) {
 	// See if we've been passed a return path to redirect to
 	$return_path = ((x($_REQUEST,'return')) ? $_REQUEST['return'] : '');
 
-	like_content_return(System::baseUrl(), $return_path);
+	like_content_return($a, $return_path);
 	killme(); // NOTREACHED
 }
 
@@ -36,7 +36,7 @@ function like_content(App $a) {
 // Decide how to return. If we were called with a 'return' argument,
 // then redirect back to the calling page. If not, just quietly end
 
-function like_content_return($baseurl, $return_path) {
+function like_content_return(App $a, $return_path) {
 	if ($return_path) {
 		$rand = '_=' . time();
 		if (strpos($return_path, '?')) {
@@ -45,7 +45,7 @@ function like_content_return($baseurl, $return_path) {
 			$rand = "?$rand";
 		}
 
-		goaway($baseurl . "/" . $return_path . $rand);
+		$a->redirect($return_path . $rand);
 	}
 
 	killme();

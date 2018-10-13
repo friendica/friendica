@@ -354,7 +354,7 @@ function drop_item($id)
 
 	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
-		goaway('/network');
+		$a->redirect('network');
 	}
 
 	if ($item['deleted']) {
@@ -401,17 +401,17 @@ function drop_item($id)
 		}
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			goaway('/display/' . $item['guid']);
+			$a->redirect('display/' . $item['guid']);
 		}
 
 		// delete the item
 		Item::deleteForUser(['id' => $item['id']], local_user());
 
-		goaway('/network');
+		$a->redirect('network');
 		//NOTREACHED
 	} else {
 		notice(L10n::t('Permission denied.') . EOL);
-		goaway('/display/' . $item['guid']);
+		$a->redirect('display/' . $item['guid']);
 		//NOTREACHED
 	}
 }

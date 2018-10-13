@@ -10,6 +10,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Authentication;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -39,7 +40,7 @@ class Login extends BaseModule
 		}
 
 		if (local_user()) {
-			goaway(self::getApp()->getBaseURL());
+			$a->redirect();
 		}
 
 		return self::form($_SESSION['return_url'], intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED);
@@ -83,10 +84,12 @@ class Login extends BaseModule
 	{
 		$noid = Config::get('system', 'no_openid');
 
+		$a = self::getApp();
+
 		// if it's an email address or doesn't resolve to a URL, fail.
 		if ($noid || strpos($openid_url, '@') || !Network::isUrlValid($openid_url)) {
 			notice(L10n::t('Login failed.') . EOL);
-			goaway(self::getApp()->getBaseURL());
+			$a->redirect();
 			// NOTREACHED
 		}
 
@@ -98,7 +101,7 @@ class Login extends BaseModule
 			$_SESSION['openid'] = $openid_url;
 			$_SESSION['remember'] = $remember;
 			$openid->returnUrl = self::getApp()->getBaseURL(true) . '/openid';
-			goaway($openid->authUrl());
+			$a->redirect($openid->authUrl());
 		} catch (Exception $e) {
 			notice(L10n::t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . '<br /><br >' . L10n::t('The error message was:') . ' ' . $e->getMessage());
 		}
@@ -122,6 +125,8 @@ class Login extends BaseModule
 			'user_record' => null
 		];
 
+		$a = self::getApp();
+
 		/*
 		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
 		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
@@ -144,7 +149,7 @@ class Login extends BaseModule
 		} catch (Exception $e) {
 			logger('authenticate: failed login attempt: ' . notags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
 			info('Login failed. Please check your credentials.' . EOL);
-			goaway('/');
+			$a->redirect();
 		}
 
 		if (!$remember) {
@@ -163,7 +168,7 @@ class Login extends BaseModule
 			$return_url = '';
 		}
 
-		goaway($return_url);
+		$a->redirect($return_url);
 	}
 
 	/**
@@ -173,6 +178,8 @@ class Login extends BaseModule
 	 */
 	public static function sessionAuth()
 	{
+		$a = self::getApp();
+
 		// When the "Friendica" cookie is set, take the value to authenticate and renew the cookie.
 		if (isset($_COOKIE["Friendica"])) {
 			$data = json_decode($_COOKIE["Friendica"]);
@@ -191,7 +198,7 @@ class Login extends BaseModule
 					if ($data->hash != Authentication::getCookieHashForUser($user)) {
 						logger("Hash for user " . $data->uid . " doesn't fit.");
 						Authentication::deleteSession();
-						goaway(self::getApp()->getBaseURL());
+						$a->redirect();
 					}
 
 					// Renew the cookie
@@ -228,7 +235,7 @@ class Login extends BaseModule
 					logger('Session address changed. Paranoid setting in effect, blocking session. ' .
 						$_SESSION['addr'] . ' != ' . $_SERVER['REMOTE_ADDR']);
 					Authentication::deleteSession();
-					goaway(self::getApp()->getBaseURL());
+					$a->redirect();
 				}
 
 				$user = DBA::selectFirst('user', [],
@@ -242,7 +249,7 @@ class Login extends BaseModule
 				);
 				if (!DBA::isResult($user)) {
 					Authentication::deleteSession();
-					goaway(self::getApp()->getBaseURL());
+					$a->redirect();
 				}
 
 				// Make sure to refresh the last login time for the user if the user

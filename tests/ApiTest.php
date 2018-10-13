@@ -3379,7 +3379,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiFriendicaRemoteauthWithCorrectUrl()
 	{
-		$this->markTestIncomplete("We can't use an assertion here because of goaway().");
+		$this->markTestIncomplete("We can't use an assertion here because of App->redirect().");
 		$_GET['url'] = 'url';
 		$_GET['c_url'] = $this->selfUser['nurl'];
 		api_friendica_remoteauth();

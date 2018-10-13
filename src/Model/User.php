@@ -450,7 +450,7 @@ class User
 				} catch (Exception $e) {
 					throw new Exception(L10n::t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . EOL . EOL . L10n::t('The error message was:') . $e->getMessage(), 0, $e);
 				}
-				goaway($authurl);
+				$a->redirect($authurl);
 				// NOTREACHED
 			}
 
@@ -783,6 +783,8 @@ class User
 			return;
 		}
 
+		$a = get_app();
+
 		logger('Removing user: ' . $uid);
 
 		$user = DBA::selectFirst('user', [], ['uid' => $uid]);
@@ -807,7 +809,7 @@ class User
 		if ($uid == local_user()) {
 			unset($_SESSION['authenticated']);
 			unset($_SESSION['uid']);
-			goaway();;
+			$a->redirect();
 		}
 	}
 }

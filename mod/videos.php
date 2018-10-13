@@ -115,14 +115,14 @@ function videos_post(App $a)
 	$owner_uid = $a->data['user']['uid'];
 
 	if (local_user() != $owner_uid) {
-		goaway(System::baseUrl() . '/videos/' . $a->data['user']['nickname']);
+		$a->redirect('videos/' . $a->data['user']['nickname']);
 	}
 
 	if (($a->argc == 2) && !empty($_POST['delete']) && !empty($_POST['id'])) {
 		// Check if we should do HTML-based delete confirmation
 		if (empty($_REQUEST['confirm'])) {
 			if (!empty($_REQUEST['canceled'])) {
-				goaway(System::baseUrl() . '/videos/' . $a->data['user']['nickname']);
+				$a->redirect('videos/' . $a->data['user']['nickname']);
 			}
 
 			$drop_url = $a->query_string;
@@ -169,11 +169,11 @@ function videos_post(App $a)
 			}
 		}
 
-		goaway(System::baseUrl() . '/videos/' . $a->data['user']['nickname']);
+		$a->redirect('videos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
-	goaway(System::baseUrl() . '/videos/' . $a->data['user']['nickname']);
+	$a->redirect('videos/' . $a->data['user']['nickname']);
 }
 
 function videos_content(App $a)

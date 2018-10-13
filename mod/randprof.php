@@ -13,8 +13,8 @@ function randprof_init(App $a)
 	$x = GContact::getRandomUrl();
 
 	if ($x) {
-		goaway(Contact::magicLink($x));
+		$a->redirect(Contact::magicLink($x));
 	}
 
-	goaway(System::baseUrl() . '/profile');
+	$a->redirect('profile');
 }

@@ -13,13 +13,13 @@ use Friendica\Model\Item;
 function tagrm_post(App $a)
 {
 	if (!local_user()) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 	}
 
 	if (x($_POST,'submit') && ($_POST['submit'] === L10n::t('Cancel'))) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 	}
-
+	
 	$tags = [];
 	if (defaults($_POST, 'tag', '')){
 		foreach ($_POST['tag'] as $t){
@@ -44,7 +44,11 @@ function update_tags($item_id, $tags){
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
 	if (!DBA::isResult($item)) {
+<<<<<<< HEAD
 		goaway('/' . $_SESSION['photo_return']);
+=======
+		$a->redirect($_SESSION['photo_return']);
+>>>>>>> Renamed System::redirect() to $a->redirect()
 	}
 
 	$arr = explode(',', $item['tag']);
@@ -65,6 +69,10 @@ function update_tags($item_id, $tags){
 
 	Item::update(['tag' => $tag_str], ['id' => $item_id]);
 
+	info(L10n::t('Tag(s) removed') . EOL );
+	$a->redirect($_SESSION['photo_return']);
+
+	// NOTREACHED
 }
 
 function tagrm_content(App $a)
@@ -72,7 +80,7 @@ function tagrm_content(App $a)
 	$o = '';
 
 	if (!local_user()) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 		// NOTREACHED
 	}
 
@@ -83,19 +91,19 @@ function tagrm_content(App $a)
 
 	$item_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 	if (!$item_id) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 		// NOTREACHED
 	}
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
 	if (!DBA::isResult($item)) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 	}
 
 	$arr = explode(',', $item['tag']);
 
 	if (empty($item['tag'])) {
-		goaway('/' . $_SESSION['photo_return']);
+		$a->redirect($_SESSION['photo_return']);
 	}
 
 	$o .= '<h3>' . L10n::t('Remove Item Tag') . '</h3>';

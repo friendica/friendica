@@ -599,21 +599,6 @@ function killme()
 }
 
 /**
- * @brief Redirect to another URL and terminate this process.
- */
-function goaway($path = '')
-{
-	if (strstr(normalise_link($path), 'http://')) {
-		$url = $path;
-	} else {
-		$url = System::baseUrl() . '/' . ltrim($path, '/');
-	}
-
-	header("Location: $url");
-	killme();
-}
-
-/**
  * @brief Returns the user id of locally logged in user or false.
  *
  * @return int|bool user id or false

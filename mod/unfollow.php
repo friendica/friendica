@@ -12,13 +12,13 @@ use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 
-function unfollow_post()
+function unfollow_post(App $a)
 {
 	$return_url = 'contacts';
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		goaway('/login');
+		$a->redirect('login');
 		// NOTREACHED
 	}
 
@@ -32,17 +32,17 @@ function unfollow_post()
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		goaway($return_url);
+		$a->redirect($return_url);
 		// NOTREACHED
 	}
 
 	if (!empty($_REQUEST['cancel'])) {
-		goaway($return_url . '/' . $contact['id']);
+		$a->redirect($return_url . '/' . $contact['id']);
 	}
 
 	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 		notice(L10n::t('Unfollowing is currently not supported by your network.'));
-		goaway($return_url . '/' . $contact['id']);
+		$a->redirect($return_url . '/' . $contact['id']);
 		// NOTREACHED
 	}
 
@@ -63,7 +63,7 @@ function unfollow_post()
 	}
 
 	info(L10n::t('Contact unfollowed'));
-	goaway($return_path);
+	$a->redirect($return_path);
 	// NOTREACHED
 }
 
@@ -73,7 +73,7 @@ function unfollow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		goaway('/login');
+		$a->redirect('login');
 		// NOTREACHED
 	}
 
@@ -88,13 +88,13 @@ function unfollow_content(App $a)
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		goaway($return_url);
+		$a->redirect($return_url);
 		// NOTREACHED
 	}
 
 	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 		notice(L10n::t('Unfollowing is currently not supported by your network.'));
-		goaway('contact/' . $contact['id']);
+		$a->redirect('contact/' . $contact['id']);
 		// NOTREACHED
 	}
 
@@ -105,7 +105,7 @@ function unfollow_content(App $a)
 
 	if (!DBA::isResult($self)) {
 		notice(L10n::t('Permission denied.'));
-		goaway($return_url);
+		$a->redirect($return_url);
 		// NOTREACHED
 	}
 

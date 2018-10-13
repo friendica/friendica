@@ -100,7 +100,7 @@ function events_post(App $a)
 	$type     = 'event';
 
 	$action = ($event_id == '') ? 'new' : "event/" . $event_id;
-	$onerror_url = System::baseUrl() . "/events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
+	$onerror_url = "events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
 
 	if (strcmp($finish, $start) < 0 && !$nofinish) {
 		notice(L10n::t('Event can not end before it has started.') . EOL);
@@ -108,7 +108,7 @@ function events_post(App $a)
 			echo L10n::t('Event can not end before it has started.');
 			killme();
 		}
-		goaway($onerror_url);
+		$a->redirect($onerror_url);
 	}
 
 	if (!$summary || ($start === NULL_DATE)) {
@@ -117,7 +117,7 @@ function events_post(App $a)
 			echo L10n::t('Event title and start time are required.');
 			killme();
 		}
-		goaway($onerror_url);
+		$a->redirect($onerror_url);
 	}
 
 	$share = intval(defaults($_POST, 'share', 0));
@@ -187,7 +187,7 @@ function events_post(App $a)
 		Worker::add(PRIORITY_HIGH, "Notifier", "event", $item_id);
 	}
 
-	goaway('/events');
+	$a->redirect('events');
 }
 
 function events_content(App $a)
@@ -577,6 +577,6 @@ function events_content(App $a)
 			info(L10n::t('Event removed') . EOL);
 		}
 
-		goaway(System::baseUrl() . '/events');
+		$a->redirect('events');
 	}
 }

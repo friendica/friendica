@@ -5,6 +5,7 @@
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Module\Login;
 
@@ -76,7 +77,7 @@ function api_content(App $a)
 				if (strstr($consumer->callback_url, $glue)) {
 					$glue = "?";
 				}
-				goaway($consumer->callback_url . $glue . "oauth_token=" . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . "&oauth_verifier=" . OAuthUtil::urlencode_rfc3986($verifier));
+				$a->redirect($consumer->callback_url . $glue . 'oauth_token=' . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . '&oauth_verifier=' . OAuthUtil::urlencode_rfc3986($verifier));
 				killme();
 			}
 

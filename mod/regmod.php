@@ -101,11 +101,11 @@ function regmod_content(App $a)
 
 	if ($cmd === 'deny') {
 		user_deny($hash);
-		goaway('admin/users/');
+		$a->redirect('admin/users/');
 	}
 
 	if ($cmd === 'allow') {
 		user_allow($hash);
-		goaway('admin/users/');
+		$a->redirect('admin/users/');
 	}
 }

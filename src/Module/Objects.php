@@ -24,7 +24,7 @@ class Objects extends BaseModule
 		}
 
 		if (!ActivityPub::isRequest()) {
-			goaway(str_replace('objects/', 'display/', $a->query_string));
+			$a->redirect(str_replace('objects/', 'display/', $a->query_string));
 		}
 
 		$item = Item::selectFirst(['id'], ['guid' => $a->argv[1], 'wall' => true, 'private' => false]);

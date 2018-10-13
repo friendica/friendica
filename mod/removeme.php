@@ -64,7 +64,7 @@ function removeme_post(App $a)
 function removeme_content(App $a)
 {
 	if (!local_user()) {
-		goaway(System::baseUrl());
+		$a->redirect();
 	}
 
 	$hash = random_string();
@@ -76,7 +76,7 @@ function removeme_content(App $a)
 
 	$tpl = get_markup_template('removeme.tpl');
 	$o = replace_macros($tpl, [
-		'$basedir' => System::baseUrl(),
+		'$basedir' => $a->getBaseURL(),
 		'$hash' => $hash,
 		'$title' => L10n::t('Remove My Account'),
 		'$desc' => L10n::t('This will completely remove your account. Once this has been done it is not recoverable.'),

@@ -38,7 +38,7 @@ function network_init(App $a)
 	$search = (x($_GET, 'search') ? escape_tags($_GET['search']) : '');
 
 	if (($search != '') && !empty($_GET['submit'])) {
-		goaway('search?search=' . urlencode($search));
+		$a->redirect('search?search=' . urlencode($search));
 	}
 
 	if (x($_GET, 'save')) {
@@ -140,7 +140,7 @@ function network_init(App $a)
 
 			$redir_url = ($net_queries ? $net_baseurl . '?' . $net_queries : $net_baseurl);
 
-			goaway(System::baseUrl() . $redir_url);
+			$a->redirect($redir_url);
 		}
 	}
 
@@ -618,7 +618,7 @@ function networkThreadedView(App $a, $update, $parent)
 				killme();
 			}
 			notice(L10n::t('No such group') . EOL);
-			goaway('network/0');
+			$a->redirect('network/0');
 			// NOTREACHED
 		}
 
@@ -672,7 +672,7 @@ function networkThreadedView(App $a, $update, $parent)
 			}
 		} else {
 			notice(L10n::t('Invalid contact.') . EOL);
-			goaway('network');
+			$a->redirect('network');
 			// NOTREACHED
 		}
 	}

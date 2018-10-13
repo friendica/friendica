@@ -18,7 +18,7 @@ class Acctlink extends BaseModule
 			$url = defaults(Probe::uri(trim($addr)), 'url', false);
 
 			if ($url) {
-				goaway($url);
+				self::getApp()->redirect($url);
 				exit();
 			}
 		}

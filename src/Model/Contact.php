@@ -1639,7 +1639,7 @@ class Contact extends BaseObject
 					$myaddr = bin2hex($a->user['nickname'] . '@' . $a->getHostName());
 				}
 
-				goaway($ret['request'] . "&addr=$myaddr");
+				$a->redirect($ret['request'] . "&addr=$myaddr");
 
 				// NOTREACHED
 			}

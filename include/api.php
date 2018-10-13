@@ -4809,7 +4809,9 @@ function api_friendica_remoteauth()
 
 	logger($contact['name'] . ' ' . $sec, LOGGER_DEBUG);
 	$dest = ($url ? '&destination_url=' . $url : '');
-	goaway(
+
+	$app = get_app();
+	$app->redirect(
 		$contact['poll'] . '?dfrn_id=' . $dfrn_id
 		. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
 		. '&type=profile&sec=' . $sec . $dest

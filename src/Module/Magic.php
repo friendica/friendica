@@ -5,6 +5,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Util\HTTPSignature;
@@ -41,7 +42,7 @@ class Magic extends BaseModule
 
 		if (!$cid) {
 			logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
-			goaway($dest);
+			$a->redirect($dest);
 		}
 
 		$contact = DBA::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
@@ -55,7 +56,7 @@ class Magic extends BaseModule
 			}
 
 			logger('Contact is already authenticated', LOGGER_DEBUG);
-			goaway($dest);
+			$a->redirect($dest);
 		}
 
 		if (local_user()) {
@@ -99,10 +100,10 @@ class Magic extends BaseModule
 						$x = strpbrk($dest, '?&');
 						$args = (($x) ? '&owt=' . $token : '?f=&owt=' . $token);
 
-						goaway($dest . $args);
+						$a->redirect($dest . $args);
 					}
 				}
-				goaway($dest);
+				$a->redirect($dest);
 			}
 		}
 
@@ -111,6 +112,6 @@ class Magic extends BaseModule
 			return $ret;
 		}
 
-		goaway($dest);
+		$a->redirect($dest);
 	}
 }

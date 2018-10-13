@@ -60,7 +60,8 @@ abstract class BaseModule extends BaseObject
 	 */
 	public static function post()
 	{
-		// goaway('module');
+		// $a = self::getApp();
+		// $a->redirect('module');
 	}
 
 	/**
