@@ -18,13 +18,14 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 use Friendica\Module\Tos;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Temporal;
 use Friendica\Util\Network;
+use Friendica\Util\Temporal;
 
 require_once 'include/enotify.php';
 require_once 'include/text.php';
@@ -33,11 +34,11 @@ require_once 'include/items.php';
 /**
  * @brief Process send data from the admin panels subpages
  *
- * This function acts as relais for processing the data send from the subpages
+ * This function acts as relay for processing the data send from the subpages
  * of the admin panel. Depending on the 1st parameter of the url (argv[1])
  * specialized functions are called to process the data from the subpages.
  *
- * The function itself does not return anything, but the subsequencely function
+ * The function itself does not return anything, but the subsequently function
  * return the HTML for the pages of the admin panel.
  *
  * @param App $a
@@ -895,8 +896,7 @@ function admin_page_summary(App $a)
 
 	logger('accounts: ' . print_r($accounts, true), LOGGER_DATA);
 
-	$r = q("SELECT COUNT(`id`) AS `count` FROM `register`");
-	$pending = $r[0]['count'];
+	$pending = Register::getPendingCount();
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `queue` WHERE 1");
 	$queue = (($r) ? $r[0]['total'] : 0);
@@ -912,10 +912,10 @@ function admin_page_summary(App $a)
 	$r = q("SHOW variables LIKE 'max_allowed_packet'");
 	$max_allowed_packet = (($r) ? $r[0]['Value'] : 0);
 
-	$server_settings = ['label' => L10n::t('Server Settings'), 
-				'php' => ['upload_max_filesize' => ini_get('upload_max_filesize'), 
-						  'post_max_size' => ini_get('post_max_size'), 
-						  'memory_limit' => ini_get('memory_limit')], 
+	$server_settings = ['label' => L10n::t('Server Settings'),
+				'php' => ['upload_max_filesize' => ini_get('upload_max_filesize'),
+						  'post_max_size' => ini_get('post_max_size'),
+						  'memory_limit' => ini_get('memory_limit')],
 				'mysql' => ['max_allowed_packet' => $max_allowed_packet]];
 
 	$t = get_markup_template('admin/summary.tpl');
@@ -1792,11 +1792,7 @@ function admin_page_users(App $a)
 	}
 
 	/* get pending */
-	$pending = q("SELECT `register`.*, `contact`.`name`, `user`.`email`
-				 FROM `register`
-				 INNER JOIN `contact` ON `register`.`uid` = `contact`.`uid`
-				 INNER JOIN `user` ON `register`.`uid` = `user`.`uid`;");
-
+	$pending = Register::getPending();
 
 	/* get users */
 	$total = q("SELECT COUNT(*) AS `total` FROM `user` WHERE 1");

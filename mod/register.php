@@ -11,10 +11,8 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBA;
-use Friendica\Model\User;
+use Friendica\Model;
 use Friendica\Module\Tos;
-use Friendica\Util\DateTimeFormat;
 
 require_once 'include/enotify.php';
 
@@ -67,7 +65,7 @@ function register_post(App $a)
 	$arr['language'] = L10n::getBrowserLanguage();
 
 	try {
-		$result = User::create($arr);
+		$result = Model\User::create($arr);
 	} catch (Exception $e) {
 		notice($e->getMessage());
 		return;
@@ -76,7 +74,7 @@ function register_post(App $a)
 	$user = $result['user'];
 
 	if ($netpublish && intval(Config::get('config', 'register_policy')) !== REGISTER_APPROVE) {
-		$url = System::baseUrl() . '/profile/' . $user['nickname'];
+		$url = $a->getBaseUrl() . '/profile/' . $user['nickname'];
 		Worker::add(PRIORITY_LOW, "Directory", $url);
 	}
 
@@ -86,18 +84,24 @@ function register_post(App $a)
 
 	if (intval(Config::get('config', 'register_policy')) === REGISTER_OPEN) {
 		if ($using_invites && $invite_id) {
-			q("delete * from register where hash = '%s' limit 1", DBA::escape($invite_id));
+			Model\Register::deleteByHash($invite_id);
 			PConfig::set($user['uid'], 'system', 'invites_remaining', $num_invites);
 		}
 
 		// Only send a password mail when the password wasn't manually provided
 		if (!x($_POST, 'password1') || !x($_POST, 'confirm')) {
-			$res = User::sendRegisterOpenEmail(
-					$user['email'], Config::get('config', 'sitename'), System::baseUrl(), $user['username'], $result['password'], $user);
+			$res = Model\User::sendRegisterOpenEmail(
+				$user['email'],
+				Config::get('config', 'sitename'),
+				$a->getBaseUrl(),
+				$user['username'],
+				$result['password'],
+				$user
+			);
 
 			if ($res) {
 				info(L10n::t('Registration successful. Please check your email for further instructions.') . EOL);
-				goaway(System::baseUrl());
+				goaway();
 			} else {
 				notice(
 					L10n::t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
@@ -108,27 +112,19 @@ function register_post(App $a)
 			}
 		} else {
 			info(L10n::t('Registration successful.') . EOL);
-			goaway(System::baseUrl());
+			goaway();
 		}
 	} elseif (intval(Config::get('config', 'register_policy')) === REGISTER_APPROVE) {
 		if (!strlen(Config::get('config', 'admin_email'))) {
 			notice(L10n::t('Your registration can not be processed.') . EOL);
-			goaway(System::baseUrl());
+			goaway();
 		}
 
-		$hash = random_string();
-		$r = q("INSERT INTO `register` ( `hash`, `created`, `uid`, `password`, `language`, `note` ) VALUES ( '%s', '%s', %d, '%s', '%s', '%s' ) ",
-			DBA::escape($hash),
-			DBA::escape(DateTimeFormat::utcNow()),
-			intval($user['uid']),
-			DBA::escape($result['password']),
-			DBA::escape(Config::get('system', 'language')),
-			DBA::escape($_POST['permonlybox'])
-		);
+		Model\Register::createForApproval($user['uid'], Config::get('system', 'language'), $_POST['permonlybox']);
 
 		// invite system
 		if ($using_invites && $invite_id) {
-			q("DELETE * FROM `register` WHERE `hash` = '%s' LIMIT 1", DBA::escape($invite_id));
+			Model\Register::deleteByHash($invite_id);
 			PConfig::set($user['uid'], 'system', 'invites_remaining', $num_invites);
 		}
 
@@ -146,9 +142,9 @@ function register_post(App $a)
 				'source_name'  => $user['username'],
 				'source_mail'  => $user['email'],
 				'source_nick'  => $user['nickname'],
-				'source_link'  => System::baseUrl() . "/admin/users/",
-				'link'         => System::baseUrl() . "/admin/users/",
-				'source_photo' => System::baseUrl() . "/photo/avatar/" . $user['uid'] . ".jpg",
+				'source_link'  => $a->getBaseUrl() . "/admin/users/",
+				'link'         => $a->getBaseUrl() . "/admin/users/",
+				'source_photo' => $a->getBaseUrl() . "/photo/avatar/" . $user['uid'] . ".jpg",
 				'to_email'     => $admin['email'],
 				'uid'          => $admin['uid'],
 				'language'     => $admin['language'] ? $admin['language'] : 'en',
@@ -156,11 +152,18 @@ function register_post(App $a)
 			]);
 		}
 		// send notification to the user, that the registration is pending
-		User::sendRegisterPendingEmail(
-			$user['email'], Config::get('config', 'sitename'), $user['username']);
+		Model\User::sendRegisterPendingEmail(
+			$user['uid'],
+			$user['email'],
+			Config::get('config', 'sitename'),
+			$user['username'],
+			$a->getBaseURL(),
+			$user['nickname'],
+			$result['password']
+		);
 
 		info(L10n::t('Your registration is pending approval by the site owner.') . EOL);
-		goaway(System::baseUrl());
+		goaway();
 	}
 
 	return;

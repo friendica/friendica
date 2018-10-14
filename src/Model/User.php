@@ -32,6 +32,17 @@ require_once 'include/text.php';
 class User
 {
 	/**
+	 * Returns true if a user record exists with the provided id
+	 *
+	 * @param  integer $uid
+	 * @return boolean
+	 */
+	public static function exists($uid)
+	{
+		return DBA::exists('user', ['uid' => $uid]);
+	}
+
+	/**
 	 * @brief Returns the user id of a given profile url
 	 *
 	 * @param string $profile
@@ -401,7 +412,7 @@ class User
 				throw new Exception(L10n::t('An invitation is required.'));
 			}
 
-			if (!DBA::exists('register', ['hash' => $invite_id])) {
+			if (!Register::existsByHash($invite_id)) {
 				throw new Exception(L10n::t('Invitation could not be verified.'));
 			}
 		}
@@ -644,27 +655,36 @@ class User
 	}
 
 	/**
-	 * @brief Sends pending registration confiŕmation email
+	 * @brief Sends pending registration confirmation email
 	 *
 	 * @param string $email
 	 * @param string $sitename
 	 * @param string $username
+	 * @param string $password Plaintext password
 	 * @return NULL|boolean from notification() and email() inherited
 	 */
-	public static function sendRegisterPendingEmail($email, $sitename, $username)
+	public static function sendRegisterPendingEmail($uid, $email, $sitename, $username, $siteurl, $nickname, $password)
 	{
 		$body = deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account is pending for approval by the administrator.
-		'));
 
-		$body = sprintf($body, $username, $sitename);
+			Your login details are as follows:
+
+			Site Location:	%3$s
+			Login Name:		%4$s
+			Password:		%5$s
+		',
+			$body, $username, $sitename, $siteurl, $nickname, $password
+		));
 
 		return notification([
-			'type' => SYSTEM_EMAIL,
+			'type'     => SYSTEM_EMAIL,
+			'uid'      => $uid,
 			'to_email' => $email,
-			'subject'=> L10n::t('Registration at %s', $sitename),
-			'body' => $body]);
+			'subject'  => L10n::t('Registration at %s', $sitename),
+			'body'     => $body
+		]);
 	}
 
 	/**
@@ -684,7 +704,9 @@ class User
 		$preamble = deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account has been created.
-		'));
+		',
+			$preamble, $username, $sitename
+		));
 		$body = deindent(L10n::t('
 			The login details are as follows:
 
@@ -711,19 +733,19 @@ class User
 
 			If you ever want to delete your account, you can do so at %3$s/removeme
 
-			Thank you and welcome to %2$s.'));
-
-		$preamble = sprintf($preamble, $username, $sitename);
-		$body = sprintf($body, $email, $sitename, $siteurl, $username, $password);
+			Thank you and welcome to %2$s.',
+			$body, $email, $sitename, $siteurl, $username, $password
+		));
 
 		return notification([
-			'uid' => $user['uid'],
+			'uid'      => $user['uid'],
 			'language' => $user['language'],
-			'type' => SYSTEM_EMAIL,
+			'type'     => SYSTEM_EMAIL,
 			'to_email' => $email,
-			'subject'=> L10n::t('Registration details for %s', $sitename),
-			'preamble'=> $preamble,
-			'body' => $body]);
+			'subject'  => L10n::t('Registration details for %s', $sitename),
+			'preamble' => $preamble,
+			'body'     => $body
+		]);
 	}
 
 	/**
@@ -760,7 +782,7 @@ class User
 		if ($uid == local_user()) {
 			unset($_SESSION['authenticated']);
 			unset($_SESSION['uid']);
-			goaway(System::baseUrl());
+			goaway();;
 		}
 	}
 }

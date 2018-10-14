@@ -647,7 +647,7 @@ function killme()
 /**
  * @brief Redirect to another URL and terminate this process.
  */
-function goaway($path)
+function goaway($path = '')
 {
 	if (strstr(normalise_link($path), 'http://')) {
 		$url = $path;

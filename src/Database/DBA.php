@@ -821,7 +821,7 @@ class DBA
 	 * @param array $param parameter array
 	 * @param bool $on_duplicate_update Do an update on a duplicate entry
 	 *
-	 * @return boolean was the insert successfull?
+	 * @return boolean was the insert successful?
 	 */
 	public static function insert($table, $param, $on_duplicate_update = false) {
 

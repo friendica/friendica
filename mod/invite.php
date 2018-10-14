@@ -58,13 +58,8 @@ function invite_post(App $a)
 		}
 
 		if ($invitation_only && ($invites_remaining || is_site_admin())) {
-			$code = autoname(8) . srand(1000, 9999);
+			$code = Friendica\Model\Register::createForInvitation();
 			$nmessage = str_replace('$invite_code', $code, $message);
-
-			$r = q("INSERT INTO `register` (`hash`,`created`) VALUES ('%s', '%s') ",
-				DBA::escape($code),
-				DBA::escape(DateTimeFormat::utcNow())
-			);
 
 			if (! is_site_admin()) {
 				$invites_remaining --;
