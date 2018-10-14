@@ -80,7 +80,6 @@ function ping_init(App $a)
 	$mail_count     = 0;
 	$home_count     = 0;
 	$network_count  = 0;
-	$register_count = 0;
 	$sysnotify_count = 0;
 	$groups_unseen  = [];
 	$forums_unseen  = [];
@@ -97,7 +96,6 @@ function ping_init(App $a)
 	$data['mail']     = $mail_count;
 	$data['net']      = $network_count;
 	$data['home']     = $home_count;
-	$data['register'] = $register_count;
 
 	$data['all-events']       = $all_events;
 	$data['all-events-today'] = $all_events_today;
@@ -201,18 +199,6 @@ function ping_init(App $a)
 		);
 		$mail_count = count($mails);
 
-		if (intval(Config::get('config', 'register_policy')) === REGISTER_APPROVE && is_site_admin()) {
-			$regs = q(
-				"SELECT `contact`.`name`, `contact`.`url`, `contact`.`micro`, `register`.`created`
-				FROM `contact` RIGHT JOIN `register` ON `register`.`uid` = `contact`.`uid`
-				WHERE `contact`.`self` = 1"
-			);
-
-			if (DBA::isResult($regs)) {
-				$register_count = count($regs);
-			}
-		}
-
 		$cachekey = "ping_init:".local_user();
 		$ev = Cache::get($cachekey);
 		if (is_null($ev)) {
@@ -258,7 +244,6 @@ function ping_init(App $a)
 		$data['mail']     = $mail_count;
 		$data['net']      = $network_count;
 		$data['home']     = $home_count;
-		$data['register'] = $register_count;
 
 		$data['all-events']       = $all_events;
 		$data['all-events-today'] = $all_events_today;
@@ -394,7 +379,7 @@ function ping_init(App $a)
 	if ($format == 'json') {
 		$data['groups'] = $groups_unseen;
 		$data['forums'] = $forums_unseen;
-		$data['notify'] = $sysnotify_count + $intro_count + $mail_count + $register_count;
+		$data['notify'] = $sysnotify_count + $intro_count + $mail_count;
 		$data['notifications'] = $notifications;
 		$data['sysmsgs'] = [
 			'notice' => $sysmsgs,
