@@ -11,10 +11,8 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Database\DBA;
 use Friendica\Model;
 use Friendica\Module\Tos;
-use Friendica\Util\DateTimeFormat;
 
 require_once 'include/enotify.php';
 
@@ -86,7 +84,7 @@ function register_post(App $a)
 
 	if (intval(Config::get('config', 'register_policy')) === REGISTER_OPEN) {
 		if ($using_invites && $invite_id) {
-			q("delete * from register where hash = '%s' limit 1", DBA::escape($invite_id));
+			Model\Register::deleteByHash($invite_id);
 			PConfig::set($user['uid'], 'system', 'invites_remaining', $num_invites);
 		}
 
@@ -122,19 +120,11 @@ function register_post(App $a)
 			goaway();
 		}
 
-		$hash = random_string();
-		$r = q("INSERT INTO `register` ( `hash`, `created`, `uid`, `password`, `language`, `note` ) VALUES ( '%s', '%s', %d, '%s', '%s', '%s' ) ",
-			DBA::escape($hash),
-			DBA::escape(DateTimeFormat::utcNow()),
-			intval($user['uid']),
-			DBA::escape($result['password']),
-			DBA::escape(Config::get('system', 'language')),
-			DBA::escape($_POST['permonlybox'])
-		);
+		Model\Register::createForApproval($user['uid'], Config::get('system', 'language'), $_POST['permonlybox']);
 
 		// invite system
 		if ($using_invites && $invite_id) {
-			q("DELETE * FROM `register` WHERE `hash` = '%s' LIMIT 1", DBA::escape($invite_id));
+			Model\Register::deleteByHash($invite_id);
 			PConfig::set($user['uid'], 'system', 'invites_remaining', $num_invites);
 		}
 
@@ -163,6 +153,7 @@ function register_post(App $a)
 		}
 		// send notification to the user, that the registration is pending
 		Model\User::sendRegisterPendingEmail(
+			$user['uid'],
 			$user['email'],
 			Config::get('config', 'sitename'),
 			$user['username'],

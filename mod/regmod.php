@@ -9,6 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 
@@ -18,30 +19,24 @@ function user_allow($hash)
 {
 	$a = get_app();
 
-	$register = q("SELECT * FROM `register` WHERE `hash` = '%s' LIMIT 1",
-		DBA::escape($hash)
-	);
-
+	$register = Register::getByHash($hash);
 
 	if (!DBA::isResult($register)) {
 		return false;
 	}
 
 	$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
-		intval($register[0]['uid'])
+		intval($register['uid'])
 	);
 
 	if (!DBA::isResult($user)) {
 		killme();
 	}
 
-	$r = q("DELETE FROM `register` WHERE `hash` = '%s'",
-		DBA::escape($register[0]['hash'])
-	);
-
+	Register::deleteByHash($hash);
 
 	$r = q("UPDATE `user` SET `blocked` = 0, `verified` = 1 WHERE `uid` = %d",
-		intval($register[0]['uid'])
+		intval($register['uid'])
 	);
 
 	$r = q("SELECT * FROM `profile` WHERE `uid` = %d AND `is-default` = 1",
@@ -54,14 +49,14 @@ function user_allow($hash)
 		}
 	}
 
-	L10n::pushLang($register[0]['language']);
+	L10n::pushLang($register['language']);
 
 	$res = User::sendRegisterOpenEmail(
 		$user[0]['email'],
 		Config::get('config', 'sitename'),
 		System::baseUrl(),
 		$user[0]['username'],
-		$register[0]['password'],
+		'Sent in a previous email',
 		$user[0]);
 
 	L10n::popLang();
@@ -77,20 +72,19 @@ function user_allow($hash)
 // allowed to have friends on this system
 function user_deny($hash)
 {
-	$register = q("SELECT * FROM `register` WHERE `hash` = '%s' LIMIT 1",
-		DBA::escape($hash)
-	);
+	$register = Register::getByHash($hash);
 
 	if (!DBA::isResult($register)) {
 		return false;
 	}
 
 	$user = q("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1",
-		intval($register[0]['uid'])
+		intval($register['uid'])
 	);
 
-	DBA::delete('user', ['uid' => $register[0]['uid']]);
-	DBA::delete('register', ['hash' => $register[0]['hash']]);
+	DBA::delete('user', ['uid' => $register['uid']]);
+
+	Register::deleteByHash($register['hash']);
 
 	notice(L10n::t('Registration revoked for %s', $user[0]['username']) . EOL);
 	return true;
