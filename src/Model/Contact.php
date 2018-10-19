@@ -2024,6 +2024,8 @@ class Contact extends BaseObject
 	/**
 	 * @brief Returns a magic link to authenticate remote visitors
 	 *
+	 * @todo check if the return is either a fully qualified URL or a relative path to Friendica basedir
+	 *
 	 * @param string $contact_url The address of the target contact profile
 	 * @param string $url An url that we will be redirected to after the authentication
 	 *
