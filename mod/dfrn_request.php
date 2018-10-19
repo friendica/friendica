@@ -173,9 +173,9 @@ function dfrn_request_post(App $a)
 						Contact::updateAvatar($photo, local_user(), $r[0]["id"], true);
 					}
 
-					$forwardurl = "contact/" . $r[0]['id'];
+					$forward_path = "contact/" . $r[0]['id'];
 				} else {
-					$forwardurl = "contact";
+					$forward_path = "contact";
 				}
 
 				// Allow the blocked remote notification to complete
@@ -188,7 +188,7 @@ function dfrn_request_post(App $a)
 				}
 
 				// (ignore reply, nothing we can do it failed)
-				$a->internalRedirect($forwardurl);
+				$a->internalRedirect($forward_path);
 				return; // NOTREACHED
 			}
 		}
