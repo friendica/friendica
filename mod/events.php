@@ -100,7 +100,7 @@ function events_post(App $a)
 	$type     = 'event';
 
 	$action = ($event_id == '') ? 'new' : "event/" . $event_id;
-	$onerror_url = "events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
+	$onerror_path = "events/" . $action . "?summary=$summary&description=$desc&location=$location&start=$start_text&finish=$finish_text&adjust=$adjust&nofinish=$nofinish";
 
 	if (strcmp($finish, $start) < 0 && !$nofinish) {
 		notice(L10n::t('Event can not end before it has started.') . EOL);
@@ -108,7 +108,7 @@ function events_post(App $a)
 			echo L10n::t('Event can not end before it has started.');
 			killme();
 		}
-		$a->internalRedirect($onerror_url);
+		$a->internalRedirect($onerror_path);
 	}
 
 	if (!$summary || ($start === NULL_DATE)) {
@@ -117,7 +117,7 @@ function events_post(App $a)
 			echo L10n::t('Event title and start time are required.');
 			killme();
 		}
-		$a->internalRedirect($onerror_url);
+		$a->internalRedirect($onerror_path);
 	}
 
 	$share = intval(defaults($_POST, 'share', 0));
