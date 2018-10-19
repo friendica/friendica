@@ -36,7 +36,7 @@ function redir_init(App $a) {
 			|| (!local_user() && !remote_user()) // Visitors (not logged in or not remotes) can't authenticate.
 			|| (!empty($a->contact['id']) && $a->contact['id'] == $cid)) // Local user is already authenticated.
 		{
-			System::externalRedirect($url != '' ? $url : $contact_url);
+			System::externalRedirect(defaults($url, $contact_url));
 		}
 
 		if ($contact['uid'] == 0 && local_user()) {
@@ -50,7 +50,7 @@ function redir_init(App $a) {
 
 			if (!empty($a->contact['id']) && $a->contact['id'] == $cid) {
 				// Local user is already authenticated.
-				$target_url = $url != '' ? $url : $contact_url;
+				$target_url = defaults($url, $contact_url);
 				logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
 				System::externalRedirect($target_url);
 			}
@@ -71,7 +71,7 @@ function redir_init(App $a) {
 				foreach ($_SESSION['remote'] as $v) {
 					if ($v['uid'] == $_SESSION['visitor_visiting'] && $v['cid'] == $_SESSION['visitor_id']) {
 						// Remote user is already authenticated.
-						$target_url = $url != '' ? $url : $contact_url;
+						$target_url = defaults($url, $contact_url);
 						logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
 						System::externalRedirect($target_url);
 					}
@@ -106,7 +106,7 @@ function redir_init(App $a) {
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet);
 		}
 
-		$url = $url != '' ? $url : $contact_url;
+		$url = defaults($url, $contact_url);
 	}
 
 	// If we don't have a connected contact, redirect with
@@ -121,7 +121,7 @@ function redir_init(App $a) {
 		}
 
 		logger('redirecting to ' . $url, LOGGER_DEBUG);
-		$a->internalRedirect($url);
+		System::externalRedirect($url);
 	}
 
 	notice(L10n::t('Contact not found.'));

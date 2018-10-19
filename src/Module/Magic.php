@@ -7,6 +7,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Core\System;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
 
@@ -41,9 +42,13 @@ class Magic extends BaseModule
 
 		if (!$cid) {
 			logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
-			$a->internalRedirect($dest);
+			// @TODO Finding a more elegant possibility to redirect to either internal or external URL
+			if (filter_var($dest, FILTER_VALIDATE_URL)) {
+				System::externalRedirect($dest);
+			} else {
+				$a->internalRedirect($dest);
+			}
 		}
-
 		$contact = DBA::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
 
 		// Redirect if the contact is already authenticated on this site.
@@ -55,7 +60,7 @@ class Magic extends BaseModule
 			}
 
 			logger('Contact is already authenticated', LOGGER_DEBUG);
-			$a->internalRedirect($dest);
+			System::externalRedirect($dest);
 		}
 
 		if (local_user()) {
@@ -99,10 +104,10 @@ class Magic extends BaseModule
 						$x = strpbrk($dest, '?&');
 						$args = (($x) ? '&owt=' . $token : '?f=&owt=' . $token);
 
-						$a->internalRedirect($dest . $args);
+						System::externalRedirect($dest . $args);
 					}
 				}
-				$a->internalRedirect($dest);
+				System::externalRedirect($dest);
 			}
 		}
 
@@ -111,6 +116,11 @@ class Magic extends BaseModule
 			return $ret;
 		}
 
-		$a->internalRedirect($dest);
+		// @TODO Finding a more elegant possibility to redirect to either internal or external URL
+		if (filter_var($dest, FILTER_VALIDATE_URL)) {
+			System::externalRedirect($dest);
+		} else {
+			$a->internalRedirect($dest);
+		}
 	}
 }
