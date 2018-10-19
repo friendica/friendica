@@ -1987,7 +1987,7 @@ class App
 	}
 
 	/**
-	 * Redirects to another service relative to the current Friendica base.
+	 * Redirects to another module relative to the current Friendica base.
 	 * If you want to redirect to a external URL, use System::externalRedirectTo()
 	 *
 	 * @param string $toUrl The destination URL (Default is empty, which is the default page of the Friendica node)
