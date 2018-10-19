@@ -265,7 +265,7 @@ function message_content(App $a)
 	}
 
 
-	$_SESSION['return_url'] = $a->query_string;
+	$_SESSION['return_path'] = $a->query_string;
 
 	if ($a->argc == 1) {
 

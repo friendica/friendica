@@ -43,14 +43,14 @@ class Login extends BaseModule
 			$a->internalRedirect();
 		}
 
-		return self::form($_SESSION['return_url'], intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED);
+		return self::form($_SESSION['return_path'], intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED);
 	}
 
 	public static function post()
 	{
-		$return_url = $_SESSION['return_url'];
+		$return_path = $_SESSION['return_path'];
 		session_unset();
-		$_SESSION['return_url'] = $return_url;
+		$_SESSION['return_path'] = $return_path;
 		
 		// OpenId Login
 		if (
@@ -160,14 +160,14 @@ class Login extends BaseModule
 		$_SESSION['last_login_date'] = DateTimeFormat::utcNow();
 		Authentication::setAuthenticatedSessionForUser($record, true, true);
 
-		if (x($_SESSION, 'return_url')) {
-			$return_url = $_SESSION['return_url'];
-			unset($_SESSION['return_url']);
+		if (x($_SESSION, 'return_path')) {
+			$return_path = $_SESSION['return_path'];
+			unset($_SESSION['return_path']);
 		} else {
-			$return_url = '';
+			$return_path = '';
 		}
 
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 	}
 
 	/**
@@ -269,7 +269,7 @@ class Login extends BaseModule
 	/**
 	 * @brief Wrapper for adding a login box.
 	 *
-	 * @param string $return_url The url relative to the base the user should be sent
+	 * @param string $return_path The path relative to the base the user should be sent
 	 *							 back to after login completes
 	 * @param bool $register If $register == true provide a registration link.
 	 *						 This will most always depend on the value of config.register_policy.
@@ -279,7 +279,7 @@ class Login extends BaseModule
 	 *
 	 * @hooks 'login_hook' string $o
 	 */
-	public static function form($return_url = null, $register = false, $hiddens = [])
+	public static function form($return_path = null, $register = false, $hiddens = [])
 	{
 		$a = self::getApp();
 		$o = '';
@@ -293,8 +293,8 @@ class Login extends BaseModule
 
 		$noid = Config::get('system', 'no_openid');
 
-		if (is_null($return_url)) {
-			$return_url = $a->query_string;
+		if (is_null($return_path)) {
+			$return_path = $a->query_string;
 		}
 
 		if (local_user()) {
@@ -308,7 +308,7 @@ class Login extends BaseModule
 			);
 
 			$tpl = get_markup_template('login.tpl');
-			$_SESSION['return_url'] = $return_url;
+			$_SESSION['return_path'] = $return_path;
 		}
 
 		$o .= replace_macros(

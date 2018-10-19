@@ -35,7 +35,7 @@ function match_content(App $a)
 	$a->page['aside'] .= Widget::findPeople();
 	$a->page['aside'] .= Widget::follow();
 
-	$_SESSION['return_url'] = System::baseUrl() . '/' . $a->cmd;
+	$_SESSION['return_path'] = $a->cmd;
 
 	$r = q(
 		"SELECT `pub_keywords`, `prv_keywords` FROM `profile` WHERE `is-default` = 1 AND `uid` = %d LIMIT 1",

@@ -82,7 +82,7 @@ class Authentication extends BaseObject
 
 		if ($interactive) {
 			if ($a->user['login_date'] <= NULL_DATE) {
-				$_SESSION['return_url'] = 'profile_photo/new';
+				$_SESSION['return_path'] = 'profile_photo/new';
 				$a->module = 'profile_photo';
 				info(L10n::t("Welcome ") . $a->user['username'] . EOL);
 				info(L10n::t('Please upload a profile photo.') . EOL);
@@ -193,8 +193,8 @@ class Authentication extends BaseObject
 		if ($login_initial) {
 			Addon::callHooks('logged_in', $a->user);
 
-			if (($a->module !== 'home') && isset($_SESSION['return_url'])) {
-				$a->internalRedirect($_SESSION['return_url']);
+			if (($a->module !== 'home') && isset($_SESSION['return_path'])) {
+				$a->internalRedirect($_SESSION['return_path']);
 			}
 		}
 	}

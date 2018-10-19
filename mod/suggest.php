@@ -62,7 +62,7 @@ function suggest_content(App $a)
 		return;
 	}
 
-	$_SESSION['return_url'] = System::baseUrl() . '/' . $a->cmd;
+	$_SESSION['return_path'] = $a->cmd;
 
 	$a->page['aside'] .= Widget::findPeople();
 	$a->page['aside'] .= Widget::follow();

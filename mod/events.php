@@ -198,7 +198,7 @@ function events_content(App $a)
 	}
 
 	if ($a->argc == 1) {
-		$_SESSION['return_url'] = System::baseUrl() . '/' . $a->cmd;
+		$_SESSION['return_path'] = $a->cmd;
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {

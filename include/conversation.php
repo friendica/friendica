@@ -534,7 +534,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 	$page_dropping = ((local_user() && local_user() == $profile_owner) ? true : false);
 
 	if (!$update) {
-		$_SESSION['return_url'] = $a->query_string;
+		$_SESSION['return_path'] = $a->query_string;
 	}
 
 	$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];

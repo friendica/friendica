@@ -1468,7 +1468,7 @@ function photos_content(App $a)
 		if (count($linked_items)) {
 			$cmnt_tpl = get_markup_template('comment_item.tpl');
 			$tpl = get_markup_template('photo_item.tpl');
-			$return_url = $a->cmd;
+			$return_path = $a->cmd;
 
 			if ($can_post || Security::canWriteToUserWall($owner_uid)) {
 				$like_tpl = get_markup_template('like_noshare.tpl');
@@ -1485,7 +1485,7 @@ function photos_content(App $a)
 				if (($can_post || Security::canWriteToUserWall($owner_uid))) {
 					$comments .= replace_macros($cmnt_tpl, [
 						'$return_path' => '',
-						'$jsreload' => $return_url,
+						'$jsreload' => $return_path,
 						'$id' => $link_item['id'],
 						'$parent' => $link_item['id'],
 						'$profile_uid' =>  $owner_uid,
@@ -1524,7 +1524,7 @@ function photos_content(App $a)
 				if (($can_post || Security::canWriteToUserWall($owner_uid))) {
 					$comments .= replace_macros($cmnt_tpl,[
 						'$return_path' => '',
-						'$jsreload' => $return_url,
+						'$jsreload' => $return_path,
 						'$id' => $link_item['id'],
 						'$parent' => $link_item['id'],
 						'$profile_uid' =>  $owner_uid,
@@ -1584,7 +1584,7 @@ function photos_content(App $a)
 					if (($can_post || Security::canWriteToUserWall($owner_uid))) {
 						$comments .= replace_macros($cmnt_tpl, [
 							'$return_path' => '',
-							'$jsreload' => $return_url,
+							'$jsreload' => $return_path,
 							'$id' => $item['item_id'],
 							'$parent' => $item['parent'],
 							'$profile_uid' =>  $owner_uid,

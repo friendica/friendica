@@ -468,7 +468,7 @@ class Contact extends BaseModule
 			}
 		}
 
-		$_SESSION['return_url'] = $a->query_string;
+		$_SESSION['return_path'] = $a->query_string;
 
 		if (!empty($a->data['contact']) && is_array($a->data['contact'])) {
 			$contact_id = $a->data['contact']['id'];

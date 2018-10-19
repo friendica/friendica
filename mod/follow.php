@@ -25,7 +25,7 @@ function follow_post(App $a)
 
 	$uid = local_user();
 	$url = notags(trim($_REQUEST['url']));
-	$return_url = 'contacts';
+	$return_path = 'contacts';
 
 	// Makes the connection request for friendica contacts easier
 	// This is just a precaution if maybe this page is called somewhere directly via POST
@@ -37,24 +37,24 @@ function follow_post(App $a)
 		if ($result['message']) {
 			notice($result['message']);
 		}
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 	} elseif ($result['cid']) {
 		$a->internalRedirect('contact/' . $result['cid']);
 	}
 
 	info(L10n::t('The contact could not be added.'));
 
-	$a->internalRedirect($return_url);
+	$a->internalRedirect($return_path);
 	// NOTREACHED
 }
 
 function follow_content(App $a)
 {
-	$return_url = 'contacts';
+	$return_path = 'contacts';
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 		// NOTREACHED
 	}
 
@@ -74,7 +74,7 @@ function follow_content(App $a)
 		if ($r[0]['pending']) {
 			notice(L10n::t('You already added this contact.'));
 			$submit = '';
-			//$a->internalRedirect($_SESSION['return_url']);
+			//$a->internalRedirect($_SESSION['return_path']);
 			// NOTREACHED
 		}
 	}
@@ -84,21 +84,21 @@ function follow_content(App $a)
 	if (($ret['network'] == Protocol::DIASPORA) && !Config::get('system', 'diaspora_enabled')) {
 		notice(L10n::t("Diaspora support isn't enabled. Contact can't be added."));
 		$submit = '';
-		//$a->internalRedirect($_SESSION['return_url']);
+		//$a->internalRedirect($_SESSION['return_path']);
 		// NOTREACHED
 	}
 
 	if (($ret['network'] == Protocol::OSTATUS) && Config::get('system', 'ostatus_disabled')) {
 		notice(L10n::t("OStatus support is disabled. Contact can't be added."));
 		$submit = '';
-		//$a->internalRedirect($_SESSION['return_url']);
+		//$a->internalRedirect($_SESSION['return_path']);
 		// NOTREACHED
 	}
 
 	if ($ret['network'] == Protocol::PHANTOM) {
 		notice(L10n::t("The network type couldn't be detected. Contact can't be added."));
 		$submit = '';
-		//$a->internalRedirect($_SESSION['return_url']);
+		//$a->internalRedirect($_SESSION['return_path']);
 		// NOTREACHED
 	}
 
@@ -118,7 +118,7 @@ function follow_content(App $a)
 
 	if (!$r) {
 		notice(L10n::t('Permission denied.'));
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 		// NOTREACHED
 	}
 

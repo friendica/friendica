@@ -14,7 +14,7 @@ use Friendica\Model\User;
 
 function unfollow_post(App $a)
 {
-	$return_url = 'contacts';
+	$return_path = 'contacts';
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
@@ -32,17 +32,17 @@ function unfollow_post(App $a)
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 		// NOTREACHED
 	}
 
 	if (!empty($_REQUEST['cancel'])) {
-		$a->internalRedirect($return_url . '/' . $contact['id']);
+		$a->internalRedirect($return_path . '/' . $contact['id']);
 	}
 
 	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 		notice(L10n::t('Unfollowing is currently not supported by your network.'));
-		$a->internalRedirect($return_url . '/' . $contact['id']);
+		$a->internalRedirect($return_path . '/' . $contact['id']);
 		// NOTREACHED
 	}
 
@@ -69,7 +69,7 @@ function unfollow_post(App $a)
 
 function unfollow_content(App $a)
 {
-	$return_url = 'contacts';
+	$return_path = 'contacts';
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
@@ -88,7 +88,7 @@ function unfollow_content(App $a)
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 		// NOTREACHED
 	}
 
@@ -105,7 +105,7 @@ function unfollow_content(App $a)
 
 	if (!DBA::isResult($self)) {
 		notice(L10n::t('Permission denied.'));
-		$a->internalRedirect($return_url);
+		$a->internalRedirect($return_path);
 		// NOTREACHED
 	}
 
