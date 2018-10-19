@@ -115,14 +115,14 @@ function videos_post(App $a)
 	$owner_uid = $a->data['user']['uid'];
 
 	if (local_user() != $owner_uid) {
-		$a->redirect('videos/' . $a->data['user']['nickname']);
+		$a->internalRedirect('videos/' . $a->data['user']['nickname']);
 	}
 
 	if (($a->argc == 2) && !empty($_POST['delete']) && !empty($_POST['id'])) {
 		// Check if we should do HTML-based delete confirmation
 		if (empty($_REQUEST['confirm'])) {
 			if (!empty($_REQUEST['canceled'])) {
-				$a->redirect('videos/' . $a->data['user']['nickname']);
+				$a->internalRedirect('videos/' . $a->data['user']['nickname']);
 			}
 
 			$drop_url = $a->query_string;
@@ -169,11 +169,11 @@ function videos_post(App $a)
 			}
 		}
 
-		$a->redirect('videos/' . $a->data['user']['nickname']);
+		$a->internalRedirect('videos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
-	$a->redirect('videos/' . $a->data['user']['nickname']);
+	$a->internalRedirect('videos/' . $a->data['user']['nickname']);
 }
 
 function videos_content(App $a)

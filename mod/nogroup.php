@@ -24,5 +24,5 @@ function nogroup_content(App $a)
 		return '';
 	}
 
-	$a->redirect('group/none');
+	$a->internalRedirect('group/none');
 }

@@ -15,7 +15,7 @@ function notice_init(App $a)
 	$r = q("SELECT `user`.`nickname` FROM `user` LEFT JOIN `item` ON `item`.`uid` = `user`.`uid` WHERE `item`.`id` = %d", intval($id));
 	if (DBA::isResult($r)) {
 		$nick = $r[0]['nickname'];
-		$a->redirect('display/' . $nick . '/' . $id);
+		$a->internalRedirect('display/' . $nick . '/' . $id);
 	} else {
 		$a->error = 404;
 		notice(L10n::t('Item not found.') . EOL);

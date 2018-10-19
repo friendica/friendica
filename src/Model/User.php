@@ -450,7 +450,7 @@ class User
 				} catch (Exception $e) {
 					throw new Exception(L10n::t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . EOL . EOL . L10n::t('The error message was:') . $e->getMessage(), 0, $e);
 				}
-				$a->redirect($authurl);
+				System::externalRedirect($authurl);
 				// NOTREACHED
 			}
 
@@ -809,7 +809,7 @@ class User
 		if ($uid == local_user()) {
 			unset($_SESSION['authenticated']);
 			unset($_SESSION['uid']);
-			$a->redirect();
+			$a->internalRedirect();
 		}
 	}
 }

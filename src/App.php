@@ -1987,20 +1987,21 @@ class App
 	}
 
 	/**
-	 * Redirects to another URL and exits this process.
+	 * Redirects to another service relative to the current Friendica base.
+	 * If you want to redirect to a external URL, use System::externalRedirectTo()
 	 *
 	 * @param string $toUrl The destination URL (Default is empty, which is the default page of the Friendica node)
 	 * @param bool $ssl if true, base URL will try to get called with https:// (works just for relative paths)
+	 *
+	 * @throws InternalServerErrorException In Case the given URL is not relative to the Friendica node
 	 */
-	public function redirect($toUrl = '', $ssl = false)
+	public function internalRedirect($toUrl = '', $ssl = false)
 	{
-		if (strstr(normalise_link($toUrl), 'http://')) {
-			$redirectTo = $toUrl;
-		} else {
-			$redirectTo = self::getApp()->getBaseURL($ssl) . '/' . ltrim($toUrl, '/');
+		if (filter_var($toUrl, FILTER_VALIDATE_URL)) {
+			throw new InternalServerErrorException('URL is not a relative path, please use System::externalRedirectTo');
 		}
 
-		header("Location: $redirectTo");
-		exit();
+		$redirectTo = $this->getBaseURL($ssl) . '/' . ltrim($toUrl, '/');
+		System::externalRedirect($redirectTo);
 	}
 }

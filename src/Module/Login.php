@@ -40,7 +40,7 @@ class Login extends BaseModule
 		}
 
 		if (local_user()) {
-			$a->redirect();
+			$a->internalRedirect();
 		}
 
 		return self::form($_SESSION['return_url'], intval(Config::get('config', 'register_policy')) !== REGISTER_CLOSED);
@@ -89,19 +89,18 @@ class Login extends BaseModule
 		// if it's an email address or doesn't resolve to a URL, fail.
 		if ($noid || strpos($openid_url, '@') || !Network::isUrlValid($openid_url)) {
 			notice(L10n::t('Login failed.') . EOL);
-			$a->redirect();
+			$a->internalRedirect();
 			// NOTREACHED
 		}
 
 		// Otherwise it's probably an openid.
 		try {
-			$a = get_app();
 			$openid = new LightOpenID($a->getHostName());
 			$openid->identity = $openid_url;
 			$_SESSION['openid'] = $openid_url;
 			$_SESSION['remember'] = $remember;
-			$openid->returnUrl = self::getApp()->getBaseURL(true) . '/openid';
-			$a->redirect($openid->authUrl());
+			$openid->returnUrl = $a->getBaseURL(true) . '/openid';
+			System::externalRedirect($openid->authUrl());
 		} catch (Exception $e) {
 			notice(L10n::t('We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID.') . '<br /><br >' . L10n::t('The error message was:') . ' ' . $e->getMessage());
 		}
@@ -149,7 +148,7 @@ class Login extends BaseModule
 		} catch (Exception $e) {
 			logger('authenticate: failed login attempt: ' . notags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
 			info('Login failed. Please check your credentials.' . EOL);
-			$a->redirect();
+			$a->internalRedirect();
 		}
 
 		if (!$remember) {
@@ -168,7 +167,7 @@ class Login extends BaseModule
 			$return_url = '';
 		}
 
-		$a->redirect($return_url);
+		$a->internalRedirect($return_url);
 	}
 
 	/**
@@ -198,7 +197,7 @@ class Login extends BaseModule
 					if ($data->hash != Authentication::getCookieHashForUser($user)) {
 						logger("Hash for user " . $data->uid . " doesn't fit.");
 						Authentication::deleteSession();
-						$a->redirect();
+						$a->internalRedirect();
 					}
 
 					// Renew the cookie
@@ -235,7 +234,7 @@ class Login extends BaseModule
 					logger('Session address changed. Paranoid setting in effect, blocking session. ' .
 						$_SESSION['addr'] . ' != ' . $_SERVER['REMOTE_ADDR']);
 					Authentication::deleteSession();
-					$a->redirect();
+					$a->internalRedirect();
 				}
 
 				$user = DBA::selectFirst('user', [],
@@ -249,7 +248,7 @@ class Login extends BaseModule
 				);
 				if (!DBA::isResult($user)) {
 					Authentication::deleteSession();
-					$a->redirect();
+					$a->internalRedirect();
 				}
 
 				// Make sure to refresh the last login time for the user if the user

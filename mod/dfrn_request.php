@@ -62,7 +62,7 @@ function dfrn_request_post(App $a)
 	}
 
 	if (x($_POST, 'cancel')) {
-		$a->redirect();
+		$a->internalRedirect();
 	}
 
 	/*
@@ -188,14 +188,14 @@ function dfrn_request_post(App $a)
 				}
 
 				// (ignore reply, nothing we can do it failed)
-				$a->redirect($forwardurl);
+				$a->internalRedirect($forwardurl);
 				return; // NOTREACHED
 			}
 		}
 
 		// invalid/bogus request
 		notice(L10n::t('Unrecoverable protocol error.') . EOL);
-		$a->redirect();
+		$a->internalRedirect();
 		return; // NOTREACHED
 	}
 
@@ -331,19 +331,19 @@ function dfrn_request_post(App $a)
 				$url = Network::isUrlValid($url);
 				if (!$url) {
 					notice(L10n::t('Invalid profile URL.') . EOL);
-					$a->redirect($a->cmd);
+					$a->internalRedirect($a->cmd);
 					return; // NOTREACHED
 				}
 
 				if (!Network::isUrlAllowed($url)) {
 					notice(L10n::t('Disallowed profile URL.') . EOL);
-					$a->redirect($a->cmd);
+					$a->internalRedirect($a->cmd);
 					return; // NOTREACHED
 				}
 
 				if (Network::isUrlBlocked($url)) {
 					notice(L10n::t('Blocked domain') . EOL);
-					$a->redirect($a->cmd);
+					$a->internalRedirect($a->cmd);
 					return; // NOTREACHED
 				}
 
@@ -351,7 +351,7 @@ function dfrn_request_post(App $a)
 
 				if (!count($parms)) {
 					notice(L10n::t('Profile location is not valid or does not contain profile information.') . EOL);
-					$a->redirect($a->cmd);
+					$a->internalRedirect($a->cmd);
 				} else {
 					if (!x($parms, 'fn')) {
 						notice(L10n::t('Warning: profile location has no identifiable owner name.') . EOL);
@@ -433,10 +433,10 @@ function dfrn_request_post(App $a)
 			}
 
 			// "Homecoming" - send the requestor back to their site to record the introduction.
-			$dfrn_url = bin2hex(System::baseUrl() . '/profile/' . $nickname);
+			$dfrn_url = bin2hex($a->getBaseURL() . '/profile/' . $nickname);
 			$aes_allow = ((function_exists('openssl_encrypt')) ? 1 : 0);
 
-			$a->redirect($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
+			System::externalRedirect($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION
 				. '&confirm_key=' . $hash
 				. (($aes_allow) ? "&aes_allow=1" : "")
@@ -463,7 +463,7 @@ function dfrn_request_post(App $a)
 			}
 
 			$url = str_replace('{uri}', $uri, $url);
-			$a->redirect($url);
+			System::externalRedirect($url);
 			// NOTREACHED
 			// END $network != Protocol::PHANTOM
 		} else {

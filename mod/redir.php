@@ -27,7 +27,7 @@ function redir_init(App $a) {
 		$contact = DBA::selectFirst('contact', $fields, ['id' => $cid, 'uid' => [0, local_user()]]);
 		if (!DBA::isResult($contact)) {
 			notice(L10n::t('Contact not found.'));
-			$a->redirect();
+			$a->internalRedirect();
 		}
 
 		$contact_url = $contact['url'];
@@ -36,7 +36,7 @@ function redir_init(App $a) {
 			|| (!local_user() && !remote_user()) // Visitors (not logged in or not remotes) can't authenticate.
 			|| (!empty($a->contact['id']) && $a->contact['id'] == $cid)) // Local user is already authenticated.
 		{
-			$a->redirect($url != '' ? $url : $contact_url);
+			System::externalRedirect($url != '' ? $url : $contact_url);
 		}
 
 		if ($contact['uid'] == 0 && local_user()) {
@@ -52,12 +52,12 @@ function redir_init(App $a) {
 				// Local user is already authenticated.
 				$target_url = $url != '' ? $url : $contact_url;
 				logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
-				$a->redirect($target_url);
+				System::externalRedirect($target_url);
 			}
 		}
 
 		if (remote_user()) {
-			$host = substr(System::baseUrl() . ($a->getURLPath() ? '/' . $a->getURLPath() : ''), strpos(System::baseUrl(), '://') + 3);
+			$host = substr($a->getBaseURL() . ($a->getURLPath() ? '/' . $a->getURLPath() : ''), strpos($a->getBaseURL(), '://') + 3);
 			$remotehost = substr($contact['addr'], strpos($contact['addr'], '@') + 1);
 
 			// On a local instance we have to check if the local user has already authenticated
@@ -73,7 +73,7 @@ function redir_init(App $a) {
 						// Remote user is already authenticated.
 						$target_url = $url != '' ? $url : $contact_url;
 						logger($contact['name'] . " is already authenticated. Redirecting to " . $target_url, LOGGER_DEBUG);
-						$a->redirect($target_url);
+						System::externalRedirect($target_url);
 					}
 				}
 			}
@@ -102,7 +102,7 @@ function redir_init(App $a) {
 
 			$dest = (!empty($url) ? '&destination_url=' . $url : '');
 
-			$a->redirect($contact['poll'] . '?dfrn_id=' . $dfrn_id
+			System::externalRedirect($contact['poll'] . '?dfrn_id=' . $dfrn_id
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest . $quiet);
 		}
 
@@ -121,9 +121,9 @@ function redir_init(App $a) {
 		}
 
 		logger('redirecting to ' . $url, LOGGER_DEBUG);
-		$a->redirect($url);
+		$a->internalRedirect($url);
 	}
 
 	notice(L10n::t('Contact not found.'));
-	$a->redirect();
+	$a->internalRedirect();
 }

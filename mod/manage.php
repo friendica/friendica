@@ -119,7 +119,7 @@ function manage_post(App $a) {
 	$ret = [];
 	Addon::callHooks('home_init',$ret);
 
-	$a->redirect('profile/' . $a->user['nickname'] );
+	$a->internalRedirect('profile/' . $a->user['nickname'] );
 	// NOTREACHED
 }
 

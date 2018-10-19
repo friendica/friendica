@@ -27,6 +27,6 @@ class Logout extends BaseModule
 		Addon::callHooks("logging_out");
 		Authentication::deleteSession();
 		info(L10n::t('Logged out.') . EOL);
-		self::getApp()->redirect();
+		self::getApp()->internalRedirect();
 	}
 }

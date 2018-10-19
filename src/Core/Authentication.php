@@ -194,7 +194,7 @@ class Authentication extends BaseObject
 			Addon::callHooks('logged_in', $a->user);
 
 			if (($a->module !== 'home') && isset($_SESSION['return_url'])) {
-				goaway($a->getbaseUrl() . '/' . $_SESSION['return_url']);
+				$a->internalRedirect($_SESSION['return_url']);
 			}
 		}
 	}

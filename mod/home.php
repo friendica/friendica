@@ -16,11 +16,11 @@ function home_init(App $a) {
 	Addon::callHooks('home_init',$ret);
 
 	if (local_user() && ($a->user['nickname'])) {
-		$a->redirect('network');
+		$a->internalRedirect('network');
 	}
 
 	if (strlen(Config::get('system','singleuser'))) {
-		$a->redirect('profile/' . Config::get('system','singleuser'));
+		$a->internalRedirect('profile/' . Config::get('system','singleuser'));
 	}
 
 }}

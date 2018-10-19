@@ -160,7 +160,7 @@ function settings_post(App $a)
 
 		$key = $_POST['remove'];
 		DBA::delete('tokens', ['id' => $key, 'uid' => local_user()]);
-		$a->redirect('settings/oauth/', true);
+		$a->internalRedirect('settings/oauth/', true);
 		return;
 	}
 
@@ -206,7 +206,7 @@ function settings_post(App $a)
 				);
 			}
 		}
-		$a->redirect('settings/oauth/', true);
+		$a->internalRedirect('settings/oauth/', true);
 		return;
 	}
 
@@ -371,7 +371,7 @@ function settings_post(App $a)
 		);
 
 		Addon::callHooks('display_settings_post', $_POST);
-		$a->redirect('settings/display');
+		$a->internalRedirect('settings/display');
 		return; // NOTREACHED
 	}
 
@@ -380,7 +380,7 @@ function settings_post(App $a)
 	if (x($_POST,'resend_relocate')) {
 		Worker::add(PRIORITY_HIGH, 'Notifier', 'relocate', local_user());
 		info(L10n::t("Relocate message has been send to your contacts"));
-		$a->redirect('settings');
+		$a->internalRedirect('settings');
 	}
 
 	Addon::callHooks('settings_post', $_POST);
@@ -649,7 +649,7 @@ function settings_post(App $a)
 	// Update the global contact for the user
 	GContact::updateForUser(local_user());
 
-	$a->redirect('settings');
+	$a->internalRedirect('settings');
 	return; // NOTREACHED
 }
 
@@ -716,7 +716,7 @@ function settings_content(App $a)
 			BaseModule::checkFormSecurityTokenRedirectOnError('/settings/oauth', 'settings_oauth', 't');
 
 			DBA::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
-			$a->redirect('settings/oauth/', true);
+			$a->internalRedirect('settings/oauth/', true);
 			return;
 		}
 
@@ -795,7 +795,7 @@ function settings_content(App $a)
 		$legacy_contact            = PConfig::get(local_user(), 'ostatus', 'legacy_contact');
 
 		if (x($legacy_contact)) {
-			/// @todo Isn't it supposed to be a $a->redirect() call?
+			/// @todo Isn't it supposed to be a $a->internalRedirect() call?
 			$a->page['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . System::baseUrl().'/ostatus_subscribe?url=' . urlencode($legacy_contact) . '">';
 		}
 

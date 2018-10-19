@@ -196,7 +196,7 @@ function photos_post(App $a)
 		$album = hex2bin($a->argv[3]);
 
 		if ($album === L10n::t('Profile Photos') || $album === 'Contact Photos' || $album === L10n::t('Contact Photos')) {
-			$a->redirect($_SESSION['photo_return']);
+			$a->internalRedirect($_SESSION['photo_return']);
 			return; // NOTREACHED
 		}
 
@@ -207,13 +207,13 @@ function photos_post(App $a)
 
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Album not found.') . EOL);
-			$a->redirect($_SESSION['photo_return']);
+			$a->internalRedirect($_SESSION['photo_return']);
 			return; // NOTREACHED
 		}
 
 		// Check if the user has responded to a delete confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			$a->redirect($_SESSION['photo_return']);
+			$a->internalRedirect($_SESSION['photo_return']);
 		}
 
 		// RENAME photo album
@@ -227,7 +227,7 @@ function photos_post(App $a)
 			// Update the photo albums cache
 			Photo::clearAlbumCache($page_owner_uid);
 
-			$a->redirect('photos/' . $a->user['nickname'] . '/album/' . bin2hex($newalbum));
+			$a->internalRedirect('photos/' . $a->user['nickname'] . '/album/' . bin2hex($newalbum));
 			return; // NOTREACHED
 		}
 
@@ -280,7 +280,7 @@ function photos_post(App $a)
 					$res[] = "'" . DBA::escape($rr['rid']) . "'" ;
 				}
 			} else {
-				$a->redirect($_SESSION['photo_return']);
+				$a->internalRedirect($_SESSION['photo_return']);
 				return; // NOTREACHED
 			}
 
@@ -298,14 +298,14 @@ function photos_post(App $a)
 			Photo::clearAlbumCache($page_owner_uid);
 		}
 
-		$a->redirect('photos/' . $a->data['user']['nickname']);
+		$a->internalRedirect('photos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
 
 	// Check if the user has responded to a delete confirmation query for a single photo
 	if ($a->argc > 2 && !empty($_REQUEST['canceled'])) {
-		$a->redirect($_SESSION['photo_return']);
+		$a->internalRedirect($_SESSION['photo_return']);
 	}
 
 	if ($a->argc > 2 && defaults($_POST, 'delete', '') === L10n::t('Delete Photo')) {
@@ -355,7 +355,7 @@ function photos_post(App $a)
 			Photo::clearAlbumCache($page_owner_uid);
 		}
 
-		$a->redirect('photos/' . $a->data['user']['nickname']);
+		$a->internalRedirect('photos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
@@ -697,7 +697,7 @@ function photos_post(App $a)
 				}
 			}
 		}
-		$a->redirect($_SESSION['photo_return']);
+		$a->internalRedirect($_SESSION['photo_return']);
 		return; // NOTREACHED
 	}
 
@@ -928,7 +928,7 @@ function photos_post(App $a)
 	// addon uploaders should call "killme()" [e.g. exit] within the photo_post_end hook
 	// if they do not wish to be redirected
 
-	$a->redirect($_SESSION['photo_return']);
+	$a->internalRedirect($_SESSION['photo_return']);
 	// NOTREACHED
 }
 

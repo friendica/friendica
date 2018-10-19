@@ -62,7 +62,7 @@ function delegate_content(App $a)
 	if ($a->argc > 2 && $a->argv[1] === 'add' && intval($a->argv[2])) {
 		// delegated admins can view but not change delegation permissions
 		if (x($_SESSION, 'submanage')) {
-			$a->redirect('delegate');
+			$a->internalRedirect('delegate');
 		}
 
 		$user_id = $a->argv[2];
@@ -77,17 +77,17 @@ function delegate_content(App $a)
 				DBA::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
 			}
 		}
-		$a->redirect('delegate');
+		$a->internalRedirect('delegate');
 	}
 
 	if ($a->argc > 2 && $a->argv[1] === 'remove' && intval($a->argv[2])) {
 		// delegated admins can view but not change delegation permissions
 		if (x($_SESSION, 'submanage')) {
-			$a->redirect('delegate');
+			$a->internalRedirect('delegate');
 		}
 
 		DBA::delete('manage', ['uid' => $a->argv[2], 'mid' => local_user()]);
-		$a->redirect('delegate');
+		$a->internalRedirect('delegate');
 	}
 
 	// find everybody that currently has delegated management to this account/page

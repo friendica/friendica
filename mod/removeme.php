@@ -64,7 +64,7 @@ function removeme_post(App $a)
 function removeme_content(App $a)
 {
 	if (!local_user()) {
-		$a->redirect();
+		$a->internalRedirect();
 	}
 
 	$hash = random_string();

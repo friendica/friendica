@@ -90,7 +90,7 @@ function dfrn_poll_init(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				$a->redirect();
+				$a->internalRedirect();
 				break; // NOTREACHED
 		}
 
@@ -109,7 +109,7 @@ function dfrn_poll_init(App $a)
 			if (strlen($s)) {
 				$xml = XML::parseString($s);
 
-				if ((int) $xml->status === 1) {
+				if ((int)$xml->status === 1) {
 					$_SESSION['authenticated'] = 1;
 					if (!x($_SESSION, 'remote')) {
 						$_SESSION['remote'] = [];
@@ -135,10 +135,15 @@ function dfrn_poll_init(App $a)
 					);
 				}
 			}
-			$profile = $r[0]['nickname'];
-			$a->redirect((strlen($destination_url)) ? $destination_url : 'profile/' . $profile);
+
+			$profile = (count($r) > 0 && isset($r[0]['nickname']) ? $r[0]['nickname'] : '');
+			if (!empty($destination_url)) {
+				System::externalRedirect($destination_url);
+			} else {
+				$a->internalRedirect('profile/' . $profile);
+			}
 		}
-		$a->redirect();
+		$a->internalRedirect();
 	}
 
 	if ($type === 'profile-check' && $dfrn_version < 2.2) {
@@ -325,7 +330,7 @@ function dfrn_poll_post(App $a)
 			$my_id = '0:' . $dfrn_id;
 			break;
 		default:
-			$a->redirect();
+			$a->internalRedirect();
 			break; // NOTREACHED
 	}
 
@@ -446,7 +451,7 @@ function dfrn_poll_content(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				$a->redirect();
+				$a->internalRedirect();
 				break; // NOTREACHED
 		}
 
@@ -505,25 +510,6 @@ function dfrn_poll_content(App $a)
 				])->getBody();
 			}
 
-			$profile = ((DBA::isResult($r) && $r[0]['nickname']) ? $r[0]['nickname'] : $nickname);
-
-			switch ($destination_url) {
-				case 'profile':
-					$dest = 'profile/' . $profile . '?f=&tab=profile';
-					break;
-				case 'photos':
-					$dest = 'photos/' . $profile;
-					break;
-				case 'status':
-				case '':
-					$dest = 'profile/' . $profile;
-					break;
-				default:
-					$appendix = (strstr($destination_url, '?') ? '&f=&redir=1' : '?f=&redir=1');
-					$dest = $destination_url . $appendix;
-					break;
-			}
-
 			logger("dfrn_poll: sec profile: " . $s, LOGGER_DATA);
 
 			if (strlen($s) && strstr($s, '<?xml')) {
@@ -557,10 +543,26 @@ function dfrn_poll_content(App $a)
 						DBA::escape($session_id)
 					);
 				}
-
-				$a->redirect($dest);
 			}
-			$a->redirect($dest);
+
+			$profile = ((DBA::isResult($r) && $r[0]['nickname']) ? $r[0]['nickname'] : $nickname);
+
+			switch ($destination_url) {
+				case 'profile':
+					$a->internalRedirect('profile/' . $profile . '?f=&tab=profile';
+					break;
+				case 'photos':
+					$a->internalRedirect('photos/' . $profile;
+					break;
+				case 'status':
+				case '':
+					$a->internalRedirect('profile/' . $profile;
+					break;
+				default:
+					$appendix = (strstr($destination_url, '?') ? '&f=&redir=1' : '?f=&redir=1');
+					System::externalRedirect($destination_url . $appendix);
+					break;
+			}
 			// NOTREACHED
 		} else {
 			// XML reply

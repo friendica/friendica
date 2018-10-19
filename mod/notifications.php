@@ -17,7 +17,7 @@ use Friendica\Module\Login;
 function notifications_post(App $a)
 {
 	if (!local_user()) {
-		$a->redirect();
+		$a->internalRedirect();
 	}
 
 	$request_id = (($a->argc > 1) ? $a->argv[1] : 0);
@@ -52,12 +52,12 @@ function notifications_post(App $a)
 					'self' => false, 'blocked' => true, 'pending' => true];
 				DBA::delete('contact', $condition);
 			}
-			$a->redirect('notifications/intros');
+			$a->internalRedirect('notifications/intros');
 		}
 
 		if ($_POST['submit'] == L10n::t('Ignore')) {
 			DBA::update('intro', ['ignore' => true], ['id' => $intro_id]);
-			$a->redirect('notifications/intros');
+			$a->internalRedirect('notifications/intros');
 		}
 	}
 }

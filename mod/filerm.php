@@ -25,7 +25,7 @@ function filerm_content(App $a) {
 		file_tag_unsave_file(local_user(),$item_id,$term, $category);
 	}
 
-	//$a->redirect('network');
+	//$a->internalRedirect('network');
 
 	killme();
 }

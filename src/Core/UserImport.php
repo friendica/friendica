@@ -272,6 +272,6 @@ class UserImport
 		Worker::add(PRIORITY_HIGH, 'Notifier', 'relocate', $newuid);
 
 		info(L10n::t("Done. You can now login with your username and password"));
-		$a->redirect('login');
+		$a->internalRedirect('login');
 	}
 }

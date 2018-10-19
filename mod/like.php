@@ -45,7 +45,7 @@ function like_content_return(App $a, $return_path) {
 			$rand = "?$rand";
 		}
 
-		$a->redirect($return_path . $rand);
+		$a->internalRedirect($return_path . $rand);
 	}
 
 	killme();

@@ -4,6 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Network\Probe;
+use Friendica\Core\System;
 
 /**
  * Redirects to another URL based on the parameter 'addr'
@@ -18,7 +19,7 @@ class Acctlink extends BaseModule
 			$url = defaults(Probe::uri(trim($addr)), 'url', false);
 
 			if ($url) {
-				self::getApp()->redirect($url);
+				System::externalRedirect($url);
 				exit();
 			}
 		}

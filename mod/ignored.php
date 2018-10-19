@@ -43,7 +43,7 @@ function ignored_init(App $a)
 			$rand = "?$rand";
 		}
 
-		$a->redirect($return_path . $rand);
+		$a->internalRedirect($return_path . $rand);
 	}
 
 	// the json doesn't really matter, it will either be 0 or 1

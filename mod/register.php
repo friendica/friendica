@@ -100,7 +100,7 @@ function register_post(App $a)
 
 			if ($res) {
 				info(L10n::t('Registration successful. Please check your email for further instructions.') . EOL);
-				$a->redirect();
+				$a->internalRedirect();
 			} else {
 				notice(
 					L10n::t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
@@ -111,12 +111,12 @@ function register_post(App $a)
 			}
 		} else {
 			info(L10n::t('Registration successful.') . EOL);
-			$a->redirect();
+			$a->internalRedirect();
 		}
 	} elseif (intval(Config::get('config', 'register_policy')) === REGISTER_APPROVE) {
 		if (!strlen(Config::get('config', 'admin_email'))) {
 			notice(L10n::t('Your registration can not be processed.') . EOL);
-			$a->redirect();
+			$a->internalRedirect();
 		}
 
 		Model\Register::createForApproval($user['uid'], Config::get('system', 'language'), $_POST['permonlybox']);
@@ -159,7 +159,7 @@ function register_post(App $a)
 		);
 
 		info(L10n::t('Your registration is pending approval by the site owner.') . EOL);
-		$a->redirect();
+		$a->internalRedirect();
 	}
 
 	return;

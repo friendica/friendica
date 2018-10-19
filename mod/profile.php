@@ -34,7 +34,7 @@ function profile_init(App $a)
 	} else {
 		$r = q("SELECT `nickname` FROM `user` WHERE `blocked` = 0 AND `account_expired` = 0 AND `account_removed` = 0 AND `verified` = 1 ORDER BY RAND() LIMIT 1");
 		if (DBA::isResult($r)) {
-			$a->redirect('profile/' . $r[0]['nickname']);
+			$a->internalRedirect('profile/' . $r[0]['nickname']);
 		} else {
 			logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
 			notice(L10n::t('Requested profile is not available.') . EOL);

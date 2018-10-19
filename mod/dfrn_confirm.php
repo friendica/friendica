@@ -400,7 +400,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// Let's send our user to the contact editor in case they want to
 		// do anything special with this new friend.
 		if ($handsfree === null) {
-			$a->redirect('contact/' . intval($contact_id));
+			$a->internalRedirect('contact/' . intval($contact_id));
 		} else {
 			return;
 		}
@@ -620,6 +620,6 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 	}
 
 	// somebody arrived here by mistake or they are fishing. Send them to the homepage.
-	$a->redirect();
+	$a->internalRedirect();
 	// NOTREACHED
 }

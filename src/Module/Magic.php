@@ -42,7 +42,7 @@ class Magic extends BaseModule
 
 		if (!$cid) {
 			logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
-			$a->redirect($dest);
+			$a->internalRedirect($dest);
 		}
 
 		$contact = DBA::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
@@ -56,7 +56,7 @@ class Magic extends BaseModule
 			}
 
 			logger('Contact is already authenticated', LOGGER_DEBUG);
-			$a->redirect($dest);
+			$a->internalRedirect($dest);
 		}
 
 		if (local_user()) {
@@ -100,10 +100,10 @@ class Magic extends BaseModule
 						$x = strpbrk($dest, '?&');
 						$args = (($x) ? '&owt=' . $token : '?f=&owt=' . $token);
 
-						$a->redirect($dest . $args);
+						$a->internalRedirect($dest . $args);
 					}
 				}
-				$a->redirect($dest);
+				$a->internalRedirect($dest);
 			}
 		}
 
@@ -112,6 +112,6 @@ class Magic extends BaseModule
 			return $ret;
 		}
 
-		$a->redirect($dest);
+		$a->internalRedirect($dest);
 	}
 }

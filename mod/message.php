@@ -87,7 +87,7 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-		$a->redirect($a->cmd . '/' . $ret);
+		$a->internalRedirect($a->cmd . '/' . $ret);
 	}
 }
 
@@ -155,7 +155,7 @@ function message_content(App $a)
 
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			$a->redirect('message');
+			$a->internalRedirect('message');
 		}
 
 		$cmd = $a->argv[1];
@@ -163,7 +163,7 @@ function message_content(App $a)
 			$message = DBA::selectFirst('mail', ['convid'], ['id' => $a->argv[2], 'uid' => local_user()]);
 			if(!DBA::isResult($message)){
 				info(L10n::t('Conversation not found.') . EOL);
-				$a->redirect('message');
+				$a->internalRedirect('message');
 			}
 
 			if (DBA::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
@@ -173,10 +173,10 @@ function message_content(App $a)
 			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => local_user()]);
 			if(!DBA::isResult($conversation)){
 				info(L10n::t('Conversation removed.') . EOL);
-				$a->redirect('message');
+				$a->internalRedirect('message');
 			}
 
-			$a->redirect('message/' . $conversation['id'] );
+			$a->internalRedirect('message/' . $conversation['id'] );
 		} else {
 			$r = q("SELECT `parent-uri`,`convid` FROM `mail` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
@@ -190,7 +190,7 @@ function message_content(App $a)
 					info(L10n::t('Conversation removed.') . EOL);
 				}
 			}
-			$a->redirect('message');
+			$a->internalRedirect('message');
 		}
 	}
 

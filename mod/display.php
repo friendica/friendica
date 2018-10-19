@@ -79,7 +79,7 @@ function display_init(App $a)
 	}
 
 	if (ActivityPub::isRequest()) {
-		$a->redirect(str_replace('display/', 'objects/', $a->query_string));
+		$a->internalRedirect(str_replace('display/', 'objects/', $a->query_string));
 	}
 
 	if ($item["id"] != $item["parent"]) {

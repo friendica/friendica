@@ -5,6 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\XML;
 
 /**
@@ -234,6 +235,23 @@ class System extends BaseObject
 		}
 
 		return max($load_arr[0], $load_arr[1]);
+	}
+
+	/**
+	 * Redirects to an external URL (fully qualified URL)
+	 * If you want to route relative to the current Friendica base, use App->internalRedirect()
+	 *
+	 * @param string $url The new Location to redirect
+	 * @throws InternalServerErrorException If the URL is not fully qualified
+	 */
+	public static function externalRedirect($url)
+	{
+		if (!filter_var($url, FILTER_VALIDATE_URL)) {
+			throw new InternalServerErrorException('URL is not a fully qualified URL, please use App->internalRedirect() instead');
+		}
+
+		header("Location: $url");
+		exit();
 	}
 
 	/// @todo Move the following functions from boot.php

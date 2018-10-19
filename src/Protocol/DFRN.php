@@ -3037,7 +3037,7 @@ class DFRN
 
 			logger('auto_redir: ' . $r[0]['name'] . ' ' . $sec, LOGGER_DEBUG);
 			$dest = (($url) ? '&destination_url=' . $url : '');
-			$a->redirect($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
+			System::externalRedirect($r[0]['poll'] . '?dfrn_id=' . $dfrn_id
 				. '&dfrn_version=' . DFRN_PROTOCOL_VERSION . '&type=profile&sec=' . $sec . $dest);
 		}
 

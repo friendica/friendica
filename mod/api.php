@@ -77,7 +77,7 @@ function api_content(App $a)
 				if (strstr($consumer->callback_url, $glue)) {
 					$glue = "?";
 				}
-				$a->redirect($consumer->callback_url . $glue . 'oauth_token=' . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . '&oauth_verifier=' . OAuthUtil::urlencode_rfc3986($verifier));
+				$a->internalRedirect($consumer->callback_url . $glue . 'oauth_token=' . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . '&oauth_verifier=' . OAuthUtil::urlencode_rfc3986($verifier));
 				killme();
 			}
 

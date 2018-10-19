@@ -115,7 +115,7 @@ function item_post(App $a) {
 		if (!DBA::isResult($parent_item)) {
 			notice(L10n::t('Unable to locate original post.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				$a->redirect($return_path);
+				$a->internalRedirect($return_path);
 			}
 			killme();
 		}
@@ -165,7 +165,7 @@ function item_post(App $a) {
 		notice(L10n::t('Permission denied.') . EOL) ;
 
 		if (!empty($_REQUEST['return'])) {
-			$a->redirect($return_path);
+			$a->internalRedirect($return_path);
 		}
 
 		killme();
@@ -283,7 +283,7 @@ function item_post(App $a) {
 			}
 			info(L10n::t('Empty post discarded.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				$a->redirect($return_path);
+				$a->internalRedirect($return_path);
 			}
 			killme();
 		}
@@ -678,7 +678,7 @@ function item_post(App $a) {
 	if (!empty($datarray['cancel'])) {
 		logger('mod_item: post cancelled by addon.');
 		if ($return_path) {
-			$a->redirect($return_path);
+			$a->internalRedirect($return_path);
 		}
 
 		$json = ['cancel' => 1];
@@ -714,7 +714,7 @@ function item_post(App $a) {
 
 		if (!empty($_REQUEST['return']) && strlen($return_path)) {
 			logger('return: ' . $return_path);
-			$a->redirect($return_path);
+			$a->internalRedirect($return_path);
 		}
 		killme();
 	} else {
@@ -729,14 +729,14 @@ function item_post(App $a) {
 
 	if (!$post_id) {
 		logger("Item wasn't stored.");
-		$a->redirect($return_path);
+		$a->internalRedirect($return_path);
 	}
 
 	$datarray = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 
 	if (!DBA::isResult($datarray)) {
 		logger("Item with id ".$post_id." couldn't be fetched.");
-		$a->redirect($return_path);
+		$a->internalRedirect($return_path);
 	}
 
 	// update filetags in pconfig
@@ -851,7 +851,7 @@ function item_post_return($baseurl, $api_source, $return_path)
 	}
 
 	if ($return_path) {
-		$a->redirect($return_path);
+		$a->internalRedirect($return_path);
 	}
 
 	$json = ['success' => 1];

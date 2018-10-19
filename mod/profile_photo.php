@@ -74,7 +74,7 @@ function profile_photo_post(App $a)
 		$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = %d LIMIT 1", DBA::escape($image_id),
 			DBA::escape(local_user()), intval($scale));
 
-		$url = System::baseUrl() . '/profile/' . $a->user['nickname'];
+		$url = 'profile/' . $a->user['nickname'];
 		if (DBA::isResult($r)) {
 			$base_image = $r[0];
 
@@ -135,7 +135,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		$a->redirect($url);
+		$a->internalRedirect($url);
 		return; // NOTREACHED
 	}
 
@@ -168,7 +168,7 @@ function profile_photo_post(App $a)
 	@unlink($src);
 
 	$imagecrop = profile_photo_crop_ui_head($a, $ph);
-	$a->redirect('profile_photo/use/' . $imagecrop['hash']);
+	$a->internalRedirect('profile_photo/use/' . $imagecrop['hash']);
 }
 
 function profile_photo_content(App $a)
@@ -225,7 +225,7 @@ function profile_photo_content(App $a)
 				Worker::add(PRIORITY_LOW, "Directory", $url);
 			}
 
-			$a->redirect('profile/' . $a->user['nickname']);
+			$a->internalRedirect('profile/' . $a->user['nickname']);
 			return; // NOTREACHED
 		}
 		$ph = new Image($r[0]['data'], $r[0]['type']);

@@ -1062,7 +1062,7 @@ class Profile
 			$serverret = Network::curl($basepath . '/magic');
 			if ($serverret->isSuccess()) {
 				logger('Doing magic auth for visitor ' . $my_url . ' to ' . $magic_path, LOGGER_DEBUG);
-				$a->redirect($magic_path);
+				System::externalRedirect($magic_path);
 			}
 		}
 	}

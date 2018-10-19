@@ -108,7 +108,7 @@ function events_post(App $a)
 			echo L10n::t('Event can not end before it has started.');
 			killme();
 		}
-		$a->redirect($onerror_url);
+		$a->internalRedirect($onerror_url);
 	}
 
 	if (!$summary || ($start === NULL_DATE)) {
@@ -117,7 +117,7 @@ function events_post(App $a)
 			echo L10n::t('Event title and start time are required.');
 			killme();
 		}
-		$a->redirect($onerror_url);
+		$a->internalRedirect($onerror_url);
 	}
 
 	$share = intval(defaults($_POST, 'share', 0));
@@ -187,7 +187,7 @@ function events_post(App $a)
 		Worker::add(PRIORITY_HIGH, "Notifier", "event", $item_id);
 	}
 
-	$a->redirect('events');
+	$a->internalRedirect('events');
 }
 
 function events_content(App $a)
@@ -577,6 +577,6 @@ function events_content(App $a)
 			info(L10n::t('Event removed') . EOL);
 		}
 
-		$a->redirect('events');
+		$a->internalRedirect('events');
 	}
 }
