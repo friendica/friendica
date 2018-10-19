@@ -92,7 +92,7 @@ function parse_url_content(App $a)
 		}
 	}
 
-	if(!empty($_GET['isComment'])) {
+	if (!empty($_GET['isComment'])) {
 		echo $br . '[url]' . $url . '[/url]';
 		exit();
 	}

@@ -14,7 +14,7 @@
 		<input type="hidden" name="post_id_random" value="{{$rand_num}}" />
 
 		<div class="bb form-group">
-			<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text-empty form-control text-autosize" name="body" placeholder="{{$comment}}" onFocus="commentOpenUI(this,{{$id}});"></textarea>
+			<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text-empty form-control text-autosize" name="body" placeholder="{{$comment}}" onFocus="commentOpenUI(this,{{$id}});" onpaste="getPasteLinks(event, {{$id}})" onInput="handleLinks({{$id}})"></textarea>
 		</div>
 		{{if $qcomment}}
 			<select id="qcomment-select-{{$id}}" name="qcomment-{{$id}}" class="qcomment" onchange="qCommentInsert(this,{{$id}});">

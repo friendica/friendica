@@ -2,15 +2,40 @@
  * @brief The file contains functions for text editing and commenting
  */
 
-function initComment(callback) {
-    if (typeof callback != "undefined") {
-        callback();
+var commentLink = "";
+var commentBefore = "";
+
+function getPasteLinks(event, id) {
+    if (!commentLink) {
+        commentLink = "";
     }
+    commentLink = event.clipboardData.getData('text/plain');
+    commentBefore = $("#comment-edit-text-" + id).val();
+    return false;
+}
+
+function handleLinks(id) {
+	var textfield = document.getElementById("comment-edit-text-" + id);
+
+	if (commentLink.includes("https://") | commentLink.includes("http://")) {
+        textfield.value = commentBefore;
+        var isAttachement = "";
+        if (commentBefore.includes("https://") || commentBefore.includes("http://")){
+        	isAttachement = "&isComment=1";
+		}
+		var link = bin2hex(commentLink);
+		$.get('parse_url?binurl=' + link + isAttachement, function (data) {
+			addcommenttext(data, id);
+		});
+	}
+
+	commentLink = "";
+	commentBefore = "";
 }
 
 function commentGetLink(id) {
     reply = prompt("Please enter a link URL:");
-    if(reply && reply.length) {
+    if (reply && reply.length) {
         reply = bin2hex(reply);
         $.get('parse_url?isComment=1&binurl=' + reply, function(data) {
             addcommenttext(data, id);
@@ -34,21 +59,19 @@ function commentlinkdrop(event, id) {
     var reply = event.dataTransfer.getData("text/uri-list");
     event.target.textContent = reply;
     event.preventDefault();
-    if(reply && reply.length) {
+    if (reply && reply.length) {
         reply = bin2hex(reply);
         $.get('parse_url?isComment=1&binurl=' + reply, function(data) {
-            if (!editor) $("comment-edit-text-" + id).val("");
-            initComment(function(){
-                addcommenttext(data, id);
-            });
+        	addcommenttext(data, id);
         });
     }
 }
 
 function commentlinkdropper(event) {
     var linkFound = event.dataTransfer.types.contains("text/uri-list");
-    if(linkFound)
+    if (linkFound) {
         event.preventDefault();
+    }
 }
 
 
