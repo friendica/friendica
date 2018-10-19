@@ -74,7 +74,7 @@ function profile_photo_post(App $a)
 		$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = %d LIMIT 1", DBA::escape($image_id),
 			DBA::escape(local_user()), intval($scale));
 
-		$url = 'profile/' . $a->user['nickname'];
+		$path = 'profile/' . $a->user['nickname'];
 		if (DBA::isResult($r)) {
 			$base_image = $r[0];
 
@@ -125,8 +125,8 @@ function profile_photo_post(App $a)
 
 				info(L10n::t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
-				if ($url && strlen(Config::get('system', 'directory'))) {
-					Worker::add(PRIORITY_LOW, "Directory", $url);
+				if ($path && strlen(Config::get('system', 'directory'))) {
+					Worker::add(PRIORITY_LOW, "Directory", $path);
 				}
 
 				Worker::add(PRIORITY_LOW, 'ProfileUpdate', local_user());
@@ -135,7 +135,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		$a->internalRedirect($url);
+		$a->internalRedirect($path);
 		return; // NOTREACHED
 	}
 
