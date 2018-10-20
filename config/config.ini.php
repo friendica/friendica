@@ -369,6 +369,18 @@ throttle_limit_month = 0
 ; For instance if your URL is 'http://example.com/directory/subdirectory', set urlpath to 'directory/subdirectory'.
 urlpath =
 
+; username_min_length (Integer)
+; The minimum character length a username can be.
+; This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
+; Minimum for this config value is 1. Maximum is 255;
+username_min_length = 3
+
+; username_max_length (Integer)
+; The maximum character length a username can be.
+; This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
+; Minimum for this config value is 1. Maximum is 255;
+username_max_length = 48
+
 ; worker_cooldown (Integer)
 ; Cooldown period in seconds after each worker function call.
 worker_cooldown = 0
