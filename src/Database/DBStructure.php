@@ -5,8 +5,8 @@
 namespace Friendica\Database;
 
 use Exception;
-use Friendica\Core\Hook;
 use Friendica\Core\Config;
+use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Util\DateTimeFormat;
 
@@ -830,6 +830,7 @@ class DBStructure
 
 	/**
 	 * Loads the database structure definition from the config/dbstructure.php file.
+	 * On first pass, defines DB_UPDATE_VERSION constant.
 	 *
 	 * @see config/dbstructure.php
 	 * @return array

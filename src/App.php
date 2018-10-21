@@ -573,7 +573,11 @@ class App
 
 		$stamp1 = microtime(true);
 
-		DBA::connect($db_host, $db_user, $db_pass, $db_data, $charset);
+		if (DBA::connect($db_host, $db_user, $db_pass, $db_data, $charset)) {
+			// Loads DB_UPDATE_VERSION constant
+			Database\DBStructure::definition();
+		}
+
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
 
 		$this->saveTimestamp($stamp1, 'network');
