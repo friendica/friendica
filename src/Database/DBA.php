@@ -24,6 +24,9 @@ require_once 'include/dba.php';
  */
 class DBA
 {
+	const NULL_DATE     = '0001-01-01';
+	const NULL_DATETIME = '0001-01-01 00:00:00';
+
 	public static $connected = false;
 
 	private static $server_info = '';

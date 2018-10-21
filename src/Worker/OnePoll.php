@@ -12,8 +12,8 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Protocol\Email;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\Email;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -121,7 +121,7 @@ class OnePoll
 			$hub_update = false;
 		}
 
-		$last_update = (($contact['last-update'] <= NULL_DATE)
+		$last_update = (($contact['last-update'] <= DBA::NULL_DATETIME)
 			? DateTimeFormat::utc('now - 7 days', DateTimeFormat::ATOM)
 			: DateTimeFormat::utc($contact['last-update'], DateTimeFormat::ATOM)
 		);
@@ -252,7 +252,7 @@ class OnePoll
 				self::updateContact($contact, $fields);
 
 				Contact::markForArchival($contact);
-			} elseif ($contact['term-date'] > NULL_DATE) {
+			} elseif ($contact['term-date'] > DBA::NULL_DATETIME) {
 				logger("$url back from the dead - removing mark for death");
 				Contact::unmarkForArchival($contact);
 			}

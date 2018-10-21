@@ -774,7 +774,7 @@ class Profile
 				$profile['marital']['with'] = $a->profile['with'];
 			}
 
-			if (strlen($a->profile['howlong']) && $a->profile['howlong'] >= NULL_DATE) {
+			if (strlen($a->profile['howlong']) && $a->profile['howlong'] >= DBA::NULL_DATETIME) {
 				$profile['howlong'] = Temporal::getRelativeDate($a->profile['howlong'], L10n::t('for %1$d %2$s'));
 			}
 

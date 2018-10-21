@@ -8,7 +8,6 @@ use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -17,8 +16,8 @@ use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\DFRN;
+use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
 use Friendica\Protocol\PortableContact;
 use Friendica\Protocol\Salmon;
@@ -594,9 +593,9 @@ class Contact extends BaseObject
 			return;
 		}
 
-		if ($contact['term-date'] <= NULL_DATE) {
+		if ($contact['term-date'] <= DBA::NULL_DATETIME) {
 			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
-			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', normalise_link($contact['url']), NULL_DATE]);
+			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', normalise_link($contact['url']), DBA::NULL_DATETIME]);
 		} else {
 			/* @todo
 			 * We really should send a notification to the owner after 2-3 weeks
@@ -629,7 +628,7 @@ class Contact extends BaseObject
 	 */
 	public static function unmarkForArchival(array $contact)
 	{
-		$condition = ['`id` = ? AND (`term-date` > ? OR `archive`)', $contact['id'], NULL_DATE];
+		$condition = ['`id` = ? AND (`term-date` > ? OR `archive`)', $contact['id'], DBA::NULL_DATETIME];
 		$exists = DBA::exists('contact', $condition);
 
 		// We don't need to update, we never marked this contact for archival
@@ -646,7 +645,7 @@ class Contact extends BaseObject
 		}
 
 		// It's a miracle. Our dead contact has inexplicably come back to life.
-		$fields = ['term-date' => NULL_DATE, 'archive' => false];
+		$fields = ['term-date' => DBA::NULL_DATETIME, 'archive' => false];
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
 		DBA::update('contact', $fields, ['nurl' => normalise_link($contact['url'])]);
 

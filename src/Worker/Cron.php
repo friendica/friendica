@@ -204,7 +204,7 @@ class Cron
 		foreach ($contacts as $contact) {
 
 			if ($manual_id) {
-				$contact['last-update'] = NULL_DATE;
+				$contact['last-update'] = DBA::NULL_DATETIME;
 			}
 
 			// Friendica and OStatus are checked once a day

@@ -113,7 +113,7 @@ class PortableContact
 			$connect_url = '';
 			$name = '';
 			$network = '';
-			$updated = NULL_DATE;
+			$updated = DBA::NULL_DATETIME;
 			$location = '';
 			$about = '';
 			$keywords = '';
@@ -317,7 +317,7 @@ class PortableContact
 
 		$contact = ["url" => $profile];
 
-		if ($gcontacts[0]["created"] <= NULL_DATE) {
+		if ($gcontacts[0]["created"] <= DBA::NULL_DATETIME) {
 			$contact['created'] = DateTimeFormat::utcNow();
 		}
 
@@ -522,7 +522,7 @@ class PortableContact
 		// Maybe there aren't any entries. Then check if it is a valid feed
 		if ($last_updated == "") {
 			if ($xpath->query('/atom:feed')->length > 0) {
-				$last_updated = NULL_DATE;
+				$last_updated = DBA::NULL_DATETIME;
 			}
 		}
 
@@ -931,7 +931,7 @@ class PortableContact
 
 		$gserver = DBA::selectFirst('gserver', [], ['nurl' => normalise_link($server_url)]);
 		if (DBA::isResult($gserver)) {
-			if ($gserver["created"] <= NULL_DATE) {
+			if ($gserver["created"] <= DBA::NULL_DATETIME) {
 				$fields = ['created' => DateTimeFormat::utcNow()];
 				$condition = ['nurl' => normalise_link($server_url)];
 				DBA::update('gserver', $fields, $condition);
@@ -954,12 +954,12 @@ class PortableContact
 
 			// See discussion under https://forum.friendi.ca/display/0b6b25a8135aabc37a5a0f5684081633
 			// It can happen that a zero date is in the database, but storing it again is forbidden.
-			if ($last_contact < NULL_DATE) {
-				$last_contact = NULL_DATE;
+			if ($last_contact < DBA::NULL_DATETIME) {
+				$last_contact = DBA::NULL_DATETIME;
 			}
 
-			if ($last_failure < NULL_DATE) {
-				$last_failure = NULL_DATE;
+			if ($last_failure < DBA::NULL_DATETIME) {
+				$last_failure = DBA::NULL_DATETIME;
 			}
 
 			if (!$force && !self::updateNeeded($gserver["created"], "", $last_failure, $last_contact)) {
@@ -976,8 +976,8 @@ class PortableContact
 			$register_policy = -1;
 			$registered_users = 0;
 
-			$last_contact = NULL_DATE;
-			$last_failure = NULL_DATE;
+			$last_contact = DBA::NULL_DATETIME;
+			$last_failure = DBA::NULL_DATETIME;
 		}
 		logger("Server ".$server_url." is outdated or unknown. Start discovery. Force: ".$force." Created: ".$gserver["created"]." Failure: ".$last_failure." Contact: ".$last_contact, LOGGER_DEBUG);
 
@@ -1794,7 +1794,7 @@ class PortableContact
 			$connect_url = '';
 			$name = '';
 			$network = '';
-			$updated = NULL_DATE;
+			$updated = DBA::NULL_DATETIME;
 			$location = '';
 			$about = '';
 			$keywords = '';

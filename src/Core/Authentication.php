@@ -5,17 +5,17 @@
 
 namespace Friendica\Core;
 
-use Friendica\Core\Addon;
 use Friendica\BaseObject;
+use Friendica\Core\Addon;
 use Friendica\Core\Config;
-use Friendica\Util\DateTimeFormat;
-use Friendica\Database\DBA;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Database\DBA;
+use Friendica\Util\DateTimeFormat;
 
 /**
 * Handle Authentification, Session and Cookies
-*/    
+*/
 class Authentication extends BaseObject
 {
 	/**
@@ -81,7 +81,7 @@ class Authentication extends BaseObject
 		$a->user = $user_record;
 
 		if ($interactive) {
-			if ($a->user['login_date'] <= NULL_DATE) {
+			if ($a->user['login_date'] <= DBA::NULL_DATETIME) {
 				$_SESSION['return_path'] = 'profile_photo/new';
 				$a->module = 'profile_photo';
 				info(L10n::t("Welcome ") . $a->user['username'] . EOL);

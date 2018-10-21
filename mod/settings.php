@@ -20,11 +20,10 @@ use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
+use Friendica\Module\Login;
 use Friendica\Protocol\Email;
 use Friendica\Util\Network;
 use Friendica\Util\Temporal;
-use Friendica\Util\Security;
-use Friendica\Module\Login;
 
 function get_theme_config_file($theme)
 {
@@ -830,7 +829,7 @@ function settings_content(App $a)
 		$mail_pubmail      = ((DBA::isResult($r)) ? $r[0]['pubmail'] : 0);
 		$mail_action       = ((DBA::isResult($r)) ? $r[0]['action'] : 0);
 		$mail_movetofolder = ((DBA::isResult($r)) ? $r[0]['movetofolder'] : '');
-		$mail_chk          = ((DBA::isResult($r)) ? $r[0]['last_check'] : NULL_DATE);
+		$mail_chk          = ((DBA::isResult($r)) ? $r[0]['last_check'] : DBA::NULL_DATETIME);
 
 
 		$tpl = get_markup_template('settings/connectors.tpl');

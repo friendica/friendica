@@ -257,10 +257,10 @@ class Event extends BaseObject
 
 		$event['created']   = DateTimeFormat::utc(defaults($arr, 'created'  , 'now'));
 		$event['edited']    = DateTimeFormat::utc(defaults($arr, 'edited'   , 'now'));
-		$event['start']     = DateTimeFormat::utc(defaults($arr, 'start'    , NULL_DATE));
-		$event['finish']    = DateTimeFormat::utc(defaults($arr, 'finish'   , NULL_DATE));
-		if ($event['finish'] < NULL_DATE) {
-			$event['finish'] = NULL_DATE;
+		$event['start']     = DateTimeFormat::utc(defaults($arr, 'start'    , DBA::NULL_DATETIME));
+		$event['finish']    = DateTimeFormat::utc(defaults($arr, 'finish'   , DBA::NULL_DATETIME));
+		if ($event['finish'] < DBA::NULL_DATETIME) {
+			$event['finish'] = DBA::NULL_DATETIME;
 		}
 		$private = intval(defaults($arr, 'private', 0));
 

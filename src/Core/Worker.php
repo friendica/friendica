@@ -4,11 +4,11 @@
  */
 namespace Friendica\Core;
 
+use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Model\Process;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
-use Friendica\BaseObject;
 
 require_once 'include/dba.php';
 
@@ -154,7 +154,7 @@ class Worker
 	private static function totalEntries()
 	{
 		return DBA::count('workerqueue', ["`executed` <= ? AND NOT `done` AND `next_try` < ?",
-			NULL_DATE, DateTimeFormat::utcNow()]);
+			DBA::NULL_DATETIME, DateTimeFormat::utcNow()]);
 	}
 
 	/**
@@ -164,7 +164,7 @@ class Worker
 	 */
 	private static function highestPriority()
 	{
-		$condition = ["`executed` <= ? AND NOT `done` AND `next_try` < ?", NULL_DATE, DateTimeFormat::utcNow()];
+		$condition = ["`executed` <= ? AND NOT `done` AND `next_try` < ?", DBA::NULL_DATETIME, DateTimeFormat::utcNow()];
 		$workerqueue = DBA::selectFirst('workerqueue', ['priority'], $condition, ['order' => ['priority']]);
 		if (DBA::isResult($workerqueue)) {
 			return $workerqueue["priority"];
@@ -183,7 +183,7 @@ class Worker
 	private static function processWithPriorityActive($priority)
 	{
 		$condition = ["`priority` <= ? AND `executed` > ? AND NOT `done` AND `next_try` < ?",
-			$priority, NULL_DATE, DateTimeFormat::utcNow()];
+			$priority, DBA::NULL_DATETIME, DateTimeFormat::utcNow()];
 		return DBA::exists('workerqueue', $condition);
 	}
 
@@ -553,7 +553,7 @@ class Worker
 		$entries = DBA::select(
 			'workerqueue',
 			['id', 'pid', 'executed', 'priority', 'parameter'],
-			['`executed` > ? AND NOT `done` AND `pid` != 0', NULL_DATE],
+			['`executed` > ? AND NOT `done` AND `pid` != 0', DBA::NULL_DATETIME],
 			['order' => ['priority', 'created']]
 		);
 
@@ -561,7 +561,7 @@ class Worker
 			if (!posix_kill($entry["pid"], 0)) {
 				DBA::update(
 					'workerqueue',
-					['executed' => NULL_DATE, 'pid' => 0],
+					['executed' => DBA::NULL_DATETIME, 'pid' => 0],
 					['id' => $entry["id"]]
 				);
 			} else {
@@ -597,7 +597,7 @@ class Worker
 					}
 					DBA::update(
 						'workerqueue',
-						['executed' => NULL_DATE, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
+						['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
 						['id' => $entry["id"]]
 					);
 				} else {
@@ -809,7 +809,7 @@ class Worker
 				'workerqueue',
 				['id'],
 				["`executed` <= ? AND `priority` < ? AND NOT `done` AND `next_try` < ?",
-				NULL_DATE, $highest_priority, DateTimeFormat::utcNow()],
+				DBA::NULL_DATETIME, $highest_priority, DateTimeFormat::utcNow()],
 				['limit' => $limit, 'order' => ['priority', 'created']]
 			);
 
@@ -826,7 +826,7 @@ class Worker
 					'workerqueue',
 					['id'],
 					["`executed` <= ? AND `priority` > ? AND NOT `done` AND `next_try` < ?",
-					NULL_DATE, $highest_priority, DateTimeFormat::utcNow()],
+					DBA::NULL_DATETIME, $highest_priority, DateTimeFormat::utcNow()],
 					['limit' => $limit, 'order' => ['priority', 'created']]
 				);
 
@@ -846,7 +846,7 @@ class Worker
 				'workerqueue',
 				['id'],
 				["`executed` <= ? AND NOT `done` AND `next_try` < ?",
-				NULL_DATE, DateTimeFormat::utcNow()],
+				DBA::NULL_DATETIME, DateTimeFormat::utcNow()],
 				['limit' => $limit, 'order' => ['priority', 'created']]
 			);
 
@@ -912,7 +912,7 @@ class Worker
 	{
 		$mypid = getmypid();
 
-		DBA::update('workerqueue', ['executed' => NULL_DATE, 'pid' => 0], ['pid' => $mypid, 'done' => false]);
+		DBA::update('workerqueue', ['executed' => DBA::NULL_DATETIME, 'pid' => 0], ['pid' => $mypid, 'done' => false]);
 	}
 
 	/**
@@ -1147,7 +1147,7 @@ class Worker
 
 		logger('Defer execution ' . $retrial . ' of id ' . $id . ' to ' . $next, LOGGER_DEBUG);
 
-		$fields = ['retrial' => $retrial + 1, 'next_try' => $next, 'executed' => NULL_DATE, 'pid' => 0];
+		$fields = ['retrial' => $retrial + 1, 'next_try' => $next, 'executed' => DBA::NULL_DATETIME, 'pid' => 0];
 		DBA::update('workerqueue', $fields, ['id' => $id]);
 	}
 

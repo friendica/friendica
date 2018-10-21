@@ -8,6 +8,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
+use Friendica\Core\ACL;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -15,11 +16,10 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model;
+use Friendica\Module\Login;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
-use Friendica\Core\ACL;
-use Friendica\Module\Login;
 
 /**
  *  Manages and show Contacts and their content
@@ -522,9 +522,9 @@ class Contact extends BaseModule
 
 			$insecure = L10n::t('Private communications are not available for this contact.');
 
-			$last_update = (($contact['last-update'] <= NULL_DATE) ? L10n::t('Never') : DateTimeFormat::local($contact['last-update'], 'D, j M Y, g:i A'));
+			$last_update = (($contact['last-update'] <= DBA::NULL_DATETIME) ? L10n::t('Never') : DateTimeFormat::local($contact['last-update'], 'D, j M Y, g:i A'));
 
-			if ($contact['last-update'] > NULL_DATE) {
+			if ($contact['last-update'] > DBA::NULL_DATETIME) {
 				$last_update .= ' ' . (($contact['last-update'] <= $contact['success_update']) ? L10n::t('(Update was successful)') : L10n::t('(Update was not successful)'));
 			}
 			$lblsuggest = (($contact['network'] === Protocol::DFRN) ? L10n::t('Suggest friends') : '');
@@ -536,7 +536,7 @@ class Contact extends BaseModule
 			// tabs
 			$tab_str = self::getTabsHTML($a, $contact, 3);
 
-			$lost_contact = (($contact['archive'] && $contact['term-date'] > NULL_DATE && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
+			$lost_contact = (($contact['archive'] && $contact['term-date'] > DBA::NULL_DATETIME && $contact['term-date'] < DateTimeFormat::utcNow()) ? L10n::t('Communications lost with this contact!') : '');
 
 			$fetch_further_information = null;
 			if ($contact['network'] == Protocol::FEED) {

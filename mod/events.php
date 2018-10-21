@@ -15,9 +15,9 @@ use Friendica\Database\DBA;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
+use Friendica\Module\Login;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use Friendica\Module\Login;
 
 require_once 'include/items.php';
 
@@ -66,8 +66,8 @@ function events_post(App $a)
 	// The default setting for the `private` field in event_store() is false, so mirror that
 	$private_event = false;
 
-	$start  = NULL_DATE;
-	$finish = NULL_DATE;
+	$start  = DBA::NULL_DATETIME;
+	$finish = DBA::NULL_DATETIME;
 
 	if ($start_text) {
 		$start = $start_text;
@@ -111,7 +111,7 @@ function events_post(App $a)
 		$a->internalRedirect($onerror_path);
 	}
 
-	if (!$summary || ($start === NULL_DATE)) {
+	if (!$summary || ($start === DBA::NULL_DATETIME)) {
 		notice(L10n::t('Event title and start time are required.') . EOL);
 		if (intval($_REQUEST['preview'])) {
 			echo L10n::t('Event title and start time are required.');

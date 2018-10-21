@@ -176,7 +176,7 @@ class GContact
 			if (!isset($gcontact['network']) && ($gcnt["network"] != Protocol::STATUSNET)) {
 				$gcontact['network'] = $gcnt["network"];
 			}
-			if ($gcontact['updated'] <= NULL_DATE) {
+			if ($gcontact['updated'] <= DBA::NULL_DATETIME) {
 				$gcontact['updated'] = $gcnt["updated"];
 			}
 			if (!isset($gcontact['server_url']) && (normalise_link($gcnt["server_url"]) != normalise_link($gcnt["url"]))) {
@@ -457,7 +457,7 @@ class GContact
 			intval($uid),
 			intval($uid),
 			intval($uid),
-			DBA::escape(NULL_DATE),
+			DBA::NULL_DATETIME,
 			$sql_network,
 			intval($start),
 			intval($limit)
@@ -486,7 +486,7 @@ class GContact
 			intval($uid),
 			intval($uid),
 			intval($uid),
-			DBA::escape(NULL_DATE),
+			DBA::NULL_DATETIME,
 			$sql_network,
 			intval($start),
 			intval($limit)

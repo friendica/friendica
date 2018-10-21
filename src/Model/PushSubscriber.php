@@ -21,7 +21,7 @@ class PushSubscriber
 	public static function publishFeed($uid, $default_priority = PRIORITY_HIGH)
 	{
 		$condition = ['push' => 0, 'uid' => $uid];
-		DBA::update('push_subscriber', ['push' => 1, 'next_try' => NULL_DATE], $condition);
+		DBA::update('push_subscriber', ['push' => 1, 'next_try' => DBA::NULL_DATETIME], $condition);
 
 		self::requeue($default_priority);
 	}
@@ -114,10 +114,10 @@ class PushSubscriber
 			$days = round((time() -  strtotime($subscriber['renewed'])) / (60 * 60 * 24));
 
 			if ($days > 60) {
-				DBA::update('push_subscriber', ['push' => -1, 'next_try' => NULL_DATE], ['id' => $id]);
+				DBA::update('push_subscriber', ['push' => -1, 'next_try' => DBA::NULL_DATETIME], ['id' => $id]);
 				logger('Delivery error: Subscription ' . $subscriber['callback_url'] . ' for ' . $subscriber['nickname'] . ' is marked as ended.', LOGGER_DEBUG);
 			} else {
-				DBA::update('push_subscriber', ['push' => 0, 'next_try' => NULL_DATE], ['id' => $id]);
+				DBA::update('push_subscriber', ['push' => 0, 'next_try' => DBA::NULL_DATETIME], ['id' => $id]);
 				logger('Delivery error: Giving up ' . $subscriber['callback_url'] . ' for ' . $subscriber['nickname'] . ' for now.', LOGGER_DEBUG);
 			}
 		} else {
@@ -146,7 +146,7 @@ class PushSubscriber
 		}
 
 		// set last_update to the 'created' date of the last item, and reset push=0
-		$fields = ['push' => 0, 'next_try' => NULL_DATE, 'last_update' => $last_update];
+		$fields = ['push' => 0, 'next_try' => DBA::NULL_DATETIME, 'last_update' => $last_update];
 		DBA::update('push_subscriber', $fields, ['id' => $id]);
 		logger('Subscriber ' . $subscriber['callback_url'] . ' for ' . $subscriber['nickname'] . ' is marked as vital', LOGGER_DEBUG);
 	}

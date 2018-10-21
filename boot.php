@@ -345,11 +345,6 @@ define('SR_SCOPE_ALL',  'all');
 define('SR_SCOPE_TAGS', 'tags');
 /* @}*/
 
-/**
- * Lowest possible date time value
- */
-define('NULL_DATE', '0001-01-01 00:00:00');
-
 // Normally this constant is defined - but not if "pcntl" isn't installed
 if (!defined("SIGTERM")) {
 	define("SIGTERM", 15);

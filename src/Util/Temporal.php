@@ -11,6 +11,7 @@ use DateTimeZone;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
+use Friendica\Database\DBA;
 
 require_once 'boot.php';
 require_once 'include/text.php';
@@ -290,7 +291,7 @@ class Temporal
 
 		$abs = strtotime($localtime);
 
-		if (is_null($posted_date) || $posted_date <= NULL_DATE || $abs === false) {
+		if (is_null($posted_date) || $posted_date <= DBA::NULL_DATETIME || $abs === false) {
 			return L10n::t('never');
 		}
 

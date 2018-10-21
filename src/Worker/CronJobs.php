@@ -108,7 +108,7 @@ class CronJobs
 	private static function expireAndRemoveUsers()
 	{
 		// expire any expired regular accounts. Don't expire forums.
-		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", NULL_DATE];
+		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", DBA::NULL_DATETIME];
 		DBA::update('user', ['account_expired' => true], $condition);
 
 		// Remove any freshly expired account
