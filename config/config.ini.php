@@ -372,13 +372,13 @@ urlpath =
 ; username_min_length (Integer)
 ; The minimum character length a username can be.
 ; This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
-; Minimum for this config value is 1. Maximum is 255;
+; Minimum for this config value is 1. Maximum is 150 as the resulting profile URL shouldn't be longer than 255 chars.
 username_min_length = 3
 
 ; username_max_length (Integer)
 ; The maximum character length a username can be.
 ; This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
-; Minimum for this config value is 1. Maximum is 255;
+; Minimum for this config value is 1. Maximum is 150 as the resulting profile URL shouldn't be longer than 255 chars.
 username_max_length = 48
 
 ; worker_cooldown (Integer)
