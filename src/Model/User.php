@@ -469,8 +469,15 @@ class User
 		$username_min_length = max(1, min(255, intval(Config::get('system', 'username_min_length', 0))));
 		$username_max_length = max(1, min(255, intval(Config::get('system', 'username_max_length', 0))));
 
+		if ($username_min_length > $username_max_length) {
+			logger(L10n::t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length), LOGGER_WARNING);
+			$tmp = $username_min_length;
+			$username_min_length = $username_max_length;
+			$username_max_length = $tmp;
+		}
+
 		if (mb_strlen($username) < $username_min_length) {
-			throw new Exception(L10n::tt('Username should be at least %s character.', 'Username should be at least %s character.', $username_min_length));
+			throw new Exception(L10n::tt('Username should be at least %s character.', 'Username should be at least %s characters.', $username_min_length));
 		}
 
 		if (mb_strlen($username) > $username_max_length) {
