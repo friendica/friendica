@@ -575,7 +575,7 @@ class App
 
 		if (DBA::connect($db_host, $db_user, $db_pass, $db_data, $charset)) {
 			// Loads DB_UPDATE_VERSION constant
-			Database\DBStructure::definition();
+			Database\DBStructure::definition(false);
 		}
 
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
