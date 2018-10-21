@@ -2202,9 +2202,6 @@ ul.dropdown-menu li:hover {
     -webkit-box-shadow: 0 0 3px #dadada;
     -moz-box-shadow: 0 0 3px #dadada;
 }
-.credits-content-wrapper {
-    overflow: hidden;
-}
 #content:hover .page-action.faded-icon {
     opacity: 0.8;
     transition: all 0.25s ease-in-out;
