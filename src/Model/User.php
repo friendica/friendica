@@ -466,8 +466,8 @@ class User
 		// collapse multiple spaces in name
 		$username = preg_replace('/ +/', ' ', $username);
 
-		$username_min_length = max(1, min(150, intval(Config::get('system', 'username_min_length', 3))));
-		$username_max_length = max(1, min(150, intval(Config::get('system', 'username_max_length', 48))));
+		$username_min_length = max(1, min(64, intval(Config::get('system', 'username_min_length', 3))));
+		$username_max_length = max(1, min(64, intval(Config::get('system', 'username_max_length', 48))));
 
 		if ($username_min_length > $username_max_length) {
 			logger(L10n::t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length), LOGGER_WARNING);
