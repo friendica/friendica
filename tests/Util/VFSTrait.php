@@ -26,7 +26,7 @@ trait VFSTrait
 		$this->setConfigFile('config.ini.php');
 		$this->setConfigFile('settings.ini.php');
 		$this->setConfigFile('local.ini.php');
-		$this->setConfigFile('dbstructure.json');
+		$this->setConfigFile('dbstructure.php');
 	}
 
 	protected function setConfigFile($filename)

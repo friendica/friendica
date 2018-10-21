@@ -20,7 +20,7 @@ require_once 'include/dba.php';
  * This function is responsible for doing post update changes to the data
  * (not the structure) in the database.
  *
- * Database structure changes are done in src/Database/DBStructure.php
+ * Database structure changes are done in config/dbstructure.php
  *
  * If there is a need for a post process to a structure change, update this file
  * by adding a new function at the end with the number of the new DB_UPDATE_VERSION.
@@ -31,7 +31,7 @@ require_once 'include/dba.php';
  * You are currently on version 4711 and you are preparing changes that demand an update script.
  *
  * 1. Create a function "update_4712()" here in the update.php
- * 2. Apply the needed structural changes in src/Database/DBStructure.php
+ * 2. Apply the needed structural changes in config/dbStructure.php
  * 3. Set DB_UPDATE_VERSION in boot.php to 4712.
  *
  * If you need to run a script before the database update, name the function "pre_update_4712()"
