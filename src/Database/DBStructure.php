@@ -173,7 +173,7 @@ class DBStructure
 	}
 
 	public static function printStructure() {
-		$database = self::definition();
+		$database = self::definition(false);
 
 		echo "-- ------------------------------------------\n";
 		echo "-- ".FRIENDICA_PLATFORM." ".FRIENDICA_VERSION." (".FRIENDICA_CODENAME,")\n";
@@ -833,10 +833,11 @@ class DBStructure
 	 * On first pass, defines DB_UPDATE_VERSION constant.
 	 *
 	 * @see config/dbstructure.php
+	 * @param boolean $with_addons_structure Whether to tack on addons additional tables
 	 * @return array
 	 * @throws Exception
 	 */
-	public static function definition()
+	public static function definition($with_addons_structure = true)
 	{
 		if (!self::$definition) {
 			$a = \Friendica\BaseObject::getApp();
@@ -858,7 +859,9 @@ class DBStructure
 			$definition = self::$definition;
 		}
 
-		Hook::callAll('dbstructure_definition', $definition);
+		if ($with_addons_structure) {
+			Hook::callAll('dbstructure_definition', $definition);
+		}
 
 		return $definition;
 	}
