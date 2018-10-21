@@ -24,7 +24,13 @@ require_once 'include/dba.php';
  */
 class DBA
 {
+	/**
+	 * Lowest possible date value
+	 */
 	const NULL_DATE     = '0001-01-01';
+	/**
+	 * Lowest possible datetime value
+	 */
 	const NULL_DATETIME = '0001-01-01 00:00:00';
 
 	public static $connected = false;

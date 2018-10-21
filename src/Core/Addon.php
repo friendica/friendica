@@ -255,6 +255,11 @@ class Addon extends BaseObject
 		return in_array($addon, self::$addons);
 	}
 
+	/**
+	 * Returns a list of the enabled addon names
+	 *
+	 * @return array
+	 */
 	public static function getEnabledList()
 	{
 		return self::$addons;

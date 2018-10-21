@@ -93,7 +93,7 @@ class Hook extends BaseObject
 	/**
 	 * Returns the list of callbacks for a single hook
 	 *
-	 * @param  string $name
+	 * @param  string $name Name of the hook
 	 * @return array
 	 */
 	public static function getByName($name)
@@ -112,8 +112,9 @@ class Hook extends BaseObject
 	 *
 	 * Use this function when you want to fork a hook via the worker.
 	 *
-	 * @param string       $name of the hook to call
-	 * @param string|array $data to transmit to the callback handler
+	 * @param integer $priority of the hook
+	 * @param string  $name     of the hook to call
+	 * @param mixed   $data     to transmit to the callback handler
 	 */
 	public static function fork($priority, $name, $data = null)
 	{
@@ -169,8 +170,11 @@ class Hook extends BaseObject
 	}
 
 	/**
-	 * check if an app_menu hook exist for addon $name.
+	 * Checks if an app_menu hook exist for the provided addon name.
 	 * Return true if the addon is an app
+	 *
+	 * @param string $name Name of the addon
+	 * @return boolean
 	 */
 	public static function isAddonApp($name)
 	{
