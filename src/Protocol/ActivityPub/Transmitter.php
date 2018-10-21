@@ -289,7 +289,7 @@ class Transmitter
 
 			foreach ($activity[$element] as $receiver) {
 				if ($receiver == $profile['followers'] && !empty($item_profile['followers'])) {
-					$receiver = $item_profile['followers'];
+					$permissions[$element][] = $item_profile['followers'];
 				}
 				if (!in_array($receiver, $exclude)) {
 					$permissions[$element][] = $receiver;
