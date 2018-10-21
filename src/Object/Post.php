@@ -209,7 +209,13 @@ class Post extends BaseObject
 
 		$author = ['uid' => 0, 'id' => $item['author-id'],
 			'network' => $item['author-network'], 'url' => $item['author-link']];
-		$profile_link = Contact::magicLinkbyContact($author);
+
+		if (local_user()) {
+			$profile_link = Contact::magicLinkbyContact($author);
+		} else {
+			$profile_link = $item['author-link'];
+		}
+
 		if (strpos($profile_link, 'redir/') === 0) {
 			$sparkle = ' sparkle';
 		}
