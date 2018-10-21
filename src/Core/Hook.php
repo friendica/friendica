@@ -8,8 +8,6 @@ use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Database\DBA;
 
-require_once 'include/dba.php';
-
 /**
  * Some functions to handle hooks
  */
