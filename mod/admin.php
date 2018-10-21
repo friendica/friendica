@@ -214,11 +214,12 @@ function admin_content(App $a)
 
 	$r = q("SELECT `name` FROM `addon` WHERE `plugin_admin` = 1 ORDER BY `name`");
 	$aside_tools['addons_admin'] = [];
+	$addons_admin = [];
 	foreach ($r as $h) {
 		$addon = $h['name'];
 		$aside_tools['addons_admin'][] = ["admin/addons/" . $addon, $addon, "addon"];
 		// temp addons with admin
-		$a->addons_admin[] = $addon;
+		$addons_admin[] = $addon;
 	}
 
 	$t = get_markup_template('admin/aside.tpl');
@@ -243,7 +244,7 @@ function admin_content(App $a)
 				$o = admin_page_users($a);
 				break;
 			case 'addons':
-				$o = admin_page_addons($a);
+				$o = admin_page_addons($a, $addons_admin);
 				break;
 			case 'themes':
 				$o = admin_page_themes($a);
@@ -932,7 +933,7 @@ function admin_page_summary(App $a)
 		'$platform' => FRIENDICA_PLATFORM,
 		'$codename' => FRIENDICA_CODENAME,
 		'$build' => Config::get('system', 'build'),
-		'$addons' => [L10n::t('Active addons'), $a->addons],
+		'$addons' => [L10n::t('Active addons'), Addon::getEnabledList()],
 		'$serversettings' => $server_settings,
 		'$showwarning' => $showwarning,
 		'$warningtext' => $warningtext
@@ -1956,10 +1957,11 @@ function admin_page_users(App $a)
  *
  * The returned string returned hulds the HTML code of the page.
  *
- * @param App $a
+ * @param App   $a
+ * @param array $addons_admin A list of admin addon names
  * @return string
  */
-function admin_page_addons(App $a)
+function admin_page_addons(App $a, array $addons_admin)
 {
 	/*
 	 * Single addon
@@ -1971,27 +1973,25 @@ function admin_page_addons(App $a)
 			return '';
 		}
 
-		if (x($_GET, "a") && $_GET['a'] == "t") {
+		if (defaults($_GET, 'a', '') == "t") {
 			BaseModule::checkFormSecurityTokenRedirectOnError('/admin/addons', 'admin_themes', 't');
 
 			// Toggle addon status
-			$idx = array_search($addon, $a->addons);
-			if ($idx !== false) {
-				unset($a->addons[$idx]);
+			if (Addon::isEnabled($addon)) {
 				Addon::uninstall($addon);
 				info(L10n::t("Addon %s disabled.", $addon));
 			} else {
-				$a->addons[] = $addon;
 				Addon::install($addon);
 				info(L10n::t("Addon %s enabled.", $addon));
 			}
-			Config::set("system", "addon", implode(", ", $a->addons));
+
+			Addon::saveEnabledList();
 			$a->internalRedirect('admin/addons');
 			return ''; // NOTREACHED
 		}
 
 		// display addon details
-		if (in_array($addon, $a->addons)) {
+		if (Addon::isEnabled($addon)) {
 			$status = "on";
 			$action = L10n::t("Disable");
 		} else {
@@ -2007,7 +2007,7 @@ function admin_page_addons(App $a)
 		}
 
 		$admin_form = "";
-		if (in_array($addon, $a->addons_admin)) {
+		if (in_array($addon, $addons_admin)) {
 			require_once "addon/$addon/$addon.php";
 			$func = $addon . '_addon_admin';
 			$func($a, $admin_form);
@@ -2058,7 +2058,7 @@ function admin_page_addons(App $a)
 				$show_addon = true;
 
 				// If the addon is unsupported, then only show it, when it is enabled
-				if ((strtolower($info["status"]) == "unsupported") && !in_array($id, $a->addons)) {
+				if ((strtolower($info["status"]) == "unsupported") && !Addon::isEnabled($id)) {
 					$show_addon = false;
 				}
 
@@ -2068,7 +2068,7 @@ function admin_page_addons(App $a)
 				}
 
 				if ($show_addon) {
-					$addons[] = [$id, (in_array($id, $a->addons) ? "on" : "off"), $info];
+					$addons[] = [$id, (Addon::isEnabled($id) ? "on" : "off"), $info];
 				}
 			}
 		}

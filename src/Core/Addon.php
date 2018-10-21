@@ -16,7 +16,14 @@ require_once 'include/dba.php';
 class Addon extends BaseObject
 {
 	/**
-	 * @brief Synchronise addons:
+	 * List of the names of enabled addons
+	 *
+	 * @var array
+	 */
+	private static $addons = [];
+
+	/**
+	 * @brief Synchronize addons:
 	 *
 	 * system.addon contains a comma-separated list of names
 	 * of addons which are used on this system.
@@ -27,15 +34,13 @@ class Addon extends BaseObject
 	 * call the install procedure and add it to the database.
 	 *
 	 */
-	public static function check()
+	public static function loadAddons()
 	{
-		$a = self::getApp();
+		$installed_addons = [];
 
 		$r = DBA::select('addon', [], ['installed' => 1]);
 		if (DBA::isResult($r)) {
-			$installed = DBA::toArray($r);
-		} else {
-			$installed = [];
+			$installed_addons = DBA::toArray($r);
 		}
 
 		$addons = Config::get('system', 'addon');
@@ -45,31 +50,23 @@ class Addon extends BaseObject
 			$addons_arr = explode(',', str_replace(' ', '', $addons));
 		}
 
-		$a->addons = $addons_arr;
+		self::$addons = $addons_arr;
 
 		$installed_arr = [];
 
-		if (count($installed)) {
-			foreach ($installed as $i) {
-				if (!in_array($i['name'], $addons_arr)) {
-					self::uninstall($i['name']);
-				} else {
-					$installed_arr[] = $i['name'];
-				}
+		foreach ($installed_addons as $addon) {
+			if (!self::isEnabled($addon['name'])) {
+				self::uninstall($addon['name']);
+			} else {
+				$installed_arr[] = $addon['name'];
 			}
 		}
 
-		if (count($addons_arr)) {
-			foreach ($addons_arr as $p) {
-				if (!in_array($p, $installed_arr)) {
-					self::install($p);
-				}
+		foreach (self::$addons as $p) {
+			if (!in_array($p, $installed_arr)) {
+				self::install($p);
 			}
 		}
-
-		self::loadHooks();
-
-		return;
 	}
 
 	/**
@@ -88,6 +85,8 @@ class Addon extends BaseObject
 			$func = $addon . '_uninstall';
 			$func();
 		}
+
+		unset(self::$addons[$idx]);
 	}
 
 	/**
@@ -110,10 +109,10 @@ class Addon extends BaseObject
 			$func = $addon . '_install';
 			$func();
 
-			$addon_admin = (function_exists($addon."_addon_admin") ? 1 : 0);
+			$addon_admin = (function_exists($addon . "_addon_admin") ? 1 : 0);
 
 			DBA::insert('addon', ['name' => $addon, 'installed' => true,
-						'timestamp' => $t, 'plugin_admin' => $addon_admin]);
+				'timestamp' => $t, 'plugin_admin' => $addon_admin]);
 
 			// we can add the following with the previous SQL
 			// once most site tables have been updated.
@@ -121,6 +120,10 @@ class Addon extends BaseObject
 
 			if (file_exists('addon/' . $addon . '/.hidden')) {
 				DBA::update('addon', ['hidden' => true], ['name' => $addon]);
+			}
+
+			if (!self::isEnabled($addon)) {
+				self::$addons[] = $addon;
 			}
 			return true;
 		} else {
@@ -172,165 +175,6 @@ class Addon extends BaseObject
 				}
 			}
 		}
-	}
-
-	/**
-	 * @brief check if addon is enabled
-	 *
-	 * @param string $addon
-	 * @return boolean
-	 */
-	public static function isEnabled($addon)
-	{
-		return DBA::exists('addon', ['installed' => true, 'name' => $addon]);
-	}
-
-
-	/**
-	 * @brief registers a hook.
-	 *
-	 * @param string $hook the name of the hook
-	 * @param string $file the name of the file that hooks into
-	 * @param string $function the name of the function that the hook will call
-	 * @param int $priority A priority (defaults to 0)
-	 * @return mixed|bool
-	 */
-	public static function registerHook($hook, $file, $function, $priority = 0)
-	{
-		$file = str_replace(self::getApp()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
-
-		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
-		$exists = DBA::exists('hook', $condition);
-		if ($exists) {
-			return true;
-		}
-
-		$r = DBA::insert('hook', ['hook' => $hook, 'file' => $file, 'function' => $function, 'priority' => $priority]);
-
-		return $r;
-	}
-
-	/**
-	 * @brief unregisters a hook.
-	 *
-	 * @param string $hook the name of the hook
-	 * @param string $file the name of the file that hooks into
-	 * @param string $function the name of the function that the hook called
-	 * @return array
-	 */
-	public static function unregisterHook($hook, $file, $function)
-	{
-		$relative_file = str_replace(self::getApp()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
-
-		// This here is only needed for fixing a problem that existed on the develop branch
-		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
-		DBA::delete('hook', $condition);
-
-		$condition = ['hook' => $hook, 'file' => $relative_file, 'function' => $function];
-		$r = DBA::delete('hook', $condition);
-		return $r;
-	}
-
-	/**
-	 * Load hooks
-	 */
-	public static function loadHooks()
-	{
-		$a = self::getApp();
-		$a->hooks = [];
-		$r = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
-
-		while ($rr = DBA::fetch($r)) {
-			if (! array_key_exists($rr['hook'], $a->hooks)) {
-				$a->hooks[$rr['hook']] = [];
-			}
-			$a->hooks[$rr['hook']][] = [$rr['file'],$rr['function']];
-		}
-		DBA::close($r);
-	}
-
-	/**
-	 * @brief Forks a hook.
-	 *
-	 * Use this function when you want to fork a hook via the worker.
-	 *
-	 * @param string $name of the hook to call
-	 * @param string|array $data to transmit to the callback handler
-	 */
-	public static function forkHooks($priority, $name, $data = null)
-	{
-		$a = self::getApp();
-
-		if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
-			foreach ($a->hooks[$name] as $hook) {
-				Worker::add($priority, 'ForkHook', $name, $hook, $data);
-			}
-		}
-	}
-
-	/**
-	 * @brief Calls a hook.
-	 *
-	 * Use this function when you want to be able to allow a hook to manipulate
-	 * the provided data.
-	 *
-	 * @param string $name of the hook to call
-	 * @param string|array &$data to transmit to the callback handler
-	 */
-	public static function callHooks($name, &$data = null)
-	{
-		$a = self::getApp();
-
-		if (is_array($a->hooks) && array_key_exists($name, $a->hooks)) {
-			foreach ($a->hooks[$name] as $hook) {
-				self::callSingleHook($a, $name, $hook, $data);
-			}
-		}
-	}
-
-	/**
-	 * @brief Calls a single hook.
-	 *
-	 * @param App $a
-	 * @param string         $name of the hook to call
-	 * @param array          $hook Hook data
-	 * @param string|array   &$data to transmit to the callback handler
-	 */
-	public static function callSingleHook(App $a, $name, $hook, &$data = null)
-	{
-		// Don't run a theme's hook if the user isn't using the theme
-		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . $a->getCurrentTheme()) === false) {
-			return;
-		}
-
-		@include_once($hook[0]);
-		if (function_exists($hook[1])) {
-			$func = $hook[1];
-			$func($a, $data);
-		} else {
-			// remove orphan hooks
-			$condition = ['hook' => $name, 'file' => $hook[0], 'function' => $hook[1]];
-			DBA::delete('hook', $condition, ['cascade' => false]);
-		}
-	}
-
-	/**
-	 * check if an app_menu hook exist for addon $name.
-	 * Return true if the addon is an app
-	 */
-	public static function isApp($name)
-	{
-		$a = self::getApp();
-
-		if (is_array($a->hooks) && (array_key_exists('app_menu', $a->hooks))) {
-			foreach ($a->hooks['app_menu'] as $hook) {
-				if ($hook[0] == 'addon/'.$name.'/'.$name.'.php') {
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -400,5 +244,93 @@ class Addon extends BaseObject
 			}
 		}
 		return $info;
+	}
+
+	/**
+	 * Checks if the provided addon is enabled
+	 *
+	 * @param string $addon
+	 * @return boolean
+	 */
+	public static function isEnabled($addon)
+	{
+		return in_array($addon, self::$addons);
+	}
+
+	public static function getEnabledList()
+	{
+		return self::$addons;
+	}
+
+	/**
+	 * Saves the current enabled addon list in the system.addon config key
+	 *
+	 * @return boolean
+	 */
+	public static function saveEnabledList()
+	{
+		return Config::set("system", "addon", implode(", ", self::$addons));
+	}
+
+	/**
+	 * Returns the list of non-hidden enabled addon names
+	 *
+	 * @return array
+	 */
+	public static function getVisibleList()
+	{
+		$visible_addons = [];
+		$stmt = DBA::select('addon', ['name'], ['hidden' => false, 'installed' => true]);
+		if (DBA::isResult($stmt)) {
+			foreach (DBA::toArray($stmt) as $addon) {
+				$visible_addons[] = $addon['name'];
+			}
+		}
+
+		return $visible_addons;
+	}
+
+	/**
+	 * Shim of Hook::register left for backward compatibility purpose.
+	 *
+	 * @see Hook::register
+	 * @deprecated since version 2018.12
+	 * @param string $hook     the name of the hook
+	 * @param string $file     the name of the file that hooks into
+	 * @param string $function the name of the function that the hook will call
+	 * @param int    $priority A priority (defaults to 0)
+	 * @return mixed|bool
+	 */
+	public static function registerHook($hook, $file, $function, $priority = 0)
+	{
+		return Hook::register($hook, $file, $function, $priority);
+	}
+
+	/**
+	 * Shim of Hook::unregister left for backward compatibility purpose.
+	 *
+	 * @see Hook::unregister
+	 * @deprecated since version 2018.12
+	 * @param string $hook     the name of the hook
+	 * @param string $file     the name of the file that hooks into
+	 * @param string $function the name of the function that the hook called
+	 * @return boolean
+	 */
+	public static function unregisterHook($hook, $file, $function)
+	{
+		return Hook::unregister($hook, $file, $function);
+	}
+
+	/**
+	 * Shim of Hook::callAll left for backward-compatibility purpose.
+	 *
+	 * @see Hook::callAll
+	 * @deprecated since version 2018.12
+	 * @param string       $name  of the hook to call
+	 * @param string|array &$data to transmit to the callback handler
+	 */
+	public static function callHooks($name, &$data = null)
+	{
+		Hook::callAll($name, $data);
 	}
 }

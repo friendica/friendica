@@ -50,11 +50,8 @@ class App
 	public $argv;
 	public $argc;
 	public $module;
-	public $hooks = [];
 	public $timezone;
 	public $interactive = true;
-	public $addons;
-	public $addons_admin = [];
 	public $identities;
 	public $is_mobile = false;
 	public $is_tablet = false;
@@ -360,7 +357,7 @@ class App
 		Core\Config::load();
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
-			Core\Addon::loadHooks();
+			Core\Hook::loadHooks();
 
 			$this->loadAddonConfig();
 		}

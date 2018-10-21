@@ -7,10 +7,12 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\Model\Conversation;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\PushSubscriber;
@@ -20,7 +22,6 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
 use Friendica\Protocol\Salmon;
-use Friendica\Model\Conversation;
 
 require_once 'include/dba.php';
 require_once 'include/items.php';
@@ -501,7 +502,7 @@ class Notifier
 		logger('notifier: calling hooks for ' . $cmd . ' ' . $item_id, LOGGER_DEBUG);
 
 		if ($normal_mode) {
-			Addon::forkHooks($a->queue['priority'], 'notifier_normal', $target_item);
+			Hook::fork($a->queue['priority'], 'notifier_normal', $target_item);
 		}
 
 		Addon::callHooks('notifier_end',$target_item);

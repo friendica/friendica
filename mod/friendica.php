@@ -31,15 +31,7 @@ function friendica_init(App $a)
 			$admin = false;
 		}
 
-		$visible_addons = [];
-		if (is_array($a->addons) && count($a->addons)) {
-			$r = q("SELECT * FROM `addon` WHERE `hidden` = 0");
-			if (DBA::isResult($r)) {
-				foreach ($r as $rr) {
-					$visible_addons[] = $rr['name'];
-				}
-			}
-		}
+		$visible_addons = Addon::getVisibleList();
 
 		Config::load('feature_lock');
 		$locked_features = [];
@@ -91,16 +83,7 @@ function friendica_content(App $a)
 	$o .= L10n::t('Suggestions, praise, etc. - please email "info" at "friendi - dot - ca');
 	$o .= '</p>' . PHP_EOL;
 
-	$visible_addons = [];
-	if (is_array($a->addons) && count($a->addons)) {
-		$r = q("SELECT * FROM `addon` WHERE `hidden` = 0");
-		if (DBA::isResult($r)) {
-			foreach ($r as $rr) {
-				$visible_addons[] = $rr['name'];
-			}
-		}
-	}
-
+	$visible_addons = Addon::getVisibleList();
 	if (count($visible_addons)) {
 		$o .= '<p>' . L10n::t('Installed addons/apps:') . '</p>' . PHP_EOL;
 		$sorted = $visible_addons;

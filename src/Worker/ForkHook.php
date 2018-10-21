@@ -5,7 +5,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Addon;
+use Friendica\Core\Hook;
 
 Class ForkHook
 {
@@ -13,6 +13,6 @@ Class ForkHook
 	{
 		$a = \Friendica\BaseObject::getApp();
 
-		Addon::callSingleHook($a, $name, $hook, $data);
+		Hook::callSingle($a, $name, $hook, $data);
 	}
 }

@@ -7,8 +7,8 @@
 namespace Friendica\Worker;
 
 use Friendica\BaseObject;
-use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\Hook;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -17,13 +17,13 @@ require_once 'include/dba.php';
 
 class Expire
 {
-	public static function execute($param = '', $hook_name = '')
+	public static function execute($param = '', $hook_function = '')
 	{
 		$a = BaseObject::getApp();
 
 		require_once 'include/items.php';
 
-		Addon::loadHooks();
+		Hook::loadHooks();
 
 		if ($param == 'delete') {
 			logger('Delete expired items', LOGGER_DEBUG);
@@ -62,11 +62,11 @@ class Expire
 				logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - done ', LOGGER_DEBUG);
 			}
 			return;
-		} elseif (!empty($hook_name) && ($param == 'hook') && is_array($a->hooks) && array_key_exists("expire", $a->hooks)) {
-			foreach ($a->hooks["expire"] as $hook) {
-				if ($hook[1] == $hook_name) {
+		} elseif ($param == 'hook' && !empty($hook_function)) {
+			foreach (Hook::getByName('expire') as $hook) {
+				if ($hook[1] == $hook_function) {
 					logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
-					Addon::callSingleHook($a, $hook_name, $hook, $data);
+					Hook::callSingle($a, 'expire', $hook, $data);
 				}
 			}
 			return;
@@ -86,13 +86,10 @@ class Expire
 		DBA::close($r);
 
 		logger('expire: calling hooks');
-
-		if (is_array($a->hooks) && array_key_exists('expire', $a->hooks)) {
-			foreach ($a->hooks['expire'] as $hook) {
-				logger("Calling expire hook for '" . $hook[1] . "'", LOGGER_DEBUG);
-				Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
-						'Expire', 'hook', $hook[1]);
-			}
+		foreach (Hook::getByName('expire') as $hook) {
+			logger("Calling expire hook for '" . $hook[1] . "'", LOGGER_DEBUG);
+			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
+					'Expire', 'hook', $hook[1]);
 		}
 
 		logger('expire: end');
