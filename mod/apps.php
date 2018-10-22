@@ -2,11 +2,11 @@
 /**
  * @file mod/apps.php
  */
-use Friendica\App;
+use Friendica\Content\Nav;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 
-function apps_content(App $a)
+function apps_content()
 {
 	$privateaddons = Config::get('config', 'private_addons');
 	if ($privateaddons === "1") {
@@ -18,13 +18,15 @@ function apps_content(App $a)
 
 	$title = L10n::t('Applications');
 
-	if (count($a->apps) == 0) {
+	$apps = Nav::getAppMenu();
+
+	if (count($apps) == 0) {
 		notice(L10n::t('No installed applications.') . EOL);
 	}
 
 	$tpl = get_markup_template('apps.tpl');
 	return replace_macros($tpl, [
 		'$title' => $title,
-		'$apps' => $a->apps,
+		'$apps'  => $apps,
 	]);
 }

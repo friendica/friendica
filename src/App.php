@@ -55,14 +55,12 @@ class App
 	public $interactive = true;
 	public $addons;
 	public $addons_admin = [];
-	public $apps = [];
 	public $identities;
 	public $is_mobile = false;
 	public $is_tablet = false;
 	public $performance = [];
 	public $callstack = [];
 	public $theme_info = [];
-	public $nav_sel;
 	public $category;
 	// Allow themes to control internal parameters
 	// by changing App values in theme.php
@@ -370,19 +368,6 @@ class App
 		$this->loadDefaultTimezone();
 
 		Core\L10n::init();
-
-		$this->page = [
-			'aside' => '',
-			'bottom' => '',
-			'content' => '',
-			'footer' => '',
-			'htmlhead' => '',
-			'nav' => '',
-			'page_title' => '',
-			'right_aside' => '',
-			'template' => '',
-			'title' => ''
-		];
 
 		$this->process_id = Core\System::processID('log');
 	}
@@ -1732,17 +1717,18 @@ class App
 			Core\Addon::check();
 		}
 
-		Content\Nav::setSelected('nothing');
-
-		//Don't populate apps_menu if apps are private
-		$privateapps = Core\Config::get('config', 'private_addons');
-		if ((local_user()) || (! $privateapps === "1")) {
-			$arr = ['app_menu' => $this->apps];
-
-			Core\Addon::callHooks('app_menu', $arr);
-
-			$this->apps = $arr['app_menu'];
-		}
+		$this->page = [
+			'aside' => '',
+			'bottom' => '',
+			'content' => '',
+			'footer' => '',
+			'htmlhead' => '',
+			'nav' => '',
+			'page_title' => '',
+			'right_aside' => '',
+			'template' => '',
+			'title' => ''
+		];
 
 		if (strlen($this->module)) {
 			// Compatibility with the Android Diaspora client
@@ -1849,7 +1835,6 @@ class App
 			require_once $theme_info_file;
 		}
 
-
 		// initialise content region
 		if ($this->getMode()->isNormal()) {
 			Core\Addon::callHooks('page_content_top', $this->page['content']);
@@ -1926,7 +1911,8 @@ class App
 
 		// Add the navigation (menu) template
 		if ($this->module != 'install' && $this->module != 'maintenance') {
-			Content\Nav::build($this);
+			$this->page['htmlhead'] .= replace_macros(get_markup_template('nav_head.tpl'), []);
+			$this->page['nav']       = Content\Nav::build($this);
 		}
 
 		// Build the page - now that we have all the components
