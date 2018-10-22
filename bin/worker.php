@@ -4,9 +4,7 @@
  * @file bin/worker.php
  * @brief Starts the background processing
  */
-
 use Friendica\App;
-use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Core\L10n;
@@ -20,10 +18,10 @@ $options = getopt($shortopts, $longopts);
 if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 	$directory = dirname($_SERVER["argv"][0]);
 
-	if (substr($directory, 0, 1) != "/") {
-		$directory = $_SERVER["PWD"]."/".$directory;
+	if (substr($directory, 0, 1) != '/') {
+		$directory = $_SERVER["PWD"] . '/' . $directory;
 	}
-	$directory = realpath($directory."/..");
+	$directory = realpath($directory . '/..');
 
 	chdir($directory);
 }
@@ -32,8 +30,6 @@ require_once "boot.php";
 
 $a = new App(dirname(__DIR__));
 
-Config::load();
-
 $lang = L10n::getBrowserLanguage();
 L10n::loadTranslationTable($lang);
 
@@ -41,13 +37,11 @@ L10n::loadTranslationTable($lang);
 check_db(true);
 
 // Quit when in maintenance
-if (Config::get('system', 'maintenance', false, true)) {
+if (!$a->getMode()->has(App\Mode::MAINTENANCEDISABLED)) {
 	return;
 }
 
 $a->setBaseURL(Config::get('system', 'url'));
-
-Addon::loadHooks();
 
 $spawn = array_key_exists('s', $options) || array_key_exists('spawn', $options);
 
@@ -63,5 +57,3 @@ Worker::processQueue($run_cron);
 Worker::unclaimProcess();
 
 Worker::endProcess();
-
-killme();
