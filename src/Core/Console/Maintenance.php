@@ -68,11 +68,6 @@ HELP;
 			throw new \RuntimeException('Database isn\'t ready or populated yet');
 		}
 
-		Core\Config::load();
-
-		$lang = Core\L10n::getBrowserLanguage();
-		Core\L10n::loadTranslationTable($lang);
-
 		$enabled = intval($this->getArgument(0));
 
 		Core\Config::set('system', 'maintenance', $enabled);

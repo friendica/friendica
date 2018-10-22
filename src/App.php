@@ -50,7 +50,6 @@ class App
 	public $argv;
 	public $argc;
 	public $module;
-	public $strings;
 	public $hooks = [];
 	public $timezone;
 	public $interactive = true;
@@ -369,6 +368,8 @@ class App
 		}
 
 		$this->loadDefaultTimezone();
+
+		Core\L10n::init();
 
 		$this->page = [
 			'aside' => '',
@@ -1663,38 +1664,16 @@ class App
 			Core\Addon::callHooks('init_1');
 		}
 
-		$lang = Core\L10n::getBrowserLanguage();
-
-		Core\L10n::loadTranslationTable($lang);
-
-
 		// Exclude the backend processes from the session management
 		if (!$this->isBackend()) {
 			$stamp1 = microtime(true);
 			session_start();
-			$this->saveTimestamp($stamp1, "parser");
+			$this->saveTimestamp($stamp1, 'parser');
+			Core\L10n::setSessionVariable();
+			Core\L10n::setLangFromSession();
 		} else {
 			$_SESSION = [];
 			Core\Worker::executeIfIdle();
-		}
-
-		/* Language was set earlier, but we can over-ride it in the session.
-		 * We have to do it here because the session was just now opened.
-		 */
-		if (!empty($_SESSION['authenticated']) && empty($_SESSION['language'])) {
-			$_SESSION['language'] = $lang;
-			// we haven't loaded user data yet, but we need user language
-			if (!empty($_SESSION['uid'])) {
-				$user = DBA::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
-				if (DBA::isResult($user)) {
-					$_SESSION['language'] = $user['language'];
-				}
-			}
-		}
-
-		if (!empty($_SESSION['language']) && $_SESSION['language'] !== $lang) {
-			$lang = $_SESSION['language'];
-			Core\L10n::loadTranslationTable($lang);
 		}
 
 		// ZRL

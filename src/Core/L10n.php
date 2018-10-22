@@ -12,19 +12,90 @@ require_once 'boot.php';
 require_once 'include/dba.php';
 
 /**
- * Provide Languange, Translation, and Localisation functions to the application
- * Localisation can be referred to by the numeronym L10N (as in: "L", followed by ten more letters, and then "N").
+ * Provide Language, Translation, and Localization functions to the application
+ * Localization can be referred to by the numeronym L10N (as in: "L", followed by ten more letters, and then "N").
  */
 class L10n extends BaseObject
 {
 	/**
-	 * @brief get the prefered language from the HTTP_ACCEPT_LANGUAGE header
+	 * A string indicating the current language used for translation:
+	 * - Two-letter ISO 639-1 code.
+	 * - Two-letter ISO 639-1 code + dash + Two-letter ISO 3166-1 alpha-2 country code.
+	 * @var string
 	 */
-	public static function getBrowserLanguage()
+	private $lang = '';
+	/**
+	 * A language code saved for later after pushLang() has been called.
+	 *
+	 * @var string
+	 */
+	private $langSave = '';
+
+	/**
+	 * An array of translation strings whose key is the neutral english message.
+	 *
+	 * @var array
+	 */
+	private $strings = [];
+	/**
+	 * An array of translation strings saved for later after pushLang() has been called.
+	 *
+	 * @var array
+	 */
+	private $stringsSave = [];
+
+	/**
+	 * Detects the language and sets the translation table
+	 */
+	public static function init()
+	{
+		$lang = self::detectLanguage();
+		self::loadTranslationTable($lang);
+	}
+
+	/**
+	 * Returns the current language code
+	 *
+	 * @return string Language code
+	 */
+	public static function getCurrentLang()
+	{
+		return self::$lang;
+	}
+
+	/**
+	 * Sets the language session variable
+	 */
+	public static function setSessionVariable()
+	{
+		if (!empty($_SESSION['authenticated']) && empty($_SESSION['language'])) {
+			$_SESSION['language'] = self::$lang;
+			// we haven't loaded user data yet, but we need user language
+			if (!empty($_SESSION['uid'])) {
+				$user = DBA::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
+				if (DBA::isResult($user)) {
+					$_SESSION['language'] = $user['language'];
+				}
+			}
+		}
+	}
+
+	public static function setLangFromSession()
+	{
+		if (!empty($_SESSION['language']) && $_SESSION['language'] !== self::$lang) {
+			self::loadTranslationTable($_SESSION['language']);
+		}
+	}
+
+	/**
+	 * @brief Returns the preferred language from the HTTP_ACCEPT_LANGUAGE header
+	 * @return string The two-letter language code
+	 */
+	public static function detectLanguage()
 	{
 		$lang_list = [];
 
-		if (x($_SERVER, 'HTTP_ACCEPT_LANGUAGE')) {
+		if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 			// break up string into pieces (languages and q factors)
 			preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
 
@@ -59,58 +130,69 @@ class L10n extends BaseObject
 	}
 
 	/**
-	 * @param string $language language
+	 * This function should be called before formatting messages in a specific target language
+	 * different from the current user/system language.
+	 *
+	 * It saves the current translation strings in a separate variable and loads new translations strings.
+	 *
+	 * If called repeatedly, it won't save the translation strings again, just load the new ones.
+	 *
+	 * @see popLang()
+	 * @brief Stores the current language strings and load a different language.
+	 * @param string $lang Language code
 	 */
-	public static function pushLang($language)
+	public static function pushLang($lang)
 	{
-		$a = self::getApp();
+		if (!self::$lang) {
+			self::init();
+		}
 
-		$a->langsave = Config::get('system', 'language');
-
-		if ($language === $a->langsave) {
+		if ($lang === self::$lang) {
 			return;
 		}
 
-		if (isset($a->strings) && count($a->strings)) {
-			$a->stringsave = $a->strings;
+		if (!self::$langSave) {
+			self::$langSave = self::$lang;
+			self::$stringsSave = self::$strings;
 		}
-		$a->strings = [];
-		self::loadTranslationTable($language);
-		Config::set('system', 'language', $language);
+
+		self::loadTranslationTable($lang);
 	}
 
 	/**
-	 * Pop language off the top of the stack
+	 * Restores the original user/system language after having used pushLang()
 	 */
 	public static function popLang()
 	{
-		$a = self::getApp();
-
-		if (Config::get('system', 'language') === $a->langsave) {
+		if (!self::$langSave) {
 			return;
 		}
 
-		if (isset($a->stringsave)) {
-			$a->strings = $a->stringsave;
-		} else {
-			$a->strings = [];
-		}
+		self::$strings = self::$stringsSave;
+		self::$lang = self::$langSave;
 
-		Config::set('system', 'language', $a->langsave);
+		self::$stringsSave = [];
+		self::$langSave = '';
 	}
 
 	/**
-	 * load string translation table for alternate language
+	 * Loads string translation table
 	 *
-	 * first addon strings are loaded, then globals
+	 * First addon strings are loaded, then globals
+	 *
+	 * Uses an App object shim since all the strings files refer to $a->strings
 	 *
 	 * @param string $lang language code to load
 	 */
-	public static function loadTranslationTable($lang)
+	private static function loadTranslationTable($lang)
 	{
-		$a = self::getApp();
+		if ($lang === self::$lang) {
+			return;
+		}
 
+		$a = new \stdClass();
 		$a->strings = [];
+
 		// load enabled addons strings
 		$addons = DBA::select('addon', ['name'], ['installed' => true]);
 		while ($p = DBA::fetch($addons)) {
@@ -123,6 +205,11 @@ class L10n extends BaseObject
 		if (file_exists("view/lang/$lang/strings.php")) {
 			include "view/lang/$lang/strings.php";
 		}
+
+		self::$lang = $lang;
+		self::$strings = $a->strings;
+
+		unset($a);
 	}
 
 	/**
@@ -143,14 +230,16 @@ class L10n extends BaseObject
 	 */
 	public static function t($s, ...$vars)
 	{
-		$a = self::getApp();
-
 		if (empty($s)) {
 			return '';
 		}
 
-		if (x($a->strings, $s)) {
-			$t = $a->strings[$s];
+		if (!self::$lang) {
+			self::init();
+		}
+
+		if (!empty(self::$strings[$s])) {
+			$t = self::$strings[$s];
 			$s = is_array($t) ? $t[0] : $t;
 		}
 
@@ -181,18 +270,18 @@ class L10n extends BaseObject
 	 */
 	public static function tt($singular, $plural, $count)
 	{
-		$a = self::getApp();
-
 		if (!is_numeric($count)) {
 			logger('Non numeric count called by ' . System::callstack(20));
 		}
 
-		$lang = Config::get('system', 'language');
+		if (!self::$lang) {
+			self::init();
+		}
 
-		if (!empty($a->strings[$singular])) {
-			$t = $a->strings[$singular];
+		if (!empty(self::$strings[$singular])) {
+			$t = self::$strings[$singular];
 			if (is_array($t)) {
-				$plural_function = 'string_plural_select_' . str_replace('-', '_', $lang);
+				$plural_function = 'string_plural_select_' . str_replace('-', '_', self::$lang);
 				if (function_exists($plural_function)) {
 					$i = $plural_function($count);
 				} else {
@@ -226,8 +315,6 @@ class L10n extends BaseObject
 	{
 		return $n != 1;
 	}
-
-
 
 	/**
 	 * @brief Return installed languages codes as associative array

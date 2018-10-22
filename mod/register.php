@@ -63,7 +63,7 @@ function register_post(App $a)
 
 	$arr['blocked'] = $blocked;
 	$arr['verified'] = $verified;
-	$arr['language'] = L10n::getBrowserLanguage();
+	$arr['language'] = L10n::detectLanguage();
 
 	try {
 		$result = Model\User::create($arr);
