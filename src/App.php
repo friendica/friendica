@@ -1678,8 +1678,7 @@ class App
 			Core\Worker::executeIfIdle();
 		}
 
-		/**
-		 * Language was set earlier, but we can over-ride it in the session.
+		/* Language was set earlier, but we can over-ride it in the session.
 		 * We have to do it here because the session was just now opened.
 		 */
 		if (!empty($_SESSION['authenticated']) && empty($_SESSION['language'])) {
@@ -1867,25 +1866,19 @@ class App
 			}
 		}
 
-		/**
-		 * Load current theme info
-		 */
+		// Load current theme info
 		$theme_info_file = 'view/theme/' . $this->getCurrentTheme() . '/theme.php';
 		if (file_exists($theme_info_file)) {
 			require_once $theme_info_file;
 		}
 
 
-		/* initialise content region */
-
+		// initialise content region
 		if ($this->getMode()->isNormal()) {
 			Core\Addon::callHooks('page_content_top', $this->page['content']);
 		}
 
-		/**
-		 * Call module functions
-		 */
-
+		// Call module functions
 		if ($this->module_loaded) {
 			$this->page['page_title'] = $this->module;
 			$placeholder = '';
@@ -2010,8 +2003,7 @@ class App
 		// Things like embedded OSM maps don't work, when this is enabled
 		// header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https: data:; media-src 'self' https:; child-src 'self' https:; object-src 'none'");
 
-		/*
-		 * We use $_GET["mode"] for special page templates. So we will check if we have
+		/* We use $_GET["mode"] for special page templates. So we will check if we have
 		 * to load another page template than the default one.
 		 * The page templates are located in /view/php/ or in the theme directory.
 		 */
