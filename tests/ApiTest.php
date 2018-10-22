@@ -12,6 +12,8 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Network\HTTPException;
 
+require_once __DIR__.'/../include/api.php';
+
 /**
  * Tests for the API functions.
  *
@@ -20,7 +22,6 @@ use Friendica\Network\HTTPException;
  */
 class ApiTest extends DatabaseTest
 {
-
 	/**
 	 * Create variables used by tests.
 	 */
@@ -28,7 +29,7 @@ class ApiTest extends DatabaseTest
 	{
 		parent::setUp();
 
-		require_once __DIR__.'/../include/api.php';
+		$this->app = BaseObject::getApp();
 
 		// User data that the test database is populated with
 		$this->selfUser = [
@@ -59,6 +60,10 @@ class ApiTest extends DatabaseTest
 			'authenticated' => true,
 			'uid' => $this->selfUser['id']
 		];
+
+		Config::set('system', 'url', 'http://localhost');
+		Config::set('system', 'hostname', 'localhost');
+		Config::set('system', 'worker_dont_fork', true);
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');

@@ -14,29 +14,14 @@ use PHPUnit\DbUnit\TestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Extensions_Database_DB_IDatabaseConnection;
 
+require_once __DIR__.'/../boot.php';
+
 /**
  * Abstract class used by tests that need a database.
  */
 abstract class DatabaseTest extends TestCase
 {
 	use TestCaseTrait;
-
-	/**
-	 * @var App The Friendica App
-	 */
-	protected $app;
-
-	protected function setUp()
-	{
-		require_once __DIR__.'/../boot.php';
-
-		// Reusable App object
-		$this->app = BaseObject::getApp();
-
-		Config::set('system', 'url', 'http://localhost');
-		Config::set('system', 'hostname', 'localhost');
-		Config::set('system', 'worker_dont_fork', true);
-	}
 
 	/**
 	 * Get database connection.
@@ -54,6 +39,11 @@ abstract class DatabaseTest extends TestCase
 		if (!getenv('MYSQL_DATABASE')) {
 			$this->markTestSkipped('Please set the MYSQL_* environment variables to your test database credentials.');
 		}
+
+		DBA::connect(getenv('MYSQL_HOST'),
+			getenv('MYSQL_USERNAME'),
+			getenv('MYSQL_PASSWORD'),
+			getenv('MYSQL_DATABASE'));
 
 		if (!DBA::connected()) {
 			$this->markTestSkipped('Could not connect to the database.');

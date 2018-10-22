@@ -6,6 +6,10 @@ namespace Friendica\Core;
 use Friendica\Test\Util\VFSTrait;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class InstallTest extends TestCase
 {
 	use VFSTrait;
@@ -48,7 +52,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testCheckKeys()
 	{
@@ -63,7 +66,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testCheckFunctions()
 	{
@@ -141,7 +143,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testCheckLocalIni()
 	{
@@ -160,7 +161,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testCheckHtAccessFail()
 	{
@@ -201,7 +201,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testCheckHtAccessWork()
 	{
@@ -241,7 +240,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testImagick()
 	{
@@ -264,7 +262,6 @@ class InstallTest extends TestCase
 
 	/**
 	 * @small
-	 * @runInSeparateProcess
 	 */
 	public function testImagickNotFound()
 	{
