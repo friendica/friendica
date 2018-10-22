@@ -2004,6 +2004,6 @@ class App
 		}
 
 		$redirectTo = $this->getBaseURL($ssl) . '/' . ltrim($toUrl, '/');
-		System::externalRedirect($redirectTo);
+		Core\System::externalRedirect($redirectTo);
 	}
 }
