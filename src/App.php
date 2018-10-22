@@ -1649,12 +1649,13 @@ class App
 		}
 
 		if (!$this->getMode()->isInstall()) {
+			// Force SSL redirection
 			if (Core\Config::get('system', 'force_ssl') && ($this->getScheme() == "http")
-				&& (intval(Core\Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL)
-				&& (substr($this->getBaseURL(), 0, 8) == "https://")
-				&& ($_SERVER['REQUEST_METHOD'] == 'GET')) {
-				header("HTTP/1.1 302 Moved Temporarily");
-				header("Location: " . $this->getBaseURL() . "/" . $this->query_string);
+				&& intval(Core\Config::get('system', 'ssl_policy')) == SSL_POLICY_FULL
+				&& strpos($this->getBaseURL(), 'https://') === 0
+				&& $_SERVER['REQUEST_METHOD'] == 'GET') {
+				header('HTTP/1.1 302 Moved Temporarily');
+				header('Location: ' . $this->getBaseURL() . '/' . $this->query_string);
 				exit();
 			}
 
@@ -1666,14 +1667,6 @@ class App
 
 		Core\L10n::loadTranslationTable($lang);
 
-		/**
-		 * Important stuff we always need to do.
-		 *
-		 * The order of these may be important so use caution if you think they're all
-		 * intertwingled with no logical order and decide to sort it out. Some of the
-		 * dependencies have changed, but at least at one time in the recent past - the
-		 * order was critical to everything working properly
-		 */
 
 		// Exclude the backend processes from the session management
 		if (!$this->isBackend()) {
@@ -1705,6 +1698,7 @@ class App
 			Core\L10n::loadTranslationTable($lang);
 		}
 
+		// ZRL
 		if (!empty($_GET['zrl']) && $this->getMode()->isNormal()) {
 			$this->query_string = Model\Profile::stripZrls($this->query_string);
 			if (!local_user()) {
@@ -1813,11 +1807,10 @@ class App
 				$this->module = "login";
 			}
 
-			$privateapps = Core\Config::get('config', 'private_addons');
-
+			$privateapps = Core\Config::get('config', 'private_addons', false);
 			if (is_array($this->addons) && in_array($this->module, $this->addons) && file_exists("addon/{$this->module}/{$this->module}.php")) {
 				//Check if module is an app and if public access to apps is allowed or not
-				if ((!local_user()) && Core\Addon::isApp($this->module) && $privateapps === "1") {
+				if ((!local_user()) && Core\Addon::isApp($this->module) && $privateapps) {
 					info(Core\L10n::t("You must be logged in to use addons. "));
 				} else {
 					include_once "addon/{$this->module}/{$this->module}.php";
