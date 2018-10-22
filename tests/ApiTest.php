@@ -12,7 +12,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Network\HTTPException;
 
-require_once(__DIR__ . '/../include/api.php');
+require_once __DIR__ . '/../include/api.php';
 
 /**
  * Tests for the API functions.
