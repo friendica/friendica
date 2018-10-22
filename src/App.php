@@ -1714,9 +1714,7 @@ class App
 					// Someone came with an invalid parameter, maybe as a DDoS attempt
 					// We simply stop processing here
 					logger("Invalid ZRL parameter " . $_GET['zrl'], LOGGER_DEBUG);
-					header('HTTP/1.1 403 Forbidden');
-					echo "<h1>403 Forbidden</h1>";
-					exit();
+					Core\System::httpExit(403, ['title' => '403 Forbidden']);
 				}
 			}
 		}
