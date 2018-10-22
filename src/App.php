@@ -1733,35 +1733,35 @@ class App
 		if (strlen($this->module)) {
 			// Compatibility with the Android Diaspora client
 			if ($this->module == 'stream') {
-				goaway('network?f=&order=post');
+				$this->internalRedirect('network?f=&order=post');
 			}
 
 			if ($this->module == 'conversations') {
-				goaway('message');
+				$this->internalRedirect('message');
 			}
 
 			if ($this->module == 'commented') {
-				goaway('network?f=&order=comment');
+				$this->internalRedirect('network?f=&order=comment');
 			}
 
 			if ($this->module == 'liked') {
-				goaway('network?f=&order=comment');
+				$this->internalRedirect('network?f=&order=comment');
 			}
 
 			if ($this->module == 'activity') {
-				goaway('network/?f=&conv=1');
+				$this->internalRedirect('network/?f=&conv=1');
 			}
 
 			if (($this->module == 'status_messages') && ($this->cmd == 'status_messages/new')) {
-				goaway('bookmarklet');
+				$this->internalRedirect('bookmarklet');
 			}
 
 			if (($this->module == 'user') && ($this->cmd == 'user/edit')) {
-				goaway('settings');
+				$this->internalRedirect('settings');
 			}
 
 			if (($this->module == 'tag_followings') && ($this->cmd == 'tag_followings/manage')) {
-				goaway('search');
+				$this->internalRedirect('search');
 			}
 
 			// Compatibility with the Firefox App
@@ -1816,7 +1816,7 @@ class App
 
 				if (!empty($_SERVER['QUERY_STRING']) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
 					logger('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
-					goaway($this->getBaseURL() . $_SERVER['REQUEST_URI']);
+					$this->internalRedirect($_SERVER['REQUEST_URI']);
 				}
 
 				logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
