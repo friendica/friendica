@@ -1715,7 +1715,8 @@ class App
 		} else {
 			$this->checkURL();
 			check_db(false);
-			Core\Addon::check();
+			Core\Addon::loadAddons();
+			Core\Hook::loadHooks();
 		}
 
 		$this->page = [
