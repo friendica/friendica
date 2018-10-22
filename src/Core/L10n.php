@@ -23,26 +23,26 @@ class L10n extends BaseObject
 	 * - Two-letter ISO 639-1 code + dash + Two-letter ISO 3166-1 alpha-2 country code.
 	 * @var string
 	 */
-	private $lang = '';
+	private static $lang = '';
 	/**
 	 * A language code saved for later after pushLang() has been called.
 	 *
 	 * @var string
 	 */
-	private $langSave = '';
+	private static $langSave = '';
 
 	/**
 	 * An array of translation strings whose key is the neutral english message.
 	 *
 	 * @var array
 	 */
-	private $strings = [];
+	private static $strings = [];
 	/**
 	 * An array of translation strings saved for later after pushLang() has been called.
 	 *
 	 * @var array
 	 */
-	private $stringsSave = [];
+	private static $stringsSave = [];
 
 	/**
 	 * Detects the language and sets the translation table
