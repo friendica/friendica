@@ -1335,9 +1335,9 @@ function api_status_show($type, $item_id = 0)
 		}
 
 		if ($status_info["source"] == 'web') {
-			$status_info["source"] = ContactSelector::networkToName($lastwall['network'], $user_info['url']);
-		} elseif (ContactSelector::networkToName($lastwall['network'], $user_info['url']) != $status_info["source"]) {
-			$status_info["source"] = trim($status_info["source"].' ('.ContactSelector::networkToName($lastwall['network'], $user_info['url']).')');
+			$status_info["source"] = ContactSelector::networkToName($lastwall['network'], $lastwall['author-link']);
+		} elseif (ContactSelector::networkToName($lastwall['network'], $lastwall['author-link']) != $status_info["source"]) {
+			$status_info["source"] = trim($status_info["source"].' ('.ContactSelector::networkToName($lastwall['network'], $lastwall['author-link']).')');
 		}
 
 		// "uid" and "self" are only needed for some internal stuff, so remove it from here
@@ -1410,11 +1410,11 @@ function api_users_show($type)
 		}
 
 		if ($user_info["status"]["source"] == 'web') {
-			$user_info["status"]["source"] = ContactSelector::networkToName($lastwall['network'], $user_info['url']);
+			$user_info["status"]["source"] = ContactSelector::networkToName($lastwall['network'], $lastwall['author-link']);
 		}
 
 		if (ContactSelector::networkToName($lastwall['network'], $user_info['url']) != $user_info["status"]["source"]) {
-			$user_info["status"]["source"] = trim($user_info["status"]["source"] . ' (' . ContactSelector::networkToName($lastwall['network'], $user_info['url']) . ')');
+			$user_info["status"]["source"] = trim($user_info["status"]["source"] . ' (' . ContactSelector::networkToName($lastwall['network'], $lastwall['author-link']) . ')');
 		}
 	}
 
@@ -2912,9 +2912,9 @@ function api_format_items($r, $user_info, $filter_user = false, $type = "json")
 		}
 
 		if ($status["source"] == 'web') {
-			$status["source"] = ContactSelector::networkToName($item['network'], $user_info['url']);
-		} elseif (ContactSelector::networkToName($item['network'], $user_info['url']) != $status["source"]) {
-			$status["source"] = trim($status["source"].' ('.ContactSelector::networkToName($item['network'], $user_info['url']).')');
+			$status["source"] = ContactSelector::networkToName($item['network'], $item['author-link']);
+		} elseif (ContactSelector::networkToName($item['network'], $item['author-link']) != $status["source"]) {
+			$status["source"] = trim($status["source"].' ('.ContactSelector::networkToName($item['network'], $item['author-link']).')');
 		}
 
 		if ($item["id"] == $item["parent"]) {
