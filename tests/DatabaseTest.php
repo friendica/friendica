@@ -28,6 +28,8 @@ abstract class DatabaseTest extends TestCase
 
 	protected function setUp()
 	{
+		require_once __DIR__.'/../boot.php';
+
 		// Reusable App object
 		$this->app = BaseObject::getApp();
 
