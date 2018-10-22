@@ -99,32 +99,55 @@ class APContact extends BaseObject
 		}
 
 		$data = ActivityPub::fetchContent($url);
-
-		if (empty($data) || empty($data['id']) || empty($data['inbox'])) {
+		if (empty($data)) {
 			return false;
 		}
 
+		$compacted = JsonLD::compact($data);
+
 		$apcontact = [];
-		$apcontact['url'] = $data['id'];
-		$apcontact['uuid'] = defaults($data, 'diaspora:guid', null);
-		$apcontact['type'] = defaults($data, 'type', null);
-		$apcontact['following'] = defaults($data, 'following', null);
-		$apcontact['followers'] = defaults($data, 'followers', null);
-		$apcontact['inbox'] = defaults($data, 'inbox', null);
-		$apcontact['outbox'] = defaults($data, 'outbox', null);
-		$apcontact['sharedinbox'] = JsonLD::fetchElement($data, 'endpoints', 'sharedInbox');
-		$apcontact['nick'] = defaults($data, 'preferredUsername', null);
-		$apcontact['name'] = defaults($data, 'name', $apcontact['nick']);
-		$apcontact['about'] = HTML::toBBCode(defaults($data, 'summary', ''));
-		$apcontact['photo'] = JsonLD::fetchElement($data, 'icon', 'url');
-		$apcontact['alias'] = JsonLD::fetchElement($data, 'url', 'href');
+		$apcontact['url'] = $compacted['@id'];
+		$apcontact['uuid'] = JsonLD::fetchElement($compacted, 'diaspora:guid');
+		$apcontact['type'] = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
+		$apcontact['following'] = JsonLD::fetchElement($compacted, 'as:following', '@id');
+		$apcontact['followers'] = JsonLD::fetchElement($compacted, 'as:followers', '@id');
+		$apcontact['inbox'] = JsonLD::fetchElement($compacted, 'ldp:inbox', '@id');
+		$apcontact['outbox'] = JsonLD::fetchElement($compacted, 'as:outbox', '@id');
+
+		$apcontact['sharedinbox'] = '';
+		if (!empty($compacted['as:endpoints'])) {
+			$apcontact['sharedinbox'] = JsonLD::fetchElement($compacted['as:endpoints'], 'as:sharedInbox', '@id');
+		}
+
+		$apcontact['nick'] = JsonLD::fetchElement($compacted, 'as:preferredUsername');
+		$apcontact['name'] = JsonLD::fetchElement($compacted, 'as:name');
+
+		if (empty($apcontact['name'])) {
+			$apcontact['name'] = $apcontact['nick'];
+		}
+
+		$apcontact['about'] = HTML::toBBCode(JsonLD::fetchElement($compacted, 'as:summary'));
+
+		$apcontact['photo'] = JsonLD::fetchElement($compacted, 'as:icon', '@id');
+		if (is_array($apcontact['photo'])) {
+			$apcontact['photo'] = JsonLD::fetchElement($compacted['as:icon'], 'as:url', '@id');
+		}
+
+		$apcontact['alias'] = JsonLD::fetchElement($compacted, 'as:url', '@id');
+		if (is_array($apcontact['alias'])) {
+			$apcontact['alias'] = JsonLD::fetchElement($compacted['as:url'], 'as:href', '@id');
+		}
+
+		if (empty($apcontact['url']) || empty($apcontact['inbox'])) {
+			return false;
+		}
 
 		$parts = parse_url($apcontact['url']);
 		unset($parts['scheme']);
 		unset($parts['path']);
 		$apcontact['addr'] = $apcontact['nick'] . '@' . str_replace('//', '', Network::unparseURL($parts));
 
-		$apcontact['pubkey'] = trim(JsonLD::fetchElement($data, 'publicKey', 'publicKeyPem'));
+		$apcontact['pubkey'] = trim(JsonLD::fetchElement($compacted, 'w3id:publicKey', 'w3id:publicKeyPem'));
 
 		// To-Do
 		// manuallyApprovesFollowers
