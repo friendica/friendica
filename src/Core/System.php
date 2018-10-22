@@ -142,7 +142,7 @@ class System extends BaseObject
 				'$description' => defaults($description, 'description', '')]);
 		}
 
-		killme();
+		exit();
 	}
 
 	/**
