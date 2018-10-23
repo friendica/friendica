@@ -54,6 +54,7 @@ class Delivery extends BaseObject
 			$uid = $target_item['uid'];
 		} elseif ($cmd == self::RELOCATION) {
 			$uid = $item_id;
+			$target_item = [];
 		} else {
 			$item = Item::selectFirst(['parent'], ['id' => $item_id]);
 			if (!DBA::isResult($item) || empty($item['parent'])) {
