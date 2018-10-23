@@ -549,14 +549,14 @@ function dfrn_poll_content(App $a)
 
 			switch ($destination_url) {
 				case 'profile':
-					$a->internalRedirect('profile/' . $profile . '?f=&tab=profile';
+					$a->internalRedirect('profile/' . $profile . '?f=&tab=profile');
 					break;
 				case 'photos':
-					$a->internalRedirect('photos/' . $profile;
+					$a->internalRedirect('photos/' . $profile);
 					break;
 				case 'status':
 				case '':
-					$a->internalRedirect('profile/' . $profile;
+					$a->internalRedirect('profile/' . $profile);
 					break;
 				default:
 					$appendix = (strstr($destination_url, '?') ? '&f=&redir=1' : '?f=&redir=1');
