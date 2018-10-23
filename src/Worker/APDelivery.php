@@ -7,6 +7,7 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Model\Item;
+use Friendica\Core\Worker;
 use Friendica\Util\HTTPSignature;
 
 class APDelivery extends BaseObject
@@ -23,19 +24,25 @@ class APDelivery extends BaseObject
 	{
 		logger('Invoked: ' . $cmd . ': ' . $item_id . ' to ' . $inbox, LOGGER_DEBUG);
 
+		$success = true;
+
 		if ($cmd == Delivery::MAIL) {
 		} elseif ($cmd == Delivery::SUGGESTION) {
-			ActivityPub\Transmitter::sendContactSuggestion($uid, $inbox, $item_id);
+			$success = ActivityPub\Transmitter::sendContactSuggestion($uid, $inbox, $item_id);
 		} elseif ($cmd == Delivery::RELOCATION) {
 		} elseif ($cmd == Delivery::REMOVAL) {
-			ActivityPub\Transmitter::sendProfileDeletion($uid, $inbox);
+			$success = ActivityPub\Transmitter::sendProfileDeletion($uid, $inbox);
 		} elseif ($cmd == Delivery::PROFILEUPDATE) {
-			ActivityPub\Transmitter::sendProfileUpdate($uid, $inbox);
+			$success = ActivityPub\Transmitter::sendProfileUpdate($uid, $inbox);
 		} else {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item_id);
 			if (!empty($data)) {
-				HTTPSignature::transmit($data, $inbox, $uid);
+				$success = HTTPSignature::transmit($data, $inbox, $uid);
 			}
+		}
+
+		if (!$success) {
+			Worker::defer();
 		}
 	}
 }

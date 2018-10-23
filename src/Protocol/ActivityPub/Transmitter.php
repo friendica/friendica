@@ -936,6 +936,8 @@ class Transmitter
 	 * @param integer $uid User ID
 	 * @param string $inbox Target inbox
 	 * @param integer $suggestion_id Suggestion ID
+	 *
+	 * @return boolean was the transmission successful?
 	 */
 	public static function sendContactSuggestion($uid, $inbox, $suggestion_id)
 	{
@@ -957,7 +959,7 @@ class Transmitter
 		$signed = LDSignature::sign($data, $owner);
 
 		logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
-		HTTPSignature::transmit($signed, $inbox, $uid);
+		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
 	/**
@@ -965,6 +967,8 @@ class Transmitter
 	 *
 	 * @param integer $uid User ID
 	 * @param string $inbox Target inbox
+	 *
+	 * @return boolean was the transmission successful?
 	 */
 	public static function sendProfileDeletion($uid, $inbox)
 	{
@@ -984,7 +988,7 @@ class Transmitter
 		$signed = LDSignature::sign($data, $owner);
 
 		logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
-		HTTPSignature::transmit($signed, $inbox, $uid);
+		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
 	/**
@@ -992,6 +996,8 @@ class Transmitter
 	 *
 	 * @param integer $uid User ID
 	 * @param string $inbox Target inbox
+	 *
+	 * @return boolean was the transmission successful?
 	 */
 	public static function sendProfileUpdate($uid, $inbox)
 	{
@@ -1011,7 +1017,7 @@ class Transmitter
 		$signed = LDSignature::sign($data, $owner);
 
 		logger('Deliver profile update for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
-		HTTPSignature::transmit($signed, $inbox, $uid);
+		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
 	/**

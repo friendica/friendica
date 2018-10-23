@@ -243,7 +243,9 @@ class Worker
 			self::execFunction($queue, $include, $argv, true);
 
 			$stamp = (float)microtime(true);
-			if (DBA::update('workerqueue', ['done' => true], ['id' => $queue['id']])) {
+
+			$condition = ["`id` = ? AND `next_try` < ?", $queue['id'], DateTimeFormat::utcNow()];
+			if (DBA::update('workerqueue', ['done' => true], $condition)) {
 				Config::set('system', 'last_worker_execution', DateTimeFormat::utcNow());
 			}
 			self::$db_duration = (microtime(true) - $stamp);
@@ -1137,8 +1139,8 @@ class Worker
 		$id = $queue['id'];
 
 		if ($retrial > 14) {
-			logger('Id ' . $id . ' had been tried 14 times, it will be deleted now.', LOGGER_DEBUG);
-			DBA::delete('workerqueue', ['id' => $id]);
+			logger('Id ' . $id . ' had been tried 14 times. We stop now.', LOGGER_DEBUG);
+			return;
 		}
 
 		// Calculate the delay until the next trial

@@ -272,9 +272,11 @@ class HTTPSignature
 	/**
 	 * @brief Transmit given data to a target for a user
 	 *
-	 * @param $data
-	 * @param $target
-	 * @param $uid
+	 * @param array $data Data that is about to be send
+	 * @param string $target The URL of the inbox
+	 * @param integer $uid User id of the sender
+	 *
+	 * @return boolean Was the transmission successful?
 	 */
 	public static function transmit($data, $target, $uid)
 	{
@@ -303,8 +305,11 @@ class HTTPSignature
 		$headers[] = 'Content-Type: application/activity+json';
 
 		$postResult = Network::post($target, $content, $headers);
+		$return_code = $postResult->getReturnCode();
 
-		logger('Transmit to ' . $target . ' returned ' . $postResult->getReturnCode());
+		logger('Transmit to ' . $target . ' returned ' . $return_code);
+
+		return ($return_code >= 200) && ($return_code <= 299);
 	}
 
 	/**
