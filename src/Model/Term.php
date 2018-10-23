@@ -290,4 +290,19 @@ class Term
 
 		return $return;
 	}
+
+	/*
+	 * Deletes all Tags from an item
+	 */
+	public static function deleteAllTags($itemid)
+	{
+		$message = Item::selectFirst(['id'], ['id' => $itemid]);
+		if (!DBA::isResult($message)) {
+			return;
+		}
+
+		// Clean up all tags
+		DBA::delete('term', ['otype' => TERM_OBJ_POST, 'oid' => $itemid, 'type' => [TERM_HASHTAG, TERM_MENTION]]);
+
+	}
 }

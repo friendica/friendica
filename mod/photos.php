@@ -612,7 +612,8 @@ function photos_post(App $a)
 						}
 					} elseif (strpos($tag, '#') === 0) {
 						$tagname = substr($tag, 1);
-						$str_tags .= '#[url=' . System::baseUrl() . "/search?tag=" . $tagname . ']' . $tagname . '[/url]';
+						$str_tags .= '#[url=' . System::baseUrl() . "/search?tag=" . $tagname . ']' . $tagname . '[/url],';
+						logger("Handle Tag: " . $tag . ' STR_TAGS: ' . $str_tags, LOGGER_DEBUG);
 					}
 				}
 			}
@@ -1412,17 +1413,15 @@ function photos_content(App $a)
 		if (count($linked_items) && strlen($link_item['tag'])) {
 			$arr = explode(',', $link_item['tag']);
 			// parse tags and add links
-			$tag_str = '';
+			$tag_arr = [];
 			foreach ($arr as $t) {
-				if (strlen($tag_str)) {
-					$tag_str .= ', ';
-				}
-				$tag_str .= BBCode::convert($t);
+				array_push($tag_arr, ['name' => BBCode::convert($t),
+					'removeurl' => '/tagrm/'.$link_item['id'] . '/' . bin2hex($t)]);
 			}
-			$tags = [L10n::t('Tags: '), $tag_str];
+			$tags = ['title' => L10n::t('Tags: '), 'tags' => $tag_arr];
 			if ($cmd === 'edit') {
-				$tags[] = 'tagrm/' . $link_item['id'];
-				$tags[] = L10n::t('[Remove any tag]');
+				$tags += ['removeanyurl' => 'tagrm/' . $link_item['id']];
+				$tags += ['removetitle' => L10n::t('[Remove any tag]')];
 			}
 		}
 
