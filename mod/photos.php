@@ -612,7 +612,6 @@ function photos_post(App $a)
 					} elseif (strpos($tag, '#') === 0) {
 						$tagname = substr($tag, 1);
 						$str_tags .= '#[url=' . System::baseUrl() . "/search?tag=" . $tagname . ']' . $tagname . '[/url],';
-						logger("Handle Tag: " . $tag . ' STR_TAGS: ' . $str_tags, LOGGER_DEBUG);
 					}
 				}
 			}

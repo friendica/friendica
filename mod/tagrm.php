@@ -32,14 +32,14 @@ function tagrm_post(App $a)
 
 	info(L10n::t('Tag(s) removed') . EOL );
 
-	goaway('/' . $_SESSION['photo_return']);
+	$a->internalRedirect($_SESSION['photo_return']);
 
 	// NOTREACHED
 }
 
 function update_tags($item_id, $tags){
 	if (empty($item_id) || empty($tags)){
-		goaway('/' . $_SESSION['photo_return']);
+		$a->internalRedirect($_SESSION['photo_return']);
 	}
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
