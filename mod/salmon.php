@@ -3,6 +3,7 @@
  * @file mod/salmon.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -22,7 +23,7 @@ function salmon_post(App $a, $xml = '') {
 
 	logger('new salmon ' . $xml, LOGGER_DATA);
 
-	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
+	$nick       = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : '');
 	$mentions   = (($a->argc > 2 && $a->argv[2] === 'mention') ? true : false);
 
 	$r = q("SELECT * FROM `user` WHERE `nickname` = '%s' AND `account_expired` = 0 AND `account_removed` = 0 LIMIT 1",

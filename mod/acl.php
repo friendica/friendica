@@ -3,6 +3,7 @@
 /* ACL selector json backend */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
@@ -187,7 +188,7 @@ function acl_content(App $a)
 		);
 	} elseif ($type == 'x') {
 		// autocomplete for global contact search (e.g. navbar search)
-		$search = notags(trim($_REQUEST['search']));
+		$search = Text::noTags(trim($_REQUEST['search']));
 		$mode = $_REQUEST['smode'];
 
 		$r = ACL::contactAutocomplete($search, $mode);

@@ -18,10 +18,10 @@ function wallmessage_post(App $a) {
 		return;
 	}
 
-	$subject   = ((x($_REQUEST,'subject'))   ? notags(trim($_REQUEST['subject']))   : '');
+	$subject   = ((x($_REQUEST,'subject'))   ? Text::noTags(trim($_REQUEST['subject']))   : '');
 	$body      = ((x($_REQUEST,'body'))      ? Text::escapeTags(trim($_REQUEST['body'])) : '');
 
-	$recipient = (($a->argc > 1) ? notags($a->argv[1]) : '');
+	$recipient = (($a->argc > 1) ? Text::noTags($a->argv[1]) : '');
 	if ((! $recipient) || (! $body)) {
 		return;
 	}

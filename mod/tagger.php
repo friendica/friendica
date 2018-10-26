@@ -3,6 +3,7 @@
  * @file mod/tagger.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -18,7 +19,7 @@ function tagger_content(App $a) {
 		return;
 	}
 
-	$term = notags(trim($_GET['term']));
+	$term = Text::noTags(trim($_GET['term']));
 	// no commas allowed
 	$term = str_replace([',',' '],['','_'],$term);
 
@@ -26,7 +27,7 @@ function tagger_content(App $a) {
 		return;
 	}
 
-	$item_id = (($a->argc > 1) ? notags(trim($a->argv[1])) : 0);
+	$item_id = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : 0);
 
 	logger('tagger: tag ' . $term . ' item ' . $item_id);
 

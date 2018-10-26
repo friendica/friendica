@@ -38,15 +38,15 @@ function dfrn_notify_post(App $a) {
 		}
 	}
 
-	$dfrn_id      = ((x($_POST,'dfrn_id'))      ? notags(trim($_POST['dfrn_id']))   : '');
+	$dfrn_id      = ((x($_POST,'dfrn_id'))      ? Text::noTags(trim($_POST['dfrn_id']))   : '');
 	$dfrn_version = ((x($_POST,'dfrn_version')) ? (float) $_POST['dfrn_version']    : 2.0);
-	$challenge    = ((x($_POST,'challenge'))    ? notags(trim($_POST['challenge'])) : '');
+	$challenge    = ((x($_POST,'challenge'))    ? Text::noTags(trim($_POST['challenge'])) : '');
 	$data         = ((x($_POST,'data'))         ? $_POST['data']                    : '');
 	$key          = ((x($_POST,'key'))          ? $_POST['key']                     : '');
 	$rino_remote  = ((x($_POST,'rino'))         ? intval($_POST['rino'])            :  0);
 	$dissolve     = ((x($_POST,'dissolve'))     ? intval($_POST['dissolve'])        :  0);
-	$perm         = ((x($_POST,'perm'))         ? notags(trim($_POST['perm']))      : 'r');
-	$ssl_policy   = ((x($_POST,'ssl_policy'))   ? notags(trim($_POST['ssl_policy'])): 'none');
+	$perm         = ((x($_POST,'perm'))         ? Text::noTags(trim($_POST['perm']))      : 'r');
+	$ssl_policy   = ((x($_POST,'ssl_policy'))   ? Text::noTags(trim($_POST['ssl_policy'])): 'none');
 	$page         = ((x($_POST,'page'))         ? intval($_POST['page'])            :  0);
 
 	$forum = (($page == 1) ? 1 : 0);
@@ -253,7 +253,7 @@ function dfrn_notify_content(App $a) {
 		 * If this is a duplex communication, ours will be the opposite.
 		 */
 
-		$dfrn_id = notags(trim($_GET['dfrn_id']));
+		$dfrn_id = Text::noTags(trim($_GET['dfrn_id']));
 		$dfrn_version = (float) $_GET['dfrn_version'];
 		$rino_remote = ((x($_GET,'rino')) ? intval($_GET['rino']) : 0);
 		$type = "";

@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -23,7 +24,7 @@ function unfollow_post(App $a)
 	}
 
 	$uid = local_user();
-	$url = notags(trim(defaults($_REQUEST, 'url', '')));
+	$url = Text::noTags(trim(defaults($_REQUEST, 'url', '')));
 
 	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
 		$uid, Contact::SHARING, Contact::FRIEND, normalise_link($url),
@@ -78,7 +79,7 @@ function unfollow_content(App $a)
 	}
 
 	$uid = local_user();
-	$url = notags(trim($_REQUEST['url']));
+	$url = Text::noTags(trim($_REQUEST['url']));
 
 	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
 		local_user(), Contact::SHARING, Contact::FRIEND, normalise_link($url),

@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Authentication;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -73,16 +74,16 @@ function openid_content(App $a) {
 			if (is_array($attr) && count($attr)) {
 				foreach ($attr as $k => $v) {
 					if ($k === 'namePerson/friendly') {
-						$nick = notags(trim($v));
+						$nick = Text::noTags(trim($v));
 					}
 					if($k === 'namePerson/first') {
-						$first = notags(trim($v));
+						$first = Text::noTags(trim($v));
 					}
 					if($k === 'namePerson') {
-						$args .= '&username=' . urlencode(notags(trim($v)));
+						$args .= '&username=' . urlencode(Text::noTags(trim($v)));
 					}
 					if ($k === 'contact/email') {
-						$args .= '&email=' . urlencode(notags(trim($v)));
+						$args .= '&email=' . urlencode(Text::noTags(trim($v)));
 					}
 					if ($k === 'media/image/aspect11') {
 						$photosq = bin2hex(trim($v));
@@ -106,7 +107,7 @@ function openid_content(App $a) {
 				$args .= '&photo=' . urlencode($photo);
 			}
 
-			$args .= '&openid_url=' . urlencode(notags(trim($authid)));
+			$args .= '&openid_url=' . urlencode(Text::noTags(trim($authid)));
 
 			$a->internalRedirect('register?' . $args);
 

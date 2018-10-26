@@ -3,6 +3,7 @@
  * @file mod/follow.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -24,7 +25,7 @@ function follow_post(App $a)
 	}
 
 	$uid = local_user();
-	$url = notags(trim($_REQUEST['url']));
+	$url = Text::noTags(trim($_REQUEST['url']));
 	$return_path = 'contacts';
 
 	// Makes the connection request for friendica contacts easier
@@ -59,7 +60,7 @@ function follow_content(App $a)
 	}
 
 	$uid = local_user();
-	$url = notags(trim($_REQUEST['url']));
+	$url = Text::noTags(trim($_REQUEST['url']));
 
 	$submit = L10n::t('Submit Request');
 

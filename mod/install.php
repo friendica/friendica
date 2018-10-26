@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Install;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -43,11 +44,11 @@ function install_post(App $a) {
 			return;
 			break; // just in case return don't return :)
 		case 3:
-			$dbhost = notags(trim($_POST['dbhost']));
-			$dbuser = notags(trim($_POST['dbuser']));
-			$dbpass = notags(trim($_POST['dbpass']));
-			$dbdata = notags(trim($_POST['dbdata']));
-			$phpath = notags(trim($_POST['phpath']));
+			$dbhost = Text::noTags(trim($_POST['dbhost']));
+			$dbuser = Text::noTags(trim($_POST['dbuser']));
+			$dbpass = Text::noTags(trim($_POST['dbpass']));
+			$dbdata = Text::noTags(trim($_POST['dbdata']));
+			$phpath = Text::noTags(trim($_POST['phpath']));
 
 			require_once("include/dba.php");
 			if (!DBA::connect($dbhost, $dbuser, $dbpass, $dbdata)) {
@@ -58,14 +59,14 @@ function install_post(App $a) {
 			break;
 		case 4:
 			$urlpath = $a->getURLPath();
-			$dbhost = notags(trim($_POST['dbhost']));
-			$dbuser = notags(trim($_POST['dbuser']));
-			$dbpass = notags(trim($_POST['dbpass']));
-			$dbdata = notags(trim($_POST['dbdata']));
-			$phpath = notags(trim($_POST['phpath']));
-			$timezone = notags(trim($_POST['timezone']));
-			$language = notags(trim($_POST['language']));
-			$adminmail = notags(trim($_POST['adminmail']));
+			$dbhost = Text::noTags(trim($_POST['dbhost']));
+			$dbuser = Text::noTags(trim($_POST['dbuser']));
+			$dbpass = Text::noTags(trim($_POST['dbpass']));
+			$dbdata = Text::noTags(trim($_POST['dbdata']));
+			$phpath = Text::noTags(trim($_POST['phpath']));
+			$timezone = Text::noTags(trim($_POST['timezone']));
+			$language = Text::noTags(trim($_POST['language']));
+			$adminmail = Text::noTags(trim($_POST['adminmail']));
 
 			// connect to db
 			DBA::connect($dbhost, $dbuser, $dbpass, $dbdata);
@@ -169,12 +170,12 @@ function install_content(App $a) {
 
 		case 2: { // Database config
 
-			$dbhost    = notags(trim(defaults($_POST, 'dbhost'   , 'localhost')));
-			$dbuser    = notags(trim(defaults($_POST, 'dbuser'   , ''         )));
-			$dbpass    = notags(trim(defaults($_POST, 'dbpass'   , ''         )));
-			$dbdata    = notags(trim(defaults($_POST, 'dbdata'   , ''         )));
-			$phpath    = notags(trim(defaults($_POST, 'phpath'   , ''         )));
-			$adminmail = notags(trim(defaults($_POST, 'adminmail', ''         )));
+			$dbhost    = Text::noTags(trim(defaults($_POST, 'dbhost'   , 'localhost')));
+			$dbuser    = Text::noTags(trim(defaults($_POST, 'dbuser'   , ''         )));
+			$dbpass    = Text::noTags(trim(defaults($_POST, 'dbpass'   , ''         )));
+			$dbdata    = Text::noTags(trim(defaults($_POST, 'dbdata'   , ''         )));
+			$phpath    = Text::noTags(trim(defaults($_POST, 'phpath'   , ''         )));
+			$adminmail = Text::noTags(trim(defaults($_POST, 'adminmail', ''         )));
 
 			$tpl = get_markup_template('install_db.tpl');
 			$o .= replace_macros($tpl, [
@@ -203,13 +204,13 @@ function install_content(App $a) {
 			return $o;
 		}; break;
 		case 3: { // Site settings
-			$dbhost = ((x($_POST, 'dbhost')) ? notags(trim($_POST['dbhost'])) : 'localhost');
-			$dbuser = notags(trim($_POST['dbuser']));
-			$dbpass = notags(trim($_POST['dbpass']));
-			$dbdata = notags(trim($_POST['dbdata']));
-			$phpath = notags(trim($_POST['phpath']));
+			$dbhost = ((x($_POST, 'dbhost')) ? Text::noTags(trim($_POST['dbhost'])) : 'localhost');
+			$dbuser = Text::noTags(trim($_POST['dbuser']));
+			$dbpass = Text::noTags(trim($_POST['dbpass']));
+			$dbdata = Text::noTags(trim($_POST['dbdata']));
+			$phpath = Text::noTags(trim($_POST['phpath']));
 
-			$adminmail = notags(trim($_POST['adminmail']));
+			$adminmail = Text::noTags(trim($_POST['adminmail']));
 			$timezone = ((x($_POST, 'timezone')) ? ($_POST['timezone']) : 'America/Los_Angeles');
 			/* Installed langs */
 			$lang_choices = L10n::getAvailableLanguages();

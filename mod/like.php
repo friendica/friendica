@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 use Friendica\Model\Item;
 
@@ -12,13 +13,13 @@ function like_content(App $a) {
 	}
 
 
-	$verb = notags(trim($_GET['verb']));
+	$verb = Text::noTags(trim($_GET['verb']));
 
 	if (!$verb) {
 		$verb = 'like';
 	}
 
-	$item_id = (($a->argc > 1) ? notags(trim($a->argv[1])) : 0);
+	$item_id = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : 0);
 
 	$r = Item::performLike($item_id, $verb);
 	if (!$r) {

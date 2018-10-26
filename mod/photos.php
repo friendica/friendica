@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
@@ -218,7 +219,7 @@ function photos_post(App $a)
 		}
 
 		// RENAME photo album
-		$newalbum = notags(trim($_POST['albumname']));
+		$newalbum = Text::noTags(trim($_POST['albumname']));
 		if ($newalbum != $album) {
 			q("UPDATE `photo` SET `album` = '%s' WHERE `album` = '%s' AND `uid` = %d",
 				DBA::escape($newalbum),
@@ -361,11 +362,11 @@ function photos_post(App $a)
 	}
 
 	if ($a->argc > 2 && (!empty($_POST['desc']) || !empty($_POST['newtag']) || !empty($_POST['albname']) !== false)) {
-		$desc        = !empty($_POST['desc'])      ? notags(trim($_POST['desc']))      : '';
-		$rawtags     = !empty($_POST['newtag'])    ? notags(trim($_POST['newtag']))    : '';
+		$desc        = !empty($_POST['desc'])      ? Text::noTags(trim($_POST['desc']))      : '';
+		$rawtags     = !empty($_POST['newtag'])    ? Text::noTags(trim($_POST['newtag']))    : '';
 		$item_id     = !empty($_POST['item_id'])   ? intval($_POST['item_id'])         : 0;
-		$albname     = !empty($_POST['albname'])   ? notags(trim($_POST['albname']))   : '';
-		$origaname   = !empty($_POST['origaname']) ? notags(trim($_POST['origaname'])) : '';
+		$albname     = !empty($_POST['albname'])   ? Text::noTags(trim($_POST['albname']))   : '';
+		$origaname   = !empty($_POST['origaname']) ? Text::noTags(trim($_POST['origaname'])) : '';
 
 		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
 		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
@@ -703,8 +704,8 @@ function photos_post(App $a)
 	Addon::callHooks('photo_post_init', $_POST);
 
 	// Determine the album to use
-	$album    = !empty($_REQUEST['album'])    ? notags(trim($_REQUEST['album']))    : '';
-	$newalbum = !empty($_REQUEST['newalbum']) ? notags(trim($_REQUEST['newalbum'])) : '';
+	$album    = !empty($_REQUEST['album'])    ? Text::noTags(trim($_REQUEST['album']))    : '';
+	$newalbum = !empty($_REQUEST['newalbum']) ? Text::noTags(trim($_REQUEST['newalbum'])) : '';
 
 	logger('mod/photos.php: photos_post(): album= ' . $album . ' newalbum= ' . $newalbum , LOGGER_DEBUG);
 

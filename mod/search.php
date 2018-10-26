@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -20,7 +21,7 @@ require_once 'mod/dirfind.php';
 function search_saved_searches() {
 
 	$o = '';
-	$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
+	$search = ((x($_GET,'search')) ? Text::noTags(trim(rawurldecode($_GET['search']))) : '');
 
 	if (!Feature::isEnabled(local_user(),'savedsearch'))
 		return $o;
@@ -59,7 +60,7 @@ function search_saved_searches() {
 
 function search_init(App $a) {
 
-	$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
+	$search = ((x($_GET,'search')) ? Text::noTags(trim(rawurldecode($_GET['search']))) : '');
 
 	if (local_user()) {
 		if (x($_GET,'save') && $search) {
@@ -146,14 +147,14 @@ function search_content(App $a) {
 
 	$search = '';
 	if (x($a->data,'search'))
-		$search = notags(trim($a->data['search']));
+		$search = Text::noTags(trim($a->data['search']));
 	else
-		$search = ((x($_GET,'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
+		$search = ((x($_GET,'search')) ? Text::noTags(trim(rawurldecode($_GET['search']))) : '');
 
 	$tag = false;
 	if (x($_GET,'tag')) {
 		$tag = true;
-		$search = (x($_GET,'tag') ? '#' . notags(trim(rawurldecode($_GET['tag']))) : '');
+		$search = (x($_GET,'tag') ? '#' . Text::noTags(trim(rawurldecode($_GET['tag']))) : '');
 	}
 
 	// contruct a wrapper for the search header

@@ -474,9 +474,9 @@ class OnePoll
 									$datarray['title'] .= $subpart->text;
 								}
 							}
-							$datarray['title'] = notags(trim($datarray['title']));
+							$datarray['title'] = Text::noTags(trim($datarray['title']));
 
-							//$datarray['title'] = notags(trim($meta->subject));
+							//$datarray['title'] = Text::noTags(trim($meta->subject));
 							$datarray['created'] = DateTimeFormat::utc($meta->date);
 
 							// Is it a reply?

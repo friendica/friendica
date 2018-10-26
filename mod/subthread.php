@@ -3,6 +3,7 @@
  * @file mod/subthread.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -20,7 +21,7 @@ function subthread_content(App $a) {
 
 	$activity = ACTIVITY_FOLLOW;
 
-	$item_id = (($a->argc > 1) ? notags(trim($a->argv[1])) : 0);
+	$item_id = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : 0);
 
 	$condition = ["`parent` = ? OR `parent-uri` = ? AND `parent` = `id`", $item_id, $item_id];
 	$item = Item::selectFirst([], $condition);

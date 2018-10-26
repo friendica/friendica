@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -16,7 +17,7 @@ function xrd_init(App $a)
 			System::httpExit(404);
 		}
 
-		$uri = urldecode(notags(trim($_GET['uri'])));
+		$uri = urldecode(Text::noTags(trim($_GET['uri'])));
 		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/jrd+json') {
 			$mode = 'json';
 		} else {
@@ -27,7 +28,7 @@ function xrd_init(App $a)
 			System::httpExit(404);
 		}
 
-		$uri = urldecode(notags(trim($_GET['resource'])));
+		$uri = urldecode(Text::noTags(trim($_GET['resource'])));
 		if (defaults($_SERVER, 'HTTP_ACCEPT', '') == 'application/xrd+xml') {
 			$mode = 'xml';
 		} else {

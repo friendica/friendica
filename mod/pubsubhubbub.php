@@ -12,7 +12,7 @@ use Friendica\Model\PushSubscriber;
 use Friendica\Util\Network;
 
 function post_var($name) {
-	return (x($_POST, $name)) ? notags(trim($_POST[$name])) : '';
+	return (x($_POST, $name)) ? Text::noTags(trim($_POST[$name])) : '';
 }
 
 function pubsubhubbub_init(App $a) {

@@ -1673,7 +1673,7 @@ class Probe
 						}
 					}
 
-					$data["name"] = notags($data["name"]);
+					$data["name"] = Text::noTags($data["name"]);
 				}
 			}
 		}

@@ -3,6 +3,7 @@
  * @file mod/oexchange.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Module\Login;
@@ -32,13 +33,13 @@ function oexchange_content(App $a) {
 	}
 
 	$url = ((x($_REQUEST,'url') && strlen($_REQUEST['url']))
-		? urlencode(notags(trim($_REQUEST['url']))) : '');
+		? urlencode(Text::noTags(trim($_REQUEST['url']))) : '');
 	$title = ((x($_REQUEST,'title') && strlen($_REQUEST['title']))
-		? '&title=' . urlencode(notags(trim($_REQUEST['title']))) : '');
+		? '&title=' . urlencode(Text::noTags(trim($_REQUEST['title']))) : '');
 	$description = ((x($_REQUEST,'description') && strlen($_REQUEST['description']))
-		? '&description=' . urlencode(notags(trim($_REQUEST['description']))) : '');
+		? '&description=' . urlencode(Text::noTags(trim($_REQUEST['description']))) : '');
 	$tags = ((x($_REQUEST,'tags') && strlen($_REQUEST['tags']))
-		? '&tags=' . urlencode(notags(trim($_REQUEST['tags']))) : '');
+		? '&tags=' . urlencode(Text::noTags(trim($_REQUEST['tags']))) : '');
 
 	$s = Network::fetchUrl(System::baseUrl() . '/parse_url?f=&url=' . $url . $title . $description . $tags);
 

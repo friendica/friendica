@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -479,7 +480,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 		if (!$update) {
 			$tab = 'posts';
 			if (x($_GET, 'tab')) {
-				$tab = notags(trim($_GET['tab']));
+				$tab = Text::noTags(trim($_GET['tab']));
 			}
 			if ($tab === 'posts') {
 				/*

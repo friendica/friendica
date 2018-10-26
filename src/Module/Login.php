@@ -6,6 +6,7 @@ namespace Friendica\Module;
 
 use Exception;
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Authentication;
 use Friendica\Core\Config;
@@ -146,7 +147,7 @@ class Login extends BaseModule
 				);
 			}
 		} catch (Exception $e) {
-			logger('authenticate: failed login attempt: ' . notags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
+			logger('authenticate: failed login attempt: ' . Text::noTags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
 			info('Login failed. Please check your credentials.' . EOL);
 			$a->internalRedirect();
 		}

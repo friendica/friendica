@@ -5,6 +5,7 @@
 
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -22,7 +23,7 @@ function poco_init(App $a) {
 	}
 
 	if ($a->argc > 1) {
-		$user = notags(trim($a->argv[1]));
+		$user = Text::noTags(trim($a->argv[1]));
 	}
 	if (empty($user)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");

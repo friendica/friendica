@@ -7,6 +7,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -1135,7 +1136,7 @@ class Item extends BaseObject
 	private static function guid($item, $notify)
 	{
 		if (!empty($item['guid'])) {
-			return notags(trim($item['guid']));
+			return Text::noTags(trim($item['guid']));
 		}
 
 		if ($notify) {
@@ -1250,7 +1251,7 @@ class Item extends BaseObject
 		}
 
 		$item['guid'] = self::guid($item, $notify);
-		$item['uri'] = notags(trim(defaults($item, 'uri', self::newURI($item['uid'], $item['guid']))));
+		$item['uri'] = Text::noTags(trim(defaults($item, 'uri', self::newURI($item['uid'], $item['guid']))));
 
 		// Store URI data
 		$item['uri-id'] = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);

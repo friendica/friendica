@@ -9,6 +9,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Config;
@@ -22,7 +23,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 	logger("wall upload: starting new upload", LOGGER_DEBUG);
 
 	$r_json = (x($_GET, 'response') && $_GET['response'] == 'json');
-	$album = (x($_GET, 'album') ? notags(trim($_GET['album'])) : '');
+	$album = (x($_GET, 'album') ? Text::noTags(trim($_GET['album'])) : '');
 
 	if ($a->argc > 1) {
 		if (!x($_FILES, 'media')) {

@@ -601,7 +601,7 @@ class Contact extends BaseModule
 				'$lbl_vis2'       => L10n::t('Please choose the profile you would like to display to %s when viewing your profile securely.', $contact['name']),
 				'$lbl_info1'      => $lbl_info1,
 				'$lbl_info2'      => L10n::t('Their personal note'),
-				'$reason'         => trim(notags($contact['reason'])),
+				'$reason'         => trim(Text::noTags($contact['reason'])),
 				'$infedit'        => L10n::t('Edit contact notes'),
 				'$common_link'    => 'common/loc/' . local_user() . '/' . $contact['id'],
 				'$relation_text'  => $relation_text,
@@ -694,8 +694,8 @@ class Contact extends BaseModule
 
 		$sql_extra .= sprintf(" AND `network` != '%s' ", Protocol::PHANTOM);
 
-		$search = notags(trim(defaults($_GET, 'search', '')));
-		$nets   = notags(trim(defaults($_GET, 'nets'  , '')));
+		$search = Text::noTags(trim(defaults($_GET, 'search', '')));
+		$nets   = Text::noTags(trim(defaults($_GET, 'nets'  , '')));
 
 		$tabs = [
 			[

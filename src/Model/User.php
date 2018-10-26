@@ -7,6 +7,7 @@ namespace Friendica\Model;
 
 use DivineOmega\PasswordExposed;
 use Exception;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -400,18 +401,18 @@ class User
 		$using_invites = Config::get('system', 'invitation_only');
 		$num_invites   = Config::get('system', 'number_invites');
 
-		$invite_id  = !empty($data['invite_id'])  ? notags(trim($data['invite_id']))  : '';
-		$username   = !empty($data['username'])   ? notags(trim($data['username']))   : '';
-		$nickname   = !empty($data['nickname'])   ? notags(trim($data['nickname']))   : '';
-		$email      = !empty($data['email'])      ? notags(trim($data['email']))      : '';
-		$openid_url = !empty($data['openid_url']) ? notags(trim($data['openid_url'])) : '';
-		$photo      = !empty($data['photo'])      ? notags(trim($data['photo']))      : '';
+		$invite_id  = !empty($data['invite_id'])  ? Text::noTags(trim($data['invite_id']))  : '';
+		$username   = !empty($data['username'])   ? Text::noTags(trim($data['username']))   : '';
+		$nickname   = !empty($data['nickname'])   ? Text::noTags(trim($data['nickname']))   : '';
+		$email      = !empty($data['email'])      ? Text::noTags(trim($data['email']))      : '';
+		$openid_url = !empty($data['openid_url']) ? Text::noTags(trim($data['openid_url'])) : '';
+		$photo      = !empty($data['photo'])      ? Text::noTags(trim($data['photo']))      : '';
 		$password   = !empty($data['password'])   ? trim($data['password'])           : '';
 		$password1  = !empty($data['password1'])  ? trim($data['password1'])          : '';
 		$confirm    = !empty($data['confirm'])    ? trim($data['confirm'])            : '';
 		$blocked    = !empty($data['blocked'])    ? intval($data['blocked'])          : 0;
 		$verified   = !empty($data['verified'])   ? intval($data['verified'])         : 0;
-		$language   = !empty($data['language'])   ? notags(trim($data['language']))   : 'en';
+		$language   = !empty($data['language'])   ? Text::noTags(trim($data['language']))   : 'en';
 
 		$publish = !empty($data['profile_publish_reg']) && intval($data['profile_publish_reg']) ? 1 : 0;
 		$netpublish = strlen(Config::get('system', 'directory')) ? $publish : 0;

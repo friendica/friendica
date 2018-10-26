@@ -84,11 +84,11 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$cid      = 0;
 			$hidden   = intval(defaults($handsfree, 'hidden'  , 0));
 		} else {
-			$dfrn_id  = notags(trim(defaults($_POST, 'dfrn_id'   , '')));
-			$intro_id =      intval(defaults($_POST, 'intro_id'  , 0));
-			$duplex   =      intval(defaults($_POST, 'duplex'    , 0));
-			$cid      =      intval(defaults($_POST, 'contact_id', 0));
-			$hidden   =      intval(defaults($_POST, 'hidden'    , 0));
+			$dfrn_id  = Text::noTags(trim(defaults($_POST, 'dfrn_id'   , '')));
+			$intro_id =	intval(defaults($_POST, 'intro_id'  , 0));
+			$duplex   =	intval(defaults($_POST, 'duplex'    , 0));
+			$cid      =	intval(defaults($_POST, 'contact_id', 0));
+			$hidden   =	intval(defaults($_POST, 'hidden'    , 0));
 		}
 
 		/*

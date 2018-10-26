@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
+use Friendica\Content\Text;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -46,7 +47,7 @@ function help_content(App $a)
 		$title = basename($path);
 		$filename = $path;
 		$text = load_doc_file('doc/' . $path . '.md');
-		$a->page['title'] = L10n::t('Help:') . ' ' . str_replace('-', ' ', notags($title));
+		$a->page['title'] = L10n::t('Help:') . ' ' . str_replace('-', ' ', Text::noTags($title));
 	}
 
 	$home = load_doc_file('doc/Home.md');

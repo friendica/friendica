@@ -74,7 +74,7 @@ function dfrn_request_post(App $a)
 	if ((x($_POST, 'localconfirm')) && ($_POST['localconfirm'] == 1)) {
 		// Ensure this is a valid request
 		if (local_user() && ($a->user['nickname'] == $a->argv[1]) && (x($_POST, 'dfrn_url'))) {
-			$dfrn_url = notags(trim($_POST['dfrn_url']));
+			$dfrn_url = Text::noTags(trim($_POST['dfrn_url']));
 			$aes_allow = (((x($_POST, 'aes_allow')) && ($_POST['aes_allow'] == 1)) ? 1 : 0);
 			$confirm_key = ((x($_POST, 'confirm_key')) ? $_POST['confirm_key'] : "");
 			$hidden = ((x($_POST, 'hidden-contact')) ? intval($_POST['hidden-contact']) : 0);
@@ -268,7 +268,7 @@ function dfrn_request_post(App $a)
 			}
 		}
 
-		$real_name = x($_POST, 'realname') ? notags(trim($_POST['realname'])) : '';
+		$real_name = x($_POST, 'realname') ? Text::noTags(trim($_POST['realname'])) : '';
 
 		$url = trim($_POST['dfrn_url']);
 		if (!strlen($url)) {
@@ -422,7 +422,7 @@ function dfrn_request_post(App $a)
 					intval($uid),
 					intval($contact_record['id']),
 					((x($_POST,'knowyou') && ($_POST['knowyou'] == 1)) ? 1 : 0),
-					DBA::escape(notags(trim(defaults($_POST, 'dfrn-request-message', '')))),
+					DBA::escape(Text::noTags(trim(defaults($_POST, 'dfrn-request-message', '')))),
 					DBA::escape($hash),
 					DBA::escape(DateTimeFormat::utcNow())
 				);
@@ -496,7 +496,7 @@ function dfrn_request_content(App $a)
 			return Login::form();
 		}
 
-		$dfrn_url = notags(trim(hex2bin($_GET['dfrn_url'])));
+		$dfrn_url = Text::noTags(trim(hex2bin($_GET['dfrn_url'])));
 		$aes_allow = x($_GET, 'aes_allow') && $_GET['aes_allow'] == 1 ? 1 : 0;
 		$confirm_key = x($_GET, 'confirm_key') ? $_GET['confirm_key'] : "";
 

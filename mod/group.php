@@ -7,6 +7,7 @@
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -32,7 +33,7 @@ function group_post(App $a) {
 	if (($a->argc == 2) && ($a->argv[1] === 'new')) {
 		BaseModule::checkFormSecurityTokenRedirectOnError('/group/new', 'group_edit');
 
-		$name = notags(trim($_POST['groupname']));
+		$name = Text::noTags(trim($_POST['groupname']));
 		$r = Model\Group::create(local_user(), $name);
 		if ($r) {
 			info(L10n::t('Group created.') . EOL);
@@ -60,7 +61,7 @@ function group_post(App $a) {
 			return; // NOTREACHED
 		}
 		$group = $r[0];
-		$groupname = notags(trim($_POST['groupname']));
+		$groupname = Text::noTags(trim($_POST['groupname']));
 		if (strlen($groupname) && ($groupname != $group['name'])) {
 			$r = q("UPDATE `group` SET `name` = '%s' WHERE `uid` = %d AND `id` = %d",
 				DBA::escape($groupname),

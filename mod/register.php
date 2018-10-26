@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -81,7 +82,7 @@ function register_post(App $a)
 
 	$using_invites = Config::get('system', 'invitation_only');
 	$num_invites   = Config::get('system', 'number_invites');
-	$invite_id = ((x($_POST, 'invite_id')) ? notags(trim($_POST['invite_id'])) : '');
+	$invite_id = ((x($_POST, 'invite_id')) ? Text::noTags(trim($_POST['invite_id'])) : '');
 
 	if (intval(Config::get('config', 'register_policy')) === REGISTER_OPEN) {
 		if ($using_invites && $invite_id) {

@@ -202,7 +202,7 @@ function item_post(App $a) {
 		$objecttype        = $orig_post['object-type'];
 		$app               = $orig_post['app'];
 		$categories        = $orig_post['file'];
-		$title             = notags(trim($_REQUEST['title']));
+		$title             = Text::noTags(trim($_REQUEST['title']));
 		$body              = Text::escapeTags(trim($_REQUEST['body']));
 		$private           = $orig_post['private'];
 		$pubmail_enabled   = $orig_post['pubmail'];
@@ -234,13 +234,13 @@ function item_post(App $a) {
 			$str_contact_deny  = perms2str(defaults($_REQUEST, 'contact_deny', ''));
 		}
 
-		$title             =      notags(trim(defaults($_REQUEST, 'title'   , '')));
-		$location          =      notags(trim(defaults($_REQUEST, 'location', '')));
-		$coord             =      notags(trim(defaults($_REQUEST, 'coord'   , '')));
-		$verb              =      notags(trim(defaults($_REQUEST, 'verb'    , '')));
-		$emailcc           =      notags(trim(defaults($_REQUEST, 'emailcc' , '')));
+		$title             =      Text::noTags(trim(defaults($_REQUEST, 'title'   , '')));
+		$location          =      Text::noTags(trim(defaults($_REQUEST, 'location', '')));
+		$coord             =      Text::noTags(trim(defaults($_REQUEST, 'coord'   , '')));
+		$verb              =      Text::noTags(trim(defaults($_REQUEST, 'verb'    , '')));
+		$emailcc           =      Text::noTags(trim(defaults($_REQUEST, 'emailcc' , '')));
 		$body              = 	  Text::escapeTags(trim(defaults($_REQUEST, 'body'    , '')));
-		$network           =      notags(trim(defaults($_REQUEST, 'network' , Protocol::DFRN)));
+		$network           =      Text::noTags(trim(defaults($_REQUEST, 'network' , Protocol::DFRN)));
 		$guid              =      System::createUUID();
 
 		$postopts = defaults($_REQUEST, 'postopts', '');

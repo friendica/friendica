@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -46,9 +47,9 @@ function directory_content(App $a)
 	Nav::setSelected('directory');
 
 	if (x($a->data, 'search')) {
-		$search = notags(trim($a->data['search']));
+		$search = Text::noTags(trim($a->data['search']));
 	} else {
-		$search = ((x($_GET, 'search')) ? notags(trim(rawurldecode($_GET['search']))) : '');
+		$search = ((x($_GET, 'search')) ? Text::noTags(trim(rawurldecode($_GET['search']))) : '');
 	}
 
 	$gdirpath = '';

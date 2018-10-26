@@ -8,6 +8,7 @@
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -39,7 +40,7 @@ function invite_post(App $a)
 
 
 	$recipients  = !empty($_POST['recipients']) ? explode("\n", $_POST['recipients']) : [];
-	$message     = !empty($_POST['message'])    ? notags(trim($_POST['message']))     : '';
+	$message     = !empty($_POST['message'])    ? Text::noTags(trim($_POST['message']))     : '';
 
 	$total = 0;
 

@@ -89,12 +89,12 @@ function replace_macros($s, $r) {
  * @param string $string Input string
  * @return string Filtered string
  */
-function notags($string) {
+/* function notags($string) {
 	return str_replace(["<", ">"], ['[', ']'], $string);
 
 //  High-bit filter no longer used
 //	return str_replace(array("<",">","\xBA","\xBC","\xBE"), array('[',']','','',''), $string);
-}
+} */
 
 
 /**

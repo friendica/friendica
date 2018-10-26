@@ -8,6 +8,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Content\Widget;
 use Friendica\Core\Addon;
@@ -298,7 +299,7 @@ function frio_remote_nav($a, &$nav)
  */
 function frio_acl_lookup(App $a, &$results)
 {
-	$nets = x($_GET, 'nets') ? notags(trim($_GET['nets'])) : '';
+	$nets = x($_GET, 'nets') ? Text::noTags(trim($_GET['nets'])) : '';
 
 	// we introduce a new search type, r should do the same query like it's
 	// done in /src/Module/Contact.php for connections

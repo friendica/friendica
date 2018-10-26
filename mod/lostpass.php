@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -17,7 +18,7 @@ require_once 'include/text.php';
 
 function lostpass_post(App $a)
 {
-	$loginame = notags(trim($_POST['login-name']));
+	$loginame = Text::noTags(trim($_POST['login-name']));
 	if (!$loginame) {
 		$a->internalRedirect();
 	}

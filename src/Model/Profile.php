@@ -7,6 +7,7 @@ namespace Friendica\Model;
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
@@ -878,7 +879,7 @@ class Profile
 
 		$tab = false;
 		if (x($_GET, 'tab')) {
-			$tab = notags(trim($_GET['tab']));
+			$tab = Text::noTags(trim($_GET['tab']));
 		}
 
 		$url = System::baseUrl() . '/profile/' . $nickname;

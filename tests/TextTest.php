@@ -240,7 +240,7 @@ class TextTest extends TestCase
 	{
 		$invalidstring='<submit type="button" onclick="alert(\'failed!\');" />';
 
-		$validstring=notags($invalidstring);
+		$validstring=Text::noTags($invalidstring);
 		$escapedString=Text::escapeTags($invalidstring);
 
 		$this->assertEquals('[submit type="button" onclick="alert(\'failed!\');" /]', $validstring);

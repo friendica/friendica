@@ -201,7 +201,7 @@ function profiles_post(App $a) {
 
 		$is_default = (($orig[0]['is-default']) ? 1 : 0);
 
-		$profile_name = notags(trim($_POST['profile_name']));
+		$profile_name = Text::noTags(trim($_POST['profile_name']));
 		if (! strlen($profile_name)) {
 			notice(L10n::t('Profile Name is required.') . EOL);
 			return;
@@ -228,7 +228,7 @@ function profiles_post(App $a) {
 			}
 		}
 
-		$name = notags(trim($_POST['name']));
+		$name = Text::noTags(trim($_POST['name']));
 
 		if (! strlen($name)) {
 			$name = '[No Name]';
@@ -238,19 +238,19 @@ function profiles_post(App $a) {
 			$namechanged = true;
 		}
 
-		$pdesc = notags(trim($_POST['pdesc']));
-		$gender = notags(trim($_POST['gender']));
-		$address = notags(trim($_POST['address']));
-		$locality = notags(trim($_POST['locality']));
-		$region = notags(trim($_POST['region']));
-		$postal_code = notags(trim($_POST['postal_code']));
-		$country_name = notags(trim($_POST['country_name']));
-		$pub_keywords = profile_clean_keywords(notags(trim($_POST['pub_keywords'])));
-		$prv_keywords = profile_clean_keywords(notags(trim($_POST['prv_keywords'])));
-		$marital = notags(trim($_POST['marital']));
-		$howlong = notags(trim($_POST['howlong']));
+		$pdesc = Text::noTags(trim($_POST['pdesc']));
+		$gender = Text::noTags(trim($_POST['gender']));
+		$address = Text::noTags(trim($_POST['address']));
+		$locality = Text::noTags(trim($_POST['locality']));
+		$region = Text::noTags(trim($_POST['region']));
+		$postal_code = Text::noTags(trim($_POST['postal_code']));
+		$country_name = Text::noTags(trim($_POST['country_name']));
+		$pub_keywords = profile_clean_keywords(Text::noTags(trim($_POST['pub_keywords'])));
+		$prv_keywords = profile_clean_keywords(Text::noTags(trim($_POST['prv_keywords'])));
+		$marital = Text::noTags(trim($_POST['marital']));
+		$howlong = Text::noTags(trim($_POST['howlong']));
 
-		$with = ((x($_POST,'with')) ? notags(trim($_POST['with'])) : '');
+		$with = ((x($_POST,'with')) ? Text::noTags(trim($_POST['with'])) : '');
 
 		if (! strlen($howlong)) {
 			$howlong = DBA::NULL_DATETIME;
@@ -311,16 +311,16 @@ function profiles_post(App $a) {
 		}
 
 		/// @TODO Not flexible enough for later expansion, let's have more OOP here
-		$sexual = notags(trim($_POST['sexual']));
-		$xmpp = notags(trim($_POST['xmpp']));
-		$homepage = notags(trim($_POST['homepage']));
+		$sexual = Text::noTags(trim($_POST['sexual']));
+		$xmpp = Text::noTags(trim($_POST['xmpp']));
+		$homepage = Text::noTags(trim($_POST['homepage']));
 		if ((strpos($homepage, 'http') !== 0) && (strlen($homepage))) {
 			// neither http nor https in URL, add them
 			$homepage = 'http://'.$homepage;
 		}
-		$hometown = notags(trim($_POST['hometown']));
-		$politic = notags(trim($_POST['politic']));
-		$religion = notags(trim($_POST['religion']));
+		$hometown = Text::noTags(trim($_POST['hometown']));
+		$politic = Text::noTags(trim($_POST['politic']));
+		$religion = Text::noTags(trim($_POST['religion']));
 
 		$likes = Text::escapeTags(trim($_POST['likes']));
 		$dislikes = Text::escapeTags(trim($_POST['dislikes']));

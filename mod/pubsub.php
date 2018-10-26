@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -29,15 +30,15 @@ function hub_post_return()
 
 function pubsub_init(App $a)
 {
-	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
+	$nick       = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
 
 	if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-		$hub_mode      = notags(trim(defaults($_GET, 'hub_mode', '')));
-		$hub_topic     = notags(trim(defaults($_GET, 'hub_topic', '')));
-		$hub_challenge = notags(trim(defaults($_GET, 'hub_challenge', '')));
-		$hub_lease     = notags(trim(defaults($_GET, 'hub_lease_seconds', '')));
-		$hub_verify    = notags(trim(defaults($_GET, 'hub_verify_token', '')));
+		$hub_mode      = Text::noTags(trim(defaults($_GET, 'hub_mode', '')));
+		$hub_topic     = Text::noTags(trim(defaults($_GET, 'hub_topic', '')));
+		$hub_challenge = Text::noTags(trim(defaults($_GET, 'hub_challenge', '')));
+		$hub_lease     = Text::noTags(trim(defaults($_GET, 'hub_lease_seconds', '')));
+		$hub_verify    = Text::noTags(trim(defaults($_GET, 'hub_verify_token', '')));
 
 		logger('Subscription from ' . $_SERVER['REMOTE_ADDR'] . ' Mode: ' . $hub_mode . ' Nick: ' . $nick);
 		logger('Data: ' . print_r($_GET,true), LOGGER_DATA);
@@ -90,7 +91,7 @@ function pubsub_post(App $a)
 	logger('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' .  $a->cmd . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
 	logger('Data: ' . $xml, LOGGER_DATA);
 
-	$nick       = (($a->argc > 1) ? notags(trim($a->argv[1])) : '');
+	$nick       = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
 
 	$importer = DBA::selectFirst('user', [], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);

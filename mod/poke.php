@@ -14,6 +14,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -35,7 +36,7 @@ function poke_init(App $a)
 		return;
 	}
 
-	$verb = notags(trim($_GET['verb']));
+	$verb = Text::noTags(trim($_GET['verb']));
 
 	$verbs = get_poke_verbs();
 
