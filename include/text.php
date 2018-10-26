@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Content\Smilies;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -61,16 +62,16 @@ function replace_macros($s, $r) {
  * @param int $size
  * @return string
  */
-/* function random_string($size = 64)
+function random_string($size = 64)
 {
-	$byte_size = ceil($size / 2);
+	/* $byte_size = ceil($size / 2);
 
 	$bytes = random_bytes($byte_size);
 
-	$return = substr(bin2hex($bytes), 0, $size);
+	$return = substr(bin2hex($bytes), 0, $size); */
 
-	return $return;
-} */
+	return Text::randomString($size = 64);
+}
 
 /**
  * This is our primary input filter.
@@ -89,12 +90,13 @@ function replace_macros($s, $r) {
  * @param string $string Input string
  * @return string Filtered string
  */
-/* function notags($string) {
-	return str_replace(["<", ">"], ['[', ']'], $string);
+function notags($string) {
+	//return str_replace(["<", ">"], ['[', ']'], $string);
+	return Text::noTags($string);
 
 //  High-bit filter no longer used
 //	return str_replace(array("<",">","\xBA","\xBC","\xBE"), array('[',']','','',''), $string);
-} */
+}
 
 
 /**
@@ -103,9 +105,10 @@ function replace_macros($s, $r) {
  * @param string $string
  * @return string
  */
-/* function escape_tags($string) {
-	return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
-} */
+function escape_tags($string) {
+	//return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
+	return Text::escapeTags($string);
+}
 
 
 /**
