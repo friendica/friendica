@@ -109,4 +109,84 @@ class Text
         return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
     }
 
+    /**
+     * generate a string that's random, but usually pronounceable.
+     * used to generate initial passwords
+     * @param int $len
+     * @return string
+     */
+    function autoName($len) {
+
+        if ($len <= 0) {
+            return '';
+        }
+
+        $vowels = ['a','a','ai','au','e','e','e','ee','ea','i','ie','o','ou','u'];
+        if (mt_rand(0, 5) == 4) {
+            $vowels[] = 'y';
+        }
+
+        $cons = [
+                'b','bl','br',
+                'c','ch','cl','cr',
+                'd','dr',
+                'f','fl','fr',
+                'g','gh','gl','gr',
+                'h',
+                'j',
+                'k','kh','kl','kr',
+                'l',
+                'm',
+                'n',
+                'p','ph','pl','pr',
+                'qu',
+                'r','rh',
+                's','sc','sh','sm','sp','st',
+                't','th','tr',
+                'v',
+                'w','wh',
+                'x',
+                'z','zh'
+                ];
+
+        $midcons = ['ck','ct','gn','ld','lf','lm','lt','mb','mm', 'mn','mp',
+                    'nd','ng','nk','nt','rn','rp','rt'];
+
+        $noend = ['bl', 'br', 'cl','cr','dr','fl','fr','gl','gr',
+                    'kh', 'kl','kr','mn','pl','pr','rh','tr','qu','wh','q'];
+
+        $start = mt_rand(0,2);
+        if ($start == 0) {
+            $table = $vowels;
+        } else {
+            $table = $cons;
+        }
+
+        $word = '';
+
+        for ($x = 0; $x < $len; $x ++) {
+            $r = mt_rand(0,count($table) - 1);
+            $word .= $table[$r];
+
+            if ($table == $vowels) {
+                $table = array_merge($cons,$midcons);
+            } else {
+                $table = $vowels;
+            }
+
+        }
+
+        $word = substr($word,0,$len);
+
+        foreach ($noend as $noe) {
+            $noelen = strlen($noe);
+            if ((strlen($word) > $noelen) && (substr($word, -$noelen) == $noe)) {
+                $word = autoName($len);
+                break;
+            }
+        }
+
+        return $word;
+    }
+
 }

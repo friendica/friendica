@@ -269,7 +269,7 @@ class User
 	 */
 	public static function generateNewPassword()
 	{
-		return autoname(6) . mt_rand(100, 9999);
+		return Text::autoName(6) . mt_rand(100, 9999);
 	}
 
 	/**

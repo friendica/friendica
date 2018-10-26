@@ -6,6 +6,7 @@ namespace Friendica\Core;
 
 use DOMDocument;
 use Exception;
+use Friendica\Content\Text;
 use Friendica\Object\Image;
 use Friendica\Util\Network;
 
@@ -209,7 +210,7 @@ class Install
 		}
 
 		if ($passed2) {
-			$str = autoname(8);
+			$str = Text::autoName(8);
 			$cmd = "$phppath testargs.php $str";
 			$result = trim(shell_exec($cmd));
 			$passed3 = $result == $str;

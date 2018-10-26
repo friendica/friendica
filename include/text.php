@@ -119,7 +119,7 @@ function escape_tags($string) {
  */
 function autoname($len) {
 
-	if ($len <= 0) {
+	/* if ($len <= 0) {
 		return '';
 	}
 
@@ -188,7 +188,8 @@ function autoname($len) {
 		}
 	}
 
-	return $word;
+	return $word; */
+	return Text::autoName($len);
 }
 
 
