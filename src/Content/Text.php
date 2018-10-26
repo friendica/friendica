@@ -78,4 +78,35 @@ class Text
         return $return;
     }
 
+    /**
+     * This is our primary input filter.
+     *
+     * The high bit hack only involved some old IE browser, forget which (IE5/Mac?)
+     * that had an XSS attack vector due to stripping the high-bit on an 8-bit character
+     * after cleansing, and angle chars with the high bit set could get through as markup.
+     *
+     * This is now disabled because it was interfering with some legitimate unicode sequences
+     * and hopefully there aren't a lot of those browsers left.
+     *
+     * Use this on any text input where angle chars are not valid or permitted
+     * They will be replaced with safer brackets. This may be filtered further
+     * if these are not allowed either.
+     *
+     * @param string $string Input string
+     * @return string Filtered string
+     */
+    function noTags($string) {
+        return str_replace(["<", ">"], ['[', ']'], $string);
+    }
+
+    /**
+     * use this on "body" or "content" input where angle chars shouldn't be removed,
+     * and allow them to be safely displayed.
+     * @param string $string
+     * @return string
+     */
+    function escapeTags($string) {
+        return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
+    }
+
 }

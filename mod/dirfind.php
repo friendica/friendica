@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -124,8 +125,8 @@ function dirfind_content(App $a, $prefix = "") {
 						(`url` LIKE '%s' OR `name` LIKE '%s' OR `location` LIKE '%s' OR
 						`addr` LIKE '%s' OR `about` LIKE '%s' OR `keywords` LIKE '%s') $extra_sql",
 					DBA::escape(Protocol::DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
-					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
-					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)));
+					DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)),
+					DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)));
 
 			$results = q("SELECT `nurl`
 					FROM `gcontact`
@@ -136,8 +137,8 @@ function dirfind_content(App $a, $prefix = "") {
 						GROUP BY `nurl`
 						ORDER BY `updated` DESC LIMIT %d, %d",
 					DBA::escape(Protocol::DFRN), DBA::escape($ostatus), DBA::escape($diaspora),
-					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
-					DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)), DBA::escape(escape_tags($search2)),
+					DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)),
+					DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)), DBA::escape(Text::escapeTags($search2)),
 					$pager->getStart(), $pager->getItemsPerPage());
 			$j = new stdClass();
 			$j->total = $count[0]["total"];

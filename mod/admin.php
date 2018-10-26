@@ -9,6 +9,7 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -2473,9 +2474,9 @@ function admin_page_viewlogs(App $a)
 				}
 				$seek = fseek($fp, 0 - $size, SEEK_END);
 				if ($seek === 0) {
-					$data = escape_tags(fread($fp, $size));
+					$data = Text::escapeTags(fread($fp, $size));
 					while (!feof($fp)) {
-						$data .= escape_tags(fread($fp, 4096));
+						$data .= Text::escapeTags(fread($fp, 4096));
 					}
 				}
 			}

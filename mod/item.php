@@ -17,6 +17,7 @@
 
 use Friendica\App;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
@@ -202,7 +203,7 @@ function item_post(App $a) {
 		$app               = $orig_post['app'];
 		$categories        = $orig_post['file'];
 		$title             = notags(trim($_REQUEST['title']));
-		$body              = escape_tags(trim($_REQUEST['body']));
+		$body              = Text::escapeTags(trim($_REQUEST['body']));
 		$private           = $orig_post['private'];
 		$pubmail_enabled   = $orig_post['pubmail'];
 		$network           = $orig_post['network'];
@@ -238,7 +239,7 @@ function item_post(App $a) {
 		$coord             =      notags(trim(defaults($_REQUEST, 'coord'   , '')));
 		$verb              =      notags(trim(defaults($_REQUEST, 'verb'    , '')));
 		$emailcc           =      notags(trim(defaults($_REQUEST, 'emailcc' , '')));
-		$body              = escape_tags(trim(defaults($_REQUEST, 'body'    , '')));
+		$body              = 	  Text::escapeTags(trim(defaults($_REQUEST, 'body'    , '')));
 		$network           =      notags(trim(defaults($_REQUEST, 'network' , Protocol::DFRN)));
 		$guid              =      System::createUUID();
 

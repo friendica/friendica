@@ -103,9 +103,9 @@ function notags($string) {
  * @param string $string
  * @return string
  */
-function escape_tags($string) {
+/* function escape_tags($string) {
 	return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
-}
+} */
 
 
 /**

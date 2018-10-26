@@ -9,6 +9,7 @@ use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
@@ -38,7 +39,7 @@ function network_init(App $a)
 
 	Hook::add('head', __FILE__, 'network_infinite_scroll_head');
 
-	$search = (x($_GET, 'search') ? escape_tags($_GET['search']) : '');
+	$search = (x($_GET, 'search') ? Text::escapeTags($_GET['search']) : '');
 
 	if (($search != '') && !empty($_GET['submit'])) {
 		$a->internalRedirect('search?search=' . urlencode($search));
@@ -515,9 +516,9 @@ function networkThreadedView(App $a, $update, $parent)
 		for ($x = 1; $x < $a->argc; $x ++) {
 			if (is_a_date_arg($a->argv[$x])) {
 				if ($datequery) {
-					$datequery2 = escape_tags($a->argv[$x]);
+					$datequery2 = Text::escapeTags($a->argv[$x]);
 				} else {
-					$datequery = escape_tags($a->argv[$x]);
+					$datequery = Text::escapeTags($a->argv[$x]);
 					$_GET['order'] = 'post';
 				}
 			} elseif (intval($a->argv[$x])) {

@@ -7,6 +7,7 @@ use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
@@ -212,14 +213,14 @@ class Contact extends BaseModule
 
 		$fetch_further_information = intval(defaults($_POST, 'fetch_further_information', 0));
 
-		$ffi_keyword_blacklist = escape_tags(trim(defaults($_POST, 'ffi_keyword_blacklist', '')));
+		$ffi_keyword_blacklist = Text::escapeTags(trim(defaults($_POST, 'ffi_keyword_blacklist', '')));
 
 		$priority = intval(defaults($_POST, 'poll', 0));
 		if ($priority > 5 || $priority < 0) {
 			$priority = 0;
 		}
 
-		$info = escape_tags(trim($_POST['info']));
+		$info = Text::escapeTags(trim($_POST['info']));
 
 		$r = DBA::update('contact', [
 			'profile-id' => $profile_id,

@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
@@ -112,9 +113,9 @@ function profile_content(App $a, $update = 0)
 		for ($x = 2; $x < $a->argc; $x ++) {
 			if (is_a_date_arg($a->argv[$x])) {
 				if ($datequery) {
-					$datequery2 = escape_tags($a->argv[$x]);
+					$datequery2 = Text::escapeTags($a->argv[$x]);
 				} else {
-					$datequery = escape_tags($a->argv[$x]);
+					$datequery = Text::escapeTags($a->argv[$x]);
 				}
 			} else {
 				$category = $a->argv[$x];

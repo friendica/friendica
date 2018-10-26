@@ -8,6 +8,7 @@ use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -206,7 +207,7 @@ function profiles_post(App $a) {
 			return;
 		}
 
-		$dob = $_POST['dob'] ? escape_tags(trim($_POST['dob'])) : '0000-00-00';
+		$dob = $_POST['dob'] ? Text::escapeTags(trim($_POST['dob'])) : '0000-00-00';
 
 		$y = substr($dob, 0, 4);
 		if ((! ctype_digit($y)) || ($y < 1900)) {
@@ -321,19 +322,19 @@ function profiles_post(App $a) {
 		$politic = notags(trim($_POST['politic']));
 		$religion = notags(trim($_POST['religion']));
 
-		$likes = escape_tags(trim($_POST['likes']));
-		$dislikes = escape_tags(trim($_POST['dislikes']));
+		$likes = Text::escapeTags(trim($_POST['likes']));
+		$dislikes = Text::escapeTags(trim($_POST['dislikes']));
 
-		$about = escape_tags(trim($_POST['about']));
-		$interest = escape_tags(trim($_POST['interest']));
-		$contact = escape_tags(trim($_POST['contact']));
-		$music = escape_tags(trim($_POST['music']));
-		$book = escape_tags(trim($_POST['book']));
-		$tv = escape_tags(trim($_POST['tv']));
-		$film = escape_tags(trim($_POST['film']));
-		$romance = escape_tags(trim($_POST['romance']));
-		$work = escape_tags(trim($_POST['work']));
-		$education = escape_tags(trim($_POST['education']));
+		$about = Text::escapeTags(trim($_POST['about']));
+		$interest = Text::escapeTags(trim($_POST['interest']));
+		$contact = Text::escapeTags(trim($_POST['contact']));
+		$music = Text::escapeTags(trim($_POST['music']));
+		$book = Text::escapeTags(trim($_POST['book']));
+		$tv = Text::escapeTags(trim($_POST['tv']));
+		$film = Text::escapeTags(trim($_POST['film']));
+		$romance = Text::escapeTags(trim($_POST['romance']));
+		$work = Text::escapeTags(trim($_POST['work']));
+		$education = Text::escapeTags(trim($_POST['education']));
 
 		$hide_friends = (($_POST['hide-friends'] == 1) ? 1: 0);
 

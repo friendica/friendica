@@ -5,6 +5,7 @@
 namespace Friendica\Worker;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -505,7 +506,7 @@ class OnePoll
 								logger("Mail: can't fetch msg ".$msg_uid." for ".$mailconf['user']);
 								continue;
 							}
-							$datarray['body'] = escape_tags($r['body']);
+							$datarray['body'] = Text::escapeTags($r['body']);
 							$datarray['body'] = BBCode::limitBodySize($datarray['body']);
 
 							logger("Mail: Importing ".$msg_uid." for ".$mailconf['user']);

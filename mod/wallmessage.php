@@ -3,6 +3,7 @@
  * @file mod/wallmessage.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -18,7 +19,7 @@ function wallmessage_post(App $a) {
 	}
 
 	$subject   = ((x($_REQUEST,'subject'))   ? notags(trim($_REQUEST['subject']))   : '');
-	$body      = ((x($_REQUEST,'body'))      ? escape_tags(trim($_REQUEST['body'])) : '');
+	$body      = ((x($_REQUEST,'body'))      ? Text::escapeTags(trim($_REQUEST['body'])) : '');
 
 	$recipient = (($a->argc > 1) ? notags($a->argv[1]) : '');
 	if ((! $recipient) || (! $body)) {
@@ -129,7 +130,7 @@ function wallmessage_content(App $a) {
 		'$recipname' => $user['username'],
 		'$nickname' => $user['nickname'],
 		'$subjtxt' => ((x($_REQUEST, 'subject')) ? strip_tags($_REQUEST['subject']) : ''),
-		'$text' => ((x($_REQUEST, 'body')) ? escape_tags(htmlspecialchars($_REQUEST['body'])) : ''),
+		'$text' => ((x($_REQUEST, 'body')) ? Text::escapeTags(htmlspecialchars($_REQUEST['body'])) : ''),
 		'$readonly' => '',
 		'$yourmessage' => L10n::t('Your message:'),
 		'$parent' => '',
