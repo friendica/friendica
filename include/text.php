@@ -61,7 +61,7 @@ function replace_macros($s, $r) {
  * @param int $size
  * @return string
  */
-function random_string($size = 64)
+/* function random_string($size = 64)
 {
 	$byte_size = ceil($size / 2);
 
@@ -70,7 +70,7 @@ function random_string($size = 64)
 	$return = substr(bin2hex($bytes), 0, $size);
 
 	return $return;
-}
+} */
 
 /**
  * This is our primary input filter.

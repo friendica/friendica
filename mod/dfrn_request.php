@@ -13,6 +13,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -318,7 +319,7 @@ function dfrn_request_post(App $a)
 				}
 			}
 
-			$issued_id = random_string();
+			$issued_id = Text::randomString();
 
 			if (is_array($contact_record)) {
 				// There is a contact record but no issued-id, so this
@@ -413,7 +414,7 @@ function dfrn_request_post(App $a)
 				return;
 			}
 
-			$hash = random_string() . (string) time();   // Generate a confirm_key
+			$hash = Text::randomString() . (string) time();   // Generate a confirm_key
 
 			if (is_array($contact_record)) {
 				$ret = q("INSERT INTO `intro` ( `uid`, `contact-id`, `blocked`, `knowyou`, `note`, `hash`, `datetime`)

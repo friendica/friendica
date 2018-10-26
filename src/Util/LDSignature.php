@@ -1,7 +1,11 @@
 <?php
+/**
+ * @file src/Util/LDSignature.php
+ */
 
 namespace Friendica\Util;
 
+use Friendica\Content\Text;
 use Friendica\Util\JsonLD;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Protocol\ActivityPub;
@@ -53,7 +57,7 @@ class LDSignature
 	{
 		$options = [
 			'type' => 'RsaSignature2017',
-			'nonce' => random_string(64),
+			'nonce' => Text::randomString(64),
 			'creator' => $owner['url'] . '#main-key',
 			'created' => DateTimeFormat::utcNow(DateTimeFormat::ATOM)
 		];

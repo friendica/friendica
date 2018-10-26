@@ -5,6 +5,7 @@
  */
 namespace Friendica\Model;
 
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
@@ -100,7 +101,7 @@ class Register
 	 */
 	public static function createForApproval($uid, $language, $note = '')
 	{
-		$hash = random_string();
+		$hash = Text::randomString();
 
 		if (!User::exists($uid)) {
 			return false;

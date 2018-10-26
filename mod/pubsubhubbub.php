@@ -1,6 +1,10 @@
 <?php
+/**
+ * @file mod/pubsubhubbub.php
+ */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -92,7 +96,7 @@ function pubsubhubbub_init(App $a) {
 		}
 
 		// do subscriber verification according to the PuSH protocol
-		$hub_challenge = random_string(40);
+		$hub_challenge = Text::randomString(40);
 		$params = 'hub.mode=' .
 			($subscribe == 1 ? 'subscribe' : 'unsubscribe') .
 			'&hub.topic=' . urlencode($hub_topic) .

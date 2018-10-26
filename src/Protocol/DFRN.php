@@ -12,6 +12,7 @@ use DOMDocument;
 use DOMXPath;
 use Friendica\App;
 use Friendica\Content\OEmbed;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
@@ -2008,7 +2009,7 @@ class DFRN
 
 		$fid = $r[0]["id"];
 
-		$hash = random_string();
+		$hash = Text::randomString();
 
 		$r = q(
 			"INSERT INTO `intro` (`uid`, `fid`, `contact-id`, `note`, `hash`, `datetime`, `blocked`)
@@ -3029,7 +3030,7 @@ class DFRN
 				return;
 			}
 
-			$sec = random_string();
+			$sec = Text::randomString();
 
 			DBA::insert('profile_check', ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id, 'sec' => $sec, 'expire' => time() + 45]);
 

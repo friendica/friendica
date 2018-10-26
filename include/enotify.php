@@ -3,6 +3,7 @@
  * @file include/enotify.php
  */
 
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
@@ -455,7 +456,7 @@ function notification($params)
 		logger("adding notification entry", LOGGER_DEBUG);
 		do {
 			$dups = false;
-			$hash = random_string();
+			$hash = Text::randomString();
 			if (DBA::exists('notify', ['hash' => $hash])) {
 				$dups = true;
 			}

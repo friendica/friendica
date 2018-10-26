@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -67,7 +68,7 @@ function removeme_content(App $a)
 		$a->internalRedirect();
 	}
 
-	$hash = random_string();
+	$hash = Text::randomString();
 
 	require_once("mod/settings.php");
 	settings_init($a);

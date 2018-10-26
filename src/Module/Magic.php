@@ -5,6 +5,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Core\System;
@@ -73,7 +74,7 @@ class Magic extends BaseModule
 
 				$headers = [];
 				$headers['Accept'] = 'application/x-dfrn+json';
-				$headers['X-Open-Web-Auth'] = random_string();
+				$headers['X-Open-Web-Auth'] = Text::randomString();
 
 				// Create a header that is signed with the local users private key.
 				$headers = HTTPSignature::createSig(

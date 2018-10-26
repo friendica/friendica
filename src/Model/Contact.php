@@ -6,6 +6,7 @@ namespace Friendica\Model;
 
 use Friendica\BaseObject;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -1888,7 +1889,7 @@ class Contact extends BaseObject
 			$user = DBA::selectFirst('user', $fields, ['uid' => $importer['uid']]);
 			if (DBA::isResult($user) && !in_array($user['page-flags'], [self::PAGE_SOAPBOX, self::PAGE_FREELOVE, self::PAGE_COMMUNITY])) {
 				// create notification
-				$hash = random_string();
+				$hash = Text::randomString();
 
 				if (is_array($contact_record)) {
 					DBA::insert('intro', ['uid' => $importer['uid'], 'contact-id' => $contact_record['id'],

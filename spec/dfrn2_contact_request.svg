@@ -38,7 +38,7 @@ text { font:12px Dialog; }
 <text x="904" y="1084" style="font:13px Open Sans">where self = 0 to look if this contact is already there (if </text>
 <text x="904" y="1107" style="font:13px Open Sans">issued-id or rel is already available return here because it </text>
 <text x="904" y="1130" style="font:13px Open Sans">seems that we are already connected)</text>
-<text x="904" y="1176" style="font:13px Open Sans">- create a issued-id with $issued_id = random_string();</text>
+<text x="904" y="1176" style="font:13px Open Sans">- create a issued-id with $issued_id = Text::randomString();</text>
 <text x="904" y="1222" style="font:13px Open Sans">- if we already found a contact record above update the </text>
 <text x="904" y="1245" style="font:13px Open Sans">issued-id with the one we have created</text>
 <text x="904" y="1291" style="font:13px Open Sans">- otherwise if Bob is not already in the contact table scrape </text>

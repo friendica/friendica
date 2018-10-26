@@ -10,6 +10,7 @@
 
 namespace Friendica\Protocol;
 
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\Cache;
@@ -2420,7 +2421,7 @@ class Diaspora
 		if (in_array($importer["page-flags"], [Contact::PAGE_NORMAL, Contact::PAGE_PRVGROUP])) {
 			logger("Sending intra message for author ".$author.".", LOGGER_DEBUG);
 
-			$hash = random_string().(string)time();   // Generate a confirm_key
+			$hash = Text::randomString().(string)time();   // Generate a confirm_key
 
 			$ret = q(
 				"INSERT INTO `intro` (`uid`, `contact-id`, `blocked`, `knowyou`, `note`, `hash`, `datetime`)
@@ -3054,7 +3055,7 @@ class Diaspora
 			return 200;
 		}
 
-		$logid = random_string(4);
+		$logid = Text::randomString(4);
 
 		$dest_url = ($public_batch ? $contact["batch"] : $contact["notify"]);
 

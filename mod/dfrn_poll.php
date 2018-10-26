@@ -5,6 +5,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -414,7 +415,7 @@ function dfrn_poll_content(App $a)
 
 	if ($dfrn_id != '') {
 		// initial communication from external contact
-		$hash = random_string();
+		$hash = Text::randomString();
 
 		$status = 0;
 

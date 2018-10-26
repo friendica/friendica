@@ -1,6 +1,10 @@
 <?php
+/**
+ * @file mod/redir.php
+ */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -92,7 +96,7 @@ function redir_init(App $a) {
 				$dfrn_id = '0:' . $orig_id;
 			}
 
-			$sec = random_string();
+			$sec = Text::randomString();
 
 			$fields = ['uid' => local_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id,
 				'sec' => $sec, 'expire' => time() + 45];

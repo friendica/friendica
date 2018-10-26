@@ -10,6 +10,7 @@ namespace Friendica\Network;
  */
 
 use DOMDocument;
+use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Protocol;
@@ -1647,8 +1648,8 @@ class Probe
 		$data["nick"]    = $data["name"];
 		$data["photo"]   = Network::lookupAvatarByEmail($uri);
 		$data["url"]     = 'mailto:'.$uri;
-		$data["notify"]  = 'smtp '.random_string();
-		$data["poll"]    = 'email '.random_string();
+		$data["notify"]  = 'smtp ' . Text::randomString();
+		$data["poll"]    = 'email ' . Text::randomString();
 
 		$x = Email::messageMeta($mbox, $msgs[0]);
 		if (stristr($x[0]->from, $uri)) {

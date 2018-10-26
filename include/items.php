@@ -5,6 +5,7 @@
 
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -306,7 +307,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 	$push_url = System::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
 
 	// Use a single verify token, even if multiple hubs
-	$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : random_string());
+	$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : Text::randomString());
 
 	$params= 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode($contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
 

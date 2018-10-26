@@ -9,6 +9,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Addon;
@@ -4801,7 +4802,7 @@ function api_friendica_remoteauth()
 		$dfrn_id = '0:' . $orig_id;
 	}
 
-	$sec = random_string();
+	$sec = Text::randomString();
 
 	$fields = ['uid' => api_user(), 'cid' => $cid, 'dfrn_id' => $dfrn_id,
 		'sec' => $sec, 'expire' => time() + 45];

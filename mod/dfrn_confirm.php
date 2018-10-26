@@ -18,6 +18,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -262,7 +263,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					break;
 				case 1:
 					// birthday paradox - generate new dfrn-id and fall through.
-					$new_dfrn_id = random_string();
+					$new_dfrn_id = Text::randomString();
 					q("UPDATE contact SET `issued-id` = '%s' WHERE `id` = %d AND `uid` = %d",
 						DBA::escape($new_dfrn_id),
 						intval($contact_id),

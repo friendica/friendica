@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\Worker;
@@ -34,7 +35,7 @@ function fsuggest_post(App $a)
 
 	$new_contact = intval($_POST['suggest']);
 
-	$hash = random_string();
+	$hash = Text::randomString();
 
 	$note = escape_tags(trim(defaults($_POST, 'note', '')));
 

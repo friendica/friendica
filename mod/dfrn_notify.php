@@ -7,6 +7,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -266,7 +267,7 @@ function dfrn_notify_content(App $a) {
 			$dfrn_id = substr($dfrn_id,2);
 		}
 
-		$hash = random_string();
+		$hash = Text::randomString();
 
 		$status = 0;
 

@@ -5,6 +5,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -61,7 +62,7 @@ class Owa extends BaseModule
 								logger('OWA success: ' . $contact['addr'], LOGGER_DATA);
 
 								$ret['success'] = true;
-								$token = random_string(32);
+								$token = Text::randomString(32);
 
 								// Store the generated token in the databe.
 								OpenWebAuthToken::create('owt', 0, $token, $contact['addr']);
