@@ -40,29 +40,29 @@
 				<ul class="nav navbar-nav navbar-left" role="menubar">
 					<li id="nav-communication" class="nav-segment" role="presentation">
 						{{if $nav.network}}
-						<a accesskey="n" role="menuitem" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}" data-toggle="tooltip" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}"><i class="fa fa-lg fa-th" aria-hidden="true"></i><span id="net-update" class="nav-network-badge badge nav-notify"></span></a>
+						<a accesskey="n" role="menuitem" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}" data-toggle="tooltip" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}" target="_self"><i class="fa fa-lg fa-th" aria-hidden="true"></i><span id="net-update" class="nav-network-badge badge nav-notify"></span></a>
 						{{/if}}
 
 						{{if $nav.home}}
-						<a accesskey="p" role="menuitem" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip" aria-label="{{$nav.home.3}}" title="{{$nav.home.3}}"><i class="fa fa-lg fa-home" aria-hidden="true"></i><span id="home-update" class="nav-home-badge badge nav-notify"></span></a>
+						<a accesskey="p" role="menuitem" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip" aria-label="{{$nav.home.3}}" title="{{$nav.home.3}}" target="_self"><i class="fa fa-lg fa-home" aria-hidden="true"></i><span id="home-update" class="nav-home-badge badge nav-notify"></span></a>
 						{{/if}}
 
 						{{if $nav.community}}
-						<a accesskey="c" role="menuitem" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}" data-toggle="tooltip" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i class="fa fa-lg fa-bullseye" aria-hidden="true"></i></a>
+						<a accesskey="c" role="menuitem" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}" data-toggle="tooltip" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}" target="_self"><i class="fa fa-lg fa-bullseye" aria-hidden="true"></i></a>
 						{{/if}}
 					</li>
 
 					<li id="nav-personal" class="nav-segment hidden-xs" role="presentation">
 						{{if $nav.messages}}
-						<a role="menuitem" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}" class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i><span id="mail-update" class="nav-mail-badge badge nav-notify"></span></a>
+						<a role="menuitem" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}" class="nav-menu {{$sel.messages}}" target="_self"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i><span id="mail-update" class="nav-mail-badge badge nav-notify"></span></a>
 						{{/if}}
 
 						{{if $nav.events}}
-						<a accesskey="e" role="menuitem" id="nav-events-link" href="{{$nav.events.0}}" data-toggle="tooltip" aria-label="{{$nav.events.1}}" title="{{$nav.events.1}}" class="nav-menu"><i class="fa fa-lg fa-calendar"></i></a>
+						<a accesskey="e" role="menuitem" id="nav-events-link" href="{{$nav.events.0}}" data-toggle="tooltip" aria-label="{{$nav.events.1}}" title="{{$nav.events.1}}" class="nav-menu" target="_self"><i class="fa fa-lg fa-calendar"></i></a>
 						{{/if}}
 
 						{{if $nav.contacts}}
-						<a role="menuitem" id="nav-contacts-link" class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}" href="{{$nav.contacts.0}}" data-toggle="tooltip" aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}" ><i class="fa fa-users fa-lg" aria-hidden="true"></i></a>
+						<a role="menuitem" id="nav-contacts-link" class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}" href="{{$nav.contacts.0}}" data-toggle="tooltip" aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}" target="_self"><i class="fa fa-users fa-lg" aria-hidden="true"></i></a>
 						<span id="intro-update" class="nav-intro-badge badge nav-notify" onclick="window.location.href = '{{$nav.introductions.0}}' " data-toggle="tooltip" aria-label="{{$nav.introductions.3}}" title="{{$nav.introductions.3}}"></span>
 						{{/if}}
 					</li>
