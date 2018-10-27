@@ -189,4 +189,26 @@ class Text
         return $word;
     }
 
+    /**
+     * escape text ($str) for XML transport
+     * @param string $str
+     * @return string Escaped text.
+     */
+    function xmlify($str) {
+        $buffer = htmlspecialchars($str, ENT_QUOTES, "UTF-8");
+        $buffer = trim($buffer);
+
+        return $buffer;
+    }
+
+    /**
+     * undo an xmlify
+     * @param string $s xml escaped text
+     * @return string unescaped text
+     */
+    function unxmlify($s) {
+        $ret = htmlspecialchars_decode($s, ENT_QUOTES);
+        return $ret;
+    }
+
 }

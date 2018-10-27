@@ -6,6 +6,7 @@ namespace Friendica\Util;
 
 use DOMXPath;
 use SimpleXMLElement;
+use Friendica\Content\Text;
 
 /**
  * @brief This class contain methods to work with XML data
@@ -35,7 +36,7 @@ class XML
 					$root = new SimpleXMLElement("<".$key."/>");
 					self::fromArray($value, $root, $remove_header, $namespaces, false);
 				} else {
-					$root = new SimpleXMLElement("<".$key.">".xmlify($value)."</".$key.">");
+					$root = new SimpleXMLElement("<".$key.">".Text::xmlify($value)."</".$key.">");
 				}
 
 				$dom = dom_import_simplexml($root)->ownerDocument;
@@ -103,7 +104,7 @@ class XML
 			}
 
 			if (!is_array($value)) {
-				$element = $xml->addChild($key, xmlify($value), $namespace);
+				$element = $xml->addChild($key, Text::xmlify($value), $namespace);
 			} elseif (is_array($value)) {
 				$element = $xml->addChild($key, null, $namespace);
 				self::fromArray($value, $element, $remove_header, $namespaces, false);
@@ -122,7 +123,7 @@ class XML
 	public static function copy(&$source, &$target, $elementname)
 	{
 		if (count($source->children()) == 0) {
-			$target->addChild($elementname, xmlify($source));
+			$target->addChild($elementname, Text::xmlify($source));
 		} else {
 			$child = $target->addChild($elementname);
 			foreach ($source->children() as $childfield => $childentry) {
@@ -143,11 +144,11 @@ class XML
 	 */
 	public static function createElement($doc, $element, $value = "", $attributes = [])
 	{
-		$element = $doc->createElement($element, xmlify($value));
+		$element = $doc->createElement($element, Text::xmlify($value));
 
 		foreach ($attributes as $key => $value) {
 			$attribute = $doc->createAttribute($key);
-			$attribute->value = xmlify($value);
+			$attribute->value = Text::xmlify($value);
 			$element->appendChild($attribute);
 		}
 		return $element;

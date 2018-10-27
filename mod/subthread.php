@@ -87,7 +87,7 @@ function subthread_content(App $a) {
 
 	$post_type = (($item['resource-id']) ? L10n::t('photo') : L10n::t('status'));
 	$objtype = (($item['resource-id']) ? ACTIVITY_OBJ_IMAGE : ACTIVITY_OBJ_NOTE );
-	$link = xmlify('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
+	$link = Text::xmlify('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/display/' . $owner['nickname'] . '/' . $item['id'] . '" />' . "\n") ;
 	$body = $item['body'];
 
 	$obj = <<< EOT

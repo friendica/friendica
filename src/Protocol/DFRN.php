@@ -2547,7 +2547,7 @@ class DFRN
 		$item["guid"] = XML::getFirstNodeValue($xpath, "dfrn:diaspora_guid/text()", $entry);
 
 		// We store the data from "dfrn:diaspora_signature" in a different table, this is done in "Item::insert"
-		$dsprsig = unxmlify(XML::getFirstNodeValue($xpath, "dfrn:diaspora_signature/text()", $entry));
+		$dsprsig = Text::unxmlify(XML::getFirstNodeValue($xpath, "dfrn:diaspora_signature/text()", $entry));
 		if ($dsprsig != "") {
 			$item["dsprsig"] = $dsprsig;
 		}

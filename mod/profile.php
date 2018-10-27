@@ -209,7 +209,7 @@ function profile_content(App $a, $update = 0)
 		$commvisitor = $commpage && $remote_contact;
 
 		$a->page['aside'] .= posted_date_widget(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'], true);
-		$a->page['aside'] .= Widget::categories(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], (!empty($category) ? xmlify($category) : ''));
+		$a->page['aside'] .= Widget::categories(System::baseUrl(true) . '/profile/' . $a->profile['nickname'], (!empty($category) ? Text::xmlify($category) : ''));
 		$a->page['aside'] .= Widget::tagCloud();
 
 		if (Security::canWriteToUserWall($a->profile['profile_uid'])) {

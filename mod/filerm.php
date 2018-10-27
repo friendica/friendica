@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 
 function filerm_content(App $a) {
@@ -9,8 +10,8 @@ function filerm_content(App $a) {
 		killme();
 	}
 
-	$term = unxmlify(trim($_GET['term']));
-	$cat = unxmlify(trim($_GET['cat']));
+	$term = Text::unxmlify(trim($_GET['term']));
+	$cat = Text::unxmlify(trim($_GET['cat']));
 
 	$category = (($cat) ? true : false);
 	if ($category) {

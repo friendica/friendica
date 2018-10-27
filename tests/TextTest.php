@@ -256,8 +256,8 @@ class TextTest extends TestCase
 	public function testXmlify()
 	{
 		$text="<tag>I want to break\n this!11!<?hard?></tag>";
-		$xml=xmlify($text);
-		$retext=unxmlify($text);
+		$xml=Text::xmlify($text);
+		$retext=Text::unxmlify($text);
 
 		$this->assertEquals($text, $retext);
 	}
@@ -268,7 +268,7 @@ class TextTest extends TestCase
 	public function testXmlifyDocument()
 	{
 		$tag="<tag>I want to break</tag>";
-		$xml=xmlify($tag);
+		$xml=Text::xmlify($tag);
 		$text='<text>'.$xml.'</text>';
 
 		$xml_parser=xml_parser_create();

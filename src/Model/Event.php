@@ -301,8 +301,8 @@ class Event extends BaseObject
 
 			$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 			if (DBA::isResult($item)) {
-				$object = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($event['uri']) . '</id>';
-				$object .= '<content>' . xmlify(self::getBBCode($event)) . '</content>';
+				$object = '<object><type>' . Text::xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . Text::xmlify($event['uri']) . '</id>';
+				$object .= '<content>' . Text::xmlify(self::getBBCode($event)) . '</content>';
 				$object .= '</object>' . "\n";
 
 				$fields = ['body' => self::getBBCode($event), 'object' => $object, 'edited' => $event['edited']];
@@ -352,8 +352,8 @@ class Event extends BaseObject
 			$item_arr['body']          = self::getBBCode($event);
 			$item_arr['event-id']      = $event['id'];
 
-			$item_arr['object']  = '<object><type>' . xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . xmlify($event['uri']) . '</id>';
-			$item_arr['object'] .= '<content>' . xmlify(self::getBBCode($event)) . '</content>';
+			$item_arr['object']  = '<object><type>' . Text::xmlify(ACTIVITY_OBJ_EVENT) . '</type><title></title><id>' . Text::xmlify($event['uri']) . '</id>';
+			$item_arr['object'] .= '<content>' . Text::xmlify(self::getBBCode($event)) . '</content>';
 			$item_arr['object'] .= '</object>' . "\n";
 
 			$item_id = Item::insert($item_arr);

@@ -256,7 +256,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			$xml = XML::parseString($res);
 			$status = (int) $xml->status;
-			$message = unxmlify($xml->message);   // human readable text of what may have gone wrong.
+			$message = Text::unxmlify($xml->message);   // human readable text of what may have gone wrong.
 			switch ($status) {
 				case 0:
 					info(L10n::t("Confirmation completed successfully.") . EOL);

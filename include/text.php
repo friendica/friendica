@@ -241,10 +241,11 @@ function xmlify($str) {
 	$buffer = mb_ereg_replace("<", "&lt;", $buffer);
 	$buffer = mb_ereg_replace(">", "&gt;", $buffer);
 	*/
-	$buffer = htmlspecialchars($str, ENT_QUOTES, "UTF-8");
+	/* $buffer = htmlspecialchars($str, ENT_QUOTES, "UTF-8");
 	$buffer = trim($buffer);
 
-	return $buffer;
+	return $buffer; */
+	return Text::xmlify($str);
 }
 
 
@@ -263,8 +264,9 @@ function unxmlify($s) {
 	$ret = mb_ereg_replace('&lt;', "<", $ret);
 	$ret = mb_ereg_replace('&gt;', ">", $ret);
 	*/
-	$ret = htmlspecialchars_decode($s, ENT_QUOTES);
-	return $ret;
+	/* $ret = htmlspecialchars_decode($s, ENT_QUOTES);
+	return $ret; */
+	return Text::unxmlify($s);
 }
 
 /**
