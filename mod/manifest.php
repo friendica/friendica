@@ -1,6 +1,7 @@
 <?php
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 use Friendica\Core\Config;
 
@@ -15,7 +16,7 @@ function manifest_content(App $a) {
 		$touch_icon = 'images/friendica-128.png';
 	}
 
-	$o = replace_macros($tpl, [
+	$o = Text::replaceMacros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$touch_icon' => $touch_icon,
 		'$title' => Config::get('config', 'sitename', 'Friendica'),

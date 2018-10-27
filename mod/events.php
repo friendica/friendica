@@ -5,8 +5,8 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Text;
 use Friendica\Content\Nav;
+use Friendica\Content\Text;
 use Friendica\Content\Widget\CalendarExport;
 use Friendica\Core\ACL;
 use Friendica\Core\L10n;
@@ -226,7 +226,7 @@ function events_content(App $a)
 	$i18n = Event::getStrings();
 
 	$htpl = get_markup_template('event_head.tpl');
-	$a->page['htmlhead'] .= replace_macros($htpl, [
+	$a->page['htmlhead'] .= Text::replaceMacros($htpl, [
 		'$baseurl' => System::baseUrl(),
 		'$module_url' => '/events',
 		'$modparams' => 1,
@@ -382,7 +382,7 @@ function events_content(App $a)
 			$events[$key]['item'] = $event_item;
 		}
 
-		$o = replace_macros($tpl, [
+		$o = Text::replaceMacros($tpl, [
 			'$baseurl'   => System::baseUrl(),
 			'$tabs'      => $tabs,
 			'$title'     => L10n::t('Events'),
@@ -499,7 +499,7 @@ function events_content(App $a)
 
 		$tpl = get_markup_template('event_form.tpl');
 
-		$o .= replace_macros($tpl, [
+		$o .= Text::replaceMacros($tpl, [
 			'$post' => System::baseUrl() . '/events',
 			'$eid'  => $eid,
 			'$cid'  => $cid,

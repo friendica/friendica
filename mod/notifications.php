@@ -8,6 +8,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\Protocol;
@@ -158,7 +159,7 @@ function notifications_content(App $a)
 			// We have to distinguish between these two because they use different data.
 			switch ($notif['label']) {
 				case 'friend_suggestion':
-					$notif_content[] = replace_macros($sugg, [
+					$notif_content[] = Text::replaceMacros($sugg, [
 						'$type'       => $notif['label'],
 						'$str_notifytype' => L10n::t('Notification type:'),
 						'$notify_type'=> $notif['notify_type'],
@@ -209,7 +210,7 @@ function notifications_content(App $a)
 					}
 
 					$dfrn_tpl = get_markup_template('netfriend.tpl');
-					$dfrn_text = replace_macros($dfrn_tpl, [
+					$dfrn_text = Text::replaceMacros($dfrn_tpl, [
 						'$intro_id'    => $notif['intro_id'],
 						'$friend_selected' => $friend_selected,
 						'$fan_selected'=> $fan_selected,
@@ -234,7 +235,7 @@ function notifications_content(App $a)
 						$discard = '';
 					}
 
-					$notif_content[] = replace_macros($tpl, [
+					$notif_content[] = Text::replaceMacros($tpl, [
 						'$type'        => $notif['label'],
 						'$header'      => htmlentities($header),
 						'$str_notifytype' => L10n::t('Notification type:'),
@@ -295,7 +296,7 @@ function notifications_content(App $a)
 
 			$tpl_notif = get_markup_template($notification_templates[$notif['label']]);
 
-			$notif_content[] = replace_macros($tpl_notif, [
+			$notif_content[] = Text::replaceMacros($tpl_notif, [
 				'$item_label' => $notif['label'],
 				'$item_link'  => $notif['link'],
 				'$item_image' => $notif['image'],
@@ -310,7 +311,7 @@ function notifications_content(App $a)
 		$notif_nocontent = L10n::t('No more %s notifications.', $notifs['ident']);
 	}
 
-	$o .= replace_macros($notif_tpl, [
+	$o .= Text::replaceMacros($notif_tpl, [
 		'$notif_header'    => $notif_header,
 		'$tabs'            => $tabs,
 		'$notif_content'   => $notif_content,

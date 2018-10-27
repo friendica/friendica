@@ -251,7 +251,7 @@ function dirfind_content(App $a, $prefix = "") {
 			}
 
 			$tpl = get_markup_template('viewcontact_template.tpl');
-			$o .= replace_macros($tpl,[
+			$o .= Text::replaceMacros($tpl,[
 				'title' => $header,
 				'$contacts' => $entries,
 				'$paginate' => $pager->renderFull($j->total),

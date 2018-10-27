@@ -4,6 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -39,12 +40,12 @@ function editpost_content(App $a)
 
 	$geotag = '';
 
-	$o .= replace_macros(get_markup_template("section_title.tpl"), [
+	$o .= Text::replaceMacros(get_markup_template("section_title.tpl"), [
 		'$title' => L10n::t('Edit post')
 	]);
 
 	$tpl = get_markup_template('jot-header.tpl');
-	$a->page['htmlhead'] .= replace_macros($tpl, [
+	$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
@@ -84,7 +85,7 @@ function editpost_content(App $a)
 	Addon::callHooks('jot_tool', $jotplugins);
 	//Addon::callHooks('jot_networks', $jotnets);
 
-	$o .= replace_macros($tpl, [
+	$o .= Text::replaceMacros($tpl, [
 		'$is_edit' => true,
 		'$return_path' => '/display/' . $item['guid'],
 		'$action' => 'item',

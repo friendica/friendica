@@ -3,6 +3,7 @@
  * @file mod/hostxrd.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Protocol\Salmon;
@@ -22,7 +23,7 @@ function hostxrd_init(App $a)
 	}
 
 	$tpl = get_markup_template('xrd_host.tpl');
-	echo replace_macros($tpl, [
+	echo Text::replaceMacros($tpl, [
 		'$zhost' => $a->getHostName(),
 		'$zroot' => System::baseUrl(),
 		'$domain' => System::baseUrl(),

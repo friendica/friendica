@@ -7,6 +7,7 @@
 namespace Friendica\Content\Widget;
 
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 
 require_once 'boot.php';
@@ -61,7 +62,7 @@ class CalendarExport
 		$user = defaults($a->data['user'], 'nickname', $a->user['nickname']);
 
 		$tpl = get_markup_template("events_aside.tpl");
-		$return = replace_macros($tpl, [
+		$return = Text::replaceMacros($tpl, [
 			'$etitle'      => L10n::t("Export"),
 			'$export_ical' => L10n::t("Export calendar as ical"),
 			'$export_csv'  => L10n::t("Export calendar as csv"),

@@ -10,6 +10,7 @@ use DOMNode;
 use DOMText;
 use DOMXPath;
 use Exception;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -179,7 +180,7 @@ class OEmbed
 					$th = 120;
 					$tw = $th * $tr;
 					$tpl = get_markup_template('oembed_video.tpl');
-					$ret .= replace_macros($tpl, [
+					$ret .= Text::replaceMacros($tpl, [
 						'$baseurl' => System::baseUrl(),
 						'$embedurl' => $oembed->embed_url,
 						'$escapedhtml' => base64_encode($oembed->html),

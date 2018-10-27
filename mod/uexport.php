@@ -3,6 +3,7 @@
  * @file mod/uexport.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -47,7 +48,7 @@ function uexport_content(App $a) {
 	Addon::callHooks('uexport_options', $options);
 
 	$tpl = get_markup_template("uexport.tpl");
-	return replace_macros($tpl, [
+	return Text::replaceMacros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$title' => L10n::t('Export personal data'),
 		'$options' => $options

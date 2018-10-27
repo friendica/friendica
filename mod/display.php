@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\ACL;
@@ -262,7 +263,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$conversation = '';
 	}
 
-	$a->page['htmlhead'] .= replace_macros(get_markup_template('display-head.tpl'),
+	$a->page['htmlhead'] .= Text::replaceMacros(get_markup_template('display-head.tpl'),
 				['$alternate' => $alternate,
 					'$conversation' => $conversation]);
 

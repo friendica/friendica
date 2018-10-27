@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -69,7 +70,7 @@ function quattro_form(App $a, $align, $color, $tfs, $pfs) {
 	}
 
 	$t = get_markup_template("theme_settings.tpl" );
-	$o = replace_macros($t, [
+	$o = Text::replaceMacros($t, [
 		'$submit'  => L10n::t('Submit'),
 		'$baseurl' => System::baseUrl(),
 		'$title'   => L10n::t("Theme settings"),

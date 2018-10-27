@@ -171,7 +171,7 @@ class Profile
 		}
 
 		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
-			$a->page['aside'] .= replace_macros(
+			$a->page['aside'] .= Text::replaceMacros(
 				get_markup_template('profile_edlink.tpl'),
 				[
 					'$editprofile' => L10n::t('Edit profile'),
@@ -517,7 +517,7 @@ class Profile
 		$p['url'] = Contact::magicLink(defaults($p, 'url', $profile_url));
 
 		$tpl = get_markup_template('profile_vcard.tpl');
-		$o .= replace_macros($tpl, [
+		$o .= Text::replaceMacros($tpl, [
 			'$profile' => $p,
 			'$xmpp' => $xmpp,
 			'$connect' => $connect,
@@ -622,7 +622,7 @@ class Profile
 			}
 		}
 		$tpl = get_markup_template('birthdays_reminder.tpl');
-		return replace_macros($tpl, [
+		return Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
 			'$count' => $total,
@@ -711,7 +711,7 @@ class Profile
 			$classtoday = (($istoday) ? 'event-today' : '');
 		}
 		$tpl = get_markup_template('events_reminder.tpl');
-		return replace_macros($tpl, [
+		return Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
 			'$count' => count($r),
@@ -726,7 +726,7 @@ class Profile
 		$o = '';
 		$uid = $a->profile['uid'];
 
-		$o .= replace_macros(
+		$o .= Text::replaceMacros(
 			get_markup_template('section_title.tpl'),
 			['$title' => L10n::t('Profile')]
 		);
@@ -860,7 +860,7 @@ class Profile
 				$profile['edit'] = [System::baseUrl() . '/profiles/' . $a->profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
 			}
 
-			return replace_macros($tpl, [
+			return Text::replaceMacros($tpl, [
 				'$title' => L10n::t('Profile'),
 				'$basic' => L10n::t('Basic'),
 				'$advanced' => L10n::t('Advanced'),
@@ -979,7 +979,7 @@ class Profile
 
 		$tpl = get_markup_template('common_tabs.tpl');
 
-		return replace_macros($tpl, ['$tabs' => $arr['tabs']]);
+		return Text::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
 	}
 
 	/**

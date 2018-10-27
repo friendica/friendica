@@ -515,7 +515,7 @@ function dfrn_request_content(App $a)
 		}
 
 		$tpl = get_markup_template("dfrn_req_confirm.tpl");
-		$o = replace_macros($tpl, [
+		$o = Text::replaceMacros($tpl, [
 			'$dfrn_url' => $dfrn_url,
 			'$aes_allow' => (($aes_allow) ? '<input type="hidden" name="aes_allow" value="1" />' : "" ),
 			'$hidethem' => L10n::t('Hide this contact'),
@@ -639,7 +639,7 @@ function dfrn_request_content(App $a)
 			get_server() . '/servers'
 		);
 
-		$o = replace_macros($tpl, [
+		$o = Text::replaceMacros($tpl, [
 			'$header' => L10n::t('Friend/Connection Request'),
 			'$desc' => L10n::t('Examples: jojo@demo.friendica.com, http://demo.friendica.com/profile/jojo, testuser@gnusocial.de'),
 			'$pls_answer' => L10n::t('Please answer the following:'),

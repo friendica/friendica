@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -136,7 +137,7 @@ function crepair_content(App $a)
 	$tab_str = Module\Contact::getTabsHTML($a, $contact, 5);
 
 	$tpl = get_markup_template('crepair.tpl');
-	$o = replace_macros($tpl, [
+	$o = Text::replaceMacros($tpl, [
 		'$tab_str'        => $tab_str,
 		'$warning'        => $warning,
 		'$info'           => $info,

@@ -6,6 +6,7 @@ namespace Friendica\Content;
 
 use Friendica\App;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -63,7 +64,7 @@ class Nav
 
 		$tpl = get_markup_template('nav.tpl');
 
-		$nav .= replace_macros($tpl, [
+		$nav .= Text::replaceMacros($tpl, [
 			'$baseurl'      => System::baseUrl(),
 			'$sitelocation' => $nav_info['sitelocation'],
 			'$nav'          => $nav_info['nav'],

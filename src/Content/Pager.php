@@ -2,6 +2,7 @@
 
 namespace Friendica\Content;
 
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 
 /**
@@ -173,7 +174,7 @@ class Pager
 		];
 
 		$tpl = get_markup_template('paginate.tpl');
-		return replace_macros($tpl, ['pager' => $data]);
+		return Text::replaceMacros($tpl, ['pager' => $data]);
 	}
 
 	/**
@@ -277,6 +278,6 @@ class Pager
 		}
 
 		$tpl = get_markup_template('paginate.tpl');
-		return replace_macros($tpl, ['pager' => $data]);
+		return Text::replaceMacros($tpl, ['pager' => $data]);
 	}
 }

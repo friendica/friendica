@@ -3,6 +3,7 @@
  * @file mod/apps.php
  */
 use Friendica\Content\Nav;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 
@@ -25,7 +26,7 @@ function apps_content()
 	}
 
 	$tpl = get_markup_template('apps.tpl');
-	return replace_macros($tpl, [
+	return Text::replaceMacros($tpl, [
 		'$title' => $title,
 		'$apps'  => $apps,
 	]);

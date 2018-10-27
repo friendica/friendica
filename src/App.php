@@ -776,7 +776,7 @@ class App
 		 * since the code added by the modules frequently depends on it
 		 * being first
 		 */
-		$this->page['htmlhead'] = replace_macros($tpl, [
+		$this->page['htmlhead'] = Content\Text::replaceMacros($tpl, [
 			'$baseurl'         => $this->getBaseURL(),
 			'$local_user'      => local_user(),
 			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
@@ -822,7 +822,7 @@ class App
 			} else {
 				$link = 'toggle_mobile?off=1&address=' . curPageURL();
 			}
-			$this->page['footer'] .= replace_macros(get_markup_template("toggle_mobile_footer.tpl"), [
+			$this->page['footer'] .= Content\Text::replaceMacros(get_markup_template("toggle_mobile_footer.tpl"), [
 				'$toggle_link' => $link,
 				'$toggle_text' => Core\L10n::t('toggle mobile')
 			]);
@@ -831,7 +831,7 @@ class App
 		Core\Addon::callHooks('footer', $this->page['footer']);
 
 		$tpl = get_markup_template('footer.tpl');
-		$this->page['footer'] = replace_macros($tpl, [
+		$this->page['footer'] = Content\Text::replaceMacros($tpl, [
 			'$baseurl' => $this->getBaseURL(),
 			'$footerScripts' => $this->footerScripts,
 		]) . $this->page['footer'];
@@ -1792,7 +1792,7 @@ class App
 
 				header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . Core\L10n::t('Not Found'));
 				$tpl = get_markup_template("404.tpl");
-				$this->page['content'] = replace_macros($tpl, [
+				$this->page['content'] = Content\Text::replaceMacros($tpl, [
 					'$message' =>  Core\L10n::t('Page not found.')
 				]);
 			}
@@ -1880,7 +1880,7 @@ class App
 
 		// Add the navigation (menu) template
 		if ($this->module != 'install' && $this->module != 'maintenance') {
-			$this->page['htmlhead'] .= replace_macros(get_markup_template('nav_head.tpl'), []);
+			$this->page['htmlhead'] .= Content\Text::replaceMacros(get_markup_template('nav_head.tpl'), []);
 			$this->page['nav']       = Content\Nav::build($this);
 		}
 

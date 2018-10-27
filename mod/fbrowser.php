@@ -6,6 +6,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -95,7 +96,7 @@ function fbrowser_content(App $a)
 
 			$tpl = get_markup_template($template_file);
 
-			$o =  replace_macros($tpl, [
+			$o =  Text::replaceMacros($tpl, [
 				'$type'     => 'image',
 				'$baseurl'  => System::baseUrl(),
 				'$path'     => $path,
@@ -126,7 +127,7 @@ function fbrowser_content(App $a)
 
 
 				$tpl = get_markup_template($template_file);
-				$o = replace_macros($tpl, [
+				$o = Text::replaceMacros($tpl, [
 					'$type'     => 'file',
 					'$baseurl'  => System::baseUrl(),
 					'$path'     => [ [ "", L10n::t("Files")] ],

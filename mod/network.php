@@ -201,7 +201,7 @@ function saved_searches($search)
 	}
 
 	$tpl = get_markup_template('saved_searches_aside.tpl');
-	$o = replace_macros($tpl, [
+	$o = Text::replaceMacros($tpl, [
 		'$title'     => L10n::t('Saved Searches'),
 		'$add'       => L10n::t('add'),
 		'$searchbox' => search($search, 'netsearch-box', $srchurl, true),
@@ -653,7 +653,7 @@ function networkThreadedView(App $a, $update, $parent)
 			info(L10n::t('Group is empty'));
 		}
 
-		$o = replace_macros(get_markup_template('section_title.tpl'), [
+		$o = Text::replaceMacros(get_markup_template('section_title.tpl'), [
 			'$title' => L10n::t('Group: %s', $group['name'])
 		]) . $o;
 	} elseif ($cid) {
@@ -674,7 +674,7 @@ function networkThreadedView(App $a, $update, $parent)
 
 			$entries[0]['account_type'] = Contact::getAccountType($contact);
 
-			$o = replace_macros(get_markup_template('viewcontact_template.tpl'), [
+			$o = Text::replaceMacros(get_markup_template('viewcontact_template.tpl'), [
 				'contacts' => $entries,
 				'id' => 'network',
 			]) . $o;
@@ -1034,7 +1034,7 @@ function network_tabs(App $a)
 
 	$tpl = get_markup_template('common_tabs.tpl');
 
-	return replace_macros($tpl, ['$tabs' => $arr['tabs']]);
+	return Text::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
 
 	// --- end item filter tabs
 }
@@ -1059,7 +1059,7 @@ function network_infinite_scroll_head(App $a, &$htmlhead)
 		&& defaults($_GET, 'mode', '') != 'minimal'
 	) {
 		$tpl = get_markup_template('infinite_scroll_head.tpl');
-		$htmlhead .= replace_macros($tpl, [
+		$htmlhead .= Text::replaceMacros($tpl, [
 			'$pageno'     => $pager->getPage(),
 			'$reload_uri' => $pager->getBaseQueryString()
 		]);

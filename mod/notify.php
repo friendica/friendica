@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
@@ -66,7 +67,7 @@ function notify_content(App $a)
 	$r = $nm->getAll(['seen'=>0]);
 	if (DBA::isResult($r) > 0) {
 		foreach ($r as $it) {
-			$notif_content .= replace_macros($not_tpl, [
+			$notif_content .= Text::replaceMacros($not_tpl, [
 				'$item_link' => System::baseUrl(true).'/notify/view/'. $it['id'],
 				'$item_image' => $it['photo'],
 				'$item_text' => strip_tags(BBCode::convert($it['msg'])),
@@ -77,7 +78,7 @@ function notify_content(App $a)
 		$notif_content .= L10n::t('No more system notifications.');
 	}
 
-	$o = replace_macros($notif_tpl, [
+	$o = Text::replaceMacros($notif_tpl, [
 		'$notif_header' => L10n::t('System Notifications'),
 		'$tabs' => false, // $tabs,
 		'$notif_content' => $notif_content,

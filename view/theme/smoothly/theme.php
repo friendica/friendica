@@ -11,6 +11,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 
 function smoothly_init(App $a) {
@@ -112,6 +113,6 @@ if (! function_exists('_js_in_foot')) {
 		$bottom['$baseurl'] = $baseurl;
 		$tpl = get_markup_template('bottom.tpl');
 
-		return $a->page['bottom'] = replace_macros($tpl, $bottom);
+		return $a->page['bottom'] = Text::replaceMacros($tpl, $bottom);
 	}
 }

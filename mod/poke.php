@@ -160,7 +160,7 @@ function poke_content(App $a)
 	$base = System::baseUrl();
 
 	$head_tpl = get_markup_template('poke_head.tpl');
-	$a->page['htmlhead'] .= replace_macros($head_tpl,[
+	$a->page['htmlhead'] .= Text::replaceMacros($head_tpl,[
 		'$baseurl' => System::baseUrl(true),
 		'$base' => $base
 	]);
@@ -180,7 +180,7 @@ function poke_content(App $a)
 
 	$tpl = get_markup_template('poke_content.tpl');
 
-	$o = replace_macros($tpl,[
+	$o = Text::replaceMacros($tpl,[
 		'$title' => L10n::t('Poke/Prod'),
 		'$desc' => L10n::t('poke, prod or do other things to somebody'),
 		'$clabel' => L10n::t('Recipient'),

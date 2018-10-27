@@ -8,6 +8,7 @@ namespace Friendica\Core;
 
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -292,7 +293,7 @@ class ACL extends BaseObject
 		}
 
 		$tpl = get_markup_template('acl_selector.tpl');
-		$o = replace_macros($tpl, [
+		$o = Text::replaceMacros($tpl, [
 			'$showall' => L10n::t('Visible to everybody'),
 			'$show' => L10n::t('show'),
 			'$hide' => L10n::t('don\'t show'),

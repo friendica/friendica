@@ -36,7 +36,7 @@ require_once "include/conversation.php";
  */
 function replace_macros($s, $r) {
 
-	$stamp1 = microtime(true);
+	/* $stamp1 = microtime(true);
 
 	$a = get_app();
 
@@ -53,7 +53,8 @@ function replace_macros($s, $r) {
 
 	$a->saveTimestamp($stamp1, "rendering");
 
-	return $output;
+	return $output; */
+	return Text::replaceMacros($s, $r);
 }
 
 /**

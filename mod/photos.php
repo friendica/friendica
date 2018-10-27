@@ -64,7 +64,7 @@ function photos_init(App $a) {
 
 		$tpl = get_markup_template("vcard-widget.tpl");
 
-		$vcard_widget = replace_macros($tpl, [
+		$vcard_widget = Text::replaceMacros($tpl, [
 			'$name' => $profile['name'],
 			'$photo' => $profile['photo'],
 			'$addr' => defaults($profile, 'addr', ''),
@@ -109,7 +109,7 @@ function photos_init(App $a) {
 		}
 
 		if ($ret['success']) {
-			$photo_albums_widget = replace_macros(get_markup_template('photo_albums.tpl'), [
+			$photo_albums_widget = Text::replaceMacros(get_markup_template('photo_albums.tpl'), [
 				'$nick'     => $a->data['user']['nickname'],
 				'$title'    => L10n::t('Photo Albums'),
 				'$recent'   => L10n::t('Recent Photos'),
@@ -132,7 +132,7 @@ function photos_init(App $a) {
 
 		$tpl = get_markup_template("photos_head.tpl");
 
-		$a->page['htmlhead'] .= replace_macros($tpl,[
+		$a->page['htmlhead'] .= Text::replaceMacros($tpl,[
 			'$ispublic' => L10n::t('everybody')
 		]);
 	}
@@ -246,7 +246,7 @@ function photos_post(App $a)
 					['name' => 'albumname', 'value' => $_POST['albumname']],
 				];
 
-				$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
+				$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
 					'$method' => 'post',
 					'$message' => L10n::t('Do you really want to delete this photo album and all its photos?'),
 					'$extra_inputs' => $extra_inputs,
@@ -318,7 +318,7 @@ function photos_post(App $a)
 		if (!empty($_REQUEST['confirm'])) {
 			$drop_url = $a->query_string;
 
-			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
+			$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
 				'$method' => 'post',
 				'$message' => L10n::t('Do you really want to delete this photo?'),
 				'$extra_inputs' => [],
@@ -1084,8 +1084,8 @@ function photos_content(App $a)
 
 		Addon::callHooks('photo_upload_form',$ret);
 
-		$default_upload_box = replace_macros(get_markup_template('photos_default_uploader_box.tpl'), []);
-		$default_upload_submit = replace_macros(get_markup_template('photos_default_uploader_submit.tpl'), [
+		$default_upload_box = Text::replaceMacros(get_markup_template('photos_default_uploader_box.tpl'), []);
+		$default_upload_submit = Text::replaceMacros(get_markup_template('photos_default_uploader_submit.tpl'), [
 			'$submit' => L10n::t('Submit'),
 		]);
 
@@ -1095,7 +1095,7 @@ function photos_content(App $a)
 
 		$aclselect_e = ($visitor ? '' : ACL::getFullSelectorHTML($a->user));
 
-		$o .= replace_macros($tpl,[
+		$o .= Text::replaceMacros($tpl,[
 			'$pagename' => L10n::t('Upload Photos'),
 			'$sessid' => session_id(),
 			'$usage' => $usage_message,
@@ -1169,7 +1169,7 @@ function photos_content(App $a)
 
 					$album_e = $album;
 
-					$o .= replace_macros($edit_tpl,[
+					$o .= Text::replaceMacros($edit_tpl,[
 						'$nametext' => L10n::t('New album name: '),
 						'$nickname' => $a->data['user']['nickname'],
 						'$album' => $album_e,
@@ -1220,7 +1220,7 @@ function photos_content(App $a)
 		}
 
 		$tpl = get_markup_template('photo_album.tpl');
-		$o .= replace_macros($tpl, [
+		$o .= Text::replaceMacros($tpl, [
 			'$photos' => $photos,
 			'$album' => $album,
 			'$can_post' => $can_post,
@@ -1342,7 +1342,7 @@ function photos_content(App $a)
 
 		if ($cmd === 'edit') {
 			$tpl = get_markup_template('photo_edit_head.tpl');
-			$a->page['htmlhead'] .= replace_macros($tpl,[
+			$a->page['htmlhead'] .= Text::replaceMacros($tpl,[
 				'$prevlink' => $prevlink,
 				'$nextlink' => $nextlink
 			]);
@@ -1434,7 +1434,7 @@ function photos_content(App $a)
 			$caption_e = $ph[0]['desc'];
 			$aclselect_e = ACL::getFullSelectorHTML($a->user, false, $ph[0]);
 
-			$edit = replace_macros($edit_tpl, [
+			$edit = Text::replaceMacros($edit_tpl, [
 				'$id' => $ph[0]['id'],
 				'$album' => ['albname', L10n::t('New album name'), $album_e,''],
 				'$caption' => ['desc', L10n::t('Caption'), $caption_e, ''],
@@ -1473,7 +1473,7 @@ function photos_content(App $a)
 
 			if ($can_post || Security::canWriteToUserWall($owner_uid)) {
 				$like_tpl = get_markup_template('like_noshare.tpl');
-				$likebuttons = replace_macros($like_tpl, [
+				$likebuttons = Text::replaceMacros($like_tpl, [
 					'$id' => $link_item['id'],
 					'$likethis' => L10n::t("I like this \x28toggle\x29"),
 					'$nolike' => (Feature::isEnabled(local_user(), 'dislike') ? L10n::t("I don't like this \x28toggle\x29") : ''),
@@ -1484,7 +1484,7 @@ function photos_content(App $a)
 
 			if (!DBA::isResult($items)) {
 				if (($can_post || Security::canWriteToUserWall($owner_uid))) {
-					$comments .= replace_macros($cmnt_tpl, [
+					$comments .= Text::replaceMacros($cmnt_tpl, [
 						'$return_path' => '',
 						'$jsreload' => $return_path,
 						'$id' => $link_item['id'],
@@ -1523,7 +1523,7 @@ function photos_content(App $a)
 				}
 
 				if (($can_post || Security::canWriteToUserWall($owner_uid))) {
-					$comments .= replace_macros($cmnt_tpl,[
+					$comments .= Text::replaceMacros($cmnt_tpl,[
 						'$return_path' => '',
 						'$jsreload' => $return_path,
 						'$id' => $link_item['id'],
@@ -1568,7 +1568,7 @@ function photos_content(App $a)
 					$title_e = $item['title'];
 					$body_e = BBCode::convert($item['body']);
 
-					$comments .= replace_macros($template,[
+					$comments .= Text::replaceMacros($template,[
 						'$id' => $item['id'],
 						'$profile_url' => $profile_url,
 						'$name' => $item['author-name'],
@@ -1583,7 +1583,7 @@ function photos_content(App $a)
 					]);
 
 					if (($can_post || Security::canWriteToUserWall($owner_uid))) {
-						$comments .= replace_macros($cmnt_tpl, [
+						$comments .= Text::replaceMacros($cmnt_tpl, [
 							'$return_path' => '',
 							'$jsreload' => $return_path,
 							'$id' => $item['item_id'],
@@ -1612,7 +1612,7 @@ function photos_content(App $a)
 		}
 
 		$photo_tpl = get_markup_template('photo_view.tpl');
-		$o .= replace_macros($photo_tpl, [
+		$o .= Text::replaceMacros($photo_tpl, [
 			'$id' => $ph[0]['id'],
 			'$album' => [$album_link, $ph[0]['album']],
 			'$tools' => $tools,
@@ -1704,7 +1704,7 @@ function photos_content(App $a)
 	}
 
 	$tpl = get_markup_template('photos_recent.tpl');
-	$o .= replace_macros($tpl, [
+	$o .= Text::replaceMacros($tpl, [
 		'$title' => L10n::t('Recent Photos'),
 		'$can_post' => $can_post,
 		'$upload' => [L10n::t('Upload New Photos'), 'photos/'.$a->data['user']['nickname'].'/upload'],

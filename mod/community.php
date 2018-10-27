@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -120,7 +121,7 @@ function community_content(App $a, $update = 0)
 		}
 
 		$tab_tpl = get_markup_template('common_tabs.tpl');
-		$o .= replace_macros($tab_tpl, ['$tabs' => $tabs]);
+		$o .= Text::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
 
 		Nav::setSelected('community');
 
@@ -199,7 +200,7 @@ function community_content(App $a, $update = 0)
 	}
 
 	$t = get_markup_template("community.tpl");
-	return replace_macros($t, [
+	return Text::replaceMacros($t, [
 		'$content' => $o,
 		'$header' => '',
 		'$show_global_community_hint' => ($content == 'global') && Config::get('system', 'show_global_community_hint'),

@@ -3,6 +3,7 @@
  * @file mod/filer.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 
@@ -29,7 +30,7 @@ function filer_content(App $a)
 		$filetags = explode(",", $filetags);
 
 		$tpl = get_markup_template("filer_dialog.tpl");
-		$o = replace_macros($tpl, [
+		$o = Text::replaceMacros($tpl, [
 			'$field' => ['term', L10n::t("Save to Folder:"), '', '', $filetags, L10n::t('- select -')],
 			'$submit' => L10n::t('Save'),
 		]);

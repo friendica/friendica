@@ -6,6 +6,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -100,7 +101,7 @@ function allfriends_content(App $a)
 
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
-	$o .= replace_macros($tpl, [
+	$o .= Text::replaceMacros($tpl, [
 		//'$title' => L10n::t('Friends of %s', htmlentities($c[0]['name'])),
 		'$tab_str' => $tab_str,
 		'$contacts' => $entries,

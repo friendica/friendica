@@ -5,6 +5,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\UserImport;
@@ -48,7 +49,7 @@ function uimport_content(App $a)
 	}
 
 	$tpl = get_markup_template("uimport.tpl");
-	return replace_macros($tpl, [
+	return Text::replaceMacros($tpl, [
 		'$regbutt' => L10n::t('Import'),
 		'$import' => [
 			'title' => L10n::t("Move account"),

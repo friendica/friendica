@@ -758,7 +758,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 		}
 	}
 
-	$o = replace_macros($page_template, [
+	$o = Text::replaceMacros($page_template, [
 		'$baseurl' => System::baseUrl($ssl_state),
 		'$return_path' => $a->query_string,
 		'$live_update' => $live_update_div,
@@ -1062,7 +1062,7 @@ function format_like($cnt, array $arr, $type, $id) {
 	}
 
 	$phrase .= EOL ;
-	$o .= replace_macros(get_markup_template('voting_fakelink.tpl'), [
+	$o .= Text::replaceMacros(get_markup_template('voting_fakelink.tpl'), [
 		'$phrase' => $phrase,
 		'$type' => $type,
 		'$id' => $id
@@ -1076,10 +1076,10 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 {
 	$o = '';
 
-	$geotag = x($x, 'allow_location') ? replace_macros(get_markup_template('jot_geotag.tpl'), []) : '';
+	$geotag = x($x, 'allow_location') ? Text::replaceMacros(get_markup_template('jot_geotag.tpl'), []) : '';
 
 	$tpl = get_markup_template('jot-header.tpl');
-	$a->page['htmlhead'] .= replace_macros($tpl, [
+	$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
 		'$newpost'   => 'true',
 		'$baseurl'   => System::baseUrl(true),
 		'$geotag'    => $geotag,
@@ -1117,10 +1117,10 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		$public_post_link = '&public=1';
 	}
 
-	// $tpl = replace_macros($tpl,array('$jotplugins' => $jotplugins));
+	// $tpl = Text::replaceMacros($tpl,array('$jotplugins' => $jotplugins));
 	$tpl = get_markup_template("jot.tpl");
 
-	$o .= replace_macros($tpl,[
+	$o .= Text::replaceMacros($tpl,[
 		'$new_post' => L10n::t('New Post'),
 		'$return_path'  => $query_str,
 		'$action'       => 'item',

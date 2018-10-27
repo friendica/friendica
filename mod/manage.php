@@ -3,6 +3,7 @@
  * @file mod/manage.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Authentication;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
@@ -176,7 +177,7 @@ function manage_content(App $a) {
 		$identities[$key]['notifications'] = $notifications;
 	}
 
-	$o = replace_macros(get_markup_template('manage.tpl'), [
+	$o = Text::replaceMacros(get_markup_template('manage.tpl'), [
 		'$title' => L10n::t('Manage Identities and/or Pages'),
 		'$desc' => L10n::t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions'),
 		'$choose' => L10n::t('Select an identity to manage: '),

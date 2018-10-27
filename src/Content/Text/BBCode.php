@@ -11,6 +11,7 @@ use Exception;
 use Friendica\BaseObject;
 use Friendica\Content\OEmbed;
 use Friendica\Content\Smilies;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -986,7 +987,7 @@ class BBCode extends BaseObject
 					$text = ($is_quote_share? "\n" : '');
 
 					$tpl = get_markup_template('shared_content.tpl');
-					$text .= replace_macros($tpl, [
+					$text .= Text::replaceMacros($tpl, [
 						'$profile' => $attributes['profile'],
 						'$avatar'  => $attributes['avatar'],
 						'$author'  => $attributes['author'],

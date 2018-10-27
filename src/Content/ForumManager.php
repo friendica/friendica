@@ -7,6 +7,7 @@ namespace Friendica\Content;
 
 use Friendica\Core\Protocol;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -124,7 +125,7 @@ class ForumManager
 
 			$tpl = get_markup_template('widget_forumlist.tpl');
 
-			$o .= replace_macros(
+			$o .= Text::replaceMacros(
 				$tpl,
 				[
 					'$title'	=> L10n::t('Forums'),

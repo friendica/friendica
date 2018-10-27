@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -163,7 +164,7 @@ function delegate_content(App $a)
 		$parent_password = ['parent_password', L10n::t('Parent Password:'), '', L10n::t('Please enter the password of the parent account to legitimize your request.')];
 	}
 
-	$o = replace_macros(get_markup_template('delegate.tpl'), [
+	$o = Text::replaceMacros(get_markup_template('delegate.tpl'), [
 		'$form_security_token' => BaseModule::getFormSecurityToken('delegate'),
 		'$parent_header' => L10n::t('Parent User'),
 		'$parent_user' => $parent_user,

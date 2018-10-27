@@ -7,6 +7,7 @@ namespace Friendica\Object;
 use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -785,7 +786,7 @@ class Post extends BaseObject
 			}
 
 			$template = get_markup_template($this->getCommentBoxTemplate());
-			$comment_box = replace_macros($template, [
+			$comment_box = Text::replaceMacros($template, [
 				'$return_path' => $a->query_string,
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',

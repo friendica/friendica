@@ -6,6 +6,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
@@ -898,7 +899,7 @@ class Event extends BaseObject
 		$profile_link = Contact::magicLinkById($item['author-id']);
 
 		$tpl = get_markup_template('event_stream_item.tpl');
-		$return = replace_macros($tpl, [
+		$return = Text::replaceMacros($tpl, [
 			'$id'             => $item['event-id'],
 			'$title'          => prepare_text($item['event-summary']),
 			'$dtstart_label'  => L10n::t('Starts:'),

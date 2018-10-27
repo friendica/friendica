@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\ContactSelector;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -33,7 +34,7 @@ function suggest_init(App $a)
 				}
 			}
 
-			$a->page['content'] = replace_macros(get_markup_template('confirm.tpl'), [
+			$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this suggestion?'),
 				'$extra_inputs' => $inputs,
@@ -113,7 +114,7 @@ function suggest_content(App $a)
 
 	$tpl = get_markup_template('viewcontact_template.tpl');
 
-	$o .= replace_macros($tpl,[
+	$o .= Text::replaceMacros($tpl,[
 		'$title' => L10n::t('Friend Suggestions'),
 		'$contacts' => $entries,
 	]);

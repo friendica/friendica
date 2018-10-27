@@ -3,6 +3,7 @@
  * @file mod/home.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -54,7 +55,7 @@ function home_content(App $a) {
 
 
 	$tpl = get_markup_template('home.tpl');
-	return replace_macros($tpl, [
+	return Text::replaceMacros($tpl, [
 		'$defaultheader' => $defaultheader,
 		'$customhome' => $customhome,
 		'$login' => $login,

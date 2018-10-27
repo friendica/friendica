@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -125,7 +126,7 @@ function viewcontacts_content(App $a)
 
 
 	$tpl = get_markup_template("viewcontact_template.tpl");
-	$o .= replace_macros($tpl, [
+	$o .= Text::replaceMacros($tpl, [
 		'$title' => L10n::t('Contacts'),
 		'$contacts' => $contacts,
 		'$paginate' => $pager->renderFull($total),

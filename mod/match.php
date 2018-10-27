@@ -5,6 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Pager;
+use Friendica\Content\Text;
 use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -114,7 +115,7 @@ function match_content(App $a)
 
 			$tpl = get_markup_template('viewcontact_template.tpl');
 
-			$o .= replace_macros($tpl, [
+			$o .= Text::replaceMacros($tpl, [
 				'$title'    => L10n::t('Profile Match'),
 				'$contacts' => $entries,
 				'$paginate' => $pager->renderFull($j->total)

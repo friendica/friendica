@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -67,7 +68,7 @@ function clean_form(App $a, &$colorset, $user)
 	}
 
 	$t = get_markup_template("theme_settings.tpl");
-	$o = replace_macros($t, [
+	$o = Text::replaceMacros($t, [
 		'$submit'   => L10n::t('Submit'),
 		'$baseurl'  => System::baseUrl(),
 		'$title'    => L10n::t("Theme settings"),

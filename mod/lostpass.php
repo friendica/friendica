@@ -117,7 +117,7 @@ function lostpass_content(App $a)
 function lostpass_form()
 {
 	$tpl = get_markup_template('lostpass.tpl');
-	$o = replace_macros($tpl, [
+	$o = Text::replaceMacros($tpl, [
 		'$title' => L10n::t('Forgot your Password?'),
 		'$desc' => L10n::t('Enter your email address and submit to have your password reset. Then check your email for further instructions.'),
 		'$name' => L10n::t('Nickname or Email: '),
@@ -136,7 +136,7 @@ function lostpass_generate_password($user)
 	$result = User::updatePassword($user['uid'], $new_password);
 	if (DBA::isResult($result)) {
 		$tpl = get_markup_template('pwdreset.tpl');
-		$o .= replace_macros($tpl, [
+		$o .= Text::replaceMacros($tpl, [
 			'$lbl1'    => L10n::t('Password Reset'),
 			'$lbl2'    => L10n::t('Your password has been reset as requested.'),
 			'$lbl3'    => L10n::t('Your new password is'),
