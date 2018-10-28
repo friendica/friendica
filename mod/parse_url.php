@@ -10,6 +10,7 @@
  * @see ParseUrl::getSiteinfo() for more information about scraping embeddable content
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
@@ -54,7 +55,7 @@ function parse_url_content(App $a)
 		}
 	}
 
-	logger($url);
+	Text::logger($url);
 
 	// Check if the URL is an image, video or audio file. If so format
 	// the URL with the corresponding BBCode media tag
@@ -114,7 +115,7 @@ function parse_url_content(App $a)
 
 		$result = sprintf($template, $url, ($title) ? $title : $url, $text) . $str_tags;
 
-		logger('(unparsed): returns: ' . $result);
+		Text::logger('(unparsed): returns: ' . $result);
 
 		echo $result;
 		exit();

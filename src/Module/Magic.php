@@ -23,9 +23,9 @@ class Magic extends BaseModule
 	{
 		$a = self::getApp();
 		$ret = ['success' => false, 'url' => '', 'message' => ''];
-		logger('magic mdule: invoked', LOGGER_DEBUG);
+		Text::logger('magic mdule: invoked', LOGGER_DEBUG);
 
-		logger('args: ' . print_r($_REQUEST, true), LOGGER_DATA);
+		Text::logger('args: ' . print_r($_REQUEST, true), LOGGER_DATA);
 
 		$addr = ((x($_REQUEST, 'addr')) ? $_REQUEST['addr'] : '');
 		$dest = ((x($_REQUEST, 'dest')) ? $_REQUEST['dest'] : '');
@@ -42,7 +42,7 @@ class Magic extends BaseModule
 		}
 
 		if (!$cid) {
-			logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
+			Text::logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
 			// @TODO Finding a more elegant possibility to redirect to either internal or external URL
 			$a->redirect($dest);
 		}
@@ -56,7 +56,7 @@ class Magic extends BaseModule
 				return $ret;
 			}
 
-			logger('Contact is already authenticated', LOGGER_DEBUG);
+			Text::logger('Contact is already authenticated', LOGGER_DEBUG);
 			System::externalRedirect($dest);
 		}
 

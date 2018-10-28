@@ -752,7 +752,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 			$threads = $conv->getTemplateData($conv_responses);
 			if (!$threads) {
-				logger('[ERROR] conversation : Failed to get template data.', LOGGER_DEBUG);
+				Text::logger('[ERROR] conversation : Failed to get template data.', LOGGER_DEBUG);
 				$threads = [];
 			}
 		}

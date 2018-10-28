@@ -38,7 +38,7 @@ function profile_init(App $a)
 		if (DBA::isResult($r)) {
 			$a->internalRedirect('profile/' . $r[0]['nickname']);
 		} else {
-			logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
+			Text::logger('profile error: mod_profile ' . $a->query_string, LOGGER_DEBUG);
 			notice(L10n::t('Requested profile is not available.') . EOL);
 			$a->error = 404;
 			return;

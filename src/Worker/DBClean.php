@@ -6,6 +6,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -80,46 +81,46 @@ class DBClean {
 
 			$last_id = Config::get('system', 'dbclean-last-id-1', 0);
 
-			logger("Deleting old global item entries from item table without user copy. Last ID: ".$last_id);
+			Text::logger("Deleting old global item entries from item table without user copy. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
 						NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
 						`received` < UTC_TIMESTAMP() - INTERVAL ? DAY AND `id` >= ?
 					ORDER BY `id` LIMIT ?", $days_unclaimed, $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found global item orphans: ".$count);
+				Text::logger("found global item orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 1, $last_id);
 			} else {
-				logger("No global item orphans found");
+				Text::logger("No global item orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." old global item entries from item table without user copy. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." old global item entries from item table without user copy. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-1', $last_id);
 		} elseif ($stage == 2) {
 			$last_id = Config::get('system', 'dbclean-last-id-2', 0);
 
-			logger("Deleting items without parents. Last ID: ".$last_id);
+			Text::logger("Deleting items without parents. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `id` FROM `item`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` AS `i` WHERE `item`.`parent` = `i`.`id`)
 					AND `id` >= ? ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found item orphans without parents: ".$count);
+				Text::logger("found item orphans without parents: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 2, $last_id);
 			} else {
-				logger("No item orphans without parents found");
+				Text::logger("No item orphans without parents found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." items without parents. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." items without parents. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-2', $last_id);
 
@@ -129,23 +130,23 @@ class DBClean {
 		} elseif ($stage == 3) {
 			$last_id = Config::get('system', 'dbclean-last-id-3', 0);
 
-			logger("Deleting orphaned data from thread table. Last ID: ".$last_id);
+			Text::logger("Deleting orphaned data from thread table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid` FROM `thread`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `thread`.`iid`) AND `iid` >= ?
 					ORDER BY `iid` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found thread orphans: ".$count);
+				Text::logger("found thread orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["iid"];
 					DBA::delete('thread', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 3, $last_id);
 			} else {
-				logger("No thread orphans found");
+				Text::logger("No thread orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." orphaned data from thread table. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." orphaned data from thread table. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-3', $last_id);
 
@@ -155,23 +156,23 @@ class DBClean {
 		} elseif ($stage == 4) {
 			$last_id = Config::get('system', 'dbclean-last-id-4', 0);
 
-			logger("Deleting orphaned data from notify table. Last ID: ".$last_id);
+			Text::logger("Deleting orphaned data from notify table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid`, `id` FROM `notify`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `notify`.`iid`) AND `id` >= ?
 					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found notify orphans: ".$count);
+				Text::logger("found notify orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('notify', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 4, $last_id);
 			} else {
-				logger("No notify orphans found");
+				Text::logger("No notify orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." orphaned data from notify table. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." orphaned data from notify table. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-4', $last_id);
 
@@ -181,23 +182,23 @@ class DBClean {
 		} elseif ($stage == 5) {
 			$last_id = Config::get('system', 'dbclean-last-id-5', 0);
 
-			logger("Deleting orphaned data from notify-threads table. Last ID: ".$last_id);
+			Text::logger("Deleting orphaned data from notify-threads table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `id` FROM `notify-threads`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`parent` = `notify-threads`.`master-parent-item`) AND `id` >= ?
 					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found notify-threads orphans: ".$count);
+				Text::logger("found notify-threads orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('notify-threads', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 5, $last_id);
 			} else {
-				logger("No notify-threads orphans found");
+				Text::logger("No notify-threads orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." orphaned data from notify-threads table. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." orphaned data from notify-threads table. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-5', $last_id);
 
@@ -207,23 +208,23 @@ class DBClean {
 		} elseif ($stage == 6) {
 			$last_id = Config::get('system', 'dbclean-last-id-6', 0);
 
-			logger("Deleting orphaned data from sign table. Last ID: ".$last_id);
+			Text::logger("Deleting orphaned data from sign table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `iid`, `id` FROM `sign`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `sign`.`iid`) AND `id` >= ?
 					ORDER BY `id` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found sign orphans: ".$count);
+				Text::logger("found sign orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('sign', ['iid' => $orphan["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 6, $last_id);
 			} else {
-				logger("No sign orphans found");
+				Text::logger("No sign orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." orphaned data from sign table. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." orphaned data from sign table. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-6', $last_id);
 
@@ -233,23 +234,23 @@ class DBClean {
 		} elseif ($stage == 7) {
 			$last_id = Config::get('system', 'dbclean-last-id-7', 0);
 
-			logger("Deleting orphaned data from term table. Last ID: ".$last_id);
+			Text::logger("Deleting orphaned data from term table. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `oid`, `tid` FROM `term`
 					WHERE NOT EXISTS (SELECT `id` FROM `item` WHERE `item`.`id` = `term`.`oid`) AND `tid` >= ?
 					ORDER BY `tid` LIMIT ?", $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found term orphans: ".$count);
+				Text::logger("found term orphans: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["tid"];
 					DBA::delete('term', ['oid' => $orphan["oid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 7, $last_id);
 			} else {
-				logger("No term orphans found");
+				Text::logger("No term orphans found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." orphaned data from term table. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." orphaned data from term table. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-7', $last_id);
 
@@ -263,7 +264,7 @@ class DBClean {
 
 			$last_id = Config::get('system', 'dbclean-last-id-8', 0);
 
-			logger("Deleting expired threads. Last ID: ".$last_id);
+			Text::logger("Deleting expired threads. Last ID: ".$last_id);
 			$r = DBA::p("SELECT `thread`.`iid` FROM `thread`
 	                                INNER JOIN `contact` ON `thread`.`contact-id` = `contact`.`id` AND NOT `notify_new_posts`
 	                                WHERE `thread`.`received` < UTC_TIMESTAMP() - INTERVAL ? DAY
@@ -278,17 +279,17 @@ class DBClean {
 	                                ORDER BY `thread`.`iid` LIMIT ?", $days, $last_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found expired threads: ".$count);
+				Text::logger("found expired threads: ".$count);
 				while ($thread = DBA::fetch($r)) {
 					$last_id = $thread["iid"];
 					DBA::delete('thread', ['iid' => $thread["iid"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 8, $last_id);
 			} else {
-				logger("No expired threads found");
+				Text::logger("No expired threads found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." expired threads. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." expired threads. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-8', $last_id);
 		} elseif ($stage == 9) {
@@ -299,47 +300,47 @@ class DBClean {
 			$last_id = Config::get('system', 'dbclean-last-id-9', 0);
 			$till_id = Config::get('system', 'dbclean-last-id-8', 0);
 
-			logger("Deleting old global item entries from expired threads from ID ".$last_id." to ID ".$till_id);
+			Text::logger("Deleting old global item entries from expired threads from ID ".$last_id." to ID ".$till_id);
 			$r = DBA::p("SELECT `id` FROM `item` WHERE `uid` = 0 AND
 						NOT EXISTS (SELECT `guid` FROM `item` AS `i` WHERE `item`.`guid` = `i`.`guid` AND `i`.`uid` != 0) AND
 						`received` < UTC_TIMESTAMP() - INTERVAL 90 DAY AND `id` >= ? AND `id` <= ?
 					ORDER BY `id` LIMIT ?", $last_id, $till_id, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found global item entries from expired threads: ".$count);
+				Text::logger("found global item entries from expired threads: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["id"];
 					DBA::delete('item', ['id' => $orphan["id"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 9, $last_id);
 			} else {
-				logger("No global item entries from expired threads");
+				Text::logger("No global item entries from expired threads");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." old global item entries from expired threads. Last ID: ".$last_id);
+			Text::logger("Done deleting ".$count." old global item entries from expired threads. Last ID: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-9', $last_id);
 		} elseif ($stage == 10) {
 			$last_id = Config::get('system', 'dbclean-last-id-10', 0);
 			$days = intval(Config::get('system', 'dbclean_expire_conversation', 90));
 
-			logger("Deleting old conversations. Last created: ".$last_id);
+			Text::logger("Deleting old conversations. Last created: ".$last_id);
 			$r = DBA::p("SELECT `received`, `item-uri` FROM `conversation`
 					WHERE `received` < UTC_TIMESTAMP() - INTERVAL ? DAY
 					ORDER BY `received` LIMIT ?", $days, $limit);
 			$count = DBA::numRows($r);
 			if ($count > 0) {
-				logger("found old conversations: ".$count);
+				Text::logger("found old conversations: ".$count);
 				while ($orphan = DBA::fetch($r)) {
 					$last_id = $orphan["received"];
 					DBA::delete('conversation', ['item-uri' => $orphan["item-uri"]]);
 				}
 				Worker::add(PRIORITY_MEDIUM, 'DBClean', 10, $last_id);
 			} else {
-				logger("No old conversations found");
+				Text::logger("No old conversations found");
 			}
 			DBA::close($r);
-			logger("Done deleting ".$count." conversations. Last created: ".$last_id);
+			Text::logger("Done deleting ".$count." conversations. Last created: ".$last_id);
 
 			Config::set('system', 'dbclean-last-id-10', $last_id);
 		}

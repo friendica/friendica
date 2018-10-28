@@ -5,6 +5,7 @@
 namespace Friendica\Protocol\ActivityPub;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Core\System;
 use Friendica\Util\HTTPSignature;
@@ -1015,7 +1016,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
+		Text::logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
 		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
@@ -1044,7 +1045,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
+		Text::logger('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
 		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
@@ -1073,7 +1074,7 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		logger('Deliver profile update for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
+		Text::logger('Deliver profile update for user ' . $uid . ' to ' . $inbox . ' via ActivityPub', LOGGER_DEBUG);
 		return HTTPSignature::transmit($signed, $inbox, $uid);
 	}
 
@@ -1098,7 +1099,7 @@ class Transmitter
 			'instrument' => ['type' => 'Service', 'name' => BaseObject::getApp()->getUserAgent()],
 			'to' => $profile['url']];
 
-		logger('Sending activity ' . $activity . ' to ' . $target . ' for user ' . $uid, LOGGER_DEBUG);
+		Text::logger('Sending activity ' . $activity . ' to ' . $target . ' for user ' . $uid, LOGGER_DEBUG);
 
 		$signed = LDSignature::sign($data, $owner);
 		HTTPSignature::transmit($signed, $profile['inbox'], $uid);
@@ -1126,7 +1127,7 @@ class Transmitter
 			'instrument' => ['type' => 'Service', 'name' => BaseObject::getApp()->getUserAgent()],
 			'to' => $profile['url']];
 
-		logger('Sending accept to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
+		Text::logger('Sending accept to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
 
 		$signed = LDSignature::sign($data, $owner);
 		HTTPSignature::transmit($signed, $profile['inbox'], $uid);
@@ -1154,7 +1155,7 @@ class Transmitter
 			'instrument' => ['type' => 'Service', 'name' => BaseObject::getApp()->getUserAgent()],
 			'to' => $profile['url']];
 
-		logger('Sending reject to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
+		Text::logger('Sending reject to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
 
 		$signed = LDSignature::sign($data, $owner);
 		HTTPSignature::transmit($signed, $profile['inbox'], $uid);
@@ -1183,7 +1184,7 @@ class Transmitter
 			'instrument' => ['type' => 'Service', 'name' => BaseObject::getApp()->getUserAgent()],
 			'to' => $profile['url']];
 
-		logger('Sending undo to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
+		Text::logger('Sending undo to ' . $target . ' for user ' . $uid . ' with id ' . $id, LOGGER_DEBUG);
 
 		$signed = LDSignature::sign($data, $owner);
 		HTTPSignature::transmit($signed, $profile['inbox'], $uid);

@@ -8,6 +8,7 @@ namespace Friendica\Util;
 use DOMDocument;
 use DOMXPath;
 use Friendica\Content\OEmbed;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Database\DBA;
 use Friendica\Object\Image;
@@ -123,7 +124,7 @@ class ParseUrl
 		}
 
 		if ($count > 10) {
-			logger('Endless loop detected for ' . $url, LOGGER_DEBUG);
+			Text::logger('Endless loop detected for ' . $url, LOGGER_DEBUG);
 			return $siteinfo;
 		}
 
@@ -187,7 +188,7 @@ class ParseUrl
 		}
 
 		if (($charset != '') && (strtoupper($charset) != 'UTF-8')) {
-			logger('detected charset ' . $charset, LOGGER_DEBUG);
+			Text::logger('detected charset ' . $charset, LOGGER_DEBUG);
 			$body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 		}
 
@@ -421,7 +422,7 @@ class ParseUrl
 			}
 		}
 
-		logger('Siteinfo for ' . $url . ' ' . print_r($siteinfo, true), LOGGER_DEBUG);
+		Text::logger('Siteinfo for ' . $url . ' ' . print_r($siteinfo, true), LOGGER_DEBUG);
 
 		Addon::callHooks('getsiteinfo', $siteinfo);
 

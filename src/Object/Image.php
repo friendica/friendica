@@ -6,6 +6,7 @@
 namespace Friendica\Object;
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -482,7 +483,7 @@ class Image
 				break;
 		}
 
-		//	logger('exif: ' . print_r($exif,true));
+		//	Text::logger('exif: ' . print_r($exif,true));
 		return $exif;
 	}
 
@@ -726,7 +727,7 @@ class Image
 	 */
 	public static function guessType($filename, $fromcurl = false, $header = '')
 	{
-		logger('Image: guessType: '.$filename . ($fromcurl?' from curl headers':''), LOGGER_DEBUG);
+		Text::logger('Image: guessType: '.$filename . ($fromcurl?' from curl headers':''), LOGGER_DEBUG);
 		$type = null;
 		if ($fromcurl) {
 			$a = get_app();
@@ -764,7 +765,7 @@ class Image
 				}
 			}
 		}
-		logger('Image: guessType: type='.$type, LOGGER_DEBUG);
+		Text::logger('Image: guessType: type='.$type, LOGGER_DEBUG);
 		return $type;
 	}
 
@@ -890,7 +891,7 @@ class Image
 		);
 
 		if (!DBA::isResult($r)) {
-			logger("Can't detect user data for uid ".$uid, LOGGER_DEBUG);
+			Text::logger("Can't detect user data for uid ".$uid, LOGGER_DEBUG);
 			return([]);
 		}
 
@@ -901,10 +902,10 @@ class Image
 		/// $community_page   = (($r[0]['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
 
 		if ((strlen($imagedata) == 0) && ($url == "")) {
-			logger("No image data and no url provided", LOGGER_DEBUG);
+			Text::logger("No image data and no url provided", LOGGER_DEBUG);
 			return([]);
 		} elseif (strlen($imagedata) == 0) {
-			logger("Uploading picture from ".$url, LOGGER_DEBUG);
+			Text::logger("Uploading picture from ".$url, LOGGER_DEBUG);
 
 			$stamp1 = microtime(true);
 			$imagedata = @file_get_contents($url);
@@ -914,7 +915,7 @@ class Image
 		$maximagesize = Config::get('system', 'maximagesize');
 
 		if (($maximagesize) && (strlen($imagedata) > $maximagesize)) {
-			logger("Image exceeds size limit of ".$maximagesize, LOGGER_DEBUG);
+			Text::logger("Image exceeds size limit of ".$maximagesize, LOGGER_DEBUG);
 			return([]);
 		}
 
@@ -928,7 +929,7 @@ class Image
 
 		if (!isset($data["mime"])) {
 			unlink($tempfile);
-			logger("File is no picture", LOGGER_DEBUG);
+			Text::logger("File is no picture", LOGGER_DEBUG);
 			return([]);
 		}
 
@@ -936,7 +937,7 @@ class Image
 
 		if (!$Image->isValid()) {
 			unlink($tempfile);
-			logger("Picture is no valid picture", LOGGER_DEBUG);
+			Text::logger("Picture is no valid picture", LOGGER_DEBUG);
 			return([]);
 		}
 
@@ -967,7 +968,7 @@ class Image
 		$r = Photo::store($Image, $uid, $visitor, $hash, $tempfile, L10n::t('Wall Photos'), 0, 0, $defperm);
 
 		if (!$r) {
-			logger("Picture couldn't be stored", LOGGER_DEBUG);
+			Text::logger("Picture couldn't be stored", LOGGER_DEBUG);
 			return([]);
 		}
 

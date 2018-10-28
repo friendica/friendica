@@ -36,7 +36,7 @@ class Inbox extends BaseModule
 		$tempfile = tempnam(get_temppath(), $filename);
 		file_put_contents($tempfile, json_encode(['argv' => $a->argv, 'header' => $_SERVER, 'body' => $postdata], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-		logger('Incoming message stored under ' . $tempfile);
+		Text::logger('Incoming message stored under ' . $tempfile);
 */
 		if (!empty($a->argv[1])) {
 			$user = DBA::selectFirst('user', ['uid'], ['nickname' => $a->argv[1]]);

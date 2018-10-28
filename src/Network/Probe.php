@@ -110,7 +110,7 @@ class Probe
 		$xrd_timeout = Config::get('system', 'xrd_timeout', 20);
 		$redirects = 0;
 
-		logger("Probing for ".$host, LOGGER_DEBUG);
+		Text::logger("Probing for ".$host, LOGGER_DEBUG);
 		$xrd = null;
 
 		$curlResult = Network::curl($ssl_url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
@@ -123,7 +123,7 @@ class Probe
 		if (!is_object($xrd)) {
 			$curlResult = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 			if ($curlResult->isTimeout()) {
-				logger("Probing timeout for " . $url, LOGGER_DEBUG);
+				Text::logger("Probing timeout for " . $url, LOGGER_DEBUG);
 				return false;
 			}
 			$xml = $curlResult->getBody();
@@ -131,13 +131,13 @@ class Probe
 			$host_url = 'http://'.$host;
 		}
 		if (!is_object($xrd)) {
-			logger("No xrd object found for ".$host, LOGGER_DEBUG);
+			Text::logger("No xrd object found for ".$host, LOGGER_DEBUG);
 			return [];
 		}
 
 		$links = XML::elementToArray($xrd);
 		if (!isset($links["xrd"]["link"])) {
-			logger("No xrd data found for ".$host, LOGGER_DEBUG);
+			Text::logger("No xrd data found for ".$host, LOGGER_DEBUG);
 			return [];
 		}
 
@@ -165,7 +165,7 @@ class Probe
 
 		self::$baseurl = "http://".$host;
 
-		logger("Probing successful for ".$host, LOGGER_DEBUG);
+		Text::logger("Probing successful for ".$host, LOGGER_DEBUG);
 
 		return $lrdd;
 	}
@@ -195,7 +195,7 @@ class Probe
 		$profile_link = '';
 
 		$links = self::lrdd($webbie);
-		logger('webfingerDfrn: '.$webbie.':'.print_r($links, true), LOGGER_DATA);
+		Text::logger('webfingerDfrn: '.$webbie.':'.print_r($links, true), LOGGER_DATA);
 		if (count($links)) {
 			foreach ($links as $link) {
 				if ($link['@attributes']['rel'] === NAMESPACE_DFRN) {
@@ -254,7 +254,7 @@ class Probe
 		}
 
 		if (!$lrdd) {
-			logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
+			Text::logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
 			return [];
 		}
 
@@ -286,7 +286,7 @@ class Probe
 		}
 
 		if (!is_array($webfinger["links"])) {
-			logger("No webfinger links found for ".$uri, LOGGER_DEBUG);
+			Text::logger("No webfinger links found for ".$uri, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -596,7 +596,7 @@ class Probe
 				$lrdd = self::hostMeta($host);
 			}
 			if (!$lrdd) {
-				logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
+				Text::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::feed($uri);
 			}
 			$nick = array_pop($path_parts);
@@ -631,12 +631,12 @@ class Probe
 			}
 
 			if (!$lrdd) {
-				logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
+				Text::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::mail($uri, $uid);
 			}
 			$addr = $uri;
 		} else {
-			logger("Uri ".$uri." was not detectable", LOGGER_DEBUG);
+			Text::logger("Uri ".$uri." was not detectable", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -681,7 +681,7 @@ class Probe
 
 		$result = false;
 
-		logger("Probing ".$uri, LOGGER_DEBUG);
+		Text::logger("Probing ".$uri, LOGGER_DEBUG);
 
 		if (in_array($network, ["", Protocol::DFRN])) {
 			$result = self::dfrn($webfinger);
@@ -717,7 +717,7 @@ class Probe
 			$result["url"] = $uri;
 		}
 
-		logger($uri." is ".$result["network"], LOGGER_DEBUG);
+		Text::logger($uri." is ".$result["network"], LOGGER_DEBUG);
 
 		if (empty($result["baseurl"])) {
 			$pos = strpos($result["url"], $host);
@@ -752,7 +752,7 @@ class Probe
 		$webfinger = json_decode($data, true);
 		if (is_array($webfinger)) {
 			if (!isset($webfinger["links"])) {
-				logger("No json webfinger links for ".$url, LOGGER_DEBUG);
+				Text::logger("No json webfinger links for ".$url, LOGGER_DEBUG);
 				return false;
 			}
 			return $webfinger;
@@ -761,13 +761,13 @@ class Probe
 		// If it is not JSON, maybe it is XML
 		$xrd = XML::parseString($data, false);
 		if (!is_object($xrd)) {
-			logger("No webfinger data retrievable for ".$url, LOGGER_DEBUG);
+			Text::logger("No webfinger data retrievable for ".$url, LOGGER_DEBUG);
 			return false;
 		}
 
 		$xrd_arr = XML::elementToArray($xrd);
 		if (!isset($xrd_arr["xrd"]["link"])) {
-			logger("No XML webfinger links for ".$url, LOGGER_DEBUG);
+			Text::logger("No XML webfinger links for ".$url, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -816,13 +816,13 @@ class Probe
 		}
 		$content = $curlResult->getBody();
 		if (!$content) {
-			logger("Empty body for ".$noscrape_url, LOGGER_DEBUG);
+			Text::logger("Empty body for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
 		$json = json_decode($content, true);
 		if (!is_array($json)) {
-			logger("No json data for ".$noscrape_url, LOGGER_DEBUG);
+			Text::logger("No json data for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -928,7 +928,7 @@ class Probe
 	{
 		$data = [];
 
-		logger("Check profile ".$profile_link, LOGGER_DEBUG);
+		Text::logger("Check profile ".$profile_link, LOGGER_DEBUG);
 
 		// Fetch data via noscrape - this is faster
 		$noscrape_url = str_replace(["/hcard/", "/profile/"], "/noscrape/", $profile_link);
@@ -962,7 +962,7 @@ class Probe
 		$prof_data["fn"]           = defaults($data, 'name'   , null);
 		$prof_data["key"]          = defaults($data, 'pubkey' , null);
 
-		logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
+		Text::logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;
 	}
@@ -1633,7 +1633,7 @@ class Probe
 		}
 
 		$msgs = Email::poll($mbox, $uri);
-		logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
+		Text::logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
 
 		if (!count($msgs)) {
 			return false;
@@ -1715,7 +1715,7 @@ class Probe
 
 		$fixed = $scheme.$host.$port.$path.$query.$fragment;
 
-		logger('Base: '.$base.' - Avatar: '.$avatar.' - Fixed: '.$fixed, LOGGER_DATA);
+		Text::logger('Base: '.$base.' - Avatar: '.$avatar.' - Fixed: '.$fixed, LOGGER_DATA);
 
 		return $fixed;
 	}

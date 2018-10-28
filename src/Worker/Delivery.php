@@ -5,6 +5,7 @@
 namespace Friendica\Worker;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -33,7 +34,7 @@ class Delivery extends BaseObject
 
 	public static function execute($cmd, $item_id, $contact_id)
 	{
-		logger('Invoked: ' . $cmd . ': ' . $item_id . ' to ' . $contact_id, LOGGER_DEBUG);
+		Text::logger('Invoked: ' . $cmd . ': ' . $item_id . ' to ' . $contact_id, LOGGER_DEBUG);
 
 		$top_level = false;
 		$followup = false;
@@ -78,12 +79,12 @@ class Delivery extends BaseObject
 			DBA::close($itemdata);
 
 			if (empty($target_item)) {
-				logger('Item ' . $item_id . "wasn't found. Quitting here.");
+				Text::logger('Item ' . $item_id . "wasn't found. Quitting here.");
 				return;
 			}
 
 			if (empty($parent)) {
-				logger('Parent ' . $parent_id . ' for item ' . $item_id . "wasn't found. Quitting here.");
+				Text::logger('Parent ' . $parent_id . ' for item ' . $item_id . "wasn't found. Quitting here.");
 				return;
 			}
 
@@ -100,7 +101,7 @@ class Delivery extends BaseObject
 			// The count then showed more than one entry. The additional check should help.
 			// The check for the "count" should be superfluous, but I'm not totally sure by now, so we keep it.
 			if ((($parent['id'] == $item_id) || (count($items) == 1)) && ($parent['uri'] === $parent['parent-uri'])) {
-				logger('Top level post');
+				Text::logger('Top level post');
 				$top_level = true;
 			}
 
@@ -125,7 +126,7 @@ class Delivery extends BaseObject
 			 */
 
 			if (!$top_level && ($parent['wall'] == 0) && stristr($target_item['uri'], $localhost)) {
-				logger('Followup ' . $target_item["guid"], LOGGER_DEBUG);
+				Text::logger('Followup ' . $target_item["guid"], LOGGER_DEBUG);
 				// local followup to remote post
 				$followup = true;
 			}
@@ -140,7 +141,7 @@ class Delivery extends BaseObject
 		}
 
 		if (empty($items)) {
-			logger('No delivery data for  ' . $cmd . ' - Item ID: ' .$item_id . ' - Contact ID: ' . $contact_id);
+			Text::logger('No delivery data for  ' . $cmd . ' - Item ID: ' .$item_id . ' - Contact ID: ' . $contact_id);
 		}
 
 		$owner = User::getOwnerDataById($uid);
@@ -162,7 +163,7 @@ class Delivery extends BaseObject
 			$contact['network'] = Protocol::DIASPORA;
 		}
 
-		logger("Delivering " . $cmd . " followup=$followup - via network " . $contact['network']);
+		Text::logger("Delivering " . $cmd . " followup=$followup - via network " . $contact['network']);
 
 		switch ($contact['network']) {
 
@@ -212,7 +213,7 @@ class Delivery extends BaseObject
 	 */
 	private static function deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
 	{
-		logger('Deliver ' . $target_item["guid"] . ' via DFRN to ' . (empty($contact['addr']) ? $contact['url'] : $contact['addr']));
+		Text::logger('Deliver ' . $target_item["guid"] . ' via DFRN to ' . (empty($contact['addr']) ? $contact['url'] : $contact['addr']));
 
 		if ($cmd == self::MAIL) {
 			$item = $target_item;
@@ -240,7 +241,7 @@ class Delivery extends BaseObject
 			$atom = DFRN::entries($msgitems, $owner);
 		}
 
-		logger('Notifier entry: ' . $contact["url"] . ' ' . $target_item["guid"] . ' entry: ' . $atom, LOGGER_DATA);
+		Text::logger('Notifier entry: ' . $contact["url"] . ' ' . $target_item["guid"] . ' entry: ' . $atom, LOGGER_DATA);
 
 		$basepath =  implode('/', array_slice(explode('/', $contact['url']), 0, 3));
 
@@ -284,7 +285,7 @@ class Delivery extends BaseObject
 
 			// We never spool failed relay deliveries
 			if ($public_dfrn) {
-				logger('Relay delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
+				Text::logger('Relay delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
 				return;
 			}
 
@@ -299,10 +300,10 @@ class Delivery extends BaseObject
 			$deliver_status = DFRN::deliver($owner, $contact, $atom, false, true);
 		}
 
-		logger('Delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
+		Text::logger('Delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
 
 		if ($deliver_status < 0) {
-			logger('Delivery failed: queuing message ' . $target_item["guid"] );
+			Text::logger('Delivery failed: queuing message ' . $target_item["guid"] );
 			Queue::add($contact['id'], Protocol::DFRN, $atom, false, $target_item['guid']);
 		}
 
@@ -342,7 +343,7 @@ class Delivery extends BaseObject
 			$loc = $contact['addr'];
 		}
 
-		logger('Deliver ' . $target_item["guid"] . ' via Diaspora to ' . $loc);
+		Text::logger('Deliver ' . $target_item["guid"] . ' via Diaspora to ' . $loc);
 
 		if (Config::get('system', 'dfrn_only') || !Config::get('system', 'diaspora_enabled')) {
 			return;
@@ -360,7 +361,7 @@ class Delivery extends BaseObject
 		}
 		if (($target_item['deleted']) && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
 			// top-level retraction
-			logger('diaspora retract: ' . $loc);
+			Text::logger('diaspora retract: ' . $loc);
 			Diaspora::sendRetraction($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($cmd == self::RELOCATION) {
@@ -368,22 +369,22 @@ class Delivery extends BaseObject
 			return;
 		} elseif ($followup) {
 			// send comments and likes to owner to relay
-			logger('diaspora followup: ' . $loc);
+			Text::logger('diaspora followup: ' . $loc);
 			Diaspora::sendFollowup($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($target_item['uri'] !== $target_item['parent-uri']) {
 			// we are the relay - send comments, likes and relayable_retractions to our conversants
-			logger('diaspora relay: ' . $loc);
+			Text::logger('diaspora relay: ' . $loc);
 			Diaspora::sendRelay($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($top_level && !$walltowall) {
 			// currently no workable solution for sending walltowall
-			logger('diaspora status: ' . $loc);
+			Text::logger('diaspora status: ' . $loc);
 			Diaspora::sendStatus($target_item, $owner, $contact, $public_message);
 			return;
 		}
 
-		logger('Unknown mode ' . $cmd . ' for ' . $loc);
+		Text::logger('Unknown mode ' . $cmd . ' for ' . $loc);
 	}
 
 	/**
@@ -415,7 +416,7 @@ class Delivery extends BaseObject
 			return;
 		}
 
-		logger('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
+		Text::logger('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
 
 		$reply_to = '';
 		$mailacct = DBA::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);

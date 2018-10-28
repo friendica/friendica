@@ -4,6 +4,7 @@
  */
 namespace Friendica\Database;
 
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
@@ -52,7 +53,7 @@ class PostUpdate
 			return true;
 		}
 
-		logger("Start", LOGGER_DEBUG);
+		Text::logger("Start", LOGGER_DEBUG);
 
 		$end_id = Config::get("system", "post_update_1194_end");
 		if (!$end_id) {
@@ -63,7 +64,7 @@ class PostUpdate
 			}
 		}
 
-		logger("End ID: ".$end_id, LOGGER_DEBUG);
+		Text::logger("End ID: ".$end_id, LOGGER_DEBUG);
 
 		$start_id = Config::get("system", "post_update_1194_start");
 
@@ -82,14 +83,14 @@ class PostUpdate
 			DBA::escape(Protocol::DFRN), DBA::escape(Protocol::DIASPORA), DBA::escape(Protocol::OSTATUS));
 		if (!$r) {
 			Config::set("system", "post_update_version", 1194);
-			logger("Update is done", LOGGER_DEBUG);
+			Text::logger("Update is done", LOGGER_DEBUG);
 			return true;
 		} else {
 			Config::set("system", "post_update_1194_start", $r[0]["id"]);
 			$start_id = Config::get("system", "post_update_1194_start");
 		}
 
-		logger("Start ID: ".$start_id, LOGGER_DEBUG);
+		Text::logger("Start ID: ".$start_id, LOGGER_DEBUG);
 
 		$r = q($query1.$query2.$query3."  ORDER BY `item`.`id` LIMIT 1000,1",
 			intval($start_id), intval($end_id),
@@ -99,13 +100,13 @@ class PostUpdate
 		} else {
 			$pos_id = $end_id;
 		}
-		logger("Progress: Start: ".$start_id." position: ".$pos_id." end: ".$end_id, LOGGER_DEBUG);
+		Text::logger("Progress: Start: ".$start_id." position: ".$pos_id." end: ".$end_id, LOGGER_DEBUG);
 
 		q("UPDATE `item` ".$query2." SET `item`.`global` = 1 ".$query3,
 			intval($start_id), intval($pos_id),
 			DBA::escape(Protocol::DFRN), DBA::escape(Protocol::DIASPORA), DBA::escape(Protocol::OSTATUS));
 
-		logger("Done", LOGGER_DEBUG);
+		Text::logger("Done", LOGGER_DEBUG);
 	}
 
 	/**
@@ -122,7 +123,7 @@ class PostUpdate
 			return true;
 		}
 
-		logger("Start", LOGGER_DEBUG);
+		Text::logger("Start", LOGGER_DEBUG);
 		$r = q("SELECT `contact`.`id`, `contact`.`last-item`,
 			(SELECT MAX(`changed`) FROM `item` USE INDEX (`uid_wall_changed`) WHERE `wall` AND `uid` = `user`.`uid`) AS `lastitem_date`
 			FROM `user`
@@ -138,7 +139,7 @@ class PostUpdate
 		}
 
 		Config::set("system", "post_update_version", 1206);
-		logger("Done", LOGGER_DEBUG);
+		Text::logger("Done", LOGGER_DEBUG);
 		return true;
 	}
 
@@ -156,7 +157,7 @@ class PostUpdate
 
 		$id = Config::get("system", "post_update_version_1279_id", 0);
 
-		logger("Start from item " . $id, LOGGER_DEBUG);
+		Text::logger("Start from item " . $id, LOGGER_DEBUG);
 
 		$fields = array_merge(Item::MIXED_CONTENT_FIELDLIST, ['network', 'author-id', 'owner-id', 'tag', 'file',
 			'author-name', 'author-avatar', 'author-link', 'owner-name', 'owner-avatar', 'owner-link', 'id',
@@ -170,7 +171,7 @@ class PostUpdate
 		$items = Item::select($fields, $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			Text::logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
 			return false;
 		}
 
@@ -225,7 +226,7 @@ class PostUpdate
 
 		Config::set("system", "post_update_version_1279_id", $id);
 
-		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
+		Text::logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
 			// Set all deprecated fields to "null" if they contain an empty string
@@ -237,13 +238,13 @@ class PostUpdate
 			foreach ($nullfields as $field) {
 				$fields = [$field => null];
 				$condition = [$field => ''];
-				logger("Setting '" . $field . "' to null if empty.", LOGGER_DEBUG);
+				Text::logger("Setting '" . $field . "' to null if empty.", LOGGER_DEBUG);
 				// Important: This has to be a "DBA::update", not a "Item::update"
 				DBA::update('item', $fields, $condition);
 			}
 
 			Config::set("system", "post_update_version", 1279);
-			logger("Done", LOGGER_DEBUG);
+			Text::logger("Done", LOGGER_DEBUG);
 			return true;
 		}
 
@@ -306,7 +307,7 @@ class PostUpdate
 
 		$id = Config::get("system", "post_update_version_1281_id", 0);
 
-		logger("Start from item " . $id, LOGGER_DEBUG);
+		Text::logger("Start from item " . $id, LOGGER_DEBUG);
 
 		$fields = ['id', 'guid', 'uri', 'uri-id', 'parent-uri', 'parent-uri-id', 'thr-parent', 'thr-parent-id'];
 
@@ -317,7 +318,7 @@ class PostUpdate
 		$items = DBA::select('item', $fields, $condition, $params);
 
 		if (DBA::errorNo() != 0) {
-			logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
+			Text::logger('Database error ' . DBA::errorNo() . ':' . DBA::errorMessage());
 			return false;
 		}
 
@@ -358,17 +359,17 @@ class PostUpdate
 
 		Config::set("system", "post_update_version_1281_id", $id);
 
-		logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
+		Text::logger("Processed rows: " . $rows . " - last processed item:  " . $id, LOGGER_DEBUG);
 
 		if ($start_id == $id) {
-			logger("Updating item-uri in item-activity", LOGGER_DEBUG);
+			Text::logger("Updating item-uri in item-activity", LOGGER_DEBUG);
 			DBA::e("UPDATE `item-activity` INNER JOIN `item-uri` ON `item-uri`.`uri` = `item-activity`.`uri` SET `item-activity`.`uri-id` = `item-uri`.`id` WHERE `item-activity`.`uri-id` IS NULL");
 
-			logger("Updating item-uri in item-content", LOGGER_DEBUG);
+			Text::logger("Updating item-uri in item-content", LOGGER_DEBUG);
 			DBA::e("UPDATE `item-content` INNER JOIN `item-uri` ON `item-uri`.`uri` = `item-content`.`uri` SET `item-content`.`uri-id` = `item-uri`.`id` WHERE `item-content`.`uri-id` IS NULL");
 
 			Config::set("system", "post_update_version", 1281);
-			logger("Done", LOGGER_DEBUG);
+			Text::logger("Done", LOGGER_DEBUG);
 			return true;
 		}
 

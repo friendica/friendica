@@ -471,7 +471,7 @@ class User
 		$username_max_length = max(1, min(64, intval(Config::get('system', 'username_max_length', 48))));
 
 		if ($username_min_length > $username_max_length) {
-			logger(L10n::t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length), LOGGER_WARNING);
+			Text::logger(L10n::t('system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values.', $username_min_length, $username_max_length), LOGGER_WARNING);
 			$tmp = $username_min_length;
 			$username_min_length = $username_max_length;
 			$username_max_length = $tmp;
@@ -786,7 +786,7 @@ class User
 
 		$a = get_app();
 
-		logger('Removing user: ' . $uid);
+		Text::logger('Removing user: ' . $uid);
 
 		$user = DBA::selectFirst('user', [], ['uid' => $uid]);
 

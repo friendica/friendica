@@ -101,7 +101,7 @@ class System extends BaseObject
 		}
 
 		if ($st) {
-			logger('xml_status returning non_zero: ' . $st . " message=" . $message);
+			Text::logger('xml_status returning non_zero: ' . $st . " message=" . $message);
 		}
 
 		header("Content-type: text/xml");
@@ -135,7 +135,7 @@ class System extends BaseObject
 			$err = 'OK';
 		}
 
-		logger('http_status_exit ' . $val);
+		Text::logger('http_status_exit ' . $val);
 		header($_SERVER["SERVER_PROTOCOL"] . ' ' . $val . ' ' . $err);
 
 		if (isset($description["title"])) {

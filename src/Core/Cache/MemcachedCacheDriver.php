@@ -2,6 +2,7 @@
 
 namespace Friendica\Core\Cache;
 
+use Friendica\Content\Text;
 use Friendica\Core\Cache;
 
 use Exception;
@@ -64,7 +65,7 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 		if ($this->memcached->getResultCode() == Memcached::RES_SUCCESS) {
 			return $this->filterArrayKeysByPrefix($keys, $prefix);
 		} else {
-			logger('Memcached \'getAllKeys\' failed with ' . $this->memcached->getResultMessage(), LOGGER_ALL);
+			Text::logger('Memcached \'getAllKeys\' failed with ' . $this->memcached->getResultMessage(), LOGGER_ALL);
 			return [];
 		}
 	}
@@ -83,7 +84,7 @@ class MemcachedCacheDriver extends AbstractCacheDriver implements IMemoryCacheDr
 		if ($this->memcached->getResultCode() === Memcached::RES_SUCCESS) {
 			$return = $value;
 		} else {
-			logger('Memcached \'get\' failed with ' . $this->memcached->getResultMessage(), LOGGER_ALL);
+			Text::logger('Memcached \'get\' failed with ' . $this->memcached->getResultMessage(), LOGGER_ALL);
 		}
 
 		return $return;

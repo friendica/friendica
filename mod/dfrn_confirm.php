@@ -77,7 +77,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		// These data elements may come from either the friend request notification form or $handsfree array.
 		if (is_array($handsfree)) {
-			logger('Confirm in handsfree mode');
+			Text::logger('Confirm in handsfree mode');
 			$dfrn_id  = $handsfree['dfrn_id'];
 			$intro_id = $handsfree['intro_id'];
 			$duplex   = $handsfree['duplex'];
@@ -100,9 +100,9 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			$cid = 0;
 		}
 
-		logger('Confirming request for dfrn_id (issued) ' . $dfrn_id);
+		Text::logger('Confirming request for dfrn_id (issued) ' . $dfrn_id);
 		if ($cid) {
-			logger('Confirming follower with contact_id: ' . $cid);
+			Text::logger('Confirming follower with contact_id: ' . $cid);
 		}
 
 		/*
@@ -125,7 +125,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 			intval($uid)
 		);
 		if (!DBA::isResult($r)) {
-			logger('Contact not found in DB.');
+			Text::logger('Contact not found in DB.');
 			notice(L10n::t('Contact not found.') . EOL);
 			notice(L10n::t('This may occasionally happen if contact was requested by both persons and it has already been approved.') . EOL);
 			return;
@@ -212,7 +212,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 				$params['page'] = 2;
 			}
 
-			logger('Confirm: posting data to ' . $dfrn_confirm . ': ' . print_r($params, true), LOGGER_DATA);
+			Text::logger('Confirm: posting data to ' . $dfrn_confirm . ': ' . print_r($params, true), LOGGER_DATA);
 
 			/*
 			 *
@@ -224,7 +224,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			$res = Network::post($dfrn_confirm, $params, null, $redirects, 120)->getBody();
 
-			logger(' Confirm: received data: ' . $res, LOGGER_DATA);
+			Text::logger(' Confirm: received data: ' . $res, LOGGER_DATA);
 
 			// Now figure out what they responded. Try to be robust if the remote site is
 			// having difficulty and throwing up errors of some kind.
@@ -249,7 +249,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 			if (stristr($res, "<status") === false) {
 				// wrong xml! stop here!
-				logger('Unexpected response posting to ' . $dfrn_confirm);
+				Text::logger('Unexpected response posting to ' . $dfrn_confirm);
 				notice(L10n::t('Unexpected response from remote site: ') . EOL . htmlspecialchars($res) . EOL);
 				return;
 			}
@@ -306,7 +306,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		 */
 		Contact::updateAvatar($contact['photo'], $uid, $contact_id);
 
-		logger('dfrn_confirm: confirm - imported photos');
+		Text::logger('dfrn_confirm: confirm - imported photos');
 
 		if ($network === Protocol::DFRN) {
 			$new_relation = Contact::FOLLOWER;
@@ -388,7 +388,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		if ((isset($new_relation) && $new_relation == Contact::FRIEND)) {
 			if (DBA::isResult($contact) && ($contact['network'] === Protocol::DIASPORA)) {
 				$ret = Diaspora::sendShare($user, $contact);
-				logger('share returns: ' . $ret);
+				Text::logger('share returns: ' . $ret);
 			}
 		}
 
@@ -428,9 +428,9 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		$forum = (($page == 1) ? 1 : 0);
 		$prv   = (($page == 2) ? 1 : 0);
 
-		logger('dfrn_confirm: requestee contacted: ' . $node);
+		Text::logger('dfrn_confirm: requestee contacted: ' . $node);
 
-		logger('dfrn_confirm: request: POST=' . print_r($_POST, true), LOGGER_DATA);
+		Text::logger('dfrn_confirm: request: POST=' . print_r($_POST, true), LOGGER_DATA);
 
 		// If $aes_key is set, both of these items require unpacking from the hex transport encoding.
 
@@ -543,7 +543,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 
 		Contact::updateAvatar($photo, $local_uid, $dfrn_record);
 
-		logger('dfrn_confirm: request - photos imported');
+		Text::logger('dfrn_confirm: request - photos imported');
 
 		$new_relation = Contact::SHARING;
 
@@ -583,7 +583,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// Otherwise everything seems to have worked and we are almost done. Yay!
 		// Send an email notification
 
-		logger('dfrn_confirm: request: info updated');
+		Text::logger('dfrn_confirm: request: info updated');
 
 		$combined = null;
 		$r = q("SELECT `contact`.*, `user`.*

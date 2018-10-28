@@ -1100,10 +1100,10 @@ class App
 
 		$processlist = DBA::processlist();
 		if ($processlist['list'] != '') {
-			logger('Processcheck: Processes: ' . $processlist['amount'] . ' - Processlist: ' . $processlist['list'], LOGGER_DEBUG);
+			Content\Text::logger('Processcheck: Processes: ' . $processlist['amount'] . ' - Processlist: ' . $processlist['list'], LOGGER_DEBUG);
 
 			if ($processlist['amount'] > $max_processes) {
-				logger('Processcheck: Maximum number of processes for ' . $process . ' tasks (' . $max_processes . ') reached.', LOGGER_DEBUG);
+				Content\Text::logger('Processcheck: Maximum number of processes for ' . $process . ' tasks (' . $max_processes . ') reached.', LOGGER_DEBUG);
 				return true;
 			}
 		}
@@ -1149,7 +1149,7 @@ class App
 		$reached = ($free < $min_memory);
 
 		if ($reached) {
-			logger('Minimal memory reached: ' . $free . '/' . $meminfo['MemTotal'] . ' - limit ' . $min_memory, LOGGER_DEBUG);
+			Content\Text::logger('Minimal memory reached: ' . $free . '/' . $meminfo['MemTotal'] . ' - limit ' . $min_memory, LOGGER_DEBUG);
 		}
 
 		return $reached;
@@ -1179,7 +1179,7 @@ class App
 		$load = Core\System::currentLoad();
 		if ($load) {
 			if (intval($load) > $maxsysload) {
-				logger('system: load ' . $load . ' for ' . $process . ' tasks (' . $maxsysload . ') too high.');
+				Content\Text::logger('system: load ' . $load . ' for ' . $process . ' tasks (' . $maxsysload . ') too high.');
 				return true;
 			}
 		}
@@ -1221,7 +1221,7 @@ class App
 			$resource = proc_open($cmdline . ' &', [], $foo, $this->getBasePath());
 		}
 		if (!is_resource($resource)) {
-			logger('We got no resource for command ' . $cmdline, LOGGER_DEBUG);
+			Content\Text::logger('We got no resource for command ' . $cmdline, LOGGER_DEBUG);
 			return;
 		}
 		proc_close($resource);
@@ -1252,27 +1252,27 @@ class App
 	public static function isDirectoryUsable($directory, $check_writable = true)
 	{
 		if ($directory == '') {
-			logger('Directory is empty. This shouldn\'t happen.', LOGGER_DEBUG);
+			Content\Text::logger('Directory is empty. This shouldn\'t happen.', LOGGER_DEBUG);
 			return false;
 		}
 
 		if (!file_exists($directory)) {
-			logger('Path "' . $directory . '" does not exist for user ' . self::getSystemUser(), LOGGER_DEBUG);
+			Content\Text::logger('Path "' . $directory . '" does not exist for user ' . self::getSystemUser(), LOGGER_DEBUG);
 			return false;
 		}
 
 		if (is_file($directory)) {
-			logger('Path "' . $directory . '" is a file for user ' . self::getSystemUser(), LOGGER_DEBUG);
+			Content\Text::logger('Path "' . $directory . '" is a file for user ' . self::getSystemUser(), LOGGER_DEBUG);
 			return false;
 		}
 
 		if (!is_dir($directory)) {
-			logger('Path "' . $directory . '" is not a directory for user ' . self::getSystemUser(), LOGGER_DEBUG);
+			Content\Text::logger('Path "' . $directory . '" is not a directory for user ' . self::getSystemUser(), LOGGER_DEBUG);
 			return false;
 		}
 
 		if ($check_writable && !is_writable($directory)) {
-			logger('Path "' . $directory . '" is not writable for user ' . self::getSystemUser(), LOGGER_DEBUG);
+			Content\Text::logger('Path "' . $directory . '" is not writable for user ' . self::getSystemUser(), LOGGER_DEBUG);
 			return false;
 		}
 
@@ -1645,7 +1645,7 @@ class App
 				} else {
 					// Someone came with an invalid parameter, maybe as a DDoS attempt
 					// We simply stop processing here
-					logger("Invalid ZRL parameter " . $_GET['zrl'], LOGGER_DEBUG);
+					Content\Text::logger("Invalid ZRL parameter " . $_GET['zrl'], LOGGER_DEBUG);
 					Core\System::httpExit(403, ['title' => '403 Forbidden']);
 				}
 			}
@@ -1784,11 +1784,11 @@ class App
 				}
 
 				if (!empty($_SERVER['QUERY_STRING']) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
-					logger('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
+					Content\Text::logger('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
 					$this->internalRedirect($_SERVER['REQUEST_URI']);
 				}
 
-				logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
+				Content\Text::logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
 
 				header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . Core\L10n::t('Not Found'));
 				$tpl = Content\Text::getMarkupTemplate("404.tpl");

@@ -225,7 +225,7 @@ class Event extends BaseObject
 		}
 
 		DBA::delete('event', ['id' => $event_id]);
-		logger("Deleted event ".$event_id, LOGGER_DEBUG);
+		Text::logger("Deleted event ".$event_id, LOGGER_DEBUG);
 	}
 
 	/**

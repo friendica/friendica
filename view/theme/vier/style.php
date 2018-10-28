@@ -2,6 +2,7 @@
 /**
  * @file view/theme/vier/style.php
  */
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Model\Profile;
@@ -31,7 +32,7 @@ foreach (['style', $style] as $file) {
 		}
 	} else {
 		//TODO: use LOGGER_ERROR?
-		logger('Error: missing file: "' . $stylecssfile .'" (userid: '. $uid .')');
+		Text::logger('Error: missing file: "' . $stylecssfile .'" (userid: '. $uid .')');
 	}
 }
 $modified = gmdate('r', $modified);

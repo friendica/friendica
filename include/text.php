@@ -388,13 +388,14 @@ function get_markup_template($s, $root = '') {
  * @return boolean True if found, False otherwise
  */
 function attribute_contains($attr, $s) {
-	$a = explode(' ', $attr);
-	return (count($a) && in_array($s,$a));
+	/* $a = explode(' ', $attr);
+	return (count($a) && in_array($s,$a)); */
+	return Text::attributeContains($attr, $s);
 }
 
 
 /* setup int->string log level map */
-$LOGGER_LEVELS = [];
+//$LOGGER_LEVELS = [];
 
 /**
  * @brief Logs the given message at the given log level
@@ -412,7 +413,7 @@ $LOGGER_LEVELS = [];
  * @param int $level
  */
 function logger($msg, $level = LOGGER_INFO) {
-	$a = get_app();
+	/* $a = get_app();
 	global $LOGGER_LEVELS;
 
 	$debugging = Config::get('system', 'debugging');
@@ -461,7 +462,9 @@ function logger($msg, $level = LOGGER_INFO) {
 
 	$stamp1 = microtime(true);
 	@file_put_contents($logfile, $logline, FILE_APPEND);
-	$a->saveTimestamp($stamp1, "file");
+	$a->saveTimestamp($stamp1, "file"); */
+
+	Text::logger($msg, $level);
 }
 
 /**
@@ -483,7 +486,7 @@ function logger($msg, $level = LOGGER_INFO) {
  * @param int $level
  */
 function dlogger($msg, $level = LOGGER_INFO) {
-	$a = get_app();
+	/* $a = get_app();
 
 	$logfile = Config::get('system', 'dlogfile');
 	if (!$logfile) {
@@ -521,7 +524,8 @@ function dlogger($msg, $level = LOGGER_INFO) {
 
 	$stamp1 = microtime(true);
 	@file_put_contents($logfile, $logline, FILE_APPEND);
-	$a->saveTimestamp($stamp1, "file");
+	$a->saveTimestamp($stamp1, "file"); */
+	Text::dlogger($msg, $level);
 }
 
 

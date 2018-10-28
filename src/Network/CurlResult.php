@@ -2,7 +2,7 @@
 
 namespace Friendica\Network;
 
-
+use Friendica\Content\Text;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 
 /**
@@ -104,7 +104,7 @@ class CurlResult
 		$this->errorNumber = $errorNumber;
 		$this->error = $error;
 
-		logger($url . ': ' . $this->returnCode . " " . $result, LOGGER_DATA);
+		Text::logger($url . ': ' . $this->returnCode . " " . $result, LOGGER_DATA);
 
 		$this->parseBodyHeader($result);
 		$this->checkSuccess();
@@ -134,8 +134,8 @@ class CurlResult
 		$this->isSuccess = ($this->returnCode >= 200 && $this->returnCode <= 299) || $this->errorNumber == 0;
 
 		if (!$this->isSuccess) {
-			logger('error: ' . $this->url . ': ' . $this->returnCode . ' - ' . $this->error, LOGGER_INFO);
-			logger('debug: ' . print_r($this->info, true), LOGGER_DATA);
+			Text::logger('error: ' . $this->url . ': ' . $this->returnCode . ' - ' . $this->error, LOGGER_INFO);
+			Text::logger('debug: ' . print_r($this->info, true), LOGGER_DATA);
 		}
 
 		if (!$this->isSuccess && $this->errorNumber == CURLE_OPERATION_TIMEDOUT) {

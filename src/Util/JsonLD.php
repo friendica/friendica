@@ -4,6 +4,7 @@
  */
 namespace Friendica\Util;
 
+use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Exception;
 
@@ -33,7 +34,7 @@ class JsonLD
 		}
 
 		if ($recursion > 5) {
-			logger('jsonld bomb detected at: ' . $url);
+			Text::logger('jsonld bomb detected at: ' . $url);
 			exit();
 		}
 
@@ -65,7 +66,7 @@ class JsonLD
 		}
 		catch (Exception $e) {
 			$normalized = false;
-			logger('normalise error:' . print_r($e, true), LOGGER_DEBUG);
+			Text::logger('normalise error:' . print_r($e, true), LOGGER_DEBUG);
 		}
 
 		return $normalized;
@@ -98,7 +99,7 @@ class JsonLD
 		}
 		catch (Exception $e) {
 			$compacted = false;
-			logger('compacting error:' . print_r($e, true), LOGGER_DEBUG);
+			Text::logger('compacting error:' . print_r($e, true), LOGGER_DEBUG);
 		}
 
 		return json_decode(json_encode($compacted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);

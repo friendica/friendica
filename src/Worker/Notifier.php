@@ -58,7 +58,7 @@ class Notifier
 	{
 		$a = BaseObject::getApp();
 
-		logger('notifier: invoked: '.$cmd.': '.$item_id, LOGGER_DEBUG);
+		Text::logger('notifier: invoked: '.$cmd.': '.$item_id, LOGGER_DEBUG);
 
 		$top_level = false;
 		$recipients = [];
@@ -105,7 +105,7 @@ class Notifier
 
 			$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser(0);
 			foreach ($inboxes as $inbox) {
-				logger('Account removal for user ' . $item_id . ' to ' . $inbox .' via ActivityPub', LOGGER_DEBUG);
+				Text::logger('Account removal for user ' . $item_id . ' to ' . $inbox .' via ActivityPub', LOGGER_DEBUG);
 				Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'APDelivery', Delivery::REMOVAL, '', $inbox, $item_id);
 			}
@@ -148,7 +148,7 @@ class Notifier
 			}
 
 			if ((count($items) == 1) && ($items[0]['id'] === $target_item['id']) && ($items[0]['uri'] === $items[0]['parent-uri'])) {
-				logger('notifier: top level post');
+				Text::logger('notifier: top level post');
 				$top_level = true;
 			}
 		}
@@ -185,7 +185,7 @@ class Notifier
 			$condition = ['uri' => $target_item["thr-parent"], 'uid' => $target_item["uid"]];
 			$thr_parent = Item::selectFirst($fields, $condition);
 
-			logger('GUID: '.$target_item["guid"].': Parent is '.$parent['network'].'. Thread parent is '.$thr_parent['network'], LOGGER_DEBUG);
+			Text::logger('GUID: '.$target_item["guid"].': Parent is '.$parent['network'].'. Thread parent is '.$thr_parent['network'], LOGGER_DEBUG);
 
 			// This is IMPORTANT!!!!
 
@@ -249,7 +249,7 @@ class Notifier
 				$recipients = [$parent['contact-id']];
 				$recipients_followup  = [$parent['contact-id']];
 
-				logger('notifier: followup '.$target_item["guid"].' to '.$conversant_str, LOGGER_DEBUG);
+				Text::logger('notifier: followup '.$target_item["guid"].' to '.$conversant_str, LOGGER_DEBUG);
 
 				//if (!$target_item['private'] && $target_item['wall'] &&
 				if (!$target_item['private'] &&
@@ -279,16 +279,16 @@ class Notifier
 					$push_notify = false;
 				}
 
-				logger("Notify ".$target_item["guid"]." via PuSH: ".($push_notify?"Yes":"No"), LOGGER_DEBUG);
+				Text::logger("Notify ".$target_item["guid"]." via PuSH: ".($push_notify?"Yes":"No"), LOGGER_DEBUG);
 			} else {
 				$followup = false;
 
-				logger('Distributing directly '.$target_item["guid"], LOGGER_DEBUG);
+				Text::logger('Distributing directly '.$target_item["guid"], LOGGER_DEBUG);
 
 				// don't send deletions onward for other people's stuff
 
 				if ($target_item['deleted'] && !intval($target_item['wall'])) {
-					logger('notifier: ignoring delete notification for non-wall item');
+					Text::logger('notifier: ignoring delete notification for non-wall item');
 					return;
 				}
 
@@ -329,7 +329,7 @@ class Notifier
 				}
 
 				if (count($url_recipients)) {
-					logger('notifier: '.$target_item["guid"].' url_recipients ' . print_r($url_recipients,true));
+					Text::logger('notifier: '.$target_item["guid"].' url_recipients ' . print_r($url_recipients,true));
 				}
 
 				$conversants = array_unique($conversants);
@@ -346,31 +346,31 @@ class Notifier
 			if (($thr_parent && ($thr_parent['network'] == Protocol::OSTATUS)) || ($parent['network'] == Protocol::OSTATUS)) {
 				$diaspora_delivery = false;
 
-				logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent['author-id']." - Owner: ".$thr_parent['owner-id'], LOGGER_DEBUG);
+				Text::logger('Some parent is OStatus for '.$target_item["guid"]." - Author: ".$thr_parent['author-id']." - Owner: ".$thr_parent['owner-id'], LOGGER_DEBUG);
 
 				// Send a salmon to the parent author
 				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['author-id']]);
 				if (DBA::isResult($probed_contact) && !empty($probed_contact["notify"])) {
-					logger('Notify parent author '.$probed_contact["url"].': '.$probed_contact["notify"]);
+					Text::logger('Notify parent author '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 				}
 
 				// Send a salmon to the parent owner
 				$probed_contact = DBA::selectFirst('contact', ['url', 'notify'], ['id' => $thr_parent['owner-id']]);
 				if (DBA::isResult($probed_contact) && !empty($probed_contact["notify"])) {
-					logger('Notify parent owner '.$probed_contact["url"].': '.$probed_contact["notify"]);
+					Text::logger('Notify parent owner '.$probed_contact["url"].': '.$probed_contact["notify"]);
 					$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 				}
 
 				// Send a salmon notification to every person we mentioned in the post
 				$arr = explode(',',$target_item['tag']);
 				foreach ($arr as $x) {
-					//logger('Checking tag '.$x, LOGGER_DEBUG);
+					//Text::logger('Checking tag '.$x, LOGGER_DEBUG);
 					$matches = null;
 					if (preg_match('/@\[url=([^\]]*)\]/',$x,$matches)) {
 							$probed_contact = Probe::uri($matches[1]);
 						if ($probed_contact["notify"] != "") {
-							logger('Notify mentioned user '.$probed_contact["url"].': '.$probed_contact["notify"]);
+							Text::logger('Notify mentioned user '.$probed_contact["url"].': '.$probed_contact["notify"]);
 							$url_recipients[$probed_contact["notify"]] = $probed_contact["notify"];
 						}
 					}
@@ -420,7 +420,7 @@ class Notifier
 		// delivery loop
 		if (DBA::isResult($r)) {
 			foreach ($r as $contact) {
-				logger("Deliver ".$item_id." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
+				Text::logger("Deliver ".$item_id." to ".$contact['url']." via network ".$contact['network'], LOGGER_DEBUG);
 
 				Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 						'Delivery', $cmd, $item_id, (int)$contact['id']);
@@ -433,7 +433,7 @@ class Notifier
 			$slap = OStatus::salmon($target_item, $owner);
 			foreach ($url_recipients as $url) {
 				if ($url) {
-					logger('notifier: urldelivery: ' . $url);
+					Text::logger('notifier: urldelivery: ' . $url);
 					$deliver_status = Salmon::slapper($owner, $url, $slap);
 					/// @TODO Redeliver/queue these items on failure, though there is no contact record
 				}
@@ -470,19 +470,19 @@ class Notifier
 			$r = array_merge($r2, $r1);
 
 			if (DBA::isResult($r)) {
-				logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
+				Text::logger('pubdeliver '.$target_item["guid"].': '.print_r($r,true), LOGGER_DEBUG);
 
 				foreach ($r as $rr) {
 					// except for Diaspora batch jobs
 					// Don't deliver to folks who have already been delivered to
 
 					if (($rr['network'] !== Protocol::DIASPORA) && (in_array($rr['id'], $conversants))) {
-						logger('notifier: already delivered id=' . $rr['id']);
+						Text::logger('notifier: already delivered id=' . $rr['id']);
 						continue;
 					}
 
 					if (!in_array($cmd, [Delivery::MAIL, Delivery::SUGGESTION]) && !$followup) {
-						logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
+						Text::logger('notifier: delivery agent: '.$rr['name'].' '.$rr['id'].' '.$rr['network'].' '.$target_item["guid"]);
 						Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 								'Delivery', $cmd, $item_id, (int)$rr['id']);
 					}
@@ -494,13 +494,13 @@ class Notifier
 
 		// Notify PuSH subscribers (Used for OStatus distribution of regular posts)
 		if ($push_notify) {
-			logger('Activating internal PuSH for item '.$item_id, LOGGER_DEBUG);
+			Text::logger('Activating internal PuSH for item '.$item_id, LOGGER_DEBUG);
 
 			// Handling the pubsubhubbub requests
 			PushSubscriber::publishFeed($owner['uid'], $a->queue['priority']);
 		}
 
-		logger('notifier: calling hooks for ' . $cmd . ' ' . $item_id, LOGGER_DEBUG);
+		Text::logger('notifier: calling hooks for ' . $cmd . ' ' . $item_id, LOGGER_DEBUG);
 
 		if ($normal_mode) {
 			Hook::fork($a->queue['priority'], 'notifier_normal', $target_item);
@@ -518,15 +518,15 @@ class Notifier
 
 		if ($target_item['origin']) {
 			$inboxes = ActivityPub\Transmitter::fetchTargetInboxes($target_item, $uid);
-			logger('Origin item ' . $item_id . ' with URL ' . $target_item['uri'] . ' will be distributed.', LOGGER_DEBUG);
+			Text::logger('Origin item ' . $item_id . ' with URL ' . $target_item['uri'] . ' will be distributed.', LOGGER_DEBUG);
 		} elseif (!DBA::exists('conversation', ['item-uri' => $target_item['uri'], 'protocol' => Conversation::PARCEL_ACTIVITYPUB])) {
-			logger('Remote item ' . $item_id . ' with URL ' . $target_item['uri'] . ' is no AP post. It will not be distributed.', LOGGER_DEBUG);
+			Text::logger('Remote item ' . $item_id . ' with URL ' . $target_item['uri'] . ' is no AP post. It will not be distributed.', LOGGER_DEBUG);
 			return;
 		} else {
 			// Remote items are transmitted via the personal inboxes.
 			// Doing so ensures that the dedicated receiver will get the message.
 			$personal = true;
-			logger('Remote item ' . $item_id . ' with URL ' . $target_item['uri'] . ' will be distributed.', LOGGER_DEBUG);
+			Text::logger('Remote item ' . $item_id . ' with URL ' . $target_item['uri'] . ' will be distributed.', LOGGER_DEBUG);
 		}
 
 		if ($parent['origin']) {
@@ -535,7 +535,7 @@ class Notifier
 		}
 
 		if (empty($inboxes)) {
-			logger('No inboxes found for item ' . $item_id . ' with URL ' . $target_item['uri'] . '. It will not be distributed.', LOGGER_DEBUG);
+			Text::logger('No inboxes found for item ' . $item_id . ' with URL ' . $target_item['uri'] . '. It will not be distributed.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -543,7 +543,7 @@ class Notifier
 		ActivityPub\Transmitter::createCachedActivityFromItem($item_id, true);
 
 		foreach ($inboxes as $inbox) {
-			logger('Deliver ' . $item_id .' to ' . $inbox .' via ActivityPub', LOGGER_DEBUG);
+			Text::logger('Deliver ' . $item_id .' to ' . $inbox .' via ActivityPub', LOGGER_DEBUG);
 
 			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'APDelivery', $cmd, $item_id, $inbox, $uid);

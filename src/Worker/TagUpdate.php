@@ -2,6 +2,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 
 class TagUpdate
@@ -10,7 +11,7 @@ class TagUpdate
 	{
 		$messages = DBA::p("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''");
 
-		logger('fetched messages: ' . DBA::numRows($messages));
+		Text::logger('fetched messages: ' . DBA::numRows($messages));
 		while ($message = DBA::fetch($messages)) {
 			if ($message['uid'] == 0) {
 				$global = true;
@@ -29,7 +30,7 @@ class TagUpdate
 
 		$messages = DBA::select('item', ['guid'], ['uid' => 0]);
 
-		logger('fetched messages: ' . DBA::numRows($messages));
+		Text::logger('fetched messages: ' . DBA::numRows($messages));
 		while ($message = DBA::fetch(messages)) {
 			DBA::update('item', ['global' => true], ['guid' => $message['guid']]);
 		}

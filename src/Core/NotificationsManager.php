@@ -7,6 +7,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
@@ -358,7 +359,7 @@ class NotificationsManager extends BaseObject
 							break;
 						}
 						/// @todo Check if this part here is used at all
-						logger('Complete data: ' . json_encode($it) . ' - ' . System::callstack(20), LOGGER_DEBUG);
+						Text::logger('Complete data: ' . json_encode($it) . ' - ' . System::callstack(20), LOGGER_DEBUG);
 
 						$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 						$obj = XML::parseString($xmlhead . $it['object']);

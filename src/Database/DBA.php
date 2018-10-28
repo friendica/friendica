@@ -6,6 +6,7 @@ namespace Friendica\Database;
 // Please use App->getConfigVariable() instead.
 //use Friendica\Core\Config;
 
+use Friendica\Content\Text;
 use Friendica\Core\System;
 use Friendica\Util\DateTimeFormat;
 use mysqli;
@@ -412,7 +413,7 @@ class DBA
 
 		if ((substr_count($sql, '?') != count($args)) && (count($args) > 0)) {
 			// Question: Should we continue or stop the query here?
-			logger('Parameter mismatch. Query "'.$sql.'" - Parameters '.print_r($args, true), LOGGER_DEBUG);
+			Text::logger('Parameter mismatch. Query "'.$sql.'" - Parameters '.print_r($args, true), LOGGER_DEBUG);
 		}
 
 		$sql = self::cleanQuery($sql);
@@ -552,7 +553,7 @@ class DBA
 			$error = self::$error;
 			$errorno = self::$errorno;
 
-			logger('DB Error '.self::$errorno.': '.self::$error."\n".
+			Text::logger('DB Error '.self::$errorno.': '.self::$error."\n".
 				System::callstack(8)."\n".self::replaceParameters($sql, $args));
 
 			// On a lost connection we try to reconnect - but only once.
@@ -560,14 +561,14 @@ class DBA
 				if (self::$in_retrial || !self::reconnect()) {
 					// It doesn't make sense to continue when the database connection was lost
 					if (self::$in_retrial) {
-						logger('Giving up retrial because of database error '.$errorno.': '.$error);
+						Text::logger('Giving up retrial because of database error '.$errorno.': '.$error);
 					} else {
-						logger("Couldn't reconnect after database error ".$errorno.': '.$error);
+						Text::logger("Couldn't reconnect after database error ".$errorno.': '.$error);
 					}
 					exit(1);
 				} else {
 					// We try it again
-					logger('Reconnected after database error '.$errorno.': '.$error);
+					Text::logger('Reconnected after database error '.$errorno.': '.$error);
 					self::$in_retrial = true;
 					$ret = self::p($sql, $args);
 					self::$in_retrial = false;
@@ -636,13 +637,13 @@ class DBA
 			$error = self::$error;
 			$errorno = self::$errorno;
 
-			logger('DB Error '.self::$errorno.': '.self::$error."\n".
+			Text::logger('DB Error '.self::$errorno.': '.self::$error."\n".
 				System::callstack(8)."\n".self::replaceParameters($sql, $params));
 
 			// On a lost connection we simply quit.
 			// A reconnect like in self::p could be dangerous with modifications
 			if ($errorno == 2006) {
-				logger('Giving up because of database error '.$errorno.': '.$error);
+				Text::logger('Giving up because of database error '.$errorno.': '.$error);
 				exit(1);
 			}
 
@@ -835,7 +836,7 @@ class DBA
 	public static function insert($table, $param, $on_duplicate_update = false) {
 
 		if (empty($table) || empty($param)) {
-			logger('Table and fields have to be set');
+			Text::logger('Table and fields have to be set');
 			return false;
 		}
 
@@ -1051,7 +1052,7 @@ class DBA
 	public static function delete($table, array $conditions, array $options = [], $in_process = false, array &$callstack = [])
 	{
 		if (empty($table) || empty($conditions)) {
-			logger('Table and conditions have to be set');
+			Text::logger('Table and conditions have to be set');
 			return false;
 		}
 
@@ -1142,7 +1143,7 @@ class DBA
 
 				if ((count($command['conditions']) > 1) || is_int($first_key)) {
 					$sql = "DELETE FROM `" . $command['table'] . "`" . $condition_string;
-					logger(self::replaceParameters($sql, $conditions), LOGGER_DATA);
+					Text::logger(self::replaceParameters($sql, $conditions), LOGGER_DATA);
 
 					if (!self::e($sql, $conditions)) {
 						if ($do_transaction) {
@@ -1172,7 +1173,7 @@ class DBA
 						$sql = "DELETE FROM `" . $table . "` WHERE `" . $field . "` IN (" .
 							substr(str_repeat("?, ", count($field_values)), 0, -2) . ");";
 
-						logger(self::replaceParameters($sql, $field_values), LOGGER_DATA);
+						Text::logger(self::replaceParameters($sql, $field_values), LOGGER_DATA);
 
 						if (!self::e($sql, $field_values)) {
 							if ($do_transaction) {
@@ -1223,7 +1224,7 @@ class DBA
 	public static function update($table, $fields, $condition, $old_fields = []) {
 
 		if (empty($table) || empty($fields) || empty($condition)) {
-			logger('Table, fields and condition have to be set');
+			Text::logger('Table, fields and condition have to be set');
 			return false;
 		}
 

@@ -40,14 +40,14 @@ function pubsub_init(App $a)
 		$hub_lease     = Text::noTags(trim(defaults($_GET, 'hub_lease_seconds', '')));
 		$hub_verify    = Text::noTags(trim(defaults($_GET, 'hub_verify_token', '')));
 
-		logger('Subscription from ' . $_SERVER['REMOTE_ADDR'] . ' Mode: ' . $hub_mode . ' Nick: ' . $nick);
-		logger('Data: ' . print_r($_GET,true), LOGGER_DATA);
+		Text::logger('Subscription from ' . $_SERVER['REMOTE_ADDR'] . ' Mode: ' . $hub_mode . ' Nick: ' . $nick);
+		Text::logger('Data: ' . print_r($_GET,true), LOGGER_DATA);
 
 		$subscribe = (($hub_mode === 'subscribe') ? 1 : 0);
 
 		$owner = DBA::selectFirst('user', ['uid'], ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false]);
 		if (!DBA::isResult($owner)) {
-			logger('Local account not found: ' . $nick);
+			Text::logger('Local account not found: ' . $nick);
 			hub_return(false, '');
 		}
 
@@ -59,12 +59,12 @@ function pubsub_init(App $a)
 
 		$contact = DBA::selectFirst('contact', ['id', 'poll'], $condition);
 		if (!DBA::isResult($contact)) {
-			logger('Contact ' . $contact_id . ' not found.');
+			Text::logger('Contact ' . $contact_id . ' not found.');
 			hub_return(false, '');
 		}
 
 		if (!empty($hub_topic) && !link_compare($hub_topic, $contact['poll'])) {
-			logger('Hub topic ' . $hub_topic . ' != ' . $contact['poll']);
+			Text::logger('Hub topic ' . $hub_topic . ' != ' . $contact['poll']);
 			hub_return(false, '');
 		}
 
@@ -72,13 +72,13 @@ function pubsub_init(App $a)
 		// Don't allow outsiders to unsubscribe us.
 
 		if (($hub_mode === 'unsubscribe') && empty($hub_verify)) {
-			logger('Bogus unsubscribe');
+			Text::logger('Bogus unsubscribe');
 			hub_return(false, '');
 		}
 
 		if (!empty($hub_mode)) {
 			DBA::update('contact', ['subhub' => $subscribe], ['id' => $contact['id']]);
-			logger($hub_mode . ' success for contact ' . $contact_id . '.');
+			Text::logger($hub_mode . ' success for contact ' . $contact_id . '.');
 		}
  		hub_return(true, $hub_challenge);
 	}
@@ -88,8 +88,8 @@ function pubsub_post(App $a)
 {
 	$xml = file_get_contents('php://input');
 
-	logger('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' .  $a->cmd . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
-	logger('Data: ' . $xml, LOGGER_DATA);
+	Text::logger('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' .  $a->cmd . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
+	Text::logger('Data: ' . $xml, LOGGER_DATA);
 
 	$nick       = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : '');
 	$contact_id = (($a->argc > 2) ? intval($a->argv[2])       : 0 );
@@ -107,16 +107,16 @@ function pubsub_post(App $a)
 		if (!empty($author['contact-id'])) {
 			$condition = ['id' => $author['contact-id'], 'uid' => $importer['uid'], 'subhub' => true, 'blocked' => false];
 			$contact = DBA::selectFirst('contact', [], $condition);
-			logger('No record for ' . $nick .' with contact id ' . $contact_id . ' - using '.$author['contact-id'].' instead.');
+			Text::logger('No record for ' . $nick .' with contact id ' . $contact_id . ' - using '.$author['contact-id'].' instead.');
 		}
 		if (!DBA::isResult($contact)) {
-			logger('Contact ' . $author["author-link"] . ' (' . $contact_id . ') for user ' . $nick . " wasn't found - ignored. XML: " . $xml);
+			Text::logger('Contact ' . $author["author-link"] . ' (' . $contact_id . ') for user ' . $nick . " wasn't found - ignored. XML: " . $xml);
 			hub_post_return();
 		}
 	}
 
 	if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) && ($contact['network'] != Protocol::FEED)) {
-		logger('Contact ' . $contact['id'] . ' is not expected to share with us - ignored.');
+		Text::logger('Contact ' . $contact['id'] . ' is not expected to share with us - ignored.');
 		hub_post_return();
 	}
 
@@ -126,7 +126,7 @@ function pubsub_post(App $a)
 		hub_post_return();
 	}
 
-	logger('Import item for ' . $nick . ' from ' . $contact['nick'] . ' (' . $contact['id'] . ')');
+	Text::logger('Import item for ' . $nick . ' from ' . $contact['nick'] . ' (' . $contact['id'] . ')');
 	$feedhub = '';
 	consume_feed($xml, $importer, $contact, $feedhub);
 

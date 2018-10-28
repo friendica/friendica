@@ -58,7 +58,7 @@ function dfrn_request_init(App $a)
 function dfrn_request_post(App $a)
 {
 	if (($a->argc != 2) || (!count($a->profile))) {
-		logger('Wrong count of argc or profiles: argc=' . $a->argc . ',profile()=' . count($a->profile));
+		Text::logger('Wrong count of argc or profiles: argc=' . $a->argc . ',profile()=' . count($a->profile));
 		return;
 	}
 
@@ -298,7 +298,7 @@ function dfrn_request_post(App $a)
 			$network = Protocol::DFRN;
 		}
 
-		logger('dfrn_request: url: ' . $url . ',network=' . $network, LOGGER_DEBUG);
+		Text::logger('dfrn_request: url: ' . $url . ',network=' . $network, LOGGER_DEBUG);
 
 		if ($network === Protocol::DFRN) {
 			$ret = q("SELECT * FROM `contact` WHERE `uid` = %d AND `url` = '%s' AND `self` = 0 LIMIT 1",

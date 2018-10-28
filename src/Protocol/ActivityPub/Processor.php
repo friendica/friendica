@@ -4,6 +4,7 @@
  */
 namespace Friendica\Protocol\ActivityPub;
 
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Core\Protocol;
 use Friendica\Model\Conversation;
@@ -140,7 +141,7 @@ class Processor
 		}
 
 		if (($activity['id'] != $activity['reply-to-id']) && !Item::exists(['uri' => $activity['reply-to-id']])) {
-			logger('Parent ' . $activity['reply-to-id'] . ' not found. Try to refetch it.');
+			Text::logger('Parent ' . $activity['reply-to-id'] . ' not found. Try to refetch it.');
 			self::fetchMissingActivity($activity['reply-to-id'], $activity);
 		}
 
@@ -158,7 +159,7 @@ class Processor
 	{
 		$owner = Contact::getIdForURL($activity['actor']);
 
-		logger('Deleting item ' . $activity['object_id'] . ' from ' . $owner, LOGGER_DEBUG);
+		Text::logger('Deleting item ' . $activity['object_id'] . ' from ' . $owner, LOGGER_DEBUG);
 		Item::delete(['uri' => $activity['object_id'], 'owner-id' => $owner]);
 	}
 
@@ -211,7 +212,7 @@ class Processor
 		}
 
 		$event_id = Event::store($event);
-		logger('Event '.$event_id.' was stored', LOGGER_DEBUG);
+		Text::logger('Event '.$event_id.' was stored', LOGGER_DEBUG);
 	}
 
 	/**
@@ -225,7 +226,7 @@ class Processor
 		/// @todo What to do with $activity['context']?
 
 		if (($item['gravity'] != GRAVITY_PARENT) && !Item::exists(['uri' => $item['parent-uri']])) {
-			logger('Parent ' . $item['parent-uri'] . ' not found, message will be discarded.', LOGGER_DEBUG);
+			Text::logger('Parent ' . $item['parent-uri'] . ' not found, message will be discarded.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -238,7 +239,7 @@ class Processor
 			$item['owner-link'] = $activity['actor'];
 			$item['owner-id'] = Contact::getIdForURL($activity['actor'], 0, true);
 		} else {
-			logger('Ignoring actor because of thread completion.', LOGGER_DEBUG);
+			Text::logger('Ignoring actor because of thread completion.', LOGGER_DEBUG);
 			$item['owner-link'] = $item['author-link'];
 			$item['owner-id'] = $item['author-id'];
 		}
@@ -284,7 +285,7 @@ class Processor
 			}
 
 			$item_id = Item::insert($item);
-			logger('Storing for user ' . $item['uid'] . ': ' . $item_id);
+			Text::logger('Storing for user ' . $item['uid'] . ': ' . $item_id);
 		}
 	}
 
@@ -302,7 +303,7 @@ class Processor
 
 		$object = ActivityPub::fetchContent($url);
 		if (empty($object)) {
-			logger('Activity ' . $url . ' was not fetchable, aborting.');
+			Text::logger('Activity ' . $url . ' was not fetchable, aborting.');
 			return;
 		}
 
@@ -322,7 +323,7 @@ class Processor
 		$ldactivity['thread-completion'] = true;
 
 		ActivityPub\Receiver::processActivity($ldactivity);
-		logger('Activity ' . $url . ' had been fetched and processed.');
+		Text::logger('Activity ' . $url . ' had been fetched and processed.');
 	}
 
 	/**
@@ -360,7 +361,7 @@ class Processor
 		}
 
 		DBA::update('contact', ['hub-verify' => $activity['id']], ['id' => $cid]);
-		logger('Follow user ' . $uid . ' from contact ' . $cid . ' with id ' . $activity['id']);
+		Text::logger('Follow user ' . $uid . ' from contact ' . $cid . ' with id ' . $activity['id']);
 	}
 
 	/**
@@ -374,7 +375,7 @@ class Processor
 			return;
 		}
 
-		logger('Updating profile for ' . $activity['object_id'], LOGGER_DEBUG);
+		Text::logger('Updating profile for ' . $activity['object_id'], LOGGER_DEBUG);
 		APContact::getByURL($activity['object_id'], true);
 	}
 
@@ -386,12 +387,12 @@ class Processor
 	public static function deletePerson($activity)
 	{
 		if (empty($activity['object_id']) || empty($activity['actor'])) {
-			logger('Empty object id or actor.', LOGGER_DEBUG);
+			Text::logger('Empty object id or actor.', LOGGER_DEBUG);
 			return;
 		}
 
 		if ($activity['object_id'] != $activity['actor']) {
-			logger('Object id does not match actor.', LOGGER_DEBUG);
+			Text::logger('Object id does not match actor.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -401,7 +402,7 @@ class Processor
 		}
 		DBA::close($contacts);
 
-		logger('Deleted contact ' . $activity['object_id'], LOGGER_DEBUG);
+		Text::logger('Deleted contact ' . $activity['object_id'], LOGGER_DEBUG);
 	}
 
 	/**
@@ -420,7 +421,7 @@ class Processor
 
 		$cid = Contact::getIdForURL($activity['actor'], $uid);
 		if (empty($cid)) {
-			logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
+			Text::logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
 			return;
 		}
 
@@ -435,7 +436,7 @@ class Processor
 
 		$condition = ['id' => $cid];
 		DBA::update('contact', $fields, $condition);
-		logger('Accept contact request from contact ' . $cid . ' for user ' . $uid, LOGGER_DEBUG);
+		Text::logger('Accept contact request from contact ' . $cid . ' for user ' . $uid, LOGGER_DEBUG);
 	}
 
 	/**
@@ -454,7 +455,7 @@ class Processor
 
 		$cid = Contact::getIdForURL($activity['actor'], $uid);
 		if (empty($cid)) {
-			logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
+			Text::logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
 			return;
 		}
 
@@ -462,9 +463,9 @@ class Processor
 
 		if (DBA::exists('contact', ['id' => $cid, 'rel' => Contact::SHARING, 'pending' => true])) {
 			Contact::remove($cid);
-			logger('Rejected contact request from contact ' . $cid . ' for user ' . $uid . ' - contact had been removed.', LOGGER_DEBUG);
+			Text::logger('Rejected contact request from contact ' . $cid . ' for user ' . $uid . ' - contact had been removed.', LOGGER_DEBUG);
 		} else {
-			logger('Rejected contact request from contact ' . $cid . ' for user ' . $uid . '.', LOGGER_DEBUG);
+			Text::logger('Rejected contact request from contact ' . $cid . ' for user ' . $uid . '.', LOGGER_DEBUG);
 		}
 	}
 
@@ -507,7 +508,7 @@ class Processor
 
 		$cid = Contact::getIdForURL($activity['actor'], $uid);
 		if (empty($cid)) {
-			logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
+			Text::logger('No contact found for ' . $activity['actor'], LOGGER_DEBUG);
 			return;
 		}
 
@@ -519,7 +520,7 @@ class Processor
 		}
 
 		Contact::removeFollower($owner, $contact);
-		logger('Undo following request from contact ' . $cid . ' for user ' . $uid, LOGGER_DEBUG);
+		Text::logger('Undo following request from contact ' . $cid . ' for user ' . $uid, LOGGER_DEBUG);
 	}
 
 	/**
@@ -534,7 +535,7 @@ class Processor
 			return;
 		}
 
-		logger('Change existing contact ' . $cid . ' from ' . $contact['network'] . ' to ActivityPub.');
+		Text::logger('Change existing contact ' . $cid . ' from ' . $contact['network'] . ' to ActivityPub.');
 		Contact::updateFromProbe($cid, Protocol::ACTIVITYPUB);
 	}
 }

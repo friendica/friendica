@@ -7,6 +7,7 @@ namespace Friendica\Core;
  * @brief Functions for preventing parallel execution of functions
  */
 
+use Friendica\Content\Text;
 use Friendica\Core\Cache\CacheDriverFactory;
 use Friendica\Core\Cache\IMemoryCacheDriver;
 
@@ -83,7 +84,7 @@ class Lock
 				}
 				return;
 			} catch (\Exception $exception) {
-				logger('Using Cache driver for locking failed: ' . $exception->getMessage());
+				Text::logger('Using Cache driver for locking failed: ' . $exception->getMessage());
 			}
 		}
 

@@ -18,7 +18,7 @@ function filer_content(App $a)
 	$term = Text::unxmlify(trim(defaults($_GET, 'term', '')));
 	$item_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
-	logger('filer: tag ' . $term . ' item ' . $item_id);
+	Text::logger('filer: tag ' . $term . ' item ' . $item_id);
 
 	if ($item_id && strlen($term)) {
 		// file item

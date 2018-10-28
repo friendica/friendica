@@ -911,7 +911,7 @@ function admin_page_summary(App $a)
 		$users+= $u['count'];
 	}
 
-	logger('accounts: ' . print_r($accounts, true), LOGGER_DATA);
+	Text::logger('accounts: ' . print_r($accounts, true), LOGGER_DATA);
 
 	$pending = Register::getPendingCount();
 
@@ -2500,7 +2500,7 @@ function admin_page_features_post(App $a)
 {
 	BaseModule::checkFormSecurityTokenRedirectOnError('/admin/features', 'admin_manage_features');
 
-	logger('postvars: ' . print_r($_POST, true), LOGGER_DATA);
+	Text::logger('postvars: ' . print_r($_POST, true), LOGGER_DATA);
 
 	$features = Feature::get(false);
 

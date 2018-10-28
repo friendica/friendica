@@ -5,6 +5,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\Content\Text;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
@@ -82,12 +83,12 @@ class Conversation
 					unset($conversation['source']);
 				}
 				if (!DBA::update('conversation', $conversation, ['item-uri' => $conversation['item-uri']], $old_conv)) {
-					logger('Conversation: update for ' . $conversation['item-uri'] . ' from ' . $old_conv['protocol'] . ' to ' . $conversation['protocol'] . ' failed',
+					Text::logger('Conversation: update for ' . $conversation['item-uri'] . ' from ' . $old_conv['protocol'] . ' to ' . $conversation['protocol'] . ' failed',
 						LOGGER_DEBUG);
 				}
 			} else {
 				if (!DBA::insert('conversation', $conversation, true)) {
-					logger('Conversation: insert for ' . $conversation['item-uri'] . ' (protocol ' . $conversation['protocol'] . ') failed',
+					Text::logger('Conversation: insert for ' . $conversation['item-uri'] . ' (protocol ' . $conversation['protocol'] . ') failed',
 						LOGGER_DEBUG);
 				}
 			}

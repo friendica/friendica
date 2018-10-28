@@ -4,6 +4,7 @@
  */
 namespace Friendica\Util;
 
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use ASN_BASE;
@@ -232,7 +233,7 @@ class Crypto
 		$result = openssl_pkey_new($openssl_options);
 
 		if (empty($result)) {
-			logger('new_keypair: failed');
+			Text::logger('new_keypair: failed');
 			return false;
 		}
 
@@ -347,7 +348,7 @@ class Crypto
 	private static function encapsulateOther($data, $pubkey, $alg)
 	{
 		if (!$pubkey) {
-			logger('no key. data: '.$data);
+			Text::logger('no key. data: '.$data);
 		}
 		$fn = 'encrypt' . strtoupper($alg);
 		if (method_exists(__CLASS__, $fn)) {
@@ -359,7 +360,7 @@ class Crypto
 			// log the offending call so we can track it down
 			if (!openssl_public_encrypt($key, $k, $pubkey)) {
 				$x = debug_backtrace();
-				logger('RSA failed. ' . print_r($x[0], true));
+				Text::logger('RSA failed. ' . print_r($x[0], true));
 			}
 
 			$result['alg'] = $alg;
@@ -388,7 +389,7 @@ class Crypto
 	private static function encapsulateAes($data, $pubkey)
 	{
 		if (!$pubkey) {
-			logger('aes_encapsulate: no key. data: ' . $data);
+			Text::logger('aes_encapsulate: no key. data: ' . $data);
 		}
 
 		$key = random_bytes(32);
@@ -399,7 +400,7 @@ class Crypto
 		// log the offending call so we can track it down
 		if (!openssl_public_encrypt($key, $k, $pubkey)) {
 			$x = debug_backtrace();
-			logger('aes_encapsulate: RSA failed. ' . print_r($x[0], true));
+			Text::logger('aes_encapsulate: RSA failed. ' . print_r($x[0], true));
 		}
 
 		$result['alg'] = 'aes256cbc';

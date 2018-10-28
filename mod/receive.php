@@ -5,6 +5,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -18,7 +19,7 @@ function receive_post(App $a)
 {
 	$enabled = intval(Config::get('system', 'diaspora_enabled'));
 	if (!$enabled) {
-		logger('mod-diaspora: disabled');
+		Text::logger('mod-diaspora: disabled');
 		System::httpExit(500);
 	}
 
@@ -41,7 +42,7 @@ function receive_post(App $a)
 
 	// It is an application/x-www-form-urlencoded
 
-	logger('mod-diaspora: receiving post', LOGGER_DEBUG);
+	Text::logger('mod-diaspora: receiving post', LOGGER_DEBUG);
 
 	if (empty($_POST['xml'])) {
 		$postdata = file_get_contents("php://input");
@@ -49,29 +50,29 @@ function receive_post(App $a)
 			System::httpExit(500);
 		}
 
-		logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
+		Text::logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
 		$msg = Diaspora::decodeRaw($importer, $postdata);
 	} else {
 		$xml = urldecode($_POST['xml']);
 
-		logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
+		Text::logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
 		$msg = Diaspora::decode($importer, $xml);
 
 		if ($public && !$msg) {
-			logger('mod-diaspora: decode message in the new format', LOGGER_DEBUG);
+			Text::logger('mod-diaspora: decode message in the new format', LOGGER_DEBUG);
 			$msg = Diaspora::decodeRaw($importer, $xml);
 		}
 	}
 
-	logger('mod-diaspora: decoded', LOGGER_DEBUG);
+	Text::logger('mod-diaspora: decoded', LOGGER_DEBUG);
 
-	logger('mod-diaspora: decoded msg: ' . print_r($msg, true), LOGGER_DATA);
+	Text::logger('mod-diaspora: decoded msg: ' . print_r($msg, true), LOGGER_DATA);
 
 	if (!is_array($msg)) {
 		System::httpExit(500);
 	}
 
-	logger('mod-diaspora: dispatching', LOGGER_DEBUG);
+	Text::logger('mod-diaspora: dispatching', LOGGER_DEBUG);
 
 	$ret = true;
 	if ($public) {

@@ -4,6 +4,7 @@
  */
 namespace Friendica\Protocol\ActivityPub;
 
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Util\HTTPSignature;
 use Friendica\Core\Protocol;
@@ -59,16 +60,16 @@ class Receiver
 	{
 		$http_signer = HTTPSignature::getSigner($body, $header);
 		if (empty($http_signer)) {
-			logger('Invalid HTTP signature, message will be discarded.', LOGGER_DEBUG);
+			Text::logger('Invalid HTTP signature, message will be discarded.', LOGGER_DEBUG);
 			return;
 		} else {
-			logger('HTTP signature is signed by ' . $http_signer, LOGGER_DEBUG);
+			Text::logger('HTTP signature is signed by ' . $http_signer, LOGGER_DEBUG);
 		}
 
 		$activity = json_decode($body, true);
 
 		if (empty($activity)) {
-			logger('Invalid body.', LOGGER_DEBUG);
+			Text::logger('Invalid body.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -76,31 +77,31 @@ class Receiver
 
 		$actor = JsonLD::fetchElement($ldactivity, 'as:actor');
 
-		logger('Message for user ' . $uid . ' is from actor ' . $actor, LOGGER_DEBUG);
+		Text::logger('Message for user ' . $uid . ' is from actor ' . $actor, LOGGER_DEBUG);
 
 		if (LDSignature::isSigned($activity)) {
 			$ld_signer = LDSignature::getSigner($activity);
 			if (empty($ld_signer)) {
-				logger('Invalid JSON-LD signature from ' . $actor, LOGGER_DEBUG);
+				Text::logger('Invalid JSON-LD signature from ' . $actor, LOGGER_DEBUG);
 			}
 			if (!empty($ld_signer && ($actor == $http_signer))) {
-				logger('The HTTP and the JSON-LD signature belong to ' . $ld_signer, LOGGER_DEBUG);
+				Text::logger('The HTTP and the JSON-LD signature belong to ' . $ld_signer, LOGGER_DEBUG);
 				$trust_source = true;
 			} elseif (!empty($ld_signer)) {
-				logger('JSON-LD signature is signed by ' . $ld_signer, LOGGER_DEBUG);
+				Text::logger('JSON-LD signature is signed by ' . $ld_signer, LOGGER_DEBUG);
 				$trust_source = true;
 			} elseif ($actor == $http_signer) {
-				logger('Bad JSON-LD signature, but HTTP signer fits the actor.', LOGGER_DEBUG);
+				Text::logger('Bad JSON-LD signature, but HTTP signer fits the actor.', LOGGER_DEBUG);
 				$trust_source = true;
 			} else {
-				logger('Invalid JSON-LD signature and the HTTP signer is different.', LOGGER_DEBUG);
+				Text::logger('Invalid JSON-LD signature and the HTTP signer is different.', LOGGER_DEBUG);
 				$trust_source = false;
 			}
 		} elseif ($actor == $http_signer) {
-			logger('Trusting post without JSON-LD signature, The actor fits the HTTP signer.', LOGGER_DEBUG);
+			Text::logger('Trusting post without JSON-LD signature, The actor fits the HTTP signer.', LOGGER_DEBUG);
 			$trust_source = true;
 		} else {
-			logger('No JSON-LD signature, different actor.', LOGGER_DEBUG);
+			Text::logger('No JSON-LD signature, different actor.', LOGGER_DEBUG);
 			$trust_source = false;
 		}
 
@@ -159,7 +160,7 @@ class Receiver
 	{
 		$actor = JsonLD::fetchElement($activity, 'as:actor');
 		if (empty($actor)) {
-			logger('Empty actor', LOGGER_DEBUG);
+			Text::logger('Empty actor', LOGGER_DEBUG);
 			return [];
 		}
 
@@ -175,11 +176,11 @@ class Receiver
 			$receivers = array_merge($receivers, $additional);
 		}
 
-		logger('Receivers: ' . json_encode($receivers), LOGGER_DEBUG);
+		Text::logger('Receivers: ' . json_encode($receivers), LOGGER_DEBUG);
 
 		$object_id = JsonLD::fetchElement($activity, 'as:object');
 		if (empty($object_id)) {
-			logger('No object found', LOGGER_DEBUG);
+			Text::logger('No object found', LOGGER_DEBUG);
 			return [];
 		}
 
@@ -192,7 +193,7 @@ class Receiver
 			}
 			$object_data = self::fetchObject($object_id, $activity['as:object'], $trust_source);
 			if (empty($object_data)) {
-				logger("Object data couldn't be processed", LOGGER_DEBUG);
+				Text::logger("Object data couldn't be processed", LOGGER_DEBUG);
 				return [];
 			}
 			// We had been able to retrieve the object data - so we can trust the source
@@ -229,7 +230,7 @@ class Receiver
 		$object_data['actor'] = $actor;
 		$object_data['receiver'] = array_merge(defaults($object_data, 'receiver', []), $receivers);
 
-		logger('Processing ' . $object_data['type'] . ' ' . $object_data['object_type'] . ' ' . $object_data['id'], LOGGER_DEBUG);
+		Text::logger('Processing ' . $object_data['type'] . ' ' . $object_data['object_type'] . ' ' . $object_data['id'], LOGGER_DEBUG);
 
 		return $object_data;
 	}
@@ -272,17 +273,17 @@ class Receiver
 	{
 		$type = JsonLD::fetchElement($activity, '@type');
 		if (!$type) {
-			logger('Empty type', LOGGER_DEBUG);
+			Text::logger('Empty type', LOGGER_DEBUG);
 			return;
 		}
 
 		if (!JsonLD::fetchElement($activity, 'as:object')) {
-			logger('Empty object', LOGGER_DEBUG);
+			Text::logger('Empty object', LOGGER_DEBUG);
 			return;
 		}
 
 		if (!JsonLD::fetchElement($activity, 'as:actor')) {
-			logger('Empty actor', LOGGER_DEBUG);
+			Text::logger('Empty actor', LOGGER_DEBUG);
 			return;
 
 		}
@@ -290,12 +291,12 @@ class Receiver
 		// $trust_source is called by reference and is set to true if the content was retrieved successfully
 		$object_data = self::prepareObjectData($activity, $uid, $trust_source);
 		if (empty($object_data)) {
-			logger('No object data found', LOGGER_DEBUG);
+			Text::logger('No object data found', LOGGER_DEBUG);
 			return;
 		}
 
 		if (!$trust_source) {
-			logger('No trust for activity type "' . $type . '", so we quit now.', LOGGER_DEBUG);
+			Text::logger('No trust for activity type "' . $type . '", so we quit now.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -384,7 +385,7 @@ class Receiver
 				break;
 
 			default:
-				logger('Unknown activity: ' . $type . ' ' . $object_data['object_type'], LOGGER_DEBUG);
+				Text::logger('Unknown activity: ' . $type . ' ' . $object_data['object_type'], LOGGER_DEBUG);
 				break;
 		}
 	}
@@ -414,9 +415,9 @@ class Receiver
 			$profile = APContact::getByURL($actor);
 			$followers = defaults($profile, 'followers', '');
 
-			logger('Actor: ' . $actor . ' - Followers: ' . $followers, LOGGER_DEBUG);
+			Text::logger('Actor: ' . $actor . ' - Followers: ' . $followers, LOGGER_DEBUG);
 		} else {
-			logger('Empty actor', LOGGER_DEBUG);
+			Text::logger('Empty actor', LOGGER_DEBUG);
 			$followers = '';
 		}
 
@@ -486,7 +487,7 @@ class Receiver
 			return;
 		}
 
-		logger('Switch contact ' . $cid . ' (' . $profile['url'] . ') for user ' . $uid . ' to ActivityPub');
+		Text::logger('Switch contact ' . $cid . ' (' . $profile['url'] . ') for user ' . $uid . ' to ActivityPub');
 
 		$photo = defaults($profile, 'photo', null);
 		unset($profile['photo']);
@@ -500,7 +501,7 @@ class Receiver
 		// Send a new follow request to be sure that the connection still exists
 		if (($uid != 0) && DBA::exists('contact', ['id' => $cid, 'rel' => [Contact::SHARING, Contact::FRIEND]])) {
 			ActivityPub\Transmitter::sendActivity('Follow', $profile['url'], $uid);
-			logger('Send a new follow request to ' . $profile['url'] . ' for user ' . $uid, LOGGER_DEBUG);
+			Text::logger('Send a new follow request to ' . $profile['url'] . ' for user ' . $uid, LOGGER_DEBUG);
 		}
 	}
 
@@ -570,27 +571,27 @@ class Receiver
 			$data = ActivityPub::fetchContent($object_id);
 			if (!empty($data)) {
 				$object = JsonLD::compact($data);
-				logger('Fetched content for ' . $object_id, LOGGER_DEBUG);
+				Text::logger('Fetched content for ' . $object_id, LOGGER_DEBUG);
 			} else {
-				logger('Empty content for ' . $object_id . ', check if content is available locally.', LOGGER_DEBUG);
+				Text::logger('Empty content for ' . $object_id . ', check if content is available locally.', LOGGER_DEBUG);
 
 				$item = Item::selectFirst([], ['uri' => $object_id]);
 				if (!DBA::isResult($item)) {
-					logger('Object with url ' . $object_id . ' was not found locally.', LOGGER_DEBUG);
+					Text::logger('Object with url ' . $object_id . ' was not found locally.', LOGGER_DEBUG);
 					return false;
 				}
-				logger('Using already stored item for url ' . $object_id, LOGGER_DEBUG);
+				Text::logger('Using already stored item for url ' . $object_id, LOGGER_DEBUG);
 				$data = ActivityPub\Transmitter::createNote($item);
 				$object = JsonLD::compact($data);
 			}
 		} else {
-			logger('Using original object for url ' . $object_id, LOGGER_DEBUG);
+			Text::logger('Using original object for url ' . $object_id, LOGGER_DEBUG);
 		}
 
 		$type = JsonLD::fetchElement($object, '@type');
 
 		if (empty($type)) {
-			logger('Empty type', LOGGER_DEBUG);
+			Text::logger('Empty type', LOGGER_DEBUG);
 			return false;
 		}
 
@@ -606,7 +607,7 @@ class Receiver
 			return self::fetchObject($object_id);
 		}
 
-		logger('Unhandled object type: ' . $type, LOGGER_DEBUG);
+		Text::logger('Unhandled object type: ' . $type, LOGGER_DEBUG);
 	}
 
 	/**

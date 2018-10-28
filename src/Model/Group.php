@@ -326,7 +326,7 @@ class Group extends BaseObject
 				'selected' => $gid == $group['id'] ? 'true' : ''
 			];
 		}
-		logger('groups: ' . print_r($display_groups, true));
+		Text::logger('groups: ' . print_r($display_groups, true));
 
 		if ($label == '') {
 			$label = L10n::t('Default privacy group for new contacts');

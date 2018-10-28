@@ -74,8 +74,8 @@ class TextTest extends TestCase
 	public function testAttributeContains1()
 	{
 		$testAttr="class1 notclass2 class3";
-		$this->assertTrue(attribute_contains($testAttr, "class3"));
-		$this->assertFalse(attribute_contains($testAttr, "class2"));
+		$this->assertTrue(Text::attributeContains($testAttr, "class3"));
+		$this->assertFalse(Text::attributeContains($testAttr, "class2"));
 	}
 
 	/**
@@ -84,8 +84,8 @@ class TextTest extends TestCase
 	public function testAttributeContains2()
 	{
 		$testAttr="class1 not-class2 class3";
-		$this->assertTrue(attribute_contains($testAttr, "class3"));
-		$this->assertFalse(attribute_contains($testAttr, "class2"));
+		$this->assertTrue(Text::attributeContains($testAttr, "class3"));
+		$this->assertFalse(Text::attributeContains($testAttr, "class2"));
 	}
 
 	/**
@@ -94,7 +94,7 @@ class TextTest extends TestCase
 	public function testAttributeContainsEmpty()
 	{
 		$testAttr="";
-		$this->assertFalse(attribute_contains($testAttr, "class2"));
+		$this->assertFalse(Text::attributeContains($testAttr, "class2"));
 	}
 
 	/**
@@ -103,7 +103,7 @@ class TextTest extends TestCase
 	public function testAttributeContainsSpecialChars()
 	{
 		$testAttr="--... %\$ä() /(=?}";
-		$this->assertFalse(attribute_contains($testAttr, "class2"));
+		$this->assertFalse(Text::attributeContains($testAttr, "class2"));
 	}
 
 	/**

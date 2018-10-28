@@ -5,6 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Database\DBA;
 use Friendica\Core\System;
 
@@ -271,7 +272,7 @@ class L10n extends BaseObject
 	public static function tt($singular, $plural, $count)
 	{
 		if (!is_numeric($count)) {
-			logger('Non numeric count called by ' . System::callstack(20));
+			Text::logger('Non numeric count called by ' . System::callstack(20));
 		}
 
 		if (!self::$lang) {

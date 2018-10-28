@@ -7,6 +7,7 @@
 namespace Friendica\Model;
 
 use Exception;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -256,7 +257,7 @@ class GContact
 			intval($cid)
 		);
 
-		// logger("countCommonFriends: $uid $cid {$r[0]['total']}");
+		// Text::logger("countCommonFriends: $uid $cid {$r[0]['total']}");
 		if (DBA::isResult($r)) {
 			return $r[0]['total'];
 		}
@@ -588,7 +589,7 @@ class GContact
 		}
 
 		if ($new_url != $url) {
-			logger("Cleaned contact url ".$url." to ".$new_url." - Called by: ".System::callstack(), LOGGER_DEBUG);
+			Text::logger("Cleaned contact url ".$url." to ".$new_url." - Called by: ".System::callstack(), LOGGER_DEBUG);
 		}
 
 		return $new_url;
@@ -605,7 +606,7 @@ class GContact
 		if (($contact["network"] == Protocol::OSTATUS) && PortableContact::alternateOStatusUrl($contact["url"])) {
 			$data = Probe::uri($contact["url"]);
 			if ($contact["network"] == Protocol::OSTATUS) {
-				logger("Fix primary url from ".$contact["url"]." to ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
+				Text::logger("Fix primary url from ".$contact["url"]." to ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
 				$contact["url"] = $data["url"];
 				$contact["addr"] = $data["addr"];
 				$contact["alias"] = $data["alias"];
@@ -629,12 +630,12 @@ class GContact
 		$last_contact_str = '';
 
 		if (empty($contact["network"])) {
-			logger("Empty network for contact url ".$contact["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
+			Text::logger("Empty network for contact url ".$contact["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
 			return false;
 		}
 
 		if (in_array($contact["network"], [Protocol::PHANTOM])) {
-			logger("Invalid network for contact url ".$contact["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
+			Text::logger("Invalid network for contact url ".$contact["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
 			return false;
 		}
 
@@ -702,7 +703,7 @@ class GContact
 		DBA::unlock();
 
 		if ($doprobing) {
-			logger("Last Contact: ". $last_contact_str." - Last Failure: ".$last_failure_str." - Checking: ".$contact["url"], LOGGER_DEBUG);
+			Text::logger("Last Contact: ". $last_contact_str." - Last Failure: ".$last_failure_str." - Checking: ".$contact["url"], LOGGER_DEBUG);
 			Worker::add(PRIORITY_LOW, 'GProbe', $contact["url"]);
 		}
 
@@ -807,19 +808,19 @@ class GContact
 		if ((($contact["generation"] > 0) && ($contact["generation"] <= $public_contact[0]["generation"])) || ($public_contact[0]["generation"] == 0)) {
 			foreach ($fields as $field => $data) {
 				if ($contact[$field] != $public_contact[0][$field]) {
-					logger("Difference for contact ".$contact["url"]." in field '".$field."'. New value: '".$contact[$field]."', old value '".$public_contact[0][$field]."'", LOGGER_DEBUG);
+					Text::logger("Difference for contact ".$contact["url"]." in field '".$field."'. New value: '".$contact[$field]."', old value '".$public_contact[0][$field]."'", LOGGER_DEBUG);
 					$update = true;
 				}
 			}
 
 			if ($contact["generation"] < $public_contact[0]["generation"]) {
-				logger("Difference for contact ".$contact["url"]." in field 'generation'. new value: '".$contact["generation"]."', old value '".$public_contact[0]["generation"]."'", LOGGER_DEBUG);
+				Text::logger("Difference for contact ".$contact["url"]." in field 'generation'. new value: '".$contact["generation"]."', old value '".$public_contact[0]["generation"]."'", LOGGER_DEBUG);
 				$update = true;
 			}
 		}
 
 		if ($update) {
-			logger("Update gcontact for ".$contact["url"], LOGGER_DEBUG);
+			Text::logger("Update gcontact for ".$contact["url"], LOGGER_DEBUG);
 			$condition = ['`nurl` = ? AND (`generation` = 0 OR `generation` >= ?)',
 					normalise_link($contact["url"]), $contact["generation"]];
 			$contact["updated"] = DateTimeFormat::utc($contact["updated"]);
@@ -843,7 +844,7 @@ class GContact
 			// The quality of the gcontact table is mostly lower than the public contact
 			$public_contact = DBA::selectFirst('contact', ['id'], ['nurl' => normalise_link($contact["url"]), 'uid' => 0]);
 			if (DBA::isResult($public_contact)) {
-				logger("Update public contact ".$public_contact["id"], LOGGER_DEBUG);
+				Text::logger("Update public contact ".$public_contact["id"], LOGGER_DEBUG);
 
 				Contact::updateAvatar($contact["photo"], 0, $public_contact["id"]);
 
@@ -885,7 +886,7 @@ class GContact
 		$data = Probe::uri($url);
 
 		if (in_array($data["network"], [Protocol::PHANTOM])) {
-			logger("Invalid network for contact url ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
+			Text::logger("Invalid network for contact url ".$data["url"]." - Called by: ".System::callstack(), LOGGER_DEBUG);
 			return;
 		}
 
@@ -916,7 +917,7 @@ class GContact
 		);
 
 		if (!DBA::isResult($r)) {
-			logger('Cannot find user with uid=' . $uid, LOGGER_INFO);
+			Text::logger('Cannot find user with uid=' . $uid, LOGGER_INFO);
 			return false;
 		}
 
@@ -953,7 +954,7 @@ class GContact
 	 */
 	public static function fetchGsUsers($server)
 	{
-		logger("Fetching users from GNU Social server ".$server, LOGGER_DEBUG);
+		Text::logger("Fetching users from GNU Social server ".$server, LOGGER_DEBUG);
 
 		$url = $server."/main/statistics";
 

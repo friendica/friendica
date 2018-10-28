@@ -205,7 +205,7 @@ function search_content(App $a) {
 	$pager = new Pager($a->query_string);
 
 	if ($tag) {
-		logger("Start tag search for '".$search."'", LOGGER_DEBUG);
+		Text::logger("Start tag search for '".$search."'", LOGGER_DEBUG);
 
 		$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))
 			AND `otype` = ? AND `type` = ? AND `term` = ?",
@@ -228,7 +228,7 @@ function search_content(App $a) {
 			$r = [];
 		}
 	} else {
-		logger("Start fulltext search for '".$search."'", LOGGER_DEBUG);
+		Text::logger("Start fulltext search for '".$search."'", LOGGER_DEBUG);
 
 		$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))
 			AND `body` LIKE CONCAT('%',?,'%')",
@@ -255,12 +255,12 @@ function search_content(App $a) {
 		'$title' => $title
 	]);
 
-	logger("Start Conversation for '".$search."'", LOGGER_DEBUG);
+	Text::logger("Start Conversation for '".$search."'", LOGGER_DEBUG);
 	$o .= conversation($a, $r, $pager, 'search', false, false, 'commented', local_user());
 
 	$o .= $pager->renderMinimal(count($r));
 
-	logger("Done '".$search."'", LOGGER_DEBUG);
+	Text::logger("Done '".$search."'", LOGGER_DEBUG);
 
 	return $o;
 }

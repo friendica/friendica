@@ -6,6 +6,7 @@
 */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\System;
@@ -172,7 +173,7 @@ function nodeinfo_cron() {
 		return;
 	}
 
-	logger('cron_start');
+	Text::logger('cron_start');
 
 	$users = q("SELECT `user`.`uid`, `user`.`login_date`, `contact`.`last-item`
 			FROM `user`
@@ -203,22 +204,22 @@ function nodeinfo_cron() {
 		Config::set('nodeinfo', 'active_users_halfyear', $active_users_halfyear);
 		Config::set('nodeinfo', 'active_users_monthly', $active_users_monthly);
 
-		logger('total_users: ' . $total_users . '/' . $active_users_halfyear. '/' . $active_users_monthly, LOGGER_DEBUG);
+		Text::logger('total_users: ' . $total_users . '/' . $active_users_halfyear. '/' . $active_users_monthly, LOGGER_DEBUG);
 	}
 
 	$local_posts = DBA::count('thread', ["`wall` AND NOT `deleted` AND `uid` != 0"]);
 	Config::set('nodeinfo', 'local_posts', $local_posts);
-	logger('local_posts: ' . $local_posts, LOGGER_DEBUG);
+	Text::logger('local_posts: ' . $local_posts, LOGGER_DEBUG);
 
 	$local_comments = DBA::count('item', ["`origin` AND `id` != `parent` AND NOT `deleted` AND `uid` != 0"]);
 	Config::set('nodeinfo', 'local_comments', $local_comments);
-	logger('local_comments: ' . $local_comments, LOGGER_DEBUG);
+	Text::logger('local_comments: ' . $local_comments, LOGGER_DEBUG);
 
 	// Now trying to register
 	$url = 'http://the-federation.info/register/'.$a->getHostName();
-	logger('registering url: '.$url, LOGGER_DEBUG);
+	Text::logger('registering url: '.$url, LOGGER_DEBUG);
 	$ret = Network::fetchUrl($url);
-	logger('registering answer: '.$ret, LOGGER_DEBUG);
+	Text::logger('registering answer: '.$ret, LOGGER_DEBUG);
 
-	logger('cron_end');
+	Text::logger('cron_end');
 }

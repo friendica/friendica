@@ -69,7 +69,7 @@ function dfrn_poll_init(App $a)
 			$user = $r[0]['nickname'];
 		}
 
-		logger('dfrn_poll: public feed request from ' . $_SERVER['REMOTE_ADDR'] . ' for ' . $user);
+		Text::logger('dfrn_poll: public feed request from ' . $_SERVER['REMOTE_ADDR'] . ' for ' . $user);
 		header("Content-type: application/atom+xml");
 		echo DFRN::feed('', $user, $last_update, 0, $hidewall);
 		killme();
@@ -105,7 +105,7 @@ function dfrn_poll_init(App $a)
 		if (DBA::isResult($r)) {
 			$s = Network::fetchUrl($r[0]['poll'] . '?dfrn_id=' . $my_id . '&type=profile-check');
 
-			logger("dfrn_poll: old profile returns " . $s, LOGGER_DATA);
+			Text::logger("dfrn_poll: old profile returns " . $s, LOGGER_DATA);
 
 			if (strlen($s)) {
 				$xml = XML::parseString($s);
@@ -192,7 +192,7 @@ function dfrn_poll_init(App $a)
 			}
 
 			if ($final_dfrn_id != $orig_id) {
-				logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
+				Text::logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
 				// did not decode properly - cannot trust this site
 				System::xmlExit(3, 'Bad decryption');
 			}
@@ -239,7 +239,7 @@ function dfrn_poll_post(App $a)
 
 	if ($ptype === 'profile-check') {
 		if (strlen($challenge) && strlen($sec)) {
-			logger('dfrn_poll: POST: profile-check');
+			Text::logger('dfrn_poll: POST: profile-check');
 
 			DBA::delete('profile_check', ["`expire` < ?", time()]);
 			$r = q("SELECT * FROM `profile_check` WHERE `sec` = '%s' ORDER BY `expire` DESC LIMIT 1",
@@ -284,7 +284,7 @@ function dfrn_poll_post(App $a)
 			}
 
 			if ($final_dfrn_id != $orig_id) {
-				logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
+				Text::logger('profile_check: ' . $final_dfrn_id . ' != ' . $orig_id, LOGGER_DEBUG);
 				// did not decode properly - cannot trust this site
 				System::xmlExit(3, 'Bad decryption');
 			}
@@ -373,7 +373,7 @@ function dfrn_poll_post(App $a)
 		// NOTREACHED
 	} else {
 		// Update the writable flag if it changed
-		logger('dfrn_poll: post request feed: ' . print_r($_POST, true), LOGGER_DATA);
+		Text::logger('dfrn_poll: post request feed: ' . print_r($_POST, true), LOGGER_DATA);
 		if ($dfrn_version >= 2.21) {
 			if ($perm === 'rw') {
 				$writable = 1;
@@ -511,15 +511,15 @@ function dfrn_poll_content(App $a)
 				])->getBody();
 			}
 
-			logger("dfrn_poll: sec profile: " . $s, LOGGER_DATA);
+			Text::logger("dfrn_poll: sec profile: " . $s, LOGGER_DATA);
 
 			if (strlen($s) && strstr($s, '<?xml')) {
 				$xml = XML::parseString($s);
 
-				logger('dfrn_poll: profile: parsed xml: ' . print_r($xml, true), LOGGER_DATA);
+				Text::logger('dfrn_poll: profile: parsed xml: ' . print_r($xml, true), LOGGER_DATA);
 
-				logger('dfrn_poll: secure profile: challenge: ' . $xml->challenge . ' expecting ' . $hash);
-				logger('dfrn_poll: secure profile: sec: ' . $xml->sec . ' expecting ' . $sec);
+				Text::logger('dfrn_poll: secure profile: challenge: ' . $xml->challenge . ' expecting ' . $hash);
+				Text::logger('dfrn_poll: secure profile: sec: ' . $xml->sec . ' expecting ' . $sec);
 
 				if (((int) $xml->status == 0) && ($xml->challenge == $hash) && ($xml->sec == $sec)) {
 					$_SESSION['authenticated'] = 1;

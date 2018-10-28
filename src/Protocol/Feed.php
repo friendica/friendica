@@ -8,6 +8,7 @@ namespace Friendica\Protocol;
 
 use DOMDocument;
 use DOMXPath;
+use Friendica\Content\Text;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -40,12 +41,12 @@ class Feed {
 		$a = get_app();
 
 		if (!$simulate) {
-			logger("Import Atom/RSS feed '".$contact["name"]."' (Contact ".$contact["id"].") for user ".$importer["uid"], LOGGER_DEBUG);
+			Text::logger("Import Atom/RSS feed '".$contact["name"]."' (Contact ".$contact["id"].") for user ".$importer["uid"], LOGGER_DEBUG);
 		} else {
-			logger("Test Atom/RSS feed", LOGGER_DEBUG);
+			Text::logger("Test Atom/RSS feed", LOGGER_DEBUG);
 		}
 		if (empty($xml)) {
-			logger('XML is empty.', LOGGER_DEBUG);
+			Text::logger('XML is empty.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -199,7 +200,7 @@ class Feed {
 		$header["contact-id"] = $contact["id"];
 
 		if (!is_object($entries)) {
-			logger("There are no entries in this feed.", LOGGER_DEBUG);
+			Text::logger("There are no entries in this feed.", LOGGER_DEBUG);
 			return;
 		}
 
@@ -248,7 +249,7 @@ class Feed {
 					$importer["uid"], $item["uri"], Protocol::FEED, Protocol::DFRN];
 				$previous = Item::selectFirst(['id'], $condition);
 				if (DBA::isResult($previous)) {
-					logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
+					Text::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
 					continue;
 				}
 			}
@@ -423,7 +424,7 @@ class Feed {
 			}
 
 			if (!$simulate) {
-				logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
+				Text::logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
 
 				$notify = Item::isRemoteSelf($contact, $item);
 
@@ -440,7 +441,7 @@ class Feed {
 
 				$id = Item::insert($item, false, $notify);
 
-				logger("Feed for contact ".$contact["url"]." stored under id ".$id);
+				Text::logger("Feed for contact ".$contact["url"]." stored under id ".$id);
 			} else {
 				$items[] = $item;
 			}

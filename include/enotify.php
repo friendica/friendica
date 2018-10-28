@@ -30,7 +30,7 @@ function notification($params)
 
 	// Temporary logging for finding the origin
 	if (!isset($params['language']) || !isset($params['uid'])) {
-		logger('Missing parameters.' . System::callstack());
+		Text::logger('Missing parameters.' . System::callstack());
 	}
 
 	// Ensure that the important fields are set at any time
@@ -38,7 +38,7 @@ function notification($params)
 	$user = DBA::selectFirst('user', $fields, ['uid' => $params['uid']]);
 
 	if (!DBA::isResult($user)) {
-		logger('Unknown user ' . $params['uid']);
+		Text::logger('Unknown user ' . $params['uid']);
 		return;
 	}
 
@@ -134,7 +134,7 @@ function notification($params)
 	if ($params['type'] == NOTIFY_COMMENT) {
 		$thread = Item::selectFirstThreadForUser($params['uid'] ,['ignored'], ['iid' => $parent_id]);
 		if (DBA::isResult($thread) && $thread["ignored"]) {
-			logger("Thread ".$parent_id." will be ignored", LOGGER_DEBUG);
+			Text::logger("Thread ".$parent_id." will be ignored", LOGGER_DEBUG);
 			L10n::popLang();
 			return;
 		}
@@ -453,7 +453,7 @@ function notification($params)
 	$itemlink  = $h['itemlink'];
 
 	if ($show_in_notification_page) {
-		logger("adding notification entry", LOGGER_DEBUG);
+		Text::logger("adding notification entry", LOGGER_DEBUG);
 		do {
 			$dups = false;
 			$hash = Text::randomString();
@@ -530,14 +530,14 @@ function notification($params)
 		|| $params['type'] == NOTIFY_SYSTEM
 		|| $params['type'] == SYSTEM_EMAIL) {
 
-		logger('sending notification email');
+		Text::logger('sending notification email');
 
 		if (isset($params['parent']) && (intval($params['parent']) != 0)) {
 			$id_for_parent = $params['parent']."@".$hostname;
 
 			// Is this the first email notification for this parent item and user?
 			if (!DBA::exists('notify-threads', ['master-parent-item' => $params['parent'], 'receiver-uid' => $params['uid']])) {
-				logger("notify_id:".intval($notify_id).", parent: ".intval($params['parent'])."uid: ".intval($params['uid']), LOGGER_DEBUG);
+				Text::logger("notify_id:".intval($notify_id).", parent: ".intval($params['parent'])."uid: ".intval($params['uid']), LOGGER_DEBUG);
 
 				$fields = ['notify-id' => $notify_id, 'master-parent-item' => $params['parent'],
 					'receiver-uid' => $params['uid'], 'parent-item' => 0];
@@ -546,11 +546,11 @@ function notification($params)
 				$additional_mail_header .= "Message-ID: <${id_for_parent}>\n";
 				$log_msg = "include/enotify: No previous notification found for this parent:\n".
 						"  parent: ${params['parent']}\n"."  uid   : ${params['uid']}\n";
-				logger($log_msg, LOGGER_DEBUG);
+				Text::logger($log_msg, LOGGER_DEBUG);
 			} else {
 				// If not, just "follow" the thread.
 				$additional_mail_header .= "References: <${id_for_parent}>\nIn-Reply-To: <${id_for_parent}>\n";
-				logger("There's already a notification for this parent.", LOGGER_DEBUG);
+				Text::logger("There's already a notification for this parent.", LOGGER_DEBUG);
 			}
 		}
 

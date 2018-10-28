@@ -6,6 +6,7 @@
 namespace Friendica\Worker;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\PushSubscriber;
@@ -37,7 +38,7 @@ class PubSubPublish
 		/// @todo Check server status with PortableContact::checkServer()
 		// Before this can be done we need a way to safely detect the server url.
 
-		logger("Generate feed of user " . $subscriber['nickname']. " to " . $subscriber['callback_url']. " - last updated " . $subscriber['last_update'], LOGGER_DEBUG);
+		Text::logger("Generate feed of user " . $subscriber['nickname']. " to " . $subscriber['callback_url']. " - last updated " . $subscriber['last_update'], LOGGER_DEBUG);
 
 		$last_update = $subscriber['last_update'];
 		$params = OStatus::feed($subscriber['nickname'], $last_update);
@@ -54,7 +55,7 @@ class PubSubPublish
 					$subscriber['topic']),
 				"X-Hub-Signature: sha1=" . $hmac_sig];
 
-		logger('POST ' . print_r($headers, true) . "\n" . $params, LOGGER_DATA);
+		Text::logger('POST ' . print_r($headers, true) . "\n" . $params, LOGGER_DATA);
 
 		$postResult = Network::post($subscriber['callback_url'], $params, $headers);
 		$ret = $postResult->getReturnCode();
@@ -62,11 +63,11 @@ class PubSubPublish
 		$condition = ['id' => $subscriber['id']];
 
 		if ($ret >= 200 && $ret <= 299) {
-			logger('Successfully pushed to ' . $subscriber['callback_url']);
+			Text::logger('Successfully pushed to ' . $subscriber['callback_url']);
 
 			PushSubscriber::reset($subscriber['id'], $last_update);
 		} else {
-			logger('Delivery error when pushing to ' . $subscriber['callback_url'] . ' HTTP: ' . $ret);
+			Text::logger('Delivery error when pushing to ' . $subscriber['callback_url'] . ' HTTP: ' . $ret);
 
 			PushSubscriber::delay($subscriber['id']);
 		}

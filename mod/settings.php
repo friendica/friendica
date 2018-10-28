@@ -270,7 +270,7 @@ function settings_post(App $a)
 					intval($mail_pubmail),
 					intval(local_user())
 				);
-				logger("mail: updating mailaccount. Response: ".print_r($r, true));
+				Text::logger("mail: updating mailaccount. Response: ".print_r($r, true));
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
 				);
@@ -548,7 +548,7 @@ function settings_post(App $a)
 	// If openid has changed or if there's an openid but no openidserver, try and discover it.
 	if ($openid != $a->user['openid'] || (strlen($openid) && (!strlen($openidserver)))) {
 		if (Network::isUrlValid($openid)) {
-			logger('updating openidserver');
+			Text::logger('updating openidserver');
 			$open_id_obj = new LightOpenID($a->getHostName());
 			$open_id_obj->identity = $openid;
 			$openidserver = $open_id_obj->discover($open_id_obj->identity);

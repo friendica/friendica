@@ -5,6 +5,7 @@
 namespace Friendica\Database;
 
 use Exception;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -69,7 +70,7 @@ class DBStructure
 
 		// No valid result?
 		if (!DBA::isResult($adminlist)) {
-			logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_INFO);
+			Text::logger(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), LOGGER_INFO);
 
 			// Don't continue
 			return;
@@ -100,7 +101,7 @@ class DBStructure
 		}
 
 		//try the logger
-		logger("CRITICAL: Database structure update failed: ".$error_message);
+		Text::logger("CRITICAL: Database structure update failed: ".$error_message);
 	}
 
 
@@ -221,7 +222,7 @@ class DBStructure
 
 		$errors = '';
 
-		logger('updating structure', LOGGER_DEBUG);
+		Text::logger('updating structure', LOGGER_DEBUG);
 
 		// Get the current structure
 		$database = [];
@@ -234,7 +235,7 @@ class DBStructure
 			foreach ($tables AS $table) {
 				$table = current($table);
 
-				logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
+				Text::logger(sprintf('updating structure for table %s ...', $table), LOGGER_DEBUG);
 				$database[$table] = self::tableStructure($table);
 			}
 		}
