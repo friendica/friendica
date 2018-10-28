@@ -370,7 +370,7 @@ function get_markup_template($s, $root = '') {
 	$a->saveTimestamp($stamp1, "file");
 
 	return $template; */
-	return Text::getMarkeupTemplate($s, $root);
+	return Text::getMarkupTemplate($s, $root);
 }
 
 /**
