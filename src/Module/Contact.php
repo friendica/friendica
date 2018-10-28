@@ -83,7 +83,7 @@ class Contact extends BaseModule
 			}
 
 			/// @TODO Add nice spaces
-			$vcard_widget = Text::replaceMacros(get_markup_template('vcard-widget.tpl'), [
+			$vcard_widget = Text::replaceMacros(Text::getMarkupTemplate('vcard-widget.tpl'), [
 				'$name'         => htmlentities($contact['name']),
 				'$photo'        => $contact['photo'],
 				'$url'          => Model\Contact::MagicLink($contact['url']),
@@ -114,7 +114,7 @@ class Contact extends BaseModule
 			$groups_widget = null;
 		}
 
-		$a->page['aside'] .= Text::replaceMacros(get_markup_template('contacts-widget-sidebar.tpl'), [
+		$a->page['aside'] .= Text::replaceMacros(Text::getMarkupTemplate('contacts-widget-sidebar.tpl'), [
 			'$vcard_widget'      => $vcard_widget,
 			'$findpeople_widget' => $findpeople_widget,
 			'$follow_widget'     => $follow_widget,
@@ -123,7 +123,7 @@ class Contact extends BaseModule
 		]);
 
 		$base = $a->getBaseURL();
-		$tpl = get_markup_template('contacts-head.tpl');
+		$tpl = Text::getMarkupTemplate('contacts-head.tpl');
 		$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$base' => $base
@@ -439,7 +439,7 @@ class Contact extends BaseModule
 
 					$a->page['aside'] = '';
 
-					return Text::replaceMacros(get_markup_template('contact_drop_confirm.tpl'), [
+					return Text::replaceMacros(Text::getMarkupTemplate('contact_drop_confirm.tpl'), [
 						'$header' => L10n::t('Drop contact'),
 						'$contact' => self::getContactTemplateVars($orig_record),
 						'$method' => 'get',
@@ -476,7 +476,7 @@ class Contact extends BaseModule
 			$contact_id = $a->data['contact']['id'];
 			$contact = $a->data['contact'];
 
-			$a->page['htmlhead'] .= Text::replaceMacros(get_markup_template('contact_head.tpl'), [
+			$a->page['htmlhead'] .= Text::replaceMacros(Text::getMarkupTemplate('contact_head.tpl'), [
 				'$baseurl' => $a->getBaseURL(true),
 			]);
 
@@ -592,7 +592,7 @@ class Contact extends BaseModule
 				$contact_settings_label = null;
 			}
 
-			$tpl = get_markup_template('contact_edit.tpl');
+			$tpl = Text::getMarkupTemplate('contact_edit.tpl');
 			$o .= Text::replaceMacros($tpl, [
 				'$header'         => L10n::t('Contact'),
 				'$tab_str'        => $tab_str,
@@ -756,7 +756,7 @@ class Contact extends BaseModule
 			],
 		];
 
-		$tab_tpl = get_markup_template('common_tabs.tpl');
+		$tab_tpl = Text::getMarkupTemplate('common_tabs.tpl');
 		$t = Text::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
 
 		$total = 0;
@@ -801,7 +801,7 @@ class Contact extends BaseModule
 			}
 		}
 
-		$tpl = get_markup_template('contacts-template.tpl');
+		$tpl = Text::getMarkupTemplate('contacts-template.tpl');
 		$o .= Text::replaceMacros($tpl, [
 			'$baseurl'    => System::baseUrl(),
 			'$header'     => L10n::t('Contacts') . (($nets) ? ' - ' . ContactSelector::networkToName($nets) : ''),
@@ -904,7 +904,7 @@ class Contact extends BaseModule
 			];
 		}
 
-		$tab_tpl = get_markup_template('common_tabs.tpl');
+		$tab_tpl = Text::getMarkupTemplate('common_tabs.tpl');
 		$tab_str = Text::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
 
 		return $tab_str;

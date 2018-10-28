@@ -514,7 +514,7 @@ function dfrn_request_content(App $a)
 			return; // NOTREACHED
 		}
 
-		$tpl = get_markup_template("dfrn_req_confirm.tpl");
+		$tpl = Text::getMarkupTemplate("dfrn_req_confirm.tpl");
 		$o = Text::replaceMacros($tpl, [
 			'$dfrn_url' => $dfrn_url,
 			'$aes_allow' => (($aes_allow) ? '<input type="hidden" name="aes_allow" value="1" />' : "" ),
@@ -627,9 +627,9 @@ function dfrn_request_content(App $a)
 		 * it doesn't matter if they know you or not.
 		 */
 		if ($a->profile['page-flags'] == Contact::PAGE_NORMAL) {
-			$tpl = get_markup_template('dfrn_request.tpl');
+			$tpl = Text::getMarkupTemplate('dfrn_request.tpl');
 		} else {
-			$tpl = get_markup_template('auto_request.tpl');
+			$tpl = Text::getMarkupTemplate('auto_request.tpl');
 		}
 
 		$page_desc = L10n::t("Please enter your 'Identity Address' from one of the following supported communications networks:");

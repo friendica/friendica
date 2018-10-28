@@ -29,7 +29,7 @@ function filer_content(App $a)
 		$filetags = file_tag_file_to_list($filetags, 'file');
 		$filetags = explode(",", $filetags);
 
-		$tpl = get_markup_template("filer_dialog.tpl");
+		$tpl = Text::getMarkupTemplate("filer_dialog.tpl");
 		$o = Text::replaceMacros($tpl, [
 			'$field' => ['term', L10n::t("Save to Folder:"), '', '', $filetags, L10n::t('- select -')],
 			'$submit' => L10n::t('Save'),

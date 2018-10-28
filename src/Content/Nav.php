@@ -62,7 +62,7 @@ class Nav
 
 		$nav_info = self::getInfo($a);
 
-		$tpl = get_markup_template('nav.tpl');
+		$tpl = Text::getMarkupTemplate('nav.tpl');
 
 		$nav .= Text::replaceMacros($tpl, [
 			'$baseurl'      => System::baseUrl(),

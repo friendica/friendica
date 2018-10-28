@@ -62,7 +62,7 @@ function photos_init(App $a) {
 
 		$account_type = Contact::getAccountType($profile);
 
-		$tpl = get_markup_template("vcard-widget.tpl");
+		$tpl = Text::getMarkupTemplate("vcard-widget.tpl");
 
 		$vcard_widget = Text::replaceMacros($tpl, [
 			'$name' => $profile['name'],
@@ -109,7 +109,7 @@ function photos_init(App $a) {
 		}
 
 		if ($ret['success']) {
-			$photo_albums_widget = Text::replaceMacros(get_markup_template('photo_albums.tpl'), [
+			$photo_albums_widget = Text::replaceMacros(Text::getMarkupTemplate('photo_albums.tpl'), [
 				'$nick'     => $a->data['user']['nickname'],
 				'$title'    => L10n::t('Photo Albums'),
 				'$recent'   => L10n::t('Recent Photos'),
@@ -130,7 +130,7 @@ function photos_init(App $a) {
 			$a->page['aside'] .= $photo_albums_widget;
 		}
 
-		$tpl = get_markup_template("photos_head.tpl");
+		$tpl = Text::getMarkupTemplate("photos_head.tpl");
 
 		$a->page['htmlhead'] .= Text::replaceMacros($tpl,[
 			'$ispublic' => L10n::t('everybody')
@@ -246,7 +246,7 @@ function photos_post(App $a)
 					['name' => 'albumname', 'value' => $_POST['albumname']],
 				];
 
-				$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
+				$a->page['content'] = Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 					'$method' => 'post',
 					'$message' => L10n::t('Do you really want to delete this photo album and all its photos?'),
 					'$extra_inputs' => $extra_inputs,
@@ -318,7 +318,7 @@ function photos_post(App $a)
 		if (!empty($_REQUEST['confirm'])) {
 			$drop_url = $a->query_string;
 
-			$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
+			$a->page['content'] = Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'post',
 				'$message' => L10n::t('Do you really want to delete this photo?'),
 				'$extra_inputs' => [],
@@ -368,10 +368,10 @@ function photos_post(App $a)
 		$albname     = !empty($_POST['albname'])   ? Text::noTags(trim($_POST['albname']))   : '';
 		$origaname   = !empty($_POST['origaname']) ? Text::noTags(trim($_POST['origaname'])) : '';
 
-		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
-		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
-		$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
-		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
+		$str_group_allow   = !empty($_POST['group_allow'])   ? Text::perms2Str($_POST['group_allow'])   : '';
+		$str_contact_allow = !empty($_POST['contact_allow']) ? Text::perms2Str($_POST['contact_allow']) : '';
+		$str_group_deny    = !empty($_POST['group_deny'])    ? Text::perms2Str($_POST['group_deny'])    : '';
+		$str_contact_deny  = !empty($_POST['contact_deny'])  ? Text::perms2Str($_POST['contact_deny'])  : '';
 
 		$resource_id = $a->argv[2];
 
@@ -745,10 +745,10 @@ function photos_post(App $a)
 	$group_deny    = defaults($_REQUEST, 'group_deny'   , []);
 	$contact_deny  = defaults($_REQUEST, 'contact_deny' , []);
 
-	$str_group_allow   = perms2str(is_array($group_allow)   ? $group_allow   : explode(',', $group_allow));
-	$str_contact_allow = perms2str(is_array($contact_allow) ? $contact_allow : explode(',', $contact_allow));
-	$str_group_deny    = perms2str(is_array($group_deny)    ? $group_deny    : explode(',', $group_deny));
-	$str_contact_deny  = perms2str(is_array($contact_deny)  ? $contact_deny  : explode(',', $contact_deny));
+	$str_group_allow   = Text::perms2Str(is_array($group_allow)   ? $group_allow   : explode(',', $group_allow));
+	$str_contact_allow = Text::perms2Str(is_array($contact_allow) ? $contact_allow : explode(',', $contact_allow));
+	$str_group_deny    = Text::perms2Str(is_array($group_deny)    ? $group_deny    : explode(',', $group_deny));
+	$str_contact_deny  = Text::perms2Str(is_array($contact_deny)  ? $contact_deny  : explode(',', $contact_deny));
 
 	$ret = ['src' => '', 'filename' => '', 'filesize' => 0, 'type' => ''];
 
@@ -1084,14 +1084,14 @@ function photos_content(App $a)
 
 		Addon::callHooks('photo_upload_form',$ret);
 
-		$default_upload_box = Text::replaceMacros(get_markup_template('photos_default_uploader_box.tpl'), []);
-		$default_upload_submit = Text::replaceMacros(get_markup_template('photos_default_uploader_submit.tpl'), [
+		$default_upload_box = Text::replaceMacros(Text::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
+		$default_upload_submit = Text::replaceMacros(Text::getMarkupTemplate('photos_default_uploader_submit.tpl'), [
 			'$submit' => L10n::t('Submit'),
 		]);
 
 		$usage_message = '';
 
-		$tpl = get_markup_template('photos_upload.tpl');
+		$tpl = Text::getMarkupTemplate('photos_upload.tpl');
 
 		$aclselect_e = ($visitor ? '' : ACL::getFullSelectorHTML($a->user));
 
@@ -1165,7 +1165,7 @@ function photos_content(App $a)
 		if ($cmd === 'edit') {
 			if (($album !== L10n::t('Profile Photos')) && ($album !== 'Contact Photos') && ($album !== L10n::t('Contact Photos'))) {
 				if ($can_post) {
-					$edit_tpl = get_markup_template('album_edit.tpl');
+					$edit_tpl = Text::getMarkupTemplate('album_edit.tpl');
 
 					$album_e = $album;
 
@@ -1219,7 +1219,7 @@ function photos_content(App $a)
 			}
 		}
 
-		$tpl = get_markup_template('photo_album.tpl');
+		$tpl = Text::getMarkupTemplate('photo_album.tpl');
 		$o .= Text::replaceMacros($tpl, [
 			'$photos' => $photos,
 			'$album' => $album,
@@ -1341,7 +1341,7 @@ function photos_content(App $a)
 		}
 
 		if ($cmd === 'edit') {
-			$tpl = get_markup_template('photo_edit_head.tpl');
+			$tpl = Text::getMarkupTemplate('photo_edit_head.tpl');
 			$a->page['htmlhead'] .= Text::replaceMacros($tpl,[
 				'$prevlink' => $prevlink,
 				'$nextlink' => $nextlink
@@ -1428,7 +1428,7 @@ function photos_content(App $a)
 
 		$edit = Null;
 		if ($cmd === 'edit' && $can_post) {
-			$edit_tpl = get_markup_template('photo_edit.tpl');
+			$edit_tpl = Text::getMarkupTemplate('photo_edit.tpl');
 
 			$album_e = $ph[0]['album'];
 			$caption_e = $ph[0]['desc'];
@@ -1467,12 +1467,12 @@ function photos_content(App $a)
 		$responses = '';
 
 		if (count($linked_items)) {
-			$cmnt_tpl = get_markup_template('comment_item.tpl');
-			$tpl = get_markup_template('photo_item.tpl');
+			$cmnt_tpl = Text::getMarkupTemplate('comment_item.tpl');
+			$tpl = Text::getMarkupTemplate('photo_item.tpl');
 			$return_path = $a->cmd;
 
 			if ($can_post || Security::canWriteToUserWall($owner_uid)) {
-				$like_tpl = get_markup_template('like_noshare.tpl');
+				$like_tpl = Text::getMarkupTemplate('like_noshare.tpl');
 				$likebuttons = Text::replaceMacros($like_tpl, [
 					'$id' => $link_item['id'],
 					'$likethis' => L10n::t("I like this \x28toggle\x29"),
@@ -1611,7 +1611,7 @@ function photos_content(App $a)
 			$paginate = $pager->renderFull($total);
 		}
 
-		$photo_tpl = get_markup_template('photo_view.tpl');
+		$photo_tpl = Text::getMarkupTemplate('photo_view.tpl');
 		$o .= Text::replaceMacros($photo_tpl, [
 			'$id' => $ph[0]['id'],
 			'$album' => [$album_link, $ph[0]['album']],
@@ -1703,7 +1703,7 @@ function photos_content(App $a)
 		}
 	}
 
-	$tpl = get_markup_template('photos_recent.tpl');
+	$tpl = Text::getMarkupTemplate('photos_recent.tpl');
 	$o .= Text::replaceMacros($tpl, [
 		'$title' => L10n::t('Recent Photos'),
 		'$can_post' => $can_post,

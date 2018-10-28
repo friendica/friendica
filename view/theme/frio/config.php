@@ -114,7 +114,7 @@ function frio_form($arr)
 
 	$background_image_help = '<strong>' . L10n::t('Note') . ': </strong>' . L10n::t('Check image permissions if all users are allowed to see the image');
 
-	$t = get_markup_template('theme_settings.tpl');
+	$t = Text::getMarkupTemplate('theme_settings.tpl');
 	$ctx = [
 		'$submit'           => L10n::t('Submit'),
 		'$baseurl'          => System::baseUrl(),

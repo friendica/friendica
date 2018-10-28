@@ -12,7 +12,7 @@ use Friendica\Util\Network;
 function oexchange_init(App $a) {
 
 	if (($a->argc > 1) && ($a->argv[1] === 'xrd')) {
-		$tpl = get_markup_template('oexchange_xrd.tpl');
+		$tpl = Text::getMarkupTemplate('oexchange_xrd.tpl');
 
 		$o = Text::replaceMacros($tpl, ['$base' => System::baseUrl()]);
 		echo $o;

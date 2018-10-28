@@ -200,7 +200,7 @@ function saved_searches($search)
 		];
 	}
 
-	$tpl = get_markup_template('saved_searches_aside.tpl');
+	$tpl = Text::getMarkupTemplate('saved_searches_aside.tpl');
 	$o = Text::replaceMacros($tpl, [
 		'$title'     => L10n::t('Saved Searches'),
 		'$add'       => L10n::t('add'),
@@ -347,7 +347,7 @@ function networkConversation(App $a, $items, Pager $pager, $mode, $update, $orde
 
 	if (!$update) {
 		if (PConfig::get(local_user(), 'system', 'infinite_scroll')) {
-			$o .= scroll_loader();
+			$o .= Text::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));
 		}
@@ -653,7 +653,7 @@ function networkThreadedView(App $a, $update, $parent)
 			info(L10n::t('Group is empty'));
 		}
 
-		$o = Text::replaceMacros(get_markup_template('section_title.tpl'), [
+		$o = Text::replaceMacros(Text::getMarkupTemplate('section_title.tpl'), [
 			'$title' => L10n::t('Group: %s', $group['name'])
 		]) . $o;
 	} elseif ($cid) {
@@ -674,7 +674,7 @@ function networkThreadedView(App $a, $update, $parent)
 
 			$entries[0]['account_type'] = Contact::getAccountType($contact);
 
-			$o = Text::replaceMacros(get_markup_template('viewcontact_template.tpl'), [
+			$o = Text::replaceMacros(Text::getMarkupTemplate('viewcontact_template.tpl'), [
 				'contacts' => $entries,
 				'id' => 'network',
 			]) . $o;
@@ -1032,7 +1032,7 @@ function network_tabs(App $a)
 	$arr = ['tabs' => $tabs];
 	Addon::callHooks('network_tabs', $arr);
 
-	$tpl = get_markup_template('common_tabs.tpl');
+	$tpl = Text::getMarkupTemplate('common_tabs.tpl');
 
 	return Text::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
 
@@ -1058,7 +1058,7 @@ function network_infinite_scroll_head(App $a, &$htmlhead)
 	if (PConfig::get(local_user(), 'system', 'infinite_scroll')
 		&& defaults($_GET, 'mode', '') != 'minimal'
 	) {
-		$tpl = get_markup_template('infinite_scroll_head.tpl');
+		$tpl = Text::getMarkupTemplate('infinite_scroll_head.tpl');
 		$htmlhead .= Text::replaceMacros($tpl, [
 			'$pageno'     => $pager->getPage(),
 			'$reload_uri' => $pager->getBaseQueryString()

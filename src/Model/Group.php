@@ -332,7 +332,7 @@ class Group extends BaseObject
 			$label = L10n::t('Default privacy group for new contacts');
 		}
 
-		$o = Text::replaceMacros(get_markup_template('group_selection.tpl'), [
+		$o = Text::replaceMacros(Text::getMarkupTemplate('group_selection.tpl'), [
 			'$label' => $label,
 			'$groups' => $display_groups
 		]);
@@ -399,7 +399,7 @@ class Group extends BaseObject
 			];
 		}
 
-		$tpl = get_markup_template('group_side.tpl');
+		$tpl = Text::getMarkupTemplate('group_side.tpl');
 		$o = Text::replaceMacros($tpl, [
 			'$add' => L10n::t('add'),
 			'$title' => L10n::t('Groups'),

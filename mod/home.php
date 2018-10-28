@@ -54,7 +54,7 @@ function home_content(App $a) {
 	Addon::callHooks("home_content",$content);
 
 
-	$tpl = get_markup_template('home.tpl');
+	$tpl = Text::getMarkupTemplate('home.tpl');
 	return Text::replaceMacros($tpl, [
 		'$defaultheader' => $defaultheader,
 		'$customhome' => $customhome,

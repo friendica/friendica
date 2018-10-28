@@ -6,7 +6,7 @@ use Friendica\Core\System;
 
 function opensearch_content(App $a) {
 
-	$tpl = get_markup_template('opensearch.tpl');
+	$tpl = Text::getMarkupTemplate('opensearch.tpl');
 
 	header("Content-type: application/opensearchdescription+xml");
 

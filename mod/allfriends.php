@@ -99,7 +99,7 @@ function allfriends_content(App $a)
 
 	$tab_str = Module\Contact::getTabsHTML($a, $contact, 4);
 
-	$tpl = get_markup_template('viewcontact_template.tpl');
+	$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
 	$o .= Text::replaceMacros($tpl, [
 		//'$title' => L10n::t('Friends of %s', htmlentities($c[0]['name'])),

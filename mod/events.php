@@ -135,10 +135,10 @@ function events_post(App $a)
 
 
 	if ($share) {
-		$str_group_allow   = !empty($_POST['group_allow'])   ? perms2str($_POST['group_allow'])   : '';
-		$str_contact_allow = !empty($_POST['contact_allow']) ? perms2str($_POST['contact_allow']) : '';
-		$str_group_deny    = !empty($_POST['group_deny'])    ? perms2str($_POST['group_deny'])    : '';
-		$str_contact_deny  = !empty($_POST['contact_deny'])  ? perms2str($_POST['contact_deny'])  : '';
+		$str_group_allow   = !empty($_POST['group_allow'])   ? Text::perms2Str($_POST['group_allow'])   : '';
+		$str_contact_allow = !empty($_POST['contact_allow']) ? Text::perms2Str($_POST['contact_allow']) : '';
+		$str_group_deny    = !empty($_POST['group_deny'])    ? Text::perms2Str($_POST['group_deny'])    : '';
+		$str_contact_deny  = !empty($_POST['contact_deny'])  ? Text::perms2Str($_POST['contact_deny'])  : '';
 
 		// Undo the pseudo-contact of self, since there are real contacts now
 		if (strpos($str_contact_allow, '<' . $self . '>') !== false) {
@@ -225,7 +225,7 @@ function events_content(App $a)
 	// get the translation strings for the callendar
 	$i18n = Event::getStrings();
 
-	$htpl = get_markup_template('event_head.tpl');
+	$htpl = Text::getMarkupTemplate('event_head.tpl');
 	$a->page['htmlhead'] .= Text::replaceMacros($htpl, [
 		'$baseurl' => System::baseUrl(),
 		'$module_url' => '/events',
@@ -367,9 +367,9 @@ function events_content(App $a)
 		}
 
 		if (!empty($_GET['id'])) {
-			$tpl = get_markup_template("event.tpl");
+			$tpl = Text::getMarkupTemplate("event.tpl");
 		} else {
-			$tpl = get_markup_template("events_js.tpl");
+			$tpl = Text::getMarkupTemplate("events_js.tpl");
 		}
 
 		// Get rid of dashes in key names, Smarty3 can't handle them
@@ -497,7 +497,7 @@ function events_content(App $a)
 			$uri = '';
 		}
 
-		$tpl = get_markup_template('event_form.tpl');
+		$tpl = Text::getMarkupTemplate('event_form.tpl');
 
 		$o .= Text::replaceMacros($tpl, [
 			'$post' => System::baseUrl() . '/events',

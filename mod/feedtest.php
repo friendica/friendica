@@ -44,7 +44,7 @@ function feedtest_content(App $a)
 		];
 	}
 
-	$tpl = get_markup_template('feedtest.tpl');
+	$tpl = Text::getMarkupTemplate('feedtest.tpl');
 	$o = Text::replaceMacros($tpl, [
 		'$url'    => ['url', L10n::t('Source URL'), defaults($_REQUEST, 'url', ''), ''],
 		'$result' => $result

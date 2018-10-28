@@ -82,7 +82,7 @@ function api_content(App $a)
 				killme();
 			}
 
-			$tpl = get_markup_template("oauth_authorize_done.tpl");
+			$tpl = Text::getMarkupTemplate("oauth_authorize_done.tpl");
 			$o = Text::replaceMacros($tpl, [
 				'$title' => L10n::t('Authorize application connection'),
 				'$info' => L10n::t('Return to your app and insert this Securty Code:'),
@@ -104,7 +104,7 @@ function api_content(App $a)
 			return "Invalid request. Unknown token.";
 		}
 
-		$tpl = get_markup_template('oauth_authorize.tpl');
+		$tpl = Text::getMarkupTemplate('oauth_authorize.tpl');
 		$o = Text::replaceMacros($tpl, [
 			'$title' => L10n::t('Authorize application connection'),
 			'$app' => $app,

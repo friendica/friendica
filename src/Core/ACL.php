@@ -292,7 +292,7 @@ class ACL extends BaseObject
 			}
 		}
 
-		$tpl = get_markup_template('acl_selector.tpl');
+		$tpl = Text::getMarkupTemplate('acl_selector.tpl');
 		$o = Text::replaceMacros($tpl, [
 			'$showall' => L10n::t('Visible to everybody'),
 			'$show' => L10n::t('show'),

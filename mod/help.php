@@ -61,7 +61,7 @@ function help_content(App $a)
 
 	if (!strlen($text)) {
 		header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . L10n::t('Not Found'));
-		$tpl = get_markup_template("404.tpl");
+		$tpl = Text::getMarkupTemplate("404.tpl");
 		return Text::replaceMacros($tpl, [
 			'$message' => L10n::t('Page not found.')
 		]);

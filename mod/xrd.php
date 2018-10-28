@@ -106,7 +106,7 @@ function xrd_xml($a, $uri, $alias, $profile_url, $r)
 	header('Access-Control-Allow-Origin: *');
 	header("Content-type: text/xml");
 
-	$tpl = get_markup_template('xrd_person.tpl');
+	$tpl = Text::getMarkupTemplate('xrd_person.tpl');
 
 	$o = Text::replaceMacros($tpl, [
 		'$nick'        => $r['nickname'],

@@ -898,7 +898,7 @@ class Event extends BaseObject
 		// Construct the profile link (magic-auth).
 		$profile_link = Contact::magicLinkById($item['author-id']);
 
-		$tpl = get_markup_template('event_stream_item.tpl');
+		$tpl = Text::getMarkupTemplate('event_stream_item.tpl');
 		$return = Text::replaceMacros($tpl, [
 			'$id'             => $item['event-id'],
 			'$title'          => prepare_text($item['event-summary']),

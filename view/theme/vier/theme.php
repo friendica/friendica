@@ -145,7 +145,7 @@ function vier_community_info()
 	if ($show_profiles) {
 		$r = GContact::suggestionQuery(local_user(), 0, 9);
 
-		$tpl = get_markup_template('ch_directory_item.tpl');
+		$tpl = Text::getMarkupTemplate('ch_directory_item.tpl');
 		if (DBA::isResult($r)) {
 			$aside['$comunity_profiles_title'] = L10n::t('Community Profiles');
 			$aside['$comunity_profiles_items'] = [];
@@ -167,7 +167,7 @@ function vier_community_info()
 		$publish = (Config::get('system', 'publish_all') ? '' : " AND `publish` = 1 ");
 		$order = " ORDER BY `register_date` DESC ";
 
-		$tpl = get_markup_template('ch_directory_item.tpl');
+		$tpl = Text::getMarkupTemplate('ch_directory_item.tpl');
 
 		$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`
 				FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
@@ -244,7 +244,7 @@ function vier_community_info()
 			}
 
 
-			$tpl = get_markup_template('widget_forumlist_right.tpl');
+			$tpl = Text::getMarkupTemplate('widget_forumlist_right.tpl');
 
 			$page = Text::replaceMacros(
 				$tpl,
@@ -289,7 +289,7 @@ function vier_community_info()
 
 		$r[] = ["url" => "help/Quick-Start-guide", "name" => L10n::t("Quick Start")];
 
-		$tpl = get_markup_template('ch_helpers.tpl');
+		$tpl = Text::getMarkupTemplate('ch_helpers.tpl');
 
 		if ($r) {
 			$helpers = [];
@@ -380,7 +380,7 @@ function vier_community_info()
 			$r[] = ["photo" => "images/mail.png", "name" => "E-Mail"];
 		}
 
-		$tpl = get_markup_template('ch_connectors.tpl');
+		$tpl = Text::getMarkupTemplate('ch_connectors.tpl');
 
 		if (DBA::isResult($r)) {
 			$con_services = [];
@@ -400,6 +400,6 @@ function vier_community_info()
 	//end connectable services
 
 	//print right_aside
-	$tpl = get_markup_template('communityhome.tpl');
+	$tpl = Text::getMarkupTemplate('communityhome.tpl');
 	$a->page['right_aside'] = Text::replaceMacros($tpl, $aside);
 }

@@ -60,9 +60,9 @@ function notify_content(App $a)
 
 	$nm = new NotificationsManager();
 
-	$notif_tpl = get_markup_template('notifications.tpl');
+	$notif_tpl = Text::getMarkupTemplate('notifications.tpl');
 
-	$not_tpl = get_markup_template('notify.tpl');
+	$not_tpl = Text::getMarkupTemplate('notify.tpl');
 
 	$r = $nm->getAll(['seen'=>0]);
 	if (DBA::isResult($r) > 0) {

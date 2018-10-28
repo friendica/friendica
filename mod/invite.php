@@ -111,7 +111,7 @@ function invite_content(App $a) {
 		return;
 	}
 
-	$tpl = get_markup_template('invite.tpl');
+	$tpl = Text::getMarkupTemplate('invite.tpl');
 	$invonly = false;
 
 	if (Config::get('system', 'invitation_only')) {

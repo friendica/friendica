@@ -228,10 +228,10 @@ function item_post(App $a) {
 			$str_contact_deny  = $user['deny_cid'];
 		} else {
 			// use the posted permissions
-			$str_group_allow   = perms2str(defaults($_REQUEST, 'group_allow', ''));
-			$str_contact_allow = perms2str(defaults($_REQUEST, 'contact_allow', ''));
-			$str_group_deny    = perms2str(defaults($_REQUEST, 'group_deny', ''));
-			$str_contact_deny  = perms2str(defaults($_REQUEST, 'contact_deny', ''));
+			$str_group_allow   = Text::perms2Str(defaults($_REQUEST, 'group_allow', ''));
+			$str_contact_allow = Text::perms2Str(defaults($_REQUEST, 'contact_allow', ''));
+			$str_group_deny    = Text::perms2Str(defaults($_REQUEST, 'group_deny', ''));
+			$str_contact_deny  = Text::perms2Str(defaults($_REQUEST, 'contact_deny', ''));
 		}
 
 		$title             =      Text::noTags(trim(defaults($_REQUEST, 'title'   , '')));

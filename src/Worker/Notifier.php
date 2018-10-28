@@ -5,6 +5,7 @@
 namespace Friendica\Worker;
 
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -298,10 +299,10 @@ class Notifier
 					$public_message = false; // private recipients, not public
 				}
 
-				$allow_people = expand_acl($parent['allow_cid']);
-				$allow_groups = Group::expand(expand_acl($parent['allow_gid']),true);
-				$deny_people  = expand_acl($parent['deny_cid']);
-				$deny_groups  = Group::expand(expand_acl($parent['deny_gid']));
+				$allow_people = Text::expandAcl($parent['allow_cid']);
+				$allow_groups = Group::expand(Text::expandAcl($parent['allow_gid']),true);
+				$deny_people  = Text::expandAcl($parent['deny_cid']);
+				$deny_groups  = Group::expand(Text::expandAcl($parent['deny_gid']));
 
 				// if our parent is a public forum (forum_mode == 1), uplink to the origional author causing
 				// a delivery fork. private groups (forum_mode == 2) do not uplink

@@ -94,7 +94,7 @@ function fbrowser_content(App $a)
 			}
 			$files = array_map("_map_files1", $r);
 
-			$tpl = get_markup_template($template_file);
+			$tpl = Text::getMarkupTemplate($template_file);
 
 			$o =  Text::replaceMacros($tpl, [
 				'$type'     => 'image',
@@ -126,7 +126,7 @@ function fbrowser_content(App $a)
 				$files = array_map("_map_files2", $files);
 
 
-				$tpl = get_markup_template($template_file);
+				$tpl = Text::getMarkupTemplate($template_file);
 				$o = Text::replaceMacros($tpl, [
 					'$type'     => 'file',
 					'$baseurl'  => System::baseUrl(),

@@ -111,7 +111,7 @@ if (! function_exists('_js_in_foot')) {
 		$ssl_state = null;
 		$baseurl = System::baseUrl($ssl_state);
 		$bottom['$baseurl'] = $baseurl;
-		$tpl = get_markup_template('bottom.tpl');
+		$tpl = Text::getMarkupTemplate('bottom.tpl');
 
 		return $a->page['bottom'] = Text::replaceMacros($tpl, $bottom);
 	}

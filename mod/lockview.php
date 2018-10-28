@@ -3,6 +3,7 @@
  * @file mod/lockview.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
@@ -58,10 +59,10 @@ function lockview_content(App $a)
 		killme();
 	}
 
-	$allowed_users  = expand_acl($item['allow_cid']);
-	$allowed_groups = expand_acl($item['allow_gid']);
-	$deny_users     = expand_acl($item['deny_cid']);
-	$deny_groups    = expand_acl($item['deny_gid']);
+	$allowed_users  = Text::expandAcl($item['allow_cid']);
+	$allowed_groups = Text::expandAcl($item['allow_gid']);
+	$deny_users     = Text::expandAcl($item['deny_cid']);
+	$deny_groups    = Text::expandAcl($item['deny_gid']);
 
 	$o = L10n::t('Visible to:') . '<br />';
 	$l = [];

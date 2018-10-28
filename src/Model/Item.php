@@ -2827,10 +2827,10 @@ class Item extends BaseObject
 	// returns an array of contact-ids that are allowed to see this object
 	public static function enumeratePermissions($obj)
 	{
-		$allow_people = expand_acl($obj['allow_cid']);
-		$allow_groups = Group::expand(expand_acl($obj['allow_gid']));
-		$deny_people  = expand_acl($obj['deny_cid']);
-		$deny_groups  = Group::expand(expand_acl($obj['deny_gid']));
+		$allow_people = Text::expandAcl($obj['allow_cid']);
+		$allow_groups = Group::expand(Text::expandAcl($obj['allow_gid']));
+		$deny_people  = Text::expandAcl($obj['deny_cid']);
+		$deny_groups  = Group::expand(Text::expandAcl($obj['deny_gid']));
 		$recipients   = array_unique(array_merge($allow_people, $allow_groups));
 		$deny         = array_unique(array_merge($deny_people, $deny_groups));
 		$recipients   = array_diff($recipients, $deny);

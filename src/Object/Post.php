@@ -785,7 +785,7 @@ class Post extends BaseObject
 				$uid = $parent_uid;
 			}
 
-			$template = get_markup_template($this->getCommentBoxTemplate());
+			$template = Text::getMarkupTemplate($this->getCommentBoxTemplate());
 			$comment_box = Text::replaceMacros($template, [
 				'$return_path' => $a->query_string,
 				'$threaded'    => $this->isThreaded(),

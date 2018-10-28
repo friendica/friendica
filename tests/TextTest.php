@@ -112,7 +112,7 @@ class TextTest extends TestCase
 	public function testExpandAclNormal()
 	{
 		$text='<1><2><3>';
-		$this->assertEquals(array(1, 2, 3), expand_acl($text));
+		$this->assertEquals(array(1, 2, 3), Text::expandAcl($text));
 	}
 
 	/**
@@ -121,7 +121,7 @@ class TextTest extends TestCase
 	public function testExpandAclBigNumber()
 	{
 		$text='<1><'.PHP_INT_MAX.'><15>';
-		$this->assertEquals(array(1, PHP_INT_MAX, 15), expand_acl($text));
+		$this->assertEquals(array(1, PHP_INT_MAX, 15), Text::expandAcl($text));
 	}
 
 	/**
@@ -132,7 +132,7 @@ class TextTest extends TestCase
 	public function testExpandAclString()
 	{
 		$text="<1><279012><tt>";
-		$this->assertEquals(array(1, 279012), expand_acl($text));
+		$this->assertEquals(array(1, 279012), Text::expandAcl($text));
 	}
 
 	/**
@@ -143,7 +143,7 @@ class TextTest extends TestCase
 	public function testExpandAclSpace()
 	{
 		$text="<1><279 012><32>";
-		$this->assertEquals(array(1, "279", "32"), expand_acl($text));
+		$this->assertEquals(array(1, "279", "32"), Text::expandAcl($text));
 	}
 
 	/**
@@ -152,7 +152,7 @@ class TextTest extends TestCase
 	public function testExpandAclEmpty()
 	{
 		$text="";
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -163,7 +163,7 @@ class TextTest extends TestCase
 	public function testExpandAclNoBrackets()
 	{
 		$text="According to documentation, that's invalid. "; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -174,7 +174,7 @@ class TextTest extends TestCase
 	public function testExpandAclJustOneBracket1()
 	{
 		$text="<Another invalid string"; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -185,7 +185,7 @@ class TextTest extends TestCase
 	public function testExpandAclJustOneBracket2()
 	{
 		$text="Another invalid> string"; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -196,7 +196,7 @@ class TextTest extends TestCase
 	public function testExpandAclCloseOnly()
 	{
 		$text="Another> invalid> string>"; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -207,7 +207,7 @@ class TextTest extends TestCase
 	public function testExpandAclOpenOnly()
 	{
 		$text="<Another< invalid string<"; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -218,7 +218,7 @@ class TextTest extends TestCase
 	public function testExpandAclNoMatching1()
 	{
 		$text="<Another<> invalid <string>"; //should be invalid
-		$this->assertEquals(array(), expand_acl($text));
+		$this->assertEquals(array(), Text::expandAcl($text));
 	}
 
 	/**
@@ -230,7 +230,7 @@ class TextTest extends TestCase
 	public function testExpandAclEmptyMatch()
 	{
 		$text="<1><><3>";
-		$this->assertEquals(array(1,3), expand_acl($text));
+		$this->assertEquals(array(1,3), Text::expandAcl($text));
 	}
 
 	/**

@@ -164,7 +164,7 @@ function delegate_content(App $a)
 		$parent_password = ['parent_password', L10n::t('Parent Password:'), '', L10n::t('Please enter the password of the parent account to legitimize your request.')];
 	}
 
-	$o = Text::replaceMacros(get_markup_template('delegate.tpl'), [
+	$o = Text::replaceMacros(Text::getMarkupTemplate('delegate.tpl'), [
 		'$form_security_token' => BaseModule::getFormSecurityToken('delegate'),
 		'$parent_header' => L10n::t('Parent User'),
 		'$parent_user' => $parent_user,

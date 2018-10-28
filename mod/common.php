@@ -49,7 +49,7 @@ function common_content(App $a)
 		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['self' => true, 'uid' => $uid]);
 
 		if (DBA::isResult($contact)) {
-			$vcard_widget = Text::replaceMacros(get_markup_template("vcard-widget.tpl"), [
+			$vcard_widget = Text::replaceMacros(Text::getMarkupTemplate("vcard-widget.tpl"), [
 				'$name'  => htmlentities($contact['name']),
 				'$photo' => $contact['photo'],
 				'url'    => 'contact/' . $cid
@@ -143,7 +143,7 @@ function common_content(App $a)
 		$title = L10n::t('Common Friends');
 	}
 
-	$tpl = get_markup_template('viewcontact_template.tpl');
+	$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
 	$o .= Text::replaceMacros($tpl, [
 		'$title'    => $title,

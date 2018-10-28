@@ -771,7 +771,7 @@ class App
 
 		Core\Addon::callHooks('head', $this->page['htmlhead']);
 
-		$tpl = get_markup_template('head.tpl');
+		$tpl = Content\Text::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
 		 * since the code added by the modules frequently depends on it
 		 * being first
@@ -822,7 +822,7 @@ class App
 			} else {
 				$link = 'toggle_mobile?off=1&address=' . curPageURL();
 			}
-			$this->page['footer'] .= Content\Text::replaceMacros(get_markup_template("toggle_mobile_footer.tpl"), [
+			$this->page['footer'] .= Content\Text::replaceMacros(Content\Text::getMarkupTemplate("toggle_mobile_footer.tpl"), [
 				'$toggle_link' => $link,
 				'$toggle_text' => Core\L10n::t('toggle mobile')
 			]);
@@ -830,7 +830,7 @@ class App
 
 		Core\Addon::callHooks('footer', $this->page['footer']);
 
-		$tpl = get_markup_template('footer.tpl');
+		$tpl = Content\Text::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Content\Text::replaceMacros($tpl, [
 			'$baseurl' => $this->getBaseURL(),
 			'$footerScripts' => $this->footerScripts,
@@ -1791,7 +1791,7 @@ class App
 				logger('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], LOGGER_DEBUG);
 
 				header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . Core\L10n::t('Not Found'));
-				$tpl = get_markup_template("404.tpl");
+				$tpl = Content\Text::getMarkupTemplate("404.tpl");
 				$this->page['content'] = Content\Text::replaceMacros($tpl, [
 					'$message' =>  Core\L10n::t('Page not found.')
 				]);
@@ -1880,7 +1880,7 @@ class App
 
 		// Add the navigation (menu) template
 		if ($this->module != 'install' && $this->module != 'maintenance') {
-			$this->page['htmlhead'] .= Content\Text::replaceMacros(get_markup_template('nav_head.tpl'), []);
+			$this->page['htmlhead'] .= Content\Text::replaceMacros(Content\Text::getMarkupTemplate('nav_head.tpl'), []);
 			$this->page['nav']       = Content\Nav::build($this);
 		}
 

@@ -61,7 +61,7 @@ class CalendarExport
 		// of the profile page it should be the personal /events page. So we can use $a->user.
 		$user = defaults($a->data['user'], 'nickname', $a->user['nickname']);
 
-		$tpl = get_markup_template("events_aside.tpl");
+		$tpl = Text::getMarkupTemplate("events_aside.tpl");
 		$return = Text::replaceMacros($tpl, [
 			'$etitle'      => L10n::t("Export"),
 			'$export_ical' => L10n::t("Export calendar as ical"),

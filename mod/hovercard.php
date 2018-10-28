@@ -111,7 +111,7 @@ function hovercard_content()
 		'actions'  => $actions,
 	];
 	if ($datatype == 'html') {
-		$tpl = get_markup_template('hovercard.tpl');
+		$tpl = Text::getMarkupTemplate('hovercard.tpl');
 		$o = Text::replaceMacros($tpl, [
 			'$profile' => $profile,
 		]);
@@ -134,7 +134,7 @@ function get_template_content($template, $root = '')
 {
 	// We load the whole template system to get the filename.
 	// Maybe we can do it a little bit smarter if I get time.
-	$t = get_markup_template($template, $root);
+	$t = Text::getMarkupTemplate($template, $root);
 	$filename = $t->filename;
 
 	// Get the content of the template file

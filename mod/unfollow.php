@@ -100,7 +100,7 @@ function unfollow_content(App $a)
 	}
 
 	$request = System::baseUrl() . '/unfollow';
-	$tpl = get_markup_template('auto_request.tpl');
+	$tpl = Text::getMarkupTemplate('auto_request.tpl');
 
 	$self = DBA::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
 
@@ -145,7 +145,7 @@ function unfollow_content(App $a)
 	$a->page['aside'] = '';
 	Profile::load($a, '', 0, Contact::getDetailsByURL($contact['url']));
 
-	$o .= Text::replaceMacros(get_markup_template('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);
+	$o .= Text::replaceMacros(Text::getMarkupTemplate('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);
 
 	// Show last public posts
 	$o .= Contact::getPostsFromUrl($contact['url']);

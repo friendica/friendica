@@ -98,7 +98,7 @@ function group_content(App $a) {
 		$switchtotext = Config::get('system', 'groupedit_image_limit', 400);
 	}
 
-	$tpl = get_markup_template('group_edit.tpl');
+	$tpl = Text::getMarkupTemplate('group_edit.tpl');
 
 	$context = [
 		'$submit' => L10n::t('Save Group'),
@@ -215,7 +215,7 @@ function group_content(App $a) {
 			}
 		}
 
-		$drop_tpl = get_markup_template('group_drop.tpl');
+		$drop_tpl = Text::getMarkupTemplate('group_drop.tpl');
 		$drop_txt = Text::replaceMacros($drop_tpl, [
 			'$id' => $group['id'],
 			'$delete' => L10n::t('Delete Group'),
@@ -307,7 +307,7 @@ function group_content(App $a) {
 	$context['$shortmode'] = (($switchtotext && ($total > $switchtotext)) ? true : false);
 
 	if ($change) {
-		$tpl = get_markup_template('groupeditor.tpl');
+		$tpl = Text::getMarkupTemplate('groupeditor.tpl');
 		echo Text::replaceMacros($tpl, $context);
 		killme();
 	}

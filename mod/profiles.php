@@ -527,11 +527,11 @@ function profiles_content(App $a) {
 			return;
 		}
 
-		$a->page['htmlhead'] .= Text::replaceMacros(get_markup_template('profed_head.tpl'), [
+		$a->page['htmlhead'] .= Text::replaceMacros(Text::getMarkupTemplate('profed_head.tpl'), [
 			'$baseurl' => System::baseUrl(true),
 		]);
 
-		$opt_tpl = get_markup_template("profile-hide-friends.tpl");
+		$opt_tpl = Text::getMarkupTemplate("profile-hide-friends.tpl");
 		$hide_friends = Text::replaceMacros($opt_tpl,[
 			'$yesno' => [
 				'hide-friends', //Name
@@ -553,7 +553,7 @@ function profiles_content(App $a) {
 		$detailled_profile = (PConfig::get(local_user(), 'system', 'detailled_profile') AND $personal_account);
 
 		$is_default = (($r[0]['is-default']) ? 1 : 0);
-		$tpl = get_markup_template("profile_edit.tpl");
+		$tpl = Text::getMarkupTemplate("profile_edit.tpl");
 		$o .= Text::replaceMacros($tpl, [
 			'$personal_account' => $personal_account,
 			'$detailled_profile' => $detailled_profile,
@@ -664,7 +664,7 @@ function profiles_content(App $a) {
 
 		if (DBA::isResult($r)) {
 
-			$tpl = get_markup_template('profile_entry.tpl');
+			$tpl = Text::getMarkupTemplate('profile_entry.tpl');
 
 			$profiles = '';
 			foreach ($r as $rr) {
@@ -678,7 +678,7 @@ function profiles_content(App $a) {
 				]);
 			}
 
-			$tpl_header = get_markup_template('profile_listing_header.tpl');
+			$tpl_header = Text::getMarkupTemplate('profile_listing_header.tpl');
 			$o .= Text::replaceMacros($tpl_header,[
 				'$header'      => L10n::t('Edit/Manage Profiles'),
 				'$chg_photo'   => L10n::t('Change profile photo'),

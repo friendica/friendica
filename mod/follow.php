@@ -109,10 +109,10 @@ function follow_content(App $a)
 
 	if (($ret['network'] === Protocol::DFRN) && !DBA::isResult($r)) {
 		$request = $ret['request'];
-		$tpl = get_markup_template('dfrn_request.tpl');
+		$tpl = Text::getMarkupTemplate('dfrn_request.tpl');
 	} else {
 		$request = System::baseUrl() . '/follow';
-		$tpl = get_markup_template('auto_request.tpl');
+		$tpl = Text::getMarkupTemplate('auto_request.tpl');
 	}
 
 	$r = q("SELECT `url` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1", intval($uid));
@@ -188,7 +188,7 @@ function follow_content(App $a)
 	}
 
 	if ($gcontact_id <> 0) {
-		$o .= Text::replaceMacros(get_markup_template('section_title.tpl'),
+		$o .= Text::replaceMacros(Text::getMarkupTemplate('section_title.tpl'),
 			['$title' => L10n::t('Status Messages and Posts')]
 		);
 

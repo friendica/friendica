@@ -172,7 +172,7 @@ class Profile
 
 		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
 			$a->page['aside'] .= Text::replaceMacros(
-				get_markup_template('profile_edlink.tpl'),
+				Text::getMarkupTemplate('profile_edlink.tpl'),
 				[
 					'$editprofile' => L10n::t('Edit profile'),
 					'$profid' => $a->profile['id']
@@ -516,7 +516,7 @@ class Profile
 
 		$p['url'] = Contact::magicLink(defaults($p, 'url', $profile_url));
 
-		$tpl = get_markup_template('profile_vcard.tpl');
+		$tpl = Text::getMarkupTemplate('profile_vcard.tpl');
 		$o .= Text::replaceMacros($tpl, [
 			'$profile' => $p,
 			'$xmpp' => $xmpp,
@@ -621,7 +621,7 @@ class Profile
 				}
 			}
 		}
-		$tpl = get_markup_template('birthdays_reminder.tpl');
+		$tpl = Text::getMarkupTemplate('birthdays_reminder.tpl');
 		return Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
@@ -710,7 +710,7 @@ class Profile
 			DBA::close($s);
 			$classtoday = (($istoday) ? 'event-today' : '');
 		}
-		$tpl = get_markup_template('events_reminder.tpl');
+		$tpl = Text::getMarkupTemplate('events_reminder.tpl');
 		return Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
@@ -727,12 +727,12 @@ class Profile
 		$uid = $a->profile['uid'];
 
 		$o .= Text::replaceMacros(
-			get_markup_template('section_title.tpl'),
+			Text::getMarkupTemplate('section_title.tpl'),
 			['$title' => L10n::t('Profile')]
 		);
 
 		if ($a->profile['name']) {
-			$tpl = get_markup_template('profile_advanced.tpl');
+			$tpl = Text::getMarkupTemplate('profile_advanced.tpl');
 
 			$profile = [];
 
@@ -977,7 +977,7 @@ class Profile
 		$arr = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $tab, 'tabs' => $tabs];
 		Addon::callHooks('profile_tabs', $arr);
 
-		$tpl = get_markup_template('common_tabs.tpl');
+		$tpl = Text::getMarkupTemplate('common_tabs.tpl');
 
 		return Text::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
 	}

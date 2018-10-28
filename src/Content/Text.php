@@ -211,4 +211,100 @@ class Text
         return $ret;
     }
 
+    /**
+     * Loader for infinite scrolling
+     * @return string html for loader
+     */
+    function scrollLoader() {
+        $tpl = self::getMarkupTemplate("scroll_loader.tpl");
+        return self::replaceMacros($tpl, [
+            'wait' => L10n::t('Loading more entries...'),
+            'end' => L10n::t('The end')
+        ]);
+    }
+
+    /**
+     * Turn user/group ACLs stored as angle bracketed text into arrays
+     *
+     * @param string $s
+     * @return array
+     */
+    function expandAcl($s) {
+        // turn string array of angle-bracketed elements into numeric array
+        // e.g. "<1><2><3>" => array(1,2,3);
+        $ret = [];
+
+        if (strlen($s)) {
+            $t = str_replace('<', '', $s);
+            $a = explode('>', $t);
+            foreach ($a as $aa) {
+                if (intval($aa)) {
+                    $ret[] = intval($aa);
+                }
+            }
+        }
+        return $ret;
+    }
+
+    /**
+     * Wrap ACL elements in angle brackets for storage
+     * @param string $item
+     */
+    function sanitiseAcl(&$item) {
+        if (intval($item)) {
+            $item = '<' . intval(notags(trim($item))) . '>';
+        } else {
+            unset($item);
+        }
+    }
+
+
+    /**
+     * Convert an ACL array to a storable string
+     *
+     * Normally ACL permissions will be an array.
+     * We'll also allow a comma-separated string.
+     *
+     * @param string|array $p
+     * @return string
+     */
+    function perms2Str($p) {
+        $ret = '';
+        if (is_array($p)) {
+            $tmp = $p;
+        } else {
+            $tmp = explode(',', $p);
+        }
+
+        if (is_array($tmp)) {
+            array_walk($tmp, 'Text::sanitiseAcl');
+            $ret = implode('', $tmp);
+        }
+        return $ret;
+    }
+
+    /**
+     * load template $s
+     *
+     * @param string $s
+     * @param string $root
+     * @return string
+     */
+    function getMarkupTemplate($s, $root = '') {
+        $stamp1 = microtime(true);
+
+        $a = get_app();
+        $t = $a->getTemplateEngine();
+        try {
+            $template = $t->getTemplateFile($s, $root);
+        } catch (Exception $e) {
+            echo "<pre><b>" . __FUNCTION__ . "</b>: " . $e->getMessage() . "</pre>";
+            killme();
+        }
+
+        $a->saveTimestamp($stamp1, "file");
+
+        return $template;
+    }
+
 }

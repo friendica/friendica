@@ -202,7 +202,7 @@ function directory_content(App $a)
 		}
 		DBA::close($r);
 
-		$tpl = get_markup_template('directory_header.tpl');
+		$tpl = Text::getMarkupTemplate('directory_header.tpl');
 
 		$o .= Text::replaceMacros($tpl, [
 			'$search'    => $search,

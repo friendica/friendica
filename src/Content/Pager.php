@@ -173,7 +173,7 @@ class Pager
 			]
 		];
 
-		$tpl = get_markup_template('paginate.tpl');
+		$tpl = Text::getMarkupTemplate('paginate.tpl');
 		return Text::replaceMacros($tpl, ['pager' => $data]);
 	}
 
@@ -277,7 +277,7 @@ class Pager
 			];
 		}
 
-		$tpl = get_markup_template('paginate.tpl');
+		$tpl = Text::getMarkupTemplate('paginate.tpl');
 		return Text::replaceMacros($tpl, ['pager' => $data]);
 	}
 }

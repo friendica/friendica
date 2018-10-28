@@ -133,7 +133,7 @@ function notifications_content(App $a)
 		System::jsonExit($notifs);
 	}
 
-	$notif_tpl = get_markup_template('notifications.tpl');
+	$notif_tpl = Text::getMarkupTemplate('notifications.tpl');
 
 	$notif_show_lnk = [
 		'href' => ($show ? 'notifications/' . $notifs['ident'] : 'notifications/' . $notifs['ident'] . '?show=all' ),
@@ -142,8 +142,8 @@ function notifications_content(App $a)
 
 	// Process the data for template creation
 	if (defaults($notifs, 'ident', '') === 'introductions') {
-		$sugg = get_markup_template('suggestions.tpl');
-		$tpl = get_markup_template('intros.tpl');
+		$sugg = Text::getMarkupTemplate('suggestions.tpl');
+		$tpl = Text::getMarkupTemplate('intros.tpl');
 
 		// The link to switch between ignored and normal connection requests
 		$notif_show_lnk = [
@@ -209,7 +209,7 @@ function notifications_content(App $a)
 						$helptext3 = L10n::t('Accepting %s as a sharer allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $notif['name']);
 					}
 
-					$dfrn_tpl = get_markup_template('netfriend.tpl');
+					$dfrn_tpl = Text::getMarkupTemplate('netfriend.tpl');
 					$dfrn_text = Text::replaceMacros($dfrn_tpl, [
 						'$intro_id'    => $notif['intro_id'],
 						'$friend_selected' => $friend_selected,
@@ -294,7 +294,7 @@ function notifications_content(App $a)
 				'notify'      => 'notify.tpl',
 			];
 
-			$tpl_notif = get_markup_template($notification_templates[$notif['label']]);
+			$tpl_notif = Text::getMarkupTemplate($notification_templates[$notif['label']]);
 
 			$notif_content[] = Text::replaceMacros($tpl_notif, [
 				'$item_label' => $notif['label'],

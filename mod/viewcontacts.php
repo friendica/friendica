@@ -125,7 +125,7 @@ function viewcontacts_content(App $a)
 	}
 
 
-	$tpl = get_markup_template("viewcontact_template.tpl");
+	$tpl = Text::getMarkupTemplate("viewcontact_template.tpl");
 	$o .= Text::replaceMacros($tpl, [
 		'$title' => L10n::t('Contacts'),
 		'$contacts' => $contacts,

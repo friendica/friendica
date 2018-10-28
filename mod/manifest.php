@@ -7,7 +7,7 @@ use Friendica\Core\Config;
 
 function manifest_content(App $a) {
 
-	$tpl = get_markup_template('manifest.tpl');
+	$tpl = Text::getMarkupTemplate('manifest.tpl');
 
 	header('Content-type: application/manifest+json');
 

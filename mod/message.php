@@ -37,14 +37,14 @@ function message_init(App $a)
 		'accesskey' => 'm',
 	];
 
-	$tpl = get_markup_template('message_side.tpl');
+	$tpl = Text::getMarkupTemplate('message_side.tpl');
 	$a->page['aside'] = Text::replaceMacros($tpl, [
 		'$tabs' => $tabs,
 		'$new' => $new,
 	]);
 	$base = System::baseUrl();
 
-	$head_tpl = get_markup_template('message-head.tpl');
+	$head_tpl = Text::getMarkupTemplate('message-head.tpl');
 	$a->page['htmlhead'] .= Text::replaceMacros($head_tpl, [
 		'$baseurl' => System::baseUrl(true),
 		'$base' => $base
@@ -105,7 +105,7 @@ function message_content(App $a)
 
 	$myprofile = System::baseUrl() . '/profile/' . $a->user['nickname'];
 
-	$tpl = get_markup_template('mail_head.tpl');
+	$tpl = Text::getMarkupTemplate('mail_head.tpl');
 	if ($a->argc > 1 && $a->argv[1] == 'new') {
 		$button = [
 			'label' => L10n::t('Discard'),
@@ -144,7 +144,7 @@ function message_content(App $a)
 			}
 
 			//$a->page['aside'] = '';
-			return Text::replaceMacros(get_markup_template('confirm.tpl'), [
+			return Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this message?'),
 				'$extra_inputs' => $inputs,
@@ -199,7 +199,7 @@ function message_content(App $a)
 	if (($a->argc > 1) && ($a->argv[1] === 'new')) {
 		$o .= $header;
 
-		$tpl = get_markup_template('msg-header.tpl');
+		$tpl = Text::getMarkupTemplate('msg-header.tpl');
 		$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$nickname' => $a->user['nickname'],
@@ -244,7 +244,7 @@ function message_content(App $a)
 		// the ugly select box
 		$select = ACL::getMessageContactSelectHTML('messageto', 'message-to-select', $preselect, 4, 10);
 
-		$tpl = get_markup_template('prv_message.tpl');
+		$tpl = Text::getMarkupTemplate('prv_message.tpl');
 		$o .= Text::replaceMacros($tpl, [
 			'$header' => L10n::t('Send Private Message'),
 			'$to' => L10n::t('To:'),
@@ -339,7 +339,7 @@ function message_content(App $a)
 			intval(local_user())
 		);
 
-		$tpl = get_markup_template('msg-header.tpl');
+		$tpl = Text::getMarkupTemplate('msg-header.tpl');
 		$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$nickname' => $a->user['nickname'],
@@ -399,7 +399,7 @@ function message_content(App $a)
 		$select = $message['name'] . '<input type="hidden" name="messageto" value="' . $contact_id . '" />';
 		$parent = '<input type="hidden" name="replyto" value="' . $message['parent-uri'] . '" />';
 
-		$tpl = get_markup_template('mail_display.tpl');
+		$tpl = Text::getMarkupTemplate('mail_display.tpl');
 		$o = Text::replaceMacros($tpl, [
 			'$thread_id' => $a->argv[1],
 			'$thread_subject' => $message['title'],
@@ -454,7 +454,7 @@ function render_messages(array $msg, $t)
 {
 	$a = get_app();
 
-	$tpl = get_markup_template($t);
+	$tpl = Text::getMarkupTemplate($t);
 	$rslt = '';
 
 	$myprofile = System::baseUrl() . '/profile/' . $a->user['nickname'];

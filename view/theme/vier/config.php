@@ -71,7 +71,7 @@ function theme_admin(App $a) {
 	if ($helperlist == "")
 		$helperlist = "https://forum.friendi.ca/profile/helpers";
 
-	$t = get_markup_template("theme_admin_settings.tpl");
+	$t = Text::getMarkupTemplate("theme_admin_settings.tpl");
 	$o = Text::replaceMacros($t, [
 		'$helperlist' => ['vier_helperlist', L10n::t('Comma separated list of helper forums'), $helperlist, '', ''],
 		]);
@@ -115,7 +115,7 @@ function vier_form(App $a, $style, $show_pages, $show_profiles, $show_helpers, $
 
 	$show_or_not = ['0' => L10n::t("don't show"), '1' => L10n::t("show"),];
 
-	$t = get_markup_template("theme_settings.tpl");
+	$t = Text::getMarkupTemplate("theme_settings.tpl");
 	$o = Text::replaceMacros($t, [
 		'$submit' => L10n::t('Submit'),
 		'$baseurl' => System::baseUrl(),

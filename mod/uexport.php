@@ -47,7 +47,7 @@ function uexport_content(App $a) {
 	];
 	Addon::callHooks('uexport_options', $options);
 
-	$tpl = get_markup_template("uexport.tpl");
+	$tpl = Text::getMarkupTemplate("uexport.tpl");
 	return Text::replaceMacros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$title' => L10n::t('Export personal data'),

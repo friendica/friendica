@@ -274,11 +274,13 @@ function unxmlify($s) {
  * @return string html for loader
  */
 function scroll_loader() {
-	$tpl = get_markup_template("scroll_loader.tpl");
+	/* $tpl = Text::getMarkupTemplate("scroll_loader.tpl");
 	return replace_macros($tpl, [
 		'wait' => L10n::t('Loading more entries...'),
 		'end' => L10n::t('The end')
-	]);
+	]); */
+
+	return Text::scrollLoader();
 }
 
 
@@ -291,7 +293,7 @@ function scroll_loader() {
 function expand_acl($s) {
 	// turn string array of angle-bracketed elements into numeric array
 	// e.g. "<1><2><3>" => array(1,2,3);
-	$ret = [];
+	/* $ret = [];
 
 	if (strlen($s)) {
 		$t = str_replace('<', '', $s);
@@ -302,7 +304,8 @@ function expand_acl($s) {
 			}
 		}
 	}
-	return $ret;
+	return $ret; */
+	return Text::expandAcl($s);
 }
 
 
@@ -310,13 +313,13 @@ function expand_acl($s) {
  * Wrap ACL elements in angle brackets for storage
  * @param string $item
  */
-function sanitise_acl(&$item) {
+/* function sanitise_acl(&$item) {
 	if (intval($item)) {
 		$item = '<' . intval(notags(trim($item))) . '>';
 	} else {
 		unset($item);
 	}
-}
+} */
 
 
 /**
@@ -329,7 +332,7 @@ function sanitise_acl(&$item) {
  * @return string
  */
 function perms2str($p) {
-	$ret = '';
+	/* $ret = '';
 	if (is_array($p)) {
 		$tmp = $p;
 	} else {
@@ -340,7 +343,9 @@ function perms2str($p) {
 		array_walk($tmp, 'sanitise_acl');
 		$ret = implode('', $tmp);
 	}
-	return $ret;
+	return $ret; */
+
+	return Text::perms2Str($p);
 }
 
 /**
@@ -351,7 +356,7 @@ function perms2str($p) {
  * @return string
  */
 function get_markup_template($s, $root = '') {
-	$stamp1 = microtime(true);
+	/* $stamp1 = microtime(true);
 
 	$a = get_app();
 	$t = $a->getTemplateEngine();
@@ -364,7 +369,8 @@ function get_markup_template($s, $root = '') {
 
 	$a->saveTimestamp($stamp1, "file");
 
-	return $template;
+	return $template; */
+	return Text::getMarkeupTemplate($s, $root);
 }
 
 /**

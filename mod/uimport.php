@@ -48,7 +48,7 @@ function uimport_content(App $a)
 		unset($_SESSION['mobile-theme']);
 	}
 
-	$tpl = get_markup_template("uimport.tpl");
+	$tpl = Text::getMarkupTemplate("uimport.tpl");
 	return Text::replaceMacros($tpl, [
 		'$regbutt' => L10n::t('Import'),
 		'$import' => [

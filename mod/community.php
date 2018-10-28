@@ -120,7 +120,7 @@ function community_content(App $a, $update = 0)
 			];
 		}
 
-		$tab_tpl = get_markup_template('common_tabs.tpl');
+		$tab_tpl = Text::getMarkupTemplate('common_tabs.tpl');
 		$o .= Text::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
 
 		Nav::setSelected('community');
@@ -199,7 +199,7 @@ function community_content(App $a, $update = 0)
 		$o .= $pager->renderMinimal(count($r));
 	}
 
-	$t = get_markup_template("community.tpl");
+	$t = Text::getMarkupTemplate("community.tpl");
 	return Text::replaceMacros($t, [
 		'$content' => $o,
 		'$header' => '',

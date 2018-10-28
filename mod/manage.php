@@ -177,7 +177,7 @@ function manage_content(App $a) {
 		$identities[$key]['notifications'] = $notifications;
 	}
 
-	$o = Text::replaceMacros(get_markup_template('manage.tpl'), [
+	$o = Text::replaceMacros(Text::getMarkupTemplate('manage.tpl'), [
 		'$title' => L10n::t('Manage Identities and/or Pages'),
 		'$desc' => L10n::t('Toggle between different identities or community/group pages which share your account details or which you have been granted "manage" permissions'),
 		'$choose' => L10n::t('Select an identity to manage: '),

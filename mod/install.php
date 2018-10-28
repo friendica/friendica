@@ -136,7 +136,7 @@ function install_content(App $a) {
 	}
 
 	if ($db_return_text != "") {
-		$tpl = get_markup_template('install.tpl');
+		$tpl = Text::getMarkupTemplate('install.tpl');
 		return Text::replaceMacros($tpl, [
 			'$title' => $install_title,
 			'$pass' => "",
@@ -153,7 +153,7 @@ function install_content(App $a) {
 
 			$status = $install->checkAll($a->getBasePath(), $a->getBaseURL());
 
-			$tpl = get_markup_template('install_checks.tpl');
+			$tpl = Text::getMarkupTemplate('install_checks.tpl');
 			$o .= Text::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('System check'),
@@ -177,7 +177,7 @@ function install_content(App $a) {
 			$phpath    = Text::noTags(trim(defaults($_POST, 'phpath'   , ''         )));
 			$adminmail = Text::noTags(trim(defaults($_POST, 'adminmail', ''         )));
 
-			$tpl = get_markup_template('install_db.tpl');
+			$tpl = Text::getMarkupTemplate('install_db.tpl');
 			$o .= Text::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('Database connection'),
@@ -215,7 +215,7 @@ function install_content(App $a) {
 			/* Installed langs */
 			$lang_choices = L10n::getAvailableLanguages();
 
-			$tpl = get_markup_template('install_settings.tpl');
+			$tpl = Text::getMarkupTemplate('install_settings.tpl');
 			$o .= Text::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('Site settings'),

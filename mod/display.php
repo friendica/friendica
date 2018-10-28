@@ -263,7 +263,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$conversation = '';
 	}
 
-	$a->page['htmlhead'] .= Text::replaceMacros(get_markup_template('display-head.tpl'),
+	$a->page['htmlhead'] .= Text::replaceMacros(Text::getMarkupTemplate('display-head.tpl'),
 				['$alternate' => $alternate,
 					'$conversation' => $conversation]);
 

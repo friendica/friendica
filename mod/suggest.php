@@ -34,7 +34,7 @@ function suggest_init(App $a)
 				}
 			}
 
-			$a->page['content'] = Text::replaceMacros(get_markup_template('confirm.tpl'), [
+			$a->page['content'] = Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this suggestion?'),
 				'$extra_inputs' => $inputs,
@@ -112,7 +112,7 @@ function suggest_content(App $a)
 		$entries[] = $entry;
 	}
 
-	$tpl = get_markup_template('viewcontact_template.tpl');
+	$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
 	$o .= Text::replaceMacros($tpl,[
 		'$title' => L10n::t('Friend Suggestions'),

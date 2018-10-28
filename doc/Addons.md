@@ -160,7 +160,7 @@ In your code, like in the function addon_name_content(), load the template file 
 ```php
 # load template file. first argument is the template name,
 # second is the addon path relative to friendica top folder
-$tpl = get_markup_template('mytemplate.tpl', 'addon/addon_name/');
+$tpl = Text::getMarkupTemplate('mytemplate.tpl', 'addon/addon_name/');
 
 # apply template. first argument is the loaded template,
 # second an array of 'name' => 'values' to pass to template
