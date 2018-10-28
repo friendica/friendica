@@ -326,9 +326,6 @@ class Text
         return (count($a) && in_array($s,$a));
     }
 
-    /* setup int->string log level map */
-    public $LOGGER_LEVELS = [];
-
     /**
      * @brief Logs the given message at the given log level
      *
@@ -347,6 +344,7 @@ class Text
     function logger($msg, $level = LOGGER_INFO) {
         $a = get_app();
         global $LOGGER_LEVELS;
+        $LOGGER_LEVELS = [];
 
         $debugging = Config::get('system', 'debugging');
         $logfile   = Config::get('system', 'logfile');
