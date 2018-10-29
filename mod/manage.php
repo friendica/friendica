@@ -10,8 +10,6 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 
-require_once "include/text.php";
-
 function manage_post(App $a) {
 
 	if (! local_user()) {

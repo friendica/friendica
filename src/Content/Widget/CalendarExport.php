@@ -11,7 +11,6 @@ use Friendica\Content\Text;
 use Friendica\Core\L10n;
 
 require_once 'boot.php';
-require_once 'include/text.php';
 
 /**
  * TagCloud widget

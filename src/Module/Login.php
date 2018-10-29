@@ -19,7 +19,6 @@ use Friendica\Util\Network;
 use LightOpenID;
 
 require_once 'boot.php';
-require_once 'include/text.php';
 
 /**
  * Login module

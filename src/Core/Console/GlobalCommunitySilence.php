@@ -8,8 +8,6 @@ use Friendica\Database\DBA;
 use Friendica\Network\Probe;
 use RuntimeException;
 
-require_once 'include/text.php';
-
 /**
  * @brief tool to silence accounts on the global community page
  *

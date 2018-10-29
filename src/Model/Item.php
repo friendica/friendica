@@ -30,7 +30,6 @@ use Text_LanguageDetect;
 
 require_once 'boot.php';
 require_once 'include/items.php';
-require_once 'include/text.php';
 
 class Item extends BaseObject
 {

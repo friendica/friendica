@@ -12,7 +12,6 @@ class CurlResultTest extends TestCase
 		parent::setUp();
 
 		require_once __DIR__.'/../../../boot.php';
-		require_once __DIR__.'/../../../include/text.php';
 	}
 
 	/**

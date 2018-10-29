@@ -15,8 +15,6 @@ use Friendica\Model\Contact;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 
-require_once 'include/text.php';
-
 /**
  * @brief Controller for /match.
  *

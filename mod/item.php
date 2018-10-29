@@ -37,7 +37,6 @@ use Friendica\Util\Emailer;
 use Friendica\Util\Security;
 
 require_once 'include/enotify.php';
-require_once 'include/text.php';
 require_once 'include/items.php';
 
 function item_post(App $a) {

@@ -208,9 +208,6 @@ class InstallTest extends TestCase
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
 
-		// needed because of "normalise_link"
-		require_once __DIR__ . '/../../../include/text.php';
-
 		$install = new Install();
 
 		$this->assertFalse($install->checkHtAccess('https://test', 'https://test'));
@@ -247,9 +244,6 @@ class InstallTest extends TestCase
 
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
-
-		// needed because of "normalise_link"
-		require_once __DIR__ . '/../../../include/text.php';
 
 		$install = new Install();
 

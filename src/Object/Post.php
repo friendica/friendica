@@ -22,7 +22,6 @@ use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Temporal;
 
 require_once 'include/dba.php';
-require_once 'include/text.php';
 require_once 'boot.php';
 require_once 'include/conversation.php';
 

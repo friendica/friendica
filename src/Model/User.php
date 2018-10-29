@@ -25,7 +25,6 @@ use LightOpenID;
 require_once 'boot.php';
 require_once 'include/dba.php';
 require_once 'include/enotify.php';
-require_once 'include/text.php';
 /**
  * @brief This class handles User related functions
  */

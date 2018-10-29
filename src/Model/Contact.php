@@ -28,7 +28,6 @@ use Friendica\Util\Network;
 
 require_once 'boot.php';
 require_once 'include/dba.php';
-require_once 'include/text.php';
 
 /**
  * @brief functions for interacting with a contact
