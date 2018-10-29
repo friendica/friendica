@@ -2255,7 +2255,7 @@ class DFRN
 				}
 			}
 
-			if ($Blink && link_compare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
+			if ($Blink && Text::linkCompare($Blink, System::baseUrl() . "/profile/" . $importer["nickname"])) {
 				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
 				$item['id'] = $posted_id;
@@ -2737,7 +2737,7 @@ class DFRN
 				Text::logger("Contact ".$importer["id"]." isn't known to user ".$importer["importer_uid"].". The post will be ignored.", LOGGER_DEBUG);
 				return;
 			}
-			if (!link_compare($item["owner-link"], $importer["url"])) {
+			if (!Text::linkCompare($item["owner-link"], $importer["url"])) {
 				/*
 				 * The item owner info is not our contact. It's OK and is to be expected if this is a tgroup delivery,
 				 * but otherwise there's a possible data mixup on the sender's system.
@@ -3089,7 +3089,7 @@ class DFRN
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
+				if (Text::linkCompare($link, $mtch[1]) || Text::linkCompare($dlink, $mtch[1])) {
 					$mention = true;
 					Text::logger('mention found: ' . $mtch[2]);
 				}

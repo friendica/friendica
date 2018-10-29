@@ -803,51 +803,51 @@ class Profile
 				$profile['religion'] = [L10n::t('Religion:'), $a->profile['religion']];
 			}
 
-			if ($txt = prepare_text($a->profile['about'])) {
+			if ($txt = Text::prepareText($a->profile['about'])) {
 				$profile['about'] = [L10n::t('About:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['interest'])) {
+			if ($txt = Text::prepareText($a->profile['interest'])) {
 				$profile['interest'] = [L10n::t('Hobbies/Interests:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['likes'])) {
+			if ($txt = Text::prepareText($a->profile['likes'])) {
 				$profile['likes'] = [L10n::t('Likes:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['dislikes'])) {
+			if ($txt = Text::prepareText($a->profile['dislikes'])) {
 				$profile['dislikes'] = [L10n::t('Dislikes:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['contact'])) {
+			if ($txt = Text::prepareText($a->profile['contact'])) {
 				$profile['contact'] = [L10n::t('Contact information and Social Networks:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['music'])) {
+			if ($txt = Text::prepareText($a->profile['music'])) {
 				$profile['music'] = [L10n::t('Musical interests:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['book'])) {
+			if ($txt = Text::prepareText($a->profile['book'])) {
 				$profile['book'] = [L10n::t('Books, literature:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['tv'])) {
+			if ($txt = Text::prepareText($a->profile['tv'])) {
 				$profile['tv'] = [L10n::t('Television:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['film'])) {
+			if ($txt = Text::prepareText($a->profile['film'])) {
 				$profile['film'] = [L10n::t('Film/dance/culture/entertainment:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['romance'])) {
+			if ($txt = Text::prepareText($a->profile['romance'])) {
 				$profile['romance'] = [L10n::t('Love/Romance:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['work'])) {
+			if ($txt = Text::prepareText($a->profile['work'])) {
 				$profile['work'] = [L10n::t('Work/employment:'), $txt];
 			}
 
-			if ($txt = prepare_text($a->profile['education'])) {
+			if ($txt = Text::prepareText($a->profile['education'])) {
 				$profile['education'] = [L10n::t('School/education:'), $txt];
 			}
 
@@ -1138,7 +1138,7 @@ class Profile
 		}
 		$achar = strpos($s, '?') ? '&' : '?';
 		$mine = self::getMyURL();
-		if ($mine && !link_compare($mine, $s)) {
+		if ($mine && !Text::linkCompare($mine, $s)) {
 			return $s . $achar . 'zrl=' . urlencode($mine);
 		}
 		return $s;

@@ -920,7 +920,8 @@ function normalise_link($url) {
  *
  */
 function link_compare($a, $b) {
-	return (strcasecmp(normalise_link($a), normalise_link($b)) === 0);
+	//return (strcasecmp(normalise_link($a), normalise_link($b)) === 0);
+	return Text::linkCompare($a, $b);
 }
 
 
@@ -932,7 +933,7 @@ function link_compare($a, $b) {
  */
 function redir_private_images($a, &$item)
 {
-	$matches = false;
+	/* $matches = false;
 	$cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
@@ -945,7 +946,8 @@ function redir_private_images($a, &$item)
 				$item['body'] = str_replace($mtch[0], '[img]' . $img_url . '[/img]', $item['body']);
 			}
 		}
-	}
+	} */
+	Text::redirPrivateImages($a, $item);
 }
 
 /**
@@ -960,7 +962,7 @@ function redir_private_images($a, &$item)
  */
 function put_item_in_cache(&$item, $update = false)
 {
-	$body = $item["body"];
+	/* $body = $item["body"];
 
 	$rendered_hash = defaults($item, 'rendered-hash', '');
 	$rendered_html = defaults($item, 'rendered-html', '');
@@ -998,7 +1000,8 @@ function put_item_in_cache(&$item, $update = false)
 		}
 	}
 
-	$item["body"] = $body;
+	$item["body"] = $body; */
+	Text::putItemInCache($item, $update);
 }
 
 /**
@@ -1016,7 +1019,7 @@ function put_item_in_cache(&$item, $update = false)
  */
 function prepare_body(array &$item, $attach = false, $is_preview = false)
 {
-	$a = get_app();
+	/* $a = get_app();
 	Addon::callHooks('prepare_body_init', $item);
 
 	// In order to provide theme developers more possibilities, event items
@@ -1175,7 +1178,9 @@ function prepare_body(array &$item, $attach = false, $is_preview = false)
 	$hook_data = ['item' => $item, 'html' => $s];
 	Addon::callHooks('prepare_body_final', $hook_data);
 
-	return $hook_data['html'];
+	return $hook_data['html']; */
+
+	return Text::prepareBody($item, $attach, $is_preview);
 }
 
 /**
@@ -1189,7 +1194,7 @@ function prepare_body(array &$item, $attach = false, $is_preview = false)
  */
 function apply_content_filter($html, array $reasons)
 {
-	if (count($reasons)) {
+	/* if (count($reasons)) {
 		$tpl = get_markup_template('wall/content_filter.tpl');
 		$html = replace_macros($tpl, [
 			'$reasons'   => $reasons,
@@ -1199,7 +1204,8 @@ function apply_content_filter($html, array $reasons)
 		]);
 	}
 
-	return $html;
+	return $html; */
+	return Text::applyContentFilter($html, $reasons);
 }
 
 /**
@@ -1209,13 +1215,14 @@ function apply_content_filter($html, array $reasons)
  * @return string Formattet HTML.
  */
 function prepare_text($text) {
-	if (stristr($text, '[nosmile]')) {
+	/* if (stristr($text, '[nosmile]')) {
 		$s = BBCode::convert($text);
 	} else {
 		$s = Smilies::replace(BBCode::convert($text));
 	}
 
-	return trim($s);
+	return trim($s); */
+	return Text::prepareText($text);
 }
 
 /**

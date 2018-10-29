@@ -381,7 +381,7 @@ Hook data:
 - **filter_reasons** (input/output): reasons array
 
 ### prepare_body
-Called after the HTML conversion in `prepare_body()`.
+Called after the HTML conversion in `Text::prepareBody()`.
 Hook data:
 
 - **item** (input): item array
@@ -390,14 +390,14 @@ Hook data:
 - **filter_reasons** (input): reasons array
 
 ### prepare_body_final
-Called at the end of `prepare_body()`.
+Called at the end of `Text::prepareBody()`.
 Hook data:
 
 - **item**: item array (input)
 - **html**: converted item body (input/output)
 
 ### put_item_in_cache
-Called after `prepare_text()` in `put_item_in_cache()`.
+Called after `Text::prepareText()` in `Text::putItemInCache()`.
 Hook data:
 
 - **item** (input): item array
@@ -454,10 +454,10 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Addon::callHooks('contact_block_end', $arr);
     Addon::callHooks('poke_verbs', $arr);
-    Addon::callHooks('put_item_in_cache', $hook_data);
+    Addon::callHooks('Text::putItemInCache', $hook_data);
     Addon::callHooks('prepare_body_init', $item);
     Addon::callHooks('prepare_body_content_filter', $hook_data);
-    Addon::callHooks('prepare_body', $hook_data);
+    Addon::callHooks('Text::prepareBody', $hook_data);
     Addon::callHooks('prepare_body_final', $hook_data);
 
 ### include/items.php

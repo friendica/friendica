@@ -636,7 +636,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 				$lock = false;
 				$likebuttons = false;
 
-				$body = prepare_body($item, true, $preview);
+				$body = Text::prepareBody($item, true, $preview);
 
 				list($categories, $folders) = get_cats_and_terms($item);
 

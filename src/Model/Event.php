@@ -901,7 +901,7 @@ class Event extends BaseObject
 		$tpl = Text::getMarkupTemplate('event_stream_item.tpl');
 		$return = Text::replaceMacros($tpl, [
 			'$id'             => $item['event-id'],
-			'$title'          => prepare_text($item['event-summary']),
+			'$title'          => Text::prepareText($item['event-summary']),
 			'$dtstart_label'  => L10n::t('Starts:'),
 			'$dtstart_title'  => $dtstart_title,
 			'$dtstart_dt'     => $dtstart_dt,
@@ -919,7 +919,7 @@ class Event extends BaseObject
 			'$author_name'    => $item['author-name'],
 			'$author_link'    => $profile_link,
 			'$author_avatar'  => $item['author-avatar'],
-			'$description'    => prepare_text($item['event-desc']),
+			'$description'    => Text::prepareText($item['event-desc']),
 			'$location_label' => L10n::t('Location:'),
 			'$show_map_label' => L10n::t('Show map'),
 			'$hide_map_label' => L10n::t('Hide map'),
@@ -968,7 +968,7 @@ class Event extends BaseObject
 			}
 		}
 
-		$location['name'] = prepare_text($location['name']);
+		$location['name'] = Text::prepareText($location['name']);
 
 		// Construct the map HTML.
 		if (isset($location['address'])) {

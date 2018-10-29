@@ -816,4 +816,313 @@ class Text
         return rtrim($ret,'/');
     }
 
+    /**
+     * Compare two URLs to see if they are the same, but ignore
+     * slight but hopefully insignificant differences such as if one
+     * is https and the other isn't, or if one is www.something and
+     * the other isn't - and also ignore case differences.
+     *
+     * @param string $a first url
+     * @param string $b second url
+     * @return boolean True if the URLs match, otherwise False
+     *
+     */
+    function linkCompare($a, $b) {
+        return (strcasecmp(self::normaliseLink($a), self::normaliseLink($b)) === 0);
+    }
+
+    /**
+     * @brief Find any non-embedded images in private items and add redir links to them
+     *
+     * @param App $a
+     * @param array &$item The field array of an item row
+     */
+    function redirPrivateImages($a, &$item)
+    {
+        $matches = false;
+        $cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
+        if ($cnt) {
+            foreach ($matches as $mtch) {
+                if (strpos($mtch[1], '/redir') !== false) {
+                    continue;
+                }
+
+                if ((local_user() == $item['uid']) && ($item['private'] == 1) && ($item['contact-id'] != $a->contact['id']) && ($item['network'] == Protocol::DFRN)) {
+                    $img_url = 'redir?f=1&quiet=1&url=' . urlencode($mtch[1]) . '&conurl=' . urlencode($item['author-link']);
+                    $item['body'] = str_replace($mtch[0], '[img]' . $img_url . '[/img]', $item['body']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the "rendered-html" field of the provided item
+     *
+     * Body is preserved to avoid side-effects as we modify it just-in-time for spoilers and private image links
+     *
+     * @param array $item
+     * @param bool  $update
+     *
+     * @todo Remove reference, simply return "rendered-html" and "rendered-hash"
+     */
+    function putItemInCache(&$item, $update = false)
+    {
+        $body = $item["body"];
+
+        $rendered_hash = defaults($item, 'rendered-hash', '');
+        $rendered_html = defaults($item, 'rendered-html', '');
+
+        if ($rendered_hash == ''
+            || $rendered_html == ""
+            || $rendered_hash != hash("md5", $item["body"])
+            || Config::get("system", "ignore_cache")
+        ) {
+            $a = get_app();
+            self::redirPrivateImages($a, $item);
+
+            $item["rendered-html"] = self::prepareText($item["body"]);
+            $item["rendered-hash"] = hash("md5", $item["body"]);
+
+            $hook_data = ['item' => $item, 'rendered-html' => $item['rendered-html'], 'rendered-hash' => $item['rendered-hash']];
+            Addon::callHooks('Text::putItemInCache', $hook_data);
+            $item['rendered-html'] = $hook_data['rendered-html'];
+            $item['rendered-hash'] = $hook_data['rendered-hash'];
+            unset($hook_data);
+
+            // Force an update if the generated values differ from the existing ones
+            if ($rendered_hash != $item["rendered-hash"]) {
+                $update = true;
+            }
+
+            // Only compare the HTML when we forcefully ignore the cache
+            if (Config::get("system", "ignore_cache") && ($rendered_html != $item["rendered-html"])) {
+                $update = true;
+            }
+
+            if ($update && !empty($item["id"])) {
+                Item::update(['rendered-html' => $item["rendered-html"], 'rendered-hash' => $item["rendered-hash"]],
+                        ['id' => $item["id"]]);
+            }
+        }
+
+        $item["body"] = $body;
+    }
+
+    /**
+     * @brief Given an item array, convert the body element from bbcode to html and add smilie icons.
+     * If attach is true, also add icons for item attachments.
+     *
+     * @param array   $item
+     * @param boolean $attach
+     * @param boolean $is_preview
+     * @return string item body html
+     * @hook prepare_body_init item array before any work
+     * @hook prepare_body_content_filter ('item'=>item array, 'filter_reasons'=>string array) before first bbcode to html
+     * @hook prepare_body ('item'=>item array, 'html'=>body string, 'is_preview'=>boolean, 'filter_reasons'=>string array) after first bbcode to html
+     * @hook prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
+     */
+    function prepareBody(array &$item, $attach = false, $is_preview = false)
+    {
+        $a = get_app();
+        Addon::callHooks('prepare_body_init', $item);
+
+        // In order to provide theme developers more possibilities, event items
+        // are treated differently.
+        if ($item['object-type'] === ACTIVITY_OBJ_EVENT && isset($item['event-id'])) {
+            $ev = Event::getItemHTML($item);
+            return $ev;
+        }
+
+        $tags = \Friendica\Model\Term::populateTagsFromItem($item);
+
+        $item['tags'] = $tags['tags'];
+        $item['hashtags'] = $tags['hashtags'];
+        $item['mentions'] = $tags['mentions'];
+
+        // Compile eventual content filter reasons
+        $filter_reasons = [];
+        if (!$is_preview && public_contact() != $item['author-id']) {
+            if (!empty($item['content-warning']) && (!local_user() || !PConfig::get(local_user(), 'system', 'disable_cw', false))) {
+                $filter_reasons[] = L10n::t('Content warning: %s', $item['content-warning']);
+            }
+
+            $hook_data = [
+                'item' => $item,
+                'filter_reasons' => $filter_reasons
+            ];
+            Addon::callHooks('prepare_body_content_filter', $hook_data);
+            $filter_reasons = $hook_data['filter_reasons'];
+            unset($hook_data);
+        }
+
+        // Update the cached values if there is no "zrl=..." on the links.
+        $update = (!local_user() && !remote_user() && ($item["uid"] == 0));
+
+        // Or update it if the current viewer is the intented viewer.
+        if (($item["uid"] == local_user()) && ($item["uid"] != 0)) {
+            $update = true;
+        }
+
+        self::putItemInCache($item, $update);
+        $s = $item["rendered-html"];
+
+        $hook_data = [
+            'item' => $item,
+            'html' => $s,
+            'preview' => $is_preview,
+            'filter_reasons' => $filter_reasons
+        ];
+        Addon::callHooks('Text::prepareBody', $hook_data);
+        $s = $hook_data['html'];
+        unset($hook_data);
+
+        if (!$attach) {
+            // Replace the blockquotes with quotes that are used in mails.
+            $mailquote = '<blockquote type="cite" class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex;">';
+            $s = str_replace(['<blockquote>', '<blockquote class="spoiler">', '<blockquote class="author">'], [$mailquote, $mailquote, $mailquote], $s);
+            return $s;
+        }
+
+        $as = '';
+        $vhead = false;
+        $matches = [];
+        preg_match_all('|\[attach\]href=\"(.*?)\" length=\"(.*?)\" type=\"(.*?)\"(?: title=\"(.*?)\")?|', $item['attach'], $matches, PREG_SET_ORDER);
+        foreach ($matches as $mtch) {
+            $mime = $mtch[3];
+
+            $the_url = Contact::magicLinkById($item['author-id'], $mtch[1]);
+
+            if (strpos($mime, 'video') !== false) {
+                if (!$vhead) {
+                    $vhead = true;
+                    $a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), [
+                        '$baseurl' => System::baseUrl(),
+                    ]);
+                }
+
+                $url_parts = explode('/', $the_url);
+                $id = end($url_parts);
+                $as .= replace_macros(get_markup_template('video_top.tpl'), [
+                    '$video' => [
+                        'id'     => $id,
+                        'title'  => L10n::t('View Video'),
+                        'src'    => $the_url,
+                        'mime'   => $mime,
+                    ],
+                ]);
+            }
+
+            $filetype = strtolower(substr($mime, 0, strpos($mime, '/')));
+            if ($filetype) {
+                $filesubtype = strtolower(substr($mime, strpos($mime, '/') + 1));
+                $filesubtype = str_replace('.', '-', $filesubtype);
+            } else {
+                $filetype = 'unkn';
+                $filesubtype = 'unkn';
+            }
+
+            $title = escape_tags(trim(!empty($mtch[4]) ? $mtch[4] : $mtch[1]));
+            $title .= ' ' . $mtch[2] . ' ' . L10n::t('bytes');
+
+            $icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
+            $as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
+        }
+
+        if ($as != '') {
+            $s .= '<div class="body-attach">'.$as.'<div class="clear"></div></div>';
+        }
+
+        // Map.
+        if (strpos($s, '<div class="map">') !== false && x($item, 'coord')) {
+            $x = Map::byCoordinates(trim($item['coord']));
+            if ($x) {
+                $s = preg_replace('/\<div class\=\"map\"\>/', '$0' . $x, $s);
+            }
+        }
+
+
+        // Look for spoiler.
+        $spoilersearch = '<blockquote class="spoiler">';
+
+        // Remove line breaks before the spoiler.
+        while ((strpos($s, "\n" . $spoilersearch) !== false)) {
+            $s = str_replace("\n" . $spoilersearch, $spoilersearch, $s);
+        }
+        while ((strpos($s, "<br />" . $spoilersearch) !== false)) {
+            $s = str_replace("<br />" . $spoilersearch, $spoilersearch, $s);
+        }
+
+        while ((strpos($s, $spoilersearch) !== false)) {
+            $pos = strpos($s, $spoilersearch);
+            $rnd = random_string(8);
+            $spoilerreplace = '<br /> <span id="spoiler-wrap-' . $rnd . '" class="spoiler-wrap fakelink" onclick="openClose(\'spoiler-' . $rnd . '\');">' . L10n::t('Click to open/close') . '</span>'.
+                        '<blockquote class="spoiler" id="spoiler-' . $rnd . '" style="display: none;">';
+            $s = substr($s, 0, $pos) . $spoilerreplace . substr($s, $pos + strlen($spoilersearch));
+        }
+
+        // Look for quote with author.
+        $authorsearch = '<blockquote class="author">';
+
+        while ((strpos($s, $authorsearch) !== false)) {
+            $pos = strpos($s, $authorsearch);
+            $rnd = random_string(8);
+            $authorreplace = '<br /> <span id="author-wrap-' . $rnd . '" class="author-wrap fakelink" onclick="openClose(\'author-' . $rnd . '\');">' . L10n::t('Click to open/close') . '</span>'.
+                        '<blockquote class="author" id="author-' . $rnd . '" style="display: block;">';
+            $s = substr($s, 0, $pos) . $authorreplace . substr($s, $pos + strlen($authorsearch));
+        }
+
+        // Replace friendica image url size with theme preference.
+        if (x($a->theme_info, 'item_image_size')){
+            $ps = $a->theme_info['item_image_size'];
+            $s = preg_replace('|(<img[^>]+src="[^"]+/photo/[0-9a-f]+)-[0-9]|', "$1-" . $ps, $s);
+        }
+
+        $s = self::applyContentFilter($s, $filter_reasons);
+
+        $hook_data = ['item' => $item, 'html' => $s];
+        Addon::callHooks('prepare_body_final', $hook_data);
+
+        return $hook_data['html'];
+    }
+
+    /**
+     * Given a HTML text and a set of filtering reasons, adds a content hiding header with the provided reasons
+     *
+     * Reasons are expected to have been translated already.
+     *
+     * @param string $html
+     * @param array  $reasons
+     * @return string
+     */
+    function applyContentFilter($html, array $reasons)
+    {
+        if (count($reasons)) {
+            $tpl = self::getMarkupTemplate('wall/content_filter.tpl');
+            $html = self::replaceMacros($tpl, [
+                '$reasons'   => $reasons,
+                '$rnd'       => self::randomString(8),
+                '$openclose' => L10n::t('Click to open/close'),
+                '$html'      => $html
+            ]);
+        }
+
+        return $html;
+    }
+
+    /**
+     * @brief Given a text string, convert from bbcode to html and add smilie icons.
+     *
+     * @param string $text String with bbcode.
+     * @return string Formattet HTML.
+     */
+    function prepareText($text) {
+        if (stristr($text, '[nosmile]')) {
+            $s = BBCode::convert($text);
+        } else {
+            $s = Smilies::replace(BBCode::convert($text));
+        }
+
+        return trim($s);
+    }
+
 }

@@ -1362,7 +1362,7 @@ class BBCode extends BaseObject
 		$text = preg_replace("/\[mail\=([$MAILSearchString]*)\](.*?)\[\/mail\]/", '<a href="mailto:$1">$2</a>', $text);
 
 		// leave open the posibility of [map=something]
-		// this is replaced in prepare_body() which has knowledge of the item location
+		// this is replaced in Text::prepareBody() which has knowledge of the item location
 
 		if (strpos($text, '[/map]') !== false) {
 			$text = preg_replace_callback(
@@ -1473,7 +1473,7 @@ class BBCode extends BaseObject
 
 		$text = str_replace('[hr]', '<hr />', $text);
 
-		// This is actually executed in prepare_body()
+		// This is actually executed in Text::prepareBody()
 
 		$text = str_replace('[nosmile]', '', $text);
 

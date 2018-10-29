@@ -118,7 +118,7 @@ function redir_init(App $a) {
 	if (!empty($url)) {
 		$my_profile = Profile::getMyURL();
 
-		if (!empty($my_profile) && !link_compare($my_profile, $url)) {
+		if (!empty($my_profile) && !Text::linkCompare($my_profile, $url)) {
 			$separator = strpos($url, '?') ? '&' : '?';
 
 			$url .= $separator . 'zrl=' . urlencode($my_profile);

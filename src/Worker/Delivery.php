@@ -247,7 +247,7 @@ class Delivery extends BaseObject
 
 		// perform local delivery if we are on the same site
 
-		if (link_compare($basepath, System::baseUrl())) {
+		if (Text::linkCompare($basepath, System::baseUrl())) {
 			$condition = ['nurl' => Text::normaliseLink($contact['url']), 'self' => true];
 			$target_self = DBA::selectFirst('contact', ['uid'], $condition);
 			if (!DBA::isResult($target_self)) {

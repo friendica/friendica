@@ -230,10 +230,10 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Addon::callHooks('contact_block_end', $arr);
     Addon::callHooks('poke_verbs', $arr);
-    Addon::callHooks('put_item_in_cache', $hook_data);
+    Addon::callHooks('Text::putItemInCache', $hook_data);
     Addon::callHooks('prepare_body_init', $item);
     Addon::callHooks('prepare_body_content_filter', $hook_data);
-    Addon::callHooks('prepare_body', $hook_data);
+    Addon::callHooks('Text::prepareBody', $hook_data);
     Addon::callHooks('prepare_body_final', $hook_data);
 
 ### include/items.php

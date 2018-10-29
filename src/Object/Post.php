@@ -154,7 +154,7 @@ class Post extends BaseObject
 
 		$shareable = in_array($conv->getProfileOwner(), [0, local_user()]) && $item['private'] != 1;
 
-		if (local_user() && link_compare($a->contact['url'], $item['author-link'])) {
+		if (local_user() && Text::linkCompare($a->contact['url'], $item['author-link'])) {
 			if ($item["event-id"] != 0) {
 				$edpost = ["events/event/" . $item['event-id'], L10n::t("Edit")];
 			} else {
@@ -313,7 +313,7 @@ class Post extends BaseObject
 
 		localize_item($item);
 
-		$body = prepare_body($item, true);
+		$body = Text::prepareBody($item, true);
 
 		list($categories, $folders) = get_cats_and_terms($item);
 
@@ -851,8 +851,8 @@ class Post extends BaseObject
 					$this->owner_name = $a->page_contact['name'];
 					$this->wall_to_wall = true;
 				} elseif ($this->getDataValue('owner-link')) {
-					$owner_linkmatch = (($this->getDataValue('owner-link')) && link_compare($this->getDataValue('owner-link'), $this->getDataValue('author-link')));
-					$alias_linkmatch = (($this->getDataValue('alias')) && link_compare($this->getDataValue('alias'), $this->getDataValue('author-link')));
+					$owner_linkmatch = (($this->getDataValue('owner-link')) && Text::linkCompare($this->getDataValue('owner-link'), $this->getDataValue('author-link')));
+					$alias_linkmatch = (($this->getDataValue('alias')) && Text::linkCompare($this->getDataValue('alias'), $this->getDataValue('author-link')));
 					$owner_namematch = (($this->getDataValue('owner-name')) && $this->getDataValue('owner-name') == $this->getDataValue('author-name'));
 
 					if (!$owner_linkmatch && !$alias_linkmatch && !$owner_namematch) {

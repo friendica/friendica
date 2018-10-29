@@ -174,7 +174,7 @@ class Smilies
 	 * processed.
 	 *
 	 * At a higher level, the bbcode [nosmile] tag can be used to prevent this
-	 * function from being executed by the prepare_text() routine when preparing
+	 * function from being executed by the Text::prepareText() routine when preparing
 	 * bbcode source for HTML display
 	 *
 	 * @brief Replaces text emoticons with graphical images

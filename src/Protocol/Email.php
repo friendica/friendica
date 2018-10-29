@@ -331,7 +331,7 @@ class Email
 
 		$part = uniqid("", true);
 
-		$html    = prepare_body($item);
+		$html    = Text::prepareBody($item);
 
 		$headers .= "Mime-Version: 1.0\n";
 		$headers .= 'Content-Type: multipart/alternative; boundary="=_'.$part.'"'."\n\n";

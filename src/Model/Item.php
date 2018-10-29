@@ -1600,7 +1600,7 @@ class Item extends BaseObject
 		$item["deleted"] = $parent_deleted;
 
 		// Fill the cache field
-		put_item_in_cache($item);
+		Text::putItemInCache($item);
 
 		if ($notify) {
 			$item['edit'] = false;
@@ -2542,7 +2542,7 @@ class Item extends BaseObject
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				if (link_compare($link, $mtch[1]) || link_compare($dlink, $mtch[1])) {
+				if (Text::linkCompare($link, $mtch[1]) || Text::linkCompare($dlink, $mtch[1])) {
 					$mention = true;
 					Text::logger('mention found: ' . $mtch[2]);
 				}

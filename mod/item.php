@@ -696,7 +696,7 @@ function item_post(App $a) {
 
 		// Fill the cache field
 		// This could be done in Item::update as well - but we have to check for the existance of some fields.
-		put_item_in_cache($datarray);
+		Text::putItemInCache($datarray);
 
 		$fields = [
 			'title' => $datarray['title'],
@@ -810,7 +810,7 @@ function item_post(App $a) {
 					$subject = Email::encodeHeader('[Friendica]' . ' ' . L10n::t('%s posted an update.', $a->user['username']), 'UTF-8');
 				}
 				$link = '<a href="' . System::baseUrl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
-				$html    = prepare_body($datarray);
+				$html    = Text::prepareBody($datarray);
 				$message = '<html><body>' . $link . $html . $disclaimer . '</body></html>';
 				$params =  [
 					'fromName' => $a->user['username'],

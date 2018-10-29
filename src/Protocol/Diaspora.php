@@ -112,7 +112,7 @@ class Diaspora
 		// Now we are collecting all relay contacts
 		foreach ($serverlist as $server_url) {
 			// We don't send messages to ourselves
-			if (link_compare($server_url, System::baseUrl())) {
+			if (Text::linkCompare($server_url, System::baseUrl())) {
 				continue;
 			}
 			$contact = self::getRelayContact($server_url);
@@ -2705,7 +2705,7 @@ class Diaspora
 			$parent = Item::selectFirst(['author-link'], ['id' => $item["parent"]]);
 
 			// Only delete it if the parent author really fits
-			if (!link_compare($parent["author-link"], $contact["url"]) && !link_compare($item["author-link"], $contact["url"])) {
+			if (!Text::linkCompare($parent["author-link"], $contact["url"]) && !Text::linkCompare($item["author-link"], $contact["url"])) {
 				Text::logger("Thread author ".$parent["author-link"]." and item author ".$item["author-link"]." don't fit to expected contact ".$contact["url"], LOGGER_DEBUG);
 				continue;
 			}
