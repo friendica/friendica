@@ -277,7 +277,7 @@ class Text
         }
 
         if (is_array($tmp)) {
-            array_walk($tmp, 'Text::sanitiseAcl');
+            array_walk($tmp, 'self::sanitiseAcl');
             $ret = implode('', $tmp);
         }
         return $ret;
