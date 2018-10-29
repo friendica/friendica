@@ -39,8 +39,8 @@ class Text
     * @param array $r key value pairs (search => replace)
     * @return string substituted string
     */
-    public function replaceMacros($s, $r) {
-
+    public static function replaceMacros($s, $r)
+    {
         $stamp1 = microtime(true);
 
         $a = get_app();
@@ -67,7 +67,7 @@ class Text
      * @param int $size
      * @return string
      */
-    public function randomString($size = 64)
+    public static function randomString($size = 64)
     {
         $byte_size = ceil($size / 2);
 
@@ -95,7 +95,8 @@ class Text
      * @param string $string Input string
      * @return string Filtered string
      */
-    public function noTags($string) {
+    public static function noTags($string)
+    {
         return str_replace(["<", ">"], ['[', ']'], $string);
     }
 
@@ -105,7 +106,8 @@ class Text
      * @param string $string
      * @return string
      */
-    public function escapeTags($string) {
+    public static function escapeTags($string)
+    {
         return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
     }
 
@@ -115,8 +117,8 @@ class Text
      * @param int $len
      * @return string
      */
-    public function autoName($len) {
-
+    public static function autoName($len)
+    {
         if ($len <= 0) {
             return '';
         }
@@ -194,7 +196,8 @@ class Text
      * @param string $str
      * @return string Escaped text.
      */
-    public function xmlify($str) {
+    public static function xmlify($str)
+    {
         $buffer = htmlspecialchars($str, ENT_QUOTES, "UTF-8");
         $buffer = trim($buffer);
 
@@ -206,7 +209,8 @@ class Text
      * @param string $s xml escaped text
      * @return string unescaped text
      */
-    public function unxmlify($s) {
+    public static function unxmlify($s)
+    {
         $ret = htmlspecialchars_decode($s, ENT_QUOTES);
         return $ret;
     }
@@ -215,7 +219,8 @@ class Text
      * Loader for infinite scrolling
      * @return string html for loader
      */
-    public function scrollLoader() {
+    public static function scrollLoader()
+    {
         $tpl = self::getMarkupTemplate("scroll_loader.tpl");
         return self::replaceMacros($tpl, [
             'wait' => L10n::t('Loading more entries...'),
@@ -229,7 +234,8 @@ class Text
      * @param string $s
      * @return array
      */
-    public function expandAcl($s) {
+    public static function expandAcl($s)
+    {
         // turn string array of angle-bracketed elements into numeric array
         // e.g. "<1><2><3>" => array(1,2,3);
         $ret = [];
@@ -250,7 +256,8 @@ class Text
      * Wrap ACL elements in angle brackets for storage
      * @param string $item
      */
-    public function sanitiseAcl(&$item) {
+    public static function sanitiseAcl(&$item)
+    {
         if (intval($item)) {
             $item = '<' . intval(self::noTags(trim($item))) . '>';
         } else {
@@ -268,7 +275,8 @@ class Text
      * @param string|array $p
      * @return string
      */
-    public function perms2Str($p) {
+    public static function perms2Str($p)
+    {
         $ret = '';
         if (is_array($p)) {
             $tmp = $p;
@@ -290,7 +298,8 @@ class Text
      * @param string $root
      * @return string
      */
-    public function getMarkupTemplate($s, $root = '') {
+    public static function getMarkupTemplate($s, $root = '')
+    {
         $stamp1 = microtime(true);
 
         $a = get_app();
@@ -321,7 +330,8 @@ class Text
      * @param string $s string to search
      * @return boolean True if found, False otherwise
      */
-    public function attributeContains($attr, $s) {
+    public static function attributeContains($attr, $s)
+    {
         $a = explode(' ', $attr);
         return (count($a) && in_array($s,$a));
     }
@@ -341,7 +351,8 @@ class Text
      * @param string $msg
      * @param int $level
      */
-    public function logger($msg, $level = LOGGER_INFO) {
+    public static function logger($msg, $level = LOGGER_INFO)
+    {
         $a = get_app();
         global $LOGGER_LEVELS;
         $LOGGER_LEVELS = [];
@@ -413,7 +424,8 @@ class Text
      * @param string $msg
      * @param int $level
      */
-    public function dlogger($msg, $level = LOGGER_INFO) {
+    public static function dlogger($msg, $level = LOGGER_INFO)
+    {
         $a = get_app();
 
         $logfile = Config::get('system', 'dlogfile');
@@ -462,7 +474,8 @@ class Text
      * @param string $needle
      * @return boolean
      */
-    public function activityMatch($haystack, $needle) {
+    public static function activityMatch($haystack, $needle)
+    {
         return (($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle, NAMESPACE_ACTIVITY_SCHEMA)));
     }
 
@@ -478,7 +491,8 @@ class Text
      * @param string $string Post content
      * @return array List of tag and person names
      */
-    public function getTags($string) {
+    public static function getTags($string)
+    {
         $ret = [];
 
         // Convert hashtag links to hashtags
@@ -542,7 +556,8 @@ class Text
      * @param string $s
      * @return string
      */
-    public function qp($s) {
+    public static function qp($s)
+    {
         return str_replace("%", "=", rawurlencode($s));
     }
 
@@ -553,7 +568,8 @@ class Text
      * @hook contact_block_end (contacts=>array, output=>string)
      * @return string
      */
-    public function contactBlock() {
+    public static function contactBlock()
+    {
         $o = '';
         $a = get_app();
 
@@ -644,8 +660,8 @@ class Text
 
     * @return string Formatted html
     */
-    public function micropro($contact, $redirect = false, $class = '', $textmode = false) {
-
+    public static function micropro($contact, $redirect = false, $class = '', $textmode = false)
+    {
         // Use the contact URL if no address is available
         if (!x($contact, "addr")) {
             $contact["addr"] = $contact["url"];
@@ -691,7 +707,7 @@ class Text
      *
      * @return string Formatted HTML.
      */
-    public function search($s, $id = 'search-box', $url = 'search', $save = false, $aside = true)
+    public static function search($s, $id = 'search-box', $url = 'search', $save = false, $aside = true)
     {
         $mode = 'text';
 
@@ -731,7 +747,7 @@ class Text
      * @param string $email_address
      * @return boolean
      */
-    public function validEmail($email_address)
+    public static function validEmail($email_address)
     {
         return preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/', $email_address);
     }
@@ -741,7 +757,8 @@ class Text
      *
      * @param string $s
      */
-    public function linkify($s) {
+    public static function linkify($s)
+    {
         $s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
         $s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
         return $s;
@@ -754,8 +771,8 @@ class Text
      * 				 value is array containing past tense verb, translation of present, translation of past
      * @hook poke_verbs pokes array
      */
-    public function getPokeVerbs() {
-
+    public static function getPokeVerbs()
+    {
         // index is present tense verb
         // value is array containing past tense verb, translation of present, translation of past
 
@@ -777,7 +794,8 @@ class Text
      * @param string $s String with day or month name.
      * @return string Translated string.
      */
-    public function dayTranslate($s) {
+    public static function dayTranslate($s)
+    {
         $ret = str_replace(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
             [L10n::t('Monday'), L10n::t('Tuesday'), L10n::t('Wednesday'), L10n::t('Thursday'), L10n::t('Friday'), L10n::t('Saturday'), L10n::t('Sunday')],
             $s);
@@ -795,7 +813,8 @@ class Text
      * @param string $s String with short day or month name.
      * @return string Translated string.
      */
-    public function dayShortTranslate($s) {
+    public static function dayShortTranslate($s)
+    {
         $ret = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             [L10n::t('Mon'), L10n::t('Tue'), L10n::t('Wed'), L10n::t('Thu'), L10n::t('Fri'), L10n::t('Sat'), L10n::t('Sun')],
             $s);
@@ -811,7 +830,8 @@ class Text
      * @param string $url
      * @return string
      */
-    public function normaliseLink($url) {
+    public static function normaliseLink($url)
+    {
         $ret = str_replace(['https:', '//www.'], ['http:', '//'], $url);
         return rtrim($ret,'/');
     }
@@ -827,7 +847,8 @@ class Text
      * @return boolean True if the URLs match, otherwise False
      *
      */
-    public function linkCompare($a, $b) {
+    public static function linkCompare($a, $b)
+    {
         return (strcasecmp(self::normaliseLink($a), self::normaliseLink($b)) === 0);
     }
 
@@ -837,7 +858,7 @@ class Text
      * @param App $a
      * @param array &$item The field array of an item row
      */
-    public function redirPrivateImages($a, &$item)
+    public static function redirPrivateImages($a, &$item)
     {
         $matches = false;
         $cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
@@ -865,7 +886,7 @@ class Text
      *
      * @todo Remove reference, simply return "rendered-html" and "rendered-hash"
      */
-    public function putItemInCache(&$item, $update = false)
+    public static function putItemInCache(&$item, $update = false)
     {
         $body = $item["body"];
 
@@ -921,7 +942,7 @@ class Text
      * @hook prepare_body ('item'=>item array, 'html'=>body string, 'is_preview'=>boolean, 'filter_reasons'=>string array) after first bbcode to html
      * @hook prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
      */
-    public function prepareBody(array &$item, $attach = false, $is_preview = false)
+    public static function prepareBody(array &$item, $attach = false, $is_preview = false)
     {
         $a = get_app();
         Addon::callHooks('prepare_body_init', $item);
@@ -1094,7 +1115,7 @@ class Text
      * @param array  $reasons
      * @return string
      */
-    public function applyContentFilter($html, array $reasons)
+    public static function applyContentFilter($html, array $reasons)
     {
         if (count($reasons)) {
             $tpl = self::getMarkupTemplate('wall/content_filter.tpl');
@@ -1115,7 +1136,8 @@ class Text
      * @param string $text String with bbcode.
      * @return string Formattet HTML.
      */
-    public function prepareText($text) {
+    public static function prepareText($text)
+    {
         if (stristr($text, '[nosmile]')) {
             $s = BBCode::convert($text);
         } else {
@@ -1152,7 +1174,7 @@ class Text
      *       ]
      *  ]
      */
-    public function getCatsAndTerms($item)
+    public static function getCatsAndTerms($item)
     {
         $categories = [];
         $folders = [];
@@ -1207,7 +1229,8 @@ class Text
      * @param array $item
      * @return boolean|array False if item has not plink, otherwise array('href'=>plink url, 'title'=>translated title)
      */
-    public function getPlink($item) {
+    public static function getPlink($item)
+    {
         $a = get_app();
 
         if ($a->user['nickname'] != "") {
@@ -1242,7 +1265,8 @@ class Text
      * @param string $s
      * @return string
      */
-    public function unamp($s) {
+    public static function unamp($s)
+    {
         return str_replace('&amp;', '&', $s);
     }
 
@@ -1252,7 +1276,8 @@ class Text
      * @param string $size_str
      * @return number
      */
-    public function returnBytes($size_str) {
+    public static function returnBytes($size_str)
+    {
         switch (substr ($size_str, -1)) {
             case 'M': case 'm': return (int)$size_str * 1048576;
             case 'K': case 'k': return (int)$size_str * 1024;
@@ -1266,8 +1291,8 @@ class Text
      * @param boolean $strip_padding
      * @return string
      */
-    public function base64UrlEncode($s, $strip_padding = false) {
-
+    public static function base64UrlEncode($s, $strip_padding = false)
+    {
         $s = strtr(base64_encode($s), '+/', '-_');
 
         if ($strip_padding) {
@@ -1281,8 +1306,8 @@ class Text
      * @param string $s
      * @return string
      */
-    public function base64UrlDecode($s) {
-
+    public static function base64UrlDecode($s)
+    {
         if (is_array($s)) {
             self::logger('Text::base64UrlDecode: illegal input: ' . print_r(debug_backtrace(), true));
             return $s;
@@ -1312,12 +1337,13 @@ class Text
      * @return string
      * @deprecated
      */
-    public function clearDiv() {
+    public static function clearDiv()
+    {
         return '<div class="clear"></div>';
     }
 
-    public function bbTranslateVideo($s) {
-
+    public static function bbTranslateVideo($s)
+    {
         $matches = null;
         $r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
         if ($r) {
@@ -1332,8 +1358,8 @@ class Text
         return $s;
     }
 
-    public function HTML2BBVideo($s) {
-
+    public static function HTML2BBVideo($s)
+    {
         $s = preg_replace('#<object[^>]+>(.*?)https?://www.youtube.com/((?:v|cp)/[A-Za-z0-9\-_=]+)(.*?)</object>#ism',
                 '[youtube]$2[/youtube]', $s);
     
@@ -1351,7 +1377,8 @@ class Text
      * @param array $val
      * @return array
      */
-    public function arrayXmlify($val){
+    public static function arrayXmlify($val)
+    {
         if (is_bool($val)) {
             return $val?"true":"false";
         } elseif (is_array($val)) {
@@ -1367,7 +1394,8 @@ class Text
      * @param string $base base url
      * @return string
      */
-    public function relToAbs($text, $base) {
+    public static function relToAbs($text, $base)
+    {
         if (empty($base)) {
             return $text;
         }
@@ -1405,7 +1433,8 @@ class Text
      * @param array $itme
      * @return string
      */
-    public function itemPostType($item) {
+    public static function itemPostType($item)
+    {
         if (!empty($item['event-id'])) {
             return L10n::t('event');
         } elseif (!empty($item['resource-id'])) {
@@ -1424,16 +1453,18 @@ class Text
     // and save to file categories in square brackets.
     // To do this we need to escape these characters if they appear in our tag.
 
-    public function fileTagEncode($s) {
+    public static function fileTagEncode($s)
+    {
         return str_replace(['<','>','[',']'],['%3c','%3e','%5b','%5d'],$s);
     }
 
-    public function fileTagDecode($s) {
+    public static function fileTagDecode($s)
+    {
         return str_replace(['%3c', '%3e', '%5b', '%5d'], ['<', '>', '[', ']'], $s);
     }
 
-    public function fileTagFileQuery($table,$s,$type = 'file') {
-
+    public static function fileTagFileQuery($table,$s,$type = 'file')
+    {
         if ($type == 'file') {
             $str = preg_quote('[' . str_replace('%', '%%', self::fileTagEncode($s)) . ']');
         } else {
@@ -1443,7 +1474,8 @@ class Text
     }
 
     // ex. given music,video return <music><video> or [music][video]
-    public function fileTagListToFile($list, $type = 'file') {
+    public static function fileTagListToFile($list, $type = 'file')
+    {
         $tag_list = '';
         if (strlen($list)) {
             $list_array = explode(",",$list);
@@ -1465,7 +1497,8 @@ class Text
     }
 
     // ex. given <music><video>[friends], return music,video or friends
-    public function fileTagFileToList($file, $type = 'file') {
+    public static function fileTagFileToList($file, $type = 'file')
+    {
         $matches = false;
         $list = '';
         if ($type == 'file') {
@@ -1485,7 +1518,8 @@ class Text
         return $list;
     }
 
-    public function fileTagUpdatePconfig($uid, $file_old, $file_new, $type = 'file') {
+    public static function fileTagUpdatePconfig($uid, $file_old, $file_new, $type = 'file')
+    {
         // $file_old - categories previously associated with an item
         // $file_new - new list of categories for an item
 
@@ -1555,7 +1589,7 @@ class Text
         return true;
     }
 
-    public function fileTagSaveFile($uid, $item_id, $file)
+    public static function fileTagSaveFile($uid, $item_id, $file)
     {
         if (!intval($uid)) {
             return false;
@@ -1576,7 +1610,7 @@ class Text
         return true;
     }
 
-    public function fileTagUnsaveFile($uid, $item_id, $file, $cat = false)
+    public static function fileTagUnsaveFile($uid, $item_id, $file, $cat = false)
     {
         if (!intval($uid)) {
             return false;
@@ -1612,12 +1646,14 @@ class Text
         return true;
     }
 
-    public function normaliseOpenid($s) {
+    public static function normaliseOpenid($s)
+    {
         return trim(str_replace(['http://', 'https://'], ['', ''], $s), '/');
     }
     
     
-    public function undoPostTagging($s) {
+    public static function undoPostTagging($s)
+    {
         $matches = null;
         $cnt = preg_match_all('/([!#@])\[url=(.*?)\](.*?)\[\/url\]/ism', $s, $matches, PREG_SET_ORDER);
         if ($cnt) {
@@ -1632,12 +1668,14 @@ class Text
         return $s;
     }
     
-    public function protectSprintf($s) {
+    public static function protectSprintf($s)
+    {
         return str_replace('%', '%%', $s);
     }
     
     /// @TODO Rewrite this
-    public function isDateArg($s) {
+    public static function isDateArg($s)
+    {
         $i = intval($s);
     
         if ($i > 1900) {
@@ -1658,7 +1696,8 @@ class Text
     /**
      * remove intentation from a text
      */
-    public function deindent($text, $chr = "[\t ]", $count = NULL) {
+    public static function deindent($text, $chr = "[\t ]", $count = NULL)
+    {
         $lines = explode("\n", $text);
     
         if (is_null($count)) {
@@ -1678,7 +1717,8 @@ class Text
         return implode("\n", $lines);
     }
     
-    public function formatBytes($bytes, $precision = 2) {
+    public static function formatBytes($bytes, $precision = 2)
+    {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
     
         $bytes = max($bytes, 0);
@@ -1699,7 +1739,8 @@ class Text
      *	The contact url
      * @return string
      */
-    public function formatNetworkName($network, $url = 0) {
+    public static function formatNetworkName($network, $url = 0)
+    {
         if ($network != "") {
             if ($url != "") {
                 $network_name = '<a href="'.$url.'">'.ContactSelector::networkToName($network, $url)."</a>";
