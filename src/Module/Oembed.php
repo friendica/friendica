@@ -4,6 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content;
+use Friendica\Content\Text;
 
 /**
  * Oembed module
@@ -36,7 +37,7 @@ class Oembed extends BaseModule
 
 		if ($a->argc == 2) {
 			echo '<html><body>';
-			$url = base64url_decode($a->argv[1]);
+			$url = Text::base64UrlDecode($a->argv[1]);
 			$j = Content\OEmbed::fetchURL($url);
 
 			// workaround for media.ccc.de (and any other endpoint that return size 0)

@@ -74,7 +74,7 @@ class Owa extends BaseModule
 								// At a later time, we will compare weather the token we're getting
 								// is really the same token we have stored in the database.
 								openssl_public_encrypt($token, $result, $contact['pubkey']);
-								$ret['encrypted_token'] = base64url_encode($result);
+								$ret['encrypted_token'] = Text::base64UrlEncode($result);
 							} else {
 								Text::logger('OWA fail: ' . $contact['id'] . ' ' . $contact['addr'] . ' ' . $contact['url'], LOGGER_DEBUG);
 							}

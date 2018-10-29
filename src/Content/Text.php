@@ -1125,4 +1125,298 @@ class Text
         return trim($s);
     }
 
+    /**
+     * return array with details for categories and folders for an item
+     *
+     * @param array $item
+     * @return array
+     *
+     * [
+     *      [ // categories array
+     *          {
+     *               'name': 'category name',
+     *               'removeurl': 'url to remove this category',
+     *               'first': 'is the first in this array? true/false',
+     *               'last': 'is the last in this array? true/false',
+     *           } ,
+     *           ....
+     *       ],
+     *       [ //folders array
+     *			{
+     *               'name': 'folder name',
+     *               'removeurl': 'url to remove this folder',
+     *               'first': 'is the first in this array? true/false',
+     *               'last': 'is the last in this array? true/false',
+     *           } ,
+     *           ....
+     *       ]
+     *  ]
+     */
+    function getCatsAndTerms($item)
+    {
+        $categories = [];
+        $folders = [];
+
+        $matches = false;
+        $first = true;
+        $cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches, PREG_SET_ORDER);
+        if ($cnt) {
+            foreach ($matches as $mtch) {
+                $categories[] = [
+                    'name' => self::xmlify(file_tag_decode($mtch[1])),
+                    'url' =>  "#",
+                    'removeurl' => ((local_user() == $item['uid'])?'filerm/' . $item['id'] . '?f=&cat=' . self::xmlify(file_tag_decode($mtch[1])):""),
+                    'first' => $first,
+                    'last' => false
+                ];
+                $first = false;
+            }
+        }
+
+        if (count($categories)) {
+            $categories[count($categories) - 1]['last'] = true;
+        }
+
+        if (local_user() == $item['uid']) {
+            $matches = false;
+            $first = true;
+            $cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches, PREG_SET_ORDER);
+            if ($cnt) {
+                foreach ($matches as $mtch) {
+                    $folders[] = [
+                        'name' => self::xmlify(file_tag_decode($mtch[1])),
+                        'url' =>  "#",
+                        'removeurl' => ((local_user() == $item['uid']) ? 'filerm/' . $item['id'] . '?f=&term=' . self::xmlify(file_tag_decode($mtch[1])) : ""),
+                        'first' => $first,
+                        'last' => false
+                    ];
+                    $first = false;
+                }
+            }
+        }
+
+        if (count($folders)) {
+            $folders[count($folders) - 1]['last'] = true;
+        }
+
+        return [$categories, $folders];
+    }
+
+    /**
+     * get private link for item
+     * @param array $item
+     * @return boolean|array False if item has not plink, otherwise array('href'=>plink url, 'title'=>translated title)
+     */
+    function getPlink($item) {
+        $a = get_app();
+
+        if ($a->user['nickname'] != "") {
+            $ret = [
+                    //'href' => "display/" . $a->user['nickname'] . "/" . $item['id'],
+                    'href' => "display/" . $item['guid'],
+                    'orig' => "display/" . $item['guid'],
+                    'title' => L10n::t('View on separate page'),
+                    'orig_title' => L10n::t('view on separate page'),
+                ];
+
+            if (x($item, 'plink')) {
+                $ret["href"] = $a->removeBaseURL($item['plink']);
+                $ret["title"] = L10n::t('link to source');
+            }
+
+        } elseif (x($item, 'plink') && ($item['private'] != 1)) {
+            $ret = [
+                    'href' => $item['plink'],
+                    'orig' => $item['plink'],
+                    'title' => L10n::t('link to source'),
+                ];
+        } else {
+            $ret = [];
+        }
+
+        return $ret;
+    }
+
+    /**
+     * replace html amp entity with amp char
+     * @param string $s
+     * @return string
+     */
+    function unamp($s) {
+        return str_replace('&amp;', '&', $s);
+    }
+
+
+    /**
+     * return number of bytes in size (K, M, G)
+     * @param string $size_str
+     * @return number
+     */
+    function returnBytes($size_str) {
+        switch (substr ($size_str, -1)) {
+            case 'M': case 'm': return (int)$size_str * 1048576;
+            case 'K': case 'k': return (int)$size_str * 1024;
+            case 'G': case 'g': return (int)$size_str * 1073741824;
+            default: return $size_str;
+        }
+    }
+
+    /**
+     * @param string $s
+     * @param boolean $strip_padding
+     * @return string
+     */
+    function base64UrlEncode($s, $strip_padding = false) {
+
+        $s = strtr(base64_encode($s), '+/', '-_');
+
+        if ($strip_padding) {
+            $s = str_replace('=','',$s);
+        }
+
+        return $s;
+    }
+
+    /**
+     * @param string $s
+     * @return string
+     */
+    function base64UrlDecode($s) {
+
+        if (is_array($s)) {
+            self::logger('Text::base64UrlDecode: illegal input: ' . print_r(debug_backtrace(), true));
+            return $s;
+        }
+
+    /*
+    *  // Placeholder for new rev of salmon which strips base64 padding.
+    *  // PHP base64_decode handles the un-padded input without requiring this step
+    *  // Uncomment if you find you need it.
+    *
+    *	$l = strlen($s);
+    *	if (!strpos($s,'=')) {
+    *		$m = $l % 4;
+    *		if ($m == 2)
+    *			$s .= '==';
+    *		if ($m == 3)
+    *			$s .= '=';
+    *	}
+    *
+    */
+
+        return base64_decode(strtr($s,'-_','+/'));
+    }
+
+    /**
+     * return div element with class 'clear'
+     * @return string
+     * @deprecated
+     */
+    function clearDiv() {
+        return '<div class="clear"></div>';
+    }
+
+    function bbTranslateVideo($s) {
+
+        $matches = null;
+        $r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
+        if ($r) {
+            foreach ($matches as $mtch) {
+                if ((stristr($mtch[1], 'youtube')) || (stristr($mtch[1], 'youtu.be'))) {
+                    $s = str_replace($mtch[0], '[youtube]' . $mtch[1] . '[/youtube]', $s);
+                } elseif (stristr($mtch[1], 'vimeo')) {
+                    $s = str_replace($mtch[0], '[vimeo]' . $mtch[1] . '[/vimeo]', $s);
+                }
+            }
+        }
+        return $s;
+    }
+
+    function HTML2BBVideo($s) {
+
+        $s = preg_replace('#<object[^>]+>(.*?)https?://www.youtube.com/((?:v|cp)/[A-Za-z0-9\-_=]+)(.*?)</object>#ism',
+                '[youtube]$2[/youtube]', $s);
+    
+        $s = preg_replace('#<iframe[^>](.*?)https?://www.youtube.com/embed/([A-Za-z0-9\-_=]+)(.*?)</iframe>#ism',
+                '[youtube]$2[/youtube]', $s);
+    
+        $s = preg_replace('#<iframe[^>](.*?)https?://player.vimeo.com/video/([0-9]+)(.*?)</iframe>#ism',
+                '[vimeo]$2[/vimeo]', $s);
+    
+        return $s;
+    }
+
+    /**
+     * apply xmlify() to all values of array $val, recursively
+     * @param array $val
+     * @return array
+     */
+    function arrayXmlify($val){
+        if (is_bool($val)) {
+            return $val?"true":"false";
+        } elseif (is_array($val)) {
+            return array_map('Text::arrayXmlify', $val);
+        }
+        return self::xmlify((string) $val);
+    }
+
+    /**
+     * transform link href and img src from relative to absolute
+     *
+     * @param string $text
+     * @param string $base base url
+     * @return string
+     */
+    function relToAbs($text, $base) {
+        if (empty($base)) {
+            return $text;
+        }
+
+        $base = rtrim($base,'/');
+
+        $base2 = $base . "/";
+
+        // Replace links
+        $pattern = "/<a([^>]*) href=\"(?!http|https|\/)([^\"]*)\"/";
+        $replace = "<a\${1} href=\"" . $base2 . "\${2}\"";
+        $text = preg_replace($pattern, $replace, $text);
+
+        $pattern = "/<a([^>]*) href=\"(?!http|https)([^\"]*)\"/";
+        $replace = "<a\${1} href=\"" . $base . "\${2}\"";
+        $text = preg_replace($pattern, $replace, $text);
+
+        // Replace images
+        $pattern = "/<img([^>]*) src=\"(?!http|https|\/)([^\"]*)\"/";
+        $replace = "<img\${1} src=\"" . $base2 . "\${2}\"";
+        $text = preg_replace($pattern, $replace, $text);
+
+        $pattern = "/<img([^>]*) src=\"(?!http|https)([^\"]*)\"/";
+        $replace = "<img\${1} src=\"" . $base . "\${2}\"";
+        $text = preg_replace($pattern, $replace, $text);
+
+
+        // Done
+        return $text;
+    }
+
+    /**
+     * get translated item type
+     *
+     * @param array $itme
+     * @return string
+     */
+    function itemPostType($item) {
+        if (!empty($item['event-id'])) {
+            return L10n::t('event');
+        } elseif (!empty($item['resource-id'])) {
+            return L10n::t('photo');
+        } elseif (!empty($item['verb']) && $item['verb'] !== ACTIVITY_POST) {
+            return L10n::t('activity');
+        } elseif ($item['id'] != $item['parent']) {
+            return L10n::t('comment');
+        }
+
+        return L10n::t('post');
+    }
+
 }

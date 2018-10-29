@@ -15,6 +15,7 @@
 namespace Friendica\Content;
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -241,7 +242,7 @@ class Smilies
 	 */
 	private static function encode($m)
 	{
-		return(str_replace($m[1], base64url_encode($m[1]), $m[0]));
+		return(str_replace($m[1], Text::base64UrlEncode($m[1]), $m[0]));
 	}
 
 	/**
@@ -251,7 +252,7 @@ class Smilies
 	 */
 	private static function decode($m)
 	{
-		return(str_replace($m[1], base64url_decode($m[1]), $m[0]));
+		return(str_replace($m[1], Text::base64UrlDecode($m[1]), $m[0]));
 	}
 
 

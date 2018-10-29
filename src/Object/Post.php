@@ -315,7 +315,7 @@ class Post extends BaseObject
 
 		$body = Text::prepareBody($item, true);
 
-		list($categories, $folders) = get_cats_and_terms($item);
+		list($categories, $folders) = Text::getCatsAndTerms($item);
 
 		$body_e       = $body;
 		$text_e       = strip_tags($body);
@@ -390,7 +390,7 @@ class Post extends BaseObject
 			'owner_url'       => $this->getOwnerUrl(),
 			'owner_photo'     => $a->removeBaseURL(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'owner_name'      => htmlentities($owner_name_e),
-			'plink'           => get_plink($item),
+			'plink'           => Text::getPlink($item),
 			'edpost'          => Feature::isEnabled($conv->getProfileOwner(), 'edit_posts') ? $edpost : '',
 			'isstarred'       => $isstarred,
 			'star'            => Feature::isEnabled($conv->getProfileOwner(), 'star_posts') ? $star : '',

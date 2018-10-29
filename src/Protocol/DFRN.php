@@ -1001,7 +1001,7 @@ class DFRN
 		XML::addElement($doc, $entry, "updated", DateTimeFormat::utc($item["edited"] . "+00:00", DateTimeFormat::ATOM));
 
 		// "dfrn:env" is used to read the content
-		XML::addElement($doc, $entry, "dfrn:env", base64url_encode($body, true));
+		XML::addElement($doc, $entry, "dfrn:env", Text::base64UrlEncode($body, true));
 
 		// The "content" field is not read by the receiver. We could remove it when the type is "text"
 		// We keep it at the moment, maybe there is some old version that doesn't read "dfrn:env"
@@ -2493,16 +2493,16 @@ class DFRN
 		$item["body"] = XML::getFirstNodeValue($xpath, "dfrn:env/text()", $entry);
 		$item["body"] = str_replace([' ',"\t","\r","\n"], ['','','',''], $item["body"]);
 		// make sure nobody is trying to sneak some html tags by us
-		$item["body"] = Text::noTags(base64url_decode($item["body"]));
+		$item["body"] = Text::noTags(Text::base64UrlDecode($item["body"]));
 
 		$item["body"] = BBCode::limitBodySize($item["body"]);
 
 		/// @todo Do we really need this check for HTML elements? (It was copied from the old function)
 		if ((strpos($item['body'], '<') !== false) && (strpos($item['body'], '>') !== false)) {
 			$base_url = get_app()->getBaseURL();
-			$item['body'] = reltoabs($item['body'], $base_url);
+			$item['body'] = Text::relToAbs($item['body'], $base_url);
 
-			$item['body'] = html2bb_video($item['body']);
+			$item['body'] = Text::HTML2BBVideo($item['body']);
 
 			$item['body'] = OEmbed::HTML2BBCode($item['body']);
 

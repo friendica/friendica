@@ -638,7 +638,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 				$body = Text::prepareBody($item, true, $preview);
 
-				list($categories, $folders) = get_cats_and_terms($item);
+				list($categories, $folders) = Text::getCatsAndTerms($item);
 
 				$profile_name_e = $profile_name;
 
@@ -687,7 +687,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 					'owner_name' => $owner_name_e,
 					'owner_url' => $owner_url,
 					'owner_photo' => System::removedBaseUrl(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
-					'plink' => get_plink($item),
+					'plink' => Text::getPlink($item),
 					'edpost' => false,
 					'isstarred' => $isstarred,
 					'star' => $star,

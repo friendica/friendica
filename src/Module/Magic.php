@@ -94,7 +94,7 @@ class Magic extends BaseModule
 						if ($j['encrypted_token']) {
 							// The token is encrypted. If the local user is really the one the other instance
 							// thinks he/she is, the token can be decrypted with the local users public key.
-							openssl_private_decrypt(base64url_decode($j['encrypted_token']), $token, $user['prvkey']);
+							openssl_private_decrypt(Text::base64UrlDecode($j['encrypted_token']), $token, $user['prvkey']);
 						} else {
 							$token = $j['token'];
 						}

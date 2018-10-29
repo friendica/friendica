@@ -373,7 +373,7 @@ class OEmbed
 		}
 		$width = '100%';
 
-		$src = System::baseUrl() . '/oembed/' . base64url_encode($src);
+		$src = System::baseUrl() . '/oembed/' . Text::base64UrlEncode($src);
 		return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $src . '" allowfullscreen scrolling="no" frameborder="no">' . L10n::t('Embedded content') . '</iframe>';
 	}
 

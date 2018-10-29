@@ -1254,7 +1254,7 @@ function prepare_text($text) {
  */
 function get_cats_and_terms($item)
 {
-	$categories = [];
+	/* $categories = [];
 	$folders = [];
 
 	$matches = false;
@@ -1299,7 +1299,8 @@ function get_cats_and_terms($item)
 		$folders[count($folders) - 1]['last'] = true;
 	}
 
-	return [$categories, $folders];
+	return [$categories, $folders]; */
+	return Text::getCatsAndTerms($item);
 }
 
 
@@ -1309,7 +1310,7 @@ function get_cats_and_terms($item)
  * @return boolean|array False if item has not plink, otherwise array('href'=>plink url, 'title'=>translated title)
  */
 function get_plink($item) {
-	$a = get_app();
+	/* $a = get_app();
 
 	if ($a->user['nickname'] != "") {
 		$ret = [
@@ -1335,7 +1336,8 @@ function get_plink($item) {
 		$ret = [];
 	}
 
-	return $ret;
+	return $ret; */
+	return Text::getPlink($item);
 }
 
 
@@ -1345,7 +1347,8 @@ function get_plink($item) {
  * @return string
  */
 function unamp($s) {
-	return str_replace('&amp;', '&', $s);
+	//return str_replace('&amp;', '&', $s);
+	return Text::unamp($s);
 }
 
 
@@ -1355,12 +1358,13 @@ function unamp($s) {
  * @return number
  */
 function return_bytes($size_str) {
-	switch (substr ($size_str, -1)) {
+	/* switch (substr ($size_str, -1)) {
 		case 'M': case 'm': return (int)$size_str * 1048576;
 		case 'K': case 'k': return (int)$size_str * 1024;
 		case 'G': case 'g': return (int)$size_str * 1073741824;
 		default: return $size_str;
-	}
+	} */
+	Text::returnBytes($size_str);
 }
 
 /**
@@ -1370,13 +1374,14 @@ function return_bytes($size_str) {
  */
 function base64url_encode($s, $strip_padding = false) {
 
-	$s = strtr(base64_encode($s), '+/', '-_');
+	/* $s = strtr(base64_encode($s), '+/', '-_');
 
 	if ($strip_padding) {
 		$s = str_replace('=','',$s);
 	}
 
-	return $s;
+	return $s; */
+	return Text::base64UrlEncode($s, $strip_padding);
 }
 
 /**
@@ -1385,10 +1390,10 @@ function base64url_encode($s, $strip_padding = false) {
  */
 function base64url_decode($s) {
 
-	if (is_array($s)) {
+	/* if (is_array($s)) {
 		logger('base64url_decode: illegal input: ' . print_r(debug_backtrace(), true));
 		return $s;
-	}
+	} */
 
 /*
  *  // Placeholder for new rev of salmon which strips base64 padding.
@@ -1406,7 +1411,8 @@ function base64url_decode($s) {
  *
  */
 
-	return base64_decode(strtr($s,'-_','+/'));
+	//return base64_decode(strtr($s,'-_','+/'));
+	return Text::base64UrlDecode($s);
 }
 
 
@@ -1416,13 +1422,14 @@ function base64url_decode($s) {
  * @deprecated
  */
 function cleardiv() {
-	return '<div class="clear"></div>';
+	//return '<div class="clear"></div>';
+	return Text::clearDiv();
 }
 
 
 function bb_translate_video($s) {
 
-	$matches = null;
+	/* $matches = null;
 	$r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
 	if ($r) {
 		foreach ($matches as $mtch) {
@@ -1433,12 +1440,13 @@ function bb_translate_video($s) {
 			}
 		}
 	}
-	return $s;
+	return $s; */
+	return Text::bbTranslateVideo($s);
 }
 
 function html2bb_video($s) {
 
-	$s = preg_replace('#<object[^>]+>(.*?)https?://www.youtube.com/((?:v|cp)/[A-Za-z0-9\-_=]+)(.*?)</object>#ism',
+	/* $s = preg_replace('#<object[^>]+>(.*?)https?://www.youtube.com/((?:v|cp)/[A-Za-z0-9\-_=]+)(.*?)</object>#ism',
 			'[youtube]$2[/youtube]', $s);
 
 	$s = preg_replace('#<iframe[^>](.*?)https?://www.youtube.com/embed/([A-Za-z0-9\-_=]+)(.*?)</iframe>#ism',
@@ -1447,7 +1455,8 @@ function html2bb_video($s) {
 	$s = preg_replace('#<iframe[^>](.*?)https?://player.vimeo.com/video/([0-9]+)(.*?)</iframe>#ism',
 			'[vimeo]$2[/vimeo]', $s);
 
-	return $s;
+	return $s; */
+	return Text::HTML2BBVideo($s);
 }
 
 /**
@@ -1456,12 +1465,13 @@ function html2bb_video($s) {
  * @return array
  */
 function array_xmlify($val){
-	if (is_bool($val)) {
+	/* if (is_bool($val)) {
 		return $val?"true":"false";
 	} elseif (is_array($val)) {
 		return array_map('array_xmlify', $val);
 	}
-	return xmlify((string) $val);
+	return xmlify((string) $val); */
+	return Text::arrayXmlify($val);
 }
 
 
@@ -1473,7 +1483,7 @@ function array_xmlify($val){
  * @return string
  */
 function reltoabs($text, $base) {
-	if (empty($base)) {
+	/* if (empty($base)) {
 		return $text;
 	}
 
@@ -1501,7 +1511,8 @@ function reltoabs($text, $base) {
 
 
 	// Done
-	return $text;
+	return $text; */
+	return Text::relToAbs($text, $base);
 }
 
 /**
@@ -1511,7 +1522,7 @@ function reltoabs($text, $base) {
  * @return string
  */
 function item_post_type($item) {
-	if (!empty($item['event-id'])) {
+	/* if (!empty($item['event-id'])) {
 		return L10n::t('event');
 	} elseif (!empty($item['resource-id'])) {
 		return L10n::t('photo');
@@ -1521,7 +1532,8 @@ function item_post_type($item) {
 		return L10n::t('comment');
 	}
 
-	return L10n::t('post');
+	return L10n::t('post'); */
+	return Text::itemPostType($item);
 }
 
 // post categories and "save to file" use the same item.file table for storage.

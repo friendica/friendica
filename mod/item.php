@@ -505,7 +505,7 @@ function item_post(App $a) {
 		$objecttype = ACTIVITY_OBJ_BOOKMARK;
 	}
 
-	$body = bb_translate_video($body);
+	$body = Text::bbTranslateVideo($body);
 
 
 	// Fold multi-line [code] sequences

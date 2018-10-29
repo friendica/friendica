@@ -70,7 +70,7 @@ class Salmon
 			return $ret[0];
 		} else {
 			foreach ($ret as $a) {
-				$hash = base64url_encode(hash('sha256', $a));
+				$hash = Text::base64UrlEncode(hash('sha256', $a));
 				if ($hash == $keyhash) {
 					return $a;
 				}
@@ -104,22 +104,22 @@ class Salmon
 
 		// create a magic envelope
 
-		$data      = base64url_encode($slap);
+		$data      = Text::base64UrlEncode($slap);
 		$data_type = 'application/atom+xml';
 		$encoding  = 'base64url';
 		$algorithm = 'RSA-SHA256';
-		$keyhash   = base64url_encode(hash('sha256', self::salmonKey($owner['spubkey'])), true);
+		$keyhash   = Text::base64UrlEncode(hash('sha256', self::salmonKey($owner['spubkey'])), true);
 
-		$precomputed = '.' . base64url_encode($data_type) . '.' . base64url_encode($encoding) . '.' . base64url_encode($algorithm);
+		$precomputed = '.' . Text::base64UrlEncode($data_type) . '.' . Text::base64UrlEncode($encoding) . '.' . Text::base64UrlEncode($algorithm);
 
 		// GNU Social format
-		$signature   = base64url_encode(Crypto::rsaSign($data . $precomputed, $owner['sprvkey']));
+		$signature   = Text::base64UrlEncode(Crypto::rsaSign($data . $precomputed, $owner['sprvkey']));
 
 		// Compliant format
-		$signature2  = base64url_encode(Crypto::rsaSign(str_replace('=', '', $data . $precomputed), $owner['sprvkey']));
+		$signature2  = Text::base64UrlEncode(Crypto::rsaSign(str_replace('=', '', $data . $precomputed), $owner['sprvkey']));
 
 		// Old Status.net format
-		$signature3  = base64url_encode(Crypto::rsaSign($data, $owner['sprvkey']));
+		$signature3  = Text::base64UrlEncode(Crypto::rsaSign($data, $owner['sprvkey']));
 
 		// At first try the non compliant method that works for GNU Social
 		$xmldata = ["me:env" => ["me:data" => $data,
@@ -208,6 +208,6 @@ class Salmon
 	public static function salmonKey($pubkey)
 	{
 		Crypto::pemToMe($pubkey, $m, $e);
-		return 'RSA' . '.' . base64url_encode($m, true) . '.' . base64url_encode($e, true);
+		return 'RSA' . '.' . Text::base64UrlEncode($m, true) . '.' . Text::base64UrlEncode($e, true);
 	}
 }

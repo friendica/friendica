@@ -156,7 +156,7 @@ function notification($params)
 			$item = Item::selectFirstForUser($params['uid'], Item::ITEM_FIELDLIST, ['id' => $parent_id]);
 		}
 
-		$item_post_type = item_post_type($item);
+		$item_post_type = Text::itemPostType($item);
 		$itemlink = $item['plink'];
 
 		// "a post"

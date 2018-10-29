@@ -159,8 +159,8 @@ class Crypto
 
 		$r = ASN_BASE::parseASNString($x);
 
-		$m = base64url_decode($r[0]->asnData[0]->asnData);
-		$e = base64url_decode($r[0]->asnData[1]->asnData);
+		$m = Text::base64UrlDecode($r[0]->asnData[0]->asnData);
+		$e = Text::base64UrlDecode($r[0]->asnData[1]->asnData);
 	}
 
 	/**
@@ -198,8 +198,8 @@ class Crypto
 
 		$r = ASN_BASE::parseASNString($x);
 
-		$m = base64url_decode($r[0]->asnData[1]->asnData[0]->asnData[0]->asnData);
-		$e = base64url_decode($r[0]->asnData[1]->asnData[0]->asnData[1]->asnData);
+		$m = Text::base64UrlDecode($r[0]->asnData[1]->asnData[0]->asnData[0]->asnData);
+		$e = Text::base64UrlDecode($r[0]->asnData[1]->asnData[0]->asnData[1]->asnData);
 	}
 
 	/**
@@ -355,7 +355,7 @@ class Crypto
 			$result = ['encrypted' => true];
 			$key = random_bytes(256);
 			$iv  = random_bytes(256);
-			$result['data'] = base64url_encode(self::$fn($data, $key, $iv), true);
+			$result['data'] = Text::base64UrlEncode(self::$fn($data, $key, $iv), true);
 
 			// log the offending call so we can track it down
 			if (!openssl_public_encrypt($key, $k, $pubkey)) {
@@ -364,9 +364,9 @@ class Crypto
 			}
 
 			$result['alg'] = $alg;
-			$result['key'] = base64url_encode($k, true);
+			$result['key'] = Text::base64UrlEncode($k, true);
 			openssl_public_encrypt($iv, $i, $pubkey);
-			$result['iv'] = base64url_encode($i, true);
+			$result['iv'] = Text::base64UrlEncode($i, true);
 
 			return $result;
 		} else {
@@ -395,7 +395,7 @@ class Crypto
 		$key = random_bytes(32);
 		$iv  = random_bytes(16);
 		$result = ['encrypted' => true];
-		$result['data'] = base64url_encode(self::encryptAES256CBC($data, $key, $iv), true);
+		$result['data'] = Text::base64UrlEncode(self::encryptAES256CBC($data, $key, $iv), true);
 
 		// log the offending call so we can track it down
 		if (!openssl_public_encrypt($key, $k, $pubkey)) {
@@ -404,9 +404,9 @@ class Crypto
 		}
 
 		$result['alg'] = 'aes256cbc';
-		$result['key'] = base64url_encode($k, true);
+		$result['key'] = Text::base64UrlEncode($k, true);
 		openssl_public_encrypt($iv, $i, $pubkey);
-		$result['iv'] = base64url_encode($i, true);
+		$result['iv'] = Text::base64UrlEncode($i, true);
 
 		return $result;
 	}
@@ -448,10 +448,10 @@ class Crypto
 		$fn = 'decrypt' . strtoupper($alg);
 
 		if (method_exists(__CLASS__, $fn)) {
-			openssl_private_decrypt(base64url_decode($data['key']), $k, $prvkey);
-			openssl_private_decrypt(base64url_decode($data['iv']), $i, $prvkey);
+			openssl_private_decrypt(Text::base64UrlDecode($data['key']), $k, $prvkey);
+			openssl_private_decrypt(Text::base64UrlDecode($data['iv']), $i, $prvkey);
 
-			return self::$fn(base64url_decode($data['data']), $k, $i);
+			return self::$fn(Text::base64UrlDecode($data['data']), $k, $i);
 		} else {
 			$x = ['data' => $data, 'prvkey' => $prvkey, 'alg' => $alg, 'result' => $data];
 			Addon::callHooks('other_unencapsulate', $x);
@@ -471,9 +471,9 @@ class Crypto
 	 */
 	private static function unencapsulateAes($data, $prvkey)
 	{
-		openssl_private_decrypt(base64url_decode($data['key']), $k, $prvkey);
-		openssl_private_decrypt(base64url_decode($data['iv']), $i, $prvkey);
+		openssl_private_decrypt(Text::base64UrlDecode($data['key']), $k, $prvkey);
+		openssl_private_decrypt(Text::base64UrlDecode($data['iv']), $i, $prvkey);
 
-		return self::decryptAES256CBC(base64url_decode($data['data']), $k, $i);
+		return self::decryptAES256CBC(Text::base64UrlDecode($data['data']), $k, $i);
 	}
 }
