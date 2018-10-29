@@ -162,7 +162,7 @@ function search_content(App $a) {
 		'name' => "search-header",
 		'$title' => L10n::t("Search"),
 		'$title_size' => 3,
-		'$content' => search($search,'search-box','search',((local_user()) ? true : false), false)
+		'$content' => Text::search($search,'search-box','search',((local_user()) ? true : false), false)
 	]);
 
 	if (strpos($search,'#') === 0) {

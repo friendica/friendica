@@ -499,7 +499,7 @@ class Post extends BaseObject
 		 */
 		if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {
 			return false;
-		} elseif (activity_match($item->getDataValue('verb'), ACTIVITY_LIKE) || activity_match($item->getDataValue('verb'), ACTIVITY_DISLIKE)) {
+		} elseif (Text::activityMatch($item->getDataValue('verb'), ACTIVITY_LIKE) || Text::activityMatch($item->getDataValue('verb'), ACTIVITY_DISLIKE)) {
 			return false;
 		}
 

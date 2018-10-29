@@ -521,7 +521,7 @@ function photos_post(App $a)
 			}
 
 			$taginfo = [];
-			$tags = get_tags($rawtags);
+			$tags = Text::getTags($rawtags);
 
 			if (count($tags)) {
 				foreach ($tags as $tag) {
@@ -1546,7 +1546,7 @@ function photos_content(App $a)
 					$template = $tpl;
 					$sparkle = '';
 
-					if ((activity_match($item['verb'], ACTIVITY_LIKE) || activity_match($item['verb'], ACTIVITY_DISLIKE)) && ($item['id'] != $item['parent'])) {
+					if ((Text::activityMatch($item['verb'], ACTIVITY_LIKE) || Text::activityMatch($item['verb'], ACTIVITY_DISLIKE)) && ($item['id'] != $item['parent'])) {
 						continue;
 					}
 

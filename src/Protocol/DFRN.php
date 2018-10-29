@@ -2310,22 +2310,22 @@ class DFRN
 
 			// Big question: Do we need these functions? They were part of the "consume_feed" function.
 			// This function once was responsible for DFRN and OStatus.
-			if (activity_match($item["verb"], ACTIVITY_FOLLOW)) {
+			if (Text::activityMatch($item["verb"], ACTIVITY_FOLLOW)) {
 				Text::logger("New follower");
 				Contact::addRelationship($importer, $contact, $item, $nickname);
 				return false;
 			}
-			if (activity_match($item["verb"], ACTIVITY_UNFOLLOW)) {
+			if (Text::activityMatch($item["verb"], ACTIVITY_UNFOLLOW)) {
 				Text::logger("Lost follower");
 				Contact::removeFollower($importer, $contact, $item);
 				return false;
 			}
-			if (activity_match($item["verb"], ACTIVITY_REQ_FRIEND)) {
+			if (Text::activityMatch($item["verb"], ACTIVITY_REQ_FRIEND)) {
 				Text::logger("New friend request");
 				Contact::addRelationship($importer, $contact, $item, $nickname, true);
 				return false;
 			}
-			if (activity_match($item["verb"], ACTIVITY_UNFRIEND)) {
+			if (Text::activityMatch($item["verb"], ACTIVITY_UNFRIEND)) {
 				Text::logger("Lost sharer");
 				Contact::removeSharer($importer, $contact, $item);
 				return false;

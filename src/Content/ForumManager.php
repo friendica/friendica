@@ -169,7 +169,7 @@ class ForumManager
 		$total_shown = 0;
 		$forumlist = '';
 		foreach ($contacts as $contact) {
-			$forumlist .= micropro($contact, false, 'forumlist-profile-advanced');
+			$forumlist .= Text::micropro($contact, false, 'forumlist-profile-advanced');
 			$total_shown ++;
 			if ($total_shown == $show_total) {
 				break;

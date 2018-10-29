@@ -537,7 +537,8 @@ function dlogger($msg, $level = LOGGER_INFO) {
  * @return boolean
  */
 function activity_match($haystack,$needle) {
-	return (($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle, NAMESPACE_ACTIVITY_SCHEMA)));
+	//return (($haystack === $needle) || ((basename($needle) === $haystack) && strstr($needle, NAMESPACE_ACTIVITY_SCHEMA)));
+	return Text::activityMatch($haystack, $needle);
 }
 
 
@@ -554,7 +555,7 @@ function activity_match($haystack,$needle) {
  * @return array List of tag and person names
  */
 function get_tags($string) {
-	$ret = [];
+	/* $ret = [];
 
 	// Convert hashtag links to hashtags
 	$string = preg_replace('/#\[url\=([^\[\]]*)\](.*?)\[\/url\]/ism', '#$2', $string);
@@ -608,7 +609,8 @@ function get_tags($string) {
 			$ret[] = $match;
 		}
 	}
-	return $ret;
+	return $ret; */
+	return Text::getTags($string);
 }
 
 
@@ -619,7 +621,8 @@ function get_tags($string) {
  * @return string
  */
 function qp($s) {
-	return str_replace("%", "=", rawurlencode($s));
+	//return str_replace("%", "=", rawurlencode($s));
+	return Text::qp($s);
 }
 
 
@@ -631,7 +634,7 @@ function qp($s) {
  * @return string
  */
 function contact_block() {
-	$o = '';
+	/* $o = '';
 	$a = get_app();
 
 	$shown = PConfig::get($a->profile['uid'], 'system', 'display_friend_count', 24);
@@ -699,8 +702,8 @@ function contact_block() {
 	$arr = ['contacts' => $r, 'output' => $o];
 
 	Addon::callHooks('contact_block_end', $arr);
-	return $o;
-
+	return $o; */
+	return Text::contactBlock();
 }
 
 
@@ -726,7 +729,7 @@ function contact_block() {
 function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 
 	// Use the contact URL if no address is available
-	if (!x($contact, "addr")) {
+	/* if (!x($contact, "addr")) {
 		$contact["addr"] = $contact["url"];
 	}
 
@@ -756,7 +759,8 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
 		'$parkle' => $sparkle,
 		'$redir' => $redir,
 
-	]);
+	]); */
+	return Text::micropro($contact, $redirect, $class, $textmode);
 }
 
 /**
@@ -772,7 +776,7 @@ function micropro($contact, $redirect = false, $class = '', $textmode = false) {
  */
 function search($s, $id = 'search-box', $url = 'search', $save = false, $aside = true)
 {
-	$mode = 'text';
+	/* $mode = 'text';
 
 	if (strpos($s, '#') === 0) {
 		$mode = 'tag';
@@ -801,7 +805,8 @@ function search($s, $id = 'search-box', $url = 'search', $save = false, $aside =
 		}
 	}
 
-	return replace_macros(get_markup_template('searchbox.tpl'), $values);
+	return replace_macros(get_markup_template('searchbox.tpl'), $values); */
+	return Text::search($s, $id, $url, $save, $aside);
 }
 
 /**
@@ -812,7 +817,8 @@ function search($s, $id = 'search-box', $url = 'search', $save = false, $aside =
  */
 function valid_email($email_address)
 {
-	return preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/', $email_address);
+	//return preg_match('/^[_a-zA-Z0-9\-\+]+(\.[_a-zA-Z0-9\-\+]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/', $email_address);
+	return Text::validEmail($email_address);
 }
 
 
@@ -822,9 +828,10 @@ function valid_email($email_address)
  * @param string $s
  */
 function linkify($s) {
-	$s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
+	/* $s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
 	$s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
-	return $s;
+	return $s; */
+	return Text::linkify($s);
 }
 
 
@@ -840,7 +847,7 @@ function get_poke_verbs() {
 	// index is present tense verb
 	// value is array containing past tense verb, translation of present, translation of past
 
-	$arr = [
+	/* $arr = [
 		'poke' => ['poked', L10n::t('poke'), L10n::t('poked')],
 		'ping' => ['pinged', L10n::t('ping'), L10n::t('pinged')],
 		'prod' => ['prodded', L10n::t('prod'), L10n::t('prodded')],
@@ -849,7 +856,8 @@ function get_poke_verbs() {
 		'rebuff' => ['rebuffed', L10n::t('rebuff'), L10n::t('rebuffed')],
 	];
 	Addon::callHooks('poke_verbs', $arr);
-	return $arr;
+	return $arr; */
+	return Text::getPokeVerbs();
 }
 
 /**
@@ -859,7 +867,7 @@ function get_poke_verbs() {
  * @return string Translated string.
  */
 function day_translate($s) {
-	$ret = str_replace(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+	/* $ret = str_replace(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
 		[L10n::t('Monday'), L10n::t('Tuesday'), L10n::t('Wednesday'), L10n::t('Thursday'), L10n::t('Friday'), L10n::t('Saturday'), L10n::t('Sunday')],
 		$s);
 
@@ -867,7 +875,8 @@ function day_translate($s) {
 		[L10n::t('January'), L10n::t('February'), L10n::t('March'), L10n::t('April'), L10n::t('May'), L10n::t('June'), L10n::t('July'), L10n::t('August'), L10n::t('September'), L10n::t('October'), L10n::t('November'), L10n::t('December')],
 		$ret);
 
-	return $ret;
+	return $ret; */
+	return Text::dayTranslate($s);
 }
 
 /**

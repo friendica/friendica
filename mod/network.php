@@ -204,7 +204,7 @@ function saved_searches($search)
 	$o = Text::replaceMacros($tpl, [
 		'$title'     => L10n::t('Saved Searches'),
 		'$add'       => L10n::t('add'),
-		'$searchbox' => search($search, 'netsearch-box', $srchurl, true),
+		'$searchbox' => Text::search($search, 'netsearch-box', $srchurl, true),
 		'$saved'     => $saved,
 	]);
 

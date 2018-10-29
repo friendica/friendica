@@ -1295,7 +1295,7 @@ class Item extends BaseObject
 			$item['gravity'] = intval($item['gravity']);
 		} elseif ($item['parent-uri'] === $item['uri']) {
 			$item['gravity'] = GRAVITY_PARENT;
-		} elseif (activity_match($item['verb'], ACTIVITY_POST)) {
+		} elseif (Text::activityMatch($item['verb'], ACTIVITY_POST)) {
 			$item['gravity'] = GRAVITY_COMMENT;
 		} else {
 			$item['gravity'] = GRAVITY_UNKNOWN;   // Should not happen
@@ -2389,7 +2389,7 @@ class Item extends BaseObject
 	public static function setHashtags(&$item)
 	{
 
-		$tags = get_tags($item["body"]);
+		$tags = Text::getTags($item["body"]);
 
 		// No hashtags?
 		if (!count($tags)) {

@@ -3,6 +3,7 @@
  * @file mod/profperm.php
  */
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
@@ -133,7 +134,7 @@ function profperm_content(App $a) {
 	foreach($members as $member) {
 		if ($member['url']) {
 			$member['click'] = 'profChangeMember(' . $profile['id'] . ',' . $member['id'] . '); return true;';
-			$o .= micropro($member,true,'mpprof', $textmode);
+			$o .= Text::micropro($member,true,'mpprof', $textmode);
 		}
 	}
 	$o .= '</div><div id="prof-members-end"></div>';
@@ -155,7 +156,7 @@ function profperm_content(App $a) {
 			foreach($r as $member) {
 				if (!in_array($member['id'],$ingroup)) {
 					$member['click'] = 'profChangeMember(' . $profile['id'] . ',' . $member['id'] . '); return true;';
-					$o .= micropro($member,true,'mpprof',$textmode);
+					$o .= Text::micropro($member,true,'mpprof',$textmode);
 				}
 			}
 		}

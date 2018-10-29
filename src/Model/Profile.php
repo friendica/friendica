@@ -466,7 +466,7 @@ class Profile
 		$updated = '';
 		$contacts = 0;
 		if (!$block) {
-			$contact_block = contact_block();
+			$contact_block = Text::contactBlock();
 
 			if (is_array($a->profile) && !$a->profile['hide-friends']) {
 				$r = q(
@@ -615,7 +615,7 @@ class Profile
 
 					$rr['link'] = Contact::magicLink($rr['url']);
 					$rr['title'] = $rr['name'];
-					$rr['date'] = day_translate(DateTimeFormat::convert($rr['start'], $a->timezone, 'UTC', $rr['adjust'] ? $bd_format : $bd_short)) . (($today) ? ' ' . L10n::t('[today]') : '');
+					$rr['date'] = Text::dayTranslate(DateTimeFormat::convert($rr['start'], $a->timezone, 'UTC', $rr['adjust'] ? $bd_format : $bd_short)) . (($today) ? ' ' . L10n::t('[today]') : '');
 					$rr['startime'] = null;
 					$rr['today'] = $today;
 				}
@@ -701,7 +701,7 @@ class Profile
 
 				$rr['title'] = $title;
 				$rr['description'] = $description;
-				$rr['date'] = day_translate(DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC', 'UTC', $bd_format)) . (($today) ? ' ' . L10n::t('[today]') : '');
+				$rr['date'] = Text::dayTranslate(DateTimeFormat::convert($rr['start'], $rr['adjust'] ? $a->timezone : 'UTC', 'UTC', $bd_format)) . (($today) ? ' ' . L10n::t('[today]') : '');
 				$rr['startime'] = $strt;
 				$rr['today'] = $today;
 
@@ -750,7 +750,7 @@ class Profile
 				$year_bd_format = L10n::t('j F, Y');
 				$short_bd_format = L10n::t('j F');
 
-				$val = day_translate(
+				$val = Text::dayTranslate(
 					intval($a->profile['dob']) ?
 						DateTimeFormat::utc($a->profile['dob'] . ' 00:00 +00:00', $year_bd_format)
 						: DateTimeFormat::utc('2001-' . substr($a->profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format)
@@ -784,11 +784,11 @@ class Profile
 			}
 
 			if ($a->profile['homepage']) {
-				$profile['homepage'] = [L10n::t('Homepage:'), linkify($a->profile['homepage'])];
+				$profile['homepage'] = [L10n::t('Homepage:'), Text::linkify($a->profile['homepage'])];
 			}
 
 			if ($a->profile['hometown']) {
-				$profile['hometown'] = [L10n::t('Hometown:'), linkify($a->profile['hometown'])];
+				$profile['hometown'] = [L10n::t('Hometown:'), Text::linkify($a->profile['hometown'])];
 			}
 
 			if ($a->profile['pub_keywords']) {

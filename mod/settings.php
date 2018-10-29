@@ -515,7 +515,7 @@ function settings_post(App $a)
 			$email = $a->user['email'];
 		}
 		//  check the email is valid
-		if (!valid_email($email)) {
+		if (!Text::validEmail($email)) {
 			$err .= L10n::t('Invalid email.');
 		}
 		//  ensure new email is not the admin mail

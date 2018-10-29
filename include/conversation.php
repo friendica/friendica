@@ -131,11 +131,11 @@ function localize_item(&$item)
 	*/
 
 	$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
-	if (activity_match($item['verb'], ACTIVITY_LIKE)
-		|| activity_match($item['verb'], ACTIVITY_DISLIKE)
-		|| activity_match($item['verb'], ACTIVITY_ATTEND)
-		|| activity_match($item['verb'], ACTIVITY_ATTENDNO)
-		|| activity_match($item['verb'], ACTIVITY_ATTENDMAYBE)) {
+	if (Text::activityMatch($item['verb'], ACTIVITY_LIKE)
+		|| Text::activityMatch($item['verb'], ACTIVITY_DISLIKE)
+		|| Text::activityMatch($item['verb'], ACTIVITY_ATTEND)
+		|| Text::activityMatch($item['verb'], ACTIVITY_ATTENDNO)
+		|| Text::activityMatch($item['verb'], ACTIVITY_ATTENDMAYBE)) {
 
 		$fields = ['author-link', 'author-name', 'verb', 'object-type', 'resource-id', 'body', 'plink'];
 		$obj = Item::selectFirst($fields, ['uri' => $item['parent-uri']]);
@@ -169,22 +169,22 @@ function localize_item(&$item)
 
 		$plink = '[url=' . $obj['plink'] . ']' . $post_type . '[/url]';
 
-		if (activity_match($item['verb'], ACTIVITY_LIKE)) {
+		if (Text::activityMatch($item['verb'], ACTIVITY_LIKE)) {
 			$bodyverb = L10n::t('%1$s likes %2$s\'s %3$s');
-		} elseif (activity_match($item['verb'], ACTIVITY_DISLIKE)) {
+		} elseif (Text::activityMatch($item['verb'], ACTIVITY_DISLIKE)) {
 			$bodyverb = L10n::t('%1$s doesn\'t like %2$s\'s %3$s');
-		} elseif (activity_match($item['verb'], ACTIVITY_ATTEND)) {
+		} elseif (Text::activityMatch($item['verb'], ACTIVITY_ATTEND)) {
 			$bodyverb = L10n::t('%1$s attends %2$s\'s %3$s');
-		} elseif (activity_match($item['verb'], ACTIVITY_ATTENDNO)) {
+		} elseif (Text::activityMatch($item['verb'], ACTIVITY_ATTENDNO)) {
 			$bodyverb = L10n::t('%1$s doesn\'t attend %2$s\'s %3$s');
-		} elseif (activity_match($item['verb'], ACTIVITY_ATTENDMAYBE)) {
+		} elseif (Text::activityMatch($item['verb'], ACTIVITY_ATTENDMAYBE)) {
 			$bodyverb = L10n::t('%1$s attends maybe %2$s\'s %3$s');
 		}
 
 		$item['body'] = sprintf($bodyverb, $author, $objauthor, $plink);
 	}
 
-	if (activity_match($item['verb'], ACTIVITY_FRIEND)) {
+	if (Text::activityMatch($item['verb'], ACTIVITY_FRIEND)) {
 
 		if ($item['object-type']=="" || $item['object-type']!== ACTIVITY_OBJ_PERSON) return;
 
@@ -266,7 +266,7 @@ function localize_item(&$item)
 
 	}
 
-	if (activity_match($item['verb'], ACTIVITY_TAG)) {
+	if (Text::activityMatch($item['verb'], ACTIVITY_TAG)) {
 		$fields = ['author-id', 'author-link', 'author-name', 'author-network',
 			'verb', 'object-type', 'resource-id', 'body', 'plink'];
 		$obj = Item::selectFirst($fields, ['uri' => $item['parent-uri']]);
@@ -311,7 +311,7 @@ function localize_item(&$item)
 		$item['body'] = L10n::t('%1$s tagged %2$s\'s %3$s with %4$s', $author, $objauthor, $plink, $tag);
 	}
 
-	if (activity_match($item['verb'], ACTIVITY_FAVORITE)) {
+	if (Text::activityMatch($item['verb'], ACTIVITY_FAVORITE)) {
 		if ($item['object-type'] == "") {
 			return;
 		}
@@ -388,13 +388,13 @@ function visible_activity($item) {
 	 */
 	$hidden_activities = [ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE];
 	foreach ($hidden_activities as $act) {
-		if (activity_match($item['verb'], $act)) {
+		if (Text::activityMatch($item['verb'], $act)) {
 			return false;
 		}
 	}
 
 	// @TODO below if() block can be rewritten to a single line: $isVisible = allConditionsHere;
-	if (activity_match($item['verb'], ACTIVITY_FOLLOW) && $item['object-type'] === ACTIVITY_OBJ_NOTE && empty($item['self']) && $item['uid'] == local_user()) {
+	if (Text::activityMatch($item['verb'], ACTIVITY_FOLLOW) && $item['object-type'] === ACTIVITY_OBJ_NOTE && empty($item['self']) && $item['uid'] == local_user()) {
 		return false;
 	}
 
@@ -938,7 +938,7 @@ function builtin_activity_puller($item, &$conv_responses) {
 				return;
 		}
 
-		if (activity_match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
+		if (Text::activityMatch($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
 			$author = ['uid' => 0, 'id' => $item['author-id'],
 				'network' => $item['author-network'], 'url' => $item['author-link']];
 			$url = Contact::magicLinkbyContact($author);

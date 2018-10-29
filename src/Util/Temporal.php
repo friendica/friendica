@@ -463,11 +463,11 @@ class Temporal
 			$tddate = intval(DateTimeFormat::localNow('j'));
 		}
 
-		$str_month = day_translate($mtab[$m]);
+		$str_month = Text::dayTranslate($mtab[$m]);
 		$o = '<table class="calendar' . $class . '">';
 		$o .= "<caption>$str_month $y</caption><tr>";
 		for ($a = 0; $a < 7; $a ++) {
-			$o .= '<th>' . mb_substr(day_translate($dn[$a]), 0, 3, 'UTF-8') . '</th>';
+			$o .= '<th>' . mb_substr(Text::dayTranslate($dn[$a]), 0, 3, 'UTF-8') . '</th>';
 		}
 
 		$o .= '</tr><tr>';
