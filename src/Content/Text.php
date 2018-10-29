@@ -123,39 +123,39 @@ class Text
             return '';
         }
 
-        $vowels = ['a','a','ai','au','e','e','e','ee','ea','i','ie','o','ou','u'];
+        $vowels = ['a', 'a', 'ai', 'au', 'e', 'e', 'e', 'ee', 'ea', 'i', 'ie', 'o', 'ou', 'u'];
         if (mt_rand(0, 5) == 4) {
             $vowels[] = 'y';
         }
 
         $cons = [
-                'b','bl','br',
-                'c','ch','cl','cr',
-                'd','dr',
-                'f','fl','fr',
-                'g','gh','gl','gr',
+                'b', 'bl', 'br',
+                'c', 'ch', 'cl', 'cr',
+                'd', 'dr',
+                'f', 'fl', 'fr',
+                'g', 'gh', 'gl', 'gr',
                 'h',
                 'j',
-                'k','kh','kl','kr',
+                'k', 'kh', 'kl', 'kr',
                 'l',
                 'm',
                 'n',
-                'p','ph','pl','pr',
+                'p', 'ph', 'pl', 'pr',
                 'qu',
-                'r','rh',
-                's','sc','sh','sm','sp','st',
-                't','th','tr',
+                'r', 'rh',
+                's', 'sc', 'sh', 'sm', 'sp', 'st',
+                't', 'th', 'tr',
                 'v',
-                'w','wh',
+                'w', 'wh',
                 'x',
-                'z','zh'
+                'z', 'zh'
                 ];
 
-        $midcons = ['ck','ct','gn','ld','lf','lm','lt','mb','mm', 'mn','mp',
-                    'nd','ng','nk','nt','rn','rp','rt'];
+        $midcons = ['ck', 'ct', 'gn', 'ld', 'lf', 'lm', 'lt', 'mb', 'mm', 'mn', 'mp',
+                    'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt'];
 
-        $noend = ['bl', 'br', 'cl','cr','dr','fl','fr','gl','gr',
-                    'kh', 'kl','kr','mn','pl','pr','rh','tr','qu','wh','q'];
+        $noend = ['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr',
+                    'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q'];
 
         $start = mt_rand(0,2);
         if ($start == 0) {
@@ -171,14 +171,14 @@ class Text
             $word .= $table[$r];
 
             if ($table == $vowels) {
-                $table = array_merge($cons,$midcons);
+                $table = array_merge($cons, $midcons);
             } else {
                 $table = $vowels;
             }
 
         }
 
-        $word = substr($word,0,$len);
+        $word = substr($word, 0, $len);
 
         foreach ($noend as $noe) {
             $noelen = strlen($noe);
@@ -333,7 +333,7 @@ class Text
     public static function attributeContains($attr, $s)
     {
         $a = explode(' ', $attr);
-        return (count($a) && in_array($s,$a));
+        return (count($a) && in_array($s, $a));
     }
 
     /**
@@ -722,7 +722,7 @@ class Text
                 '$action_url' => $url,
                 '$search_label' => L10n::t('Search'),
                 '$save_label' => $save_label,
-                '$savedsearch' => local_user() && Feature::isEnabled(local_user(),'savedsearch'),
+                '$savedsearch' => local_user() && Feature::isEnabled(local_user(), 'savedsearch'),
                 '$search_hint' => L10n::t('@name, !forum, #tags, content'),
                 '$mode' => $mode
             ];
@@ -733,7 +733,7 @@ class Text
                         L10n::t("Tags"),
                         L10n::t("Contacts")];
 
-            if (Config::get('system','poco_local_search')) {
+            if (Config::get('system', 'poco_local_search')) {
                 $values['$searchoption'][] = L10n::t("Forums");
             }
         }
@@ -760,7 +760,7 @@ class Text
     public static function linkify($s)
     {
         $s = preg_replace("/(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\'\%\$\!\+]*)/", ' <a href="$1" target="_blank">$1</a>', $s);
-        $s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism",'<$1$2=$3&$4>',$s);
+        $s = preg_replace("/\<(.*?)(src|href)=(.*?)\&amp\;(.*?)\>/ism", '<$1$2=$3&$4>', $s);
         return $s;
     }
 
@@ -796,11 +796,11 @@ class Text
      */
     public static function dayTranslate($s)
     {
-        $ret = str_replace(['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+        $ret = str_replace(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             [L10n::t('Monday'), L10n::t('Tuesday'), L10n::t('Wednesday'), L10n::t('Thursday'), L10n::t('Friday'), L10n::t('Saturday'), L10n::t('Sunday')],
             $s);
 
-        $ret = str_replace(['January','February','March','April','May','June','July','August','September','October','November','December'],
+        $ret = str_replace(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
             [L10n::t('January'), L10n::t('February'), L10n::t('March'), L10n::t('April'), L10n::t('May'), L10n::t('June'), L10n::t('July'), L10n::t('August'), L10n::t('September'), L10n::t('October'), L10n::t('November'), L10n::t('December')],
             $ret);
 
@@ -818,7 +818,7 @@ class Text
         $ret = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             [L10n::t('Mon'), L10n::t('Tue'), L10n::t('Wed'), L10n::t('Thu'), L10n::t('Fri'), L10n::t('Sat'), L10n::t('Sun')],
             $s);
-        $ret = str_replace(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov','Dec'],
+        $ret = str_replace(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             [L10n::t('Jan'), L10n::t('Feb'), L10n::t('Mar'), L10n::t('Apr'), L10n::t('May'), ('Jun'), L10n::t('Jul'), L10n::t('Aug'), L10n::t('Sep'), L10n::t('Oct'), L10n::t('Nov'), L10n::t('Dec')],
             $ret);
         return $ret;
@@ -833,7 +833,7 @@ class Text
     public static function normaliseLink($url)
     {
         $ret = str_replace(['https:', '//www.'], ['http:', '//'], $url);
-        return rtrim($ret,'/');
+        return rtrim($ret, '/');
     }
 
     /**
@@ -1296,7 +1296,7 @@ class Text
         $s = strtr(base64_encode($s), '+/', '-_');
 
         if ($strip_padding) {
-            $s = str_replace('=','',$s);
+            $s = str_replace('=', '', $s);
         }
 
         return $s;
@@ -1329,7 +1329,7 @@ class Text
     *
     */
 
-        return base64_decode(strtr($s,'-_','+/'));
+        return base64_decode(strtr($s, '-_', '+/'));
     }
 
     /**
@@ -1345,7 +1345,7 @@ class Text
     public static function bbTranslateVideo($s)
     {
         $matches = null;
-        $r = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$s,$matches,PREG_SET_ORDER);
+        $r = preg_match_all("/\[video\](.*?)\[\/video\]/ism", $s, $matches,PREG_SET_ORDER);
         if ($r) {
             foreach ($matches as $mtch) {
                 if ((stristr($mtch[1], 'youtube')) || (stristr($mtch[1], 'youtu.be'))) {
@@ -1400,7 +1400,7 @@ class Text
             return $text;
         }
 
-        $base = rtrim($base,'/');
+        $base = rtrim($base, '/');
 
         $base2 = $base . "/";
 
@@ -1455,7 +1455,7 @@ class Text
 
     public static function fileTagEncode($s)
     {
-        return str_replace(['<','>','[',']'],['%3c','%3e','%5b','%5d'],$s);
+        return str_replace(['<', '>', '[', ']'], ['%3c', '%3e', '%5b', '%5d'], $s);
     }
 
     public static function fileTagDecode($s)
@@ -1463,7 +1463,7 @@ class Text
         return str_replace(['%3c', '%3e', '%5b', '%5d'], ['<', '>', '[', ']'], $s);
     }
 
-    public static function fileTagFileQuery($table,$s,$type = 'file')
+    public static function fileTagFileQuery($table, $s, $type = 'file')
     {
         if ($type == 'file') {
             $str = preg_quote('[' . str_replace('%', '%%', self::fileTagEncode($s)) . ']');
@@ -1478,7 +1478,7 @@ class Text
     {
         $tag_list = '';
         if (strlen($list)) {
-            $list_array = explode(",",$list);
+            $list_array = explode(",", $list);
             if ($type == 'file') {
                 $lbracket = '[';
                 $rbracket = ']';
@@ -1545,22 +1545,22 @@ class Text
 
             // check for new tags to be added as filetags in pconfig
             $new_tags = [];
-            $check_new_tags = explode(",", self::fileTagFileToList($file_new,$type));
+            $check_new_tags = explode(",", self::fileTagFileToList($file_new, $type));
 
             foreach ($check_new_tags as $tag) {
-                if (!stristr($saved,$lbracket . self::fileTagEncode($tag) . $rbracket)) {
+                if (!stristr($saved, $lbracket . self::fileTagEncode($tag) . $rbracket)) {
                     $new_tags[] = $tag;
                 }
             }
 
-            $filetags_updated .= self::fileTagListToFile(implode(",",$new_tags),$type);
+            $filetags_updated .= self::fileTagListToFile(implode(",", $new_tags), $type);
 
             // check for deleted tags to be removed from filetags in pconfig
             $deleted_tags = [];
-            $check_deleted_tags = explode(",", self::fileTagFileToList($file_old,$type));
+            $check_deleted_tags = explode(",", self::fileTagFileToList($file_old, $type));
 
             foreach ($check_deleted_tags as $tag) {
-                if (!stristr($file_new,$lbracket . self::fileTagEncode($tag) . $rbracket)) {
+                if (!stristr($file_new, $lbracket . self::fileTagEncode($tag) . $rbracket)) {
                     $deleted_tags[] = $tag;
                 }
             }
@@ -1575,7 +1575,7 @@ class Text
                 if (DBA::isResult($r)) {
                     unset($deleted_tags[$key]);
                 } else {
-                    $filetags_updated = str_replace($lbracket . self::fileTagEncode($tag) . $rbracket,'',$filetags_updated);
+                    $filetags_updated = str_replace($lbracket . self::fileTagEncode($tag) . $rbracket, '', $filetags_updated);
                 }
             }
 
@@ -1597,7 +1597,7 @@ class Text
 
         $item = Item::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
         if (DBA::isResult($item)) {
-            if (!stristr($item['file'],'[' . self::fileTagEncode($file) . ']')) {
+            if (!stristr($item['file'], '[' . self::fileTagEncode($file) . ']')) {
                 $fields = ['file' => $item['file'] . '[' . self::fileTagEncode($file) . ']'];
                 Item::update($fields, ['id' => $item_id]);
             }
@@ -1629,7 +1629,7 @@ class Text
             return false;
         }
 
-        $fields = ['file' => str_replace($pattern,'',$item['file'])];
+        $fields = ['file' => str_replace($pattern, '', $item['file'])];
         Item::update($fields, ['id' => $item_id]);
 
         $r = q("SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d",
@@ -1662,7 +1662,7 @@ class Text
                     $contact = Contact::getDetailsByURL($mtch[2]);
                     $mtch[3] = empty($contact['addr']) ? $mtch[2] : $contact['addr'];
                 }
-                $s = str_replace($mtch[0], $mtch[1] . $mtch[3],$s);
+                $s = str_replace($mtch[0], $mtch[1] . $mtch[3], $s);
             }
         }
         return $s;
