@@ -11,8 +11,6 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Util\Temporal;
 
-$install_wizard_pass = 1;
-
 function install_init(App $a) {
 
 	// $baseurl/install/testrwrite to test if rewite in .htaccess is working
@@ -26,18 +24,11 @@ function install_init(App $a) {
 
 	$a->setConfigValue('system', 'value', '../install');
 	$a->theme['stylesheet'] = System::baseUrl()."/view/install/style.css";
-
-	global $install_wizard_pass;
-	if (x($_POST, 'pass')) {
-		$install_wizard_pass = intval($_POST['pass']);
-	}
-
 }
 
 function install_post(App $a) {
-	global $install_wizard_pass;
 
-	switch($install_wizard_pass) {
+	switch(getWizardPass()) {
 		case 1:
 		case 2:
 			return;
@@ -94,7 +85,8 @@ function install_post(App $a) {
 
 function install_content(App $a) {
 
-	global $install_wizard_pass;
+	$install_wizard_pass = getWizardPass();
+
 	$o = '';
 	$wizard_status = "";
 	$install_title = L10n::t('Friendica Communications Server - Setup');
@@ -268,4 +260,13 @@ function what_next() {
 		."</p><p>"
 		.L10n::t('Go to your new Friendica node <a href="%s/register">registration page</a> and register as new user. Remember to use the same email you have entered as administrator email. This will allow you to enter the site admin panel.', $baseurl)
 		."</p>";
+}
+
+function getWizardPass()
+{
+	if (x($_POST, 'pass')) {
+		return intval($_POST['pass']);
+	} else {
+		return 1;
+	}
 }
