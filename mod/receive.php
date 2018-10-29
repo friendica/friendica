@@ -19,7 +19,7 @@ function receive_post(App $a)
 {
 	$enabled = intval(Config::get('system', 'diaspora_enabled'));
 	if (!$enabled) {
-		Text::logger('mod-diaspora: disabled');
+		App::logger('mod-diaspora: disabled');
 		System::httpExit(500);
 	}
 
@@ -42,7 +42,7 @@ function receive_post(App $a)
 
 	// It is an application/x-www-form-urlencoded
 
-	Text::logger('mod-diaspora: receiving post', LOGGER_DEBUG);
+	App::logger('mod-diaspora: receiving post', LOGGER_DEBUG);
 
 	if (empty($_POST['xml'])) {
 		$postdata = file_get_contents("php://input");
@@ -50,29 +50,29 @@ function receive_post(App $a)
 			System::httpExit(500);
 		}
 
-		Text::logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
+		App::logger('mod-diaspora: message is in the new format', LOGGER_DEBUG);
 		$msg = Diaspora::decodeRaw($importer, $postdata);
 	} else {
 		$xml = urldecode($_POST['xml']);
 
-		Text::logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
+		App::logger('mod-diaspora: decode message in the old format', LOGGER_DEBUG);
 		$msg = Diaspora::decode($importer, $xml);
 
 		if ($public && !$msg) {
-			Text::logger('mod-diaspora: decode message in the new format', LOGGER_DEBUG);
+			App::logger('mod-diaspora: decode message in the new format', LOGGER_DEBUG);
 			$msg = Diaspora::decodeRaw($importer, $xml);
 		}
 	}
 
-	Text::logger('mod-diaspora: decoded', LOGGER_DEBUG);
+	App::logger('mod-diaspora: decoded', LOGGER_DEBUG);
 
-	Text::logger('mod-diaspora: decoded msg: ' . print_r($msg, true), LOGGER_DATA);
+	App::logger('mod-diaspora: decoded msg: ' . print_r($msg, true), LOGGER_DATA);
 
 	if (!is_array($msg)) {
 		System::httpExit(500);
 	}
 
-	Text::logger('mod-diaspora: dispatching', LOGGER_DEBUG);
+	App::logger('mod-diaspora: dispatching', LOGGER_DEBUG);
 
 	$ret = true;
 	if ($public) {

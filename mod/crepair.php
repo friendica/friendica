@@ -79,7 +79,7 @@ function crepair_post(App $a)
 	);
 
 	if ($photo) {
-		Text::logger('mod-crepair: updating photo from ' . $photo);
+		App::logger('mod-crepair: updating photo from ' . $photo);
 
 		Model\Contact::updateAvatar($photo, local_user(), $contact['id']);
 	}

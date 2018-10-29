@@ -4,6 +4,7 @@
  */
 namespace Friendica\Protocol;
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
@@ -29,12 +30,12 @@ class Email
 
 		$errors = imap_errors();
 		if (!empty($errors)) {
-			Text::logger('IMAP Errors occured: ' . json_encode($errors));
+			App::logger('IMAP Errors occured: ' . json_encode($errors));
 		}
 
 		$alerts = imap_alerts();
 		if (!empty($alerts)) {
-			Text::logger('IMAP Alerts occured: ' . json_encode($alerts));
+			App::logger('IMAP Alerts occured: ' . json_encode($alerts));
 		}
 
 		return $mbox;
@@ -55,21 +56,21 @@ class Email
 		if (!$search1) {
 			$search1 = [];
 		} else {
-			Text::logger("Found mails from ".$email_addr, LOGGER_DEBUG);
+			App::logger("Found mails from ".$email_addr, LOGGER_DEBUG);
 		}
 
 		$search2 = @imap_search($mbox, 'TO "' . $email_addr . '"', SE_UID);
 		if (!$search2) {
 			$search2 = [];
 		} else {
-			Text::logger("Found mails to ".$email_addr, LOGGER_DEBUG);
+			App::logger("Found mails to ".$email_addr, LOGGER_DEBUG);
 		}
 
 		$search3 = @imap_search($mbox, 'CC "' . $email_addr . '"', SE_UID);
 		if (!$search3) {
 			$search3 = [];
 		} else {
-			Text::logger("Found mails cc ".$email_addr, LOGGER_DEBUG);
+			App::logger("Found mails cc ".$email_addr, LOGGER_DEBUG);
 		}
 
 		$res = array_unique(array_merge($search1, $search2, $search3));
@@ -352,7 +353,7 @@ class Email
 
 		//$message = '<html><body>' . $html . '</body></html>';
 		//$message = html2plain($html);
-		Text::logger('notifier: email delivery to ' . $addr);
+		App::logger('notifier: email delivery to ' . $addr);
 		mail($addr, $subject, $body, $headers);
 	}
 

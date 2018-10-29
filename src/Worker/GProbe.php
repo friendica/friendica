@@ -5,6 +5,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Friendica\Core\Protocol;
@@ -25,7 +26,7 @@ class GProbe {
 			DBA::escape(Text::normaliseLink($url))
 		);
 
-		Text::logger("gprobe start for ".Text::normaliseLink($url), LOGGER_DEBUG);
+		App::logger("gprobe start for ".Text::normaliseLink($url), LOGGER_DEBUG);
 
 		if (!DBA::isResult($r)) {
 			// Is it a DDoS attempt?
@@ -34,7 +35,7 @@ class GProbe {
 			$result = Cache::get("gprobe:".$urlparts["host"]);
 			if (!is_null($result)) {
 				if (in_array($result["network"], [Protocol::FEED, Protocol::PHANTOM])) {
-					Text::logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
+					App::logger("DDoS attempt detected for ".$urlparts["host"]." by ".$_SERVER["REMOTE_ADDR"].". server data: ".print_r($_SERVER, true), LOGGER_DEBUG);
 					return;
 				}
 			}
@@ -61,7 +62,7 @@ class GProbe {
 			}
 		}
 
-		Text::logger("gprobe end for ".Text::normaliseLink($url), LOGGER_DEBUG);
+		App::logger("gprobe end for ".Text::normaliseLink($url), LOGGER_DEBUG);
 		return;
 	}
 }

@@ -46,11 +46,11 @@ function pubsubhubbub_init(App $a) {
 		} elseif ($hub_mode === 'unsubscribe') {
 			$subscribe = 0;
 		} else {
-			Text::logger("Invalid hub_mode=$hub_mode, ignoring.");
+			App::logger("Invalid hub_mode=$hub_mode, ignoring.");
 			System::httpExit(404);
 		}
 
-		Text::logger("$hub_mode request from " . $_SERVER['REMOTE_ADDR']);
+		App::logger("$hub_mode request from " . $_SERVER['REMOTE_ADDR']);
 
 		// get the nick name from the topic, a bit hacky but needed as a fallback
 		$nick = substr(strrchr($hub_topic, "/"), 1);
@@ -61,7 +61,7 @@ function pubsubhubbub_init(App $a) {
 		}
 
 		if (!$nick) {
-			Text::logger('Bad hub_topic=$hub_topic, ignoring.');
+			App::logger('Bad hub_topic=$hub_topic, ignoring.');
 			System::httpExit(404);
 		}
 
@@ -69,13 +69,13 @@ function pubsubhubbub_init(App $a) {
 		$condition = ['nickname' => $nick, 'account_expired' => false, 'account_removed' => false];
 		$owner = DBA::selectFirst('user', ['uid', 'hidewall'], $condition);
 		if (!DBA::isResult($owner)) {
-			Text::logger('Local account not found: ' . $nick . ' - topic: ' . $hub_topic . ' - callback: ' . $hub_callback);
+			App::logger('Local account not found: ' . $nick . ' - topic: ' . $hub_topic . ' - callback: ' . $hub_callback);
 			System::httpExit(404);
 		}
 
 		// abort if user's wall is supposed to be private
 		if ($owner['hidewall']) {
-			Text::logger('Local user ' . $nick . 'has chosen to hide wall, ignoring.');
+			App::logger('Local user ' . $nick . 'has chosen to hide wall, ignoring.');
 			System::httpExit(403);
 		}
 
@@ -84,14 +84,14 @@ function pubsubhubbub_init(App $a) {
 			'pending' => false, 'self' => true];
 		$contact = DBA::selectFirst('contact', ['poll'], $condition);
 		if (!DBA::isResult($contact)) {
-			Text::logger('Self contact for user ' . $owner['uid'] . ' not found.');
+			App::logger('Self contact for user ' . $owner['uid'] . ' not found.');
 			System::httpExit(404);
 		}
 
 		// sanity check that topic URLs are the same
 		$hub_topic2 = str_replace('/feed/', '/dfrn_poll/', $hub_topic);
 		if (!Text::linkCompare($hub_topic, $contact['poll']) && !Text::linkCompare($hub_topic2, $contact['poll'])) {
-			Text::logger('Hub topic ' . $hub_topic . ' != ' . $contact['poll']);
+			App::logger('Hub topic ' . $hub_topic . ' != ' . $contact['poll']);
 			System::httpExit(404);
 		}
 
@@ -114,14 +114,14 @@ function pubsubhubbub_init(App $a) {
 
 		// give up if the HTTP return code wasn't a success (2xx)
 		if ($ret < 200 || $ret > 299) {
-			Text::logger("Subscriber verification for $hub_topic at $hub_callback returned $ret, ignoring.");
+			App::logger("Subscriber verification for $hub_topic at $hub_callback returned $ret, ignoring.");
 			System::httpExit(404);
 		}
 
 		// check that the correct hub_challenge code was echoed back
 		if (trim($body) !== $hub_challenge) {
-			Text::logger("Subscriber did not echo back hub.challenge, ignoring.");
-			Text::logger("\"$hub_challenge\" != \"".trim($body)."\"");
+			App::logger("Subscriber did not echo back hub.challenge, ignoring.");
+			App::logger("\"$hub_challenge\" != \"".trim($body)."\"");
 			System::httpExit(404);
 		}
 

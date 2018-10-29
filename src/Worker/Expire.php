@@ -6,8 +6,8 @@
 
 namespace Friendica\Worker;
 
+use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\Worker;
@@ -27,7 +27,7 @@ class Expire
 		Hook::loadHooks();
 
 		if ($param == 'delete') {
-			Text::logger('Delete expired items', LOGGER_DEBUG);
+			App::logger('Delete expired items', LOGGER_DEBUG);
 			// physically remove anything that has been deleted for more than two months
 			$condition = ["`deleted` AND `changed` < UTC_TIMESTAMP() - INTERVAL 60 DAY"];
 			$rows = DBA::select('item', ['id'],  $condition);
@@ -38,62 +38,62 @@ class Expire
 
 			// Normally we shouldn't have orphaned data at all.
 			// If we do have some, then we have to check why.
-			Text::logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
+			App::logger('Deleting orphaned item activities - start', LOGGER_DEBUG);
 			$condition = ["NOT EXISTS (SELECT `iaid` FROM `item` WHERE `item`.`iaid` = `item-activity`.`id`)"];
 			DBA::delete('item-activity', $condition);
-			Text::logger('Orphaned item activities deleted: ' . DBA::affectedRows(), LOGGER_DEBUG);
+			App::logger('Orphaned item activities deleted: ' . DBA::affectedRows(), LOGGER_DEBUG);
 
-			Text::logger('Deleting orphaned item content - start', LOGGER_DEBUG);
+			App::logger('Deleting orphaned item content - start', LOGGER_DEBUG);
 			$condition = ["NOT EXISTS (SELECT `icid` FROM `item` WHERE `item`.`icid` = `item-content`.`id`)"];
 			DBA::delete('item-content', $condition);
-			Text::logger('Orphaned item content deleted: ' . DBA::affectedRows(), LOGGER_DEBUG);
+			App::logger('Orphaned item content deleted: ' . DBA::affectedRows(), LOGGER_DEBUG);
 
 			// make this optional as it could have a performance impact on large sites
 			if (intval(Config::get('system', 'optimize_items'))) {
 				DBA::e("OPTIMIZE TABLE `item`");
 			}
 
-			Text::logger('Delete expired items - done', LOGGER_DEBUG);
+			App::logger('Delete expired items - done', LOGGER_DEBUG);
 			return;
 		} elseif (intval($param) > 0) {
 			$user = DBA::selectFirst('user', ['uid', 'username', 'expire'], ['uid' => $param]);
 			if (DBA::isResult($user)) {
-				Text::logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
+				App::logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - interval: '.$user['expire'], LOGGER_DEBUG);
 				Item::expire($user['uid'], $user['expire']);
-				Text::logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - done ', LOGGER_DEBUG);
+				App::logger('Expire items for user '.$user['uid'].' ('.$user['username'].') - done ', LOGGER_DEBUG);
 			}
 			return;
 		} elseif ($param == 'hook' && !empty($hook_function)) {
 			foreach (Hook::getByName('expire') as $hook) {
 				if ($hook[1] == $hook_function) {
-					Text::logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
+					App::logger("Calling expire hook '" . $hook[1] . "'", LOGGER_DEBUG);
 					Hook::callSingle($a, 'expire', $hook, $data);
 				}
 			}
 			return;
 		}
 
-		Text::logger('expire: start');
+		App::logger('expire: start');
 
 		Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 				'Expire', 'delete');
 
 		$r = DBA::p("SELECT `uid`, `username` FROM `user` WHERE `expire` != 0");
 		while ($row = DBA::fetch($r)) {
-			Text::logger('Calling expiry for user '.$row['uid'].' ('.$row['username'].')', LOGGER_DEBUG);
+			App::logger('Calling expiry for user '.$row['uid'].' ('.$row['username'].')', LOGGER_DEBUG);
 			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'Expire', (int)$row['uid']);
 		}
 		DBA::close($r);
 
-		Text::logger('expire: calling hooks');
+		App::logger('expire: calling hooks');
 		foreach (Hook::getByName('expire') as $hook) {
-			Text::logger("Calling expire hook for '" . $hook[1] . "'", LOGGER_DEBUG);
+			App::logger("Calling expire hook for '" . $hook[1] . "'", LOGGER_DEBUG);
 			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
 					'Expire', 'hook', $hook[1]);
 		}
 
-		Text::logger('expire: end');
+		App::logger('expire: end');
 
 		return;
 	}

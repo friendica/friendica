@@ -75,7 +75,7 @@ function display_init(App $a)
 	}
 
 	if (!empty($_SERVER['HTTP_ACCEPT']) && strstr($_SERVER['HTTP_ACCEPT'], 'application/atom+xml')) {
-		Text::logger('Directly serving XML for id '.$item["id"], LOGGER_DEBUG);
+		App::logger('Directly serving XML for id '.$item["id"], LOGGER_DEBUG);
 		displayShowFeed($item["id"], false);
 	}
 

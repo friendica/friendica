@@ -6,6 +6,7 @@ namespace Friendica\Protocol;
 
 use DOMDocument;
 use DOMXPath;
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -196,7 +197,7 @@ class OStatus
 			DBA::update('contact', $contact, ['id' => $contact["id"]], $current);
 
 			if (!empty($author["author-avatar"]) && ($author["author-avatar"] != $current['avatar'])) {
-				Text::logger("Update profile picture for contact ".$contact["id"], LOGGER_DEBUG);
+				App::logger("Update profile picture for contact ".$contact["id"], LOGGER_DEBUG);
 				Contact::updateAvatar($author["author-avatar"], $importer["uid"], $contact["id"]);
 			}
 
@@ -323,7 +324,7 @@ class OStatus
 			self::$conv_list = [];
 		}
 
-		Text::logger('Import OStatus message for user ' . $importer['uid'], LOGGER_DEBUG);
+		App::logger('Import OStatus message for user ' . $importer['uid'], LOGGER_DEBUG);
 
 		if ($xml == "") {
 			return false;
@@ -349,7 +350,7 @@ class OStatus
 				foreach ($hub_attributes as $hub_attribute) {
 					if ($hub_attribute->name == "href") {
 						$hub = $hub_attribute->textContent;
-						Text::logger("Found hub ".$hub, LOGGER_DEBUG);
+						App::logger("Found hub ".$hub, LOGGER_DEBUG);
 					}
 				}
 			}
@@ -434,27 +435,27 @@ class OStatus
 
 			if (in_array($item["verb"], [NAMESPACE_OSTATUS."/unfavorite", ACTIVITY_UNFAVORITE])) {
 				// Ignore "Unfavorite" message
-				Text::logger("Ignore unfavorite message ".print_r($item, true), LOGGER_DEBUG);
+				App::logger("Ignore unfavorite message ".print_r($item, true), LOGGER_DEBUG);
 				continue;
 			}
 
 			// Deletions come with the same uri, so we check for duplicates after processing deletions
 			if (Item::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]])) {
-				Text::logger('Post with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
+				App::logger('Post with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
 				continue;
 			} else {
-				Text::logger('Processing post with URI '.$item["uri"].' for user '.$importer["uid"].'.', LOGGER_DEBUG);
+				App::logger('Processing post with URI '.$item["uri"].' for user '.$importer["uid"].'.', LOGGER_DEBUG);
 			}
 
 			if ($item["verb"] == ACTIVITY_JOIN) {
 				// ignore "Join" messages
-				Text::logger("Ignore join message ".print_r($item, true), LOGGER_DEBUG);
+				App::logger("Ignore join message ".print_r($item, true), LOGGER_DEBUG);
 				continue;
 			}
 
 			if ($item["verb"] == "http://mastodon.social/schema/1.0/block") {
 				// ignore mastodon "block" messages
-				Text::logger("Ignore block message ".print_r($item, true), LOGGER_DEBUG);
+				App::logger("Ignore block message ".print_r($item, true), LOGGER_DEBUG);
 				continue;
 			}
 
@@ -471,7 +472,7 @@ class OStatus
 
 			if ($item["verb"] == ACTIVITY_FAVORITE) {
 				$orig_uri = $xpath->query("activity:object/atom:id", $entry)->item(0)->nodeValue;
-				Text::logger("Favorite ".$orig_uri." ".print_r($item, true));
+				App::logger("Favorite ".$orig_uri." ".print_r($item, true));
 
 				$item["verb"] = ACTIVITY_LIKE;
 				$item["parent-uri"] = $orig_uri;
@@ -481,7 +482,7 @@ class OStatus
 
 			// http://activitystrea.ms/schema/1.0/rsvp-yes
 			if (!in_array($item["verb"], [ACTIVITY_POST, ACTIVITY_LIKE, ACTIVITY_SHARE])) {
-				Text::logger("Unhandled verb ".$item["verb"]." ".print_r($item, true), LOGGER_DEBUG);
+				App::logger("Unhandled verb ".$item["verb"]." ".print_r($item, true), LOGGER_DEBUG);
 			}
 
 			self::processPost($xpath, $entry, $item, $importer);
@@ -494,10 +495,10 @@ class OStatus
 						// If not, then it depends on this setting
 						$valid = !Config::get('system', 'ostatus_full_threads');
 						if ($valid) {
-							Text::logger("Item with uri ".self::$itemlist[0]['uri']." will be imported due to the system settings.", LOGGER_DEBUG);
+							App::logger("Item with uri ".self::$itemlist[0]['uri']." will be imported due to the system settings.", LOGGER_DEBUG);
 						}
 					} else {
-						Text::logger("Item with uri ".self::$itemlist[0]['uri']." belongs to a contact (".self::$itemlist[0]['contact-id']."). It will be imported.", LOGGER_DEBUG);
+						App::logger("Item with uri ".self::$itemlist[0]['uri']." belongs to a contact (".self::$itemlist[0]['contact-id']."). It will be imported.", LOGGER_DEBUG);
 					}
 					if ($valid) {
 						// Never post a thread when the only interaction by our contact was a like
@@ -509,14 +510,14 @@ class OStatus
 							}
 						}
 						if ($valid) {
-							Text::logger("Item with uri ".self::$itemlist[0]['uri']." will be imported since the thread contains posts or shares.", LOGGER_DEBUG);
+							App::logger("Item with uri ".self::$itemlist[0]['uri']." will be imported since the thread contains posts or shares.", LOGGER_DEBUG);
 						}
 					}
 				} else {
 					// But we will only import complete threads
 					$valid = Item::exists(['uid' => $importer["uid"], 'uri' => self::$itemlist[0]['parent-uri']]);
 					if ($valid) {
-						Text::logger("Item with uri ".self::$itemlist[0]["uri"]." belongs to parent ".self::$itemlist[0]['parent-uri']." of user ".$importer["uid"].". It will be imported.", LOGGER_DEBUG);
+						App::logger("Item with uri ".self::$itemlist[0]["uri"]." belongs to parent ".self::$itemlist[0]['parent-uri']." of user ".$importer["uid"].". It will be imported.", LOGGER_DEBUG);
 					}
 				}
 
@@ -533,25 +534,25 @@ class OStatus
 					foreach (self::$itemlist as $item) {
 						$found = Item::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]]);
 						if ($found) {
-							Text::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already exists.", LOGGER_DEBUG);
+							App::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already exists.", LOGGER_DEBUG);
 						} elseif ($item['contact-id'] < 0) {
-							Text::logger("Item with uri ".$item["uri"]." is from a blocked contact.", LOGGER_DEBUG);
+							App::logger("Item with uri ".$item["uri"]." is from a blocked contact.", LOGGER_DEBUG);
 						} else {
 							// We are having duplicated entries. Hopefully this solves it.
 							if (Lock::acquire('ostatus_process_item_insert')) {
 								$ret = Item::insert($item);
 								Lock::release('ostatus_process_item_insert');
-								Text::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"].' stored. Return value: '.$ret);
+								App::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"].' stored. Return value: '.$ret);
 							} else {
 								$ret = Item::insert($item);
-								Text::logger("We couldn't lock - but tried to store the item anyway. Return value is ".$ret);
+								App::logger("We couldn't lock - but tried to store the item anyway. Return value is ".$ret);
 							}
 						}
 					}
 				}
 				self::$itemlist = [];
 			}
-			Text::logger('Processing done for post with URI '.$item["uri"].' for user '.$importer["uid"].'.', LOGGER_DEBUG);
+			App::logger('Processing done for post with URI '.$item["uri"].' for user '.$importer["uid"].'.', LOGGER_DEBUG);
 		}
 		return true;
 	}
@@ -565,13 +566,13 @@ class OStatus
 	{
 		$condition = ['uid' => $item['uid'], 'author-id' => $item['author-id'], 'uri' => $item['uri']];
 		if (!Item::exists($condition)) {
-			Text::logger('Item from '.$item['author-link'].' with uri '.$item['uri'].' for user '.$item['uid']." wasn't found. We don't delete it.");
+			App::logger('Item from '.$item['author-link'].' with uri '.$item['uri'].' for user '.$item['uid']." wasn't found. We don't delete it.");
 			return;
 		}
 
 		Item::delete($condition);
 
-		Text::logger('Deleted item with uri '.$item['uri'].' for user '.$item['uid']);
+		App::logger('Deleted item with uri '.$item['uri'].' for user '.$item['uid']);
 	}
 
 	/**
@@ -707,7 +708,7 @@ class OStatus
 					self::fetchRelated($related, $item["parent-uri"], $importer);
 				}
 			} else {
-				Text::logger('Reply with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
+				App::logger('Reply with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', LOGGER_DEBUG);
 			}
 		} else {
 			$item["parent-uri"] = $item["uri"];
@@ -853,11 +854,11 @@ class OStatus
 
 			$condition = ['item-uri' => $conv_data['uri'],'protocol' => Conversation::PARCEL_FEED];
 			if (DBA::exists('conversation', $condition)) {
-				Text::logger('Delete deprecated entry for URI '.$conv_data['uri'], LOGGER_DEBUG);
+				App::logger('Delete deprecated entry for URI '.$conv_data['uri'], LOGGER_DEBUG);
 				DBA::delete('conversation', ['item-uri' => $conv_data['uri']]);
 			}
 
-			Text::logger('Store conversation data for uri '.$conv_data['uri'], LOGGER_DEBUG);
+			App::logger('Store conversation data for uri '.$conv_data['uri'], LOGGER_DEBUG);
 			Conversation::insert($conv_data);
 		}
 	}
@@ -877,7 +878,7 @@ class OStatus
 	{
 		$condition = ['`item-uri` = ? AND `protocol` IN (?, ?)', $self, Conversation::PARCEL_DFRN, Conversation::PARCEL_SALMON];
 		if (DBA::exists('conversation', $condition)) {
-			Text::logger('Conversation '.$item['uri'].' is already stored.', LOGGER_DEBUG);
+			App::logger('Conversation '.$item['uri'].' is already stored.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -897,7 +898,7 @@ class OStatus
 		$item["protocol"] = Conversation::PARCEL_SALMON;
 		$item["source"] = $xml;
 
-		Text::logger('Conversation '.$item['uri'].' is now fetched.', LOGGER_DEBUG);
+		App::logger('Conversation '.$item['uri'].' is now fetched.', LOGGER_DEBUG);
 	}
 
 	/**
@@ -916,11 +917,11 @@ class OStatus
 			$stored = true;
 			$xml = $conversation['source'];
 			if (self::process($xml, $importer, $contact, $hub, $stored, false)) {
-				Text::logger('Got valid cached XML for URI '.$related_uri, LOGGER_DEBUG);
+				App::logger('Got valid cached XML for URI '.$related_uri, LOGGER_DEBUG);
 				return;
 			}
 			if ($conversation['protocol'] == Conversation::PARCEL_SALMON) {
-				Text::logger('Delete invalid cached XML for URI '.$related_uri, LOGGER_DEBUG);
+				App::logger('Delete invalid cached XML for URI '.$related_uri, LOGGER_DEBUG);
 				DBA::delete('conversation', ['item-uri' => $related_uri]);
 			}
 		}
@@ -935,7 +936,7 @@ class OStatus
 		$xml = '';
 
 		if (stristr($curlResult->getHeader(), 'Content-Type: application/atom+xml')) {
-			Text::logger('Directly fetched XML for URI ' . $related_uri, LOGGER_DEBUG);
+			App::logger('Directly fetched XML for URI ' . $related_uri, LOGGER_DEBUG);
 			$xml = $curlResult->getBody();
 		}
 
@@ -960,7 +961,7 @@ class OStatus
 					$curlResult = Network::curl($atom_file);
 
 					if ($curlResult->isSuccess()) {
-						Text::logger('Fetched XML for URI ' . $related_uri, LOGGER_DEBUG);
+						App::logger('Fetched XML for URI ' . $related_uri, LOGGER_DEBUG);
 						$xml = $curlResult->getBody();
 					}
 				}
@@ -972,7 +973,7 @@ class OStatus
 			$curlResult = Network::curl(str_replace('/notice/', '/api/statuses/show/', $related).'.atom');
 
 			if ($curlResult->isSuccess()) {
-				Text::logger('GNU Social workaround to fetch XML for URI ' . $related_uri, LOGGER_DEBUG);
+				App::logger('GNU Social workaround to fetch XML for URI ' . $related_uri, LOGGER_DEBUG);
 				$xml = $curlResult->getBody();
 			}
 		}
@@ -983,7 +984,7 @@ class OStatus
 			$curlResult = Network::curl(str_replace('/notice/', '/api/statuses/show/', $related_guess).'.atom');
 
 			if ($curlResult->isSuccess()) {
-				Text::logger('GNU Social workaround 2 to fetch XML for URI ' . $related_uri, LOGGER_DEBUG);
+				App::logger('GNU Social workaround 2 to fetch XML for URI ' . $related_uri, LOGGER_DEBUG);
 				$xml = $curlResult->getBody();
 			}
 		}
@@ -994,7 +995,7 @@ class OStatus
 			$conversation = DBA::selectFirst('conversation', ['source'], $condition);
 			if (DBA::isResult($conversation)) {
 				$stored = true;
-				Text::logger('Got cached XML from conversation for URI '.$related_uri, LOGGER_DEBUG);
+				App::logger('Got cached XML from conversation for URI '.$related_uri, LOGGER_DEBUG);
 				$xml = $conversation['source'];
 			}
 		}
@@ -1002,7 +1003,7 @@ class OStatus
 		if ($xml != '') {
 			self::process($xml, $importer, $contact, $hub, $stored, false);
 		} else {
-			Text::logger("XML couldn't be fetched for URI: ".$related_uri." - href: ".$related, LOGGER_DEBUG);
+			App::logger("XML couldn't be fetched for URI: ".$related_uri." - href: ".$related, LOGGER_DEBUG);
 		}
 		return;
 	}
@@ -1652,7 +1653,7 @@ class OStatus
 	private static function reshareEntry(DOMDocument $doc, array $item, array $owner, $repeated_guid, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (Text::normaliseLink($item["author-link"]) != Text::normaliseLink($owner["url"]))) {
-			Text::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
+			App::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
 		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
@@ -1715,7 +1716,7 @@ class OStatus
 	private static function likeEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (Text::normaliseLink($item["author-link"]) != Text::normaliseLink($owner["url"]))) {
-			Text::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
+			App::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
 		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
@@ -1862,7 +1863,7 @@ class OStatus
 	private static function noteEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
 		if (($item["id"] != $item["parent"]) && (Text::normaliseLink($item["author-link"]) != Text::normaliseLink($owner["url"]))) {
-			Text::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
+			App::logger("OStatus entry is from author ".$owner["url"]." - not from ".$item["author-link"].". Quitting.", LOGGER_DEBUG);
 		}
 
 		$title = self::entryHeader($doc, $entry, $owner, $item, $toplevel);
@@ -2153,7 +2154,7 @@ class OStatus
 		if ((time() - strtotime($owner['last-item'])) < 15*60) {
 			$result = Cache::get($cachekey);
 			if (!$nocache && !is_null($result)) {
-				Text::logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created . ' (cached)', LOGGER_DEBUG);
+				App::logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created . ' (cached)', LOGGER_DEBUG);
 				$last_update = $result['last_update'];
 				return $result['feed'];
 			}
@@ -2213,7 +2214,7 @@ class OStatus
 		$msg = ['feed' => $feeddata, 'last_update' => $last_update];
 		Cache::set($cachekey, $msg, Cache::QUARTER_HOUR);
 
-		Text::logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created, LOGGER_DEBUG);
+		App::logger('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created, LOGGER_DEBUG);
 
 		return $feeddata;
 	}

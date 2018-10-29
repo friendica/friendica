@@ -5,6 +5,7 @@
 
 namespace Friendica\Util;
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Util\JsonLD;
 use Friendica\Util\DateTimeFormat;
@@ -44,7 +45,7 @@ class LDSignature
 		$dhash = self::hash(self::signableData($data));
 
 		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode($data['signature']['signatureValue']), $pubkey);
-		Text::logger('LD-verify: ' . intval($x));
+		App::logger('LD-verify: ' . intval($x));
 
 		if (empty($x)) {
 			return false;

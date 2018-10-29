@@ -5,8 +5,8 @@
  */
 namespace Friendica\Util;
 
+use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
@@ -60,7 +60,7 @@ class HTTPSignature
 		$sig_block = self::parseSigheader($headers['authorization']);
 
 		if (!$sig_block) {
-			Text::logger('no signature provided.');
+			App::logger('no signature provided.');
 			return $result;
 		}
 
@@ -90,7 +90,7 @@ class HTTPSignature
 			$key = $key($sig_block['keyId']);
 		}
 
-		Text::logger('Got keyID ' . $sig_block['keyId']);
+		App::logger('Got keyID ' . $sig_block['keyId']);
 
 		if (!$key) {
 			return $result;
@@ -98,7 +98,7 @@ class HTTPSignature
 
 		$x = Crypto::rsaVerify($signed_data, $sig_block['signature'], $key, $algorithm);
 
-		Text::logger('verified: ' . $x, LOGGER_DEBUG);
+		App::logger('verified: ' . $x, LOGGER_DEBUG);
 
 		if (!$x) {
 			return $result;
@@ -308,7 +308,7 @@ class HTTPSignature
 		$postResult = Network::post($target, $content, $headers);
 		$return_code = $postResult->getReturnCode();
 
-		Text::logger('Transmit to ' . $target . ' returned ' . $return_code);
+		App::logger('Transmit to ' . $target . ' returned ' . $return_code);
 
 		return ($return_code >= 200) && ($return_code <= 299);
 	}
@@ -433,12 +433,12 @@ class HTTPSignature
 
 		$profile = APContact::getByURL($url);
 		if (!empty($profile)) {
-			Text::logger('Taking key from id ' . $id, LOGGER_DEBUG);
+			App::logger('Taking key from id ' . $id, LOGGER_DEBUG);
 			return ['url' => $url, 'pubkey' => $profile['pubkey']];
 		} elseif ($url != $actor) {
 			$profile = APContact::getByURL($actor);
 			if (!empty($profile)) {
-				Text::logger('Taking key from actor ' . $actor, LOGGER_DEBUG);
+				App::logger('Taking key from actor ' . $actor, LOGGER_DEBUG);
 				return ['url' => $actor, 'pubkey' => $profile['pubkey']];
 			}
 		}

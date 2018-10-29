@@ -98,7 +98,7 @@ if ($mode == "stop") {
 
 	unlink($pidfile);
 
-	Text::logger("Worker daemon process $pid was killed.", LOGGER_DEBUG);
+	App::logger("Worker daemon process $pid was killed.", LOGGER_DEBUG);
 
 	Config::set('system', 'worker_daemon_mode', false);
 	die("Worker daemon process $pid was killed.\n");
@@ -108,7 +108,7 @@ if (!empty($pid) && posix_kill($pid, 0)) {
 	die("Daemon process $pid is already running.\n");
 }
 
-Text::logger('Starting worker daemon.', LOGGER_DEBUG);
+App::logger('Starting worker daemon.', LOGGER_DEBUG);
 
 if (!$foreground) {
 	echo "Starting worker daemon.\n";
@@ -156,7 +156,7 @@ $last_cron = 0;
 // Now running as a daemon.
 while (true) {
 	if (!$do_cron && ($last_cron + $wait_interval) < time()) {
-		Text::logger('Forcing cron worker call.', LOGGER_DEBUG);
+		App::logger('Forcing cron worker call.', LOGGER_DEBUG);
 		$do_cron = true;
 	}
 
@@ -170,7 +170,7 @@ while (true) {
 		$last_cron = time();
 	}
 
-	Text::logger("Sleeping", LOGGER_DEBUG);
+	App::logger("Sleeping", LOGGER_DEBUG);
 	$start = time();
 	do {
 		$seconds = (time() - $start);
@@ -187,10 +187,10 @@ while (true) {
 
 	if ($timeout) {
 		$do_cron = true;
-		Text::logger("Woke up after $wait_interval seconds.", LOGGER_DEBUG);
+		App::logger("Woke up after $wait_interval seconds.", LOGGER_DEBUG);
 	} else {
 		$do_cron = false;
-		Text::logger("Worker jobs are calling to be forked.", LOGGER_DEBUG);
+		App::logger("Worker jobs are calling to be forked.", LOGGER_DEBUG);
 	}
 }
 

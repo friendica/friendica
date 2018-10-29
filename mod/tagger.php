@@ -29,13 +29,13 @@ function tagger_content(App $a) {
 
 	$item_id = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : 0);
 
-	Text::logger('tagger: tag ' . $term . ' item ' . $item_id);
+	App::logger('tagger: tag ' . $term . ' item ' . $item_id);
 
 
 	$item = Item::selectFirst([], ['id' => $item_id]);
 
 	if (!$item_id || !DBA::isResult($item)) {
-		Text::logger('tagger: no item ' . $item_id);
+		App::logger('tagger: no item ' . $item_id);
 		return;
 	}
 
@@ -61,7 +61,7 @@ function tagger_content(App $a) {
 	if (DBA::isResult($r)) {
 			$contact = $r[0];
 	} else {
-		Text::logger('tagger: no contact_id');
+		App::logger('tagger: no contact_id');
 		return;
 	}
 

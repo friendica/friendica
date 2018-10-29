@@ -3,6 +3,7 @@
  * @file mod/babel.php
  */
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\L10n;
 

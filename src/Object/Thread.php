@@ -4,8 +4,8 @@
  */
 namespace Friendica\Object;
 
+use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Content\Text;
 use Friendica\Core\Protocol;
 use Friendica\Object\Post;
 use Friendica\Util\Security;
@@ -77,7 +77,7 @@ class Thread extends BaseObject
 				$this->writable = $writable;
 				break;
 			default:
-				Text::logger('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').', LOGGER_DEBUG);
+				App::logger('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').', LOGGER_DEBUG);
 				return false;
 				break;
 		}
@@ -137,12 +137,12 @@ class Thread extends BaseObject
 		$item_id = $item->getId();
 
 		if (!$item_id) {
-			Text::logger('[ERROR] Conversation::addThread : Item has no ID!!', LOGGER_DEBUG);
+			App::logger('[ERROR] Conversation::addThread : Item has no ID!!', LOGGER_DEBUG);
 			return false;
 		}
 
 		if ($this->getParent($item->getId())) {
-			Text::logger('[WARN] Conversation::addThread : Thread already exists ('. $item->getId() .').', LOGGER_DEBUG);
+			App::logger('[WARN] Conversation::addThread : Thread already exists ('. $item->getId() .').', LOGGER_DEBUG);
 			return false;
 		}
 
@@ -150,12 +150,12 @@ class Thread extends BaseObject
 		 * Only add will be displayed
 		 */
 		if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {
-			Text::logger('[WARN] Conversation::addThread : Thread is a mail ('. $item->getId() .').', LOGGER_DEBUG);
+			App::logger('[WARN] Conversation::addThread : Thread is a mail ('. $item->getId() .').', LOGGER_DEBUG);
 			return false;
 		}
 
 		if ($item->getDataValue('verb') === ACTIVITY_LIKE || $item->getDataValue('verb') === ACTIVITY_DISLIKE) {
-			Text::logger('[WARN] Conversation::addThread : Thread is a (dis)like ('. $item->getId() .').', LOGGER_DEBUG);
+			App::logger('[WARN] Conversation::addThread : Thread is a (dis)like ('. $item->getId() .').', LOGGER_DEBUG);
 			return false;
 		}
 
@@ -189,7 +189,7 @@ class Thread extends BaseObject
 			$item_data = $item->getTemplateData($conv_responses);
 
 			if (!$item_data) {
-				Text::logger('[ERROR] Conversation::getTemplateData : Failed to get item template data ('. $item->getId() .').', LOGGER_DEBUG);
+				App::logger('[ERROR] Conversation::getTemplateData : Failed to get item template data ('. $item->getId() .').', LOGGER_DEBUG);
 				return false;
 			}
 			$result[] = $item_data;

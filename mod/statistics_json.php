@@ -57,6 +57,6 @@ function statistics_json_init(App $a) {
 
 	header("Content-Type: application/json");
 	echo json_encode($statistics, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	Text::logger("statistics_init: printed " . print_r($statistics, true), LOGGER_DATA);
+	App::logger("statistics_init: printed " . print_r($statistics, true), LOGGER_DATA);
 	killme();
 }

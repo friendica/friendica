@@ -4,8 +4,8 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -39,12 +39,12 @@ class Cron
 		if ($last) {
 			$next = $last + ($poll_interval * 60);
 			if ($next > time()) {
-				Text::logger('cron intervall not reached');
+				App::logger('cron intervall not reached');
 				return;
 			}
 		}
 
-		Text::logger('cron: start');
+		App::logger('cron: start');
 
 		// Fork the cron jobs in separate parts to avoid problems when one of them is crashing
 		Hook::fork($a->queue['priority'], "cron");
@@ -125,7 +125,7 @@ class Cron
 		// Poll contacts
 		self::pollContacts($parameter, $generation);
 
-		Text::logger('cron: end');
+		App::logger('cron: end');
 
 		Config::set('system', 'last_cron', time());
 
@@ -288,7 +288,7 @@ class Cron
 				$priority = PRIORITY_LOW;
 			}
 
-			Text::logger("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
+			App::logger("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
 
 			Worker::add(['priority' => $priority, 'dont_fork' => true], 'OnePoll', (int)$contact['id']);
 		}

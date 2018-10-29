@@ -27,7 +27,7 @@ function subthread_content(App $a) {
 	$item = Item::selectFirst([], $condition);
 
 	if (empty($item_id) || !DBA::isResult($item)) {
-		Text::logger('subthread: no item ' . $item_id);
+		App::logger('subthread: no item ' . $item_id);
 		return;
 	}
 
@@ -63,7 +63,7 @@ function subthread_content(App $a) {
 	}
 
 	if (!$owner) {
-		Text::logger('like: no owner');
+		App::logger('like: no owner');
 		return;
 	}
 

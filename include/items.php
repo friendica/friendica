@@ -3,6 +3,7 @@
  * @file include/items.php
  */
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Content\Text;
@@ -109,7 +110,7 @@ function query_page_info($url, $photo = "", $keywords = false, $keyword_blacklis
 		$data["images"][0]["src"] = $photo;
 	}
 
-	Text::logger('fetch page info for ' . $url . ' ' . print_r($data, true), LOGGER_DEBUG);
+	App::logger('fetch page info for ' . $url . ' ' . print_r($data, true), LOGGER_DEBUG);
 
 	if (!$keywords && isset($data["keywords"])) {
 		unset($data["keywords"]);
@@ -167,7 +168,7 @@ function add_page_info($url, $no_photos = false, $photo = "", $keywords = false,
 
 function add_page_info_to_body($body, $texturl = false, $no_photos = false)
 {
-	Text::logger('add_page_info_to_body: fetch page info for body ' . $body, LOGGER_DEBUG);
+	App::logger('add_page_info_to_body: fetch page info for body ' . $body, LOGGER_DEBUG);
 
 	$URLSearchString = "^\[\]";
 
@@ -251,7 +252,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 			// Test - remove before flight
 			//$tempfile = tempnam(get_temppath(), "ostatus2");
 			//file_put_contents($tempfile, $xml);
-			Text::logger("Consume OStatus messages ", LOGGER_DEBUG);
+			App::logger("Consume OStatus messages ", LOGGER_DEBUG);
 			OStatus::import($xml, $importer, $contact, $hub);
 		}
 
@@ -260,7 +261,7 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 
 	if ($contact['network'] === Protocol::FEED) {
 		if ($pass < 2) {
-			Text::logger("Consume feeds", LOGGER_DEBUG);
+			App::logger("Consume feeds", LOGGER_DEBUG);
 			Feed::import($xml, $importer, $contact, $hub);
 		}
 
@@ -268,10 +269,10 @@ function consume_feed($xml, array $importer, array $contact, &$hub, $datedir = 0
 	}
 
 	if ($contact['network'] === Protocol::DFRN) {
-		Text::logger("Consume DFRN messages", LOGGER_DEBUG);
+		App::logger("Consume DFRN messages", LOGGER_DEBUG);
 		$dfrn_importer = DFRN::getImporter($contact["id"], $importer["uid"]);
 		if (!empty($dfrn_importer)) {
-			Text::logger("Now import the DFRN feed");
+			App::logger("Now import the DFRN feed");
 			DFRN::import($xml, $dfrn_importer, true);
 			return;
 		}
@@ -310,7 +311,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 
 	$params= 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode($contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
 
-	Text::logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
+	App::logger('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: '  . $push_url . ' with verifier ' . $verify_token);
 
 	if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
 		DBA::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
@@ -318,7 +319,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 
 	$postResult = Network::post($url, $params);
 
-	Text::logger('subscribe_to_hub: returns: ' . $postResult->getReturnCode(), LOGGER_DEBUG);
+	App::logger('subscribe_to_hub: returns: ' . $postResult->getReturnCode(), LOGGER_DEBUG);
 
 	return;
 

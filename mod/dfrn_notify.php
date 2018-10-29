@@ -18,7 +18,7 @@ use Friendica\Protocol\Diaspora;
 require_once 'include/items.php';
 
 function dfrn_notify_post(App $a) {
-	Text::logger(__function__, LOGGER_TRACE);
+	App::logger(__function__, LOGGER_TRACE);
 
 	$postdata = file_get_contents('php://input');
 
@@ -64,7 +64,7 @@ function dfrn_notify_post(App $a) {
 	}
 
 	if (!DBA::exists('challenge', ['dfrn-id' => $dfrn_id, 'challenge' => $challenge])) {
-		Text::logger('could not match challenge to dfrn_id ' . $dfrn_id . ' challenge=' . $challenge);
+		App::logger('could not match challenge to dfrn_id ' . $dfrn_id . ' challenge=' . $challenge);
 		System::xmlExit(3, 'Could not match challenge');
 	}
 
@@ -72,7 +72,7 @@ function dfrn_notify_post(App $a) {
 
 	$user = DBA::selectFirst('user', ['uid'], ['nickname' => $a->argv[1]]);
 	if (!DBA::isResult($user)) {
-		Text::logger('User not found for nickname ' . $a->argv[1]);
+		App::logger('User not found for nickname ' . $a->argv[1]);
 		System::xmlExit(3, 'User not found');
 	}
 
@@ -95,7 +95,7 @@ function dfrn_notify_post(App $a) {
 
 	$contact = DBA::selectFirst('contact', ['id'], $condition);
 	if (!DBA::isResult($contact)) {
-		Text::logger('contact not found for dfrn_id ' . $dfrn_id);
+		App::logger('contact not found for dfrn_id ' . $dfrn_id);
 		System::xmlExit(3, 'Contact not found');
 	}
 
@@ -118,12 +118,12 @@ function dfrn_notify_post(App $a) {
 
 	$importer = Contact::updateSslPolicy($importer, $ssl_policy);
 
-	Text::logger('data: ' . $data, LOGGER_DATA);
+	App::logger('data: ' . $data, LOGGER_DATA);
 
 	if ($dissolve == 1) {
 		// Relationship is dissolved permanently
 		Contact::remove($importer['id']);
-		Text::logger('relationship dissolved : ' . $importer['name'] . ' dissolved ' . $importer['username']);
+		App::logger('relationship dissolved : ' . $importer['name'] . ' dissolved ' . $importer['username']);
 		System::xmlExit(0, 'relationship dissolved');
 	}
 
@@ -135,12 +135,12 @@ function dfrn_notify_post(App $a) {
 		// if local rino is lower than remote rino, abort: should not happen!
 		// but only for $remote_rino > 1, because old code did't send rino version
 		if ($rino_remote > 1 && $rino < $rino_remote) {
-			Text::logger("rino version '$rino_remote' is lower than supported '$rino'");
+			App::logger("rino version '$rino_remote' is lower than supported '$rino'");
 			System::xmlExit(0, "rino version '$rino_remote' is lower than supported '$rino'");
 		}
 
 		$rawkey = hex2bin(trim($key));
-		Text::logger('rino: md5 raw key: ' . md5($rawkey), LOGGER_DATA);
+		App::logger('rino: md5 raw key: ' . md5($rawkey), LOGGER_DATA);
 
 		$final_key = '';
 
@@ -166,14 +166,14 @@ function dfrn_notify_post(App $a) {
 				$data = DFRN::aesDecrypt(hex2bin($data), $final_key);
 				break;
 			default:
-				Text::logger("rino: invalid sent version '$rino_remote'");
+				App::logger("rino: invalid sent version '$rino_remote'");
 				System::xmlExit(0, "Invalid sent version '$rino_remote'");
 		}
 
-		Text::logger('rino: decrypted data: ' . $data, LOGGER_DATA);
+		App::logger('rino: decrypted data: ' . $data, LOGGER_DATA);
 	}
 
-	Text::logger('Importing post from ' . $importer['addr'] . ' to ' . $importer['nickname'] . ' with the RINO ' . $rino_remote . ' encryption.', LOGGER_DEBUG);
+	App::logger('Importing post from ' . $importer['addr'] . ' to ' . $importer['nickname'] . ' with the RINO ' . $rino_remote . ' encryption.', LOGGER_DEBUG);
 
 	$ret = DFRN::import($data, $importer);
 	System::xmlExit($ret, 'Processed');
@@ -192,7 +192,7 @@ function dfrn_dispatch_public($postdata)
 	// Fetch the corresponding public contact
 	$contact = Contact::getDetailsByAddr($msg['author'], 0);
 	if (!$contact) {
-		Text::logger('Contact not found for address ' . $msg['author']);
+		App::logger('Contact not found for address ' . $msg['author']);
 		System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 	}
 
@@ -200,11 +200,11 @@ function dfrn_dispatch_public($postdata)
 
 	// This should never fail
 	if (empty($importer)) {
-		Text::logger('Contact not found for address ' . $msg['author']);
+		App::logger('Contact not found for address ' . $msg['author']);
 		System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 	}
 
-	Text::logger('Importing post from ' . $msg['author'] . ' with the public envelope.', LOGGER_DEBUG);
+	App::logger('Importing post from ' . $msg['author'] . ' with the public envelope.', LOGGER_DEBUG);
 
 	// Now we should be able to import it
 	$ret = DFRN::import($msg['message'], $importer);
@@ -224,7 +224,7 @@ function dfrn_dispatch_private($user, $postdata)
 		// Otherwise there should be a public contact
 		$cid = Contact::getIdForURL($msg['author']);
 		if (!$cid) {
-			Text::logger('Contact not found for address ' . $msg['author']);
+			App::logger('Contact not found for address ' . $msg['author']);
 			System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 		}
 	}
@@ -233,11 +233,11 @@ function dfrn_dispatch_private($user, $postdata)
 
 	// This should never fail
 	if (empty($importer)) {
-		Text::logger('Contact not found for address ' . $msg['author']);
+		App::logger('Contact not found for address ' . $msg['author']);
 		System::xmlExit(3, 'Contact ' . $msg['author'] . ' not found');
 	}
 
-	Text::logger('Importing post from ' . $msg['author'] . ' to ' . $user['nickname'] . ' with the private envelope.', LOGGER_DEBUG);
+	App::logger('Importing post from ' . $msg['author'] . ' to ' . $user['nickname'] . ' with the private envelope.', LOGGER_DEBUG);
 
 	// Now we should be able to import it
 	$ret = DFRN::import($msg['message'], $importer);
@@ -259,7 +259,7 @@ function dfrn_notify_content(App $a) {
 		$type = "";
 		$last_update = "";
 
-		Text::logger('new notification dfrn_id=' . $dfrn_id);
+		App::logger('new notification dfrn_id=' . $dfrn_id);
 
 		$direction = (-1);
 		if (strpos($dfrn_id,':') == 1) {
@@ -277,11 +277,11 @@ function dfrn_notify_content(App $a) {
 			'type' => $type, 'last_update' => $last_update];
 		DBA::insert('challenge', $fields);
 
-		Text::logger('challenge=' . $hash, LOGGER_DATA);
+		App::logger('challenge=' . $hash, LOGGER_DATA);
 
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $a->argv[1]]);
 		if (!DBA::isResult($user)) {
-			Text::logger('User not found for nickname ' . $a->argv[1]);
+			App::logger('User not found for nickname ' . $a->argv[1]);
 			killme();
 		}
 
@@ -306,18 +306,18 @@ function dfrn_notify_content(App $a) {
 
 		$contact = DBA::selectFirst('contact', ['id'], $condition);
 		if (!DBA::isResult($contact)) {
-			Text::logger('contact not found for dfrn_id ' . $dfrn_id);
+			App::logger('contact not found for dfrn_id ' . $dfrn_id);
 			System::xmlExit(3, 'Contact not found');
 		}
 
 		// $importer in this case contains the contact record for the remote contact joined with the user record of our user.
 		$importer = DFRN::getImporter($contact['id'], $user['uid']);
 		if (empty($importer)) {
-			Text::logger('No importer data found for user ' . $a->argv[1] . ' and contact ' . $dfrn_id);
+			App::logger('No importer data found for user ' . $a->argv[1] . ' and contact ' . $dfrn_id);
 			killme();
 		}
 
-		Text::logger("Remote rino version: ".$rino_remote." for ".$importer["url"], LOGGER_DATA);
+		App::logger("Remote rino version: ".$rino_remote." for ".$importer["url"], LOGGER_DATA);
 
 		$challenge    = '';
 		$encrypted_id = '';
@@ -345,7 +345,7 @@ function dfrn_notify_content(App $a) {
 		$rino = Config::get('system', 'rino_encrypt');
 		$rino = intval($rino);
 
-		Text::logger("Local rino version: ". $rino, LOGGER_DATA);
+		App::logger("Local rino version: ". $rino, LOGGER_DATA);
 
 		// if requested rino is lower than enabled local rino, lower local rino version
 		// if requested rino is higher than enabled local rino, reply with local rino

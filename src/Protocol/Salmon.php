@@ -4,6 +4,7 @@
  */
 namespace Friendica\Protocol;
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
@@ -26,7 +27,7 @@ class Salmon
 	{
 		$ret = [];
 
-		Text::logger('Fetching salmon key for '.$uri);
+		App::logger('Fetching salmon key for '.$uri);
 
 		$arr = Probe::lrdd($uri);
 
@@ -58,7 +59,7 @@ class Salmon
 		}
 
 
-		Text::logger('Key located: ' . print_r($ret, true));
+		App::logger('Key located: ' . print_r($ret, true));
 
 		if (count($ret) == 1) {
 			// We only found one one key so we don't care if the hash matches.
@@ -95,12 +96,12 @@ class Salmon
 		}
 
 		if (! $owner['sprvkey']) {
-			Text::logger(sprintf("user '%s' (%d) does not have a salmon private key. Send failed.",
+			App::logger(sprintf("user '%s' (%d) does not have a salmon private key. Send failed.",
 			$owner['username'], $owner['uid']));
 			return;
 		}
 
-		Text::logger('slapper called for '.$url.'. Data: ' . $slap);
+		App::logger('slapper called for '.$url.'. Data: ' . $slap);
 
 		// create a magic envelope
 
@@ -144,7 +145,7 @@ class Salmon
 		// check for success, e.g. 2xx
 
 		if ($return_code > 299) {
-			Text::logger('GNU Social salmon failed. Falling back to compliant mode');
+			App::logger('GNU Social salmon failed. Falling back to compliant mode');
 
 			// Now try the compliant mode that normally isn't used for GNU Social
 			$xmldata = ["me:env" => ["me:data" => $data,
@@ -167,7 +168,7 @@ class Salmon
 		}
 
 		if ($return_code > 299) {
-			Text::logger('compliant salmon failed. Falling back to old status.net');
+			App::logger('compliant salmon failed. Falling back to old status.net');
 
 			// Last try. This will most likely fail as well.
 			$xmldata = ["me:env" => ["me:data" => $data,
@@ -188,7 +189,7 @@ class Salmon
 			$return_code = $postResult->getReturnCode();
 		}
 
-		Text::logger('slapper for '.$url.' returned ' . $return_code);
+		App::logger('slapper for '.$url.' returned ' . $return_code);
 
 		if (! $return_code) {
 			return -1;

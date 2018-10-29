@@ -20,7 +20,7 @@ use Friendica\Object\Image;
 
 function wall_upload_post(App $a, $desktopmode = true)
 {
-	Text::logger("wall upload: starting new upload", LOGGER_DEBUG);
+	App::logger("wall upload: starting new upload", LOGGER_DEBUG);
 
 	$r_json = (x($_GET, 'response') && $_GET['response'] == 'json');
 	$album = (x($_GET, 'album') ? Text::noTags(trim($_GET['album'])) : '');
@@ -187,7 +187,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 		$filetype = $imagedata['mime'];
 	}
 
-	Text::logger("File upload src: " . $src . " - filename: " . $filename .
+	App::logger("File upload src: " . $src . " - filename: " . $filename .
 		" - size: " . $filesize . " - type: " . $filetype, LOGGER_DEBUG);
 
 	$maximagesize = Config::get('system', 'maximagesize');
@@ -226,7 +226,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 	}
 	if ($max_length > 0) {
 		$Image->scaleDown($max_length);
-		Text::logger("File upload: Scaling picture to new size " . $max_length, LOGGER_DEBUG);
+		App::logger("File upload: Scaling picture to new size " . $max_length, LOGGER_DEBUG);
 	}
 
 	$width = $Image->getWidth();
@@ -301,11 +301,11 @@ function wall_upload_post(App $a, $desktopmode = true)
 			echo json_encode(['picture' => $picture]);
 			killme();
 		}
-		Text::logger("upload done", LOGGER_DEBUG);
+		App::logger("upload done", LOGGER_DEBUG);
 		return $picture;
 	}
 
-	Text::logger("upload done", LOGGER_DEBUG);
+	App::logger("upload done", LOGGER_DEBUG);
 
 	if ($r_json) {
 		echo json_encode(['ok' => true]);

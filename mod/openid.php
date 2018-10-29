@@ -17,7 +17,7 @@ function openid_content(App $a) {
 	if($noid)
 		$a->internalRedirect();
 
-	Text::logger('mod_openid ' . print_r($_REQUEST,true), LOGGER_DATA);
+	App::logger('mod_openid ' . print_r($_REQUEST,true), LOGGER_DATA);
 
 	if((x($_GET,'openid_mode')) && (x($_SESSION,'openid'))) {
 
@@ -28,7 +28,7 @@ function openid_content(App $a) {
 			$authid = $_REQUEST['openid_identity'];
 
 			if(! strlen($authid)) {
-				Text::logger(L10n::t('OpenID protocol error. No ID returned.') . EOL);
+				App::logger(L10n::t('OpenID protocol error. No ID returned.') . EOL);
 				$a->internalRedirect();
 			}
 

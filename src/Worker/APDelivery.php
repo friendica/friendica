@@ -4,8 +4,8 @@
  */
 namespace Friendica\Worker;
 
+use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Content\Text;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Model\Item;
 use Friendica\Core\Worker;
@@ -23,7 +23,7 @@ class APDelivery extends BaseObject
 	 */
 	public static function execute($cmd, $item_id, $inbox, $uid)
 	{
-		Text::logger('Invoked: ' . $cmd . ': ' . $item_id . ' to ' . $inbox, LOGGER_DEBUG);
+		App::logger('Invoked: ' . $cmd . ': ' . $item_id . ' to ' . $inbox, LOGGER_DEBUG);
 
 		$success = true;
 

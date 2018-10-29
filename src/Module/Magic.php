@@ -4,6 +4,7 @@
  */
 namespace Friendica\Module;
 
+use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Content\Text;
 use Friendica\Database\DBA;
@@ -23,9 +24,9 @@ class Magic extends BaseModule
 	{
 		$a = self::getApp();
 		$ret = ['success' => false, 'url' => '', 'message' => ''];
-		Text::logger('magic mdule: invoked', LOGGER_DEBUG);
+		App::logger('magic mdule: invoked', LOGGER_DEBUG);
 
-		Text::logger('args: ' . print_r($_REQUEST, true), LOGGER_DATA);
+		App::logger('args: ' . print_r($_REQUEST, true), LOGGER_DATA);
 
 		$addr = ((x($_REQUEST, 'addr')) ? $_REQUEST['addr'] : '');
 		$dest = ((x($_REQUEST, 'dest')) ? $_REQUEST['dest'] : '');
@@ -42,7 +43,7 @@ class Magic extends BaseModule
 		}
 
 		if (!$cid) {
-			Text::logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
+			App::logger('No contact record found: ' . print_r($_REQUEST, true), LOGGER_DEBUG);
 			// @TODO Finding a more elegant possibility to redirect to either internal or external URL
 			$a->redirect($dest);
 		}
@@ -56,7 +57,7 @@ class Magic extends BaseModule
 				return $ret;
 			}
 
-			Text::logger('Contact is already authenticated', LOGGER_DEBUG);
+			App::logger('Contact is already authenticated', LOGGER_DEBUG);
 			System::externalRedirect($dest);
 		}
 

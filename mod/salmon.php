@@ -21,7 +21,7 @@ function salmon_post(App $a, $xml = '') {
 		$xml = file_get_contents('php://input');
 	}
 
-	Text::logger('new salmon ' . $xml, LOGGER_DATA);
+	App::logger('new salmon ' . $xml, LOGGER_DATA);
 
 	$nick       = (($a->argc > 1) ? Text::noTags(trim($a->argv[1])) : '');
 	$mentions   = (($a->argc > 2 && $a->argv[2] === 'mention') ? true : false);
@@ -50,7 +50,7 @@ function salmon_post(App $a, $xml = '') {
 		$base = $dom;
 
 	if (empty($base)) {
-		Text::logger('unable to locate salmon data in xml ');
+		App::logger('unable to locate salmon data in xml ');
 		System::httpExit(400);
 	}
 
@@ -88,18 +88,18 @@ function salmon_post(App $a, $xml = '') {
 	$author_link = $author["author-link"];
 
 	if(! $author_link) {
-		Text::logger('Could not retrieve author URI.');
+		App::logger('Could not retrieve author URI.');
 		System::httpExit(400);
 	}
 
 	// Once we have the author URI, go to the web and try to find their public key
 
-	Text::logger('Fetching key for ' . $author_link);
+	App::logger('Fetching key for ' . $author_link);
 
 	$key = Salmon::getKey($author_link, $keyhash);
 
 	if(! $key) {
-		Text::logger('Could not retrieve author key.');
+		App::logger('Could not retrieve author key.');
 		System::httpExit(400);
 	}
 
@@ -108,7 +108,7 @@ function salmon_post(App $a, $xml = '') {
 	$m = Text::base64UrlDecode($key_info[1]);
 	$e = Text::base64UrlDecode($key_info[2]);
 
-	Text::logger('key details: ' . print_r($key_info,true), LOGGER_DEBUG);
+	App::logger('key details: ' . print_r($key_info,true), LOGGER_DEBUG);
 
 	$pubkey = Crypto::meToPem($m, $e);
 
@@ -119,23 +119,23 @@ function salmon_post(App $a, $xml = '') {
 	$mode = 1;
 
 	if (! $verify) {
-		Text::logger('message did not verify using protocol. Trying compliant format.');
+		App::logger('message did not verify using protocol. Trying compliant format.');
 		$verify = Crypto::rsaVerify($compliant_format, $signature, $pubkey);
 		$mode = 2;
 	}
 
 	if (! $verify) {
-		Text::logger('message did not verify using padding. Trying old statusnet format.');
+		App::logger('message did not verify using padding. Trying old statusnet format.');
 		$verify = Crypto::rsaVerify($stnet_signed_data, $signature, $pubkey);
 		$mode = 3;
 	}
 
 	if (! $verify) {
-		Text::logger('Message did not verify. Discarding.');
+		App::logger('Message did not verify. Discarding.');
 		System::httpExit(400);
 	}
 
-	Text::logger('Message verified with mode '.$mode);
+	App::logger('Message verified with mode '.$mode);
 
 
 	/*
@@ -156,7 +156,7 @@ function salmon_post(App $a, $xml = '') {
 	);
 
 	if (!DBA::isResult($r)) {
-		Text::logger('Author ' . $author_link . ' unknown to user ' . $importer['uid'] . '.');
+		App::logger('Author ' . $author_link . ' unknown to user ' . $importer['uid'] . '.');
 
 		if (PConfig::get($importer['uid'], 'system', 'ostatus_autofriend')) {
 			$result = Contact::createFromProbe($importer['uid'], $author_link);
@@ -178,7 +178,7 @@ function salmon_post(App $a, $xml = '') {
 
 	//if((DBA::isResult($r)) && (($r[0]['readonly']) || ($r[0]['rel'] == Contact::FOLLOWER) || ($r[0]['blocked']))) {
 	if (DBA::isResult($r) && $r[0]['blocked']) {
-		Text::logger('Ignoring this author.');
+		App::logger('Ignoring this author.');
 		System::httpExit(202);
 		// NOTREACHED
 	}

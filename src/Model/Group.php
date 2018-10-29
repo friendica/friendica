@@ -4,6 +4,7 @@
  */
 namespace Friendica\Model;
 
+use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
@@ -325,7 +326,7 @@ class Group extends BaseObject
 				'selected' => $gid == $group['id'] ? 'true' : ''
 			];
 		}
-		Text::logger('groups: ' . print_r($display_groups, true));
+		App::logger('groups: ' . print_r($display_groups, true));
 
 		if ($label == '') {
 			$label = L10n::t('Default privacy group for new contacts');

@@ -4,6 +4,7 @@
  */
 namespace Friendica\Object;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
@@ -487,10 +488,10 @@ class Post extends BaseObject
 	{
 		$item_id = $item->getId();
 		if (!$item_id) {
-			Text::logger('[ERROR] Post::addChild : Item has no ID!!', LOGGER_DEBUG);
+			App::logger('[ERROR] Post::addChild : Item has no ID!!', LOGGER_DEBUG);
 			return false;
 		} elseif ($this->getChild($item->getId())) {
-			Text::logger('[WARN] Post::addChild : Item already exists (' . $item->getId() . ').', LOGGER_DEBUG);
+			App::logger('[WARN] Post::addChild : Item already exists (' . $item->getId() . ').', LOGGER_DEBUG);
 			return false;
 		}
 		/*
@@ -584,7 +585,7 @@ class Post extends BaseObject
 				return true;
 			}
 		}
-		Text::logger('[WARN] Item::removeChild : Item is not a child (' . $id . ').', LOGGER_DEBUG);
+		App::logger('[WARN] Item::removeChild : Item is not a child (' . $id . ').', LOGGER_DEBUG);
 		return false;
 	}
 
@@ -650,7 +651,7 @@ class Post extends BaseObject
 	public function getDataValue($name)
 	{
 		if (!isset($this->data[$name])) {
-			// Text::logger('[ERROR] Item::getDataValue : Item has no value name "'. $name .'".', LOGGER_DEBUG);
+			// App::logger('[ERROR] Item::getDataValue : Item has no value name "'. $name .'".', LOGGER_DEBUG);
 			return false;
 		}
 
@@ -667,7 +668,7 @@ class Post extends BaseObject
 	private function setTemplate($name)
 	{
 		if (!x($this->available_templates, $name)) {
-			Text::logger('[ERROR] Item::setTemplate : Template not available ("' . $name . '").', LOGGER_DEBUG);
+			App::logger('[ERROR] Item::setTemplate : Template not available ("' . $name . '").', LOGGER_DEBUG);
 			return false;
 		}
 

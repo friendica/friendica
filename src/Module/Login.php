@@ -5,6 +5,7 @@
 namespace Friendica\Module;
 
 use Exception;
+use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Content\Text;
 use Friendica\Core\Addon;
@@ -146,7 +147,7 @@ class Login extends BaseModule
 				);
 			}
 		} catch (Exception $e) {
-			Text::logger('authenticate: failed login attempt: ' . Text::noTags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
+			App::logger('authenticate: failed login attempt: ' . Text::noTags($username) . ' from IP ' . $_SERVER['REMOTE_ADDR']);
 			info('Login failed. Please check your credentials.' . EOL);
 			$a->internalRedirect();
 		}
@@ -195,7 +196,7 @@ class Login extends BaseModule
 				);
 				if (DBA::isResult($user)) {
 					if ($data->hash != Authentication::getCookieHashForUser($user)) {
-						Text::logger("Hash for user " . $data->uid . " doesn't fit.");
+						App::logger("Hash for user " . $data->uid . " doesn't fit.");
 						Authentication::deleteSession();
 						$a->internalRedirect();
 					}
@@ -231,7 +232,7 @@ class Login extends BaseModule
 				$check = Config::get('system', 'paranoia');
 				// extra paranoia - if the IP changed, log them out
 				if ($check && ($_SESSION['addr'] != $_SERVER['REMOTE_ADDR'])) {
-					Text::logger('Session address changed. Paranoid setting in effect, blocking session. ' .
+					App::logger('Session address changed. Paranoid setting in effect, blocking session. ' .
 						$_SESSION['addr'] . ' != ' . $_SERVER['REMOTE_ADDR']);
 					Authentication::deleteSession();
 					$a->internalRedirect();

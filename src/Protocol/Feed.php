@@ -8,7 +8,7 @@ namespace Friendica\Protocol;
 
 use DOMDocument;
 use DOMXPath;
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -41,12 +41,12 @@ class Feed {
 		$a = get_app();
 
 		if (!$simulate) {
-			Text::logger("Import Atom/RSS feed '".$contact["name"]."' (Contact ".$contact["id"].") for user ".$importer["uid"], LOGGER_DEBUG);
+			App::logger("Import Atom/RSS feed '".$contact["name"]."' (Contact ".$contact["id"].") for user ".$importer["uid"], LOGGER_DEBUG);
 		} else {
-			Text::logger("Test Atom/RSS feed", LOGGER_DEBUG);
+			App::logger("Test Atom/RSS feed", LOGGER_DEBUG);
 		}
 		if (empty($xml)) {
-			Text::logger('XML is empty.', LOGGER_DEBUG);
+			App::logger('XML is empty.', LOGGER_DEBUG);
 			return;
 		}
 
@@ -200,7 +200,7 @@ class Feed {
 		$header["contact-id"] = $contact["id"];
 
 		if (!is_object($entries)) {
-			Text::logger("There are no entries in this feed.", LOGGER_DEBUG);
+			App::logger("There are no entries in this feed.", LOGGER_DEBUG);
 			return;
 		}
 
@@ -249,7 +249,7 @@ class Feed {
 					$importer["uid"], $item["uri"], Protocol::FEED, Protocol::DFRN];
 				$previous = Item::selectFirst(['id'], $condition);
 				if (DBA::isResult($previous)) {
-					Text::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
+					App::logger("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already existed under id ".$previous["id"], LOGGER_DEBUG);
 					continue;
 				}
 			}
@@ -424,7 +424,7 @@ class Feed {
 			}
 
 			if (!$simulate) {
-				Text::logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
+				App::logger("Stored feed: ".print_r($item, true), LOGGER_DEBUG);
 
 				$notify = Item::isRemoteSelf($contact, $item);
 
@@ -441,7 +441,7 @@ class Feed {
 
 				$id = Item::insert($item, false, $notify);
 
-				Text::logger("Feed for contact ".$contact["url"]." stored under id ".$id);
+				App::logger("Feed for contact ".$contact["url"]." stored under id ".$id);
 			} else {
 				$items[] = $item;
 			}

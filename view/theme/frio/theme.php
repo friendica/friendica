@@ -64,7 +64,7 @@ function frio_install()
 	Addon::registerHook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
 	Addon::registerHook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
 
-	Text::logger('installed theme frio');
+	App::logger('installed theme frio');
 }
 
 function frio_uninstall()
@@ -76,7 +76,7 @@ function frio_uninstall()
 	Addon::unregisterHook('acl_lookup_end', 'view/theme/frio/theme.php', 'frio_acl_lookup');
 	Addon::unregisterHook('display_item', 'view/theme/frio/theme.php', 'frio_display_item');
 
-	Text::logger('uninstalled theme frio');
+	App::logger('uninstalled theme frio');
 }
 
 /**

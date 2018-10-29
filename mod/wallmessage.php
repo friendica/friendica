@@ -31,7 +31,7 @@ function wallmessage_post(App $a) {
 	);
 
 	if (! DBA::isResult($r)) {
-		Text::logger('wallmessage: no recipient');
+		App::logger('wallmessage: no recipient');
 		return;
 	}
 
@@ -94,7 +94,7 @@ function wallmessage_content(App $a) {
 
 	if (! DBA::isResult($r)) {
 		notice(L10n::t('No recipient.') . EOL);
-		Text::logger('wallmessage: no recipient');
+		App::logger('wallmessage: no recipient');
 		return;
 	}
 

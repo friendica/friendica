@@ -6,6 +6,7 @@ namespace Friendica\Util;
 
 use DOMXPath;
 use SimpleXMLElement;
+use Friendica\App;
 use Friendica\Content\Text;
 
 /**
@@ -249,7 +250,7 @@ class XML
 		}
 
 		if (!function_exists('xml_parser_create')) {
-			Text::logger('Xml::toArray: parser function missing');
+			App::logger('Xml::toArray: parser function missing');
 			return [];
 		}
 
@@ -264,7 +265,7 @@ class XML
 		}
 
 		if (! $parser) {
-			Text::logger('Xml::toArray: xml_parser_create: no resource');
+			App::logger('Xml::toArray: xml_parser_create: no resource');
 			return [];
 		}
 
@@ -276,9 +277,9 @@ class XML
 		@xml_parser_free($parser);
 
 		if (! $xml_values) {
-			Text::logger('Xml::toArray: libxml: parse error: ' . $contents, LOGGER_DATA);
+			App::logger('Xml::toArray: libxml: parse error: ' . $contents, LOGGER_DATA);
 			foreach (libxml_get_errors() as $err) {
-				Text::logger('libxml: parse: ' . $err->code . " at " . $err->line . ":" . $err->column . " : " . $err->message, LOGGER_DATA);
+				App::logger('libxml: parse: ' . $err->code . " at " . $err->line . ":" . $err->column . " : " . $err->message, LOGGER_DATA);
 			}
 			libxml_clear_errors();
 			return;
@@ -424,9 +425,9 @@ class XML
 
 		$x = @simplexml_load_string($s);
 		if (!$x) {
-			Text::logger('libxml: parse: error: ' . $s, LOGGER_DATA);
+			App::logger('libxml: parse: error: ' . $s, LOGGER_DATA);
 			foreach (libxml_get_errors() as $err) {
-				Text::logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
+				App::logger('libxml: parse: ' . $err->code." at ".$err->line.":".$err->column." : ".$err->message, LOGGER_DATA);
 			}
 			libxml_clear_errors();
 		}

@@ -6,6 +6,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
@@ -960,7 +961,7 @@ class Item extends BaseObject
 			} elseif ($item['uid'] == $uid) {
 				self::deleteById($item['id'], PRIORITY_HIGH);
 			} else {
-				Text::logger('Wrong ownership. Not deleting item ' . $item['id']);
+				App::logger('Wrong ownership. Not deleting item ' . $item['id']);
 			}
 		}
 		DBA::close($items);
@@ -983,12 +984,12 @@ class Item extends BaseObject
 			'icid', 'iaid', 'psid'];
 		$item = self::selectFirst($fields, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
-			Text::logger('Item with ID ' . $item_id . " hasn't been found.", LOGGER_DEBUG);
+			App::logger('Item with ID ' . $item_id . " hasn't been found.", LOGGER_DEBUG);
 			return false;
 		}
 
 		if ($item['deleted']) {
-			Text::logger('Item with ID ' . $item_id . ' has already been deleted.', LOGGER_DEBUG);
+			App::logger('Item with ID ' . $item_id . ' has already been deleted.', LOGGER_DEBUG);
 			return false;
 		}
 
@@ -1089,7 +1090,7 @@ class Item extends BaseObject
 			}
 		}
 
-		Text::logger('Item with ID ' . $item_id . " has been deleted.", LOGGER_DEBUG);
+		App::logger('Item with ID ' . $item_id . " has been deleted.", LOGGER_DEBUG);
 
 		return true;
 	}
@@ -1192,7 +1193,7 @@ class Item extends BaseObject
 		if (!empty($contact_id)) {
 			return $contact_id;
 		}
-		Text::logger('Missing contact-id. Called by: '.System::callstack(), LOGGER_DEBUG);
+		App::logger('Missing contact-id. Called by: '.System::callstack(), LOGGER_DEBUG);
 		/*
 		 * First we are looking for a suitable contact that matches with the author of the post
 		 * This is done only for comments
@@ -1213,7 +1214,7 @@ class Item extends BaseObject
 				$contact_id = $self["id"];
 			}
 		}
-		Text::logger("Contact-id was missing for post ".$item['guid']." from user id ".$item['uid']." - now set to ".$contact_id, LOGGER_DEBUG);
+		App::logger("Contact-id was missing for post ".$item['guid']." from user id ".$item['uid']." - now set to ".$contact_id, LOGGER_DEBUG);
 
 		return $contact_id;
 	}
@@ -1298,7 +1299,7 @@ class Item extends BaseObject
 			$item['gravity'] = GRAVITY_COMMENT;
 		} else {
 			$item['gravity'] = GRAVITY_UNKNOWN;   // Should not happen
-			Text::logger('Unknown gravity for verb: ' . $item['verb'], LOGGER_DEBUG);
+			App::logger('Unknown gravity for verb: ' . $item['verb'], LOGGER_DEBUG);
 		}
 
 		$uid = intval($item['uid']);
@@ -1315,7 +1316,7 @@ class Item extends BaseObject
 			$expire_date = time() - ($expire_interval * 86400);
 			$created_date = strtotime($item['created']);
 			if ($created_date < $expire_date) {
-				Text::logger('item-store: item created ('.date('c', $created_date).') before expiration time ('.date('c', $expire_date).'). ignored. ' . print_r($item,true), LOGGER_DEBUG);
+				App::logger('item-store: item created ('.date('c', $created_date).') before expiration time ('.date('c', $expire_date).'). ignored. ' . print_r($item,true), LOGGER_DEBUG);
 				return 0;
 			}
 		}
@@ -1333,7 +1334,7 @@ class Item extends BaseObject
 			if (DBA::isResult($existing)) {
 				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
 				if ($uid != 0) {
-					Text::logger("Item with uri ".$item['uri']." already existed for user ".$uid." with id ".$existing["id"]." target network ".$existing["network"]." - new network: ".$item['network']);
+					App::logger("Item with uri ".$item['uri']." already existed for user ".$uid." with id ".$existing["id"]." target network ".$existing["network"]." - new network: ".$item['network']);
 				}
 
 				return $existing["id"];
@@ -1384,7 +1385,7 @@ class Item extends BaseObject
 
 		// When there is no content then we don't post it
 		if ($item['body'].$item['title'] == '') {
-			Text::logger('No body, no title.');
+			App::logger('No body, no title.');
 			return 0;
 		}
 
@@ -1411,7 +1412,7 @@ class Item extends BaseObject
 		$item['author-id'] = defaults($item, 'author-id', Contact::getIdForURL($item["author-link"], 0, false, $default));
 
 		if (Contact::isBlocked($item["author-id"])) {
-			Text::logger('Contact '.$item["author-id"].' is blocked, item '.$item["uri"].' will not be stored');
+			App::logger('Contact '.$item["author-id"].' is blocked, item '.$item["uri"].' will not be stored');
 			return 0;
 		}
 
@@ -1421,22 +1422,22 @@ class Item extends BaseObject
 		$item['owner-id'] = defaults($item, 'owner-id', Contact::getIdForURL($item["owner-link"], 0, false, $default));
 
 		if (Contact::isBlocked($item["owner-id"])) {
-			Text::logger('Contact '.$item["owner-id"].' is blocked, item '.$item["uri"].' will not be stored');
+			App::logger('Contact '.$item["owner-id"].' is blocked, item '.$item["uri"].' will not be stored');
 			return 0;
 		}
 
 		if ($item['network'] == Protocol::PHANTOM) {
-			Text::logger('Missing network. Called by: '.System::callstack(), LOGGER_DEBUG);
+			App::logger('Missing network. Called by: '.System::callstack(), LOGGER_DEBUG);
 
 			$item['network'] = Protocol::DFRN;
-			Text::logger("Set network to " . $item["network"] . " for " . $item["uri"], LOGGER_DEBUG);
+			App::logger("Set network to " . $item["network"] . " for " . $item["uri"], LOGGER_DEBUG);
 		}
 
 		// Checking if there is already an item with the same guid
-		Text::logger('Checking for an item for user '.$item['uid'].' on network '.$item['network'].' with the guid '.$item['guid'], LOGGER_DEBUG);
+		App::logger('Checking for an item for user '.$item['uid'].' on network '.$item['network'].' with the guid '.$item['guid'], LOGGER_DEBUG);
 		$condition = ['guid' => $item['guid'], 'network' => $item['network'], 'uid' => $item['uid']];
 		if (self::exists($condition)) {
-			Text::logger('found item with guid '.$item['guid'].' for user '.$item['uid'].' on network '.$item['network'], LOGGER_DEBUG);
+			App::logger('found item with guid '.$item['guid'].' for user '.$item['uid'].' on network '.$item['network'], LOGGER_DEBUG);
 			return 0;
 		}
 
@@ -1517,15 +1518,15 @@ class Item extends BaseObject
 				}
 
 				// If its a post from myself then tag the thread as "mention"
-				Text::logger("Checking if parent ".$parent_id." has to be tagged as mention for user ".$item['uid'], LOGGER_DEBUG);
+				App::logger("Checking if parent ".$parent_id." has to be tagged as mention for user ".$item['uid'], LOGGER_DEBUG);
 				$user = DBA::selectFirst('user', ['nickname'], ['uid' => $item['uid']]);
 				if (DBA::isResult($user)) {
 					$self = Text::normaliseLink(System::baseUrl() . '/profile/' . $user['nickname']);
 					$self_id = Contact::getIdForURL($self, 0, true);
-					Text::logger("'myself' is ".$self_id." for parent ".$parent_id." checking against ".$item['author-id']." and ".$item['owner-id'], LOGGER_DEBUG);
+					App::logger("'myself' is ".$self_id." for parent ".$parent_id." checking against ".$item['author-id']." and ".$item['owner-id'], LOGGER_DEBUG);
 					if (($item['author-id'] == $self_id) || ($item['owner-id'] == $self_id)) {
 						DBA::update('thread', ['mention' => true], ['iid' => $parent_id]);
-						Text::logger("tagged thread ".$parent_id." as mention for user ".$self, LOGGER_DEBUG);
+						App::logger("tagged thread ".$parent_id." as mention for user ".$self, LOGGER_DEBUG);
 					}
 				}
 			} else {
@@ -1534,12 +1535,12 @@ class Item extends BaseObject
 				 * we don't have or can't see the original post.
 				 */
 				if ($force_parent) {
-					Text::logger('$force_parent=true, reply converted to top-level post.');
+					App::logger('$force_parent=true, reply converted to top-level post.');
 					$parent_id = 0;
 					$item['parent-uri'] = $item['uri'];
 					$item['gravity'] = GRAVITY_PARENT;
 				} else {
-					Text::logger('item parent '.$item['parent-uri'].' for '.$item['uid'].' was not found - ignoring item');
+					App::logger('item parent '.$item['parent-uri'].' for '.$item['uid'].' was not found - ignoring item');
 					return 0;
 				}
 
@@ -1553,7 +1554,7 @@ class Item extends BaseObject
 		$condition = ["`uri` = ? AND `network` IN (?, ?) AND `uid` = ?",
 			$item['uri'], $item['network'], Protocol::DFRN, $item['uid']];
 		if (self::exists($condition)) {
-			Text::logger('duplicated item with the same uri found. '.print_r($item,true));
+			App::logger('duplicated item with the same uri found. '.print_r($item,true));
 			return 0;
 		}
 
@@ -1561,7 +1562,7 @@ class Item extends BaseObject
 		if (in_array($item['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
 			$condition = ['guid' => $item['guid'], 'uid' => $item['uid']];
 			if (self::exists($condition)) {
-				Text::logger('duplicated item with the same guid found. '.print_r($item,true));
+				App::logger('duplicated item with the same guid found. '.print_r($item,true));
 				return 0;
 			}
 		} else {
@@ -1569,7 +1570,7 @@ class Item extends BaseObject
 			$condition = ["`body` = ? AND `network` = ? AND `created` = ? AND `contact-id` = ? AND `uid` = ?",
 					$item['body'], $item['network'], $item['created'], $item['contact-id'], $item['uid']];
 			if (self::exists($condition)) {
-				Text::logger('duplicated item with the same body found. '.print_r($item,true));
+				App::logger('duplicated item with the same body found. '.print_r($item,true));
 				return 0;
 			}
 		}
@@ -1616,7 +1617,7 @@ class Item extends BaseObject
 		unset($item['api_source']);
 
 		if (x($item, 'cancel')) {
-			Text::logger('post cancelled by addon.');
+			App::logger('post cancelled by addon.');
 			return 0;
 		}
 
@@ -1627,12 +1628,12 @@ class Item extends BaseObject
 		 */
 		if ($item["uid"] == 0) {
 			if (self::exists(['uri' => trim($item['uri']), 'uid' => 0])) {
-				Text::logger('Global item already stored. URI: '.$item['uri'].' on network '.$item['network'], LOGGER_DEBUG);
+				App::logger('Global item already stored. URI: '.$item['uri'].' on network '.$item['network'], LOGGER_DEBUG);
 				return 0;
 			}
 		}
 
-		Text::logger('' . print_r($item,true), LOGGER_DATA);
+		App::logger('' . print_r($item,true), LOGGER_DATA);
 
 		if (array_key_exists('tag', $item)) {
 			$tags = $item['tag'];
@@ -1700,14 +1701,14 @@ class Item extends BaseObject
 				$item = array_merge($item, $delivery_data);
 
 				file_put_contents($spool, json_encode($item));
-				Text::logger("Item wasn't stored - Item was spooled into file ".$file, LOGGER_DEBUG);
+				App::logger("Item wasn't stored - Item was spooled into file ".$file, LOGGER_DEBUG);
 			}
 			return 0;
 		}
 
 		if ($current_post == 0) {
 			// This is one of these error messages that never should occur.
-			Text::logger("couldn't find created item - we better quit now.");
+			App::logger("couldn't find created item - we better quit now.");
 			DBA::rollback();
 			return 0;
 		}
@@ -1718,7 +1719,7 @@ class Item extends BaseObject
 
 		if ($entries > 1) {
 			// There are duplicates. We delete our just created entry.
-			Text::logger('Duplicated post occurred. uri = ' . $item['uri'] . ' uid = ' . $item['uid']);
+			App::logger('Duplicated post occurred. uri = ' . $item['uri'] . ' uid = ' . $item['uid']);
 
 			// Yes, we could do a rollback here - but we are having many users with MyISAM.
 			DBA::delete('item', ['id' => $current_post]);
@@ -1726,12 +1727,12 @@ class Item extends BaseObject
 			return 0;
 		} elseif ($entries == 0) {
 			// This really should never happen since we quit earlier if there were problems.
-			Text::logger("Something is terribly wrong. We haven't found our created entry.");
+			App::logger("Something is terribly wrong. We haven't found our created entry.");
 			DBA::rollback();
 			return 0;
 		}
 
-		Text::logger('created item '.$current_post);
+		App::logger('created item '.$current_post);
 		self::updateContact($item);
 
 		if (!$parent_id || ($item['parent-uri'] === $item['uri'])) {
@@ -1759,7 +1760,7 @@ class Item extends BaseObject
 			 */
 			if (base64_encode(base64_decode(base64_decode($dsprsig->signature))) == base64_decode($dsprsig->signature)) {
 				$dsprsig->signature = base64_decode($dsprsig->signature);
-				Text::logger("Repaired double encoded signature from handle ".$dsprsig->signer, LOGGER_DEBUG);
+				App::logger("Repaired double encoded signature from handle ".$dsprsig->signer, LOGGER_DEBUG);
 			}
 
 			if (!empty($dsprsig->signed_text) && empty($dsprsig->signature) && empty($dsprsig->signer)) {
@@ -1790,7 +1791,7 @@ class Item extends BaseObject
 					Addon::callHooks('post_remote_end', $posted_item);
 				}
 			} else {
-				Text::logger('new item not found in DB, id ' . $current_post);
+				App::logger('new item not found in DB, id ' . $current_post);
 			}
 		}
 
@@ -1895,20 +1896,20 @@ class Item extends BaseObject
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_activity');
 		if (!$locked) {
-			Text::logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
+			App::logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
 		$item_activity = DBA::selectFirst('item-activity', ['id'], ['uri-id' => $item['uri-id']]);
 		if (DBA::isResult($item_activity)) {
 			$item['iaid'] = $item_activity['id'];
-			Text::logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
+			App::logger('Fetched activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
 		} elseif (DBA::insert('item-activity', $fields)) {
 			$item['iaid'] = DBA::lastInsertId();
-			Text::logger('Inserted activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
+			App::logger('Inserted activity for URI ' . $item['uri'] . ' (' . $item['iaid'] . ')');
 		} else {
 			// This shouldn't happen.
-			Text::logger('Could not insert activity for URI ' . $item['uri'] . ' - should not happen');
+			App::logger('Could not insert activity for URI ' . $item['uri'] . ' - should not happen');
 			Lock::release('item_insert_activity');
 			return false;
 		}
@@ -1937,20 +1938,20 @@ class Item extends BaseObject
 		// To avoid timing problems, we are using locks.
 		$locked = Lock::acquire('item_insert_content');
 		if (!$locked) {
-			Text::logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
+			App::logger("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
 
 		// Do we already have this content?
 		$item_content = DBA::selectFirst('item-content', ['id'], ['uri-id' => $item['uri-id']]);
 		if (DBA::isResult($item_content)) {
 			$item['icid'] = $item_content['id'];
-			Text::logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
+			App::logger('Fetched content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
 		} elseif (DBA::insert('item-content', $fields)) {
 			$item['icid'] = DBA::lastInsertId();
-			Text::logger('Inserted content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
+			App::logger('Inserted content for URI ' . $item['uri'] . ' (' . $item['icid'] . ')');
 		} else {
 			// This shouldn't happen.
-			Text::logger('Could not insert content for URI ' . $item['uri'] . ' - should not happen');
+			App::logger('Could not insert content for URI ' . $item['uri'] . ' - should not happen');
 		}
 		if ($locked) {
 			Lock::release('item_insert_content');
@@ -1976,7 +1977,7 @@ class Item extends BaseObject
 
 		$fields = ['activity' => $activity_index];
 
-		Text::logger('Update activity for ' . json_encode($condition));
+		App::logger('Update activity for ' . json_encode($condition));
 
 		DBA::update('item-activity', $fields, $condition, true);
 
@@ -2005,7 +2006,7 @@ class Item extends BaseObject
 			$fields = $condition;
 		}
 
-		Text::logger('Update content for ' . json_encode($condition));
+		App::logger('Update content for ' . json_encode($condition));
 
 		DBA::update('item-content', $fields, $condition, true);
 	}
@@ -2144,9 +2145,9 @@ class Item extends BaseObject
 		$distributed = self::insert($item, false, $notify, true);
 
 		if (!$distributed) {
-			Text::logger("Distributed public item " . $itemid . " for user " . $uid . " wasn't stored", LOGGER_DEBUG);
+			App::logger("Distributed public item " . $itemid . " for user " . $uid . " wasn't stored", LOGGER_DEBUG);
 		} else {
-			Text::logger("Distributed public item " . $itemid . " for user " . $uid . " with id " . $distributed, LOGGER_DEBUG);
+			App::logger("Distributed public item " . $itemid . " for user " . $uid . " with id " . $distributed, LOGGER_DEBUG);
 		}
 	}
 
@@ -2209,7 +2210,7 @@ class Item extends BaseObject
 
 			$public_shadow = self::insert($item, false, false, true);
 
-			Text::logger("Stored public shadow for thread ".$itemid." under id ".$public_shadow, LOGGER_DEBUG);
+			App::logger("Stored public shadow for thread ".$itemid." under id ".$public_shadow, LOGGER_DEBUG);
 		}
 	}
 
@@ -2266,7 +2267,7 @@ class Item extends BaseObject
 
 		$public_shadow = self::insert($item, false, false, true);
 
-		Text::logger("Stored public shadow for comment ".$item['uri']." under id ".$public_shadow, LOGGER_DEBUG);
+		App::logger("Stored public shadow for comment ".$item['uri']." under id ".$public_shadow, LOGGER_DEBUG);
 
 		// If this was a comment to a Diaspora post we don't get our comment back.
 		// This means that we have to distribute the comment by ourselves.
@@ -2543,7 +2544,7 @@ class Item extends BaseObject
 			foreach ($matches as $mtch) {
 				if (Text::linkCompare($link, $mtch[1]) || Text::linkCompare($dlink, $mtch[1])) {
 					$mention = true;
-					Text::logger('mention found: ' . $mtch[2]);
+					App::logger('mention found: ' . $mtch[2]);
 				}
 			}
 		}
@@ -2553,7 +2554,7 @@ class Item extends BaseObject
 				  !$item['wall'] && !$item['origin'] && ($item['id'] == $item['parent'])) {
 				// mmh.. no mention.. community page or private group... no wall.. no origin.. top-post (not a comment)
 				// delete it!
-				Text::logger("no-mention top-level post to community or private group. delete.");
+				App::logger("no-mention top-level post to community or private group. delete.");
 				DBA::delete('item', ['id' => $item_id]);
 				return true;
 			}
@@ -2612,29 +2613,29 @@ class Item extends BaseObject
 
 		// Prevent the forwarding of posts that are forwarded
 		if (!empty($datarray["extid"]) && ($datarray["extid"] == Protocol::DFRN)) {
-			Text::logger('Already forwarded', LOGGER_DEBUG);
+			App::logger('Already forwarded', LOGGER_DEBUG);
 			return false;
 		}
 
 		// Prevent to forward already forwarded posts
 		if ($datarray["app"] == $a->getHostName()) {
-			Text::logger('Already forwarded (second test)', LOGGER_DEBUG);
+			App::logger('Already forwarded (second test)', LOGGER_DEBUG);
 			return false;
 		}
 
 		// Only forward posts
 		if ($datarray["verb"] != ACTIVITY_POST) {
-			Text::logger('No post', LOGGER_DEBUG);
+			App::logger('No post', LOGGER_DEBUG);
 			return false;
 		}
 
 		if (($contact['network'] != Protocol::FEED) && $datarray['private']) {
-			Text::logger('Not public', LOGGER_DEBUG);
+			App::logger('Not public', LOGGER_DEBUG);
 			return false;
 		}
 
 		$datarray2 = $datarray;
-		Text::logger('remote-self start - Contact '.$contact['url'].' - '.$contact['remote_self'].' Item '.print_r($datarray, true), LOGGER_DEBUG);
+		App::logger('remote-self start - Contact '.$contact['url'].' - '.$contact['remote_self'].' Item '.print_r($datarray, true), LOGGER_DEBUG);
 		if ($contact['remote_self'] == 2) {
 			$self = DBA::selectFirst('contact', ['id', 'name', 'url', 'thumb'],
 					['uid' => $contact['uid'], 'self' => true]);
@@ -2674,7 +2675,7 @@ class Item extends BaseObject
 		if ($contact['network'] != Protocol::FEED) {
 			// Store the original post
 			$result = self::insert($datarray2, false, false);
-			Text::logger('remote-self post original item - Contact '.$contact['url'].' return '.$result.' Item '.print_r($datarray2, true), LOGGER_DEBUG);
+			App::logger('remote-self post original item - Contact '.$contact['url'].' return '.$result.' Item '.print_r($datarray2, true), LOGGER_DEBUG);
 		} else {
 			$datarray["app"] = "Feed";
 			$result = true;
@@ -2704,7 +2705,7 @@ class Item extends BaseObject
 			return $s;
 		}
 
-		Text::logger('check for photos', LOGGER_DEBUG);
+		App::logger('check for photos', LOGGER_DEBUG);
 		$site = substr(System::baseUrl(), strpos(System::baseUrl(), '://'));
 
 		$orig_body = $s;
@@ -2718,7 +2719,7 @@ class Item extends BaseObject
 			$img_st_close++; // make it point to AFTER the closing bracket
 			$image = substr($orig_body, $img_start + $img_st_close, $img_len);
 
-			Text::logger('found photo ' . $image, LOGGER_DEBUG);
+			App::logger('found photo ' . $image, LOGGER_DEBUG);
 
 			if (stristr($image, $site . '/photo/')) {
 				// Only embed locally hosted photos
@@ -2760,7 +2761,7 @@ class Item extends BaseObject
 
 							// If a custom width and height were specified, apply before embedding
 							if (preg_match("/\[img\=([0-9]*)x([0-9]*)\]/is", substr($orig_body, $img_start, $img_st_close), $match)) {
-								Text::logger('scaling photo', LOGGER_DEBUG);
+								App::logger('scaling photo', LOGGER_DEBUG);
 
 								$width = intval($match[1]);
 								$height = intval($match[2]);
@@ -2773,9 +2774,9 @@ class Item extends BaseObject
 								}
 							}
 
-							Text::logger('replacing photo', LOGGER_DEBUG);
+							App::logger('replacing photo', LOGGER_DEBUG);
 							$image = 'data:' . $type . ';base64,' . base64_encode($data);
-							Text::logger('replaced: ' . $image, LOGGER_DATA);
+							App::logger('replaced: ' . $image, LOGGER_DATA);
 						}
 					}
 				}
@@ -2938,7 +2939,7 @@ class Item extends BaseObject
 			++$expired;
 		}
 		DBA::close($items);
-		Text::logger('User ' . $uid . ": expired $expired items; expire items: $expire_items, expire notes: $expire_notes, expire starred: $expire_starred, expire photos: $expire_photos");
+		App::logger('User ' . $uid . ": expired $expired items; expire items: $expire_items, expire notes: $expire_notes, expire starred: $expire_starred, expire photos: $expire_photos");
 	}
 
 	public static function firstPostDate($uid, $wall = false)
@@ -2994,18 +2995,18 @@ class Item extends BaseObject
 				$activity = ACTIVITY_ATTENDMAYBE;
 				break;
 			default:
-				Text::logger('like: unknown verb ' . $verb . ' for item ' . $item_id);
+				App::logger('like: unknown verb ' . $verb . ' for item ' . $item_id);
 				return false;
 		}
 
 		// Enable activity toggling instead of on/off
 		$event_verb_flag = $activity === ACTIVITY_ATTEND || $activity === ACTIVITY_ATTENDNO || $activity === ACTIVITY_ATTENDMAYBE;
 
-		Text::logger('like: verb ' . $verb . ' item ' . $item_id);
+		App::logger('like: verb ' . $verb . ' item ' . $item_id);
 
 		$item = self::selectFirst(self::ITEM_FIELDLIST, ['`id` = ? OR `uri` = ?', $item_id, $item_id]);
 		if (!DBA::isResult($item)) {
-			Text::logger('like: unknown item ' . $item_id);
+			App::logger('like: unknown item ' . $item_id);
 			return false;
 		}
 
@@ -3017,14 +3018,14 @@ class Item extends BaseObject
 		}
 
 		if (!Security::canWriteToUserWall($uid)) {
-			Text::logger('like: unable to write on wall ' . $uid);
+			App::logger('like: unable to write on wall ' . $uid);
 			return false;
 		}
 
 		// Retrieves the local post owner
 		$owner_self_contact = DBA::selectFirst('contact', [], ['uid' => $uid, 'self' => true]);
 		if (!DBA::isResult($owner_self_contact)) {
-			Text::logger('like: unknown owner ' . $uid);
+			App::logger('like: unknown owner ' . $uid);
 			return false;
 		}
 
@@ -3033,7 +3034,7 @@ class Item extends BaseObject
 
 		$author_contact = DBA::selectFirst('contact', ['url'], ['id' => $author_id]);
 		if (!DBA::isResult($author_contact)) {
-			Text::logger('like: unknown author ' . $author_id);
+			App::logger('like: unknown author ' . $author_id);
 			return false;
 		}
 
@@ -3045,7 +3046,7 @@ class Item extends BaseObject
 			$item_contact_id = Contact::getIdForURL($author_contact['url'], $uid, true);
 			$item_contact = DBA::selectFirst('contact', [], ['id' => $item_contact_id]);
 			if (!DBA::isResult($item_contact)) {
-				Text::logger('like: unknown item contact ' . $item_contact_id);
+				App::logger('like: unknown item contact ' . $item_contact_id);
 				return false;
 			}
 		}
@@ -3147,7 +3148,7 @@ class Item extends BaseObject
 		if (!$onlyshadow) {
 			$result = DBA::insert('thread', $item);
 
-			Text::logger("Add thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
+			App::logger("Add thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
 		}
 	}
 
@@ -3179,26 +3180,26 @@ class Item extends BaseObject
 
 		$result = DBA::update('thread', $fields, ['iid' => $itemid]);
 
-		Text::logger("Update thread for item ".$itemid." - guid ".$item["guid"]." - ".(int)$result, LOGGER_DEBUG);
+		App::logger("Update thread for item ".$itemid." - guid ".$item["guid"]." - ".(int)$result, LOGGER_DEBUG);
 	}
 
 	private static function deleteThread($itemid, $itemuri = "")
 	{
 		$item = DBA::selectFirst('thread', ['uid'], ['iid' => $itemid]);
 		if (!DBA::isResult($item)) {
-			Text::logger('No thread found for id '.$itemid, LOGGER_DEBUG);
+			App::logger('No thread found for id '.$itemid, LOGGER_DEBUG);
 			return;
 		}
 
 		$result = DBA::delete('thread', ['iid' => $itemid], ['cascade' => false]);
 
-		Text::logger("deleteThread: Deleted thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
+		App::logger("deleteThread: Deleted thread for item ".$itemid." - ".print_r($result, true), LOGGER_DEBUG);
 
 		if ($itemuri != "") {
 			$condition = ["`uri` = ? AND NOT `deleted` AND NOT (`uid` IN (?, 0))", $itemuri, $item["uid"]];
 			if (!self::exists($condition)) {
 				DBA::delete('item', ['uri' => $itemuri, 'uid' => 0]);
-				Text::logger("deleteThread: Deleted shadow for item ".$itemuri, LOGGER_DEBUG);
+				App::logger("deleteThread: Deleted shadow for item ".$itemuri, LOGGER_DEBUG);
 			}
 		}
 	}

@@ -12,6 +12,7 @@ namespace Friendica\Protocol;
 use DOMDocument;
 use DOMXPath;
 use Exception;
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
@@ -85,14 +86,14 @@ class PortableContact
 
 		$url = $url . (($uid) ? '/@me/@all?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation' : '?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation') ;
 
-		Text::logger('load: ' . $url, LOGGER_DEBUG);
+		App::logger('load: ' . $url, LOGGER_DEBUG);
 
 		$fetchresult = Network::fetchUrlFull($url);
 		$s = $fetchresult->getBody();
 
-		Text::logger('load: returns ' . $s, LOGGER_DATA);
+		App::logger('load: returns ' . $s, LOGGER_DATA);
 
-		Text::logger('load: return code: ' . $fetchresult->getReturnCode(), LOGGER_DEBUG);
+		App::logger('load: return code: ' . $fetchresult->getReturnCode(), LOGGER_DEBUG);
 
 		if (($fetchresult->getReturnCode() > 299) || (! $s)) {
 			return;
@@ -100,7 +101,7 @@ class PortableContact
 
 		$j = json_decode($s, true);
 
-		Text::logger('load: json: ' . print_r($j, true), LOGGER_DATA);
+		App::logger('load: json: ' . print_r($j, true), LOGGER_DATA);
 
 		if (!isset($j['entry'])) {
 			return;
@@ -200,10 +201,10 @@ class PortableContact
 
 				GContact::link($gcid, $uid, $cid, $zcid);
 			} catch (Exception $e) {
-				Text::logger($e->getMessage(), LOGGER_DEBUG);
+				App::logger($e->getMessage(), LOGGER_DEBUG);
 			}
 		}
-		Text::logger("load: loaded $total entries", LOGGER_DEBUG);
+		App::logger("load: loaded $total entries", LOGGER_DEBUG);
 
 		$condition = ["`cid` = ? AND `uid` = ? AND `zcid` = ? AND `updated` < UTC_TIMESTAMP - INTERVAL 2 DAY", $cid, $uid, $zcid];
 		DBA::delete('glink', $condition);
@@ -336,7 +337,7 @@ class PortableContact
 		}
 
 		if (!in_array($gcontacts[0]["network"], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::FEED, Protocol::OSTATUS, ""])) {
-			Text::logger("Profile ".$profile.": Network type ".$gcontacts[0]["network"]." can't be checked", LOGGER_DEBUG);
+			App::logger("Profile ".$profile.": Network type ".$gcontacts[0]["network"]." can't be checked", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -347,7 +348,7 @@ class PortableContact
 					DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($profile)]);
 				}
 
-				Text::logger("Profile ".$profile.": Server ".$server_url." wasn't reachable.", LOGGER_DEBUG);
+				App::logger("Profile ".$profile.": Server ".$server_url." wasn't reachable.", LOGGER_DEBUG);
 				return false;
 			}
 			$contact['server_url'] = $server_url;
@@ -427,7 +428,7 @@ class PortableContact
 							$fields = ['last_contact' => DateTimeFormat::utcNow()];
 							DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($profile)]);
 
-							Text::logger("Profile ".$profile." was last updated at ".$noscrape["updated"]." (noscrape)", LOGGER_DEBUG);
+							App::logger("Profile ".$profile." was last updated at ".$noscrape["updated"]." (noscrape)", LOGGER_DEBUG);
 
 							return $noscrape["updated"];
 						}
@@ -438,7 +439,7 @@ class PortableContact
 
 		// If we only can poll the feed, then we only do this once a while
 		if (!$force && !self::updateNeeded($gcontacts[0]["created"], $gcontacts[0]["updated"], $gcontacts[0]["last_failure"], $gcontacts[0]["last_contact"])) {
-			Text::logger("Profile ".$profile." was last updated at ".$gcontacts[0]["updated"]." (cached)", LOGGER_DEBUG);
+			App::logger("Profile ".$profile." was last updated at ".$gcontacts[0]["updated"]." (cached)", LOGGER_DEBUG);
 
 			GContact::update($contact);
 			return $gcontacts[0]["updated"];
@@ -465,10 +466,10 @@ class PortableContact
 
 				self::lastUpdated($data["url"], $force);
 			} catch (Exception $e) {
-				Text::logger($e->getMessage(), LOGGER_DEBUG);
+				App::logger($e->getMessage(), LOGGER_DEBUG);
 			}
 
-			Text::logger("Profile ".$profile." was deleted", LOGGER_DEBUG);
+			App::logger("Profile ".$profile." was deleted", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -476,7 +477,7 @@ class PortableContact
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($profile)]);
 
-			Text::logger("Profile ".$profile." wasn't reachable (profile)", LOGGER_DEBUG);
+			App::logger("Profile ".$profile." wasn't reachable (profile)", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -492,7 +493,7 @@ class PortableContact
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($profile)]);
 
-			Text::logger("Profile ".$profile." wasn't reachable (no feed)", LOGGER_DEBUG);
+			App::logger("Profile ".$profile." wasn't reachable (no feed)", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -540,7 +541,7 @@ class PortableContact
 			DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($profile)]);
 		}
 
-		Text::logger("Profile ".$profile." was last updated at ".$last_updated, LOGGER_DEBUG);
+		App::logger("Profile ".$profile." was last updated at ".$last_updated, LOGGER_DEBUG);
 
 		return $last_updated;
 	}
@@ -663,7 +664,7 @@ class PortableContact
 
 		foreach ($nodeinfo['links'] as $link) {
 			if (!is_array($link) || empty($link['rel'])) {
-				Text::logger('Invalid nodeinfo format for ' . $server_url, LOGGER_DEBUG);
+				App::logger('Invalid nodeinfo format for ' . $server_url, LOGGER_DEBUG);
 				continue;
 			}
 			if ($link['rel'] == 'http://nodeinfo.diaspora.software/ns/schema/1.0') {
@@ -964,7 +965,7 @@ class PortableContact
 			}
 
 			if (!$force && !self::updateNeeded($gserver["created"], "", $last_failure, $last_contact)) {
-				Text::logger("Use cached data for server ".$server_url, LOGGER_DEBUG);
+				App::logger("Use cached data for server ".$server_url, LOGGER_DEBUG);
 				return ($last_contact >= $last_failure);
 			}
 		} else {
@@ -980,7 +981,7 @@ class PortableContact
 			$last_contact = DBA::NULL_DATETIME;
 			$last_failure = DBA::NULL_DATETIME;
 		}
-		Text::logger("Server ".$server_url." is outdated or unknown. Start discovery. Force: ".$force." Created: ".$gserver["created"]." Failure: ".$last_failure." Contact: ".$last_contact, LOGGER_DEBUG);
+		App::logger("Server ".$server_url." is outdated or unknown. Start discovery. Force: ".$force." Created: ".$gserver["created"]." Failure: ".$last_failure." Contact: ".$last_contact, LOGGER_DEBUG);
 
 		$failure = false;
 		$possible_failure = false;
@@ -1005,7 +1006,7 @@ class PortableContact
 		// But we want to make sure to only quit if we are mostly sure that this server url fits.
 		if (DBA::isResult($gserver) && ($orig_server_url == $server_url) &&
 			($curlResult->isTimeout())) {
-			Text::logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
+			App::logger("Connection to server ".$server_url." timed out.", LOGGER_DEBUG);
 			DBA::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => Text::normaliseLink($server_url)]);
 			return false;
 		}
@@ -1020,7 +1021,7 @@ class PortableContact
 
 			// Quit if there is a timeout
 			if ($curlResult->isTimeout()) {
-				Text::logger("Connection to server " . $server_url . " timed out.", LOGGER_DEBUG);
+				App::logger("Connection to server " . $server_url . " timed out.", LOGGER_DEBUG);
 				DBA::update('gserver', ['last_failure' => DateTimeFormat::utcNow()], ['nurl' => Text::normaliseLink($server_url)]);
 				return false;
 			}
@@ -1399,9 +1400,9 @@ class PortableContact
 		}
 
 		if (($last_contact <= $last_failure) && !$failure) {
-			Text::logger("Server ".$server_url." seems to be alive, but last contact wasn't set - could be a bug", LOGGER_DEBUG);
+			App::logger("Server ".$server_url." seems to be alive, but last contact wasn't set - could be a bug", LOGGER_DEBUG);
 		} elseif (($last_contact >= $last_failure) && $failure) {
-			Text::logger("Server ".$server_url." seems to be dead, but last failure wasn't set - could be a bug", LOGGER_DEBUG);
+			App::logger("Server ".$server_url." seems to be dead, but last failure wasn't set - could be a bug", LOGGER_DEBUG);
 		}
 
 		// Check again if the server exists
@@ -1430,7 +1431,7 @@ class PortableContact
 			self::discoverRelay($server_url);
 		}
 
-		Text::logger("End discovery for server " . $server_url, LOGGER_DEBUG);
+		App::logger("End discovery for server " . $server_url, LOGGER_DEBUG);
 
 		return !$failure;
 	}
@@ -1442,7 +1443,7 @@ class PortableContact
 	 */
 	private static function discoverRelay($server_url)
 	{
-		Text::logger("Discover relay data for server " . $server_url, LOGGER_DEBUG);
+		App::logger("Discover relay data for server " . $server_url, LOGGER_DEBUG);
 
 		$curlResult = Network::curl($server_url . "/.well-known/x-social-relay");
 
@@ -1558,7 +1559,7 @@ class PortableContact
 			$r = q("SELECT `nurl` FROM `gserver` WHERE `nurl` = '%s'", DBA::escape(Text::normaliseLink($server_url)));
 
 			if (!DBA::isResult($r)) {
-				Text::logger("Call server check for server ".$server_url, LOGGER_DEBUG);
+				App::logger("Call server check for server ".$server_url, LOGGER_DEBUG);
 				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $server_url);
 			}
 		}
@@ -1643,7 +1644,7 @@ class PortableContact
 		// Fetch all users from the other server
 		$url = $server["poco"] . "/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation";
 
-		Text::logger("Fetch all users from the server " . $server["url"], LOGGER_DEBUG);
+		App::logger("Fetch all users from the server " . $server["url"], LOGGER_DEBUG);
 
 		$curlResult = Network::curl($url);
 
@@ -1671,7 +1672,7 @@ class PortableContact
 				$curlResult = Network::curl($url);
 
 				if ($curlResult->isSuccess() && !empty($curlResult->getBody())) {
-					Text::logger("Fetch all global contacts from the server " . $server["nurl"], LOGGER_DEBUG);
+					App::logger("Fetch all global contacts from the server " . $server["nurl"], LOGGER_DEBUG);
 					$data = json_decode($curlResult->getBody(), true);
 
 					if (!empty($data)) {
@@ -1680,7 +1681,7 @@ class PortableContact
 				}
 
 				if (!$success && (Config::get('system', 'poco_discovery') > 2)) {
-					Text::logger("Fetch contacts from users of the server " . $server["nurl"], LOGGER_DEBUG);
+					App::logger("Fetch contacts from users of the server " . $server["nurl"], LOGGER_DEBUG);
 					self::discoverServerUsers($data, $server);
 				}
 			}
@@ -1733,7 +1734,7 @@ class PortableContact
 					continue;
 				}
 
-				Text::logger('Update directory from server ' . $gserver['url'] . ' with ID ' . $gserver['id'], LOGGER_DEBUG);
+				App::logger('Update directory from server ' . $gserver['url'] . ' with ID ' . $gserver['id'], LOGGER_DEBUG);
 				Worker::add(PRIORITY_LOW, 'DiscoverPoCo', 'update_server_directory', (int) $gserver['id']);
 
 				if (!$complete && ( --$no_of_queries == 0)) {
@@ -1763,7 +1764,7 @@ class PortableContact
 			}
 
 			if ($username != '') {
-				Text::logger('Fetch contacts for the user ' . $username . ' from the server ' . $server['nurl'], LOGGER_DEBUG);
+				App::logger('Fetch contacts for the user ' . $username . ' from the server ' . $server['nurl'], LOGGER_DEBUG);
 
 				// Fetch all contacts from a given user from the other server
 				$url = $server['poco'] . '/' . $username . '/?fields=displayName,urls,photos,updated,network,aboutMe,currentLocation,tags,gender,contactType,generation';
@@ -1866,7 +1867,7 @@ class PortableContact
 			if ($generation > 0) {
 				$success = true;
 
-				Text::logger("Store profile ".$profile_url, LOGGER_DEBUG);
+				App::logger("Store profile ".$profile_url, LOGGER_DEBUG);
 
 				$gcontact = ["url" => $profile_url,
 						"name" => $name,
@@ -1885,10 +1886,10 @@ class PortableContact
 					$gcontact = GContact::sanitize($gcontact);
 					GContact::update($gcontact);
 				} catch (Exception $e) {
-					Text::logger($e->getMessage(), LOGGER_DEBUG);
+					App::logger($e->getMessage(), LOGGER_DEBUG);
 				}
 
-				Text::logger("Done for profile ".$profile_url, LOGGER_DEBUG);
+				App::logger("Done for profile ".$profile_url, LOGGER_DEBUG);
 			}
 		}
 		return $success;

@@ -4,7 +4,7 @@
  */
 namespace Friendica\Network;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\PConfig;
 use Friendica\Core\System;
@@ -35,12 +35,12 @@ class FKOAuth1 extends OAuthServer
 	 */
 	public function loginUser($uid)
 	{
-		Text::logger("FKOAuth1::loginUser $uid");
+		App::logger("FKOAuth1::loginUser $uid");
 		$a = get_app();
 		$record = DBA::selectFirst('user', [], ['uid' => $uid, 'blocked' => 0, 'account_expired' => 0, 'account_removed' => 0, 'verified' => 1]);
 
 		if (!DBA::isResult($record)) {
-			Text::logger('FKOAuth1::loginUser failure: ' . print_r($_SERVER, true), LOGGER_DEBUG);
+			App::logger('FKOAuth1::loginUser failure: ' . print_r($_SERVER, true), LOGGER_DEBUG);
 			header('HTTP/1.0 401 Unauthorized');
 			die('This api requires login');
 		}

@@ -4,6 +4,7 @@
  */
 namespace Friendica\Core;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -101,7 +102,7 @@ class System extends BaseObject
 		}
 
 		if ($st) {
-			Text::logger('xml_status returning non_zero: ' . $st . " message=" . $message);
+			App::logger('xml_status returning non_zero: ' . $st . " message=" . $message);
 		}
 
 		header("Content-type: text/xml");
@@ -135,7 +136,7 @@ class System extends BaseObject
 			$err = 'OK';
 		}
 
-		Text::logger('http_status_exit ' . $val);
+		App::logger('http_status_exit ' . $val);
 		header($_SERVER["SERVER_PROTOCOL"] . ' ' . $val . ' ' . $err);
 
 		if (isset($description["title"])) {

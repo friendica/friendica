@@ -6,7 +6,7 @@
 
 namespace Friendica\Core;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Core\System;
 
 require_once 'boot.php';
@@ -107,7 +107,7 @@ class Theme
 	// install and uninstall theme
 	public static function uninstall($theme)
 	{
-		Text::logger("Addons: uninstalling theme " . $theme);
+		App::logger("Addons: uninstalling theme " . $theme);
 
 		include_once "view/theme/$theme/theme.php";
 		if (function_exists("{$theme}_uninstall")) {
@@ -124,7 +124,7 @@ class Theme
 			return false;
 		}
 
-		Text::logger("Addons: installing theme $theme");
+		App::logger("Addons: installing theme $theme");
 
 		include_once "view/theme/$theme/theme.php";
 
@@ -133,7 +133,7 @@ class Theme
 			$func();
 			return true;
 		} else {
-			Text::logger("Addons: FAILED installing theme $theme");
+			App::logger("Addons: FAILED installing theme $theme");
 			return false;
 		}
 	}

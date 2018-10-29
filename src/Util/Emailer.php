@@ -4,7 +4,7 @@
  */
 namespace Friendica\Util;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -97,8 +97,8 @@ class Emailer
 			$hookdata['headers'],
 			$hookdata['parameters']
 		);
-		Text::logger("header " . 'To: ' . $params['toEmail'] . "\n" . $messageHeader, LOGGER_DEBUG);
-		Text::logger("return value " . (($res)?"true":"false"), LOGGER_DEBUG);
+		App::logger("header " . 'To: ' . $params['toEmail'] . "\n" . $messageHeader, LOGGER_DEBUG);
+		App::logger("return value " . (($res)?"true":"false"), LOGGER_DEBUG);
 		return $res;
 	}
 }

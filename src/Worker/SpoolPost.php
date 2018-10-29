@@ -5,7 +5,7 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Model\Item;
 use Friendica\Core\Config;
 
@@ -50,7 +50,7 @@ class SpoolPost {
 
 					$result = Item::insert($arr);
 
-					Text::logger("Spool file ".$file." stored: ".$result, LOGGER_DEBUG);
+					App::logger("Spool file ".$file." stored: ".$result, LOGGER_DEBUG);
 					unlink($fullfile);
 				}
 				closedir($dh);

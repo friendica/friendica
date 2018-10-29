@@ -54,7 +54,7 @@ function poke_init(App $a)
 	$parent = (x($_GET,'parent') ? intval($_GET['parent']) : 0);
 
 
-	Text::logger('poke: verb ' . $verb . ' contact ' . $contact_id, LOGGER_DEBUG);
+	App::logger('poke: verb ' . $verb . ' contact ' . $contact_id, LOGGER_DEBUG);
 
 
 	$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
@@ -63,7 +63,7 @@ function poke_init(App $a)
 	);
 
 	if (!DBA::isResult($r)) {
-		Text::logger('poke: no contact ' . $contact_id);
+		App::logger('poke: no contact ' . $contact_id);
 		return;
 	}
 

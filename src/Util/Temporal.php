@@ -8,6 +8,7 @@ namespace Friendica\Util;
 
 use DateTime;
 use DateTimeZone;
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;

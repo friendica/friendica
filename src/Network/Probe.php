@@ -10,6 +10,7 @@ namespace Friendica\Network;
  */
 
 use DOMDocument;
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -110,7 +111,7 @@ class Probe
 		$xrd_timeout = Config::get('system', 'xrd_timeout', 20);
 		$redirects = 0;
 
-		Text::logger("Probing for ".$host, LOGGER_DEBUG);
+		App::logger("Probing for ".$host, LOGGER_DEBUG);
 		$xrd = null;
 
 		$curlResult = Network::curl($ssl_url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
@@ -123,7 +124,7 @@ class Probe
 		if (!is_object($xrd)) {
 			$curlResult = Network::curl($url, false, $redirects, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 			if ($curlResult->isTimeout()) {
-				Text::logger("Probing timeout for " . $url, LOGGER_DEBUG);
+				App::logger("Probing timeout for " . $url, LOGGER_DEBUG);
 				return false;
 			}
 			$xml = $curlResult->getBody();
@@ -131,13 +132,13 @@ class Probe
 			$host_url = 'http://'.$host;
 		}
 		if (!is_object($xrd)) {
-			Text::logger("No xrd object found for ".$host, LOGGER_DEBUG);
+			App::logger("No xrd object found for ".$host, LOGGER_DEBUG);
 			return [];
 		}
 
 		$links = XML::elementToArray($xrd);
 		if (!isset($links["xrd"]["link"])) {
-			Text::logger("No xrd data found for ".$host, LOGGER_DEBUG);
+			App::logger("No xrd data found for ".$host, LOGGER_DEBUG);
 			return [];
 		}
 
@@ -165,7 +166,7 @@ class Probe
 
 		self::$baseurl = "http://".$host;
 
-		Text::logger("Probing successful for ".$host, LOGGER_DEBUG);
+		App::logger("Probing successful for ".$host, LOGGER_DEBUG);
 
 		return $lrdd;
 	}
@@ -195,7 +196,7 @@ class Probe
 		$profile_link = '';
 
 		$links = self::lrdd($webbie);
-		Text::logger('webfingerDfrn: '.$webbie.':'.print_r($links, true), LOGGER_DATA);
+		App::logger('webfingerDfrn: '.$webbie.':'.print_r($links, true), LOGGER_DATA);
 		if (count($links)) {
 			foreach ($links as $link) {
 				if ($link['@attributes']['rel'] === NAMESPACE_DFRN) {
@@ -254,7 +255,7 @@ class Probe
 		}
 
 		if (!$lrdd) {
-			Text::logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
+			App::logger("No lrdd data found for ".$uri, LOGGER_DEBUG);
 			return [];
 		}
 
@@ -286,7 +287,7 @@ class Probe
 		}
 
 		if (!is_array($webfinger["links"])) {
-			Text::logger("No webfinger links found for ".$uri, LOGGER_DEBUG);
+			App::logger("No webfinger links found for ".$uri, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -596,7 +597,7 @@ class Probe
 				$lrdd = self::hostMeta($host);
 			}
 			if (!$lrdd) {
-				Text::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
+				App::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::feed($uri);
 			}
 			$nick = array_pop($path_parts);
@@ -631,12 +632,12 @@ class Probe
 			}
 
 			if (!$lrdd) {
-				Text::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
+				App::logger('No XRD data was found for '.$uri, LOGGER_DEBUG);
 				return self::mail($uri, $uid);
 			}
 			$addr = $uri;
 		} else {
-			Text::logger("Uri ".$uri." was not detectable", LOGGER_DEBUG);
+			App::logger("Uri ".$uri." was not detectable", LOGGER_DEBUG);
 			return false;
 		}
 
@@ -681,7 +682,7 @@ class Probe
 
 		$result = false;
 
-		Text::logger("Probing ".$uri, LOGGER_DEBUG);
+		App::logger("Probing ".$uri, LOGGER_DEBUG);
 
 		if (in_array($network, ["", Protocol::DFRN])) {
 			$result = self::dfrn($webfinger);
@@ -717,7 +718,7 @@ class Probe
 			$result["url"] = $uri;
 		}
 
-		Text::logger($uri." is ".$result["network"], LOGGER_DEBUG);
+		App::logger($uri." is ".$result["network"], LOGGER_DEBUG);
 
 		if (empty($result["baseurl"])) {
 			$pos = strpos($result["url"], $host);
@@ -752,7 +753,7 @@ class Probe
 		$webfinger = json_decode($data, true);
 		if (is_array($webfinger)) {
 			if (!isset($webfinger["links"])) {
-				Text::logger("No json webfinger links for ".$url, LOGGER_DEBUG);
+				App::logger("No json webfinger links for ".$url, LOGGER_DEBUG);
 				return false;
 			}
 			return $webfinger;
@@ -761,13 +762,13 @@ class Probe
 		// If it is not JSON, maybe it is XML
 		$xrd = XML::parseString($data, false);
 		if (!is_object($xrd)) {
-			Text::logger("No webfinger data retrievable for ".$url, LOGGER_DEBUG);
+			App::logger("No webfinger data retrievable for ".$url, LOGGER_DEBUG);
 			return false;
 		}
 
 		$xrd_arr = XML::elementToArray($xrd);
 		if (!isset($xrd_arr["xrd"]["link"])) {
-			Text::logger("No XML webfinger links for ".$url, LOGGER_DEBUG);
+			App::logger("No XML webfinger links for ".$url, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -816,13 +817,13 @@ class Probe
 		}
 		$content = $curlResult->getBody();
 		if (!$content) {
-			Text::logger("Empty body for ".$noscrape_url, LOGGER_DEBUG);
+			App::logger("Empty body for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
 		$json = json_decode($content, true);
 		if (!is_array($json)) {
-			Text::logger("No json data for ".$noscrape_url, LOGGER_DEBUG);
+			App::logger("No json data for ".$noscrape_url, LOGGER_DEBUG);
 			return false;
 		}
 
@@ -928,7 +929,7 @@ class Probe
 	{
 		$data = [];
 
-		Text::logger("Check profile ".$profile_link, LOGGER_DEBUG);
+		App::logger("Check profile ".$profile_link, LOGGER_DEBUG);
 
 		// Fetch data via noscrape - this is faster
 		$noscrape_url = str_replace(["/hcard/", "/profile/"], "/noscrape/", $profile_link);
@@ -962,7 +963,7 @@ class Probe
 		$prof_data["fn"]           = defaults($data, 'name'   , null);
 		$prof_data["key"]          = defaults($data, 'pubkey' , null);
 
-		Text::logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
+		App::logger("Result for profile ".$profile_link.": ".print_r($prof_data, true), LOGGER_DEBUG);
 
 		return $prof_data;
 	}
@@ -1633,7 +1634,7 @@ class Probe
 		}
 
 		$msgs = Email::poll($mbox, $uri);
-		Text::logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
+		App::logger('searching '.$uri.', '.count($msgs).' messages found.', LOGGER_DEBUG);
 
 		if (!count($msgs)) {
 			return false;
@@ -1715,7 +1716,7 @@ class Probe
 
 		$fixed = $scheme.$host.$port.$path.$query.$fragment;
 
-		Text::logger('Base: '.$base.' - Avatar: '.$avatar.' - Fixed: '.$fixed, LOGGER_DATA);
+		App::logger('Base: '.$base.' - Avatar: '.$avatar.' - Fixed: '.$fixed, LOGGER_DATA);
 
 		return $fixed;
 	}

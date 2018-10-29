@@ -7,7 +7,7 @@
  **/
 namespace Friendica\Worker;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
 use Friendica\Util\Network;
@@ -22,7 +22,7 @@ class CheckVersion
 {
 	public static function execute()
 	{
-		Text::logger('checkversion: start');
+		App::logger('checkversion: start');
 
 		$checkurl = Config::get('system', 'check_new_version_url', 'none');
 
@@ -37,15 +37,15 @@ class CheckVersion
 				// don't check
 				return;
 		}
-		Text::logger("Checking VERSION from: ".$checked_url, LOGGER_DEBUG);
+		App::logger("Checking VERSION from: ".$checked_url, LOGGER_DEBUG);
 
 		// fetch the VERSION file
 		$gitversion = DBA::escape(trim(Network::fetchUrl($checked_url)));
-		Text::logger("Upstream VERSION is: ".$gitversion, LOGGER_DEBUG);
+		App::logger("Upstream VERSION is: ".$gitversion, LOGGER_DEBUG);
 
 		Config::set('system', 'git_friendica_version', $gitversion);
 
-		Text::logger('checkversion: end');
+		App::logger('checkversion: end');
 
 		return;
 	}

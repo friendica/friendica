@@ -5,6 +5,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Content\Text\BBCode;
@@ -225,7 +226,7 @@ class Event extends BaseObject
 		}
 
 		DBA::delete('event', ['id' => $event_id]);
-		Text::logger("Deleted event ".$event_id, LOGGER_DEBUG);
+		App::logger("Deleted event ".$event_id, LOGGER_DEBUG);
 	}
 
 	/**

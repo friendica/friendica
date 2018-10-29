@@ -9,7 +9,7 @@
 
 namespace Friendica\Network;
 
-use Friendica\Content\Text;
+use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
 use OAuthConsumer;
@@ -40,7 +40,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function lookup_consumer($consumer_key)
 	{
-		Text::logger(__function__ . ":" . $consumer_key);
+		App::logger(__function__ . ":" . $consumer_key);
 
 		$s = DBA::select('clients', ['client_id', 'pw', 'redirect_uri'], ['client_id' => $consumer_key]);
 		$r = DBA::toArray($s);
@@ -60,7 +60,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function lookup_token($consumer, $token_type, $token)
 	{
-		Text::logger(__function__ . ":" . $consumer . ", " . $token_type . ", " . $token);
+		App::logger(__function__ . ":" . $consumer . ", " . $token_type . ", " . $token);
 
 		$s = DBA::select('tokens', ['id', 'secret', 'scope', 'expires', 'uid'], ['client_id' => $consumer->key, 'scope' => $token_type, 'id' => $token]);
 		$r = DBA::toArray($s);
@@ -100,7 +100,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function new_request_token($consumer, $callback = null)
 	{
-		Text::logger(__function__ . ":" . $consumer . ", " . $callback);
+		App::logger(__function__ . ":" . $consumer . ", " . $callback);
 		$key = self::genToken();
 		$sec = self::genToken();
 
@@ -135,7 +135,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 */
 	public function new_access_token($token, $consumer, $verifier = null)
 	{
-		Text::logger(__function__ . ":" . $token . ", " . $consumer . ", " . $verifier);
+		App::logger(__function__ . ":" . $token . ", " . $consumer . ", " . $verifier);
 
 		// return a new access token attached to this consumer
 		// for the user associated with this token if the request token
@@ -146,7 +146,7 @@ class FKOAuthDataStore extends OAuthDataStore
 
 		// get user for this verifier
 		$uverifier = Config::get("oauth", $verifier);
-		Text::logger(__function__ . ":" . $verifier . "," . $uverifier);
+		App::logger(__function__ . ":" . $verifier . "," . $uverifier);
 
 		if (is_null($verifier) || ($uverifier !== false)) {
 			$key = self::genToken();

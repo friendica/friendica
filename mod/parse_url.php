@@ -55,7 +55,7 @@ function parse_url_content(App $a)
 		}
 	}
 
-	Text::logger($url);
+	App::logger($url);
 
 	// Check if the URL is an image, video or audio file. If so format
 	// the URL with the corresponding BBCode media tag
@@ -115,7 +115,7 @@ function parse_url_content(App $a)
 
 		$result = sprintf($template, $url, ($title) ? $title : $url, $text) . $str_tags;
 
-		Text::logger('(unparsed): returns: ' . $result);
+		App::logger('(unparsed): returns: ' . $result);
 
 		echo $result;
 		exit();

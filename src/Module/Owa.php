@@ -4,6 +4,7 @@
  */
 namespace Friendica\Module;
 
+use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Content\Text;
 use Friendica\Core\System;
@@ -58,8 +59,8 @@ class Owa extends BaseModule
 							$verified = HTTPSignature::verifyMagic($contact['pubkey']);
 
 							if ($verified && $verified['header_signed'] && $verified['header_valid']) {
-								Text::logger('OWA header: ' . print_r($verified, true), LOGGER_DATA);
-								Text::logger('OWA success: ' . $contact['addr'], LOGGER_DATA);
+								App::logger('OWA header: ' . print_r($verified, true), LOGGER_DATA);
+								App::logger('OWA success: ' . $contact['addr'], LOGGER_DATA);
 
 								$ret['success'] = true;
 								$token = Text::randomString(32);
@@ -76,10 +77,10 @@ class Owa extends BaseModule
 								openssl_public_encrypt($token, $result, $contact['pubkey']);
 								$ret['encrypted_token'] = Text::base64UrlEncode($result);
 							} else {
-								Text::logger('OWA fail: ' . $contact['id'] . ' ' . $contact['addr'] . ' ' . $contact['url'], LOGGER_DEBUG);
+								App::logger('OWA fail: ' . $contact['id'] . ' ' . $contact['addr'] . ' ' . $contact['url'], LOGGER_DEBUG);
 							}
 						} else {
-							Text::logger('Contact not found: ' . $handle, LOGGER_DEBUG);
+							App::logger('Contact not found: ' . $handle, LOGGER_DEBUG);
 						}
 					}
 				}

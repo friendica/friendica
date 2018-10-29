@@ -6,6 +6,7 @@
 
 namespace Friendica\Model;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Database\DBA;
@@ -193,7 +194,7 @@ class APContact extends BaseObject
 		// Update the gcontact table
 		DBA::update('gcontact', $contact_fields, ['nurl' => Text::normaliseLink($url)]);
 
-		Text::logger('Updated profile for ' . $url, LOGGER_DEBUG);
+		App::logger('Updated profile for ' . $url, LOGGER_DEBUG);
 
 		return $apcontact;
 	}

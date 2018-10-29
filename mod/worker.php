@@ -4,6 +4,7 @@
  * @brief Module for running the worker as frontend process
  */
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
@@ -34,7 +35,7 @@ function worker_init()
 
 	Worker::startProcess();
 
-	Text::logger("Front end worker started: ".getmypid());
+	App::logger("Front end worker started: ".getmypid());
 
 	Worker::callWorker();
 
@@ -56,7 +57,7 @@ function worker_init()
 
 	Worker::endProcess();
 
-	Text::logger("Front end worker ended: ".getmypid());
+	App::logger("Front end worker ended: ".getmypid());
 
 	killme();
 }

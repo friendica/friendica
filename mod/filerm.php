@@ -20,7 +20,7 @@ function filerm_content(App $a) {
 
 	$item_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 
-	Text::logger('filerm: tag ' . $term . ' item ' . $item_id);
+	App::logger('filerm: tag ' . $term . ' item ' . $item_id);
 
 	if ($item_id && strlen($term)) {
 		Text::fileTagUnsaveFile(local_user(),$item_id,$term, $category);

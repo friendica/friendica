@@ -9,7 +9,7 @@ namespace Friendica\Util;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use Friendica\Content\Text;
+use Friendica\App;
 
 /**
  * @brief Temporal class
@@ -126,7 +126,7 @@ class DateTimeFormat
 		try {
 			$d = new DateTime($s, $from_obj);
 		} catch (Exception $e) {
-			Text::logger('DateTimeFormat::convert: exception: ' . $e->getMessage());
+			App::logger('DateTimeFormat::convert: exception: ' . $e->getMessage());
 			$d = new DateTime('now', $from_obj);
 		}
 

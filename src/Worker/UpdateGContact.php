@@ -6,6 +6,7 @@
 
 namespace Friendica\Worker;
 
+use Friendica\App;
 use Friendica\Content\Text;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
@@ -17,10 +18,10 @@ class UpdateGContact
 {
 	public static function execute($contact_id)
 	{
-		Text::logger('update_gcontact: start');
+		App::logger('update_gcontact: start');
 
 		if (empty($contact_id)) {
-			Text::logger('update_gcontact: no contact');
+			App::logger('update_gcontact: no contact');
 			return;
 		}
 

@@ -2,6 +2,7 @@
 /**
  * @file mod/apps.php
  */
+use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Content\Text;
 use Friendica\Core\Config;

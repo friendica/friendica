@@ -142,9 +142,9 @@ function photos_init(App $a) {
 
 function photos_post(App $a)
 {
-	Text::logger('mod-photos: photos_post: begin' , LOGGER_DEBUG);
-	Text::logger('mod_photos: REQUEST ' . print_r($_REQUEST, true), LOGGER_DATA);
-	Text::logger('mod_photos: FILES '   . print_r($_FILES, true), LOGGER_DATA);
+	App::logger('mod-photos: photos_post: begin' , LOGGER_DEBUG);
+	App::logger('mod_photos: REQUEST ' . print_r($_REQUEST, true), LOGGER_DATA);
+	App::logger('mod_photos: FILES '   . print_r($_FILES, true), LOGGER_DATA);
 
 	$phototypes = Image::supportedTypes();
 
@@ -190,7 +190,7 @@ function photos_post(App $a)
 
 	if (!$owner_record) {
 		notice(L10n::t('Contact information unavailable') . EOL);
-		Text::logger('photos_post: unable to locate contact record for page owner. uid=' . $page_owner_uid);
+		App::logger('photos_post: unable to locate contact record for page owner. uid=' . $page_owner_uid);
 		killme();
 	}
 
@@ -380,7 +380,7 @@ function photos_post(App $a)
 		}
 
 		if (!empty($_POST['rotate']) && (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
-			Text::logger('rotate');
+			App::logger('rotate');
 
 			$r = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 0 LIMIT 1",
 				DBA::escape($resource_id),
@@ -707,7 +707,7 @@ function photos_post(App $a)
 	$album    = !empty($_REQUEST['album'])    ? Text::noTags(trim($_REQUEST['album']))    : '';
 	$newalbum = !empty($_REQUEST['newalbum']) ? Text::noTags(trim($_REQUEST['newalbum'])) : '';
 
-	Text::logger('mod/photos.php: photos_post(): album= ' . $album . ' newalbum= ' . $newalbum , LOGGER_DEBUG);
+	App::logger('mod/photos.php: photos_post(): album= ' . $album . ' newalbum= ' . $newalbum , LOGGER_DEBUG);
 
 	if (!strlen($album)) {
 		if (strlen($newalbum)) {
@@ -800,7 +800,7 @@ function photos_post(App $a)
 		$type = Image::guessType($filename);
 	}
 
-	Text::logger('photos: upload: received file: ' . $filename . ' as ' . $src . ' ('. $type . ') ' . $filesize . ' bytes', LOGGER_DEBUG);
+	App::logger('photos: upload: received file: ' . $filename . ' as ' . $src . ' ('. $type . ') ' . $filesize . ' bytes', LOGGER_DEBUG);
 
 	$maximagesize = Config::get('system', 'maximagesize');
 
@@ -820,14 +820,14 @@ function photos_post(App $a)
 		return;
 	}
 
-	Text::logger('mod/photos.php: photos_post(): loading the contents of ' . $src , LOGGER_DEBUG);
+	App::logger('mod/photos.php: photos_post(): loading the contents of ' . $src , LOGGER_DEBUG);
 
 	$imagedata = @file_get_contents($src);
 
 	$image = new Image($imagedata, $type);
 
 	if (!$image->isValid()) {
-		Text::logger('mod/photos.php: photos_post(): unable to process image' , LOGGER_DEBUG);
+		App::logger('mod/photos.php: photos_post(): unable to process image' , LOGGER_DEBUG);
 		notice(L10n::t('Unable to process image.') . EOL);
 		@unlink($src);
 		$foo = 0;
@@ -856,7 +856,7 @@ function photos_post(App $a)
 	$r = Photo::store($image, $page_owner_uid, $visitor, $photo_hash, $filename, $album, 0 , 0, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
 
 	if (!$r) {
-		Text::logger('mod/photos.php: photos_post(): image store failed', LOGGER_DEBUG);
+		App::logger('mod/photos.php: photos_post(): image store failed', LOGGER_DEBUG);
 		notice(L10n::t('Image upload failed.') . EOL);
 		killme();
 	}
