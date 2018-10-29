@@ -1692,10 +1692,10 @@ function admin_page_users_post(App $a)
 		}
 
 		$user = $result['user'];
-		$preamble = deindent(L10n::t('
+		$preamble = Text::deindent(L10n::t('
 			Dear %1$s,
 				the administrator of %2$s has set up an account for you.'));
-		$body = deindent(L10n::t('
+		$body = Text::deindent(L10n::t('
 			The login details are as follows:
 
 			Site Location:	%1$s

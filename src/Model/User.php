@@ -692,7 +692,7 @@ class User
 	 */
 	public static function sendRegisterPendingEmail($user, $sitename, $siteurl, $password)
 	{
-		$body = deindent(L10n::t('
+		$body = Text::deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account is pending for approval by the administrator.
 
@@ -727,13 +727,13 @@ class User
 	 */
 	public static function sendRegisterOpenEmail($user, $sitename, $siteurl, $password)
 	{
-		$preamble = deindent(L10n::t('
+		$preamble = Text::deindent(L10n::t('
 			Dear %1$s,
 				Thank you for registering at %2$s. Your account has been created.
 		',
 			$preamble, $user['username'], $sitename
 		));
-		$body = deindent(L10n::t('
+		$body = Text::deindent(L10n::t('
 			The login details are as follows:
 
 			Site Location:	%3$s

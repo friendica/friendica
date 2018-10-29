@@ -108,7 +108,7 @@ function editpost_content(App $a)
 		'$permset' => L10n::t('Permission settings'),
 		'$wall' => $item['wall'],
 		'$posttype' => $item['post-type'],
-		'$content' => undo_post_tagging($item['body']),
+		'$content' => Text::undoPostTagging($item['body']),
 		'$post_id' => $post_id,
 		'$baseurl' => System::baseUrl(),
 		'$defloc' => $a->user['default-location'],

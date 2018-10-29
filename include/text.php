@@ -1738,12 +1738,13 @@ function file_tag_unsave_file($uid, $item_id, $file, $cat = false)
 }
 
 function normalise_openid($s) {
-	return trim(str_replace(['http://', 'https://'], ['', ''], $s), '/');
+	//return trim(str_replace(['http://', 'https://'], ['', ''], $s), '/');
+	return Text::normaliseOpenid($s);
 }
 
 
 function undo_post_tagging($s) {
-	$matches = null;
+	/* $matches = null;
 	$cnt = preg_match_all('/([!#@])\[url=(.*?)\](.*?)\[\/url\]/ism', $s, $matches, PREG_SET_ORDER);
 	if ($cnt) {
 		foreach ($matches as $mtch) {
@@ -1754,16 +1755,18 @@ function undo_post_tagging($s) {
 			$s = str_replace($mtch[0], $mtch[1] . $mtch[3],$s);
 		}
 	}
-	return $s;
+	return $s; */
+	return Text::undoPostTagging($s);
 }
 
 function protect_sprintf($s) {
-	return str_replace('%', '%%', $s);
+	//return str_replace('%', '%%', $s);
+	return Text::protectSprintf($s);
 }
 
 /// @TODO Rewrite this
 function is_a_date_arg($s) {
-	$i = intval($s);
+	/* $i = intval($s);
 
 	if ($i > 1900) {
 		$y = date('Y');
@@ -1777,14 +1780,15 @@ function is_a_date_arg($s) {
 		}
 	}
 
-	return false;
+	return false; */
+	return Text::isDateArg($s);
 }
 
 /**
  * remove intentation from a text
  */
 function deindent($text, $chr = "[\t ]", $count = NULL) {
-	$lines = explode("\n", $text);
+	/* $lines = explode("\n", $text);
 
 	if (is_null($count)) {
 		$m = [];
@@ -1800,11 +1804,12 @@ function deindent($text, $chr = "[\t ]", $count = NULL) {
 		$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
 	}
 
-	return implode("\n", $lines);
+	return implode("\n", $lines); */
+	return Text::deindent($text, $chr, $count);
 }
 
 function formatBytes($bytes, $precision = 2) {
-	$units = ['B', 'KB', 'MB', 'GB', 'TB'];
+	/* $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
 	$bytes = max($bytes, 0);
 	$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
@@ -1812,7 +1817,8 @@ function formatBytes($bytes, $precision = 2) {
 
 	$bytes /= pow(1024, $pow);
 
-	return round($bytes, $precision) . ' ' . $units[$pow];
+	return round($bytes, $precision) . ' ' . $units[$pow]; */
+	return Text::formatBytes($bytes, $precision);
 }
 
 /**
@@ -1825,7 +1831,7 @@ function formatBytes($bytes, $precision = 2) {
  * @return string
  */
 function format_network_name($network, $url = 0) {
-	if ($network != "") {
+	/* if ($network != "") {
 		if ($url != "") {
 			$network_name = '<a href="'.$url.'">'.ContactSelector::networkToName($network, $url)."</a>";
 		} else {
@@ -1833,5 +1839,7 @@ function format_network_name($network, $url = 0) {
 		}
 
 		return $network_name;
-	}
+	} */
+
+	Text::formatNetworkName($network, $url);
 }

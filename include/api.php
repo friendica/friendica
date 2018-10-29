@@ -4499,7 +4499,7 @@ function save_media_to_database($mediatype, $media, $type, $album, $allow_cid, $
 	// check against max upload size within Friendica instance
 	$maximagesize = Config::get('system', 'maximagesize');
 	if ($maximagesize && ($filesize > $maximagesize)) {
-		$formattedBytes = formatBytes($maximagesize);
+		$formattedBytes = Text::formatBytes($maximagesize);
 		throw new InternalServerErrorException("image size exceeds Friendica config setting (uploaded size: $formattedBytes)");
 	}
 

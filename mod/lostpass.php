@@ -44,7 +44,7 @@ function lostpass_post(App $a)
 	$sitename = Config::get('config', 'sitename');
 	$resetlink = System::baseUrl() . '/lostpass/' . $pwdreset_token;
 
-	$preamble = deindent(L10n::t('
+	$preamble = Text::deindent(L10n::t('
 		Dear %1$s,
 			A request was recently received at "%2$s" to reset your account
 		password. In order to confirm this request, please select the verification link
@@ -55,7 +55,7 @@ function lostpass_post(App $a)
 
 		Your password will not be changed unless we can verify that you
 		issued this request.', $user['username'], $sitename));
-	$body = deindent(L10n::t('
+	$body = Text::deindent(L10n::t('
 		Follow this link soon to verify your identity:
 
 		%1$s
@@ -150,13 +150,13 @@ function lostpass_generate_password($user)
 		info("Your password has been reset." . EOL);
 
 		$sitename = Config::get('config', 'sitename');
-		$preamble = deindent(L10n::t('
+		$preamble = Text::deindent(L10n::t('
 			Dear %1$s,
 				Your password has been changed as requested. Please retain this
 			information for your records ' . "\x28" . 'or change your password immediately to
 			something that you will remember' . "\x29" . '.
 		', $user['username']));
-		$body = deindent(L10n::t('
+		$body = Text::deindent(L10n::t('
 			Your login details are as follows:
 
 			Site Location:	%1$s

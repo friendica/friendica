@@ -77,7 +77,7 @@ class Contact extends BaseModule
 			$a->data['contact'] = $contact;
 
 			if (($contact['network'] != '') && ($contact['network'] != Protocol::DFRN)) {
-				$networkname = format_network_name($contact['network'], $contact['url']);
+				$networkname = Text::formatNetworkName($contact['network'], $contact['url']);
 			} else {
 				$networkname = '';
 			}
@@ -765,7 +765,7 @@ class Contact extends BaseModule
 		if ($search) {
 			$searching = true;
 			$search_hdr = $search;
-			$search_txt = DBA::escape(protect_sprintf(preg_quote($search)));
+			$search_txt = DBA::escape(Text::protectSprintf(preg_quote($search)));
 			$sql_extra .= " AND (name REGEXP '$search_txt' OR url REGEXP '$search_txt'  OR nick REGEXP '$search_txt') ";
 		}
 

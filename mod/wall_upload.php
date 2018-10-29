@@ -193,7 +193,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 	$maximagesize = Config::get('system', 'maximagesize');
 
 	if (($maximagesize) && ($filesize > $maximagesize)) {
-		$msg = L10n::t('Image exceeds size limit of %s', formatBytes($maximagesize));
+		$msg = L10n::t('Image exceeds size limit of %s', Text::formatBytes($maximagesize));
 		if ($r_json) {
 			echo json_encode(['error' => $msg]);
 		} else {

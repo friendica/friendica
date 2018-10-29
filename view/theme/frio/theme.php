@@ -309,7 +309,7 @@ function frio_acl_lookup(App $a, &$results)
 
 	$sql_extra = '';
 	if ($results['search']) {
-		$search_txt = DBA::escape(protect_sprintf(preg_quote($results['search'])));
+		$search_txt = DBA::escape(Text::protectSprintf(preg_quote($results['search'])));
 		$sql_extra .= " AND (`attag` LIKE '%%" . $search_txt . "%%' OR `name` LIKE '%%" . $search_txt . "%%' OR `nick` LIKE '%%" . $search_txt . "%%') ";
 	}
 

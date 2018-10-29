@@ -776,7 +776,7 @@ function photos_post(App $a)
 				notice(L10n::t('Image exceeds size limit of %s', ini_get('upload_max_filesize')) . EOL);
 				break;
 			case UPLOAD_ERR_FORM_SIZE:
-				notice(L10n::t('Image exceeds size limit of %s', formatBytes(defaults($_REQUEST, 'MAX_FILE_SIZE', 0))) . EOL);
+				notice(L10n::t('Image exceeds size limit of %s', Text::formatBytes(defaults($_REQUEST, 'MAX_FILE_SIZE', 0))) . EOL);
 				break;
 			case UPLOAD_ERR_PARTIAL:
 				notice(L10n::t('Image upload didn\'t complete, please try again') . EOL);
@@ -805,7 +805,7 @@ function photos_post(App $a)
 	$maximagesize = Config::get('system', 'maximagesize');
 
 	if ($maximagesize && ($filesize > $maximagesize)) {
-		notice(L10n::t('Image exceeds size limit of %s', formatBytes($maximagesize)) . EOL);
+		notice(L10n::t('Image exceeds size limit of %s', Text::formatBytes($maximagesize)) . EOL);
 		@unlink($src);
 		$foo = 0;
 		Addon::callHooks('photo_post_end', $foo);

@@ -240,7 +240,7 @@ class DFRN
 		if (isset($category)) {
 			$sql_post_table = sprintf(
 				"INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				DBA::escape(protect_sprintf($category)),
+				DBA::escape(Text::protectSprintf($category)),
 				intval(TERM_OBJ_POST),
 				intval(TERM_CATEGORY),
 				intval($owner_id)

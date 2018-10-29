@@ -81,7 +81,7 @@ class DBStructure
 			$lang = (($admin['language'])?$admin['language']:'en');
 			L10n::pushLang($lang);
 
-			$preamble = deindent(L10n::t("
+			$preamble = Text::deindent(L10n::t("
 				The friendica developers released update %s recently,
 				but when I tried to install it, something went terribly wrong.
 				This needs to be fixed soon and I can't do it alone. Please contact a

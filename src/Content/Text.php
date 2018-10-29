@@ -1612,4 +1612,103 @@ class Text
         return true;
     }
 
+    function normaliseOpenid($s) {
+        return trim(str_replace(['http://', 'https://'], ['', ''], $s), '/');
+    }
+    
+    
+    function undoPostTagging($s) {
+        $matches = null;
+        $cnt = preg_match_all('/([!#@])\[url=(.*?)\](.*?)\[\/url\]/ism', $s, $matches, PREG_SET_ORDER);
+        if ($cnt) {
+            foreach ($matches as $mtch) {
+                if (in_array($mtch[1], ['!', '@'])) {
+                    $contact = Contact::getDetailsByURL($mtch[2]);
+                    $mtch[3] = empty($contact['addr']) ? $mtch[2] : $contact['addr'];
+                }
+                $s = str_replace($mtch[0], $mtch[1] . $mtch[3],$s);
+            }
+        }
+        return $s;
+    }
+    
+    function protectSprintf($s) {
+        return str_replace('%', '%%', $s);
+    }
+    
+    /// @TODO Rewrite this
+    function isDateArg($s) {
+        $i = intval($s);
+    
+        if ($i > 1900) {
+            $y = date('Y');
+    
+            if ($i <= $y + 1 && strpos($s, '-') == 4) {
+                $m = intval(substr($s, 5));
+    
+                if ($m > 0 && $m <= 12) {
+                    return true;
+                }
+            }
+        }
+    
+        return false;
+    }
+    
+    /**
+     * remove intentation from a text
+     */
+    function deindent($text, $chr = "[\t ]", $count = NULL) {
+        $lines = explode("\n", $text);
+    
+        if (is_null($count)) {
+            $m = [];
+            $k = 0;
+            while ($k < count($lines) && strlen($lines[$k]) == 0) {
+                $k++;
+            }
+            preg_match("|^" . $chr . "*|", $lines[$k], $m);
+            $count = strlen($m[0]);
+        }
+    
+        for ($k = 0; $k < count($lines); $k++) {
+            $lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
+        }
+    
+        return implode("\n", $lines);
+    }
+    
+    function formatBytes($bytes, $precision = 2) {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+    
+        $bytes /= pow(1024, $pow);
+    
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+    
+    /**
+     * @brief translate and format the networkname of a contact
+     *
+     * @param string $network
+     *	Networkname of the contact (e.g. dfrn, rss and so on)
+     * @param sting $url
+     *	The contact url
+     * @return string
+     */
+    function formatNetworkName($network, $url = 0) {
+        if ($network != "") {
+            if ($url != "") {
+                $network_name = '<a href="'.$url.'">'.ContactSelector::networkToName($network, $url)."</a>";
+            } else {
+                $network_name = ContactSelector::networkToName($network);
+            }
+    
+            return $network_name;
+        }
+    }
+
 }

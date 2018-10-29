@@ -68,7 +68,7 @@ function network_init(App $a)
 
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if (is_a_date_arg($a->argv[$x])) {
+			if (Text::isDateArg($a->argv[$x])) {
 				$is_a_date_query = true;
 				break;
 			}
@@ -514,7 +514,7 @@ function networkThreadedView(App $a, $update, $parent)
 
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if (is_a_date_arg($a->argv[$x])) {
+			if (Text::isDateArg($a->argv[$x])) {
 				if ($datequery) {
 					$datequery2 = Text::escapeTags($a->argv[$x]);
 				} else {
@@ -647,7 +647,7 @@ function networkThreadedView(App $a, $update, $parent)
 
 			$sql_post_table .= " INNER JOIN `item` AS `temp1` ON `temp1`.`id` = " . $sql_table . "." . $sql_parent;
 			$sql_extra3 .= " AND (`thread`.`contact-id` IN ($contact_str) ";
-			$sql_extra3 .= " OR (`thread`.`contact-id` = '$contact_str_self' AND `temp1`.`allow_gid` LIKE '" . protect_sprintf('%<' . intval($gid) . '>%') . "' AND `temp1`.`private`))";
+			$sql_extra3 .= " OR (`thread`.`contact-id` = '$contact_str_self' AND `temp1`.`allow_gid` LIKE '" . Text::protectSprintf('%<' . intval($gid) . '>%') . "' AND `temp1`.`private`))";
 		} else {
 			$sql_extra3 .= " AND false ";
 			info(L10n::t('Group is empty'));
@@ -695,11 +695,11 @@ function networkThreadedView(App $a, $update, $parent)
 	}
 
 	if ($datequery) {
-		$sql_extra3 .= protect_sprintf(sprintf(" AND $sql_table.created <= '%s' ",
+		$sql_extra3 .= Text::protectSprintf(sprintf(" AND $sql_table.created <= '%s' ",
 				DBA::escape(DateTimeFormat::convert($datequery, 'UTC', date_default_timezone_get()))));
 	}
 	if ($datequery2) {
-		$sql_extra3 .= protect_sprintf(sprintf(" AND $sql_table.created >= '%s' ",
+		$sql_extra3 .= Text::protectSprintf(sprintf(" AND $sql_table.created >= '%s' ",
 				DBA::escape(DateTimeFormat::convert($datequery2, 'UTC', date_default_timezone_get()))));
 	}
 

@@ -151,7 +151,7 @@ function profile_photo_post(App $a)
 	$maximagesize = Config::get('system', 'maximagesize');
 
 	if (($maximagesize) && ($filesize > $maximagesize)) {
-		notice(L10n::t('Image exceeds size limit of %s', formatBytes($maximagesize)) . EOL);
+		notice(L10n::t('Image exceeds size limit of %s', Text::formatBytes($maximagesize)) . EOL);
 		@unlink($src);
 		return;
 	}

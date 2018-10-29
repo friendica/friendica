@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
@@ -115,7 +116,7 @@ function wall_attach_post(App $a) {
 	}
 
 	if ($maxfilesize && $filesize > $maxfilesize) {
-		$msg = L10n::t('File exceeds size limit of %s', formatBytes($maxfilesize));
+		$msg = L10n::t('File exceeds size limit of %s', Text::formatBytes($maxfilesize));
 		if ($r_json) {
 			echo json_encode(['error' => $msg]);
 		} else {

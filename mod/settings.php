@@ -543,7 +543,7 @@ function settings_post(App $a)
 	$str_contact_deny  = !empty($_POST['contact_deny'])  ? Text::perms2Str($_POST['contact_deny'])  : '';
 
 	$openidserver = $a->user['openidserver'];
-	//$openid = normalise_openid($openid);
+	//$openid = Text::normaliseOpenid($openid);
 
 	// If openid has changed or if there's an openid but no openidserver, try and discover it.
 	if ($openid != $a->user['openid'] || (strlen($openid) && (!strlen($openidserver)))) {
