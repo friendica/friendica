@@ -101,7 +101,7 @@ function allfriends_content(App $a)
 
 	$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
-	$o .= Text::replaceMacros($tpl, [
+	$o .= App::replaceMacros($tpl, [
 		//'$title' => L10n::t('Friends of %s', htmlentities($c[0]['name'])),
 		'$tab_str' => $tab_str,
 		'$contacts' => $entries,

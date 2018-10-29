@@ -374,7 +374,7 @@ function poco_init(App $a) {
 
 	if ($format === 'xml') {
 		header('Content-type: text/xml');
-		echo Text::replaceMacros(Text::getMarkupTemplate('poco_xml.tpl'), Text::arrayXmlify(['$response' => $ret]));
+		echo App::replaceMacros(Text::getMarkupTemplate('poco_xml.tpl'), Text::arrayXmlify(['$response' => $ret]));
 		killme();
 	}
 	if ($format === 'json') {

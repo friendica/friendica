@@ -49,7 +49,7 @@ function uimport_content(App $a)
 	}
 
 	$tpl = Text::getMarkupTemplate("uimport.tpl");
-	return Text::replaceMacros($tpl, [
+	return App::replaceMacros($tpl, [
 		'$regbutt' => L10n::t('Import'),
 		'$import' => [
 			'title' => L10n::t("Move account"),

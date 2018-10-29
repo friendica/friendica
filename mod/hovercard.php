@@ -112,7 +112,7 @@ function hovercard_content()
 	];
 	if ($datatype == 'html') {
 		$tpl = Text::getMarkupTemplate('hovercard.tpl');
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$profile' => $profile,
 		]);
 

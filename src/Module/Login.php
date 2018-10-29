@@ -300,7 +300,7 @@ class Login extends BaseModule
 		if (local_user()) {
 			$tpl = Text::getMarkupTemplate('logout.tpl');
 		} else {
-			$a->page['htmlhead'] .= Text::replaceMacros(
+			$a->page['htmlhead'] .= App::replaceMacros(
 				Text::getMarkupTemplate('login_head.tpl'),
 				[
 					'$baseurl' => $a->getBaseURL(true)
@@ -311,7 +311,7 @@ class Login extends BaseModule
 			$_SESSION['return_path'] = $return_path;
 		}
 
-		$o .= Text::replaceMacros(
+		$o .= App::replaceMacros(
 			$tpl,
 			[
 				'$dest_url'     => self::getApp()->getBaseURL(true) . '/login',

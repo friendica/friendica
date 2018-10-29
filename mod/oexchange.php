@@ -14,7 +14,7 @@ function oexchange_init(App $a) {
 	if (($a->argc > 1) && ($a->argv[1] === 'xrd')) {
 		$tpl = Text::getMarkupTemplate('oexchange_xrd.tpl');
 
-		$o = Text::replaceMacros($tpl, ['$base' => System::baseUrl()]);
+		$o = App::replaceMacros($tpl, ['$base' => System::baseUrl()]);
 		echo $o;
 		killme();
 	}

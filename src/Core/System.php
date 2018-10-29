@@ -140,7 +140,7 @@ class System extends BaseObject
 
 		if (isset($description["title"])) {
 			$tpl = Text::getMarkupTemplate('http_status.tpl');
-			echo Text::replaceMacros($tpl, ['$title' => $description["title"],
+			echo App::replaceMacros($tpl, ['$title' => $description["title"],
 				'$description' => defaults($description, 'description', '')]);
 		}
 

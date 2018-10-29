@@ -180,7 +180,7 @@ class OEmbed
 					$th = 120;
 					$tw = $th * $tr;
 					$tpl = Text::getMarkupTemplate('oembed_video.tpl');
-					$ret .= Text::replaceMacros($tpl, [
+					$ret .= App::replaceMacros($tpl, [
 						'$baseurl' => System::baseUrl(),
 						'$embedurl' => $oembed->embed_url,
 						'$escapedhtml' => base64_encode($oembed->html),

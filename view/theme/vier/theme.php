@@ -151,7 +151,7 @@ function vier_community_info()
 			$aside['$comunity_profiles_items'] = [];
 
 			foreach ($r as $rr) {
-				$entry = Text::replaceMacros($tpl, [
+				$entry = App::replaceMacros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => 'follow/?url='.urlencode($rr['url']),
 					'$photo' => ProxyUtils::proxifyUrl($rr['photo'], false, ProxyUtils::SIZE_MICRO),
@@ -182,7 +182,7 @@ function vier_community_info()
 
 			foreach ($r as $rr) {
 				$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
-				$entry = Text::replaceMacros($tpl, [
+				$entry = App::replaceMacros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => $profile_link,
 					'$photo' => $a->removeBaseURL($rr['thumb']),
@@ -246,7 +246,7 @@ function vier_community_info()
 
 			$tpl = Text::getMarkupTemplate('widget_forumlist_right.tpl');
 
-			$page = Text::replaceMacros(
+			$page = App::replaceMacros(
 				$tpl,
 				[
 					'$title'          => L10n::t('Forums'),
@@ -298,7 +298,7 @@ function vier_community_info()
 			$aside['$helpers_items'] = [];
 
 			foreach ($r as $rr) {
-				$entry = Text::replaceMacros($tpl, [
+				$entry = App::replaceMacros($tpl, [
 					'$url' => $rr['url'],
 					'$title' => $rr['name'],
 				]);
@@ -388,7 +388,7 @@ function vier_community_info()
 			$aside['$con_services'] = $con_services;
 
 			foreach ($r as $rr) {
-				$entry = Text::replaceMacros($tpl, [
+				$entry = App::replaceMacros($tpl, [
 					'$url' => $url,
 					'$photo' => $rr['photo'],
 					'$alt_text' => $rr['name'],
@@ -401,5 +401,5 @@ function vier_community_info()
 
 	//print right_aside
 	$tpl = Text::getMarkupTemplate('communityhome.tpl');
-	$a->page['right_aside'] = Text::replaceMacros($tpl, $aside);
+	$a->page['right_aside'] = App::replaceMacros($tpl, $aside);
 }

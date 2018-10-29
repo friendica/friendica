@@ -141,7 +141,7 @@ function invite_content(App $a) {
 		}
 	}
 
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$form_security_token' => BaseModule::getFormSecurityToken("send_invite"),
 		'$title'               => L10n::t('Send invitations'),
 		'$recipients'          => ['recipients', L10n::t('Enter email addresses, one per line:')],

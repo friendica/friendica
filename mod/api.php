@@ -83,7 +83,7 @@ function api_content(App $a)
 			}
 
 			$tpl = Text::getMarkupTemplate("oauth_authorize_done.tpl");
-			$o = Text::replaceMacros($tpl, [
+			$o = App::replaceMacros($tpl, [
 				'$title' => L10n::t('Authorize application connection'),
 				'$info' => L10n::t('Return to your app and insert this Securty Code:'),
 				'$code' => $verifier,
@@ -105,7 +105,7 @@ function api_content(App $a)
 		}
 
 		$tpl = Text::getMarkupTemplate('oauth_authorize.tpl');
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$title' => L10n::t('Authorize application connection'),
 			'$app' => $app,
 			'$authorize' => L10n::t('Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'),

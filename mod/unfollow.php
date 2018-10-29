@@ -115,7 +115,7 @@ function unfollow_content(App $a)
 
 	$header = L10n::t('Disconnect/Unfollow');
 
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$header'        => htmlentities($header),
 		'$desc'          => '',
 		'$pls_answer'    => '',
@@ -145,7 +145,7 @@ function unfollow_content(App $a)
 	$a->page['aside'] = '';
 	Profile::load($a, '', 0, Contact::getDetailsByURL($contact['url']));
 
-	$o .= Text::replaceMacros(Text::getMarkupTemplate('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);
+	$o .= App::replaceMacros(Text::getMarkupTemplate('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);
 
 	// Show last public posts
 	$o .= Contact::getPostsFromUrl($contact['url']);

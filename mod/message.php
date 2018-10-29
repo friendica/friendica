@@ -38,14 +38,14 @@ function message_init(App $a)
 	];
 
 	$tpl = Text::getMarkupTemplate('message_side.tpl');
-	$a->page['aside'] = Text::replaceMacros($tpl, [
+	$a->page['aside'] = App::replaceMacros($tpl, [
 		'$tabs' => $tabs,
 		'$new' => $new,
 	]);
 	$base = System::baseUrl();
 
 	$head_tpl = Text::getMarkupTemplate('message-head.tpl');
-	$a->page['htmlhead'] .= Text::replaceMacros($head_tpl, [
+	$a->page['htmlhead'] .= App::replaceMacros($head_tpl, [
 		'$baseurl' => System::baseUrl(true),
 		'$base' => $base
 	]);
@@ -120,7 +120,7 @@ function message_content(App $a)
 			'accesskey' => 'm',
 		];
 	}
-	$header = Text::replaceMacros($tpl, [
+	$header = App::replaceMacros($tpl, [
 		'$messages' => L10n::t('Messages'),
 		'$button' => $button,
 	]);
@@ -144,7 +144,7 @@ function message_content(App $a)
 			}
 
 			//$a->page['aside'] = '';
-			return Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
+			return App::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this message?'),
 				'$extra_inputs' => $inputs,
@@ -200,7 +200,7 @@ function message_content(App $a)
 		$o .= $header;
 
 		$tpl = Text::getMarkupTemplate('msg-header.tpl');
-		$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
+		$a->page['htmlhead'] .= App::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => L10n::t('Please enter a link URL:')
@@ -245,7 +245,7 @@ function message_content(App $a)
 		$select = ACL::getMessageContactSelectHTML('messageto', 'message-to-select', $preselect, 4, 10);
 
 		$tpl = Text::getMarkupTemplate('prv_message.tpl');
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$header' => L10n::t('Send Private Message'),
 			'$to' => L10n::t('To:'),
 			'$showinputs' => 'true',
@@ -340,7 +340,7 @@ function message_content(App $a)
 		);
 
 		$tpl = Text::getMarkupTemplate('msg-header.tpl');
-		$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
+		$a->page['htmlhead'] .= App::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => L10n::t('Please enter a link URL:')
@@ -400,7 +400,7 @@ function message_content(App $a)
 		$parent = '<input type="hidden" name="replyto" value="' . $message['parent-uri'] . '" />';
 
 		$tpl = Text::getMarkupTemplate('mail_display.tpl');
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$thread_id' => $a->argv[1],
 			'$thread_subject' => $message['title'],
 			'$thread_seen' => $seen,
@@ -479,7 +479,7 @@ function render_messages(array $msg, $t)
 			$from_photo = (($rr['thumb']) ? $rr['thumb'] : $rr['from-photo']);
 		}
 
-		$rslt .= Text::replaceMacros($tpl, [
+		$rslt .= App::replaceMacros($tpl, [
 			'$id' => $rr['id'],
 			'$from_name' => $participants,
 			'$from_url' => Contact::magicLink($rr['url']),

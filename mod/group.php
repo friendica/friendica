@@ -106,7 +106,7 @@ function group_content(App $a) {
 	];
 
 	if (($a->argc == 2) && ($a->argv[1] === 'new')) {
-		return Text::replaceMacros($tpl, $context + [
+		return App::replaceMacros($tpl, $context + [
 			'$title' => L10n::t('Create a group of contacts/friends.'),
 			'$gname' => ['groupname', L10n::t('Group Name: '), '', ''],
 			'$gid' => 'new',
@@ -216,7 +216,7 @@ function group_content(App $a) {
 		}
 
 		$drop_tpl = Text::getMarkupTemplate('group_drop.tpl');
-		$drop_txt = Text::replaceMacros($drop_tpl, [
+		$drop_txt = App::replaceMacros($drop_tpl, [
 			'$id' => $group['id'],
 			'$delete' => L10n::t('Delete Group'),
 			'$form_security_token' => BaseModule::getFormSecurityToken("group_drop"),
@@ -308,10 +308,10 @@ function group_content(App $a) {
 
 	if ($change) {
 		$tpl = Text::getMarkupTemplate('groupeditor.tpl');
-		echo Text::replaceMacros($tpl, $context);
+		echo App::replaceMacros($tpl, $context);
 		killme();
 	}
 
-	return Text::replaceMacros($tpl, $context);
+	return App::replaceMacros($tpl, $context);
 
 }

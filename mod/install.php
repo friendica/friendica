@@ -137,7 +137,7 @@ function install_content(App $a) {
 
 	if ($db_return_text != "") {
 		$tpl = Text::getMarkupTemplate('install.tpl');
-		return Text::replaceMacros($tpl, [
+		return App::replaceMacros($tpl, [
 			'$title' => $install_title,
 			'$pass' => "",
 			'$text' => $db_return_text . what_next(),
@@ -154,7 +154,7 @@ function install_content(App $a) {
 			$status = $install->checkAll($a->getBasePath(), $a->getBaseURL());
 
 			$tpl = Text::getMarkupTemplate('install_checks.tpl');
-			$o .= Text::replaceMacros($tpl, [
+			$o .= App::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('System check'),
 				'$checks' => $install->getChecks(),
@@ -178,7 +178,7 @@ function install_content(App $a) {
 			$adminmail = Text::noTags(trim(defaults($_POST, 'adminmail', ''         )));
 
 			$tpl = Text::getMarkupTemplate('install_db.tpl');
-			$o .= Text::replaceMacros($tpl, [
+			$o .= App::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('Database connection'),
 				'$info_01' => L10n::t('In order to install Friendica we need to know how to connect to your database.'),
@@ -216,7 +216,7 @@ function install_content(App $a) {
 			$lang_choices = L10n::getAvailableLanguages();
 
 			$tpl = Text::getMarkupTemplate('install_settings.tpl');
-			$o .= Text::replaceMacros($tpl, [
+			$o .= App::replaceMacros($tpl, [
 				'$title' => $install_title,
 				'$pass' => L10n::t('Site settings'),
 

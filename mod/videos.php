@@ -53,7 +53,7 @@ function videos_init(App $a)
 
 		$tpl = Text::getMarkupTemplate("vcard-widget.tpl");
 
-		$vcard_widget = Text::replaceMacros($tpl, [
+		$vcard_widget = App::replaceMacros($tpl, [
 			'$name' => $profile['name'],
 			'$photo' => $profile['photo'],
 			'$addr' => defaults($profile, 'addr', ''),
@@ -104,7 +104,7 @@ function videos_init(App $a)
 		$a->page['aside'] .= $vcard_widget;
 
 		$tpl = Text::getMarkupTemplate("videos_head.tpl");
-		$a->page['htmlhead'] .= Text::replaceMacros($tpl,[
+		$a->page['htmlhead'] .= App::replaceMacros($tpl,[
 			'$baseurl' => System::baseUrl(),
 		]);
 	}
@@ -129,7 +129,7 @@ function videos_post(App $a)
 
 			$drop_url = $a->query_string;
 
-			$a->page['content'] = Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
+			$a->page['content'] = App::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'post',
 				'$message' => L10n::t('Do you really want to delete this video?'),
 				'$extra_inputs' => [
@@ -383,7 +383,7 @@ function videos_content(App $a)
 	}
 
 	$tpl = Text::getMarkupTemplate('videos_recent.tpl');
-	$o .= Text::replaceMacros($tpl, [
+	$o .= App::replaceMacros($tpl, [
 		'$title'      => L10n::t('Recent Videos'),
 		'$can_post'   => $can_post,
 		'$upload'     => [L10n::t('Upload New Videos'), System::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/upload'],

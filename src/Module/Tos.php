@@ -67,7 +67,7 @@ class Tos extends BaseModule
 	public static function content() {
 		$tpl = Text::getMarkupTemplate('tos.tpl');
 		if (Config::get('system', 'tosdisplay')) {
-			return Text::replaceMacros($tpl, [
+			return App::replaceMacros($tpl, [
 				'$title' => L10n::t('Terms of Service'),
 				'$tostext' => BBCode::convert(Config::get('system', 'tostext')),
 				'$displayprivstatement' => Config::get('system', 'tosprivstatement'),

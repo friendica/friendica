@@ -229,7 +229,7 @@ function register_content(App $a)
 		$profile_publish = '<input type="hidden" name="profile_publish_reg" value="1" />';
 	} else {
 		$publish_tpl = Text::getMarkupTemplate("profile_publish.tpl");
-		$profile_publish = Text::replaceMacros($publish_tpl, [
+		$profile_publish = App::replaceMacros($publish_tpl, [
 			'$instance' => 'reg',
 			'$pubdesc' => L10n::t('Include your profile in member directory?'),
 			'$yes_selected' => '',
@@ -254,7 +254,7 @@ function register_content(App $a)
 
 	$tos = new Tos();
 
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$oidhtml' => $oidhtml,
 		'$invitations' => Config::get('system', 'invitation_only'),
 		'$permonly'    => intval(Config::get('config', 'register_policy')) === REGISTER_APPROVE,

@@ -899,7 +899,7 @@ class Event extends BaseObject
 		$profile_link = Contact::magicLinkById($item['author-id']);
 
 		$tpl = Text::getMarkupTemplate('event_stream_item.tpl');
-		$return = Text::replaceMacros($tpl, [
+		$return = App::replaceMacros($tpl, [
 			'$id'             => $item['event-id'],
 			'$title'          => Text::prepareText($item['event-summary']),
 			'$dtstart_label'  => L10n::t('Starts:'),

@@ -125,7 +125,7 @@ class ForumManager
 
 			$tpl = Text::getMarkupTemplate('widget_forumlist.tpl');
 
-			$o .= Text::replaceMacros(
+			$o .= App::replaceMacros(
 				$tpl,
 				[
 					'$title'	=> L10n::t('Forums'),

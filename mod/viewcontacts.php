@@ -126,7 +126,7 @@ function viewcontacts_content(App $a)
 
 
 	$tpl = Text::getMarkupTemplate("viewcontact_template.tpl");
-	$o .= Text::replaceMacros($tpl, [
+	$o .= App::replaceMacros($tpl, [
 		'$title' => L10n::t('Contacts'),
 		'$contacts' => $contacts,
 		'$paginate' => $pager->renderFull($total),

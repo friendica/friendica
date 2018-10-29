@@ -49,7 +49,7 @@ function common_content(App $a)
 		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['self' => true, 'uid' => $uid]);
 
 		if (DBA::isResult($contact)) {
-			$vcard_widget = Text::replaceMacros(Text::getMarkupTemplate("vcard-widget.tpl"), [
+			$vcard_widget = App::replaceMacros(Text::getMarkupTemplate("vcard-widget.tpl"), [
 				'$name'  => htmlentities($contact['name']),
 				'$photo' => $contact['photo'],
 				'url'    => 'contact/' . $cid
@@ -145,7 +145,7 @@ function common_content(App $a)
 
 	$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
-	$o .= Text::replaceMacros($tpl, [
+	$o .= App::replaceMacros($tpl, [
 		'$title'    => $title,
 		'$tab_str'  => $tab_str,
 		'$contacts' => $entries,

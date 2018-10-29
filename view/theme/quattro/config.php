@@ -70,7 +70,7 @@ function quattro_form(App $a, $align, $color, $tfs, $pfs) {
 	}
 
 	$t = Text::getMarkupTemplate("theme_settings.tpl" );
-	$o = Text::replaceMacros($t, [
+	$o = App::replaceMacros($t, [
 		'$submit'  => L10n::t('Submit'),
 		'$baseurl' => System::baseUrl(),
 		'$title'   => L10n::t("Theme settings"),

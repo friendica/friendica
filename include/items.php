@@ -389,7 +389,7 @@ function drop_item($id)
 				}
 			}
 
-			return Text::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
+			return App::replaceMacros(Text::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this item?'),
 				'$extra_inputs' => $inputs,
@@ -480,7 +480,7 @@ function posted_date_widget($url, $uid, $wall)
 	$cutoff_year = intval(DateTimeFormat::localNow('Y')) - $visible_years;
 	$cutoff = ((array_key_exists($cutoff_year, $ret))? true : false);
 
-	$o = Text::replaceMacros(Text::getMarkupTemplate('posted_date_widget.tpl'),[
+	$o = App::replaceMacros(Text::getMarkupTemplate('posted_date_widget.tpl'),[
 		'$title' => L10n::t('Archives'),
 		'$size' => $visible_years,
 		'$cutoff_year' => $cutoff_year,

@@ -31,7 +31,7 @@ class Itemsource extends \Friendica\BaseModule
 		}
 
 		$tpl = Text::getMarkupTemplate('debug/itemsource.tpl');
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$guid'          => ['guid', L10n::t('Item Guid'), htmlentities(defaults($_REQUEST, 'guid', '')), ''],
 			'$source'        => $source,
 			'$item_uri'      => $item_uri

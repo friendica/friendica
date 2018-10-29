@@ -76,7 +76,7 @@ function removeme_content(App $a)
 	$_SESSION['remove_account_verify'] = $hash;
 
 	$tpl = Text::getMarkupTemplate('removeme.tpl');
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$basedir' => $a->getBaseURL(),
 		'$hash' => $hash,
 		'$title' => L10n::t('Remove My Account'),

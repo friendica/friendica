@@ -32,36 +32,6 @@ require_once "include/conversation.php";
 class Text
 {
     /**
-     * This is our template processor
-     *
-     * @param string|FriendicaSmarty $s the string requiring macro substitution,
-     *				or an instance of FriendicaSmarty
-    * @param array $r key value pairs (search => replace)
-    * @return string substituted string
-    */
-    public static function replaceMacros($s, $r)
-    {
-        $stamp1 = microtime(true);
-
-        $a = get_app();
-
-        // pass $baseurl to all templates
-        $r['$baseurl'] = System::baseUrl();
-
-        $t = $a->getTemplateEngine();
-        try {
-            $output = $t->replaceMacros($s, $r);
-        } catch (Exception $e) {
-            echo "<pre><b>" . __FUNCTION__ . "</b>: " . $e->getMessage() . "</pre>";
-            killme();
-        }
-
-        $a->saveTimestamp($stamp1, "rendering");
-
-        return $output;
-    }
-
-    /**
      * @brief Generates a pseudo-random string of hexadecimal characters
      *
      * @param int $size
@@ -222,7 +192,7 @@ class Text
     public static function scrollLoader()
     {
         $tpl = self::getMarkupTemplate("scroll_loader.tpl");
-        return self::replaceMacros($tpl, [
+        return App::replaceMacros($tpl, [
             'wait' => L10n::t('Loading more entries...'),
             'end' => L10n::t('The end')
         ]);
@@ -628,7 +598,7 @@ class Text
         }
 
         $tpl = self::getMarkupTemplate('contact_block.tpl');
-        $o = self::replaceMacros($tpl, [
+        $o = App::replaceMacros($tpl, [
             '$contacts' => $contacts,
             '$nickname' => $a->profile['nickname'],
             '$viewcontacts' => L10n::t('View Contacts'),
@@ -683,7 +653,7 @@ class Text
             $url = '';
         }
 
-        return self::replaceMacros(self::getMarkupTemplate(($textmode)?'micropro_txt.tpl':'micropro_img.tpl'),[
+        return App::replaceMacros(self::getMarkupTemplate(($textmode)?'micropro_txt.tpl':'micropro_img.tpl'),[
             '$click' => defaults($contact, 'click', ''),
             '$class' => $class,
             '$url' => $url,
@@ -738,7 +708,7 @@ class Text
             }
         }
 
-        return self::replaceMacros(self::getMarkupTemplate('searchbox.tpl'), $values);
+        return App::replaceMacros(self::getMarkupTemplate('searchbox.tpl'), $values);
     }
 
     /**
@@ -1016,14 +986,14 @@ class Text
             if (strpos($mime, 'video') !== false) {
                 if (!$vhead) {
                     $vhead = true;
-                    $a->page['htmlhead'] .= self::replaceMacros(self::getMarkupTemplate('videos_head.tpl'), [
+                    $a->page['htmlhead'] .= App::replaceMacros(self::getMarkupTemplate('videos_head.tpl'), [
                         '$baseurl' => System::baseUrl(),
                     ]);
                 }
 
                 $url_parts = explode('/', $the_url);
                 $id = end($url_parts);
-                $as .= self::replaceMacros(self::getMarkupTemplate('video_top.tpl'), [
+                $as .= App::replaceMacros(self::getMarkupTemplate('video_top.tpl'), [
                     '$video' => [
                         'id'     => $id,
                         'title'  => L10n::t('View Video'),
@@ -1119,7 +1089,7 @@ class Text
     {
         if (count($reasons)) {
             $tpl = self::getMarkupTemplate('wall/content_filter.tpl');
-            $html = self::replaceMacros($tpl, [
+            $html = App::replaceMacros($tpl, [
                 '$reasons'   => $reasons,
                 '$rnd'       => self::randomString(8),
                 '$openclose' => L10n::t('Click to open/close'),

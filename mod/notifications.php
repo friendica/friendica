@@ -159,7 +159,7 @@ function notifications_content(App $a)
 			// We have to distinguish between these two because they use different data.
 			switch ($notif['label']) {
 				case 'friend_suggestion':
-					$notif_content[] = Text::replaceMacros($sugg, [
+					$notif_content[] = App::replaceMacros($sugg, [
 						'$type'       => $notif['label'],
 						'$str_notifytype' => L10n::t('Notification type:'),
 						'$notify_type'=> $notif['notify_type'],
@@ -210,7 +210,7 @@ function notifications_content(App $a)
 					}
 
 					$dfrn_tpl = Text::getMarkupTemplate('netfriend.tpl');
-					$dfrn_text = Text::replaceMacros($dfrn_tpl, [
+					$dfrn_text = App::replaceMacros($dfrn_tpl, [
 						'$intro_id'    => $notif['intro_id'],
 						'$friend_selected' => $friend_selected,
 						'$fan_selected'=> $fan_selected,
@@ -235,7 +235,7 @@ function notifications_content(App $a)
 						$discard = '';
 					}
 
-					$notif_content[] = Text::replaceMacros($tpl, [
+					$notif_content[] = App::replaceMacros($tpl, [
 						'$type'        => $notif['label'],
 						'$header'      => htmlentities($header),
 						'$str_notifytype' => L10n::t('Notification type:'),
@@ -296,7 +296,7 @@ function notifications_content(App $a)
 
 			$tpl_notif = Text::getMarkupTemplate($notification_templates[$notif['label']]);
 
-			$notif_content[] = Text::replaceMacros($tpl_notif, [
+			$notif_content[] = App::replaceMacros($tpl_notif, [
 				'$item_label' => $notif['label'],
 				'$item_link'  => $notif['link'],
 				'$item_image' => $notif['image'],
@@ -311,7 +311,7 @@ function notifications_content(App $a)
 		$notif_nocontent = L10n::t('No more %s notifications.', $notifs['ident']);
 	}
 
-	$o .= Text::replaceMacros($notif_tpl, [
+	$o .= App::replaceMacros($notif_tpl, [
 		'$notif_header'    => $notif_header,
 		'$tabs'            => $tabs,
 		'$notif_content'   => $notif_content,

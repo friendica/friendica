@@ -138,7 +138,7 @@ function frio_form($arr)
 		$ctx['$login_bg_color'] = ['frio_login_bg_color', L10n::t('Login page background color'), $arr['login_bg_color'], L10n::t('Leave background image and color empty for theme defaults'), false];
 	}
 
-	$o = Text::replaceMacros($t, $ctx);
+	$o = App::replaceMacros($t, $ctx);
 
 	return $o;
 }

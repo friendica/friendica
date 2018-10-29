@@ -51,7 +51,7 @@ class TagCloud
 			}
 
 			$tpl = Text::getMarkupTemplate('tagblock_widget.tpl');
-			$o = Text::replaceMacros($tpl, [
+			$o = App::replaceMacros($tpl, [
 				'$title' => L10n::t('Tags'),
 				'$tags' => $tags
 			]);

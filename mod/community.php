@@ -121,7 +121,7 @@ function community_content(App $a, $update = 0)
 		}
 
 		$tab_tpl = Text::getMarkupTemplate('common_tabs.tpl');
-		$o .= Text::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
+		$o .= App::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
 
 		Nav::setSelected('community');
 
@@ -200,7 +200,7 @@ function community_content(App $a, $update = 0)
 	}
 
 	$t = Text::getMarkupTemplate("community.tpl");
-	return Text::replaceMacros($t, [
+	return App::replaceMacros($t, [
 		'$content' => $o,
 		'$header' => '',
 		'$show_global_community_hint' => ($content == 'global') && Config::get('system', 'show_global_community_hint'),

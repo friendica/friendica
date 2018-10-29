@@ -204,7 +204,7 @@ function directory_content(App $a)
 
 		$tpl = Text::getMarkupTemplate('directory_header.tpl');
 
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$search'    => $search,
 			'$globaldir' => L10n::t('Global Directory'),
 			'$gdirpath'  => $gdirpath,

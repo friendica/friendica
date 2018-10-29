@@ -174,7 +174,7 @@ class Pager
 		];
 
 		$tpl = Text::getMarkupTemplate('paginate.tpl');
-		return Text::replaceMacros($tpl, ['pager' => $data]);
+		return App::replaceMacros($tpl, ['pager' => $data]);
 	}
 
 	/**
@@ -278,6 +278,6 @@ class Pager
 		}
 
 		$tpl = Text::getMarkupTemplate('paginate.tpl');
-		return Text::replaceMacros($tpl, ['pager' => $data]);
+		return App::replaceMacros($tpl, ['pager' => $data]);
 	}
 }

@@ -226,7 +226,7 @@ function events_content(App $a)
 	$i18n = Event::getStrings();
 
 	$htpl = Text::getMarkupTemplate('event_head.tpl');
-	$a->page['htmlhead'] .= Text::replaceMacros($htpl, [
+	$a->page['htmlhead'] .= App::replaceMacros($htpl, [
 		'$baseurl' => System::baseUrl(),
 		'$module_url' => '/events',
 		'$modparams' => 1,
@@ -382,7 +382,7 @@ function events_content(App $a)
 			$events[$key]['item'] = $event_item;
 		}
 
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$baseurl'   => System::baseUrl(),
 			'$tabs'      => $tabs,
 			'$title'     => L10n::t('Events'),
@@ -499,7 +499,7 @@ function events_content(App $a)
 
 		$tpl = Text::getMarkupTemplate('event_form.tpl');
 
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$post' => System::baseUrl() . '/events',
 			'$eid'  => $eid,
 			'$cid'  => $cid,

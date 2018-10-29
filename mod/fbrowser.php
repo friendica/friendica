@@ -96,7 +96,7 @@ function fbrowser_content(App $a)
 
 			$tpl = Text::getMarkupTemplate($template_file);
 
-			$o =  Text::replaceMacros($tpl, [
+			$o =  App::replaceMacros($tpl, [
 				'$type'     => 'image',
 				'$baseurl'  => System::baseUrl(),
 				'$path'     => $path,
@@ -127,7 +127,7 @@ function fbrowser_content(App $a)
 
 
 				$tpl = Text::getMarkupTemplate($template_file);
-				$o = Text::replaceMacros($tpl, [
+				$o = App::replaceMacros($tpl, [
 					'$type'     => 'file',
 					'$baseurl'  => System::baseUrl(),
 					'$path'     => [ [ "", L10n::t("Files")] ],

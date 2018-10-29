@@ -113,7 +113,7 @@ function match_content(App $a)
 
 			$tpl = Text::getMarkupTemplate('viewcontact_template.tpl');
 
-			$o .= Text::replaceMacros($tpl, [
+			$o .= App::replaceMacros($tpl, [
 				'$title'    => L10n::t('Profile Match'),
 				'$contacts' => $entries,
 				'$paginate' => $pager->renderFull($j->total)

@@ -241,7 +241,7 @@ function profile_photo_content(App $a)
 	if (empty($imagecrop)) {
 		$tpl = Text::getMarkupTemplate('profile_photo.tpl');
 
-		$o = Text::replaceMacros($tpl,
+		$o = App::replaceMacros($tpl,
 			[
 			'$user' => $a->user['nickname'],
 			'$lbl_upfile' => L10n::t('Upload File:'),
@@ -258,7 +258,7 @@ function profile_photo_content(App $a)
 	} else {
 		$filename = $imagecrop['hash'] . '-' . $imagecrop['resolution'] . '.' . $imagecrop['ext'];
 		$tpl = Text::getMarkupTemplate("cropbody.tpl");
-		$o = Text::replaceMacros($tpl,
+		$o = App::replaceMacros($tpl,
 			[
 			'$filename'  => $filename,
 			'$profile'   => (isset($_REQUEST['profile']) ? intval($_REQUEST['profile']) : 0),
@@ -319,7 +319,7 @@ function profile_photo_crop_ui_head(App $a, Image $image)
 		}
 	}
 
-	$a->page['htmlhead'] .= Text::replaceMacros(Text::getMarkupTemplate("crophead.tpl"), []);
+	$a->page['htmlhead'] .= App::replaceMacros(Text::getMarkupTemplate("crophead.tpl"), []);
 
 	$imagecrop = [
 		'hash'       => $hash,

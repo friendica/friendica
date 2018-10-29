@@ -55,7 +55,7 @@ function home_content(App $a) {
 
 
 	$tpl = Text::getMarkupTemplate('home.tpl');
-	return Text::replaceMacros($tpl, [
+	return App::replaceMacros($tpl, [
 		'$defaultheader' => $defaultheader,
 		'$customhome' => $customhome,
 		'$login' => $login,

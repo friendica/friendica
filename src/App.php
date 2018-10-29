@@ -775,7 +775,7 @@ class App
 		 * since the code added by the modules frequently depends on it
 		 * being first
 		 */
-		$this->page['htmlhead'] = Content\Text::replaceMacros($tpl, [
+		$this->page['htmlhead'] = $this->replaceMacros($tpl, [
 			'$baseurl'         => $this->getBaseURL(),
 			'$local_user'      => local_user(),
 			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
@@ -821,7 +821,7 @@ class App
 			} else {
 				$link = 'toggle_mobile?off=1&address=' . curPageURL();
 			}
-			$this->page['footer'] .= Content\Text::replaceMacros(Content\Text::getMarkupTemplate("toggle_mobile_footer.tpl"), [
+			$this->page['footer'] .= $this->replaceMacros(Content\Text::getMarkupTemplate("toggle_mobile_footer.tpl"), [
 				'$toggle_link' => $link,
 				'$toggle_text' => Core\L10n::t('toggle mobile')
 			]);
@@ -830,7 +830,7 @@ class App
 		Core\Addon::callHooks('footer', $this->page['footer']);
 
 		$tpl = Content\Text::getMarkupTemplate('footer.tpl');
-		$this->page['footer'] = Content\Text::replaceMacros($tpl, [
+		$this->page['footer'] = $this->replaceMacros($tpl, [
 			'$baseurl' => $this->getBaseURL(),
 			'$footerScripts' => $this->footerScripts,
 		]) . $this->page['footer'];
@@ -1791,7 +1791,7 @@ class App
 
 				header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . Core\L10n::t('Not Found'));
 				$tpl = Content\Text::getMarkupTemplate("404.tpl");
-				$this->page['content'] = Content\Text::replaceMacros($tpl, [
+				$this->page['content'] = $this->replaceMacros($tpl, [
 					'$message' =>  Core\L10n::t('Page not found.')
 				]);
 			}
@@ -1879,7 +1879,7 @@ class App
 
 		// Add the navigation (menu) template
 		if ($this->module != 'install' && $this->module != 'maintenance') {
-			$this->page['htmlhead'] .= Content\Text::replaceMacros(Content\Text::getMarkupTemplate('nav_head.tpl'), []);
+			$this->page['htmlhead'] .= $this->replaceMacros(Content\Text::getMarkupTemplate('nav_head.tpl'), []);
 			$this->page['nav']       = Content\Nav::build($this);
 		}
 
@@ -1991,4 +1991,34 @@ class App
 			$this->internalRedirect($toUrl);
 		}
 	}
+
+	/**
+     * This is our template processor
+     *
+     * @param string|FriendicaSmarty $s the string requiring macro substitution,
+     *				or an instance of FriendicaSmarty
+    * @param array $r key value pairs (search => replace)
+    * @return string substituted string
+    */
+    public static function replaceMacros($s, $r)
+    {
+        $stamp1 = microtime(true);
+
+        $a = get_app();
+
+        // pass $baseurl to all templates
+        $r['$baseurl'] = System::baseUrl();
+
+        $t = $a->getTemplateEngine();
+        try {
+            $output = $t->replaceMacros($s, $r);
+        } catch (Exception $e) {
+            echo "<pre><b>" . __FUNCTION__ . "</b>: " . $e->getMessage() . "</pre>";
+            killme();
+        }
+
+        $a->saveTimestamp($stamp1, "rendering");
+
+        return $output;
+    }
 }

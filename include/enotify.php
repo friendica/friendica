@@ -517,7 +517,7 @@ function notification($params)
 		}
 
 		$itemlink = System::baseUrl().'/notify/view/'.$notify_id;
-		$msg = Text::replaceMacros($epreamble, ['$itemlink' => $itemlink]);
+		$msg = App::replaceMacros($epreamble, ['$itemlink' => $itemlink]);
 		$msg_cache = format_notification_message($datarray['name_cache'], strip_tags(BBCode::convert($msg)));
 
 		$fields = ['msg' => $msg, 'msg_cache' => $msg_cache];
@@ -590,7 +590,7 @@ function notification($params)
 
 		// load the template for private message notifications
 		$tpl = Text::getMarkupTemplate('email_notify_html.tpl');
-		$email_html_body = Text::replaceMacros($tpl, [
+		$email_html_body = App::replaceMacros($tpl, [
 			'$banner'       => $datarray['banner'],
 			'$product'      => $datarray['product'],
 			'$preamble'     => str_replace("\n", "<br>\n", $datarray['preamble']),
@@ -611,7 +611,7 @@ function notification($params)
 
 		// load the template for private message notifications
 		$tpl = Text::getMarkupTemplate('email_notify_text.tpl');
-		$email_text_body = Text::replaceMacros($tpl, [
+		$email_text_body = App::replaceMacros($tpl, [
 			'$banner'       => $datarray['banner'],
 			'$product'      => $datarray['product'],
 			'$preamble'     => $datarray['preamble'],

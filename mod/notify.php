@@ -67,7 +67,7 @@ function notify_content(App $a)
 	$r = $nm->getAll(['seen'=>0]);
 	if (DBA::isResult($r) > 0) {
 		foreach ($r as $it) {
-			$notif_content .= Text::replaceMacros($not_tpl, [
+			$notif_content .= App::replaceMacros($not_tpl, [
 				'$item_link' => System::baseUrl(true).'/notify/view/'. $it['id'],
 				'$item_image' => $it['photo'],
 				'$item_text' => strip_tags(BBCode::convert($it['msg'])),
@@ -78,7 +78,7 @@ function notify_content(App $a)
 		$notif_content .= L10n::t('No more system notifications.');
 	}
 
-	$o = Text::replaceMacros($notif_tpl, [
+	$o = App::replaceMacros($notif_tpl, [
 		'$notif_header' => L10n::t('System Notifications'),
 		'$tabs' => false, // $tabs,
 		'$notif_content' => $notif_content,

@@ -171,7 +171,7 @@ class Profile
 		}
 
 		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
-			$a->page['aside'] .= Text::replaceMacros(
+			$a->page['aside'] .= App::replaceMacros(
 				Text::getMarkupTemplate('profile_edlink.tpl'),
 				[
 					'$editprofile' => L10n::t('Edit profile'),
@@ -517,7 +517,7 @@ class Profile
 		$p['url'] = Contact::magicLink(defaults($p, 'url', $profile_url));
 
 		$tpl = Text::getMarkupTemplate('profile_vcard.tpl');
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$profile' => $p,
 			'$xmpp' => $xmpp,
 			'$connect' => $connect,
@@ -622,7 +622,7 @@ class Profile
 			}
 		}
 		$tpl = Text::getMarkupTemplate('birthdays_reminder.tpl');
-		return Text::replaceMacros($tpl, [
+		return App::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
 			'$count' => $total,
@@ -711,7 +711,7 @@ class Profile
 			$classtoday = (($istoday) ? 'event-today' : '');
 		}
 		$tpl = Text::getMarkupTemplate('events_reminder.tpl');
-		return Text::replaceMacros($tpl, [
+		return App::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$classtoday' => $classtoday,
 			'$count' => count($r),
@@ -726,7 +726,7 @@ class Profile
 		$o = '';
 		$uid = $a->profile['uid'];
 
-		$o .= Text::replaceMacros(
+		$o .= App::replaceMacros(
 			Text::getMarkupTemplate('section_title.tpl'),
 			['$title' => L10n::t('Profile')]
 		);
@@ -860,7 +860,7 @@ class Profile
 				$profile['edit'] = [System::baseUrl() . '/profiles/' . $a->profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
 			}
 
-			return Text::replaceMacros($tpl, [
+			return App::replaceMacros($tpl, [
 				'$title' => L10n::t('Profile'),
 				'$basic' => L10n::t('Basic'),
 				'$advanced' => L10n::t('Advanced'),
@@ -979,7 +979,7 @@ class Profile
 
 		$tpl = Text::getMarkupTemplate('common_tabs.tpl');
 
-		return Text::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
+		return App::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
 	}
 
 	/**

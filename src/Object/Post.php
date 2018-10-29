@@ -785,7 +785,7 @@ class Post extends BaseObject
 			}
 
 			$template = Text::getMarkupTemplate($this->getCommentBoxTemplate());
-			$comment_box = Text::replaceMacros($template, [
+			$comment_box = App::replaceMacros($template, [
 				'$return_path' => $a->query_string,
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',

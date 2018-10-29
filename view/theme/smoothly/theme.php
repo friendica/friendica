@@ -113,6 +113,6 @@ if (! function_exists('_js_in_foot')) {
 		$bottom['$baseurl'] = $baseurl;
 		$tpl = Text::getMarkupTemplate('bottom.tpl');
 
-		return $a->page['bottom'] = Text::replaceMacros($tpl, $bottom);
+		return $a->page['bottom'] = App::replaceMacros($tpl, $bottom);
 	}
 }

@@ -45,7 +45,7 @@ function search_saved_searches() {
 
 		$tpl = Text::getMarkupTemplate("saved_searches_aside.tpl");
 
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$title'	=> L10n::t('Saved Searches'),
 			'$add'		=> '',
 			'$searchbox'	=> '',
@@ -158,7 +158,7 @@ function search_content(App $a) {
 	}
 
 	// contruct a wrapper for the search header
-	$o = Text::replaceMacros(Text::getMarkupTemplate("content_wrapper.tpl"),[
+	$o = App::replaceMacros(Text::getMarkupTemplate("content_wrapper.tpl"),[
 		'name' => "search-header",
 		'$title' => L10n::t("Search"),
 		'$title_size' => 3,
@@ -251,7 +251,7 @@ function search_content(App $a) {
 		$title = L10n::t('Results for: %s', $search);
 	}
 
-	$o .= Text::replaceMacros(Text::getMarkupTemplate("section_title.tpl"),[
+	$o .= App::replaceMacros(Text::getMarkupTemplate("section_title.tpl"),[
 		'$title' => $title
 	]);
 

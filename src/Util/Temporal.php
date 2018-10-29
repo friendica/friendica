@@ -115,7 +115,7 @@ class Temporal
 		$options = str_replace('</select>', '', $options);
 
 		$tpl = Text::getMarkupTemplate('field_select_raw.tpl');
-		return Text::replaceMacros($tpl, [
+		return App::replaceMacros($tpl, [
 			'$field' => [$name, $label, $current, $help, $options],
 		]);
 	}
@@ -141,7 +141,7 @@ class Temporal
 		$age = (intval($value) ? self::getAgeByTimezone($value, $a->user["timezone"], $a->user["timezone"]) : "");
 
 		$tpl = Text::getMarkupTemplate("field_input.tpl");
-		$o = Text::replaceMacros($tpl,
+		$o = App::replaceMacros($tpl,
 			[
 			'$field' => [
 				'dob',
@@ -247,7 +247,7 @@ class Temporal
 		$readable_format = str_replace(['Y', 'm', 'd', 'H', 'i'], ['yyyy', 'mm', 'dd', 'HH', 'MM'], $dateformat);
 
 		$tpl = Text::getMarkupTemplate('field_datetime.tpl');
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$field' => [
 				$id,
 				$label,

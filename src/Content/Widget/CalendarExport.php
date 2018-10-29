@@ -61,7 +61,7 @@ class CalendarExport
 		$user = defaults($a->data['user'], 'nickname', $a->user['nickname']);
 
 		$tpl = Text::getMarkupTemplate("events_aside.tpl");
-		$return = Text::replaceMacros($tpl, [
+		$return = App::replaceMacros($tpl, [
 			'$etitle'      => L10n::t("Export"),
 			'$export_ical' => L10n::t("Export calendar as ical"),
 			'$export_csv'  => L10n::t("Export calendar as csv"),

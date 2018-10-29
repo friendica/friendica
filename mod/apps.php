@@ -26,7 +26,7 @@ function apps_content()
 	}
 
 	$tpl = Text::getMarkupTemplate('apps.tpl');
-	return Text::replaceMacros($tpl, [
+	return App::replaceMacros($tpl, [
 		'$title' => $title,
 		'$apps'  => $apps,
 	]);

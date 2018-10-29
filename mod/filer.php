@@ -30,7 +30,7 @@ function filer_content(App $a)
 		$filetags = explode(",", $filetags);
 
 		$tpl = Text::getMarkupTemplate("filer_dialog.tpl");
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$field' => ['term', L10n::t("Save to Folder:"), '', '', $filetags, L10n::t('- select -')],
 			'$submit' => L10n::t('Save'),
 		]);

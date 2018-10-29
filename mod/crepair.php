@@ -137,7 +137,7 @@ function crepair_content(App $a)
 	$tab_str = Module\Contact::getTabsHTML($a, $contact, 5);
 
 	$tpl = Text::getMarkupTemplate('crepair.tpl');
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$tab_str'        => $tab_str,
 		'$warning'        => $warning,
 		'$info'           => $info,

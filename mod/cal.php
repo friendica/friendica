@@ -62,7 +62,7 @@ function cal_init(App $a)
 
 	$tpl = Text::getMarkupTemplate("vcard-widget.tpl");
 
-	$vcard_widget = Text::replaceMacros($tpl, [
+	$vcard_widget = App::replaceMacros($tpl, [
 		'$name' => $profile['name'],
 		'$photo' => $profile['photo'],
 		'$addr' => (($profile['addr'] != "") ? $profile['addr'] : ""),
@@ -90,7 +90,7 @@ function cal_content(App $a)
 	$i18n = Event::getStrings();
 
 	$htpl = Text::getMarkupTemplate('event_head.tpl');
-	$a->page['htmlhead'] .= Text::replaceMacros($htpl, [
+	$a->page['htmlhead'] .= App::replaceMacros($htpl, [
 		'$baseurl' => System::baseUrl(),
 		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$modparams' => 2,
@@ -268,7 +268,7 @@ function cal_content(App $a)
 			$events[$key]['item'] = $event_item;
 		}
 
-		$o = Text::replaceMacros($tpl, [
+		$o = App::replaceMacros($tpl, [
 			'$baseurl' => System::baseUrl(),
 			'$tabs' => $tabs,
 			'$title' => L10n::t('Events'),

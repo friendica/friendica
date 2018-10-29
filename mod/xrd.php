@@ -108,7 +108,7 @@ function xrd_xml($a, $uri, $alias, $profile_url, $r)
 
 	$tpl = Text::getMarkupTemplate('xrd_person.tpl');
 
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$nick'        => $r['nickname'],
 		'$accturi'     => $uri,
 		'$alias'       => $alias,

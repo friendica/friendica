@@ -23,7 +23,7 @@ function hostxrd_init(App $a)
 	}
 
 	$tpl = Text::getMarkupTemplate('xrd_host.tpl');
-	echo Text::replaceMacros($tpl, [
+	echo App::replaceMacros($tpl, [
 		'$zhost' => $a->getHostName(),
 		'$zroot' => System::baseUrl(),
 		'$domain' => System::baseUrl(),

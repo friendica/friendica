@@ -527,12 +527,12 @@ function profiles_content(App $a) {
 			return;
 		}
 
-		$a->page['htmlhead'] .= Text::replaceMacros(Text::getMarkupTemplate('profed_head.tpl'), [
+		$a->page['htmlhead'] .= App::replaceMacros(Text::getMarkupTemplate('profed_head.tpl'), [
 			'$baseurl' => System::baseUrl(true),
 		]);
 
 		$opt_tpl = Text::getMarkupTemplate("profile-hide-friends.tpl");
-		$hide_friends = Text::replaceMacros($opt_tpl,[
+		$hide_friends = App::replaceMacros($opt_tpl,[
 			'$yesno' => [
 				'hide-friends', //Name
 				L10n::t('Hide contacts and friends:'), //Label
@@ -554,7 +554,7 @@ function profiles_content(App $a) {
 
 		$is_default = (($r[0]['is-default']) ? 1 : 0);
 		$tpl = Text::getMarkupTemplate("profile_edit.tpl");
-		$o .= Text::replaceMacros($tpl, [
+		$o .= App::replaceMacros($tpl, [
 			'$personal_account' => $personal_account,
 			'$detailled_profile' => $detailled_profile,
 
@@ -668,7 +668,7 @@ function profiles_content(App $a) {
 
 			$profiles = '';
 			foreach ($r as $rr) {
-				$profiles .= Text::replaceMacros($tpl, [
+				$profiles .= App::replaceMacros($tpl, [
 					'$photo'        => $a->removeBaseURL($rr['thumb']),
 					'$id'           => $rr['id'],
 					'$alt'          => L10n::t('Profile Image'),
@@ -679,7 +679,7 @@ function profiles_content(App $a) {
 			}
 
 			$tpl_header = Text::getMarkupTemplate('profile_listing_header.tpl');
-			$o .= Text::replaceMacros($tpl_header,[
+			$o .= App::replaceMacros($tpl_header,[
 				'$header'      => L10n::t('Edit/Manage Profiles'),
 				'$chg_photo'   => L10n::t('Change profile photo'),
 				'$cr_new'      => L10n::t('Create New Profile'),

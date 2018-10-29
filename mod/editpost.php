@@ -40,12 +40,12 @@ function editpost_content(App $a)
 
 	$geotag = '';
 
-	$o .= Text::replaceMacros(Text::getMarkupTemplate("section_title.tpl"), [
+	$o .= App::replaceMacros(Text::getMarkupTemplate("section_title.tpl"), [
 		'$title' => L10n::t('Edit post')
 	]);
 
 	$tpl = Text::getMarkupTemplate('jot-header.tpl');
-	$a->page['htmlhead'] .= Text::replaceMacros($tpl, [
+	$a->page['htmlhead'] .= App::replaceMacros($tpl, [
 		'$baseurl' => System::baseUrl(),
 		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
@@ -85,7 +85,7 @@ function editpost_content(App $a)
 	Addon::callHooks('jot_tool', $jotplugins);
 	//Addon::callHooks('jot_networks', $jotnets);
 
-	$o .= Text::replaceMacros($tpl, [
+	$o .= App::replaceMacros($tpl, [
 		'$is_edit' => true,
 		'$return_path' => '/display/' . $item['guid'],
 		'$action' => 'item',

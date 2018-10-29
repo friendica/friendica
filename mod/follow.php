@@ -145,7 +145,7 @@ function follow_content(App $a)
 
 	$header = L10n::t('Connect/Follow');
 
-	$o = Text::replaceMacros($tpl, [
+	$o = App::replaceMacros($tpl, [
 		'$header'        => htmlentities($header),
 		//'$photo'         => ProxyUtils::proxifyUrl($ret['photo'], false, ProxyUtils::SIZE_SMALL),
 		'$desc'          => '',
@@ -188,7 +188,7 @@ function follow_content(App $a)
 	}
 
 	if ($gcontact_id <> 0) {
-		$o .= Text::replaceMacros(Text::getMarkupTemplate('section_title.tpl'),
+		$o .= App::replaceMacros(Text::getMarkupTemplate('section_title.tpl'),
 			['$title' => L10n::t('Status Messages and Posts')]
 		);
 

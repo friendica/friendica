@@ -30,7 +30,7 @@ class Widget
 	 */
 	public static function follow($value = "")
 	{
-		return Text::replaceMacros(Text::getMarkupTemplate('follow.tpl'), array(
+		return App::replaceMacros(Text::getMarkupTemplate('follow.tpl'), array(
 			'$connect' => L10n::t('Add New Contact'),
 			'$desc' => L10n::t('Enter address or web location'),
 			'$hint' => L10n::t('Example: bob@example.com, http://example.com/barbara'),
@@ -73,7 +73,7 @@ class Widget
 		$aside = [];
 		$aside['$nv'] = $nv;
 
-		return Text::replaceMacros(Text::getMarkupTemplate('peoplefind.tpl'), $aside);
+		return App::replaceMacros(Text::getMarkupTemplate('peoplefind.tpl'), $aside);
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Widget
 			return '';
 		}
 
-		return Text::replaceMacros(Text::getMarkupTemplate('nets.tpl'), array(
+		return App::replaceMacros(Text::getMarkupTemplate('nets.tpl'), array(
 			'$title' => L10n::t('Networks'),
 			'$desc' => '',
 			'$sel_all' => (($selected == '') ? 'selected' : ''),
@@ -192,7 +192,7 @@ class Widget
 			}
 		}
 
-		return Text::replaceMacros(Text::getMarkupTemplate('fileas_widget.tpl'), array(
+		return App::replaceMacros(Text::getMarkupTemplate('fileas_widget.tpl'), array(
 			'$title' => L10n::t('Saved Folders'),
 			'$desc' => '',
 			'$sel_all' => (($selected == '') ? 'selected' : ''),
@@ -232,7 +232,7 @@ class Widget
 			}
 		}
 
-		return Text::replaceMacros(Text::getMarkupTemplate('categories_widget.tpl'), array(
+		return App::replaceMacros(Text::getMarkupTemplate('categories_widget.tpl'), array(
 			'$title' => L10n::t('Categories'),
 			'$desc' => '',
 			'$sel_all' => (($selected == '') ? 'selected' : ''),
@@ -299,7 +299,7 @@ class Widget
 			$r = GContact::commonFriendsZcid($profile_uid, $zcid, 0, 5, true);
 		}
 
-		return Text::replaceMacros(Text::getMarkupTemplate('remote_friends_common.tpl'), array(
+		return App::replaceMacros(Text::getMarkupTemplate('remote_friends_common.tpl'), array(
 			'$desc' => L10n::tt("%d contact in common", "%d contacts in common", $t),
 			'$base' => System::baseUrl(),
 			'$uid' => $profile_uid,
