@@ -22,11 +22,11 @@ function filer_content(App $a)
 
 	if ($item_id && strlen($term)) {
 		// file item
-		file_tag_save_file(local_user(), $item_id, $term);
+		Text::fileTagSaveFile(local_user(), $item_id, $term);
 	} else {
 		// return filer dialog
 		$filetags = PConfig::get(local_user(), 'system', 'filetags');
-		$filetags = file_tag_file_to_list($filetags, 'file');
+		$filetags = Text::fileTagFileToList($filetags, 'file');
 		$filetags = explode(",", $filetags);
 
 		$tpl = Text::getMarkupTemplate("filer_dialog.tpl");

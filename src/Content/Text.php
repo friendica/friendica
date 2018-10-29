@@ -1163,9 +1163,9 @@ class Text
         if ($cnt) {
             foreach ($matches as $mtch) {
                 $categories[] = [
-                    'name' => self::xmlify(file_tag_decode($mtch[1])),
+                    'name' => self::xmlify(self::fileTagDecode($mtch[1])),
                     'url' =>  "#",
-                    'removeurl' => ((local_user() == $item['uid'])?'filerm/' . $item['id'] . '?f=&cat=' . self::xmlify(file_tag_decode($mtch[1])):""),
+                    'removeurl' => ((local_user() == $item['uid'])?'filerm/' . $item['id'] . '?f=&cat=' . self::xmlify(self::fileTagDecode($mtch[1])):""),
                     'first' => $first,
                     'last' => false
                 ];
@@ -1184,9 +1184,9 @@ class Text
             if ($cnt) {
                 foreach ($matches as $mtch) {
                     $folders[] = [
-                        'name' => self::xmlify(file_tag_decode($mtch[1])),
+                        'name' => self::xmlify(self::fileTagDecode($mtch[1])),
                         'url' =>  "#",
-                        'removeurl' => ((local_user() == $item['uid']) ? 'filerm/' . $item['id'] . '?f=&term=' . self::xmlify(file_tag_decode($mtch[1])) : ""),
+                        'removeurl' => ((local_user() == $item['uid']) ? 'filerm/' . $item['id'] . '?f=&term=' . self::xmlify(self::fileTagDecode($mtch[1])) : ""),
                         'first' => $first,
                         'last' => false
                     ];
@@ -1417,6 +1417,199 @@ class Text
         }
 
         return L10n::t('post');
+    }
+
+    // post categories and "save to file" use the same item.file table for storage.
+    // We will differentiate the different uses by wrapping categories in angle brackets
+    // and save to file categories in square brackets.
+    // To do this we need to escape these characters if they appear in our tag.
+
+    function fileTagEncode($s) {
+        return str_replace(['<','>','[',']'],['%3c','%3e','%5b','%5d'],$s);
+    }
+
+    function fileTagDecode($s) {
+        return str_replace(['%3c', '%3e', '%5b', '%5d'], ['<', '>', '[', ']'], $s);
+    }
+
+    function fileTagFileQuery($table,$s,$type = 'file') {
+
+        if ($type == 'file') {
+            $str = preg_quote('[' . str_replace('%', '%%', self::fileTagEncode($s)) . ']');
+        } else {
+            $str = preg_quote('<' . str_replace('%', '%%', self::fileTagEncode($s)) . '>');
+        }
+        return " AND " . (($table) ? DBA::escape($table) . '.' : '') . "file regexp '" . DBA::escape($str) . "' ";
+    }
+
+    // ex. given music,video return <music><video> or [music][video]
+    function fileTagListToFile($list, $type = 'file') {
+        $tag_list = '';
+        if (strlen($list)) {
+            $list_array = explode(",",$list);
+            if ($type == 'file') {
+                $lbracket = '[';
+                $rbracket = ']';
+            } else {
+                $lbracket = '<';
+                $rbracket = '>';
+            }
+
+            foreach ($list_array as $item) {
+                if (strlen($item)) {
+                    $tag_list .= $lbracket . self::fileTagEncode(trim($item))  . $rbracket;
+                }
+            }
+        }
+        return $tag_list;
+    }
+
+    // ex. given <music><video>[friends], return music,video or friends
+    function fileTagFileToList($file, $type = 'file') {
+        $matches = false;
+        $list = '';
+        if ($type == 'file') {
+            $cnt = preg_match_all('/\[(.*?)\]/', $file, $matches, PREG_SET_ORDER);
+        } else {
+            $cnt = preg_match_all('/<(.*?)>/', $file, $matches, PREG_SET_ORDER);
+        }
+        if ($cnt) {
+            foreach ($matches as $mtch) {
+                if (strlen($list)) {
+                    $list .= ',';
+                }
+                $list .= self::fileTagDecode($mtch[1]);
+            }
+        }
+
+        return $list;
+    }
+
+    function fileTagUpdatePconfig($uid, $file_old, $file_new, $type = 'file') {
+        // $file_old - categories previously associated with an item
+        // $file_new - new list of categories for an item
+
+        if (!intval($uid)) {
+            return false;
+        } elseif ($file_old == $file_new) {
+            return true;
+        }
+
+        $saved = PConfig::get($uid, 'system', 'filetags');
+        if (strlen($saved)) {
+            if ($type == 'file') {
+                $lbracket = '[';
+                $rbracket = ']';
+                $termtype = TERM_FILE;
+            } else {
+                $lbracket = '<';
+                $rbracket = '>';
+                $termtype = TERM_CATEGORY;
+            }
+
+            $filetags_updated = $saved;
+
+            // check for new tags to be added as filetags in pconfig
+            $new_tags = [];
+            $check_new_tags = explode(",", self::fileTagFileToList($file_new,$type));
+
+            foreach ($check_new_tags as $tag) {
+                if (!stristr($saved,$lbracket . self::fileTagEncode($tag) . $rbracket)) {
+                    $new_tags[] = $tag;
+                }
+            }
+
+            $filetags_updated .= self::fileTagListToFile(implode(",",$new_tags),$type);
+
+            // check for deleted tags to be removed from filetags in pconfig
+            $deleted_tags = [];
+            $check_deleted_tags = explode(",", self::fileTagFileToList($file_old,$type));
+
+            foreach ($check_deleted_tags as $tag) {
+                if (!stristr($file_new,$lbracket . self::fileTagEncode($tag) . $rbracket)) {
+                    $deleted_tags[] = $tag;
+                }
+            }
+
+            foreach ($deleted_tags as $key => $tag) {
+                $r = q("SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d",
+                    DBA::escape($tag),
+                    intval(TERM_OBJ_POST),
+                    intval($termtype),
+                    intval($uid));
+
+                if (DBA::isResult($r)) {
+                    unset($deleted_tags[$key]);
+                } else {
+                    $filetags_updated = str_replace($lbracket . self::fileTagEncode($tag) . $rbracket,'',$filetags_updated);
+                }
+            }
+
+            if ($saved != $filetags_updated) {
+                PConfig::set($uid, 'system', 'filetags', $filetags_updated);
+            }
+            return true;
+        } elseif (strlen($file_new)) {
+            PConfig::set($uid, 'system', 'filetags', $file_new);
+        }
+        return true;
+    }
+
+    function fileTagSaveFile($uid, $item_id, $file)
+    {
+        if (!intval($uid)) {
+            return false;
+        }
+
+        $item = Item::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
+        if (DBA::isResult($item)) {
+            if (!stristr($item['file'],'[' . self::fileTagEncode($file) . ']')) {
+                $fields = ['file' => $item['file'] . '[' . self::fileTagEncode($file) . ']'];
+                Item::update($fields, ['id' => $item_id]);
+            }
+            $saved = PConfig::get($uid, 'system', 'filetags');
+            if (!strlen($saved) || !stristr($saved, '[' . self::fileTagEncode($file) . ']')) {
+                PConfig::set($uid, 'system', 'filetags', $saved . '[' . self::fileTagEncode($file) . ']');
+            }
+            info(L10n::t('Item filed'));
+        }
+        return true;
+    }
+
+    function fileTagUnsaveFile($uid, $item_id, $file, $cat = false)
+    {
+        if (!intval($uid)) {
+            return false;
+        }
+
+        if ($cat == true) {
+            $pattern = '<' . self::fileTagEncode($file) . '>' ;
+            $termtype = TERM_CATEGORY;
+        } else {
+            $pattern = '[' . self::fileTagEncode($file) . ']' ;
+            $termtype = TERM_FILE;
+        }
+
+        $item = Item::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
+        if (!DBA::isResult($item)) {
+            return false;
+        }
+
+        $fields = ['file' => str_replace($pattern,'',$item['file'])];
+        Item::update($fields, ['id' => $item_id]);
+
+        $r = q("SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d",
+            DBA::escape($file),
+            intval(TERM_OBJ_POST),
+            intval($termtype),
+            intval($uid)
+        );
+        if (!DBA::isResult($r)) {
+            $saved = PConfig::get($uid, 'system', 'filetags');
+            PConfig::set($uid, 'system', 'filetags', str_replace($pattern, '', $saved));
+        }
+
+        return true;
     }
 
 }

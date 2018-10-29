@@ -245,7 +245,7 @@ class DFRN
 				intval(TERM_CATEGORY),
 				intval($owner_id)
 			);
-			//$sql_extra .= file_tag_file_query('item',$category,'category');
+			//$sql_extra .= Text::fileTagFileQuery('item',$category,'category');
 		}
 
 		if ($public_feed && ! $converse) {

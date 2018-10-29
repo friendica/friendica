@@ -187,7 +187,7 @@ class Widget
 		$cnt = preg_match_all('/\[(.*?)\]/', $saved, $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				$unescaped = Text::xmlify(file_tag_decode($mtch[1]));
+				$unescaped = Text::xmlify(Text::fileTagDecode($mtch[1]));
 				$terms[] = array('name' => $unescaped, 'selected' => (($selected == $unescaped) ? 'selected' : ''));
 			}
 		}
@@ -227,7 +227,7 @@ class Widget
 
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				$unescaped = Text::xmlify(file_tag_decode($mtch[1]));
+				$unescaped = Text::xmlify(Text::fileTagDecode($mtch[1]));
 				$terms[] = array('name' => $unescaped, 'selected' => (($selected == $unescaped) ? 'selected' : ''));
 			}
 		}

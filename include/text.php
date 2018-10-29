@@ -1542,26 +1542,29 @@ function item_post_type($item) {
 // To do this we need to escape these characters if they appear in our tag.
 
 function file_tag_encode($s) {
-	return str_replace(['<','>','[',']'],['%3c','%3e','%5b','%5d'],$s);
+	//return str_replace(['<','>','[',']'],['%3c','%3e','%5b','%5d'],$s);
+	return Text::fileTagEncode($s);
 }
 
 function file_tag_decode($s) {
-	return str_replace(['%3c', '%3e', '%5b', '%5d'], ['<', '>', '[', ']'], $s);
+	//return str_replace(['%3c', '%3e', '%5b', '%5d'], ['<', '>', '[', ']'], $s);
+	return Text::fileTagDecode($s);
 }
 
 function file_tag_file_query($table,$s,$type = 'file') {
 
-	if ($type == 'file') {
+	/* if ($type == 'file') {
 		$str = preg_quote('[' . str_replace('%', '%%', file_tag_encode($s)) . ']');
 	} else {
 		$str = preg_quote('<' . str_replace('%', '%%', file_tag_encode($s)) . '>');
 	}
-	return " AND " . (($table) ? DBA::escape($table) . '.' : '') . "file regexp '" . DBA::escape($str) . "' ";
+	return " AND " . (($table) ? DBA::escape($table) . '.' : '') . "file regexp '" . DBA::escape($str) . "' "; */
+	return Text::fileTagFileQuery($table, $s, $type);
 }
 
 // ex. given music,video return <music><video> or [music][video]
 function file_tag_list_to_file($list, $type = 'file') {
-	$tag_list = '';
+	/* $tag_list = '';
 	if (strlen($list)) {
 		$list_array = explode(",",$list);
 		if ($type == 'file') {
@@ -1578,12 +1581,13 @@ function file_tag_list_to_file($list, $type = 'file') {
 			}
 		}
 	}
-	return $tag_list;
+	return $tag_list; */
+	return Text::fileTagListToFile($list, $type);
 }
 
 // ex. given <music><video>[friends], return music,video or friends
 function file_tag_file_to_list($file, $type = 'file') {
-	$matches = false;
+	/* $matches = false;
 	$list = '';
 	if ($type == 'file') {
 		$cnt = preg_match_all('/\[(.*?)\]/', $file, $matches, PREG_SET_ORDER);
@@ -1599,14 +1603,15 @@ function file_tag_file_to_list($file, $type = 'file') {
 		}
 	}
 
-	return $list;
+	return $list; */
+	return Text::fileTagFileToList($file, $type);
 }
 
 function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 	// $file_old - categories previously associated with an item
 	// $file_new - new list of categories for an item
 
-	if (!intval($uid)) {
+	/* if (!intval($uid)) {
 		return false;
 	} elseif ($file_old == $file_new) {
 		return true;
@@ -1669,12 +1674,13 @@ function file_tag_update_pconfig($uid, $file_old, $file_new, $type = 'file') {
 	} elseif (strlen($file_new)) {
 		PConfig::set($uid, 'system', 'filetags', $file_new);
 	}
-	return true;
+	return true; */
+	return Text::fileTagUpdatePconfig($uid, $file_old, $file_new, $type);
 }
 
 function file_tag_save_file($uid, $item_id, $file)
 {
-	if (!intval($uid)) {
+	/* if (!intval($uid)) {
 		return false;
 	}
 
@@ -1690,12 +1696,13 @@ function file_tag_save_file($uid, $item_id, $file)
 		}
 		info(L10n::t('Item filed'));
 	}
-	return true;
+	return true; */
+	return Text::fileTagSaveFile($uid, $item_id, $file);
 }
 
 function file_tag_unsave_file($uid, $item_id, $file, $cat = false)
 {
-	if (!intval($uid)) {
+	/* if (!intval($uid)) {
 		return false;
 	}
 
@@ -1726,7 +1733,8 @@ function file_tag_unsave_file($uid, $item_id, $file, $cat = false)
 		PConfig::set($uid, 'system', 'filetags', str_replace($pattern, '', $saved));
 	}
 
-	return true;
+	return true; */
+	return Text::fileTagUnsaveFile($uid, $item_id, $file, $cat);
 }
 
 function normalise_openid($s) {

@@ -23,7 +23,7 @@ function filerm_content(App $a) {
 	Text::logger('filerm: tag ' . $term . ' item ' . $item_id);
 
 	if ($item_id && strlen($term)) {
-		file_tag_unsave_file(local_user(),$item_id,$term, $category);
+		Text::fileTagUnsaveFile(local_user(),$item_id,$term, $category);
 	}
 
 	//$a->internalRedirect('network');

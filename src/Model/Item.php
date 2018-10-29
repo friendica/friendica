@@ -1004,7 +1004,7 @@ class Item extends BaseObject
 		$cnt = preg_match_all('/<(.*?)>/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],true);
+				Text::fileTagUnsaveFile($item['uid'], $item['id'], $mtch[1],true);
 			}
 		}
 
@@ -1013,7 +1013,7 @@ class Item extends BaseObject
 		$cnt = preg_match_all('/\[(.*?)\]/', $item['file'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
 			foreach ($matches as $mtch) {
-				file_tag_unsave_file($item['uid'], $item['id'], $mtch[1],false);
+				Text::fileTagUnsaveFile($item['uid'], $item['id'], $mtch[1],false);
 			}
 		}
 
