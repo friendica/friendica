@@ -252,7 +252,7 @@ class Text
      */
     function sanitiseAcl(&$item) {
         if (intval($item)) {
-            $item = '<' . intval(notags(trim($item))) . '>';
+            $item = '<' . intval(self::noTags(trim($item))) . '>';
         } else {
             unset($item);
         }
@@ -995,14 +995,14 @@ class Text
             if (strpos($mime, 'video') !== false) {
                 if (!$vhead) {
                     $vhead = true;
-                    $a->page['htmlhead'] .= replace_macros(get_markup_template('videos_head.tpl'), [
+                    $a->page['htmlhead'] .= self::replaceMacros(self::getMarkupTemplate('videos_head.tpl'), [
                         '$baseurl' => System::baseUrl(),
                     ]);
                 }
 
                 $url_parts = explode('/', $the_url);
                 $id = end($url_parts);
-                $as .= replace_macros(get_markup_template('video_top.tpl'), [
+                $as .= self::replaceMacros(self::getMarkupTemplate('video_top.tpl'), [
                     '$video' => [
                         'id'     => $id,
                         'title'  => L10n::t('View Video'),
@@ -1021,7 +1021,7 @@ class Text
                 $filesubtype = 'unkn';
             }
 
-            $title = escape_tags(trim(!empty($mtch[4]) ? $mtch[4] : $mtch[1]));
+            $title = self::escapeTags(trim(!empty($mtch[4]) ? $mtch[4] : $mtch[1]));
             $title .= ' ' . $mtch[2] . ' ' . L10n::t('bytes');
 
             $icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
@@ -1054,7 +1054,7 @@ class Text
 
         while ((strpos($s, $spoilersearch) !== false)) {
             $pos = strpos($s, $spoilersearch);
-            $rnd = random_string(8);
+            $rnd = self::randomString(8);
             $spoilerreplace = '<br /> <span id="spoiler-wrap-' . $rnd . '" class="spoiler-wrap fakelink" onclick="openClose(\'spoiler-' . $rnd . '\');">' . L10n::t('Click to open/close') . '</span>'.
                         '<blockquote class="spoiler" id="spoiler-' . $rnd . '" style="display: none;">';
             $s = substr($s, 0, $pos) . $spoilerreplace . substr($s, $pos + strlen($spoilersearch));
@@ -1065,7 +1065,7 @@ class Text
 
         while ((strpos($s, $authorsearch) !== false)) {
             $pos = strpos($s, $authorsearch);
-            $rnd = random_string(8);
+            $rnd = self::randomString(8);
             $authorreplace = '<br /> <span id="author-wrap-' . $rnd . '" class="author-wrap fakelink" onclick="openClose(\'author-' . $rnd . '\');">' . L10n::t('Click to open/close') . '</span>'.
                         '<blockquote class="author" id="author-' . $rnd . '" style="display: block;">';
             $s = substr($s, 0, $pos) . $authorreplace . substr($s, $pos + strlen($authorsearch));
