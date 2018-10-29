@@ -392,7 +392,7 @@ class Contact extends BaseObject
 			'blocked'     => 0,
 			'pending'     => 0,
 			'url'         => System::baseUrl() . '/profile/' . $user['nickname'],
-			'nurl'        => normalise_link(System::baseUrl() . '/profile/' . $user['nickname']),
+			'nurl'        => Text::normaliseLink(System::baseUrl() . '/profile/' . $user['nickname']),
 			'addr'        => $user['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3),
 			'request'     => System::baseUrl() . '/dfrn_request/' . $user['nickname'],
 			'notify'      => System::baseUrl() . '/dfrn_notify/'  . $user['nickname'],
@@ -477,7 +477,7 @@ class Contact extends BaseObject
 
 		// it seems as if ported accounts can have wrong values, so we make sure that now everything is fine.
 		$fields['url'] = System::baseUrl() . '/profile/' . $user['nickname'];
-		$fields['nurl'] = normalise_link($fields['url']);
+		$fields['nurl'] = Text::normaliseLink($fields['url']);
 		$fields['addr'] = $user['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3);
 		$fields['request'] = System::baseUrl() . '/dfrn_request/' . $user['nickname'];
 		$fields['notify'] = System::baseUrl() . '/dfrn_notify/'  . $user['nickname'];
@@ -597,7 +597,7 @@ class Contact extends BaseObject
 
 		if ($contact['term-date'] <= DBA::NULL_DATETIME) {
 			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
-			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', normalise_link($contact['url']), DBA::NULL_DATETIME]);
+			DBA::update('contact', ['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', Text::normaliseLink($contact['url']), DBA::NULL_DATETIME]);
 		} else {
 			/* @todo
 			 * We really should send a notification to the owner after 2-3 weeks
@@ -615,7 +615,7 @@ class Contact extends BaseObject
 				 * the whole process over again.
 				 */
 				DBA::update('contact', ['archive' => 1], ['id' => $contact['id']]);
-				DBA::update('contact', ['archive' => 1], ['nurl' => normalise_link($contact['url']), 'self' => false]);
+				DBA::update('contact', ['archive' => 1], ['nurl' => Text::normaliseLink($contact['url']), 'self' => false]);
 			}
 		}
 	}
@@ -649,7 +649,7 @@ class Contact extends BaseObject
 		// It's a miracle. Our dead contact has inexplicably come back to life.
 		$fields = ['term-date' => DBA::NULL_DATETIME, 'archive' => false];
 		DBA::update('contact', $fields, ['id' => $contact['id']]);
-		DBA::update('contact', $fields, ['nurl' => normalise_link($contact['url'])]);
+		DBA::update('contact', $fields, ['nurl' => Text::normaliseLink($contact['url'])]);
 
 		if (!empty($contact['batch'])) {
 			$condition = ['batch' => $contact['batch'], 'contact-type' => self::ACCOUNT_TYPE_RELAY];
@@ -690,14 +690,14 @@ class Contact extends BaseObject
 		// Fetch contact data from the contact table for the given user
 		$s = DBA::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-		FROM `contact` WHERE `nurl` = ? AND `uid` = ?", normalise_link($url), $uid);
+		FROM `contact` WHERE `nurl` = ? AND `uid` = ?", Text::normaliseLink($url), $uid);
 		$r = DBA::toArray($s);
 
 		// Fetch contact data from the contact table for the given user, checking with the alias
 		if (!DBA::isResult($r)) {
 			$s = DBA::p("SELECT `id`, `id` AS `cid`, 0 AS `gid`, 0 AS `zid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 				`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ?", normalise_link($url), $url, $ssl_url, $uid);
+			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = ?", Text::normaliseLink($url), $url, $ssl_url, $uid);
 			$r = DBA::toArray($s);
 		}
 
@@ -705,7 +705,7 @@ class Contact extends BaseObject
 		if (!DBA::isResult($r)) {
 			$s = DBA::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `nurl` = ? AND `uid` = 0", normalise_link($url));
+			FROM `contact` WHERE `nurl` = ? AND `uid` = 0", Text::normaliseLink($url));
 			$r = DBA::toArray($s);
 		}
 
@@ -713,7 +713,7 @@ class Contact extends BaseObject
 		if (!DBA::isResult($r)) {
 			$s = DBA::p("SELECT `id`, 0 AS `cid`, `id` AS `zid`, 0 AS `gid`, `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, `xmpp`,
 			`keywords`, `gender`, `photo`, `thumb`, `micro`, `forum`, `prv`, (`forum` | `prv`) AS `community`, `contact-type`, `bd` AS `birthday`, 0 AS `self`
-			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = 0", normalise_link($url), $url, $ssl_url);
+			FROM `contact` WHERE `alias` IN (?, ?, ?) AND `uid` = 0", Text::normaliseLink($url), $url, $ssl_url);
 			$r = DBA::toArray($s);
 		}
 
@@ -721,7 +721,7 @@ class Contact extends BaseObject
 		if (!DBA::isResult($r)) {
 			$s = DBA::p("SELECT 0 AS `id`, 0 AS `cid`, `id` AS `gid`, 0 AS `zid`, 0 AS `uid`, `url`, `nurl`, `alias`, `network`, `name`, `nick`, `addr`, `location`, `about`, '' AS `xmpp`,
 			`keywords`, `gender`, `photo`, `photo` AS `thumb`, `photo` AS `micro`, 0 AS `forum`, 0 AS `prv`, `community`, `contact-type`, `birthday`, 0 AS `self`
-			FROM `gcontact` WHERE `nurl` = ?", normalise_link($url));
+			FROM `gcontact` WHERE `nurl` = ?", Text::normaliseLink($url));
 			$r = DBA::toArray($s);
 		}
 
@@ -1038,7 +1038,7 @@ class Contact extends BaseObject
 
 		/// @todo Verify if we can't use Contact::getDetailsByUrl instead of the following
 		// We first try the nurl (http://server.tld/nick), most common case
-		$contact = DBA::selectFirst('contact', ['id', 'avatar', 'avatar-date'], ['nurl' => normalise_link($url), 'uid' => $uid, 'deleted' => false]);
+		$contact = DBA::selectFirst('contact', ['id', 'avatar', 'avatar-date'], ['nurl' => Text::normaliseLink($url), 'uid' => $uid, 'deleted' => false]);
 
 		// Then the addr (nick@server.tld)
 		if (!DBA::isResult($contact)) {
@@ -1049,7 +1049,7 @@ class Contact extends BaseObject
 		if (!DBA::isResult($contact)) {
 			// The link could be provided as http although we stored it as https
 			$ssl_url = str_replace('http://', 'https://', $url);
-			$condition = ['`alias` IN (?, ?, ?) AND `uid` = ? AND NOT `deleted`', $url, normalise_link($url), $ssl_url, $uid];
+			$condition = ['`alias` IN (?, ?, ?) AND `uid` = ? AND NOT `deleted`', $url, Text::normaliseLink($url), $ssl_url, $uid];
 			$contact = DBA::selectFirst('contact', ['id', 'avatar', 'avatar-date'], $condition);
 		}
 
@@ -1076,7 +1076,7 @@ class Contact extends BaseObject
 			$fields = ['url', 'addr', 'alias', 'notify', 'poll', 'name', 'nick',
 				'photo', 'keywords', 'location', 'about', 'network',
 				'priority', 'batch', 'request', 'confirm', 'poco'];
-			$data = DBA::selectFirst('contact', $fields, ['nurl' => normalise_link($url)]);
+			$data = DBA::selectFirst('contact', $fields, ['nurl' => Text::normaliseLink($url)]);
 
 			if (DBA::isResult($data)) {
 				// For security reasons we don't fetch key data from our users
@@ -1103,9 +1103,9 @@ class Contact extends BaseObject
 
 			// Get data from the gcontact table
 			$fields = ['name', 'nick', 'url', 'photo', 'addr', 'alias', 'network'];
-			$contact = DBA::selectFirst('gcontact', $fields, ['nurl' => normalise_link($url)]);
+			$contact = DBA::selectFirst('gcontact', $fields, ['nurl' => Text::normaliseLink($url)]);
 			if (!DBA::isResult($contact)) {
-				$contact = DBA::selectFirst('contact', $fields, ['nurl' => normalise_link($url)]);
+				$contact = DBA::selectFirst('contact', $fields, ['nurl' => Text::normaliseLink($url)]);
 			}
 
 			if (!DBA::isResult($contact)) {
@@ -1118,14 +1118,14 @@ class Contact extends BaseObject
 			if (!DBA::isResult($contact)) {
 				// The link could be provided as http although we stored it as https
 				$ssl_url = str_replace('http://', 'https://', $url);
-				$condition = ['alias' => [$url, normalise_link($url), $ssl_url]];
+				$condition = ['alias' => [$url, Text::normaliseLink($url), $ssl_url]];
 				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
 
 			if (!DBA::isResult($contact)) {
 				$fields = ['url', 'addr', 'alias', 'notify', 'poll', 'name', 'nick',
 					'photo', 'network', 'priority', 'batch', 'request', 'confirm'];
-				$condition = ['url' => [$url, normalise_link($url), $ssl_url]];
+				$condition = ['url' => [$url, Text::normaliseLink($url), $ssl_url]];
 				$contact = DBA::selectFirst('fcontact', $fields, $condition);
 			}
 
@@ -1150,7 +1150,7 @@ class Contact extends BaseObject
 				'uid'       => $uid,
 				'created'   => DateTimeFormat::utcNow(),
 				'url'       => $data["url"],
-				'nurl'      => normalise_link($data["url"]),
+				'nurl'      => Text::normaliseLink($data["url"]),
 				'addr'      => $data["addr"],
 				'alias'     => $data["alias"],
 				'notify'    => $data["notify"],
@@ -1178,7 +1178,7 @@ class Contact extends BaseObject
 				'pending'   => 0]
 			);
 
-			$s = DBA::select('contact', ['id'], ['nurl' => normalise_link($data["url"]), 'uid' => $uid], ['order' => ['id'], 'limit' => 2]);
+			$s = DBA::select('contact', ['id'], ['nurl' => Text::normaliseLink($data["url"]), 'uid' => $uid], ['order' => ['id'], 'limit' => 2]);
 			$contacts = DBA::toArray($s);
 			if (!DBA::isResult($contacts)) {
 				return 0;
@@ -1187,7 +1187,7 @@ class Contact extends BaseObject
 			$contact_id = $contacts[0]["id"];
 
 			// Update the newly created contact from data in the gcontact table
-			$gcontact = DBA::selectFirst('gcontact', ['location', 'about', 'keywords', 'gender'], ['nurl' => normalise_link($data["url"])]);
+			$gcontact = DBA::selectFirst('gcontact', ['location', 'about', 'keywords', 'gender'], ['nurl' => Text::normaliseLink($data["url"])]);
 			if (DBA::isResult($gcontact)) {
 				// Only use the information when the probing hadn't fetched these values
 				if ($data['keywords'] != '') {
@@ -1204,7 +1204,7 @@ class Contact extends BaseObject
 
 			if (count($contacts) > 1 && $uid == 0 && $contact_id != 0 && $data["url"] != "") {
 				DBA::delete('contact', ["`nurl` = ? AND `uid` = 0 AND `id` != ? AND NOT `self`",
-					normalise_link($data["url"]), $contact_id]);
+					Text::normaliseLink($data["url"]), $contact_id]);
 			}
 		}
 
@@ -1221,7 +1221,7 @@ class Contact extends BaseObject
 		$updated = ['addr' => $data['addr'],
 			'alias' => $data['alias'],
 			'url' => $data['url'],
-			'nurl' => normalise_link($data['url']),
+			'nurl' => Text::normaliseLink($data['url']),
 			'name' => $data['name'],
 			'nick' => $data['nick']];
 
@@ -1543,7 +1543,7 @@ class Contact extends BaseObject
 		DBA::update(
 			'contact', [
 				'url'     => $ret['url'],
-				'nurl'    => normalise_link($ret['url']),
+				'nurl'    => Text::normaliseLink($ret['url']),
 				'network' => $ret['network'],
 				'addr'    => $ret['addr'],
 				'alias'   => $ret['alias'],
@@ -1627,10 +1627,10 @@ class Contact extends BaseObject
 		// the poll url is more reliable than the profile url, as we may have
 		// indirect links or webfinger links
 
-		$condition = ['uid' => $uid, 'poll' => [$ret['poll'], normalise_link($ret['poll'])], 'network' => $ret['network'], 'pending' => false];
+		$condition = ['uid' => $uid, 'poll' => [$ret['poll'], Text::normaliseLink($ret['poll'])], 'network' => $ret['network'], 'pending' => false];
 		$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
 		if (!DBA::isResult($contact)) {
-			$condition = ['uid' => $uid, 'nurl' => normalise_link($url), 'network' => $ret['network'], 'pending' => false];
+			$condition = ['uid' => $uid, 'nurl' => Text::normaliseLink($url), 'network' => $ret['network'], 'pending' => false];
 			$contact = DBA::selectFirst('contact', ['id', 'rel'], $condition);
 		}
 
@@ -1710,7 +1710,7 @@ class Contact extends BaseObject
 				'uid'     => $uid,
 				'created' => DateTimeFormat::utcNow(),
 				'url'     => $ret['url'],
-				'nurl'    => normalise_link($ret['url']),
+				'nurl'    => Text::normaliseLink($ret['url']),
 				'addr'    => $ret['addr'],
 				'alias'   => $ret['alias'],
 				'batch'   => $ret['batch'],
@@ -1855,7 +1855,7 @@ class Contact extends BaseObject
 
 			// send email notification to owner?
 		} else {
-			if (DBA::exists('contact', ['nurl' => normalise_link($url), 'uid' => $importer['uid'], 'pending' => true])) {
+			if (DBA::exists('contact', ['nurl' => Text::normaliseLink($url), 'uid' => $importer['uid'], 'pending' => true])) {
 				Text::logger('ignoring duplicated connection request from pending contact ' . $url);
 				return;
 			}
@@ -1866,7 +1866,7 @@ class Contact extends BaseObject
 				intval($importer['uid']),
 				DBA::escape(DateTimeFormat::utcNow()),
 				DBA::escape($url),
-				DBA::escape(normalise_link($url)),
+				DBA::escape(Text::normaliseLink($url)),
 				DBA::escape($name),
 				DBA::escape($nick),
 				DBA::escape($photo),

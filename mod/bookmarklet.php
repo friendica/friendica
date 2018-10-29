@@ -4,6 +4,7 @@
  */
 
 use Friendica\App;
+use Friendica\Context\Text;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -26,8 +27,8 @@ function bookmarklet_content(App $a)
 		return $o;
 	}
 
-	$referer = normalise_link(defaults($_SERVER, 'HTTP_REFERER', ''));
-	$page = normalise_link(System::baseUrl() . "/bookmarklet");
+	$referer = Text::normaliseLink(defaults($_SERVER, 'HTTP_REFERER', ''));
+	$page = Text::normaliseLink(System::baseUrl() . "/bookmarklet");
 
 	if (!strstr($referer, $page)) {
 		if (empty($_REQUEST["url"])) {

@@ -347,7 +347,7 @@ class Probe
 		}
 
 		if (x($data, "photo")) {
-			$data["baseurl"] = Network::getUrlMatch(normalise_link(defaults($data, "baseurl", "")), normalise_link($data["photo"]));
+			$data["baseurl"] = Network::getUrlMatch(Text::normaliseLink(defaults($data, "baseurl", "")), Text::normaliseLink($data["photo"]));
 		} else {
 			$data["photo"] = System::baseUrl().'/images/person-300.jpg';
 		}
@@ -426,7 +426,7 @@ class Probe
 
 				$fields['updated'] = DateTimeFormat::utcNow();
 
-				$condition = ['nurl' => normalise_link($data["url"])];
+				$condition = ['nurl' => Text::normaliseLink($data["url"])];
 
 				$old_fields = DBA::selectFirst('gcontact', $fieldnames, $condition);
 
@@ -473,7 +473,7 @@ class Probe
 					}
 				}
 
-				$condition = ['nurl' => normalise_link($data["url"]), 'self' => false, 'uid' => 0];
+				$condition = ['nurl' => Text::normaliseLink($data["url"]), 'self' => false, 'uid' => 0];
 
 				// "$old_fields" will return a "false" when the contact doesn't exist.
 				// This won't trigger an insert. This is intended, since we only need
@@ -1009,7 +1009,7 @@ class Probe
 			foreach ($webfinger["aliases"] as $alias) {
 				if (empty($data["url"]) && !strstr($alias, "@")) {
 					$data["url"] = $alias;
-				} elseif (!strstr($alias, "@") && normalise_link($alias) != normalise_link($data["url"])) {
+				} elseif (!strstr($alias, "@") && Text::normaliseLink($alias) != Text::normaliseLink($data["url"])) {
 					$data["alias"] = $alias;
 				} elseif (substr($alias, 0, 5) == 'acct:') {
 					$data["addr"] = substr($alias, 5);
@@ -1212,7 +1212,7 @@ class Probe
 
 		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
-				if (normalise_link($alias) != normalise_link($data["url"]) && ! strstr($alias, "@")) {
+				if (Text::normaliseLink($alias) != Text::normaliseLink($data["url"]) && ! strstr($alias, "@")) {
 					$data["alias"] = $alias;
 				} elseif (substr($alias, 0, 5) == 'acct:') {
 					$data["addr"] = substr($alias, 5);
@@ -1268,14 +1268,14 @@ class Probe
 
 		if (!empty($webfinger["aliases"]) && is_array($webfinger["aliases"])) {
 			foreach ($webfinger["aliases"] as $alias) {
-				if (strstr($alias, "@") && !strstr(normalise_link($alias), "http://")) {
+				if (strstr($alias, "@") && !strstr(Text::normaliseLink($alias), "http://")) {
 					$data["addr"] = str_replace('acct:', '', $alias);
 				}
 			}
 		}
 
 		if (!empty($webfinger["subject"]) && strstr($webfinger["subject"], "@")
-			&& !strstr(normalise_link($webfinger["subject"]), "http://")
+			&& !strstr(Text::normaliseLink($webfinger["subject"]), "http://")
 		) {
 			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
 		}
@@ -1301,7 +1301,7 @@ class Probe
 						} else {
 							$pubkey = substr($pubkey, 5);
 						}
-					} elseif (normalise_link($pubkey) == 'http://') {
+					} elseif (Text::normaliseLink($pubkey) == 'http://') {
 						$curlResult = Network::curl($pubkey);
 						if ($curlResult->isTimeout()) {
 							return false;

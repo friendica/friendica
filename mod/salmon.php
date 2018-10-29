@@ -149,9 +149,9 @@ function salmon_post(App $a, $xml = '') {
 						AND `uid` = %d LIMIT 1",
 		DBA::escape(Protocol::OSTATUS),
 		DBA::escape(Protocol::DFRN),
-		DBA::escape(normalise_link($author_link)),
+		DBA::escape(Text::normaliseLink($author_link)),
 		DBA::escape($author_link),
-		DBA::escape(normalise_link($author_link)),
+		DBA::escape(Text::normaliseLink($author_link)),
 		intval($importer['uid'])
 	);
 

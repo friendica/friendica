@@ -4,6 +4,7 @@ This file is part of the Diaspora protocol. It is used for fetching single publi
 */
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -35,7 +36,7 @@ function fetch_init(App $a)
 			$parts = parse_url($item["author-link"]);
 			$host = $parts["scheme"]."://".$parts["host"];
 
-			if (normalise_link($host) != normalise_link(System::baseUrl())) {
+			if (Text::normaliseLink($host) != Text::normaliseLink(System::baseUrl())) {
 				$location = $host."/fetch/".$a->argv[1]."/".urlencode($guid);
 
 				header("HTTP/1.1 301 Moved Permanently");

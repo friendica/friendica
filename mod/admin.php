@@ -994,8 +994,8 @@ function admin_page_site_post(App $a)
 		$old_url = $a->getBaseURL(true);
 
 		// Generate host names for relocation the addresses in the format user@address.tld
-		$new_host = str_replace("http://", "@", normalise_link($new_url));
-		$old_host = str_replace("http://", "@", normalise_link($old_url));
+		$new_host = str_replace("http://", "@", Text::normaliseLink($new_url));
+		$old_host = str_replace("http://", "@", Text::normaliseLink($old_url));
 
 		function update_table(App $a, $table_name, $fields, $old_url, $new_url)
 		{

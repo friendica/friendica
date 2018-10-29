@@ -277,7 +277,7 @@ function vier_community_info()
 					$query .= ",";
 				}
 
-				$query .= "'".DBA::escape(normalise_link(trim($helper)))."'";
+				$query .= "'".DBA::escape(Text::normaliseLink(trim($helper)))."'";
 			}
 
 			$r = q("SELECT `url`, `name` FROM `gcontact` WHERE `nurl` IN (%s)", $query);

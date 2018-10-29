@@ -60,7 +60,7 @@ function crepair_post(App $a)
 	$attag       = defaults($_POST, 'attag'      , '');
 	$photo       = defaults($_POST, 'photo'      , '');
 	$remote_self = defaults($_POST, 'remote_self', false);
-	$nurl        = normalise_link($url);
+	$nurl        = Text::normaliseLink($url);
 
 	$r = q("UPDATE `contact` SET `name` = '%s', `nick` = '%s', `url` = '%s', `nurl` = '%s', `request` = '%s', `confirm` = '%s', `notify` = '%s', `poll` = '%s', `attag` = '%s' , `remote_self` = %d
 		WHERE `id` = %d AND `uid` = %d",

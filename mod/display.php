@@ -89,8 +89,8 @@ function display_init(App $a)
 
 	$profiledata = display_fetchauthor($a, $item);
 
-	if (strstr(normalise_link($profiledata["url"]), normalise_link(System::baseUrl()))) {
-		$nickname = str_replace(normalise_link(System::baseUrl())."/profile/", "", normalise_link($profiledata["url"]));
+	if (strstr(Text::normaliseLink($profiledata["url"]), Text::normaliseLink(System::baseUrl()))) {
+		$nickname = str_replace(Text::normaliseLink(System::baseUrl())."/profile/", "", Text::normaliseLink($profiledata["url"]));
 
 		if (($nickname != $a->user["nickname"])) {
 			$profile = DBA::fetchFirst("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`

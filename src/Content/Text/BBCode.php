@@ -942,7 +942,7 @@ class BBCode extends BaseObject
 			case 3: // Diaspora
 				$headline = '<p><b>' . html_entity_decode('&#x2672; ', ENT_QUOTES, 'UTF-8') . $mention . ':</b></p>' . "\n";
 
-				if (stripos(normalise_link($attributes['link']), 'http://twitter.com/') === 0) {
+				if (stripos(Text::normaliseLink($attributes['link']), 'http://twitter.com/') === 0) {
 					$text = ($is_quote_share? '<hr />' : '') . '<p><a href="' . $attributes['link'] . '">' . $attributes['link'] . '</a></p>' . "\n";
 				} else {
 					$text = ($is_quote_share? '<hr />' : '') . $headline . '<blockquote>' . trim($content) . '</blockquote>' . "\n";
@@ -977,7 +977,7 @@ class BBCode extends BaseObject
 				break;
 			default:
 				// Transforms quoted tweets in rich attachments to avoid nested tweets
-				if (stripos(normalise_link($attributes['link']), 'http://twitter.com/') === 0 && OEmbed::isAllowedURL($attributes['link'])) {
+				if (stripos(Text::normaliseLink($attributes['link']), 'http://twitter.com/') === 0 && OEmbed::isAllowedURL($attributes['link'])) {
 					try {
 						$text = ($is_quote_share? '<br />' : '') . OEmbed::getHTML($attributes['link']);
 					} catch (Exception $e) {

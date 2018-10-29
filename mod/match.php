@@ -76,7 +76,7 @@ function match_content(App $a)
 			$id = 0;
 
 			foreach ($j->results as $jj) {
-				$match_nurl = normalise_link($jj->url);
+				$match_nurl = Text::normaliseLink($jj->url);
 				$match = q(
 					"SELECT `nurl` FROM `contact` WHERE `uid` = '%d' AND nurl='%s' LIMIT 1",
 					intval(local_user()),

@@ -22,10 +22,10 @@ class GProbe {
 
 		$r = q(
 			"SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
-			DBA::escape(normalise_link($url))
+			DBA::escape(Text::normaliseLink($url))
 		);
 
-		Text::logger("gprobe start for ".normalise_link($url), LOGGER_DEBUG);
+		Text::logger("gprobe start for ".Text::normaliseLink($url), LOGGER_DEBUG);
 
 		if (!DBA::isResult($r)) {
 			// Is it a DDoS attempt?
@@ -51,7 +51,7 @@ class GProbe {
 
 			$r = q(
 				"SELECT `id`, `url`, `network` FROM `gcontact` WHERE `nurl` = '%s' ORDER BY `id` LIMIT 1",
-				DBA::escape(normalise_link($url))
+				DBA::escape(Text::normaliseLink($url))
 			);
 		}
 		if (DBA::isResult($r)) {
@@ -61,7 +61,7 @@ class GProbe {
 			}
 		}
 
-		Text::logger("gprobe end for ".normalise_link($url), LOGGER_DEBUG);
+		Text::logger("gprobe end for ".Text::normaliseLink($url), LOGGER_DEBUG);
 		return;
 	}
 }

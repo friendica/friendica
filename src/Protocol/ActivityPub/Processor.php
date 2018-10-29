@@ -396,7 +396,7 @@ class Processor
 			return;
 		}
 
-		$contacts = DBA::select('contact', ['id'], ['nurl' => normalise_link($activity['object_id'])]);
+		$contacts = DBA::select('contact', ['id'], ['nurl' => Text::normaliseLink($activity['object_id'])]);
 		while ($contact = DBA::fetch($contacts)) {
 			Contact::remove($contact['id']);
 		}

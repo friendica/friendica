@@ -434,7 +434,7 @@ class Receiver
 
 				if (($receiver == self::PUBLIC_COLLECTION) && !empty($actor)) {
 					// This will most likely catch all OStatus connections to Mastodon
-					$condition = ['alias' => [$actor, normalise_link($actor)], 'rel' => [Contact::SHARING, Contact::FRIEND]
+					$condition = ['alias' => [$actor, Text::normaliseLink($actor)], 'rel' => [Contact::SHARING, Contact::FRIEND]
 						, 'archive' => false, 'pending' => false];
 					$contacts = DBA::select('contact', ['uid'], $condition);
 					while ($contact = DBA::fetch($contacts)) {
@@ -447,7 +447,7 @@ class Receiver
 
 				if (in_array($receiver, [$followers, self::PUBLIC_COLLECTION]) && !empty($actor)) {
 					$networks = [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS];
-					$condition = ['nurl' => normalise_link($actor), 'rel' => [Contact::SHARING, Contact::FRIEND],
+					$condition = ['nurl' => Text::normaliseLink($actor), 'rel' => [Contact::SHARING, Contact::FRIEND],
 						'network' => $networks, 'archive' => false, 'pending' => false];
 					$contacts = DBA::select('contact', ['uid'], $condition);
 					while ($contact = DBA::fetch($contacts)) {
@@ -459,7 +459,7 @@ class Receiver
 					continue;
 				}
 
-				$condition = ['self' => true, 'nurl' => normalise_link($receiver)];
+				$condition = ['self' => true, 'nurl' => Text::normaliseLink($receiver)];
 				$contact = DBA::selectFirst('contact', ['uid'], $condition);
 				if (!DBA::isResult($contact)) {
 					continue;
@@ -493,7 +493,7 @@ class Receiver
 		unset($profile['photo']);
 		unset($profile['baseurl']);
 
-		$profile['nurl'] = normalise_link($profile['url']);
+		$profile['nurl'] = Text::normaliseLink($profile['url']);
 		DBA::update('contact', $profile, ['id' => $cid]);
 
 		Contact::updateAvatar($photo, $uid, $cid);
@@ -518,12 +518,12 @@ class Receiver
 		}
 
 		foreach ($receivers as $receiver) {
-			$contact = DBA::selectFirst('contact', ['id'], ['uid' => $receiver, 'network' => Protocol::OSTATUS, 'nurl' => normalise_link($actor)]);
+			$contact = DBA::selectFirst('contact', ['id'], ['uid' => $receiver, 'network' => Protocol::OSTATUS, 'nurl' => Text::normaliseLink($actor)]);
 			if (DBA::isResult($contact)) {
 				self::switchContact($contact['id'], $receiver, $actor);
 			}
 
-			$contact = DBA::selectFirst('contact', ['id'], ['uid' => $receiver, 'network' => Protocol::OSTATUS, 'alias' => [normalise_link($actor), $actor]]);
+			$contact = DBA::selectFirst('contact', ['id'], ['uid' => $receiver, 'network' => Protocol::OSTATUS, 'alias' => [Text::normaliseLink($actor), $actor]]);
 			if (DBA::isResult($contact)) {
 				self::switchContact($contact['id'], $receiver, $actor);
 			}

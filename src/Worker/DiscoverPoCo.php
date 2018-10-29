@@ -80,7 +80,7 @@ class DiscoverPoCo
 				return;
 			}
 			$server_url = filter_var($server_url, FILTER_SANITIZE_URL);
-			if (substr(normalise_link($server_url), 0, 7) != "http://") {
+			if (substr(Text::normaliseLink($server_url), 0, 7) != "http://") {
 				return;
 			}
 			$result = "Checking server ".$server_url." - ";
@@ -162,7 +162,7 @@ class DiscoverPoCo
 			$urlparts = parse_url($user["url"]);
 			if (!isset($urlparts["scheme"])) {
 				DBA::update('gcontact', ['network' => Protocol::PHANTOM],
-					['nurl' => normalise_link($user["url"])]);
+					['nurl' => Text::normaliseLink($user["url"])]);
 				continue;
 			 }
 
@@ -170,7 +170,7 @@ class DiscoverPoCo
 				$networks = ["twitter.com" => Protocol::TWITTER, "identi.ca" => Protocol::PUMPIO];
 
 				DBA::update('gcontact', ['network' => $networks[$urlparts["host"]]],
-					['nurl' => normalise_link($user["url"])]);
+					['nurl' => Text::normaliseLink($user["url"])]);
 				continue;
 			}
 
@@ -179,7 +179,7 @@ class DiscoverPoCo
 
 			if ($user["server_url"] != "") {
 
-				$force_update = (normalise_link($user["server_url"]) != normalise_link($server_url));
+				$force_update = (Text::normaliseLink($user["server_url"]) != Text::normaliseLink($server_url));
 
 				$server_url = $user["server_url"];
 			}
@@ -193,7 +193,7 @@ class DiscoverPoCo
 				}
 			} else {
 				DBA::update('gcontact', ['last_failure' => DateTimeFormat::utcNow()],
-					['nurl' => normalise_link($user["url"])]);
+					['nurl' => Text::normaliseLink($user["url"])]);
 			}
 
 			// Quit the loop after 3 minutes
@@ -220,7 +220,7 @@ class DiscoverPoCo
 		if (!empty($j->results)) {
 			foreach ($j->results as $jj) {
 				// Check if the contact already exists
-				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", normalise_link($jj->url));
+				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", Text::normaliseLink($jj->url));
 				if (DBA::isResult($exists)) {
 					Text::logger("Profile ".$jj->url." already exists (".$search.")", LOGGER_DEBUG);
 

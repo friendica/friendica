@@ -11,7 +11,7 @@ function maintenance_content(App $a)
 {
 	$reason = Config::get('system', 'maintenance_reason');
 
-	if (substr(normalise_link($reason), 0, 7) == 'http://') {
+	if (substr(Text::normaliseLink($reason), 0, 7) == 'http://') {
 		header("HTTP/1.1 307 Temporary Redirect");
 		header("Location:".$reason);
 		return;

@@ -702,11 +702,11 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 		// Check for invalid profile urls. 13 should be the shortest possible profile length:
 		// http://a.bc/d
 		// Additionally check for invalid urls that would return the normalised value "http:"
-		if ((strlen($profile) >= 13) && (normalise_link($profile) != "http:")) {
+		if ((strlen($profile) >= 13) && (Text::normaliseLink($profile) != "http:")) {
 			if (!in_array($profile, $profiles2))
 				$profiles2[] = $profile;
 
-			$profile = normalise_link($profile);
+			$profile = Text::normaliseLink($profile);
 			if (!in_array($profile, $profiles2))
 				$profiles2[] = $profile;
 
@@ -760,7 +760,7 @@ function check_item_notification($itemid, $uid, $defaulttype = "") {
 
 			if (DBA::isResult($tags)) {
 				foreach ($tags AS $tag) {
-					$condition = ['nurl' => normalise_link($tag["url"]), 'uid' => $uid, 'notify_new_posts' => true];
+					$condition = ['nurl' => Text::normaliseLink($tag["url"]), 'uid' => $uid, 'notify_new_posts' => true];
 					$r = DBA::exists('contact', $condition);
 					if ($r) {
 						$send_notification = true;

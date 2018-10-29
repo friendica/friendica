@@ -1096,7 +1096,7 @@ class DFRN
 		}
 
 		foreach ($mentioned as $mention) {
-			$condition = ['uid' => $owner["uid"], 'nurl' => normalise_link($mention)];
+			$condition = ['uid' => $owner["uid"], 'nurl' => Text::normaliseLink($mention)];
 			$contact = DBA::selectFirst('contact', ['forum', 'prv'], $condition);
 
 			if (DBA::isResult($contact) && ($contact["forum"] || $contact["prv"])) {
@@ -1568,7 +1568,7 @@ class DFRN
 		$fields = ['id', 'uid', 'url', 'network', 'avatar-date', 'avatar', 'name-date', 'uri-date', 'addr',
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
 		$condition = ["`uid` = ? AND `nurl` = ? AND `network` != ?",
-			$importer["importer_uid"], normalise_link($author["link"]), Protocol::STATUSNET];
+			$importer["importer_uid"], Text::normaliseLink($author["link"]), Protocol::STATUSNET];
 		$contact_old = DBA::selectFirst('contact', $fields, $condition);
 
 		if (DBA::isResult($contact_old)) {
@@ -1959,7 +1959,7 @@ class DFRN
 		 *
 		 * @see https://github.com/friendica/friendica/pull/3254#discussion_r107315246
 		 */
-		$condition = ['name' => $suggest["name"], 'nurl' => normalise_link($suggest["url"]),
+		$condition = ['name' => $suggest["name"], 'nurl' => Text::normaliseLink($suggest["url"]),
 			'uid' => $suggest["uid"]];
 		if (DBA::exists('contact', $condition)) {
 			return false;
@@ -2099,18 +2099,18 @@ class DFRN
 		$relocate["server_url"] = preg_replace("=(https?://)(.*)/profile/(.*)=ism", "$1$2", $relocate["url"]);
 
 		$fields = ['name' => $relocate["name"], 'photo' => $relocate["avatar"],
-			'url' => $relocate["url"], 'nurl' => normalise_link($relocate["url"]),
+			'url' => $relocate["url"], 'nurl' => Text::normaliseLink($relocate["url"]),
 			'addr' => $relocate["addr"], 'connect' => $relocate["addr"],
 			'notify' => $relocate["notify"], 'server_url' => $relocate["server_url"]];
-		DBA::update('gcontact', $fields, ['nurl' => normalise_link($old["url"])]);
+		DBA::update('gcontact', $fields, ['nurl' => Text::normaliseLink($old["url"])]);
 
 		// Update the contact table. We try to find every entry.
 		$fields = ['name' => $relocate["name"], 'avatar' => $relocate["avatar"],
-			'url' => $relocate["url"], 'nurl' => normalise_link($relocate["url"]),
+			'url' => $relocate["url"], 'nurl' => Text::normaliseLink($relocate["url"]),
 			'addr' => $relocate["addr"], 'request' => $relocate["request"],
 			'confirm' => $relocate["confirm"], 'notify' => $relocate["notify"],
 			'poll' => $relocate["poll"], 'site-pubkey' => $relocate["sitepubkey"]];
-		$condition = ["(`id` = ?) OR (`nurl` = ?)", $importer["id"], normalise_link($old["url"])];
+		$condition = ["(`id` = ?) OR (`nurl` = ?)", $importer["id"], Text::normaliseLink($old["url"])];
 
 		DBA::update('contact', $fields, $condition);
 
@@ -2985,7 +2985,7 @@ class DFRN
 				return;
 			}
 			$baseurl = substr($baseurl, $domain_st + 3);
-			$nurl = normalise_link($baseurl);
+			$nurl = Text::normaliseLink($baseurl);
 
 			/// @todo Why is there a query for "url" *and* "nurl"? Especially this normalising is strange.
 			$r = q("SELECT `id` FROM `contact` WHERE `uid` = (SELECT `uid` FROM `user` WHERE `nickname` = '%s' LIMIT 1)
@@ -3078,13 +3078,13 @@ class DFRN
 		$community_page = ($user['page-flags'] == Contact::PAGE_COMMUNITY);
 		$prvgroup = ($user['page-flags'] == Contact::PAGE_PRVGROUP);
 
-		$link = normalise_link(System::baseUrl() . '/profile/' . $user['nickname']);
+		$link = Text::normaliseLink(System::baseUrl() . '/profile/' . $user['nickname']);
 
 		/*
 		 * Diaspora uses their own hardwired link URL in @-tags
 		 * instead of the one we supply with webfinger
 		 */
-		$dlink = normalise_link(System::baseUrl() . '/u/' . $user['nickname']);
+		$dlink = Text::normaliseLink(System::baseUrl() . '/u/' . $user['nickname']);
 
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {

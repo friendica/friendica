@@ -27,8 +27,8 @@ function unfollow_post(App $a)
 	$url = Text::noTags(trim(defaults($_REQUEST, 'url', '')));
 
 	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
-		$uid, Contact::SHARING, Contact::FRIEND, normalise_link($url),
-		normalise_link($url), $url];
+		$uid, Contact::SHARING, Contact::FRIEND, Text::normaliseLink($url),
+		Text::normaliseLink($url), $url];
 	$contact = DBA::selectFirst('contact', [], $condition);
 
 	if (!DBA::isResult($contact)) {
@@ -82,8 +82,8 @@ function unfollow_content(App $a)
 	$url = Text::noTags(trim($_REQUEST['url']));
 
 	$condition = ["`uid` = ? AND (`rel` = ? OR `rel` = ?) AND (`nurl` = ? OR `alias` = ? OR `alias` = ?)",
-		local_user(), Contact::SHARING, Contact::FRIEND, normalise_link($url),
-		normalise_link($url), $url];
+		local_user(), Contact::SHARING, Contact::FRIEND, Text::normaliseLink($url),
+		Text::normaliseLink($url), $url];
 
 	$contact = DBA::selectFirst('contact', ['url', 'network', 'addr', 'name'], $condition);
 

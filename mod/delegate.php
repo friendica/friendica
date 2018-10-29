@@ -72,7 +72,7 @@ function delegate_content(App $a)
 		if (DBA::isResult($user)) {
 			$condition = [
 				'uid' => local_user(),
-				'nurl' => normalise_link(System::baseUrl() . '/profile/' . $user['nickname'])
+				'nurl' => Text::normaliseLink(System::baseUrl() . '/profile/' . $user['nickname'])
 			];
 			if (DBA::exists('contact', $condition)) {
 				DBA::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
@@ -114,7 +114,7 @@ function delegate_content(App $a)
 		AND SUBSTRING_INDEX(`nurl`, '/', 3) = '%s'
 		AND `uid` = %d
 		AND `network` = '%s' ",
-		DBA::escape(normalise_link(System::baseUrl())),
+		DBA::escape(Text::normaliseLink(System::baseUrl())),
 		intval(local_user()),
 		DBA::escape(Protocol::DFRN)
 	);

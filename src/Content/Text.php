@@ -789,4 +789,31 @@ class Text
         return $ret;
     }
 
+    /**
+     * @brief Translate short days and months names.
+     *
+     * @param string $s String with short day or month name.
+     * @return string Translated string.
+     */
+    function dayShortTranslate($s) {
+        $ret = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            [L10n::t('Mon'), L10n::t('Tue'), L10n::t('Wed'), L10n::t('Thu'), L10n::t('Fri'), L10n::t('Sat'), L10n::t('Sun')],
+            $s);
+        $ret = str_replace(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov','Dec'],
+            [L10n::t('Jan'), L10n::t('Feb'), L10n::t('Mar'), L10n::t('Apr'), L10n::t('May'), ('Jun'), L10n::t('Jul'), L10n::t('Aug'), L10n::t('Sep'), L10n::t('Oct'), L10n::t('Nov'), L10n::t('Dec')],
+            $ret);
+        return $ret;
+    }
+
+    /**
+     * Normalize url
+     *
+     * @param string $url
+     * @return string
+     */
+    function normaliseLink($url) {
+        $ret = str_replace(['https:', '//www.'], ['http:', '//'], $url);
+        return rtrim($ret,'/');
+    }
+
 }

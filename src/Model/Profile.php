@@ -324,9 +324,9 @@ class Profile
 		// Is the local user already connected to that user?
 		if ($connect && local_user()) {
 			if (isset($profile['url'])) {
-				$profile_url = normalise_link($profile['url']);
+				$profile_url = Text::normaliseLink($profile['url']);
 			} else {
-				$profile_url = normalise_link(System::baseUrl() . '/profile/' . $profile['nickname']);
+				$profile_url = Text::normaliseLink(System::baseUrl() . '/profile/' . $profile['nickname']);
 			}
 
 			if (DBA::exists('contact', ['pending' => false, 'uid' => local_user(), 'nurl' => $profile_url])) {
@@ -368,7 +368,7 @@ class Profile
 				$r = q(
 					"SELECT `url` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND `rel` = %d",
 					intval($profile['uid']),
-					DBA::escape(normalise_link(self::getMyURL())),
+					DBA::escape(Text::normaliseLink(self::getMyURL())),
 					intval(Contact::FRIEND)
 				);
 			}

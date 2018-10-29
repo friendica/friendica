@@ -303,7 +303,7 @@ class Contact extends BaseModule
 			}
 		}
 
-		$fields['nurl'] = normalise_link($data['url']);
+		$fields['nurl'] = Text::normaliseLink($data['url']);
 
 		if (!empty($data['priority'])) {
 			$fields['priority'] = intval($data['priority']);

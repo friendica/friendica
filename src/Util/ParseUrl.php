@@ -49,7 +49,7 @@ class ParseUrl
 		}
 
 		$parsed_url = DBA::selectFirst('parsed_url', ['content'],
-			['url' => normalise_link($url), 'guessing' => !$no_guessing, 'oembed' => $do_oembed]
+			['url' => Text::normaliseLink($url), 'guessing' => !$no_guessing, 'oembed' => $do_oembed]
 		);
 		if (!empty($parsed_url['content'])) {
 			$data = unserialize($parsed_url['content']);
@@ -61,7 +61,7 @@ class ParseUrl
 		DBA::insert(
 			'parsed_url',
 			[
-				'url' => normalise_link($url), 'guessing' => !$no_guessing,
+				'url' => Text::normaliseLink($url), 'guessing' => !$no_guessing,
 				'oembed' => $do_oembed, 'content' => serialize($data),
 				'created' => DateTimeFormat::utcNow()
 			],

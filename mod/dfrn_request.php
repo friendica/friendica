@@ -86,7 +86,7 @@ function dfrn_request_post(App $a)
 				// Lookup the contact based on their URL (which is the only unique thing we have at the moment)
 				$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND NOT `self` LIMIT 1",
 					intval(local_user()),
-					DBA::escape(normalise_link($dfrn_url))
+					DBA::escape(Text::normaliseLink($dfrn_url))
 				);
 
 				if (DBA::isResult($r)) {
@@ -140,7 +140,7 @@ function dfrn_request_post(App $a)
 						intval(local_user()),
 						DateTimeFormat::utcNow(),
 						DBA::escape($dfrn_url),
-						DBA::escape(normalise_link($dfrn_url)),
+						DBA::escape(Text::normaliseLink($dfrn_url)),
 						$parms['addr'],
 						$parms['fn'],
 						$parms['nick'],
@@ -379,7 +379,7 @@ function dfrn_request_post(App $a)
 					intval($uid),
 					DBA::escape(DateTimeFormat::utcNow()),
 					$parms['url'],
-					DBA::escape(normalise_link($url)),
+					DBA::escape(Text::normaliseLink($url)),
 					$parms['addr'],
 					$parms['fn'],
 					$parms['nick'],
@@ -501,7 +501,7 @@ function dfrn_request_content(App $a)
 		$confirm_key = x($_GET, 'confirm_key') ? $_GET['confirm_key'] : "";
 
 		// Checking fastlane for validity
-		if (x($_SESSION, "fastlane") && (normalise_link($_SESSION["fastlane"]) == normalise_link($dfrn_url))) {
+		if (x($_SESSION, "fastlane") && (Text::normaliseLink($_SESSION["fastlane"]) == Text::normaliseLink($dfrn_url))) {
 			$_POST["dfrn_url"] = $dfrn_url;
 			$_POST["confirm_key"] = $confirm_key;
 			$_POST["localconfirm"] = 1;

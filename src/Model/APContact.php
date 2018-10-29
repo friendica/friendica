@@ -182,16 +182,16 @@ class APContact extends BaseObject
 
 		// Update some data in the contact table with various ways to catch them all
 		$contact_fields = ['name' => $apcontact['name'], 'about' => $apcontact['about']];
-		DBA::update('contact', $contact_fields, ['nurl' => normalise_link($url)]);
+		DBA::update('contact', $contact_fields, ['nurl' => Text::normaliseLink($url)]);
 
-		$contacts = DBA::select('contact', ['uid', 'id'], ['nurl' => normalise_link($url)]);
+		$contacts = DBA::select('contact', ['uid', 'id'], ['nurl' => Text::normaliseLink($url)]);
 		while ($contact = DBA::fetch($contacts)) {
 			Contact::updateAvatar($apcontact['photo'], $contact['uid'], $contact['id']);
 		}
 		DBA::close($contacts);
 
 		// Update the gcontact table
-		DBA::update('gcontact', $contact_fields, ['nurl' => normalise_link($url)]);
+		DBA::update('gcontact', $contact_fields, ['nurl' => Text::normaliseLink($url)]);
 
 		Text::logger('Updated profile for ' . $url, LOGGER_DEBUG);
 

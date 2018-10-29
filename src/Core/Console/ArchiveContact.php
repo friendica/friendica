@@ -3,6 +3,7 @@
 namespace Friendica\Core\Console;
 
 use Friendica\App;
+use Friendica\Content\Text;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use RuntimeException;
@@ -60,7 +61,7 @@ HELP;
 			throw new RuntimeException('Friendica isn\'t properly installed yet.');
 		}
 
-		$nurl = normalise_link($this->getArgument(0));
+		$nurl = Text::normaliseLink($this->getArgument(0));
 		if (!DBA::exists('contact', ['nurl' => $nurl, 'archive' => false])) {
 			throw new RuntimeException(L10n::t('Could not find any unarchived contact entry for this URL (%s)', $nurl));
 		}

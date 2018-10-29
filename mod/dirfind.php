@@ -53,7 +53,7 @@ function dirfind_content(App $a, $prefix = "") {
 		$search = substr($search,1);
 		$header = L10n::t('People Search - %s', $search);
 		if ((Text::validEmail($search) && Network::isEmailDomainValid($search)) ||
-			(substr(normalise_link($search), 0, 7) == "http://")) {
+			(substr(Text::normaliseLink($search), 0, 7) == "http://")) {
 			$user_data = Probe::uri($search);
 			$discover_user = (in_array($user_data["network"], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA]));
 		}

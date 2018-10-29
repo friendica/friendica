@@ -61,7 +61,7 @@ class OEmbed
 
 		$cache_key = 'oembed:' . $a->videowidth . ':' . $embedurl;
 
-		$condition = ['url' => normalise_link($embedurl), 'maxwidth' => $a->videowidth];
+		$condition = ['url' => Text::normaliseLink($embedurl), 'maxwidth' => $a->videowidth];
 		$oembed_record = DBA::selectFirst('oembed', ['content'], $condition);
 		if (DBA::isResult($oembed_record)) {
 			$json_string = $oembed_record['content'];
@@ -116,7 +116,7 @@ class OEmbed
 
 			if (!empty($oembed->type) && $oembed->type != 'error') {
 				DBA::insert('oembed', [
-					'url' => normalise_link($embedurl),
+					'url' => Text::normaliseLink($embedurl),
 					'maxwidth' => $a->videowidth,
 					'content' => $json_string,
 					'created' => DateTimeFormat::utcNow()

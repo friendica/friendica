@@ -68,8 +68,8 @@ function follow_content(App $a)
 	$r = q("SELECT `pending` FROM `contact` WHERE `uid` = %d AND ((`rel` != %d) OR (`network` = '%s')) AND
 		(`nurl` = '%s' OR `alias` = '%s' OR `alias` = '%s') AND
 		`network` != '%s' LIMIT 1",
-		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(Protocol::DFRN), DBA::escape(normalise_link($url)),
-		DBA::escape(normalise_link($url)), DBA::escape($url), DBA::escape(Protocol::STATUSNET));
+		intval(local_user()), DBA::escape(Contact::FOLLOWER), DBA::escape(Protocol::DFRN), DBA::escape(Text::normaliseLink($url)),
+		DBA::escape(Text::normaliseLink($url)), DBA::escape($url), DBA::escape(Protocol::STATUSNET));
 
 	if ($r) {
 		if ($r[0]['pending']) {
@@ -130,7 +130,7 @@ function follow_content(App $a)
 	$_SESSION['fastlane'] = $ret['url'];
 
 	$r = q("SELECT `id`, `location`, `about`, `keywords` FROM `gcontact` WHERE `nurl` = '%s'",
-		normalise_link($ret['url']));
+		Text::normaliseLink($ret['url']));
 
 	if (!$r) {
 		$r = [['location' => '', 'about' => '', 'keywords' => '']];

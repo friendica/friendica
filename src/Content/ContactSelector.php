@@ -4,6 +4,7 @@
  */
 namespace Friendica\Content;
 
+use Friendica\Content\Text;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -106,12 +107,12 @@ class ContactSelector
 			// Create the server url out of the profile url
 			$parts = parse_url($profile);
 			unset($parts['path']);
-			$server_url = [normalise_link(Network::unparseURL($parts))];
+			$server_url = [Text::normaliseLink(Network::unparseURL($parts))];
 
 			// Fetch the server url
-			$gcontact = DBA::selectFirst('gcontact', ['server_url'], ['nurl' => normalise_link($profile)]);
+			$gcontact = DBA::selectFirst('gcontact', ['server_url'], ['nurl' => Text::normaliseLink($profile)]);
 			if (!empty($gcontact) && !empty($gcontact['server_url'])) {
-				$server_url[] = normalise_link($gcontact['server_url']);
+				$server_url[] = Text::normaliseLink($gcontact['server_url']);
 			}
 
 			// Now query the GServer for the platform name

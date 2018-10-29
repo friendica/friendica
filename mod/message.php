@@ -218,7 +218,7 @@ function message_content(App $a)
 			if (!DBA::isResult($r)) {
 				$r = q("SELECT `name`, `url`, `id` FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' LIMIT 1",
 					intval(local_user()),
-					DBA::escape(normalise_link(base64_decode($a->argv[2])))
+					DBA::escape(Text::normaliseLink(base64_decode($a->argv[2])))
 				);
 			}
 

@@ -4,6 +4,7 @@ namespace Friendica\Util;
 
 use Friendica\BaseModule;
 use Friendica\BaseObject;
+use Friendica\Content\Text;
 use Friendica\Core\Config;
 use Friendica\Core\System;
 
@@ -76,7 +77,7 @@ class Proxy
 
 		// Only continue if it isn't a local image and the isn't deactivated
 		if (self::isLocalImage($url)) {
-			$url = str_replace(normalise_link(System::baseUrl()) . '/', System::baseUrl() . '/', $url);
+			$url = str_replace(Text::normaliseLink(System::baseUrl()) . '/', System::baseUrl() . '/', $url);
 			return $url;
 		}
 
@@ -140,7 +141,7 @@ class Proxy
 	 */
 	public static function proxifyHtml($html)
 	{
-		$html = str_replace(normalise_link(System::baseUrl()) . '/', System::baseUrl() . '/', $html);
+		$html = str_replace(Text::normaliseLink(System::baseUrl()) . '/', System::baseUrl() . '/', $html);
 
 		return preg_replace_callback('/(<img [^>]*src *= *["\'])([^"\']+)(["\'][^>]*>)/siU', 'self::replaceUrl', $html);
 	}
@@ -162,8 +163,8 @@ class Proxy
 		}
 
 		// links normalised - bug #431
-		$baseurl = normalise_link(System::baseUrl());
-		$url = normalise_link($url);
+		$baseurl = Text::normaliseLink(System::baseUrl());
+		$url = Text::normaliseLink($url);
 
 		return (substr($url, 0, strlen($baseurl)) == $baseurl);
 	}

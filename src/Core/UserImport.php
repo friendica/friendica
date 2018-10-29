@@ -119,8 +119,8 @@ class UserImport
 		$oldbaseurl = $account['baseurl'];
 		$newbaseurl = System::baseUrl();
 
-		$oldaddr = str_replace('http://', '@', normalise_link($oldbaseurl));
-		$newaddr = str_replace('http://', '@', normalise_link($newbaseurl));
+		$oldaddr = str_replace('http://', '@', Text::normaliseLink($oldbaseurl));
+		$newaddr = str_replace('http://', '@', Text::normaliseLink($newbaseurl));
 
 		if (!empty($account['profile']['addr'])) {
 			$old_handle = $account['profile']['addr'];

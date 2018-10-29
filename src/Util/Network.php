@@ -713,8 +713,8 @@ class Network
 			return "";
 		}
 
-		$url1 = normalise_link($url1);
-		$url2 = normalise_link($url2);
+		$url1 = Text::normaliseLink($url1);
+		$url2 = Text::normaliseLink($url2);
 
 		$parts1 = parse_url($url1);
 		$parts2 = parse_url($url2);
@@ -785,7 +785,7 @@ class Network
 
 		$match .= $path;
 
-		return normalise_link($match);
+		return Text::normaliseLink($match);
 	}
 
 	/**

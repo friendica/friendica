@@ -457,7 +457,7 @@ class Install
 		if (function_exists('curl_init')) {
 			$fetchResult = Network::fetchUrlFull($basepath . "/install/testrewrite");
 
-			$url = normalise_link($baseurl . "/install/testrewrite");
+			$url = Text::normaliseLink($baseurl . "/install/testrewrite");
 			if ($fetchResult->getBody() != "ok") {
 				$fetchResult = Network::fetchUrlFull($url);
 			}
