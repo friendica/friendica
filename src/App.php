@@ -2003,7 +2003,7 @@ class App
     * @param array $r key value pairs (search => replace)
     * @return string substituted string
     */
-    public function replaceMacros($s, $r)
+    public static function replaceMacros($s, $r)
     {
         $stamp1 = microtime(true);
 
@@ -2018,7 +2018,7 @@ class App
             killme();
         }
 
-        $this->saveTimestamp($stamp1, "rendering");
+        self::saveTimestamp($stamp1, "rendering");
 
         return $output;
 	}
@@ -2038,7 +2038,7 @@ class App
      * @param string $msg
      * @param int $level
      */
-    public function logger($msg, $level = LOGGER_INFO)
+    public static function logger($msg, $level = LOGGER_INFO)
     {
         global $LOGGER_LEVELS;
         $LOGGER_LEVELS = [];
@@ -2089,7 +2089,7 @@ class App
 
         $stamp1 = microtime(true);
         @file_put_contents($logfile, $logline, FILE_APPEND);
-        $this->saveTimestamp($stamp1, "file");
+        self::saveTimestamp($stamp1, "file");
     }
 
     /**
@@ -2110,7 +2110,7 @@ class App
      * @param string $msg
      * @param int $level
      */
-    public function dlogger($msg, $level = LOGGER_INFO)
+    public static function dlogger($msg, $level = LOGGER_INFO)
     {
         $logfile = Config::get('system', 'dlogfile');
         if (!$logfile) {
@@ -2148,6 +2148,6 @@ class App
 
         $stamp1 = microtime(true);
         @file_put_contents($logfile, $logline, FILE_APPEND);
-        $this->saveTimestamp($stamp1, "file");
+        self::saveTimestamp($stamp1, "file");
     }
 }
