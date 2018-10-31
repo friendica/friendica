@@ -2237,12 +2237,16 @@ function api_favorites_create_destroy($type)
 		throw new BadRequestException("Invalid item.");
 	}
 
-	switch ($action) {
+	// Coming from Twidere client, "starring" is akin to Liking a post or comment.
+	switch ($action)
+	{
 		case "create":
 			$item['starred'] = 1;
+			Item::performLike($itemid, 'like');
 			break;
 		case "destroy":
 			$item['starred'] = 0;
+			Item::performLike($itemid, 'unlike');
 			break;
 		default:
 			throw new BadRequestException("Invalid action ".$action);
