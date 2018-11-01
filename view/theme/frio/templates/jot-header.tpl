@@ -166,13 +166,6 @@
 		}
 	}
 
-	function jotGetLanguage() {
-		reply = prompt("{{$whatlang}}", $('#jot-language').val());
-		if(reply && reply.length) {
-			$('#jot-language').val(reply);
-		}
-	}
-
 	function jotShare(id) {
 		$.get('share/' + id, function(data) {
 			// remove the former content of the text input
