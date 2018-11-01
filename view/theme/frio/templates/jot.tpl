@@ -103,6 +103,14 @@
 						<!-- TODO: waiting for a better placement
 						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->
+						<li role="presentation"><label class="language">
+							<select class="language">
+								<option selected="selected"></option>
+								<option>DE</option>
+								<option>EN</option>
+								<option>FR</option>
+							</select>
+						</label></li>
 
 						<li role="presentation" class="pull-right"><button class="btn btn-primary" type="submit" id="profile-jot-submit" name="submit" ><i class="fa fa-slideshare fa-fw" aria-hidden="true"></i> {{$share}}</button></li>
 						<li role="presentation" id="character-counter" class="grey jothidden text-info pull-right"></li>

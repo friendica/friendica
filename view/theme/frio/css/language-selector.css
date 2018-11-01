@@ -1,0 +1,47 @@
+select.language {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+	-moz-focusring
+    appearance: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: #fff;
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+select.language option {
+    background-color: #fff;
+}
+select.language::-ms-expand {
+    display: none;
+}
+select.language:focus::-ms-value {
+    background-color: transparent;
+}
+label.language {
+    position:relative
+    display: block;
+    padding: 10px 11px;
+}
+label.language:after {
+    content:"\f024";   
+    font-family: "FontAwesome";
+    font-size: 14px;
+    color:#555;
+    right:20px;
+    padding:0 0 2px;
+    position:absolute;
+    pointer-events:none;
+}
+label.language:before {
+    content:'';
+    right:4px;
+    top:0px;
+    width:23px;
+    height:18px;
+    background:#fff;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
