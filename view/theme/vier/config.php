@@ -8,11 +8,12 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 
 function theme_content(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
@@ -20,7 +21,7 @@ function theme_content(App $a)
 		return;
 	}
 
-	$style = PConfig::get(local_user(), 'vier', 'style');
+	$style = PConfig::get(Session::user()->getUid(), 'vier', 'style');
 
 	if ($style == "") {
 		$style = Config::get('vier', 'style');
@@ -43,18 +44,20 @@ function theme_content(App $a)
 
 function theme_post(App $a)
 {
-	if (! local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
+	$uid = Session::user()->getUid();
+
 	if (isset($_POST['vier-settings-submit'])) {
-		PConfig::set(local_user(), 'vier', 'style', $_POST['vier_style']);
-		PConfig::set(local_user(), 'vier', 'show_pages', $_POST['vier_show_pages']);
-		PConfig::set(local_user(), 'vier', 'show_profiles', $_POST['vier_show_profiles']);
-		PConfig::set(local_user(), 'vier', 'show_helpers', $_POST['vier_show_helpers']);
-		PConfig::set(local_user(), 'vier', 'show_services', $_POST['vier_show_services']);
-		PConfig::set(local_user(), 'vier', 'show_friends', $_POST['vier_show_friends']);
-		PConfig::set(local_user(), 'vier', 'show_lastusers', $_POST['vier_show_lastusers']);
+		PConfig::set($uid, 'vier', 'style', $_POST['vier_style']);
+		PConfig::set($uid, 'vier', 'show_pages', $_POST['vier_show_pages']);
+		PConfig::set($uid, 'vier', 'show_profiles', $_POST['vier_show_profiles']);
+		PConfig::set($uid, 'vier', 'show_helpers', $_POST['vier_show_helpers']);
+		PConfig::set($uid, 'vier', 'show_services', $_POST['vier_show_services']);
+		PConfig::set($uid, 'vier', 'show_friends', $_POST['vier_show_friends']);
+		PConfig::set($uid, 'vier', 'show_lastusers', $_POST['vier_show_lastusers']);
 	}
 }
 
@@ -118,7 +121,7 @@ function vier_form(App $a, $style, $show_pages, $show_profiles, $show_helpers, $
 	$t = Renderer::getMarkupTemplate("theme_settings.tpl");
 	$o = Renderer::replaceMacros($t, [
 		'$submit' => L10n::t('Submit'),
-		'$baseurl' => System::baseUrl(),
+		'$baseurl' => $a->getBaseURL(),
 		'$title' => L10n::t("Theme settings"),
 		'$style' => ['vier_style', L10n::t('Set style'), $style, '', $styles],
 		'$show_pages' => ['vier_show_pages', L10n::t('Community Pages'), $show_pages, '', $show_or_not],

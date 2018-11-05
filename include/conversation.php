@@ -716,7 +716,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 			// Normal View
 			$page_template = Renderer::getMarkupTemplate("threaded_conversation.tpl");
 
-			$conv = new Thread($mode, $preview, $writable);
+			$conv = new Thread($a, $mode, $preview, $writable);
 
 			/*
 			 * get all the topmost parents
@@ -747,7 +747,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 				$item['pagedrop'] = $page_dropping;
 
 				if ($item['id'] == $item['parent']) {
-					$item_object = new Post($item);
+					$item_object = new Post($a, $item);
 					$conv->addParent($item_object);
 				}
 			}

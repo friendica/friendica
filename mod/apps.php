@@ -6,12 +6,13 @@ use Friendica\Content\Nav;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 
 function apps_content()
 {
 	$privateaddons = Config::get('config', 'private_addons');
 	if ($privateaddons === "1") {
-		if (! local_user()) {
+		if (!Session::user()->isLocal()) {
 			info(L10n::t('You must be logged in to use addons. '));
 			return;
 		};

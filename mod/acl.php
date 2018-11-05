@@ -8,6 +8,7 @@ use Friendica\Core\ACL;
 use Friendica\Core\Addon;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -17,7 +18,7 @@ require_once 'include/dba.php';
 
 function acl_content(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return '';
 	}
 
@@ -49,7 +50,7 @@ function acl_content(App $a)
 	$group_count = 0;
 	if ($type == '' || $type == 'g') {
 		$r = q("SELECT COUNT(*) AS g FROM `group` WHERE `deleted` = 0 AND `uid` = %d $sql_extra",
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		$group_count = (int) $r[0]['g'];
 	}
@@ -64,7 +65,7 @@ function acl_content(App $a)
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
 				AND `success_update` >= `failure_update`
 				AND `notify` != '' $sql_extra2",
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		$contact_count = (int) $r[0]['c'];
 	} elseif ($type == 'f') {
@@ -75,7 +76,7 @@ function acl_content(App $a)
 				AND (`forum` OR `prv`)
 				AND `success_update` >= `failure_update`
 				AND `notify` != '' $sql_extra2",
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		$contact_count = (int) $r[0]['c'];
 	} elseif ($type == 'm') {
@@ -85,7 +86,7 @@ function acl_content(App $a)
 				AND NOT `blocked` AND NOT `pending` AND NOT `archive`
 				AND `success_update` >= `failure_update`
 				AND `network` IN ('%s', '%s', '%s') $sql_extra2",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::ACTIVITYPUB),
 			DBA::escape(Protocol::DFRN),
 			DBA::escape(Protocol::DIASPORA)
@@ -96,7 +97,7 @@ function acl_content(App $a)
 		$r = q("SELECT COUNT(*) AS c FROM `contact`
 				WHERE `uid` = %d AND NOT `self`
 				AND NOT `pending` $sql_extra2",
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		$contact_count = (int) $r[0]['c'];
 	}
@@ -117,7 +118,7 @@ function acl_content(App $a)
 				GROUP BY `group`.`name`, `group`.`id`
 				ORDER BY `group`.`name`
 				LIMIT %d,%d",
-			intval(local_user()),
+			Session::user()->getUid(),
 			intval($start),
 			intval($count)
 		);
@@ -145,7 +146,7 @@ function acl_content(App $a)
 				AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s', '%s'))
 				$sql_extra2
 				ORDER BY `name` ASC ",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::OSTATUS),
 			DBA::escape(Protocol::STATUSNET)
 		);
@@ -155,7 +156,7 @@ function acl_content(App $a)
 				AND `success_update` >= `failure_update` AND NOT (`network` IN ('%s'))
 				$sql_extra2
 				ORDER BY `name` ASC ",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::STATUSNET)
 		);
 	} elseif ($type == 'f') {
@@ -165,7 +166,7 @@ function acl_content(App $a)
 				AND (`forum` OR `prv`)
 				$sql_extra2
 				ORDER BY `name` ASC ",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::STATUSNET)
 		);
 	} elseif ($type == 'm') {
@@ -174,7 +175,7 @@ function acl_content(App $a)
 				AND `success_update` >= `failure_update` AND `network` IN ('%s', '%s', '%s')
 				$sql_extra2
 				ORDER BY `name` ASC ",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::ACTIVITYPUB),
 			DBA::escape(Protocol::DFRN),
 			DBA::escape(Protocol::DIASPORA)
@@ -184,7 +185,7 @@ function acl_content(App $a)
 				WHERE `uid` = %d AND `pending` = 0 AND `success_update` >= `failure_update`
 				$sql_extra2
 				ORDER BY `name` ASC ",
-			intval(local_user())
+				Session::user()->getUid()
 		);
 	} elseif ($type == 'x') {
 		// autocomplete for global contact search (e.g. navbar search)

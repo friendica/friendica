@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Module\Login;
 
@@ -20,14 +21,14 @@ function bookmarklet_init()
 
 function bookmarklet_content(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		$o = '<h2>' . L10n::t('Login') . '</h2>';
 		$o .= Login::form($a->query_string, intval(Config::get('config', 'register_policy')) === REGISTER_CLOSED ? false : true);
 		return $o;
 	}
 
 	$referer = normalise_link(defaults($_SERVER, 'HTTP_REFERER', ''));
-	$page = normalise_link(System::baseUrl() . "/bookmarklet");
+	$page = normalise_link($a->getBaseURL() . "/bookmarklet");
 
 	if (!strstr($referer, $page)) {
 		if (empty($_REQUEST["url"])) {
@@ -46,7 +47,7 @@ function bookmarklet_content(App $a)
 			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
-			'profile_uid' => local_user(),
+			'profile_uid' => Session::user()->getUid(),
 			'title' => trim(defaults($_REQUEST, 'title', ''), "*"),
 			'content' => $content
 		];

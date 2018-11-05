@@ -11,6 +11,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -323,7 +324,7 @@ class Contact extends BaseObject
 				AND NOT `contact`.`pending`
 				ORDER BY `contact`.`name` ASC',
 				$gid,
-				local_user()
+				Session::user()->getUid()
 			);
 
 			if (DBA::isResult($stmt)) {
@@ -353,7 +354,7 @@ class Contact extends BaseObject
 				AND `contact`.`network` = ?
 				AND `contact`.`notify` != ""',
 				$gid,
-				local_user(),
+				Session::user()->getUid(),
 				Protocol::OSTATUS
 			);
 			$return = $contacts['count'];
@@ -370,6 +371,8 @@ class Contact extends BaseObject
 	 */
 	public static function createSelfFromUserId($uid)
 	{
+		$a = self::getApp();
+
 		// Only create the entry if it doesn't exist yet
 		if (DBA::exists('contact', ['uid' => $uid, 'self' => true])) {
 			return true;
@@ -386,19 +389,19 @@ class Contact extends BaseObject
 			'self'        => 1,
 			'name'        => $user['username'],
 			'nick'        => $user['nickname'],
-			'photo'       => System::baseUrl() . '/photo/profile/' . $user['uid'] . '.jpg',
-			'thumb'       => System::baseUrl() . '/photo/avatar/'  . $user['uid'] . '.jpg',
-			'micro'       => System::baseUrl() . '/photo/micro/'   . $user['uid'] . '.jpg',
+			'photo'       => $a->getBaseURL() . '/photo/profile/' . $user['uid'] . '.jpg',
+			'thumb'       => $a->getBaseURL() . '/photo/avatar/'  . $user['uid'] . '.jpg',
+			'micro'       => $a->getBaseURL() . '/photo/micro/'   . $user['uid'] . '.jpg',
 			'blocked'     => 0,
 			'pending'     => 0,
-			'url'         => System::baseUrl() . '/profile/' . $user['nickname'],
-			'nurl'        => normalise_link(System::baseUrl() . '/profile/' . $user['nickname']),
-			'addr'        => $user['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3),
-			'request'     => System::baseUrl() . '/dfrn_request/' . $user['nickname'],
-			'notify'      => System::baseUrl() . '/dfrn_notify/'  . $user['nickname'],
-			'poll'        => System::baseUrl() . '/dfrn_poll/'    . $user['nickname'],
-			'confirm'     => System::baseUrl() . '/dfrn_confirm/' . $user['nickname'],
-			'poco'        => System::baseUrl() . '/poco/'         . $user['nickname'],
+			'url'         => $a->getBaseURL() . '/profile/' . $user['nickname'],
+			'nurl'        => normalise_link($a->getBaseURL() . '/profile/' . $user['nickname']),
+			'addr'        => $user['nickname'] . '@' . substr($a->getBaseURL(), strpos($a->getBaseURL(), '://') + 3),
+			'request'     => $a->getBaseURL() . '/dfrn_request/' . $user['nickname'],
+			'notify'      => $a->getBaseURL() . '/dfrn_notify/'  . $user['nickname'],
+			'poll'        => $a->getBaseURL() . '/dfrn_poll/'    . $user['nickname'],
+			'confirm'     => $a->getBaseURL() . '/dfrn_confirm/' . $user['nickname'],
+			'poco'        => $a->getBaseURL() . '/poco/'         . $user['nickname'],
 			'name-date'   => DateTimeFormat::utcNow(),
 			'uri-date'    => DateTimeFormat::utcNow(),
 			'avatar-date' => DateTimeFormat::utcNow(),
@@ -416,6 +419,8 @@ class Contact extends BaseObject
 	 */
 	public static function updateSelfFromUserID($uid, $update_avatar = false)
 	{
+		$a = self::getApp();
+
 		$fields = ['id', 'name', 'nick', 'location', 'about', 'keywords', 'gender', 'avatar',
 			'xmpp', 'contact-type', 'forum', 'prv', 'avatar-date', 'nurl'];
 		$self = DBA::selectFirst('contact', $fields, ['uid' => $uid, 'self' => true]);
@@ -459,7 +464,7 @@ class Contact extends BaseObject
 			// We are adding a timestamp value so that other systems won't use cached content
 			$timestamp = strtotime($fields['avatar-date']);
 
-			$prefix = System::baseUrl() . '/photo/' .$avatar['resource-id'] . '-';
+			$prefix = $a->getBaseURL() . '/photo/' .$avatar['resource-id'] . '-';
 			$suffix = '.' . $file_suffix . '?ts=' . $timestamp;
 
 			$fields['photo'] = $prefix . '4' . $suffix;
@@ -467,23 +472,23 @@ class Contact extends BaseObject
 			$fields['micro'] = $prefix . '6' . $suffix;
 		} else {
 			// We hadn't found a photo entry, so we use the default avatar
-			$fields['photo'] = System::baseUrl() . '/images/person-300.jpg';
-			$fields['thumb'] = System::baseUrl() . '/images/person-80.jpg';
-			$fields['micro'] = System::baseUrl() . '/images/person-48.jpg';
+			$fields['photo'] = $a->getBaseURL() . '/images/person-300.jpg';
+			$fields['thumb'] = $a->getBaseURL() . '/images/person-80.jpg';
+			$fields['micro'] = $a->getBaseURL() . '/images/person-48.jpg';
 		}
 
 		$fields['forum'] = $user['page-flags'] == self::PAGE_COMMUNITY;
 		$fields['prv'] = $user['page-flags'] == self::PAGE_PRVGROUP;
 
 		// it seems as if ported accounts can have wrong values, so we make sure that now everything is fine.
-		$fields['url'] = System::baseUrl() . '/profile/' . $user['nickname'];
+		$fields['url'] = $a->getBaseURL() . '/profile/' . $user['nickname'];
 		$fields['nurl'] = normalise_link($fields['url']);
-		$fields['addr'] = $user['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3);
-		$fields['request'] = System::baseUrl() . '/dfrn_request/' . $user['nickname'];
-		$fields['notify'] = System::baseUrl() . '/dfrn_notify/'  . $user['nickname'];
-		$fields['poll'] = System::baseUrl() . '/dfrn_poll/'    . $user['nickname'];
-		$fields['confirm'] = System::baseUrl() . '/dfrn_confirm/' . $user['nickname'];
-		$fields['poco'] = System::baseUrl() . '/poco/'         . $user['nickname'];
+		$fields['addr'] = $user['nickname'] . '@' . substr($a->getBaseURL(), strpos($a->getBaseURL(), '://') + 3);
+		$fields['request'] = $a->getBaseURL() . '/dfrn_request/' . $user['nickname'];
+		$fields['notify'] = $a->getBaseURL() . '/dfrn_notify/'  . $user['nickname'];
+		$fields['poll'] = $a->getBaseURL() . '/dfrn_poll/'    . $user['nickname'];
+		$fields['confirm'] = $a->getBaseURL() . '/dfrn_confirm/' . $user['nickname'];
+		$fields['poco'] = $a->getBaseURL() . '/poco/'         . $user['nickname'];
 
 		$update = false;
 
@@ -501,8 +506,8 @@ class Contact extends BaseObject
 			DBA::update('contact', $fields, ['uid' => 0, 'nurl' => $self['nurl']]);
 
 			// Update the profile
-			$fields = ['photo' => System::baseUrl() . '/photo/profile/' .$uid . '.jpg',
-				'thumb' => System::baseUrl() . '/photo/avatar/' . $uid .'.jpg'];
+			$fields = ['photo' => $a->getBaseURL() . '/photo/profile/' .$uid . '.jpg',
+				'thumb' => $a->getBaseURL() . '/photo/avatar/' . $uid .'.jpg'];
 			DBA::update('profile', $fields, ['uid' => $uid, 'is-default' => true]);
 		}
 	}
@@ -678,7 +683,7 @@ class Contact extends BaseObject
 		}
 
 		if ($uid == -1) {
-			$uid = local_user();
+			$uid = Session::user()->getUid();
 		}
 
 		if (isset($cache[$url][$uid])) {
@@ -820,7 +825,7 @@ class Contact extends BaseObject
 		}
 
 		if ($uid == -1) {
-			$uid = local_user();
+			$uid = Session::user()->getUid();
 		}
 
 		// Fetch contact data from the contact table for the given user
@@ -868,7 +873,6 @@ class Contact extends BaseObject
 	 */
 	public static function photoMenu(array $contact, $uid = 0)
 	{
-		// @todo Unused, to be removed
 		$a = get_app();
 
 		$contact_url = '';
@@ -880,7 +884,7 @@ class Contact extends BaseObject
 		$poke_link = '';
 
 		if ($uid == 0) {
-			$uid = local_user();
+			$uid = Session::user()->getUid();
 		}
 
 		if (empty($contact['uid']) || ($contact['uid'] != $uid)) {
@@ -901,7 +905,7 @@ class Contact extends BaseObject
 		$sparkle = false;
 		if (($contact['network'] === Protocol::DFRN) && !$contact['self']) {
 			$sparkle = true;
-			$profile_link = System::baseUrl() . '/redir/' . $contact['id'];
+			$profile_link = $a->getBaseURL() . '/redir/' . $contact['id'];
 		} else {
 			$profile_link = $contact['url'];
 		}
@@ -917,19 +921,19 @@ class Contact extends BaseObject
 		}
 
 		if (in_array($contact['network'], [Protocol::DFRN, Protocol::DIASPORA]) && !$contact['self']) {
-			$pm_url = System::baseUrl() . '/message/new/' . $contact['id'];
+			$pm_url = $a->getBaseURL() . '/message/new/' . $contact['id'];
 		}
 
 		if (($contact['network'] == Protocol::DFRN) && !$contact['self']) {
-			$poke_link = System::baseUrl() . '/poke/?f=&c=' . $contact['id'];
+			$poke_link = $a->getBaseURL() . '/poke/?f=&c=' . $contact['id'];
 		}
 
-		$contact_url = System::baseUrl() . '/contact/' . $contact['id'];
+		$contact_url = $a->getBaseURL() . '/contact/' . $contact['id'];
 
-		$posts_link = System::baseUrl() . '/contact/' . $contact['id'] . '/conversations';
+		$posts_link = $a->getBaseURL() . '/contact/' . $contact['id'] . '/conversations';
 
 		if (!$contact['self']) {
-			$contact_drop_link = System::baseUrl() . '/contact/' . $contact['id'] . '/drop?confirm=1';
+			$contact_drop_link = $a->getBaseURL() . '/contact/' . $contact['id'] . '/drop?confirm=1';
 		}
 
 		/**
@@ -1341,10 +1345,10 @@ class Contact extends BaseObject
 
 		if ($thread_mode) {
 			$condition = ["`$contact_field` = ? AND `gravity` = ? AND " . $sql,
-				$cid, GRAVITY_PARENT, local_user()];
+				$cid, GRAVITY_PARENT, Session::user()->getUid()];
 		} else {
 			$condition = ["`$contact_field` = ? AND `gravity` IN (?, ?) AND " . $sql,
-				$cid, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
+				$cid, GRAVITY_PARENT, GRAVITY_COMMENT, Session::user()->getUid()];
 		}
 
 		$pager = new Pager($a->query_string);
@@ -1353,13 +1357,13 @@ class Contact extends BaseObject
 			'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 
 		if ($thread_mode) {
-			$r = Item::selectThreadForUser(local_user(), ['uri'], $condition, $params);
+			$r = Item::selectThreadForUser(Session::user()->getUid(), ['uri'], $condition, $params);
 
 			$items = Item::inArray($r);
 
 			$o = conversation($a, $items, $pager, 'contacts', $update);
 		} else {
-			$r = Item::selectForUser(local_user(), [], $condition, $params);
+			$r = Item::selectForUser(Session::user()->getUid(), [], $condition, $params);
 
 			$items = Item::inArray($r);
 

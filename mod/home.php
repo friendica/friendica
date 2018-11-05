@@ -7,6 +7,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Module\Login;
 
@@ -16,7 +17,7 @@ function home_init(App $a) {
 	$ret = [];
 	Addon::callHooks('home_init',$ret);
 
-	if (local_user() && ($a->user['nickname'])) {
+	if (Session::user()->isLocal() && ($a->user['nickname'])) {
 		$a->internalRedirect('network');
 	}
 

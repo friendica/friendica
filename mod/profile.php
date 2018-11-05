@@ -13,6 +13,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -47,7 +48,7 @@ function profile_init(App $a)
 	}
 
 	$profile = 0;
-	if (local_user() && $a->argc > 2 && $a->argv[2] === 'view') {
+	if (Session::user()->isLocal() && $a->argc > 2 && $a->argv[2] === 'view') {
 		$which = $a->user['nickname'];
 		$profile = htmlspecialchars($a->argv[1]);
 	} else {
@@ -66,8 +67,8 @@ function profile_init(App $a)
 
 	Profile::load($a, $which, $profile);
 
-	$blocked   = !local_user() && !remote_user() && Config::get('system', 'block_public');
-	$userblock = !local_user() && !remote_user() && $a->profile['hidewall'];
+	$blocked   = !Session::user()->isLoggedIn() && Config::get('system', 'block_public');
+	$userblock = !Session::user()->isLoggedIn() && $a->profile['hidewall'];
 
 	if (!empty($a->profile['page-flags']) && $a->profile['page-flags'] == Contact::PAGE_COMMUNITY) {
 		$a->page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
@@ -130,7 +131,7 @@ function profile_content(App $a, $update = 0)
 
 	$hashtags = defaults($_GET, 'tag', '');
 
-	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
+	if (Config::get('system', 'block_public') && Session::user()->isLoggedIn()) {
 		return Login::form();
 	}
 
@@ -145,7 +146,7 @@ function profile_content(App $a, $update = 0)
 	if ($update) {
 		// Ensure we've got a profile owner if updating.
 		$a->profile['profile_uid'] = $update;
-	} elseif ($a->profile['profile_uid'] == local_user()) {
+	} elseif (Session::user()->isLocal($a->profile['profile_uid'])) {
 		Nav::setSelected('home');
 	}
 
@@ -176,14 +177,14 @@ function profile_content(App $a, $update = 0)
 	}
 
 	if (!$remote_contact) {
-		if (local_user()) {
+		if (Session::user()->isLocal()) {
 			$contact_id = $_SESSION['cid'];
 			$contact = $a->contact;
 		}
 	}
 
-	$is_owner = local_user() == $a->profile['profile_uid'];
-	$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . remote_user();
+	$is_owner = Session::user()->isLocal($a->profile['profile_uid']);
+	$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . Session::user()->getUid() . ":" . Session::user()->getVisitorId();
 
 	if (!empty($a->profile['hidewall']) && !$is_owner && !$remote_contact) {
 		notice(L10n::t('Access to this profile has been restricted.') . EOL);
@@ -299,9 +300,9 @@ function profile_content(App $a, $update = 0)
 		//  check if we serve a mobile device and get the user settings
 		//  accordingly
 		if ($a->is_mobile) {
-			$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 10);
+			$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_mobile_network', 10);
 		} else {
-			$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 20);
+			$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_network', 20);
 		}
 
 		//  now that we have the user settings, see if the theme forces
@@ -340,14 +341,14 @@ function profile_content(App $a, $update = 0)
 	}
 
 	if ($is_owner) {
-		$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+		$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => Session::user()->getUid()]);
 		if ($unseen) {
 			$r = Item::update(['unseen' => false],
-					['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+					['wall' => true, 'unseen' => true, 'uid' => Session::user()->getUid()]);
 		}
 	}
 
-	$o .= conversation($a, $items, $pager, 'profile', $update, false, 'created', local_user());
+	$o .= conversation($a, $items, $pager, 'profile', $update, false, 'created', Session::user()->getUid());
 
 	if (!$update) {
 		$o .= $pager->renderMinimal(count($items));

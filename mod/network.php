@@ -19,6 +19,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -33,7 +34,7 @@ require_once 'include/items.php';
 
 function network_init(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
@@ -87,7 +88,7 @@ function network_init(App $a)
 		$sel_nets = defaults($_GET, 'nets', false);
 		$sel_tabs = network_query_get_sel_tab($a);
 		$sel_groups = network_query_get_sel_group($a);
-		$last_sel_tabs = PConfig::get(local_user(), 'network.view', 'tab.selected');
+		$last_sel_tabs = PConfig::get(Session::user()->getUid(), 'network.view', 'tab.selected');
 
 		$remember_tab = ($sel_tabs[0] === 'active' && is_array($last_sel_tabs) && $last_sel_tabs[0] !== 'active');
 
@@ -169,7 +170,7 @@ function network_init(App $a)
 
 function saved_searches($search)
 {
-	if (!Feature::isEnabled(local_user(), 'savedsearch')) {
+	if (!Feature::isEnabled(Session::user()->getUid(), 'savedsearch')) {
 		return '';
 	}
 
@@ -188,7 +189,7 @@ function saved_searches($search)
 
 	$o = '';
 
-	$terms = DBA::select('search', ['id', 'term'], ['uid' => local_user()]);
+	$terms = DBA::select('search', ['id', 'term'], ['uid' => Session::user()->getUid()]);
 	$saved = [];
 
 	while ($rr = DBA::fetch($terms)) {
@@ -280,8 +281,10 @@ function network_query_get_sel_group(App $a)
 /**
  * @brief Sets the pager data and returns SQL
  *
- * @param App $a The global App
+ * @param App     $a      The global App
+ * @param Pager   $pager  The Pager of the network page
  * @param integer $update Used for the automatic reloading
+ *
  * @return string SQL with the appropriate LIMIT clause
  */
 function networkPager(App $a, Pager $pager, $update)
@@ -294,10 +297,10 @@ function networkPager(App $a, Pager $pager, $update)
 	//  check if we serve a mobile device and get the user settings
 	//  accordingly
 	if ($a->is_mobile) {
-		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network');
+		$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_mobile_network');
 		$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
 	} else {
-		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network');
+		$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_network');
 		$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 40);
 	}
 
@@ -333,10 +336,13 @@ function networkSetSeen($condition)
 /**
  * @brief Create the conversation HTML
  *
- * @param App     $a      The global App
- * @param array   $items  Items of the conversation
- * @param string  $mode   Display mode for the conversation
- * @param integer $update Used for the automatic reloading
+ * @param App     $a        The global App
+ * @param array   $items    Items of the conversation
+ * @param Pager   $pager    The Pager of the network page
+ * @param string  $mode     Display mode for the conversation
+ * @param integer $update   Used for the automatic reloading
+ * @param string  $ordering The ordering of the conversation
+ *
  * @return string HTML of the conversation
  */
 function networkConversation(App $a, $items, Pager $pager, $mode, $update, $ordering = '')
@@ -347,7 +353,7 @@ function networkConversation(App $a, $items, Pager $pager, $mode, $update, $orde
 	$o = conversation($a, $items, $pager, $mode, $update, false, $ordering, local_user());
 
 	if (!$update) {
-		if (PConfig::get(local_user(), 'system', 'infinite_scroll')) {
+		if (PConfig::get(Session::user()->getUid(), 'system', 'infinite_scroll')) {
 			$o .= scroll_loader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));
@@ -359,7 +365,7 @@ function networkConversation(App $a, $items, Pager $pager, $mode, $update, $orde
 
 function network_content(App $a, $update = 0, $parent = 0)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return Login::form();
 	}
 
@@ -432,7 +438,7 @@ function networkFlatView(App $a, $update = 0)
 			'acl' => ACL::getFullSelectorHTML($a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
-			'profile_uid' => local_user(),
+			'profile_uid' => Session::user()->getUid(),
 			'content' => '',
 		];
 
@@ -451,7 +457,7 @@ function networkFlatView(App $a, $update = 0)
 
 	if (strlen($file)) {
 		$condition = ["`term` = ? AND `otype` = ? AND `type` = ? AND `uid` = ?",
-			$file, TERM_OBJ_POST, TERM_FILE, local_user()];
+			$file, TERM_OBJ_POST, TERM_FILE, Session::user()->getUid()];
 		$params = ['order' => ['tid' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 		$result = DBA::select('term', ['oid'], $condition);
 
@@ -461,16 +467,16 @@ function networkFlatView(App $a, $update = 0)
 		}
 		DBA::close($result);
 
-		$condition = ['uid' => local_user(), 'id' => $posts];
+		$condition = ['uid' => Session::user()->getUid(), 'id' => $posts];
 	} else {
-		$condition = ['uid' => local_user()];
+		$condition = ['uid' => Session::user()->getUid()];
 	}
 
 	$params = ['order' => ['id' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
-	$result = Item::selectForUser(local_user(), [], $condition, $params);
+	$result = Item::selectForUser(Session::user()->getUid(), [], $condition, $params);
 	$items = Item::inArray($result);
 
-	$condition = ['unseen' => true, 'uid' => local_user()];
+	$condition = ['unseen' => true, 'uid' => Session::user()->getUid()];
 	networkSetSeen($condition);
 
 	$o .= networkConversation($a, $items, $pager, 'network-new', $update);
@@ -543,7 +549,7 @@ function networkThreadedView(App $a, $update, $parent)
 	}
 
 	if ($nets) {
-		$r = DBA::select('contact', ['id'], ['uid' => local_user(), 'network' => $nets], ['self' => false]);
+		$r = DBA::select('contact', ['id'], ['uid' => Session::user()->getUid(), 'network' => $nets], ['self' => false]);
 
 		$str = '';
 		while ($rr = DBA::fetch($r)) {
@@ -594,7 +600,7 @@ function networkThreadedView(App $a, $update, $parent)
 			'acl' => ACL::getFullSelectorHTML($a->user, true, $default_permissions),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
-			'profile_uid' => local_user(),
+			'profile_uid' => Session::user()->getUid(),
 			'content' => $content,
 		];
 
@@ -625,7 +631,7 @@ function networkThreadedView(App $a, $update, $parent)
 	$sql_tag_nets = (($nets) ? sprintf(" AND `item`.`network` = '%s' ", DBA::escape($nets)) : '');
 
 	if ($gid) {
-		$group = DBA::selectFirst('group', ['name'], ['id' => $gid, 'uid' => local_user()]);
+		$group = DBA::selectFirst('group', ['name'], ['id' => $gid, 'uid' => Session::user()->getUid()]);
 		if (!DBA::isResult($group)) {
 			if ($update) {
 				killme();
@@ -641,7 +647,7 @@ function networkThreadedView(App $a, $update, $parent)
 			$contact_str_self = '';
 
 			$contact_str = implode(',', $contacts);
-			$self = DBA::selectFirst('contact', ['id'], ['uid' => local_user(), 'self' => true]);
+			$self = DBA::selectFirst('contact', ['id'], ['uid' => Session::user()->getUid(), 'self' => true]);
 			if (DBA::isResult($self)) {
 				$contact_str_self = $self['id'];
 			}
@@ -680,7 +686,7 @@ function networkThreadedView(App $a, $update, $parent)
 				'id' => 'network',
 			]) . $o;
 
-			if ($contact['network'] === Protocol::OSTATUS && $contact['writable'] && !PConfig::get(local_user(),'system','nowarn_insecure')) {
+			if ($contact['network'] === Protocol::OSTATUS && $contact['writable'] && !PConfig::get(Session::user()->getUid(),'system','nowarn_insecure')) {
 				notice(L10n::t('Private messages to this person are at risk of public disclosure.') . EOL);
 			}
 		} else {
@@ -798,8 +804,8 @@ function networkThreadedView(App $a, $update, $parent)
 			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
-			intval(local_user()),
-			intval(local_user())
+			Session::user()->getUid(),
+			Session::user()->getUid()
 		);
 	} else {
 		$r = q("SELECT `item`.`uri`, `thread`.`iid` AS `item_id`, $sql_order AS `order_date`
@@ -819,8 +825,8 @@ function networkThreadedView(App $a, $update, $parent)
 			intval(GRAVITY_PARENT),
 			intval(Contact::SHARING),
 			intval(Contact::FRIEND),
-			intval(local_user()),
-			intval(local_user())
+			Session::user()->getUid(),
+			Session::user()->getUid()
 		);
 	}
 
@@ -862,7 +868,7 @@ function networkThreadedView(App $a, $update, $parent)
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `item`.`author-id`
 			WHERE `item`.`uid` = 0 AND `item`.$ordering < ? AND `item`.$ordering > ?
 				AND NOT `author`.`hidden` AND NOT `author`.`blocked`" . $sql_tag_nets,
-			local_user(), TERM_OBJ_POST, TERM_HASHTAG,
+			Session::user()->getUid(), TERM_OBJ_POST, TERM_HASHTAG,
 			$top_limit, $bottom_limit);
 
 		$data = DBA::toArray($items);
@@ -873,7 +879,7 @@ function networkThreadedView(App $a, $update, $parent)
 				$_SESSION['network_last_date'] = $tag_top_limit;
 			}
 
-			Logger::log('Tagged items: ' . count($data) . ' - ' . $bottom_limit . ' - ' . $top_limit . ' - ' . local_user().' - '.(int)$update);
+			Logger::log('Tagged items: ' . count($data) . ' - ' . $bottom_limit . ' - ' . $top_limit . ' - ' . Session::user()->getUid() . ' - ' . (int)$update);
 			$s = [];
 			foreach ($r as $item) {
 				$s[$item['uri']] = $item;
@@ -881,7 +887,7 @@ function networkThreadedView(App $a, $update, $parent)
 			foreach ($data as $item) {
 				// Don't show hash tag posts from blocked or ignored contacts
 				$condition = ["`nurl` = ? AND `uid` = ? AND (`blocked` OR `readonly`)",
-					normalise_link($item['author-link']), local_user()];
+					normalise_link($item['author-link']), Session::user()->getUid()];
 				if (!DBA::exists('contact', $condition)) {
 					$s[$item['uri']] = $item;
 				}
@@ -925,10 +931,10 @@ function networkThreadedView(App $a, $update, $parent)
 	// at the top level network page just mark everything seen.
 
 	if (!$gid && !$cid && !$star) {
-		$condition = ['unseen' => true, 'uid' => local_user()];
+		$condition = ['unseen' => true, 'uid' => Session::user()->getUid()];
 		networkSetSeen($condition);
 	} elseif ($parents_str) {
-		$condition = ["`uid` = ? AND `unseen` AND `parent` IN (" . DBA::escape($parents_str) . ")", local_user()];
+		$condition = ["`uid` = ? AND `unseen` AND `parent` IN (" . DBA::escape($parents_str) . ")", Session::user()->getUid()];
 		networkSetSeen($condition);
 	}
 
@@ -979,7 +985,7 @@ function network_tabs(App $a)
 		],
 	];
 
-	if (Feature::isEnabled(local_user(), 'personal_tab')) {
+	if (Feature::isEnabled(Session::user()->getUid(), 'personal_tab')) {
 		$tabs[] = [
 			'label'	=> L10n::t('Personal'),
 			'url'	=> str_replace('/new', '', $cmd) . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : '/?f=') . '&conv=1',
@@ -990,7 +996,7 @@ function network_tabs(App $a)
 		];
 	}
 
-	if (Feature::isEnabled(local_user(), 'new_tab')) {
+	if (Feature::isEnabled(Session::user()->getUid(), 'new_tab')) {
 		$tabs[] = [
 			'label'	=> L10n::t('New'),
 			'url'	=> 'network/new' . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : ''),
@@ -1001,7 +1007,7 @@ function network_tabs(App $a)
 		];
 	}
 
-	if (Feature::isEnabled(local_user(), 'link_tab')) {
+	if (Feature::isEnabled(Session::user()->getUid(), 'link_tab')) {
 		$tabs[] = [
 			'label'	=> L10n::t('Shared Links'),
 			'url'	=> str_replace('/new', '', $cmd) . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : '/?f=') . '&bmark=1',
@@ -1012,7 +1018,7 @@ function network_tabs(App $a)
 		];
 	}
 
-	if (Feature::isEnabled(local_user(), 'star_posts')) {
+	if (Feature::isEnabled(Session::user()->getUid(), 'star_posts')) {
 		$tabs[] = [
 			'label'	=> L10n::t('Starred'),
 			'url'	=> str_replace('/new', '', $cmd) . ((x($_GET,'cid')) ? '/?f=&cid=' . $_GET['cid'] : '/?f=') . '&star=1',
@@ -1025,7 +1031,7 @@ function network_tabs(App $a)
 
 	// save selected tab, but only if not in file mode
 	if (!x($_GET, 'file')) {
-		PConfig::set(local_user(), 'network.view', 'tab.selected', [
+		PConfig::set(Session::user()->getUid(), 'network.view', 'tab.selected', [
 			$all_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active
 		]);
 	}
@@ -1056,7 +1062,7 @@ function network_infinite_scroll_head(App $a, &$htmlhead)
 	/// @TODO this will have to be converted to a static property of the converted Module\Network class
 	global $pager;
 
-	if (PConfig::get(local_user(), 'system', 'infinite_scroll')
+	if (PConfig::get(Session::user()->getUid(), 'system', 'infinite_scroll')
 		&& defaults($_GET, 'mode', '') != 'minimal'
 	) {
 		$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');

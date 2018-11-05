@@ -19,6 +19,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -2970,7 +2971,7 @@ class DFRN
 			return;
 		}
 
-		if (local_user()) {
+		if (Session::user()->isLocal()) {
 			// We need to find out if $contact_nick is a user on this hub, and if so, if I
 			// am a contact of that user. However, that user may have other contacts with the
 			// same nickname as me on other hubs or other networks. Exclude these by requiring

@@ -14,6 +14,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -34,7 +35,7 @@ class Contact extends BaseModule
 	{
 		$a = self::getApp();
 
-		if (!local_user()) {
+		if (!Session::user()->isLocal()) {
 			return;
 		}
 
@@ -53,7 +54,7 @@ class Contact extends BaseModule
 			|| $a->argc == 3 && intval($a->argv[1]) && in_array($a->argv[2], ['posts', 'conversations'])
 		) {
 			$contact_id = intval($a->argv[1]);
-			$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+			$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 
 			if (!DBA::isResult($contact)) {
 				$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => 0]);
@@ -125,7 +126,7 @@ class Contact extends BaseModule
 		$base = $a->getBaseURL();
 		$tpl = Renderer::getMarkupTemplate('contacts-head.tpl');
 		$a->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$baseurl' => System::baseUrl(true),
+			'$baseurl' => $a->getBaseURL(true),
 			'$base' => $base
 		]);
 	}
@@ -138,7 +139,7 @@ class Contact extends BaseModule
 
 		$contacts_id = $_POST['contact_batch'];
 
-		$stmt = DBA::select('contact', ['id', 'archive'], ['id' => $contacts_id, 'uid' => local_user(), 'self' => false]);
+		$stmt = DBA::select('contact', ['id', 'archive'], ['id' => $contacts_id, 'uid' => Session::user()->getUid(), 'self' => false]);
 		$orig_records = DBA::toArray($stmt);
 
 		$count_actions = 0;
@@ -177,7 +178,7 @@ class Contact extends BaseModule
 	{
 		$a = self::getApp();
 
-		if (!local_user()) {
+		if (!Session::user()->isLocal()) {
 			return;
 		}
 
@@ -191,7 +192,7 @@ class Contact extends BaseModule
 			return;
 		}
 
-		if (!DBA::exists('contact', ['id' => $contact_id, 'uid' => local_user()])) {
+		if (!DBA::exists('contact', ['id' => $contact_id, 'uid' => Session::user()->getUid()])) {
 			notice(L10n::t('Could not access contact record.') . EOL);
 			$a->internalRedirect('contact');
 			return; // NOTREACHED
@@ -201,7 +202,7 @@ class Contact extends BaseModule
 
 		$profile_id = intval(defaults($_POST, 'profile-assign', 0));
 		if ($profile_id) {
-			if (!DBA::exists('profile', ['id' => $profile_id, 'uid' => local_user()])) {
+			if (!DBA::exists('profile', ['id' => $profile_id, 'uid' => Session::user()->getUid()])) {
 				notice(L10n::t('Could not locate selected profile.') . EOL);
 				return;
 			}
@@ -230,7 +231,7 @@ class Contact extends BaseModule
 			'notify_new_posts' => $notify,
 			'fetch_further_information' => $fetch_further_information,
 			'ffi_keyword_blacklist'     => $ffi_keyword_blacklist],
-			['id' => $contact_id, 'uid' => local_user()]
+			['id' => $contact_id, 'uid' => Session::user()->getUid()]
 		);
 
 		if (DBA::isResult($r)) {
@@ -239,7 +240,7 @@ class Contact extends BaseModule
 			notice(L10n::t('Failed to update contact record.') . EOL);
 		}
 
-		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 		if (DBA::isResult($contact)) {
 			$a->data['contact'] = $contact;
 		}
@@ -251,7 +252,7 @@ class Contact extends BaseModule
 
 	private static function updateContactFromPoll($contact_id)
 	{
-		$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 		if (!DBA::isResult($contact)) {
 			return;
 		}
@@ -272,7 +273,7 @@ class Contact extends BaseModule
 
 	private static function updateContactFromProbe($contact_id)
 	{
-		$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user()]);
+		$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 		if (!DBA::isResult($contact)) {
 			return;
 		}
@@ -313,10 +314,10 @@ class Contact extends BaseModule
 			return;
 		}
 
-		$r = DBA::update('contact', $fields, ['id' => $contact_id, 'uid' => local_user()]);
+		$r = DBA::update('contact', $fields, ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 
 		// Update the entry in the contact table
-		Model\Contact::updateAvatar($data['photo'], local_user(), $contact_id, true);
+		Model\Contact::updateAvatar($data['photo'], Session::user()->getUid(), $contact_id, true);
 
 		// Update the entry in the gcontact table
 		Model\GContact::updateFromProbe($data['url']);
@@ -324,27 +325,27 @@ class Contact extends BaseModule
 
 	private static function blockContact($contact_id)
 	{
-		$blocked = !Model\Contact::isBlockedByUser($contact_id, local_user());
-		Model\Contact::setBlockedForUser($contact_id, local_user(), $blocked);
+		$blocked = !Model\Contact::isBlockedByUser($contact_id, Session::user()->getUid());
+		Model\Contact::setBlockedForUser($contact_id, Session::user()->getUid(), $blocked);
 	}
 
 	private static function ignoreContact($contact_id)
 	{
-		$ignored = !Model\Contact::isIgnoredByUser($contact_id, local_user());
-		Model\Contact::setIgnoredForUser($contact_id, local_user(), $ignored);
+		$ignored = !Model\Contact::isIgnoredByUser($contact_id, Session::user()->getUid());
+		Model\Contact::setIgnoredForUser($contact_id, Session::user()->getUid(), $ignored);
 	}
 
 	private static function archiveContact($contact_id, $orig_record)
 	{
 		$archived = (defaults($orig_record, 'archive', '') ? 0 : 1);
-		$r = DBA::update('contact', ['archive' => $archived], ['id' => $contact_id, 'uid' => local_user()]);
+		$r = DBA::update('contact', ['archive' => $archived], ['id' => $contact_id, 'uid' => Session::user()->getUid()]);
 
 		return DBA::isResult($r);
 	}
 
 	private static function dropContact($orig_record)
 	{
-		$owner = Model\User::getOwnerDataById(local_user());
+		$owner = Model\User::getOwnerDataById(Session::user()->getUid());
 		if (!DBA::isResult($owner)) {
 			return;
 		}
@@ -360,7 +361,7 @@ class Contact extends BaseModule
 		$o = '';
 		Nav::setSelected('contact');
 
-		if (!local_user()) {
+		if (!Session::user()->isLocal()) {
 			notice(L10n::t('Permission denied.') . EOL);
 			return Login::form();
 		}
@@ -373,7 +374,7 @@ class Contact extends BaseModule
 
 			$cmd = $a->argv[2];
 
-			$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => [0, local_user()], 'self' => false]);
+			$orig_record = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => [0, Session::user()->getUid()], 'self' => false]);
 			if (!DBA::isResult($orig_record)) {
 				notice(L10n::t('Could not access contact record.') . EOL);
 				$a->internalRedirect('contact');
@@ -395,7 +396,7 @@ class Contact extends BaseModule
 			if ($cmd === 'block') {
 				self::blockContact($contact_id);
 
-				$blocked = Model\Contact::isBlockedByUser($contact_id, local_user());
+				$blocked = Model\Contact::isBlockedByUser($contact_id, Session::user()->getUid());
 				info(($blocked ? L10n::t('Contact has been blocked') : L10n::t('Contact has been unblocked')) . EOL);
 
 				$a->internalRedirect('contact/' . $contact_id);
@@ -405,7 +406,7 @@ class Contact extends BaseModule
 			if ($cmd === 'ignore') {
 				self::ignoreContact($contact_id);
 
-				$ignored = Model\Contact::isIgnoredByUser($contact_id, local_user());
+				$ignored = Model\Contact::isIgnoredByUser($contact_id, Session::user()->getUid());
 				info(($ignored ? L10n::t('Contact has been ignored') : L10n::t('Contact has been unignored')) . EOL);
 
 				$a->internalRedirect('contact/' . $contact_id);
@@ -480,8 +481,8 @@ class Contact extends BaseModule
 				'$baseurl' => $a->getBaseURL(true),
 			]);
 
-			$contact['blocked']  = Model\Contact::isBlockedByUser($contact['id'], local_user());
-			$contact['readonly'] = Model\Contact::isIgnoredByUser($contact['id'], local_user());
+			$contact['blocked']  = Model\Contact::isBlockedByUser($contact['id'], Session::user()->getUid());
+			$contact['readonly'] = Model\Contact::isIgnoredByUser($contact['id'], Session::user()->getUid());
 
 			$dir_icon = '';
 			$relation_text = '';
@@ -603,7 +604,7 @@ class Contact extends BaseModule
 				'$lbl_info2'      => L10n::t('Their personal note'),
 				'$reason'         => trim(notags($contact['reason'])),
 				'$infedit'        => L10n::t('Edit contact notes'),
-				'$common_link'    => 'common/loc/' . local_user() . '/' . $contact['id'],
+				'$common_link'    => 'common/loc/' . Session::user()->getUid() . '/' . $contact['id'],
 				'$relation_text'  => $relation_text,
 				'$visit'          => L10n::t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
 				'$blockunblock'   => L10n::t('Block/Unblock contact'),
@@ -777,7 +778,7 @@ class Contact extends BaseModule
 
 		$r = q("SELECT COUNT(*) AS `total` FROM `contact`
 			WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 ",
-			intval($_SESSION['uid'])
+			Session::user()->getUid()
 		);
 		if (DBA::isResult($r)) {
 			$total = $r[0]['total'];
@@ -789,21 +790,21 @@ class Contact extends BaseModule
 		$contacts = [];
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `self` = 0 AND `pending` = 0 $sql_extra $sql_extra2 $sql_extra3 ORDER BY `name` ASC LIMIT %d , %d ",
-			intval($_SESSION['uid']),
+			Session::user()->getUid(),
 			$pager->getStart(),
 			$pager->getItemsPerPage()
 		);
 		if (DBA::isResult($r)) {
 			foreach ($r as $rr) {
-				$rr['blocked'] = Model\Contact::isBlockedByUser($rr['id'], local_user());
-				$rr['readonly'] = Model\Contact::isIgnoredByUser($rr['id'], local_user());
+				$rr['blocked'] = Model\Contact::isBlockedByUser($rr['id'], Session::user()->getUid());
+				$rr['readonly'] = Model\Contact::isIgnoredByUser($rr['id'], Session::user()->getUid());
 				$contacts[] = self::getContactTemplateVars($rr);
 			}
 		}
 
 		$tpl = Renderer::getMarkupTemplate('contacts-template.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$baseurl'    => System::baseUrl(),
+			'$baseurl'    => $a->getBaseURL(),
 			'$header'     => L10n::t('Contacts') . (($nets) ? ' - ' . ContactSelector::networkToName($nets) : ''),
 			'$tabs'       => $t,
 			'$total'      => $total,
@@ -872,7 +873,7 @@ class Contact extends BaseModule
 		];
 
 		// Show this tab only if there is visible friend list
-		$x = Model\GContact::countAllFriends(local_user(), $contact['id']);
+		$x = Model\GContact::countAllFriends(Session::user()->getUid(), $contact['id']);
 		if ($x) {
 			$tabs[] = ['label' => L10n::t('Contacts'),
 				'url'   => "allfriends/" . $contact['id'],
@@ -883,10 +884,10 @@ class Contact extends BaseModule
 		}
 
 		// Show this tab only if there is visible common friend list
-		$common = Model\GContact::countCommonFriends(local_user(), $contact['id']);
+		$common = Model\GContact::countCommonFriends(Session::user()->getUid(), $contact['id']);
 		if ($common) {
 			$tabs[] = ['label' => L10n::t('Common Friends'),
-				'url'   => "common/loc/" . local_user() . "/" . $contact['id'],
+				'url'   => "common/loc/" . Session::user()->getUid() . "/" . $contact['id'],
 				'sel'   => (($active_tab == 5) ? 'active' : ''),
 				'title' => L10n::t('View all common friends'),
 				'id'    => 'common-loc-tab',
@@ -916,7 +917,7 @@ class Contact extends BaseModule
 
 		if (!$update) {
 			// We need the editor here to be able to reshare an item.
-			if (local_user()) {
+			if (Session::user()->isLocal()) {
 				$x = [
 					'is_owner' => true,
 					'allow_location' => $a->user['allow_location'],
@@ -926,7 +927,7 @@ class Contact extends BaseModule
 					'acl' => ACL::getFullSelectorHTML($a->user, true),
 					'bang' => '',
 					'visitor' => 'block',
-					'profile_uid' => local_user(),
+					'profile_uid' => Session::user()->getUid(),
 				];
 				$o = status_editor($a, $x, 0, true);
 			}
@@ -943,7 +944,7 @@ class Contact extends BaseModule
 
 			$profiledata = Model\Contact::getDetailsByURL($contact['url']);
 
-			if (local_user() && in_array($profiledata['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
+			if (Session::user()->isLocal() && in_array($profiledata['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
 				$profiledata['remoteconnect'] = System::baseUrl() . '/follow?url=' . urlencode($profiledata['url']);
 			}
 
@@ -954,7 +955,7 @@ class Contact extends BaseModule
 		return $o;
 	}
 
-	private static function getPostsHTML($a, $contact_id)
+	private static function getPostsHTML(App $a, $contact_id)
 	{
 		$contact = DBA::selectFirst('contact', ['uid', 'url', 'id'], ['id' => $contact_id]);
 
@@ -965,8 +966,8 @@ class Contact extends BaseModule
 
 			$profiledata = Model\Contact::getDetailsByURL($contact['url']);
 
-			if (local_user() && in_array($profiledata['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
-				$profiledata['remoteconnect'] = System::baseUrl() . '/follow?url=' . urlencode($profiledata['url']);
+			if (Session::user()->isLocal() && in_array($profiledata['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS])) {
+				$profiledata['remoteconnect'] = $a->getBaseURL() . '/follow?url=' . urlencode($profiledata['url']);
 			}
 
 			Model\Profile::load($a, '', 0, $profiledata, true);

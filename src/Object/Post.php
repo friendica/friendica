@@ -4,7 +4,7 @@
  */
 namespace Friendica\Object;
 
-use Friendica\BaseObject;
+use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Core\Addon;
@@ -14,6 +14,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
@@ -31,7 +32,7 @@ require_once 'include/conversation.php';
 /**
  * An item
  */
-class Post extends BaseObject
+class Post
 {
 	private $data = [];
 	private $template = null;
@@ -44,6 +45,9 @@ class Post extends BaseObject
 	private $writable = false;
 	private $children = [];
 	private $parent = null;
+	/**
+	 * @var Thread current thread
+	 */
 	private $thread = null;
 	private $redirect_url = null;
 	private $owner_url = '';
@@ -54,13 +58,19 @@ class Post extends BaseObject
 	private $visiting = false;
 
 	/**
+	 * @var App The global App
+	 */
+	private $app;
+
+	/**
 	 * Constructor
 	 *
+	 * @param App   $app  The global App
 	 * @param array $data data array
 	 */
-	public function __construct(array $data)
+	public function __construct(App $app, array $data)
 	{
-		$a = self::getApp();
+		$this->app = $app;
 
 		$this->data = $data;
 		$this->setTemplate('wall');
@@ -100,7 +110,7 @@ class Post extends BaseObject
 				}
 
 				$item['pagedrop'] = $data['pagedrop'];
-				$child = new Post($item);
+				$child = new Post($this->app, $item);
 				$this->addChild($child);
 			}
 		}
@@ -118,8 +128,6 @@ class Post extends BaseObject
 	public function getTemplateData($conv_responses, $thread_level = 1)
 	{
 		$result = [];
-
-		$a = self::getApp();
 
 		$item = $this->getData();
 		$edited = false;
@@ -156,7 +164,7 @@ class Post extends BaseObject
 
 		$shareable = in_array($conv->getProfileOwner(), [0, local_user()]) && $item['private'] != 1;
 
-		if (local_user() && link_compare($a->contact['url'], $item['author-link'])) {
+		if (local_user() && link_compare($this->app->contact['url'], $item['author-link'])) {
 			if ($item["event-id"] != 0) {
 				$edpost = ["events/event/" . $item['event-id'], L10n::t("Edit")];
 			} else {
@@ -174,7 +182,7 @@ class Post extends BaseObject
 			$edpost = false;
 		}
 
-		if (($this->getDataValue('uid') == local_user()) || $this->isVisiting()) {
+		if (Session::user()->isLocal($this->getDataValue('uid')) || $this->isVisiting()) {
 			$dropping = true;
 		}
 
@@ -199,7 +207,7 @@ class Post extends BaseObject
 			'delete'   => $delete,
 		];
 
-		if (!local_user() || ($item['uid'] == 0)) {
+		if (!Session::user()->isLocal() || ($item['uid'] == 0)) {
 			$drop = false;
 		}
 
@@ -213,7 +221,7 @@ class Post extends BaseObject
 		$author = ['uid' => 0, 'id' => $item['author-id'],
 			'network' => $item['author-network'], 'url' => $item['author-link']];
 
-		if (local_user() || remote_user()) {
+		if (Session::user()->isLocal() || remote_user()) {
 			$profile_link = Contact::magicLinkbyContact($author);
 		} else {
 			$profile_link = $item['author-link'];
@@ -377,7 +385,7 @@ class Post extends BaseObject
 			'profile_url'     => $profile_link,
 			'item_photo_menu' => item_photo_menu($item),
 			'name'            => $name_e,
-			'thumb'           => $a->removeBaseURL(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
+			'thumb'           => $this->app->appremoveBaseURL(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
 			'title'           => $title_e,
@@ -390,7 +398,7 @@ class Post extends BaseObject
 			'indent'          => $indent,
 			'shiny'           => $shiny,
 			'owner_url'       => $this->getOwnerUrl(),
-			'owner_photo'     => $a->removeBaseURL(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
+			'owner_photo'     => $this->app->appremoveBaseURL(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'owner_name'      => htmlentities($owner_name_e),
 			'plink'           => get_plink($item),
 			'edpost'          => Feature::isEnabled($conv->getProfileOwner(), 'edit_posts') ? $edpost : '',
@@ -415,7 +423,7 @@ class Post extends BaseObject
 			'received'        => $item['received'],
 			'commented'       => $item['commented'],
 			'created_date'    => $item['created'],
-			'return'          => ($a->cmd) ? bin2hex($a->cmd) : '',
+			'return'          => ($this->app->cmd) ? bin2hex($this->app->cmd) : '',
 		];
 
 		$arr = ['item' => $item, 'output' => $tmp_item];
@@ -759,8 +767,6 @@ class Post extends BaseObject
 	 */
 	private function getCommentBox($indent)
 	{
-		$a = self::getApp();
-
 		$comment_box = '';
 		$conv = $this->getThread();
 		$ww = '';
@@ -790,7 +796,7 @@ class Post extends BaseObject
 
 			$template = Renderer::getMarkupTemplate($this->getCommentBoxTemplate());
 			$comment_box = Renderer::replaceMacros($template, [
-				'$return_path' => $a->query_string,
+				'$return_path' => $this->app->query_string,
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',
 				'$wall'        => ($conv->getMode() === 'profile'),
@@ -798,9 +804,9 @@ class Post extends BaseObject
 				'$parent'      => $this->getId(),
 				'$qcomment'    => $qcomment,
 				'$profile_uid' => $uid,
-				'$mylink'      => $a->removeBaseURL($a->contact['url']),
+				'$mylink'      => $this->app->removeBaseURL($this->app->contact['url']),
 				'$mytitle'     => L10n::t('This is you'),
-				'$myphoto'     => $a->removeBaseURL($a->contact['thumb']),
+				'$myphoto'     => $this->app->removeBaseURL($this->app->contact['thumb']),
 				'$comment'     => L10n::t('Comment'),
 				'$submit'      => L10n::t('Submit'),
 				'$edbold'      => L10n::t('Bold'),
@@ -814,7 +820,7 @@ class Post extends BaseObject
 				'$prompttext'  => L10n::t('Please enter a image/video/audio/webpage URL:'),
 				'$preview'     => ((Feature::isEnabled($conv->getProfileOwner(), 'preview')) ? L10n::t('Preview') : ''),
 				'$indent'      => $indent,
-				'$sourceapp'   => L10n::t($a->sourcename),
+				'$sourceapp'   => L10n::t($this->app->sourcename),
 				'$ww'          => $conv->getMode() === 'network' ? $ww : '',
 				'$rand_num'    => Crypto::randomDigits(12)
 			]);
@@ -838,7 +844,6 @@ class Post extends BaseObject
 	 */
 	protected function checkWallToWall()
 	{
-		$a = self::getApp();
 		$conv = $this->getThread();
 		$this->wall_to_wall = false;
 
@@ -846,12 +851,12 @@ class Post extends BaseObject
 			if ($conv->getMode() !== 'profile') {
 				if ($this->getDataValue('wall') && !$this->getDataValue('self')) {
 					// On the network page, I am the owner. On the display page it will be the profile owner.
-					// This will have been stored in $a->page_contact by our calling page.
+					// This will have been stored in $this->app->page_contact by our calling page.
 					// Put this person as the wall owner of the wall-to-wall notice.
 
-					$this->owner_url = Contact::magicLink($a->page_contact['url']);
-					$this->owner_photo = $a->page_contact['thumb'];
-					$this->owner_name = $a->page_contact['name'];
+					$this->owner_url = Contact::magicLink($this->app->page_contact['url']);
+					$this->owner_photo = $this->app->page_contact['thumb'];
+					$this->owner_name = $this->app->page_contact['name'];
 					$this->wall_to_wall = true;
 				} elseif ($this->getDataValue('owner-link')) {
 					$owner_linkmatch = (($this->getDataValue('owner-link')) && link_compare($this->getDataValue('owner-link'), $this->getDataValue('author-link')));

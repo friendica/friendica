@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Module\Login;
 
@@ -33,12 +33,12 @@ function oauth_get_client($request)
 
 function api_post(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
 
-	if (count($a->user) && x($a->user, 'uid') && $a->user['uid'] != local_user()) {
+	if (count($a->user) && x($a->user, 'uid') && !Session::user()->isLocal($a->user['uid'])) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
@@ -69,8 +69,8 @@ function api_content(App $a)
 			}
 			$consumer = new OAuthConsumer($app['client_id'], $app['pw'], $app['redirect_uri']);
 
-			$verifier = md5($app['secret'] . local_user());
-			Config::set("oauth", $verifier, local_user());
+			$verifier = md5($app['secret'] . Session::user()->getUid());
+			Config::set("oauth", $verifier, Session::user()->getUid());
 
 			if ($consumer->callback_url != null) {
 				$params = $request->get_parameters();
@@ -92,7 +92,7 @@ function api_content(App $a)
 			return $o;
 		}
 
-		if (!local_user()) {
+		if (!Session::user()->isLocal()) {
 			/// @TODO We need login form to redirect to this page
 			notice(L10n::t('Please login to continue.') . EOL);
 			return Login::form($a->query_string, false, $request->get_parameters());

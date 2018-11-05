@@ -8,15 +8,16 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 
 function theme_content(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
-	$colorset = PConfig::get(local_user(), 'duepuntozero', 'colorset');
+	$colorset = PConfig::get(Session::user()->getUid(), 'duepuntozero', 'colorset');
 	$user = true;
 
 	return clean_form($a, $colorset, $user);
@@ -24,12 +25,12 @@ function theme_content(App $a)
 
 function theme_post(App $a)
 {
-	if (! local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
 	if (isset($_POST['duepuntozero-settings-submit'])) {
-		PConfig::set(local_user(), 'duepuntozero', 'colorset', $_POST['duepuntozero_colorset']);
+		PConfig::set(Session::user()->getUid(), 'duepuntozero', 'colorset', $_POST['duepuntozero_colorset']);
 	}
 }
 
@@ -62,7 +63,7 @@ function clean_form(App $a, &$colorset, $user)
 	];
 
 	if ($user) {
-		$color = PConfig::get(local_user(), 'duepuntozero', 'colorset');
+		$color = PConfig::get(Session::user()->getUid(), 'duepuntozero', 'colorset');
 	} else {
 		$color = Config::get('duepuntozero', 'colorset');
 	}
@@ -70,7 +71,7 @@ function clean_form(App $a, &$colorset, $user)
 	$t = Renderer::getMarkupTemplate("theme_settings.tpl");
 	$o = Renderer::replaceMacros($t, [
 		'$submit'   => L10n::t('Submit'),
-		'$baseurl'  => System::baseUrl(),
+		'$baseurl'  => $a->getBaseURL(),
 		'$title'    => L10n::t("Theme settings"),
 		'$colorset' => ['duepuntozero_colorset', L10n::t('Variations'), $color, '', $colorset],
 	]);

@@ -4,10 +4,9 @@
  */
 namespace Friendica\Object;
 
-use Friendica\BaseObject;
+use Friendica\App;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\Object\Post;
 use Friendica\Util\Security;
 
 require_once 'boot.php';
@@ -18,7 +17,7 @@ require_once 'include/text.php';
  *
  * We should think about making this a SPL Iterator
  */
-class Thread extends BaseObject
+class Thread
 {
 	private $parents = [];
 	private $mode = null;
@@ -27,14 +26,21 @@ class Thread extends BaseObject
 	private $preview = false;
 
 	/**
+	 * @var App The global App
+	 */
+	private $app;
+
+	/**
 	 * Constructor
 	 *
+	 * @param App     $app     The global App
 	 * @param string  $mode    The mode
 	 * @param boolean $preview Are we in the preview mode?
 	 * @param boolean $writable Override the writable check
 	 */
-	public function __construct($mode, $preview, $writable = false)
+	public function __construct($app, $mode, $preview, $writable = false)
 	{
+		$this->app = $app;
 		$this->setMode($mode, $writable);
 		$this->preview = $preview;
 	}
@@ -53,8 +59,6 @@ class Thread extends BaseObject
 			return;
 		}
 
-		$a = self::getApp();
-
 		switch ($mode) {
 			case 'network':
 			case 'notes':
@@ -62,11 +66,11 @@ class Thread extends BaseObject
 				$this->writable = true;
 				break;
 			case 'profile':
-				$this->profile_owner = $a->profile['profile_uid'];
+				$this->profile_owner = $this->app->profile['profile_uid'];
 				$this->writable = Security::canWriteToUserWall($this->profile_owner);
 				break;
 			case 'display':
-				$this->profile_owner = $a->profile['uid'];
+				$this->profile_owner = $this->app->profile['uid'];
 				$this->writable = Security::canWriteToUserWall($this->profile_owner) || $writable;
 				break;
 			case 'community':
@@ -128,7 +132,7 @@ class Thread extends BaseObject
 	/**
 	 * Add a thread to the conversation
 	 *
-	 * @param object $item The item to insert
+	 * @param Post $item The item to insert
 	 *
 	 * @return mixed The inserted item on success
 	 *               false on failure
@@ -178,9 +182,7 @@ class Thread extends BaseObject
 	 */
 	public function getTemplateData($conv_responses)
 	{
-		$a = self::getApp();
 		$result = [];
-		$i = 0;
 
 		foreach ($this->parents as $item) {
 			if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {

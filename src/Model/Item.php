@@ -14,6 +14,7 @@ use Friendica\Core\Lock;
 use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -2483,7 +2484,7 @@ class Item extends BaseObject
 		$id = 0;
 
 		if ($uid == 0) {
-			$uid == local_user();
+			$uid = Session::user()->getUid();
 		}
 
 		// Does the given user have this item?
@@ -2976,7 +2977,7 @@ class Item extends BaseObject
 	 */
 	public static function performLike($item_id, $verb)
 	{
-		if (!local_user() && !remote_user()) {
+		if (!Session::user()->isLoggedIn()) {
 			return false;
 		}
 
@@ -3020,8 +3021,8 @@ class Item extends BaseObject
 		$item_uri = $item['uri'];
 
 		$uid = $item['uid'];
-		if (($uid == 0) && local_user()) {
-			$uid = local_user();
+		if (($uid == 0) && Session::user()->isLocal()) {
+			$uid = Session::user()->getUid();
 		}
 
 		if (!Security::canWriteToUserWall($uid)) {
@@ -3046,7 +3047,7 @@ class Item extends BaseObject
 		}
 
 		// Contact-id is the uid-dependant author contact
-		if (local_user() == $uid) {
+		if (Session::user()->isLocal($uid)) {
 			$item_contact_id = $owner_self_contact['id'];
 			$item_contact = $owner_self_contact;
 		} else {
@@ -3213,8 +3214,8 @@ class Item extends BaseObject
 
 	public static function getPermissionsSQLByUserId($owner_id, $remote_verified = false, $groups = null)
 	{
-		$local_user = local_user();
-		$remote_user = remote_user();
+		$local_user = Session::user()->getUid();
+		$remote_user = Session::user()->getVisitorId();
 
 		/*
 		 * Construct permissions

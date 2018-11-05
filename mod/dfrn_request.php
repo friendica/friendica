@@ -18,6 +18,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -74,7 +75,7 @@ function dfrn_request_post(App $a)
 	 */
 	if ((x($_POST, 'localconfirm')) && ($_POST['localconfirm'] == 1)) {
 		// Ensure this is a valid request
-		if (local_user() && ($a->user['nickname'] == $a->argv[1]) && (x($_POST, 'dfrn_url'))) {
+		if (Session::user()->isLocal() && ($a->user['nickname'] == $a->argv[1]) && (x($_POST, 'dfrn_url'))) {
 			$dfrn_url = notags(trim($_POST['dfrn_url']));
 			$aes_allow = (((x($_POST, 'aes_allow')) && ($_POST['aes_allow'] == 1)) ? 1 : 0);
 			$confirm_key = ((x($_POST, 'confirm_key')) ? $_POST['confirm_key'] : "");
@@ -86,7 +87,7 @@ function dfrn_request_post(App $a)
 			if (x($dfrn_url)) {
 				// Lookup the contact based on their URL (which is the only unique thing we have at the moment)
 				$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `nurl` = '%s' AND NOT `self` LIMIT 1",
-					intval(local_user()),
+					Session::user()->getUid(),
 					DBA::escape(normalise_link($dfrn_url))
 				);
 
@@ -138,7 +139,7 @@ function dfrn_request_post(App $a)
 					$r = q("INSERT INTO `contact` ( `uid`, `created`,`url`, `nurl`, `addr`, `name`, `nick`, `photo`, `site-pubkey`,
 						`request`, `confirm`, `notify`, `poll`, `network`, `aes_allow`, `hidden`, `blocked`, `pending`)
 						VALUES ( %d, '%s', '%s', '%s', '%s', '%s' , '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, %d, %d, %d)",
-						intval(local_user()),
+						Session::user()->getUid(),
 						DateTimeFormat::utcNow(),
 						DBA::escape($dfrn_url),
 						DBA::escape(normalise_link($dfrn_url)),
@@ -164,7 +165,7 @@ function dfrn_request_post(App $a)
 				}
 
 				$r = q("SELECT `id`, `network` FROM `contact` WHERE `uid` = %d AND `url` = '%s' AND `site-pubkey` = '%s' LIMIT 1",
-					intval(local_user()),
+					Session::user()->getUid(),
 					DBA::escape($dfrn_url),
 					$parms['key'] // this was already escaped
 				);

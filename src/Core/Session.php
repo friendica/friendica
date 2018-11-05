@@ -7,6 +7,7 @@ namespace Friendica\Core;
 
 use Friendica\Core\Session\CacheSessionHandler;
 use Friendica\Core\Session\DatabaseSessionHandler;
+use Friendica\Core\Session\User;
 
 /**
  * High-level Session service class
@@ -17,6 +18,11 @@ class Session
 {
 	public static $exists = false;
 	public static $expire = 180000;
+
+	/**
+	 * @var User The current Session user
+	 */
+	private static $user = null;
 
 	public static function init()
 	{
@@ -68,5 +74,19 @@ class Session
 	public static function set($name, $value)
 	{
 		$_SESSION[$name] = $value;
+	}
+
+	/**
+	 * Gets the current Session User
+	 *
+	 * @return User The current user
+	 */
+	public static function user()
+	{
+		if (!isset(self::$user)) {
+			self::$user = new User();
+		}
+
+		return self::$user;
 	}
 }

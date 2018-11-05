@@ -7,6 +7,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Model\FileTag;
 use Friendica\Util\XML;
 
@@ -14,7 +15,7 @@ require_once 'include/items.php';
 
 function filer_content(App $a)
 {
-	if (! local_user()) {
+	if (!Session::user()->isLocal()) {
 		killme();
 	}
 

@@ -16,6 +16,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -171,7 +172,7 @@ class Profile
 			require_once $theme_info_file;
 		}
 
-		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
+		if (Session::user()->isLocal($a->profile['uid']) && $profiledata) {
 			$a->page['aside'] .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('profile_edlink.tpl'),
 				[
@@ -387,7 +388,7 @@ class Profile
 			$profile['edit'] = [System::baseUrl() . '/profiles', L10n::t('Profiles'), '', L10n::t('Manage/edit profiles')];
 			$r = q(
 				"SELECT * FROM `profile` WHERE `uid` = %d",
-				local_user()
+				Session::user()->getUid()
 			);
 
 			$profile['menu'] = [

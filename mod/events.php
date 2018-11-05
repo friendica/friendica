@@ -11,6 +11,7 @@ use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -25,7 +26,7 @@ require_once 'include/items.php';
 
 function events_init(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
@@ -51,13 +52,13 @@ function events_post(App $a)
 
 	Logger::log('post: ' . print_r($_REQUEST, true), Logger::DATA);
 
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
 	$event_id = !empty($_POST['event_id']) ? intval($_POST['event_id']) : 0;
 	$cid = !empty($_POST['cid']) ? intval($_POST['cid']) : 0;
-	$uid = local_user();
+	$uid = Session::user()->getUid();
 
 	$start_text  = escape_tags(defaults($_REQUEST, 'start_text', ''));
 	$finish_text = escape_tags(defaults($_REQUEST, 'finish_text', ''));
@@ -125,7 +126,7 @@ function events_post(App $a)
 	$share = intval(defaults($_POST, 'share', 0));
 
 	$c = q("SELECT `id` FROM `contact` WHERE `uid` = %d AND `self` LIMIT 1",
-		intval(local_user())
+		$uid
 	);
 
 	if (DBA::isResult($c)) {
@@ -194,7 +195,7 @@ function events_post(App $a)
 
 function events_content(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return Login::form();
 	}
@@ -206,14 +207,14 @@ function events_content(App $a)
 	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
 		$r = q("UPDATE `event` SET `ignore` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
-			intval(local_user())
+			Session::user()->getUid()
 		);
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'unignore') && intval($a->argv[2])) {
 		$r = q("UPDATE `event` SET `ignore` = 0 WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
-			intval(local_user())
+			Session::user()->getUid()
 		);
 	}
 
@@ -228,7 +229,7 @@ function events_content(App $a)
 
 	$htpl = Renderer::getMarkupTemplate('event_head.tpl');
 	$a->page['htmlhead'] .= Renderer::replaceMacros($htpl, [
-		'$baseurl' => System::baseUrl(),
+		'$baseurl' => $a->getBaseURL(),
 		'$module_url' => '/events',
 		'$modparams' => 1,
 		'$i18n' => $i18n,
@@ -349,7 +350,7 @@ function events_content(App $a)
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (empty($links[$j])) {
-					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
+					$links[$j] = $a->getBaseURL() . '/' . $a->cmd . '#link-' . $j;
 				}
 			}
 		}
@@ -413,7 +414,7 @@ function events_content(App $a)
 	if (($mode === 'edit' || $mode === 'copy') && $event_id) {
 		$r = q("SELECT * FROM `event` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 			intval($event_id),
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		if (DBA::isResult($r)) {
 			$orig_event = $r[0];
@@ -501,7 +502,7 @@ function events_content(App $a)
 		$tpl = Renderer::getMarkupTemplate('event_form.tpl');
 
 		$o .= Renderer::replaceMacros($tpl, [
-			'$post' => System::baseUrl() . '/events',
+			'$post' => $a->getBaseURL() . '/events',
 			'$eid'  => $eid,
 			'$cid'  => $cid,
 			'$uri'  => $uri,
@@ -566,11 +567,11 @@ function events_content(App $a)
 
 	// Remove an event from the calendar and its related items
 	if ($mode === 'drop' && $event_id) {
-		$ev = Event::getListById(local_user(), $event_id);
+		$ev = Event::getListById(Session::user()->getUid(), $event_id);
 
 		// Delete only real events (no birthdays)
 		if (DBA::isResult($ev) && $ev[0]['type'] == 'event') {
-			Item::deleteForUser(['id' => $ev[0]['itemid']], local_user());
+			Item::deleteForUser(['id' => $ev[0]['itemid']], Session::user()->getUid());
 		}
 
 		if (Item::exists(['id' => $ev[0]['itemid']])) {

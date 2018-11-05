@@ -103,7 +103,7 @@ class ACL extends BaseObject
 		$stmt = DBA::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
 			WHERE `uid` = ? AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			$sql_extra
-			ORDER BY `name` ASC ", intval(local_user())
+			ORDER BY `name` ASC ", Session::user()->getUid()
 		);
 
 		$contacts = DBA::toArray($stmt);
@@ -168,7 +168,7 @@ class ACL extends BaseObject
 		$stmt = DBA::p("SELECT `id`, `name`, `url`, `network` FROM `contact`
 			WHERE `uid` = ? AND NOT `self` AND NOT `blocked` AND NOT `pending` AND NOT `archive` AND `notify` != ''
 			$sql_extra
-			ORDER BY `name` ASC ", intval(local_user())
+			ORDER BY `name` ASC ", Session::user()->getUid()
 		);
 
 		$contacts = DBA::toArray($stmt);
@@ -272,7 +272,7 @@ class ACL extends BaseObject
 			$pubmail_enabled = false;
 
 			if (!$imap_disabled) {
-				$mailacct = DBA::selectFirst('mailacct', ['pubmail'], ['`uid` = ? AND `server` != ""', local_user()]);
+				$mailacct = DBA::selectFirst('mailacct', ['pubmail'], ['`uid` = ? AND `server` != ""', Session::user()->getUid()]);
 				if (DBA::isResult($mailacct)) {
 					$mail_enabled = true;
 					$pubmail_enabled = !empty($mailacct['pubmail']);
@@ -325,7 +325,7 @@ class ACL extends BaseObject
 	 */
 	public static function contactAutocomplete($search, $mode)
 	{
-		if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
+		if (Config::get('system', 'block_public') && !Session::user()->isLocal() && !remote_user()) {
 			return [];
 		}
 

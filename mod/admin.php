@@ -15,6 +15,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Update;
@@ -1877,7 +1878,7 @@ function admin_page_users(App $a)
 		$e['login_date'] = Temporal::getRelativeDate($e['login_date']);
 		$e['lastitem_date'] = Temporal::getRelativeDate($e['lastitem_date']);
 		$e['is_admin'] = in_array($e['email'], $adminlist);
-		$e['is_deletable'] = (intval($e['uid']) != local_user());
+		$e['is_deletable'] = !Session::user()->isLocal(intval($e['uid']));
 		$e['deleted'] = ($e['account_removed'] ? Temporal::getRelativeDate($e['account_expires_on']) : False);
 
 		return $e;

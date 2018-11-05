@@ -79,16 +79,16 @@ abstract class BaseModule extends BaseObject
 	 * Functions used to protect against Cross-Site Request Forgery
 	 * The security token has to base on at least one value that an attacker can't know - here it's the session ID and the private key.
 	 * In this implementation, a security token is reusable (if the user submits a form, goes back and resubmits the form, maybe with small changes;
-	 * or if the security token is used for ajax-calls that happen several times), but only valid for a certain amout of time (3hours).
-	 * The "typename" seperates the security tokens of different types of forms. This could be relevant in the following case:
-	 *    A security token is used to protekt a link from CSRF (e.g. the "delete this profile"-link).
+	 * or if the security token is used for ajax-calls that happen several times), but only valid for a certain amount of time (3hours).
+	 * The "typename" separates the security tokens of different types of forms. This could be relevant in the following case:
+	 *    A security token is used to protect a link from CSRF (e.g. the "delete this profile"-link).
 	 *    If the new page contains by any chance external elements, then the used security token is exposed by the referrer.
-	 *    Actually, important actions should not be triggered by Links / GET-Requests at all, but somethimes they still are,
+	 *    Actually, important actions should not be triggered by Links / GET-Requests at all, but sometimes they still are,
 	 *    so this mechanism brings in some damage control (the attacker would be able to forge a request to a form of this type, but not to forms of other types).
 	 */
 	public static function getFormSecurityToken($typename = '')
 	{
-		$a = get_app();
+		$a = self::getApp();
 
 		$timestamp = time();
 		$sec_hash = hash('whirlpool', $a->user['guid'] . $a->user['prvkey'] . session_id() . $timestamp . $typename);

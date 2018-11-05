@@ -7,6 +7,7 @@
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Protocol\Feed;
@@ -29,7 +30,7 @@ function feedtest_content(App $a)
 
 		$importer = DBA::selectFirst('user', [], ['uid' => local_user()]);
 
-		$contact_id = Contact::getIdForURL($url, local_user(), true);
+		$contact_id = Contact::getIdForURL($url, Session::user()->getUID(), true);
 
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 

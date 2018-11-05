@@ -27,6 +27,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
@@ -381,7 +382,7 @@ function x($s, $k = null)
  * - defaults($var, $default)
  * - defaults($array, 'key', $default)
  *
- * @brief Returns a defaut value if the provided variable or array key is falsy
+ * @brief Returns a default value if the provided variable or array key is falsy
  * @see x()
  * @return mixed
  */
@@ -425,6 +426,7 @@ function killme()
 /**
  * @brief Returns the user id of locally logged in user or false.
  *
+ * @deprecated
  * @return int|bool user id or false
  */
 function local_user()
@@ -516,7 +518,7 @@ function info($s)
 {
 	$a = get_app();
 
-	if (local_user() && PConfig::get(local_user(), 'system', 'ignore_info')) {
+	if (Session::user()->isLocal() && PConfig::get(Session::user()->getUid(), 'system', 'ignore_info')) {
 		return;
 	}
 
@@ -583,7 +585,7 @@ function is_site_admin()
 
 	$adminlist = explode(',', str_replace(' ', '', $admin_email));
 
-	return local_user() && $admin_email && in_array(defaults($a->user, 'email', ''), $adminlist);
+	return Session::user()->isLocal() && $admin_email && in_array(defaults($a->user, 'email', ''), $adminlist);
 }
 
 /**

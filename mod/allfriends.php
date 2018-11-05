@@ -8,6 +8,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model;
@@ -20,7 +21,7 @@ require_once 'include/dba.php';
 function allfriends_content(App $a)
 {
 	$o = '';
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		return;
 	}
@@ -36,7 +37,7 @@ function allfriends_content(App $a)
 
 	$uid = $a->user['uid'];
 
-	$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['id' => $cid, 'uid' => local_user()]);
+	$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['id' => $cid, 'uid' => Session::user()->getUid()]);
 
 	if (!DBA::isResult($contact)) {
 		return;
@@ -45,11 +46,11 @@ function allfriends_content(App $a)
 	$a->page['aside'] = "";
 	Model\Profile::load($a, "", 0, Model\Contact::getDetailsByURL($contact["url"]));
 
-	$total = Model\GContact::countAllFriends(local_user(), $cid);
+	$total = Model\GContact::countAllFriends(Session::user()->getUid(), $cid);
 
 	$pager = new Pager($a->query_string);
 
-	$r = Model\GContact::allFriends(local_user(), $cid, $pager->getStart(), $pager->getItemsPerPage());
+	$r = Model\GContact::allFriends(Session::user()->getUid(), $cid, $pager->getStart(), $pager->getItemsPerPage());
 	if (!DBA::isResult($r)) {
 		$o .= L10n::t('No friends to display.');
 		return $o;

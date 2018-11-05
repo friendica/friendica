@@ -13,6 +13,7 @@ use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
@@ -23,7 +24,6 @@ use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use Friendica\Util\Security;
 
 function cal_init(App $a)
 {
@@ -31,7 +31,7 @@ function cal_init(App $a)
 		DFRN::autoRedir($a, $a->argv[1]);
 	}
 
-	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
+	if (Config::get('system', 'block_public') && !Session::user()->isLoggedIn()) {
 		System::httpExit(403, ['title' => L10n::t('Access denied.')]);
 	}
 
@@ -136,7 +136,7 @@ function cal_content(App $a)
 		}
 	}
 
-	$is_owner = local_user() == $a->profile['profile_uid'];
+	$is_owner = Session::user()->isLocal($a->profile['profile_uid']);
 
 	if ($a->profile['hidewall'] && !$is_owner && !$remote_contact) {
 		notice(L10n::t('Access to this profile has been restricted.') . EOL);
@@ -300,7 +300,7 @@ function cal_content(App $a)
 
 		// Test permissions
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
-		if ((local_user() !== intval($owner_uid)) && !Feature::isEnabled($owner_uid, "export_calendar")) {
+		if ((!Session::user()->isLocal(intval($owner_uid))) && !Feature::isEnabled($owner_uid, "export_calendar")) {
 			notice(L10n::t('Permission denied.') . EOL);
 			$a->internalRedirect('cal/' . $nick);
 		}
@@ -317,7 +317,7 @@ function cal_content(App $a)
 
 			// If it the own calendar return to the events page
 			// otherwise to the profile calendar page
-			if (local_user() === intval($owner_uid)) {
+			if (Session::user()->isLocal(intval($owner_uid))) {
 				$return_path = "events";
 			} else {
 				$return_path = "cal/" . $nick;

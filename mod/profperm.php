@@ -7,12 +7,13 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 
 function profperm_init(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		return;
 	}
 
@@ -25,7 +26,7 @@ function profperm_init(App $a)
 
 function profperm_content(App $a) {
 
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		notice(L10n::t('Permission denied') . EOL);
 		return;
 	}
@@ -40,7 +41,7 @@ function profperm_content(App $a) {
 
 	// Switch to text mod interface if we have more than 'n' contacts or group members
 
-	$switchtotext = PConfig::get(local_user(),'system','groupedit_image_limit');
+	$switchtotext = PConfig::get(Session::user()->getUid(),'system','groupedit_image_limit');
 	if (is_null($switchtotext)) {
 		$switchtotext = Config::get('system','groupedit_image_limit', 400);
 	}
@@ -50,7 +51,7 @@ function profperm_content(App $a) {
 			AND `network` = '%s' AND `id` = %d AND `uid` = %d LIMIT 1",
 			DBA::escape(Protocol::DFRN),
 			intval($a->argv[2]),
-			intval(local_user())
+			Session::user()->getUid()
 		);
 
 		if (DBA::isResult($r)) {
@@ -62,7 +63,7 @@ function profperm_content(App $a) {
 	if (($a->argc > 1) && (intval($a->argv[1]))) {
 		$r = q("SELECT * FROM `profile` WHERE `id` = %d AND `uid` = %d AND `is-default` = 0 LIMIT 1",
 			intval($a->argv[1]),
-			intval(local_user())
+			Session::user()->getUid()
 		);
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Invalid profile identifier.') . EOL );
@@ -71,7 +72,7 @@ function profperm_content(App $a) {
 		$profile = $r[0];
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `profile-id` = %d",
-			intval(local_user()),
+			Session::user()->getUid(),
 			intval($a->argv[1])
 		);
 
@@ -86,20 +87,20 @@ function profperm_content(App $a) {
 			if (in_array($change,$ingroup)) {
 				q("UPDATE `contact` SET `profile-id` = 0 WHERE `id` = %d AND `uid` = %d",
 					intval($change),
-					intval(local_user())
+					Session::user()->getUid()
 				);
 			}
 			else {
 				q("UPDATE `contact` SET `profile-id` = %d WHERE `id` = %d AND `uid` = %d",
 					intval($a->argv[1]),
 					intval($change),
-					intval(local_user())
+					Session::user()->getUid()
 				);
 
 			}
 
 			$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `profile-id` = %d",
-				intval(local_user()),
+				Session::user()->getUid(),
 				intval($a->argv[1])
 			);
 
@@ -146,7 +147,7 @@ function profperm_content(App $a) {
 
 		$r = q("SELECT * FROM `contact` WHERE `uid` = %d AND `blocked` = 0 and `pending` = 0 and `self` = 0
 			AND `network` = '%s' ORDER BY `name` ASC",
-			intval(local_user()),
+			Session::user()->getUid(),
 			DBA::escape(Protocol::DFRN)
 		);
 

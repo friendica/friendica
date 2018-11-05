@@ -130,7 +130,7 @@ class Cache extends \Friendica\BaseObject
 	 *
 	 * @param boolean $outdated just remove outdated values
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public static function clear($outdated = true)
 	{

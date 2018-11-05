@@ -11,13 +11,14 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 
 function community_init(App $a)
 {
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		unset($_SESSION['theme']);
 		unset($_SESSION['mobile-theme']);
 	}
@@ -27,7 +28,7 @@ function community_content(App $a, $update = 0)
 {
 	$o = '';
 
-	if (Config::get('system', 'block_public') && !local_user() && !remote_user()) {
+	if (Config::get('system', 'block_public') && !Session::user()->isLoggedIn()) {
 		notice(L10n::t('Public access denied.') . EOL);
 		return;
 	}
@@ -76,7 +77,7 @@ function community_content(App $a, $update = 0)
 	}
 
 	// Check if we are allowed to display the content to visitors
-	if (!local_user()) {
+	if (!Session::user()->isLocal()) {
 		$available = $page_style == CP_USERS_AND_GLOBAL;
 
 		if (!$available) {
@@ -98,7 +99,7 @@ function community_content(App $a, $update = 0)
 	if (!$update) {
 		$tabs = [];
 
-		if ((local_user() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_USERS_ON_SERVER])) && empty(Config::get('system', 'singleuser'))) {
+		if ((Session::user()->isLocal() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_USERS_ON_SERVER])) && empty(Config::get('system', 'singleuser'))) {
 			$tabs[] = [
 				'label' => L10n::t('Local Community'),
 				'url' => 'community/local',
@@ -109,7 +110,7 @@ function community_content(App $a, $update = 0)
 			];
 		}
 
-		if (local_user() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_GLOBAL_COMMUNITY])) {
+		if (Session::user()->isLocal() || in_array($page_style, [CP_USERS_AND_GLOBAL, CP_GLOBAL_COMMUNITY])) {
 			$tabs[] = [
 				'label' => L10n::t('Global Community'),
 				'url' => 'community/global',
@@ -126,7 +127,7 @@ function community_content(App $a, $update = 0)
 		Nav::setSelected('community');
 
 		// We need the editor here to be able to reshare an item.
-		if (local_user()) {
+		if (Session::user()->isLocal()) {
 			$x = [
 				'is_owner' => true,
 				'allow_location' => $a->user['allow_location'],
@@ -136,7 +137,7 @@ function community_content(App $a, $update = 0)
 				'acl' => ACL::getFullSelectorHTML($a->user, true),
 				'bang' => '',
 				'visitor' => 'block',
-				'profile_uid' => local_user(),
+				'profile_uid' => Session::user()->getUid(),
 			];
 			$o .= status_editor($a, $x, 0, true);
 		}
@@ -144,9 +145,9 @@ function community_content(App $a, $update = 0)
 
 	// check if we serve a mobile device and get the user settings accordingly
 	if ($a->is_mobile) {
-		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 20);
+		$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_mobile_network', 20);
 	} else {
-		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 40);
+		$itemspage_network = PConfig::get(Session::user()->getUid(), 'system', 'itemspage_network', 40);
 	}
 
 	// now that we have the user settings, see if the theme forces
@@ -193,7 +194,7 @@ function community_content(App $a, $update = 0)
 		$s = $r;
 	}
 
-	$o .= conversation($a, $s, $pager, 'community', $update, false, 'commented', local_user());
+	$o .= conversation($a, $s, $pager, 'community', $update, false, 'commented', Session::user()->getUid());
 
 	if (!$update) {
 		$o .= $pager->renderMinimal(count($r));
