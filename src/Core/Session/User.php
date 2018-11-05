@@ -23,7 +23,7 @@ class User
 	/**
 	 * Checks if the current session user is an authenticated site visitor
 	 *
-	 * @param null $uid
+	 * @param null $uid Optional UID of an user to check if it is the authenticated site visitor
 	 * @return bool
 	 */
 	public function isRemote($uid = null)
@@ -33,6 +33,11 @@ class User
 			&& (isset($uid) ? $uid === Session::get('visitor_id') : true);
 	}
 
+	/**
+	 * Checks if the current session user is logged in
+	 *
+	 * @return bool
+	 */
 	public function isLoggedIn()
 	{
 		return $this->isLocal() || $this->isRemote();
