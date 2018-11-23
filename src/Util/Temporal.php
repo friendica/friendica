@@ -327,7 +327,7 @@ class Temporal
 						$format = L10n::t('in %1$d %2$s');
 					}
 					else {
-						$format = L10n::t('%1$d %2$s ago');
+						$format = ('%1$d %2$s');
 					}
 				}
 
