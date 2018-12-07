@@ -96,10 +96,10 @@ if (!$scheme) {
 
 //Set some defaults - we have to do this after pulling owner settings, and we have to check for each setting
 //individually.  If we don't, we'll have problems if a user has set one, but not all options.
-$nav_bg           = (empty($nav_bg)           ? '#708fa0'      : $nav_bg);
-$nav_icon_color   = (empty($nav_icon_color)   ? '#fff'         : $nav_icon_color);
-$link_color       = (empty($link_color)       ? '#6fdbe8'      : $link_color);
-$background_color = (empty($background_color) ? '#ededed'      : $background_color);
+$nav_bg           = (empty($nav_bg)           ? '#3b5998'      : $nav_bg);
+$nav_icon_color   = (empty($nav_icon_color)   ? '#ffffff'      : $nav_icon_color);
+$link_color       = (empty($link_color)       ? '#365899'      : $link_color);
+$background_color = (empty($background_color) ? '#e9ebee'      : $background_color);
 // The background image can not be empty. So we use a dummy jpg if no image was set.
 $background_image = (empty($background_image) ? 'img/none.jpg' : $background_image);
 $modified         = (empty($modified)         ? time()         : $modified);
