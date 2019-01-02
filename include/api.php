@@ -4073,10 +4073,10 @@ function api_fr_photo_create_update($type)
 	$desc = defaults($_REQUEST, 'desc', (array_key_exists('desc', $_REQUEST) ? "" : null)) ; // extra check necessary to distinguish between 'not provided' and 'empty string'
 	$album = defaults($_REQUEST, 'album', null);
 	$album_new = defaults($_REQUEST, 'album_new', null);
-	$allow_cid = defaults($_REQUEST, 'allow_cid', (array_key_exists('allow_cid', $_REQUEST) ? " " : null));
-	$deny_cid  = defaults($_REQUEST, 'deny_cid' , (array_key_exists('deny_cid' , $_REQUEST) ? " " : null));
-	$allow_gid = defaults($_REQUEST, 'allow_gid', (array_key_exists('allow_gid', $_REQUEST) ? " " : null));
-	$deny_gid  = defaults($_REQUEST, 'deny_gid' , (array_key_exists('deny_gid' , $_REQUEST) ? " " : null));
+	$allow_cid = defaults($_REQUEST, 'allow_cid', '');
+	$deny_cid  = defaults($_REQUEST, 'deny_cid' , '');
+	$allow_gid = defaults($_REQUEST, 'allow_gid', '');
+	$deny_gid  = defaults($_REQUEST, 'deny_gid' , '');
 	$visibility = !empty($_REQUEST['visibility']) && $_REQUEST['visibility'] !== "false";
 
 	// do several checks on input parameters
