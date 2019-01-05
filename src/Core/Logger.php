@@ -5,7 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Util\Logger\FriendicaLoggerInterface;
 use Friendica\Util\LoggerFactory;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -56,51 +56,57 @@ class Logger extends BaseObject
 	];
 
 	/**
-	 * @var LoggerInterface A PSR-3 compliant logger instance
+	 * @var FriendicaLoggerInterface A PSR-3 compliant logger instance
 	 */
 	private static $logger;
 
 	/**
-	 * @var LoggerInterface A PSR-3 compliant logger instance for developing only
+	 * @var FriendicaLoggerInterface PSR-3 compliant logger instance for developing only
 	 */
 	private static $devLogger;
 
 	/**
-	 * Sets the default logging handler for Friendica.
-	 * @todo Can be combined with other handlers too if necessary, could be configurable.
-	 *
-	 * @param LoggerInterface $logger The Logger instance of this Application
-	 *
-	 * @throws InternalServerErrorException if the logger factory is incompatible to this logger
+	 * @var FriendicaLoggerInterface PSR-3 compliant logger instance for performance profiling
 	 */
-	public static function setLogger($logger)
+	private static $profLogger;
+
+	/**
+	 * Sets the default logging handler for Friendica.
+	 *
+	 * @param FriendicaLoggerInterface $logger The Logger instance of this Application
+	 */
+	public static function init($logger)
 	{
-		$debugging = Config::get('system', 'debugging');
-		$logfile = Config::get('system', 'logfile');
-		$loglevel = Config::get('system', 'loglevel');
+		// if default logging is enabled
+		if(Config::get('system', 'debugging') && isset($logger)) {
+			self::$logger = $logger;
 
-		if (!$debugging || !$logfile) {
-			return;
+			$handlerList = Config::get('logchannel', self::$logger->getChannel());
+			foreach ($handlerList as $handler) {
+				self::$logger->addHandler(Config::get('loghandler', $handler));
+			}
 		}
 
-		if (is_int($loglevel)) {
-			$loglevel = self::mapLegacyConfigDebugLevel($loglevel);
+		// if additional performance profiling is enabled
+		if(Config::get('system', 'profiler')) {
+			self::$profLogger = LoggerFactory::createProf();
+
+			$handlerList = Config::get('logchannel', self::$profLogger->getChannel());
+			foreach ($handlerList as $handler) {
+				self::$profLogger->addHandler(Config::get('loghandler', $handler));
+			}
 		}
 
-		LoggerFactory::addStreamHandler($logger, $logfile, $loglevel);
-
-		self::$logger = $logger;
-
-		$logfile = Config::get('system', 'dlogfile');
-
-		if (!$logfile) {
-			return;
-		}
-
+		// if additional develop (set due to the developer IP config) is enabled
 		$developIp = Config::get('system', 'dlogip');
+		if (isset($developIp)) {
+			self::$devLogger = LoggerFactory::createDev($developIp);
 
-		self::$devLogger = LoggerFactory::createDev('develop', $developIp);
-		LoggerFactory::addStreamHandler(self::$devLogger, $logfile, LogLevel::DEBUG);
+			$handlerList = Config::get('logchannel', self::$devLogger->getChannel());
+			foreach ($handlerList as $handler) {
+				self::$devLogger->addHandler(Config::get('loghandler', $handler));
+			}
+		}
 	}
 
 	/**
@@ -111,7 +117,7 @@ class Logger extends BaseObject
 	 *
 	 * @return string the PSR-3 compliant level
 	 */
-	private static function mapLegacyConfigDebugLevel($level)
+	public static function mapLegacyConfigDebugLevel($level)
 	{
 		switch ($level) {
 			// legacy WARNING
@@ -345,7 +351,7 @@ class Logger extends BaseObject
      * @param string $msg
 	 * @param string $level
      */
-    public static function devLog($msg, $level = LogLevel::DEBUG)
+    public static function develop($msg, $level = LogLevel::DEBUG)
     {
 		if (!isset(self::$logger)) {
 			return;
@@ -355,4 +361,21 @@ class Logger extends BaseObject
         self::$devLogger->log($level, $msg);
         self::getApp()->saveTimestamp($stamp1, "file");
     }
+
+	/**
+	 * @brief explicit performance logger for profiling the app
+	 *
+	 * @param string $msg
+	 * @param string $level
+	 */
+    public static function profile($msg, $level = LogLevel::DEBUG)
+	{
+		if (!isset(self::$profLogger)) {
+			return;
+		}
+
+		$stamp1 = microtime(true);
+		self::$profLogger->log($level, $msg);
+		self::getApp()->saveTimestamp($stamp1, "file");
+	}
 }

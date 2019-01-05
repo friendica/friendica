@@ -124,4 +124,73 @@ return [
 	// Used in the admin settings to lock certain features
 	'featurelock' => [
 	],
+
+	// Mapping the log channels to the different log handlers
+	'log_channel' => [
+		'index' => ['default'],
+		'console' => ['default'],
+		'worker' => ['default'],
+		'daemon' => ['default'],
+		'db' => ['default'],
+		'auth_ejabbered' => ['ejabbered'],
+		'performance' => ['profiler'],
+		'develop' => ['develop'],
+	],
+
+	// Default log handling in Friendica
+	'log_handler' => [
+
+		// Standard Log handler in Friendica
+		'default' => [
+			// The type of handler (currently only stream is allowed)
+			'type' => 'stream',
+
+			// Enabling the Handler (Boolean)
+			'enabled' => true,
+
+			// logfile (String)
+			// The logfile for storing logs.
+			// Can be a full path or a relative path to the Friendica home directory
+			'logfile' => 'friendica.log',
+
+			// loglevel (String)
+			// The loglevel for all logs.
+			// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
+			'loglevel' => 'notice',
+
+			// PHP Error handling (Boolean)
+			// Enabling runtime errors, exceptions and fatal errors for this logger
+			'errors' => true,
+		],
+
+		// The auth_ejabberd.php is run by the ejabberd user
+		// so it mustn't log into the same logfile than the other log processes
+		'ejabbered' => [
+			'type' => 'stream',
+			'enabled' => true,
+			'logfile' => 'ejabbered.log',
+			'loglevel' => 'notice',
+			'errors' => true,
+		],
+
+		// Friendica profiling log
+		// per default disabled
+		'profiler' => [
+			'type' => 'stream',
+			'enabled' => false,
+			'logfile' => 'friendica.log',
+			'loglevel' => 'debug',
+			'errors' => false,
+		],
+
+		// Develop logging
+		// Used for local debugging only
+		'develop' => [
+			'type' => 'stream',
+			'enabled' => false,
+			'logfile' => 'develop.log',
+			'loglevel' => 'debug',
+			'errors' => false,
+		],
+	],
 ];

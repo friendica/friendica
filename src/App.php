@@ -8,9 +8,9 @@ use Detection\MobileDetect;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Util\Logger\FriendicaLoggerInterface;
 use Psr\Log\LoggerInterface;
 
 require_once 'boot.php';
@@ -107,7 +107,7 @@ class App
 	private $isAjax;
 
 	/**
-	 * @var LoggerInterface The current logger of this App
+	 * @var FriendicaLoggerInterface The current logger of this App
 	 */
 	private $logger;
 
@@ -151,13 +151,13 @@ class App
 	/**
 	 * @brief App constructor.
 	 *
-	 * @param string           $basePath  Path to the app base folder
-	 * @param LoggerInterface  $logger    Logger of this application
-	 * @param bool             $isBackend Whether it is used for backend or frontend (Default true=backend)
+	 * @param string                    $basePath  Path to the app base folder
+	 * @param FriendicaLoggerInterface  $logger    Logger of this application
+	 * @param bool                      $isBackend Whether it is used for backend or frontend (Default true=backend)
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct($basePath, LoggerInterface $logger, $isBackend = true)
+	public function __construct($basePath, FriendicaLoggerInterface $logger, $isBackend = true)
 	{
 		$this->logger = $logger;
 
@@ -349,7 +349,7 @@ class App
 
 		$this->process_id = Core\System::processID('log');
 
-		Core\Logger::setLogger($this->logger);
+		Core\Logger::init($this->logger);
 	}
 
 	/**
