@@ -325,7 +325,7 @@ function api_call(App $a)
 					$duration = microtime(true)-$a->performance["start"];
 
 					/// @TODO round() really everywhere?
-					Logger::debug(
+					Logger::profile(
 						API_LOG_PREFIX . 'performance',
 						[
 							'module' => 'api',

@@ -453,7 +453,7 @@ class Worker
 				}
 			}
 
-			Logger::log(
+			Logger::profile(
 				"ID ".$queue["id"].": ".$funcname.": ".sprintf(
 					"DB: %s/%s, Cache: %s/%s, Net: %s, I/O: %s, Other: %s, Total: %s".$o,
 					number_format($a->performance["database"] - $a->performance["database_write"], 2),
@@ -466,8 +466,7 @@ class Worker
 						+ $a->performance["cache"] + $a->performance["cache_write"]
 						+ $a->performance["network"] + $a->performance["file"]), 2),
 					number_format($duration, 2)
-				),
-				Logger::DEBUG
+				)
 			);
 		}
 
