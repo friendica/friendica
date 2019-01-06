@@ -24,6 +24,9 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		$this->load($uid, 'config');
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function load($uid, $family)
 	{
 		if ($this->config_loaded) {
@@ -43,6 +46,9 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		$this->config_loaded = true;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function get($uid, $cat, $k, $default_value = null, $refresh = false)
 	{
 		if (!$this->config_loaded) {
@@ -63,6 +69,11 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		return $return;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 *
+	 * @throws Exception if it isn't possible to store the config value
+	 */
 	public function set($uid, $cat, $k, $value)
 	{
 		if (!$this->config_loaded) {
@@ -90,6 +101,9 @@ class PreloadPConfigAdapter extends BaseObject implements IPConfigAdapter
 		return true;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function delete($uid, $cat, $k)
 	{
 		if (!$this->config_loaded) {

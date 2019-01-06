@@ -42,6 +42,24 @@ interface IConfigAdapter
 	public function get($cat, $k, $default_value = null, $refresh = false);
 
 	/**
+	 * @brief Get all key/values of a given category name ($family).
+	 *
+	 * Gets all config values from the given category ($family) from a cache
+	 * storage in $a->config[].
+	 *
+	 * It isn't designed for high frequent usage, because it merge all key/values in this order:
+	 * - default/fallback settings
+	 * - local/manual config settings
+	 * - DB settings
+	 * Every key will be stored distinct in this particular order
+	 *
+	 * @param string  $cat           The category of the configuration value
+	 *
+	 * @return array Stored array of [key => value] pairs or empty [] if it does not exist
+	 */
+	public function getAll($cat);
+
+	/**
 	 * @brief Sets a configuration value for system config
 	 *
 	 * Stores a config value ($value) in the category ($family) under the key ($key)

@@ -17,6 +17,9 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 {
 	private $in_db;
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function load($uid, $cat)
 	{
 		$a = self::getApp();
@@ -37,6 +40,9 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 		DBA::close($pconfigs);
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function get($uid, $cat, $k, $default_value = null, $refresh = false)
 	{
 		$a = self::getApp();
@@ -75,6 +81,9 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 		}
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function set($uid, $cat, $k, $value)
 	{
 		// We store our setting values in a string variable.
@@ -102,6 +111,9 @@ class JITPConfigAdapter extends BaseObject implements IPConfigAdapter
 		return $result;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function delete($uid, $cat, $k)
 	{
 		self::getApp()->deletePConfigValue($uid, $cat, $k);

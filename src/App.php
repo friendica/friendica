@@ -1224,7 +1224,7 @@ class App
 	 *
 	 * @return string Returns the value of the Config entry
 	 */
-	public function getConfigValue($cat, $k, $default = null)
+	public function getConfigValue($cat, $k = null, $default = null)
 	{
 		$return = $default;
 
@@ -1235,6 +1235,8 @@ class App
 		} else {
 			if (isset($this->config[$cat][$k])) {
 				$return = $this->config[$cat][$k];
+			} elseif (!isset($k) && isset($this->config[$cat])) {
+				$return = $this->config[$cat];
 			}
 		}
 

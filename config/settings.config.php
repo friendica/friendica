@@ -52,6 +52,10 @@ return [
 		// It only applies to timestamps for anonymous viewers.
 		'default_timezone' => 'UTC',
 
+		// dlogip (String)
+		// restricts develop log writes to requests originating from this IP address.
+		'dlogip' => '',
+
 		// directory (String)
 		// URL of the global directory.
 		'directory' => 'https://dir.friendica.social',
@@ -69,16 +73,6 @@ return [
 		// System default languague, inluding admin-created user default language.
 		// Two-letters ISO 639-1 code.
 		'language' => 'en',
-
-		// logfile (String)
-		// The logfile for storing logs.
-		// Can be a full path or a relative path to the Friendica home directory
-		'logfile' => 'friendica.log',
-
-		// loglevel (String)
-		// The loglevel for all logs.
-		// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
-		'loglevel' => 'notice',
 
 		// max_image_length (Integer)
 		// An alternate way of limiting picture upload sizes.
@@ -100,6 +94,10 @@ return [
 		// -1 to disable automatic optimization.
 		//  0 to use internal default (100MB)
 		'optimize_max_tablesize' => -1,
+
+		// profiler (Boolean)
+		// Enable internal timings to help optimize code. Needed for "rendertime" addon.
+		'profiler' => false,
 
 		// rino_encrypt (Integer)
 		// Server-to-server private message encryption (RINO).
@@ -142,10 +140,16 @@ return [
 
 		// Standard Log handler in Friendica
 		'default' => [
+			// type (String)
 			// The type of handler (currently only stream is allowed)
 			'type' => 'stream',
 
-			// Enabling the Handler (Boolean)
+			// description (String)
+			// a human readable description of this handler
+			'description' => 'The Default log handler',
+
+			// enabled (Boolean)
+			// Enabling the Handler
 			'enabled' => true,
 
 			// logfile (String)
@@ -158,7 +162,7 @@ return [
 			// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
 			'loglevel' => 'notice',
 
-			// PHP Error handling (Boolean)
+			// errors (Boolean)
 			// Enabling runtime errors, exceptions and fatal errors for this logger
 			'errors' => true,
 		],
@@ -167,6 +171,7 @@ return [
 		// so it mustn't log into the same logfile than the other log processes
 		'ejabbered' => [
 			'type' => 'stream',
+			'description' => 'Logging the authentication based on ejabbered',
 			'enabled' => true,
 			'logfile' => 'ejabbered.log',
 			'loglevel' => 'notice',
@@ -177,6 +182,7 @@ return [
 		// per default disabled
 		'profiler' => [
 			'type' => 'stream',
+			'description' => 'Use to profile Friendica',
 			'enabled' => false,
 			'logfile' => 'friendica.log',
 			'loglevel' => 'debug',
@@ -187,6 +193,7 @@ return [
 		// Used for local debugging only
 		'develop' => [
 			'type' => 'stream',
+			'description' => 'Specific log for local debugging only',
 			'enabled' => false,
 			'logfile' => 'develop.log',
 			'loglevel' => 'debug',

@@ -24,6 +24,9 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 		$this->load();
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function load($family = 'config')
 	{
 		if ($this->config_loaded) {
@@ -39,6 +42,9 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 		$this->config_loaded = true;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function get($cat, $k, $default_value = null, $refresh = false)
 	{
 		if ($refresh) {
@@ -53,6 +59,24 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 		return $return;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
+	public function getAll($cat)
+	{
+		$config = self::getApp()->getConfigValue($cat);
+		if (is_array($config)) {
+			return $config;
+		} else {
+			return [];
+		}
+	}
+
+	/**
+	 * [@inheritdoc}
+	 *
+	 * @throws Exception if it isn't possible to store the config value
+	 */
 	public function set($cat, $k, $value)
 	{
 		// We store our setting values as strings.
@@ -77,6 +101,9 @@ class PreloadConfigAdapter extends BaseObject implements IConfigAdapter
 		return true;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function delete($cat, $k)
 	{
 		self::getApp()->deleteConfigValue($cat, $k);

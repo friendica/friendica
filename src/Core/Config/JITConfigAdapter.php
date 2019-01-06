@@ -18,6 +18,9 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 	private $cache;
 	private $in_db;
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function load($cat = "config")
 	{
 		// We don't preload "system" anymore.
@@ -40,6 +43,9 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 		DBA::close($configs);
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function get($cat, $k, $default_value = null, $refresh = false)
 	{
 		$a = self::getApp();
@@ -84,6 +90,36 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 		return $default_value;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
+	public function getAll($cat)
+	{
+		$a = self::getApp();
+
+		$catList = [];
+
+		if (isset($a->config[$cat])) {
+			$catList = $catList + $a->config[$cat];
+		}
+
+		if (isset($this->cache[$cat])) {
+			$catList = $catList + $this->cache[$cat];
+		}
+
+		$dbKeys = DBA::select('config', ['k', 'v'], ['cat' => $cat]);
+		while($config = DBA::fetch($dbKeys)) {
+			// manage array value
+			$value = (preg_match("|^a:[0-9]+:{.*}$|s", $config['v']) ? unserialize($config['v']) : $config['v']);
+			$catList[$config['k']] = $value;
+		}
+
+		return $catList;
+	}
+
+	/**
+	 * [@inheritdoc}
+	 */
 	public function set($cat, $k, $value)
 	{
 		$a = self::getApp();
@@ -123,6 +159,9 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 		return $result;
 	}
 
+	/**
+	 * [@inheritdoc}
+	 */
 	public function delete($cat, $k)
 	{
 		if (isset($this->cache[$cat][$k])) {

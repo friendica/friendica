@@ -100,6 +100,41 @@ class Config extends BaseObject
 	}
 
 	/**
+	 * @brief Get all key/values of a given category name ($family).
+	 *
+	 * Gets all config values from the given category ($family) from a cache
+	 * storage in $a->config[].
+	 *
+	 * It isn't designed for high frequent usage, because it merge all key/values in this order:
+	 * - default/fallback settings
+	 * - local/manual config settings
+	 * - DB settings
+	 * Every key will be stored distinct in this particular order
+	 *
+	 * @param string  $family         The category of the configuration value
+	 *
+	 * @return array Stored array of [key => value] pairs or empty [] if it does not exist
+	 */
+	public static function getAll($family)
+	{
+		// Database isn't ready or populated yet, fallback to file config
+		if (!self::getApp()->getMode()->has(App\Mode::DBCONFIGAVAILABLE)) {
+			$config = self::getApp()->getConfigValue($family);
+			if (is_array($config)) {
+				return $config;
+			} else {
+				return [];
+			}
+		}
+
+		if (empty(self::$adapter)) {
+			self::init();
+		}
+
+		return self::$adapter->getAll($family);
+	}
+
+	/**
 	 * @brief Sets a configuration value for system config
 	 *
 	 * Stores a config value ($value) in the category ($family) under the key ($key)

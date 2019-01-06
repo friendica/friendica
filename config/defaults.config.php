@@ -147,14 +147,6 @@ return [
 		// Disable the polling of DFRN and OStatus contacts through onepoll.php.
 		'disable_polling' => false,
 
-		// dlogfile (Path)
-		// location of the developer log file.
-		'dlogfile' => '',
-
-		// dlogip (String)
-		// restricts develop log writes to requests originating from this IP address.
-		'dlogip' => '',
-
 		// free_crawls (Integer)
 		// Number of "free" searches when system => permit_crawling is enabled.
 		'free_crawls' => 10,
@@ -294,10 +286,6 @@ return [
 		// png_quality (Integer)
 		// Sets the ImageMagick compression level for PNG images. Values ranges from 0 (uncompressed) to 9 (most compressed).
 		'png_quality' => 8,
-
-		// profiler (Boolean)
-		// Enable internal timings to help optimize code. Needed for "rendertime" addon.
-		'profiler' => false,
 
 		// proxy_cache_time (Integer)
 		// Period in seconds after which the cache is cleared.
