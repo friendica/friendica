@@ -2,7 +2,6 @@
 
 namespace Friendica\Test\Model;
 
-use Friendica\BaseObject;
 use Friendica\Model\User;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\DBAMockTrait;
@@ -22,9 +21,6 @@ class UserTest extends MockedTest
 	protected function setUp()
 	{
 		parent::setUp();
-
-		$this->app = BaseObject::getApp();
-		$this->app->getLogger()->enableTest();
 
 		$this->parent = [
 			'uid'        => 1,
