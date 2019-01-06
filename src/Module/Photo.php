@@ -10,10 +10,6 @@ use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Model\Photo as MPhoto;
 use Friendica\Object\Image;
-use Friendica\Util\Security;
-use Friendica\Network\HTTPException\NotFoundException;
-use Friendica\Network\HTTPException\BadRequestException;
-use Friendica\Network\HTTPException\InternalServerErrorException;
 
 /**
  * @brief Photo Module

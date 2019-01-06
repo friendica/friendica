@@ -4,8 +4,6 @@ namespace Friendica\Module;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Database\DBA;
-use Friendica\Database\DBStructure;
 use Friendica\Core;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;

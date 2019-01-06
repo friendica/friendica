@@ -5,7 +5,6 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\Core\Config;
 use Friendica\Core\Update;
 
 class DBUpdate

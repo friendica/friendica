@@ -6,9 +6,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\Core\Logger;
-use Friendica\Core\System;
-
 require_once 'boot.php';
 
 /**

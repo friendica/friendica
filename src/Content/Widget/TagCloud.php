@@ -11,7 +11,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
-use Friendica\Util\Security;
 
 require_once 'include/dba.php';
 

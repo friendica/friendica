@@ -3,9 +3,6 @@
 namespace Friendica\Core;
 
 use Friendica\Database\DBA;
-use Friendica\Core\Config;
-use Friendica\Core\Logger;
-
 
 
 /**

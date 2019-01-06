@@ -8,7 +8,6 @@ namespace Friendica\Model;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBA;
-use Friendica\Model\Item;
 
 /**
  * @brief This class handles FileTag related functions

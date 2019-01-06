@@ -9,7 +9,6 @@ namespace Friendica\Content\Text;
 use Friendica\BaseObject;
 use Friendica\Model\Contact;
 use Michelf\MarkdownExtra;
-use Friendica\Content\Text\HTML;
 
 /**
  * Friendica-specific usage of Markdown

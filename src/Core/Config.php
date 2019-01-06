@@ -10,7 +10,6 @@ namespace Friendica\Core;
 
 use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Core\Config;
 
 require_once 'include/dba.php';
 

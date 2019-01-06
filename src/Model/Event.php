@@ -14,7 +14,6 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 use Friendica\Util\XML;

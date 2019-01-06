@@ -2,11 +2,9 @@
 
 namespace Friendica\Util;
 
-use Friendica\BaseModule;
 use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\Util\Strings;
 
 /**
  * @brief Proxy utilities class

@@ -21,7 +21,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Util\JsonLD;
 use Friendica\Util\LDSignature;
 use Friendica\Model\Profile;
-use Friendica\Core\Config;
 use Friendica\Object\Image;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;

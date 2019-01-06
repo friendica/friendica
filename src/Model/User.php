@@ -16,7 +16,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;

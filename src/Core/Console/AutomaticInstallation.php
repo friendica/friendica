@@ -7,8 +7,6 @@ use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Installer;
 use Friendica\Core\Theme;
-use Friendica\Database\DBA;
-use Friendica\Database\DBStructure;
 use RuntimeException;
 
 require_once 'include/dba.php';

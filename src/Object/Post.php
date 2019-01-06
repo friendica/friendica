@@ -16,7 +16,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Model\Conversation;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
 use Friendica\Util\Crypto;

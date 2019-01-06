@@ -6,7 +6,6 @@ namespace Friendica\Core;
 
 use DOMDocument;
 use Exception;
-use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;

@@ -5,9 +5,6 @@
 namespace Friendica\Core;
 
 use Friendica\App;
-use Friendica\Core\Logger;
-use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;

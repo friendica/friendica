@@ -7,7 +7,6 @@ namespace Friendica\Core;
 
 use Exception;
 use Friendica\BaseObject;
-use Friendica\Core\System;
 use Friendica\Render\FriendicaSmarty;
 
 /**

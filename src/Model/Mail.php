@@ -10,7 +10,6 @@ use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Model\Photo;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 

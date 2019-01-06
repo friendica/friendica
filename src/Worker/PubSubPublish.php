@@ -5,7 +5,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;

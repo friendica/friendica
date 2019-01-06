@@ -4,6 +4,7 @@
  */
 namespace Friendica\Protocol;
 
+use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
 use Friendica\Core\Protocol;
 use Friendica\Model\APContact;

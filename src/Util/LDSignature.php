@@ -3,9 +3,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Logger;
-use Friendica\Util\JsonLD;
-use Friendica\Util\DateTimeFormat;
-use Friendica\Protocol\ActivityPub;
 use Friendica\Model\APContact;
 
 /**

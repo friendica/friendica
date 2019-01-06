@@ -8,7 +8,6 @@ use Detection\MobileDetect;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Psr\Log\LoggerInterface;

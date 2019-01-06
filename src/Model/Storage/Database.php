@@ -8,7 +8,6 @@ namespace Friendica\Model\Storage;
 
 use Friendica\Core\Logger;
 use Friendica\Core\L10n;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 
 /**

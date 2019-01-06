@@ -18,7 +18,6 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model;
-use Friendica\Module\Login;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;

@@ -11,7 +11,6 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\PermissionSet;
-use Friendica\Database\DBA;
 
 require_once 'include/dba.php';
 

@@ -10,7 +10,6 @@ use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\Util\Security;
 
 require_once 'boot.php';
 require_once 'include/dba.php';

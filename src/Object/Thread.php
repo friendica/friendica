@@ -7,7 +7,6 @@ namespace Friendica\Object;
 use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\Object\Post;
 use Friendica\Util\Security;
 
 require_once 'boot.php';

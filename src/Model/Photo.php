@@ -219,7 +219,7 @@ class Photo extends BaseObject
 		$fields = self::getFields();
 		$values = array_fill(0, count($fields), "");
 		$photo = array_combine($fields, $values);
-		$photo["backend-class"] = \Friendica\Model\Storage\SystemResource::class;
+		$photo["backend-class"] = Storage\SystemResource::class;
 		$photo["backend-ref"] = $filename;
 		$photo["type"] = $mimetype;
 		$photo["cacheable"] = false;

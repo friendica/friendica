@@ -5,8 +5,6 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Core\Logger;
-use Friendica\Core\Renderer;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\XML;
 

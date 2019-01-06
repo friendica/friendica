@@ -4,8 +4,6 @@
  */
 namespace Friendica\Content;
 
-use Friendica\Content\ContactSelector;
-use Friendica\Content\Feature;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;

@@ -9,7 +9,6 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\Model\Conversation;
 use Friendica\Model\Contact;
 use Friendica\Model\APContact;
 use Friendica\Model\Item;

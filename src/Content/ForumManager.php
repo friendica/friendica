@@ -6,7 +6,6 @@
 namespace Friendica\Content;
 
 use Friendica\Core\Protocol;
-use Friendica\Content\Feature;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;

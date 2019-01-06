@@ -6,7 +6,6 @@ namespace Friendica\Protocol;
 
 use Friendica\Core\Logger;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Protocol;
 use Friendica\Model\Item;
 
 /**

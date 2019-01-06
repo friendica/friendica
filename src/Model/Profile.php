@@ -20,7 +20,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Model\Contact;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;

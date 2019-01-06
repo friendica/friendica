@@ -2,7 +2,6 @@
 
 namespace Friendica\Core\Console;
 
-use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Util\Strings;

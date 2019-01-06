@@ -6,7 +6,6 @@ use Friendica\Core\Cache;
 use Friendica\Core\Logger;
 
 use Exception;
-use Friendica\Network\HTTPException\InternalServerErrorException;
 use Memcached;
 
 /**

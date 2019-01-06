@@ -9,9 +9,6 @@ use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Core\L10n;
-use Friendica\Model\PermissionSet;
-use Friendica\Core\System;
 
 /**
  * Secures that User is allow to do requests

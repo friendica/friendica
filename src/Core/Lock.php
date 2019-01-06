@@ -1,13 +1,12 @@
 <?php
 
-namespace Friendica\Core;
-
 /**
  * @file src/Core/Lock.php
  * @brief Functions for preventing parallel execution of functions
  */
 
-use Friendica\Core\Logger;
+namespace Friendica\Core;
+
 use Friendica\Core\Cache\CacheDriverFactory;
 use Friendica\Core\Cache\IMemoryCacheDriver;
 
