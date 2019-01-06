@@ -41,7 +41,7 @@ class BaseObjectTest extends TestCase
 	{
 		$logger = $logger = LoggerFactory::create('test');
 		$app = new App(__DIR__ . '/../../', $logger);
-		LoggerFactory::enableTest($logger);
+		$logger->enableTest();
 		$this->assertNull($this->baseObject->setApp($app));
 		$this->assertEquals($app, $this->baseObject->getApp());
 	}
