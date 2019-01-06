@@ -2561,10 +2561,10 @@ function admin_page_logs(App $a)
 
 			$loghandlerform[] = [
 				'handler'     => ["handler_name[$id]", L10n::t('Handler name'), $id, '', L10n::t('The handler name'), 'required', '', ''],
-				'enabled'     => ["handler_enabled[$id]", L10n::t('Handler enabled'), $h['enabled'], L10n::t('Enabling/Disabling this handler')],
-				'description' => ["handler_desc[$id]", L10n::t('Handler description'), $h['description'], L10n::t('Human readable description of this handler')],
-				'logfile'     => ["handler_logfile[$id]", L10n::t('Handler logfile'), $logfile, L10n::t('Must be writable by web server. Relative to your Friendica top-level directory.')],
-				'loglevel'    => ["handler_loglevel[$id]", L10n::t('Handler log level'), $h['loglevel'], '', $log_choices],
+				'enabled'     => ["handler_enabled[$id]", L10n::t('Handler enabled'), $h['enabled'], L10n::t('Enabling/Disabling this handler.')],
+				'description' => ["handler_desc[$id]", L10n::t('Handler description'), $h['description'], L10n::t('A human readable description of this handler.')],
+				'logfile'     => ["handler_logfile[$id]", L10n::t('Handler logfile'), $logfile, L10n::t('Must be writable by web server.')],
+				'loglevel'    => ["handler_loglevel[$id]", L10n::t('Handler log level'), $h['loglevel'], L10n::t('The loglevel for this handler to listen on.'), $log_choices],
 				'errors'      => ["handler_errors[$id]", L10n::t('PHP logging'), $h['errors'], L10n::t('Writing PHP error logging to the current log handler (f.e. E_ERROR)')],
 			];
 		}
