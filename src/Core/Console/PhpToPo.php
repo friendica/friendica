@@ -206,6 +206,9 @@ HELP;
 	 * - replace " with \"
 	 * - replace tab char with \t
 	 * - manage multiline strings
+	 *
+	 * @param string $str
+	 * @return string
 	 */
 	private function massageString($str)
 	{

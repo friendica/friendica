@@ -60,6 +60,7 @@ class Proxy
 	 * @param string $size      One of the ProxyUtils::SIZE_* constants
 	 *
 	 * @return string The proxyfied URL or relative path
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function proxifyUrl($url, $writemode = false, $size = '')
 	{
@@ -138,6 +139,7 @@ class Proxy
 	 * @param string $html Un-proxified HTML code
 	 *
 	 * @return string Proxified HTML code
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function proxifyHtml($html)
 	{
@@ -151,6 +153,7 @@ class Proxy
 	 *
 	 * @param string $url
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function isLocalImage($url)
 	{
@@ -190,6 +193,7 @@ class Proxy
 	 *
 	 * @param array $matches Matches from preg_replace_callback()
 	 * @return string Proxified HTML image tag
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function replaceUrl(array $matches)
 	{

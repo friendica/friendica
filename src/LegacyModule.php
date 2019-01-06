@@ -22,6 +22,7 @@ class LegacyModule extends BaseModule
 	 * The only method that needs to be called, with the module/addon file name.
 	 *
 	 * @param string $file_path
+	 * @throws \Exception
 	 */
 	public static function setModuleFile($file_path)
 	{
@@ -59,6 +60,7 @@ class LegacyModule extends BaseModule
 	 *
 	 * @param string $function_suffix
 	 * @return string
+	 * @throws \Exception
 	 */
 	private static function runModuleFunction($function_suffix)
 	{

@@ -48,9 +48,9 @@ class Hook extends BaseObject
 	 *
 	 * This function is meant to be called by modules on each page load as it works after loadHooks has been called.
 	 *
-	 * @param type $hook
-	 * @param type $file
-	 * @param type $function
+	 * @param string $hook
+	 * @param string $file
+	 * @param string $function
 	 */
 	public static function add($hook, $file, $function)
 	{
@@ -70,6 +70,7 @@ class Hook extends BaseObject
 	 * @param string $function the name of the function that the hook will call
 	 * @param int    $priority A priority (defaults to 0)
 	 * @return mixed|bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function register($hook, $file, $function, $priority = 0)
 	{
@@ -92,6 +93,7 @@ class Hook extends BaseObject
 	 * @param string $file     the name of the file that hooks into
 	 * @param string $function the name of the function that the hook called
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function unregister($hook, $file, $function)
 	{
@@ -131,6 +133,7 @@ class Hook extends BaseObject
 	 * @param integer $priority of the hook
 	 * @param string  $name     of the hook to call
 	 * @param mixed   $data     to transmit to the callback handler
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function fork($priority, $name, $data = null)
 	{
@@ -163,8 +166,9 @@ class Hook extends BaseObject
 	 * Use this function when you want to be able to allow a hook to manipulate
 	 * the provided data.
 	 *
-	 * @param string       $name  of the hook to call
+	 * @param string        $name of the hook to call
 	 * @param string|array &$data to transmit to the callback handler
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function callAll($name, &$data = null)
 	{
@@ -178,10 +182,11 @@ class Hook extends BaseObject
 	/**
 	 * @brief Calls a single hook.
 	 *
-	 * @param App $a
-	 * @param string         $name of the hook to call
-	 * @param array          $hook Hook data
+	 * @param App             $a
+	 * @param string          $name of the hook to call
+	 * @param array           $hook Hook data
 	 * @param string|array   &$data to transmit to the callback handler
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function callSingle(App $a, $name, $hook, &$data = null)
 	{

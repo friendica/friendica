@@ -9,9 +9,9 @@ class Plaintext
 	/**
 	 * Shortens message
 	 *
-	 * @param type $msg
-	 * @param type $limit
-	 * @return type
+	 * @param  string $msg
+	 * @param  int    $limit
+	 * @return string
 	 *
 	 * @todo For Twitter URLs aren't shortened, but they have to be calculated as if.
 	 */

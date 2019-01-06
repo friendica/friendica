@@ -53,6 +53,7 @@ class Tos extends BaseModule
 			self::getApp()->internalRedirect('profile/' . Config::get('system','singleuser'));
 		}
 	}
+
 	/**
 	 * @brief generate the content of the /tos page
 	 *
@@ -63,7 +64,8 @@ class Tos extends BaseModule
 	 *     This privacy statement has fixed text, so it can be translated easily.
 	 *
 	 * @return string
-	 **/
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
 	public static function content() {
 		$tpl = Renderer::getMarkupTemplate('tos.tpl');
 		if (Config::get('system', 'tosdisplay')) {

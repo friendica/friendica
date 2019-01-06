@@ -102,12 +102,13 @@ class Temporal
 	 * arguments follow convention as other field_* template array:
 	 * 'name', 'label', $value, 'help'
 	 *
-	 * @param string $name Name of the selector
-	 * @param string $label Label for the selector
+	 * @param string $name    Name of the selector
+	 * @param string $label   Label for the selector
 	 * @param string $current Timezone
-	 * @param string $help Help text
+	 * @param string $help    Help text
 	 *
 	 * @return string Parsed HTML
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getTimezoneField($name = 'timezone', $label = '', $current = 'America/Los_Angeles', $help = '')
 	{
@@ -126,6 +127,7 @@ class Temporal
 	 *
 	 * @param string $dob Date of Birth
 	 * @return string Formatted HTML
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getDateofBirthField($dob)
 	{
@@ -166,6 +168,7 @@ class Temporal
 	 * @param string $id      ID and name of datetimepicker (defaults to "datetimepicker")
 	 *
 	 * @return string Parsed HTML output.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getDateField($min, $max, $default, $id = 'datepicker')
 	{
@@ -180,6 +183,7 @@ class Temporal
 	 * @param string $id ID and name of datetimepicker (defaults to "timepicker")
 	 *
 	 * @return string Parsed HTML output.
+	 * @throws \Exception
 	 */
 	public static function getTimeField($h, $m, $id = 'timepicker')
 	{
@@ -192,6 +196,7 @@ class Temporal
 	 * @param DateTime $minDate     Minimum date
 	 * @param DateTime $maxDate     Maximum date
 	 * @param DateTime $defaultDate Default date
+	 * @param          $label
 	 * @param string   $id          Id and name of datetimepicker (defaults to "datetimepicker")
 	 * @param bool     $pickdate    true to show date picker (default)
 	 * @param bool     $picktime    true to show time picker (default)
@@ -201,7 +206,8 @@ class Temporal
 	 *
 	 * @return string Parsed HTML output.
 	 *
-	 * @todo Once browser support is better this could probably be replaced with
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @todo  Once browser support is better this could probably be replaced with
 	 * native HTML5 date picker.
 	 */
 	public static function getDateTimeField(
@@ -351,11 +357,12 @@ class Temporal
 	 * and become a year older. If you wish me happy birthday on January 1
 	 * (San Bruno time), you'll be a day late.
 	 *
-	 * @param string $dob Date of Birth
-	 * @param string $owner_tz (optional) Timezone of the person of interest
+	 * @param string $dob       Date of Birth
+	 * @param string $owner_tz  (optional) Timezone of the person of interest
 	 * @param string $viewer_tz (optional) Timezone of the person viewing
 	 *
 	 * @return int Age in years
+	 * @throws \Exception
 	 */
 	public static function getAgeByTimezone($dob, $owner_tz = '', $viewer_tz = '')
 	{
@@ -407,6 +414,7 @@ class Temporal
 	 * @param int $m Month (1=January, 12=December)
 	 *
 	 * @return string day 0 = Sunday through 6 = Saturday
+	 * @throws \Exception
 	 */
 	private static function getFirstDayInMonth($y, $m)
 	{
@@ -423,14 +431,15 @@ class Temporal
 	 * altering td class.
 	 * Months count from 1.
 	 *
-	 * @param int    $y Year
-	 * @param int    $m Month
+	 * @param int    $y     Year
+	 * @param int    $m     Month
 	 * @param array  $links (default null)
 	 * @param string $class
 	 *
 	 * @return string
 	 *
-	 * @todo Provide (prev, next) links, define class variations for different size calendars
+	 * @throws \Exception
+	 * @todo  Provide (prev, next) links, define class variations for different size calendars
 	 */
 	public static function getCalendarTable($y = 0, $m = 0, $links = null, $class = '')
 	{

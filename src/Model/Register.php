@@ -20,6 +20,7 @@ class Register
 	 * Return the list of pending registrations
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function getPending()
 	{
@@ -37,6 +38,7 @@ class Register
 	 * Returns the pending registration count
 	 *
 	 * @return int
+	 * @throws \Exception
 	 */
 	public static function getPendingCount()
 	{
@@ -54,6 +56,7 @@ class Register
 	 *
 	 * @param  string $hash
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function getByHash($hash)
 	{
@@ -63,8 +66,9 @@ class Register
 	/**
 	 * Returns true if a register record exists with the provided hash
 	 *
-	 * @param  string  $hash
+	 * @param  string $hash
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function existsByHash($hash)
 	{
@@ -75,6 +79,7 @@ class Register
 	 * Creates a register record for an invitation and returns the auto-generated code for it
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function createForInvitation()
 	{
@@ -98,6 +103,7 @@ class Register
 	 * @param  string  $language The registration language
 	 * @param  string  $note     An additional message from the user
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function createForApproval($uid, $language, $note = '')
 	{
@@ -122,8 +128,9 @@ class Register
 	/**
 	 * Deletes a register record by the provided hash and returns the success of the database deletion
 	 *
-	 * @param  string  $hash
+	 * @param  string $hash
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function deleteByHash($hash)
 	{

@@ -77,6 +77,7 @@ class CurlResult
 	 * @param string $url optional URL
 	 *
 	 * @return CurlResult a CURL with error response
+	 * @throws InternalServerErrorException
 	 */
 	public static function createErrorCurl($url = '')
 	{

@@ -36,7 +36,7 @@ require_once 'include/text.php';
 class Contact extends BaseObject
 {
 	/**
-	 * @name page/profile types
+	 * Page/profile types
 	 *
 	 * PAGE_NORMAL is a typical personal profile account
 	 * PAGE_SOAPBOX automatically approves all friend requests as Contact::SHARING, (readonly)
@@ -85,7 +85,7 @@ class Contact extends BaseObject
 	 */
 
 	/**
-	 * @name Contact_is
+	 * Contact_is
 	 *
 	 * Relationship types
 	 * @{
@@ -104,6 +104,8 @@ class Contact extends BaseObject
 	 * @param int $uid User ID
 	 *
 	 * @return boolean is the contact id a follower?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function isFollower($cid, $uid)
 	{
@@ -122,11 +124,13 @@ class Contact extends BaseObject
 
 	/**
 	 * @brief Get the basepath for a given contact link
-	 * @todo Add functionality to store this value in the contact table
+	 * @todo  Add functionality to store this value in the contact table
 	 *
 	 * @param string $url The contact link
 	 *
 	 * @return string basepath
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getBasepath($url)
 	{
@@ -146,6 +150,8 @@ class Contact extends BaseObject
 	 * @param int $uid User ID
 	 *
 	 * @return array with public and user's contact id
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getPublicAndUserContacID($cid, $uid)
 	{
@@ -183,6 +189,7 @@ class Contact extends BaseObject
 	 * @param int     $cid     Either public contact id or user's contact id
 	 * @param int     $uid     User ID
 	 * @param boolean $blocked Is the contact blocked or unblocked?
+	 * @throws \Exception
 	 */
 	public static function setBlockedForUser($cid, $uid, $blocked)
 	{
@@ -205,6 +212,7 @@ class Contact extends BaseObject
 	 * @param int $uid User ID
 	 *
 	 * @return boolean is the contact id blocked for the given user?
+	 * @throws \Exception
 	 */
 	public static function isBlockedByUser($cid, $uid)
 	{
@@ -244,6 +252,7 @@ class Contact extends BaseObject
 	 * @param int     $cid     Either public contact id or user's contact id
 	 * @param int     $uid     User ID
 	 * @param boolean $ignored Is the contact ignored or unignored?
+	 * @throws \Exception
 	 */
 	public static function setIgnoredForUser($cid, $uid, $ignored)
 	{
@@ -266,6 +275,7 @@ class Contact extends BaseObject
 	 * @param int $uid User ID
 	 *
 	 * @return boolean is the contact id ignored for the given user?
+	 * @throws \Exception
 	 */
 	public static function isIgnoredByUser($cid, $uid)
 	{
@@ -305,6 +315,7 @@ class Contact extends BaseObject
 	 * @param int     $cid       Either public contact id or user's contact id
 	 * @param int     $uid       User ID
 	 * @param boolean $collapsed are the contact's posts collapsed or uncollapsed?
+	 * @throws \Exception
 	 */
 	public static function setCollapsedForUser($cid, $uid, $collapsed)
 	{
@@ -323,6 +334,8 @@ class Contact extends BaseObject
 	 * @param int $uid User ID
 	 *
 	 * @return boolean is the contact id blocked for the given user?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function isCollapsedByUser($cid, $uid)
 	{
@@ -348,6 +361,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $gid
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function getByGroupId($gid)
 	{
@@ -381,6 +395,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $gid
 	 * @return int
+	 * @throws \Exception
 	 */
 	public static function getOStatusCountByGroupId($gid)
 	{
@@ -409,6 +424,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $uid
 	 * @return bool Operation success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function createSelfFromUserId($uid)
 	{
@@ -453,8 +469,9 @@ class Contact extends BaseObject
 	/**
 	 * Updates the self-contact for the provided user id
 	 *
-	 * @param int $uid
+	 * @param int     $uid
 	 * @param boolean $update_avatar Force the avatar update
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function updateSelfFromUserID($uid, $update_avatar = false)
 	{
@@ -554,6 +571,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $id contact id
 	 * @return null
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function remove($id)
 	{
@@ -577,6 +595,8 @@ class Contact extends BaseObject
 	 * @param array   $contact  Contact unfriended
 	 * @param boolean $dissolve Remove the contact on the remote side
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function terminateFriendship(array $user, array $contact, $dissolve = false)
 	{
@@ -619,6 +639,7 @@ class Contact extends BaseObject
 	 *
 	 * @param array $contact contact to mark for archival
 	 * @return null
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function markForArchival(array $contact)
 	{
@@ -665,10 +686,11 @@ class Contact extends BaseObject
 	/**
 	 * @brief Cancels the archival countdown
 	 *
-	 * @see Contact::markForArchival()
+	 * @see   Contact::markForArchival()
 	 *
 	 * @param array $contact contact to be unmarked for archival
 	 * @return null
+	 * @throws \Exception
 	 */
 	public static function unmarkForArchival(array $contact)
 	{
@@ -710,6 +732,7 @@ class Contact extends BaseObject
 	 * @param array  $default If not data was found take this data as default value
 	 *
 	 * @return array Contact data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getDetailsByURL($url, $uid = -1, array $default = [])
 	{
@@ -852,6 +875,8 @@ class Contact extends BaseObject
 	 * @param int    $uid  User id
 	 *
 	 * @return array Contact data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getDetailsByAddr($addr, $uid = -1)
 	{
@@ -907,6 +932,8 @@ class Contact extends BaseObject
 	 * @param array $contact contact
 	 * @param int   $uid     optional, default 0
 	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function photoMenu(array $contact, $uid = 0)
 	{
@@ -1020,10 +1047,7 @@ class Contact extends BaseObject
 	 * Returns either the total number of ungrouped contacts for the given user
 	 * id or a paginated list of ungrouped contacts.
 	 *
-	 * @param int $uid   uid
-	 * @param int $start optional, default 0
-	 * @param int $count optional, default 0
-	 *
+	 * @param int $uid uid
 	 * @return array
 	 */
 	public static function getUngroupedList($uid)
@@ -1067,6 +1091,8 @@ class Contact extends BaseObject
 	 * @param boolean $in_loop   Internally used variable to prevent an endless loop
 	 *
 	 * @return integer Contact ID
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getIdForURL($url, $uid = 0, $no_update = false, $default = [], $in_loop = false)
 	{
@@ -1324,6 +1350,7 @@ class Contact extends BaseObject
 	 * @param int $cid contact id
 	 *
 	 * @return boolean Is the contact blocked?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isBlocked($cid)
 	{
@@ -1349,6 +1376,7 @@ class Contact extends BaseObject
 	 * @param int $cid contact id
 	 *
 	 * @return boolean Is the contact hidden?
+	 * @throws \Exception
 	 */
 	public static function isHidden($cid)
 	{
@@ -1368,7 +1396,10 @@ class Contact extends BaseObject
 	 *
 	 * @param string $contact_url Contact URL
 	 *
+	 * @param bool   $thread_mode
+	 * @param int    $update
 	 * @return string posts in HTML
+	 * @throws \Exception
 	 */
 	public static function getPostsFromUrl($contact_url, $thread_mode = false, $update = 0)
 	{
@@ -1485,6 +1516,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $uid
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function block($uid)
 	{
@@ -1498,6 +1530,7 @@ class Contact extends BaseObject
 	 *
 	 * @param int $uid
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function unblock($uid)
 	{
@@ -1515,6 +1548,8 @@ class Contact extends BaseObject
 	 * @param bool   $force  force picture update
 	 *
 	 * @return array Returns array of the different avatar sizes
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function updateAvatar($avatar, $uid, $cid, $force = false)
 	{
@@ -1554,6 +1589,8 @@ class Contact extends BaseObject
 	 * @param integer $id      contact id
 	 * @param string  $network Optional network we are probing for
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function updateFromProbe($id, $network = '')
 	{
@@ -1629,7 +1666,9 @@ class Contact extends BaseObject
 	 * @param string $url
 	 * @param bool   $interactive
 	 * @param string $network
-	 * @return boolean|string
+	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function createFromProbe($uid, $url, $interactive = false, $network = '')
 	{
@@ -1836,10 +1875,11 @@ class Contact extends BaseObject
 	/**
 	 * @brief Updated contact's SSL policy
 	 *
-	 * @param array  $contact Contact array
+	 * @param array  $contact    Contact array
 	 * @param string $new_policy New policy, valid: self,full
 	 *
 	 * @return array Contact array with updated values
+	 * @throws \Exception
 	 */
 	public static function updateSslPolicy(array $contact, $new_policy)
 	{
@@ -2043,6 +2083,7 @@ class Contact extends BaseObject
 	 * Remove the unavailable contact ids from the provided list
 	 *
 	 * @param array $contact_ids Contact id list
+	 * @throws \Exception
 	 */
 	public static function pruneUnavailable(array &$contact_ids)
 	{
@@ -2067,12 +2108,14 @@ class Contact extends BaseObject
 	/**
 	 * @brief Returns a magic link to authenticate remote visitors
 	 *
-	 * @todo check if the return is either a fully qualified URL or a relative path to Friendica basedir
+	 * @todo  check if the return is either a fully qualified URL or a relative path to Friendica basedir
 	 *
 	 * @param string $contact_url The address of the target contact profile
-	 * @param string $url An url that we will be redirected to after the authentication
+	 * @param string $url         An url that we will be redirected to after the authentication
 	 *
 	 * @return string with "redir" link
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function magicLink($contact_url, $url = '')
 	{
@@ -2092,9 +2135,11 @@ class Contact extends BaseObject
 	 * @brief Returns a magic link to authenticate remote visitors
 	 *
 	 * @param integer $cid The contact id of the target contact profile
-	 * @param integer $url An url that we will be redirected to after the authentication
+	 * @param string  $url An url that we will be redirected to after the authentication
 	 *
 	 * @return string with "redir" link
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function magicLinkbyId($cid, $url = '')
 	{
@@ -2106,10 +2151,12 @@ class Contact extends BaseObject
 	/**
 	 * @brief Returns a magic link to authenticate remote visitors
 	 *
-	 * @param array $contact The contact array with "uid", "network" and "url"
-	 * @param string $url An url that we will be redirected to after the authentication
+	 * @param array  $contact The contact array with "uid", "network" and "url"
+	 * @param string $url     An url that we will be redirected to after the authentication
 	 *
 	 * @return string with "redir" link
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function magicLinkbyContact($contact, $url = '')
 	{

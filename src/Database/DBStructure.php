@@ -165,6 +165,7 @@ class DBStructure
 	 * @param array $tables     An array of the database tables
 	 * @param array $definition An array of the definition tables
 	 * @return string Empty string if the update is successful, error messages otherwise
+	 * @throws Exception
 	 */
 	public static function update($verbose, $action, $install = false, array $tables = null, array $definition = null) {
 		if ($action && !$install) {
@@ -648,11 +649,12 @@ class DBStructure
 	}
 
 	/**
-	 * 	Check if a table exists
+	 *    Check if a table exists
 	 *
 	 * @param string $table Table name
 	 *
 	 * @return boolean Does the table exist?
+	 * @throws Exception
 	 */
 	public static function existsTable($table)
 	{
@@ -678,12 +680,13 @@ class DBStructure
 	}
 
 	/**
-	 * 	Check if the columns of the table exists
+	 *    Check if the columns of the table exists
 	 *
 	 * @param string $table   Table name
 	 * @param array  $columns Columns to check ( Syntax: [ $col1, $col2, .. ] )
 	 *
 	 * @return boolean Does the table exist?
+	 * @throws Exception
 	 */
 	public static function existsColumn($table, $columns = []) {
 		if (empty($table)) {
@@ -722,15 +725,16 @@ class DBStructure
 
 	/**
 	 * Renames columns or the primary key of a table
+	 *
 	 * @todo You cannot rename a primary key if "auto increment" is set
 	 *
-	 * @param string $table    Table name
-	 * @param array  $columns  Columns Syntax for Rename: [ $old1 => [ $new1, $type1 ], $old2 => [ $new2, $type2 ], ... ] )
-	 *                                 Syntax for Primary Key: [ $col1, $col2, ...] )
-	 * @param int    $type     The type of renaming (Default is Column)
+	 * @param string $table   Table name
+	 * @param array  $columns Columns Syntax for Rename: [ $old1 => [ $new1, $type1 ], $old2 => [ $new2, $type2 ], ... ] )
+	 *                                Syntax for Primary Key: [ $col1, $col2, ...] )
+	 * @param int    $type    The type of renaming (Default is Column)
 	 *
 	 * @return boolean Was the renaming successful?
-	 *
+	 * @throws Exception
 	 */
 	public static function rename($table, $columns, $type = self::RENAME_COLUMN) {
 		if (empty($table) || empty($columns)) {

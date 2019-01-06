@@ -38,6 +38,7 @@ class NotificationsManager extends BaseObject
 	 *  - date_rel : relative date string
 	 *  - msg_html: message as html string
 	 *  - msg_plain: message as plain text string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function _set_extra($notes)
 	{
@@ -63,6 +64,7 @@ class NotificationsManager extends BaseObject
 	 * @param string $limit  optional Query limits
 	 *
 	 * @return array of results or false on errors
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function getAll($filter = [], $order = "-date", $limit = "")
 	{
@@ -111,6 +113,7 @@ class NotificationsManager extends BaseObject
 	 *
 	 * @param int $id identity
 	 * @return array note values or null if not found
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function getByID($id)
 	{
@@ -163,6 +166,7 @@ class NotificationsManager extends BaseObject
 	 * @brief List of pages for the Notifications TabBar
 	 *
 	 * @return array with with notifications TabBar data
+	 * @throws \Exception
 	 */
 	public function getTabs()
 	{
@@ -215,14 +219,15 @@ class NotificationsManager extends BaseObject
 	 * @param array  $notifs The array from the db query
 	 * @param string $ident  The notifications identifier (e.g. network)
 	 * @return array
-	 * 	string 'label' => The type of the notification
-	 * 	string 'link' => URL to the source
-	 * 	string 'image' => The avatar image
-	 * 	string 'url' => The profile url of the contact
-	 * 	string 'text' => The notification text
-	 * 	string 'when' => The date of the notification
-	 * 	string 'ago' => T relative date of the notification
-	 * 	bool 'seen' => Is the notification marked as "seen"
+	 *                       string 'label' => The type of the notification
+	 *                       string 'link' => URL to the source
+	 *                       string 'image' => The avatar image
+	 *                       string 'url' => The profile url of the contact
+	 *                       string 'text' => The notification text
+	 *                       string 'when' => The date of the notification
+	 *                       string 'ago' => T relative date of the notification
+	 *                       bool 'seen' => Is the notification marked as "seen"
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function formatNotifs(array $notifs, $ident = "")
 	{
@@ -400,14 +405,15 @@ class NotificationsManager extends BaseObject
 	/**
 	 * @brief Get network notifications
 	 *
-	 * @param int|string $seen  If 0 only include notifications into the query
-	 * 	                        which aren't marked as "seen"
-	 * @param int        $start Start the query at this point
-	 * @param int        $limit Maximum number of query results
+	 * @param int|string $seen    If 0 only include notifications into the query
+	 *                            which aren't marked as "seen"
+	 * @param int        $start   Start the query at this point
+	 * @param int        $limit   Maximum number of query results
 	 *
 	 * @return array with
-	 * 	string 'ident' => Notification identifier
-	 * 	array 'notifications' => Network notifications
+	 *    string 'ident' => Notification identifier
+	 *    array 'notifications' => Network notifications
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function networkNotifs($seen = 0, $start = 0, $limit = 80)
 	{
@@ -441,14 +447,15 @@ class NotificationsManager extends BaseObject
 	/**
 	 * @brief Get system notifications
 	 *
-	 * @param int|string $seen  If 0 only include notifications into the query
-	 * 	                        which aren't marked as "seen"
-	 * @param int        $start Start the query at this point
-	 * @param int        $limit Maximum number of query results
+	 * @param int|string $seen    If 0 only include notifications into the query
+	 *                            which aren't marked as "seen"
+	 * @param int        $start   Start the query at this point
+	 * @param int        $limit   Maximum number of query results
 	 *
 	 * @return array with
-	 * 	string 'ident' => Notification identifier
-	 * 	array 'notifications' => System notifications
+	 *    string 'ident' => Notification identifier
+	 *    array 'notifications' => System notifications
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function systemNotifs($seen = 0, $start = 0, $limit = 80)
 	{
@@ -483,14 +490,15 @@ class NotificationsManager extends BaseObject
 	/**
 	 * @brief Get personal notifications
 	 *
-	 * @param int|string $seen  If 0 only include notifications into the query
-	 * 	                        which aren't marked as "seen"
-	 * @param int        $start Start the query at this point
-	 * @param int        $limit Maximum number of query results
+	 * @param int|string $seen    If 0 only include notifications into the query
+	 *                            which aren't marked as "seen"
+	 * @param int        $start   Start the query at this point
+	 * @param int        $limit   Maximum number of query results
 	 *
 	 * @return array with
-	 * 	string 'ident' => Notification identifier
-	 * 	array 'notifications' => Personal notifications
+	 *    string 'ident' => Notification identifier
+	 *    array 'notifications' => Personal notifications
+	 * @throws \Exception
 	 */
 	public function personalNotifs($seen = 0, $start = 0, $limit = 80)
 	{
@@ -528,14 +536,15 @@ class NotificationsManager extends BaseObject
 	/**
 	 * @brief Get home notifications
 	 *
-	 * @param int|string $seen  If 0 only include notifications into the query
-	 * 	                        which aren't marked as "seen"
-	 * @param int        $start Start the query at this point
-	 * @param int        $limit Maximum number of query results
+	 * @param int|string $seen    If 0 only include notifications into the query
+	 *                            which aren't marked as "seen"
+	 * @param int        $start   Start the query at this point
+	 * @param int        $limit   Maximum number of query results
 	 *
 	 * @return array with
-	 * 	string 'ident' => Notification identifier
-	 * 	array 'notifications' => Home notifications
+	 *    string 'ident' => Notification identifier
+	 *    array 'notifications' => Home notifications
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function homeNotifs($seen = 0, $start = 0, $limit = 80)
 	{
@@ -568,14 +577,16 @@ class NotificationsManager extends BaseObject
 	/**
 	 * @brief Get introductions
 	 *
-	 * @param bool $all   If false only include introductions into the query
-	 * 	                  which aren't marked as ignored
-	 * @param int  $start Start the query at this point
-	 * @param int  $limit Maximum number of query results
+	 * @param bool $all     If false only include introductions into the query
+	 *                      which aren't marked as ignored
+	 * @param int  $start   Start the query at this point
+	 * @param int  $limit   Maximum number of query results
 	 *
 	 * @return array with
-	 *	string 'ident' => Notification identifier
-	 *	array 'notifications' => Introductions
+	 *    string 'ident' => Notification identifier
+	 *    array 'notifications' => Introductions
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public function introNotifs($all = false, $start = 0, $limit = 80)
 	{
@@ -622,6 +633,8 @@ class NotificationsManager extends BaseObject
 	 *
 	 * @param array $intros The array from the db query
 	 * @return array with the introductions
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private function formatIntros($intros)
 	{
@@ -705,6 +718,7 @@ class NotificationsManager extends BaseObject
 	 * @param array $arr The input array with the intro data
 	 *
 	 * @return array The array with the intro data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function getMissingIntroData($arr)
 	{

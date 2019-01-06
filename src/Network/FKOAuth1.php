@@ -32,6 +32,7 @@ class FKOAuth1 extends OAuthServer
 	/**
 	 * @param string $uid user id
 	 * @return void
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public function loginUser($uid)
 	{

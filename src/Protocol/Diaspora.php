@@ -56,6 +56,7 @@ class Diaspora
 	 * @param array   $contacts The previously fetched contacts
 	 *
 	 * @return array of relay servers
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function relayList($item_id, array $contacts = [])
 	{
@@ -141,6 +142,7 @@ class Diaspora
 	 *
 	 * @param string $server_url The url of the server
 	 * @return array with the contact
+	 * @throws \Exception
 	 */
 	private static function getRelayContact($server_url)
 	{
@@ -172,8 +174,9 @@ class Diaspora
 	/**
 	 * @brief Update or insert a relay contact
 	 *
-	 * @param string $server_url The url of the server
-	 * @param array $network_fields Optional network specific fields
+	 * @param string $server_url     The url of the server
+	 * @param array  $network_fields Optional network specific fields
+	 * @throws \Exception
 	 */
 	public static function setRelayContact($server_url, array $network_fields = [])
 	{
@@ -207,6 +210,7 @@ class Diaspora
 	 * @param array   $contacts The previously fetched contacts
 	 *
 	 * @return array of relay servers
+	 * @throws \Exception
 	 */
 	public static function participantsForThread($thread, array $contacts)
 	{
@@ -253,6 +257,7 @@ class Diaspora
 	 * @param integer $level     This value is only set inside this function to avoid endless loops
 	 *
 	 * @return string the repaired signature
+	 * @throws \Exception
 	 */
 	private static function repairSignature($signature, $handle = "", $level = 1)
 	{
@@ -279,6 +284,8 @@ class Diaspora
 	 * @param string $envelope The magic envelope
 	 *
 	 * @return string verified data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function verifyMagicEnvelope($envelope)
 	{
@@ -375,6 +382,8 @@ class Diaspora
 	 * 'message' -> decoded Diaspora XML message
 	 * 'author' -> author diaspora handle
 	 * 'key' -> author public key (converted to pkcs#8)
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function decodeRaw(array $importer, $raw, $no_exit = false)
 	{
@@ -478,6 +487,8 @@ class Diaspora
 	 * 'message' -> decoded Diaspora XML message
 	 * 'author' -> author diaspora handle
 	 * 'key' -> author public key (converted to pkcs#8)
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function decode(array $importer, $xml)
 	{
@@ -615,6 +626,8 @@ class Diaspora
 	 * @param array $msg The post that will be dispatched
 	 *
 	 * @return int The message id of the generated message, "true" or "false" if there was an error
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function dispatchPublic($msg)
 	{
@@ -643,6 +656,8 @@ class Diaspora
 	 * @param object $fields   SimpleXML object that contains the message
 	 *
 	 * @return int The message id of the generated message, "true" or "false" if there was an error
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function dispatch(array $importer, $msg, $fields = null)
 	{
@@ -749,6 +764,8 @@ class Diaspora
 	 * @param array $msg Array with the XML, the sender handle and the sender signature
 	 *
 	 * @return bool|array If the posting is valid then an array with an SimpleXML object is returned
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function validPosting($msg)
 	{
@@ -897,6 +914,8 @@ class Diaspora
 	 * @param string $handle The handle
 	 *
 	 * @return string The public key
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function key($handle)
 	{
@@ -918,6 +937,8 @@ class Diaspora
 	 * @param string $handle The handle
 	 *
 	 * @return array the queried data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function personByHandle($handle)
 	{
@@ -963,6 +984,7 @@ class Diaspora
 	 * @brief Updates the fcontact table
 	 *
 	 * @param array $arr The fcontact data
+	 * @throws \Exception
 	 */
 	private static function updateFContact($arr)
 	{
@@ -986,6 +1008,7 @@ class Diaspora
 	 * @param int $pcontact_id The id in the contact table (Used for the public contact)
 	 *
 	 * @return string the handle
+	 * @throws \Exception
 	 */
 	private static function handleFromContact($contact_id, $pcontact_id = 0)
 	{
@@ -1032,6 +1055,7 @@ class Diaspora
 	 * @param mixed $fcontact_guid Hexadecimal string guid
 	 *
 	 * @return string the contact url or null
+	 * @throws \Exception
 	 */
 	public static function urlFromContactGuid($fcontact_guid)
 	{
@@ -1053,12 +1077,14 @@ class Diaspora
 	/**
 	 * @brief Get a contact id for a given handle
 	 *
-	 * @todo Move to Friendica\Model\Contact
+	 * @todo  Move to Friendica\Model\Contact
 	 *
 	 * @param int    $uid    The user id
 	 * @param string $handle The handle in the format user@domain.tld
 	 *
 	 * @return int Contact id
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function contactByHandle($uid, $handle)
 	{
@@ -1142,6 +1168,7 @@ class Diaspora
 	 * @param bool   $is_comment Is the check for a comment?
 	 *
 	 * @return array The contact data
+	 * @throws \Exception
 	 */
 	private static function allowedContactByHandle(array $importer, $handle, $is_comment = false)
 	{
@@ -1172,6 +1199,7 @@ class Diaspora
 	 * @param string $guid The guid of the message
 	 *
 	 * @return int|bool message id if the message already was stored into the system - or false.
+	 * @throws \Exception
 	 */
 	private static function messageExists($uid, $guid)
 	{
@@ -1252,6 +1280,8 @@ class Diaspora
 	 * @param array $match array containing a link that has to be checked for a message link
 	 * @param array $item  The item array
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function fetchGuidSub($match, $item)
 	{
@@ -1268,6 +1298,8 @@ class Diaspora
 	 * @param int    $uid    The user id of the user
 	 *
 	 * @return int the message id of the stored message or false
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function storeByGuid($guid, $server, $uid = 0)
 	{
@@ -1304,6 +1336,7 @@ class Diaspora
 	 *      'message' => The message XML
 	 *      'author' => The author handle
 	 *      'key' => The public key of the author
+	 * @throws \Exception
 	 */
 	private static function message($guid, $server, $level = 0)
 	{
@@ -1387,6 +1420,7 @@ class Diaspora
 	 * @param array  $contact The contact of the item owner
 	 *
 	 * @return array the item record
+	 * @throws \Exception
 	 */
 	private static function parentItem($uid, $guid, $author, array $contact)
 	{
@@ -1431,6 +1465,7 @@ class Diaspora
 	 * @return array
 	 *      'cid' => contact id
 	 *      'network' => network type
+	 * @throws \Exception
 	 */
 	private static function authorContactByUrl($def_contact, $person, $uid)
 	{
@@ -1467,6 +1502,8 @@ class Diaspora
 	 * @param string $parent_guid optional parent guid
 	 *
 	 * @return string the post link
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function plink($addr, $guid, $parent_guid = '')
 	{
@@ -1503,6 +1540,8 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveAccountMigration(array $importer, $data)
 	{
@@ -1560,9 +1599,10 @@ class Diaspora
 	/**
 	 * @brief Processes an account deletion
 	 *
-	 * @param object $data     The message object
+	 * @param object $data The message object
 	 *
 	 * @return bool Success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function receiveAccountDeletion($data)
 	{
@@ -1588,6 +1628,8 @@ class Diaspora
 	 * @param boolean $onlyfound Only return uri when found in the database
 	 *
 	 * @return string The constructed uri or the one from our database
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function getUriFromGuid($author, $guid, $onlyfound = false)
 	{
@@ -1614,6 +1656,7 @@ class Diaspora
 	 * @param string $uid Author handle
 	 *
 	 * @return string The post guid
+	 * @throws \Exception
 	 */
 	private static function getGuidFromUri($uri, $uid)
 	{
@@ -1631,6 +1674,7 @@ class Diaspora
 	 * @param string $guid The guid of the item
 	 *
 	 * @return array|boolean the origin owner of that post - or false
+	 * @throws \Exception
 	 */
 	private static function importerForGuid($guid)
 	{
@@ -1654,6 +1698,8 @@ class Diaspora
 	 * @param string $xml      The original XML of the message
 	 *
 	 * @return int The message id of the generated comment or "false" if there was an error
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveComment(array $importer, $sender, $data, $xml)
 	{
@@ -1771,6 +1817,7 @@ class Diaspora
 	 * @param array  $conversation The conversation record to which this message belongs
 	 *
 	 * @return bool "true" if it was successful
+	 * @throws \Exception
 	 */
 	private static function receiveConversationMessage(array $importer, array $contact, $data, $msg, $mesg, $conversation)
 	{
@@ -1859,6 +1906,7 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success
+	 * @throws \Exception
 	 */
 	private static function receiveConversation(array $importer, $msg, $data)
 	{
@@ -1917,6 +1965,8 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return int The message id of the generated like or "false" if there was an error
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveLike(array $importer, $sender, $data)
 	{
@@ -2026,6 +2076,7 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success?
+	 * @throws \Exception
 	 */
 	private static function receiveMessage(array $importer, $data)
 	{
@@ -2101,6 +2152,8 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool always true
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveParticipation(array $importer, $data)
 	{
@@ -2194,6 +2247,8 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveProfile(array $importer, $data)
 	{
@@ -2287,6 +2342,7 @@ class Diaspora
 	 * @param array $importer Array of the importer user
 	 * @param array $contact  The contact that send the request
 	 * @return void
+	 * @throws \Exception
 	 */
 	private static function receiveRequestMakeFriend(array $importer, array $contact)
 	{
@@ -2308,6 +2364,7 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success
+	 * @throws \Exception
 	 */
 	private static function receiveContactRequest(array $importer, $data)
 	{
@@ -2488,9 +2545,9 @@ class Diaspora
 	 *
 	 * @param string $guid        message guid
 	 * @param string $orig_author handle of the original post
-	 * @param string $author      handle of the sharer
-	 *
 	 * @return array The fetched item
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function originalItem($guid, $orig_author)
 	{
@@ -2571,6 +2628,8 @@ class Diaspora
 	 * @param string $xml      The original XML of the message
 	 *
 	 * @return int the message id
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveReshare(array $importer, $data, $xml)
 	{
@@ -2663,6 +2722,7 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool success
+	 * @throws \Exception
 	 */
 	private static function itemRetraction(array $importer, array $contact, $data)
 	{
@@ -2727,6 +2787,7 @@ class Diaspora
 	 * @param object $data     The message object
 	 *
 	 * @return bool Success
+	 * @throws \Exception
 	 */
 	private static function receiveRetraction(array $importer, $sender, $data)
 	{
@@ -2767,11 +2828,13 @@ class Diaspora
 	/**
 	 * @brief Receives status messages
 	 *
-	 * @param array  $importer Array of the importer user
-	 * @param object $data     The message object
-	 * @param string $xml      The original XML of the message
+	 * @param array            $importer Array of the importer user
+	 * @param SimpleXMLElement $data     The message object
+	 * @param string           $xml      The original XML of the message
 	 *
 	 * @return int The message id of the newly created item
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function receiveStatusMessage(array $importer, SimpleXMLElement $data, $xml)
 	{
@@ -2892,6 +2955,7 @@ class Diaspora
 	 * @param array $contact contact array
 	 *
 	 * @return string the handle in the format user@domain.tld
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function myHandle(array $contact)
 	{
@@ -2921,6 +2985,7 @@ class Diaspora
 	 * @param string $pubkey  The public key of the receiver
 	 *
 	 * @return string The encrypted data
+	 * @throws \Exception
 	 */
 	public static function encodePrivateData($msg, array $user, array $contact, $prvkey, $pubkey)
 	{
@@ -2959,6 +3024,7 @@ class Diaspora
 	 * @param array  $user The record of the sender
 	 *
 	 * @return string The envelope
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function buildMagicEnvelope($msg, array $user)
 	{
@@ -3002,6 +3068,7 @@ class Diaspora
 	 * @param bool   $public  Is the message public?
 	 *
 	 * @return string The message that will be transmitted to other servers
+	 * @throws \Exception
 	 */
 	public static function buildMessage($msg, array $user, array $contact, $prvkey, $pubkey, $public = false)
 	{
@@ -3045,7 +3112,10 @@ class Diaspora
 	 * @param bool   $queue_run    Is the transmission called from the queue?
 	 * @param string $guid         message guid
 	 *
+	 * @param bool   $no_queue
 	 * @return int Result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function transmit(array $owner, array $contact, $envelope, $public_batch, $queue_run = false, $guid = "", $no_queue = false)
 	{
@@ -3137,6 +3207,8 @@ class Diaspora
 	 * @param bool   $spool        Should the transmission be spooled or transmitted?
 	 *
 	 * @return int Result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function buildAndTransmit(array $owner, array $contact, $type, $message, $public_batch = false, $guid = "", $spool = false)
 	{
@@ -3168,9 +3240,10 @@ class Diaspora
 	 * @brief sends a participation (Used to get all further updates)
 	 *
 	 * @param array $contact Target of the communication
-	 * @param array $item	 Item array
+	 * @param array $item    Item array
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Exception
 	 */
 	private static function sendParticipation(array $contact, array $item)
 	{
@@ -3217,9 +3290,11 @@ class Diaspora
 	 *
 	 * @param array $owner   the array of the item owner
 	 * @param array $contact Target of the communication
-	 * @param int 	$uid     User ID
+	 * @param int   $uid     User ID
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function sendAccountMigration(array $owner, array $contact, $uid)
 	{
@@ -3245,6 +3320,7 @@ class Diaspora
 	 * @param array $contact Target of the communication
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Exception
 	 */
 	public static function sendShare(array $owner, array $contact)
 	{
@@ -3288,6 +3364,7 @@ class Diaspora
 	 * @param array $contact Target of the communication
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Exception
 	 */
 	public static function sendUnshare(array $owner, array $contact)
 	{
@@ -3308,6 +3385,8 @@ class Diaspora
 	 * @param bool   $complete Should it be a complete check or a simple check?
 	 *
 	 * @return array|bool Reshare details or "false" if no reshare
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function isReshare($body, $complete = true)
 	{
@@ -3395,6 +3474,7 @@ class Diaspora
 	 * @param integer $event_id The id of the event
 	 *
 	 * @return array with event data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function buildEvent($event_id)
 	{
@@ -3477,6 +3557,8 @@ class Diaspora
 	 * @return array
 	 * 'type' -> Message type ("status_message" or "reshare")
 	 * 'message' -> Array of XML elements of the status
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function buildStatus(array $item, array $owner)
 	{
@@ -3591,6 +3673,8 @@ class Diaspora
 	 * @param bool  $public_batch Is it a public post?
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function sendStatus(array $item, array $owner, array $contact, $public_batch = false)
 	{
@@ -3606,6 +3690,7 @@ class Diaspora
 	 * @param array $owner the array of the item owner
 	 *
 	 * @return array The data for a "like"
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function constructLike(array $item, array $owner)
 	{
@@ -3637,6 +3722,7 @@ class Diaspora
 	 * @param array $owner the array of the item owner
 	 *
 	 * @return array The data for an "EventParticipation"
+	 * @throws \Exception
 	 */
 	private static function constructAttend(array $item, array $owner)
 	{
@@ -3674,6 +3760,7 @@ class Diaspora
 	 * @param array $owner the array of the item owner
 	 *
 	 * @return array The data for a comment
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function constructComment(array $item, array $owner)
 	{
@@ -3718,6 +3805,8 @@ class Diaspora
 	 * @param bool  $public_batch Is it a public post?
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function sendFollowup(array $item, array $owner, array $contact, $public_batch = false)
 	{
@@ -3744,10 +3833,8 @@ class Diaspora
 	/**
 	 * @brief Creates a message from a signature record entry
 	 *
-	 * @param array $item      The item that will be exported
-	 * @param array $signature The entry of the "sign" record
-	 *
-	 * @return string The message
+	 * @param array $item The item that will be exported
+	 * @return array The message
 	 */
 	private static function messageFromSignature(array $item)
 	{
@@ -3798,6 +3885,7 @@ class Diaspora
 	 * @param bool  $public_batch Is it a public post?
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Exception
 	 */
 	public static function sendRelay(array $item, array $owner, array $contact, $public_batch = false)
 	{
@@ -3854,6 +3942,7 @@ class Diaspora
 	 * @param bool  $relay        Is the retraction transmitted from a relay?
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Exception
 	 */
 	public static function sendRetraction(array $item, array $owner, array $contact, $public_batch = false, $relay = false)
 	{
@@ -3886,6 +3975,8 @@ class Diaspora
 	 * @param array $contact Target of the communication
 	 *
 	 * @return int The result of the transmission
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function sendMail(array $item, array $owner, array $contact)
 	{
@@ -3996,6 +4087,7 @@ class Diaspora
 	 * @param int $uid The user id
 	 *
 	 * @return array The profile data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function createProfileData($uid)
 	{
@@ -4080,6 +4172,7 @@ class Diaspora
 	 * @param int  $uid    The user id
 	 * @param bool $recips optional, default false
 	 * @return void
+	 * @throws \Exception
 	 */
 	public static function sendProfile($uid, $recips = false)
 	{
@@ -4121,6 +4214,7 @@ class Diaspora
 	 * @param array   $item Item array
 	 *
 	 * @return array Signed content
+	 * @throws \Exception
 	 */
 	public static function createLikeSignature($uid, array $item)
 	{
@@ -4151,6 +4245,7 @@ class Diaspora
 	 * @param array   $item Item array
 	 *
 	 * @return array Signed content
+	 * @throws \Exception
 	 */
 	public static function createCommentSignature($uid, array $item)
 	{

@@ -64,7 +64,7 @@ class Pager
 	/**
 	 * Returns the current page number
 	 *
-	 * @return type
+	 * @return int
 	 */
 	public function getPage()
 	{
@@ -154,6 +154,7 @@ class Pager
 	 *
 	 * @param integer $itemCount The number of displayed items on the page
 	 * @return string HTML string of the pager
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function renderMinimal($itemCount)
 	{
@@ -196,6 +197,7 @@ class Pager
 	 *
 	 * @param integer $itemCount The total number of items including those note displayed on the page
 	 * @return string HTML string of the pager
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function renderFull($itemCount)
 	{

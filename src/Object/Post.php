@@ -66,6 +66,7 @@ class Post extends BaseObject
 	 * Constructor
 	 *
 	 * @param array $data data array
+	 * @throws \Exception
 	 */
 	public function __construct(array $data)
 	{
@@ -121,6 +122,8 @@ class Post extends BaseObject
 	 *
 	 * @return mixed The data requested on success
 	 *               false on failure
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public function getTemplateData(array $conv_responses, $thread_level = 1)
 	{
@@ -506,6 +509,7 @@ class Post extends BaseObject
 	 * @param Post $item The child item to add
 	 *
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function addChild(Post $item)
 	{
@@ -595,6 +599,7 @@ class Post extends BaseObject
 	 * @param Post $item The child to be removed
 	 *
 	 * @return boolean Success or failure
+	 * @throws \Exception
 	 */
 	public function removeChild(Post $item)
 	{
@@ -684,6 +689,7 @@ class Post extends BaseObject
 	 *
 	 * @param string $name template name
 	 * @return bool
+	 * @throws \Exception
 	 */
 	private function setTemplate($name)
 	{
@@ -775,6 +781,7 @@ class Post extends BaseObject
 	 *
 	 * @return mixed The comment box string (empty if no comment box)
 	 *               false on failure
+	 * @throws \Exception
 	 */
 	private function getCommentBox($indent)
 	{
@@ -854,6 +861,7 @@ class Post extends BaseObject
 	 * Check if we are a wall to wall item and set the relevant properties
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	protected function checkWallToWall()
 	{

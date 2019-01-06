@@ -254,6 +254,7 @@ class Install extends BaseModule
 	 * @param App $a The global App
 	 *
 	 * @return string The text for the next steps
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function whatNext($a)
 	{

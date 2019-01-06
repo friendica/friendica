@@ -49,7 +49,6 @@ class ExAuth
 	/**
 	 * @brief Create the class
 	 *
-	 * @param boolean $bDebug Debug mode
 	 */
 	public function __construct()
 	{
@@ -65,6 +64,7 @@ class ExAuth
 	 * parameters
 	 *
 	 * @return null
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function readStdin()
 	{
@@ -121,6 +121,7 @@ class ExAuth
 	 * @brief Check if the given username exists
 	 *
 	 * @param array $aCommand The command array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function isUser(array $aCommand)
 	{
@@ -167,11 +168,12 @@ class ExAuth
 	/**
 	 * @brief Check remote user existance via HTTP(S)
 	 *
-	 * @param string $host The hostname
-	 * @param string $user Username
-	 * @param boolean $ssl Should the check be done via SSL?
+	 * @param string  $host The hostname
+	 * @param string  $user Username
+	 * @param boolean $ssl  Should the check be done via SSL?
 	 *
 	 * @return boolean Was the user found?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function checkUser($host, $user, $ssl)
 	{
@@ -201,6 +203,7 @@ class ExAuth
 	 * @brief Authenticate the given user and password
 	 *
 	 * @param array $aCommand The command array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function auth(array $aCommand)
 	{
@@ -296,6 +299,7 @@ class ExAuth
 	 * @brief Set the hostname for this process
 	 *
 	 * @param string $host The hostname
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function setHost($host)
 	{

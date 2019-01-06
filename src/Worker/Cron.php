@@ -135,10 +135,11 @@ class Cron
 	/**
 	 * @brief Poll contacts for unreceived messages
 	 *
-	 * @todo Currently it seems as if the following parameter aren't used at all ...
+	 * @todo  Currently it seems as if the following parameter aren't used at all ...
 	 *
-	 * @param string $parameter Parameter (force, restart, ...) for the contact polling
+	 * @param string  $parameter Parameter (force, restart, ...) for the contact polling
 	 * @param integer $generation
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function pollContacts($parameter, $generation) {
 		$manual_id  = 0;

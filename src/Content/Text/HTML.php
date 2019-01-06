@@ -117,12 +117,13 @@ class HTML
 	/**
 	 * Made by: ike@piratenpartei.de
 	 * Originally made for the syncom project: http://wiki.piratenpartei.de/Syncom
-	 * 					https://github.com/annando/Syncom
+	 *                    https://github.com/annando/Syncom
 	 *
 	 * @brief Converter for HTML to BBCode
 	 * @param string $message
 	 * @param string $basepath
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function toBBCode($message, $basepath = '')
 	{
@@ -711,6 +712,7 @@ class HTML
 	 * @brief Convert video HTML to BBCode tags
 	 *
 	 * @param string $s
+	 * @return string
 	 */
 	public static function toBBCodeVideo($s)
 	{
@@ -787,7 +789,9 @@ class HTML
 
 	/**
 	 * Loader for infinite scrolling
+	 *
 	 * @return string html for loader
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function scrollLoader()
 	{
@@ -802,8 +806,10 @@ class HTML
 	 * Get html for contact block.
 	 *
 	 * @template contact_block.tpl
-	 * @hook contact_block_end (contacts=>array, output=>string)
+	 * @hook     contact_block_end (contacts=>array, output=>string)
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function contactBlock()
 	{
@@ -888,22 +894,23 @@ class HTML
 	/**
 	 * @brief Format contacts as picture links or as texxt links
 	 *
-	 * @param array $contact Array with contacts which contains an array with
-	 *	int 'id' => The ID of the contact
-	*	int 'uid' => The user ID of the user who owns this data
-	*	string 'name' => The name of the contact
-	*	string 'url' => The url to the profile page of the contact
-	*	string 'addr' => The webbie of the contact (e.g.) username@friendica.com
-	*	string 'network' => The network to which the contact belongs to
-	*	string 'thumb' => The contact picture
-	*	string 'click' => js code which is performed when clicking on the contact
-	* @param boolean $redirect If true try to use the redir url if it's possible
-	* @param string $class CSS class for the
-	* @param boolean $textmode If true display the contacts as text links
-	*	if false display the contacts as picture links
-
-	* @return string Formatted html
-	*/
+	 * @param array   $contact  Array with contacts which contains an array with
+	 *                          int 'id' => The ID of the contact
+	 *                          int 'uid' => The user ID of the user who owns this data
+	 *                          string 'name' => The name of the contact
+	 *                          string 'url' => The url to the profile page of the contact
+	 *                          string 'addr' => The webbie of the contact (e.g.) username@friendica.com
+	 *                          string 'network' => The network to which the contact belongs to
+	 *                          string 'thumb' => The contact picture
+	 *                          string 'click' => js code which is performed when clicking on the contact
+	 * @param boolean $redirect If true try to use the redir url if it's possible
+	 * @param string  $class    CSS class for the
+	 * @param boolean $textmode If true display the contacts as text links
+	 *                          if false display the contacts as picture links
+	 * @return string Formatted html
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
 	public static function micropro($contact, $redirect = false, $class = '', $textmode = false)
 	{
 		// Use the contact URL if no address is available
@@ -945,10 +952,10 @@ class HTML
 	 * @param string $s     Search query.
 	 * @param string $id    HTML id
 	 * @param string $url   Search url.
-	 * @param bool   $save  Show save search button.
 	 * @param bool   $aside Display the search widgit aside.
 	 *
 	 * @return string Formatted HTML.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function search($s, $id = 'search-box', $url = 'search', $aside = true)
 	{
@@ -988,6 +995,7 @@ class HTML
 	 * Replace naked text hyperlink with HTML formatted hyperlink
 	 *
 	 * @param string $s
+	 * @return string
 	 */
 	public static function toLink($s)
 	{
@@ -1004,6 +1012,7 @@ class HTML
 	 * @param string $html
 	 * @param array  $reasons
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function applyContentFilter($html, array $reasons)
 	{

@@ -53,6 +53,7 @@ class ItemDeliveryData
 	 *
 	 * @param integer $item_id
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function incrementQueueDone($item_id)
 	{
@@ -65,6 +66,7 @@ class ItemDeliveryData
 	 * @param integer $item_id
 	 * @param array   $fields
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function insert($item_id, array $fields)
 	{
@@ -85,6 +87,7 @@ class ItemDeliveryData
 	 * @param integer $item_id
 	 * @param array   $fields
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function update($item_id, array $fields)
 	{
@@ -105,6 +108,7 @@ class ItemDeliveryData
 	 *
 	 * @param integer $item_id
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function delete($item_id)
 	{

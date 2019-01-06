@@ -25,6 +25,7 @@ class APContact extends BaseObject
 	 *
 	 * @param string $addr profile address (user@domain.tld)
 	 * @return string url
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function addrToUrl($addr)
 	{
@@ -65,6 +66,8 @@ class APContact extends BaseObject
 	 * @param string  $url    profile url
 	 * @param boolean $update true = always update, false = never update, null = update when not found
 	 * @return array profile array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getByURL($url, $update = null)
 	{

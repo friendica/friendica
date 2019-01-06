@@ -187,6 +187,7 @@ HELP;
 	 * @param Installer $installer the Installer instance
 	 *
 	 * @return bool true if checks were successfully, otherwise false
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private function runBasicChecks(Installer $installer)
 	{

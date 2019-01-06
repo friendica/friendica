@@ -28,6 +28,8 @@ class Mail
 	 * @param string  $body      message body, default empty
 	 * @param string  $subject   message subject, default empty
 	 * @param string  $replyto   reply to
+	 * @return int
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function send($recipient = 0, $body = '', $subject = '', $replyto = '')
 	{
@@ -162,6 +164,9 @@ class Mail
 	 * @param string $body      message body, default empty
 	 * @param string $subject   message subject, default empty
 	 * @param string $replyto   reply to, default empty
+	 * @return int
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function sendWall($recipient = '', $body = '', $subject = '', $replyto = '')
 	{

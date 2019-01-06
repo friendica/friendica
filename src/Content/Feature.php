@@ -18,6 +18,7 @@ class Feature
 	 * @param integer $uid     user id
 	 * @param string  $feature feature
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isEnabled($uid, $feature)
 	{
@@ -45,6 +46,7 @@ class Feature
 	 *
 	 * @param string $feature feature
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function getDefault($feature)
 	{
@@ -69,6 +71,7 @@ class Feature
 	 * @param bool $filtered True removes any locked features
 	 *
 	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function get($filtered = true)
 	{

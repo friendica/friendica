@@ -93,6 +93,7 @@ class L10n extends BaseObject
 	/**
 	 * @brief Returns the preferred language from the HTTP_ACCEPT_LANGUAGE header
 	 * @return string The two-letter language code
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function detectLanguage()
 	{
@@ -144,9 +145,10 @@ class L10n extends BaseObject
 	 *
 	 * If called repeatedly, it won't save the translation strings again, just load the new ones.
 	 *
-	 * @see popLang()
+	 * @see   popLang()
 	 * @brief Stores the current language strings and load a different language.
 	 * @param string $lang Language code
+	 * @throws \Exception
 	 */
 	public static function pushLang($lang)
 	{
@@ -190,6 +192,7 @@ class L10n extends BaseObject
 	 * Uses an App object shim since all the strings files refer to $a->strings
 	 *
 	 * @param string $lang language code to load
+	 * @throws \Exception
 	 */
 	private static function loadTranslationTable($lang)
 	{
@@ -272,8 +275,9 @@ class L10n extends BaseObject
 	 *
 	 * @param string $singular
 	 * @param string $plural
-	 * @param int $count
+	 * @param int    $count
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function tt($singular, $plural, $count)
 	{
@@ -317,6 +321,9 @@ class L10n extends BaseObject
 
 	/**
 	 * Provide a fallback which will not collide with a function defined in any language file
+	 *
+	 * @param int $n
+	 * @return bool
 	 */
 	private static function stringPluralSelectDefault($n)
 	{
@@ -394,7 +401,8 @@ class L10n extends BaseObject
 	 * Load poke verbs
 	 *
 	 * @return array index is present tense verb
-	 * 				 value is array containing past tense verb, translation of present, translation of past
+	 *                 value is array containing past tense verb, translation of present, translation of past
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @hook poke_verbs pokes array
 	 */
 	public static function getPokeVerbs()

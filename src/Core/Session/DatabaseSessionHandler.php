@@ -50,6 +50,7 @@ class DatabaseSessionHandler extends BaseObject implements SessionHandlerInterfa
 	 * @param  string $session_id   Session ID with format: [a-z0-9]{26}
 	 * @param  string $session_data Serialized session data
 	 * @return boolean Returns false if parameters are missing, true otherwise
+	 * @throws \Exception
 	 */
 	public function write($session_id, $session_data)
 	{

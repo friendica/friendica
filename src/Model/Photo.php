@@ -29,13 +29,14 @@ class Photo extends BaseObject
 	/**
 	 * @brief Select rows from the photo table
 	 *
-	 * @param array  $fields     Array of selected fields, empty for all
-	 * @param array  $conditions Array of fields for conditions
-	 * @param array  $params     Array of several parameters
+	 * @param array $fields     Array of selected fields, empty for all
+	 * @param array $conditions Array of fields for conditions
+	 * @param array $params     Array of several parameters
 	 *
 	 * @return boolean|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function select(array $fields = [], array $conditions = [], array $params = [])
 	{
@@ -50,13 +51,14 @@ class Photo extends BaseObject
 	/**
 	 * @brief Retrieve a single record from the photo table
 	 *
-	 * @param array  $fields     Array of selected fields, empty for all
-	 * @param array  $conditions Array of fields for conditions
-	 * @param array  $params     Array of several parameters
+	 * @param array $fields     Array of selected fields, empty for all
+	 * @param array $conditions Array of fields for conditions
+	 * @param array $params     Array of several parameters
 	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function selectFirst(array $fields = [], array $conditions = [], array $params = [])
 	{
@@ -70,14 +72,15 @@ class Photo extends BaseObject
 	/**
 	 * @brief Get photos for user id
 	 *
-	 * @param integer  $uid          User id
-	 * @param string   $resourceid   Rescource ID of the photo
-	 * @param array    $conditions   Array of fields for conditions
-	 * @param array    $params       Array of several parameters
+	 * @param integer $uid        User id
+	 * @param string  $resourceid Rescource ID of the photo
+	 * @param array   $conditions Array of fields for conditions
+	 * @param array   $params     Array of several parameters
 	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function getPhotosForUser($uid, $resourceid, array $conditions = [], array $params = [])
 	{
@@ -90,15 +93,16 @@ class Photo extends BaseObject
 	/**
 	 * @brief Get a photo for user id
 	 *
-	 * @param integer  $uid          User id
-	 * @param string   $resourceid   Rescource ID of the photo
-	 * @param integer  $scale        Scale of the photo. Defaults to 0
-	 * @param array    $conditions   Array of fields for conditions
-	 * @param array    $params       Array of several parameters
+	 * @param integer $uid        User id
+	 * @param string  $resourceid Rescource ID of the photo
+	 * @param integer $scale      Scale of the photo. Defaults to 0
+	 * @param array   $conditions Array of fields for conditions
+	 * @param array   $params     Array of several parameters
 	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function getPhotoForUser($uid, $resourceid, $scale = 0, array $conditions = [], array $params = [])
 	{
@@ -116,10 +120,11 @@ class Photo extends BaseObject
 	 * on success, "no sign" image info, if user has no permission,
 	 * false if photo does not exists
 	 *
-	 * @param string  $resourceid  Rescource ID of the photo
-	 * @param integer $scale       Scale of the photo. Defaults to 0
+	 * @param string  $resourceid Rescource ID of the photo
+	 * @param integer $scale      Scale of the photo. Defaults to 0
 	 *
 	 * @return boolean|array
+	 * @throws \Exception
 	 */
 	public static function getPhoto($resourceid, $scale = 0)
 	{
@@ -145,9 +150,10 @@ class Photo extends BaseObject
 	/**
 	 * @brief Check if photo with given conditions exists
 	 *
-	 * @param array   $conditions  Array of extra conditions
+	 * @param array $conditions Array of extra conditions
 	 *
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function exists(array $conditions)
 	{
@@ -158,9 +164,11 @@ class Photo extends BaseObject
 	/**
 	 * @brief Get Image object for given row id. null if row id does not exist
 	 *
-	 * @param array  $photo  Photo data. Needs at least 'id', 'type', 'backend-class', 'backend-ref'
+	 * @param array $photo Photo data. Needs at least 'id', 'type', 'backend-class', 'backend-ref'
 	 *
 	 * @return \Friendica\Object\Image
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getImageForPhoto(array $photo)
 	{
@@ -188,6 +196,7 @@ class Photo extends BaseObject
 	 * @brief Return a list of fields that are associated with the photo table
 	 *
 	 * @return array field list
+	 * @throws \Exception
 	 */
 	private static function getFields()
 	{
@@ -200,10 +209,11 @@ class Photo extends BaseObject
 	/**
 	 * @brief Construct a photo array for a system resource image
 	 *
-	 * @param string  $filename  Image file name relative to code root
-	 * @param string  $mimetype  Image mime type. Defaults to "image/jpeg"
+	 * @param string $filename Image file name relative to code root
+	 * @param string $mimetype Image mime type. Defaults to "image/jpeg"
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function createPhotoForSystemResource($filename, $mimetype = "image/jpeg")
 	{
@@ -236,6 +246,7 @@ class Photo extends BaseObject
 	 * @param string  $desc      Photo caption. optional, default = ""
 	 *
 	 * @return boolean True on success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function store(Image $Image, $uid, $cid, $rid, $filename, $album, $scale, $profile = 0, $allow_cid = "", $allow_gid = "", $deny_cid = "", $deny_gid = "", $desc = "")
 	{
@@ -309,12 +320,13 @@ class Photo extends BaseObject
 	/**
 	 * @brief Delete info from table and data from storage
 	 *
-	 * @param array  $conditions  Field condition(s)
-	 * @param array  $options     Options array, Optional
+	 * @param array $conditions Field condition(s)
+	 * @param array $options    Options array, Optional
 	 *
 	 * @return boolean
 	 *
-	 * @see \Friendica\Database\DBA::delete
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::delete
 	 */
 	public static function delete(array $conditions, array $options = [])
 	{
@@ -341,7 +353,8 @@ class Photo extends BaseObject
 	 *
 	 * @return boolean  Was the update successfull?
 	 *
-	 * @see \Friendica\Database\DBA::update
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @see   \Friendica\Database\DBA::update
 	 */
 	public static function update($fields, $conditions, Image $img = null, array $old_fields = [])
 	{
@@ -371,6 +384,8 @@ class Photo extends BaseObject
 	 * @param integer $cid           contact id
 	 * @param boolean $quit_on_error optional, default false
 	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function importProfilePhoto($image_url, $uid, $cid, $quit_on_error = false)
 	{
@@ -507,6 +522,7 @@ class Photo extends BaseObject
 	 * @param bool $update Update the cache
 	 *
 	 * @return array Returns array of the photo albums
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getAlbums($uid, $update = false)
 	{
@@ -544,6 +560,7 @@ class Photo extends BaseObject
 	/**
 	 * @param int $uid User id of the photos
 	 * @return void
+	 * @throws \Exception
 	 */
 	public static function clearAlbumCache($uid)
 	{
@@ -555,6 +572,7 @@ class Photo extends BaseObject
 	 * Generate a unique photo ID.
 	 *
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function newResource()
 	{

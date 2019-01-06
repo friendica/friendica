@@ -37,13 +37,14 @@ class BBCode extends BaseObject
 	 *
 	 * @param string $body Message body
 	 * @return array
-	 * 'type' -> Message type ("link", "video", "photo")
-	 * 'text' -> Text before the shared message
-	 * 'after' -> Text after the shared message
-	 * 'image' -> Preview image of the message
-	 * 'url' -> Url to the attached message
-	 * 'title' -> Title of the attachment
-	 * 'description' -> Description of the attachment
+	 *                     'type' -> Message type ("link", "video", "photo")
+	 *                     'text' -> Text before the shared message
+	 *                     'after' -> Text after the shared message
+	 *                     'image' -> Preview image of the message
+	 *                     'url' -> Url to the attached message
+	 *                     'title' -> Title of the attachment
+	 *                     'description' -> Description of the attachment
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function getOldAttachmentData($body)
 	{
@@ -108,13 +109,14 @@ class BBCode extends BaseObject
 	 *
 	 * @param string $body Message body
 	 * @return array
-	 * 'type' -> Message type ("link", "video", "photo")
-	 * 'text' -> Text before the shared message
-	 * 'after' -> Text after the shared message
-	 * 'image' -> Preview image of the message
-	 * 'url' -> Url to the attached message
-	 * 'title' -> Title of the attachment
-	 * 'description' -> Description of the attachment
+	 *                     'type' -> Message type ("link", "video", "photo")
+	 *                     'text' -> Text before the shared message
+	 *                     'after' -> Text after the shared message
+	 *                     'image' -> Preview image of the message
+	 *                     'url' -> Url to the attached message
+	 *                     'title' -> Title of the attachment
+	 *                     'description' -> Description of the attachment
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getAttachmentData($body)
 	{
@@ -345,6 +347,7 @@ class BBCode extends BaseObject
 	/**
 	 * @brief Converts a BBCode text into plaintext
 	 *
+	 * @param      $text
 	 * @param bool $keep_urls Whether to keep URLs in the resulting plaintext
 	 *
 	 * @return string
@@ -446,6 +449,7 @@ class BBCode extends BaseObject
 	 * @brief Truncates imported message body string length to max_import_size
 	 * @param string $body
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function limitBodySize($body)
 	{
@@ -532,10 +536,11 @@ class BBCode extends BaseObject
 	 * Note: Can produce a [bookmark] tag in the returned string
 	 *
 	 * @brief Processes [attachment] tags
-	 * @param string $return
+	 * @param string   $return
 	 * @param bool|int $simplehtml
-	 * @param bool $tryoembed
+	 * @param bool     $tryoembed
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function convertAttachment($return, $simplehtml = false, $tryoembed = true)
 	{
@@ -777,10 +782,10 @@ class BBCode extends BaseObject
 	/**
 	 * Performs a preg_replace within the boundaries of all named BBCode tags in a text
 	 *
-	 * @param type $pattern Preg pattern string
-	 * @param type $replace Preg replace string
-	 * @param type $name    BBCode tag name
-	 * @param type $text    Text to search
+	 * @param string $pattern Preg pattern string
+	 * @param string $replace Preg replace string
+	 * @param string $name    BBCode tag name
+	 * @param string $text    Text to search
 	 * @return string
 	 */
 	public static function pregReplaceInTag($pattern, $replace, $name, $text)
@@ -930,6 +935,7 @@ class BBCode extends BaseObject
 	 * @param boolean $is_quote_share Whether there is content before the [share] block
 	 * @param integer $simplehtml     Mysterious integer value depending on the target network/formatting style
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function convertShareCallback(array $attributes, array $author_contact, $content, $is_quote_share, $simplehtml)
 	{
@@ -1142,6 +1148,7 @@ class BBCode extends BaseObject
 	 * @param int    $simple_html
 	 * @param bool   $for_plaintext
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function convert($text, $try_oembed = true, $simple_html = false, $for_plaintext = false)
 	{
@@ -1810,6 +1817,8 @@ class BBCode extends BaseObject
 	 *
 	 * @param array $match Matching values for the callback
 	 * @return string Replaced mention
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function bbCodeMention2DiasporaCallback($match)
 	{
@@ -1836,6 +1845,7 @@ class BBCode extends BaseObject
 	 * @param string $text
 	 * @param bool   $for_diaspora Diaspora requires more changes than Libertree
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function toMarkdown($text, $for_diaspora = true)
 	{

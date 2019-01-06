@@ -25,6 +25,7 @@ class Attach extends BaseObject
 	 * @brief Return a list of fields that are associated with the attach table
 	 *
 	 * @return array field list
+	 * @throws \Exception
 	 */
 	private static function getFields()
 	{
@@ -37,13 +38,14 @@ class Attach extends BaseObject
 	/**
 	 * @brief Select rows from the attach table
 	 *
-	 * @param array  $fields     Array of selected fields, empty for all
-	 * @param array  $conditions Array of fields for conditions
-	 * @param array  $params     Array of several parameters
+	 * @param array $fields     Array of selected fields, empty for all
+	 * @param array $conditions Array of fields for conditions
+	 * @param array $params     Array of several parameters
 	 *
 	 * @return boolean|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function select(array $fields = [], array $conditions = [], array $params = [])
 	{
@@ -58,13 +60,14 @@ class Attach extends BaseObject
 	/**
 	 * @brief Retrieve a single record from the attach table
 	 *
-	 * @param array  $fields     Array of selected fields, empty for all
-	 * @param array  $conditions Array of fields for conditions
-	 * @param array  $params     Array of several parameters
+	 * @param array $fields     Array of selected fields, empty for all
+	 * @param array $conditions Array of fields for conditions
+	 * @param array $params     Array of several parameters
 	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function selectFirst(array $fields = [], array $conditions = [], array $params = [])
 	{
@@ -78,9 +81,10 @@ class Attach extends BaseObject
 	/**
 	 * @brief Check if attachment with given conditions exists
 	 *
-	 * @param array   $conditions  Array of extra conditions
+	 * @param array $conditions Array of extra conditions
 	 *
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function exists(array $conditions)
 	{
@@ -89,12 +93,13 @@ class Attach extends BaseObject
 
 	/**
 	 * @brief Retrive a single record given the ID
-	 * 
-	 * @param int  $id  Row id of the record
-	 * 
+	 *
+	 * @param int $id Row id of the record
+	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function getById($id)
 	{
@@ -102,13 +107,14 @@ class Attach extends BaseObject
 	}
 
 	/**
-	 * @brief Retrive a single record given the ID 
-	 * 
-	 * @param int  $id  Row id of the record
-	 * 
+	 * @brief Retrive a single record given the ID
+	 *
+	 * @param int $id Row id of the record
+	 *
 	 * @return bool|array
 	 *
-	 * @see \Friendica\Database\DBA::select
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::select
 	 */
 	public static function getByIdWithPermission($id)
 	{
@@ -131,10 +137,11 @@ class Attach extends BaseObject
 
 	/**
 	 * @brief Get file data for given row id. null if row id does not exist
-	 * 
-	 * @param array  $item  Attachment data. Needs at least 'id', 'backend-class', 'backend-ref'
-	 * 
+	 *
+	 * @param array $item Attachment data. Needs at least 'id', 'backend-class', 'backend-ref'
+	 *
 	 * @return string  file data
+	 * @throws \Exception
 	 */
 	public static function getData($item)
 	{
@@ -155,7 +162,7 @@ class Attach extends BaseObject
 	/**
 	 * @brief Store new file metadata in db and binary in default backend
 	 *
-	 * @param string  $data  Binary data
+	 * @param string  $data      Binary data
 	 * @param integer $uid       User ID
 	 * @param string  $filename  Filename
 	 * @param string  $filetype  Mimetype. optional, default = ''
@@ -166,6 +173,7 @@ class Attach extends BaseObject
 	 * @param string  $deny_gid  Permissions, denied greoup.optional, default = ''
 	 *
 	 * @return boolean/integer Row id on success, False on errors
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function store($data, $uid, $filename, $filetype = '' , $filesize = null, $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '')
 	{
@@ -214,7 +222,15 @@ class Attach extends BaseObject
 	/**
 	 * @brief Store new file metadata in db and binary in default backend from existing file
 	 *
+	 * @param        $src
+	 * @param        $uid
+	 * @param string $filename
+	 * @param string $allow_cid
+	 * @param string $allow_gid
+	 * @param string $deny_cid
+	 * @param string $deny_gid
 	 * @return boolean True on success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function storeFile($src, $uid, $filename = '', $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '')
 	{
@@ -233,12 +249,13 @@ class Attach extends BaseObject
 	 *
 	 * @param array         $fields     Contains the fields that are updated
 	 * @param array         $conditions Condition array with the key values
-	 * @param string        $data       File data to update. Optional, default null.
+	 * @param Image         $img        Image data to update. Optional, default null.
 	 * @param array|boolean $old_fields Array with the old field values that are about to be replaced (true = update on duplicate)
 	 *
-	 * @return boolean  Was the update successfull?
+	 * @return boolean  Was the update successful?
 	 *
-	 * @see \Friendica\Database\DBA::update
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @see   \Friendica\Database\DBA::update
 	 */
 	public static function update($fields, $conditions, $img = null, array $old_fields = [])
 	{
@@ -265,12 +282,13 @@ class Attach extends BaseObject
 	/**
 	 * @brief Delete info from table and data from storage
 	 *
-	 * @param array  $conditions  Field condition(s)
-	 * @param array  $options     Options array, Optional
+	 * @param array $conditions Field condition(s)
+	 * @param array $options    Options array, Optional
 	 *
 	 * @return boolean
 	 *
-	 * @see \Friendica\Database\DBA::delete
+	 * @throws \Exception
+	 * @see   \Friendica\Database\DBA::delete
 	 */
 	public static function delete(array $conditions, array $options = [])
 	{

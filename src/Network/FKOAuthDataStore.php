@@ -37,6 +37,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	/**
 	 * @param string $consumer_key key
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function lookup_consumer($consumer_key)
 	{
@@ -57,6 +58,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 * @param string $token_type type
 	 * @param string $token      token
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function lookup_token($consumer, $token_type, $token)
 	{
@@ -82,6 +84,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 * @param string $nonce     nonce
 	 * @param string $timestamp timestamp
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function lookup_nonce($consumer, $token, $nonce, $timestamp)
 	{
@@ -97,6 +100,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 * @param string $consumer consumer
 	 * @param string $callback optional, default null
 	 * @return mixed
+	 * @throws \Exception
 	 */
 	public function new_request_token($consumer, $callback = null)
 	{
@@ -132,6 +136,7 @@ class FKOAuthDataStore extends OAuthDataStore
 	 * @param string $consumer consumer
 	 * @param string $verifier optional, defult null
 	 * @return object
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public function new_access_token($token, $consumer, $verifier = null)
 	{

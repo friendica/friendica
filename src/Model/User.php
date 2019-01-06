@@ -38,6 +38,7 @@ class User
 	 *
 	 * @param  integer $uid
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public static function exists($uid)
 	{
@@ -45,8 +46,9 @@ class User
 	}
 
 	/**
-	 * @param  integer       $uid
+	 * @param  integer $uid
 	 * @return array|boolean User record if it exists, false otherwise
+	 * @throws Exception
 	 */
 	public static function getById($uid)
 	{
@@ -59,6 +61,7 @@ class User
 	 * @param string $url
 	 *
 	 * @return integer user id
+	 * @throws Exception
 	 */
 	public static function getIdForURL($url)
 	{
@@ -75,6 +78,7 @@ class User
 	 *
 	 * @param int $uid
 	 * @return boolean|array
+	 * @throws Exception
 	 */
 	public static function getOwnerDataById($uid) {
 		$r = DBA::fetchFirst("SELECT
@@ -106,6 +110,7 @@ class User
 	 *
 	 * @param int $nick
 	 * @return boolean|array
+	 * @throws Exception
 	 */
 	public static function getOwnerDataByNick($nick)
 	{
@@ -121,10 +126,11 @@ class User
 	/**
 	 * @brief Returns the default group for a given user and network
 	 *
-	 * @param int $uid User id
+	 * @param int    $uid     User id
 	 * @param string $network network name
 	 *
 	 * @return int group id
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getDefaultGroup($uid, $network = '')
 	{
@@ -308,6 +314,7 @@ class User
 	 *
 	 * @param string $password
 	 * @return string
+	 * @throws Exception
 	 */
 	public static function hashPassword($password)
 	{
@@ -324,6 +331,7 @@ class User
 	 * @param int    $uid
 	 * @param string $password
 	 * @return bool
+	 * @throws Exception
 	 */
 	public static function updatePassword($uid, $password)
 	{
@@ -337,6 +345,7 @@ class User
 	 * @param int    $uid
 	 * @param string $pasword_hashed
 	 * @return bool
+	 * @throws Exception
 	 */
 	private static function updatePasswordHashed($uid, $pasword_hashed)
 	{
@@ -358,6 +367,7 @@ class User
 	 *
 	 * @param string $nickname The nickname that should be checked
 	 * @return boolean True is the nickname is blocked on the node
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isNicknameBlocked($nickname)
 	{
@@ -392,7 +402,10 @@ class User
 	 * - Create profile image
 	 *
 	 * @param array $data
-	 * @return string
+	 * @return array
+	 * @throws \ErrorException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 * @throw Exception
 	 */
 	public static function create(array $data)
@@ -778,7 +791,8 @@ class User
 
 	/**
 	 * @param object $uid user to remove
-	 * @return void
+	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function remove($uid)
 	{
@@ -819,18 +833,19 @@ class User
 	 * @return array All identities for this user
 	 *
 	 * Example for a return:
-	 * 	[
-	 * 		[
-	 * 			'uid' => 1,
-	 * 			'username' => 'maxmuster',
-	 * 			'nickname' => 'Max Mustermann'
-	 * 		],
-	 * 		[
-	 * 			'uid' => 2,
-	 * 			'username' => 'johndoe',
-	 * 			'nickname' => 'John Doe'
-	 * 		]
-	 * 	]
+	 *    [
+	 *        [
+	 *            'uid' => 1,
+	 *            'username' => 'maxmuster',
+	 *            'nickname' => 'Max Mustermann'
+	 *        ],
+	 *        [
+	 *            'uid' => 2,
+	 *            'username' => 'johndoe',
+	 *            'nickname' => 'John Doe'
+	 *        ]
+	 *    ]
+	 * @throws Exception
 	 */
 	public static function identities($uid)
 	{

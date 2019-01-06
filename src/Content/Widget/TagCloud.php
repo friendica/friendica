@@ -26,13 +26,14 @@ class TagCloud
 	 * Construct a tag/term cloud block for an user.
 	 *
 	 * @brief Construct a tag/term cloud block for an user.
-	 * @param int $uid      The user ID.
-	 * @param int $count    Max number of displayed tags/terms.
-	 * @param int $owner_id The contact ID of the owner of the tagged items.
-	 * @param string $flags Special item flags.
-	 * @param int $type     The tag/term type.
+	 * @param int    $uid      The user ID.
+	 * @param int    $count    Max number of displayed tags/terms.
+	 * @param int    $owner_id The contact ID of the owner of the tagged items.
+	 * @param string $flags    Special item flags.
+	 * @param int    $type     The tag/term type.
 	 *
 	 * @return string       HTML formatted output.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getHTML($uid, $count = 0, $owner_id = 0, $flags = '', $type = TERM_HASHTAG)
 	{
@@ -65,13 +66,14 @@ class TagCloud
 	 *
 	 * @brief Get alphabetical sorted array of used tags/terms of an user including
 	 * a weighting by frequency of use.
-	 * @param int $uid      The user ID.
-	 * @param int $count    Max number of displayed tags/terms.
-	 * @param int $owner_id The contact id of the owner of the tagged items.
-	 * @param string $flags Special item flags.
-	 * @param int $type     The tag/term type.
+	 * @param int    $uid      The user ID.
+	 * @param int    $count    Max number of displayed tags/terms.
+	 * @param int    $owner_id The contact id of the owner of the tagged items.
+	 * @param string $flags    Special item flags.
+	 * @param int    $type     The tag/term type.
 	 *
-	 * @return arr          Alphabetical sorted array of used tags of an user.
+	 * @return array        Alphabetical sorted array of used tags of an user.
+	 * @throws \Exception
 	 */
 	private static function tagadelic($uid, $count = 0, $owner_id = 0, $flags = '', $type = TERM_HASHTAG)
 	{
@@ -148,8 +150,8 @@ class TagCloud
 	 * Compare function to sort tags/terms alphabetically.
 	 *
 	 * @brief Compare function to sort tags/terms alphabetically.
-	 * @param type $a
-	 * @param type $b
+	 * @param string $a
+	 * @param string $b
 	 *
 	 * @return int
 	 */

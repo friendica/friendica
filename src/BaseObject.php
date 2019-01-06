@@ -23,6 +23,7 @@ class BaseObject
 	 * Same as get_app from boot.php
 	 *
 	 * @return App
+	 * @throws \Exception
 	 */
 	public static function getApp()
 	{

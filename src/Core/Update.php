@@ -15,6 +15,7 @@ class Update
 	 * @brief Function to check if the Database structure needs an update.
 	 *
 	 * @param boolean $via_worker boolean Is the check run via the worker?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function check($via_worker)
 	{
@@ -45,11 +46,12 @@ class Update
 	/**
 	 * Automatic database updates
 	 *
-	 * @param bool $force Force the Update-Check even if the lock is set
-	 * @param bool $verbose Run the Update-Check verbose
+	 * @param bool $force    Force the Update-Check even if the lock is set
+	 * @param bool $verbose  Run the Update-Check verbose
 	 * @param bool $sendMail Sends a Mail to the administrator in case of success/failure
 	 *
 	 * @return string Empty string if the update is successful, error messages otherwise
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function run($force = false, $verbose = false, $sendMail = true)
 	{
@@ -132,10 +134,11 @@ class Update
 	/**
 	 * Executes a specific update function
 	 *
-	 * @param int $x the DB version number of the function
+	 * @param int    $x      the DB version number of the function
 	 * @param string $prefix the prefix of the function (update, pre_update)
 	 *
 	 * @return bool true, if the update function worked
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function runUpdateFunction($x, $prefix)
 	{
@@ -195,8 +198,9 @@ class Update
 	/**
 	 * send the email and do what is needed to do on update fails
 	 *
-	 * @param int $update_id		number of failed update
-	 * @param string $error_message	error message
+	 * @param int    $update_id     number of failed update
+	 * @param string $error_message error message
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function updateFailed($update_id, $error_message) {
 		//send the administrators an e-mail

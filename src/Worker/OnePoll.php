@@ -670,7 +670,8 @@ class OnePoll
 	 * @brief Updates a personal contact entry and the public contact entry
 	 *
 	 * @param array $contact The personal contact entry
-	 * @param array $fields The fields that are updated
+	 * @param array $fields  The fields that are updated
+	 * @throws \Exception
 	 */
 	private static function updateContact(array $contact, array $fields)
 	{

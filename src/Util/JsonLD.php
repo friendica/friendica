@@ -18,7 +18,8 @@ class JsonLD
 	 *
 	 * @param $url
 	 *
-	 * @return the loaded data
+	 * @return mixed the loaded data
+	 * @throws \JsonLdException
 	 */
 	public static function documentLoader($url)
 	{
@@ -53,7 +54,8 @@ class JsonLD
 	 *
 	 * @param array $json
 	 *
-	 * @return normalized JSON string
+	 * @return mixed|bool normalized JSON string
+	 * @throws Exception
 	 */
 	public static function normalize($json)
 	{
@@ -77,7 +79,8 @@ class JsonLD
 	 *
 	 * @param array $json
 	 *
-	 * @return comacted JSON array
+	 * @return array Compacted JSON array
+	 * @throws Exception
 	 */
 	public static function compact($json)
 	{
@@ -114,7 +117,7 @@ class JsonLD
 	 * @param $element
 	 * @param $key
 	 *
-	 * @return fetched element array
+	 * @return array fetched element
 	 */
 	public static function fetchElementArray($array, $element, $key = '@id')
 	{
@@ -155,7 +158,7 @@ class JsonLD
 	 * @param $type
 	 * @param $type_value
 	 *
-	 * @return fetched element
+	 * @return string fetched element
 	 */
 	public static function fetchElement($array, $element, $key = '@id', $type = null, $type_value = null)
 	{

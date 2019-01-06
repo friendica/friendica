@@ -21,6 +21,8 @@ class APDelivery extends BaseObject
 	 * @param integer $target_id
 	 * @param string  $inbox
 	 * @param integer $uid
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function execute($cmd, $target_id, $inbox, $uid)
 	{

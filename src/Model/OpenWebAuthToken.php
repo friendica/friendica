@@ -16,12 +16,13 @@ class OpenWebAuthToken
 	/**
 	 * Create an entry in the 'openwebauth-token' table.
 	 *
-	 * @param string $type   Verify type.
-	 * @param int    $uid    The user ID.
+	 * @param string $type Verify type.
+	 * @param int    $uid  The user ID.
 	 * @param string $token
 	 * @param string $meta
 	 *
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function create($type, $uid, $token, $meta)
 	{
@@ -38,11 +39,12 @@ class OpenWebAuthToken
 	/**
 	 * Get the "meta" field of an entry in the openwebauth-token table.
 	 *
-	 * @param string $type   Verify type.
-	 * @param int    $uid    The user ID.
+	 * @param string $type Verify type.
+	 * @param int    $uid  The user ID.
 	 * @param string $token
 	 *
 	 * @return string|boolean The meta enry or false if not found.
+	 * @throws \Exception
 	 */
 	public static function getMeta($type, $uid, $token)
 	{
@@ -62,6 +64,7 @@ class OpenWebAuthToken
 	 *
 	 * @param string $type     Verify type.
 	 * @param string $interval SQL compatible time interval
+	 * @throws \Exception
 	 */
 	public static function purge($type, $interval)
 	{

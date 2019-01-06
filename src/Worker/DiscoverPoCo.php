@@ -267,6 +267,9 @@ class DiscoverPoCo
 	 * @brief Search for GNU Social user with gstools.org
 	 *
 	 * @param string $search User name
+	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function gsSearchUser($search) {
 

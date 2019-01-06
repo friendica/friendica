@@ -21,6 +21,7 @@ class Authentication extends BaseObject
 	 * @param array $user Record from "user" table
 	 *
 	 * @return string Hashed data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getCookieHashForUser($user)
 	{
@@ -32,8 +33,9 @@ class Authentication extends BaseObject
 	/**
 	 * @brief Set the "Friendica" cookie
 	 *
-	 * @param int $time
+	 * @param int   $time
 	 * @param array $user Record from "user" table
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static  function setCookie($time, $user = [])
 	{
@@ -55,12 +57,13 @@ class Authentication extends BaseObject
 	/**
 	 * @brief Sets the provided user's authenticated session
 	 *
-	 * @todo Should be moved to Friendica\Core\Session once it's created
+	 * @todo  Should be moved to Friendica\Core\Session once it's created
 	 *
-	 * @param type $user_record
-	 * @param type $login_initial
-	 * @param type $interactive
-	 * @param type $login_refresh
+	 * @param array $user_record
+	 * @param bool  $login_initial
+	 * @param bool  $interactive
+	 * @param bool  $login_refresh
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function setAuthenticatedSessionForUser($user_record, $login_initial = false, $interactive = false, $login_refresh = false)
 	{

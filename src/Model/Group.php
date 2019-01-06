@@ -26,9 +26,10 @@ class Group extends BaseObject
 	 *
 	 * Note: If we found a deleted group with the same name, we restore it
 	 *
-	 * @param int $uid
+	 * @param int    $uid
 	 * @param string $name
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function create($uid, $name)
 	{
@@ -60,10 +61,11 @@ class Group extends BaseObject
 	/**
 	 * Update group information.
 	 *
-	 * @param  int	  $id   Group ID
+	 * @param  int    $id   Group ID
 	 * @param  string $name Group name
 	 *
 	 * @return bool Was the update successful?
+	 * @throws \Exception
 	 */
 	public static function update($id, $name)
 	{
@@ -75,6 +77,7 @@ class Group extends BaseObject
 	 *
 	 * @param int $cid
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function getIdsByContactId($cid)
 	{
@@ -96,9 +99,10 @@ class Group extends BaseObject
 	 * Count unread items of each groups of the local user
 	 *
 	 * @return array
-	 * 	'id' => group id
-	 * 	'name' => group name
-	 * 	'count' => counted unseen group items
+	 *    'id' => group id
+	 *    'name' => group name
+	 *    'count' => counted unseen group items
+	 * @throws \Exception
 	 */
 	public static function countUnseen()
 	{
@@ -125,9 +129,10 @@ class Group extends BaseObject
 	 *
 	 * Returns false if no group has been found.
 	 *
-	 * @param int $uid
+	 * @param int    $uid
 	 * @param string $name
 	 * @return int|boolean
+	 * @throws \Exception
 	 */
 	public static function getIdByName($uid, $name)
 	{
@@ -148,6 +153,7 @@ class Group extends BaseObject
 	 *
 	 * @param int $gid
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function remove($gid) {
 		if (! $gid) {
@@ -192,13 +198,14 @@ class Group extends BaseObject
 	}
 
 	/**
-	 * @brief Mark a group as deleted based on its name
+	 * @brief      Mark a group as deleted based on its name
 	 *
 	 * @deprecated Use Group::remove instead
 	 *
-	 * @param int $uid
+	 * @param int    $uid
 	 * @param string $name
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function removeByName($uid, $name) {
 		$return = false;
@@ -217,6 +224,7 @@ class Group extends BaseObject
 	 * @param int $gid
 	 * @param int $cid
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function addMember($gid, $cid)
 	{
@@ -241,6 +249,7 @@ class Group extends BaseObject
 	 * @param int $gid
 	 * @param int $cid
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function removeMember($gid, $cid)
 	{
@@ -254,14 +263,15 @@ class Group extends BaseObject
 	}
 
 	/**
-	 * @brief Removes a contact from a group based on its name
+	 * @brief      Removes a contact from a group based on its name
 	 *
 	 * @deprecated Use Group::removeMember instead
 	 *
-	 * @param int $uid
+	 * @param int    $uid
 	 * @param string $name
-	 * @param int $cid
+	 * @param int    $cid
 	 * @return boolean
+	 * @throws \Exception
 	 */
 	public static function removeMemberByName($uid, $name, $cid)
 	{
@@ -275,9 +285,10 @@ class Group extends BaseObject
 	/**
 	 * @brief Returns the combined list of contact ids from a group id list
 	 *
-	 * @param array $group_ids
+	 * @param array   $group_ids
 	 * @param boolean $check_dead
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function expand($group_ids, $check_dead = false)
 	{
@@ -302,10 +313,11 @@ class Group extends BaseObject
 	/**
 	 * @brief Returns a templated group selection list
 	 *
-	 * @param int $uid
-	 * @param int $gid An optional pre-selected group
+	 * @param int    $uid
+	 * @param int    $gid   An optional pre-selected group
 	 * @param string $label An optional label of the list
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function displayGroupSelection($uid, $gid = 0, $label = '')
 	{
@@ -346,12 +358,13 @@ class Group extends BaseObject
 	 * @param string $every
 	 * @param string $each
 	 * @param string $editmode
-	 * 	'standard' => include link 'Edit groups'
-	 * 	'extended' => include link 'Create new group'
-	 * 	'full' => include link 'Create new group' and provide for each group a link to edit this group
-	 * @param int $group_id
-	 * @param int $cid
+	 *    'standard' => include link 'Edit groups'
+	 *    'extended' => include link 'Create new group'
+	 *    'full' => include link 'Create new group' and provide for each group a link to edit this group
+	 * @param string $group_id
+	 * @param int    $cid
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function sidebarWidget($every = 'contact', $each = 'group', $editmode = 'standard', $group_id = '', $cid = 0)
 	{

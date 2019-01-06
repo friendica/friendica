@@ -65,7 +65,8 @@ class Image
 	 * @brief Constructor
 	 * @param object  $data data
 	 * @param boolean $type optional, default null
-	 * @return object
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public function __construct($data, $type = null)
 	{
@@ -128,6 +129,8 @@ class Image
 	/**
 	 * @param object $data data
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private function loadData($data)
 	{
@@ -643,6 +646,7 @@ class Image
 	/**
 	 * @param string $path file path
 	 * @return mixed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function saveToFilePath($path)
 	{
@@ -667,6 +671,7 @@ class Image
 	 * $data = (string) $Image;
 	 *
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function __toString() {
 		return $this->asString();
@@ -674,6 +679,7 @@ class Image
 
 	/**
 	 * @return mixed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function asString()
 	{
@@ -721,9 +727,10 @@ class Image
 	 *
 	 * @param string  $filename Image filename
 	 * @param boolean $fromcurl Check Content-Type header from curl request
-	 * @param string $header passed headers to take into account
+	 * @param string  $header   passed headers to take into account
 	 *
 	 * @return object
+	 * @throws \ImagickException
 	 */
 	public static function guessType($filename, $fromcurl = false, $header = '')
 	{
@@ -772,6 +779,7 @@ class Image
 	/**
 	 * @param string $url url
 	 * @return object
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getInfoFromURL($url)
 	{
@@ -876,11 +884,13 @@ class Image
 
 	/**
 	 * @brief This function is used by the fromgplus addon
-	 * @param object  $a         App
+	 * @param App     $a         App
 	 * @param integer $uid       user id
 	 * @param string  $imagedata optional, default empty
 	 * @param string  $url       optional, default empty
 	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function storePhoto(App $a, $uid, $imagedata = "", $url = "")
 	{

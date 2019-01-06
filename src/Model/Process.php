@@ -21,6 +21,7 @@ class Process extends BaseObject
 	 * @param string $command
 	 * @param string $pid
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function insert($command, $pid = null)
 	{
@@ -46,6 +47,7 @@ class Process extends BaseObject
 	 *
 	 * @param string $pid
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function deleteByPid($pid = null)
 	{

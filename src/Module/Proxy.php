@@ -32,7 +32,6 @@ class Proxy extends BaseModule
 	 *
 	 * Sets application instance and checks if /proxy/ path is writable.
 	 *
-	 * @param \Friendica\App $app Application instance
 	 */
 	public static function init()
 	{
@@ -157,6 +156,7 @@ class Proxy extends BaseModule
 	 *      'size' => requested image size (int)
 	 *      'sizetype' => requested image size (string): ':micro', ':thumb', ':small', ':medium', ':large'
 	 *    ]
+	 * @throws \Exception
 	 */
 	private static function getRequestInfo()
 	{
@@ -224,12 +224,13 @@ class Proxy extends BaseModule
 			'sizetype' => $sizetype,
 		];
 	}
-	
-	
+
+
 	/**
 	 * @brief setup ./proxy folder for direct cache
 	 *
 	 * @return bool  False if direct cache can't be used.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function setupDirectCache()
 	{
@@ -248,16 +249,18 @@ class Proxy extends BaseModule
 		
 		return $direct_cache;
 	}
-	
-	
+
+
 	/**
 	 * @brief Try to reply with image in cachefile
 	 *
-	 * @param array $request  Array from getRequestInfo
+	 * @param array $request Array from getRequestInfo
 	 *
 	 * @return string  Cache file name, empty string if cache is not enabled.
-	 * 
+	 *
 	 * If cachefile exists, script ends here and this function will never returns
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function responseFromCache(&$request)
 	{
@@ -269,13 +272,15 @@ class Proxy extends BaseModule
 		}
 		return $cachefile;
 	}
-	
+
 	/**
 	 * @brief Try to reply with image in database
 	 *
-	 * @param array $request  Array from getRequestInfo
+	 * @param array $request Array from getRequestInfo
 	 *
 	 * If the image exists in database, then script ends here and this function will never returns
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function responseFromDB(&$request) {
 	
@@ -297,11 +302,12 @@ class Proxy extends BaseModule
 		echo file_get_contents('images/blank.png');
 		exit();
 	}
-	
+
 	/**
 	 * @brief Output the image with cache headers
 	 *
-	 * @param Image $image
+	 * @param Image $img
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function responseImageHttpCache(Image $img)
 	{

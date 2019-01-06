@@ -33,6 +33,7 @@ class Worker
 	 *
 	 * @param boolean $run_cron Should the cron processes be executed?
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function processQueue($run_cron = true)
 	{
@@ -150,6 +151,7 @@ class Worker
 	 * @brief Returns the number of deferred entries in the worker queue
 	 *
 	 * @return integer Number of deferred entries in the worker queue
+	 * @throws \Exception
 	 */
 	private static function deferredEntries()
 	{
@@ -161,6 +163,7 @@ class Worker
 	 * @brief Returns the number of non executed entries in the worker queue
 	 *
 	 * @return integer Number of non executed entries in the worker queue
+	 * @throws \Exception
 	 */
 	private static function totalEntries()
 	{
@@ -172,6 +175,7 @@ class Worker
 	 * @brief Returns the highest priority in the worker queue that isn't executed
 	 *
 	 * @return integer Number of active worker processes
+	 * @throws \Exception
 	 */
 	private static function highestPriority()
 	{
@@ -190,6 +194,7 @@ class Worker
 	 * @param integer $priority The priority that should be checked
 	 *
 	 * @return integer Is there a process running with that priority?
+	 * @throws \Exception
 	 */
 	private static function processWithPriorityActive($priority)
 	{
@@ -204,6 +209,7 @@ class Worker
 	 * @param array $queue Workerqueue entry
 	 *
 	 * @return boolean "true" if further processing should be stopped
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function execute($queue)
 	{
@@ -317,6 +323,7 @@ class Worker
 	 * @param array   $argv        Array of values to be passed to the function
 	 * @param boolean $method_call boolean
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function execFunction($queue, $funcname, $argv, $method_call)
 	{
@@ -483,6 +490,7 @@ class Worker
 	 * @brief Checks if the number of database connections has reached a critical limit.
 	 *
 	 * @return bool Are more than 3/4 of the maximum connections used?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function maxConnectionsReached()
 	{
@@ -560,6 +568,7 @@ class Worker
 	/**
 	 * @brief fix the queue entry if the worker process died
 	 * @return void
+	 * @throws \Exception
 	 */
 	private static function killStaleWorkers()
 	{
@@ -624,6 +633,7 @@ class Worker
 	 * @brief Checks if the number of active workers exceeds the given limits
 	 *
 	 * @return bool Are there too much workers running?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function tooMuchWorkers()
 	{
@@ -728,6 +738,7 @@ class Worker
 	 * @brief Returns the number of active worker processes
 	 *
 	 * @return integer Number of active worker processes
+	 * @throws \Exception
 	 */
 	private static function activeWorkers()
 	{
@@ -742,6 +753,7 @@ class Worker
 	 *
 	 * @param string $highest_priority Returns the currently highest priority
 	 * @return bool We let pass a slower process than $highest_priority
+	 * @throws \Exception
 	 */
 	private static function passingSlow(&$highest_priority)
 	{
@@ -794,6 +806,7 @@ class Worker
 	 *
 	 * @param boolean $passing_slow Returns if we had passed low priority processes
 	 * @return boolean Have we found something?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function findWorkerProcesses(&$passing_slow)
 	{
@@ -888,6 +901,7 @@ class Worker
 	 *
 	 * @param boolean $passing_slow Returns if we had passed low priority processes
 	 * @return string SQL statement
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function workerProcess(&$passing_slow)
 	{
@@ -923,6 +937,7 @@ class Worker
 	/**
 	 * @brief Removes a workerqueue entry from the current process
 	 * @return void
+	 * @throws \Exception
 	 */
 	public static function unclaimProcess()
 	{
@@ -934,6 +949,7 @@ class Worker
 	/**
 	 * @brief Call the front end worker
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function callWorker()
 	{
@@ -948,6 +964,7 @@ class Worker
 	/**
 	 * @brief Call the front end worker if there aren't any active
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function executeIfIdle()
 	{
@@ -998,6 +1015,7 @@ class Worker
 	/**
 	 * @brief Removes long running worker processes
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function clearProcesses()
 	{
@@ -1012,6 +1030,7 @@ class Worker
 	/**
 	 * @brief Runs the cron processes
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function runCron()
 	{
@@ -1029,7 +1048,9 @@ class Worker
 
 	/**
 	 * @brief Spawns a new worker
+	 * @param bool $do_cron
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function spawnWorker($do_cron = false)
 	{
@@ -1054,12 +1075,13 @@ class Worker
 	 * or: Worker::add(PRIORITY_HIGH, "Notifier", "drop", $drop_id);
 	 * or: Worker::add(array('priority' => PRIORITY_HIGH, 'dont_fork' => true), "CreateShadowEntry", $post_id);
 	 *
+	 * @return boolean "false" if proc_run couldn't be executed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @note $cmd and string args are surrounded with ""
 	 *
 	 * @hooks 'proc_run'
-	 * 	array $arr
+	 *    array $arr
 	 *
-	 * @return boolean "false" if proc_run couldn't be executed
 	 */
 	public static function add($cmd)
 	{
@@ -1188,6 +1210,7 @@ class Worker
 	 *
 	 * @brief Remove the active process from the "process" table
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function endProcess()
 	{
@@ -1199,6 +1222,7 @@ class Worker
 	 *
 	 * @brief Set the flag if some job is waiting
 	 * @param boolean $jobs Is there a waiting job?
+	 * @throws \Exception
 	 */
 	public static function IPCSetJobState($jobs)
 	{
@@ -1210,6 +1234,7 @@ class Worker
 	 *
 	 * @brief Checks if some worker job waits to be executed
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function IPCJobsExists()
 	{

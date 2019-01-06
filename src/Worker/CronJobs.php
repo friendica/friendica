@@ -135,6 +135,7 @@ class CronJobs
 	 * @brief Clear cache entries
 	 *
 	 * @param App $a
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function clearCache(App $a)
 	{
@@ -232,6 +233,8 @@ class CronJobs
 	 * @brief Repair missing values in Diaspora contacts
 	 *
 	 * @param App $a
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function repairDiaspora(App $a)
 	{

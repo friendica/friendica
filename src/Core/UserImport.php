@@ -35,7 +35,8 @@ class UserImport
 	 * Remove columns from array $arr that aren't in table $table
 	 *
 	 * @param string $table Table name
-	 * @param array &$arr Column=>Value array from json (by ref)
+	 * @param array &$arr   Column=>Value array from json (by ref)
+	 * @throws \Exception
 	 */
 	private static function checkCols($table, &$arr)
 	{
@@ -59,7 +60,9 @@ class UserImport
 	 * Import data into table $table
 	 *
 	 * @param string $table Table name
-	 * @param array $arr Column=>Value array from json
+	 * @param array  $arr   Column=>Value array from json
+	 * @return array|bool
+	 * @throws \Exception
 	 */
 	private static function dbImportAssoc($table, $arr)
 	{
@@ -83,8 +86,10 @@ class UserImport
 	/**
 	 * @brief Import account file exported from mod/uexport
 	 *
-	 * @param App $a Friendica App Class
+	 * @param App   $a    Friendica App Class
 	 * @param array $file array from $_FILES
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function importAccount(App $a, $file)
 	{

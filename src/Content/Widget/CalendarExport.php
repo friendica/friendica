@@ -24,6 +24,7 @@ class CalendarExport
 	 * @brief Get the events widget.
 	 *
 	 * @return string Formated HTML of the calendar widget.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getHTML() {
 		$a = get_app();

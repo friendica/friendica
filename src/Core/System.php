@@ -27,6 +27,7 @@ class System extends BaseObject
 	 *
 	 * @param bool $ssl Whether to append http or https under SSL_POLICY_SELFSIGN
 	 * @return string Friendica server base URL
+	 * @throws InternalServerErrorException
 	 */
 	public static function baseUrl($ssl = false)
 	{
@@ -39,6 +40,7 @@ class System extends BaseObject
 	 * @param string $orig_url The url to be cleaned
 	 *
 	 * @return string The cleaned url
+	 * @throws \Exception
 	 */
 	public static function removedBaseUrl($orig_url)
 	{
@@ -92,6 +94,10 @@ class System extends BaseObject
 	 * Generic XML return
 	 * Outputs a basic dfrn XML status structure to STDOUT, with a <status> variable
 	 * of $st and an optional text <message> of $message and terminates the current process.
+	 *
+	 * @param        $st
+	 * @param string $message
+	 * @throws \Exception
 	 */
 	public static function xmlExit($st, $message = '')
 	{
@@ -121,6 +127,7 @@ class System extends BaseObject
 	 * @param array   $description optional message
 	 *                             'title' => header title
 	 *                             'description' => optional message
+	 * @throws InternalServerErrorException
 	 */
 	public static function httpExit($val, $description = [])
 	{
@@ -191,8 +198,9 @@ class System extends BaseObject
 	/**
 	 * Generates a random string in the UUID format
 	 *
-	 * @param bool|string  $prefix   A given prefix (default is empty)
+	 * @param bool|string $prefix A given prefix (default is empty)
 	 * @return string a generated UUID
+	 * @throws \Exception
 	 */
 	public static function createUUID($prefix = '')
 	{
@@ -203,9 +211,10 @@ class System extends BaseObject
 	/**
 	 * Generates a GUID with the given parameters
 	 *
-	 * @param int          $size     The size of the GUID (default is 16)
-	 * @param bool|string  $prefix   A given prefix (default is empty)
+	 * @param int         $size   The size of the GUID (default is 16)
+	 * @param bool|string $prefix A given prefix (default is empty)
 	 * @return string a generated GUID
+	 * @throws \Exception
 	 */
 	public static function createGUID($size = 16, $prefix = '')
 	{

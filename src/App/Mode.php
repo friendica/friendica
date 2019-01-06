@@ -42,7 +42,7 @@ class Mode
 	 * - App::MODE_NORMAL     : Normal run with all features enabled
 	 *
 	 * @param string $basepath the Basepath of the Application
-	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function determine($basepath = null)
 	{

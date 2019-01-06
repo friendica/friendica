@@ -152,6 +152,7 @@ class Event extends BaseObject
 	 * @brief Extract bbcode formatted event data from a string.
 	 *
 	 * @params: string $s The string which should be parsed for event data.
+	 * @param $text
 	 * @return array The array with the event information.
 	 */
 	public static function fromBBCode($text)
@@ -219,6 +220,7 @@ class Event extends BaseObject
 	 *
 	 * @param int $event_id Event ID.
 	 * @return void
+	 * @throws \Exception
 	 */
 	public static function delete($event_id)
 	{
@@ -237,6 +239,7 @@ class Event extends BaseObject
 	 *
 	 * @param array $arr Array with event data.
 	 * @return int The new event id.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function store($arr)
 	{
@@ -375,6 +378,7 @@ class Event extends BaseObject
 	 * @brief Create an array with translation strings used for events.
 	 *
 	 * @return array Array with translations strings.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getStrings()
 	{
@@ -550,6 +554,8 @@ class Event extends BaseObject
 	 *
 	 * @param array $event_result Event query array.
 	 * @return array Event array for the template.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function prepareListForTemplate(array $event_result)
 	{
@@ -633,7 +639,6 @@ class Event extends BaseObject
 	 *
 	 * @param array  $events   Query result for events.
 	 * @param string $format   The output format (ical/csv).
-	 * @param string $timezone The timezone of the user (not implemented yet).
 	 *
 	 * @return string Content according to selected export format.
 	 *
@@ -745,6 +750,7 @@ class Event extends BaseObject
 	 * @param int $uid The user ID.
 	 *
 	 * @return array Query results.
+	 * @throws \Exception
 	 */
 	private static function getListByUserId($uid = 0)
 	{
@@ -775,14 +781,15 @@ class Event extends BaseObject
 
 	/**
 	 *
-	 * @param int $uid The user ID.
+	 * @param int    $uid    The user ID.
 	 * @param string $format Output format (ical/csv).
 	 * @return array With the results:
-	 *	bool 'success' => True if the processing was successful,<br>
-	 *	string 'format' => The output format,<br>
-	 *	string 'extension' => The file extension of the output format,<br>
-	 *	string 'content' => The formatted output content.<br>
+	 *                       bool 'success' => True if the processing was successful,<br>
+	 *                       string 'format' => The output format,<br>
+	 *                       string 'extension' => The file extension of the output format,<br>
+	 *                       string 'content' => The formatted output content.<br>
 	 *
+	 * @throws \Exception
 	 * @todo Respect authenticated users with events_by_uid().
 	 */
 	public static function exportListByUserId($uid, $format = 'ical')
@@ -835,6 +842,8 @@ class Event extends BaseObject
 	 *
 	 * @param array $item Array with item and event data.
 	 * @return string HTML output.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getItemHTML(array $item) {
 		$same_date = false;
@@ -993,6 +1002,7 @@ class Event extends BaseObject
 	 * @param array  $contact  Contact array, expects: id, uid, url, name
 	 * @param string $birthday Birthday of the contact
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function createBirthday($contact, $birthday)
 	{

@@ -18,7 +18,8 @@ class PermissionSet extends BaseObject
 	 * Fetch the id of a given permission set. Generate a new one when needed
 	 *
 	 * @param array $postarray The array from an item, picture or event post
-	 * @return id
+	 * @return int id
+	 * @throws \Exception
 	 */
 	public static function fetchIDForPost(&$postarray)
 	{
@@ -71,6 +72,7 @@ class PermissionSet extends BaseObject
 	 * @param array   $groups     Possibly previously fetched group ids for that contact
 	 *
 	 * @return array of permission set ids.
+	 * @throws \Exception
 	 */
 
 	static public function get($uid, $contact_id, $groups = null)

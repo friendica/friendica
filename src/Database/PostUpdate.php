@@ -45,6 +45,7 @@ class PostUpdate
 	 * @brief Updates the "global" field in the item table
 	 *
 	 * @return bool "true" when the job is done
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function update1194()
 	{
@@ -115,6 +116,7 @@ class PostUpdate
 	 * This field avoids cost intensive calls in the admin panel and in "nodeinfo"
 	 *
 	 * @return bool "true" when the job is done
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function update1206()
 	{
@@ -147,6 +149,8 @@ class PostUpdate
 	 * @brief update the item related tables
 	 *
 	 * @return bool "true" when the job is done
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function update1279()
 	{
@@ -297,6 +301,7 @@ class PostUpdate
 	 * @brief update item-uri data. Prerequisite for the next item structure update.
 	 *
 	 * @return bool "true" when the job is done
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function update1281()
 	{

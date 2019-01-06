@@ -70,7 +70,8 @@ class Addon extends BaseObject
 	 * @brief uninstalls an addon.
 	 *
 	 * @param string $addon name of the addon
-	 * @return boolean
+	 * @return void
+	 * @throws \Exception
 	 */
 	public static function uninstall($addon)
 	{
@@ -91,6 +92,7 @@ class Addon extends BaseObject
 	 *
 	 * @param string $addon name of the addon
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public static function install($addon)
 	{
@@ -190,6 +192,7 @@ class Addon extends BaseObject
 	 *   *\endcode
 	 * @param string $addon the name of the addon
 	 * @return array with the addon information
+	 * @throws \Exception
 	 */
 	public static function getInfo($addon)
 	{
@@ -269,6 +272,7 @@ class Addon extends BaseObject
 	 * Saves the current enabled addon list in the system.addon config key
 	 *
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function saveEnabledList()
 	{
@@ -279,6 +283,7 @@ class Addon extends BaseObject
 	 * Returns the list of non-hidden enabled addon names
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function getVisibleList()
 	{
@@ -296,13 +301,14 @@ class Addon extends BaseObject
 	/**
 	 * Shim of Hook::register left for backward compatibility purpose.
 	 *
-	 * @see Hook::register
+	 * @see        Hook::register
 	 * @deprecated since version 2018.12
 	 * @param string $hook     the name of the hook
 	 * @param string $file     the name of the file that hooks into
 	 * @param string $function the name of the function that the hook will call
 	 * @param int    $priority A priority (defaults to 0)
 	 * @return mixed|bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function registerHook($hook, $file, $function, $priority = 0)
 	{
@@ -312,12 +318,13 @@ class Addon extends BaseObject
 	/**
 	 * Shim of Hook::unregister left for backward compatibility purpose.
 	 *
-	 * @see Hook::unregister
+	 * @see        Hook::unregister
 	 * @deprecated since version 2018.12
 	 * @param string $hook     the name of the hook
 	 * @param string $file     the name of the file that hooks into
 	 * @param string $function the name of the function that the hook called
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function unregisterHook($hook, $file, $function)
 	{
@@ -327,10 +334,11 @@ class Addon extends BaseObject
 	/**
 	 * Shim of Hook::callAll left for backward-compatibility purpose.
 	 *
-	 * @see Hook::callAll
+	 * @see        Hook::callAll
 	 * @deprecated since version 2018.12
-	 * @param string       $name  of the hook to call
+	 * @param string        $name of the hook to call
 	 * @param string|array &$data to transmit to the callback handler
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function callHooks($name, &$data = null)
 	{

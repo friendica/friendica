@@ -19,6 +19,8 @@ class ContactSelector
 	/**
 	 * @param string $current     current
 	 * @param string $foreign_net network
+	 * @return string
+	 * @throws \Exception
 	 */
 	public static function profileAssign($current, $foreign_net)
 	{
@@ -73,6 +75,7 @@ class ContactSelector
 	 * @param string $network network
 	 * @param string $profile optional, default empty
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function networkToName($network, $profile = "")
 	{
@@ -141,6 +144,7 @@ class ContactSelector
 	 * @param string $current optional, default empty
 	 * @param string $suffix  optionsl, default empty
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function gender($current = "", $suffix = "")
 	{
@@ -180,6 +184,7 @@ class ContactSelector
 	 * @param string $current optional, default empty
 	 * @param string $suffix  optionsl, default empty
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function sexualPreference($current = "", $suffix = "")
 	{
@@ -217,6 +222,7 @@ class ContactSelector
 	/**
 	 * @param string $current optional, default empty
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function maritalStatus($current = "")
 	{

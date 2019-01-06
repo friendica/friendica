@@ -13,12 +13,13 @@ use Friendica\Core\Logger;
  */
 class Strings
 {
-    /**
-     * @brief Generates a pseudo-random string of hexadecimal characters
-     *
-     * @param int $size
-     * @return string
-     */
+	/**
+	 * @brief Generates a pseudo-random string of hexadecimal characters
+	 *
+	 * @param int $size
+	 * @return string
+	 * @throws \Exception
+	 */
     public static function getRandomHex($size = 64)
     {
         $byte_size = ceil($size / 2);
@@ -139,14 +140,15 @@ class Strings
         return $word;
     }
 
-    /**
-     * @brief translate and format the networkname of a contact
-     *
-     * @param string $network   Networkname of the contact (e.g. dfrn, rss and so on)
-     * @param string $url       The contact url
-     * 
-     * @return string   Formatted network name
-     */
+	/**
+	 * @brief translate and format the networkname of a contact
+	 *
+	 * @param string $network Networkname of the contact (e.g. dfrn, rss and so on)
+	 * @param int    $url     The contact url
+	 *
+	 * @return string   Formatted network name
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
     public static function formatNetworkName($network, $url = 0)
     {
         if ($network != "") {
@@ -240,12 +242,13 @@ class Strings
         return $s;
     }
 
-    /**
-     * @brief Decode Base64 Encoded URL and translate -_ to +/
-     * @param string $s URL to decode
-     * 
-     * @return string   Decoded URL
-     */
+	/**
+	 * @brief Decode Base64 Encoded URL and translate -_ to +/
+	 * @param string $s URL to decode
+	 *
+	 * @return string   Decoded URL
+	 * @throws \Exception
+	 */
     public static function base64UrlDecode($s)
     {
         if (is_array($s)) {

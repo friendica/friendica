@@ -840,12 +840,12 @@ class Contact extends BaseModule
 	 *
 	 * Available Pages are 'Status', 'Profile', 'Contacts' and 'Common Friends'
 	 *
-	 * @param App $a
-	 * @param array $contact The contact array
-	 * @param int $active_tab 1 if tab should be marked as active
+	 * @param App   $a
+	 * @param array $contact    The contact array
+	 * @param int   $active_tab 1 if tab should be marked as active
 	 *
-	 * @return string | HTML string of the contact page tabs buttons.
-
+	 * @return string HTML string of the contact page tabs buttons.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getTabsHTML($a, $contact, $active_tab)
 	{

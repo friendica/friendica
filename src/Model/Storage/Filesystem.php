@@ -49,7 +49,8 @@ class Filesystem implements IStorage
 
 	/**
 	 * @brief Create dirctory tree to store file, with .htaccess and index.html files
-	 * @param string  $file  Path and filename
+	 * @param string $file Path and filename
+	 * @throws StorageException
 	 */
 	private static function createFoldersForFile($file)
 	{

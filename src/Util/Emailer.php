@@ -19,17 +19,18 @@ class Emailer
 	 * Send a multipart/alternative message with Text and HTML versions
 	 *
 	 * @param array $params parameters
-	 *                      fromName name of the sender
-	 *                      fromEmail			 email fo the sender
-	 *                      replyTo			     replyTo address to direct responses
-	 *                      toEmail			     destination email address
-	 *                      messageSubject	     subject of the message
-	 *                      htmlVersion		     html version of the message
-	 *                      textVersion		     text only version of the message
-	 *                      additionalMailHeader additions to the smtp mail header
+	 *                      fromName             name of the sender
+	 *                      fromEmail            email of the sender
+	 *                      replyTo              address to direct responses
+	 *                      toEmail              destination email address
+	 *                      messageSubject       subject of the message
+	 *                      htmlVersion          html version of the message
+	 *                      textVersion          text only version of the message
+	 *                      additionalMailHeader additions to the SMTP mail header
 	 *                      optional             uid user id of the destination user
 	 *
 	 * @return object
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function send($params)
 	{

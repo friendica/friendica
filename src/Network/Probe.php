@@ -99,6 +99,7 @@ class Probe
 	 * @param string $host The host part of an url
 	 *
 	 * @return array with template and type of the webfinger template for JSON or XML
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function hostMeta($host)
 	{
@@ -190,6 +191,7 @@ class Probe
 	 * @param string $hcard_url Link to the hcard - is returned by reference
 	 *
 	 * @return string profile link
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public static function webfingerDfrn($webbie, &$hcard_url)
 	{
@@ -223,6 +225,7 @@ class Probe
 	 * @param string $uri Address that should be probed
 	 *
 	 * @return array uri data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public static function lrdd($uri)
 	{
@@ -317,6 +320,8 @@ class Probe
 	 * @param boolean $cache   Use cached values?
 	 *
 	 * @return array uri data
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function uri($uri, $network = '', $uid = -1, $cache = true)
 	{
@@ -529,6 +534,7 @@ class Probe
 	 * @param string $type      type
 	 *
 	 * @return array fixed webfinger data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function fixOStatus($webfinger, $lrdd, $type)
 	{
@@ -574,6 +580,7 @@ class Probe
 	 * @param integer $uid     User ID for the probe (only used for mails)
 	 *
 	 * @return array uri data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function detect($uri, $network, $uid)
 	{
@@ -742,6 +749,7 @@ class Probe
 	 * @param string $type type
 	 *
 	 * @return array webfinger data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function webfinger($url, $type)
 	{
@@ -812,6 +820,7 @@ class Probe
 	 * @param array  $data         The already fetched data
 	 *
 	 * @return array noscrape data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function pollNoscrape($noscrape_url, $data)
 	{
@@ -928,6 +937,8 @@ class Probe
 	 * @param string $profile_link Link to the profile page
 	 *
 	 * @return array profile data
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function profile($profile_link)
 	{
@@ -978,6 +989,7 @@ class Probe
 	 * @param array $webfinger Webfinger data
 	 *
 	 * @return array DFRN data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function dfrn($webfinger)
 	{
@@ -1059,6 +1071,7 @@ class Probe
 	 * @param boolean $dfrn      Poll DFRN specific data
 	 *
 	 * @return array hcard data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
@@ -1183,6 +1196,7 @@ class Probe
 	 * @param array $webfinger Webfinger data
 	 *
 	 * @return array Diaspora data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function diaspora($webfinger)
 	{
@@ -1270,6 +1284,7 @@ class Probe
 	 * @param bool  $short     Short detection mode
 	 *
 	 * @return array|bool OStatus data or "false" on error or "true" on short mode
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function ostatus($webfinger, $short = false)
 	{
@@ -1452,6 +1467,7 @@ class Probe
 	 *
 	 * @param array $webfinger Webfinger data
 	 *
+	 * @param       $addr
 	 * @return array pump.io data
 	 */
 	private static function pumpio($webfinger, $addr)
@@ -1554,6 +1570,7 @@ class Probe
 	 * @param boolean $probe Do a probe if the page contains a feed link
 	 *
 	 * @return array feed data
+	 * @throws HTTPException\InternalServerErrorException
 	 */
 	private static function feed($url, $probe = true)
 	{
@@ -1616,6 +1633,7 @@ class Probe
 	 * @param integer $uid User ID
 	 *
 	 * @return array mail data
+	 * @throws \Exception
 	 */
 	private static function mail($uri, $uid)
 	{
@@ -1703,6 +1721,7 @@ class Probe
 	 * @param string $base   Another path that is hopefully complete
 	 *
 	 * @return string fixed avatar path
+	 * @throws \Exception
 	 */
 	public static function fixAvatar($avatar, $base)
 	{

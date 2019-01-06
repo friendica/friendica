@@ -37,6 +37,7 @@ class Conversation
 	 *
 	 * @param array $arr Item array with conversation data
 	 * @return array Item array with removed conversation data
+	 * @throws \Exception
 	 */
 	public static function insert(array $arr)
 	{

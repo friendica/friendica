@@ -42,7 +42,7 @@ class Receiver
 	/**
 	 * Checks if the web request is done for the AP protocol
 	 *
-	 * @return is it AP?
+	 * @return bool is it AP?
 	 */
 	public static function isRequest()
 	{
@@ -53,9 +53,10 @@ class Receiver
 	/**
 	 * Checks incoming message from the inbox
 	 *
-	 * @param $body
-	 * @param $header
+	 * @param         $body
+	 * @param         $header
 	 * @param integer $uid User ID
+	 * @throws \Exception
 	 */
 	public static function processInbox($body, $header, $uid)
 	{
@@ -114,9 +115,11 @@ class Receiver
 	 *
 	 * @param array   $activity
 	 * @param string  $object_id Object ID of the the provided object
-	 * @param integer $uid User ID
+	 * @param integer $uid       User ID
 	 *
 	 * @return string with object type
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function fetchObjectType($activity, $object_id, $uid = 0)
 	{
@@ -152,11 +155,13 @@ class Receiver
 	/**
 	 * Prepare the object array
 	 *
-	 * @param array $activity
+	 * @param array   $activity
 	 * @param integer $uid User ID
-	 * @param $trust_source
+	 * @param         $trust_source
 	 *
 	 * @return array with object data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function prepareObjectData($activity, $uid, &$trust_source)
 	{
@@ -263,6 +268,7 @@ class Receiver
 	 *
 	 * @param array  $activity Array with activity data
 	 * @param string $body     The raw message
+	 * @throws \Exception
 	 */
 	private static function storeConversation($activity, $body)
 	{
@@ -289,6 +295,7 @@ class Receiver
 	 * @param string  $body
 	 * @param integer $uid          User ID
 	 * @param boolean $trust_source Do we trust the source?
+	 * @throws \Exception
 	 */
 	public static function processActivity($activity, $body = '', $uid = null, $trust_source = false)
 	{
@@ -424,11 +431,12 @@ class Receiver
 	/**
 	 * Fetch the receiver list from an activity array
 	 *
-	 * @param array $activity
+	 * @param array  $activity
 	 * @param string $actor
-	 * @param array $tags
+	 * @param array  $tags
 	 *
 	 * @return array with receivers (user id)
+	 * @throws \Exception
 	 */
 	private static function getReceivers($activity, $actor, $tags = [])
 	{
@@ -519,9 +527,10 @@ class Receiver
 	 * Fetch the receiver list of a given actor
 	 *
 	 * @param string $actor
-	 * @param array $tags
+	 * @param array  $tags
 	 *
 	 * @return array with receivers (user id)
+	 * @throws \Exception
 	 */
 	public static function getReceiverForActor($actor, $tags)
 	{
@@ -542,11 +551,12 @@ class Receiver
 	/**
 	 * Tests if the contact is a valid receiver for this actor
 	 *
-	 * @param array $contact
+	 * @param array  $contact
 	 * @param string $actor
-	 * @param array $tags
+	 * @param array  $tags
 	 *
-	 * @return array with receivers (user id)
+	 * @return bool with receivers (user id)
+	 * @throws \Exception
 	 */
 	private static function isValidReceiverForActor($contact, $actor, $tags)
 	{
@@ -585,7 +595,9 @@ class Receiver
 	 *
 	 * @param integer $cid Contact ID
 	 * @param integer $uid User ID
-	 * @param string $url Profile URL
+	 * @param string  $url Profile URL
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function switchContact($cid, $uid, $url)
 	{
@@ -618,6 +630,8 @@ class Receiver
 	 *
 	 * @param $receivers
 	 * @param $actor
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function switchContacts($receivers, $actor)
 	{
@@ -641,10 +655,10 @@ class Receiver
 	/**
 	 *
 	 *
-	 * @param $object_data
+	 * @param       $object_data
 	 * @param array $activity
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	private static function addActivityFields($object_data, $activity)
 	{
@@ -670,6 +684,8 @@ class Receiver
 	 * @param integer $uid          User ID for the signature that we use to fetch data
 	 *
 	 * @return array with trusted and valid object data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function fetchObject($object_id, $object = [], $trust_source = false, $uid = 0)
 	{
@@ -755,8 +771,7 @@ class Receiver
 	/**
 	 * Convert emojis from JSON-LD format into a simplified format
 	 *
-	 * @param array $tags Tags in JSON-LD format
-	 *
+	 * @param $emojis
 	 * @return array with emojis in a simplified format
 	 */
 	private static function processEmojis($emojis)
@@ -815,6 +830,7 @@ class Receiver
 	 * @param array $object
 	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	private static function processObject($object)
 	{

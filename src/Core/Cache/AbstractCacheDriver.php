@@ -14,8 +14,9 @@ use Friendica\BaseObject;
 abstract class AbstractCacheDriver extends BaseObject
 {
 	/**
-	 * @param string $key	The original key
-	 * @return string		The cache key used for the cache
+	 * @param string $key The original key
+	 * @return string        The cache key used for the cache
+	 * @throws \Exception
 	 */
 	protected function getCacheKey($key)
 	{

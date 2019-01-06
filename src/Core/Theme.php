@@ -90,8 +90,9 @@ class Theme
 	 *
 	 * The screenshot is expected as view/theme/$theme/screenshot.[png|jpg].
 	 *
-	 * @param sring $theme The name of the theme
+	 * @param string $theme The name of the theme
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getScreenshot($theme)
 	{
@@ -148,6 +149,7 @@ class Theme
 	 * @param string $file Filename
 	 * @param string $root Full root path
 	 * @return string Path to the file or empty string if the file isn't found
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getPathForFile($file, $root = '')
 	{

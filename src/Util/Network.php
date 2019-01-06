@@ -31,6 +31,7 @@ class Network
 	 * @param string  $cookiejar      Path to cookie jar file
 	 *
 	 * @return string The fetched content
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function fetchUrl($url, $binary = false, &$redirects = 0, $timeout = 0, $accept_content = null, $cookiejar = '')
 	{
@@ -55,6 +56,7 @@ class Network
 	 * @param string  $cookiejar      Path to cookie jar file
 	 *
 	 * @return CurlResult With all relevant information, 'body' contains the actual fetched content.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function fetchUrlFull($url, $binary = false, &$redirects = 0, $timeout = 0, $accept_content = null, $cookiejar = '')
 	{
@@ -86,6 +88,7 @@ class Network
 	 *                           'header' => header array
 	 *
 	 * @return CurlResult
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function curl($url, $binary = false, &$redirects = 0, $opts = [])
 	{
@@ -240,6 +243,7 @@ class Network
 	 * @param integer $timeout   The timeout in seconds, default system config value or 60 seconds
 	 *
 	 * @return CurlResult The content
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function post($url, $params, $headers = null, &$redirects = 0, $timeout = 0)
 	{
@@ -342,6 +346,7 @@ class Network
 	 *
 	 * @param string $url The URL to be validated
 	 * @return string|boolean The actual working URL, false else
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isUrlValid($url)
 	{
@@ -373,6 +378,7 @@ class Network
 	 *
 	 * @param string $addr The email address
 	 * @return boolean True if it's a valid email address, false if it's not
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isEmailDomainValid($addr)
 	{
@@ -404,6 +410,7 @@ class Network
 	 *
 	 * @param string $url URL which get tested
 	 * @return boolean True if url is allowed otherwise return false
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isUrlAllowed($url)
 	{
@@ -449,6 +456,7 @@ class Network
 	 * @param string $url The url to check the domain from
 	 *
 	 * @return boolean
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isUrlBlocked($url)
 	{
@@ -478,7 +486,8 @@ class Network
 	 *
 	 * @param  string $email email address
 	 * @return boolean False if not allowed, true if allowed
-	 *    or if allowed list is not configured
+	 *                       or if allowed list is not configured
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function isEmailDomainAllowed($email)
 	{
@@ -592,14 +601,15 @@ class Network
 	 * This function strips tracking query params and follows redirections, either
 	 * through HTTP code or meta refresh tags. Stops after 10 redirections.
 	 *
-	 * @todo Remove the $fetchbody parameter that generates an extraneous HEAD request
+	 * @todo  Remove the $fetchbody parameter that generates an extraneous HEAD request
 	 *
-	 * @see ParseUrl::getSiteinfo
+	 * @see   ParseUrl::getSiteinfo
 	 *
 	 * @param string $url       A user-submitted URL
 	 * @param int    $depth     The current redirection recursion level (internal)
 	 * @param bool   $fetchbody Wether to fetch the body or not after the HEAD requests
 	 * @return string A canonical URL
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function finalUrl($url, $depth = 1, $fetchbody = false)
 	{

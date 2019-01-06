@@ -22,6 +22,7 @@ class Salmon
 	 * @param string $uri     Uniform Resource Identifier
 	 * @param string $keyhash encoded key
 	 * @return mixed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getKey($uri, $keyhash)
 	{
@@ -86,6 +87,7 @@ class Salmon
 	 * @param string $url   url
 	 * @param string $slap  slap
 	 * @return integer
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function slapper($owner, $url, $slap)
 	{
@@ -205,6 +207,7 @@ class Salmon
 	/**
 	 * @param string $pubkey public key
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function salmonKey($pubkey)
 	{

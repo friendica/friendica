@@ -33,6 +33,7 @@ class GContact
 	 * @param string $mode   Search mode (e.g. "community")
 	 *
 	 * @return array with search results
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function searchByName($search, $mode = '')
 	{
@@ -93,6 +94,7 @@ class GContact
 	 * @param integer $cid  Contact ID
 	 * @param integer $zcid Global Contact ID
 	 * @return void
+	 * @throws Exception
 	 */
 	public static function link($gcid, $uid = 0, $cid = 0, $zcid = 0)
 	{
@@ -107,16 +109,16 @@ class GContact
 	/**
 	 * @brief Sanitize the given gcontact data
 	 *
-	 * @param array $gcontact array with gcontact data
-	 * @throw Exception
-	 *
 	 * Generation:
 	 *  0: No definition
 	 *  1: Profiles on this server
 	 *  2: Contacts of profiles on this server
 	 *  3: Contacts of contacts of profiles on this server
 	 *  4: ...
+	 *
+	 * @param array $gcontact array with gcontact data
 	 * @return array $gcontact
+	 * @throws Exception
 	 */
 	public static function sanitize($gcontact)
 	{
@@ -414,6 +416,7 @@ class GContact
 	 * @param integer $start optional, default 0
 	 * @param integer $limit optional, default 80
 	 * @return array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function suggestionQuery($uid, $start = 0, $limit = 80)
 	{
@@ -517,6 +520,7 @@ class GContact
 
 	/**
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function updateSuggestions()
 	{
@@ -570,6 +574,7 @@ class GContact
 	 * @param string $url Contact url
 	 *
 	 * @return string Contact url with the wanted parts
+	 * @throws Exception
 	 */
 	public static function cleanContactUrl($url)
 	{
@@ -601,6 +606,8 @@ class GContact
 	 *
 	 * @param array $contact contact array (called by reference)
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function fixAlternateContactAddress(&$contact)
 	{
@@ -622,6 +629,8 @@ class GContact
 	 * @param array $contact contact array
 	 *
 	 * @return bool|int Returns false if not found, integer if contact was found
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function getId($contact)
 	{
@@ -717,6 +726,8 @@ class GContact
 	 * @param array $contact contact array
 	 *
 	 * @return bool|int Returns false if not found, integer if contact was found
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function update($contact)
 	{
@@ -881,6 +892,8 @@ class GContact
 	 *
 	 * @param string $url profile link
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function updateFromProbe($url)
 	{
@@ -900,7 +913,9 @@ class GContact
 	 * @brief Update the gcontact entry for a given user id
 	 *
 	 * @param int $uid User ID
-	 * @return void
+	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function updateForUser($uid)
 	{
@@ -951,7 +966,9 @@ class GContact
 	 * If the "Statistics" addon is enabled (See http://gstools.org/ for details) we query user data with this.
 	 *
 	 * @param string $server Server address
-	 * @return void
+	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function fetchGsUsers($server)
 	{
@@ -1011,6 +1028,8 @@ class GContact
 	/**
 	 * @brief Asking GNU Social server on a regular base for their user data
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function discoverGsUsers()
 	{

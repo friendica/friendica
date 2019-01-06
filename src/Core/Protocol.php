@@ -48,7 +48,7 @@ class Protocol
 	 *
 	 * @param string $profile_url
 	 * @return string
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public static function getAddrFromProfileUrl($profile_url)
 	{
@@ -67,8 +67,9 @@ class Protocol
 	 * Guesses the network from a profile URL
 	 *
 	 * @param string $profile_url
-	 * @param array  $matches     preg_match return array: [0] => Full match [1] => hostname [2] => username
-	 * @return type
+	 * @param array  $matches preg_match return array: [0] => Full match [1] => hostname [2] => username
+	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function matchByProfileUrl($profile_url, &$matches = [])
 	{
@@ -129,6 +130,7 @@ class Protocol
 	 * @param string $profile_url
 	 * @param string $display_name
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function formatMention($profile_url, $display_name)
 	{

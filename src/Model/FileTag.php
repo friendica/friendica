@@ -134,16 +134,17 @@ class FileTag
         return $list;
     }
 
-    /**
-     * @brief Update file tags in PConfig
-     * 
-     * @param int $uid          Unique Identity.
-     * @param string $file_old  Categories previously associated with an item
-     * @param string $file_new  New list of categories for an item
-     * @param string $type      Optional file type.
-     * 
-     * @return boolean          A value indicating success or failure.
-     */
+	/**
+	 * @brief Update file tags in PConfig
+	 *
+	 * @param int    $uid      Unique Identity.
+	 * @param string $file_old Categories previously associated with an item
+	 * @param string $file_new New list of categories for an item
+	 * @param string $type     Optional file type.
+	 *
+	 * @return boolean          A value indicating success or failure.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
     public static function updatePconfig($uid, $file_old, $file_new, $type = 'file')
     {
         if (!intval($uid)) {
@@ -220,15 +221,16 @@ class FileTag
         return true;
     }
 
-    /**
-     * @brief Add tag to file
-     * 
-     * @param int $uid      Unique identity.
-     * @param int $item_id  Item identity.
-     * @param string $file  File tag.
-     * 
-     * @return boolean      A value indicating success or failure.
-     */
+	/**
+	 * @brief Add tag to file
+	 *
+	 * @param int    $uid     Unique identity.
+	 * @param int    $item_id Item identity.
+	 * @param string $file    File tag.
+	 *
+	 * @return boolean      A value indicating success or failure.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
     public static function saveFile($uid, $item_id, $file)
     {
         if (!intval($uid))
@@ -258,16 +260,17 @@ class FileTag
         return true;
     }
 
-    /**
-     * @brief Remove tag from file
-     * 
-     * @param int $uid      Unique identity.
-     * @param int $item_id  Item identity.
-     * @param string $file  File tag.
-     * @param boolean $cat  Optional value indicating the term type (i.e. Category or File)
-     * 
-     * @return boolean      A value indicating success or failure.
-     */
+	/**
+	 * @brief Remove tag from file
+	 *
+	 * @param int     $uid     Unique identity.
+	 * @param int     $item_id Item identity.
+	 * @param string  $file    File tag.
+	 * @param boolean $cat     Optional value indicating the term type (i.e. Category or File)
+	 *
+	 * @return boolean      A value indicating success or failure.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
     public static function unsaveFile($uid, $item_id, $file, $cat = false)
     {
         if (!intval($uid))

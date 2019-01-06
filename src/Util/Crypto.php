@@ -42,7 +42,7 @@ class Crypto
 
 	/**
 	 * @param string $Der     der formatted string
-	 * @param string $Private key type optional, default false
+	 * @param bool   $Private key type optional, default false
 	 * @return string
 	 */
 	private static function DerToPem($Der, $Private = false)
@@ -149,6 +149,7 @@ class Crypto
 	 * @param string $m   modulo reference
 	 * @param object $e   exponent reference
 	 * @return void
+	 * @throws \Exception
 	 */
 	private static function pubRsaToMe($key, &$m, &$e)
 	{
@@ -166,6 +167,7 @@ class Crypto
 	/**
 	 * @param string $key key
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function rsaToPem($key)
 	{
@@ -176,6 +178,7 @@ class Crypto
 	/**
 	 * @param string $key key
 	 * @return string
+	 * @throws \Exception
 	 */
 	private static function pemToRsa($key)
 	{
@@ -188,6 +191,7 @@ class Crypto
 	 * @param string $m   modulo reference
 	 * @param string $e   exponent reference
 	 * @return void
+	 * @throws \Exception
 	 */
 	public static function pemToMe($key, &$m, &$e)
 	{
@@ -217,6 +221,7 @@ class Crypto
 	/**
 	 * @param integer $bits number of bits
 	 * @return mixed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function newKeypair($bits)
 	{
@@ -318,14 +323,15 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
+	 *
 	 * @param string $data
 	 * @param string $pubkey The public key.
 	 * @param string $alg    The algorithm used for encryption.
-	 * 
+	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	public static function encapsulate($data, $pubkey, $alg = 'aes256cbc')
 	{
@@ -336,14 +342,15 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
-	 * @param type $data
-	 * @param type $pubkey The public key.
-	 * @param type $alg    The algorithm used for encryption.
-	 * 
+	 *
+	 * @param string $data
+	 * @param string $pubkey The public key.
+	 * @param string $alg    The algorithm used for encryption.
+	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	private static function encapsulateOther($data, $pubkey, $alg)
 	{
@@ -378,13 +385,14 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
+	 *
 	 * @param string $data
 	 * @param string $pubkey
-	 * 
+	 *
 	 * @return array
+	 * @throws \Exception
 	 */
 	private static function encapsulateAes($data, $pubkey)
 	{
@@ -412,13 +420,14 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
+	 *
 	 * @param string $data
-	 * @param string $prvkey  The private key used for decryption.
-	 * 
+	 * @param string $prvkey The private key used for decryption.
+	 *
 	 * @return string|boolean The decrypted string or false on failure.
+	 * @throws \Exception
 	 */
 	public static function unencapsulate($data, $prvkey)
 	{
@@ -434,14 +443,15 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
+	 *
 	 * @param string $data
-	 * @param string $prvkey  The private key used for decryption.
+	 * @param string $prvkey The private key used for decryption.
 	 * @param string $alg
-	 * 
+	 *
 	 * @return string|boolean The decrypted string or false on failure.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function unencapsulateOther($data, $prvkey, $alg)
 	{
@@ -461,13 +471,14 @@ class Crypto
 	}
 
 	/**
-	 * 
+	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
-	 * 
+	 *
 	 * @param array  $data
-	 * @param string $prvkey  The private key used for decryption.
-	 * 
+	 * @param string $prvkey The private key used for decryption.
+	 *
 	 * @return string|boolean The decrypted string or false on failure.
+	 * @throws \Exception
 	 */
 	private static function unencapsulateAes($data, $prvkey)
 	{

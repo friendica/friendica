@@ -23,15 +23,16 @@ class ACL extends BaseObject
 	/**
 	 * Returns a select input tag with all the contact of the local user
 	 *
-	 * @param string $selname Name attribute of the select input tag
-	 * @param string $selclass Class attribute of the select input tag
-	 * @param array $options Available options:
-	 * - size: length of the select box
-	 * - mutual_friends: Only used for the hook
-	 * - single: Only used for the hook
-	 * - exclude: Only used for the hook
-	 * @param array $preselected Contact ID that should be already selected
+	 * @param string $selname     Name attribute of the select input tag
+	 * @param string $selclass    Class attribute of the select input tag
+	 * @param array  $options     Available options:
+	 *                            - size: length of the select box
+	 *                            - mutual_friends: Only used for the hook
+	 *                            - single: Only used for the hook
+	 *                            - exclude: Only used for the hook
+	 * @param array  $preselected Contact ID that should be already selected
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function getSuggestContactSelectHTML($selname, $selclass, array $options = [], array $preselected = [])
 	{
@@ -141,6 +142,7 @@ class ACL extends BaseObject
 	 * @param int    $size        Length of the select box
 	 * @param int    $tabindex    Select input tag tabindex attribute
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function getMessageContactSelectHTML($selname, $selclass, array $preselected = [], $size = 4, $tabindex = null)
 	{
@@ -215,6 +217,7 @@ class ACL extends BaseObject
 	 *
 	 * @param array $user
 	 * @return array Hash of contact id lists
+	 * @throws \Exception
 	 */
 	public static function getDefaultUserPermissions(array $user = null)
 	{
@@ -251,9 +254,10 @@ class ACL extends BaseObject
 	 * Return the full jot ACL selector HTML
 	 *
 	 * @param array $user                User array
-	 * @param array $default_permissions Static defaults permission array: ['allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '']
 	 * @param bool  $show_jotnets
+	 * @param array $default_permissions Static defaults permission array: ['allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '']
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function getFullSelectorHTML(array $user, $show_jotnets = false, array $default_permissions = [])
 	{
@@ -320,6 +324,7 @@ class ACL extends BaseObject
 	 * @param string $search Name or part of a name or nick
 	 * @param string $mode   Search mode (e.g. "community")
 	 * @return array with the search results
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function contactAutocomplete($search, $mode)
 	{

@@ -82,6 +82,7 @@ class Login extends BaseModule
 	 *
 	 * @param string $openid_url OpenID URL string
 	 * @param bool   $remember   Whether to set the session remember flag
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function openIdAuthentication($openid_url, $remember)
 	{
@@ -115,6 +116,7 @@ class Login extends BaseModule
 	 * @param string $username User name
 	 * @param string $password Clear password
 	 * @param bool   $remember Whether to set the session remember flag
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function passwordAuthentication($username, $password, $remember)
 	{
@@ -272,14 +274,15 @@ class Login extends BaseModule
 	/**
 	 * @brief Wrapper for adding a login box.
 	 *
-	 * @param string $return_path The path relative to the base the user should be sent
-	 *							 back to after login completes
-	 * @param bool $register If $register == true provide a registration link.
-	 *						 This will most always depend on the value of config.register_policy.
-	 * @param array $hiddens  optional
+	 * @param string $return_path  The path relative to the base the user should be sent
+	 *                             back to after login completes
+	 * @param bool   $register     If $register == true provide a registration link.
+	 *                             This will most always depend on the value of config.register_policy.
+	 * @param array  $hiddens      optional
 	 *
 	 * @return string Returns the complete html for inserting into the page
 	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @hooks 'login_hook' string $o
 	 */
 	public static function form($return_path = null, $register = false, $hiddens = [])

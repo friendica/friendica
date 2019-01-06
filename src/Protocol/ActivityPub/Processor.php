@@ -30,7 +30,7 @@ class Processor
 	 *
 	 * @param string $body
 	 *
-	 * @return converted body
+	 * @return string converted body
 	 */
 	private static function convertMentions($body)
 	{
@@ -93,7 +93,7 @@ class Processor
 	 * @param array $attachments
 	 * @param array $item
 	 *
-	 * @return item array
+	 * @return array array
 	 */
 	private static function constructAttachList($attachments, $item)
 	{
@@ -124,7 +124,8 @@ class Processor
 	/**
 	 * Updates a message
 	 *
-	 * @param array  $activity Activity array
+	 * @param array $activity Activity array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function updateItem($activity)
 	{
@@ -143,7 +144,9 @@ class Processor
 	/**
 	 * Prepares data for a message
 	 *
-	 * @param array  $activity Activity array
+	 * @param array $activity Activity array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function createItem($activity)
 	{
@@ -173,6 +176,8 @@ class Processor
 	 * Delete items
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function deleteItem($activity)
 	{
@@ -187,6 +192,8 @@ class Processor
 	 *
 	 * @param array  $activity Activity array
 	 * @param string $verb     Activity verb
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function createActivity($activity, $verb)
 	{
@@ -206,6 +213,7 @@ class Processor
 	 *
 	 * @param array $activity Activity array
 	 * @param array $item
+	 * @throws \Exception
 	 */
 	public static function createEvent($activity, $item)
 	{
@@ -237,8 +245,10 @@ class Processor
 	/**
 	 * Creates an item post
 	 *
-	 * @param array  $activity Activity data
-	 * @param array  $item     item array
+	 * @param array $activity Activity data
+	 * @param array $item     item array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function postItem($activity, $item)
 	{
@@ -314,6 +324,7 @@ class Processor
 	 *
 	 * @param $url
 	 * @param $child
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function fetchMissingActivity($url, $child)
 	{
@@ -352,6 +363,8 @@ class Processor
 	 * perform a "follow" request
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function followUser($activity)
 	{
@@ -390,6 +403,7 @@ class Processor
 	 * Update the given profile
 	 *
 	 * @param array $activity
+	 * @throws \Exception
 	 */
 	public static function updatePerson($activity)
 	{
@@ -405,6 +419,7 @@ class Processor
 	 * Delete the given profile
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function deletePerson($activity)
 	{
@@ -431,6 +446,8 @@ class Processor
 	 * Accept a follow request
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function acceptFollowUser($activity)
 	{
@@ -465,6 +482,8 @@ class Processor
 	 * Reject a follow request
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function rejectFollowUser($activity)
 	{
@@ -495,6 +514,8 @@ class Processor
 	 * Undo activity like "like" or "dislike"
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function undoActivity($activity)
 	{
@@ -518,6 +539,8 @@ class Processor
 	 * Activity to remove a follower
 	 *
 	 * @param array $activity
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function undoFollowUser($activity)
 	{
@@ -549,6 +572,7 @@ class Processor
 	 * Switches a contact to AP if needed
 	 *
 	 * @param integer $cid Contact ID
+	 * @throws \Exception
 	 */
 	private static function switchContact($cid)
 	{

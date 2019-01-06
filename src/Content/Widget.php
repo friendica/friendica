@@ -30,6 +30,8 @@ class Widget
 	 * Return the follow widget
 	 *
 	 * @param string $value optional, default empty
+	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function follow($value = "")
 	{
@@ -127,6 +129,8 @@ class Widget
 	 *
 	 * @param string $baseurl  baseurl
 	 * @param string $selected optional, default empty
+	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function networks($baseurl, $selected = '')
 	{
@@ -169,6 +173,8 @@ class Widget
 	 *
 	 * @param string $baseurl  baseurl
 	 * @param string $selected optional, default empty
+	 * @return string|void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function fileAs($baseurl, $selected = '')
 	{
@@ -207,6 +213,8 @@ class Widget
 	 *
 	 * @param string $baseurl  baseurl
 	 * @param string $selected optional, default empty
+	 * @return string|void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function categories($baseurl, $selected = '')
 	{
@@ -246,6 +254,8 @@ class Widget
 	 * Return common friends visitor widget
 	 *
 	 * @param string $profile_uid uid
+	 * @return string|void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function commonFriendsVisitor($profile_uid)
 	{
@@ -314,8 +324,10 @@ class Widget
 	 * Insert a tag cloud widget for the present profile.
 	 *
 	 * @brief Insert a tag cloud widget for the present profile.
-	 * @param int     $limit Max number of displayed tags.
+	 * @param int $limit Max number of displayed tags.
 	 * @return string HTML formatted output.
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function tagCloud($limit = 50)
 	{

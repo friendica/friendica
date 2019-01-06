@@ -46,13 +46,15 @@ class OStatus
 	/**
 	 * @brief Fetches author data
 	 *
-	 * @param object $xpath     The xpath object
-	 * @param object $context   The xml context of the author details
-	 * @param array  $importer  user record of the importing user
-	 * @param array  $contact   Called by reference, will contain the fetched contact
-	 * @param bool   $onlyfetch Only fetch the header without updating the contact entries
+	 * @param DOMXPath $xpath     The xpath object
+	 * @param object   $context   The xml context of the author details
+	 * @param array    $importer  user record of the importing user
+	 * @param array    $contact   Called by reference, will contain the fetched contact
+	 * @param bool     $onlyfetch Only fetch the header without updating the contact entries
 	 *
 	 * @return array Array of author related entries for the item
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function fetchAuthor(DOMXPath $xpath, $context, array $importer, array &$contact = null, $onlyfetch)
 	{
@@ -245,6 +247,8 @@ class OStatus
 	 * @param array  $importer user record of the importing user
 	 *
 	 * @return array Array of author related entries for the item
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function salmonAuthor($xml, array $importer)
 	{
@@ -299,6 +303,8 @@ class OStatus
 	 * @param array  $contact  contact
 	 * @param string $hub      Called by reference, returns the fetched hub data
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function import($xml, array $importer, array &$contact = null, &$hub)
 	{
@@ -316,6 +322,8 @@ class OStatus
 	 * @param boolean $initialize Is it the leading post so that data has to be initialized?
 	 *
 	 * @return boolean Could the XML be processed?
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function process($xml, array $importer, array &$contact = null, &$hub, $stored = false, $initialize = true)
 	{
@@ -559,8 +567,10 @@ class OStatus
 
 	/**
 	 * Removes notice item from database
+	 *
 	 * @param array $item item
 	 * @return void
+	 * @throws \Exception
 	 */
 	private static function deleteNotice(array $item)
 	{
@@ -578,11 +588,13 @@ class OStatus
 	/**
 	 * @brief Processes the XML for a post
 	 *
-	 * @param object $xpath    The xpath object
-	 * @param object $entry    The xml entry that is processed
-	 * @param array  $item     The item array
-	 * @param array  $importer user record of the importing user
+	 * @param DOMXPath $xpath    The xpath object
+	 * @param object   $entry    The xml entry that is processed
+	 * @param array    $item     The item array
+	 * @param array    $importer user record of the importing user
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function processPost(DOMXPath $xpath, $entry, array &$item, array $importer)
 	{
@@ -728,6 +740,7 @@ class OStatus
 	 * @param string $conversation     The link to the conversation
 	 * @param string $conversation_uri The conversation in "uri" format
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function fetchConversation($conversation, $conversation_uri)
 	{
@@ -790,6 +803,7 @@ class OStatus
 	 * @param string $conversation     conversation
 	 * @param string $conversation_uri conversation uri
 	 * @return void
+	 * @throws \Exception
 	 */
 	private static function storeConversation($xml, $conversation = '', $conversation_uri = '')
 	{
@@ -873,6 +887,7 @@ class OStatus
 	 * @param string $self The link to the self item
 	 * @param array  $item The item array
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function fetchSelf($self, array &$item)
 	{
@@ -908,6 +923,8 @@ class OStatus
 	 * @param string $related_uri The related item in "uri" format
 	 * @param array  $importer    user record of the importing user
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function fetchRelated($related, $related_uri, $importer)
 	{
@@ -1011,12 +1028,14 @@ class OStatus
 	/**
 	 * @brief Processes the XML for a repeated post
 	 *
-	 * @param object $xpath    The xpath object
-	 * @param object $entry    The xml entry that is processed
-	 * @param array  $item     The item array
-	 * @param array  $importer user record of the importing user
+	 * @param DOMXPath $xpath    The xpath object
+	 * @param object   $entry    The xml entry that is processed
+	 * @param array    $item     The item array
+	 * @param array    $importer user record of the importing user
 	 *
 	 * @return array with data from links
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function processRepeatedItem(DOMXPath $xpath, $entry, array &$item, array $importer)
 	{
@@ -1226,6 +1245,7 @@ class OStatus
 	 * @param string $body The body
 	 *
 	 * @return string The cleaned body
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function formatPicturePost($body)
 	{
@@ -1260,12 +1280,13 @@ class OStatus
 	/**
 	 * @brief Adds the header elements to the XML document
 	 *
-	 * @param object $doc    XML document
-	 * @param array  $owner  Contact data of the poster
-	 * @param string $filter The related feed filter (activity, posts or comments)
-	 * @param bool   $feed_mode Behave like a regular feed for users if true
+	 * @param DOMDocument $doc       XML document
+	 * @param array       $owner     Contact data of the poster
+	 * @param string      $filter    The related feed filter (activity, posts or comments)
+	 * @param bool        $feed_mode Behave like a regular feed for users if true
 	 *
 	 * @return object header root element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function addHeader(DOMDocument $doc, array $owner, $filter, $feed_mode = false)
 	{
@@ -1350,10 +1371,11 @@ class OStatus
 	/**
 	 * @brief Add the link to the push hubs to the XML document
 	 *
-	 * @param object $doc  XML document
-	 * @param object $root XML root element where the hub links are added
-	 * @param object $nick nick
+	 * @param DOMDocument $doc  XML document
+	 * @param object      $root XML root element where the hub links are added
+	 * @param object      $nick nick
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function hublinks(DOMDocument $doc, $root, $nick)
 	{
@@ -1364,14 +1386,14 @@ class OStatus
 	/**
 	 * @brief Adds attachment data to the XML document
 	 *
-	 * @param object $doc  XML document
-	 * @param object $root XML root element where the hub links are added
-	 * @param array  $item Data of the item that is to be posted
+	 * @param DOMDocument $doc  XML document
+	 * @param object      $root XML root element where the hub links are added
+	 * @param array       $item Data of the item that is to be posted
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function getAttachment(DOMDocument $doc, $root, $item)
 	{
-		$o = "";
 		$siteinfo = BBCode::getAttachedData($item["body"]);
 
 		switch ($siteinfo["type"]) {
@@ -1436,11 +1458,12 @@ class OStatus
 	/**
 	 * @brief Adds the author element to the XML document
 	 *
-	 * @param object $doc   XML document
-	 * @param array  $owner Contact data of the poster
-	 * @param bool   $show_profile Whether to show profile
+	 * @param DOMDocument $doc          XML document
+	 * @param array       $owner        Contact data of the poster
+	 * @param bool        $show_profile Whether to show profile
 	 *
 	 * @return object author element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function addAuthor(DOMDocument $doc, array $owner, $show_profile = true)
 	{
@@ -1551,13 +1574,15 @@ class OStatus
 	/**
 	 * @brief Adds an entry element to the XML document
 	 *
-	 * @param object $doc       XML document
-	 * @param array  $item      Data of the item that is to be posted
-	 * @param array  $owner     Contact data of the poster
-	 * @param bool   $toplevel  optional default false
-	 * @param bool   $feed_mode Behave like a regular feed for users if true
+	 * @param DOMDocument $doc       XML document
+	 * @param array       $item      Data of the item that is to be posted
+	 * @param array       $owner     Contact data of the poster
+	 * @param bool        $toplevel  optional default false
+	 * @param bool        $feed_mode Behave like a regular feed for users if true
 	 *
 	 * @return object Entry element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function entry(DOMDocument $doc, array $item, array $owner, $toplevel = false, $feed_mode = false)
 	{
@@ -1584,10 +1609,11 @@ class OStatus
 	/**
 	 * @brief Adds a source entry to the XML document
 	 *
-	 * @param object $doc     XML document
-	 * @param array  $contact Array of the contact that is added
+	 * @param DOMDocument $doc     XML document
+	 * @param array       $contact Array of the contact that is added
 	 *
 	 * @return object Source element
+	 * @throws \Exception
 	 */
 	private static function sourceEntry(DOMDocument $doc, array $contact)
 	{
@@ -1609,6 +1635,8 @@ class OStatus
 	 * @param array  $owner Contact data of the poster
 	 *
 	 * @return array Contact array
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function contactEntry($url, array $owner)
 	{
@@ -1656,13 +1684,15 @@ class OStatus
 	/**
 	 * @brief Adds an entry element with reshared content
 	 *
-	 * @param object $doc           XML document
-	 * @param array  $item          Data of the item that is to be posted
-	 * @param array  $owner         Contact data of the poster
-	 * @param string $repeated_guid guid
-	 * @param bool   $toplevel      Is it for en entry element (false) or a feed entry (true)?
+	 * @param DOMDocument $doc           XML document
+	 * @param array       $item          Data of the item that is to be posted
+	 * @param array       $owner         Contact data of the poster
+	 * @param string      $repeated_guid guid
+	 * @param bool        $toplevel      Is it for en entry element (false) or a feed entry (true)?
 	 *
-	 * @return object Entry element
+	 * @return bool Entry element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function reshareEntry(DOMDocument $doc, array $item, array $owner, $repeated_guid, $toplevel)
 	{
@@ -1720,12 +1750,14 @@ class OStatus
 	/**
 	 * @brief Adds an entry element with a "like"
 	 *
-	 * @param object $doc      XML document
-	 * @param array  $item     Data of the item that is to be posted
-	 * @param array  $owner    Contact data of the poster
-	 * @param bool   $toplevel Is it for en entry element (false) or a feed entry (true)?
+	 * @param DOMDocument $doc      XML document
+	 * @param array       $item     Data of the item that is to be posted
+	 * @param array       $owner    Contact data of the poster
+	 * @param bool        $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element with "like"
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function likeEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
@@ -1760,9 +1792,9 @@ class OStatus
 	/**
 	 * @brief Adds the person object element to the XML document
 	 *
-	 * @param object $doc     XML document
-	 * @param array  $owner   Contact data of the poster
-	 * @param array  $contact Contact data of the target
+	 * @param DOMDocument $doc     XML document
+	 * @param array       $owner   Contact data of the poster
+	 * @param array       $contact Contact data of the target
 	 *
 	 * @return object author element
 	 */
@@ -1805,12 +1837,14 @@ class OStatus
 	/**
 	 * @brief Adds a follow/unfollow entry element
 	 *
-	 * @param object $doc      XML document
-	 * @param array  $item     Data of the follow/unfollow message
-	 * @param array  $owner    Contact data of the poster
-	 * @param bool   $toplevel Is it for en entry element (false) or a feed entry (true)?
+	 * @param DOMDocument $doc      XML document
+	 * @param array       $item     Data of the follow/unfollow message
+	 * @param array       $owner    Contact data of the poster
+	 * @param bool        $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return object Entry element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function followEntry(DOMDocument $doc, array $item, array $owner, $toplevel)
 	{
@@ -1867,13 +1901,15 @@ class OStatus
 	/**
 	 * @brief Adds a regular entry element
 	 *
-	 * @param object $doc       XML document
-	 * @param array  $item      Data of the item that is to be posted
-	 * @param array  $owner     Contact data of the poster
-	 * @param bool   $toplevel  Is it for en entry element (false) or a feed entry (true)?
-	 * @param bool   $feed_mode Behave like a regular feed for users if true
+	 * @param DOMDocument $doc       XML document
+	 * @param array       $item      Data of the item that is to be posted
+	 * @param array       $owner     Contact data of the poster
+	 * @param bool        $toplevel  Is it for en entry element (false) or a feed entry (true)?
+	 * @param bool        $feed_mode Behave like a regular feed for users if true
 	 *
 	 * @return object Entry element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function noteEntry(DOMDocument $doc, array $item, array $owner, $toplevel, $feed_mode)
 	{
@@ -1895,12 +1931,15 @@ class OStatus
 	/**
 	 * @brief Adds a header element to the XML document
 	 *
-	 * @param object $doc      XML document
-	 * @param object $entry    The entry element where the elements are added
-	 * @param array  $owner    Contact data of the poster
-	 * @param bool   $toplevel Is it for en entry element (false) or a feed entry (true)?
+	 * @param DOMDocument $doc      XML document
+	 * @param object      $entry    The entry element where the elements are added
+	 * @param array       $owner    Contact data of the poster
+	 * @param array       $item
+	 * @param bool        $toplevel Is it for en entry element (false) or a feed entry (true)?
 	 *
 	 * @return string The title for the element
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function entryHeader(DOMDocument $doc, &$entry, array $owner, array $item, $toplevel)
 	{
@@ -1941,15 +1980,16 @@ class OStatus
 	/**
 	 * @brief Adds elements to the XML document
 	 *
-	 * @param object $doc       XML document
-	 * @param object $entry     Entry element where the content is added
-	 * @param array  $item      Data of the item that is to be posted
-	 * @param array  $owner     Contact data of the poster
-	 * @param string $title     Title for the post
-	 * @param string $verb      The activity verb
-	 * @param bool   $complete  Add the "status_net" element?
-	 * @param bool   $feed_mode Behave like a regular feed for users if true
+	 * @param DOMDocument $doc       XML document
+	 * @param object      $entry     Entry element where the content is added
+	 * @param array       $item      Data of the item that is to be posted
+	 * @param array       $owner     Contact data of the poster
+	 * @param string      $title     Title for the post
+	 * @param string      $verb      The activity verb
+	 * @param bool        $complete  Add the "status_net" element?
+	 * @param bool        $feed_mode Behave like a regular feed for users if true
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function entryContent(DOMDocument $doc, $entry, array $item, array $owner, $title, $verb = "", $complete = true, $feed_mode = false)
 	{
@@ -1989,13 +2029,14 @@ class OStatus
 	/**
 	 * @brief Adds the elements at the foot of an entry to the XML document
 	 *
-	 * @param object $doc       XML document
-	 * @param object $entry     The entry element where the elements are added
-	 * @param array  $item      Data of the item that is to be posted
-	 * @param array  $owner     Contact data of the poster
-	 * @param bool   $complete  default true
-	 * @param bool   $feed_mode Behave like a regular feed for users if true
+	 * @param DOMDocument $doc       XML document
+	 * @param object      $entry     The entry element where the elements are added
+	 * @param array       $item      Data of the item that is to be posted
+	 * @param array       $owner     Contact data of the poster
+	 * @param bool        $complete  default true
+	 * @param bool        $feed_mode Behave like a regular feed for users if true
 	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function entryFooter(DOMDocument $doc, $entry, array $item, array $owner, $complete = true, $feed_mode = false)
 	{
@@ -2160,6 +2201,8 @@ class OStatus
 	 * @param boolean $feed_mode   Behave like a regular feed for users if true
 	 *
 	 * @return string XML feed
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function feed($owner_nick, &$last_update, $max_items = 300, $filter = 'activity', $nocache = false, $feed_mode = false)
 	{
@@ -2251,6 +2294,8 @@ class OStatus
 	 * @param array $owner Contact data of the poster
 	 *
 	 * @return string XML for the salmon
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function salmon(array $item, array $owner)
 	{

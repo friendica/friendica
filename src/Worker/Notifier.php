@@ -491,9 +491,11 @@ class Notifier
 
 	/**
 	 * @param int    $self_user_id
-	 * @param int    $priority     The priority the Notifier queue item was created with
-	 * @param string $created      The date the Notifier queue item was created on
+	 * @param int    $priority The priority the Notifier queue item was created with
+	 * @param string $created  The date the Notifier queue item was created on
 	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function notifySelfRemoval($self_user_id, $priority, $created)
 	{
@@ -526,9 +528,11 @@ class Notifier
 	 * @param string $cmd
 	 * @param array  $target_item
 	 * @param array  $parent
-	 * @param int    $priority    The priority the Notifier queue item was created with
-	 * @param string $created     The date the Notifier queue item was created on
+	 * @param int    $priority The priority the Notifier queue item was created with
+	 * @param string $created  The date the Notifier queue item was created on
 	 * @return int The number of delivery tasks created
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function activityPubDelivery($cmd, array $target_item, array $parent, $priority, $created)
 	{

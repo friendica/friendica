@@ -46,7 +46,7 @@ class PortableContact
 	 * Once the global contact is stored add (if necessary) the contact linkage which associates
 	 * the given uid, cid to the global contact entry. There can be many uid/cid combinations
 	 * pointing to the same global contact id.
-	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function loadWorker($cid, $uid = 0, $zcid = 0, $url = null)
 	{
@@ -61,7 +61,7 @@ class PortableContact
 	 * @param integer $uid  User ID
 	 * @param integer $zcid Global Contact ID
 	 * @param integer $url  POCO address that should be polled
-	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function load($cid, $uid, $zcid, $url)
 	{
@@ -645,6 +645,7 @@ class PortableContact
 	 *
 	 * @param string $server_url address of the server
 	 * @return array Server data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function fetchNodeinfo($server_url)
 	{
@@ -698,6 +699,7 @@ class PortableContact
 	 *
 	 * @param string $nodeinfo_url address of the nodeinfo path
 	 * @return array Server data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function parseNodeinfo1($nodeinfo_url)
 	{
@@ -782,6 +784,7 @@ class PortableContact
 	 *
 	 * @param string $nodeinfo_url address of the nodeinfo path
 	 * @return array Server data
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function parseNodeinfo2($nodeinfo_url)
 	{
@@ -1446,6 +1449,7 @@ class PortableContact
 	 * @brief Fetch relay data from a given server url
 	 *
 	 * @param string $server_url address of the server
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function discoverRelay($server_url)
 	{
@@ -1544,6 +1548,7 @@ class PortableContact
 	 * @brief Fetch server list from remote servers and adds them when they are new.
 	 *
 	 * @param string $poco URL to the POCO endpoint
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	private static function fetchServerlist($poco)
 	{

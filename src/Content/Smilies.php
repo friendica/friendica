@@ -55,10 +55,11 @@ class Smilies
 	 * Get an array of all smilies, both internal and from addons.
 	 *
 	 * @return array
-	 *	'texts' => smilie shortcut
-	 *	'icons' => icon in html
+	 *    'texts' => smilie shortcut
+	 *    'icons' => icon in html
 	 *
-	 * @hook smilie ('texts' => smilies texts array, 'icons' => smilies html array)
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @hook  smilie ('texts' => smilies texts array, 'icons' => smilies html array)
 	 */
 	public static function getList()
 	{
@@ -182,6 +183,7 @@ class Smilies
 	 * @param boolean $no_images Only replace emoticons without images
 	 *
 	 * @return string HTML Output of the Smilie
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function replace($s, $no_images = false)
 	{
@@ -201,6 +203,7 @@ class Smilies
 	 * @param array  $smilies   An string replacement array with the following structure: ['texts' => [], 'icons' => []]
 	 * @param bool   $no_images Only replace shortcodes without image replacement (e.g. Unicode characters)
 	 * @return string
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function replaceFromArray($text, array $smilies, $no_images = false)
 	{
@@ -248,6 +251,7 @@ class Smilies
 	 * @param string $m string
 	 *
 	 * @return string base64 decoded string
+	 * @throws \Exception
 	 */
 	private static function decode($m)
 	{
@@ -262,7 +266,8 @@ class Smilies
 	 *
 	 * @return string HTML Output
 	 *
-	 * @todo: Rework because it doesn't work correctly
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @todo  : Rework because it doesn't work correctly
 	 */
 	private static function pregHeart($x)
 	{

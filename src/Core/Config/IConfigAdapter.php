@@ -49,9 +49,9 @@ interface IConfigAdapter
 	 *
 	 * Note: Please do not store booleans - convert to 0/1 integer values!
 	 *
-	 * @param string $family The category of the configuration value
-	 * @param string $key    The configuration key to set
-	 * @param mixed  $value  The value to store
+	 * @param string $cat   The category of the configuration value
+	 * @param string $k     The configuration key to set
+	 * @param mixed  $value The value to store
 	 *
 	 * @return bool Operation success
 	 */
