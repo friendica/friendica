@@ -77,13 +77,13 @@ class Logger extends BaseObject
 	 */
 	public static function init($logger)
 	{
+		self::$logger = $logger;
+
 		// if default logging is enabled
 		if(Config::get('system', 'debugging') && isset($logger)) {
-			self::$logger = $logger;
-
-			$handlerList = Config::get('logchannel', self::$logger->getChannel());
+			$handlerList = Config::get('log_channel', self::$logger->getChannel());
 			foreach ($handlerList as $handler) {
-				self::$logger->addHandler(Config::get('loghandler', $handler));
+				self::$logger->addHandler(Config::get('log_handler', $handler));
 			}
 		}
 
@@ -91,9 +91,9 @@ class Logger extends BaseObject
 		if(Config::get('system', 'profiler')) {
 			self::$profLogger = LoggerFactory::createProf();
 
-			$handlerList = Config::get('logchannel', self::$profLogger->getChannel());
+			$handlerList = Config::get('log_channel', self::$profLogger->getChannel());
 			foreach ($handlerList as $handler) {
-				self::$profLogger->addHandler(Config::get('loghandler', $handler));
+				self::$profLogger->addHandler(Config::get('log_handler', $handler));
 			}
 		}
 
@@ -102,9 +102,9 @@ class Logger extends BaseObject
 		if (isset($developIp)) {
 			self::$devLogger = LoggerFactory::createDev($developIp);
 
-			$handlerList = Config::get('logchannel', self::$devLogger->getChannel());
+			$handlerList = Config::get('log_channel', self::$devLogger->getChannel());
 			foreach ($handlerList as $handler) {
-				self::$devLogger->addHandler(Config::get('loghandler', $handler));
+				self::$devLogger->addHandler(Config::get('log_handler', $handler));
 			}
 		}
 	}

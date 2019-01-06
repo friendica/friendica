@@ -50,9 +50,9 @@ class FriendicaLogger extends Monolog\Logger implements FriendicaLoggerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addHandler(array $handlerConfig)
+	public function addHandler($handlerConfig)
 	{
-		if (isset($handlerConfig['enabled']) && $handlerConfig['enabled']) {
+		if (is_array($handlerConfig) && isset($handlerConfig['enabled']) && $handlerConfig['enabled']) {
 			if (isset($handlerConfig['type']) && $handlerConfig['type'] === 'stream') {
 				$loglevel = (isset($handlerConfig['loglevel'])) ? $handlerConfig['loglevel'] : LogLevel::NOTICE;
 				$logfile = (isset($handlerConfig['logfile'])) ? $handlerConfig['logfile'] : 'friendica.log';

@@ -39,5 +39,5 @@ interface FriendicaLoggerInterface extends LoggerInterface
 	 *
 	 * @throws \Exception if the handler config is incompatible to the logger
 	 */
-	function addHandler(array $handlerConfig);
+	function addHandler($handlerConfig);
 }
