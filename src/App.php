@@ -1859,14 +1859,14 @@ class App
 				// And then append it to the target
 				$target->documentElement->appendChild($item);
 			}
-		}
 
-		if (isset($_GET["mode"]) && ($_GET["mode"] == "raw")) {
-			header("Content-type: text/html; charset=utf-8");
+			if ($_GET["mode"] == "raw") {
+				header("Content-type: text/html; charset=utf-8");
 
-			echo substr($target->saveHTML(), 6, -8);
+				echo substr($target->saveHTML(), 6, -8);
 
-			exit();
+				exit();
+			}
 		}
 
 		$page    = $this->page;

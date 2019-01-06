@@ -41,7 +41,7 @@ class Photo extends BaseObject
 	public static function select(array $fields = [], array $conditions = [], array $params = [])
 	{
 		if (empty($fields)) {
-			$selected = self::getFields();
+			$fields = self::getFields();
 		}
 
 		$r = DBA::select("photo", $fields, $conditions, $params);

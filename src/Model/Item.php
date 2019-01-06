@@ -1256,6 +1256,8 @@ class Item extends BaseObject
 	{
 		$orig_item = $item;
 
+		$priority = PRIORITY_HIGH;
+
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
 			$item['wall'] = 1;
@@ -1265,8 +1267,6 @@ class Item extends BaseObject
 
 			if (is_int($notify)) {
 				$priority = $notify;
-			} else {
-				$priority = PRIORITY_HIGH;
 			}
 		} else {
 			$item['network'] = trim(defaults($item, 'network', Protocol::PHANTOM));
@@ -1854,7 +1854,7 @@ class Item extends BaseObject
 				$cmd = 'wall-new';
 			}
 
-			Worker::add(['priority' => PRIORITY_HIGH, 'dont_fork' => true], 'Notifier', $cmd, $current_post);
+			Worker::add(['priority' => $priority, 'dont_fork' => true], 'Notifier', $cmd, $current_post);
 		}
 
 		return $current_post;
@@ -2023,7 +2023,7 @@ class Item extends BaseObject
 		$condition = ['id' => $itemid, 'uid' => 0,
 			'network' => [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, ""],
 			'visible' => true, 'deleted' => false, 'moderated' => false, 'private' => false];
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
+		$item = self::selectFirst(self::ITEM_FIELDLIST, $condition);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -2480,7 +2480,7 @@ class Item extends BaseObject
 		$id = 0;
 
 		if ($uid == 0) {
-			$uid == local_user();
+			$uid = local_user();
 		}
 
 		// Does the given user have this item?

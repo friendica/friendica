@@ -31,7 +31,7 @@ class TagUpdate
 		$messages = DBA::select('item', ['guid'], ['uid' => 0]);
 
 		Logger::log('fetched messages: ' . DBA::numRows($messages));
-		while ($message = DBA::fetch(messages)) {
+		while ($message = DBA::fetch($messages)) {
 			DBA::update('item', ['global' => true], ['guid' => $message['guid']]);
 		}
 

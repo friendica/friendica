@@ -293,7 +293,7 @@ class Proxy extends BaseModule
 	 *
 	 */
 	private static function responseError() {
-		header('Content-type: ' . $img->getType());
+		header('Content-type: image/png');
 		echo file_get_contents('images/blank.png');
 		exit();
 	}

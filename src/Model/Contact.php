@@ -645,7 +645,7 @@ class Contact extends BaseObject
 	{
 		if (!isset($contact['url']) && !empty($contact['id'])) {
 			$fields = ['id', 'url', 'archive', 'self', 'term-date'];
-			$contact = DBA::selectFirst('contact', [], ['id' => $contact['id']]);
+			$contact = DBA::selectFirst('contact', $fields, ['id' => $contact['id']]);
 			if (!DBA::isResult($contact)) {
 				return;
 			}
@@ -704,7 +704,7 @@ class Contact extends BaseObject
 
 		if (!isset($contact['url']) && !empty($contact['id'])) {
 			$fields = ['id', 'url', 'batch'];
-			$contact = DBA::selectFirst('contact', [], ['id' => $contact['id']]);
+			$contact = DBA::selectFirst('contact', $fields, ['id' => $contact['id']]);
 			if (!DBA::isResult($contact)) {
 				return;
 			}
@@ -1177,9 +1177,10 @@ class Contact extends BaseObject
 				$contact = DBA::selectFirst('contact', $fields, ['addr' => $url]);
 			}
 
+			// The link could be provided as http although we stored it as https
+			$ssl_url = str_replace('http://', 'https://', $url);
+
 			if (!DBA::isResult($contact)) {
-				// The link could be provided as http although we stored it as https
-				$ssl_url = str_replace('http://', 'https://', $url);
 				$condition = ['alias' => [$url, Strings::normaliseLink($url), $ssl_url]];
 				$contact = DBA::selectFirst('contact', $fields, $condition);
 			}
@@ -1400,7 +1401,7 @@ class Contact extends BaseObject
 
 		require_once 'include/conversation.php';
 
-		$cid = Self::getIdForURL($contact_url);
+		$cid = self::getIdForURL($contact_url);
 
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1732,7 +1733,7 @@ class Contact extends BaseObject
 			}
 		} elseif (Config::get('system', 'dfrn_only') && ($ret['network'] != Protocol::DFRN)) {
 			$result['message'] = L10n::t('This site is not configured to allow communications with other networks.') . EOL;
-			$result['message'] != L10n::t('No compatible communication protocols or feeds were discovered.') . EOL;
+			$result['message'] .= L10n::t('No compatible communication protocols or feeds were discovered.') . EOL;
 			return $result;
 		}
 

@@ -118,7 +118,7 @@ class StorageManager
 	public static function move($dest, $tables = null)
 	{
 		if (is_null($dest) || empty($dest)) {
-			throw Exception('Can\'t move to NULL storage backend');
+			throw new \Exception('Can\'t move to NULL storage backend');
 		}
 		
 		if (is_null($tables)) {

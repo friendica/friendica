@@ -96,6 +96,7 @@ class Network
 
 		$a = get_app();
 
+		$parts2 = [];
 		$parts = parse_url($url);
 		$path_parts = explode('/', defaults($parts, 'path', ''));
 		foreach ($path_parts as $part) {

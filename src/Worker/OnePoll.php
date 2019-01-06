@@ -44,7 +44,6 @@ class OnePoll
 			return;
 		}
 
-
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		if (!DBA::isResult($contact)) {
 			Logger::log('Contact not found or cannot be used.');
@@ -485,7 +484,7 @@ class OnePoll
 
 							// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 							if (empty($datarray['parent-uri']) && $reply) {
-								$condition = ['title' => $datarray['title'], 'uid' => importer_uid, 'network' => Protocol::MAIL];
+								$condition = ['title' => $datarray['title'], 'uid' => $importer_uid, 'network' => Protocol::MAIL];
 								$params = ['order' => ['created' => true]];
 								$parent = Item::selectFirst(['parent-uri'], $condition, $params);
 								if (DBA::isResult($parent)) {

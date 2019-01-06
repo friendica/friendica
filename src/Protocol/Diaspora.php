@@ -4128,7 +4128,7 @@ class Diaspora
 			if ($profile['pub_keywords']) {
 				$kw = str_replace(',', ' ', $profile['pub_keywords']);
 				$kw = str_replace('  ', ' ', $kw);
-				$arr = explode(' ', $profile['pub_keywords']);
+				$arr = explode(' ', $kw);
 				if (count($arr)) {
 					for ($x = 0; $x < 5; $x ++) {
 						if (!empty($arr[$x])) {

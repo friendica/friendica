@@ -11,6 +11,7 @@ use Friendica\Core\System;
 use Friendica\Core\StorageManager;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\Object\Image;
 use Friendica\Util\Security;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Mimetype;
@@ -50,7 +51,7 @@ class Attach extends BaseObject
 	public static function select(array $fields = [], array $conditions = [], array $params = [])
 	{
 		if (empty($fields)) {
-			$selected = self::getFields();
+			$fields = self::getFields();
 		}
 
 		$r = DBA::select('attach', $fields, $conditions, $params);
@@ -257,9 +258,9 @@ class Attach extends BaseObject
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @see   \Friendica\Database\DBA::update
 	 */
-	public static function update($fields, $conditions, $img = null, array $old_fields = [])
+	public static function update($fields, $conditions, Image $img = null, array $old_fields = [])
 	{
-		if (!is_null($data)) {
+		if (!is_null($img)) {
 			// get items to update
 			$items = self::select(['backend-class','backend-ref'], $conditions);
 
@@ -268,7 +269,7 @@ class Attach extends BaseObject
 				if ($backend_class !== '') {
 					$fields['backend-ref'] = $backend_class::put($img->asString(), $item['backend-ref']);
 				} else {
-					$fields['data'] = $data;
+					$fields['data'] = $img->asString();
 				}
 			}
 		}

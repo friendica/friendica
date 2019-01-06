@@ -1150,7 +1150,7 @@ class BBCode extends BaseObject
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convert($text, $try_oembed = true, $simple_html = false, $for_plaintext = false)
+	public static function convert($text, $try_oembed = true, $simple_html = 0, $for_plaintext = false)
 	{
 		$a = self::getApp();
 
