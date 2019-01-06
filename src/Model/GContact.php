@@ -524,8 +524,6 @@ class GContact
 	 */
 	public static function updateSuggestions()
 	{
-		$a = get_app();
-
 		$done = [];
 
 		/// @TODO Check if it is really neccessary to poll the own server

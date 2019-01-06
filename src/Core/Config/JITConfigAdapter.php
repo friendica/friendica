@@ -86,8 +86,6 @@ class JITConfigAdapter extends BaseObject implements IConfigAdapter
 
 	public function set($cat, $k, $value)
 	{
-		$a = self::getApp();
-
 		// We store our setting values in a string variable.
 		// So we have to do the conversion here so that the compare below works.
 		// The exception are array values.

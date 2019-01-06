@@ -179,8 +179,6 @@ class Email
 		// $partno = '1', '2', '2.1', '2.1.3', etc for multipart, 0 if simple
 		global $htmlmsg,$plainmsg,$charset,$attachments;
 
-		//echo $partno."\n";
-
 		// DECODE DATA
 		$data = ($partno)
 			? @imap_fetchbody($mbox, $uid, $partno, FT_UID|FT_PEEK)
@@ -248,9 +246,6 @@ class Email
 			$x = "";
 			foreach ($p->parts as $partno0 => $p2) {
 				$x .=  self::messageGetPart($mbox, $uid, $p2, $partno . '.' . ($partno0+1), $subtype);  // 1.2, 1.2.1, etc.
-				//if ($x) {
-				//	return $x;
-				//}
 			}
 			return $x;
 		}
@@ -562,26 +557,6 @@ class Email
 				$nextline = ltrim(substr($nextline, 1));
 			}
 
-			$firstword = strpos($nextline.' ', ' ');
-
-			$specialchars = ((substr(trim($nextline), 0, 1) == '-') ||
-					(substr(trim($nextline), 0, 1) == '=') ||
-					(substr(trim($nextline), 0, 1) == '*') ||
-					(substr(trim($nextline), 0, 1) == '·') ||
-					(substr(trim($nextline), 0, 4) == '[url') ||
-					(substr(trim($nextline), 0, 5) == '[size') ||
-					(substr(trim($nextline), 0, 7) == 'http://') ||
-					(substr(trim($nextline), 0, 8) == 'https://'));
-
-			if (!$specialchars) {
-				$specialchars = ((substr(rtrim($line), -1) == '-') ||
-						(substr(rtrim($line), -1) == '=') ||
-						(substr(rtrim($line), -1) == '*') ||
-						(substr(rtrim($line), -1) == '·') ||
-						(substr(rtrim($line), -6) == '[/url]') ||
-						(substr(rtrim($line), -7) == '[/size]'));
-			}
-
 			if ($lines[$lineno] != '') {
 				if (substr($lines[$lineno], -1) != ' ') {
 					$lines[$lineno] .= ' ';
@@ -626,13 +601,11 @@ class Email
 		}
 
 		$quotelevel = 0;
-		$previousquote = 0;
 		$arrbodyquoted = [];
 
 		for ($i = 0; $i < count($arrbody); $i++) {
 			$previousquote = $quotelevel;
 			$quotelevel = $arrlevel[$i];
-			$currline = $arrbody[$i];
 
 			while ($previousquote < $quotelevel) {
 				$quote = "[quote]";

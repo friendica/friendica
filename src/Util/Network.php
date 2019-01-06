@@ -92,8 +92,6 @@ class Network
 	 */
 	public static function curl($url, $binary = false, &$redirects = 0, $opts = [])
 	{
-		$ret = ['return_code' => 0, 'success' => false, 'header' => '', 'info' => '', 'body' => ''];
-
 		$stamp1 = microtime(true);
 
 		$a = get_app();
@@ -317,7 +315,6 @@ class Network
 
 		$s = @curl_exec($ch);
 
-		$base = $s;
 		$curl_info = curl_getinfo($ch);
 
 		$curlResponse = new CurlResult($url, $s, $curl_info, curl_errno($ch), curl_error($ch));

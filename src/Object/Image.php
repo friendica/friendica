@@ -299,8 +299,6 @@ class Image
 		$width = $this->getWidth();
 		$height = $this->getHeight();
 
-		$dest_width = $dest_height = 0;
-
 		if ((! $width)|| (! $height)) {
 			return false;
 		}
@@ -503,8 +501,6 @@ class Image
 		$width = $this->getWidth();
 		$height = $this->getHeight();
 
-		$dest_width = $dest_height = 0;
-
 		if ((!$width)|| (!$height)) {
 			return false;
 		}
@@ -694,8 +690,6 @@ class Image
 			return $string;
 		}
 
-		$quality = false;
-
 		ob_start();
 
 		// Enable interlacing
@@ -737,7 +731,6 @@ class Image
 		Logger::log('Image: guessType: '.$filename . ($fromcurl?' from curl headers':''), Logger::DEBUG);
 		$type = null;
 		if ($fromcurl) {
-			$a = get_app();
 			$headers=[];
 			$h = explode("\n", $header);
 			foreach ($h as $l) {
@@ -836,8 +829,6 @@ class Image
 	 */
 	public static function getScalingDimensions($width, $height, $max)
 	{
-		$dest_width = $dest_height = 0;
-
 		if ((!$width) || (!$height)) {
 			return false;
 		}
@@ -967,8 +958,6 @@ class Image
 		$height = $Image->getHeight();
 
 		$hash = Photo::newResource();
-
-		$smallest = 0;
 
 		// Pictures are always public by now
 		//$defperm = '<'.$default_cid.'>';

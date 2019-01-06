@@ -741,13 +741,7 @@ class Profile
 
 	public static function getAdvanced(App $a)
 	{
-		$o = '';
 		$uid = $a->profile['uid'];
-
-		$o .= Renderer::replaceMacros(
-			Renderer::getMarkupTemplate('section_title.tpl'),
-			['$title' => L10n::t('Profile')]
-		);
 
 		if ($a->profile['name']) {
 			$tpl = Renderer::getMarkupTemplate('profile_advanced.tpl');

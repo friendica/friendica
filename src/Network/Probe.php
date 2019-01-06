@@ -1304,7 +1304,6 @@ class Probe
 			$data["addr"] = str_replace('acct:', '', $webfinger["subject"]);
 		}
 
-		$pubkey = "";
 		if (is_array($webfinger["links"])) {
 			// The array is reversed to take into account the order of preference for same-rel links
 			// See: https://tools.ietf.org/html/rfc7033#section-4.4.4

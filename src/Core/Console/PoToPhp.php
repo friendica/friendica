@@ -47,8 +47,6 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		$a = get_app();
-
 		$pofile = realpath($this->getArgument(0));
 
 		if (!file_exists($pofile)) {
@@ -106,7 +104,6 @@ HELP;
 				}
 
 				if ($inv) {
-					$inv = false;
 					$out .= '"' . $v . '"';
 				}
 
@@ -179,7 +176,6 @@ HELP;
 		}
 
 		if ($inv) {
-			$inv = false;
 			$out .= '"' . $v . '"';
 		}
 

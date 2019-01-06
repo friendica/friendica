@@ -795,7 +795,7 @@ class Post extends BaseObject
 		}
 
 		if ($conv->isWritable() && $this->isWritable()) {
-			$qc = $qcomment = null;
+			$qcomment = null;
 
 			/*
 			 * Hmmm, code depending on the presence of a particular addon?

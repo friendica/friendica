@@ -340,8 +340,6 @@ class Transmitter
 		} else {
 			$receiver_list = Item::enumeratePermissions($item);
 
-			$mentioned = [];
-
 			foreach ($terms as $term) {
 				$cid = Contact::getIdForURL($term['url'], $item['uid']);
 				if (!empty($cid) && in_array($cid, $receiver_list)) {

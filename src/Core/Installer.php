@@ -225,8 +225,6 @@ class Installer
 	 */
 	public function checkPHP($phppath = null, $required = false)
 	{
-		$passed = false;
-		$passed2 = false;
 		$passed3 = false;
 
 		if (!isset($phppath)) {
@@ -395,7 +393,7 @@ class Installer
 		$help = '';
 		$status = true;
 		try {
-			$xml = new DOMDocument();
+			new DOMDocument();
 		} catch (Exception $e) {
 			$help = L10n::t('Error, XML PHP module required but not installed.');
 			$status = false;

@@ -231,7 +231,6 @@ class NotificationsManager extends BaseObject
 	 */
 	private function formatNotifs(array $notifs, $ident = "")
 	{
-		$notif = [];
 		$arr = [];
 
 		if (DBA::isResult($notifs)) {
@@ -639,6 +638,8 @@ class NotificationsManager extends BaseObject
 	private function formatIntros($intros)
 	{
 		$knowyou = '';
+
+		$arr = [];
 
 		foreach ($intros as $it) {
 			// There are two kind of introduction. Contacts suggested by other contacts and normal connection requests.

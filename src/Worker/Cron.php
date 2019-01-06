@@ -145,13 +145,11 @@ class Cron
 		$manual_id  = 0;
 		$generation = 0;
 		$force      = false;
-		$restart    = false;
 
 		if ($parameter == 'force') {
 			$force = true;
 		}
 		if ($parameter == 'restart') {
-			$restart = true;
 			$generation = intval($generation);
 			if (!$generation) {
 				exit();
@@ -168,8 +166,6 @@ class Cron
 		$sql_extra = (($manual_id) ? " AND `id` = $manual_id " : "");
 
 		Addon::reload();
-
-		$d = DateTimeFormat::utcNow();
 
 		// Only poll from those with suitable relationships,
 		// and which have a polling address and ignore Diaspora since

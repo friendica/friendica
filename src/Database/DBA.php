@@ -1107,7 +1107,7 @@ class DBA
 			if ((count($conditions) == 1) && ($field == array_keys($conditions)[0])) {
 				foreach ($rel_def AS $rel_table => $rel_fields) {
 					foreach ($rel_fields AS $rel_field) {
-						$retval = self::delete($rel_table, [$rel_field => array_values($conditions)[0]], $options, $callstack);
+						self::delete($rel_table, [$rel_field => array_values($conditions)[0]], $options, $callstack);
 					}
 				}
 				// We quit when this key already exists in the callstack.
@@ -1580,8 +1580,6 @@ class DBA
 	{
 		$ret = self::p("SHOW PROCESSLIST");
 		$data = self::toArray($ret);
-
-		$s = [];
 
 		$processes = 0;
 		$states = [];

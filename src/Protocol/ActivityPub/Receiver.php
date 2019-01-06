@@ -375,15 +375,15 @@ class Receiver
 				if (in_array($object_data['object_type'], self::CONTENT_TYPES)) {
 					ActivityPub\Processor::updateItem($object_data);
 				} elseif (in_array($object_data['object_type'], self::ACCOUNT_TYPES)) {
-					ActivityPub\Processor::updatePerson($object_data, $body);
+					ActivityPub\Processor::updatePerson($object_data);
 				}
 				break;
 
 			case 'as:Delete':
 				if ($object_data['object_type'] == 'as:Tombstone') {
-					ActivityPub\Processor::deleteItem($object_data, $body);
+					ActivityPub\Processor::deleteItem($object_data);
 				} elseif (in_array($object_data['object_type'], self::ACCOUNT_TYPES)) {
-					ActivityPub\Processor::deletePerson($object_data, $body);
+					ActivityPub\Processor::deletePerson($object_data);
 				}
 				break;
 

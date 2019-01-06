@@ -61,7 +61,6 @@ class System extends BaseObject
 		array_shift($trace);
 
 		$callstack = [];
-		$counter = 0;
 		$previous = ['class' => '', 'function' => ''];
 
 		// The ignore list contains all functions that are only wrapper functions

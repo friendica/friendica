@@ -105,13 +105,13 @@ class Proxy extends BaseModule
 
 		// If there is an error then return a blank image
 		if ((substr($fetchResult->getReturnCode(), 0, 1) == '4') || (!$img_str)) {
-			self::responseError($request);
+			self::responseError();
 			// stop.
 		}
 
 		$image = new Image($img_str, $mime);
 		if (!$image->isValid()) {
-			self::responseError($request);
+			self::responseError();
 			// stop.
 		}
 		
@@ -161,7 +161,6 @@ class Proxy extends BaseModule
 	private static function getRequestInfo()
 	{
 		$a = self::getApp();
-		$url = '';
 		$size = 1024;
 		$sizetype = '';
 		

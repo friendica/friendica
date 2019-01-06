@@ -880,8 +880,6 @@ class Contact extends BaseObject
 	 */
 	public static function getDetailsByAddr($addr, $uid = -1)
 	{
-		static $cache = [];
-
 		if ($addr == '') {
 			return [];
 		}
@@ -938,13 +936,9 @@ class Contact extends BaseObject
 	public static function photoMenu(array $contact, $uid = 0)
 	{
 		// @todo Unused, to be removed
-		$a = get_app();
-
-		$contact_url = '';
 		$pm_url = '';
 		$status_link = '';
 		$photos_link = '';
-		$posts_link = '';
 		$contact_drop_link = '';
 		$poke_link = '';
 
@@ -1212,7 +1206,6 @@ class Contact extends BaseObject
 			$contact_id = self::getIdForURL($data["alias"], $uid, true, $default, true);
 		}
 
-		$url = $data["url"];
 		if (!$contact_id) {
 			$fields = [
 				'uid'       => $uid,

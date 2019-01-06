@@ -182,9 +182,7 @@ class Thread extends BaseObject
 	 */
 	public function getTemplateData($conv_responses)
 	{
-		$a = self::getApp();
 		$result = [];
-		$i = 0;
 
 		foreach ($this->parents as $item) {
 			if ($item->getDataValue('network') === Protocol::MAIL && local_user() != $item->getDataValue('uid')) {

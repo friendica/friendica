@@ -73,7 +73,6 @@ HELP;
 			$this->out('Options: ' . var_export($this->options, true));
 		}
 
-		$showHelp = false;
 		$subHelp = false;
 		$command = null;
 
@@ -83,7 +82,7 @@ HELP;
 			return 0;
 		} elseif ((count($this->options) === 0 || $this->getOption($this->customHelpOptions) === true || $this->getOption($this->customHelpOptions) === 1) && count($this->args) === 0
 		) {
-			$showHelp = true;
+			$command = null;
 		} elseif (count($this->args) >= 2 && $this->getArgument(0) == 'help') {
 			$command = $this->getArgument(1);
 			$subHelp = true;

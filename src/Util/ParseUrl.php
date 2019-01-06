@@ -115,8 +115,6 @@ class ParseUrl
 	 */
 	public static function getSiteinfo($url, $no_guessing = false, $do_oembed = true, $count = 1)
 	{
-		$a = get_app();
-
 		$siteinfo = [];
 
 		// Check if the URL does contain a scheme

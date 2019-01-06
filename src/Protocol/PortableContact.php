@@ -65,8 +65,6 @@ class PortableContact
 	 */
 	public static function load($cid, $uid, $zcid, $url)
 	{
-		$a = get_app();
-
 		if ($cid) {
 			if (!$url || !$uid) {
 				$contact = DBA::selectFirst('contact', ['poco', 'uid'], ['id' => $cid]);
@@ -232,7 +230,6 @@ class PortableContact
 			$friendica = preg_replace("=(https?://)(.*)/profile/(.*)=ism", "$1$2", $profile);
 			if ($friendica != $profile) {
 				$server_url = $friendica;
-				$network = Protocol::DFRN;
 			}
 		}
 
@@ -240,7 +237,6 @@ class PortableContact
 			$diaspora = preg_replace("=(https?://)(.*)/u/(.*)=ism", "$1$2", $profile);
 			if ($diaspora != $profile) {
 				$server_url = $diaspora;
-				$network = Protocol::DIASPORA;
 			}
 		}
 
@@ -248,7 +244,6 @@ class PortableContact
 			$red = preg_replace("=(https?://)(.*)/channel/(.*)=ism", "$1$2", $profile);
 			if ($red != $profile) {
 				$server_url = $red;
-				$network = Protocol::DIASPORA;
 			}
 		}
 
@@ -257,7 +252,6 @@ class PortableContact
 			$mastodon = preg_replace("=(https?://)(.*)/users/(.*)=ism", "$1$2", $profile);
 			if ($mastodon != $profile) {
 				$server_url = $mastodon;
-				$network = Protocol::OSTATUS;
 			}
 		}
 
@@ -266,7 +260,6 @@ class PortableContact
 			$ostatus = preg_replace("=(https?://)(.*)/user/(.*)=ism", "$1$2", $profile);
 			if ($ostatus != $profile) {
 				$server_url = $ostatus;
-				$network = Protocol::OSTATUS;
 			}
 		}
 
@@ -275,7 +268,6 @@ class PortableContact
 			$base = preg_replace("=(https?://)(.*?)/(.*)=ism", "$1$2", $profile);
 			if ($base != $profile) {
 				$server_url = $base;
-				$network = Protocol::PHANTOM;
 			}
 		}
 
@@ -611,8 +603,6 @@ class PortableContact
 	 */
 	private static function detectPocoData(array $data)
 	{
-		$server = false;
-
 		if (!isset($data['entry'])) {
 			return false;
 		}

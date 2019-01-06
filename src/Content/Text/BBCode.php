@@ -1683,7 +1683,7 @@ class BBCode extends BaseObject
 
 		// Replace non graphical smilies for external posts
 		if ($simple_html) {
-			$text = Smilies::replace($text, false, true);
+			$text = Smilies::replace($text);
 		}
 
 		// Unhide all [noparse] contained bbtags unspacefying them

@@ -60,7 +60,6 @@ class Filesystem implements IStorage
 			if (!mkdir($path, 0770, true)) {
 				Logger::log('Failed to create dirs ' . $path);
 				throw new StorageException(L10n::t('Filesystem storage failed to create "%s". Check you write permissions.', $path));
-				killme();
 			}
 		}
 
@@ -100,7 +99,6 @@ class Filesystem implements IStorage
 		if ($r === FALSE) {
 			Logger::log('Failed to write data to ' . $file);
 			throw new StorageException(L10n::t('Filesystem storage failed to save data to "%s". Check your write permissions', $file));
-			killme();
 		}
 		return $ref;
 	}

@@ -321,8 +321,6 @@ class Group extends BaseObject
 	 */
 	public static function displayGroupSelection($uid, $gid = 0, $label = '')
 	{
-		$o = '';
-
 		$stmt = DBA::select('group', [], ['deleted' => 0, 'uid' => $uid], ['order' => ['name']]);
 
 		$display_groups = [

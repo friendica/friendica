@@ -311,7 +311,7 @@ class Contact extends BaseModule
 			return;
 		}
 
-		$r = DBA::update('contact', $fields, ['id' => $contact_id, 'uid' => local_user()]);
+		DBA::update('contact', $fields, ['id' => $contact_id, 'uid' => local_user()]);
 
 		// Update the entry in the contact table
 		Model\Contact::updateAvatar($data['photo'], local_user(), $contact_id, true);
@@ -471,7 +471,6 @@ class Contact extends BaseModule
 		$_SESSION['return_path'] = $a->query_string;
 
 		if (!empty($a->data['contact']) && is_array($a->data['contact'])) {
-			$contact_id = $a->data['contact']['id'];
 			$contact = $a->data['contact'];
 
 			$a->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
@@ -633,7 +632,6 @@ class Contact extends BaseModule
 				'$hidden'         => ['hidden', L10n::t('Hide this contact from others'), ($contact['hidden'] == 1), L10n::t('Replies/likes to your public posts <strong>may</strong> still be visible')],
 				'$notify'         => ['notify', L10n::t('Notification for new posts'), ($contact['notify_new_posts'] == 1), L10n::t('Send a notification of every new post of this contact')],
 				'$fetch_further_information' => $fetch_further_information,
-				'$ffi_keyword_blacklist' => $contact['ffi_keyword_blacklist'],
 				'$ffi_keyword_blacklist' => ['ffi_keyword_blacklist', L10n::t('Blacklisted keywords'), $contact['ffi_keyword_blacklist'], L10n::t('Comma separated list of keywords that should not be converted to hashtags, when "Fetch information and keywords" is selected')],
 				'$photo'          => $contact['photo'],
 				'$name'           => $contact['name'],

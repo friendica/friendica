@@ -37,8 +37,6 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\BaseObject::getApp();
-
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
 			$this->out('Class: ' . __CLASS__);
