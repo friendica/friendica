@@ -5,6 +5,7 @@
 
 namespace Friendica\Test;
 
+use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
@@ -30,6 +31,11 @@ class ApiTest extends DatabaseTest
 	protected $logOutput;
 
 	/**
+	 * @var App
+	 */
+	private $app;
+
+	/**
 	 * Create variables used by tests.
 	 */
 	public function setUp()
@@ -37,7 +43,7 @@ class ApiTest extends DatabaseTest
 		parent::setUp();
 
 		$this->app = BaseObject::getApp();
-		$this->logOutput = LoggerFactory::enableTest($this->app->getLogger());
+		$this->logOutput = $this->app->getLogger()->enableTest();
 
 		// User data that the test database is populated with
 		$this->selfUser = [

@@ -309,7 +309,7 @@ class App
 	/**
 	 * Returns the Logger of the Application
 	 *
-	 * @return LoggerInterface The Logger
+	 * @return FriendicaLoggerInterface The Logger
 	 * @throws InternalServerErrorException when the logger isn't created
 	 */
 	public function getLogger()
