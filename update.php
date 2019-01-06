@@ -380,9 +380,28 @@ function update_1295()
 		Config::set('log_handler', 'default', $default_handler);
 	}
 
+	$develop_handler = Config::get('log_handler', 'develop');
+	$legacy_dlogfile  = Config::get('system', 'dlogfile');
+
+	$save = false;
+
+	// map legacy develop logfile to default handler logfile
+	if (isset($legacy_dlogfile)
+		&& is_array($develop_handler)
+		&& isset($develop_handler['logfile'])
+		&& $develop_handler['logfile'] !== $legacy_dlogfile) {
+		$develop_handler['logfile'] = $legacy_dlogfile;
+		$save = true;
+	}
+
+	if ($save) {
+		Config::set('log_handler', 'develop', $develop_handler);
+	}
+
 	// remove legacy logfile settings
 	Config::delete('system', 'loglevel');
 	Config::delete('system', 'logfile');
+	Config::delete('system', 'dlogfile');
 
 	return Update::SUCCESS;
 }
