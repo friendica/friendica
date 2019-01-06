@@ -2577,7 +2577,7 @@ function admin_page_logs(App $a)
 		'$clear' => L10n::t('Clear'),
 		'$baseurl' => $a->getBaseURL(true),
 		// name, label, value, help string, extra data...
-		'$debugging' => ['debugging', L10n::t("Enable Debugging"), Config::get('system', 'debugging'), L10n::t("Enables debugging")],
+		'$debugging' => ['debugging', L10n::t("Enable Debugging"), Config::get('system', 'debugging'), L10n::t("Enables adding debug output to logfiles")],
 		'$profiling' => ['profiling', L10n::t("Enable Profiling"), Config::get('system', 'profiler'), L10n::t("Enables the profiler of Friendica. This should only be necessary during performance optimization")],
 		'$devip' => ['developer_ip', L10n::t("Developer IP"), Config::get('system', 'devip'), L10n::t("Adding an IP here enables developer debugging. This should not be necessary during normal usage.")],
 		'$channels' => [
