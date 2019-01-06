@@ -2497,6 +2497,12 @@ function admin_page_logs_post(App $a)
 
 	// update channel handler
 	foreach ($_POST['handler_enabled'] as $handler => $enabled) {
+		$logfile = (!empty($_POST['handler_logfile'][$handler]) ? Strings::escapeTags(trim($_POST['handler_logfile'][$handler])) : '');
+		if (is_string($logfile) && !is_writable($logfile)) {
+			notice(L10n::t('Logfile %s isn\'t writable.', $logfile));
+			continue;
+		}
+
 		$value = [
 			'type'         => 'stream',
 			'enabled'      => $enabled !== '0',
@@ -2548,11 +2554,16 @@ function admin_page_logs(App $a)
 	$loghandlerform = [];
 	if (is_array($logHandler)) {
 		foreach ($logHandler as $id => $h) {
+			$logfile = (!empty($h['logfile']) ? Strings::escapeTags(trim($h['logfile'])) : '');
+			if (is_string($logfile) && !is_writable($logfile)) {
+				notice(L10n::t('Logfile %s isn\'t writable.', $logfile));
+			}
+
 			$loghandlerform[] = [
 				'handler'     => ["handler_name[$id]", L10n::t('Handler name'), $id, '', L10n::t('The handler name'), 'required', '', ''],
 				'enabled'     => ["handler_enabled[$id]", L10n::t('Handler enabled'), $h['enabled'], L10n::t('Enabling/Disabling this handler')],
 				'description' => ["handler_desc[$id]", L10n::t('Handler description'), $h['description'], L10n::t('Human readable description of this handler')],
-				'logfile'     => ["handler_logfile[$id]", L10n::t('Handler logfile'), $h['logfile'], L10n::t('Must be writable by web server. Relative to your Friendica top-level directory.')],
+				'logfile'     => ["handler_logfile[$id]", L10n::t('Handler logfile'), $logfile, L10n::t('Must be writable by web server. Relative to your Friendica top-level directory.')],
 				'loglevel'    => ["handler_loglevel[$id]", L10n::t('Handler log level'), $h['loglevel'], '', $log_choices],
 				'errors'      => ["handler_errors[$id]", L10n::t('PHP logging'), $h['errors'], L10n::t('Writing PHP error logging to the current log handler (f.e. E_ERROR)')],
 			];
