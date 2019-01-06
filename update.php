@@ -349,7 +349,7 @@ function update_1294()
 	return Update::SUCCESS;
 }
 
-function update_1295()
+function update_1296()
 {
 	$default_handler = Config::get('log_handler', 'default');
 
