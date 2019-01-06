@@ -15,6 +15,7 @@ class DBStructureTest extends DatabaseTest
 
 		// Reusable App object
 		$this->app = BaseObject::getApp();
+		$this->app->getLogger()->enableTest();
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');

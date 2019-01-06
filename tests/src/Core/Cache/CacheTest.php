@@ -29,6 +29,7 @@ abstract class CacheTest extends DatabaseTest
 
 		// Reusable App object
 		$this->app = \Friendica\BaseObject::getApp();
+		$this->app->getLogger()->enableTest();
 
 		// Default config
 		Config::set('config', 'hostname', 'localhost');

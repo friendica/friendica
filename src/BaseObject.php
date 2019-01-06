@@ -27,7 +27,7 @@ class BaseObject
 	public static function getApp()
 	{
 		if (empty(self::$app)) {
-			$logger = $logger = LoggerFactory::create('app');
+			$logger = $logger = LoggerFactory::create('index');
 			self::$app = new App(dirname(__DIR__), $logger);
 		}
 
