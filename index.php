@@ -5,7 +5,7 @@
  */
 
 use Friendica\App;
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\LoggerFactory;
 
 require_once 'boot.php';
 

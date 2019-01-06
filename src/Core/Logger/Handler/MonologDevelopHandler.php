@@ -1,9 +1,9 @@
 <?php
 
-namespace Friendica\Util\Logger;
+namespace Friendica\Core\Logger\Handler;
 
-use Monolog\Handler;
-use Monolog\Logger;
+use Friendica\Core\Config\IConfigurable;
+use Psr\Log\LogLevel;
 
 /**
  * Simple handler for Friendica developers to use for deeper logging
@@ -11,7 +11,7 @@ use Monolog\Logger;
  * If you want to debug only interactions from your IP or the IP of a remote server for federation debug,
  * you'll use Logger::develop() for the duration of your work, and you clean it up when you're done before submitting your PR.
  */
-class FriendicaDevelopHandler extends Handler\AbstractHandler
+class MonologDevelopHandler extends MonologStreamHandler implements IConfigurable
 {
 	/**
 	 * @var string The IP of the developer who wants to debug
@@ -19,13 +19,12 @@ class FriendicaDevelopHandler extends Handler\AbstractHandler
 	private $developerIp;
 
 	/**
+	 * {@inheritdoc}
 	 * @param string $developerIp  The IP of the developer who wants to debug
-	 * @param int    $level        The minimum logging level at which this handler will be triggered
-	 * @param bool   $bubble       Whether the messages that are handled can bubble up the stack or not
 	 */
-	public function __construct($developerIp, $level = Logger::DEBUG, $bubble = true)
+	public function __construct($name, $developerIp = '', $description = '', $enabled = true, $logfile = '', $loglevel = LogLevel::NOTICE)
 	{
-		parent::__construct($level, $bubble);
+		parent::__construct($name, $description, $enabled, $logfile, $loglevel);
 
 		$this->developerIp = $developerIp;
 	}
@@ -46,5 +45,34 @@ class FriendicaDevelopHandler extends Handler\AbstractHandler
 		}
 
 		return false === $this->bubble;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	function loadConfig()
+	{
+		parent::loadConfig();
+		$this->developerIp = $this->getConfig('dlogip', '');
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	function saveConfig()
+	{
+		parent::saveConfig();
+		$this->setConfig('dlogip', $this->developerIp);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	function toArray()
+	{
+		return [
+			'enabled' => $this->enabled,
+			'developer_ip' => $this->developerIp,
+		];
 	}
 }

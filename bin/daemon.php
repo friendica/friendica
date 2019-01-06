@@ -11,7 +11,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\LoggerFactory;
 
 // Get options
 $shortopts = 'f';

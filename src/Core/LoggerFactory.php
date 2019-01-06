@@ -1,10 +1,12 @@
 <?php
 
-namespace Friendica\Util;
+namespace Friendica\Core;
 
-use Friendica\Util\Logger\FriendicaDevelopHandler;
-use Friendica\Util\Logger\FriendicaLogger;
-use Friendica\Util\Logger\FriendicaLoggerInterface;
+use Friendica\Core\Logger\Handler\ILogHandler;
+use Friendica\Core\Logger\Handler\MonologStreamHandler;
+use Friendica\Core\Logger\Handler\MonologDevelopHandler;
+use Friendica\Core\Logger\IFriendicaLogger;
+use Friendica\Core\Logger\MonologLogger;
 use Monolog;
 use Psr\Log\LogLevel;
 
@@ -18,12 +20,12 @@ class LoggerFactory
 	 *
 	 * @param string $channel            The channel of the logger instance
 	 *
-	 * @return FriendicaLoggerInterface  The PSR-3 compliant logger instance
+	 * @return IFriendicaLogger  The PSR-3 compliant logger instance
 	 */
 	public static function create($channel)
 	{
 		// create the default channel
-		$logger = new FriendicaLogger($channel);
+		$logger = new MonologLogger($channel);
 		$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 		$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 		$logger->pushProcessor(new Monolog\Processor\UidProcessor());
@@ -40,11 +42,11 @@ class LoggerFactory
 	 *
 	 * @param string $channel      The channel of the logger instance
 	 *
-	 * @return FriendicaLoggerInterface The PSR-3 compliant logger instance
+	 * @return IFriendicaLogger The PSR-3 compliant logger instance
 	 */
 	public static function createProf($channel = 'performance')
 	{
-		$logger = new FriendicaLogger($channel);
+		$logger = new MonologLogger($channel);
 		$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 		$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 		$logger->pushProcessor(new Monolog\Processor\UidProcessor());
@@ -63,21 +65,44 @@ class LoggerFactory
 	 *
 	 * It should never get filled during normal usage of Friendica
 	 *
-	 * @param string $developerIp  The IP of the developer who wants to use the logger
 	 * @param string $channel      The channel of the logger instance
 	 *
-	 * @return FriendicaLoggerInterface The PSR-3 compliant logger instance
+	 * @return IFriendicaLogger The PSR-3 compliant logger instance
 	 */
-	public static function createDev($developerIp, $channel = 'develop')
+	public static function createDev($channel = 'develop')
 	{
-		$logger = new FriendicaLogger($channel);
+		$logger = new MonologLogger($channel);
 		$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 		$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 
 		$logger->pushProcessor(new Monolog\Processor\IntrospectionProcessor(Loglevel::DEBUG, [], 1));
 
-		$logger->pushHandler(new FriendicaDevelopHandler($developerIp));
-
 		return $logger;
+	}
+
+	/**
+	 * Creates a new Log Handler for Friendica
+	 *
+	 * Depending on the $name of the handler, different Handler are creating
+	 *
+	 * @param $name
+	 * @return ILogHandler
+	 * @throws \Exception
+	 */
+	public static function createHandler($name)
+	{
+		$type = Config::get('log_handler', sprintf("%s.type", $name), 'stream');
+
+		switch ($type) {
+			case 'stream':
+				return new MonologStreamHandler($name);
+				break;
+			case 'develop':
+				return new MonologDevelopHandler($name);
+				break;
+			default:
+				return new MonologStreamHandler($name);
+				break;
+		}
 	}
 }

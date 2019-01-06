@@ -3,7 +3,7 @@
 
 include_once dirname(__DIR__) . '/boot.php';
 
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\LoggerFactory;
 
 $logger = LoggerFactory::create('console');
 

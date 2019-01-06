@@ -5,8 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Util\Logger\FriendicaLoggerInterface;
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\Logger\IFriendicaLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -41,106 +40,63 @@ class Logger extends BaseObject
 	const ALL = LogLevel::DEBUG;
 
 	/**
-	 * @var array the legacy loglevels
-	 * @deprecated 2019.03 use PSR-3 loglevels
-	 * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#5-psrlogloglevel
-	 *
-	 */
-	public static $levels = [
-		self::WARNING => 'Warning',
-		self::INFO => 'Info',
-		self::TRACE => 'Trace',
-		self::DEBUG => 'Debug',
-		self::DATA => 'Data',
-		self::ALL => 'All',
-	];
-
-	/**
-	 * @var FriendicaLoggerInterface A PSR-3 compliant logger instance
+	 * @var IFriendicaLogger A PSR-3 compliant logger instance
 	 */
 	private static $logger;
 
 	/**
-	 * @var FriendicaLoggerInterface PSR-3 compliant logger instance for developing only
+	 * @var IFriendicaLogger PSR-3 compliant logger instance for developing only
 	 */
 	private static $devLogger;
 
 	/**
-	 * @var FriendicaLoggerInterface PSR-3 compliant logger instance for performance profiling
+	 * @var IFriendicaLogger PSR-3 compliant logger instance for performance profiling
 	 */
 	private static $profLogger;
 
 	/**
 	 * Sets the default logging handler for Friendica.
 	 *
-	 * @param FriendicaLoggerInterface $logger The Logger instance of this Application
+	 * @param IFriendicaLogger $logger The Logger instance of this Application
 	 */
 	public static function init($logger)
 	{
 		self::$logger = $logger;
 
 		// if default logging is enabled
-		if(Config::get('system', 'debugging') && isset($logger)) {
-			$handlerList = Config::get('log_channel', self::$logger->getChannel());
-			foreach ($handlerList as $handler) {
-				self::$logger->addHandler(Config::get('log_handler', $handler));
-			}
+		if (!Config::get('system', 'debugging') || !isset($logger)) {
+			return;
 		}
 
-		// if additional performance profiling is enabled
-		if(Config::get('system', 'profiler')) {
-			self::$profLogger = LoggerFactory::createProf();
+		$handlerList = [];
 
-			$handlerList = Config::get('log_channel', self::$profLogger->getChannel());
-			foreach ($handlerList as $handler) {
-				self::$profLogger->addHandler(Config::get('log_handler', $handler));
-			}
+		$handlerNames = Config::get('log_handler', 'names');
+
+		foreach ($handlerNames as $name) {
+			$handler = LoggerFactory::createHandler($name);
+			$handler->loadConfig();
+			$handlerList[] = [
+				$name => $handler,
+			];
 		}
 
-		// if additional develop (set due to the developer IP config) is enabled
-		$developIp = Config::get('system', 'dlogip');
-		if (isset($developIp)) {
-			self::$devLogger = LoggerFactory::createDev($developIp);
-
-			$handlerList = Config::get('log_channel', self::$devLogger->getChannel());
-			foreach ($handlerList as $handler) {
-				self::$devLogger->addHandler(Config::get('log_handler', $handler));
-			}
+		self::$logger->loadConfig();
+		foreach (self::$logger->getHandlerNames() as $name) {
+			self::$logger->addHandler($handlerList[$name]);
 		}
-	}
 
-	/**
-	 * Mapping a legacy level to the PSR-3 compliant levels
-	 * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#5-psrlogloglevel
-	 *
-	 * @param int $level the level to be mapped
-	 *
-	 * @return string the PSR-3 compliant level
-	 */
-	public static function mapLegacyConfigDebugLevel($level)
-	{
-		switch ($level) {
-			// legacy WARNING
-			case 0:
-				return LogLevel::ERROR;
-			// legacy INFO
-			case 1:
-				return LogLevel::WARNING;
-			// legacy TRACE
-			case 2:
-				return LogLevel::NOTICE;
-			// legacy DEBUG
-			case 3:
-				return LogLevel::INFO;
-			// legacy DATA
-			case 4:
-				return LogLevel::DEBUG;
-			// legacy ALL
-			case 5:
-				return LogLevel::DEBUG;
-			// default if nothing set
-			default:
-				return LogLevel::NOTICE;
+		self::$profLogger = LoggerFactory::createProf();
+		self::$profLogger->loadConfig();
+
+		foreach (self::$profLogger->getHandlerNames() as $name) {
+			self::$profLogger->addHandler($handlerList[$name]);
+		}
+
+		self::$devLogger = LoggerFactory::createDev();
+		self::$devLogger->loadConfig();
+
+		foreach (self::$devLogger->getHandlerNames() as $name) {
+			self::$devLogger->addHandler($handlerList[$name]);
 		}
 	}
 

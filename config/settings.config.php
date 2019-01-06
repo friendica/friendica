@@ -52,10 +52,6 @@ return [
 		// It only applies to timestamps for anonymous viewers.
 		'default_timezone' => 'UTC',
 
-		// dlogip (String)
-		// restricts develop log writes to requests originating from this IP address.
-		'dlogip' => '',
-
 		// directory (String)
 		// URL of the global directory.
 		'directory' => 'https://dir.friendica.social',
@@ -124,80 +120,98 @@ return [
 	],
 
 	// Mapping the log channels to the different log handlers
+	// config entries needs to be set %channelname%.%field%
+	// The only exception is "names"
 	'log_channel' => [
-		'index' => ['default'],
-		'console' => ['default'],
-		'worker' => ['default'],
-		'daemon' => ['default'],
-		'db' => ['default'],
-		'auth_ejabbered' => ['ejabbered'],
-		'performance' => ['profiler'],
-		'develop' => ['develop'],
+		'names' => ['index', 'console', 'daemon', 'db', 'auth_ejabbered', 'performance', 'develop'],
+
+		// channels (Array)
+		// The list of handler for this channel
+		'index.handler' => ['default'],
+
+		// errors (Boolean)
+		// Enabling runtime errors, exceptions and fatal errors for this logger
+		'index.errors' => true,
+
+		'console.handler' => ['default'],
+		'console.errors' => true,
+
+		'worker.handler' => ['default'],
+		'worker.errors' => true,
+
+		'daemon.handler' => ['default'],
+		'daemon.errors' => true,
+
+		'db.handler' => ['default'],
+		'db.errors' => true,
+
+		'auth_ejabbered.handler' => ['ejabbered'],
+		'auth_ejabbered.errors' => true,
+
+		'performance.handler' => ['profiler'],
+		'performance.errors' => true,
+
+		'develop.handler' => ['develop'],
+		'develop.errors' => true,
 	],
 
 	// Default log handling in Friendica
+	// config entries needs to be set %handlername%.%field%
+	// The only exception is "names"
 	'log_handler' => [
+		'names' => ['default', 'ejabbered', 'profiler', 'develop'],
 
-		// Standard Log handler in Friendica
-		'default' => [
-			// type (String)
-			// The type of handler (currently only stream is allowed)
-			'type' => 'stream',
+		// type (String)
+		// The type of handler (currently only stream is allowed)
+		'default.type' => 'stream',
 
-			// description (String)
-			// a human readable description of this handler
-			'description' => 'The Default log handler',
+		// description (String)
+		// a human readable description of this handler
+		'default.description' => 'The Default log handler',
 
-			// enabled (Boolean)
-			// Enabling the Handler
-			'enabled' => true,
+		// enabled (Boolean)
+		// Enabling the Handler
+		'default.enabled' => true,
 
-			// logfile (String)
-			// The logfile for storing logs.
-			// Can be a full path or a relative path to the Friendica home directory
-			'logfile' => 'friendica.log',
+		// logfile (String)
+		// The logfile for storing logs.
+		// Can be a full path or a relative path to the Friendica home directory
+		'default.logfile' => 'friendica.log',
 
-			// loglevel (String)
-			// The loglevel for all logs.
-			// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
-			'loglevel' => 'notice',
-
-			// errors (Boolean)
-			// Enabling runtime errors, exceptions and fatal errors for this logger
-			'errors' => true,
-		],
+		// loglevel (String)
+		// The loglevel for all logs.
+		// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
+		'default.loglevel' => 'notice',
 
 		// The auth_ejabberd.php is run by the ejabberd user
 		// so it mustn't log into the same logfile than the other log processes
-		'ejabbered' => [
-			'type' => 'stream',
-			'description' => 'Logging the authentication based on ejabbered',
-			'enabled' => true,
-			'logfile' => 'ejabbered.log',
-			'loglevel' => 'notice',
-			'errors' => true,
-		],
+		'ejabbered.type' => 'stream',
+		'ejabbered.description' => 'Logging the authentication based on ejabbered',
+		'ejabbered.enabled' => true,
+		'ejabbered.logfile' => 'ejabbered.log',
+		'ejabbered.loglevel' => 'notice',
+		'ejabbered.errors' => true,
 
 		// Friendica profiling log
 		// per default disabled
-		'profiler' => [
-			'type' => 'stream',
-			'description' => 'Use to profile Friendica',
-			'enabled' => false,
-			'logfile' => 'friendica.log',
-			'loglevel' => 'debug',
-			'errors' => false,
-		],
+		'profiler.type' => 'stream',
+		'profiler.description' => 'Use to profile Friendica',
+		'profiler.enabled' => false,
+		'profiler.logfile' => 'friendica.log',
+		'profiler.loglevel' => 'debug',
+		'profiler.errors' => false,
 
 		// Develop logging
 		// Used for local debugging only
-		'develop' => [
-			'type' => 'stream',
-			'description' => 'Specific log for local debugging only',
-			'enabled' => false,
-			'logfile' => 'develop.log',
-			'loglevel' => 'debug',
-			'errors' => false,
-		],
+		'develop.type' => 'develop',
+		'develop.description' => 'Specific log for local debugging only',
+		'develop.enabled' => false,
+		'develop.logfile' => 'develop.log',
+		'develop.loglevel' => 'debug',
+		'develop.errors' => false,
+
+		// dlogip (String)
+		// restricts develop log writes to requests originating from this IP address.
+		'develop.dlogip' => '',
 	],
 ];

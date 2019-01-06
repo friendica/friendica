@@ -8,7 +8,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Core\Update;
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\LoggerFactory;
 
 // Get options
 $shortopts = 'sn';

@@ -34,7 +34,7 @@
 
 use Friendica\App;
 use Friendica\Util\ExAuth;
-use Friendica\Util\LoggerFactory;
+use Friendica\Core\LoggerFactory;
 
 if (sizeof($_SERVER["argv"]) == 0) {
 	die();
