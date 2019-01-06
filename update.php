@@ -348,3 +348,41 @@ function update_1294()
 	}
 	return Update::SUCCESS;
 }
+
+function update_1295()
+{
+	$default_handler = Config::get('log_handler', 'default');
+
+	$legacy_loglevel = Config::get('system', 'loglevel');
+	$legacy_logfile  = Config::get('system', 'logfile');
+
+	$save = false;
+
+	// map legacy loglevel to default handler loglevel
+	if (isset($legacy_loglevel)
+		&& is_array($default_handler)
+		&& isset($default_handler['loglevel'])
+		&& $default_handler['loglevel'] !== Logger::mapLegacyConfigDebugLevel($legacy_loglevel)) {
+		$default_handler['loglevel'] = Logger::mapLegacyConfigDebugLevel($legacy_loglevel);
+		$save = true;
+	}
+
+	// map legacy logfile to default handler logfile
+	if (isset($legacy_logfile)
+		&& is_array($default_handler)
+		&& isset($default_handler['logfile'])
+		&& $default_handler['logfile'] !== $legacy_logfile) {
+		$default_handler['logfile'] = $legacy_logfile;
+		$save = true;
+	}
+
+	if ($save) {
+		Config::set('log_handler', 'default', $default_handler);
+	}
+
+	// remove legacy logfile settings
+	Config::delete('system', 'loglevel');
+	Config::delete('system', 'logfile');
+
+	return Update::SUCCESS;
+}
