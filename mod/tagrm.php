@@ -36,8 +36,10 @@ function tagrm_post(App $a)
 
 /**
  * Updates tags from an item
+ *
  * @param $item_id
  * @param $tags array
+ * @throws Exception
  */
 function update_tags($item_id, $tags){
 	if (empty($item_id) || empty($tags)){

@@ -12,8 +12,10 @@ use Friendica\Database\DBA;
 use Friendica\Protocol\Diaspora;
 
 /**
- * @param object $a App
+ * @param App $a App
  * @return void
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function receive_post(App $a)
 {

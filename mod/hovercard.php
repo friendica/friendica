@@ -127,9 +127,10 @@ function hovercard_content()
  * @brief Get the raw content of a template file
  *
  * @param string $template The name of the template
- * @param string $root Directory of the template
+ * @param string $root     Directory of the template
  *
  * @return string|bool Output the raw content if existent, otherwise false
+ * @throws Exception
  */
 function get_template_content($template, $root = '')
 {

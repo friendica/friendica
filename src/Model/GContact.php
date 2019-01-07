@@ -412,7 +412,7 @@ class GContact
 	}
 
 	/**
-	 * @param object  $uid   user
+	 * @param int     $uid   user
 	 * @param integer $start optional, default 0
 	 * @param integer $limit optional, default 80
 	 * @return array

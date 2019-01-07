@@ -110,7 +110,7 @@ class PConfig extends BaseObject
 	 * @param string $uid    The user_id
 	 * @param string $family The category of the configuration value
 	 * @param string $key    The configuration key to set
-	 * @param string $value  The value to store
+	 * @param mixed  $value  The value to store
 	 *
 	 * @return bool Operation success
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException

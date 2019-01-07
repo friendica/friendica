@@ -14,6 +14,8 @@ use Friendica\Object\Image;
 
 /**
  * @param App $a
+ * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function fbrowser_content(App $a)
 {

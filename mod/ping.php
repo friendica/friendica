@@ -32,30 +32,31 @@ require_once 'include/enotify.php';
  *
  * Expected JSON structure:
  * {
- *		"result": {
- *			"intro": 0,
- *			"mail": 0,
- *			"net": 0,
- *			"home": 0,
- *			"register": 0,
- *			"all-events": 0,
- *			"all-events-today": 0,
- *			"events": 0,
- *			"events-today": 0,
- *			"birthdays": 0,
- *			"birthdays-today": 0,
- *			"groups": [ ],
- *			"forums": [ ],
- *			"notify": 0,
- *			"notifications": [ ],
- *			"sysmsgs": {
- *				"notice": [ ],
- *				"info": [ ]
- *			}
- *		}
- *	}
+ *        "result": {
+ *            "intro": 0,
+ *            "mail": 0,
+ *            "net": 0,
+ *            "home": 0,
+ *            "register": 0,
+ *            "all-events": 0,
+ *            "all-events-today": 0,
+ *            "events": 0,
+ *            "events-today": 0,
+ *            "birthdays": 0,
+ *            "birthdays-today": 0,
+ *            "groups": [ ],
+ *            "forums": [ ],
+ *            "notify": 0,
+ *            "notifications": [ ],
+ *            "sysmsgs": {
+ *                "notice": [ ],
+ *                "info": [ ]
+ *            }
+ *        }
+ *    }
  *
  * @param App $a The Friendica App instance
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function ping_init(App $a)
 {
@@ -418,6 +419,7 @@ function ping_init(App $a)
  *
  * @param int $uid User id
  * @return array Associative array of notifications
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function ping_get_notifications($uid)
 {
@@ -506,8 +508,8 @@ function ping_get_notifications($uid)
  * @param array $notifs          Complete list of notification
  * @param array $sysmsgs         List of system notice messages
  * @param array $sysmsgs_info    List of system info messages
- * @param int   $groups_unseen   Number of unseen group items
- * @param int   $forums_unseen   Number of unseen forum items
+ * @param array $groups_unseen   List of unseen group items
+ * @param array $forums_unseen   List of unseen forum items
  *
  * @return array XML-transform ready data array
  */

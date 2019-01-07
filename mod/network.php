@@ -203,15 +203,16 @@ function saved_searches($search)
  * Return selected tab from query
  *
  * urls -> returns
- * 		'/network'					=> $no_active = 'active'
- * 		'/network?f=&order=comment'	=> $comment_active = 'active'
- * 		'/network?f=&order=post'	=> $postord_active = 'active'
- * 		'/network?f=&conv=1',		=> $conv_active = 'active'
- * 		'/network/new',				=> $new_active = 'active'
- * 		'/network?f=&star=1',		=> $starred_active = 'active'
- * 		'/network?f=&bmark=1',		=> $bookmarked_active = 'active'
+ *        '/network'                    => $no_active = 'active'
+ *        '/network?f=&order=comment'    => $comment_active = 'active'
+ *        '/network?f=&order=post'    => $postord_active = 'active'
+ *        '/network?f=&conv=1',        => $conv_active = 'active'
+ *        '/network/new',                => $new_active = 'active'
+ *        '/network?f=&star=1',        => $starred_active = 'active'
+ *        '/network?f=&bmark=1',        => $bookmarked_active = 'active'
  *
- * @return Array ($no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active);
+ * @param App $a
+ * @return array ($no_active, $comment_active, $postord_active, $conv_active, $new_active, $starred_active, $bookmarked_active);
  */
 function network_query_get_sel_tab(App $a)
 {
@@ -267,9 +268,11 @@ function network_query_get_sel_group(App $a)
 /**
  * @brief Sets the pager data and returns SQL
  *
- * @param App $a The global App
+ * @param App     $a      The global App
+ * @param Pager   $pager
  * @param integer $update Used for the automatic reloading
  * @return string SQL with the appropriate LIMIT clause
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function networkPager(App $a, Pager $pager, $update)
 {
@@ -303,6 +306,7 @@ function networkPager(App $a, Pager $pager, $update)
  * @brief Sets items as seen
  *
  * @param array $condition The array with the SQL condition
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function networkSetSeen($condition)
 {
@@ -322,9 +326,12 @@ function networkSetSeen($condition)
  *
  * @param App     $a      The global App
  * @param array   $items  Items of the conversation
+ * @param Pager   $pager
  * @param string  $mode   Display mode for the conversation
  * @param integer $update Used for the automatic reloading
+ * @param string  $ordering
  * @return string HTML of the conversation
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function networkConversation(App $a, $items, Pager $pager, $mode, $update, $ordering = '')
 {
@@ -389,10 +396,11 @@ function network_content(App $a, $update = 0, $parent = 0)
 /**
  * @brief Get the network content in flat view
  *
- * @param Pager   $pager
  * @param App     $a      The global App
  * @param integer $update Used for the automatic reloading
  * @return string HTML of the network content in flat view
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+ * @global Pager  $pager
  */
 function networkFlatView(App $a, $update = 0)
 {
@@ -480,11 +488,12 @@ function networkFlatView(App $a, $update = 0)
 /**
  * @brief Get the network content in threaded view
  *
- * @global Pager   $pager
  * @param  App     $a      The global App
  * @param  integer $update Used for the automatic reloading
  * @param  integer $parent
  * @return string HTML of the network content in flat view
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+ * @global Pager   $pager
  */
 function networkThreadedView(App $a, $update, $parent)
 {
@@ -1042,13 +1051,16 @@ function network_tabs(App $a)
  * of the page to make the correct asynchronous call. This is obtained through the Pager that was instantiated in
  * networkThreadedView or networkFlatView.
  *
- * @global Pager  $pager
- * @param  App    $a
  * @param  string $htmlhead The head tag HTML string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+ * @global Pager  $pager
  */
 function network_infinite_scroll_head(App $a, &$htmlhead)
 {
 	/// @TODO this will have to be converted to a static property of the converted Module\Network class
+	/**
+	 * @var $pager Pager
+	 */
 	global $pager;
 
 	if (PConfig::get(local_user(), 'system', 'infinite_scroll')

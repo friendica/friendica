@@ -27,6 +27,8 @@ require_once 'include/text.php';
  * @param App $a App
  *
  * @return void|string
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function match_content(App $a)
 {

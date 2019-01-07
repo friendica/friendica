@@ -1,8 +1,9 @@
 <?php
 /**
  * load view/theme/$current_theme/style.php with friendica contex
+ *
+ * @param App $a
  */
- 
 function view_init($a){
 	header("Content-Type: text/css");
 		

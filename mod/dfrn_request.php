@@ -56,6 +56,9 @@ function dfrn_request_init(App $a)
  * in order to link our friend request with our own server cell.
  * After logging in, we click 'submit' to approve the linkage.
  *
+ * @param App $a
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function dfrn_request_post(App $a)
 {

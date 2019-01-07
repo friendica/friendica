@@ -130,7 +130,7 @@ class Renderer extends BaseObject
 	 * If $name is not defined, return engine defined by theme,
 	 * or default
 	 *
-	 * @return object Template Engine instance
+	 * @return ITemplateEngine Template Engine instance
 	 */
 	public static function getTemplateEngine()
 	{

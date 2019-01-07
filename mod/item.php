@@ -915,17 +915,18 @@ function item_content(App $a)
 
 /**
  * This function removes the tag $tag from the text $body and replaces it with
- * the appropiate link.
+ * the appropriate link.
  *
- * @param App $a Application instance @TODO is unused in this function's scope (excluding included files)
- * @param string $body the text to replace the tag in
- * @param string $inform a comma-seperated string containing everybody to inform
- * @param string $str_tags string to add the tag to
+ * @param string  $body     the text to replace the tag in
+ * @param string  $inform   a comma-seperated string containing everybody to inform
+ * @param string  $str_tags string to add the tag to
  * @param integer $profile_uid
- * @param string $tag the tag to replace
- * @param string $network The network of the post
+ * @param string  $tag      the tag to replace
+ * @param string  $network  The network of the post
  *
- * @return boolean true if replaced, false if not replaced
+ * @return array|bool ['replaced' => $replaced, 'contact' => $contact];
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function handle_tag(App $a, &$body, &$inform, &$str_tags, $profile_uid, $tag, $network = "")
 {

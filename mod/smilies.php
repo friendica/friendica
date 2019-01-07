@@ -7,8 +7,9 @@ use Friendica\Content\Smilies;
 use Friendica\Core\System;
 
 /**
- * @param object $a App
+ * @param App $a App
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function smilies_content(App $a)
 {

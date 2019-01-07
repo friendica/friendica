@@ -49,7 +49,8 @@ require_once 'include/items.php';
  * return the HTML for the pages of the admin panel.
  *
  * @param App $a
- *
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_post(App $a)
 {
@@ -161,6 +162,7 @@ function admin_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_content(App $a)
 {
@@ -312,6 +314,7 @@ function admin_content(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_tos(App $a)
 {
@@ -334,6 +337,7 @@ function admin_page_tos(App $a)
  * @brief Process send data from Admin TOS Page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_tos_post(App $a)
 {
@@ -366,6 +370,7 @@ function admin_page_tos_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_blocklist(App $a)
 {
@@ -406,6 +411,7 @@ function admin_page_blocklist(App $a)
  * @brief Process send data from Admin Blocklist Page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_blocklist_post(App $a)
 {
@@ -450,6 +456,8 @@ function admin_page_blocklist_post(App $a)
  * @brief Process data send by the contact block admin page
  *
  * @param App $a
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_contactblock_post(App $a)
 {
@@ -482,6 +490,7 @@ function admin_page_contactblock_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_contactblock(App $a)
 {
@@ -534,6 +543,7 @@ function admin_page_contactblock(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_deleteitem(App $a)
 {
@@ -558,6 +568,7 @@ function admin_page_deleteitem(App $a)
  * URLs like the full /display URL to make the process more easy for the admin.
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_deleteitem_post(App $a)
 {
@@ -597,6 +608,7 @@ function admin_page_deleteitem_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_federation(App $a)
 {
@@ -783,6 +795,7 @@ function admin_page_federation(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_queue(App $a)
 {
@@ -825,7 +838,9 @@ function admin_page_queue(App $a)
  * The returned string holds the content of the page.
  *
  * @param App $a
+ * @param     $deferred
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_workerqueue(App $a, $deferred)
 {
@@ -875,6 +890,7 @@ function admin_page_workerqueue(App $a, $deferred)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_summary(App $a)
 {
@@ -993,6 +1009,7 @@ function admin_page_summary(App $a)
  * @brief Process send data from Admin Site Page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_site_post(App $a)
 {
@@ -1170,10 +1187,13 @@ function admin_page_site_post(App $a)
 	$relay_server_tags = (!empty($_POST['relay_server_tags']) ? Strings::escapeTags(trim($_POST['relay_server_tags']))  : '');
 	$relay_user_tags   = !empty($_POST['relay_user_tags']);
 	$active_panel      = (!empty($_POST['active_panel'])      ? "#" . Strings::escapeTags(trim($_POST['active_panel'])) : '');
-	
+
+	/**
+	 * @var $storagebackend \Friendica\Model\Storage\IStorage
+	 */
 	$storagebackend    = Strings::escapeTags(trim(defaults($_POST, 'storagebackend', '')));
 	StorageManager::setBackend($storagebackend);
-	
+
 	// save storage backend form
 	if (!is_null($storagebackend) && $storagebackend != "") {
 		$storage_opts = $storagebackend::getOptions();
@@ -1397,6 +1417,7 @@ function admin_page_site_post(App $a)
  *
  * @param  App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_site(App $a)
 {
@@ -1520,6 +1541,9 @@ function admin_page_site(App $a)
 
 	/* storage backend */
 	$storage_backends = StorageManager::listBackends();
+	/**
+	 * @var $storage_current_backend \Friendica\Model\Storage\IStorage
+	 */
 	$storage_current_backend = StorageManager::getBackend();
 
 	$storage_backends_choices = [
@@ -1679,7 +1703,8 @@ function admin_page_site(App $a)
  *
  * @param App $a
  * @return string
- * */
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+ */
 function admin_page_dbsync(App $a)
 {
 	$o = '';
@@ -1769,6 +1794,7 @@ function admin_page_dbsync(App $a)
  * @brief Process data send by Users admin page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_users_post(App $a)
 {
@@ -1886,6 +1912,7 @@ function admin_page_users_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_users(App $a)
 {
@@ -2084,6 +2111,7 @@ function admin_page_users(App $a)
  * @param App   $a
  * @param array $addons_admin A list of admin addon names
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_addons(App $a, array $addons_admin)
 {
@@ -2289,6 +2317,7 @@ function rebuild_theme_table($themes)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_themes(App $a)
 {
@@ -2473,6 +2502,7 @@ function admin_page_themes(App $a)
  * @brief Prosesses data send by Logs admin page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_logs_post(App $a)
 {
@@ -2508,6 +2538,7 @@ function admin_page_logs_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_logs(App $a)
 {
@@ -2564,6 +2595,7 @@ function admin_page_logs(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_viewlogs(App $a)
 {
@@ -2607,6 +2639,7 @@ function admin_page_viewlogs(App $a)
  * @brief Prosesses data send by the features admin page
  *
  * @param App $a
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_features_post(App $a)
 {
@@ -2654,6 +2687,7 @@ function admin_page_features_post(App $a)
  *
  * @param App $a
  * @return string
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function admin_page_features(App $a)
 {
