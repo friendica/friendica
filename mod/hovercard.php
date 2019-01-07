@@ -47,7 +47,6 @@ function hovercard_content()
 	// If a contact is connected the url is internally changed to 'redir/CID'. We need the pure url to search for
 	// the contact. So we strip out the contact id from the internal url and look in the contact table for
 	// the real url (nurl)
-	$cid = 0;
 	if (strpos($profileurl, 'redir/') === 0) {
 		$cid = intval(substr($profileurl, 6));
 		$remote_contact = DBA::selectFirst('contact', ['nurl'], ['id' => $cid]);

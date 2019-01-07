@@ -10,15 +10,15 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 
-function repair_ostatus_content(App $a) {
-
-	if (! local_user()) {
+function repair_ostatus_content(App $a)
+{
+	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
 		$a->internalRedirect('ostatus_repair');
 		// NOTREACHED
 	}
 
-	$o = "<h2>".L10n::t("Resubscribing to OStatus contacts")."</h2>";
+	$o = "<h2>" . L10n::t("Resubscribing to OStatus contacts") . "</h2>";
 
 	$uid = local_user();
 
@@ -53,13 +53,13 @@ function repair_ostatus_content(App $a) {
 		return $o;
 	}
 
-	$o .= "<p>".$counter."/".$total.": ".$r[0]["url"]."</p>";
+	$o .= "<p>" . $counter . "/" . $total . ": " . $r[0]["url"] . "</p>";
 
-	$o .= "<p>".L10n::t("Keep this window open until done.")."</p>";
+	$o .= "<p>" . L10n::t("Keep this window open until done.") . "</p>";
 
-	$result = Contact::createFromProbe($uid, $r[0]["url"], true);
+	Contact::createFromProbe($uid, $r[0]["url"], true);
 
-	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="1; URL='.System::baseUrl().'/repair_ostatus?counter='.$counter.'">';
+	$a->page['htmlhead'] = '<meta http-equiv="refresh" content="1; URL=' . System::baseUrl() . '/repair_ostatus?counter=' . $counter . '">';
 
 	return $o;
 }

@@ -109,11 +109,11 @@ function profile_photo_post(App $a)
 				// If setting for the default profile, unset the profile photo flag from any other photos I own
 
 				if ($is_default_profile) {
-					$r = q("UPDATE `photo` SET `profile` = 0 WHERE `profile` = 1 AND `resource-id` != '%s' AND `uid` = %d",
+					q("UPDATE `photo` SET `profile` = 0 WHERE `profile` = 1 AND `resource-id` != '%s' AND `uid` = %d",
 						DBA::escape($base_image['resource-id']), intval(local_user())
 					);
 				} else {
-					$r = q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
+					q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
 						DBA::escape(System::baseUrl() . '/photo/' . $base_image['resource-id'] . '-4.' . $Image->getExt()),
 						DBA::escape(System::baseUrl() . '/photo/' . $base_image['resource-id'] . '-5.' . $Image->getExt()),
 						intval($_REQUEST['profile']), intval(local_user())
@@ -215,9 +215,9 @@ function profile_photo_content(App $a)
 		// set an already uloaded photo as profile photo
 		// if photo is in 'Profile Photos', change it in db
 		if (($r[0]['album'] == L10n::t('Profile Photos')) && ($havescale)) {
-			$r = q("UPDATE `photo` SET `profile`=0 WHERE `profile`=1 AND `uid`=%d", intval(local_user()));
+			q("UPDATE `photo` SET `profile`=0 WHERE `profile`=1 AND `uid`=%d", intval(local_user()));
 
-			$r = q("UPDATE `photo` SET `profile`=1 WHERE `uid` = %d AND `resource-id` = '%s'", intval(local_user()),
+			q("UPDATE `photo` SET `profile`=1 WHERE `uid` = %d AND `resource-id` = '%s'", intval(local_user()),
 				DBA::escape($resource_id)
 			);
 
@@ -275,8 +275,6 @@ function profile_photo_content(App $a)
 		]);
 		return $o;
 	}
-
-	return; // NOTREACHED
 }
 
 function profile_photo_crop_ui_head(App $a, Image $image)

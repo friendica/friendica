@@ -41,6 +41,8 @@ function invite_post(App $a)
 	$message     = !empty($_POST['message'])    ? Strings::escapeTags(trim($_POST['message']))     : '';
 
 	$total = 0;
+	$invitation_only = false;
+	$invites_remaining = null;
 
 	if (Config::get('system', 'invitation_only')) {
 		$invitation_only = true;

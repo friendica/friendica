@@ -394,7 +394,7 @@ function photos_post(App $a)
 					$width  = $image->getWidth();
 					$height = $image->getHeight();
 
-					$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 0",
+					q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 0",
 						DBA::escape($image->asString()),
 						intval($height),
 						intval($width),
@@ -407,7 +407,7 @@ function photos_post(App $a)
 						$width  = $image->getWidth();
 						$height = $image->getHeight();
 
-						$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 1",
+						q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 1",
 							DBA::escape($image->asString()),
 							intval($height),
 							intval($width),
@@ -421,7 +421,7 @@ function photos_post(App $a)
 						$width  = $image->getWidth();
 						$height = $image->getHeight();
 
-						$x = q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 2",
+						q("UPDATE `photo` SET `data` = '%s', `height` = %d, `width` = %d WHERE `resource-id` = '%s' AND `uid` = %d AND `scale` = 2",
 							DBA::escape($image->asString()),
 							intval($height),
 							intval($width),
@@ -551,7 +551,6 @@ function photos_post(App $a)
 							$taginfo[] = [$newname, $profile, $salmon];
 						} else {
 							$newname = $name;
-							$alias = '';
 							$tagcid = 0;
 
 							if (strrpos($newname, '+')) {
@@ -688,7 +687,7 @@ function photos_post(App $a)
 						. System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . '</id>';
 					$arr['target'] .= '<link>' . XML::escape('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . '" />' . "\n" . '<link rel="preview" type="'.$photo['type'].'" href="' . System::baseUrl() . "/photo/" . $photo['resource-id'] . '-' . $best . '.' . $ext . '" />') . '</link></target>';
 
-					$item_id = Item::insert($arr);
+					Item::insert($arr);
 				}
 			}
 		}

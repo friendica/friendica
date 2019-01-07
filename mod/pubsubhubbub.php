@@ -33,7 +33,6 @@ function pubsubhubbub_init(App $a) {
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$hub_mode = post_var('hub_mode');
 		$hub_callback = post_var('hub_callback');
-		$hub_verify = post_var('hub_verify');
 		$hub_verify_token = post_var('hub_verify_token');
 		$hub_secret = post_var('hub_secret');
 		$hub_topic = post_var('hub_topic');

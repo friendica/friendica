@@ -85,7 +85,6 @@ function lostpass_post(App $a)
 
 function lostpass_content(App $a)
 {
-	$o = '';
 	if ($a->argc > 1) {
 		$pwdreset_token = $a->argv[1];
 
@@ -131,7 +130,6 @@ function lostpass_form()
 function lostpass_generate_password($user)
 {
 	$o = '';
-	$a = get_app();
 
 	$new_password = User::generateNewPassword();
 	$result = User::updatePassword($user['uid'], $new_password);

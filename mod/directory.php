@@ -112,7 +112,6 @@ function directory_content(App $a)
 		}
 
 		while ($rr = DBA::fetch($r)) {
-			$itemurl= '';
 
 			$itemurl = (($rr['addr'] != "") ? $rr['addr'] : $rr['profile_url']);
 

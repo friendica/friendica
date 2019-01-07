@@ -62,8 +62,6 @@ function allfriends_content(App $a)
 		//get further details of the contact
 		$contact_details = Model\Contact::getDetailsByURL($rr['url'], $uid, $rr);
 
-		$photo_menu = '';
-
 		$connlnk = '';
 		// $rr[cid] is only available for common contacts. So if the contact is a common one, use contact_photo_menu to generate the photo_menu
 		// If the contact is not common to the user, Connect/Follow' will be added to the photo menu

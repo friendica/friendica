@@ -48,12 +48,12 @@ function profiles_init(App $a) {
 
 		// move every contact using this profile as their default to the user default
 
-		$r = q("UPDATE `contact` SET `profile-id` = (SELECT `profile`.`id` AS `profile-id` FROM `profile` WHERE `profile`.`is-default` = 1 AND `profile`.`uid` = %d LIMIT 1) WHERE `profile-id` = %d AND `uid` = %d ",
+		q("UPDATE `contact` SET `profile-id` = (SELECT `profile`.`id` AS `profile-id` FROM `profile` WHERE `profile`.`is-default` = 1 AND `profile`.`uid` = %d LIMIT 1) WHERE `profile-id` = %d AND `uid` = %d ",
 			intval(local_user()),
 			intval($a->argv[2]),
 			intval(local_user())
 		);
-		$r = q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d",
+		q("DELETE FROM `profile` WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
@@ -79,7 +79,7 @@ function profiles_init(App $a) {
 		$r1 = q("SELECT `name`, `photo`, `thumb` FROM `profile` WHERE `uid` = %d AND `is-default` = 1 LIMIT 1",
 			intval(local_user()));
 
-		$r2 = q("INSERT INTO `profile` (`uid` , `profile-name` , `name`, `photo`, `thumb`)
+		q("INSERT INTO `profile` (`uid` , `profile-name` , `name`, `photo`, `thumb`)
 			VALUES ( %d, '%s', '%s', '%s', '%s' )",
 			intval(local_user()),
 			DBA::escape($name),
@@ -118,7 +118,6 @@ function profiles_init(App $a) {
 		if(! DBA::isResult($r1)) {
 			notice(L10n::t('Profile unavailable to clone.') . EOL);
 			exit();
-			return;
 		}
 		unset($r1[0]['id']);
 		$r1[0]['is-default'] = 0;
@@ -151,7 +150,6 @@ function profiles_init(App $a) {
 		if (! DBA::isResult($r)) {
 			notice(L10n::t('Profile not found.') . EOL);
 			exit();
-			return;
 		}
 
 		Profile::load($a, $a->user['nickname'], $r[0]['id']);
@@ -342,54 +340,42 @@ function profiles_post(App $a) {
 		PConfig::set(local_user(), 'system', 'detailled_profile', (($_POST['detailled_profile'] == 1) ? 1: 0));
 
 		$changes = [];
-		$value = '';
 		if ($is_default) {
 			if ($marital != $orig[0]['marital']) {
 				$changes[] = '[color=#ff0000]&hearts;[/color] ' . L10n::t('Marital Status');
-				$value = $marital;
 			}
 			if ($withchanged) {
 				$changes[] = '[color=#ff0000]&hearts;[/color] ' . L10n::t('Romantic Partner');
-				$value = strip_tags($with);
 			}
 			if ($likes != $orig[0]['likes']) {
 				$changes[] = L10n::t('Likes');
-				$value = $likes;
 			}
 			if ($dislikes != $orig[0]['dislikes']) {
 				$changes[] = L10n::t('Dislikes');
-				$value = $dislikes;
 			}
 			if ($work != $orig[0]['work']) {
 				$changes[] = L10n::t('Work/Employment');
 			}
 			if ($religion != $orig[0]['religion']) {
 				$changes[] = L10n::t('Religion');
-				$value = $religion;
 			}
 			if ($politic != $orig[0]['politic']) {
 				$changes[] = L10n::t('Political Views');
-				$value = $politic;
 			}
 			if ($gender != $orig[0]['gender']) {
 				$changes[] = L10n::t('Gender');
-				$value = $gender;
 			}
 			if ($sexual != $orig[0]['sexual']) {
 				$changes[] = L10n::t('Sexual Preference');
-				$value = $sexual;
 			}
 			if ($xmpp != $orig[0]['xmpp']) {
 				$changes[] = L10n::t('XMPP');
-				$value = $xmpp;
 			}
 			if ($homepage != $orig[0]['homepage']) {
 				$changes[] = L10n::t('Homepage');
-				$value = $homepage;
 			}
 			if ($interest != $orig[0]['interest']) {
 				$changes[] = L10n::t('Interests');
-				$value = $interest;
 			}
 			if ($address != $orig[0]['address']) {
 				$changes[] = L10n::t('Address');
@@ -400,9 +386,6 @@ function profiles_post(App $a) {
 			if ($locality != $orig[0]['locality'] || $region != $orig[0]['region']
 				|| $country_name != $orig[0]['country-name']) {
  				$changes[] = L10n::t('Location');
-				$comma1 = ((($locality) && ($region || $country_name)) ? ', ' : ' ');
-				$comma2 = (($region && $country_name) ? ', ' : '');
-				$value = $locality . $comma1 . $region . $comma2 . $country_name;
 			}
 		}
 
@@ -487,7 +470,7 @@ function profiles_post(App $a) {
 
 		if ($is_default) {
 			if ($namechanged) {
-				$r = q("UPDATE `user` set `username` = '%s' where `uid` = %d",
+				q("UPDATE `user` set `username` = '%s' where `uid` = %d",
 					DBA::escape($name),
 					intval(local_user())
 				);

@@ -141,7 +141,6 @@ function profile_content(App $a, $update = 0)
 	$groups = [];
 	$remote_cid = null;
 
-	$tab = 'posts';
 	$o = '';
 
 	if ($update) {
@@ -321,8 +320,7 @@ function profile_content(App $a, $update = 0)
 	if ($is_owner) {
 		$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		if ($unseen) {
-			$r = Item::update(['unseen' => false],
-					['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+			Item::update(['unseen' => false], ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 		}
 	}
 

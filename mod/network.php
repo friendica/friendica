@@ -317,7 +317,7 @@ function networkSetSeen($condition)
 	$unseen = Item::exists($condition);
 
 	if ($unseen) {
-		$r = Item::update(['unseen' => false], $condition);
+		Item::update(['unseen' => false], $condition);
 	}
 }
 
@@ -408,12 +408,6 @@ function networkFlatView(App $a, $update = 0)
 	// Rawmode is used for fetching new content at the end of the page
 	$rawmode = (isset($_GET['mode']) && ($_GET['mode'] == 'raw'));
 
-	if (isset($_GET['last_id'])) {
-		$last_id = intval($_GET['last_id']);
-	} else {
-		$last_id = 0;
-	}
-
 	$o = '';
 
 	$file = defaults($_GET, 'file', '');
@@ -450,8 +444,7 @@ function networkFlatView(App $a, $update = 0)
 
 	$pager = new Pager($a->query_string);
 
-	/// @TODO Figure out why this variable is unused
-	$pager_sql = networkPager($a, $pager, $update);
+	networkPager($a, $pager, $update);
 
 	if (strlen($file)) {
 		$condition = ["`term` = ? AND `otype` = ? AND `type` = ? AND `uid` = ?",
@@ -621,7 +614,6 @@ function networkThreadedView(App $a, $update, $parent)
 	$sql_extra3 = '';
 	$sql_table = '`thread`';
 	$sql_parent = '`iid`';
-	$sql_order = '';
 
 	if ($update) {
 		$sql_table = '`item`';
@@ -952,6 +944,7 @@ function networkThreadedView(App $a, $update, $parent)
  *
  * @param App $a The global App
  * @return string Html of the networktab
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function network_tabs(App $a)
 {
@@ -1051,6 +1044,7 @@ function network_tabs(App $a)
  * of the page to make the correct asynchronous call. This is obtained through the Pager that was instantiated in
  * networkThreadedView or networkFlatView.
  *
+ * @param  App    $a
  * @param  string $htmlhead The head tag HTML string
  * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  * @global Pager  $pager

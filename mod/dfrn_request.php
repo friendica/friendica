@@ -190,7 +190,7 @@ function dfrn_request_post(App $a)
 				}
 
 				if (strlen($dfrn_request) && strlen($confirm_key)) {
-					$s = Network::fetchUrl($dfrn_request . '?confirm_key=' . $confirm_key);
+					Network::fetchUrl($dfrn_request . '?confirm_key=' . $confirm_key);
 				}
 
 				// (ignore reply, nothing we can do it failed)
@@ -232,7 +232,6 @@ function dfrn_request_post(App $a)
 	}
 
 	$nickname       = $a->profile['nickname'];
-	$notify_flags   = $a->profile['notify-flags'];
 	$uid            = $a->profile['uid'];
 	$maxreq         = intval($a->profile['maxreq']);
 	$contact_record = null;
@@ -272,8 +271,6 @@ function dfrn_request_post(App $a)
 				DBA::delete('intro', ['id' => $rr['iid']]);
 			}
 		}
-
-		$real_name = !empty($_POST['realname']) ? Strings::escapeTags(trim($_POST['realname'])) : '';
 
 		$url = trim($_POST['dfrn_url']);
 		if (!strlen($url)) {
@@ -422,7 +419,7 @@ function dfrn_request_post(App $a)
 			$hash = Strings::getRandomHex() . (string) time();   // Generate a confirm_key
 
 			if (is_array($contact_record)) {
-				$ret = q("INSERT INTO `intro` ( `uid`, `contact-id`, `blocked`, `knowyou`, `note`, `hash`, `datetime`)
+				q("INSERT INTO `intro` ( `uid`, `contact-id`, `blocked`, `knowyou`, `note`, `hash`, `datetime`)
 					VALUES ( %d, %d, 1, %d, '%s', '%s', '%s' )",
 					intval($uid),
 					intval($contact_record['id']),
@@ -590,7 +587,7 @@ function dfrn_request_content(App $a)
 				// If we are auto_confirming, this record will have already been nuked
 				// in dfrn_confirm_post()
 
-				$r = q("UPDATE `intro` SET `blocked` = 0 WHERE `hash` = '%s'",
+				q("UPDATE `intro` SET `blocked` = 0 WHERE `hash` = '%s'",
 					DBA::escape($_GET['confirm_key'])
 				);
 			}
@@ -664,6 +661,4 @@ function dfrn_request_content(App $a)
 		]);
 		return $o;
 	}
-
-	return; // Somebody is fishing.
 }

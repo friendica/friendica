@@ -64,27 +64,7 @@ function editpost_content(App $a)
 	$jotplugins = '';
 	$jotnets = '';
 
-	$mail_disabled = ((function_exists('imap_open') && !Config::get('system', 'imap_disabled')) ? 0 : 1);
-
-	$mail_enabled = false;
-	$pubmail_enabled = false;
-
-	if (!$mail_disabled) {
-		$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d AND `server` != '' LIMIT 1",
-			intval(local_user())
-		);
-
-		if (DBA::isResult($r)) {
-			$mail_enabled = true;
-
-			if (intval($r[0]['pubmail'])) {
-				$pubmail_enabled = true;
-			}
-		}
-	}
-
 	Addon::callHooks('jot_tool', $jotplugins);
-	//Addon::callHooks('jot_networks', $jotnets);
 
 	$o .= Renderer::replaceMacros($tpl, [
 		'$is_edit' => true,

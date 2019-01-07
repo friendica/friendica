@@ -38,11 +38,9 @@ function wall_attach_post(App $a) {
 	}
 
 	$can_post  = false;
-	$visitor   = 0;
 
 	$page_owner_uid   = $r[0]['uid'];
 	$page_owner_cid   = $r[0]['id'];
-	$page_owner_nick  = $r[0]['nickname'];
 	$community_page   = (($r[0]['page-flags'] == Contact::PAGE_COMMUNITY) ? true : false);
 
 	if ((local_user()) && (local_user() == $page_owner_uid)) {
@@ -68,7 +66,6 @@ function wall_attach_post(App $a) {
 
 				if (DBA::isResult($r)) {
 					$can_post = true;
-					$visitor = $contact_id;
 				}
 			}
 		}

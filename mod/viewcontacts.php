@@ -40,7 +40,6 @@ function viewcontacts_init(App $a)
 
 	$a->data['user'] = $r[0];
 	$a->profile_uid = $r[0]['uid'];
-	$is_owner = (local_user() && (local_user() == $a->profile_uid));
 
 	Profile::load($a, $a->argv[1]);
 }

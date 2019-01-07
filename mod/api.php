@@ -11,10 +11,8 @@ use Friendica\Module\Login;
 
 require_once 'include/api.php';
 
-function oauth_get_client($request)
+function oauth_get_client(OAuthRequest $request)
 {
-
-
 	$params = $request->get_parameters();
 	$token = $params['oauth_token'];
 

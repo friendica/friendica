@@ -24,9 +24,6 @@ function register_post(App $a)
 {
 	BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
 
-	$verified = 0;
-	$blocked  = 1;
-
 	$arr = ['post' => $_POST];
 	Hook::callAll('register_post', $arr);
 

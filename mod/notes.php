@@ -17,13 +17,7 @@ function notes_init(App $a)
 		return;
 	}
 
-	$profile = 0;
-
-	$which = $a->user['nickname'];
-
 	Nav::setSelected('home');
-
-	//Profile::load($a, $which, $profile);
 }
 
 

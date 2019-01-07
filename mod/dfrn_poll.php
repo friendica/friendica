@@ -30,7 +30,6 @@ function dfrn_poll_init(App $a)
 	$challenge       = defaults($_GET, 'challenge'      , '');
 	$sec             = defaults($_GET, 'sec'            , '');
 	$dfrn_version    = (float) defaults($_GET, 'dfrn_version'   , 2.0);
-	$perm            = defaults($_GET, 'perm'           , 'r');
 	$quiet			 = !empty($_GET['quiet']);
 
 	// Possibly it is an OStatus compatible server that requests a user feed
@@ -321,15 +320,12 @@ function dfrn_poll_post(App $a)
 	switch ($direction) {
 		case -1:
 			$sql_extra = sprintf(" AND `issued-id` = '%s' ", DBA::escape($dfrn_id));
-			$my_id = $dfrn_id;
 			break;
 		case 0:
 			$sql_extra = sprintf(" AND `issued-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
-			$my_id = '1:' . $dfrn_id;
 			break;
 		case 1:
 			$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
-			$my_id = '0:' . $dfrn_id;
 			break;
 		default:
 			$a->internalRedirect();
@@ -422,7 +418,7 @@ function dfrn_poll_content(App $a)
 		DBA::delete('challenge', ["`expire` < ?", time()]);
 
 		if ($type !== 'profile') {
-			$r = q("INSERT INTO `challenge` ( `challenge`, `dfrn-id`, `expire` , `type`, `last_update` )
+			q("INSERT INTO `challenge` ( `challenge`, `dfrn-id`, `expire` , `type`, `last_update` )
 				VALUES( '%s', '%s', '%s', '%s', '%s' ) ",
 				DBA::escape($hash),
 				DBA::escape($dfrn_id),

@@ -8,18 +8,20 @@ function msearch_post(App $a) {
 
 	$perpage = (($_POST['n']) ? $_POST['n'] : 80);
 	$page = (($_POST['p']) ? intval($_POST['p'] - 1) : 0);
-	$startrec = (($page+1) * $perpage) - $perpage;
+	$startrec = (($page + 1) * $perpage) - $perpage;
 
 	$search = $_POST['s'];
-	if(! strlen($search))
+	if (!strlen($search)) {
 		exit();
+	}
 
 	$r = q("SELECT COUNT(*) AS `total` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 AND `user`.`hidewall` = 0 AND MATCH `pub_keywords` AGAINST ('%s') ",
 		DBA::escape($search)
 	);
 
-	if (DBA::isResult($r))
+	if (DBA::isResult($r)) {
 		$total = $r[0]['total'];
+	}
 
 	$results = [];
 

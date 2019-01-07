@@ -187,7 +187,6 @@ function message_content(App $a)
 			);
 			if (DBA::isResult($r)) {
 				$parent = $r[0]['parent-uri'];
-				$convid = $r[0]['convid'];
 
 				if (DBA::delete('mail', ['parent-uri' => $parent, 'uid' => local_user()])) {
 					info(L10n::t('Conversation removed.') . EOL);
@@ -232,7 +231,6 @@ function message_content(App $a)
 
 			if (DBA::isResult($r)) {
 				$prename = $r[0]['name'];
-				$preurl = $r[0]['url'];
 				$preid = $r[0]['id'];
 				$preselect = [$preid];
 			} else {
@@ -335,7 +333,7 @@ function message_content(App $a)
 			return $o;
 		}
 
-		$r = q("UPDATE `mail` SET `seen` = 1 WHERE `parent-uri` = '%s' AND `uid` = %d",
+		q("UPDATE `mail` SET `seen` = 1 WHERE `parent-uri` = '%s' AND `uid` = %d",
 			DBA::escape($r[0]['parent-uri']),
 			intval(local_user())
 		);

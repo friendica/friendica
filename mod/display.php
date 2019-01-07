@@ -35,7 +35,6 @@ function display_init(App $a)
 	}
 
 	$nick = (($a->argc > 1) ? $a->argv[1] : '');
-	$profiledata = [];
 
 	if ($a->argc == 3) {
 		if (substr($a->argv[2], -5) == '.atom') {
@@ -157,7 +156,6 @@ function display_fetchauthor($a, $item)
 	}
 
 	if (!$skip) {
-		$author = "";
 		preg_match("/author='(.*?)'/ism", $attributes, $matches);
 		if (!empty($matches[1])) {
 			$profiledata["name"] = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
@@ -166,7 +164,6 @@ function display_fetchauthor($a, $item)
 		if (!empty($matches[1])) {
 			$profiledata["name"] = html_entity_decode($matches[1],ENT_QUOTES,'UTF-8');
 		}
-		$profile = "";
 		preg_match("/profile='(.*?)'/ism", $attributes, $matches);
 		if (!empty($matches[1])) {
 			$profiledata["url"] = $matches[1];
@@ -175,7 +172,6 @@ function display_fetchauthor($a, $item)
 		if (!empty($matches[1])) {
 			$profiledata["url"] = $matches[1];
 		}
-		$avatar = "";
 		preg_match("/avatar='(.*?)'/ism", $attributes, $matches);
 		if (!empty($matches[1])) {
 			$profiledata["photo"] = $matches[1];

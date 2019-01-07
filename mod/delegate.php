@@ -17,7 +17,7 @@ require_once 'mod/settings.php';
 
 function delegate_init(App $a)
 {
-	return settings_init($a);
+	settings_init($a);
 }
 
 function delegate_post(App $a)

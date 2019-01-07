@@ -61,7 +61,4 @@ function home_content(App $a) {
 		'$login' => $login,
 		'$content' => $content
 	]);
-
-	return $o;
-
 }}

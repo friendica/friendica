@@ -255,7 +255,6 @@ function dfrn_notify_content(App $a) {
 		 */
 
 		$dfrn_id = Strings::escapeTags(trim($_GET['dfrn_id']));
-		$dfrn_version = (float) $_GET['dfrn_version'];
 		$rino_remote = (!empty($_GET['rino']) ? intval($_GET['rino']) : 0);
 		$type = "";
 		$last_update = "";

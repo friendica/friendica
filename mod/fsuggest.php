@@ -45,7 +45,7 @@ function fsuggest_post(App $a)
 			intval(local_user())
 		);
 		if (DBA::isResult($r)) {
-			$x = q("INSERT INTO `fsuggest` ( `uid`,`cid`,`name`,`url`,`request`,`photo`,`note`,`created`)
+			q("INSERT INTO `fsuggest` ( `uid`,`cid`,`name`,`url`,`request`,`photo`,`note`,`created`)
 				VALUES ( %d, %d, '%s','%s','%s','%s','%s','%s')",
 				intval(local_user()),
 				intval($contact_id),

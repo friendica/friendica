@@ -272,8 +272,6 @@ function wall_upload_post(App $a, $desktopmode = true)
 		}
 	}
 
-	$basename = basename($filename);
-
 	if (!$desktopmode) {
 		$r = q("SELECT `id`, `datasize`, `width`, `height`, `type` FROM `photo`
 			WHERE `resource-id` = '%s'

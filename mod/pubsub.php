@@ -38,7 +38,6 @@ function pubsub_init(App $a)
 		$hub_mode      = Strings::escapeTags(trim(defaults($_GET, 'hub_mode', '')));
 		$hub_topic     = Strings::escapeTags(trim(defaults($_GET, 'hub_topic', '')));
 		$hub_challenge = Strings::escapeTags(trim(defaults($_GET, 'hub_challenge', '')));
-		$hub_lease     = Strings::escapeTags(trim(defaults($_GET, 'hub_lease_seconds', '')));
 		$hub_verify    = Strings::escapeTags(trim(defaults($_GET, 'hub_verify_token', '')));
 
 		Logger::log('Subscription from ' . $_SERVER['REMOTE_ADDR'] . ' Mode: ' . $hub_mode . ' Nick: ' . $nick);

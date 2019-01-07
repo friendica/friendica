@@ -205,14 +205,14 @@ function events_content(App $a)
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
-		$r = q("UPDATE `event` SET `ignore` = 1 WHERE `id` = %d AND `uid` = %d",
+		q("UPDATE `event` SET `ignore` = 1 WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'unignore') && intval($a->argv[2])) {
-		$r = q("UPDATE `event` SET `ignore` = 0 WHERE `id` = %d AND `uid` = %d",
+		q("UPDATE `event` SET `ignore` = 0 WHERE `id` = %d AND `uid` = %d",
 			intval($a->argv[2]),
 			intval(local_user())
 		);
@@ -290,21 +290,6 @@ function events_content(App $a)
 		}
 		if ($y > 2099) {
 			$y = 2100;
-		}
-
-		$nextyear = $y;
-		$nextmonth = $m + 1;
-		if ($nextmonth > 12) {
-			$nextmonth = 1;
-			$nextyear ++;
-		}
-
-		$prevyear = $y;
-		if ($m > 1) {
-			$prevmonth = $m - 1;
-		} else {
-			$prevmonth = 12;
-			$prevyear --;
 		}
 
 		$dim    = Temporal::getDaysInMonth($y, $m);
@@ -517,7 +502,7 @@ function events_content(App $a)
 			'$s_text' => L10n::t('Event Starts:') . ' <span class="required" title="' . L10n::t('Required') . '">*</span>',
 			'$s_dsel' => Temporal::getDateTimeField(
 				new DateTime(),
-				DateTime::createFromFormat('Y', $syear+5),
+				DateTime::createFromFormat('Y', intval($syear) + 5),
 				DateTime::createFromFormat('Y-m-d H:i', "$syear-$smonth-$sday $shour:$sminute"),
 				L10n::t('Event Starts:'),
 				'start_text',
@@ -532,7 +517,7 @@ function events_content(App $a)
 			'$f_text' => L10n::t('Event Finishes:'),
 			'$f_dsel' => Temporal::getDateTimeField(
 				new DateTime(),
-				DateTime::createFromFormat('Y', $fyear+5),
+				DateTime::createFromFormat('Y', intval($fyear) + 5),
 				DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"),
 				L10n::t('Event Finishes:'),
 				'finish_text',
