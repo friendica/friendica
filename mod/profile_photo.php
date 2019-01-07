@@ -15,7 +15,6 @@ use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Object\Image;
-use Friendica\Util\Security;
 use Friendica\Util\Strings;
 
 function profile_photo_init(App $a)

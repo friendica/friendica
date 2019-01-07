@@ -12,7 +12,6 @@ use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Database\DBA;
-use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 
 function follow_post(App $a)

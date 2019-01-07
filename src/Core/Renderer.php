@@ -8,6 +8,7 @@ namespace Friendica\Core;
 use Exception;
 use Friendica\BaseObject;
 use Friendica\Render\FriendicaSmarty;
+use Friendica\Render\ITemplateEngine;
 
 /**
  * @brief This class handles Renderer related functions.

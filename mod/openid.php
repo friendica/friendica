@@ -8,7 +8,6 @@ use Friendica\Core\Authentication;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Util\Strings;
 

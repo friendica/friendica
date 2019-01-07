@@ -11,11 +11,9 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model;
 use Friendica\Module;
-use Friendica\Util\Security;
 use Friendica\Util\Strings;
 
 function group_init(App $a) {

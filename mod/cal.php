@@ -23,7 +23,6 @@ use Friendica\Model\Profile;
 use Friendica\Protocol\DFRN;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
-use Friendica\Util\Security;
 
 function cal_init(App $a)
 {

@@ -1,7 +1,6 @@
 <?php
 
 use Friendica\App;
-use Friendica\Core\System;
 use Friendica\Model\Item;
 use Friendica\Util\Strings;
 

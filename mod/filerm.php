@@ -2,7 +2,6 @@
 
 use Friendica\App;
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Model\FileTag;
 use Friendica\Util\XML;
 

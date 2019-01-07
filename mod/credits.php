@@ -5,7 +5,7 @@
  * (only contributors to the git repositories for friendica core and the
  * addons repository will be listed though ATM)
  */
-use Friendica\App;
+
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 

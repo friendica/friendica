@@ -6,7 +6,6 @@
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 
 function notice_init(App $a)

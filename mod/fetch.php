@@ -4,14 +4,12 @@ This file is part of the Diaspora protocol. It is used for fetching single publi
 */
 
 use Friendica\App;
-use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Protocol\Diaspora;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Util\Strings;
-use Friendica\Util\XML;
 use Friendica\Database\DBA;
 
 function fetch_init(App $a)

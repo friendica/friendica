@@ -4,7 +4,6 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;

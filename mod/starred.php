@@ -3,7 +3,6 @@
  * @file mod/starred.php
  */
 use Friendica\App;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 

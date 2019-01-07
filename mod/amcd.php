@@ -1,7 +1,5 @@
 <?php
 
-use Friendica\App;
-
 function amcd_content()
 {
 	echo <<< JSON

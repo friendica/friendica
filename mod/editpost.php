@@ -4,7 +4,7 @@
  */
 use Friendica\App;
 use Friendica\Content\Feature;
-use Friendica\Core\Config;
+use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;

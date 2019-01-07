@@ -13,10 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
-use Friendica\Database\DBA;
 use Friendica\Protocol\Email;
-use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Security;
 use Friendica\Util\Strings;
 
 function invite_post(App $a)
