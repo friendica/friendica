@@ -33,6 +33,7 @@ function help_content(App $a)
 	Nav::setSelected('help');
 
 	$text = '';
+	$filename = '';
 
 	if ($a->argc > 1) {
 		$path = '';

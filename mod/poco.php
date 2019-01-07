@@ -26,9 +26,9 @@ function poco_init(App $a) {
 	}
 
 	if ($a->argc > 1) {
-		$user = Strings::escapeTags(trim($a->argv[1]));
+		$nickname = Strings::escapeTags(trim($a->argv[1]));
 	}
-	if (empty($user)) {
+	if (empty($nickname)) {
 		$c = q("SELECT * FROM `pconfig` WHERE `cat` = 'system' AND `k` = 'suggestme' AND `v` = 1");
 		if (!DBA::isResult($c)) {
 			System::httpExit(401);
@@ -70,7 +70,7 @@ function poco_init(App $a) {
 	if (! $system_mode && ! $global) {
 		$users = q("SELECT `user`.*,`profile`.`hide-friends` from user left join profile on `user`.`uid` = `profile`.`uid`
 			where `user`.`nickname` = '%s' and `profile`.`is-default` = 1 limit 1",
-			DBA::escape($user)
+			DBA::escape($nickname)
 		);
 		if (! DBA::isResult($users) || $users[0]['hidewall'] || $users[0]['hide-friends']) {
 			System::httpExit(404);

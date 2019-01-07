@@ -29,6 +29,8 @@ function fbrowser_content(App $a)
 
 	$template_file = "filebrowser.tpl";
 
+	$o = '';
+
 	switch ($a->argv[1]) {
 		case "image":
 			$path = [["", L10n::t("Photos")]];

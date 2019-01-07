@@ -92,6 +92,8 @@ function notifications_content(App $a)
 
 	$notif_header = L10n::t('Notifications');
 
+	$all = false;
+
 	// Get introductions
 	if ((($a->argc > 1) && ($a->argv[1] == 'intros')) || (($a->argc == 1))) {
 		Nav::setSelected('introductions');

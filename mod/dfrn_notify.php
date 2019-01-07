@@ -301,6 +301,7 @@ function dfrn_notify_content(App $a) {
 				break;
 			default:
 				$status = 1;
+				$my_id = '';
 				break;
 		}
 

@@ -295,7 +295,7 @@ class Strings
      * 
      * @return string   normalized OpenId Identity
      */
-    function normaliseOpenID($s)
+    public static function normaliseOpenID($s)
     {
         return trim(str_replace(['http://', 'https://'], ['', ''], $s), '/');
     }

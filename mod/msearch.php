@@ -15,6 +15,8 @@ function msearch_post(App $a) {
 		exit();
 	}
 
+	$total = 0;
+
 	$r = q("SELECT COUNT(*) AS `total` FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid` WHERE `is-default` = 1 AND `user`.`hidewall` = 0 AND MATCH `pub_keywords` AGAINST ('%s') ",
 		DBA::escape($search)
 	);

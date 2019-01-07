@@ -450,7 +450,7 @@ function networkFlatView(App $a, $update = 0)
 		$condition = ["`term` = ? AND `otype` = ? AND `type` = ? AND `uid` = ?",
 			$file, TERM_OBJ_POST, TERM_FILE, local_user()];
 		$params = ['order' => ['tid' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
-		$result = DBA::select('term', ['oid'], $condition);
+		$result = DBA::select('term', ['oid'], $condition, $params);
 
 		$posts = [];
 		while ($term = DBA::fetch($result)) {

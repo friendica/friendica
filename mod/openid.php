@@ -93,17 +93,17 @@ function openid_content(App $a) {
 					}
 				}
 			}
-			if ($nick) {
+			if (!empty($nick)) {
 				$args .= '&nickname=' . urlencode($nick);
 			}
-			elseif ($first) {
+			elseif (!empty($first)) {
 				$args .= '&nickname=' . urlencode($first);
 			}
 
-			if ($photosq) {
+			if (!empty($photosq)) {
 				$args .= '&photo=' . urlencode($photosq);
 			}
-			elseif ($photo) {
+			elseif (!empty($photo)) {
 				$args .= '&photo=' . urlencode($photo);
 			}
 

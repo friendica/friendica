@@ -233,7 +233,7 @@ class Attach extends BaseObject
 	 * @return boolean True on success
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function storeFile($src, $uid, $filename = '', $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '')
+	public static function storeFile($src, $uid, $filename = '', $allow_cid = '', $allow_gid = '', $deny_cid = '', $deny_gid = '')
 	{
 		if ($filename === '') {
 			$filename = basename($src);

@@ -135,8 +135,10 @@ function get_template_content($template, $root = '')
 {
 	// We load the whole template system to get the filename.
 	// Maybe we can do it a little bit smarter if I get time.
-	$t = Renderer::getMarkupTemplate($template, $root);
-	$filename = $t->filename;
+	$templateEngine = Renderer::getTemplateEngine();
+	$template = $templateEngine->getTemplateFile($template, $root);
+
+	$filename = $template->filename;
 
 	// Get the content of the template file
 	if (file_exists($filename)) {

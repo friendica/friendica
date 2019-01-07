@@ -1298,7 +1298,7 @@ function admin_page_site_post(App $a)
 		Config::set('system', 'banner', $banner);
 	}
 
-	if ($info == "") {
+	if (empty($info)) {
 		Config::delete('config', 'info');
 	} else {
 		Config::set('config', 'info', $info);

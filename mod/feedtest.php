@@ -39,7 +39,7 @@ function feedtest_content(App $a)
 		$import_result = Feed::import($xml, $importer, $contact, $dummy, true);
 
 		$result = [
-			'input' => text_highlight($xml, 'xml'),
+			'input' => $xml,
 			'output' => var_export($import_result, true),
 		];
 	}

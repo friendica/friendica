@@ -14,7 +14,7 @@ function ignored_init(App $a)
 		$message_id = intval($a->argv[1]);
 	}
 
-	if (!$message_id) {
+	if (empty($message_id)) {
 		exit();
 	}
 

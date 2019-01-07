@@ -58,6 +58,8 @@ function notify_content(App $a)
 		return Login::form();
 	}
 
+	$notif_content = '';
+
 	$nm = new NotificationsManager();
 
 	$notif_tpl = Renderer::getMarkupTemplate('notifications.tpl');

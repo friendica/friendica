@@ -111,8 +111,9 @@ function directory_content(App $a)
 			$photo = 'photo';
 		}
 
-		while ($rr = DBA::fetch($r)) {
+		$entries = [];
 
+		while ($rr = DBA::fetch($r)) {
 			$itemurl = (($rr['addr'] != "") ? $rr['addr'] : $rr['profile_url']);
 
 			$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);

@@ -433,13 +433,10 @@ function photos_post(App $a)
 			}
 		}
 
-		$p = q("SELECT * FROM `photo` WHERE `resource-id` = '%s' AND `uid` = %d ORDER BY `scale` DESC",
-			DBA::escape($resource_id),
-			intval($page_owner_uid)
-		);
+		$photo = DBA::selectFirst('photo', [], ['resource-id' => $resource_id, 'uid' => $page_owner_uid], ['order' => ['scale' => true]]);
 
-		if (DBA::isResult($p)) {
-			$ext = $phototypes[$p[0]['type']];
+		if (DBA::isResult($photo)) {
+			$ext = $phototypes[$photo['type']];
 			$r = q("UPDATE `photo` SET `desc` = '%s', `album` = '%s', `allow_cid` = '%s', `allow_gid` = '%s', `deny_cid` = '%s', `deny_gid` = '%s' WHERE `resource-id` = '%s' AND `uid` = %d",
 				DBA::escape($desc),
 				DBA::escape($albname),
@@ -460,7 +457,7 @@ function photos_post(App $a)
 		/* Don't make the item visible if the only change was the album name */
 
 		$visibility = 0;
-		if ($p[0]['desc'] !== $desc || strlen($rawtags)) {
+		if ($photo['desc'] !== $desc || strlen($rawtags)) {
 			$visibility = 1;
 		}
 
@@ -476,7 +473,7 @@ function photos_post(App $a)
 			$arr['parent-uri']    = $uri;
 			$arr['post-type']     = Item::PT_IMAGE;
 			$arr['wall']          = 1;
-			$arr['resource-id']   = $p[0]['resource-id'];
+			$arr['resource-id']   = $photo['resource-id'];
 			$arr['contact-id']    = $owner_record['id'];
 			$arr['owner-name']    = $owner_record['name'];
 			$arr['owner-link']    = $owner_record['url'];
@@ -485,15 +482,15 @@ function photos_post(App $a)
 			$arr['author-link']   = $owner_record['url'];
 			$arr['author-avatar'] = $owner_record['thumb'];
 			$arr['title']         = $title;
-			$arr['allow_cid']     = $p[0]['allow_cid'];
-			$arr['allow_gid']     = $p[0]['allow_gid'];
-			$arr['deny_cid']      = $p[0]['deny_cid'];
-			$arr['deny_gid']      = $p[0]['deny_gid'];
+			$arr['allow_cid']     = $photo['allow_cid'];
+			$arr['allow_gid']     = $photo['allow_gid'];
+			$arr['deny_cid']      = $photo['deny_cid'];
+			$arr['deny_gid']      = $photo['deny_gid'];
 			$arr['visible']       = $visibility;
 			$arr['origin']        = 1;
 
-			$arr['body']          = '[url=' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $p[0]['resource-id'] . ']'
-						. '[img]' . System::baseUrl() . '/photo/' . $p[0]['resource-id'] . '-' . $p[0]['scale'] . '.'. $ext . '[/img]'
+			$arr['body']          = '[url=' . System::baseUrl() . '/photos/' . $a->data['user']['nickname'] . '/image/' . $photo['resource-id'] . ']'
+						. '[img]' . System::baseUrl() . '/photo/' . $photo['resource-id'] . '-' . $photo['scale'] . '.'. $ext . '[/img]'
 						. '[/url]';
 
 			$item_id = Item::insert($arr);
@@ -560,7 +557,7 @@ function photos_post(App $a)
 							if ($tagcid) {
 								$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 									intval($tagcid),
-									intval($profile_uid)
+									intval($page_owner_uid)
 								);
 							} else {
 								$newname = str_replace('_',' ',$name);
@@ -648,44 +645,44 @@ function photos_post(App $a)
 					$uri = Item::newURI($page_owner_uid);
 
 					$arr = [];
-					$arr['guid']          = System::createUUID();
-					$arr['uid']           = $page_owner_uid;
-					$arr['uri']           = $uri;
-					$arr['parent-uri']    = $uri;
-					$arr['wall']          = 1;
-					$arr['contact-id']    = $owner_record['id'];
-					$arr['owner-name']    = $owner_record['name'];
-					$arr['owner-link']    = $owner_record['url'];
-					$arr['owner-avatar']  = $owner_record['thumb'];
-					$arr['author-name']   = $owner_record['name'];
-					$arr['author-link']   = $owner_record['url'];
+					$arr['guid'] = System::createUUID();
+					$arr['uid'] = $page_owner_uid;
+					$arr['uri'] = $uri;
+					$arr['parent-uri'] = $uri;
+					$arr['wall'] = 1;
+					$arr['contact-id'] = $owner_record['id'];
+					$arr['owner-name'] = $owner_record['name'];
+					$arr['owner-link'] = $owner_record['url'];
+					$arr['owner-avatar'] = $owner_record['thumb'];
+					$arr['author-name'] = $owner_record['name'];
+					$arr['author-link'] = $owner_record['url'];
 					$arr['author-avatar'] = $owner_record['thumb'];
-					$arr['title']         = '';
-					$arr['allow_cid']     = $photo['allow_cid'];
-					$arr['allow_gid']     = $photo['allow_gid'];
-					$arr['deny_cid']      = $photo['deny_cid'];
-					$arr['deny_gid']      = $photo['deny_gid'];
-					$arr['visible']       = 1;
-					$arr['verb']          = ACTIVITY_TAG;
-					$arr['gravity']       = GRAVITY_PARENT;
-					$arr['object-type']   = ACTIVITY_OBJ_PERSON;
-					$arr['target-type']   = ACTIVITY_OBJ_IMAGE;
-					$arr['tag']           = $tagged[4];
-					$arr['inform']        = $tagged[2];
-					$arr['origin']        = 1;
-					$arr['body']          = L10n::t('%1$s was tagged in %2$s by %3$s', '[url=' . $tagged[1] . ']' . $tagged[0] . '[/url]', '[url=' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . ']' . L10n::t('a photo') . '[/url]', '[url=' . $owner_record['url'] . ']' . $owner_record['name'] . '[/url]');
+					$arr['title'] = '';
+					$arr['allow_cid'] = $photo['allow_cid'];
+					$arr['allow_gid'] = $photo['allow_gid'];
+					$arr['deny_cid'] = $photo['deny_cid'];
+					$arr['deny_gid'] = $photo['deny_gid'];
+					$arr['visible'] = 1;
+					$arr['verb'] = ACTIVITY_TAG;
+					$arr['gravity'] = GRAVITY_PARENT;
+					$arr['object-type'] = ACTIVITY_OBJ_PERSON;
+					$arr['target-type'] = ACTIVITY_OBJ_IMAGE;
+					$arr['tag'] = $tagged[4];
+					$arr['inform'] = $tagged[2];
+					$arr['origin'] = 1;
+					$arr['body'] = L10n::t('%1$s was tagged in %2$s by %3$s', '[url=' . $tagged[1] . ']' . $tagged[0] . '[/url]', '[url=' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . ']' . L10n::t('a photo') . '[/url]', '[url=' . $owner_record['url'] . ']' . $owner_record['name'] . '[/url]');
 					$arr['body'] .= "\n\n" . '[url=' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . ']' . '[img]' . System::baseUrl() . "/photo/" . $photo['resource-id'] . '-' . $best . '.' . $ext . '[/img][/url]' . "\n";
 
 					$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $tagged[0] . '</title><id>' . $tagged[1] . '/' . $tagged[0] . '</id>';
 					$arr['object'] .= '<link>' . XML::escape('<link rel="alternate" type="text/html" href="' . $tagged[1] . '" />' . "\n");
 					if ($tagged[3]) {
-						$arr['object'] .= XML::escape('<link rel="photo" type="'.$photo['type'].'" href="' . $tagged[3]['photo'] . '" />' . "\n");
+						$arr['object'] .= XML::escape('<link rel="photo" type="' . $photo['type'] . '" href="' . $tagged[3]['photo'] . '" />' . "\n");
 					}
 					$arr['object'] .= '</link></object>' . "\n";
 
 					$arr['target'] = '<target><type>' . ACTIVITY_OBJ_IMAGE . '</type><title>' . $photo['desc'] . '</title><id>'
 						. System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . '</id>';
-					$arr['target'] .= '<link>' . XML::escape('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . '" />' . "\n" . '<link rel="preview" type="'.$photo['type'].'" href="' . System::baseUrl() . "/photo/" . $photo['resource-id'] . '-' . $best . '.' . $ext . '" />') . '</link></target>';
+					$arr['target'] .= '<link>' . XML::escape('<link rel="alternate" type="text/html" href="' . System::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $photo['resource-id'] . '" />' . "\n" . '<link rel="preview" type="' . $photo['type'] . '" href="' . System::baseUrl() . "/photo/" . $photo['resource-id'] . '-' . $best . '.' . $ext . '" />') . '</link></target>';
 
 					Item::insert($arr);
 				}
@@ -1537,7 +1534,6 @@ function photos_content(App $a)
 				foreach ($items as $item) {
 					$comment = '';
 					$template = $tpl;
-					$sparkle = '';
 
 					if ((activity_match($item['verb'], ACTIVITY_LIKE) || activity_match($item['verb'], ACTIVITY_DISLIKE)) && ($item['id'] != $item['parent'])) {
 						continue;

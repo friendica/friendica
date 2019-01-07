@@ -23,15 +23,11 @@ function fsuggest_post(App $a)
 
 	$contact_id = intval($a->argv[1]);
 
-	$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-		intval($contact_id),
-		intval(local_user())
-	);
-	if (! DBA::isResult($r)) {
+	$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+	if (! DBA::isResult($contact)) {
 		notice(L10n::t('Contact not found.') . EOL);
 		return;
 	}
-	$contact = $r[0];
 
 	$new_contact = intval($_POST['suggest']);
 
@@ -49,10 +45,10 @@ function fsuggest_post(App $a)
 				VALUES ( %d, %d, '%s','%s','%s','%s','%s','%s')",
 				intval(local_user()),
 				intval($contact_id),
-				DBA::escape($r[0]['name']),
-				DBA::escape($r[0]['url']),
-				DBA::escape($r[0]['request']),
-				DBA::escape($r[0]['photo']),
+				DBA::escape($contact['name']),
+				DBA::escape($contact['url']),
+				DBA::escape($contact['request']),
+				DBA::escape($contact['photo']),
 				DBA::escape($hash),
 				DBA::escape(DateTimeFormat::utcNow())
 			);
@@ -61,7 +57,7 @@ function fsuggest_post(App $a)
 				intval(local_user())
 			);
 			if (DBA::isResult($r)) {
-				$fsuggest_id = $r[0]['id'];
+				$fsuggest_id = $contact['id'];
 				q("UPDATE `fsuggest` SET `note` = '%s' WHERE `id` = %d AND `uid` = %d",
 					DBA::escape($note),
 					intval($fsuggest_id),
@@ -88,16 +84,11 @@ function fsuggest_content(App $a)
 
 	$contact_id = intval($a->argv[1]);
 
-	$r = q(
-		"SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-		intval($contact_id),
-		intval(local_user())
-	);
-	if (! DBA::isResult($r)) {
+	$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => local_user()]);
+	if (! DBA::isResult($contact)) {
 		notice(L10n::t('Contact not found.') . EOL);
 		return;
 	}
-	$contact = $r[0];
 
 	$o = '<h3>' . L10n::t('Suggest Friends') . '</h3>';
 

@@ -63,13 +63,13 @@ function xrd_init(App $a)
 	}
 
 	if ($mode == 'xml') {
-		xrd_xml($a, $addr, $alias, $profile_url, $user);
+		xrd_xml($addr, $alias, $profile_url, $user);
 	} else {
-		xrd_json($a, $addr, $alias, $profile_url, $user);
+		xrd_json($addr, $alias, $profile_url, $user);
 	}
 }
 
-function xrd_json($a, $uri, $alias, $profile_url, $r)
+function xrd_json($uri, $alias, $profile_url, $r)
 {
 	$salmon_key = Salmon::salmonKey($r['spubkey']);
 
@@ -100,7 +100,7 @@ function xrd_json($a, $uri, $alias, $profile_url, $r)
 	exit();
 }
 
-function xrd_xml($a, $uri, $alias, $profile_url, $r)
+function xrd_xml($uri, $alias, $profile_url, $r)
 {
 	$salmon_key = Salmon::salmonKey($r['spubkey']);
 

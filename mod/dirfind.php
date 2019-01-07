@@ -179,21 +179,18 @@ function dirfind_content(App $a, $prefix = "") {
 
 			// Add found profiles from the global directory to the local directory
 			Worker::add(PRIORITY_LOW, 'DiscoverPoCo', "dirsearch", urlencode($search));
-		} else {
+		} elseif (strlen(Config::get('system','directory'))) {
 			$p = (($pager->getPage() != 1) ? '&p=' . $pager->getPage() : '');
 
-			if (strlen(Config::get('system','directory'))) {
-				$x = Network::fetchUrl(get_server() . '/lsearch?f=' . $p .  '&search=' . urlencode($search));
-			}
-
+			$x = Network::fetchUrl(get_server() . '/lsearch?f=' . $p .  '&search=' . urlencode($search));
 			$j = json_decode($x);
-
 			$pager->setItemsPerPage($j->items_page);
 		}
 
 		if (!empty($j->results)) {
 			$id = 0;
 
+			$entries = [];
 			foreach ($j->results as $jj) {
 
 				$alt_text = "";

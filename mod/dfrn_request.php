@@ -36,9 +36,9 @@ function dfrn_request_init(App $a)
 {
 	if ($a->argc > 1) {
 		$which = $a->argv[1];
+		Profile::load($a, $which);
 	}
 
-	Profile::load($a, $which);
 	return;
 }
 
@@ -170,7 +170,7 @@ function dfrn_request_post(App $a)
 				$r = q("SELECT `id`, `network` FROM `contact` WHERE `uid` = %d AND `url` = '%s' AND `site-pubkey` = '%s' LIMIT 1",
 					intval(local_user()),
 					DBA::escape($dfrn_url),
-					$parms['key'] // this was already escaped
+					defaults($parms, 'key', '') // Potentially missing
 				);
 				if (DBA::isResult($r)) {
 					Group::addMember(User::getDefaultGroup(local_user(), $r[0]["network"]), $r[0]['id']);
@@ -189,7 +189,7 @@ function dfrn_request_post(App $a)
 					$dfrn_request = $contact_record['request'];
 				}
 
-				if (strlen($dfrn_request) && strlen($confirm_key)) {
+				if (!empty($dfrn_request) && strlen($confirm_key)) {
 					Network::fetchUrl($dfrn_request . '?confirm_key=' . $confirm_key);
 				}
 

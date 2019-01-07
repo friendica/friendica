@@ -1053,7 +1053,7 @@ function handle_tag(&$body, &$inform, &$str_tags, $profile_uid, $tag, $network =
 			 * Status.Net seems to require the numeric ID URL in a mention if the person isn't
 			 * subscribed to you. But the nickname URL is OK if they are. Grrr. We'll tag both.
 			 */
-			if (strlen($alias)) {
+			if (!empty($alias)) {
 				$newtag = '@[url=' . $alias . ']' . $newname . '[/url]';
 				if (!stripos($str_tags, '[url=' . $alias . ']')) {
 					if (strlen($str_tags)) {

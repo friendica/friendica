@@ -78,6 +78,7 @@ function match_content(App $a)
 
 			$id = 0;
 
+			$entries = [];
 			foreach ($j->results as $jj) {
 				$match_nurl = Strings::normaliseLink($jj->url);
 				$match = q(

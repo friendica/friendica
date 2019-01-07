@@ -79,10 +79,10 @@ function display_init(App $a)
 
 		// Is it an item with uid=0?
 		if (!DBA::isResult($item)) {
-			$item = Item::selectFirstForUser(local_user(), $fields, ['guid' => $a->argv[1], 'private' => [0, 2], 'uid' => 0]);
+			$item = Item::selectFirst($fields, ['guid' => $a->argv[1], 'private' => [0, 2], 'uid' => 0]);
 		}
 	} elseif (($a->argc == 3) && ($nick == 'feed-item')) {
-		$item = Item::selectFirstForUser(local_user(), $fields, ['id' => $a->argv[2], 'private' => [0, 2], 'uid' => 0]);
+		$item = Item::selectFirst($fields, ['id' => $a->argv[2], 'private' => [0, 2], 'uid' => 0]);
 	}
 
 	if (!DBA::isResult($item)) {
@@ -95,7 +95,7 @@ function display_init(App $a)
 	}
 
 	if ($item["id"] != $item["parent"]) {
-		$item = Item::selectFirstForUser(local_user(), $fields, ['id' => $item["parent"]]);
+		$item = Item::selectFirstForUser($item_user, $fields, ['id' => $item["parent"]]);
 	}
 
 	$profiledata = display_fetchauthor($a, $item);

@@ -77,6 +77,7 @@ function suggest_content(App $a)
 	}
 
 	$id = 0;
+	$entries = [];
 
 	foreach ($r as $rr) {
 
