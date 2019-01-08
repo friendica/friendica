@@ -33,8 +33,8 @@
  */
 
 use Friendica\App;
+use Friendica\Container;
 use Friendica\Util\ExAuth;
-use Friendica\Util\LoggerFactory;
 
 if (sizeof($_SERVER["argv"]) == 0) {
 	die();
@@ -53,9 +53,17 @@ chdir($directory);
 require_once "boot.php";
 require_once "include/dba.php";
 
-$logger = LoggerFactory::create('auth_ejabberd');
+$settings = require 'src/settings.php';
+$settings['settings']['channel'] = 'auth_ejabbered';
+$settings['settings']['logfile'] = 'ejabbered.log';
 
-$a = new App(dirname(__DIR__), $logger);
+$container = new Container($settings);
+
+require 'src/dependencies.php';
+
+// We assume that the index.php is called by a frontend process
+// The value is set to "true" by default in App
+$a = new App(dirname(__DIR__), $container, false);
 
 if ($a->getMode()->isNormal()) {
 	$oAuth = new ExAuth();

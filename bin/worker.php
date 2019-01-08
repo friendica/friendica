@@ -5,10 +5,10 @@
  * @brief Starts the background processing
  */
 use Friendica\App;
+use Friendica\Container;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Core\Update;
-use Friendica\Util\LoggerFactory;
 
 // Get options
 $shortopts = 'sn';
@@ -29,9 +29,16 @@ if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 
 require_once "boot.php";
 
-$logger = LoggerFactory::create('worker');
+$settings = require 'src/settings.php';
+$settings['settings']['channel'] = 'worker';
 
-$a = new App(dirname(__DIR__), $logger);
+$container = new Container($settings);
+
+require '/src/dependencies.php';
+
+// We assume that the index.php is called by a frontend process
+// The value is set to "true" by default in App
+$a = new App(dirname(__DIR__), $container);
 
 // Check the database structure and possibly fixes it
 Update::check(true);

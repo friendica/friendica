@@ -8,10 +8,9 @@ use Detection\MobileDetect;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Network\HTTPException\InternalServerErrorException;
-use Psr\Log\LoggerInterface;
+use Psr\Container\ContainerInterface;
 
 require_once 'boot.php';
 require_once 'include/text.php';
@@ -107,9 +106,9 @@ class App
 	private $isAjax;
 
 	/**
-	 * @var LoggerInterface The current logger of this App
+	 * @var ContainerInterface Contains the dependencies of this App
 	 */
-	private $logger;
+	private $container;
 
 	/**
 	 * Register a stylesheet file path to be included in the <head> tag of every page.
@@ -151,15 +150,15 @@ class App
 	/**
 	 * @brief App constructor.
 	 *
-	 * @param string           $basePath  Path to the app base folder
-	 * @param LoggerInterface  $logger    Logger of this application
-	 * @param bool             $isBackend Whether it is used for backend or frontend (Default true=backend)
+	 * @param string              $basePath  Path to the app base folder
+	 * @param ContainerInterface  $container dependencies of this application
+	 * @param bool                $isBackend Whether it is used for backend or frontend (Default true=backend)
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct($basePath, LoggerInterface $logger, $isBackend = true)
+	public function __construct($basePath, ContainerInterface $container, $isBackend = true)
 	{
-		$this->logger = $logger;
+		$this->container = $container;
 
 		if (!static::isDirectoryUsable($basePath, false)) {
 			throw new Exception('Basepath ' . $basePath . ' isn\'t usable.');
@@ -307,18 +306,19 @@ class App
 	}
 
 	/**
-	 * Returns the Logger of the Application
+	 * Returns the Dependencies of the Application
 	 *
-	 * @return LoggerInterface The Logger
-	 * @throws InternalServerErrorException when the logger isn't created
+	 * @return ContainerInterface The container with dependencies
+	 *
+	 * @throws InternalServerErrorException if the container isn't set
 	 */
-	public function getLogger()
+	public function getContainer()
 	{
-		if (empty($this->logger)) {
-			throw new InternalServerErrorException('Logger of the Application is not defined');
+		if (empty($this->container)) {
+			throw new InternalServerErrorException('Dependencies of the Application is not defined');
 		}
 
-		return $this->logger;
+		return $this->container;
 	}
 
 	/**
@@ -349,7 +349,7 @@ class App
 
 		$this->process_id = Core\System::processID('log');
 
-		Core\Logger::setLogger($this->logger);
+		Core\Logger::init($this->container);
 	}
 
 	/**

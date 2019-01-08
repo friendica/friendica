@@ -8,10 +8,10 @@
  */
 
 use Friendica\App;
+use Friendica\Container;
 use Friendica\Core\Config;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Util\LoggerFactory;
 
 // Get options
 $shortopts = 'f';
@@ -33,9 +33,16 @@ if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 require_once "boot.php";
 require_once "include/dba.php";
 
-$logger = LoggerFactory::create('daemon');
+$settings = require __DIR__ . '/../src/settings.php';
+$settings['settings']['channel'] = 'daemon';
 
-$a = new App(dirname(__DIR__), $logger);
+$container = new Container($settings);
+
+require __DIR__ . '/../src/dependencies.php';
+
+// We assume that the index.php is called by a frontend process
+// The value is set to "true" by default in App
+$a = new App(dirname(__DIR__), $container);
 
 if ($a->getMode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");

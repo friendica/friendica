@@ -5,8 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
-use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Util\LoggerFactory;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -66,39 +65,14 @@ class Logger extends BaseObject
 	private static $devLogger;
 
 	/**
-	 * Sets the default logging handler for Friendica.
-	 * @todo Can be combined with other handlers too if necessary, could be configurable.
+	 * Initialize the Logger based on the configuration
 	 *
-	 * @param LoggerInterface $logger The Logger instance of this Application
-	 *
-	 * @throws InternalServerErrorException if the logger factory is incompatible to this logger
+	 * @param ContainerInterface $container
 	 */
-	public static function setLogger($logger)
+	public static function init($container)
 	{
-		$debugging = Config::get('system', 'debugging');
-		$logfile = Config::get('system', 'logfile');
-		$loglevel = Config::get('system', 'loglevel');
-
-		if (!$debugging || !$logfile) {
-			return;
-		}
-
-		$loglevel = self::mapLegacyConfigDebugLevel((string)$loglevel);
-
-		LoggerFactory::addStreamHandler($logger, $logfile, $loglevel);
-
-		self::$logger = $logger;
-
-		$logfile = Config::get('system', 'dlogfile');
-
-		if (!$logfile) {
-			return;
-		}
-
-		$developIp = Config::get('system', 'dlogip');
-
-		self::$devLogger = LoggerFactory::createDev('develop', $developIp);
-		LoggerFactory::addStreamHandler(self::$devLogger, $logfile, LogLevel::DEBUG);
+		self::$logger = $container->get('logger');
+		self::$devLogger = $container->get('dlogger');
 	}
 
 	/**
@@ -109,7 +83,7 @@ class Logger extends BaseObject
 	 *
 	 * @return string the PSR-3 compliant level
 	 */
-	private static function mapLegacyConfigDebugLevel($level)
+	public static function mapLegacyConfigDebugLevel($level)
 	{
 		switch ($level) {
 			// legacy WARNING
@@ -345,7 +319,7 @@ class Logger extends BaseObject
      */
     public static function devLog($msg, $level = LogLevel::DEBUG)
     {
-		if (!isset(self::$logger)) {
+		if (!isset(self::$devLogger)) {
 			return;
 		}
 

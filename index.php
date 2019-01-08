@@ -5,14 +5,19 @@
  */
 
 use Friendica\App;
-use Friendica\Util\LoggerFactory;
+use Friendica\Container;
 
 require_once 'boot.php';
 
-$logger = LoggerFactory::create('index');
+$settings = require __DIR__ . '/src/settings.php';
+$settings['settings']['channel']  = 'index';
+
+$container = new Container($settings);
+
+require __DIR__ . '/src/dependencies.php';
 
 // We assume that the index.php is called by a frontend process
 // The value is set to "true" by default in App
-$a = new App(__DIR__, $logger, false);
+$a = new App(__DIR__, $container, false);
 
 $a->runFrontend();

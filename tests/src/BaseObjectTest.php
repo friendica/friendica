@@ -7,7 +7,7 @@ namespace Friendica\Test;
 
 use Friendica\App;
 use Friendica\BaseObject;
-use Friendica\Util\LoggerFactory;
+use Friendica\Container;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,9 +39,9 @@ class BaseObjectTest extends TestCase
 	 */
 	public function testSetApp()
 	{
-		$logger = $logger = LoggerFactory::create('test');
-		$app = new App(__DIR__ . '/../../', $logger);
-		LoggerFactory::enableTest($logger);
+		$container = new Container();
+		include __DIR__ . '/../../bin/dev/dependencies.php';
+		$app = new App(__DIR__ . '/../../', $container);
 		$this->assertNull($this->baseObject->setApp($app));
 		$this->assertEquals($app, $this->baseObject->getApp());
 	}
