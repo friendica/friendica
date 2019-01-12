@@ -4,8 +4,8 @@
 namespace Friendica\Core;
 
 use Friendica\Test\MockedTest;
-use Friendica\Test\Util\L10nMockTrait;
-use Friendica\Test\Util\VFSTrait;
+use Friendica\Test\Util\Mocks\L10nMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 
 /**
  * @runTestsInSeparateProcesses

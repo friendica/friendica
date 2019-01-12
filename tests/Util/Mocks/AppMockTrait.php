@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Test\Util;
+namespace Friendica\Test\Util\Mocks;
 
 use Friendica\App;
 use Friendica\BaseObject;

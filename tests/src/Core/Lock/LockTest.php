@@ -2,12 +2,15 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-use Friendica\BaseObject;
-use Friendica\Core\Config;
-use Friendica\Test\DatabaseTest;
+use Friendica\Test\MockedTest;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 
-abstract class LockTest extends DatabaseTest
+abstract class LockTest extends MockedTest
 {
+	use VFSTrait;
+	use AppMockTrait;
+
 	/**
 	 * @var \Friendica\Core\Lock\ILockDriver
 	 */
@@ -18,18 +21,14 @@ abstract class LockTest extends DatabaseTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->instance = $this->getInstance();
-		$this->instance->releaseAll();
 
 		// Reusable App object
-		$this->app = BaseObject::getApp();
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
+		$this->app->shouldReceive('getHostname')->andReturn('localhost');
 
-		// Default config
-		Config::set('config', 'hostname', 'localhost');
-		Config::set('system', 'throttle_limit_day', 100);
-		Config::set('system', 'throttle_limit_week', 100);
-		Config::set('system', 'throttle_limit_month', 100);
-		Config::set('system', 'theme', 'system_theme');
+		$this->instance = $this->getInstance();
+		$this->instance->releaseAll();
 	}
 
 	protected function tearDown()

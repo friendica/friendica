@@ -3,10 +3,10 @@
 namespace Friendica\Test\src\Core\Console;
 
 use Friendica\Core\Console\AutomaticInstallation;
-use Friendica\Test\Util\DBAMockTrait;
-use Friendica\Test\Util\DBStructureMockTrait;
-use Friendica\Test\Util\L10nMockTrait;
-use Friendica\Test\Util\RendererMockTrait;
+use Friendica\Test\Util\Mocks\DBAMockTrait;
+use Friendica\Test\Util\Mocks\DBStructureMockTrait;
+use Friendica\Test\Util\Mocks\L10nMockTrait;
+use Friendica\Test\Util\Mocks\RendererMockTrait;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 

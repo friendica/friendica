@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Test\Util;
+namespace Friendica\Test\Util\Mocks;
 
 use Mockery\MockInterface;
 
@@ -118,7 +118,7 @@ trait DBAMockTrait
 	/**
 	 * Mocking DBA::isResult()
 	 *
-	 * @param object $record The record to test
+	 * @param mixed $record The record to test
 	 * @param bool $return True, if the DB is connected, otherwise false
 	 * @param null|int $times How often the method will get used
 	 */
@@ -131,6 +131,27 @@ trait DBAMockTrait
 		$this->dbaMock
 			->shouldReceive('isResult')
 			->with($record)
+			->times($times)
+			->andReturn($return);
+	}
+
+	/**
+	 * Mocking DBA::delete()
+	 *
+	 * @param string $tableName The name of the table
+	 * @param array $where The Where Array (Default is [])
+	 * @param boolean $return The return value (default is true)
+	 * @param null|int $times How often the method will get used
+	 */
+	public function mockDelete($tableName, $where = [], $return = true, $times = null)
+	{
+		if (!isset($this->dbaMock)) {
+			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
+		}
+
+		$this->dbaMock
+			->shouldReceive('delete')
+			->with($tableName, $where)
 			->times($times)
 			->andReturn($return);
 	}
@@ -181,5 +202,18 @@ trait DBAMockTrait
 				->times($times)
 				->andReturn($return);
 		}
+	}
+
+	public function mockEscape($stmt, $times = null)
+	{
+		if (!isset($this->dbaMock)) {
+			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
+		}
+
+		$this->dbaMock
+			->shouldReceive('escape')
+			->times($times)
+			->with($stmt)
+			->andReturn($stmt);
 	}
 }

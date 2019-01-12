@@ -5,14 +5,16 @@
 
 namespace Friendica\Test;
 
-use Friendica\BaseObject;
-use Friendica\Core\Config;
-use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Network\HTTPException;
-use Friendica\Util\LoggerFactory;
-use Monolog\Handler\TestHandler;
+use Friendica\Test\Util\ApiTestDatasetTrait;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\ContactMockTrait;
+use Friendica\Test\Util\Mocks\DBAMockTrait;
+use Friendica\Test\Util\Mocks\UserMockTrait;
+use Friendica\Test\Util\Mocks\PConfigMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 
 require_once __DIR__ . '/../../include/api.php';
 
@@ -22,12 +24,15 @@ require_once __DIR__ . '/../../include/api.php';
  * Functions that use header() need to be tested in a separate process.
  * @see https://phpunit.de/manual/5.7/en/appendixes.annotations.html#appendixes.annotations.runTestsInSeparateProcesses
  */
-class ApiTest extends DatabaseTest
+class ApiTest extends MockedTest
 {
-	/**
-	 * @var TestHandler Can handle log-outputs
-	 */
-	protected $logOutput;
+	use AppMockTrait;
+	use ApiTestDatasetTrait;
+	use ContactMockTrait;
+	use DBAMockTrait;
+	use PConfigMockTrait;
+	use UserMockTrait;
+	use VFSTrait;
 
 	/**
 	 * Create variables used by tests.
@@ -36,8 +41,8 @@ class ApiTest extends DatabaseTest
 	{
 		parent::setUp();
 
-		$this->app = BaseObject::getApp();
-		$this->logOutput = LoggerFactory::enableTest($this->app->getLogger());
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
 
 		// User data that the test database is populated with
 		$this->selfUser = [
@@ -69,16 +74,25 @@ class ApiTest extends DatabaseTest
 			'uid' => $this->selfUser['id']
 		];
 
-		Config::set('system', 'url', 'http://localhost');
-		Config::set('system', 'hostname', 'localhost');
-		Config::set('system', 'worker_dont_fork', true);
+		$this->mockConfigGet('system', 'url', 'http://localhost');
+		$this->mockConfigGet('system', 'hostname', 'localhost');
+		$this->mockConfigGet('system', 'worker_dont_fork', true);
 
 		// Default config
-		Config::set('config', 'hostname', 'localhost');
-		Config::set('system', 'throttle_limit_day', 100);
-		Config::set('system', 'throttle_limit_week', 100);
-		Config::set('system', 'throttle_limit_month', 100);
-		Config::set('system', 'theme', 'system_theme');
+		$this->mockConfigGet('config', 'hostname', 'localhost');
+		$this->mockConfigGet('system', 'throttle_limit_day', 100);
+		$this->mockConfigGet('system', 'throttle_limit_week', 100);
+		$this->mockConfigGet('system', 'throttle_limit_month', 100);
+		$this->mockConfigGet('system', 'theme', 'system_theme');
+
+		/// @todo not needed anymore with new Logging 2019.03
+		$this->mockConfigGet('system', 'debugging', false);
+		$this->mockConfigGet('system', 'logfile', 'friendica.log');
+		$this->mockConfigGet('system', 'loglevel', '0');
+
+		// setup DB mock
+		$this->mockConnect();
+		$this->mockConnected();
 	}
 
 	/**
@@ -95,33 +109,19 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Assert that an user array contains expected keys.
 	 * @param array $user User array
+	 * @param array $data DataSource array
 	 * @return void
 	 */
-	private function assertSelfUser(array $user)
+	private function assertUser(array $user, array $data)
 	{
-		$this->assertEquals($this->selfUser['id'], $user['uid']);
-		$this->assertEquals($this->selfUser['id'], $user['cid']);
-		$this->assertEquals(1, $user['self']);
-		$this->assertEquals('DFRN', $user['location']);
-		$this->assertEquals($this->selfUser['name'], $user['name']);
-		$this->assertEquals($this->selfUser['nick'], $user['screen_name']);
-		$this->assertEquals('dfrn', $user['network']);
+		$this->assertEquals($data['uid'], $user['uid']);
+		$this->assertEquals($data['uid'], $user['cid']);
+		$this->assertEquals($data['self'], $user['self']);
+		$this->assertEquals($data['location'], $user['location']);
+		$this->assertEquals($data['name'], $user['name']);
+		$this->assertEquals($data['nick'], $user['screen_name']);
+		$this->assertEquals($data['network'], $user['network']);
 		$this->assertTrue($user['verified']);
-	}
-
-	/**
-	 * Assert that an user array contains expected keys.
-	 * @param array $user User array
-	 * @return void
-	 */
-	private function assertOtherUser(array $user)
-	{
-		$this->assertEquals($this->otherUser['id'], $user['id']);
-		$this->assertEquals($this->otherUser['id'], $user['id_str']);
-		$this->assertEquals(0, $user['self']);
-		$this->assertEquals($this->otherUser['name'], $user['name']);
-		$this->assertEquals($this->otherUser['nick'], $user['screen_name']);
-		$this->assertFalse($user['verified']);
 	}
 
 	/**
@@ -278,6 +278,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiLoginWithBadLogin()
 	{
+		$this->mockIsResult(\Mockery::any(), false);
 		$_SERVER['PHP_AUTH_USER'] = 'user@server';
 		api_login($this->app);
 	}
@@ -302,24 +303,43 @@ class ApiTest extends DatabaseTest
 
 	/**
 	 * Test the api_login() function with a correct login.
-	 * @return void
-	 * @runInSeparateProcess
+	 * @dataProvider dataDefaultUser
+	 * @@runInSeparateProcess
 	 */
-	public function testApiLoginWithCorrectLogin()
+	public function testApiLoginWithCorrectLogin($data)
 	{
-		$_SERVER['PHP_AUTH_USER'] = 'Test user';
-		$_SERVER['PHP_AUTH_PW'] = 'password';
+		$_SESSION['allow_api'] = false;
+
+		$this->mockAuthenticate($data['username'], $data['password'], $data['uid'], 1);
+		$this->mockSelectFirst('user', [], ['uid' => $data['uid']], $data, 1);
+		$this->mockIsResult($data, true, 1);
+
+		$this->mockPConfigGet($data['uid'], 'system', 'mobile_theme', $data['mobile_theme'], 1);
+
+		$this->mockIdentites($data['uid'], 1);
+
+		$this->mockSelectFirst('contact', [], ['uid' => $_SESSION['uid'], 'self' => true], [], 1);
+		$this->mockIsResult([], false, 1);
+
+		$_SERVER['PHP_AUTH_USER'] = $data['username'];
+		$_SERVER['PHP_AUTH_PW'] = $data['password'];
 		api_login($this->app);
+
+		$this->assertTrue($_SESSION['allow_api']);
 	}
 
 	/**
 	 * Test the api_login() function with a remote user.
-	 * @return void
 	 * @runInSeparateProcess
 	 * @expectedException Friendica\Network\HTTPException\UnauthorizedException
 	 */
 	public function testApiLoginWithRemoteUser()
 	{
+		$_SESSION['allow_api'] = false;
+
+		$this->mockAuthenticate('user', 'password', false, 1);
+		$this->mockIsResult(null, false, 1);
+
 		$_SERVER['REDIRECT_REMOTE_USER'] = '123456dXNlcjpwYXNzd29yZA==';
 		api_login($this->app);
 	}
@@ -369,6 +389,8 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_GET['callback'] = 'callback_name';
 
+		$this->mockConfigGet('system', 'profiler', false, 1);
+
 		$this->app->query_string = 'api_path';
 		$this->assertEquals(
 			'callback_name(["some_data"])',
@@ -391,8 +413,8 @@ class ApiTest extends DatabaseTest
 			}
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
-		Config::set('system', 'profiler', true);
-		Config::set('rendertime', 'callstack', true);
+		$this->mockConfigGet('system', 'profiler', true);
+		$this->mockConfigGet('rendertime', 'callstack', true);
 		$this->app->callstack = [
 			'database' => ['some_function' => 200],
 			'database_write' => ['some_function' => 200],
@@ -400,6 +422,14 @@ class ApiTest extends DatabaseTest
 			'cache_write' => ['some_function' => 200],
 			'network' => ['some_function' => 200]
 		];
+		$this->app->performance['start'] = (float)(microtime(true));
+
+		$this->app->performance["database"] = (float)(microtime(true));
+		$this->app->performance["database_write"] = (float)(microtime(true));
+		$this->app->performance["cache"] = (float)(microtime(true));
+		$this->app->performance["cache_write"] = (float)(microtime(true));
+		$this->app->performance["network"] = (float)(microtime(true));
+		$this->app->performance["file"] = (float)(microtime(true));
 
 		$this->app->query_string = 'api_path';
 		$this->assertEquals(
@@ -423,6 +453,8 @@ class ApiTest extends DatabaseTest
 			}
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
+
+		$this->mockConfigGet('system', 'profiler', false);
 
 		$this->app->query_string = 'api_path';
 		$this->assertEquals(
@@ -460,6 +492,8 @@ class ApiTest extends DatabaseTest
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
 
+		$this->mockConfigGet('system', 'profiler', false);
+
 		$this->app->query_string = 'api_path.json';
 		$this->assertEquals(
 			'["some_data"]',
@@ -482,6 +516,8 @@ class ApiTest extends DatabaseTest
 			}
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
+
+		$this->mockConfigGet('system', 'profiler', false);
 
 		$this->app->query_string = 'api_path.xml';
 		$this->assertEquals(
@@ -506,6 +542,8 @@ class ApiTest extends DatabaseTest
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
 
+		$this->mockConfigGet('system', 'profiler', false);
+
 		$this->app->query_string = 'api_path.rss';
 		$this->assertEquals(
 			'<?xml version="1.0" encoding="UTF-8"?>'."\n".
@@ -529,6 +567,8 @@ class ApiTest extends DatabaseTest
 			}
 		];
 		$_SERVER['REQUEST_METHOD'] = 'method';
+
+		$this->mockConfigGet('system', 'profiler', false);
 
 		$this->app->query_string = 'api_path.atom';
 		$this->assertEquals(
@@ -670,11 +710,25 @@ class ApiTest extends DatabaseTest
 
 	/**
 	 * Test the api_rss_extra() function without any user info.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiRssExtraWithoutUserInfo()
+	public function testApiRssExtraWithoutUserInfo($data)
 	{
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
+			, $data['uid']);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
 		$result = api_rss_extra($this->app, [], null);
 		$this->assertInternalType('array', $result['$user']);
 		$this->assertArrayHasKey('alternate', $result['$rss']);
@@ -692,6 +746,8 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiUniqueIdToNurl()
 	{
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $this->wrongUserId], null, 1);
+		$this->mockIsResult(null, false, 1);
 		$this->assertFalse(api_unique_id_to_nurl($this->wrongUserId));
 	}
 
@@ -701,66 +757,65 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiUniqueIdToNurlWithCorrectId()
 	{
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $this->otherUser['id']], ['nurl' => $this->otherUser['nurl']], 1);
+		$this->mockIsResult(['nurl' => $this->otherUser['nurl']], true, 1);
 		$this->assertEquals($this->otherUser['nurl'], api_unique_id_to_nurl($this->otherUser['id']));
 	}
 
 	/**
 	 * Test the api_get_user() function.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUser()
+	public function testApiGetUser($data)
 	{
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
+			, $data['uid']);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', '---', 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'nav_bg', $data['nav_bg'], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'link_color', $data['link_color'], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'background_color', $data['background_color'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
 		$user = api_get_user($this->app);
-		$this->assertSelfUser($user);
-		$this->assertEquals('708fa0', $user['profile_sidebar_fill_color']);
-		$this->assertEquals('6fdbe8', $user['profile_link_color']);
-		$this->assertEquals('ededed', $user['profile_background_color']);
+		$this->assertUser($user, $data);
+		$this->assertEquals(str_replace('#', '', $data['nav_bg']), $user['profile_sidebar_fill_color']);
+		$this->assertEquals(str_replace('#', '', $data['link_color']), $user['profile_link_color']);
+		$this->assertEquals(str_replace('#', '', $data['background_color']), $user['profile_background_color']);
 	}
 
 	/**
 	 * Test the api_get_user() function with a Frio schema.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithFrioSchema()
+	public function testApiGetUserWithFrioSchema($data)
 	{
-		PConfig::set($this->selfUser['id'], 'frio', 'schema', 'red');
-		$user = api_get_user($this->app);
-		$this->assertSelfUser($user);
-		$this->assertEquals('708fa0', $user['profile_sidebar_fill_color']);
-		$this->assertEquals('6fdbe8', $user['profile_link_color']);
-		$this->assertEquals('ededed', $user['profile_background_color']);
-	}
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
+			, $data['uid']);
 
-	/**
-	 * Test the api_get_user() function with a custom Frio schema.
-	 * @return void
-	 * @runInSeparateProcess
-	 */
-	public function testApiGetUserWithCustomFrioSchema()
-	{
-		$ret1 = PConfig::set($this->selfUser['id'], 'frio', 'schema', '---');
-		$ret2 = PConfig::set($this->selfUser['id'], 'frio', 'nav_bg', '#123456');
-		$ret3 = PConfig::set($this->selfUser['id'], 'frio', 'link_color', '#123456');
-		$ret4 = PConfig::set($this->selfUser['id'], 'frio', 'background_color', '#123456');
-		$user = api_get_user($this->app);
-		$this->assertSelfUser($user);
-		$this->assertEquals('123456', $user['profile_sidebar_fill_color']);
-		$this->assertEquals('123456', $user['profile_link_color']);
-		$this->assertEquals('123456', $user['profile_background_color']);
-	}
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
 
-	/**
-	 * Test the api_get_user() function with an empty Frio schema.
-	 * @return void
-	 * @runInSeparateProcess
-	 */
-	public function testApiGetUserWithEmptyFrioSchema()
-	{
-		PConfig::set($this->selfUser['id'], 'frio', 'schema', '---');
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
 		$user = api_get_user($this->app);
-		$this->assertSelfUser($user);
+		$this->assertUser($user, $data);
 		$this->assertEquals('708fa0', $user['profile_sidebar_fill_color']);
 		$this->assertEquals('6fdbe8', $user['profile_link_color']);
 		$this->assertEquals('ededed', $user['profile_background_color']);
@@ -769,136 +824,181 @@ class ApiTest extends DatabaseTest
 	/**
 	 * Test the api_get_user() function with an user that is not allowed to use the API.
 	 * @return void
+	 * @dataProvider dataDefaultUser
 	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithoutApiUser()
+	public function testApiGetUserWithoutApiUser($data)
 	{
-		$_SERVER['PHP_AUTH_USER'] = 'Test user';
-		$_SERVER['PHP_AUTH_PW'] = 'password';
+		$this->mockAuthenticate($data['username'], $data['password'], $data['uid'], 1);
+		$this->mockSelectFirst('user', [], ['uid' => $data['uid']], $data, 1);
+		$this->mockIsResult($data, true, 1);
+		$this->mockPConfigGet($data['uid'], 'system', 'mobile_theme', $data['mobile_theme']);
+		$this->mockIdentites($data['uid'], [$data]);
+		$this->mockSelectFirst('contact', [], ['uid' => $data['uid'], 'self' => true], ['id' => $data['uid']], 1);
+		$this->mockIsResult(['id' => $data['uid']], true, 1);
+
+		$_SERVER['PHP_AUTH_USER'] = $data['username'];
+		$_SERVER['PHP_AUTH_PW'] = $data['password'];
 		$_SESSION['allow_api'] = false;
 		$this->assertFalse(api_get_user($this->app));
 	}
 
 	/**
 	 * Test the api_get_user() function with an user ID in a GET parameter.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithGetId()
+	public function testApiGetUserWithGetId($data)
 	{
-		$_GET['user_id'] = $this->otherUser['id'];
-		$this->assertOtherUser(api_get_user($this->app));
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], ['nurl' => $data['url']], 1);
+		$this->mockIsResult(['nurl' => $data['url']], true, 1);
+		$this->mockEscape($data['url'], 1);
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '%s' AND `contact`.`uid`=" . $data['uid'], $data['url']);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
+		$_GET['user_id'] = $data['uid'];
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with a wrong user ID in a GET parameter.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 */
-	public function testApiGetUserWithWrongGetId()
+	public function testApiGetUserWithWrongGetId($data)
 	{
-		$_GET['user_id'] = $this->wrongUserId;
-		$this->assertOtherUser(api_get_user($this->app));
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], [], 1);
+		$this->mockIsResult([], false, 1);
+		$this->mockEscape(false, 1);
+
+		$_GET['user_id'] = $data['uid'];
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with an user name in a GET parameter.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithGetName()
+	public function testApiGetUserWithGetName($data)
 	{
-		$_GET['screen_name'] = $this->selfUser['nick'];
-		$this->assertSelfUser(api_get_user($this->app));
+		$this->mockEscape($data['nick'], 1);
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nick` = '%s' AND `contact`.`uid`=" . $data['uid'], $data['nick']);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
+		$_GET['screen_name'] = $data['nick'];
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with a profile URL in a GET parameter.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithGetUrl()
+	public function testApiGetUserWithGetUrl($data)
 	{
-		$_GET['profileurl'] = $this->selfUser['nurl'];
-		$this->assertSelfUser(api_get_user($this->app));
+		$_GET['profileurl'] = $data['url'];
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with an user ID in the API path.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithNumericCalledApi()
+	public function testApiGetUserWithNumericCalledApi($data)
 	{
 		global $called_api;
 		$called_api = ['api_path'];
-		$this->app->argv[1] = $this->otherUser['id'].'.json';
-		$this->assertOtherUser(api_get_user($this->app));
+		$this->app->argv[1] = $data['uid'].'.json';
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with the $called_api global variable.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithCalledApi()
+	public function testApiGetUserWithCalledApi($data)
 	{
 		global $called_api;
 		$called_api = ['api', 'api_path'];
-		$this->assertSelfUser(api_get_user($this->app));
+		$this->assertUser(api_get_user($this->app), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with a valid user.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithCorrectUser()
+	public function testApiGetUserWithCorrectUser($data)
 	{
-		$this->assertOtherUser(api_get_user($this->app, $this->otherUser['id']));
+		$this->assertOtherUser(api_get_user($this->app, $data['uid']));
 	}
 
 	/**
 	 * Test the api_get_user() function with a wrong user ID.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 */
-	public function testApiGetUserWithWrongUser()
+	public function testApiGetUserWithWrongUser($data)
 	{
-		$this->assertOtherUser(api_get_user($this->app, $this->wrongUserId));
+		$this->assertUser(api_get_user($this->app, $data['uid']), $data);
 	}
 
 	/**
 	 * Test the api_get_user() function with a 0 user ID.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiGetUserWithZeroUser()
+	public function testApiGetUserWithZeroUser($data)
 	{
-		$this->assertSelfUser(api_get_user($this->app, 0));
+		/// @todo special data constelation => new dataProvider
+		$this->assertUser(api_get_user($this->app, 0), $data);
 	}
 
 	/**
 	 * Test the api_item_get_user() function.
+	 * @dataProvider dataDefaultUser
 	 * @return void
-	 * @runInSeparateProcess
 	 */
-	public function testApiItemGetUser()
+	public function testApiItemGetUser($data)
 	{
 		$users = api_item_get_user($this->app, []);
-		$this->assertSelfUser($users[0]);
+		$this->assertUser($users[0], $data);
 	}
 
 	/**
 	 * Test the api_item_get_user() function with a different item parent.
+	 * @dataProvider dataDefaultUser
 	 * @return void
 	 */
-	public function testApiItemGetUserWithDifferentParent()
+	public function testApiItemGetUserWithDifferentParent($data)
 	{
 		$users = api_item_get_user($this->app, ['thr-parent' => 'item_parent', 'uri' => 'item_uri']);
-		$this->assertSelfUser($users[0]);
+		$this->assertUser($users[0], $data);
 		$this->assertEquals($users[0], $users[1]);
 	}
 
@@ -1250,8 +1350,7 @@ class ApiTest extends DatabaseTest
 				'type' => 'image/png'
 			]
 		];
-		$app = \get_app();
-		$app->argc = 2;
+		$this->app->argc = 2;
 
 		$result = api_media_upload();
 		$this->assertEquals('image/png', $result['media']['image']['image_type']);
@@ -1317,13 +1416,14 @@ class ApiTest extends DatabaseTest
 
 	/**
 	 * Test the api_users_search() function.
+	 * @dataProvider dataDefaultUser
 	 * @return void
 	 */
-	public function testApiUsersSearch()
+	public function testApiUsersSearch($data)
 	{
-		$_GET['q'] = 'othercontact';
+		$_GET['q'] = $data['nick'];
 		$result = api_users_search('json');
-		$this->assertOtherUser($result['users'][0]);
+		$this->assertUser($result['users'][0], $data);
 	}
 
 	/**
@@ -1359,13 +1459,14 @@ class ApiTest extends DatabaseTest
 
 	/**
 	 * Test the api_users_lookup() function with an user ID.
+	 * @dataProvider dataDefaultUser
 	 * @return void
 	 */
-	public function testApiUsersLookupWithUserId()
+	public function testApiUsersLookupWithUserId($data)
 	{
-		$_REQUEST['user_id'] = $this->otherUser['id'];
+		$_REQUEST['user_id'] = $data['uid'];
 		$result = api_users_lookup('json');
-		$this->assertOtherUser($result['users'][0]);
+		$this->assertOtherUser($result['users'][0], $data);
 	}
 
 	/**

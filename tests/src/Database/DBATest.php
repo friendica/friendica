@@ -1,32 +1,55 @@
 <?php
 namespace Friendica\Test\Database;
 
-use Friendica\BaseObject;
-use Friendica\Core\Config;
 use Friendica\Database\DBA;
-use Friendica\Test\DatabaseTest;
+use Friendica\Test\MockedTest;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
+use Mockery\MockInterface;
 
-class DBATest extends DatabaseTest
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
+class DBATest extends MockedTest
 {
+	use VFSTrait;
+	use AppMockTrait;
+
+	/**
+	 * @var \PDO|MockInterface The mocked PDO connection
+	 */
+	protected $mockConn;
+
 	public function setUp()
 	{
 		parent::setUp();
 
-		// Reusable App object
-		$this->app = BaseObject::getApp();
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
+		$this->app->shouldReceive('getConfigValue')
+			->withArgs(['system', 'db_callstack'])
+			->andReturn(false);
+		$this->app->shouldReceive('getConfigValue')
+			->withArgs(['system', 'db_log'])
+			->andReturn(false);
 
-		// Default config
-		Config::set('config', 'hostname', 'localhost');
-		Config::set('system', 'throttle_limit_day', 100);
-		Config::set('system', 'throttle_limit_week', 100);
-		Config::set('system', 'throttle_limit_month', 100);
-		Config::set('system', 'theme', 'system_theme');
+		DBA::connect(getenv('MYSQL_HOST'),
+			getenv('MYSQL_USERNAME'),
+			getenv('MYSQL_PASSWORD'),
+			getenv('MYSQL_DATABASE'));
+
+		if (!DBA::connected()) {
+			$this->markTestSkipped('Could not connect to the database.');
+		}
 	}
 
 	/**
 	 * @small
 	 */
-	public function testExists() {
+	public function testExists()
+	{
+		$this->markTestSkipped('Currently no db connection is possible');
 
 		$this->assertTrue(DBA::exists('config', []));
 		$this->assertFalse(DBA::exists('notable', []));

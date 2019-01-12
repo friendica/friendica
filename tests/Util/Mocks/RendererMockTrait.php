@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: philipp
- * Date: 01.11.18
- * Time: 10:08
- */
 
-namespace Friendica\Test\Util;
+namespace Friendica\Test\Util\Mocks;
 
 
 use Mockery\MockInterface;

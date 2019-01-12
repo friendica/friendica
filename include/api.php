@@ -640,13 +640,10 @@ function api_get_user(App $a, $contact_id = null)
 
 	Logger::info(API_LOG_PREFIX . 'found user {user}', ['module' => 'api', 'action' => 'get_user', 'user' => $user, 'extra_query' => $extra_query]);
 
+	$stmt = @vsprintf("SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 $extra_query", $user);
+
 	// user info
-	$uinfo = q(
-		"SELECT *, `contact`.`id` AS `cid` FROM `contact`
-			WHERE 1
-		$extra_query",
-		$user
-	);
+	$uinfo = DBA::p($stmt);
 
 	// Selecting the id by priority, friendica first
 	if (is_array($uinfo)) {
