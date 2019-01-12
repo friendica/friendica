@@ -3,12 +3,16 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\MemcachedCacheDriver;
-use Friendica\Core\Config;
-use Friendica\Test\DatabaseTest;
+use Friendica\Test\MockedTest;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 use Friendica\Util\DateTimeFormat;
 
-abstract class CacheTest extends DatabaseTest
+abstract class CacheTest extends MockedTest
 {
+	use VFSTrait;
+	use AppMockTrait;
+
 	/**
 	 * @var \Friendica\Core\Cache\ICacheDriver
 	 */
@@ -25,18 +29,13 @@ abstract class CacheTest extends DatabaseTest
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->instance = $this->getInstance();
 
 		// Reusable App object
-		$this->app = \Friendica\BaseObject::getApp();
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
+		$this->app->shouldReceive('getHostname')->andReturn('localhost');
 
-		// Default config
-		Config::set('config', 'hostname', 'localhost');
-		Config::set('system', 'throttle_limit_day', 100);
-		Config::set('system', 'throttle_limit_week', 100);
-		Config::set('system', 'throttle_limit_month', 100);
-		Config::set('system', 'theme', 'system_theme');
-
+		$this->instance = $this->getInstance();
 		$this->instance->clear(false);
 	}
 

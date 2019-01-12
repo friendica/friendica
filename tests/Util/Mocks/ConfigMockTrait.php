@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Test\Util;
+namespace Friendica\Test\Util\Mocks;
 
 use Mockery\MockInterface;
 
@@ -36,6 +36,33 @@ trait ConfigMockTrait
 	}
 
 	/**
+	 * Mocking setting a new config entry and expect at least getting it once
+	 *
+	 * @param string $family The family of the config double
+	 * @param string $key The key of the config double
+	 * @param mixed $value The value of the config double
+	 * @param null|int $times How often the Config will get used
+	 * @param bool $return Return value of the set (default is true)
+	 */
+	public function mockConfigSetGet($family, $key, $value, $times = null, $return = true)
+	{
+		if (!isset($this->configMock)) {
+			$this->configMock = \Mockery::mock('alias:Friendica\Core\Config');
+		}
+
+		$this->mockConfigGet($family, $key, false, 1);
+		if ($return) {
+			$this->mockConfigGet($family, $key, $value, 1);
+		}
+
+		$this->configMock
+			->shouldReceive('set')
+			->times($times)
+			->with($family, $key, $value)
+			->andReturn($return);
+	}
+
+	/**
 	 * Mocking setting a new config entry
 	 *
 	 * @param string $family The family of the config double
@@ -48,11 +75,6 @@ trait ConfigMockTrait
 	{
 		if (!isset($this->configMock)) {
 			$this->configMock = \Mockery::mock('alias:Friendica\Core\Config');
-		}
-
-		$this->mockConfigGet($family, $key, false, 1);
-		if ($return) {
-			$this->mockConfigGet($family, $key, $value, 1);
 		}
 
 		$this->configMock

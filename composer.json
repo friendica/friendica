@@ -93,7 +93,6 @@
 		]
 	},
 	"require-dev": {
-		"phpunit/dbunit": "^2.0",
 		"phpdocumentor/reflection-docblock": "^3.0.2",
 		"phpunit/php-token-stream": "^1.4.2",
 		"mikey179/vfsStream": "^1.6",

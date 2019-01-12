@@ -3,9 +3,9 @@
 namespace Friendica\Test\src\Core\Console;
 
 use Asika\SimpleConsole\Console;
-use Friendica\Test\Util\AppMockTrait;
 use Friendica\Test\Util\Intercept;
-use Friendica\Test\Util\VFSTrait;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 use PHPUnit\Framework\TestCase;
 
 abstract class ConsoleTest extends TestCase

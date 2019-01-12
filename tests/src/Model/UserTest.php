@@ -4,7 +4,7 @@ namespace Friendica\Test\Model;
 
 use Friendica\Model\User;
 use Friendica\Test\MockedTest;
-use Friendica\Test\Util\DBAMockTrait;
+use Friendica\Test\Util\Mocks\DBAMockTrait;
 
 /**
  * @runTestsInSeparateProcesses

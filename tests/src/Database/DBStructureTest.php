@@ -2,26 +2,42 @@
 
 namespace Friendica\Test\Database;
 
-use Friendica\BaseObject;
-use Friendica\Core\Config;
+use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\Test\DatabaseTest;
+use Friendica\Test\MockedTest;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 
-class DBStructureTest extends DatabaseTest
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
+class DBStructureTest extends MockedTest
 {
+	use VFSTrait;
+	use AppMockTrait;
+
 	public function setUp()
 	{
 		parent::setUp();
 
-		// Reusable App object
-		$this->app = BaseObject::getApp();
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
+		$this->app->shouldReceive('getConfigValue')
+			->withArgs(['system', 'db_callstack'])
+			->andReturn(false);
+		$this->app->shouldReceive('getConfigValue')
+			->withArgs(['system', 'db_log'])
+			->andReturn(false);
 
-		// Default config
-		Config::set('config', 'hostname', 'localhost');
-		Config::set('system', 'throttle_limit_day', 100);
-		Config::set('system', 'throttle_limit_week', 100);
-		Config::set('system', 'throttle_limit_month', 100);
-		Config::set('system', 'theme', 'system_theme');
+		DBA::connect(getenv('MYSQL_HOST'),
+			getenv('MYSQL_USERNAME'),
+			getenv('MYSQL_PASSWORD'),
+			getenv('MYSQL_DATABASE'));
+
+		if (!DBA::connected()) {
+			$this->markTestSkipped('Could not connect to the database.');
+		}
 	}
 
 	/**

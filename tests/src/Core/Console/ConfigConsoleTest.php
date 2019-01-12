@@ -32,7 +32,7 @@ class ConfigConsoleTest extends ConsoleTest
 	}
 
 	function testSetGetKeyValue() {
-		$this->mockConfigSet('config', 'test', 'now', 1);
+		$this->mockConfigSetGet('config', 'test', 'now', 1);
 		$console = new Config($this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
@@ -105,7 +105,7 @@ CONF;
 	}
 
 	function testUnableToSet() {
-		$this->mockConfigSet('test', 'it', 'now', 1, false);
+		$this->mockConfigSetGet('test', 'it', 'now', 1, false);
 		$console = new Config();
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
