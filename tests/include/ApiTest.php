@@ -15,6 +15,7 @@ use Friendica\Test\Util\Mocks\DBAMockTrait;
 use Friendica\Test\Util\Mocks\UserMockTrait;
 use Friendica\Test\Util\Mocks\PConfigMockTrait;
 use Friendica\Test\Util\Mocks\VFSTrait;
+use Friendica\Util\Strings;
 
 require_once __DIR__ . '/../../include/api.php';
 
@@ -918,6 +919,21 @@ class ApiTest extends MockedTest
 	 */
 	public function testApiGetUserWithGetUrl($data)
 	{
+		$url = Strings::normaliseLink($data['url']);
+		$this->mockEscape($url, 1);
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '%s' AND `contact`.`uid`=" . $data['uid'], $url);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
 		$_GET['profileurl'] = $data['url'];
 		$this->assertUser(api_get_user($this->app), $data);
 	}
@@ -929,6 +945,18 @@ class ApiTest extends MockedTest
 	 */
 	public function testApiGetUserWithNumericCalledApi($data)
 	{
+		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $data['uid'] . " AND `contact`.`self` ";
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockConstants();
+
 		global $called_api;
 		$called_api = ['api_path'];
 		$this->app->argv[1] = $data['uid'].'.json';
