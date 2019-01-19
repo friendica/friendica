@@ -3,14 +3,12 @@
 namespace Friendica\Test\Api;
 
 use Friendica\Test\ApiTest;
-use Friendica\Test\Util\Mocks\AuhtenticationMockTrait;
-use Friendica\Util\Strings;
 
 class ApiItemGetUserTest extends ApiTest
 {
 	/**
 	 * Test the api_item_get_user() function.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testApiItemGetUser($data)
@@ -35,7 +33,7 @@ class ApiItemGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_item_get_user() function with a different item parent.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testApiItemGetUserWithDifferentParent($data)

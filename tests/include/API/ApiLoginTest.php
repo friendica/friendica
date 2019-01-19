@@ -8,7 +8,7 @@ class ApiLoginTest extends ApiTest
 {
 	/**
 	 * Test the api_login() function with a correct login.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @@runInSeparateProcess
 	 */
 	public function testWithCorrectLogin($data)

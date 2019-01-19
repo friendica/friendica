@@ -12,7 +12,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testDefault($data)
@@ -46,7 +46,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a Frio schema.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithFrioSchema($data)
@@ -77,7 +77,7 @@ class ApiGetUserTest extends ApiTest
 	/**
 	 * Test the api_get_user() function with an user that is not allowed to use the API.
 	 * @return void
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @runInSeparateProcess
 	 */
 	public function testWithoutApiUser($data)
@@ -98,7 +98,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with an user ID in a GET parameter.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithGetId($data)
@@ -127,7 +127,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a wrong user ID in a GET parameter.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 */
@@ -143,7 +143,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with an user name in a GET parameter.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithGetName($data)
@@ -170,7 +170,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a profile URL in a GET parameter.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithGetUrl($data)
@@ -198,7 +198,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with an user ID in the API path.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithNumericCalledApi($data)
@@ -225,7 +225,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with the $called_api global variable.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithCalledApi($data)
@@ -251,7 +251,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a valid user.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithCorrectUser($data)
@@ -280,7 +280,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a wrong user ID.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 */
@@ -295,7 +295,7 @@ class ApiGetUserTest extends ApiTest
 
 	/**
 	 * Test the api_get_user() function with a 0 user ID.
-	 * @dataProvider dataApiUser
+	 * @dataProvider dataApiUserFull
 	 * @return void
 	 */
 	public function testWithZeroUser($data)

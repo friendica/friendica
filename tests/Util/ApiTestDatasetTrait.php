@@ -48,7 +48,7 @@ trait ApiTestDatasetTrait
 		],
 	];
 
-	public function dataApiUser()
+	public function dataApiUserFull()
 	{
 		return $this->data;
 	}
