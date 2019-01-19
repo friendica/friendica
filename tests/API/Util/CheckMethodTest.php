@@ -1,0 +1,34 @@
+<?php
+
+namespace Friendica\Test\API;
+
+class CheckMethodTest extends ApiTest
+{
+	/**
+	 * Test the api_check_method() function.
+	 * @return void
+	 */
+	public function testWithoutCorrectMethod()
+	{
+		$this->assertFalse(api_check_method('method'));
+	}
+
+	/**
+	 * Test the api_check_method() function with a correct method.
+	 * @return void
+	 */
+	public function testWithCorrectMethod()
+	{
+		$_SERVER['REQUEST_METHOD'] = 'method';
+		$this->assertTrue(api_check_method('method'));
+	}
+
+	/**
+	 * Test the api_check_method() function with a wildcard.
+	 * @return void
+	 */
+	public function testWithWildcard()
+	{
+		$this->assertTrue(api_check_method('*'));
+	}
+}

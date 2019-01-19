@@ -13,7 +13,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Authentication;
 use Friendica\Core\Config;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\NotificationsManager;
@@ -546,7 +545,6 @@ function api_get_user(App $a, $contact_id = null)
 
 	// Searching for contact URL
 	if (!is_null($contact_id) && (intval($contact_id) == 0)) {
-		/// @todo nupplaphil 20190119 normalizeLink of id 0 - why?
 		$user = DBA::escape(Strings::normaliseLink($contact_id));
 		$url = $user;
 		$extra_query = "AND `contact`.`nurl` = '%s' ";
@@ -2869,6 +2867,7 @@ function api_format_items_embeded_images($item, $text)
 
 /**
  * @brief return <a href='url'>name</a> as array
+ * @deprecated No usage found (nupplaphil 20190119)
  *
  * @param string $txt text
  * @return array
