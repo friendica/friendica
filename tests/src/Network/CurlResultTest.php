@@ -3,10 +3,28 @@
 namespace Friendica\Test\src\Network;
 
 use Friendica\Network\CurlResult;
-use PHPUnit\Framework\TestCase;
+use Friendica\Test\MockedTest;
+use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\VFSTrait;
 
-class CurlResultTest extends TestCase
+class CurlResultTest extends MockedTest
 {
+	use AppMockTrait;
+	use VFSTrait;
+
+	protected function setUp()
+	{
+		parent::setUp();
+
+		$this->setUpVfsDir();
+		$this->mockApp($this->root);
+
+		/// @todo not needed anymore with new Logging 2019.03
+		$this->mockConfigGet('system', 'debugging', false);
+		$this->mockConfigGet('system', 'logfile', 'friendica.log');
+		$this->mockConfigGet('system', 'loglevel', '0');
+	}
+
 	/**
 	 * @small
 	 */
