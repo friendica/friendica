@@ -7,8 +7,6 @@ namespace Friendica\Test;
 
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
-use Friendica\Network\HTTPException;
-use Friendica\Util\Strings;
 
 /**
  * Tests for the API functions.
@@ -206,74 +204,6 @@ class ApiTestLegacy extends ApiTest
 	}
 
 	/**
-	 * Test the api_reformat_xml() function.
-	 * @return void
-	 */
-	public function testApiReformatXml()
-	{
-		$item = true;
-		$key = '';
-		$this->assertTrue(api_reformat_xml($item, $key));
-		$this->assertEquals('true', $item);
-	}
-
-	/**
-	 * Test the api_reformat_xml() function with a statusnet_api key.
-	 * @return void
-	 */
-	public function testApiReformatXmlWithStatusnetKey()
-	{
-		$item = '';
-		$key = 'statusnet_api';
-		$this->assertTrue(api_reformat_xml($item, $key));
-		$this->assertEquals('statusnet:api', $key);
-	}
-
-	/**
-	 * Test the api_reformat_xml() function with a friendica_api key.
-	 * @return void
-	 */
-	public function testApiReformatXmlWithFriendicaKey()
-	{
-		$item = '';
-		$key = 'friendica_api';
-		$this->assertTrue(api_reformat_xml($item, $key));
-		$this->assertEquals('friendica:api', $key);
-	}
-
-	/**
-	 * Test the api_create_xml() function.
-	 * @return void
-	 */
-	public function testApiCreateXml()
-	{
-		$this->assertEquals(
-			'<?xml version="1.0"?>'."\n".
-			'<root_element xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" '.
-				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
-				'xmlns:georss="http://www.georss.org/georss">'."\n".
-				'  <data>some_data</data>'."\n".
-			'</root_element>'."\n",
-			api_create_xml(['data' => ['some_data']], 'root_element')
-		);
-	}
-
-	/**
-	 * Test the api_create_xml() function without any XML namespace.
-	 * @return void
-	 */
-	public function testApiCreateXmlWithoutNamespaces()
-	{
-		$this->assertEquals(
-			'<?xml version="1.0"?>'."\n".
-			'<ok>'."\n".
-				'  <data>some_data</data>'."\n".
-			'</ok>'."\n",
-			api_create_xml(['data' => ['some_data']], 'ok')
-		);
-	}
-
-	/**
 	 * Test the api_format_data() function.
 	 * @return void
 	 */
@@ -331,35 +261,6 @@ class ApiTestLegacy extends ApiTest
 	{
 		$_SESSION['authenticated'] = false;
 		api_account_verify_credentials('json');
-	}
-
-	/**
-	 * Test the requestdata() function.
-	 * @return void
-	 */
-	public function testRequestdata()
-	{
-		$this->assertNull(requestdata('variable_name'));
-	}
-
-	/**
-	 * Test the requestdata() function with a POST parameter.
-	 * @return void
-	 */
-	public function testRequestdataWithPost()
-	{
-		$_POST['variable_name'] = 'variable_value';
-		$this->assertEquals('variable_value', requestdata('variable_name'));
-	}
-
-	/**
-	 * Test the requestdata() function with a GET parameter.
-	 * @return void
-	 */
-	public function testRequestdataWithGet()
-	{
-		$_GET['variable_name'] = 'variable_value';
-		$this->assertEquals('variable_value', requestdata('variable_name'));
 	}
 
 	/**
