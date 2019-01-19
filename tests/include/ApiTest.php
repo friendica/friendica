@@ -784,7 +784,7 @@ class ApiTest extends MockedTest
 		$this->mockPConfigGet($data['uid'], 'frio', 'nav_bg', $data['nav_bg'], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'link_color', $data['link_color'], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'background_color', $data['background_color'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		$user = api_get_user($this->app);
@@ -812,7 +812,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		$user = api_get_user($this->app);
@@ -834,7 +834,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('user', [], ['uid' => $data['uid']], $data, 1);
 		$this->mockIsResult($data, true, 1);
 		$this->mockPConfigGet($data['uid'], 'system', 'mobile_theme', $data['mobile_theme']);
-		$this->mockIdentites($data['uid'], [$data]);
+		$this->mockIdentites($data['uid'], [$data], 1);
 		$this->mockSelectFirst('contact', [], ['uid' => $data['uid'], 'self' => true], ['id' => $data['uid']], 1);
 		$this->mockIsResult(['id' => $data['uid']], true, 1);
 
@@ -864,7 +864,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		$_GET['user_id'] = $data['uid'];
@@ -905,7 +905,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		$_GET['screen_name'] = $data['nick'];
@@ -931,7 +931,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		$_GET['profileurl'] = $data['url'];
@@ -954,7 +954,7 @@ class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
 		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
 		global $called_api;
@@ -970,6 +970,18 @@ class ApiTest extends MockedTest
 	 */
 	public function testApiGetUserWithCalledApi($data)
 	{
+		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $data['uid'] . " AND `contact`.`self` ";
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
+		$this->mockConstants();
+
 		global $called_api;
 		$called_api = ['api', 'api_path'];
 		$this->assertUser(api_get_user($this->app), $data);
@@ -982,7 +994,24 @@ class ApiTest extends MockedTest
 	 */
 	public function testApiGetUserWithCorrectUser($data)
 	{
-		$this->assertOtherUser(api_get_user($this->app, $data['uid']));
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], ['nurl' => $data['url']], 1);
+		$this->mockIsResult(['nurl' => $data['url']], true, 1);
+		$this->mockEscape($data['url'], 1);
+
+		$stmt = @vsprintf(
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '%s' AND `contact`.`uid`=" . $data['uid'], $data['url']);
+
+		$this->mockP($stmt, [$data], 1);
+		$this->mockIsResult([$data], true, 1);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
+		$this->mockConstants();
+
+		$this->assertUser(api_get_user($this->app, $data['uid']), $data);
 	}
 
 	/**
@@ -993,6 +1022,10 @@ class ApiTest extends MockedTest
 	 */
 	public function testApiGetUserWithWrongUser($data)
 	{
+		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], false, 1);
+		$this->mockIsResult(false, false, 1);
+		$this->mockEscape(false, 1);
+
 		$this->assertUser(api_get_user($this->app, $data['uid']), $data);
 	}
 
