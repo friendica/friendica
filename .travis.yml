@@ -17,8 +17,6 @@ install:
  - composer install
 before_script:
  - cp config/local-sample.config.php config/local.config.php
- - mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
- - mysql -utravis test < database.sql
  - echo "extension=redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
  - echo "extension=memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 after_success: bash <(curl -s https://codecov.io/bash)
