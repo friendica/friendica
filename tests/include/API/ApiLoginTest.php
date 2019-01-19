@@ -6,13 +6,6 @@ use Friendica\Test\ApiTest;
 
 class ApiLoginTest extends ApiTest
 {
-	public function setUp()
-	{
-		parent::setUp();
-
-		$_SESSION['allow_api'] = false;
-	}
-
 	/**
 	 * Test the api_login() function with a correct login.
 	 * @dataProvider dataApiUser

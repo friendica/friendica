@@ -65,7 +65,7 @@ abstract class ApiTest extends MockedTest
 	}
 
 	/**
-	 * Mocking the login because we already test api_login() in other unittests
+	 * Mocking the login because we already test api_login() in other UnitTests
 	 * @see ApiLoginTest
 	 *
 	 * @param $uid
