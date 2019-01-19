@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for the BaseObject class.
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class BaseObjectTest extends TestCase
 {
