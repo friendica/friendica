@@ -15,6 +15,12 @@ use Friendica\Test\Util\Mocks\VFSTrait;
 
 require_once __DIR__ . '/../../include/api.php';
 
+/**
+ * Tests for the API functions.
+ *
+ * Functions that use header() need to be tested in a separate process.
+ * @see https://phpunit.de/manual/5.7/en/appendixes.annotations.html#appendixes.annotations.runTestsInSeparateProcesses
+ */
 abstract class ApiTest extends MockedTest
 {
 	use AppMockTrait;
