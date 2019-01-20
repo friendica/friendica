@@ -2,6 +2,7 @@
 
 namespace Friendica\Test\API\Account;
 
+use Friendica\Test\API\ApiTest;
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
 
