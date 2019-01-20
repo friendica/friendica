@@ -5,10 +5,52 @@ namespace Friendica\Test\API;
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
 
-class ApiStatusesUpdate extends ApiTest
+class ApiStatusesUpdateTest extends ApiTest
 {
 	use ApiUserItemDatasetTrait;
 	use L10nMockTrait;
+
+	/**
+	 * Test the api_statuses_update() function.
+	 * @dataProvider dataApiUserItemFull
+	 * @return void
+	 */
+	public function testDefault($user, $item)
+	{
+		$this->mockL10nT();
+
+		$this->mockApiUser($user['uid']);
+		$this->mockApiGetUser($user, 2);
+
+		// Return something below 'throttle_limit_day'
+		$this->mockCount('thread', \Mockery::any(), 1, 3);
+
+		/// Mocking this select to return "false" forces the item_post() function to return 0
+		/// @todo we currently mock the complete item_post() without result, this is ugly and leads to wrong results
+		$this->mockSelectFirst('user', [], ['uid' => $user['uid']], false, 1);
+		$this->mockIsResult(false, false, 1);
+
+		$this->mockApiStatusShow($item, 1);
+
+		$_GET['status'] = 'Status content';
+		$_GET['in_reply_to_status_id'] = -1;
+		$_GET['lat'] = 48;
+		$_GET['long'] = 7;
+		$_FILES = [
+			'media' => [
+				'id' => 666,
+				'size' => 666,
+				'width' => 666,
+				'height' => 666,
+				'tmp_name' => $this->getTempImage(),
+				'name' => 'spacer.png',
+				'type' => 'image/png'
+			]
+		];
+
+		$result = api_statuses_update('json');
+		$this->assertStatus($result['status']);
+	}
 
 	/**
 	 * Test the api_statuses_update() function with an HTML status.
@@ -26,6 +68,7 @@ class ApiStatusesUpdate extends ApiTest
 		$this->mockCount('thread', \Mockery::any(), 1, 3);
 
 		/// Mocking this select to return "false" forces the item_post() function to return 0
+		/// @todo we currently mock the complete item_post() without result, this is ugly and leads to wrong results
 		$this->mockSelectFirst('user', [], ['uid' => $user['uid']], false, 1);
 		$this->mockIsResult(false, false, 1);
 
