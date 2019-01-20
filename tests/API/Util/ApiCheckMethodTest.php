@@ -1,8 +1,6 @@
 <?php
 
-namespace Friendica\Test\Api;
-
-use Friendica\Test\ApiTest;
+namespace Friendica\Test\API;
 
 class ApiCheckMethodTest extends ApiTest
 {
@@ -10,7 +8,7 @@ class ApiCheckMethodTest extends ApiTest
 	 * Test the api_check_method() function.
 	 * @return void
 	 */
-	public function testDefault()
+	public function testWithoutCorrectMethod()
 	{
 		$this->assertFalse(api_check_method('method'));
 	}

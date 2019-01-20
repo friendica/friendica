@@ -1,14 +1,15 @@
 <?php
 
-namespace Friendica\Test\Api;
+namespace Friendica\Test\API;
 
-use Friendica\Test\ApiTest;
+use Friendica\Test\Util\ApiUserDatasetTrait;
 use Friendica\Test\Util\Mocks\AuhtenticationMockTrait;
 use Friendica\Util\Strings;
 
 class ApiGetUserTest extends ApiTest
 {
 	use AuhtenticationMockTrait;
+	use ApiUserDatasetTrait;
 
 	/**
 	 * Test the api_get_user() function.
@@ -17,7 +18,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testDefault($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$stmt = @vsprintf(
 			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
@@ -51,7 +52,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithFrioSchema($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$stmt = @vsprintf(
 			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
@@ -103,7 +104,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithGetId($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], ['nurl' => $data['url']], 1);
 		$this->mockIsResult(['nurl' => $data['url']], true, 1);
@@ -130,6 +131,7 @@ class ApiGetUserTest extends ApiTest
 	 * @dataProvider dataApiUserFull
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @runInSeparateProcess
 	 */
 	public function testWithWrongGetId($data)
 	{
@@ -144,23 +146,25 @@ class ApiGetUserTest extends ApiTest
 	/**
 	 * Test the api_get_user() function with an user name in a GET parameter.
 	 * @dataProvider dataApiUserFull
+	 * @dataProvider dataApiOtherUserFull
 	 * @return void
 	 */
 	public function testWithGetName($data)
 	{
-		$this->mockLogin($data['uid']);
-
 		$this->mockEscape($data['nick'], 1);
 		$stmt = @vsprintf(
-			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nick` = '%s' AND `contact`.`uid`=" . $data['uid'], $data['nick']);
+			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nick` = '%s' ", $data['nick']);
 
 		$this->mockP($stmt, [$data], 1);
 		$this->mockIsResult([$data], true, 1);
 
-		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
-		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
-		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
-		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		if (isset($data['self']) && $data['self'] == 1) {
+			$this->mockSelectFirst('user', ['default-location'], ['uid' => false], ['default-location' => $data['default-location']], 1);
+			$this->mockSelectFirst('profile', ['about'], ['uid' => false, 'is-default' => true], ['about' => $data['about']], 1);
+			$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
+			$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
+		}
+
 		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
 		$this->mockConstants();
 
@@ -175,7 +179,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithGetUrl($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$url = Strings::normaliseLink($data['url']);
 		$this->mockEscape($url, 1);
@@ -203,7 +207,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithNumericCalledApi($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $data['uid'] . " AND `contact`.`self` ";
 
@@ -230,7 +234,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithCalledApi($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $data['uid'] . " AND `contact`.`self` ";
 
@@ -256,7 +260,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithCorrectUser($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$this->mockSelectFirst('contact', ['nurl'], ['id' => $data['uid']], ['nurl' => $data['url']], 1);
 		$this->mockIsResult(['nurl' => $data['url']], true, 1);
@@ -300,7 +304,7 @@ class ApiGetUserTest extends ApiTest
 	 */
 	public function testWithZeroUser($data)
 	{
-		$this->mockLogin($data['uid']);
+		$this->mockApiUser($data['uid']);
 
 		$this->mockEscape(false, 1);
 

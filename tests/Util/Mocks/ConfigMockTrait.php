@@ -36,6 +36,28 @@ trait ConfigMockTrait
 	}
 
 	/**
+	 * Mocking a config setting
+	 *
+	 * @param string $family The family of the config double
+	 * @param string $key The key of the config double
+	 * @param mixed $value The value of the config double
+	 * @param mixed $default The default value of the config double
+	 * @param null|int $times How often the Config will get used
+	 */
+	public function mockConfigGetDefault($family, $key, $value, $default, $times = null)
+	{
+		if (!isset($this->configMock)) {
+			$this->configMock = \Mockery::mock('alias:Friendica\Core\Config');
+		}
+
+		$this->configMock
+			->shouldReceive('get')
+			->times($times)
+			->with($family, $key, $default)
+			->andReturn($value);
+	}
+
+	/**
 	 * Mocking setting a new config entry and expect at least getting it once
 	 *
 	 * @param string $family The family of the config double

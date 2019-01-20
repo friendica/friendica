@@ -3,7 +3,7 @@
  * ApiTest class.
  */
 
-namespace Friendica\Test;
+namespace Friendica\Test\API;
 
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -23,135 +23,6 @@ class ApiTestLegacy extends ApiTest
 	public function testApiDate()
 	{
 		$this->assertEquals('Wed Oct 10 00:00:00 +0000 1990', api_date('1990-10-10'));
-	}
-
-	/**
-	 * Test the api_register_func() function.
-	 * @return void
-	 */
-	public function testApiRegisterFunc()
-	{
-		global $API;
-		$this->assertNull(
-			api_register_func(
-				'api_path',
-				function () {
-				},
-				true,
-				'method'
-			)
-		);
-		$this->assertTrue($API['api_path']['auth']);
-		$this->assertEquals('method', $API['api_path']['method']);
-		$this->assertTrue(is_callable($API['api_path']['func']));
-	}
-
-	/**
-	 * Test the api_walk_recursive() function.
-	 * @return void
-	 */
-	public function testApiWalkRecursive()
-	{
-		$array = ['item1'];
-		$this->assertEquals(
-			$array,
-			api_walk_recursive(
-				$array,
-				function () {
-					// Should we test this with a callback that actually does something?
-					return true;
-				}
-			)
-		);
-	}
-
-	/**
-	 * Test the api_walk_recursive() function with an array.
-	 * @return void
-	 */
-	public function testApiWalkRecursiveWithArray()
-	{
-		$array = [['item1'], ['item2']];
-		$this->assertEquals(
-			$array,
-			api_walk_recursive(
-				$array,
-				function () {
-					// Should we test this with a callback that actually does something?
-					return true;
-				}
-			)
-		);
-	}
-
-	/**
-	 * Test the api_account_verify_credentials() function.
-	 * @dataProvider dataApiUser
-	 * @return void
-	 */
-	public function testApiAccountVerifyCredentials($data)
-	{
-		$this->mockLogin($data['uid']);
-
-		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $data['uid'] . " AND `contact`.`self` ";
-
-		$this->mockP($stmt, [$data], 1);
-		$this->mockIsResult([$data], true, 1);
-
-		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
-		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
-		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
-		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true, null, null, null, 2);
-		$this->mockConstants();
-
-		$this->assertArrayHasKey('user', api_account_verify_credentials('json'));
-	}
-
-	/**
-	 * Test the api_account_verify_credentials() function without an authenticated user.
-	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
-	 */
-	public function testApiAccountVerifyCredentialsWithoutAuthenticatedUser()
-	{
-		api_account_verify_credentials('json');
-	}
-
-	/**
-	 * Test the api_statuses_mediap() function.
-	 * @return void
-	 */
-	public function testApiStatusesMediap()
-	{
-		$this->app->argc = 2;
-
-		$_FILES = [
-			'media' => [
-				'id' => 666,
-				'size' => 666,
-				'width' => 666,
-				'height' => 666,
-				'tmp_name' => $this->getTempImage(),
-				'name' => 'spacer.png',
-				'type' => 'image/png'
-			]
-		];
-		$_GET['status'] = '<b>Status content</b>';
-
-		$result = api_statuses_mediap('json');
-		$this->assertStatus($result['status']);
-	}
-
-	/**
-	 * Test the api_statuses_mediap() function without an authenticated user.
-	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
-	 */
-	public function testApiStatusesMediapWithoutAuthenticatedUser()
-	{
-		$_SESSION['authenticated'] = false;
-		api_statuses_mediap('json');
 	}
 
 	/**

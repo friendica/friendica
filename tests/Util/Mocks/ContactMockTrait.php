@@ -9,6 +9,8 @@ class ContactStub
 	const FOLLOWER = 1;
 	const SHARING  = 2;
 	const FRIEND   = 3;
+
+	const PAGE_COMMUNITY = 2;
 }
 
 trait ContactMockTrait

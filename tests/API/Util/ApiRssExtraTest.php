@@ -1,11 +1,13 @@
 <?php
 
-namespace Friendica\Test\Api;
+namespace Friendica\Test\API;
 
-use Friendica\Test\ApiTest;
+use Friendica\Test\Util\ApiUserDatasetTrait;
 
 class ApiRssExtraTest extends ApiTest
 {
+	use ApiUserDatasetTrait;
+
 	/**
 	 * Test the api_rss_extra() function.
 	 * @return void
@@ -31,21 +33,8 @@ class ApiRssExtraTest extends ApiTest
 	 */
 	public function testWithoutUserInfo($data)
 	{
-		$this->mockLogin($data['uid']);
-
-		$stmt = @vsprintf(
-			"SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = %d AND `contact`.`self` "
-			, $data['uid']);
-
-		$this->mockP($stmt, [$data], 1);
-		$this->mockIsResult([$data], true, 1);
-
-		$this->mockSelectFirst('user', ['default-location'], ['uid' => $data['uid']], ['default-location' => $data['default-location']], 1);
-		$this->mockSelectFirst('profile', ['about'], ['uid' => $data['uid'], 'is-default' => true], ['about' => $data['about']], 1);
-		$this->mockSelectFirst('user', ['theme'], ['uid' => $data['uid']], ['theme' => $data['theme']], 1);
-		$this->mockPConfigGet($data['uid'], 'frio', 'schema', $data['schema'], 1);
-		$this->mockGetIdForURL($data['url'], 0, true);
-		$this->mockConstants();
+		$this->mockApiUser($data['uid']);
+		$this->mockApiGetUser($data);
 
 		$result = api_rss_extra($this->app, [], null);
 		$this->assertInternalType('array', $result['$user']);

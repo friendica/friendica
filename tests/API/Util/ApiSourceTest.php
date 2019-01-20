@@ -1,8 +1,6 @@
 <?php
 
-namespace Friendica\Test\Api;
-
-use Friendica\Test\ApiTest;
+namespace Friendica\Test\API;
 
 class ApiSourceTest extends ApiTest
 {

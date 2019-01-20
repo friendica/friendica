@@ -4,6 +4,11 @@ namespace Friendica\Test\Util\Mocks;
 
 use Mockery\MockInterface;
 
+class DBAStub
+{
+	public static $connected = true;
+}
+
 /**
  * Trait to mock the DBA connection status
  */
@@ -15,6 +20,16 @@ trait DBAMockTrait
 	private $dbaMock;
 
 	/**
+	 * Check if the mock interface
+	 */
+	private function checkMock()
+	{
+		if (!isset($this->dbaMock)) {
+			$this->dbaMock = \Mockery::namedMock('Friendica\Database\DBA', 'Friendica\Test\Util\Mocks\DBAStub');
+		}
+	}
+
+	/**
 	 * Mocking DBA::connect()
 	 *
 	 * @param bool $return True, if the connect was successful, otherwise false
@@ -22,9 +37,7 @@ trait DBAMockTrait
 	 */
 	public function mockConnect($return = true, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('connect')
@@ -40,9 +53,7 @@ trait DBAMockTrait
 	 */
 	public function mockConnected($return = true, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('connected')
@@ -59,9 +70,7 @@ trait DBAMockTrait
 	 */
 	public function mockFetchFirst($arg, $return = true, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('fetchFirst')
@@ -82,9 +91,7 @@ trait DBAMockTrait
 	 */
 	public function mockSelect($tableName, $select = [], $where = [], $return = null, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('select')
@@ -104,9 +111,7 @@ trait DBAMockTrait
 	 */
 	public function mockSelectFirst($tableName, $select = [], $where = [], $return = [], $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('selectFirst')
@@ -124,9 +129,7 @@ trait DBAMockTrait
 	 */
 	public function mockIsResult($record, $return = true, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('isResult')
@@ -145,9 +148,7 @@ trait DBAMockTrait
 	 */
 	public function mockDelete($tableName, $where = [], $return = true, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('delete')
@@ -165,9 +166,7 @@ trait DBAMockTrait
 	 */
 	public function mockToArray($record = null, $return = [], $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('toArray')
@@ -186,9 +185,7 @@ trait DBAMockTrait
 	 */
 	public function mockP($sql = null, $return = null, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		if (!isset($sql)) {
 			$this->dbaMock
@@ -206,14 +203,45 @@ trait DBAMockTrait
 
 	public function mockEscape($stmt, $times = null)
 	{
-		if (!isset($this->dbaMock)) {
-			$this->dbaMock = \Mockery::mock('alias:Friendica\Database\DBA');
-		}
+		$this->checkMock();
 
 		$this->dbaMock
 			->shouldReceive('escape')
 			->times($times)
 			->with($stmt)
 			->andReturn($stmt);
+	}
+
+	public function mockCleanQuery($stmt, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('cleanQuery')
+			->times($times)
+			->with($stmt)
+			->andReturn($stmt);
+	}
+
+	public function mockAnyValueFallback($stmt, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('anyValueFallback')
+			->times($times)
+			->with($stmt)
+			->andReturn($stmt);
+	}
+
+	public function mockColumnCount($stmt, $columns = 0, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('columnCount')
+			->times($times)
+			->with($stmt)
+			->andReturn($columns);
 	}
 }

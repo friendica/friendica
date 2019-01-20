@@ -1,9 +1,8 @@
 <?php
 
-namespace Friendica\Test\Api;
+namespace Friendica\Test\API;
 
 use Friendica\Network\HTTPException;
-use Friendica\Test\ApiTest;
 
 class ApiErrorTest extends ApiTest
 {

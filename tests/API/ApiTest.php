@@ -1,13 +1,13 @@
 <?php
 
-namespace Friendica\Test;
+namespace Friendica\Test\API;
 
-use Friendica\Test\Util\ApiTestDatasetTrait;
+use Friendica\Test\MockedTest;
 use Friendica\Test\Util\Mocks\AppMockTrait;
 use Friendica\Test\Util\Mocks\ContactMockTrait;
 use Friendica\Test\Util\Mocks\DBAMockTrait;
-use Friendica\Test\Util\Mocks\UserMockTrait;
 use Friendica\Test\Util\Mocks\PConfigMockTrait;
+use Friendica\Test\Util\Mocks\UserMockTrait;
 use Friendica\Test\Util\Mocks\VFSTrait;
 
 require_once __DIR__ . '/../../include/api.php';
@@ -15,7 +15,6 @@ require_once __DIR__ . '/../../include/api.php';
 abstract class ApiTest extends MockedTest
 {
 	use AppMockTrait;
-	use ApiTestDatasetTrait;
 	use ContactMockTrait;
 	use DBAMockTrait;
 	use PConfigMockTrait;
@@ -65,18 +64,51 @@ abstract class ApiTest extends MockedTest
 	}
 
 	/**
-	 * Mocking the login because we already test api_login() in other UnitTests
+	 * Mocking the login because we already test api_user() in other UnitTests
 	 * @see ApiLoginTest
 	 *
 	 * @param $uid
 	 */
-	protected function mockLogin($uid)
+	protected function mockApiUser($uid = 1)
 	{
 		$_SESSION = [
 			'allow_api' => true,
 			'authenticated' => true,
 			'uid' => $uid,
 		];
+	}
+
+	/**
+	 * Mocking the "default" way to get user data per api_get_user()
+	 * We test this function already in other tests
+	 * @see ApiGetUserTest
+	 *
+	 * @param array $user
+	 * @param int $times
+	 */
+	protected function mockApiGetUser($user, $times = 1)
+	{
+		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $user['uid'] . " AND `contact`.`self` ";
+
+		$this->mockP($stmt, [$user], $times);
+		$this->mockIsResult([$user], true, $times);
+
+		$this->mockSelectFirst('user', ['default-location'], ['uid' => $user['uid']], ['default-location' => $user['default-location']], $times);
+		$this->mockSelectFirst('profile', ['about'], ['uid' => $user['uid'], 'is-default' => true], ['about' => $user['about']], $times);
+		$this->mockSelectFirst('user', ['theme'], ['uid' => $user['uid']], ['theme' => $user['theme']], $times);
+		$this->mockPConfigGet($user['uid'], 'frio', 'schema', $user['schema'], $times);
+		$this->mockGetIdForURL($user['url'], 0, true, null, null, null, $times * 2);
+		$this->mockConstants();
+	}
+
+	protected function mockDBAQ($sql, $return, $args = [], $times = 1)
+	{
+		$this->mockCleanQuery($sql, $times);
+		$this->mockAnyValueFallback($sql, $times);
+		$stmt = @vsprintf($sql, $args);
+		$this->mockP($stmt, $return, $times);
+		$this->mockColumnCount($return, 1, $times);
+		$this->mockToArray($return, $return, 1);
 	}
 
 	/**

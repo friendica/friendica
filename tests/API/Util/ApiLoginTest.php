@@ -1,11 +1,13 @@
 <?php
 
-namespace Friendica\Test\Api;
+namespace Friendica\Test\API;
 
-use Friendica\Test\ApiTest;
+use Friendica\Test\Util\ApiUserDatasetTrait;
 
 class ApiLoginTest extends ApiTest
 {
+	use ApiUserDatasetTrait;
+
 	/**
 	 * Test the api_login() function with a correct login.
 	 * @dataProvider dataApiUserFull
