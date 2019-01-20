@@ -26,35 +26,6 @@ class ApiTestLegacy extends ApiTest
 	}
 
 	/**
-	 * Test the api_status_show() function.
-	 * @return void
-	 */
-	public function testApiStatusShow()
-	{
-		$result = api_status_show('json');
-		$this->assertStatus($result['status']);
-	}
-
-	/**
-	 * Test the api_status_show() function with an XML result.
-	 * @return void
-	 */
-	public function testApiStatusShowWithXml()
-	{
-		$result = api_status_show('xml');
-		$this->assertXml($result, 'statuses');
-	}
-
-	/**
-	 * Test the api_status_show() function with a raw result.
-	 * @return void
-	 */
-	public function testApiStatusShowWithRaw()
-	{
-		$this->assertStatus(api_status_show('raw'));
-	}
-
-	/**
 	 * Test the api_users_show() function.
 	 * @return void
 	 */
