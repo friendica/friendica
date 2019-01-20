@@ -21,7 +21,7 @@ trait DBStructureMockTrait
 	 * @param bool $return True, if the connect was successful, otherwise false
 	 * @param null|int $times How often the method will get used
 	 */
-	public function mockUpdate($args = [], $return = true, $times = null)
+	public function mockDBStructureUpdate($args = [], $return = true, $times = null)
 	{
 		if (!isset($this->dbStructure)) {
 			$this->dbStructure = \Mockery::mock('alias:Friendica\Database\DBStructure');

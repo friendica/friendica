@@ -2,15 +2,23 @@
 
 namespace Friendica\Test\API;
 
+use Friendica\Test\Util\ApiUserItemDatasetTrait;
+use Friendica\Test\Util\Mocks\ItemMockTrait;
+
 class FormatItemsActivitiesTest extends ApiTest
 {
+	use ApiUserItemDatasetTrait;
+	use ItemMockTrait;
+
 	/**
 	 * Test the api_format_items_activities() function.
+	 * @dataProvider dataApiUserItemFull
 	 * @return void
 	 */
-	public function testDefault()
+	public function testDefault($user, $item)
 	{
-		$item = ['uid' => 0, 'uri' => ''];
+		$this->mockSelectForUser($item['uid'], ['author-id', 'verb'], ['uid' => $item['uid'], 'thr-parent' => $item['uri']], ['author-id' => $item['author-id'], 'verb' => $item['verb']]);
+
 		$result = api_format_items_activities($item);
 		$this->assertArrayHasKey('like', $result);
 		$this->assertArrayHasKey('dislike', $result);
