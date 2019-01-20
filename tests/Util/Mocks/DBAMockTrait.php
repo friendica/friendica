@@ -79,7 +79,6 @@ trait DBAMockTrait
 			->andReturn($return);
 	}
 
-
 	/**
 	 * Mocking DBA::select()
 	 *
@@ -153,6 +152,54 @@ trait DBAMockTrait
 		$this->dbaMock
 			->shouldReceive('delete')
 			->with($tableName, $where)
+			->times($times)
+			->andReturn($return);
+	}
+
+	/**
+	 * Mocking DBA::update()
+	 *
+	 * @param string $expTableName The name of the table
+	 * @param array $expFields The Fields Array
+	 * @param array $expCondition The Condition Array
+	 * @param array $expOld_fields The Old Fieldnames (Default is [])
+	 * @param bool $return true if the update was successful
+	 * @param null|int $times How often the method will get used
+	 */
+	public function mockUpdate($expTableName, $expFields, $expCondition, $expOld_fields = [], $return = true, $times = null)
+	{
+		$this->checkMock();
+
+		$closure = function ($tableName, $fields, $condition, $old_fields = []) use ($expTableName, $expFields, $expCondition, $expOld_fields) {
+			return
+				$tableName == $expTableName &&
+				$fields == $expFields &&
+				$condition == $expCondition &&
+				$old_fields == $expOld_fields;
+		};
+
+		$this->dbaMock
+			->shouldReceive('update')
+			->withArgs($closure)
+			->times($times)
+			->andReturn($return);
+	}
+
+	/**
+	 * Mocking DBA::exists()
+	 *
+	 * @param string $expTableName The name of the table
+	 * @param array $expCondition The Condition Array
+	 * @param bool $return true if the update was successful
+	 * @param null|int $times How often the method will get used
+	 */
+	public function mockExists($expTableName, $expCondition, $return = true, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('exists')
+			->with($expTableName, $expCondition)
 			->times($times)
 			->andReturn($return);
 	}

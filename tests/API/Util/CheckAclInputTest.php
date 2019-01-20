@@ -8,8 +8,11 @@ class CheckAclInputTest extends ApiTest
 	 * Test the check_acl_input() function.
 	 * @return void
 	 */
-	public function testDefault()
+	public function testWithWrongAclString()
 	{
+		$this->mockApiUser(42);
+		$this->mockExists('contact', ['id' => 'aclstring', 'uid' => 42], false, 1);
+
 		$result = check_acl_input('<aclstring>');
 		// Where does this result come from?
 		$this->assertEquals(1, $result);

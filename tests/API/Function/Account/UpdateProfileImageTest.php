@@ -11,8 +11,9 @@ class UpdateProfileImageTest extends ApiTest
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
 	 */
-	public function testDefault()
+	public function testWithoutImage()
 	{
+		$this->mockApiUser();
 		api_account_update_profile_image('json');
 	}
 
