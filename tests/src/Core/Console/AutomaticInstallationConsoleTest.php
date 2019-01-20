@@ -181,7 +181,7 @@ FIN;
 		$this->mockConnect(true, 1);
 		$this->mockConnected(true, 1);
 		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([false, true, true], null, 1);
+		$this->mockDBStructureUpdate([false, true, true], null, 1);
 
 		$config = <<<CONF
 <?php
@@ -241,7 +241,7 @@ CONF;
 		$this->mockConnect(true, 1);
 		$this->mockConnected(true, 1);
 		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([false, true, true], null, 1);
+		$this->mockDBStructureUpdate([false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
 		$this->mockReplaceMacros('testTemplate', $this->createArgumentsForMacro(true), '', 1);
@@ -267,7 +267,7 @@ CONF;
 		$this->mockConnect(true, 1);
 		$this->mockConnected(true, 1);
 		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([false, true, true], null, 1);
+		$this->mockDBStructureUpdate([false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
 		$this->mockReplaceMacros('testTemplate', $this->createArgumentsForMacro(false), '', 1);
@@ -292,7 +292,7 @@ CONF;
 		$this->mockConnect(true, 1);
 		$this->mockConnected(true, 1);
 		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([false, true, true], null, 1);
+		$this->mockDBStructureUpdate([false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
 		$this->mockReplaceMacros('testTemplate', $this->createArgumentsForMacro(true), '', 1);
