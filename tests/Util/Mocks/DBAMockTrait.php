@@ -244,4 +244,15 @@ trait DBAMockTrait
 			->with($stmt)
 			->andReturn($columns);
 	}
+
+	public function mockCount($table, $condition = [], $return = 0, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('count')
+			->with($table, $condition)
+			->times($times)
+			->andReturn($return);
+	}
 }

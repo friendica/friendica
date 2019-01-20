@@ -52,56 +52,6 @@ class ApiTestLegacy extends ApiTest
 	}
 
 	/**
-	 * Test the api_statuses_update() function with an HTML status.
-	 * @return void
-	 */
-	public function testApiStatusesUpdateWithHtml()
-	{
-		$_GET['htmlstatus'] = '<b>Status content</b>';
-
-		$result = api_statuses_update('json');
-		$this->assertStatus($result['status']);
-	}
-
-	/**
-	 * Test the api_statuses_update() function without an authenticated user.
-	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
-	 */
-	public function testApiStatusesUpdateWithoutAuthenticatedUser()
-	{
-		$_SESSION['authenticated'] = false;
-		api_statuses_update('json');
-	}
-
-	/**
-	 * Test the api_statuses_update() function with a parent status.
-	 * @return void
-	 */
-	public function testApiStatusesUpdateWithParent()
-	{
-		$this->markTestIncomplete('This triggers an exit() somewhere and kills PHPUnit.');
-	}
-
-	/**
-	 * Test the api_statuses_update() function with a media_ids parameter.
-	 * @return void
-	 */
-	public function testApiStatusesUpdateWithMediaIds()
-	{
-		$this->markTestIncomplete();
-	}
-
-	/**
-	 * Test the api_statuses_update() function with the throttle limit reached.
-	 * @return void
-	 */
-	public function testApiStatusesUpdateWithDayThrottleReached()
-	{
-		$this->markTestIncomplete();
-	}
-
-	/**
 	 * Test the api_media_upload() function.
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\BadRequestException
