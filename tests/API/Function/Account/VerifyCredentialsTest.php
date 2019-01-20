@@ -1,11 +1,11 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Account;
 
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
 
-class AccountVerifyCredentialsTest extends ApiTest
+class VerifyCredentialsTest extends ApiTest
 {
 	use ApiUserItemDatasetTrait;
 	use L10nMockTrait;

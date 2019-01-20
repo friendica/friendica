@@ -1,7 +1,8 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Search;
 
+use Friendica\Test\API\ApiTest;
 use Friendica\Test\Util\ApiUserDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
 

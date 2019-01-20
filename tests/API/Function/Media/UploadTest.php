@@ -1,12 +1,13 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Media;
 
+use Friendica\Test\API\ApiTest;
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
 use Friendica\Test\Util\Mocks\PhotoMockTrait;
 
-class MediaUploadTest extends ApiTest
+class UploadTest extends ApiTest
 {
 	use ApiUserItemDatasetTrait;
 	use L10nMockTrait;

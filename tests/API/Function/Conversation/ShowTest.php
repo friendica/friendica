@@ -1,8 +1,10 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Conversation;
 
-class ConversationShowTest extends ApiTest
+use Friendica\Test\API\ApiTest;
+
+class ShowTest extends ApiTest
 {
 	/**
 	 * Test the api_conversation_show() function.

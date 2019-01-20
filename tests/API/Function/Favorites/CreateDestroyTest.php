@@ -1,8 +1,10 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Favorites;
 
-class FavoritesCreateDestroyTest extends ApiTest
+use Friendica\Test\API\ApiTest;
+
+class CreateDestroyTest extends ApiTest
 {
 	/**
 	 * Test the api_favorites_create_destroy() function.

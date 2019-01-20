@@ -1,6 +1,8 @@
 <?php
 
-namespace Friendica\Test\API;
+namespace Friendica\Test\API\Favorites;
+
+use Friendica\Test\API\ApiTest;
 
 class FavoritesTest extends ApiTest
 {
