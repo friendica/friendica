@@ -36,14 +36,17 @@ trait ItemMockTrait
 		}
 	}
 
-	public function mockItemSelectFirst(array $fields = [], array $condition = [], $params = [], $return = [], $times = null)
+	public function mockItemSelectFirst(array $expFields = [], array $expCondition = [], $expParams = [], $return = [], $times = null)
 	{
 		if (!isset($this->itemMock)) {
 			$this->itemMock = \Mockery::namedMock('Friendica\Model\Item', 'Friendica\Test\Util\Mocks\ItemStub');
 		}
 
-		$closure = function (array $fields = [], array $condition = [], $params = []) {
-			return true;
+		$closure = function (array $fields = [], array $condition = [], $params = []) use ($expFields, $expCondition, $expParams) {
+			return
+				$fields == $expFields &&
+				$condition == $expCondition &&
+				$params == $expParams;
 		};
 
 		$this->itemMock
@@ -51,5 +54,39 @@ trait ItemMockTrait
 			->withArgs($closure)
 			->times($times)
 			->andReturn($return);
+	}
+
+	public function mockSelectForUser($expUid, array $expSelected = [], array $expCondition = [], $expParams = [], $return = [], $times = null)
+	{
+		if (!isset($this->itemMock)) {
+			$this->itemMock = \Mockery::namedMock('Friendica\Model\Item', 'Friendica\Test\Util\Mocks\ItemStub');
+		}
+
+		$closure = function ($uid, array $selected = [], array $condition = [], $params = []) use ($expUid, $expSelected, $expCondition, $expParams) {
+			return
+				$uid == $expUid &&
+				$selected == $expSelected &&
+				$condition == $expCondition &&
+				$params == $expParams;
+		};
+
+		$this->itemMock
+			->shouldReceive('selectForUser')
+			->withArgs($closure)
+			->times($times)
+			->andReturn($return);
+	}
+
+	public function mockItemInArray(array $statuses = [], $times = null)
+	{
+		if (!isset($this->itemMock)) {
+			$this->itemMock = \Mockery::namedMock('Friendica\Model\Item', 'Friendica\Test\Util\Mocks\ItemStub');
+		}
+
+		$this->itemMock
+			->shouldReceive('inArray')
+			->with($statuses)
+			->times($times)
+			->andReturn($statuses);
 	}
 }

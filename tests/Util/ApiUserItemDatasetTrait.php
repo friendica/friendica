@@ -85,6 +85,10 @@ trait ApiUserItemDatasetTrait
 					'uri' => '',
 
 					'contact-id' => 123,
+
+					'author-id' => 123,
+					'author-network' => 'drfn',
+					'private' => 0,
 				],
 			],
 		];

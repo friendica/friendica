@@ -23,6 +23,7 @@ class DestroyTest extends ApiTest
 
 		$this->mockItemConstants();
 		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, [], [], $item, 1);
+		// "false" results in "BadRequestException"
 		$this->mockIsResult($item, false, 1);
 
 		api_statuses_destroy('json');
@@ -40,10 +41,15 @@ class DestroyTest extends ApiTest
 
 	/**
 	 * Test the api_statuses_destroy() function with an ID.
+	 * @dataProvider dataApiUserItemFull
 	 * @return void
 	 */
-	public function testWithId()
+	public function testWithId($user, $item)
 	{
+		$this->mockApiUser($user['uid']);
+		$this->mockApiGetUser($user, 2);
+		$this->mockApiStatusShow($item, $user, 1);
+
 		$this->app->argv[3] = 1;
 		$result = api_statuses_destroy('json');
 		$this->assertStatus($result['status']);

@@ -91,11 +91,24 @@ abstract class ApiTest extends MockedTest
 	 * @param array $user
 	 * @param int $times
 	 */
-	protected function mockApiGetUser($user, $times = 1)
+	protected function mockApiGetUser($user, $contact_id = null, $times = 1)
 	{
+		if (isset($contact_id)) {
+			// api_unique_id_to_nurl()
+			$this->mockSelectFirst('contact', ['nurl'], ['id' => $contact_id], ['nurl' => $user['url']], $times);
+			$this->mockIsResult(['nurl' => $user['url']], true, $times);
+			$this->mockEscape($user['url'], $times);
+
+			$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' AND `contact`.`uid`=" . $user['uid'];
+
+			$this->mockP($stmt, [$user], $times);
+			$this->mockIsResult([$user], true, $times);
+		}
+
 		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $user['uid'] . " AND `contact`.`self` ";
 
 		$this->mockP($stmt, [$user], $times);
+
 		$this->mockIsResult([$user], true, $times);
 
 		$this->mockSelectFirst('user', ['default-location'], ['uid' => $user['uid']], ['default-location' => $user['default-location']], $times);
@@ -122,11 +135,21 @@ abstract class ApiTest extends MockedTest
 	 * @param $item
 	 * @param int $times
 	 */
-	protected function mockApiStatusShow($item, $times = 1)
+	protected function mockApiStatusShow($item, $user, $times = 1)
 	{
 		$this->mockItemConstants();
 		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, [], [], $item, $times);
 		$this->mockIsResult($item, true, $times);
+
+		$this->mockItemSelectFirst(['uri'], ['id' => $item['id']], [], ['uri' => $item['uri']], $times);
+		$this->mockIsResult(['uri' => $item['uri']], true, $times);
+		$this->mockItemSelectFirst(['id'], ['uri' => $item['uri'], 'uid' => [0, api_user()]], ['order' => ['uid' => true]], ['id' => $item['id']], $times);
+		$this->mockIsResult(['id' => $item['id']], true, $times);
+		$this->mockSelectForUser($user['uid'], [], ['id' => $item['id'], 'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]], [], [$item], $times);
+		$this->mockIsResult([$item], true, $times);
+		$this->mockItemInArray([$item], $times);
+
+		$this->mockApiGetUser($user, $item['author-id'], $times);
 
 		/// for mocking api_convert_item()
 		$this->mockCleanPictureLinks($item['body'], $item['body'], $times);
