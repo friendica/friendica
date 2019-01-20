@@ -2,6 +2,9 @@
 
 namespace Friendica\Test\API;
 
+/**
+ * @runTestsInSeparateProcesses
+ */
 class ConvertItemTest extends ApiTest
 {
 	/**
