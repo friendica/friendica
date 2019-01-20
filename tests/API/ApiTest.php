@@ -70,7 +70,7 @@ abstract class ApiTest extends MockedTest
 
 	/**
 	 * Mocking the login because we already test api_user() in other UnitTests
-	 * @see ApiLoginTest
+	 * @see LoginTest
 	 *
 	 * @param $uid
 	 */
@@ -86,7 +86,7 @@ abstract class ApiTest extends MockedTest
 	/**
 	 * Mocking the "default" way to get user data per api_get_user()
 	 * We test this function already in other tests
-	 * @see ApiGetUserTest
+	 * @see GetUserTest
 	 *
 	 * @param array $user
 	 * @param int $times

@@ -2867,6 +2867,7 @@ function api_format_items_embeded_images($item, $text)
 
 /**
  * @brief return <a href='url'>name</a> as array
+ * @deprecated No usage found (nupplaphil 20190119)
  *
  * @param string $txt text
  * @return array
