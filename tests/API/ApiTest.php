@@ -2,10 +2,13 @@
 
 namespace Friendica\Test\API;
 
+use Friendica\Model\Item;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\Mocks\AppMockTrait;
+use Friendica\Test\Util\Mocks\BBCodeMockTrait;
 use Friendica\Test\Util\Mocks\ContactMockTrait;
 use Friendica\Test\Util\Mocks\DBAMockTrait;
+use Friendica\Test\Util\Mocks\ItemMockTrait;
 use Friendica\Test\Util\Mocks\PConfigMockTrait;
 use Friendica\Test\Util\Mocks\UserMockTrait;
 use Friendica\Test\Util\Mocks\VFSTrait;
@@ -20,6 +23,8 @@ abstract class ApiTest extends MockedTest
 	use PConfigMockTrait;
 	use UserMockTrait;
 	use VFSTrait;
+	use ItemMockTrait;
+	use BBCodeMockTrait;
 
 	/**
 	 * Create variables used by tests.
@@ -109,6 +114,24 @@ abstract class ApiTest extends MockedTest
 		$this->mockP($stmt, $return, $times);
 		$this->mockColumnCount($return, 1, $times);
 		$this->mockToArray($return, $return, 1);
+	}
+
+	/**
+	 * Mocking the "default" way to show item data per api_status_show()
+	 *
+	 * @param $item
+	 * @param int $times
+	 */
+	protected function mockApiStatusShow($item, $times = 1)
+	{
+		$this->mockItemConstants();
+		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, [], [], $item, $times);
+		$this->mockIsResult($item, true, $times);
+
+		/// for mocking api_convert_item()
+		$this->mockCleanPictureLinks($item['body'], $item['body'], $times);
+		$this->mockGetAttachmentData($item['body'], [], $times * 2);
+		$this->mockConvert("", "", false, false, false, $times * 3);
 	}
 
 	/**

@@ -18,6 +18,8 @@ class ItemStub
 		'rendered-hash', 'rendered-html', 'object-type', 'object', 'target-type', 'target',
 		'author-id', 'author-link', 'author-name', 'author-avatar',
 		'owner-id', 'owner-link', 'owner-name', 'owner-avatar'];
+
+	const PT_ARTICLE = 0;
 }
 
 trait ItemMockTrait

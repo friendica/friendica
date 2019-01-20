@@ -63,6 +63,9 @@ trait AppMockTrait
 		$this->app
 			->shouldReceive('getBaseUrl')
 			->andReturn('http://friendica.local');
+		$this->app
+			->shouldReceive('getHostName')
+			->andReturn('friendica.local');
 
 		BaseObject::setApp($this->app);
 	}

@@ -34,7 +34,6 @@ trait PhotoMockTrait
 
 		$this->photoMock
 			->shouldReceive('store')
-			->with(\Mockery::any())
 			->times($times)
 			->andReturn($return);
 	}
