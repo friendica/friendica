@@ -23,46 +23,6 @@ class ApiTestLegacy extends ApiTest
 	}
 
 	/**
-	 * Test the api_share_as_retweet() function.
-	 * @return void
-	 */
-	public function testApiShareAsRetweet()
-	{
-		$item = ['body' => '', 'author-id' => 1, 'owner-id' => 1];
-		$result = api_share_as_retweet($item);
-		$this->assertFalse($result);
-	}
-
-	/**
-	 * Test the api_share_as_retweet() function with a valid item.
-	 * @return void
-	 */
-	public function testApiShareAsRetweetWithValidItem()
-	{
-		$this->markTestIncomplete();
-	}
-
-	/**
-	 * Test the api_get_nick() function.
-	 * @return void
-	 */
-	public function testApiGetNick()
-	{
-		$result = api_get_nick($this->otherUser['nurl']);
-		$this->assertEquals('othercontact', $result);
-	}
-
-	/**
-	 * Test the api_get_nick() function with a wrong URL.
-	 * @return void
-	 */
-	public function testApiGetNickWithWrongUrl()
-	{
-		$result = api_get_nick('wrong_url');
-		$this->assertFalse($result);
-	}
-
-	/**
 	 * Test the api_in_reply_to() function.
 	 * @return void
 	 */
