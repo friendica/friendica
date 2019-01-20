@@ -141,4 +141,50 @@ trait ApiUserDatasetTrait
 			]
 		];
 	}
+
+	public function dataApiUserSearch()
+	{
+		return [
+			'self' => [
+				'data' => [
+					'uid' => 42,
+					'return' => 42,
+				],
+				'auth' => [
+					'allow_api' => true,
+					'authenticated' => true,
+				],
+			],
+			'friend' => [
+				'data' => [
+					'uid' => 43,
+					'return' => 43,
+				],
+				'auth' => [
+					'allow_api' => true,
+					'authenticated' => true,
+				],
+			],
+			'other' => [
+				'data' => [
+					'uid' => 44,
+					'return' => false,
+				],
+				'auth' => [
+					'allow_api' => true,
+					'authenticated' => false,
+				],
+			],
+			'wrong' => [
+				'data' => [
+					'uid' => null,
+					'return' => false,
+				],
+				'auth' => [
+					'allow_api' => false,
+					'authenticated' => false,
+				],
+			]
+		];
+	}
 }
