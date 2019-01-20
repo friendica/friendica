@@ -26,32 +26,6 @@ class ApiTestLegacy extends ApiTest
 	}
 
 	/**
-	 * Test the api_users_show() function.
-	 * @return void
-	 */
-	public function testApiUsersShow()
-	{
-		$result = api_users_show('json');
-		// We can't use assertSelfUser() here because the user object is missing some properties.
-		$this->assertEquals($this->selfUser['id'], $result['user']['cid']);
-		$this->assertEquals('DFRN', $result['user']['location']);
-		$this->assertEquals($this->selfUser['name'], $result['user']['name']);
-		$this->assertEquals($this->selfUser['nick'], $result['user']['screen_name']);
-		$this->assertEquals('dfrn', $result['user']['network']);
-		$this->assertTrue($result['user']['verified']);
-	}
-
-	/**
-	 * Test the api_users_show() function with an XML result.
-	 * @return void
-	 */
-	public function testApiUsersShowWithXml()
-	{
-		$result = api_users_show('xml');
-		$this->assertXml($result, 'statuses');
-	}
-
-	/**
 	 * Test the api_users_search() function.
 	 * @dataProvider dataApiUser
 	 * @return void

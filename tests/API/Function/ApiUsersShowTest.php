@@ -4,71 +4,49 @@ namespace Friendica\Test\API;
 
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
 use Friendica\Test\Util\Mocks\L10nMockTrait;
-use Friendica\Test\Util\Mocks\PhotoMockTrait;
 
 class ApiUsersShowTest extends ApiTest
 {
 	use ApiUserItemDatasetTrait;
 	use L10nMockTrait;
-	use PhotoMockTrait;
 
 	/**
-	 * Test the api_statuses_mediap() function.
-	 * @dataProvider dataApiUserMediaFull
+	 * Test the api_users_show() function.
+	 * @dataProvider dataApiUserItemFull
 	 * @return void
 	 */
-	public function testDefault($user, $media)
+	public function testDefault($user, $item)
 	{
 		$this->mockL10nT();
 
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, 3);
+		$this->mockApiGetUser($user, 1);
+		$this->mockApiUsersShow($item, 1);
 
-		$this->mockEscape($user['nick'], 1);
-		$stmt = "SELECT `user`.*, `contact`.`id` FROM `user`
-				INNER JOIN `contact` on `user`.`uid` = `contact`.`uid`
-				WHERE `user`.`nickname` = '%s' AND `user`.`blocked` = 0
-				AND `contact`.`self` = 1 LIMIT 1";
-		$this->mockDBAQ($stmt, [$user], $user['nick'], 1);
-
-		$this->mockConfigGet('system', 'maximagesize', false, 1);
-		$this->mockConfigGet('system', 'png_quality', false, 1);
-		$this->mockConfigGet('system', 'max_image_length', false, 1);
-
-		$this->mockPhotoNewResource(123, 1);
-		$this->mockPhotoStore(true, 1);
-
-		$stmt = "SELECT `id`, `datasize`, `width`, `height`, `type` FROM `photo`
-			WHERE `resource-id` = '%s'
-			ORDER BY `width` DESC LIMIT 1";
-		$this->mockDBAQ($stmt, [$media], 123, 1);
-
-		/// Mocking this select to return "false" forces the item_post() function to return 0
-		$this->mockSelectFirst('user', [], ['uid' => $user['uid']], false, 1);
-		$this->mockIsResult(false, false, 1);
-
-		$this->mockApiStatusShow($media, 1);
-
-		$this->app->argc = 2;
-
-		$_FILES = [
-			'media' => $media,
-		];
-
-		$_GET['status'] = '<b>Status content</b>';
-
-		$result = api_statuses_mediap('json');
-		$this->assertStatus($result['status']);
+		$result = api_users_show('json');
+		// We can't use assertSelfUser() here because the user object is missing some properties.
+		$this->assertEquals($user['cid'], $result['user']['cid']);
+		$this->assertEquals($user['location'], $result['user']['location']);
+		$this->assertEquals($user['name'], $result['user']['name']);
+		$this->assertEquals($user['nick'], $result['user']['screen_name']);
+		$this->assertEquals($user['location'], $result['user']['network']);
+		$this->assertTrue($result['user']['verified']);
 	}
 
 	/**
-	 * Test the api_statuses_mediap() function without an authenticated user.
+	 * Test the api_users_show() function with an XML result.
+	 * @dataProvider dataApiUserItemFull
 	 * @return void
-	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
 	 */
-	public function testWithoutAuthenticatedUser()
+	public function testWithXml($user, $item)
 	{
-		$_SESSION['authenticated'] = false;
-		api_statuses_mediap('json');
+		$this->mockL10nT();
+
+		$this->mockApiUser($user['uid']);
+		$this->mockApiGetUser($user, 1);
+		$this->mockApiUsersShow($item, 1);
+
+		$result = api_users_show('xml');
+		$this->assertXml($result, 'statuses');
 	}
 }

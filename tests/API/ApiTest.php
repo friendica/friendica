@@ -135,6 +135,24 @@ abstract class ApiTest extends MockedTest
 	}
 
 	/**
+	 * Mocking the "default" way to show item data per api_users_show()
+	 *
+	 * @param $item
+	 * @param int $times
+	 */
+	protected function mockApiUsersShow($item, $times = 1)
+	{
+		$this->mockItemConstants();
+		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, [], [], $item, $times);
+		$this->mockIsResult($item, true, $times);
+
+		/// for mocking api_convert_item()
+		$this->mockCleanPictureLinks($item['body'], $item['body'], $times);
+		$this->mockGetAttachmentData($item['body'], [], $times * 2);
+		$this->mockConvert("", "", false, false, false, $times * 3);
+	}
+
+	/**
 	 * Assert that an user array contains expected keys.
 	 * @param array $user User array
 	 * @param array $data DataSource array

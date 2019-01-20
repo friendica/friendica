@@ -83,6 +83,8 @@ trait ApiUserItemDatasetTrait
 
 					'thr-parent' => 1,
 					'uri' => '',
+
+					'contact-id' => 123,
 				],
 			],
 		];
