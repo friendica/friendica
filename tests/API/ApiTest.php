@@ -97,7 +97,7 @@ abstract class ApiTest extends MockedTest
 	 * @param array $user
 	 * @param int $times
 	 */
-	protected function mockApiGetUser($user, $contact_id = null, $times = 1)
+	protected function mockApiGetUser($user, $contact_id = null, $self = true, $times = 1)
 	{
 		if (isset($contact_id)) {
 			// api_unique_id_to_nurl()
@@ -105,7 +105,11 @@ abstract class ApiTest extends MockedTest
 			$this->mockIsResult(['nurl' => $user['url']], true, $times);
 			$this->mockEscape($user['url'], $times);
 
-			$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' AND `contact`.`uid`=" . $user['uid'];
+			if ($self) {
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' AND `contact`.`uid`=" . $user['uid'];
+			} else {
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' ";
+			}
 
 			$this->mockP($stmt, [$user], $times);
 			$this->mockIsResult([$user], true, $times);

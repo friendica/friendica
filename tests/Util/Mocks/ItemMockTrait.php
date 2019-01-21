@@ -89,4 +89,17 @@ trait ItemMockTrait
 			->times($times)
 			->andReturn($statuses);
 	}
+
+	public function mockItemFetch($stmt, $return = [], $times = null)
+	{
+		if (!isset($this->itemMock)) {
+			$this->itemMock = \Mockery::namedMock('Friendica\Model\Item', 'Friendica\Test\Util\Mocks\ItemStub');
+		}
+
+		$this->itemMock
+			->shouldReceive('fetch')
+			->with($stmt)
+			->times($times)
+			->andReturn($return);
+	}
 }
