@@ -3,8 +3,6 @@
  * This file is loaded by PHPUnit before any test.
  */
 
-use PHPUnit\DbUnit\DataSet\YamlDataSet;
-use PHPUnit\DbUnit\TestCaseTrait;
 use PHPUnit\Framework\TestCase;
 
 // Backward compatibility

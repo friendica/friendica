@@ -99,6 +99,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckKeys()
 	{
+		$this->mockL10nT();
+
 		$this->setFunctions(['openssl_pkey_new' => false]);
 		$install = new Installer();
 		$this->assertFalse($install->checkKeys());
@@ -209,6 +211,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckLocalIni()
 	{
+		$this->mockL10nT();
+
 		$this->assertTrue($this->root->hasChild('config/local.config.php'));
 
 		$install = new Installer();
@@ -227,6 +231,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckHtAccessFail()
 	{
+		$this->mockL10nT();
+
 		// Mocking the CURL Response
 		$curlResult = \Mockery::mock('Friendica\Network\CurlResult');
 		$curlResult
@@ -264,6 +270,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckHtAccessWork()
 	{
+		$this->mockL10nT();
+
 		// Mocking the failed CURL Response
 		$curlResultF = \Mockery::mock('Friendica\Network\CurlResult');
 		$curlResultF
@@ -303,6 +311,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testImagick()
 	{
+		$this->mockL10nT();
+
 		$imageMock = \Mockery::mock('alias:Friendica\Object\Image');
 		$imageMock
 			->shouldReceive('supportedTypes')
@@ -328,6 +338,8 @@ class InstallerTest extends MockedTest
 	 */
 	public function testImagickNotFound()
 	{
+		$this->mockL10nT();
+
 		$imageMock = \Mockery::mock('alias:Friendica\Object\Image');
 		$imageMock
 			->shouldReceive('supportedTypes')

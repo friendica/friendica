@@ -39,25 +39,6 @@ abstract class ApiTest extends MockedTest
 	{
 		parent::setUp();
 
-		$this->setUpVfsDir();
-		$this->mockApp($this->root);
-
-		$this->mockConfigGet('system', 'url', 'http://localhost');
-		$this->mockConfigGet('system', 'hostname', 'localhost');
-		$this->mockConfigGet('system', 'worker_dont_fork', true);
-
-		// Default config
-		$this->mockConfigGet('config', 'hostname', 'localhost');
-		$this->mockConfigGet('system', 'throttle_limit_day', 100);
-		$this->mockConfigGet('system', 'throttle_limit_week', 100);
-		$this->mockConfigGet('system', 'throttle_limit_month', 100);
-		$this->mockConfigGet('system', 'theme', 'system_theme');
-
-		/// @todo not needed anymore with new Logging 2019.03
-		$this->mockConfigGet('system', 'debugging', false);
-		$this->mockConfigGet('system', 'logfile', 'friendica.log');
-		$this->mockConfigGet('system', 'loglevel', '0');
-
 		// setup DB mock
 		$this->mockConnect();
 		$this->mockConnected();
