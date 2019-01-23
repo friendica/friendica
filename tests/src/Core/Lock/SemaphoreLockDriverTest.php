@@ -15,8 +15,8 @@ class SemaphoreLockDriverTest extends LockTest
 
 	protected function getInstance()
 	{
-		$this->mockConfigGet('system', 'temppath', '/tmp/localhost');
-		$this->mockConfigSet('system', 'temppath', '/tmp/localhost');
+		$this->mockConfigGet('system', 'temppath', '/tmp/' . $this->app->getHostName());
+		$this->mockConfigSet('system', 'temppath', '/tmp/' . $this->app->getHostName());
 
 		/// @todo not needed anymore with new Logging 2019.03
 		$this->mockConfigGet('system', 'debugging', false);
