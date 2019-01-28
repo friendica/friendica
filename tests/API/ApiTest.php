@@ -106,7 +106,7 @@ abstract class ApiTest extends MockedTest
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $user['uid'], 'is-default' => true], ['about' => $user['about']], $times);
 		$this->mockSelectFirst('user', ['theme'], ['uid' => $user['uid']], ['theme' => $user['theme']], $times);
 		$this->mockPConfigGet($user['uid'], 'frio', 'schema', $user['schema'], $times);
-		$this->mockGetIdForURL($user['url'], 0, true, null, null, null, $times * 2);
+		$this->mockGetIdForURL($user['url'], 0, true, null, null, $user['id'], $times * 2);
 		$this->mockConstants();
 	}
 
@@ -122,6 +122,7 @@ abstract class ApiTest extends MockedTest
 
 	/**
 	 * Mocking the "default" way to show item data per api_status_show()
+	 * @see api_status_show()
 	 *
 	 * @param $item
 	 * @param int $times
@@ -129,7 +130,7 @@ abstract class ApiTest extends MockedTest
 	protected function mockApiStatusShow($item, $user, $times = 1)
 	{
 		$this->mockItemConstants();
-		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, [], [], $item, $times);
+		$this->mockItemSelectFirst(Item::ITEM_FIELDLIST, \Mockery::any() , ['order' => ['id' => true]], $item, $times);
 		$this->mockIsResult($item, true, $times);
 
 		$this->mockItemSelectFirst(['uri'], ['id' => $item['id']], [], ['uri' => $item['uri']], $times);
@@ -170,18 +171,20 @@ abstract class ApiTest extends MockedTest
 	 * Assert that an user array contains expected keys.
 	 * @param array $user User array
 	 * @param array $data DataSource array
+	 * @param bool  $full True, if uid and self should get checked too
 	 * @return void
 	 */
-	protected function assertUser(array $user, array $data)
+	protected function assertUser(array $user, array $data, $full = true)
 	{
-		$this->assertEquals($data['uid'], $user['uid']);
-		$this->assertEquals($data['uid'], $user['cid']);
-		$this->assertEquals($data['self'], $user['self']);
+		if ($full) {
+			$this->assertEquals($data['uid'], $user['uid']);
+			$this->assertEquals($data['uid'], $user['cid']);
+			$this->assertEquals($data['self'], $user['self']);
+		}
 		$this->assertEquals($data['location'], $user['location']);
 		$this->assertEquals($data['name'], $user['name']);
 		$this->assertEquals($data['nick'], $user['screen_name']);
 		$this->assertEquals($data['network'], $user['network']);
-		$this->assertTrue($user['verified']);
 	}
 
 	/**

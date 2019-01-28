@@ -36,13 +36,17 @@ trait ItemMockTrait
 		}
 	}
 
-	public function mockItemSelectFirst(array $expFields = [], array $expCondition = [], $expParams = [], $return = [], $times = null)
+	public function mockItemSelectFirst(array $expFields = [], $expCondition = null, $expParams = [], $return = [], $times = null)
 	{
+		if (!isset($expCondition)) {
+			$expCondition = [];
+		}
+
 		if (!isset($this->itemMock)) {
 			$this->itemMock = \Mockery::namedMock('Friendica\Model\Item', 'Friendica\Test\Util\Mocks\ItemStub');
 		}
 
-		$closure = function (array $fields = [], array $condition = [], $params = []) use ($expFields, $expCondition, $expParams) {
+		$closure = function (array $fields = [], $condition = null, $params = []) use ($expFields, $expCondition, $expParams) {
 			return
 				$fields == $expFields &&
 				$condition == $expCondition &&

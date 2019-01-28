@@ -4,6 +4,7 @@ namespace Friendica\Test\API\Account;
 
 use Friendica\Test\API\ApiTest;
 use Friendica\Test\Util\ApiUserItemDatasetTrait;
+use Friendica\Test\Util\Mocks\WorkerMockTrait;
 
 /**
  * Tests for api_account_update_profile()
@@ -12,6 +13,7 @@ use Friendica\Test\Util\ApiUserItemDatasetTrait;
 class UpdateProfileTest extends ApiTest
 {
 	use ApiUserItemDatasetTrait;
+	use WorkerMockTrait;
 
 	/**
 	 * Test the api_account_update_profile() function.
@@ -24,7 +26,7 @@ class UpdateProfileTest extends ApiTest
 		$new_desc = 'new_description';
 
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, null, 1);
+		$this->mockApiGetUser($user, null, true, 2);
 
 		// Mocking the NewName Update
 		$this->mockUpdate('profile', ['name' => $new_name], ['uid' => $user['uid']], [], true, 1);
@@ -34,18 +36,20 @@ class UpdateProfileTest extends ApiTest
 
 		// Mocking the NewDescription Update
 		$this->mockUpdate('profile', ['about' => $new_desc], ['uid' => $user['uid']], [], true, 1);
-		$this->mockUpdate('contact', ['about' => $new_desc], ['uid' => $user['uid']], [], true, 1);
+		$this->mockUpdate('contact', ['about' => $new_desc], ['uid' => $user['uid'], 'self' => 1], [], true, 1);
 		$this->mockUpdate('contact', ['about' => $new_desc], ['id' => $user['id']], [], true, 1);
 
-		$_POST['name'] = 'new_name';
-		$_POST['description'] = 'new_description';
+		// Mocking the ProfileUpdate Worker
+		$this->mockWorkerAdd(PRIORITY_LOW, 'ProfileUpdate', $user['uid'], true, 1);
+		$this->mockConfigGet('system', 'directory', false, 1);
+
+		// Mocking the api_status_show function
+		$_REQUEST['skip_status'] = true;
+
+		$_POST['name'] = $new_name;
+		$_POST['description'] = $new_desc;
+
 		$result = api_account_update_profile('json');
-		// We can't use assertSelfUser() here because the user object is missing some properties.
-		$this->assertEquals($user['id'], $result['user']['cid']);
-		$this->assertEquals($user['location'], $result['user']['location']);
-		$this->assertEquals($user['nick'], $result['user']['screen_name']);
-		$this->assertEquals($user['network'], $result['user']['network']);
-		$this->assertEquals('new_name', $result['user']['name']);
-		$this->assertEquals('new_description', $result['user']['description']);
+		$this->assertUser($result['user'], $user, false);
 	}
 }
