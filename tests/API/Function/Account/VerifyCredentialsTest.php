@@ -21,8 +21,10 @@ class VerifyCredentialsTest extends ApiTest
 		$this->mockL10nT();
 
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, 2);
-		$this->mockApiStatusShow($item, 1);
+		$this->mockApiGetUser($user);
+
+		// Mocking the api_status_show function
+		$_REQUEST['skip_status'] = true;
 
 		$this->assertArrayHasKey('user', api_account_verify_credentials('json'));
 	}
