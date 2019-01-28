@@ -16,7 +16,7 @@ class VerifyCredentialsTest extends ApiTest
 	 * @dataProvider dataApiUserItemFull
 	 * @return void
 	 */
-	public function testApiAccountVerifyCredentials($user, $item)
+	public function testDefault($user, $item)
 	{
 		$this->mockL10nT();
 
@@ -34,8 +34,17 @@ class VerifyCredentialsTest extends ApiTest
 	 * @return void
 	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
 	 */
-	public function testApiAccountVerifyCredentialsWithoutAuthenticatedUser()
+	public function testWithoutAuthenticatedUser()
 	{
 		api_account_verify_credentials('json');
+	}
+
+	/**
+	 * Test the api_account_verify_credentioals() function without 'skip_status'
+	 * @return void
+	 */
+	public function testWithoutSkipStatus()
+	{
+		$this->markTestSkipped('Need to mock \'api_status_show()\' too.');
 	}
 }
