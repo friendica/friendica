@@ -12,6 +12,7 @@ use Friendica\Test\Util\Mocks\ItemMockTrait;
 use Friendica\Test\Util\Mocks\PConfigMockTrait;
 use Friendica\Test\Util\Mocks\UserMockTrait;
 use Friendica\Test\Util\Mocks\VFSTrait;
+use Friendica\Util\Strings;
 
 require_once __DIR__ . '/../../include/api.php';
 
@@ -81,26 +82,32 @@ abstract class ApiTest extends MockedTest
 	protected function mockApiGetUser($user, $contact_id = null, $self = true, $times = 1)
 	{
 		if (isset($contact_id)) {
-			// api_unique_id_to_nurl()
-			$this->mockSelectFirst('contact', ['nurl'], ['id' => $contact_id], ['nurl' => $user['url']], $times);
-			$this->mockIsResult(['nurl' => $user['url']], true, $times);
-			$this->mockEscape($user['url'], $times);
+			if (intval($contact_id) == 0) {
+				$nurl = Strings::normaliseLink($user['url']);
+				$this->mockEscape($nurl, $times);
+			} else {
+				// api_unique_id_to_nurl()
+				$nurl = $user['url'];
+				$this->mockSelectFirst('contact', ['nurl'], ['id' => $contact_id], ['nurl' => $nurl], $times);
+				$this->mockIsResult(['nurl' => $user['url']], true, $times);
+				$this->mockEscape($user['url'], $times);
+			}
 
 			if ($self) {
-				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' AND `contact`.`uid`=" . $user['uid'];
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $nurl . "' AND `contact`.`uid`=" . $user['uid'];
 			} else {
-				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $user['url'] . "' ";
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $nurl . "' ";
 			}
 
 			$this->mockP($stmt, [$user], $times);
 			$this->mockIsResult([$user], true, $times);
+		} else {
+
+			$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $user['uid'] . " AND `contact`.`self` ";
+
+			$this->mockP($stmt, [$user], $times);
+			$this->mockIsResult([$user], true, $times);
 		}
-
-		$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $user['uid'] . " AND `contact`.`self` ";
-
-		$this->mockP($stmt, [$user], $times);
-
-		$this->mockIsResult([$user], true, $times);
 
 		$this->mockSelectFirst('user', ['default-location'], ['uid' => $user['uid']], ['default-location' => $user['default-location']], $times);
 		$this->mockSelectFirst('profile', ['about'], ['uid' => $user['uid'], 'is-default' => true], ['about' => $user['about']], $times);
