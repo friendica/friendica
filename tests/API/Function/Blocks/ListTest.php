@@ -17,7 +17,9 @@ class ListTest extends ApiTest
 	public function testDefault($user)
 	{
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, null, true, 1);
+		$this->mockApiGetUser($user, null, null, isset($user['self']), true, 1);
+
+		/// @todo replace Mocker::any() with real statement
 		$this->mockDBAQ(\Mockery::any(), [['nurl' => $user['url']]], \Mockery::any(), 1);
 		$this->mockApiGetUser($user, $user['url'], true, 1);
 
@@ -33,7 +35,7 @@ class ListTest extends ApiTest
 	public function testWithUndefinedCursor($user)
 	{
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, null, true, 1);
+		$this->mockApiGetUser($user, null, null, isset($user['self']), true, 1);
 
 		$_GET['cursor'] = 'undefined';
 		$this->assertFalse(api_blocks_list('json'));

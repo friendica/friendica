@@ -26,7 +26,7 @@ class UpdateProfileTest extends ApiTest
 		$new_desc = 'new_description';
 
 		$this->mockApiUser($user['uid']);
-		$this->mockApiGetUser($user, null, true, 2);
+		$this->mockApiGetUser($user, null, null, isset($user['self']), true, 2);
 
 		// Mocking the NewName Update
 		$this->mockUpdate('profile', ['name' => $new_name], ['uid' => $user['uid']], [], true, 1);

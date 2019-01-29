@@ -82,6 +82,7 @@ trait ApiUserItemDatasetTrait
 					'created' => '01-01-2019 10:10:10',
 
 					'thr-parent' => 1,
+					'parent-uri' => 'http://parent.uri/test',
 					'uri' => '',
 
 					'contact-id' => 123,

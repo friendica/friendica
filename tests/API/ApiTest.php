@@ -79,12 +79,17 @@ abstract class ApiTest extends MockedTest
 	 * @param array $user
 	 * @param int $times
 	 */
-	protected function mockApiGetUser($user, $contact_id = null, $self = true, $times = 1)
+	protected function mockApiGetUser($user, $contact_id = null, $screen_name = null, $self = true, $allowed = true, $times = 1)
 	{
+		/// In case $contact_id is set
 		if (isset($contact_id)) {
+
+			/// in case $contact_id is a url
 			if (intval($contact_id) == 0) {
 				$nurl = Strings::normaliseLink($user['url']);
 				$this->mockEscape($nurl, $times);
+
+				/// in case $contact_id is 0
 			} else {
 				// api_unique_id_to_nurl()
 				$nurl = $user['url'];
@@ -93,28 +98,59 @@ abstract class ApiTest extends MockedTest
 				$this->mockEscape($user['url'], $times);
 			}
 
-			if ($self) {
+			/// in case it is called by a known user
+			if ($self && $allowed) {
 				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $nurl . "' AND `contact`.`uid`=" . $user['uid'];
+
+				/// in case it is called by a unknown user
 			} else {
 				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nurl` = '" . $nurl . "' ";
 			}
 
-			$this->mockP($stmt, [$user], $times);
-			$this->mockIsResult([$user], true, $times);
+			/// in case $screen_name is set
+		} elseif (isset($screen_name)) {
+			$this->mockEscape($screen_name, $times);
+
+			/// In case it is called by a known user
+			if ($self && $allowed) {
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nick` = '" . $screen_name . "' AND `contact`.`uid`=" . $user['uid'];
+
+				/// in case it is called by a unknown user
+			} else {
+				$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`nick` = '" . $screen_name . "' ";
+			}
+
+			/// in case it is called without any argument
 		} else {
-
 			$stmt = "SELECT *, `contact`.`id` AS `cid` FROM `contact` WHERE 1 AND `contact`.`uid` = " . $user['uid'] . " AND `contact`.`self` ";
-
-			$this->mockP($stmt, [$user], $times);
-			$this->mockIsResult([$user], true, $times);
 		}
 
-		$this->mockSelectFirst('user', ['default-location'], ['uid' => $user['uid']], ['default-location' => $user['default-location']], $times);
-		$this->mockSelectFirst('profile', ['about'], ['uid' => $user['uid'], 'is-default' => true], ['about' => $user['about']], $times);
-		$this->mockSelectFirst('user', ['theme'], ['uid' => $user['uid']], ['theme' => $user['theme']], $times);
-		$this->mockPConfigGet($user['uid'], 'frio', 'schema', $user['schema'], $times);
-		$this->mockGetIdForURL($user['url'], 0, true, null, null, $user['id'], $times * 2);
-		$this->mockConstants();
+		$this->mockP($stmt, [$user], $times);
+		$this->mockIsResult([$user], true, $times);
+
+		/// in case the user is allowed for the call, return all values needed
+		if ($allowed) {
+			$this->mockSelectFirst('user', ['default-location'], ['uid' => $user['uid']], ['default-location' => $user['default-location']], $times);
+			$this->mockSelectFirst('profile', ['about'], ['uid' => $user['uid'], 'is-default' => true], ['about' => $user['about']], $times);
+
+			if ($self) {
+				$this->mockSelectFirst('user', ['theme'], ['uid' => $user['uid']], ['theme' => $user['theme']], $times);
+				$this->mockPConfigGet($user['uid'], 'frio', 'schema', $user['schema'], $times);
+			}
+
+			$this->mockGetIdForURL($user['url'], 0, true, null, null, $user['id'], $times * 2);
+			$this->mockConstants();
+		} else {
+			$this->mockSelectFirst('user', ['default-location'], ['uid' => false], null, $times);
+			$this->mockSelectFirst('profile', ['about'], ['uid' => false, 'is-default' => true], null, $times);
+
+			if ($self) {
+				$this->mockSelectFirst('user', ['theme'], ['uid' => $user['uid']], ['theme' => $user['theme']], $times);
+				$this->mockPConfigGet($user['uid'], 'frio', 'schema', $user['schema'], $times);
+			}
+			$this->mockGetIdForURL($user['url'], 0, true, null, null, $user['id'], $times * 2);
+			$this->mockConstants();
+		}
 	}
 
 	protected function mockDBAQ($sql, $return, $args = [], $times = 1)
