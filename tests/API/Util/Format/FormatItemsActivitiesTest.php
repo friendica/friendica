@@ -20,7 +20,7 @@ class FormatItemsActivitiesTest extends ApiTest
 		$this->mockSelectForUser($item['uid'], ['author-id', 'verb'], ['uid' => $item['uid'], 'thr-parent' => $item['uri']], [], ['author-id' => $item['author-id'], 'verb' => $item['verb']], 1);
 		$this->mockItemFetch(['author-id' => $item['author-id'], 'verb' => $item['verb']], ['author-id' => $item['author-id'], 'verb' => $item['verb']], 1);
 
-		$this->mockApiGetUser($user, $item['author-id'], false, 1);
+		$this->mockApiGetUser($user, $item['author-id'], null, isset($user['self']), true, 1);
 
 		$result = api_format_items_activities($item);
 		$this->assertArrayHasKey('like', $result);

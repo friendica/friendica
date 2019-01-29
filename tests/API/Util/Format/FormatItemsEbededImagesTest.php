@@ -2,6 +2,8 @@
 
 namespace Friendica\Test\API;
 
+use Friendica\Core\System;
+
 class FormatItemsEbededImagesTest extends ApiTest
 {
 	/**
