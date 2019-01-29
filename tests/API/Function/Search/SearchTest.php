@@ -78,4 +78,18 @@ class SearchTest extends ApiTest
 	{
 		api_search('json');
 	}
+
+	/**
+	 * Test the api_search() function with an q parameter contains hashtag.
+	 * @return void
+	 */
+	public function testWithHashtag()
+	{
+		$_REQUEST['q'] = '%23friendica';
+		$result = api_search('json');
+		foreach ($result['status'] as $status) {
+			$this->assertStatus($status);
+			$this->assertContains('#friendica', $status['text'], null, true);
+		}
+	}
 }

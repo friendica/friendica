@@ -33,7 +33,7 @@ class UpdateTest extends ApiTest
 
 		$this->mockApiStatusShow($item, 1);
 
-		$_GET['status'] = 'Status content';
+		$_GET['status'] = 'Status content #friendica';
 		$_GET['in_reply_to_status_id'] = -1;
 		$_GET['lat'] = 48;
 		$_GET['long'] = 7;

@@ -3,26 +3,54 @@
 namespace Friendica\Test\API\Conversation;
 
 use Friendica\Test\API\ApiTest;
+use Friendica\Test\Util\ApiUserItemDatasetTrait;
 
 class ShowTest extends ApiTest
 {
+	use ApiUserItemDatasetTrait;
+
 	/**
-	 * Test the api_blocks_list() function.
+	 * Test the api_conversation_show() function.
 	 * @return void
+	 * @expectedException Friendica\Network\HTTPException\BadRequestException
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
+	 *
+	 * @dataProvider dataApiUserItemFull
 	 */
-	public function testDefault()
+	public function testDefault($user, $item)
 	{
-		$result = api_blocks_list('json');
-		$this->assertArrayHasKey('user', $result);
+		$this->mockApiUser();
+		$this->mockApiGetUser($user);
+
+		api_conversation_show('json');
 	}
 
 	/**
-	 * Test the api_blocks_list() function an undefined cursor GET variable.
+	 * Test the api_conversation_show() function with an ID.
 	 * @return void
 	 */
-	public function testWithUndefinedCursor()
+	public function testWithId()
 	{
-		$_GET['cursor'] = 'undefined';
-		$this->assertFalse(api_blocks_list('json'));
+		$this->app->argv[3] = 1;
+		$_REQUEST['max_id'] = 10;
+		$_REQUEST['page'] = -2;
+		$result = api_conversation_show('json');
+		$this->assertNotEmpty($result['status']);
+		foreach ($result['status'] as $status) {
+			$this->assertStatus($status);
+		}
+	}
+
+	/**
+	 * Test the api_conversation_show() function with an unallowed user.
+	 * @return void
+	 * @expectedException Friendica\Network\HTTPException\ForbiddenException
+	 */
+	public function testWithUnallowedUser()
+	{
+		$_SESSION['allow_api'] = false;
+		$_GET['screen_name'] = $this->selfUser['nick'];
+		api_conversation_show('json');
 	}
 }
