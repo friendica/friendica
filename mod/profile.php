@@ -52,9 +52,13 @@ function profile_init(App $a)
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $which]);
 		if (DBA::isResult($user)) {
 			$data = ActivityPub\Transmitter::getProfile($user['uid']);
-			header('Content-Type: application/activity+json');
-			echo json_encode($data);
-			exit();
+			System::jsonExit($data, 'application/activity+json');
+		} elseif (DBA::exists('userd', ['username' => $which])) {
+			// Known deleted user
+			System::httpExit(410);
+		} else {
+			// Unknown user
+			System::httpExit(404);
 		}
 	}
 
