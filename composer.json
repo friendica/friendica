@@ -27,7 +27,7 @@
 		"ext-simplexml": "*",
 		"ext-xml": "*",
 		"asika/simple-console": "^1.0",
-		"divineomega/password_exposed": "^2.4",
+		"divineomega/password_exposed": "^2.4|^3.0",
 		"ezyang/htmlpurifier": "~4.7.0",
 		"friendica/json-ld": "^1.0",
 		"league/html-to-markdown": "~4.8.0",
