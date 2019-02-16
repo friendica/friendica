@@ -370,9 +370,9 @@ class Worker
 
 		$mypid = getmypid();
 
-		$workerLogger = new WorkerLogger($a->getLogger());
-
 		$argc = count($argv);
+
+		$workerLogger = new WorkerLogger($a->getLogger());
 
 		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: " . $workerLogger->getWorkerId());
 
