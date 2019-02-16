@@ -3,9 +3,11 @@
 namespace Friendica\Factory;
 
 use Friendica\Core\Config\ConfigCache;
+use Friendica\Core\Logger;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Logger\FriendicaDevelopHandler;
 use Friendica\Util\Logger\FriendicaIntrospectionProcessor;
+use Friendica\Util\Logger\WorkerLogger;
 use Monolog;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -31,7 +33,7 @@ class LoggerFactory
 		$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 		$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 		$logger->pushProcessor(new Monolog\Processor\UidProcessor());
-		$logger->pushProcessor(new FriendicaIntrospectionProcessor(LogLevel::DEBUG, ['Friendica\\Core\\Logger', 'Friendica\\Util\\WorkerLogger']));
+		$logger->pushProcessor(new FriendicaIntrospectionProcessor(LogLevel::DEBUG, [Logger::class, WorkerLogger::class]));
 
 		if (isset($config)) {
 			$debugging = $config->get('system', 'debugging');
