@@ -11,6 +11,11 @@ use Friendica\Worker\CheckVersion;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @todo Remove annotation when 'Network' isn't static
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class CheckVersionTest extends MockedTest
 {
 	use NetworkMockTrait;

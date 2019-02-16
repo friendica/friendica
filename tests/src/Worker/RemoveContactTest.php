@@ -3,20 +3,26 @@
 namespace Friendica\Test\Worker;
 
 use Friendica\App;
+use Friendica\Core\Config;
 use Friendica\Test\MockedTest;
-use Friendica\Test\Util\UpdateMockTrait;
-use Friendica\Worker\DBUpdate;
+use Friendica\Test\Util\DBAMockTrait;
+use Friendica\Worker\RemoveContact;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @todo Remove annotation when 'Update' isn't static
+ * @todo Remove annotation when 'DBA' isn't static
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-class DBUpdateTest extends MockedTest
+class RemoveContactTest extends MockedTest
 {
-	use UpdateMockTrait;
+	use DBAMockTrait;
+
+	/**
+	 * @var Config\ConfigCache|MockInterface
+	 */
+	private $configMock;
 
 	/**
 	 * @var LoggerInterface|MockInterface
@@ -33,7 +39,9 @@ class DBUpdateTest extends MockedTest
 		parent::setUp();
 
 		$this->app = \Mockery::mock('Friendica\App');
-		$this->app->shouldReceive('getBasePath')->andReturn('/temp');
+
+		$this->configMock = \Mockery::mock('Friendica\Core\Config\ConfigCache');
+		Config::init($this->configMock);
 
 		$this->logger = \Mockery::mock('Psr\Log\LoggerInterface');
 		$this->logger->shouldReceive('info')->with(\Mockery::any(), \Mockery::any());
@@ -43,13 +51,15 @@ class DBUpdateTest extends MockedTest
 	}
 
 	/**
-	 * Test the Worker DbUpdate
+	 * Test the Worker checkVersion with wrong arguments
 	 */
-	public function testNormal()
+	public function testWrongArguments()
 	{
-		$this->mockUpdateRun($this->app->getBasePath(), $this->logger);
+		$this->logger->shouldReceive('alert')
+			->with('Invoked with wrong parameters', ['count' => 0, 'parameter' => []])
+			->once();
 
-		$worker = new DBUpdate($this->app, $this->logger);
-		$worker->execute();
+		$worker = new RemoveContact($this->app, $this->logger);
+		$worker->execute([]);
 	}
 }

@@ -48,7 +48,7 @@ abstract class AbstractWorker
 	protected function checkParameters(array $parameter, $expectedCount)
 	{
 		if (count($parameter) !== $expectedCount) {
-			$this->logger->alert('Invoked with wrong parameters', ['count' => $parameter, 'parameter' => $parameter]);
+			$this->logger->alert('Invoked with wrong parameters', ['count' => count($parameter), 'parameter' => $parameter]);
 			return false;
 		} else {
 			return true;
