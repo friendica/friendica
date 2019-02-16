@@ -2,7 +2,6 @@
 
 namespace Friendica\Util\Logger;
 
-use Friendica\Core\System;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -25,7 +24,18 @@ class WorkerLogger implements LoggerInterface
 	public function __construct(LoggerInterface $logger)
 	{
 		$this->logger = $logger;
-		$this->workerId = System::processID("wrk");
+		$this->workerId = $this->generateUid(7);
+	}
+
+	/**
+	 * Generates an UID
+	 *
+	 * @param $length
+	 * @return bool|string
+	 */
+	private function generateUid($length)
+	{
+		return substr(hash('md5', uniqid('', true)), 0, $length);
 	}
 
 	/**
