@@ -8,7 +8,9 @@ use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Model\Process;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Logger\WorkerLogger;
 use Friendica\Util\Network;
+use Friendica\Worker\WorkerFactory;
 
 /**
  * @file src/Core/Worker.php
@@ -368,13 +370,11 @@ class Worker
 
 		$mypid = getmypid();
 
+		$workerLogger = new WorkerLogger($a->getLogger());
+
 		$argc = count($argv);
 
-		// Currently deactivated, since the new logger doesn't support this
-		//$new_process_id = System::processID("wrk");
-		$new_process_id = '';
-
-		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: ".$new_process_id);
+		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: " . $workerLogger->getWorkerId());
 
 		$stamp = (float)microtime(true);
 
@@ -395,24 +395,22 @@ class Worker
 			$a->callstack = [];
 		}
 
-		// For better logging create a new process id for every worker call
-		// But preserve the old one for the worker
-		$old_process_id = $a->process_id;
-		$a->process_id = $new_process_id;
-		$a->queue = $queue;
-
 		$up_duration = microtime(true) - self::$up_start;
 
 		// Reset global data to avoid interferences
 		unset($_SESSION);
 
 		if ($method_call) {
-			call_user_func_array(sprintf('Friendica\Worker\%s::execute', $funcname), $argv);
+			$worker = WorkerFactory::create($funcname, $a, $workerLogger);
+			/**
+			 * This call uses the array as a parameter because of this benchmark
+			 * https://github.com/fab2s/call_user_func/
+			 */
+			$worker->execute($argv);
 		} else {
 			$funcname($argv, $argc);
 		}
 
-		$a->process_id = $old_process_id;
 		unset($a->queue);
 
 		$duration = (microtime(true) - $stamp);

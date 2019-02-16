@@ -10,9 +10,21 @@ namespace Friendica\Worker;
 
 use Friendica\Model\Item;
 
-class CreateShadowEntry {
-	public static function execute($message_id = 0) {
-		if (empty($message_id)) {
+class CreateShadowEntry extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 * @throws \Exception
+	 */
+	public function execute(array $parameters = [])
+	{
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$message_id = $parameters[0];
+
+		if (empty($message_id) || !is_int($message_id)) {
 			return;
 		}
 

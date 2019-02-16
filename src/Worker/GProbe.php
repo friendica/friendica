@@ -6,7 +6,6 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Cache;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\GContact;
@@ -14,9 +13,17 @@ use Friendica\Network\Probe;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\Strings;
 
-class GProbe {
-	public static function execute($url = '')
+class GProbe extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
+		$url = isset($parameters[0]) ? $parameters[0] : '';
+
 		if (empty($url)) {
 			return;
 		}
@@ -26,7 +33,7 @@ class GProbe {
 			DBA::escape(Strings::normaliseLink($url))
 		);
 
-		Logger::log("gprobe start for ".Strings::normaliseLink($url), Logger::DEBUG);
+		$this->logger->info("gprobe start for ".Strings::normaliseLink($url));
 
 		if (!DBA::isResult($r)) {
 			// Is it a DDoS attempt?
@@ -35,7 +42,7 @@ class GProbe {
 			$result = Cache::get("gprobe:".$urlparts["host"]);
 			if (!is_null($result)) {
 				if (in_array($result["network"], [Protocol::FEED, Protocol::PHANTOM])) {
-					Logger::log("DDoS attempt detected for ".$urlparts["host"]." by ".defaults($_SERVER, "REMOTE_ADDR", '').". server data: ".print_r($_SERVER, true), Logger::DEBUG);
+					$this->logger->info("DDoS attempt detected for ".$urlparts["host"]." by ".defaults($_SERVER, "REMOTE_ADDR", '').". server data: ".print_r($_SERVER, true));
 					return;
 				}
 			}
@@ -62,7 +69,7 @@ class GProbe {
 			}
 		}
 
-		Logger::log("gprobe end for ".Strings::normaliseLink($url), Logger::DEBUG);
+		$this->logger->info("gprobe end for ".Strings::normaliseLink($url));
 		return;
 	}
 }

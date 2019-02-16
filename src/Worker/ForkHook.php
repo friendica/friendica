@@ -7,12 +7,22 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Hook;
 
-Class ForkHook
+Class ForkHook extends AbstractWorker
 {
-	public static function execute($name, $hook, $data)
+	/**
+	 * {@inheritdoc}
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function execute(array $parameters = [])
 	{
-		$a = \Friendica\BaseObject::getApp();
+		if (!$this->checkParameters($parameters, 3)) {
+			return;
+		}
 
-		Hook::callSingle($a, $name, $hook, $data);
+		$name = $parameters[0];
+		$hook = $parameters[1];
+		$data = $parameters[2];
+
+		Hook::callSingle($this->app, $name, $hook, $data);
 	}
 }

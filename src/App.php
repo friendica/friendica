@@ -393,8 +393,6 @@ class App
 
 		Core\L10n::init();
 
-		$this->process_id = Core\System::processID('log');
-
 		Core\Logger::setLogger($this->logger);
 	}
 
@@ -1287,7 +1285,7 @@ class App
 			$this->module = 'maintenance';
 		} else {
 			$this->checkURL();
-			Core\Update::check($this->basePath, false);
+			Core\Update::check($this->basePath, $this->getLogger(),false);
 			Core\Addon::loadAddons();
 			Core\Hook::loadHooks();
 		}

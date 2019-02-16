@@ -7,7 +7,6 @@ namespace Friendica\Worker;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -20,17 +19,25 @@ use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\PortableContact;
 use Friendica\Protocol\Salmon;
 
-class Queue
+class Queue extends AbstractWorker
 {
-	public static function execute($queue_id = 0)
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
+		$queue_id = (isset($parameters[0]) && is_int($parameters[0])) ? $parameters[0] : 0;
+
 		$cachekey_deadguy = 'queue_run:deadguy:';
 		$cachekey_server = 'queue_run:server:';
 
 		$no_dead_check = Config::get('system', 'queue_no_dead_check', false);
 
 		if (!$queue_id) {
-			Logger::log('filling queue jobs - start');
+			$this->logger->info('filling queue jobs - start');
 
 			// Handling the pubsubhubbub requests
 			PushSubscriber::requeue();
@@ -41,11 +48,11 @@ class Queue
 
 			if (DBA::isResult($r)) {
 				foreach ($r as $q_item) {
-					Logger::log('Call queue for id ' . $q_item['id']);
+					$this->logger->info('Call queue for id ' . $q_item['id']);
 					Worker::add(['priority' => PRIORITY_LOW, 'dont_fork' => true], "Queue", (int) $q_item['id']);
 				}
 			}
-			Logger::log('filling queue jobs - end');
+			$this->logger->info('filling queue jobs - end');
 			return;
 		}
 
@@ -70,7 +77,7 @@ class Queue
 		$dead = Cache::get($cachekey_deadguy . $contact['notify']);
 
 		if (!is_null($dead) && $dead && !$no_dead_check) {
-			Logger::log('queue: skipping known dead url: ' . $contact['notify']);
+			$this->logger->info('queue: skipping known dead url: ' . $contact['notify']);
 			QueueModel::updateTime($q_item['id']);
 			return;
 		}
@@ -82,14 +89,14 @@ class Queue
 				$vital = Cache::get($cachekey_server . $server);
 
 				if (is_null($vital)) {
-					Logger::log("Check server " . $server . " (" . $contact["network"] . ")");
+					$this->logger->info("Check server " . $server . " (" . $contact["network"] . ")");
 
 					$vital = PortableContact::checkServer($server, $contact["network"], true);
 					Cache::set($cachekey_server . $server, $vital, Cache::MINUTE);
 				}
 
 				if (!is_null($vital) && !$vital) {
-					Logger::log('queue: skipping dead server: ' . $server);
+					$this->logger->info('queue: skipping dead server: ' . $server);
 					QueueModel::updateTime($q_item['id']);
 					return;
 				}
@@ -110,7 +117,7 @@ class Queue
 
 		switch ($contact['network']) {
 			case Protocol::DFRN:
-				Logger::log('queue: dfrndelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
+				$this->logger->info('queue: dfrndelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = DFRN::deliver($owner, $contact, $data);
 
 				if (($deliver_status >= 200) && ($deliver_status <= 299)) {
@@ -122,7 +129,7 @@ class Queue
 				break;
 
 			case Protocol::OSTATUS:
-				Logger::log('queue: slapdelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
+				$this->logger->info('queue: slapdelivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = Salmon::slapper($owner, $contact['notify'], $data);
 
 				if ($deliver_status == -1) {
@@ -134,7 +141,7 @@ class Queue
 				break;
 
 			case Protocol::DIASPORA:
-				Logger::log('queue: diaspora_delivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
+				$this->logger->info('queue: diaspora_delivery: item ' . $q_item['id'] . ' for ' . $contact['name'] . ' <' . $contact['url'] . '>');
 				$deliver_status = Diaspora::transmit($owner, $contact, $data, $public, true, 'Queue:' . $q_item['id'], true);
 
 				if ((($deliver_status >= 200) && ($deliver_status <= 299)) ||
@@ -157,7 +164,7 @@ class Queue
 				}
 				break;
 		}
-		Logger::log('Deliver status ' . (int)$deliver_status . ' for item ' . $q_item['id'] . ' to ' . $contact['name'] . ' <' . $contact['url'] . '>');
+		$this->logger->info('Deliver status ' . (int)$deliver_status . ' for item ' . $q_item['id'] . ' to ' . $contact['name'] . ' <' . $contact['url'] . '>');
 
 		return;
 	}

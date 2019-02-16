@@ -5,12 +5,24 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\Database\DBA;
 use Friendica\Core\Protocol;
+use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
-class RemoveContact {
-	public static function execute($id) {
+class RemoveContact extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Exception
+	 */
+	public function execute(array $parameters = [])
+	{
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$id = $parameters[0];
 
 		// Only delete if the contact is to be deleted
 		$condition = ['network' => Protocol::PHANTOM, 'id' => $id];

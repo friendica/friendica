@@ -8,15 +8,25 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Util\Network;
 
-class Directory
+class Directory extends AbstractWorker
 {
-	public static function execute($url = '')
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function execute(array $parameters = [])
 	{
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$url = $parameters[0];
+
 		$dir = Config::get('system', 'directory');
 
 		if (!strlen($dir)) {
@@ -24,7 +34,7 @@ class Directory
 		}
 
 		if ($url == '') {
-			self::updateAll();
+			$this->updateAll();
 			return;
 		}
 
@@ -34,7 +44,7 @@ class Directory
 
 		Hook::callAll('globaldir_update', $arr);
 
-		Logger::log('Updating directory: ' . $arr['url'], Logger::DEBUG);
+		$this->logger->info('Updating directory: ' . $arr['url']);
 		if (strlen($arr['url'])) {
 			Network::fetchUrl($dir . '?url=' . bin2hex($arr['url']));
 		}
@@ -42,7 +52,7 @@ class Directory
 		return;
 	}
 
-	private static function updateAll() {
+	private function updateAll() {
 		$r = q("SELECT `url` FROM `contact`
 			INNER JOIN `profile` ON `profile`.`uid` = `contact`.`uid`
 			INNER JOIN `user` ON `user`.`uid` = `contact`.`uid`

@@ -39,7 +39,7 @@ $logger = Factory\LoggerFactory::create('worker', $config);
 $a = new App($config, $logger);
 
 // Check the database structure and possibly fixes it
-Update::check($a->getBasePath(), true);
+Update::check($a->getBasePath(), $logger, true);
 
 // Quit when in maintenance
 if (!$a->getMode()->has(App\Mode::MAINTENANCEDISABLED)) {

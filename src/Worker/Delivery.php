@@ -4,10 +4,8 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -19,10 +17,10 @@ use Friendica\Model\User;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
-use Friendica\Util\Strings;
 use Friendica\Util\Network;
+use Friendica\Util\Strings;
 
-class Delivery extends BaseObject
+class Delivery extends AbstractWorker
 {
 	const MAIL          = 'mail';
 	const SUGGESTION    = 'suggest';
@@ -33,9 +31,23 @@ class Delivery extends BaseObject
 	const REMOVAL       = 'removeme';
 	const PROFILEUPDATE = 'profileupdate';
 
-	public static function execute($cmd, $target_id, $contact_id)
+	/**
+	 * {@inheritdoc}
+	 * 
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
-		Logger::log('Invoked: ' . $cmd . ': ' . $target_id . ' to ' . $contact_id, Logger::DEBUG);
+		if (!$this->checkParameters($parameters, 3)) {
+			return;
+		}
+		
+		$cmd        = $parameters[0];
+		$target_id  = $parameters[1];
+		$contact_id = $parameters[2];
+		
+		$this->logger->info('Invoked: ' . $target_id . ' to ' . $contact_id, ['cmd' => $cmd]);
 
 		$top_level = false;
 		$followup = false;
@@ -80,12 +92,12 @@ class Delivery extends BaseObject
 			DBA::close($itemdata);
 
 			if (empty($target_item)) {
-				Logger::log('Item ' . $target_id . "wasn't found. Quitting here.");
+				$this->logger->info('Item wasn\'t found. Quitting here.', ['item' => $target_id]);
 				return;
 			}
 
 			if (empty($parent)) {
-				Logger::log('Parent ' . $parent_id . ' for item ' . $target_id . "wasn't found. Quitting here.");
+				$this->logger->info('Parent for item wasn\'t found. Quitting here.', ['item' => $target_id, 'parent' => $parent_id]);
 				return;
 			}
 
@@ -94,7 +106,7 @@ class Delivery extends BaseObject
 			} elseif (!empty($target_item['uid'])) {
 				$uid = $target_item['uid'];
 			} else {
-				Logger::log('Only public users for item ' . $target_id, Logger::DEBUG);
+				$this->logger->info('Only public users for item.', ['item' => $target_id]);
 				return;
 			}
 
@@ -109,7 +121,7 @@ class Delivery extends BaseObject
 			// The count then showed more than one entry. The additional check should help.
 			// The check for the "count" should be superfluous, but I'm not totally sure by now, so we keep it.
 			if ((($parent['id'] == $target_id) || (count($items) == 1)) && ($parent['uri'] === $parent['parent-uri'])) {
-				Logger::log('Top level post');
+				$this->logger->info('Top level post');
 				$top_level = true;
 			}
 
@@ -121,7 +133,7 @@ class Delivery extends BaseObject
 			// if $parent['wall'] == 1 we will already have the parent message in our array
 			// and we will relay the whole lot.
 
-			$localhost = self::getApp()->getHostName();
+			$localhost = $this->app->getHostName();
 			if (strpos($localhost, ':')) {
 				$localhost = substr($localhost, 0, strpos($localhost, ':'));
 			}
@@ -134,7 +146,7 @@ class Delivery extends BaseObject
 			 */
 
 			if (!$top_level && ($parent['wall'] == 0) && stristr($target_item['uri'], $localhost)) {
-				Logger::log('Followup ' . $target_item["guid"], Logger::DEBUG);
+				$this->logger->info('Followup.', ['guid' => $target_item['guid']]);
 				// local followup to remote post
 				$followup = true;
 			}
@@ -149,7 +161,7 @@ class Delivery extends BaseObject
 		}
 
 		if (empty($items)) {
-			Logger::log('No delivery data for  ' . $cmd . ' - Item ID: ' .$target_id . ' - Contact ID: ' . $contact_id);
+			$this->logger->info('No delivery data for  ' . $cmd . ' - Item ID: ' .$target_id . ' - Contact ID: ' . $contact_id);
 		}
 
 		$owner = User::getOwnerDataById($uid);
@@ -175,12 +187,12 @@ class Delivery extends BaseObject
 			$contact['network'] = Protocol::DIASPORA;
 		}
 
-		Logger::log("Delivering " . $cmd . " followup=$followup - via network " . $contact['network']);
+		$this->logger->info("Delivering " . $cmd . " followup=$followup - via network " . $contact['network']);
 
 		switch ($contact['network']) {
 
 			case Protocol::DFRN:
-				self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
+				$this->deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 
 				if (in_array($cmd, [Delivery::POST, Delivery::COMMENT])) {
 					ItemDeliveryData::incrementQueueDone($target_id);
@@ -188,7 +200,7 @@ class Delivery extends BaseObject
 				break;
 
 			case Protocol::DIASPORA:
-				self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
+				$this->deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 
 				if (in_array($cmd, [Delivery::POST, Delivery::COMMENT])) {
 					ItemDeliveryData::incrementQueueDone($target_id);
@@ -209,7 +221,7 @@ class Delivery extends BaseObject
 				break;
 
 			case Protocol::MAIL:
-				self::deliverMail($cmd, $contact, $owner, $target_item);
+				$this->deliverMail($cmd, $contact, $owner, $target_item);
 				break;
 
 			default:
@@ -233,9 +245,9 @@ class Delivery extends BaseObject
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
+	private function deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
 	{
-		Logger::log('Deliver ' . defaults($target_item, 'guid', $target_item['id']) . ' via DFRN to ' . (empty($contact['addr']) ? $contact['url'] : $contact['addr']));
+		$this->logger->info('Deliver ' . defaults($target_item, 'guid', $target_item['id']) . ' via DFRN to ' . (empty($contact['addr']) ? $contact['url'] : $contact['addr']));
 
 		if ($cmd == self::MAIL) {
 			$item = $target_item;
@@ -263,7 +275,7 @@ class Delivery extends BaseObject
 			$atom = DFRN::entries($msgitems, $owner);
 		}
 
-		Logger::log('Notifier entry: ' . $contact["url"] . ' ' . defaults($target_item, 'guid', $target_item['id']) . ' entry: ' . $atom, Logger::DATA);
+		$this->logger->debug('Notifier entry: ' . $contact["url"] . ' ' . defaults($target_item, 'guid', $target_item['id']) . ' entry: ' . $atom);
 
 		$basepath =  implode('/', array_slice(explode('/', $contact['url']), 0, 3));
 
@@ -307,13 +319,13 @@ class Delivery extends BaseObject
 
 			// We never spool failed relay deliveries
 			if ($public_dfrn) {
-				Logger::log('Relay delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
+				$this->logger->info('Relay delivery to ' . $contact["url"] . ' with guid ' . $target_item["guid"] . ' returns ' . $deliver_status);
 				return;
 			}
 
 			if (($deliver_status < 200) || ($deliver_status > 299)) {
 				// Transmit via Diaspora if not possible via Friendica
-				self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
+				$this->deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 				return;
 			}
 		} elseif ($cmd != self::RELOCATION) {
@@ -322,10 +334,10 @@ class Delivery extends BaseObject
 			$deliver_status = DFRN::deliver($owner, $contact, $atom, false, true);
 		}
 
-		Logger::log('Delivery to ' . $contact['url'] . ' with guid ' . defaults($target_item, 'guid', $target_item['id']) . ' returns ' . $deliver_status);
+		$this->logger->info('Delivery to ' . $contact['url'] . ' with guid ' . defaults($target_item, 'guid', $target_item['id']) . ' returns ' . $deliver_status);
 
 		if ($deliver_status < 0) {
-			Logger::log('Delivery failed: queuing message ' . defaults($target_item, 'guid', $target_item['id']));
+			$this->logger->info('Delivery failed: queuing message ' . defaults($target_item, 'guid', $target_item['id']));
 			Queue::add($contact['id'], Protocol::DFRN, $atom, false, $target_item['guid']);
 		}
 
@@ -338,7 +350,7 @@ class Delivery extends BaseObject
 
 			// Transmit via Diaspora when all other methods (legacy DFRN and new one) are failing.
 			// This is a fallback for systems that don't know the new methods.
-			self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
+			$this->deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 		}
 	}
 
@@ -356,7 +368,7 @@ class Delivery extends BaseObject
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
+	private function deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
 	{
 		// We don't treat Forum posts as "wall-to-wall" to be able to post them via Diaspora
 		$walltowall = $top_level && ($owner['id'] != $items[0]['contact-id']) & ($owner['account-type'] != User::ACCOUNT_TYPE_COMMUNITY);
@@ -367,7 +379,7 @@ class Delivery extends BaseObject
 			$loc = $contact['addr'];
 		}
 
-		Logger::log('Deliver ' . defaults($target_item, 'guid', $target_item['id']) . ' via Diaspora to ' . $loc);
+		$this->logger->info('Deliver ' . defaults($target_item, 'guid', $target_item['id']) . ' via Diaspora to ' . $loc);
 
 		if (Config::get('system', 'dfrn_only') || !Config::get('system', 'diaspora_enabled')) {
 			return;
@@ -388,27 +400,27 @@ class Delivery extends BaseObject
 			return;
 		} elseif ($target_item['deleted'] && (($target_item['uri'] === $target_item['parent-uri']) || $followup)) {
 			// top-level retraction
-			Logger::log('diaspora retract: ' . $loc);
+			$this->logger->info('diaspora retract: ' . $loc);
 			Diaspora::sendRetraction($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($followup) {
 			// send comments and likes to owner to relay
-			Logger::log('diaspora followup: ' . $loc);
+			$this->logger->info('diaspora followup: ' . $loc);
 			Diaspora::sendFollowup($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($target_item['uri'] !== $target_item['parent-uri']) {
 			// we are the relay - send comments, likes and relayable_retractions to our conversants
-			Logger::log('diaspora relay: ' . $loc);
+			$this->logger->info('diaspora relay: ' . $loc);
 			Diaspora::sendRelay($target_item, $owner, $contact, $public_message);
 			return;
 		} elseif ($top_level && !$walltowall) {
 			// currently no workable solution for sending walltowall
-			Logger::log('diaspora status: ' . $loc);
+			$this->logger->info('diaspora status: ' . $loc);
 			Diaspora::sendStatus($target_item, $owner, $contact, $public_message);
 			return;
 		}
 
-		Logger::log('Unknown mode ' . $cmd . ' for ' . $loc);
+		$this->logger->info('Unknown mode ' . $cmd . ' for ' . $loc);
 	}
 
 	/**
@@ -421,7 +433,7 @@ class Delivery extends BaseObject
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function deliverMail($cmd, $contact, $owner, $target_item)
+	private function deliverMail($cmd, $contact, $owner, $target_item)
 	{
 		if (Config::get('system','dfrn_only')) {
 			return;
@@ -442,7 +454,7 @@ class Delivery extends BaseObject
 			return;
 		}
 
-		Logger::log('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
+		$this->logger->info('Deliver ' . $target_item["guid"] . ' via mail to ' . $contact['addr']);
 
 		$reply_to = '';
 		$mailacct = DBA::selectFirst('mailacct', ['reply_to'], ['uid' => $owner['uid']]);
@@ -462,7 +474,7 @@ class Delivery extends BaseObject
 				$headers  = 'From: ' . Email::encodeHeader($local_user['username'],'UTF-8').' <' . $local_user['email'] . '>' . "\n";
 			}
 		} else {
-			$headers  = 'From: '. Email::encodeHeader($local_user['username'], 'UTF-8') . ' <noreply@' . self::getApp()->getHostName() . '>' . "\n";
+			$headers  = 'From: '. Email::encodeHeader($local_user['username'], 'UTF-8') . ' <noreply@' . $this->app->getHostName() . '>' . "\n";
 		}
 
 		$headers .= 'Message-Id: <' . Email::iri2msgid($target_item['uri']) . '>' . "\n";

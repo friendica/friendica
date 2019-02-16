@@ -4,11 +4,8 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
@@ -22,18 +19,28 @@ use Friendica\Util\Proxy as ProxyUtils;
 
 require_once 'mod/nodeinfo.php';
 
-class CronJobs
+class CronJobs extends AbstractWorker
 {
-	public static function execute($command = '')
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
-		$a = BaseObject::getApp();
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$command = $parameters[0];
 
 		// No parameter set? So return
 		if ($command == '') {
 			return;
 		}
 
-		Logger::log("Starting cronjob " . $command, Logger::DEBUG);
+		$this->logger->info('Start.', ['cmd' => 'cronjob', 'action' => $command]);
 
 		// Call possible post update functions
 		// see src/Database/PostUpdate.php for more details
@@ -50,7 +57,7 @@ class CronJobs
 
 		// Expire and remove user entries
 		if ($command == 'expire_and_remove_users') {
-			self::expireAndRemoveUsers();
+			$this->expireAndRemoveUsers();
 			return;
 		}
 
@@ -60,29 +67,29 @@ class CronJobs
 		}
 
 		if ($command == 'update_photo_albums') {
-			self::updatePhotoAlbums();
+			$this->updatePhotoAlbums();
 			return;
 		}
 
 		// Clear cache entries
 		if ($command == 'clear_cache') {
-			self::clearCache($a);
+			$this->clearCache();
 			return;
 		}
 
 		// Repair missing Diaspora values in contacts
 		if ($command == 'repair_diaspora') {
-			self::repairDiaspora($a);
+			$this->repairDiaspora();
 			return;
 		}
 
 		// Repair entries in the database
 		if ($command == 'repair_database') {
-			self::repairDatabase();
+			$this->repairDatabase();
 			return;
 		}
 
-		Logger::log("Xronjob " . $command . " is unknown.", Logger::DEBUG);
+		$this->logger->info('Cronjob is unknown.', ['cmd' => 'cronjob', 'action' => $command]);
 
 		return;
 	}
@@ -90,7 +97,7 @@ class CronJobs
 	/**
 	 * @brief Update the cached values for the number of photo albums per user
 	 */
-	private static function updatePhotoAlbums()
+	private function updatePhotoAlbums()
 	{
 		$r = q("SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed`");
 		if (!DBA::isResult($r)) {
@@ -105,7 +112,7 @@ class CronJobs
 	/**
 	 * @brief Expire and remove user entries
 	 */
-	private static function expireAndRemoveUsers()
+	private function expireAndRemoveUsers()
 	{
 		// expire any expired regular accounts. Don't expire forums.
 		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < UTC_TIMESTAMP() AND `page-flags` = 0", DBA::NULL_DATETIME];
@@ -133,10 +140,9 @@ class CronJobs
 	/**
 	 * @brief Clear cache entries
 	 *
-	 * @param App $a
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function clearCache(App $a)
+	private function clearCache()
 	{
 		$last = Config::get('system', 'cache_last_cleared');
 
@@ -157,15 +163,17 @@ class CronJobs
 		// clear old item cache files
 		clear_cache();
 
+		$basePath = $this->app->getBasePath();
+
 		// clear cache for photos
-		clear_cache($a->getBasePath(), $a->getBasePath() . "/photo");
+		clear_cache($basePath, $basePath . "/photo");
 
 		// clear smarty cache
-		clear_cache($a->getBasePath() . "/view/smarty3/compiled", $a->getBasePath() . "/view/smarty3/compiled");
+		clear_cache($basePath . "/view/smarty3/compiled", $basePath . "/view/smarty3/compiled");
 
 		// clear cache for image proxy
 		if (!Config::get("system", "proxy_disabled")) {
-			clear_cache($a->getBasePath(), $a->getBasePath() . "/proxy");
+			clear_cache($basePath, $basePath . "/proxy");
 
 			$cachetime = Config::get('system', 'proxy_cache_time');
 
@@ -212,7 +220,7 @@ class CronJobs
 				// Calculate fragmentation
 				$fragmentation = $table["Data_free"] / ($table["Data_length"] + $table["Index_length"]);
 
-				Logger::log("Table " . $table["Name"] . " - Fragmentation level: " . round($fragmentation * 100, 2), Logger::DEBUG);
+				$this->logger->info("Table " . $table["Name"] . " - Fragmentation level: " . round($fragmentation * 100, 2));
 
 				// Don't optimize tables that needn't to be optimized
 				if ($fragmentation < $fragmentation_level) {
@@ -220,7 +228,7 @@ class CronJobs
 				}
 
 				// So optimize it
-				Logger::log("Optimize Table " . $table["Name"], Logger::DEBUG);
+				$logger->info("Optimize Table " . $table["Name"]);
 				q("OPTIMIZE TABLE `%s`", DBA::escape($table["Name"]));
 			}
 		}
@@ -231,11 +239,10 @@ class CronJobs
 	/**
 	 * @brief Repair missing values in Diaspora contacts
 	 *
-	 * @param App $a
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function repairDiaspora(App $a)
+	private function repairDiaspora()
 	{
 		$starttime = time();
 
@@ -261,7 +268,7 @@ class CronJobs
 				continue;
 			}
 
-			Logger::log("Repair contact " . $contact["id"] . " " . $contact["url"], Logger::DEBUG);
+			$this->logger->info("Repair contact " . $contact["id"] . " " . $contact["url"]);
 			q("UPDATE `contact` SET `batch` = '%s', `notify` = '%s', `poll` = '%s', pubkey = '%s' WHERE `id` = %d",
 				DBA::escape($data["batch"]), DBA::escape($data["notify"]), DBA::escape($data["poll"]), DBA::escape($data["pubkey"]),
 				intval($contact["id"]));
@@ -270,16 +277,15 @@ class CronJobs
 
 	/**
 	 * @brief Do some repairs in database entries
-	 *
 	 */
-	private static function repairDatabase()
+	private function repairDatabase()
 	{
 		// Sometimes there seem to be issues where the "self" contact vanishes.
 		// We haven't found the origin of the problem by now.
 		$r = q("SELECT `uid` FROM `user` WHERE NOT EXISTS (SELECT `uid` FROM `contact` WHERE `contact`.`uid` = `user`.`uid` AND `contact`.`self`)");
 		if (DBA::isResult($r)) {
 			foreach ($r AS $user) {
-				Logger::log('Create missing self contact for user ' . $user['uid']);
+				$this->logger->info('Create missing self contact for user ' . $user['uid']);
 				Contact::createSelfFromUserId($user['uid']);
 			}
 		}

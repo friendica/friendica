@@ -6,7 +6,6 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -17,10 +16,17 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
-class DiscoverPoCo
+class DiscoverPoCo extends AbstractWorker
 {
-	/// @todo Clean up this mess of a parameter hell and split it in several classes
-	public static function execute($command = '', $param1 = '', $param2 = '', $param3 = '', $param4 = '')
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @todo Clean up this mess of a parameter hell and split it in several classes
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
 		/*
 		This function can be called in these ways:
@@ -33,6 +39,12 @@ class DiscoverPoCo
 		- PortableContact::load: Load POCO data from a given POCO address
 		- check_profile: Update remote profile data
 		*/
+
+		$command = isset($parameters[0]) ? $parameters[0] : '';
+		$param1  = isset($parameters[1]) ? $parameters[1] : '';
+		$param2  = isset($parameters[2]) ? $parameters[2] : '';
+		$param3  = isset($parameters[3]) ? $parameters[3] : '';
+		$param4  = isset($parameters[4]) ? $parameters[4] : '';
 
 		$search = "";
 		$mode = 0;
@@ -54,11 +66,11 @@ class DiscoverPoCo
 		} elseif ($command == "check_profile") {
 			$mode = 8;
 		} elseif ($command !== "") {
-			Logger::log("Unknown or missing parameter ".$command."\n");
+			$this->logger->notice('Unknown or missing parameter.', ['cmd' => $command]);
 			return;
 		}
 
-		Logger::log('start '.$search);
+		$this->logger->info('start ' . $search);
 
 		if ($mode == 8) {
 			if ($param1 != "") {
@@ -74,7 +86,7 @@ class DiscoverPoCo
 		} elseif ($mode == 6) {
 			PortableContact::discoverSingleServer(intval($param1));
 		} elseif ($mode == 5) {
-			self::updateServer();
+			$this->updateServer();
 		} elseif ($mode == 4) {
 			$server_url = $param1;
 			if ($server_url == "") {
@@ -91,14 +103,14 @@ class DiscoverPoCo
 			} else {
 				$result .= "failed";
 			}
-			Logger::log($result, Logger::DEBUG);
+			$this->logger->info($result);
 		} elseif ($mode == 3) {
 			GContact::updateSuggestions();
 		} elseif (($mode == 2) && Config::get('system', 'poco_completion')) {
-			self::discoverUsers();
+			$this->discoverUsers();
 		} elseif (($mode == 1) && ($search != "") && Config::get('system', 'poco_local_search')) {
-			self::discoverDirectory($search);
-			self::gsSearchUser($search);
+			$this->discoverDirectory($search);
+			$this->gsSearchUser($search);
 		} elseif (($mode == 0) && ($search == "") && (Config::get('system', 'poco_discovery') != PortableContact::DISABLED)) {
 			// Query Friendica and Hubzilla servers for their users
 			PortableContact::discover();
@@ -109,7 +121,7 @@ class DiscoverPoCo
 			}
 		}
 
-		Logger::log('end '.$search);
+		$this->logger->info('end '.$search);
 
 		return;
 	}
@@ -118,7 +130,7 @@ class DiscoverPoCo
 	 * @brief Updates the first 250 servers
 	 *
 	 */
-	private static function updateServer() {
+	private function updateServer() {
 		$r = q("SELECT `url`, `created`, `last_failure`, `last_contact` FROM `gserver` ORDER BY rand()");
 
 		if (!DBA::isResult($r)) {
@@ -131,7 +143,7 @@ class DiscoverPoCo
 			if (!PortableContact::updateNeeded($server["created"], "", $server["last_failure"], $server["last_contact"])) {
 				continue;
 			}
-			Logger::log('Update server status for server '.$server["url"], Logger::DEBUG);
+			$this->logger->info('Update server status for server '.$server["url"]);
 
 			Worker::add(PRIORITY_LOW, "DiscoverPoCo", "server", $server["url"]);
 
@@ -141,8 +153,8 @@ class DiscoverPoCo
 		}
 	}
 
-	private static function discoverUsers() {
-		Logger::log("Discover users", Logger::DEBUG);
+	private function discoverUsers() {
+		$this->logger->info("Discover users");
 
 		$starttime = time();
 
@@ -186,7 +198,7 @@ class DiscoverPoCo
 			}
 
 			if ((($server_url == "") && ($user["network"] == Protocol::FEED)) || $force_update || PortableContact::checkServer($server_url, $user["network"])) {
-				Logger::log('Check profile '.$user["url"]);
+				$this->logger->info('Check profile.', ['url' => $user["url"]]);
 				Worker::add(PRIORITY_LOW, "DiscoverPoCo", "check_profile", $user["url"]);
 
 				if (++$checked > 100) {
@@ -204,13 +216,13 @@ class DiscoverPoCo
 		}
 	}
 
-	private static function discoverDirectory($search) {
+	private function discoverDirectory($search) {
 
 		$data = Cache::get("dirsearch:".$search);
 		if (!is_null($data)) {
 			// Only search for the same item every 24 hours
 			if (time() < $data + (60 * 60 * 24)) {
-				Logger::log("Already searched for ".$search." in the last 24 hours", Logger::DEBUG);
+				$this->logger->info("Already searched for ".$search." in the last 24 hours");
 				return;
 			}
 		}
@@ -223,7 +235,7 @@ class DiscoverPoCo
 				// Check if the contact already exists
 				$exists = q("SELECT `id`, `last_contact`, `last_failure`, `updated` FROM `gcontact` WHERE `nurl` = '%s'", Strings::normaliseLink($jj->url));
 				if (DBA::isResult($exists)) {
-					Logger::log("Profile ".$jj->url." already exists (".$search.")", Logger::DEBUG);
+					$this->logger->info("Profile ".$jj->url." already exists (".$search.")");
 
 					if (($exists[0]["last_contact"] < $exists[0]["last_failure"]) &&
 						($exists[0]["updated"] < $exists[0]["last_failure"])) {
@@ -237,16 +249,16 @@ class DiscoverPoCo
 				$server_url = PortableContact::detectServer($jj->url);
 				if ($server_url != '') {
 					if (!PortableContact::checkServer($server_url)) {
-						Logger::log("Friendica server ".$server_url." doesn't answer.", Logger::DEBUG);
+						$this->logger->info("Friendica server ".$server_url." doesn't answer.");
 						continue;
 					}
-					Logger::log("Friendica server ".$server_url." seems to be okay.", Logger::DEBUG);
+					$this->logger->info("Friendica server ".$server_url." seems to be okay.");
 				}
 
 				$data = Probe::uri($jj->url);
 				if ($data["network"] == Protocol::DFRN) {
-					Logger::log("Profile ".$jj->url." is reachable (".$search.")", Logger::DEBUG);
-					Logger::log("Add profile ".$jj->url." to local directory (".$search.")", Logger::DEBUG);
+					$this->logger->info("Profile ".$jj->url." is reachable (".$search.")");
+					$this->logger->info("Add profile ".$jj->url." to local directory (".$search.")");
 
 					if ($jj->tags != "") {
 						$data["keywords"] = $jj->tags;
@@ -256,7 +268,7 @@ class DiscoverPoCo
 
 					GContact::update($data);
 				} else {
-					Logger::log("Profile ".$jj->url." is not responding or no Friendica contact - but network ".$data["network"], Logger::DEBUG);
+					$this->logger->info("Profile ".$jj->url." is not responding or no Friendica contact - but network ".$data["network"]);
 				}
 			}
 		}
@@ -271,7 +283,7 @@ class DiscoverPoCo
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function gsSearchUser($search) {
+	private function gsSearchUser($search) {
 
 		// Currently disabled, since the service isn't available anymore.
 		// It is not removed since I hope that there will be a successor.

@@ -4,28 +4,32 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Model\ItemDeliveryData;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\HTTPSignature;
 
-class APDelivery extends BaseObject
+class APDelivery extends AbstractWorker
 {
 	/**
 	 * @brief Delivers ActivityPub messages
 	 *
-	 * @param string  $cmd
-	 * @param integer $target_id
-	 * @param string  $inbox
-	 * @param integer $uid
+	 * {@inheritdoc}
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function execute($cmd, $target_id, $inbox, $uid)
+	public function execute(array $parameters = [])
 	{
-		Logger::log('Invoked: ' . $cmd . ': ' . $target_id . ' to ' . $inbox, Logger::DEBUG);
+		if (!$this->checkParameters($parameters, 4)) {
+			return;
+		}
+
+		$cmd       = $parameters[0];
+		$target_id = $parameters[1];
+		$inbox     = $parameters[2];
+		$uid       = $parameters[3];
+
+		$this->logger->debug('Invoked: ' . $target_id . ' to ' . $inbox, ['cmd' => $cmd]);
 
 		$success = true;
 

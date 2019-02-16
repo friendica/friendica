@@ -8,9 +8,21 @@ namespace Friendica\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
-class RemoveUser {
-	public static function execute($uid)
+class RemoveUser extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function execute(array $parameters = [])
 	{
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$uid = $parameters[0];
+
 		// Only delete if the user is archived
 		$condition = ['account_removed' => true, 'uid' => $uid];
 		if (!DBA::exists('user', $condition)) {

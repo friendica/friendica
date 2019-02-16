@@ -8,22 +8,32 @@ use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 
-class Cron
+class Cron extends AbstractWorker
 {
-	public static function execute($parameter = '', $generation = 0)
+	/***
+	 * {@inheritdoc}
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function execute(array $parameters = [])
 	{
+		if (!$this->checkParameters($parameters, 2)) {
+			return;
+		}
+
+		$parameter  = $parameters[0];
+		$generation = $parameters[1];
+
 		$a = BaseObject::getApp();
 
 		// Poll contacts with specific parameters
 		if (!empty($parameter)) {
-			self::pollContacts($parameter, $generation);
+			$this->pollContacts($parameter, $generation);
 			return;
 		}
 
@@ -37,12 +47,12 @@ class Cron
 		if ($last) {
 			$next = $last + ($poll_interval * 60);
 			if ($next > time()) {
-				Logger::log('cron intervall not reached');
+				$this->logger->info('Intervall not reached');
 				return;
 			}
 		}
 
-		Logger::log('cron: start');
+		$this->logger->info('Start.');
 
 		// Fork the cron jobs in separate parts to avoid problems when one of them is crashing
 		Hook::fork($a->queue['priority'], "cron");
@@ -123,7 +133,7 @@ class Cron
 		// Poll contacts
 		self::pollContacts($parameter, $generation);
 
-		Logger::log('cron: end');
+		$this->logger->info('End.');
 
 		Config::set('system', 'last_cron', time());
 
@@ -139,7 +149,7 @@ class Cron
 	 * @param integer $generation
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function pollContacts($parameter, $generation) {
+	private function pollContacts($parameter, $generation) {
 		$manual_id  = 0;
 		$generation = 0;
 		$force      = false;
@@ -283,7 +293,7 @@ class Cron
 				$priority = PRIORITY_LOW;
 			}
 
-			Logger::log("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"]);
+			$this->logger->info("Polling " . $contact["network"] . " " . $contact["id"] . " " . $contact['priority'] . " " . $contact["nick"] . " " . $contact["name"], ['cmd' => 'cron']);
 
 			Worker::add(['priority' => $priority, 'dont_fork' => true, 'force_priority' => true], 'OnePoll', (int)$contact['id']);
 		}

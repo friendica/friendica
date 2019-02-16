@@ -69,7 +69,7 @@ HELP;
 				break;
 			case "update":
 				$force = $this->getOption(['f', 'force'], false);
-				$output = Update::run($a->getBasePath(), $force, true, false);
+				$output = Update::run($a->getBasePath(), $a->getLogger(), $force, true, false);
 				break;
 			case "dumpsql":
 				ob_start();

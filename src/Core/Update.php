@@ -4,7 +4,9 @@ namespace Friendica\Core;
 
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\Util\Logger\WorkerLogger;
 use Friendica\Util\Strings;
+use Psr\Log\LoggerInterface;
 
 class Update
 {
@@ -15,10 +17,11 @@ class Update
 	 * @brief Function to check if the Database structure needs an update.
 	 *
 	 * @param string $basePath The base path of this application
+	 * @param LoggerInterface $logger The Logger of this instance
 	 * @param boolean $via_worker boolean Is the check run via the worker?
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function check($basePath, $via_worker)
+	public static function check($basePath, LoggerInterface $logger, $via_worker)
 	{
 		if (!DBA::connected()) {
 			return;
@@ -39,7 +42,7 @@ class Update
 		if ($build < DB_UPDATE_VERSION) {
 			// When we cannot execute the database update via the worker, we will do it directly
 			if (!Worker::add(PRIORITY_CRITICAL, 'DBUpdate') && $via_worker) {
-				self::run($basePath);
+				self::run($basePath, $logger);
 			}
 		}
 	}
@@ -48,6 +51,8 @@ class Update
 	 * Automatic database updates
 	 *
 	 * @param string $basePath The base path of this application
+	 * @param LoggerInterface $logger The logger of the current instance
+	 * (could be a WorkerLogger too @see WorkerLogger )
 	 * @param bool $force      Force the Update-Check even if the lock is set
 	 * @param bool $verbose    Run the Update-Check verbose
 	 * @param bool $sendMail   Sends a Mail to the administrator in case of success/failure
@@ -55,7 +60,7 @@ class Update
 	 * @return string Empty string if the update is successful, error messages otherwise
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function run($basePath, $force = false, $verbose = false, $sendMail = true)
+	public static function run($basePath, LoggerInterface $logger, $force = false, $verbose = false, $sendMail = true)
 	{
 		// In force mode, we release the dbupdate lock first
 		// Necessary in case of an stuck update
@@ -78,7 +83,7 @@ class Update
 			if ($stored < $current) {
 				Config::load('database');
 
-				Logger::log('Update from \'' . $stored . '\'  to \'' . $current . '\' - starting', Logger::DEBUG);
+				$logger->info('Update from \'' . $stored . '\'  to \'' . $current . '\' - starting');
 
 				// Compare the current structure with the defined structure
 				// If the Lock is acquired, never release it automatically to avoid double updates
@@ -101,26 +106,26 @@ class Update
 								$retval
 							);
 						}
-						Logger::log('ERROR: Update from \'' . $stored . '\'  to \'' . $current . '\' - failed:  ' - $retval, Logger::ALL);
+						$logger->alert('ERROR: Update from \'' . $stored . '\'  to \'' . $current . '\' - failed:  ' - $retval);
 						Lock::release('dbupdate');
 						return $retval;
 					} else {
 						Config::set('database', 'last_successful_update', $current);
 						Config::set('database', 'last_successful_update_time', time());
-						Logger::log('Update from \'' . $stored . '\'  to \'' . $current . '\' - finished', Logger::DEBUG);
+						$logger->info('Update from \'' . $stored . '\'  to \'' . $current . '\' - finished');
 					}
 
 					// run the update_nnnn functions in update.php
 					for ($x = $stored + 1; $x <= $current; $x++) {
-						$r = self::runUpdateFunction($x, 'update');
+						$r = self::runUpdateFunction($logger, $x, 'update');
 						if (!$r) {
 							break;
 						}
 					}
 
-					Logger::log('Update from \'' . $stored . '\'  to \'' . $current . '\' - successful', Logger::DEBUG);
+					$logger->info('Update from \'' . $stored . '\'  to \'' . $current . '\' - successful');
 					if ($sendMail) {
-						self::updateSuccessfull($stored, $current);
+						self::updateSuccessfull($logger, $stored, $current);
 					}
 
 					Lock::release('dbupdate');
@@ -136,17 +141,18 @@ class Update
 	/**
 	 * Executes a specific update function
 	 *
+	 * @param LoggerInterface $logger
 	 * @param int    $x      the DB version number of the function
 	 * @param string $prefix the prefix of the function (update, pre_update)
 	 *
 	 * @return bool true, if the update function worked
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function runUpdateFunction($x, $prefix)
+	private static function runUpdateFunction(LoggerInterface $logger, $x, $prefix)
 	{
 		$funcname = $prefix . '_' . $x;
 
-		Logger::log('Update function \'' . $funcname . '\' - start', Logger::DEBUG);
+		$logger->info('Update function \'' . $funcname . '\' - start');
 
 		if (function_exists($funcname)) {
 			// There could be a lot of processes running or about to run.
@@ -167,7 +173,7 @@ class Update
 						$x,
 						L10n::t('Update %s failed. See error logs.', $x)
 					);
-					Logger::log('ERROR: Update function \'' . $funcname . '\' - failed: ' . $retval, Logger::ALL);
+					$logger->alert('ERROR: Update function \'' . $funcname . '\' - failed: ' . $retval);
 					Lock::release('dbupdate_function');
 					return false;
 				} else {
@@ -179,12 +185,12 @@ class Update
 					}
 
 					Lock::release('dbupdate_function');
-					Logger::log('Update function \'' . $funcname . '\' - finished', Logger::DEBUG);
+					$logger->info('Update function \'' . $funcname . '\' - finished');
 					return true;
 				}
 			}
 		} else {
-			 Logger::log('Skipping \'' . $funcname . '\' without executing', Logger::DEBUG);
+			 $logger->info('Skipping \'' . $funcname . '\' without executing');
 
 			Config::set('database', 'last_successful_update_function', $funcname);
 			Config::set('database', 'last_successful_update_function_time', time());
@@ -200,18 +206,19 @@ class Update
 	/**
 	 * send the email and do what is needed to do on update fails
 	 *
+	 * @param LoggerInterface $logger
 	 * @param int    $update_id     number of failed update
 	 * @param string $error_message error message
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function updateFailed($update_id, $error_message) {
+	private static function updateFailed(LoggerInterface $logger, $update_id, $error_message) {
 		//send the administrators an e-mail
 		$admin_mail_list = "'".implode("','", array_map(['Friendica\Database\DBA', 'escape'], explode(",", str_replace(" ", "", Config::get('config', 'admin_email')))))."'";
 		$adminlist = DBA::select('user', ['uid', 'language', 'email'], ['`email` IN (%s)', $admin_mail_list]);
 
 		// No valid result?
 		if (!DBA::isResult($adminlist)) {
-			Logger::log(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message), Logger::INFO);
+			$logger->info(sprintf('Cannot notify administrators about update_id=%d, error_message=%s', $update_id, $error_message));
 
 			// Don't continue
 			return;
@@ -242,10 +249,10 @@ class Update
 		}
 
 		//try the logger
-		Logger::log("CRITICAL: Database structure update failed: " . $error_message);
+		$logger->alert("CRITICAL: Database structure update failed: " . $error_message);
 	}
 
-	private static function updateSuccessfull($from_build, $to_build)
+	private static function updateSuccessfull(LoggerInterface $logger, $from_build, $to_build)
 	{
 		//send the administrators an e-mail
 		$admin_mail_list = "'".implode("','", array_map(['Friendica\Database\DBA', 'escape'], explode(",", str_replace(" ", "", Config::get('config', 'admin_email')))))."'";
@@ -274,6 +281,6 @@ class Update
 		}
 
 		//try the logger
-		Logger::log("Database structure update successful.", Logger::TRACE);
+		$logger->notice("Database structure update successful.");
 	}
 }

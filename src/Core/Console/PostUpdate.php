@@ -56,7 +56,7 @@ HELP;
 		}
 
 		echo L10n::t('Check for pending update actions.') . "\n";
-		Update::run($a->getBasePath(), true, true, false);
+		Update::run($a->getBasePath(), $a->getLogger(), true, true, false);
 		echo L10n::t('Done.') . "\n";
 
 		echo L10n::t('Execute pending post updates.') . "\n";

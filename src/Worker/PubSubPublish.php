@@ -5,25 +5,29 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\PushSubscriber;
 use Friendica\Protocol\OStatus;
 use Friendica\Util\Network;
 
-class PubSubPublish
+class PubSubPublish extends AbstractWorker
 {
-	public static function execute($pubsubpublish_id = 0)
+	/**
+	 * {@inheritdoc}
+	 */
+	public function execute(array $parameters = [])
 	{
+		$pubsubpublish_id = (isset($parameters[0]) && is_int($parameters[0])) ? $parameters[0] : 0;
+
 		if ($pubsubpublish_id == 0) {
 			return;
 		}
 
-		self::publish($pubsubpublish_id);
+		$this->publish($pubsubpublish_id);
 	}
 
-	private static function publish($id)
+	private function publish($id)
 	{
 		$subscriber = DBA::selectFirst('push_subscriber', [], ['id' => $id]);
 		if (!DBA::isResult($subscriber)) {
@@ -33,7 +37,7 @@ class PubSubPublish
 		/// @todo Check server status with PortableContact::checkServer()
 		// Before this can be done we need a way to safely detect the server url.
 
-		Logger::log("Generate feed of user " . $subscriber['nickname']. " to " . $subscriber['callback_url']. " - last updated " . $subscriber['last_update'], Logger::DEBUG);
+		$this->logger->info("Generate feed of user " . $subscriber['nickname']. " to " . $subscriber['callback_url']. " - last updated " . $subscriber['last_update']);
 
 		$last_update = $subscriber['last_update'];
 		$params = OStatus::feed($subscriber['nickname'], $last_update);
@@ -50,17 +54,17 @@ class PubSubPublish
 					$subscriber['topic']),
 				"X-Hub-Signature: sha1=" . $hmac_sig];
 
-		Logger::log('POST ' . print_r($headers, true) . "\n" . $params, Logger::DATA);
+		$this->logger->debug('POST ' . print_r($headers, true) . "\n" . $params);
 
 		$postResult = Network::post($subscriber['callback_url'], $params, $headers);
 		$ret = $postResult->getReturnCode();
 
 		if ($ret >= 200 && $ret <= 299) {
-			Logger::log('Successfully pushed to ' . $subscriber['callback_url']);
+			$this->logger->info('Successfully pushed to ' . $subscriber['callback_url']);
 
 			PushSubscriber::reset($subscriber['id'], $last_update);
 		} else {
-			Logger::log('Delivery error when pushing to ' . $subscriber['callback_url'] . ' HTTP: ' . $ret);
+			$this->logger->info('Delivery error when pushing to ' . $subscriber['callback_url'] . ' HTTP: ' . $ret);
 
 			PushSubscriber::delay($subscriber['id']);
 		}

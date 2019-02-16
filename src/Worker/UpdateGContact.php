@@ -6,7 +6,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Network\Probe;
@@ -14,14 +13,25 @@ use Friendica\Protocol\PortableContact;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
-class UpdateGContact
+class UpdateGContact extends AbstractWorker
 {
-	public static function execute($contact_id)
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
 	{
-		Logger::log('update_gcontact: start');
+		if (!$this->checkParameters($parameters, 1)) {
+			return;
+		}
+
+		$contact_id = $parameters[0];
+		$this->logger->info('update_gcontact: start');
 
 		if (empty($contact_id)) {
-			Logger::log('update_gcontact: no contact');
+			$this->logger->info('update_gcontact: no contact');
 			return;
 		}
 

@@ -2,16 +2,20 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 
-class TagUpdate
+class TagUpdate extends AbstractWorker
 {
-	public static function execute()
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Exception
+	 */
+	public function execute(array $parameters = [])
 	{
 		$messages = DBA::p("SELECT `oid`,`item`.`guid`, `item`.`created`, `item`.`received` FROM `term` INNER JOIN `item` ON `item`.`id`=`term`.`oid` WHERE `term`.`otype` = 1 AND `term`.`guid` = ''");
 
-		Logger::log('fetched messages: ' . DBA::numRows($messages));
+		$this->logger->info('fetched messages: ' . DBA::numRows($messages));
 		while ($message = DBA::fetch($messages)) {
 			if ($message['uid'] == 0) {
 				$global = true;
@@ -30,7 +34,7 @@ class TagUpdate
 
 		$messages = DBA::select('item', ['guid'], ['uid' => 0]);
 
-		Logger::log('fetched messages: ' . DBA::numRows($messages));
+		$this->logger->info('fetched messages: ' . DBA::numRows($messages));
 		while ($message = DBA::fetch($messages)) {
 			DBA::update('item', ['global' => true], ['guid' => $message['guid']]);
 		}

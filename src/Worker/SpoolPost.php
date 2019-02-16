@@ -5,11 +5,16 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Model\Item;
 
-class SpoolPost {
-	public static function execute() {
+class SpoolPost extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 * 
+	 * @throws \Exception
+	 */
+	public function execute(array $parameters = []) {
 		$path = get_spoolpath();
 
 		if (($path != '') && is_writable($path)){
@@ -47,7 +52,7 @@ class SpoolPost {
 
 					$result = Item::insert($arr);
 
-					Logger::log("Spool file ".$file." stored: ".$result, Logger::DEBUG);
+					$this->logger->info("Spool file ".$file." stored: ".$result);
 					unlink($fullfile);
 				}
 				closedir($dh);

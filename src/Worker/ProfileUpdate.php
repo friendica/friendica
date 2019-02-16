@@ -6,25 +6,32 @@
 
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
-use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\Diaspora;
 
-class ProfileUpdate {
-	public static function execute($uid = 0) {
+class ProfileUpdate extends AbstractWorker
+{
+	/**
+	 * {@inheritdoc}
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	public function execute(array $parameters = [])
+	{
+
+		$uid = (isset($parameters[0]) && is_int($parameters[0])) ? $parameters[0] : 0;
+
 		if (empty($uid)) {
 			return;
 		}
 
-		$a = BaseObject::getApp();
-
 		$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser($uid);
 
 		foreach ($inboxes as $inbox) {
-			Logger::log('Profile update for user ' . $uid . ' to ' . $inbox .' via ActivityPub', Logger::DEBUG);
-			Worker::add(['priority' => $a->queue['priority'], 'created' => $a->queue['created'], 'dont_fork' => true],
+			$this->logger->info('Profile update for user ' . $uid . ' to ' . $inbox .' via ActivityPub');
+			Worker::add(['priority' => $this->app->queue['priority'], 'created' => $this->app->queue['created'], 'dont_fork' => true],
 				'APDelivery', Delivery::PROFILEUPDATE, '', $inbox, $uid);
 		}
 
