@@ -102,6 +102,19 @@ class Logger extends BaseObject
 	}
 
 	/**
+	 * Switches the Logger and returns the old logger
+	 *
+	 * @param LoggerInterface $logger The new logger
+	 * @return LoggerInterface the old logger
+	 */
+	public static function switchLogger(LoggerInterface $logger)
+	{
+		$oldLogger = self::$logger;
+		self::$logger = $logger;
+		return $oldLogger;
+	}
+
+	/**
 	 * Mapping a legacy level to the PSR-3 compliant levels
 	 * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#5-psrlogloglevel
 	 *

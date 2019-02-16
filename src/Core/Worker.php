@@ -401,12 +401,14 @@ class Worker
 		unset($_SESSION);
 
 		if ($method_call) {
+			$oldLogger = Logger::switchLogger($workerLogger);
 			$worker = WorkerFactory::create($funcname, $a, $workerLogger);
 			/**
 			 * This call uses the array as a parameter because of this benchmark
 			 * https://github.com/fab2s/call_user_func/
 			 */
 			$worker->execute($argv);
+			Logger::switchLogger($oldLogger);
 		} else {
 			$funcname($argv, $argc);
 		}
