@@ -332,6 +332,13 @@ trait DBAMockTrait
 			->andReturn($return);
 	}
 
+	/**
+	 * Mocking DBA::escape()
+	 *
+	 * @param string $input the input for escape
+	 * @param null|string $output The output of the escape (null means same as input)
+	 * @param null|int $times How often the method will get used
+	 */
 	public function mockDbaEscape($input, $output = null, $times = null)
 	{
 		$this->checkMock();
