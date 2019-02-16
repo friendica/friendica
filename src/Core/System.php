@@ -235,21 +235,6 @@ class System extends BaseObject
 	}
 
 	/**
-	 * Generates a process identifier for the logging
-	 *
-	 * @param string $prefix A given prefix
-	 *
-	 * @return string a generated process identifier
-	 */
-	public static function processID($prefix)
-	{
-		// We aren't calling any other function here.
-		// Doing so could easily create an endless loop
-		$trailer = $prefix . ':' . getmypid() . ':';
-		return substr($trailer . uniqid('') . mt_rand(), 0, 26);
-	}
-
-	/**
 	 * Returns the current Load of the System
 	 *
 	 * @return integer
