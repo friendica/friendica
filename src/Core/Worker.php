@@ -372,7 +372,7 @@ class Worker
 
 		$argc = count($argv);
 
-		$workerLogger = new WorkerLogger($a->getLogger());
+		$workerLogger = new WorkerLogger($a->getLogger(), $funcname);
 
 		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." ".$queue["parameter"]." - Process PID: " . $workerLogger->getWorkerId());
 
@@ -450,7 +450,7 @@ class Worker
 			Logger::log("Prio ".$queue["priority"].": ".$queue["parameter"]." - longer than 2 minutes (".round($duration/60, 3).")", Logger::DEBUG);
 		}
 
-		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - done in ".number_format($duration, 4)." seconds. Process PID: ".$new_process_id);
+		Logger::log("Process ".$mypid." - Prio ".$queue["priority"]." - ID ".$queue["id"].": ".$funcname." - done in ".number_format($duration, 4)." seconds.");
 
 		// Write down the performance values into the log
 		if (Config::get("system", "profiler")) {

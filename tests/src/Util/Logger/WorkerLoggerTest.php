@@ -15,7 +15,7 @@ class WorkerLoggerTest extends MockedTest
 		$logger = \Mockery::mock('Psr\Log\LoggerInterface');
 
 		for ($i = 0; $i < 10; $i++) {
-			$workLogger = new WorkerLogger($logger);
+			$workLogger = new WorkerLogger($logger, 'test');
 
 			$uid = $workLogger->getWorkerId();
 			$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $uid);
@@ -70,12 +70,13 @@ class WorkerLoggerTest extends MockedTest
 	public function testEmergency($func, $msg, $context = [])
 	{
 		$logger = \Mockery::mock('Psr\Log\LoggerInterface');
-		$workLogger = new WorkerLogger($logger);
+		$workLogger = new WorkerLogger($logger, 'test');
 
 		$testContext = $context;
 
-		$testContext['worker'] = $workLogger->getWorkerId();
-		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker']);
+		$testContext['worker_id'] = $workLogger->getWorkerId();
+		$testContext['worker_cmd'] = 'test';
+		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker_id']);
 
 		$logger
 			->shouldReceive($func)
@@ -91,11 +92,12 @@ class WorkerLoggerTest extends MockedTest
 	public function testLog()
 	{
 		$logger = \Mockery::mock('Psr\Log\LoggerInterface');
-		$workLogger = new WorkerLogger($logger);
+		$workLogger = new WorkerLogger($logger, 'test');
 
 		$context = $testContext = ['test' => 'it'];
-		$testContext['worker'] = $workLogger->getWorkerId();
-		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker']);
+		$testContext['worker_id'] = $workLogger->getWorkerId();
+		$testContext['worker_cmd'] = 'test';
+		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker_id']);
 
 		$logger
 			->shouldReceive('log')

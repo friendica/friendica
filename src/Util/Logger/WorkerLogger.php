@@ -21,9 +21,15 @@ class WorkerLogger implements LoggerInterface
 	 */
 	private $workerId;
 
-	public function __construct(LoggerInterface $logger)
+	/**
+	 * @var string The current function Name of the worker
+	 */
+	private $functionName;
+
+	public function __construct(LoggerInterface $logger, $functionName)
 	{
 		$this->logger = $logger;
+		$this->functionName = $functionName;
 		$this->workerId = $this->generateUid(7);
 	}
 
@@ -36,6 +42,17 @@ class WorkerLogger implements LoggerInterface
 	private function generateUid($length)
 	{
 		return substr(hash('md5', uniqid('', true)), 0, $length);
+	}
+
+	/**
+	 * Adds the worker context for each log entry
+	 *
+	 * @param array $context The context
+	 */
+	private function addContext(array &$context)
+	{
+		$context['worker_id'] = $this->workerId;
+		$context['worker_cmd'] = $this->functionName;
 	}
 
 	/**
@@ -56,7 +73,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function emergency($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->emergency($message, $context);
 	}
 
@@ -73,7 +90,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function alert($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->alert($message, $context);
 	}
 
@@ -89,7 +106,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function critical($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->critical($message, $context);
 	}
 
@@ -104,7 +121,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function error($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->error($message, $context);
 	}
 
@@ -121,7 +138,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function warning($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->warning($message, $context);
 	}
 
@@ -135,7 +152,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function notice($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->notice($message, $context);
 	}
 
@@ -151,7 +168,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function info($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->info($message, $context);
 	}
 
@@ -165,7 +182,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function debug($message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->debug($message, $context);
 	}
 
@@ -180,7 +197,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function log($level, $message, array $context = array())
 	{
-		$context['worker'] = $this->workerId;
+		$this->addContext($context);
 		$this->logger->log($level, $message, $context);
 	}
 }
