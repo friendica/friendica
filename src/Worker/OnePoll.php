@@ -561,7 +561,7 @@ class OnePoll extends AbstractWorker
 								}
 							}
 
-							$fromarr = imap_rfc822_parse_adrlist($fromdecoded, $a->getHostName());
+							$fromarr = imap_rfc822_parse_adrlist($fromdecoded, $this->app->getHostName());
 
 							$frommail = $fromarr[0]->mailbox."@".$fromarr[0]->host;
 

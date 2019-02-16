@@ -4,7 +4,6 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -28,8 +27,6 @@ class Cron extends AbstractWorker
 
 		$parameter  = $parameters[0];
 		$generation = $parameters[1];
-
-		$a = BaseObject::getApp();
 
 		// Poll contacts with specific parameters
 		if (!empty($parameter)) {
@@ -55,7 +52,7 @@ class Cron extends AbstractWorker
 		$this->logger->info('Start.');
 
 		// Fork the cron jobs in separate parts to avoid problems when one of them is crashing
-		Hook::fork($a->queue['priority'], "cron");
+		Hook::fork($this->app->queue['priority'], "cron");
 
 		// run queue delivery process in the background
 		Worker::add(PRIORITY_NEGLIGIBLE, "Queue");
@@ -125,13 +122,13 @@ class Cron extends AbstractWorker
 
 		// Ensure to have a .htaccess file.
 		// this is a precaution for systems that update automatically
-		$basepath = $a->getBasePath();
+		$basepath = $this->app->getBasePath();
 		if (!file_exists($basepath . '/.htaccess')) {
 			copy($basepath . '/.htaccess-dist', $basepath . '/.htaccess');
 		}
 
 		// Poll contacts
-		self::pollContacts($parameter, $generation);
+		$this->pollContacts($parameter, $generation);
 
 		$this->logger->info('End.');
 

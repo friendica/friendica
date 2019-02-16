@@ -322,7 +322,7 @@ trait DBAMockTrait
 	 * @param bool $return True, if the lock is set successful
 	 * @param null|int $times How often the method will get used
 	 */
-	public function mockDbaUnlock( $return = true, $times = null)
+	public function mockDbaUnlock($return = true, $times = null)
 	{
 		$this->checkMock();
 
@@ -330,5 +330,16 @@ trait DBAMockTrait
 			->shouldReceive('unlock')
 			->times($times)
 			->andReturn($return);
+	}
+
+	public function mockDbaEscape($input, $output = null, $times = null)
+	{
+		$this->checkMock();
+
+		$this->dbaMock
+			->shouldReceive('escape')
+			->with($input)
+			->andReturn((isset($output) ? $output : $input))
+			->times($times);
 	}
 }
