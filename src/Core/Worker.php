@@ -400,14 +400,14 @@ class Worker
 		// Reset global data to avoid interferences
 		unset($_SESSION);
 
+		$oldLogger = Logger::switchLogger($workerLogger);
 		if ($method_call) {
-			$oldLogger = Logger::switchLogger($workerLogger);
 			$worker = WorkerFactory::create($funcname, $a, $workerLogger);
 			$worker->execute($argv);
-			Logger::switchLogger($oldLogger);
 		} else {
 			$funcname($argv, $argc);
 		}
+		Logger::switchLogger($oldLogger);
 
 		unset($a->queue);
 
