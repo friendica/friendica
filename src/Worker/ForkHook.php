@@ -19,9 +19,7 @@ Class ForkHook extends AbstractWorker
 			return;
 		}
 
-		$name = $parameters[0];
-		$hook = $parameters[1];
-		$data = $parameters[2];
+		list($name, $hook, $data) = $parameters;
 
 		Hook::callSingle($this->app, $name, $hook, $data);
 	}

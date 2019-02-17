@@ -22,7 +22,7 @@ class RemoveContact extends AbstractWorker
 			return;
 		}
 
-		$id = $parameters[0];
+		list($id) = $parameters;
 
 		// Only delete if the contact is to be deleted
 		$condition = ['network' => Protocol::PHANTOM, 'id' => $id];

@@ -22,7 +22,7 @@ class DBClean extends AbstractWorker
 			return;
 		}
 
-		$stage = $parameters[0];
+		list($stage) = $parameters;
 
 		if (!Config::get('system', 'dbclean', false)) {
 			return;

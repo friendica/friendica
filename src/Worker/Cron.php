@@ -25,8 +25,7 @@ class Cron extends AbstractWorker
 			return;
 		}
 
-		$parameter  = $parameters[0];
-		$generation = $parameters[1];
+		list($parameter, $generation) = $parameters;
 
 		// Poll contacts with specific parameters
 		if (!empty($parameter)) {

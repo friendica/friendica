@@ -33,7 +33,7 @@ class CronJobs extends AbstractWorker
 			return;
 		}
 
-		$command = $parameters[0];
+		list($command) = $parameters;
 
 		// No parameter set? So return
 		if ($command == '') {

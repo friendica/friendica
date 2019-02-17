@@ -21,7 +21,7 @@ class RemoveUser extends AbstractWorker
 			return;
 		}
 
-		$uid = $parameters[0];
+		list($uid) = $parameters;
 
 		// Only delete if the user is archived
 		$condition = ['account_removed' => true, 'uid' => $uid];

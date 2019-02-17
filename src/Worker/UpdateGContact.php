@@ -27,7 +27,7 @@ class UpdateGContact extends AbstractWorker
 			return;
 		}
 
-		$contact_id = $parameters[0];
+		list($contact_id) = $parameters;
 		$this->logger->info('update_gcontact: start');
 
 		if (empty($contact_id)) {

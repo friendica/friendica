@@ -20,7 +20,6 @@ class ProfileUpdate extends AbstractWorker
 	 */
 	public function execute(array $parameters = [])
 	{
-
 		$uid = (isset($parameters[0]) && is_int($parameters[0])) ? $parameters[0] : 0;
 
 		if (empty($uid)) {

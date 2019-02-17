@@ -25,7 +25,7 @@ class Directory extends AbstractWorker
 			return;
 		}
 
-		$url = $parameters[0];
+		list($url) = $parameters;
 
 		$dir = Config::get('system', 'directory');
 

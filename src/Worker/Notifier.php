@@ -63,8 +63,7 @@ class Notifier extends AbstractWorker
 			return;
 		}
 
-		$cmd       = $parameters[0];
-		$target_id = $parameters[1];
+		list($cmd, $target_id) = $parameters;
 
 		$this->logger->info('Invoked: ' . $target_id, ['cmd' => $cmd]);
 

@@ -37,11 +37,11 @@ class WorkerLogger implements LoggerInterface
 	 * Generates an UID
 	 *
 	 * @param $length
-	 * @return bool|string
+	 * @return string
 	 */
 	private function generateUid($length)
 	{
-		return substr(hash('md5', uniqid('', true)), 0, $length);
+		return bin2hex(random_bytes($length / 2));
 	}
 
 	/**

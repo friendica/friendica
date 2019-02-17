@@ -42,11 +42,9 @@ class Delivery extends AbstractWorker
 		if (!$this->checkParameters($parameters, 3)) {
 			return;
 		}
-		
-		$cmd        = $parameters[0];
-		$target_id  = $parameters[1];
-		$contact_id = $parameters[2];
-		
+
+		list($cmd, $target_id, $contact_id) = $parameters;
+
 		$this->logger->info('Invoked: ' . $target_id . ' to ' . $contact_id, ['cmd' => $cmd]);
 
 		$top_level = false;

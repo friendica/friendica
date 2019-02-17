@@ -24,10 +24,7 @@ class APDelivery extends AbstractWorker
 			return;
 		}
 
-		$cmd       = $parameters[0];
-		$target_id = $parameters[1];
-		$inbox     = $parameters[2];
-		$uid       = $parameters[3];
+		list($cmd, $target_id, $inbox, $uid) = $parameters;
 
 		$this->logger->debug('Invoked: ' . $target_id . ' to ' . $inbox, ['cmd' => $cmd]);
 
