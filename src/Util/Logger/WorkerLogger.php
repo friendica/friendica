@@ -2,6 +2,7 @@
 
 namespace Friendica\Util\Logger;
 
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,15 +23,22 @@ class WorkerLogger implements LoggerInterface
 	private $workerId;
 
 	/**
-	 * @var string The current function Name of the worker
+	 * @var string The current function name of the worker
 	 */
 	private $functionName;
 
-	public function __construct(LoggerInterface $logger, $functionName)
+	/**
+	 * @param LoggerInterface $logger       The logger for worker entries
+	 * @param string          $functionName The current function name of the worker
+	 * @param int             $uidLength    The length of the generated UID
+	 *
+	 * @throws InternalServerErrorException if the uid is too long
+	 */
+	public function __construct(LoggerInterface $logger, $functionName, $uidLength = 7)
 	{
 		$this->logger = $logger;
 		$this->functionName = $functionName;
-		$this->workerId = $this->generateUid(8);
+		$this->workerId = $this->generateUid($uidLength);
 	}
 
 	/**
@@ -38,10 +46,15 @@ class WorkerLogger implements LoggerInterface
 	 *
 	 * @param $length
 	 * @return string
+	 *
+	 * @throws InternalServerErrorException If the uid is too long
 	 */
 	private function generateUid($length)
 	{
-		return bin2hex(random_bytes($length / 2));
+		if ($length > 13) {
+			throw new InternalServerErrorException('Maximum of 13 characters for UID possible, used \'' . $length . '\'');
+		}
+		return substr(uniqid('', true), 0, $length);
 	}
 
 	/**

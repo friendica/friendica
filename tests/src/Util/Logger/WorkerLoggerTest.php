@@ -7,9 +7,9 @@ use Friendica\Util\Logger\WorkerLogger;
 
 class WorkerLoggerTest extends MockedTest
 {
-	private function assertUid($uid)
+	private function assertUid($uid, $length = 7)
 	{
-		$this->assertRegExp('/^[a-zA-Z0-9]{8}+$/', $uid);
+		$this->assertRegExp('/^[a-zA-Z0-9]{' . $length . '}+$/', $uid);
 	}
 
 	/**
@@ -19,11 +19,28 @@ class WorkerLoggerTest extends MockedTest
 	{
 		$logger = \Mockery::mock('Psr\Log\LoggerInterface');
 
-		for ($i = 0; $i < 10; $i++) {
-			$workLogger = new WorkerLogger($logger, 'test');
+		for ($i = 0; $i < 14; $i++) {
+			$workLogger = new WorkerLogger($logger, 'test', $i);
 
 			$uid = $workLogger->getWorkerId();
-			$this->assertUid($uid);
+			$this->assertUid($uid, $i);
+		}
+	}
+
+	/**
+	 * Test the generated Uid with wrong length
+	 * @expectedException Friendica\Network\HTTPException\InternalServerErrorException
+	 * @expectedExceptionMessageRegExp /Maximum of 13 characters for UID possible, used '\d+'/
+	 */
+	public function testWrongWorkerId()
+	{
+		$logger = \Mockery::mock('Psr\Log\LoggerInterface');
+
+		for ($i = 15; $i < 18; $i++) {
+			$workLogger = new WorkerLogger($logger, 'test', $i);
+
+			$uid = $workLogger->getWorkerId();
+			$this->assertUid($uid, $i);
 		}
 	}
 
