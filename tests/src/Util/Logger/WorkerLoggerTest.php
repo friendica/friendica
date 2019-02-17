@@ -7,6 +7,11 @@ use Friendica\Util\Logger\WorkerLogger;
 
 class WorkerLoggerTest extends MockedTest
 {
+	private function assertUid($uid)
+	{
+		$this->assertRegExp('/^[a-zA-Z0-9]{8}+$/', $uid);
+	}
+
 	/**
 	 * Test the generated Uid
 	 */
@@ -18,7 +23,7 @@ class WorkerLoggerTest extends MockedTest
 			$workLogger = new WorkerLogger($logger, 'test');
 
 			$uid = $workLogger->getWorkerId();
-			$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $uid);
+			$this->assertUid($uid);
 		}
 	}
 
@@ -76,7 +81,7 @@ class WorkerLoggerTest extends MockedTest
 
 		$testContext['worker_id'] = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = 'test';
-		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker_id']);
+		$this->assertUid($testContext['worker_id']);
 
 		$logger
 			->shouldReceive($func)
@@ -97,7 +102,7 @@ class WorkerLoggerTest extends MockedTest
 		$context = $testContext = ['test' => 'it'];
 		$testContext['worker_id'] = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = 'test';
-		$this->assertRegExp('/^[a-zA-Z0-9]{7}+$/', $testContext['worker_id']);
+		$this->assertUid($testContext['worker_id']);
 
 		$logger
 			->shouldReceive('log')

@@ -30,7 +30,7 @@ class WorkerLogger implements LoggerInterface
 	{
 		$this->logger = $logger;
 		$this->functionName = $functionName;
-		$this->workerId = $this->generateUid(7);
+		$this->workerId = $this->generateUid(8);
 	}
 
 	/**
