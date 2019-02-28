@@ -130,6 +130,11 @@ class App
 	private $profiler;
 
 	/**
+	 * @var IDatabase The database of this app
+	 */
+	private $database;
+
+	/**
 	 * Returns the current config cache of this node
 	 *
 	 * @return IConfigCache
@@ -182,6 +187,16 @@ class App
 	public function getRouter()
 	{
 		return $this->router;
+	}
+
+	/**
+	 * The database of this app
+	 *
+	 * @return IDatabase
+	 */
+	public function getDb()
+	{
+		return $this->database;
 	}
 
 	/**
@@ -241,6 +256,7 @@ class App
 		BaseObject::setApp($this);
 
 		$this->config   = $config;
+		$this->database = $database;
 		$this->mode     = $mode;
 		$this->router   = $router;
 		$this->profiler = $profiler;
