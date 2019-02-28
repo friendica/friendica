@@ -28,13 +28,13 @@ class DependencyFactory
 		$configLoader = new Config\ConfigFileLoader($basePath, $mode);
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
-		Factory\DBFactory::init($basePath, $configCache, $profiler, $_SERVER);
+		$database = Factory\DBFactory::init($basePath, $configCache, $profiler, $_SERVER);
 		$config = Factory\ConfigFactory::createConfig($configCache);
 		// needed to call PConfig::init()
 		Factory\ConfigFactory::createPConfig($configCache);
 		$logger = Factory\LoggerFactory::create($channel, $config, $profiler);
 		Factory\LoggerFactory::createDev($channel, $config, $profiler);
 
-		return new App($config, $mode, $router, $logger, $profiler, $isBackend);
+		return new App($config, $mode, $router, $logger, $profiler, $database, $isBackend);
 	}
 }

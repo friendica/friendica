@@ -14,6 +14,7 @@ use Friendica\Core\Config\Configuration;
 use Friendica\Core\Hook;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Database\IDatabase;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Config\ConfigFileLoader;
@@ -235,7 +236,7 @@ class App
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Configuration $config, App\Mode $mode, App\Router $router, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
+	public function __construct(Configuration $config, App\Mode $mode, App\Router $router, LoggerInterface $logger, Profiler $profiler, IDatabase $database, $isBackend = true)
 	{
 		BaseObject::setApp($this);
 
