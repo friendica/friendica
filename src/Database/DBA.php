@@ -53,94 +53,20 @@ class DBA
 	private static $in_transaction = false;
 	private static $in_retrial = false;
 	private static $relation = [];
-	private static $db_serveraddr = '';
-	private static $db_user = '';
-	private static $db_pass = '';
-	private static $db_name = '';
-	private static $db_charset = '';
 
-	public static function connect($basePath, IConfigCache $configCache, Profiler $profiler, $serveraddr, $user, $pass, $db, $charset = null)
+	/**
+	 * @var IDatabase
+	 */
+	private static $db;
+
+	/**
+	 * Initialize the DBA with a given database
+	 *
+	 * @param IDatabase $db
+	 */
+	public function init(IDatabase $db)
 	{
-		if (!is_null(self::$connection) && self::connected()) {
-			return true;
-		}
-
-		// We are storing these values for being able to perform a reconnect
-		self::$basePath = $basePath;
-		self::$configCache = $configCache;
-		self::$profiler = $profiler;
-		self::$db_serveraddr = $serveraddr;
-		self::$db_user = $user;
-		self::$db_pass = $pass;
-		self::$db_name = $db;
-		self::$db_charset = $charset;
-
-		$port = 0;
-		$serveraddr = trim($serveraddr);
-
-		$serverdata = explode(':', $serveraddr);
-		$server = $serverdata[0];
-
-		if (count($serverdata) > 1) {
-			$port = trim($serverdata[1]);
-		}
-
-		$server = trim($server);
-		$user = trim($user);
-		$pass = trim($pass);
-		$db = trim($db);
-		$charset = trim($charset);
-
-		if (!(strlen($server) && strlen($user))) {
-			return false;
-		}
-
-		if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
-			self::$driver = 'pdo';
-			$connect = "mysql:host=".$server.";dbname=".$db;
-
-			if ($port > 0) {
-				$connect .= ";port=".$port;
-			}
-
-			if ($charset) {
-				$connect .= ";charset=".$charset;
-			}
-
-			try {
-				self::$connection = @new PDO($connect, $user, $pass);
-				self::$connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-				self::$connected = true;
-			} catch (PDOException $e) {
-				/// @TODO At least log exception, don't ignore it!
-			}
-		}
-
-		if (!self::$connected && class_exists('\mysqli')) {
-			self::$driver = 'mysqli';
-
-			if ($port > 0) {
-				self::$connection = @new mysqli($server, $user, $pass, $db, $port);
-			} else {
-				self::$connection = @new mysqli($server, $user, $pass, $db);
-			}
-
-			if (!mysqli_connect_errno()) {
-				self::$connected = true;
-
-				if ($charset) {
-					self::$connection->set_charset($charset);
-				}
-			}
-		}
-
-		// No suitable SQL driver was found.
-		if (!self::$connected) {
-			self::$driver = null;
-			self::$connection = null;
-		}
-
-		return self::$connected;
+		self::$db = $db;
 	}
 
 	/**
@@ -148,29 +74,15 @@ class DBA
 	 */
 	public static function disconnect()
 	{
-		if (is_null(self::$connection)) {
-			return;
-		}
-
-		switch (self::$driver) {
-			case 'pdo':
-				self::$connection = null;
-				break;
-			case 'mysqli':
-				self::$connection->close();
-				self::$connection = null;
-				break;
-		}
+		self::$db->disconnect();
 	}
 
 	/**
 	 * Perform a reconnect of an existing database connection
 	 */
-	public static function reconnect() {
-		self::disconnect();
-
-		$ret = self::connect(self::$basePath, self::$configCache, self::$profiler, self::$db_serveraddr, self::$db_user, self::$db_pass, self::$db_name, self::$db_charset);
-		return $ret;
+	public static function reconnect()
+	{
+		self::$db->reconnect();
 	}
 
 	/**
@@ -179,7 +91,7 @@ class DBA
 	 */
 	public static function getConnection()
 	{
-		return self::$connection;
+		return self::$db->getConnection();
 	}
 
 	/**
@@ -190,18 +102,9 @@ class DBA
 	 *
 	 * @return string
 	 */
-	public static function serverInfo() {
-		if (self::$server_info == '') {
-			switch (self::$driver) {
-				case 'pdo':
-					self::$server_info = self::$connection->getAttribute(PDO::ATTR_SERVER_VERSION);
-					break;
-				case 'mysqli':
-					self::$server_info = self::$connection->server_info;
-					break;
-			}
-		}
-		return self::$server_info;
+	public static function serverInfo()
+	{
+		return self::$db->serverInfo();
 	}
 
 	/**

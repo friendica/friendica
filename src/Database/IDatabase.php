@@ -17,6 +17,8 @@ interface IDatabase
 
 	/**
 	 * Perform a reconnect of an existing database connection
+	 *
+	 * @return bool Wsa the reconnect successful?
 	 */
 	function reconnect();
 
