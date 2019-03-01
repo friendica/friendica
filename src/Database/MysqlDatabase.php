@@ -194,9 +194,15 @@ class MysqlDatabase implements IDatabase, IDatabaseLock
 		return $this->serverInfo;
 	}
 
-	public function databaseName()
+	/**
+	 * {@inheritdoc}
+	 * @throws \Exception
+	 */
+	public function getDatabaseName()
 	{
-		return DBA::databaseName();
+		$ret = $this->p("SELECT DATABASE() AS `db`");
+		$data = $this->toArray($ret);
+		return $data[0]['db'];
 	}
 
 	public function exists($table, array $condition)

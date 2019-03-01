@@ -38,7 +38,7 @@ interface IDatabase
 	 * Returns the selected database name
 	 * @return string
 	 */
-	function databaseName();
+	function getDatabaseName();
 
 	/**
 	 * Check if data exists

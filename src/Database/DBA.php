@@ -113,10 +113,9 @@ class DBA
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function databaseName() {
-		$ret = self::p("SELECT DATABASE() AS `db`");
-		$data = self::toArray($ret);
-		return $data[0]['db'];
+	public static function databaseName()
+	{
+		return self::$db->getDatabaseName();
 	}
 
 	/**
