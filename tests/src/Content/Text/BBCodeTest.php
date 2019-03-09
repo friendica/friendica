@@ -96,6 +96,6 @@ class BBCodeTest extends MockedTest
 			$assert = $data;
 		}
 
-		self::assertEquals($assert, $output);
+		$this->assertEquals($assert, $output);
 	}
 }
