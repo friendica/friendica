@@ -50,30 +50,30 @@ class BBCodeTest extends MockedTest
 			/** @see https://github.com/friendica/friendica/issues/2487 */
 			'bug-2487-1' => [
 				'data' => 'https://de.wikipedia.org/wiki/Juha_Sipilä',
-				'link' => true,
+				'assertHTML' => true,
 			],
 			'bug-2487-2' => [
 				'data' => 'https://de.wikipedia.org/wiki/Dnepr_(Motorradmarke)',
-				'link' => true,
+				'assertHTML' => true,
 			],
 			'bug-2487-3' => [
 				'data' => 'https://friendica.wäckerlin.ch/friendica',
-				'link' => false,
+				'assertHTML' => false,
 			],
 			'bug-2487-4' => [
 				'data' => 'https://mastodon.social/@morevnaproject',
-				'link' => false,
+				'assertHTML' => false,
 			],
 			/** @see https://github.com/friendica/friendica/issues/5795 */
 			'bug-5795' => [
 				'data' => 'https://social.nasqueron.org/@liw/100798039015010628',
-				'link' => true,
+				'assertHTML' => true,
 			],
 			/** @see https://github.com/friendica/friendica/issues/6095 */
 			/** @todo skipped because this test fails
 			'bug-6095' => [
 				'data' => 'https://en.wikipedia.org/wiki/Solid_(web_decentralization_project)',
-				'link' => true,
+				'assertHTML' => true,
 			]
 			 */
 		];
@@ -83,14 +83,14 @@ class BBCodeTest extends MockedTest
 	 * Test convert different links inside a text
 	 * @dataProvider dataLinks
 	 *
-	 * @param string $data The data to text
-	 * @param bool   $link True, if the link is a external HTML link
+	 * @param string $data       The data to text
+	 * @param bool   $assertHTML True, if the link is a HTML link (<a href...>...</a>)
 	 */
-	public function testAutoLinking($data, $link)
+	public function testAutoLinking($data, $assertHTML)
 	{
 		$output = BBCode::convert($data);
 
-		if ($link) {
+		if ($assertHTML) {
 			$assert = "<a href=\"$data\" target=\"_blank\">$data</a>";
 		} else {
 			$assert = $data;
