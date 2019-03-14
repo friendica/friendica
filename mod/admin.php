@@ -1105,7 +1105,6 @@ function admin_page_site_post(App $a)
 	// end relocate
 
 	$sitename         = (!empty($_POST['sitename'])         ? Strings::escapeTags(trim($_POST['sitename']))      : '');
-	$hostname         = (!empty($_POST['hostname'])         ? Strings::escapeTags(trim($_POST['hostname']))      : '');
 	$sender_email     = (!empty($_POST['sender_email'])     ? Strings::escapeTags(trim($_POST['sender_email']))  : '');
 	$banner           = (!empty($_POST['banner'])           ? trim($_POST['banner'])                             : false);
 	$shortcut_icon    = (!empty($_POST['shortcut_icon'])    ? Strings::escapeTags(trim($_POST['shortcut_icon'])) : '');
@@ -1176,7 +1175,6 @@ function admin_page_site_post(App $a)
 	$itemcache_duration     = (!empty($_POST['itemcache_duration'])     ? intval($_POST['itemcache_duration'])            : 0);
 	$max_comments           = (!empty($_POST['max_comments'])           ? intval($_POST['max_comments'])                  : 0);
 	$temppath               = (!empty($_POST['temppath'])               ? Strings::escapeTags(trim($_POST['temppath']))   : '');
-	$basepath               = (!empty($_POST['basepath'])               ? Strings::escapeTags(trim($_POST['basepath']))   : '');
 	$singleuser             = (!empty($_POST['singleuser'])             ? Strings::escapeTags(trim($_POST['singleuser'])) : '');
 	$proxy_disabled         = !empty($_POST['proxy_disabled']);
 	$only_tag_search        = !empty($_POST['only_tag_search']);
@@ -1294,7 +1292,6 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'poco_local_search'     , $poco_local_search);
 	Config::set('system', 'nodeinfo'              , $nodeinfo);
 	Config::set('config', 'sitename'              , $sitename);
-	Config::set('config', 'hostname'              , $hostname);
 	Config::set('config', 'sender_email'          , $sender_email);
 	Config::set('system', 'suppress_tags'         , $suppress_tags);
 	Config::set('system', 'shortcut_icon'         , $shortcut_icon);
@@ -1390,11 +1387,6 @@ function admin_page_site_post(App $a)
 
 	Config::set('system', 'temppath', $temppath);
 
-	if ($basepath != '') {
-		$basepath = BasePath::getRealPath($basepath);
-	}
-
-	Config::set('system', 'basepath'         , $basepath);
 	Config::set('system', 'proxy_disabled'   , $proxy_disabled);
 	Config::set('system', 'only_tag_search'  , $only_tag_search);
 
@@ -1534,9 +1526,6 @@ function admin_page_site(App $a)
 		"develop" => L10n::t("check the development version")
 	];
 
-	if (empty(Config::get('config', 'hostname'))) {
-		Config::set('config', 'hostname', $a->getHostName());
-	}
 	$diaspora_able = ($a->getURLPath() == "");
 
 	$optimize_max_tablesize = Config::get('system', 'optimize_max_tablesize', -1);
@@ -1595,7 +1584,6 @@ function admin_page_site(App $a)
 
 		// name, label, value, help string, extra data...
 		'$sitename'         => ['sitename', L10n::t("Site name"), Config::get('config', 'sitename'), ''],
-		'$hostname'         => ['hostname', L10n::t("Host name"), Config::get('config', 'hostname'), ""],
 		'$sender_email'     => ['sender_email', L10n::t("Sender Email"), Config::get('config', 'sender_email'), L10n::t("The email address your server shall use to send notification emails from."), "", "", "email"],
 		'$banner'           => ['banner', L10n::t("Banner/Logo"), $banner, ""],
 		'$shortcut_icon'    => ['shortcut_icon', L10n::t("Shortcut icon"), Config::get('system', 'shortcut_icon'), L10n::t("Link to an icon that will be used for browsers.")],
@@ -1673,7 +1661,6 @@ function admin_page_site(App $a)
 		'$itemcache_duration'     => ['itemcache_duration', L10n::t("Cache duration in seconds"), Config::get('system', 'itemcache_duration'), L10n::t("How long should the cache files be hold? Default value is 86400 seconds \x28One day\x29. To disable the item cache, set the value to -1.")],
 		'$max_comments'           => ['max_comments', L10n::t("Maximum numbers of comments per post"), Config::get('system', 'max_comments'), L10n::t("How much comments should be shown for each post? Default value is 100.")],
 		'$temppath'               => ['temppath', L10n::t("Temp path"), Config::get('system', 'temppath'), L10n::t("If you have a restricted system where the webserver can't access the system temp path, enter another path here.")],
-		'$basepath'               => ['basepath', L10n::t("Base path to installation"), Config::get('system', 'basepath'), L10n::t("If the system cannot detect the correct path to your installation, enter the correct path here. This setting should only be set if you are using a restricted system and symbolic links to your webroot.")],
 		'$proxy_disabled'         => ['proxy_disabled', L10n::t("Disable picture proxy"), Config::get('system', 'proxy_disabled'), L10n::t("The picture proxy increases performance and privacy. It shouldn't be used on systems with very low bandwidth.")],
 		'$only_tag_search'        => ['only_tag_search', L10n::t("Only search in tags"), Config::get('system', 'only_tag_search'), L10n::t("On large systems the text search can slow down the system extremely.")],
 
