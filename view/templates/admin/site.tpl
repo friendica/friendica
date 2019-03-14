@@ -46,7 +46,6 @@
     <input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
 
 	{{include file="field_input.tpl" field=$sitename}}
-	{{include file="field_input.tpl" field=$hostname}}
 	{{include file="field_input.tpl" field=$sender_email}}
 	{{include file="field_textarea.tpl" field=$banner}}
 	{{include file="field_input.tpl" field=$shortcut_icon}}
@@ -125,7 +124,6 @@
 	{{include file="field_input.tpl" field=$optimize_fragmentation}}
 	{{include file="field_input.tpl" field=$abandon_days}}
 	{{include file="field_input.tpl" field=$temppath}}
-	{{include file="field_input.tpl" field=$basepath}}
 	{{include file="field_checkbox.tpl" field=$suppress_tags}}
 	{{include file="field_checkbox.tpl" field=$nodeinfo}}
 	{{include file="field_select.tpl" field=$check_new_version_url}}
