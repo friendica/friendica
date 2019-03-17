@@ -34,10 +34,10 @@ class ConfigCacheManagerTest extends MockedTest
 	 */
 	public function testLoadConfigFiles()
 	{
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 
 		$this->assertEquals($this->root->url(), $configCache->get('system', 'basepath'));
 	}
@@ -55,10 +55,10 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root->getChild('config'))
 			->setContent('<?php return true;');
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 	}
 
 	/**
@@ -80,10 +80,10 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root->getChild('config'))
 			->setContent(file_get_contents($file));
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 
 		$this->assertEquals('testhost', $configCache->get('database', 'hostname'));
 		$this->assertEquals('testuser', $configCache->get('database', 'username'));
@@ -113,10 +113,10 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root->getChild('config'))
 			->setContent(file_get_contents($file));
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 
 		$this->assertEquals('testhost', $configCache->get('database', 'hostname'));
 		$this->assertEquals('testuser', $configCache->get('database', 'username'));
@@ -145,10 +145,10 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root)
 			->setContent(file_get_contents($file));
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 
 		$this->assertEquals('testhost', $configCache->get('database', 'hostname'));
 		$this->assertEquals('testuser', $configCache->get('database', 'username'));
@@ -184,9 +184,9 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root->getChild('addon')->getChild('test')->getChild('config'))
 			->setContent(file_get_contents($file));
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 
-		$conf = $configCacheLoader->loadAddonConfig('test');
+		$conf = $configCacheManager->loadAddonConfig('test');
 
 		$this->assertEquals('testhost', $conf['database']['hostname']);
 		$this->assertEquals('testuser', $conf['database']['username']);
@@ -215,18 +215,18 @@ class ConfigCacheManagerTest extends MockedTest
 			->at($this->root->getChild('config'))
 			->setContent(file_get_contents($file));
 
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
 		$this->assertEquals('!<unset>!', $configCache->get('config', 'test_val'));
 
-		$configCacheLoader->saveToConfigFile('config', 'admin_email', 'new@mail.it');
-		$configCacheLoader->saveToConfigFile('config', 'test_val', 'Testing$!"$with@all.we can!');
+		$configCacheManager->saveToConfigFile('config', 'admin_email', 'new@mail.it');
+		$configCacheManager->saveToConfigFile('config', 'test_val', 'Testing$!"$with@all.we can!');
 
 		$newConfigCache = new ConfigCache();
-		$configCacheLoader->loadConfigFiles($newConfigCache);
+		$configCacheManager->loadConfigFiles($newConfigCache);
 		$this->assertEquals('new@mail.it', $newConfigCache->get('config', 'admin_email'));
 		$this->assertEquals('Testing$!"$with@all.we can!', $newConfigCache->get('config', 'test_val'));
 	}
@@ -249,18 +249,18 @@ class ConfigCacheManagerTest extends MockedTest
 		vfsStream::newFile('local.ini.php')
 			->at($this->root->getChild('config'))
 			->setContent(file_get_contents($file));
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
 		$this->assertEquals('!<unset>!', $configCache->get('config', 'test_val'));
 
-		$configCacheLoader->saveToConfigFile('config', 'admin_email', 'new@mail.it');
-		$configCacheLoader->saveToConfigFile('config', 'test_val', "Testing@with.all we can");
+		$configCacheManager->saveToConfigFile('config', 'admin_email', 'new@mail.it');
+		$configCacheManager->saveToConfigFile('config', 'test_val', "Testing@with.all we can");
 
 		$newConfigCache = new ConfigCache();
-		$configCacheLoader->loadConfigFiles($newConfigCache);
+		$configCacheManager->loadConfigFiles($newConfigCache);
 		$this->assertEquals('new@mail.it', $newConfigCache->get('config', 'admin_email'));
 		$this->assertEquals("Testing@with.all we can", $newConfigCache->get('config', 'test_val'));
 	}
@@ -285,18 +285,18 @@ class ConfigCacheManagerTest extends MockedTest
 		vfsStream::newFile('.htconfig.php')
 			->at($this->root)
 			->setContent(file_get_contents($file));
-		$configCacheLoader = new ConfigCacheManager($this->root->url(), $this->mode);
+		$configCacheManager = new ConfigCacheManager($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 
-		$configCacheLoader->loadConfigFiles($configCache);
+		$configCacheManager->loadConfigFiles($configCache);
 		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
 		$this->assertEquals('!<unset>!', $configCache->get('config', 'test_val'));
 
-		$configCacheLoader->saveToConfigFile('config', 'admin_email', 'new@mail.it');
-		$configCacheLoader->saveToConfigFile('config', 'test_val', 'Testing$!"$with@all.we can!');
+		$configCacheManager->saveToConfigFile('config', 'admin_email', 'new@mail.it');
+		$configCacheManager->saveToConfigFile('config', 'test_val', 'Testing$!"$with@all.we can!');
 
 		$newConfigCache = new ConfigCache();
-		$configCacheLoader->loadConfigFiles($newConfigCache);
+		$configCacheManager->loadConfigFiles($newConfigCache);
 		$this->assertEquals('new@mail.it', $newConfigCache->get('config', 'admin_email'));
 		$this->assertEquals('Testing$!"$with@all.we can!', $newConfigCache->get('config', 'test_val'));
 	}

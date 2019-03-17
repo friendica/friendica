@@ -353,9 +353,9 @@ class App
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = new ConfigCacheManager($this->getBasePath(), $this->mode);
-			Core\Hook::callAll('load_config', $loader);
-			$this->config->getCache()->load($loader->loadCoreConfig('addon'), true);
+			$configCacheManager = new ConfigCacheManager($this->getBasePath(), $this->mode);
+			Core\Hook::callAll('load_config', $configCacheManager);
+			$this->config->getCache()->load($configCacheManager->loadCoreConfig('addon'), true);
 		}
 
 		$this->loadDefaultTimezone();
