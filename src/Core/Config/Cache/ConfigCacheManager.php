@@ -368,8 +368,8 @@ class ConfigCacheManager
 			return;
 		}
 
-		$reading = fopen($fullName, 'r');
-		$writing = fopen($fullName . '.tmp', 'w');
+		$reading = fopen($filePath, 'r');
+		$writing = fopen($filePath . '.tmp', 'w');
 
 		$found = false;
 
@@ -393,6 +393,6 @@ class ConfigCacheManager
 
 		fclose($reading);
 		fclose($writing);
-		rename($fullName . '.tmp', $fullName);
+		rename($filePath . '.tmp', $fullName);
 	}
 }
