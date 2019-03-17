@@ -65,6 +65,9 @@ class StorageManager
 
 		Config::set('storage', 'class', $class);
 
+		// Start background storage move task
+		Worker::add(PRIORITY_LOW, "CronJobs", "move_storage");
+
 		return true;
 	}
 

@@ -10,6 +10,8 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\StorageManager;
+use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
 use Friendica\Model\Contact;
@@ -66,6 +68,10 @@ class CronJobs
 
 			case 'repair_database':
 				self::repairDatabase();
+				break;
+
+			case 'move_storage':
+				self::moveStorage();
 				break;
 
 			default:
@@ -288,5 +294,21 @@ class CronJobs
 		/// - remove sign entries without item
 		/// - remove children when parent got lost
 		/// - set contact-id in item when not present
+	}
+
+	/**
+	 * Moves up to 5000 attachments and photos to the current storage system.
+	 * Self-replicates if legacy items have been found and moved.
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	private static function moveStorage()
+	{
+		$current = StorageManager::getBackend();
+		$moved = StorageManager::move($current);
+
+		if ($moved) {
+			Worker::add(PRIORITY_LOW, "CronJobs", "move_storage");
+		}
 	}
 }

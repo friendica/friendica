@@ -82,6 +82,9 @@ class Cron
 
 			Worker::add(PRIORITY_LOW, "CronJobs", "update_photo_albums");
 
+			// Daily pickup if the expected storage move task started on setting change stopped for any reason
+			Worker::add(PRIORITY_LOW, "CronJobs", "move_storage");
+
 			// update nodeinfo data
 			Worker::add(PRIORITY_LOW, "CronJobs", "nodeinfo");
 
