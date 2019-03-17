@@ -103,7 +103,7 @@ HELP;
 			}
 
 			//reload the config cache
-			$loader = new Config\Cache\ConfigCacheLoader($a->getBasePath(), $a->getMode());
+			$loader = new Config\Cache\ConfigCacheManager($a->getBasePath(), $a->getMode());
 			$loader->loadConfigFiles($configCache);
 
 		} else {

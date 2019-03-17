@@ -29,6 +29,7 @@ return [
 	],
 	'system' => [
 		'urlpath' => '{{$urlpath}}',
+		'basepath' => '{{$basepath}}',
 		'default_timezone' => '{{$timezone}}',
 		'language' => '{{$language}}',
 	],

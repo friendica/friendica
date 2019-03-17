@@ -10,11 +10,11 @@ use Friendica\Core\Config\Cache;
 class ConfigFactory
 {
 	/**
-	 * @param Cache\ConfigCacheLoader $loader The Config Cache loader (INI/config/.htconfig)
+	 * @param Cache\ConfigCacheManager $loader The Config Cache loader (INI/config/.htconfig)
 	 *
 	 * @return Cache\ConfigCache
 	 */
-	public static function createCache(Cache\ConfigCacheLoader $loader)
+	public static function createCache(Cache\ConfigCacheManager $loader)
 	{
 		$configCache = new Cache\ConfigCache();
 		$loader->loadConfigFiles($configCache);

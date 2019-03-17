@@ -43,7 +43,7 @@ abstract class DatabaseTest extends MockedTest
 
 		$basepath = BasePath::create(dirname(__DIR__));
 		$mode = new App\Mode($basepath);
-		$configLoader = new Cache\ConfigCacheLoader($basepath, $mode);
+		$configLoader = new Cache\ConfigCacheManager($basepath, $mode);
 		$config = Factory\ConfigFactory::createCache($configLoader);
 
 		$profiler = \Mockery::mock(Profiler::class);

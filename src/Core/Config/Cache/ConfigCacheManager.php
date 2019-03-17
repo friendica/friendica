@@ -6,20 +6,26 @@ use Friendica\App;
 use Friendica\Core\Addon;
 
 /**
- * The ConfigCacheLoader loads config-files and stores them in a ConfigCache ( @see ConfigCache )
+ * The ConfigCacheManager either loads config-files and stores them in a ConfigCache ( @see ConfigCache )
+ * or saves specific variables back into the config-files
  *
  * It is capable of loading the following config files:
  * - *.config.php   (current)
  * - *.ini.php      (deprecated)
  * - *.htconfig.php (deprecated)
  */
-class ConfigCacheLoader
+class ConfigCacheManager
 {
 	/**
 	 * The Sub directory of the config-files
 	 * @var string
 	 */
 	const SUBDIRECTORY = 'config';
+	/**
+	 * The standard indention for config files
+	 * @var string
+	 */
+	const IDENT = "\t";
 
 	private $baseDir;
 	private $configDir;
@@ -213,5 +219,180 @@ class ConfigCacheLoader
 		}
 
 		return $config;
+	}
+
+	/**
+	 * Saves a given value to the config file
+	 * Either it replaces the current value or it will get added
+	 *
+	 * @param string $cat   The configuration category
+	 * @param string $key   The configuration key
+	 * @param string $value The new value
+	 */
+	public function saveToConfigFile($cat, $key, $value)
+	{
+		$this->saveToLegacyConfig('htpreconfig', $cat, $key, $value);
+		$this->saveToLegacyConfig('htconfig', $cat, $key, $value);
+
+		$this->saveToCoreConfig('local', $cat, $key, $value);
+	}
+
+	/**
+	 * Saves a value to either an config or an ini file
+	 *
+	 * @param string $name  The configuration file name ('local', 'addon', ..)
+	 * @param string $cat   The configuration category
+	 * @param string $key   The configuration key
+	 * @param string $value The new value
+	 */
+	private function saveToCoreConfig($name, $cat, $key, $value)
+	{
+		if (file_exists($this->configDir . DIRECTORY_SEPARATOR . $name . '.config.php')) {
+			$this->saveConfigFile($this->configDir . DIRECTORY_SEPARATOR . $name . '.config.php', $cat, $key, $value);
+		} elseif (file_exists($this->configDir . DIRECTORY_SEPARATOR . $name . '.ini.php')) {
+			$this->saveINIConfigFile($this->configDir . DIRECTORY_SEPARATOR . $name . '.ini.php', $cat, $key, $value);
+		} else {
+			return;
+		}
+	}
+
+	/**
+	 * Saves a value to a config file
+	 *
+	 * @param string $fullName The configuration full name (including the path)
+	 * @param string $cat   The configuration category
+	 * @param string $key   The configuration key
+	 * @param string $value The new value
+	 */
+	private function saveConfigFile($fullName, $cat, $key, $value)
+	{
+		$reading = fopen($fullName, 'r');
+		$writing = fopen($fullName . '.tmp', 'w');
+
+		$categoryFound = false;
+		$categoryBracketFound = false;
+		$lineFound = false;
+		$lineArrowFound = false;
+
+		while (!feof($reading)) {
+			$line = fgets($reading);
+
+			// find lines like '
+			if (!$categoryFound && stristr($line, sprintf('\'%s\'', $cat))) {
+				$categoryFound = true;
+			}
+
+			if ($categoryFound && !$categoryBracketFound && stristr($line, '[')) {
+				$categoryBracketFound = true;
+			}
+
+			if ($categoryBracketFound && !$lineFound && stristr($line, sprintf('\'%s\'', $key))) {
+				$lineFound = true;
+			}
+
+			if ($lineFound && !$lineArrowFound && stristr($line, '=>')) {
+				$lineArrowFound = true;
+			}
+
+			if ($lineArrowFound && preg_match_all('/\'(.*?)\'/', $line, $matches, PREG_SET_ORDER)) {
+				$lineVal = end($matches)[0];
+				$writeLine = str_replace($lineVal, '\'' . $value . '\'', $line);
+				$categoryFound = false;
+				$categoryBracketFound = false;
+				$lineFound = false;
+				$lineArrowFound = false;
+			} elseif ($categoryBracketFound && !$lineArrowFound && stristr($line, ']')) {
+				$categoryFound = false;
+				$categoryBracketFound = false;
+				$lineFound = false;
+				$lineArrowFound = false;
+				$writeLine = sprintf(self::IDENT . self::IDENT .'\'%s\' => \'%s\',' . PHP_EOL, $key, $value);
+				$writeLine .= $line;
+			} else {
+				$writeLine = $line;
+			}
+
+			fputs($writing, $writeLine);
+		}
+
+		fclose($reading);
+		fclose($writing);
+		rename($fullName . '.tmp', $fullName);
+	}
+
+	/**
+	 * Saves a value to a ini file
+	 *
+	 * @param string $fullName The configuration full name (including the path)
+	 * @param string $cat   The configuration category
+	 * @param string $key   The configuration key
+	 * @param string $value The new value
+	 */
+	private function saveINIConfigFile($fullName, $cat, $key, $value)
+	{
+		$reading = fopen($fullName, 'r');
+		$writing = fopen($fullName . '.tmp', 'w');
+
+		$categoryFound = false;
+
+		while (!feof($reading)) {
+			$line = fgets($reading);
+
+			if (!$categoryFound && stristr($line, sprintf('[%s]', $cat))) {
+				$categoryFound = true;
+				$writeLine = $line;
+			} elseif ($categoryFound && preg_match_all('/^' . $key . '\s*=\s*(.*?)$/', $line, $matches, PREG_SET_ORDER)) {
+				$writeLine = $key . ' = ' . $value . PHP_EOL;
+				$categoryFound = false;
+			} elseif ($categoryFound && (preg_match_all('/^\[.*?\]$/', $line) || preg_match_all('/^INI;.*$/', $line))) {
+				$categoryFound = false;
+				$writeLine = $key . ' = ' .  $value . PHP_EOL;
+				$writeLine .= $line;
+			} else {
+				$writeLine = $line;
+			}
+
+			fputs($writing, $writeLine);
+		}
+
+		fclose($reading);
+		fclose($writing);
+		rename($fullName . '.tmp', $fullName);
+	}
+
+	private function saveToLegacyConfig($name, $cat, $key, $value)
+	{
+		$filePath = $this->baseDir  . DIRECTORY_SEPARATOR . '.' . $name . '.php';
+
+		if (!file_exists($filePath)) {
+			return;
+		}
+
+		$reading = fopen($fullName, 'r');
+		$writing = fopen($fullName . '.tmp', 'w');
+
+		$found = false;
+
+		while (!feof($reading)) {
+			$line = fgets($reading);
+
+			if (preg_match_all('/^\$a\-\>config\[\'' . $cat . '\',\'' . $key . '\'\]\s*=\s\'*(.*?)\'$/', $line, $matches, PREG_SET_ORDER)) {
+				$writeLine = $key . ' = ' . $value . PHP_EOL;
+				$found = true;
+			} else {
+				$writeLine = $line;
+			}
+
+			fputs($writing, $writeLine);
+		}
+
+		if (!$found) {
+			$writeLine = $key . ' = ' . $value . PHP_EOL;
+			fputs($writing, $writeLine);
+		}
+
+		fclose($reading);
+		fclose($writing);
+		rename($fullName . '.tmp', $fullName);
 	}
 }

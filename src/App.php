@@ -8,7 +8,7 @@ use Detection\MobileDetect;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\Core\Config\Cache\ConfigCacheLoader;
+use Friendica\Core\Config\Cache\ConfigCacheManager;
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Config\Configuration;
 use Friendica\Database\DBA;
@@ -353,7 +353,7 @@ class App
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = new ConfigCacheLoader($this->getBasePath(), $this->mode);
+			$loader = new ConfigCacheManager($this->getBasePath(), $this->mode);
 			Core\Hook::callAll('load_config', $loader);
 			$this->config->getCache()->load($loader->loadCoreConfig('addon'), true);
 		}
