@@ -358,9 +358,9 @@ function update_1303()
 	$app = BaseObject::getApp();
 	$configCache = $app->getConfigCache();
 
-	$configCacheManager = new Config\Cache\ConfigCacheManager($app->getBasePath(), $app->getMode());
+	$configCacheSaver = new Config\Cache\ConfigCacheSaver($app->getBasePath());
 
-	$updateConfigEntry = function($cat, $key) use ($configCache, $configCacheManager) {
+	$updateConfigEntry = function($cat, $key) use ($configCache, $configCacheSaver) {
 		// check if the config file differs from the whole configuration (= The db contains other values)
 		$fileConfig = $configCache->get($cat, $key);
 		if ($fileConfig === '!<unset>!') {
@@ -369,7 +369,7 @@ function update_1303()
 		$savedConfig = Config::get($cat, $key, null, true);
 		if ($fileConfig !== $savedConfig) {
 			Logger::info('Difference in config found', ['cat' => $cat, 'key' => $key, 'file' => $fileConfig, 'saved' => $savedConfig]);
-			$configCacheManager->saveToConfigFile($cat, $key, $savedConfig);
+			$configCacheSaver->saveToConfigFile($cat, $key, $savedConfig);
 		} else {
 			Logger::info('No Difference in config found', ['cat' => $cat, 'key' => $key, 'value' => $fileConfig, 'saved' => $savedConfig]);
 		}

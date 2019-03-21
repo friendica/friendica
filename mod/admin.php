@@ -1087,8 +1087,8 @@ function admin_page_site_post(App $a)
 		update_table($a, "gcontact", ['connect', 'addr'], $old_host, $new_host);
 
 		// update config
-		$configCacheManager = new Config\Cache\ConfigCacheManager($a->getBasePath(), $a->getMode());
-		$configCacheManager->saveToConfigFile('system', 'hostname', parse_url($new_url, PHP_URL_HOST));
+		$configCacheSaver = new Config\Cache\ConfigCacheSaver($a->getBasePath());
+		$configCacheSaver->saveToConfigFile('system', 'hostname', parse_url($new_url, PHP_URL_HOST));
 		Config::set('system', 'hostname', parse_url($new_url, PHP_URL_HOST));
 		Config::set('system', 'url', $new_url);
 		$a->setBaseURL($new_url);

@@ -15,7 +15,7 @@ class DBATest extends DatabaseTest
 	{
 		$basePath = BasePath::create(dirname(__DIR__) . '/../../');
 		$mode = new App\Mode($basePath);
-		$configLoader = new Cache\ConfigCacheManager($basePath, $mode);
+		$configLoader = new Cache\ConfigCacheLoader($basePath, $mode);
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
 		Factory\DBFactory::init($configCache, $profiler, $_SERVER);
