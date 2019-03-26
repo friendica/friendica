@@ -1093,9 +1093,10 @@ function admin_page_site_post(App $a)
 		// update config
 		$configFileSaver = new \Friendica\Util\Config\ConfigFileSaver($a->getBasePath());
 		$configFileSaver->addConfigValue('config', 'hostname', parse_url($new_url, PHP_URL_HOST));
+		$configFileSaver->addConfigValue('system', 'urlpath', parse_url($new_url, PHP_URL_PATH));
+		$configFileSaver->addConfigValue('system', 'url', $new_url);
 		$configFileSaver->saveToConfigFile();
 		Config::set('system', 'url', $new_url);
-		$a->setBaseURL($new_url);
 
 		// send relocate
 		$users = q("SELECT `uid` FROM `user` WHERE `account_removed` = 0 AND `account_expired` = 0");
