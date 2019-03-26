@@ -69,6 +69,7 @@ class DBA
 		// We are storing these values for being able to perform a reconnect
 		self::$configCache = $configCache;
 		self::$profiler = $profiler;
+		// Set VoidLogger in case there is no other Logger
 		self::$logger = isset($logger) ? $logger : new VoidLogger();
 		self::$db_serveraddr = $serveraddr;
 		self::$db_user = $user;
@@ -144,6 +145,12 @@ class DBA
 		return self::$connected;
 	}
 
+	/**
+	 * Sets a logger for DBA calls
+	 * (used in cases, where the DBA is created before the logger)
+	 *
+	 * @param LoggerInterface $logger
+	 */
 	public static function setLogger(LoggerInterface $logger)
 	{
 		self::$logger = $logger;
