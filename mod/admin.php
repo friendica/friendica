@@ -1248,8 +1248,17 @@ function admin_page_site_post(App $a)
 	if ($a->getURLPath() != "") {
 		$diaspora_enabled = false;
 	}
+
+	// Update file config values
+	$configFileSaver = new \Friendica\Util\Config\ConfigFileSaver($a->getBasePath());
+
 	if ($ssl_policy != intval(Config::get('system', 'ssl_policy'))) {
+		$hostname = Config::get('config', 'hostname');
+		$urlPath = Config::get('system', 'urlpath');
+		$schema = 'http';
+
 		if ($ssl_policy == SSL_POLICY_FULL) {
+			$schema = 'https';
 			q("UPDATE `contact` SET
 				`url`     = REPLACE(`url`    , 'http:' , 'https:'),
 				`photo`   = REPLACE(`photo`  , 'http:' , 'https:'),
@@ -1286,8 +1295,11 @@ function admin_page_site_post(App $a)
 				WHERE 1 "
 			);
 		}
+		$url = $schema . '://' . $hostname . (!empty($urlPath) ? '/' . $urlPath : '' );
+		$configFileSaver->addConfigValue('system', 'url', $url);
 	}
-	Config::set('system', 'ssl_policy'            , $ssl_policy);
+
+	$configFileSaver->addConfigValue('system', 'ssl_policy', $ssl_policy);
 	Config::set('system', 'maxloadavg'            , $maxloadavg);
 	Config::set('system', 'maxloadavg_frontend'   , $maxloadavg_frontend);
 	Config::set('system', 'min_memory'            , $min_memory);
@@ -1411,6 +1423,9 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'relay_user_tags'  , $relay_user_tags);
 
 	Config::set('system', 'rino_encrypt'     , $rino);
+
+	$configFileSaver->saveToConfigFile();
+	$a->reload();
 
 	info(L10n::t('Site settings updated.') . EOL);
 
