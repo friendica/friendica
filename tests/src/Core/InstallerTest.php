@@ -3,6 +3,7 @@
 // this is in the same namespace as Install for mocking 'function_exists'
 namespace Friendica\Core;
 
+use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Network\CurlResult;
 use Friendica\Object\Image;
 use Friendica\Test\MockedTest;
@@ -577,6 +578,13 @@ class InstallerTest extends MockedTest
 		$configCache->shouldReceive('set')->with('system', 'basepath', '/test/')->once();
 		$configCache->shouldReceive('set')->with('system', 'urlpath', \Mockery::any())->once();
 		$configCache->shouldReceive('set')->with('system', 'ssl_policy', SSL_POLICY_NONE)->once();
+		$configCache->shouldReceive('set')->with('system', 'url', \Mockery::any())->once();
+		$configCache->shouldReceive('get')->with('system', 'ssl_policy')
+			->andReturn(SSL_POLICY_NONE)->once();
+		$configCache->shouldReceive('get')->with('config', 'hostname')
+			->andReturn('friendica.local')->once();
+		$configCache->shouldReceive('get')->with('system', 'urlpath')
+			->andReturn('/test')->once();
 
 		$install->setUpCache($configCache, '/test/', []);
 	}
