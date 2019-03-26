@@ -1297,9 +1297,11 @@ function admin_page_site_post(App $a)
 		}
 		$url = $schema . '://' . $hostname . (!empty($urlPath) ? '/' . $urlPath : '' );
 		$configFileSaver->addConfigValue('system', 'url', $url);
+		Config::set('system', 'url'            , $url);
 	}
 
 	$configFileSaver->addConfigValue('system', 'ssl_policy', $ssl_policy);
+	Config::set('system', 'ssl_policy'            , $ssl_policy);
 	Config::set('system', 'maxloadavg'            , $maxloadavg);
 	Config::set('system', 'maxloadavg_frontend'   , $maxloadavg_frontend);
 	Config::set('system', 'min_memory'            , $min_memory);
@@ -1425,7 +1427,6 @@ function admin_page_site_post(App $a)
 	Config::set('system', 'rino_encrypt'     , $rino);
 
 	$configFileSaver->saveToConfigFile();
-	$a->reload();
 
 	info(L10n::t('Site settings updated.') . EOL);
 

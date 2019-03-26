@@ -16,7 +16,13 @@ class Configuration
 	 */
 	private $configSaveBlacklist = [
 		'config' => [
-			'hostname' => true,
+			'hostname'    => true,
+		],
+		'system' => [
+			'basepath'    => true,
+			'url'         => true,
+			'urlpath'     => true,
+			'ssl_poloicy' => true,
 		]
 	];
 
