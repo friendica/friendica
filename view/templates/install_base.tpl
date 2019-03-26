@@ -13,22 +13,21 @@
 			{{if ! $check.status}}
 			<img src="{{$baseurl}}/view/install/red.png" alt="Requirement not satisfied">
 			{{/if}}
-	{{/foreach}}
+			{{/foreach}}
 </table>
 
 <form id="install-form" action="{{$baseurl}}/install" method="post">
 
 	<input type="hidden" name="config-php_path" value="{{$php_path}}" />
-	<input type="hidden" name="config-hostname" value="{{$hostname}}" />
-	<input type="hidden" name="system-ssl_policy" value="{{$ssl_policy}}" />
-	<input type="hidden" name="system-basepath" value="{{$basepath}}" />
-	<input type="hidden" name="system-urlpath" value="{{$urlpath}}" />
-	<input type="hidden" name="pass" value="4" />
+	<input type="hidden" name="pass" value="3" />
 
-	{{include file="field_input.tpl" field=$dbhost}}
-	{{include file="field_input.tpl" field=$dbuser}}
-	{{include file="field_password.tpl" field=$dbpass}}
-	{{include file="field_input.tpl" field=$dbdata}}
+	{{include file="field_select.tpl" field=$ssl_policy}}
+	<br />
+	{{include file="field_input.tpl" field=$hostname}}
+	<br />
+	{{include file="field_input.tpl" field=$basepath}}
+	<br />
+	{{include file="field_input.tpl" field=$urlpath}}
 
 	<input id="install-submit" type="submit" name="submit" value="{{$submit}}" />
 

@@ -392,6 +392,194 @@ class InstallerTest extends MockedTest
 			false,
 			$install->getChecks());
 	}
+
+	/**
+	 * Gets the data for different url path tests
+	 *
+	 * @return array
+	 */
+	public function dataUrlPath()
+	{
+		return [
+			'REDIRECT_URL' => [
+				'server' => ['REDIRECT_URL' => 'test/it'],
+				'assert' => 'test/it',
+			],
+			'REDIRECT_SCRIPT_URL' => [
+				'server' => ['REDIRECT_SCRIPT_URL' => 'test/again'],
+				'assert' => 'test/again',
+			],
+			'SCRIPT_URL' => [
+				'server' => ['SCRIPT_URL' => 'test/another'],
+				'assert' => 'test/another',
+			],
+			'REQUEST_URI' => [
+				'server' => ['REQUEST_URI' => 'test/fourth'],
+				'assert' => 'test/fourth',
+			],
+			'combined' => [
+				'server' => ['REQUEST_URI' => 'test/fourth', 'REDIRECT_SCRIPT_URL' => 'test/again'],
+				'assert' => 'test/fourth',
+			],
+			'combined-query' => [
+				'server' => ['REQUEST_URI' => 'test/fourth', 'REDIRECT_SCRIPT_URL' => 'test/again', 'QUERY_STRING' => '/fourth/'],
+				'assert' => 'test',
+			],
+		];
+	}
+
+	/**
+	 * Test the urlpath determination with different paths
+	 * @dataProvider dataUrlPath
+	 */
+	public function testDetermineUrlPath($server, $assert)
+	{
+		$install = new Installer();
+		$this->assertEquals($assert, $install->determineUrlPath($server));
+	}
+
+	/**
+	 * Test the basepath determination
+	 */
+	public function testDetermineBasePath()
+	{
+		$serverArr = ['DOCUMENT_ROOT' => '/invalid', 'PWD' => '/invalid2'];
+		$install = new Installer();
+		$this->assertEquals('/valid', $install->determineBasePath('/valid', $serverArr));
+	}
+
+	/**
+	 * Test the basepath determination with DOCUMENT_ROOT and PWD
+	 */
+	public function testDetermineBasePathWithServer()
+	{
+		$serverArr = ['DOCUMENT_ROOT' => '/valid'];
+		$install = new Installer();
+		$this->assertEquals('/valid', $install->determineBasePath('', $serverArr));
+
+		$serverArr = ['PWD' => '/valid_too'];
+		$install = new Installer();
+		$this->assertEquals('/valid_too', $install->determineBasePath('', $serverArr));
+	}
+
+	/**
+	 * Gets the data for different hostname tests
+	 *
+	 * @return array
+	 */
+	public function dataHostname()
+	{
+		return [
+			'server_name' => [
+				'server' => ['SERVER_NAME' => 'test.de'],
+				'assert' => 'test.de',
+			],
+			'server_port_valid'=> [
+				'server' => ['SERVER_NAME' => 'test.local', 'SERVER_PORT' => 1234],
+				'assert' => 'test.local:1234',
+			],
+			'server_port_not_number'=> [
+				'server' => ['SERVER_NAME' => 'test.local', 'SERVER_PORT' => 'test'],
+				'assert' => 'test.local',
+			],
+			'server_port_80'=> [
+				'server' => ['SERVER_NAME' => 'test.local', 'SERVER_PORT' => 80],
+				'assert' => 'test.local',
+			],
+			'server_port_443'=> [
+				'server' => ['SERVER_NAME' => 'test.local', 'SERVER_PORT' => 443],
+				'assert' => 'test.local',
+			],
+		];
+	}
+
+	/**
+	 * Test the hostname determination
+	 * @dataProvider dataHostname
+	 */
+	public function testDetermineHostname($server, $assert)
+	{
+		$install = new Installer();
+		$this->assertEquals($assert, $install->determineHostname($server));
+	}
+
+	public function dataBaseUrl()
+	{
+		return [
+			'nossl_nourlpath' => [
+				'ssl_policy' => SSL_POLICY_NONE,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => '',
+				'assert'     => 'http://friendica.local',
+			],
+			'nossl_urlpath' => [
+				'ssl_policy' => SSL_POLICY_NONE,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => 'test/it',
+				'assert'     => 'http://friendica.local/test/it',
+			],
+			'ssl_nourlpath' => [
+				'ssl_policy' => SSL_POLICY_FULL,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => '',
+				'assert'     => 'https://friendica.local',
+			],
+			'ssl_urlpath' => [
+				'ssl_policy' => SSL_POLICY_FULL,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => 'test/it',
+				'assert'     => 'https://friendica.local/test/it',
+			],
+			'ssldet_nourlpath' => [
+				'ssl_policy' => SSL_POLICY_SELFSIGN,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => '',
+				'assert'     => 'http://friendica.local',
+			],
+			'ssldet_urlpath' => [
+				'ssl_policy' => SSL_POLICY_SELFSIGN,
+				'hostname'   => 'friendica.local',
+				'urlpath'    => 'test/it',
+				'assert'     => 'http://friendica.local/test/it',
+			],
+		];
+	}
+
+	/**
+	 * Test the baseurl determination
+	 * @dataProvider dataBaseUrl
+	 */
+	public function testDetermineBaseurl($ssl_policy, $hostname, $urlpath, $assert)
+	{
+		$configCache = \Mockery::mock(IConfigCache::class);
+		$configCache->shouldReceive('get')->with('system', 'ssl_policy')
+			->andReturn($ssl_policy)->once();
+		$configCache->shouldReceive('get')->with('config', 'hostname')
+			->andReturn($hostname)->once();
+		$configCache->shouldReceive('get')->with('system', 'urlpath')
+			->andReturn($urlpath)->once();
+
+		$install = new Installer();
+		$this->assertEquals($assert, $install->determineBaseUrl($configCache));
+	}
+
+	/**
+	 * Test the setup of the config cache for installation
+	 */
+	public function testSetUpCache()
+	{
+		$this->mockL10nT();
+
+		$install = new Installer();
+		$configCache = \Mockery::mock(IConfigCache::class);
+		$configCache->shouldReceive('set')->with('config', 'php_path', \Mockery::any())->once();
+		$configCache->shouldReceive('set')->with('config', 'hostname', \Mockery::any())->once();
+		$configCache->shouldReceive('set')->with('system', 'basepath', '/test/')->once();
+		$configCache->shouldReceive('set')->with('system', 'urlpath', \Mockery::any())->once();
+		$configCache->shouldReceive('set')->with('system', 'ssl_policy', SSL_POLICY_NONE)->once();
+
+		$install->setUpCache($configCache, '/test/', []);
+	}
 }
 
 /**

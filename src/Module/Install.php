@@ -18,17 +18,21 @@ class Install extends BaseModule
 	 */
 	const SYSTEM_CHECK = 1;
 	/**
-	 * Step two - Database configuration
+	 * Step two - Base information
 	 */
-	const DATABASE_CONFIG = 2;
+	const BASE_CONFIG = 2;
 	/**
-	 * Step three - Adapat site settings
+	 * Step three - Database configuration
 	 */
-	const SITE_SETTINGS = 3;
+	const DATABASE_CONFIG = 3;
 	/**
-	 * Step four - All steps finished
+	 * Step four - Adapat site settings
 	 */
-	const FINISHED = 4;
+	const SITE_SETTINGS = 4;
+	/**
+	 * Step five - All steps finished
+	 */
+	const FINISHED = 5;
 
 	/**
 	 * @var int The current step of the wizard
@@ -44,10 +48,6 @@ class Install extends BaseModule
 	{
 		$a = self::getApp();
 
-		if (!$a->getMode()->isInstall()) {
-			Core\System::httpExit(403);
-		}
-
 		// route: install/testrwrite
 		// $baseurl/install/testrwrite to test if rewrite in .htaccess is working
 		if ($a->getArgumentValue(1, '') == 'testrewrite') {
@@ -55,11 +55,16 @@ class Install extends BaseModule
 			Core\System::httpExit(204);
 		}
 
+		self::$installer = new Core\Installer();
+
+		// get basic installation information and save them to the config cache
+		$configCache = $a->getConfigCache();
+		self::$installer->setUpCache($configCache, dirname(__DIR__, 2), $_SERVER);
+
 		// We overwrite current theme css, because during install we may not have a working mod_rewrite
 		// so we may not have a css at all. Here we set a static css file for the install procedure pages
 		Renderer::$theme['stylesheet'] = $a->getBaseURL() . '/view/install/style.css';
 
-		self::$installer = new Core\Installer();
 		self::$currentWizardStep = defaults($_POST, 'pass', self::SYSTEM_CHECK);
 	}
 
@@ -70,12 +75,26 @@ class Install extends BaseModule
 
 		switch (self::$currentWizardStep) {
 			case self::SYSTEM_CHECK:
+			case self::BASE_CONFIG:
+				self::checkSetting($configCache, $_POST, 'config', 'php_path');
+				break;
+
 			case self::DATABASE_CONFIG:
 				self::checkSetting($configCache, $_POST, 'config', 'php_path');
+
+				self::checkSetting($configCache, $_POST, 'config', 'hostname');
+				self::checkSetting($configCache, $_POST, 'system', 'ssl_policy');
+				self::checkSetting($configCache, $_POST, 'system', 'basepath');
+				self::checkSetting($configCache, $_POST, 'system', 'urlpath');
 				break;
 
 			case self::SITE_SETTINGS:
 				self::checkSetting($configCache, $_POST, 'config', 'php_path');
+
+				self::checkSetting($configCache, $_POST, 'config', 'hostname');
+				self::checkSetting($configCache, $_POST, 'system', 'ssl_policy');
+				self::checkSetting($configCache, $_POST, 'system', 'basepath');
+				self::checkSetting($configCache, $_POST, 'system', 'urlpath');
 
 				self::checkSetting($configCache, $_POST, 'database', 'hostname', Core\Installer::DEFAULT_HOST);
 				self::checkSetting($configCache, $_POST, 'database', 'username', '');
@@ -83,7 +102,7 @@ class Install extends BaseModule
 				self::checkSetting($configCache, $_POST, 'database', 'database', '');
 
 				// If we cannot connect to the database, return to the previous step
-				if (!self::$installer->checkDB($a->getBasePath(), $configCache, $a->getProfiler())) {
+				if (!self::$installer->checkDB($configCache, $a->getProfiler())) {
 					self::$currentWizardStep = self::DATABASE_CONFIG;
 				}
 
@@ -91,6 +110,11 @@ class Install extends BaseModule
 
 			case self::FINISHED:
 				self::checkSetting($configCache, $_POST, 'config', 'php_path');
+
+				self::checkSetting($configCache, $_POST, 'config', 'hostname');
+				self::checkSetting($configCache, $_POST, 'system', 'ssl_policy');
+				self::checkSetting($configCache, $_POST, 'system', 'basepath');
+				self::checkSetting($configCache, $_POST, 'system', 'urlpath');
 
 				self::checkSetting($configCache, $_POST, 'database', 'hostname', Core\Installer::DEFAULT_HOST);
 				self::checkSetting($configCache, $_POST, 'database', 'username', '');
@@ -102,16 +126,18 @@ class Install extends BaseModule
 				self::checkSetting($configCache, $_POST, 'config', 'admin_email', '');
 
 				// If we cannot connect to the database, return to the Database config wizard
-				if (!self::$installer->checkDB($a->getBasePath(), $configCache, $a->getProfiler())) {
+				if (!self::$installer->checkDB($configCache, $a->getProfiler())) {
 					self::$currentWizardStep = self::DATABASE_CONFIG;
 					return;
 				}
 
-				if (!self::$installer->createConfig($a, $configCache, $a->getBasePath())) {
+				$configCache->set('system', 'url', self::$installer->determineBaseUrl($configCache));
+
+				if (!self::$installer->createConfig($configCache)) {
 					return;
 				}
 
-				self::$installer->installDatabase($a->getBasePath());
+				self::$installer->installDatabase($configCache->get('system', 'basepath'));
 
 				break;
 		}
@@ -143,6 +169,43 @@ class Install extends BaseModule
 					'$reload'       => L10n::t('Check again'),
 					'$php_path'     => $php_path,
 					'$baseurl'      => $a->getBaseURL()
+				]);
+				break;
+
+			case self::BASE_CONFIG:
+				$ssl_choices = [
+					SSL_POLICY_NONE     => L10n::t("No SSL policy, links will track page SSL state"),
+					SSL_POLICY_FULL     => L10n::t("Force all links to use SSL"),
+					SSL_POLICY_SELFSIGN => L10n::t("Self-signed certificate, use SSL for local links only \x28discouraged\x29")
+				];
+
+				$tpl = Renderer::getMarkupTemplate('install_base.tpl');
+				$output .= Renderer::replaceMacros($tpl, [
+					'$title'      => $install_title,
+					'$pass'       => L10n::t('Base settings'),
+					'$ssl_policy' => ['system-ssl_policy',
+										L10n::t("SSL link policy"),
+										$configCache->get('system', 'ssl_policy'),
+										L10n::t("Determines whether generated links should be forced to use SSL"),
+										$ssl_choices],
+					'$hostname'   => ['config-hostname',
+										L10n::t('Host name'),
+										$configCache->get('config', 'hostname'),
+										L10n::t('Overwrite this field in case the determinated hostname isn\'t right, otherweise leave it as is.'),
+										'required'],
+					'$basepath'   => ['system-basepath',
+										L10n::t("Base path to installation"),
+										$configCache->get('system', 'basepath'),
+										L10n::t("If the system cannot detect the correct path to your installation, enter the correct path here. This setting should only be set if you are using a restricted system and symbolic links to your webroot."),
+										'required'],
+					'$urlpath'    => ['system-urlpath',
+										L10n::t('Sub path of the URL'),
+										$configCache->get('system', 'urlpath'),
+										L10n::t('Overwrite this field in case the sub path determination isn\'t right, otherwise leave it as is. Leaving this field blank means the installation is at the base URL without sub path.'),
+										''],
+					'$baseurl'    => $a->getBaseURL(),
+					'$php_path'   => $configCache->get('config', 'php_path'),
+					'$submit'     => L10n::t('Submit'),
 				]);
 				break;
 
@@ -192,6 +255,10 @@ class Install extends BaseModule
 					'$title' 		=> $install_title,
 					'$checks' 		=> self::$installer->getChecks(),
 					'$pass' 		=> L10n::t('Site settings'),
+					'$hostname'     => $configCache->get('config', 'hostname'),
+					'$ssl_policy'   => $configCache->get('system', 'ssl_policy'),
+					'$basepath'     => $configCache->get('system', 'basepath'),
+					'$urlpath'      => $configCache->get('system', 'urlpath'),
 					'$dbhost' 		=> $configCache->get('database', 'hostname'),
 					'$dbuser' 		=> $configCache->get('database', 'username'),
 					'$dbpass' 		=> $configCache->get('database', 'password'),

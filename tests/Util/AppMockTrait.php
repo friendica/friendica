@@ -39,10 +39,9 @@ trait AppMockTrait
 	 * Mock the App
 	 *
 	 * @param vfsStreamDirectory $root The root directory
-	 * @param Config\Cache\ConfigCache $configCache
 	 * @param bool $raw If true, no config mocking will be done
 	 */
-	public function mockApp(vfsStreamDirectory $root, $configCache = null, $raw = false)
+	public function mockApp(vfsStreamDirectory $root, $raw = false)
 	{
 		$this->configMock = \Mockery::mock(Config\Cache\IConfigCache::class);
 		$this->mode = \Mockery::mock(App\Mode::class);
@@ -50,7 +49,7 @@ trait AppMockTrait
 		// Disable the adapter
 		$configAdapterMock->shouldReceive('isConnected')->andReturn(false);
 
-		$config = new Config\Configuration((isset($configCache) ? $configCache : $this->configMock), $configAdapterMock);
+		$config = new Config\Configuration($this->configMock, $configAdapterMock);
 		// Initialize empty Config
 		Config::init($config);
 
@@ -69,7 +68,7 @@ trait AppMockTrait
 
 		$this->app
 			->shouldReceive('getConfigCache')
-			->andReturn((isset($configCache) ? $configCache : $this->configMock));
+			->andReturn($this->configMock);
 		$this->app
 			->shouldReceive('getTemplateEngine')
 			->andReturn(new FriendicaSmartyEngine());
@@ -82,7 +81,7 @@ trait AppMockTrait
 		$this->app
 			->shouldReceive('getBaseUrl')
 			->andReturnUsing(function () {
-				return $this->app->getConfigCache()->get('system', 'url');
+				return $this->configMock->get('system', 'url');
 			});
 
 		BaseObject::setApp($this->app);

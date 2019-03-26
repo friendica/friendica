@@ -76,11 +76,6 @@ class App
 	private $mode;
 
 	/**
-	 * @var string The App URL path
-	 */
-	private $urlPath;
-
-	/**
 	 * @var bool true, if the call is from the Friendica APP, otherwise false
 	 */
 	private $isFriendicaApp;
@@ -206,7 +201,6 @@ class App
 
 	public $queue;
 	private $scheme;
-	private $hostname;
 
 	/**
 	 * @brief App constructor.
@@ -227,6 +221,10 @@ class App
 		$this->config   = $config;
 		$this->profiler = $profiler;
 		$this->mode     = $mode;
+
+		if (!Core\System::isDirectoryUsable($this->getBasePath(), false)) {
+			throw new Exception('Basepath \'' . $this->getBasePath() . '\' isn\'t usable.');
+		}
 
 		$this->checkBackend($isBackend);
 		$this->checkFriendicaApp();
@@ -250,14 +248,6 @@ class App
 			!empty($_SERVER['SERVER_PORT']) && (intval($_SERVER['SERVER_PORT']) == 443) // XXX: reasonable assumption, but isn't this hardcoding too much?
 		) {
 			$this->scheme = 'https';
-		}
-
-		if (!empty($_SERVER['SERVER_NAME'])) {
-			$this->hostname = $_SERVER['SERVER_NAME'];
-
-			if (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) {
-				$this->hostname .= ':' . $_SERVER['SERVER_PORT'];
-			}
 		}
 
 		set_include_path(
@@ -337,8 +327,6 @@ class App
 	 */
 	public function reload()
 	{
-		$this->determineURLPath();
-
 		$this->getMode()->determine($this->getBasePath());
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
@@ -380,54 +368,6 @@ class App
 		}
 	}
 
-	/**
-	 * Figure out if we are running at the top of a domain or in a sub-directory and adjust accordingly
-	 */
-	private function determineURLPath()
-	{
-		/*
-		 * The automatic path detection in this function is currently deactivated,
-		 * see issue https://github.com/friendica/friendica/issues/6679
-		 *
-		 * The problem is that the function seems to be confused with some url.
-		 * These then confuses the detection which changes the url path.
-		 */
-
-		/* Relative script path to the web server root
-		 * Not all of those $_SERVER properties can be present, so we do by inverse priority order
-		 */
-/*
-		$relative_script_path = '';
-		$relative_script_path = defaults($_SERVER, 'REDIRECT_URL'       , $relative_script_path);
-		$relative_script_path = defaults($_SERVER, 'REDIRECT_URI'       , $relative_script_path);
-		$relative_script_path = defaults($_SERVER, 'REDIRECT_SCRIPT_URL', $relative_script_path);
-		$relative_script_path = defaults($_SERVER, 'SCRIPT_URL'         , $relative_script_path);
-		$relative_script_path = defaults($_SERVER, 'REQUEST_URI'        , $relative_script_path);
-*/
-		$this->urlPath = $this->config->get('system', 'urlpath');
-
-		/* $relative_script_path gives /relative/path/to/friendica/module/parameter
-		 * QUERY_STRING gives pagename=module/parameter
-		 *
-		 * To get /relative/path/to/friendica we perform dirname() for as many levels as there are slashes in the QUERY_STRING
-		 */
-/*
-		if (!empty($relative_script_path)) {
-			// Module
-			if (!empty($_SERVER['QUERY_STRING'])) {
-				$path = trim(rdirname($relative_script_path, substr_count(trim($_SERVER['QUERY_STRING'], '/'), '/') + 1), '/');
-			} else {
-				// Root page
-				$path = trim($relative_script_path, '/');
-			}
-
-			if ($path && $path != $this->urlPath) {
-				$this->urlPath = $path;
-			}
-		}
-*/
-	}
-
 	public function getScheme()
 	{
 		return $this->scheme;
@@ -436,99 +376,33 @@ class App
 	/**
 	 * @brief Retrieves the Friendica instance base URL
 	 *
-	 * This function assembles the base URL from multiple parts:
-	 * - Protocol is determined either by the request or a combination of
-	 * system.ssl_policy and the $ssl parameter.
-	 * - Host name is determined either by system.hostname or inferred from request
-	 * - Path is inferred from SCRIPT_NAME
-	 *
 	 * Note: $ssl parameter value doesn't directly correlate with the resulting protocol
 	 *
-	 * @param bool $ssl Whether to append http or https under SSL_POLICY_SELFSIGN
+	 * @param bool   $ssl      Whether to append http or https under SSL_POLICY_SELFSIGN
+	 *
 	 * @return string Friendica server base URL
-	 * @throws InternalServerErrorException
 	 */
 	public function getBaseURL($ssl = false)
 	{
-		$scheme = $this->scheme;
+		$url = $this->config->get('system', 'url');
 
-		if ($this->config->get('system', 'ssl_policy') == SSL_POLICY_FULL) {
-			$scheme = 'https';
+		if ($this->getScheme() === 'http' && (
+			$this->config->get('system', 'ssl_policy') == SSL_POLICY_FULL ||
+			($this->config->get('system', 'ssl_policy') == SSL_POLICY_SELFSIGN && $ssl))) {
+			$url = Util\Network::switchScheme($url);
 		}
 
-		//	Basically, we have $ssl = true on any links which can only be seen by a logged in user
-		//	(and also the login link). Anything seen by an outsider will have it turned off.
-
-		if ($this->config->get('system', 'ssl_policy') == SSL_POLICY_SELFSIGN) {
-			if ($ssl) {
-				$scheme = 'https';
-			} else {
-				$scheme = 'http';
-			}
-		}
-
-		if ($this->config->get('config', 'hostname') != '') {
-			$this->hostname = $this->config->get('config', 'hostname');
-		}
-
-		return $scheme . '://' . $this->hostname . (!empty($this->getURLPath()) ? '/' . $this->getURLPath() : '' );
-	}
-
-	/**
-	 * @brief Initializes the baseurl components
-	 *
-	 * Clears the baseurl cache to prevent inconsistencies
-	 *
-	 * @param string $url
-	 * @throws InternalServerErrorException
-	 */
-	public function setBaseURL($url)
-	{
-		$parsed = @parse_url($url);
-		$hostname = '';
-
-		if (!empty($parsed)) {
-			if (!empty($parsed['scheme'])) {
-				$this->scheme = $parsed['scheme'];
-			}
-
-			if (!empty($parsed['host'])) {
-				$hostname = $parsed['host'];
-			}
-
-			if (!empty($parsed['port'])) {
-				$hostname .= ':' . $parsed['port'];
-			}
-			if (!empty($parsed['path'])) {
-				$this->urlPath = trim($parsed['path'], '\\/');
-			}
-
-			if (file_exists($this->getBasePath() . '/.htpreconfig.php')) {
-				include $this->getBasePath() . '/.htpreconfig.php';
-			}
-
-			if ($this->config->get('config', 'hostname') != '') {
-				$this->hostname = $this->config->get('config', 'hostname');
-			}
-
-			if (!isset($this->hostname) || ($this->hostname == '')) {
-				$this->hostname = $hostname;
-			}
-		}
+		return $url;
 	}
 
 	public function getHostName()
 	{
-		if ($this->config->get('config', 'hostname') != '') {
-			$this->hostname = $this->config->get('config', 'hostname');
-		}
-
-		return $this->hostname;
+		return $this->config->get('config', 'hostname');
 	}
 
 	public function getURLPath()
 	{
-		return $this->urlPath;
+		return $this->config->get('system', 'urlpath');
 	}
 
 	/**
@@ -1056,25 +930,6 @@ class App
 	}
 
 	/**
-	 * Sets the base url for use in cmdline programs which don't have
-	 * $_SERVER variables
-	 */
-	public function checkURL()
-	{
-		$url = $this->config->get('system', 'url');
-
-		// if the url isn't set or the stored url is radically different
-		// than the currently visited url, store the current value accordingly.
-		// "Radically different" ignores common variations such as http vs https
-		// and www.example.com vs example.com.
-		// We will only change the url to an ip address if there is no existing setting
-
-		if (empty($url) || (!Util\Strings::compareLink($url, $this->getBaseURL())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->getHostName()))) {
-			$this->config->set('system', 'url', $this->getBaseURL());
-		}
-	}
-
-	/**
 	 * Frontend App script
 	 *
 	 * The App object behaves like a container and a dispatcher at the same time, including a representation of the
@@ -1186,7 +1041,6 @@ class App
 		} elseif (!$this->getMode()->has(App\Mode::MAINTENANCEDISABLED) && $this->module != 'view') {
 			$this->module = 'maintenance';
 		} else {
-			$this->checkURL();
 			Core\Update::check($this->getBasePath(), false);
 			Core\Addon::loadAddons();
 			Core\Hook::loadHooks();

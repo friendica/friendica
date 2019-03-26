@@ -6,11 +6,11 @@ namespace Friendica\Core;
 
 use DOMDocument;
 use Exception;
-use Friendica\App;
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;
+use Friendica\Util\BasePath;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
@@ -130,15 +130,15 @@ class Installer
 	 * - Creates `config/local.config.php`
 	 * - Installs Database Structure
 	 *
-	 * @param App          $app         The Friendica App
 	 * @param IConfigCache $configCache The config cache with all config relevant information
-	 * @param string $basepath  The basepath of Friendica
 	 *
 	 * @return bool true if the config was created, otherwise false
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function createConfig(App $app, IConfigCache $configCache, $basepath)
+	public function createConfig(IConfigCache $configCache)
 	{
+		$basepath = $configCache->get('system', 'basepath');
+
 		$tpl = Renderer::getMarkupTemplate('local.config.tpl');
 		$txt = Renderer::replaceMacros($tpl, [
 			'$dbhost'    => $configCache->get('database', 'hostname'),
@@ -146,12 +146,16 @@ class Installer
 			'$dbpass'    => $configCache->get('database', 'password'),
 			'$dbdata'    => $configCache->get('database', 'database'),
 
-			'$phpath'    => $this->getPHPPath(),
+			'$phpath'    => $configCache->get('config', 'php_path'),
 			'$adminmail' => $configCache->get('config', 'admin_email'),
+			'$hostname'  => $configCache->get('config', 'hostname'),
 
+			'$urlpath'   => $configCache->get('system', 'urlpath'),
+			'$baseurl'   => $configCache->get('system', 'url'),
+			'$sslpolicy' => $configCache->get('system', 'ssl_policy'),
+			'$basepath'  => $basepath,
 			'$timezone'  => $configCache->get('system', 'default_timezone'),
 			'$language'  => $configCache->get('system', 'language'),
-			'$urlpath'   => $app->getURLPath(),
 		]);
 
 		$result = file_put_contents($basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.php', $txt);
@@ -243,7 +247,7 @@ class Installer
 			$help .= EOL . EOL;
 			$tpl = Renderer::getMarkupTemplate('field_input.tpl');
 			$help .= Renderer::replaceMacros($tpl, [
-				'$field' => ['phpath', L10n::t('PHP executable path'), $phppath, L10n::t('Enter full path to php executable. You can leave this blank to continue the installation.')],
+				'$field' => ['config.php_path', L10n::t('PHP executable path'), $phppath, L10n::t('Enter full path to php executable. You can leave this blank to continue the installation.')],
 			]);
 			$phppath = "";
 		}
@@ -587,21 +591,20 @@ class Installer
 	/**
 	 * Checking the Database connection and if it is available for the current installation
 	 *
-	 * @param string       $basePath    The basepath of this call
 	 * @param IConfigCache $configCache The configuration cache
 	 * @param Profiler    $profiler    The profiler of this app
 	 *
 	 * @return bool true if the check was successful, otherwise false
 	 * @throws Exception
 	 */
-	public function checkDB($basePath, IConfigCache $configCache, Profiler $profiler)
+	public function checkDB(IConfigCache $configCache, Profiler $profiler)
 	{
 		$dbhost = $configCache->get('database', 'hostname');
 		$dbuser = $configCache->get('database', 'username');
 		$dbpass = $configCache->get('database', 'password');
 		$dbdata = $configCache->get('database', 'database');
 
-		if (!DBA::connect($basePath, $configCache, $profiler, $dbhost, $dbuser, $dbpass, $dbdata)) {
+		if (!DBA::connect($configCache, $profiler, $dbhost, $dbuser, $dbpass, $dbdata)) {
 			$this->addCheck(L10n::t('Could not connect to database.'), false, true, '');
 
 			return false;
@@ -616,5 +619,127 @@ class Installer
 		}
 
 		return true;
+	}
+
+	/**
+	 * Setup the default cache for a new installation
+	 *
+	 * @param IConfigCache $configCache The configuration cache
+	 * @param string       $basePath    The determined basepath
+	 * @param array $server The array with additional $_SERVER information
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function setUpCache(IConfigCache $configCache, $basePath, array $server = [])
+	{
+		$configCache->set('config', 'php_path'  , $this->getPHPPath());
+		$configCache->set('config', 'hostname'  , $this->determineHostname($server));
+		$configCache->set('system', 'basepath'  , $this->determineBasePath($basePath, $server));
+		$configCache->set('system', 'urlpath'   , $this->determineUrlPath($server));
+		$configCache->set('system', 'ssl_policy', SSL_POLICY_NONE);
+		$configCache->set('system', 'url'       , $this->determineBaseUrl($configCache));
+	}
+
+	/**
+	 * Figure out if we are running at the top of a domain or in a sub-directory and return the sub path
+	 *
+	 * @param array $server The array with additional $_SERVER information
+	 *
+	 * @return string the url path
+	 */
+	public function determineUrlPath(array $server = [])
+	{
+		$path = '';
+
+		/* Relative script path to the web server root
+		 * Not all of those $_SERVER properties can be present, so we do by inverse priority order
+		 */
+		$relative_script_path = '';
+		$relative_script_path = defaults($server, 'REDIRECT_URL'       , $relative_script_path);
+		$relative_script_path = defaults($server, 'REDIRECT_URI'       , $relative_script_path);
+		$relative_script_path = defaults($server, 'REDIRECT_SCRIPT_URL', $relative_script_path);
+		$relative_script_path = defaults($server, 'SCRIPT_URL'         , $relative_script_path);
+		$relative_script_path = defaults($server, 'REQUEST_URI'        , $relative_script_path);
+
+		/* $relative_script_path gives /relative/path/to/friendica/module/parameter
+		 * QUERY_STRING gives pagename=module/parameter
+		 *
+		 * To get /relative/path/to/friendica we perform dirname() for as many levels as there are slashes in the QUERY_STRING
+		 */
+		if (!empty($relative_script_path)) {
+			// Module
+			if (!empty($server['QUERY_STRING'])) {
+				$path = trim(rdirname($relative_script_path, substr_count(trim($server['QUERY_STRING'], '/'), '/') + 1), '/');
+			} else {
+				// Root page
+				$path = trim($relative_script_path, '/');
+			}
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Determine the (real) base path of the current node
+	 *
+	 * @param string $basePath The guessed base path based on the installation
+	 * @param array  $server   The array with additional $_SERVER information
+	 *
+	 * @return string the real base path
+	 */
+	public function determineBasePath($basePath = '', array $server = [])
+	{
+		if (empty($basePath) && !empty($server['DOCUMENT_ROOT'])) {
+			$basePath = $server['DOCUMENT_ROOT'];
+		}
+
+		if (empty($basePath) && !empty($server['PWD'])) {
+			$basePath = $server['PWD'];
+		}
+
+		return BasePath::getRealPath($basePath);
+	}
+
+	/**
+	 * Determine the hostname
+	 *
+	 * @param array $server The array with additional $_SERVER information
+	 *
+	 * @return string the hostname
+	 */
+	public function determineHostname(array $server = [])
+	{
+		$hostname = '';
+
+		if (!empty($server['SERVER_NAME'])) {
+			$hostname = $server['SERVER_NAME'];
+
+			if (!empty($server['SERVER_PORT']) && is_int($server['SERVER_PORT']) && $server['SERVER_PORT'] != 80 && $server['SERVER_PORT'] != 443) {
+				$hostname .= ':' . $server['SERVER_PORT'];
+			}
+		}
+
+		return $hostname;
+	}
+
+	/**
+	 * Determines the Friendica instance base URL
+	 *
+	 * @param IConfigCache $configCache The current config cache with the other base information
+	 *
+	 * @return string Friendica server base URL
+	 */
+	public function determineBaseUrl(IConfigCache $configCache)
+	{
+		if ($configCache->get('system', 'ssl_policy') == SSL_POLICY_FULL) {
+			$scheme = 'https';
+		} else {
+			$scheme = 'http';
+		}
+
+		$hostname = $configCache->get('config', 'hostname');
+		$urlPath  = $configCache->get('system', 'urlpath');
+
+		return $scheme . '://' . $hostname . (!empty($urlPath) ? '/' . $urlPath : '' );
 	}
 }

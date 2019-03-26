@@ -11,16 +11,13 @@ class DBFactory
 	/**
 	 * Initialize the DBA connection
 	 *
-	 * @param string             $basePath    The basepath of the application
 	 * @param Cache\IConfigCache $configCache The configuration cache
 	 * @param Profiler           $profiler    The profiler
 	 * @param array              $server      The $_SERVER variables
 	 *
 	 * @throws \Exception if connection went bad
-	 *
-	 * @todo refactor basedir during https://github.com/friendica/friendica/issues/6720
 	 */
-	public static function init($basePath, Cache\IConfigCache $configCache, Profiler $profiler, array $server)
+	public static function init(Cache\IConfigCache $configCache, Profiler $profiler, array $server)
 	{
 		if (Database\DBA::connected()) {
 			return;
@@ -51,9 +48,9 @@ class DBFactory
 			$db_data = $server['MYSQL_DATABASE'];
 		}
 
-		if (Database\DBA::connect($basePath, $configCache, $profiler, $db_host, $db_user, $db_pass, $db_data, $charset)) {
+		if (Database\DBA::connect($configCache, $profiler, $db_host, $db_user, $db_pass, $db_data, $charset)) {
 			// Loads DB_UPDATE_VERSION constant
-			Database\DBStructure::definition($basePath, false);
+			Database\DBStructure::definition($configCache->get('system', 'basepath'), false);
 		}
 
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
