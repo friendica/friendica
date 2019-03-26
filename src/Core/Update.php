@@ -6,7 +6,6 @@ use Friendica\App;
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\Util\BasePath;
 use Friendica\Util\Config\ConfigFileLoader;
 use Friendica\Util\Config\ConfigFileSaver;
 use Friendica\Util\Strings;
@@ -229,10 +228,11 @@ class Update
 	 *
 	 * @param string   $basePath The basepath of Friendica
 	 * @param App\Mode $mode     The Application mode
+	 * @param array    $settings The settings array (['cat' => ['key' => ['fallback']]])
 	 *
 	 * @return bool True, if something has been saved
 	 */
-	public static function saveConfigToFile($basePath, App\Mode $mode)
+	public static function saveConfigToFile($basePath, App\Mode $mode, $settings)
 	{
 		$configFileLoader = new ConfigFileLoader($basePath, $mode);
 		$configCache = new Config\Cache\ConfigCache();
@@ -241,12 +241,16 @@ class Update
 
 		$updated = false;
 
-		if (self::updateConfigEntry($configCache, $configFileSaver,'config', 'hostname')) {
-			$updated = true;
-		};
+		$categories = array_keys($settings);
 
-		if (self::updateConfigEntry($configCache, $configFileSaver,'system', 'basepath', BasePath::create(dirname(__DIR__) . '/../'))) {
-			$updated = true;
+		foreach ($categories as $category) {
+			$keys = array_keys($settings[$category]);
+			foreach ($keys as $key) {
+				$default = $settings[$category][$key];
+				if (self::updateConfigEntry($configCache, $configFileSaver, $category, $key, $default)) {
+					$updated = true;
+				};
+			}
 		}
 
 		// In case there is nothing to do, skip the update
@@ -259,8 +263,12 @@ class Update
 			return false;
 		}
 
-		DBA::delete('config', ['cat' => 'config', 'k' => 'hostname']);
-		DBA::delete('config', ['cat' => 'system', 'k' => 'basepath']);
+		foreach ($categories as $category) {
+			$keys = array_keys($settings[$category]);
+			foreach ($keys as $key) {
+				DBA::delete('config', ['cat' => $category, 'k' => $key]);
+			}
+		}
 
 		return true;
 	}

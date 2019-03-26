@@ -3,6 +3,7 @@
 use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
+use Friendica\Core\Installer;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
@@ -350,12 +351,55 @@ function update_1298()
 
 /**
  * @see https://github.com/friendica/friendica/pull/6920
+ *
  * @return int Success
  */
 function update_1307()
 {
 	$app = BaseObject::getApp();
-	if (Update::saveConfigToFile($app->getBasePath(), $app->getMode())) {
+	$installer = new Installer();
+	$configCache = new Config\Cache\ConfigCache();
+	$installer->setUpCache($configCache, $app->getBasePath(), $_SERVER);
+
+	// settings to update
+	$settings = [
+		'config' => [
+			'hostname' => $configCache->get('config', 'hostname'),
+		],
+		'system' => [
+			'basepath' => $configCache->get('system', 'basepath'),
+		]
+	];
+
+	if (Update::saveConfigToFile($app->getBasePath(), $app->getMode(), $settings)) {
+		return Update::SUCCESS;
+	} else {
+		return Update::FAILED;
+	}
+}
+
+/**
+ * @see https://github.com/friendica/friendica/pull/6815
+ *
+ * @return int Success
+ */
+function update_1308()
+{
+	$app = BaseObject::getApp();
+	$installer = new Installer();
+	$configCache = new Config\Cache\ConfigCache();
+	$installer->setUpCache($configCache, $app->getBasePath(), $_SERVER);
+
+	// settings to update
+	$settings = [
+		'system' => [
+			'urlpath'    => $configCache->get('system', 'urlpath'),
+			'ssl_policy' => $configCache->get('system', 'ssl_policy'),
+			'url'        => $configCache->get('system', 'url'),
+		]
+	];
+
+	if (Update::saveConfigToFile($app->getBasePath(), $app->getMode(), $settings)) {
 		return Update::SUCCESS;
 	} else {
 		return Update::FAILED;

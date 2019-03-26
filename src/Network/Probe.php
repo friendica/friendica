@@ -10,6 +10,7 @@ namespace Friendica\Network;
  */
 
 use DOMDocument;
+use DomXPath;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
@@ -18,15 +19,14 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
-use Friendica\Protocol\ActivityPub;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
-use DomXPath;
 
 /**
  * @brief This class contain functions for probing URL
@@ -511,30 +511,6 @@ class Probe
 	}
 
 	/**
-	 * @brief Switch the scheme of an url between http and https
-	 *
-	 * @param string $url URL
-	 *
-	 * @return string switched URL
-	 */
-	private static function switchScheme($url)
-	{
-		$parts = parse_url($url);
-
-		if (!isset($parts['scheme'])) {
-			return $url;
-		}
-
-		if ($parts['scheme'] == 'http') {
-			$url = str_replace('http://', 'https://', $url);
-		} elseif ($parts['scheme'] == 'https') {
-			$url = str_replace('https://', 'http://', $url);
-		}
-
-		return $url;
-	}
-
-	/**
 	 * @brief Checks if a profile url should be OStatus but only provides partial information
 	 *
 	 * @param array  $webfinger Webfinger data
@@ -566,7 +542,7 @@ class Probe
 			return $webfinger;
 		}
 
-		$url = self::switchScheme($webfinger['subject']);
+		$url = Network::switchScheme($webfinger['subject']);
 		$path = str_replace('{uri}', urlencode($url), $lrdd);
 		$webfinger2 = self::webfinger($path, $type);
 
