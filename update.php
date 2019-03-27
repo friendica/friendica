@@ -383,7 +383,7 @@ function update_1307()
  *
  * @return int Success
  */
-function update_1308()
+function update_1309()
 {
 	$app = BaseObject::getApp();
 	$installer = new Installer();
