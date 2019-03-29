@@ -199,13 +199,13 @@ class ForumManager
 		$stmtContacts = DBA::p(
 			"SELECT `contact`.`id`, `contact`.`name`, COUNT(*) AS `count` FROM `item`
 				INNER JOIN `contact` ON `item`.`contact-id` = `contact`.`id`
-				WHERE `item`.`uid` = %d AND `item`.`visible` AND NOT `item`.`deleted` AND `item`.`unseen`
+				WHERE `item`.`uid` = ? AND `item`.`visible` AND NOT `item`.`deleted` AND `item`.`unseen`
 				AND `contact`.`network`= 'dfrn' AND (`contact`.`forum` OR `contact`.`prv`)
 				AND NOT `contact`.`blocked` AND NOT `contact`.`hidden`
 				AND NOT `contact`.`pending` AND NOT `contact`.`archive`
 				AND `contact`.`success_update` > `failure_update`
 				GROUP BY `contact`.`id` ",
-			intval(local_user())
+			local_user()
 		);
 
 		return DBA::toArray($stmtContacts);

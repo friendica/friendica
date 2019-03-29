@@ -466,6 +466,18 @@ class Transmitter
 	}
 
 	/**
+	 * Check if an inbox is archived
+	 *
+	 * @param string $url Inbox url
+	 *
+	 * @return boolean "true" if inbox is archived
+	 */
+	private static function archivedInbox($url)
+	{
+		return DBA::exists('inbox-status', ['url' => $url, 'archive' => true]);
+	}
+
+	/**
 	 * Fetches a list of inboxes of followers of a given user
 	 *
 	 * @param integer $uid      User ID
@@ -506,7 +518,9 @@ class Transmitter
 				} else {
 					$target = $profile['sharedinbox'];
 				}
-				$inboxes[$target] = $target;
+				if (!self::archivedInbox($target)) {
+					$inboxes[$target] = $target;
+				}
 			}
 		}
 		DBA::close($contacts);
@@ -563,7 +577,9 @@ class Transmitter
 						} else {
 							$target = $profile['sharedinbox'];
 						}
-						$inboxes[$target] = $target;
+						if (!self::archivedInbox($target)) {
+							$inboxes[$target] = $target;
+						}
 					}
 				}
 			}

@@ -84,7 +84,7 @@ HELP;
 
 		if ($current === '') {
 			$this->out();
-			$this->out('This sistem is using legacy storage system');
+			$this->out('This system is using legacy storage system');
 		}
 		if ($current !== '' && !$isregisterd) {
 			$this->out();

@@ -563,7 +563,7 @@ class NotificationsManager extends BaseObject
 		$sql_extra = "";
 
 		if (!$all) {
-			$sql_extra = " AND `ignore` = 0 ";
+			$sql_extra = " AND NOT `ignore` ";
 		}
 
 		/// @todo Fetch contact details by "Contact::getDetailsByUrl" instead of queries to contact, fcontact and gcontact
@@ -578,11 +578,11 @@ class NotificationsManager extends BaseObject
 				LEFT JOIN `contact` ON `contact`.`id` = `intro`.`contact-id`
 				LEFT JOIN `gcontact` ON `gcontact`.`nurl` = `contact`.`nurl`
 				LEFT JOIN `fcontact` ON `intro`.`fid` = `fcontact`.`id`
-			WHERE `intro`.`uid` = %d $sql_extra AND `intro`.`blocked` = 0
-			LIMIT %d, %d",
-			intval($_SESSION['uid']),
-			intval($start),
-			intval($limit)
+			WHERE `intro`.`uid` = ? $sql_extra AND `intro`.`blocked` = 0
+			LIMIT ?, ?",
+			$_SESSION['uid'],
+			$start,
+			$limit
 		);
 		if (DBA::isResult($stmtNotifies)) {
 			$notifs = $this->formatIntros(DBA::toArray($stmtNotifies));

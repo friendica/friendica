@@ -92,7 +92,7 @@ class Item extends BaseObject
 
 	// Never reorder or remove entries from this list. Just add new ones at the end, if needed.
 	// The item-activity table only stores the index and needs this array to know the matching activity.
-	const ACTIVITIES = [ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE];
+	const ACTIVITIES = [ACTIVITY_LIKE, ACTIVITY_DISLIKE, ACTIVITY_ATTEND, ACTIVITY_ATTENDNO, ACTIVITY_ATTENDMAYBE, ACTIVITY_FOLLOW, ACTIVITY2_ANNOUNCE];
 
 	private static $legacy_mode = null;
 

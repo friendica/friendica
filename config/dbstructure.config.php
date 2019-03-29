@@ -529,6 +529,21 @@ return [
 			"hook_file_function" => ["UNIQUE", "hook", "file", "function"],
 		]
 	],
+	"inbox-status" => [
+		"comment" => "Status of ActivityPub inboxes",
+		"fields" => [
+			"url" => ["type" => "varbinary(255)", "not null" => "1", "primary" => "1", "comment" => "URL of the inbox"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Creation date of this entry"],
+			"success" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last successful delivery"],
+			"failure" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last failed delivery"],
+			"previous" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Previous delivery date"],
+			"archive" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Is the inbox archived?"],
+			"shared" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Is it a shared inbox?"]
+		],
+		"indexes" => [
+			"PRIMARY" => ["url"]
+		]
+	],
 	"intro" => [
 		"comment" => "",
 		"fields" => [

@@ -282,7 +282,7 @@ $(document).ready(function(){
 	 * We are making an exception for buttons because of a race condition with the
 	 * comment opening button that results in an already closed comment UI.
 	 */
-	$(document).on('click', function(event) {
+	$(document).on('mousedown', function(event) {
 		if (event.target.type === 'button') {
 			return true;
 		}

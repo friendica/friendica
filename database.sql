@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2019.03-dev (The Tazmans Flax-lily)
--- DB_UPDATE_VERSION 1300
+-- Friendica 2019.06-dev (Dalmatian Bellflower)
+-- DB_UPDATE_VERSION 1308
 -- ------------------------------------------
 
 
@@ -471,6 +471,20 @@ CREATE TABLE IF NOT EXISTS `hook` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='addon hook registry';
 
 --
+-- TABLE inbox-status
+--
+CREATE TABLE IF NOT EXISTS `inbox-status` (
+	`url` varbinary(255) NOT NULL COMMENT 'URL of the inbox',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Creation date of this entry',
+	`success` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last successful delivery',
+	`failure` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Date of the last failed delivery',
+	`previous` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Previous delivery date',
+	`archive` boolean NOT NULL DEFAULT '0' COMMENT 'Is the inbox archived?',
+	`shared` boolean NOT NULL DEFAULT '0' COMMENT 'Is it a shared inbox?',
+	 PRIMARY KEY(`url`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Status of ActivityPub inboxes';
+
+--
 -- TABLE intro
 --
 CREATE TABLE IF NOT EXISTS `intro` (
@@ -879,7 +893,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
 	`backend-class` tinytext COMMENT 'Storage backend class',
 	`backend-ref` text COMMENT 'Storage backend data reference',
-	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'edited timestamp',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	 PRIMARY KEY(`id`),
 	 INDEX `contactid` (`contact-id`),
 	 INDEX `uid_contactid` (`uid`,`contact-id`),
@@ -1099,7 +1113,7 @@ CREATE TABLE IF NOT EXISTS `term` (
 	`global` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'User id',
 	 PRIMARY KEY(`tid`),
-	 INDEX `term_type` (`term`(64), `type`),
+	 INDEX `term_type` (`term`(64),`type`),
 	 INDEX `oid_otype_type_term` (`oid`,`otype`,`type`,`term`(32)),
 	 INDEX `uid_otype_type_term_global_created` (`uid`,`otype`,`type`,`term`(32),`global`,`created`),
 	 INDEX `uid_otype_type_url` (`uid`,`otype`,`type`,`url`(64)),
@@ -1271,13 +1285,12 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	`retrial` tinyint NOT NULL DEFAULT 0 COMMENT 'Retrial counter',
 	`done` boolean NOT NULL DEFAULT '0' COMMENT 'Marked 1 when the task was done - will be deleted later',
 	 PRIMARY KEY(`id`),
-	 INDEX `pid` (`pid`),
-	 INDEX `parameter` (`parameter`(64)),
-	 INDEX `priority_created_next_try` (`priority`,`created`,`next_try`),
-	 INDEX `done_priority_executed_next_try` (`done`,`priority`,`executed`,`next_try`),
-	 INDEX `done_executed_next_try` (`done`,`executed`,`next_try`),
+	 INDEX `done_parameter` (`done`,`parameter`(64)),
+	 INDEX `done_executed` (`done`,`executed`),
+	 INDEX `done_priority_created` (`done`,`priority`,`created`),
 	 INDEX `done_priority_next_try` (`done`,`priority`,`next_try`),
-	 INDEX `done_next_try` (`done`,`next_try`)
+	 INDEX `done_pid_next_try` (`done`,`pid`,`next_try`),
+	 INDEX `done_pid_priority_created` (`done`,`pid`,`priority`,`created`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Background tasks queue entries';
 
 --

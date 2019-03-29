@@ -5,6 +5,7 @@
  */
 namespace Friendica\Util;
 
+use Friendica\Database\DBA;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Model\User;
@@ -314,7 +315,66 @@ class HTTPSignature
 
 		Logger::log('Transmit to ' . $target . ' returned ' . $return_code, Logger::DEBUG);
 
-		return ($return_code >= 200) && ($return_code <= 299);
+		$success = ($return_code >= 200) && ($return_code <= 299);
+
+		self::setInboxStatus($target, $success);
+
+		return $success;
+	}
+
+	/**
+	 * @brief Set the delivery status for a given inbox
+	 *
+	 * @param string  $url     The URL of the inbox
+	 * @param boolean $success Transmission status
+	 */
+	static private function setInboxStatus($url, $success)
+	{
+		$now = DateTimeFormat::utcNow();
+
+		$status = DBA::selectFirst('inbox-status', [], ['url' => $url]);
+		if (!DBA::isResult($status)) {
+			DBA::insert('inbox-status', ['url' => $url, 'created' => $now]);
+			$status = DBA::selectFirst('inbox-status', [], ['url' => $url]);
+		}
+
+		if ($success) {
+			$fields = ['success' => $now];
+		} else {
+			$fields = ['failure' => $now];
+		}
+
+		if ($status['failure'] > DBA::NULL_DATETIME) {
+			$new_previous_stamp = strtotime($status['failure']);
+			$old_previous_stamp = strtotime($status['previous']);
+
+			// Only set "previous" with at least one day difference.
+			// We use this to assure to not accidentally archive too soon.
+			if (($new_previous_stamp - $old_previous_stamp) >= 86400) {
+				$fields['previous'] = $status['failure'];
+			}
+		}
+
+		if (!$success) {
+			if ($status['success'] <= DBA::NULL_DATETIME) {
+				$stamp1 = strtotime($status['created']);
+			} else {
+				$stamp1 = strtotime($status['success']);
+			}
+
+			$stamp2 = strtotime($now);
+			$previous_stamp = strtotime($status['previous']);
+
+			// Archive the inbox when there had been failures for five days.
+			// Additionally ensure that at least one previous attempt has to be in between.
+			if ((($stamp2 - $stamp1) >= 86400 * 5) && ($previous_stamp > $stamp1)) {
+				$fields['archive'] = true;
+			}
+		} else {
+			$fields['archive'] = false;
+		}
+
+		DBA::update('inbox-status', $fields, ['url' => $url]);
 	}
 
 	/**

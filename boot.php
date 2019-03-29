@@ -204,6 +204,7 @@ define('NAMESPACE_ZOT',             'http://purl.org/zot');
 define('NAMESPACE_DFRN',            'http://purl.org/macgirvin/dfrn/1.0');
 define('NAMESPACE_THREAD',          'http://purl.org/syndication/thread/1.0');
 define('NAMESPACE_TOMB',            'http://purl.org/atompub/tombstones/1.0');
+define('NAMESPACE_ACTIVITY2',       'https://www.w3.org/ns/activitystreams#');
 define('NAMESPACE_ACTIVITY',        'http://activitystrea.ms/spec/1.0/');
 define('NAMESPACE_ACTIVITY_SCHEMA', 'http://activitystrea.ms/schema/1.0/');
 define('NAMESPACE_MEDIA',           'http://purl.org/syndication/atommedia');
@@ -246,6 +247,7 @@ define('ACTIVITY_FAVORITE',    NAMESPACE_ACTIVITY_SCHEMA . 'favorite');
 define('ACTIVITY_UNFAVORITE',  NAMESPACE_ACTIVITY_SCHEMA . 'unfavorite');
 define('ACTIVITY_SHARE',       NAMESPACE_ACTIVITY_SCHEMA . 'share');
 define('ACTIVITY_DELETE',      NAMESPACE_ACTIVITY_SCHEMA . 'delete');
+define('ACTIVITY2_ANNOUNCE',   NAMESPACE_ACTIVITY2       . 'Announce');
 
 define('ACTIVITY_POKE',        NAMESPACE_ZOT . '/activity/poke');
 
