@@ -98,7 +98,7 @@
 		GenerateShareString();
 
 		// Take advantage of the effects of previous comment
-		$(document).on("change", "#id_frio_share_string", function() {
+		$(document).on("input", "#id_frio_share_string", function() {
 			theme = JSON.parse($("#id_frio_share_string").val());
 
 			if ($("#id_frio_nav_bg").length) {
