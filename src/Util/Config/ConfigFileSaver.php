@@ -74,33 +74,33 @@ class ConfigFileSaver extends ConfigFileManager
 		$saved = false;
 
 		// Check for the *.config.php file inside the /config/ path
-		list($reading, $writing) = $this->openFile($this->getConfigFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveConfigFile($reading, $writing);
+		$readLines = $this->getFile($this->getConfigFullName($name));
+		if (!empty($readLines)) {
+			$writeLines = $this->saveConfigFile($readLines);
 			// Close the current file handler and rename them
-			if ($this->closeFile($this->getConfigFullName($name), $reading, $writing)) {
+			if ($this->writeFile($this->getConfigFullName($name), $writeLines)) {
 				// just return true, if everything went fine
 				$saved = true;
 			}
 		}
 
 		// Check for the *.ini.php file inside the /config/ path
-		list($reading, $writing) = $this->openFile($this->getIniFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveINIConfigFile($reading, $writing);
+		$readLines = $this->getFile($this->getIniFullName($name));
+		if (!empty($readLines)) {
+			$writeLines = $this->saveINIConfigFile($readLines);
 			// Close the current file handler and rename them
-			if ($this->closeFile($this->getIniFullName($name), $reading, $writing)) {
+			if ($this->writeFile($this->getIniFullName($name), $writeLines)) {
 				// just return true, if everything went fine
 				$saved = true;
 			}
 		}
 
 		// Check for the *.php file (normally .htconfig.php) inside the / path
-		list($reading, $writing) = $this->openFile($this->getHtConfigFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveToLegacyConfig($reading, $writing);
+		$readLines = $this->getFile($this->getHtConfigFullName($name));
+		if (!empty($readLines)) {
+			$writeLines = $this->saveToLegacyConfig($readLines);
 			// Close the current file handler and rename them
-			if ($this->closeFile($this->getHtConfigFullName($name), $reading, $writing)) {
+			if ($this->writeFile($this->getHtConfigFullName($name), $writeLines)) {
 				// just return true, if everything went fine
 				$saved = true;
 			}
@@ -116,52 +116,39 @@ class ConfigFileSaver extends ConfigFileManager
 	 *
 	 * @param string $fullName The full name of the current config
 	 *
-	 * @return array An array containing the two reading and writing handler
+	 * @return array An array containing the file
 	 */
-	private function openFile($fullName)
+	private function getFile($fullName)
 	{
 		if (empty($fullName)) {
-			return [null, null];
+			return [];
 		}
 
 		try {
-			$reading = fopen($fullName, 'r');
+			$readLines = file($fullName, FILE_IGNORE_NEW_LINES);
+			return $readLines;
 		} catch (\Exception $exception) {
-			return [null, null];
+			return [];
 		}
-
-		if (!$reading) {
-			return [null, null];
-		}
-
-		try {
-			$writing = fopen($fullName . '.tmp', 'w');
-		} catch (\Exception $exception) {
-			fclose($reading);
-			return [null, null];
-		}
-
-		if (!$writing) {
-			fclose($reading);
-			return [null, null];
-		}
-
-		return [$reading, $writing];
 	}
 
 	/**
 	 * Close and rename the config file
 	 *
-	 * @param string   $fullName The full name of the current config
-	 * @param resource $reading  The reading resource handler
-	 * @param resource $writing  The writing resource handler
+	 * @param string $fullName  The full name of the current config
+	 * @param array  $writeFile The writing resource handler
 	 *
 	 * @return bool True, if the close was successful
 	 */
-	private function closeFile($fullName, $reading, $writing)
+	private function writeFile($fullName, array $writeFile)
 	{
-		fclose($reading);
-		fclose($writing);
+		try {
+			if (!file_put_contents($fullName . '.tmp', implode(PHP_EOL, $writeFile))) {
+				return false;
+			}
+		} catch (\Exception $exception) {
+			return false;
+		}
 
 		try {
 			$renamed = rename($fullName, $fullName . '.old');
@@ -193,20 +180,21 @@ class ConfigFileSaver extends ConfigFileManager
 	/**
 	 * Saves all configuration values to a config file
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array $readLines
+	 *
+	 * @return array
 	 */
-	private function saveConfigFile($reading, $writing)
+	private function saveConfigFile(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$categoryFound = array_fill(0, $settingsCount, false);
-		$categoryBracketFound = array_fill(0, $settingsCount, false);;
-		$lineFound = array_fill(0, $settingsCount, false);;
-		$lineArrowFound = array_fill(0, $settingsCount, false);;
+		$categoryBracketFound = array_fill(0, $settingsCount, false);
+		$lineFound = array_fill(0, $settingsCount, false);
+		$lineArrowFound = array_fill(0, $settingsCount, false);
 
-		while (!feof($reading)) {
+		$writeLine = [];
 
-			$line = fgets($reading);
+		foreach ($readLines as $line) {
 
 			// check for each added setting if we have to replace a config line
 			for ($i = 0; $i < $settingsCount; $i++) {
@@ -251,24 +239,53 @@ class ConfigFileSaver extends ConfigFileManager
 				}
 			}
 
-			fputs($writing, $line);
+			array_push($writeLine, $line);
 		}
+
+		return $writeLine;
 	}
 
 	/**
 	 * Saves a value to a ini file
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array $readLines
+	 *
+	 * @return array
 	 */
-	private function saveINIConfigFile($reading, $writing)
+	private function saveINIConfigFile(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$categoryFound = array_fill(0, $settingsCount, false);
 
-		while (!feof($reading)) {
+		// find missing categories
+		$missingCategories = array_reduce($this->settings, function ($matches, $setting) use ($readLines) {
+			$category = $setting['cat'];
+			if (!in_array(sprintf('[%s]', $category), $readLines) && (!isset($matches) || !in_array($category, $matches))) {
+				$matches[] = $category;
+			}
 
-			$line = fgets($reading);
+			return $matches;
+		});
+
+		// add missing categories and return as checkedLines
+		$checkedLines = [];
+		if (!empty($missingCategories)) {
+			foreach ($readLines as $line) {
+				if (preg_match_all('/^INI;.*$/', $line)) {
+					foreach ($missingCategories as $category) {
+						array_push($checkedLines, sprintf(PHP_EOL . '[%s]', $category));
+					}
+				}
+
+				array_push($checkedLines, $line);
+			}
+		} else {
+			$checkedLines = $readLines;
+		}
+
+		// check settings
+		$writeLines = [];
+		foreach ($checkedLines as $line) {
 
 			// check for each added setting if we have to replace a config line
 			for ($i = 0; $i < $settingsCount; $i++) {
@@ -279,34 +296,39 @@ class ConfigFileSaver extends ConfigFileManager
 
 				// check the current value
 				} elseif ($categoryFound[$i] && preg_match_all('/^' . $this->settings[$i]['key'] . '\s*=\s*(.*?)$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = $this->settings[$i]['key'] . ' = ' . $this->settings[$i]['value'] . PHP_EOL;
 					$categoryFound[$i] = false;
+					$line = sprintf('%s = %s', $this->settings[$i]['key'], $this->settings[$i]['value']);
 
 				// If end of INI file, add the line before the INI end
-				} elseif ($categoryFound[$i] && (preg_match_all('/^\[.*?\]$/', $line) || preg_match_all('/^INI;.*$/', $line))) {
+				} elseif ($categoryFound[$i] && (preg_match_all('/^\s*?\[.*?\].*?$/', $line) || preg_match_all('/^\s*?INI;.*?$/', $line) || empty($line))) {
 					$categoryFound[$i] = false;
-					$newLine = $this->settings[$i]['key'] . ' = ' . $this->settings[$i]['value'] . PHP_EOL;
-					$line = $newLine . $line;
+					array_push($writeLines, sprintf('%s = %s', $this->settings[$i]['key'], $this->settings[$i]['value']));
 				}
 			}
 
-			fputs($writing, $line);
+			array_push($writeLines, $line);
 		}
+
+		array_push($writeLines, PHP_EOL);
+
+		return $writeLines;
 	}
 
 	/**
 	 * Saves a value to a .php file (normally .htconfig.php)
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array $readLines
+	 *
+	 * @return array
 	 */
-	private function saveToLegacyConfig($reading, $writing)
+	private function saveToLegacyConfig(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$found  = array_fill(0, $settingsCount, false);
-		while (!feof($reading)) {
 
-			$line = fgets($reading);
+		$writeLines = [];
+
+		foreach ($readLines as $line) {
 
 			// check for each added setting if we have to replace a config line
 			for ($i = 0; $i < $settingsCount; $i++) {
@@ -323,7 +345,7 @@ class ConfigFileSaver extends ConfigFileManager
 				}
 			}
 
-			fputs($writing, $line);
+			array_push($writeLines, $line);
 		}
 
 		for ($i = 0; $i < $settingsCount; $i++) {
@@ -334,8 +356,10 @@ class ConfigFileSaver extends ConfigFileManager
 					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
 				}
 
-				fputs($writing, $line);
+				array_push($writeLines, $line);
 			}
 		}
+
+		return $writeLines;
 	}
 }

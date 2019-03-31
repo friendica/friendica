@@ -104,8 +104,14 @@ class ConfigFileSaverTest extends MockedTest
 		// overwrite value
 		$configFileSaver->addConfigValue('system', 'test_val2', 'TestIt Now');
 
+		// new category
+        $configFileSaver->addConfigValue('newCat', 'test_val3', 'TestIt Again');
+        $configFileSaver->addConfigValue('newCat', 'test_val4', 'TestIt Fourth');
+
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
+
+		print_r(file_get_contents($this->root->getChild($relativeFullName)->url()));
 
 		$newConfigCache = new ConfigCache();
 		$configFileLoader->setupCache($newConfigCache);
@@ -114,6 +120,8 @@ class ConfigFileSaverTest extends MockedTest
 		$this->assertEquals('Testingwith@all.we can', $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('vier', $newConfigCache->get('system', 'theme'));
 		$this->assertEquals('TestIt Now', $newConfigCache->get('system', 'test_val2'));
+		$this->assertEquals('TestIt Again', $newConfigCache->get('newCat', 'test_val3'));
+		$this->assertEquals('TestIt Fourth', $newConfigCache->get('newCat', 'test_val4'));
 
 		$this->assertTrue($this->root->hasChild($relativeFullName));
 		$this->assertTrue($this->root->hasChild($relativeFullName . '.old'));
