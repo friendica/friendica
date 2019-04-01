@@ -403,7 +403,7 @@ class ConfigFileSaver extends ConfigFileManager
 				if ($ini) {
 					return implode(',', $value);
 				} else {
-					return "'" . implode(',', $value) . "'";
+					return "'" . addslashes(implode(',', $value)) . "'";
 				}
 			case is_numeric($value):
 				return "$value";
@@ -411,7 +411,7 @@ class ConfigFileSaver extends ConfigFileManager
 				if ($ini) {
 					return (string)$value;
 				} else {
-					return "'" . (string)$value . "'";
+					return "'" . addslashes((string)$value) . "'";
 				}
 		}
 	}

@@ -64,8 +64,6 @@ class ConfigFileSaverTest extends MockedTest
 	/**
 	 * Test the saveToConfigFile() method
 	 * @dataProvider dataConfigFiles
-	 *
-	 * @todo 20190324 [nupplaphil] for ini-configs, it isn't possible to use $ or ! inside values
 	 */
 	public function testSaveToConfig($fileName, $filePath, $relativePath)
 	{
@@ -82,6 +80,13 @@ class ConfigFileSaverTest extends MockedTest
 		vfsStream::newFile($fileName)
 			->at($root)
 			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
+
+		// The parse_ini_string() method doesn't support every escaped character by definition
+		if (stristr($fileName, '.ini.')) {
+			$escapeString = 'Testingwith@all.we can';
+		} else {
+			$escapeString = 'Testingwith@all\'.we can?!, \$';
+		}
 
 		$configFileSaver = new ConfigFileSaver($this->root->url());
 		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
@@ -102,7 +107,7 @@ class ConfigFileSaverTest extends MockedTest
 		$configFileSaver->addConfigValue('system', 'theme', 'vier');
 
 		// insert values (system and config value)
-		$configFileSaver->addConfigValue('config', 'test_val', 'Testingwith@all.we can');
+		$configFileSaver->addConfigValue('config', 'test_val', $escapeString);
 		$configFileSaver->addConfigValue('system', 'test_val2', 'TestIt First');
 
 		// overwrite value
@@ -116,7 +121,7 @@ class ConfigFileSaverTest extends MockedTest
 		$configFileSaver->addConfigValue('config', 'register_policy', \Friendica\Module\Register::APPROVE);
 		$configFileSaver->addConfigValue('system', 'no_regfullname', false);
 		$configFileSaver->addConfigValue('system', 'numeric', 6.78);
-		$configFileSaver->addConfigValue('system', 'allowed_themes', ['quattro','frio']);
+		$configFileSaver->addConfigValue('system', 'allowed_themes', ['quattro',$escapeString]);
 
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
@@ -131,7 +136,7 @@ class ConfigFileSaverTest extends MockedTest
 		$this->assertEquals('vier', $newConfigCache->get('system', 'theme'));
 
 		// insert/overwritten values (system and config value)
-		$this->assertEquals('Testingwith@all.we can', $newConfigCache->get('config', 'test_val'));
+		$this->assertEquals($escapeString, $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('TestIt Now', $newConfigCache->get('system', 'test_val2'));
 
 		// new categories
@@ -142,7 +147,7 @@ class ConfigFileSaverTest extends MockedTest
 		$this->assertEquals(\Friendica\Module\Register::APPROVE, $newConfigCache->get('config', 'register_policy'));
 		$this->assertEquals(false, $newConfigCache->get('system', 'no_regfullname'));
 		$this->assertEquals(6.78, $newConfigCache->get('system', 'numeric'));
-		$this->assertEquals('quattro,frio', $newConfigCache->get('system', 'allowed_themes'));
+		$this->assertEquals('quattro,' . $escapeString, $newConfigCache->get('system', 'allowed_themes'));
 
 		$this->assertTrue($this->root->hasChild($relativeFullName));
 		$this->assertTrue($this->root->hasChild($relativeFullName . '.old'));
