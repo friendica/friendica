@@ -66,6 +66,7 @@ class ConfigFileSaverTest extends MockedTest
 	 * @dataProvider dataConfigFiles
 	 *
 	 * @todo 20190324 [nupplaphil] for ini-configs, it isn't possible to use $ or ! inside values
+	 * @todo 20190402 [nupplaphil] array, bool, numeric value checks
 	 */
 	public function testSaveToConfig($fileName, $filePath, $relativePath)
 	{
@@ -111,15 +112,18 @@ class ConfigFileSaverTest extends MockedTest
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
 
-		print_r(file_get_contents($this->root->getChild($relativeFullName)->url()));
-
 		$newConfigCache = new ConfigCache();
 		$configFileLoader->setupCache($newConfigCache);
 
+		// update values (system and config value)
 		$this->assertEquals('new@mail.it', $newConfigCache->get('config', 'admin_email'));
-		$this->assertEquals('Testingwith@all.we can', $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('vier', $newConfigCache->get('system', 'theme'));
+
+		// insert/overwritten values (system and config value)
+		$this->assertEquals('Testingwith@all.we can', $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('TestIt Now', $newConfigCache->get('system', 'test_val2'));
+
+		// new categories
 		$this->assertEquals('TestIt Again', $newConfigCache->get('newCat', 'test_val3'));
 		$this->assertEquals('TestIt Fourth', $newConfigCache->get('newCat', 'test_val4'));
 
@@ -140,10 +144,8 @@ class ConfigFileSaverTest extends MockedTest
 
 		if (empty($relativePath)) {
 			$root = $this->root;
-			$relativeFullName = $fileName;
 		} else {
 			$root = $this->root->getChild($relativePath);
-			$relativeFullName = $relativePath . DIRECTORY_SEPARATOR . $fileName;
 		}
 
 		$root->chmod(000);
