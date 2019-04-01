@@ -30,7 +30,7 @@ class ConfigFileSaver extends ConfigFileManager
 	 *
 	 * @param string $cat   The configuration category
 	 * @param string $key   The configuration key
-	 * @param string $value The new value
+	 * @param mixed  $value The new value
 	 */
 	public function addConfigValue($cat, $key, $value)
 	{
@@ -76,7 +76,7 @@ class ConfigFileSaver extends ConfigFileManager
 		// Check for the *.config.php file inside the /config/ path
 		$readLines = $this->getFile($this->getConfigFullName($name));
 		if (!empty($readLines)) {
-			$writeLines = $this->saveConfigFile($readLines);
+			$writeLines = $this->saveSettingsForConfig($readLines);
 			// Close the current file handler and rename them
 			if ($this->writeFile($this->getConfigFullName($name), $writeLines)) {
 				// just return true, if everything went fine
@@ -87,7 +87,7 @@ class ConfigFileSaver extends ConfigFileManager
 		// Check for the *.ini.php file inside the /config/ path
 		$readLines = $this->getFile($this->getIniFullName($name));
 		if (!empty($readLines)) {
-			$writeLines = $this->saveINIConfigFile($readLines);
+			$writeLines = $this->saveSettingsForINI($readLines);
 			// Close the current file handler and rename them
 			if ($this->writeFile($this->getIniFullName($name), $writeLines)) {
 				// just return true, if everything went fine
@@ -98,7 +98,7 @@ class ConfigFileSaver extends ConfigFileManager
 		// Check for the *.php file (normally .htconfig.php) inside the / path
 		$readLines = $this->getFile($this->getHtConfigFullName($name));
 		if (!empty($readLines)) {
-			$writeLines = $this->saveToLegacyConfig($readLines);
+			$writeLines = $this->saveSettingsForLegacy($readLines);
 			// Close the current file handler and rename them
 			if ($this->writeFile($this->getHtConfigFullName($name), $writeLines)) {
 				// just return true, if everything went fine
@@ -178,19 +178,22 @@ class ConfigFileSaver extends ConfigFileManager
 	}
 
 	/**
-	 * Saves all configuration values to a config file
+	 * Save the added settings to a given array of config lines
+	 * and return it as a new array
 	 *
 	 * @param array $readLines
 	 *
 	 * @return array
 	 */
-	private function saveConfigFile(array $readLines)
+	private function saveSettingsForConfig(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$categoryFound = array_fill(0, $settingsCount, false);
 		$categoryBracketFound = array_fill(0, $settingsCount, false);
 		$lineFound = array_fill(0, $settingsCount, false);
 		$lineArrowFound = array_fill(0, $settingsCount, false);
+
+		// check categories
 
 		$writeLine = [];
 
@@ -220,9 +223,9 @@ class ConfigFileSaver extends ConfigFileManager
 				}
 
 				// find the current value and replace it
-				if ($lineArrowFound[$i] && preg_match_all('/\'(.*?)\'/', $line, $matches, PREG_SET_ORDER)) {
+				if ($lineArrowFound[$i] && preg_match_all('/\'?(.*?)\'?/', $line, $matches, PREG_SET_ORDER)) {
 					$lineVal = end($matches)[0];
-					$line = str_replace($lineVal, '\'' . $this->settings[$i]['value'] . '\'', $line);
+					$line = str_replace($lineVal, $this->valueToString($this->settings[$i]['value']), $line);
 					$categoryFound[$i] = false;
 					$categoryBracketFound[$i] = false;
 					$lineFound[$i] = false;
@@ -234,7 +237,7 @@ class ConfigFileSaver extends ConfigFileManager
 					$categoryBracketFound[$i] = false;
 					$lineFound[$i] = false;
 					$lineArrowFound[$i] = false;
-					$newLine = sprintf(self::INDENT . self::INDENT . '\'%s\' => \'%s\',' . PHP_EOL, $this->settings[$i]['key'], $this->settings[$i]['value']);
+					$newLine = sprintf(self::INDENT . self::INDENT . '\'%s\' => %s,' . PHP_EOL, $this->settings[$i]['key'], $this->valueToString($this->settings[$i]['value']));
 					$line = $newLine . $line;
 				}
 			}
@@ -246,13 +249,14 @@ class ConfigFileSaver extends ConfigFileManager
 	}
 
 	/**
-	 * Saves a value to a ini file
+	 * Save the added settings to a given array of INI lines
+	 * and return it as a new array
 	 *
 	 * @param array $readLines
 	 *
 	 * @return array
 	 */
-	private function saveINIConfigFile(array $readLines)
+	private function saveSettingsForINI(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$categoryFound = array_fill(0, $settingsCount, false);
@@ -291,18 +295,34 @@ class ConfigFileSaver extends ConfigFileManager
 			for ($i = 0; $i < $settingsCount; $i++) {
 
 				// find the category of the current setting
-				if (!$categoryFound[$i] && stristr($line, sprintf('[%s]', $this->settings[$i]['cat']))) {
+				if (
+					!$categoryFound[$i] &&
+					// right category found
+					stristr($line, sprintf('[%s]', $this->settings[$i]['cat']))
+				) {
 					$categoryFound[$i] = true;
 
 				// check the current value
-				} elseif ($categoryFound[$i] && preg_match_all('/^' . $this->settings[$i]['key'] . '\s*=\s*(.*?)$/', $line, $matches, PREG_SET_ORDER)) {
+				} elseif ($categoryFound[$i] &&
+					// found the key in the right category
+					preg_match_all('/^' . $this->settings[$i]['key'] . '\s*=\s*(.*?)$/', $line, $matches, PREG_SET_ORDER)
+				) {
 					$categoryFound[$i] = false;
-					$line = sprintf('%s = %s', $this->settings[$i]['key'], $this->settings[$i]['value']);
+					$line = sprintf('%s = %s', $this->settings[$i]['key'], $this->valueToString($this->settings[$i]['value'], true));
 
 				// If end of INI file, add the line before the INI end
-				} elseif ($categoryFound[$i] && (preg_match_all('/^\s*?\[.*?\].*?$/', $line) || preg_match_all('/^\s*?INI;.*?$/', $line) || empty($line))) {
+				} elseif (
+					$categoryFound[$i] &&
+					(
+						// new category found
+						preg_match_all('/^\s*?\[.*?\].*?$/', $line) ||
+						// end of INI file found
+						preg_match_all('/^\s*?INI;.*?$/', $line) ||
+						// empty line found
+						empty($line)
+					)) {
 					$categoryFound[$i] = false;
-					array_push($writeLines, sprintf('%s = %s', $this->settings[$i]['key'], $this->settings[$i]['value']));
+					array_push($writeLines, sprintf('%s = %s', $this->settings[$i]['key'], $this->valueToString($this->settings[$i]['value'], true)));
 				}
 			}
 
@@ -315,13 +335,14 @@ class ConfigFileSaver extends ConfigFileManager
 	}
 
 	/**
-	 * Saves a value to a .php file (normally .htconfig.php)
+	 * Save the added settings to a given array of (legacy) config lines
+	 * and return it as a new array
 	 *
 	 * @param array $readLines
 	 *
 	 * @return array
 	 */
-	private function saveToLegacyConfig(array $readLines)
+	private function saveSettingsForLegacy(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
 		$found  = array_fill(0, $settingsCount, false);
@@ -334,13 +355,13 @@ class ConfigFileSaver extends ConfigFileManager
 			for ($i = 0; $i < $settingsCount; $i++) {
 
 				// check for a non plain config setting (use category too)
-				if ($this->settings[$i]['cat'] !== 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['cat'] . '\'\]\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s\'*(.*?)\';$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+				if ($this->settings[$i]['cat'] !== 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['cat'] . '\'\]\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $line, $matches, PREG_SET_ORDER)) {
+					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
 					$found[$i] = true;
 
 				// check for a plain config setting (don't use a category)
-				} elseif ($this->settings[$i]['cat'] === 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s\'*(.*?)\';$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+				} elseif ($this->settings[$i]['cat'] === 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $line, $matches, PREG_SET_ORDER)) {
+					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
 					$found[$i] = true;
 				}
 			}
@@ -351,9 +372,9 @@ class ConfigFileSaver extends ConfigFileManager
 		for ($i = 0; $i < $settingsCount; $i++) {
 			if (!$found[$i]) {
 				if ($this->settings[$i]['cat'] !== 'config') {
-					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
 				} else {
-					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
 				}
 
 				array_push($writeLines, $line);
@@ -361,5 +382,37 @@ class ConfigFileSaver extends ConfigFileManager
 		}
 
 		return $writeLines;
+	}
+
+	/**
+	 * creates a string representation of the current value
+	 *
+	 * @param mixed $value Any type of value
+	 * @param bool  $ini   In case of ini, don't add apostrophes to values
+	 *
+	 * @return string
+	 */
+	private function valueToString($value, $ini = false)
+	{
+		switch (true) {
+			case is_bool($value) && $value:
+				return "true";
+			case is_bool($value) && !$value:
+				return "false";
+			case is_array($value):
+				if ($ini) {
+					return implode(',', $value);
+				} else {
+					return "'" . implode(',', $value) . "'";
+				}
+			case is_numeric($value):
+				return "$value";
+			default:
+				if ($ini) {
+					return (string)$value;
+				} else {
+					return "'" . (string)$value . "'";
+				}
+		}
 	}
 }

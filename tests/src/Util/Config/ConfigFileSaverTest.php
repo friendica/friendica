@@ -66,7 +66,6 @@ class ConfigFileSaverTest extends MockedTest
 	 * @dataProvider dataConfigFiles
 	 *
 	 * @todo 20190324 [nupplaphil] for ini-configs, it isn't possible to use $ or ! inside values
-	 * @todo 20190402 [nupplaphil] array, bool, numeric value checks
 	 */
 	public function testSaveToConfig($fileName, $filePath, $relativePath)
 	{
@@ -91,6 +90,10 @@ class ConfigFileSaverTest extends MockedTest
 
 		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
 		$this->assertEquals('frio', $configCache->get('system', 'theme'));
+		$this->assertEquals(true, $configCache->get('system', 'no_regfullname'));
+		$this->assertEquals(\Friendica\Module\Register::OPEN, $configCache->get('config', 'register_policy'));
+		$this->assertEquals(2.5, $configCache->get('system', 'numeric'));
+		$this->assertEquals('quattro,vier,duepuntozero', $configCache->get('system', 'allowed_themes'));
 		$this->assertNull($configCache->get('config', 'test_val'));
 		$this->assertNull($configCache->get('system', 'test_val2'));
 
@@ -109,8 +112,16 @@ class ConfigFileSaverTest extends MockedTest
         $configFileSaver->addConfigValue('newCat', 'test_val3', 'TestIt Again');
         $configFileSaver->addConfigValue('newCat', 'test_val4', 'TestIt Fourth');
 
+        // replace types
+		$configFileSaver->addConfigValue('config', 'register_policy', \Friendica\Module\Register::APPROVE);
+		$configFileSaver->addConfigValue('system', 'no_regfullname', false);
+		$configFileSaver->addConfigValue('system', 'numeric', 6.78);
+		$configFileSaver->addConfigValue('system', 'allowed_themes', ['quattro','frio']);
+
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
+
+		print_r(file_get_contents($this->root->getChild($relativeFullName)->url()));
 
 		$newConfigCache = new ConfigCache();
 		$configFileLoader->setupCache($newConfigCache);
@@ -126,6 +137,12 @@ class ConfigFileSaverTest extends MockedTest
 		// new categories
 		$this->assertEquals('TestIt Again', $newConfigCache->get('newCat', 'test_val3'));
 		$this->assertEquals('TestIt Fourth', $newConfigCache->get('newCat', 'test_val4'));
+
+		// check types
+		$this->assertEquals(\Friendica\Module\Register::APPROVE, $newConfigCache->get('config', 'register_policy'));
+		$this->assertEquals(false, $newConfigCache->get('system', 'no_regfullname'));
+		$this->assertEquals(6.78, $newConfigCache->get('system', 'numeric'));
+		$this->assertEquals('quattro,frio', $newConfigCache->get('system', 'allowed_themes'));
 
 		$this->assertTrue($this->root->hasChild($relativeFullName));
 		$this->assertTrue($this->root->hasChild($relativeFullName . '.old'));

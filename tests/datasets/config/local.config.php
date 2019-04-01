@@ -32,13 +32,17 @@ return [
             // and here too
                 \Friendica\Module\Register::OPEN,
             'register_text' => '',
+			'max_import_size' => 999,
         ],
     'system'
     =>
         [
             'default_timezone' => 'UTC',
             'language' => 'en',
-            'theme' => 'frio'
+			'no_regfullname' => true,
+            'theme' => 'frio',
+			'numeric' => 2.5,
+			'allowed_themes' => 'quattro,vier,duepuntozero',
         ],
     'testcat' => [
         'testarr' => ['1','2','3'],
