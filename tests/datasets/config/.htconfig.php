@@ -69,5 +69,6 @@ $a->config['system']['directory'] = 'http://another.url';
 $a->config
 ['system']
 ['numeric']
+// geht hier ein kommentar??
 	=
 	2.5;

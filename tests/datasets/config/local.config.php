@@ -24,25 +24,24 @@ return [
 	'config' =>
 	// but with comment here
 		[
-		'admin_email' =>
-		// and here
-			'admin@test.it',
-		'sitename' => 'Friendica Social Network',
-		'register_policy' =>
-		// and here too
-			\Friendica\Module\Register::OPEN,
-		'register_text' => '',
-		'max_import_size' => 999,
+			'admin_email' =>
+			// and here
+				'admin@test.it',
+			'sitename' => 'Friendica Social Network',
+			'register_policy' =>
+			// and here too
+				\Friendica\Module\Register::OPEN,
+			'register_text' => '',
+			'max_import_size' => 999,
 		],
 	'system'
-	=>
-		[
+			   =>
+		[ 'allowed_themes' => 'quattro,vier,duepuntozero',
 		'default_timezone' => 'UTC',
 		'language' => 'en',
 		'no_regfullname' => true,
 		'theme' => 'frio',
-		'numeric' => 2.5,
-		'allowed_themes' => 'quattro,vier,duepuntozero',
+		'numeric' => 2.5
 		],
 	'testcat' => [
 		'testarr' => ['1','2','3'],

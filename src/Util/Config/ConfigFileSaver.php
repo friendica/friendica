@@ -188,64 +188,205 @@ class ConfigFileSaver extends ConfigFileManager
 	private function saveSettingsForConfig(array $readLines)
 	{
 		$settingsCount = count(array_keys($this->settings));
-		$categoryFound = array_fill(0, $settingsCount, false);
-		$categoryBracketFound = array_fill(0, $settingsCount, false);
-		$lineFound = array_fill(0, $settingsCount, false);
-		$lineArrowFound = array_fill(0, $settingsCount, false);
+		$settingFound = array_fill(0, $settingsCount, false);
+
+		// temporary create the full config to get multi-line patterns
+		$fullConfig = implode(PHP_EOL, $readLines);
 
 		// check categories
-
-		$writeLine = [];
-
-		foreach ($readLines as $line) {
-
-			// check for each added setting if we have to replace a config line
-			for ($i = 0; $i < $settingsCount; $i++) {
-
-				// find the first line like "'system' =>"
-				if (!$categoryFound[$i] && stristr($line, sprintf('\'%s\'', $this->settings[$i]['cat']))) {
-					$categoryFound[$i] = true;
-				}
-
-				// find the first line with a starting bracket ( "[" )
-				if ($categoryFound[$i] && !$categoryBracketFound[$i] && stristr($line, '[')) {
-					$categoryBracketFound[$i] = true;
-				}
-
-				// find the first line with the key like "'value'"
-				if ($categoryBracketFound[$i] && !$lineFound[$i] && stristr($line, sprintf('\'%s\'', $this->settings[$i]['key']))) {
-					$lineFound[$i] = true;
-				}
-
-				// find the first line with an arrow ("=>") after finding the key
-				if ($lineFound[$i] && !$lineArrowFound[$i] && stristr($line, '=>')) {
-					$lineArrowFound[$i] = true;
-				}
-
-				// find the current value and replace it
-				if ($lineArrowFound[$i] && preg_match_all('/\'(.*?)\'|(.*?)\s*\,?$/', $line, $matches, PREG_SET_ORDER)) {
-					$lineVal = end($matches)[0];
-					$line = str_replace($lineVal, $this->valueToString($this->settings[$i]['value']), $line);
-					$categoryFound[$i] = false;
-					$categoryBracketFound[$i] = false;
-					$lineFound[$i] = false;
-					$lineArrowFound[$i] = false;
-					// if a line contains a closing bracket for the category ( "]" ) and we didn't find the key/value pair,
-					// add it as a new line before the closing bracket
-				} elseif ($categoryBracketFound[$i] && !$lineArrowFound[$i] && stristr($line, ']')) {
-					$categoryFound[$i] = false;
-					$categoryBracketFound[$i] = false;
-					$lineFound[$i] = false;
-					$lineArrowFound[$i] = false;
-					$newLine = sprintf(self::INDENT . self::INDENT . '\'%s\' => %s,' . PHP_EOL, $this->settings[$i]['key'], $this->valueToString($this->settings[$i]['value']));
-					$line = $newLine . $line;
-				}
+		// find missing categories
+		$missingCategories = array_reduce($this->settings, function ($matches, $setting) use ($fullConfig) {
+			$category = $setting['cat'];
+			// match cases like "'category' => [", but also if there are comments, whitespaces or newlines in between
+			if (!preg_match('/\s*\'?' . $category . '\'?[\s\w\*\/]*\=\>[\s\*\/\w]*\[/', $fullConfig)
+				&&
+				(!isset($matches) || !in_array($category, $matches))) {
+				$matches[] = $category;
 			}
 
-			array_push($writeLine, $line);
+			return $matches;
+		});
+
+		// add missing categories and return as checkedLines
+		$checkedLines = [];
+		if (!empty($missingCategories)) {
+			foreach ($readLines as $line) {
+				// check if it is the last line, and add the missing categories before
+				if (preg_match_all('/\];/', $line)) {
+					foreach ($missingCategories as $category) {
+						array_push($checkedLines, sprintf(self::INDENT . '\'%s\' => [', $category));
+						array_push($checkedLines, self::INDENT . '],');
+					}
+				}
+
+				array_push($checkedLines, $line);
+			}
+		} else {
+			$checkedLines = $readLines;
 		}
 
-		return $writeLine;
+		$returnFound = false;
+		$returnBracketFound = false;
+		$returnAdded = false;
+		$currentCat = null;
+		$currentCatOpenBracketFound = false;
+		$currentCatCloseBracketFound = false;
+		$currentCatAdded = false;
+		$currentCatArrowFound = false;
+		$currentKey = null;
+		$currentKeyArrowFound = false;
+		$currentVal = null;
+
+		$writeLines = [];
+		foreach ($checkedLines as $line) {
+
+			// If we find a comment line, write the whole line and continue to the next line
+			if (preg_match('/^\s*[\<\/\*]/', $line) ) {
+				array_push($writeLines, $line);
+				continue;
+			}
+
+			// split the current line in the different parts of the config file
+			$values = preg_split("/(\ |\,)|\t/", $line, 0, PREG_SPLIT_NO_EMPTY);
+
+			// skip empty values
+			if (!empty($values)) {
+
+				// loop through each part of the current line
+				foreach ($values as $value) {
+
+					// if we didn't found the return, nothing else will get triggered
+					if (!$returnFound && $value === 'return') {
+						$returnFound = true;
+						continue;
+					}
+
+					// return is not enough, we need the [ as well (in case it's in the next line)
+					if ($returnFound && !$returnBracketFound && $value === '[') {
+						$returnBracketFound = true;
+						continue;
+					}
+
+					// return is set, now check if we do have a new category (and not the end of array)
+					if ($returnBracketFound && !isset($currentCat) && $value !== '];') {
+						$currentCat = str_replace('\'', '', $value);
+						continue;
+					}
+
+					// if we do have a category, the arrow of the category is necessary
+					if (isset($currentCat) && !$currentCatArrowFound && $value === '=>') {
+						$currentCatArrowFound = true;
+						continue;
+					}
+
+					// if we do have the category arrow, we need the open bracket
+					if ($currentCatArrowFound && !$currentCatOpenBracketFound && $value == '[') {
+						$currentCatOpenBracketFound = true;
+						continue;
+					}
+
+					// the open category bracket is found, check if the next value is the close bracket, so we
+					// trigger the action for closing a category
+					if ($currentCatOpenBracketFound && !$currentCatCloseBracketFound && $value === ']') {
+						$currentCatCloseBracketFound = true;
+						continue;
+					}
+
+					// the open category bracket is found and the next value is not a closing bracket
+					// it has to be a config key
+					if ($currentCatOpenBracketFound && !isset($currentKey) && $value !== ']') {
+						$currentKey = str_replace('\'', '', $value);
+						continue;
+					}
+
+					// we found a key, but we do need the arrow of the key as well
+					if (isset($currentKey) && !$currentKeyArrowFound && $value === '=>') {
+						$currentKeyArrowFound = true;
+						continue;
+					}
+
+					// if we found the arrow of the key, the next value has to be the value of the key
+					if ($currentKeyArrowFound && !isset($currentVal)) {
+						$currentVal = str_replace('\'', '', $value);
+						continue;
+					}
+
+					// we're still in the value setting mode, because all next values are values of the current key
+					// (this is because we split by whitespace, which includes multi string values, e.g. "Friendica Server")
+					if ($currentKeyArrowFound && isset($currentVal)) {
+						$currentVal = ' ' . str_replace('\'', '', $value);
+						continue;
+					}
+				}
+
+				// if we didn't even found the return, just add the line
+				if (!$returnFound) {
+					array_push($writeLines, $line);
+				}
+
+				// if we found the return bracket, but didn't add the return line
+				// add it now and check that it's just called once
+				if ($returnBracketFound && !$returnAdded) {
+					array_push($writeLines, 'return [');
+					$returnAdded = true;
+				}
+
+				// if we found a category, but didn't add add it yet
+				/// add it now and check that it's just called once
+				if (isset($currentCat) && !$currentCatAdded) {
+					array_push($writeLines, sprintf(self::INDENT . '%s => [', $this->valueToString($currentCat)));
+					$currentCatAdded = true;
+				}
+
+				// if we found a value, check if we have to replace them by new settings
+				if (isset($currentVal)) {
+
+					// overwrite the current value in case we do have a new setting
+					foreach ($this->settings as $num => $setting) {
+						if ($setting['cat'] === $currentCat &&
+							$setting['key'] === $currentKey) {
+
+							$currentVal = $setting['value'];
+							$settingFound[$num] = true;
+						}
+					}
+
+					array_push($writeLines, sprintf(self::INDENT . self::INDENT . '%s => %s,', $this->valueToString($currentKey), $this->valueToString($currentVal)));
+
+					// reset the flags for new key search
+					$currentVal = null;
+					$currentKey = null;
+					$currentKeyArrowFound = false;
+				}
+
+				if ($currentCatCloseBracketFound) {
+
+					// if the current category is closing, check if we have to add missing keys of the category
+					foreach ($this->settings as $num => $setting) {
+
+						if (!$settingFound[$num] &&
+							$setting['cat'] === $currentCat) {
+
+							array_push($writeLines, sprintf(self::INDENT . self::INDENT . '%s => %s,', $this->valueToString($setting['key']), $this->valueToString($setting['value'])));
+							$settingFound[$num] = true;
+						}
+					}
+
+					array_push($writeLines, self::INDENT . '],');
+
+					// reset the flags for new category search
+					$currentCat = null;
+					$currentCatCloseBracketFound = false;
+					$currentCatOpenBracketFound = false;
+					$currentCatArrowFound = false;
+					$currentCatAdded = false;
+				}
+			}
+		}
+
+		array_push($writeLines, '];');
+
+		return $writeLines;
 	}
 
 	/**
@@ -349,30 +490,36 @@ class ConfigFileSaver extends ConfigFileManager
 
 		$writeLines = [];
 
-		$foundVarA = false;
-		$foundVarComma = false;
+		$foundVarStart = false;
+		$foundVarEnd = false;
 		$bufferLine = '';
 
 		foreach ($readLines as $line) {
 
+			// If we find a comment line, write the whole line and continue to the next line
+			if (preg_match('/^\s*[\/\*]/', $line) ) {
+				array_push($writeLines, $line);
+				continue;
+			}
+
 			// If we found start and end of a variable, set them as buffer line and activate replacing
-			if (!$foundVarA && preg_match('/\s*\$a/', $line) && preg_match('/.*\;$/', $line)) {
-				$foundVarA = true;
-				$foundVarComma = true;
+			if (!$foundVarStart && preg_match('/\s*\$a/', $line) && preg_match('/.*\;$/', $line)) {
+				$foundVarStart = true;
+				$foundVarEnd = true;
 				$bufferLine = $line;
 
 			// If we found a start but not an end of a variable, start buffering the line until end is found
-			} elseif (!$foundVarA && preg_match('/\s*\$a/', $line) && !preg_match('/.*\;$/', $line)) {
-				$foundVarA = true;
+			} elseif (!$foundVarStart && preg_match('/\s*\$a/', $line) && !preg_match('/.*\;$/', $line)) {
+				$foundVarStart = true;
 				$bufferLine = $line;
 
 			// If we find an end and we already found a start, add the line to the buffered line and activate replacing
-			} elseif ($foundVarA && preg_match('/.*\;$/', $line)) {
-				$foundVarComma = true;
+			} elseif ($foundVarStart && preg_match('/.*\;$/', $line)) {
+				$foundVarEnd = true;
 				$bufferLine .= $line;
 
 			// If we doesn't find an end, but we already found a start, add the line to the buffered line and continue
-			} elseif($foundVarA) {
+			} elseif($foundVarStart) {
 				$bufferLine .= $line;
 
 			// In any other case, just set the line as buffered line
@@ -381,7 +528,7 @@ class ConfigFileSaver extends ConfigFileManager
 			}
 
 			// In case we found the end of a variable setting, activate replacing
-			if ($foundVarComma) {
+			if ($foundVarEnd) {
 				// remove any unwanted tabs
 				$bufferLine = preg_replace('/\t/', ' ', $bufferLine);
 				// check for each added setting if we have to replace a config line
@@ -400,12 +547,12 @@ class ConfigFileSaver extends ConfigFileManager
 				}
 
 				// set both variables to false to save the buffered line to the array
-				$foundVarComma = false;
-				$foundVarA = false;
+				$foundVarEnd = false;
+				$foundVarStart = false;
 			}
 
 			// if we are currently buffering, don't add the line to the array (we're not finished!)
-			if (!$foundVarA && !$foundVarComma) {
+			if (!$foundVarStart && !$foundVarEnd) {
 				array_push($writeLines, $bufferLine);
 			}
 		}

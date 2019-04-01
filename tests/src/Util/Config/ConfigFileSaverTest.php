@@ -126,8 +126,6 @@ class ConfigFileSaverTest extends MockedTest
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
 
-		print_r(file_get_contents($this->root->getChild($relativeFullName)->url()));
-
 		$newConfigCache = new ConfigCache();
 		$configFileLoader->setupCache($newConfigCache);
 
