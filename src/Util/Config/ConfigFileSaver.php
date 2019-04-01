@@ -223,7 +223,7 @@ class ConfigFileSaver extends ConfigFileManager
 				}
 
 				// find the current value and replace it
-				if ($lineArrowFound[$i] && preg_match_all('/\'?(.*?)\'?/', $line, $matches, PREG_SET_ORDER)) {
+				if ($lineArrowFound[$i] && preg_match_all('/\'(.*?)\'|(.*?)\s*\,?$/', $line, $matches, PREG_SET_ORDER)) {
 					$lineVal = end($matches)[0];
 					$line = str_replace($lineVal, $this->valueToString($this->settings[$i]['value']), $line);
 					$categoryFound[$i] = false;
@@ -349,24 +349,65 @@ class ConfigFileSaver extends ConfigFileManager
 
 		$writeLines = [];
 
+		$foundVarA = false;
+		$foundVarComma = false;
+		$bufferLine = '';
+
 		foreach ($readLines as $line) {
 
-			// check for each added setting if we have to replace a config line
-			for ($i = 0; $i < $settingsCount; $i++) {
+			// If we found start and end of a variable, set them as buffer line and activate replacing
+			if (!$foundVarA && preg_match('/\s*\$a/', $line) && preg_match('/.*\;$/', $line)) {
+				$foundVarA = true;
+				$foundVarComma = true;
+				$bufferLine = $line;
 
-				// check for a non plain config setting (use category too)
-				if ($this->settings[$i]['cat'] !== 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['cat'] . '\'\]\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
-					$found[$i] = true;
+			// If we found a start but not an end of a variable, start buffering the line until end is found
+			} elseif (!$foundVarA && preg_match('/\s*\$a/', $line) && !preg_match('/.*\;$/', $line)) {
+				$foundVarA = true;
+				$bufferLine = $line;
 
-				// check for a plain config setting (don't use a category)
-				} elseif ($this->settings[$i]['cat'] === 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
-					$found[$i] = true;
-				}
+			// If we find an end and we already found a start, add the line to the buffered line and activate replacing
+			} elseif ($foundVarA && preg_match('/.*\;$/', $line)) {
+				$foundVarComma = true;
+				$bufferLine .= $line;
+
+			// If we doesn't find an end, but we already found a start, add the line to the buffered line and continue
+			} elseif($foundVarA) {
+				$bufferLine .= $line;
+
+			// In any other case, just set the line as buffered line
+			} else {
+				$bufferLine = $line;
 			}
 
-			array_push($writeLines, $line);
+			// In case we found the end of a variable setting, activate replacing
+			if ($foundVarComma) {
+				// remove any unwanted tabs
+				$bufferLine = preg_replace('/\t/', ' ', $bufferLine);
+				// check for each added setting if we have to replace a config line
+				for ($i = 0; $i < $settingsCount; $i++) {
+
+					// check for a non plain config setting (use category too)
+					if ($this->settings[$i]['cat'] !== 'config' && preg_match_all('/^\s*\$a\-\>config\s*\[\'' . $this->settings[$i]['cat'] . '\'\]\s*\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $bufferLine, $matches, PREG_SET_ORDER)) {
+						$bufferLine = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
+						$found[$i] = true;
+
+						// check for a plain config setting (don't use a category)
+					} elseif ($this->settings[$i]['cat'] === 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s*\'?(.*?)\'?;$/', $bufferLine, $matches, PREG_SET_ORDER)) {
+						$bufferLine = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = ' . $this->valueToString($this->settings[$i]['value']) . ';';
+						$found[$i] = true;
+					}
+				}
+
+				// set both variables to false to save the buffered line to the array
+				$foundVarComma = false;
+				$foundVarA = false;
+			}
+
+			// if we are currently buffering, don't add the line to the array (we're not finished!)
+			if (!$foundVarA && !$foundVarComma) {
+				array_push($writeLines, $bufferLine);
+			}
 		}
 
 		for ($i = 0; $i < $settingsCount; $i++) {
