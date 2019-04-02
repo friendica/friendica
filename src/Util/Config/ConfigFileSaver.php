@@ -314,7 +314,7 @@ class ConfigFileSaver extends ConfigFileManager
 					// we're still in the value setting mode, because all next values are values of the current key
 					// (this is because we split by whitespace, which includes multi string values, e.g. "Friendica Server")
 					if ($currentKeyArrowFound && isset($currentVal)) {
-						$currentVal = ' ' . str_replace('\'', '', $value);
+						$currentVal .= ' ' . str_replace('\'', '', $value);
 						continue;
 					}
 				}
@@ -583,9 +583,11 @@ class ConfigFileSaver extends ConfigFileManager
 	private function valueToString($value, $ini = false)
 	{
 		switch (true) {
-			case is_bool($value) && $value:
+			case ((is_bool($value) && $value) ||
+			       $value === 'true'):
 				return "true";
-			case is_bool($value) && !$value:
+			case ((is_bool($value) && !$value) ||
+				   $value === 'false'):
 				return "false";
 			case is_array($value):
 				if ($ini) {
@@ -594,6 +596,8 @@ class ConfigFileSaver extends ConfigFileManager
 					return "'" . addslashes(implode(',', $value)) . "'";
 				}
 			case is_numeric($value):
+				return "$value";
+			case defined($value):
 				return "$value";
 			default:
 				if ($ini) {

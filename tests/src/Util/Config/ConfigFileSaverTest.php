@@ -227,10 +227,8 @@ class ConfigFileSaverTest extends MockedTest
 
 		if (empty($relativePath)) {
 			$root = $this->root;
-			$relativeFullName = $fileName;
 		} else {
 			$root = $this->root->getChild($relativePath);
-			$relativeFullName = $relativePath . DIRECTORY_SEPARATOR . $fileName;
 		}
 
 		vfsStream::newFile($fileName)
