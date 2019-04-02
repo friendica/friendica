@@ -216,4 +216,14 @@ class ConfigCache implements IConfigCache, IPConfigCache
 
 		return $return;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function combine(array $config, $overwrite = false)
+	{
+		$newConfigCache = new ConfigCache($this->config);
+		$newConfigCache->load($config, $overwrite);
+		return $newConfigCache;
+	}
 }

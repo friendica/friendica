@@ -53,4 +53,14 @@ interface IConfigCache
 	 * @return array
 	 */
 	function getAll();
+
+	/**
+	 * Combine the current config cache with a given config array and return the result
+	 *
+	 * @param array $config
+	 * @param bool  $overwrite   If true, the given config cache overrules this config cache
+	 *
+	 * @return IConfigCache
+	 */
+	function combine(array $config, $overwrite = false);
 }

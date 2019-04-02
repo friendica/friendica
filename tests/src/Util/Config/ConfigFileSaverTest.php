@@ -64,8 +64,6 @@ class ConfigFileSaverTest extends MockedTest
 	/**
 	 * Test the saveToConfigFile() method
 	 * @dataProvider dataConfigFiles
-	 *
-	 * @todo 20190324 [nupplaphil] for ini-configs, it isn't possible to use $ or ! inside values
 	 */
 	public function testSaveToConfig($fileName, $filePath, $relativePath)
 	{
@@ -83,26 +81,51 @@ class ConfigFileSaverTest extends MockedTest
 			->at($root)
 			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
 
-		$configFileSaver = new ConfigFileSaver($this->root->url());
+		// The parse_ini_string() method doesn't support every escaped character by definition
+		if (stristr($fileName, '.ini.')) {
+			$escapeString = 'Testingwith@all.we can';
+		} else {
+			$escapeString = 'Testingwith@all\'.we can?!, \$';
+		}
+
+
 		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 		$configFileLoader->setupCache($configCache);
 
 		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
 		$this->assertEquals('frio', $configCache->get('system', 'theme'));
+		$this->assertEquals(true, $configCache->get('system', 'no_regfullname'));
+		$this->assertEquals(\Friendica\Module\Register::OPEN, $configCache->get('config', 'register_policy'));
+		$this->assertEquals(2.5, $configCache->get('system', 'numeric'));
+		$this->assertEquals('quattro,vier,duepuntozero', $configCache->get('system', 'allowed_themes'));
 		$this->assertNull($configCache->get('config', 'test_val'));
 		$this->assertNull($configCache->get('system', 'test_val2'));
 
+		$newConfigCache = new ConfigCache();
+
 		// update values (system and config value)
-		$configFileSaver->addConfigValue('config', 'admin_email', 'new@mail.it');
-		$configFileSaver->addConfigValue('system', 'theme', 'vier');
+		$newConfigCache->set('config', 'admin_email', 'new@mail.it');
+		$newConfigCache->set('system', 'theme', 'vier');
 
 		// insert values (system and config value)
-		$configFileSaver->addConfigValue('config', 'test_val', 'Testingwith@all.we can');
-		$configFileSaver->addConfigValue('system', 'test_val2', 'TestIt First');
+		$newConfigCache->set('config', 'test_val', $escapeString);
+		$newConfigCache->set('system', 'test_val2', 'TestIt First');
 
 		// overwrite value
-		$configFileSaver->addConfigValue('system', 'test_val2', 'TestIt Now');
+		$newConfigCache->set('system', 'test_val2', 'TestIt Now');
+
+		// new category
+		$newConfigCache->set('newCat', 'test_val3', 'TestIt Again');
+		$newConfigCache->set('newCat', 'test_val4', 'TestIt Fourth');
+
+		// replace types
+		$newConfigCache->set('config', 'register_policy', \Friendica\Module\Register::APPROVE);
+		$newConfigCache->set('system', 'no_regfullname', false);
+		$newConfigCache->set('system', 'numeric', 6.78);
+		$newConfigCache->set('system', 'allowed_themes', "quattro,$escapeString");
+
+		$configFileSaver = new ConfigFileSaver($this->root->url(), $newConfigCache);
 
 		// save it
 		$this->assertTrue($configFileSaver->saveToConfigFile());
@@ -110,10 +133,23 @@ class ConfigFileSaverTest extends MockedTest
 		$newConfigCache = new ConfigCache();
 		$configFileLoader->setupCache($newConfigCache);
 
+		// update values (system and config value)
 		$this->assertEquals('new@mail.it', $newConfigCache->get('config', 'admin_email'));
-		$this->assertEquals('Testingwith@all.we can', $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('vier', $newConfigCache->get('system', 'theme'));
+
+		// insert/overwritten values (system and config value)
+		$this->assertEquals($escapeString, $newConfigCache->get('config', 'test_val'));
 		$this->assertEquals('TestIt Now', $newConfigCache->get('system', 'test_val2'));
+
+		// new categories
+		$this->assertEquals('TestIt Again', $newConfigCache->get('newCat', 'test_val3'));
+		$this->assertEquals('TestIt Fourth', $newConfigCache->get('newCat', 'test_val4'));
+
+		// check types
+		$this->assertEquals(\Friendica\Module\Register::APPROVE, $newConfigCache->get('config', 'register_policy'));
+		$this->assertEquals(false, $newConfigCache->get('system', 'no_regfullname'));
+		$this->assertEquals(6.78, $newConfigCache->get('system', 'numeric'));
+		$this->assertEquals('quattro,' . $escapeString, $newConfigCache->get('system', 'allowed_themes'));
 
 		$this->assertTrue($this->root->hasChild($relativeFullName));
 		$this->assertTrue($this->root->hasChild($relativeFullName . '.old'));
@@ -132,10 +168,8 @@ class ConfigFileSaverTest extends MockedTest
 
 		if (empty($relativePath)) {
 			$root = $this->root;
-			$relativeFullName = $fileName;
 		} else {
 			$root = $this->root->getChild($relativePath);
-			$relativeFullName = $relativePath . DIRECTORY_SEPARATOR . $fileName;
 		}
 
 		$root->chmod(000);
@@ -144,9 +178,10 @@ class ConfigFileSaverTest extends MockedTest
 			->at($root)
 			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
 
-		$configFileSaver = new ConfigFileSaver($this->root->url());
 
-		$configFileSaver->addConfigValue('system', 'test_val2', 'TestIt Now');
+		$newConfigCache = new ConfigCache();
+		$newConfigCache->set('system', 'test_val2', 'TestIt Now');
+		$configFileSaver = new ConfigFileSaver($this->root->url(), $newConfigCache);
 
 		// wrong mod, so return false if nothing to write
 		$this->assertFalse($configFileSaver->saveToConfigFile());
@@ -172,7 +207,7 @@ class ConfigFileSaverTest extends MockedTest
 			->at($root)
 			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
 
-		$configFileSaver = new ConfigFileSaver($this->root->url());
+		$configFileSaver = new ConfigFileSaver($this->root->url(), new ConfigCache());
 		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
 		$configCache = new ConfigCache();
 		$configFileLoader->setupCache($configCache);
@@ -185,5 +220,38 @@ class ConfigFileSaverTest extends MockedTest
 		$this->assertFalse($this->root->hasChild($relativeFullName . '.tmp'));
 
 		$this->assertEquals(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName), file_get_contents($this->root->getChild($relativeFullName)->url()));
+	}
+
+
+	/**
+	 * Test the saveToConfigFile() method doesn't accidentally alter data
+	 * @dataProvider dataConfigFiles
+	 */
+	public function testNoDataAltering($fileName, $filePath, $relativePath)
+	{
+		$this->delConfigFile('local.config.php');
+		if (empty($relativePath)) {
+			$root = $this->root;
+		} else {
+			$root = $this->root->getChild($relativePath);
+		}
+
+		vfsStream::newFile($fileName)
+			->at($root)
+			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
+
+		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
+		$configCache = new ConfigCache();
+		$configFileLoader->setupCache($configCache);
+
+		// add the same value
+		$newConfigCache = new ConfigCache();
+		$newConfigCache->set('config', 'admin_email', $configCache->get('config', 'admin_email'));
+		$configFileSaver = new ConfigFileSaver($this->root->url(), $newConfigCache);
+		$this->assertTrue($configFileSaver->saveToConfigFile());
+
+		$newConfigCache = new ConfigCache();
+		$configFileLoader->setupCache($newConfigCache);
+		$this->assertEquals($configCache->getAll(), $newConfigCache->getAll());
 	}
 }

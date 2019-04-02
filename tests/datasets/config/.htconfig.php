@@ -13,7 +13,12 @@ $pidfile = '/var/run/friendica.pid';
 // Set the database connection charset to UTF8.
 // Changing this value will likely corrupt the special characters.
 // You have been warned.
-$a->config['system']['db_charset'] = "anotherCharset";
+$a->config
+['system']
+['db_charset']
+	=
+	"anotherCharset";
+
 
 // Choose a legal default timezone. If you are unsure, use "America/Los_Angeles".
 // It can be changed later and only applies to timestamps for anonymous viewers.
@@ -31,7 +36,7 @@ $a->config['sitename'] = "Friendica My Network";
 // and/or approve/deny the request.
 // In order to perform system administration via the admin panel, admin_email
 // must precisely match the email address of the person logged in.
-$a->config['register_policy'] = REGISTER_OPEN;
+$a->config['register_policy'] = \Friendica\Module\Register::OPEN;
 $a->config['register_text'] = 'A register text';
 $a->config['admin_email'] = 'admin@test.it';
 $a->config['admin_nickname'] = 'Friendly admin';
@@ -55,9 +60,16 @@ $a->config['system']['allowed_themes'] = 'quattro,vier,duepuntozero';
 $a->config['system']['theme'] = 'frio';
 
 // By default allow pseudonyms
-$a->config['system']['no_regfullname'] = true;
+ $a->config['system']['no_regfullname'] = true;
 
 //Deny public access to the local directory
 //$a->config['system']['block_local_dir'] = false;
 // Location of the global directory
 $a->config['system']['directory'] = 'http://another.url';
+
+$a->config
+['system']
+['numeric']
+// geht hier ein kommentar??
+	=
+	2.5;

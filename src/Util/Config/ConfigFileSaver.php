@@ -2,6 +2,8 @@
 
 namespace Friendica\Util\Config;
 
+use Friendica\Core\Config\Cache\IConfigCache;
+
 /**
  * The ConfigFileSaver saves specific variables into the config-files
  *
@@ -19,41 +21,14 @@ class ConfigFileSaver extends ConfigFileManager
 	const INDENT = "\t";
 
 	/**
-	 * The settings array to save to
-	 * @var array
+	 * @var IConfigCache
 	 */
-	private $settings = [];
+	private $configCache;
 
-	/**
-	 * Adds a given value to the config file
-	 * Either it replaces the current value or it will get added
-	 *
-	 * @param string $cat   The configuration category
-	 * @param string $key   The configuration key
-	 * @param string $value The new value
-	 */
-	public function addConfigValue($cat, $key, $value)
+	public function __construct($baseDir, IConfigCache $configCache)
 	{
-		$settingsCount = count(array_keys($this->settings));
-
-		for ($i = 0; $i < $settingsCount; $i++) {
-			// if already set, overwrite the value
-			if ($this->settings[$i]['cat'] === $cat &&
-				$this->settings[$i]['key'] === $key) {
-				$this->settings[$i] = ['cat' => $cat, 'key' => $key, 'value' => $value];
-				return;
-			}
-		}
-
-		$this->settings[] = ['cat' => $cat, 'key' => $key, 'value' => $value];
-	}
-
-	/**
-	 * Resetting all added configuration entries so far
-	 */
-	public function reset()
-	{
-		$this->settings = [];
+		parent::__construct($baseDir);
+		$this->configCache = $configCache;
 	}
 
 	/**
@@ -66,102 +41,56 @@ class ConfigFileSaver extends ConfigFileManager
 	 */
 	public function saveToConfigFile($name = '')
 	{
-		// If no settings et, return true
-		if (count(array_keys($this->settings)) === 0) {
+		if (empty($this->configCache->getAll())) {
 			return true;
 		}
 
 		$saved = false;
 
-		// Check for the *.config.php file inside the /config/ path
-		list($reading, $writing) = $this->openFile($this->getConfigFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveConfigFile($reading, $writing);
-			// Close the current file handler and rename them
-			if ($this->closeFile($this->getConfigFullName($name), $reading, $writing)) {
-				// just return true, if everything went fine
+		$configPath = $this->getConfigFullName($name);
+		if (!empty($configPath) && is_file($configPath)) {
+			$configFile  = file($configPath);
+			$configCache = $this->loadConfigFile($configPath);
+			$writeFile   = $this->saveConfigFile($configCache, $configFile);
+			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
 		}
 
 		// Check for the *.ini.php file inside the /config/ path
-		list($reading, $writing) = $this->openFile($this->getIniFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveINIConfigFile($reading, $writing);
-			// Close the current file handler and rename them
-			if ($this->closeFile($this->getIniFullName($name), $reading, $writing)) {
-				// just return true, if everything went fine
+		$configPath = $this->getIniFullName($name);
+		if (!empty($configPath) && is_file($configPath)) {
+			$configFile  = file($configPath);
+			$configCache = $this->loadINIConfigFile($configPath);
+			$writeFile   = $this->saveINIConfigFile($configCache, $configFile);
+			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
 		}
 
 		// Check for the *.php file (normally .htconfig.php) inside the / path
-		list($reading, $writing) = $this->openFile($this->getHtConfigFullName($name));
-		if (isset($reading) && isset($writing)) {
-			$this->saveToLegacyConfig($reading, $writing);
-			// Close the current file handler and rename them
-			if ($this->closeFile($this->getHtConfigFullName($name), $reading, $writing)) {
-				// just return true, if everything went fine
+		$configPath = $this->getHtConfigFullName($name);
+		if (!empty($configPath) && is_file($configPath)) {
+			$configFile  = file($configPath);
+			$configCache = $this->loadLegacyConfig($name);
+			$writeFile   = $this->saveLegacyConfig($configCache, $configFile);
+			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
 		}
 
-		$this->reset();
-
 		return $saved;
 	}
 
-	/**
-	 * Opens a config file and returns two handler for reading and writing
-	 *
-	 * @param string $fullName The full name of the current config
-	 *
-	 * @return array An array containing the two reading and writing handler
-	 */
-	private function openFile($fullName)
+	private function saveToFile($fullName, array $config)
 	{
-		if (empty($fullName)) {
-			return [null, null];
-		}
-
 		try {
-			$reading = fopen($fullName, 'r');
+			if (!file_put_contents($fullName . '.tmp', implode(PHP_EOL, $config))) {
+				return false;
+			}
 		} catch (\Exception $exception) {
-			return [null, null];
+			return false;
 		}
-
-		if (!$reading) {
-			return [null, null];
-		}
-
-		try {
-			$writing = fopen($fullName . '.tmp', 'w');
-		} catch (\Exception $exception) {
-			fclose($reading);
-			return [null, null];
-		}
-
-		if (!$writing) {
-			fclose($reading);
-			return [null, null];
-		}
-
-		return [$reading, $writing];
-	}
-
-	/**
-	 * Close and rename the config file
-	 *
-	 * @param string   $fullName The full name of the current config
-	 * @param resource $reading  The reading resource handler
-	 * @param resource $writing  The writing resource handler
-	 *
-	 * @return bool True, if the close was successful
-	 */
-	private function closeFile($fullName, $reading, $writing)
-	{
-		fclose($reading);
-		fclose($writing);
 
 		try {
 			$renamed = rename($fullName, $fullName . '.old');
@@ -191,151 +120,149 @@ class ConfigFileSaver extends ConfigFileManager
 	}
 
 	/**
-	 * Saves all configuration values to a config file
+	 * Combines the config of the file with the config of the new settings
+	 * Respects comments too
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array  $configCache
+	 * @param string $configFile
+	 *
+	 * @return array
 	 */
-	private function saveConfigFile($reading, $writing)
+	private function saveConfigFile(array $configCache, $configFile)
 	{
-		$settingsCount = count(array_keys($this->settings));
-		$categoryFound = array_fill(0, $settingsCount, false);
-		$categoryBracketFound = array_fill(0, $settingsCount, false);;
-		$lineFound = array_fill(0, $settingsCount, false);;
-		$lineArrowFound = array_fill(0, $settingsCount, false);;
+		$newConfigCache = $this->configCache->combine($configCache);
+		$config = $newConfigCache->getAll();
 
-		while (!feof($reading)) {
+		$newConfigArray = [
+			'<?php',
+			'',
+			'',
+			'return ['
+		];
 
-			$line = fgets($reading);
-
-			// check for each added setting if we have to replace a config line
-			for ($i = 0; $i < $settingsCount; $i++) {
-
-				// find the first line like "'system' =>"
-				if (!$categoryFound[$i] && stristr($line, sprintf('\'%s\'', $this->settings[$i]['cat']))) {
-					$categoryFound[$i] = true;
-				}
-
-				// find the first line with a starting bracket ( "[" )
-				if ($categoryFound[$i] && !$categoryBracketFound[$i] && stristr($line, '[')) {
-					$categoryBracketFound[$i] = true;
-				}
-
-				// find the first line with the key like "'value'"
-				if ($categoryBracketFound[$i] && !$lineFound[$i] && stristr($line, sprintf('\'%s\'', $this->settings[$i]['key']))) {
-					$lineFound[$i] = true;
-				}
-
-				// find the first line with an arrow ("=>") after finding the key
-				if ($lineFound[$i] && !$lineArrowFound[$i] && stristr($line, '=>')) {
-					$lineArrowFound[$i] = true;
-				}
-
-				// find the current value and replace it
-				if ($lineArrowFound[$i] && preg_match_all('/\'(.*?)\'/', $line, $matches, PREG_SET_ORDER)) {
-					$lineVal = end($matches)[0];
-					$line = str_replace($lineVal, '\'' . $this->settings[$i]['value'] . '\'', $line);
-					$categoryFound[$i] = false;
-					$categoryBracketFound[$i] = false;
-					$lineFound[$i] = false;
-					$lineArrowFound[$i] = false;
-					// if a line contains a closing bracket for the category ( "]" ) and we didn't find the key/value pair,
-					// add it as a new line before the closing bracket
-				} elseif ($categoryBracketFound[$i] && !$lineArrowFound[$i] && stristr($line, ']')) {
-					$categoryFound[$i] = false;
-					$categoryBracketFound[$i] = false;
-					$lineFound[$i] = false;
-					$lineArrowFound[$i] = false;
-					$newLine = sprintf(self::INDENT . self::INDENT . '\'%s\' => \'%s\',' . PHP_EOL, $this->settings[$i]['key'], $this->settings[$i]['value']);
-					$line = $newLine . $line;
-				}
+		foreach ($config as $category => $keys) {
+			array_push($newConfigArray, sprintf(self::INDENT . '%s => [', $this->valueToString($category)));
+			foreach ($keys as $key => $value) {
+				array_push($newConfigArray, sprintf(self::INDENT . self::INDENT . '%s => %s,', $this->valueToString($key), $this->valueToString($value)));
 			}
-
-			fputs($writing, $line);
+			array_push($newConfigArray, self::INDENT . '],');
 		}
+
+		array_push($newConfigArray, '];');
+
+		return $newConfigArray;
 	}
 
 	/**
-	 * Saves a value to a ini file
+	 * Combines the config of the file with the config of the new settings
+	 * Respects comments too
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array  $configCache
+	 * @param string $configFile
+	 *
+	 * @return array
 	 */
-	private function saveINIConfigFile($reading, $writing)
+	private function saveINIConfigFile(array $configCache, $configFile)
 	{
-		$settingsCount = count(array_keys($this->settings));
-		$categoryFound = array_fill(0, $settingsCount, false);
+		$newConfigCache = $this->configCache->combine($configCache);
+		$config = $newConfigCache->getAll();
 
-		while (!feof($reading)) {
+		$newConfigArray = [
+			'<?php',
+			'',
+			'',
+			'return <<<INI',
+			'',
+		];
 
-			$line = fgets($reading);
-
-			// check for each added setting if we have to replace a config line
-			for ($i = 0; $i < $settingsCount; $i++) {
-
-				// find the category of the current setting
-				if (!$categoryFound[$i] && stristr($line, sprintf('[%s]', $this->settings[$i]['cat']))) {
-					$categoryFound[$i] = true;
-
-				// check the current value
-				} elseif ($categoryFound[$i] && preg_match_all('/^' . $this->settings[$i]['key'] . '\s*=\s*(.*?)$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = $this->settings[$i]['key'] . ' = ' . $this->settings[$i]['value'] . PHP_EOL;
-					$categoryFound[$i] = false;
-
-				// If end of INI file, add the line before the INI end
-				} elseif ($categoryFound[$i] && (preg_match_all('/^\[.*?\]$/', $line) || preg_match_all('/^INI;.*$/', $line))) {
-					$categoryFound[$i] = false;
-					$newLine = $this->settings[$i]['key'] . ' = ' . $this->settings[$i]['value'] . PHP_EOL;
-					$line = $newLine . $line;
-				}
+		foreach ($config as $category => $keys) {
+			array_push($newConfigArray, sprintf('[%s]', $this->valueToString($category, true)));
+			foreach ($keys as $key => $value) {
+				array_push($newConfigArray, sprintf('%s = %s', $this->valueToString($key, true), $this->valueToString($value, true)));
 			}
-
-			fputs($writing, $line);
+			array_push($newConfigArray, '');
 		}
+
+		array_push($newConfigArray, 'INI;');
+		array_push($newConfigArray, '');
+
+		return $newConfigArray;
 	}
 
 	/**
-	 * Saves a value to a .php file (normally .htconfig.php)
+	 * Combines the config of the file with the config of the new settings
+	 * Respects comments too
 	 *
-	 * @param resource $reading The reading handler
-	 * @param resource $writing The writing handler
+	 * @param array  $configCache
+	 * @param string $configFile
+	 *
+	 * @return array
 	 */
-	private function saveToLegacyConfig($reading, $writing)
+	private function saveLegacyConfig(array $configCache, $configFile)
 	{
-		$settingsCount = count(array_keys($this->settings));
-		$found  = array_fill(0, $settingsCount, false);
-		while (!feof($reading)) {
+		$newConfigCache = $this->configCache->combine($configCache);
+		$config = $newConfigCache->getAll();
 
-			$line = fgets($reading);
+		$newConfigArray = [
+			'<?php',
+			'',
+		];
 
-			// check for each added setting if we have to replace a config line
-			for ($i = 0; $i < $settingsCount; $i++) {
-
-				// check for a non plain config setting (use category too)
-				if ($this->settings[$i]['cat'] !== 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['cat'] . '\'\]\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s\'*(.*?)\';$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
-					$found[$i] = true;
-
-				// check for a plain config setting (don't use a category)
-				} elseif ($this->settings[$i]['cat'] === 'config' && preg_match_all('/^\$a\-\>config\[\'' . $this->settings[$i]['key'] . '\'\]\s*=\s\'*(.*?)\';$/', $line, $matches, PREG_SET_ORDER)) {
-					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
-					$found[$i] = true;
+		foreach ($config as $category => $keys) {
+			if ($category === 'config') {
+				foreach ($keys as $key => $value) {
+					array_push($newConfigArray, sprintf('$a->config[%s] = %s;', $this->valueToString($key), $this->valueToString($value)));
+				}
+			} else {
+				foreach ($keys as $key => $value) {
+					array_push($newConfigArray, sprintf('$a->config[%s][%s] = %s;', $this->valueToString($category), $this->valueToString($key), $this->valueToString($value)));
 				}
 			}
 
-			fputs($writing, $line);
+			array_push($newConfigArray, '');
 		}
 
-		for ($i = 0; $i < $settingsCount; $i++) {
-			if (!$found[$i]) {
-				if ($this->settings[$i]['cat'] !== 'config') {
-					$line = '$a->config[\'' . $this->settings[$i]['cat'] . '\'][\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+		return $newConfigArray;
+	}
+
+	/**
+	 * creates a string representation of the current value
+	 *
+	 * @param mixed $value Any type of value
+	 * @param bool  $ini   In case of ini, don't add apostrophes to values
+	 *
+	 * @return string
+	 */
+	private function valueToString($value, $ini = false)
+	{
+		switch (true) {
+			case ((is_bool($value) && $value) ||
+				$value === 'true'):
+				return "true";
+			case ((is_bool($value) && !$value) ||
+				$value === 'false'):
+				return "false";
+			case is_array($value):
+				if ($ini) {
+					return implode(',', $value);
 				} else {
-					$line = '$a->config[\'' . $this->settings[$i]['key'] . '\'] = \'' . $this->settings[$i]['value'] . '\';' . PHP_EOL;
+					$array = '[';
+					foreach ($value as $oneValue) {
+						$array .= $this->valueToString($oneValue, $ini) . ',';
+					}
+					$array .= ']';
+					return $array;
 				}
-
-				fputs($writing, $line);
-			}
+			case is_numeric($value):
+				return "$value";
+			case defined($value):
+				return "$value";
+			default:
+				if ($ini) {
+					return (string)$value;
+				} else {
+					return "'" . addslashes((string)$value) . "'";
+				}
 		}
 	}
 }
