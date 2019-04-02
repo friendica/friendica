@@ -66,7 +66,7 @@ class ConfigFileSaver extends ConfigFileManager
 	 */
 	public function saveToConfigFile($name = '')
 	{
-		// If there aer no settings, return true
+		// If there are no settings, return true
 		if (count(array_keys($this->settings)) === 0) {
 			return true;
 		}
