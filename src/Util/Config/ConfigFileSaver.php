@@ -66,7 +66,7 @@ class ConfigFileSaver extends ConfigFileManager
 	 */
 	public function saveToConfigFile($name = '')
 	{
-		// If no settings et, return true
+		// If there aer no settings, return true
 		if (count(array_keys($this->settings)) === 0) {
 			return true;
 		}
@@ -112,7 +112,7 @@ class ConfigFileSaver extends ConfigFileManager
 	}
 
 	/**
-	 * Opens a config file and returns two handler for reading and writing
+	 * Opens a config file and returns the current config file as an array
 	 *
 	 * @param string $fullName The full name of the current config
 	 *

@@ -216,4 +216,40 @@ class ConfigFileSaverTest extends MockedTest
 
 		$this->assertEquals(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName), file_get_contents($this->root->getChild($relativeFullName)->url()));
 	}
+
+	/**
+	 * Test the saveToConfigFile() method doesn't accidentally alter data
+	 * @dataProvider dataConfigFiles
+	 */
+	public function testNoDataAltering($fileName, $filePath, $relativePath)
+	{
+		$this->delConfigFile('local.config.php');
+
+		if (empty($relativePath)) {
+			$root = $this->root;
+			$relativeFullName = $fileName;
+		} else {
+			$root = $this->root->getChild($relativePath);
+			$relativeFullName = $relativePath . DIRECTORY_SEPARATOR . $fileName;
+		}
+
+		vfsStream::newFile($fileName)
+			->at($root)
+			->setContent(file_get_contents($filePath . DIRECTORY_SEPARATOR . $fileName));
+
+		$configFileSaver = new ConfigFileSaver($this->root->url());
+		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
+		$configCache = new ConfigCache();
+		$configFileLoader->setupCache($configCache);
+
+		// add the same value
+		$configFileSaver->addConfigValue('config', 'admin_email', $configCache->get('config', 'admin_email'));
+
+		$this->assertTrue($configFileSaver->saveToConfigFile());
+
+		$newConfigCache = new ConfigCache();
+		$configFileLoader->setupCache($newConfigCache);
+
+		$this->assertEquals($configCache->getAll(), $newConfigCache->getAll());
+	}
 }
