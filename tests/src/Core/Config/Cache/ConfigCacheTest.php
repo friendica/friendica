@@ -275,4 +275,60 @@ class ConfigCacheTest extends MockedTest
 
 		$this->assertEmpty($configCache->keyDiff($diffConfig));
 	}
+
+	/**
+	 * Test the combine() method with new config overwriting
+	 * @dataProvider dataTests
+	 */
+	public function testCombineOverwrite($data)
+	{
+		$configCache = new ConfigCache($data);
+
+		$newConfig = [
+			'system' => [
+				'test' => 'new',
+			]
+		];
+
+		$newConfigCache = $configCache->combine($newConfig, true);
+
+		$this->assertEquals('it', $configCache->get('system', 'test'));
+		$this->assertEquals('new', $newConfigCache->get('system', 'test'));
+	}
+
+	/**
+	 * Test the combine() method without new config overwriting
+	 * @dataProvider dataTests
+	 */
+	public function testCombineWithoutOverwrite($data)
+	{
+		$configCache = new ConfigCache($data);
+
+		$newConfig = [
+			'system' => [
+				'test' => 'new',
+			]
+		];
+
+		$newConfigCache = $configCache->combine($newConfig, false);
+
+		$this->assertEquals('it', $configCache->get('system', 'test'));
+		$this->assertEquals('it', $newConfigCache->get('system', 'test'));
+	}
+
+	/**
+	 * Test the combine() method without altering data
+	 * @dataProvider dataTests
+	 */
+	public function testCombineWithoutAlterData($data)
+	{
+		$configCache = new ConfigCache($data);
+
+		$newConfigCache = $configCache->combine([]);
+
+		$this->assertEquals($configCache->getAll(), $newConfigCache->getAll());
+
+		// the returned configCache is not the same as the input
+		$this->assertNotSame($configCache, $newConfigCache);
+	}
 }
