@@ -44,8 +44,6 @@ class ConfigFileLoaderTest extends MockedTest
 
 	/**
 	 * Test the loadConfigFiles() method with a wrong local.config.php
-	 * @expectedException \Exception
-	 * @expectedExceptionMessageRegExp /Error loading config file \w+/
 	 */
 	public function testLoadConfigWrong()
 	{
@@ -59,6 +57,12 @@ class ConfigFileLoaderTest extends MockedTest
 		$configCache = new ConfigCache();
 
 		$configFileLoader->setupCache($configCache);
+
+		$this->assertEmpty($configCache->get('database', 'hostname'));
+		$this->assertEmpty($configCache->get('database', 'username'));
+		$this->assertEmpty($configCache->get('database', 'password'));
+		$this->assertEmpty($configCache->get('database', 'database'));
+		$this->assertEmpty($configCache->get('config', 'admin_email'));
 	}
 
 	/**
