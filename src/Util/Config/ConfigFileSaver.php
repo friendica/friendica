@@ -49,9 +49,8 @@ class ConfigFileSaver extends ConfigFileManager
 
 		$configPath = $this->getConfigFullName($name);
 		if (!empty($configPath) && is_file($configPath)) {
-			$configFile  = file($configPath);
 			$configCache = $this->loadConfigFile($configPath);
-			$writeFile   = $this->saveConfigFile($configCache, $configFile);
+			$writeFile   = $this->saveConfigFile($configCache);
 			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
@@ -60,9 +59,8 @@ class ConfigFileSaver extends ConfigFileManager
 		// Check for the *.ini.php file inside the /config/ path
 		$configPath = $this->getIniFullName($name);
 		if (!empty($configPath) && is_file($configPath)) {
-			$configFile  = file($configPath);
 			$configCache = $this->loadINIConfigFile($configPath);
-			$writeFile   = $this->saveINIConfigFile($configCache, $configFile);
+			$writeFile   = $this->saveINIConfigFile($configCache);
 			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
@@ -71,9 +69,8 @@ class ConfigFileSaver extends ConfigFileManager
 		// Check for the *.php file (normally .htconfig.php) inside the / path
 		$configPath = $this->getHtConfigFullName($name);
 		if (!empty($configPath) && is_file($configPath)) {
-			$configFile  = file($configPath);
 			$configCache = $this->loadLegacyConfig($name);
-			$writeFile   = $this->saveLegacyConfig($configCache, $configFile);
+			$writeFile   = $this->saveLegacyConfig($configCache);
 			if ($this->saveToFile($configPath, $writeFile)) {
 				$saved = true;
 			}
@@ -121,14 +118,12 @@ class ConfigFileSaver extends ConfigFileManager
 
 	/**
 	 * Combines the config of the file with the config of the new settings
-	 * Respects comments too
 	 *
 	 * @param array  $configCache
-	 * @param string $configFile
 	 *
 	 * @return array
 	 */
-	private function saveConfigFile(array $configCache, $configFile)
+	private function saveConfigFile(array $configCache)
 	{
 		$newConfigCache = $this->configCache->combine($configCache);
 		$config = $newConfigCache->getAll();
@@ -155,14 +150,12 @@ class ConfigFileSaver extends ConfigFileManager
 
 	/**
 	 * Combines the config of the file with the config of the new settings
-	 * Respects comments too
 	 *
 	 * @param array  $configCache
-	 * @param string $configFile
 	 *
 	 * @return array
 	 */
-	private function saveINIConfigFile(array $configCache, $configFile)
+	private function saveINIConfigFile(array $configCache)
 	{
 		$newConfigCache = $this->configCache->combine($configCache);
 		$config = $newConfigCache->getAll();
@@ -191,14 +184,12 @@ class ConfigFileSaver extends ConfigFileManager
 
 	/**
 	 * Combines the config of the file with the config of the new settings
-	 * Respects comments too
 	 *
 	 * @param array  $configCache
-	 * @param string $configFile
 	 *
 	 * @return array
 	 */
-	private function saveLegacyConfig(array $configCache, $configFile)
+	private function saveLegacyConfig(array $configCache)
 	{
 		$newConfigCache = $this->configCache->combine($configCache);
 		$config = $newConfigCache->getAll();

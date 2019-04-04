@@ -48,4 +48,7 @@ return [
 	\Friendica\App::class => [
 		\Friendica\App\Mode::class => true
 	]
+	/*
+	 * Comment at the end of the category
+	 */
 ];
