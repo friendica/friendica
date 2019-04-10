@@ -53,9 +53,7 @@
 		"npm-asset/moment": "^2.20.1",
 		"npm-asset/fullcalendar": "^3.0.1",
 		"npm-asset/cropperjs": "1.2.2",
-		"npm-asset/imagesloaded": "4.1.4",
-		"ext-mysqli": "^7.0",
-		"ext-PDO": "^7.0"
+		"npm-asset/imagesloaded": "4.1.4"
 	},
 	"repositories": [
 		{
