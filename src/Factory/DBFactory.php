@@ -5,6 +5,7 @@ namespace Friendica\Factory;
 use Friendica\Core\Config\Cache;
 use Friendica\Database;
 use Friendica\Util\Profiler;
+use PDO;
 
 class DBFactory
 {
@@ -49,14 +50,22 @@ class DBFactory
 			$db_data = $server['MYSQL_DATABASE'];
 		}
 
-		$database = new Database\MysqlDatabase($basePath, $configCache, $profiler, $db_host, $db_user, $db_pass, $db_data, $charset);
-
-		if ($database->isConnected()) {
-			// Loads DB_UPDATE_VERSION constant
-			Database\DBStructure::definition($basePath, false);
+		if (class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
+			$dbConnection = new Database\Connection\PDOConnection($db_host, $db_user, $db_pass, $db_data, $charset);
+		} elseif (class_exists('\mysqli')) {
+			$dbConnection = new Database\Connection\MysqlIConnection($db_host, $db_user, $db_pass, $db_data, $charset);
+		} else {
+			throw new \Exception('Missing connection environment');
 		}
 
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
+
+		$database = new Database\Database($dbConnection, $configCache, $profiler);
+
+		if ($dbConnection->isConnected()) {
+			// Loads DB_UPDATE_VERSION constant
+			Database\DBStructure::definition($basePath, false);
+		}
 
 		return $database;
 	}

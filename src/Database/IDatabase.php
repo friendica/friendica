@@ -2,43 +2,55 @@
 
 namespace Friendica\Database;
 
+use Friendica\Database\Connection\IConnection;
+use Psr\Log\LoggerInterface;
+
 interface IDatabase
 {
 	/**
-	 * Returns if the database is connected
-	 * @return bool
+	 * Sets the Logger of this database instance
+	 * @param LoggerInterface $logger
 	 */
-	function isConnected();
+	function setLogger(LoggerInterface $logger);
 
 	/**
-	 * Disconnects the current database connection
-	 */
-	function disconnect();
-
-	/**
-	 * Perform a reconnect of an existing database connection
-	 *
-	 * @return bool Wsa the reconnect successful?
-	 */
-	function reconnect();
-
-	/**
-	 * Return the database object.
-	 * @return mixed
+	 * Returns the current connection of the database
+	 * @return IConnection
 	 */
 	function getConnection();
-
-	/**
-	 * Returns the server version string
-	 * @return string
-	 */
-	function serverInfo();
 
 	/**
 	 * Returns the selected database name
 	 * @return string
 	 */
 	function getDatabaseName();
+
+	/**
+	 * Executes a prepared statement that returns data
+	 *
+	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
+	 *
+	 * Please only use it with complicated queries.
+	 * For all regular queries please use DBA::select or DBA::exists
+	 *
+	 * @param string $sql SQL statement
+	 *
+	 * @return bool|object statement object or result object
+	 *
+	 * @throws \Exception
+	 */
+	function prepared($sql);
+
+	/**
+	 * Executes a prepared statement like UPDATE or INSERT that doesn't return data
+	 *
+	 * Please use DBA::delete, DBA::insert, DBA::update, ... instead
+	 *
+	 * @param string $sql SQL statement
+	 * @return boolean Was the query successfull? False is returned only if an error occurred
+	 * @throws \Exception
+	 */
+	function execute($sql);
 
 	/**
 	 * Check if data exists
@@ -85,6 +97,15 @@ interface IDatabase
 	function transaction();
 
 	/**
+	 * @brief Closes the current statement
+	 *
+	 * @param object $stmt statement object
+	 *
+	 * @return boolean was the close successful?
+	 */
+	function close($stmt);
+
+	/**
 	 * Does a commit
 	 *
 	 * @return bool Was the command executed successfully?
@@ -119,7 +140,7 @@ interface IDatabase
 	 *
 	 * @return bool Was the delete successful?
 	 */
-	function delete($table, array $conditions, $cascade = false);
+	function delete($table, array $conditions, $cascade = true);
 
 	/**
 	 * Updates rows in the database.
