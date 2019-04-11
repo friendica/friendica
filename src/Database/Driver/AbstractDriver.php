@@ -17,8 +17,6 @@ abstract class AbstractDriver implements IDriver
 	protected $dbPort;
 	protected $dbCharset;
 
-	protected $serverInfo;
-
 	public function __construct($serverAddress, $user, $pass, $db, $charset = null)
 	{
 		$this->isConnected = false;
@@ -45,8 +43,6 @@ abstract class AbstractDriver implements IDriver
 		$this->dbPass    = trim($this->dbPass);
 		$this->dbName    = trim($this->dbName);
 		$this->dbCharset = trim($this->dbCharset);
-
-		$this->serverInfo = '';
 	}
 
 	/**

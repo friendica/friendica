@@ -86,7 +86,7 @@ class MySQLiDriver extends AbstractDriver implements IDriver
 	 */
 	public function getServerInfo()
 	{
-		$this->serverInfo = $this->connection->server_info;
+		return $this->connection->server_info;
 	}
 
 	/**

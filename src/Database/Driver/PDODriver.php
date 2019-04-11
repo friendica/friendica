@@ -86,7 +86,7 @@ class PDODriver extends AbstractDriver implements IDriver
 	 */
 	function getServerInfo()
 	{
-		$this->serverInfo = $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
+		return $this->connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 	}
 
 	/**

@@ -5,7 +5,7 @@ namespace Friendica\Database\Driver;
 use Exception;
 
 /**
- * A DB connection exception
+ * A DB driver exception
  */
 class DriverException extends Exception
 {

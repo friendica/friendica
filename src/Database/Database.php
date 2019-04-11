@@ -25,8 +25,7 @@ class Database implements IDatabase, IDatabaseLock
 	private $configCache;
 
 	/**
-	 * The connection instance of the database
-	 *
+	 * The current driver of the database
 	 * @var IDriver
 	 */
 	private $driver;
@@ -49,11 +48,12 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	private $dbRelation;
 
-	public function __construct(IDriver $connection, IConfigCache $configCache, Profiler $profiler, LoggerInterface $logger)
+	public function __construct(IDriver $driver, IConfigCache $configCache, Profiler $profiler, LoggerInterface $logger)
 	{
 		$this->configCache = $configCache;
 		$this->profiler    = $profiler;
-		$this->driver  = $connection;
+		$this->driver      = $driver;
+		$this->logger      = $logger;
 		$this->driver->connect();
 	}
 
@@ -138,7 +138,7 @@ class Database implements IDatabase, IDatabaseLock
 			return false;
 		}
 
-		$columns = $this->getDriver()->fetch($stmt);
+		$columns = $this->driver->fetch($stmt);
 
 		$this->profiler->saveTimestamp($stamp1, 'database', System::callstack());
 
@@ -150,9 +150,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function commit()
 	{
-		$conn = $this->driver;
-
-		if (!$conn->performCommit()) {
+		if (!$this->driver->performCommit()) {
 			return false;
 		}
 
@@ -165,9 +163,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function rollback()
 	{
-		$conn = $this->driver;
-
-		$ret = $conn->rollbackTransaction();
+		$ret = $this->driver->rollbackTransaction();
 
 		$this->inTransaction = false;
 
@@ -184,7 +180,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function delete($table, array $conditions, $cascade = true, array &$callstack = [])
 	{
-		$conn   = $this->driver;
+		$driver = $this->driver;
 		$logger = $this->logger;
 
 		if (empty($table) || empty($conditions)) {
@@ -204,7 +200,7 @@ class Database implements IDatabase, IDatabaseLock
 
 		$callstack[$key] = true;
 
-		$table = $conn->escape($table);
+		$table = $driver->escape($table);
 
 		$commands[$key] = ['table' => $table, 'conditions' => $conditions];
 
@@ -319,7 +315,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function update($table, array $fields, array $condition, $old_fields = [])
 	{
-		$conn   = $this->driver;
+		$driver = $this->driver;
 		$logger = $this->logger;
 
 		if (empty($table) || empty($fields) || empty($condition)) {
@@ -327,7 +323,7 @@ class Database implements IDatabase, IDatabaseLock
 			return false;
 		}
 
-		$table = $conn->escape($table);
+		$table = $driver->escape($table);
 
 		$condition_string = self::buildCondition($condition);
 
@@ -376,13 +372,11 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function select($table, array $fields = [], array $condition = [], array $params = [])
 	{
-		$conn = $this->driver;
-
 		if ($table == '') {
 			return false;
 		}
 
-		$table = $conn->escape($table);
+		$table = $this->driver->escape($table);
 
 		if (count($fields) > 0) {
 			$select_fields = "`" . implode("`, `", array_values($fields)) . "`";
@@ -436,7 +430,7 @@ class Database implements IDatabase, IDatabaseLock
 		$logger   = $this->logger;
 		$profiler = $this->profiler;
 		$config   = $this->configCache;
-		$conn     = $this->driver;
+		$driver   = $this->driver;
 
 		$stamp1 = microtime(true);
 
@@ -453,7 +447,7 @@ class Database implements IDatabase, IDatabaseLock
 			$args[++$i] = $param;
 		}
 
-		if (!$conn->isConnected()) {
+		if (!$driver->isConnected()) {
 			return false;
 		}
 
@@ -487,8 +481,8 @@ class Database implements IDatabase, IDatabaseLock
 
 		try {
 
-			$retval = $conn->executePrepared($sql, $args);
-			self::$affected_rows = $conn->getNumRows($retval);
+			$retval = $driver->executePrepared($sql, $args);
+			self::$affected_rows = $driver->getNumRows($retval);
 
 		} catch (DriverException $exception) {
 			// We are having an own error logging in the function "e"
@@ -502,7 +496,7 @@ class Database implements IDatabase, IDatabaseLock
 
 				// On a lost connection we try to reconnect - but only once.
 				if ($errorno == 2006) {
-					if (self::$in_retrial || !$conn->reconnect()) {
+					if (self::$in_retrial || !$driver->reconnect()) {
 						// It doesn't make sense to continue when the database connection was lost
 						if (self::$in_retrial) {
 							$logger->notice('Giving up retrial because of database error ' . $errorno . ': ' . $error);
@@ -550,7 +544,6 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function execute($sql)
 	{
-		$conn     = $this->driver;
 		$profiler = $this->profiler;
 		$logger   = $this->logger;
 
