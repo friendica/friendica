@@ -2,7 +2,7 @@
 
 namespace Friendica\Database;
 
-use Friendica\Database\Connection\IConnection;
+use Friendica\Database\Driver\IDriver;
 use Psr\Log\LoggerInterface;
 
 interface IDatabase
@@ -15,9 +15,10 @@ interface IDatabase
 
 	/**
 	 * Returns the current connection of the database
-	 * @return IConnection
+	 *
+	 * @return IDriver
 	 */
-	function getConnection();
+	function getDriver();
 
 	/**
 	 * Returns the selected database name

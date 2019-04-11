@@ -1,13 +1,13 @@
 <?php
 
-namespace Friendica\Database\Connection;
+namespace Friendica\Database\Driver;
 
 use Friendica\Database\Database;
 use mysqli;
 use mysqli_result;
 use mysqli_stmt;
 
-class MysqlIConnection extends AbstractConnection implements IConnection
+class MySQLiDriver extends AbstractDriver implements IDriver
 {
 	/**
 	 * The connection to the database
@@ -138,7 +138,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 	 *
 	 * @param mysqli_stmt|mysqli_result
 	 *
-	 * @throws ConnectionException In case of a wrong statement
+	 * @throws DriverException In case of a wrong statement
 	 */
 	public function fetch($stmt)
 	{
@@ -174,7 +174,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 			}
 		}
 
-		throw new ConnectionException('Wrong statement for this connection');
+		throw new DriverException('Wrong statement for this connection');
 	}
 
 	/**
@@ -193,7 +193,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 			$retval = $this->connection->query(Database::replaceParameters($sql, $args));
 
 			if ($this->connection->errno) {
-				throw new ConnectionException($this->connection->error, $this->connection->errno);
+				throw new DriverException($this->connection->error, $this->connection->errno);
 			}
 
 			return $retval;
@@ -202,7 +202,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 		$stmt = $this->connection->stmt_init();
 
 		if (!$stmt->prepare($sql)) {
-			throw new ConnectionException($this->connection->error, $this->connection->errno);
+			throw new DriverException($this->connection->error, $this->connection->errno);
 		}
 
 		$param_types = '';
@@ -226,7 +226,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 		}
 
 		if (!$stmt->execute()) {
-			throw new ConnectionException($this->connection->error, $this->connection->errno);
+			throw new DriverException($this->connection->error, $this->connection->errno);
 		} else {
 			$stmt->store_result();
 			return $stmt;
@@ -253,7 +253,7 @@ class MysqlIConnection extends AbstractConnection implements IConnection
 				return $stmt->num_rows;
 			}
 		} else {
-			throw new ConnectionException('Wrong statement for this connection');
+			throw new DriverException('Wrong statement for this connection');
 		}
 	}
 

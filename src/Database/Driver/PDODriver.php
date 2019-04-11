@@ -1,11 +1,11 @@
 <?php
 
-namespace Friendica\Database\Connection;
+namespace Friendica\Database\Driver;
 
 use PDO;
 use PDOStatement;
 
-class PDOConnection extends AbstractConnection implements IConnection
+class PDODriver extends AbstractDriver implements IDriver
 {
 	/**
 	 * The connection to the database
@@ -145,14 +145,14 @@ class PDOConnection extends AbstractConnection implements IConnection
 		if (count($args) == 0) {
 			if (!$retval = $this->connection->query($sql)) {
 				$errorInfo = $this->connection->errorInfo();
-				throw new ConnectionException($errorInfo[2], $errorInfo[1]);
+				throw new DriverException($errorInfo[2], $errorInfo[1]);
 			}
 			return $retval;
 		}
 
 		if (!$stmt = $this->connection->prepare($sql)) {
 			$errorInfo = $this->connection->errorInfo();
-			throw new ConnectionException($errorInfo[2], $errorInfo[1]);
+			throw new DriverException($errorInfo[2], $errorInfo[1]);
 		}
 
 		foreach ($args AS $param => $value) {
@@ -166,7 +166,7 @@ class PDOConnection extends AbstractConnection implements IConnection
 
 		if (!$stmt->execute()) {
 			$errorInfo = $stmt->errorInfo();
-			throw new ConnectionException($errorInfo[2], $errorInfo[1]);
+			throw new DriverException($errorInfo[2], $errorInfo[1]);
 		} else {
 			return $stmt;
 		}
@@ -182,7 +182,7 @@ class PDOConnection extends AbstractConnection implements IConnection
 		if ($stmt instanceof PDOStatement) {
 			return $stmt->rowCount();
 		} else {
-			throw new ConnectionException('Wrong statement for this connection');
+			throw new DriverException('Wrong statement for this connection');
 		}
 	}
 

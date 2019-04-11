@@ -4,7 +4,7 @@ namespace Friendica\Database;
 
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Logger;
-use Friendica\Database\Connection\IConnection;
+use Friendica\Database\Driver\IDriver;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use mysqli_result;
@@ -71,7 +71,7 @@ class DBA
 	 */
 	public static function disconnect()
 	{
-		self::$db->getConnection()->disconnect();
+		self::$db->getDriver()->disconnect();
 	}
 
 	/**
@@ -79,16 +79,17 @@ class DBA
 	 */
 	public static function reconnect()
 	{
-		return self::$db->getConnection()->reconnect();
+		return self::$db->getDriver()->reconnect();
 	}
 
 	/**
 	 * Return the database object.
-	 * @return IConnection
+	 *
+	 * @return IDriver
 	 */
 	public static function getConnection()
 	{
-		return self::$db->getConnection();
+		return self::$db->getDriver();
 	}
 
 	/**
@@ -101,7 +102,7 @@ class DBA
 	 */
 	public static function serverInfo()
 	{
-		return self::$db->getConnection()->getServerInfo();
+		return self::$db->getDriver()->getServerInfo();
 	}
 
 	/**
@@ -174,12 +175,12 @@ class DBA
 
 	public static function escape($sql)
 	{
-		return self::$db->getConnection()->escape($sql);
+		return self::$db->getDriver()->escape($sql);
 	}
 
 	public static function connected()
 	{
-		return self::$db->getConnection()->isConnected(true);
+		return self::$db->getDriver()->isConnected(true);
 	}
 
 	/**

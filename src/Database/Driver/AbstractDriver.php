@@ -1,8 +1,8 @@
 <?php
 
-namespace Friendica\Database\Connection;
+namespace Friendica\Database\Driver;
 
-abstract class AbstractConnection implements IConnection
+abstract class AbstractDriver implements IDriver
 {
 	/**
 	 * The connection state of the database

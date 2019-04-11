@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Friendica\Database\Connection;
+namespace Friendica\Database\Driver;
 
 
-interface IConnection
+interface IDriver
 {
 	/**
 	 * Connecting to the current database
@@ -97,7 +97,7 @@ interface IConnection
 	 *
 	 * @return object
 	 *
-	 * @throws ConnectionException In case the execution doesn't work
+	 * @throws DriverException In case the execution doesn't work
 	 */
 	function executePrepared($sql, array $args = []);
 
@@ -108,7 +108,7 @@ interface IConnection
 	 *
 	 * @return int
 	 *
-	 * @throws ConnectionException In case the statement isn't valid
+	 * @throws DriverException In case the statement isn't valid
 	 */
 	function getNumRows($stmt);
 }

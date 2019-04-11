@@ -4,10 +4,9 @@ namespace Friendica\Database;
 
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\System;
-use Friendica\Database\Connection\ConnectionException;
-use Friendica\Database\Connection\IConnection;
+use Friendica\Database\Driver\DriverException;
+use Friendica\Database\Driver\IDriver;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Logger\VoidLogger;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -27,9 +26,10 @@ class Database implements IDatabase, IDatabaseLock
 
 	/**
 	 * The connection instance of the database
-	 * @var IConnection
+	 *
+	 * @var IDriver
 	 */
-	private $connection;
+	private $driver;
 
 	/**
 	 * The logger instance
@@ -49,14 +49,12 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	private $dbRelation;
 
-	public function __construct(IConnection $connection, IConfigCache $configCache, Profiler $profiler)
+	public function __construct(IDriver $connection, IConfigCache $configCache, Profiler $profiler, LoggerInterface $logger)
 	{
-		// At startup, the logger isn't set
-		$this->logger      = new VoidLogger();
 		$this->configCache = $configCache;
 		$this->profiler    = $profiler;
-		$this->connection  = $connection;
-		$this->connection->connect();
+		$this->driver  = $connection;
+		$this->driver->connect();
 	}
 
 	/**
@@ -70,9 +68,9 @@ class Database implements IDatabase, IDatabaseLock
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getConnection()
+	public function getDriver()
 	{
-		return $this->connection;
+		return $this->driver;
 	}
 
 	/**
@@ -97,7 +95,7 @@ class Database implements IDatabase, IDatabaseLock
 			return false;
 		}
 
-		$ret = $this->connection->closeStatement($stmt);
+		$ret = $this->driver->closeStatement($stmt);
 
 		$this->profiler->saveTimestamp($stamp1, 'database', System::callstack());
 
@@ -109,8 +107,8 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function transaction()
 	{
-		if (!$this->connection->performCommit() ||
-			!$this->connection->startTransaction()) {
+		if (!$this->driver->performCommit() ||
+			!$this->driver->startTransaction()) {
 			return false;
 		}
 
@@ -140,7 +138,7 @@ class Database implements IDatabase, IDatabaseLock
 			return false;
 		}
 
-		$columns = $this->getConnection()->fetch($stmt);
+		$columns = $this->getDriver()->fetch($stmt);
 
 		$this->profiler->saveTimestamp($stamp1, 'database', System::callstack());
 
@@ -152,7 +150,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function commit()
 	{
-		$conn = $this->connection;
+		$conn = $this->driver;
 
 		if (!$conn->performCommit()) {
 			return false;
@@ -167,7 +165,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function rollback()
 	{
-		$conn = $this->connection;
+		$conn = $this->driver;
 
 		$ret = $conn->rollbackTransaction();
 
@@ -186,7 +184,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function delete($table, array $conditions, $cascade = true, array &$callstack = [])
 	{
-		$conn   = $this->connection;
+		$conn   = $this->driver;
 		$logger = $this->logger;
 
 		if (empty($table) || empty($conditions)) {
@@ -321,7 +319,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function update($table, array $fields, array $condition, $old_fields = [])
 	{
-		$conn   = $this->connection;
+		$conn   = $this->driver;
 		$logger = $this->logger;
 
 		if (empty($table) || empty($fields) || empty($condition)) {
@@ -378,7 +376,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function select($table, array $fields = [], array $condition = [], array $params = [])
 	{
-		$conn = $this->connection;
+		$conn = $this->driver;
 
 		if ($table == '') {
 			return false;
@@ -438,7 +436,7 @@ class Database implements IDatabase, IDatabaseLock
 		$logger   = $this->logger;
 		$profiler = $this->profiler;
 		$config   = $this->configCache;
-		$conn     = $this->connection;
+		$conn     = $this->driver;
 
 		$stamp1 = microtime(true);
 
@@ -492,7 +490,7 @@ class Database implements IDatabase, IDatabaseLock
 			$retval = $conn->executePrepared($sql, $args);
 			self::$affected_rows = $conn->getNumRows($retval);
 
-		} catch (ConnectionException $exception) {
+		} catch (DriverException $exception) {
 			// We are having an own error logging in the function "e"
 			if (($exception->getCode() != 0) && !$called_from_e) {
 				// We have to preserve the error code, somewhere in the logging it get lost
@@ -552,7 +550,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	public function execute($sql)
 	{
-		$conn     = $this->connection;
+		$conn     = $this->driver;
 		$profiler = $this->profiler;
 		$logger   = $this->logger;
 
@@ -577,7 +575,7 @@ class Database implements IDatabase, IDatabaseLock
 				}
 
 				$this->close($stmt);
-			} catch (ConnectionException $exception) {
+			} catch (DriverException $exception) {
 				$errorno = $exception->getCode();
 			}
 
@@ -768,7 +766,7 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	private function escapeArrayCallback(&$value, $key, $add_quotation)
 	{
-		$conn = $this->connection;
+		$conn = $this->driver;
 
 		if (!$add_quotation) {
 			if (is_bool($value)) {
