@@ -6,11 +6,6 @@ use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Logger;
 use Friendica\Database\Driver\IDriver;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Profiler;
-use mysqli_result;
-use mysqli_stmt;
-use PDO;
-use PDOStatement;
 
 /**
  * @class MySQL database class
@@ -34,22 +29,11 @@ class DBA
 	 * @var IConfigCache
 	 */
 	private static $configCache;
-	/**
-	 * @var Profiler
-	 */
-	private static $profiler;
-	/**
-	 * @var string
-	 */
-	private static $basePath;
 	private static $connection;
 	private static $driver;
 	private static $error = false;
 	private static $errorno = 0;
-	private static $affected_rows = 0;
 	private static $in_transaction = false;
-	private static $in_retrial = false;
-	private static $relation = [];
 
 	/**
 	 * @var IDatabase
@@ -183,55 +167,19 @@ class DBA
 		return self::$db->getDriver()->isConnected(true);
 	}
 
-	/**
-	 * @brief Replaces ANY_VALUE() function by MIN() function,
-	 *  if the database server does not support ANY_VALUE().
-	 *
-	 * Considerations for Standard SQL, or MySQL with ONLY_FULL_GROUP_BY (default since 5.7.5).
-	 * ANY_VALUE() is available from MySQL 5.7.5 https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html
-	 * A standard fall-back is to use MIN().
-	 *
-	 * @param string $sql An SQL string without the values
-	 * @return string The input SQL string modified if necessary.
-	 */
-	public static function anyValueFallback($sql) {
-		$server_info = self::serverInfo();
-		if (version_compare($server_info, '5.7.5', '<') ||
-			(stripos($server_info, 'MariaDB') !== false)) {
-			$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
-		}
-		return $sql;
-	}
-
-	/**
-	 * @brief beautifies the query - useful for "SHOW PROCESSLIST"
-	 *
-	 * This is safe when we bind the parameters later.
-	 * The parameter values aren't part of the SQL.
-	 *
-	 * @param string $sql An SQL string without the values
-	 * @return string The input SQL string modified if necessary.
-	 */
-	public static function cleanQuery($sql) {
-		$search = ["\t", "\n", "\r", "  "];
-		$replace = [' ', ' ', ' ', ' '];
-		do {
-			$oldsql = $sql;
-			$sql = str_replace($search, $replace, $sql);
-		} while ($oldsql != $sql);
-
-		return $sql;
-	}
-
 	public static function p($sql)
 	{
-		return self::$db->prepared($sql);
+		$params = Utils::getParameters(func_get_args());
+
+		return self::$db->prepared($sql, $params);
 	}
 
 
-	public static function e($sql) {
+	public static function e($sql)
+	{
+		$params = Utils::getParameters(func_get_args());
 
-
+		return self::$db->execute($sql, $params);
 	}
 
 	/**
@@ -299,13 +247,9 @@ class DBA
 		return $retval;
 	}
 
-	/**
-	 * @brief Returns the number of affected rows of the last statement
-	 *
-	 * @return int Number of rows
-	 */
-	public static function affectedRows() {
-		return self::$affected_rows;
+	public static function affectedRows()
+	{
+		return self::$db->getAffectedRows();
 	}
 
 	/**

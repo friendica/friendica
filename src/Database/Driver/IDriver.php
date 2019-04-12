@@ -51,6 +51,16 @@ interface IDriver
 	function escape($sql);
 
 	/**
+	 * Replaces the ? placeholders with the parameters in the $args array
+	 *
+	 * @param string $sql SQL query
+	 * @param array  $args The parameters that are to replace the ? placeholders
+	 *
+	 * @return string The replaced SQL query
+	 */
+	function replaceParameters($sql, array $args = []);
+
+	/**
 	 * Closes the current statement
 	 *
 	 * @param object $stmt

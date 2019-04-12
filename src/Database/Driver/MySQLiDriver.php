@@ -2,7 +2,6 @@
 
 namespace Friendica\Database\Driver;
 
-use Friendica\Database\Database;
 use mysqli;
 use mysqli_result;
 use mysqli_stmt;
@@ -190,7 +189,7 @@ class MySQLiDriver extends AbstractDriver implements IDriver
 		// The fallback routine is called as well when there are no arguments
 		if (!$can_be_prepared || (count($args) == 0)) {
 
-			$retval = $this->connection->query(Database::replaceParameters($sql, $args));
+			$retval = $this->connection->query($this->replaceParameters($sql, $args));
 
 			if ($this->connection->errno) {
 				throw new DriverException($this->connection->error, $this->connection->errno);

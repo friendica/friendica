@@ -48,6 +48,18 @@ class Database implements IDatabase, IDatabaseLock
 	 */
 	private $dbRelation;
 
+	/**
+	 * A possible driver exception of a current call
+	 * @var DriverException
+	 */
+	private $currDriverException;
+
+	/**
+	 * The number of affected rows of a current call
+	 * @var int
+	 */
+	private $currNumRows;
+
 	public function __construct(IDriver $driver, IConfigCache $configCache, Profiler $profiler, LoggerInterface $logger)
 	{
 		$this->configCache = $configCache;
@@ -82,6 +94,14 @@ class Database implements IDatabase, IDatabaseLock
 		$ret = $this->prepared("SELECT DATABASE() AS `db`");
 		$data = $this->toArray($ret);
 		return $data[0]['db'];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function getAffectedRows()
+	{
+		return $this->currNumRows;
 	}
 
 	/**
@@ -263,7 +283,7 @@ class Database implements IDatabase, IDatabaseLock
 
 			if ((count($command['conditions']) > 1) || is_int($first_key)) {
 				$sql = "DELETE FROM `" . $command['table'] . "`" . $condition_string;
-				$logger->debug(self::replaceParameters($sql, $conditions));
+				$logger->debug($driver->replaceParameters($sql, $conditions));
 
 				if (!$this->execute($sql, $conditions)) {
 					if ($do_transaction) {
@@ -293,7 +313,7 @@ class Database implements IDatabase, IDatabaseLock
 					$sql = "DELETE FROM `" . $table . "` WHERE `" . $field . "` IN (" .
 						substr(str_repeat("?, ", count($field_values)), 0, -2) . ");";
 
-					$logger->debug(self::replaceParameters($sql, $field_values));
+					$logger->debug($driver->replaceParameters($sql, $field_values));
 
 					if (!$this->execute($sql, $field_values)) {
 						if ($do_transaction) {
@@ -424,8 +444,10 @@ class Database implements IDatabase, IDatabaseLock
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @param bool $retried if true, this is a retry of the current call
 	 */
-	public function prepared($sql)
+	public function prepared($sql, array $params = [], $retried = false)
 	{
 		$logger   = $this->logger;
 		$profiler = $this->profiler;
@@ -433,8 +455,6 @@ class Database implements IDatabase, IDatabaseLock
 		$driver   = $this->driver;
 
 		$stamp1 = microtime(true);
-
-		$params = $this->getParameters(func_get_args());
 
 		// Renumber the array keys to be sure that they fit
 		$i = 0;
@@ -463,9 +483,8 @@ class Database implements IDatabase, IDatabaseLock
 			$sql = "/*".System::callstack()." */ ".$sql;
 		}
 
-		self::$error = '';
-		self::$errorno = 0;
-		self::$affected_rows = 0;
+		$this->currDriverException = null;
+		$this->currNumRows = 0;
 
 		// We have to make some things different if this function is called from "e"
 		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
@@ -482,40 +501,51 @@ class Database implements IDatabase, IDatabaseLock
 		try {
 
 			$retval = $driver->executePrepared($sql, $args);
-			self::$affected_rows = $driver->getNumRows($retval);
+			$this->currNumRows = $driver->getNumRows($retval);
 
 		} catch (DriverException $exception) {
 			// We are having an own error logging in the function "e"
 			if (($exception->getCode() != 0) && !$called_from_e) {
-				// We have to preserve the error code, somewhere in the logging it get lost
-				$error = $exception->getMessage();
-				$errorno = $exception->getCode();
 
-				$this->logger->error('DB Error ' . self::$errorno . ': ' . self::$error . "\n" .
-					System::callstack(8) . "\n" . self::replaceParameters($sql, $args));
+				// We have to preserve the error code, somewhere in the logging it get lost
+				$this->currDriverException = $exception;
+
+				$this->logger->error('DB Error', [
+					'code'      => $exception->getCode(),
+					'error'     => $exception->getMessage(),
+					'callstack' => System::callstack(8),
+					'param    ' => $driver->replaceParameters($sql, $args),
+				]);
 
 				// On a lost connection we try to reconnect - but only once.
-				if ($errorno == 2006) {
-					if (self::$in_retrial || !$driver->reconnect()) {
+				if ($exception->getCode() == 2006) {
+					if ($retried || !$driver->reconnect()) {
 						// It doesn't make sense to continue when the database connection was lost
-						if (self::$in_retrial) {
-							$logger->notice('Giving up retrial because of database error ' . $errorno . ': ' . $error);
+						if ($retried) {
+							$logger->notice('Giving up retrial because of database error',
+							[
+								'code'  => $exception->getCode(),
+								'error' => $exception->getMessage(),
+							]);
 						} else {
-							$logger->notice("Couldn't reconnect after database error " . $errorno . ': ' . $error);
+							$logger->notice("Couldn't reconnect after database error",
+							[
+								'code'  => $exception->getCode(),
+								'error' => $exception->getMessage(),
+							]);
 						}
+
 						exit(1);
 					} else {
 						// We try it again
-						$logger->notice('Reconnected after database error ' . $errorno . ': ' . $error);
-						self::$in_retrial = true;
-						$ret = $this->prepared($sql, $args);
-						self::$in_retrial = false;
-						return $ret;
+						$logger->notice('Reconnected after database error',
+							[
+								'code'  => $exception->getCode(),
+								'error' => $exception->getMessage(),
+							]);
+						return $this->prepared($sql, $args, true);
 					}
 				}
-
-				self::$error = $error;
-				self::$errorno = $errorno;
 			}
 		}
 
@@ -532,7 +562,7 @@ class Database implements IDatabase, IDatabaseLock
 				@file_put_contents($config->get('system', 'db_log'), DateTimeFormat::utcNow()  . $duration . "\t" .
 					basename($backtrace[1]["file"])."\t" .
 					$backtrace[1]["line"]."\t".$backtrace[2]["function"]."\t" .
-					substr(self::replaceParameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
+					substr($driver->replaceParameters($sql, $args), 0, 2000)."\n", FILE_APPEND);
 			}
 		}
 
@@ -542,21 +572,19 @@ class Database implements IDatabase, IDatabaseLock
 	/**
 	 * {@inheritDoc}
 	 */
-	public function execute($sql)
+	public function execute($sql, array $params = [])
 	{
 		$profiler = $this->profiler;
 		$logger   = $this->logger;
 
 		$stamp = microtime(true);
 
-		$params = self::getParameters(func_get_args());
-
 		// In a case of a deadlock we are repeating the query 20 times
 		$timeout = 20;
 		$errorno = 0;
+		$retval  = false;
 
 		do {
-			try {
 				$stmt = $this->prepared($sql, $params);
 
 				if (is_bool($stmt)) {
@@ -568,82 +596,37 @@ class Database implements IDatabase, IDatabaseLock
 				}
 
 				$this->close($stmt);
-			} catch (DriverException $exception) {
-				$errorno = $exception->getCode();
-			}
+
+				$errorno = isset($this->currDriverException) ? $this->currDriverException->getCode() : 0;
 
 		} while (($errorno == 1213) && (--$timeout > 0));
 
 		if ($errorno != 0) {
 			// We have to preserve the error code, somewhere in the logging it get lost
-			$error = self::$error;
-			$errorno = self::$errorno;
+			$exception = $this->currDriverException;
 
-			$logger->error('DB Error ' . self::$errorno . ': ' . self::$error . "\n" .
-				System::callstack(8)."\n".self::replaceParameters($sql, $params));
+			$this->logger->error('DB Error', [
+				'code'      => $exception->getCode(),
+				'error'     => $exception->getMessage(),
+				'callstack' => System::callstack(8),
+				'param    ' => $this->driver->replaceParameters($sql, $params),
+			]);
 
 			// On a lost connection we simply quit.
-			// A reconnect like in self::p could be dangerous with modifications
+			// A reconnect like in $this->prepared() could be dangerous with modifications
 			if ($errorno == 2006) {
-				$logger->notice('Giving up because of database error '.$errorno.': '.$error);
+				$logger->notice('Giving up retrial because of database error',
+					[
+						'code'  => $exception->getCode(),
+						'error' => $exception->getMessage(),
+					]);
 				exit(1);
 			}
-
-			self::$error = $error;
-			self::$errorno = $errorno;
 		}
 
 		$profiler->saveTimestamp($stamp, "database_write", System::callstack());
 
 		return $retval;
-	}
-
-	/**
-	 * @brief Replaces the ? placeholders with the parameters in the $args array
-	 *
-	 * @param string $sql SQL query
-	 * @param array  $args The parameters that are to replace the ? placeholders
-	 *
-	 * @return string The replaced SQL query
-	 */
-	public static function replaceParameters($sql, array $args)
-	{
-		$offset = 0;
-
-		foreach ($args AS $param => $value) {
-			if (is_int($args[$param]) || is_float($args[$param])) {
-				$replace = intval($args[$param]);
-			} else {
-				$replace = "'" . $this->escape($args[$param]) . "'";
-			}
-
-			$pos = strpos($sql, '?', $offset);
-			if ($pos !== false) {
-				$sql = substr_replace($sql, $replace, $pos, 1);
-			}
-			$offset = $pos + strlen($replace);
-		}
-
-		return $sql;
-	}
-
-	/**
-	 * Convert parameter array to an universal form
-	 *
-	 * @param array $args Parameter array
-	 *
-	 * @return array universalized parameter array
-	 */
-	public static function getParameters(array $args)
-	{
-		unset($args[0]);
-
-		// When the second function parameter is an array then use this as the parameter array
-		if ((count($args) > 0) && (is_array($args[1]))) {
-			return $args[1];
-		} else {
-			return $args;
-		}
 	}
 
 	/**

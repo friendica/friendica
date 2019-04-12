@@ -53,4 +53,28 @@ abstract class AbstractDriver implements IDriver
 		// fallback, if no explicit escaping is set for a connection
 		return str_replace("'", "\\'", $sql);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function replaceParameters($sql, array $args = [])
+	{
+		$offset = 0;
+
+		foreach ($args AS $param => $value) {
+			if (is_int($args[$param]) || is_float($args[$param])) {
+				$replace = intval($args[$param]);
+			} else {
+				$replace = "'" . $this->escape($args[$param]) . "'";
+			}
+
+			$pos = strpos($sql, '?', $offset);
+			if ($pos !== false) {
+				$sql = substr_replace($sql, $replace, $pos, 1);
+			}
+			$offset = $pos + strlen($replace);
+		}
+
+		return $sql;
+	}
 }

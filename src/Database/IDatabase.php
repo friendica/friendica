@@ -27,6 +27,13 @@ interface IDatabase
 	function getDatabaseName();
 
 	/**
+	 * Returns the number of affected rows of the last statement
+	 *
+	 * @return int Number of rows
+	 */
+	function getAffectedRows();
+
+	/**
 	 * Executes a prepared statement that returns data
 	 *
 	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
@@ -34,13 +41,12 @@ interface IDatabase
 	 * Please only use it with complicated queries.
 	 * For all regular queries please use DBA::select or DBA::exists
 	 *
-	 * @param string $sql SQL statement
+	 * @param string $sql    SQL statement
+	 * @param array  $params The parameters of the current SQL statement
 	 *
 	 * @return bool|object statement object or result object
-	 *
-	 * @throws \Exception
 	 */
-	function prepared($sql);
+	function prepared($sql, array $params = []);
 
 	/**
 	 * Executes a prepared statement like UPDATE or INSERT that doesn't return data
@@ -48,10 +54,11 @@ interface IDatabase
 	 * Please use DBA::delete, DBA::insert, DBA::update, ... instead
 	 *
 	 * @param string $sql SQL statement
+	 * @param array  $params The parameters of the current SQL statement
+	 *
 	 * @return boolean Was the query successfull? False is returned only if an error occurred
-	 * @throws \Exception
 	 */
-	function execute($sql);
+	function execute($sql, array $params = []);
 
 	/**
 	 * Check if data exists
