@@ -139,7 +139,7 @@ class MySQLiDriver extends AbstractDriver implements IDriver
 	 *
 	 * @throws DriverException In case of a wrong statement
 	 */
-	public function fetch($stmt)
+	public function fetchRow($stmt)
 	{
 		if ($stmt instanceof mysqli_result) {
 			return $stmt->fetch_assoc();
@@ -181,6 +181,8 @@ class MySQLiDriver extends AbstractDriver implements IDriver
 	 */
 	public function executePrepared($sql, array $args = [])
 	{
+		$sql = $this->anyValueFallback($sql);
+
 		// There are SQL statements that cannot be executed with a prepared statement
 		$parts = explode(' ', $sql);
 		$command = strtolower($parts[0]);

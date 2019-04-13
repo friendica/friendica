@@ -131,7 +131,7 @@ class PDODriver extends AbstractDriver implements IDriver
 	 *
 	 * @param PDOStatement $stmt
 	 */
-	public function fetch($stmt)
+	public function fetchRow($stmt)
 	{
 		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
@@ -141,6 +141,8 @@ class PDODriver extends AbstractDriver implements IDriver
 	 */
 	public function executePrepared($sql, array $args = [])
 	{
+		$sql = $this->anyValueFallback($sql);
+
 		// If there are no arguments we use "query"
 		if (count($args) == 0) {
 			if (!$retval = $this->connection->query($sql)) {

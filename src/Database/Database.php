@@ -158,7 +158,7 @@ class Database implements IDatabase, IDatabaseLock
 			return false;
 		}
 
-		$columns = $this->driver->fetch($stmt);
+		$columns = $this->driver->fetchRow($stmt);
 
 		$this->profiler->saveTimestamp($stamp1, 'database', System::callstack());
 
@@ -476,8 +476,7 @@ class Database implements IDatabase, IDatabaseLock
 			$logger->warning('Query parameters mismatch.', ['query' => $sql, 'args' => $args, 'callstack' => System::callstack()]);
 		}
 
-		$sql = $this->cleanQuery($sql);
-		$sql = $this->anyValueFallback($sql);
+		$sql = Util::cleanQuery($sql);
 
 		if ($config->get('system', 'db_callstack') !== null) {
 			$sql = "/*".System::callstack()." */ ".$sql;
@@ -730,7 +729,6 @@ class Database implements IDatabase, IDatabaseLock
 			}
 		}
 	}
-
 
 	/**
 	 * @brief Callback function for "esc_array"

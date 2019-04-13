@@ -169,7 +169,7 @@ class DBA
 
 	public static function p($sql)
 	{
-		$params = Utils::getParameters(func_get_args());
+		$params = Util::getParameters(func_get_args());
 
 		return self::$db->prepared($sql, $params);
 	}
@@ -177,7 +177,7 @@ class DBA
 
 	public static function e($sql)
 	{
-		$params = Utils::getParameters(func_get_args());
+		$params = Util::getParameters(func_get_args());
 
 		return self::$db->execute($sql, $params);
 	}

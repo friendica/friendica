@@ -97,7 +97,7 @@ interface IDriver
 	 *
 	 * @return array
 	 */
-	function fetch($stmt);
+	function fetchRow($stmt);
 
 	/**
 	 * Executes a given SQL in context of the current connected database
