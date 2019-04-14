@@ -409,6 +409,29 @@ class DBA
 	}
 
 	/**
+	 * @brief Returns the SQL condition string built from the provided condition array
+	 *
+	 * This function operates with two modes.
+	 * - Supplied with a filed/value associative array, it builds simple strict
+	 *   equality conditions linked by AND.
+	 * - Supplied with a flat list, the first element is the condition string and
+	 *   the following arguments are the values to be interpolated
+	 *
+	 * $condition = ["uid" => 1, "network" => 'dspr'];
+	 * or:
+	 * $condition = ["`uid` = ? AND `network` IN (?, ?)", 1, 'dfrn', 'dspr'];
+	 *
+	 * In either case, the provided array is left with the parameters only
+	 *
+	 * @param array $condition
+	 * @return string
+	 */
+	public static function buildCondition(array &$condition = [])
+	{
+		return Database::buildCondition($condition);
+	}
+
+	/**
 	 * @brief Fills an array with data from a query
 	 *
 	 * @param object $stmt statement object
@@ -418,6 +441,17 @@ class DBA
 	public function toArray($stmt, $do_close = true)
 	{
 		return self::$dba->toArray($stmt, $do_close);
+	}
+
+	/**
+	 * @brief Returns the SQL parameter string built from the provided parameter array
+	 *
+	 * @param array $params
+	 * @return string
+	 */
+	public static function buildParameter(array $params = [])
+	{
+		return Database::buildParameter($params);
 	}
 
 	/**
