@@ -401,25 +401,6 @@ class Database
 	}
 
 	/**
-	 * @brief Convert parameter array to an universal form
-	 *
-	 * @param array $args Parameter array
-	 *
-	 * @return array universalized parameter array
-	 */
-	private static function getParam($args)
-	{
-		unset($args[0]);
-
-		// When the second function parameter is an array then use this as the parameter array
-		if ((count($args) > 0) && (is_array($args[1]))) {
-			return $args[1];
-		} else {
-			return $args;
-		}
-	}
-
-	/**
 	 * @brief Executes a prepared statement that returns data
 	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
 	 *
@@ -427,16 +408,14 @@ class Database
 	 * For all regular queries please use DBA::select or DBA::exists
 	 *
 	 * @param string $sql SQL statement
+	 * @param array $params SQL parameters
 	 *
 	 * @return bool|object statement object or result object
 	 * @throws \Exception
 	 */
-	public function p($sql)
+	public function p($sql, array $params = [])
 	{
-
 		$stamp1 = microtime(true);
-
-		$params = self::getParam(func_get_args());
 
 		// Renumber the array keys to be sure that they fit
 		$i = 0;
@@ -660,16 +639,14 @@ class Database
 	 * Please use DBA::delete, DBA::insert, DBA::update, ... instead
 	 *
 	 * @param string $sql SQL statement
+	 * @param array  $params SQL parameters
 	 *
 	 * @return boolean Was the query successfull? False is returned only if an error occurred
 	 * @throws \Exception
 	 */
-	public function e($sql)
+	public function e($sql, array $params = [])
 	{
-
 		$stamp = microtime(true);
-
-		$params = self::getParam(func_get_args());
 
 		// In a case of a deadlock we are repeating the query 20 times
 		$timeout = 20;
@@ -768,14 +745,13 @@ class Database
 	 * @brief Fetches the first row
 	 *
 	 * @param string $sql SQL statement
+	 * @param array  $params SQL parameters
 	 *
 	 * @return array first row of query
 	 * @throws \Exception
 	 */
-	public function fetchFirst($sql)
+	public function fetchFirst($sql, array $params = [])
 	{
-		$params = self::getParam(func_get_args());
-
 		$stmt = $this->p($sql, $params);
 
 		if (is_bool($stmt)) {

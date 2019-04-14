@@ -107,6 +107,22 @@ class DBA
 	}
 
 	/**
+	 * @brief Convert parameter array to an universal form
+	 * @param array $args Parameter array
+	 * @return array universalized parameter array
+	 */
+	private static function getParam($args) {
+		unset($args[0]);
+
+		// When the second function parameter is an array then use this as the parameter array
+		if ((count($args) > 0) && (is_array($args[1]))) {
+			return $args[1];
+		} else {
+			return $args;
+		}
+	}
+
+	/**
 	 * @brief Executes a prepared statement that returns data
 	 * @usage Example: $r = p("SELECT * FROM `item` WHERE `guid` = ?", $guid);
 	 *
@@ -119,7 +135,9 @@ class DBA
 	 */
 	public static function p($sql)
 	{
-		return self::$dba->p($sql);
+		$params = self::getParam(func_get_args());
+
+		return self::$dba->p($sql, $params);
 	}
 
 	/**
@@ -133,7 +151,9 @@ class DBA
 	 */
 	public static function e($sql)
 	{
-		return self::$dba->e($sql);
+		$params = self::getParam(func_get_args());
+
+		return self::$dba->e($sql, $params);
 	}
 
 	/**
@@ -162,7 +182,9 @@ class DBA
 	 */
 	public static function fetchFirst($sql)
 	{
-		return self::$dba->fetchFirst($sql);
+		$params = self::getParam(func_get_args());
+
+		return self::$dba->fetchFirst($sql, $params);
 	}
 
 	/**
