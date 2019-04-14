@@ -18,24 +18,26 @@ function q($sql) {
 	$args = func_get_args();
 	unset($args[0]);
 
-	if (!DBA::$connected) {
+	$dba = DBA::getDb();
+
+	if (!$dba->connected) {
 		return false;
 	}
 
-	$sql = DBA::cleanQuery($sql);
-	$sql = DBA::anyValueFallback($sql);
+	$sql = $dba->cleanQuery($sql);
+	$sql = $dba->anyValueFallback($sql);
 
 	$stmt = @vsprintf($sql, $args);
 
-	$ret = DBA::p($stmt);
+	$ret = $dba->p($stmt);
 
 	if (is_bool($ret)) {
 		return $ret;
 	}
 
-	$columns = DBA::columnCount($ret);
+	$columns = $dba->columnCount($ret);
 
-	$data = DBA::toArray($ret);
+	$data = $dba->toArray($ret);
 
 	if ((count($data) == 0) && ($columns == 0)) {
 		return true;

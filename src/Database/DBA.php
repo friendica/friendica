@@ -33,6 +33,16 @@ class DBA
 	}
 
 	/**
+	 * Returns the current Database instance
+	 *
+	 * @return Database
+	 */
+	public static function getDb()
+	{
+		return self::$dba;
+	}
+
+	/**
 	 * @brief Returns the MySQL server version string
 	 *
 	 * This function discriminate between the deprecated mysql API and the current
