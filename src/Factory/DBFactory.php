@@ -16,14 +16,12 @@ class DBFactory
 	 * @param Profiler           $profiler    The profiler
 	 * @param array              $server      The $_SERVER variables
 	 *
+	 * @return Database\Database;
+	 *
 	 * @throws \Exception if connection went bad
 	 */
-	public static function init(Cache\IConfigCache $configCache, Profiler $profiler, array $server)
+	public static function create(Cache\IConfigCache $configCache, Profiler $profiler, array $server)
 	{
-		if (Database\DBA::connected()) {
-			return;
-		}
-
 		$db_host = $configCache->get('database', 'hostname');
 		$db_user = $configCache->get('database', 'username');
 		$db_pass = $configCache->get('database', 'password');
@@ -49,11 +47,17 @@ class DBFactory
 			$db_data = $server['MYSQL_DATABASE'];
 		}
 
-		if (Database\DBA::connect($configCache, $profiler, new VoidLogger(), $db_host, $db_user, $db_pass, $db_data, $charset)) {
+		$database = new Database\Database($configCache, $profiler, new VoidLogger(), $db_host, $db_user, $db_pass, $db_data, $charset);
+
+		Database\DBA::init($database);
+
+		if ($database->connect()) {
 			// Loads DB_UPDATE_VERSION constant
 			Database\DBStructure::definition($configCache->get('system', 'basepath'), false);
 		}
 
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
+
+		return $database;
 	}
 }

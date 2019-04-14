@@ -10,7 +10,6 @@
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
-use Friendica\Database\DBA;
 use Friendica\Factory;
 
 // Get options
@@ -128,7 +127,7 @@ if (!$foreground) {
 	// fclose(STDOUT); // file descriptors as we
 	// fclose(STDERR); // are running as a daemon.
 
-	DBA::disconnect();
+	$a->getDatabase()->disconnect();
 
 	register_shutdown_function('shutdown');
 
@@ -144,7 +143,7 @@ if (!$foreground) {
 	file_put_contents($pidfile, $pid);
 
 	// We lose the database connection upon forking
-	Factory\DBFactory::init($a->getConfigCache(), $a->getProfiler(), $_SERVER);
+	$a->getDatabase()->reconnect();
 }
 
 Config::set('system', 'worker_daemon_mode', true);
@@ -169,7 +168,7 @@ while (true) {
 	if ($do_cron) {
 		// We force a reconnect of the database connection.
 		// This is done to ensure that the connection don't get lost over time.
-		DBA::reconnect();
+		$a->getDatabase()->reconnect();
 
 		$last_cron = time();
 	}

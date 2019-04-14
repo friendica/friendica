@@ -6,7 +6,7 @@
 namespace Friendica\Test;
 
 use Friendica\App;
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
 use Friendica\Factory;
 use Friendica\Util\BasePath;
 use Friendica\Util\Config\ConfigFileLoader;
@@ -49,8 +49,7 @@ abstract class DatabaseTest extends MockedTest
 
 		$profiler = \Mockery::mock(Profiler::class);
 
-		DBA::connect(
-			$config,
+		$database = new Database($config,
 			$profiler,
 			new VoidLogger(),
 			getenv('MYSQL_HOST'),
@@ -58,11 +57,13 @@ abstract class DatabaseTest extends MockedTest
 			getenv('MYSQL_PASSWORD'),
 			getenv('MYSQL_DATABASE'));
 
-		if (!DBA::connected()) {
+		$database->connect();
+
+		if (!$database->connected()) {
 			$this->markTestSkipped('Could not connect to the database.');
 		}
 
-		return $this->createDefaultDBConnection(DBA::getConnection(), getenv('MYSQL_DATABASE'));
+		return $this->createDefaultDBConnection($database->getConnection(), getenv('MYSQL_DATABASE'));
 	}
 
 	/**

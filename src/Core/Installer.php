@@ -7,6 +7,7 @@ namespace Friendica\Core;
 use DOMDocument;
 use Exception;
 use Friendica\Core\Config\Cache\IConfigCache;
+use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Object\Image;
@@ -605,19 +606,23 @@ class Installer
 		$dbpass = $configCache->get('database', 'password');
 		$dbdata = $configCache->get('database', 'database');
 
-		if (!DBA::connect($configCache, $profiler, new VoidLogger(), $dbhost, $dbuser, $dbpass, $dbdata)) {
+		$database = new Database($configCache, $profiler, new VoidLogger(), $dbhost, $dbuser, $dbpass, $dbdata);
+
+		if (!$database->connect()) {
 			$this->addCheck(L10n::t('Could not connect to database.'), false, true, '');
 
 			return false;
 		}
 
-		if (DBA::connected()) {
+		if ($database->connected()) {
 			if (DBStructure::existsTable('user')) {
 				$this->addCheck(L10n::t('Database already in use.'), false, true, '');
 
 				return false;
 			}
 		}
+
+		DBA::init($database);
 
 		return true;
 	}

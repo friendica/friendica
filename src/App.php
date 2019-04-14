@@ -12,6 +12,7 @@ use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Hook;
 use Friendica\Core\Theme;
+use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -122,6 +123,19 @@ class App
 	 * @var LoggerInterface The logger
 	 */
 	private $logger;
+
+	/**
+	 * @var Database The database
+	 */
+	private $database;
+
+	/**
+	 * @return Database The database connection of this node
+	 */
+	public function getDatabase()
+	{
+		return $this->database;
+	}
 
 	/**
 	 * @var Profiler The profiler of this app
@@ -238,6 +252,7 @@ class App
 	 * @brief App constructor.
 	 *
 	 * @param Configuration    $config    The Configuration
+	 * @param Database         $database  The DB instance
 	 * @param App\Mode         $mode      The mode of this Friendica app
 	 * @param App\Router       $router    The router of this Friendica app
 	 * @param BaseURL          $baseURL   The full base URL of this Friendica app
@@ -247,11 +262,12 @@ class App
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
+	public function __construct(Configuration $config, Database $database, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
 	{
 		BaseObject::setApp($this);
 
 		$this->config   = $config;
+		$this->database = $database;
 		$this->mode     = $mode;
 		$this->router   = $router;
 		$this->baseURL  = $baseURL;

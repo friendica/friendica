@@ -29,7 +29,7 @@ class DependencyFactory
 		$configLoader = new Config\ConfigFileLoader($basePath, $mode);
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
-		Factory\DBFactory::init($configCache, $profiler, $_SERVER);
+		$database = Factory\DBFactory::create($configCache, $profiler, $_SERVER);
 		$config = Factory\ConfigFactory::createConfig($configCache);
 		// needed to call PConfig::init()
 		Factory\ConfigFactory::createPConfig($configCache);
@@ -37,6 +37,6 @@ class DependencyFactory
 		Factory\LoggerFactory::createDev($channel, $config, $profiler);
 		$baseURL = new BaseURL($config, $_SERVER);
 
-		return new App($config, $mode, $router, $baseURL, $logger, $profiler, $isBackend);
+		return new App($config, $database, $mode, $router, $baseURL, $logger, $profiler, $isBackend);
 	}
 }
