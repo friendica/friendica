@@ -283,7 +283,7 @@ class DBA
 	 *
 	 * @return boolean Was the command executed successfully?
 	 */
-	public function rollback()
+	public static function rollback()
 	{
 		return self::$dba->rollback();
 	}
@@ -438,7 +438,7 @@ class DBA
 	 * @param bool   $do_close
 	 * @return array Data array
 	 */
-	public function toArray($stmt, $do_close = true)
+	public static function toArray($stmt, $do_close = true)
 	{
 		return self::$dba->toArray($stmt, $do_close);
 	}
