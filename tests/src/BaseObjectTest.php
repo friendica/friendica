@@ -45,7 +45,6 @@ class BaseObjectTest extends TestCase
 	 */
 	public function testGetAppFailed()
 	{
-		$baseObject = new BaseObject();
-		$baseObject->getApp();
+		BaseObject::getApp();
 	}
 }
