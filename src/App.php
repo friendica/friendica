@@ -14,6 +14,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
+use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\BaseURL;
 use Friendica\Util\Config\ConfigFileLoader;
@@ -1122,134 +1123,124 @@ class App
 			'title' => ''
 		];
 
-		if (strlen($this->module)) {
-			// Compatibility with the Android Diaspora client
-			if ($this->module == 'stream') {
-				$this->internalRedirect('network?f=&order=post');
-			}
+		// Compatibility with the Android Diaspora client
+		if ($this->module == 'stream') {
+			$this->internalRedirect('network?f=&order=post');
+		}
 
-			if ($this->module == 'conversations') {
-				$this->internalRedirect('message');
-			}
+		if ($this->module == 'conversations') {
+			$this->internalRedirect('message');
+		}
 
-			if ($this->module == 'commented') {
-				$this->internalRedirect('network?f=&order=comment');
-			}
+		if ($this->module == 'commented') {
+			$this->internalRedirect('network?f=&order=comment');
+		}
 
-			if ($this->module == 'liked') {
-				$this->internalRedirect('network?f=&order=comment');
-			}
+		if ($this->module == 'liked') {
+			$this->internalRedirect('network?f=&order=comment');
+		}
 
-			if ($this->module == 'activity') {
-				$this->internalRedirect('network/?f=&conv=1');
-			}
+		if ($this->module == 'activity') {
+			$this->internalRedirect('network/?f=&conv=1');
+		}
 
-			if (($this->module == 'status_messages') && ($this->cmd == 'status_messages/new')) {
-				$this->internalRedirect('bookmarklet');
-			}
+		if (($this->module == 'status_messages') && ($this->cmd == 'status_messages/new')) {
+			$this->internalRedirect('bookmarklet');
+		}
 
-			if (($this->module == 'user') && ($this->cmd == 'user/edit')) {
-				$this->internalRedirect('settings');
-			}
+		if (($this->module == 'user') && ($this->cmd == 'user/edit')) {
+			$this->internalRedirect('settings');
+		}
 
-			if (($this->module == 'tag_followings') && ($this->cmd == 'tag_followings/manage')) {
-				$this->internalRedirect('search');
-			}
+		if (($this->module == 'tag_followings') && ($this->cmd == 'tag_followings/manage')) {
+			$this->internalRedirect('search');
+		}
 
-			// Compatibility with the Firefox App
-			if (($this->module == "users") && ($this->cmd == "users/sign_in")) {
-				$this->module = "login";
-			}
+		// Compatibility with the Firefox App
+		if (($this->module == "users") && ($this->cmd == "users/sign_in")) {
+			$this->module = "login";
+		}
 
-			/*
-			 * ROUTING
-			 *
-			 * From the request URL, routing consists of obtaining the name of a BaseModule-extending class of which the
-			 * post() and/or content() static methods can be respectively called to produce a data change or an output.
-			 */
+		/*
+		 * ROUTING
+		 *
+		 * From the request URL, routing consists of obtaining the name of a BaseModule-extending class of which the
+		 * post() and/or content() static methods can be respectively called to produce a data change or an output.
+		 */
 
-			// First we try explicit routes defined in App\Router
-			$this->router->collectRoutes();
+		// First we try explicit routes defined in App\Router
+		$this->router->collectRoutes();
 
-			$data = $this->router->getRouteCollector();
-			Hook::callAll('route_collection', $data);
+		$data = $this->router->getRouteCollector();
+		Hook::callAll('route_collection', $data);
 
-			$this->module_class = $this->router->getModuleClass($this->cmd);
+		$this->module_class = $this->router->getModuleClass($this->cmd);
 
-			// Then we try addon-provided modules that we wrap in the LegacyModule class
-			if (!$this->module_class && Core\Addon::isEnabled($this->module) && file_exists("addon/{$this->module}/{$this->module}.php")) {
-				//Check if module is an app and if public access to apps is allowed or not
-				$privateapps = $this->config->get('config', 'private_addons', false);
-				if ((!local_user()) && Core\Hook::isAddonApp($this->module) && $privateapps) {
-					info(Core\L10n::t("You must be logged in to use addons. "));
-				} else {
-					include_once "addon/{$this->module}/{$this->module}.php";
-					if (function_exists($this->module . '_module')) {
-						LegacyModule::setModuleFile("addon/{$this->module}/{$this->module}.php");
-						$this->module_class = 'Friendica\\LegacyModule';
-					}
+		// Then we try addon-provided modules that we wrap in the LegacyModule class
+		if (!$this->module_class && Core\Addon::isEnabled($this->module) && file_exists("addon/{$this->module}/{$this->module}.php")) {
+			//Check if module is an app and if public access to apps is allowed or not
+			$privateapps = $this->config->get('config', 'private_addons', false);
+			if ((!local_user()) && Core\Hook::isAddonApp($this->module) && $privateapps) {
+				info(Core\L10n::t("You must be logged in to use addons. "));
+			} else {
+				include_once "addon/{$this->module}/{$this->module}.php";
+				if (function_exists($this->module . '_module')) {
+					LegacyModule::setModuleFile("addon/{$this->module}/{$this->module}.php");
+					$this->module_class = LegacyModule::class;
 				}
-			}
-
-			// Then we try name-matching a Friendica\Module class
-			if (!$this->module_class && class_exists('Friendica\\Module\\' . ucfirst($this->module))) {
-				$this->module_class = 'Friendica\\Module\\' . ucfirst($this->module);
-			}
-
-			/* Finally, we look for a 'standard' program module in the 'mod' directory
-			 * We emulate a Module class through the LegacyModule class
-			 */
-			if (!$this->module_class && file_exists("mod/{$this->module}.php")) {
-				LegacyModule::setModuleFile("mod/{$this->module}.php");
-				$this->module_class = 'Friendica\\LegacyModule';
-			}
-
-			/* The URL provided does not resolve to a valid module.
-			 *
-			 * On Dreamhost sites, quite often things go wrong for no apparent reason and they send us to '/internal_error.html'.
-			 * We don't like doing this, but as it occasionally accounts for 10-20% or more of all site traffic -
-			 * we are going to trap this and redirect back to the requested page. As long as you don't have a critical error on your page
-			 * this will often succeed and eventually do the right thing.
-			 *
-			 * Otherwise we are going to emit a 404 not found.
-			 */
-			if (!$this->module_class) {
-				// Stupid browser tried to pre-fetch our Javascript img template. Don't log the event or return anything - just quietly exit.
-				if (!empty($_SERVER['QUERY_STRING']) && preg_match('/{[0-9]}/', $_SERVER['QUERY_STRING']) !== 0) {
-					exit();
-				}
-
-				if (!empty($_SERVER['QUERY_STRING']) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
-					Core\Logger::log('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
-					$this->internalRedirect($_SERVER['REQUEST_URI']);
-				}
-
-				Core\Logger::log('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], Core\Logger::DEBUG);
-
-				header($_SERVER["SERVER_PROTOCOL"] . ' 404 ' . Core\L10n::t('Not Found'));
-				$tpl = Core\Renderer::getMarkupTemplate("404.tpl");
-				$this->page['content'] = Core\Renderer::replaceMacros($tpl, [
-					'$message' =>  Core\L10n::t('Page not found.')
-				]);
 			}
 		}
 
-		$content = '';
+		// Then we try name-matching a Friendica\Module class
+		if (!$this->module_class && class_exists('Friendica\\Module\\' . ucfirst($this->module))) {
+			$this->module_class = 'Friendica\\Module\\' . ucfirst($this->module);
+		}
+
+		/* Finally, we look for a 'standard' program module in the 'mod' directory
+		 * We emulate a Module class through the LegacyModule class
+		 */
+		if (!$this->module_class && file_exists("mod/{$this->module}.php")) {
+			LegacyModule::setModuleFile("mod/{$this->module}.php");
+			$this->module_class = LegacyModule::class;
+		}
+
+		/* The URL provided does not resolve to a valid module.
+		 *
+		 * On Dreamhost sites, quite often things go wrong for no apparent reason and they send us to '/internal_error.html'.
+		 * We don't like doing this, but as it occasionally accounts for 10-20% or more of all site traffic -
+		 * we are going to trap this and redirect back to the requested page. As long as you don't have a critical error on your page
+		 * this will often succeed and eventually do the right thing.
+		 *
+		 * Otherwise we are going to emit a 404 not found.
+		 */
+		if (!$this->module_class) {
+			// Stupid browser tried to pre-fetch our Javascript img template. Don't log the event or return anything - just quietly exit.
+			if (!empty($_SERVER['QUERY_STRING']) && preg_match('/{[0-9]}/', $_SERVER['QUERY_STRING']) !== 0) {
+				exit();
+			}
+
+			if (!empty($_SERVER['QUERY_STRING']) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
+				Core\Logger::log('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
+				$this->internalRedirect($_SERVER['REQUEST_URI']);
+			}
+
+			Core\Logger::log('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], Core\Logger::DEBUG);
+
+			$this->module_class = Module\PageNotFound::class;
+		}
 
 		// Initialize module that can set the current theme in the init() method, either directly or via App->profile_uid
-		if ($this->module_class) {
-			$this->page['page_title'] = $this->module;
-			$placeholder = '';
+		$this->page['page_title'] = $this->module;
+		$placeholder = '';
 
-			Core\Hook::callAll($this->module . '_mod_init', $placeholder);
+		Core\Hook::callAll($this->module . '_mod_init', $placeholder);
 
-			call_user_func([$this->module_class, 'init']);
+		call_user_func([$this->module_class, 'init']);
 
-			// "rawContent" is especially meant for technical endpoints.
-			// This endpoint doesn't need any theme initialization or other comparable stuff.
-			if (!$this->error) {
-				call_user_func([$this->module_class, 'rawContent']);
-			}
+		// "rawContent" is especially meant for technical endpoints.
+		// This endpoint doesn't need any theme initialization or other comparable stuff.
+		if (!$this->error) {
+			call_user_func([$this->module_class, 'rawContent']);
 		}
 
 		// Load current theme info after module has been initialized as theme could have been set in module
@@ -1263,24 +1254,33 @@ class App
 			$func($this);
 		}
 
-		if ($this->module_class) {
-			if (! $this->error && $_SERVER['REQUEST_METHOD'] === 'POST') {
-				Core\Hook::callAll($this->module . '_mod_post', $_POST);
-				call_user_func([$this->module_class, 'post']);
-			}
+		if (! $this->error && $_SERVER['REQUEST_METHOD'] === 'POST') {
+			Core\Hook::callAll($this->module . '_mod_post', $_POST);
+			call_user_func([$this->module_class, 'post']);
+		}
 
-			if (! $this->error) {
-				Core\Hook::callAll($this->module . '_mod_afterpost', $placeholder);
-				call_user_func([$this->module_class, 'afterpost']);
-			}
+		if (! $this->error) {
+			Core\Hook::callAll($this->module . '_mod_afterpost', $placeholder);
+			call_user_func([$this->module_class, 'afterpost']);
+		}
 
-			if (! $this->error) {
+		$content = '';
+
+		if (! $this->error) {
+			try {
 				$arr = ['content' => $content];
 				Core\Hook::callAll($this->module . '_mod_content', $arr);
 				$content = $arr['content'];
 				$arr = ['content' => call_user_func([$this->module_class, 'content'])];
 				Core\Hook::callAll($this->module . '_mod_aftercontent', $arr);
 				$content .= $arr['content'];
+			} catch(HTTPException $exception) {
+				header($_SERVER["SERVER_PROTOCOL"] . ' ' . $exception->httpcode . ' ' . $exception->httpdesc);
+				$tpl = Core\Renderer::getMarkupTemplate('exception.tpl');
+				$content = Core\Renderer::replaceMacros($tpl, [
+					'$title' => $exception->httpdesc,
+					'$message' => $exception->getMessage()
+				]);
 			}
 		}
 
