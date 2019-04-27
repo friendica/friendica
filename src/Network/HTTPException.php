@@ -14,5 +14,5 @@ use Exception;
 class HTTPException extends Exception
 {
 	var $httpcode = 200;
-	var $httpdesc = "";
+	var $httpdesc = "OK";
 }

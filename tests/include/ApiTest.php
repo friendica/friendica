@@ -610,7 +610,7 @@ class ApiTest extends DatabaseTest
 	public function testApiErrorWithJson()
 	{
 		$this->assertEquals(
-			'{"status":{"error":"error_message","code":"200 Friendica\\\\Network\\\\HTTP","request":""}}',
+			'{"status":{"error":"error_message","code":"200 OK","request":""}}',
 			api_error('json', new HTTPException('error_message'))
 		);
 	}
@@ -628,7 +628,7 @@ class ApiTest extends DatabaseTest
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
 				'xmlns:georss="http://www.georss.org/georss">'."\n".
 			'  <error>error_message</error>'."\n".
-			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <code>200 OK</code>'."\n".
 			'  <request/>'."\n".
 			'</status>'."\n",
 			api_error('xml', new HTTPException('error_message'))
@@ -648,7 +648,7 @@ class ApiTest extends DatabaseTest
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
 				'xmlns:georss="http://www.georss.org/georss">'."\n".
 			'  <error>error_message</error>'."\n".
-			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <code>200 OK</code>'."\n".
 			'  <request/>'."\n".
 			'</status>'."\n",
 			api_error('rss', new HTTPException('error_message'))
@@ -668,7 +668,7 @@ class ApiTest extends DatabaseTest
 				'xmlns:friendica="http://friendi.ca/schema/api/1/" '.
 				'xmlns:georss="http://www.georss.org/georss">'."\n".
 			'  <error>error_message</error>'."\n".
-			'  <code>200 Friendica\Network\HTTP</code>'."\n".
+			'  <code>200 OK</code>'."\n".
 			'  <request/>'."\n".
 			'</status>'."\n",
 			api_error('atom', new HTTPException('error_message'))
