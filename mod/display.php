@@ -20,6 +20,7 @@ use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Objects;
+use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\DFRN;
 use Friendica\Util\Strings;
@@ -76,7 +77,7 @@ function display_init(App $a)
 	}
 
 	if (!DBA::isResult($item)) {
-		System::httpExit(404);
+		return;
 	}
 
 	if ($a->argc >= 3 && $nick == 'feed-item') {
@@ -200,8 +201,7 @@ function display_fetchauthor($a, $item)
 function display_content(App $a, $update = false, $update_uid = 0)
 {
 	if (Config::get('system','block_public') && !local_user() && !remote_user()) {
-		notice(L10n::t('Public access denied.') . EOL);
-		return;
+		throw new HTTPException\ForbiddenException(L10n::t('Public access denied.'));
 	}
 
 	$o = '';
@@ -254,7 +254,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	}
 
 	if (!$item_id) {
-		System::httpExit(404);
+		throw new HTTPException\NotFoundException(L10n::t('The requested item doesn\'t exist or has been deleted.'));
 	}
 
 	// We are displaying an "alternate" link if that post was public. See issue 2864
@@ -303,8 +303,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$is_owner = (local_user() && (in_array($a->profile['profile_uid'], [local_user(), 0])) ? true : false);
 
 	if (!empty($a->profile['hidewall']) && !$is_owner && !$is_remote_contact) {
-		notice(L10n::t('Access to this profile has been restricted.') . EOL);
-		return;
+		throw new HTTPException\ForbiddenException(L10n::t('Access to this profile has been restricted.'));
 	}
 
 	// We need the editor here to be able to reshare an item.
@@ -340,7 +339,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$item = Item::selectFirstForUser(local_user(), $fields, $condition);
 
 	if (!DBA::isResult($item)) {
-		System::httpExit(404);
+		throw new HTTPException\NotFoundException(L10n::t('The requested item doesn\'t exist or has been deleted.'));
 	}
 
 	$item['uri'] = $item['parent-uri'];
@@ -415,7 +414,7 @@ function displayShowFeed($item_id, $conversation)
 {
 	$xml = DFRN::itemFeed($item_id, $conversation);
 	if ($xml == '') {
-		System::httpExit(500);
+		throw new HTTPException\InternalServerErrorException(L10n::t('The feed for this item is unavailable.'));
 	}
 	header("Content-type: application/atom+xml");
 	echo $xml;
