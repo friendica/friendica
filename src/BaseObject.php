@@ -6,8 +6,6 @@ namespace Friendica;
 
 require_once __DIR__ . '/../boot.php';
 
-use Friendica\Network\HTTPException\InternalServerErrorException;
-
 /**
  * Basic object
  *
@@ -31,7 +29,7 @@ class BaseObject
 	public static function getApp()
 	{
 		if (empty(self::$app)) {
-			throw new InternalServerErrorException('App isn\'t initialized.');
+			throw new \Exception('App isn\'t initialized.');
 		}
 
 		return self::$app;

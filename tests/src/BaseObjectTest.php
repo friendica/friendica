@@ -33,13 +33,13 @@ class BaseObjectTest extends TestCase
 		$this->setUpVfsDir();
 		$this->mockApp($this->root);
 
-		$this->assertNull($baseObject->setApp($this->app));
+		$baseObject->setApp($this->app);
 		$this->assertEquals($this->app, $baseObject->getApp());
 	}
 
 	/**
 	 * Test the getApp() function without App
-	 * @expectedException Friendica\Network\HTTPException\InternalServerErrorException
+	 * @expectedException \Exception
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
 	 */
