@@ -5,11 +5,11 @@
  * @brief Starts the background processing
  */
 
+use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
-use Friendica\Factory;
 
 // Get options
 $shortopts = 'sn';
@@ -30,7 +30,10 @@ if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$a = Factory\DependencyFactory::setUp('worker', dirname(__DIR__));
+$diLibrary = new Dice();
+$diLibrary = $diLibrary->addRules(include dirname(__DIR__ ) . '/static/dependencies.conf.php');
+
+$a = $diLibrary->create(App::class, [], ['channel' => 'worker']);
 
 // Check the database structure and possibly fixes it
 Update::check($a->getBasePath(), true, $a->getMode());

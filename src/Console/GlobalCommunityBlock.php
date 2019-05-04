@@ -16,7 +16,7 @@ use Friendica\Model\Contact;
  * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class GlobalCommunityBlock extends \Asika\SimpleConsole\Console
+class GlobalCommunityBlock extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -40,7 +40,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \get_app();
+		$a = $this->app;
 
 		if ($this->getOption('v')) {
 			$this->out('Class: ' . __CLASS__);

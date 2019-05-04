@@ -2,8 +2,6 @@
 
 namespace Friendica\Console;
 
-use Asika\SimpleConsole\Console;
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Installer;
 use Friendica\Core\Theme;
@@ -12,7 +10,7 @@ use Friendica\Util\BaseURL;
 use Friendica\Util\Config\ConfigFileLoader;
 use RuntimeException;
 
-class AutomaticInstallation extends Console
+class AutomaticInstallation extends AbstractAppConsole
 {
 	protected function getHelp()
 	{
@@ -74,7 +72,7 @@ HELP;
 		// Initialise the app
 		$this->out("Initializing setup...\n");
 
-		$a = BaseObject::getApp();
+		$a = $this->app;
 
 		$installer = new Installer();
 

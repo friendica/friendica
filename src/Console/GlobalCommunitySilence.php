@@ -21,7 +21,7 @@ use RuntimeException;
  * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class GlobalCommunitySilence extends \Asika\SimpleConsole\Console
+class GlobalCommunitySilence extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -47,7 +47,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \get_app();
+		$a = $this->app;
 
 		if ($this->getOption('v')) {
 			$this->out('Class: ' . __CLASS__);

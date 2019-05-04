@@ -5,35 +5,54 @@ namespace Friendica\Util;
 class BasePath
 {
 	/**
+	 * @var string
+	 */
+	private $baseDir;
+	/**
+	 * @var array
+	 */
+	private $server;
+
+	/**
+	 * @param string|null $baseDir The default base path
+	 * @param array       $server  server arguments
+	 */
+	public function __construct(string $baseDir, array $server = [])
+	{
+		$this->baseDir = $baseDir;
+		$this->server = $server;
+	}
+
+	/**
 	 * @brief Returns the base filesystem path of the App
 	 *
 	 * It first checks for the internal variable, then for DOCUMENT_ROOT and
 	 * finally for PWD
 	 *
-	 * @param string|null $basePath The default base path
-	 * @param array       $server   server arguments
-	 *
 	 * @return string
 	 *
 	 * @throws \Exception if directory isn't usable
 	 */
-	public static function create($basePath, array $server = [])
+	public function getPath()
 	{
-		if ((!$basePath || !is_dir($basePath)) && !empty($server['DOCUMENT_ROOT'])) {
-			$basePath = $server['DOCUMENT_ROOT'];
+		$baseDir = $this->baseDir;
+		$server = $this->server;
+
+		if ((!$baseDir || !is_dir($baseDir)) && !empty($server['DOCUMENT_ROOT'])) {
+			$baseDir = $server['DOCUMENT_ROOT'];
 		}
 
-		if ((!$basePath || !is_dir($basePath)) && !empty($server['PWD'])) {
-			$basePath = $server['PWD'];
+		if ((!$baseDir || !is_dir($baseDir)) && !empty($server['PWD'])) {
+			$baseDir = $server['PWD'];
 		}
 
-		$basePath = self::getRealPath($basePath);
+		$baseDir = self::getRealPath($baseDir);
 
-		if (!is_dir($basePath)) {
-			throw new \Exception(sprintf('\'%s\' is not a valid basepath', $basePath));
+		if (!is_dir($baseDir)) {
+			throw new \Exception(sprintf('\'%s\' is not a valid basepath', $baseDir));
 		}
 
-		return $basePath;
+		return $baseDir;
 	}
 
 	/**

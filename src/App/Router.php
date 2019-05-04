@@ -220,13 +220,9 @@ class Router
 		$this->routeCollector->addRoute(['GET'],         '/xrd',                 Module\Xrd::class);
 	}
 
-	public function __construct(RouteCollector $routeCollector = null)
+	public function __construct()
 	{
-		if (!$routeCollector) {
-			$routeCollector = new RouteCollector(new Std(), new GroupCountBased());
-		}
-
-		$this->routeCollector = $routeCollector;
+		$this->routeCollector = new RouteCollector(new Std(), new GroupCountBased());
 	}
 
 	public function getRouteCollector()

@@ -2,7 +2,7 @@
 
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
 
 /**
  * Preload User Configuration Adapter
@@ -19,11 +19,12 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	private $config_loaded;
 
 	/**
+	 * @param Database $database
 	 * @param int $uid The UID of the current user
 	 */
-	public function __construct($uid = null)
+	public function __construct(Database $database, $uid = null)
 	{
-		parent::__construct();
+		parent::__construct($database);
 
 		$this->config_loaded = [];
 
@@ -47,14 +48,16 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 			return $return;
 		}
 
-		$pconfigs = DBA::select('pconfig', ['cat', 'v', 'k'], ['uid' => $uid]);
-		while ($pconfig = DBA::fetch($pconfigs)) {
+		$database = $this->database;
+
+		$pconfigs = $database->select('pconfig', ['cat', 'v', 'k'], ['uid' => $uid]);
+		while ($pconfig = $database->fetch($pconfigs)) {
 			$value = $this->toConfigValue($pconfig['v']);
 			if (isset($value)) {
 				$return[$pconfig['cat']][$pconfig['k']] = $value;
 			}
 		}
-		DBA::close($pconfigs);
+		$database->close($pconfigs);
 
 		$this->config_loaded[$uid] = true;
 
@@ -74,8 +77,10 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 			$this->load($uid, $cat);
 		}
 
-		$config = DBA::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($config)) {
+		$database = $this->database;
+
+		$config = $database->selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
+		if ($database->isResult($config)) {
 			$value = $this->toConfigValue($config['v']);
 
 			if (isset($value)) {
@@ -109,7 +114,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 
 		$dbvalue = $this->toDbValue($value);
 
-		return DBA::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $key], true);
+		return $this->database->update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $key], true);
 	}
 
 	/**
@@ -125,7 +130,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 			$this->load($uid, $cat);
 		}
 
-		return DBA::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
+		return $this->database->delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
 	}
 
 	/**

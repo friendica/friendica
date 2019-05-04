@@ -7,6 +7,8 @@
  * This script was taken from http://php.net/manual/en/function.pcntl-fork.php
  */
 
+use Dice\Dice;
+use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
@@ -32,7 +34,10 @@ if (!file_exists("boot.php") && (sizeof($_SERVER["argv"]) != 0)) {
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$a = Factory\DependencyFactory::setUp('daemon', dirname(__DIR__));
+$diLibrary = new Dice();
+$diLibrary = $diLibrary->addRules(include dirname(__DIR__ ) . '/static/dependencies.conf.php');
+
+$a = $diLibrary->create(App::class, [], ['channel' => 'daemon']);
 
 if ($a->getMode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");

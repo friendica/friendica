@@ -1,8 +1,6 @@
 <?php
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Database\DBA;
-
 /**
  * JustInTime Configuration Adapter
  *
@@ -31,8 +29,10 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 			return $return;
 		}
 
-		$configs = DBA::select('config', ['v', 'k'], ['cat' => $cat]);
-		while ($config = DBA::fetch($configs)) {
+		$database = $this->database;
+
+		$configs = $database->select('config', ['v', 'k'], ['cat' => $cat]);
+		while ($config = $database->fetch($configs)) {
 			$key   = $config['k'];
 			$value = $this->toConfigValue($config['v']);
 
@@ -44,7 +44,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 				$return[$key] = $value;
 			}
 		}
-		DBA::close($configs);
+		$database->close($configs);
 
 		return [$cat => $return];
 	}
@@ -65,8 +65,10 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 			$this->in_db[$cat][$key] = true;
 		}
 
-		$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($config)) {
+		$database = $this->database;
+
+		$config = $database->selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
+		if ($database->isResult($config)) {
 			$value = $this->toConfigValue($config['v']);
 
 			// just return it in case it is set
@@ -106,7 +108,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 
 		$dbvalue = $this->toDbValue($value);
 
-		$result = DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
+		$result = $this->database->update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
 
 		$this->in_db[$cat][$key] = $result;
 
@@ -126,7 +128,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 			unset($this->in_db[$cat][$key]);
 		}
 
-		$result = DBA::delete('config', ['cat' => $cat, 'k' => $key]);
+		$result = $this->database->delete('config', ['cat' => $cat, 'k' => $key]);
 
 		return $result;
 	}

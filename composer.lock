@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb985236d64ed0b0fe1fc2e4ac6616e2",
+    "content-hash": "35faeb9a9fceb419b9b563ea1bb61a95",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -768,6 +768,52 @@
                 "markdown"
             ],
             "time": "2018-09-18T12:18:08+00:00"
+        },
+        {
+            "name": "level-2/dice",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Level-2/Dice.git",
+                "reference": "e631f110f0520294fec902814c61cac26566023c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Level-2/Dice/zipball/e631f110f0520294fec902814c61cac26566023c",
+                "reference": "e631f110f0520294fec902814c61cac26566023c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Dice\\": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Tom Butler",
+                    "email": "tom@r.je"
+                }
+            ],
+            "description": "A minimalist Dependency injection container (DIC) for PHP. Please note: 3.0+ is only compatible with PHP 7.0. The 2.0 branch is compatbile with PHP 5.6.",
+            "homepage": "http://r.je/dice.html",
+            "keywords": [
+                "dependency injection",
+                "dependency injection container",
+                "di",
+                "ioc"
+            ],
+            "time": "2019-05-01T12:55:36+00:00"
         },
         {
             "name": "lightopenid/lightopenid",
@@ -4332,7 +4378,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "lightopenid/lightopenid": 20
+        "lightopenid/lightopenid": 20,
+        "level-2/dice": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

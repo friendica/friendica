@@ -16,7 +16,7 @@ use RuntimeException;
  *
  * @author Michael Vogel <heluecht@pirati.ca>
  */
-class NewPassword extends \Asika\SimpleConsole\Console
+class NewPassword extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -39,7 +39,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \get_app();
+		$a = $this->app;
 
 		if ($this->getOption('v')) {
 			$this->out('Class: ' . __CLASS__);

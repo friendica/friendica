@@ -2,8 +2,6 @@
 
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Database\DBA;
-
 /**
  * Preload Configuration Adapter
  *
@@ -30,14 +28,16 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return $return;
 		}
 
-		$configs = DBA::select('config', ['cat', 'v', 'k']);
-		while ($config = DBA::fetch($configs)) {
+		$database = $this->database;
+
+		$configs = $database->select('config', ['cat', 'v', 'k']);
+		while ($config = $database->fetch($configs)) {
 			$value = $this->toConfigValue($config['v']);
 			if (isset($value)) {
 				$return[$config['cat']][$config['k']] = $value;
 			}
 		}
-		DBA::close($configs);
+		$database->close($configs);
 
 		$this->config_loaded = true;
 
@@ -53,8 +53,10 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return null;
 		}
 
-		$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($config)) {
+		$database = $this->database;
+
+		$config = $database->selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
+		if ($database->isResult($config)) {
 			$value = $this->toConfigValue($config['v']);
 
 			if (isset($value)) {
@@ -86,7 +88,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 
 		$dbvalue = $this->toDbValue($value);
 
-		return DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
+		return $this->database->update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
 	}
 
 	/**
@@ -98,7 +100,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return false;
 		}
 
-		return DBA::delete('config', ['cat' => $cat, 'k' => $key]);
+		return $this->database->delete('config', ['cat' => $cat, 'k' => $key]);
 	}
 
 	/**

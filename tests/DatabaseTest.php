@@ -5,6 +5,7 @@
 
 namespace Friendica\Test;
 
+use Dice\Dice;
 use Friendica\App;
 use Friendica\Database\DBA;
 use Friendica\Factory;
@@ -26,6 +27,26 @@ abstract class DatabaseTest extends MockedTest
 	use TestCaseTrait;
 
 	/**
+	 * @var Dice
+	 */
+	protected $diLibrary;
+
+	/**
+	 * @var App
+	 */
+	protected $app;
+
+	protected function setUp()
+	{
+		parent::setUp();
+
+		$this->diLibrary = new Dice();
+		$this->diLibrary  = $this->diLibrary->addRules(include __DIR__ . '/../static/dependencies.conf.php');
+
+		$this->app = new App($this->diLibrary , 'index', false);
+	}
+
+	/**
 	 * Get database connection.
 	 *
 	 * This function is executed before each test in order to get a database connection that can be used by tests.
@@ -41,22 +62,6 @@ abstract class DatabaseTest extends MockedTest
 		if (!getenv('MYSQL_DATABASE')) {
 			$this->markTestSkipped('Please set the MYSQL_* environment variables to your test database credentials.');
 		}
-
-		$basePath = BasePath::create(dirname(__DIR__));
-		$mode = new App\Mode($basePath);
-		$configLoader = new ConfigFileLoader($basePath, $mode);
-		$config = Factory\ConfigFactory::createCache($configLoader);
-
-		$profiler = \Mockery::mock(Profiler::class);
-
-		DBA::connect(
-			$config,
-			$profiler,
-			new VoidLogger(),
-			getenv('MYSQL_HOST'),
-			getenv('MYSQL_USERNAME'),
-			getenv('MYSQL_PASSWORD'),
-			getenv('MYSQL_DATABASE'));
 
 		if (!DBA::connected()) {
 			$this->markTestSkipped('Could not connect to the database.');

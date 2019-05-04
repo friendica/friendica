@@ -37,42 +37,68 @@ class LoggerFactory
 	];
 
 	/**
-	 * Creates a new PSR-3 compliant logger instances
-	 *
+	 * @var string
+	 */
+	private $channel;
+	/**
+	 * @var Database
+	 */
+	private $database;
+	/**
+	 * @var Configuration
+	 */
+	private $config;
+	/**
+	 * @var Profiler
+	 */
+	private $profiler;
+
+	/**
 	 * @param string        $channel  The channel of the logger instance
+	 * @param Database $database The database connection
 	 * @param Configuration $config   The config
 	 * @param Profiler      $profiler The profiler of the app
+	 */
+	public function __construct(string $channel, Database $database, Configuration $config, Profiler $profiler)
+	{
+		$this->channel = $channel;
+		$this->database = $database;
+		$this->config = $config;
+		$this->profiler = $profiler;
+	}
+
+	/**
+	 * Creates a new PSR-3 compliant logger instances
 	 *
 	 * @return LoggerInterface The PSR-3 compliant logger instance
 	 *
 	 * @throws \Exception
 	 * @throws InternalServerErrorException
 	 */
-	public static function create($channel, Database $database, Configuration $config, Profiler $profiler)
+	public function create()
 	{
-		if (empty($config->get('system', 'debugging', false))) {
+		if (empty($this->config->get('system', 'debugging', false))) {
 			$logger = new VoidLogger();
-			$database->setLogger($logger);
-			Logger::init($logger);
+			$this->database->setLogger($logger);
 			return $logger;
 		}
 
 		$introspection = new Introspection(self::$ignoreClassList);
-		$level         = $config->get('system', 'loglevel');
+		$level         = $this->config->get('system', 'loglevel');
 		$loglevel      = self::mapLegacyConfigDebugLevel((string)$level);
 
-		switch ($config->get('system', 'logger_config', 'stream')) {
+		switch ($this->config->get('system', 'logger_config', 'stream')) {
 			case 'monolog':
 				$loggerTimeZone = new \DateTimeZone('UTC');
 				Monolog\Logger::setTimezone($loggerTimeZone);
 
-				$logger = new Monolog\Logger($channel);
+				$logger = new Monolog\Logger($this->channel);
 				$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 				$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 				$logger->pushProcessor(new Monolog\Processor\UidProcessor());
 				$logger->pushProcessor(new IntrospectionProcessor($introspection, LogLevel::DEBUG));
 
-				$stream = $config->get('system', 'logfile');
+				$stream = $this->config->get('system', 'logfile');
 
 				// just add a stream in case it's either writable or not file
 				if (!is_file($stream) || is_writable($stream)) {
@@ -81,30 +107,30 @@ class LoggerFactory
 				break;
 
 			case 'syslog':
-				$logger = new SyslogLogger($channel, $introspection, $loglevel);
+				$logger = new SyslogLogger($this->channel, $introspection, $loglevel);
 				break;
 
 			case 'stream':
 			default:
-				$stream = $config->get('system', 'logfile');
+				$stream = $this->config->get('system', 'logfile');
+
 				// just add a stream in case it's either writable or not file
 				if (!is_file($stream) || is_writable($stream)) {
-					$logger = new StreamLogger($channel, $stream, $introspection, $loglevel);
+					$logger = new StreamLogger($this->channel, $stream, $introspection, $loglevel);
 				} else {
 					$logger = new VoidLogger();
 				}
 				break;
 		}
 
-		$profiling = $config->get('system', 'profiling', false);
+		$profiling = $this->config->get('system', 'profiling', false);
 
 		// In case profiling is enabled, wrap the ProfilerLogger around the current logger
 		if (isset($profiling) && $profiling !== false) {
-			$logger = new ProfilerLogger($logger, $profiler);
+			$logger = new ProfilerLogger($logger, $this->profiler);
 		}
 
-		$database->setLogger($logger);
-		Logger::init($logger);
+		$this->database->setLogger($logger);
 
 		return $logger;
 	}
@@ -117,20 +143,16 @@ class LoggerFactory
 	 *
 	 * It should never get filled during normal usage of Friendica
 	 *
-	 * @param string        $channel  The channel of the logger instance
-	 * @param Configuration $config   The config
-	 * @param Profiler      $profiler The profiler of the app
-	 *
 	 * @return LoggerInterface The PSR-3 compliant logger instance
 	 *
 	 * @throws InternalServerErrorException
 	 * @throws \Exception
 	 */
-	public static function createDev($channel, Configuration $config, Profiler $profiler)
+	public function createDev()
 	{
-		$debugging   = $config->get('system', 'debugging');
-		$stream      = $config->get('system', 'dlogfile');
-		$developerIp = $config->get('system', 'dlogip');
+		$debugging   = $this->config->get('system', 'debugging');
+		$stream      = $this->config->get('system', 'dlogfile');
+		$developerIp = $this->config->get('system', 'dlogip');
 
 		if ((!isset($developerIp) || !$debugging) &&
 		    (!is_file($stream) || is_writable($stream))) {
@@ -144,13 +166,13 @@ class LoggerFactory
 
 		$introspection = new Introspection(self::$ignoreClassList);
 
-		switch ($config->get('system', 'logger_config', 'stream')) {
+		switch ($this->config->get('system', 'logger_config', 'stream')) {
 
 			case 'monolog':
 				$loggerTimeZone = new \DateTimeZone('UTC');
 				Monolog\Logger::setTimezone($loggerTimeZone);
 
-				$logger = new Monolog\Logger($channel);
+				$logger = new Monolog\Logger($this->channel);
 				$logger->pushProcessor(new Monolog\Processor\PsrLogMessageProcessor());
 				$logger->pushProcessor(new Monolog\Processor\ProcessIdProcessor());
 				$logger->pushProcessor(new Monolog\Processor\UidProcessor());
@@ -162,23 +184,21 @@ class LoggerFactory
 				break;
 
 			case 'syslog':
-				$logger = new SyslogLogger($channel, $introspection, LogLevel::DEBUG);
+				$logger = new SyslogLogger($this->channel, $introspection, LogLevel::DEBUG);
 				break;
 
 			case 'stream':
 			default:
-				$logger = new StreamLogger($channel, $stream, $introspection, LogLevel::DEBUG);
+				$logger = new StreamLogger($this->channel, $stream, $introspection, LogLevel::DEBUG);
 				break;
 		}
 
-		$profiling = $config->get('system', 'profiling', false);
+		$profiling = $this->config->get('system', 'profiling', false);
 
 		// In case profiling is enabled, wrap the ProfilerLogger around the current logger
 		if (isset($profiling) && $profiling !== false) {
-			$logger = new ProfilerLogger($logger, $profiler);
+			$logger = new ProfilerLogger($logger, $this->profiler);
 		}
-
-		Logger::setDevLogger($logger);
 
 		return $logger;
 	}

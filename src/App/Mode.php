@@ -2,8 +2,9 @@
 
 namespace Friendica\App;
 
-use Friendica\Core\Config;
-use Friendica\Database\DBA;
+use Friendica\Core\Config\Cache\IConfigCache;
+use Friendica\Database\Database;
+use Friendica\Util\BasePath;
 
 /**
  * Mode of the current Friendica Node
@@ -28,10 +29,22 @@ class Mode
 	 */
 	private $basepath;
 
-	public function __construct($basepath = '')
+	/**
+	 * @var Database
+	 */
+	private $database;
+
+	/**
+	 * @var IConfigCache
+	 */
+	private $configCache;
+
+	public function __construct(BasePath $basepath, Database $database, IConfigCache $configCache)
 	{
-		$this->basepath = $basepath;
-		$this->mode = 0;
+		$this->basepath    = $basepath->getPath();
+		$this->database    = $database;
+		$this->configCache = $configCache;
+		$this->mode        = 0;
 	}
 
 	/**
@@ -41,13 +54,16 @@ class Mode
 	 * - App::MODE_MAINTENANCE: The maintenance mode has been set
 	 * - App::MODE_NORMAL     : Normal run with all features enabled
 	 *
-	 * @param string $basepath the Basepath of the Application
+	 * @param string $basePath the Basepath of the Application
+	 *
+	 * @return Mode returns itself
+	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function determine($basepath = null)
+	public function determine($basePath = null)
 	{
-		if (!empty($basepath)) {
-			$this->basepath = $basepath;
+		if (!empty($basePath)) {
+			$this->basepath = $basePath;
 		}
 
 		$this->mode = 0;
@@ -55,28 +71,31 @@ class Mode
 		if (!file_exists($this->basepath . '/config/local.config.php')
 			&& !file_exists($this->basepath . '/config/local.ini.php')
 			&& !file_exists($this->basepath . '/.htconfig.php')) {
-			return;
+			return $this;
 		}
 
 		$this->mode |= Mode::LOCALCONFIGPRESENT;
 
-		if (!DBA::connected()) {
-			return;
+		if (!$this->database->connected()) {
+			return $this;
 		}
 
 		$this->mode |= Mode::DBAVAILABLE;
 
-		if (DBA::fetchFirst("SHOW TABLES LIKE 'config'") === false) {
-			return;
+		if ($this->database->fetchFirst("SHOW TABLES LIKE 'config'") === false) {
+			return $this;
 		}
 
 		$this->mode |= Mode::DBCONFIGAVAILABLE;
 
-		if (Config::get('system', 'maintenance')) {
-			return;
+		if ($this->configCache->get('system', 'maintenance') ||
+			$this->database->selectFirst('config', ['cat' => 'system', 'key' => 'maintenance'])) {
+			return $this;
 		}
 
 		$this->mode |= Mode::MAINTENANCEDISABLED;
+
+		return $this;
 	}
 
 	/**

@@ -16,7 +16,7 @@ use RuntimeException;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class Cache extends \Asika\SimpleConsole\Console
+class Cache extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -56,7 +56,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\BaseObject::getApp();
+		$a = $this->app;
 
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);

@@ -14,7 +14,7 @@ use Friendica\Core\Update;
  * @author Tobias Diekershoff <tobias.diekershoff@gmx.net>
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class PostUpdate extends \Asika\SimpleConsole\Console
+class PostUpdate extends AbstractAppConsole
 {
         protected $helpOptions = ['h', 'help', '?'];
 
@@ -34,7 +34,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\BaseObject::getApp();
+		$a = $this->app;
 
 		if ($this->getOption($this->helpOptions)) {
 			$this->out($this->getHelp());

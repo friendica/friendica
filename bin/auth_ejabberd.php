@@ -32,7 +32,8 @@
  *
  */
 
-use Friendica\Factory;
+use Dice\Dice;
+use Friendica\App;
 use Friendica\Util\ExAuth;
 
 if (sizeof($_SERVER["argv"]) == 0) {
@@ -51,7 +52,10 @@ chdir($directory);
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-$a = Factory\DependencyFactory::setUp('auth_ejabbered', dirname(__DIR__));
+$diLibrary = new Dice();
+$diLibrary = $diLibrary->addRules(include dirname(__DIR__ ) . '/static/dependencies.conf.php');
+
+$a = $diLibrary->create(App::class, [], ['channel' => 'auth_ejabberd']);
 
 if ($a->getMode()->isNormal()) {
 	$oAuth = new ExAuth();

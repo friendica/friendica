@@ -13,7 +13,7 @@ use RuntimeException;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class DatabaseStructure extends \Asika\SimpleConsole\Console
+class DatabaseStructure extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -62,7 +62,7 @@ HELP;
 
 		Core\Config::load();
 
-		$a = get_app();
+		$a = $this->app;
 
 		switch ($this->getArgument(0)) {
 			case "dryrun":

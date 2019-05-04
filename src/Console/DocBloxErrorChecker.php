@@ -24,7 +24,7 @@ namespace Friendica\Console;
  * @author Alexander Kampmann
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class DocBloxErrorChecker extends \Asika\SimpleConsole\Console
+class DocBloxErrorChecker extends AbstractAppConsole
 {
 
 	protected $helpOptions = ['h', 'help', '?'];
@@ -59,7 +59,7 @@ HELP;
 			throw new \RuntimeException('DocBlox isn\'t available.');
 		}
 
-		$dir = \get_app()->getBasePath();
+		$dir = $this->app->getBasePath();
 
 		//stack for dirs to search
 		$dirstack = [];

@@ -20,9 +20,8 @@ class DBStructureTest extends DatabaseTest
 		$configLoader = new ConfigFileLoader($basePath, $mode);
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
-		$database = Factory\DBFactory::init($configCache, $profiler, $_SERVER);
+		$database = Factory\DatabaseFactory::init($configCache, $profiler, $_SERVER);
 		$config = Factory\ConfigFactory::createConfig($configCache);
-		Factory\ConfigFactory::createPConfig($configCache);
 		$logger = Factory\LoggerFactory::create('test', $database, $config, $profiler);
 		$baseUrl = new BaseURL($config, $_SERVER);
 		$this->app = new App($database, $config, $mode, $router, $baseUrl, $logger, $profiler, false);

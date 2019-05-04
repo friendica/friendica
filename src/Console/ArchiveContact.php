@@ -16,7 +16,7 @@ use RuntimeException;
  * License: AGPLv3 or later, same as Friendica
  *
  */
-class ArchiveContact extends \Asika\SimpleConsole\Console
+class ArchiveContact extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
@@ -39,7 +39,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\BaseObject::getApp();
+		$a = $this->app;
 
 		if ($this->getOption('v')) {
 			$this->out('Class: ' . __CLASS__);

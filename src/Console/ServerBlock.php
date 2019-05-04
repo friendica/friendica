@@ -3,9 +3,7 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Asika\SimpleConsole\Console;
 use Console_Table;
-use Friendica\BaseObject;
 use Friendica\Core\Config\Configuration;
 
 /**
@@ -14,7 +12,7 @@ use Friendica\Core\Config\Configuration;
  * With this tool, you can list the current blocked servers
  * or you can add / remove a blocked server from the list
  */
-class ServerBlock extends Console
+class ServerBlock extends AbstractAppConsole
 {
 	const DEFAULT_REASON = 'blocked';
 
@@ -42,7 +40,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = BaseObject::getApp();
+		$a = $this->app;
 
 		if (count($this->args) == 0) {
 			$this->printBlockedServers($a->getConfig());

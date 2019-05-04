@@ -2,6 +2,7 @@
 
 namespace Friendica\Core;
 
+use Dice\Dice;
 use Friendica;
 
 /**
@@ -14,6 +15,14 @@ class Console extends \Asika\SimpleConsole\Console
 	// Disables the default help handling
 	protected $helpOptions = [];
 	protected $customHelpOptions = ['h', 'help', '?'];
+
+	private $dice;
+
+	public function __construct(Dice $dice, $argv = null)
+	{
+		$this->dice = $dice;
+		parent::__construct($argv);
+	}
 
 	protected function getHelp()
 	{
@@ -126,7 +135,7 @@ HELP;
 		$className = $this->subConsoles[$command];
 
 		/** @var Console $subconsole */
-		$subconsole = new $className($subargs);
+		$subconsole = $this->dice->create($className, [$subargs], ['channel' => 'console']);
 
 		foreach ($this->options as $name => $value) {
 			$subconsole->setOption($name, $value);

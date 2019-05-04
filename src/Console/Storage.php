@@ -9,7 +9,7 @@ use Friendica\Core\StorageManager;
  * @brief tool to manage storage backend and stored data from CLI
  *
  */
-class Storage extends \Asika\SimpleConsole\Console
+class Storage extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 

@@ -5,11 +5,14 @@
 namespace Friendica;
 
 use Detection\MobileDetect;
+use Dice\Dice;
 use DOMDocument;
 use DOMXPath;
 use Exception;
+use Friendica\App\Mode;
 use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\PConfiguration;
 use Friendica\Core\Hook;
 use Friendica\Core\Theme;
 use Friendica\Database\Database;
@@ -74,21 +77,6 @@ class App
 	public $footerScripts = [];
 
 	/**
-	 * @var App\Mode The Mode of the Application
-	 */
-	private $mode;
-
-	/**
-	 * @var App\Router
-	 */
-	private $router;
-
-	/**
-	 * @var BaseURL
-	 */
-	private $baseURL;
-
-	/**
 	 * @var bool true, if the call is from an backend node (f.e. worker)
 	 */
 	private $isBackend;
@@ -109,24 +97,9 @@ class App
 	public $mobileDetect;
 
 	/**
-	 * @var Configuration The config
+	 * @var Dice
 	 */
-	private $config;
-
-	/**
-	 * @var LoggerInterface The logger
-	 */
-	private $logger;
-
-	/**
-	 * @var Profiler The profiler of this app
-	 */
-	private $profiler;
-
-	/**
-	 * @var Database The Friendica database connection
-	 */
-	private $database;
+	private $diLibrary;
 
 	/**
 	 * Returns the current config cache of this node
@@ -135,7 +108,7 @@ class App
 	 */
 	public function getConfigCache()
 	{
-		return $this->config->getCache();
+		return $this->diLibrary->create(IConfigCache::class);
 	}
 
 	/**
@@ -145,7 +118,7 @@ class App
 	 */
 	public function getConfig()
 	{
-		return $this->config;
+		return $this->diLibrary->create(Configuration::class);
 	}
 
 	/**
@@ -156,7 +129,7 @@ class App
 	public function getBasePath()
 	{
 		// Don't use the basepath of the config table for basepath (it should always be the config-file one)
-		return $this->config->getCache()->get('system', 'basepath');
+		return $this->getConfig()->getCache()->get('system', 'basepath');
 	}
 
 	/**
@@ -166,7 +139,7 @@ class App
 	 */
 	public function getLogger()
 	{
-		return $this->logger;
+		return $this->diLibrary->create(LoggerInterface::class);
 	}
 
 	/**
@@ -176,7 +149,7 @@ class App
 	 */
 	public function getProfiler()
 	{
-		return $this->profiler;
+		return $this->diLibrary->create(Profiler::class);
 	}
 
 	/**
@@ -186,7 +159,7 @@ class App
 	 */
 	public function getMode()
 	{
-		return $this->mode;
+		return $this->diLibrary->create(Mode::class);
 	}
 
 	/**
@@ -196,7 +169,7 @@ class App
 	 */
 	public function getRouter()
 	{
-		return $this->router;
+		return $this->diLibrary->create(App\Router::class);
 	}
 
 	/**
@@ -204,7 +177,7 @@ class App
 	 */
 	public function getDatabase()
 	{
-		return $this->database;
+		return $this->diLibrary->create(Database::class);
 	}
 
 	/**
@@ -246,31 +219,25 @@ class App
 	/**
 	 * @brief App constructor.
 	 *
-	 * @param Database $database The Friendica Database
-	 * @param Configuration    $config    The Configuration
-	 * @param App\Mode         $mode      The mode of this Friendica app
-	 * @param App\Router       $router    The router of this Friendica app
-	 * @param BaseURL          $baseURL   The full base URL of this Friendica app
-	 * @param LoggerInterface  $logger    The current app logger
-	 * @param Profiler         $profiler  The profiler of this application
+	 * @param Dice $diLibrary
+	 * @param string $channel
 	 * @param bool             $isBackend Whether it is used for backend or frontend (Default true=backend)
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
+	public function __construct(Dice $diLibrary, $channel, $isBackend = true)
 	{
+		$this->diLibrary = $diLibrary;
+
 		BaseObject::setApp($this);
 
-		$this->database = $database;
-		$this->config   = $config;
-		$this->mode     = $mode;
-		$this->router   = $router;
-		$this->baseURL  = $baseURL;
-		$this->profiler = $profiler;
-		$this->logger   = $logger;
+		Core\Config::init($diLibrary->create(Configuration::class));
+		Core\PConfig::init($diLibrary->create(PConfiguration::class));
+		Core\Logger::init($diLibrary->create(LoggerInterface::class, [$channel]));
+		Core\Logger::setDevLogger($diLibrary->create('$devLogger', ['dev']));
+		DBA::init($diLibrary->create(Database::class));
 
-		$this->profiler->reset();
-
+		$this->getProfiler()->reset();
 		$this->reload();
 
 		set_time_limit(0);
@@ -360,15 +327,15 @@ class App
 		$this->getMode()->determine($this->getBasePath());
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
-			$loader = new ConfigFileLoader($this->getBasePath(), $this->getMode());
-			$this->config->getCache()->load($loader->loadCoreConfig('addon'), true);
+			$loader = $this->diLibrary->create(ConfigFileLoader::class);
+			$this->getConfig()->getCache()->load($loader->loadCoreConfig('addon'), true);
 
-			$this->profiler->update(
-				$this->config->get('system', 'profiler', false),
-				$this->config->get('rendertime', 'callstack', false));
+			$this->getProfiler()->update(
+				$this->getConfig()->get('system', 'profiler', false),
+				$this->getConfig()->get('rendertime', 'callstack', false));
 
 			Core\Hook::loadHooks();
-			$loader = new ConfigFileLoader($this->getBasePath(), $this->mode);
+			$loader = $this->diLibrary->create(ConfigFileLoader::class);
 			Core\Hook::callAll('load_config', $loader);
 		}
 
@@ -386,8 +353,8 @@ class App
 	 */
 	private function loadDefaultTimezone()
 	{
-		if ($this->config->get('system', 'default_timezone')) {
-			$this->timezone = $this->config->get('system', 'default_timezone');
+		if ($this->getConfig()->get('system', 'default_timezone')) {
+			$this->timezone = $this->getConfig()->get('system', 'default_timezone');
 		} else {
 			global $default_timezone;
 			$this->timezone = !empty($default_timezone) ? $default_timezone : 'UTC';
@@ -406,7 +373,8 @@ class App
 	 */
 	public function getScheme()
 	{
-		return $this->baseURL->getScheme();
+		$baseUrl = $this->diLibrary->create(BaseURL::class);
+		return $baseUrl->getScheme();
 	}
 
 	/**
@@ -418,7 +386,8 @@ class App
 	 */
 	public function getBaseURL($ssl = false)
 	{
-		return $this->baseURL->get($ssl);
+		$baseUrl = $this->diLibrary->create(BaseURL::class);
+		return $baseUrl->get($ssl);
 	}
 
 	/**
@@ -488,7 +457,7 @@ class App
 		}
 
 		// Prepend the sitename to the page title
-		$this->page['title'] = $this->config->get('config', 'sitename', '') . (!empty($this->page['title']) ? ' | ' . $this->page['title'] : '');
+		$this->page['title'] = $this->getConfig()->get('config', 'sitename', '') . (!empty($this->page['title']) ? ' | ' . $this->page['title'] : '');
 
 		if (!empty(Core\Renderer::$theme['stylesheet'])) {
 			$stylesheet = Core\Renderer::$theme['stylesheet'];
@@ -498,12 +467,12 @@ class App
 
 		$this->registerStylesheet($stylesheet);
 
-		$shortcut_icon = $this->config->get('system', 'shortcut_icon');
+		$shortcut_icon = $this->getConfig()->get('system', 'shortcut_icon');
 		if ($shortcut_icon == '') {
 			$shortcut_icon = 'images/friendica-32.png';
 		}
 
-		$touch_icon = $this->config->get('system', 'touch_icon');
+		$touch_icon = $this->getConfig()->get('system', 'touch_icon');
 		if ($touch_icon == '') {
 			$touch_icon = 'images/friendica-128.png';
 		}
@@ -522,7 +491,7 @@ class App
 			'$update_interval' => $interval,
 			'$shortcut_icon'   => $shortcut_icon,
 			'$touch_icon'      => $touch_icon,
-			'$block_public'    => intval($this->config->get('system', 'block_public')),
+			'$block_public'    => intval($this->getConfig()->get('system', 'block_public')),
 			'$stylesheets'     => $this->stylesheets,
 		]) . $this->page['htmlhead'];
 	}
@@ -678,13 +647,13 @@ class App
 		 *
 		if ($this->is_backend()) {
 			$process = 'backend';
-			$max_processes = $this->config->get('system', 'max_processes_backend');
+			$max_processes = $this->getConfig()->get('system', 'max_processes_backend');
 			if (intval($max_processes) == 0) {
 				$max_processes = 5;
 			}
 		} else {
 			$process = 'frontend';
-			$max_processes = $this->config->get('system', 'max_processes_frontend');
+			$max_processes = $this->getConfig()->get('system', 'max_processes_frontend');
 			if (intval($max_processes) == 0) {
 				$max_processes = 20;
 			}
@@ -711,7 +680,7 @@ class App
 	 */
 	public function isMinMemoryReached()
 	{
-		$min_memory = $this->config->get('system', 'min_memory', 0);
+		$min_memory = $this->getConfig()->get('system', 'min_memory', 0);
 		if ($min_memory == 0) {
 			return false;
 		}
@@ -758,13 +727,13 @@ class App
 	{
 		if ($this->isBackend()) {
 			$process = 'backend';
-			$maxsysload = intval($this->config->get('system', 'maxloadavg'));
+			$maxsysload = intval($this->getConfig()->get('system', 'maxloadavg'));
 			if ($maxsysload < 1) {
 				$maxsysload = 50;
 			}
 		} else {
 			$process = 'frontend';
-			$maxsysload = intval($this->config->get('system', 'maxloadavg_frontend'));
+			$maxsysload = intval($this->getConfig()->get('system', 'maxloadavg_frontend'));
 			if ($maxsysload < 1) {
 				$maxsysload = 50;
 			}
@@ -793,7 +762,7 @@ class App
 			return;
 		}
 
-		$cmdline = $this->config->get('config', 'php_path', 'php') . ' ' . escapeshellarg($command);
+		$cmdline = $this->getConfig()->get('config', 'php_path', 'php') . ' ' . escapeshellarg($command);
 
 		foreach ($args as $key => $value) {
 			if (!is_null($value) && is_bool($value) && !$value) {
@@ -830,7 +799,7 @@ class App
 	 */
 	public function getSenderEmailAddress()
 	{
-		$sender_email = $this->config->get('config', 'sender_email');
+		$sender_email = $this->getConfig()->get('config', 'sender_email');
 		if (empty($sender_email)) {
 			$hostname = $this->baseURL->getHostname();
 			if (strpos($hostname, ':')) {
@@ -874,7 +843,7 @@ class App
 	 */
 	private function computeCurrentTheme()
 	{
-		$system_theme = $this->config->get('system', 'theme');
+		$system_theme = $this->getConfig()->get('system', 'theme');
 		if (!$system_theme) {
 			throw new Exception(Core\L10n::t('No system theme config value set.'));
 		}
@@ -897,7 +866,7 @@ class App
 
 		// Specific mobile theme override
 		if (($this->is_mobile || $this->is_tablet) && Core\Session::get('show-mobile', true)) {
-			$system_mobile_theme = $this->config->get('system', 'mobile-theme');
+			$system_mobile_theme = $this->getConfig()->get('system', 'mobile-theme');
 			$user_mobile_theme = Core\Session::get('mobile-theme', $system_mobile_theme);
 
 			// --- means same mobile theme as desktop
@@ -969,7 +938,7 @@ class App
 	 */
 	public function checkURL()
 	{
-		$url = $this->config->get('system', 'url');
+		$url = $this->getConfig()->get('system', 'url');
 
 		// if the url isn't set or the stored url is radically different
 		// than the currently visited url, store the current value accordingly.
@@ -978,7 +947,7 @@ class App
 		// We will only change the url to an ip address if there is no existing setting
 
 		if (empty($url) || (!Util\Strings::compareLink($url, $this->getBaseURL())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->baseURL->getHostname()))) {
-			$this->config->set('system', 'url', $this->getBaseURL());
+			$this->getConfig()->set('system', 'url', $this->getBaseURL());
 		}
 	}
 
@@ -1011,9 +980,11 @@ class App
 
 		if (!$this->getMode()->isInstall()) {
 			// Force SSL redirection
-			if ($this->baseURL->checkRedirectHttps()) {
+			/** @var BaseURL $baseUrl */
+			$baseUrl = $this->diLibrary->create(BaseURL::class);
+			if ($baseUrl->checkRedirectHttps()) {
 				header('HTTP/1.1 302 Moved Temporarily');
-				header('Location: ' . $this->getBaseURL() . '/' . $this->query_string);
+				header('Location: ' . $baseUrl->get() . '/' . $this->query_string);
 				exit();
 			}
 
@@ -1025,7 +996,7 @@ class App
 		if (!$this->isBackend()) {
 			$stamp1 = microtime(true);
 			session_start();
-			$this->profiler->saveTimestamp($stamp1, 'parser', Core\System::callstack());
+			$this->getProfiler()->saveTimestamp($stamp1, 'parser', Core\System::callstack());
 			Core\L10n::setSessionVariable();
 			Core\L10n::setLangFromSession();
 		} else {
@@ -1109,7 +1080,8 @@ class App
 			'page_title' => '',
 			'right_aside' => '',
 			'template' => '',
-			'title' => ''
+			'title' => '',
+			'page' => defaults($_GET, 'page', 1),
 		];
 
 		// Compatibility with the Android Diaspora client
@@ -1158,17 +1130,18 @@ class App
 		 */
 
 		// First we try explicit routes defined in App\Router
-		$this->router->collectRoutes();
+		$router = $this->getRouter();
+		$router->collectRoutes();
 
-		$data = $this->router->getRouteCollector();
+		$data = $router->getRouteCollector();
 		Hook::callAll('route_collection', $data);
 
-		$this->module_class = $this->router->getModuleClass($this->cmd);
+		$this->module_class = $router->getModuleClass($this->cmd);
 
 		// Then we try addon-provided modules that we wrap in the LegacyModule class
 		if (!$this->module_class && Core\Addon::isEnabled($this->module) && file_exists("addon/{$this->module}/{$this->module}.php")) {
 			//Check if module is an app and if public access to apps is allowed or not
-			$privateapps = $this->config->get('config', 'private_addons', false);
+			$privateapps = $this->getConfig()->get('config', 'private_addons', false);
 			if ((!local_user()) && Core\Hook::isAddonApp($this->module) && $privateapps) {
 				info(Core\L10n::t("You must be logged in to use addons. "));
 			} else {
@@ -1330,7 +1303,7 @@ class App
 		header("X-Friendica-Version: " . FRIENDICA_VERSION);
 		header("Content-type: text/html; charset=utf-8");
 
-		if ($this->config->get('system', 'hsts') && ($this->baseURL->getSSLPolicy() == BaseUrl::SSL_POLICY_FULL)) {
+		if ($this->getConfig()->get('system', 'hsts') && ($this->baseURL->getSSLPolicy() == BaseUrl::SSL_POLICY_FULL)) {
 			header("Strict-Transport-Security: max-age=31536000");
 		}
 

@@ -7,7 +7,7 @@ namespace Friendica\Console;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class PhpToPo extends \Asika\SimpleConsole\Console
+class PhpToPo extends AbstractAppConsole
 {
 
 	protected $helpOptions = ['h', 'help', '?'];
@@ -51,7 +51,7 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		$a = \get_app();
+		$a = $this->app;
 
 		$phpfile = realpath($this->getArgument(0));
 

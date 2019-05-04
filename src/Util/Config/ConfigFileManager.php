@@ -2,6 +2,8 @@
 
 namespace Friendica\Util\Config;
 
+use Friendica\Util\BasePath;
+
 /**
  * An abstract class in case of handling with config files
  */
@@ -35,12 +37,12 @@ abstract class ConfigFileManager
 	protected $configDir;
 
 	/**
-	 * @param string $baseDir The base directory of Friendica
+	 * @param BasePath $basePath The base directory of Friendica
 	 */
-	public function __construct($baseDir)
+	public function __construct(BasePath $basePath)
 	{
-		$this->baseDir = $baseDir;
-		$this->configDir = $baseDir . DIRECTORY_SEPARATOR . self::SUBDIRECTORY;
+		$this->baseDir = $basePath->getPath();
+		$this->configDir = $this->baseDir . DIRECTORY_SEPARATOR . self::SUBDIRECTORY;
 	}
 
 	/**

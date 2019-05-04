@@ -2,6 +2,7 @@
 
 namespace Friendica\Util;
 
+use Friendica\Core\Config\Cache\IConfigCache;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -55,13 +56,15 @@ class Profiler implements ContainerInterface
 	}
 
 	/**
-	 * @param bool $enabled           True, if the Profiler is enabled
-	 * @param bool $renderTime        True, if the Profiler should measure the whole rendertime including functions
+	 * @param IConfigCache $configCache
 	 */
-	public function __construct($enabled = false, $renderTime = false)
+	public function __construct(IConfigCache $configCache)
 	{
-		$this->enabled = $enabled;
-		$this->rendertime = $renderTime;
+		$enabled = $configCache->get('system', 'profiler');
+		$this->enabled = isset($enabled) && $enabled !== '0';
+		$renderTime = $configCache->get('rendertime', 'callstack');
+		$this->rendertime = isset($renderTime) && $renderTime !== '0';
+
 		$this->reset();
 	}
 

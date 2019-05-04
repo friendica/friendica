@@ -3,9 +3,7 @@
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-use Friendica\Factory;
+$dice = new \Dice\Dice();
+$dice = $dice->addRules(include dirname(__DIR__) . '/static/dependencies.conf.php');
 
-$a = Factory\DependencyFactory::setUp('console', dirname(__DIR__));
-\Friendica\BaseObject::setApp($a);
-
-(new Friendica\Core\Console($argv))->execute();
+(new Friendica\Core\Console($dice, $argv))->execute();

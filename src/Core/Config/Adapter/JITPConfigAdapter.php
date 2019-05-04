@@ -1,8 +1,6 @@
 <?php
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Database\DBA;
-
 /**
  * JustInTime User Configuration Adapter
  *
@@ -25,9 +23,11 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 			return $return;
 		}
 
-		$pconfigs = DBA::select('pconfig', ['v', 'k'], ['cat' => $cat, 'uid' => $uid]);
-		if (DBA::isResult($pconfigs)) {
-			while ($pconfig = DBA::fetch($pconfigs)) {
+		$database = $this->database;
+
+		$pconfigs = $database->select('pconfig', ['v', 'k'], ['cat' => $cat, 'uid' => $uid]);
+		if ($database->isResult($pconfigs)) {
+			while ($pconfig = $database->fetch($pconfigs)) {
 				$key = $pconfig['k'];
 				$value = $this->toConfigValue($pconfig['v']);
 
@@ -42,7 +42,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 			// Negative caching
 			$return = null;
 		}
-		DBA::close($pconfigs);
+		$database->close($pconfigs);
 
 		return [$cat => $return];
 	}
@@ -63,8 +63,10 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 			$this->in_db[$uid][$cat][$key] = true;
 		}
 
-		$pconfig = DBA::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($pconfig)) {
+		$database = $this->database;
+
+		$pconfig = $database->selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
+		if ($database->isResult($pconfig)) {
 			$value = $this->toConfigValue($pconfig['v']);
 
 			if (isset($value)) {
@@ -108,7 +110,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 		// manage array value
 		$dbvalue = (is_array($value) ? serialize($value) : $value);
 
-		$result = DBA::update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $key], true);
+		$result = $this->database->update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $key], true);
 
 		$this->in_db[$uid][$cat][$key] = $result;
 
@@ -128,7 +130,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 			unset($this->in_db[$uid][$cat][$key]);
 		}
 
-		return DBA::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
+		return $this->database->delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
 	}
 
 	/**

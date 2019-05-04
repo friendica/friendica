@@ -7,7 +7,7 @@ namespace Friendica\Console;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class CreateDoxygen extends \Asika\SimpleConsole\Console
+class CreateDoxygen extends AbstractAppConsole
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
