@@ -105,6 +105,6 @@
 		"johnkary/phpunit-speedtrap": "1.1"
 	},
 	"scripts": {
-		"test": "phpunit"
+		"test": "phpunit/phpunit"
 	}
 }
