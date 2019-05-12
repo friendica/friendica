@@ -698,6 +698,8 @@ function item_post(App $a) {
 		Item::setHashtags($datarray);
 	}
 
+	$datarray["body"] = Item::fixPrivatePhotos( $datarray["body"], $datarray["uid"], $datarray, 0 );
+
 	// preview mode - prepare the body for display and send it via json
 	if ($preview) {
 		// We set the datarray ID to -1 because in preview mode the dataray
