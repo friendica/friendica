@@ -123,10 +123,10 @@ function poke_init(App $a)
 	$arr['body']          = '[url=' . $poster['url'] . ']' . $poster['name'] . '[/url]' . ' ' . L10n::t($verbs[$verb][0]) . ' ' . '[url=' . $target['url'] . ']' . $target['name'] . '[/url]';
 
 	$arr['object'] = '<object><type>' . ACTIVITY_OBJ_PERSON . '</type><title>' . $target['name'] . '</title><id>' . $target['url'] . '</id>';
-	$arr['object'] .= '<link>' . XML::escape('<link rel="alternate" type="text/html" href="' . $target['url'] . '" />' . "\n");
+	$arr['object'] .= XML::escape('<link rel="alternate" type="text/html" href="' . $target['url'] . '" />' . "\n");
 
 	$arr['object'] .= XML::escape('<link rel="photo" type="image/jpeg" href="' . $target['photo'] . '" />' . "\n");
-	$arr['object'] .= '</link></object>' . "\n";
+	$arr['object'] .= '</object>' . "\n";
 
 	Item::insert($arr);
 
