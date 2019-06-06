@@ -2,6 +2,8 @@
 
 namespace Friendica\Core\Config\Cache;
 
+use ParagonIE\HiddenString\HiddenString;
+
 /**
  * The Friendica config cache for the application
  * Initial, all *.config.php files are loaded into this cache with the
@@ -15,10 +17,17 @@ class ConfigCache implements IConfigCache, IPConfigCache
 	private $config;
 
 	/**
-	 * @param array $config    A initial config array
+	 * @var bool
 	 */
-	public function __construct(array $config = [])
+	private $hidePasswordOutput;
+
+	/**
+	 * @param array $config    A initial config array
+	 * @param bool  $hidePasswordOutput True, if cache variables should take extra care of password values
+	 */
+	public function __construct(array $config = [], $hidePasswordOutput = true)
 	{
+		$this->hidePasswordOutput = $hidePasswordOutput;
 		$this->load($config);
 	}
 
@@ -84,8 +93,12 @@ class ConfigCache implements IConfigCache, IPConfigCache
 			$this->config[$cat] = [];
 		}
 
-		$this->config[$cat][$key] = $value;
-
+		if ($this->hidePasswordOutput &&
+			$key == 'password') {
+			$this->config[$cat][$key] = new HiddenString($value);
+		} else {
+			$this->config[$cat][$key] = $value;
+		}
 		return true;
 	}
 

@@ -18,7 +18,7 @@ function q($sql) {
 	$args = func_get_args();
 	unset($args[0]);
 
-	if (!DBA::$connected) {
+	if (!DBA::connected()) {
 		return false;
 	}
 

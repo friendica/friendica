@@ -275,4 +275,38 @@ class ConfigCacheTest extends MockedTest
 
 		$this->assertEmpty($configCache->keyDiff($diffConfig));
 	}
+
+	/**
+	 * Test the default hiding of passwords inside the cache
+	 */
+	public function testPasswordHide()
+	{
+		$configCache = new ConfigCache([
+			'database' => [
+				'password' => 'supersecure',
+				'username' => 'notsecured',
+			],
+		]);
+
+		$this->assertEquals('supersecure', $configCache->get('database', 'password'));
+		$this->assertNotEquals('supersecure', print_r($configCache->get('database', 'password'), true));
+		$this->assertEquals('notsecured', print_r($configCache->get('database', 'username'), true));
+	}
+
+	/**
+	 * Test disabling the hiding of passwords inside the cache
+	 */
+	public function testPasswordShow()
+	{
+		$configCache = new ConfigCache([
+			'database' => [
+				'password' => 'supersecure',
+				'username' => 'notsecured',
+			],
+		], false);
+
+		$this->assertEquals('supersecure', $configCache->get('database', 'password'));
+		$this->assertEquals('supersecure', print_r($configCache->get('database', 'password'), true));
+		$this->assertEquals('notsecured', print_r($configCache->get('database', 'username'), true));
+	}
 }

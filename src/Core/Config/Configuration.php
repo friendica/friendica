@@ -88,7 +88,7 @@ class Configuration
 
 			if (isset($dbvalue)) {
 				$this->configCache->set($cat, $key, $dbvalue);
-				return $dbvalue;
+				unset($dbvalue);
 			}
 		}
 

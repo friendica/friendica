@@ -6,6 +6,7 @@ use Friendica\Core\Config\Cache;
 use Friendica\Database;
 use Friendica\Util\Logger\VoidLogger;
 use Friendica\Util\Profiler;
+use ParagonIE\HiddenString\HiddenString;
 
 class DBFactory
 {
@@ -16,14 +17,11 @@ class DBFactory
 	 * @param Profiler           $profiler    The profiler
 	 * @param array              $server      The $_SERVER variables
 	 *
+	 * @return Database\Database
 	 * @throws \Exception if connection went bad
 	 */
 	public static function init(Cache\IConfigCache $configCache, Profiler $profiler, array $server)
 	{
-		if (Database\DBA::connected()) {
-			return;
-		}
-
 		$db_host = $configCache->get('database', 'hostname');
 		$db_user = $configCache->get('database', 'username');
 		$db_pass = $configCache->get('database', 'password');
@@ -45,15 +43,19 @@ class DBFactory
 			} else {
 				$db_user = $server['MYSQL_USER'];
 			}
-			$db_pass = (string) $server['MYSQL_PASSWORD'];
+			$db_pass = new HiddenString((string) $server['MYSQL_PASSWORD']);
 			$db_data = $server['MYSQL_DATABASE'];
 		}
 
-		if (Database\DBA::connect($configCache, $profiler, new VoidLogger(), $db_host, $db_user, $db_pass, $db_data, $charset)) {
+		$database = new Database\Database($configCache, $profiler, new VoidLogger(), $db_host, $db_user, $db_pass, $db_data, $charset);
+
+		if ($database->connected()) {
 			// Loads DB_UPDATE_VERSION constant
 			Database\DBStructure::definition($configCache->get('system', 'basepath'), false);
 		}
 
 		unset($db_host, $db_user, $db_pass, $db_data, $charset);
+
+		return $database;
 	}
 }
