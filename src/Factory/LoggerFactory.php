@@ -4,6 +4,7 @@ namespace Friendica\Factory;
 
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Logger;
+use Friendica\Database\Database;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Introspection;
 use Friendica\Util\Logger\Monolog\DevelopHandler;
@@ -47,10 +48,11 @@ class LoggerFactory
 	 * @throws \Exception
 	 * @throws InternalServerErrorException
 	 */
-	public static function create($channel, Configuration $config, Profiler $profiler)
+	public static function create($channel, Database $database, Configuration $config, Profiler $profiler)
 	{
 		if (empty($config->get('system', 'debugging', false))) {
 			$logger = new VoidLogger();
+			$database->setLogger($logger);
 			Logger::init($logger);
 			return $logger;
 		}
@@ -101,6 +103,7 @@ class LoggerFactory
 			$logger = new ProfilerLogger($logger, $profiler);
 		}
 
+		$database->setLogger($logger);
 		Logger::init($logger);
 
 		return $logger;

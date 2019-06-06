@@ -12,6 +12,7 @@ use Friendica\Core\Config\Cache\IConfigCache;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Hook;
 use Friendica\Core\Theme;
+use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
@@ -123,6 +124,11 @@ class App
 	private $profiler;
 
 	/**
+	 * @var Database The Friendica database connection
+	 */
+	private $database;
+
+	/**
 	 * Returns the current config cache of this node
 	 *
 	 * @return IConfigCache
@@ -194,6 +200,14 @@ class App
 	}
 
 	/**
+	 * @return Database
+	 */
+	public function getDatabase()
+	{
+		return $this->database;
+	}
+
+	/**
 	 * Register a stylesheet file path to be included in the <head> tag of every page.
 	 * Inclusion is done in App->initHead().
 	 * The path can be absolute or relative to the Friendica installation base folder.
@@ -232,6 +246,7 @@ class App
 	/**
 	 * @brief App constructor.
 	 *
+	 * @param Database $database The Friendica Database
 	 * @param Configuration    $config    The Configuration
 	 * @param App\Mode         $mode      The mode of this Friendica app
 	 * @param App\Router       $router    The router of this Friendica app
@@ -242,10 +257,11 @@ class App
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
+	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
 	{
 		BaseObject::setApp($this);
 
+		$this->database = $database;
 		$this->config   = $config;
 		$this->mode     = $mode;
 		$this->router   = $router;
