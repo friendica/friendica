@@ -882,7 +882,6 @@ function conversation_add_children(array $parents, $block_authors, $order, $uid)
 
 function item_photo_menu($item) {
 	$sub_link = '';
-	$poke_link = '';
 	$contact_url = '';
 	$pm_url = '';
 	$status_link = '';
@@ -926,7 +925,6 @@ function item_photo_menu($item) {
 	}
 
 	if ($cid && !$item['self']) {
-		$poke_link = 'poke/?f=&c=' . $cid;
 		$contact_url = 'contact/' . $cid;
 		$posts_link = 'contact/' . $cid . '/posts';
 
@@ -947,10 +945,6 @@ function item_photo_menu($item) {
 			L10n::t('Block') => $block_link,
 			L10n::t('Ignore') => $ignore_link
 		];
-
-		if ($network == Protocol::DFRN) {
-			$menu[L10n::t("Poke")] = $poke_link;
-		}
 
 		if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
 			in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::OSTATUS, Protocol::DIASPORA])) {

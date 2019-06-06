@@ -2647,13 +2647,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .photo-album-actions .photos-order-link {
     float: right;
 }
-/* poke */
-#poke-desc {
-    margin: 5px 0 30px;
-}
-#poke-wrapper-end {
-    clear: both;
-}
 
 /* Events page */
 

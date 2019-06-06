@@ -590,10 +590,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
     Hook::callAll('home_init', $ret);
     Hook::callAll("home_content", $content);
 
-### mod/poke.php
-
-    Hook::callAll('post_local_end', $arr);
-
 ### mod/contacts.php
 
     Hook::callAll('contact_edit_post', $_POST);

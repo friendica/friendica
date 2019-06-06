@@ -119,7 +119,7 @@ function frio_item_photo_links(App $a, &$body_info)
 function frio_item_photo_menu(App $a, &$arr)
 {
 	foreach ($arr['menu'] as $k => $v) {
-		if (strpos($v, 'poke/?f=&c=') === 0 || strpos($v, 'message/new/') === 0) {
+		if (strpos($v, 'message/new/') === 0) {
 			$v = 'javascript:addToModal(\'' . $v . '\'); return false;';
 			$arr['menu'][$k] = $v;
 		}
@@ -142,13 +142,7 @@ function frio_contact_photo_menu(App $a, &$args)
 {
 	$cid = $args['contact']['id'];
 
-	if (!empty($args['menu']['poke'])) {
-		$pokelink = $args['menu']['poke'][1];
-	} else {
-		$pokelink = '';
-	}
-
-	if (!empty($args['menu']['poke'])) {
+	if (!empty($args['menu']['pm'])) {
 		$pmlink = $args['menu']['pm'][1];
 	} else {
 		$pmlink = '';
@@ -170,13 +164,9 @@ function frio_contact_photo_menu(App $a, &$args)
 		}
 	}
 
-	// Add to pm and poke links a new key with the value 'modal'.
+	// Add to pm link a new key with the value 'modal'.
 	// Later we can make conditions in the corresponing templates (e.g.
 	// contact_template.tpl)
-	if (strpos($pokelink, 'poke/?f=&c=' . $cid) !== false) {
-		$args['menu']['poke'][3] = 'modal';
-	}
-
 	if (strpos($pmlink, 'message/new/' . $cid) !== false) {
 		$args['menu']['pm'][3] = 'modal';
 	}

@@ -396,30 +396,4 @@ class L10n extends BaseObject
 
 		return $ret;
 	}
-
-	/**
-	 * Load poke verbs
-	 *
-	 * @return array index is present tense verb
-	 *                 value is array containing past tense verb, translation of present, translation of past
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 * @hook poke_verbs pokes array
-	 */
-	public static function getPokeVerbs()
-	{
-		// index is present tense verb
-		// value is array containing past tense verb, translation of present, translation of past
-		$arr = [
-			'poke' => ['poked', self::t('poke'), self::t('poked')],
-			'ping' => ['pinged', self::t('ping'), self::t('pinged')],
-			'prod' => ['prodded', self::t('prod'), self::t('prodded')],
-			'slap' => ['slapped', self::t('slap'), self::t('slapped')],
-			'finger' => ['fingered', self::t('finger'), self::t('fingered')],
-			'rebuff' => ['rebuffed', self::t('rebuff'), self::t('rebuffed')],
-		];
-
-		Hook::callAll('poke_verbs', $arr);
-
-		return $arr;
-	}
 }

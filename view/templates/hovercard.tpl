@@ -18,11 +18,10 @@
 
 			</div>
 			<div class="hover-card-actions  right-aligned">
-				{{* here are the differnt actions like privat message, poke, delete and so on *}}
+				{{* here are the differnt actions like private message, delete and so on *}}
 				{{* @todo we have two different photo menus one for contacts and one for items at the network stream. We currently use the contact photo menu, so the items options are missing We need to move them *}}
 				<div class="hover-card-actions-social">
 					{{if $profile.actions.pm}}<a class="btn btn-labeled btn-primary btn-sm add-to-modal" href="{{$profile.actions.pm.1}}" aria-label="{{$profile.actions.pm.0}}"><i class="fa fa-envelope" aria-hidden="true" title="{{$profile.actions.pm.0}}"></i><span class="sr-only">{{$profile.actions.pm.0}}</span></a>{{/if}}
-					{{if $profile.actions.poke}}<a class="btn btn-labeled btn-primary btn-sm add-to-modal" href="{{$profile.actions.poke.1}}" aria-label="{{$profile.actions.poke.0}}"><i class="fa fa-heartbeat" aria-hidden="true" title="{{$profile.actions.poke.0}}"></i><span class="sr-only">{{$profile.actions.poke.0}}</span></a>{{/if}}
 				</div>
 				<div class="hover-card-actions-connection">
 					{{if $profile.actions.network}}<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.network.1}}" aria-label="{{$profile.actions.network.0}}" title="{{$profile.actions.network.0}}"><i class="fa fa-cloud" aria-hidden="true"></i></a>{{/if}}

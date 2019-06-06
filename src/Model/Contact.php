@@ -1039,7 +1039,6 @@ class Contact extends BaseObject
 		$status_link = '';
 		$photos_link = '';
 		$contact_drop_link = '';
-		$poke_link = '';
 
 		if ($uid == 0) {
 			$uid = local_user();
@@ -1082,10 +1081,6 @@ class Contact extends BaseObject
 			$pm_url = System::baseUrl() . '/message/new/' . $contact['id'];
 		}
 
-		if (($contact['network'] == Protocol::DFRN) && !$contact['self']) {
-			$poke_link = System::baseUrl() . '/poke/?f=&c=' . $contact['id'];
-		}
-
 		$contact_url = System::baseUrl() . '/contact/' . $contact['id'];
 
 		$posts_link = System::baseUrl() . '/contact/' . $contact['id'] . '/conversations';
@@ -1115,7 +1110,6 @@ class Contact extends BaseObject
 				'edit'    => [L10n::t('View Contact'),  $contact_url,       false],
 				'drop'    => [L10n::t('Drop Contact'),  $contact_drop_link, false],
 				'pm'      => [L10n::t('Send PM'),       $pm_url,            false],
-				'poke'    => [L10n::t('Poke'),          $poke_link,         false],
 			];
 		}
 

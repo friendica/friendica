@@ -48,11 +48,6 @@
 					<i class="fa fa-envelope" aria-hidden="true"></i>
 				</button>
 				{{/if}}
-				{{if $contact.photo_menu.poke}}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.poke.1}}'); return false;" data-toggle="tooltip" title="{{$contact.photo_menu.poke.0}}">
-					<i class="fa fa-heartbeat" aria-hidden="true"></i>
-				</button>
-				{{/if}}
 				{{if $contact.photo_menu.network}}
 				<a class="contact-action-link btn-link" href="{{$contact.photo_menu.network.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.network.0}}">
 					<i class="fa fa-cloud" aria-hidden="true"></i>
@@ -174,11 +169,6 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 				{if $photo_menu.pm}
 				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{$photo_menu.pm.1}')" data-toggle="tooltip" title="{$photo_menu.pm.0}">
 					<i class="fa fa-envelope" aria-hidden="true"></i>
-				</button>
-				{/if}
-				{if $photo_menu.poke}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{$photo_menu.poke.1}')" data-toggle="tooltip" title="{$photo_menu.poke.0}">
-					<i class="fa fa-heartbeat" aria-hidden="true"></i>
 				</button>
 				{/if}
 				{if $photo_menu.network}

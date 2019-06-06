@@ -313,10 +313,6 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
     Hook::callAll('home_init', $ret);
     Hook::callAll("home_content", $content);
 
-### mod/poke.php
-
-    Hook::callAll('post_local_end', $arr);
-
 ### mod/contacts.php
 
     Hook::callAll('contact_edit_post', $_POST);

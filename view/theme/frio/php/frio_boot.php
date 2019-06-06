@@ -62,7 +62,7 @@ function is_modal() {
  */
 function get_modalpage_list() {
 	//Arry of pages wich getting bootstrap modal dialogs
-	$modalpages = ['poke/',
+	$modalpages = [
 			'message/new',
 			'settings/oauth/add',
 			'events/new',
