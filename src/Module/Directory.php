@@ -4,7 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Widget;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -58,7 +58,7 @@ class Directory extends BaseModule
 			$gDirPath = Profile::zrl($dirURL, true);
 		}
 
-		$pager = new Pager($app->query_string, 60);
+		$pager = new RenderedPager($app->query_string, $app->page['page'], 60);
 
 		$profiles = Profile::searchProfiles($pager->getStart(), $pager->getItemsPerPage(), $search);
 

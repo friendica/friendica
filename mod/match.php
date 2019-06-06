@@ -4,7 +4,6 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Pager;
 use Friendica\Content\Widget;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;

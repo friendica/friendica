@@ -6,7 +6,6 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
-use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -21,14 +20,15 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Term;
+use Friendica\Object\Pager;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
+use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
-use Friendica\Util\Temporal;
 use Friendica\Util\Strings;
+use Friendica\Util\Temporal;
 use Friendica\Util\XML;
-use Friendica\Util\Crypto;
 
 function item_extract_images($body) {
 

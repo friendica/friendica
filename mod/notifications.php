@@ -7,7 +7,7 @@
 use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\L10n;
 use Friendica\Core\NotificationsManager;
 use Friendica\Core\Protocol;
@@ -127,7 +127,7 @@ function notifications_content(App $a)
 	}
 
 	// Set the pager
-	$pager = new Pager($a->query_string, $perpage);
+	$pager = new RenderedPager($a->query_string, $a->page['page'], $perpage);
 
 	// Add additional informations (needed for json output)
 	$notifs['items_page'] = $pager->getItemsPerPage();

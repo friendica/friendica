@@ -6,7 +6,7 @@
 use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
@@ -1046,7 +1046,7 @@ function photos_content(App $a)
 			$total = count($r);
 		}
 
-		$pager = new Pager($a->query_string, 20);
+		$pager = new RenderedPager($a->query_string, $a->page['page'], 20);
 
 		/// @TODO I have seen this many times, maybe generalize it script-wide and encapsulate it?
 		$order_field = defaults($_GET, 'order', '');
@@ -1325,7 +1325,7 @@ function photos_content(App $a)
 			$condition = ["`parent` = ? AND `parent` != `id`",  $link_item['parent']];
 			$total = DBA::count('item', $condition);
 
-			$pager = new Pager($a->query_string);
+			$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 			$params = ['order' => ['id'], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 			$result = Item::selectForUser($link_item['uid'], Item::ITEM_FIELDLIST, $condition, $params);
@@ -1586,7 +1586,7 @@ function photos_content(App $a)
 		$total = count($r);
 	}
 
-	$pager = new Pager($a->query_string, 20);
+	$pager = new RenderedPager($a->query_string, $a->page['page'], 20);
 
 	$r = q("SELECT `resource-id`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`filename`) AS `filename`,
 		ANY_VALUE(`type`) AS `type`, ANY_VALUE(`album`) AS `album`, max(`scale`) AS `scale`,

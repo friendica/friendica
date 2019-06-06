@@ -5,7 +5,7 @@ namespace Friendica\Module\Profile;
 use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -68,7 +68,7 @@ class Contacts extends BaseModule
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager($a->query_string);
+		$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 		$params = ['order' => ['name' => false], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 

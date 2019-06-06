@@ -2,7 +2,7 @@
 
 namespace Friendica\Module\Admin;
 
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
@@ -180,7 +180,7 @@ class Users extends BaseAdminModule
 		/* get pending */
 		$pending = Register::getPending();
 
-		$pager = new Pager($a->query_string, 100);
+		$pager = new RenderedPager($a->query_string, $a->page['page'], 100);
 
 		// @TODO Move below block to Model\User::getUsers($start, $count, $order = 'contact.name', $order_direction = '+')
 		$valid_orders = [

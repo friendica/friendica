@@ -5,7 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -53,7 +53,7 @@ function notes_content(App $a, $update = false)
 	$condition = ['uid' => local_user(), 'post-type' => Item::PT_PERSONAL_NOTE, 'gravity' => GRAVITY_PARENT,
 		'contact-id'=> $a->contact['id']];
 
-	$pager = new Pager($a->query_string, 40);
+	$pager = new RenderedPager($a->query_string, $a->page['page'], 40);
 
 	$params = ['order' => ['created' => true],
 		'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];

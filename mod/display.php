@@ -4,7 +4,6 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\ACL;
@@ -21,6 +20,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Objects;
 use Friendica\Network\HTTPException;
+use Friendica\Object\Pager;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\DFRN;
 use Friendica\Util\Strings;
@@ -353,7 +353,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$o .= "<script> var netargs = '?f=&item_id=" . $item_id . "'; </script>";
 	}
 
-	$o .= conversation($a, [$item], new Pager($a->query_string), 'display', $update_uid, false, 'commented', $item_uid);
+	$o .= conversation($a, [$item], new Pager($a->page['page']), 'display', $update_uid, false, 'commented', $item_uid);
 
 	// Preparing the meta header
 	$description = trim(HTML::toPlaintext(BBCode::convert($item["body"], false), 0, true));
