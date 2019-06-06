@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
@@ -768,7 +768,7 @@ class Contact extends BaseModule
 		if (DBA::isResult($r)) {
 			$total = $r[0]['total'];
 		}
-		$pager = new Pager($a->query_string);
+		$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 		$sql_extra3 = Widget::unavailableNetworks();
 
@@ -824,7 +824,7 @@ class Contact extends BaseModule
 				'contacts_batch_drop'    => L10n::t('Delete'),
 			],
 			'$h_batch_actions' => L10n::t('Batch Actions'),
-			'$paginate'   => $pager->renderFull($total),
+			'$paginate'   =>  $pager->renderFull($total),
 		]);
 
 		return $o;

@@ -5,14 +5,13 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 
@@ -154,7 +153,7 @@ function community_content(App $a, $update = 0)
 		$itemspage_network = $a->force_max_items;
 	}
 
-	$pager = new Pager($a->query_string, $itemspage_network);
+	$pager = new RenderedPager($a->query_string, $a->page['page'], $itemspage_network);
 
 	$r = community_getitems($pager->getStart(), $pager->getItemsPerPage(), $content, $accounttype);
 

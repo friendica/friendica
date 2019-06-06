@@ -5,7 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\BaseObject;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -1586,7 +1586,7 @@ class Contact extends BaseObject
 				$cid, GRAVITY_PARENT, GRAVITY_COMMENT, local_user()];
 		}
 
-		$pager = new Pager($a->query_string);
+		$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 		$params = ['order' => ['created' => true],
 			'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];

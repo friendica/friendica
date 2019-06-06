@@ -4,7 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
@@ -258,7 +258,7 @@ class Profile extends BaseModule
 				return '';
 			}
 
-			$pager = new Pager($a->query_string);
+			$pager = new RenderedPager($a->query_string, $a->page['page']);
 		} else {
 			$sql_post_table = "";
 
@@ -302,7 +302,7 @@ class Profile extends BaseModule
 				$itemspage_network = $a->force_max_items;
 			}
 
-			$pager = new Pager($a->query_string, $itemspage_network);
+			$pager = new RenderedPager($a->query_string, $a->page['page'], $itemspage_network);
 
 			$pager_sql = sprintf(" LIMIT %d, %d ", $pager->getStart(), $pager->getItemsPerPage());
 

@@ -8,9 +8,9 @@ use Friendica\App;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
-use Friendica\Content\Widget;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Text\HTML;
+use Friendica\Content\Widget;
 use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -26,6 +26,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Term;
 use Friendica\Module\Login;
+use Friendica\Object\Pager;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -322,7 +323,7 @@ function networkSetSeen($condition)
  *
  * @param App     $a      The global App
  * @param array   $items  Items of the conversation
- * @param Pager   $pager
+ * @param RenderedPager   $pager
  * @param string  $mode   Display mode for the conversation
  * @param integer $update Used for the automatic reloading
  * @param string  $ordering
@@ -330,7 +331,7 @@ function networkSetSeen($condition)
  * @throws ImagickException
  * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
-function networkConversation(App $a, $items, Pager $pager, $mode, $update, $ordering = '')
+function networkConversation(App $a, $items, RenderedPager $pager, $mode, $update, $ordering = '')
 {
 	// Set this so that the conversation function can find out contact info for our wall-wall items
 	$a->page_contact = $a->contact;
@@ -440,7 +441,7 @@ function networkFlatView(App $a, $update = 0)
 		}
 	}
 
-	$pager = new Pager($a->query_string);
+	$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 	networkPager($a, $pager, $update);
 
@@ -732,7 +733,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$sql_range = '';
 	}
 
-	$pager = new Pager($a->query_string);
+	$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 	$pager_sql = networkPager($a, $pager, $update);
 

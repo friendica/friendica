@@ -4,16 +4,15 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Core\Search;
 use Friendica\Model;
 use Friendica\Network\HTTPException;
+use Friendica\Object\Pager;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;
 use Friendica\Util\Proxy as ProxyUtils;
-use Friendica\Util\Strings;
 
 /**
  * Base class for search modules
@@ -154,11 +153,13 @@ class BaseSearchModule extends BaseModule
 			}
 		}
 
+		$renderedPager = RenderedPager::createByPager($a->query_string, $pager);
+
 		$tpl = Renderer::getMarkupTemplate('viewcontact_template.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'title'     => $header,
 			'$contacts' => $entries,
-			'$paginate' => $pager->renderFull($results->getTotal()),
+			'$paginate' => $renderedPager->renderFull($results->getTotal()),
 		]);
 	}
 }

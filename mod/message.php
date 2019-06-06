@@ -5,7 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
@@ -281,7 +281,7 @@ function message_content(App $a)
 			$total = $r[0]['total'];
 		}
 
-		$pager = new Pager($a->query_string);
+		$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 		$r = get_messages(local_user(), $pager->getStart(), $pager->getItemsPerPage());
 

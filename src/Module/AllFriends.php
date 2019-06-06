@@ -4,7 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Model;
@@ -48,7 +48,7 @@ class AllFriends extends BaseModule
 
 		$total = Model\GContact::countAllFriends(local_user(), $cid);
 
-		$pager = new Pager($app->query_string);
+		$pager = new RenderedPager($app->query_string, $app->page['page']);
 
 		$friends = Model\GContact::allFriends(local_user(), $cid, $pager->getStart(), $pager->getItemsPerPage());
 		if (empty($friends)) {

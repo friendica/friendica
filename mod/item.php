@@ -16,7 +16,6 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
@@ -34,6 +33,7 @@ use Friendica\Model\FileTag;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Term;
+use Friendica\Object\Pager;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
 use Friendica\Util\DateTimeFormat;
@@ -704,7 +704,7 @@ function item_post(App $a) {
 		$datarray["item_id"] = -1;
 		$datarray["author-network"] = Protocol::DFRN;
 
-		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager($a->query_string), 'search', false, true);
+		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager($a->page['page']), 'search', false, true);
 		Logger::log('preview: ' . $o);
 		echo json_encode(['preview' => $o]);
 		exit();

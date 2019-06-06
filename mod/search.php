@@ -5,7 +5,7 @@
 
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
@@ -178,7 +178,7 @@ function search_content(App $a) {
 	// OR your own posts if you are a logged in member
 	// No items will be shown if the member has a blocked profile wall.
 
-	$pager = new Pager($a->query_string);
+	$pager = new RenderedPager($a->query_string, $a->page['page']);
 
 	if ($tag) {
 		Logger::log("Start tag search for '".$search."'", Logger::DEBUG);

@@ -2,12 +2,12 @@
 
 namespace Friendica\Module\Admin\Blocklist;
 
-use Friendica\Content\Pager;
+use Friendica\Content\RenderedPager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\Module\BaseAdminModule;
 use Friendica\Model;
+use Friendica\Module\BaseAdminModule;
 
 class Contact extends BaseAdminModule
 {
@@ -51,7 +51,7 @@ class Contact extends BaseAdminModule
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager($a->query_string, 30);
+		$pager = new RenderedPager($a->query_string, $a->page['page'], 30);
 
 		$contacts = Model\Contact::select([], $condition, ['limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
 

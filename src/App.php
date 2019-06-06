@@ -359,6 +359,8 @@ class App
 		$this->loadDefaultTimezone();
 
 		Core\L10n::init();
+
+		$this->page['page'] = defaults($_GET, 'page', 1);
 	}
 
 	/**

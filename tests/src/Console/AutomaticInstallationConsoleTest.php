@@ -356,7 +356,7 @@ FIN;
 		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', \Mockery::any(), false, '', 1);
+		$this->mockReplaceMacros('testTemplate', \Mockery::any(), '', 1);
 
 		$console = new AutomaticInstallation($this->consoleArgv);
 		$console->setOption('url', 'http://friendica.local');
@@ -458,7 +458,7 @@ CONF;
 		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', \Mockery::any(), false, '', 1);
+		$this->mockReplaceMacros('testTemplate', \Mockery::any(), '', 1);
 
 		$this->assertTrue(putenv('MYSQL_HOST='     . $data['database']['hostname']));
 		$this->assertTrue(putenv('MYSQL_PORT='     . $data['database']['port']));
@@ -496,7 +496,7 @@ CONF;
 		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', \Mockery::any(), false, '', 1);
+		$this->mockReplaceMacros('testTemplate', \Mockery::any(), '', 1);
 
 		$this->assertTrue(putenv('MYSQL_HOST=' . $data['database']['hostname']));
 		$this->assertTrue(putenv('MYSQL_PORT=' . $data['database']['port']));
@@ -532,7 +532,7 @@ CONF;
 		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', \Mockery::any(), false, '', 1);
+		$this->mockReplaceMacros('testTemplate', \Mockery::any(), '', 1);
 
 		$console = new AutomaticInstallation($this->consoleArgv);
 
@@ -567,7 +567,7 @@ CONF;
 		$this->mockConnect(false, 1);
 
 		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', \Mockery::any(), false, '', 1);
+		$this->mockReplaceMacros('testTemplate', \Mockery::any(), '', 1);
 
 		$console = new AutomaticInstallation($this->consoleArgv);
 		$console->setOption('url', 'http://friendica.local');

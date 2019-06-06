@@ -37,11 +37,10 @@ trait RendererMockTrait
 	 *
 	 * @param string              $template     The template to use (normally, it is the mock result of 'mockGetMarkupTemplate()'
 	 * @param array|\Closure|null $args         The arguments to pass to the macro
-	 * @param bool                $overwriteURL if the URL should get overwritten
 	 * @param string              $return       the return value of the mock
 	 * @param null|int            $times        How often the method will get used
 	 */
-	public function mockReplaceMacros($template, $args = null, $overwriteURL = true, $return = '', $times = null)
+	public function mockReplaceMacros($template, $args = null, $return = '', $times = null)
 	{
 		if (!isset($this->rendererMock)) {
 			$this->rendererMock = \Mockery::mock('alias:' . Renderer::class);
@@ -51,18 +50,10 @@ trait RendererMockTrait
 			$args = [];
 		}
 
-		if ($overwriteURL) {
-			$this->rendererMock
-				->shouldReceive('replaceMacros')
-				->with($template, $args)
-				->times($times)
-				->andReturn($return);
-		} else {
-			$this->rendererMock
-				->shouldReceive('replaceMacros')
-				->with($template, $args, false)
-				->times($times)
-				->andReturn($return);
-		}
+		$this->rendererMock
+			->shouldReceive('replaceMacros')
+			->with($template, $args)
+			->times($times)
+			->andReturn($return);
 	}
 }
