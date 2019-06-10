@@ -29,8 +29,6 @@ return [
 		'substitutions' => [
 			Config\Cache\IConfigCache::class      => Config\Cache\ConfigCache::class,
 			Config\Cache\IPConfigCache::class     => Config\Cache\ConfigCache::class,
-			Config\Adapter\IConfigAdapter::class  => Config\Adapter\JITConfigAdapter::class,
-			Config\Adapter\IPConfigAdapter::class => Config\Adapter\JITPConfigAdapter::class,
 		],
 	],
 	Util\BasePath::class => [
@@ -57,9 +55,17 @@ return [
 	],
 	Config\Configuration::class => [
 		'shared' => true,
+		'instanceOf' => Factory\ConfigFactory::class,
+		'call' => [
+			['createConfig', [], Dice::CHAIN_CALL],
+		],
 	],
 	Config\PConfiguration::class => [
 		'shared' => true,
+		'instanceOf' => Factory\ConfigFactory::class,
+		'call' => [
+			['createPConfig', [], Dice::CHAIN_CALL],
+		]
 	],
 	Database::class => [
 		'shared' => true,

@@ -4,32 +4,56 @@ namespace Friendica\Test\src\App;
 
 use Friendica\App\Mode;
 use Friendica\Core\Config;
+use Friendica\Database\Database;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\DBAMockTrait;
 use Friendica\Test\Util\VFSTrait;
+use Friendica\Util\BasePath;
+use Mockery\MockInterface;
 
 class ModeTest extends MockedTest
 {
 	use VFSTrait;
 	use DBAMockTrait;
 
+	/**
+	 * @var BasePath|MockInterface
+	 */
+	private $basePathMock;
+
+	/**
+	 * @var Database|MockInterface
+	 */
+	private $databaseMock;
+
+	/**
+	 * @var Config\Cache\ConfigCache|MockInterface
+	 */
+	private $configCacheMock;
+
 	public function setUp()
 	{
 		parent::setUp();
 
 		$this->setUpVfsDir();
+
+		$this->basePathMock = \Mockery::mock(BasePath::class);
+		$this->basePathMock->shouldReceive('getPath')->andReturn($this->root->url())->once();
+
+		$this->databaseMock = \Mockery::mock(Database::class);
+		$this->configCacheMock = \Mockery::mock(Config\Cache\ConfigCache::class);
 	}
 
 	public function testItEmpty()
 	{
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 		$this->assertTrue($mode->isInstall());
 		$this->assertFalse($mode->isNormal());
 	}
 
 	public function testWithoutConfig()
 	{
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 
 		$this->assertTrue($this->root->hasChild('config/local.config.php'));
 
@@ -45,15 +69,11 @@ class ModeTest extends MockedTest
 		$this->assertFalse($mode->has(Mode::LOCALCONFIGPRESENT));
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function testWithoutDatabase()
 	{
-		$this->mockConnected(false, 1);
+		$this->databaseMock->shouldReceive('connected')->andReturn(false)->once();
 
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 		$mode->determine();
 
 		$this->assertFalse($mode->isNormal());
@@ -63,16 +83,13 @@ class ModeTest extends MockedTest
 		$this->assertFalse($mode->has(Mode::DBAVAILABLE));
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function testWithoutDatabaseSetup()
 	{
-		$this->mockConnected(true, 1);
-		$this->mockFetchFirst('SHOW TABLES LIKE \'config\'', false, 1);
+		$this->databaseMock->shouldReceive('connected')->andReturn(true)->once();
+		$this->databaseMock->shouldReceive('fetchFirst')
+		                   ->with('SHOW TABLES LIKE \'config\'')->andReturn(false)->once();
 
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 		$mode->determine();
 
 		$this->assertFalse($mode->isNormal());
@@ -81,25 +98,15 @@ class ModeTest extends MockedTest
 		$this->assertTrue($mode->has(Mode::LOCALCONFIGPRESENT));
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function testWithMaintenanceMode()
 	{
-		$this->mockConnected(true, 1);
-		$this->mockFetchFirst('SHOW TABLES LIKE \'config\'', true, 1);
+		$this->databaseMock->shouldReceive('connected')->andReturn(true)->once();
+		$this->databaseMock->shouldReceive('fetchFirst')
+		                   ->with('SHOW TABLES LIKE \'config\'')->andReturn(true)->once();
+		$this->configCacheMock->shouldReceive('get')->with('system', 'maintenance')
+			->andReturn(true)->once();
 
-		$config = \Mockery::mock(Config\Configuration::class);
-		$config
-			->shouldReceive('get')
-			->with('system', 'maintenance', null, false)
-			->andReturn(true)
-			->once();
-		// Initialize empty Config
-		Config::init($config);
-
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 		$mode->determine();
 
 		$this->assertFalse($mode->isNormal());
@@ -109,25 +116,18 @@ class ModeTest extends MockedTest
 		$this->assertFalse($mode->has(Mode::MAINTENANCEDISABLED));
 	}
 
-	/**
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 */
 	public function testNormalMode()
 	{
-		$this->mockConnected(true, 1);
-		$this->mockFetchFirst('SHOW TABLES LIKE \'config\'', true, 1);
+		$this->databaseMock->shouldReceive('connected')->andReturn(true)->once();
+		$this->databaseMock->shouldReceive('fetchFirst')
+		                   ->with('SHOW TABLES LIKE \'config\'')->andReturn(true)->once();
+		$this->configCacheMock->shouldReceive('get')->with('system', 'maintenance')
+		                      ->andReturn(false)->once();
+		$this->databaseMock->shouldReceive('selectFirst')
+		                   ->with('config', ['cat' => 'system', 'key' => 'maintenance'])
+		                   ->andReturn(false)->once();
 
-		$config = \Mockery::mock(Config\Configuration::class);
-		$config
-			->shouldReceive('get')
-			->with('system', 'maintenance', null, false)
-			->andReturn(false)
-			->once();
-		// Initialize empty Config
-		Config::init($config);
-
-		$mode = new Mode($this->root->url());
+		$mode = new Mode($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 		$mode->determine();
 
 		$this->assertTrue($mode->isNormal());
