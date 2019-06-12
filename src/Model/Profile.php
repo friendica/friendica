@@ -340,7 +340,9 @@ class Profile
 
 		if (!$local_user_is_self) {
 			if (!$visitor_is_authenticated) {
-				$follow_link = 'dfrn_request/' . $profile['nickname'];
+			    if (!empty($profile['nickname'])) {
+                    $follow_link = 'dfrn_request/' . $profile['nickname'];
+                }
 			} elseif ($profile_is_native) {
 				if ($visitor_is_following) {
 					$unfollow_link = $visitor_base_path . '/unfollow?url=' . urlencode($profile_url);
