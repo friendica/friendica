@@ -322,7 +322,7 @@ class Profile
 		}
 
 		$profile_contact = [];
-		if ($profile['cid'] && self::getMyURL()) {
+		if (!empty($profile['cid']) && self::getMyURL()) {
 			$profile_contact = Contact::selectFirst(['rel'], ['id' => $profile['cid']]);
 		}
 
