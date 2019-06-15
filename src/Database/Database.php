@@ -37,6 +37,7 @@ class Database
 	 */
 	private $logger;
 	private $server_info    = '';
+	/** @var PDO|mysqli */
 	private $connection;
 	private $driver;
 	private $error          = false;
@@ -473,6 +474,7 @@ class Database
 					break;
 				}
 
+				/** @var $stmt mysqli_stmt|PDOStatement */
 				if (!$stmt = $this->connection->prepare($sql)) {
 					$errorInfo     = $this->connection->errorInfo();
 					$this->error   = $errorInfo[2];
