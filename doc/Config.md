@@ -33,14 +33,23 @@ return [
 
 ### Configuration location
 
-The `config` directory holds key configuration files:
+The `config` directory holds key configuration files and can have different config files.
+All of them have to end with `.config.php` and must not include `-sample` in their name.
 
-- `defaults.config.php` holds the default values for all the configuration keys that can only be set in `local.config.php`.
-- `settings.config.php` holds the default values for some configuration keys that are set through the admin settings page.
+Some examples of common known configuration files:
 - `local.config.php` holds the current node custom configuration.
 - `addon.config.php` is optional and holds the custom configuration for specific addons.
 
 Addons can define their own default configuration values in `addon/[addon]/config/[addon].config.php` which is loaded when the addon is activated.
+
+### Static Configuration location
+
+The `static` directory holds the codebase default configurations files.
+They must not be changed by users, because they can get changed from release to release.
+
+Currently, the following configurations are included:
+- `defaults.config.php` holds the default values for all the configuration keys that can only be set in `local.config.php`.
+- `settings.config.php` holds the default values for some configuration keys that are set through the admin settings page.
 
 #### Migrating from .htconfig.php to config/local.config.php
 
@@ -292,7 +301,7 @@ Or it is for testing purposes only.
 **Attention:** Please be warned that you shouldn't use one of these values without the knowledge what it could trigger.
 Especially don't do that with undocumented values.
 
-These configurations keys and their default value are listed in `config/defaults.config.php` and should be overwritten in `config/local.config.php`.
+These configurations keys and their default value are listed in `static/defaults.config.php` and should be overwritten in `config/local.config.php`.
 
 ## Administrator Options
 

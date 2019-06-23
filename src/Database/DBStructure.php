@@ -96,7 +96,7 @@ class DBStructure
 	 * Loads the database structure definition from the config/dbstructure.config.php file.
 	 * On first pass, defines DB_UPDATE_VERSION constant.
 	 *
-	 * @see config/dbstructure.config.php
+	 * @see static/dbstructure.config.php
 	 * @param boolean $with_addons_structure Whether to tack on addons additional tables
 	 * @param string  $basePath              The base path of this application
 	 * @return array
@@ -106,16 +106,16 @@ class DBStructure
 	{
 		if (!self::$definition) {
 
-			$filename = $basePath . '/config/dbstructure.config.php';
+			$filename = $basePath . '/static/dbstructure.config.php';
 
 			if (!is_readable($filename)) {
-				throw new Exception('Missing database structure config file config/dbstructure.config.php');
+				throw new Exception('Missing database structure config file static/dbstructure.config.php');
 			}
 
 			$definition = require $filename;
 
 			if (!$definition) {
-				throw new Exception('Corrupted database structure config file config/dbstructure.config.php');
+				throw new Exception('Corrupted database structure config file static/dbstructure.config.php');
 			}
 
 			self::$definition = $definition;

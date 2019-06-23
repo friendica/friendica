@@ -14,7 +14,7 @@ use Friendica\Factory;
 use Friendica\Network\HTTPException;
 use Friendica\Util\BasePath;
 use Friendica\Util\BaseURL;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use Monolog\Handler\TestHandler;
 
 require_once __DIR__ . '/../../include/api.php';

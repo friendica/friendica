@@ -9,7 +9,7 @@ use Friendica\App;
 use Friendica\Database\DBA;
 use Friendica\Factory;
 use Friendica\Util\BasePath;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\Logger\VoidLogger;
 use Friendica\Util\Profiler;
 use PHPUnit\DbUnit\DataSet\YamlDataSet;

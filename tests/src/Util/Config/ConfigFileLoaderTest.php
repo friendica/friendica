@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 
@@ -73,7 +73,7 @@ class ConfigFileLoaderTest extends MockedTest
 			'..' . DIRECTORY_SEPARATOR .
 			'datasets' . DIRECTORY_SEPARATOR .
 			'config' . DIRECTORY_SEPARATOR .
-			'local.config.php';
+			'A.config.php';
 
 		vfsStream::newFile('local.config.php')
 			->at($this->root->getChild('config'))
@@ -105,7 +105,7 @@ class ConfigFileLoaderTest extends MockedTest
 			'..' . DIRECTORY_SEPARATOR .
 			'datasets' . DIRECTORY_SEPARATOR .
 			'config' . DIRECTORY_SEPARATOR .
-			'local.ini.php';
+			'A.ini.php';
 
 		vfsStream::newFile('local.ini.php')
 			->at($this->root->getChild('config'))
@@ -185,7 +185,7 @@ class ConfigFileLoaderTest extends MockedTest
 			'..' . DIRECTORY_SEPARATOR .
 			'datasets' . DIRECTORY_SEPARATOR .
 			'config' . DIRECTORY_SEPARATOR .
-			'local.config.php';
+			'A.config.php';
 
 		vfsStream::newFile('test.config.php')
 			->at($this->root->getChild('addon')->getChild('test')->getChild('config'))
@@ -201,5 +201,92 @@ class ConfigFileLoaderTest extends MockedTest
 		$this->assertEquals('testdb', $conf['database']['database']);
 
 		$this->assertEquals('admin@test.it', $conf['config']['admin_email']);
+	}
+
+	/**
+	 * test loading multiple config files - the last config should work
+	 */
+	public function testLoadMultipleConfigs()
+	{
+		$this->delConfigFile('local.config.php');
+
+		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
+		        '..' . DIRECTORY_SEPARATOR .
+		        '..' . DIRECTORY_SEPARATOR .
+		        'datasets' . DIRECTORY_SEPARATOR .
+		        'config' . DIRECTORY_SEPARATOR;
+
+		vfsStream::newFile('A.config.php')
+		         ->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'A.config.php'));
+		vfsStream::newFile('B.config.php')
+				->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'B.config.php'));
+
+		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
+		$configCache = new ConfigCache();
+
+		$configFileLoader->setupCache($configCache);
+
+		$this->assertEquals('admin@overwritten.local', $configCache->get('config', 'admin_email'));
+		$this->assertEquals('newValue', $configCache->get('system', 'newKey'));
+	}
+
+	/**
+	 * test loading multiple config files - the last config should work (INI-version)
+	 */
+	public function testLoadMultipleInis()
+	{
+		$this->delConfigFile('local.config.php');
+
+		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
+		           '..' . DIRECTORY_SEPARATOR .
+		           '..' . DIRECTORY_SEPARATOR .
+		           'datasets' . DIRECTORY_SEPARATOR .
+		           'config' . DIRECTORY_SEPARATOR;
+
+		vfsStream::newFile('A.ini.php')
+		         ->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'A.ini.php'));
+		vfsStream::newFile('B.ini.php')
+		         ->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'B.ini.php'));
+
+		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
+		$configCache = new ConfigCache();
+
+		$configFileLoader->setupCache($configCache);
+
+		$this->assertEquals('admin@overwritten.local', $configCache->get('config', 'admin_email'));
+		$this->assertEquals('newValue', $configCache->get('system', 'newKey'));
+	}
+
+	/**
+	 * Test that sample-files (e.g. local-sample.config.php) is never loaded
+	 */
+	public function testNotLoadingSamples()
+	{
+		$this->delConfigFile('local.config.php');
+
+		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
+		           '..' . DIRECTORY_SEPARATOR .
+		           '..' . DIRECTORY_SEPARATOR .
+		           'datasets' . DIRECTORY_SEPARATOR .
+		           'config' . DIRECTORY_SEPARATOR;
+
+		vfsStream::newFile('A.ini.php')
+		         ->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'A.ini.php'));
+		vfsStream::newFile('B-sample.ini.php')
+		         ->at($this->root->getChild('config'))
+		         ->setContent(file_get_contents($fileDir . 'B.ini.php'));
+
+		$configFileLoader = new ConfigFileLoader($this->root->url(), $this->mode);
+		$configCache = new ConfigCache();
+
+		$configFileLoader->setupCache($configCache);
+
+		$this->assertEquals('admin@test.it', $configCache->get('config', 'admin_email'));
+		$this->assertEmpty($configCache->get('system', 'NewKey'));
 	}
 }

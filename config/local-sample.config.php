@@ -12,7 +12,7 @@
  *
  * Then set the following for your MySQL installation
  *
- * If you're unsure about what any of the config keys below do, please check the config/defaults.config.php file for
+ * If you're unsure about what any of the config keys below do, please check the static/defaults.config.php file for
  * detailed documentation of their data type and behavior.
  */
 

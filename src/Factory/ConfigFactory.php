@@ -6,7 +6,7 @@ use Friendica\Core;
 use Friendica\Core\Config;
 use Friendica\Core\Config\Adapter;
 use Friendica\Core\Config\Cache;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 
 class ConfigFactory
 {

@@ -22,7 +22,7 @@ use Friendica\Worker\Delivery;
  * This function is responsible for doing post update changes to the data
  * (not the structure) in the database.
  *
- * Database structure changes are done in config/dbstructure.config.php
+ * Database structure changes are done in static/dbstructure.config.php
  *
  * If there is a need for a post process to a structure change, update this file
  * by adding a new function at the end with the number of the new DB_UPDATE_VERSION.
@@ -33,8 +33,8 @@ use Friendica\Worker\Delivery;
  * You are currently on version 4711 and you are preparing changes that demand an update script.
  *
  * 1. Create a function "update_4712()" here in the update.php
- * 2. Apply the needed structural changes in config/dbStructure.php
- * 3. Set DB_UPDATE_VERSION in config/dbstructure.config.php to 4712.
+ * 2. Apply the needed structural changes in static/dbStructure.php
+ * 3. Set DB_UPDATE_VERSION in static/dbstructure.config.php to 4712.
  *
  * If you need to run a script before the database update, name the function "pre_update_4712()"
  */

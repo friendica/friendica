@@ -16,7 +16,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
 use Friendica\Util\BaseURL;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
@@ -344,9 +344,6 @@ class App
 		$this->getMode()->determine($this->getBasePath());
 
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
-			$loader = new ConfigFileLoader($this->getBasePath(), $this->getMode());
-			$this->config->getCache()->load($loader->loadCoreConfig('addon'), true);
-
 			$this->profiler->update(
 				$this->config->get('system', 'profiler', false),
 				$this->config->get('rendertime', 'callstack', false));

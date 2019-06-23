@@ -12,7 +12,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdminModule;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 

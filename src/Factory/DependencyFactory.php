@@ -7,7 +7,7 @@ use Friendica\Database\DBA;
 use Friendica\Factory;
 use Friendica\Util\BasePath;
 use Friendica\Util\BaseURL;
-use Friendica\Util\Config;
+use Friendica\Util\ConfigFileLoader;
 
 class DependencyFactory
 {
@@ -27,7 +27,7 @@ class DependencyFactory
 		$basePath = BasePath::create($directory, $_SERVER);
 		$mode = new App\Mode($basePath);
 		$router = new App\Router();
-		$configLoader = new Config\ConfigFileLoader($basePath, $mode);
+		$configLoader = new ConfigFileLoader($basePath, $mode);
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
 		Factory\DBFactory::init($configCache, $profiler, $_SERVER);

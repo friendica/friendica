@@ -8,7 +8,7 @@ use Friendica\Factory;
 use Friendica\Test\DatabaseTest;
 use Friendica\Util\BasePath;
 use Friendica\Util\BaseURL;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 
 class DBStructureTest extends DatabaseTest
 {

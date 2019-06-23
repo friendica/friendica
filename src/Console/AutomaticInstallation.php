@@ -9,7 +9,7 @@ use Friendica\Core\Installer;
 use Friendica\Core\Theme;
 use Friendica\Util\BasePath;
 use Friendica\Util\BaseURL;
-use Friendica\Util\Config\ConfigFileLoader;
+use Friendica\Util\ConfigFileLoader;
 use RuntimeException;
 
 class AutomaticInstallation extends Console

@@ -1,7 +1,8 @@
 <?php
 
-namespace Friendica\Util\Config;
+namespace Friendica\Util;
 
+use Exception;
 use Friendica\App;
 use Friendica\Core\Addon;
 use Friendica\Core\Config\Cache\IConfigCache;
@@ -14,17 +15,66 @@ use Friendica\Core\Config\Cache\IConfigCache;
  * - *.ini.php      (deprecated)
  * - *.htconfig.php (deprecated)
  */
-class ConfigFileLoader extends ConfigFileManager
+class ConfigFileLoader
 {
+	/**
+	 * The Sub directory of the config-files
+	 *
+	 * @var string
+	 */
+	const CONFIG_DIR = 'config';
+
+	/**
+	 * The Sub directory of the static config-files
+	 *
+	 * @var string
+	 */
+	const STATIC_DIR = 'static';
+
+	/**
+	 * The default name of the user defined ini file
+	 *
+	 * @var string
+	 */
+	const CONFIG_INI = 'local';
+
+	/**
+	 * The default name of the user defined legacy config file
+	 *
+	 * @var string
+	 */
+	const CONFIG_HTCONFIG = 'htconfig';
+
+	/**
+	 * The sample string inside the configs, which shouldn't get loaded
+	 *
+	 * @var string
+	 */
+	const SAMPLE_END = '-sample';
+
 	/**
 	 * @var App\Mode
 	 */
 	private $appMode;
+	/**
+	 * @var string
+	 */
+	private $baseDir;
+	/**
+	 * @var string
+	 */
+	private $configDir;
+	/**
+	 * @var string
+	 */
+	private $staticDir;
 
 	public function __construct($baseDir, App\Mode $mode)
 	{
-		parent::__construct($baseDir);
-		$this->appMode = $mode;
+		$this->baseDir   = $baseDir;
+		$this->configDir = $baseDir . DIRECTORY_SEPARATOR . self::CONFIG_DIR;
+		$this->staticDir = $baseDir . DIRECTORY_SEPARATOR . self::STATIC_DIR;
+		$this->appMode   = $mode;
 	}
 
 	/**
@@ -36,17 +86,20 @@ class ConfigFileLoader extends ConfigFileManager
 	 * @param IConfigCache $config The config cache to load to
 	 * @param bool         $raw    Setup the raw config format
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function setupCache(IConfigCache $config, $raw = false)
 	{
-		$config->load($this->loadCoreConfig('defaults'));
-		$config->load($this->loadCoreConfig('settings'));
+		// Load static config files first, the order is important
+		$config->load($this->loadStaticConfig('defaults'));
+		$config->load($this->loadStaticConfig('settings'));
 
+		// try to load the legacy config first
 		$config->load($this->loadLegacyConfig('htpreconfig'), true);
 		$config->load($this->loadLegacyConfig('htconfig'), true);
 
-		$config->load($this->loadCoreConfig('local'), true);
+		// Now load every other config you find inside the 'config/' directory
+		$this->loadCoreConfig($config);
 
 		// In case of install mode, add the found basepath (because there isn't a basepath set yet
 		if (!$raw && ($this->appMode->isInstall() || empty($config->get('system', 'basepath')))) {
@@ -56,23 +109,50 @@ class ConfigFileLoader extends ConfigFileManager
 	}
 
 	/**
-	 * Tries to load the specified core-configuration and returns the config array.
+	 * Tries to load the static core-configuration and returns the config array.
 	 *
-	 * @param string $name The name of the configuration (default is empty, which means 'local')
+	 * @param string $name The name of the configuration
 	 *
 	 * @return array The config array (empty if no config found)
 	 *
-	 * @throws \Exception if the configuration file isn't readable
+	 * @throws Exception if the configuration file isn't readable
 	 */
-	public function loadCoreConfig($name = '')
+	private function loadStaticConfig($name)
 	{
-		if (!empty($this->getConfigFullName($name))) {
-			return $this->loadConfigFile($this->getConfigFullName($name));
-		} elseif (!empty($this->getIniFullName($name))) {
-			return $this->loadINIConfigFile($this->getIniFullName($name));
+		$configName = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.config.php';
+		$iniName    = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.ini.php';
+
+		if (file_exists($configName)) {
+			return $this->loadConfigFile($configName);
+		} elseif (file_exists($iniName)) {
+			return $this->loadINIConfigFile($iniName);
 		} else {
 			return [];
 		}
+	}
+
+	/**
+	 * Tries to load the specified core-configuration into the config cache.
+	 *
+	 * @param IConfigCache $config The Config cache
+	 *
+	 * @return array The config array (empty if no config found)
+	 *
+	 * @throws Exception if the configuration file isn't readable
+	 */
+	private function loadCoreConfig(IConfigCache $config)
+	{
+		// try to load legacy ini-files first
+		foreach ($this->getConfigFiles(true) as $configFile) {
+			$config->load($this->loadINIConfigFile($configFile), true);
+		}
+
+		// try to load supported config at last to overwrite it
+		foreach ($this->getConfigFiles() as $configFile) {
+			$config->load($this->loadConfigFile($configFile), true);
+		}
+
+		return [];
 	}
 
 	/**
@@ -82,21 +162,47 @@ class ConfigFileLoader extends ConfigFileManager
 	 *
 	 * @return array The config array (empty if no config found)
 	 *
-	 * @throws \Exception if the configuration file isn't readable
+	 * @throws Exception if the configuration file isn't readable
 	 */
 	public function loadAddonConfig($name)
 	{
 		$filepath = $this->baseDir . DIRECTORY_SEPARATOR . // /var/www/html/
-			Addon::DIRECTORY       . DIRECTORY_SEPARATOR . // addon/
-			$name                  . DIRECTORY_SEPARATOR . // openstreetmap/
-			self::SUBDIRECTORY     . DIRECTORY_SEPARATOR . // config/
-			$name . ".config.php";                         // openstreetmap.config.php
+		            Addon::DIRECTORY . DIRECTORY_SEPARATOR . // addon/
+		            $name . DIRECTORY_SEPARATOR . // openstreetmap/
+		            self::CONFIG_DIR . DIRECTORY_SEPARATOR . // config/
+		            $name . ".config.php";                         // openstreetmap.config.php
 
 		if (file_exists($filepath)) {
 			return $this->loadConfigFile($filepath);
 		} else {
 			return [];
 		}
+	}
+
+	/**
+	 * Get the config files of the config-directory
+	 *
+	 * @param bool $ini True, if scan for ini-files instead of config files
+	 *
+	 * @return array
+	 */
+	private function getConfigFiles(bool $ini = false)
+	{
+		$files = scandir($this->configDir);
+		$found = array();
+
+		$filePattern = ($ini ? '*.ini.php' : '*.config.php');
+
+		// Don't load sample files
+		$sampleEnd = self::SAMPLE_END . ($ini ? '.ini.php' : '.config.php');
+
+		foreach ($files as $filename) {
+			if (fnmatch($filePattern, $filename) && substr_compare($filename, $sampleEnd, -strlen($sampleEnd))) {
+				$found[] = $this->configDir . '/' . $filename;
+			}
+		}
+
+		return $found;
 	}
 
 	/**
@@ -110,11 +216,14 @@ class ConfigFileLoader extends ConfigFileManager
 	 */
 	private function loadLegacyConfig($name = '')
 	{
+		$name     = !empty($name) ? $name : self::CONFIG_HTCONFIG;
+		$fullName = $this->baseDir . DIRECTORY_SEPARATOR . '.' . $name . '.php';
+
 		$config = [];
-		if (!empty($this->getHtConfigFullName($name))) {
-			$a = new \stdClass();
+		if (file_exists($fullName)) {
+			$a         = new \stdClass();
 			$a->config = [];
-			include $this->getHtConfigFullName($name);
+			include $fullName;
 
 			$htConfigCategories = array_keys($a->config);
 
@@ -172,11 +281,11 @@ class ConfigFileLoader extends ConfigFileManager
 	/**
 	 * Tries to load the specified legacy configuration file and returns the config array.
 	 *
-	 * @deprecated since version 2018.12
 	 * @param string $filepath
 	 *
 	 * @return array The configuration array
-	 * @throws \Exception
+	 * @throws Exception
+	 * @deprecated since version 2018.12
 	 */
 	private function loadINIConfigFile($filepath)
 	{
@@ -185,7 +294,7 @@ class ConfigFileLoader extends ConfigFileManager
 		$config = parse_ini_string($contents, true, INI_SCANNER_TYPED);
 
 		if ($config === false) {
-			throw new \Exception('Error parsing INI config file ' . $filepath);
+			throw new Exception('Error parsing INI config file ' . $filepath);
 		}
 
 		return $config;
@@ -202,17 +311,18 @@ class ConfigFileLoader extends ConfigFileManager
 	 *      ],
 	 * ];
 	 *
-	 * @param  string $filepath The filepath of the
+	 * @param string $filepath The filepath of the
+	 *
 	 * @return array The config array0
 	 *
-	 * @throws \Exception if the config cannot get loaded.
+	 * @throws Exception if the config cannot get loaded.
 	 */
 	private function loadConfigFile($filepath)
 	{
 		$config = include($filepath);
 
 		if (!is_array($config)) {
-			throw new \Exception('Error loading config file ' . $filepath);
+			throw new Exception('Error loading config file ' . $filepath);
 		}
 
 		return $config;
