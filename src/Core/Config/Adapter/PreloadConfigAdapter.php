@@ -13,12 +13,22 @@ use Friendica\Database\DBA;
  */
 class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapter
 {
-	private $config_loaded = false;
+	/**
+	 * @var array Contains the whole node config, loaded on instantiation
+	 */
+	private $config;
+
+	public function __construct()
+	{
+		parent::__construct();
+
+		$this->load();
+	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($cat = 'config')
+	public function load($cat = null)
 	{
 		$return = [];
 
@@ -26,8 +36,8 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return $return;
 		}
 
-		if ($this->config_loaded) {
-			return $return;
+		if ($this->isLoaded()) {
+			return $this->config;
 		}
 
 		$configs = DBA::select('config', ['cat', 'v', 'k']);
@@ -39,7 +49,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 		}
 		DBA::close($configs);
 
-		$this->config_loaded = true;
+		$this->config = $return;
 
 		return $return;
 	}
@@ -53,16 +63,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return null;
 		}
 
-		$config = DBA::selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($config)) {
-			$value = $this->toConfigValue($config['v']);
-
-			if (isset($value)) {
-				return $value;
-			}
-		}
-
-		return null;
+		return $this->config[$cat][$key] ?? null;
 	}
 
 	/**
@@ -84,6 +85,8 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return true;
 		}
 
+		$this->config[$cat][$key] = $value;
+
 		$dbvalue = $this->toDbValue($value);
 
 		return DBA::update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
@@ -98,18 +101,20 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 			return false;
 		}
 
+		unset($this->config[$cat][$key]);
+
 		return DBA::delete('config', ['cat' => $cat, 'k' => $key]);
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($cat, $key)
+	public function isLoaded($cat = null, $key = null)
 	{
 		if (!$this->isConnected()) {
 			return false;
 		}
 
-		return $this->config_loaded;
+		return !empty($this->config);
 	}
 }

@@ -14,28 +14,14 @@ use Friendica\Database\DBA;
 class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdapter
 {
 	/**
-	 * @var array true if config for user is loaded
+	 * @var array Contains the users' config from the DB
 	 */
-	private $config_loaded;
-
-	/**
-	 * @param int $uid The UID of the current user
-	 */
-	public function __construct($uid = null)
-	{
-		parent::__construct();
-
-		$this->config_loaded = [];
-
-		if (isset($uid)) {
-			$this->load($uid, 'config');
-		}
-	}
+	private $config;
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($uid, $cat)
+	public function load($uid, $cat = null)
 	{
 		$return = [];
 
@@ -43,8 +29,8 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 			return $return;
 		}
 
-		if (!$this->isLoaded($uid, $cat, null)) {
-			return $return;
+		if ($this->isLoaded($uid)) {
+			return $this->config[$uid];
 		}
 
 		$pconfigs = DBA::select('pconfig', ['cat', 'v', 'k'], ['uid' => $uid]);
@@ -56,7 +42,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 		}
 		DBA::close($pconfigs);
 
-		$this->config_loaded[$uid] = true;
+		$this->config[$uid] = $return;
 
 		return $return;
 	}
@@ -71,18 +57,10 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 		}
 
 		if (!$this->isLoaded($uid, $cat, $key)) {
-			$this->load($uid, $cat);
+			$this->load($uid);
 		}
 
-		$config = DBA::selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
-		if (DBA::isResult($config)) {
-			$value = $this->toConfigValue($config['v']);
-
-			if (isset($value)) {
-				return $value;
-			}
-		}
-		return null;
+		return $this->config[$uid][$cat][$key] ?? null;
 	}
 
 	/**
@@ -95,8 +73,9 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 		}
 
 		if (!$this->isLoaded($uid, $cat, $key)) {
-			$this->load($uid, $cat);
+			$this->load($uid);
 		}
+
 		// We store our setting values as strings.
 		// So we have to do the conversion here so that the compare below works.
 		// The exception are array values.
@@ -106,6 +85,8 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 		if (isset($stored_value) && $stored_value === $compare_value) {
 			return true;
 		}
+
+		$this->config[$uid][$cat][$key] = $value;
 
 		$dbvalue = $this->toDbValue($value);
 
@@ -121,9 +102,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 			return false;
 		}
 
-		if (!$this->isLoaded($uid, $cat, $key)) {
-			$this->load($uid, $cat);
-		}
+		unset($this->config[$uid][$cat][$key]);
 
 		return DBA::delete('pconfig', ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
 	}
@@ -131,12 +110,12 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($uid, $cat, $key)
+	public function isLoaded($uid, $cat = null, $key = null)
 	{
 		if (!$this->isConnected()) {
 			return false;
 		}
 
-		return isset($this->config_loaded[$uid]) && $this->config_loaded[$uid];
+		return !empty($this->config[$uid]);
 	}
 }

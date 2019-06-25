@@ -46,14 +46,13 @@ class ConfigFactory
 
 	/**
 	 * @param Cache\ConfigCache  $configCache The config cache of this adapter
-	 * @param int                $uid         The UID of the current user
 	 *
 	 * @return Config\PConfiguration
 	 */
-	public static function createPConfig(Cache\ConfigCache $configCache, $uid = null)
+	public static function createPConfig(Cache\ConfigCache $configCache)
 	{
 		if ($configCache->get('system', 'config_adapter') === 'preload') {
-			$configAdapter = new Adapter\PreloadPConfigAdapter($uid);
+			$configAdapter = new Adapter\PreloadPConfigAdapter();
 		} else {
 			$configAdapter = new Adapter\JITPConfigAdapter();
 		}
