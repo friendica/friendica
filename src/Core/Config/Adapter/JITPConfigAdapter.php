@@ -15,7 +15,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($uid, $cat)
+	public function load(string $uid, string $cat)
 	{
 		$return = [];
 
@@ -50,7 +50,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 	 *
 	 * @param bool $mark if true, mark the selection of the current cat/key pair
 	 */
-	public function get($uid, $cat, $key, $mark = true)
+	public function get(string $uid, string $cat, string $key, $mark = true)
 	{
 		if (!$this->isConnected()) {
 			return null;
@@ -77,7 +77,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($uid, $cat, $key, $value)
+	public function set(string $uid, string $cat, string $key, $value)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -116,7 +116,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 	/**
 	 * {@inheritdoc}
 	 */
-	public function delete($uid, $cat, $key)
+	public function delete(string $uid, string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -132,7 +132,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($uid, $cat, $key)
+	public function isLoaded(string $uid, string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;

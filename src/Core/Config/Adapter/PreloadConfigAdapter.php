@@ -2,6 +2,8 @@
 
 namespace Friendica\Core\Config\Adapter;
 
+use Friendica\Network\HTTPException\InternalServerErrorException;
+
 /**
  * Preload Configuration Adapter
  *
@@ -16,7 +18,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($cat = 'config')
+	public function load(string $cat = 'config')
 	{
 		$return = [];
 
@@ -45,28 +47,15 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 	/**
 	 * {@inheritdoc}
 	 */
-	public function get($cat, $key)
+	public function get(string $cat, string $key)
 	{
-		if (!$this->isConnected()) {
-			return null;
-		}
-
-		$config = $this->dba->selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
-		if ($this->dba->isResult($config)) {
-			$value = $this->toConfigValue($config['v']);
-
-			if (isset($value)) {
-				return $value;
-			}
-		}
-
-		return null;
+		throw new InternalServerErrorException('Preload Config shouldn\'t use get');
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($cat, $key, $value)
+	public function set(string $cat, string $key, $value)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -90,7 +79,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 	/**
 	 * {@inheritdoc}
 	 */
-	public function delete($cat, $key)
+	public function delete(string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -102,7 +91,7 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($cat, $key)
+	public function isLoaded(string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;

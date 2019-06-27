@@ -15,7 +15,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($cat = "config")
+	public function load(string $cat = 'config')
 	{
 		$return = [];
 
@@ -52,7 +52,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 	 *
 	 * @param bool $mark if true, mark the selection of the current cat/key pair
 	 */
-	public function get($cat, $key, $mark = true)
+	public function get(string $cat, string $key, bool $mark = true)
 	{
 		if (!$this->isConnected()) {
 			return null;
@@ -79,7 +79,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($cat, $key, $value)
+	public function set(string $cat, string $key, $value)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -114,7 +114,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 	/**
 	 * {@inheritdoc}
 	 */
-	public function delete($cat, $key)
+	public function delete(string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -132,7 +132,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($cat, $key)
+	public function isLoaded(string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;

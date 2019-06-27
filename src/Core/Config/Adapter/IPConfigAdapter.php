@@ -22,7 +22,7 @@ interface IPConfigAdapter
 	 *
 	 * @return array
 	 */
-	public function load($uid, $cat);
+	public function load(string $uid, string $cat);
 
 	/**
 	 * Get a particular user's config variable given the category name
@@ -36,7 +36,7 @@ interface IPConfigAdapter
 	 *
 	 * @return null|mixed Stored value or null if it does not exist
 	 */
-	public function get($uid, $cat, $key);
+	public function get(string $uid, string $cat, string $key);
 
 	/**
 	 * Stores a config value ($value) in the category ($family) under the key ($key)
@@ -51,7 +51,7 @@ interface IPConfigAdapter
 	 *
 	 * @return bool Operation success
 	 */
-	public function set($uid, $cat, $key, $value);
+	public function set(string $uid, string $cat, string $key, $value);
 
 	/**
 	 * Removes the configured value from the stored cache
@@ -63,7 +63,7 @@ interface IPConfigAdapter
 	 *
 	 * @return bool Operation success
 	 */
-	public function delete($uid, $cat, $key);
+	public function delete(string $uid, string $cat, string $key);
 
 	/**
 	 * Checks, if the current adapter is connected to the backend
@@ -81,5 +81,5 @@ interface IPConfigAdapter
 	 *
 	 * @return bool
 	 */
-	public function isLoaded($uid, $cat, $key);
+	public function isLoaded(string $uid, string $cat, string $key);
 }

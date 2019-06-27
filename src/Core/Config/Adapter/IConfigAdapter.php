@@ -15,7 +15,7 @@ interface IConfigAdapter
 	 *
 	 * @return array
 	 */
-	public function load($cat = "config");
+	public function load(string $cat = 'config');
 
 	/**
 	 * Get a particular system-wide config variable given the category name
@@ -28,7 +28,7 @@ interface IConfigAdapter
 	 *
 	 * @return null|mixed Stored value or null if it does not exist
 	 */
-	public function get($cat, $key);
+	public function get(string $cat, string $key);
 
 	/**
 	 * Stores a config value ($value) in the category ($family) under the key ($key).
@@ -41,7 +41,7 @@ interface IConfigAdapter
 	 *
 	 * @return bool Operation success
 	 */
-	public function set($cat, $key, $value);
+	public function set(string $cat, string $key, $value);
 
 	/**
 	 * Removes the configured value from the stored cache
@@ -52,7 +52,7 @@ interface IConfigAdapter
 	 *
 	 * @return bool Operation success
 	 */
-	public function delete($cat, $key);
+	public function delete(string $cat, string $key);
 
 	/**
 	 * Checks, if the current adapter is connected to the backend
@@ -69,5 +69,5 @@ interface IConfigAdapter
 	 *
 	 * @return bool
 	 */
-	public function isLoaded($cat, $key);
+	public function isLoaded(string $cat, string $key);
 }

@@ -19,6 +19,8 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	private $config_loaded;
 
 	/**
+	 * {@inheritDoc}
+	 *
 	 * @param int $uid The UID of the current user
 	 */
 	public function __construct(Database $dba, $uid = null)
@@ -35,7 +37,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function load($uid, $cat)
+	public function load(string $uid, string $cat)
 	{
 		$return = [];
 
@@ -64,7 +66,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function get($uid, $cat, $key)
+	public function get(string $uid, string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return null;
@@ -88,7 +90,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($uid, $cat, $key, $value)
+	public function set(string $uid, string $cat, string $key, $value)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -115,7 +117,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function delete($uid, $cat, $key)
+	public function delete(string $uid, string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;
@@ -131,7 +133,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isLoaded($uid, $cat, $key)
+	public function isLoaded(string $uid, string $cat, string $key)
 	{
 		if (!$this->isConnected()) {
 			return false;
