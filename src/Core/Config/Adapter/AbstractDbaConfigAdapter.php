@@ -2,7 +2,7 @@
 
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
 
 abstract class AbstractDbaConfigAdapter
 {
@@ -13,9 +13,18 @@ abstract class AbstractDbaConfigAdapter
 	 */
 	protected $connected = true;
 
-	public function __construct()
+	/**
+	 * @var Database
+	 */
+	protected $dba;
+
+	/**
+	 * @param Database $dba The database backend for the Adapter
+	 */
+	public function __construct(Database $dba)
 	{
-		$this->connected = DBA::connected();
+		$this->dba = $dba;
+		$this->connected = $dba->connected();
 	}
 
 	/**

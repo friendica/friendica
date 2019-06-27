@@ -30,9 +30,9 @@ class DependencyFactory
 		$configCache = Factory\ConfigFactory::createCache($configLoader);
 		$profiler = Factory\ProfilerFactory::create($configCache);
 		$database = Factory\DBFactory::init($configCache, $profiler, $_SERVER);
-		$config = Factory\ConfigFactory::createConfig($configCache);
+		$config = Factory\ConfigFactory::createConfig($configCache, $database);
 		// needed to call PConfig::init()
-		Factory\ConfigFactory::createPConfig($configCache);
+		Factory\ConfigFactory::createPConfig($configCache, $database);
 		$logger = Factory\LoggerFactory::create($channel, $database, $config, $profiler);
 		Factory\LoggerFactory::createDev($channel, $config, $profiler);
 		$baseURL = new BaseURL($config, $_SERVER);
