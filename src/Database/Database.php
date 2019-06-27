@@ -162,6 +162,16 @@ class Database
 	}
 
 	/**
+	 * Sets the profiler for DBA
+	 *
+	 * @param Profiler $profiler
+	 */
+	public function setProfiler(Profiler $profiler)
+	{
+		$this->profiler = $profiler;
+	}
+
+	/**
 	 * Disconnects the current database connection
 	 */
 	public function disconnect()
