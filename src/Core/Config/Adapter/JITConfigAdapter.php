@@ -98,7 +98,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 			$this->in_db[$cat][$key] = false;
 		}
 
-		if (isset($stored_value) && ($stored_value === $compare_value) && $this->in_db[$cat][$key]) {
+		if (isset($stored_value) && ($stored_value === $compare_value)) {
 			return true;
 		}
 

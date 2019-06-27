@@ -51,14 +51,31 @@ abstract class ConfigAdapterTest extends MockedTest
 	 *
 	 * @param string $cat   The category
 	 * @param string $key   The key
-	 * @param string $value The guessed value
+	 * @param mixed  $value The guessed value
 	 * @param int    $times How often the DBA-call should be needed
 	 */
-	protected function mockGet(string $cat, string $key, string $value, int $times = 1)
+	protected function mockGet(string $cat, string $key, $value, int $times = 1)
 	{
 		$this->dba->shouldReceive('selectFirst')
 		          ->with('config', ['v'], ['cat' => $cat, 'k' => $key])
 		          ->andReturn(['v' => $value])
+		          ->times($times);
+	}
+
+	/**
+	 * Mock the DBA-calls for a SET operation
+	 *
+	 * @param string $cat    The category
+	 * @param string $key    The key
+	 * @param string $value  The guessed value
+	 * @param bool   $return True, if the update was successful
+	 * @param int    $times  How often the DBA-call should be needed
+	 */
+	protected function mockSet(string $cat, string $key, $value, bool $return = true, int $times = 1)
+	{
+		$this->dba->shouldReceive('update')
+		          ->with('config', ['v' => $value], ['cat' => $cat, 'k' => $key], true)
+		          ->andReturn($return)
 		          ->times($times);
 	}
 
@@ -194,5 +211,77 @@ abstract class ConfigAdapterTest extends MockedTest
 
 		// No result!
 		$this->assertEmpty($result);
+	}
+
+	/**
+	 * Test the get method of a JIT Config adapter with different arguments
+	 */
+	public function testGet()
+	{
+		// mock system check (one DB call)
+		$this->mockGet('system', 'key1', 'value1');
+		$this->mockGet('system', 'key2', 'value2');
+		$this->mockGet('system', 'key3', 'value3');
+
+		// mock config check (one DB call)
+		$this->mockGet('config', 'key1', 'value1a');
+		$this->mockGet('config', 'key4', 'value4');
+
+		// mock invalid value
+		$this->mockGet('invalid', 'invalid', null);
+
+		$configAdapter = $this->getInstance();
+
+		$this->assertFalse($configAdapter->isLoaded('system', 'key1'));
+		$this->assertFalse($configAdapter->isLoaded('system', 'key2'));
+		$this->assertFalse($configAdapter->isLoaded('system', 'key3'));
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
+		$this->assertFalse($configAdapter->isLoaded('config', 'key4'));
+
+		// Test system
+		$this->assertEquals('value1', $configAdapter->get('system', 'key1'));
+		$this->assertEquals('value2', $configAdapter->get('system', 'key2'));
+		$this->assertEquals('value3', $configAdapter->get('system', 'key3'));
+
+		// test config
+		$this->assertEquals('value1a', $configAdapter->get('config', 'key1'));
+		$this->assertEquals('value4', $configAdapter->get('config', 'key4'));
+
+		// test invalid
+		$this->assertEmpty($configAdapter->get('invalid', 'invalid'));
+
+		return $configAdapter;
+	}
+
+	/**
+	 * Test a simple SET
+	 */
+	public function testSet()
+	{
+		$this->mockGet('config', 'key1', null);
+		$this->mockSet('config', 'key1', 'value1');
+
+		$configAdapter = $this->getInstance();
+
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
+		$this->assertTrue($configAdapter->set('config', 'key1', 'value1'));
+
+		return $configAdapter;
+	}
+
+	/**
+	 * Test a simple SET
+	 */
+	public function testNotSet()
+	{
+		$this->mockGet('config', 'key1', 'value1');
+
+		$configAdapter = $this->getInstance();
+
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
+		$this->assertTrue($configAdapter->set('config', 'key1', 'value1'));
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
+
+		return $configAdapter;
 	}
 }

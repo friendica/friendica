@@ -2,8 +2,6 @@
 
 namespace Friendica\Core\Config\Adapter;
 
-use Friendica\Network\HTTPException\InternalServerErrorException;
-
 /**
  * Preload Configuration Adapter
  *
@@ -49,7 +47,20 @@ class PreloadConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAd
 	 */
 	public function get(string $cat, string $key)
 	{
-		throw new InternalServerErrorException('Preload Config shouldn\'t use get');
+		if (!$this->isConnected()) {
+			return null;
+		}
+
+		$config = $this->dba->selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
+		if ($this->dba->isResult($config)) {
+			$value = $this->toConfigValue($config['v']);
+
+			if (isset($value)) {
+				return $value;
+			}
+		}
+
+		return null;
 	}
 
 	/**

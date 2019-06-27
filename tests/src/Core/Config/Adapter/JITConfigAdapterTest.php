@@ -68,41 +68,11 @@ class JITConfigAdapterTest extends ConfigAdapterTest
 	}
 
 	/**
-	 * Test the get method of a JIT Config adapter with different arguments
+	 * {@inheritDoc}
 	 */
 	public function testGet()
 	{
-		// mock system check (one DB call)
-		$this->mockGet('system', 'key1', 'value1');
-		$this->mockGet('system', 'key2', 'value2');
-		$this->mockGet('system', 'key3', 'value3');
-
-		// mock config check (one DB call)
-		$this->mockGet('config', 'key1', 'value1a');
-		$this->mockGet('config', 'key4', 'value4');
-
-		// mock invalid value
-		$this->mockGet('invalid', 'invalid', 1423);
-
-		$configAdapter = $this->getInstance();
-
-		$this->assertFalse($configAdapter->isLoaded('system', 'key1'));
-		$this->assertFalse($configAdapter->isLoaded('system', 'key2'));
-		$this->assertFalse($configAdapter->isLoaded('system', 'key3'));
-		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
-		$this->assertFalse($configAdapter->isLoaded('config', 'key4'));
-
-		// Test system
-		$this->assertEquals('value1', $configAdapter->get('system', 'key1'));
-		$this->assertEquals('value2', $configAdapter->get('system', 'key2'));
-		$this->assertEquals('value3', $configAdapter->get('system', 'key3'));
-
-		// test config
-		$this->assertEquals('value1a', $configAdapter->get('config', 'key1'));
-		$this->assertEquals('value4', $configAdapter->get('config', 'key4'));
-
-		// test invalid
-		$this->assertEmpty($configAdapter->get('invalid', 'invalid'));
+		$configAdapter = parent::testGet();
 
 		$this->assertTrue($configAdapter->isLoaded('system', 'key1'));
 		$this->assertTrue($configAdapter->isLoaded('system', 'key2'));
@@ -124,5 +94,15 @@ class JITConfigAdapterTest extends ConfigAdapterTest
 		$configAdapter = $this->getInstance();
 
 		$this->assertEmpty($configAdapter->get('system', 'key1'));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function testSet()
+	{
+		$configAdapter = parent::testSet();
+
+		$this->assertTrue($configAdapter->isLoaded('config', 'key1'));
 	}
 }

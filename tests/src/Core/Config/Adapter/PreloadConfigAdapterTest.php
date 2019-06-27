@@ -70,13 +70,31 @@ class PreloadConfigAdapterTest extends ConfigAdapterTest
 		$this->assertTrue($configAdapter->isLoaded('config', 'key4'));
 	}
 
+
 	/**
-	 * @expectedException Friendica\Network\HTTPException\InternalServerErrorException
+	 * {@inheritDoc}
 	 */
 	public function testGet()
 	{
-		$configAdapter = $this->getInstance();
+		$configAdapter = parent::testGet();
 
-		$configAdapter->get('system', 'key1');
+		// Still not loaded, because of missing "load"
+		// Preload adapter can only load everything at all
+		$this->assertFalse($configAdapter->isLoaded('system', 'key1'));
+		$this->assertFalse($configAdapter->isLoaded('system', 'key2'));
+		$this->assertFalse($configAdapter->isLoaded('system', 'key3'));
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
+		$this->assertFalse($configAdapter->isLoaded('config', 'key4'));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function testSet()
+	{
+		$configAdapter = parent::testSet();
+
+		// Still not loaded
+		$this->assertFalse($configAdapter->isLoaded('config', 'key1'));
 	}
 }
