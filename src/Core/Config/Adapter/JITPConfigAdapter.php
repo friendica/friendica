@@ -26,7 +26,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 		$pconfigs = $this->dba->select('pconfig', ['v', 'k'], ['cat' => $cat, 'uid' => $uid]);
 		if ($this->dba->isResult($pconfigs)) {
 			while ($pconfig = $this->dba->fetch($pconfigs)) {
-				$key = $pconfig['k'];
+				$key   = $pconfig['k'];
 				$value = $this->toConfigValue($pconfig['v']);
 
 				// The value was in the db, so don't check it again (unless you have to)
@@ -36,7 +36,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 					$return[$key] = $value;
 				}
 			}
-		} else if ($cat != 'config') {
+		} elseif ($cat != 'config') {
 			// Negative caching
 			$return = null;
 		}
@@ -87,7 +87,7 @@ class JITPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfigAdap
 		// So we have to do the conversion here so that the compare below works.
 		// The exception are array values.
 		$compare_value = (!is_array($value) ? (string)$value : $value);
-		$stored_value = $this->get($uid, $cat, $key, false);
+		$stored_value  = $this->get($uid, $cat, $key, false);
 
 		if (!isset($this->in_db[$uid])) {
 			$this->in_db[$uid] = [];

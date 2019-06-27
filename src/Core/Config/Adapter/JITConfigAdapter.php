@@ -89,7 +89,7 @@ class JITConfigAdapter extends AbstractDbaConfigAdapter implements IConfigAdapte
 		// So we have to do the conversion here so that the compare below works.
 		// The exception are array values.
 		$compare_value = (!is_array($value) ? (string)$value : $value);
-		$stored_value = $this->get($cat, $key, false);
+		$stored_value  = $this->get($cat, $key, false);
 
 		if (!isset($this->in_db[$cat])) {
 			$this->in_db[$cat] = [];

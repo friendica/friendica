@@ -23,7 +23,7 @@ abstract class AbstractDbaConfigAdapter
 	 */
 	public function __construct(Database $dba)
 	{
-		$this->dba = $dba;
+		$this->dba       = $dba;
 		$this->connected = $dba->connected();
 	}
 

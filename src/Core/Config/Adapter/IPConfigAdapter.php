@@ -30,9 +30,9 @@ interface IPConfigAdapter
 	 *
 	 * Note: Boolean variables are defined as 0/1 in the database
 	 *
-	 * @param string  $uid           The user_id
-	 * @param string  $cat           The category of the configuration value
-	 * @param string  $key           The configuration key to query
+	 * @param string $uid The user_id
+	 * @param string $cat The category of the configuration value
+	 * @param string $key The configuration key to query
 	 *
 	 * @return null|mixed Stored value or null if it does not exist
 	 */

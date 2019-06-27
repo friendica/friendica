@@ -103,7 +103,7 @@ class PreloadPConfigAdapter extends AbstractDbaConfigAdapter implements IPConfig
 		// So we have to do the conversion here so that the compare below works.
 		// The exception are array values.
 		$compare_value = !is_array($value) ? (string)$value : $value;
-		$stored_value = $this->get($uid, $cat, $key);
+		$stored_value  = $this->get($uid, $cat, $key);
 
 		if (isset($stored_value) && $stored_value === $compare_value) {
 			return true;
