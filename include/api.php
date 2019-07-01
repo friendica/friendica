@@ -1446,7 +1446,7 @@ function api_search($type)
 	$data = [];
 	$data['status'] = [];
 	$count = 15;
-	$exclude_replies = !empty($_REQUEST['exclude_replies']);
+	$exclude_replies = boolval($_REQUEST['exclude_replies']);
 	if (!empty($_REQUEST['rpp'])) {
 		$count = $_REQUEST['rpp'];
 	} elseif (!empty($_REQUEST['count'])) {
@@ -1551,7 +1551,7 @@ function api_statuses_home_timeline($type)
 	}
 	$since_id = defaults($_REQUEST, 'since_id', 0);
 	$max_id = defaults($_REQUEST, 'max_id', 0);
-	$exclude_replies = !empty($_REQUEST['exclude_replies']);
+	$exclude_replies = boolval($_REQUEST['exclude_replies']);
 	$conversation_id = defaults($_REQUEST, 'conversation_id', 0);
 
 	$start = $page * $count;
@@ -1641,7 +1641,7 @@ function api_statuses_public_timeline($type)
 	}
 	$since_id = defaults($_REQUEST, 'since_id', 0);
 	$max_id = defaults($_REQUEST, 'max_id', 0);
-	$exclude_replies = (!empty($_REQUEST['exclude_replies']) ? 1 : 0);
+	$exclude_replies = (boolval($_REQUEST['exclude_replies']) ? 1 : 0);
 	$conversation_id = defaults($_REQUEST, 'conversation_id', 0);
 
 	$start = $page * $count;
@@ -2145,7 +2145,7 @@ function api_statuses_user_timeline($type)
 
 	$since_id        = defaults($_REQUEST, 'since_id', 0);
 	$max_id          = defaults($_REQUEST, 'max_id', 0);
-	$exclude_replies = !empty($_REQUEST['exclude_replies']);
+	$exclude_replies = boolval($_REQUEST['exclude_replies']);
 	$conversation_id = defaults($_REQUEST, 'conversation_id', 0);
 
 	// pagination
@@ -3241,7 +3241,7 @@ function api_lists_statuses($type)
 	}
 	$since_id = defaults($_REQUEST, 'since_id', 0);
 	$max_id = defaults($_REQUEST, 'max_id', 0);
-	$exclude_replies = (!empty($_REQUEST['exclude_replies']) ? 1 : 0);
+	$exclude_replies = (boolval($_REQUEST['exclude_replies']) ? 1 : 0);
 	$conversation_id = defaults($_REQUEST, 'conversation_id', 0);
 
 	$start = $page * $count;
