@@ -766,17 +766,17 @@ class Profile
 
                 if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
                     $howlongset = true;
-                    $maritalstringparts[2] = Temporal::getRelativeDate($a->profile['howlong'],  L10n::t('for %1$d %2$s'));
+                    $maritalstringparts[2] = Temporal::getRelativeDate($a->profile['howlong'],  L10n::t('%1$d %2$s'));
                 }
 
                 if ($whoset && $howlongset) {
-                    $maritalstring = L10n::t('%s with %s %s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
+                    $maritalstring = L10n::t('%1$s with %2$s for %3$s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
                 } elseif ($whoset && !$howlongset) {
-                    $maritalstring = L10n::t('%s with %s', $maritalstringparts[0], $maritalstringparts[1]);
+                    $maritalstring = L10n::t('%1$s with %2$s', $maritalstringparts[0], $maritalstringparts[1]);
                 } elseif (!$whoset && $howlongset) {
-                    $maritalstring = L10n::t('%s %s', $maritalstringparts[0], $maritalstringparts[2]);
+                    $maritalstring = L10n::t('%1$s for %2$s', $maritalstringparts[0], $maritalstringparts[2]);
                 } else {
-                    $maritalstring = L10n::t('%s', $maritalstringparts[0]);
+                    $maritalstring = L10n::t('%1s', $maritalstringparts[0]);
                 }
                 $profile['marital'] = [L10n::t('Status:'), $maritalstring];
 			}
