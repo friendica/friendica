@@ -774,7 +774,7 @@ class Profile
                 } elseif ($whoset && !$howlongset) {
                     $maritalstring = L10n::t('%s with %s', $maritalstringparts[0], $maritalstringparts[1]);
                 } elseif (!$whoset && $howlongset) {
-                    $maritalstring = L10n::t('%s for %s', $maritalstringparts[0], $maritalstringparts[2])
+                    $maritalstring = L10n::t('%s for %s', $maritalstringparts[0], $maritalstringparts[2]);
                 } else {
                     $maritalstring = L10n::t('%s', $maritalstringparts[0]);
                 }
