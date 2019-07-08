@@ -770,11 +770,11 @@ class Profile
                 }
 
                 if ($whoset && $howlongset) {
-                    $maritalstring = L10n::t('%s with %s for %s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
+                    $maritalstring = L10n::t('%s with %s %s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
                 } elseif ($whoset && !$howlongset) {
                     $maritalstring = L10n::t('%s with %s', $maritalstringparts[0], $maritalstringparts[1]);
                 } elseif (!$whoset && $howlongset) {
-                    $maritalstring = L10n::t('%s for %s', $maritalstringparts[0], $maritalstringparts[2]);
+                    $maritalstring = L10n::t('%s %s', $maritalstringparts[0], $maritalstringparts[2]);
                 } else {
                     $maritalstring = L10n::t('%s', $maritalstringparts[0]);
                 }
