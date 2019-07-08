@@ -758,7 +758,7 @@ class Profile
                 $maritalstring = L10n::t($a->profile['marital']);
 
                 if ($a->profile['with']) {
-                    $maritalstring .= ' ' . L10n::t('with') . ' ' . $a->profile['with'];
+                    $maritalstring .= ' ' . L10n::t('with') . ' ' . $a->profile['with'] . ' ';
                 }
 
                 if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
