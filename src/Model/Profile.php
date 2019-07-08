@@ -755,16 +755,16 @@ class Profile
 			}
 
 			if ($a->profile['marital']) {
-				$profile['marital'] = [L10n::t('Status:'), L10n::t($a->profile['marital'])];
-			}
+                $maritalstring = L10n::t($a->profile['marital']);
 
-			/// @TODO Maybe use x() here, plus below?
-			if ($a->profile['with']) {
-				$profile['marital']['with'] = $a->profile['with'];
-			}
+                if ($a->profile['with']) {
+                    $maritalstring .= ' ' . L10n::t('with') . ' ' . $a->profile['with'];
+                }
 
-			if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
-				$profile['howlong'] = Temporal::getRelativeDate($a->profile['howlong'], L10n::t('for %1$d %2$s'));
+                if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
+                    $maritalstring .= Temporal::getRelativeDate($a->profile['howlong'], L10n::t('for %1$d %2$s'));
+                }
+                $profile['marital'] = [L10n::t('Status:'), $maritalstring];
 			}
 
 			if ($a->profile['sexual']) {
