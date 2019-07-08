@@ -42,7 +42,7 @@
 {{if $profile.marital}}
 <dl id="aprofile-marital" class="aprofile">
  <dt><span class="heart">&hearts;</span>  {{$profile.marital.0}}</dt>
- <dd>{{$profile.marital.1}}{{if $profile.marital.with}} ({{$profile.marital.with}}){{/if}}{{if $profile.howlong}} {{$profile.howlong}}{{/if}}</dd>
+ <dd>{{$profile.marital.1}}</dd>
 </dl>
 {{/if}}
 

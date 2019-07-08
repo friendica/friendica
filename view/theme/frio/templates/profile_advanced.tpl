@@ -74,7 +74,7 @@
 			<div id="aprofile-marital" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 aprofile">
 				<hr class="profile-separator">
 				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted"><span class="heart">&hearts;</span>  {{$profile.marital.0}}</div>
-				<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$profile.marital.1}}{{if $profile.marital.with}} ({{$profile.marital.with}}){{/if}}{{if $profile.howlong}} {{$profile.howlong}}{{/if}}</div>
+				<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$profile.marital.1}}</div>
 			</div>
 			{{/if}}
 
