@@ -755,30 +755,31 @@ class Profile
 			}
 
 			if ($a->profile['marital']) {
-                $maritalstringparts[0] = L10n::t($a->profile['marital']);
-                $whoset = false;
-                $howlongset = false;
+				$maritalstringparts[0] = L10n::t($a->profile['marital']);
+				$whoset = false;
+				$howlongset = false;
+				
+				if ($a->profile['with']) {
+					$whoset = true;
+					$maritalstringparts[1] = $a->profile['with'];
+				}
 
-                if ($a->profile['with']) {
-                    $whoset = true;
-                    $maritalstringparts[1] = $a->profile['with'];
-                }
-
-                if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
-                    $howlongset = true;
-                    $maritalstringparts[2] = Temporal::getRelativeDate($a->profile['howlong'],  L10n::t('%1$d %2$s'));
-                }
-
-                if ($whoset && $howlongset) {
-                    $maritalstring = L10n::t('%1$s with %2$s for %3$s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
-                } elseif ($whoset && !$howlongset) {
-                    $maritalstring = L10n::t('%1$s with %2$s', $maritalstringparts[0], $maritalstringparts[1]);
-                } elseif (!$whoset && $howlongset) {
-                    $maritalstring = L10n::t('%1$s for %2$s', $maritalstringparts[0], $maritalstringparts[2]);
-                } else {
-                    $maritalstring = L10n::t('%1s', $maritalstringparts[0]);
-                }
-                $profile['marital'] = [L10n::t('Status:'), $maritalstring];
+				if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
+					$howlongset = true;
+					$maritalstringparts[2] = Temporal::getRelativeDate($a->profile['howlong'],  L10n::t('%1$d %2$s'));
+				}
+	
+				if ($whoset && $howlongset) {
+					$maritalstring = L10n::t('%1$s with %2$s for %3$s', $maritalstringparts[0], $maritalstringparts[1], $maritalstringparts[2]);
+				} elseif ($whoset && !$howlongset) {
+					$maritalstring = L10n::t('%1$s with %2$s', $maritalstringparts[0], $maritalstringparts[1]);
+				} elseif (!$whoset && $howlongset) {
+					$maritalstring = L10n::t('%1$s for %2$s', $maritalstringparts[0], $maritalstringparts[2]);
+				} else {
+					$maritalstring = L10n::t('%1s', $maritalstringparts[0]);
+				}
+				
+				$profile['marital'] = [L10n::t('Status:'), $maritalstring];
 			}
 
 			if ($a->profile['sexual']) {
