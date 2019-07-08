@@ -757,7 +757,7 @@ class Profile
 			if ($a->profile['marital']) {
                 $maritalstringparts[0] = L10n::t($a->profile['marital']);
                 $whoset = false;
-                howlongset = false;
+                $howlongset = false;
 
                 if ($a->profile['with']) {
                     $whoset = true;
