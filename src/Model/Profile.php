@@ -758,11 +758,11 @@ class Profile
                 $maritalstring = L10n::t($a->profile['marital']);
 
                 if ($a->profile['with']) {
-                    $maritalstring .= ' ' . L10n::t('with') . ' ' . $a->profile['with'] . ' ';
+                    $maritalstring .= ' ' . L10n::t('with') . ' ' . $a->profile['with'];
                 }
 
                 if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
-                    $maritalstring .= Temporal::getRelativeDate($a->profile['howlong'], L10n::t('for %1$d %2$s'));
+                    $maritalstring .= Temporal::getRelativeDate($a->profile['howlong'],  ' ' . L10n::t('for %1$d %2$s'));
                 }
                 $profile['marital'] = [L10n::t('Status:'), $maritalstring];
 			}
