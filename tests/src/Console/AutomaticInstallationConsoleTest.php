@@ -5,10 +5,10 @@ namespace Friendica\Test\src\Console;
 use Friendica\Console\AutomaticInstallation;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\Installer;
+use Friendica\Core\L10n\L10n;
 use Friendica\Core\Logger;
 use Friendica\Test\Util\DBAMockTrait;
 use Friendica\Test\Util\DBStructureMockTrait;
-use Friendica\Test\Util\L10nMockTrait;
 use Friendica\Test\Util\RendererMockTrait;
 use Friendica\Util\BaseURL;
 use Friendica\Util\Logger\VoidLogger;
@@ -20,7 +20,6 @@ use org\bovigo\vfs\vfsStreamFile;
  */
 class AutomaticInstallationConsoleTest extends ConsoleTest
 {
-	use L10nMockTrait;
 	use DBAMockTrait;
 	use DBStructureMockTrait;
 	use RendererMockTrait;
@@ -50,7 +49,9 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 				->removeChild('local.config.php');
 		}
 
-		$this->mockL10nT();
+		$l10nMock = \Mockery::mock(L10n::class);
+		$l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		\Friendica\Core\L10n::init($l10nMock);
 
 		$this->configCache = new ConfigCache();
 		$this->configCache->set('system', 'basepath', $this->root->url());
@@ -72,7 +73,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 			return $this->configCache->get($cat, $key);
 		});
 		$this->configMock->shouldReceive('load')->andReturnUsing(function ($config, $overwrite = false) {
-			return $this->configCache->load($config, $overwrite);
+			$this->configCache->load($config, $overwrite);
 		});
 
 		$this->mode->shouldReceive('isInstall')->andReturn(true);

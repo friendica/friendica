@@ -3,6 +3,7 @@
 namespace Friendica\Factory;
 
 use Friendica\App;
+use Friendica\Core\L10n\L10n;
 use Friendica\Core\Config\Cache\PConfigCache;
 use Friendica\Factory;
 use Friendica\Util\BasePath;
@@ -37,7 +38,10 @@ class DependencyFactory
 		$logger = Factory\LoggerFactory::create($channel, $database, $config, $profiler);
 		Factory\LoggerFactory::createDev($channel, $config, $profiler);
 		$baseURL = new BaseURL($config, $_SERVER);
+		$l10n = new L10n(L10n::detectLanguage($config->get('system', 'language', 'de')),
+			$database,
+			$logger);
 
-		return new App($database, $config, $mode, $router, $baseURL, $logger, $profiler, $isBackend);
+		return new App($database, $config, $mode, $router, $baseURL, $logger, $profiler, $l10n, $isBackend);
 	}
 }

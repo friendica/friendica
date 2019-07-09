@@ -3,6 +3,7 @@ namespace Friendica\Test\src\Database;
 
 use Friendica\App;
 use Friendica\Core\Config;
+use Friendica\Core\L10n\L10n;
 use Friendica\Database\DBA;
 use Friendica\Factory;
 use Friendica\Test\DatabaseTest;
@@ -25,7 +26,11 @@ class DBATest extends DatabaseTest
 		Factory\ConfigFactory::createPConfig($configCache, new Config\Cache\PConfigCache());
 		$logger = Factory\LoggerFactory::create('test', $database, $config, $profiler);
 		$baseUrl = new BaseURL($config, $_SERVER);
-		$this->app = new App($database, $config, $mode, $router, $baseUrl, $logger, $profiler, false);
+		$l10n = new L10n(L10n::detectLanguage($config->get('system', 'language', 'en')),
+			$database,
+			$logger);
+
+		$this->app = new App($database, $config, $mode, $router, $baseUrl, $logger, $profiler, $l10n, false);
 
 		parent::setUp();
 

@@ -3,20 +3,15 @@
 namespace Friendica\Test\src\Content\Text;
 
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\L10n\L10n;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\L10nMockTrait;
 use Friendica\Test\Util\VFSTrait;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class BBCodeTest extends MockedTest
 {
 	use VFSTrait;
 	use AppMockTrait;
-	use L10nMockTrait;
 
 	protected function setUp()
 	{
@@ -43,7 +38,11 @@ class BBCodeTest extends MockedTest
 		$this->configMock->shouldReceive('get')
 			->with('system', 'no_smilies')
 			->andReturn(false);
-		$this->mockL10nT();
+
+		$l10nMock = \Mockery::mock(L10n::class);
+		$l10nMock->shouldReceive('t')->withAnyArgs()->andReturnUsing(function ($args) { return $args; });
+		\Friendica\Core\L10n::init($l10nMock);
+
 	}
 
 	public function dataLinks()

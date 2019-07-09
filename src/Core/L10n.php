@@ -4,50 +4,27 @@
  */
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
-use Friendica\Database\DBA;
-use Friendica\Util\Strings;
+use Friendica\Core\L10n\L10n as L10nClass;
 
 /**
  * Provide Language, Translation, and Localization functions to the application
  * Localization can be referred to by the numeronym L10N (as in: "L", followed by ten more letters, and then "N").
  */
-class L10n extends BaseObject
+class L10n
 {
 	/**
-	 * A string indicating the current language used for translation:
-	 * - Two-letter ISO 639-1 code.
-	 * - Two-letter ISO 639-1 code + dash + Two-letter ISO 3166-1 alpha-2 country code.
-	 * @var string
+	 * @var L10nClass
 	 */
-	private static $lang = '';
-	/**
-	 * A language code saved for later after pushLang() has been called.
-	 *
-	 * @var string
-	 */
-	private static $langSave = '';
+	private static $l10n;
 
 	/**
-	 * An array of translation strings whose key is the neutral english message.
+	 * Initializes the L10n static wrapper with the instance
 	 *
-	 * @var array
+	 * @param L10nClass $l10n The l10n class
 	 */
-	private static $strings = [];
-	/**
-	 * An array of translation strings saved for later after pushLang() has been called.
-	 *
-	 * @var array
-	 */
-	private static $stringsSave = [];
-
-	/**
-	 * Detects the language and sets the translation table
-	 */
-	public static function init()
+	public static function init(L10nClass $l10n)
 	{
-		$lang = self::detectLanguage();
-		self::loadTranslationTable($lang);
+		self::$l10n = $l10n;
 	}
 
 	/**
@@ -57,43 +34,17 @@ class L10n extends BaseObject
 	 */
 	public static function getCurrentLang()
 	{
-		return self::$lang;
-	}
-
-	/**
-	 * Sets the language session variable
-	 */
-	public static function setSessionVariable()
-	{
-		if (!empty($_SESSION['authenticated']) && empty($_SESSION['language'])) {
-			$_SESSION['language'] = self::$lang;
-			// we haven't loaded user data yet, but we need user language
-			if (!empty($_SESSION['uid'])) {
-				$user = DBA::selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
-				if (DBA::isResult($user)) {
-					$_SESSION['language'] = $user['language'];
-				}
-			}
-		}
-
-		if (isset($_GET['lang'])) {
-			$_SESSION['language'] = $_GET['lang'];
-		}
-	}
-
-	public static function setLangFromSession()
-	{
-		if (!empty($_SESSION['language']) && $_SESSION['language'] !== self::$lang) {
-			self::loadTranslationTable($_SESSION['language']);
-		}
+		return self::$l10n->getCurrentLang();
 	}
 
 	/**
 	 * @brief Returns the preferred language from the HTTP_ACCEPT_LANGUAGE header
+	 *
+	 * @param string $sysLang The default fallback language
+	 *
 	 * @return string The two-letter language code
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function detectLanguage()
+	public static function detectLanguage(string $sysLang = 'en')
 	{
 		$lang_list = [];
 
@@ -106,7 +57,7 @@ class L10n extends BaseObject
 				// for sub-linguas (e.g. de-ch will add de) if not already in array
 				for ($i = 0; $i < count($lang_parse[1]); $i++) {
 					$lang_list[] = strtolower($lang_parse[1][$i]);
-					if (strlen($lang_parse[1][$i])>3) {
+					if (strlen($lang_parse[1][$i]) > 3) {
 						$dashpos = strpos($lang_parse[1][$i], '-');
 						if (!in_array(substr($lang_parse[1][$i], 0, $dashpos), $lang_list)) {
 							$lang_list[] = strtolower(substr($lang_parse[1][$i], 0, $dashpos));
@@ -132,7 +83,7 @@ class L10n extends BaseObject
 		}
 
 		// in case none matches, get the system wide configured language, or fall back to English
-		return Config::get('system', 'language', 'en');
+		return $sysLang;
 	}
 
 	/**
@@ -150,20 +101,7 @@ class L10n extends BaseObject
 	 */
 	public static function pushLang($lang)
 	{
-		if (!self::$lang) {
-			self::init();
-		}
-
-		if ($lang === self::$lang) {
-			return;
-		}
-
-		if (!self::$langSave) {
-			self::$langSave = self::$lang;
-			self::$stringsSave = self::$strings;
-		}
-
-		self::loadTranslationTable($lang);
+		self::$l10n->pushLang($lang);
 	}
 
 	/**
@@ -171,55 +109,7 @@ class L10n extends BaseObject
 	 */
 	public static function popLang()
 	{
-		if (!self::$langSave) {
-			return;
-		}
-
-		self::$strings = self::$stringsSave;
-		self::$lang = self::$langSave;
-
-		self::$stringsSave = [];
-		self::$langSave = '';
-	}
-
-	/**
-	 * Loads string translation table
-	 *
-	 * First addon strings are loaded, then globals
-	 *
-	 * Uses an App object shim since all the strings files refer to $a->strings
-	 *
-	 * @param string $lang language code to load
-	 * @throws \Exception
-	 */
-	private static function loadTranslationTable($lang)
-	{
-		$lang = Strings::sanitizeFilePathItem($lang);
-
-		if ($lang === self::$lang) {
-			return;
-		}
-
-		$a = new \stdClass();
-		$a->strings = [];
-
-		// load enabled addons strings
-		$addons = DBA::select('addon', ['name'], ['installed' => true]);
-		while ($p = DBA::fetch($addons)) {
-			$name = Strings::sanitizeFilePathItem($p['name']);
-			if (file_exists("addon/$name/lang/$lang/strings.php")) {
-				include "addon/$name/lang/$lang/strings.php";
-			}
-		}
-
-		if (file_exists("view/lang/$lang/strings.php")) {
-			include "view/lang/$lang/strings.php";
-		}
-
-		self::$lang = $lang;
-		self::$strings = $a->strings;
-
-		unset($a);
+		self::$l10n->popLang();
 	}
 
 	/**
@@ -240,24 +130,7 @@ class L10n extends BaseObject
 	 */
 	public static function t($s, ...$vars)
 	{
-		if (empty($s)) {
-			return '';
-		}
-
-		if (!self::$lang) {
-			self::init();
-		}
-
-		if (!empty(self::$strings[$s])) {
-			$t = self::$strings[$s];
-			$s = is_array($t) ? $t[0] : $t;
-		}
-
-		if (count($vars) > 0) {
-			$s = sprintf($s, ...$vars);
-		}
-
-		return $s;
+		return self::$l10n->t($s, $vars);
 	}
 
 	/**
@@ -279,55 +152,9 @@ class L10n extends BaseObject
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function tt($singular, $plural, $count)
+	public static function tt(string $singular, string $plural, int $count)
 	{
-		if (!is_numeric($count)) {
-			Logger::log('Non numeric count called by ' . System::callstack(20));
-		}
-
-		if (!self::$lang) {
-			self::init();
-		}
-
-		if (!empty(self::$strings[$singular])) {
-			$t = self::$strings[$singular];
-			if (is_array($t)) {
-				$plural_function = 'string_plural_select_' . str_replace('-', '_', self::$lang);
-				if (function_exists($plural_function)) {
-					$i = $plural_function($count);
-				} else {
-					$i = self::stringPluralSelectDefault($count);
-				}
-
-				// for some languages there is only a single array item
-				if (!isset($t[$i])) {
-					$s = $t[0];
-				} else {
-					$s = $t[$i];
-				}
-			} else {
-				$s = $t;
-			}
-		} elseif (self::stringPluralSelectDefault($count)) {
-			$s = $plural;
-		} else {
-			$s = $singular;
-		}
-
-		$s = @sprintf($s, $count);
-
-		return $s;
-	}
-
-	/**
-	 * Provide a fallback which will not collide with a function defined in any language file
-	 *
-	 * @param int $n
-	 * @return bool
-	 */
-	private static function stringPluralSelectDefault($n)
-	{
-		return $n != 1;
+		return self::$l10n->tt($singular, $plural, $count);
 	}
 
 	/**
@@ -343,20 +170,7 @@ class L10n extends BaseObject
 	 */
 	public static function getAvailableLanguages()
 	{
-		$langs = [];
-		$strings_file_paths = glob('view/lang/*/strings.php');
-
-		if (is_array($strings_file_paths) && count($strings_file_paths)) {
-			if (!in_array('view/lang/en/strings.php', $strings_file_paths)) {
-				$strings_file_paths[] = 'view/lang/en/strings.php';
-			}
-			asort($strings_file_paths);
-			foreach ($strings_file_paths as $strings_file_path) {
-				$path_array = explode('/', $strings_file_path);
-				$langs[$path_array[2]] = $path_array[2];
-			}
-		}
-		return $langs;
+		return self::$l10n::getAvailableLanguages();
 	}
 
 	/**
@@ -367,15 +181,7 @@ class L10n extends BaseObject
 	 */
 	public static function getDay($s)
 	{
-		$ret = str_replace(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-			[self::t('Monday'), self::t('Tuesday'), self::t('Wednesday'), self::t('Thursday'), self::t('Friday'), self::t('Saturday'), self::t('Sunday')],
-			$s);
-
-		$ret = str_replace(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-			[self::t('January'), self::t('February'), self::t('March'), self::t('April'), self::t('May'), self::t('June'), self::t('July'), self::t('August'), self::t('September'), self::t('October'), self::t('November'), self::t('December')],
-			$ret);
-
-		return $ret;
+		return self::$l10n->getDay($s);
 	}
 
 	/**
@@ -386,40 +192,6 @@ class L10n extends BaseObject
 	 */
 	public static function getDayShort($s)
 	{
-		$ret = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-			[self::t('Mon'), self::t('Tue'), self::t('Wed'), self::t('Thu'), self::t('Fri'), self::t('Sat'), self::t('Sun')],
-			$s);
-
-		$ret = str_replace(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-			[self::t('Jan'), self::t('Feb'), self::t('Mar'), self::t('Apr'), self::t('May'), ('Jun'), self::t('Jul'), self::t('Aug'), self::t('Sep'), self::t('Oct'), self::t('Nov'), self::t('Dec')],
-			$ret);
-
-		return $ret;
-	}
-
-	/**
-	 * Load poke verbs
-	 *
-	 * @return array index is present tense verb
-	 *                 value is array containing past tense verb, translation of present, translation of past
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 * @hook poke_verbs pokes array
-	 */
-	public static function getPokeVerbs()
-	{
-		// index is present tense verb
-		// value is array containing past tense verb, translation of present, translation of past
-		$arr = [
-			'poke' => ['poked', self::t('poke'), self::t('poked')],
-			'ping' => ['pinged', self::t('ping'), self::t('pinged')],
-			'prod' => ['prodded', self::t('prod'), self::t('prodded')],
-			'slap' => ['slapped', self::t('slap'), self::t('slapped')],
-			'finger' => ['fingered', self::t('finger'), self::t('fingered')],
-			'rebuff' => ['rebuffed', self::t('rebuff'), self::t('rebuffed')],
-		];
-
-		Hook::callAll('poke_verbs', $arr);
-
-		return $arr;
+		return self::$l10n->getDayShort($s);
 	}
 }

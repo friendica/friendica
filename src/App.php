@@ -11,6 +11,7 @@ use Exception;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Hook;
+use Friendica\Core\L10n\L10n;
 use Friendica\Core\Theme;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -129,6 +130,11 @@ class App
 	private $database;
 
 	/**
+	 * @var L10n The translator
+	 */
+	private $l10n;
+
+	/**
 	 * Returns the current config cache of this node
 	 *
 	 * @return ConfigCache
@@ -208,6 +214,14 @@ class App
 	}
 
 	/**
+	 * @return L10n
+	 */
+	public function getL10n()
+	{
+		return $this->l10n;
+	}
+
+	/**
 	 * Register a stylesheet file path to be included in the <head> tag of every page.
 	 * Inclusion is done in App->initHead().
 	 * The path can be absolute or relative to the Friendica installation base folder.
@@ -253,11 +267,12 @@ class App
 	 * @param BaseURL          $baseURL   The full base URL of this Friendica app
 	 * @param LoggerInterface  $logger    The current app logger
 	 * @param Profiler         $profiler  The profiler of this application
+	 * @param L10n             $l10n      The translator instance
 	 * @param bool             $isBackend Whether it is used for backend or frontend (Default true=backend)
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, $isBackend = true)
+	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, L10n $l10n, $isBackend = true)
 	{
 		BaseObject::setApp($this);
 
@@ -268,6 +283,7 @@ class App
 		$this->baseURL  = $baseURL;
 		$this->profiler = $profiler;
 		$this->logger   = $logger;
+		$this->l10n     = $l10n;
 
 		$this->profiler->reset();
 
@@ -373,8 +389,6 @@ class App
 		}
 
 		$this->loadDefaultTimezone();
-
-		Core\L10n::init();
 	}
 
 	/**
@@ -518,7 +532,7 @@ class App
 		$this->page['htmlhead'] = Core\Renderer::replaceMacros($tpl, [
 			'$local_user'      => local_user(),
 			'$generator'       => 'Friendica' . ' ' . FRIENDICA_VERSION,
-			'$delitem'         => Core\L10n::t('Delete this item?'),
+			'$delitem'         => $this->l10n->t('Delete this item?'),
 			'$update_interval' => $interval,
 			'$shortcut_icon'   => $shortcut_icon,
 			'$touch_icon'      => $touch_icon,
@@ -560,7 +574,7 @@ class App
 			}
 			$this->page['footer'] .= Core\Renderer::replaceMacros(Core\Renderer::getMarkupTemplate("toggle_mobile_footer.tpl"), [
 				'$toggle_link' => $link,
-				'$toggle_text' => Core\L10n::t('toggle mobile')
+				'$toggle_text' => $this->l10n->t('toggle mobile')
 			]);
 		}
 
@@ -876,7 +890,7 @@ class App
 	{
 		$system_theme = $this->config->get('system', 'theme');
 		if (!$system_theme) {
-			throw new Exception(Core\L10n::t('No system theme config value set.'));
+			throw new Exception($this->l10n->t('No system theme config value set.'));
 		}
 
 		// Sane default
@@ -1026,8 +1040,8 @@ class App
 			$stamp1 = microtime(true);
 			session_start();
 			$this->profiler->saveTimestamp($stamp1, 'parser', Core\System::callstack());
-			Core\L10n::setSessionVariable();
-			Core\L10n::setLangFromSession();
+			$this->l10n->setSessionVariable();
+			$this->l10n->setLangFromSession();
 		} else {
 			$_SESSION = [];
 			Core\Worker::executeIfIdle();
@@ -1171,7 +1185,7 @@ class App
 			//Check if module is an app and if public access to apps is allowed or not
 			$privateapps = $this->config->get('config', 'private_addons', false);
 			if ((!local_user()) && Core\Hook::isAddonApp($this->module) && $privateapps) {
-				info(Core\L10n::t("You must be logged in to use addons. "));
+				info($this->l10n->t("You must be logged in to use addons. "));
 			} else {
 				include_once "addon/{$this->module}/{$this->module}.php";
 				if (function_exists($this->module . '_module')) {
@@ -1361,7 +1375,7 @@ class App
 		$a = $this;
 
 		// Used as is in view/php/default.php
-		$lang = Core\L10n::getCurrentLang();
+		$lang = $this->l10n->getCurrentLang();
 
 		/// @TODO Looks unsafe (remote-inclusion), is maybe not but Core\Theme::getPathForFile() uses file_exists() but does not escape anything
 		require_once $template;

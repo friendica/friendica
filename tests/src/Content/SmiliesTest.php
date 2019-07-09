@@ -11,14 +11,12 @@ namespace Friendica\Test\src\Content;
 use Friendica\Content\Smilies;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\L10nMockTrait;
 use Friendica\Test\Util\VFSTrait;
 
 class SmiliesTest extends MockedTest
 {
 	use VFSTrait;
 	use AppMockTrait;
-	use L10nMockTrait;
 
 	protected function setUp()
 	{

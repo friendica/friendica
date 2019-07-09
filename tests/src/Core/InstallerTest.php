@@ -7,24 +7,32 @@ use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Network\CurlResult;
 use Friendica\Object\Image;
 use Friendica\Test\MockedTest;
-use Friendica\Test\Util\L10nMockTrait;
 use Friendica\Test\Util\VFSTrait;
 use Friendica\Util\Network;
+use Mockery\MockInterface;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class InstallerTest extends MockedTest
 {
 	use VFSTrait;
-	use L10nMockTrait;
+
+	/**
+	 * @var \Friendica\Core\L10n\L10n|MockInterface
+	 */
+	private $l10nMock;
 
 	public function setUp()
 	{
 		parent::setUp();
 
 		$this->setUpVfsDir();
+
+		$this->l10nMock = \Mockery::mock(\Friendica\Core\L10n\L10n::class);
+		L10n::init($this->l10nMock);
+	}
+
+	private function mockL10nT(string $text, $times = null)
+	{
+		$this->l10nMock->shouldReceive('t')->with($text, [])->andReturn($text)->times($times);
 	}
 
 	/**
@@ -105,7 +113,7 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckKeys()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->setFunctions(['openssl_pkey_new' => false]);
 		$install = new Installer();
@@ -229,7 +237,7 @@ class InstallerTest extends MockedTest
 	 */
 	public function testCheckLocalIni()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->assertTrue($this->root->hasChild('config/local.config.php'));
 
@@ -246,10 +254,12 @@ class InstallerTest extends MockedTest
 
 	/**
 	 * @small
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testCheckHtAccessFail()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		// Mocking the CURL Response
 		$curlResult = \Mockery::mock(CurlResult::class);
@@ -285,10 +295,12 @@ class InstallerTest extends MockedTest
 
 	/**
 	 * @small
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testCheckHtAccessWork()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		// Mocking the failed CURL Response
 		$curlResultF = \Mockery::mock(CurlResult::class);
@@ -326,10 +338,12 @@ class InstallerTest extends MockedTest
 
 	/**
 	 * @small
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testImagick()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$imageMock = \Mockery::mock('alias:'. Image::class);
 		$imageMock
@@ -353,10 +367,12 @@ class InstallerTest extends MockedTest
 
 	/**
 	 * @small
+	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testImagickNotFound()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$imageMock = \Mockery::mock('alias:' . Image::class);
 		$imageMock
@@ -399,7 +415,7 @@ class InstallerTest extends MockedTest
 	 */
 	public function testSetUpCache()
 	{
-		$this->mockL10nT();
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$install = new Installer();
 		$configCache = \Mockery::mock(ConfigCache::class);
