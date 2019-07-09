@@ -398,7 +398,11 @@ class Notifier
 					$owner['uid'],
 					Contact::SHARING
 				);
-				$relay_list = DBA::toArray($relay_list_stmt);
+				if (DBA::isResult($relay_list_stmt)) {
+					$relay_list = DBA::toArray($relay_list_stmt);
+				} else {
+					$relay_list = [];
+				}
 
 				// Fetch the participation list
 				// The function will ensure that there are no duplicates
