@@ -219,7 +219,18 @@ Du kannst den PHP-Pfad finden, indem du den Befehl „which php“ ausführst.
 Wenn du Schwierigkeiten mit diesem Schritt hast, kannst du deinen Hosting-Anbieter kontaktieren.
 Friendica wird nicht korrekt laufen, wenn dieser Schritt nicht erfolgreich abgeschlossen werden kann.
 
-Falls das Einrichten des cron nicht möglich ist, kannst Du alternativ den "frontend worker" vom Administrationsinterface aus aktivieren.
+#### worker alternative: daemon
+Wenn Du keine Möglichkeit hast, Cronjobs anzulegen, kannst Du den Friendica Daemon als Hintergrund Prozess über die Kommandozeile deines Servers starten:
+
+    cd /path/to/friendica; php bin/daemon.php start
+
+Sobald er gestartet wurde, solltest Du überprüfen ob der Daemon wirklich läuft:
+
+    cd /path/to/friendica; php bin/daemon.php status
+
+Du solltest sicherstellen, dass der Daemon bei z.B. einem Serverneustart automatisch neu gestartet wird oder im Fehlerfall. Dies kann über z.B. einen Cronjob geschehen.
+
+Andernfalls musst Du dich an der Kommandozeile anmelden und den Daemon mit dem o.g. Kommando manuell starten.
 
 ### Erstelle einen Backup Plan
 
