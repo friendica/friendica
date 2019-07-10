@@ -233,6 +233,7 @@ It may be necessary to chmod the /.well-known/.htaccess file if you were not giv
 
 ### Set up the worker
 
+#### cron job for Worker
 Set up a cron job or scheduled task to run the worker once every 5-10 minutes in order to perform background processing.
 Example:
 
@@ -249,10 +250,17 @@ You can generally find the location of PHP by executing "which php".
 If you run into trouble with this section please contact your hosting provider for assistance.
 Friendica will not work correctly if you cannot perform this step.
 
-If it is not possible to set up a cron job then please activate the "frontend worker" in the administration interface.
+#### worker alternative: daemon
+Otherwise, you’ll need to use the command line on your remote server and start the Friendica daemon (background task) using the following command:
+
+    cd /path/to/friendica; php bin/daemon.php start
+Once started, you can check the daemon status using the following command:
+
+    cd /path/to/friendica; php bin/daemon.php status
 
 Once you have installed Friendica and created an admin account as part of the process, you can access the admin panel of your installation and do most of the server wide configuration from there.
 
+### Logging & Log Rotation
 At this point it is recommended that you set up logging and logrotation.
 To do so please visit [Settings](help/Settings) and search the 'Logs' section for more information.
 
