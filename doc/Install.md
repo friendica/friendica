@@ -258,7 +258,8 @@ Once started, you can check the daemon status using the following command:
 
     cd /path/to/friendica; php bin/daemon.php status
 
-After a server restart or any other failure, the daemon needs to be restarted. This could be achieved by a cronjob.
+After a server restart or any other failure, the daemon needs to be restarted. 
+This could be achieved by a cronjob.
 
 
 Once you have installed Friendica and created an admin account as part of the process, you can access the admin panel of your installation and do most of the server wide configuration from there.

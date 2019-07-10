@@ -228,7 +228,8 @@ Sobald er gestartet wurde, solltest Du überprüfen ob der Daemon wirklich läuf
 
     cd /path/to/friendica; php bin/daemon.php status
 
-Du solltest sicherstellen, dass der Daemon bei z.B. einem Serverneustart automatisch neu gestartet wird oder im Fehlerfall. Dies kann über z.B. einen Cronjob geschehen.
+Du solltest sicherstellen, dass der Daemon bei z.B. einem Serverneustart automatisch neu gestartet wird oder im Fehlerfall. 
+Dies kann über z.B. einen Cronjob geschehen.
 
 Andernfalls musst Du dich an der Kommandozeile anmelden und den Daemon mit dem o.g. Kommando manuell starten.
 
