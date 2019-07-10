@@ -168,14 +168,15 @@ like this: (changing it to the correct PHP location)
     	'php_path' => '/usr/local/php56/bin/php',
     ]
 
-Alternative: If you cannot use a cron job as described above, you can use the
-frontend worker and an external cron service to trigger the execution of the worker script.
-You can enable the frontend worker after the installation from the admin panel
-of your node and call:
- 
-	 https://example.com/worker
+### worker alternative: daemon
 
-with the service of your choice.
+If you can not use cronjobs, login in to the command line ("shell") on your remote server and start the Friendica daemon (background task) using the following command:
+
+    cd /path/to/friendica; php bin/daemon.php start
+Once started, you can check the daemon status using the following command:
+
+    cd /path/to/friendica; php bin/daemon.php status
+After a server restart or any other failure, the daemon needs to be restarted. This could be achieved by a cronjob.
 
 ## 8. (Recommended) Set up a backup plan
 
