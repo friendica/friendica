@@ -7760,6 +7760,20 @@ msgid ""
 "with higher priority are blocked by processes of lower priority."
 msgstr ""
 
+#: src/Module/Admin/Site.php:673
+msgid "Enable frontend worker"
+msgstr ""
+
+#: src/Module/Admin/Site.php:673
+#, php-format
+msgid ""
+"When enabled the Worker process is triggered when backend access is "
+"performed (e.g. messages being delivered). On smaller sites you might want "
+"to call %s/worker on a regular basis via an external cron job. You should "
+"only enable this option if you cannot utilize cron/scheduled jobs on your "
+"server."
+msgstr ""
+
 #: src/Module/Admin/Site.php:675
 msgid "Subscribe to relay"
 msgstr ""
