@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eb985236d64ed0b0fe1fc2e4ac6616e2",
+    "content-hash": "01885fc43b31a26a09e00909968f85e4",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1030,7 +1030,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/cropperjs/-/cropperjs-1.2.2.tgz",
-                "reference": null,
                 "shasum": "30dc7a7ce872155b23a33bd10ad4c76c0d613f55"
             },
             "require-dev": {
@@ -1124,7 +1123,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/ev-emitter/-/ev-emitter-1.1.1.tgz",
-                "reference": null,
                 "shasum": "8f18b0ce5c76a5d18017f71c0a795c65b9138f2a"
             },
             "type": "npm-asset-library",
@@ -1167,7 +1165,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/fullcalendar/-/fullcalendar-3.10.0.tgz",
-                "reference": null,
                 "shasum": "cc5e87d518fd6550e142816a31dd191664847919"
             },
             "type": "npm-asset-library",
@@ -1214,27 +1211,10 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/imagesloaded/-/imagesloaded-4.1.4.tgz",
-                "reference": null,
                 "shasum": "1376efcd162bb768c34c3727ac89cc04051f3cc7"
             },
             "require": {
                 "npm-asset/ev-emitter": ">=1.0.0,<2.0.0"
-            },
-            "require-dev": {
-                "npm-asset/chalk": ">=1.1.1,<2.0.0",
-                "npm-asset/cheerio": ">=0.19.0,<0.20.0",
-                "npm-asset/gulp": ">=3.9.0,<4.0.0",
-                "npm-asset/gulp-jshint": ">=1.11.2,<2.0.0",
-                "npm-asset/gulp-json-lint": ">=0.1.0,<0.2.0",
-                "npm-asset/gulp-rename": ">=1.2.2,<2.0.0",
-                "npm-asset/gulp-replace": ">=0.5.4,<0.6.0",
-                "npm-asset/gulp-requirejs-optimize": "dev-github:metafizzy/gulp-requirejs-optimize",
-                "npm-asset/gulp-uglify": ">=1.4.2,<2.0.0",
-                "npm-asset/gulp-util": ">=3.0.7,<4.0.0",
-                "npm-asset/highlight.js": ">=8.9.1,<9.0.0",
-                "npm-asset/marked": ">=0.3.5,<0.4.0",
-                "npm-asset/minimist": ">=1.2.0,<2.0.0",
-                "npm-asset/transfob": ">=1.0.0,<2.0.0"
             },
             "type": "npm-asset-library",
             "extra": {
@@ -1278,16 +1258,7 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/jgrowl/-/jgrowl-1.4.6.tgz",
-                "reference": null,
                 "shasum": "2736e332aaee73ccf0a14a5f0066391a0a13f4a3"
-            },
-            "require-dev": {
-                "npm-asset/grunt": "~0.4.2",
-                "npm-asset/grunt-contrib-cssmin": "~0.9.0",
-                "npm-asset/grunt-contrib-jshint": "~0.6.3",
-                "npm-asset/grunt-contrib-less": "~0.11.0",
-                "npm-asset/grunt-contrib-uglify": "~0.4.0",
-                "npm-asset/grunt-contrib-watch": "~0.6.1"
             },
             "type": "npm-asset-library",
             "extra": {
@@ -1319,34 +1290,7 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/jquery/-/jquery-2.2.4.tgz",
-                "reference": null,
                 "shasum": "2c89d6889b5eac522a7eea32c14521559c6cbf02"
-            },
-            "require-dev": {
-                "npm-asset/commitplease": "2.0.0",
-                "npm-asset/core-js": "0.9.17",
-                "npm-asset/grunt": "0.4.5",
-                "npm-asset/grunt-babel": "5.0.1",
-                "npm-asset/grunt-cli": "0.1.13",
-                "npm-asset/grunt-compare-size": "0.4.0",
-                "npm-asset/grunt-contrib-jshint": "0.11.2",
-                "npm-asset/grunt-contrib-uglify": "0.9.2",
-                "npm-asset/grunt-contrib-watch": "0.6.1",
-                "npm-asset/grunt-git-authors": "2.0.1",
-                "npm-asset/grunt-jscs": "2.1.0",
-                "npm-asset/grunt-jsonlint": "1.0.4",
-                "npm-asset/grunt-npmcopy": "0.1.0",
-                "npm-asset/gzip-js": "0.3.2",
-                "npm-asset/jsdom": "5.6.1",
-                "npm-asset/load-grunt-tasks": "1.0.0",
-                "npm-asset/qunit-assert-step": "1.0.3",
-                "npm-asset/qunitjs": "1.17.1",
-                "npm-asset/requirejs": "2.1.17",
-                "npm-asset/sinon": "1.10.3",
-                "npm-asset/sizzle": "2.2.1",
-                "npm-asset/strip-json-comments": "1.0.3",
-                "npm-asset/testswarm": "1.1.0",
-                "npm-asset/win-spawn": "2.0.0"
             },
             "type": "npm-asset-library",
             "extra": {
@@ -1390,7 +1334,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/jquery-colorbox/-/jquery-colorbox-1.6.4.tgz",
-                "reference": null,
                 "shasum": "799452523a6c494839224ef702e807deb9c06cc5"
             },
             "require": {
@@ -1437,7 +1380,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/jquery-datetimepicker/-/jquery-datetimepicker-2.5.20.tgz",
-                "reference": null,
                 "shasum": "687d6204b90b03dc93f725f8df036e1d061f37ac"
             },
             "require": {
@@ -1495,14 +1437,7 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/jquery-mousewheel/-/jquery-mousewheel-3.1.13.tgz",
-                "reference": null,
                 "shasum": "06f0335f16e353a695e7206bf50503cb523a6ee5"
-            },
-            "require-dev": {
-                "npm-asset/grunt": "~0.4.1",
-                "npm-asset/grunt-contrib-connect": "~0.5.0",
-                "npm-asset/grunt-contrib-jshint": "~0.7.1",
-                "npm-asset/grunt-contrib-uglify": "~0.2.7"
             },
             "type": "npm-asset-library",
             "extra": {
@@ -1550,7 +1485,6 @@
             "dist": {
                 "type": "tar",
                 "url": "https://registry.npmjs.org/moment/-/moment-2.22.2.tgz",
-                "reference": null,
                 "shasum": "3c257f9839fc0e93ff53149632239eb90783ff66"
             },
             "type": "npm-asset-library",
@@ -1660,6 +1594,58 @@
             "description": "A Javascript datetime formatting and manipulation library using PHP date-time formats.",
             "homepage": "https://github.com/kartik-v/php-date-formatter",
             "time": "2018-07-13T06:56:46+00:00"
+        },
+        {
+            "name": "npm-asset/typeahead.js",
+            "version": "0.11.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/typeahead.js/-/typeahead.js-0.11.1.tgz",
+                "shasum": "4e64e671b22310a8606f4aec805924ba84b015b8"
+            },
+            "require": {
+                "npm-asset/jquery": ">=1.7"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/twitter/typeahead.js/issues"
+                },
+                "npm-asset-main": "dist/typeahead.bundle.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "https://github.com/twitter/typeahead.js.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
+                }
+            },
+            "authors": [
+                {
+                    "name": "Twitter, Inc.",
+                    "url": "https://twitter.com/twitteross"
+                },
+                {
+                    "name": "Jake Harding",
+                    "url": "https://twitter.com/JakeHarding"
+                },
+                {
+                    "name": "Tim Trueman",
+                    "url": "https://twitter.com/timtrueman"
+                },
+                {
+                    "name": "Veljko Skarich",
+                    "url": "https://twitter.com/vskarich"
+                }
+            ],
+            "description": "fast and fully-featured autocomplete library",
+            "homepage": "http://twitter.github.com/typeahead.js",
+            "keywords": [
+                "autocomplete",
+                "typeahead"
+            ],
+            "time": "2015-04-27T04:03:42+00:00"
         },
         {
             "name": "paragonie/certainty",
