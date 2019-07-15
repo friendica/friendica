@@ -1371,7 +1371,8 @@ section #jotOpen {
 #jot-text-wrap .preview textarea {
     width: 100%;
 }
-#preview_profile-jot-text {
+#preview_profile-jot-text,
+.comment-edit-form .preview {
     position: relative;
     padding: 0px 10px;
     margin-top: -2px;
@@ -1382,7 +1383,8 @@ section #jotOpen {
     background: #fff;
     color: #555;
 }
-textarea#profile-jot-text:focus + #preview_profile-jot-text {
+textarea#profile-jot-text:focus + #preview_profile-jot-text,
+textarea.comment-edit-text:focus + .comment-edit-form .preview {
     border: 2px solid #6fdbe8;
     border-top: none;
 }

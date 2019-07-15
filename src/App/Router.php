@@ -94,6 +94,7 @@ class Router
 		$this->routeCollector->addRoute(['GET'],         '/attach/{item:\d+}',   Module\Attach::class);
 		$this->routeCollector->addRoute(['GET'],         '/babel',               Module\Debug\Babel::class);
 		$this->routeCollector->addRoute(['GET'],         '/bookmarklet',         Module\Bookmarklet::class);
+		$this->routeCollector->addRoute(['GET', 'POST'], '/compose[/{type}]',    Module\Item\Compose::class);
 		$this->routeCollector->addGroup('/contact', function (RouteCollector $collector) {
 			$collector->addRoute(['GET'], '[/]',                                 Module\Contact::class);
 			$collector->addRoute(['GET', 'POST'], '/{id:\d+}[/]',                Module\Contact::class);
