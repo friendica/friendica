@@ -643,7 +643,7 @@ function networkThreadedView(App $a, $update, $parent)
 			// NOTREACHED
 		}
 
-		$contacts = Group::expand([$gid]);
+		$contacts = Group::expand(local_user(), [$gid]);
 
 		if ((is_array($contacts)) && count($contacts)) {
 			$contact_str_self = '';

@@ -386,7 +386,7 @@ class Transmitter
 				}
 			}
 		} else {
-			$receiver_list = Item::enumeratePermissions($item);
+			$receiver_list = Item::enumeratePermissions($item['uid'], $item);
 
 			foreach ($terms as $term) {
 				$cid = Contact::getIdForURL($term['url'], $item['uid']);

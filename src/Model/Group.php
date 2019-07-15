@@ -16,9 +16,25 @@ use Friendica\Database\DBA;
  */
 class Group extends BaseObject
 {
+	const FOLLOWERS = '~';
+	const MUTUALS = '&';
+
+	public static function getByUserId($uid, $includesDeleted = false)
+	{
+		$DB = self::getApp()->getDatabase();
+
+		$conditions = ['uid' => $uid];
+
+		if (!$includesDeleted) {
+			$conditions['deleted'] = false;
+		}
+
+		$groupsStmt = $DB->select('group', [], $conditions);
+
+		return $DB->toArray($groupsStmt);
+	}
+
 	/**
-	 *
-	 *
 	 * @param int $group_id
 	 * @return bool
 	 * @throws \Exception
@@ -300,20 +316,43 @@ class Group extends BaseObject
 	/**
 	 * @brief Returns the combined list of contact ids from a group id list
 	 *
+	 * @param int     $uid
 	 * @param array   $group_ids
 	 * @param boolean $check_dead
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function expand($group_ids, $check_dead = false)
+	public static function expand($uid, array $group_ids, $check_dead = false)
 	{
 		if (!is_array($group_ids) || !count($group_ids)) {
 			return [];
 		}
 
-		$stmt = DBA::select('group_member', ['contact-id'], ['gid' => $group_ids]);
-
 		$return = [];
+
+		$key = array_search(self::FOLLOWERS, $group_ids);
+		if ($key !== false) {
+			$followersStmt = Contact::select(['id'], ['uid' => $uid, 'rel' => [Contact::FOLLOWER, Contact::FRIEND]]);
+
+			while($follower = DBA::fetch($followersStmt)) {
+				$return[] = $follower['id'];
+			}
+
+			unset($group_ids[$key]);
+		}
+
+		$key = array_search(self::MUTUALS, $group_ids);
+		if ($key !== false) {
+			$mutualsStmt = Contact::select(['id'], ['uid' => $uid, 'rel' => [Contact::FRIEND]]);
+
+			while($mutual = DBA::fetch($mutualsStmt)) {
+				$return[] = $mutual['id'];
+			}
+
+			unset($group_ids[$key]);
+		}
+
+		$stmt = DBA::select('group_member', ['contact-id'], ['gid' => $group_ids]);
 		while($group_member = DBA::fetch($stmt)) {
 			$return[] = $group_member['contact-id'];
 		}
@@ -332,7 +371,7 @@ class Group extends BaseObject
 	 * @param int    $gid   An optional pre-selected group
 	 * @param string $label An optional label of the list
 	 * @return string
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Exception
 	 */
 	public static function displayGroupSelection($uid, $gid = 0, $label = '')
 	{
@@ -377,7 +416,7 @@ class Group extends BaseObject
 	 * @param string $group_id
 	 * @param int    $cid
 	 * @return string
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Exception
 	 */
 	public static function sidebarWidget($every = 'contact', $each = 'group', $editmode = 'standard', $group_id = '', $cid = 0)
 	{

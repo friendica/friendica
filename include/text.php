@@ -4,11 +4,11 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Smilies;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 use Friendica\Model\FileTag;
+use Friendica\Model\Group;
 use Friendica\Util\Strings;
 
 /**
@@ -20,18 +20,9 @@ use Friendica\Util\Strings;
 function expand_acl($s) {
 	// turn string array of angle-bracketed elements into numeric array
 	// e.g. "<1><2><3>" => array(1,2,3);
-	$ret = [];
+	preg_match_all('/<(' . Group::FOLLOWERS . '|'. Group::MUTUALS . '|[0-9]+)>/', $s, $matches, PREG_PATTERN_ORDER);
 
-	if (strlen($s)) {
-		$t = str_replace('<', '', $s);
-		$a = explode('>', $t);
-		foreach ($a as $aa) {
-			if (intval($aa)) {
-				$ret[] = intval($aa);
-			}
-		}
-	}
-	return $ret;
+	return $matches[1];
 }
 
 
@@ -42,6 +33,8 @@ function expand_acl($s) {
 function sanitise_acl(&$item) {
 	if (intval($item)) {
 		$item = '<' . intval(Strings::escapeTags(trim($item))) . '>';
+	} elseif (in_array($item, [Group::FOLLOWERS, Group::MUTUALS])) {
+		$item = '<' . $item . '>';
 	} else {
 		unset($item);
 	}

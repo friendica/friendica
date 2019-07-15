@@ -264,9 +264,9 @@ class Notifier
 				}
 
 				$allow_people = expand_acl($parent['allow_cid']);
-				$allow_groups = Group::expand(expand_acl($parent['allow_gid']),true);
+				$allow_groups = Group::expand($uid, expand_acl($parent['allow_gid']),true);
 				$deny_people  = expand_acl($parent['deny_cid']);
-				$deny_groups  = Group::expand(expand_acl($parent['deny_gid']));
+				$deny_groups  = Group::expand($uid, expand_acl($parent['deny_gid']));
 
 				// if our parent is a public forum (forum_mode == 1), uplink to the origional author causing
 				// a delivery fork. private groups (forum_mode == 2) do not uplink
