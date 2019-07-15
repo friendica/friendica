@@ -183,6 +183,10 @@
 	});
 </script>
 
+<div class="form-group">
+    {{include file="field_checkbox.tpl" field=$enable_compose}}
+</div>
+
 <div class="settings-submit-wrapper form-group pull-right">
 	<button type="submit" value="{{$submit}}" class="settings-submit btn btn-primary" name="frio-settings-submit">{{$submit}}</button>
 </div>

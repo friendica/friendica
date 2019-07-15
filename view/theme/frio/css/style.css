@@ -1313,7 +1313,8 @@ section ul.tabs {
 section #jotOpen {
     display: none;
 }
-#jotOpen {
+#jotOpen,
+#composeOpen {
     margin-top: 3px;
     float: right;
 }

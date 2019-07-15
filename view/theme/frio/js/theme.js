@@ -64,9 +64,24 @@ $(document).ready(function(){
 	});
 
 	// add Jot botton to the scecond navbar
-	if( $("section #jotOpen").length ) {
-		$("section #jotOpen").appendTo("#topbar-second > .container > #navbar-button");
-		if( $("#jot-popup").is(":hidden")) $("#topbar-second > .container > #navbar-button #jotOpen").hide();
+	let $jotButton = $("#jotOpen");
+	let $composeButton = $("#composeOpen");
+	if (compose) {
+		$jotButton.hide();
+		if ($composeButton.length) {
+			$composeButton.appendTo("#topbar-second > .container > #navbar-button");
+			if($("#jot-popup").is(":hidden")) {
+				$composeButton.hide();
+			}
+		}
+	} else {
+		$composeButton.hide();
+		if ($jotButton.length) {
+			$jotButton.appendTo("#topbar-second > .container > #navbar-button");
+			if($("#jot-popup").is(":hidden")) {
+				$jotButton.hide();
+			}
+		}
 	}
 
 	// show bulk deletion button at network page if checkbox is checked

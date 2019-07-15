@@ -1,6 +1,6 @@
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
 <button class="btn btn-sm btn-main pull-right" id="jotOpen" aria-label="{{$new_post}}" title="{{$new_post}}" onclick="jotShow();"><i class="fa fa-pencil-square-o fa-2x"></i></button>
-
+<a class="btn btn-sm btn-main pull-right" id="composeOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}" aria-label="{{$new_post}}" title="{{$new_post}}"><i class="fa fa-pencil-square-o fa-2x"></i></a>
 
 <div id="jot-content">
 	<div id="jot-sections">

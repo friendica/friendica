@@ -41,6 +41,14 @@ function frio_init(App $a)
 			</script>
 EOT;
 	}
+
+	$enable_compose = \Friendica\Core\PConfig::get(local_user(), 'frio', 'enable_compose');
+	$compose = $enable_compose === '1' || $enable_compose === null && Config::get('frio', 'enable_compose') ? 1 : 0;
+	$a->page['htmlhead'] .= <<< HTML
+		<script type="text/javascript">
+			var compose = $compose;
+		</script>
+HTML;
 }
 
 function frio_install()
