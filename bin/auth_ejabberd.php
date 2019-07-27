@@ -32,7 +32,6 @@
  *
  */
 
-use Friendica\App\Mode;
 use Friendica\BaseObject;
 use Friendica\Util\ExAuth;
 
@@ -56,9 +55,6 @@ $dice = new \Dice\Dice();
 $dice = $dice->addRules(include __DIR__ . '/../static/dependencies.config.php');
 BaseObject::setDependencyInjection($dice);
 
-$appMode = $dice->create(Mode::class);
-
-if ($appMode->isNormal()) {
-	$oAuth = new ExAuth();
-	$oAuth->readStdin();
-}
+/** @var ExAuth $oAuth */
+$oAuth = $dice->create(ExAuth::class);
+$oAuth->readStdin();

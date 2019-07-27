@@ -34,9 +34,9 @@
 
 namespace Friendica\Util;
 
+use Friendica\App;
 use Friendica\Core\Config;
-use Friendica\Core\PConfig;
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
 use Friendica\Model\User;
 
 class ExAuth
@@ -45,12 +45,43 @@ class ExAuth
 	private $host;
 
 	/**
+	 * @var App\Mode
+	 */
+	private $appMode;
+	/**
+	 * @var Config\Configuration
+	 */
+	private $config;
+	/**
+	 * @var Config\PConfiguration
+	 */
+	private $pConfig;
+	/**
+	 * @var Database
+	 */
+	private $dba;
+	/**
+	 * @var BaseURL
+	 */
+	private $baseUrl;
+
+	/**
 	 * @brief Create the class
 	 *
+	 * @param Config\Configuration  $config
+	 * @param Config\PConfiguration $pConfig
+	 * @param Database              $dba
+	 * @param BaseURL               $baseURL
 	 */
-	public function __construct()
+	public function __construct(App\Mode $appMode, Config\Configuration $config, Config\PConfiguration $pConfig, Database $dba, BaseURL $baseURL)
 	{
-		$this->bDebug = (int) Config::get('jabber', 'debug');
+		$this->appMode = $appMode;
+		$this->config = $config;
+		$this->pConfig = $pConfig;
+		$this->dba = $dba;
+		$this->baseUrl = $baseURL;
+
+		$this->bDebug = (int)$config->get('jabber', 'debug');
 
 		openlog('auth_ejabberd', LOG_PID, LOG_USER);
 
@@ -66,9 +97,14 @@ class ExAuth
 	 */
 	public function readStdin()
 	{
+		if (!$this->appMode->isNormal()) {
+			$this->writeLog(LOG_ERR, 'The node isn\'t ready.');
+			return;
+		}
+
 		while (!feof(STDIN)) {
 			// Quit if the database connection went down
-			if (!DBA::connected()) {
+			if (!$this->dba->isConnected()) {
 				$this->writeLog(LOG_ERR, 'the database connection went down');
 				return;
 			}
@@ -123,8 +159,6 @@ class ExAuth
 	 */
 	private function isUser(array $aCommand)
 	{
-		$a = \get_app();
-
 		// Check if there is a username
 		if (!isset($aCommand[1])) {
 			$this->writeLog(LOG_NOTICE, 'invalid isuser command, no username given');
@@ -140,9 +174,9 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if ($a->getHostName() == $aCommand[2]) {
+		if ($this->baseUrl->getHostName() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal user check for ' . $sUser . '@' . $aCommand[2]);
-			$found = DBA::exists('user', ['nickname' => $sUser]);
+			$found = $this->dba->exists('user', ['nickname' => $sUser]);
 		} else {
 			$found = false;
 		}
@@ -205,8 +239,6 @@ class ExAuth
 	 */
 	private function auth(array $aCommand)
 	{
-		$a = \get_app();
-
 		// check user authentication
 		if (sizeof($aCommand) != 4) {
 			$this->writeLog(LOG_NOTICE, 'invalid auth command, data missing');
@@ -222,11 +254,11 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if ($a->getHostName() == $aCommand[2]) {
+		if ($this->baseUrl->getHostName() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
-			$aUser = DBA::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);
-			if (DBA::isResult($aUser)) {
+			$aUser = $this->dba->selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);
+			if ($this->dba->isResult($aUser)) {
 				$uid = $aUser['uid'];
 				$success = User::authenticate($aUser, $aCommand[3], true);
 				$Error = $success === false;
@@ -237,7 +269,7 @@ class ExAuth
 			}
 			if ($Error) {
 				$this->writeLog(LOG_INFO, 'check against alternate password for ' . $sUser . '@' . $aCommand[2]);
-				$sPassword = PConfig::get($uid, 'xmpp', 'password', null, true);
+				$sPassword = $this->pConfig->get($uid, 'xmpp', 'password', null, true);
 				$Error = ($aCommand[3] != $sPassword);
 			}
 		} else {
@@ -309,7 +341,7 @@ class ExAuth
 
 		$this->host = $host;
 
-		$lockpath = Config::get('jabber', 'lockpath');
+		$lockpath = $this->config->get('jabber', 'lockpath');
 		if (is_null($lockpath)) {
 			$this->writeLog(LOG_INFO, 'No lockpath defined.');
 			return;
