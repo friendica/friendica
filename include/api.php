@@ -6223,7 +6223,7 @@ function api_friendica_profile_show($type)
 
 			// select all users from contact table, loop and prepare standard return for user data
 			$users = [];
-			$nurls = Contact::select(['id', 'nurl'], ['uid' => api_user(), 'profile-id' => $rr['id']]);
+			$nurls = Contact::selectToArray(['id', 'nurl'], ['uid' => api_user(), 'profile-id' => $rr['id']]);
 
 			if (DBA::isResult($nurls)) {
 				foreach ($nurls as $nurl) {
