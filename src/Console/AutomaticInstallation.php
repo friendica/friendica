@@ -34,6 +34,11 @@ class AutomaticInstallation extends Console
 	 */
 	private $dba;
 
+	/**
+	 * @var Installer
+	 */
+	private $installer;
+
 	protected function getHelp()
 	{
 		return <<<HELP
@@ -89,7 +94,7 @@ Examples
 HELP;
 	}
 
-	public function __construct(App\Mode $appMode, Config\Cache\ConfigCache $configCache, Config\Configuration $config, Database $dba, array $argv = null)
+	public function __construct(App\Mode $appMode, Config\Cache\ConfigCache $configCache, Config\Configuration $config, Database $dba, Installer $installer, array $argv = null)
 	{
 		parent::__construct($argv);
 
@@ -97,6 +102,7 @@ HELP;
 		$this->configCache  =$configCache;
 		$this->config = $config;
 		$this->dba = $dba;
+		$this->installer = $installer;
 	}
 
 	protected function doExecute()

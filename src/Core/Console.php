@@ -44,6 +44,7 @@ Commands:
 	po2php                 Generate a strings.php file from a messages.po file
 	typo                   Checks for parse errors in Friendica files
 	postupdate             Execute pending post update scripts (can last days)
+	systemcheck            Checks the system status of this node
 	serverblock            Manage blocked servers
 	storage                Manage storage backend
 
@@ -72,6 +73,7 @@ HELP;
 		'typo'                   => Friendica\Console\Typo::class,
 		'postupdate'             => Friendica\Console\PostUpdate::class,
 		'serverblock'            => Friendica\Console\ServerBlock::class,
+		'systemcheck'            => Friendica\Console\SystemCheck::class,
 		'storage'                => Friendica\Console\Storage::class,
 	];
 

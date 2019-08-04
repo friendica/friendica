@@ -127,11 +127,11 @@ class InstallerTest extends MockedTest
 		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->setFunctions(['openssl_pkey_new' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkKeys());
 
 		$this->setFunctions(['openssl_pkey_new' => true]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertTrue($install->checkKeys());
 	}
 
@@ -142,7 +142,7 @@ class InstallerTest extends MockedTest
 	{
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['curl_init' => false, 'imagecreatefromjpeg' => true]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(3,
 			'libCurl PHP module',
@@ -153,7 +153,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['imagecreatefromjpeg' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(4,
 			'GD graphics PHP module',
@@ -164,7 +164,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['openssl_public_encrypt' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(5,
 			'OpenSSL PHP module',
@@ -175,7 +175,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['mb_strlen' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(6,
 			'mb_string PHP module',
@@ -186,7 +186,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['iconv_strlen' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(7,
 			'iconv PHP module',
@@ -197,7 +197,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['posix_kill' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(8,
 			'POSIX PHP module',
@@ -208,7 +208,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['json_encode' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(9,
 			'JSON PHP module',
@@ -219,7 +219,7 @@ class InstallerTest extends MockedTest
 
 		$this->mockFunctionL10TCalls();
 		$this->setFunctions(['finfo_open' => false]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertFalse($install->checkFunctions());
 		$this->assertCheckExist(10,
 			'File Information PHP module',
@@ -239,7 +239,7 @@ class InstallerTest extends MockedTest
 			'json_encode' => true,
 			'finfo_open' => true,
 		]);
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertTrue($install->checkFunctions());
 	}
 
@@ -252,14 +252,14 @@ class InstallerTest extends MockedTest
 
 		$this->assertTrue($this->root->hasChild('config/local.config.php'));
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertTrue($install->checkLocalIni());
 
 		$this->delConfigFile('local.config.php');
 
 		$this->assertFalse($this->root->hasChild('config/local.config.php'));
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$this->assertTrue($install->checkLocalIni());
 	}
 
@@ -298,7 +298,7 @@ class InstallerTest extends MockedTest
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 
 		$this->assertFalse($install->checkHtAccess('https://test'));
 		$this->assertSame('test Error', $install->getChecks()[0]['error_msg']['msg']);
@@ -342,7 +342,7 @@ class InstallerTest extends MockedTest
 		// needed because of "normalise_link"
 		require_once __DIR__ . '/../../../include/text.php';
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 
 		$this->assertTrue($install->checkHtAccess('https://test'));
 	}
@@ -363,7 +363,7 @@ class InstallerTest extends MockedTest
 
 		$this->setClasses(['Imagick' => true]);
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 
 		// even there is no supported type, Imagick should return true (because it is not required)
 		$this->assertTrue($install->checkImagick());
@@ -392,7 +392,7 @@ class InstallerTest extends MockedTest
 
 		$this->setClasses(['Imagick' => true]);
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 
 		// even there is no supported type, Imagick should return true (because it is not required)
 		$this->assertTrue($install->checkImagick());
@@ -409,7 +409,7 @@ class InstallerTest extends MockedTest
 		$this->setClasses(['Imagick' => false]);
 		$this->mockL10nT('ImageMagick PHP extension is not installed');
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 
 		// even there is no supported type, Imagick should return true (because it is not required)
 		$this->assertTrue($install->checkImagick());
@@ -428,7 +428,7 @@ class InstallerTest extends MockedTest
 	{
 		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
-		$install = new Installer();
+		$install = new Installer($this->l10nMock);
 		$configCache = \Mockery::mock(ConfigCache::class);
 		$configCache->shouldReceive('set')->with('config', 'php_path', \Mockery::any())->once();
 		$configCache->shouldReceive('set')->with('system', 'basepath', '/test/')->once();
