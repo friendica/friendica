@@ -67,12 +67,31 @@ class Session extends BaseObject
 		$module = self::getClass(App\Module::class);
 
 		if (!$module->isBackend()) {
-			$stamp1 = microtime(true);
-			session_start();
-			$profiler->saveTimestamp($stamp1, 'parser', System::callstack());
+			if (!self::isStarted()) {
+				$stamp1 = microtime(true);
+				session_start();
+				$profiler->saveTimestamp($stamp1, 'parser', System::callstack());
+			}
 		}
 
 		self::$started = true;
+	}
+
+	/**
+	 * Checks, if the session is already started
+	 *
+	 * @return bool True, if the session is already staretd
+	 */
+	public static function isStarted()
+	{
+		if (php_sapi_name() !== 'cli') {
+			if (version_compare(phpversion(), '5.4.0', '>=')) {
+				return session_status() === PHP_SESSION_ACTIVE ? true : false;
+			} else {
+				return session_id() === '' ? false : true;
+			}
+		}
+		return false;
 	}
 
 	public static function exists($name)

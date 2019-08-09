@@ -125,7 +125,6 @@ class Module
 			$module = "login";
 		}
 
-
 		$isBackend = $this->checkBackend($module, $server);
 
 		return new Module($module, $this->module_class, $isBackend, $this->printNotAllowedAddon);
