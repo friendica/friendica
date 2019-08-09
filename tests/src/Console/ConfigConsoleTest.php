@@ -25,9 +25,7 @@ class ConfigConsoleTest extends ConsoleTest
 			]
 		]);
 
-		$this->appMode = \Mockery::mock(App\Mode::class);
-		$this->appMode->shouldReceive('has')
-		        ->andReturn(true);
+		$this->appMode = new App\Mode(15);
 
 		$this->configMock = \Mockery::mock(Configuration::class);
 	}

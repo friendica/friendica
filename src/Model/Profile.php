@@ -1225,29 +1225,6 @@ class Profile
 	}
 
 	/**
-	* Strip zrl parameter from a string.
-	*
-	* @param string $s The input string.
-	* @return string The zrl.
-	*/
-	public static function stripZrls($s)
-	{
-		return preg_replace('/[\?&]zrl=(.*?)([\?&]|$)/is', '', $s);
-	}
-
-	/**
-	 * Strip query parameter from a string.
-	 *
-	 * @param string $s The input string.
-	 * @param        $param
-	 * @return string The query parameter.
-	 */
-	public static function stripQueryParam($s, $param)
-	{
-		return preg_replace('/[\?&]' . $param . '=(.*?)(&|$)/ism', '$2', $s);
-	}
-
-	/**
 	 * search for Profiles
 	 *
 	 * @param int  $start

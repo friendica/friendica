@@ -75,7 +75,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 		$l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->dice->shouldReceive('create')
-		           ->with(L10n::class)
+		           ->with(L10n::class, [])
 		           ->andReturn($l10nMock);
 
 		BaseObject::setDependencyInjection($this->dice);

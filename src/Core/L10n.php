@@ -13,6 +13,28 @@ use Friendica\Core\L10n\L10n as L10nClass;
  */
 class L10n extends BaseObject
 {
+	/** @var string an optional language parameter (push/pop language) */
+	private static $lang;
+
+	/**
+	 * Returns the global L10n instance
+	 * 1) Either the "normal" user specific L10n class
+	 * 2) Or a overriden L10n class (per push/pop)
+	 *
+	 * @param string $name The class name
+	 * @param array  $params Optional parameters
+	 *
+	 * @return L10nClass The class
+	 */
+	protected static function getClass(string $name, array $params = [])
+	{
+		if (empty(self::$lang)) {
+			return parent::getClass(L10nClass::class);
+		} else {
+			return parent::getClass('$rawL10n', [self::$lang]);
+		}
+	}
+
 	/**
 	 * Returns the current language code
 	 *
@@ -38,7 +60,7 @@ class L10n extends BaseObject
 	 */
 	public static function pushLang($lang)
 	{
-		self::getClass(L10nClass::class)->pushLang($lang);
+		self::$lang = $lang;
 	}
 
 	/**
@@ -46,7 +68,7 @@ class L10n extends BaseObject
 	 */
 	public static function popLang()
 	{
-		self::getClass(L10nClass::class)->popLang();
+		self::$lang = null;
 	}
 
 	/**

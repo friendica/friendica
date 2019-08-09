@@ -18,4 +18,4 @@ $dice = (new Dice())->addRules(include __DIR__ . '/static/dependencies.config.ph
 
 $a = \Friendica\BaseObject::getApp();
 
-$a->runFrontend();
+$a->runFrontend($dice->create(\Friendica\App\Module::class), $dice->create(\Friendica\App\Router::class), $dice->create(\Friendica\Core\Config\PConfiguration::class));

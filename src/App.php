@@ -8,9 +8,11 @@ use Detection\MobileDetect;
 use DOMDocument;
 use DOMXPath;
 use Exception;
+use Friendica\App\Arguments;
+use Friendica\App\Module;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\Config\Configuration;
-use Friendica\Core\Hook;
+use Friendica\Core\Config\PConfiguration;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
@@ -18,6 +20,7 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
+use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Util\BaseURL;
 use Friendica\Util\ConfigFileLoader;
@@ -41,7 +44,7 @@ use Psr\Log\LoggerInterface;
  */
 class App
 {
-	public $module_class = null;
+	/** @deprecated 2019.09 - use App\Arguments->getQueryString() */
 	public $query_string = '';
 	public $page = [];
 	public $profile;
@@ -53,9 +56,13 @@ class App
 	public $page_contact;
 	public $content;
 	public $data = [];
+	/** @deprecated 2019.09 - use App\Arguments->getCommand() */
 	public $cmd = '';
+	/** @deprecated 2019.09 - use App\Arguments->getArgv() or Arguments->get() */
 	public $argv;
+	/** @deprecated 2019.09 - use App\Arguments->getArgc() */
 	public $argc;
+	/** @deprecated 2019.09 - Use App\Module->getName() instead */
 	public $module;
 	public $timezone;
 	public $interactive = true;
@@ -93,6 +100,8 @@ class App
 
 	/**
 	 * @var bool true, if the call is from an backend node (f.e. worker)
+	 *
+	 * @deprecated 2019.09 - use App\Module->isBackend() instead
 	 */
 	private $isBackend;
 
@@ -135,6 +144,16 @@ class App
 	 * @var L10n The translator
 	 */
 	private $l10n;
+
+	/**
+	 * @var App\Arguments
+	 */
+	private $args;
+
+	/**
+	 * @var App\Module
+	 */
+	private $moduleClass;
 
 	/**
 	 * Returns the current config cache of this node
@@ -198,6 +217,16 @@ class App
 	}
 
 	/**
+	 * Returns the Database of the Application
+	 *
+	 * @return Database
+	 */
+	public function getDBA()
+	{
+		return $this->database;
+	}
+
+	/**
 	 * Register a stylesheet file path to be included in the <head> tag of every page.
 	 * Inclusion is done in App->initHead().
 	 * The path can be absolute or relative to the Friendica installation base folder.
@@ -247,7 +276,7 @@ class App
 	 *
 	 * @throws Exception if the Basepath is not usable
 	 */
-	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, L10n $l10n)
+	public function __construct(Database $database, Configuration $config, App\Mode $mode, App\Router $router, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, L10n $l10n, Arguments $args, Module $module)
 	{
 		$this->database = $database;
 		$this->config   = $config;
@@ -257,6 +286,8 @@ class App
 		$this->profiler = $profiler;
 		$this->logger   = $logger;
 		$this->l10n     = $l10n;
+		$this->args = $args;
+		$this->isBackend = $module->isBackend();
 
 		$this->profiler->reset();
 
@@ -273,59 +304,10 @@ class App
 			. $this->getBasePath() . DIRECTORY_SEPARATOR . 'library' . PATH_SEPARATOR
 			. $this->getBasePath());
 
-		if (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['QUERY_STRING'], 'pagename=') === 0) {
-			$this->query_string = substr($_SERVER['QUERY_STRING'], 9);
-		} elseif (!empty($_SERVER['QUERY_STRING']) && strpos($_SERVER['QUERY_STRING'], 'q=') === 0) {
-			$this->query_string = substr($_SERVER['QUERY_STRING'], 2);
-		}
-
-		// removing trailing / - maybe a nginx problem
-		$this->query_string = ltrim($this->query_string, '/');
-
-		if (!empty($_GET['pagename'])) {
-			$this->cmd = trim($_GET['pagename'], '/\\');
-		} elseif (!empty($_GET['q'])) {
-			$this->cmd = trim($_GET['q'], '/\\');
-		}
-
-		// fix query_string
-		$this->query_string = str_replace($this->cmd . '&', $this->cmd . '?', $this->query_string);
-
-		// unix style "homedir"
-		if (substr($this->cmd, 0, 1) === '~') {
-			$this->cmd = 'profile/' . substr($this->cmd, 1);
-		}
-
-		// Diaspora style profile url
-		if (substr($this->cmd, 0, 2) === 'u/') {
-			$this->cmd = 'profile/' . substr($this->cmd, 2);
-		}
-
-		/*
-		 * Break the URL path into C style argc/argv style arguments for our
-		 * modules. Given "http://example.com/module/arg1/arg2", $this->argc
-		 * will be 3 (integer) and $this->argv will contain:
-		 *   [0] => 'module'
-		 *   [1] => 'arg1'
-		 *   [2] => 'arg2'
-		 *
-		 *
-		 * There will always be one argument. If provided a naked domain
-		 * URL, $this->argv[0] is set to "home".
-		 */
-
-		$this->argv = explode('/', $this->cmd);
-		$this->argc = count($this->argv);
-		if ((array_key_exists('0', $this->argv)) && strlen($this->argv[0])) {
-			$this->module = str_replace('.', '_', $this->argv[0]);
-			$this->module = str_replace('-', '_', $this->module);
-		} else {
-			$this->argc = 1;
-			$this->argv = ['home'];
-			$this->module = 'home';
-		}
-
-		$this->isBackend = $this->isBackend || $this->checkBackend($this->module);
+		$this->cmd = $args->getCommand();
+		$this->argv = $args->getArgv();
+		$this->argc = $args->getArgc();
+		$this->query_string = $args->getQueryString();
 
 		// Detect mobile devices
 		$mobile_detect = new MobileDetect();
@@ -346,10 +328,6 @@ class App
 	 */
 	public function reload()
 	{
-		$this->isBackend = basename($_SERVER['PHP_SELF'], '.php') !== 'index';
-
-		$this->getMode()->determine($this->getBasePath());
-
 		if ($this->getMode()->has(App\Mode::DBAVAILABLE)) {
 			$this->profiler->update($this->config);
 
@@ -399,6 +377,8 @@ class App
 	 * @param bool $ssl Whether to append http or https under BaseURL::SSL_POLICY_SELFSIGN
 	 *
 	 * @return string Friendica server base URL
+	 *
+	 * @deprecated 2019.09 - use BaseUrl->get($ssl) instead
 	 */
 	public function getBaseURL($ssl = false)
 	{
@@ -453,9 +433,9 @@ class App
 	 * - Infinite scroll data
 	 * - head.tpl template
 	 */
-	public function initHead()
+	private function initHead(App\Module $module, PConfiguration $pconfig)
 	{
-		$interval = ((local_user()) ? Core\PConfig::get(local_user(), 'system', 'update_interval') : 40000);
+		$interval = ((local_user()) ? $pconfig->get(local_user(), 'system', 'update_interval') : 40000);
 
 		// If the update is 'deactivated' set it to the highest integer number (~24 days)
 		if ($interval < 0) {
@@ -467,8 +447,8 @@ class App
 		}
 
 		// Default title: current module called
-		if (empty($this->page['title']) && $this->module) {
-			$this->page['title'] = ucfirst($this->module);
+		if (empty($this->page['title']) && $module->getName()) {
+			$this->page['title'] = ucfirst($module->getName());
 		}
 
 		// Prepend the sitename to the page title
@@ -520,7 +500,7 @@ class App
 	 * - Registered footer scripts (through App->registerFooterScript())
 	 * - footer.tpl template
 	 */
-	public function initFooter()
+	private function initFooter()
 	{
 		// If you're just visiting, let javascript take you home
 		if (!empty($_SESSION['visitor_home'])) {
@@ -593,58 +573,6 @@ class App
 			FRIENDICA_VERSION . '-' .
 			DB_UPDATE_VERSION . '; ' .
 			$this->getBaseURL();
-	}
-
-	/**
-	 * @brief Checks if the site is called via a backend process
-	 *
-	 * This isn't a perfect solution. But we need this check very early.
-	 * So we cannot wait until the modules are loaded.
-	 *
-	 * @param string $module
-	 * @return bool
-	 */
-	private function checkBackend($module) {
-		static $backends = [
-			'_well_known',
-			'api',
-			'dfrn_notify',
-			'feed',
-			'fetch',
-			'followers',
-			'following',
-			'hcard',
-			'hostxrd',
-			'inbox',
-			'manifest',
-			'nodeinfo',
-			'noscrape',
-			'objects',
-			'outbox',
-			'poco',
-			'post',
-			'proxy',
-			'pubsub',
-			'pubsubhubbub',
-			'receive',
-			'rsd_xml',
-			'salmon',
-			'statistics_json',
-			'xrd',
-		];
-
-		// Check if current module is in backend or backend flag is set
-		return in_array($module, $backends);
-	}
-
-	/**
-	 * Returns true, if the call is from a backend node (f.e. from a worker)
-	 *
-	 * @return bool Is it a known backend?
-	 */
-	public function isBackend()
-	{
-		return $this->isBackend;
 	}
 
 	/**
@@ -740,7 +668,7 @@ class App
 	 */
 	public function isMaxLoadReached()
 	{
-		if ($this->isBackend()) {
+		if ($this->isBackend) {
 			$process = 'backend';
 			$maxsysload = intval($this->config->get('system', 'maxloadavg'));
 			if ($maxsysload < 1) {
@@ -930,21 +858,13 @@ class App
 	}
 
 	/**
-	 * Returns the value of a argv key
-	 * TODO there are a lot of $a->argv usages in combination with defaults() which can be replaced with this method
+	 * @deprecated use Arguments->get() instead
 	 *
-	 * @param int $position the position of the argument
-	 * @param mixed $default the default value if not found
-	 *
-	 * @return mixed returns the value of the argument
+	 * @see App\Arguments
 	 */
 	public function getArgumentValue($position, $default = '')
 	{
-		if (array_key_exists($position, $this->argv)) {
-			return $this->argv[$position];
-		}
-
-		return $default;
+		return $this->args->get($position, $default);
 	}
 
 	/**
@@ -973,9 +893,13 @@ class App
 	 * request and a representation of the response.
 	 *
 	 * This probably should change to limit the size of this monster method.
+	 *
+	 * @param App\Module $module The determined module
 	 */
-	public function runFrontend()
+	public function runFrontend(App\Module $module, App\Router $router, PConfiguration $pconfig)
 	{
+		$moduleName = $module->getName();
+
 		try {
 			// Missing DB connection: ERROR
 			if ($this->getMode()->has(App\Mode::LOCALCONFIGPRESENT) && !$this->getMode()->has(App\Mode::DBAVAILABLE)) {
@@ -985,7 +909,7 @@ class App
 			// Max Load Average reached: ERROR
 			if ($this->isMaxProcessesReached() || $this->isMaxLoadReached()) {
 				header('Retry-After: 120');
-				header('Refresh: 120; url=' . $this->getBaseURL() . "/" . $this->query_string);
+				header('Refresh: 120; url=' . $this->baseURL->get() . "/" . $this->args->getQueryString());
 
 				throw new HTTPException\ServiceUnavailableException('The node is currently overloaded. Please try again later.');
 			}
@@ -993,7 +917,7 @@ class App
 			if (!$this->getMode()->isInstall()) {
 				// Force SSL redirection
 				if ($this->baseURL->checkRedirectHttps()) {
-					System::externalRedirect($this->getBaseURL() . '/' . $this->query_string);
+					System::externalRedirect($this->baseURL->get() . '/' . $this->args->getQueryString());
 				}
 
 				Core\Session::init();
@@ -1001,12 +925,8 @@ class App
 			}
 
 			// Exclude the backend processes from the session management
-			if (!$this->isBackend()) {
-				$stamp1 = microtime(true);
-				session_start();
-				$this->profiler->saveTimestamp($stamp1, 'parser', Core\System::callstack());
-				$this->l10n->setSessionVariable();
-				$this->l10n->setLangFromSession();
+			if (!$module->isBackend()) {
+				Core\Session::start();
 			} else {
 				$_SESSION = [];
 				Core\Worker::executeIfIdle();
@@ -1021,7 +941,6 @@ class App
 
 			// ZRL
 			if (!empty($_GET['zrl']) && $this->getMode()->isNormal()) {
-				$this->query_string = Model\Profile::stripZrls($this->query_string);
 				if (!local_user()) {
 					// Only continue when the given profile link seems valid
 					// Valid profile links contain a path with "/profile/" and no query parameters
@@ -1044,11 +963,10 @@ class App
 
 			if (!empty($_GET['owt']) && $this->getMode()->isNormal()) {
 				$token = $_GET['owt'];
-				$this->query_string = Model\Profile::stripQueryParam($this->query_string, 'owt');
 				Model\Profile::openWebAuthInit($token);
 			}
 
-			Module\Login::sessionAuth();
+			Login::sessionAuth();
 
 			if (empty($_SESSION['authenticated'])) {
 				header('X-Account-Management-Status: none');
@@ -1066,9 +984,9 @@ class App
 
 			// in install mode, any url loads install module
 			// but we need "view" module for stylesheet
-			if ($this->getMode()->isInstall() && $this->module !== 'install') {
+			if ($this->getMode()->isInstall() && $moduleName !== 'install') {
 				$this->internalRedirect('install');
-			} elseif (!$this->getMode()->isInstall() && !$this->getMode()->has(App\Mode::MAINTENANCEDISABLED) && $this->module !== 'maintenance') {
+			} elseif (!$this->getMode()->isInstall() && !$this->getMode()->has(App\Mode::MAINTENANCEDISABLED) && $moduleName !== 'maintenance') {
 				$this->internalRedirect('maintenance');
 			} else {
 				$this->checkURL();
@@ -1091,152 +1009,65 @@ class App
 			];
 
 			// Compatibility with the Android Diaspora client
-			if ($this->module == 'stream') {
+			if ($moduleName == 'stream') {
 				$this->internalRedirect('network?order=post');
 			}
 
-			if ($this->module == 'conversations') {
+			if ($moduleName == 'conversations') {
 				$this->internalRedirect('message');
 			}
 
-			if ($this->module == 'commented') {
+			if ($moduleName == 'commented') {
 				$this->internalRedirect('network?order=comment');
 			}
 
-			if ($this->module == 'liked') {
+			if ($moduleName == 'liked') {
 				$this->internalRedirect('network?order=comment');
 			}
 
-			if ($this->module == 'activity') {
+			if ($moduleName == 'activity') {
 				$this->internalRedirect('network?conv=1');
 			}
 
-			if (($this->module == 'status_messages') && ($this->cmd == 'status_messages/new')) {
+			if (($moduleName == 'status_messages') && ($this->args->getCommand() == 'status_messages/new')) {
 				$this->internalRedirect('bookmarklet');
 			}
 
-			if (($this->module == 'user') && ($this->cmd == 'user/edit')) {
+			if (($moduleName == 'user') && ($this->args->getCommand() == 'user/edit')) {
 				$this->internalRedirect('settings');
 			}
 
-			if (($this->module == 'tag_followings') && ($this->cmd == 'tag_followings/manage')) {
+			if (($moduleName == 'tag_followings') && ($this->args->getCommand() == 'tag_followings/manage')) {
 				$this->internalRedirect('search');
 			}
 
-			// Compatibility with the Firefox App
-			if (($this->module == "users") && ($this->cmd == "users/sign_in")) {
-				$this->module = "login";
-			}
-
-			/*
-			 * ROUTING
-			 *
-			 * From the request URL, routing consists of obtaining the name of a BaseModule-extending class of which the
-			 * post() and/or content() static methods can be respectively called to produce a data change or an output.
-			 */
-
-			// First we try explicit routes defined in App\Router
-			$this->router->collectRoutes();
-
-			$data = $this->router->getRouteCollector();
-			Hook::callAll('route_collection', $data);
-
-			$this->module_class = $this->router->getModuleClass($this->cmd);
-
-			// Then we try addon-provided modules that we wrap in the LegacyModule class
-			if (!$this->module_class && Core\Addon::isEnabled($this->module) && file_exists("addon/{$this->module}/{$this->module}.php")) {
-				//Check if module is an app and if public access to apps is allowed or not
-				$privateapps = $this->config->get('config', 'private_addons', false);
-				if ((!local_user()) && Core\Hook::isAddonApp($this->module) && $privateapps) {
-					info($this->l10n->t("You must be logged in to use addons. "));
-				} else {
-					include_once "addon/{$this->module}/{$this->module}.php";
-					if (function_exists($this->module . '_module')) {
-						LegacyModule::setModuleFile("addon/{$this->module}/{$this->module}.php");
-						$this->module_class = LegacyModule::class;
-					}
-				}
-			}
-
-			/* Finally, we look for a 'standard' program module in the 'mod' directory
-			 * We emulate a Module class through the LegacyModule class
-			 */
-			if (!$this->module_class && file_exists("mod/{$this->module}.php")) {
-				LegacyModule::setModuleFile("mod/{$this->module}.php");
-				$this->module_class = LegacyModule::class;
-			}
-
-			/* The URL provided does not resolve to a valid module.
-			 *
-			 * On Dreamhost sites, quite often things go wrong for no apparent reason and they send us to '/internal_error.html'.
-			 * We don't like doing this, but as it occasionally accounts for 10-20% or more of all site traffic -
-			 * we are going to trap this and redirect back to the requested page. As long as you don't have a critical error on your page
-			 * this will often succeed and eventually do the right thing.
-			 *
-			 * Otherwise we are going to emit a 404 not found.
-			 */
-			if (!$this->module_class) {
-				// Stupid browser tried to pre-fetch our Javascript img template. Don't log the event or return anything - just quietly exit.
-				if (!empty($_SERVER['QUERY_STRING']) && preg_match('/{[0-9]}/', $_SERVER['QUERY_STRING']) !== 0) {
-					exit();
-				}
-
-				if (!empty($_SERVER['QUERY_STRING']) && ($_SERVER['QUERY_STRING'] === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
-					Core\Logger::log('index.php: dreamhost_error_hack invoked. Original URI =' . $_SERVER['REQUEST_URI']);
-					$this->internalRedirect($_SERVER['REQUEST_URI']);
-				}
-
-				Core\Logger::log('index.php: page not found: ' . $_SERVER['REQUEST_URI'] . ' ADDRESS: ' . $_SERVER['REMOTE_ADDR'] . ' QUERY: ' . $_SERVER['QUERY_STRING'], Core\Logger::DEBUG);
-
-				$this->module_class = Module\PageNotFound::class;
-			}
-
 			// Initialize module that can set the current theme in the init() method, either directly or via App->profile_uid
-			$this->page['page_title'] = $this->module;
+			$this->page['page_title'] = $moduleName;
 
-			$placeholder = '';
+			// determine the module class and save it to the module instance
+			// @todo there's an implicit dependency due SESSION::start(), so it has to be called here (yet)
+			$module = $module->determineClass($this->args, $router, $this->config);
 
-			Core\Hook::callAll($this->module . '_mod_init', $placeholder);
+			// Let the module run it's internal process (init, get, post, ...)
+			$module->run($this->l10n, $this, $this->logger, $this->getCurrentTheme(), $_SERVER, $_POST);
 
-			call_user_func([$this->module_class, 'init']);
-
-			// "rawContent" is especially meant for technical endpoints.
-			// This endpoint doesn't need any theme initialization or other comparable stuff.
-			call_user_func([$this->module_class, 'rawContent']);
-
-			// Load current theme info after module has been initialized as theme could have been set in module
-			$theme_info_file = 'view/theme/' . $this->getCurrentTheme() . '/theme.php';
-			if (file_exists($theme_info_file)) {
-				require_once $theme_info_file;
-			}
-
-			if (function_exists(str_replace('-', '_', $this->getCurrentTheme()) . '_init')) {
-				$func = str_replace('-', '_', $this->getCurrentTheme()) . '_init';
-				$func($this);
-			}
-
-			if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-				Core\Hook::callAll($this->module . '_mod_post', $_POST);
-				call_user_func([$this->module_class, 'post']);
-			}
-
-			Core\Hook::callAll($this->module . '_mod_afterpost', $placeholder);
-			call_user_func([$this->module_class, 'afterpost']);
 		} catch(HTTPException $e) {
-			Module\Special\HTTPException::rawContent($e);
+			ModuleHTTPException::rawContent($e);
 		}
 
 		$content = '';
 
 		try {
+			$moduleClass = $module->getClassName();
+
 			$arr = ['content' => $content];
-			Core\Hook::callAll($this->module . '_mod_content', $arr);
+			Core\Hook::callAll($moduleClass . '_mod_content', $arr);
 			$content = $arr['content'];
-			$arr = ['content' => call_user_func([$this->module_class, 'content'])];
-			Core\Hook::callAll($this->module . '_mod_aftercontent', $arr);
+			$arr = ['content' => call_user_func([$moduleClass, 'content'])];
+			Core\Hook::callAll($moduleClass . '_mod_aftercontent', $arr);
 			$content .= $arr['content'];
 		} catch(HTTPException $e) {
-			$content = Module\Special\HTTPException::content($e);
+			$content = ModuleHTTPException::content($e);
 		}
 
 		// initialise content region
@@ -1253,7 +1084,7 @@ class App
 		 * all the module functions have executed so that all
 		 * theme choices made by the modules can take effect.
 		 */
-		$this->initHead();
+		$this->initHead($module, $pconfig);
 
 		/* Build the page ending -- this is stuff that goes right before
 		 * the closing </body> tag
@@ -1265,7 +1096,7 @@ class App
 		}
 
 		// Add the navigation (menu) template
-		if ($this->module != 'install' && $this->module != 'maintenance') {
+		if ($moduleName != 'install' && $moduleName != 'maintenance') {
 			$this->page['htmlhead'] .= Core\Renderer::replaceMacros(Core\Renderer::getMarkupTemplate('nav_head.tpl'), []);
 			$this->page['nav']       = Content\Nav::build($this);
 		}

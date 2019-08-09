@@ -48,20 +48,21 @@ class BaseObject
 	/**
 	 * Returns the initialized class based on it's name
 	 *
-	 * @param string $name The name of the class
+	 * @param string $name   The name of the class
+	 * @param array  $params Parameters, which are used to load the class with
 	 *
 	 * @return object The initialized name
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	protected static function getClass(string $name)
+	protected static function getClass(string $name, array $params = [])
 	{
 		if (empty(self::$dice)) {
 			throw new InternalServerErrorException('DICE isn\'t initialized.');
 		}
 
-		if (class_exists($name) || interface_exists($name   )) {
-			return self::$dice->create($name);
+		if (class_exists($name) || interface_exists($name)) {
+			return self::$dice->create($name, $params);
 		} else {
 			throw new InternalServerErrorException('Class \'' . $name . '\' isn\'t valid.');
 		}

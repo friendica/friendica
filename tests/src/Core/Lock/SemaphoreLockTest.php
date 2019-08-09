@@ -18,14 +18,14 @@ class SemaphoreLockTest extends LockTest
 
 		$app = \Mockery::mock(App::class);
 		$app->shouldReceive('getHostname')->andReturn('friendica.local');
-		$dice->shouldReceive('create')->with(App::class)->andReturn($app);
+		$dice->shouldReceive('create')->with(App::class, [])->andReturn($app);
 
 		$configMock = \Mockery::mock(Configuration::class);
 		$configMock
 			->shouldReceive('get')
 			->with('system', 'temppath', NULL, false)
 			->andReturn('/tmp/');
-		$dice->shouldReceive('create')->with(Configuration::class)->andReturn($configMock);
+		$dice->shouldReceive('create')->with(Configuration::class, [])->andReturn($configMock);
 
 		// @todo Because "get_temppath()" is using static methods, we have to initialize the BaseObject
 		BaseObject::setDependencyInjection($dice);

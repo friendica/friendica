@@ -6,21 +6,24 @@
 namespace Friendica\Core;
 
 use Friendica\App;
+use Friendica\BaseObject;
 use Friendica\Core\Session\CacheSessionHandler;
 use Friendica\Core\Session\DatabaseSessionHandler;
 use Friendica\Database\DBA;
-use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Util\BaseURL;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Profiler;
 
 /**
  * High-level Session service class
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class Session
+class Session extends BaseObject
 {
+	private static $started = false;
+
 	public static $exists = false;
 	public static $expire = 180000;
 
@@ -44,6 +47,32 @@ class Session
 
 			session_set_save_handler($SessionHandler);
 		}
+	}
+
+	/**
+	 * Starts a frontend session
+	 *
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function start()
+	{
+		if (self::$started) {
+			return;
+		}
+
+		/** @var Profiler $profiler */
+		$profiler = self::getClass(Profiler::class);
+
+		/** @var App\Module $module */
+		$module = self::getClass(App\Module::class);
+
+		if (!$module->isBackend()) {
+			$stamp1 = microtime(true);
+			session_start();
+			$profiler->saveTimestamp($stamp1, 'parser', System::callstack());
+		}
+
+		self::$started = true;
 	}
 
 	public static function exists($name)

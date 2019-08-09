@@ -35,7 +35,7 @@ class InstallerTest extends MockedTest
 		$dice = $dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 
 		$dice->shouldReceive('create')
-		           ->with(\Friendica\Core\L10n\L10n::class)
+		           ->with(\Friendica\Core\L10n\L10n::class, [])
 		           ->andReturn($this->l10nMock);
 
 		BaseObject::setDependencyInjection($dice);

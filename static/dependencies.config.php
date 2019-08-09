@@ -4,6 +4,7 @@ use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\L10n\L10n;
 use Friendica\Core\Lock\ILock;
 use Friendica\Database\Database;
 use Friendica\Factory;
@@ -27,14 +28,14 @@ use Psr\Log\LoggerInterface;
  *
  */
 return [
-	'*' => [
+	'*'                             => [
 		// marks all class result as shared for other creations, so there's just
 		// one instance for the whole execution
 		'shared' => true,
 	],
-	'$basepath' => [
-		'instanceOf' => Util\BasePath::class,
-		'call' => [
+	'$basepath'                     => [
+		'instanceOf'      => Util\BasePath::class,
+		'call'            => [
 			['getPath', [], Dice::CHAIN_CALL],
 		],
 		'constructParams' => [
@@ -42,14 +43,14 @@ return [
 			$_SERVER
 		]
 	],
-	Util\BasePath::class => [
+	Util\BasePath::class            => [
 		'constructParams' => [
 			dirname(__FILE__, 2),
 			$_SERVER
 		]
 	],
-	Util\ConfigFileLoader::class => [
-		'shared' => true,
+	Util\ConfigFileLoader::class    => [
+		'shared'          => true,
 		'constructParams' => [
 			[Dice::INSTANCE => '$basepath'],
 		],
@@ -60,24 +61,24 @@ return [
 			['createCache', [], Dice::CHAIN_CALL],
 		],
 	],
-	App\Mode::class => [
-		'call'   => [
+	App\Mode::class                 => [
+		'call' => [
 			['determine', [], Dice::CHAIN_CALL],
 		],
 	],
-	Config\Configuration::class => [
+	Config\Configuration::class     => [
 		'instanceOf' => Factory\ConfigFactory::class,
-		'call' => [
+		'call'       => [
 			['createConfig', [], Dice::CHAIN_CALL],
 		],
 	],
-	Config\PConfiguration::class => [
+	Config\PConfiguration::class    => [
 		'instanceOf' => Factory\ConfigFactory::class,
-		'call' => [
+		'call'       => [
 			['createPConfig', [], Dice::CHAIN_CALL],
 		]
 	],
-	Database::class => [
+	Database::class                 => [
 		'constructParams' => [
 			[DICE::INSTANCE => \Psr\Log\NullLogger::class],
 			$_SERVER,
@@ -89,7 +90,7 @@ return [
 	 * Same as:
 	 *   $baseURL = new Util\BaseURL($configuration, $_SERVER);
 	 */
-	Util\BaseURL::class => [
+	Util\BaseURL::class             => [
 		'constructParams' => [
 			$_SERVER,
 		],
@@ -106,34 +107,69 @@ return [
 	 *    $app = $dice->create(App::class, [], ['$channel' => 'index']);
 	 *    and is automatically passed as an argument with the same name
 	 */
-	LoggerInterface::class    => [
+	LoggerInterface::class          => [
 		'instanceOf' => Factory\LoggerFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
-	'$devLogger'              => [
+	'$devLogger'                    => [
 		'instanceOf' => Factory\LoggerFactory::class,
 		'call'       => [
 			['createDev', [], Dice::CHAIN_CALL],
 		]
 	],
-	Cache\ICache::class       => [
+	Cache\ICache::class             => [
 		'instanceOf' => Factory\CacheFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
-	Cache\IMemoryCache::class => [
+	Cache\IMemoryCache::class       => [
 		'instanceOf' => Factory\CacheFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
-	ILock::class              => [
+	ILock::class                    => [
 		'instanceOf' => Factory\LockFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
+		],
+	],
+	App\Arguments::class => [
+		'instanceOf' => App\Arguments::class,
+		'call' => [
+			['determine', [$_SERVER, $_GET], Dice::CHAIN_CALL],
+		],
+	],
+	App\Module::class => [
+		'instanceOf' => App\Module::class,
+		'call' => [
+			['determineModule', [$_SERVER], Dice::CHAIN_CALL],
+		],
+	],
+	// The default instance, which loads the user specific language settings
+	L10n::class                     => [
+		'instanceOf' => L10n::class,
+		'call'       => [
+			['userLanguage', [$_SERVER, $_GET], Dice::CHAIN_CALL],
+			['load', [], Dice::CHAIN_CALL],
+		],
+	],
+	// A system instance, which loads the system specific configuration settings
+	'$systemL10n'                   => [
+		'instanceOf' => L10n::class,
+		'call'       => [
+			['systemLanguage', [$_SERVER, $_GET], Dice::CHAIN_CALL],
+			['load', [], Dice::CHAIN_CALL],
+		],
+	],
+	// This loads the raw instance with the auto-detected settings (without addons)
+	'$rawL10n'                      => [
+		'instanceOf' => L10n::class,
+		'call'       => [
+			['load', [], Dice::CHAIN_CALL]
 		],
 	],
 ];

@@ -24,27 +24,9 @@ class Mode
 	 */
 	private $mode;
 
-	/**
-	 * @var string the basepath of the application
-	 */
-	private $basepath;
-
-	/**
-	 * @var Database
-	 */
-	private $database;
-
-	/**
-	 * @var ConfigCache
-	 */
-	private $configCache;
-
-	public function __construct(BasePath $basepath, Database $database, ConfigCache $configCache)
+	public function __construct(int $mode = 0)
 	{
-		$this->basepath    = $basepath->getPath();
-		$this->database    = $database;
-		$this->configCache = $configCache;
-		$this->mode        = 0;
+		$this->mode = $mode;
 	}
 
 	/**
@@ -54,50 +36,46 @@ class Mode
 	 * - App::MODE_MAINTENANCE: The maintenance mode has been set
 	 * - App::MODE_NORMAL     : Normal run with all features enabled
 	 *
-	 * @param string $basePath the Basepath of the Application
-	 *
-	 * @return Mode returns itself
+	 * @return Mode returns the determined mode
 	 *
 	 * @throws \Exception
 	 */
-	public function determine($basePath = null)
+	public function determine(BasePath $basepath, Database $database, ConfigCache $configCache)
 	{
-		if (!empty($basePath)) {
-			$this->basepath = $basePath;
+		$mode = 0;
+
+		$basepathName = $basepath->getPath();
+
+		if (!file_exists($basepathName . '/config/local.config.php')
+		    && !file_exists($basepathName . '/config/local.ini.php')
+		    && !file_exists($basepathName . '/.htconfig.php')) {
+			return new Mode($mode);
 		}
 
-		$this->mode = 0;
+		$mode |= Mode::LOCALCONFIGPRESENT;
 
-		if (!file_exists($this->basepath . '/config/local.config.php')
-		    && !file_exists($this->basepath . '/config/local.ini.php')
-		    && !file_exists($this->basepath . '/.htconfig.php')) {
-			return $this;
+		if (!$database->connected()) {
+			return new Mode($mode);
 		}
 
-		$this->mode |= Mode::LOCALCONFIGPRESENT;
+		$mode |= Mode::DBAVAILABLE;
 
-		if (!$this->database->connected()) {
-			return $this;
+		if ($database->fetchFirst("SHOW TABLES LIKE 'config'") === false) {
+			return new Mode($mode);
 		}
 
-		$this->mode |= Mode::DBAVAILABLE;
+		$mode |= Mode::DBCONFIGAVAILABLE;
 
-		if ($this->database->fetchFirst("SHOW TABLES LIKE 'config'") === false) {
-			return $this;
-		}
-
-		$this->mode |= Mode::DBCONFIGAVAILABLE;
-
-		if (!empty($this->configCache->get('system', 'maintenance')) ||
+		if (!empty($configCache->get('system', 'maintenance')) ||
 		    // Don't use Config or Configuration here because we're possibly BEFORE initializing the Configuration,
 		    // so this could lead to a dependency circle
-		    !empty($this->database->selectFirst('config', ['v'], ['cat' => 'system', 'k' => 'maintenance'])['v'])) {
-			return $this;
+		    !empty($database->selectFirst('config', ['v'], ['cat' => 'system', 'k' => 'maintenance'])['v'])) {
+			return new Mode($mode);
 		}
 
-		$this->mode |= Mode::MAINTENANCEDISABLED;
+		$mode |= Mode::MAINTENANCEDISABLED;
 
-		return $this;
+		return new Mode($mode);
 	}
 
 	/**

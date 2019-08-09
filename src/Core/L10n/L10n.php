@@ -2,12 +2,12 @@
 
 namespace Friendica\Core\L10n;
 
+use Friendica\App\Module;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Hook;
 use Friendica\Core\Session;
 use Friendica\Database\Database;
 use Friendica\Util\Strings;
-use Psr\Log\LoggerInterface;
 
 /**
  * Provide Language, Translation, and Localization functions to the application
@@ -15,6 +15,8 @@ use Psr\Log\LoggerInterface;
  */
 class L10n
 {
+	const DEFAULT_LANG = 'en';
+
 	/**
 	 * A string indicating the current language used for translation:
 	 * - Two-letter ISO 639-1 code.
@@ -23,12 +25,13 @@ class L10n
 	 * @var string
 	 */
 	private $lang = '';
+
 	/**
-	 * A language code saved for later after pushLang() has been called.
+	 * The addons, which languages are loaded
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $langSave = '';
+	private $addons = [];
 
 	/**
 	 * An array of translation strings whose key is the neutral english message.
@@ -36,29 +39,11 @@ class L10n
 	 * @var array
 	 */
 	private $strings = [];
-	/**
-	 * An array of translation strings saved for later after pushLang() has been called.
-	 *
-	 * @var array
-	 */
-	private $stringsSave = [];
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
-
-	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
-
-	public function __construct(Configuration $config, Database $dba, LoggerInterface $logger)
+	public function __construct(string $lang = self::DEFAULT_LANG, array $addons = [])
 	{
-		$this->dba    = $dba;
-		$this->logger = $logger;
-
-		$this->loadTranslationTable(L10n::detectLanguage($config->get('system', 'language', 'en')));
+		$this->lang   = Strings::sanitizeFilePathItem($lang);
+		$this->addons = $addons;
 	}
 
 	/**
@@ -72,75 +57,89 @@ class L10n
 	}
 
 	/**
-	 * Sets the language session variable
+	 * Load the user specific language environment
+	 *
+	 * 1) Based on a force language setting ($_GET)
+	 * 2) Based on the user language setting
+	 * 3) Auto-detected through the system
+	 *
+	 * @param Database $dba     The database connection of Friendica
+	 * @param array    $server  The $_SERVER variables
+	 * @param array    $get     The $_GET variables
+	 *
+	 * @return L10n The user specific language settings
+	 * @throws \Exception
 	 */
-	public function setSessionVariable()
+	public function userLanguage(Database $dba, Module $module, array $server, array $get)
 	{
-		if (Session::get('authenticated') && !Session::get('language')) {
-			$_SESSION['language'] = $this->lang;
+		if ($module->isBackend()) {
+			return $this;
+		}
+
+		// @todo move Session start outside of this function (bad dependency)
+		Session::start();
+
+		if (!empty($get['lang'])) {
+			Session::set('language', $get['lang']);
+		} elseif (Session::get('authenticated') && !Session::get('language')) {
+			Session::set('language', $this->lang);
 			// we haven't loaded user data yet, but we need user language
 			if (Session::get('uid')) {
-				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
-				if ($this->dba->isResult($user)) {
-					$_SESSION['language'] = $user['language'];
+				$user = $dba->selectFirst('user', ['language'], ['uid' => Session::get('uid')]);
+				if ($dba->isResult($user)) {
+					Session::set('language', $user['language']);
 				}
 			}
 		}
 
-		if (isset($_GET['lang'])) {
-			Session::set('language', $_GET['lang']);
-		}
-	}
-
-	public function setLangFromSession()
-	{
-		if (Session::get('language') !== $this->lang) {
-			$this->loadTranslationTable(Session::get('language'));
+		// Returns a new class for user languages (is called once each run during dependency injection)
+		if (Session::get('language')) {
+			return new L10n(
+				Session::get('language'),
+				$this->getAddonNames($dba)
+			);
+		} else {
+			return new L10n(
+				$this->detectLanguage($server, $get, $this->lang),
+				$this->getAddonNames($dba)
+			);
 		}
 	}
 
 	/**
-	 * This function should be called before formatting messages in a specific target language
-	 * different from the current user/system language.
+	 * Loads the system wide language environment
 	 *
-	 * It saves the current translation strings in a separate variable and loads new translations strings.
+	 * @param Configuration $config The Friendica configurations
 	 *
-	 * If called repeatedly, it won't save the translation strings again, just load the new ones.
-	 *
-	 * @param string $lang Language code
-	 *
-	 * @throws \Exception
-	 * @see   popLang()
-	 * @brief Stores the current language strings and load a different language.
+	 * @return L10n The system specific language instance
 	 */
-	public function pushLang($lang)
+	public function systemLanguage(Configuration $config, Database $dba, array $server, array $get)
 	{
-		if ($lang === $this->lang) {
-			return;
-		}
-
-		if (empty($this->langSave)) {
-			$this->langSave    = $this->lang;
-			$this->stringsSave = $this->strings;
-		}
-
-		$this->loadTranslationTable($lang);
+		return new L10n($config->get('system', 'language', $this->detectLanguage($server, $get)), $this->getAddonNames($dba));
 	}
 
 	/**
-	 * Restores the original user/system language after having used pushLang()
+	 * Returns all addons with language specific settings
+	 *
+	 * @param Database $dba The database connection of Friendica
+	 *
+	 * @return array The addons with language specific settings
+	 * @throws \Exception in case an DBA exception occured
 	 */
-	public function popLang()
+	private function getAddonNames(Database $dba)
 	{
-		if (!isset($this->langSave)) {
-			return;
+		$addons = [];
+
+		// load enabled addons strings
+		$stmtAddon = $dba->select('addon', ['name'], ['installed' => true]);
+		while ($addon = $dba->fetch($stmtAddon)) {
+			$name = Strings::sanitizeFilePathItem($addon['name']);
+			if (file_exists("addon/$name/lang/$this->lang/strings.php")) {
+				$addons[] = $name;
+			}
 		}
 
-		$this->strings = $this->stringsSave;
-		$this->lang    = $this->langSave;
-
-		$this->stringsSave = null;
-		$this->langSave = null;
+		return $addons;
 	}
 
 	/**
@@ -150,34 +149,28 @@ class L10n
 	 *
 	 * Uses an App object shim since all the strings files refer to $a->strings
 	 *
-	 * @param string $lang language code to load
-	 *
-	 * @throws \Exception
+	 * @return L10n the L10n with loaded strings
 	 */
-	private function loadTranslationTable($lang)
+	public function load()
 	{
-		$lang = Strings::sanitizeFilePathItem($lang);
-
 		$a          = new \stdClass();
 		$a->strings = [];
 
-		// load enabled addons strings
-		$addons = $this->dba->select('addon', ['name'], ['installed' => true]);
-		while ($p = $this->dba->fetch($addons)) {
-			$name = Strings::sanitizeFilePathItem($p['name']);
-			if (file_exists("addon/$name/lang/$lang/strings.php")) {
-				include "addon/$name/lang/$lang/strings.php";
+		foreach ($this->addons as $name) {
+			if (file_exists("addon/$name/lang/$this->lang/strings.php")) {
+				include "addon/$name/lang/$this->lang/strings.php";
 			}
 		}
 
-		if (file_exists("view/lang/$lang/strings.php")) {
-			include "view/lang/$lang/strings.php";
+		if (file_exists("view/lang/$this->lang/strings.php")) {
+			include "view/lang/$this->lang/strings.php";
 		}
 
-		$this->lang    = $lang;
 		$this->strings = $a->strings;
 
 		unset($a);
+
+		return $this;
 	}
 
 	/**
@@ -187,13 +180,13 @@ class L10n
 	 *
 	 * @return string The two-letter language code
 	 */
-	public static function detectLanguage(string $sysLang = 'en')
+	private function detectLanguage(array $server, array $get, string $sysLang = self::DEFAULT_LANG)
 	{
 		$lang_list = [];
 
-		if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+		if (!empty($server['HTTP_ACCEPT_LANGUAGE'])) {
 			// break up string into pieces (languages and q factors)
-			preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
+			preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $server['HTTP_ACCEPT_LANGUAGE'], $lang_parse);
 
 			if (count($lang_parse[1])) {
 				// go through the list of prefered languages and add a generic language
@@ -210,13 +203,13 @@ class L10n
 			}
 		}
 
-		if (isset($_GET['lang'])) {
-			$lang_list = [$_GET['lang']];
+		if (isset($get['lang'])) {
+			$lang_list = [$get['lang']];
 		}
 
 		// check if we have translations for the preferred languages and pick the 1st that has
 		foreach ($lang_list as $lang) {
-			if ($lang === 'en' || (file_exists("view/lang/$lang") && is_dir("view/lang/$lang"))) {
+			if ($lang === self::DEFAULT_LANG || (file_exists("view/lang/$lang") && is_dir("view/lang/$lang"))) {
 				$preferred = $lang;
 				break;
 			}

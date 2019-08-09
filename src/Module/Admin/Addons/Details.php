@@ -4,6 +4,7 @@ namespace Friendica\Module\Admin\Addons;
 
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\Addon;
+use Friendica\Core\Config\Configuration;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Module\BaseAdminModule;
@@ -65,7 +66,7 @@ class Details extends BaseAdminModule
 					info(L10n::t('Addon %s enabled.', $addon));
 				}
 
-				Addon::saveEnabledList();
+				Addon::saveEnabledList(self::getClass(Configuration::class));
 
 				$a->internalRedirect('admin/addons/' . $addon);
 			}
