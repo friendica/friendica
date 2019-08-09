@@ -67,11 +67,9 @@ class Session extends BaseObject
 		$module = self::getClass(App\Module::class);
 
 		if (!$module->isBackend()) {
-			if (!self::isStarted()) {
-				$stamp1 = microtime(true);
-				session_start();
-				$profiler->saveTimestamp($stamp1, 'parser', System::callstack());
-			}
+			$stamp1 = microtime(true);
+			session_start();
+			$profiler->saveTimestamp($stamp1, 'parser', System::callstack());
 		}
 
 		self::$started = true;
