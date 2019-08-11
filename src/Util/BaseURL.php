@@ -3,6 +3,8 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Config\Configuration;
+use Friendica\Core\System;
+use Friendica\Network\HTTPException;
 
 /**
  * A class which checks and contains the basic
@@ -248,6 +250,44 @@ class BaseURL
 
 		$this->determineSchema();
 		$this->checkConfig();
+	}
+
+	/**
+	 * Redirects to another module relative to the current Friendica base.
+	 * If you want to redirect to a external URL, use System::externalRedirectTo()
+	 *
+	 * @param string $toUrl The destination URL (Default is empty, which is the default page of the Friendica node)
+	 * @param bool $ssl if true, base URL will try to get called with https:// (works just for relative paths)
+	 *
+	 * @throws HTTPException\InternalServerErrorException In Case the given URL is not relative to the Friendica node
+	 */
+	public function redirect($toUrl = '', $ssl = false)
+	{
+		if (!empty(parse_url($toUrl, PHP_URL_SCHEME))) {
+			throw new HTTPException\InternalServerErrorException("'$toUrl is not a relative path, please use System::externalRedirectTo");
+		}
+
+		$redirectTo = $this->get($ssl) . '/' . ltrim($toUrl, '/');
+		System::externalRedirect($redirectTo);
+	}
+
+	/**
+	 * Sets the base url for use in cmdline programs which don't have
+	 * $_SERVER variables
+	 */
+	public function check()
+	{
+		$url = $this->config->get('system', 'url');
+
+		// if the url isn't set or the stored url is radically different
+		// than the currently visited url, store the current value accordingly.
+		// "Radically different" ignores common variations such as http vs https
+		// and www.example.com vs example.com.
+		// We will only change the url to an ip address if there is no existing setting
+
+		if (empty($url) || (!Strings::compareLink($url, $this->get())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->getHostname()))) {
+			$this->config->set('system', 'url', $this->get());
+		}
 	}
 
 	/**

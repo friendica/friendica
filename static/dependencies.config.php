@@ -4,7 +4,9 @@ use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Frontend;
 use Friendica\Core\Lock\ILock;
+use Friendica\Core\Process;
 use Friendica\Database\Database;
 use Friendica\Factory;
 use Friendica\Util;
@@ -49,7 +51,6 @@ return [
 		]
 	],
 	Util\ConfigFileLoader::class    => [
-		'shared'          => true,
 		'constructParams' => [
 			[Dice::INSTANCE => '$basepath'],
 		],
@@ -146,6 +147,21 @@ return [
 		'instanceOf' => App\Module::class,
 		'call' => [
 			['determineModule', [$_SERVER], Dice::CHAIN_CALL],
+		],
+	],
+	Frontend::class => [
+		'instanceOf' => Frontend::class,
+		'constructParams' => [
+			[Dice::INSTANCE => '$basepath'],
+		],
+		'call' => [
+			['init', [], Dice::CHAIN_CALL],
+			['show', [], Dice::CHAIN_CALL],
+		],
+	],
+	Process::class => [
+		'constructParams' => [
+			[Dice::INSTANCE => '$basepath'],
 		],
 	],
 ];

@@ -23,6 +23,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Protocol\Diaspora;
+use Friendica\Util\BaseURL;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -1021,11 +1022,13 @@ class Profile
 	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/channel.php
 	 *
-	 * @param App $a Application instance.
+	 * @param App\Arguments $args The execution parameters.
+	 * @param BaseURL $baseURL The Friendica Base URL class
+	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function zrlInit(App $a)
+	public static function zrlInit(App\Arguments $args, BaseURL $baseURL)
 	{
 		$my_url = self::getMyURL();
 		$my_url = Network::isUrlValid($my_url);
@@ -1034,7 +1037,7 @@ class Profile
 			return;
 		}
 
-		$arr = ['zrl' => $my_url, 'url' => $a->cmd];
+		$arr = ['zrl' => $my_url, 'url' => $args->getCommand()];
 		Hook::callAll('zrl_init', $arr);
 
 		// Try to find the public contact entry of the visitor.
@@ -1065,9 +1068,9 @@ class Profile
 		Worker::add(PRIORITY_LOW, 'GProbe', $my_url);
 
 		// Try to avoid recursion - but send them home to do a proper magic auth.
-		$query = str_replace(array('?zrl=', '&zid='), array('?rzrl=', '&rzrl='), $a->query_string);
+		$query = str_replace(array('?zrl=', '&zid='), array('?rzrl=', '&rzrl='), $args->getQueryString());
 		// The other instance needs to know where to redirect.
-		$dest = urlencode($a->getBaseURL() . '/' . $query);
+		$dest = urlencode($baseURL->get() . '/' . $query);
 
 		// We need to extract the basebath from the profile url
 		// to redirect the visitors '/magic' module.
@@ -1075,7 +1078,7 @@ class Profile
 		$urlarr = explode('/profile/', $contact['url']);
 		$basepath = $urlarr[0];
 
-		if ($basepath != $a->getBaseURL() && !strstr($dest, '/magic') && !strstr($dest, '/rmagic')) {
+		if ($basepath != $baseURL->get() && !strstr($dest, '/magic') && !strstr($dest, '/rmagic')) {
 			$magic_path = $basepath . '/magic' . '?f=&owa=1&dest=' . $dest;
 
 			// We have to check if the remote server does understand /magic without invoking something
