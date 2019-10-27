@@ -6,21 +6,10 @@
 			<div class="action">
 			<a class="icon s16 edit ttright" href="#" rel="#profiles-menu" title="{{$profile.edit.3}}"><span>{{$profile.edit.1}}</span></a>
 			<ul id="profiles-menu" class="menu-popup">
-			{{if $profile.menu.entries}}
-				{{foreach $profile.menu.entries as $e}}
-				<li>
-					<a href="profiles/{{$e.id}}"><img src='{{$e.photo}}'>{{$e.profile_name}}</a>
-				</li>
-				{{/foreach}}
-			{{else}}
 				<li>
 					<a href="{{$profile.edit.0}}">{{$profile.edit.1}}</a>
 				</li>
-			{{/if}}
-				<li><a href="profile_photo" >{{$profile.menu.chg_photo}}</a></li>
-				{{if $profile.menu.cr_new }}
-				<li><a href="profiles/new" id="profile-listing-new-link">{{$profile.menu.cr_new}}</a></li>
-				{{/if}}
+				<li><a href="settings/profile/photo" >{{$profile.menu.chg_photo}}</a></li>
 			</ul>
 			</div>
 		{{/if}}
