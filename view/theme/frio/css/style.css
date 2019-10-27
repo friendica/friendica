@@ -2288,7 +2288,7 @@ ul.dropdown-menu li:hover {
  * PAGES
  *********/
 
-.generic-page-wrapper, .profile_photo-content-wrapper, .videos-content-wrapper,
+.generic-page-wrapper, .videos-content-wrapper,
  .suggest-content-wrapper, .common-content-wrapper, .help-content-wrapper,
 .allfriends-content-wrapper, .match-content-wrapper, .dirfind-content-wrapper,
 .delegation-content-wrapper, .notes-content-wrapper,
@@ -2850,21 +2850,15 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #profile-listing-new-link-wrapper {
     margin-bottom: 20px;
 }
-.panel-group-settings {
-    margin-left: -15px;
-    margin-right: -15px;
-}
+
 .panel-group-settings > .panel,
 .panel-group-settings > form > .panel {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
-.profiles-content-wrapper #profile-photo-upload-section {
+#profile-photo-upload-section {
     display: none;
-    margin-left: -15px;
-    margin-right: -15px;
-    margin-top: 15px;
-    padding: 15px;
+    padding: 10px;
 }
 #profile-photo-upload-close {
     font-size: 14px;
@@ -3537,7 +3531,7 @@ section .profile-match-wrapper {
 		right: 10px;
 	}
 
-	.generic-page-wrapper, .profile_photo-content-wrapper, .videos-content-wrapper, .suggest-content-wrapper, .common-content-wrapper, .help-content-wrapper, .allfriends-content-wrapper, .match-content-wrapper, .dirfind-content-wrapper, .directory-content-wrapper, .delegation-content-wrapper, .notes-content-wrapper, .message-content-wrapper, .apps-content-wrapper, #adminpage, .delegate-content-wrapper, .uexport-content-wrapper, .dfrn_request-content-wrapper, .friendica-content-wrapper, .credits-content-wrapper, .nogroup-content-wrapper, .profperm-content-wrapper, .invite-content-wrapper, .tos-content-wrapper, .fsuggest-content-wrapper {
+	.generic-page-wrapper, .videos-content-wrapper, .suggest-content-wrapper, .common-content-wrapper, .help-content-wrapper, .allfriends-content-wrapper, .match-content-wrapper, .dirfind-content-wrapper, .directory-content-wrapper, .delegation-content-wrapper, .notes-content-wrapper, .message-content-wrapper, .apps-content-wrapper, #adminpage, .delegate-content-wrapper, .uexport-content-wrapper, .dfrn_request-content-wrapper, .friendica-content-wrapper, .credits-content-wrapper, .nogroup-content-wrapper, .profperm-content-wrapper, .invite-content-wrapper, .tos-content-wrapper, .fsuggest-content-wrapper {
 		border-radius: 0;
 		padding: 10px;
 	}

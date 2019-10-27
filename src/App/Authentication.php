@@ -373,7 +373,7 @@ class Authentication
 			if ($user_record['login_date'] <= DBA::NULL_DATETIME) {
 				info($this->l10n->t('Welcome %s', $user_record['username']));
 				info($this->l10n->t('Please upload a profile photo.'));
-				$this->baseUrl->redirect('profile_photo/new');
+				$this->baseUrl->redirect('settings/profile/photo/new');
 			} else {
 				info($this->l10n->t("Welcome back %s", $user_record['username']));
 			}
