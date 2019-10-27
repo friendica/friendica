@@ -9,7 +9,6 @@ Friendica - Dokumentation und Ressourcen
 	* [Beiträge erstellen](help/Text_editor)
 	* [Referenz der BBCode Elemente](help/BBCode)
 	* [Beiträge kommentieren, einordnen und löschen](help/Text_comment)
-	* [Profile](help/Profiles)
 	* [Referenz der Accesskeys](help/Accesskeys)
     * [Veranstaltungen](help/events)
 * Du und andere Nutzer

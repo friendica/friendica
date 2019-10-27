@@ -80,7 +80,6 @@ class Feature
 			'general' => [
 				DI::l10n()->t('General Features'),
 				//array('expire',         DI::l10n()->t('Content Expiration'),		DI::l10n()->t('Remove old posts/comments after a period of time')),
-				['multi_profiles',  DI::l10n()->t('Multiple Profiles'),      DI::l10n()->t('Ability to create multiple profiles'), false, Config::get('feature_lock', 'multi_profiles', false)],
 				['photo_location',  DI::l10n()->t('Photo Location'),         DI::l10n()->t("Photo metadata is normally stripped. This extracts the location \x28if present\x29 prior to stripping metadata and links it to a map."), false, Config::get('feature_lock', 'photo_location', false)],
 				['export_calendar', DI::l10n()->t('Export Public Calendar'), DI::l10n()->t('Ability for visitors to download the public calendar'), false, Config::get('feature_lock', 'export_calendar', false)],
 				['trending_tags',   DI::l10n()->t('Trending Tags'),          DI::l10n()->t('Show a community page widget with a list of the most popular tags in recent public posts.'), false, Config::get('feature_lock', 'trending_tags', false)],

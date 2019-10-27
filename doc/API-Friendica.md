@@ -655,7 +655,6 @@ Returns the [Profile](help/API-Entities#Profile) data of all profiles or a singl
 
 On success: Array of:
 
-* `multi_profiles`: true if user has activated multi_profiles
 * `global_dir`: URL of the global directory set in server settings
 * `friendica_owner`: user data of the authenticated user
 * `profiles`: array of the profile data

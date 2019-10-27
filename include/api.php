@@ -6118,7 +6118,6 @@ function api_friendica_profile_show($type)
 	$profile_id = $_REQUEST['profile_id'] ?? 0;
 
 	// retrieve general information about profiles for user
-	$multi_profiles = Feature::isEnabled(api_user(), 'multi_profiles');
 	$directory = Config::get('system', 'directory');
 
 	// get data of the specified profile id or all profiles of the user if not specified
@@ -6159,7 +6158,7 @@ function api_friendica_profile_show($type)
 	// return settings, authenticated user and profiles data
 	$self = DBA::selectFirst('contact', ['nurl'], ['uid' => api_user(), 'self' => true]);
 
-	$result = ['multi_profiles' => $multi_profiles ? true : false,
+	$result = ['multi_profiles' => false,
 					'global_dir' => $directory,
 					'friendica_owner' => api_get_user($a, $self['nurl']),
 					'profiles' => $profiles];
