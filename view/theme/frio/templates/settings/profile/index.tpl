@@ -7,37 +7,22 @@
 		<ul class="nav nav-pills preferences">
 			<li class="dropdown pull-right">
 				<button type="button" class="btn btn-link btn-sm dropdown-toggle" id="profile-edit-links-dropdown" data-toggle="dropdown" aria-expanded="false">
-					<i class="fa fa-angle-down"  aria-hidden="true"></i>&nbsp;{{$profile_action}}
+					<i class="fa fa-angle-down" aria-hidden="true"></i>&nbsp;{{$profile_action}}
 				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-edit-links-dropdown">
 					<li role="presentation"><a role="menuitem" href="{{$profpiclink}}" id="profile-photo_upload-link" title="{{$profpic}}"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$profpic}}</a></li>
 					<li role="presentation"><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" title="{{$lbl_profile_photo}}" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$lbl_profile_photo}}</button></li>
-					{{if ! $is_default}}
-					<li role="presentation" class="nav-item"><a role="menuitem" href="profperm/{{$profile_id}}" id="profile-edit-visibility-link" title="{{$editvis}}"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;{{$editvis}}</a>
-					</li>
-					{{/if}}
 					<li role="presentation" class="divider"></li>
-					<li role="presentation"><a role="menuitem" href="profile/{{$profile_id}}/view?tab=profile" id="profile-edit-view-link" title="{{$viewprof}}">{{$viewprof}}</a></li>
-					<li role="presentation"><a role="menuitem" href="profiles" id="profile-edit-view-link" title="{{$viewallprof}}">{{$viewallprof}}</a></li>
-					{{if $profile_clone_link}}
-					<li role="presentation" class="divider"></li>
-					<li role="presentation"><a role="menuitem" href="{{$profile_clone_link}}" id="profile-edit-clone-link" title="{{$cr_prof}}">{{$cl_prof}}</a></li>
-					{{/if}}
-					{{if !$is_default}}
-					<li role="presentation" class="divider"></li>
-					<li role="presentation"><a role="menuitem" href="{{$profile_drop_link}}" id="profile-edit-drop-link" title="{{$del_prof}}"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{$del_prof}}</a></li>
-					{{/if}}
+					<li role="presentation"><a role="menuitem" href="profile/{{$nickname}}" id="profile-edit-view-link" title="{{$viewprof}}">{{$viewprof}}</a></li>
 				</ul>
 			</li>
-
 		</ul>
 	</div>
 
 	<div id="profile-edit-links-end"></div>
 
-	<form enctype="multipart/form-data" action="profile_photo" method="post">
-		<input type='hidden' name='form_security_token' value='{{$form_security_token_photo}}'>
-		<input type="hidden" name="profile" value="{{$profile_name.2}}" />
+	<form enctype="multipart/form-data" action="settings/profile/photo" method="post">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token_photo}}">
 
 		<div id="profile-photo-upload-section" class="panel">
 			<a id="profile-photo-upload-close" class="close pull-right" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-times" aria-hidden="true"></i></a>
@@ -46,8 +31,8 @@
 				<input name="userfile" type="file" id="profile-photo-upload" size="48" />
 			</div>
 
-			<div class="profile-edit-submit-wrapper pull-right" >
-				<button type="submit" name="submit" class="profile-edit-submit-butto btn btn-primary" value="{{$submit}}">{{$submit}}</button>
+			<div class="profile-edit-submit-wrapper pull-right">
+				<button type="submit" name="submit" class="profile-edit-submit-button btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 			</div>
 			<div class="clear"></div>
 		</div>
@@ -60,39 +45,37 @@
 		3 => The additional help text (if available)
 	*}}
 
-	<form id="profile-edit-form" name="form1" action="profiles/{{$profile_id}}" method="post" >
-		<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
+	<form id="profile-edit-form" name="form1" action="" method="post">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
 		{{* Some hints to characteristics of the current profile (if available) *}}
-		{{if $is_default}}
 		<div class="section-content-info-wrapper">{{$default nofilter}}</div>
-		{{/if}}
+
+    {{if $personal_account}}
+	    <p>{{include file="field_yesno.tpl" field=$details}}</p>
+    {{/if}}
 
 		{{* friendica differs in $detailled_profile (all fields available and a short Version if this is variable false *}}
-		{{if $detailled_profile}}
+	{{if $detailed_profile}}
 		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="true">
 			{{* The personal settings *}}
 			<div class="panel">
 				<div class="section-subtitle-wrapper" role="tab" id="personal">
 					<h4>
-						<a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#personal-collapse" aria-expanded="true" aria-controls="personal-collapse">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#personal-collapse" aria-expanded="true" aria-controls="personal-collapse">
 							{{$lbl_personal_section}}
 						</a>
 					</h4>
 				</div>
-				{{* for the $detailled_profile we use bootstraps collapsable panel-groups to have expandable groups *}}
-				<div id="personal-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="personal">
+				{{* for the $detailed_profile we use bootstraps collapsable panel-groups to have expandable groups *}}
+				<div id="personal-collapse" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="personal">
 					<div class="section-content-tools-wrapper">
-						{{include file="field_yesno.tpl" field=$details}}
-
-						{{include file="field_input.tpl" field=$profile_name}}
-
 						{{include file="field_input.tpl" field=$name}}
 
 						{{include file="field_input.tpl" field=$pdesc}}
 
 						<div id="profile-edit-gender-wrapper" class="form-group field select">
-							<label id="profile-edit-gender-label" for="gender-select" >{{$lbl_gender}} </label>
+							<label id="profile-edit-gender-label" for="gender-select">{{$lbl_gender}} </label>
 							{{$gender nofilter}}
 						</div>
 						<div class="clear"></div>
@@ -101,7 +84,7 @@
 
 						{{$hide_friends nofilter}}
 
-						<div class="form-group pull-right" >
+						<div class="form-group pull-right">
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 						</div>
 						<div class="clear"></div>
@@ -128,18 +111,18 @@
 						{{include file="field_input.tpl" field=$postal_code}}
 
 						<div id="profile-edit-country-name-wrapper" class="form-group field select">
-							<label id="profile-edit-country-name-label" for="profile-edit-country-name" >{{$country_name.1}} </label>
+							<label id="profile-edit-country-name-label" for="profile-edit-country-name">{{$country_name.1}} </label>
 							<select name="country_name" id="profile-edit-country-name" class="form-control" onChange="Fill_States('{{$region.2}}');">
-								<option selected="selected" >{{$country_name.2}}</option>
+								<option selected="selected">{{$country_name.2}}</option>
 								<option>temp</option>
 							</select>
 						</div>
 						<div class="clear"></div>
 
 						<div id="profile-edit-region-wrapper" class="form-group field select">
-							<label id="profile-edit-region-label" for="profile-edit-region" >{{$region.1}} </label>
-							<select name="region" id="profile-edit-region" class="form-control" onChange="Update_Globals();" >
-								<option selected="selected" >{{$region.2}}</option>
+							<label id="profile-edit-region-label" for="profile-edit-region">{{$region.1}} </label>
+							<select name="region" id="profile-edit-region" class="form-control" onChange="Update_Globals();">
+								<option selected="selected">{{$region.2}}</option>
 								<option>temp</option>
 							</select>
 						</div>
@@ -147,7 +130,7 @@
 
 						{{include file="field_input.tpl" field=$hometown}}
 
-						<div class="form-group pull-right" >
+						<div class="form-group pull-right">
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 						</div>
 						<div class="clear"></div>
@@ -166,8 +149,8 @@
 				</div>
 				<div id="relation-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="relation">
 					<div class="section-content-tools-wrapper">
-						<div id="profile-edit-marital-wrapper" class="form-group field select" >
-								<label id="profile-edit-marital-label" for="profile-edit-marital" >{{$lbl_marital nofilter}}</label>
+						<div id="profile-edit-marital-wrapper" class="form-group field select">
+								<label id="profile-edit-marital-label" for="profile-edit-marital">{{$lbl_marital nofilter}}</label>
 								{{$marital.selector nofilter}}
 						</div>
 						<div class="clear"></div>
@@ -176,13 +159,13 @@
 
 						{{include file="field_input.tpl" field=$howlong}}
 
-						<div id="profile-edit-sexual-wrapper" class="form-group field select" >
-							<label id="profile-edit-sexual-label" for="sexual-select" >{{$lbl_sexual}}</label>
+						<div id="profile-edit-sexual-wrapper" class="form-group field select">
+							<label id="profile-edit-sexual-label" for="sexual-select">{{$lbl_sexual}}</label>
 							{{$sexual.selector nofilter}}
 						</div>
 						<div class="clear"></div>
 
-						<div class="form-group pull-right" >
+						<div class="form-group pull-right">
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 						</div>
 						<div class="clear"></div>
@@ -238,7 +221,7 @@
 
 						{{include file="field_textarea.tpl" field=$education}}
 
-						<div class="form-group pull-right" >
+						<div class="form-group pull-right">
 							<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 						</div>
 						<div class="clear"></div>
@@ -247,19 +230,13 @@
 			</div>
 		</div>
 
-		{{else}}
-		{{* if $detailled_profile not available a short version of the setting page is displayed *}}
-		{{if $personal_account}}
-		{{include file="field_yesno.tpl" field=$details}}
-		{{/if}}
-
-		{{include file="field_input.tpl" field=$profile_name}}
-
+	{{else}}
+		{{* if $detailed_profile not available a short version of the setting page is displayed *}}
 		{{include file="field_input.tpl" field=$name}}
 
 		{{if $personal_account}}
 		<div id="profile-edit-gender-wrapper" class="form-group field select">
-			<label id="profile-edit-gender-label" for="gender-select" >{{$lbl_gender}} </label>
+			<label id="profile-edit-gender-label" for="gender-select">{{$lbl_gender}} </label>
 			{{$gender nofilter}}
 		</div>
 		<div class="clear"></div>
@@ -278,22 +255,21 @@
 
 		{{include file="field_input.tpl" field=$locality}}
 
-
 		{{include file="field_input.tpl" field=$postal_code}}
 
 		<div id="profile-edit-country-name-wrapper" class="form-group field select">
-			<label id="profile-edit-country-name-label" for="profile-edit-country-name" >{{$country_name.1}} </label>
+			<label id="profile-edit-country-name-label" for="profile-edit-country-name">{{$country_name.1}} </label>
 			<select name="country_name" id="profile-edit-country-name" class="form-control" onChange="Fill_States('{{$region.2}}');">
-				<option selected="selected" >{{$country_name.2}}</option>
+				<option selected="selected">{{$country_name.2}}</option>
 				<option>temp</option>
 			</select>
 		</div>
 		<div class="clear"></div>
 
 		<div id="profile-edit-region-wrapper" class="form-group field select">
-			<label id="profile-edit-region-label" for="profile-edit-region" >{{$region.1}} </label>
-			<select name="region" id="profile-edit-region" class="form-control" onChange="Update_Globals();" >
-				<option selected="selected" >{{$region.2}}</option>
+			<label id="profile-edit-region-label" for="profile-edit-region">{{$region.1}} </label>
+			<select name="region" id="profile-edit-region" class="form-control" onChange="Update_Globals();">
+				<option selected="selected">{{$region.2}}</option>
 				<option>temp</option>
 			</select>
 		</div>
@@ -305,7 +281,7 @@
 
 		{{include file="field_textarea.tpl" field=$about}}
 
-		<div class="form-group pull-right" >
+		<div class="form-group pull-right">
 			<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 		</div>
 		<div class="clear"></div>

@@ -208,7 +208,7 @@ class Profile
 
 		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
 			$a->page['aside'] .= Renderer::replaceMacros(
-				Renderer::getMarkupTemplate('profile_edlink.tpl'),
+				Renderer::getMarkupTemplate('settings/profile/link.tpl'),
 				[
 					'$editprofile' => L10n::t('Edit profile'),
 					'$profid' => $a->profile['id']
@@ -394,40 +394,12 @@ class Profile
 
 		// show edit profile to yourself
 		if (!$is_contact && $local_user_is_self) {
-			if (Feature::isEnabled(local_user(), 'multi_profiles')) {
-				$profile['edit'] = [System::baseUrl() . '/profiles', L10n::t('Profiles'), '', L10n::t('Manage/edit profiles')];
-				$r = q(
-					"SELECT * FROM `profile` WHERE `uid` = %d",
-					local_user()
-				);
-
-				$profile['menu'] = [
-					'chg_photo' => L10n::t('Change profile photo'),
-					'cr_new' => L10n::t('Create New Profile'),
-					'entries' => [],
-				];
-
-				if (DBA::isResult($r)) {
-					foreach ($r as $rr) {
-						$profile['menu']['entries'][] = [
-							'photo' => $rr['thumb'],
-							'id' => $rr['id'],
-							'alt' => L10n::t('Profile Image'),
-							'profile_name' => $rr['profile-name'],
-							'isdefault' => $rr['is-default'],
-							'visibile_to_everybody' => L10n::t('visible to everybody'),
-							'edit_visibility' => L10n::t('Edit visibility'),
-						];
-					}
-				}
-			} else {
-				$profile['edit'] = [System::baseUrl() . '/profiles/' . $profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
-				$profile['menu'] = [
-					'chg_photo' => L10n::t('Change profile photo'),
-					'cr_new' => null,
-					'entries' => [],
-				];
-			}
+			$profile['edit'] = [System::baseUrl() . '/settings/profile', L10n::t('Edit profile'), '', L10n::t('Edit profile')];
+			$profile['menu'] = [
+				'chg_photo' => L10n::t('Change profile photo'),
+				'cr_new' => null,
+				'entries' => [],
+			];
 		}
 
 		// Fetch the account type
@@ -878,7 +850,7 @@ class Profile
 			}
 
 			if ($a->profile['uid'] == local_user()) {
-				$profile['edit'] = [System::baseUrl() . '/profiles/' . $a->profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
+				$profile['edit'] = [System::baseUrl() . '/settings/profile', L10n::t('Edit profile'), '', L10n::t('Edit profile')];
 			}
 
 			return Renderer::replaceMacros($tpl, [
@@ -910,20 +882,20 @@ class Profile
 
 		$tabs = [
 			[
-				'label' => L10n::t('Status'),
-				'url'   => $baseProfileUrl,
-				'sel'   => !$current ? 'active' : '',
-				'title' => L10n::t('Status Messages and Posts'),
-				'id'    => 'status-tab',
-				'accesskey' => 'm',
-			],
-			[
 				'label' => L10n::t('Profile'),
-				'url'   => $baseProfileUrl . '/?tab=profile',
+				'url'   => $baseProfileUrl,
 				'sel'   => $current == 'profile' ? 'active' : '',
 				'title' => L10n::t('Profile Details'),
 				'id'    => 'profile-tab',
 				'accesskey' => 'r',
+			],
+			[
+				'label' => L10n::t('Status'),
+				'url'   => $baseProfileUrl . '/status',
+				'sel'   => $current == 'status' ? 'active' : '',
+				'title' => L10n::t('Status Messages and Posts'),
+				'id'    => 'status-tab',
+				'accesskey' => 'm',
 			],
 			[
 				'label' => L10n::t('Photos'),
@@ -977,17 +949,7 @@ class Profile
 			];
 		}
 
-		if (!empty($_SESSION['new_member']) && $is_owner) {
-			$tabs[] = [
-				'label' => L10n::t('Tips for New Members'),
-				'url'   => System::baseUrl() . '/newmember',
-				'sel'   => false,
-				'title' => L10n::t('Tips for New Members'),
-				'id'    => 'newmember-tab',
-			];
-		}
-
-		if ($is_owner || empty($a->profile['hide-friends'])) {
+		if (empty($a->profile['hide-friends'])) {
 			$tabs[] = [
 				'label' => L10n::t('Contacts'),
 				'url'   => $baseProfileUrl . '/contacts',
@@ -998,7 +960,18 @@ class Profile
 			];
 		}
 
+		if (!empty($_SESSION['new_member']) && $is_owner) {
+			$tabs[] = [
+				'label' => L10n::t('Tips for New Members'),
+				'url'   => System::baseUrl() . '/newmember',
+				'sel'   => false,
+				'title' => L10n::t('Tips for New Members'),
+				'id'    => 'newmember-tab',
+			];
+		}
+
 		$arr = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $current, 'tabs' => $tabs];
+
 		Hook::callAll('profile_tabs', $arr);
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');

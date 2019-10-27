@@ -146,7 +146,7 @@ class RouterTest extends TestCase
 					'/post' => [
 						'/it' => [Module\NodeInfo::class, [Router::POST]],
 					],
-					'/double' => [Module\Profile::class, [Router::GET, Router::POST]]
+					'/double' => [Module\Profile\Index::class, [Router::GET, Router::POST]]
 				],
 			],
 		];
@@ -164,7 +164,7 @@ class RouterTest extends TestCase
 		$this->assertEquals(Module\Home::class, $router->getModuleClass('/'));
 		$this->assertEquals(Module\Friendica::class, $router->getModuleClass('/group/route'));
 		$this->assertEquals(Module\Xrd::class, $router->getModuleClass('/group2/group3/route'));
-		$this->assertEquals(Module\Profile::class, $router->getModuleClass('/double'));
+		$this->assertEquals(Module\Profile\Index::class, $router->getModuleClass('/double'));
 	}
 
 	/**
@@ -178,6 +178,6 @@ class RouterTest extends TestCase
 
 		// Don't find GET
 		$this->assertEquals(Module\NodeInfo::class, $router->getModuleClass('/post/it'));
-		$this->assertEquals(Module\Profile::class, $router->getModuleClass('/double'));
+		$this->assertEquals(Module\Profile\Index::class, $router->getModuleClass('/double'));
 	}
 }
