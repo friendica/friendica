@@ -109,8 +109,6 @@ Ein ['Tipp für neue Mitglieder'](newmember)-Link zeigt sich in den ersten beide
 
 ## Schau Dir ebenfalls folgende Seiten an
 
-* [Profile](help/Profiles)
-
 * [Gruppen und Privatssphäre](help/Groups-and-Privacy)
 
 * [Account löschen](help/Remove-Account)

@@ -1358,7 +1358,6 @@ show data of all profiles or a single profile of the authenticated user
 
 On success: Array of:
 
-* multi_profiles: true if user has activated multi_profiles
 * global_dir: URL of the global directory set in server settings
 * friendica_owner: user data of the authenticated user
 * profiles: array of the profile data

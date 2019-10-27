@@ -262,10 +262,6 @@ class Nav
 
 			$nav['settings'] = ['settings', L10n::t('Settings'), '', L10n::t('Account settings')];
 
-			if (Feature::isEnabled(local_user(), 'multi_profiles')) {
-				$nav['profiles'] = ['profiles', L10n::t('Profiles'), '', L10n::t('Manage/Edit Profiles')];
-			}
-
 			$nav['contacts'] = ['contact', L10n::t('Contacts'), '', L10n::t('Manage/edit friends and contacts')];
 		}
 
