@@ -1245,7 +1245,7 @@ function photos_content(App $a)
 			} else {
 				$tools['edit'] = ['photos/' . $a->data['user']['nickname'] . '/image/' . $datum . '/edit', L10n::t('Edit photo')];
 				$tools['delete'] = ['photos/' . $a->data['user']['nickname'] . '/image/' . $datum . '/drop', L10n::t('Delete photo')];
-				$tools['profile'] = ['profile_photo/use/'.$ph[0]['resource-id'], L10n::t('Use as profile photo')];
+				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], L10n::t('Use as profile photo')];
 			}
 
 			if (

@@ -198,7 +198,7 @@ class Session
 			if ($user_record['login_date'] <= DBA::NULL_DATETIME) {
 				info(L10n::t('Welcome %s', $user_record['username']));
 				info(L10n::t('Please upload a profile photo.'));
-				$a->internalRedirect('profile_photo/new');
+				$a->internalRedirect('settings/profile/photo/new');
 			} else {
 				info(L10n::t("Welcome back %s", $user_record['username']));
 			}
