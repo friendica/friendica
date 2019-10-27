@@ -195,10 +195,9 @@ return [
 	'/probe'             => [Module\Debug\Probe::class,  [R::GET]],
 
 	'/profile' => [
-		'/{nickname}'                                                 => [Module\Profile::class,          [R::GET]],
-		'/{nickname}/{to:\d{4}-\d{2}-\d{2}}/{from:\d{4}-\d{2}-\d{2}}' => [Module\Profile::class,          [R::GET]],
-		'/{nickname}/contacts[/{type}]'                               => [Module\Profile\Contacts::class, [R::GET]],
-		'/{profile:\d+}/view'                                         => [Module\Profile::class,          [R::GET]],
+		'/{nickname}'                                         => [Module\Profile\Index::class,    [R::GET]],
+		'/{nickname}/contacts[/{type}]'                       => [Module\Profile\Contacts::class, [R::GET]],
+		'/{nickname}/status[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Status::class,   [R::GET]],
 	],
 
 	'/proxy' => [
@@ -229,6 +228,7 @@ return [
 		],
 		'/delegation[/{action}/{user_id}]' => [Module\Settings\Delegation::class,       [R::GET, R::POST]],
 		'/profile' => [
+			'[/]'                  => [Module\Settings\Profile\Index::class,       [R::GET, R::POST]],
 			'/photo[/new]'         => [Module\Settings\Profile\Photo\Index::class, [R::GET, R::POST]],
 			'/photo/crop/{guid}'   => [Module\Settings\Profile\Photo\Crop::class,  [R::GET, R::POST]],
 		],
@@ -244,6 +244,9 @@ return [
 	'/starred/{item:\d+}'            => [Module\Starred::class,               [R::GET]],
 	'/toggle_mobile'                 => [Module\ToggleMobile::class,          [R::GET]],
 	'/tos'                           => [Module\Tos::class,                   [R::GET]],
+
+	'/update_profile'                => [Module\Update\Profile::class,        [R::GET]],
+
 	'/view/theme/{theme}/style.pcss' => [Module\Theme::class,                 [R::GET]],
 	'/viewsrc/{item:\d+}'            => [Module\Debug\ItemBody::class,        [R::GET]],
 	'/webfinger'                     => [Module\Debug\WebFinger::class,       [R::GET]],

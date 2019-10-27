@@ -1,16 +1,12 @@
 
-{{$default nofilter}}
-
 <h1>{{$banner}}</h1>
+
+{{$default nofilter}}
 
 <div id="profile-edit-links">
 <ul>
-<li><a href="profile_photo" id="profile-photo_upload-link" title="{{$profpic}}">{{$profpic}}</a></li>
-<li><a href="profile/{{$profile_id}}/view?tab=profile" id="profile-edit-view-link" title="{{$viewprof}}">{{$viewprof}}</a></li>
-<li><a href="{{$profile_clone_link}}" id="profile-edit-clone-link" title="{{$cr_prof}}">{{$cl_prof}}</a></li>
-<li></li>
-<li><a href="{{$profile_drop_link}}" id="profile-edit-drop-link" title="{{$del_prof}}" {{$disabled}} >{{$del_prof}}</a></li>
-
+<li><a href="settings/profile/photo" id="profile-photo_upload-link" title="{{$profpic}}">{{$profpic}}</a></li>
+<li><a href="profile/{{$nickname}}" id="profile-edit-view-link" title="{{$viewprof}}">{{$viewprof}}</a></li>
 </ul>
 </div>
 
@@ -18,17 +14,11 @@
 
 
 <div id="profile-edit-wrapper" >
-<form id="profile-edit-form" name="form1" action="profiles/{{$profile_id}}" method="post" >
-<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
+<form id="profile-edit-form" name="form1" action="settings/profiles" method="post" >
+<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-{{if $detailled_profile}}
+{{if $detailed_profile}}
 {{include file="field_yesno.tpl" field=$details}}
-<div id="profile-edit-profile-name-wrapper" >
-<label id="profile-edit-profile-name-label" for="profile-edit-profile-name" >{{$profile_name.1}} </label>
-<input type="text" size="32" name="profile_name" id="profile-edit-profile-name" value="{{$profile_name.2}}" /><div class="required">*</div>
-</div>
-<div id="profile-edit-profile-name-end"></div>
-
 <div id="profile-edit-name-wrapper" >
 <label id="profile-edit-name-label" for="profile-edit-name" >{{$name.1}} </label>
 <input type="text" size="32" name="name" id="profile-edit-name" value="{{$name.2}}" />
@@ -328,12 +318,6 @@
 {{if $personal_account}}
 {{include file="field_yesno.tpl" field=$details}}
 {{/if}}
-<div id="profile-edit-profile-name-wrapper" >
-<label id="profile-edit-profile-name-label" for="profile-edit-profile-name" >{{$profile_name.1}} </label>
-<input type="text" size="32" name="profile_name" id="profile-edit-profile-name" value="{{$profile_name.2}}" /><div class="required">*</div>
-</div>
-<div id="profile-edit-profile-name-end"></div>
-
 <div id="profile-edit-name-wrapper" >
 <label id="profile-edit-name-label" for="profile-edit-name" >{{$name.1}} </label>
 <input type="text" size="32" name="name" id="profile-edit-name" value="{{$name.2}}" />

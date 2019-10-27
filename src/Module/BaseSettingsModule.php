@@ -35,9 +35,9 @@ class BaseSettingsModule extends BaseModule
 		];
 
 		$tabs[] = [
-			'label' => DI::l10n()->t('Profiles'),
-			'url' => 'profiles',
-			'selected' => (($a->argc == 1) && ($a->argv[0] === 'profiles') ? 'active' : ''),
+			'label' => DI::l10n()->t('Profile'),
+			'url' => 'settings/profile',
+			'selected' => (($a->argc > 1) && ($a->argv[1] === 'profile') ? 'active' : ''),
 			'accesskey' => 'p',
 		];
 

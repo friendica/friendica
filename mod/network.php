@@ -880,7 +880,7 @@ function network_tabs(App $a)
 {
 	// item filter tabs
 	/// @TODO fix this logic, reduce duplication
-	/// $a->page['content'] .= '<div class="tabs-wrapper">';
+	/// DI::page()['content'] .= '<div class="tabs-wrapper">';
 	list($no_active, $all_active, $post_active, $conv_active, $new_active, $starred_active, $bookmarked_active) = network_query_get_sel_tab($a);
 
 	// if no tabs are selected, defaults to activitys
