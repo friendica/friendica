@@ -82,7 +82,7 @@ class Register extends BaseModule
 		if (Config::get('system', 'publish_all')) {
 			$profile_publish = '<input type="hidden" name="profile_publish_reg" value="1" />';
 		} else {
-			$publish_tpl = Renderer::getMarkupTemplate('profile_publish.tpl');
+			$publish_tpl = Renderer::getMarkupTemplate('profile/publish.tpl');
 			$profile_publish = Renderer::replaceMacros($publish_tpl, [
 				'$instance'     => 'reg',
 				'$pubdesc'      => L10n::t('Include your profile in member directory?'),
