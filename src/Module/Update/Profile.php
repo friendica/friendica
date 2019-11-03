@@ -31,7 +31,7 @@ class Profile extends BaseModule
 	{
 		$a = self::getApp();
 
-		if (Config::get('system', 'block_public') && !local_user() && !Session::getRemoteContactID($a->profile['profile_uid'])) {
+		if (Config::get('system', 'block_public') && !local_user() && !Session::getRemoteContactID($a->profile['uid'])) {
 			throw new ForbiddenException();
 		}
 
@@ -40,18 +40,18 @@ class Profile extends BaseModule
 		$profile_uid = intval($_GET['p'] ?? 0);
 
 		// Ensure we've got a profile owner if updating.
-		$a->profile['profile_uid'] = $profile_uid;
+		$a->profile['uid'] = $profile_uid;
 
-		$remote_contact = Session::getRemoteContactID($a->profile['profile_uid']);
-		$is_owner = local_user() == $a->profile['profile_uid'];
-		$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . $remote_contact;
+		$remote_contact = Session::getRemoteContactID($a->profile['uid']);
+		$is_owner = local_user() == $a->profile['uid'];
+		$last_updated_key = "profile:" . $a->profile['uid'] . ":" . local_user() . ":" . $remote_contact;
 
 		if (!empty($a->profile['hidewall']) && !$is_owner && !$remote_contact) {
 			throw new ForbiddenException(L10n::t('Access to this profile has been restricted.'));
 		}
 
 		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched his/her groups
-		$sql_extra = Item::getPermissionsSQLByUserId($a->profile['profile_uid']);
+		$sql_extra = Item::getPermissionsSQLByUserId($a->profile['uid']);
 		$sql_extra2 = '';
 
 		$last_updated_array = Session::get('last_updated', []);
@@ -82,7 +82,7 @@ class Profile extends BaseModule
 				$sql_extra4
 				$sql_extra
 			ORDER BY `item`.`received` DESC",
-			$a->profile['profile_uid'],
+			$a->profile['uid'],
 			GRAVITY_ACTIVITY
 		);
 
@@ -111,7 +111,7 @@ class Profile extends BaseModule
 
 		$items = DBA::toArray($items_stmt);
 
-		$o .= conversation($a, $items, $pager, 'profile', $profile_uid, false, 'received', $a->profile['profile_uid']);
+		$o .= conversation($a, $items, $pager, 'profile', $profile_uid, false, 'received', $a->profile['uid']);
 
 		header("Content-type: text/html");
 		echo "<!DOCTYPE html><html><body>\r\n";

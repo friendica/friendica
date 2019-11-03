@@ -69,19 +69,19 @@ class Status extends BaseModule
 
 		$hashtags = $_GET['tag'] ?? '';
 
-		if (Config::get('system', 'block_public') && !local_user() && !Session::getRemoteContactID($a->profile['profile_uid'])) {
+		if (Config::get('system', 'block_public') && !local_user() && !Session::getRemoteContactID($a->profile['uid'])) {
 			return Login::form();
 		}
 
 		$o = '';
 
-		if ($a->profile['profile_uid'] == local_user()) {
+		if ($a->profile['uid'] == local_user()) {
 			Nav::setSelected('home');
 		}
 
-		$remote_contact = Session::getRemoteContactID($a->profile['profile_uid']);
-		$is_owner = local_user() == $a->profile['profile_uid'];
-		$last_updated_key = "profile:" . $a->profile['profile_uid'] . ":" . local_user() . ":" . $remote_contact;
+		$remote_contact = Session::getRemoteContactID($a->profile['uid']);
+		$is_owner = local_user() == $a->profile['uid'];
+		$last_updated_key = "profile:" . $a->profile['uid'] . ":" . local_user() . ":" . $remote_contact;
 
 		if (!empty($a->profile['hidewall']) && !$is_owner && !$remote_contact) {
 			notice(L10n::t('Access to this profile has been restricted.') . EOL);
@@ -90,16 +90,16 @@ class Status extends BaseModule
 
 		$o .= ProfileModel::getTabs($a, 'status', $is_owner, $a->profile['nickname']);
 
-		$o .= Widget::commonFriendsVisitor($a->profile['profile_uid']);
+		$o .= Widget::commonFriendsVisitor($a->profile['uid']);
 
 		$commpage = $a->profile['page-flags'] == User::PAGE_FLAGS_COMMUNITY;
 		$commvisitor = $commpage && $remote_contact;
 
-		$a->page['aside'] .= Widget::postedByYear(System::baseUrl() . '/profile/' . $a->profile['nickname'] . '/status', $a->profile['profile_uid'] ?? 0, true);
+		$a->page['aside'] .= Widget::postedByYear(System::baseUrl() . '/profile/' . $a->profile['nickname'] . '/status', $a->profile['uid'] ?? 0, true);
 		$a->page['aside'] .= Widget::categories(System::baseUrl() . '/profile/' . $a->profile['nickname'] . '/status', XML::escape($category));
 		$a->page['aside'] .= Widget::tagCloud();
 
-		if (Security::canWriteToUserWall($a->profile['profile_uid'])) {
+		if (Security::canWriteToUserWall($a->profile['uid'])) {
 			$x = [
 				'is_owner' => $is_owner,
 				'allow_location' => ($is_owner || $commvisitor) && $a->profile['allow_location'],
@@ -114,14 +114,14 @@ class Status extends BaseModule
 				'acl' => $is_owner ? ACL::getFullSelectorHTML($a->page, $a->user, true) : '',
 				'bang' => '',
 				'visitor' => $is_owner || $commvisitor ? 'block' : 'none',
-				'profile_uid' => $a->profile['profile_uid'],
+				'profile_uid' => $a->profile['uid'],
 			];
 
 			$o .= status_editor($a, $x);
 		}
 
 		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched his/her groups
-		$sql_extra = Item::getPermissionsSQLByUserId($a->profile['profile_uid']);
+		$sql_extra = Item::getPermissionsSQLByUserId($a->profile['uid']);
 		$sql_extra2 = '';
 
 		$last_updated_array = Session::get('last_updated', []);
@@ -130,12 +130,12 @@ class Status extends BaseModule
 
 		if (!empty($category)) {
 			$sql_post_table = sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				DBA::escape(Strings::protectSprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['profile_uid']));
+				DBA::escape(Strings::protectSprintf($category)), intval(TERM_OBJ_POST), intval(TERM_CATEGORY), intval($a->profile['uid']));
 		}
 
 		if (!empty($hashtags)) {
 			$sql_post_table .= sprintf("INNER JOIN (SELECT `oid` FROM `term` WHERE `term` = '%s' AND `otype` = %d AND `type` = %d AND `uid` = %d ORDER BY `tid` DESC) AS `term` ON `item`.`id` = `term`.`oid` ",
-				DBA::escape(Strings::protectSprintf($hashtags)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG), intval($a->profile['profile_uid']));
+				DBA::escape(Strings::protectSprintf($hashtags)), intval(TERM_OBJ_POST), intval(TERM_HASHTAG), intval($a->profile['uid']));
 		}
 
 		if (!empty($datequery)) {
@@ -147,7 +147,7 @@ class Status extends BaseModule
 
 		// Does the profile page belong to a forum?
 		// If not then we can improve the performance with an additional condition
-		$condition = ['uid' => $a->profile['profile_uid'], 'page-flags' => [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_PRVGROUP]];
+		$condition = ['uid' => $a->profile['uid'], 'page-flags' => [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_PRVGROUP]];
 		if (!DBA::exists('user', $condition)) {
 			$sql_extra3 = sprintf(" AND `thread`.`contact-id` = %d ", intval(intval($a->profile['contact_id'])));
 		} else {
@@ -191,7 +191,7 @@ class Status extends BaseModule
 				$sql_extra2
 			ORDER BY `thread`.`received` DESC
 			$pager_sql",
-			$a->profile['profile_uid']
+			$a->profile['uid']
 		);
 
 		// Set a time stamp for this page. We will make use of it when we
@@ -213,7 +213,7 @@ class Status extends BaseModule
 
 		$items = DBA::toArray($items_stmt);
 
-		$o .= conversation($a, $items, $pager, 'profile', false, false, 'received', $a->profile['profile_uid']);
+		$o .= conversation($a, $items, $pager, 'profile', false, false, 'received', $a->profile['uid']);
 
 		$o .= $pager->renderMinimal(count($items));
 

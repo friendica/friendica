@@ -147,7 +147,7 @@ function vier_community_info()
 
 		$tpl = Renderer::getMarkupTemplate('ch_directory_item.tpl');
 
-		$r = q("SELECT `profile`.*, `profile`.`uid` AS `profile_uid`, `user`.`nickname`
+		$r = q("SELECT `profile`.*, `user`.`nickname`
 				FROM `profile` LEFT JOIN `user` ON `user`.`uid` = `profile`.`uid`
 				WHERE `is-default` = 1 $publish AND `user`.`blocked` = 0 $order LIMIT %d , %d ",
 			0,
@@ -159,7 +159,7 @@ function vier_community_info()
 			$aside['$lastusers_items'] = [];
 
 			foreach ($r as $rr) {
-				$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['profile_uid']);
+				$profile_link = 'profile/' . ((strlen($rr['nickname'])) ? $rr['nickname'] : $rr['uid']);
 				$entry = Renderer::replaceMacros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => $profile_link,

@@ -132,13 +132,13 @@ class Profile
 	 * @brief Loads a profile into the page sidebar.
 	 * @param App     $a
 	 * @param string  $nickname     string
-	 * @param int     $profile      int
+	 * @param int     $profile_id   int
 	 * @param array   $profiledata  array
 	 * @param boolean $show_connect Show connect link
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function load(App $a, $nickname, $profile = 0, array $profiledata = [], $show_connect = true)
+	public static function load(App $a, $nickname, $profile_id = 0, array $profiledata = [], $show_connect = true)
 	{
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
@@ -161,31 +161,31 @@ class Profile
 			}
 		}
 
-		$pdata = self::getByNickname($nickname, $user['uid'], $profile);
+		$profile = self::getByNickname($nickname, $user['uid'], $profile_id);
 
-		if (empty($pdata) && empty($profiledata)) {
+		if (empty($profile) && empty($profiledata)) {
 			Logger::log('profile error: ' . $a->query_string, Logger::DEBUG);
 			return;
 		}
 
-		if (empty($pdata)) {
-			$pdata = ['uid' => 0, 'profile_uid' => 0, 'is-default' => false,'name' => $nickname];
+		if (empty($profile)) {
+			$profile = ['uid' => 0, 'is-default' => false,'name' => $nickname];
 		}
 
 		// fetch user tags if this isn't the default profile
 
-		if (!$pdata['is-default']) {
-			$condition = ['uid' => $pdata['profile_uid'], 'is-default' => true];
-			$profile = DBA::selectFirst('profile', ['pub_keywords'], $condition);
-			if (DBA::isResult($profile)) {
-				$pdata['pub_keywords'] = $profile['pub_keywords'];
+		if (!$profile['is-default']) {
+			$condition = ['uid' => $profile['uid'], 'is-default' => true];
+			$profile_id = DBA::selectFirst('profile', ['pub_keywords'], $condition);
+			if (DBA::isResult($profile_id)) {
+				$profile['pub_keywords'] = $profile_id['pub_keywords'];
 			}
 		}
 
-		$a->profile = $pdata;
-		$a->profile_uid = $pdata['profile_uid'];
+		$a->profile = $profile;
+		$a->profile_uid = $profile['uid'];
 
-		$a->profile['mobile-theme'] = PConfig::get($a->profile['profile_uid'], 'system', 'mobile_theme');
+		$a->profile['mobile-theme'] = PConfig::get($a->profile['uid'], 'system', 'mobile_theme');
 		$a->profile['network'] = Protocol::DFRN;
 
 		$a->page['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
@@ -262,7 +262,7 @@ class Profile
 			$profile = DBA::fetchFirst(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` AS `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
-					`profile`.`uid` AS `profile_uid`, `profile`.*,
+					`profile`.*,
 					`contact`.`avatar-date` AS picdate, `contact`.`addr`, `contact`.`url`, `user`.*
 				FROM `profile`
 				INNER JOIN `contact` on `contact`.`uid` = `profile`.`uid` AND `contact`.`self`
@@ -276,7 +276,7 @@ class Profile
 			$profile = DBA::fetchFirst(
 				"SELECT `contact`.`id` AS `contact_id`, `contact`.`photo` as `contact_photo`,
 					`contact`.`thumb` AS `contact_thumb`, `contact`.`micro` AS `contact_micro`,
-					`profile`.`uid` AS `profile_uid`, `profile`.*,
+					`profile`.*,
 					`contact`.`avatar-date` AS picdate, `contact`.`addr`, `contact`.`url`, `user`.*
 				FROM `profile`
 				INNER JOIN `contact` ON `contact`.`uid` = `profile`.`uid` AND `contact`.`self`
@@ -358,7 +358,7 @@ class Profile
 
 		$profile_is_dfrn = $profile['network'] == Protocol::DFRN;
 		$profile_is_native = in_array($profile['network'], Protocol::NATIVE_SUPPORT);
-		$local_user_is_self = local_user() && local_user() == ($profile['profile_uid'] ?? 0);
+		$local_user_is_self = local_user() && local_user() == ($profile['uid'] ?? 0);
 		$visitor_is_authenticated = (bool)self::getMyURL();
 		$visitor_is_following =
 			in_array($visitor_contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND])

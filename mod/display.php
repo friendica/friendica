@@ -206,9 +206,9 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$item_id = $_REQUEST['item_id'];
 		$item = Item::selectFirst(['uid', 'parent', 'parent-uri'], ['id' => $item_id]);
 		if ($item['uid'] != 0) {
-			$a->profile = ['uid' => intval($item['uid']), 'profile_uid' => intval($item['uid'])];
+			$a->profile = ['uid' => intval($item['uid'])];
 		} else {
-			$a->profile = ['uid' => intval($update_uid), 'profile_uid' => intval($update_uid)];
+			$a->profile = ['uid' => intval($update_uid)];
 		}
 		$item_parent = $item['parent'];
 		$item_parent_uri = $item['parent-uri'];
@@ -277,8 +277,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$parent = Item::selectFirst(['uid'], ['uri' => $item_parent_uri, 'wall' => true]);
 		if (DBA::isResult($parent)) {
 			$a->profile['uid'] = ($a->profile['uid'] ?? 0) ?: $parent['uid'];
-			$a->profile['profile_uid'] = ($a->profile['profile_uid'] ?? 0) ?: $parent['uid'];
-			$is_remote_contact = Session::getRemoteContactID($a->profile['profile_uid']);
+			$is_remote_contact = Session::getRemoteContactID($a->profile['uid']);
 			if ($is_remote_contact) {
 				$item_uid = $parent['uid'];
 			}
@@ -290,7 +289,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$a->page_contact = $page_contact;
 	}
 
-	$is_owner = (local_user() && (in_array($a->profile['profile_uid'], [local_user(), 0])) ? true : false);
+	$is_owner = (local_user() && (in_array($a->profile['uid'], [local_user(), 0])) ? true : false);
 
 	if (!empty($a->profile['hidewall']) && !$is_owner && !$is_remote_contact) {
 		throw new HTTPException\ForbiddenException(L10n::t('Access to this profile has been restricted.'));
@@ -311,9 +310,9 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		];
 		$o .= status_editor($a, $x, 0, true);
 	}
-	$sql_extra = Item::getPermissionsSQLByUserId($a->profile['profile_uid']);
+	$sql_extra = Item::getPermissionsSQLByUserId($a->profile['uid']);
 
-	if (local_user() && (local_user() == $a->profile['profile_uid'])) {
+	if (local_user() && (local_user() == $a->profile['uid'])) {
 		$condition = ['parent-uri' => $item_parent_uri, 'uid' => local_user(), 'unseen' => true];
 		$unseen = Item::exists($condition);
 	} else {
@@ -326,7 +325,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 
 	$condition = ["`id` = ? AND `item`.`uid` IN (0, ?) " . $sql_extra, $item_id, $item_uid];
 	$fields = ['parent-uri', 'body', 'title', 'author-name', 'author-avatar', 'plink', 'author-id', 'owner-id', 'contact-id'];
-	$item = Item::selectFirstForUser($a->profile['profile_uid'], $fields, $condition);
+	$item = Item::selectFirstForUser($a->profile['uid'], $fields, $condition);
 
 	if (!DBA::isResult($item)) {
 		throw new HTTPException\NotFoundException(L10n::t('The requested item doesn\'t exist or has been deleted.'));

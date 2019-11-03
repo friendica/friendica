@@ -104,27 +104,14 @@ function cal_content(App $a)
 	}
 
 	// Setup permissions structures
-	$remote_contact = false;
-	$contact_id = 0;
-
 	$owner_uid = intval($a->data['user']['uid']);
 	$nick = $a->data['user']['nickname'];
 
-	if (!empty(Session::getRemoteContactID($a->profile['profile_uid']))) {
-		$contact_id = Session::getRemoteContactID($a->profile['profile_uid']);
-	}
+	$contact_id = Session::getRemoteContactID($a->profile['uid']);
 
-	if ($contact_id) {
-		$r = q("SELECT * FROM `contact` WHERE `id` = %d AND `uid` = %d LIMIT 1",
-			intval($contact_id),
-			intval($a->profile['profile_uid'])
-		);
-		if (DBA::isResult($r)) {
-			$remote_contact = true;
-		}
-	}
+	$remote_contact = $contact_id && DBA::exists('contact', ['id' => $contact_id, 'uid' => $a->profile['uid']]);
 
-	$is_owner = local_user() == $a->profile['profile_uid'];
+	$is_owner = local_user() == $a->profile['uid'];
 
 	if ($a->profile['hidewall'] && !$is_owner && !$remote_contact) {
 		notice(L10n::t('Access to this profile has been restricted.') . EOL);

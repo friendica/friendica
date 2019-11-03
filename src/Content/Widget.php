@@ -306,7 +306,7 @@ class Widget
 	{
 		$a = \get_app();
 
-		$uid = intval($a->profile['profile_uid']);
+		$uid = intval($a->profile['uid']);
 
 		if (!Feature::isEnabled($uid, 'categories')) {
 			return '';
@@ -424,7 +424,7 @@ class Widget
 	{
 		$a = \get_app();
 
-		$uid = intval($a->profile['profile_uid']);
+		$uid = intval($a->profile['uid']);
 
 		if (!$uid || !$a->profile['url']) {
 			return '';
