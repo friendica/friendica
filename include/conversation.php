@@ -495,7 +495,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 		}
 	} elseif ($mode === 'profile') {
 		$items = conversation_add_children($items, false, $order, $uid);
-		$profile_owner = $a->profile['profile_uid'];
+		$profile_owner = $a->profile['uid'];
 
 		if (!$update) {
 			$tab = 'posts';
@@ -509,7 +509,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 				 */
 
 				$live_update_div = '<div id="live-profile"></div>' . "\r\n"
-					. "<script> var profile_uid = " . $a->profile['profile_uid']
+					. "<script> var profile_uid = " . $a->profile['uid']
 					. "; var netargs = '?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 			}
 		}

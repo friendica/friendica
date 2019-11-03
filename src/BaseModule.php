@@ -61,8 +61,7 @@ abstract class BaseModule
 	 */
 	public static function post(array $parameters = [])
 	{
-		// $a = self::getApp();
-		// $a->internalRedirect('module');
+		// DI::baseurl()->redirect('module');
 	}
 
 	/**

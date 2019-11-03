@@ -61,7 +61,7 @@ class Thread
 				$this->writable = true;
 				break;
 			case 'profile':
-				$this->profile_owner = $a->profile['profile_uid'];
+				$this->profile_owner = $a->profile['uid'];
 				$this->writable = Security::canWriteToUserWall($this->profile_owner);
 				break;
 			case 'display':

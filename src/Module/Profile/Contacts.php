@@ -41,7 +41,7 @@ class Contacts extends BaseModule
 
 		Profile::load($a, $nickname);
 
-		$is_owner = $a->profile['profile_uid'] == local_user();
+		$is_owner = $a->profile['uid'] == local_user();
 
 		// tabs
 		$o = Profile::getTabs($a, 'contacts', $is_owner, $nickname);
