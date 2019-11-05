@@ -61,7 +61,7 @@ class Session
 		$session = DI::session();
 
 		if (empty($session->get('remote')[$uid])) {
-			return false;
+			return 0;
 		}
 
 		return $session->get('remote')[$uid];
