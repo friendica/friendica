@@ -5,9 +5,9 @@
  */
 namespace Friendica\Content;
 
-use Friendica\Core\Protocol;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -153,8 +153,8 @@ class ForumManager
 	public static function profileAdvanced($uid)
 	{
 		$profile = intval(Feature::isEnabled($uid, 'forumlist_profile'));
-		if (! $profile) {
-			return;
+		if (!$profile) {
+			return '';
 		}
 
 		$o = '';
@@ -168,19 +168,15 @@ class ForumManager
 		$contacts = self::getList($uid, $lastitem, false, false);
 
 		$total_shown = 0;
-		$forumlist = '';
 		foreach ($contacts as $contact) {
-			$forumlist .= HTML::micropro($contact, true, 'forumlist-profile-advanced');
-			$total_shown ++;
+			$o .= HTML::micropro($contact, true, 'forumlist-profile-advanced');
+			$total_shown++;
 			if ($total_shown == $show_total) {
 				break;
 			}
 		}
 
-		if (count($contacts) > 0) {
-			$o .= $forumlist;
-			return $o;
-		}
+		return $o;
 	}
 
 	/**
