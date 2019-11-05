@@ -224,7 +224,7 @@ class Session
 	public static function getRemoteContactID($uid)
 	{
 		if (empty($_SESSION['remote'][$uid])) {
-			return false;
+			return 0;
 		}
 
 		return $_SESSION['remote'][$uid];
