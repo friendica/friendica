@@ -2,9 +2,13 @@
 /**
  * @file src/Model/PermissionSet.php
  */
+
 namespace Friendica\Model;
 
+use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\DI;
+use Friendica\Network\HTTPException;
 
 /**
  * functions for interacting with the permission set of an object (item, photo, event, ...)
@@ -14,51 +18,53 @@ class PermissionSet
 	/**
 	 * Fetch the id of a given permission set. Generate a new one when needed
 	 *
-	 * @param array $postarray The array from an item, picture or event post
+	 * @param int         $uid
+	 * @param string|null $allow_cid Allowed contact IDs    - empty = everyone
+	 * @param string|null $allow_gid Allowed group IDs      - empty = everyone
+	 * @param string|null $deny_cid  Disallowed contact IDs - empty = no one
+	 * @param string|null $deny_gid  Disallowed group IDs   - empty = no one
 	 * @return int id
-	 * @throws \Exception
+	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public static function fetchIDForPost(&$postarray)
-	{
-		$condition = ['uid' => $postarray['uid'],
-			'allow_cid' => self::sortPermissions($postarray['allow_cid'] ?? ''),
-			'allow_gid' => self::sortPermissions($postarray['allow_gid'] ?? ''),
-			'deny_cid'  => self::sortPermissions($postarray['deny_cid']  ?? ''),
-			'deny_gid'  => self::sortPermissions($postarray['deny_gid']  ?? '')];
+	public static function getIdFromACL(
+		int $uid,
+		string $allow_cid = null,
+		string $allow_gid = null,
+		string $deny_cid = null,
+		string $deny_gid = null
+	) {
+		$ACLFormatter = DI::aclFormatter();
 
-		$set = DBA::selectFirst('permissionset', ['id'], $condition);
+		$allow_cid = $ACLFormatter->sanitize($allow_cid);
+		$allow_gid = $ACLFormatter->sanitize($allow_gid);
+		$deny_cid = $ACLFormatter->sanitize($deny_cid);
+		$deny_gid = $ACLFormatter->sanitize($deny_gid);
 
-		if (!DBA::isResult($set)) {
-			DBA::insert('permissionset', $condition, true);
-
-			$set = DBA::selectFirst('permissionset', ['id'], $condition);
+		// Public permission
+		if (!$allow_cid && !$allow_gid && !$deny_cid && !$deny_gid) {
+			return 0;
 		}
 
-		$postarray['allow_cid'] = null;
-		$postarray['allow_gid'] = null;
-		$postarray['deny_cid'] = null;
-		$postarray['deny_gid'] = null;
+		$condition = [
+			'uid' => $uid,
+			'allow_cid' => $allow_cid,
+			'allow_gid' => $allow_gid,
+			'deny_cid'  => $deny_cid,
+			'deny_gid'  => $deny_gid
+		];
+		$permissionset = DBA::selectFirst('permissionset', ['id'], $condition);
 
-		return $set['id'];
-	}
-
-	private static function sortPermissions($permissionlist)
-	{
-		$cleaned_list = trim($permissionlist, '<>');
-
-		if (empty($cleaned_list)) {
-			return $permissionlist;
+		if (DBA::isResult($permissionset)) {
+			$psid = $permissionset['id'];
+		} else {
+			if (DBA::insert('permissionset', $condition, true)) {
+				$psid = DBA::lastInsertId();
+			} else {
+				throw new HTTPException\InternalServerErrorException(L10n::t('Unable to create a new permission set.'));
+			}
 		}
 
-		$elements = explode('><', $cleaned_list);
-
-		if (count($elements) <= 1) {
-			return $permissionlist;
-		}
-
-		asort($elements);
-
-		return '<' . implode('><', $elements) . '>';
+		return $psid;
 	}
 
 	/**

@@ -1857,7 +1857,18 @@ class Item
 		}
 
 		// Creates or assigns the permission set
-		$item['psid'] = PermissionSet::fetchIDForPost($item);
+		$item['psid'] = PermissionSet::getIdFromACL(
+			$item['uid'],
+			$item['allow_cid'],
+			$item['allow_gid'],
+			$item['deny_cid'],
+			$item['deny_gid']
+		);
+
+		$item['allow_cid'] = null;
+		$item['allow_gid'] = null;
+		$item['deny_cid'] = null;
+		$item['deny_gid'] = null;
 
 		// We are doing this outside of the transaction to avoid timing problems
 		if (!self::insertActivity($item)) {
@@ -2730,7 +2741,13 @@ class Item
 
 		$private = ($user['allow_cid'] || $user['allow_gid'] || $user['deny_cid'] || $user['deny_gid']) ? 1 : 0;
 
-		$psid = PermissionSet::fetchIDForPost($user);
+		$psid = PermissionSet::getIdFromACL(
+			$user['uid'],
+			$user['allow_cid'],
+			$user['allow_gid'],
+			$user['deny_cid'],
+			$user['deny_gid']
+		);
 
 		$forum_mode = ($prvgroup ? 2 : 1);
 

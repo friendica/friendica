@@ -204,13 +204,19 @@ class PostUpdate
 			}
 
 			if (empty($item['psid'])) {
-				$item['psid'] = PermissionSet::fetchIDForPost($item);
-			} else {
-				$item['allow_cid'] = null;
-				$item['allow_gid'] = null;
-				$item['deny_cid'] = null;
-				$item['deny_gid'] = null;
+				$item['psid'] = PermissionSet::getIdFromACL(
+					$item['uid'],
+					$item['allow_cid'],
+					$item['allow_gid'],
+					$item['deny_cid'],
+					$item['deny_gid']
+				);
 			}
+
+			$item['allow_cid'] = null;
+			$item['allow_gid'] = null;
+			$item['deny_cid'] = null;
+			$item['deny_gid'] = null;
 
 			if ($item['post-type'] == 0) {
 				if (!empty($item['type']) && ($item['type'] == 'note')) {
