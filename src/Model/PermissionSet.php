@@ -5,7 +5,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\HTTPException;
@@ -60,7 +59,7 @@ class PermissionSet
 			if (DBA::insert('permissionset', $condition, true)) {
 				$psid = DBA::lastInsertId();
 			} else {
-				throw new HTTPException\InternalServerErrorException(L10n::t('Unable to create a new permission set.'));
+				throw new HTTPException\InternalServerErrorException(DI::l10n()->t('Unable to create a new permission set.'));
 			}
 		}
 

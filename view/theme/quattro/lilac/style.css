@@ -1964,6 +1964,9 @@ ul.tabs li .active {
   list-style: none;
   margin-top: 10px;
 }
+#profile-menu {
+	display: none;
+}
 #profile-edit-default-desc {
   color: #FF0000;
   border: 1px solid #FF8888;

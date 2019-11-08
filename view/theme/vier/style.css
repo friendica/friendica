@@ -2406,6 +2406,10 @@ aside #id_password {
 	list-style: none;
 }
 
+#profile-menu {
+	display: none;
+}
+
 .profile-edit-side-div {
 /*  display: none; */
 	float: right;

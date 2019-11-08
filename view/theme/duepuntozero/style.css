@@ -646,10 +646,14 @@ input#dfrn-url {
 #profile-edit-links ul {
 	list-style-type: none;
 }
-
 #profile-edit-links li {
 	margin-top: 10px;
 }
+
+#profile-menu {
+	display: none;
+}
+
 .profile-edit-side-div {
 	float: right;
 }

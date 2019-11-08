@@ -104,6 +104,14 @@ input[type=submit]:active {
 	top: 1px;
 }
 
+.btn {
+	background-color: transparent;
+	box-shadow: none;
+	border: none;
+	padding: 0;
+	text-align: inherit;
+}
+
 #search-text,
 #search-submit,
 #search-save {
@@ -2125,6 +2133,10 @@ div[id$="wrapper"] br {
 	margin-left: 180px;
 	float: left;
 	position: absolute;
+}
+
+#profile-menu {
+	display: none;
 }
 
 #cropimage-wrapper {

@@ -5,10 +5,7 @@
 namespace Friendica\Model;
 
 use Friendica\App;
-use Friendica\Content\Feature;
-use Friendica\Content\ForumManager;
 use Friendica\Content\Text\BBCode;
-use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Duration;
 use Friendica\Core\Config;
@@ -26,7 +23,6 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 
 class Profile
 {
@@ -713,149 +709,6 @@ class Profile
 			'$event_title' => DI::l10n()->t('Upcoming events the next 7 days:'),
 			'$events' => $r,
 		]);
-	}
-
-	public static function getAdvanced(App $a)
-	{
-		$uid = intval($a->profile['uid']);
-
-		if ($a->profile['name']) {
-			$profile = [];
-
-			$profile['fullname'] = [DI::l10n()->t('Full Name:'), $a->profile['name']];
-
-			if (Feature::isEnabled($uid, 'profile_membersince')) {
-				$profile['membersince'] = [DI::l10n()->t('Member since:'), DateTimeFormat::local($a->profile['register_date'])];
-			}
-
-			if ($a->profile['gender']) {
-				$profile['gender'] = [DI::l10n()->t('Gender:'), DI::l10n()->t($a->profile['gender'])];
-			}
-
-			if (!empty($a->profile['dob']) && $a->profile['dob'] > DBA::NULL_DATE) {
-				$year_bd_format = DI::l10n()->t('j F, Y');
-				$short_bd_format = DI::l10n()->t('j F');
-
-				$val = DI::l10n()->getDay(
-					intval($a->profile['dob']) ?
-						DateTimeFormat::utc($a->profile['dob'] . ' 00:00 +00:00', $year_bd_format)
-						: DateTimeFormat::utc('2001-' . substr($a->profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format)
-				);
-
-				$profile['birthday'] = [DI::l10n()->t('Birthday:'), $val];
-			}
-
-			if (!empty($a->profile['dob'])
-				&& $a->profile['dob'] > DBA::NULL_DATE
-				&& $age = Temporal::getAgeByTimezone($a->profile['dob'], $a->profile['timezone'], '')
-			) {
-				$profile['age'] = [DI::l10n()->t('Age:'), $age];
-			}
-
-			if ($a->profile['marital']) {
-				$profile['marital'] = [DI::l10n()->t('Status:'), DI::l10n()->t($a->profile['marital'])];
-			}
-
-			/// @TODO Maybe use x() here, plus below?
-			if ($a->profile['with']) {
-				$profile['marital']['with'] = $a->profile['with'];
-			}
-
-			if (strlen($a->profile['howlong']) && $a->profile['howlong'] > DBA::NULL_DATETIME) {
-				$profile['howlong'] = Temporal::getRelativeDate($a->profile['howlong'], DI::l10n()->t('for %1$d %2$s'));
-			}
-
-			if ($a->profile['sexual']) {
-				$profile['sexual'] = [DI::l10n()->t('Sexual Preference:'), DI::l10n()->t($a->profile['sexual'])];
-			}
-
-			if ($a->profile['homepage']) {
-				$profile['homepage'] = [DI::l10n()->t('Homepage:'), HTML::toLink($a->profile['homepage'])];
-			}
-
-			if ($a->profile['hometown']) {
-				$profile['hometown'] = [DI::l10n()->t('Hometown:'), HTML::toLink($a->profile['hometown'])];
-			}
-
-			if ($a->profile['pub_keywords']) {
-				$profile['pub_keywords'] = [DI::l10n()->t('Tags:'), $a->profile['pub_keywords']];
-			}
-
-			if ($a->profile['politic']) {
-				$profile['politic'] = [DI::l10n()->t('Political Views:'), $a->profile['politic']];
-			}
-
-			if ($a->profile['religion']) {
-				$profile['religion'] = [DI::l10n()->t('Religion:'), $a->profile['religion']];
-			}
-
-			if ($txt = BBCode::convert($a->profile['about'])) {
-				$profile['about'] = [DI::l10n()->t('About:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['interest'])) {
-				$profile['interest'] = [DI::l10n()->t('Hobbies/Interests:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['likes'])) {
-				$profile['likes'] = [DI::l10n()->t('Likes:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['dislikes'])) {
-				$profile['dislikes'] = [DI::l10n()->t('Dislikes:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['contact'])) {
-				$profile['contact'] = [DI::l10n()->t('Contact information and Social Networks:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['music'])) {
-				$profile['music'] = [DI::l10n()->t('Musical interests:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['book'])) {
-				$profile['book'] = [DI::l10n()->t('Books, literature:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['tv'])) {
-				$profile['tv'] = [DI::l10n()->t('Television:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['film'])) {
-				$profile['film'] = [DI::l10n()->t('Film/dance/culture/entertainment:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['romance'])) {
-				$profile['romance'] = [DI::l10n()->t('Love/Romance:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['work'])) {
-				$profile['work'] = [DI::l10n()->t('Work/employment:'), $txt];
-			}
-
-			if ($txt = BBCode::convert($a->profile['education'])) {
-				$profile['education'] = [DI::l10n()->t('School/education:'), $txt];
-			}
-
-			//show subcribed forum if it is enabled in the usersettings
-			if (Feature::isEnabled($uid, 'forumlist_profile')) {
-				$profile['forumlist'] = [DI::l10n()->t('Forums:'), ForumManager::profileAdvanced($uid)];
-			}
-
-			if ($a->profile['uid'] == local_user()) {
-				$profile['edit'] = [DI::baseUrl() . '/settings/profile', DI::l10n()->t('Edit profile'), '', DI::l10n()->t('Edit profile')];
-			}
-
-			$tpl = Renderer::getMarkupTemplate('profile/advanced.tpl');
-			return Renderer::replaceMacros($tpl, [
-				'$title' => DI::l10n()->t('Profile'),
-				'$basic' => DI::l10n()->t('Basic'),
-				'$advanced' => DI::l10n()->t('Advanced'),
-				'$profile' => $profile
-			]);
-		}
-
-		return '';
 	}
 
     /**
