@@ -1140,6 +1140,23 @@ return [
 			"PRIMARY" => ["id"],
 		]
 	],
+	"profile_field" => [
+		"comment" => "Custom profile fields",
+		"fields" => [
+			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "relation" => ["user" => "uid"], "comment" => "Owner user id"],
+			"order" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "1", "comment" => "Field ordering per user"],
+			"psid" => ["type" => "int unsigned", "relation" => ["permissionset" => "id"], "comment" => "ID of the permission set of this profile field - 0 = public"],
+			"label" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Label of the field"],
+			"value" => ["type" => "text", "not null" => "1", "default" => "", "comment" => "Value of the field"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["id"],
+			"uid" => ["uid"],
+			"order" => ["order"],
+			"psid" => ["psid"],
+		]
+	],
 	"push_subscriber" => [
 		"comment" => "Used for OStatus: Contains feed subscribers",
 		"fields" => [
