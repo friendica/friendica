@@ -118,6 +118,16 @@ class Group extends BaseObject
 		}
 		DBA::close($stmt);
 
+		// Meta-groups
+		$contact = Contact::getById($cid, ['rel']);
+		if ($contact['rel'] == Contact::FOLLOWER || $contact['rel'] == Contact::FRIEND) {
+			$return[] = self::FOLLOWERS;
+		}
+
+		if ($contact['rel'] == Contact::FRIEND) {
+			$return[] = self::MUTUALS;
+		}
+
 		return $return;
 	}
 

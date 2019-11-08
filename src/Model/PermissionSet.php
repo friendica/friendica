@@ -84,14 +84,9 @@ class PermissionSet extends BaseObject
 			$groups = Group::getIdsByContactId($contact_id);
 		}
 
-		if (empty($groups) || !is_array($groups)) {
-			return [];
-		}
-
 		$group_str = '<<>>'; // should be impossible to match
-
-		foreach ($groups as $g) {
-			$group_str .= '|<' . intval($g) . '>';
+		foreach ($groups as $group_id) {
+			$group_str .= '|<' . preg_quote($group_id) . '>';
 		}
 
 		$contact_str = '<' . $contact_id . '>';
