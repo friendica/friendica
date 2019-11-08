@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2020.03-dev (Dalmatian Bellflower)
--- DB_UPDATE_VERSION 1330
+-- DB_UPDATE_VERSION 1331
 -- ------------------------------------------
 
 
@@ -1052,6 +1052,25 @@ CREATE TABLE IF NOT EXISTS `profile_check` (
 	`expire` int unsigned NOT NULL DEFAULT 0 COMMENT '',
 	 PRIMARY KEY(`id`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='DFRN remote auth use';
+
+--
+-- TABLE profile_field
+--
+CREATE TABLE IF NOT EXISTS `profile_field` (
+    `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'sequential ID',
+    `uid` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Owner user id',
+    `psid` int(10) unsigned DEFAULT NULL COMMENT 'ID of the permission set of this profile field - 0 = public',
+    `name` varchar(255) NOT NULL DEFAULT '' COMMENT 'Name of the field',
+    `value` text COMMENT 'Value of the field',
+    `order` mediumint(8) unsigned NOT NULL DEFAULT 1 COMMENT 'Field ordering per user',
+    `label` varchar(255) NOT NULL DEFAULT '' COMMENT 'Label of the field',
+    `created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+    `edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+    PRIMARY KEY (`id`),
+    KEY `uid` (`uid`),
+    KEY `psid` (`psid`),
+    KEY `order` (`order`)
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Custom profile fields';
 
 --
 -- TABLE push_subscriber
