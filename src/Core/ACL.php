@@ -305,7 +305,7 @@ class ACL extends BaseObject
 		];
 		foreach (Group::getByUserId($user_id) as $group) {
 			$acl_groups[] = [
-				'id' => $group['id'],
+				'id' => -$group['id'],
 				'name' => $group['name'],
 				'addr' => '',
 				'micro' => 'images/twopeople.png',
