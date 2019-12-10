@@ -4,6 +4,8 @@ namespace Friendica\Api\Mastodon;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
+use Friendica\Model\APContact;
+use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -65,13 +67,13 @@ class Account
 		$account->username = $contact['nick'];
 		$account->acct = $contact['nick'];
 		$account->display_name = $contact['name'];
-		$account->locked = $contact['blocked'];
+		$account->locked = false;
 		$account->created_at = DateTimeFormat::utc($contact['created'], DateTimeFormat::ATOM);
 		// No data is available from contact
 		$account->followers_count = 0;
 		$account->following_count = 0;
 		$account->statuses_count = 0;
-		$account->note = BBCode::convert($contact['about']);
+		$account->note = BBCode::convert($contact['about'], false);
 		$account->url = $contact['url'];
 		$account->avatar = $contact['avatar'];
 		$account->avatar_static = $contact['avatar'];
@@ -80,6 +82,12 @@ class Account
 		$account->header_static = '';
 		// No custom emojis per account in Friendica
 		$account->emojis = [];
+		$account->bot = ($contact['contact-type'] == Contact::TYPE_NEWS);
+
+		$apcontact = APContact::getByURL($contact['url'], false);
+		if (!empty($apcontact)) {
+			$account->locked = (bool)$apcontact['manually-approve'];
+		}
 
 		return $account;
 	}
