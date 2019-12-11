@@ -69,7 +69,7 @@ class Account
 		$account->username = $contact['nick'];
 		$account->acct = $contact['nick'];
 		$account->display_name = $contact['name'];
-		$account->locked = (bool)$apcontact['manually-approve'] ?? false;
+		$account->locked = !empty($apcontact['manually-approve']);
 		$account->created_at = DateTimeFormat::utc($contact['created'], DateTimeFormat::ATOM);
 		$account->followers_count = $apcontact['followers_count'] ?? 0;
 		$account->following_count = $apcontact['following_count'] ?? 0;
