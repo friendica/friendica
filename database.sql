@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2019.12-dev (Dalmatian Bellflower)
--- DB_UPDATE_VERSION 1324
+-- Friendica 2019.12-rc (Dalmatian Bellflower)
+-- DB_UPDATE_VERSION 1325
 -- ------------------------------------------
 
 
@@ -66,6 +66,9 @@ CREATE TABLE IF NOT EXISTS `apcontact` (
 	`pubkey` text COMMENT '',
 	`baseurl` varchar(255) COMMENT 'baseurl of the ap contact',
 	`generator` varchar(255) COMMENT 'Name of the contact\'s system',
+	`following_count` int unsigned DEFAULT 0 COMMENT 'Number of following contacts',
+	`followers_count` int unsigned DEFAULT 0 COMMENT 'Number of followers',
+	`statuses_count` int unsigned DEFAULT 0 COMMENT 'Number of posts',
 	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
 	 PRIMARY KEY(`url`),
 	 INDEX `addr` (`addr`(32)),
