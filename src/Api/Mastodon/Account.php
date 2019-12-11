@@ -62,17 +62,18 @@ class Account
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function createFromContact(array $contact) {
+		$apcontact = APContact::getByURL($contact['url'], false);
+
 		$account = new Account();
 		$account->id = $contact['id'];
 		$account->username = $contact['nick'];
 		$account->acct = $contact['nick'];
 		$account->display_name = $contact['name'];
-		$account->locked = false;
+		$account->locked = (bool)$apcontact['manually-approve'] ?? false;
 		$account->created_at = DateTimeFormat::utc($contact['created'], DateTimeFormat::ATOM);
-		// No data is available from contact
-		$account->followers_count = 0;
-		$account->following_count = 0;
-		$account->statuses_count = 0;
+		$account->followers_count = $apcontact['followers_count'] ?? 0;
+		$account->following_count = $apcontact['following_count'] ?? 0;
+		$account->statuses_count = $apcontact['statuses_count'] ?? 0;
 		$account->note = BBCode::convert($contact['about'], false);
 		$account->url = $contact['url'];
 		$account->avatar = $contact['avatar'];
@@ -83,11 +84,6 @@ class Account
 		// No custom emojis per account in Friendica
 		$account->emojis = [];
 		$account->bot = ($contact['contact-type'] == Contact::TYPE_NEWS);
-
-		$apcontact = APContact::getByURL($contact['url'], false);
-		if (!empty($apcontact)) {
-			$account->locked = (bool)$apcontact['manually-approve'];
-		}
 
 		return $account;
 	}
