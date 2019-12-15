@@ -156,16 +156,6 @@ class App
 	}
 
 	/**
-	 * The Logger of this app
-	 *
-	 * @return LoggerInterface
-	 */
-	public function getLogger()
-	{
-		return $this->logger;
-	}
-
-	/**
 	 * The profiler of this app
 	 *
 	 * @return Profiler

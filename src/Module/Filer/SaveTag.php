@@ -26,7 +26,7 @@ class SaveTag extends BaseModule
 	public static function rawContent(array $parameters = [])
 	{
 		$a = DI::app();
-		$logger = $a->getLogger();
+		$logger = DI::logger();
 
 		$term = XML::unescape(trim($_GET['term'] ?? ''));
 		// @TODO: Replace with parameter from router

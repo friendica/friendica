@@ -118,7 +118,7 @@ class Summary extends BaseAdminModule
 		$currBasepath = DI::config()->get('system', 'basepath');
 		if ($confBasepath !== $currBasepath || !is_dir($currBasepath)) {
 			if (is_dir($confBasepath) && Config::set('system', 'basepath', $confBasepath)) {
-				$a->getLogger()->info('Friendica\'s system.basepath was updated successfully.', [
+				DI::logger()->info('Friendica\'s system.basepath was updated successfully.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
@@ -126,7 +126,7 @@ class Summary extends BaseAdminModule
 					$currBasepath,
 					$confBasepath);
 			} elseif (!is_dir($currBasepath)) {
-				$a->getLogger()->alert('Friendica\'s system.basepath is wrong.', [
+				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
@@ -134,7 +134,7 @@ class Summary extends BaseAdminModule
 					$currBasepath,
 					$confBasepath);
 			} else {
-				$a->getLogger()->alert('Friendica\'s system.basepath is wrong.', [
+				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);

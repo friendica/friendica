@@ -20,7 +20,7 @@ class RemoveTag extends BaseModule
 		}
 
 		$app = DI::app();
-		$logger = $app->getLogger();
+		$logger = DI::logger();
 
 		$item_id = (($app->argc > 1) ? intval($app->argv[1]) : 0);
 

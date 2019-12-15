@@ -19,7 +19,7 @@ class Statistics extends BaseModule
 	public static function rawContent(array $parameters = [])
 	{
 		$config = DI::config();
-		$logger = DI::app()->getLogger();
+		$logger = DI::logger();
 
 		$registration_open =
 			intval($config->get('config', 'register_policy')) !== Register::CLOSED

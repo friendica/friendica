@@ -443,7 +443,7 @@ class Worker
 
 		Logger::info('Process done.', ['priority' => $queue["priority"], 'id' => $queue["id"], 'duration' => round($duration, 3)]);
 
-		$a->getProfiler()->saveLog($a->getLogger(), "ID " . $queue["id"] . ": " . $funcname);
+		$a->getProfiler()->saveLog(DI::logger(), "ID " . $queue["id"] . ": " . $funcname);
 
 		$cooldown = Config::get("system", "worker_cooldown", 0);
 
@@ -1086,7 +1086,7 @@ class Worker
 		$args = ['no_cron' => !$do_cron];
 
 		$a = get_app();
-		$process = new Core\Process($a->getLogger(), $a->getMode(), DI::config(), $a->getBasePath());
+		$process = new Core\Process(DI::logger(), $a->getMode(), DI::config(), $a->getBasePath());
 		$process->run($command, $args);
 
 		// after spawning we have to remove the flag.

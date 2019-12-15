@@ -351,7 +351,7 @@ class Authentication
 			 * The week ensures that sessions will expire after some inactivity.
 			 */;
 			if ($this->session->get('remember')) {
-				$a->getLogger()->info('Injecting cookie for remembered user ' . $user_record['nickname']);
+				$this->logger->info('Injecting cookie for remembered user ' . $user_record['nickname']);
 				$this->cookie->set($user_record['uid'], $user_record['password'], $user_record['prvkey']);
 				$this->session->remove('remember');
 			}
