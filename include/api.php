@@ -328,7 +328,7 @@ function api_call(App $a)
 
 				Logger::info(API_LOG_PREFIX . 'username {username}', ['module' => 'api', 'action' => 'call', 'username' => $a->user['username'], 'duration' => round($duration, 2)]);
 
-				$a->getProfiler()->saveLog(DI::logger(), API_LOG_PREFIX . 'performance');
+				DI::profiler()->saveLog(DI::logger(), API_LOG_PREFIX . 'performance');
 
 				if (false === $return) {
 					/*

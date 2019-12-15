@@ -75,7 +75,7 @@ class Renderer
 			exit();
 		}
 
-		$a->getProfiler()->saveTimestamp($stamp1, "rendering", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "rendering", System::callstack());
 
 		return $output;
 	}
@@ -102,7 +102,7 @@ class Renderer
 			exit();
 		}
 
-		$a->getProfiler()->saveTimestamp($stamp1, "file", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 		return $template;
 	}

@@ -17,6 +17,7 @@ use Friendica\Content;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\FileSystem;
 use Friendica\Util\Logger\WorkerLogger;
+use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,6 +40,7 @@ use Psr\Log\LoggerInterface;
  * @method static LoggerInterface logger()
  * @method static LoggerInterface devLogger()
  * @method static LoggerInterface workerLogger()
+ * @method static Profiler profiler()
  * @method static ISession session()
  * @method static App\Authentication auth()
  * @method static App\Arguments args()
@@ -79,6 +81,7 @@ class DI
 		'session'      => ISession::class,
 		'dba'          => Database::class,
 		'fs'           => FileSystem::class,
+		'profiler'     => Profiler::class,
 	];
 
 	/** @var Dice */

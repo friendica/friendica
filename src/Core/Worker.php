@@ -386,7 +386,7 @@ class Worker
 
 		// We use the callstack here to analyze the performance of executed worker entries.
 		// For this reason the variables have to be initialized.
-		$a->getProfiler()->reset();
+		DI::profiler()->reset();
 
 		$a->queue = $queue;
 
@@ -443,7 +443,7 @@ class Worker
 
 		Logger::info('Process done.', ['priority' => $queue["priority"], 'id' => $queue["id"], 'duration' => round($duration, 3)]);
 
-		$a->getProfiler()->saveLog(DI::logger(), "ID " . $queue["id"] . ": " . $funcname);
+		DI::profiler()->saveLog(DI::logger(), "ID " . $queue["id"] . ": " . $funcname);
 
 		$cooldown = Config::get("system", "worker_cooldown", 0);
 

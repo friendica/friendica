@@ -1104,7 +1104,7 @@ class BBCode
 			@curl_exec($ch);
 			$curl_info = @curl_getinfo($ch);
 
-			$a->getProfiler()->saveTimestamp($stamp1, "network", System::callstack());
+			DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 			if (substr($curl_info['content_type'], 0, 6) == 'image/') {
 				$text = "[url=" . $match[1] . ']' . $match[1] . "[/url]";
@@ -1178,7 +1178,7 @@ class BBCode
 		@curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
 
-		$a->getProfiler()->saveTimestamp($stamp1, "network", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 		// if its a link to a picture then embed this picture
 		if (substr($curl_info['content_type'], 0, 6) == 'image/') {
@@ -2067,7 +2067,7 @@ class BBCode
 		// unmask the special chars back to HTML
 		$text = str_replace(['&\_lt\_;', '&\_gt\_;', '&\_amp\_;'], ['&lt;', '&gt;', '&amp;'], $text);
 
-		$a->getProfiler()->saveTimestamp($stamp1, "parser", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
 
 		// Libertree has a problem with escaped hashtags.
 		$text = str_replace(['\#'], ['#'], $text);

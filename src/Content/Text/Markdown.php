@@ -43,7 +43,7 @@ class Markdown
 
 		$html = $MarkdownParser->transform($text);
 
-		DI::app()->getProfiler()->saveTimestamp($stamp1, "parser", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
 
 		return $html;
 	}

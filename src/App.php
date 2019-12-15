@@ -156,16 +156,6 @@ class App
 	}
 
 	/**
-	 * The profiler of this app
-	 *
-	 * @return Profiler
-	 */
-	public function getProfiler()
-	{
-		return $this->profiler;
-	}
-
-	/**
 	 * Returns the Mode of the Application
 	 *
 	 * @return App\Mode The Application Mode

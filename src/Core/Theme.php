@@ -73,10 +73,9 @@ class Theme
 			return $info;
 		}
 
-		$a = \get_app();
 		$stamp1 = microtime(true);
 		$theme_file = file_get_contents("view/theme/$theme/theme.php");
-		$a->getProfiler()->saveTimestamp($stamp1, "file", System::callstack());
+		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 		$result = preg_match("|/\*.*\*/|msU", $theme_file, $matches);
 
