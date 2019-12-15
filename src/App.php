@@ -156,16 +156,6 @@ class App
 	}
 
 	/**
-	 * Returns the Mode of the Application
-	 *
-	 * @return App\Mode The Application Mode
-	 */
-	public function getMode()
-	{
-		return $this->mode;
-	}
-
-	/**
 	 * Returns the Database of the Application
 	 *
 	 * @return Database

@@ -1086,7 +1086,7 @@ class Worker
 		$args = ['no_cron' => !$do_cron];
 
 		$a = get_app();
-		$process = new Core\Process(DI::logger(), $a->getMode(), DI::config(), $a->getBasePath());
+		$process = new Core\Process(DI::logger(), DI::mode(), DI::config(), $a->getBasePath());
 		$process->run($command, $args);
 
 		// after spawning we have to remove the flag.
@@ -1129,7 +1129,7 @@ class Worker
 
 		$priority = PRIORITY_MEDIUM;
 		// Don't fork from frontend tasks by default
-		$dont_fork = Config::get("system", "worker_dont_fork", false) || !\get_app()->getMode()->isBackend();
+		$dont_fork = Config::get("system", "worker_dont_fork", false) || !DI::mode()->isBackend();
 		$created = DateTimeFormat::utcNow();
 		$force_priority = false;
 

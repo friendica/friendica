@@ -12,6 +12,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Psr\Log\LoggerInterface;
 
 // Get options
@@ -36,10 +37,10 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['daemon']]);
 
-\Friendica\DI::init($dice);
-$a = \Friendica\DI::app();
+DI::init($dice);
+$a = DI::app();
 
-if ($a->getMode()->isInstall()) {
+if (DI::mode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");
 }
 

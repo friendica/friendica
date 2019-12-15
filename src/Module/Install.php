@@ -51,7 +51,7 @@ class Install extends BaseModule
 	{
 		$a = DI::app();
 
-		if (!$a->getMode()->isInstall()) {
+		if (!DI::mode()->isInstall()) {
 			throw new HTTPException\ForbiddenException();
 		}
 

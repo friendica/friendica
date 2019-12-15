@@ -10,6 +10,7 @@ use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
+use Friendica\DI;
 use Psr\Log\LoggerInterface;
 
 // Get options
@@ -34,14 +35,14 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['worker']]);
 
-\Friendica\DI::init($dice);
-$a = Friendica\DI::app();
+DI::init($dice);
+$a = DI::app();
 
 // Check the database structure and possibly fixes it
-Update::check($a->getBasePath(), true, $a->getMode());
+Update::check($a->getBasePath(), true, DI::mode());
 
 // Quit when in maintenance
-if (!$a->getMode()->has(App\Mode::MAINTENANCEDISABLED)) {
+if (!DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 	return;
 }
 
