@@ -286,20 +286,6 @@ class App
 	}
 
 	/**
-	 * @brief      Initializes the baseurl components
-	 *
-	 * Clears the baseurl cache to prevent inconsistencies
-	 *
-	 * @param string $url
-	 *
-	 * @deprecated 2019.06 - use BaseURL->saveByURL($url) instead
-	 */
-	public function setBaseURL($url)
-	{
-		$this->baseURL->saveByURL($url);
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String

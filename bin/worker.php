@@ -46,7 +46,7 @@ if (!DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 	return;
 }
 
-$a->setBaseURL(Config::get('system', 'url'));
+DI::baseUrl()->saveByURL(Config::get('system', 'url'));
 
 $spawn = array_key_exists('s', $options) || array_key_exists('spawn', $options);
 

@@ -95,7 +95,7 @@ class Site extends BaseAdminModule
 
 			// update config
 			Config::set('system', 'url', $new_url);
-			$a->setBaseURL($new_url);
+			DI::baseUrl()->saveByURL($new_url);
 
 			// send relocate
 			$usersStmt = DBA::select('user', ['uid'], ['account_removed' => false, 'account_expired' => false]);
