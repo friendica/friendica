@@ -36,7 +36,7 @@ class Help extends BaseModule
 					$path .= '/';
 				}
 
-				$path .= $a->getArgumentValue($x);
+				$path .= DI::args()->get($x);
 			}
 			$title = basename($path);
 			$filename = $path;

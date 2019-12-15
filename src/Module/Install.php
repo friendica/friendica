@@ -57,8 +57,7 @@ class Install extends BaseModule
 
 		// route: install/testrwrite
 		// $baseurl/install/testrwrite to test if rewrite in .htaccess is working
-		// @TODO: Replace with parameter from router
-		if ($a->getArgumentValue(1, '') == 'testrewrite') {
+		if (DI::args()->get(1, '') == 'testrewrite') {
 			// Status Code 204 means that it worked without content
 			throw new HTTPException\NoContentException();
 		}

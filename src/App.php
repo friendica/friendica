@@ -544,16 +544,6 @@ class App
 	}
 
 	/**
-	 * @deprecated use Arguments->get() instead
-	 *
-	 * @see        App\Arguments
-	 */
-	public function getArgumentValue($position, $default = '')
-	{
-		return $this->args->get($position, $default);
-	}
-
-	/**
 	 * Sets the base url for use in cmdline programs which don't have
 	 * $_SERVER variables
 	 */
