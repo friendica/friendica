@@ -13,8 +13,7 @@ use Friendica\Database\Database;
 use Friendica\Model\Notify;
 use Friendica\Protocol\Activity;
 use Friendica\Util\ACLFormatter;
-use Friendica\Content\Item as ContentItem;
-use Friendica\Content\Text\BBCode\Video as BBCodeVideo;
+use Friendica\Content;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\FileSystem;
 use Friendica\Util\Logger\WorkerLogger;
@@ -29,8 +28,8 @@ use Psr\Log\LoggerInterface;
  * @method static ACLFormatter aclFormatter()
  * @method static Notify notify()
  * @method static Activity activity()
- * @method static ContentItem contentItem()
- * @method static BBCodeVideo bbCodeVideo()
+ * @method static Content\Item contentItem()
+ * @method static Content\Text\BBCode\Video bbCodeVideo()
  * @method static DateTimeFormat dtFormat()
  * @method static ICache cache()
  * @method static Configuration config()
@@ -54,6 +53,34 @@ use Psr\Log\LoggerInterface;
  */
 class DI
 {
+	const CLASS_MAPPING = [
+		'app'          => App::class,
+		'aclFormatter' => ACLFormatter::class,
+		'auth'         => App\Authentication::class,
+		'args'         => App\Arguments::class,
+		'baseUrl'      => App\BaseURL::class,
+		'mode'         => App\Mode::class,
+		'module'       => App\Module::class,
+		'page'         => App\Page::class,
+		'router'       => App\Router::class,
+		'notify'       => Notify::class,
+		'activity'     => Activity::class,
+		'contentItem'  => Content\Item::class,
+		'bbCodeVideo'  => Content\Text\BBCode\Video::class,
+		'dtFormat'     => DateTimeFormat::class,
+		'cache'        => ICache::class,
+		'config'       => Configuration::class,
+		'pConfig'      => PConfiguration::class,
+		'l10n'         => L10n::class,
+		'lock'         => ILock::class,
+		'logger'       => LoggerInterface::class,
+		'workerLogger' => WorkerLogger::class,
+		'devLogger'    => '$devLogger',
+		'session'      => ISession::class,
+		'dba'          => Database::class,
+		'fs'           => FileSystem::class,
+	];
+
 	/** @var Dice */
 	private static $dice;
 
@@ -64,59 +91,6 @@ class DI
 
 	public static function __callStatic($name, $arguments)
 	{
-		switch ($name) {
-			case 'app':
-				return self::$dice->create(App::class, $arguments);
-			case 'aclFormatter':
-				return self::$dice->create(ACLFormatter::class, $arguments);
-			case 'auth':
-				return self::$dice->create(App\Authentication::class, $arguments);
-			case 'args':
-				return self::$dice->create(App\Arguments::class, $arguments);
-			case 'baseUrl':
-				return self::$dice->create(App\BaseURL::class, $arguments);
-			case 'mode':
-				return self::$dice->create(App\Mode::class, $arguments);
-			case 'module':
-				return self::$dice->create(App\Module::class, $arguments);
-			case 'page':
-				return self::$dice->create(App\Page::class, $arguments);
-			case 'router':
-				return self::$dice->create(App\Router::class, $arguments);
-			case 'notify':
-				return self::$dice->create(Notify::class, $arguments);
-			case 'activity':
-				return self::$dice->create(Activity::class, $arguments);
-			case 'contentItem':
-				return self::$dice->create(ContentItem::class, $arguments);
-			case 'bbCodeVideo':
-				return self::$dice->create(BBCodeVideo::class, $arguments);
-			case 'dtFormat':
-				return self::$dice->create(DateTimeFormat::class, $arguments);
-			case 'cache':
-				return self::$dice->create(ICache::class, $arguments);
-			case 'config':
-				return self::$dice->create(Configuration::class, $arguments);
-			case 'pConfig':
-				return self::$dice->create(PConfiguration::class, $arguments);
-			case 'lock':
-				return self::$dice->create(ILock::class, $arguments);
-			case 'l10n':
-				return self::$dice->create(L10n::class, $arguments);
-			case 'logger':
-				return self::$dice->create(LoggerInterface::class, $arguments);
-			case 'devLogger':
-				return self::$dice->create('$devLogger', $arguments);
-			case 'workerLogger':
-				return self::$dice->create(WorkerLogger::class, $arguments);
-			case 'session':
-				return self::$dice->create(ISession::class, $arguments);
-			case 'dba':
-				return self::$dice->create(Database::class, $arguments);
-			case 'fs':
-				return self::$dice->create(FileSystem::class, $arguments);
-			default:
-				return null;
-		}
+		return self::$dice->create(self::CLASS_MAPPING[$name], $arguments);
 	}
 }
