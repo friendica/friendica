@@ -40,9 +40,7 @@ class Verify extends BaseModule
 				Session::set('2fa', $code);
 
 				// Resume normal login workflow
-				/** @var Authentication $authentication */
-				$authentication = self::getClass(Authentication::class);
-				$authentication->setForUser($a, $a->user, true, true);
+				DI::auth()->setForUser($a, $a->user, true, true);
 			} else {
 				self::$errors[] = L10n::t('Invalid code, please retry.');
 			}

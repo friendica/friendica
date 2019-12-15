@@ -6,10 +6,9 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 
-class ItemURI extends BaseObject
+class ItemURI
 {
 	/**
 	 * @brief Insert an item-uri record and return its id

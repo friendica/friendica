@@ -3,13 +3,12 @@
  * @file mod/lockview.php
  */
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
-use Friendica\Util\ACLFormatter;
 
 function lockview_content(App $a)
 {
@@ -61,8 +60,7 @@ function lockview_content(App $a)
 		exit();
 	}
 
-	/** @var ACLFormatter $aclFormatter */
-	$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+	$aclFormatter = DI::aclFormatter();
 
 	$allowed_users = $aclFormatter->expand($item['allow_cid']);
 	$allowed_groups = $aclFormatter->expand($item['allow_gid']);

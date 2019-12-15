@@ -4,9 +4,9 @@ namespace Friendica\Test\src\Core\Lock;
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Lock\SemaphoreLock;
+use Friendica\DI;
 
 class SemaphoreLockTest extends LockTest
 {
@@ -26,7 +26,7 @@ class SemaphoreLockTest extends LockTest
 		$dice->shouldReceive('create')->with(Configuration::class)->andReturn($configMock);
 
 		// @todo Because "get_temppath()" is using static methods, we have to initialize the BaseObject
-		BaseObject::setDependencyInjection($dice);
+		DI::init($dice);
 
 		parent::setUp();
 	}

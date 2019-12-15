@@ -34,7 +34,6 @@
 
 use Dice\Dice;
 use Friendica\App\Mode;
-use Friendica\BaseObject;
 use Friendica\Util\ExAuth;
 use Psr\Log\LoggerInterface;
 
@@ -57,7 +56,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['auth_ejabberd']]);
 
-BaseObject::setDependencyInjection($dice);
+\Friendica\DI::init($dice);
 
 $appMode = $dice->create(Mode::class);
 

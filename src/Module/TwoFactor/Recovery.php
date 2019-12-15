@@ -42,10 +42,7 @@ class Recovery extends BaseModule
 				Session::set('2fa', true);
 				notice(L10n::t('Remaining recovery codes: %d', RecoveryCode::countValidForUser(local_user())));
 
-				// Resume normal login workflow
-				/** @var Authentication $authentication */
-				$authentication = self::getClass(Authentication::class);
-				$authentication->setForUser($a, $a->user, true, true);
+				DI::auth()->setForUser($a, $a->user, true, true);
 			} else {
 				notice(L10n::t('Invalid code, please retry.'));
 			}

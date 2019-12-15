@@ -7,7 +7,6 @@
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
@@ -35,7 +34,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['worker']]);
 
-BaseObject::setDependencyInjection($dice);
+\Friendica\DI::init($dice);
 $a = Friendica\DI::app();
 
 // Check the database structure and possibly fixes it

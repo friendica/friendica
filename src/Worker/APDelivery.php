@@ -4,14 +4,13 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Model\ItemDeliveryData;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\HTTPSignature;
 
-class APDelivery extends BaseObject
+class APDelivery
 {
 	/**
 	 * @brief Delivers ActivityPub messages

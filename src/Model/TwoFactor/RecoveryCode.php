@@ -2,7 +2,6 @@
 
 namespace Friendica\Model\TwoFactor;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 use PragmaRX\Random\Random;
@@ -13,7 +12,7 @@ use PragmaRX\Recovery\Recovery;
  *
  * @package Friendica\Model
  */
-class RecoveryCode extends BaseObject
+class RecoveryCode
 {
     /**
      * Returns the number of code the provided users can still use to replace a TOTP code

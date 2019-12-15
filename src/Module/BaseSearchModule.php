@@ -65,8 +65,7 @@ class BaseSearchModule extends BaseModule
 			$header = L10n::t('Forum Search - %s', $search);
 		}
 
-		/** @var Arguments $args */
-		$args = self::getClass(Arguments::class);
+		$args = DI::args();
 		$pager = new Pager($args->getQueryString());
 
 		if ($localSearch && empty($results)) {

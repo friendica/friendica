@@ -6,7 +6,6 @@
 namespace Friendica\Core;
 
 use Exception;
-use Friendica\BaseObject;
 use Friendica\DI;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Render\ITemplateEngine;
@@ -14,7 +13,7 @@ use Friendica\Render\ITemplateEngine;
 /**
  * @brief This class handles Renderer related functions.
  */
-class Renderer extends BaseObject
+class Renderer
 {
 	/**
 	 * @brief An array of registered template engines ('name'=>'class name')

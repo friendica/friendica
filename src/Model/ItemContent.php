@@ -6,12 +6,11 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Content\Text;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 
-class ItemContent extends BaseObject
+class ItemContent
 {
 	/**
 	 * @brief Convert a message into plaintext for connectors to other networks

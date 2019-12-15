@@ -62,7 +62,7 @@ class UserExport extends BaseSettingsModule
 	 **/
 	public static function rawContent(array $parameters = [])
 	{
-		$args = self::getClass(Arguments::class);
+		$args = DI::args();
 		if ($args->getArgc() == 3) {
 			// @TODO Replace with router-provided arguments
 			$action = $args->get(2);

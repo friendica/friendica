@@ -4,7 +4,6 @@
  */
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\Core;
 use Friendica\Database\DBA;
 use Friendica\DI;

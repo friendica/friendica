@@ -6,7 +6,6 @@
 namespace Friendica\Model;
 
 use Friendica\BaseModule;
-use Friendica\BaseObject;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
@@ -16,7 +15,7 @@ use Friendica\Database\DBA;
 /**
  * @brief functions for interacting with the group database table
  */
-class Group extends BaseObject
+class Group
 {
 	const FOLLOWERS = '~';
 	const MUTUALS = '&';

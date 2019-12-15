@@ -4,14 +4,13 @@
  */
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 /**
  * @brief functions for interacting with a process
  */
-class Process extends BaseObject
+class Process
 {
 	/**
 	 * Insert a new process row. If the pid parameter is omitted, we use the current pid

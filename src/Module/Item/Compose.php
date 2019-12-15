@@ -63,8 +63,7 @@ class Compose extends BaseModule
 
 		$user = User::getById(local_user(), ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'hidewall', 'default-location']);
 
-		/** @var ACLFormatter $aclFormatter */
-		$aclFormatter = self::getClass(ACLFormatter::class);
+		$aclFormatter = DI::aclFormatter();
 
 		$contact_allow_list = $aclFormatter->expand($user['allow_cid']);
 		$group_allow_list   = $aclFormatter->expand($user['allow_gid']);

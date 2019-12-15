@@ -6,7 +6,6 @@
  */
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Core\StorageManager;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -21,7 +20,7 @@ use Friendica\Util\Security;
 /**
  * Class to handle attach dabatase table
  */
-class Attach extends BaseObject
+class Attach
 {
 
 	/**

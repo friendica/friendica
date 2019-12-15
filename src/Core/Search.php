@@ -2,7 +2,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -21,7 +20,7 @@ use Friendica\Util\Strings;
  * - Search in the local directory
  * - Search in the global directory
  */
-class Search extends BaseObject
+class Search
 {
 	const DEFAULT_DIRECTORY = 'https://dir.friendica.social';
 

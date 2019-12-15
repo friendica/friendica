@@ -5,7 +5,6 @@
 
 namespace Friendica\Util;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -15,7 +14,7 @@ use Friendica\Core\Session;
 /**
  * Secures that User is allow to do requests
  */
-class Security extends BaseObject
+class Security
 {
 	public static function canWriteToUserWall($owner)
 	{

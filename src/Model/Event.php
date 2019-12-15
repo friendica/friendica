@@ -5,7 +5,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -23,7 +22,7 @@ use Friendica\Util\XML;
 /**
  * @brief functions for interacting with the event database table
  */
-class Event extends BaseObject
+class Event
 {
 
 	public static function getHTML(array $event, $simple = false)

@@ -5,7 +5,6 @@
 namespace Friendica\Worker;
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;

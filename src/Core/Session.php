@@ -5,9 +5,8 @@
  */
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
-use Friendica\Core\Session\ISession;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Util\Strings;
 
@@ -16,39 +15,39 @@ use Friendica\Util\Strings;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class Session extends BaseObject
+class Session
 {
 	public static $exists = false;
 	public static $expire = 180000;
 
 	public static function exists($name)
 	{
-		return self::getClass(ISession::class)->exists($name);
+		return DI::session()->exists($name);
 	}
 
 	public static function get($name, $defaults = null)
 	{
-		return self::getClass(ISession::class)->get($name, $defaults);
+		return DI::session()->get($name, $defaults);
 	}
 
 	public static function set($name, $value)
 	{
-		self::getClass(ISession::class)->set($name, $value);
+		DI::session()->set($name, $value);
 	}
 
 	public static function setMultiple(array $values)
 	{
-		self::getClass(ISession::class)->setMultiple($values);
+		DI::session()->setMultiple($values);
 	}
 
 	public static function remove($name)
 	{
-		self::getClass(ISession::class)->remove($name);
+		DI::session()->remove($name);
 	}
 
 	public static function clear()
 	{
-		self::getClass(ISession::class)->clear();
+		DI::session()->clear();
 	}
 
 	/**
@@ -59,8 +58,7 @@ class Session extends BaseObject
 	 */
 	public static function getRemoteContactID($uid)
 	{
-		/** @var ISession $session */
-		$session = self::getClass(ISession::class);
+		$session = DI::session();
 
 		if (empty($session->get('remote')[$uid])) {
 			return false;
@@ -77,8 +75,7 @@ class Session extends BaseObject
 	 */
 	public static function getUserIDForVisitorContactID($cid)
 	{
-		/** @var ISession $session */
-		$session = self::getClass(ISession::class);
+		$session = DI::session();
 
 		if (empty($session->get('remote'))) {
 			return false;
@@ -94,8 +91,7 @@ class Session extends BaseObject
 	 */
 	public static function setVisitorsContacts()
 	{
-		/** @var ISession $session */
-		$session = self::getClass(ISession::class);
+		$session = DI::session();
 
 		$session->set('remote', []);
 
@@ -117,8 +113,7 @@ class Session extends BaseObject
 	 */
 	public static function isAuthenticated()
 	{
-		/** @var ISession $session */
-		$session = self::getClass(ISession::class);
+		$session = DI::session();
 
 		return $session->get('authenticated', false);
 	}

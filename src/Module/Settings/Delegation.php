@@ -55,8 +55,7 @@ class Delegation extends BaseSettingsModule
 			throw new HTTPException\ForbiddenException(L10n::t('Permission denied.'));
 		}
 
-		/** @var Arguments $args */
-		$args = self::getClass(Arguments::class);
+		$args = DI::args();
 
 		// @TODO Replace with router-provided arguments
 		$action = $args->get(2);

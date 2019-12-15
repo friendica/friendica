@@ -4,14 +4,13 @@
  */
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\Core\Cache\Cache as CacheClass;
-use Friendica\Core\Cache\ICache;
+use Friendica\DI;
 
 /**
  * @brief Class for storing data for a short time
  */
-class Cache extends BaseObject
+class Cache
 {
 	/** @deprecated Use CacheClass::MONTH */
 	const MONTH        = CacheClass::MONTH;
@@ -42,7 +41,7 @@ class Cache extends BaseObject
 	 */
 	public static function getAllKeys($prefix = null)
 	{
-		return self::getClass(ICache::class)->getAllKeys($prefix);
+		return DI::cache()->getAllKeys($prefix);
 	}
 
 	/**
@@ -55,7 +54,7 @@ class Cache extends BaseObject
 	 */
 	public static function get($key)
 	{
-		return self::getClass(ICache::class)->get($key);
+		return DI::cache()->get($key);
 	}
 
 	/**
@@ -72,7 +71,7 @@ class Cache extends BaseObject
 	 */
 	public static function set($key, $value, $duration = CacheClass::MONTH)
 	{
-		return self::getClass(ICache::class)->set($key, $value, $duration);
+		return DI::cache()->set($key, $value, $duration);
 	}
 
 	/**
@@ -85,7 +84,7 @@ class Cache extends BaseObject
 	 */
 	public static function delete($key)
 	{
-		return self::getClass(ICache::class)->delete($key);
+		return DI::cache()->delete($key);
 	}
 
 	/**
@@ -98,6 +97,6 @@ class Cache extends BaseObject
 	 */
 	public static function clear($outdated = true)
 	{
-		return self::getClass(ICache::class)->clear($outdated);
+		return DI::cache()->clear($outdated);
 	}
 }

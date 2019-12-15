@@ -4,7 +4,6 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
@@ -21,7 +20,7 @@ use Friendica\Util\Strings;
 use Friendica\Util\Network;
 use Friendica\Core\Worker;
 
-class Delivery extends BaseObject
+class Delivery
 {
 	const MAIL          = 'mail';
 	const SUGGESTION    = 'suggest';

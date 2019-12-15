@@ -3,9 +3,9 @@
 namespace Friendica\Test\src\Database;
 
 use Dice\Dice;
-use Friendica\BaseObject;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
 
@@ -18,7 +18,7 @@ class DBStructureTest extends DatabaseTest
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true]);
-		BaseObject::setDependencyInjection($dice);
+		DI::init($dice);
 	}
 
 	/**

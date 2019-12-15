@@ -4,13 +4,12 @@
  */
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 
 /**
  * @brief functions for interacting with the permission set of an object (item, photo, event, ...)
  */
-class PermissionSet extends BaseObject
+class PermissionSet
 {
 	/**
 	 * Fetch the id of a given permission set. Generate a new one when needed

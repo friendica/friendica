@@ -5,7 +5,6 @@
 namespace Friendica\Core;
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Util\Strings;
@@ -13,7 +12,7 @@ use Friendica\Util\Strings;
 /**
  * Some functions to handle hooks
  */
-class Hook extends BaseObject
+class Hook
 {
 	/**
 	 * Array of registered hooks

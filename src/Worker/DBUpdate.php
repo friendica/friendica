@@ -5,12 +5,11 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Update;
 use Friendica\DI;
 
-class DBUpdate extends BaseObject
+class DBUpdate
 {
 	public static function execute()
 	{

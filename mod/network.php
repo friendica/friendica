@@ -5,7 +5,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Content\ForumManager;
 use Friendica\Content\Nav;
@@ -22,6 +21,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
@@ -52,12 +52,9 @@ function network_init(App $a)
 		$group_id = 0;
 	}
 
-	/** @var DateTimeFormat $dtFormat */
-	$dtFormat = BaseObject::getClass(DateTimeFormat::class);
-
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if ($dtFormat->isYearMonth($a->argv[$x])) {
+			if (DI::dtFormat()->isYearMonth($a->argv[$x])) {
 				$is_a_date_query = true;
 				break;
 			}
@@ -465,12 +462,9 @@ function networkThreadedView(App $a, $update, $parent)
 
 	$default_permissions = [];
 
-	/** @var DateTimeFormat $dtFormat */
-	$dtFormat = BaseObject::getClass(DateTimeFormat::class);
-
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if ($dtFormat->isYearMonth($a->argv[$x])) {
+			if (DI::dtFormat()->isYearMonth($a->argv[$x])) {
 				if ($datequery) {
 					$datequery2 = Strings::escapeHtml($a->argv[$x]);
 				} else {

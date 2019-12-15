@@ -3,13 +3,10 @@
  * @file include/items.php
  */
 
-use Friendica\BaseObject;
-use Friendica\Content\Feature;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
-use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -19,11 +16,9 @@ use Friendica\Model\Item;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Feed;
 use Friendica\Protocol\OStatus;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 
 require_once __DIR__ . '/../mod/share.php';
 

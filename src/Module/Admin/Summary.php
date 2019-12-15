@@ -81,8 +81,7 @@ class Summary extends BaseAdminModule
 		if (Config::get('system', 'debugging')) {
 			$file = Config::get('system', 'logfile');
 
-			/** @var FileSystem $fileSystem */
-			$fileSystem = self::getClass(FileSystem::class);
+			$fileSystem = DI::fs();
 
 			try {
 				$stream = $fileSystem->createStream($file);

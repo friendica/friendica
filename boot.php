@@ -18,7 +18,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;

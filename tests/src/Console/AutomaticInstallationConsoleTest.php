@@ -4,13 +4,13 @@ namespace Friendica\Test\src\Console;
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Console\AutomaticInstallation;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Logger;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Test\Util\DBAMockTrait;
 use Friendica\Test\Util\DBStructureMockTrait;
 use Friendica\Test\Util\RendererMockTrait;
@@ -77,7 +77,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 		           ->with(L10n::class)
 		           ->andReturn($l10nMock);
 
-		BaseObject::setDependencyInjection($this->dice);
+		DI::init($this->dice);
 
 		$this->configCache = new ConfigCache();
 		$this->configCache->set('system', 'basepath', $this->root->url());

@@ -19,17 +19,14 @@ class Ignore extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		/** @var L10n $l10n */
-		$l10n = self::getClass(L10n::class);
+		$l10n = DI::l10n();
 
 		if (!Session::isAuthenticated()) {
 			throw new HttpException\ForbiddenException($l10n->t('Access denied.'));
 		}
 
-		/** @var App\Arguments $args */
-		$args = self::getClass(App\Arguments::class);
-		/** @var Database $dba */
-		$dba = self::getClass(Database::class);
+		$args = DI::args();
+		$dba = DI::dba();
 
 		$message_id = intval($args->get(2));
 

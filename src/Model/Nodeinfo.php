@@ -2,7 +2,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -10,7 +9,7 @@ use Friendica\DI;
 /**
  * Model interaction for the nodeinfo
  */
-class Nodeinfo extends BaseObject
+class Nodeinfo
 {
 	/**
 	 * Updates the info about the current node

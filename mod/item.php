@@ -16,7 +16,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -29,6 +28,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -39,7 +39,6 @@ use Friendica\Model\Term;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
-use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
 use Friendica\Util\Security;
@@ -273,8 +272,7 @@ function item_post(App $a) {
 		} else {
 			// use the posted permissions
 
-			/** @var ACLFormatter $aclFormatter */
-			$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+			$aclFormatter = DI::aclFormatter();
 
 			$str_group_allow   = $aclFormatter->toString($_REQUEST['group_allow'] ?? '');
 			$str_contact_allow = $aclFormatter->toString($_REQUEST['contact_allow'] ?? '');
@@ -506,9 +504,7 @@ function item_post(App $a) {
 		$objecttype =  Activity\ObjectType::BOOKMARK;
 	}
 
-	/** @var BBCode\Video $bbCodeVideo */
-	$bbCodeVideo = BaseObject::getClass(BBCode\Video::class);
-	$body =  $bbCodeVideo->transform($body);
+	$body = DI::bbCodeVideo()->transform($body);
 
 	// Fold multi-line [code] sequences
 	$body = preg_replace('/\[\/code\]\s*\[code\]/ism', "\n", $body);

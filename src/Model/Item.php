@@ -6,7 +6,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config;
@@ -26,7 +25,6 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
-use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
@@ -36,7 +34,7 @@ use Friendica\Util\XML;
 use Friendica\Worker\Delivery;
 use Text_LanguageDetect;
 
-class Item extends BaseObject
+class Item
 {
 	// Posting types, inspired by https://www.w3.org/TR/activitystreams-vocabulary/#object-types
 	const PT_ARTICLE = 0;
@@ -1442,8 +1440,7 @@ class Item extends BaseObject
 			$item['parent-uri'] = $item['thr-parent'];
 		}
 
-		/** @var Activity $activity */
-		$activity = self::getClass(Activity::class);
+		$activity = DI::activity();
 
 		if (isset($item['gravity'])) {
 			$item['gravity'] = intval($item['gravity']);
@@ -2980,8 +2977,7 @@ class Item extends BaseObject
 	 */
 	public static function enumeratePermissions(array $obj, bool $check_dead = false)
 	{
-		/** @var ACLFormatter $aclFormater */
-		$aclFormater = self::getClass(ACLFormatter::class);
+		$aclFormater = DI::aclFormatter();
 
 		$allow_people = $aclFormater->expand($obj['allow_cid']);
 		$allow_groups = Group::expand($obj['uid'], $aclFormater->expand($obj['allow_gid']), $check_dead);

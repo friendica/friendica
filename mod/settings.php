@@ -5,7 +5,6 @@
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Core\ACL;
@@ -20,14 +19,13 @@ use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
 use Friendica\Module\Login;
 use Friendica\Protocol\Email;
-use Friendica\Util\ACLFormatter;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use Friendica\Worker\Delivery;
@@ -564,8 +562,7 @@ function settings_post(App $a)
 		date_default_timezone_set($timezone);
 	}
 
-	/** @var ACLFormatter $aclFormatter */
-	$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+	$aclFormatter = DI::aclFormatter();
 
 	$str_group_allow   = !empty($_POST['group_allow'])   ? $aclFormatter->toString($_POST['group_allow'])   : '';
 	$str_contact_allow = !empty($_POST['contact_allow']) ? $aclFormatter->toString($_POST['contact_allow']) : '';

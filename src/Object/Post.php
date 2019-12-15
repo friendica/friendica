@@ -4,10 +4,8 @@
  */
 namespace Friendica\Object;
 
-use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
-use Friendica\Content\Item as ContentItem;
 use Friendica\Core\Addon;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -33,7 +31,7 @@ use Friendica\Util\Temporal;
 /**
  * An item
  */
-class Post extends BaseObject
+class Post
 {
 	private $data = [];
 	private $template = null;
@@ -344,10 +342,7 @@ class Post extends BaseObject
 
 		$body = Item::prepareBody($item, true);
 
-		/** @var ContentItem $contItem */
-		$contItem = self::getClass(ContentItem::class);
-
-		list($categories, $folders) = $contItem->determineCategoriesTerms($item);
+		list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item);
 
 		$body_e       = $body;
 		$text_e       = strip_tags($body);
@@ -551,8 +546,7 @@ class Post extends BaseObject
 			return false;
 		}
 
-		/** @var Activity $activity */
-		$activity = self::getClass(Activity::class);
+		$activity = DI::activity();
 
 		/*
 		 * Only add what will be displayed

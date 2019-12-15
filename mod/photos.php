@@ -4,7 +4,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
@@ -18,6 +17,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
@@ -26,7 +26,6 @@ use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
-use Friendica\Util\ACLFormatter;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
@@ -298,8 +297,7 @@ function photos_post(App $a)
 		$albname     = !empty($_POST['albname'])   ? Strings::escapeTags(trim($_POST['albname']))   : '';
 		$origaname   = !empty($_POST['origaname']) ? Strings::escapeTags(trim($_POST['origaname'])) : '';
 
-		/** @var ACLFormatter $aclFormatter */
-		$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+		$aclFormatter = DI::aclFormatter();
 
 		$str_group_allow   = !empty($_POST['group_allow'])   ? $aclFormatter->toString($_POST['group_allow'])   : '';
 		$str_contact_allow = !empty($_POST['contact_allow']) ? $aclFormatter->toString($_POST['contact_allow']) : '';
@@ -640,8 +638,7 @@ function photos_post(App $a)
 	$group_deny    = $_REQUEST['group_deny']    ?? [];
 	$contact_deny  = $_REQUEST['contact_deny']  ?? [];
 
-	/** @var ACLFormatter $aclFormatter */
-	$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+	$aclFormatter = DI::aclFormatter();
 
 	$str_group_allow   = $aclFormatter->toString(is_array($group_allow)   ? $group_allow   : explode(',', $group_allow));
 	$str_contact_allow = $aclFormatter->toString(is_array($contact_allow) ? $contact_allow : explode(',', $contact_allow));
@@ -1446,8 +1443,7 @@ function photos_content(App $a)
 					$template = $tpl;
 					$sparkle = '';
 
-					/** @var Activity $activity */
-					$activity = BaseObject::getClass(Activity::class);
+					$activity = DI::activity();
 
 					if (($activity->match($item['verb'], Activity::LIKE) ||
 					     $activity->match($item['verb'], Activity::DISLIKE)) &&

@@ -3,7 +3,7 @@
 namespace Friendica\App;
 
 use Friendica\App;
-use Friendica\BaseObject;
+use Friendica\BaseModule;
 use Friendica\Core;
 use Friendica\LegacyModule;
 use Friendica\Module\Home;
@@ -59,7 +59,7 @@ class Module
 	private $module;
 
 	/**
-	 * @var BaseObject The module class
+	 * @var BaseModule The module class
 	 */
 	private $module_class;
 

@@ -4,7 +4,6 @@
  */
 namespace Friendica\Object;
 
-use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\DI;
@@ -16,7 +15,7 @@ use Friendica\Util\Security;
  *
  * We should think about making this a SPL Iterator
  */
-class Thread extends BaseObject
+class Thread
 {
 	private $parents = [];
 	private $mode = null;

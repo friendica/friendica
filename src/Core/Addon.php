@@ -5,7 +5,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Util\Strings;
@@ -13,7 +12,7 @@ use Friendica\Util\Strings;
 /**
  * Some functions to handle addons
  */
-class Addon extends BaseObject
+class Addon
 {
 	/**
 	 * The addon sub-directory

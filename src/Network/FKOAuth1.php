@@ -4,10 +4,7 @@
  */
 namespace Friendica\Network;
 
-use Friendica\BaseObject;
-use Friendica\App\Authentication;
 use Friendica\Core\Logger;
-use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use OAuthServer;
@@ -47,8 +44,6 @@ class FKOAuth1 extends OAuthServer
 			die('This api requires login');
 		}
 
-		/** @var Authentication $authentication */
-		$authentication = BaseObject::getClass(Authentication::class);
-		$authentication->setForUser($a, $record, true);
+		DI::auth()->setForUser($a, $record, true);
 	}
 }

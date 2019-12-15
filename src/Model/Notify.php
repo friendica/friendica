@@ -4,7 +4,6 @@ namespace Friendica\Model;
 
 use Exception;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\PConfiguration;
@@ -26,7 +25,7 @@ use Friendica\Network\HTTPException;
  * @brief Methods for read and write notifications from/to database
  *  or for formatting notifications
  */
-final class Notify extends BaseObject
+final class Notify
 {
 	/** @var int The default limit of notifies per page */
 	const DEFAULT_PAGE_LIMIT = 80;

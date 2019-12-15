@@ -14,7 +14,7 @@ use Friendica\Core\Logger;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-abstract class BaseModule extends BaseObject
+abstract class BaseModule
 {
 	/**
 	 * @brief Initialization method common to both content() and post()

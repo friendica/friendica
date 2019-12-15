@@ -6,7 +6,6 @@
  */
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
@@ -29,7 +28,7 @@ require_once "include/dba.php";
 /**
  * Class to handle photo dabatase table
  */
-class Photo extends BaseObject
+class Photo
 {
 	/**
 	 * @brief Select rows from the photo table and returns them as array

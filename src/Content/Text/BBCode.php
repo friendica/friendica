@@ -8,7 +8,6 @@ namespace Friendica\Content\Text;
 use DOMDocument;
 use DOMXPath;
 use Exception;
-use Friendica\BaseObject;
 use Friendica\Content\OEmbed;
 use Friendica\Content\Smilies;
 use Friendica\Core\Cache;
@@ -34,7 +33,7 @@ use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 
-class BBCode extends BaseObject
+class BBCode
 {
 	/**
 	 * @brief Fetches attachment data that were generated the old way

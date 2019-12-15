@@ -4,7 +4,6 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
@@ -279,8 +278,7 @@ class Notifier
 					$public_message = false; // private recipients, not public
 				}
 
-				/** @var ACLFormatter $aclFormatter */
-				$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+				$aclFormatter = DI::aclFormatter();
 
 				$allow_people = $aclFormatter->expand($parent['allow_cid']);
 				$allow_groups = Group::expand($uid, $aclFormatter->expand($parent['allow_gid']),true);

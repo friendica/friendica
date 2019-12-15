@@ -3,10 +3,10 @@
 namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\Api\Mastodon;
-use Friendica\App\BaseURL;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\APContact;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Introduction;
 use Friendica\Module\Base\Api;
@@ -104,8 +104,7 @@ class FollowRequests extends Api
 			$base_query['limit'] = $limit;
 		}
 
-		/** @var BaseURL $BaseURL */
-		$BaseURL = self::getClass(BaseURL::class);
+		$BaseURL = DI::baseUrl();
 
 		$links = [];
 		if ($count > $limit) {

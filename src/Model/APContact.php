@@ -6,7 +6,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Logger;
 use Friendica\Core\Config;
@@ -17,7 +16,7 @@ use Friendica\Util\JsonLD;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
-class APContact extends BaseObject
+class APContact
 {
 	/**
 	 * Resolves the profile url from the address by using webfinger

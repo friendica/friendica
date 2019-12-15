@@ -4,8 +4,6 @@
  */
 namespace Friendica\Core;
 
-use Friendica\App\BaseURL;
-use Friendica\BaseObject;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\XML;
@@ -20,18 +18,17 @@ use Friendica\Util\XML;
 /**
  * @brief System methods
  */
-class System extends BaseObject
+class System
 {
 	/**
 	 * @brief Retrieves the Friendica instance base URL
 	 *
 	 * @param bool $ssl Whether to append http or https under BaseURL::SSL_POLICY_SELFSIGN
 	 * @return string Friendica server base URL
-	 * @throws InternalServerErrorException
 	 */
 	public static function baseUrl($ssl = false)
 	{
-		return self::getClass(BaseURL::class)->get($ssl);
+		return DI::baseUrl()->get($ssl);
 	}
 
 	/**

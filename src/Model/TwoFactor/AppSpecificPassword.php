@@ -2,7 +2,6 @@
 
 namespace Friendica\Model\TwoFactor;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -14,7 +13,7 @@ use PragmaRX\Random\Random;
  *
  * @package Friendica\Model
  */
-class AppSpecificPassword extends BaseObject
+class AppSpecificPassword
 {
 	public static function countForUser($uid)
 	{

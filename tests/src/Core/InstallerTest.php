@@ -4,10 +4,9 @@
 namespace Friendica\Core;
 
 use Dice\Dice;
-use Friendica\BaseObject;
 use Friendica\Core\Config\Cache\ConfigCache;
+use Friendica\DI;
 use Friendica\Network\CurlResult;
-use Friendica\Object\Image;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;
 use Friendica\Util\Network;
@@ -38,7 +37,7 @@ class InstallerTest extends MockedTest
 		           ->with(\Friendica\Core\L10n\L10n::class)
 		           ->andReturn($this->l10nMock);
 
-		BaseObject::setDependencyInjection($dice);
+		DI::init($dice);
 	}
 
 	private function mockL10nT(string $text, $times = null)

@@ -5,15 +5,13 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
-use Friendica\App\Authentication;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\Module\Login;
+use Friendica\DI;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
 use Friendica\Util\Network;
@@ -22,9 +20,7 @@ use Friendica\Util\XML;
 
 function dfrn_poll_init(App $a)
 {
-	/** @var Authentication $authentication */
-	$authentication = BaseObject::getClass(Authentication::class);
-	$authentication->withSession($a);
+	DI::auth()->withSession($a);
 
 	$dfrn_id         =  $_GET['dfrn_id']         ?? '';
 	$type            = ($_GET['type']            ?? '') ?: 'data';

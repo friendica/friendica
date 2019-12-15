@@ -3,7 +3,7 @@
 namespace Friendica\Test\src\Network;
 
 use Dice\Dice;
-use Friendica\BaseObject;
+use Friendica\DI;
 use Friendica\Network\CurlResult;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +26,7 @@ class CurlResultTest extends TestCase
 		           ->with(LoggerInterface::class)
 		           ->andReturn($logger);
 
-		BaseObject::setDependencyInjection($dice);
+		DI::init($dice);
 	}
 
 	/**

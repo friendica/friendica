@@ -6,7 +6,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\DI;
 use Friendica\Model\Profile;
 use Friendica\Util\Strings;

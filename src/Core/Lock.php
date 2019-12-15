@@ -7,14 +7,13 @@
 
 namespace Friendica\Core;
 
-use Friendica\BaseObject;
 use Friendica\Core\Cache\Cache;
-use Friendica\Core\Lock\ILock;
+use Friendica\DI;
 
 /**
  * This class contain Functions for preventing parallel execution of functions
  */
-class Lock extends BaseObject
+class Lock
 {
 	/**
 	 * @brief Acquires a lock for a given name
@@ -28,7 +27,7 @@ class Lock extends BaseObject
 	 */
 	public static function acquire($key, $timeout = 120, $ttl = Cache::FIVE_MINUTES)
 	{
-		return self::getClass(ILock::class)->acquireLock($key, $timeout, $ttl);
+		return DI::lock()->acquireLock($key, $timeout, $ttl);
 	}
 
 	/**
@@ -37,12 +36,12 @@ class Lock extends BaseObject
 	 * @param string $key      Name of the lock
 	 * @param bool   $override Overrides the lock to get releases
 	 *
-	 * @return void
+	 * @return bool
 	 * @throws \Exception
 	 */
 	public static function release($key, $override = false)
 	{
-		return self::getClass(ILock::class)->releaseLock($key, $override);
+		return DI::lock()->releaseLock($key, $override);
 	}
 
 	/**
@@ -52,6 +51,6 @@ class Lock extends BaseObject
 	 */
 	public static function releaseAll()
 	{
-		self::getClass(ILock::class)->releaseAll();
+		DI::lock()->releaseAll();
 	}
 }

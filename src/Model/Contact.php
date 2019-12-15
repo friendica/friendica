@@ -5,7 +5,6 @@
 namespace Friendica\Model;
 
 use Friendica\App\BaseURL;
-use Friendica\BaseObject;
 use Friendica\Content\Pager;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
@@ -18,7 +17,6 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\Probe;
-use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\DFRN;
@@ -33,7 +31,7 @@ use Friendica\Util\Strings;
 /**
  * @brief functions for interacting with a contact
  */
-class Contact extends BaseObject
+class Contact
 {
 	/**
 	 * @deprecated since version 2019.03

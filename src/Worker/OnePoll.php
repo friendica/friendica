@@ -4,8 +4,6 @@
  */
 namespace Friendica\Worker;
 
-use Friendica\BaseObject;
-use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\PConfig;

@@ -2,13 +2,12 @@
 
 namespace Friendica\Model;
 
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 
 /**
  * Model for DB specific logic for the search entity
  */
-class Search extends BaseObject
+class Search
 {
 	/**
 	 * Returns the list of user defined tags (e.g. #Friendica)

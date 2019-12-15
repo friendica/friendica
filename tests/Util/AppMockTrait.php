@@ -4,8 +4,8 @@ namespace Friendica\Test\Util;
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config;
+use Friendica\DI;
 use Friendica\Render\FriendicaSmartyEngine;
 use Friendica\Util\Profiler;
 use Mockery\MockInterface;
@@ -109,7 +109,7 @@ trait AppMockTrait
 				return $this->configMock->get('system', 'url');
 			});
 
-		BaseObject::setDependencyInjection($this->dice);
+		DI::init($this->dice);
 
 		if ($raw) {
 			return;

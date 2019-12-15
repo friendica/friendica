@@ -6,7 +6,6 @@
 
 namespace Friendica\Content\Text;
 
-use Friendica\BaseObject;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -16,7 +15,7 @@ use Friendica\Model\Contact;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class Markdown extends BaseObject
+class Markdown
 {
 	/**
 	 * Converts a Markdown string into HTML. The hardwrap parameter maximizes

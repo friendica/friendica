@@ -23,15 +23,15 @@ class Api extends BaseModule
 
 	public static function init(array $parameters = [])
 	{
-		$Arguments = self::getClass(Arguments::class);
+		$arguments = DI::args();
 
-		if (substr($Arguments->getQueryString(), -4) === '.xml') {
+		if (substr($arguments->getQueryString(), -4) === '.xml') {
 			self::$format = 'xml';
 		}
-		if (substr($Arguments->getQueryString(), -4) === '.rss') {
+		if (substr($arguments->getQueryString(), -4) === '.rss') {
 			self::$format = 'rss';
 		}
-		if (substr($Arguments->getQueryString(), -4) === '.atom') {
+		if (substr($arguments->getQueryString(), -4) === '.atom') {
 			self::$format = 'atom';
 		}
 	}

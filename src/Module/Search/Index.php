@@ -127,9 +127,7 @@ class Index extends BaseSearchModule
 		// OR your own posts if you are a logged in member
 		// No items will be shown if the member has a blocked profile wall.
 
-		/** @var Arguments $args */
-		$args = self::getClass(Arguments::class);
-		$pager = new Pager($args->getQueryString());
+		$pager = new Pager(DI::args()->getQueryString());
 
 		if ($tag) {
 			Logger::info('Start tag search.', ['q' => $search]);

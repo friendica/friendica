@@ -146,7 +146,7 @@ HELP;
 
 		$className = $this->subConsoles[$command];
 
-		Friendica\BaseObject::setDependencyInjection($this->dice);
+		Friendica\DI::init($this->dice);
 
 		/** @var Console $subconsole */
 		$subconsole = $this->dice->create($className, [$subargs]);

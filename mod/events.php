@@ -5,7 +5,6 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget\CalendarExport;
 use Friendica\Core\ACL;
@@ -20,7 +19,6 @@ use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Module\Login;
-use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
@@ -150,8 +148,7 @@ function events_post(App $a)
 
 	if ($share) {
 
-		/** @var ACLFormatter $aclFormatter */
-		$aclFormatter = BaseObject::getClass(ACLFormatter::class);
+		$aclFormatter = \Friendica\DI::aclFormatter();
 
 		$str_group_allow   = $aclFormatter->toString($_POST['group_allow'] ?? '');
 		$str_contact_allow = $aclFormatter->toString($_POST['contact_allow'] ?? '');

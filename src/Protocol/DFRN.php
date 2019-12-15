@@ -11,7 +11,6 @@ namespace Friendica\Protocol;
 use DOMDocument;
 use DOMXPath;
 use Friendica\App\BaseURL;
-use Friendica\BaseObject;
 use Friendica\Content\OEmbed;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -21,6 +20,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\Event;
@@ -31,8 +31,6 @@ use Friendica\Model\PermissionSet;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
-use Friendica\Object\Image;
-use Friendica\Protocol\ActivityNamespace;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
@@ -2181,8 +2179,7 @@ class DFRN
 			// The functions below are partly used by ostatus.php as well - where we have this variable
 			$contact = Contact::selectFirst([], ['id' => $importer['id']]);
 
-			/** @var Activity $activity */
-			$activity = BaseObject::getClass(Activity::class);
+			$activity = DI::activity();
 
 			// Big question: Do we need these functions? They were part of the "consume_feed" function.
 			// This function once was responsible for DFRN and OStatus.

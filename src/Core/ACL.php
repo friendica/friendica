@@ -7,7 +7,6 @@
 namespace Friendica\Core;
 
 use Friendica\App\Page;
-use Friendica\BaseObject;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -18,7 +17,7 @@ use Friendica\Model\Group;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-class ACL extends BaseObject
+class ACL
 {
 	/**
 	 * Returns a select input tag with all the contact of the local user

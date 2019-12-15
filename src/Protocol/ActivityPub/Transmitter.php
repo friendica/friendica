@@ -4,7 +4,6 @@
  */
 namespace Friendica\Protocol\ActivityPub;
 
-use Friendica\BaseObject;
 use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Plaintext;

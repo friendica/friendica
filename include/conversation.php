@@ -4,10 +4,8 @@
  */
 
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
-use Friendica\Content\Item as ContentItem;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
@@ -20,6 +18,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -141,8 +140,7 @@ function localize_item(&$item)
 	During the further steps of the database restructuring I would like to address this issue.
 	*/
 
-	/** @var Activity $activity */
-	$activity = BaseObject::getClass(Activity::class);
+	$activity = DI::activity();
 
 	$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 	if ($activity->match($item['verb'], Activity::LIKE)
@@ -399,8 +397,7 @@ function count_descendants($item) {
 
 function visible_activity($item) {
 
-	/** @var Activity $activity */
-	$activity = BaseObject::getClass(Activity::class);
+	$activity = DI::activity();
 
 	if (empty($item['verb']) || $activity->isHidden($item['verb'])) {
 		return false;
@@ -668,10 +665,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 				$body = Item::prepareBody($item, true, $preview);
 
-				/** @var ContentItem $contItem */
-				$contItem = BaseObject::getClass(ContentItem::class);
-
-				list($categories, $folders) = $contItem->determineCategoriesTerms($item);
+				list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item);
 
 				if (!empty($item['content-warning']) && PConfig::get(local_user(), 'system', 'disable_cw', false)) {
 					$title = ucfirst($item['content-warning']);
@@ -1031,10 +1025,7 @@ function builtin_activity_puller($item, &$conv_responses) {
 				return;
 		}
 
-		/** @var Activity $activity */
-		$activity = BaseObject::getClass(Activity::class);
-
-		if (!empty($item['verb']) && $activity->match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
+		if (!empty($item['verb']) && DI::activity()->match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
 			$author = ['uid' => 0, 'id' => $item['author-id'],
 				'network' => $item['author-network'], 'url' => $item['author-link']];
 			$url = Contact::magicLinkByContact($author);

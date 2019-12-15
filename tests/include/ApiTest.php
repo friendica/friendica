@@ -7,7 +7,6 @@ namespace Friendica\Test;
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\BaseObject;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Config\PConfiguration;
 use Friendica\Core\Protocol;
@@ -65,7 +64,7 @@ class ApiTest extends DatabaseTest
 			->addRules(include __DIR__ . '/../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
 			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
-		BaseObject::setDependencyInjection($this->dice);
+		DI::init($this->dice);
 
 		/** @var Database $dba */
 		$dba = $this->dice->create(Database::class);
@@ -116,8 +115,7 @@ class ApiTest extends DatabaseTest
 		// User ID that we know is not in the database
 		$this->wrongUserId = 666;
 
-		/** @var ISession $session */
-		$session = BaseObject::getClass(ISession::class);
+		$session = DI::session();
 		$session->start();
 
 		// Most API require login so we force the session
