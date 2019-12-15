@@ -128,7 +128,7 @@ function network_init(App $a)
 
 			$redir_url = ($net_queries ? $net_baseurl . '?' . $net_queries : $net_baseurl);
 
-			$a->internalRedirect($redir_url);
+			DI::baseUrl()->redirect($redir_url);
 		}
 	}
 
@@ -587,7 +587,7 @@ function networkThreadedView(App $a, $update, $parent)
 				exit();
 			}
 			notice(L10n::t('No such group') . EOL);
-			$a->internalRedirect('network/0');
+			DI::baseUrl()->redirect('network/0');
 			// NOTREACHED
 		}
 
@@ -641,7 +641,7 @@ function networkThreadedView(App $a, $update, $parent)
 			}
 		} else {
 			notice(L10n::t('Invalid contact.') . EOL);
-			$a->internalRedirect('network');
+			DI::baseUrl()->redirect('network');
 			// NOTREACHED
 		}
 	}

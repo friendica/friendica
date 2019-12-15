@@ -47,6 +47,6 @@ class RemoveTag extends BaseModule
 			info('Item was not deleted');
 		}
 
-		$app->internalRedirect('network?file=' . rawurlencode($term));
+		DI::baseUrl()->redirect('network?file=' . rawurlencode($term));
 	}
 }

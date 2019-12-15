@@ -8,6 +8,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Util\Strings;
 
@@ -59,7 +60,7 @@ function removeme_post(App $a)
 
 		unset($_SESSION['authenticated']);
 		unset($_SESSION['uid']);
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 		// NOTREACHED
 	}
 }
@@ -67,7 +68,7 @@ function removeme_post(App $a)
 function removeme_content(App $a)
 {
 	if (!local_user()) {
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 	}
 
 	$hash = Strings::getRandomHex();

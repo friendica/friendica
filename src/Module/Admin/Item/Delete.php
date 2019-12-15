@@ -34,7 +34,7 @@ class Delete extends BaseAdminModule
 		}
 
 		info(L10n::t('Item marked for deletion.') . EOL);
-		DI::app()->internalRedirect('admin/item/delete');
+		DI::baseUrl()->redirect('admin/item/delete');
 	}
 
 	public static function content(array $parameters = [])

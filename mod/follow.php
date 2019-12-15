@@ -8,6 +8,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
@@ -21,7 +22,7 @@ function follow_post(App $a)
 	}
 
 	if (isset($_REQUEST['cancel'])) {
-		$a->internalRedirect('contact');
+		DI::baseUrl()->redirect('contact');
 	}
 
 	$uid = local_user();
@@ -38,14 +39,14 @@ function follow_post(App $a)
 		if ($result['message']) {
 			notice($result['message']);
 		}
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 	} elseif ($result['cid']) {
-		$a->internalRedirect('contact/' . $result['cid']);
+		DI::baseUrl()->redirect('contact/' . $result['cid']);
 	}
 
 	info(L10n::t('The contact could not be added.'));
 
-	$a->internalRedirect($return_path);
+	DI::baseUrl()->redirect($return_path);
 	// NOTREACHED
 }
 
@@ -55,7 +56,7 @@ function follow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 
@@ -70,7 +71,7 @@ function follow_content(App $a)
 	}
 
 	if (!$url) {
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 	}
 
 	$submit = L10n::t('Submit Request');
@@ -132,7 +133,7 @@ function follow_content(App $a)
 
 	if (!$r) {
 		notice(L10n::t('Permission denied.'));
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 

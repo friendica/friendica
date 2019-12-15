@@ -10,6 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -28,7 +29,7 @@ function suggest_post(App $a)
 		notice(L10n::t('Contact suggestion successfully ignored.'));
 	}
 
-	$a->internalRedirect('suggest');
+	DI::baseUrl()->redirect('suggest');
 }
 
 function suggest_content(App $a)

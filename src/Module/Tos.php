@@ -51,7 +51,7 @@ class Tos extends BaseModule
 	public static function init(array $parameters = [])
 	{
 		if (strlen(Config::get('system','singleuser'))) {
-			DI::app()->internalRedirect('profile/' . Config::get('system','singleuser'));
+			DI::baseUrl()->redirect('profile/' . Config::get('system','singleuser'));
 		}
 	}
 

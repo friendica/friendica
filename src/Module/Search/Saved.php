@@ -36,6 +36,6 @@ class Saved extends BaseModule
 			}
 		}
 
-		DI::app()->internalRedirect($return_url);
+		DI::baseUrl()->redirect($return_url);
 	}
 }

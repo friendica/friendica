@@ -39,7 +39,7 @@ class Index extends BaseSettingsModule
 
 						PConfig::set(local_user(), '2fa', 'secret', $Google2FA->generateSecretKey(32));
 
-						DI::app()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::baseUrl()->redirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'disable':
@@ -50,22 +50,22 @@ class Index extends BaseSettingsModule
 						Session::remove('2fa');
 
 						notice(L10n::t('Two-factor authentication successfully disabled.'));
-						DI::app()->internalRedirect('settings/2fa');
+						DI::baseUrl()->redirect('settings/2fa');
 					}
 					break;
 				case 'recovery':
 					if ($has_secret) {
-						DI::app()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::baseUrl()->redirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'app_specific':
 					if ($has_secret) {
-						DI::app()->internalRedirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::baseUrl()->redirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'configure':
 					if (!$verified) {
-						DI::app()->internalRedirect('settings/2fa/verify?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::baseUrl()->redirect('settings/2fa/verify?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 			}

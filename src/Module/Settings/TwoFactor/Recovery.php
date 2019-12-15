@@ -28,12 +28,12 @@ class Recovery extends BaseSettingsModule
 		$secret = PConfig::get(local_user(), '2fa', 'secret');
 
 		if (!$secret) {
-			DI::app()->internalRedirect('settings/2fa');
+			DI::baseUrl()->redirect('settings/2fa');
 		}
 
 		if (!self::checkFormSecurityToken('settings_2fa_password', 't')) {
 			notice(L10n::t('Please enter your password to access this page.'));
-			DI::app()->internalRedirect('settings/2fa');
+			DI::baseUrl()->redirect('settings/2fa');
 		}
 	}
 
@@ -49,7 +49,7 @@ class Recovery extends BaseSettingsModule
 			if ($_POST['action'] == 'regenerate') {
 				RecoveryCode::regenerateForUser(local_user());
 				notice(L10n::t('New recovery codes successfully generated.'));
-				DI::app()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+				DI::baseUrl()->redirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 			}
 		}
 	}

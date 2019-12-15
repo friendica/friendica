@@ -41,7 +41,7 @@ class Index extends BaseAdminModule
 
 			}
 
-			$a->internalRedirect('admin/addons');
+			DI::baseUrl()->redirect('admin/addons');
 		}
 
 		$addons = Addon::getAvailableList();

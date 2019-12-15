@@ -24,6 +24,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
@@ -331,7 +332,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// Let's send our user to the contact editor in case they want to
 		// do anything special with this new friend.
 		if ($handsfree === null) {
-			$a->internalRedirect('contact/' . intval($contact_id));
+			DI::baseUrl()->redirect('contact/' . intval($contact_id));
 		} else {
 			return;
 		}
@@ -551,6 +552,6 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 	}
 
 	// somebody arrived here by mistake or they are fishing. Send them to the homepage.
-	$a->internalRedirect();
+	DI::baseUrl()->redirect();
 	// NOTREACHED
 }

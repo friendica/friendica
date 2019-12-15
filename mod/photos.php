@@ -173,12 +173,12 @@ function photos_post(App $a)
 
 	if ($a->argc > 3 && $a->argv[2] === 'album') {
 		if (!Strings::isHex($a->argv[3])) {
-			$a->internalRedirect('photos/' . $a->data['user']['nickname'] . '/album');
+			DI::baseUrl()->redirect('photos/' . $a->data['user']['nickname'] . '/album');
 		}
 		$album = hex2bin($a->argv[3]);
 
 		if ($album === L10n::t('Profile Photos') || $album === 'Contact Photos' || $album === L10n::t('Contact Photos')) {
-			$a->internalRedirect($_SESSION['photo_return']);
+			DI::baseUrl()->redirect($_SESSION['photo_return']);
 			return; // NOTREACHED
 		}
 
@@ -189,13 +189,13 @@ function photos_post(App $a)
 
 		if (!DBA::isResult($r)) {
 			notice(L10n::t('Album not found.') . EOL);
-			$a->internalRedirect($_SESSION['photo_return']);
+			DI::baseUrl()->redirect($_SESSION['photo_return']);
 			return; // NOTREACHED
 		}
 
 		// Check if the user has responded to a delete confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			$a->internalRedirect($_SESSION['photo_return']);
+			DI::baseUrl()->redirect($_SESSION['photo_return']);
 		}
 
 		// RENAME photo album
@@ -209,7 +209,7 @@ function photos_post(App $a)
 			// Update the photo albums cache
 			Photo::clearAlbumCache($page_owner_uid);
 
-			$a->internalRedirect('photos/' . $a->user['nickname'] . '/album/' . bin2hex($newalbum));
+			DI::baseUrl()->redirect('photos/' . $a->user['nickname'] . '/album/' . bin2hex($newalbum));
 			return; // NOTREACHED
 		}
 
@@ -252,13 +252,13 @@ function photos_post(App $a)
 			}
 		}
 
-		$a->internalRedirect('photos/' . $a->argv[1]);
+		DI::baseUrl()->redirect('photos/' . $a->argv[1]);
 	}
 
 	if ($a->argc > 3 && $a->argv[2] === 'image') {
 		// Check if the user has responded to a delete confirmation query for a single photo
 		if (!empty($_POST['canceled'])) {
-			$a->internalRedirect('photos/' . $a->argv[1] . '/image/' . $a->argv[3]);
+			DI::baseUrl()->redirect('photos/' . $a->argv[1] . '/image/' . $a->argv[3]);
 		}
 
 		if (!empty($_POST['delete'])) {
@@ -282,10 +282,10 @@ function photos_post(App $a)
 				notice('Successfully deleted the photo.');
 			} else {
 				notice('Failed to delete the photo.');
-				$a->internalRedirect('photos/' . $a->argv[1] . '/image/' . $a->argv[3]);
+				DI::baseUrl()->redirect('photos/' . $a->argv[1] . '/image/' . $a->argv[3]);
 			}
 
-			$a->internalRedirect('photos/' . $a->argv[1]);
+			DI::baseUrl()->redirect('photos/' . $a->argv[1]);
 			return; // NOTREACHED
 		}
 	}
@@ -591,7 +591,7 @@ function photos_post(App $a)
 				}
 			}
 		}
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 		return; // NOTREACHED
 	}
 
@@ -817,7 +817,7 @@ function photos_post(App $a)
 	// addon uploaders should call "killme()" [e.g. exit] within the photo_post_end hook
 	// if they do not wish to be redirected
 
-	$a->internalRedirect($_SESSION['photo_return']);
+	DI::baseUrl()->redirect($_SESSION['photo_return']);
 	// NOTREACHED
 }
 
@@ -994,7 +994,7 @@ function photos_content(App $a)
 	if ($datatype === 'album') {
 		// if $datum is not a valid hex, redirect to the default page
 		if (!Strings::isHex($datum)) {
-			$a->internalRedirect('photos/' . $a->data['user']['nickname']. '/album');
+			DI::baseUrl()->redirect('photos/' . $a->data['user']['nickname']. '/album');
 		}
 		$album = hex2bin($datum);
 

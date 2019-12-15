@@ -15,7 +15,7 @@ use Friendica\Util\Strings;
 function openid_content(App $a) {
 
 	if (Config::get('system','no_openid')) {
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 	}
 
 	Logger::log('mod_openid ' . print_r($_REQUEST,true), Logger::DATA);
@@ -29,7 +29,7 @@ function openid_content(App $a) {
 
 			if (empty($authid)) {
 				Logger::log(L10n::t('OpenID protocol error. No ID returned.') . EOL);
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 			}
 
 			// NOTE: we search both for normalised and non-normalised form of $authid
@@ -51,7 +51,7 @@ function openid_content(App $a) {
 				// just in case there was no return url set
 				// and we fell through
 
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 			}
 
 			// Successful OpenID login - but we can't match it to an existing account.
@@ -70,10 +70,10 @@ function openid_content(App $a) {
 				notice(L10n::t('Account not found. Please register a new account or login to your existing account to add the OpenID to it.'));
 			}
 
-			$a->internalRedirect('login');
+			DI::baseUrl()->redirect('login');
 		}
 	}
 	notice(L10n::t('Login failed.') . EOL);
-	$a->internalRedirect();
+	DI::baseUrl()->redirect();
 	// NOTREACHED
 }

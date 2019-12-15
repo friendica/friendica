@@ -24,10 +24,8 @@ class Login extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = DI::app();
-
 		if (local_user()) {
-			$a->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		return self::form(Session::get('return_path'), intval(Config::get('config', 'register_policy')) !== \Friendica\Module\Register::CLOSED);

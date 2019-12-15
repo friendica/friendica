@@ -2277,7 +2277,7 @@ class Contact
 					$myaddr = bin2hex($a->user['nickname'] . '@' . $a->getHostName());
 				}
 
-				$a->internalRedirect($ret['request'] . "&addr=$myaddr");
+				DI::baseUrl()->redirect($ret['request'] . "&addr=$myaddr");
 
 				// NOTREACHED
 			}

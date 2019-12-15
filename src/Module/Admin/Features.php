@@ -40,7 +40,7 @@ class Features extends BaseAdminModule
 			}
 		}
 
-		DI::app()->internalRedirect('admin/features');
+		DI::baseUrl()->redirect('admin/features');
 	}
 
 	public static function content(array $parameters = [])

@@ -129,7 +129,7 @@ class Users extends BaseAdminModule
 			}
 		}
 
-		$a->internalRedirect('admin/users');
+		DI::baseUrl()->redirect('admin/users');
 	}
 
 	public static function content(array $parameters = [])
@@ -145,7 +145,7 @@ class Users extends BaseAdminModule
 			$user = User::getById($uid, ['username', 'blocked']);
 			if (!DBA::isResult($user)) {
 				notice('User not found' . EOL);
-				$a->internalRedirect('admin/users');
+				DI::baseUrl()->redirect('admin/users');
 				return ''; // NOTREACHED
 			}
 
@@ -175,7 +175,7 @@ class Users extends BaseAdminModule
 					break;
 			}
 
-			$a->internalRedirect('admin/users');
+			DI::baseUrl()->redirect('admin/users');
 		}
 
 		/* get pending */

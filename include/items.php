@@ -12,6 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Feed;
@@ -339,7 +340,7 @@ function drop_items(array $items)
 
 function drop_item($id, $return = '')
 {
-	$a = Friendica\DI::app();
+	$a = DI::app();
 
 	// locate item to be deleted
 
@@ -348,7 +349,7 @@ function drop_item($id, $return = '')
 
 	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
-		$a->internalRedirect('network');
+		DI::baseUrl()->redirect('network');
 	}
 
 	if ($item['deleted']) {
@@ -389,7 +390,7 @@ function drop_item($id, $return = '')
 		}
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			$a->internalRedirect('display/' . $item['guid']);
+			DI::baseUrl()->redirect('display/' . $item['guid']);
 		}
 
 		$is_comment = ($item['gravity'] == GRAVITY_COMMENT) ? true : false;
@@ -411,28 +412,28 @@ function drop_item($id, $return = '')
 		if ($is_comment) {
 			// Return to parent guid
 			if (!empty($parentitem)) {
-				$a->internalRedirect('display/' . $parentitem['guid']);
+				DI::baseUrl()->redirect('display/' . $parentitem['guid']);
 				//NOTREACHED
 			}
 			// In case something goes wrong
 			else {
-				$a->internalRedirect('network');
+				DI::baseUrl()->redirect('network');
 				//NOTREACHED
 			}
 		}
 		else {
 			// if unknown location or deleting top level post called from display
 			if (empty($return_url) || strpos($return_url, 'display') !== false) {
-				$a->internalRedirect('network');
+				DI::baseUrl()->redirect('network');
 				//NOTREACHED
 			} else {
-				$a->internalRedirect($return_url);
+				DI::baseUrl()->redirect($return_url);
 				//NOTREACHED
 			}
 		}
 	} else {
 		notice(L10n::t('Permission denied.') . EOL);
-		$a->internalRedirect('display/' . $item['guid']);
+		DI::baseUrl()->redirect('display/' . $item['guid']);
 		//NOTREACHED
 	}
 }

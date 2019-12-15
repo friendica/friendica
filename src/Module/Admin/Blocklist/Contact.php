@@ -39,7 +39,7 @@ class Contact extends BaseAdminModule
 			notice(L10n::tt('%s contact unblocked', '%s contacts unblocked', count($contacts)));
 		}
 
-		DI::app()->internalRedirect('admin/blocklist/contact');
+		DI::baseUrl()->redirect('admin/blocklist/contact');
 	}
 
 	public static function content(array $parameters = [])

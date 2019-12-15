@@ -173,7 +173,7 @@ function settings_post(App $a)
 
 		$key = $_POST['remove'];
 		DBA::delete('tokens', ['id' => $key, 'uid' => local_user()]);
-		$a->internalRedirect('settings/oauth/', true);
+		DI::baseUrl()->redirect('settings/oauth/', true);
 		return;
 	}
 
@@ -219,7 +219,7 @@ function settings_post(App $a)
 				);
 			}
 		}
-		$a->internalRedirect('settings/oauth/', true);
+		DI::baseUrl()->redirect('settings/oauth/', true);
 		return;
 	}
 
@@ -383,7 +383,7 @@ function settings_post(App $a)
 		}
 
 		Hook::callAll('display_settings_post', $_POST);
-		$a->internalRedirect('settings/display');
+		DI::baseUrl()->redirect('settings/display');
 		return; // NOTREACHED
 	}
 
@@ -419,7 +419,7 @@ function settings_post(App $a)
 	if (!empty($_POST['resend_relocate'])) {
 		Worker::add(PRIORITY_HIGH, 'Notifier', Delivery::RELOCATION, local_user());
 		info(L10n::t("Relocate message has been send to your contacts"));
-		$a->internalRedirect('settings');
+		DI::baseUrl()->redirect('settings');
 	}
 
 	Hook::callAll('settings_post', $_POST);
@@ -638,7 +638,7 @@ function settings_post(App $a)
 	// Update the global contact for the user
 	GContact::updateForUser(local_user());
 
-	$a->internalRedirect('settings');
+	DI::baseUrl()->redirect('settings');
 	return; // NOTREACHED
 }
 
@@ -705,7 +705,7 @@ function settings_content(App $a)
 			BaseModule::checkFormSecurityTokenRedirectOnError('/settings/oauth', 'settings_oauth', 't');
 
 			DBA::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
-			$a->internalRedirect('settings/oauth/', true);
+			DI::baseUrl()->redirect('settings/oauth/', true);
 			return;
 		}
 

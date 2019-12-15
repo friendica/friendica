@@ -52,12 +52,12 @@ class Recovery extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		if (!local_user()) {
-			DI::app()->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		// Already authenticated with 2FA token
 		if (Session::get('2fa')) {
-			DI::app()->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('twofactor/recovery.tpl'), [

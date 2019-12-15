@@ -36,7 +36,7 @@ class Details extends BaseAdminModule
 				return;
 			}
 
-			$a->internalRedirect('admin/themes/' . $theme);
+			DI::baseUrl()->redirect('admin/themes/' . $theme);
 		}
 	}
 
@@ -76,7 +76,7 @@ class Details extends BaseAdminModule
 					info(L10n::t('Theme %s failed to install.', $theme));
 				}
 
-				$a->internalRedirect('admin/themes/' . $theme);
+				DI::baseUrl()->redirect('admin/themes/' . $theme);
 			}
 
 			$readme = null;
@@ -122,6 +122,6 @@ class Details extends BaseAdminModule
 			]);
 		}
 
-		$a->internalRedirect('admin/themes');
+		DI::baseUrl()->redirect('admin/themes');
 	}
 }

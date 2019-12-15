@@ -407,7 +407,7 @@ class Authentication
 		if ($a->isAjax()) {
 			throw new HTTPException\ForbiddenException();
 		} else {
-			$a->internalRedirect('2fa');
+			$this->baseUrl->redirect('2fa');
 		}
 	}
 }

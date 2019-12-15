@@ -125,7 +125,7 @@ function item_post(App $a) {
 		if (!DBA::isResult($toplevel_item)) {
 			notice(L10n::t('Unable to locate original post.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				$a->internalRedirect($return_path);
+				DI::baseUrl()->redirect($return_path);
 			}
 			exit();
 		}
@@ -173,7 +173,7 @@ function item_post(App $a) {
 		notice(L10n::t('Permission denied.') . EOL);
 
 		if (!empty($_REQUEST['return'])) {
-			$a->internalRedirect($return_path);
+			DI::baseUrl()->redirect($return_path);
 		}
 
 		exit();
@@ -327,7 +327,7 @@ function item_post(App $a) {
 			}
 			info(L10n::t('Empty post discarded.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				$a->internalRedirect($return_path);
+				DI::baseUrl()->redirect($return_path);
 			}
 			exit();
 		}
@@ -678,7 +678,7 @@ function item_post(App $a) {
 	if (!empty($datarray['cancel'])) {
 		Logger::log('mod_item: post cancelled by addon.');
 		if ($return_path) {
-			$a->internalRedirect($return_path);
+			DI::baseUrl()->redirect($return_path);
 		}
 
 		$json = ['cancel' => 1];
@@ -713,7 +713,7 @@ function item_post(App $a) {
 
 		if (!empty($_REQUEST['return']) && strlen($return_path)) {
 			Logger::log('return: ' . $return_path);
-			$a->internalRedirect($return_path);
+			DI::baseUrl()->redirect($return_path);
 		}
 		exit();
 	}
@@ -733,14 +733,14 @@ function item_post(App $a) {
 
 	if (!$post_id) {
 		Logger::log("Item wasn't stored.");
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 	}
 
 	$datarray = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 
 	if (!DBA::isResult($datarray)) {
 		Logger::log("Item with id ".$post_id." couldn't be fetched.");
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 	}
 
 	// update filetags in pconfig
@@ -855,7 +855,7 @@ function item_post_return($baseurl, $api_source, $return_path)
 	}
 
 	if ($return_path) {
-		$a->internalRedirect($return_path);
+		DI::baseUrl()->redirect($return_path);
 	}
 
 	$json = ['success' => 1];

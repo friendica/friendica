@@ -67,7 +67,7 @@ class Ignore extends BaseModule
 				$rand = "?$rand";
 			}
 
-			DI::app()->internalRedirect($return_path . $rand);
+			DI::baseUrl()->redirect($return_path . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

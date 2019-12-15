@@ -50,7 +50,7 @@ class Embed extends BaseAdminModule
 				return;
 			}
 
-			$a->internalRedirect('admin/themes/' . $theme . '/embed?mode=minimal');
+			DI::baseUrl()->redirect('admin/themes/' . $theme . '/embed?mode=minimal');
 		}
 	}
 

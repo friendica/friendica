@@ -32,7 +32,7 @@ class DBSync extends BaseAdminModule
 				}
 				info(L10n::t('Update has been marked successful') . EOL);
 			}
-			$a->internalRedirect('admin/dbsync');
+			DI::baseUrl()->redirect('admin/dbsync');
 		}
 
 		if ($a->argc > 2) {

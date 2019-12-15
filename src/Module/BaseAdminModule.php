@@ -56,7 +56,7 @@ abstract class BaseAdminModule extends BaseModule
 		if (!is_site_admin()) {
 			notice(L10n::t('Please login to continue.'));
 			Session::set('return_path', $a->query_string);
-			$a->internalRedirect('login');
+			DI::baseUrl()->redirect('login');
 		}
 
 		if (!empty($_SESSION['submanage'])) {

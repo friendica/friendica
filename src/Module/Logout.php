@@ -40,7 +40,7 @@ class Logout extends BaseModule
 			System::externalRedirect($visitor_home);
 		} else {
 			info(L10n::t('Logged out.'));
-			DI::app()->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 	}
 }

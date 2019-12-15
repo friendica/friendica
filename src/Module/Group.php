@@ -30,7 +30,7 @@ class Group extends BaseModule
 
 		if (!local_user()) {
 			notice(L10n::t('Permission denied.'));
-			$a->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		// @TODO: Replace with parameter from router
@@ -43,12 +43,12 @@ class Group extends BaseModule
 				info(L10n::t('Group created.'));
 				$r = Model\Group::getIdByName(local_user(), $name);
 				if ($r) {
-					$a->internalRedirect('group/' . $r);
+					DI::baseUrl()->redirect('group/' . $r);
 				}
 			} else {
 				notice(L10n::t('Could not create group.'));
 			}
-			$a->internalRedirect('group');
+			DI::baseUrl()->redirect('group');
 		}
 
 		// @TODO: Replace with parameter from router
@@ -58,7 +58,7 @@ class Group extends BaseModule
 			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => $a->argv[1], 'uid' => local_user()]);
 			if (!DBA::isResult($group)) {
 				notice(L10n::t('Group not found.'));
-				$a->internalRedirect('contact');
+				DI::baseUrl()->redirect('contact');
 			}
 			$groupname = Strings::escapeTags(trim($_POST['groupname']));
 			if (strlen($groupname) && ($groupname != $group['name'])) {
@@ -148,7 +148,7 @@ class Group extends BaseModule
 		// With no group number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if ($a->argc == 1) {
-			$a->internalRedirect('group/none');
+			DI::baseUrl()->redirect('group/none');
 		}
 
 		// Switch to text mode interface if we have more than 'n' contacts or group members
@@ -206,7 +206,7 @@ class Group extends BaseModule
 			if (intval($a->argv[2])) {
 				if (!Model\Group::exists($a->argv[2], local_user())) {
 					notice(L10n::t('Group not found.'));
-					$a->internalRedirect('contact');
+					DI::baseUrl()->redirect('contact');
 				}
 
 				if (Model\Group::remove($a->argv[2])) {
@@ -215,7 +215,7 @@ class Group extends BaseModule
 					notice(L10n::t('Unable to remove group.'));
 				}
 			}
-			$a->internalRedirect('group');
+			DI::baseUrl()->redirect('group');
 		}
 
 		// @TODO: Replace with parameter from router
@@ -232,7 +232,7 @@ class Group extends BaseModule
 			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => $a->argv[1], 'uid' => local_user(), 'deleted' => false]);
 			if (!DBA::isResult($group)) {
 				notice(L10n::t('Group not found.'));
-				$a->internalRedirect('contact');
+				DI::baseUrl()->redirect('contact');
 			}
 
 			$members = Model\Contact::getByGroupId($group['id']);

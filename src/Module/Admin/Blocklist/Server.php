@@ -48,7 +48,7 @@ class Server extends BaseAdminModule
 			info(L10n::t('Site blocklist updated.') . EOL);
 		}
 
-		DI::app()->internalRedirect('admin/blocklist/server');
+		DI::baseUrl()->redirect('admin/blocklist/server');
 	}
 
 	public static function content(array $parameters = [])

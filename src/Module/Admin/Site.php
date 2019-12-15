@@ -48,7 +48,7 @@ class Site extends BaseAdminModule
 			$parsed = @parse_url($new_url);
 			if (!is_array($parsed) || empty($parsed['host']) || empty($parsed['scheme'])) {
 				notice(L10n::t("Can not parse base url. Must have at least <scheme>://<domain>"));
-				$a->internalRedirect('admin/site');
+				DI::baseUrl()->redirect('admin/site');
 			}
 
 			/* steps:
@@ -77,7 +77,7 @@ class Site extends BaseAdminModule
 				$r = DBA::e(sprintf("UPDATE %s SET %s;", $table_name, $upds));
 				if (!DBA::isResult($r)) {
 					notice("Failed updating '$table_name': " . DBA::errorMessage());
-					$a->internalRedirect('admin/site');
+					DI::baseUrl()->redirect('admin/site');
 				}
 			}
 
@@ -105,7 +105,7 @@ class Site extends BaseAdminModule
 
 			info("Relocation started. Could take a while to complete.");
 
-			$a->internalRedirect('admin/site');
+			DI::baseUrl()->redirect('admin/site');
 		}
 		// end relocate
 
@@ -229,7 +229,7 @@ class Site extends BaseAdminModule
 					foreach ($storage_form_errors as $name => $err) {
 						notice('Storage backend, ' . $storage_opts[$name][1] . ': ' . $err);
 					}
-					$a->internalRedirect('admin/site' . $active_panel);
+					DI::baseUrl()->redirect('admin/site' . $active_panel);
 				}
 			} else {
 				info(L10n::t('Invalid storage backend setting value.'));
@@ -410,7 +410,7 @@ class Site extends BaseAdminModule
 
 		info(L10n::t('Site settings updated.') . EOL);
 
-		$a->internalRedirect('admin/site' . $active_panel);
+		DI::baseUrl()->redirect('admin/site' . $active_panel);
 	}
 
 	public static function content(array $parameters = [])

@@ -90,7 +90,7 @@ function dfrn_poll_init(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 				break; // NOTREACHED
 		}
 
@@ -137,10 +137,10 @@ function dfrn_poll_init(App $a)
 			if (!empty($destination_url)) {
 				System::externalRedirect($destination_url);
 			} else {
-				$a->internalRedirect('profile/' . $profile);
+				DI::baseUrl()->redirect('profile/' . $profile);
 			}
 		}
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 	}
 
 	if ($type === 'profile-check' && $dfrn_version < 2.2) {
@@ -324,7 +324,7 @@ function dfrn_poll_post(App $a)
 			$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 			break;
 		default:
-			$a->internalRedirect();
+			DI::baseUrl()->redirect();
 			break; // NOTREACHED
 	}
 
@@ -444,7 +444,7 @@ function dfrn_poll_content(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 				break; // NOTREACHED
 		}
 
@@ -540,18 +540,18 @@ function dfrn_poll_content(App $a)
 
 			switch ($destination_url) {
 				case 'profile':
-					$a->internalRedirect('profile/' . $profile . '?f=&tab=profile');
+					DI::baseUrl()->redirect('profile/' . $profile . '?f=&tab=profile');
 					break;
 				case 'photos':
-					$a->internalRedirect('photos/' . $profile);
+					DI::baseUrl()->redirect('photos/' . $profile);
 					break;
 				case 'status':
 				case '':
-					$a->internalRedirect('profile/' . $profile);
+					DI::baseUrl()->redirect('profile/' . $profile);
 					break;
 				default:
 					$appendix = (strstr($destination_url, '?') ? '&f=&redir=1' : '?f=&redir=1');
-					$a->redirect($destination_url . $appendix);
+					DI::baseUrl()->redirect($destination_url . $appendix);
 					break;
 			}
 			// NOTREACHED

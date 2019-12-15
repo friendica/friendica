@@ -64,7 +64,7 @@ class Delegation extends BaseSettingsModule
 		if ($action === 'add' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				DI::app()->internalRedirect('settings/delegation');
+				DI::baseUrl()->redirect('settings/delegation');
 			}
 
 			$user = User::getById($user_id, ['nickname']);
@@ -80,17 +80,17 @@ class Delegation extends BaseSettingsModule
 				notice(L10n::t('Delegate user not found.'));
 			}
 
-			DI::app()->internalRedirect('settings/delegation');
+			DI::baseUrl()->redirect('settings/delegation');
 		}
 
 		if ($action === 'remove' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				DI::app()->internalRedirect('settings/delegation');
+				DI::baseUrl()->redirect('settings/delegation');
 			}
 
 			DBA::delete('manage', ['uid' => $user_id, 'mid' => local_user()]);
-			DI::app()->internalRedirect('settings/delegation');
+			DI::baseUrl()->redirect('settings/delegation');
 		}
 
 		// find everybody that currently has delegated management to this account/page

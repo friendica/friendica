@@ -29,11 +29,11 @@ class Details extends BaseAdminModule
 					$func($a);
 				}
 
-				$a->internalRedirect('admin/addons/' . $addon);
+				DI::baseUrl()->redirect('admin/addons/' . $addon);
 			}
 		}
 
-		$a->internalRedirect('admin/addons');
+		DI::baseUrl()->redirect('admin/addons');
 	}
 
 	public static function content(array $parameters = [])
@@ -51,7 +51,7 @@ class Details extends BaseAdminModule
 			if (!is_file("addon/$addon/$addon.php")) {
 				notice(L10n::t('Addon not found.'));
 				Addon::uninstall($addon);
-				$a->internalRedirect('admin/addons');
+				DI::baseUrl()->redirect('admin/addons');
 			}
 
 			if (($_GET['action'] ?? '') == 'toggle') {
@@ -68,7 +68,7 @@ class Details extends BaseAdminModule
 
 				Addon::saveEnabledList();
 
-				$a->internalRedirect('admin/addons/' . $addon);
+				DI::baseUrl()->redirect('admin/addons/' . $addon);
 			}
 
 			// display addon details
@@ -119,6 +119,6 @@ class Details extends BaseAdminModule
 			]);
 		}
 
-		$a->internalRedirect('admin/addons');
+		DI::baseUrl()->redirect('admin/addons');
 	}
 }

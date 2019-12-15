@@ -35,7 +35,7 @@ class Settings extends BaseAdminModule
 		}
 
 		info(L10n::t("Log settings updated."));
-		DI::app()->internalRedirect('admin/logs');
+		DI::baseUrl()->redirect('admin/logs');
 	}
 
 	public static function content(array $parameters = [])

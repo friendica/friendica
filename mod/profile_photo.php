@@ -11,6 +11,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
@@ -134,7 +135,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		$a->internalRedirect($path);
+		DI::baseUrl()->redirect($path);
 		return; // NOTREACHED
 	}
 
@@ -167,7 +168,7 @@ function profile_photo_post(App $a)
 	@unlink($src);
 
 	$imagecrop = profile_photo_crop_ui_head($a, $ph);
-	$a->internalRedirect('profile_photo/use/' . $imagecrop['hash']);
+	DI::baseUrl()->redirect('profile_photo/use/' . $imagecrop['hash']);
 }
 
 function profile_photo_content(App $a)
@@ -222,7 +223,7 @@ function profile_photo_content(App $a)
 				Worker::add(PRIORITY_LOW, "Directory", $url);
 			}
 
-			$a->internalRedirect('profile/' . $a->user['nickname']);
+			DI::baseUrl()->redirect('profile/' . $a->user['nickname']);
 			return; // NOTREACHED
 		}
 		$ph = Photo::getImageForPhoto($r[0]);

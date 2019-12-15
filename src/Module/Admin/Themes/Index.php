@@ -59,7 +59,7 @@ class Index extends BaseAdminModule
 
 			}
 
-			$a->internalRedirect('admin/themes');
+			DI::baseUrl()->redirect('admin/themes');
 		}
 
 		$themes = [];

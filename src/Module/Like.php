@@ -47,7 +47,7 @@ class Like extends BaseModule
 				$rand = "?$rand";
 			}
 
-			$app->internalRedirect($returnPath . $rand);
+			DI::baseUrl()->redirect($returnPath . $rand);
 		}
 	}
 }

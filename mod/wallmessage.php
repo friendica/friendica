@@ -8,6 +8,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Mail;
 use Friendica\Model\Profile;
 use Friendica\Util\Strings;
@@ -72,7 +73,7 @@ function wallmessage_post(App $a) {
 			info(L10n::t('Message sent.') . EOL);
 	}
 
-	$a->internalRedirect('profile/'.$user['nickname']);
+	DI::baseUrl()->redirect('profile/'.$user['nickname']);
 }
 
 

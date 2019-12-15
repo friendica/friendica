@@ -8,13 +8,14 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 
 function repair_ostatus_content(App $a) {
 
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		$a->internalRedirect('ostatus_repair');
+		DI::baseUrl()->redirect('ostatus_repair');
 		// NOTREACHED
 	}
 

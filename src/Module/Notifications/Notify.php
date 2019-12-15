@@ -58,10 +58,10 @@ class Notify extends BaseModule
 				}
 			}
 
-			$a->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		// @TODO: Replace with parameter from router
-		$a->internalRedirect('notifications/system');
+		DI::baseUrl()->redirect('notifications/system');
 	}
 }

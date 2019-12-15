@@ -13,6 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
 use Friendica\Module\Login;
@@ -88,7 +89,7 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-		$a->internalRedirect($a->cmd . '/' . $ret);
+		DI::baseUrl()->redirect($a->cmd . '/' . $ret);
 	}
 }
 
@@ -156,7 +157,7 @@ function message_content(App $a)
 
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			$a->internalRedirect('message');
+			DI::baseUrl()->redirect('message');
 		}
 
 		$cmd = $a->argv[1];
@@ -164,7 +165,7 @@ function message_content(App $a)
 			$message = DBA::selectFirst('mail', ['convid'], ['id' => $a->argv[2], 'uid' => local_user()]);
 			if(!DBA::isResult($message)){
 				info(L10n::t('Conversation not found.') . EOL);
-				$a->internalRedirect('message');
+				DI::baseUrl()->redirect('message');
 			}
 
 			if (DBA::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
@@ -174,10 +175,10 @@ function message_content(App $a)
 			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => local_user()]);
 			if(!DBA::isResult($conversation)){
 				info(L10n::t('Conversation removed.') . EOL);
-				$a->internalRedirect('message');
+				DI::baseUrl()->redirect('message');
 			}
 
-			$a->internalRedirect('message/' . $conversation['id'] );
+			DI::baseUrl()->redirectinternalRedirect('message/' . $conversation['id'] );
 		} else {
 			$r = q("SELECT `parent-uri`,`convid` FROM `mail` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
@@ -190,7 +191,7 @@ function message_content(App $a)
 					info(L10n::t('Conversation removed.') . EOL);
 				}
 			}
-			$a->internalRedirect('message');
+			DI::baseUrl()->redirect('message');
 		}
 	}
 

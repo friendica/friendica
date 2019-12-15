@@ -24,11 +24,11 @@ class Home extends BaseModule
 		Hook::callAll('home_init', $ret);
 
 		if (local_user() && ($app->user['nickname'])) {
-			$app->internalRedirect('network');
+			DI::baseUrl()->redirect('network');
 		}
 
 		if (strlen($config->get('system', 'singleuser'))) {
-			$app->internalRedirect('/profile/' . $config->get('system', 'singleuser'));
+			DI::baseUrl()->redirect('/profile/' . $config->get('system', 'singleuser'));
 		}
 
 		$customHome = '';

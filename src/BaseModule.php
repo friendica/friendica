@@ -140,7 +140,7 @@ abstract class BaseModule
 			Logger::log('checkFormSecurityToken failed: user ' . $a->user['guid'] . ' - form element ' . $typename);
 			Logger::log('checkFormSecurityToken failed: _REQUEST data: ' . print_r($_REQUEST, true), Logger::DATA);
 			notice(self::getFormSecurityStandardErrorMessage());
-			$a->internalRedirect($err_redirect);
+			DI::baseUrl()->redirect($err_redirect);
 		}
 	}
 

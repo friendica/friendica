@@ -23,6 +23,6 @@ class RandomProfile extends BaseModule
 			$a->redirect($link);
 		}
 
-		$a->internalRedirect('profile');
+		DI::baseUrl()->redirect('profile');
 	}
 }

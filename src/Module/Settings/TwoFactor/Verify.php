@@ -35,12 +35,12 @@ class Verify extends BaseSettingsModule
 		$verified = PConfig::get(local_user(), '2fa', 'verified');
 
 		if ($secret && $verified) {
-			DI::app()->internalRedirect('settings/2fa');
+			DI::baseUrl()->redirect('settings/2fa');
 		}
 
 		if (!self::checkFormSecurityToken('settings_2fa_password', 't')) {
 			notice(L10n::t('Please enter your password to access this page.'));
-			DI::app()->internalRedirect('settings/2fa');
+			DI::baseUrl()->redirect('settings/2fa');
 		}
 	}
 
@@ -63,7 +63,7 @@ class Verify extends BaseSettingsModule
 
 				notice(L10n::t('Two-factor authentication successfully activated.'));
 
-				DI::app()->internalRedirect('settings/2fa');
+				DI::baseUrl()->redirect('settings/2fa');
 			} else {
 				notice(L10n::t('Invalid code, please retry.'));
 			}

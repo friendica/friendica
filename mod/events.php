@@ -15,6 +15,7 @@ use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -121,7 +122,7 @@ function events_post(App $a)
 			echo L10n::t('Event can not end before it has started.');
 			exit();
 		}
-		$a->internalRedirect($onerror_path);
+		DI::baseUrl()->redirect($onerror_path);
 	}
 
 	if (!$summary || ($start === DBA::NULL_DATETIME)) {
@@ -130,7 +131,7 @@ function events_post(App $a)
 			echo L10n::t('Event title and start time are required.');
 			exit();
 		}
-		$a->internalRedirect($onerror_path);
+		DI::baseUrl()->redirect($onerror_path);
 	}
 
 	$share = intval($_POST['share'] ?? 0);
@@ -148,7 +149,7 @@ function events_post(App $a)
 
 	if ($share) {
 
-		$aclFormatter = \Friendica\DI::aclFormatter();
+		$aclFormatter = DI::aclFormatter();
 
 		$str_group_allow   = $aclFormatter->toString($_POST['group_allow'] ?? '');
 		$str_contact_allow = $aclFormatter->toString($_POST['contact_allow'] ?? '');
@@ -203,7 +204,7 @@ function events_post(App $a)
 		Worker::add(PRIORITY_HIGH, "Notifier", Delivery::POST, $item_id);
 	}
 
-	$a->internalRedirect('events');
+	DI::baseUrl()->redirect('events');
 }
 
 function events_content(App $a)
@@ -576,6 +577,6 @@ function events_content(App $a)
 			info(L10n::t('Event removed') . EOL);
 		}
 
-		$a->internalRedirect('events');
+		DI::baseUrl()->redirect('events');
 	}
 }

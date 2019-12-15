@@ -89,7 +89,7 @@ class Delegation extends BaseModule
 		$ret = [];
 		Hook::callAll('home_init', $ret);
 
-		DI::app()->internalRedirect('profile/' . DI::app()->user['nickname']);
+		DI::baseUrl()->redirect('profile/' . DI::app()->user['nickname']);
 		// NOTREACHED
 	}
 

@@ -9,6 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\Login;
@@ -99,11 +100,11 @@ function regmod_content(App $a)
 
 	if ($cmd === 'deny') {
 		user_deny($hash);
-		$a->internalRedirect('admin/users/');
+		DI::baseUrl()->redirect('admin/users/');
 	}
 
 	if ($cmd === 'allow') {
 		user_allow($hash);
-		$a->internalRedirect('admin/users/');
+		DI::baseUrl()->redirect('admin/users/');
 	}
 }

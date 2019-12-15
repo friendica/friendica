@@ -10,6 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
@@ -18,14 +19,14 @@ function lostpass_post(App $a)
 {
 	$loginame = Strings::escapeTags(trim($_POST['login-name']));
 	if (!$loginame) {
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` = 1 AND `blocked` = 0', $loginame, $loginame];
 	$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
 	if (!DBA::isResult($user)) {
 		notice(L10n::t('No valid account found.') . EOL);
-		$a->internalRedirect();
+		DI::baseUrl()->redirect();
 	}
 
 	$pwdreset_token = Strings::getRandomName(12) . random_int(1000, 9999);
@@ -77,7 +78,7 @@ function lostpass_post(App $a)
 		'body'     => $body
 	]);
 
-	$a->internalRedirect();
+	DI::baseUrl()->redirect();
 }
 
 function lostpass_content(App $a)

@@ -208,14 +208,14 @@ class Module
 	 * Run the determined module class and calls all hooks applied to
 	 *
 	 * @param Core\L10n\L10n  $l10n         The L10n instance
-	 * @param App             $app          The whole Friendica app (for method arguments)
+	 * @param App\BaseURL     $baseUrl      The Friendica Base URL
 	 * @param LoggerInterface $logger       The Friendica logger
 	 * @param array           $server       The $_SERVER variable
 	 * @param array           $post         The $_POST variables
 	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function run(Core\L10n\L10n $l10n, App $app, LoggerInterface $logger, array $server, array $post)
+	public function run(Core\L10n\L10n $l10n, App\BaseURL $baseUrl, LoggerInterface $logger, array $server, array $post)
 	{
 		if ($this->printNotAllowedAddon) {
 			info($l10n->t("You must be logged in to use addons. "));
@@ -239,7 +239,7 @@ class Module
 
 			if (!empty($queryString) && ($queryString === 'q=internal_error.html') && isset($dreamhost_error_hack)) {
 				$logger->info('index.php: dreamhost_error_hack invoked.', ['Original URI' => $server['REQUEST_URI']]);
-				$app->internalRedirect($server['REQUEST_URI']);
+				$baseUrl->redirect($server['REQUEST_URI']);
 			}
 
 			$logger->debug('index.php: page not found.', ['request_uri' => $server['REQUEST_URI'], 'address' => $server['REMOTE_ADDR'], 'query' => $server['QUERY_STRING']]);

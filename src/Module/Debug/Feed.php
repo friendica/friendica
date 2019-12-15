@@ -19,7 +19,7 @@ class Feed extends BaseModule
 	{
 		if (!local_user()) {
 			info(L10n::t('You must be logged in to use this module'));
-			DI::app()->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 	}
 

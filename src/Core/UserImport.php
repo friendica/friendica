@@ -7,6 +7,7 @@ namespace Friendica\Core;
 use Friendica\App;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\Strings;
@@ -85,12 +86,11 @@ class UserImport
 	/**
 	 * @brief Import account file exported from mod/uexport
 	 *
-	 * @param App   $a    Friendica App Class
 	 * @param array $file array from $_FILES
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function importAccount(App $a, $file)
+	public static function importAccount($file)
 	{
 		Logger::log("Start user import from " . $file['tmp_name']);
 		/*
@@ -282,6 +282,6 @@ class UserImport
 		Worker::add(PRIORITY_HIGH, 'Notifier', Delivery::RELOCATION, $newuid);
 
 		info(L10n::t("Done. You can now login with your username and password"));
-		$a->internalRedirect('login');
+		DI::baseUrl()->redirect('login');
 	}
 }

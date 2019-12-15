@@ -16,6 +16,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Profile;
@@ -41,7 +42,7 @@ function profiles_init(App $a) {
 		);
 		if (! DBA::isResult($r)) {
 			notice(L10n::t('Profile not found.') . EOL);
-			$a->internalRedirect('profiles');
+			DI::baseUrl()->redirect('profiles');
 			return; // NOTREACHED
 		}
 
@@ -62,7 +63,7 @@ function profiles_init(App $a) {
 			info(L10n::t('Profile deleted.').EOL);
 		}
 
-		$a->internalRedirect('profiles');
+		DI::baseUrl()->redirect('profiles');
 		return; // NOTREACHED
 	}
 
@@ -96,10 +97,10 @@ function profiles_init(App $a) {
 
 		info(L10n::t('New profile created.') . EOL);
 		if (DBA::isResult($r3) && count($r3) == 1) {
-			$a->internalRedirect('profiles/' . $r3[0]['id']);
+			DI::baseUrl()->redirect('profiles/' . $r3[0]['id']);
 		}
 
-		$a->internalRedirect('profiles');
+		DI::baseUrl()->redirect('profiles');
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'clone')) {
@@ -134,10 +135,10 @@ function profiles_init(App $a) {
 		);
 		info(L10n::t('New profile created.') . EOL);
 		if ((DBA::isResult($r3)) && (count($r3) == 1)) {
-			$a->internalRedirect('profiles/'.$r3[0]['id']);
+			DI::baseUrl()->redirect('profiles/'.$r3[0]['id']);
 		}
 
-		$a->internalRedirect('profiles');
+		DI::baseUrl()->redirect('profiles');
 
 		return; // NOTREACHED
 	}
@@ -640,7 +641,7 @@ function profiles_content(App $a) {
 			);
 			if (DBA::isResult($r)) {
 				//Go to the default profile.
-				$a->internalRedirect('profiles/' . $r[0]['id']);
+				DI::baseUrl()->redirect('profiles/' . $r[0]['id']);
 			}
 		}
 

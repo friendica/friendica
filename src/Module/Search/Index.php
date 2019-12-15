@@ -97,7 +97,7 @@ class Index extends BaseSearchModule
 			if (!empty($id)) {
 				$item = Item::selectFirst(['guid'], ['id' => $id]);
 				if (DBA::isResult($item)) {
-					DI::app()->internalRedirect('display/' . $item['guid']);
+					DI::baseUrl()->redirect('display/' . $item['guid']);
 				}
 			}
 		}

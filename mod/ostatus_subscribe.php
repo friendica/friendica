@@ -8,6 +8,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\Probe;
 use Friendica\Util\Network;
@@ -16,7 +17,7 @@ function ostatus_subscribe_content(App $a)
 {
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		$a->internalRedirect('ostatus_subscribe');
+		DI::baseUrl()->redirect('ostatus_subscribe');
 		// NOTREACHED
 	}
 

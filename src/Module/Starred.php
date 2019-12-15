@@ -36,7 +36,7 @@ class Starred extends BaseModule
 		$returnPath = $_REQUEST['return'] ?? '';
 		if (!empty($returnPath)) {
 			$rand = '_=' . time() . (strpos($returnPath, '?') ? '&' : '?') . 'rand';
-			DI::app()->internalRedirect($returnPath . $rand);
+			DI::baseUrl()->redirect($returnPath . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

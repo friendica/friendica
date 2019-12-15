@@ -7,6 +7,7 @@ use Friendica\App;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
 use Friendica\Util\Strings;
@@ -14,11 +15,11 @@ use Friendica\Util\Strings;
 function tagrm_post(App $a)
 {
 	if (!local_user()) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 	}
 
 	if (!empty($_POST['submit']) && ($_POST['submit'] === L10n::t('Cancel'))) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 	}
 
 	$tags = [];
@@ -30,7 +31,7 @@ function tagrm_post(App $a)
 	update_tags($item_id, $tags);
 	info(L10n::t('Tag(s) removed') . EOL);
 
-	$a->internalRedirect($_SESSION['photo_return']);
+	DI::baseUrl()->redirect($_SESSION['photo_return']);
 	// NOTREACHED
 }
 
@@ -71,31 +72,31 @@ function tagrm_content(App $a)
 	$o = '';
 
 	if (!local_user()) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 		// NOTREACHED
 	}
 
 	if ($a->argc == 3) {
 		update_tags($a->argv[1], [Strings::escapeTags(trim(hex2bin($a->argv[2])))]);
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 	}
 
 	$item_id = (($a->argc > 1) ? intval($a->argv[1]) : 0);
 	if (!$item_id) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 		// NOTREACHED
 	}
 
 	$item = Item::selectFirst(['tag'], ['id' => $item_id, 'uid' => local_user()]);
 	if (!DBA::isResult($item)) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 	}
 
 	$arr = explode(',', $item['tag']);
 
 
 	if (empty($item['tag'])) {
-		$a->internalRedirect($_SESSION['photo_return']);
+		DI::baseUrl()->redirect($_SESSION['photo_return']);
 	}
 
 	$o .= '<h3>' . L10n::t('Remove Item Tag') . '</h3>';

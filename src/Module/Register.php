@@ -237,7 +237,7 @@ class Register extends BaseModule
 
 				if ($res) {
 					\info(L10n::t('Registration successful. Please check your email for further instructions.') . EOL);
-					$a->internalRedirect();
+					DI::baseUrl()->redirect();
 				} else {
 					\notice(
 						L10n::t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
@@ -247,12 +247,12 @@ class Register extends BaseModule
 				}
 			} else {
 				\info(L10n::t('Registration successful.') . EOL);
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 			}
 		} elseif (intval(Config::get('config', 'register_policy')) === self::APPROVE) {
 			if (!strlen(Config::get('config', 'admin_email'))) {
 				\notice(L10n::t('Your registration can not be processed.') . EOL);
-				$a->internalRedirect();
+				DI::baseUrl()->redirect();
 			}
 
 			// Check if the note to the admin is actually filled out
@@ -260,12 +260,12 @@ class Register extends BaseModule
 				\notice(L10n::t('You have to leave a request note for the admin.')
 					. L10n::t('Your registration can not be processed.') . EOL);
 
-				$a->internalRedirect('register/');
+				DI::baseUrl()->redirect('register/');
 			}
 			// Is there text in the tar pit?
 			if (!empty($_POST['registertarpit'])) {
 				\notice(L10n::t('You have entered too much information.'));
-				$a->internalRedirect('register/');
+				DI::baseUrl()->redirect('register/');
 			}
 
 			Model\Register::createForApproval($user['uid'], Config::get('system', 'language'), $_POST['permonlybox']);
@@ -311,7 +311,7 @@ class Register extends BaseModule
 			);
 
 			\info(L10n::t('Your registration is pending approval by the site owner.') . EOL);
-			$a->internalRedirect();
+			DI::baseUrl()->redirect();
 		}
 
 		return;

@@ -19,7 +19,7 @@ function uimport_post(App $a)
 	}
 
 	if (!empty($_FILES['accountfile'])) {
-		UserImport::importAccount($a, $_FILES['accountfile']);
+		UserImport::importAccount($_FILES['accountfile']);
 		return;
 	}
 }

@@ -30,7 +30,7 @@ class Tos extends BaseAdminModule
 
 		info(L10n::t('The Terms of Service settings have been updated.'));
 
-		DI::app()->internalRedirect('admin/tos');
+		DI::baseUrl()->redirect('admin/tos');
 	}
 
 	public static function content(array $parameters = [])

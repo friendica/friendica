@@ -13,8 +13,6 @@ class FollowConfirm extends BaseModule
 {
 	public static function post(array $parameters = [])
 	{
-		$a = DI::app();
-
 		$uid = local_user();
 		if (!$uid) {
 			notice(L10n::t('Permission denied.') . EOL);
@@ -33,6 +31,6 @@ class FollowConfirm extends BaseModule
 
 		$Intro->confirm($duplex, $hidden);
 
-		$a->internalRedirect('contact/' . intval($cid));
+		DI::baseUrl()->redirect('contact/' . intval($cid));
 	}
 }

@@ -16,12 +16,11 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
-use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
-use Friendica\Protocol\DFRN;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -289,7 +288,7 @@ function cal_content(App $a)
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
 		if ((local_user() !== $owner_uid) && !Feature::isEnabled($owner_uid, "export_calendar")) {
 			notice(L10n::t('Permission denied.') . EOL);
-			$a->internalRedirect('cal/' . $nick);
+			DI::baseUrl()->redirect('cal/' . $nick);
 		}
 
 		// Get the export data by uid
@@ -310,7 +309,7 @@ function cal_content(App $a)
 				$return_path = "cal/" . $nick;
 			}
 
-			$a->internalRedirect($return_path);
+			DI::baseUrl()->redirect($return_path);
 		}
 
 		// If nothing went wrong we can echo the export content

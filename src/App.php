@@ -681,9 +681,9 @@ class App
 			// in install mode, any url loads install module
 			// but we need "view" module for stylesheet
 			if ($this->mode->isInstall() && $moduleName !== 'install') {
-				$this->internalRedirect('install');
+				$this->baseURL->redirect('install');
 			} elseif (!$this->mode->isInstall() && !$this->mode->has(App\Mode::MAINTENANCEDISABLED) && $moduleName !== 'maintenance') {
-				$this->internalRedirect('maintenance');
+				$this->baseURL->redirect('maintenance');
 			} else {
 				$this->checkURL();
 				Core\Update::check($this->getBasePath(), false, $this->mode);
@@ -693,35 +693,35 @@ class App
 
 			// Compatibility with the Android Diaspora client
 			if ($moduleName == 'stream') {
-				$this->internalRedirect('network?order=post');
+				$this->baseURL->redirect('network?order=post');
 			}
 
 			if ($moduleName == 'conversations') {
-				$this->internalRedirect('message');
+				$this->baseURL->redirect('message');
 			}
 
 			if ($moduleName == 'commented') {
-				$this->internalRedirect('network?order=comment');
+				$this->baseURL->redirect('network?order=comment');
 			}
 
 			if ($moduleName == 'liked') {
-				$this->internalRedirect('network?order=comment');
+				$this->baseURL->redirect('network?order=comment');
 			}
 
 			if ($moduleName == 'activity') {
-				$this->internalRedirect('network?conv=1');
+				$this->baseURL->redirect('network?conv=1');
 			}
 
 			if (($moduleName == 'status_messages') && ($this->args->getCommand() == 'status_messages/new')) {
-				$this->internalRedirect('bookmarklet');
+				$this->baseURL->redirect('bookmarklet');
 			}
 
 			if (($moduleName == 'user') && ($this->args->getCommand() == 'user/edit')) {
-				$this->internalRedirect('settings');
+				$this->baseURL->redirect('settings');
 			}
 
 			if (($moduleName == 'tag_followings') && ($this->args->getCommand() == 'tag_followings/manage')) {
-				$this->internalRedirect('search');
+				$this->baseURL->redirect('search');
 			}
 
 			// Initialize module that can set the current theme in the init() method, either directly or via App->profile_uid
@@ -732,21 +732,12 @@ class App
 			$module = $module->determineClass($this->args, $router, $this->config);
 
 			// Let the module run it's internal process (init, get, post, ...)
-			$module->run($this->l10n, $this, $this->logger, $_SERVER, $_POST);
+			$module->run($this->l10n, $this->baseURL, $this->logger, $_SERVER, $_POST);
 		} catch (HTTPException $e) {
 			ModuleHTTPException::rawContent($e);
 		}
 
 		$this->page->run($this, $this->baseURL, $this->mode, $module, $this->l10n, $this->config, $pconfig);
-	}
-
-	/**
-	 * @deprecated 2019.12 use BaseUrl::redirect instead
-	 * @see BaseURL::redirect()
-	 */
-	public function internalRedirect($toUrl = '', $ssl = false)
-	{
-		$this->baseURL->redirect($toUrl, $ssl);
 	}
 
 	/**

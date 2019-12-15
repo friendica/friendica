@@ -12,6 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
@@ -75,7 +76,7 @@ function videos_post(App $a)
 	$owner_uid = $a->data['user']['uid'];
 
 	if (local_user() != $owner_uid) {
-		$a->internalRedirect('videos/' . $a->data['user']['nickname']);
+		DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 	}
 
 	if (($a->argc == 2) && !empty($_POST['delete']) && !empty($_POST['id'])) {
@@ -92,11 +93,11 @@ function videos_post(App $a)
 			], local_user());
 		}
 
-		$a->internalRedirect('videos/' . $a->data['user']['nickname']);
+		DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
-	$a->internalRedirect('videos/' . $a->data['user']['nickname']);
+	DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 }
 
 function videos_content(App $a)
