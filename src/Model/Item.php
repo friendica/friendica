@@ -3655,7 +3655,7 @@ class Item
 			];
 
 			if (!empty($item['plink'])) {
-				$ret["href"] = $a->removeBaseURL($item['plink']);
+				$ret["href"] = DI::baseUrl()->remove($item['plink']);
 				$ret["title"] = L10n::t('link to source');
 			}
 

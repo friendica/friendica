@@ -12,6 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 
@@ -167,7 +168,7 @@ class Nav
 			// user info
 			$contact = DBA::selectFirst('contact', ['micro'], ['uid' => $a->user['uid'], 'self' => true]);
 			$userinfo = [
-				'icon' => (DBA::isResult($contact) ? $a->removeBaseURL($contact['micro']) : 'images/person-48.jpg'),
+				'icon' => (DBA::isResult($contact) ? DI::baseUrl()->remove($contact['micro']) : 'images/person-48.jpg'),
 				'name' => $a->user['username'],
 			];
 		}

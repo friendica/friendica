@@ -655,7 +655,7 @@ function profiles_content(App $a) {
 			$profiles = '';
 			foreach ($r as $rr) {
 				$profiles .= Renderer::replaceMacros($tpl, [
-					'$photo'        => $a->removeBaseURL($rr['thumb']),
+					'$photo'        => DI::baseUrl()->remove($rr['thumb']),
 					'$id'           => $rr['id'],
 					'$alt'          => L10n::t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],

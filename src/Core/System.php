@@ -41,7 +41,7 @@ class System
 	 */
 	public static function removedBaseUrl(string $orig_url)
 	{
-		return DI::app()->removeBaseURL($orig_url);
+		return DI::baseUrl()->remove($orig_url);
 	}
 
 	/**

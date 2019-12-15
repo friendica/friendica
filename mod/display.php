@@ -16,6 +16,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
@@ -326,7 +327,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$title = trim(HTML::toPlaintext(BBCode::convert($item["title"], false), 0, true));
 	$author_name = $item["author-name"];
 
-	$image = $a->removeBaseURL($item["author-avatar"]);
+	$image = DI::baseUrl()->remove($item["author-avatar"]);
 
 	if ($title == "") {
 		$title = $author_name;

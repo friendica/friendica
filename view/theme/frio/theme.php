@@ -17,6 +17,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Module;
 use Friendica\Util\Strings;
@@ -239,7 +240,7 @@ function frio_remote_nav($a, &$nav)
 		// user info
 		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self`", intval($a->user['uid']));
 
-		$r[0]['photo'] = (DBA::isResult($r) ? $a->removeBaseURL($r[0]['micro']) : 'images/person-48.jpg');
+		$r[0]['photo'] = (DBA::isResult($r) ? DI::baseUrl()->remove($r[0]['micro']) : 'images/person-48.jpg');
 		$r[0]['name'] = $a->user['username'];
 	} elseif (!local_user() && remote_user()) {
 		$r = q("SELECT `name`, `nick`, `micro` AS `photo` FROM `contact` WHERE `id` = %d", intval(remote_user()));

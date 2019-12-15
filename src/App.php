@@ -324,21 +324,6 @@ class App
 	}
 
 	/**
-	 * @brief      Removes the base url from an url. This avoids some mixed content problems.
-	 *
-	 * @param string $origURL
-	 *
-	 * @return string The cleaned url
-	 *
-	 * @deprecated 2019.09 - Use BaseURL->remove() instead
-	 * @see        BaseURL::remove()
-	 */
-	public function removeBaseURL(string $origURL)
-	{
-		return $this->baseURL->remove($origURL);
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String
