@@ -111,7 +111,7 @@ class Install extends BaseModule
 				self::checkSetting($configCache, $_POST, 'database', 'database', '');
 
 				// If we cannot connect to the database, return to the previous step
-				if (!self::$installer->checkDB($a->getDBA())) {
+				if (!self::$installer->checkDB(DI::dba())) {
 					self::$currentWizardStep = self::DATABASE_CONFIG;
 				}
 
@@ -135,7 +135,7 @@ class Install extends BaseModule
 				self::checkSetting($configCache, $_POST, 'config', 'admin_email', '');
 
 				// If we cannot connect to the database, return to the Database config wizard
-				if (!self::$installer->checkDB($a->getDBA())) {
+				if (!self::$installer->checkDB(DI::dba())) {
 					self::$currentWizardStep = self::DATABASE_CONFIG;
 					return;
 				}

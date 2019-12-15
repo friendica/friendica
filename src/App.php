@@ -156,16 +156,6 @@ class App
 	}
 
 	/**
-	 * Returns the Database of the Application
-	 *
-	 * @return Database
-	 */
-	public function getDBA()
-	{
-		return $this->database;
-	}
-
-	/**
 	 * @deprecated 2019.09 - use Page->registerStylesheet instead
 	 * @see        Page::registerStylesheet()
 	 */
