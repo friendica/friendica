@@ -13,12 +13,10 @@ use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\Config\Configuration;
 use Friendica\Core\Config\PConfiguration;
 use Friendica\Core\L10n\L10n;
-use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Database\Database;
 use Friendica\Model\Profile;
-use Friendica\Module\Login;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Util\ConfigFileLoader;
@@ -354,30 +352,6 @@ class App
 			FRIENDICA_VERSION . '-' .
 			DB_UPDATE_VERSION . '; ' .
 			$this->getBaseURL();
-	}
-
-	/**
-	 * @deprecated 2019.09 - use Core\Process->isMaxProcessesReached() instead
-	 */
-	public function isMaxProcessesReached()
-	{
-		return $this->process->isMaxProcessesReached();
-	}
-
-	/**
-	 * @deprecated 2019.09 - use Core\Process->isMinMemoryReached() instead
-	 */
-	public function isMinMemoryReached()
-	{
-		return $this->process->isMinMemoryReached();
-	}
-
-	/**
-	 * @deprecated 2019.09 - use Core\Process->isMaxLoadReached() instead
-	 */
-	public function isMaxLoadReached()
-	{
-		return $this->process->isMaxLoadReached();
 	}
 
 	/**

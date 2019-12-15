@@ -56,7 +56,7 @@ class Worker
 		self::$up_start = microtime(true);
 
 		// At first check the maximum load. We shouldn't continue with a high load
-		if ($a->isMaxLoadReached()) {
+		if (DI::process()->isMaxLoadReached()) {
 			Logger::log('Pre check: maximum load reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -78,7 +78,7 @@ class Worker
 		}
 
 		// Do we have too few memory?
-		if ($a->isMinMemoryReached()) {
+		if (DI::process()->isMinMemoryReached()) {
 			Logger::log('Pre check: Memory limit reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -90,7 +90,7 @@ class Worker
 		}
 
 		// Possibly there are too much database processes that block the system
-		if ($a->isMaxProcessesReached()) {
+		if (DI::process()->isMaxProcessesReached()) {
 			Logger::log('Pre check: maximum processes reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -140,7 +140,7 @@ class Worker
 					}
 
 					// Check free memory
-					if ($a->isMinMemoryReached()) {
+					if (DI::process()->isMinMemoryReached()) {
 						Logger::log('Memory limit reached, quitting.', Logger::DEBUG);
 						Lock::release('worker');
 						return;
@@ -251,8 +251,6 @@ class Worker
 	 */
 	public static function execute($queue)
 	{
-		$a = \get_app();
-
 		$mypid = getmypid();
 
 		// Quit when in maintenance
@@ -262,7 +260,7 @@ class Worker
 		}
 
 		// Constantly check the number of parallel database processes
-		if ($a->isMaxProcessesReached()) {
+		if (DI::process()->isMaxProcessesReached()) {
 			Logger::log("Max processes reached for process ".$mypid, Logger::DEBUG);
 			return false;
 		}

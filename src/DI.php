@@ -8,6 +8,7 @@ use Friendica\Core\Config\Configuration;
 use Friendica\Core\Config\PConfiguration;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Lock\ILock;
+use Friendica\Core\Process;
 use Friendica\Core\Session\ISession;
 use Friendica\Database\Database;
 use Friendica\Model\Notify;
@@ -51,6 +52,7 @@ use Psr\Log\LoggerInterface;
  * @method static App\Router router()
  * @method static Database dba()
  * @method static FileSystem fs()
+ * @method static Process process()
  *
  */
 class DI
@@ -82,6 +84,7 @@ class DI
 		'dba'          => Database::class,
 		'fs'           => FileSystem::class,
 		'profiler'     => Profiler::class,
+		'process'      => Process::class,
 	];
 
 	/** @var Dice */
