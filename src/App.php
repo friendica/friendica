@@ -300,18 +300,6 @@ class App
 	}
 
 	/**
-	 * Returns the current hostname
-	 *
-	 * @return string
-	 *
-	 * @deprecated 2019.06 - use BaseURL->getHostname() instead
-	 */
-	public function getHostName()
-	{
-		return $this->baseURL->getHostname();
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String

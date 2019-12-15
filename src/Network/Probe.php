@@ -17,6 +17,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Protocol\ActivityNamespace;
@@ -76,7 +77,7 @@ class Probe
 	 */
 	private static function ownHost($host)
 	{
-		$own_host = \get_app()->getHostName();
+		$own_host = DI::baseUrl()->getHostname();
 
 		$parts = parse_url($host);
 

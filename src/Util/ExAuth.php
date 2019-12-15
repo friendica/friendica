@@ -37,6 +37,7 @@ namespace Friendica\Util;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 
 class ExAuth
@@ -123,8 +124,6 @@ class ExAuth
 	 */
 	private function isUser(array $aCommand)
 	{
-		$a = \get_app();
-
 		// Check if there is a username
 		if (!isset($aCommand[1])) {
 			$this->writeLog(LOG_NOTICE, 'invalid isuser command, no username given');
@@ -140,7 +139,7 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if ($a->getHostName() == $aCommand[2]) {
+		if (DI::baseUrl()->getHostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal user check for ' . $sUser . '@' . $aCommand[2]);
 			$found = DBA::exists('user', ['nickname' => $sUser]);
 		} else {
@@ -205,8 +204,6 @@ class ExAuth
 	 */
 	private function auth(array $aCommand)
 	{
-		$a = \get_app();
-
 		// check user authentication
 		if (sizeof($aCommand) != 4) {
 			$this->writeLog(LOG_NOTICE, 'invalid auth command, data missing');
@@ -222,7 +219,7 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if ($a->getHostName() == $aCommand[2]) {
+		if (DI::baseUrl()->getHostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
 			$aUser = DBA::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);

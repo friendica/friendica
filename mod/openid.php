@@ -22,7 +22,7 @@ function openid_content(App $a) {
 
 	if (!empty($_GET['openid_mode']) && !empty($_SESSION['openid'])) {
 
-		$openid = new LightOpenID($a->getHostName());
+		$openid = new LightOpenID(DI::baseUrl()->getHostname());
 
 		if ($openid->validate()) {
 			$authid = $openid->data['openid_identity'];
@@ -60,7 +60,7 @@ function openid_content(App $a) {
 			Session::set('openid_identity', $authid);
 
 			// Detect the server URL
-			$open_id_obj = new LightOpenID($a->getHostName());
+			$open_id_obj = new LightOpenID(DI::baseUrl()->getHostname());
 			$open_id_obj->identity = $authid;
 			Session::set('openid_server', $open_id_obj->discover($open_id_obj->identity));
 

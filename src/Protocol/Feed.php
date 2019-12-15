@@ -13,6 +13,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\ActivityNamespace;
 use Friendica\Util\ParseUrl;
@@ -465,7 +466,7 @@ class Feed {
 				// Distributed items should have a well formatted URI.
 				// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
 				if ($notify) {
-					$item['guid'] = Item::guidFromUri($orig_plink, $a->getHostName());
+					$item['guid'] = Item::guidFromUri($orig_plink, DI::baseUrl()->getHostname()());
 					unset($item['uri']);
 					unset($item['parent-uri']);
 

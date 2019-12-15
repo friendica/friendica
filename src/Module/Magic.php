@@ -80,7 +80,7 @@ class Magic extends BaseModule
 				$headers = HTTPSignature::createSig(
 					$headers,
 					$user['prvkey'],
-					'acct:' . $user['nickname'] . '@' . $a->getHostName() . (DI::baseUrl()->getUrlPath() ? '/' . DI::baseUrl()->getUrlPath() : '')
+					'acct:' . $user['nickname'] . '@' . DI::baseUrl()->getHostname()() . (DI::baseUrl()->getUrlPath() ? '/' . DI::baseUrl()->getUrlPath() : '')
 				);
 
 				// Try to get an authentication token from the other instance.

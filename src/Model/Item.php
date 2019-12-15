@@ -1279,7 +1279,7 @@ class Item
 		if ($notify) {
 			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
 			// We add the hash of our own host because our host is the original creator of the post.
-			$prefix_host = \get_app()->getHostName();
+			$prefix_host = DI::baseUrl()->getHostname();
 		} else {
 			$prefix_host = '';
 
@@ -2752,8 +2752,6 @@ class Item
 
 	public static function isRemoteSelf($contact, &$datarray)
 	{
-		$a = \get_app();
-
 		if (!$contact['remote_self']) {
 			return false;
 		}
@@ -2765,7 +2763,7 @@ class Item
 		}
 
 		// Prevent to forward already forwarded posts
-		if ($datarray["app"] == $a->getHostName()) {
+		if ($datarray["app"] == DI::baseUrl()->getHostname()) {
 			Logger::log('Already forwarded (second test)', Logger::DEBUG);
 			return false;
 		}

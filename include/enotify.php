@@ -12,6 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
@@ -68,7 +69,7 @@ function notification($params)
 	}
 
 	$sender_name = $sitename;
-	$hostname = $a->getHostName();
+	$hostname = DI::baseUrl()->getHostname();
 	if (strpos($hostname, ':')) {
 		$hostname = substr($hostname, 0, strpos($hostname, ':'));
 	}

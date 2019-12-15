@@ -3563,10 +3563,8 @@ api_register_func('api/friendships/incoming', 'api_friendships_incoming', true);
  */
 function api_statusnet_config($type)
 {
-	$a = \get_app();
-
 	$name      = Config::get('config', 'sitename');
-	$server    = $a->getHostName();
+	$server    = DI::baseUrl()->getHostname();
 	$logo      = System::baseUrl() . '/images/friendica-64.png';
 	$email     = Config::get('config', 'admin_email');
 	$closed    = intval(Config::get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED ? 'true' : 'false';

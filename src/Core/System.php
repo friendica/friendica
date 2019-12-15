@@ -182,7 +182,7 @@ class System
 		if (is_bool($prefix) && !$prefix) {
 			$prefix = '';
 		} elseif (empty($prefix)) {
-			$prefix = hash('crc32', DI::app()->getHostName());
+			$prefix = hash('crc32', DI::baseUrl()->getHostname());
 		}
 
 		while (strlen($prefix) < ($size - 13)) {

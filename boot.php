@@ -482,8 +482,6 @@ function get_server()
 
 function get_temppath()
 {
-	$a = \get_app();
-
 	$temppath = Config::get("system", "temppath");
 
 	if (($temppath != "") && System::isDirectoryUsable($temppath)) {
@@ -500,7 +498,7 @@ function get_temppath()
 		$temppath = BasePath::getRealPath($temppath);
 
 		// To avoid any interferences with other systems we create our own directory
-		$new_temppath = $temppath . "/" . $a->getHostName();
+		$new_temppath = $temppath . "/" . DI::baseUrl()->getHostname();
 		if (!is_dir($new_temppath)) {
 			/// @TODO There is a mkdir()+chmod() upwards, maybe generalize this (+ configurable) into a function/method?
 			mkdir($new_temppath);

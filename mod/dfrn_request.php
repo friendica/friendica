@@ -455,7 +455,7 @@ function dfrn_request_post(App $a)
 			// Diaspora needs the uri in the format user@domain.tld
 			// Diaspora will support the remote subscription in a future version
 			if ($network == Protocol::DIASPORA) {
-				$uri = $nickname . '@' . $a->getHostName();
+				$uri = $nickname . '@' . DI::baseUrl()->getHostname();
 
 				if (DI::baseUrl()->getUrlPath()) {
 					$uri .= '/' . DI::baseUrl()->getUrlPath();

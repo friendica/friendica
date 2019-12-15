@@ -30,7 +30,7 @@ class HostMeta extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('xrd_host.tpl');
 		echo Renderer::replaceMacros($tpl, [
-			'$zhost'  => $app->getHostName(),
+			'$zhost'  => DI::baseUrl()->getHostname()(),
 			'$zroot'  => $app->getBaseURL(),
 			'$domain' => $app->getBaseURL(),
 			'$bigkey' => Salmon::salmonKey($config->get('system', 'site_pubkey'))

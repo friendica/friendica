@@ -21,7 +21,7 @@ class OpenSearch extends BaseModule
 	{
 		header('Content-type: application/opensearchdescription+xml');
 
-		$hostname = DI::app()->getHostName();
+		$hostname = DI::baseUrl()->getHostname()();
 		$baseUrl  = DI::app()->getBaseURL();
 
 		/** @var DOMDocument $xml */
