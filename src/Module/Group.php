@@ -24,7 +24,7 @@ class Group extends BaseModule
 	{
 		$a = DI::app();
 
-		if ($a->isAjax()) {
+		if (DI::mode()->isAjax()) {
 			self::ajaxPost();
 		}
 

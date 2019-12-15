@@ -46,7 +46,7 @@ class Embed extends BaseAdminModule
 
 			info(L10n::t('Theme settings updated.'));
 
-			if ($a->isAjax()) {
+			if (DI::mode()->isAjax()) {
 				return;
 			}
 

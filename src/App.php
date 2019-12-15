@@ -544,15 +544,6 @@ class App
 	}
 
 	/**
-	 * @deprecated 2019.09 - use App\Mode->isAjax() instead
-	 * @see        App\Mode::isAjax()
-	 */
-	public function isAjax()
-	{
-		return $this->mode->isAjax();
-	}
-
-	/**
 	 * @deprecated use Arguments->get() instead
 	 *
 	 * @see        App\Arguments

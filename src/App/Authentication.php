@@ -31,6 +31,8 @@ class Authentication
 {
 	/** @var Configuration */
 	private $config;
+	/** @var App\Mode */
+	private $mode;
 	/** @var App\BaseURL */
 	private $baseUrl;
 	/** @var L10n */
@@ -48,6 +50,7 @@ class Authentication
 	 * Authentication constructor.
 	 *
 	 * @param Configuration   $config
+	 * @param App\Mode        $mode
 	 * @param App\BaseURL     $baseUrl
 	 * @param L10n            $l10n
 	 * @param Database        $dba
@@ -55,9 +58,10 @@ class Authentication
 	 * @param User\Cookie     $cookie
 	 * @param Session\ISession $session
 	 */
-	public function __construct(Configuration $config, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session)
+	public function __construct(Configuration $config, App\Mode $mode, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session)
 	{
 		$this->config  = $config;
+		$this->mode = $mode;
 		$this->baseUrl = $baseUrl;
 		$this->l10n    = $l10n;
 		$this->dba     = $dba;
@@ -404,7 +408,7 @@ class Authentication
 		}
 
 		// Case 2: No valid 2FA session: redirect to code verification page
-		if ($a->isAjax()) {
+		if ($this->mode->isAjax()) {
 			throw new HTTPException\ForbiddenException();
 		} else {
 			$this->baseUrl->redirect('2fa');

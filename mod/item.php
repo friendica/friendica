@@ -878,7 +878,7 @@ function item_content(App $a)
 	$o = '';
 
 	if (($a->argc >= 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
-		if ($a->isAjax()) {
+		if (DI::mode()->isAjax()) {
 			$o = Item::deleteForUser(['id' => $a->argv[2]], local_user());
 		} else {
 			if (!empty($a->argv[3])) {
@@ -889,7 +889,7 @@ function item_content(App $a)
 			}
 		}
 
-		if ($a->isAjax()) {
+		if (DI::mode()->isAjax()) {
 			// ajax return: [<item id>, 0 (no perm) | <owner id>]
 			echo json_encode([intval($a->argv[2]), intval($o)]);
 			exit();

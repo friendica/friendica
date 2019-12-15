@@ -31,7 +31,7 @@ class ItemBody extends BaseModule
 		$item = Item::selectFirst(['body'], ['uid' => local_user(), 'id' => $itemId]);
 
 		if (!empty($item)) {
-			if ($app->isAjax()) {
+			if (DI::mode()->isAjax()) {
 				echo str_replace("\n", '<br />', $item['body']);
 				exit();
 			} else {
