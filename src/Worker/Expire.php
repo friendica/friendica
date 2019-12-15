@@ -12,13 +12,14 @@ use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Item;
 
 class Expire
 {
 	public static function execute($param = '', $hook_function = '')
 	{
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		Hook::loadHooks();
 

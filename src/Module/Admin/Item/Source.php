@@ -4,6 +4,7 @@ namespace Friendica\Module\Admin\Item;
 
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Module\BaseAdminModule;
 
@@ -17,7 +18,7 @@ class Source extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$guid = null;
 		// @TODO: Replace with parameter from router

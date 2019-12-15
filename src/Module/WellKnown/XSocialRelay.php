@@ -3,6 +3,7 @@
 namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Model\Search;
 
 /**
@@ -13,7 +14,7 @@ class XSocialRelay extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		$subscribe = $config->get('system', 'relay_subscribe', false);

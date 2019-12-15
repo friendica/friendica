@@ -14,6 +14,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Content\Text\BBCode;
+use Friendica\DI;
 
 class Tos extends BaseModule
 {
@@ -50,7 +51,7 @@ class Tos extends BaseModule
 	public static function init(array $parameters = [])
 	{
 		if (strlen(Config::get('system','singleuser'))) {
-			self::getApp()->internalRedirect('profile/' . Config::get('system','singleuser'));
+			DI::app()->internalRedirect('profile/' . Config::get('system','singleuser'));
 		}
 	}
 

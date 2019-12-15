@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 
@@ -13,7 +14,7 @@ class RandomProfile extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$contactUrl = GContact::getRandomUrl();
 

@@ -6,6 +6,7 @@ namespace Friendica\Core;
 
 use Friendica\App\BaseURL;
 use Friendica\BaseObject;
+use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\XML;
 
@@ -43,7 +44,7 @@ class System extends BaseObject
 	 */
 	public static function removedBaseUrl(string $orig_url)
 	{
-		return self::getApp()->removeBaseURL($orig_url);
+		return DI::app()->removeBaseURL($orig_url);
 	}
 
 	/**
@@ -184,7 +185,7 @@ class System extends BaseObject
 		if (is_bool($prefix) && !$prefix) {
 			$prefix = '';
 		} elseif (empty($prefix)) {
-			$prefix = hash('crc32', self::getApp()->getHostName());
+			$prefix = hash('crc32', DI::app()->getHostName());
 		}
 
 		while (strlen($prefix) < ($size - 13)) {

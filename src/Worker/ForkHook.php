@@ -6,12 +6,13 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Hook;
+use Friendica\DI;
 
 Class ForkHook
 {
 	public static function execute($name, $hook, $data)
 	{
-		$a = \Friendica\BaseObject::getApp();
+		$a = DI::app();
 
 		Hook::callSingle($a, $name, $hook, $data);
 	}

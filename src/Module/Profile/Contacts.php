@@ -12,6 +12,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -24,7 +25,7 @@ class Contacts extends BaseModule
 			throw new \Friendica\Network\HTTPException\NotFoundException(L10n::t('User not found.'));
 		}
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		//@TODO: Get value from router parameters
 		$nickname = $a->argv[1];

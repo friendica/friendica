@@ -5,6 +5,7 @@ namespace Friendica\Module\Admin;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
@@ -23,7 +24,7 @@ class Queue extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		// @TODO: Replace with parameter from router
 		$deferred = $a->argc > 2 && $a->argv[2] == 'deferred';

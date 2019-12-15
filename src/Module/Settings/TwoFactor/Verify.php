@@ -13,6 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\DI;
 use Friendica\Module\BaseSettingsModule;
 use Friendica\Module\Login;
 use PragmaRX\Google2FA\Google2FA;
@@ -34,12 +35,12 @@ class Verify extends BaseSettingsModule
 		$verified = PConfig::get(local_user(), '2fa', 'verified');
 
 		if ($secret && $verified) {
-			self::getApp()->internalRedirect('settings/2fa');
+			DI::app()->internalRedirect('settings/2fa');
 		}
 
 		if (!self::checkFormSecurityToken('settings_2fa_password', 't')) {
 			notice(L10n::t('Please enter your password to access this page.'));
-			self::getApp()->internalRedirect('settings/2fa');
+			DI::app()->internalRedirect('settings/2fa');
 		}
 	}
 
@@ -62,7 +63,7 @@ class Verify extends BaseSettingsModule
 
 				notice(L10n::t('Two-factor authentication successfully activated.'));
 
-				self::getApp()->internalRedirect('settings/2fa');
+				DI::app()->internalRedirect('settings/2fa');
 			} else {
 				notice(L10n::t('Invalid code, please retry.'));
 			}

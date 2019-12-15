@@ -7,6 +7,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\DI;
 use Friendica\Network\HTTPException\ForbiddenException;
 
 require_once 'boot.php';
@@ -50,7 +51,7 @@ abstract class BaseAdminModule extends BaseModule
 
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (!is_site_admin()) {
 			notice(L10n::t('Please login to continue.'));

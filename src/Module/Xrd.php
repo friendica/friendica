@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityNamespace;
@@ -19,7 +20,7 @@ class Xrd extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if ($app->argv[0] == 'xrd') {

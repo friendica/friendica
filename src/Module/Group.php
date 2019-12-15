@@ -12,6 +12,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Util\Strings;
 
@@ -21,7 +22,7 @@ class Group extends BaseModule
 {
 	public static function post(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->isAjax()) {
 			self::ajaxPost();
@@ -71,7 +72,7 @@ class Group extends BaseModule
 	public static function ajaxPost()
 	{
 		try {
-			$a = self::getApp();
+			$a = DI::app();
 
 			if (!local_user()) {
 				throw new \Exception(L10n::t('Permission denied.'), 403);
@@ -140,7 +141,7 @@ class Group extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$a->page['aside'] = Model\Group::sidebarWidget('contact', 'group', 'extended', (($a->argc > 1) ? $a->argv[1] : 'everyone'));
 

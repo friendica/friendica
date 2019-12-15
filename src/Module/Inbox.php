@@ -10,6 +10,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
@@ -21,7 +22,7 @@ class Inbox extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$postdata = Network::postdata();
 

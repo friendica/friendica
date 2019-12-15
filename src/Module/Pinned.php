@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Model\Item;
 
 /**
@@ -30,7 +31,7 @@ class Pinned extends BaseModule
 		$returnPath = $_REQUEST['return'] ?? '';
 		if (!empty($returnPath)) {
 			$rand = '_=' . time() . (strpos($returnPath, '?') ? '&' : '?') . 'rand';
-			self::getApp()->internalRedirect($returnPath . $rand);
+			DI::app()->internalRedirect($returnPath . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

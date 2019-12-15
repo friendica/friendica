@@ -7,6 +7,7 @@ namespace Friendica\Core;
 use Friendica\App;
 use Friendica\BaseObject;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Util\Strings;
 
 /**
@@ -75,7 +76,7 @@ class Hook extends BaseObject
 	 */
 	public static function register($hook, $file, $function, $priority = 0)
 	{
-		$file = str_replace(self::getApp()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
+		$file = str_replace(DI::app()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
 
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
 		if (DBA::exists('hook', $condition)) {
@@ -98,7 +99,7 @@ class Hook extends BaseObject
 	 */
 	public static function unregister($hook, $file, $function)
 	{
-		$relative_file = str_replace(self::getApp()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
+		$relative_file = str_replace(DI::app()->getBasePath() . DIRECTORY_SEPARATOR, '', $file);
 
 		// This here is only needed for fixing a problem that existed on the develop branch
 		$condition = ['hook' => $hook, 'file' => $file, 'function' => $function];
@@ -148,7 +149,7 @@ class Hook extends BaseObject
 						if ($hook[0] != $fork_hook[0]) {
 							continue;
 						}
-						self::callSingle(self::getApp(), 'hook_fork', $fork_hook, $hookdata);
+						self::callSingle(DI::app(), 'hook_fork', $fork_hook, $hookdata);
 					}
 
 					if (!$hookdata['execute']) {
@@ -175,7 +176,7 @@ class Hook extends BaseObject
 	{
 		if (array_key_exists($name, self::$hooks)) {
 			foreach (self::$hooks[$name] as $hook) {
-				self::callSingle(self::getApp(), $name, $hook, $data);
+				self::callSingle(DI::app(), $name, $hook, $data);
 			}
 		}
 	}

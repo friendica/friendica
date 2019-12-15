@@ -14,6 +14,7 @@ use Friendica\Core\StorageManager;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\GServer;
@@ -29,7 +30,7 @@ class CronJobs
 {
 	public static function execute($command = '')
 	{
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		// No parameter set? So return
 		if ($command == '') {

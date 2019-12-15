@@ -9,6 +9,7 @@ namespace Friendica\Worker;
 use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
+use Friendica\DI;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\ActivityPub;
 
@@ -18,7 +19,7 @@ class ProfileUpdate {
 			return;
 		}
 
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		$inboxes = ActivityPub\Transmitter::fetchTargetInboxesforUser($uid);
 

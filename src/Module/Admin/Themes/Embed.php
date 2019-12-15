@@ -4,6 +4,7 @@ namespace Friendica\Module\Admin\Themes;
 
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Util\Strings;
 
@@ -11,7 +12,7 @@ class Embed extends BaseAdminModule
 {
 	public static function init(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->argc > 2) {
 			// @TODO: Replace with parameter from router
@@ -27,7 +28,7 @@ class Embed extends BaseAdminModule
 	{
 		parent::post($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->argc > 2) {
 			// @TODO: Replace with parameter from router
@@ -57,7 +58,7 @@ class Embed extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->argc > 2) {
 			// @TODO: Replace with parameter from router

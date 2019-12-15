@@ -11,6 +11,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -41,7 +42,7 @@ class Notifier
 {
 	public static function execute($cmd, $target_id)
 	{
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		Logger::info('Invoked', ['cmd' => $cmd, 'target' => $target_id]);
 

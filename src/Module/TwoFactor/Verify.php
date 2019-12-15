@@ -8,6 +8,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\DI;
 use PragmaRX\Google2FA\Google2FA;
 
 /**
@@ -28,7 +29,7 @@ class Verify extends BaseModule
 		if (($_POST['action'] ?? '') == 'verify') {
 			self::checkFormSecurityTokenRedirectOnError('2fa', 'twofactor_verify');
 
-			$a = self::getApp();
+			$a = DI::app();
 
 			$code = $_POST['verify_code'] ?? '';
 
@@ -51,12 +52,12 @@ class Verify extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		if (!local_user()) {
-			self::getApp()->internalRedirect();
+			DI::app()->internalRedirect();
 		}
 
 		// Already authenticated with 2FA token
 		if (Session::get('2fa')) {
-			self::getApp()->internalRedirect();
+			DI::app()->internalRedirect();
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('twofactor/verify.tpl'), [

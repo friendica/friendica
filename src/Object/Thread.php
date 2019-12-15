@@ -7,6 +7,7 @@ namespace Friendica\Object;
 use Friendica\BaseObject;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Util\Security;
 
@@ -52,7 +53,7 @@ class Thread extends BaseObject
 			return;
 		}
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		switch ($mode) {
 			case 'network':

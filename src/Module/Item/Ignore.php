@@ -8,6 +8,7 @@ use Friendica\Core\L10n\L10n;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Network\HTTPException;
 
@@ -69,7 +70,7 @@ class Ignore extends BaseModule
 				$rand = "?$rand";
 			}
 
-			self::getApp()->internalRedirect($return_path . $rand);
+			DI::app()->internalRedirect($return_path . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

@@ -9,6 +9,7 @@ use Friendica\App\Authentication;
 use Friendica\Core\Logger;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use OAuthServer;
 use OAuthSignatureMethod_HMAC_SHA1;
 use OAuthSignatureMethod_PLAINTEXT;
@@ -37,7 +38,7 @@ class FKOAuth1 extends OAuthServer
 	public function loginUser($uid)
 	{
 		Logger::log("FKOAuth1::loginUser $uid");
-		$a = BaseObject::getApp();
+		$a = DI::app();
 		$record = DBA::selectFirst('user', [], ['uid' => $uid, 'blocked' => 0, 'account_expired' => 0, 'account_removed' => 0, 'verified' => 1]);
 
 		if (!DBA::isResult($record)) {

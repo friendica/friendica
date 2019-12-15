@@ -6,6 +6,7 @@ use Friendica\App\Arguments;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Util\Strings;
 
 class Saved extends BaseModule
@@ -39,6 +40,6 @@ class Saved extends BaseModule
 			}
 		}
 
-		self::getApp()->internalRedirect($return_url);
+		DI::app()->internalRedirect($return_url);
 	}
 }

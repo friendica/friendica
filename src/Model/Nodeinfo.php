@@ -5,6 +5,7 @@ namespace Friendica\Model;
 use Friendica\BaseObject;
 use Friendica\Core\Addon;
 use Friendica\Database\DBA;
+use Friendica\DI;
 
 /**
  * Model interaction for the nodeinfo
@@ -18,7 +19,7 @@ class Nodeinfo extends BaseObject
 	 */
 	public static function update()
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 		$logger = $app->getLogger();
 

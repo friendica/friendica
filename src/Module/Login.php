@@ -13,6 +13,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\DI;
 use Friendica\Util\Strings;
 
 /**
@@ -24,7 +25,7 @@ class Login extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (local_user()) {
 			$a->internalRedirect();
@@ -56,7 +57,7 @@ class Login extends BaseModule
 			/** @var Authentication $authentication */
 			$authentication = self::getClass(Authentication::class);
 			$authentication->withPassword(
-				self::getApp(),
+				DI::app(),
 				trim($_POST['username']),
 				trim($_POST['password']),
 				!empty($_POST['remember'])
@@ -80,7 +81,7 @@ class Login extends BaseModule
 	 */
 	public static function form($return_path = null, $register = false, $hiddens = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		$o = '';
 
 		$noid = Config::get('system', 'no_openid');
@@ -132,7 +133,7 @@ class Login extends BaseModule
 		$o .= Renderer::replaceMacros(
 			$tpl,
 			[
-				'$dest_url'     => self::getApp()->getBaseURL(true) . '/login',
+				'$dest_url'     => DI::app()->getBaseURL(true) . '/login',
 				'$logout'       => L10n::t('Logout'),
 				'$login'        => L10n::t('Login'),
 

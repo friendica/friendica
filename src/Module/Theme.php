@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Util\Strings;
 
 /**
@@ -14,7 +15,7 @@ class Theme extends BaseModule
 	{
 		header("Content-Type: text/css");
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->argc == 4) {
 			$theme = $a->argv[2];

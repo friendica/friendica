@@ -5,6 +5,7 @@ namespace Friendica\Module\Diaspora;
 use Friendica\BaseModule;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
@@ -19,7 +20,7 @@ class Fetch extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if (($app->argc != 3) || (!in_array($app->argv[1], ["post", "status_message", "reshare"]))) {

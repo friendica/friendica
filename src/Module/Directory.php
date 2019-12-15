@@ -10,6 +10,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
@@ -23,7 +24,7 @@ class Directory extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		if (($config->get('system', 'block_public') && !Session::isAuthenticated()) ||

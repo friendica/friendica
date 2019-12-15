@@ -5,6 +5,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Strings;
 
@@ -16,7 +17,7 @@ class Maintenance extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$config = self::getApp()->getConfig();
+		$config = DI::app()->getConfig();
 
 		$reason = $config->get('system', 'maintenance_reason');
 

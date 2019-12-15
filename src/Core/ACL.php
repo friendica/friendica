@@ -9,6 +9,7 @@ namespace Friendica\Core;
 use Friendica\App\Page;
 use Friendica\BaseObject;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 
@@ -35,7 +36,7 @@ class ACL extends BaseObject
 	 */
 	public static function getSuggestContactSelectHTML($selname, $selclass, array $options = [], array $preselected = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$networks = null;
 
@@ -145,7 +146,7 @@ class ACL extends BaseObject
 	 */
 	public static function getMessageContactSelectHTML($selname, $selclass, array $preselected = [], $size = 4, $tabindex = null)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$o = '';
 

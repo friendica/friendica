@@ -5,6 +5,7 @@ namespace Friendica\Module\Admin\Blocklist;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Util\Strings;
 
@@ -47,14 +48,14 @@ class Server extends BaseAdminModule
 			info(L10n::t('Site blocklist updated.') . EOL);
 		}
 
-		self::getApp()->internalRedirect('admin/blocklist/server');
+		DI::app()->internalRedirect('admin/blocklist/server');
 	}
 
 	public static function content(array $parameters = [])
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$blocklist = Config::get('system', 'blocklist');
 		$blocklistform = [];

@@ -344,7 +344,7 @@ function drop_items(array $items)
 
 function drop_item($id, $return = '')
 {
-	$a = BaseObject::getApp();
+	$a = Friendica\DI::app();
 
 	// locate item to be deleted
 

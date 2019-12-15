@@ -17,7 +17,7 @@ $dice = $dice->addRule(Friendica\App\Mode::class, ['call' => [['determineRunMode
 
 \Friendica\BaseObject::setDependencyInjection($dice);
 
-$a = \Friendica\BaseObject::getApp();
+$a = \Friendica\DI::app();
 
 $a->runFrontend(
 	$dice->create(\Friendica\App\Module::class),

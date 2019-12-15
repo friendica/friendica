@@ -1370,7 +1370,7 @@ function api_get_item(array $condition)
  */
 function api_users_show($type)
 {
-	$a = BaseObject::getApp();
+	$a = Friendica\DI::app();
 
 	$user_info = api_get_user($a);
 
@@ -2968,7 +2968,7 @@ function api_format_items_profiles($profile_row)
  */
 function api_format_items($items, $user_info, $filter_user = false, $type = "json")
 {
-	$a = BaseObject::getApp();
+	$a = Friendica\DI::app();
 
 	$ret = [];
 
@@ -3002,7 +3002,7 @@ function api_format_items($items, $user_info, $filter_user = false, $type = "jso
  */
 function api_format_item($item, $type = "json", $status_user = null, $author_user = null, $owner_user = null)
 {
-	$a = BaseObject::getApp();
+	$a = Friendica\DI::app();
 
 	if (empty($status_user) || empty($author_user) || empty($owner_user)) {
 		list($status_user, $author_user, $owner_user) = api_item_get_user($a, $item);

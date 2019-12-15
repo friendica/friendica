@@ -10,6 +10,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettingsModule;
 use Friendica\Network\HTTPException;
@@ -22,7 +23,7 @@ class Delegation extends BaseSettingsModule
 {
 	public static function post(array $parameters = [])
 	{
-		if (!local_user() || !empty(self::getApp()->user['uid']) && self::getApp()->user['uid'] != local_user()) {
+		if (!local_user() || !empty(DI::app()->user['uid']) && DI::app()->user['uid'] != local_user()) {
 			throw new HTTPException\ForbiddenException(L10n::t('Permission denied.'));
 		}
 
@@ -64,7 +65,7 @@ class Delegation extends BaseSettingsModule
 		if ($action === 'add' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				self::getApp()->internalRedirect('settings/delegation');
+				DI::app()->internalRedirect('settings/delegation');
 			}
 
 			$user = User::getById($user_id, ['nickname']);
@@ -80,17 +81,17 @@ class Delegation extends BaseSettingsModule
 				notice(L10n::t('Delegate user not found.'));
 			}
 
-			self::getApp()->internalRedirect('settings/delegation');
+			DI::app()->internalRedirect('settings/delegation');
 		}
 
 		if ($action === 'remove' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				self::getApp()->internalRedirect('settings/delegation');
+				DI::app()->internalRedirect('settings/delegation');
 			}
 
 			DBA::delete('manage', ['uid' => $user_id, 'mid' => local_user()]);
-			self::getApp()->internalRedirect('settings/delegation');
+			DI::app()->internalRedirect('settings/delegation');
 		}
 
 		// find everybody that currently has delegated management to this account/page

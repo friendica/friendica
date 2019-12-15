@@ -7,6 +7,7 @@ use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model\User;
 
 /**
@@ -17,7 +18,7 @@ class Friendica extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		$visibleAddonList = Addon::getVisibleList();
@@ -90,7 +91,7 @@ class Friendica extends BaseModule
 
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if ($app->argc <= 1 || ($app->argv[1] !== 'json')) {

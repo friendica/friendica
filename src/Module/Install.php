@@ -8,6 +8,7 @@ use Friendica\Core;
 use Friendica\Core\Config\Cache\ConfigCache;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Network\HTTPException;
 use Friendica\Util\BasePath;
 use Friendica\Util\Strings;
@@ -48,7 +49,7 @@ class Install extends BaseModule
 
 	public static function init(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (!$a->getMode()->isInstall()) {
 			throw new HTTPException\ForbiddenException();
@@ -78,7 +79,7 @@ class Install extends BaseModule
 
 	public static function post(array $parameters = [])
 	{
-		$a           = self::getApp();
+		$a           = DI::app();
 		$configCache = $a->getConfigCache();
 
 		switch (self::$currentWizardStep) {
@@ -151,7 +152,7 @@ class Install extends BaseModule
 
 	public static function content(array $parameters = [])
 	{
-		$a           = self::getApp();
+		$a           = DI::app();
 		$configCache = $a->getConfigCache();
 
 		$output = '';

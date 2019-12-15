@@ -15,6 +15,7 @@ use Friendica\Core\StorageManager;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Model\Storage\IStorage;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
@@ -202,7 +203,7 @@ class Photo extends BaseObject
 	 */
 	private static function getFields()
 	{
-		$allfields = DBStructure::definition(self::getApp()->getBasePath(), false);
+		$allfields = DBStructure::definition(DI::app()->getBasePath(), false);
 		$fields = array_keys($allfields["photo"]["fields"]);
 		array_splice($fields, array_search("data", $fields), 1);
 		return $fields;

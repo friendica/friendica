@@ -19,6 +19,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Photo;
@@ -1093,7 +1094,7 @@ class BBCode extends BaseObject
 		$text = Cache::get($cache_key);
 
 		if (is_null($text)) {
-			$a = self::getApp();
+			$a = DI::app();
 
 			$stamp1 = microtime(true);
 
@@ -1149,7 +1150,7 @@ class BBCode extends BaseObject
 
 	private static function cleanPictureLinksCallback($match)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// When the picture link is the own photo path then we can avoid fetching the link
 		$own_photo_url = preg_quote(Strings::normaliseLink($a->getBaseURL()) . '/photos/');
@@ -1253,7 +1254,7 @@ class BBCode extends BaseObject
 	 */
 	public static function convert($text, $try_oembed = true, $simple_html = 0, $for_plaintext = false)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		/*
 		 * preg_match_callback function to replace potential Oembed tags with Oembed content
@@ -2010,7 +2011,7 @@ class BBCode extends BaseObject
 	 */
 	public static function toMarkdown($text, $for_diaspora = true)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$original_text = $text;
 

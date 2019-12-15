@@ -5,6 +5,7 @@ namespace Friendica\Module\Admin\Logs;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Util\Strings;
 use Psr\Log\LogLevel;
@@ -34,14 +35,14 @@ class Settings extends BaseAdminModule
 		}
 
 		info(L10n::t("Log settings updated."));
-		self::getApp()->internalRedirect('admin/logs');
+		DI::app()->internalRedirect('admin/logs');
 	}
 
 	public static function content(array $parameters = [])
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$log_choices = [
 			LogLevel::ERROR   => 'Error',

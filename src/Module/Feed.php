@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Protocol\OStatus;
 
 /**
@@ -25,7 +26,7 @@ class Feed extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$last_update = $_GET['last_update'] ?? '';
 		$nocache     = !empty($_GET['nocache']) && local_user();

@@ -7,6 +7,7 @@ namespace Friendica\Core;
 
 use Exception;
 use Friendica\BaseObject;
+use Friendica\DI;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Render\ITemplateEngine;
 
@@ -61,7 +62,7 @@ class Renderer extends BaseObject
 	public static function replaceMacros($s, array $vars = [])
 	{
 		$stamp1 = microtime(true);
-		$a = self::getApp();
+		$a = DI::app();
 
 		// pass $baseurl to all templates if it isn't set
 		$vars = array_merge(['$baseurl' => $a->getBaseURL()], $vars);
@@ -92,7 +93,7 @@ class Renderer extends BaseObject
 	public static function getMarkupTemplate($s, $root = '')
 	{
 		$stamp1 = microtime(true);
-		$a = self::getApp();
+		$a = DI::app();
 		$t = self::getTemplateEngine();
 
 		try {

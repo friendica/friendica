@@ -14,6 +14,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Module\BaseSettingsModule;
 
 /**
@@ -65,18 +66,18 @@ class UserExport extends BaseSettingsModule
 		if ($args->getArgc() == 3) {
 			// @TODO Replace with router-provided arguments
 			$action = $args->get(2);
-			$user = self::getApp()->user;
+			$user = DI::app()->user;
 			switch ($action) {
 				case "backup":
 					header("Content-type: application/json");
 					header('Content-Disposition: attachment; filename="' . $user['nickname'] . '.' . $action . '"');
-					self::exportAll(self::getApp());
+					self::exportAll(DI::app());
 					exit();
 					break;
 				case "account":
 					header("Content-type: application/json");
 					header('Content-Disposition: attachment; filename="' . $user['nickname'] . '.' . $action . '"');
-					self::exportAccount(self::getApp());
+					self::exportAccount(DI::app());
 					exit();
 					break;
 				case "contact":
@@ -92,7 +93,7 @@ class UserExport extends BaseSettingsModule
 	}
 	private static function exportMultiRow(string $query)
 	{
-		$dbStructure = DBStructure::definition(self::getApp()->getBasePath(), false);
+		$dbStructure = DBStructure::definition(DI::app()->getBasePath(), false);
 
 		preg_match("/\s+from\s+`?([a-z\d_]+)`?/i", $query, $match);
 		$table = $match[1];
@@ -119,7 +120,7 @@ class UserExport extends BaseSettingsModule
 
 	private static function exportRow(string $query)
 	{
-		$dbStructure = DBStructure::definition(self::getApp()->getBasePath(), false);
+		$dbStructure = DBStructure::definition(DI::app()->getBasePath(), false);
 
 		preg_match("/\s+from\s+`?([a-z\d_]+)`?/i", $query, $match);
 		$table = $match[1];

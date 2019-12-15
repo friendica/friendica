@@ -9,6 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\ForbiddenException;
@@ -25,7 +26,7 @@ class Delegation extends BaseModule
 		}
 
 		$uid = local_user();
-		$orig_record = self::getApp()->user;
+		$orig_record = DI::app()->user;
 
 		if (Session::get('submanage')) {
 			$user = User::getById(Session::get('submanage'));
@@ -82,7 +83,7 @@ class Delegation extends BaseModule
 
 		/** @var Authentication $authentication */
 		$authentication = self::getClass(Authentication::class);
-		$authentication->setForUser(self::getApp(), $user, true, true);
+		$authentication->setForUser(DI::app(), $user, true, true);
 
 		if ($limited_id) {
 			Session::set('submanage', $original_id);
@@ -91,7 +92,7 @@ class Delegation extends BaseModule
 		$ret = [];
 		Hook::callAll('home_init', $ret);
 
-		self::getApp()->internalRedirect('profile/' . self::getApp()->user['nickname']);
+		DI::app()->internalRedirect('profile/' . DI::app()->user['nickname']);
 		// NOTREACHED
 	}
 
@@ -101,7 +102,7 @@ class Delegation extends BaseModule
 			throw new ForbiddenException(L10n::t('Permission denied.'));
 		}
 
-		$identities = self::getApp()->identities;
+		$identities = DI::app()->identities;
 
 		//getting additinal information for each identity
 		foreach ($identities as $key => $identity) {
@@ -112,7 +113,7 @@ class Delegation extends BaseModule
 
 			$identities[$key]['thumb'] = $thumb['thumb'];
 
-			$identities[$key]['selected'] = ($identity['nickname'] === self::getApp()->user['nickname']);
+			$identities[$key]['selected'] = ($identity['nickname'] === DI::app()->user['nickname']);
 
 			$condition = ["`uid` = ? AND `msg` != '' AND NOT (`type` IN (?, ?)) AND NOT `seen`", $identity['uid'], NOTIFY_INTRO, NOTIFY_MAIL];
 			$params = ['distinct' => true, 'expression' => 'parent'];

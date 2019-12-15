@@ -7,6 +7,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\BaseAdminModule;
@@ -19,7 +20,7 @@ class Users extends BaseAdminModule
 	{
 		parent::post($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$pending     = $_POST['pending']           ?? [];
 		$users       = $_POST['user']              ?? [];
@@ -135,7 +136,7 @@ class Users extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->argc > 3) {
 			// @TODO: Replace with parameter from router

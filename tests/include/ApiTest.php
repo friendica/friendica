@@ -15,6 +15,7 @@ use Friendica\Core\Session;
 use Friendica\Core\Session\ISession;
 use Friendica\Core\System;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPException;
 use Friendica\Test\Util\Database\StaticDatabase;
@@ -87,7 +88,7 @@ class ApiTest extends DatabaseTest
 		$this->loadFixture(__DIR__ . '/../datasets/api.fixture.php', $dba);
 
 		/** @var App app */
-		$this->app = BaseObject::getApp();
+		$this->app = DI::app();
 
 		$this->app->argc = 1;
 		$this->app->argv = ['home'];

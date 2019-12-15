@@ -12,6 +12,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
 
@@ -19,7 +20,7 @@ class Cron
 {
 	public static function execute()
 	{
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		$last = Config::get('system', 'last_cron');
 

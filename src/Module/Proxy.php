@@ -9,6 +9,7 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\HTTPSignature;
@@ -33,7 +34,7 @@ class Proxy extends BaseModule
 	public static function init(array $parameters = [])
 	{
 		// Set application instance here
-		$a = self::getApp();
+		$a = DI::app();
 
 		/*
 		 * Pictures are stored in one of the following ways:
@@ -156,7 +157,7 @@ class Proxy extends BaseModule
 	 */
 	private static function getRequestInfo()
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		$size = 1024;
 		$sizetype = '';
 
@@ -230,7 +231,7 @@ class Proxy extends BaseModule
 	 */
 	private static function setupDirectCache()
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		$basepath = $a->getBasePath();
 
 		// If the cache path isn't there, try to create it

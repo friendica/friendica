@@ -21,6 +21,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;
@@ -2513,7 +2514,7 @@ class Item extends BaseObject
 			$guid = System::createUUID();
 		}
 
-		return self::getApp()->getBaseURL() . '/objects/' . $guid;
+		return DI::app()->getBaseURL() . '/objects/' . $guid;
 	}
 
 	/**
@@ -3474,7 +3475,7 @@ class Item extends BaseObject
 	 */
 	private static function addRedirToImageTags(array &$item)
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		$matches = [];
 		$cnt = preg_match_all('|\[img\](http[^\[]*?/photo/[a-fA-F0-9]+?(-[0-9]\.[\w]+?)?)\[\/img\]|', $item['body'], $matches, PREG_SET_ORDER);
@@ -3509,7 +3510,7 @@ class Item extends BaseObject
 	 */
 	public static function prepareBody(array &$item, $attach = false, $is_preview = false)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		Hook::callAll('prepare_body_init', $item);
 
 		// In order to provide theme developers more possibilities, event items
@@ -3647,7 +3648,7 @@ class Item extends BaseObject
 	 */
 	public static function getPlink($item)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->user['nickname'] != "") {
 			$ret = [

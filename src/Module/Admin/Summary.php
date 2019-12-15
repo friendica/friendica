@@ -10,6 +10,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -24,7 +25,7 @@ class Summary extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		// are there MyISAM tables in the DB? If so, trigger a warning message
 		$warningtext = [];
@@ -208,7 +209,7 @@ class Summary extends BaseAdminModule
 	private static function checkSelfHostMeta()
 	{
 		// Fetch the host-meta to check if this really is a vital server
-		return Network::curl(self::getApp()->getBaseURL() . '/.well-known/host-meta')->isSuccess();
+		return Network::curl(DI::app()->getBaseURL() . '/.well-known/host-meta')->isSuccess();
 	}
 
 }

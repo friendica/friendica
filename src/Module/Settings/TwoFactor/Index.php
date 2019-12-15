@@ -8,6 +8,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\DI;
 use Friendica\Model\TwoFactor\AppSpecificPassword;
 use Friendica\Model\TwoFactor\RecoveryCode;
 use Friendica\Model\User;
@@ -38,7 +39,7 @@ class Index extends BaseSettingsModule
 
 						PConfig::set(local_user(), '2fa', 'secret', $Google2FA->generateSecretKey(32));
 
-						self::getApp()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::app()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'disable':
@@ -49,22 +50,22 @@ class Index extends BaseSettingsModule
 						Session::remove('2fa');
 
 						notice(L10n::t('Two-factor authentication successfully disabled.'));
-						self::getApp()->internalRedirect('settings/2fa');
+						DI::app()->internalRedirect('settings/2fa');
 					}
 					break;
 				case 'recovery':
 					if ($has_secret) {
-						self::getApp()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::app()->internalRedirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'app_specific':
 					if ($has_secret) {
-						self::getApp()->internalRedirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::app()->internalRedirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 				case 'configure':
 					if (!$verified) {
-						self::getApp()->internalRedirect('settings/2fa/verify?t=' . self::getFormSecurityToken('settings_2fa_password'));
+						DI::app()->internalRedirect('settings/2fa/verify?t=' . self::getFormSecurityToken('settings_2fa_password'));
 					}
 					break;
 			}

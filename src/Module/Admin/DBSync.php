@@ -8,6 +8,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 
 class DBSync extends BaseAdminModule
@@ -16,7 +17,7 @@ class DBSync extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$o = '';
 

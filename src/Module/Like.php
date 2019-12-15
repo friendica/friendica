@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Core\Session;
 use Friendica\Network\HTTPException;
@@ -25,7 +26,7 @@ class Like extends BaseModule
 			$verb = 'like';
 		}
 
-		$app = self::getApp();
+		$app = DI::app();
 
 		// @TODO: Replace with parameter from router
 		$itemId = (($app->argc > 1) ? Strings::escapeTags(trim($app->argv[1])) : 0);

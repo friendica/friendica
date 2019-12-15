@@ -14,6 +14,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -204,7 +205,7 @@ class Transmitter
 	{
 		return ['type' => 'Service',
 			'name' =>  FRIENDICA_PLATFORM . " '" . FRIENDICA_CODENAME . "' " . FRIENDICA_VERSION . '-' . DB_UPDATE_VERSION,
-			'url' => BaseObject::getApp()->getBaseURL()];
+			'url' => DI::app()->getBaseURL()];
 	}
 
 	/**

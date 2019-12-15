@@ -31,18 +31,7 @@ class BaseObject
 	public static function setDependencyInjection(Dice $dice)
 	{
 		self::$dice = $dice;
-	}
-
-	/**
-	 * Get the app
-	 *
-	 * Same as get_app from boot.php
-	 *
-	 * @return App
-	 */
-	public static function getApp()
-	{
-		return self::getClass(App::class);
+		DI::init($dice);
 	}
 
 	/**

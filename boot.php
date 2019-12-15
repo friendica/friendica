@@ -23,8 +23,8 @@ use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
-use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Term;
 use Friendica\Util\BasePath;
@@ -241,12 +241,12 @@ if (!defined('CURLE_OPERATION_TIMEDOUT')) {
  * Useful in functions which require it but don't get it passed to them
  *
  * @deprecated since version 2018.09
- * @see BaseObject::getApp()
+ * @see DI::app()
  * @return App
  */
 function get_app()
 {
-	return BaseObject::getApp();
+	return DI::app();
 }
 
 /**

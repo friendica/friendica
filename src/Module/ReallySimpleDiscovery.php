@@ -3,6 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Util\XML;
 
 /**
@@ -15,7 +16,7 @@ class ReallySimpleDiscovery extends BaseModule
 	{
 		header('Content-Type: text/xml');
 
-		$app = self::getApp();
+		$app = DI::app();
 		$xml = null;
 		echo XML::fromArray([
 			'rsd' => [

@@ -36,7 +36,7 @@ $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['worker']]);
 
 BaseObject::setDependencyInjection($dice);
-$a = BaseObject::getApp();
+$a = Friendica\DI::app();
 
 // Check the database structure and possibly fixes it
 Update::check($a->getBasePath(), true, $a->getMode());

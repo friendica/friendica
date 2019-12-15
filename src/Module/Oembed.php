@@ -4,6 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content;
+use Friendica\DI;
 use Friendica\Util\Strings;
 
 /**
@@ -19,7 +20,7 @@ class Oembed extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// Unused form: /oembed/b2h?url=...
 		if ($a->argv[1] == 'b2h') {

@@ -8,6 +8,7 @@ namespace Friendica\Content\Text;
 
 use Friendica\BaseObject;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Contact;
 
 /**
@@ -43,7 +44,7 @@ class Markdown extends BaseObject
 
 		$html = $MarkdownParser->transform($text);
 
-		self::getApp()->getProfiler()->saveTimestamp($stamp1, "parser", System::callstack());
+		DI::app()->getProfiler()->saveTimestamp($stamp1, "parser", System::callstack());
 
 		return $html;
 	}

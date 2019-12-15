@@ -7,6 +7,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\ActivityPub;
 
@@ -17,7 +18,7 @@ class Objects extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (empty($a->argv[1])) {
 			throw new \Friendica\Network\HTTPException\NotFoundException();

@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 
 /**
  * Home module - Landing page of the current node
@@ -14,7 +15,7 @@ class Home extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		// currently no returned data is used

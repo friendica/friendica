@@ -4,6 +4,7 @@ namespace Friendica\Module\Search;
 
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
+use Friendica\DI;
 use Friendica\Module\BaseSearchModule;
 use Friendica\Module\Login;
 use Friendica\Util\Strings;
@@ -22,7 +23,7 @@ class Directory extends BaseSearchModule
 
 		$search = Strings::escapeTags(trim(rawurldecode($_REQUEST['search'] ?? '')));
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (empty($a->page['aside'])) {
 			$a->page['aside'] = '';

@@ -14,6 +14,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Util\Strings;
 
@@ -123,7 +124,7 @@ class Register extends BaseModule
 			'$ask_password' => $ask_password,
 			'$password1'    => ['password1', L10n::t('New Password:'), '', L10n::t('Leave empty for an auto generated password.')],
 			'$password2'    => ['confirm', L10n::t('Confirm:'), '', ''],
-			'$nickdesc'     => L10n::t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', self::getApp()->getHostName()),
+			'$nickdesc'     => L10n::t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::app()->getHostName()),
 			'$nicklabel'    => L10n::t('Choose a nickname: '),
 			'$photo'        => $photo,
 			'$publish'      => $profile_publish,
@@ -131,7 +132,7 @@ class Register extends BaseModule
 			'$username'     => $username,
 			'$email'        => $email,
 			'$nickname'     => $nickname,
-			'$sitename'     => self::getApp()->getHostName(),
+			'$sitename'     => DI::app()->getHostName(),
 			'$importh'      => L10n::t('Import'),
 			'$importt'      => L10n::t('Import your profile to this friendica instance'),
 			'$showtoslink'  => Config::get('system', 'tosdisplay'),
@@ -156,7 +157,7 @@ class Register extends BaseModule
 	{
 		BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$arr = ['post' => $_POST];
 		Hook::callAll('register_post', $arr);

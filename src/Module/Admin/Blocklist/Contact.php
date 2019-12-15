@@ -6,6 +6,7 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Model;
 
@@ -38,14 +39,14 @@ class Contact extends BaseAdminModule
 			notice(L10n::tt('%s contact unblocked', '%s contacts unblocked', count($contacts)));
 		}
 
-		self::getApp()->internalRedirect('admin/blocklist/contact');
+		DI::app()->internalRedirect('admin/blocklist/contact');
 	}
 
 	public static function content(array $parameters = [])
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$condition = ['uid' => 0, 'blocked' => true];
 

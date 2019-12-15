@@ -4,6 +4,7 @@ namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Protocol\Salmon;
 use Friendica\Util\Crypto;
 
@@ -15,7 +16,7 @@ class HostMeta extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		header('Content-type: text/xml');

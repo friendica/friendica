@@ -14,6 +14,7 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact as ContactModel;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
@@ -35,7 +36,7 @@ class Profile extends BaseModule
 
 	public static function init(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if ($a->argc < 2) {
@@ -77,7 +78,7 @@ class Profile extends BaseModule
 
 	public static function content(array $parameters = [], $update = 0)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (!$update) {
 			ProfileModel::load($a, self::$which, self::$profile);

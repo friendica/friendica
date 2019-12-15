@@ -6,6 +6,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
 
@@ -16,7 +17,7 @@ class Outbox extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if (empty($a->argv[1])) {

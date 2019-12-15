@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Util\XML;
 
@@ -18,13 +19,13 @@ class SaveTag extends BaseModule
 	{
 		if (!local_user()) {
 			info(L10n::t('You must be logged in to use this module'));
-			self::getApp()->internalRedirect();
+			DI::app()->internalRedirect();
 		}
 	}
 
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		$logger = $a->getLogger();
 
 		$term = XML::unescape(trim($_GET['term'] ?? ''));

@@ -7,6 +7,7 @@
 namespace Friendica\Core;
 
 use Friendica\BaseObject;
+use Friendica\DI;
 use Friendica\Model\Profile;
 use Friendica\Util\Strings;
 
@@ -194,7 +195,7 @@ class Theme
 	 */
 	public static function getPathForFile($file)
 	{
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		$theme = $a->getCurrentTheme();
 
@@ -232,7 +233,7 @@ class Theme
 			return 'view/theme/' . $theme . '/style.css';
 		}
 
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		$query_params = [];
 

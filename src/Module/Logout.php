@@ -12,6 +12,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Profile;
 
 /**
@@ -39,7 +40,7 @@ class Logout extends BaseModule
 			System::externalRedirect($visitor_home);
 		} else {
 			info(L10n::t('Logged out.'));
-			self::getApp()->internalRedirect();
+			DI::app()->internalRedirect();
 		}
 	}
 }

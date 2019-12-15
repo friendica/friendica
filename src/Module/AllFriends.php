@@ -7,6 +7,7 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -18,7 +19,7 @@ class AllFriends extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		if (!local_user()) {
 			throw new HTTPException\ForbiddenException();

@@ -37,7 +37,7 @@ $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['daemon']]);
 
 \Friendica\BaseObject::setDependencyInjection($dice);
-$a = \Friendica\BaseObject::getApp();
+$a = \Friendica\DI::app();
 
 if ($a->getMode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");

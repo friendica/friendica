@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Content;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
+use Friendica\DI;
 
 /**
  * Prints the possible Smilies of this node
@@ -14,7 +15,7 @@ class Smilies extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		if (!empty($app->argv[1]) && ($app->argv[1] === "json")) {
 			$smilies = Content\Smilies::getList();

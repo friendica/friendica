@@ -18,6 +18,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
@@ -121,7 +122,7 @@ class Post extends BaseObject
 	 */
 	public function getTemplateData(array $conv_responses, $thread_level = 1)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$item = $this->getData();
 		$edited = false;
@@ -815,7 +816,7 @@ class Post extends BaseObject
 	 */
 	private function getDefaultText()
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (!local_user()) {
 			return '';
@@ -862,7 +863,7 @@ class Post extends BaseObject
 	 */
 	private function getCommentBox($indent)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$comment_box = '';
 		$conv = $this->getThread();
@@ -945,7 +946,7 @@ class Post extends BaseObject
 	 */
 	protected function checkWallToWall()
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		$conv = $this->getThread();
 		$this->wall_to_wall = false;
 

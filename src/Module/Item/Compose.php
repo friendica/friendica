@@ -12,6 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\FileTag;
 use Friendica\Model\Group;
@@ -29,7 +30,7 @@ class Compose extends BaseModule
 		if (!empty($_REQUEST['body'])) {
 			$_REQUEST['return'] = 'network';
 			require_once 'mod/item.php';
-			item_post(self::getApp());
+			item_post(DI::app());
 		} else {
 			notice(L10n::t('Please enter a post body.'));
 		}
@@ -41,7 +42,7 @@ class Compose extends BaseModule
 			return Login::form('compose', false);
 		}
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if ($a->getCurrentTheme() !== 'frio') {
 			throw new NotImplementedException(L10n::t('This feature is only available with the frio theme.'));

@@ -5,6 +5,7 @@ namespace Friendica\Util;
 use Friendica\BaseObject;
 use Friendica\Core\Config;
 use Friendica\Core\System;
+use Friendica\DI;
 
 /**
  * @brief Proxy utilities class
@@ -63,7 +64,7 @@ class Proxy
 	public static function proxifyUrl($url, $writemode = false, $size = '')
 	{
 		// Get application instance
-		$a = BaseObject::getApp();
+		$a = DI::app();
 
 		// Trim URL first
 		$url = trim($url);

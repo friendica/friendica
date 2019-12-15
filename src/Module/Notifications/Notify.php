@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\BaseObject;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Notify as ModelNotify;
 use Friendica\Network\HTTPException;
 
@@ -23,7 +24,7 @@ class Notify extends BaseModule
 
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if ($a->argc > 2 && $a->argv[1] === 'mark' && $a->argv[2] === 'all') {
@@ -47,7 +48,7 @@ class Notify extends BaseModule
 	 */
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		// @TODO: Replace with parameter from router
 		if ($a->argc > 2 && $a->argv[1] === 'view' && intval($a->argv[2])) {

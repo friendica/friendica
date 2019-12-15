@@ -3,6 +3,7 @@
 namespace Friendica\Module\Filer;
 
 use Friendica\BaseModule;
+use Friendica\DI;
 use Friendica\Model\FileTag;
 use Friendica\Network\HTTPException;
 use Friendica\Util\XML;
@@ -18,7 +19,7 @@ class RemoveTag extends BaseModule
 			throw new HTTPException\ForbiddenException();
 		}
 
-		$app = self::getApp();
+		$app = DI::app();
 		$logger = $app->getLogger();
 
 		$item_id = (($app->argc > 1) ? intval($app->argv[1]) : 0);

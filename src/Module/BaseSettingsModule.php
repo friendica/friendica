@@ -6,12 +6,13 @@ use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 
 class BaseSettingsModule extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$tpl = Renderer::getMarkupTemplate('settings/head.tpl');
 		$a->page['htmlhead'] .= Renderer::replaceMacros($tpl, [

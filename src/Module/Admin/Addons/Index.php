@@ -5,6 +5,7 @@ namespace Friendica\Module\Admin\Addons;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 
 class Index extends BaseAdminModule
@@ -13,7 +14,7 @@ class Index extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		// reload active themes
 		if (!empty($_GET['action'])) {

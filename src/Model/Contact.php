@@ -16,6 +16,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
@@ -1738,7 +1739,7 @@ class Contact extends BaseObject
 	 */
 	public static function getPostsFromUrl($contact_url, $thread_mode = false, $update = 0)
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$cid = self::getIdForURL($contact_url);
 

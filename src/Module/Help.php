@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\L10n;
+use Friendica\DI;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Strings;
 
@@ -21,7 +22,7 @@ class Help extends BaseModule
 		$text = '';
 		$filename = '';
 
-		$a = self::getApp();
+		$a = DI::app();
 		$config = $a->getConfig();
 		$lang = $config->get('system', 'language');
 

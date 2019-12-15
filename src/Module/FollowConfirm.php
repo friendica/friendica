@@ -4,6 +4,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Model\Introduction;
+use Friendica\DI;
 
 /**
  * Process follow request confirmations
@@ -12,7 +13,7 @@ class FollowConfirm extends BaseModule
 {
 	public static function post(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 
 		$uid = local_user();
 		if (!$uid) {

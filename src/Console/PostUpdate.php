@@ -57,7 +57,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\BaseObject::getApp();
+		$a = \Friendica\DI::app();
 
 		if ($this->getOption($this->helpOptions)) {
 			$this->out($this->getHelp());

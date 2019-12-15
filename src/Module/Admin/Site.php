@@ -10,6 +10,7 @@ use Friendica\Core\StorageManager;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Module\Register;
 use Friendica\Protocol\PortableContact;
@@ -27,7 +28,7 @@ class Site extends BaseAdminModule
 
 		self::checkFormSecurityTokenRedirectOnError('/admin/site', 'admin_site');
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		if (!empty($_POST['republish_directory'])) {
 			Worker::add(PRIORITY_LOW, 'Directory');
@@ -416,7 +417,7 @@ class Site extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		/* Installed langs */
 		$lang_choices = L10n::getAvailableLanguages();

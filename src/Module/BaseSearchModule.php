@@ -9,6 +9,7 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Search\ContactResult;
@@ -33,7 +34,7 @@ class BaseSearchModule extends BaseModule
 	 */
 	public static function performSearch($search, $prefix = '')
 	{
-		$a      = self::getApp();
+		$a      = DI::app();
 		$config = $a->getConfig();
 
 		$type = Search::TYPE_ALL;
@@ -97,7 +98,7 @@ class BaseSearchModule extends BaseModule
 			return '';
 		}
 
-		$a = self::getApp();
+		$a = DI::app();
 
 		$id      = 0;
 		$entries = [];

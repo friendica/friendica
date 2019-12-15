@@ -7,6 +7,7 @@ namespace Friendica\Core;
 use Friendica\BaseObject;
 use Friendica\Core;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Process;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -1232,11 +1233,11 @@ class Worker
 	 */
 	public static function defer()
 	{
-		if (empty(BaseObject::getApp()->queue)) {
+		if (empty(DI::app()->queue)) {
 			return false;
 		}
 
-		$queue = BaseObject::getApp()->queue;
+		$queue = DI::app()->queue;
 
 		$retrial = $queue['retrial'];
 		$id = $queue['id'];

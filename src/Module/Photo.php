@@ -9,6 +9,7 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Photo as MPhoto;
 use Friendica\Object\Image;
 
@@ -25,7 +26,7 @@ class Photo extends BaseModule
 	 */
 	public static function init(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		// @TODO: Replace with parameter from router
 		if ($a->argc <= 1 || $a->argc > 4) {
 			throw new \Friendica\Network\HTTPException\BadRequestException();

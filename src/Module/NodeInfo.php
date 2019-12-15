@@ -6,6 +6,7 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
 use Friendica\Core\System;
+use Friendica\DI;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -15,7 +16,7 @@ class NodeInfo extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = self::getApp();
+		$app = DI::app();
 
 		if ($parameters['version'] == '1.0') {
 			self::printNodeInfo1($app);

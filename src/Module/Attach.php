@@ -10,6 +10,7 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Model\Attach as MAttach;
 
 /**
@@ -22,7 +23,7 @@ class Attach extends BaseModule
 	 */
 	public static function rawContent(array $parameters = [])
 	{
-		$a = self::getApp();
+		$a = DI::app();
 		if ($a->argc != 2) {
 			throw new \Friendica\Network\HTTPException\BadRequestException();
 		}

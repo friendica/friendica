@@ -6,6 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Email;
@@ -24,7 +25,7 @@ class Invite extends BaseModule
 
 		self::checkFormSecurityTokenRedirectOnError('/', 'send_invite');
 
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		$max_invites = intval($config->get('system', 'max_invites'));
@@ -110,7 +111,7 @@ class Invite extends BaseModule
 			throw new HTTPException\ForbiddenException(L10n::t('Permission denied.'));
 		}
 
-		$app = self::getApp();
+		$app = DI::app();
 		$config = $app->getConfig();
 
 		$inviteOnly = false;

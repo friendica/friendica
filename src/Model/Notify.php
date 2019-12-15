@@ -12,6 +12,7 @@ use Friendica\Core\L10n\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -515,7 +516,7 @@ final class Notify extends BaseObject
 		$ident    = self::PERSONAL;
 		$notifies = [];
 
-		$myurl     = str_replace('http://', '', self::getApp()->contact['nurl']);
+		$myurl     = str_replace('http://', '', DI::app()->contact['nurl']);
 		$diasp_url = str_replace('/profile/', '/u/', $myurl);
 
 		$condition = ["NOT `wall` AND `uid` = ? AND (`item`.`author-id` = ? OR `item`.`tag` REGEXP ? OR `item`.`tag` REGEXP ?)",
@@ -669,7 +670,7 @@ final class Notify extends BaseObject
 			// We have to distinguish between these two because they use different data.
 			// Contact suggestions
 			if ($intro['fid']) {
-				$return_addr = bin2hex(self::getApp()->user['nickname'] . '@' .
+				$return_addr = bin2hex(DI::app()->user['nickname'] . '@' .
 				                       $this->baseUrl->getHostName() .
 				                       (($this->baseUrl->getURLPath()) ? '/' . $this->baseUrl->getURLPath() : ''));
 

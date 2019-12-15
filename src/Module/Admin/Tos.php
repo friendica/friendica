@@ -5,6 +5,7 @@ namespace Friendica\Module\Admin;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 
 class Tos extends BaseAdminModule
@@ -29,7 +30,7 @@ class Tos extends BaseAdminModule
 
 		info(L10n::t('The Terms of Service settings have been updated.'));
 
-		self::getApp()->internalRedirect('admin/tos');
+		DI::app()->internalRedirect('admin/tos');
 	}
 
 	public static function content(array $parameters = [])
