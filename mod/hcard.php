@@ -7,6 +7,7 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Session;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
@@ -50,7 +51,7 @@ function hcard_init(App $a)
 
 	$a->page['htmlhead'] .= '<meta name="dfrn-global-visibility" content="' . (($a->profile['net-publish']) ? 'true' : 'false') . '" />' . "\r\n";
 	$a->page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . System::baseUrl() . '/dfrn_poll/' . $which .'" />' . "\r\n";
-	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->getHostName() . (($a->getURLPath()) ? '/' . $a->getURLPath() : ''));
+	$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $a->getHostName() . ((DI::baseUrl()->getUrlPath()) ? '/' . DI::baseUrl()->getUrlPath() : ''));
 	$a->page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . System::baseUrl() . '/xrd/?uri=' . $uri . '" />' . "\r\n";
 	header('Link: <' . System::baseUrl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 

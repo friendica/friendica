@@ -242,7 +242,7 @@ class Site extends BaseAdminModule
 			Worker::add(PRIORITY_LOW, 'Directory');
 		}
 
-		if ($a->getURLPath() != "") {
+		if (DI::baseUrl()->getUrlPath() != "") {
 			$diaspora_enabled = false;
 		}
 		if ($ssl_policy != intval(Config::get('system', 'ssl_policy'))) {
@@ -523,7 +523,7 @@ class Site extends BaseAdminModule
 			'develop' => L10n::t('check the development version')
 		];
 
-		$diaspora_able = ($a->getURLPath() == '');
+		$diaspora_able = (DI::baseUrl()->getUrlPath() == '');
 
 		$optimize_max_tablesize = Config::get('system', 'optimize_max_tablesize', -1);
 

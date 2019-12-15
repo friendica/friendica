@@ -312,18 +312,6 @@ class App
 	}
 
 	/**
-	 * Returns the sub-path of the full URL
-	 *
-	 * @return string
-	 *
-	 * @deprecated 2019.06 - use BaseURL->getUrlPath() instead
-	 */
-	public function getURLPath()
-	{
-		return $this->baseURL->getUrlPath();
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String

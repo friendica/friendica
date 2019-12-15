@@ -457,8 +457,8 @@ function dfrn_request_post(App $a)
 			if ($network == Protocol::DIASPORA) {
 				$uri = $nickname . '@' . $a->getHostName();
 
-				if ($a->getURLPath()) {
-					$uri .= '/' . $a->getURLPath();
+				if (DI::baseUrl()->getUrlPath()) {
+					$uri .= '/' . DI::baseUrl()->getUrlPath();
 				}
 
 				$uri = urlencode($uri);
@@ -610,7 +610,7 @@ function dfrn_request_content(App $a)
 		} elseif (!empty($_GET['address'])) {
 			$myaddr = $_GET['address'];
 		} elseif (local_user()) {
-			if (strlen($a->getURLPath())) {
+			if (strlen(DI::baseUrl()->getUrlPath())) {
 				$myaddr = System::baseUrl() . '/profile/' . $a->user['nickname'];
 			} else {
 				$myaddr = $a->user['nickname'] . '@' . substr(System::baseUrl(), strpos(System::baseUrl(), '://') + 3);

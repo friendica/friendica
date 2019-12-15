@@ -2271,7 +2271,7 @@ class Contact
 
 		if (($protocol === Protocol::DFRN) && !DBA::isResult($contact)) {
 			if ($interactive) {
-				if (strlen($a->getURLPath())) {
+				if (strlen(DI::baseUrl()->getUrlPath())) {
 					$myaddr = bin2hex(System::baseUrl() . '/profile/' . $a->user['nickname']);
 				} else {
 					$myaddr = bin2hex($a->user['nickname'] . '@' . $a->getHostName());
