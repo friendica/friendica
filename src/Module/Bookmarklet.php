@@ -20,7 +20,7 @@ class Bookmarklet extends BaseModule
 		$_GET['mode'] = 'minimal';
 
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		if (!local_user()) {
 			$output = '<h2>' . L10n::t('Login') . '</h2>';

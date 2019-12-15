@@ -10,8 +10,7 @@ class Manifest extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$tpl = Renderer::getMarkupTemplate('manifest.tpl');
 

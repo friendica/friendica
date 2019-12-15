@@ -2,10 +2,8 @@
 
 namespace Friendica\Module;
 
-use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
-use Friendica\Core\System;
 use Friendica\DI;
 
 /**
@@ -16,12 +14,10 @@ class NodeInfo extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = DI::app();
-
 		if ($parameters['version'] == '1.0') {
-			self::printNodeInfo1($app);
+			self::printNodeInfo1();
 		} elseif ($parameters['version'] == '2.0') {
-			self::printNodeInfo2($app);
+			self::printNodeInfo2();
 		} else {
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
@@ -30,13 +26,11 @@ class NodeInfo extends BaseModule
 	/**
 	 * Return the supported services
 	 *
-	 * @param App $app
-	 *
 	 * @return array with supported services
 	*/
-	private static function getUsage(App $app)
+	private static function getUsage()
 	{
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$usage = [];
 
@@ -56,11 +50,9 @@ class NodeInfo extends BaseModule
 	/**
 	 * Return the supported services
 	 *
-	 * @param App $app
-	 *
 	 * @return array with supported services
 	*/
-	private static function getServices(App $app)
+	private static function getServices()
 	{
 		$services = [
 			'inbound'  => [],
@@ -117,12 +109,10 @@ class NodeInfo extends BaseModule
 
 	/**
 	 * Print the nodeinfo version 1
-	 *
-	 * @param App $app
 	 */
-	private static function printNodeInfo1(App $app)
+	private static function printNodeInfo1()
 	{
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$nodeinfo = [
 			'version'           => '1.0',
@@ -156,9 +146,9 @@ class NodeInfo extends BaseModule
 			$nodeinfo['protocols']['outbound'][] = 'gnusocial';
 		}
 
-		$nodeinfo['usage'] = self::getUsage($app);
+		$nodeinfo['usage'] = self::getUsage();
 
-		$nodeinfo['services'] = self::getServices($app);
+		$nodeinfo['services'] = self::getServices();
 
 		$nodeinfo['metadata']['protocols'] = $nodeinfo['protocols'];
 		$nodeinfo['metadata']['protocols']['outbound'][] = 'atom1.0';
@@ -180,12 +170,10 @@ class NodeInfo extends BaseModule
 
 	/**
 	 * Print the nodeinfo version 2
-	 *
-	 * @param App $app
 	 */
-	private static function printNodeInfo2(App $app)
+	private static function printNodeInfo2()
 	{
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$imap = (function_exists('imap_open') && !$config->get('system', 'imap_disabled') && !$config->get('system', 'dfrn_only'));
 
@@ -212,9 +200,9 @@ class NodeInfo extends BaseModule
 			$nodeinfo['protocols'][] = 'ostatus';
 		}
 
-		$nodeinfo['usage'] = self::getUsage($app);
+		$nodeinfo['usage'] = self::getUsage();
 
-		$nodeinfo['services'] = self::getServices($app);
+		$nodeinfo['services'] = self::getServices();
 
 		if (Addon::isEnabled('twitter')) {
 			$nodeinfo['services']['inbound'][] = 'twitter';

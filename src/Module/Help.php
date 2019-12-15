@@ -23,7 +23,7 @@ class Help extends BaseModule
 		$filename = '';
 
 		$a = DI::app();
-		$config = $a->getConfig();
+		$config = DI::config();
 		$lang = $config->get('system', 'language');
 
 		// @TODO: Replace with parameter from router

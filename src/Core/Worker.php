@@ -1086,7 +1086,7 @@ class Worker
 		$args = ['no_cron' => !$do_cron];
 
 		$a = get_app();
-		$process = new Core\Process($a->getLogger(), $a->getMode(), $a->getConfig(), $a->getBasePath());
+		$process = new Core\Process($a->getLogger(), $a->getMode(), DI::config(), $a->getBasePath());
 		$process->run($command, $args);
 
 		// after spawning we have to remove the flag.

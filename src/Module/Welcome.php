@@ -14,7 +14,7 @@ class Welcome extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$config = DI::app()->getConfig();
+		$config = DI::config();
 
 		$mail_disabled   = ((function_exists('imap_open') &&
 		                     (!$config->get('system', 'imap_disabled'))));

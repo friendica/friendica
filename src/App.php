@@ -145,16 +145,6 @@ class App
 	}
 
 	/**
-	 * Returns the current config of this node
-	 *
-	 * @return Configuration
-	 */
-	public function getConfig()
-	{
-		return $this->config;
-	}
-
-	/**
 	 * The basepath of this app
 	 *
 	 * @return string

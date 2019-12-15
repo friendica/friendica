@@ -19,7 +19,7 @@ class Nodeinfo
 	public static function update()
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 		$logger = $app->getLogger();
 
 		// If the addon 'statistics_json' is enabled then disable it and activate nodeinfo.

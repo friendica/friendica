@@ -16,7 +16,7 @@ class Home extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		// currently no returned data is used
 		$ret = [];

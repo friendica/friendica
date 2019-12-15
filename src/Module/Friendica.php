@@ -19,7 +19,7 @@ class Friendica extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$visibleAddonList = Addon::getVisibleList();
 		if (!empty($visibleAddonList)) {
@@ -98,7 +98,7 @@ class Friendica extends BaseModule
 			return;
 		}
 
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$register_policies = [
 			Register::CLOSED  => 'REGISTER_CLOSED',

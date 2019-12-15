@@ -115,7 +115,7 @@ class Summary extends BaseAdminModule
 		$configCache = new Config\Cache\ConfigCache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');
-		$currBasepath = $a->getConfig()->get('system', 'basepath');
+		$currBasepath = DI::config()->get('system', 'basepath');
 		if ($confBasepath !== $currBasepath || !is_dir($currBasepath)) {
 			if (is_dir($confBasepath) && Config::set('system', 'basepath', $confBasepath)) {
 				$a->getLogger()->info('Friendica\'s system.basepath was updated successfully.', [

@@ -25,7 +25,7 @@ class Directory extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		if (($config->get('system', 'block_public') && !Session::isAuthenticated()) ||
 			($config->get('system', 'block_local_dir') && !Session::isAuthenticated())) {

@@ -17,7 +17,7 @@ class HostMeta extends BaseModule
 	public static function rawContent(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		header('Content-type: text/xml');
 

@@ -35,7 +35,7 @@ class BaseSearchModule extends BaseModule
 	public static function performSearch($search, $prefix = '')
 	{
 		$a      = DI::app();
-		$config = $a->getConfig();
+		$config = DI::config();
 
 		$type = Search::TYPE_ALL;
 

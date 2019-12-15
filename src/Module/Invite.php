@@ -26,7 +26,7 @@ class Invite extends BaseModule
 		self::checkFormSecurityTokenRedirectOnError('/', 'send_invite');
 
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$max_invites = intval($config->get('system', 'max_invites'));
 		if (!$max_invites) {
@@ -112,7 +112,7 @@ class Invite extends BaseModule
 		}
 
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$inviteOnly = false;
 

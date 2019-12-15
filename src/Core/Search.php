@@ -92,8 +92,7 @@ class Search
 	 */
 	public static function getContactsFromGlobalDirectory($search, $type = self::TYPE_ALL, $page = 1)
 	{
-		$config = DI::app()->getConfig();
-		$server = $config->get('system', 'directory', self::DEFAULT_DIRECTORY);
+		$server = DI::config()->get('system', 'directory', self::DEFAULT_DIRECTORY);
 
 		$searchUrl = $server . '/search';
 
@@ -158,7 +157,7 @@ class Search
 	 */
 	public static function getContactsFromLocalDirectory($search, $type = self::TYPE_ALL, $start = 0, $itemPage = 80)
 	{
-		$config = DI::app()->getConfig();
+		$config = DI::config();
 
 		$diaspora = $config->get('system', 'diaspora_enabled') ? Protocol::DIASPORA : Protocol::DFRN;
 		$ostatus  = !$config->get('system', 'ostatus_disabled') ? Protocol::OSTATUS : Protocol::DFRN;

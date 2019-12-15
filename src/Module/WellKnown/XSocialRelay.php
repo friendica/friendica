@@ -15,7 +15,7 @@ class XSocialRelay extends BaseModule
 	public static function rawContent(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = $app->getConfig();
+		$config = DI::config();
 
 		$subscribe = $config->get('system', 'relay_subscribe', false);
 

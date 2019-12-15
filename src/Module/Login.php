@@ -87,7 +87,7 @@ class Login extends BaseModule
 		}
 
 		$reg = false;
-		if ($register && intval($a->getConfig()->get('config', 'register_policy')) !== Register::CLOSED) {
+		if ($register && intval(DI::config()->get('config', 'register_policy')) !== Register::CLOSED) {
 			$reg = [
 				'title' => L10n::t('Create a New Account'),
 				'desc' => L10n::t('Register'),
