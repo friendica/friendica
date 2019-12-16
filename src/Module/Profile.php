@@ -289,7 +289,7 @@ class Profile extends BaseModule
 
 			//  check if we serve a mobile device and get the user settings
 			//  accordingly
-			if ($a->is_mobile) {
+			if (DI::mode()->isMobile()) {
 				$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 10);
 			} else {
 				$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 20);

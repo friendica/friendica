@@ -35,7 +35,7 @@ function frio_init(App $a)
 
 	// if the device is a mobile device set js is_mobile
 	// variable so the js scripts can use this information
-	if ($a->is_mobile || $a->is_tablet) {
+	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
 		$a->page['htmlhead'] .= <<< EOT
 			<script type="text/javascript">
 				var is_mobile = 1;

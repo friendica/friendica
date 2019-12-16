@@ -66,10 +66,6 @@ class App
 	public $timezone;
 	public $interactive = true;
 	public $identities;
-	/** @deprecated 2019.09 - Use App\Mode->isMobile() instead */
-	public $is_mobile;
-	/** @deprecated 2019.09 - Use App\Mode->isTable() instead */
-	public $is_tablet;
 	public $theme_info = [];
 	public $category;
 	// Allow themes to control internal parameters
@@ -182,9 +178,6 @@ class App
 		$this->query_string = $args->getQueryString();
 		$this->module       = $module->getName();
 		$this->page         = $page;
-
-		$this->is_mobile = $mode->isMobile();
-		$this->is_tablet = $mode->isTablet();
 
 		$this->load();
 	}

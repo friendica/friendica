@@ -571,7 +571,7 @@ class Profile
 		$a = \get_app();
 		$o = '';
 
-		if (!local_user() || $a->is_mobile || $a->is_tablet) {
+		if (!local_user() || DI::mode()->isMobile() || DI::mode()->isMobile()) {
 			return $o;
 		}
 
@@ -668,7 +668,7 @@ class Profile
 		$a = \get_app();
 		$o = '';
 
-		if (!local_user() || $a->is_mobile || $a->is_tablet) {
+		if (!local_user() || DI::mode()->isMobile() || DI::mode()->isMobile()) {
 			return $o;
 		}
 

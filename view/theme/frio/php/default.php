@@ -22,7 +22,7 @@ if (!isset($minimal)) {
 
 $basepath = DI::baseUrl()->getUrlPath() ? "/" . DI::baseUrl()->getUrlPath() . "/" : "/";
 $frio = "view/theme/frio";
-$view_mode_class = ($a->is_mobile || $a->is_tablet) ? 'mobile-view' : 'desktop-view';
+$view_mode_class = (DI::mode()->isMobile() || DI::mode()->isMobile()) ? 'mobile-view' : 'desktop-view';
 $is_singleuser = Config::get('system', 'singleuser');
 $is_singleuser_class = $is_singleuser ? "is-singleuser" : "is-not-singleuser";
 ?>

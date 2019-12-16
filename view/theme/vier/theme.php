@@ -36,7 +36,7 @@ function vier_init(App $a)
 		$a->page['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
 	}
 
-	if ($a->is_mobile || $a->is_tablet) {
+	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
 		$a->page['htmlhead'] .= '<meta name=viewport content="width=device-width, initial-scale=1">'."\n";
 		$a->page['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="view/theme/vier/mobile.css" media="screen"/>'."\n";
 	}
@@ -64,7 +64,7 @@ function cmtBbClose(id) {
 </script>
 EOT;
 
-	if ($a->is_mobile || $a->is_tablet) {
+	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
 		$a->page['htmlhead'] .= <<< EOT
 <script>
 	$(document).ready(function() {
