@@ -58,7 +58,7 @@ function suggest_content(App $a)
 	if (!empty($_GET['ignore'])) {
 		// <form> can't take arguments in its "action" parameter
 		// so add any arguments as hidden inputs
-		$query = explode_querystring($a->query_string);
+		$query = explode_querystring(DI::args()->getQueryString());
 		$inputs = [];
 		foreach ($query['args'] as $arg) {
 			if (strpos($arg, 'confirm=') === false) {

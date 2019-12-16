@@ -94,7 +94,7 @@ class Login extends BaseModule
 		}
 
 		if (is_null($return_path)) {
-			$return_path = $a->query_string;
+			$return_path = DI::args()->getQueryString();
 		}
 
 		if (local_user()) {

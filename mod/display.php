@@ -320,7 +320,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$o .= "<script> var netargs = '?f=&item_id=" . $item_id . "'; </script>";
 	}
 
-	$o .= conversation($a, [$item], new Pager($a->query_string), 'display', $update_uid, false, 'commented', $item_uid);
+	$o .= conversation($a, [$item], new Pager(DI::args()->getQueryString()), 'display', $update_uid, false, 'commented', $item_uid);
 
 	// Preparing the meta header
 	$description = trim(HTML::toPlaintext(BBCode::convert($item["body"], false), 0, true));

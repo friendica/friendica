@@ -257,7 +257,7 @@ class Profile extends BaseModule
 				return '';
 			}
 
-			$pager = new Pager($a->query_string);
+			$pager = new Pager(DI::args()->getQueryString());
 		} else {
 			$sql_post_table = "";
 
@@ -301,7 +301,7 @@ class Profile extends BaseModule
 				$itemspage_network = $a->force_max_items;
 			}
 
-			$pager = new Pager($a->query_string, $itemspage_network);
+			$pager = new Pager(DI::args()->getQueryString(), $itemspage_network);
 
 			$pager_sql = sprintf(" LIMIT %d, %d ", $pager->getStart(), $pager->getItemsPerPage());
 

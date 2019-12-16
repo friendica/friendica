@@ -46,13 +46,11 @@ class Contact extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = DI::app();
-
 		$condition = ['uid' => 0, 'blocked' => true];
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager($a->query_string, 30);
+		$pager = new Pager(DI::args()->getQueryString(), 30);
 
 		$contacts = Model\Contact::selectToArray([], $condition, ['limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
 

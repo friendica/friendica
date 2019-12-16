@@ -63,7 +63,7 @@ function network_init(App $a)
 
 	// convert query string to array. remove friendica args
 	$query_array = [];
-	parse_str(parse_url($a->query_string, PHP_URL_QUERY), $query_array);
+	parse_str(parse_url(DI::args()->getQueryString(), PHP_URL_QUERY), $query_array);
 
 	// fetch last used network view and redirect if needed
 	if (!$is_a_date_query) {
@@ -140,7 +140,7 @@ function network_init(App $a)
 	$a->page['aside'] .= ForumManager::widget(local_user(), $cid);
 	$a->page['aside'] .= Widget::postedByYear('network', local_user(), false);
 	$a->page['aside'] .= Widget::networks('network', $_GET['nets'] ?? '');
-	$a->page['aside'] .= Widget\SavedSearches::getHTML($a->query_string);
+	$a->page['aside'] .= Widget\SavedSearches::getHTML(DI::args()->getQueryString());
 	$a->page['aside'] .= Widget::fileAs('network', $_GET['file'] ?? '');
 }
 
@@ -309,7 +309,7 @@ function network_content(App $a, $update = 0, $parent = 0)
 	}
 
 	/// @TODO Is this really necessary? $a is already available to hooks
-	$arr = ['query' => $a->query_string];
+	$arr = ['query' => DI::args()->getQueryString()];
 	Hook::callAll('network_content_init', $arr);
 
 	$flat_mode = false;
@@ -389,7 +389,7 @@ function networkFlatView(App $a, $update = 0)
 		}
 	}
 
-	$pager = new Pager($a->query_string);
+	$pager = new Pager(DI::args()->getQueryString());
 
 	networkPager($a, $pager, $update);
 
@@ -681,7 +681,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$sql_range = '';
 	}
 
-	$pager = new Pager($a->query_string);
+	$pager = new Pager(DI::args()->getQueryString());
 
 	$pager_sql = networkPager($a, $pager, $update);
 
@@ -869,7 +869,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$date_offset = $_GET['offset'];
 	}
 
-	$query_string = $a->query_string;
+	$query_string = DI::args()->getQueryString();
 	if ($date_offset && !preg_match('/[?&].offset=/', $query_string)) {
 		$query_string .= '&offset=' . urlencode($date_offset);
 	}

@@ -55,7 +55,7 @@ abstract class BaseAdminModule extends BaseModule
 
 		if (!is_site_admin()) {
 			notice(L10n::t('Please login to continue.'));
-			Session::set('return_path', $a->query_string);
+			Session::set('return_path', DI::args()->getQueryString());
 			DI::baseUrl()->redirect('login');
 		}
 

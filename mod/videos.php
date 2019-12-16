@@ -212,7 +212,7 @@ function videos_content(App $a)
 		$total = count($r);
 	}
 
-	$pager = new Pager($a->query_string, 20);
+	$pager = new Pager(DI::args()->getQueryString(), 20);
 
 	$r = q("SELECT hash, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`created`) AS `created`,
 		ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`filetype`) as `filetype`

@@ -25,7 +25,7 @@ class Objects extends BaseModule
 		}
 
 		if (!ActivityPub::isRequest()) {
-			DI::baseUrl()->redirect(str_replace('objects/', 'display/', $a->query_string));
+			DI::baseUrl()->redirect(str_replace('objects/', 'display/', DI::args()->getQueryString()));
 		}
 
 		/// @todo Add Authentication to enable fetching of non public content

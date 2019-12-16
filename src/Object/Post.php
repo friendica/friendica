@@ -890,7 +890,7 @@ class Post
 
 			$template = Renderer::getMarkupTemplate($this->getCommentBoxTemplate());
 			$comment_box = Renderer::replaceMacros($template, [
-				'$return_path' => $a->query_string,
+				'$return_path' => DI::args()->getQueryString(),
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',
 				'$wall'        => ($conv->getMode() === 'profile'),

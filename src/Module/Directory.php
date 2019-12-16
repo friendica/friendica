@@ -52,7 +52,7 @@ class Directory extends BaseModule
 			$gDirPath = Profile::zrl($dirURL, true);
 		}
 
-		$pager = new Pager($app->query_string, 60);
+		$pager = new Pager(DI::args()->getQueryString(), 60);
 
 		$profiles = Profile::searchProfiles($pager->getStart(), $pager->getItemsPerPage(), $search);
 

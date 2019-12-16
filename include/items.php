@@ -368,7 +368,7 @@ function drop_item($id, $return = '')
 		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
-			$query = explode_querystring($a->query_string);
+			$query = explode_querystring(DI::args()->getQueryString());
 			$inputs = [];
 
 			foreach ($query['args'] as $arg) {

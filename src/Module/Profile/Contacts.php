@@ -69,7 +69,7 @@ class Contacts extends BaseModule
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager($a->query_string);
+		$pager = new Pager(DI::args()->getQueryString());
 
 		$params = ['order' => ['name' => false], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 

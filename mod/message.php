@@ -134,7 +134,7 @@ function message_content(App $a)
 		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
-			$query = explode_querystring($a->query_string);
+			$query = explode_querystring(DI::args()->getQueryString());
 			$inputs = [];
 			foreach ($query['args'] as $arg) {
 				if (strpos($arg, 'confirm=') === false) {
@@ -265,7 +265,7 @@ function message_content(App $a)
 	}
 
 
-	$_SESSION['return_path'] = $a->query_string;
+	$_SESSION['return_path'] = DI::args()->getQueryString();
 
 	if ($a->argc == 1) {
 
@@ -282,7 +282,7 @@ function message_content(App $a)
 			$total = $r[0]['total'];
 		}
 
-		$pager = new Pager($a->query_string);
+		$pager = new Pager(DI::args()->getQueryString());
 
 		$r = get_messages(local_user(), $pager->getStart(), $pager->getItemsPerPage());
 

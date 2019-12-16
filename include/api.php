@@ -291,22 +291,22 @@ function api_call(App $a)
 	global $API, $called_api;
 
 	$type = "json";
-	if (strpos($a->query_string, ".xml") > 0) {
+	if (strpos(DI::args()->getQueryString(), ".xml") > 0) {
 		$type = "xml";
 	}
-	if (strpos($a->query_string, ".json") > 0) {
+	if (strpos(DI::args()->getQueryString(), ".json") > 0) {
 		$type = "json";
 	}
-	if (strpos($a->query_string, ".rss") > 0) {
+	if (strpos(DI::args()->getQueryString(), ".rss") > 0) {
 		$type = "rss";
 	}
-	if (strpos($a->query_string, ".atom") > 0) {
+	if (strpos(DI::args()->getQueryString(), ".atom") > 0) {
 		$type = "atom";
 	}
 
 	try {
 		foreach ($API as $p => $info) {
-			if (strpos($a->query_string, $p) === 0) {
+			if (strpos(DI::args()->getQueryString(), $p) === 0) {
 				if (!api_check_method($info['method'])) {
 					throw new MethodNotAllowedException();
 				}
@@ -365,7 +365,7 @@ function api_call(App $a)
 			}
 		}
 
-		Logger::warning(API_LOG_PREFIX . 'not implemented', ['module' => 'api', 'action' => 'call', 'query' => $a->query_string]);
+		Logger::warning(API_LOG_PREFIX . 'not implemented', ['module' => 'api', 'action' => 'call', 'query' => DI::args()->getQueryString()]);
 		throw new NotImplementedException();
 	} catch (HTTPException $e) {
 		header("HTTP/1.1 {$e->getCode()} {$e->httpdesc}");
@@ -389,7 +389,7 @@ function api_error($type, $e)
 
 	$error = ["error" => $error,
 			"code" => $e->getCode() . " " . $e->httpdesc,
-			"request" => $a->query_string];
+			"request" => DI::args()->getQueryString()];
 
 	$return = api_format_data('status', $type, ['status' => $error]);
 
@@ -434,7 +434,7 @@ function api_rss_extra(App $a, $arr, $user_info)
 	$arr['$user'] = $user_info;
 	$arr['$rss'] = [
 		'alternate'    => $user_info['url'],
-		'self'         => System::baseUrl() . "/" . $a->query_string,
+		'self'         => System::baseUrl() . "/" . DI::args()->getQueryString(),
 		'base'         => System::baseUrl(),
 		'updated'      => api_date(null),
 		'atom_updated' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),

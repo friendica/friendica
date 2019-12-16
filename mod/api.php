@@ -94,7 +94,7 @@ function api_content(App $a)
 		if (!local_user()) {
 			/// @TODO We need login form to redirect to this page
 			notice(L10n::t('Please login to continue.') . EOL);
-			return Login::form($a->query_string, false, $request->get_parameters());
+			return Login::form(DI::args()->getQueryString(), false, $request->get_parameters());
 		}
 		//FKOAuth1::loginUser(4);
 

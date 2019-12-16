@@ -984,7 +984,7 @@ function photos_content(App $a)
 			// ACL permissions box
 			'$group_perms' => L10n::t('Show to Groups'),
 			'$contact_perms' => L10n::t('Show to Contacts'),
-			'$return_path' => $a->query_string,
+			'$return_path' => DI::args()->getQueryString(),
 		]);
 
 		return $o;
@@ -1008,7 +1008,7 @@ function photos_content(App $a)
 			$total = count($r);
 		}
 
-		$pager = new Pager($a->query_string, 20);
+		$pager = new Pager(DI::args()->getQueryString(), 20);
 
 		/// @TODO I have seen this many times, maybe generalize it script-wide and encapsulate it?
 		$order_field = $_GET['order'] ?? '';
@@ -1030,7 +1030,7 @@ function photos_content(App $a)
 		);
 
 		if ($cmd === 'drop') {
-			$drop_url = $a->query_string;
+			$drop_url = DI::args()->getQueryString();
 
 			$extra_inputs = [
 				['name' => 'albumname', 'value' => $_POST['albumname']],
@@ -1141,7 +1141,7 @@ function photos_content(App $a)
 		}
 
 		if ($cmd === 'drop') {
-			$drop_url = $a->query_string;
+			$drop_url = DI::args()->getQueryString();
 
 			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'post',
@@ -1288,7 +1288,7 @@ function photos_content(App $a)
 			$condition = ["`parent` = ? AND `parent` != `id`",  $link_item['parent']];
 			$total = DBA::count('item', $condition);
 
-			$pager = new Pager($a->query_string);
+			$pager = new Pager(DI::args()->getQueryString());
 
 			$params = ['order' => ['id'], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 			$result = Item::selectForUser($link_item['uid'], Item::ITEM_FIELDLIST, $condition, $params);
@@ -1352,7 +1352,7 @@ function photos_content(App $a)
 				// ACL permissions box
 				'$group_perms' => L10n::t('Show to Groups'),
 				'$contact_perms' => L10n::t('Show to Contacts'),
-				'$return_path' => $a->query_string,
+				'$return_path' => DI::args()->getQueryString(),
 			]);
 		}
 
@@ -1375,7 +1375,7 @@ function photos_content(App $a)
 					'$likethis' => L10n::t("I like this \x28toggle\x29"),
 					'$nolike' => L10n::t("I don't like this \x28toggle\x29"),
 					'$wait' => L10n::t('Please wait'),
-					'$return_path' => $a->query_string,
+					'$return_path' => DI::args()->getQueryString(),
 				]);
 			}
 
@@ -1553,7 +1553,7 @@ function photos_content(App $a)
 		$total = count($r);
 	}
 
-	$pager = new Pager($a->query_string, 20);
+	$pager = new Pager(DI::args()->getQueryString(), 20);
 
 	$r = q("SELECT `resource-id`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`filename`) AS `filename`,
 		ANY_VALUE(`type`) AS `type`, ANY_VALUE(`album`) AS `album`, max(`scale`) AS `scale`,

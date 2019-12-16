@@ -144,7 +144,7 @@ class Profile
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
 		if (!DBA::isResult($user) && empty($profiledata)) {
-			Logger::log('profile error: ' . $a->query_string, Logger::DEBUG);
+			Logger::log('profile error: ' . DI::args()->getQueryString(), Logger::DEBUG);
 			return;
 		}
 
@@ -165,7 +165,7 @@ class Profile
 		$pdata = self::getByNickname($nickname, $user['uid'], $profile);
 
 		if (empty($pdata) && empty($profiledata)) {
-			Logger::log('profile error: ' . $a->query_string, Logger::DEBUG);
+			Logger::log('profile error: ' . DI::args()->getQueryString(), Logger::DEBUG);
 			return;
 		}
 
@@ -1079,7 +1079,7 @@ class Profile
 
 		// Remove the "addr" parameter from the destination. It is later added as separate parameter again.
 		$addr_request = 'addr=' . urlencode($addr);
-		$query = rtrim(str_replace($addr_request, '', $a->query_string), '?&');
+		$query = rtrim(str_replace($addr_request, '', DI::args()->getQueryString()), '?&');
 
 		// The other instance needs to know where to redirect.
 		$dest = urlencode(DI::baseUrl()->get() . '/' . $query);
@@ -1166,7 +1166,7 @@ class Profile
 
 		$arr = [
 			'visitor' => $visitor,
-			'url' => $a->query_string
+			'url' => DI::args()->getQueryString()
 		];
 		/**
 		 * @hooks magic_auth_success

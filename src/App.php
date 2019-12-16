@@ -40,8 +40,6 @@ use Psr\Log\LoggerInterface;
  */
 class App
 {
-	/** @deprecated 2019.09 - use App\Arguments->getQueryString() */
-	public $query_string;
 	/**
 	 * @var Page The current page environment
 	 */
@@ -175,7 +173,6 @@ class App
 		$this->cmd          = $args->getCommand();
 		$this->argv         = $args->getArgv();
 		$this->argc         = $args->getArgc();
-		$this->query_string = $args->getQueryString();
 		$this->module       = $module->getName();
 		$this->page         = $page;
 

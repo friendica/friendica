@@ -424,7 +424,7 @@ class Contact extends BaseModule
 				if (!empty($_REQUEST['confirm'])) {
 					// <form> can't take arguments in its 'action' parameter
 					// so add any arguments as hidden inputs
-					$query = explode_querystring($a->query_string);
+					$query = explode_querystring(DI::args()->getQueryString());
 					$inputs = [];
 					foreach ($query['args'] as $arg) {
 						if (strpos($arg, 'confirm=') === false) {
@@ -466,7 +466,7 @@ class Contact extends BaseModule
 			}
 		}
 
-		$_SESSION['return_path'] = $a->query_string;
+		$_SESSION['return_path'] = DI::args()->getQueryString();
 
 		if (!empty($a->data['contact']) && is_array($a->data['contact'])) {
 			$contact = $a->data['contact'];
@@ -775,7 +775,7 @@ class Contact extends BaseModule
 		if (DBA::isResult($r)) {
 			$total = $r[0]['total'];
 		}
-		$pager = new Pager($a->query_string);
+		$pager = new Pager(DI::args()->getQueryString());
 
 		$contacts = [];
 

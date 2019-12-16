@@ -9,6 +9,7 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Module;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -91,7 +92,7 @@ function common_content(App $a)
 		return $o;
 	}
 
-	$pager = new Pager($a->query_string);
+	$pager = new Pager(DI::args()->getQueryString());
 
 	if ($cid) {
 		$common_friends = Model\GContact::commonFriends($uid, $cid, $pager->getStart(), $pager->getItemsPerPage());

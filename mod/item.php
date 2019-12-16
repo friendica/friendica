@@ -667,7 +667,7 @@ function item_post(App $a) {
 		$datarray["item_id"] = -1;
 		$datarray["author-network"] = Protocol::DFRN;
 
-		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager($a->query_string), 'search', false, true);
+		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager(DI::args()->getQueryString()), 'search', false, true);
 		Logger::log('preview: ' . $o);
 		echo json_encode(['preview' => $o]);
 		exit();

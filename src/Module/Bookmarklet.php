@@ -24,7 +24,7 @@ class Bookmarklet extends BaseModule
 
 		if (!local_user()) {
 			$output = '<h2>' . L10n::t('Login') . '</h2>';
-			$output .= Login::form($app->query_string, intval($config->get('config', 'register_policy')) === Register::CLOSED ? false : true);
+			$output .= Login::form(DI::args()->getQueryString(), intval($config->get('config', 'register_policy')) === Register::CLOSED ? false : true);
 			return $output;
 		}
 

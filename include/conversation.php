@@ -559,7 +559,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 	$page_dropping = ((local_user() && local_user() == $profile_owner) ? true : false);
 
 	if (!$update) {
-		$_SESSION['return_path'] = $a->query_string;
+		$_SESSION['return_path'] = DI::args()->getQueryString();
 	}
 
 	$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
@@ -780,7 +780,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 	$o = Renderer::replaceMacros($page_template, [
 		'$baseurl' => System::baseUrl($ssl_state),
-		'$return_path' => $a->query_string,
+		'$return_path' => DI::args()->getQueryString(),
 		'$live_update' => $live_update_div,
 		'$remove' => L10n::t('remove'),
 		'$mode' => $mode,
@@ -1193,7 +1193,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		$private_post = 0;
 	}
 
-	$query_str = $a->query_string;
+	$query_str = DI::args()->getQueryString();
 	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(['?public=1', '&public=1'], ['', ''], $query_str);
 	}

@@ -1152,7 +1152,7 @@ function settings_content(App $a)
 		$private_post = 0;
 	}
 
-	$query_str = $a->query_string;
+	$query_str = DI::args()->getQueryString();
 	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(['?public=1', '&public=1'], ['', ''], $query_str);
 	}
