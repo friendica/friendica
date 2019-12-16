@@ -283,30 +283,35 @@ function api_check_method($method)
  * @brief Main API entry point
  *
  * @param App $a App
+ * @param App\Arguments $args The app arguments (optional, will retrieved by the DI-Container in case of missing)
  * @return string|array API call result
  * @throws Exception
  */
-function api_call(App $a)
+function api_call(App $a, App\Arguments $args = null)
 {
 	global $API, $called_api;
 
+	if ($args == null) {
+		$args = DI::args();
+	}
+
 	$type = "json";
-	if (strpos(DI::args()->getQueryString(), ".xml") > 0) {
+	if (strpos($args->getQueryString(), ".xml") > 0) {
 		$type = "xml";
 	}
-	if (strpos(DI::args()->getQueryString(), ".json") > 0) {
+	if (strpos($args->getQueryString(), ".json") > 0) {
 		$type = "json";
 	}
-	if (strpos(DI::args()->getQueryString(), ".rss") > 0) {
+	if (strpos($args->getQueryString(), ".rss") > 0) {
 		$type = "rss";
 	}
-	if (strpos(DI::args()->getQueryString(), ".atom") > 0) {
+	if (strpos($args->getQueryString(), ".atom") > 0) {
 		$type = "atom";
 	}
 
 	try {
 		foreach ($API as $p => $info) {
-			if (strpos(DI::args()->getQueryString(), $p) === 0) {
+			if (strpos($args->getQueryString(), $p) === 0) {
 				if (!api_check_method($info['method'])) {
 					throw new MethodNotAllowedException();
 				}
@@ -369,7 +374,7 @@ function api_call(App $a)
 		throw new NotImplementedException();
 	} catch (HTTPException $e) {
 		header("HTTP/1.1 {$e->getCode()} {$e->httpdesc}");
-		return api_error($type, $e);
+		return api_error($type, $e, $args);
 	}
 }
 
@@ -378,18 +383,17 @@ function api_call(App $a)
  *
  * @param string $type Return type (xml, json, rss, as)
  * @param object $e    HTTPException Error object
+ * @param App\Arguments $args The App arguments
  * @return string|array error message formatted as $type
  */
-function api_error($type, $e)
+function api_error($type, $e, App\Arguments $args)
 {
-	$a = \get_app();
-
 	$error = ($e->getMessage() !== "" ? $e->getMessage() : $e->httpdesc);
 	/// @TODO:  https://dev.twitter.com/overview/api/response-codes
 
 	$error = ["error" => $error,
 			"code" => $e->getCode() . " " . $e->httpdesc,
-			"request" => DI::args()->getQueryString()];
+			"request" => $args->getQueryString()];
 
 	$return = api_format_data('status', $type, ['status' => $error]);
 

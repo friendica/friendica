@@ -153,7 +153,7 @@ class Nav
 		if (Session::isAuthenticated()) {
 			$nav['logout'] = ['logout', L10n::t('Logout'), '', L10n::t('End this session')];
 		} else {
-			$nav['login'] = ['login', L10n::t('Login'), ($a->module == 'login' ? 'selected' : ''), L10n::t('Sign in')];
+			$nav['login'] = ['login', L10n::t('Login'), (DI::module()->getName() == 'login' ? 'selected' : ''), L10n::t('Sign in')];
 		}
 
 		if (local_user()) {
@@ -179,7 +179,7 @@ class Nav
 			$homelink = Session::get('visitor_home', '');
 		}
 
-		if (($a->module != 'home') && (! (local_user()))) {
+		if ((DI::module()->getName() != 'home') && (! (local_user()))) {
 			$nav['home'] = [$homelink, L10n::t('Home'), '', L10n::t('Home Page')];
 		}
 

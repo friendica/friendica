@@ -15,6 +15,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
@@ -378,7 +379,7 @@ class Authentication
 		if ($login_initial) {
 			Hook::callAll('logged_in', $a->user);
 
-			if ($a->module !== 'home' && $this->session->exists('return_path')) {
+			if (DI::module()->getName() !== 'home' && $this->session->exists('return_path')) {
 				$this->baseUrl->redirect($this->session->get('return_path'));
 			}
 		}

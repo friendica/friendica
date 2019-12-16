@@ -109,7 +109,7 @@ class ACL
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
 		// e.g. 'network_pre_contact_deny', 'profile_pre_contact_allow'
-		Hook::callAll($a->module . '_pre_' . $selname, $arr);
+		Hook::callAll(DI::module()->getName() . '_pre_' . $selname, $arr);
 
 		if (DBA::isResult($contacts)) {
 			foreach ($contacts as $contact) {
@@ -127,7 +127,7 @@ class ACL
 
 		$o .= '</select>' . PHP_EOL;
 
-		Hook::callAll($a->module . '_post_' . $selname, $o);
+		Hook::callAll(DI::module()->getName() . '_post_' . $selname, $o);
 
 		return $o;
 	}
@@ -175,7 +175,7 @@ class ACL
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
 		// e.g. 'network_pre_contact_deny', 'profile_pre_contact_allow'
-		Hook::callAll($a->module . '_pre_' . $selname, $arr);
+		Hook::callAll(DI::module()->getName() . '_pre_' . $selname, $arr);
 
 		$receiverlist = [];
 
@@ -201,7 +201,7 @@ class ACL
 			$o .= implode(', ', $receiverlist);
 		}
 
-		Hook::callAll($a->module . '_post_' . $selname, $o);
+		Hook::callAll(DI::module()->getName() . '_post_' . $selname, $o);
 
 		return $o;
 	}

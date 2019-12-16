@@ -5,6 +5,7 @@ namespace Friendica\Test\src\Core\Lock;
 use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\JitConfiguration;
 use Friendica\Core\Lock\SemaphoreLock;
 use Friendica\DI;
 
@@ -18,7 +19,7 @@ class SemaphoreLockTest extends LockTest
 		$app->shouldReceive('getHostname')->andReturn('friendica.local');
 		$dice->shouldReceive('create')->with(App::class)->andReturn($app);
 
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(JitConfiguration::class);
 		$configMock
 			->shouldReceive('get')
 			->with('system', 'temppath', NULL, false)
