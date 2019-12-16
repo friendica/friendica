@@ -16,7 +16,6 @@ class HostMeta extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$app = DI::app();
 		$config = DI::config();
 
 		header('Content-type: text/xml');
@@ -31,8 +30,8 @@ class HostMeta extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('xrd_host.tpl');
 		echo Renderer::replaceMacros($tpl, [
 			'$zhost'  => DI::baseUrl()->getHostname()(),
-			'$zroot'  => $app->getBaseURL(),
-			'$domain' => $app->getBaseURL(),
+			'$zroot'  => DI::baseUrl()->get(),
+			'$domain' => DI::baseUrl()->get(),
 			'$bigkey' => Salmon::salmonKey($config->get('system', 'site_pubkey'))
 		]);
 

@@ -16,8 +16,6 @@ use Friendica\Module\Login;
 
 function user_allow($hash)
 {
-	$a = \get_app();
-
 	$register = Register::getByHash($hash);
 	if (!DBA::isResult($register)) {
 		return false;
@@ -44,7 +42,7 @@ function user_allow($hash)
 	$res = User::sendRegisterOpenEmail(
 		$user,
 		Config::get('config', 'sitename'),
-		$a->getBaseUrl(),
+		DI::baseUrl()->get(),
 		($register['password'] ?? '') ?: 'Sent in a previous email'
 	);
 

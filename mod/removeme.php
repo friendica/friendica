@@ -80,7 +80,7 @@ function removeme_content(App $a)
 
 	$tpl = Renderer::getMarkupTemplate('removeme.tpl');
 	$o = Renderer::replaceMacros($tpl, [
-		'$basedir' => $a->getBaseURL(),
+		'$basedir' => DI::baseUrl()->get(),
 		'$hash' => $hash,
 		'$title' => L10n::t('Remove My Account'),
 		'$desc' => L10n::t('This will completely remove your account. Once this has been done it is not recoverable.'),

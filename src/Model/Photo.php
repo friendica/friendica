@@ -679,8 +679,7 @@ class Photo
 	 */
 	public static function getGUID($name)
 	{
-		$a = \get_app();
-		$base = $a->getBaseURL();
+		$base = DI::baseUrl()->get();
 
 		$guid = str_replace([Strings::normaliseLink($base), '/photo/'], '', Strings::normaliseLink($name));
 
@@ -725,8 +724,7 @@ class Photo
 	 */
 	public static function isLocalPage($name)
 	{
-		$a = \get_app();
-		$base = $a->getBaseURL();
+		$base = DI::baseUrl()->get();
 
 		$guid = str_replace(Strings::normaliseLink($base), '', Strings::normaliseLink($name));
 		$guid = preg_replace("=/photos/.*/image/(.*)=ism", '$1', $guid);

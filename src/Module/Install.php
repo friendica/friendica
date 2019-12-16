@@ -71,7 +71,7 @@ class Install extends BaseModule
 
 		// We overwrite current theme css, because during install we may not have a working mod_rewrite
 		// so we may not have a css at all. Here we set a static css file for the install procedure pages
-		Renderer::$theme['stylesheet'] = $a->getBaseURL() . '/view/install/style.css';
+		Renderer::$theme['stylesheet'] = DI::baseUrl()->get() . '/view/install/style.css';
 
 		self::$currentWizardStep = ($_POST['pass'] ?? '') ?: self::SYSTEM_CHECK;
 	}
@@ -162,7 +162,7 @@ class Install extends BaseModule
 			case self::SYSTEM_CHECK:
 				$php_path = $configCache->get('config', 'php_path');
 
-				$status = self::$installer->checkEnvironment($a->getBaseURL(), $php_path);
+				$status = self::$installer->checkEnvironment(DI::baseUrl()->get(), $php_path);
 
 				$tpl    = Renderer::getMarkupTemplate('install_checks.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
@@ -303,7 +303,7 @@ class Install extends BaseModule
 					'$title'  => $install_title,
 					'$checks' => self::$installer->getChecks(),
 					'$pass'   => L10n::t('Installation finished'),
-					'$text'   => $db_return_text . self::whatNext($a),
+					'$text'   => $db_return_text . self::whatNext(),
 				]);
 
 				break;
@@ -315,14 +315,12 @@ class Install extends BaseModule
 	/**
 	 * Creates the text for the next steps
 	 *
-	 * @param App $a The global App
-	 *
 	 * @return string The text for the next steps
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function whatNext($a)
+	private static function whatNext()
 	{
-		$baseurl = $a->getBaseUrl();
+		$baseurl = DI::baseUrl()->get();
 		return
 			L10n::t('<h1>What next</h1>')
 			. "<p>" . L10n::t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')

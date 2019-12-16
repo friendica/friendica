@@ -63,18 +63,18 @@ class Summary extends BaseAdminModule
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', $a->getBaseURL() . '/help/Config');
+			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', $a->getBaseURL() . '/help/Config');
+			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
 		}
 
 		// Check server vitality
 		if (!self::checkSelfHostMeta()) {
-			$well_known = $a->getBaseURL() . '/.well-known/host-meta';
+			$well_known = DI::baseUrl()->get() . '/.well-known/host-meta';
 			$warningtext[] = L10n::t('<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
-				$well_known, $well_known, $a->getBaseURL() . '/help/Install');
+				$well_known, $well_known, DI::baseUrl()->get() . '/help/Install');
 		}
 
 		// Check logfile permission
@@ -208,7 +208,7 @@ class Summary extends BaseAdminModule
 	private static function checkSelfHostMeta()
 	{
 		// Fetch the host-meta to check if this really is a vital server
-		return Network::curl(DI::app()->getBaseURL() . '/.well-known/host-meta')->isSuccess();
+		return Network::curl(DI::baseUrl()->get() . '/.well-known/host-meta')->isSuccess();
 	}
 
 }

@@ -29,7 +29,7 @@ class Bookmarklet extends BaseModule
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page = Strings::normaliseLink($app->getBaseURL() . "/bookmarklet");
+		$page = Strings::normaliseLink(DI::baseUrl()->get() . "/bookmarklet");
 
 		if (!strstr($referer, $page)) {
 			if (empty($_REQUEST["url"])) {

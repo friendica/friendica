@@ -55,8 +55,6 @@ class Server extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = DI::app();
-
 		$blocklist = Config::get('system', 'blocklist');
 		$blocklistform = [];
 		if (is_array($blocklist)) {
@@ -91,7 +89,7 @@ class Server extends BaseAdminModule
 			'$threason' => L10n::t('Reason for the block'),
 			'$delentry' => L10n::t('Delete entry from blocklist'),
 			'$entries' => $blocklistform,
-			'$baseurl' => $a->getBaseURL(true),
+			'$baseurl' => DI::baseUrl()->get(true),
 			'$confirm_delete' => L10n::t('Delete entry from blocklist?'),
 			'$form_security_token' => parent::getFormSecurityToken("admin_blocklist")
 		]);

@@ -70,7 +70,7 @@ class AllFriends extends BaseModule
 				$friend['id'] = $friend['cid'];
 				$photoMenu = Model\Contact::photoMenu($friend);
 			} else {
-				$connlnk = $app->getBaseURL() . '/follow/?url=' . $friend['url'];
+				$connlnk = DI::baseUrl()->get() . '/follow/?url=' . $friend['url'];
 				$photoMenu = [
 					'profile' => [L10n::t('View Profile'), Model\Contact::magicLinkbyId($friend['id'], $friend['url'])],
 					'follow'  => [L10n::t('Connect/Follow'), $connlnk]

@@ -437,7 +437,7 @@ function dfrn_request_post(App $a)
 			}
 
 			// "Homecoming" - send the requestor back to their site to record the introduction.
-			$dfrn_url = bin2hex($a->getBaseURL() . '/profile/' . $nickname);
+			$dfrn_url = bin2hex(DI::baseUrl()->get() . '/profile/' . $nickname);
 			$aes_allow = ((function_exists('openssl_encrypt')) ? 1 : 0);
 
 			System::externalRedirect($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"

@@ -75,9 +75,9 @@ class Xrd extends BaseModule
 		}
 
 		if ($mode == 'xml') {
-			self::printXML($alias, $app->getBaseURL(), $user, $owner, $avatar);
+			self::printXML($alias, DI::baseUrl()->get(), $user, $owner, $avatar);
 		} else {
-			self::printJSON($alias, $app->getBaseURL(), $owner, $avatar);
+			self::printJSON($alias, DI::baseUrl()->get(), $owner, $avatar);
 		}
 	}
 

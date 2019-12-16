@@ -76,7 +76,7 @@ class Contact extends BaseAdminModule
 			'$form_security_token' => parent::getFormSecurityToken('admin_contactblock'),
 
 			// values //
-			'$baseurl'    => $a->getBaseURL(true),
+			'$baseurl'    => DI::baseUrl()->get(true),
 
 			'$contacts'   => $contacts,
 			'$total_contacts' => L10n::tt('%s total blocked contact', '%s total blocked contacts', $total),

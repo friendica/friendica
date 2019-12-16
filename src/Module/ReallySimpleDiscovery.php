@@ -16,7 +16,6 @@ class ReallySimpleDiscovery extends BaseModule
 	{
 		header('Content-Type: text/xml');
 
-		$app = DI::app();
 		$xml = null;
 		echo XML::fromArray([
 			'rsd' => [
@@ -32,7 +31,7 @@ class ReallySimpleDiscovery extends BaseModule
 							'@attributes' => [
 								'name'      => 'Twitter',
 								'preferred' => 'true',
-								'apiLink'   => $app->getBaseURL(),
+								'apiLink'   => DI::baseUrl()->get(),
 								'blogID'    => '',
 							],
 							'settings'    => [

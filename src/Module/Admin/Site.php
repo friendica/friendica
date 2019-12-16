@@ -56,7 +56,7 @@ class Site extends BaseAdminModule
 			 * send relocate for every local user
 			 * */
 
-			$old_url = $a->getBaseURL(true);
+			$old_url = DI::baseUrl()->get(true);
 
 			// Generate host names for relocation the addresses in the format user@address.tld
 			$new_host = str_replace("http://", "@", Strings::normaliseLink($new_url));
@@ -417,8 +417,6 @@ class Site extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = DI::app();
-
 		/* Installed langs */
 		$lang_choices = L10n::getAvailableLanguages();
 
@@ -578,7 +576,7 @@ class Site extends BaseAdminModule
 			'$relay_title'       => L10n::t('Message Relay'),
 			'$relocate'          => L10n::t('Relocate Instance'),
 			'$relocate_warning'  => L10n::t('Warning! Advanced function. Could make this server unreachable.'),
-			'$baseurl'           => $a->getBaseURL(true),
+			'$baseurl'           => DI::baseUrl()->get(true),
 
 			// name, label, value, help string, extra data...
 			'$sitename'         => ['sitename', L10n::t('Site name'), Config::get('config', 'sitename'), ''],
@@ -661,14 +659,14 @@ class Site extends BaseAdminModule
 			'$proxy_disabled'         => ['proxy_disabled', L10n::t('Disable picture proxy'), Config::get('system', 'proxy_disabled'), L10n::t('The picture proxy increases performance and privacy. It shouldn\'t be used on systems with very low bandwidth.')],
 			'$only_tag_search'        => ['only_tag_search', L10n::t('Only search in tags'), Config::get('system', 'only_tag_search'), L10n::t('On large systems the text search can slow down the system extremely.')],
 
-			'$relocate_url'           => ['relocate_url', L10n::t('New base url'), $a->getBaseURL(), L10n::t('Change base url for this server. Sends relocate message to all Friendica and Diaspora* contacts of all users.')],
+			'$relocate_url'           => ['relocate_url', L10n::t('New base url'), DI::baseUrl()->get(), L10n::t('Change base url for this server. Sends relocate message to all Friendica and Diaspora* contacts of all users.')],
 
 			'$rino'                   => ['rino', L10n::t('RINO Encryption'), intval(Config::get('system', 'rino_encrypt')), L10n::t('Encryption layer between nodes.'), [0 => L10n::t('Disabled'), 1 => L10n::t('Enabled')]],
 
 			'$worker_queues'          => ['worker_queues', L10n::t('Maximum number of parallel workers'), Config::get('system', 'worker_queues'), L10n::t('On shared hosters set this to %d. On larger systems, values of %d are great. Default value is %d.', 5, 20, 10)],
 			'$worker_dont_fork'       => ['worker_dont_fork', L10n::t('Don\'t use "proc_open" with the worker'), Config::get('system', 'worker_dont_fork'), L10n::t('Enable this if your system doesn\'t allow the use of "proc_open". This can happen on shared hosters. If this is enabled you should increase the frequency of worker calls in your crontab.')],
 			'$worker_fastlane'        => ['worker_fastlane', L10n::t('Enable fastlane'), Config::get('system', 'worker_fastlane'), L10n::t('When enabed, the fastlane mechanism starts an additional worker if processes with higher priority are blocked by processes of lower priority.')],
-			'$worker_frontend'        => ['worker_frontend', L10n::t('Enable frontend worker'), Config::get('system', 'frontend_worker'), L10n::t('When enabled the Worker process is triggered when backend access is performed (e.g. messages being delivered). On smaller sites you might want to call %s/worker on a regular basis via an external cron job. You should only enable this option if you cannot utilize cron/scheduled jobs on your server.', $a->getBaseURL())],
+			'$worker_frontend'        => ['worker_frontend', L10n::t('Enable frontend worker'), Config::get('system', 'frontend_worker'), L10n::t('When enabled the Worker process is triggered when backend access is performed (e.g. messages being delivered). On smaller sites you might want to call %s/worker on a regular basis via an external cron job. You should only enable this option if you cannot utilize cron/scheduled jobs on your server.', DI::baseUrl()->get())],
 
 			'$relay_subscribe'        => ['relay_subscribe', L10n::t('Subscribe to relay'), Config::get('system', 'relay_subscribe'), L10n::t('Enables the receiving of public posts from the relay. They will be included in the search, subscribed tags and on the global community page.')],
 			'$relay_server'           => ['relay_server', L10n::t('Relay server'), Config::get('system', 'relay_server', 'https://relay.diasp.org'), L10n::t('Address of the relay server where public posts should be send to. For example https://relay.diasp.org')],

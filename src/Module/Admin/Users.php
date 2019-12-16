@@ -20,8 +20,6 @@ class Users extends BaseAdminModule
 	{
 		parent::post($parameters);
 
-		$a = DI::app();
-
 		$pending     = $_POST['pending']           ?? [];
 		$users       = $_POST['user']              ?? [];
 		$nu_name     = $_POST['new_user_name']     ?? '';
@@ -78,7 +76,7 @@ class Users extends BaseAdminModule
 			Thank you and welcome to %4$s.'));
 
 			$preamble = sprintf($preamble, $user['username'], Config::get('config', 'sitename'));
-			$body = sprintf($body, $a->getBaseURL(), $user['nickname'], $result['password'], Config::get('config', 'sitename'));
+			$body = sprintf($body, DI::baseUrl()->get(), $user['nickname'], $result['password'], Config::get('config', 'sitename'));
 
 			notification([
 				'type'     => SYSTEM_EMAIL,
@@ -306,7 +304,7 @@ class Users extends BaseAdminModule
 			'$form_security_token' => parent::getFormSecurityToken('admin_users'),
 
 			// values //
-			'$baseurl' => $a->getBaseURL(true),
+			'$baseurl' => DI::baseUrl()->get(true),
 
 			'$pending' => $pending,
 			'deleted' => $deleted,

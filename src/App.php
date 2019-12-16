@@ -272,20 +272,6 @@ class App
 	}
 
 	/**
-	 * Retrieves the Friendica instance base URL
-	 *
-	 * @param bool $ssl Whether to append http or https under BaseURL::SSL_POLICY_SELFSIGN
-	 *
-	 * @return string Friendica server base URL
-	 *
-	 * @deprecated 2019.09 - use BaseUrl->get($ssl) instead
-	 */
-	public function getBaseURL($ssl = false)
-	{
-		return $this->baseURL->get($ssl);
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String
@@ -298,7 +284,7 @@ class App
 			FRIENDICA_CODENAME . "' " .
 			FRIENDICA_VERSION . '-' .
 			DB_UPDATE_VERSION . '; ' .
-			$this->getBaseURL();
+			$this->baseURL->get();
 	}
 
 	/**
@@ -478,8 +464,8 @@ class App
 		// and www.example.com vs example.com.
 		// We will only change the url to an ip address if there is no existing setting
 
-		if (empty($url) || (!Util\Strings::compareLink($url, $this->getBaseURL())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->baseURL->getHostname()))) {
-			$this->config->set('system', 'url', $this->getBaseURL());
+		if (empty($url) || (!Util\Strings::compareLink($url, $this->baseURL->get())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->baseURL->getHostname()))) {
+			$this->config->set('system', 'url', $this->baseURL->get());
 		}
 	}
 

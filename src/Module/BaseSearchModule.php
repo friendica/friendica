@@ -97,8 +97,6 @@ class BaseSearchModule extends BaseModule
 			return '';
 		}
 
-		$a = DI::app();
-
 		$id      = 0;
 		$entries = [];
 		foreach ($results->getResults() as $result) {
@@ -131,7 +129,7 @@ class BaseSearchModule extends BaseModule
 						$photo_menu = [];
 					}
 				} else {
-					$connLink = $a->getBaseURL() . '/follow/?url=' . $result->getUrl();
+					$connLink = DI::baseUrl()->get() . '/follow/?url=' . $result->getUrl();
 					$connTxt  = L10n::t('Connect');
 
 					$photo_menu['profile'] = [L10n::t("View Profile"), Model\Contact::magicLink($result->getUrl())];

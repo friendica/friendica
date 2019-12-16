@@ -126,7 +126,7 @@ function profile_photo_post(App $a)
 				info(L10n::t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
 				if ($path && strlen(Config::get('system', 'directory'))) {
-					Worker::add(PRIORITY_LOW, "Directory", $a->getBaseURL() . '/' . $path);
+					Worker::add(PRIORITY_LOW, "Directory", DI::baseUrl()->get() . '/' . $path);
 				}
 
 				Worker::add(PRIORITY_LOW, 'ProfileUpdate', local_user());

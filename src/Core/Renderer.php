@@ -61,10 +61,9 @@ class Renderer
 	public static function replaceMacros($s, array $vars = [])
 	{
 		$stamp1 = microtime(true);
-		$a = DI::app();
 
 		// pass $baseurl to all templates if it isn't set
-		$vars = array_merge(['$baseurl' => $a->getBaseURL()], $vars);
+		$vars = array_merge(['$baseurl' => DI::baseUrl()->get()], $vars);
 
 		$t = self::getTemplateEngine();
 

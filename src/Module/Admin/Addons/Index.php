@@ -14,8 +14,6 @@ class Index extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = DI::app();
-
 		// reload active themes
 		if (!empty($_GET['action'])) {
 			parent::checkFormSecurityTokenRedirectOnError('/admin/addons', 'admin_addons', 't');
@@ -52,7 +50,7 @@ class Index extends BaseAdminModule
 			'$page' => L10n::t('Addons'),
 			'$submit' => L10n::t('Save Settings'),
 			'$reload' => L10n::t('Reload active addons'),
-			'$baseurl' => $a->getBaseURL(true),
+			'$baseurl' => DI::baseUrl()->get(true),
 			'$function' => 'addons',
 			'$addons' => $addons,
 			'$pcount' => count($addons),

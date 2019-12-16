@@ -42,8 +42,6 @@ class Settings extends BaseAdminModule
 	{
 		parent::content($parameters);
 
-		$a = DI::app();
-
 		$log_choices = [
 			LogLevel::ERROR   => 'Error',
 			LogLevel::WARNING => 'Warning',
@@ -65,7 +63,7 @@ class Settings extends BaseAdminModule
 			'$page' => L10n::t('Logs'),
 			'$submit' => L10n::t('Save Settings'),
 			'$clear' => L10n::t('Clear'),
-			'$baseurl' => $a->getBaseURL(true),
+			'$baseurl' => DI::baseUrl()->get(true),
 			'$logname' => Config::get('system', 'logfile'),
 			// see /help/smarty3-templates#1_1 on any Friendica node
 			'$debugging' => ['debugging', L10n::t("Enable Debugging"), Config::get('system', 'debugging'), ""],

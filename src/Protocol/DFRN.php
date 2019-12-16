@@ -2372,7 +2372,7 @@ class DFRN
 
 		/// @todo Do we really need this check for HTML elements? (It was copied from the old function)
 		if ((strpos($item['body'], '<') !== false) && (strpos($item['body'], '>') !== false)) {
-			$base_url = \get_app()->getBaseURL();
+			$base_url = DI::baseUrl()->get();
 			$item['body'] = HTML::relToAbs($item['body'], $base_url);
 
 			$item['body'] = HTML::toBBCodeVideo($item['body']);

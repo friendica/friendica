@@ -721,7 +721,7 @@ function settings_content(App $a)
 		$tpl = Renderer::getMarkupTemplate('settings/oauth.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseModule::getFormSecurityToken("settings_oauth"),
-			'$baseurl'	=> $a->getBaseURL(true),
+			'$baseurl'	=> DI::baseUrl()->get(true),
 			'$title'	=> L10n::t('Connected Apps'),
 			'$add'		=> L10n::t('Add application'),
 			'$edit'		=> L10n::t('Edit'),

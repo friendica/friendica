@@ -204,7 +204,7 @@ class Transmitter
 	{
 		return ['type' => 'Service',
 			'name' =>  FRIENDICA_PLATFORM . " '" . FRIENDICA_CODENAME . "' " . FRIENDICA_VERSION . '-' . DB_UPDATE_VERSION,
-			'url' => DI::app()->getBaseURL()];
+			'url' => DI::baseUrl()->get()];
 	}
 
 	/**

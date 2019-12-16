@@ -2511,7 +2511,7 @@ class Item
 			$guid = System::createUUID();
 		}
 
-		return DI::app()->getBaseURL() . '/objects/' . $guid;
+		return DI::baseUrl()->get() . '/objects/' . $guid;
 	}
 
 	/**

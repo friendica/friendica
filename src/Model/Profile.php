@@ -337,7 +337,7 @@ class Profile
 		if (isset($profile['url'])) {
 			$profile_url = $profile['url'];
 		} else {
-			$profile_url = $a->getBaseURL() . '/profile/' . $profile['nickname'];
+			$profile_url = DI::baseUrl()->get() . '/profile/' . $profile['nickname'];
 		}
 
 		$follow_link = null;
@@ -1082,13 +1082,13 @@ class Profile
 		$query = rtrim(str_replace($addr_request, '', $a->query_string), '?&');
 
 		// The other instance needs to know where to redirect.
-		$dest = urlencode($a->getBaseURL() . '/' . $query);
+		$dest = urlencode(DI::baseUrl()->get() . '/' . $query);
 
 		// We need to extract the basebath from the profile url
 		// to redirect the visitors '/magic' module.
 		$basepath = Contact::getBasepath($contact['url']);
 
-		if ($basepath != $a->getBaseURL() && !strstr($dest, '/magic')) {
+		if ($basepath != DI::baseUrl()->get() && !strstr($dest, '/magic')) {
 			$magic_path = $basepath . '/magic' . '?owa=1&dest=' . $dest . '&' . $addr_request;
 
 			// We have to check if the remote server does understand /magic without invoking something

@@ -47,7 +47,7 @@ class Fetch extends BaseModule
 				}
 				$host = $parts["scheme"] . "://" . $parts["host"];
 
-				if (Strings::normaliseLink($host) != Strings::normaliseLink($app->getBaseURL())) {
+				if (Strings::normaliseLink($host) != Strings::normaliseLink(DI::baseUrl()->get())) {
 					$location = $host . "/fetch/" . $app->argv[1] . "/" . urlencode($guid);
 					System::externalRedirect($location, 301);
 				}

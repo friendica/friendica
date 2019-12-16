@@ -106,7 +106,7 @@ class Details extends BaseAdminModule
 				'$page' => L10n::t('Themes'),
 				'$toggle' => L10n::t('Toggle'),
 				'$settings' => L10n::t('Settings'),
-				'$baseurl' => $a->getBaseURL(true),
+				'$baseurl' => DI::baseUrl()->get(true),
 				'$addon' => $theme,
 				'$status' => $status,
 				'$action' => $action,
