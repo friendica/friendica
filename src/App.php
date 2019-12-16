@@ -154,24 +154,6 @@ class App
 	}
 
 	/**
-	 * @deprecated 2019.09 - use Page->registerStylesheet instead
-	 * @see        Page::registerStylesheet()
-	 */
-	public function registerStylesheet($path)
-	{
-		$this->page->registerStylesheet($path);
-	}
-
-	/**
-	 * @deprecated 2019.09 - use Page->registerFooterScript instead
-	 * @see        Page::registerFooterScript()
-	 */
-	public function registerFooterScript($path)
-	{
-		$this->page->registerFooterScript($path);
-	}
-
-	/**
 	 * @param Database        $database The Friendica Database
 	 * @param Configuration   $config   The Configuration
 	 * @param App\Mode        $mode     The mode of this Friendica app
