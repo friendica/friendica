@@ -260,18 +260,6 @@ class App
 	}
 
 	/**
-	 * Returns the scheme of the current call
-	 *
-	 * @return string
-	 *
-	 * @deprecated 2019.06 - use BaseURL->getScheme() instead
-	 */
-	public function getScheme()
-	{
-		return $this->baseURL->getScheme();
-	}
-
-	/**
 	 * Returns the current UserAgent as a String
 	 *
 	 * @return string the UserAgent as a String
