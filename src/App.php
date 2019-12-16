@@ -53,8 +53,6 @@ class App
 	public $page_contact;
 	public $content;
 	public $data = [];
-	/** @deprecated 2019.09 - use App\Arguments->getCommand() */
-	public $cmd = '';
 	/** @deprecated 2019.09 - use App\Arguments->getArgv() or Arguments->get() */
 	public $argv;
 	/** @deprecated 2019.09 - use App\Arguments->getArgc() */
@@ -170,7 +168,6 @@ class App
 		$this->args     = $args;
 		$this->process  = $process;
 
-		$this->cmd          = $args->getCommand();
 		$this->argv         = $args->getArgv();
 		$this->argc         = $args->getArgc();
 		$this->module       = $module->getName();

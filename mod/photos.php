@@ -846,7 +846,7 @@ function photos_content(App $a)
 
 	$phototypes = Images::supportedTypes();
 
-	$_SESSION['photo_return'] = $a->cmd;
+	$_SESSION['photo_return'] = DI::args()->getCommand();
 
 	// Parse arguments
 	$datum = null;
@@ -1366,7 +1366,7 @@ function photos_content(App $a)
 		if (!empty($link_item['id']) && !empty($link_item['uri'])) {
 			$cmnt_tpl = Renderer::getMarkupTemplate('comment_item.tpl');
 			$tpl = Renderer::getMarkupTemplate('photo_item.tpl');
-			$return_path = $a->cmd;
+			$return_path = DI::args()->getCommand();
 
 			if ($cmd === 'view' && ($can_post || Security::canWriteToUserWall($owner_uid))) {
 				$like_tpl = Renderer::getMarkupTemplate('like_noshare.tpl');

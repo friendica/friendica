@@ -86,7 +86,7 @@ function pubsub_post(App $a)
 {
 	$xml = Network::postdata();
 
-	Logger::log('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' .  $a->cmd . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
+	Logger::log('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' .  DI::args()->getCommand() . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
 	Logger::log('Data: ' . $xml, Logger::DATA);
 
 	$nick       = (($a->argc > 1) ? Strings::escapeTags(trim($a->argv[1])) : '');

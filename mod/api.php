@@ -45,7 +45,7 @@ function api_post(App $a)
 
 function api_content(App $a)
 {
-	if ($a->cmd == 'api/oauth/authorize') {
+	if (DI::args()->getCommand() == 'api/oauth/authorize') {
 		/*
 		 * api/oauth/authorize interact with the user. return a standard page
 		 */

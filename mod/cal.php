@@ -221,7 +221,7 @@ function cal_content(App $a)
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (empty($links[$j])) {
-					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
+					$links[$j] = System::baseUrl() . '/' . DI::args()->getCommand() . '#link-' . $j;
 				}
 			}
 		}

@@ -335,19 +335,19 @@ function dfrn_request_post(App $a)
 				$url = Network::isUrlValid($url);
 				if (!$url) {
 					notice(L10n::t('Invalid profile URL.') . EOL);
-					DI::baseUrl()->redirect($a->cmd);
+					DI::baseUrl()->redirect(DI::args()->getCommand());
 					return; // NOTREACHED
 				}
 
 				if (!Network::isUrlAllowed($url)) {
 					notice(L10n::t('Disallowed profile URL.') . EOL);
-					DI::baseUrl()->redirect($a->cmd);
+					DI::baseUrl()->redirect(DI::args()->getCommand());
 					return; // NOTREACHED
 				}
 
 				if (Network::isUrlBlocked($url)) {
 					notice(L10n::t('Blocked domain') . EOL);
-					DI::baseUrl()->redirect($a->cmd);
+					DI::baseUrl()->redirect(DI::args()->getCommand());
 					return; // NOTREACHED
 				}
 
@@ -355,7 +355,7 @@ function dfrn_request_post(App $a)
 
 				if (!count($parms)) {
 					notice(L10n::t('Profile location is not valid or does not contain profile information.') . EOL);
-					DI::baseUrl()->redirect($a->cmd);
+					DI::baseUrl()->redirect(DI::args()->getCommand());
 				} else {
 					if (empty($parms['fn'])) {
 						notice(L10n::t('Warning: profile location has no identifiable owner name.') . EOL);

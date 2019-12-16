@@ -818,7 +818,7 @@ class Contact extends BaseModule
 			'$desc'       => L10n::t('Search your contacts'),
 			'$finding'    => $searching ? L10n::t('Results for: %s', $search) : '',
 			'$submit'     => L10n::t('Find'),
-			'$cmd'        => $a->cmd,
+			'$cmd'        => DI::args()->getCommand(),
 			'$contacts'   => $contacts,
 			'$contact_drop_confirm' => L10n::t('Do you really want to delete this contact?'),
 			'multiselect' => 1,

@@ -480,7 +480,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 			 */
 			$live_update_div = '<div id="live-network"></div>' . "\r\n"
 				. "<script> var profile_uid = " . $_SESSION['uid']
-				. "; var netargs = '" . substr($a->cmd, 8)
+				. "; var netargs = '" . substr(DI::args()->getCommand(), 8)
 				. '?f='
 				. (!empty($_GET['cid'])    ? '&cid='    . rawurlencode($_GET['cid'])    : '')
 				. (!empty($_GET['search']) ? '&search=' . rawurlencode($_GET['search']) : '')
@@ -540,7 +540,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-community"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 10)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(DI::args()->getCommand(), 10)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'contacts') {
@@ -549,7 +549,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr($a->cmd, 9)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(DI::args()->getCommand(), 9)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'search') {

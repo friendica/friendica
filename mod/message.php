@@ -89,7 +89,7 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-		DI::baseUrl()->redirect($a->cmd . '/' . $ret);
+		DI::baseUrl()->redirect(DI::args()->getCommand() . '/' . $ret);
 	}
 }
 

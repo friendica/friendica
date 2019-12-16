@@ -1047,7 +1047,7 @@ class Profile
 
 		$addr = $_GET['addr'] ?? $my_url;
 
-		$arr = ['zrl' => $my_url, 'url' => $a->cmd];
+		$arr = ['zrl' => $my_url, 'url' => DI::args()->getCommand()];
 		Hook::callAll('zrl_init', $arr);
 
 		// Try to find the public contact entry of the visitor.

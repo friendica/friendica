@@ -41,7 +41,7 @@ function suggest_content(App $a)
 		return;
 	}
 
-	$_SESSION['return_path'] = $a->cmd;
+	$_SESSION['return_path'] = DI::args()->getCommand();
 
 	$a->page['aside'] .= Widget::findPeople();
 	$a->page['aside'] .= Widget::follow();

@@ -914,7 +914,7 @@ function network_tabs(App $a)
 		$all_active = 'active';
 	}
 
-	$cmd = $a->cmd;
+	$cmd = DI::args()->getCommand();
 
 	// tabs
 	$tabs = [

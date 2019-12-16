@@ -11,6 +11,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Util\Network;
@@ -38,7 +39,7 @@ function match_content(App $a)
 	$a->page['aside'] .= Widget::findPeople();
 	$a->page['aside'] .= Widget::follow();
 
-	$_SESSION['return_path'] = $a->cmd;
+	$_SESSION['return_path'] = DI::args()->getCommand();
 
 	$profile = Profile::getByUID(local_user());
 

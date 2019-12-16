@@ -215,7 +215,7 @@ function events_content(App $a)
 	}
 
 	if ($a->argc == 1) {
-		$_SESSION['return_path'] = $a->cmd;
+		$_SESSION['return_path'] = DI::args()->getCommand();
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
@@ -348,7 +348,7 @@ function events_content(App $a)
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (empty($links[$j])) {
-					$links[$j] = System::baseUrl() . '/' . $a->cmd . '#link-' . $j;
+					$links[$j] = System::baseUrl() . '/' . DI::args()->getCommand() . '#link-' . $j;
 				}
 			}
 		}

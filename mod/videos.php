@@ -124,7 +124,7 @@ function videos_content(App $a)
 
 	//$phototypes = Photo::supportedTypes();
 
-	$_SESSION['video_return'] = $a->cmd;
+	$_SESSION['video_return'] = DI::args()->getCommand();
 
 	//
 	// Parse arguments
