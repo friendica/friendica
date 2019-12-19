@@ -16,14 +16,13 @@ class CurlResultTest extends TestCase
 	{
 		parent::setUp();
 
-
 		/** @var Dice|MockInterface $dice */
 		$dice = \Mockery::mock(Dice::class)->makePartial();
 		$dice = $dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 
 		$logger = new NullLogger();
 		$dice->shouldReceive('create')
-		           ->with(LoggerInterface::class)
+		           ->with(LoggerInterface::class, [])
 		           ->andReturn($logger);
 
 		DI::init($dice);

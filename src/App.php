@@ -10,8 +10,8 @@ use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\App\Authentication;
 use Friendica\Core\Config\Cache\ConfigCache;
-use Friendica\Core\Config\Configuration;
-use Friendica\Core\Config\PConfiguration;
+use Friendica\Core\Config\IConfiguration;
+use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
@@ -88,7 +88,7 @@ class App
 	private $currentMobileTheme;
 
 	/**
-	 * @var Configuration The config
+	 * @var IConfiguration The config
 	 */
 	private $config;
 
@@ -145,7 +145,7 @@ class App
 
 	/**
 	 * @param Database        $database The Friendica Database
-	 * @param Configuration   $config   The Configuration
+	 * @param IConfiguration   $config   The Configuration
 	 * @param App\Mode        $mode     The mode of this Friendica app
 	 * @param BaseURL         $baseURL  The full base URL of this Friendica app
 	 * @param LoggerInterface $logger   The current app logger
@@ -154,7 +154,7 @@ class App
 	 * @param App\Arguments   $args     The Friendica Arguments of the call
 	 * @param Core\Process    $process  The process methods
 	 */
-	public function __construct(Database $database, Configuration $config, App\Mode $mode, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, L10n $l10n, Arguments $args, App\Page $page, Core\Process $process)
+	public function __construct(Database $database, IConfiguration $config, App\Mode $mode, BaseURL $baseURL, LoggerInterface $logger, Profiler $profiler, L10n $l10n, Arguments $args, App\Page $page, Core\Process $process)
 	{
 		$this->database = $database;
 		$this->config   = $config;
@@ -433,12 +433,12 @@ class App
 	 *
 	 * @param App\Module     $module The determined module
 	 * @param App\Router     $router
-	 * @param PConfiguration $pconfig
+	 * @param IPConfiguration $pconfig
 	 * @param Authentication $auth The Authentication backend of the node
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function runFrontend(App\Module $module, App\Router $router, PConfiguration $pconfig, Authentication $auth)
+	public function runFrontend(App\Module $module, App\Router $router, IPConfiguration $pconfig, Authentication $auth)
 	{
 		$moduleName = $module->getName();
 

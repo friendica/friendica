@@ -34,7 +34,7 @@ class InstallerTest extends MockedTest
 		$dice = $dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 
 		$dice->shouldReceive('create')
-		           ->with(\Friendica\Core\L10n\L10n::class)
+		           ->with(\Friendica\Core\L10n\L10n::class, [])
 		           ->andReturn($this->l10nMock);
 
 		DI::init($dice);
@@ -362,7 +362,7 @@ class InstallerTest extends MockedTest
 		$this->assertTrue($install->checkImagick());
 
 		$this->assertCheckExist(1,
-			L10n::t('ImageMagick supports GIF'),
+			$this->l10nMock->t('ImageMagick supports GIF'),
 			'',
 			true,
 			false,
@@ -385,9 +385,9 @@ class InstallerTest extends MockedTest
 		// even there is no supported type, Imagick should return true (because it is not required)
 		$this->assertTrue($install->checkImagick());
 		$this->assertCheckExist(1,
-			L10n::t('ImageMagick supports GIF'),
+			$this->l10nMock->t('ImageMagick supports GIF'),
 			'',
-			false,
+			true,
 			false,
 			$install->getChecks());
 	}

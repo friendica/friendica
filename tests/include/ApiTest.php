@@ -7,8 +7,8 @@ namespace Friendica\Test;
 
 use Dice\Dice;
 use Friendica\App;
-use Friendica\Core\Config\Configuration;
-use Friendica\Core\Config\PConfiguration;
+use Friendica\Core\Config\IConfiguration;
+use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session;
 use Friendica\Core\Session\ISession;
@@ -47,7 +47,7 @@ class ApiTest extends DatabaseTest
 	/** @var App */
 	protected $app;
 
-	/** @var Configuration */
+	/** @var IConfiguration */
 	protected $config;
 
 	/** @var Dice */
@@ -69,8 +69,8 @@ class ApiTest extends DatabaseTest
 		/** @var Database $dba */
 		$dba = $this->dice->create(Database::class);
 
-		/** @var Configuration $config */
-		$this->config = $this->dice->create(Configuration::class);
+		/** @var IConfiguration $config */
+		$this->config = $this->dice->create(IConfiguration::class);
 
 		$this->config->set('system', 'url', 'http://localhost');
 		$this->config->set('system', 'hostname', 'localhost');
@@ -827,7 +827,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiGetUserWithFrioSchema()
 	{
-		$pConfig = $this->dice->create(PConfiguration::class);
+		$pConfig = $this->dice->create(IPConfiguration::class);
 		$pConfig->set($this->selfUser['id'], 'frio', 'schema', 'red');
 		$user = api_get_user($this->app);
 		$this->assertSelfUser($user);
@@ -843,7 +843,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiGetUserWithCustomFrioSchema()
 	{
-		$pConfig = $this->dice->create(PConfiguration::class);
+		$pConfig = $this->dice->create(IPConfiguration::class);
 		$pConfig->set($this->selfUser['id'], 'frio', 'schema', '---');
 		$pConfig->set($this->selfUser['id'], 'frio', 'nav_bg', '#123456');
 		$pConfig->set($this->selfUser['id'], 'frio', 'link_color', '#123456');
@@ -862,7 +862,7 @@ class ApiTest extends DatabaseTest
 	 */
 	public function testApiGetUserWithEmptyFrioSchema()
 	{
-		$pConfig = $this->dice->create(PConfiguration::class);
+		$pConfig = $this->dice->create(IPConfiguration::class);
 		$pConfig->set($this->selfUser['id'], 'frio', 'schema', '---');
 		$user = api_get_user($this->app);
 		$this->assertSelfUser($user);

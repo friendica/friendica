@@ -3,7 +3,7 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Config\Cache\ConfigCache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -47,9 +47,9 @@ class Profiler implements ContainerInterface
 	/**
 	 * Updates the enabling of the current profiler
 	 *
-	 * @param Configuration $config
+	 * @param IConfiguration $config
 	 */
-	public function update(Configuration $config)
+	public function update(IConfiguration $config)
 	{
 		$this->enabled = $config->get('system', 'profiler');
 		$this->rendertime = $config->get('rendertime', 'callstack');

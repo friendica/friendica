@@ -6,7 +6,7 @@ use Exception;
 use Friendica\App;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Config\PConfiguration;
+use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -71,13 +71,13 @@ final class Notify
 	private $args;
 	/** @var App\BaseURL */
 	private $baseUrl;
-	/** @var PConfiguration */
+	/** @var IPConfiguration */
 	private $pConfig;
 	/** @var LoggerInterface */
 	private $logger;
 
 	public function __construct(Database $dba, L10n $l10n, App\Arguments $args, App\BaseURL $baseUrl,
-	                            PConfiguration $pConfig, LoggerInterface $logger)
+	                            IPConfiguration $pConfig, LoggerInterface $logger)
 	{
 		$this->dba     = $dba;
 		$this->l10n    = $l10n;

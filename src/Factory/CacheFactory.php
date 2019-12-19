@@ -5,7 +5,7 @@ namespace Friendica\Factory;
 use Friendica\App\BaseURL;
 use Friendica\Core\Cache;
 use Friendica\Core\Cache\ICache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Database\Database;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -25,7 +25,7 @@ class CacheFactory
 	const DEFAULT_TYPE = Cache\Cache::TYPE_DATABASE;
 
 	/**
-	 * @var Configuration The configuration to read parameters out of the config
+	 * @var IConfiguration The IConfiguration to read parameters out of the config
 	 */
 	private $config;
 
@@ -49,7 +49,7 @@ class CacheFactory
 	 */
 	private $logger;
 
-	public function __construct(BaseURL $baseURL, Configuration $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
+	public function __construct(BaseURL $baseURL, IConfiguration $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
 	{
 		$this->hostname = $baseURL->getHostname();
 		$this->config   = $config;

@@ -27,7 +27,7 @@ class ConfigFactory
 	 * @param Cache\ConfigCache $configCache The config cache of this adapter
 	 * @param ConfigModel       $configModel The configuration model
 	 *
-	 * @return Config\Configuration
+	 * @return Config\IConfiguration
 	 */
 	public function createConfig(Cache\ConfigCache $configCache, ConfigModel $configModel)
 	{
@@ -46,7 +46,7 @@ class ConfigFactory
 	 * @param Cache\PConfigCache $pConfigCache The personal config cache
 	 * @param PConfigModel       $configModel  The configuration model
 	 *
-	 * @return Config\PConfiguration
+	 * @return Config\IPConfiguration
 	 */
 	public function createPConfig(Cache\ConfigCache $configCache, Cache\PConfigCache $pConfigCache, PConfigModel $configModel)
 	{

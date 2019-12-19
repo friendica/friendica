@@ -3,7 +3,7 @@
 namespace Friendica\Testsrc\Model\User;
 
 use Friendica\App\BaseURL;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Model\User\Cookie;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\StaticCookie;
@@ -11,7 +11,7 @@ use Mockery\MockInterface;
 
 class CookieTest extends DatabaseTest
 {
-	/** @var MockInterface|Configuration */
+	/** @var MockInterface|IConfiguration */
 	private $config;
 	/** @var MockInterface|BaseURL */
 	private $baseUrl;
@@ -22,7 +22,7 @@ class CookieTest extends DatabaseTest
 
 		parent::setUp();
 
-		$this->config = \Mockery::mock(Configuration::class);
+		$this->config = \Mockery::mock(IConfiguration::class);
 		$this->baseUrl = \Mockery::mock(BaseURL::class);
 	}
 

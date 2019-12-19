@@ -151,13 +151,13 @@ class Module
 	 *
 	 * @param Arguments                 $args   The Friendica execution arguments
 	 * @param Router                    $router The Friendica routing instance
-	 * @param Core\Config\Configuration $config The Friendica Configuration
+	 * @param Core\Config\IConfiguration $config The Friendica Configuration
 	 *
 	 * @return Module The determined module of this call
 	 *
 	 * @throws \Exception
 	 */
-	public function determineClass(Arguments $args, Router $router, Core\Config\Configuration $config)
+	public function determineClass(Arguments $args, Router $router, Core\Config\IConfiguration $config)
 	{
 		$printNotAllowedAddon = false;
 

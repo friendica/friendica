@@ -2,7 +2,7 @@
 
 namespace Friendica\Console;
 
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 
 /**
  * Tired of chasing typos and finding them after a commit.
@@ -15,7 +15,7 @@ class Typo extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/**
-	 * @var Configuration
+	 * @var IConfiguration
 	 */
 	private $config;
 
@@ -36,7 +36,7 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Configuration $config, array $argv = null)
+	public function __construct(IConfiguration $config, array $argv = null)
 	{
 		parent::__construct($argv);
 

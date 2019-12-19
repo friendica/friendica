@@ -25,7 +25,7 @@ class AutomaticInstallation extends Console
 	private $configCache;
 
 	/**
-	 * @var Config\Configuration
+	 * @var Config\IConfiguration
 	 */
 	private $config;
 
@@ -89,7 +89,7 @@ Examples
 HELP;
 	}
 
-	public function __construct(App\Mode $appMode, Config\Cache\ConfigCache $configCache, Config\Configuration $config, Database $dba, array $argv = null)
+	public function __construct(App\Mode $appMode, Config\Cache\ConfigCache $configCache, Config\IConfiguration $config, Database $dba, array $argv = null)
 	{
 		parent::__construct($argv);
 

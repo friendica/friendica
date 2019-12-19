@@ -8,7 +8,7 @@ namespace Friendica\App;
 
 use Exception;
 use Friendica\App;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Core\Hook;
 use Friendica\Core\PConfig;
 use Friendica\Core\Session;
@@ -30,7 +30,7 @@ use Psr\Log\LoggerInterface;
  */
 class Authentication
 {
-	/** @var Configuration */
+	/** @var IConfiguration */
 	private $config;
 	/** @var App\Mode */
 	private $mode;
@@ -50,7 +50,7 @@ class Authentication
 	/**
 	 * Authentication constructor.
 	 *
-	 * @param Configuration   $config
+	 * @param IConfiguration   $config
 	 * @param App\Mode        $mode
 	 * @param App\BaseURL     $baseUrl
 	 * @param L10n            $l10n
@@ -59,7 +59,7 @@ class Authentication
 	 * @param User\Cookie     $cookie
 	 * @param Session\ISession $session
 	 */
-	public function __construct(Configuration $config, App\Mode $mode, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session)
+	public function __construct(IConfiguration $config, App\Mode $mode, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session)
 	{
 		$this->config  = $config;
 		$this->mode = $mode;

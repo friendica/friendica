@@ -3,7 +3,7 @@
 namespace Friendica\Core\Cache;
 
 use Exception;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Memcache;
 
 /**
@@ -25,7 +25,7 @@ class MemcacheCache extends Cache implements IMemoryCache
 	/**
 	 * @throws Exception
 	 */
-	public function __construct(string $hostname, Configuration $config)
+	public function __construct(string $hostname, IConfiguration $config)
 	{
 		if (!class_exists('Memcache', false)) {
 			throw new Exception('Memcache class isn\'t available');

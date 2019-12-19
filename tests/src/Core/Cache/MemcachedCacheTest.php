@@ -4,7 +4,7 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\MemcachedCache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Psr\Log\NullLogger;
 
 /**
@@ -15,7 +15,7 @@ class MemcachedCacheTest extends MemoryCacheTest
 {
 	protected function getInstance()
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 
 		$host = $_SERVER['MEMCACHED_HOST'] ?? 'localhost';
 

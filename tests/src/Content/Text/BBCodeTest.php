@@ -43,13 +43,13 @@ class BBCodeTest extends MockedTest
 		$l10nMock = \Mockery::mock(L10n::class);
 		$l10nMock->shouldReceive('t')->withAnyArgs()->andReturnUsing(function ($args) { return $args; });
 		$this->dice->shouldReceive('create')
-		           ->with(L10n::class)
+		           ->with(L10n::class, [])
 		           ->andReturn($l10nMock);
 
 		$baseUrlMock = \Mockery::mock(BaseURL::class);
 		$baseUrlMock->shouldReceive('get')->withAnyArgs()->andReturn('friendica.local');
 		$this->dice->shouldReceive('create')
-		           ->with(BaseURL::class)
+		           ->with(BaseURL::class, [])
 		           ->andReturn($baseUrlMock);
 	}
 

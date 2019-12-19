@@ -3,7 +3,7 @@
 namespace Friendica\Test\src\App;
 
 use Friendica\App;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\LegacyModule;
 use Friendica\Module\HTTPException\PageNotFound;
 use Friendica\Module\WellKnown\HostMeta;
@@ -149,7 +149,7 @@ class ModuleTest extends DatabaseTest
 	 */
 	public function testModuleClass($assert, string $name, string $command, bool $privAdd)
 	{
-		$config = \Mockery::mock(Configuration::class);
+		$config = \Mockery::mock(IConfiguration::class);
 		$config->shouldReceive('get')->with('config', 'private_addons', false)->andReturn($privAdd)->atMost()->once();
 
 		$router = (new App\Router([]))->loadRoutes(include __DIR__ . '/../../../static/routes.config.php');

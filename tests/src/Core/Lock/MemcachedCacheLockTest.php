@@ -4,7 +4,7 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Cache\MemcachedCache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Core\Lock\CacheLock;
 use Psr\Log\NullLogger;
 
@@ -16,7 +16,7 @@ class MemcachedCacheLockTest extends LockTest
 {
 	protected function getInstance()
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 
 		$host = $_SERVER['MEMCACHED_HOST'] ?? 'localhost';
 

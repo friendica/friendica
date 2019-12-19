@@ -2,7 +2,7 @@
 
 namespace Friendica\Factory;
 
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -50,13 +50,13 @@ class LoggerFactory
 	 * Creates a new PSR-3 compliant logger instances
 	 *
 	 * @param Database      $database The Friendica Database instance
-	 * @param Configuration $config   The config
+	 * @param IConfiguration $config   The config
 	 * @param Profiler      $profiler The profiler of the app
 	 * @param FileSystem    $fileSystem FileSystem utils
 	 *
 	 * @return LoggerInterface The PSR-3 compliant logger instance
 	 */
-	public function create(Database $database, Configuration $config, Profiler $profiler, FileSystem $fileSystem)
+	public function create(Database $database, IConfiguration $config, Profiler $profiler, FileSystem $fileSystem)
 	{
 		if (empty($config->get('system', 'debugging', false))) {
 			$logger = new VoidLogger();
@@ -137,7 +137,7 @@ class LoggerFactory
 	 *
 	 * It should never get filled during normal usage of Friendica
 	 *
-	 * @param Configuration $config   The config
+	 * @param IConfiguration $config   The config
 	 * @param Profiler      $profiler The profiler of the app
 	 * @param FileSystem    $fileSystem FileSystem utils
 	 *
@@ -146,7 +146,7 @@ class LoggerFactory
 	 * @throws InternalServerErrorException
 	 * @throws \Exception
 	 */
-	public static function createDev(Configuration $config, Profiler $profiler, FileSystem $fileSystem)
+	public static function createDev(IConfiguration $config, Profiler $profiler, FileSystem $fileSystem)
 	{
 		$debugging   = $config->get('system', 'debugging');
 		$stream      = $config->get('system', 'dlogfile');

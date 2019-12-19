@@ -4,7 +4,7 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\RedisCache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 
 /**
  * @requires extension redis
@@ -14,7 +14,7 @@ class RedisCacheTest extends MemoryCacheTest
 {
 	protected function getInstance()
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 
 		$host = $_SERVER['REDIS_HOST'] ?? 'localhost';
 

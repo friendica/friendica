@@ -4,8 +4,8 @@ namespace Friendica;
 
 use Dice\Dice;
 use Friendica\Core\Cache\ICache;
-use Friendica\Core\Config\Configuration;
-use Friendica\Core\Config\PConfiguration;
+use Friendica\Core\Config\IConfiguration;
+use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Lock\ILock;
 use Friendica\Core\Process;
@@ -34,8 +34,8 @@ use Psr\Log\LoggerInterface;
  * @method static Content\Text\BBCode\Video bbCodeVideo()
  * @method static DateTimeFormat dtFormat()
  * @method static ICache cache()
- * @method static Configuration config()
- * @method static PConfiguration pConfig()
+ * @method static IConfiguration config()
+ * @method static IPConfiguration pConfig()
  * @method static ILock lock()
  * @method static L10n l10n()
  * @method static LoggerInterface logger()
@@ -73,8 +73,8 @@ class DI
 		'bbCodeVideo'  => Content\Text\BBCode\Video::class,
 		'dtFormat'     => DateTimeFormat::class,
 		'cache'        => ICache::class,
-		'config'       => Configuration::class,
-		'pConfig'      => PConfiguration::class,
+		'config'       => IConfiguration::class,
+		'pConfig'      => IPConfiguration::class,
 		'l10n'         => L10n::class,
 		'lock'         => ILock::class,
 		'logger'       => LoggerInterface::class,

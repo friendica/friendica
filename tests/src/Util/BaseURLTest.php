@@ -2,7 +2,7 @@
 namespace Friendica\Test\src\Util;
 
 use Friendica\App\BaseURL;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Test\MockedTest;
 
 class BaseURLTest extends MockedTest
@@ -173,7 +173,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testCheck($server, $input, $assert)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn($input['hostname']);
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn($input['urlPath']);
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($input['sslPolicy']);
@@ -295,7 +295,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testSave($input, $save, $url)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn($input['hostname']);
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn($input['urlPath']);
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($input['sslPolicy']);
@@ -333,7 +333,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testSaveByUrl($input, $save, $url)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn($input['hostname']);
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn($input['urlPath']);
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($input['sslPolicy']);
@@ -409,7 +409,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testGetURL($sslPolicy, $ssl, $url, $assert)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn('friendica.local');
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn('new/test');
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($sslPolicy);
@@ -467,7 +467,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testCheckRedirectHTTPS($server, $forceSSL, $sslPolicy, $url, $redirect)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn('friendica.local');
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn('new/test');
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($sslPolicy);
@@ -503,7 +503,7 @@ class BaseURLTest extends MockedTest
 	 */
 	public function testWrongSave($fail)
 	{
-		$configMock = \Mockery::mock(Configuration::class);
+		$configMock = \Mockery::mock(IConfiguration::class);
 		$configMock->shouldReceive('get')->with('config', 'hostname')->andReturn('friendica.local');
 		$configMock->shouldReceive('get')->with('system', 'urlpath')->andReturn('new/test');
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn(BaseURL::DEFAULT_SSL_SCHEME);

@@ -3,7 +3,7 @@
 namespace Friendica\Core;
 
 use Friendica\App;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -28,7 +28,7 @@ final class Process
 	private $mode;
 
 	/**
-	 * @var Configuration
+	 * @var IConfiguration
 	 */
 	private $config;
 
@@ -37,7 +37,7 @@ final class Process
 	 */
 	private $basePath;
 
-	public function __construct(LoggerInterface $logger, App\Mode $mode, Configuration $config, string $basepath)
+	public function __construct(LoggerInterface $logger, App\Mode $mode, IConfiguration $config, string $basepath)
 	{
 		$this->logger   = $logger;
 		$this->mode     = $mode;

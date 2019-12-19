@@ -3,7 +3,7 @@
 namespace Friendica\Core\Cache;
 
 use Exception;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Memcached;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +39,7 @@ class MemcachedCache extends Cache implements IMemoryCache
 	 *
 	 * @throws \Exception
 	 */
-	public function __construct(string $hostname, Configuration $config, LoggerInterface $logger)
+	public function __construct(string $hostname, IConfiguration $config, LoggerInterface $logger)
 	{
 		if (!class_exists('Memcached', false)) {
 			throw new Exception('Memcached class isn\'t available');

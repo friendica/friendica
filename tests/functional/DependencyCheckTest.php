@@ -7,7 +7,7 @@ use Friendica\App;
 use Friendica\Core\Cache\ICache;
 use Friendica\Core\Cache\IMemoryCache;
 use Friendica\Core\Config\Cache\ConfigCache;
-use Friendica\Core\Config\Configuration;
+use Friendica\Core\Config\IConfiguration;
 use Friendica\Core\Lock\ILock;
 use Friendica\Database\Database;
 use Friendica\Test\Util\VFSTrait;
@@ -115,10 +115,10 @@ class dependencyCheck extends TestCase
 
 	public function testConfiguration()
 	{
-		/** @var Configuration $config */
-		$config = $this->dice->create(Configuration::class);
+		/** @var IConfiguration $config */
+		$config = $this->dice->create(IConfiguration::class);
 
-		$this->assertInstanceOf(Configuration::class, $config);
+		$this->assertInstanceOf(IConfiguration::class, $config);
 
 		$this->assertNotEmpty($config->get('database', 'username'));
 	}
@@ -133,8 +133,8 @@ class dependencyCheck extends TestCase
 
 	public function testDevLogger()
 	{
-		/** @var Configuration $config */
-		$config = $this->dice->create(Configuration::class);
+		/** @var IConfiguration $config */
+		$config = $this->dice->create(IConfiguration::class);
 		$config->set('system', 'dlogfile', $this->root->url() . '/friendica.log');
 
 		/** @var LoggerInterface $logger */

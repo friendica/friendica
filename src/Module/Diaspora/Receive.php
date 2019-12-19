@@ -2,10 +2,7 @@
 
 namespace Friendica\Module\Diaspora;
 
-use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Core\Config\Configuration;
-use Friendica\Core\L10n\L10n;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;

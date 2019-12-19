@@ -7,8 +7,8 @@ use DOMDocument;
 use DOMXPath;
 use Friendica\App;
 use Friendica\Content\Nav;
-use Friendica\Core\Config\Configuration;
-use Friendica\Core\Config\PConfiguration;
+use Friendica\Core\Config\IConfiguration;
+use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Renderer;
@@ -171,12 +171,12 @@ class Page implements ArrayAccess
 	 * @param App            $app     The Friendica App instance
 	 * @param Module         $module  The loaded Friendica module
 	 * @param L10n           $l10n    The l10n language instance
-	 * @param Configuration  $config  The Friendica configuration
-	 * @param PConfiguration $pConfig The Friendica personal configuration (for user)
+	 * @param IConfiguration  $config  The Friendica configuration
+	 * @param IPConfiguration $pConfig The Friendica personal configuration (for user)
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private function initHead(App $app, Module $module, L10n $l10n, Configuration $config, PConfiguration $pConfig)
+	private function initHead(App $app, Module $module, L10n $l10n, IConfiguration $config, IPConfiguration $pConfig)
 	{
 		$interval = ((local_user()) ? $pConfig->get(local_user(), 'system', 'update_interval') : 40000);
 
@@ -347,12 +347,12 @@ class Page implements ArrayAccess
 	 * @param Mode           $mode    The current node mode
 	 * @param Module         $module  The loaded Friendica module
 	 * @param L10n           $l10n    The l10n language class
-	 * @param Configuration  $config  The Configuration of this node
-	 * @param PConfiguration $pconfig The personal/user configuration
+	 * @param IConfiguration  $config  The Configuration of this node
+	 * @param IPConfiguration $pconfig The personal/user configuration
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public function run(App $app, BaseURL $baseURL, Mode $mode, Module $module, L10n $l10n, Configuration $config, PConfiguration $pconfig)
+	public function run(App $app, BaseURL $baseURL, Mode $mode, Module $module, L10n $l10n, IConfiguration $config, IPConfiguration $pconfig)
 	{
 		$moduleName = $module->getName();
 
