@@ -10,10 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class SystemTest extends TestCase
 {
-	protected function setUp()
+	private function useBaseUrl()
 	{
-		parent::setUp();
-
 		$baseUrl = \Mockery::mock(BaseURL::class);
 		$baseUrl->shouldReceive('getHostname')->andReturn('friendica.local')->once();
 		$dice = \Mockery::mock(Dice::class);
@@ -30,21 +28,27 @@ class SystemTest extends TestCase
 
 	function testGuidWithoutParameter()
 	{
+		$this->useBaseUrl();
 		$guid = System::createGUID();
 		$this->assertGuid($guid, 16);
 	}
 
-	function testGuidWithSize32() {
+	function testGuidWithSize32()
+	{
+		$this->useBaseUrl();
 		$guid = System::createGUID(32);
 		$this->assertGuid($guid, 32);
 	}
 
-	function testGuidWithSize64() {
+	function testGuidWithSize64()
+	{
+		$this->useBaseUrl();
 		$guid = System::createGUID(64);
 		$this->assertGuid($guid, 64);
 	}
 
-	function testGuidWithPrefix() {
+	function testGuidWithPrefix()
+	{
 		$guid = System::createGUID(23, 'test');
 		$this->assertGuid($guid, 23, 'test');
 	}
