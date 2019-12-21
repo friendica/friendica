@@ -73,13 +73,15 @@ class InstallerTest extends MockedTest
 
 	private function assertCheckExist($position, $title, $help, $status, $required, $assertionArray)
 	{
-		$this->assertArraySubset([$position => [
+		$subSet = [$position => [
 			'title' => $title,
 			'status' => $status,
 			'required' => $required,
 			'error_msg' => null,
 			'help' => $help]
-		], $assertionArray);
+		];
+
+		$this->assertArraySubset($subSet, $assertionArray, false, "expected subset: " . PHP_EOL . print_r($subSet, true) . PHP_EOL . "current subset: " . print_r($assertionArray, true));
 	}
 
 	/**
