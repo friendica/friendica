@@ -2,11 +2,26 @@
 
 namespace Friendica\Test\src\Core;
 
+use Dice\Dice;
+use Friendica\App\BaseURL;
 use Friendica\Core\System;
+use Friendica\DI;
 use PHPUnit\Framework\TestCase;
 
 class SystemTest extends TestCase
 {
+	protected function setUp()
+	{
+		parent::setUp();
+
+		$baseUrl = \Mockery::mock(BaseURL::class);
+		$baseUrl->shouldReceive('getHostname')->andReturn('friendica.local')->once();
+		$dice = \Mockery::mock(Dice::class);
+		$dice->shouldReceive('create')->with(BaseURL::class, [])->andReturn($baseUrl);
+
+		DI::init($dice);
+	}
+
 	private function assertGuid($guid, $length, $prefix = '')
 	{
 		$length -= strlen($prefix);
