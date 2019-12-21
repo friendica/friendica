@@ -1,7 +1,7 @@
 # Mastodon API
 
 * [Home](help)
-  * [Using the APIs](https://docs.joinmastodon.org/api/)
+  * [Using the APIs](help/api)
 
 ## Overview
 
