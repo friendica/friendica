@@ -224,4 +224,31 @@ class BBCodeTest extends MockedTest
 
 		$this->assertEquals($expectedHtml, $actual);
 	}
+
+	public function dataBBCodesToMarkdown()
+	{
+		return [
+			'bug-7808-chevrons' => [
+				'expected' => '=> `[guid] => `',
+				'text' => '=> [code][guid] => [/code]',
+			],
+		];
+	}
+
+	/**
+	 * Test convert bbcodes to Markdown
+	 *
+	 * @dataProvider dataBBCodesToMarkdown
+	 *
+	 * @param string $expected     Expected Markdown output
+	 * @param string $text         BBCode text
+	 * @param bool   $for_diaspora
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function testToMarkdown($expected, $text, $for_diaspora = false)
+	{
+		$actual = BBCode::toMarkdown($text, $for_diaspora);
+
+		$this->assertEquals($expected, $actual);
+	}
 }
