@@ -11,14 +11,14 @@ Authentication is the same as described in [Using the APIs](help/api#Authenticat
 
 ## Entities
 
-These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/api/entities/).
+These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/entities/).
 
 ## Implemented endpoints
 
-- [GET /api/v1/follow_requests](https://docs.joinmastodon.org/api/rest/follow-requests/#get-api-v1-follow-requests)
+- [GET /api/v1/follow_requests](https://docs.joinmastodon.org/methods/accounts/follow_requests#pending-follows)
 
 ## Non-implemented endpoints
 
-- [POST /api/v1/follow_requests/:id/authorize](https://docs.joinmastodon.org/api/rest/follow-requests/#post-api-v1-follow-requests-id-authorize)
-- [POST /api/v1/follow_requests/:id/reject](https://docs.joinmastodon.org/api/rest/follow-requests/#post-api-v1-follow-requests-id-reject)
+- [POST /api/v1/follow_requests/:id/authorize](https://docs.joinmastodon.org/methods/accounts/follow_requests#accept-follow)
+- [POST /api/v1/follow_requests/:id/reject](https://docs.joinmastodon.org/methods/accounts/follow_requests#reject-follow)
 
