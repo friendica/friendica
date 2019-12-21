@@ -59,10 +59,14 @@ class Babel extends BaseModule
 					$markdown = Text\BBCode::toMarkdown($bbcode);
 					$results[] = [
 						'title'   => L10n::t('BBCode::toMarkdown'),
-						'content' => visible_whitespace($markdown)
+						'content' => visible_whitespace(htmlspecialchars($markdown))
 					];
 
 					$html2 = Text\Markdown::convert($markdown);
+					$results[] = [
+						'title'   => L10n::t('BBCode::toMarkdown => Markdown::convert (raw HTML)'),
+						'content' => visible_whitespace(htmlspecialchars($html2))
+					];
 					$results[] = [
 						'title'   => L10n::t('BBCode::toMarkdown => Markdown::convert'),
 						'content' => $html2
