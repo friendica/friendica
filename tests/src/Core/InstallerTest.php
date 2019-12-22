@@ -389,7 +389,7 @@ class InstallerTest extends MockedTest
 		$this->assertCheckExist(1,
 			$this->l10nMock->t('ImageMagick supports GIF'),
 			'',
-			true,
+			false,
 			false,
 			$install->getChecks());
 	}
