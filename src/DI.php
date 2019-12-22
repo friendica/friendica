@@ -3,22 +3,6 @@
 namespace Friendica;
 
 use Dice\Dice;
-use Friendica\Core\Cache\ICache;
-use Friendica\Core\Config\IConfiguration;
-use Friendica\Core\Config\IPConfiguration;
-use Friendica\Core\L10n\L10n;
-use Friendica\Core\Lock\ILock;
-use Friendica\Core\Process;
-use Friendica\Core\Session\ISession;
-use Friendica\Database\Database;
-use Friendica\Model\Notify;
-use Friendica\Protocol\Activity;
-use Friendica\Util\ACLFormatter;
-use Friendica\Content;
-use Friendica\Util\DateTimeFormat;
-use Friendica\Util\FileSystem;
-use Friendica\Util\Logger\WorkerLogger;
-use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -27,22 +11,6 @@ use Psr\Log\LoggerInterface;
  * There has to be a "method" phpDoc for each new class, containing result class for a proper matching
  *
  * @method static App app()
- * @method static ACLFormatter aclFormatter()
- * @method static Notify notify()
- * @method static Activity activity()
- * @method static Content\Item contentItem()
- * @method static Content\Text\BBCode\Video bbCodeVideo()
- * @method static DateTimeFormat dtFormat()
- * @method static ICache cache()
- * @method static IConfiguration config()
- * @method static IPConfiguration pConfig()
- * @method static ILock lock()
- * @method static L10n l10n()
- * @method static LoggerInterface logger()
- * @method static LoggerInterface devLogger()
- * @method static LoggerInterface workerLogger()
- * @method static Profiler profiler()
- * @method static ISession session()
  * @method static App\Authentication auth()
  * @method static App\Arguments args()
  * @method static App\BaseURL baseUrl()
@@ -50,16 +18,31 @@ use Psr\Log\LoggerInterface;
  * @method static App\Module module()
  * @method static App\Page page()
  * @method static App\Router router()
- * @method static Database dba()
- * @method static FileSystem fs()
- * @method static Process process()
+ * @method static Content\Item contentItem()
+ * @method static Content\Text\BBCode\Video bbCodeVideo()
+ * @method static Core\Cache\ICache cache()
+ * @method static Core\Config\IConfiguration config()
+ * @method static Core\Config\IPConfiguration pConfig()
+ * @method static Core\Lock\ILock lock()
+ * @method static Core\L10n\L10n l10n()
+ * @method static Core\Process process()
+ * @method static Core\Session\ISession session()
+ * @method static Database\Database dba()
+ * @method static Model\Notify notify()
+ * @method static Protocol\Activity activity()
+ * @method static Util\ACLFormatter aclFormatter()
+ * @method static Util\DateTimeFormat dtFormat()
+ * @method static Util\FileSystem fs()
+ * @method static Util\Profiler profiler()
+ * @method static LoggerInterface logger()
+ * @method static LoggerInterface devLogger()
+ * @method static LoggerInterface workerLogger()
  *
  */
 class DI
 {
 	const CLASS_MAPPING = [
 		'app'          => App::class,
-		'aclFormatter' => ACLFormatter::class,
 		'auth'         => App\Authentication::class,
 		'args'         => App\Arguments::class,
 		'baseUrl'      => App\BaseURL::class,
@@ -67,24 +50,25 @@ class DI
 		'module'       => App\Module::class,
 		'page'         => App\Page::class,
 		'router'       => App\Router::class,
-		'notify'       => Notify::class,
-		'activity'     => Activity::class,
 		'contentItem'  => Content\Item::class,
 		'bbCodeVideo'  => Content\Text\BBCode\Video::class,
-		'dtFormat'     => DateTimeFormat::class,
-		'cache'        => ICache::class,
-		'config'       => IConfiguration::class,
-		'pConfig'      => IPConfiguration::class,
-		'l10n'         => L10n::class,
-		'lock'         => ILock::class,
+		'cache'        => Core\Cache\ICache::class,
+		'config'       => Core\Config\IConfiguration::class,
+		'pConfig'      => Core\Config\IPConfiguration::class,
+		'l10n'         => Core\L10n\L10n::class,
+		'lock'         => Core\Lock\ILock::class,
+		'process'      => Core\Process::class,
+		'session'      => Core\Session\ISession::class,
+		'dba'          => Database\Database::class,
+		'notify'       => Model\Notify::class,
+		'activity'     => Protocol\Activity::class,
+		'aclFormatter' => Util\ACLFormatter::class,
+		'dtFormat'     => Util\DateTimeFormat::class,
+		'fs'           => Util\FileSystem::class,
+		'workerLogger' => Util\Logger\WorkerLogger::class,
+		'profiler'     => Util\Profiler::class,
 		'logger'       => LoggerInterface::class,
-		'workerLogger' => WorkerLogger::class,
 		'devLogger'    => '$devLogger',
-		'session'      => ISession::class,
-		'dba'          => Database::class,
-		'fs'           => FileSystem::class,
-		'profiler'     => Profiler::class,
-		'process'      => Process::class,
 	];
 
 	/** @var Dice */
