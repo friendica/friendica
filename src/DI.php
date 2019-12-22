@@ -39,7 +39,7 @@ use Psr\Log\LoggerInterface;
  * @method static LoggerInterface workerLogger()
  *
  */
-class DI
+abstract class DI
 {
 	const CLASS_MAPPING = [
 		'app'          => App::class,
