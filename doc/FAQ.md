@@ -172,7 +172,7 @@ Here is a list of known working clients:
 
 * Android
   * [Friendiqa](https://git.friendi.ca/lubuwest/Friendiqa) (available in Google Playstore or from a binary repository you can add to [F-Droid](https://freunde.ma-nic.de/display/3e98eba8185a13c5bdbf3d1539646854))
-  * [Fedilab](https://gitlab.com/tom79/mastalab) (available in F-Droid and Google stores)
+  * [Fedilab](https://fedilab.app/) (available in F-Droid and Google stores)
   * [DiCa](https://dica.mixi.cool/)
   * AndStatus
   * Twidere
