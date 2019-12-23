@@ -3,61 +3,32 @@
 namespace Friendica;
 
 use Friendica\Database\Database;
+use Friendica\Model\Entity\BaseEntity;
 use Friendica\Network\HTTPException;
 use Psr\Log\LoggerInterface;
 
 /**
  * Class BaseModel
  *
- * The Model classes inheriting from this abstract class are meant to represent a single database record.
- * The associated table name has to be provided in the child class, and the table is expected to have a unique `id` field.
- *
- * @property int id
+ * A model implements the business logic between the persistance layer (=db) and the used entitys
+ * There's only one model/service per call possible, so the table-name and main-entity-class stays as a static variable
  */
 abstract class BaseModel
 {
+	/** @var string */
 	protected static $table_name;
+	/** @var BaseEntity */
+	protected static $entity_class;
 
 	/** @var Database */
 	protected $dba;
 	/** @var LoggerInterface */
 	protected $logger;
 
-	/**
-	 * Model record abstraction.
-	 * Child classes never have to interact directly with it.
-	 * Please use the magic getter instead.
-	 *
-	 * @var array
-	 */
-	private $data = [];
-
 	public function __construct(Database $dba, LoggerInterface $logger)
 	{
-		$this->dba = $dba;
+		$this->dba    = $dba;
 		$this->logger = $logger;
-	}
-
-	/**
-	 * Magic getter. This allows to retrieve model fields with the following syntax:
-	 * - $model->field (outside of class)
-	 * - $this->field (inside of class)
-	 *
-	 * @param $name
-	 * @return mixed
-	 * @throws HTTPException\InternalServerErrorException
-	 */
-	public function __get($name)
-	{
-		if (empty($this->data['id'])) {
-			throw new HTTPException\InternalServerErrorException(static::class . ' record uninitialized');
-		}
-
-		if (!array_key_exists($name, $this->data)) {
-			throw new HTTPException\InternalServerErrorException('Field ' . $name . ' not found in ' . static::class);
-		}
-
-		return $this->data[$name];
 	}
 
 	/**
@@ -66,30 +37,30 @@ abstract class BaseModel
 	 * Chainable.
 	 *
 	 * @param array $condition
-	 * @return BaseModel
+	 * @param array $fields Optional array of fields for lazy-loading (just load things you need)
+	 *
+	 * @return mixed
 	 * @throws HTTPException\NotFoundException
 	 */
-	public function fetch(array $condition)
+	public function fetch(array $condition, array $fields = [])
 	{
-		$intro = $this->dba->selectFirst(static::$table_name, [], $condition);
+		$entity = $this->dba->selectFirst(static::$table_name, $fields, $condition);
 
-		if (!$intro) {
+		if (!$entity) {
 			throw new HTTPException\NotFoundException(static::class . ' record not found.');
 		}
 
-		$this->data = $intro;
-
-		return $this;
+		return new self::$entity_class($entity);
 	}
 
 	/**
 	 * Deletes the model record from the database.
 	 * Prevents further methods from being called by wiping the internal model data.
 	 */
-	public function delete()
+	public function delete(BaseEntity &$entity)
 	{
-		if ($this->dba->delete(static::$table_name, ['id' => $this->id])) {
-			$this->data = [];
+		if ($this->dba->delete(static::$table_name, ['id' => $entity->id])) {
+			unset($entity);
 		}
 	}
 }

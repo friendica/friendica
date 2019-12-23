@@ -30,25 +30,23 @@ class FollowRequests extends Api
 	{
 		parent::post($parameters);
 
-		/** @var Introduction $Intro */
-		$Intro = self::getClass(Introduction::class);
-		$Intro->fetch(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
+		$intro = DI::intro()->fetch(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
 
-		$contactId = $Intro->{'contact-id'};
+		$contactId = $intro->{'contact-id'};
 
 		$relationship = new Mastodon\Relationship();
 		$relationship->id = $contactId;
 
 		switch ($parameters['action']) {
 			case 'authorize':
-				$Intro->confirm();
+				DI::intro()->confirm($intro);
 				$relationship = Mastodon\Relationship::createFromContact(Contact::getById($contactId));
 				break;
 			case 'ignore':
-				$Intro->ignore();
+				DI::intro()->ignore($intro);
 				break;
 			case 'reject':
-				$Intro->discard();
+				DI::intro()->discard($intro);
 				break;
 			default:
 				throw new HTTPException\BadRequestException('Unexpected action parameter, expecting "authorize", "ignore" or "reject"');

@@ -30,16 +30,14 @@ function notifications_post(App $a)
 	}
 
 	if ($request_id) {
-		/** @var Introduction $Intro */
-		$Intro = \Friendica\BaseObject::getClass(Introduction::class);
-		$Intro->fetch(['id' => $request_id, 'uid' => local_user()]);
+		$intro = DI::intro()->fetch(['id' => $request_id, 'uid' => local_user()]);
 
 		switch ($_POST['submit']) {
 			case L10n::t('Discard'):
-				$Intro->discard();
+				DI::intro()->discard($intro);
 				break;
 			case L10n::t('Ignore'):
-				$Intro->ignore();
+				DI::intro()->ignore($intro);
 				break;
 		}
 
