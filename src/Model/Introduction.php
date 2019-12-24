@@ -98,9 +98,9 @@ final class Introduction extends BaseModel
 	 */
 	public function ignore(Entity\Introduction &$intro)
 	{
-		if ($this->dba->update('intro', ['ignore' => true], ['id' => $intro->id])) {
+		if ($this->dba->update('intro', ['ignored' => true], ['id' => $intro->id])) {
 			// since we cannot update a current intro entity, we create a new one with the ignore flag and return it
-			$intro = Entity\Introduction::fromEntity($intro, ['ignore' => true]);
+			$intro = Entity\Introduction::fromEntity($intro, ['ignored' => true]);
 		}
 	}
 

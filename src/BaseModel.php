@@ -50,7 +50,7 @@ abstract class BaseModel
 			throw new HTTPException\NotFoundException(static::class . ' record not found.');
 		}
 
-		return new self::$entity_class($entity);
+		return new static::$entity_class($entity);
 	}
 
 	/**
@@ -60,7 +60,7 @@ abstract class BaseModel
 	public function delete(BaseEntity &$entity)
 	{
 		if ($this->dba->delete(static::$table_name, ['id' => $entity->id])) {
-			unset($entity);
+			$entity = null;
 		}
 	}
 }
