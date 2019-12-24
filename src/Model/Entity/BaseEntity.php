@@ -44,6 +44,10 @@ abstract class BaseEntity
 
 	public function __construct(array $data)
 	{
+		if (!key_exists('id', $data)) {
+			throw new HTTPException\InternalServerErrorException("data are incomplete, id is missing.");
+		}
+
 		$this->data = $data;
 		$this->entityId = ++self::$entities;
 	}
@@ -79,6 +83,14 @@ abstract class BaseEntity
 		}
 
 		return $this->data[$name];
+	}
+
+	/**
+	 * @throws HTTPException\InternalServerErrorException Entity set is not allowed
+	 */
+	public function __set($name, $value)
+	{
+		throw new HTTPException\InternalServerErrorException('Entity set is not allowed.');
 	}
 
 	/**
