@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
  *
  * @package Friendica
  */
-abstract class BaseCollection implements \Iterator
+abstract class BaseCollection implements \Iterator, \Countable, \ArrayAccess
 {
 	const LIMIT = 30;
 
@@ -79,7 +79,51 @@ abstract class BaseCollection implements \Iterator
 	 */
 	public function rewind()
 	{
-		reset($this->items);
+		return reset($this->items);
+	}
+
+	// Countable interface
+
+	/**
+	 * @inheritDoc
+	 */
+	public function count()
+	{
+		return count($this->items);
+	}
+
+	// ArrayAccess interface
+
+	/**
+	 * @inheritDoc
+	 */
+	public function offsetExists($offset)
+	{
+		return array_key_exists($offset, $this->items);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->items[$offset];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function offsetSet($offset, $value)
+	{
+		$this->items[$offset] = $value;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function offsetUnset($offset)
+	{
+		unset($this->items[$offset]);
 	}
 
 	// Custom methods
