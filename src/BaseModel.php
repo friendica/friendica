@@ -32,7 +32,12 @@ abstract class BaseModel
 	 */
 	private $data = [];
 
-	public function __construct(Database $dba, LoggerInterface $logger, $data = [])
+	/**
+	 * @param Database        $dba
+	 * @param LoggerInterface $logger
+	 * @param array           $data   Table row attributes
+	 */
+	public function __construct(Database $dba, LoggerInterface $logger, array $data = [])
 	{
 		$this->dba = $dba;
 		$this->logger = $logger;
