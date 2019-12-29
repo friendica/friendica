@@ -2,6 +2,7 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
 use Friendica\App\BaseURL;
 use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
@@ -13,52 +14,52 @@ use Friendica\Util\DateTimeFormat;
  *
  * @see https://docs.joinmastodon.org/entities/account
  */
-class Account
+class Account extends Entity
 {
 	/** @var string */
-	var $id;
+	protected $id;
 	/** @var string */
-	var $username;
+	protected $username;
 	/** @var string */
-	var $acct;
+	protected $acct;
 	/** @var string */
-	var $display_name;
+	protected $display_name;
 	/** @var bool */
-	var $locked;
+	protected $locked;
 	/** @var string (Datetime) */
-	var $created_at;
+	protected $created_at;
 	/** @var int */
-	var $followers_count;
+	protected $followers_count;
 	/** @var int */
-	var $following_count;
+	protected $following_count;
 	/** @var int */
-	var $statuses_count;
+	protected $statuses_count;
 	/** @var string */
-	var $note;
+	protected $note;
 	/** @var string (URL)*/
-	var $url;
+	protected $url;
 	/** @var string (URL) */
-	var $avatar;
+	protected $avatar;
 	/** @var string (URL) */
-	var $avatar_static;
+	protected $avatar_static;
 	/** @var string (URL) */
-	var $header;
+	protected $header;
 	/** @var string (URL) */
-	var $header_static;
+	protected $header_static;
 	/** @var Emoji[] */
-	var $emojis;
+	protected $emojis;
 	/** @var Account|null */
-	var $moved = null;
+	protected $moved = null;
 	/** @var Field[]|null */
-	var $fields = null;
+	protected $fields = null;
 	/** @var bool|null */
-	var $bot = null;
+	protected $bot = null;
 	/** @var bool */
-	var $group;
+	protected $group;
 	/** @var bool */
-	var $discoverable;
+	protected $discoverable;
 	/** @var string|null (Datetime) */
-	var $last_status_at = null;
+	protected $last_status_at = null;
 
 	/**
 	 * Creates an account record from a public contact record. Expects all contact table fields to be set.
@@ -66,7 +67,7 @@ class Account
 	 * @param BaseURL $baseUrl
 	 * @param array   $publicContact Full contact table record with uid = 0
 	 * @param array   $apcontact     Optional full apcontact table record
-	 * @param array   $userContact   Optional full contact table record with uid = local_user()
+	 * @param array   $userContact   Optional full contact table record with uid != 0
 	 * @return Account
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */

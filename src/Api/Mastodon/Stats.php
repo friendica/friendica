@@ -2,6 +2,7 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
 use Friendica\Core\Config;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
@@ -11,14 +12,14 @@ use Friendica\Database\DBA;
  *
  * @see https://docs.joinmastodon.org/api/entities/#stats
  */
-class Stats
+class Stats extends Entity
 {
 	/** @var int */
-	var $user_count;
+	protected $user_count = 0;
 	/** @var int */
-	var $status_count;
+	protected $status_count = 0;
 	/** @var int */
-	var $domain_count;
+	protected $domain_count = 0;
 
 	/**
 	 * Creates a stats record

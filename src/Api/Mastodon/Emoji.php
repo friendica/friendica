@@ -2,19 +2,21 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
+
 /**
  * Class Emoji
  *
  * @see https://docs.joinmastodon.org/api/entities/#emoji
  */
-class Emoji
+class Emoji extends Entity
 {
 	/** @var string */
-	var $shortcode;
+	protected $shortcode;
 	/** @var string (URL)*/
-	var $static_url;
+	protected $static_url;
 	/** @var string (URL)*/
-	var $url;
+	protected $url;
 	/** @var bool */
-	var $visible_in_picker;
+	protected $visible_in_picker;
 }

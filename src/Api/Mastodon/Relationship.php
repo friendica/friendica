@@ -2,6 +2,7 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
 use Friendica\Model\Contact;
 use Friendica\Util\Network;
 
@@ -10,28 +11,42 @@ use Friendica\Util\Network;
  *
  * @see https://docs.joinmastodon.org/api/entities/#relationship
  */
-class Relationship
+class Relationship extends Entity
 {
 	/** @var int */
-	var $id;
+	protected $id;
 	/** @var bool */
-	var $following = false;
+	protected $following = false;
 	/** @var bool */
-	var $followed_by = false;
+	protected $followed_by = false;
 	/** @var bool */
-	var $blocking = false;
+	protected $blocking = false;
 	/** @var bool */
-	var $muting = false;
+	protected $muting = false;
 	/** @var bool */
-	var $muting_notifications = false;
+	protected $muting_notifications = false;
 	/** @var bool */
-	var $requested = false;
+	protected $requested = false;
 	/** @var bool */
-	var $domain_blocking = false;
+	protected $domain_blocking = false;
 	/** @var bool */
-	var $showing_reblogs = false;
+	protected $showing_reblogs = false;
 	/** @var bool */
-	var $endorsed = false;
+	protected $endorsed = false;
+
+	/**
+	 * Default relationship factory for deleted user-contacts
+	 *
+	 * @param int $contactId
+	 * @return Relationship
+	 */
+	public static function createDefaultFromContactId(int $contactId)
+	{
+		$relationship = new self();
+		$relationship->id = $contactId;
+
+		return $relationship;
+	}
 
 	/**
 	 * @param array $contact Full Contact table record

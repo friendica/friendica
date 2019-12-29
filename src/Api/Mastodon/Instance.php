@@ -2,6 +2,7 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
 use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
@@ -15,34 +16,34 @@ use Friendica\Module\Register;
  *
  * @see https://docs.joinmastodon.org/api/entities/#instance
  */
-class Instance
+class Instance extends Entity
 {
 	/** @var string (URL) */
-	var $uri;
+	protected $uri;
 	/** @var string */
-	var $title;
+	protected $title;
 	/** @var string */
-	var $description;
+	protected $description;
 	/** @var string */
-	var $email;
+	protected $email;
 	/** @var string */
-	var $version;
+	protected $version;
 	/** @var array */
-	var $urls;
+	protected $urls;
 	/** @var Stats */
-	var $stats;
-	/** @var string */
-	var $thumbnail;
+	protected $stats;
+	/** @var string|null */
+	protected $thumbnail = null;
 	/** @var array */
-	var $languages;
+	protected $languages;
 	/** @var int */
-	var $max_toot_chars;
+	protected $max_toot_chars;
 	/** @var bool */
-	var $registrations;
+	protected $registrations;
 	/** @var bool */
-	var $approval_required;
+	protected $approval_required;
 	/** @var Account|null */
-	var $contact_account;
+	protected $contact_account = null;
 
 	/**
 	 * Creates an instance record

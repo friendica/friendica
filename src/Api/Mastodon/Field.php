@@ -2,17 +2,19 @@
 
 namespace Friendica\Api\Mastodon;
 
+use Friendica\Api\Entity;
+
 /**
  * Class Field
  *
  * @see https://docs.joinmastodon.org/api/entities/#field
  */
-class Field
+class Field extends Entity
 {
 	/** @var string */
-	var $name;
+	protected $name;
 	/** @var string (HTML) */
-	var $value;
+	protected $value;
 	/** @var string (Datetime)*/
-	var $verified_at;
+	protected $verified_at;
 }
