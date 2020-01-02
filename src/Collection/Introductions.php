@@ -2,10 +2,13 @@
 
 namespace Friendica\Collection;
 
-use Friendica\BaseCollection;
+use Friendica\Collection;
 use Friendica\Model\Introduction;
 
-class Introductions extends BaseCollection
+/**
+ * @property Introduction[] $models
+ */
+class Introductions extends Collection
 {
-	static $model_class = Introduction::class;
+
 }

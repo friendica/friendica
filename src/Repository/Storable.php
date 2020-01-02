@@ -2,9 +2,9 @@
 
 namespace Friendica\Repository;
 
-use Friendica\BaseCollection;
-use Friendica\BaseModel;
-use Friendica\BaseRepository;
+use Friendica\Collection;
+use Friendica\Model;
+use Friendica\Repository;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Network\HTTPException;
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  * Storable repositories are linked to a main table with an id primary key and will instanciate Models and Collections
  * related to that table.
  */
-abstract class Storable extends BaseRepository
+abstract class Storable extends Repository
 {
 	const LIMIT = 30;
 
@@ -24,10 +24,10 @@ abstract class Storable extends BaseRepository
 	/** @var string */
 	protected static $table_name;
 
-	/** @var BaseModel */
+	/** @var Model */
 	protected static $model_class;
 
-	/** @var BaseCollection */
+	/** @var Collection */
 	protected static $collection_class;
 
 	public function __construct(Database $dba, LoggerInterface $logger)
@@ -44,7 +44,7 @@ abstract class Storable extends BaseRepository
 	 * Chainable.
 	 *
 	 * @param array $condition
-	 * @return BaseModel
+	 * @return Model
 	 * @throws HTTPException\NotFoundException
 	 */
 	public function selectFirst(array $condition)
@@ -65,7 +65,7 @@ abstract class Storable extends BaseRepository
 	 *
 	 * @param array $condition
 	 * @param array $params
-	 * @return BaseCollection
+	 * @return Collection
 	 * @throws \Exception
 	 */
 	public function select(array $condition = [], array $params = [])
@@ -128,11 +128,11 @@ abstract class Storable extends BaseRepository
 	/**
 	 * Deletes the model record from the database.
 	 *
-	 * @param BaseModel $model
+	 * @param Model $model
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function delete(BaseModel &$model)
+	public function delete(Model &$model)
 	{
 		if ($success = $this->dba->delete(static::$table_name, ['id' => $model->id])) {
 			$model = null;

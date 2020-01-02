@@ -7,10 +7,10 @@ use Psr\Log\LoggerInterface;
 /**
  * Repositories contain the business logic of each domanis. They directly act on Models and Collections.
  *
- * @see BaseModel
- * @see BaseCollection
+ * @see Model
+ * @see Collection
  */
-abstract class BaseRepository
+abstract class Repository
 {
 	/** @var LoggerInterface */
 	protected $logger;

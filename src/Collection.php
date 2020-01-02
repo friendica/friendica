@@ -12,17 +12,17 @@ use Psr\Log\LoggerInterface;
  *
  * Collections can be used with foreach().
  */
-abstract class BaseCollection implements \Iterator, \Countable, \ArrayAccess
+abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 {
-	/** @var BaseModel[] */
+	/** @var Model[] */
 	protected $models = [];
 
 	/** @var int */
 	protected $totalCount = 0;
 
 	/**
-	 * @param BaseModel[] $models
-	 * @param int|null    $totalCount
+	 * @param Model[]  $models
+	 * @param int|null $totalCount
 	 */
 	public function __construct(array $models = [], int $totalCount = null)
 	{

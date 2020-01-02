@@ -29,8 +29,7 @@ use Psr\Log\LoggerInterface;
  * @method static Core\Session\ISession session()
  * @method static Database\Database dba()
  * @method static Model\Notify notify()
- * @method static Model\Introduction intro()
- * @method static Collection\Introductions intros()
+ * @method static Repository\Storable\Introduction intro()
  * @method static Protocol\Activity activity()
  * @method static Util\ACLFormatter aclFormatter()
  * @method static Util\DateTimeFormat dtFormat()
@@ -63,8 +62,7 @@ abstract class DI
 		'session'      => Core\Session\ISession::class,
 		'dba'          => Database\Database::class,
 		'notify'       => Model\Notify::class,
-		'intro'        => Model\Introduction::class,
-		'intros'       => Collection\Introductions::class,
+		'intro'        => Repository\Introduction::class,
 		'activity'     => Protocol\Activity::class,
 		'aclFormatter' => Util\ACLFormatter::class,
 		'dtFormat'     => Util\DateTimeFormat::class,
