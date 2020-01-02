@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Api\Mastodon;
+namespace Friendica\Api\Entity\Mastodon;
 
 use Friendica\Api\Entity;
 use Friendica\App;

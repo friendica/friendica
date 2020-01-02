@@ -106,6 +106,10 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 	 */
 	public function offsetSet($offset, $value)
 	{
+		if (!$this->offsetExists($offset)) {
+			$this->totalCount++;
+		}
+
 		$this->models[$offset] = $value;
 	}
 
@@ -115,6 +119,8 @@ abstract class Collection implements \Iterator, \Countable, \ArrayAccess
 	public function offsetUnset($offset)
 	{
 		unset($this->models[$offset]);
+
+		$this->totalCount--;
 	}
 
 	// Custom methods

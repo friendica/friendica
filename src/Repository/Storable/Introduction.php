@@ -27,7 +27,7 @@ class Introduction extends Storable
 	/**
 	 * Confirms a follow request and sends a notic to the remote contact.
 	 *
-	 * @param Model\Introduction $introduction
+	 * @param Model\Introduction $Introduction
 	 * @param bool               $duplex       Is it a follow back?
 	 * @param bool|null          $hidden       Should this contact be hidden? null = no change
 	 * @return bool
@@ -35,17 +35,17 @@ class Introduction extends Storable
 	 * @throws HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	public function confirm(Model\Introduction $introduction, bool $duplex = false, bool $hidden = null)
+	public function confirm(Model\Introduction $Introduction, bool $duplex = false, bool $hidden = null)
 	{
 		$this->logger->info('Confirming follower', ['cid' => $this->{'contact-id'}]);
 
-		$contact = Model\Contact::selectFirst([], ['id' => $introduction->{'contact-id'}, 'uid' => $introduction->uid]);
+		$contact = Model\Contact::selectFirst([], ['id' => $Introduction->{'contact-id'}, 'uid' => $Introduction->uid]);
 
 		if (!$contact) {
 			throw new HTTPException\NotFoundException('Contact record not found.');
 		}
 
-		$new_relation = $contact['rel'];
+		$newRelation = $contact['rel'];
 		$writable = $contact['writable'];
 
 		if (!empty($contact['protocol'])) {
@@ -60,12 +60,12 @@ class Introduction extends Storable
 
 		if (in_array($protocol, [Protocol::DIASPORA, Protocol::ACTIVITYPUB])) {
 			if ($duplex) {
-				$new_relation = Model\Contact::FRIEND;
+				$newRelation = Model\Contact::FRIEND;
 			} else {
-				$new_relation = Model\Contact::FOLLOWER;
+				$newRelation = Model\Contact::FOLLOWER;
 			}
 
-			if ($new_relation != Model\Contact::FOLLOWER) {
+			if ($newRelation != Model\Contact::FOLLOWER) {
 				$writable = 1;
 			}
 		}
@@ -78,13 +78,13 @@ class Introduction extends Storable
 			'protocol'  => $protocol,
 			'writable'  => $writable,
 			'hidden'    => $hidden ?? $contact['hidden'],
-			'rel'       => $new_relation,
+			'rel'       => $newRelation,
 		];
 		$this->dba->update('contact', $fields, ['id' => $contact['id']]);
 
 		array_merge($contact, $fields);
 
-		if ($new_relation == Model\Contact::FRIEND) {
+		if ($newRelation == Model\Contact::FRIEND) {
 			if ($protocol == Protocol::DIASPORA) {
 				$ret = Diaspora::sendShare(Model\Contact::getById($contact['uid']), $contact);
 				$this->logger->info('share returns', ['return' => $ret]);
@@ -93,7 +93,7 @@ class Introduction extends Storable
 			}
 		}
 
-		return $this->delete($introduction);
+		return $this->delete($Introduction);
 	}
 
 
@@ -101,31 +101,31 @@ class Introduction extends Storable
 	 * Silently ignores the introduction, hides it from notifications and prevents the remote contact from submitting
 	 * additional follow requests.
 	 *
-	 * @param Model\Introduction $introduction
+	 * @param Model\Introduction $Introduction
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public function ignore(Model\Introduction $introduction)
+	public function ignore(Model\Introduction $Introduction)
 	{
-		return $this->dba->update('intro', ['ignore' => true], ['id' => $introduction->id]);
+		return $this->dba->update('intro', ['ignore' => true], ['id' => $Introduction->id]);
 	}
 
 	/**
 	 * Discards the introduction and sends a rejection message to AP contacts.
 	 *
-	 * @param Model\Introduction $introduction
+	 * @param Model\Introduction $Introduction
 	 * @return bool
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	public function discard(Model\Introduction $introduction)
+	public function discard(Model\Introduction $Introduction)
 	{
 		// If it is a friend suggestion, the contact is not a new friend but an existing friend
 		// that should not be deleted.
-		if (!$introduction->fid) {
+		if (!$Introduction->fid) {
 			// When the contact entry had been created just for that intro, we want to get rid of it now
-			$condition = ['id' => $this->{'contact-id'}, 'uid' => $introduction->uid,
+			$condition = ['id' => $this->{'contact-id'}, 'uid' => $Introduction->uid,
 				'self' => false, 'pending' => true, 'rel' => [0, Model\Contact::FOLLOWER]];
 			if ($this->dba->exists('contact', $condition)) {
 				Model\Contact::remove($this->{'contact-id'});
@@ -134,7 +134,7 @@ class Introduction extends Storable
 			}
 		}
 
-		$contact = Model\Contact::selectFirst([], ['id' => $this->{'contact-id'}, 'uid' => $introduction->uid]);
+		$contact = Model\Contact::selectFirst([], ['id' => $this->{'contact-id'}, 'uid' => $Introduction->uid]);
 
 		if (!$contact) {
 			throw new HTTPException\NotFoundException('Contact record not found.');
@@ -150,6 +150,6 @@ class Introduction extends Storable
 			ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $contact['uid']);
 		}
 
-		return $this->delete($introduction);
+		return $this->delete($Introduction);
 	}
 }

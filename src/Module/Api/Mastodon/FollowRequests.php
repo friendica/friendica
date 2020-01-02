@@ -2,12 +2,11 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Api\Mastodon;
+use Friendica\Api\Entity\Mastodon;
+use Friendica\Api\Entity\Mastodon\Relationship;
 use Friendica\Core\System;
-use Friendica\Model\APContact;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Introduction;
 use Friendica\Module\Base\Api;
 use Friendica\Network\HTTPException;
 
@@ -41,22 +40,22 @@ class FollowRequests extends Api
 	{
 		parent::post($parameters);
 
-		$Intro = DI::intro()->fetch(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
+		$Introduction = DI::intro()->selectFirst(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
 
-		$contactId = $Intro->{'contact-id'};
+		$contactId = $Introduction->{'contact-id'};
 
 		switch ($parameters['action']) {
 			case 'authorize':
-				$Intro->confirm();
-				$relationship = Mastodon\Relationship::createFromContact(Contact::getById($contactId));
+				DI::intro()->confirm($Introduction);
+				$relationship = new Relationship($contactId, Contact::getById($contactId));
 				break;
 			case 'ignore':
-				$Intro->ignore();
-				$relationship = Mastodon\Relationship::createDefaultFromContactId($contactId);
+				DI::intro()->ignore($Introduction);
+				$relationship = new Relationship($contactId);
 				break;
 			case 'reject':
-				$Intro->discard();
-				$relationship = Mastodon\Relationship::createDefaultFromContactId($contactId);
+				DI::intro()->discard($Introduction);
+				$relationship = new Relationship($contactId);
 				break;
 			default:
 				throw new HTTPException\BadRequestException('Unexpected action parameter, expecting "authorize", "ignore" or "reject"');
@@ -79,7 +78,7 @@ class FollowRequests extends Api
 
 		$baseUrl = DI::baseUrl();
 
-		$Introductions = DI::intros()->selectByBoundaries(
+		$Introductions = DI::intro()->selectByBoundaries(
 			['`uid` = ? AND NOT `ignore`', self::$current_user_id],
 			['order' => ['id' => 'DESC']],
 			$since_id,
@@ -89,19 +88,13 @@ class FollowRequests extends Api
 
 		$return = [];
 
-		/** @var Introduction $Introduction */
-		foreach ($Introductions as $Introduction) {
-			$cdata = Contact::getPublicAndUserContacID($Introduction->{'contact-id'}, $Introduction->uid);
-			if (empty($cdata['public'])) {
-				continue;
+		foreach ($Introductions as $key => $Introduction) {
+			try {
+				$return[] = DI::mstdnFollowRequest()->createFromIntroduction($Introduction);
+			} catch (HTTPException\InternalServerErrorException $exception) {
+				DI::intro()->delete($Introduction);
+				unset($Introductions[$key]);
 			}
-
-			$publicContact = Contact::getById($cdata['public']);
-			$userContact = Contact::getById($cdata['user']);
-			$apcontact = APContact::getByURL($publicContact['url'], false);
-			$followRequest = Mastodon\FollowRequest::createFromIntroduction($baseUrl, $Introduction, $publicContact, $apcontact);
-
-			$return[] = $followRequest;
 		}
 
 		$base_query = [];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Friendica\Api\Mastodon;
+namespace Friendica\Api\Entity\Mastodon;
 
 use Friendica\Api\Entity;
 use Friendica\App\BaseURL;
@@ -68,45 +68,41 @@ class Account extends Entity
 	 * @param array   $publicContact Full contact table record with uid = 0
 	 * @param array   $apcontact     Optional full apcontact table record
 	 * @param array   $userContact   Optional full contact table record with uid != 0
-	 * @return Account
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function create(BaseURL $baseUrl, array $publicContact, array $apcontact = [], array $userContact = [])
+	public function __construct(BaseURL $baseUrl, array $publicContact, array $apcontact = [], array $userContact = [])
 	{
-		$account = new Account();
-		$account->id              = $publicContact['id'];
-		$account->username        = $publicContact['nick'];
-		$account->acct            =
+		$this->id              = $publicContact['id'];
+		$this->username        = $publicContact['nick'];
+		$this->acct            =
 			strpos($publicContact['url'], $baseUrl->get() . '/') === 0 ?
-			$publicContact['nick'] :
-			$publicContact['addr'];
-		$account->display_name    = $publicContact['name'];
-		$account->locked          = !empty($apcontact['manually-approve']);
-		$account->created_at      = DateTimeFormat::utc($publicContact['created'], DateTimeFormat::ATOM);
-		$account->followers_count = $apcontact['followers_count'] ?? 0;
-		$account->following_count = $apcontact['following_count'] ?? 0;
-		$account->statuses_count  = $apcontact['statuses_count'] ?? 0;
-		$account->note            = BBCode::convert($publicContact['about'], false);
-		$account->url             = $publicContact['url'];
-		$account->avatar          = $userContact['avatar'] ?? $publicContact['avatar'];
-		$account->avatar_static   = $userContact['avatar'] ?? $publicContact['avatar'];
+				$publicContact['nick'] :
+				$publicContact['addr'];
+		$this->display_name    = $publicContact['name'];
+		$this->locked          = !empty($apcontact['manually-approve']);
+		$this->created_at      = DateTimeFormat::utc($publicContact['created'], DateTimeFormat::ATOM);
+		$this->followers_count = $apcontact['followers_count'] ?? 0;
+		$this->following_count = $apcontact['following_count'] ?? 0;
+		$this->statuses_count  = $apcontact['statuses_count'] ?? 0;
+		$this->note            = BBCode::convert($publicContact['about'], false);
+		$this->url             = $publicContact['url'];
+		$this->avatar          = $userContact['avatar'] ?? $publicContact['avatar'];
+		$this->avatar_static   = $userContact['avatar'] ?? $publicContact['avatar'];
 		// No header picture in Friendica
-		$account->header          = '';
-		$account->header_static   = '';
+		$this->header          = '';
+		$this->header_static   = '';
 		// No custom emojis per account in Friendica
-		$account->emojis          = [];
+		$this->emojis          = [];
 		// No metadata fields in Friendica
-		$account->fields          = [];
-		$account->bot             = ($publicContact['contact-type'] == Contact::TYPE_NEWS);
-		$account->group           = ($publicContact['contact-type'] == Contact::TYPE_COMMUNITY);
-		$account->discoverable    = !$publicContact['unsearchable'];
+		$this->fields          = [];
+		$this->bot             = ($publicContact['contact-type'] == Contact::TYPE_NEWS);
+		$this->group           = ($publicContact['contact-type'] == Contact::TYPE_COMMUNITY);
+		$this->discoverable    = !$publicContact['unsearchable'];
 
 		$publicContactLastItem = $publicContact['last-item'] ?: DBA::NULL_DATETIME;
 		$userContactLastItem = $userContact['last-item'] ?? DBA::NULL_DATETIME;
 
 		$lastItem = $userContactLastItem > $publicContactLastItem ? $userContactLastItem : $publicContactLastItem;
-		$account->last_status_at  = $lastItem != DBA::NULL_DATETIME ? DateTimeFormat::utc($lastItem, DateTimeFormat::ATOM) : null;
-
-		return $account;
+		$this->last_status_at  = $lastItem != DBA::NULL_DATETIME ? DateTimeFormat::utc($lastItem, DateTimeFormat::ATOM) : null;
 	}
 }

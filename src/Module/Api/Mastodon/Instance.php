@@ -2,7 +2,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Api\Entity\Mastodon\Instance as InstanceEntity;
 use Friendica\Core\System;
 use Friendica\Module\Base\Api;
 
