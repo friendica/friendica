@@ -46,15 +46,20 @@ class FollowRequests extends Api
 
 		switch ($parameters['action']) {
 			case 'authorize':
-				DI::intro()->confirm($Introduction);
+				$Introduction->confirm();
+				DI::intro()->delete($Introduction);
+
 				$relationship = new Relationship($contactId, Contact::getById($contactId));
 				break;
 			case 'ignore':
-				DI::intro()->ignore($Introduction);
+				$Introduction->ignore();
+
 				$relationship = new Relationship($contactId);
 				break;
 			case 'reject':
-				DI::intro()->discard($Introduction);
+				$Introduction->discard();
+				DI::intro()->delete($Introduction);
+
 				$relationship = new Relationship($contactId);
 				break;
 			default:

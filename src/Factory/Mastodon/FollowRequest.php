@@ -1,15 +1,15 @@
 <?php
 
-namespace Friendica\Repository\Mastodon;
+namespace Friendica\Factory\Mastodon;
 
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Introduction;
 use Friendica\Network\HTTPException;
-use Friendica\Repository;
+use Friendica\Factory;
 
-class FollowRequest extends Repository
+class FollowRequest extends Factory
 {
 	/**
 	 * @param Introduction $Introduction

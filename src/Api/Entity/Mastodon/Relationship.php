@@ -41,19 +41,19 @@ class Relationship extends Entity
 	protected $endorsed = false;
 
 	/**
-	 * @param int   $contact_id Contact row Id
-	 * @param array $contact    Full Contact table record
+	 * @param int   $userContactId Contact row Id with uid != 0
+	 * @param array $userContact   Full Contact table record with uid != 0
 	 */
-	public function __construct(int $contact_id, array $contact = [])
+	public function __construct(int $userContactId, array $userContact = [])
 	{
-		$this->id                   = $contact_id;
-		$this->following            = in_array($contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND]);
-		$this->followed_by          = in_array($contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND]);
-		$this->blocking             = (bool)$contact['blocked'] ?? false;
-		$this->muting               = (bool)$contact['readonly'] ?? false;
-		$this->muting_notifications = (bool)$contact['readonly'] ?? false;
-		$this->requested            = (bool)$contact['pending'] ?? false;
-		$this->domain_blocking      = Network::isUrlBlocked($contact['url'] ?? '');
+		$this->id                   = $userContactId;
+		$this->following            = in_array($userContact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND]);
+		$this->followed_by          = in_array($userContact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND]);
+		$this->blocking             = (bool)$userContact['blocked'] ?? false;
+		$this->muting               = (bool)$userContact['readonly'] ?? false;
+		$this->muting_notifications = (bool)$userContact['readonly'] ?? false;
+		$this->requested            = (bool)$userContact['pending'] ?? false;
+		$this->domain_blocking      = Network::isUrlBlocked($userContact['url'] ?? '');
 
 		return $this;
 	}
