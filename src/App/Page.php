@@ -13,6 +13,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
+use Friendica\DI;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Strings;
@@ -267,9 +268,9 @@ class Page implements ArrayAccess
 		 */
 		if ($mode->isMobile() || $mode->isTablet()) {
 			if (isset($_SESSION['show-mobile']) && !$_SESSION['show-mobile']) {
-				$link = 'toggle_mobile?address=' . urlencode(curPageURL());
+				$link = 'toggle_mobile?address=' . urlencode(DI::baseUrl());
 			} else {
-				$link = 'toggle_mobile?off=1&address=' . urlencode(curPageURL());
+				$link = 'toggle_mobile?off=1&address=' . urlencode(DI::baseUrl());
 			}
 			$this->page['footer'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate("toggle_mobile_footer.tpl"), [
 				'$toggle_link' => $link,
