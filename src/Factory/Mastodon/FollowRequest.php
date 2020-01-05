@@ -23,17 +23,17 @@ class FollowRequest extends Factory
 	}
 
 	/**
-	 * @param Introduction $Introduction
+	 * @param Introduction $introduction
 	 * @return \Friendica\Api\Entity\Mastodon\FollowRequest
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function createFromIntroduction(Introduction $Introduction)
+	public function createFromIntroduction(Introduction $introduction)
 	{
-		$cdata = Contact::getPublicAndUserContacID($Introduction->{'contact-id'}, $Introduction->uid);
+		$cdata = Contact::getPublicAndUserContacID($introduction->{'contact-id'}, $introduction->uid);
 
 		if (empty($cdata)) {
-			$this->logger->warning('Wrong introduction data', ['Introduction' => $Introduction]);
+			$this->logger->warning('Wrong introduction data', ['Introduction' => $introduction]);
 			throw new HTTPException\InternalServerErrorException('Wrong introduction data');
 		}
 
@@ -42,6 +42,6 @@ class FollowRequest extends Factory
 
 		$apcontact = APContact::getByURL($publicContact['url'], false);
 
-		return new \Friendica\Api\Entity\Mastodon\FollowRequest($this->baseUrl, $Introduction->id, $publicContact, $apcontact, $userContact);
+		return new \Friendica\Api\Entity\Mastodon\FollowRequest($this->baseUrl, $introduction->id, $publicContact, $apcontact, $userContact);
 	}
 }

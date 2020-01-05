@@ -31,14 +31,14 @@ function notifications_post(App $a)
 	}
 
 	if ($request_id) {
-		$Intro = DI::intro()->fetch(['id' => $request_id, 'uid' => local_user()]);
+		$intro = DI::intro()->selectFirst(['id' => $request_id, 'uid' => local_user()]);
 
 		switch ($_POST['submit']) {
 			case L10n::t('Discard'):
-				$Intro->discard();
+				$intro->discard();
 				break;
 			case L10n::t('Ignore'):
-				$Intro->ignore();
+				$intro->ignore();
 				break;
 		}
 

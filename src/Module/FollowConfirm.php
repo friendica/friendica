@@ -23,11 +23,11 @@ class FollowConfirm extends BaseModule
 		$duplex   = intval($_POST['duplex']     ?? 0);
 		$hidden   = intval($_POST['hidden']     ?? 0);
 
-		$Intro = DI::intro()->fetch(['id' => $intro_id, 'uid' => local_user()]);
+		$intro = DI::intro()->selectFirst(['id' => $intro_id, 'uid' => local_user()]);
 
-		$cid = $Intro->{'contact-id'};
+		$cid = $intro->{'contact-id'};
 
-		$Intro->confirm($duplex, $hidden);
+		$intro->confirm($duplex, $hidden);
 
 		DI::baseUrl()->redirect('contact/' . intval($cid));
 	}
