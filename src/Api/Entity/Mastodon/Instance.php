@@ -1,12 +1,11 @@
 <?php
 
-namespace Friendica\Api\Mastodon;
+namespace Friendica\Api\Entity\Mastodon;
 
-use Friendica\App;
+use Friendica\Api\Entity;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Module\Register;
 
@@ -15,42 +14,41 @@ use Friendica\Module\Register;
  *
  * @see https://docs.joinmastodon.org/api/entities/#instance
  */
-class Instance
+class Instance extends Entity
 {
 	/** @var string (URL) */
-	var $uri;
+	protected $uri;
 	/** @var string */
-	var $title;
+	protected $title;
 	/** @var string */
-	var $description;
+	protected $description;
 	/** @var string */
-	var $email;
+	protected $email;
 	/** @var string */
-	var $version;
+	protected $version;
 	/** @var array */
-	var $urls;
+	protected $urls;
 	/** @var Stats */
-	var $stats;
-	/** @var string */
-	var $thumbnail;
+	protected $stats;
+	/** @var string|null */
+	protected $thumbnail = null;
 	/** @var array */
-	var $languages;
+	protected $languages;
 	/** @var int */
-	var $max_toot_chars;
+	protected $max_toot_chars;
 	/** @var bool */
-	var $registrations;
+	protected $registrations;
 	/** @var bool */
-	var $approval_required;
+	protected $approval_required;
 	/** @var Account|null */
-	var $contact_account;
+	protected $contact_account = null;
 
 	/**
 	 * Creates an instance record
 	 *
-	 * @param App $app
-	 *
 	 * @return Instance
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function get()
 	{
@@ -77,9 +75,8 @@ class Instance
 			$adminList = explode(',', str_replace(' ', '', Config::get('config', 'admin_email')));
 			$administrator = User::getByEmail($adminList[0], ['nickname']);
 			if (!empty($administrator)) {
-				$adminContact = DBA::selectFirst('contact', [], ['nick' => $administrator['nickname'], 'self' => true]);
-				$apcontact = APContact::getByURL($adminContact['url'], false);
-				$instance->contact_account = Account::create($baseUrl, $adminContact, $apcontact);
+				$adminContact = DBA::selectFirst('contact', ['id'], ['nick' => $administrator['nickname'], 'self' => true]);
+				$instance->contact_account = DI::mstdnAccount()->createFromContactId($adminContact['id']);
 			}
 		}
 
