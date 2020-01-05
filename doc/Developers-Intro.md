@@ -41,6 +41,8 @@ If you have seen Friendica you probably have ideas to improve it, haven't you?
 
 ## Programming
 
+Friendica uses an implementation of [Domain-Driven-Design](help/Developer-Domain-Driven-Design), please make sure to check out the provided links for hints at the expected code architecture.
+
 ### Composer
 
 Friendica uses [Composer](https://getcomposer.org) to manage dependencies libraries and the class autoloader both for libraries and namespaced Friendica classes.

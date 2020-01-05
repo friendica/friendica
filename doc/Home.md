@@ -45,6 +45,7 @@ Friendica Documentation and Resources
 	* [Help on Vagrant](help/Vagrant)
 	* [Bugs and Issues](help/Bugs-and-Issues)
 * Code structure
+    * [Domain-Driven-Design](help/Developer-Domain-Driven-Design)
 	* [Addon Development](help/Addons)
 	* [Theme Development](help/themes)
 	* [Smarty 3 Templates](help/smarty3-templates)
