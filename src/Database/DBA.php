@@ -529,65 +529,94 @@ class DBA
 	 */
 	public static function buildCondition(array &$condition = [])
 	{
+		$condition = self::collapseCondition($condition);
+		
 		$condition_string = '';
 		if (count($condition) > 0) {
-			reset($condition);
-			$first_key = key($condition);
-			if (is_int($first_key)) {
-				$condition_string = " WHERE (" . array_shift($condition) . ")";
-			} else {
-				$new_values = [];
-				$condition_string = "";
-				foreach ($condition as $field => $value) {
-					if ($condition_string != "") {
-						$condition_string .= " AND ";
-					}
-					if (is_array($value)) {
-						if (count($value)) {
-							/* Workaround for MySQL Bug #64791.
-							 * Never mix data types inside any IN() condition.
-							 * In case of mixed types, cast all as string.
-							 * Logic needs to be consistent with DBA::p() data types.
-							 */
-							$is_int = false;
-							$is_alpha = false;
-							foreach ($value as $single_value) {
-								if (is_int($single_value)) {
-									$is_int = true;
-								} else {
-									$is_alpha = true;
-								}
-							}
-
-							if ($is_int && $is_alpha) {
-								foreach ($value as &$ref) {
-									if (is_int($ref)) {
-										$ref = (string)$ref;
-									}
-								}
-								unset($ref); //Prevent accidental re-use.
-							}
-
-							$new_values = array_merge($new_values, array_values($value));
-							$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
-							$condition_string .= self::quoteIdentifier($field) . " IN (" . $placeholders . ")";
-						} else {
-							// Empty value array isn't supported by IN and is logically equivalent to no match
-							$condition_string .= "FALSE";
-						}
-					} elseif (is_null($value)) {
-						$condition_string .= self::quoteIdentifier($field) . " IS NULL";
-					} else {
-						$new_values[$field] = $value;
-						$condition_string .= self::quoteIdentifier($field) . " = ?";
-					}
-				}
-				$condition_string = " WHERE (" . $condition_string . ")";
-				$condition = $new_values;
-			}
+			$condition_string = " WHERE (" . array_shift($condition) . ")";
 		}
 
 		return $condition_string;
+	}
+
+	/**
+	 * Collapse an associative array condition into a SQL string + parameters condition array.
+	 *
+	 * ['uid' => 1, 'network' => ['dspr', 'apub']]
+	 *
+	 * gets transformed into
+	 *
+	 * ["`uid` = ? AND `network` IN (?, ?)", 1, 'dspr', 'apub']
+	 *
+	 * @param array $condition
+	 * @return array
+	 */
+	public static function collapseCondition(array $condition)
+	{
+		// Ensures an always true condition is returned
+		if (count($condition) < 1) {
+			return ['1'];
+		}
+
+		reset($condition);
+		$first_key = key($condition);
+
+		if (is_int($first_key)) {
+			// Already collapsed
+			return $condition;
+		}
+
+		$values = [];
+		$condition_string = "";
+		foreach ($condition as $field => $value) {
+			if ($condition_string != "") {
+				$condition_string .= " AND ";
+			}
+
+			if (is_array($value)) {
+				if (count($value)) {
+					/* Workaround for MySQL Bug #64791.
+					 * Never mix data types inside any IN() condition.
+					 * In case of mixed types, cast all as string.
+					 * Logic needs to be consistent with DBA::p() data types.
+					 */
+					$is_int = false;
+					$is_alpha = false;
+					foreach ($value as $single_value) {
+						if (is_int($single_value)) {
+							$is_int = true;
+						} else {
+							$is_alpha = true;
+						}
+					}
+
+					if ($is_int && $is_alpha) {
+						foreach ($value as &$ref) {
+							if (is_int($ref)) {
+								$ref = (string)$ref;
+							}
+						}
+						unset($ref); //Prevent accidental re-use.
+					}
+
+					$values = array_merge($values, array_values($value));
+					$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
+					$condition_string .= self::quoteIdentifier($field) . " IN (" . $placeholders . ")";
+				} else {
+					// Empty value array isn't supported by IN and is logically equivalent to no match
+					$condition_string .= "FALSE";
+				}
+			} elseif (is_null($value)) {
+				$condition_string .= self::quoteIdentifier($field) . " IS NULL";
+			} else {
+				$values[$field] = $value;
+				$condition_string .= self::quoteIdentifier($field) . " = ?";
+			}
+		}
+
+		$condition = array_merge([$condition_string], array_values($values));
+
+		return $condition;
 	}
 
 	/**

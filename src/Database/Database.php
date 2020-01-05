@@ -1327,10 +1327,6 @@ class Database
 			return false;
 		}
 
-		$table_string = DBA::buildTableString($table);
-
-		$condition_string = DBA::buildCondition($condition);
-
 		if (is_bool($old_fields)) {
 			$do_insert = $old_fields;
 
@@ -1361,13 +1357,16 @@ class Database
 			return true;
 		}
 
+		$table_string = DBA::buildTableString($table);
+
+		$condition_string = DBA::buildCondition($condition);
+
 		$sql = "UPDATE " . $table_string . " SET "
 			. implode(" = ?, ", array_map([DBA::class, 'quoteIdentifier'], array_keys($fields))) . " = ?"
 			. $condition_string;
 
-		$params1 = array_values($fields);
-		$params2 = array_values($condition);
-		$params  = array_merge_recursive($params1, $params2);
+		// Combines the updated fields parameter values with the condition parameter values
+		$params  = array_merge(array_values($fields), $condition);
 
 		return $this->e($sql, $params);
 	}
