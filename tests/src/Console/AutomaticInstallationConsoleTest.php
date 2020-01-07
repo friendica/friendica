@@ -10,7 +10,7 @@ use Friendica\Core\Installer;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Logger;
 use Friendica\Database\Database;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Test\Util\DBAMockTrait;
 use Friendica\Test\Util\DBStructureMockTrait;
 use Friendica\Test\Util\RendererMockTrait;

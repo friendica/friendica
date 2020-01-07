@@ -4,10 +4,12 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\Session;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 
 /**
  * Loads a profile for the HoverCard view
@@ -27,12 +29,12 @@ class HoverCard extends BaseModule
 			$nickname = $parameters['profile'];
 			$profile  = 0;
 		} else {
-			throw new NotFoundException(DI::l10n()->t('No profile'));
+			throw new NotFoundException(Core::l10n()->t('No profile'));
 		}
 
 		Profile::load($a, $nickname, $profile);
 
-		$page = DI::page();
+		$page = App::page();
 
 		if (!empty($a->profile['page-flags']) && ($a->profile['page-flags'] == User::PAGE_FLAGS_COMMUNITY)) {
 			$page['htmlhead'] .= '<meta name="friendica.community" content="true" />';
@@ -46,7 +48,7 @@ class HoverCard extends BaseModule
 		}
 
 		// check if blocked
-		if (DI::config()->get('system', 'block_public') && !Session::isAuthenticated()) {
+		if (Core::config()->get('system', 'block_public') && !Session::isAuthenticated()) {
 			$keywords = $a->profile['pub_keywords'] ?? '';
 			$keywords = str_replace([',', ' ', ',,'], [' ', ',', ','], $keywords);
 			if (strlen($keywords)) {
@@ -54,7 +56,7 @@ class HoverCard extends BaseModule
 			}
 		}
 
-		$baseUrl = DI::baseUrl();
+		$baseUrl = App::baseUrl();
 
 		$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . $baseUrl->getHostname() . ($baseUrl->getUrlPath() ? '/' . $baseUrl->getUrlPath() : ''));
 

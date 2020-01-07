@@ -10,8 +10,8 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Registry\App;
 use Friendica\Util\Proxy as ProxyUtils;
 
 /**
@@ -116,7 +116,7 @@ class ForumManager
 					'name' => $contact['name'],
 					'cid' => $contact['id'],
 					'selected' 	=> $selected,
-					'micro' => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($contact['micro'], false, ProxyUtils::SIZE_MICRO)),
+					'micro' => App::baseUrl()->remove(ProxyUtils::proxifyUrl($contact['micro'], false, ProxyUtils::SIZE_MICRO)),
 					'id' => ++$id,
 				];
 				$entries[] = $entry;

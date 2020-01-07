@@ -16,12 +16,15 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App;
+use Friendica\Registry\Content;
+use Friendica\Registry\Protocol as P;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -342,7 +345,7 @@ class Post
 
 		$body = Item::prepareBody($item, true);
 
-		list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item);
+		list($categories, $folders) = Content::item()->determineCategoriesTerms($item);
 
 		$body_e       = $body;
 		$text_e       = strip_tags($body);
@@ -409,7 +412,7 @@ class Post
 			'profile_url'     => $profile_link,
 			'item_photo_menu' => item_photo_menu($item),
 			'name'            => $name_e,
-			'thumb'           => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
+			'thumb'           => App::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
 			'title'           => $title_e,
@@ -423,7 +426,7 @@ class Post
 			'shiny'           => $shiny,
 			'owner_self'      => $item['author-link'] == Session::get('my_url'),
 			'owner_url'       => $this->getOwnerUrl(),
-			'owner_photo'     => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
+			'owner_photo'     => App::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 			'owner_name'      => $owner_name_e,
 			'plink'           => Item::getPlink($item),
 			'edpost'          => $edpost,
@@ -453,7 +456,7 @@ class Post
 			'received'        => $item['received'],
 			'commented'       => $item['commented'],
 			'created_date'    => $item['created'],
-			'return'          => (DI::args()->getCommand()) ? bin2hex(DI::args()->getCommand()) : '',
+			'return'          => (App::args()->getCommand()) ? bin2hex(App::args()->getCommand()) : '',
 			'delivery'        => [
 				'queue_count'       => $item['delivery_queue_count'],
 				'queue_done'        => $item['delivery_queue_done'] + $item['delivery_queue_failed'], /// @todo Possibly display it separately in the future
@@ -546,7 +549,7 @@ class Post
 			return false;
 		}
 
-		$activity = DI::activity();
+		$activity = P::activity();
 
 		/*
 		 * Only add what will be displayed
@@ -890,7 +893,7 @@ class Post
 
 			$template = Renderer::getMarkupTemplate($this->getCommentBoxTemplate());
 			$comment_box = Renderer::replaceMacros($template, [
-				'$return_path' => DI::args()->getQueryString(),
+				'$return_path' => App::args()->getQueryString(),
 				'$threaded'    => $this->isThreaded(),
 				'$jsreload'    => '',
 				'$wall'        => ($conv->getMode() === 'profile'),
@@ -899,9 +902,9 @@ class Post
 				'$qcomment'    => $qcomment,
 				'$default'     => $default_text,
 				'$profile_uid' => $uid,
-				'$mylink'      => DI::baseUrl()->remove($a->contact['url']),
+				'$mylink'      => App::baseUrl()->remove($a->contact['url']),
 				'$mytitle'     => L10n::t('This is you'),
-				'$myphoto'     => DI::baseUrl()->remove($a->contact['thumb']),
+				'$myphoto'     => App::baseUrl()->remove($a->contact['thumb']),
 				'$comment'     => L10n::t('Comment'),
 				'$submit'      => L10n::t('Submit'),
 				'$edbold'      => L10n::t('Bold'),

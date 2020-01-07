@@ -6,8 +6,8 @@
 namespace Friendica\Core;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -22,32 +22,32 @@ class Session
 
 	public static function exists($name)
 	{
-		return DI::session()->exists($name);
+		return Core::session()->exists($name);
 	}
 
 	public static function get($name, $defaults = null)
 	{
-		return DI::session()->get($name, $defaults);
+		return Core::session()->get($name, $defaults);
 	}
 
 	public static function set($name, $value)
 	{
-		DI::session()->set($name, $value);
+		Core::session()->set($name, $value);
 	}
 
 	public static function setMultiple(array $values)
 	{
-		DI::session()->setMultiple($values);
+		Core::session()->setMultiple($values);
 	}
 
 	public static function remove($name)
 	{
-		DI::session()->remove($name);
+		Core::session()->remove($name);
 	}
 
 	public static function clear()
 	{
-		DI::session()->clear();
+		Core::session()->clear();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Session
 	 */
 	public static function getRemoteContactID($uid)
 	{
-		$session = DI::session();
+		$session = Core::session();
 
 		if (empty($session->get('remote')[$uid])) {
 			return false;
@@ -75,7 +75,7 @@ class Session
 	 */
 	public static function getUserIDForVisitorContactID($cid)
 	{
-		$session = DI::session();
+		$session = Core::session();
 
 		if (empty($session->get('remote'))) {
 			return false;
@@ -91,7 +91,7 @@ class Session
 	 */
 	public static function setVisitorsContacts()
 	{
-		$session = DI::session();
+		$session = Core::session();
 
 		$session->set('remote', []);
 
@@ -113,7 +113,7 @@ class Session
 	 */
 	public static function isAuthenticated()
 	{
-		$session = DI::session();
+		$session = Core::session();
 
 		return $session->get('authenticated', false);
 	}

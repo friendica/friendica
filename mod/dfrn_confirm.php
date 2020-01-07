@@ -24,12 +24,11 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
-use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App as A;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -177,7 +176,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		$params['dfrn_id'] = bin2hex($result);
 		$params['public_key'] = $public_key;
 
-		$my_url = DI::baseUrl() . '/profile/' . $user['nickname'];
+		$my_url = A::baseUrl() . '/profile/' . $user['nickname'];
 
 		openssl_public_encrypt($my_url, $params['source_url'], $site_pubkey);
 		$params['source_url'] = bin2hex($params['source_url']);
@@ -332,7 +331,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		// Let's send our user to the contact editor in case they want to
 		// do anything special with this new friend.
 		if ($handsfree === null) {
-			DI::baseUrl()->redirect('contact/' . intval($contact_id));
+			A::baseUrl()->redirect('contact/' . intval($contact_id));
 		} else {
 			return;
 		}
@@ -469,7 +468,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		if (DBA::isResult($contact)) {
 			$photo = $contact['photo'];
 		} else {
-			$photo = DI::baseUrl() . '/images/person-300.jpg';
+			$photo = A::baseUrl() . '/images/person-300.jpg';
 		}
 
 		Contact::updateAvatar($photo, $local_uid, $dfrn_record);
@@ -536,7 +535,7 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 					'to_name'      => $combined['username'],
 					'to_email'     => $combined['email'],
 					'uid'          => $combined['uid'],
-					'link'         => DI::baseUrl() . '/contact/' . $dfrn_record,
+					'link'         => A::baseUrl() . '/contact/' . $dfrn_record,
 					'source_name'  => ((strlen(stripslashes($combined['name']))) ? stripslashes($combined['name']) : L10n::t('[Name Withheld]')),
 					'source_link'  => $combined['url'],
 					'source_photo' => $combined['photo'],
@@ -552,6 +551,6 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 	}
 
 	// somebody arrived here by mistake or they are fishing. Send them to the homepage.
-	DI::baseUrl()->redirect();
+	A::baseUrl()->redirect();
 	// NOTREACHED
 }

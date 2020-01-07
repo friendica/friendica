@@ -7,9 +7,10 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 use Friendica\Util\Proxy as ProxyUtils;
 
 /**
@@ -44,12 +45,12 @@ class AllFriends extends BaseModule
 			throw new HTTPException\BadRequestException(L10n::t('Invalid contact.'));
 		}
 
-		DI::page()['aside'] = "";
+		App::page()['aside'] = "";
 		Model\Profile::load($app, "", 0, Model\Contact::getDetailsByURL($contact["url"]));
 
 		$total = Model\GContact::countAllFriends(local_user(), $cid);
 
-		$pager = new Pager(DI::args()->getQueryString());
+		$pager = new Pager(App::args()->getQueryString());
 
 		$friends = Model\GContact::allFriends(local_user(), $cid, $pager->getStart(), $pager->getItemsPerPage());
 		if (empty($friends)) {
@@ -70,7 +71,7 @@ class AllFriends extends BaseModule
 				$friend['id'] = $friend['cid'];
 				$photoMenu = Model\Contact::photoMenu($friend);
 			} else {
-				$connlnk = DI::baseUrl()->get() . '/follow/?url=' . $friend['url'];
+				$connlnk = App::baseUrl()->get() . '/follow/?url=' . $friend['url'];
 				$photoMenu = [
 					'profile' => [L10n::t('View Profile'), Model\Contact::magicLinkbyId($friend['id'], $friend['url'])],
 					'follow'  => [L10n::t('Connect/Follow'), $connlnk]

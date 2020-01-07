@@ -10,13 +10,15 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
+use Friendica\Registry\Util;
 use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\FileSystem;
 use Friendica\Util\Network;
 
 class Summary extends BaseAdminModule
@@ -63,25 +65,25 @@ class Summary extends BaseAdminModule
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', App::baseUrl()->get() . '/help/Config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = L10n::t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', App::baseUrl()->get() . '/help/Config');
 		}
 
 		// Check server vitality
 		if (!self::checkSelfHostMeta()) {
-			$well_known = DI::baseUrl()->get() . '/.well-known/host-meta';
+			$well_known = App::baseUrl()->get() . '/.well-known/host-meta';
 			$warningtext[] = L10n::t('<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
-				$well_known, $well_known, DI::baseUrl()->get() . '/help/Install');
+				$well_known, $well_known, App::baseUrl()->get() . '/help/Install');
 		}
 
 		// Check logfile permission
 		if (Config::get('system', 'debugging')) {
 			$file = Config::get('system', 'logfile');
 
-			$fileSystem = DI::fs();
+			$fileSystem = Util::fs();
 
 			try {
 				$stream = $fileSystem->createStream($file);
@@ -115,10 +117,10 @@ class Summary extends BaseAdminModule
 		$configCache = new Config\Cache\ConfigCache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');
-		$currBasepath = DI::config()->get('system', 'basepath');
+		$currBasepath = Core::config()->get('system', 'basepath');
 		if ($confBasepath !== $currBasepath || !is_dir($currBasepath)) {
 			if (is_dir($confBasepath) && Config::set('system', 'basepath', $confBasepath)) {
-				DI::logger()->info('Friendica\'s system.basepath was updated successfully.', [
+				Core::logger()->info('Friendica\'s system.basepath was updated successfully.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
@@ -126,7 +128,7 @@ class Summary extends BaseAdminModule
 					$currBasepath,
 					$confBasepath);
 			} elseif (!is_dir($currBasepath)) {
-				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
+				Core::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
@@ -134,7 +136,7 @@ class Summary extends BaseAdminModule
 					$currBasepath,
 					$confBasepath);
 			} else {
-				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
+				Core::logger()->alert('Friendica\'s system.basepath is wrong.', [
 					'from' => $currBasepath,
 					'to'   => $confBasepath,
 				]);
@@ -208,7 +210,7 @@ class Summary extends BaseAdminModule
 	private static function checkSelfHostMeta()
 	{
 		// Fetch the host-meta to check if this really is a vital server
-		return Network::curl(DI::baseUrl()->get() . '/.well-known/host-meta')->isSuccess();
+		return Network::curl(App::baseUrl()->get() . '/.well-known/host-meta')->isSuccess();
 	}
 
 }

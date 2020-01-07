@@ -20,11 +20,14 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
+use Friendica\Registry\App;
+use Friendica\Registry\Protocol as P;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
@@ -1279,7 +1282,7 @@ class Item
 		if ($notify) {
 			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
 			// We add the hash of our own host because our host is the original creator of the post.
-			$prefix_host = DI::baseUrl()->getHostname();
+			$prefix_host = App::baseUrl()->getHostname();
 		} else {
 			$prefix_host = '';
 
@@ -1440,7 +1443,7 @@ class Item
 			$item['parent-uri'] = $item['thr-parent'];
 		}
 
-		$activity = DI::activity();
+		$activity = P::activity();
 
 		if (isset($item['gravity'])) {
 			$item['gravity'] = intval($item['gravity']);
@@ -1564,7 +1567,7 @@ class Item
 			$item['edited'] = DateTimeFormat::utcNow();
 		}
 
-		$item['plink'] = ($item['plink'] ?? '') ?: DI::baseUrl() . '/display/' . urlencode($item['guid']);
+		$item['plink'] = ($item['plink'] ?? '') ?: App::baseUrl() . '/display/' . urlencode($item['guid']);
 
 		$default = ['url' => $item['author-link'], 'name' => $item['author-name'],
 			'photo' => $item['author-avatar'], 'network' => $item['network']];
@@ -2513,7 +2516,7 @@ class Item
 			$guid = System::createUUID();
 		}
 
-		return DI::baseUrl()->get() . '/objects/' . $guid;
+		return App::baseUrl()->get() . '/objects/' . $guid;
 	}
 
 	/**
@@ -2594,10 +2597,10 @@ class Item
 		// All hashtags should point to the home server if "local_tags" is activated
 		if (Config::get('system', 'local_tags')) {
 			$item["body"] = preg_replace("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-					"#[url=".DI::baseUrl()."/search?tag=$2]$2[/url]", $item["body"]);
+				"#[url=" . App::baseUrl() . "/search?tag=$2]$2[/url]", $item["body"]);
 
 			$item["tag"] = preg_replace("/#\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-					"#[url=".DI::baseUrl()."/search?tag=$2]$2[/url]", $item["tag"]);
+				"#[url=" . App::baseUrl() . "/search?tag=$2]$2[/url]", $item["tag"]);
 		}
 
 		// mask hashtags inside of url, bookmarks and attachments to avoid urls in urls
@@ -2626,7 +2629,7 @@ class Item
 			}
 
 			$basetag = str_replace('_',' ',substr($tag,1));
-			$newtag = '#[url=' . DI::baseUrl() . '/search?tag=' . $basetag . ']' . $basetag . '[/url]';
+			$newtag = '#[url=' . App::baseUrl() . '/search?tag=' . $basetag . ']' . $basetag . '[/url]';
 
 			$item["body"] = str_replace($tag, $newtag, $item["body"]);
 
@@ -2678,13 +2681,13 @@ class Item
 			return false;
 		}
 
-		$link = Strings::normaliseLink(DI::baseUrl() . '/profile/' . $user['nickname']);
+		$link = Strings::normaliseLink(App::baseUrl() . '/profile/' . $user['nickname']);
 
 		/*
 		 * Diaspora uses their own hardwired link URL in @-tags
 		 * instead of the one we supply with webfinger
 		 */
-		$dlink = Strings::normaliseLink(DI::baseUrl() . '/u/' . $user['nickname']);
+		$dlink = Strings::normaliseLink(App::baseUrl() . '/u/' . $user['nickname']);
 
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {
@@ -2765,7 +2768,7 @@ class Item
 		}
 
 		// Prevent to forward already forwarded posts
-		if ($datarray["app"] == DI::baseUrl()->getHostname()) {
+		if ($datarray["app"] == App::baseUrl()->getHostname()) {
 			Logger::log('Already forwarded (second test)', Logger::DEBUG);
 			return false;
 		}
@@ -2854,7 +2857,7 @@ class Item
 		}
 
 		Logger::log('check for photos', Logger::DEBUG);
-		$site = substr(DI::baseUrl(), strpos(DI::baseUrl(), '://'));
+		$site = substr(App::baseUrl(), strpos(App::baseUrl(), '://'));
 
 		$orig_body = $s;
 		$new_body = '';
@@ -2977,7 +2980,7 @@ class Item
 	 */
 	public static function enumeratePermissions(array $obj, bool $check_dead = false)
 	{
-		$aclFormater = DI::aclFormatter();
+		$aclFormater = Util::aclFormatter();
 
 		$allow_people = $aclFormater->expand($obj['allow_cid']);
 		$allow_groups = Group::expand($obj['uid'], $aclFormater->expand($obj['allow_gid']), $check_dead);
@@ -3577,8 +3580,8 @@ class Item
 
 			if (strpos($mime, 'video') !== false) {
 				if (!$vhead) {
-					$vhead = true;
-					DI::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('videos_head.tpl'));
+					$vhead                  = true;
+					App::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('videos_head.tpl'));
 				}
 
 				$url_parts = explode('/', $the_url);
@@ -3655,7 +3658,7 @@ class Item
 			];
 
 			if (!empty($item['plink'])) {
-				$ret["href"] = DI::baseUrl()->remove($item['plink']);
+				$ret["href"] = App::baseUrl()->remove($item['plink']);
 				$ret["title"] = L10n::t('link to source');
 			}
 

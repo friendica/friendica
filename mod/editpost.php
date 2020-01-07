@@ -9,10 +9,10 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\FileTag;
 use Friendica\Model\Item;
+use Friendica\Registry\App as A;
 use Friendica\Util\Crypto;
 
 function editpost_content(App $a)
@@ -47,8 +47,8 @@ function editpost_content(App $a)
 		'$title' => L10n::t('Edit post')
 	]);
 
-	$tpl = Renderer::getMarkupTemplate('jot-header.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+	$tpl                         = Renderer::getMarkupTemplate('jot-header.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']

@@ -5,7 +5,7 @@
 namespace Friendica\Core;
 
 use Friendica\Core\L10n\L10n as L10nClass;
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * Provide Language, Translation, and Localization functions to the application
@@ -20,7 +20,7 @@ class L10n
 	 */
 	public static function getCurrentLang()
 	{
-		return DI::l10n()->getCurrentLang();
+		return Core::l10n()->getCurrentLang();
 	}
 
 	/**
@@ -32,7 +32,7 @@ class L10n
 	 */
 	public static function withLang(string $lang)
 	{
-		return DI::l10n()->withLang($lang);
+		return Core::l10n()->withLang($lang);
 	}
 
 	/**
@@ -54,7 +54,7 @@ class L10n
 	 */
 	public static function t($s, ...$vars)
 	{
-		return DI::l10n()->t($s, ...$vars);
+		return Core::l10n()->t($s, ...$vars);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class L10n
 	 */
 	public static function tt(string $singular, string $plural, int $count)
 	{
-		return DI::l10n()->tt($singular, $plural, $count);
+		return Core::l10n()->tt($singular, $plural, $count);
 	}
 
 	/**
@@ -107,7 +107,7 @@ class L10n
 	 */
 	public static function getDay($s)
 	{
-		return DI::l10n()->getDay($s);
+		return Core::l10n()->getDay($s);
 	}
 
 	/**
@@ -119,7 +119,7 @@ class L10n
 	 */
 	public static function getDayShort($s)
 	{
-		return DI::l10n()->getDayShort($s);
+		return Core::l10n()->getDayShort($s);
 	}
 
 	/**
@@ -131,6 +131,6 @@ class L10n
 	 */
 	public static function getPokeVerbs()
 	{
-		return DI::l10n()->getPokeVerbs();
+		return Core::l10n()->getPokeVerbs();
 	}
 }

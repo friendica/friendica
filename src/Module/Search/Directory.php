@@ -4,9 +4,9 @@ namespace Friendica\Module\Search;
 
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
-use Friendica\DI;
 use Friendica\Module\BaseSearchModule;
 use Friendica\Module\Security\Login;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -23,12 +23,12 @@ class Directory extends BaseSearchModule
 
 		$search = Strings::escapeTags(trim(rawurldecode($_REQUEST['search'] ?? '')));
 
-		if (empty(DI::page()['aside'])) {
-			DI::page()['aside'] = '';
+		if (empty(App::page()['aside'])) {
+			App::page()['aside'] = '';
 		}
 
-		DI::page()['aside'] .= Widget::findPeople();
-		DI::page()['aside'] .= Widget::follow();
+		App::page()['aside'] .= Widget::findPeople();
+		App::page()['aside'] .= Widget::follow();
 
 		return self::performContactSearch($search);
 	}

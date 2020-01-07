@@ -5,11 +5,12 @@ namespace Friendica\Module\Diaspora;
 use Friendica\BaseModule;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Diaspora;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -47,7 +48,7 @@ class Fetch extends BaseModule
 				}
 				$host = $parts["scheme"] . "://" . $parts["host"];
 
-				if (Strings::normaliseLink($host) != Strings::normaliseLink(DI::baseUrl()->get())) {
+				if (Strings::normaliseLink($host) != Strings::normaliseLink(App::baseUrl()->get())) {
 					$location = $host . "/fetch/" . $app->argv[1] . "/" . urlencode($guid);
 					System::externalRedirect($location, 301);
 				}

@@ -17,9 +17,9 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model;
 use Friendica\Module;
+use Friendica\Registry\App as A;
 use Friendica\Util\Strings;
 
 function frio_init(App $a)
@@ -35,17 +35,17 @@ function frio_init(App $a)
 
 	// if the device is a mobile device set js is_mobile
 	// variable so the js scripts can use this information
-	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
-		DI::page()['htmlhead'] .= <<< EOT
+	if (A::mode()->isMobile() || A::mode()->isMobile()) {
+		A::page()['htmlhead'] .= <<< EOT
 			<script type="text/javascript">
 				var is_mobile = 1;
 			</script>
 EOT;
 	}
 
-	$enable_compose = \Friendica\Core\PConfig::get(local_user(), 'frio', 'enable_compose');
-	$compose = $enable_compose === '1' || $enable_compose === null && Config::get('frio', 'enable_compose') ? 1 : 0;
-	DI::page()['htmlhead'] .= <<< HTML
+	$enable_compose              = \Friendica\Core\PConfig::get(local_user(), 'frio', 'enable_compose');
+	$compose                     = $enable_compose === '1' || $enable_compose === null && Config::get('frio', 'enable_compose') ? 1 : 0;
+	A::page()['htmlhead'] .= <<< HTML
 		<script type="text/javascript">
 			var compose = $compose;
 		</script>
@@ -240,7 +240,7 @@ function frio_remote_nav($a, &$nav)
 		// user info
 		$r = q("SELECT `micro` FROM `contact` WHERE `uid` = %d AND `self`", intval($a->user['uid']));
 
-		$r[0]['photo'] = (DBA::isResult($r) ? DI::baseUrl()->remove($r[0]['micro']) : 'images/person-48.jpg');
+		$r[0]['photo'] = (DBA::isResult($r) ? A::baseUrl()->remove($r[0]['micro']) : 'images/person-48.jpg');
 		$r[0]['name'] = $a->user['username'];
 	} elseif (!local_user() && remote_user()) {
 		$r = q("SELECT `name`, `nick`, `micro` AS `photo` FROM `contact` WHERE `id` = %d", intval(remote_user()));

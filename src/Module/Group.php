@@ -12,8 +12,9 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 require_once 'boot.php';
@@ -24,13 +25,13 @@ class Group extends BaseModule
 	{
 		$a = DI::app();
 
-		if (DI::mode()->isAjax()) {
+		if (App::mode()->isAjax()) {
 			self::ajaxPost();
 		}
 
 		if (!local_user()) {
 			notice(L10n::t('Permission denied.'));
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		// @TODO: Replace with parameter from router
@@ -43,12 +44,12 @@ class Group extends BaseModule
 				info(L10n::t('Group created.'));
 				$r = Model\Group::getIdByName(local_user(), $name);
 				if ($r) {
-					DI::baseUrl()->redirect('group/' . $r);
+					App::baseUrl()->redirect('group/' . $r);
 				}
 			} else {
 				notice(L10n::t('Could not create group.'));
 			}
-			DI::baseUrl()->redirect('group');
+			App::baseUrl()->redirect('group');
 		}
 
 		// @TODO: Replace with parameter from router
@@ -58,7 +59,7 @@ class Group extends BaseModule
 			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => $a->argv[1], 'uid' => local_user()]);
 			if (!DBA::isResult($group)) {
 				notice(L10n::t('Group not found.'));
-				DI::baseUrl()->redirect('contact');
+				App::baseUrl()->redirect('contact');
 			}
 			$groupname = Strings::escapeTags(trim($_POST['groupname']));
 			if (strlen($groupname) && ($groupname != $group['name'])) {
@@ -137,12 +138,12 @@ class Group extends BaseModule
 
 		$a = DI::app();
 
-		DI::page()['aside'] = Model\Group::sidebarWidget('contact', 'group', 'extended', (($a->argc > 1) ? $a->argv[1] : 'everyone'));
+		App::page()['aside'] = Model\Group::sidebarWidget('contact', 'group', 'extended', (($a->argc > 1) ? $a->argv[1] : 'everyone'));
 
 		// With no group number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if ($a->argc == 1) {
-			DI::baseUrl()->redirect('group/none');
+			App::baseUrl()->redirect('group/none');
 		}
 
 		// Switch to text mode interface if we have more than 'n' contacts or group members
@@ -200,7 +201,7 @@ class Group extends BaseModule
 			if (intval($a->argv[2])) {
 				if (!Model\Group::exists($a->argv[2], local_user())) {
 					notice(L10n::t('Group not found.'));
-					DI::baseUrl()->redirect('contact');
+					App::baseUrl()->redirect('contact');
 				}
 
 				if (Model\Group::remove($a->argv[2])) {
@@ -209,7 +210,7 @@ class Group extends BaseModule
 					notice(L10n::t('Unable to remove group.'));
 				}
 			}
-			DI::baseUrl()->redirect('group');
+			App::baseUrl()->redirect('group');
 		}
 
 		// @TODO: Replace with parameter from router
@@ -226,7 +227,7 @@ class Group extends BaseModule
 			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => $a->argv[1], 'uid' => local_user(), 'deleted' => false]);
 			if (!DBA::isResult($group)) {
 				notice(L10n::t('Group not found.'));
-				DI::baseUrl()->redirect('contact');
+				App::baseUrl()->redirect('contact');
 			}
 
 			$members = Model\Contact::getByGroupId($group['id']);

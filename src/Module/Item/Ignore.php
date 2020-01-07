@@ -2,15 +2,14 @@
 
 namespace Friendica\Module\Item;
 
-use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Core\L10n\L10n;
 use Friendica\Core\Session;
 use Friendica\Core\System;
-use Friendica\Database\Database;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Core;
 
 /**
  * Module for ignoring threads or user items
@@ -19,13 +18,13 @@ class Ignore extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$l10n = DI::l10n();
+		$l10n = Core::l10n();
 
 		if (!Session::isAuthenticated()) {
 			throw new HttpException\ForbiddenException($l10n->t('Access denied.'));
 		}
 
-		$args = DI::args();
+		$args = A::args();
 		$dba = DI::dba();
 
 		$message_id = intval($args->get(2));
@@ -67,7 +66,7 @@ class Ignore extends BaseModule
 				$rand = "?$rand";
 			}
 
-			DI::baseUrl()->redirect($return_path . $rand);
+			A::baseUrl()->redirect($return_path . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

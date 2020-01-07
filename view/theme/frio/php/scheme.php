@@ -19,7 +19,7 @@
  */
 
 use Friendica\Core\PConfig;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Util\Strings;
 
 function get_scheme_info($scheme)

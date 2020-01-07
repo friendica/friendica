@@ -4,7 +4,7 @@
  */
 namespace Friendica\Core;
 
-use Friendica\DI;
+use Friendica\Registry\Core;
 use Friendica\Util\Logger\WorkerLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -72,9 +72,9 @@ class Logger
 	private static function getWorker()
 	{
 		if (self::$type === self::TYPE_LOGGER) {
-			return DI::logger();
+			return Core::logger();
 		} else {
-			return DI::workerLogger();
+			return Core::workerLogger();
 		}
 	}
 
@@ -257,6 +257,6 @@ class Logger
 	 */
 	public static function devLog($msg, $level = LogLevel::DEBUG)
 	{
-		DI::devLogger()->log($level, $msg);
+		Core::devLogger()->log($level, $msg);
 	}
 }

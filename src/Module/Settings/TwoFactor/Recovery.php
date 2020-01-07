@@ -7,10 +7,10 @@ namespace Friendica\Module\Settings\TwoFactor;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 use Friendica\Model\TwoFactor\RecoveryCode;
 use Friendica\Module\BaseSettingsModule;
 use Friendica\Module\Security\Login;
+use Friendica\Registry\App;
 
 /**
  * // Page 3: 2FA enabled but not verified, show recovery codes
@@ -28,12 +28,12 @@ class Recovery extends BaseSettingsModule
 		$secret = PConfig::get(local_user(), '2fa', 'secret');
 
 		if (!$secret) {
-			DI::baseUrl()->redirect('settings/2fa');
+			App::baseUrl()->redirect('settings/2fa');
 		}
 
 		if (!self::checkFormSecurityToken('settings_2fa_password', 't')) {
 			notice(L10n::t('Please enter your password to access this page.'));
-			DI::baseUrl()->redirect('settings/2fa');
+			App::baseUrl()->redirect('settings/2fa');
 		}
 	}
 
@@ -49,7 +49,7 @@ class Recovery extends BaseSettingsModule
 			if ($_POST['action'] == 'regenerate') {
 				RecoveryCode::regenerateForUser(local_user());
 				notice(L10n::t('New recovery codes successfully generated.'));
-				DI::baseUrl()->redirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
+				App::baseUrl()->redirect('settings/2fa/recovery?t=' . self::getFormSecurityToken('settings_2fa_password'));
 			}
 		}
 	}

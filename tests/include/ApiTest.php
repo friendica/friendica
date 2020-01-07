@@ -12,11 +12,12 @@ use Friendica\Core\Config\IPConfiguration;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session;
 use Friendica\Core\Session\ISession;
-use Friendica\Core\System;
 use Friendica\Database\Database;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Core;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Monolog\Handler\TestHandler;
 
@@ -115,7 +116,7 @@ class ApiTest extends DatabaseTest
 		// User ID that we know is not in the database
 		$this->wrongUserId = 666;
 
-		DI::session()->start();
+		Core::session()->start();
 
 		// Most API require login so we force the session
 		$_SESSION = [
@@ -435,7 +436,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['QUERY_STRING'] = 'q=api_path';
 		$_GET['callback']          = 'callback_name';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'callback_name(["some_data"])',
@@ -462,7 +463,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->config->set('system', 'profiler', true);
 		$this->config->set('rendertime', 'callstack', true);
@@ -498,7 +499,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'{"status":{"error":"Internal Server Error","code":"500 Internal Server Error","request":"api_path"}}',
@@ -538,7 +539,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path.json';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'["some_data"]',
@@ -564,7 +565,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path.xml';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'some_data',
@@ -590,7 +591,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path.rss';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
@@ -617,7 +618,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path.atom';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
@@ -639,7 +640,7 @@ class ApiTest extends DatabaseTest
 
 		$_SERVER['QUERY_STRING'] = 'q=api_path';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'{"status":{"error":"Method Not Allowed","code":"405 Method Not Allowed","request":"api_path"}}',
@@ -664,7 +665,7 @@ class ApiTest extends DatabaseTest
 		$_SERVER['REQUEST_METHOD'] = 'method';
 		$_SERVER['QUERY_STRING'] = 'q=api_path';
 
-		$args = DI::args()->determine($_SERVER, $_GET);
+		$args = A::args()->determine($_SERVER, $_GET);
 
 		$this->assertEquals(
 			'{"status":{"error":"This API requires login","code":"401 Unauthorized","request":"api_path"}}',
@@ -682,7 +683,7 @@ class ApiTest extends DatabaseTest
 	{
 		$this->assertEquals(
 			'{"status":{"error":"error_message","code":"200 OK","request":""}}',
-			api_error('json', new HTTPException\OKException('error_message'), DI::args())
+			api_error('json', new HTTPException\OKException('error_message'), A::args())
 		);
 	}
 
@@ -703,7 +704,7 @@ class ApiTest extends DatabaseTest
 			'  <code>200 OK</code>' . "\n" .
 			'  <request/>' . "\n" .
 			'</status>' . "\n",
-			api_error('xml', new HTTPException\OKException('error_message'), DI::args())
+			api_error('xml', new HTTPException\OKException('error_message'), A::args())
 		);
 	}
 
@@ -724,7 +725,7 @@ class ApiTest extends DatabaseTest
 			'  <code>200 OK</code>' . "\n" .
 			'  <request/>' . "\n" .
 			'</status>' . "\n",
-			api_error('rss', new HTTPException\OKException('error_message'), DI::args())
+			api_error('rss', new HTTPException\OKException('error_message'), A::args())
 		);
 	}
 
@@ -745,7 +746,7 @@ class ApiTest extends DatabaseTest
 			'  <code>200 OK</code>' . "\n" .
 			'  <request/>' . "\n" .
 			'</status>' . "\n",
-			api_error('atom', new HTTPException\OKException('error_message'), DI::args())
+			api_error('atom', new HTTPException\OKException('error_message'), A::args())
 		);
 	}
 
@@ -2418,7 +2419,7 @@ class ApiTest extends DatabaseTest
 	public function testApiFormatItemsEmbededImages()
 	{
 		$this->assertEquals(
-			'text ' . DI::baseUrl() . '/display/item_guid',
+			'text ' . A::baseUrl() . '/display/item_guid',
 			api_format_items_embeded_images(['guid' => 'item_guid'], 'text data:image/foo')
 		);
 	}
@@ -2921,7 +2922,7 @@ class ApiTest extends DatabaseTest
 		$result = api_statusnet_config('json');
 		$this->assertEquals('localhost', $result['config']['site']['server']);
 		$this->assertEquals('default', $result['config']['site']['theme']);
-		$this->assertEquals(DI::baseUrl() . '/images/friendica-64.png', $result['config']['site']['logo']);
+		$this->assertEquals(A::baseUrl() . '/images/friendica-64.png', $result['config']['site']['logo']);
 		$this->assertTrue($result['config']['site']['fancy']);
 		$this->assertEquals('en', $result['config']['site']['language']);
 		$this->assertEquals('UTC', $result['config']['site']['timezone']);

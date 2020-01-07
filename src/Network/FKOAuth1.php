@@ -6,7 +6,8 @@ namespace Friendica\Network;
 
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 use OAuthServer;
 use OAuthSignatureMethod_HMAC_SHA1;
 use OAuthSignatureMethod_PLAINTEXT;
@@ -44,6 +45,6 @@ class FKOAuth1 extends OAuthServer
 			die('This api requires login');
 		}
 
-		DI::auth()->setForUser($a, $record, true);
+		App::auth()->setForUser($a, $record, true);
 	}
 }

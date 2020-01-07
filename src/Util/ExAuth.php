@@ -37,8 +37,8 @@ namespace Friendica\Util;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\User;
+use Friendica\Registry\App;
 
 class ExAuth
 {
@@ -139,7 +139,7 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if (DI::baseUrl()->getHostname() == $aCommand[2]) {
+		if (App::baseUrl()->getHostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal user check for ' . $sUser . '@' . $aCommand[2]);
 			$found = DBA::exists('user', ['nickname' => $sUser]);
 		} else {
@@ -219,7 +219,7 @@ class ExAuth
 		$sUser = str_replace(['%20', '(a)'], [' ', '@'], $aCommand[1]);
 
 		// Does the hostname match? So we try directly
-		if (DI::baseUrl()->getHostname() == $aCommand[2]) {
+		if (App::baseUrl()->getHostname() == $aCommand[2]) {
 			$this->writeLog(LOG_INFO, 'internal auth for ' . $sUser . '@' . $aCommand[2]);
 
 			$aUser = DBA::selectFirst('user', ['uid', 'password', 'legacy_password'], ['nickname' => $sUser]);

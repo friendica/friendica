@@ -3,7 +3,9 @@
 namespace Friendica\Module\Security;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 use LightOpenID;
 
@@ -14,26 +16,26 @@ class OpenID extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		if (DI::config()->get('system', 'no_openid')) {
-			DI::baseUrl()->redirect();
+		if (Core::config()->get('system', 'no_openid')) {
+			App::baseUrl()->redirect();
 		}
 
-		DI::logger()->debug('mod_openid.', ['request' => $_REQUEST]);
+		Core::logger()->debug('mod_openid.', ['request' => $_REQUEST]);
 
-		$session = DI::session();
+		$session = Core::session();
 
 		if (!empty($_GET['openid_mode']) && !empty($session->get('openid'))) {
 
-			$openid = new LightOpenID(DI::baseUrl()->getHostname());
+			$openid = new LightOpenID(App::baseUrl()->getHostname());
 
-			$l10n = DI::l10n();
+			$l10n = Core::l10n();
 
 			if ($openid->validate()) {
 				$authId = $openid->data['openid_identity'];
 
 				if (empty($authId)) {
-					DI::logger()->info($l10n->t('OpenID protocol error. No ID returned'));
-					DI::baseUrl()->redirect();
+					Core::logger()->info($l10n->t('OpenID protocol error. No ID returned'));
+					App::baseUrl()->redirect();
 				}
 
 				// NOTE: we search both for normalised and non-normalised form of $authid
@@ -52,11 +54,11 @@ class OpenID extends BaseModule
 					// successful OpenID login
 					$session->remove('openid');
 
-					DI::auth()->setForUser(DI::app(), $user, true, true);
+					App::auth()->setForUser(DI::app(), $user, true, true);
 
 					// just in case there was no return url set
 					// and we fell through
-					DI::baseUrl()->redirect();
+					App::baseUrl()->redirect();
 				}
 
 				// Successful OpenID login - but we can't match it to an existing account.
@@ -65,17 +67,17 @@ class OpenID extends BaseModule
 				$session->set('openid_identity', $authId);
 
 				// Detect the server URL
-				$open_id_obj = new LightOpenID(DI::baseUrl()->getHostName());
+				$open_id_obj = new LightOpenID(App::baseUrl()->getHostName());
 				$open_id_obj->identity = $authId;
 				$session->set('openid_server', $open_id_obj->discover($open_id_obj->identity));
 
-				if (intval(DI::config()->get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED) {
+				if (intval(Core::config()->get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED) {
 					notice($l10n->t('Account not found. Please login to your existing account to add the OpenID to it.'));
 				} else {
 					notice($l10n->t('Account not found. Please register a new account or login to your existing account to add the OpenID to it.'));
 				}
 
-				DI::baseUrl()->redirect('login');
+				App::baseUrl()->redirect('login');
 			}
 		}
 	}

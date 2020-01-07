@@ -18,9 +18,9 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\TwoFactor\AppSpecificPassword;
 use Friendica\Object\Image;
+use Friendica\Registry\App;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
@@ -217,12 +217,12 @@ class User
 		// Check if the returned data is valid, otherwise fix it. See issue #6122
 
 		// Check for correct url and normalised nurl
-		$url = DI::baseUrl() . '/profile/' . $r['nickname'];
+		$url = App::baseUrl() . '/profile/' . $r['nickname'];
 		$repair = ($r['url'] != $url) || ($r['nurl'] != Strings::normaliseLink($r['url']));
 
 		if (!$repair) {
 			// Check if "addr" is present and correct
-			$addr = $r['nickname'] . '@' . substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3);
+			$addr = $r['nickname'] . '@' . substr(App::baseUrl(), strpos(App::baseUrl(), '://') + 3);
 			$repair = ($addr != $r['addr']);
 		}
 
@@ -633,9 +633,9 @@ class User
 				$_SESSION['register'] = 1;
 				$_SESSION['openid'] = $openid_url;
 
-				$openid = new LightOpenID(DI::baseUrl()->getHostname());
+				$openid = new LightOpenID(App::baseUrl()->getHostname());
 				$openid->identity = $openid_url;
-				$openid->returnUrl = DI::baseUrl() . '/openid';
+				$openid->returnUrl = App::baseUrl() . '/openid';
 				$openid->required = ['namePerson/friendly', 'contact/email', 'namePerson'];
 				$openid->optional = ['namePerson/first', 'media/image/aspect11', 'media/image/default'];
 				try {
@@ -782,8 +782,8 @@ class User
 		$insert_result = DBA::insert('profile', [
 			'uid' => $uid,
 			'name' => $username,
-			'photo' => DI::baseUrl() . "/photo/profile/{$uid}.jpg",
-			'thumb' => DI::baseUrl() . "/photo/avatar/{$uid}.jpg",
+			'photo' => App::baseUrl() . "/photo/profile/{$uid}.jpg",
+			'thumb' => App::baseUrl() . "/photo/avatar/{$uid}.jpg",
 			'publish' => $publish,
 			'is-default' => 1,
 			'net-publish' => $netpublish,

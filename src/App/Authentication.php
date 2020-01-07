@@ -15,7 +15,6 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
@@ -46,6 +45,8 @@ class Authentication
 	private $cookie;
 	/** @var Session\ISession */
 	private $session;
+	/** @var App\Module */
+	private $module;
 
 	/**
 	 * Authentication constructor.
@@ -58,8 +59,9 @@ class Authentication
 	 * @param LoggerInterface $logger
 	 * @param User\Cookie     $cookie
 	 * @param Session\ISession $session
+	 * @param App\Module $module
 	 */
-	public function __construct(IConfiguration $config, App\Mode $mode, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session)
+	public function __construct(IConfiguration $config, App\Mode $mode, App\BaseURL $baseUrl, L10n $l10n, Database $dba, LoggerInterface $logger, User\Cookie $cookie, Session\ISession $session, App\Module $module)
 	{
 		$this->config  = $config;
 		$this->mode = $mode;
@@ -69,6 +71,7 @@ class Authentication
 		$this->logger  = $logger;
 		$this->cookie = $cookie;
 		$this->session = $session;
+		$this->module = $module;
 	}
 
 	/**
@@ -380,7 +383,7 @@ class Authentication
 		if ($login_initial) {
 			Hook::callAll('logged_in', $a->user);
 
-			if (DI::module()->getName() !== 'home' && $this->session->exists('return_path')) {
+			if ($this->module->getName() !== 'home' && $this->session->exists('return_path')) {
 				$this->baseUrl->redirect($this->session->get('return_path'));
 			}
 		}

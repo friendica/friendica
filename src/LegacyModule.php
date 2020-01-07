@@ -67,7 +67,7 @@ class LegacyModule extends BaseModule
 		$function_name = static::$moduleName . '_' . $function_suffix;
 
 		if (\function_exists($function_name)) {
-			$a = DI::app();
+			$a = Registry\DI::app();
 			return $function_name($a);
 		} else {
 			return parent::{$function_suffix}($parameters);

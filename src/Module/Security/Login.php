@@ -12,8 +12,10 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\Register;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -26,7 +28,7 @@ class Login extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		if (local_user()) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		return self::form(Session::get('return_path'), intval(Config::get('config', 'register_policy')) !== \Friendica\Module\Register::CLOSED);
@@ -46,11 +48,11 @@ class Login extends BaseModule
 		) {
 			$openid_url = trim(($_POST['openid_url'] ?? '') ?: $_POST['username']);
 
-			DI::auth()->withOpenId($openid_url, !empty($_POST['remember']));
+			App::auth()->withOpenId($openid_url, !empty($_POST['remember']));
 		}
 
 		if (!empty($_POST['auth-params']) && $_POST['auth-params'] === 'login') {
-			DI::auth()->withPassword(
+			App::auth()->withPassword(
 				DI::app(),
 				trim($_POST['username']),
 				trim($_POST['password']),
@@ -85,7 +87,7 @@ class Login extends BaseModule
 		}
 
 		$reg = false;
-		if ($register && intval(DI::config()->get('config', 'register_policy')) !== Register::CLOSED) {
+		if ($register && intval(Core::config()->get('config', 'register_policy')) !== Register::CLOSED) {
 			$reg = [
 				'title' => L10n::t('Create a New Account'),
 				'desc' => L10n::t('Register'),
@@ -94,16 +96,16 @@ class Login extends BaseModule
 		}
 
 		if (is_null($return_path)) {
-			$return_path = DI::args()->getQueryString();
+			$return_path = App::args()->getQueryString();
 		}
 
 		if (local_user()) {
 			$tpl = Renderer::getMarkupTemplate('logout.tpl');
 		} else {
-			DI::page()['htmlhead'] .= Renderer::replaceMacros(
+			App::page()['htmlhead'] .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('login_head.tpl'),
 				[
-					'$baseurl' => DI::baseUrl()->get(true)
+					'$baseurl' => App::baseUrl()->get(true)
 				]
 			);
 
@@ -126,7 +128,7 @@ class Login extends BaseModule
 		$o .= Renderer::replaceMacros(
 			$tpl,
 			[
-				'$dest_url'     => DI::baseUrl()->get(true) . '/login',
+				'$dest_url'     => App::baseUrl()->get(true) . '/login',
 				'$logout'       => L10n::t('Logout'),
 				'$login'        => L10n::t('Login'),
 

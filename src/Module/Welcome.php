@@ -5,7 +5,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * Prints the welcome page for new users
@@ -14,7 +14,7 @@ class Welcome extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$mail_disabled   = ((function_exists('imap_open') &&
 		                     (!$config->get('system', 'imap_disabled'))));

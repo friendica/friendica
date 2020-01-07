@@ -7,8 +7,8 @@ use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
-use Friendica\DI;
 use Friendica\Network\HTTPException\ForbiddenException;
+use Friendica\Registry\App;
 
 require_once 'boot.php';
 
@@ -53,8 +53,8 @@ abstract class BaseAdminModule extends BaseModule
 	{
 		if (!is_site_admin()) {
 			notice(L10n::t('Please login to continue.'));
-			Session::set('return_path', DI::args()->getQueryString());
-			DI::baseUrl()->redirect('login');
+			Session::set('return_path', App::args()->getQueryString());
+			App::baseUrl()->redirect('login');
 		}
 
 		if (!empty($_SESSION['submanage'])) {
@@ -62,7 +62,7 @@ abstract class BaseAdminModule extends BaseModule
 		}
 
 		// Header stuff
-		DI::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/settings_head.tpl'), []);
+		App::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/settings_head.tpl'), []);
 
 		/*
 		 * Side bar links
@@ -106,8 +106,8 @@ abstract class BaseAdminModule extends BaseModule
 			]],
 		];
 
-		$t = Renderer::getMarkupTemplate('admin/aside.tpl');
-		DI::page()['aside'] .= Renderer::replaceMacros($t, [
+		$t                   = Renderer::getMarkupTemplate('admin/aside.tpl');
+		App::page()['aside'] .= Renderer::replaceMacros($t, [
 			'$admin' => ['addons_admin' => Addon::getAdminList()],
 			'$subpages' => $aside_sub,
 			'$admtxt' => L10n::t('Admin'),

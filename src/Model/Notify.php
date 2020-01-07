@@ -11,7 +11,7 @@ use Friendica\Core\L10n\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\Database;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;

@@ -4,13 +4,13 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 class Manifest extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$tpl = Renderer::getMarkupTemplate('manifest.tpl');
 

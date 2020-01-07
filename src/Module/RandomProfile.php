@@ -3,9 +3,10 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Registry\App;
 
 /**
  * Redirects to a random Friendica profile this node knows about
@@ -23,6 +24,6 @@ class RandomProfile extends BaseModule
 			$a->redirect($link);
 		}
 
-		DI::baseUrl()->redirect('profile');
+		App::baseUrl()->redirect('profile');
 	}
 }

@@ -8,7 +8,7 @@
  */
 
 use Friendica\App;
-use Friendica\DI;
+use Friendica\Registry\App as A;
 
 /**
  * @brief Load page template in dependence of the template mode
@@ -23,7 +23,7 @@ function load_page(App $a)
 		require 'view/theme/frio/none.php';
 	} else {
 		$template = 'view/theme/' . $a->getCurrentTheme() . '/'
-			. ((DI::page()['template'] ?? '') ?: 'default' ) . '.php';
+			. ((A::page()['template'] ?? '') ?: 'default' ) . '.php';
 		if (file_exists($template)) {
 			require_once $template;
 		} else {

@@ -8,10 +8,10 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
+use Friendica\Registry\App as A;
 use Friendica\Util\Strings;
 
 function unfollow_post(App $a)
@@ -20,7 +20,7 @@ function unfollow_post(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		DI::baseUrl()->redirect('login');
+		A::baseUrl()->redirect('login');
 		// NOTREACHED
 	}
 
@@ -34,17 +34,17 @@ function unfollow_post(App $a)
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		DI::baseUrl()->redirect($base_return_path);
+		A::baseUrl()->redirect($base_return_path);
 		// NOTREACHED
 	}
 
 	if (!empty($_REQUEST['cancel'])) {
-		DI::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
+		A::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
 	}
 
 	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 		notice(L10n::t('Unfollowing is currently not supported by your network.'));
-		DI::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
+		A::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
 		// NOTREACHED
 	}
 
@@ -65,7 +65,7 @@ function unfollow_post(App $a)
 	}
 
 	info(L10n::t('Contact unfollowed'));
-	DI::baseUrl()->redirect($return_path);
+	A::baseUrl()->redirect($return_path);
 	// NOTREACHED
 }
 
@@ -75,7 +75,7 @@ function unfollow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		DI::baseUrl()->redirect('login');
+		A::baseUrl()->redirect('login');
 		// NOTREACHED
 	}
 
@@ -90,24 +90,24 @@ function unfollow_content(App $a)
 
 	if (!DBA::isResult($contact)) {
 		notice(L10n::t("You aren't following this contact."));
-		DI::baseUrl()->redirect($base_return_path);
+		A::baseUrl()->redirect($base_return_path);
 		// NOTREACHED
 	}
 
 	if (!in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 		notice(L10n::t('Unfollowing is currently not supported by your network.'));
-		DI::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
+		A::baseUrl()->redirect($base_return_path . '/' . $contact['id']);
 		// NOTREACHED
 	}
 
-	$request = DI::baseUrl() . '/unfollow';
+	$request = A::baseUrl() . '/unfollow';
 	$tpl = Renderer::getMarkupTemplate('auto_request.tpl');
 
 	$self = DBA::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
 
 	if (!DBA::isResult($self)) {
 		notice(L10n::t('Permission denied.'));
-		DI::baseUrl()->redirect($base_return_path);
+		A::baseUrl()->redirect($base_return_path);
 		// NOTREACHED
 	}
 
@@ -141,7 +141,7 @@ function unfollow_content(App $a)
 		'$keywords_label'=> ''
 	]);
 
-	DI::page()['aside'] = '';
+	A::page()['aside'] = '';
 	Profile::load($a, '', 0, Contact::getDetailsByURL($contact['url']));
 
 	$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), ['$title' => L10n::t('Status Messages and Posts')]);

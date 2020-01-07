@@ -7,12 +7,11 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Database\DBA;
+use Friendica\Registry\App as A;
 use Friendica\Util\Strings;
 
 function follow_post(App $a)
@@ -22,7 +21,7 @@ function follow_post(App $a)
 	}
 
 	if (isset($_REQUEST['cancel'])) {
-		DI::baseUrl()->redirect('contact');
+		A::baseUrl()->redirect('contact');
 	}
 
 	$uid = local_user();
@@ -39,14 +38,14 @@ function follow_post(App $a)
 		if ($result['message']) {
 			notice($result['message']);
 		}
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 	} elseif ($result['cid']) {
-		DI::baseUrl()->redirect('contact/' . $result['cid']);
+		A::baseUrl()->redirect('contact/' . $result['cid']);
 	}
 
 	info(L10n::t('The contact could not be added.'));
 
-	DI::baseUrl()->redirect($return_path);
+	A::baseUrl()->redirect($return_path);
 	// NOTREACHED
 }
 
@@ -56,7 +55,7 @@ function follow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 
@@ -71,7 +70,7 @@ function follow_content(App $a)
 	}
 
 	if (!$url) {
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 	}
 
 	$submit = L10n::t('Submit Request');
@@ -125,7 +124,7 @@ function follow_content(App $a)
 		$request = $ret['request'];
 		$tpl = Renderer::getMarkupTemplate('dfrn_request.tpl');
 	} else {
-		$request = DI::baseUrl() . '/follow';
+		$request = A::baseUrl() . '/follow';
 		$tpl = Renderer::getMarkupTemplate('auto_request.tpl');
 	}
 
@@ -133,7 +132,7 @@ function follow_content(App $a)
 
 	if (!$r) {
 		notice(L10n::t('Permission denied.'));
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 
@@ -184,7 +183,7 @@ function follow_content(App $a)
 		'$keywords_label'=> L10n::t('Tags:')
 	]);
 
-	DI::page()['aside'] = '';
+	A::page()['aside'] = '';
 
 	$profiledata = Contact::getDetailsByURL($ret['url']);
 	if ($profiledata) {

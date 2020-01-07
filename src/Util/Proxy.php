@@ -3,7 +3,8 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Config;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 
 /**
  * @brief Proxy utilities class
@@ -75,7 +76,7 @@ class Proxy
 
 		// Only continue if it isn't a local image and the isn't deactivated
 		if (self::isLocalImage($url)) {
-			$url = str_replace(Strings::normaliseLink(DI::baseUrl()) . '/', DI::baseUrl() . '/', $url);
+			$url = str_replace(Strings::normaliseLink(App::baseUrl()) . '/', App::baseUrl() . '/', $url);
 			return $url;
 		}
 
@@ -108,7 +109,7 @@ class Proxy
 			$longpath .= '.' . $extension;
 		}
 
-		$proxypath = DI::baseUrl() . '/proxy/' . $longpath;
+		$proxypath = App::baseUrl() . '/proxy/' . $longpath;
 
 		if ($size != '') {
 			$size = ':' . $size;
@@ -119,7 +120,7 @@ class Proxy
 		if ((strlen($proxypath) > 250) && $writemode) {
 			return $shortpath;
 		} elseif (strlen($proxypath) > 250) {
-			return DI::baseUrl() . '/proxy/' . $shortpath . '?url=' . urlencode($url);
+			return App::baseUrl() . '/proxy/' . $shortpath . '?url=' . urlencode($url);
 		} elseif ($writemode) {
 			return $longpath;
 		} else {
@@ -140,7 +141,7 @@ class Proxy
 	 */
 	public static function proxifyHtml($html)
 	{
-		$html = str_replace(Strings::normaliseLink(DI::baseUrl()) . '/', DI::baseUrl() . '/', $html);
+		$html = str_replace(Strings::normaliseLink(App::baseUrl()) . '/', App::baseUrl() . '/', $html);
 
 		return preg_replace_callback('/(<img [^>]*src *= *["\'])([^"\']+)(["\'][^>]*>)/siU', 'self::replaceUrl', $html);
 	}
@@ -163,7 +164,7 @@ class Proxy
 		}
 
 		// links normalised - bug #431
-		$baseurl = Strings::normaliseLink(DI::baseUrl());
+		$baseurl = Strings::normaliseLink(App::baseUrl());
 		$url = Strings::normaliseLink($url);
 
 		return (substr($url, 0, strlen($baseurl)) == $baseurl);

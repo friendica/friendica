@@ -14,12 +14,13 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
@@ -37,13 +38,13 @@ function events_init(App $a)
 		return;
 	}
 
-	if (empty(DI::page()['aside'])) {
-		DI::page()['aside'] = '';
+	if (empty(A::page()['aside'])) {
+		A::page()['aside'] = '';
 	}
 
 	$cal_widget = CalendarExport::getHTML();
 
-	DI::page()['aside'] .= $cal_widget;
+	A::page()['aside'] .= $cal_widget;
 
 	return;
 }
@@ -122,7 +123,7 @@ function events_post(App $a)
 			echo L10n::t('Event can not end before it has started.');
 			exit();
 		}
-		DI::baseUrl()->redirect($onerror_path);
+		A::baseUrl()->redirect($onerror_path);
 	}
 
 	if (!$summary || ($start === DBA::NULL_DATETIME)) {
@@ -131,7 +132,7 @@ function events_post(App $a)
 			echo L10n::t('Event title and start time are required.');
 			exit();
 		}
-		DI::baseUrl()->redirect($onerror_path);
+		A::baseUrl()->redirect($onerror_path);
 	}
 
 	$share = intval($_POST['share'] ?? 0);
@@ -149,7 +150,7 @@ function events_post(App $a)
 
 	if ($share) {
 
-		$aclFormatter = DI::aclFormatter();
+		$aclFormatter = Util::aclFormatter();
 
 		$str_group_allow   = $aclFormatter->toString($_POST['group_allow'] ?? '');
 		$str_contact_allow = $aclFormatter->toString($_POST['contact_allow'] ?? '');
@@ -204,7 +205,7 @@ function events_post(App $a)
 		Worker::add(PRIORITY_HIGH, "Notifier", Delivery::POST, $item_id);
 	}
 
-	DI::baseUrl()->redirect('events');
+	A::baseUrl()->redirect('events');
 }
 
 function events_content(App $a)
@@ -215,7 +216,7 @@ function events_content(App $a)
 	}
 
 	if ($a->argc == 1) {
-		$_SESSION['return_path'] = DI::args()->getCommand();
+		$_SESSION['return_path'] = A::args()->getCommand();
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'ignore') && intval($a->argv[2])) {
@@ -241,8 +242,8 @@ function events_content(App $a)
 	// get the translation strings for the callendar
 	$i18n = Event::getStrings();
 
-	$htpl = Renderer::getMarkupTemplate('event_head.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($htpl, [
+	$htpl                        = Renderer::getMarkupTemplate('event_head.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($htpl, [
 		'$module_url' => '/events',
 		'$modparams' => 1,
 		'$i18n' => $i18n,
@@ -348,7 +349,7 @@ function events_content(App $a)
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (empty($links[$j])) {
-					$links[$j] = DI::baseUrl() . '/' . DI::args()->getCommand() . '#link-' . $j;
+					$links[$j] = A::baseUrl() . '/' . A::args()->getCommand() . '#link-' . $j;
 				}
 			}
 		}
@@ -384,18 +385,18 @@ function events_content(App $a)
 		}
 
 		// ACL blocks are loaded in modals in frio
-		DI::page()->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
-		DI::page()->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
-		DI::page()->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
-		DI::page()->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
+		A::page()->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
+		A::page()->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
+		A::page()->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
+		A::page()->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
 		$o = Renderer::replaceMacros($tpl, [
 			'$tabs'      => $tabs,
 			'$title'     => L10n::t('Events'),
 			'$view'      => L10n::t('View'),
-			'$new_event' => [DI::baseUrl() . '/events/new', L10n::t('Create New Event'), '', ''],
-			'$previous'  => [DI::baseUrl() . '/events/$prevyear/$prevmonth', L10n::t('Previous'), '', ''],
-			'$next'      => [DI::baseUrl() . '/events/$nextyear/$nextmonth', L10n::t('Next'), '', ''],
+			'$new_event' => [A::baseUrl() . '/events/new', L10n::t('Create New Event'), '', ''],
+			'$previous'  => [A::baseUrl() . '/events/$prevyear/$prevmonth', L10n::t('Previous'), '', ''],
+			'$next'      => [A::baseUrl() . '/events/$nextyear/$nextmonth', L10n::t('Next'), '', ''],
 			'$calendar'  => Temporal::getCalendarTable($y, $m, $links, ' eventcal'),
 
 			'$events'    => $events,
@@ -489,7 +490,7 @@ function events_content(App $a)
 		$fminute = !empty($orig_event) ? DateTimeFormat::convert($fdt, $tz, 'UTC', 'i') : '00';
 
 		if (!$cid && in_array($mode, ['new', 'copy'])) {
-			$acl = ACL::getFullSelectorHTML(DI::page(), $a->user, false, ACL::getDefaultUserPermissions($orig_event));
+			$acl = ACL::getFullSelectorHTML(A::page(), $a->user, false, ACL::getDefaultUserPermissions($orig_event));
 		} else {
 			$acl = '';
 		}
@@ -504,7 +505,7 @@ function events_content(App $a)
 		$tpl = Renderer::getMarkupTemplate('event_form.tpl');
 
 		$o .= Renderer::replaceMacros($tpl, [
-			'$post' => DI::baseUrl() . '/events',
+			'$post' => A::baseUrl() . '/events',
 			'$eid'  => $eid,
 			'$cid'  => $cid,
 			'$uri'  => $uri,
@@ -577,6 +578,6 @@ function events_content(App $a)
 			info(L10n::t('Event removed') . EOL);
 		}
 
-		DI::baseUrl()->redirect('events');
+		A::baseUrl()->redirect('events');
 	}
 }

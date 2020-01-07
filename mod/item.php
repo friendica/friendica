@@ -28,7 +28,6 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -39,6 +38,9 @@ use Friendica\Model\Term;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Email;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Content;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
 use Friendica\Util\Security;
@@ -81,7 +83,7 @@ function item_post(App $a) {
 	if (!$preview && !empty($_REQUEST['post_id_random'])) {
 		if (!empty($_SESSION['post-random']) && $_SESSION['post-random'] == $_REQUEST['post_id_random']) {
 			Logger::log("item post: duplicate post", Logger::DEBUG);
-			item_post_return(DI::baseUrl(), $api_source, $return_path);
+			item_post_return(A::baseUrl(), $api_source, $return_path);
 		} else {
 			$_SESSION['post-random'] = $_REQUEST['post_id_random'];
 		}
@@ -125,7 +127,7 @@ function item_post(App $a) {
 		if (!DBA::isResult($toplevel_item)) {
 			notice(L10n::t('Unable to locate original post.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				DI::baseUrl()->redirect($return_path);
+				A::baseUrl()->redirect($return_path);
 			}
 			exit();
 		}
@@ -173,7 +175,7 @@ function item_post(App $a) {
 		notice(L10n::t('Permission denied.') . EOL);
 
 		if (!empty($_REQUEST['return'])) {
-			DI::baseUrl()->redirect($return_path);
+			A::baseUrl()->redirect($return_path);
 		}
 
 		exit();
@@ -272,7 +274,7 @@ function item_post(App $a) {
 		} else {
 			// use the posted permissions
 
-			$aclFormatter = DI::aclFormatter();
+			$aclFormatter = Util::aclFormatter();
 
 			$str_group_allow   = $aclFormatter->toString($_REQUEST['group_allow'] ?? '');
 			$str_contact_allow = $aclFormatter->toString($_REQUEST['contact_allow'] ?? '');
@@ -327,7 +329,7 @@ function item_post(App $a) {
 			}
 			info(L10n::t('Empty post discarded.') . EOL);
 			if (!empty($_REQUEST['return'])) {
-				DI::baseUrl()->redirect($return_path);
+				A::baseUrl()->redirect($return_path);
 			}
 			exit();
 		}
@@ -504,7 +506,7 @@ function item_post(App $a) {
 		$objecttype =  Activity\ObjectType::BOOKMARK;
 	}
 
-	$body = DI::bbCodeVideo()->transform($body);
+	$body = Content::bbCodeVideo()->transform($body);
 
 	// Fold multi-line [code] sequences
 	$body = preg_replace('/\[\/code\]\s*\[code\]/ism', "\n", $body);
@@ -537,8 +539,8 @@ function item_post(App $a) {
 				if (strlen($attachments)) {
 					$attachments .= ',';
 				}
-				$attachments .= '[attach]href="' . DI::baseUrl() . '/attach/' . $attachment['id'] .
-						'" length="' . $attachment['filesize'] . '" type="' . $attachment['filetype'] .
+				$attachments .= '[attach]href="' . A::baseUrl() . '/attach/' . $attachment['id'] .
+				                '" length="' . $attachment['filesize'] . '" type="' . $attachment['filetype'] .
 						'" title="' . ($attachment['filename'] ? $attachment['filename'] : '') . '"[/attach]';
 			}
 			$body = str_replace($match[1],'',$body);
@@ -667,7 +669,7 @@ function item_post(App $a) {
 		$datarray["item_id"] = -1;
 		$datarray["author-network"] = Protocol::DFRN;
 
-		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager(DI::args()->getQueryString()), 'search', false, true);
+		$o = conversation($a, [array_merge($contact_record, $datarray)], new Pager(A::args()->getQueryString()), 'search', false, true);
 		Logger::log('preview: ' . $o);
 		echo json_encode(['preview' => $o]);
 		exit();
@@ -678,12 +680,12 @@ function item_post(App $a) {
 	if (!empty($datarray['cancel'])) {
 		Logger::log('mod_item: post cancelled by addon.');
 		if ($return_path) {
-			DI::baseUrl()->redirect($return_path);
+			A::baseUrl()->redirect($return_path);
 		}
 
 		$json = ['cancel' => 1];
 		if (!empty($_REQUEST['jsreload'])) {
-			$json['reload'] = DI::baseUrl() . '/' . $_REQUEST['jsreload'];
+			$json['reload'] = A::baseUrl() . '/' . $_REQUEST['jsreload'];
 		}
 
 		echo json_encode($json);
@@ -713,7 +715,7 @@ function item_post(App $a) {
 
 		if (!empty($_REQUEST['return']) && strlen($return_path)) {
 			Logger::log('return: ' . $return_path);
-			DI::baseUrl()->redirect($return_path);
+			A::baseUrl()->redirect($return_path);
 		}
 		exit();
 	}
@@ -733,14 +735,14 @@ function item_post(App $a) {
 
 	if (!$post_id) {
 		Logger::log("Item wasn't stored.");
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 	}
 
 	$datarray = Item::selectFirst(Item::ITEM_FIELDLIST, ['id' => $post_id]);
 
 	if (!DBA::isResult($datarray)) {
 		Logger::log("Item with id ".$post_id." couldn't be fetched.");
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 	}
 
 	// update filetags in pconfig
@@ -757,7 +759,7 @@ function item_post(App $a) {
 				'to_email'     => $user['email'],
 				'uid'          => $user['uid'],
 				'item'         => $datarray,
-				'link'         => DI::baseUrl().'/display/'.urlencode($datarray['guid']),
+				'link'         => A::baseUrl() . '/display/' . urlencode($datarray['guid']),
 				'source_name'  => $datarray['author-name'],
 				'source_link'  => $datarray['author-link'],
 				'source_photo' => $datarray['author-avatar'],
@@ -777,7 +779,7 @@ function item_post(App $a) {
 				'to_email'     => $user['email'],
 				'uid'          => $user['uid'],
 				'item'         => $datarray,
-				'link'         => DI::baseUrl().'/display/'.urlencode($datarray['guid']),
+				'link'         => A::baseUrl() . '/display/' . urlencode($datarray['guid']),
 				'source_name'  => $datarray['author-name'],
 				'source_link'  => $datarray['author-link'],
 				'source_photo' => $datarray['author-avatar'],
@@ -799,14 +801,14 @@ function item_post(App $a) {
 				}
 				$disclaimer = '<hr />' . L10n::t('This message was sent to you by %s, a member of the Friendica social network.', $a->user['username'])
 					. '<br />';
-				$disclaimer .= L10n::t('You may visit them online at %s', DI::baseUrl() . '/profile/' . $a->user['nickname']) . EOL;
+				$disclaimer .= L10n::t('You may visit them online at %s', A::baseUrl() . '/profile/' . $a->user['nickname']) . EOL;
 				$disclaimer .= L10n::t('Please contact the sender by replying to this post if you do not wish to receive these messages.') . EOL;
 				if (!$datarray['title']=='') {
 					$subject = Email::encodeHeader($datarray['title'], 'UTF-8');
 				} else {
 					$subject = Email::encodeHeader('[Friendica]' . ' ' . L10n::t('%s posted an update.', $a->user['username']), 'UTF-8');
 				}
-				$link = '<a href="' . DI::baseUrl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
+				$link = '<a href="' . A::baseUrl() . '/profile/' . $a->user['nickname'] . '"><img src="' . $author['thumb'] . '" alt="' . $a->user['username'] . '" /></a><br /><br />';
 				$html    = Item::prepareBody($datarray);
 				$message = '<html><body>' . $link . $html . $disclaimer . '</body></html>';
 				$params =  [
@@ -841,21 +843,18 @@ function item_post(App $a) {
 		return $post_id;
 	}
 
-	item_post_return(DI::baseUrl(), $api_source, $return_path);
+	item_post_return(A::baseUrl(), $api_source, $return_path);
 	// NOTREACHED
 }
 
 function item_post_return($baseurl, $api_source, $return_path)
 {
-	// figure out how to return, depending on from whence we came
-    $a = DI::app();
-
 	if ($api_source) {
 		return;
 	}
 
 	if ($return_path) {
-		DI::baseUrl()->redirect($return_path);
+		A::baseUrl()->redirect($return_path);
 	}
 
 	$json = ['success' => 1];
@@ -878,7 +877,7 @@ function item_content(App $a)
 	$o = '';
 
 	if (($a->argc >= 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
-		if (DI::mode()->isAjax()) {
+		if (A::mode()->isAjax()) {
 			$o = Item::deleteForUser(['id' => $a->argv[2]], local_user());
 		} else {
 			if (!empty($a->argv[3])) {
@@ -889,7 +888,7 @@ function item_content(App $a)
 			}
 		}
 
-		if (DI::mode()->isAjax()) {
+		if (A::mode()->isAjax()) {
 			// ajax return: [<item id>, 0 (no perm) | <owner id>]
 			echo json_encode([intval($a->argv[2]), intval($o)]);
 			exit();

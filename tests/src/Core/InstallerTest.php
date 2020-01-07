@@ -5,7 +5,7 @@ namespace Friendica\Core;
 
 use Dice\Dice;
 use Friendica\Core\Config\Cache\ConfigCache;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\CurlResult;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;
@@ -34,7 +34,7 @@ class InstallerTest extends MockedTest
 		$dice = $dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 
 		$dice->shouldReceive('create')
-		           ->with(\Friendica\Core\L10n\L10n::class, [])
+		           ->with(\Friendica\Core\L10n\L10n::class)
 		           ->andReturn($this->l10nMock);
 
 		DI::init($dice);

@@ -17,7 +17,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
@@ -25,6 +24,9 @@ use Friendica\Model\Term;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Content;
+use Friendica\Registry\Protocol as P;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -85,7 +87,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 	while ($pos !== false && $cnt < 1000) {
 
 		$search = '/\[url\=(.*?)\]\[!#saved_image([0-9]*)#!\]\[\/url\]' . '/is';
-		$replace = '[url=' . DI::baseUrl() . '/redir/' . $cid
+		$replace = '[url=' . A::baseUrl() . '/redir/' . $cid
 				   . '?f=1&url=' . '$1' . '][!#saved_image' . '$2' .'#!][/url]';
 
 		$newbody .= substr($origbody, 0, $pos['start']['open']);
@@ -139,7 +141,7 @@ function localize_item(&$item)
 	During the further steps of the database restructuring I would like to address this issue.
 	*/
 
-	$activity = DI::activity();
+	$activity = P::activity();
 
 	$xmlhead = "<" . "?xml version='1.0' encoding='UTF-8' ?" . ">";
 	if ($activity->match($item['verb'], Activity::LIKE)
@@ -396,7 +398,7 @@ function count_descendants($item) {
 
 function visible_activity($item) {
 
-	$activity = DI::activity();
+	$activity = P::activity();
 
 	if (empty($item['verb']) || $activity->isHidden($item['verb'])) {
 		return false;
@@ -479,7 +481,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 			 */
 			$live_update_div = '<div id="live-network"></div>' . "\r\n"
 				. "<script> var profile_uid = " . $_SESSION['uid']
-				. "; var netargs = '" . substr(DI::args()->getCommand(), 8)
+				. "; var netargs = '" . substr(A::args()->getCommand(), 8)
 				. '?f='
 				. (!empty($_GET['cid'])    ? '&cid='    . rawurlencode($_GET['cid'])    : '')
 				. (!empty($_GET['search']) ? '&search=' . rawurlencode($_GET['search']) : '')
@@ -539,7 +541,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-community"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr(DI::args()->getCommand(), 10)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(A::args()->getCommand(), 10)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'contacts') {
@@ -548,7 +550,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr(DI::args()->getCommand(), 9)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(A::args()->getCommand(), 9)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'search') {
@@ -558,7 +560,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 	$page_dropping = ((local_user() && local_user() == $profile_owner) ? true : false);
 
 	if (!$update) {
-		$_SESSION['return_path'] = DI::args()->getQueryString();
+		$_SESSION['return_path'] = A::args()->getQueryString();
 	}
 
 	$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
@@ -664,7 +666,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 				$body = Item::prepareBody($item, true, $preview);
 
-				list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item);
+				list($categories, $folders) = Content::item()->determineCategoriesTerms($item);
 
 				if (!empty($item['content-warning']) && PConfig::get(local_user(), 'system', 'disable_cw', false)) {
 					$title = ucfirst($item['content-warning']);
@@ -685,7 +687,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 					'name' => $profile_name,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
-					'thumb' => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
+					'thumb' => A::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'title' => $title,
 					'body' => $body,
 					'tags' => $tags['tags'],
@@ -705,7 +707,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 					'indent' => '',
 					'owner_name' => $owner_name,
 					'owner_url' => $owner_url,
-					'owner_photo' => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
+					'owner_photo' => A::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'plink' => Item::getPlink($item),
 					'edpost' => false,
 					'isstarred' => $isstarred,
@@ -778,8 +780,8 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 	}
 
 	$o = Renderer::replaceMacros($page_template, [
-		'$baseurl' => DI::baseUrl()->get($ssl_state),
-		'$return_path' => DI::args()->getQueryString(),
+		'$baseurl' => A::baseUrl()->get($ssl_state),
+		'$return_path' => A::args()->getQueryString(),
 		'$live_update' => $live_update_div,
 		'$remove' => L10n::t('remove'),
 		'$mode' => $mode,
@@ -1024,7 +1026,7 @@ function builtin_activity_puller($item, &$conv_responses) {
 				return;
 		}
 
-		if (!empty($item['verb']) && DI::activity()->match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
+		if (!empty($item['verb']) && P::activity()->match($item['verb'], $verb) && ($item['id'] != $item['parent'])) {
 			$author = ['uid' => 0, 'id' => $item['author-id'],
 				'network' => $item['author-network'], 'url' => $item['author-link']];
 			$url = Contact::magicLinkByContact($author);
@@ -1169,10 +1171,10 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 
 	$geotag = !empty($x['allow_location']) ? Renderer::replaceMacros(Renderer::getMarkupTemplate('jot_geotag.tpl'), []) : '';
 
-	$tpl = Renderer::getMarkupTemplate('jot-header.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+	$tpl                         = Renderer::getMarkupTemplate('jot-header.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 		'$newpost'   => 'true',
-		'$baseurl'   => DI::baseUrl()->get(true),
+		'$baseurl'   => A::baseUrl()->get(true),
 		'$geotag'    => $geotag,
 		'$nickname'  => $x['nickname'],
 		'$ispublic'  => L10n::t('Visible to <strong>everybody</strong>'),
@@ -1192,7 +1194,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		$private_post = 0;
 	}
 
-	$query_str = DI::args()->getQueryString();
+	$query_str = A::args()->getQueryString();
 	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(['?public=1', '&public=1'], ['', ''], $query_str);
 	}
@@ -1243,7 +1245,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		'$posttype'     => $notes_cid ? Item::PT_PERSONAL_NOTE : Item::PT_ARTICLE,
 		'$content'      => $x['content'] ?? '',
 		'$post_id'      => $x['post_id'] ?? '',
-		'$baseurl'      => DI::baseUrl()->get(true),
+		'$baseurl'      => A::baseUrl()->get(true),
 		'$defloc'       => $x['default_location'],
 		'$visitor'      => $x['visitor'],
 		'$pvisit'       => $notes_cid ? 'none' : $x['visitor'],

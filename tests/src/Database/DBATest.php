@@ -5,7 +5,7 @@ use Dice\Dice;
 use Friendica\Core\Config;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
 

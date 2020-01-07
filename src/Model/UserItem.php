@@ -9,7 +9,7 @@ namespace Friendica\Model;
 use Friendica\Core\Logger;
 use Friendica\Core\Hook;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 class UserItem
@@ -151,7 +151,7 @@ class UserItem
 		$profiles[] = $owner['alias'];
 
 		// Notifications from Diaspora are often with an URL in the Diaspora format
-		$profiles[] = DI::baseUrl() . '/u/' . $user['nickname'];
+		$profiles[] = App::baseUrl() . '/u/' . $user['nickname'];
 
 		// Validate and add profile links
 		foreach ($profiles AS $key => $profile) {

@@ -2,7 +2,7 @@
 
 namespace Friendica\Database;
 
-use Friendica\DI;
+use Friendica\Registry\DI;
 use mysqli;
 use mysqli_result;
 use mysqli_stmt;

@@ -12,7 +12,7 @@ use Friendica\Core\StorageManager;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\GServer;
@@ -20,6 +20,7 @@ use Friendica\Model\Nodeinfo;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Registry\App as A;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -46,7 +47,7 @@ class CronJobs
 				Logger::info('cron_start');
 				Nodeinfo::update();
 				// Now trying to register
-				$url = 'http://the-federation.info/register/' . DI::baseUrl()->getHostname();
+				$url = 'http://the-federation.info/register/' . A::baseUrl()->getHostname();
 				Logger::debug('Check registering url', ['url' => $url]);
 				$ret = Network::fetchUrl($url);
 				Logger::debug('Check registering answer', ['answer' => $ret]);

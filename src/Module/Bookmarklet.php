@@ -5,9 +5,11 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\ACL;
 use Friendica\Core\L10n;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -21,16 +23,16 @@ class Bookmarklet extends BaseModule
 		$_GET['mode'] = 'minimal';
 
 		$app = DI::app();
-		$config = DI::config();
+		$config = Core::config();
 
 		if (!local_user()) {
 			$output = '<h2>' . L10n::t('Login') . '</h2>';
-			$output .= Login::form(DI::args()->getQueryString(), intval($config->get('config', 'register_policy')) === Register::CLOSED ? false : true);
+			$output .= Login::form(App::args()->getQueryString(), intval($config->get('config', 'register_policy')) === Register::CLOSED ? false : true);
 			return $output;
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page = Strings::normaliseLink(DI::baseUrl()->get() . "/bookmarklet");
+		$page = Strings::normaliseLink(App::baseUrl()->get() . "/bookmarklet");
 
 		if (!strstr($referer, $page)) {
 			if (empty($_REQUEST["url"])) {
@@ -46,7 +48,7 @@ class Bookmarklet extends BaseModule
 				'nickname'         => $app->user['nickname'],
 				'lockstate'        => ((is_array($app->user) && ((strlen($app->user['allow_cid'])) || (strlen($app->user['allow_gid'])) || (strlen($app->user['deny_cid'])) || (strlen($app->user['deny_gid'])))) ? 'lock' : 'unlock'),
 				'default_perms'    => ACL::getDefaultUserPermissions($app->user),
-				'acl'              => ACL::getFullSelectorHTML(DI::page(), $app->user, true),
+				'acl'              => ACL::getFullSelectorHTML(App::page(), $app->user, true),
 				'bang'             => '',
 				'visitor'          => 'block',
 				'profile_uid'      => local_user(),

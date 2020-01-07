@@ -5,7 +5,7 @@ namespace Friendica\Module\Admin;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;

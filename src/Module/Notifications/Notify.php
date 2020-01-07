@@ -5,8 +5,10 @@ namespace Friendica\Module\Notifications;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
+use Friendica\Registry\Model;
 
 /**
  * Interacting with the /notify command
@@ -26,7 +28,7 @@ class Notify extends BaseModule
 
 		// @TODO: Replace with parameter from router
 		if ($a->argc > 2 && $a->argv[1] === 'mark' && $a->argv[2] === 'all') {
-			$success              = DI::notify()->setAllSeen();
+			$success              = Model::notify()->setAllSeen();
 
 			header('Content-type: application/json; charset=utf-8');
 			echo json_encode([
@@ -48,7 +50,7 @@ class Notify extends BaseModule
 
 		// @TODO: Replace with parameter from router
 		if ($a->argc > 2 && $a->argv[1] === 'view' && intval($a->argv[2])) {
-			$notificationsManager = DI::notify();
+			$notificationsManager = Model::notify();
 			// @TODO: Replace with parameter from router
 			$note = $notificationsManager->getByID($a->argv[2]);
 			if (!empty($note)) {
@@ -58,10 +60,10 @@ class Notify extends BaseModule
 				}
 			}
 
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		// @TODO: Replace with parameter from router
-		DI::baseUrl()->redirect('notifications/system');
+		App::baseUrl()->redirect('notifications/system');
 	}
 }

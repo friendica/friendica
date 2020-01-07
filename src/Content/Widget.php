@@ -12,12 +12,13 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\FileTag;
 use Friendica\Model\GContact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -53,9 +54,9 @@ class Widget
 		if (Config::get('system', 'invitation_only')) {
 			$x = intval(PConfig::get(local_user(), 'system', 'invites_remaining'));
 			if ($x || is_site_admin()) {
-				DI::page()['aside'] .= '<div class="side-link widget" id="side-invite-remain">'
-					. L10n::tt('%d invitation available', '%d invitations available', $x)
-					. '</div>';
+				App::page()['aside'] .= '<div class="side-link widget" id="side-invite-remain">'
+				                        . L10n::tt('%d invitation available', '%d invitations available', $x)
+				                        . '</div>';
 			}
 		}
 
@@ -400,7 +401,7 @@ class Widget
 		$tpl = Renderer::getMarkupTemplate('widget/remote_friends_common.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$desc'     => L10n::tt("%d contact in common", "%d contacts in common", $t),
-			'$base'     => DI::baseUrl(),
+			'$base'     => App::baseUrl(),
 			'$uid'      => $profile_uid,
 			'$cid'      => (($cid) ? $cid : '0'),
 			'$linkmore' => (($t > 5) ? 'true' : ''),

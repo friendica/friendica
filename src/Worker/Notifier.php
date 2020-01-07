@@ -10,7 +10,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -24,7 +24,8 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\OStatus;
 use Friendica\Protocol\Salmon;
-use Friendica\Util\ACLFormatter;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 
 require_once 'include/items.php';
 
@@ -180,7 +181,7 @@ class Notifier
 			// if $parent['wall'] == 1 we will already have the parent message in our array
 			// and we will relay the whole lot.
 
-			$localhost = str_replace('www.','', DI::baseUrl()->getHostname());
+			$localhost = str_replace('www.','', App::baseUrl()->getHostname());
 			if (strpos($localhost,':')) {
 				$localhost = substr($localhost,0,strpos($localhost,':'));
 			}
@@ -278,7 +279,7 @@ class Notifier
 					$public_message = false; // private recipients, not public
 				}
 
-				$aclFormatter = DI::aclFormatter();
+				$aclFormatter = Util::aclFormatter();
 
 				$allow_people = $aclFormatter->expand($parent['allow_cid']);
 				$allow_groups = Group::expand($uid, $aclFormatter->expand($parent['allow_gid']),true);

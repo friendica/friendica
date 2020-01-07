@@ -6,7 +6,7 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Hook;
-use Friendica\DI;
+use Friendica\Registry\DI;
 
 Class ForkHook
 {

@@ -12,15 +12,15 @@
 
 use Friendica\App;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\App as A;
 
 function smoothly_init(App $a) {
 	Renderer::setActiveTemplateEngine('smarty3');
 
-	$cssFile = null;
-	$ssl_state = null;
-	$baseurl = DI::baseUrl()->get($ssl_state);
-	DI::page()['htmlhead'] .= <<< EOT
+	$cssFile                     = null;
+	$ssl_state                   = null;
+	$baseurl                     = A::baseUrl()->get($ssl_state);
+	A::page()['htmlhead'] .= <<< EOT
 
 <script>
 function cmtBbOpen(id) {
@@ -75,7 +75,7 @@ EOT;
 
 	/** custom css **/
 	if (!is_null($cssFile)) {
-		DI::page()['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
+		A::page()['htmlhead'] .= sprintf('<link rel="stylesheet" type="text/css" href="%s" />', $cssFile);
 	}
 
 	_js_in_foot();
@@ -86,10 +86,10 @@ if (! function_exists('_js_in_foot')) {
 		/** @purpose insert stuff in bottom of page
 		*/
 		$ssl_state = null;
-		$baseurl = DI::baseUrl()->get($ssl_state);
+		$baseurl = A::baseUrl()->get($ssl_state);
 		$bottom['$baseurl'] = $baseurl;
 		$tpl = Renderer::getMarkupTemplate('bottom.tpl');
 
-		return DI::page()['bottom'] = Renderer::replaceMacros($tpl, $bottom);
+		return A::page()['bottom'] = Renderer::replaceMacros($tpl, $bottom);
 	}
 }

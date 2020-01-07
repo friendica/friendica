@@ -7,8 +7,10 @@ use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\User;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 
 /**
  * Prints information about the current node
@@ -18,7 +20,7 @@ class Friendica extends BaseModule
 {
 	public static function content(array $parameters = [])
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$visibleAddonList = Addon::getVisibleList();
 		if (!empty($visibleAddonList)) {
@@ -47,7 +49,7 @@ class Friendica extends BaseModule
 		}
 
 		$tos = ($config->get('system', 'tosdisplay')) ?
-			L10n::t('Read about the <a href="%1$s/tos">Terms of Service</a> of this node.', DI::baseUrl()->get()) :
+			L10n::t('Read about the <a href="%1$s/tos">Terms of Service</a> of this node.', App::baseUrl()->get()) :
 			'';
 
 		$blockList = $config->get('system', 'blocklist');
@@ -74,7 +76,7 @@ class Friendica extends BaseModule
 		return Renderer::replaceMacros($tpl, [
 			'about'     => L10n::t('This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s.',
 				'<strong>' . FRIENDICA_VERSION . '</strong>',
-				DI::baseUrl()->get(),
+				App::baseUrl()->get(),
 				'<strong>' . DB_UPDATE_VERSION . '</strong>',
 				'<strong>' . $config->get('system', 'post_update_version') . '</strong>'),
 			'friendica' => L10n::t('Please visit <a href="https://friendi.ca">Friendi.ca</a> to learn more about the Friendica project.'),
@@ -97,7 +99,7 @@ class Friendica extends BaseModule
 			return;
 		}
 
-		$config = DI::config();
+		$config = Core::config();
 
 		$register_policies = [
 			Register::CLOSED  => 'REGISTER_CLOSED',
@@ -124,7 +126,7 @@ class Friendica extends BaseModule
 			if (!empty($administrator)) {
 				$admin = [
 					'name'    => $administrator['username'],
-					'profile' => DI::baseUrl()->get() . '/profile/' . $administrator['nickname'],
+					'profile' => App::baseUrl()->get() . '/profile/' . $administrator['nickname'],
 				];
 			}
 		}
@@ -146,7 +148,7 @@ class Friendica extends BaseModule
 
 		$data = [
 			'version'          => FRIENDICA_VERSION,
-			'url'              => DI::baseUrl()->get(),
+			'url'              => App::baseUrl()->get(),
 			'addons'           => $visible_addons,
 			'locked_features'  => $locked_features,
 			'explicit_content' => intval($config->get('system', 'explicit_content', 0)),
@@ -156,7 +158,7 @@ class Friendica extends BaseModule
 			'site_name'        => $config->get('config', 'sitename'),
 			'platform'         => FRIENDICA_PLATFORM,
 			'info'             => $config->get('config', 'info'),
-			'no_scrape_url'    => DI::baseUrl()->get() . '/noscrape',
+			'no_scrape_url'    => App::baseUrl()->get() . '/noscrape',
 		];
 
 		header('Content-type: application/json; charset=utf-8');

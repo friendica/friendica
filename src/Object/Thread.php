@@ -6,7 +6,7 @@ namespace Friendica\Object;
 
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Util\Security;
 

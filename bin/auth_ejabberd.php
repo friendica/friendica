@@ -56,7 +56,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['auth_ejabberd']]);
 
-\Friendica\DI::init($dice);
+\Friendica\Registry\DI::init($dice);
 
 $appMode = $dice->create(Mode::class);
 

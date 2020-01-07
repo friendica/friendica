@@ -8,7 +8,7 @@ namespace Friendica\Object;
 use Exception;
 use Friendica\Core\Config;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\Util;
 use Friendica\Util\Images;
 use Imagick;
 use ImagickPixel;
@@ -610,7 +610,7 @@ class Image
 
 		$stamp1 = microtime(true);
 		file_put_contents($path, $string);
-		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 	}
 
 	/**

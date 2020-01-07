@@ -4,7 +4,7 @@
  */
 
 use Dice\Dice;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use PHPUnit\Framework\TestCase;
 
 // Backward compatibility

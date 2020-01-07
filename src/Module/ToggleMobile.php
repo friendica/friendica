@@ -3,7 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\DI;
 
 /**
  * Toggles the mobile view (on/off)

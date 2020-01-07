@@ -11,10 +11,10 @@ use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
 use Friendica\Module\Security\Login;
+use Friendica\Registry\App as A;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -25,7 +25,7 @@ function message_init(App $a)
 	$tabs = '';
 
 	if ($a->argc > 1 && is_numeric($a->argv[1])) {
-		$tabs = render_messages(get_messages(local_user(), 0, 5), 'mail_list.tpl');
+		$tabs = render_messages($a, get_messages(local_user(), 0, 5), 'mail_list.tpl');
 	}
 
 	$new = [
@@ -35,16 +35,16 @@ function message_init(App $a)
 		'accesskey' => 'm',
 	];
 
-	$tpl = Renderer::getMarkupTemplate('message_side.tpl');
-	DI::page()['aside'] = Renderer::replaceMacros($tpl, [
+	$tpl                      = Renderer::getMarkupTemplate('message_side.tpl');
+	A::page()['aside'] = Renderer::replaceMacros($tpl, [
 		'$tabs' => $tabs,
 		'$new' => $new,
 	]);
-	$base = DI::baseUrl();
+	$base                     = A::baseUrl();
 
-	$head_tpl = Renderer::getMarkupTemplate('message-head.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl, [
-		'$baseurl' => DI::baseUrl()->get(true),
+	$head_tpl                    = Renderer::getMarkupTemplate('message-head.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl, [
+		'$baseurl' => A::baseUrl()->get(true),
 		'$base' => $base
 	]);
 }
@@ -87,7 +87,7 @@ function message_post(App $a)
 		$a->argc = 2;
 		$a->argv[1] = 'new';
 	} else {
-		DI::baseUrl()->redirect(DI::args()->getCommand() . '/' . $ret);
+		A::baseUrl()->redirect(A::args()->getCommand() . '/' . $ret);
 	}
 }
 
@@ -101,7 +101,7 @@ function message_content(App $a)
 		return Login::form();
 	}
 
-	$myprofile = DI::baseUrl() . '/profile/' . $a->user['nickname'];
+	$myprofile = A::baseUrl() . '/profile/' . $a->user['nickname'];
 
 	$tpl = Renderer::getMarkupTemplate('mail_head.tpl');
 	if ($a->argc > 1 && $a->argv[1] == 'new') {
@@ -132,7 +132,7 @@ function message_content(App $a)
 		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
-			$query = explode_querystring(DI::args()->getQueryString());
+			$query = explode_querystring(A::args()->getQueryString());
 			$inputs = [];
 			foreach ($query['args'] as $arg) {
 				if (strpos($arg, 'confirm=') === false) {
@@ -155,7 +155,7 @@ function message_content(App $a)
 
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			DI::baseUrl()->redirect('message');
+			A::baseUrl()->redirect('message');
 		}
 
 		$cmd = $a->argv[1];
@@ -163,7 +163,7 @@ function message_content(App $a)
 			$message = DBA::selectFirst('mail', ['convid'], ['id' => $a->argv[2], 'uid' => local_user()]);
 			if(!DBA::isResult($message)){
 				info(L10n::t('Conversation not found.') . EOL);
-				DI::baseUrl()->redirect('message');
+				A::baseUrl()->redirect('message');
 			}
 
 			if (DBA::delete('mail', ['id' => $a->argv[2], 'uid' => local_user()])) {
@@ -173,10 +173,10 @@ function message_content(App $a)
 			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => local_user()]);
 			if(!DBA::isResult($conversation)){
 				info(L10n::t('Conversation removed.') . EOL);
-				DI::baseUrl()->redirect('message');
+				A::baseUrl()->redirect('message');
 			}
 
-			DI::baseUrl()->redirect('message/' . $conversation['id'] );
+			A::baseUrl()->redirect('message/' . $conversation['id'] );
 		} else {
 			$r = q("SELECT `parent-uri`,`convid` FROM `mail` WHERE `id` = %d AND `uid` = %d LIMIT 1",
 				intval($a->argv[2]),
@@ -189,16 +189,16 @@ function message_content(App $a)
 					info(L10n::t('Conversation removed.') . EOL);
 				}
 			}
-			DI::baseUrl()->redirect('message');
+			A::baseUrl()->redirect('message');
 		}
 	}
 
 	if (($a->argc > 1) && ($a->argv[1] === 'new')) {
 		$o .= $header;
 
-		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
-		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$baseurl' => DI::baseUrl()->get(true),
+		$tpl                         = Renderer::getMarkupTemplate('msg-header.tpl');
+		A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+			'$baseurl' => A::baseUrl()->get(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => L10n::t('Please enter a link URL:')
 		]);
@@ -263,7 +263,7 @@ function message_content(App $a)
 	}
 
 
-	$_SESSION['return_path'] = DI::args()->getQueryString();
+	$_SESSION['return_path'] = A::args()->getQueryString();
 
 	if ($a->argc == 1) {
 
@@ -280,7 +280,7 @@ function message_content(App $a)
 			$total = $r[0]['total'];
 		}
 
-		$pager = new Pager(DI::args()->getQueryString());
+		$pager = new Pager(A::args()->getQueryString());
 
 		$r = get_messages(local_user(), $pager->getStart(), $pager->getItemsPerPage());
 
@@ -289,7 +289,7 @@ function message_content(App $a)
 			return $o;
 		}
 
-		$o .= render_messages($r, 'mail_list.tpl');
+		$o .= render_messages($a, $r, 'mail_list.tpl');
 
 		$o .= $pager->renderFull($total);
 
@@ -352,9 +352,9 @@ function message_content(App $a)
 			return $o;
 		}
 
-		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
-		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$baseurl' => DI::baseUrl()->get(true),
+		$tpl                         = Renderer::getMarkupTemplate('msg-header.tpl');
+		A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+			'$baseurl' => A::baseUrl()->get(true),
 			'$nickname' => $a->user['nickname'],
 			'$linkurl' => L10n::t('Please enter a link URL:')
 		]);
@@ -497,14 +497,12 @@ function get_messages($uid, $start, $limit)
 		, $uid, $uid, $start, $limit));
 }
 
-function render_messages(array $msg, $t)
+function render_messages(App $a, array $msg, $t)
 {
-	$a = DI::app();
-
 	$tpl = Renderer::getMarkupTemplate($t);
 	$rslt = '';
 
-	$myprofile = DI::baseUrl() . '/profile/' . $a->user['nickname'];
+	$myprofile = A::baseUrl() . '/profile/' . $a->user['nickname'];
 
 	foreach ($msg as $rr) {
 		if ($rr['unknown']) {

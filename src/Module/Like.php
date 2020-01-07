@@ -3,10 +3,11 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Core\Session;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -47,7 +48,7 @@ class Like extends BaseModule
 				$rand = "?$rand";
 			}
 
-			DI::baseUrl()->redirect($returnPath . $rand);
+			App::baseUrl()->redirect($returnPath . $rand);
 		}
 	}
 }

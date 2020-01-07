@@ -6,8 +6,11 @@ namespace Friendica\Core;
 
 use Friendica\Core;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Process;
+use Friendica\Registry\App;
+use Friendica\Registry\Core as C;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 
@@ -54,7 +57,7 @@ class Worker
 		self::$up_start = microtime(true);
 
 		// At first check the maximum load. We shouldn't continue with a high load
-		if (DI::process()->isMaxLoadReached()) {
+		if (C::process()->isMaxLoadReached()) {
 			Logger::log('Pre check: maximum load reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -76,7 +79,7 @@ class Worker
 		}
 
 		// Do we have too few memory?
-		if (DI::process()->isMinMemoryReached()) {
+		if (C::process()->isMinMemoryReached()) {
 			Logger::log('Pre check: Memory limit reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -88,7 +91,7 @@ class Worker
 		}
 
 		// Possibly there are too much database processes that block the system
-		if (DI::process()->isMaxProcessesReached()) {
+		if (C::process()->isMaxProcessesReached()) {
 			Logger::log('Pre check: maximum processes reached, quitting.', Logger::DEBUG);
 			return;
 		}
@@ -138,7 +141,7 @@ class Worker
 					}
 
 					// Check free memory
-					if (DI::process()->isMinMemoryReached()) {
+					if (C::process()->isMinMemoryReached()) {
 						Logger::log('Memory limit reached, quitting.', Logger::DEBUG);
 						DI::lock()->release('worker');
 						return;
@@ -258,7 +261,7 @@ class Worker
 		}
 
 		// Constantly check the number of parallel database processes
-		if (DI::process()->isMaxProcessesReached()) {
+		if (C::process()->isMaxProcessesReached()) {
 			Logger::log("Max processes reached for process ".$mypid, Logger::DEBUG);
 			return false;
 		}
@@ -382,7 +385,7 @@ class Worker
 
 		// We use the callstack here to analyze the performance of executed worker entries.
 		// For this reason the variables have to be initialized.
-		DI::profiler()->reset();
+		Util::profiler()->reset();
 
 		$a->queue = $queue;
 
@@ -439,7 +442,7 @@ class Worker
 
 		Logger::info('Process done.', ['priority' => $queue["priority"], 'id' => $queue["id"], 'duration' => round($duration, 3)]);
 
-		DI::profiler()->saveLog(DI::logger(), "ID " . $queue["id"] . ": " . $funcname);
+		Util::profiler()->saveLog(C::logger(), "ID " . $queue["id"] . ": " . $funcname);
 
 		$cooldown = Config::get("system", "worker_cooldown", 0);
 
@@ -977,7 +980,7 @@ class Worker
 			return;
 		}
 
-		$url = DI::baseUrl() . '/worker';
+		$url = App::baseUrl() . '/worker';
 		Network::fetchUrl($url, false, 1);
 	}
 
@@ -1082,7 +1085,7 @@ class Worker
 		$args = ['no_cron' => !$do_cron];
 
 		$a = DI::app();
-		$process = new Core\Process(DI::logger(), DI::mode(), DI::config(), $a->getBasePath());
+		$process = new Core\Process(C::logger(), App::mode(), C::config(), $a->getBasePath());
 		$process->run($command, $args);
 
 		// after spawning we have to remove the flag.
@@ -1125,7 +1128,7 @@ class Worker
 
 		$priority = PRIORITY_MEDIUM;
 		// Don't fork from frontend tasks by default
-		$dont_fork = Config::get("system", "worker_dont_fork", false) || !DI::mode()->isBackend();
+		$dont_fork = Config::get("system", "worker_dont_fork", false) || !App::mode()->isBackend();
 		$created = DateTimeFormat::utcNow();
 		$force_priority = false;
 

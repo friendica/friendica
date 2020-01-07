@@ -104,7 +104,7 @@ function <addon>_install()
 
 function <addon>_head(App $a)
 {
-	\Friendica\DI::page()->registerStylesheet(__DIR__ . '/relative/path/to/addon/stylesheet.css');
+	\Friendica\Registry\App::page()->registerStylesheet(__DIR__ . '/relative/path/to/addon/stylesheet.css');
 }
 ```
 
@@ -126,7 +126,7 @@ function <addon>_install()
 
 function <addon>_footer(App $a)
 {
-	\Friendica\DI::page()->registerFooterScript(__DIR__ . '/relative/path/to/addon/script.js');
+	\Friendica\Regitry\App::page()->registerFooterScript(__DIR__ . '/relative/path/to/addon/script.js');
 }
 ```
 

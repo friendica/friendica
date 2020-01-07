@@ -3,16 +3,17 @@
  * @file view/theme/frio/php/modes/default.php
  * @brief The default site template
  */
-?>
+
+use Friendica\Registry\App; ?>
 <!DOCTYPE html >
 <html>
 <head>
 	<title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
-	<script type="text/javascript">var baseurl="<?php echo Friendica\DI::baseUrl() ?>";</script>
+	<script type="text/javascript">var baseurl="<?php echo App::baseUrl() ?>";</script>
 	<script type="text/javascript">var frio="<?php echo "view/theme/frio"; ?>";</script>
-	<?php $baseurl = Friendica\DI::baseUrl(); ?>
+	<?php $baseurl = App::baseUrl(); ?>
 	<?php $frio = "view/theme/frio"; ?>
 	<?php if(!empty($page['htmlhead'])) echo $page['htmlhead']; ?>
 </head>

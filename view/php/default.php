@@ -1,8 +1,10 @@
 <!DOCTYPE html >
-<html itemscope itemtype="http://schema.org/Blog" lang="<?php echo $lang; ?>">
+<html itemscope itemtype="http://schema.org/Blog" lang="<?php use Friendica\Registry\App;
+
+echo $lang; ?>">
 <head>
   <title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
-  <script>var baseurl="<?php echo Friendica\DI::baseUrl() ?>";</script>
+  <script>var baseurl="<?php echo App::baseUrl() ?>";</script>
   <?php if(!empty($page['htmlhead'])) echo $page['htmlhead'] ?>
 </head>
 <body>

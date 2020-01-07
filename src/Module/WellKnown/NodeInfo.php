@@ -3,7 +3,7 @@
 namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\App;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -26,9 +26,9 @@ class NodeInfo extends BaseModule
 		$nodeinfo = [
 			'links' => [
 				['rel'  => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
-				'href' => DI::baseUrl()->get() . '/nodeinfo/1.0'],
+				'href' => App::baseUrl()->get() . '/nodeinfo/1.0'],
 				['rel'  => 'http://nodeinfo.diaspora.software/ns/schema/2.0',
-				'href' => DI::baseUrl()->get() . '/nodeinfo/2.0'],
+				'href' => App::baseUrl()->get() . '/nodeinfo/2.0'],
 			]
 		];
 

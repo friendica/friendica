@@ -8,8 +8,9 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\BaseAdminModule;
+use Friendica\Registry\App;
 
 class DBSync extends BaseAdminModule
 {
@@ -32,7 +33,7 @@ class DBSync extends BaseAdminModule
 				}
 				info(L10n::t('Update has been marked successful') . EOL);
 			}
-			DI::baseUrl()->redirect('admin/dbsync');
+			App::baseUrl()->redirect('admin/dbsync');
 		}
 
 		if ($a->argc > 2) {
@@ -88,13 +89,13 @@ class DBSync extends BaseAdminModule
 
 		if (!count($failed)) {
 			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/structure_check.tpl'), [
-				'$base' => DI::baseUrl()->get(true),
+				'$base' => App::baseUrl()->get(true),
 				'$banner' => L10n::t('No failed updates.'),
 				'$check' => L10n::t('Check database structure'),
 			]);
 		} else {
 			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/failed_updates.tpl'), [
-				'$base' => DI::baseUrl()->get(true),
+				'$base' => App::baseUrl()->get(true),
 				'$banner' => L10n::t('Failed Updates'),
 				'$desc' => L10n::t('This does not include updates prior to 1139, which did not return a status.'),
 				'$mark' => L10n::t("Mark success \x28if update was manually applied\x29"),

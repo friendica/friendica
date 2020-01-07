@@ -18,22 +18,22 @@ use Friendica\Core\Session;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Model\Group;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\Email;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Util;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use Friendica\Worker\Delivery;
 
-function get_theme_config_file($theme)
+function get_theme_config_file(App $a, $theme)
 {
 	$theme = Strings::sanitizeFilePathItem($theme);
 
-	$a = DI::app();
 	$base_theme = $a->theme_info['extends'] ?? '';
 
 	if (file_exists("view/theme/$theme/config.php")) {
@@ -54,8 +54,8 @@ function settings_init(App $a)
 
 	// These lines provide the javascript needed by the acl selector
 
-	$tpl = Renderer::getMarkupTemplate('settings/head.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+	$tpl                         = Renderer::getMarkupTemplate('settings/head.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 		'$ispublic' => L10n::t('everybody')
 	]);
 
@@ -141,8 +141,8 @@ function settings_init(App $a)
 	];
 
 
-	$tabtpl = Renderer::getMarkupTemplate("generic_links_widget.tpl");
-	DI::page()['aside'] = Renderer::replaceMacros($tabtpl, [
+	$tabtpl                   = Renderer::getMarkupTemplate("generic_links_widget.tpl");
+	A::page()['aside'] = Renderer::replaceMacros($tabtpl, [
 		'$title' => L10n::t('Settings'),
 		'$class' => 'settings-widget',
 		'$items' => $tabs,
@@ -172,7 +172,7 @@ function settings_post(App $a)
 
 		$key = $_POST['remove'];
 		DBA::delete('tokens', ['id' => $key, 'uid' => local_user()]);
-		DI::baseUrl()->redirect('settings/oauth/', true);
+		A::baseUrl()->redirect('settings/oauth/', true);
 		return;
 	}
 
@@ -218,7 +218,7 @@ function settings_post(App $a)
 				);
 			}
 		}
-		DI::baseUrl()->redirect('settings/oauth/', true);
+		A::baseUrl()->redirect('settings/oauth/', true);
 		return;
 	}
 
@@ -370,7 +370,7 @@ function settings_post(App $a)
 		if (in_array($theme, Theme::getAllowedList())) {
 			if ($theme == $a->user['theme']) {
 				// call theme_post only if theme has not been changed
-				if (($themeconfigfile = get_theme_config_file($theme)) !== null) {
+				if (($themeconfigfile = get_theme_config_file($a, $theme)) !== null) {
 					require_once $themeconfigfile;
 					theme_post($a);
 				}
@@ -382,7 +382,7 @@ function settings_post(App $a)
 		}
 
 		Hook::callAll('display_settings_post', $_POST);
-		DI::baseUrl()->redirect('settings/display');
+		A::baseUrl()->redirect('settings/display');
 		return; // NOTREACHED
 	}
 
@@ -418,7 +418,7 @@ function settings_post(App $a)
 	if (!empty($_POST['resend_relocate'])) {
 		Worker::add(PRIORITY_HIGH, 'Notifier', Delivery::RELOCATION, local_user());
 		info(L10n::t("Relocate message has been send to your contacts"));
-		DI::baseUrl()->redirect('settings');
+		A::baseUrl()->redirect('settings');
 	}
 
 	Hook::callAll('settings_post', $_POST);
@@ -561,7 +561,7 @@ function settings_post(App $a)
 		date_default_timezone_set($timezone);
 	}
 
-	$aclFormatter = DI::aclFormatter();
+	$aclFormatter = Util::aclFormatter();
 
 	$str_group_allow   = !empty($_POST['group_allow'])   ? $aclFormatter->toString($_POST['group_allow'])   : '';
 	$str_contact_allow = !empty($_POST['contact_allow']) ? $aclFormatter->toString($_POST['contact_allow']) : '';
@@ -637,7 +637,7 @@ function settings_post(App $a)
 	// Update the global contact for the user
 	GContact::updateForUser(local_user());
 
-	DI::baseUrl()->redirect('settings');
+	A::baseUrl()->redirect('settings');
 	return; // NOTREACHED
 }
 
@@ -704,7 +704,7 @@ function settings_content(App $a)
 			BaseModule::checkFormSecurityTokenRedirectOnError('/settings/oauth', 'settings_oauth', 't');
 
 			DBA::delete('clients', ['client_id' => $a->argv[3], 'uid' => local_user()]);
-			DI::baseUrl()->redirect('settings/oauth/', true);
+			A::baseUrl()->redirect('settings/oauth/', true);
 			return;
 		}
 
@@ -720,7 +720,7 @@ function settings_content(App $a)
 		$tpl = Renderer::getMarkupTemplate('settings/oauth.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseModule::getFormSecurityToken("settings_oauth"),
-			'$baseurl'	=> DI::baseUrl()->get(true),
+			'$baseurl'	=> A::baseUrl()->get(true),
 			'$title'	=> L10n::t('Connected Apps'),
 			'$add'		=> L10n::t('Add application'),
 			'$edit'		=> L10n::t('Edit'),
@@ -786,7 +786,7 @@ function settings_content(App $a)
 
 		if (!empty($legacy_contact)) {
 			/// @todo Isn't it supposed to be a $a->internalRedirect() call?
-			DI::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . DI::baseUrl().'/ostatus_subscribe?url=' . urlencode($legacy_contact) . '">';
+			A::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . A::baseUrl() . '/ostatus_subscribe?url=' . urlencode($legacy_contact) . '">';
 		}
 
 		$settings_connectors = '';
@@ -850,7 +850,7 @@ function settings_content(App $a)
 			'$default_group' => Group::displayGroupSelection(local_user(), $default_group, L10n::t("Default group for OStatus contacts")),
 			'$legacy_contact' => ['legacy_contact', L10n::t('Your legacy GNU Social account'), $legacy_contact, L10n::t("If you enter your old GNU Social/Statusnet account name here \x28in the format user@domain.tld\x29, your contacts will be added automatically. The field will be emptied when done.")],
 
-			'$repair_ostatus_url' => DI::baseUrl() . '/repair_ostatus',
+			'$repair_ostatus_url' => A::baseUrl() . '/repair_ostatus',
 			'$repair_ostatus_text' => L10n::t('Repair OStatus subscriptions'),
 
 			'$settings_connectors' => $settings_connectors,
@@ -938,7 +938,7 @@ function settings_content(App $a)
 		$no_smart_threading = PConfig::get(local_user(), 'system', 'no_smart_threading', 0);
 
 		$theme_config = "";
-		if (($themeconfigfile = get_theme_config_file($theme_selected)) !== null) {
+		if (($themeconfigfile = get_theme_config_file($a, $theme_selected)) !== null) {
 			require_once $themeconfigfile;
 			$theme_config = theme_content($a);
 		}
@@ -948,7 +948,7 @@ function settings_content(App $a)
 			'$ptitle' 	=> L10n::t('Display Settings'),
 			'$form_security_token' => BaseModule::getFormSecurityToken("settings_display"),
 			'$submit' 	=> L10n::t('Save Settings'),
-			'$baseurl' => DI::baseUrl()->get(true),
+			'$baseurl' => A::baseUrl()->get(true),
 			'$uid' => local_user(),
 
 			'$theme'	=> ['theme', L10n::t('Display Theme:'), $theme_selected, '', $themes, true],
@@ -1083,7 +1083,7 @@ function settings_content(App $a)
 		$profile_in_dir = '<input type="hidden" name="profile_in_directory" value="1" />';
 	} else {
 		$profile_in_dir = Renderer::replaceMacros($opt_tpl, [
-			'$field' => ['profile_in_directory', L10n::t('Publish your default profile in your local site directory?'), $profile['publish'], L10n::t('Your profile will be published in this node\'s <a href="%s">local directory</a>. Your profile details may be publicly visible depending on the system settings.', DI::baseUrl().'/directory'), [L10n::t('No'), L10n::t('Yes')]]
+			'$field' => ['profile_in_directory', L10n::t('Publish your default profile in your local site directory?'), $profile['publish'], L10n::t('Your profile will be published in this node\'s <a href="%s">local directory</a>. Your profile details may be publicly visible depending on the system settings.', A::baseUrl() . '/directory'), [L10n::t('No'), L10n::t('Yes')]]
 		]);
 	}
 
@@ -1126,8 +1126,8 @@ function settings_content(App $a)
 	$tpl_addr = Renderer::getMarkupTemplate('settings/nick_set.tpl');
 
 	$prof_addr = Renderer::replaceMacros($tpl_addr,[
-		'$desc' => L10n::t("Your Identity Address is <strong>'%s'</strong> or '%s'.", $nickname . '@' . DI::baseUrl()->getHostname() . DI::baseUrl()->getUrlPath(), DI::baseUrl() . '/profile/' . $nickname),
-		'$basepath' => DI::baseUrl()->getHostname()
+		'$desc' => L10n::t("Your Identity Address is <strong>'%s'</strong> or '%s'.", $nickname . '@' . A::baseUrl()->getHostname() . A::baseUrl()->getUrlPath(), A::baseUrl() . '/profile/' . $nickname),
+		'$basepath' => A::baseUrl()->getHostname()
 	]);
 
 	$stpl = Renderer::getMarkupTemplate('settings/settings.tpl');
@@ -1151,7 +1151,7 @@ function settings_content(App $a)
 		$private_post = 0;
 	}
 
-	$query_str = DI::args()->getQueryString();
+	$query_str = A::args()->getQueryString();
 	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(['?public=1', '&public=1'], ['', ''], $query_str);
 	}
@@ -1173,7 +1173,7 @@ function settings_content(App $a)
 		'$ptitle' 	=> L10n::t('Account Settings'),
 
 		'$submit' 	=> L10n::t('Save Settings'),
-		'$baseurl' => DI::baseUrl()->get(true),
+		'$baseurl' => A::baseUrl()->get(true),
 		'$uid' => local_user(),
 		'$form_security_token' => BaseModule::getFormSecurityToken("settings"),
 		'$nickname_block' => $prof_addr,
@@ -1202,7 +1202,7 @@ function settings_content(App $a)
 		'$permissions' => L10n::t('Default Post Permissions'),
 		'$permdesc' => L10n::t("\x28click to open/close\x29"),
 		'$visibility' => $profile['net-publish'],
-		'$aclselect' => ACL::getFullSelectorHTML(DI::page(), $a->user),
+		'$aclselect' => ACL::getFullSelectorHTML(A::page(), $a->user),
 		'$suggestme' => $suggestme,
 		'$blockwall'=> $blockwall, // array('blockwall', L10n::t('Allow friends to post to your profile page:'), !$blockwall, ''),
 		'$blocktags'=> $blocktags, // array('blocktags', L10n::t('Allow friends to tag your posts:'), !$blocktags, ''),

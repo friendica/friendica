@@ -12,7 +12,8 @@ use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 use Psr\Log\LoggerInterface;
 
 // Get options
@@ -40,7 +41,7 @@ $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['daemon']])
 DI::init($dice);
 $a = DI::app();
 
-if (DI::mode()->isInstall()) {
+if (App::mode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");
 }
 

@@ -6,10 +6,8 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\L10n;
-use Friendica\Core\System;
 use Friendica\Core\Logger;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
 use Friendica\Util\HTTPSignature;

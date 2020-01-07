@@ -5,7 +5,7 @@ namespace Friendica\Module;
 use DOMDocument;
 use DOMElement;
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\App;
 use Friendica\Util\XML;
 
 /**
@@ -21,8 +21,8 @@ class OpenSearch extends BaseModule
 	{
 		header('Content-type: application/opensearchdescription+xml');
 
-		$hostname = DI::baseUrl()->getHostname();
-		$baseUrl  = DI::baseUrl()->get();
+		$hostname = App::baseUrl()->getHostname();
+		$baseUrl  = App::baseUrl()->get();
 
 		/** @var DOMDocument $xml */
 		$xml = null;

@@ -11,11 +11,11 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Feed;
 use Friendica\Protocol\OStatus;
+use Friendica\Registry\App;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
@@ -91,7 +91,7 @@ function add_page_info_data(array $data, $no_photos = false)
 			/// @TODO make a positive list of allowed characters
 			$hashtag = str_replace([" ", "+", "/", ".", "#", "'", "’", "`", "(", ")", "„", "“"],
 						["", "", "", "", "", "", "", "", "", "", "", ""], $keyword);
-			$hashtags .= "#[url=" . DI::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url] ";
+			$hashtags .= "#[url=" . App::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url] ";
 		}
 	}
 
@@ -142,7 +142,7 @@ function add_page_keywords($url, $photo = "", $keywords = false, $keyword_blackl
 				$tags .= ", ";
 			}
 
-			$tags .= "#[url=" . DI::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url]";
+			$tags .= "#[url=" . App::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url]";
 		}
 	}
 
@@ -297,7 +297,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 		return;
 	}
 
-	$push_url = DI::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
+	$push_url = App::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
 
 	// Use a single verify token, even if multiple hubs
 	$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : Strings::getRandomHex());
@@ -339,8 +339,6 @@ function drop_items(array $items)
 
 function drop_item($id, $return = '')
 {
-	$a = DI::app();
-
 	// locate item to be deleted
 
 	$fields = ['id', 'uid', 'guid', 'contact-id', 'deleted', 'gravity', 'parent'];
@@ -348,7 +346,7 @@ function drop_item($id, $return = '')
 
 	if (!DBA::isResult($item)) {
 		notice(L10n::t('Item not found.') . EOL);
-		DI::baseUrl()->redirect('network');
+		App::baseUrl()->redirect('network');
 	}
 
 	if ($item['deleted']) {
@@ -367,7 +365,7 @@ function drop_item($id, $return = '')
 		if (!empty($_REQUEST['confirm'])) {
 			// <form> can't take arguments in its "action" parameter
 			// so add any arguments as hidden inputs
-			$query = explode_querystring(DI::args()->getQueryString());
+			$query = explode_querystring(App::args()->getQueryString());
 			$inputs = [];
 
 			foreach ($query['args'] as $arg) {
@@ -389,7 +387,7 @@ function drop_item($id, $return = '')
 		}
 		// Now check how the user responded to the confirmation query
 		if (!empty($_REQUEST['canceled'])) {
-			DI::baseUrl()->redirect('display/' . $item['guid']);
+			App::baseUrl()->redirect('display/' . $item['guid']);
 		}
 
 		$is_comment = ($item['gravity'] == GRAVITY_COMMENT) ? true : false;
@@ -411,28 +409,28 @@ function drop_item($id, $return = '')
 		if ($is_comment) {
 			// Return to parent guid
 			if (!empty($parentitem)) {
-				DI::baseUrl()->redirect('display/' . $parentitem['guid']);
+				App::baseUrl()->redirect('display/' . $parentitem['guid']);
 				//NOTREACHED
 			}
 			// In case something goes wrong
 			else {
-				DI::baseUrl()->redirect('network');
+				App::baseUrl()->redirect('network');
 				//NOTREACHED
 			}
 		}
 		else {
 			// if unknown location or deleting top level post called from display
 			if (empty($return_url) || strpos($return_url, 'display') !== false) {
-				DI::baseUrl()->redirect('network');
+				App::baseUrl()->redirect('network');
 				//NOTREACHED
 			} else {
-				DI::baseUrl()->redirect($return_url);
+				App::baseUrl()->redirect($return_url);
 				//NOTREACHED
 			}
 		}
 	} else {
 		notice(L10n::t('Permission denied.') . EOL);
-		DI::baseUrl()->redirect('display/' . $item['guid']);
+		App::baseUrl()->redirect('display/' . $item['guid']);
 		//NOTREACHED
 	}
 }

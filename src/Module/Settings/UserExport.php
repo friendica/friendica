@@ -11,8 +11,9 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\BaseSettingsModule;
+use Friendica\Registry\App as A;
 
 /**
  * Module to export user data
@@ -59,7 +60,7 @@ class UserExport extends BaseSettingsModule
 	 **/
 	public static function rawContent(array $parameters = [])
 	{
-		$args = DI::args();
+		$args = A::args();
 		if ($args->getArgc() == 3) {
 			// @TODO Replace with router-provided arguments
 			$action = $args->get(2);
@@ -193,7 +194,7 @@ class UserExport extends BaseSettingsModule
 		$output = [
 			'version' => FRIENDICA_VERSION,
 			'schema' => DB_UPDATE_VERSION,
-			'baseurl' => DI::baseUrl(),
+			'baseurl' => A::baseUrl(),
 			'user' => $user,
 			'contact' => $contact,
 			'profile' => $profile,

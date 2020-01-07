@@ -17,15 +17,15 @@
  * easily as email does today.
  */
 
-use Friendica\App;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Term;
+use Friendica\Registry\App as A;
 use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 
@@ -464,7 +464,7 @@ function get_temppath()
 		$temppath = BasePath::getRealPath($temppath);
 
 		// To avoid any interferences with other systems we create our own directory
-		$new_temppath = $temppath . "/" . DI::baseUrl()->getHostname();
+		$new_temppath = $temppath . "/" . A::baseUrl()->getHostname();
 		if (!is_dir($new_temppath)) {
 			/// @TODO There is a mkdir()+chmod() upwards, maybe generalize this (+ configurable) into a function/method?
 			mkdir($new_temppath);

@@ -6,8 +6,10 @@ use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\XML;
 
 /**
@@ -19,14 +21,14 @@ class SaveTag extends BaseModule
 	{
 		if (!local_user()) {
 			info(L10n::t('You must be logged in to use this module'));
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 	}
 
 	public static function rawContent(array $parameters = [])
 	{
 		$a = DI::app();
-		$logger = DI::logger();
+		$logger = Core::logger();
 
 		$term = XML::unescape(trim($_GET['term'] ?? ''));
 		// @TODO: Replace with parameter from router

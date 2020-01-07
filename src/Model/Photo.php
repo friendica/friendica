@@ -13,9 +13,10 @@ use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\DI;
-use Friendica\Model\Storage\SystemResource;
+use Friendica\Registry\DI;
+use Friendica\Model\Storage\IStorage;
 use Friendica\Object\Image;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -450,9 +451,9 @@ class Photo
 
 			$suffix = "?ts=" . time();
 
-			$image_url = DI::baseUrl() . "/photo/" . $resource_id . "-4." . $Image->getExt() . $suffix;
-			$thumb = DI::baseUrl() . "/photo/" . $resource_id . "-5." . $Image->getExt() . $suffix;
-			$micro = DI::baseUrl() . "/photo/" . $resource_id . "-6." . $Image->getExt() . $suffix;
+			$image_url = App::baseUrl() . "/photo/" . $resource_id . "-4." . $Image->getExt() . $suffix;
+			$thumb = App::baseUrl() . "/photo/" . $resource_id . "-5." . $Image->getExt() . $suffix;
+			$micro = App::baseUrl() . "/photo/" . $resource_id . "-6." . $Image->getExt() . $suffix;
 
 			// Remove the cached photo
 			$a = DI::app();
@@ -481,9 +482,9 @@ class Photo
 		}
 
 		if ($photo_failure) {
-			$image_url = DI::baseUrl() . "/images/person-300.jpg";
-			$thumb = DI::baseUrl() . "/images/person-80.jpg";
-			$micro = DI::baseUrl() . "/images/person-48.jpg";
+			$image_url = App::baseUrl() . "/images/person-300.jpg";
+			$thumb = App::baseUrl() . "/images/person-80.jpg";
+			$micro = App::baseUrl() . "/images/person-48.jpg";
 		}
 
 		return [$image_url, $thumb, $micro];
@@ -616,7 +617,7 @@ class Photo
 		}
 
 		foreach ($images as $image) {
-			if (!stristr($image, DI::baseUrl() . '/photo/')) {
+			if (!stristr($image, App::baseUrl() . '/photo/')) {
 				continue;
 			}
 			$image_uri = substr($image,strrpos($image,'/') + 1);
@@ -673,7 +674,7 @@ class Photo
 	 */
 	public static function getGUID($name)
 	{
-		$base = DI::baseUrl()->get();
+		$base = App::baseUrl()->get();
 
 		$guid = str_replace([Strings::normaliseLink($base), '/photo/'], '', Strings::normaliseLink($name));
 
@@ -718,7 +719,7 @@ class Photo
 	 */
 	public static function isLocalPage($name)
 	{
-		$base = DI::baseUrl()->get();
+		$base = App::baseUrl()->get();
 
 		$guid = str_replace(Strings::normaliseLink($base), '', Strings::normaliseLink($name));
 		$guid = preg_replace("=/photos/.*/image/(.*)=ism", '$1', $guid);

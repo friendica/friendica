@@ -6,7 +6,7 @@ use Friendica\BaseModule;
 use Friendica\Content;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 
 /**
  * Prints the possible Smilies of this node

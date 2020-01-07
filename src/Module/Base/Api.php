@@ -2,11 +2,11 @@
 
 namespace Friendica\Module\Base;
 
-use Friendica\App\Arguments;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 
 require_once __DIR__ . '/../../../include/api.php';
 
@@ -23,7 +23,7 @@ class Api extends BaseModule
 
 	public static function init(array $parameters = [])
 	{
-		$arguments = DI::args();
+		$arguments = App::args();
 
 		if (substr($arguments->getQueryString(), -4) === '.xml') {
 			self::$format = 'xml';

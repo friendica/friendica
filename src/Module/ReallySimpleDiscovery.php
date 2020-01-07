@@ -3,7 +3,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\App;
 use Friendica\Util\XML;
 
 /**
@@ -31,7 +31,7 @@ class ReallySimpleDiscovery extends BaseModule
 							'@attributes' => [
 								'name'      => 'Twitter',
 								'preferred' => 'true',
-								'apiLink'   => DI::baseUrl()->get(),
+								'apiLink'   => App::baseUrl()->get(),
 								'blogID'    => '',
 							],
 							'settings'    => [

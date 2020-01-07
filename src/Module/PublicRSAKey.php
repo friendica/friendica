@@ -4,7 +4,7 @@ namespace Friendica\Module;
 
 use ASN_BASE;
 use Friendica\BaseModule;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\BadRequestException;
 

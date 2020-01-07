@@ -4,8 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
-use Friendica\DI;
-use stdClass;
+use Friendica\Registry\Core;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -31,7 +30,7 @@ class NodeInfo extends BaseModule
 	*/
 	private static function getUsage()
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$usage = new stdClass();
 
@@ -113,7 +112,7 @@ class NodeInfo extends BaseModule
 	 */
 	private static function printNodeInfo1()
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$nodeinfo = [
 			'version'           => '1.0',
@@ -174,7 +173,7 @@ class NodeInfo extends BaseModule
 	 */
 	private static function printNodeInfo2()
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$imap = (function_exists('imap_open') && !$config->get('system', 'imap_disabled') && !$config->get('system', 'dfrn_only'));
 

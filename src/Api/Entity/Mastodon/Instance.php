@@ -5,9 +5,10 @@ namespace Friendica\Api\Entity\Mastodon;
 use Friendica\Api\BaseEntity;
 use Friendica\Core\Config;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Module\Register;
+use Friendica\Registry\App as A;
 
 /**
  * Class Instance
@@ -54,7 +55,7 @@ class Instance extends BaseEntity
 	{
 		$register_policy = intval(Config::get('config', 'register_policy'));
 
-		$baseUrl = DI::baseUrl();
+		$baseUrl = A::baseUrl();
 
 		$instance = new Instance();
 		$instance->uri = $baseUrl->get();

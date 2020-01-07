@@ -12,8 +12,8 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Registry\App;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\XML;
@@ -370,7 +370,7 @@ class Feed {
 					$tags .= ', ';
 				}
 
-				$taglink = "#[url=" . DI::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url]";
+				$taglink = "#[url=" . App::baseUrl() . "/search?tag=" . $hashtag . "]" . $hashtag . "[/url]";
 				$tags .= $taglink;
 			}
 
@@ -487,7 +487,7 @@ class Feed {
 				// Distributed items should have a well formatted URI.
 				// Additionally we have to avoid conflicts with identical URI between imported feeds and these items.
 				if ($notify) {
-					$item['guid'] = Item::guidFromUri($orig_plink, DI::baseUrl()->getHostname());
+					$item['guid'] = Item::guidFromUri($orig_plink, App::baseUrl()->getHostname());
 					unset($item['uri']);
 					unset($item['parent-uri']);
 
