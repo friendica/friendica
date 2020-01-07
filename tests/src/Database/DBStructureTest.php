@@ -5,7 +5,7 @@ namespace Friendica\Test\src\Database;
 use Dice\Dice;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
 

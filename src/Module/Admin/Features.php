@@ -6,8 +6,8 @@ use Friendica\Content\Feature;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
+use Friendica\Registry\App;
 
 class Features extends BaseAdminModule
 {
@@ -40,7 +40,7 @@ class Features extends BaseAdminModule
 			}
 		}
 
-		DI::baseUrl()->redirect('admin/features');
+		App::baseUrl()->redirect('admin/features');
 	}
 
 	public static function content(array $parameters = [])

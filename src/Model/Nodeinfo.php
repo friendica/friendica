@@ -4,7 +4,7 @@ namespace Friendica\Model;
 
 use Friendica\Core\Addon;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * Model interaction for the nodeinfo
@@ -18,8 +18,8 @@ class Nodeinfo
 	 */
 	public static function update()
 	{
-		$config = DI::config();
-		$logger = DI::logger();
+		$config = Core::config();
+		$logger = Core::logger();
 
 		// If the addon 'statistics_json' is enabled then disable it and activate nodeinfo.
 		if (Addon::isEnabled('statistics_json')) {

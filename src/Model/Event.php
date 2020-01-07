@@ -13,8 +13,8 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
 use Friendica\Util\Strings;
@@ -590,9 +590,9 @@ class Event
 			$copy = null;
 			$drop = null;
 			if (local_user() && local_user() == $event['uid'] && $event['type'] == 'event') {
-				$edit = !$event['cid'] ? [DI::baseUrl() . '/events/event/' . $event['id'], L10n::t('Edit event')     , '', ''] : null;
-				$copy = !$event['cid'] ? [DI::baseUrl() . '/events/copy/' . $event['id'] , L10n::t('Duplicate event'), '', ''] : null;
-				$drop =                  [DI::baseUrl() . '/events/drop/' . $event['id'] , L10n::t('Delete event')   , '', ''];
+				$edit = !$event['cid'] ? [App::baseUrl() . '/events/event/' . $event['id'], L10n::t('Edit event')     , '', ''] : null;
+				$copy = !$event['cid'] ? [App::baseUrl() . '/events/copy/' . $event['id'] , L10n::t('Duplicate event'), '', ''] : null;
+				$drop =                  [App::baseUrl() . '/events/drop/' . $event['id'] , L10n::t('Delete event')   , '', ''];
 			}
 
 			$title = BBCode::convert(Strings::escapeHtml($event['summary']));

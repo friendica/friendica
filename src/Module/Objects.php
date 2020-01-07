@@ -6,9 +6,10 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Registry\App;
 
 /**
  * ActivityPub Objects
@@ -24,7 +25,7 @@ class Objects extends BaseModule
 		}
 
 		if (!ActivityPub::isRequest()) {
-			DI::baseUrl()->redirect(str_replace('objects/', 'display/', DI::args()->getQueryString()));
+			App::baseUrl()->redirect(str_replace('objects/', 'display/', App::args()->getQueryString()));
 		}
 
 		/// @todo Add Authentication to enable fetching of non public content
@@ -37,7 +38,7 @@ class Objects extends BaseModule
 			// If no original post could be found, it could possibly be a forum post, there we remove the "origin" field.
 			// @TODO: Replace with parameter from router
 			$item = Item::selectFirst(['id', 'author-link'], ['guid' => $a->argv[1], 'private' => false]);
-			if (!DBA::isResult($item) || !strstr($item['author-link'], DI::baseUrl()->get())) {
+			if (!DBA::isResult($item) || !strstr($item['author-link'], App::baseUrl()->get())) {
 				throw new \Friendica\Network\HTTPException\NotFoundException();
 			}
 		}

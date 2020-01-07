@@ -14,15 +14,14 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
-use Friendica\Model\Contact as ContactModel;
-use Friendica\Model\Group;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Protocol\DFRN;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Security;
 use Friendica\Util\Strings;
@@ -84,7 +83,7 @@ class Profile extends BaseModule
 		if (!$update) {
 			ProfileModel::load($a, self::$which, self::$profile);
 
-			$page = DI::page();
+			$page = App::page();
 
 			$page['htmlhead'] .= "\n";
 
@@ -118,26 +117,26 @@ class Profile extends BaseModule
 				$page['htmlhead'] .= '<meta content="noindex, noarchive" name="robots" />' . "\n";
 			}
 
-			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . DI::baseUrl() . '/dfrn_poll/' . self::$which . '" title="DFRN: ' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\n";
-			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . DI::baseUrl() . '/feed/' . self::$which . '/" title="' . L10n::t('%s\'s posts', $a->profile['username']) . '"/>' . "\n";
-			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . DI::baseUrl() . '/feed/' . self::$which . '/comments" title="' . L10n::t('%s\'s comments', $a->profile['username']) . '"/>' . "\n";
-			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . DI::baseUrl() . '/feed/' . self::$which . '/activity" title="' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\n";
-			$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . DI::baseUrl()->getHostname() . (DI::baseUrl()->getUrlPath() ? '/' . DI::baseUrl()->getUrlPath() : ''));
-			$page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . DI::baseUrl() . '/xrd/?uri=' . $uri . '" />' . "\n";
-			header('Link: <' . DI::baseUrl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
+			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . App::baseUrl() . '/dfrn_poll/' . self::$which . '" title="DFRN: ' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\n";
+			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . App::baseUrl() . '/feed/' . self::$which . '/" title="' . L10n::t('%s\'s posts', $a->profile['username']) . '"/>' . "\n";
+			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . App::baseUrl() . '/feed/' . self::$which . '/comments" title="' . L10n::t('%s\'s comments', $a->profile['username']) . '"/>' . "\n";
+			$page['htmlhead'] .= '<link rel="alternate" type="application/atom+xml" href="' . App::baseUrl() . '/feed/' . self::$which . '/activity" title="' . L10n::t('%s\'s timeline', $a->profile['username']) . '"/>' . "\n";
+			$uri = urlencode('acct:' . $a->profile['nickname'] . '@' . App::baseUrl()->getHostname() . (App::baseUrl()->getUrlPath() ? '/' . App::baseUrl()->getUrlPath() : ''));
+			$page['htmlhead'] .= '<link rel="lrdd" type="application/xrd+xml" href="' . App::baseUrl() . '/xrd/?uri=' . $uri . '" />' . "\n";
+			header('Link: <' . App::baseUrl() . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 
 			$dfrn_pages = ['request', 'confirm', 'notify', 'poll'];
 			foreach ($dfrn_pages as $dfrn) {
-				$page['htmlhead'] .= '<link rel="dfrn-' . $dfrn . '" href="' . DI::baseUrl() . '/dfrn_' . $dfrn . '/' . self::$which . '" />' . "\n";
+				$page['htmlhead'] .= '<link rel="dfrn-' . $dfrn . '" href="' . App::baseUrl() . '/dfrn_' . $dfrn . '/' . self::$which . '" />' . "\n";
 			}
-			$page['htmlhead'] .= '<link rel="dfrn-poco" href="' . DI::baseUrl() . '/poco/' . self::$which . '" />' . "\n";
+			$page['htmlhead'] .= '<link rel="dfrn-poco" href="' . App::baseUrl() . '/poco/' . self::$which . '" />' . "\n";
 		}
 
 		$category = $datequery = $datequery2 = '';
 
 		if ($a->argc > 2) {
 			for ($x = 2; $x < $a->argc; $x ++) {
-				if (DI::dtFormat()->isYearMonth($a->argv[$x])) {
+				if (Util::dtFormat()->isYearMonth($a->argv[$x])) {
 					if ($datequery) {
 						$datequery2 = Strings::escapeHtml($a->argv[$x]);
 					} else {
@@ -193,9 +192,9 @@ class Profile extends BaseModule
 			$commpage = $a->profile['page-flags'] == User::PAGE_FLAGS_COMMUNITY;
 			$commvisitor = $commpage && $remote_contact;
 
-			DI::page()['aside'] .= Widget::postedByYear(DI::baseUrl()->get(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'] ?? 0, true);
-			DI::page()['aside'] .= Widget::categories(DI::baseUrl()->get(true) . '/profile/' . $a->profile['nickname'], XML::escape($category));
-			DI::page()['aside'] .= Widget::tagCloud();
+			App::page()['aside'] .= Widget::postedByYear(App::baseUrl()->get(true) . '/profile/' . $a->profile['nickname'], $a->profile['profile_uid'] ?? 0, true);
+			App::page()['aside'] .= Widget::categories(App::baseUrl()->get(true) . '/profile/' . $a->profile['nickname'], XML::escape($category));
+			App::page()['aside'] .= Widget::tagCloud();
 
 			if (Security::canWriteToUserWall($a->profile['profile_uid'])) {
 				$x = [
@@ -209,7 +208,7 @@ class Profile extends BaseModule
 						|| strlen($a->user['deny_cid'])
 						|| strlen($a->user['deny_gid'])
 					) ? 'lock' : 'unlock',
-					'acl' => $is_owner ? ACL::getFullSelectorHTML(DI::page(), $a->user, true) : '',
+					'acl' => $is_owner ? ACL::getFullSelectorHTML(App::page(), $a->user, true) : '',
 					'bang' => '',
 					'visitor' => $is_owner || $commvisitor ? 'block' : 'none',
 					'profile_uid' => $a->profile['profile_uid'],
@@ -260,7 +259,7 @@ class Profile extends BaseModule
 				return '';
 			}
 
-			$pager = new Pager(DI::args()->getQueryString());
+			$pager = new Pager(App::args()->getQueryString());
 		} else {
 			$sql_post_table = "";
 
@@ -292,7 +291,7 @@ class Profile extends BaseModule
 
 			//  check if we serve a mobile device and get the user settings
 			//  accordingly
-			if (DI::mode()->isMobile()) {
+			if (App::mode()->isMobile()) {
 				$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 10);
 			} else {
 				$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 20);
@@ -304,7 +303,7 @@ class Profile extends BaseModule
 				$itemspage_network = $a->force_max_items;
 			}
 
-			$pager = new Pager(DI::args()->getQueryString(), $itemspage_network);
+			$pager = new Pager(App::args()->getQueryString(), $itemspage_network);
 
 			$pager_sql = sprintf(" LIMIT %d, %d ", $pager->getStart(), $pager->getItemsPerPage());
 

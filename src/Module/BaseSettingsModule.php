@@ -6,7 +6,8 @@ use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 
 class BaseSettingsModule extends BaseModule
 {
@@ -14,8 +15,8 @@ class BaseSettingsModule extends BaseModule
 	{
 		$a = DI::app();
 
-		$tpl = Renderer::getMarkupTemplate('settings/head.tpl');
-		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+		$tpl                    = Renderer::getMarkupTemplate('settings/head.tpl');
+		App::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$ispublic' => L10n::t('everybody')
 		]);
 
@@ -101,8 +102,8 @@ class BaseSettingsModule extends BaseModule
 		];
 
 
-		$tabtpl = Renderer::getMarkupTemplate("generic_links_widget.tpl");
-		DI::page()['aside'] = Renderer::replaceMacros($tabtpl, [
+		$tabtpl              = Renderer::getMarkupTemplate("generic_links_widget.tpl");
+		App::page()['aside'] = Renderer::replaceMacros($tabtpl, [
 			'$title' => L10n::t('Settings'),
 			'$class' => 'settings-widget',
 			'$items' => $tabs,

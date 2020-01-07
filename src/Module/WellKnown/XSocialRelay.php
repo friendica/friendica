@@ -3,8 +3,9 @@
 namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
-use Friendica\DI;
 use Friendica\Model\Search;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 
 /**
  * Node subscription preferences for social realy systems
@@ -14,7 +15,7 @@ class XSocialRelay extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		$subscribe = $config->get('system', 'relay_subscribe', false);
 
@@ -49,10 +50,10 @@ class XSocialRelay extends BaseModule
 			'tags'      => $tagList,
 			'protocols' => [
 				'diaspora' => [
-					'receive' => DI::baseUrl()->get() . '/receive/public'
+					'receive' => App::baseUrl()->get() . '/receive/public'
 				],
 				'dfrn'     => [
-					'receive' => DI::baseUrl()->get() . '/dfrn_notify'
+					'receive' => App::baseUrl()->get() . '/dfrn_notify'
 				]
 			]
 		];

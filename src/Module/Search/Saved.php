@@ -5,14 +5,14 @@ namespace Friendica\Module\Search;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 class Saved extends BaseModule
 {
 	public static function init(array $parameters = [])
 	{
-		$action = DI::args()->get(2, 'none');
+		$action = App::args()->get(2, 'none');
 		$search = Strings::escapeTags(trim(rawurldecode($_GET['term'] ?? '')));
 
 		$return_url = $_GET['return_url'] ?? 'search?q=' . urlencode($search);
@@ -36,6 +36,6 @@ class Saved extends BaseModule
 			}
 		}
 
-		DI::baseUrl()->redirect($return_url);
+		App::baseUrl()->redirect($return_url);
 	}
 }

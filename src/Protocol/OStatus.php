@@ -16,7 +16,6 @@ use Friendica\Core\Logger;
 use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
@@ -24,6 +23,7 @@ use Friendica\Model\GContact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -646,7 +646,7 @@ class OStatus
 							$item['tag'] = '';
 						}
 
-						$item['tag'] .= '#[url=' . DI::baseUrl() . '/search?tag=' . $term . ']' . $term . '[/url]';
+						$item['tag'] .= '#[url=' . App::baseUrl() . '/search?tag=' . $term . ']' . $term . '[/url]';
 					}
 				}
 			}
@@ -1290,7 +1290,7 @@ class OStatus
 
 		$attributes = ["uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION . "-" . DB_UPDATE_VERSION];
 		XML::addElement($doc, $root, "generator", FRIENDICA_PLATFORM, $attributes);
-		XML::addElement($doc, $root, "id", DI::baseUrl() . "/profile/" . $owner["nick"]);
+		XML::addElement($doc, $root, "id", App::baseUrl() . "/profile/" . $owner["nick"]);
 		XML::addElement($doc, $root, "title", $title);
 		XML::addElement($doc, $root, "subtitle", sprintf("Updates from %s on %s", $owner["name"], Config::get('config', 'sitename')));
 		XML::addElement($doc, $root, "logo", $owner["photo"]);
@@ -1310,16 +1310,16 @@ class OStatus
 
 		self::hublinks($doc, $root, $owner["nick"]);
 
-		$attributes = ["href" => DI::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "salmon"];
+		$attributes = ["href" => App::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "salmon"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = ["href" => DI::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-replies"];
+		$attributes = ["href" => App::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-replies"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = ["href" => DI::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-mention"];
+		$attributes = ["href" => App::baseUrl() . "/salmon/" . $owner["nick"], "rel" => "http://salmon-protocol.org/ns/salmon-mention"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
-		$attributes = ["href" => DI::baseUrl() . $selfUri, "rel" => "self", "type" => "application/atom+xml"];
+		$attributes = ["href" => App::baseUrl() . $selfUri, "rel" => "self", "type" => "application/atom+xml"];
 		XML::addElement($doc, $root, "link", "", $attributes);
 
 		if ($owner['account-type'] == Contact::TYPE_COMMUNITY) {
@@ -1343,7 +1343,7 @@ class OStatus
 	 */
 	public static function hublinks(DOMDocument $doc, $root, $nick)
 	{
-		$h = DI::baseUrl() . '/pubsubhubbub/'.$nick;
+		$h = App::baseUrl() . '/pubsubhubbub/' . $nick;
 		XML::addElement($doc, $root, "link", "", ["href" => $h, "rel" => "hub"]);
 	}
 
@@ -1489,7 +1489,7 @@ class OStatus
 				$author->appendChild($urls);
 			}
 
-			XML::addElement($doc, $author, "followers", "", ["url" => DI::baseUrl() . "/profile/" . $owner["nick"] . "/contacts/followers"]);
+			XML::addElement($doc, $author, "followers", "", ["url" => App::baseUrl() . "/profile/" . $owner["nick"] . "/contacts/followers"]);
 			XML::addElement($doc, $author, "statusnet:profile_info", "", ["local_id" => $owner["uid"]]);
 
 			if ($profile["publish"]) {
@@ -1844,8 +1844,8 @@ class OStatus
 		}
 
 		$item["uri"] = $item['parent-uri'] = $item['thr-parent']
-				= 'tag:' . DI::baseUrl()->getHostname().
-				','.date('Y-m-d').':'.$action.':'.$owner['uid'].
+				= 'tag:' . App::baseUrl()->getHostname() .
+				  ','.date('Y-m-d').':'.$action.':'.$owner['uid'].
 				':person:'.$connect_id.':'.$item['created'];
 
 		$item["body"] = sprintf($message, $owner["nick"], $contact["nick"]);
@@ -1977,7 +1977,7 @@ class OStatus
 		XML::addElement($doc, $entry, "content", $body, ["type" => "html"]);
 
 		XML::addElement($doc, $entry, "link", "", ["rel" => "alternate", "type" => "text/html",
-								"href" => DI::baseUrl()."/display/".$item["guid"]]
+								"href" => App::baseUrl() . "/display/" . $item["guid"]]
 		);
 
 		if (!$feed_mode && $complete && ($item["id"] > 0)) {
@@ -2021,7 +2021,7 @@ class OStatus
 			} else {
 				$mentioned[$parent["author-link"]] = $parent["author-link"];
 				$mentioned[$parent["owner-link"]] = $parent["owner-link"];
-				$parent_plink = DI::baseUrl()."/display/".$parent["guid"];
+				$parent_plink = App::baseUrl() . "/display/" . $parent["guid"];
 			}
 
 			$attributes = [

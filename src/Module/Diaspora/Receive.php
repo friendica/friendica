@@ -3,10 +3,11 @@
 namespace Friendica\Module\Diaspora;
 
 use Friendica\BaseModule;
-use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Diaspora;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Network;
 use Psr\Log\LoggerInterface;
 
@@ -21,18 +22,18 @@ class Receive extends BaseModule
 
 	public static function init(array $parameters = [])
 	{
-		self::$logger = DI::logger();
+		self::$logger = Core::logger();
 	}
 
 	public static function post(array $parameters = [])
 	{
-		$enabled = DI::config()->get('system', 'diaspora_enabled', false);
+		$enabled = Core::config()->get('system', 'diaspora_enabled', false);
 		if (!$enabled) {
 			self::$logger->info('Diaspora disabled.');
-			throw new HTTPException\ForbiddenException(DI::l10n()->t('Access denied.'));
+			throw new HTTPException\ForbiddenException(Core::l10n()->t('Access denied.'));
 		}
 
-		$args = DI::args();
+		$args = App::args();
 
 		$type = $args->get(1);
 

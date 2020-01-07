@@ -14,10 +14,10 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Network\Probe;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\PortableContact;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -150,7 +150,7 @@ class GContact
 		}
 
 		// The global contacts should contain the original picture, not the cached one
-		if (($gcontact['generation'] != 1) && stristr(Strings::normaliseLink($gcontact['photo']), Strings::normaliseLink(DI::baseUrl() . '/photo/'))) {
+		if (($gcontact['generation'] != 1) && stristr(Strings::normaliseLink($gcontact['photo']), Strings::normaliseLink(App::baseUrl() . '/photo/'))) {
 			$gcontact['photo'] = '';
 		}
 
@@ -504,9 +504,9 @@ class GContact
 		$done = [];
 
 		/// @TODO Check if it is really neccessary to poll the own server
-		PortableContact::loadWorker(0, 0, 0, DI::baseUrl() . '/poco');
+		PortableContact::loadWorker(0, 0, 0, App::baseUrl() . '/poco');
 
-		$done[] = DI::baseUrl() . '/poco';
+		$done[] = App::baseUrl() . '/poco';
 
 		if (strlen(Config::get('system', 'directory'))) {
 			$x = Network::fetchUrl(Search::getGlobalDirectory() . '/pubsites');
@@ -1123,7 +1123,7 @@ class GContact
 				"notify" => $userdata['notify'], 'url' => $userdata['url'],
 				"hide" => ($userdata['hidewall'] || !$userdata['net-publish']),
 				'nick' => $userdata['nickname'], 'addr' => $userdata['addr'],
-				"connect" => $userdata['addr'], "server_url" => DI::baseUrl(),
+				"connect" => $userdata['addr'], "server_url" => App::baseUrl(),
 				"generation" => 1, 'network' => Protocol::DFRN];
 
 		self::update($gcontact);
@@ -1215,7 +1215,7 @@ class GContact
 						'addr' => $user->nickname . '@' . $hostname,
 						'nick' => $user->nickname,
 						"network" => Protocol::OSTATUS,
-						'photo' => DI::baseUrl() . '/images/person-300.jpg'];
+						'photo' => App::baseUrl() . '/images/person-300.jpg'];
 
 				if (isset($user->bio)) {
 					$contact['about'] = $user->bio;

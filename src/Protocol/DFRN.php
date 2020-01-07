@@ -19,7 +19,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\Event;
@@ -30,6 +30,8 @@ use Friendica\Model\PermissionSet;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
+use Friendica\Registry\App;
+use Friendica\Registry\Protocol as P;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
@@ -505,7 +507,7 @@ class DFRN
 		$ext = Images::supportedTypes();
 
 		foreach ($rp as $p) {
-			$photos[$p['scale']] = DI::baseUrl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
+			$photos[$p['scale']] = App::baseUrl() . '/photo/' . $p['resource-id'] . '-' . $p['scale'] . '.' . $ext[$p['type']];
 		}
 
 
@@ -567,7 +569,7 @@ class DFRN
 		$root->setAttribute("xmlns:ostatus", ActivityNamespace::OSTATUS);
 		$root->setAttribute("xmlns:statusnet", ActivityNamespace::STATUSNET);
 
-		XML::addElement($doc, $root, "id", DI::baseUrl()."/profile/".$owner["nick"]);
+		XML::addElement($doc, $root, "id", App::baseUrl() . "/profile/" . $owner["nick"]);
 		XML::addElement($doc, $root, "title", $owner["name"]);
 
 		$attributes = ["uri" => "https://friendi.ca", "version" => FRIENDICA_VERSION."-".DB_UPDATE_VERSION];
@@ -584,13 +586,13 @@ class DFRN
 			// DFRN itself doesn't uses this. But maybe someone else wants to subscribe to the public feed.
 			OStatus::hublinks($doc, $root, $owner["nick"]);
 
-			$attributes = ["rel" => "salmon", "href" => DI::baseUrl()."/salmon/".$owner["nick"]];
+			$attributes = ["rel" => "salmon", "href" => App::baseUrl() . "/salmon/" . $owner["nick"]];
 			XML::addElement($doc, $root, "link", "", $attributes);
 
-			$attributes = ["rel" => "http://salmon-protocol.org/ns/salmon-replies", "href" => DI::baseUrl()."/salmon/".$owner["nick"]];
+			$attributes = ["rel" => "http://salmon-protocol.org/ns/salmon-replies", "href" => App::baseUrl() . "/salmon/" . $owner["nick"]];
 			XML::addElement($doc, $root, "link", "", $attributes);
 
-			$attributes = ["rel" => "http://salmon-protocol.org/ns/salmon-mention", "href" => DI::baseUrl()."/salmon/".$owner["nick"]];
+			$attributes = ["rel" => "http://salmon-protocol.org/ns/salmon-mention", "href" => App::baseUrl() . "/salmon/" . $owner["nick"]];
 			XML::addElement($doc, $root, "link", "", $attributes);
 		}
 
@@ -651,7 +653,7 @@ class DFRN
 		}
 
 		XML::addElement($doc, $author, "name", $owner["name"], $attributes);
-		XML::addElement($doc, $author, "uri", DI::baseUrl().'/profile/'.$owner["nickname"], $attributes);
+		XML::addElement($doc, $author, "uri", App::baseUrl() . '/profile/' . $owner["nickname"], $attributes);
 		XML::addElement($doc, $author, "dfrn:handle", $owner["addr"], $attributes);
 
 		$attributes = ["rel" => "photo", "type" => "image/jpeg",
@@ -988,7 +990,7 @@ class DFRN
 		}
 
 		// Add conversation data. This is used for OStatus
-		$conversation_href = DI::baseUrl()."/display/".$item["parent-guid"];
+		$conversation_href = App::baseUrl() . "/display/" . $item["parent-guid"];
 		$conversation_uri = $conversation_href;
 
 		if (isset($parent_item)) {
@@ -1029,7 +1031,7 @@ class DFRN
 			"link",
 			"",
 			["rel" => "alternate", "type" => "text/html",
-				 "href" => DI::baseUrl() . "/display/" . $item["guid"]]
+				 "href" => App::baseUrl() . "/display/" . $item["guid"]]
 		);
 
 		// "comment-allow" is some old fashioned stuff for old Friendica versions.
@@ -1900,7 +1902,7 @@ class DFRN
 				'to_email'     => $importer['email'],
 				'uid'          => $importer['importer_uid'],
 				'item'         => $suggest,
-				'link'         => DI::baseUrl().'/notifications/intros',
+				'link'         => App::baseUrl() . '/notifications/intros',
 				'source_name'  => $importer['name'],
 				'source_link'  => $importer['url'],
 				'source_photo' => $importer['photo'],
@@ -2128,7 +2130,7 @@ class DFRN
 				}
 			}
 
-			if ($Blink && Strings::compareLink($Blink, DI::baseUrl() . "/profile/" . $importer["nickname"])) {
+			if ($Blink && Strings::compareLink($Blink, App::baseUrl() . "/profile/" . $importer["nickname"])) {
 				$author = DBA::selectFirst('contact', ['name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
 				$parent = Item::selectFirst(['id'], ['uri' => $item['parent-uri'], 'uid' => $importer["importer_uid"]]);
@@ -2144,7 +2146,7 @@ class DFRN
 					"to_email"     => $importer["email"],
 					"uid"          => $importer["importer_uid"],
 					"item"         => $item,
-					"link"         => DI::baseUrl()."/display/".urlencode($item['guid']),
+					"link"         => App::baseUrl() . "/display/" . urlencode($item['guid']),
 					"source_name"  => $author["name"],
 					"source_link"  => $author["url"],
 					"source_photo" => $author["thumb"],
@@ -2178,7 +2180,7 @@ class DFRN
 			// The functions below are partly used by ostatus.php as well - where we have this variable
 			$contact = Contact::selectFirst([], ['id' => $importer['id']]);
 
-			$activity = DI::activity();
+			$activity = P::activity();
 
 			// Big question: Do we need these functions? They were part of the "consume_feed" function.
 			// This function once was responsible for DFRN and OStatus.
@@ -2371,7 +2373,7 @@ class DFRN
 
 		/// @todo Do we really need this check for HTML elements? (It was copied from the old function)
 		if ((strpos($item['body'], '<') !== false) && (strpos($item['body'], '>') !== false)) {
-			$base_url = DI::baseUrl()->get();
+			$base_url = App::baseUrl()->get();
 			$item['body'] = HTML::relToAbs($item['body'], $base_url);
 
 			$item['body'] = HTML::toBBCodeVideo($item['body']);
@@ -2885,13 +2887,13 @@ class DFRN
 		$community_page = ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY);
 		$prvgroup = ($user['page-flags'] == User::PAGE_FLAGS_PRVGROUP);
 
-		$link = Strings::normaliseLink(DI::baseUrl() . '/profile/' . $user['nickname']);
+		$link = Strings::normaliseLink(App::baseUrl() . '/profile/' . $user['nickname']);
 
 		/*
 		 * Diaspora uses their own hardwired link URL in @-tags
 		 * instead of the one we supply with webfinger
 		 */
-		$dlink = Strings::normaliseLink(DI::baseUrl() . '/u/' . $user['nickname']);
+		$dlink = Strings::normaliseLink(App::baseUrl() . '/u/' . $user['nickname']);
 
 		$cnt = preg_match_all('/[\@\!]\[url\=(.*?)\](.*?)\[\/url\]/ism', $item['body'], $matches, PREG_SET_ORDER);
 		if ($cnt) {

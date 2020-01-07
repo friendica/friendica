@@ -5,7 +5,7 @@
 namespace Friendica\Render;
 
 use Friendica\Core\Hook;
-use Friendica\DI;
+use Friendica\Registry\DI;
 
 /**
  * Smarty implementation of the Friendica template engine interface

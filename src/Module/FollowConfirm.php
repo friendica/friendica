@@ -3,8 +3,8 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Model\Introduction;
-use Friendica\DI;
+use Friendica\Registry\App;
+use Friendica\Registry\Model;
 
 /**
  * Process follow request confirmations
@@ -23,12 +23,12 @@ class FollowConfirm extends BaseModule
 		$duplex   = intval($_POST['duplex']     ?? 0);
 		$hidden   = intval($_POST['hidden']     ?? 0);
 
-		$intro = DI::intro()->selectFirst(['id' => $intro_id, 'uid' => local_user()]);
+		$Intro = Model::intro()->selectFirst(['id' => $intro_id, 'uid' => local_user()]);
 
 		$cid = $intro->{'contact-id'};
 
 		$intro->confirm($duplex, $hidden);
 
-		DI::baseUrl()->redirect('contact/' . intval($cid));
+		App::baseUrl()->redirect('contact/' . intval($cid));
 	}
 }

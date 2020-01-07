@@ -13,15 +13,14 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\Security\Login;
-use Friendica\Model\Contact;
-use Friendica\Model\Introduction;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Model;
 
 function notifications_post(App $a)
 {
 	if (!local_user()) {
-		DI::baseUrl()->redirect();
+		A::baseUrl()->redirect();
 	}
 
 	$request_id = (($a->argc > 1) ? $a->argv[1] : 0);
@@ -31,7 +30,7 @@ function notifications_post(App $a)
 	}
 
 	if ($request_id) {
-		$intro = DI::intro()->selectFirst(['id' => $request_id, 'uid' => local_user()]);
+		$intro = Model::intro()->selectFirst(['id' => $request_id, 'uid' => local_user()]);
 
 		switch ($_POST['submit']) {
 			case L10n::t('Discard'):
@@ -42,7 +41,7 @@ function notifications_post(App $a)
 				break;
 		}
 
-		DI::baseUrl()->redirect('notifications/intros');
+		A::baseUrl()->redirect('notifications/intros');
 	}
 }
 
@@ -60,7 +59,7 @@ function notifications_content(App $a)
 
 	$json = (($a->argc > 1 && $a->argv[$a->argc - 1] === 'json') ? true : false);
 
-	$nm = DI::notify();
+	$nm = Model::notify();
 
 	$o = '';
 	// Get the nav tabs for the notification pages
@@ -110,11 +109,11 @@ function notifications_content(App $a)
 		$notifs = $nm->getHomeList($show, $startrec, $perpage);
 	// fallback - redirect to main page
 	} else {
-		DI::baseUrl()->redirect('notifications');
+		A::baseUrl()->redirect('notifications');
 	}
 
 	// Set the pager
-	$pager = new Pager(DI::args()->getQueryString(), $perpage);
+	$pager = new Pager(A::args()->getQueryString(), $perpage);
 
 	// Add additional informations (needed for json output)
 	$notifs['items_page'] = $pager->getItemsPerPage();

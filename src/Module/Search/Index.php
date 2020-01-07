@@ -13,12 +13,13 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Term;
 use Friendica\Module\BaseSearchModule;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 class Index extends BaseSearchModule
@@ -63,7 +64,7 @@ class Index extends BaseSearchModule
 		}
 
 		if (local_user()) {
-			DI::page()['aside'] .= Widget\SavedSearches::getHTML('search?q=' . urlencode($search), $search);
+			App::page()['aside'] .= Widget\SavedSearches::getHTML('search?q=' . urlencode($search), $search);
 		}
 
 		Nav::setSelected('search');
@@ -120,7 +121,7 @@ class Index extends BaseSearchModule
 		// OR your own posts if you are a logged in member
 		// No items will be shown if the member has a blocked profile wall.
 
-		$pager = new Pager(DI::args()->getQueryString());
+		$pager = new Pager(App::args()->getQueryString());
 
 		if ($tag) {
 			Logger::info('Start tag search.', ['q' => $search]);
@@ -239,7 +240,7 @@ class Index extends BaseSearchModule
 		}
 
 		if (!empty($contact_id)) {
-			DI::baseUrl()->redirect('contact/' . $contact_id);
+			App::baseUrl()->redirect('contact/' . $contact_id);
 		}
 	}
 
@@ -270,7 +271,7 @@ class Index extends BaseSearchModule
 		if (!empty($item_id)) {
 			$item = Item::selectFirst(['guid'], ['id' => $item_id]);
 			if (DBA::isResult($item)) {
-				DI::baseUrl()->redirect('display/' . $item['guid']);
+				App::baseUrl()->redirect('display/' . $item['guid']);
 			}
 		}
 	}

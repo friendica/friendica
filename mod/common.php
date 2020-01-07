@@ -9,9 +9,9 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model;
 use Friendica\Module;
+use Friendica\Registry\App as A;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 
@@ -41,7 +41,7 @@ function common_content(App $a)
 		$contact = DBA::selectFirst('contact', ['name', 'url', 'photo', 'uid', 'id'], ['id' => $cid, 'uid' => $uid]);
 
 		if (DBA::isResult($contact)) {
-			DI::page()['aside'] = "";
+			A::page()['aside'] = "";
 			Model\Profile::load($a, "", 0, Model\Contact::getDetailsByURL($contact["url"]));
 		}
 	} else {
@@ -54,10 +54,10 @@ function common_content(App $a)
 				'url'    => 'contact/' . $cid
 			]);
 
-			if (empty(DI::page()['aside'])) {
-				DI::page()['aside'] = '';
+			if (empty(A::page()['aside'])) {
+				A::page()['aside'] = '';
 			}
-			DI::page()['aside'] .= $vcard_widget;
+			A::page()['aside'] .= $vcard_widget;
 		}
 	}
 
@@ -92,7 +92,7 @@ function common_content(App $a)
 		return $o;
 	}
 
-	$pager = new Pager(DI::args()->getQueryString());
+	$pager = new Pager(A::args()->getQueryString());
 
 	if ($cid) {
 		$common_friends = Model\GContact::commonFriends($uid, $cid, $pager->getStart(), $pager->getItemsPerPage());

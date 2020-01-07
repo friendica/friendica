@@ -6,9 +6,9 @@ use Friendica\App;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
+use Friendica\Registry\Util;
 
 function lockview_content(App $a)
 {
@@ -60,7 +60,7 @@ function lockview_content(App $a)
 		exit();
 	}
 
-	$aclFormatter = DI::aclFormatter();
+	$aclFormatter = Util::aclFormatter();
 
 	$allowed_users = $aclFormatter->expand($item['allow_cid']);
 	$allowed_groups = $aclFormatter->expand($item['allow_gid']);

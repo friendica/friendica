@@ -9,9 +9,9 @@ use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Registry\App as A;
 use Friendica\Util\Proxy as ProxyUtils;
 
 function suggest_init(App $a)
@@ -28,7 +28,7 @@ function suggest_post(App $a)
 		notice(L10n::t('Contact suggestion successfully ignored.'));
 	}
 
-	DI::baseUrl()->redirect('suggest');
+	A::baseUrl()->redirect('suggest');
 }
 
 function suggest_content(App $a)
@@ -40,10 +40,10 @@ function suggest_content(App $a)
 		return;
 	}
 
-	$_SESSION['return_path'] = DI::args()->getCommand();
+	$_SESSION['return_path'] = A::args()->getCommand();
 
-	DI::page()['aside'] .= Widget::findPeople();
-	DI::page()['aside'] .= Widget::follow();
+	A::page()['aside'] .= Widget::findPeople();
+	A::page()['aside'] .= Widget::follow();
 
 
 	$r = GContact::suggestionQuery(local_user());
@@ -57,7 +57,7 @@ function suggest_content(App $a)
 	if (!empty($_GET['ignore'])) {
 		// <form> can't take arguments in its "action" parameter
 		// so add any arguments as hidden inputs
-		$query = explode_querystring(DI::args()->getQueryString());
+		$query = explode_querystring(A::args()->getQueryString());
 		$inputs = [];
 		foreach ($query['args'] as $arg) {
 			if (strpos($arg, 'confirm=') === false) {
@@ -81,8 +81,8 @@ function suggest_content(App $a)
 	$entries = [];
 
 	foreach ($r as $rr) {
-		$connlnk = DI::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
-		$ignlnk = DI::baseUrl() . '/suggest?ignore=' . $rr['id'];
+		$connlnk = A::baseUrl() . '/follow/?url=' . (($rr['connect']) ? $rr['connect'] : $rr['url']);
+		$ignlnk = A::baseUrl() . '/suggest?ignore=' . $rr['id'];
 		$photo_menu = [
 			'profile' => [L10n::t("View Profile"), Contact::magicLink($rr["url"])],
 			'follow' => [L10n::t("Connect/Follow"), $connlnk],

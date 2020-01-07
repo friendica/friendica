@@ -11,12 +11,12 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
+use Friendica\Registry\App as A;
 use Friendica\Util\Security;
 
 function videos_init(App $a)
@@ -55,14 +55,14 @@ function videos_init(App $a)
 		]);
 
 		// If not there, create 'aside' empty
-		if (!isset(DI::page()['aside'])) {
-			DI::page()['aside'] = '';
+		if (!isset(A::page()['aside'])) {
+			A::page()['aside'] = '';
 		}
 
-		DI::page()['aside'] .= $vcard_widget;
+		A::page()['aside'] .= $vcard_widget;
 
-		$tpl = Renderer::getMarkupTemplate("videos_head.tpl");
-		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl);
+		$tpl                         = Renderer::getMarkupTemplate("videos_head.tpl");
+		A::page()['htmlhead'] .= Renderer::replaceMacros($tpl);
 	}
 
 	return;
@@ -73,7 +73,7 @@ function videos_post(App $a)
 	$owner_uid = $a->data['user']['uid'];
 
 	if (local_user() != $owner_uid) {
-		DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
+		A::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 	}
 
 	if (($a->argc == 2) && !empty($_POST['delete']) && !empty($_POST['id'])) {
@@ -90,11 +90,11 @@ function videos_post(App $a)
 			], local_user());
 		}
 
-		DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
+		A::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 		return; // NOTREACHED
 	}
 
-	DI::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
+	A::baseUrl()->redirect('videos/' . $a->data['user']['nickname']);
 }
 
 function videos_content(App $a)
@@ -121,7 +121,7 @@ function videos_content(App $a)
 
 	//$phototypes = Photo::supportedTypes();
 
-	$_SESSION['video_return'] = DI::args()->getCommand();
+	$_SESSION['video_return'] = A::args()->getCommand();
 
 	//
 	// Parse arguments
@@ -209,7 +209,7 @@ function videos_content(App $a)
 		$total = count($r);
 	}
 
-	$pager = new Pager(DI::args()->getQueryString(), 20);
+	$pager = new Pager(A::args()->getQueryString(), 20);
 
 	$r = q("SELECT hash, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`created`) AS `created`,
 		ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`filetype`) as `filetype`
@@ -232,13 +232,13 @@ function videos_content(App $a)
 
 			$videos[] = [
 				'id'       => $rr['id'],
-				'link'     => DI::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['hash'],
+				'link'     => A::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/video/' . $rr['hash'],
 				'title'    => L10n::t('View Video'),
-				'src'      => DI::baseUrl() . '/attach/' . $rr['id'] . '?attachment=0',
+				'src'      => A::baseUrl() . '/attach/' . $rr['id'] . '?attachment=0',
 				'alt'      => $alt_e,
 				'mime'     => $rr['filetype'],
 				'album' => [
-					'link'  => DI::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
+					'link'  => A::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/album/' . bin2hex($rr['album']),
 					'name'  => $name_e,
 					'alt'   => L10n::t('View Album'),
 				],
@@ -250,9 +250,9 @@ function videos_content(App $a)
 	$o .= Renderer::replaceMacros($tpl, [
 		'$title'      => L10n::t('Recent Videos'),
 		'$can_post'   => $can_post,
-		'$upload'     => [L10n::t('Upload New Videos'), DI::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/upload'],
+		'$upload'     => [L10n::t('Upload New Videos'), A::baseUrl() . '/videos/' . $a->data['user']['nickname'] . '/upload'],
 		'$videos'     => $videos,
-		'$delete_url' => (($can_post) ? DI::baseUrl() . '/videos/' . $a->data['user']['nickname'] : false)
+		'$delete_url' => (($can_post) ? A::baseUrl() . '/videos/' . $a->data['user']['nickname'] : false)
 	]);
 
 	$o .= $pager->renderFull($total);

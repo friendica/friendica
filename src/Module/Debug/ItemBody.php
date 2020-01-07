@@ -4,9 +4,10 @@ namespace Friendica\Module\Debug;
 
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 
 /**
  * Print the body of an Item
@@ -31,7 +32,7 @@ class ItemBody extends BaseModule
 		$item = Item::selectFirst(['body'], ['uid' => local_user(), 'id' => $itemId]);
 
 		if (!empty($item)) {
-			if (DI::mode()->isAjax()) {
+			if (App::mode()->isAjax()) {
 				echo str_replace("\n", '<br />', $item['body']);
 				exit();
 			} else {

@@ -3,12 +3,12 @@
 namespace Friendica\Module\Security\TwoFactor;
 
 use Friendica\BaseModule;
-use Friendica\App\Authentication;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 use PragmaRX\Google2FA\Google2FA;
 
 /**
@@ -40,7 +40,7 @@ class Verify extends BaseModule
 				Session::set('2fa', $code);
 
 				// Resume normal login workflow
-				DI::auth()->setForUser($a, $a->user, true, true);
+				App::auth()->setForUser($a, $a->user, true, true);
 			} else {
 				self::$errors[] = L10n::t('Invalid code, please retry.');
 			}
@@ -50,12 +50,12 @@ class Verify extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		if (!local_user()) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		// Already authenticated with 2FA token
 		if (Session::get('2fa')) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('twofactor/verify.tpl'), [

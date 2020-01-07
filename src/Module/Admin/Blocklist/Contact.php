@@ -6,9 +6,9 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
 use Friendica\Model;
+use Friendica\Registry\App;
 
 class Contact extends BaseAdminModule
 {
@@ -39,7 +39,7 @@ class Contact extends BaseAdminModule
 			notice(L10n::tt('%s contact unblocked', '%s contacts unblocked', count($contacts)));
 		}
 
-		DI::baseUrl()->redirect('admin/blocklist/contact');
+		App::baseUrl()->redirect('admin/blocklist/contact');
 	}
 
 	public static function content(array $parameters = [])
@@ -50,7 +50,7 @@ class Contact extends BaseAdminModule
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager(DI::args()->getQueryString(), 30);
+		$pager = new Pager(App::args()->getQueryString(), 30);
 
 		$contacts = Model\Contact::selectToArray([], $condition, ['limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
 
@@ -74,7 +74,7 @@ class Contact extends BaseAdminModule
 			'$form_security_token' => parent::getFormSecurityToken('admin_contactblock'),
 
 			// values //
-			'$baseurl'    => DI::baseUrl()->get(true),
+			'$baseurl'    => App::baseUrl()->get(true),
 
 			'$contacts'   => $contacts,
 			'$total_contacts' => L10n::tt('%s total blocked contact', '%s total blocked contacts', $total),

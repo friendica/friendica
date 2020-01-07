@@ -4,8 +4,8 @@
  */
 namespace Friendica\Core;
 
-use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Registry\App;
 use Friendica\Util\XML;
 
 /**
@@ -158,7 +158,7 @@ class System
 		if (is_bool($prefix) && !$prefix) {
 			$prefix = '';
 		} elseif (empty($prefix)) {
-			$prefix = hash('crc32', DI::baseUrl()->getHostname());
+			$prefix = hash('crc32', App::baseUrl()->getHostname());
 		}
 
 		while (strlen($prefix) < ($size - 13)) {

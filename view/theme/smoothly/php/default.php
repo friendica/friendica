@@ -1,8 +1,10 @@
 <!DOCTYPE html >
 <html>
 <head>
-  <title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
-  <script>var baseurl="<?php echo Friendica\DI::baseUrl() ?>";</script>
+  <title><?php use Friendica\Registry\App;
+
+	  if(!empty($page['title'])) echo $page['title'] ?></title>
+  <script>var baseurl="<?php echo App::baseUrl() ?>";</script>
   <script type="text/javascript">
 	function ScrollToBottom(){
 	window.scrollTo(0,document.body.scrollHeight);

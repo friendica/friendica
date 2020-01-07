@@ -16,7 +16,8 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
@@ -373,7 +374,7 @@ class OEmbed
 		}
 		$width = '100%';
 
-		$src = DI::baseUrl() . '/oembed/' . Strings::base64UrlEncode($src);
+		$src = App::baseUrl() . '/oembed/' . Strings::base64UrlEncode($src);
 		return '<iframe onload="resizeIframe(this);" class="embed_rich" height="' . $height . '" width="' . $width . '" src="' . $src . '" allowfullscreen scrolling="no" frameborder="no">' . L10n::t('Embedded content') . '</iframe>';
 	}
 

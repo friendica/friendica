@@ -2,17 +2,17 @@
 
 namespace Friendica\Module\Settings;
 
-use Friendica\App\Arguments;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettingsModule;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -54,7 +54,7 @@ class Delegation extends BaseSettingsModule
 			throw new HTTPException\ForbiddenException(L10n::t('Permission denied.'));
 		}
 
-		$args = DI::args();
+		$args = App::args();
 
 		// @TODO Replace with router-provided arguments
 		$action = $args->get(2);
@@ -63,14 +63,14 @@ class Delegation extends BaseSettingsModule
 		if ($action === 'add' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				DI::baseUrl()->redirect('settings/delegation');
+				App::baseUrl()->redirect('settings/delegation');
 			}
 
 			$user = User::getById($user_id, ['nickname']);
 			if (DBA::isResult($user)) {
 				$condition = [
 					'uid' => local_user(),
-					'nurl' => Strings::normaliseLink(DI::baseUrl() . '/profile/' . $user['nickname'])
+					'nurl' => Strings::normaliseLink(App::baseUrl() . '/profile/' . $user['nickname'])
 				];
 				if (DBA::exists('contact', $condition)) {
 					DBA::insert('manage', ['uid' => $user_id, 'mid' => local_user()]);
@@ -79,17 +79,17 @@ class Delegation extends BaseSettingsModule
 				notice(L10n::t('Delegate user not found.'));
 			}
 
-			DI::baseUrl()->redirect('settings/delegation');
+			App::baseUrl()->redirect('settings/delegation');
 		}
 
 		if ($action === 'remove' && $user_id) {
 			if (Session::get('submanage')) {
 				notice(L10n::t('Delegated administrators can view but not change delegation permissions.'));
-				DI::baseUrl()->redirect('settings/delegation');
+				App::baseUrl()->redirect('settings/delegation');
 			}
 
 			DBA::delete('manage', ['uid' => $user_id, 'mid' => local_user()]);
-			DI::baseUrl()->redirect('settings/delegation');
+			App::baseUrl()->redirect('settings/delegation');
 		}
 
 		// find everybody that currently has delegated management to this account/page
@@ -147,7 +147,7 @@ class Delegation extends BaseSettingsModule
 			'$submit' => L10n::t('Save Settings'),
 			'$header' => L10n::t('Delegate Page Management'),
 			'$delegates_header' => L10n::t('Delegates'),
-			'$base' => DI::baseUrl(),
+			'$base' => App::baseUrl(),
 			'$desc' => L10n::t('Delegates are able to manage all aspects of this account/page except for basic account settings. Please do not delegate your personal account to anybody that you do not trust completely.'),
 			'$head_delegates' => L10n::t('Existing Page Delegates'),
 			'$delegates' => $delegates,

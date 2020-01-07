@@ -6,7 +6,7 @@ namespace Friendica\Core;
 
 use Friendica\App;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Util\Strings;
 
 /**

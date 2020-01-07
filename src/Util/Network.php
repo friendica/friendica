@@ -10,8 +10,10 @@ use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\CurlResult;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 
 class Network
 {
@@ -234,7 +236,7 @@ class Network
 
 		@curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
 
 		return $curlResponse;
 	}
@@ -326,7 +328,7 @@ class Network
 
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
 
 		// Very old versions of Lighttpd don't like the "Expect" header, so we remove it when needed
 		if ($curlResponse->getReturnCode() == 417) {
@@ -556,7 +558,7 @@ class Network
 		Hook::callAll('avatar_lookup', $avatar);
 
 		if (! $avatar['success']) {
-			$avatar['url'] = DI::baseUrl() . '/images/person-300.jpg';
+			$avatar['url'] = App::baseUrl() . '/images/person-300.jpg';
 		}
 
 		Logger::log('Avatar: ' . $avatar['email'] . ' ' . $avatar['url'], Logger::DEBUG);
@@ -655,7 +657,7 @@ class Network
 		$http_code = $curl_info['http_code'];
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 		if ($http_code == 0) {
 			return $url;
@@ -697,7 +699,7 @@ class Network
 		$body = curl_exec($ch);
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 		if (trim($body) == "") {
 			return $url;

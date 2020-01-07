@@ -12,9 +12,10 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
+use Friendica\Registry\App;
 use Friendica\Util\Proxy as ProxyUtils;
 
 class Contacts extends BaseModule
@@ -69,7 +70,7 @@ class Contacts extends BaseModule
 
 		$total = DBA::count('contact', $condition);
 
-		$pager = new Pager(DI::args()->getQueryString());
+		$pager = new Pager(App::args()->getQueryString());
 
 		$params = ['order' => ['name' => false], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 

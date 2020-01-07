@@ -4,7 +4,7 @@
  */
 namespace Friendica\Render;
 
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Smarty;
 use Friendica\Core\Renderer;
 

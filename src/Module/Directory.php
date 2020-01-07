@@ -10,10 +10,12 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 
@@ -25,7 +27,7 @@ class Directory extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		$app = DI::app();
-		$config = DI::config();
+		$config = Core::config();
 
 		if (($config->get('system', 'block_public') && !Session::isAuthenticated()) ||
 			($config->get('system', 'block_local_dir') && !Session::isAuthenticated())) {
@@ -33,8 +35,8 @@ class Directory extends BaseModule
 		}
 
 		if (local_user()) {
-			DI::page()['aside'] .= Widget::findPeople();
-			DI::page()['aside'] .= Widget::follow();
+			App::page()['aside'] .= Widget::findPeople();
+			App::page()['aside'] .= Widget::follow();
 		}
 
 		$output = '';
@@ -52,7 +54,7 @@ class Directory extends BaseModule
 			$gDirPath = Profile::zrl($dirURL, true);
 		}
 
-		$pager = new Pager(DI::args()->getQueryString(), 60);
+		$pager = new Pager(App::args()->getQueryString(), 60);
 
 		$profiles = Profile::searchProfiles($pager->getStart(), $pager->getItemsPerPage(), $search);
 

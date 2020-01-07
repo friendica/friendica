@@ -10,9 +10,9 @@ use Friendica\Core\Logger;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App as A;
 use Friendica\Util\Security;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
@@ -91,7 +91,7 @@ function subthread_content(App $a) {
 
 	$post_type = (($item['resource-id']) ? L10n::t('photo') : L10n::t('status'));
 	$objtype = (($item['resource-id']) ? Activity\ObjectType::IMAGE : Activity\ObjectType::NOTE );
-	$link = XML::escape('<link rel="alternate" type="text/html" href="' . DI::baseUrl() . '/display/' . $item['guid'] . '" />' . "\n");
+	$link = XML::escape('<link rel="alternate" type="text/html" href="' . A::baseUrl() . '/display/' . $item['guid'] . '" />' . "\n");
 	$body = $item['body'];
 
 	$obj = <<< EOT
@@ -132,7 +132,7 @@ EOT;
 
 	$ulink = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
 	$alink = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
-	$plink = '[url=' . DI::baseUrl() . '/display/' . $item['guid'] . ']' . $post_type . '[/url]';
+	$plink = '[url=' . A::baseUrl() . '/display/' . $item['guid'] . ']' . $post_type . '[/url]';
 	$arr['body'] =  sprintf( $bodyverb, $ulink, $alink, $plink );
 
 	$arr['verb'] = $activity;

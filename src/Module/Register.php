@@ -2,7 +2,6 @@
 
 namespace Friendica\Module;
 
-use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config;
@@ -14,8 +13,9 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -124,7 +124,7 @@ class Register extends BaseModule
 			'$ask_password' => $ask_password,
 			'$password1'    => ['password1', L10n::t('New Password:'), '', L10n::t('Leave empty for an auto generated password.')],
 			'$password2'    => ['confirm', L10n::t('Confirm:'), '', ''],
-			'$nickdesc'     => L10n::t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHostname()),
+			'$nickdesc'     => L10n::t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', App::baseUrl()->getHostname()),
 			'$nicklabel'    => L10n::t('Choose a nickname: '),
 			'$photo'        => $photo,
 			'$publish'      => $profile_publish,
@@ -132,7 +132,7 @@ class Register extends BaseModule
 			'$username'     => $username,
 			'$email'        => $email,
 			'$nickname'     => $nickname,
-			'$sitename'     => DI::baseUrl()->getHostname(),
+			'$sitename'     => App::baseUrl()->getHostname(),
 			'$importh'      => L10n::t('Import'),
 			'$importt'      => L10n::t('Import your profile to this friendica instance'),
 			'$showtoslink'  => Config::get('system', 'tosdisplay'),
@@ -156,8 +156,6 @@ class Register extends BaseModule
 	public static function post(array $parameters = [])
 	{
 		BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
-
-		$a = DI::app();
 
 		$arr = ['post' => $_POST];
 		Hook::callAll('register_post', $arr);
@@ -198,7 +196,7 @@ class Register extends BaseModule
 
 		$arr['blocked'] = $blocked;
 		$arr['verified'] = $verified;
-		$arr['language'] = L10nClass::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		$arr['language'] = L10nClass::detectLanguage($_SERVER, $_GET, Core::config()->get('system', 'language'));
 
 		try {
 			$result = Model\User::create($arr);
@@ -209,7 +207,7 @@ class Register extends BaseModule
 
 		$user = $result['user'];
 
-		$base_url = DI::baseUrl()->get();
+		$base_url = App::baseUrl()->get();
 
 		if ($netpublish && intval(Config::get('config', 'register_policy')) !== self::APPROVE) {
 			$url = $base_url . '/profile/' . $user['nickname'];
@@ -238,7 +236,7 @@ class Register extends BaseModule
 
 				if ($res) {
 					\info(L10n::t('Registration successful. Please check your email for further instructions.') . EOL);
-					DI::baseUrl()->redirect();
+					App::baseUrl()->redirect();
 				} else {
 					\notice(
 						L10n::t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
@@ -248,12 +246,12 @@ class Register extends BaseModule
 				}
 			} else {
 				\info(L10n::t('Registration successful.') . EOL);
-				DI::baseUrl()->redirect();
+				App::baseUrl()->redirect();
 			}
 		} elseif (intval(Config::get('config', 'register_policy')) === self::APPROVE) {
 			if (!strlen(Config::get('config', 'admin_email'))) {
 				\notice(L10n::t('Your registration can not be processed.') . EOL);
-				DI::baseUrl()->redirect();
+				App::baseUrl()->redirect();
 			}
 
 			// Check if the note to the admin is actually filled out
@@ -261,12 +259,12 @@ class Register extends BaseModule
 				\notice(L10n::t('You have to leave a request note for the admin.')
 					. L10n::t('Your registration can not be processed.') . EOL);
 
-				DI::baseUrl()->redirect('register/');
+				App::baseUrl()->redirect('register/');
 			}
 			// Is there text in the tar pit?
 			if (!empty($_POST['registertarpit'])) {
 				\notice(L10n::t('You have entered too much information.'));
-				DI::baseUrl()->redirect('register/');
+				App::baseUrl()->redirect('register/');
 			}
 
 			Model\Register::createForApproval($user['uid'], Config::get('system', 'language'), $_POST['permonlybox']);
@@ -312,7 +310,7 @@ class Register extends BaseModule
 			);
 
 			\info(L10n::t('Your registration is pending approval by the site owner.') . EOL);
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		return;

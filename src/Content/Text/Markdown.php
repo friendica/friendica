@@ -7,8 +7,8 @@
 namespace Friendica\Content\Text;
 
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Registry\Util;
 
 /**
  * Friendica-specific usage of Markdown
@@ -43,7 +43,7 @@ class Markdown
 
 		$html = $MarkdownParser->transform($text);
 
-		DI::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
 
 		return $html;
 	}

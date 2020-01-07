@@ -7,9 +7,9 @@ use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Mail;
 use Friendica\Model\Profile;
+use Friendica\Registry\App as A;
 use Friendica\Util\Strings;
 
 function wallmessage_post(App $a) {
@@ -72,7 +72,7 @@ function wallmessage_post(App $a) {
 			info(L10n::t('Message sent.') . EOL);
 	}
 
-	DI::baseUrl()->redirect('profile/'.$user['nickname']);
+	A::baseUrl()->redirect('profile/' . $user['nickname']);
 }
 
 
@@ -116,9 +116,9 @@ function wallmessage_content(App $a) {
 		return;
 	}
 
-	$tpl = Renderer::getMarkupTemplate('wallmsg-header.tpl');
-	DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-		'$baseurl' => DI::baseUrl()->get(true),
+	$tpl                         = Renderer::getMarkupTemplate('wallmsg-header.tpl');
+	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+		'$baseurl' => A::baseUrl()->get(true),
 		'$nickname' => $user['nickname'],
 		'$linkurl' => L10n::t('Please enter a link URL:')
 	]);

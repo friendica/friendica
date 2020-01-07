@@ -17,7 +17,7 @@ namespace Friendica\Content;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
 use Friendica\Core\PConfig;
-use Friendica\DI;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -102,7 +102,7 @@ class Smilies
 
 		];
 
-		$baseUrl = DI::baseUrl();
+		$baseUrl = App::baseUrl();
 
 		$icons = [
 		'<img class="smiley" src="' . $baseUrl . '/images/smiley-heart.gif" alt="&lt;3" title="&lt;3" />',

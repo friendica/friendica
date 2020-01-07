@@ -9,12 +9,11 @@ use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\DI;
-use Friendica\Model\Item;
-use Friendica\Model\Photo;
+use Friendica\Registry\DI;
 use Friendica\Database\DBA;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\Delivery;
 
@@ -149,7 +148,7 @@ class Mail
 			$recip_host = substr($recip_host, 0, strpos($recip_host, '/'));
 
 			$recip_handle = (($contact['addr']) ? $contact['addr'] : $contact['nick'] . '@' . $recip_host);
-			$sender_handle = $a->user['nickname'] . '@' . substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3);
+			$sender_handle = $a->user['nickname'] . '@' . substr(App::baseUrl(), strpos(App::baseUrl(), '://') + 3);
 
 			$conv_guid = System::createUUID();
 			$convuri = $recip_handle . ':' . $conv_guid;
@@ -261,7 +260,7 @@ class Mail
 
 		$conv_guid = System::createUUID();
 
-		$recip_handle = $recipient['nickname'] . '@' . substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3);
+		$recip_handle = $recipient['nickname'] . '@' . substr(App::baseUrl(), strpos(App::baseUrl(), '://') + 3);
 
 		$sender_nick = basename($replyto);
 		$sender_host = substr($replyto, strpos($replyto, '://') + 3);

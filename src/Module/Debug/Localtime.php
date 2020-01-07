@@ -5,7 +5,8 @@ namespace Friendica\Module\Debug;
 use Friendica\BaseModule;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -40,7 +41,7 @@ class Localtime extends BaseModule
 			$output .= '<p>' . L10n::t('Converted localtime: %s', $app->data['mod-localtime']) . '</p>';
 		}
 
-		$output .= '<form action ="' . DI::baseUrl()->get() . '/localtime?time=' . $time . '" method="post" >';
+		$output .= '<form action ="' . App::baseUrl()->get() . '/localtime?time=' . $time . '" method="post" >';
 		$output .= '<p>' . L10n::t('Please select your timezone:') . '</p>';
 		$output .= Temporal::getTimezoneSelect(($_REQUEST['timezone'] ?? '') ?: Installer::DEFAULT_TZ);
 		$output .= '<input type="submit" name="submit" value="' . L10n::t('Submit') . '" /></form>';

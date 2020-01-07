@@ -6,7 +6,8 @@
 namespace Friendica\Core;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\Util;
 use Friendica\Util\Strings;
 
 /**
@@ -286,7 +287,7 @@ class Addon
 
 		$stamp1 = microtime(true);
 		$f = file_get_contents("addon/$addon/$addon.php");
-		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 		$r = preg_match("|/\*.*\*/|msU", $f, $m);
 

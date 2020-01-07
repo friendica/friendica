@@ -11,16 +11,15 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\Model\Contact;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Model\ItemContent;
 use Friendica\Model\User;
 use Friendica\Model\UserItem;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
-use Friendica\Util\Strings;
 
 /**
  * @brief Creates a notification entry and possibly sends a mail
@@ -61,7 +60,7 @@ function notification($params)
 
 	$banner = $l10n->t('Friendica Notification');
 	$product = FRIENDICA_PLATFORM;
-	$siteurl = DI::baseUrl()->get(true);
+	$siteurl = App::baseUrl()->get(true);
 	$thanks = $l10n->t('Thank You,');
 	$sitename = Config::get('config', 'sitename');
 	if (Config::get('config', 'admin_name')) {
@@ -71,7 +70,7 @@ function notification($params)
 	}
 
 	$sender_name = $sitename;
-	$hostname = DI::baseUrl()->getHostname();
+	$hostname = App::baseUrl()->getHostname();
 	if (strpos($hostname, ':')) {
 		$hostname = substr($hostname, 0, strpos($hostname, ':'));
 	}
@@ -103,7 +102,7 @@ function notification($params)
 	$additional_mail_header .= "X-Friendica-Platform: ".FRIENDICA_PLATFORM."\n";
 	$additional_mail_header .= "X-Friendica-Version: ".FRIENDICA_VERSION."\n";
 	$additional_mail_header .= "List-ID: <notification.".$hostname.">\n";
-	$additional_mail_header .= "List-Archive: <".DI::baseUrl()."/notifications/system>\n";
+	$additional_mail_header .= "List-Archive: <" . App::baseUrl() . "/notifications/system>\n";
 
 	if (array_key_exists('item', $params)) {
 		$title = $params['item']['title'];
@@ -520,7 +519,7 @@ function notification($params)
 
 		$notify_id = DBA::lastInsertId();
 
-		$itemlink = DI::baseUrl().'/notify/view/'.$notify_id;
+		$itemlink = App::baseUrl() . '/notify/view/' . $notify_id;
 		$msg = Renderer::replaceMacros($epreamble, ['$itemlink' => $itemlink]);
 		$msg_cache = format_notification_message($datarray['name_cache'], strip_tags(BBCode::convert($msg)));
 
@@ -690,7 +689,7 @@ function check_item_notification($itemid, $uid, $notification_type) {
 	$params['uid'] = $uid;
 	$params['item'] = $item;
 	$params['parent'] = $item['parent'];
-	$params['link'] = DI::baseUrl() . '/display/' . urlencode($item['guid']);
+	$params['link'] = App::baseUrl() . '/display/' . urlencode($item['guid']);
 	$params['otype'] = 'item';
 	$params['source_name'] = $item['author-name'];
 	$params['source_link'] = $item['author-link'];

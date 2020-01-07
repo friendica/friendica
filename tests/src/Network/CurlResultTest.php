@@ -3,7 +3,7 @@
 namespace Friendica\Test\src\Network;
 
 use Dice\Dice;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\CurlResult;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +22,7 @@ class CurlResultTest extends TestCase
 
 		$logger = new NullLogger();
 		$dice->shouldReceive('create')
-		           ->with(LoggerInterface::class, [])
+		           ->with(LoggerInterface::class)
 		           ->andReturn($logger);
 
 		DI::init($dice);

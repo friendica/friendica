@@ -4,7 +4,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Util\Strings;
 
 /**

@@ -5,8 +5,7 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
 

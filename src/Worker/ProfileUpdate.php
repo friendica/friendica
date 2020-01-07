@@ -8,7 +8,7 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\ActivityPub;
 

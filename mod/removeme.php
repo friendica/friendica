@@ -8,8 +8,8 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\User;
+use Friendica\Registry\App as A;
 use Friendica\Util\Strings;
 
 function removeme_post(App $a)
@@ -60,7 +60,7 @@ function removeme_post(App $a)
 
 		unset($_SESSION['authenticated']);
 		unset($_SESSION['uid']);
-		DI::baseUrl()->redirect();
+		A::baseUrl()->redirect();
 		// NOTREACHED
 	}
 }
@@ -68,7 +68,7 @@ function removeme_post(App $a)
 function removeme_content(App $a)
 {
 	if (!local_user()) {
-		DI::baseUrl()->redirect();
+		A::baseUrl()->redirect();
 	}
 
 	$hash = Strings::getRandomHex();
@@ -80,7 +80,7 @@ function removeme_content(App $a)
 
 	$tpl = Renderer::getMarkupTemplate('removeme.tpl');
 	$o = Renderer::replaceMacros($tpl, [
-		'$basedir' => DI::baseUrl()->get(),
+		'$basedir' => A::baseUrl()->get(),
 		'$hash' => $hash,
 		'$title' => L10n::t('Remove My Account'),
 		'$desc' => L10n::t('This will completely remove your account. Once this has been done it is not recoverable.'),

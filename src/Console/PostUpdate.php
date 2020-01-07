@@ -20,6 +20,10 @@ class PostUpdate extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/**
+	 * @var App
+	 */
+	private $app;
+	/**
 	 * @var App\Mode
 	 */
 	private $appMode;
@@ -46,10 +50,11 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(App\Mode $appMode, IConfiguration $config, L10n $l10n, array $argv = null)
+	public function __construct(App $app, App\Mode $appMode, IConfiguration $config, L10n $l10n, array $argv = null)
 	{
 		parent::__construct($argv);
 
+		$this->app = $app;
 		$this->appMode = $appMode;
 		$this->config = $config;
 		$this->l10n = $l10n;
@@ -57,7 +62,7 @@ HELP;
 
 	protected function doExecute()
 	{
-		$a = \Friendica\DI::app();
+		$a = $this->app;
 
 		if ($this->getOption($this->helpOptions)) {
 			$this->out($this->getHelp());

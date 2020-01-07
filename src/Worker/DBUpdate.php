@@ -7,7 +7,7 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Config;
 use Friendica\Core\Update;
-use Friendica\DI;
+use Friendica\Registry\DI;
 
 class DBUpdate
 {

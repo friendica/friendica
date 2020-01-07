@@ -3,12 +3,12 @@
 namespace Friendica\Module\Security\TwoFactor;
 
 use Friendica\BaseModule;
-use Friendica\App\Authentication;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\TwoFactor\RecoveryCode;
+use Friendica\Registry\App;
 
 /**
  * // Page 1a: Recovery code verification
@@ -42,7 +42,7 @@ class Recovery extends BaseModule
 				Session::set('2fa', true);
 				notice(L10n::t('Remaining recovery codes: %d', RecoveryCode::countValidForUser(local_user())));
 
-				DI::auth()->setForUser($a, $a->user, true, true);
+				App::auth()->setForUser($a, $a->user, true, true);
 			} else {
 				notice(L10n::t('Invalid code, please retry.'));
 			}
@@ -52,12 +52,12 @@ class Recovery extends BaseModule
 	public static function content(array $parameters = [])
 	{
 		if (!local_user()) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		// Already authenticated with 2FA token
 		if (Session::get('2fa')) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('twofactor/recovery.tpl'), [

@@ -5,10 +5,13 @@ namespace Friendica\Module\Api\Mastodon;
 use Friendica\Api\Entity\Mastodon;
 use Friendica\Api\Entity\Mastodon\Relationship;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Database\DBA;
+use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Module\Base\Api;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
+use Friendica\Registry\Model;
 
 /**
  * @see https://docs.joinmastodon.org/methods/accounts/follow_requests
@@ -40,7 +43,7 @@ class FollowRequests extends Api
 	{
 		parent::post($parameters);
 
-		$introduction = DI::intro()->selectFirst(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
+		$Intro = Model::intro()->selectFirst(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
 
 		$contactId = $introduction->{'contact-id'};
 
@@ -79,7 +82,7 @@ class FollowRequests extends Api
 		$max_id = $_GET['max_id'] ?? null;
 		$limit = intval($_GET['limit'] ?? 40);
 
-		$baseUrl = DI::baseUrl();
+		$baseUrl = App::baseUrl();
 
 		$introductions = DI::intro()->selectByBoundaries(
 			['`uid` = ? AND NOT `ignore`', self::$current_user_id],

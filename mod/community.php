@@ -15,9 +15,9 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\User;
+use Friendica\Registry\App as A;
 
 function community_content(App $a, $update = 0)
 {
@@ -127,7 +127,7 @@ function community_content(App $a, $update = 0)
 				'default_location' => $a->user['default-location'],
 				'nickname' => $a->user['nickname'],
 				'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-				'acl' => ACL::getFullSelectorHTML(DI::page(), $a->user, true),
+				'acl' => ACL::getFullSelectorHTML(A::page(), $a->user, true),
 				'bang' => '',
 				'visitor' => 'block',
 				'profile_uid' => local_user(),
@@ -137,7 +137,7 @@ function community_content(App $a, $update = 0)
 	}
 
 	// check if we serve a mobile device and get the user settings accordingly
-	if (DI::mode()->isMobile()) {
+	if (A::mode()->isMobile()) {
 		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network', 20);
 	} else {
 		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_network', 40);
@@ -149,7 +149,7 @@ function community_content(App $a, $update = 0)
 		$itemspage_network = $a->force_max_items;
 	}
 
-	$pager = new Pager(DI::args()->getQueryString(), $itemspage_network);
+	$pager = new Pager(A::args()->getQueryString(), $itemspage_network);
 
 	$r = community_getitems($pager->getStart(), $pager->getItemsPerPage(), $content, $accounttype);
 
@@ -193,12 +193,12 @@ function community_content(App $a, $update = 0)
 		$o .= $pager->renderMinimal(count($r));
 	}
 
-	if (empty(DI::page()['aside'])) {
-		DI::page()['aside'] = '';
+	if (empty(A::page()['aside'])) {
+		A::page()['aside'] = '';
 	}
 
 	if (Feature::isEnabled(local_user(), 'trending_tags')) {
-		DI::page()['aside'] .= TrendingTags::getHTML($content);
+		A::page()['aside'] .= TrendingTags::getHTML($content);
 	}
 
 	$t = Renderer::getMarkupTemplate("community.tpl");

@@ -3,8 +3,8 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Registry\App;
 
 /**
  * Toggle pinned items
@@ -31,7 +31,7 @@ class Pinned extends BaseModule
 		$returnPath = $_REQUEST['return'] ?? '';
 		if (!empty($returnPath)) {
 			$rand = '_=' . time() . (strpos($returnPath, '?') ? '&' : '?') . 'rand';
-			DI::baseUrl()->redirect($returnPath . $rand);
+			App::baseUrl()->redirect($returnPath . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

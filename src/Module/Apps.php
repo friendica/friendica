@@ -7,7 +7,7 @@ use Friendica\Content\Nav;
 use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\App;
 
 /**
  * Shows the App menu
@@ -18,7 +18,7 @@ class Apps extends BaseModule
 	{
 		$privateaddons = Config::get('config', 'private_addons');
 		if ($privateaddons === "1" && !local_user()) {
-			DI::baseUrl()->redirect();
+			App::baseUrl()->redirect();
 		}
 	}
 

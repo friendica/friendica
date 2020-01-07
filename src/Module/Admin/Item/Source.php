@@ -4,7 +4,7 @@ namespace Friendica\Module\Admin\Item;
 
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model;
 use Friendica\Module\BaseAdminModule;
 

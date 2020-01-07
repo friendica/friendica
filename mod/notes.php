@@ -8,9 +8,9 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
+use Friendica\Registry\App as A;
 
 function notes_init(App $a)
 {
@@ -54,7 +54,7 @@ function notes_content(App $a, $update = false)
 	$condition = ['uid' => local_user(), 'post-type' => Item::PT_PERSONAL_NOTE, 'gravity' => GRAVITY_PARENT,
 		'contact-id'=> $a->contact['id']];
 
-	$pager = new Pager(DI::args()->getQueryString(), 40);
+	$pager = new Pager(A::args()->getQueryString(), 40);
 
 	$params = ['order' => ['created' => true],
 		'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];

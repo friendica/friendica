@@ -21,13 +21,14 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
 use Friendica\Model\Term;
 use Friendica\Module\Security\Login;
+use Friendica\Registry\App as A;
+use Friendica\Registry\Util;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -54,7 +55,7 @@ function network_init(App $a)
 
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if (DI::dtFormat()->isYearMonth($a->argv[$x])) {
+			if (Util::dtFormat()->isYearMonth($a->argv[$x])) {
 				$is_a_date_query = true;
 				break;
 			}
@@ -63,7 +64,7 @@ function network_init(App $a)
 
 	// convert query string to array. remove friendica args
 	$query_array = [];
-	parse_str(parse_url(DI::args()->getQueryString(), PHP_URL_QUERY), $query_array);
+	parse_str(parse_url(A::args()->getQueryString(), PHP_URL_QUERY), $query_array);
 
 	// fetch last used network view and redirect if needed
 	if (!$is_a_date_query) {
@@ -128,20 +129,20 @@ function network_init(App $a)
 
 			$redir_url = ($net_queries ? $net_baseurl . '?' . $net_queries : $net_baseurl);
 
-			DI::baseUrl()->redirect($redir_url);
+			A::baseUrl()->redirect($redir_url);
 		}
 	}
 
-	if (empty(DI::page()['aside'])) {
-		DI::page()['aside'] = '';
+	if (empty(A::page()['aside'])) {
+		A::page()['aside'] = '';
 	}
 
-	DI::page()['aside'] .= Group::sidebarWidget('network/0', 'network', 'standard', $group_id);
-	DI::page()['aside'] .= ForumManager::widget(local_user(), $cid);
-	DI::page()['aside'] .= Widget::postedByYear('network', local_user(), false);
-	DI::page()['aside'] .= Widget::networks('network', $_GET['nets'] ?? '');
-	DI::page()['aside'] .= Widget\SavedSearches::getHTML(DI::args()->getQueryString());
-	DI::page()['aside'] .= Widget::fileAs('network', $_GET['file'] ?? '');
+	A::page()['aside'] .= Group::sidebarWidget('network/0', 'network', 'standard', $group_id);
+	A::page()['aside'] .= ForumManager::widget(local_user(), $cid);
+	A::page()['aside'] .= Widget::postedByYear('network', local_user(), false);
+	A::page()['aside'] .= Widget::networks('network', $_GET['nets'] ?? '');
+	A::page()['aside'] .= Widget\SavedSearches::getHTML(A::args()->getQueryString());
+	A::page()['aside'] .= Widget::fileAs('network', $_GET['file'] ?? '');
 }
 
 /**
@@ -228,7 +229,7 @@ function networkPager(App $a, Pager $pager, $update)
 
 	//  check if we serve a mobile device and get the user settings
 	//  accordingly
-	if (DI::mode()->isMobile()) {
+	if (A::mode()->isMobile()) {
 		$itemspage_network = PConfig::get(local_user(), 'system', 'itemspage_mobile_network');
 		$itemspage_network = ((intval($itemspage_network)) ? $itemspage_network : 20);
 	} else {
@@ -309,7 +310,7 @@ function network_content(App $a, $update = 0, $parent = 0)
 	}
 
 	/// @TODO Is this really necessary? $a is already available to hooks
-	$arr = ['query' => DI::args()->getQueryString()];
+	$arr = ['query' => A::args()->getQueryString()];
 	Hook::callAll('network_content_init', $arr);
 
 	$flat_mode = false;
@@ -374,7 +375,7 @@ function networkFlatView(App $a, $update = 0)
 			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
 			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
-			'acl' => ACL::getFullSelectorHTML(DI::page(), $a->user, true),
+			'acl' => ACL::getFullSelectorHTML(A::page(), $a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -389,7 +390,7 @@ function networkFlatView(App $a, $update = 0)
 		}
 	}
 
-	$pager = new Pager(DI::args()->getQueryString());
+	$pager = new Pager(A::args()->getQueryString());
 
 	networkPager($a, $pager, $update);
 
@@ -464,7 +465,7 @@ function networkThreadedView(App $a, $update, $parent)
 
 	if ($a->argc > 1) {
 		for ($x = 1; $x < $a->argc; $x ++) {
-			if (DI::dtFormat()->isYearMonth($a->argv[$x])) {
+			if (Util::dtFormat()->isYearMonth($a->argv[$x])) {
 				if ($datequery) {
 					$datequery2 = Strings::escapeHtml($a->argv[$x]);
 				} else {
@@ -548,7 +549,7 @@ function networkThreadedView(App $a, $update, $parent)
 			(strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) ||
 			strlen($a->user['deny_cid']) || strlen($a->user['deny_gid']))) ? 'lock' : 'unlock'),
 			'default_perms' => ACL::getDefaultUserPermissions($a->user),
-			'acl' => ACL::getFullSelectorHTML(DI::page(), $a->user, true, $default_permissions),
+			'acl' => ACL::getFullSelectorHTML(A::page(), $a->user, true, $default_permissions),
 			'bang' => (($gid || $cid || $nets) ? '!' : ''),
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -587,7 +588,7 @@ function networkThreadedView(App $a, $update, $parent)
 				exit();
 			}
 			notice(L10n::t('No such group') . EOL);
-			DI::baseUrl()->redirect('network/0');
+			A::baseUrl()->redirect('network/0');
 			// NOTREACHED
 		}
 
@@ -641,7 +642,7 @@ function networkThreadedView(App $a, $update, $parent)
 			}
 		} else {
 			notice(L10n::t('Invalid contact.') . EOL);
-			DI::baseUrl()->redirect('network');
+			A::baseUrl()->redirect('network');
 			// NOTREACHED
 		}
 	}
@@ -681,7 +682,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$sql_range = '';
 	}
 
-	$pager = new Pager(DI::args()->getQueryString());
+	$pager = new Pager(A::args()->getQueryString());
 
 	$pager_sql = networkPager($a, $pager, $update);
 
@@ -869,7 +870,7 @@ function networkThreadedView(App $a, $update, $parent)
 		$date_offset = $_GET['offset'];
 	}
 
-	$query_string = DI::args()->getQueryString();
+	$query_string = A::args()->getQueryString();
 	if ($date_offset && !preg_match('/[?&].offset=/', $query_string)) {
 		$query_string .= '&offset=' . urlencode($date_offset);
 	}
@@ -914,7 +915,7 @@ function network_tabs(App $a)
 		$all_active = 'active';
 	}
 
-	$cmd = DI::args()->getCommand();
+	$cmd = A::args()->getCommand();
 
 	// tabs
 	$tabs = [

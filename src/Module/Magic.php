@@ -8,8 +8,9 @@ use Friendica\BaseModule;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
+use Friendica\Registry\App;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -49,7 +50,7 @@ class Magic extends BaseModule
 		$contact = DBA::selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
 
 		// Redirect if the contact is already authenticated on this site.
-		if (!empty($a->contact) && array_key_exists('id', $a->contact) && strpos($contact['nurl'], Strings::normaliseLink(DI::baseUrl()->get())) !== false) {
+		if (!empty($a->contact) && array_key_exists('id', $a->contact) && strpos($contact['nurl'], Strings::normaliseLink(App::baseUrl()->get())) !== false) {
 			if ($test) {
 				$ret['success'] = true;
 				$ret['message'] .= 'Local site - you are already authenticated.' . EOL;
@@ -80,7 +81,7 @@ class Magic extends BaseModule
 				$headers = HTTPSignature::createSig(
 					$headers,
 					$user['prvkey'],
-					'acct:' . $user['nickname'] . '@' . DI::baseUrl()->getHostname() . (DI::baseUrl()->getUrlPath() ? '/' . DI::baseUrl()->getUrlPath() : '')
+					'acct:' . $user['nickname'] . '@' . App::baseUrl()->getHostname() . (App::baseUrl()->getUrlPath() ? '/' . App::baseUrl()->getUrlPath() : '')
 				);
 
 				// Try to get an authentication token from the other instance.

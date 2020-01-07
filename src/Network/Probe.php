@@ -16,13 +16,13 @@ use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Protocol\ActivityNamespace;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
+use Friendica\Registry\App;
 use Friendica\Util\Crypto;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -76,7 +76,7 @@ class Probe
 	 */
 	private static function ownHost($host)
 	{
-		$own_host = DI::baseUrl()->getHostname();
+		$own_host = App::baseUrl()->getHostname();
 
 		$parts = parse_url($host);
 
@@ -372,7 +372,7 @@ class Probe
 		if (!empty($data['photo']) && !empty($data['baseurl'])) {
 			$data['baseurl'] = Network::getUrlMatch(Strings::normaliseLink($data['baseurl']), Strings::normaliseLink($data['photo']));
 		} elseif (empty($data['photo'])) {
-			$data['photo'] = DI::baseUrl() . '/images/person-300.jpg';
+			$data['photo'] = App::baseUrl() . '/images/person-300.jpg';
 		}
 
 		if (empty($data['name'])) {

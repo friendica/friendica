@@ -4,8 +4,9 @@ namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 use Friendica\Protocol\Salmon;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Crypto;
 
 /**
@@ -16,7 +17,7 @@ class HostMeta extends BaseModule
 {
 	public static function rawContent(array $parameters = [])
 	{
-		$config = DI::config();
+		$config = Core::config();
 
 		header('Content-type: text/xml');
 
@@ -29,9 +30,9 @@ class HostMeta extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('xrd_host.tpl');
 		echo Renderer::replaceMacros($tpl, [
-			'$zhost'  => DI::baseUrl()->getHostname(),
-			'$zroot'  => DI::baseUrl()->get(),
-			'$domain' => DI::baseUrl()->get(),
+			'$zhost'  => App::baseUrl()->getHostname(),
+			'$zroot'  => App::baseUrl()->get(),
+			'$domain' => App::baseUrl()->get(),
 			'$bigkey' => Salmon::salmonKey($config->get('system', 'site_pubkey'))
 		]);
 

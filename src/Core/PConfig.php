@@ -8,7 +8,7 @@
  */
 namespace Friendica\Core;
 
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * @brief Management of user configuration storage
@@ -29,7 +29,7 @@ class PConfig
 	 */
 	public static function load(int $uid, string $cat)
 	{
-		DI::pConfig()->load($uid, $cat);
+		Core::pConfig()->load($uid, $cat);
 	}
 
 	/**
@@ -46,7 +46,7 @@ class PConfig
 	 */
 	public static function get(int $uid, string $cat, string $key, $default_value = null, bool $refresh = false)
 	{
-		return DI::pConfig()->get($uid, $cat, $key, $default_value, $refresh);
+		return Core::pConfig()->get($uid, $cat, $key, $default_value, $refresh);
 	}
 
 	/**
@@ -61,7 +61,7 @@ class PConfig
 	 */
 	public static function set(int $uid, string $cat, string $key, $value)
 	{
-		return DI::pConfig()->set($uid, $cat, $key, $value);
+		return Core::pConfig()->set($uid, $cat, $key, $value);
 	}
 
 	/**
@@ -75,6 +75,6 @@ class PConfig
 	 */
 	public static function delete(int $uid, string $cat, string $key)
 	{
-		return DI::pConfig()->delete($uid, $cat, $key);
+		return Core::pConfig()->delete($uid, $cat, $key);
 	}
 }

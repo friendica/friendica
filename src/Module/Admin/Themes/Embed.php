@@ -4,8 +4,9 @@ namespace Friendica\Module\Admin\Themes;
 
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Module\BaseAdminModule;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 class Embed extends BaseAdminModule
@@ -46,11 +47,11 @@ class Embed extends BaseAdminModule
 
 			info(L10n::t('Theme settings updated.'));
 
-			if (DI::mode()->isAjax()) {
+			if (App::mode()->isAjax()) {
 				return;
 			}
 
-			DI::baseUrl()->redirect('admin/themes/' . $theme . '/embed?mode=minimal');
+			App::baseUrl()->redirect('admin/themes/' . $theme . '/embed?mode=minimal');
 		}
 	}
 

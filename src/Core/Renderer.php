@@ -6,7 +6,9 @@
 namespace Friendica\Core;
 
 use Exception;
-use Friendica\DI;
+use Friendica\Registry\DI;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 use Friendica\Render\FriendicaSmarty;
 use Friendica\Render\ITemplateEngine;
 
@@ -63,7 +65,7 @@ class Renderer
 		$stamp1 = microtime(true);
 
 		// pass $baseurl to all templates if it isn't set
-		$vars = array_merge(['$baseurl' => DI::baseUrl()->get()], $vars);
+		$vars = array_merge(['$baseurl' => App::baseUrl()->get()], $vars);
 
 		$t = self::getTemplateEngine();
 
@@ -74,7 +76,7 @@ class Renderer
 			exit();
 		}
 
-		DI::profiler()->saveTimestamp($stamp1, "rendering", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "rendering", System::callstack());
 
 		return $output;
 	}
@@ -101,7 +103,7 @@ class Renderer
 			exit();
 		}
 
-		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 		return $template;
 	}

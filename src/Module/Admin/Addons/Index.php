@@ -5,8 +5,8 @@ namespace Friendica\Module\Admin\Addons;
 use Friendica\Core\Addon;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 use Friendica\Module\BaseAdminModule;
+use Friendica\Registry\App;
 
 class Index extends BaseAdminModule
 {
@@ -39,7 +39,7 @@ class Index extends BaseAdminModule
 
 			}
 
-			DI::baseUrl()->redirect('admin/addons');
+			App::baseUrl()->redirect('admin/addons');
 		}
 
 		$addons = Addon::getAvailableList();
@@ -50,7 +50,7 @@ class Index extends BaseAdminModule
 			'$page' => L10n::t('Addons'),
 			'$submit' => L10n::t('Save Settings'),
 			'$reload' => L10n::t('Reload active addons'),
-			'$baseurl' => DI::baseUrl()->get(true),
+			'$baseurl' => App::baseUrl()->get(true),
 			'$function' => 'addons',
 			'$addons' => $addons,
 			'$pcount' => count($addons),

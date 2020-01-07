@@ -17,13 +17,15 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Photo;
 use Friendica\Network\Probe;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 use Friendica\Util\Images;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
@@ -445,7 +447,7 @@ class BBCode
 			foreach ($matches as $mtch) {
 				Logger::log('scale_external_image: ' . $mtch[1]);
 
-				$hostname = str_replace('www.', '', substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3));
+				$hostname = str_replace('www.', '', substr(App::baseUrl(), strpos(App::baseUrl(), '://') + 3));
 				if (stristr($mtch[1], $hostname)) {
 					continue;
 				}
@@ -1083,7 +1085,7 @@ class BBCode
 			@curl_exec($ch);
 			$curl_info = @curl_getinfo($ch);
 
-			DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+			Util::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 			if (substr($curl_info['content_type'], 0, 6) == 'image/') {
 				$text = "[url=" . $match[1] . ']' . $match[1] . "[/url]";
@@ -1131,7 +1133,7 @@ class BBCode
 		$a = DI::app();
 
 		// When the picture link is the own photo path then we can avoid fetching the link
-		$own_photo_url = preg_quote(Strings::normaliseLink(DI::baseUrl()->get()) . '/photos/');
+		$own_photo_url = preg_quote(Strings::normaliseLink(App::baseUrl()->get()) . '/photos/');
 		if (preg_match('|' . $own_photo_url . '.*?/image/|', Strings::normaliseLink($match[1]))) {
 			if (!empty($match[3])) {
 				$text = '[img=' . str_replace('-1.', '-0.', $match[2]) . ']' . $match[3] . '[/img]';
@@ -1157,7 +1159,7 @@ class BBCode
 		@curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "network", System::callstack());
 
 		// if its a link to a picture then embed this picture
 		if (substr($curl_info['content_type'], 0, 6) == 'image/') {
@@ -1605,8 +1607,8 @@ class BBCode
 		$text = preg_replace("/\[img\](.*?)\[\/img\]/ism", '<img src="$1" alt="' . L10n::t('Image/photo') . '" />', $text);
 		$text = preg_replace("/\[zmg\](.*?)\[\/zmg\]/ism", '<img src="$1" alt="' . L10n::t('Image/photo') . '" />', $text);
 
-		$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br/><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . L10n::t('Encrypted content') . '" title="' . L10n::t('Encrypted content') . '" /><br />', $text);
-		$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br/><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . L10n::t('Encrypted content') . '" title="' . '$1' . ' ' . L10n::t('Encrypted content') . '" /><br />', $text);
+		$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br/><img src="' . App::baseUrl() . '/images/lock_icon.gif" alt="' . L10n::t('Encrypted content') . '" title="' . L10n::t('Encrypted content') . '" /><br />', $text);
+		$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br/><img src="' . App::baseUrl() . '/images/lock_icon.gif" alt="' . L10n::t('Encrypted content') . '" title="' . '$1' . ' ' . L10n::t('Encrypted content') . '" /><br />', $text);
 		//$Text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism", '<br/><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . L10n::t('Encrypted content') . '" title="' . '$1' . ' ' . L10n::t('Encrypted content') . '" /><br />', $Text);
 
 		// Simplify "video" element
@@ -1757,21 +1759,21 @@ class BBCode
 		$text = preg_replace_callback(
 			"&\[url=/?posts/([^\[\]]*)\](.*)\[\/url\]&Usi",
 			function ($match) {
-				return "[url=" . DI::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
+				return "[url=" . App::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
 			}, $text
 		);
 
 		$text = preg_replace_callback(
 			"&\[url=/people\?q\=(.*)\](.*)\[\/url\]&Usi",
 			function ($match) {
-				return "[url=" . DI::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
+				return "[url=" . App::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
 			}, $text
 		);
 
 		// Server independent link to posts and comments
 		// See issue: https://github.com/diaspora/diaspora_federation/issues/75
 		$expression = "=diaspora://.*?/post/([0-9A-Za-z\-_@.:]{15,254}[0-9A-Za-z])=ism";
-		$text = preg_replace($expression, DI::baseUrl()."/display/$1", $text);
+		$text = preg_replace($expression, App::baseUrl() . "/display/$1", $text);
 
 		/* Tag conversion
 		 * Supports:
@@ -1780,7 +1782,7 @@ class BBCode
 		 */
 		$text = preg_replace_callback("/(?:#\[url\=[^\[\]]*\]|\[url\=[^\[\]]*\]#)(.*?)\[\/url\]/ism", function($matches) {
 			return '#<a href="'
-				. DI::baseUrl()	. '/search?tag=' . rawurlencode($matches[1])
+			       . App::baseUrl() . '/search?tag=' . rawurlencode($matches[1])
 				. '" class="tag" rel="tag" title="' . XML::escape($matches[1]) . '">'
 				. XML::escape($matches[1])
 				. '</a>';
@@ -1788,7 +1790,7 @@ class BBCode
 
 		// We need no target="_blank" for local links
 		// convert links start with DI::baseUrl() as local link without the target="_blank" attribute
-		$escapedBaseUrl = preg_quote(DI::baseUrl(), '/');
+		$escapedBaseUrl = preg_quote(App::baseUrl(), '/');
 		$text = preg_replace("/\[url\](".$escapedBaseUrl.".*?)\[\/url\]/ism", '<a href="$1">$1</a>', $text);
 		$text = preg_replace("/\[url\=(".$escapedBaseUrl.".*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
 
@@ -1802,7 +1804,7 @@ class BBCode
 		// we may need to restrict this further if it picks up too many strays
 		// link acct:user@host to a webfinger profile redirector
 
-		$text = preg_replace('/acct:([^@]+)@((?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63})/', '<a href="' . DI::baseUrl() . '/acctlink?addr=$1@$2" target="extlink">acct:$1@$2</a>', $text);
+		$text = preg_replace('/acct:([^@]+)@((?!\-)(?:[a-zA-Z\d\-]{0,62}[a-zA-Z\d]\.){1,126}(?!\d+)[a-zA-Z\d]{1,63})/', '<a href="' . App::baseUrl() . '/acctlink?addr=$1@$2" target="extlink">acct:$1@$2</a>', $text);
 
 		// Perform MAIL Search
 		$text = preg_replace("/\[mail\](.*?)\[\/mail\]/", '<a href="mailto:$1">$1</a>', $text);
@@ -2040,7 +2042,7 @@ class BBCode
 		// Now convert HTML to Markdown
 		$text = HTML::toMarkdown($text);
 
-		DI::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "parser", System::callstack());
 
 		// Libertree has a problem with escaped hashtags.
 		$text = str_replace(['\#'], ['#'], $text);

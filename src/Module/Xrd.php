@@ -6,11 +6,12 @@ use Friendica\BaseModule;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityNamespace;
 use Friendica\Protocol\Salmon;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 /**
@@ -75,9 +76,9 @@ class Xrd extends BaseModule
 		}
 
 		if ($mode == 'xml') {
-			self::printXML($alias, DI::baseUrl()->get(), $user, $owner, $avatar);
+			self::printXML($alias, App::baseUrl()->get(), $user, $owner, $avatar);
 		} else {
-			self::printJSON($alias, DI::baseUrl()->get(), $owner, $avatar);
+			self::printJSON($alias, App::baseUrl()->get(), $owner, $avatar);
 		}
 	}
 

@@ -18,9 +18,10 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
+use Friendica\Registry\App as A;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 
@@ -33,17 +34,17 @@ function vier_init(App $a)
 	if (!empty($a->argv[0]) && ($a->argv[0] . ($a->argv[1] ?? '')) === ('profile' . $a->user['nickname']) || $a->argv[0] === 'network' && local_user()) {
 		vier_community_info();
 
-		DI::page()['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
+		A::page()['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
 	}
 
-	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
-		DI::page()['htmlhead'] .= '<meta name=viewport content="width=device-width, initial-scale=1">'."\n";
-		DI::page()['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="view/theme/vier/mobile.css" media="screen"/>'."\n";
+	if (A::mode()->isMobile() || A::mode()->isMobile()) {
+		A::page()['htmlhead'] .= '<meta name=viewport content="width=device-width, initial-scale=1">' . "\n";
+		A::page()['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="view/theme/vier/mobile.css" media="screen"/>' . "\n";
 	}
 	/// @todo deactivated since it doesn't work with desktop browsers at the moment
 	//DI::page()['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="view/theme/vier/mobile.css" media="screen and (max-width: 1000px)"/>'."\n";
 
-	DI::page()['htmlhead'] .= <<< EOT
+	A::page()['htmlhead'] .= <<< EOT
 <link rel='stylesheet' type='text/css' href='view/theme/vier/narrow.css' media='screen and (max-width: 1100px)' />
 <script type="text/javascript">
 function showThread(id) {
@@ -64,8 +65,8 @@ function cmtBbClose(id) {
 </script>
 EOT;
 
-	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
-		DI::page()['htmlhead'] .= <<< EOT
+	if (A::mode()->isMobile() || A::mode()->isMobile()) {
+		A::page()['htmlhead'] .= <<< EOT
 <script>
 	$(document).ready(function() {
 		$(".mobile-aside-toggle a").click(function(e){
@@ -82,9 +83,9 @@ EOT;
 
 	// Hide the left menu bar
 	/// @TODO maybe move this static array out where it should belong?
-	if (empty(DI::page()['aside']) && in_array($a->argv[0], ["community", "events", "help", "delegation", "notifications",
+	if (empty(A::page()['aside']) && in_array($a->argv[0], ["community", "events", "help", "delegation", "notifications",
 			"probe", "webfinger", "login", "invite", "credits"])) {
-		DI::page()['htmlhead'] .= "<link rel='stylesheet' href='view/theme/vier/hide.css' />";
+		A::page()['htmlhead'] .= "<link rel='stylesheet' href='view/theme/vier/hide.css' />";
 	}
 }
 
@@ -117,7 +118,7 @@ function vier_community_info()
 	$show_lastusers  = get_vier_config("show_lastusers", 1);
 
 	// get_baseurl
-	$url = DI::baseUrl();
+	$url = A::baseUrl();
 	$aside['$url'] = $url;
 
 	// comunity_profiles
@@ -164,7 +165,7 @@ function vier_community_info()
 				$entry = Renderer::replaceMacros($tpl, [
 					'$id' => $rr['id'],
 					'$profile_link' => $profile_link,
-					'$photo' => DI::baseUrl()->remove($rr['thumb']),
+					'$photo' => A::baseUrl()->remove($rr['thumb']),
 					'$alt_text' => $rr['name']]);
 				$aside['$lastusers_items'][] = $entry;
 			}
@@ -213,7 +214,7 @@ function vier_community_info()
 					'name'         => $contact['name'],
 					'cid'          => $contact['id'],
 					'selected'     => $selected,
-					'micro'        => DI::baseUrl()->remove(ProxyUtils::proxifyUrl($contact['micro'], false, ProxyUtils::SIZE_MICRO)),
+					'micro'        => A::baseUrl()->remove(ProxyUtils::proxifyUrl($contact['micro'], false, ProxyUtils::SIZE_MICRO)),
 					'id'           => ++$id,
 				];
 				$entries[] = $entry;
@@ -364,6 +365,6 @@ function vier_community_info()
 	//end connectable services
 
 	//print right_aside
-	$tpl = Renderer::getMarkupTemplate('communityhome.tpl');
-	DI::page()['right_aside'] = Renderer::replaceMacros($tpl, $aside);
+	$tpl                            = Renderer::getMarkupTemplate('communityhome.tpl');
+	A::page()['right_aside'] = Renderer::replaceMacros($tpl, $aside);
 }

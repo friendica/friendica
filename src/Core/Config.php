@@ -8,7 +8,7 @@
  */
 namespace Friendica\Core;
 
-use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * @brief Arbitrary system configuration storage
@@ -28,7 +28,7 @@ class Config
 	 */
 	public static function load($cat = "config")
 	{
-		DI::config()->load($cat);
+		Core::config()->load($cat);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Config
 	 */
 	public static function get($cat, $key, $default_value = null, $refresh = false)
 	{
-		return DI::config()->get($cat, $key, $default_value, $refresh);
+		return Core::config()->get($cat, $key, $default_value, $refresh);
 	}
 
 	/**
@@ -62,7 +62,7 @@ class Config
 	 */
 	public static function set($cat, $key, $value)
 	{
-		return DI::config()->set($cat, $key, $value);
+		return Core::config()->set($cat, $key, $value);
 	}
 
 	/**
@@ -75,6 +75,6 @@ class Config
 	 */
 	public static function delete($cat, $key)
 	{
-		return DI::config()->delete($cat, $key);
+		return Core::config()->delete($cat, $key);
 	}
 }

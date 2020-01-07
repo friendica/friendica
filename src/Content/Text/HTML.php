@@ -12,7 +12,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Config;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;

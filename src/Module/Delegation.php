@@ -8,10 +8,11 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\ForbiddenException;
+use Friendica\Registry\App;
 
 /**
  * Switches current user between delegates/parent user
@@ -80,7 +81,7 @@ class Delegation extends BaseModule
 
 		Session::clear();
 
-		DI::auth()->setForUser(DI::app(), $user, true, true);
+		App::auth()->setForUser(DI::app(), $user, true, true);
 
 		if ($limited_id) {
 			Session::set('submanage', $original_id);
@@ -89,7 +90,7 @@ class Delegation extends BaseModule
 		$ret = [];
 		Hook::callAll('home_init', $ret);
 
-		DI::baseUrl()->redirect('profile/' . DI::app()->user['nickname']);
+		App::baseUrl()->redirect('profile/' . DI::app()->user['nickname']);
 		// NOTREACHED
 	}
 

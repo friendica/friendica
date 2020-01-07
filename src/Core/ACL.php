@@ -8,9 +8,11 @@ namespace Friendica\Core;
 
 use Friendica\App\Page;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 
 /**
  * Handle ACL management and display
@@ -109,7 +111,7 @@ class ACL
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
 		// e.g. 'network_pre_contact_deny', 'profile_pre_contact_allow'
-		Hook::callAll(DI::module()->getName() . '_pre_' . $selname, $arr);
+		Hook::callAll(App::module()->getName() . '_pre_' . $selname, $arr);
 
 		if (DBA::isResult($contacts)) {
 			foreach ($contacts as $contact) {
@@ -127,7 +129,7 @@ class ACL
 
 		$o .= '</select>' . PHP_EOL;
 
-		Hook::callAll(DI::module()->getName() . '_post_' . $selname, $o);
+		Hook::callAll(App::module()->getName() . '_post_' . $selname, $o);
 
 		return $o;
 	}
@@ -175,7 +177,7 @@ class ACL
 		$arr = ['contact' => $contacts, 'entry' => $o];
 
 		// e.g. 'network_pre_contact_deny', 'profile_pre_contact_allow'
-		Hook::callAll(DI::module()->getName() . '_pre_' . $selname, $arr);
+		Hook::callAll(App::module()->getName() . '_pre_' . $selname, $arr);
 
 		$receiverlist = [];
 
@@ -201,7 +203,7 @@ class ACL
 			$o .= implode(', ', $receiverlist);
 		}
 
-		Hook::callAll(DI::module()->getName() . '_post_' . $selname, $o);
+		Hook::callAll(App::module()->getName() . '_post_' . $selname, $o);
 
 		return $o;
 	}
@@ -215,7 +217,7 @@ class ACL
 	 */
 	public static function getDefaultUserPermissions(array $user = null)
 	{
-		$aclFormatter = DI::aclFormatter();
+		$aclFormatter = Util::aclFormatter();
 
 		return [
 			'allow_cid' => Contact::pruneUnavailable($aclFormatter->expand($user['allow_cid'] ?? '')),

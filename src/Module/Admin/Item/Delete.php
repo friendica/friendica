@@ -4,9 +4,9 @@ namespace Friendica\Module\Admin\Item;
 
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Module\BaseAdminModule;
+use Friendica\Registry\App;
 use Friendica\Util\Strings;
 
 class Delete extends BaseAdminModule
@@ -34,7 +34,7 @@ class Delete extends BaseAdminModule
 		}
 
 		info(L10n::t('Item marked for deletion.') . EOL);
-		DI::baseUrl()->redirect('admin/item/delete');
+		App::baseUrl()->redirect('admin/item/delete');
 	}
 
 	public static function content(array $parameters = [])

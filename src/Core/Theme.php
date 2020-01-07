@@ -6,8 +6,10 @@
 
 namespace Friendica\Core;
 
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Model\Profile;
+use Friendica\Registry\App;
+use Friendica\Registry\Util;
 use Friendica\Util\Strings;
 
 require_once 'boot.php';
@@ -75,7 +77,7 @@ class Theme
 
 		$stamp1 = microtime(true);
 		$theme_file = file_get_contents("view/theme/$theme/theme.php");
-		DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
+		Util::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 		$result = preg_match("|/\*.*\*/|msU", $theme_file, $matches);
 
@@ -125,10 +127,10 @@ class Theme
 		$exts = ['.png', '.jpg'];
 		foreach ($exts as $ext) {
 			if (file_exists('view/theme/' . $theme . '/screenshot' . $ext)) {
-				return DI::baseUrl() . '/view/theme/' . $theme . '/screenshot' . $ext;
+				return App::baseUrl() . '/view/theme/' . $theme . '/screenshot' . $ext;
 			}
 		}
-		return DI::baseUrl() . '/images/blank.png';
+		return App::baseUrl() . '/images/blank.png';
 	}
 
 	public static function uninstall($theme)

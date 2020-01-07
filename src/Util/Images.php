@@ -4,7 +4,7 @@ namespace Friendica\Util;
 
 use Friendica\Core\Logger;
 use Friendica\Core\System;
-use Friendica\DI;
+use Friendica\Registry\Util;
 use Imagick;
 
 /**
@@ -164,7 +164,7 @@ class Images
 
 				$stamp1 = microtime(true);
 				file_put_contents($tempfile, $img_str);
-				DI::profiler()->saveTimestamp($stamp1, "file", System::callstack());
+				Util::profiler()->saveTimestamp($stamp1, "file", System::callstack());
 
 				$data = getimagesize($tempfile);
 				unlink($tempfile);

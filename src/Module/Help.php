@@ -6,8 +6,10 @@ use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\Markdown;
 use Friendica\Core\L10n;
-use Friendica\DI;
+use Friendica\Registry\DI;
 use Friendica\Network\HTTPException;
+use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -23,7 +25,7 @@ class Help extends BaseModule
 		$filename = '';
 
 		$a = DI::app();
-		$config = DI::config();
+		$config = Core::config();
 		$lang = $config->get('system', 'language');
 
 		// @TODO: Replace with parameter from router
@@ -36,21 +38,21 @@ class Help extends BaseModule
 					$path .= '/';
 				}
 
-				$path .= DI::args()->get($x);
+				$path .= App::args()->get($x);
 			}
-			$title = basename($path);
-			$filename = $path;
-			$text = self::loadDocFile('doc/' . $path . '.md', $lang);
-			DI::page()['title'] = L10n::t('Help:') . ' ' . str_replace('-', ' ', Strings::escapeTags($title));
+			$title               = basename($path);
+			$filename            = $path;
+			$text                = self::loadDocFile('doc/' . $path . '.md', $lang);
+			App::page()['title'] = L10n::t('Help:') . ' ' . str_replace('-', ' ', Strings::escapeTags($title));
 		}
 
 		$home = self::loadDocFile('doc/Home.md', $lang);
 		if (!$text) {
-			$text = $home;
-			$filename = "Home";
-			DI::page()['title'] = L10n::t('Help');
+			$text                = $home;
+			$filename            = "Home";
+			App::page()['title'] = L10n::t('Help');
 		} else {
-			DI::page()['aside'] = Markdown::convert($home, false);
+			App::page()['aside'] = Markdown::convert($home, false);
 		}
 
 		if (!strlen($text)) {
@@ -87,7 +89,7 @@ class Help extends BaseModule
 
 						$idNum[$level] ++;
 
-						$href = DI::baseUrl()->get() . "/help/{$filename}#{$anchor}";
+						$href = App::baseUrl()->get() . "/help/{$filename}#{$anchor}";
 						$toc .= "<li><a href=\"{$href}\">" . strip_tags($line) . "</a></li>";
 						$id = implode("_", array_slice($idNum, 1, $level));
 						$line = "<a name=\"{$id}\"></a>" . $line;
@@ -104,7 +106,7 @@ class Help extends BaseModule
 
 			$html = implode("\n", $lines);
 
-			DI::page()['aside'] = '<div class="help-aside-wrapper widget"><div id="toc-wrapper">' . $toc . '</div>' . DI::page()['aside'] . '</div>';
+			App::page()['aside'] = '<div class="help-aside-wrapper widget"><div id="toc-wrapper">' . $toc . '</div>' . App::page()['aside'] . '</div>';
 		}
 
 		return $html;
