@@ -1,10 +1,6 @@
-<span id="{{$type}}-sidebar-inflated" class="widget fakelink" style="display: block;" onclick="openClose('{{$type}}-sidebar'); openClose('{{$type}}-sidebar-inflated');">
+
+<div id="{{$type}}-sidebar" class="widget">
 	<h3>{{$title}}</h3>
-</span>
-<div id="{{$type}}-sidebar" class="widget" style="display: none;">
-	<span class="fakelink" onclick="openClose('{{$type}}-sidebar'); openClose('{{$type}}-sidebar-inflated');">
-		<h3>{{$title}}</h3>
-	</span>
 	<div id="{{$type}}-desc">{{$desc nofilter}}</div>
 	<ul role="menu" class="{{$type}}-ul">
 		<li role="menuitem" {{if !$selected}}class="selected"{{/if}}><a href="{{$base}}" class="{{$type}}-link{{if !$selected}} {{$type}}-selected{{/if}} {{$type}}-all">{{$all_label}}</a></li>
