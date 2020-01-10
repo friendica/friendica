@@ -21,6 +21,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
@@ -587,7 +588,7 @@ class Profile
 		$bd_short = L10n::t('F d');
 
 		$cachekey = 'get_birthdays:' . local_user();
-		$r = DI::cache()->get($cachekey);
+		$r = Core::cache()->get($cachekey);
 		if (is_null($r)) {
 			$s = DBA::p(
 				"SELECT `event`.*, `event`.`id` AS `eid`, `contact`.* FROM `event`
@@ -609,7 +610,7 @@ class Profile
 			);
 			if (DBA::isResult($s)) {
 				$r = DBA::toArray($s);
-				DI::cache()->set($cachekey, $r, Cache::HOUR);
+				Core::cache()->set($cachekey, $r, Cache::HOUR);
 			}
 		}
 
@@ -1067,11 +1068,11 @@ class Profile
 
 		// Avoid endless loops
 		$cachekey = 'zrlInit:' . $my_url;
-		if (DI::cache()->get($cachekey)) {
+		if (Core::cache()->get($cachekey)) {
 			Logger::log('URL ' . $my_url . ' already tried to authenticate.', Logger::DEBUG);
 			return;
 		} else {
-			DI::cache()->set($cachekey, true, Cache::MINUTE);
+			Core::cache()->set($cachekey, true, Cache::MINUTE);
 		}
 
 		Logger::log('Not authenticated. Invoking reverse magic-auth for ' . $my_url, Logger::DEBUG);

@@ -710,7 +710,7 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Hook::callAll('logged_in', $a->user);
     
-### src/Core/StorageManager
+### src/Repository/StorageManager
 
     Hook::callAll('storage_instance', $data);
 

@@ -3,7 +3,7 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\Core\StorageManager;
+use Friendica\Repository\Storage;
 
 /**
  * @brief tool to manage storage backend and stored data from CLI
@@ -13,13 +13,13 @@ class Storage extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var StorageManager */
+	/** @var Storage */
 	private $storageManager;
 
 	/**
-	 * @param StorageManager $storageManager
+	 * @param Storage $storageManager
 	 */
-	public function __construct(StorageManager $storageManager, array $argv = [])
+	public function __construct(Storage $storageManager, array $argv = [])
 	{
 		parent::__construct($argv);
 
@@ -113,7 +113,7 @@ HELP;
 		}
 
 		$name = $this->args[1];
-		$class = $this->storageManager->getByName($name);
+		$class = $this->storageManager->selectFirst(['name' => $name]);
 
 		if ($class === '') {
 			$this->out($name . ' is not a registered backend.');

@@ -8,6 +8,7 @@ use Friendica\Core\Cache\Cache;
 use Friendica\Core\Logger;
 use Exception;
 use Friendica\DI;
+use Friendica\Registry\Core;
 
 /**
  * @brief This class contain methods to work with JsonLD data
@@ -40,13 +41,13 @@ class JsonLD
 			exit();
 		}
 
-		$result = DI::cache()->get('documentLoader:' . $url);
+		$result = Core::cache()->get('documentLoader:' . $url);
 		if (!is_null($result)) {
 			return $result;
 		}
 
 		$data = jsonld_default_document_loader($url);
-		DI::cache()->set('documentLoader:' . $url, $data, Cache::DAY);
+		Core::cache()->set('documentLoader:' . $url, $data, Cache::DAY);
 		return $data;
 	}
 

@@ -8,6 +8,7 @@ use Friendica\Core\Cache\Cache;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Strings;
 
 /**
@@ -57,7 +58,7 @@ class Term
 	 */
 	public static function getGlobalTrendingHashtags(int $period, $limit = 10)
 	{
-		$tags = DI::cache()->get('global_trending_tags');
+		$tags = Core::cache()->get('global_trending_tags');
 
 		if (!$tags) {
 			$tagsStmt = DBA::p("SELECT t.`term`, COUNT(*) AS `score`
@@ -84,7 +85,7 @@ class Term
 
 			if (DBA::isResult($tagsStmt)) {
 				$tags = DBA::toArray($tagsStmt);
-				DI::cache()->set('global_trending_tags', $tags, Cache::HOUR);
+				Core::cache()->set('global_trending_tags', $tags, Cache::HOUR);
 			}
 		}
 
@@ -100,7 +101,7 @@ class Term
 	 */
 	public static function getLocalTrendingHashtags(int $period, $limit = 10)
 	{
-		$tags = DI::cache()->get('local_trending_tags');
+		$tags = Core::cache()->get('local_trending_tags');
 
 		if (!$tags) {
 			$tagsStmt = DBA::p("SELECT t.`term`, COUNT(*) AS `score`
@@ -129,7 +130,7 @@ class Term
 
 			if (DBA::isResult($tagsStmt)) {
 				$tags = DBA::toArray($tagsStmt);
-				DI::cache()->set('local_trending_tags', $tags, Cache::HOUR);
+				Core::cache()->set('local_trending_tags', $tags, Cache::HOUR);
 			}
 		}
 

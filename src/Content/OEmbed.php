@@ -16,6 +16,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Registry\App;
 use Friendica\Util\DateTimeFormat;
@@ -67,7 +68,7 @@ class OEmbed
 		if (DBA::isResult($oembed_record)) {
 			$json_string = $oembed_record['content'];
 		} else {
-			$json_string = DI::cache()->get($cache_key);
+			$json_string = Core::cache()->get($cache_key);
 		}
 
 		// These media files should now be caught in bbcode.php
@@ -126,7 +127,7 @@ class OEmbed
 				$cache_ttl = Cache::FIVE_MINUTES;
 			}
 
-			DI::cache()->set($cache_key, $json_string, $cache_ttl);
+			Core::cache()->set($cache_key, $json_string, $cache_ttl);
 		}
 
 		if ($oembed->type == 'error') {

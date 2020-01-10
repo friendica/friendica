@@ -8,12 +8,12 @@ use Friendica\Core\Config\PreloadConfiguration;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Session\ISession;
-use Friendica\Core\StorageManager;
+use Friendica\Registry\DI;
+use Friendica\Repository\Storage;
 use Friendica\Database\Database;
-use Friendica\DI;
 use Friendica\Factory\ConfigFactory;
 use Friendica\Model\Config\Config;
-use Friendica\Model\Storage;
+use Friendica\Model\Storage as S;
 use Friendica\Core\Session;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Friendica\Test\Util\SampleStorageBackend;
 
-class StorageManagerTest extends DatabaseTest
+class StorageTest extends DatabaseTest
 {
 	/** @var Database */
 	private $dba;
@@ -66,9 +66,9 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testInstance()
 	{
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertInstanceOf(StorageManager::class, $storageManager);
+		$this->assertInstanceOf(Storage::class, $storageManager);
 	}
 
 	public function dataStorages()
@@ -81,21 +81,21 @@ class StorageManagerTest extends DatabaseTest
 				'userBackend' => false,
 			],
 			'database'       => [
-				'name'        => Storage\Database::NAME,
-				'assert'      => Storage\Database::class,
-				'assertName'  => Storage\Database::NAME,
+				'name'        => S\Database::NAME,
+				'assert'      => S\Database::class,
+				'assertName'  => S\Database::NAME,
 				'userBackend' => true,
 			],
 			'filesystem'     => [
-				'name'        => Storage\Filesystem::NAME,
-				'assert'      => Storage\Filesystem::class,
-				'assertName'  => Storage\Filesystem::NAME,
+				'name'        => S\Filesystem::NAME,
+				'assert'      => S\Filesystem::class,
+				'assertName'  => S\Filesystem::NAME,
 				'userBackend' => true,
 			],
 			'systemresource' => [
-				'name'        => Storage\SystemResource::NAME,
-				'assert'      => Storage\SystemResource::class,
-				'assertName'  => Storage\SystemResource::NAME,
+				'name'        => S\SystemResource::NAME,
+				'assert'      => S\SystemResource::class,
+				'assertName'  => S\SystemResource::NAME,
 				// false here, because SystemResource isn't meant to be a user backend,
 				// it's for system resources only
 				'userBackend' => false,
@@ -116,12 +116,12 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testGetByName($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$storage = $storageManager->getByName($name, $userBackend);
+		$storage = $storageManager->selectFirst(['name' => $name, 'userBackend' => $userBackend]);
 
 		if (!empty($assert)) {
-			$this->assertInstanceOf(Storage\IStorage::class, $storage);
+			$this->assertInstanceOf(S\IStorage::class, $storage);
 			$this->assertInstanceOf($assert, $storage);
 			$this->assertEquals($name, $storage::getName());
 		} else {
@@ -137,7 +137,7 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testIsValidBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertEquals($userBackend, $storageManager->isValidBackend($name));
 	}
@@ -147,9 +147,9 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testListBackends()
 	{
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertEquals(StorageManager::DEFAULT_BACKENDS, $storageManager->listBackends());
+		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storageManager->listBackends());
 	}
 
 	/**
@@ -159,7 +159,7 @@ class StorageManagerTest extends DatabaseTest
 	 */
 	public function testGetBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertNull($storageManager->getBackend());
 
@@ -179,7 +179,7 @@ class StorageManagerTest extends DatabaseTest
 	{
 		$this->config->set('storage', 'name', $name);
 
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
 		if ($userBackend) {
 			$this->assertInstanceOf($assert, $storageManager->getBackend());
@@ -204,14 +204,14 @@ class StorageManagerTest extends DatabaseTest
 			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertTrue($storageManager->register(SampleStorageBackend::class));
 
-		$this->assertEquals(array_merge(StorageManager::DEFAULT_BACKENDS, [
+		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
 		]), $storageManager->listBackends());
-		$this->assertEquals(array_merge(StorageManager::DEFAULT_BACKENDS, [
+		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
 		]), $this->config->get('storage', 'backends'));
 
@@ -225,8 +225,8 @@ class StorageManagerTest extends DatabaseTest
 		$this->assertInstanceOf(SampleStorageBackend::class, $storageManager->getBackend());
 
 		$this->assertTrue($storageManager->unregister(SampleStorageBackend::class));
-		$this->assertEquals(StorageManager::DEFAULT_BACKENDS, $this->config->get('storage', 'backends'));
-		$this->assertEquals(StorageManager::DEFAULT_BACKENDS, $storageManager->listBackends());
+		$this->assertEquals(Storage::DEFAULT_BACKENDS, $this->config->get('storage', 'backends'));
+		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storageManager->listBackends());
 
 		$this->assertNull($storageManager->getBackend());
 		$this->assertNull($this->config->get('storage', 'name'));
@@ -245,8 +245,8 @@ class StorageManagerTest extends DatabaseTest
 
 		$this->loadFixture(__DIR__ . '/../../datasets/storage/database.fixture.php', $this->dba);
 
-		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
-		$storage = $storageManager->getByName($name);
+		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = $storageManager->selectFirst(['name' => $name]);
 		$storageManager->move($storage);
 
 		$photos = $this->dba->select('photo', ['backend-ref', 'backend-class', 'id', 'data']);
@@ -255,7 +255,7 @@ class StorageManagerTest extends DatabaseTest
 
 			$this->assertEmpty($photo['data']);
 
-			$storage = $storageManager->getByName($photo['backend-class']);
+			$storage = $storageManager->selectFirst(['name' => $photo['backend-class']]);
 			$data = $storage->get($photo['backend-ref']);
 
 			$this->assertNotEmpty($data);

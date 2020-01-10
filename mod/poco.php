@@ -11,8 +11,8 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Protocol\PortableContact;
+use Friendica\Registry\Core;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
@@ -254,10 +254,10 @@ function poco_init(App $a) {
 				if (isset($contact['account-type'])) {
 					$contact['contact-type'] = $contact['account-type'];
 				}
-				$about = DI::cache()->get("about:" . $contact['updated'] . ":" . $contact['nurl']);
+				$about = Core::cache()->get("about:" . $contact['updated'] . ":" . $contact['nurl']);
 				if (is_null($about)) {
 					$about = BBCode::convert($contact['about'], false);
-					DI::cache()->set("about:" . $contact['updated'] . ":" . $contact['nurl'], $about);
+					Core::cache()->set("about:" . $contact['updated'] . ":" . $contact['nurl'], $about);
 				}
 
 				// Non connected persons can only see the keywords of a Diaspora account

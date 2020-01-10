@@ -425,7 +425,7 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('logged_in', $a->user);
     
-### src/Core/StorageManager
+### src/Repository/StorageManager
 
     Hook::callAll('storage_instance', $data);
 

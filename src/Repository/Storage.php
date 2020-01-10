@@ -1,12 +1,15 @@
 <?php
 
-namespace Friendica\Core;
+namespace Friendica\Repository;
 
 use Exception;
+use Friendica\BaseRepository;
 use Friendica\Core\Config\IConfiguration;
+use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Database\Database;
-use Friendica\Model\Storage;
+use Friendica\Model\Storage as S;
+use Friendica\Network\HTTPException;
 use Psr\Log\LoggerInterface;
 
 
@@ -16,34 +19,32 @@ use Psr\Log\LoggerInterface;
  * Core code uses this class to get and set current storage backend class.
  * Addons use this class to register and unregister additional backends.
  */
-class StorageManager
+class Storage extends BaseRepository
 {
+	protected static $model_class = S\IStorage::class;
+
 	// Default tables to look for data
 	const TABLES = ['photo', 'attach'];
 
 	// Default storage backends
 	const DEFAULT_BACKENDS = [
-		Storage\Filesystem::NAME => Storage\Filesystem::class,
-		Storage\Database::NAME   => Storage\Database::class,
+		S\Filesystem::NAME => S\Filesystem::class,
+		S\Database::NAME   => S\Database::class,
 	];
 
 	private $backends = [];
 
 	/**
-	 * @var Storage\IStorage[] A local cache for storage instances
+	 * @var S\IStorage[] A local cache for storage instances
 	 */
 	private $backendInstances = [];
 
-	/** @var Database */
-	private $dba;
 	/** @var IConfiguration */
 	private $config;
-	/** @var LoggerInterface */
-	private $logger;
 	/** @var L10n */
 	private $l10n;
 
-	/** @var Storage\IStorage */
+	/** @var S\IStorage */
 	private $currentBackend;
 
 	/**
@@ -54,21 +55,25 @@ class StorageManager
 	 */
 	public function __construct(Database $dba, IConfiguration $config, LoggerInterface $logger, L10n $l10n)
 	{
-		$this->dba      = $dba;
+		parent::__construct($dba, $logger);
+
 		$this->config   = $config;
-		$this->logger   = $logger;
 		$this->l10n     = $l10n;
 		$this->backends = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
 
 		$currentName = $this->config->get('storage', 'name', '');
 
-		$this->currentBackend = $this->getByName($currentName);
+		try {
+			$this->currentBackend = $this->selectFirst(['name' => $currentName]);
+		} catch (HTTPException\NotFoundException $e) {
+			$this->currentBackend = null;
+		}
 	}
 
 	/**
 	 * @brief Return current storage backend class
 	 *
-	 * @return Storage\IStorage|null
+	 * @return S\IStorage|null
 	 */
 	public function getBackend()
 	{
@@ -76,41 +81,46 @@ class StorageManager
 	}
 
 	/**
-	 * @brief Return storage backend class by registered name
+	 * @inheritDoc
 	 *
-	 * @param string|null $name        Backend name
-	 * @param boolean     $userBackend Just return instances in case it's a user backend (e.g. not SystemResource)
+	 * @param array $condition The possible condition of the selection are:
+	 *                         'name'        = Backend name (mandatory)
+	 *                         'userBackend' = Just return instances in case it's a user backend (e.g. not
+	 *                         SystemResource (Default is true))
 	 *
-	 * @return Storage\IStorage|null null if no backend registered at $name
+	 * @return S\IStorage|null null if no backend registered at $name
 	 *
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public function getByName(string $name = null, $userBackend = true)
+	public function selectFirst(array $conditions)
 	{
+		$name        = $conditions['name'] ?? null;
+		$userBackend = $conditions['userBackend'] ?? true;
+
 		// If there's no cached instance create a new instance
 		if (!isset($this->backendInstances[$name])) {
 			// If the current name isn't a valid backend (or the SystemResource instance) create it
 			if ($this->isValidBackend($name, $userBackend)) {
 				switch ($name) {
 					// Try the filesystem backend
-					case Storage\Filesystem::getName():
-						$this->backendInstances[$name] = new Storage\Filesystem($this->config, $this->logger, $this->l10n);
+					case S\Filesystem::getName():
+						$this->backendInstances[$name] = new S\Filesystem($this->config, $this->logger, $this->l10n);
 						break;
 					// try the database backend
-					case Storage\Database::getName():
-						$this->backendInstances[$name] = new Storage\Database($this->dba, $this->logger, $this->l10n);
+					case S\Database::getName():
+						$this->backendInstances[$name] = new S\Database($this->dba, $this->logger, $this->l10n);
 						break;
 					// at least, try if there's an addon for the backend
-					case Storage\SystemResource::getName():
-						$this->backendInstances[$name] =  new Storage\SystemResource();
+					case S\SystemResource::getName():
+						$this->backendInstances[$name] = new S\SystemResource();
 						break;
 					default:
 						$data = [
-							'name' => $name,
+							'name'    => $name,
 							'storage' => null,
 						];
 						Hook::callAll('storage_instance', $data);
-						if (($data['storage'] ?? null) instanceof Storage\IStorage) {
+						if (($data['storage'] ?? null) instanceof S\IStorage) {
 							$this->backendInstances[$data['name'] ?? $name] = $data['storage'];
 						} else {
 							return null;
@@ -136,7 +146,7 @@ class StorageManager
 	public function isValidBackend(string $name = null, bool $userBackend = true)
 	{
 		return array_key_exists($name, $this->backends) ||
-		       (!$userBackend && $name === Storage\SystemResource::getName());
+		       (!$userBackend && $name === S\SystemResource::getName());
 	}
 
 	/**
@@ -145,6 +155,9 @@ class StorageManager
 	 * @param string $name Backend class name
 	 *
 	 * @return boolean True, if the set was successful
+	 *
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\NotFoundException
 	 */
 	public function setBackend(string $name = null)
 	{
@@ -153,7 +166,7 @@ class StorageManager
 		}
 
 		if ($this->config->set('storage', 'name', $name)) {
-			$this->currentBackend = $this->getByName($name);
+			$this->currentBackend = $this->selectFirst(['name' => $name]);
 			return true;
 		} else {
 			return false;
@@ -181,10 +194,10 @@ class StorageManager
 	 */
 	public function register(string $class)
 	{
-		if (is_subclass_of($class, Storage\IStorage::class)) {
-			/** @var Storage\IStorage $class */
+		if (is_subclass_of($class, S\IStorage::class)) {
+			/** @var S\IStorage $class */
 
-			$backends        = $this->backends;
+			$backends                    = $this->backends;
 			$backends[$class::getName()] = $class;
 
 			if ($this->config->set('storage', 'backends', $backends)) {
@@ -207,13 +220,13 @@ class StorageManager
 	 */
 	public function unregister(string $class)
 	{
-		if (is_subclass_of($class, Storage\IStorage::class)) {
-			/** @var Storage\IStorage $class */
+		if (is_subclass_of($class, S\IStorage::class)) {
+			/** @var S\IStorage $class */
 
 			unset($this->backends[$class::getName()]);
 
 			if ($this->currentBackend instanceof $class) {
-			    $this->config->set('storage', 'name', null);
+				$this->config->set('storage', 'name', null);
 				$this->currentBackend = null;
 			}
 
@@ -229,18 +242,18 @@ class StorageManager
 	 * Copy existing data to destination storage and delete from source.
 	 * This method cannot move to legacy in-table `data` field.
 	 *
-	 * @param Storage\IStorage $destination Destination storage class name
-	 * @param array            $tables      Tables to look in for resources. Optional, defaults to ['photo', 'attach']
-	 * @param int              $limit       Limit of the process batch size, defaults to 5000
+	 * @param S\IStorage $destination Destination storage class name
+	 * @param array      $tables      Tables to look in for resources. Optional, defaults to ['photo', 'attach']
+	 * @param int        $limit       Limit of the process batch size, defaults to 5000
 	 *
 	 * @return int Number of moved resources
-	 * @throws Storage\StorageException
+	 * @throws S\StorageException
 	 * @throws Exception
 	 */
-	public function move(Storage\IStorage $destination, array $tables = self::TABLES, int $limit = 5000)
+	public function move(S\IStorage $destination, array $tables = self::TABLES, int $limit = 5000)
 	{
 		if ($destination === null) {
-			throw new Storage\StorageException('Can\'t move to NULL storage backend');
+			throw new S\StorageException('Can\'t move to NULL storage backend');
 		}
 
 		$moved = 0;
@@ -256,7 +269,7 @@ class StorageManager
 			while ($resource = $this->dba->fetch($resources)) {
 				$id        = $resource['id'];
 				$data      = $resource['data'];
-				$source    = $this->getByName($resource['backend-class']);
+				$source    = $this->selectFirst(['name' => $resource['backend-class']]);
 				$sourceRef = $resource['backend-ref'];
 
 				if (!empty($source)) {

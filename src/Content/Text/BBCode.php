@@ -17,6 +17,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
@@ -1071,7 +1072,7 @@ class BBCode
 	private static function removePictureLinksCallback($match)
 	{
 		$cache_key = 'remove:' . $match[1];
-		$text = DI::cache()->get($cache_key);
+		$text = Core::cache()->get($cache_key);
 
 		if (is_null($text)) {
 			$a = DI::app();
@@ -1113,7 +1114,7 @@ class BBCode
 					}
 				}
 			}
-			DI::cache()->set($cache_key, $text);
+			Core::cache()->set($cache_key, $text);
 		}
 
 		return $text;
@@ -1144,7 +1145,7 @@ class BBCode
 		}
 
 		$cache_key = 'clean:' . $match[1];
-		$text = DI::cache()->get($cache_key);
+		$text = Core::cache()->get($cache_key);
 		if (!is_null($text)) {
 			return $text;
 		}
@@ -1195,7 +1196,7 @@ class BBCode
 				}
 			}
 		}
-		DI::cache()->set($cache_key, $text);
+		Core::cache()->set($cache_key, $text);
 
 		return $text;
 	}

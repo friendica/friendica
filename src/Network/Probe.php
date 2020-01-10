@@ -23,6 +23,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
 use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\Crypto;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -332,7 +333,7 @@ class Probe
 	public static function uri($uri, $network = '', $uid = -1, $cache = true)
 	{
 		if ($cache) {
-			$result = DI::cache()->get('Probe::uri:' . $network . ':' . $uri);
+			$result = Core::cache()->get('Probe::uri:' . $network . ':' . $uri);
 			if (!is_null($result)) {
 				return $result;
 			}
@@ -409,7 +410,7 @@ class Probe
 
 		// Only store into the cache if the value seems to be valid
 		if (!in_array($data['network'], [Protocol::PHANTOM, Protocol::MAIL])) {
-			DI::cache()->set('Probe::uri:' . $network . ':' . $uri, $data, Cache::DAY);
+			Core::cache()->set('Probe::uri:' . $network . ':' . $uri, $data, Cache::DAY);
 		}
 
 		return $data;

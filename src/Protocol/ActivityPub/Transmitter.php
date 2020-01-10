@@ -24,6 +24,7 @@ use Friendica\Model\User;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Images;
@@ -819,7 +820,7 @@ class Transmitter
 		$cachekey = 'APDelivery:createActivity:' . $item_id;
 
 		if (!$force) {
-			$data = DI::cache()->get($cachekey);
+			$data = Core::cache()->get($cachekey);
 			if (!is_null($data)) {
 				return $data;
 			}
@@ -827,7 +828,7 @@ class Transmitter
 
 		$data = ActivityPub\Transmitter::createActivityFromItem($item_id);
 
-		DI::cache()->set($cachekey, $data, Cache::QUARTER_HOUR);
+		Core::cache()->set($cachekey, $data, Cache::QUARTER_HOUR);
 		return $data;
 	}
 
