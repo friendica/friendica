@@ -142,7 +142,7 @@ There you'll find somethink alike
             $colorset = Config::get('duepuntozero', 'colorset');
         if ($colorset) {
             if ($colorset == 'greenzero')
-                DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/greenzero.css" type="text/css" media="screen" />'."\n";
+                App::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/greenzero.css" type="text/css" media="screen" />'."\n";
             /* some more variants */
         }
 
@@ -281,7 +281,7 @@ which declares *duepuntozero* as parent of the theme.
 If you want to add something to the HTML header of the theme, one way to do so is by adding it to the theme.php file.
 To do so, add something alike
 
-    DI::page()['htmlhead'] .= <<< EOT
+    App::page()['htmlhead'] .= <<< EOT
     /* stuff you want to add to the header */
     EOT;
 

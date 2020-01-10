@@ -4,6 +4,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Registry\App;
+use Friendica\Registry\Factory;
 use Friendica\Registry\Model;
 
 /**
@@ -23,7 +24,7 @@ class FollowConfirm extends BaseModule
 		$duplex   = intval($_POST['duplex']     ?? 0);
 		$hidden   = intval($_POST['hidden']     ?? 0);
 
-		$Intro = Model::intro()->selectFirst(['id' => $intro_id, 'uid' => local_user()]);
+		$Intro = Factory::intro()->selectFirst(['id' => $intro_id, 'uid' => local_user()]);
 
 		$cid = $intro->{'contact-id'};
 

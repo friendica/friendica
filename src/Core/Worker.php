@@ -118,9 +118,9 @@ class Worker
 				}
 
 				// Trying to fetch new processes - but only once when successful
-				if (!$refetched && DI::lock()->acquire('worker_process', 0)) {
+				if (!$refetched && C::lock()->acquire('worker_process', 0)) {
 					self::findWorkerProcesses();
-					DI::lock()->release('worker_process');
+					C::lock()->release('worker_process');
 					self::$state = self::STATE_REFETCH;
 					$refetched = true;
 				} else {
@@ -132,21 +132,21 @@ class Worker
 			if (!self::getWaitingJobForPID()) {
 				self::$state = self::STATE_LONG_LOOP;
 
-				if (DI::lock()->acquire('worker', 0)) {
+				if (C::lock()->acquire('worker', 0)) {
 				// Count active workers and compare them with a maximum value that depends on the load
 					if (self::tooMuchWorkers()) {
 						Logger::log('Active worker limit reached, quitting.', Logger::DEBUG);
-						DI::lock()->release('worker');
+						C::lock()->release('worker');
 						return;
 					}
 
 					// Check free memory
 					if (C::process()->isMinMemoryReached()) {
 						Logger::log('Memory limit reached, quitting.', Logger::DEBUG);
-						DI::lock()->release('worker');
+						C::lock()->release('worker');
 						return;
 					}
-					DI::lock()->release('worker');
+					C::lock()->release('worker');
 				}
 			}
 
@@ -936,14 +936,14 @@ class Worker
 		}
 
 		$stamp = (float)microtime(true);
-		if (!DI::lock()->acquire('worker_process')) {
+		if (!C::lock()->acquire('worker_process')) {
 			return false;
 		}
 		self::$lock_duration += (microtime(true) - $stamp);
 
 		$found = self::findWorkerProcesses();
 
-		DI::lock()->release('worker_process');
+		C::lock()->release('worker_process');
 
 		if ($found) {
 			$stamp = (float)microtime(true);
@@ -1175,13 +1175,13 @@ class Worker
 		}
 
 		// If there is a lock then we don't have to check for too much worker
-		if (!DI::lock()->acquire('worker', 0)) {
+		if (!C::lock()->acquire('worker', 0)) {
 			return $added;
 		}
 
 		// If there are already enough workers running, don't fork another one
 		$quit = self::tooMuchWorkers();
-		DI::lock()->release('worker');
+		C::lock()->release('worker');
 
 		if ($quit) {
 			return $added;

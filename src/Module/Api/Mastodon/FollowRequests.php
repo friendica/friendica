@@ -2,16 +2,14 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Api\Entity\Mastodon;
-use Friendica\Api\Entity\Mastodon\Relationship;
 use Friendica\Core\System;
-use Friendica\Database\DBA;
-use Friendica\Model\APContact;
-use Friendica\Model\Contact;
 use Friendica\Module\Base\Api;
 use Friendica\Network\HTTPException;
 use Friendica\Registry\App;
+use Friendica\Registry\DI;
+use Friendica\Registry\Factory;
 use Friendica\Registry\Model;
+use Friendica\Registry\Repository;
 
 /**
  * @see https://docs.joinmastodon.org/methods/accounts/follow_requests
@@ -43,7 +41,7 @@ class FollowRequests extends Api
 	{
 		parent::post($parameters);
 
-		$Intro = Model::intro()->selectFirst(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
+		$introduction = Repository::intro()->selectFirst(['id' => $parameters['id'], 'uid' => self::$current_user_id]);
 
 		$contactId = $introduction->{'contact-id'};
 
@@ -51,17 +49,17 @@ class FollowRequests extends Api
 			case 'authorize':
 				$introduction->confirm();
 
-				$relationship = DI::mstdnRelationship()->createFromContactId($contactId);
+				$relationship = Factory::mstdnRelationship()->createFromContactId($contactId);
 				break;
 			case 'ignore':
 				$introduction->ignore();
 
-				$relationship = DI::mstdnRelationship()->createDefaultFromContactId($contactId);
+				$relationship = Factory::mstdnRelationship()->createDefaultFromContactId($contactId);
 				break;
 			case 'reject':
 				$introduction->discard();
 
-				$relationship = DI::mstdnRelationship()->createDefaultFromContactId($contactId);
+				$relationship = Factory::mstdnRelationship()->createDefaultFromContactId($contactId);
 				break;
 			default:
 				throw new HTTPException\BadRequestException('Unexpected action parameter, expecting "authorize", "ignore" or "reject"');
@@ -84,7 +82,7 @@ class FollowRequests extends Api
 
 		$baseUrl = App::baseUrl();
 
-		$introductions = DI::intro()->selectByBoundaries(
+		$introductions = Repository::intro()->selectByBoundaries(
 			['`uid` = ? AND NOT `ignore`', self::$current_user_id],
 			['order' => ['id' => 'DESC']],
 			$since_id,
@@ -96,9 +94,9 @@ class FollowRequests extends Api
 
 		foreach ($introductions as $key => $introduction) {
 			try {
-				$return[] = DI::mstdnFollowRequest()->createFromIntroduction($introduction);
+				$return[] = Factory::mstdnFollowRequest()->createFromIntroduction($introduction);
 			} catch (HTTPException\InternalServerErrorException $exception) {
-				DI::intro()->delete($introduction);
+				Repository::intro()->delete($introduction);
 				unset($introductions[$key]);
 			}
 		}

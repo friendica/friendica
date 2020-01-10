@@ -24,6 +24,7 @@ use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Registry\App;
+use Friendica\Registry\Core;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -539,9 +540,9 @@ class OStatus
 							Logger::log("Item with uri ".$item["uri"]." is from a blocked contact.", Logger::DEBUG);
 						} else {
 							// We are having duplicated entries. Hopefully this solves it.
-							if (DI::lock()->acquire('ostatus_process_item_insert')) {
+							if (Core::lock()->acquire('ostatus_process_item_insert')) {
 								$ret = Item::insert($item);
-								DI::lock()->release('ostatus_process_item_insert');
+								Core::lock()->release('ostatus_process_item_insert');
 								Logger::log("Item with uri ".$item["uri"]." for user ".$importer["uid"].' stored. Return value: '.$ret);
 							} else {
 								$ret = Item::insert($item);
@@ -1303,7 +1304,7 @@ class OStatus
 		XML::addElement($doc, $root, "link", "", $attributes);
 
 		/// @TODO We have to find out what this is
-		/// $attributes = array("href" => DI::baseUrl()."/sup",
+		/// $attributes = array("href" => App::baseUrl()."/sup",
 		///		"rel" => "http://api.friendfeed.com/2008/03#sup",
 		///		"type" => "application/json");
 		/// XML::addElement($doc, $root, "link", "", $attributes);
