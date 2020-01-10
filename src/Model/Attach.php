@@ -12,6 +12,8 @@ use Friendica\Database\DBStructure;
 use Friendica\Registry\DI;
 use Friendica\Model\Storage\IStorage;
 use Friendica\Object\Image;
+use Friendica\Registry\Model;
+use Friendica\Registry\Repository;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Mimetype;
 use Friendica\Util\Security;
@@ -185,7 +187,7 @@ class Attach
 			$filesize = strlen($data);
 		}
 
-		$backend_ref = DI::storage()->put($data);
+		$backend_ref = Model::storage()->put($data);
 		$data = '';
 
 		$hash = System::createGUID(64);
@@ -204,7 +206,7 @@ class Attach
 			'allow_gid' => $allow_gid,
 			'deny_cid' => $deny_cid,
 			'deny_gid' => $deny_gid,
-			'backend-class' => (string)DI::storage(),
+			'backend-class' => (string)Model::storage(),
 			'backend-ref' => $backend_ref
 		];
 
@@ -260,7 +262,7 @@ class Attach
 			$items = self::selectToArray(['backend-class','backend-ref'], $conditions);
 
 			foreach($items as $item) {
-				$backend_class = DI::storageManager()->getByName($item['backend-class'] ?? '');
+				$backend_class = Repository::storageManager()->selectFirst(['name' => $item['backend-class'] ?? '']);
 				if ($backend_class !== null) {
 					$fields['backend-ref'] = $backend_class->put($img->asString(), $item['backend-ref'] ?? '');
 				} else {
@@ -292,7 +294,7 @@ class Attach
 		$items = self::selectToArray(['backend-class','backend-ref'], $conditions);
 
 		foreach($items as $item) {
-			$backend_class = DI::storageManager()->getByName($item['backend-class'] ?? '');
+			$backend_class = Repository::storageManager()->selectFirst(['name' => $item['backend-class'] ?? '']);
 			if ($backend_class !== null) {
 				$backend_class->delete($item['backend-ref'] ?? '');
 			}

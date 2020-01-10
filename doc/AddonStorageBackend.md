@@ -86,10 +86,10 @@ See doxygen documentation of `IStorage` interface for details about each method.
 
 Each backend must be registered in the system when the plugin is installed, to be aviable.
 
-`DI::facStorage()->register(string $class)` is used to register the backend class.
+`Repository::storageManage()->register(string $class)` is used to register the backend class.
 
 When the plugin is uninstalled, registered backends must be unregistered using
-`DI::facStorage()->unregister(string $class)`.
+`Repository::storageManage()->unregister(string $class)`.
 
 You have to register a new hook in your addon, listening on `storage_instance(App $a, array $data)`.
 In case `$data['name']` is your storage class name, you have to instance a new instance of your `Friendica\Model\Storage\IStorage` class.
@@ -243,27 +243,27 @@ The file is `addon/samplestorage/samplestorage.php`
  */
 
 use Friendica\Addon\samplestorage\SampleStorageBackend;
-use Friendica\DI;
+use Friendica\Registry\Repository;
 
 function samplestorage_install()
 {
 	// on addon install, we register our class with name "Sample Storage".
 	// note: we use `::class` property, which returns full class name as string
 	// this save us the problem of correctly escape backslashes in class name
-	DI::storageManager()->register(SampleStorageBackend::class);
+	Repository::storageManager()->register(SampleStorageBackend::class);
 }
 
 function samplestorage_unistall()
 {
 	// when the plugin is uninstalled, we unregister the backend.
-	DI::storageManager()->unregister(SampleStorageBackend::class);
+	Repository::storageManager()->unregister(SampleStorageBackend::class);
 }
 
 function samplestorage_storage_instance(\Friendica\App $a, array $data)
 {
     if ($data['name'] === SampleStorageBackend::getName()) {
     // instance a new sample storage instance and pass it back to the core for usage
-        $data['storage'] = new SampleStorageBackend(DI::config(), DI::l10n(), DI::cache());
+        $data['storage'] = new SampleStorageBackend(Core::config(), Core::l10n(), Core::cache());
     }
 }
 ```

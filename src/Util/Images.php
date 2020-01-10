@@ -4,6 +4,7 @@ namespace Friendica\Util;
 
 use Friendica\Core\Logger;
 use Friendica\Core\System;
+use Friendica\Registry\Core;
 use Friendica\Registry\Util;
 use Imagick;
 
@@ -124,12 +125,12 @@ class Images
 			return $data;
 		}
 
-		$data = DI::cache()->get($url);
+		$data = Core::cache()->get($url);
 
 		if (empty($data) || !is_array($data)) {
 			$data = self::getInfoFromURL($url);
 
-			DI::cache()->set($url, $data);
+			Core::cache()->set($url, $data);
 		}
 
 		return $data;

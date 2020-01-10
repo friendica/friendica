@@ -16,6 +16,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Registry\App as A;
+use Friendica\Registry\Core;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -197,7 +198,7 @@ function ping_init(App $a)
 		}
 
 		$cachekey = "ping_init:".local_user();
-		$ev = DI::cache()->get($cachekey);
+		$ev = Core::cache()->get($cachekey);
 		if (is_null($ev)) {
 			$ev = q(
 				"SELECT type, start, adjust FROM `event`
@@ -208,7 +209,7 @@ function ping_init(App $a)
 				DBA::escape(DateTimeFormat::utcNow())
 			);
 			if (DBA::isResult($ev)) {
-				DI::cache()->set($cachekey, $ev, Cache::HOUR);
+				Core::cache()->set($cachekey, $ev, Cache::HOUR);
 			}
 		}
 

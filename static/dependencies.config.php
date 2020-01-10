@@ -8,7 +8,7 @@ use Friendica\Core\L10n\L10n;
 use Friendica\Core\Lock\ILock;
 use Friendica\Core\Process;
 use Friendica\Core\Session\ISession;
-use Friendica\Core\StorageManager;
+use Friendica\Repository\Storage;
 use Friendica\Database\Database;
 use Friendica\Factory;
 use Friendica\Model\Storage\IStorage;
@@ -197,7 +197,7 @@ return [
 		],
 	],
 	IStorage::class => [
-		'instanceOf' => StorageManager::class,
+		'instanceOf' => Storage::class,
 		'call' => [
 			['getBackend', [], Dice::CHAIN_CALL],
 		],

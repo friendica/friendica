@@ -2186,7 +2186,7 @@ class OStatus
 
 		// Don't cache when the last item was posted less then 15 minutes ago (Cache duration)
 		if ((time() - strtotime($owner['last-item'])) < 15*60) {
-			$result = DI::cache()->get($cachekey);
+			$result = Core::cache()->get($cachekey);
 			if (!$nocache && !is_null($result)) {
 				Logger::log('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created . ' (cached)', Logger::DEBUG);
 				$last_update = $result['last_update'];
@@ -2247,7 +2247,7 @@ class OStatus
 		$feeddata = trim($doc->saveXML());
 
 		$msg = ['feed' => $feeddata, 'last_update' => $last_update];
-		DI::cache()->set($cachekey, $msg, Cache::QUARTER_HOUR);
+		Core::cache()->set($cachekey, $msg, Cache::QUARTER_HOUR);
 
 		Logger::log('Feed duration: ' . number_format(microtime(true) - $stamp, 3) . ' - ' . $owner_nick . ' - ' . $filter . ' - ' . $previous_created, Logger::DEBUG);
 

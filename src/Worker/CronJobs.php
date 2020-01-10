@@ -12,6 +12,7 @@ use Friendica\Core\StorageManager;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
@@ -21,6 +22,8 @@ use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
 use Friendica\Registry\App as A;
+use Friendica\Registry\Model;
+use Friendica\Registry\Repository;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -154,7 +157,7 @@ class CronJobs
 		}
 
 		// clear old cache
-		DI::cache()->clear();
+		Core::cache()->clear();
 
 		// clear old item cache files
 		clear_cache();
@@ -324,8 +327,8 @@ class CronJobs
 	 */
 	private static function moveStorage()
 	{
-		$current = DI::storage();
-		$moved = DI::storageManager()->move($current);
+		$current = Model::storage();
+		$moved = Repository::storageManager()->move($current);
 
 		if ($moved) {
 			Worker::add(PRIORITY_LOW, "CronJobs", "move_storage");

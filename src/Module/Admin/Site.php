@@ -7,7 +7,9 @@ use Friendica\Core\Config;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
-use Friendica\Core\StorageManager;
+use Friendica\Registry\Model;
+use Friendica\Registry\Repository;
+use Friendica\Repository\Storage;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -203,8 +205,8 @@ class Site extends BaseAdminModule
 		$storagebackend    = Strings::escapeTags(trim($_POST['storagebackend'] ?? ''));
 
 		// save storage backend form
-		if (DI::storageManager()->setBackend($storagebackend)) {
-			$storage_opts     = DI::storage()->getOptions();
+		if (Repository::storageManager()->setBackend($storagebackend)) {
+			$storage_opts     = Model::storage()->getOptions();
 			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $storagebackend);
 			$storage_opts_data   = [];
 			foreach ($storage_opts as $name => $info) {
@@ -222,12 +224,12 @@ class Site extends BaseAdminModule
 			unset($name);
 			unset($info);
 
-			$storage_form_errors = DI::storage()->saveOptions($storage_opts_data);
+			$storage_form_errors = Model::storage()->saveOptions($storage_opts_data);
 			if (count($storage_form_errors)) {
 				foreach ($storage_form_errors as $name => $err) {
 					notice('Storage backend, ' . $storage_opts[$name][1] . ': ' . $err);
 				}
-				DI::baseUrl()->redirect('admin/site' . $active_panel);
+				App::baseUrl()->redirect('admin/site' . $active_panel);
 			}
 		} else {
 			info(L10n::t('Invalid storage backend setting value.'));
@@ -526,7 +528,7 @@ class Site extends BaseAdminModule
 			$optimize_max_tablesize = -1;
 		}
 
-		$current_storage_backend = DI::storage();
+		$current_storage_backend = Model::storage();
 		$available_storage_backends = [];
 
 		// show legacy option only if it is the current backend:
@@ -535,7 +537,7 @@ class Site extends BaseAdminModule
 			$available_storage_backends[''] = L10n::t('Database (legacy)');
 		}
 
-		foreach (DI::storageManager()->listBackends() as $name => $class) {
+		foreach (Repository::storageManager()->listBackends() as $name => $class) {
 			$available_storage_backends[$name] = $name;
 		}
 

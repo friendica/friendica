@@ -25,4 +25,12 @@ abstract class Model extends BaseRegistry
 	{
 		return self::$dice->create(M\User\Cookie::class);
 	}
+
+	/**
+	 * @return M\Storage\IStorage
+	 */
+	public static function storage()
+	{
+		return self::$dice->create(M\Storage\IStorage::class);
+	}
 }

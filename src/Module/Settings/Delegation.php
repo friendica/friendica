@@ -104,7 +104,7 @@ class Delegation extends BaseSettingsModule
 		$potentials = [];
 		$nicknames = [];
 
-		$condition = ['baseurl' => DI::baseUrl(), 'self' => false, 'uid' => local_user(), 'blocked' => false];
+		$condition = ['baseurl' => App::baseUrl(), 'self' => false, 'uid' => local_user(), 'blocked' => false];
 		$contacts = DBA::select('contact', ['nick'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
 			$nicknames[] = $contact['nick'];

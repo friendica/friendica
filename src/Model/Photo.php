@@ -13,9 +13,12 @@ use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Object\Image;
 use Friendica\Registry\App;
+use Friendica\Registry\Model;
+use Friendica\Registry\Repository;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -171,7 +174,7 @@ class Photo
 	 */
 	public static function getImageForPhoto(array $photo)
 	{
-		$backendClass = DI::storageManager()->getByName($photo['backend-class'] ?? '');
+		$backendClass = Repository::storageManager()->selectFirst($photo['backend-class'] ?? '');
 		if ($backendClass === null) {
 			// legacy data storage in "data" column
 			$i = self::selectFirst(['data'], ['id' => $photo['id']]);
@@ -272,9 +275,9 @@ class Photo
 
 		if (DBA::isResult($existing_photo)) {
 			$backend_ref = (string)$existing_photo["backend-ref"];
-			$storage = DI::storageManager()->getByName($existing_photo["backend-class"] ?? '');
+			$storage = Repository::storageManager()->selectFirst(['name' => $existing_photo["backend-class"] ?? '']);
 		} else {
-			$storage = DI::storage();
+			$storage = Model::storage();
 		}
 
 		if ($storage === null) {
@@ -336,7 +339,7 @@ class Photo
 		$photos = self::selectToArray(['backend-class', 'backend-ref'], $conditions);
 
 		foreach($photos as $photo) {
-			$backend_class = DI::storageManager()->getByName($photo['backend-class'] ?? '');
+			$backend_class = Repository::storageManager()->selectFirst(['name' => $photo['backend-class'] ?? '']);
 			if ($backend_class !== null) {
 				$backend_class->delete($photo["backend-ref"] ?? '');
 			}
@@ -365,7 +368,7 @@ class Photo
 			$photos = self::selectToArray(['backend-class', 'backend-ref'], $conditions);
 
 			foreach($photos as $photo) {
-				$backend_class = DI::storageManager()->getByName($photo['backend-class'] ?? '');
+				$backend_class = Repository::storageManager()->selectFirst(['name' => $photo['backend-class'] ?? '']);
 				if ($backend_class !== null) {
 					$fields["backend-ref"] = $backend_class->put($img->asString(), $photo['backend-ref']);
 				} else {
@@ -540,7 +543,7 @@ class Photo
 		$sql_extra = Security::getPermissionsSQLByUserId($uid);
 
 		$key = "photo_albums:".$uid.":".local_user().":".remote_user();
-		$albums = DI::cache()->get($key);
+		$albums = Core::cache()->get($key);
 		if (is_null($albums) || $update) {
 			if (!Config::get("system", "no_count", false)) {
 				/// @todo This query needs to be renewed. It is really slow
@@ -563,7 +566,7 @@ class Photo
 					DBA::escape(L10n::t("Contact Photos"))
 				);
 			}
-			DI::cache()->set($key, $albums, Cache::DAY);
+			Core::cache()->set($key, $albums, Cache::DAY);
 		}
 		return $albums;
 	}
@@ -576,7 +579,7 @@ class Photo
 	public static function clearAlbumCache($uid)
 	{
 		$key = "photo_albums:".$uid.":".local_user().":".remote_user();
-		DI::cache()->set($key, null, Cache::DAY);
+		Core::cache()->set($key, null, Cache::DAY);
 	}
 
 	/**
