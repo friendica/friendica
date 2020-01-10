@@ -5,7 +5,7 @@ namespace Friendica\Registry;
 use Friendica\BaseRegistry;
 use Friendica\Util\Logger\WorkerLogger;
 use Psr\Log\LoggerInterface;
-use Friendica\Core as C;
+use Friendica\Core as CoreNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Core" namespace
@@ -13,19 +13,19 @@ use Friendica\Core as C;
 abstract class Core extends BaseRegistry
 {
 	/**
-	 * @return C\Config\IPConfiguration
+	 * @return CoreNamespace\Config\IPConfiguration
 	 */
 	public static function pConfig()
 	{
-		return self::$dice->create(C\Config\IPConfiguration::class);
+		return self::$dice->create(CoreNamespace\Config\IPConfiguration::class);
 	}
 
 	/**
-	 * @return C\Session\ISession
+	 * @return CoreNamespace\Session\ISession
 	 */
 	public static function session()
 	{
-		return self::$dice->create(C\Session\ISession::class);
+		return self::$dice->create(CoreNamespace\Session\ISession::class);
 	}
 
 	/**
@@ -53,42 +53,42 @@ abstract class Core extends BaseRegistry
 	}
 
 	/**
-	 * @return C\Cache\ICache
+	 * @return CoreNamespace\Cache\ICache
 	 */
 	public static function cache()
 	{
-		return self::$dice->create(C\Cache\ICache::class);
+		return self::$dice->create(CoreNamespace\Cache\ICache::class);
 	}
 
 	/**
-	 * @return C\L10n\L10n
+	 * @return CoreNamespace\L10n\L10n
 	 */
 	public static function l10n()
 	{
-		return self::$dice->create(C\L10n\L10n::class);
+		return self::$dice->create(CoreNamespace\L10n\L10n::class);
 	}
 
 	/**
-	 * @return C\Lock\ILock
+	 * @return CoreNamespace\Lock\ILock
 	 */
 	public static function lock()
 	{
-		return self::$dice->create(C\Lock\ILock::class);
+		return self::$dice->create(CoreNamespace\Lock\ILock::class);
 	}
 
 	/**
-	 * @return C\Config\IConfiguration
+	 * @return CoreNamespace\Config\IConfiguration
 	 */
 	public static function config()
 	{
-		return self::$dice->create(C\Config\IConfiguration::class);
+		return self::$dice->create(CoreNamespace\Config\IConfiguration::class);
 	}
 
 	/**
-	 * @return C\Process
+	 * @return CoreNamespace\Process
 	 */
 	public static function process()
 	{
-		return self::$dice->create(C\Process::class);
+		return self::$dice->create(CoreNamespace\Process::class);
 	}
 }

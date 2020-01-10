@@ -4,7 +4,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Factory as F;
+use Friendica\Factory as FactoryNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Factory" namespace
@@ -12,26 +12,26 @@ use Friendica\Factory as F;
 abstract class Factory extends BaseRegistry
 {
 	/**
-	 * @return F\Mastodon\Account
+	 * @return FactoryNamespace\Mastodon\Account
 	 */
 	public static function mstdnAccount()
 	{
-		return self::$dice->create(F\Mastodon\FollowRequest::class);
+		return self::$dice->create(FactoryNamespace\Mastodon\FollowRequest::class);
 	}
 
 	/**
-	 * @return F\Mastodon\FollowRequest
+	 * @return FactoryNamespace\Mastodon\FollowRequest
 	 */
 	public static function mstdnFollowRequest()
 	{
-		return self::$dice->create(F\Mastodon\FollowRequest::class);
+		return self::$dice->create(FactoryNamespace\Mastodon\FollowRequest::class);
 	}
 
 	/**
-	 * @return F\Mastodon\Relationship
+	 * @return FactoryNamespace\Mastodon\Relationship
 	 */
 	public static function mstdnRelationship()
 	{
-		return self::$dice->create(F\Mastodon\Relationship::class);
+		return self::$dice->create(FactoryNamespace\Mastodon\Relationship::class);
 	}
 }

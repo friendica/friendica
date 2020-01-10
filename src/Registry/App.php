@@ -2,7 +2,7 @@
 
 namespace Friendica\Registry;
 
-use Friendica\App as A;
+use Friendica\App as AppNamespace;
 use Friendica\BaseRegistry;
 
 /**
@@ -12,50 +12,50 @@ abstract class App extends BaseRegistry
 {
 
 	/**
-	 * @return A\Authentication
+	 * @return AppNamespace\Authentication
 	 */
 	public static function auth()
 	{
-		return self::$dice->create(A\Authentication::class);
+		return self::$dice->create(AppNamespace\Authentication::class);
 	}
 
 	/**
-	 * @return A\BaseURL
+	 * @return AppNamespace\BaseURL
 	 */
 	public static function baseUrl()
 	{
-		return self::$dice->create(A\BaseURL::class);
+		return self::$dice->create(AppNamespace\BaseURL::class);
 	}
 
 	/**
-	 * @return A\Module
+	 * @return AppNamespace\Module
 	 */
 	public static function module()
 	{
-		return self::$dice->create(A\Module::class);
+		return self::$dice->create(AppNamespace\Module::class);
 	}
 
 	/**
-	 * @return A\Arguments
+	 * @return AppNamespace\Arguments
 	 */
 	public static function args()
 	{
-		return self::$dice->create(A\Arguments::class);
+		return self::$dice->create(AppNamespace\Arguments::class);
 	}
 
 	/**
-	 * @return A\Mode
+	 * @return AppNamespace\Mode
 	 */
 	public static function mode()
 	{
-		return self::$dice->create(A\Mode::class);
+		return self::$dice->create(AppNamespace\Mode::class);
 	}
 
 	/**
-	 * @return A\Page
+	 * @return AppNamespace\Page
 	 */
 	public static function page()
 	{
-		return self::$dice->create(A\Page::class);
+		return self::$dice->create(AppNamespace\Page::class);
 	}
 }

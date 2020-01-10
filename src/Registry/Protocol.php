@@ -3,7 +3,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Protocol as P;
+use Friendica\Protocol as ProtocolNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Protocol" namespace
@@ -11,10 +11,10 @@ use Friendica\Protocol as P;
 abstract class Protocol extends BaseRegistry
 {
 	/**
-	 * @return P\Activity
+	 * @return ProtocolNamespace\Activity
 	 */
 	public static function activity()
 	{
-		return self::$dice->create(P\Activity::class);
+		return self::$dice->create(ProtocolNamespace\Activity::class);
 	}
 }

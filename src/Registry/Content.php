@@ -3,7 +3,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Content as C;
+use Friendica\Content as ContentNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Content" namespace
@@ -11,18 +11,18 @@ use Friendica\Content as C;
 abstract class Content extends BaseRegistry
 {
 	/**
-	 * @return C\Item
+	 * @return ContentNamespace\Item
 	 */
 	public static function item()
 	{
-		return self::$dice->create(C\Item::class);
+		return self::$dice->create(ContentNamespace\Item::class);
 	}
 
 	/**
-	 * @return C\Text\BBCode\Video
+	 * @return ContentNamespace\Text\BBCode\Video
 	 */
 	public static function bbCodeVideo()
 	{
-		return self::$dice->create(C\Text\BBCode\Video::class);
+		return self::$dice->create(ContentNamespace\Text\BBCode\Video::class);
 	}
 }
