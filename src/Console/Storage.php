@@ -14,16 +14,16 @@ class Storage extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/** @var S */
-	private $storage;
+	private $repoStorage;
 
 	/**
-	 * @param S $storage
+	 * @param S $repoStorage
 	 */
-	public function __construct(S $storage, array $argv = [])
+	public function __construct(S $repoStorage, array $argv = [])
 	{
 		parent::__construct($argv);
 
-		$this->storage = $storage;
+		$this->repoStorage = $repoStorage;
 	}
 
 	protected function getHelp()
@@ -82,11 +82,11 @@ HELP;
 	protected function doList()
 	{
 		$rowfmt = ' %-3s | %-20s';
-		$current = $this->storage->getBackend();
+		$current = $this->repoStorage->getBackend();
 		$this->out(sprintf($rowfmt, 'Sel', 'Name'));
 		$this->out('-----------------------');
 		$isregisterd = false;
-		foreach ($this->storage->listBackends() as $name => $class) {
+		foreach ($this->repoStorage->listBackends() as $name => $class) {
 			$issel = ' ';
 			if ($current === $class) {
 				$issel = '*';
@@ -113,14 +113,14 @@ HELP;
 		}
 
 		$name = $this->args[1];
-		$class = $this->storage->selectFirst(['name' => $name]);
+		$class = $this->repoStorage->selectFirst(['name' => $name]);
 
 		if ($class === '') {
 			$this->out($name . ' is not a registered backend.');
 			return -1;
 		}
 
-		if (!$this->storage->setBackend($class)) {
+		if (!$this->repoStorage->setBackend($class)) {
 			$this->out($class . ' is not a valid backend storage class.');
 			return -1;
 		}
@@ -143,11 +143,11 @@ HELP;
 			$tables = [$table];
 		}
 
-		$current = $this->storage->getBackend();
+		$current = $this->repoStorage->getBackend();
 		$total = 0;
 
 		do {
-			$moved = $this->storage->move($current, $tables, $this->getOption('n', 5000));
+			$moved = $this->repoStorage->move($current, $tables, $this->getOption('n', 5000));
 			if ($moved) {
 				$this->out(date('[Y-m-d H:i:s] ') . sprintf('Moved %d files', $moved));
 			}
