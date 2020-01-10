@@ -250,13 +250,13 @@ function samplestorage_install()
 	// on addon install, we register our class with name "Sample Storage".
 	// note: we use `::class` property, which returns full class name as string
 	// this save us the problem of correctly escape backslashes in class name
-	Repository::storageManager()->register(SampleStorageBackend::class);
+	Repository::storage()->register(SampleStorageBackend::class);
 }
 
 function samplestorage_unistall()
 {
 	// when the plugin is uninstalled, we unregister the backend.
-	Repository::storageManager()->unregister(SampleStorageBackend::class);
+	Repository::storage()->unregister(SampleStorageBackend::class);
 }
 
 function samplestorage_storage_instance(\Friendica\App $a, array $data)

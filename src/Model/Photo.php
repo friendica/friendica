@@ -175,7 +175,7 @@ class Photo
 	 */
 	public static function getImageForPhoto(array $photo)
 	{
-		$backendClass = Repository::storageManager()->selectFirst($photo['backend-class'] ?? '');
+		$backendClass = Repository::storage()->selectFirst($photo['backend-class'] ?? '');
 		if ($backendClass === null) {
 			// legacy data storage in "data" column
 			$i = self::selectFirst(['data'], ['id' => $photo['id']]);
@@ -276,7 +276,7 @@ class Photo
 
 		if (DBA::isResult($existing_photo)) {
 			$backend_ref = (string)$existing_photo["backend-ref"];
-			$storage = Repository::storageManager()->selectFirst(['name' => $existing_photo["backend-class"] ?? '']);
+			$storage = Repository::storage()->selectFirst(['name' => $existing_photo["backend-class"] ?? '']);
 		} else {
 			$storage = Model::storage();
 		}
@@ -340,7 +340,7 @@ class Photo
 		$photos = self::selectToArray(['backend-class', 'backend-ref'], $conditions);
 
 		foreach($photos as $photo) {
-			$backend_class = Repository::storageManager()->selectFirst(['name' => $photo['backend-class'] ?? '']);
+			$backend_class = Repository::storage()->selectFirst(['name' => $photo['backend-class'] ?? '']);
 			if ($backend_class !== null) {
 				$backend_class->delete($photo["backend-ref"] ?? '');
 			}
@@ -369,7 +369,7 @@ class Photo
 			$photos = self::selectToArray(['backend-class', 'backend-ref'], $conditions);
 
 			foreach($photos as $photo) {
-				$backend_class = Repository::storageManager()->selectFirst(['name' => $photo['backend-class'] ?? '']);
+				$backend_class = Repository::storage()->selectFirst(['name' => $photo['backend-class'] ?? '']);
 				if ($backend_class !== null) {
 					$fields["backend-ref"] = $backend_class->put($img->asString(), $photo['backend-ref']);
 				} else {

@@ -22,7 +22,7 @@ abstract class Repository extends BaseRegistry
 	/**
 	 * @return R\Storage
 	 */
-	public static function storageManager()
+	public static function storage()
 	{
 		return self::$dice->create(R\Storage::class);
 	}

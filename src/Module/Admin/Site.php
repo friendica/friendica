@@ -205,7 +205,7 @@ class Site extends BaseAdminModule
 		$storagebackend    = Strings::escapeTags(trim($_POST['storagebackend'] ?? ''));
 
 		// save storage backend form
-		if (Repository::storageManager()->setBackend($storagebackend)) {
+		if (Repository::storage()->setBackend($storagebackend)) {
 			$storage_opts     = Model::storage()->getOptions();
 			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $storagebackend);
 			$storage_opts_data   = [];
@@ -537,7 +537,7 @@ class Site extends BaseAdminModule
 			$available_storage_backends[''] = L10n::t('Database (legacy)');
 		}
 
-		foreach (Repository::storageManager()->listBackends() as $name => $class) {
+		foreach (Repository::storage()->listBackends() as $name => $class) {
 			$available_storage_backends[$name] = $name;
 		}
 

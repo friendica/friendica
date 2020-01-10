@@ -262,7 +262,7 @@ class Attach
 			$items = self::selectToArray(['backend-class','backend-ref'], $conditions);
 
 			foreach($items as $item) {
-				$backend_class = Repository::storageManager()->selectFirst(['name' => $item['backend-class'] ?? '']);
+				$backend_class = Repository::storage()->selectFirst(['name' => $item['backend-class'] ?? '']);
 				if ($backend_class !== null) {
 					$fields['backend-ref'] = $backend_class->put($img->asString(), $item['backend-ref'] ?? '');
 				} else {
@@ -294,7 +294,7 @@ class Attach
 		$items = self::selectToArray(['backend-class','backend-ref'], $conditions);
 
 		foreach($items as $item) {
-			$backend_class = Repository::storageManager()->selectFirst(['name' => $item['backend-class'] ?? '']);
+			$backend_class = Repository::storage()->selectFirst(['name' => $item['backend-class'] ?? '']);
 			if ($backend_class !== null) {
 				$backend_class->delete($item['backend-ref'] ?? '');
 			}
