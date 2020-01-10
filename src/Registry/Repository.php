@@ -4,7 +4,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Repository as R;
+use Friendica\Repository as RepositoryNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Repository" namespace
@@ -12,18 +12,18 @@ use Friendica\Repository as R;
 abstract class Repository extends BaseRegistry
 {
 	/**
-	 * @return R\Introduction
+	 * @return RepositoryNamespace\Introduction
 	 */
 	public static function intro()
 	{
-		return self::$dice->create(R\Introduction::class);
+		return self::$dice->create(RepositoryNamespace\Introduction::class);
 	}
 
 	/**
-	 * @return R\Storage
+	 * @return RepositoryNamespace\Storage
 	 */
 	public static function storage()
 	{
-		return self::$dice->create(R\Storage::class);
+		return self::$dice->create(RepositoryNamespace\Storage::class);
 	}
 }

@@ -3,7 +3,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Util as U;
+use Friendica\Util as UtilNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Util" namespace
@@ -11,34 +11,34 @@ use Friendica\Util as U;
 abstract class Util extends BaseRegistry
 {
 	/**
-	 * @return U\FileSystem
+	 * @return UtilNamespace\FileSystem
 	 */
 	public static function fs()
 	{
-		return self::$dice->create(U\FileSystem::class);
+		return self::$dice->create(UtilNamespace\FileSystem::class);
 	}
 
 	/**
-	 * @return U\DateTimeFormat
+	 * @return UtilNamespace\DateTimeFormat
 	 */
 	public static function dtFormat()
 	{
-		return self::$dice->create(U\DateTimeFormat::class);
+		return self::$dice->create(UtilNamespace\DateTimeFormat::class);
 	}
 
 	/**
-	 * @return U\ACLFormatter
+	 * @return UtilNamespace\ACLFormatter
 	 */
 	public static function aclFormatter()
 	{
-		return self::$dice->create(U\ACLFormatter::class);
+		return self::$dice->create(UtilNamespace\ACLFormatter::class);
 	}
 
 	/**
-	 * @return U\Profiler
+	 * @return UtilNamespace\Profiler
 	 */
 	public static function profiler()
 	{
-		return self::$dice->create(U\Profiler::class);
+		return self::$dice->create(UtilNamespace\Profiler::class);
 	}
 }

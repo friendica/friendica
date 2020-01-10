@@ -3,7 +3,7 @@
 namespace Friendica\Registry;
 
 use Friendica\BaseRegistry;
-use Friendica\Model as M;
+use Friendica\Model as ModelNamespace;
 
 /**
  * Registry for dynamic classes of the "Friendica\Model" namespace
@@ -11,26 +11,26 @@ use Friendica\Model as M;
 abstract class Model extends BaseRegistry
 {
 	/**
-	 * @return M\Notify
+	 * @return ModelNamespace\Notify
 	 */
 	public static function notify()
 	{
-		return self::$dice->create(M\Notify::class);
+		return self::$dice->create(ModelNamespace\Notify::class);
 	}
 
 	/**
-	 * @return M\User\Cookie
+	 * @return ModelNamespace\User\Cookie
 	 */
 	public static function cookie()
 	{
-		return self::$dice->create(M\User\Cookie::class);
+		return self::$dice->create(ModelNamespace\User\Cookie::class);
 	}
 
 	/**
-	 * @return M\Storage\IStorage
+	 * @return ModelNamespace\Storage\IStorage
 	 */
 	public static function storage()
 	{
-		return self::$dice->create(M\Storage\IStorage::class);
+		return self::$dice->create(ModelNamespace\Storage\IStorage::class);
 	}
 }
