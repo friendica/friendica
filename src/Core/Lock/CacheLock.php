@@ -13,7 +13,7 @@ class CacheLock extends Lock
 	const CACHE_PREFIX = 'lock:';
 
 	/**
-	 * @var \Friendica\Core\Cache\ICache;
+	 * @var Cache\ICache;
 	 */
 	private $cache;
 

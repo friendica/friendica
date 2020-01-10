@@ -2,6 +2,8 @@
 
 namespace Friendica\Test\Util;
 
+use Friendica\Core\Cache\Cache;
+
 trait DbaCacheMockTrait
 {
 	/**
