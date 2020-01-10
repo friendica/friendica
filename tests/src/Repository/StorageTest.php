@@ -66,9 +66,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testInstance()
 	{
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertInstanceOf(Storage::class, $storageManager);
+		$this->assertInstanceOf(Storage::class, $storage);
 	}
 
 	public function dataStorages()
@@ -116,9 +116,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testGetByName($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$storage = $storageManager->selectFirst(['name' => $name, 'userBackend' => $userBackend]);
+		$storage = $storage->selectFirst(['name' => $name, 'userBackend' => $userBackend]);
 
 		if (!empty($assert)) {
 			$this->assertInstanceOf(S\IStorage::class, $storage);
@@ -137,9 +137,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testIsValidBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertEquals($userBackend, $storageManager->isValidBackend($name));
+		$this->assertEquals($userBackend, $storage->isValidBackend($name));
 	}
 
 	/**
@@ -147,9 +147,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testListBackends()
 	{
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storageManager->listBackends());
+		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storage->listBackends());
 	}
 
 	/**
@@ -159,14 +159,14 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testGetBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertNull($storageManager->getBackend());
+		$this->assertNull($storage->getBackend());
 
 		if ($userBackend) {
-			$storageManager->setBackend($name);
+			$storage->setBackend($name);
 
-			$this->assertInstanceOf($assert, $storageManager->getBackend());
+			$this->assertInstanceOf($assert, $storage->getBackend());
 		}
 	}
 
@@ -179,12 +179,12 @@ class StorageTest extends DatabaseTest
 	{
 		$this->config->set('storage', 'name', $name);
 
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
 		if ($userBackend) {
-			$this->assertInstanceOf($assert, $storageManager->getBackend());
+			$this->assertInstanceOf($assert, $storage->getBackend());
 		} else {
-			$this->assertNull($storageManager->getBackend());
+			$this->assertNull($storage->getBackend());
 		}
 	}
 
@@ -204,13 +204,13 @@ class StorageTest extends DatabaseTest
 			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertTrue($storageManager->register(SampleStorageBackend::class));
+		$this->assertTrue($storage->register(SampleStorageBackend::class));
 
 		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
-		]), $storageManager->listBackends());
+		]), $storage->listBackends());
 		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
 		]), $this->config->get('storage', 'backends'));
@@ -219,16 +219,16 @@ class StorageTest extends DatabaseTest
 		SampleStorageBackend::registerHook();
 		Hook::loadHooks();
 
-		$this->assertTrue($storageManager->setBackend(SampleStorageBackend::NAME));
+		$this->assertTrue($storage->setBackend(SampleStorageBackend::NAME));
 		$this->assertEquals(SampleStorageBackend::NAME, $this->config->get('storage', 'name'));
 
-		$this->assertInstanceOf(SampleStorageBackend::class, $storageManager->getBackend());
+		$this->assertInstanceOf(SampleStorageBackend::class, $storage->getBackend());
 
-		$this->assertTrue($storageManager->unregister(SampleStorageBackend::class));
+		$this->assertTrue($storage->unregister(SampleStorageBackend::class));
 		$this->assertEquals(Storage::DEFAULT_BACKENDS, $this->config->get('storage', 'backends'));
-		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storageManager->listBackends());
+		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storage->listBackends());
 
-		$this->assertNull($storageManager->getBackend());
+		$this->assertNull($storage->getBackend());
 		$this->assertNull($this->config->get('storage', 'name'));
 	}
 
@@ -245,9 +245,9 @@ class StorageTest extends DatabaseTest
 
 		$this->loadFixture(__DIR__ . '/../../datasets/storage/database.fixture.php', $this->dba);
 
-		$storageManager = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
-		$storage = $storageManager->selectFirst(['name' => $name]);
-		$storageManager->move($storage);
+		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = $storage->selectFirst(['name' => $name]);
+		$storage->move($storage);
 
 		$photos = $this->dba->select('photo', ['backend-ref', 'backend-class', 'id', 'data']);
 
@@ -255,7 +255,7 @@ class StorageTest extends DatabaseTest
 
 			$this->assertEmpty($photo['data']);
 
-			$storage = $storageManager->selectFirst(['name' => $photo['backend-class']]);
+			$storage = $storage->selectFirst(['name' => $photo['backend-class']]);
 			$data = $storage->get($photo['backend-ref']);
 
 			$this->assertNotEmpty($data);

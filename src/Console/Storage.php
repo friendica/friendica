@@ -3,7 +3,7 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\Repository\Storage;
+use Friendica\Repository\Storage as S;
 
 /**
  * @brief tool to manage storage backend and stored data from CLI
@@ -13,17 +13,17 @@ class Storage extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var Storage */
-	private $storageManager;
+	/** @var S */
+	private $storage;
 
 	/**
-	 * @param Storage $storageManager
+	 * @param S $storage
 	 */
-	public function __construct(Storage $storageManager, array $argv = [])
+	public function __construct(S $storage, array $argv = [])
 	{
 		parent::__construct($argv);
 
-		$this->storageManager = $storageManager;
+		$this->storage = $storage;
 	}
 
 	protected function getHelp()
@@ -82,11 +82,11 @@ HELP;
 	protected function doList()
 	{
 		$rowfmt = ' %-3s | %-20s';
-		$current = $this->storageManager->getBackend();
+		$current = $this->storage->getBackend();
 		$this->out(sprintf($rowfmt, 'Sel', 'Name'));
 		$this->out('-----------------------');
 		$isregisterd = false;
-		foreach ($this->storageManager->listBackends() as $name => $class) {
+		foreach ($this->storage->listBackends() as $name => $class) {
 			$issel = ' ';
 			if ($current === $class) {
 				$issel = '*';
@@ -113,14 +113,14 @@ HELP;
 		}
 
 		$name = $this->args[1];
-		$class = $this->storageManager->selectFirst(['name' => $name]);
+		$class = $this->storage->selectFirst(['name' => $name]);
 
 		if ($class === '') {
 			$this->out($name . ' is not a registered backend.');
 			return -1;
 		}
 
-		if (!$this->storageManager->setBackend($class)) {
+		if (!$this->storage->setBackend($class)) {
 			$this->out($class . ' is not a valid backend storage class.');
 			return -1;
 		}
@@ -143,11 +143,11 @@ HELP;
 			$tables = [$table];
 		}
 
-		$current = $this->storageManager->getBackend();
+		$current = $this->storage->getBackend();
 		$total = 0;
 
 		do {
-			$moved = $this->storageManager->move($current, $tables, $this->getOption('n', 5000));
+			$moved = $this->storage->move($current, $tables, $this->getOption('n', 5000));
 			if ($moved) {
 				$this->out(date('[Y-m-d H:i:s] ') . sprintf('Moved %d files', $moved));
 			}
