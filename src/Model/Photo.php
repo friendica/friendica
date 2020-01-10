@@ -15,7 +15,6 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Registry\Core;
 use Friendica\Registry\DI;
-use Friendica\Model\Storage\IStorage;
 use Friendica\Object\Image;
 use Friendica\Registry\App;
 use Friendica\Registry\Model;

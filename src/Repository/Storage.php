@@ -8,7 +8,7 @@ use Friendica\Core\Config\IConfiguration;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Database\Database;
-use Friendica\Model\Storage as S;
+use Friendica\Model\Storage as StorageModel;
 use Friendica\Network\HTTPException;
 use Psr\Log\LoggerInterface;
 
@@ -21,21 +21,21 @@ use Psr\Log\LoggerInterface;
  */
 class Storage extends BaseRepository
 {
-	protected static $model_class = S\IStorage::class;
+	protected static $model_class = StorageModel\IStorage::class;
 
 	// Default tables to look for data
 	const TABLES = ['photo', 'attach'];
 
 	// Default storage backends
 	const DEFAULT_BACKENDS = [
-		S\Filesystem::NAME => S\Filesystem::class,
-		S\Database::NAME   => S\Database::class,
+		StorageModel\Filesystem::NAME => StorageModel\Filesystem::class,
+		StorageModel\Database::NAME   => StorageModel\Database::class,
 	];
 
 	private $backends = [];
 
 	/**
-	 * @var S\IStorage[] A local cache for storage instances
+	 * @var StorageModel\IStorage[] A local cache for storage instances
 	 */
 	private $backendInstances = [];
 
@@ -44,7 +44,7 @@ class Storage extends BaseRepository
 	/** @var L10n */
 	private $l10n;
 
-	/** @var S\IStorage */
+	/** @var StorageModel\IStorage */
 	private $currentBackend;
 
 	/**
@@ -73,7 +73,7 @@ class Storage extends BaseRepository
 	/**
 	 * @brief Return current storage backend class
 	 *
-	 * @return S\IStorage|null
+	 * @return StorageModel\IStorage|null
 	 */
 	public function getBackend()
 	{
@@ -88,7 +88,7 @@ class Storage extends BaseRepository
 	 *                         'userBackend' = Just return instances in case it's a user backend (e.g. not
 	 *                         SystemResource (Default is true))
 	 *
-	 * @return S\IStorage|null null if no backend registered at $name
+	 * @return StorageModel\IStorage|null null if no backend registered at $name
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 */
@@ -103,16 +103,16 @@ class Storage extends BaseRepository
 			if ($this->isValidBackend($name, $userBackend)) {
 				switch ($name) {
 					// Try the filesystem backend
-					case S\Filesystem::getName():
-						$this->backendInstances[$name] = new S\Filesystem($this->config, $this->logger, $this->l10n);
+					case StorageModel\Filesystem::getName():
+						$this->backendInstances[$name] = new StorageModel\Filesystem($this->config, $this->logger, $this->l10n);
 						break;
 					// try the database backend
-					case S\Database::getName():
-						$this->backendInstances[$name] = new S\Database($this->dba, $this->logger, $this->l10n);
+					case StorageModel\Database::getName():
+						$this->backendInstances[$name] = new StorageModel\Database($this->dba, $this->logger, $this->l10n);
 						break;
 					// at least, try if there's an addon for the backend
-					case S\SystemResource::getName():
-						$this->backendInstances[$name] = new S\SystemResource();
+					case StorageModel\SystemResource::getName():
+						$this->backendInstances[$name] = new StorageModel\SystemResource();
 						break;
 					default:
 						$data = [
@@ -120,7 +120,7 @@ class Storage extends BaseRepository
 							'storage' => null,
 						];
 						Hook::callAll('storage_instance', $data);
-						if (($data['storage'] ?? null) instanceof S\IStorage) {
+						if (($data['storage'] ?? null) instanceof StorageModel\IStorage) {
 							$this->backendInstances[$data['name'] ?? $name] = $data['storage'];
 						} else {
 							return null;
@@ -146,7 +146,7 @@ class Storage extends BaseRepository
 	public function isValidBackend(string $name = null, bool $userBackend = true)
 	{
 		return array_key_exists($name, $this->backends) ||
-		       (!$userBackend && $name === S\SystemResource::getName());
+		       (!$userBackend && $name === StorageModel\SystemResource::getName());
 	}
 
 	/**
@@ -194,8 +194,8 @@ class Storage extends BaseRepository
 	 */
 	public function register(string $class)
 	{
-		if (is_subclass_of($class, S\IStorage::class)) {
-			/** @var S\IStorage $class */
+		if (is_subclass_of($class, StorageModel\IStorage::class)) {
+			/** @var StorageModel\IStorage $class */
 
 			$backends                    = $this->backends;
 			$backends[$class::getName()] = $class;
@@ -220,8 +220,8 @@ class Storage extends BaseRepository
 	 */
 	public function unregister(string $class)
 	{
-		if (is_subclass_of($class, S\IStorage::class)) {
-			/** @var S\IStorage $class */
+		if (is_subclass_of($class, StorageModel\IStorage::class)) {
+			/** @var StorageModel\IStorage $class */
 
 			unset($this->backends[$class::getName()]);
 
@@ -242,18 +242,18 @@ class Storage extends BaseRepository
 	 * Copy existing data to destination storage and delete from source.
 	 * This method cannot move to legacy in-table `data` field.
 	 *
-	 * @param S\IStorage $destination Destination storage class name
-	 * @param array      $tables      Tables to look in for resources. Optional, defaults to ['photo', 'attach']
-	 * @param int        $limit       Limit of the process batch size, defaults to 5000
+	 * @param StorageModel\IStorage $destination Destination storage class name
+	 * @param array                 $tables      Tables to look in for resources. Optional, defaults to ['photo', 'attach']
+	 * @param int                   $limit       Limit of the process batch size, defaults to 5000
 	 *
 	 * @return int Number of moved resources
-	 * @throws S\StorageException
+	 * @throws StorageModel\StorageException
 	 * @throws Exception
 	 */
-	public function move(S\IStorage $destination, array $tables = self::TABLES, int $limit = 5000)
+	public function move(StorageModel\IStorage $destination, array $tables = self::TABLES, int $limit = 5000)
 	{
 		if ($destination === null) {
-			throw new S\StorageException('Can\'t move to NULL storage backend');
+			throw new StorageModel\StorageException('Can\'t move to NULL storage backend');
 		}
 
 		$moved = 0;

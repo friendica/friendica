@@ -10,7 +10,6 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Registry\DI;
-use Friendica\Model\Storage\IStorage;
 use Friendica\Object\Image;
 use Friendica\Registry\Model;
 use Friendica\Registry\Repository;

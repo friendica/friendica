@@ -2,12 +2,10 @@
 
 namespace Friendica\Test\Util;
 
-use Friendica\App;
 use Friendica\Core\Hook;
 use Friendica\Model\Storage\IStorage;
 
 use Friendica\Core\L10n\L10n;
-use Mockery\MockInterface;
 
 /**
  * A backend storage example class

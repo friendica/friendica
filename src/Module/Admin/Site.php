@@ -9,7 +9,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Registry\Model;
 use Friendica\Registry\Repository;
-use Friendica\Repository\Storage;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;

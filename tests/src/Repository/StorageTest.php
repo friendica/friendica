@@ -9,11 +9,11 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n\L10n;
 use Friendica\Core\Session\ISession;
 use Friendica\Registry\DI;
-use Friendica\Repository\Storage;
+use Friendica\Repository\Storage as StorageRepository;
 use Friendica\Database\Database;
 use Friendica\Factory\ConfigFactory;
 use Friendica\Model\Config\Config;
-use Friendica\Model\Storage as S;
+use Friendica\Model\Storage as StorageModel;
 use Friendica\Core\Session;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
@@ -66,9 +66,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testInstance()
 	{
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertInstanceOf(Storage::class, $storage);
+		$this->assertInstanceOf(StorageRepository::class, $storage);
 	}
 
 	public function dataStorages()
@@ -81,21 +81,21 @@ class StorageTest extends DatabaseTest
 				'userBackend' => false,
 			],
 			'database'       => [
-				'name'        => S\Database::NAME,
-				'assert'      => S\Database::class,
-				'assertName'  => S\Database::NAME,
+				'name'        => StorageModel\Database::NAME,
+				'assert'      => StorageModel\Database::class,
+				'assertName'  => StorageModel\Database::NAME,
 				'userBackend' => true,
 			],
 			'filesystem'     => [
-				'name'        => S\Filesystem::NAME,
-				'assert'      => S\Filesystem::class,
-				'assertName'  => S\Filesystem::NAME,
+				'name'        => StorageModel\Filesystem::NAME,
+				'assert'      => StorageModel\Filesystem::class,
+				'assertName'  => StorageModel\Filesystem::NAME,
 				'userBackend' => true,
 			],
 			'systemresource' => [
-				'name'        => S\SystemResource::NAME,
-				'assert'      => S\SystemResource::class,
-				'assertName'  => S\SystemResource::NAME,
+				'name'        => StorageModel\SystemResource::NAME,
+				'assert'      => StorageModel\SystemResource::class,
+				'assertName'  => StorageModel\SystemResource::NAME,
 				// false here, because SystemResource isn't meant to be a user backend,
 				// it's for system resources only
 				'userBackend' => false,
@@ -116,12 +116,12 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testGetByName($name, $assert, $assertName, $userBackend)
 	{
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$storage = $storage->selectFirst(['name' => $name, 'userBackend' => $userBackend]);
 
 		if (!empty($assert)) {
-			$this->assertInstanceOf(S\IStorage::class, $storage);
+			$this->assertInstanceOf(StorageModel\IStorage::class, $storage);
 			$this->assertInstanceOf($assert, $storage);
 			$this->assertEquals($name, $storage::getName());
 		} else {
@@ -137,7 +137,7 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testIsValidBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertEquals($userBackend, $storage->isValidBackend($name));
 	}
@@ -147,9 +147,9 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testListBackends()
 	{
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
-		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storage->listBackends());
+		$this->assertEquals(StorageRepository::DEFAULT_BACKENDS, $storage->listBackends());
 	}
 
 	/**
@@ -159,7 +159,7 @@ class StorageTest extends DatabaseTest
 	 */
 	public function testGetBackend($name, $assert, $assertName, $userBackend)
 	{
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertNull($storage->getBackend());
 
@@ -179,7 +179,7 @@ class StorageTest extends DatabaseTest
 	{
 		$this->config->set('storage', 'name', $name);
 
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
 		if ($userBackend) {
 			$this->assertInstanceOf($assert, $storage->getBackend());
@@ -204,14 +204,14 @@ class StorageTest extends DatabaseTest
 			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 
 		$this->assertTrue($storage->register(SampleStorageBackend::class));
 
-		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
+		$this->assertEquals(array_merge(StorageRepository::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
 		]), $storage->listBackends());
-		$this->assertEquals(array_merge(Storage::DEFAULT_BACKENDS, [
+		$this->assertEquals(array_merge(StorageRepository::DEFAULT_BACKENDS, [
 			SampleStorageBackend::getName() => SampleStorageBackend::class,
 		]), $this->config->get('storage', 'backends'));
 
@@ -225,8 +225,8 @@ class StorageTest extends DatabaseTest
 		$this->assertInstanceOf(SampleStorageBackend::class, $storage->getBackend());
 
 		$this->assertTrue($storage->unregister(SampleStorageBackend::class));
-		$this->assertEquals(Storage::DEFAULT_BACKENDS, $this->config->get('storage', 'backends'));
-		$this->assertEquals(Storage::DEFAULT_BACKENDS, $storage->listBackends());
+		$this->assertEquals(StorageRepository::DEFAULT_BACKENDS, $this->config->get('storage', 'backends'));
+		$this->assertEquals(StorageRepository::DEFAULT_BACKENDS, $storage->listBackends());
 
 		$this->assertNull($storage->getBackend());
 		$this->assertNull($this->config->get('storage', 'name'));
@@ -245,7 +245,7 @@ class StorageTest extends DatabaseTest
 
 		$this->loadFixture(__DIR__ . '/../../datasets/storage/database.fixture.php', $this->dba);
 
-		$repoStorage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$repoStorage = new StorageRepository($this->dba, $this->config, $this->logger, $this->l10n);
 		$storage = $repoStorage->selectFirst(['name' => $name]);
 		$repoStorage->move($storage);
 
