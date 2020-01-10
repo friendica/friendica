@@ -3,10 +3,9 @@
 namespace Friendica\Registry;
 
 use Dice\Dice;
-use Friendica\App as A;
+use Friendica\App;
 use Friendica\BaseRegistry;
 use Friendica\Database\Database;
-use Friendica\Registry;
 
 /**
  * The global Dependency injection registry.
@@ -31,10 +30,10 @@ abstract class DI extends BaseRegistry
 	}
 
 	/**
-	 * @return A
+	 * @return App
 	 */
 	public static function app()
 	{
-		return BaseRegistry::$dice->create(A::class);
+		return BaseRegistry::$dice->create(App::class);
 	}
 }
