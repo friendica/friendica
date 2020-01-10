@@ -328,7 +328,7 @@ class CronJobs
 	private static function moveStorage()
 	{
 		$current = Model::storage();
-		$moved = Repository::storageManager()->move($current);
+		$moved = Repository::storage()->move($current);
 
 		if ($moved) {
 			Worker::add(PRIORITY_LOW, "CronJobs", "move_storage");
