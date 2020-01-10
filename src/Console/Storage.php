@@ -3,7 +3,7 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\Repository\Storage as S;
+use Friendica\Repository\Storage as StorageRepository;
 
 /**
  * @brief tool to manage storage backend and stored data from CLI
@@ -13,13 +13,13 @@ class Storage extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var S */
+	/** @var StorageRepository */
 	private $repoStorage;
 
 	/**
-	 * @param S $repoStorage
+	 * @param StorageRepository $repoStorage
 	 */
-	public function __construct(S $repoStorage, array $argv = [])
+	public function __construct(StorageRepository $repoStorage, array $argv = [])
 	{
 		parent::__construct($argv);
 

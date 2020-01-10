@@ -11,7 +11,6 @@ use Friendica\Util\Profiler;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 use Psr\Log\NullLogger;
-use function GuzzleHttp\Psr7\uri_for;
 
 class FilesystemStorageTest extends StorageTest
 {
