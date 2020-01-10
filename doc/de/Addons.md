@@ -195,14 +195,14 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('init_1');
     Hook::callAll('app_menu', $arr);
-    Hook::callAll('page_content_top', DI::page()['content']);
+    Hook::callAll('page_content_top', App::page()['content']);
     Hook::callAll($a->module.'_mod_init', $placeholder);
     Hook::callAll($a->module.'_mod_init', $placeholder);
     Hook::callAll($a->module.'_mod_post', $_POST);
     Hook::callAll($a->module.'_mod_afterpost', $placeholder);
     Hook::callAll($a->module.'_mod_content', $arr);
     Hook::callAll($a->module.'_mod_aftercontent', $arr);
-    Hook::callAll('page_end', DI::page()['content']);
+    Hook::callAll('page_end', App::page()['content']);
 
 ### include/api.php
 
@@ -418,7 +418,7 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
 ### src/Content/Nav.php
 
-    Hook::callAll('page_header', DI::page()['nav']);
+    Hook::callAll('page_header', App::page()['nav']);
     Hook::callAll('nav_info', $nav);
 
 ### src/Core/Authentication.php

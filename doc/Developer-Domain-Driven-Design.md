@@ -46,7 +46,7 @@ function doSomething(\Friendica\Collection\Introductions $intros)
 }
 
 /** @var $intros \Friendica\Collection\Introductions */
-$intros = \Friendica\DI::intro()->select(['uid' => local_user()]);
+$intros = \Friendica\Registry\Repository::intro()->select(['uid' => local_user()]);
 
 doSomething($intros);
 ```
@@ -139,14 +139,14 @@ class Factory
     }
 }
 
-$model = \Friendica\DI::factory()->create();
+$model = \Friendica\Registry\Factory::factory()->create();
 $model->id = 1;
 $model->key = 'value';
 
 $model->save();
 ```
 
-Here, `DI::factory()` returns an instance of `Factory` that can then be used to create a `Model` object without having to care about its dependencies.
+Here, `Factory::factory()` returns an instance of `Factory` that can then be used to create a `Model` object without having to care about its dependencies.
 
 ### Repositories
 
@@ -195,7 +195,7 @@ class Factory
 }
 
 
-$model = \Friendica\DI::factory()->create();
+$model = \Friendica\Registry\Factory::factory()->create();
 $model->id = 1;
 $model->key = 'value';
 
@@ -231,9 +231,9 @@ class Repository extends Factory
     }
 }
 
-$model = \Friendica\DI::repository()->create();
+$model = \Friendica\Registry\Repository::repository()->create();
 $model->id = 1;
 $model->key = 'value';
 
-\Friendica\DI::repository()->save($model);
+\Friendica\Registry\Repository::repository()->save($model);
 ```

@@ -15,6 +15,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Module\Security\Login;
 use Friendica\Registry\App as A;
+use Friendica\Registry\Factory;
 use Friendica\Registry\Model;
 
 function notifications_post(App $a)
@@ -30,7 +31,7 @@ function notifications_post(App $a)
 	}
 
 	if ($request_id) {
-		$intro = Model::intro()->selectFirst(['id' => $request_id, 'uid' => local_user()]);
+		$intro = Factory::intro()->selectFirst(['id' => $request_id, 'uid' => local_user()]);
 
 		switch ($_POST['submit']) {
 			case L10n::t('Discard'):

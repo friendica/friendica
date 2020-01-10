@@ -20,6 +20,7 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
@@ -2063,7 +2064,7 @@ class Item
 		}
 
 		// To avoid timing problems, we are using locks.
-		$locked = DI::lock()->acquire('item_insert_activity');
+		$locked = Core::lock()->acquire('item_insert_activity');
 		if (!$locked) {
 			Logger::log("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
@@ -2079,11 +2080,11 @@ class Item
 		} else {
 			// This shouldn't happen.
 			Logger::log('Could not insert activity for URI ' . $item['uri'] . ' - should not happen');
-			DI::lock()->release('item_insert_activity');
+			Core::lock()->release('item_insert_activity');
 			return false;
 		}
 		if ($locked) {
-			DI::lock()->release('item_insert_activity');
+			Core::lock()->release('item_insert_activity');
 		}
 		return true;
 	}
@@ -2106,7 +2107,7 @@ class Item
 		}
 
 		// To avoid timing problems, we are using locks.
-		$locked = DI::lock()->acquire('item_insert_content');
+		$locked = Core::lock()->acquire('item_insert_content');
 		if (!$locked) {
 			Logger::log("Couldn't acquire lock for URI " . $item['uri'] . " - proceeding anyway.");
 		}
@@ -2124,7 +2125,7 @@ class Item
 			Logger::log('Could not insert content for URI ' . $item['uri'] . ' - should not happen');
 		}
 		if ($locked) {
-			DI::lock()->release('item_insert_content');
+			Core::lock()->release('item_insert_content');
 		}
 	}
 

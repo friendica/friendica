@@ -9,6 +9,7 @@ use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Module\Register;
 use Friendica\Registry\App as A;
+use Friendica\Registry\Factory;
 
 /**
  * Class Instance
@@ -77,7 +78,7 @@ class Instance extends BaseEntity
 			$administrator = User::getByEmail($adminList[0], ['nickname']);
 			if (!empty($administrator)) {
 				$adminContact = DBA::selectFirst('contact', ['id'], ['nick' => $administrator['nickname'], 'self' => true]);
-				$instance->contact_account = DI::mstdnAccount()->createFromContactId($adminContact['id']);
+				$instance->contact_account = Factory::mstdnAccount()->createFromContactId($adminContact['id']);
 			}
 		}
 

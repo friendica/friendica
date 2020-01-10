@@ -141,7 +141,7 @@ function message_content(App $a)
 				}
 			}
 
-			//DI::page()['aside'] = '';
+			//App::page()['aside'] = '';
 			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
 				'$method' => 'get',
 				'$message' => L10n::t('Do you really want to delete this message?'),

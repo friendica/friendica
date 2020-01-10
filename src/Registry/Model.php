@@ -19,14 +19,6 @@ abstract class Model extends BaseRegistry
 	}
 
 	/**
-	 * @return M\Introduction
-	 */
-	public static function intro()
-	{
-		return self::$dice->create(M\Introduction::class);
-	}
-
-	/**
 	 * @return M\User\Cookie
 	 */
 	public static function cookie()
