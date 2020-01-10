@@ -146,7 +146,7 @@ class Attach
 	 */
 	public static function getData($item)
 	{
-		$backendClass = DI::storageManager()->getByName($photo['backend-class'] ?? '');
+		$backendClass = Repository::storage()->selectFirst($photo['backend-class'] ?? '');
 		if ($backendClass === null) {
 			// legacy data storage in 'data' column
 			$i = self::selectFirst(['data'], ['id' => $item['id']]);
