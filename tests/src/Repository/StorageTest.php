@@ -245,9 +245,9 @@ class StorageTest extends DatabaseTest
 
 		$this->loadFixture(__DIR__ . '/../../datasets/storage/database.fixture.php', $this->dba);
 
-		$storage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
-		$storage = $storage->selectFirst(['name' => $name]);
-		$storage->move($storage);
+		$repoStorage = new Storage($this->dba, $this->config, $this->logger, $this->l10n);
+		$storage = $repoStorage->selectFirst(['name' => $name]);
+		$repoStorage->move($storage);
 
 		$photos = $this->dba->select('photo', ['backend-ref', 'backend-class', 'id', 'data']);
 
@@ -255,7 +255,7 @@ class StorageTest extends DatabaseTest
 
 			$this->assertEmpty($photo['data']);
 
-			$storage = $storage->selectFirst(['name' => $photo['backend-class']]);
+			$storage = $repoStorage->selectFirst(['name' => $photo['backend-class']]);
 			$data = $storage->get($photo['backend-ref']);
 
 			$this->assertNotEmpty($data);
