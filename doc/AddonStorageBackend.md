@@ -86,10 +86,10 @@ See doxygen documentation of `IStorage` interface for details about each method.
 
 Each backend must be registered in the system when the plugin is installed, to be aviable.
 
-`Repository::storageManage()->register(string $class)` is used to register the backend class.
+`Repository::storage()->register(string $class)` is used to register the backend class.
 
 When the plugin is uninstalled, registered backends must be unregistered using
-`Repository::storageManage()->unregister(string $class)`.
+`Repository::storage()->unregister(string $class)`.
 
 You have to register a new hook in your addon, listening on `storage_instance(App $a, array $data)`.
 In case `$data['name']` is your storage class name, you have to instance a new instance of your `Friendica\Model\Storage\IStorage` class.
