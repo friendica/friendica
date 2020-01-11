@@ -257,7 +257,7 @@ function api_login(App $a)
 		throw new UnauthorizedException("This API requires login");
 	}
 
-	A::auth()->setForUser($a, $record);
+	AppR::auth()->setForUser($a, $record);
 
 	$_SESSION["allow_api"] = true;
 

@@ -20,7 +20,7 @@ use Friendica\Util\XML;
 
 function dfrn_poll_init(App $a)
 {
-	A::auth()->withSession($a);
+	AppR::auth()->withSession($a);
 
 	$dfrn_id         =  $_GET['dfrn_id']         ?? '';
 	$type            = ($_GET['type']            ?? '') ?: 'data';
