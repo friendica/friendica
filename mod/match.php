@@ -12,7 +12,7 @@ use Friendica\Core\Search;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 
@@ -35,10 +35,10 @@ function match_content(App $a)
 		return '';
 	}
 
-	A::page()['aside'] .= Widget::findPeople();
-	A::page()['aside'] .= Widget::follow();
+	AppR::page()['aside'] .= Widget::findPeople();
+	AppR::page()['aside'] .= Widget::follow();
 
-	$_SESSION['return_path'] = A::args()->getCommand();
+	$_SESSION['return_path'] = AppR::args()->getCommand();
 
 	$profile = Profile::getByUID(local_user());
 
@@ -59,7 +59,7 @@ function match_content(App $a)
 	if (strlen(Config::get('system', 'directory'))) {
 		$host = Search::getGlobalDirectory();
 	} else {
-		$host = A::baseUrl();
+		$host = AppR::baseUrl();
 	}
 
 	$msearch_json = Network::post($host . '/msearch', $params)->getBody();
@@ -82,7 +82,7 @@ function match_content(App $a)
 			// Workaround for wrong directory photo URL
 			$profile->photo = str_replace('http:///photo/', Search::getGlobalDirectory() . '/photo/', $profile->photo);
 
-			$connlnk = A::baseUrl() . '/follow/?url=' . $profile->url;
+			$connlnk = AppR::baseUrl() . '/follow/?url=' . $profile->url;
 			$photo_menu = [
 				'profile' => [L10n::t("View Profile"), Contact::magicLink($profile->url)],
 				'follow' => [L10n::t("Connect/Follow"), $connlnk]

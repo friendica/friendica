@@ -11,7 +11,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 function user_allow($hash)
 {
@@ -32,7 +32,7 @@ function user_allow($hash)
 	$profile = DBA::selectFirst('profile', ['net-publish'], ['uid' => $register['uid'], 'is-default' => true]);
 
 	if (DBA::isResult($profile) && $profile['net-publish'] && Config::get('system', 'directory')) {
-		$url = A::baseUrl() . '/profile/' . $user['nickname'];
+		$url = AppR::baseUrl() . '/profile/' . $user['nickname'];
 		Worker::add(PRIORITY_LOW, "Directory", $url);
 	}
 
@@ -42,7 +42,7 @@ function user_allow($hash)
 		$l10n,
 		$user,
 		Config::get('config', 'sitename'),
-		A::baseUrl()->get(),
+		AppR::baseUrl()->get(),
 		($register['password'] ?? '') ?: 'Sent in a previous email'
 	);
 
@@ -79,7 +79,7 @@ function regmod_content(App $a)
 {
 	if (!local_user()) {
 		info(L10n::t('Please login.') . EOL);
-		return Login::form(A::args()->getQueryString(), intval(Config::get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED ? 0 : 1);
+		return Login::form(AppR::args()->getQueryString(), intval(Config::get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED ? 0 : 1);
 	}
 
 	if (!is_site_admin() || !empty($_SESSION['submanage'])) {
@@ -96,11 +96,11 @@ function regmod_content(App $a)
 
 	if ($cmd === 'deny') {
 		user_deny($hash);
-		A::baseUrl()->redirect('admin/users/');
+		AppR::baseUrl()->redirect('admin/users/');
 	}
 
 	if ($cmd === 'allow') {
 		user_allow($hash);
-		A::baseUrl()->redirect('admin/users/');
+		AppR::baseUrl()->redirect('admin/users/');
 	}
 }

@@ -29,7 +29,7 @@ use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -70,7 +70,7 @@ function dfrn_request_post(App $a)
 	}
 
 	if (!empty($_POST['cancel'])) {
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 	}
 
 	/*
@@ -196,14 +196,14 @@ function dfrn_request_post(App $a)
 				}
 
 				// (ignore reply, nothing we can do it failed)
-				A::baseUrl()->redirect($forward_path);
+				AppR::baseUrl()->redirect($forward_path);
 				return; // NOTREACHED
 			}
 		}
 
 		// invalid/bogus request
 		notice(L10n::t('Unrecoverable protocol error.') . EOL);
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 		return; // NOTREACHED
 	}
 
@@ -336,19 +336,19 @@ function dfrn_request_post(App $a)
 				$url = Network::isUrlValid($url);
 				if (!$url) {
 					notice(L10n::t('Invalid profile URL.') . EOL);
-					A::baseUrl()->redirect(A::args()->getCommand());
+					AppR::baseUrl()->redirect(AppR::args()->getCommand());
 					return; // NOTREACHED
 				}
 
 				if (!Network::isUrlAllowed($url)) {
 					notice(L10n::t('Disallowed profile URL.') . EOL);
-					A::baseUrl()->redirect(A::args()->getCommand());
+					AppR::baseUrl()->redirect(AppR::args()->getCommand());
 					return; // NOTREACHED
 				}
 
 				if (Network::isUrlBlocked($url)) {
 					notice(L10n::t('Blocked domain') . EOL);
-					A::baseUrl()->redirect(A::args()->getCommand());
+					AppR::baseUrl()->redirect(AppR::args()->getCommand());
 					return; // NOTREACHED
 				}
 
@@ -356,7 +356,7 @@ function dfrn_request_post(App $a)
 
 				if (!count($parms)) {
 					notice(L10n::t('Profile location is not valid or does not contain profile information.') . EOL);
-					A::baseUrl()->redirect(A::args()->getCommand());
+					AppR::baseUrl()->redirect(AppR::args()->getCommand());
 				} else {
 					if (empty($parms['fn'])) {
 						notice(L10n::t('Warning: profile location has no identifiable owner name.') . EOL);
@@ -438,7 +438,7 @@ function dfrn_request_post(App $a)
 			}
 
 			// "Homecoming" - send the requestor back to their site to record the introduction.
-			$dfrn_url = bin2hex(A::baseUrl()->get() . '/profile/' . $nickname);
+			$dfrn_url = bin2hex(AppR::baseUrl()->get() . '/profile/' . $nickname);
 			$aes_allow = ((function_exists('openssl_encrypt')) ? 1 : 0);
 
 			System::externalRedirect($parms['dfrn-request'] . "?dfrn_url=$dfrn_url"
@@ -456,10 +456,10 @@ function dfrn_request_post(App $a)
 			// Diaspora needs the uri in the format user@domain.tld
 			// Diaspora will support the remote subscription in a future version
 			if ($network == Protocol::DIASPORA) {
-				$uri = $nickname . '@' . A::baseUrl()->getHostname();
+				$uri = $nickname . '@' . AppR::baseUrl()->getHostname();
 
-				if (A::baseUrl()->getUrlPath()) {
-					$uri .= '/' . A::baseUrl()->getUrlPath();
+				if (AppR::baseUrl()->getUrlPath()) {
+					$uri .= '/' . AppR::baseUrl()->getUrlPath();
 				}
 
 				$uri = urlencode($uri);
@@ -560,7 +560,7 @@ function dfrn_request_content(App $a)
 						'to_name'      => $r[0]['username'],
 						'to_email'     => $r[0]['email'],
 						'uid'          => $r[0]['uid'],
-						'link'         => A::baseUrl() . '/notifications/intros',
+						'link'         => AppR::baseUrl() . '/notifications/intros',
 						'source_name'  => ((strlen(stripslashes($r[0]['name']))) ? stripslashes($r[0]['name']) : L10n::t('[Name Withheld]')),
 						'source_link'  => $r[0]['url'],
 						'source_photo' => $r[0]['photo'],
@@ -611,17 +611,17 @@ function dfrn_request_content(App $a)
 		} elseif (!empty($_GET['address'])) {
 			$myaddr = $_GET['address'];
 		} elseif (local_user()) {
-			if (strlen(A::baseUrl()->getUrlPath())) {
-				$myaddr = A::baseUrl() . '/profile/' . $a->user['nickname'];
+			if (strlen(AppR::baseUrl()->getUrlPath())) {
+				$myaddr = AppR::baseUrl() . '/profile/' . $a->user['nickname'];
 			} else {
-				$myaddr = $a->user['nickname'] . '@' . substr(A::baseUrl(), strpos(A::baseUrl(), '://') + 3);
+				$myaddr = $a->user['nickname'] . '@' . substr(AppR::baseUrl(), strpos(AppR::baseUrl(), '://') + 3);
 			}
 		} else {
 			// last, try a zrl
 			$myaddr = Profile::getMyURL();
 		}
 
-		$target_addr = $a->profile['nickname'] . '@' . substr(A::baseUrl(), strpos(A::baseUrl(), '://') + 3);
+		$target_addr = $a->profile['nickname'] . '@' . substr(AppR::baseUrl(), strpos(AppR::baseUrl(), '://') + 3);
 
 		/* The auto_request form only has the profile address
 		 * because nobody is going to read the comments and

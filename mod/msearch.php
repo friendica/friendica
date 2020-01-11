@@ -2,7 +2,7 @@
 
 use Friendica\App;
 use Friendica\Database\DBA;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 function msearch_post(App $a)
 {
@@ -54,8 +54,8 @@ function msearch_post(App $a)
 	while($search_result = DBA::fetch($search_stmt)) {
 		$results[] = [
 			'name'  => $search_result['name'],
-			'url'   => A::baseUrl() . '/profile/' . $search_result['nickname'],
-			'photo' => A::baseUrl() . '/photo/avatar/' . $search_result['uid'] . '.jpg',
+			'url'   => AppR::baseUrl() . '/profile/' . $search_result['nickname'],
+			'photo' => AppR::baseUrl() . '/photo/avatar/' . $search_result['uid'] . '.jpg',
 			'tags'  => str_replace([',', '  '], [' ', ' '], $search_result['pub_keywords'])
 		];
 	}

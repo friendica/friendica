@@ -8,7 +8,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 function noscrape_init(App $a)
 {
@@ -31,14 +31,14 @@ function noscrape_init(App $a)
 		'nick'         => $which,
 		'guid'         => $a->profile['guid'],
 		'key'          => $a->profile['pubkey'],
-		'homepage'     => A::baseUrl() . "/profile/{$which}",
+		'homepage'     => AppR::baseUrl() . "/profile/{$which}",
 		'comm'         => ($a->profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY),
 		'account-type' => $a->profile['account-type'],
 	];
 
 	$dfrn_pages = ['request', 'confirm', 'notify', 'poll'];
 	foreach ($dfrn_pages as $dfrn) {
-		$json_info["dfrn-{$dfrn}"] = A::baseUrl() . "/dfrn_{$dfrn}/{$which}";
+		$json_info["dfrn-{$dfrn}"] = AppR::baseUrl() . "/dfrn_{$dfrn}/{$which}";
 	}
 
 	if (!$a->profile['net-publish'] || $a->profile['hidewall']) {

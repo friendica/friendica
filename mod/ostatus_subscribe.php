@@ -9,14 +9,14 @@ use Friendica\Core\PConfig;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 use Friendica\Network\Probe;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 
 function ostatus_subscribe_content(App $a)
 {
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		A::baseUrl()->redirect('ostatus_subscribe');
+		AppR::baseUrl()->redirect('ostatus_subscribe');
 		// NOTREACHED
 	}
 
@@ -62,7 +62,7 @@ function ostatus_subscribe_content(App $a)
 	$total = sizeof($friends);
 
 	if ($counter >= $total) {
-		A::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . A::baseUrl() . '/settings/connectors">';
+		AppR::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . AppR::baseUrl() . '/settings/connectors">';
 		PConfig::delete($uid, 'ostatus', 'legacy_friends');
 		PConfig::delete($uid, 'ostatus', 'legacy_contact');
 		$o .= L10n::t('Done');
@@ -91,7 +91,7 @@ function ostatus_subscribe_content(App $a)
 
 	$o .= '<p>' . L10n::t('Keep this window open until done.') . '</p>';
 
-	A::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . A::baseUrl() . '/ostatus_subscribe?counter=' . $counter . '">';
+	AppR::page()['htmlhead'] = '<meta http-equiv="refresh" content="0; URL=' . AppR::baseUrl() . '/ostatus_subscribe?counter=' . $counter . '">';
 
 	return $o;
 }

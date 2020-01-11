@@ -19,7 +19,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Profile;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -66,12 +66,12 @@ function cal_init(App $a)
 
 	$cal_widget = Widget\CalendarExport::getHTML();
 
-	if (empty(A::page()['aside'])) {
-		A::page()['aside'] = '';
+	if (empty(AppR::page()['aside'])) {
+		AppR::page()['aside'] = '';
 	}
 
-	A::page()['aside'] .= $vcard_widget;
-	A::page()['aside'] .= $cal_widget;
+	AppR::page()['aside'] .= $vcard_widget;
+	AppR::page()['aside'] .= $cal_widget;
 
 	return;
 }
@@ -84,7 +84,7 @@ function cal_content(App $a)
 	$i18n = Event::getStrings();
 
 	$htpl                        = Renderer::getMarkupTemplate('event_head.tpl');
-	A::page()['htmlhead'] .= Renderer::replaceMacros($htpl, [
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros($htpl, [
 		'$module_url' => '/cal/' . $a->data['user']['nickname'],
 		'$modparams' => 2,
 		'$i18n' => $i18n,
@@ -220,7 +220,7 @@ function cal_content(App $a)
 			foreach ($r as $rr) {
 				$j = $rr['adjust'] ? DateTimeFormat::local($rr['start'], 'j') : DateTimeFormat::utc($rr['start'], 'j');
 				if (empty($links[$j])) {
-					$links[$j] = A::baseUrl() . '/' . A::args()->getCommand() . '#link-' . $j;
+					$links[$j] = AppR::baseUrl() . '/' . AppR::args()->getCommand() . '#link-' . $j;
 				}
 			}
 		}
@@ -258,8 +258,8 @@ function cal_content(App $a)
 			'$tabs' => $tabs,
 			'$title' => L10n::t('Events'),
 			'$view' => L10n::t('View'),
-			'$previous' => [A::baseUrl() . "/events/$prevyear/$prevmonth", L10n::t('Previous'), '', ''],
-			'$next' => [A::baseUrl() . "/events/$nextyear/$nextmonth", L10n::t('Next'), '', ''],
+			'$previous' => [AppR::baseUrl() . "/events/$prevyear/$prevmonth", L10n::t('Previous'), '', ''],
+			'$next' => [AppR::baseUrl() . "/events/$nextyear/$nextmonth", L10n::t('Next'), '', ''],
 			'$calendar' => Temporal::getCalendarTable($y, $m, $links, ' eventcal'),
 			'$events' => $events,
 			"today" => L10n::t("today"),
@@ -287,7 +287,7 @@ function cal_content(App $a)
 		// Respect the export feature setting for all other /cal pages if it's not the own profile
 		if ((local_user() !== $owner_uid) && !Feature::isEnabled($owner_uid, "export_calendar")) {
 			notice(L10n::t('Permission denied.') . EOL);
-			A::baseUrl()->redirect('cal/' . $nick);
+			AppR::baseUrl()->redirect('cal/' . $nick);
 		}
 
 		// Get the export data by uid
@@ -308,7 +308,7 @@ function cal_content(App $a)
 				$return_path = "cal/" . $nick;
 			}
 
-			A::baseUrl()->redirect($return_path);
+			AppR::baseUrl()->redirect($return_path);
 		}
 
 		// If nothing went wrong we can echo the export content

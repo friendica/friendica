@@ -10,7 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Registry\DI;
 use Friendica\Network\HTTPException;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\BasePath;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
@@ -52,13 +52,13 @@ class Install extends BaseModule
 	{
 		$a = DI::app();
 
-		if (!A::mode()->isInstall()) {
+		if (!AppR::mode()->isInstall()) {
 			throw new HTTPException\ForbiddenException();
 		}
 
 		// route: install/testrwrite
 		// $baseurl/install/testrwrite to test if rewrite in .htaccess is working
-		if (A::args()->get(1, '') == 'testrewrite') {
+		if (AppR::args()->get(1, '') == 'testrewrite') {
 			// Status Code 204 means that it worked without content
 			throw new HTTPException\NoContentException();
 		}
@@ -72,7 +72,7 @@ class Install extends BaseModule
 
 		// We overwrite current theme css, because during install we may not have a working mod_rewrite
 		// so we may not have a css at all. Here we set a static css file for the install procedure pages
-		Renderer::$theme['stylesheet'] = A::baseUrl()->get() . '/view/install/style.css';
+		Renderer::$theme['stylesheet'] = AppR::baseUrl()->get() . '/view/install/style.css';
 
 		self::$currentWizardStep = ($_POST['pass'] ?? '') ?: self::SYSTEM_CHECK;
 	}
@@ -163,7 +163,7 @@ class Install extends BaseModule
 			case self::SYSTEM_CHECK:
 				$php_path = $configCache->get('config', 'php_path');
 
-				$status = self::$installer->checkEnvironment(A::baseUrl()->get(), $php_path);
+				$status = self::$installer->checkEnvironment(AppR::baseUrl()->get(), $php_path);
 
 				$tpl    = Renderer::getMarkupTemplate('install_checks.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
@@ -321,7 +321,7 @@ class Install extends BaseModule
 	 */
 	private static function whatNext()
 	{
-		$baseurl = A::baseUrl()->get();
+		$baseurl = AppR::baseUrl()->get();
 		return
 			L10n::t('<h1>What next</h1>')
 			. "<p>" . L10n::t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')

@@ -6,7 +6,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Module\Security\Login;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
@@ -15,7 +15,7 @@ function oexchange_init(App $a) {
 	if (($a->argc > 1) && ($a->argv[1] === 'xrd')) {
 		$tpl = Renderer::getMarkupTemplate('oexchange_xrd.tpl');
 
-		$o = Renderer::replaceMacros($tpl, ['$base' => A::baseUrl()]);
+		$o = Renderer::replaceMacros($tpl, ['$base' => AppR::baseUrl()]);
 		echo $o;
 		exit();
 	}
@@ -42,7 +42,7 @@ function oexchange_content(App $a) {
 	$tags = ((!empty($_REQUEST['tags']))
 		? '&tags=' . urlencode(Strings::escapeTags(trim($_REQUEST['tags']))) : '');
 
-	$s = Network::fetchUrl(A::baseUrl() . '/parse_url?f=&url=' . $url . $title . $description . $tags);
+	$s = Network::fetchUrl(AppR::baseUrl() . '/parse_url?f=&url=' . $url . $title . $description . $tags);
 
 	if (!strlen($s)) {
 		return;

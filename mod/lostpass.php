@@ -10,7 +10,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
@@ -18,14 +18,14 @@ function lostpass_post(App $a)
 {
 	$loginame = Strings::escapeTags(trim($_POST['login-name']));
 	if (!$loginame) {
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 	}
 
 	$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` = 1 AND `blocked` = 0', $loginame, $loginame];
 	$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
 	if (!DBA::isResult($user)) {
 		notice(L10n::t('No valid account found.') . EOL);
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 	}
 
 	$pwdreset_token = Strings::getRandomName(12) . random_int(1000, 9999);
@@ -40,7 +40,7 @@ function lostpass_post(App $a)
 	}
 
 	$sitename = Config::get('config', 'sitename');
-	$resetlink = A::baseUrl() . '/lostpass/' . $pwdreset_token;
+	$resetlink = AppR::baseUrl() . '/lostpass/' . $pwdreset_token;
 
 	$preamble = Strings::deindent(L10n::t('
 		Dear %1$s,
@@ -64,7 +64,7 @@ function lostpass_post(App $a)
 		The login details are as follows:
 
 		Site Location:	%2$s
-		Login Name:	%3$s', $resetlink, A::baseUrl(), $user['nickname']));
+		Login Name:	%3$s', $resetlink, AppR::baseUrl(), $user['nickname']));
 
 	notification([
 		'type'     => SYSTEM_EMAIL,
@@ -77,7 +77,7 @@ function lostpass_post(App $a)
 		'body'     => $body
 	]);
 
-	A::baseUrl()->redirect();
+	AppR::baseUrl()->redirect();
 }
 
 function lostpass_content(App $a)
@@ -137,7 +137,7 @@ function lostpass_generate_password($user)
 			'$lbl2'    => L10n::t('Your password has been reset as requested.'),
 			'$lbl3'    => L10n::t('Your new password is'),
 			'$lbl4'    => L10n::t('Save or copy your new password - and then'),
-			'$lbl5'    => '<a href="' . A::baseUrl() . '">' . L10n::t('click here to login') . '</a>.',
+			'$lbl5'    => '<a href="' . AppR::baseUrl() . '">' . L10n::t('click here to login') . '</a>.',
 			'$lbl6'    => L10n::t('Your password may be changed from the <em>Settings</em> page after successful login.'),
 			'$newpass' => $new_password,
 		]);
@@ -159,7 +159,7 @@ function lostpass_generate_password($user)
 			Password:	%3$s
 
 			You may change that password from your account settings page after logging in.
-		', A::baseUrl(), $user['nickname'], $new_password));
+		', AppR::baseUrl(), $user['nickname'], $new_password));
 
 		notification([
 			'type'     => SYSTEM_EMAIL,

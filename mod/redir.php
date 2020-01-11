@@ -8,7 +8,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
@@ -31,7 +31,7 @@ function redir_init(App $a) {
 		$contact = DBA::selectFirst('contact', $fields, ['id' => $cid, 'uid' => [0, local_user()]]);
 		if (!DBA::isResult($contact)) {
 			notice(L10n::t('Contact not found.'));
-			A::baseUrl()->redirect();
+			AppR::baseUrl()->redirect();
 		}
 
 		$contact_url = $contact['url'];
@@ -60,7 +60,7 @@ function redir_init(App $a) {
 		}
 
 		if (remote_user()) {
-			$host = substr(A::baseUrl()->getUrlPath() . (A::baseUrl()->getUrlPath() ? '/' . A::baseUrl()->getUrlPath() : ''), strpos(A::baseUrl()->getUrlPath(), '://') + 3);
+			$host = substr(AppR::baseUrl()->getUrlPath() . (AppR::baseUrl()->getUrlPath() ? '/' . AppR::baseUrl()->getUrlPath() : ''), strpos(AppR::baseUrl()->getUrlPath(), '://') + 3);
 			$remotehost = substr($contact['addr'], strpos($contact['addr'], '@') + 1);
 
 			// On a local instance we have to check if the local user has already authenticated
@@ -121,7 +121,7 @@ function redir_init(App $a) {
 	}
 
 	notice(L10n::t('Contact not found.'));
-	A::baseUrl()->redirect();
+	AppR::baseUrl()->redirect();
 }
 
 function redir_magic($a, $cid, $url)
@@ -139,7 +139,7 @@ function redir_magic($a, $cid, $url)
 		if (!empty($url)) {
 			System::externalRedirect($url);
 		} else {
-			A::baseUrl()->redirect();
+			AppR::baseUrl()->redirect();
 		}
 	} else {
 		$contact_url = $contact['url'];
@@ -149,7 +149,7 @@ function redir_magic($a, $cid, $url)
 	$basepath = Contact::getBasepath($contact_url);
 
 	// We don't use magic auth when there is no visitor, we are on the same system or we visit our own stuff
-	if (empty($visitor) || Strings::compareLink($basepath, A::baseUrl()) || Strings::compareLink($contact_url, $visitor)) {
+	if (empty($visitor) || Strings::compareLink($basepath, AppR::baseUrl()) || Strings::compareLink($contact_url, $visitor)) {
 		Logger::info('Redirecting without magic', ['target' => $target_url, 'visitor' => $visitor, 'contact' => $contact_url]);
 		System::externalRedirect($target_url);
 	}

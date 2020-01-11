@@ -13,7 +13,7 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
@@ -90,7 +90,7 @@ function dfrn_poll_init(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				A::baseUrl()->redirect();
+				AppR::baseUrl()->redirect();
 				break; // NOTREACHED
 		}
 
@@ -137,10 +137,10 @@ function dfrn_poll_init(App $a)
 			if (!empty($destination_url)) {
 				System::externalRedirect($destination_url);
 			} else {
-				A::baseUrl()->redirect('profile/' . $profile);
+				AppR::baseUrl()->redirect('profile/' . $profile);
 			}
 		}
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 	}
 
 	if ($type === 'profile-check' && $dfrn_version < 2.2) {
@@ -324,7 +324,7 @@ function dfrn_poll_post(App $a)
 			$sql_extra = sprintf(" AND `dfrn-id` = '%s' AND `duplex` = 1 ", DBA::escape($dfrn_id));
 			break;
 		default:
-			A::baseUrl()->redirect();
+			AppR::baseUrl()->redirect();
 			break; // NOTREACHED
 	}
 
@@ -444,7 +444,7 @@ function dfrn_poll_content(App $a)
 				$my_id = '0:' . $dfrn_id;
 				break;
 			default:
-				A::baseUrl()->redirect();
+				AppR::baseUrl()->redirect();
 				break; // NOTREACHED
 		}
 
@@ -540,18 +540,18 @@ function dfrn_poll_content(App $a)
 
 			switch ($destination_url) {
 				case 'profile':
-					A::baseUrl()->redirect('profile/' . $profile . '?f=&tab=profile');
+					AppR::baseUrl()->redirect('profile/' . $profile . '?f=&tab=profile');
 					break;
 				case 'photos':
-					A::baseUrl()->redirect('photos/' . $profile);
+					AppR::baseUrl()->redirect('photos/' . $profile);
 					break;
 				case 'status':
 				case '':
-					A::baseUrl()->redirect('profile/' . $profile);
+					AppR::baseUrl()->redirect('profile/' . $profile);
 					break;
 				default:
 					$appendix = (strstr($destination_url, '?') ? '&f=&redir=1' : '?f=&redir=1');
-					A::baseUrl()->redirect($destination_url . $appendix);
+					AppR::baseUrl()->redirect($destination_url . $appendix);
 					break;
 			}
 			// NOTREACHED

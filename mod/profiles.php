@@ -21,7 +21,7 @@ use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Network\Probe;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
@@ -41,7 +41,7 @@ function profiles_init(App $a) {
 		);
 		if (! DBA::isResult($r)) {
 			notice(L10n::t('Profile not found.') . EOL);
-			A::baseUrl()->redirect('profiles');
+			AppR::baseUrl()->redirect('profiles');
 			return; // NOTREACHED
 		}
 
@@ -62,7 +62,7 @@ function profiles_init(App $a) {
 			info(L10n::t('Profile deleted.').EOL);
 		}
 
-		A::baseUrl()->redirect('profiles');
+		AppR::baseUrl()->redirect('profiles');
 		return; // NOTREACHED
 	}
 
@@ -96,10 +96,10 @@ function profiles_init(App $a) {
 
 		info(L10n::t('New profile created.') . EOL);
 		if (DBA::isResult($r3) && count($r3) == 1) {
-			A::baseUrl()->redirect('profiles/' . $r3[0]['id']);
+			AppR::baseUrl()->redirect('profiles/' . $r3[0]['id']);
 		}
 
-		A::baseUrl()->redirect('profiles');
+		AppR::baseUrl()->redirect('profiles');
 	}
 
 	if (($a->argc > 2) && ($a->argv[1] === 'clone')) {
@@ -134,10 +134,10 @@ function profiles_init(App $a) {
 		);
 		info(L10n::t('New profile created.') . EOL);
 		if ((DBA::isResult($r3)) && (count($r3) == 1)) {
-			A::baseUrl()->redirect('profiles/' . $r3[0]['id']);
+			AppR::baseUrl()->redirect('profiles/' . $r3[0]['id']);
 		}
 
-		A::baseUrl()->redirect('profiles');
+		AppR::baseUrl()->redirect('profiles');
 
 		return; // NOTREACHED
 	}
@@ -512,8 +512,8 @@ function profiles_content(App $a) {
 			return;
 		}
 
-		A::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('profed_head.tpl'), [
-			'$baseurl' => A::baseUrl()->get(true),
+		AppR::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('profed_head.tpl'), [
+			'$baseurl' => AppR::baseUrl()->get(true),
 		]);
 
 		$opt_tpl = Renderer::getMarkupTemplate("profile-hide-friends.tpl");
@@ -587,7 +587,7 @@ function profiles_content(App $a) {
 			'$lbl_ex2' => L10n::t('Example: fishing photography software'),
 
 			'$disabled' => (($is_default) ? 'onclick="return false;" style="color: #BBBBFF;"' : ''),
-			'$baseurl' => A::baseUrl()->get(true),
+			'$baseurl' => AppR::baseUrl()->get(true),
 			'$profile_id' => $r[0]['id'],
 			'$profile_name' => ['profile_name', L10n::t('Profile Name:'), $r[0]['profile-name'], L10n::t('Required'), '*'],
 			'$is_default'   => $is_default,
@@ -640,7 +640,7 @@ function profiles_content(App $a) {
 			);
 			if (DBA::isResult($r)) {
 				//Go to the default profile.
-				A::baseUrl()->redirect('profiles/' . $r[0]['id']);
+				AppR::baseUrl()->redirect('profiles/' . $r[0]['id']);
 			}
 		}
 
@@ -654,7 +654,7 @@ function profiles_content(App $a) {
 			$profiles = '';
 			foreach ($r as $rr) {
 				$profiles .= Renderer::replaceMacros($tpl, [
-					'$photo'        => A::baseUrl()->remove($rr['thumb']),
+					'$photo'        => AppR::baseUrl()->remove($rr['thumb']),
 					'$id'           => $rr['id'],
 					'$alt'          => L10n::t('Profile Image'),
 					'$profile_name' => $rr['profile-name'],

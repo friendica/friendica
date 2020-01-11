@@ -25,7 +25,7 @@ use Friendica\Registry\Core;
 use Friendica\Registry\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
@@ -144,7 +144,7 @@ class Profile
 		$user = DBA::selectFirst('user', ['uid'], ['nickname' => $nickname, 'account_removed' => false]);
 
 		if (!DBA::isResult($user) && empty($profiledata)) {
-			Logger::log('profile error: ' . A::args()->getQueryString(), Logger::DEBUG);
+			Logger::log('profile error: ' . AppR::args()->getQueryString(), Logger::DEBUG);
 			return;
 		}
 
@@ -155,7 +155,7 @@ class Profile
 			}
 
 			// Add profile data to sidebar
-			A::page()['aside'] .= self::sidebar($a, $profiledata, true, $show_connect);
+			AppR::page()['aside'] .= self::sidebar($a, $profiledata, true, $show_connect);
 
 			if (!DBA::isResult($user)) {
 				return;
@@ -165,7 +165,7 @@ class Profile
 		$pdata = self::getByNickname($nickname, $user['uid'], $profile);
 
 		if (empty($pdata) && empty($profiledata)) {
-			Logger::log('profile error: ' . A::args()->getQueryString(), Logger::DEBUG);
+			Logger::log('profile error: ' . AppR::args()->getQueryString(), Logger::DEBUG);
 			return;
 		}
 
@@ -189,7 +189,7 @@ class Profile
 		$a->profile['mobile-theme'] = PConfig::get($a->profile['profile_uid'], 'system', 'mobile_theme');
 		$a->profile['network'] = Protocol::DFRN;
 
-		A::page()['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
+		AppR::page()['title'] = $a->profile['name'] . ' @ ' . Config::get('config', 'sitename');
 
 		if (!$profiledata && !PConfig::get(local_user(), 'system', 'always_my_theme')) {
 			$a->setCurrentTheme($a->profile['theme']);
@@ -208,7 +208,7 @@ class Profile
 		}
 
 		if (local_user() && local_user() == $a->profile['uid'] && $profiledata) {
-			A::page()['aside'] .= Renderer::replaceMacros(
+			AppR::page()['aside'] .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('profile_edlink.tpl'),
 				[
 					'$editprofile' => L10n::t('Edit profile'),
@@ -225,7 +225,7 @@ class Profile
 		 * But: When this profile was on the same server, then we could display the contacts
 		 */
 		if (!$profiledata) {
-			A::page()['aside'] .= self::sidebar($a, $a->profile, $block, $show_connect);
+			AppR::page()['aside'] .= self::sidebar($a, $a->profile, $block, $show_connect);
 		}
 
 		return;
@@ -337,7 +337,7 @@ class Profile
 		if (isset($profile['url'])) {
 			$profile_url = $profile['url'];
 		} else {
-			$profile_url = A::baseUrl()->get() . '/profile/' . $profile['nickname'];
+			$profile_url = AppR::baseUrl()->get() . '/profile/' . $profile['nickname'];
 		}
 
 		$follow_link = null;
@@ -398,7 +398,7 @@ class Profile
 		// show edit profile to yourself
 		if (!$is_contact && $local_user_is_self) {
 			if (Feature::isEnabled(local_user(), 'multi_profiles')) {
-				$profile['edit'] = [A::baseUrl() . '/profiles', L10n::t('Profiles'), '', L10n::t('Manage/edit profiles')];
+				$profile['edit'] = [AppR::baseUrl() . '/profiles', L10n::t('Profiles'), '', L10n::t('Manage/edit profiles')];
 				$r = q(
 					"SELECT * FROM `profile` WHERE `uid` = %d",
 					local_user()
@@ -424,7 +424,7 @@ class Profile
 					}
 				}
 			} else {
-				$profile['edit'] = [A::baseUrl() . '/profiles/' . $profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
+				$profile['edit'] = [AppR::baseUrl() . '/profiles/' . $profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
 				$profile['menu'] = [
 					'chg_photo' => L10n::t('Change profile photo'),
 					'cr_new' => null,
@@ -463,7 +463,7 @@ class Profile
 		if (!empty($profile['guid'])) {
 			$diaspora = [
 				'guid' => $profile['guid'],
-				'podloc' => A::baseUrl(),
+				'podloc' => AppR::baseUrl(),
 				'searchable' => (($profile['publish'] && $profile['net-publish']) ? 'true' : 'false'),
 				'nickname' => $profile['nickname'],
 				'fullname' => $profile['name'],
@@ -573,7 +573,7 @@ class Profile
 		$a = DI::app();
 		$o = '';
 
-		if (!local_user() || A::mode()->isMobile() || A::mode()->isMobile()) {
+		if (!local_user() || AppR::mode()->isMobile() || AppR::mode()->isMobile()) {
 			return $o;
 		}
 
@@ -670,7 +670,7 @@ class Profile
 		$a = DI::app();
 		$o = '';
 
-		if (!local_user() || A::mode()->isMobile() || A::mode()->isMobile()) {
+		if (!local_user() || AppR::mode()->isMobile() || AppR::mode()->isMobile()) {
 			return $o;
 		}
 
@@ -881,7 +881,7 @@ class Profile
 			}
 
 			if ($a->profile['uid'] == local_user()) {
-				$profile['edit'] = [A::baseUrl() . '/profiles/' . $a->profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
+				$profile['edit'] = [AppR::baseUrl() . '/profiles/' . $a->profile['id'], L10n::t('Edit profile'), '', L10n::t('Edit profile')];
 			}
 
 			return Renderer::replaceMacros($tpl, [
@@ -909,7 +909,7 @@ class Profile
 			$nickname = $a->user['nickname'];
 		}
 
-		$baseProfileUrl = A::baseUrl() . '/profile/' . $nickname;
+		$baseProfileUrl = AppR::baseUrl() . '/profile/' . $nickname;
 
 		$tabs = [
 			[
@@ -930,7 +930,7 @@ class Profile
 			],
 			[
 				'label' => L10n::t('Photos'),
-				'url'   => A::baseUrl() . '/photos/' . $nickname,
+				'url'   => AppR::baseUrl() . '/photos/' . $nickname,
 				'sel'   => $current == 'photos' ? 'active' : '',
 				'title' => L10n::t('Photo Albums'),
 				'id'    => 'photo-tab',
@@ -938,7 +938,7 @@ class Profile
 			],
 			[
 				'label' => L10n::t('Videos'),
-				'url'   => A::baseUrl() . '/videos/' . $nickname,
+				'url'   => AppR::baseUrl() . '/videos/' . $nickname,
 				'sel'   => $current == 'videos' ? 'active' : '',
 				'title' => L10n::t('Videos'),
 				'id'    => 'video-tab',
@@ -950,7 +950,7 @@ class Profile
 		if ($is_owner && $a->theme_events_in_profile) {
 			$tabs[] = [
 				'label' => L10n::t('Events'),
-				'url'   => A::baseUrl() . '/events',
+				'url'   => AppR::baseUrl() . '/events',
 				'sel'   => $current == 'events' ? 'active' : '',
 				'title' => L10n::t('Events and Calendar'),
 				'id'    => 'events-tab',
@@ -961,7 +961,7 @@ class Profile
 		} elseif (!$is_owner) {
 			$tabs[] = [
 				'label' => L10n::t('Events'),
-				'url'   => A::baseUrl() . '/cal/' . $nickname,
+				'url'   => AppR::baseUrl() . '/cal/' . $nickname,
 				'sel'   => $current == 'cal' ? 'active' : '',
 				'title' => L10n::t('Events and Calendar'),
 				'id'    => 'events-tab',
@@ -972,7 +972,7 @@ class Profile
 		if ($is_owner) {
 			$tabs[] = [
 				'label' => L10n::t('Personal Notes'),
-				'url'   => A::baseUrl() . '/notes',
+				'url'   => AppR::baseUrl() . '/notes',
 				'sel'   => $current == 'notes' ? 'active' : '',
 				'title' => L10n::t('Only You Can See This'),
 				'id'    => 'notes-tab',
@@ -983,7 +983,7 @@ class Profile
 		if (!empty($_SESSION['new_member']) && $is_owner) {
 			$tabs[] = [
 				'label' => L10n::t('Tips for New Members'),
-				'url'   => A::baseUrl() . '/newmember',
+				'url'   => AppR::baseUrl() . '/newmember',
 				'sel'   => false,
 				'title' => L10n::t('Tips for New Members'),
 				'id'    => 'newmember-tab',
@@ -1049,7 +1049,7 @@ class Profile
 
 		$addr = $_GET['addr'] ?? $my_url;
 
-		$arr = ['zrl' => $my_url, 'url' => A::args()->getCommand()];
+		$arr = ['zrl' => $my_url, 'url' => AppR::args()->getCommand()];
 		Hook::callAll('zrl_init', $arr);
 
 		// Try to find the public contact entry of the visitor.
@@ -1079,16 +1079,16 @@ class Profile
 
 		// Remove the "addr" parameter from the destination. It is later added as separate parameter again.
 		$addr_request = 'addr=' . urlencode($addr);
-		$query = rtrim(str_replace($addr_request, '', A::args()->getQueryString()), '?&');
+		$query = rtrim(str_replace($addr_request, '', AppR::args()->getQueryString()), '?&');
 
 		// The other instance needs to know where to redirect.
-		$dest = urlencode(A::baseUrl()->get() . '/' . $query);
+		$dest = urlencode(AppR::baseUrl()->get() . '/' . $query);
 
 		// We need to extract the basebath from the profile url
 		// to redirect the visitors '/magic' module.
 		$basepath = Contact::getBasepath($contact['url']);
 
-		if ($basepath != A::baseUrl()->get() && !strstr($dest, '/magic')) {
+		if ($basepath != AppR::baseUrl()->get() && !strstr($dest, '/magic')) {
 			$magic_path = $basepath . '/magic' . '?owa=1&dest=' . $dest . '&' . $addr_request;
 
 			// We have to check if the remote server does understand /magic without invoking something
@@ -1166,7 +1166,7 @@ class Profile
 
 		$arr = [
 			'visitor' => $visitor,
-			'url' => A::args()->getQueryString()
+			'url' => AppR::args()->getQueryString()
 		];
 		/**
 		 * @hooks magic_auth_success
@@ -1178,7 +1178,7 @@ class Profile
 
 		$a->contact = $arr['visitor'];
 
-		info(L10n::t('OpenWebAuth: %1$s welcomes %2$s', A::baseUrl()->getHostname(), $visitor['name']));
+		info(L10n::t('OpenWebAuth: %1$s welcomes %2$s', AppR::baseUrl()->getHostname(), $visitor['name']));
 
 		Logger::log('OpenWebAuth: auth success from ' . $visitor['addr'], Logger::DEBUG);
 	}

@@ -8,13 +8,13 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 function repair_ostatus_content(App $a) {
 
 	if (! local_user()) {
 		notice(L10n::t('Permission denied.') . EOL);
-		A::baseUrl()->redirect('ostatus_repair');
+		AppR::baseUrl()->redirect('ostatus_repair');
 		// NOTREACHED
 	}
 
@@ -57,7 +57,7 @@ function repair_ostatus_content(App $a) {
 
 	Contact::createFromProbe($uid, $r[0]["url"], true);
 
-	A::page()['htmlhead'] = '<meta http-equiv="refresh" content="1; URL=' . A::baseUrl() . '/repair_ostatus?counter=' . $counter . '">';
+	AppR::page()['htmlhead'] = '<meta http-equiv="refresh" content="1; URL=' . AppR::baseUrl() . '/repair_ostatus?counter=' . $counter . '">';
 
 	return $o;
 }

@@ -5,7 +5,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Model\PushSubscriber;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
@@ -89,7 +89,7 @@ function pubsubhubbub_init(App $a) {
 
 		// sanity check that topic URLs are the same
 		$hub_topic2 = str_replace('/feed/', '/dfrn_poll/', $hub_topic);
-		$self = A::baseUrl() . '/api/statuses/user_timeline/' . $owner['nickname'] . '.atom';
+		$self = AppR::baseUrl() . '/api/statuses/user_timeline/' . $owner['nickname'] . '.atom';
 
 		if (!Strings::compareLink($hub_topic, $contact['poll']) && !Strings::compareLink($hub_topic2, $contact['poll']) && !Strings::compareLink($hub_topic, $self)) {
 			Logger::log('Hub topic ' . $hub_topic . ' != ' . $contact['poll']);

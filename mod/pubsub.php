@@ -6,7 +6,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Protocol\OStatus;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 use Friendica\Util\Network;
 
@@ -86,7 +86,7 @@ function pubsub_post(App $a)
 {
 	$xml = Network::postdata();
 
-	Logger::log('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' . A::args()->getCommand() . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
+	Logger::log('Feed arrived from ' . $_SERVER['REMOTE_ADDR'] . ' for ' . AppR::args()->getCommand() . ' with user-agent: ' . $_SERVER['HTTP_USER_AGENT']);
 	Logger::log('Data: ' . $xml, Logger::DATA);
 
 	$nick       = (($a->argc > 1) ? Strings::escapeTags(trim($a->argv[1])) : '');

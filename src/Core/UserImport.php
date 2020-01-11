@@ -8,7 +8,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 use Friendica\Worker\Delivery;
 
@@ -122,7 +122,7 @@ class UserImport
 		}
 
 		$oldbaseurl = $account['baseurl'];
-		$newbaseurl = A::baseUrl();
+		$newbaseurl = AppR::baseUrl();
 
 		$oldaddr = str_replace('http://', '@', Strings::normaliseLink($oldbaseurl));
 		$newaddr = str_replace('http://', '@', Strings::normaliseLink($newbaseurl));
@@ -281,6 +281,6 @@ class UserImport
 		Worker::add(PRIORITY_HIGH, 'Notifier', Delivery::RELOCATION, $newuid);
 
 		info(L10n::t("Done. You can now login with your username and password"));
-		A::baseUrl()->redirect('login');
+		AppR::baseUrl()->redirect('login');
 	}
 }

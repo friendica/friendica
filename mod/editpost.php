@@ -12,7 +12,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\FileTag;
 use Friendica\Model\Item;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Crypto;
 
 function editpost_content(App $a)
@@ -48,7 +48,7 @@ function editpost_content(App $a)
 	]);
 
 	$tpl                         = Renderer::getMarkupTemplate('jot-header.tpl');
-	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 		'$ispublic' => '&nbsp;', // L10n::t('Visible to <strong>everybody</strong>'),
 		'$geotag' => $geotag,
 		'$nickname' => $a->user['nickname']

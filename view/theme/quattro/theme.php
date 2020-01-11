@@ -8,9 +8,9 @@
  */
 
 use Friendica\App;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 function quattro_init(App $a) {
-	A::page()['htmlhead'] .= '<script src="' . A::baseUrl() . '/view/theme/quattro/tinycon.min.js"></script>';
-	A::page()['htmlhead'] .= '<script src="' . A::baseUrl() . '/view/theme/quattro/js/quattro.js"></script>';;
+	AppR::page()['htmlhead'] .= '<script src="' . AppR::baseUrl() . '/view/theme/quattro/tinycon.min.js"></script>';
+	AppR::page()['htmlhead'] .= '<script src="' . AppR::baseUrl() . '/view/theme/quattro/js/quattro.js"></script>';;
 }

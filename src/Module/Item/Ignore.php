@@ -8,7 +8,7 @@ use Friendica\Core\System;
 use Friendica\Registry\DI;
 use Friendica\Model\Item;
 use Friendica\Network\HTTPException;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Core;
 
 /**
@@ -24,7 +24,7 @@ class Ignore extends BaseModule
 			throw new HttpException\ForbiddenException($l10n->t('Access denied.'));
 		}
 
-		$args = A::args();
+		$args = AppR::args();
 		$dba = DI::dba();
 
 		$message_id = intval($args->get(2));
@@ -66,7 +66,7 @@ class Ignore extends BaseModule
 				$rand = "?$rand";
 			}
 
-			A::baseUrl()->redirect($return_path . $rand);
+			AppR::baseUrl()->redirect($return_path . $rand);
 		}
 
 		// the json doesn't really matter, it will either be 0 or 1

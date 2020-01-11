@@ -13,7 +13,7 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 class Nav
 {
@@ -140,7 +140,7 @@ class Nav
 
 		$myident = ((is_array($a->user) && isset($a->user['nickname'])) ? $a->user['nickname'] . '@' : '');
 
-		$sitelocation = $myident . substr(A::baseUrl()->get($ssl_state), strpos(A::baseUrl()->get($ssl_state), '//') + 2);
+		$sitelocation = $myident . substr(AppR::baseUrl()->get($ssl_state), strpos(AppR::baseUrl()->get($ssl_state), '//') + 2);
 
 		// nav links: array of array('href', 'text', 'extra css classes', 'title')
 		$nav = [];
@@ -152,7 +152,7 @@ class Nav
 		if (Session::isAuthenticated()) {
 			$nav['logout'] = ['logout', L10n::t('Logout'), '', L10n::t('End this session')];
 		} else {
-			$nav['login'] = ['login', L10n::t('Login'), (A::module()->getName() == 'login' ? 'selected' : ''), L10n::t('Sign in')];
+			$nav['login'] = ['login', L10n::t('Login'), (AppR::module()->getName() == 'login' ? 'selected' : ''), L10n::t('Sign in')];
 		}
 
 		if (local_user()) {
@@ -167,7 +167,7 @@ class Nav
 			// user info
 			$contact = DBA::selectFirst('contact', ['micro'], ['uid' => $a->user['uid'], 'self' => true]);
 			$userinfo = [
-				'icon' => (DBA::isResult($contact) ? A::baseUrl()->remove($contact['micro']) : 'images/person-48.jpg'),
+				'icon' => (DBA::isResult($contact) ? AppR::baseUrl()->remove($contact['micro']) : 'images/person-48.jpg'),
 				'name' => $a->user['username'],
 			];
 		}
@@ -178,7 +178,7 @@ class Nav
 			$homelink = Session::get('visitor_home', '');
 		}
 
-		if ((A::module()->getName() != 'home') && (! (local_user()))) {
+		if ((AppR::module()->getName() != 'home') && (! (local_user()))) {
 			$nav['home'] = [$homelink, L10n::t('Home'), '', L10n::t('Home Page')];
 		}
 

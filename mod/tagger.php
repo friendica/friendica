@@ -13,7 +13,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Protocol\Activity;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 use Friendica\Worker\Delivery;
@@ -72,7 +72,7 @@ function tagger_content(App $a) {
 	$xterm = XML::escape($term);
 	$post_type = (($item['resource-id']) ? L10n::t('photo') : L10n::t('status'));
 	$targettype = (($item['resource-id']) ? Activity\ObjectType::IMAGE : Activity\ObjectType::NOTE );
-	$href = A::baseUrl() . '/display/' . $item['guid'];
+	$href = AppR::baseUrl() . '/display/' . $item['guid'];
 
 	$link = XML::escape('<link rel="alternate" type="text/html" href="'. $href . '" />' . "\n");
 
@@ -89,7 +89,7 @@ function tagger_content(App $a) {
 	</target>
 EOT;
 
-	$tagid = A::baseUrl() . '/search?tag=' . $xterm;
+	$tagid = AppR::baseUrl() . '/search?tag=' . $xterm;
 	$objtype = Activity\ObjectType::TAGTERM;
 
 	$obj = <<< EOT
@@ -109,7 +109,7 @@ EOT;
 		return;
 	}
 
-	$termlink = html_entity_decode('&#x2317;') . '[url=' . A::baseUrl() . '/search?tag=' . $term . ']' . $term . '[/url]';
+	$termlink = html_entity_decode('&#x2317;') . '[url=' . AppR::baseUrl() . '/search?tag=' . $term . ']' . $term . '[/url]';
 
 	$arr = [];
 

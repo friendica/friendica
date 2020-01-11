@@ -11,7 +11,7 @@ use Friendica\Core\Config;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
 use Friendica\Registry\DI;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Psr\Log\LoggerInterface;
 
 // Get options
@@ -40,14 +40,14 @@ DI::init($dice);
 $a = DI::app();
 
 // Check the database structure and possibly fixes it
-Update::check($a->getBasePath(), true, A::mode());
+Update::check($a->getBasePath(), true, AppR::mode());
 
 // Quit when in maintenance
-if (!A::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
+if (!AppR::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 	return;
 }
 
-A::baseUrl()->saveByURL(Config::get('system', 'url'));
+AppR::baseUrl()->saveByURL(Config::get('system', 'url'));
 
 $spawn = array_key_exists('s', $options) || array_key_exists('spawn', $options);
 

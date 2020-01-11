@@ -12,7 +12,7 @@ use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Model;
 use Friendica\Module;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 
 function crepair_init(App $a)
@@ -104,8 +104,8 @@ function crepair_content(App $a)
 		return;
 	}
 
-	if (empty(A::page()['aside'])) {
-		A::page()['aside'] = '';
+	if (empty(AppR::page()['aside'])) {
+		AppR::page()['aside'] = '';
 	}
 
 	if (DBA::isResult($contact)) {

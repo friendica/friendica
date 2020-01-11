@@ -21,7 +21,7 @@ use Friendica\Model\Nodeinfo;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Network\Probe;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Model;
 use Friendica\Registry\Repository;
 use Friendica\Util\Network;
@@ -50,7 +50,7 @@ class CronJobs
 				Logger::info('cron_start');
 				Nodeinfo::update();
 				// Now trying to register
-				$url = 'http://the-federation.info/register/' . A::baseUrl()->getHostname();
+				$url = 'http://the-federation.info/register/' . AppR::baseUrl()->getHostname();
 				Logger::debug('Check registering url', ['url' => $url]);
 				$ret = Network::fetchUrl($url);
 				Logger::debug('Check registering answer', ['answer' => $ret]);

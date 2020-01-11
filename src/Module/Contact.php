@@ -21,7 +21,7 @@ use Friendica\Model;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\NotFoundException;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
@@ -73,7 +73,7 @@ class Contact extends BaseModule
 			info(L10n::tt('%d contact edited.', '%d contacts edited.', $count_actions));
 		}
 
-		A::baseUrl()->redirect('contact');
+		AppR::baseUrl()->redirect('contact');
 	}
 
 	public static function post(array $parameters = [])
@@ -98,7 +98,7 @@ class Contact extends BaseModule
 
 		if (!DBA::exists('contact', ['id' => $contact_id, 'uid' => local_user(), 'deleted' => false])) {
 			notice(L10n::t('Could not access contact record.') . EOL);
-			A::baseUrl()->redirect('contact');
+			AppR::baseUrl()->redirect('contact');
 			return; // NOTREACHED
 		}
 
@@ -252,8 +252,8 @@ class Contact extends BaseModule
 		$nets = $_GET['nets'] ?? '';
 		$rel  = $_GET['rel']  ?? '';
 
-		if (empty(A::page()['aside'])) {
-			A::page()['aside'] = '';
+		if (empty(AppR::page()['aside'])) {
+			AppR::page()['aside'] = '';
 		}
 
 		$contact_id = null;
@@ -279,9 +279,9 @@ class Contact extends BaseModule
 			if ($contact['self']) {
 				// @TODO: Replace with parameter from router
 				if (($a->argc == 3) && intval($a->argv[1]) && in_array($a->argv[2], ['posts', 'conversations'])) {
-					A::baseUrl()->redirect('profile/' . $contact['nick']);
+					AppR::baseUrl()->redirect('profile/' . $contact['nick']);
 				} else {
-					A::baseUrl()->redirect('profile/' . $contact['nick'] . '?tab=profile');
+					AppR::baseUrl()->redirect('profile/' . $contact['nick'] . '?tab=profile');
 				}
 			}
 
@@ -347,11 +347,11 @@ class Contact extends BaseModule
 			$groups_widget = null;
 		}
 
-		A::page()['aside'] .= $vcard_widget . $findpeople_widget . $follow_widget . $groups_widget . $networks_widget . $rel_widget;
+		AppR::page()['aside'] .= $vcard_widget . $findpeople_widget . $follow_widget . $groups_widget . $networks_widget . $rel_widget;
 
 		$tpl                         = Renderer::getMarkupTemplate('contacts-head.tpl');
-		A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$baseurl' => A::baseUrl()->get(true),
+		AppR::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+			'$baseurl' => AppR::baseUrl()->get(true),
 		]);
 
 		$sort_type = 0;
@@ -379,13 +379,13 @@ class Contact extends BaseModule
 
 			if ($cmd === 'update' && ($orig_record['uid'] != 0)) {
 				self::updateContactFromPoll($contact_id);
-				A::baseUrl()->redirect('contact/' . $contact_id);
+				AppR::baseUrl()->redirect('contact/' . $contact_id);
 				// NOTREACHED
 			}
 
 			if ($cmd === 'updateprofile' && ($orig_record['uid'] != 0)) {
 				self::updateContactFromProbe($contact_id);
-				A::baseUrl()->redirect('crepair/' . $contact_id);
+				AppR::baseUrl()->redirect('crepair/' . $contact_id);
 				// NOTREACHED
 			}
 
@@ -395,7 +395,7 @@ class Contact extends BaseModule
 				$blocked = Model\Contact::isBlockedByUser($contact_id, local_user());
 				info(($blocked ? L10n::t('Contact has been blocked') : L10n::t('Contact has been unblocked')) . EOL);
 
-				A::baseUrl()->redirect('contact/' . $contact_id);
+				AppR::baseUrl()->redirect('contact/' . $contact_id);
 				// NOTREACHED
 			}
 
@@ -405,7 +405,7 @@ class Contact extends BaseModule
 				$ignored = Model\Contact::isIgnoredByUser($contact_id, local_user());
 				info(($ignored ? L10n::t('Contact has been ignored') : L10n::t('Contact has been unignored')) . EOL);
 
-				A::baseUrl()->redirect('contact/' . $contact_id);
+				AppR::baseUrl()->redirect('contact/' . $contact_id);
 				// NOTREACHED
 			}
 
@@ -416,7 +416,7 @@ class Contact extends BaseModule
 					info((($archived) ? L10n::t('Contact has been archived') : L10n::t('Contact has been unarchived')) . EOL);
 				}
 
-				A::baseUrl()->redirect('contact/' . $contact_id);
+				AppR::baseUrl()->redirect('contact/' . $contact_id);
 				// NOTREACHED
 			}
 
@@ -425,7 +425,7 @@ class Contact extends BaseModule
 				if (!empty($_REQUEST['confirm'])) {
 					// <form> can't take arguments in its 'action' parameter
 					// so add any arguments as hidden inputs
-					$query = explode_querystring(A::args()->getQueryString());
+					$query = explode_querystring(AppR::args()->getQueryString());
 					$inputs = [];
 					foreach ($query['args'] as $arg) {
 						if (strpos($arg, 'confirm=') === false) {
@@ -434,7 +434,7 @@ class Contact extends BaseModule
 						}
 					}
 
-					A::page()['aside'] = '';
+					AppR::page()['aside'] = '';
 
 					return Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_drop_confirm.tpl'), [
 						'$header' => L10n::t('Drop contact'),
@@ -450,13 +450,13 @@ class Contact extends BaseModule
 				}
 				// Now check how the user responded to the confirmation query
 				if (!empty($_REQUEST['canceled'])) {
-					A::baseUrl()->redirect('contact');
+					AppR::baseUrl()->redirect('contact');
 				}
 
 				self::dropContact($orig_record);
 				info(L10n::t('Contact has been removed.') . EOL);
 
-				A::baseUrl()->redirect('contact');
+				AppR::baseUrl()->redirect('contact');
 				// NOTREACHED
 			}
 			if ($cmd === 'posts') {
@@ -467,13 +467,13 @@ class Contact extends BaseModule
 			}
 		}
 
-		$_SESSION['return_path'] = A::args()->getQueryString();
+		$_SESSION['return_path'] = AppR::args()->getQueryString();
 
 		if (!empty($a->data['contact']) && is_array($a->data['contact'])) {
 			$contact = $a->data['contact'];
 
-			A::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
-				'$baseurl' => A::baseUrl()->get(true),
+			AppR::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
+				'$baseurl' => AppR::baseUrl()->get(true),
 			]);
 
 			$contact['blocked']  = Model\Contact::isBlockedByUser($contact['id'], local_user());
@@ -776,7 +776,7 @@ class Contact extends BaseModule
 		if (DBA::isResult($r)) {
 			$total = $r[0]['total'];
 		}
-		$pager = new Pager(A::args()->getQueryString());
+		$pager = new Pager(AppR::args()->getQueryString());
 
 		$contacts = [];
 
@@ -819,7 +819,7 @@ class Contact extends BaseModule
 			'$desc'       => L10n::t('Search your contacts'),
 			'$finding'    => $searching ? L10n::t('Results for: %s', $search) : '',
 			'$submit'     => L10n::t('Find'),
-			'$cmd'        => A::args()->getCommand(),
+			'$cmd'        => AppR::args()->getCommand(),
 			'$contacts'   => $contacts,
 			'$contact_drop_confirm' => L10n::t('Do you really want to delete this contact?'),
 			'multiselect' => 1,
@@ -931,7 +931,7 @@ class Contact extends BaseModule
 					'default_location' => $a->user['default-location'],
 					'nickname' => $a->user['nickname'],
 					'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-					'acl' => ACL::getFullSelectorHTML(A::page(), $a->user, true),
+					'acl' => ACL::getFullSelectorHTML(AppR::page(), $a->user, true),
 					'bang' => '',
 					'visitor' => 'block',
 					'profile_uid' => local_user(),
@@ -947,7 +947,7 @@ class Contact extends BaseModule
 		}
 
 		if (DBA::isResult($contact)) {
-			A::page()['aside'] = '';
+			AppR::page()['aside'] = '';
 
 			$profiledata = Model\Contact::getDetailsByURL($contact['url']);
 
@@ -965,12 +965,12 @@ class Contact extends BaseModule
 		$o = self::getTabsHTML($a, $contact, 2);
 
 		if (DBA::isResult($contact)) {
-			A::page()['aside'] = '';
+			AppR::page()['aside'] = '';
 
 			$profiledata = Model\Contact::getDetailsByURL($contact['url']);
 
 			if (local_user() && in_array($profiledata['network'], Protocol::FEDERATED)) {
-				$profiledata['remoteconnect'] = A::baseUrl() . '/follow?url=' . urlencode($profiledata['url']);
+				$profiledata['remoteconnect'] = AppR::baseUrl() . '/follow?url=' . urlencode($profiledata['url']);
 			}
 
 			Model\Profile::load($a, '', 0, $profiledata, true);

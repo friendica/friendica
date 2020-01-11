@@ -22,7 +22,7 @@ use Friendica\Module\Objects;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\DFRN;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 
 function display_init(App $a)
@@ -98,8 +98,8 @@ function display_init(App $a)
 
 	$profiledata = display_fetchauthor($a, $item);
 
-	if (strstr(Strings::normaliseLink($profiledata["url"]), Strings::normaliseLink(A::baseUrl()))) {
-		$nickname = str_replace(Strings::normaliseLink(A::baseUrl()) . "/profile/", "", Strings::normaliseLink($profiledata["url"]));
+	if (strstr(Strings::normaliseLink($profiledata["url"]), Strings::normaliseLink(AppR::baseUrl()))) {
+		$nickname = str_replace(Strings::normaliseLink(AppR::baseUrl()) . "/profile/", "", Strings::normaliseLink($profiledata["url"]));
 
 		if ($nickname != $a->user["nickname"]) {
 			$profile = DBA::fetchFirst("SELECT `profile`.`uid` AS `profile_uid`, `profile`.* , `contact`.`avatar-date` AS picdate, `user`.* FROM `profile`
@@ -157,7 +157,7 @@ function display_fetchauthor($a, $item)
 	$profiledata = Contact::getDetailsByURL($profiledata["url"], local_user(), $profiledata);
 
 	if (!empty($profiledata["photo"])) {
-		$profiledata["photo"] = A::baseUrl()->remove($profiledata["photo"]);
+		$profiledata["photo"] = AppR::baseUrl()->remove($profiledata["photo"]);
 	}
 
 	return $profiledata;
@@ -230,14 +230,14 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$is_public = Item::exists(['id' => $item_id, 'private' => [0, 2]]);
 	if ($is_public) {
 		// For the atom feed the nickname doesn't matter at all, we only need the item id.
-		$alternate = A::baseUrl() . '/display/feed-item/' . $item_id . '.atom';
-		$conversation = A::baseUrl() . '/display/feed-item/' . $item_parent . '/conversation.atom';
+		$alternate = AppR::baseUrl() . '/display/feed-item/' . $item_id . '.atom';
+		$conversation = AppR::baseUrl() . '/display/feed-item/' . $item_parent . '/conversation.atom';
 	} else {
 		$alternate = '';
 		$conversation = '';
 	}
 
-	A::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('display-head.tpl'),
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('display-head.tpl'),
 				['$alternate' => $alternate,
 					'$conversation' => $conversation]);
 
@@ -279,7 +279,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 			'default_location' => $a->user['default-location'],
 			'nickname' => $a->user['nickname'],
 			'lockstate' => (is_array($a->user) && (strlen($a->user['allow_cid']) || strlen($a->user['allow_gid']) || strlen($a->user['deny_cid']) || strlen($a->user['deny_gid'])) ? 'lock' : 'unlock'),
-			'acl' => ACL::getFullSelectorHTML(A::page(), $a->user, true),
+			'acl' => ACL::getFullSelectorHTML(AppR::page(), $a->user, true),
 			'bang' => '',
 			'visitor' => 'block',
 			'profile_uid' => local_user(),
@@ -318,14 +318,14 @@ function display_content(App $a, $update = false, $update_uid = 0)
 		$o .= "<script> var netargs = '?f=&item_id=" . $item_id . "'; </script>";
 	}
 
-	$o .= conversation($a, [$item], new Pager(A::args()->getQueryString()), 'display', $update_uid, false, 'commented', $item_uid);
+	$o .= conversation($a, [$item], new Pager(AppR::args()->getQueryString()), 'display', $update_uid, false, 'commented', $item_uid);
 
 	// Preparing the meta header
 	$description = trim(HTML::toPlaintext(BBCode::convert($item["body"], false), 0, true));
 	$title = trim(HTML::toPlaintext(BBCode::convert($item["title"], false), 0, true));
 	$author_name = $item["author-name"];
 
-	$image = A::baseUrl()->remove($item["author-avatar"]);
+	$image = AppR::baseUrl()->remove($item["author-avatar"]);
 
 	if ($title == "") {
 		$title = $author_name;
@@ -340,13 +340,13 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$title = htmlspecialchars($title, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 	$author_name = htmlspecialchars($author_name, ENT_COMPAT, 'UTF-8', true); // allow double encoding here
 
-	$page = A::page();
+	$page = AppR::page();
 
 	if (DBA::exists('contact', ['unsearchable' => true, 'id' => [$item['contact-id'], $item['author-id'], $item['owner-id']]])) {
 		$page['htmlhead'] .= '<meta content="noindex, noarchive" name="robots" />' . "\n";
 	}
 
-	A::page()['htmlhead'] .= '<meta name="author" content="' . $author_name . '" />' . "\n";
+	AppR::page()['htmlhead'] .= '<meta name="author" content="' . $author_name . '" />' . "\n";
 	$page['htmlhead']            .= '<meta name="title" content="'.$title.'" />'."\n";
 	$page['htmlhead']            .= '<meta name="fulltitle" content="'.$title.'" />'."\n";
 	$page['htmlhead']            .= '<meta name="description" content="'.$description.'" />'."\n";
@@ -361,7 +361,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	$page['htmlhead'] .= '<meta name="twitter:card" content="summary" />'."\n";
 	$page['htmlhead'] .= '<meta name="twitter:title" content="'.$title.'" />'."\n";
 	$page['htmlhead'] .= '<meta name="twitter:description" content="'.$description.'" />'."\n";
-	$page['htmlhead'] .= '<meta name="twitter:image" content="' . A::baseUrl() . '/' . $image . '" />' . "\n";
+	$page['htmlhead'] .= '<meta name="twitter:image" content="' . AppR::baseUrl() . '/' . $image . '" />' . "\n";
 	$page['htmlhead'] .= '<meta name="twitter:url" content="'.$item["plink"].'" />'."\n";
 
 	// Dublin Core
@@ -371,7 +371,7 @@ function display_content(App $a, $update = false, $update_uid = 0)
 	// Open Graph
 	$page['htmlhead'] .= '<meta property="og:type" content="website" />'."\n";
 	$page['htmlhead'] .= '<meta property="og:title" content="'.$title.'" />'."\n";
-	$page['htmlhead'] .= '<meta property="og:image" content="' . A::baseUrl() . '/' . $image . '" />' . "\n";
+	$page['htmlhead'] .= '<meta property="og:image" content="' . AppR::baseUrl() . '/' . $image . '" />' . "\n";
 	$page['htmlhead'] .= '<meta property="og:url" content="'.$item["plink"].'" />'."\n";
 	$page['htmlhead'] .= '<meta property="og:description" content="'.$description.'" />'."\n";
 	$page['htmlhead'] .= '<meta name="og:article:author" content="'.$author_name.'" />'."\n";

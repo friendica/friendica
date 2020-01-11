@@ -14,14 +14,14 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Module\Security\Login;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Factory;
 use Friendica\Registry\Model;
 
 function notifications_post(App $a)
 {
 	if (!local_user()) {
-		A::baseUrl()->redirect();
+		AppR::baseUrl()->redirect();
 	}
 
 	$request_id = (($a->argc > 1) ? $a->argv[1] : 0);
@@ -42,7 +42,7 @@ function notifications_post(App $a)
 				break;
 		}
 
-		A::baseUrl()->redirect('notifications/intros');
+		AppR::baseUrl()->redirect('notifications/intros');
 	}
 }
 
@@ -110,11 +110,11 @@ function notifications_content(App $a)
 		$notifs = $nm->getHomeList($show, $startrec, $perpage);
 	// fallback - redirect to main page
 	} else {
-		A::baseUrl()->redirect('notifications');
+		AppR::baseUrl()->redirect('notifications');
 	}
 
 	// Set the pager
-	$pager = new Pager(A::args()->getQueryString(), $perpage);
+	$pager = new Pager(AppR::args()->getQueryString(), $perpage);
 
 	// Add additional informations (needed for json output)
 	$notifs['items_page'] = $pager->getItemsPerPage();

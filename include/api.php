@@ -44,7 +44,7 @@ use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Core;
 use Friendica\Registry\Model;
 use Friendica\Registry\Util;
@@ -297,7 +297,7 @@ function api_call(App $a, App\Arguments $args = null)
 	global $API, $called_api;
 
 	if ($args == null) {
-		$args = A::args();
+		$args = AppR::args();
 	}
 
 	$type = "json";
@@ -375,7 +375,7 @@ function api_call(App $a, App\Arguments $args = null)
 			}
 		}
 
-		Logger::warning(API_LOG_PREFIX . 'not implemented', ['module' => 'api', 'action' => 'call', 'query' => A::args()->getQueryString()]);
+		Logger::warning(API_LOG_PREFIX . 'not implemented', ['module' => 'api', 'action' => 'call', 'query' => AppR::args()->getQueryString()]);
 		throw new NotImplementedException();
 	} catch (HTTPException $e) {
 		header("HTTP/1.1 {$e->getCode()} {$e->httpdesc}");
@@ -443,12 +443,12 @@ function api_rss_extra(App $a, $arr, $user_info)
 	$arr['$user'] = $user_info;
 	$arr['$rss'] = [
 		'alternate'    => $user_info['url'],
-		'self'         => A::baseUrl() . "/" . A::args()->getQueryString(),
-		'base'         => A::baseUrl(),
+		'self'         => AppR::baseUrl() . "/" . AppR::args()->getQueryString(),
+		'base'         => AppR::baseUrl(),
 		'updated'      => api_date(null),
 		'atom_updated' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 		'language'     => $user_info['lang'],
-		'logo'         => A::baseUrl() . "/images/friendica-32.png",
+		'logo'         => AppR::baseUrl() . "/images/friendica-32.png",
 	];
 
 	return $arr;
@@ -1169,8 +1169,8 @@ function api_statuses_update($type)
 				$phototypes = Images::supportedTypes();
 				$ext = $phototypes[$r[0]['type']];
 				$description = $r[0]['desc'] ?? '';
-				$_REQUEST['body'] .= "\n\n" . '[url=' . A::baseUrl() . '/photos/' . $r[0]['nickname'] . '/image/' . $r[0]['resource-id'] . ']';
-				$_REQUEST['body'] .= '[img=' . A::baseUrl() . '/photo/' . $r[0]['resource-id'] . '-' . $r[0]['scale'] . '.' . $ext . ']' . $description . '[/img][/url]';
+				$_REQUEST['body'] .= "\n\n" . '[url=' . AppR::baseUrl() . '/photos/' . $r[0]['nickname'] . '/image/' . $r[0]['resource-id'] . ']';
+				$_REQUEST['body'] .= '[img=' . AppR::baseUrl() . '/photo/' . $r[0]['resource-id'] . '-' . $r[0]['scale'] . '.' . $ext . ']' . $description . '[/img][/url]';
 			}
 		}
 	}
@@ -2809,7 +2809,7 @@ function api_format_items_embeded_images($item, $text)
 	$text = preg_replace_callback(
 		'|data:image/([^;]+)[^=]+=*|m',
 		function () use ($item) {
-			return A::baseUrl() . '/display/' . $item['guid'];
+			return AppR::baseUrl() . '/display/' . $item['guid'];
 		},
 		$text
 	);
@@ -3064,7 +3064,7 @@ function api_format_item($item, $type = "json", $status_user = null, $author_use
 		//'entities' => NULL,
 		'statusnet_html' => $converted["html"],
 		'statusnet_conversation_id' => $item['parent'],
-		'external_url' => A::baseUrl() . "/display/" . $item['guid'],
+		'external_url' => AppR::baseUrl() . "/display/" . $item['guid'],
 		'friendica_activities' => api_format_items_activities($item, $type),
 		'friendica_title' => $item['title'],
 		'friendica_html' => BBCode::convert($item['body'], false)
@@ -3591,14 +3591,14 @@ api_register_func('api/friendships/incoming', 'api_friendships_incoming', true);
 function api_statusnet_config($type)
 {
 	$name      = Config::get('config', 'sitename');
-	$server    = A::baseUrl()->getHostname();
-	$logo      = A::baseUrl() . '/images/friendica-64.png';
+	$server    = AppR::baseUrl()->getHostname();
+	$logo      = AppR::baseUrl() . '/images/friendica-64.png';
 	$email     = Config::get('config', 'admin_email');
 	$closed    = intval(Config::get('config', 'register_policy')) === \Friendica\Module\Register::CLOSED ? 'true' : 'false';
 	$private   = Config::get('system', 'block_public') ? 'true' : 'false';
 	$textlimit = (string) Config::get('config', 'api_import_size', Config::get('config', 'max_import_size', 200000));
 	$ssl       = Config::get('system', 'have_ssl') ? 'true' : 'false';
-	$sslserver = Config::get('system', 'have_ssl') ? str_replace('http:', 'https:', A::baseUrl()) : '';
+	$sslserver = Config::get('system', 'have_ssl') ? str_replace('http:', 'https:', AppR::baseUrl()) : '';
 
 	$config = [
 		'site' => ['name' => $name,'server' => $server, 'theme' => 'default', 'path' => '',
@@ -4336,7 +4336,7 @@ function api_fr_photos_list($type)
 			$photo['album'] = $rr['album'];
 			$photo['filename'] = $rr['filename'];
 			$photo['type'] = $rr['type'];
-			$thumb = A::baseUrl() . "/photo/" . $rr['resource-id'] . "-" . $rr['scale'] . "." . $typetoext[$rr['type']];
+			$thumb = AppR::baseUrl() . "/photo/" . $rr['resource-id'] . "-" . $rr['scale'] . "." . $typetoext[$rr['type']];
 			$photo['created'] = $rr['created'];
 			$photo['edited'] = $rr['edited'];
 			$photo['desc'] = $rr['desc'];
@@ -4642,15 +4642,15 @@ function api_account_update_profile_image($type)
 		$condition = ["`profile` AND `resource-id` != ? AND `uid` = ?", $data['photo']['id'], api_user()];
 		Photo::update(['profile' => false], $condition);
 	} else {
-		$fields = ['photo' => A::baseUrl() . '/photo/' . $data['photo']['id'] . '-4.' . $fileext,
-			'thumb' => A::baseUrl() . '/photo/' . $data['photo']['id'] . '-5.' . $fileext];
+		$fields = ['photo' => AppR::baseUrl() . '/photo/' . $data['photo']['id'] . '-4.' . $fileext,
+			'thumb' => AppR::baseUrl() . '/photo/' . $data['photo']['id'] . '-5.' . $fileext];
 		DBA::update('profile', $fields, ['id' => $_REQUEST['profile'], 'uid' => api_user()]);
 	}
 
 	Contact::updateSelfFromUserID(api_user(), true);
 
 	// Update global directory in background
-	$url = A::baseUrl() . '/profile/' . DI::app()->user['nickname'];
+	$url = AppR::baseUrl() . '/profile/' . DI::app()->user['nickname'];
 	if ($url && strlen(Config::get('system', 'directory'))) {
 		Worker::add(PRIORITY_LOW, "Directory", $url);
 	}
@@ -4962,8 +4962,8 @@ function post_photo_item($hash, $allow_cid, $deny_cid, $allow_gid, $deny_gid, $f
 			];
 
 	// adds link to the thumbnail scale photo
-	$arr['body'] = '[url=' . A::baseUrl() . '/photos/' . $owner_record['nick'] . '/image/' . $hash . ']'
-				. '[img]' . A::baseUrl() . '/photo/' . $hash . '-' . "2" . '.' . $typetoext[$filetype] . '[/img]'
+	$arr['body'] = '[url=' . AppR::baseUrl() . '/photos/' . $owner_record['nick'] . '/image/' . $hash . ']'
+				. '[img]' . AppR::baseUrl() . '/photo/' . $hash . '-' . "2" . '.' . $typetoext[$filetype] . '[/img]'
 				. '[/url]';
 
 	// do the magic for storing the item in the database and trigger the federation to other contacts
@@ -5031,14 +5031,14 @@ function prepare_photo_data($type, $scale, $photo_id)
 			for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
 				$data['photo']['links'][$k . ":link"]["@attributes"] = ["type" => $data['photo']['type'],
 										"scale" => $k,
-										"href" => A::baseUrl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]];
+										"href" => AppR::baseUrl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']]];
 			}
 		} else {
 			$data['photo']['link'] = [];
 			// when we have profile images we could have only scales from 4 to 6, but index of array always needs to start with 0
 			$i = 0;
 			for ($k = intval($data['photo']['minscale']); $k <= intval($data['photo']['maxscale']); $k++) {
-				$data['photo']['link'][$i] = A::baseUrl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']];
+				$data['photo']['link'][$i] = AppR::baseUrl() . "/photo/" . $data['photo']['resource-id'] . "-" . $k . "." . $typetoext[$data['photo']['type']];
 				$i++;
 			}
 		}

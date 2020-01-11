@@ -8,7 +8,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Module\Register;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Factory;
 
 /**
@@ -56,7 +56,7 @@ class Instance extends BaseEntity
 	{
 		$register_policy = intval(Config::get('config', 'register_policy'));
 
-		$baseUrl = A::baseUrl();
+		$baseUrl = AppR::baseUrl();
 
 		$instance = new Instance();
 		$instance->uri = $baseUrl->get();

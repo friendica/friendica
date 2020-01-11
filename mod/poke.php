@@ -22,7 +22,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Protocol\Activity;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 
@@ -157,8 +157,8 @@ function poke_content(App $a)
 	$id = $contact['id'];
 
 	$head_tpl                    = Renderer::getMarkupTemplate('poke_head.tpl');
-	A::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl,[
-		'$baseurl' => A::baseUrl()->get(true),
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl,[
+		'$baseurl' => AppR::baseUrl()->get(true),
 	]);
 
 	$parent = (!empty($_GET['parent']) ? intval($_GET['parent']) : '0');

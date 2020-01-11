@@ -15,7 +15,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Core;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
@@ -180,7 +180,7 @@ function ping_init(App $a)
 		$intro_count = count($intros1) + count($intros2);
 		$intros = $intros1 + $intros2;
 
-		$myurl = A::baseUrl() . '/profile/' . $a->user['nickname'];
+		$myurl = AppR::baseUrl() . '/profile/' . $a->user['nickname'];
 		$mails = q(
 			"SELECT `id`, `from-name`, `from-url`, `from-photo`, `created` FROM `mail`
 			WHERE `uid` = %d AND `seen` = 0 AND `from-url` != '%s' ",
@@ -264,7 +264,7 @@ function ping_init(App $a)
 			foreach ($intros as $intro) {
 				$notif = [
 					'id'      => 0,
-					'href'    => A::baseUrl() . '/notifications/intros/' . $intro['id'],
+					'href'    => AppR::baseUrl() . '/notifications/intros/' . $intro['id'],
 					'name'    => $intro['name'],
 					'url'     => $intro['url'],
 					'photo'   => $intro['photo'],
@@ -280,7 +280,7 @@ function ping_init(App $a)
 			foreach ($regs as $reg) {
 				$notif = [
 					'id'      => 0,
-					'href'    => A::baseUrl() . '/admin/users/',
+					'href'    => AppR::baseUrl() . '/admin/users/',
 					'name'    => $reg['name'],
 					'url'     => $reg['url'],
 					'photo'   => $reg['micro'],
@@ -447,7 +447,7 @@ function ping_get_notifications($uid)
 				);
 			}
 
-			$notification["href"] = A::baseUrl() . "/notify/view/" . $notification["id"];
+			$notification["href"] = AppR::baseUrl() . "/notify/view/" . $notification["id"];
 
 			if ($notification["visible"]
 				&& !$notification["deleted"]

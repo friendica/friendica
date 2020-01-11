@@ -17,7 +17,7 @@ use Friendica\Database\DBA;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Object\Image;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Images;
 use Friendica\Util\Strings;
 
@@ -281,9 +281,9 @@ function wall_upload_post(App $a, $desktopmode = true)
 		$picture["width"]     = $r[0]["width"];
 		$picture["height"]    = $r[0]["height"];
 		$picture["type"]      = $r[0]["type"];
-		$picture["albumpage"] = A::baseUrl() . '/photos/' . $page_owner_nick . '/image/' . $resource_id;
-		$picture["picture"]   = A::baseUrl() . "/photo/{$resource_id}-0." . $Image->getExt();
-		$picture["preview"]   = A::baseUrl() . "/photo/{$resource_id}-{$smallest}." . $Image->getExt();
+		$picture["albumpage"] = AppR::baseUrl() . '/photos/' . $page_owner_nick . '/image/' . $resource_id;
+		$picture["picture"]   = AppR::baseUrl() . "/photo/{$resource_id}-0." . $Image->getExt();
+		$picture["preview"]   = AppR::baseUrl() . "/photo/{$resource_id}-{$smallest}." . $Image->getExt();
 
 		if ($r_json) {
 			echo json_encode(['picture' => $picture]);
@@ -300,7 +300,7 @@ function wall_upload_post(App $a, $desktopmode = true)
 		exit();
 	}
 
-	echo  "\n\n" . '[url=' . A::baseUrl() . '/photos/' . $page_owner_nick . '/image/' . $resource_id . '][img]' . A::baseUrl() . "/photo/{$resource_id}-{$smallest}." . $Image->getExt() . "[/img][/url]\n\n";
+	echo  "\n\n" . '[url=' . AppR::baseUrl() . '/photos/' . $page_owner_nick . '/image/' . $resource_id . '][img]' . AppR::baseUrl() . "/photo/{$resource_id}-{$smallest}." . $Image->getExt() . "[/img][/url]\n\n";
 	exit();
 	// NOTREACHED
 }

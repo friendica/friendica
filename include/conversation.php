@@ -24,7 +24,7 @@ use Friendica\Model\Term;
 use Friendica\Object\Post;
 use Friendica\Object\Thread;
 use Friendica\Protocol\Activity;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Registry\Content;
 use Friendica\Registry\Protocol as P;
 use Friendica\Util\Crypto;
@@ -87,7 +87,7 @@ function item_redir_and_replace_images($body, $images, $cid) {
 	while ($pos !== false && $cnt < 1000) {
 
 		$search = '/\[url\=(.*?)\]\[!#saved_image([0-9]*)#!\]\[\/url\]' . '/is';
-		$replace = '[url=' . A::baseUrl() . '/redir/' . $cid
+		$replace = '[url=' . AppR::baseUrl() . '/redir/' . $cid
 				   . '?f=1&url=' . '$1' . '][!#saved_image' . '$2' .'#!][/url]';
 
 		$newbody .= substr($origbody, 0, $pos['start']['open']);
@@ -481,7 +481,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 			 */
 			$live_update_div = '<div id="live-network"></div>' . "\r\n"
 				. "<script> var profile_uid = " . $_SESSION['uid']
-				. "; var netargs = '" . substr(A::args()->getCommand(), 8)
+				. "; var netargs = '" . substr(AppR::args()->getCommand(), 8)
 				. '?f='
 				. (!empty($_GET['cid'])    ? '&cid='    . rawurlencode($_GET['cid'])    : '')
 				. (!empty($_GET['search']) ? '&search=' . rawurlencode($_GET['search']) : '')
@@ -541,7 +541,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-community"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr(A::args()->getCommand(), 10)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(AppR::args()->getCommand(), 10)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'contacts') {
@@ -550,7 +550,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 
 		if (!$update) {
 			$live_update_div = '<div id="live-contacts"></div>' . "\r\n"
-				. "<script> var profile_uid = -1; var netargs = '" . substr(A::args()->getCommand(), 9)
+				. "<script> var profile_uid = -1; var netargs = '" . substr(AppR::args()->getCommand(), 9)
 				."/?f='; var profile_page = " . $pager->getPage() . "; </script>\r\n";
 		}
 	} elseif ($mode === 'search') {
@@ -560,7 +560,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 	$page_dropping = ((local_user() && local_user() == $profile_owner) ? true : false);
 
 	if (!$update) {
-		$_SESSION['return_path'] = A::args()->getQueryString();
+		$_SESSION['return_path'] = AppR::args()->getQueryString();
 	}
 
 	$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
@@ -687,7 +687,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 					'name' => $profile_name,
 					'sparkle' => $sparkle,
 					'lock' => $lock,
-					'thumb' => A::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
+					'thumb' => AppR::baseUrl()->remove(ProxyUtils::proxifyUrl($item['author-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'title' => $title,
 					'body' => $body,
 					'tags' => $tags['tags'],
@@ -707,7 +707,7 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 					'indent' => '',
 					'owner_name' => $owner_name,
 					'owner_url' => $owner_url,
-					'owner_photo' => A::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
+					'owner_photo' => AppR::baseUrl()->remove(ProxyUtils::proxifyUrl($item['owner-avatar'], false, ProxyUtils::SIZE_THUMB)),
 					'plink' => Item::getPlink($item),
 					'edpost' => false,
 					'isstarred' => $isstarred,
@@ -780,8 +780,8 @@ function conversation(App $a, array $items, Pager $pager, $mode, $update, $previ
 	}
 
 	$o = Renderer::replaceMacros($page_template, [
-		'$baseurl' => A::baseUrl()->get($ssl_state),
-		'$return_path' => A::args()->getQueryString(),
+		'$baseurl' => AppR::baseUrl()->get($ssl_state),
+		'$return_path' => AppR::args()->getQueryString(),
 		'$live_update' => $live_update_div,
 		'$remove' => L10n::t('remove'),
 		'$mode' => $mode,
@@ -1172,9 +1172,9 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 	$geotag = !empty($x['allow_location']) ? Renderer::replaceMacros(Renderer::getMarkupTemplate('jot_geotag.tpl'), []) : '';
 
 	$tpl                         = Renderer::getMarkupTemplate('jot-header.tpl');
-	A::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 		'$newpost'   => 'true',
-		'$baseurl'   => A::baseUrl()->get(true),
+		'$baseurl'   => AppR::baseUrl()->get(true),
 		'$geotag'    => $geotag,
 		'$nickname'  => $x['nickname'],
 		'$ispublic'  => L10n::t('Visible to <strong>everybody</strong>'),
@@ -1194,7 +1194,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		$private_post = 0;
 	}
 
-	$query_str = A::args()->getQueryString();
+	$query_str = AppR::args()->getQueryString();
 	if (strpos($query_str, 'public=1') !== false) {
 		$query_str = str_replace(['?public=1', '&public=1'], ['', ''], $query_str);
 	}
@@ -1245,7 +1245,7 @@ function status_editor(App $a, $x, $notes_cid = 0, $popup = false)
 		'$posttype'     => $notes_cid ? Item::PT_PERSONAL_NOTE : Item::PT_ARTICLE,
 		'$content'      => $x['content'] ?? '',
 		'$post_id'      => $x['post_id'] ?? '',
-		'$baseurl'      => A::baseUrl()->get(true),
+		'$baseurl'      => AppR::baseUrl()->get(true),
 		'$defloc'       => $x['default_location'],
 		'$visitor'      => $x['visitor'],
 		'$pvisit'       => $notes_cid ? 'none' : $x['visitor'],

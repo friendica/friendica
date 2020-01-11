@@ -11,7 +11,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Network\Probe;
 use Friendica\Database\DBA;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 
 function follow_post(App $a)
@@ -21,7 +21,7 @@ function follow_post(App $a)
 	}
 
 	if (isset($_REQUEST['cancel'])) {
-		A::baseUrl()->redirect('contact');
+		AppR::baseUrl()->redirect('contact');
 	}
 
 	$uid = local_user();
@@ -38,14 +38,14 @@ function follow_post(App $a)
 		if ($result['message']) {
 			notice($result['message']);
 		}
-		A::baseUrl()->redirect($return_path);
+		AppR::baseUrl()->redirect($return_path);
 	} elseif ($result['cid']) {
-		A::baseUrl()->redirect('contact/' . $result['cid']);
+		AppR::baseUrl()->redirect('contact/' . $result['cid']);
 	}
 
 	info(L10n::t('The contact could not be added.'));
 
-	A::baseUrl()->redirect($return_path);
+	AppR::baseUrl()->redirect($return_path);
 	// NOTREACHED
 }
 
@@ -55,7 +55,7 @@ function follow_content(App $a)
 
 	if (!local_user()) {
 		notice(L10n::t('Permission denied.'));
-		A::baseUrl()->redirect($return_path);
+		AppR::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 
@@ -70,7 +70,7 @@ function follow_content(App $a)
 	}
 
 	if (!$url) {
-		A::baseUrl()->redirect($return_path);
+		AppR::baseUrl()->redirect($return_path);
 	}
 
 	$submit = L10n::t('Submit Request');
@@ -124,7 +124,7 @@ function follow_content(App $a)
 		$request = $ret['request'];
 		$tpl = Renderer::getMarkupTemplate('dfrn_request.tpl');
 	} else {
-		$request = A::baseUrl() . '/follow';
+		$request = AppR::baseUrl() . '/follow';
 		$tpl = Renderer::getMarkupTemplate('auto_request.tpl');
 	}
 
@@ -132,7 +132,7 @@ function follow_content(App $a)
 
 	if (!$r) {
 		notice(L10n::t('Permission denied.'));
-		A::baseUrl()->redirect($return_path);
+		AppR::baseUrl()->redirect($return_path);
 		// NOTREACHED
 	}
 
@@ -183,7 +183,7 @@ function follow_content(App $a)
 		'$keywords_label'=> L10n::t('Tags:')
 	]);
 
-	A::page()['aside'] = '';
+	AppR::page()['aside'] = '';
 
 	$profiledata = Contact::getDetailsByURL($ret['url']);
 	if ($profiledata) {

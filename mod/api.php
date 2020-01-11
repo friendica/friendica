@@ -9,7 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Module\Security\Login;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 
 require_once __DIR__ . '/../include/api.php';
 
@@ -45,12 +45,12 @@ function api_post(App $a)
 
 function api_content(App $a)
 {
-	if (A::args()->getCommand() == 'api/oauth/authorize') {
+	if (AppR::args()->getCommand() == 'api/oauth/authorize') {
 		/*
 		 * api/oauth/authorize interact with the user. return a standard page
 		 */
 
-		A::page()['template'] = "minimal";
+		AppR::page()['template'] = "minimal";
 
 		// get consumer/client from request token
 		try {
@@ -77,7 +77,7 @@ function api_content(App $a)
 				if (strstr($consumer->callback_url, $glue)) {
 					$glue = "?";
 				}
-				A::baseUrl()->redirect($consumer->callback_url . $glue . 'oauth_token=' . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . '&oauth_verifier=' . OAuthUtil::urlencode_rfc3986($verifier));
+				AppR::baseUrl()->redirect($consumer->callback_url . $glue . 'oauth_token=' . OAuthUtil::urlencode_rfc3986($params['oauth_token']) . '&oauth_verifier=' . OAuthUtil::urlencode_rfc3986($verifier));
 				exit();
 			}
 
@@ -94,7 +94,7 @@ function api_content(App $a)
 		if (!local_user()) {
 			/// @TODO We need login form to redirect to this page
 			notice(L10n::t('Please login to continue.') . EOL);
-			return Login::form(A::args()->getQueryString(), false, $request->get_parameters());
+			return Login::form(AppR::args()->getQueryString(), false, $request->get_parameters());
 		}
 		//FKOAuth1::loginUser(4);
 

@@ -14,7 +14,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Object\Image;
-use Friendica\Registry\App as A;
+use Friendica\Registry\App as AppR;
 use Friendica\Util\Strings;
 
 function profile_photo_init(App $a)
@@ -114,8 +114,8 @@ function profile_photo_post(App $a)
 					);
 				} else {
 					q("update profile set photo = '%s', thumb = '%s' where id = %d and uid = %d",
-						DBA::escape(A::baseUrl() . '/photo/' . $base_image['resource-id'] . '-4.' . $Image->getExt()),
-						DBA::escape(A::baseUrl() . '/photo/' . $base_image['resource-id'] . '-5.' . $Image->getExt()),
+						DBA::escape(AppR::baseUrl() . '/photo/' . $base_image['resource-id'] . '-4.' . $Image->getExt()),
+						DBA::escape(AppR::baseUrl() . '/photo/' . $base_image['resource-id'] . '-5.' . $Image->getExt()),
 						intval($_REQUEST['profile']), intval(local_user())
 					);
 				}
@@ -125,7 +125,7 @@ function profile_photo_post(App $a)
 				info(L10n::t('Shift-reload the page or clear browser cache if the new photo does not display immediately.') . EOL);
 				// Update global directory in background
 				if ($path && strlen(Config::get('system', 'directory'))) {
-					Worker::add(PRIORITY_LOW, "Directory", A::baseUrl()->get() . '/' . $path);
+					Worker::add(PRIORITY_LOW, "Directory", AppR::baseUrl()->get() . '/' . $path);
 				}
 
 				Worker::add(PRIORITY_LOW, 'ProfileUpdate', local_user());
@@ -134,7 +134,7 @@ function profile_photo_post(App $a)
 			}
 		}
 
-		A::baseUrl()->redirect($path);
+		AppR::baseUrl()->redirect($path);
 		return; // NOTREACHED
 	}
 
@@ -167,7 +167,7 @@ function profile_photo_post(App $a)
 	@unlink($src);
 
 	$imagecrop = profile_photo_crop_ui_head($ph);
-	A::baseUrl()->redirect('profile_photo/use/' . $imagecrop['hash']);
+	AppR::baseUrl()->redirect('profile_photo/use/' . $imagecrop['hash']);
 }
 
 function profile_photo_content(App $a)
@@ -222,7 +222,7 @@ function profile_photo_content(App $a)
 				Worker::add(PRIORITY_LOW, "Directory", $url);
 			}
 
-			A::baseUrl()->redirect('profile/' . $a->user['nickname']);
+			AppR::baseUrl()->redirect('profile/' . $a->user['nickname']);
 			return; // NOTREACHED
 		}
 		$ph = Photo::getImageForPhoto($r[0]);
@@ -248,7 +248,7 @@ function profile_photo_content(App $a)
 			'$profiles' => $profiles,
 			'$form_security_token' => BaseModule::getFormSecurityToken("profile_photo"),
 			'$select' => sprintf('%s %s', L10n::t('or'),
-				($newuser) ? '<a href="' . A::baseUrl() . '">' . L10n::t('skip this step') . '</a>' : '<a href="' . A::baseUrl() . '/photos/' . $a->user['nickname'] . '">' . L10n::t('select a photo from your photo albums') . '</a>')
+				($newuser) ? '<a href="' . AppR::baseUrl() . '">' . L10n::t('skip this step') . '</a>' : '<a href="' . AppR::baseUrl() . '/photos/' . $a->user['nickname'] . '">' . L10n::t('select a photo from your photo albums') . '</a>')
 		]);
 
 		return $o;
@@ -260,7 +260,7 @@ function profile_photo_content(App $a)
 			'$filename'  => $filename,
 			'$profile'   => (isset($_REQUEST['profile']) ? intval($_REQUEST['profile']) : 0),
 			'$resource'  => $imagecrop['hash'] . '-' . $imagecrop['resolution'],
-			'$image_url' => A::baseUrl() . '/photo/' . $filename,
+			'$image_url' => AppR::baseUrl() . '/photo/' . $filename,
 			'$title'     => L10n::t('Crop Image'),
 			'$desc'      => L10n::t('Please adjust the image cropping for optimum viewing.'),
 			'$form_security_token' => BaseModule::getFormSecurityToken("profile_photo"),
@@ -314,7 +314,7 @@ function profile_photo_crop_ui_head(Image $image)
 		}
 	}
 
-	A::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate("crophead.tpl"), []);
+	AppR::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate("crophead.tpl"), []);
 
 	$imagecrop = [
 		'hash'       => $hash,
