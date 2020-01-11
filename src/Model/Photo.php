@@ -601,7 +601,7 @@ class Photo
 	 */
 	public static function ridFromURI(string $image_uri)
 	{
-		if (!stristr($image_uri, DI::baseUrl() . '/photo/')) {
+		if (!stristr($image_uri, App::baseUrl() . '/photo/')) {
 			return '';
 		}
 		$image_uri = substr($image_uri, strrpos($image_uri, '/') + 1);
