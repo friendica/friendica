@@ -252,7 +252,7 @@ class ACL
 		);
 
 		$acl_yourself = Contact::selectFirst($fields, ['uid' => $user_id, 'self' => true]);
-		$acl_yourself['name'] = L10n::t('Yourself');
+		$acl_yourself['name'] = DI::l10n()->t('Yourself');
 
 		$acl_contacts[] = $acl_yourself;
 

@@ -285,6 +285,14 @@ abstract class DI
 	}
 
 	/**
+	 * @return Repository\PermissionSet
+	 */
+	public static function permissionSet()
+	{
+		return self::$dice->create(Repository\PermissionSet::class);
+	}
+
+	/**
 	 * @return Repository\ProfileField
 	 */
 	public static function profileField()
