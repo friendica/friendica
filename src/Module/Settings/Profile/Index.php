@@ -2,9 +2,11 @@
 
 namespace Friendica\Module\Settings\Profile;
 
-use Friendica\Content\ContactSelector;
+use Friendica\Core\ACL;
 use Friendica\Core\Config;
 use Friendica\Core\Hook;
+use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\Worker;
@@ -12,12 +14,12 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
-use Friendica\Model\Profile as ProfileModel;
+use Friendica\Model\Profile;
+use Friendica\Model\ProfileField;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettingsModule;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
-use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
@@ -30,7 +32,7 @@ class Index extends BaseSettingsModule
 			return;
 		}
 
-		$profile = ProfileModel::getByUID(local_user());
+		$profile = Profile::getByUID(local_user());
 		if (!DBA::isResult($profile)) {
 			return;
 		}
@@ -67,10 +69,9 @@ class Index extends BaseSettingsModule
 			return;
 		}
 
-		$namechanged = $profile['username'] != $name;
+		$namechanged = $profile['name'] != $name;
 
 		$pdesc = Strings::escapeTags(trim($_POST['pdesc']));
-		$gender = Strings::escapeTags(trim($_POST['gender']));
 		$address = Strings::escapeTags(trim($_POST['address']));
 		$locality = Strings::escapeTags(trim($_POST['locality']));
 		$region = Strings::escapeTags(trim($_POST['region']));
@@ -78,63 +79,6 @@ class Index extends BaseSettingsModule
 		$country_name = Strings::escapeTags(trim($_POST['country_name']));
 		$pub_keywords = self::cleanKeywords(Strings::escapeTags(trim($_POST['pub_keywords'])));
 		$prv_keywords = self::cleanKeywords(Strings::escapeTags(trim($_POST['prv_keywords'])));
-		$marital = Strings::escapeTags(trim($_POST['marital']));
-		$howlong = Strings::escapeTags(trim($_POST['howlong']));
-
-		$with = (!empty($_POST['with']) ? Strings::escapeTags(trim($_POST['with'])) : '');
-
-		if (!strlen($howlong)) {
-			$howlong = DBA::NULL_DATETIME;
-		} else {
-			$howlong = DateTimeFormat::convert($howlong, 'UTC', date_default_timezone_get());
-		}
-
-		// linkify the relationship target if applicable
-		if (strlen($with)) {
-			if ($with != strip_tags($profile['with'])) {
-				$contact_url = '';
-				$lookup = $with;
-				if (strpos($lookup, '@') === 0) {
-					$lookup = substr($lookup, 1);
-				}
-				$lookup = str_replace('_', ' ', $lookup);
-				if (strpos($lookup, '@') || (strpos($lookup, 'http://'))) {
-					$contact_name = $lookup;
-					$links = @Probe::lrdd($lookup);
-					if (count($links)) {
-						foreach ($links as $link) {
-							if ($link['@attributes']['rel'] === 'http://webfinger.net/rel/profile-page') {
-								$contact_url = $link['@attributes']['href'];
-							}
-						}
-					}
-				} else {
-					$contact_name = $lookup;
-
-					$contact = Contact::selectFirst(
-						['url', 'name'],
-						['? IN (`name`, `nick`) AND `uid` = ?', $lookup, local_user()]
-					);
-
-					if (DBA::isResult($contact)) {
-						$contact_url = $contact['url'];
-						$contact_name = $contact['name'];
-					}
-				}
-
-				if ($contact_url) {
-					$with = str_replace($lookup, '<a href="' . $contact_url . '">' . $contact_name . '</a>', $with);
-					if (strpos($with, '@') === 0) {
-						$with = substr($with, 1);
-					}
-				}
-			} else {
-				$with = $profile['with'];
-			}
-		}
-
-		/// @TODO Not flexible enough for later expansion, let's have more OOP here
-		$sexual = Strings::escapeTags(trim($_POST['sexual']));
 		$xmpp = Strings::escapeTags(trim($_POST['xmpp']));
 		$homepage = Strings::escapeTags(trim($_POST['homepage']));
 		if ((strpos($homepage, 'http') !== 0) && (strlen($homepage))) {
@@ -142,63 +86,34 @@ class Index extends BaseSettingsModule
 			$homepage = 'http://' . $homepage;
 		}
 
-		$hometown = Strings::escapeTags(trim($_POST['hometown']));
-		$politic = Strings::escapeTags(trim($_POST['politic']));
-		$religion = Strings::escapeTags(trim($_POST['religion']));
-
-		$likes = Strings::escapeHtml(trim($_POST['likes']));
-		$dislikes = Strings::escapeHtml(trim($_POST['dislikes']));
-
-		$about = Strings::escapeHtml(trim($_POST['about']));
-		$interest = Strings::escapeHtml(trim($_POST['interest']));
-		$contact = Strings::escapeHtml(trim($_POST['contact']));
-		$music = Strings::escapeHtml(trim($_POST['music']));
-		$book = Strings::escapeHtml(trim($_POST['book']));
-		$tv = Strings::escapeHtml(trim($_POST['tv']));
-		$film = Strings::escapeHtml(trim($_POST['film']));
-		$romance = Strings::escapeHtml(trim($_POST['romance']));
-		$work = Strings::escapeHtml(trim($_POST['work']));
-		$education = Strings::escapeHtml(trim($_POST['education']));
-
 		$hide_friends = intval(!empty($_POST['hide-friends']));
 
-		DI::pConfig()->set(local_user(), 'system', 'detailed_profile', intval(!empty($_POST['detailed_profile'])));
+		$profileFields = DI::profileField()->selectByUserId(local_user());
+
+		$profileFields = DI::profileField()->updateCollectionFromForm(
+			local_user(),
+			$profileFields,
+			$_REQUEST['profile_field'],
+			$_REQUEST['profile_field_order']
+		);
+
+		DI::profileField()->saveCollection($profileFields);
 
 		$result = DBA::update(
 			'profile',
 			[
 				'name'         => $name,
 				'pdesc'        => $pdesc,
-				'gender'       => $gender,
 				'dob'          => $dob,
 				'address'      => $address,
 				'locality'     => $locality,
 				'region'       => $region,
 				'postal-code'  => $postal_code,
 				'country-name' => $country_name,
-				'marital'      => $marital,
-				'with'         => $with,
-				'howlong'      => $howlong,
-				'sexual'       => $sexual,
 				'xmpp'         => $xmpp,
 				'homepage'     => $homepage,
-				'hometown'     => $hometown,
-				'politic'      => $politic,
-				'religion'     => $religion,
 				'pub_keywords' => $pub_keywords,
 				'prv_keywords' => $prv_keywords,
-				'likes'        => $likes,
-				'dislikes'     => $dislikes,
-				'about'        => $about,
-				'interest'     => $interest,
-				'contact'      => $contact,
-				'music'        => $music,
-				'book'         => $book,
-				'tv'           => $tv,
-				'film'         => $film,
-				'romance'      => $romance,
-				'work'         => $work,
-				'education'    => $education,
 				'hide-friends' => $hide_friends,
 			],
 			[
@@ -206,7 +121,7 @@ class Index extends BaseSettingsModule
 				'is-default' => true,
 			]
 		);
-		
+
 		if ($result) {
 			info(DI::l10n()->t('Profile updated.'));
 		} else {
@@ -242,12 +157,58 @@ class Index extends BaseSettingsModule
 
 		$o = '';
 
-		$profile = ProfileModel::getByUID(local_user());
+		$profile = Profile::getByUID(local_user());
 		if (!DBA::isResult($profile)) {
 			throw new HTTPException\NotFoundException();
 		}
 
 		$a = DI::app();
+
+		$custom_fields = [];
+
+		$profileFields = DI::profileField()->selectByUserId(local_user());
+		foreach ($profileFields as $profileField) {
+			/** @var ProfileField $profileField */
+			$defaultPermissions = ACL::getDefaultUserPermissions($profileField->permissionset->toArray());
+
+			$custom_fields[] = [
+				'id' => $profileField->id,
+				'legend' => $profileField->label,
+				'fields' => [
+					'label' => ['profile_field[' . $profileField->id . '][label]', DI::l10n()->t('Label:'), $profileField->label, DI::l10n()->t('Empty the label to delete this profile field')],
+					'value' => ['profile_field[' . $profileField->id . '][value]', DI::l10n()->t('Value:'), $profileField->value, DI::l10n()->t('BBCodes allowed')],
+					'acl' => ACL::getFullSelectorHTML(
+						DI::page(),
+						$a->user,
+						false,
+						$defaultPermissions,
+						['network' => Protocol::DFRN],
+						'profile_field[' . $profileField->id . ']'
+					),
+				],
+				'permissions' => DI::l10n()->t('Field Permissions'),
+				'permdesc' => DI::l10n()->t("(click to open/close)"),
+			];
+		};
+
+		$custom_fields[] = [
+			'id' => 'new',
+			'legend' => DI::l10n()->t('Add a new profile field'),
+			'fields' => [
+				'label' => ['profile_field[new][label]', DI::l10n()->t('Label:')],
+				'value' => ['profile_field[new][value]', DI::l10n()->t('Value:'), '', DI::l10n()->t('BBCodes allowed')],
+				'acl' => ACL::getFullSelectorHTML(
+					DI::page(),
+					$a->user,
+					false,
+					['allow_cid' => []],
+					['network' => Protocol::DFRN],
+					'profile_field[new]'
+				),
+			],
+			'permissions' => DI::l10n()->t('Field Permissions'),
+			'permdesc' => DI::l10n()->t("(click to open/close)"),
+		];
 
 		DI::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('settings/profile/index_head.tpl'), [
 			'$baseurl' => DI::baseUrl()->get(true),
@@ -271,25 +232,9 @@ class Index extends BaseSettingsModule
 
 		$personal_account = !in_array($a->user['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_PRVGROUP]);
 
-		$detailed_profile =
-			$personal_account
-			&& DI::pConfig()->get(local_user(), 'system', 'detailed_profile',
-				DI::pConfig()->get(local_user(), 'system', 'detailled_profile')
-			)
-		;
-
 		$tpl = Renderer::getMarkupTemplate('settings/profile/index.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$personal_account' => $personal_account,
-			'$detailed_profile' => $detailed_profile,
-
-			'$details' => [
-				'detailed_profile', //Name
-				DI::l10n()->t('Show more profile fields:'), //Label
-				$detailed_profile, //Value
-				'', //Help string
-				[DI::l10n()->t('No'), DI::l10n()->t('Yes')] //Off - On strings
-			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_profile'),
 			'$form_security_token_photo' => self::getFormSecurityToken('settings_profile_photo'),
@@ -300,30 +245,15 @@ class Index extends BaseSettingsModule
 			'$profpic' => DI::l10n()->t('Change Profile Photo'),
 			'$profpiclink' => '/photos/' . $a->user['nickname'],
 			'$viewprof' => DI::l10n()->t('View this profile'),
-			'$viewallprof' => DI::l10n()->t('View all profiles'),
-			'$editvis' => DI::l10n()->t('Edit visibility'),
-			'$cr_prof' => DI::l10n()->t('Create a new profile using these settings'),
-			'$cl_prof' => DI::l10n()->t('Clone this profile'),
-			'$del_prof' => DI::l10n()->t('Delete this profile'),
 
-			'$lbl_basic_section' => DI::l10n()->t('Basic information'),
+			'$lbl_personal_section' => DI::l10n()->t('Personal'),
 			'$lbl_picture_section' => DI::l10n()->t('Profile picture'),
 			'$lbl_location_section' => DI::l10n()->t('Location'),
-			'$lbl_preferences_section' => DI::l10n()->t('Preferences'),
-			'$lbl_status_section' => DI::l10n()->t('Status information'),
-			'$lbl_about_section' => DI::l10n()->t('Additional information'),
-			'$lbl_interests_section' => DI::l10n()->t('Interests'),
-			'$lbl_personal_section' => DI::l10n()->t('Personal'),
-			'$lbl_relation_section' => DI::l10n()->t('Relation'),
 			'$lbl_miscellaneous_section' => DI::l10n()->t('Miscellaneous'),
+			'$lbl_custom_fields_section' => DI::l10n()->t('Custom Profile Fields'),
 
 			'$lbl_profile_photo' => DI::l10n()->t('Upload Profile Photo'),
-			'$lbl_gender' => DI::l10n()->t('Your Gender:'),
-			'$lbl_marital' => DI::l10n()->t('<span class="heart">&hearts;</span> Marital Status:'),
-			'$lbl_sexual' => DI::l10n()->t('Sexual Preference:'),
-			'$lbl_ex2' => DI::l10n()->t('Example: fishing photography software'),
 
-			'$default' => '<p id="profile-edit-default-desc">' . DI::l10n()->t('This is your <strong>public</strong> profile.<br />It <strong>may</strong> be visible to anybody using the internet.') . '</p>',
 			'$baseurl' => DI::baseUrl()->get(true),
 			'$nickname' => $a->user['nickname'],
 			'$name' => ['name', DI::l10n()->t('Display name:'), $profile['name']],
@@ -335,31 +265,11 @@ class Index extends BaseSettingsModule
 			'$region' => ['region', DI::l10n()->t('Region/State:'), $profile['region']],
 			'$postal_code' => ['postal_code', DI::l10n()->t('Postal/Zip Code:'), $profile['postal-code']],
 			'$country_name' => ['country_name', DI::l10n()->t('Country:'), $profile['country-name']],
-			'$age' => ((intval($profile['dob'])) ? '(' . DI::l10n()->t('Age: ') . Temporal::getAgeByTimezone($profile['dob'], $a->user['timezone'], $a->user['timezone']) . ')' : ''),
-			'$gender' => DI::l10n()->t(ContactSelector::gender($profile['gender'])),
-			'$marital' => ['selector' => ContactSelector::maritalStatus($profile['marital']), 'value' => DI::l10n()->t($profile['marital'])],
-			'$with' => ['with', DI::l10n()->t('Who: (if applicable)'), strip_tags($profile['with']), DI::l10n()->t('Examples: cathy123, Cathy Williams, cathy@example.com')],
-			'$howlong' => ['howlong', DI::l10n()->t('Since [date]:'), ($profile['howlong'] <= DBA::NULL_DATETIME ? '' : DateTimeFormat::local($profile['howlong']))],
-			'$sexual' => ['selector' => ContactSelector::sexualPreference($profile['sexual']), 'value' => DI::l10n()->t($profile['sexual'])],
-			'$about' => ['about', DI::l10n()->t('Tell us about yourself...'), $profile['about']],
 			'$xmpp' => ['xmpp', DI::l10n()->t('XMPP (Jabber) address:'), $profile['xmpp'], DI::l10n()->t('The XMPP address will be propagated to your contacts so that they can follow you.')],
 			'$homepage' => ['homepage', DI::l10n()->t('Homepage URL:'), $profile['homepage']],
-			'$hometown' => ['hometown', DI::l10n()->t('Hometown:'), $profile['hometown']],
-			'$politic' => ['politic', DI::l10n()->t('Political Views:'), $profile['politic']],
-			'$religion' => ['religion', DI::l10n()->t('Religious Views:'), $profile['religion']],
 			'$pub_keywords' => ['pub_keywords', DI::l10n()->t('Public Keywords:'), $profile['pub_keywords'], DI::l10n()->t('(Used for suggesting potential friends, can be seen by others)')],
 			'$prv_keywords' => ['prv_keywords', DI::l10n()->t('Private Keywords:'), $profile['prv_keywords'], DI::l10n()->t('(Used for searching profiles, never shown to others)')],
-			'$likes' => ['likes', DI::l10n()->t('Likes:'), $profile['likes']],
-			'$dislikes' => ['dislikes', DI::l10n()->t('Dislikes:'), $profile['dislikes']],
-			'$music' => ['music', DI::l10n()->t('Musical interests'), $profile['music']],
-			'$book' => ['book', DI::l10n()->t('Books, literature'), $profile['book']],
-			'$tv' => ['tv', DI::l10n()->t('Television'), $profile['tv']],
-			'$film' => ['film', DI::l10n()->t('Film/dance/culture/entertainment'), $profile['film']],
-			'$interest' => ['interest', DI::l10n()->t('Hobbies/Interests'), $profile['interest']],
-			'$romance' => ['romance', DI::l10n()->t('Love/romance'), $profile['romance']],
-			'$work' => ['work', DI::l10n()->t('Work/employment'), $profile['work']],
-			'$education' => ['education', DI::l10n()->t('School/education'), $profile['education']],
-			'$contact' => ['contact', DI::l10n()->t('Contact information and Social Networks'), $profile['contact']],
+			'$custom_fields' => $custom_fields,
 		]);
 
 		$arr = ['profile' => $profile, 'entry' => $o];

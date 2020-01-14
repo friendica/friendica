@@ -6,6 +6,7 @@ use Friendica\BaseModel;
 use Friendica\BaseRepository;
 use Friendica\Collection;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Model;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
@@ -131,5 +132,89 @@ class ProfileField extends BaseRepository
 		$model->edited = DateTimeFormat::utcNow();
 
 		return parent::update($model);
+	}
+	
+	/**
+	 * @param int                      $uid                User Id
+	 * @param Collection\ProfileFields $profileFields      Collection of existing profile fields
+	 * @param array                    $profileFieldInputs Array of profile field form inputs indexed by profile field id
+	 * @param array                    $profileFieldOrder  List of profile field id in order
+	 * @return Collection\ProfileFields
+	 * @throws \Exception
+	 */
+	public function updateCollectionFromForm(int $uid, Collection\ProfileFields $profileFields, array $profileFieldInputs, array $profileFieldOrder)
+	{
+		$aclFormatter = DI::aclFormatter();
+
+		// Returns an associative array of id => order values
+		$profileFieldOrder = array_flip($profileFieldOrder);
+
+		// Creation of the new field
+		if (!empty($profileFieldInputs['new']['label'])) {
+			$psid = $this->permissionSet->getIdFromACL(
+				$uid,
+				$aclFormatter->toString($profileFieldInputs['new']['contact_allow'] ?? ''),
+				$aclFormatter->toString($profileFieldInputs['new']['group_allow'] ?? ''),
+				$aclFormatter->toString($profileFieldInputs['new']['contact_deny'] ?? ''),
+				$aclFormatter->toString($profileFieldInputs['new']['group_deny'] ?? '')
+			);
+
+			$newProfileField = $this->insert([
+				'uid' => $uid,
+				'label' => $profileFieldInputs['new']['label'],
+				'value' => $profileFieldInputs['new']['value'],
+				'psid' => $psid,
+				'order' => $profileFieldOrder['new'],
+			]);
+
+			$profileFieldInputs[$newProfileField->id] = $profileFieldInputs['new'];
+			$profileFieldOrder[$newProfileField->id] = $profileFieldOrder['new'];
+
+			$profileFields[] = $newProfileField;
+		}
+
+		unset($profileFieldInputs['new']);
+		unset($profileFieldOrder['new']);
+
+		// Prunes profile field whose label has been emptied
+		$profileFields = $profileFields->filter(function (Model\ProfileField $profileField) use (&$profileFieldInputs, &$profileFieldOrder) {
+			$keepModel = !isset($profileFieldInputs[$profileField->id]) || !empty($profileFieldInputs[$profileField->id]['label']);
+
+			if (!$keepModel) {
+				unset($profileFieldInputs[$profileField->id]);
+				unset($profileFieldOrder[$profileField->id]);
+				$this->delete($profileField);
+			}
+
+			return $keepModel;
+		});
+
+		// Regenerates the order values if items were deleted
+		$profileFieldOrder = array_flip(array_keys($profileFieldOrder));
+
+		// Update existing profile fields from form values
+		$profileFields = $profileFields->map(function (Model\ProfileField $profileField) use ($uid, $aclFormatter, &$profileFieldInputs, &$profileFieldOrder) {
+			if (isset($profileFieldInputs[$profileField->id]) && isset($profileFieldOrder[$profileField->id])) {
+				$psid = $this->permissionSet->getIdFromACL(
+					$uid,
+					$aclFormatter->toString($profileFieldInputs[$profileField->id]['contact_allow'] ?? ''),
+					$aclFormatter->toString($profileFieldInputs[$profileField->id]['group_allow'] ?? ''),
+					$aclFormatter->toString($profileFieldInputs[$profileField->id]['contact_deny'] ?? ''),
+					$aclFormatter->toString($profileFieldInputs[$profileField->id]['group_deny'] ?? '')
+				);
+
+				$profileField->psid  = $psid;
+				$profileField->label = $profileFieldInputs[$profileField->id]['label'];
+				$profileField->value = $profileFieldInputs[$profileField->id]['value'];
+				$profileField->order = $profileFieldOrder[$profileField->id];
+
+				unset($profileFieldInputs[$profileField->id]);
+				unset($profileFieldOrder[$profileField->id]);
+			}
+
+			return $profileField;
+		});
+
+		return $profileFields;
 	}
 }
