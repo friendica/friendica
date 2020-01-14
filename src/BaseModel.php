@@ -29,6 +29,13 @@ abstract class BaseModel
 	private $data = [];
 
 	/**
+	 * Used to limit/avoid updates if no data was changed.
+	 *
+	 * @var array
+	 */
+    private $originalData = [];
+
+	/**
 	 * @param Database        $dba
 	 * @param LoggerInterface $logger
 	 * @param array           $data   Table row attributes
@@ -38,6 +45,12 @@ abstract class BaseModel
 		$this->dba = $dba;
 		$this->logger = $logger;
 		$this->data = $data;
+		$this->originalData = $data;
+	}
+
+	public function getOriginalData()
+	{
+		return $this->originalData;
 	}
 
 	/**
@@ -51,6 +64,7 @@ abstract class BaseModel
 	{
 		$model = clone $prototype;
 		$model->data = $data;
+		$model->originalData = $data;
 
 		return $model;
 	}

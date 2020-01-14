@@ -122,7 +122,7 @@ abstract class BaseRepository extends BaseFactory
 	 */
 	public function update(BaseModel $model)
 	{
-		return $this->dba->update(static::$table_name, $model->toArray(), ['id' => $model->id], true);
+		return $this->dba->update(static::$table_name, $model->toArray(), ['id' => $model->id], $model->getOriginalData());
 	}
 
 	/**
@@ -136,10 +136,12 @@ abstract class BaseRepository extends BaseFactory
 	{
 		$return = $this->dba->insert(static::$table_name, $fields);
 
-		if ($return) {
-			$fields['id'] = $this->dba->lastInsertId();
-			$return = $this->create($fields);
+		if (!$return) {
+			throw new HTTPException\InternalServerErrorException('Unable to insert new row in table "' . static::$table_name . '"');
 		}
+
+		$fields['id'] = $this->dba->lastInsertId();
+		$return = $this->create($fields);
 
 		return $return;
 	}

@@ -1342,19 +1342,13 @@ class Database
 			}
 		}
 
-		$do_update = (count($old_fields) == 0);
-
 		foreach ($old_fields AS $fieldname => $content) {
-			if (isset($fields[$fieldname])) {
-				if (($fields[$fieldname] == $content) && !is_null($content)) {
-					unset($fields[$fieldname]);
-				} else {
-					$do_update = true;
-				}
+			if (isset($fields[$fieldname]) && !is_null($content) && ($fields[$fieldname] == $content)) {
+				unset($fields[$fieldname]);
 			}
 		}
 
-		if (!$do_update || (count($fields) == 0)) {
+		if (count($fields) == 0) {
 			return true;
 		}
 
