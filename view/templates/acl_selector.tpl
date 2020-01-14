@@ -1,11 +1,11 @@
 <div id="acl-wrapper">
-	<div class="panel-group" id="visibility-accordion" role="tablist" aria-multiselectable="true">
+	<div class="panel-group" id="visibility-accordion-{{$input_group_id}}" role="tablist" aria-multiselectable="true">
 		<div class="panel panel-success">
-			<label class="panel-heading{{if $visibility != 'public'}} collapsed{{/if}}" id="visibility-public-heading" aria-expanded="{{if $visibility == 'public'}}true{{else}}false{{/if}}">
-				<input type="radio" name="visibility" id="visibility-public" value="public" tabindex="14" {{if $visibility == 'public'}}checked{{/if}}>
+			<label class="panel-heading{{if $visibility != 'public'}} collapsed{{/if}}" id="visibility-public-heading-{{$input_group_id}}" aria-expanded="{{if $visibility == 'public'}}true{{else}}false{{/if}}">
+				<input type="radio" name="{{$input_names.visibility}}" id="visibility-public-{{$input_group_id}}" value="public" tabindex="14" {{if $visibility == 'public'}}checked{{/if}}>
 				<i class="fa fa-globe"></i> {{$public_title}}
 			</label>
-			<fieldset id="visibility-public-panel" class="panel-collapse collapse{{if $visibility == 'public'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-public-heading" {{if $visibility != 'public'}}disabled{{/if}}>
+			<fieldset id="visibility-public-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'public'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-public-heading-{{$input_group_id}}" {{if $visibility != 'public'}}disabled{{/if}}>
 				<div class="panel-body">
 					<p>{{$public_desc}}</p>
 	                {{if $for_federation}}
@@ -39,26 +39,26 @@
 			</fieldset>
 		</div>
 		<div class="panel panel-info">
-			<label class="panel-heading{{if $visibility != 'custom'}} collapsed{{/if}}" id="visibility-custom-heading" aria-expanded="{{if $visibility == 'custom'}}true{{else}}false{{/if}}">
-				<input type="radio" name="visibility" id="visibility-custom" value="custom" tabindex="15" {{if $visibility == 'custom'}}checked{{/if}}>
+			<label class="panel-heading{{if $visibility != 'custom'}} collapsed{{/if}}" id="visibility-custom-heading-{{$input_group_id}}" aria-expanded="{{if $visibility == 'custom'}}true{{else}}false{{/if}}">
+				<input type="radio" name="{{$input_names.visibility}}" id="visibility-custom-{{$input_group_id}}" value="custom" tabindex="15" {{if $visibility == 'custom'}}checked{{/if}}>
 				<i class="fa fa-lock"></i> {{$custom_title}}
 			</label>
-			<fieldset id="visibility-custom-panel" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-custom-heading" {{if $visibility != 'custom'}}disabled{{/if}}>
-				<input type="hidden" name="group_allow" value="{{$group_allow}}"/>
-				<input type="hidden" name="contact_allow" value="{{$contact_allow}}"/>
-				<input type="hidden" name="group_deny" value="{{$group_deny}}"/>
-				<input type="hidden" name="contact_deny" value="{{$contact_deny}}"/>
+			<fieldset id="visibility-custom-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-custom-heading-{{$input_group_id}}" {{if $visibility != 'custom'}}disabled{{/if}}>
+				<input type="hidden" name="{{$input_names.group_allow}}" value="{{$group_allow}}"/>
+				<input type="hidden" name="{{$input_names.contact_allow}}" value="{{$contact_allow}}"/>
+				<input type="hidden" name="{{$input_names.group_deny}}" value="{{$group_deny}}"/>
+				<input type="hidden" name="{{$input_names.contact_deny}}" value="{{$contact_deny}}"/>
 				<div class="panel-body">
 					<p>{{$custom_desc}}</p>
 
 					<div class="form-group">
-						<label for="acl_allow">{{$allow_label}}</label>
-						<input type="text" class="form-control input-lg" id="acl_allow">
+						<label for="acl_allow-{{$input_group_id}}">{{$allow_label}}</label>
+						<input type="text" class="form-control input-lg" id="acl_allow-{{$input_group_id}}">
 					</div>
 
 					<div class="form-group">
-						<label for="acl_deny">{{$deny_label}}</label>
-						<input type="text" class="form-control input-lg" id="acl_deny">
+						<label for="acl_deny-{{$input_group_id}}">{{$deny_label}}</label>
+						<input type="text" class="form-control input-lg" id="acl_deny-{{$input_group_id}}">
 					</div>
 				</div>
 			</fieldset>
@@ -68,29 +68,29 @@
 
 {{if $for_federation}}
 	<div class="form-group">
-		<label for="profile-jot-email" id="profile-jot-email-label">{{$emailcc}}</label>
-		<input type="text" name="emailcc" id="profile-jot-email" class="form-control" title="{{$emtitle}}" />
+		<label for="profile-jot-email" id="profile-jot-email-label-{{$input_group_id}}">{{$emailcc}}</label>
+		<input type="text" name="{{$input_names.emailcc}}" id="profile-jot-email-{{$input_group_id}}" class="form-control" title="{{$emtitle}}" />
 	</div>
-	<div id="profile-jot-email-end"></div>
+	<div id="profile-jot-email-end-{{$input_group_id}}"></div>
 {{/if}}
 </div>
 <script type="text/javascript">
 	$(function() {
-		let $acl_allow_input = $('#acl_allow');
-		let $contact_allow_input = $('[name=contact_allow]');
-		let $group_allow_input = $('[name=group_allow]');
-		let $acl_deny_input = $('#acl_deny');
-		let $contact_deny_input = $('[name=contact_deny]');
-		let $group_deny_input = $('[name=group_deny]');
-		let $visibility_public_panel = $('#visibility-public-panel');
-		let $visibility_custom_panel = $('#visibility-custom-panel');
-		let $visibility_public_radio = $('#visibility-public');
-		let $visibility_custom_radio = $('#visibility-custom');
+		let $acl_allow_input = $('#acl_allow-{{$input_group_id}}');
+		let $contact_allow_input = $('[name="{{$input_names.contact_allow}}"]');
+		let $group_allow_input = $('[name="{{$input_names.group_allow}}"]');
+		let $acl_deny_input = $('#acl_deny-{{$input_group_id}}');
+		let $contact_deny_input = $('[name="{{$input_names.contact_deny}}"]');
+		let $group_deny_input = $('[name="{{$input_names.group_deny}}"]');
+		let $visibility_public_panel = $('#visibility-public-panel-{{$input_group_id}}');
+		let $visibility_custom_panel = $('#visibility-custom-panel-{{$input_group_id}}');
+		let $visibility_public_radio = $('#visibility-public-{{$input_group_id}}');
+		let $visibility_custom_radio = $('#visibility-custom-{{$input_group_id}}');
 
 		// Frio specific
 		if ($.fn.collapse) {
-			$visibility_public_panel.collapse({parent: '#visibility-accordion', toggle: false});
-			$visibility_custom_panel.collapse({parent: '#visibility-accordion', toggle: false});
+			$visibility_public_panel.collapse({parent: '#visibility-accordion-{{$input_group_id}}', toggle: false});
+			$visibility_custom_panel.collapse({parent: '#visibility-accordion-{{$input_group_id}}', toggle: false});
 		}
 
 		$visibility_public_radio.on('change', function (e) {
@@ -101,13 +101,13 @@
 			$visibility_public_panel.prop('disabled', false);
 			$visibility_custom_panel.prop('disabled', true);
 
-			$('.profile-jot-net input[type=checkbox]').each(function() {
+			$('#visibility-public-panel-{{$input_group_id}} .profile-jot-net input[type=checkbox]').each(function() {
 				// Restores checkbox state if it had been saved
 				if ($(this).attr('data-checked') !== undefined) {
 					$(this).prop('checked', $(this).attr('data-checked') === 'true');
 				}
 			});
-			$('.profile-jot-net input').attr('disabled', false);
+			$('#visibility-public-panel-{{$input_group_id}} .profile-jot-net input').attr('disabled', false);
 		});
 
 		$visibility_custom_radio.on('change', function(e) {
@@ -118,13 +118,13 @@
 			$visibility_public_panel.prop('disabled', true);
 			$visibility_custom_panel.prop('disabled', false);
 
-			$('.profile-jot-net input[type=checkbox]').each(function() {
+			$('#visibility-public-panel-{{$input_group_id}} .profile-jot-net input[type=checkbox]').each(function() {
 				// Saves current checkbox state
 				$(this)
 					.attr('data-checked', $(this).prop('checked'))
 					.prop('checked', false);
 			});
-			$('.profile-jot-net input').attr('disabled', 'disabled');
+			$('#visibility-public-panel-{{$input_group_id}} .profile-jot-net input').attr('disabled', 'disabled');
 		});
 
 		// Custom visibility tags inputs
@@ -233,9 +233,11 @@
 
 		// Anti-duplicate callback + acl fields value generation
 
-		$acl_allow_input.on('itemAdded', function (event) {
-			// Removes duplicate in the opposite acl box
-			$acl_deny_input.tagsinput('remove', event.item);
+		$acl_allow_input.on('itemAdded itemRemoved', function (event) {
+			if (event.type === 'itemAdded') {
+				// Removes duplicate in the opposite acl box
+				$acl_deny_input.tagsinput('remove', event.item);
+			}
 
 			// Update the real acl field
 			$group_allow_input.val('');
@@ -249,9 +251,11 @@
 			});
 		});
 
-		$acl_deny_input.on('itemAdded', function (event) {
-			// Removes duplicate in the opposite acl box
-			$acl_allow_input.tagsinput('remove', event.item);
+		$acl_deny_input.on('itemAdded itemRemoved', function (event) {
+			if (event.type === 'itemAdded') {
+				// Removes duplicate in the opposite acl box
+				$acl_allow_input.tagsinput('remove', event.item);
+			}
 
 			// Update the real acl field
 			$group_deny_input.val('');

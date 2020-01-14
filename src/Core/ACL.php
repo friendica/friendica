@@ -228,18 +228,33 @@ class ACL
 	/**
 	 * Returns the ACL list of contacts for a given user id
 	 *
-	 * @param int $user_id
+	 * @param int   $user_id
+	 * @param array $condition Additional contact lookup table conditions
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function getContactListByUserId(int $user_id)
+	public static function getContactListByUserId(int $user_id, array $condition = [])
 	{
 		$fields = ['id', 'name', 'addr', 'micro'];
 		$params = ['order' => ['name']];
-		$acl_contacts = Contact::selectToArray($fields,
-			['uid' => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
-			'pending' => false, 'rel' => [Contact::FOLLOWER, Contact::FRIEND]], $params
+		$acl_contacts = Contact::selectToArray(
+			$fields,
+			array_merge([
+				'uid' => $user_id,
+				'self' => false,
+				'blocked' => false,
+				'archive' => false,
+				'deleted' => false,
+				'pending' => false,
+				'rel' => [Contact::FOLLOWER, Contact::FRIEND]
+			], $condition),
+			$params
 		);
+
+		$acl_yourself = Contact::selectFirst($fields, ['uid' => $user_id, 'self' => true]);
+		$acl_yourself['name'] = L10n::t('Yourself');
+
+		$acl_contacts[] = $acl_yourself;
 
 		$acl_forums = Contact::selectToArray($fields,
 			['uid' => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
@@ -295,25 +310,37 @@ class ACL
 	/**
 	 * Return the full jot ACL selector HTML
 	 *
-	 * @param Page  $page
-	 * @param array $user                User array
-	 * @param bool  $for_federation
-	 * @param array $default_permissions Static defaults permission array:
-	 *                                   [
+	 * @param Page   $page
+	 * @param array  $user                  User array
+	 * @param bool   $for_federation
+	 * @param array  $default_permissions   Static defaults permission array:
+	 *                                      [
 	 *                                      'allow_cid' => [],
 	 *                                      'allow_gid' => [],
 	 *                                      'deny_cid' => [],
 	 *                                      'deny_gid' => [],
 	 *                                      'hidewall' => true/false
-	 *                                   ]
+	 *                                      ]
+	 * @param array  $condition
+	 * @param string $form_prefix
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function getFullSelectorHTML(Page $page, array $user = null, bool $for_federation = false, array $default_permissions = [])
-	{
+	public static function getFullSelectorHTML(
+		Page $page,
+		array $user = null,
+		bool $for_federation = false,
+		array $default_permissions = [],
+		array $condition = [],
+		$form_prefix = ''
+	) {
 		if (empty($user['uid'])) {
 			return '';
 		}
+
+		static $input_group_id = 0;
+
+		$input_group_id++;
 
 		$page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
 		$page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
@@ -373,11 +400,20 @@ class ACL
 			}
 		}
 
-		$acl_contacts = self::getContactListByUserId($user['uid']);
+		$acl_contacts = self::getContactListByUserId($user['uid'], $condition);
 
 		$acl_groups = self::getGroupListByUserId($user['uid']);
 
 		$acl_list = array_merge($acl_groups, $acl_contacts);
+
+		$input_names = [
+			'visibility'    => $form_prefix ? $form_prefix . '[visibility]'    : 'visibility',
+			'group_allow'   => $form_prefix ? $form_prefix . '[group_allow]'   : 'group_allow',
+			'contact_allow' => $form_prefix ? $form_prefix . '[contact_allow]' : 'contact_allow',
+			'group_deny'    => $form_prefix ? $form_prefix . '[group_deny]'    : 'group_deny',
+			'contact_deny'  => $form_prefix ? $form_prefix . '[contact_deny]'  : 'contact_deny',
+			'emailcc'       => $form_prefix ? $form_prefix . '[emailcc]'       : 'emailcc',
+		];
 
 		$tpl = Renderer::getMarkupTemplate('acl_selector.tpl');
 		$o = Renderer::replaceMacros($tpl, [
@@ -402,6 +438,8 @@ class ACL
 			'$for_federation' => $for_federation,
 			'$jotnets_fields' => $jotnets_fields,
 			'$user_hidewall'  => $default_permissions['hidewall'],
+			'$input_names'    => $input_names,
+			'$input_group_id' => $input_group_id,
 		]);
 
 		return $o;
