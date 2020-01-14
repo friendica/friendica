@@ -199,4 +199,12 @@ abstract class BaseRepository extends BaseFactory
 
 		return $models;
 	}
+
+	/**
+	 * @param BaseCollection $collection
+	 */
+	public function saveCollection(BaseCollection $collection)
+	{
+		$collection->map([$this, 'update']);
+	}
 }
