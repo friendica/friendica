@@ -5,9 +5,10 @@ namespace Friendica\Repository;
 use Friendica\BaseModel;
 use Friendica\BaseRepository;
 use Friendica\Collection;
+use Friendica\Database\Database;
 use Friendica\Model;
-use Friendica\Model\PermissionSet;
 use Friendica\Util\DateTimeFormat;
+use Psr\Log\LoggerInterface;
 
 class ProfileField extends BaseRepository
 {
@@ -17,13 +18,23 @@ class ProfileField extends BaseRepository
 
 	protected static $collection_class = Collection\ProfileFields::class;
 
+	/** @var PermissionSet */
+	private $permissionSet;
+
+	public function __construct(Database $dba, LoggerInterface $logger, PermissionSet $permissionSet)
+	{
+		parent::__construct($dba, $logger);
+
+		$this->permissionSet = $permissionSet;
+	}
+
 	/**
 	 * @param array $data
 	 * @return Model\ProfileField
 	 */
 	protected function create(array $data)
 	{
-		return new Model\ProfileField($this->dba, $this->logger, $data);
+		return new Model\ProfileField($this->dba, $this->logger, $this->permissionSet, $data);
 	}
 
 	/**
@@ -84,7 +95,9 @@ class ProfileField extends BaseRepository
 	 */
 	public function selectByContactId(int $cid, int $uid)
 	{
-		$psids = PermissionSet::get($uid, $cid);
+		$permissionSets = $this->permissionSet->selectByContactId($cid, $uid);
+
+		$psids = $permissionSets->column('id');
 
 		// Includes public custom fields
 		$psids[] = 0;

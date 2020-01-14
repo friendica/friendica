@@ -3,6 +3,9 @@
 namespace Friendica\Model;
 
 use Friendica\BaseModel;
+use Friendica\Database\Database;
+use Friendica\Network\HTTPException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Custom profile field model class.
@@ -17,8 +20,40 @@ use Friendica\BaseModel;
  * @property string value
  * @property string created
  * @property string edited
+ * @property PermissionSet permissionset
  */
 class ProfileField extends BaseModel
 {
+	/** @var PermissionSet */
+	private $permissionset;
 
+	/** @var \Friendica\Repository\PermissionSet */
+	private $permissionSetRepository;
+
+	public function __construct(Database $dba, LoggerInterface $logger, \Friendica\Repository\PermissionSet $permissionSetRepository, array $data = [])
+	{
+		parent::__construct($dba, $logger, $data);
+
+		$this->permissionSetRepository = $permissionSetRepository;
+	}
+
+	public function __get($name)
+	{
+		$this->checkValid();
+
+		switch ($name) {
+			case 'permissionset':
+				$this->permissionset =
+					$this->permissionset ??
+						$this->permissionSetRepository->selectFirst(['id' => $this->psid, 'uid' => $this->uid]);
+
+				$return = $this->permissionset;
+				break;
+			default:
+				$return = parent::__get($name);
+				break;
+		}
+
+		return $return;
+	}
 }
