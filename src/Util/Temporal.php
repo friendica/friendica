@@ -131,11 +131,14 @@ class Temporal
 
 		if ($dob < '0000-01-01') {
 			$value = '';
+			$age = 0;
+		} elseif ($dob < '0001-00-00') {
+			$value = substr($dob, 5);
+			$age = 0;
 		} else {
-			$value = DateTimeFormat::utc(($year > 1000) ? $dob : '1000-' . $month . '-' . $day, 'Y-m-d');
+			$value = DateTimeFormat::utc($dob, 'Y-m-d');
+			$age = self::getAgeByTimezone($value, $timezone);
 		}
-
-		$age = (intval($value) ? self::getAgeByTimezone($value, $timezone, $timezone) : "");
 
 		$tpl = Renderer::getMarkupTemplate("field_input.tpl");
 		$o = Renderer::replaceMacros($tpl,
@@ -144,7 +147,7 @@ class Temporal
 				'dob',
 				DI::l10n()->t('Birthday:'),
 				$value,
-				intval($age) > 0 ? DI::l10n()->t('Age: ') . $age : "",
+				intval($age) > 0 ? DI::l10n()->t('Age: ') . DI::l10n()->tt('%d year old', '%d years old', $age) : '',
 				'',
 				'placeholder="' . DI::l10n()->t('YYYY-MM-DD or MM-DD') . '"'
 			]
@@ -339,48 +342,31 @@ class Temporal
 	/**
 	 * Returns timezone correct age in years.
 	 *
-	 * Returns the age in years, given a date of birth, the timezone of the person
-	 * whose date of birth is provided, and the timezone of the person viewing the
-	 * result.
-	 *
-	 * Why? Bear with me. Let's say I live in Mittagong, Australia, and my birthday
-	 * is on New Year's. You live in San Bruno, California.
-	 * When exactly are you going to see my age increase?
-	 *
-	 * A: 5:00 AM Dec 31 San Bruno time. That's precisely when I start celebrating
-	 * and become a year older. If you wish me happy birthday on January 1
-	 * (San Bruno time), you'll be a day late.
+	 * Returns the age in years, given a date of birth and the timezone of the person
+	 * whose date of birth is provided.
 	 *
 	 * @param string $dob       Date of Birth
 	 * @param string $owner_tz  (optional) Timezone of the person of interest
-	 * @param string $viewer_tz (optional) Timezone of the person viewing
 	 *
 	 * @return int Age in years
 	 * @throws \Exception
 	 */
-	public static function getAgeByTimezone($dob, $owner_tz = '', $viewer_tz = '')
+	public static function getAgeByTimezone($dob, $owner_tz = '')
 	{
 		if (!intval($dob)) {
 			return 0;
 		}
+
 		if (!$owner_tz) {
 			$owner_tz = date_default_timezone_get();
 		}
-		if (!$viewer_tz) {
-			$viewer_tz = date_default_timezone_get();
-		}
 
-		$birthdate = DateTimeFormat::convert($dob . ' 00:00:00+00:00', $owner_tz, 'UTC', 'Y-m-d');
-		list($year, $month, $day) = explode("-", $birthdate);
-		$year_diff  = DateTimeFormat::timezoneNow($viewer_tz, 'Y') - $year;
-		$curr_month = DateTimeFormat::timezoneNow($viewer_tz, 'm');
-		$curr_day   = DateTimeFormat::timezoneNow($viewer_tz, 'd');
+		$birthdate = new DateTime($dob . ' 00:00:00', new DateTimeZone($owner_tz));
+		$currentDate = new DateTime('now', new DateTimeZone('UTC'));
 
-		if (($curr_month < $month) || (($curr_month == $month) && ($curr_day < $day))) {
-			$year_diff--;
-		}
+		$interval = $birthdate->diff($currentDate);
 
-		return $year_diff;
+		return $interval->format('%y');
 	}
 
 	/**

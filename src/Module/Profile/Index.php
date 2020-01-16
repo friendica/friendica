@@ -131,8 +131,8 @@ class Index extends BaseModule
 
 			$basic_fields += self::buildField('dob', DI::l10n()->t('Birthday:'), $dob);
 
-			if ($age = Temporal::getAgeByTimezone($a->profile['dob'], $a->profile['timezone'], '')) {
-				$basic_fields += self::buildField('age', DI::l10n()->t('Age:'), $age);
+			if ($age = Temporal::getAgeByTimezone($a->profile['dob'], $a->profile['timezone'])) {
+				$basic_fields += self::buildField('age', DI::l10n()->t('Age: '), DI::l10n()->tt('%d year old', '%d years old', $age));
 			}
 		}
 
