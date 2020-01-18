@@ -639,3 +639,37 @@ span.emoji.mastodon img {
     display: none;
   }
 }
+
+/* Profile Settings Custom Fields */
+body.dragging, body.dragging * {
+	cursor: ns-resize !important;
+}
+
+.dragged {
+	position: absolute;
+	opacity: 0.5;
+	z-index: 2000;
+}
+
+#profile-custom-fields > fieldset > legend {
+	cursor: ns-resize;
+}
+
+#profile-custom-fields div.placeholder {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	border-top: 1px dotted black;
+}
+#profile-custom-fields div.placeholder:before {
+	position: absolute;
+	content: "";
+	width: 0;
+	height: 0;
+	margin-top: -7px;
+	left: -7px;
+	top: -1px;
+	border: 7px solid transparent;
+	border-left-color: black;
+	border-right: none;
+}

@@ -150,9 +150,11 @@
 		<div class="toggle-section js-toggle-section">
 			<a class="section-caption js-section-toggler" href="javascript:;">{{$lbl_custom_fields_section}} &raquo;</a>
 			<div class="js-section toggle-section-content hidden">
+				<div id="profile-custom-fields">
 				{{foreach $custom_fields as $custom_field}}
 					{{include file="settings/profile/field/edit.tpl" profile_field=$custom_field}}
 				{{/foreach}}
+				</div>
 
 				<div class="profile-edit-submit-wrapper">
 					<input type="submit" name="submit" class="profile-edit-submit-button" value="{{$submit}}"/>

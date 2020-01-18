@@ -9,6 +9,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
+use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -163,6 +164,9 @@ class Index extends BaseSettingsModule
 		}
 
 		$a = DI::app();
+
+		DI::page()->registerFooterScript('view/asset/es-jquery-sortable/source/js/jquery-sortable-min.js');
+		DI::page()->registerFooterScript(Theme::getPathForFile('js/module/settings/profile/index.js'));
 
 		$custom_fields = [];
 

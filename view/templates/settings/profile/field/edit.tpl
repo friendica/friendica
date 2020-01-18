@@ -1,5 +1,5 @@
-<fieldset>
-	<legend>{{$profile_field.legend}}</legend>
+<fieldset data-id="{{$profile_field.id}}">
+	<legend>&#8801; {{$profile_field.legend}}</legend>
 
 	<input type="hidden" name="profile_field_order[]" value="{{$profile_field.id}}">
 

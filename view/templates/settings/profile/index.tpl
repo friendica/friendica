@@ -99,9 +99,11 @@
 
 		<h3>{{$lbl_custom_fields_section}}</h3>
 
+		<div id="profile-custom-fields">
 		{{foreach $custom_fields as $custom_field}}
 			{{include file="settings/profile/field/edit.tpl" profile_field=$custom_field}}
 		{{/foreach}}
+		</div>
 
 		<div class="profile-edit-submit-wrapper">
 			<input type="submit" name="submit" class="profile-edit-submit-button" value="{{$submit}}"/>
