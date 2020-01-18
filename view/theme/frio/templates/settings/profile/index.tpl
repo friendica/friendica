@@ -157,6 +157,7 @@
 				</div>
 				<div id="custom-fields-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="custom-fields">
 					<div class="section-content-tools-wrapper">
+						{{$custom_fields_description nofilter}}
 						<div id="profile-custom-fields">
 						{{foreach $custom_fields as $custom_field}}
 							{{include file="settings/profile/field/edit.tpl" profile_field=$custom_field}}

@@ -179,8 +179,8 @@ class Index extends BaseSettingsModule
 				'id' => $profileField->id,
 				'legend' => $profileField->label,
 				'fields' => [
-					'label' => ['profile_field[' . $profileField->id . '][label]', DI::l10n()->t('Label:'), $profileField->label, DI::l10n()->t('Empty the label to delete this profile field')],
-					'value' => ['profile_field[' . $profileField->id . '][value]', DI::l10n()->t('Value:'), $profileField->value, DI::l10n()->t('BBCodes allowed')],
+					'label' => ['profile_field[' . $profileField->id . '][label]', DI::l10n()->t('Label:'), $profileField->label],
+					'value' => ['profile_field[' . $profileField->id . '][value]', DI::l10n()->t('Value:'), $profileField->value],
 					'acl' => ACL::getFullSelectorHTML(
 						DI::page(),
 						$a->user,
@@ -200,7 +200,7 @@ class Index extends BaseSettingsModule
 			'legend' => DI::l10n()->t('Add a new profile field'),
 			'fields' => [
 				'label' => ['profile_field[new][label]', DI::l10n()->t('Label:')],
-				'value' => ['profile_field[new][value]', DI::l10n()->t('Value:'), '', DI::l10n()->t('BBCodes allowed')],
+				'value' => ['profile_field[new][value]', DI::l10n()->t('Value:')],
 				'acl' => ACL::getFullSelectorHTML(
 					DI::page(),
 					$a->user,
@@ -273,6 +273,13 @@ class Index extends BaseSettingsModule
 			'$homepage' => ['homepage', DI::l10n()->t('Homepage URL:'), $profile['homepage']],
 			'$pub_keywords' => ['pub_keywords', DI::l10n()->t('Public Keywords:'), $profile['pub_keywords'], DI::l10n()->t('(Used for suggesting potential friends, can be seen by others)')],
 			'$prv_keywords' => ['prv_keywords', DI::l10n()->t('Private Keywords:'), $profile['prv_keywords'], DI::l10n()->t('(Used for searching profiles, never shown to others)')],
+			'$custom_fields_description' => DI::l10n()->t("<p>Custom fields appear on <a href=\"%s\">your profile page</a>.</p>
+				<p>You can use BBCodes in the field values.</p>
+				<p>Reorder by dragging the field title.</p>
+				<p>Empty the label field to remove a custom field.</p>
+				<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected groups.</p>",
+				'profile/' . $a->user['nickname']
+			),
 			'$custom_fields' => $custom_fields,
 		]);
 

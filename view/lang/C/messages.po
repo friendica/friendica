@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2020.03-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 17:35-0500\n"
+"POT-Creation-Date: 2020-01-19 18:46-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -823,8 +823,8 @@ msgstr ""
 #: mod/settings.php:1117 mod/settings.php:1137 mod/settings.php:1138
 #: mod/settings.php:1139 mod/settings.php:1140 mod/settings.php:1141
 #: mod/suggest.php:72 src/Module/Contact.php:441 src/Module/Register.php:97
-#: src/Module/Settings/Profile/Index.php:224
-#: src/Module/Settings/Profile/Index.php:227
+#: src/Module/Settings/Profile/Index.php:228
+#: src/Module/Settings/Profile/Index.php:231
 msgid "Yes"
 msgstr ""
 
@@ -878,8 +878,8 @@ msgstr ""
 #: mod/settings.php:1113 mod/settings.php:1117 mod/settings.php:1137
 #: mod/settings.php:1138 mod/settings.php:1139 mod/settings.php:1140
 #: mod/settings.php:1141 src/Module/Register.php:98
-#: src/Module/Settings/Profile/Index.php:224
 #: src/Module/Settings/Profile/Index.php:228
+#: src/Module/Settings/Profile/Index.php:232
 msgid "No"
 msgstr ""
 
@@ -1055,7 +1055,7 @@ msgstr ""
 #: src/Module/Delegation.php:131 src/Module/Install.php:211
 #: src/Module/Install.php:251 src/Module/Install.php:287
 #: src/Module/Invite.php:156 src/Module/Item/Compose.php:125
-#: src/Module/Settings/Profile/Index.php:244 src/Object/Post.php:904
+#: src/Module/Settings/Profile/Index.php:248 src/Object/Post.php:904
 #: view/theme/duepuntozero/config.php:70 view/theme/frio/config.php:125
 #: view/theme/quattro/config.php:72 view/theme/vier/config.php:120
 msgid "Submit"
@@ -1966,7 +1966,7 @@ msgstr ""
 msgid "Sort by post received date"
 msgstr ""
 
-#: mod/network.php:919 src/Module/Settings/Profile/Index.php:249
+#: mod/network.php:919 src/Module/Settings/Profile/Index.php:253
 msgid "Personal"
 msgstr ""
 
@@ -3362,8 +3362,8 @@ msgstr ""
 msgid "Default Post Permissions"
 msgstr ""
 
-#: mod/settings.php:1201 src/Module/Settings/Profile/Index.php:190
-#: src/Module/Settings/Profile/Index.php:210
+#: mod/settings.php:1201 src/Module/Settings/Profile/Index.php:194
+#: src/Module/Settings/Profile/Index.php:214
 msgid "(click to open/close)"
 msgstr ""
 
@@ -8373,7 +8373,7 @@ msgid "HTML"
 msgstr ""
 
 #: src/Module/Debug/Feed.php:20 src/Module/Filer/SaveTag.php:19
-#: src/Module/Settings/Profile/Index.php:152
+#: src/Module/Settings/Profile/Index.php:153
 msgid "You must be logged in to use this module"
 msgstr ""
 
@@ -9350,147 +9350,149 @@ msgstr ""
 msgid "No entries."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:68
+#: src/Module/Settings/Profile/Index.php:69
 msgid "Profile Name is required."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:126
+#: src/Module/Settings/Profile/Index.php:127
 msgid "Profile updated."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:128
+#: src/Module/Settings/Profile/Index.php:129
 msgid "Profile couldn't be updated."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:178
-#: src/Module/Settings/Profile/Index.php:198
+#: src/Module/Settings/Profile/Index.php:182
+#: src/Module/Settings/Profile/Index.php:202
 msgid "Label:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:178
-msgid "Empty the label to delete this profile field"
-msgstr ""
-
-#: src/Module/Settings/Profile/Index.php:179
-#: src/Module/Settings/Profile/Index.php:199
+#: src/Module/Settings/Profile/Index.php:183
+#: src/Module/Settings/Profile/Index.php:203
 msgid "Value:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:179
-#: src/Module/Settings/Profile/Index.php:199
-msgid "BBCodes allowed"
-msgstr ""
-
-#: src/Module/Settings/Profile/Index.php:189
-#: src/Module/Settings/Profile/Index.php:209
+#: src/Module/Settings/Profile/Index.php:193
+#: src/Module/Settings/Profile/Index.php:213
 msgid "Field Permissions"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:196
+#: src/Module/Settings/Profile/Index.php:200
 msgid "Add a new profile field"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:221
+#: src/Module/Settings/Profile/Index.php:225
 msgid "Hide contacts and friends:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:226
+#: src/Module/Settings/Profile/Index.php:230
 msgid "Hide your contact/friend list from viewers of this profile?"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:242
+#: src/Module/Settings/Profile/Index.php:246
 msgid "Profile Actions"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:243
+#: src/Module/Settings/Profile/Index.php:247
 msgid "Edit Profile Details"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:245
+#: src/Module/Settings/Profile/Index.php:249
 msgid "Change Profile Photo"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:247
+#: src/Module/Settings/Profile/Index.php:251
 msgid "View this profile"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:250
+#: src/Module/Settings/Profile/Index.php:254
 msgid "Profile picture"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:251
+#: src/Module/Settings/Profile/Index.php:255
 msgid "Location"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:252 src/Util/Temporal.php:78
+#: src/Module/Settings/Profile/Index.php:256 src/Util/Temporal.php:78
 #: src/Util/Temporal.php:80
 msgid "Miscellaneous"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:253
+#: src/Module/Settings/Profile/Index.php:257
 msgid "Custom Profile Fields"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:255 src/Module/Welcome.php:39
+#: src/Module/Settings/Profile/Index.php:259 src/Module/Welcome.php:39
 msgid "Upload Profile Photo"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:259
+#: src/Module/Settings/Profile/Index.php:263
 msgid "Display name:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:260
+#: src/Module/Settings/Profile/Index.php:264
 msgid "Title/Description:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:263
+#: src/Module/Settings/Profile/Index.php:267
 msgid "Street Address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:264
+#: src/Module/Settings/Profile/Index.php:268
 msgid "Locality/City:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:265
+#: src/Module/Settings/Profile/Index.php:269
 msgid "Region/State:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:266
+#: src/Module/Settings/Profile/Index.php:270
 msgid "Postal/Zip Code:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:267
+#: src/Module/Settings/Profile/Index.php:271
 msgid "Country:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:268
+#: src/Module/Settings/Profile/Index.php:272
 msgid "XMPP (Jabber) address:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:268
+#: src/Module/Settings/Profile/Index.php:272
 msgid ""
 "The XMPP address will be propagated to your contacts so that they can follow "
 "you."
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:269
+#: src/Module/Settings/Profile/Index.php:273
 msgid "Homepage URL:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:270
+#: src/Module/Settings/Profile/Index.php:274
 msgid "Public Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:270
+#: src/Module/Settings/Profile/Index.php:274
 msgid "(Used for suggesting potential friends, can be seen by others)"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:271
+#: src/Module/Settings/Profile/Index.php:275
 msgid "Private Keywords:"
 msgstr ""
 
-#: src/Module/Settings/Profile/Index.php:271
+#: src/Module/Settings/Profile/Index.php:275
 msgid "(Used for searching profiles, never shown to others)"
+msgstr ""
+
+#: src/Module/Settings/Profile/Index.php:276
+#, php-format
+msgid ""
+"<p>Custom fields appear on <a href=\"%s\">your profile page</a>.</p>\n"
+"\t\t\t\t<p>You can use BBCodes in the field values.</p>\n"
+"\t\t\t\t<p>Reorder by dragging the field title.</p>\n"
+"\t\t\t\t<p>Empty the label field to remove a custom field.</p>\n"
+"\t\t\t\t<p>Non-public fields can only be seen by the selected Friendica "
+"contacts or the Friendica contacts in the selected groups.</p>"
 msgstr ""
 
 #: src/Module/Settings/Profile/Photo/Crop.php:84

@@ -150,6 +150,7 @@
 		<div class="toggle-section js-toggle-section">
 			<a class="section-caption js-section-toggler" href="javascript:;">{{$lbl_custom_fields_section}} &raquo;</a>
 			<div class="js-section toggle-section-content hidden">
+				{{$custom_fields_description nofilter}}
 				<div id="profile-custom-fields">
 				{{foreach $custom_fields as $custom_field}}
 					{{include file="settings/profile/field/edit.tpl" profile_field=$custom_field}}
