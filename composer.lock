@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "34ad225ce21474eb84ce78047d9f2c01",
+    "content-hash": "6659cc3edcbdb9d706019810788d8dc3",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1214,6 +1214,49 @@
                 "zoom"
             ],
             "time": "2018-01-03T13:39:39+00:00"
+        },
+        {
+            "name": "npm-asset/es-jquery-sortable",
+            "version": "0.9.13-patch2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/es-jquery-sortable/-/es-jquery-sortable-0.9.13-patch2.tgz",
+                "shasum": "a4db16d133fbce1bcd1543c98279902a6b0812a3"
+            },
+            "require": {
+                "npm-asset/jquery": ">=2.1.2,<3.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/johnny/jquery-sortable/issues"
+                },
+                "npm-asset-main": "./source/js/jquery-sortable.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/johnny/jquery-sortable.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "echo \"Error: no test specified\" && exit 1"
+                }
+            },
+            "license": [
+                "BSD-3"
+            ],
+            "authors": [
+                ""
+            ],
+            "description": "jquery plugin for sortable, nestable lists",
+            "homepage": "https://github.com/johnny/jquery-sortable",
+            "keywords": [
+                "drag",
+                "dragging",
+                "sort",
+                "sortable",
+                "sorting"
+            ],
+            "time": "2019-11-20T03:55:51+00:00"
         },
         {
             "name": "npm-asset/ev-emitter",
