@@ -431,3 +431,16 @@ function update_1330()
 
 	return Update::SUCCESS;
 }
+
+function update_1332()
+{
+	$condition = ["`is-default` IS NOT NULL"];
+	$profiles = DBA::select('profile', [], $condition);
+
+	while ($profile = DBA::fetch($profiles)) {
+		DI::profileField()->migrateFromProfile($profile);
+	}
+	DBA::close($profiles);
+
+	return Update::SUCCESS;
+}
