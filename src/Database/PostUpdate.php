@@ -5,16 +5,23 @@
 namespace Friendica\Database;
 
 use Friendica\Core\Config;
+use Friendica\Core\L10n;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\Worker;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
+use Friendica\Model\Profile;
 use Friendica\Model\UserItem;
 use Friendica\Model\PermissionSet;
 
 /**
- * Post update functions
+ * These database-intensive post update routines are meant to be executed in the background by the cronjob.
+ *
+ * If there is a need for a intensive migration after a database structure change, update this file
+ * by adding a new method at the end with the number of the new DB_UPDATE_VERSION.
  */
 class PostUpdate
 {

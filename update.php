@@ -16,15 +16,15 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\Delivery;
 
 /**
+ * update.php - automatic post-databse structure change updates
  *
- * update.php - automatic system update
- *
- * This function is responsible for doing post update changes to the data
- * (not the structure) in the database.
+ * These functions are responsible for doing critical post update changes to the data (not the structure) in the database.
  *
  * Database structure changes are done in static/dbstructure.config.php
  *
- * If there is a need for a post process to a structure change, update this file
+ * For non-critical database migrations, please add a method in the Database\PostUpdate class
+ *
+ * If there is a need for a post update to a structure change, update this file
  * by adding a new function at the end with the number of the new DB_UPDATE_VERSION.
  *
  * The numbered script in this file has to be exactly like the DB_UPDATE_VERSION
