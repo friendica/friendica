@@ -50,7 +50,13 @@ class HTTPException
 			$message = $explanation[$e->getCode()] ?? '';
 		}
 
-		return ['$title' => $title, '$message' => $message, '$back' => DI::l10n()->t('Go back')];
+		$vars = ['$title' => $title, '$message' => $message, '$back' => DI::l10n()->t('Go back')];
+
+		if (is_site_admin()) {
+			$vars['$trace'] = $e->getTraceAsString();
+		}
+
+		return $vars;
 	}
 
 	/**

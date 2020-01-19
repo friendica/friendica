@@ -4,6 +4,9 @@
 	</head>
 	<body>
 		<h1>{{$title}}</h1>
-		<p>{{$description nofilter}}</p>
+		<p>{{$message nofilter}}</p>
+	{{if $trace}}
+		<pre>{{$trace nofilter}}</pre>
+	{{/if}}
 	</body>
 </html>
