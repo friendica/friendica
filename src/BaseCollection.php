@@ -24,7 +24,6 @@ abstract class BaseCollection extends \ArrayIterator
 	{
 		parent::__construct($models);
 
-		$this->models = $models;
 		$this->totalCount = $totalCount ?? count($models);
 	}
 
