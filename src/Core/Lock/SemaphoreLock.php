@@ -4,16 +4,29 @@ namespace Friendica\Core\Lock;
 
 use Friendica\Core\BaseLock;
 use Friendica\Core\Cache\Duration;
+use Psr\Log\LoggerInterface;
 
 class SemaphoreLock extends BaseLock
 {
 	private static $semaphore = [];
 
-	public function __construct()
+	/** @var LoggerInterface */
+	private $logger;
+
+	/**
+	 * SemaphoreLock constructor.
+	 *
+	 * @param LoggerInterface $logger
+	 *
+	 * @throws \Exception
+	 */
+	public function __construct(LoggerInterface $logger)
 	{
 		if (!function_exists('sem_get')) {
 			throw new \Exception('Semaphore lock not supported');
 		}
+
+		$this->logger = $logger;
 	}
 
 	/**
@@ -39,12 +52,18 @@ class SemaphoreLock extends BaseLock
 	 */
 	public function acquire($key, $timeout = 120, $ttl = Duration::FIVE_MINUTES)
 	{
-		self::$semaphore[$key] = sem_get(self::semaphoreKey($key));
-		if (!empty(self::$semaphore[$key])) {
-			if ((bool)sem_acquire(self::$semaphore[$key], ($timeout === 0))) {
-				$this->markAcquire($key);
-				return true;
+		try {
+			self::$semaphore[$key] = sem_get(self::semaphoreKey($key));
+			if (!empty(self::$semaphore[$key])) {
+				if ((bool)sem_acquire(self::$semaphore[$key], ($timeout === 0))) {
+					$this->markAcquire($key);
+					return true;
+				} else {
+					$this->logger->notice('Couldnt\'t acquire semaphore lock.', ['key' => $key]);
+				}
 			}
+		} catch (\Throwable $e) {
+			$this->logger->warning('Couldn\'t acquire semaphore lock.', ['key' => $key, 'exception' => $e]);
 		}
 
 		return false;
@@ -62,11 +81,11 @@ class SemaphoreLock extends BaseLock
 
 		if (!empty(self::$semaphore[$key])) {
 			try {
-				$success = @sem_release(self::$semaphore[$key]);
+				$success = sem_release(self::$semaphore[$key]);
 				unset(self::$semaphore[$key]);
 				$this->markRelease($key);
-			} catch (\Exception $exception) {
-				$success = false;
+			} catch (\Throwable $e) {
+				$this->logger->warning('Couldn\'t release semaphore lock.', ['key' => $key, 'exception' => $e]);
 			}
 		}
 

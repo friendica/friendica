@@ -9,6 +9,7 @@ use Friendica\Core\Config\JitConfig;
 use Friendica\Core\Lock\SemaphoreLock;
 use Friendica\DI;
 use Mockery\MockInterface;
+use Psr\Log\NullLogger;
 
 class SemaphoreLockTest extends LockTest
 {
@@ -36,7 +37,7 @@ class SemaphoreLockTest extends LockTest
 
 	protected function getInstance()
 	{
-		return new SemaphoreLock();
+		return new SemaphoreLock(new NullLogger());
 	}
 
 	function testLockTTL()

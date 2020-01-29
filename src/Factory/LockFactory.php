@@ -74,7 +74,7 @@ class LockFactory
 					break;
 
 				case 'semaphore':
-					return new Lock\SemaphoreLock();
+					return new Lock\SemaphoreLock($this->logger);
 					break;
 
 				default:
@@ -101,7 +101,7 @@ class LockFactory
 		// 1. Try to use Semaphores for - local - locking
 		if (function_exists('sem_get')) {
 			try {
-				return new Lock\SemaphoreLock();
+				return new Lock\SemaphoreLock($this->logger);
 			} catch (\Exception $exception) {
 				$this->logger->debug('Using Semaphore driver for locking failed.', ['exception' => $exception]);
 			}
