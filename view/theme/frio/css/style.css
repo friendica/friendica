@@ -458,8 +458,6 @@ nav.navbar {
 #topbar-first .nav>li>a:hover,
 #topbar-first .nav>li>a:focus,
 #topbar-first .nav>.open>a,
-#dropdownMenu1:hover,
-#dropdownMenu1:focus,
 nav.navbar .nav>li>a:hover,
 nav.navbar .nav>li>a:focus{
     background-color: $nav_icon_hover_color;
@@ -594,9 +592,17 @@ nav.navbar .nav>li>a:focus{
 #topbar-first .dropdown-footer {
     margin: 10px 10px 5px
 }
-#topbar-first a, #topbar-first .btn-link,
-nav.navbar a, nav.navbar .btn-link {
+#topbar-first a,
+#topbar-first .btn-link,
+nav.navbar a,
+nav.navbar .btn-link {
     color: $nav_icon_color;
+}
+#topbar-first .open a,
+#topbar-first .open .btn-link,
+nav.navbar .open a,
+nav.navbar .open .btn-link {
+	color: $nav_bg;
 }
 #topbar-first .caret {
     border-top-color: #bebebe
