@@ -426,6 +426,54 @@ function api_error($type, $e, App\Arguments $args)
 	return $return;
 }
 
+function api_events_show($type)
+{
+	$a = \get_app();
+
+	$user_info = api_get_user($a);
+ 
+	if (api_user() === false || $user_info === false)
+	{
+		throw new ForbiddenException(); 
+	}
+
+	$since_id = $_REQUEST['since_id'] ?? 0;
+	$count = $_REQUEST['count'] ?? 20;
+	$condition = ["`id` &gt; ? AND (`uid` = 0 OR (`uid` = ?))", $since_id, api_user()];
+	$params = ['limit'=> $count];
+	$terms = DBA::select('event',[] , $condition, $params);
+
+	$events = [];
+	while ($term = DBA::fetch($terms))
+	{
+		$events[] = [
+			'id'        => intval($term['id']),
+			'uid'       => intval($term['uid']),
+			'cid'       => $term['cid'],
+			'uri'       => $term['uri'],
+			'summary'   => $term['summary'],
+			'desc'      => BBCode::convert($term['desc']),
+			'start'     => $term['start'],
+			'finish'    => $term['finish'],
+			'type'      => $term['type'],
+			'nofinish'  => $term['nofinish'],
+			'location'  => $term['location'],
+			'adjust'    => $term['adjust'],
+			'ignore'    => $term['ignore'],
+			'allow_cid' => $term['allow_cid'],
+			'allow_gid' => $term['allow_gid'],
+			'deny_cid'  => $term['deny_cid'],
+			'deny_gid'  => $term['deny_gid']
+		];
+	}
+
+	DBA::close($terms);
+
+	return api_format_data('events', $type, ['events' => $events]);
+ }
+ 
+ api_register_func('api/friendica/events/show', 'api_events_show', true);
+
 /**
  * Set values for RSS template
  *
