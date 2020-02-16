@@ -121,7 +121,8 @@
 		"mikey179/vfsstream": "^1.6",
 		"mockery/mockery": "^1.2",
 		"johnkary/phpunit-speedtrap": "1.1",
-		"jakub-onderka/php-parallel-lint": "^1.0"
+		"jakub-onderka/php-parallel-lint": "^1.0",
+		"nette/php-generator": "^3.3"
 	},
 	"scripts": {
 		"test": "phpunit"
