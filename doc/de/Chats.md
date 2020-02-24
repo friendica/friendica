@@ -25,13 +25,13 @@ In den ersten Zeilen wird Dir Dein Name und Deine aktuelle IP-Adresse angezeigt.
 Rechts im Fenster siehst Du alle Teilnehmer des Chats.
 Unten hast Du ein Eingabefeld, um Beiträge zu schreiben.
 
-Weiter Informationen zu IRC findest Du zum Beispiel auf <a href="http://wiki.ubuntuusers.de/IRC" target="_blank">ubuntuusers.de</a>, in <a href="https://de.wikipedia.org/wiki/Internet_Relay_Chat" target="_blank">Wikipedia</a> oder bei <a href="http://www.irchelp.org/" target="_blank">icrhelp.org</a> (in Englisch).
+Weiter Informationen zu IRC findest Du zum Beispiel auf <a href="http://wiki.ubuntuusers.de/IRC">ubuntuusers.de</a>, in <a href="https://de.wikipedia.org/wiki/Internet_Relay_Chat">Wikipedia</a> oder bei <a href="http://www.irchelp.org/">icrhelp.org</a> (in Englisch).
 
 ## Jappix Mini
 
 Das Jappix Mini Addon erlaubt das Erstellen einer Chatbox für Jabber/XMPP-Kontakte.
 Ein Jabber/XMPP Account sollte vor der Installation bereits vorhanden sein.
-Die ausführliche Anleitung dazu und eine Kontrolle, ob Du nicht sogar schon über Deinen E-Mail Anbieter einen Jabber-Account hast, findest Du unter <a href="http://einfachjabber.de" target="_blank">einfachjabber.de</a>.
+Die ausführliche Anleitung dazu und eine Kontrolle, ob Du nicht sogar schon über Deinen E-Mail Anbieter einen Jabber-Account hast, findest Du unter <a href="http://einfachjabber.de">einfachjabber.de</a>.
 
 Einige Server zum Anmelden eines neuen Accounts:
 

@@ -26,4 +26,4 @@ Dies gilt vor allem für Übersetzungen, da wir hier möglicherweise nicht alle 
 Außerdem: **teste Deine Änderungen!** Vergiss nicht, dass eine simple Fehlerlösung einen anderen Fehler auslösen kann.
 Lass Deine Änderungen von einem erfahrenen Friendica-Entwickler gegenprüfen.
 
-Eine ausführliche Anleitung zu Git findest Du unter <a href="https://git-scm.com/book/de/v1" target="_blank">https://git-scm.com/book/de/v1</a>.
+Eine ausführliche Anleitung zu Git findest Du unter <a href="https://git-scm.com/book/de/v1">https://git-scm.com/book/de/v1</a>.

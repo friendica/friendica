@@ -113,17 +113,17 @@ table.bbcodes > * > tr > th {
 <tr>
   <td>[bookmark]http://friendi.ca[/bookmark]<br><br>
 #^[url]http://friendi.ca[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">http://friendi.ca</a></h4></span></td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca">http://friendi.ca</a></h4></span></td>
 </tr>
 <tr>
   <td>[bookmark=http://friendi.ca]Bookmark[/bookmark]<br><br>
 #^[url=http://friendi.ca]Bookmark[/url]<br><br>
 #[url=http://friendi.ca]^[/url][url=http://friendi.ca]Bookmark[/url]</td>
-  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca" target="_blank">Bookmark</a></h4></span></td>
+  <td><span class="oembed link"><h4>Friendica: <a href="http://friendi.ca" rel="oembed"></a><a href="http://friendi.ca">Bookmark</a></h4></span></td>
 </tr>
 <tr>
   <td>[url=/posts/f16d77b0630f0134740c0cc47a0ea02a]Diaspora post with GUID[/url]</td>
-  <td><a href="/display/f16d77b0630f0134740c0cc47a0ea02a" target="_blank">Diaspora post with GUID</a></td>
+  <td><a href="/display/f16d77b0630f0134740c0cc47a0ea02a">Diaspora post with GUID</a></td>
 </tr>
 <tr>
   <td>#Friendica</td>
