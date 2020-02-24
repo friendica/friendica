@@ -462,13 +462,13 @@ class Term
 						$item['body'] = str_replace($orig_tag, $tag['url'], $item['body']);
 					}
 
-					$return['hashtags'][] = $prefix . '<a href="' . $tag['url'] . '" target="_blank">' . htmlspecialchars($tag['term']) . '</a>';
-					$return['tags'][] = $prefix . '<a href="' . $tag['url'] . '" target="_blank">' . htmlspecialchars($tag['term']) . '</a>';
+					$return['hashtags'][] = $prefix . '<a href="' . $tag['url'] . '">' . htmlspecialchars($tag['term']) . '</a>';
+					$return['tags'][] = $prefix . '<a href="' . $tag['url'] . '">' . htmlspecialchars($tag['term']) . '</a>';
 					break;
 				case self::MENTION:
 					$tag['url'] = Contact::magicLink($tag['url']);
-					$return['mentions'][] = $prefix . '<a href="' . $tag['url'] . '" target="_blank">' . htmlspecialchars($tag['term']) . '</a>';
-					$return['tags'][] = $prefix . '<a href="' . $tag['url'] . '" target="_blank">' . htmlspecialchars($tag['term']) . '</a>';
+					$return['mentions'][] = $prefix . '<a href="' . $tag['url'] . '">' . htmlspecialchars($tag['term']) . '</a>';
+					$return['tags'][] = $prefix . '<a href="' . $tag['url'] . '">' . htmlspecialchars($tag['term']) . '</a>';
 					break;
 				case self::IMPLICIT_MENTION:
 					$return['implicit_mentions'][] = $prefix . $tag['term'];

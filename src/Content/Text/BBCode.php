@@ -634,12 +634,12 @@ class BBCode
 
 			if (!empty($data['title']) && !empty($data['url'])) {
 				if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
-					$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml), $data['title']);
+					$return .= sprintf('<a href="%s"><img src="%s" alt="" title="%s" class="attachment-image" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml), $data['title']);
 				} else {
 					if (!empty($data['image'])) {
-						$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $data['url'], self::proxyUrl($data['image'], $simplehtml), $data['title']);
+						$return .= sprintf('<a href="%s"><img src="%s" alt="" title="%s" class="attachment-image" /></a><br />', $data['url'], self::proxyUrl($data['image'], $simplehtml), $data['title']);
 					} elseif (!empty($data['preview'])) {
-						$return .= sprintf('<a href="%s" target="_blank"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $data['url'], self::proxyUrl($data['preview'], $simplehtml), $data['title']);
+						$return .= sprintf('<a href="%s"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br />', $data['url'], self::proxyUrl($data['preview'], $simplehtml), $data['title']);
 					}
 					$return .= sprintf('<h4><a href="%s">%s</a></h4>', $data['url'], $data['title']);
 				}
@@ -732,7 +732,7 @@ class BBCode
 	 */
 	private static function convertUrlForActivityPub($url)
 	{
-		$html = '<a href="%s" target="_blank">%s</a>';
+		$html = '<a href="%s">%s</a>';
 		return sprintf($html, $url, self::getStyledURL($url));
 	}
 
@@ -1038,7 +1038,7 @@ class BBCode
 				break;
 			case 4:
 				$headline = '<p><b>' . html_entity_decode('&#x2672; ', ENT_QUOTES, 'UTF-8');
-				$headline .= DI::l10n()->t('<a href="%1$s" target="_blank">%2$s</a> %3$s', $attributes['link'], $mention, $attributes['posted']);
+				$headline .= DI::l10n()->t('<a href="%1$s">%2$s</a> %3$s', $attributes['link'], $mention, $attributes['posted']);
 				$headline .= ':</b></p>' . "\n";
 
 				$text = ($is_quote_share? '<hr />' : '') . $headline . '<blockquote class="shared_content">' . trim($content) . '</blockquote>' . "\n";
@@ -1636,9 +1636,9 @@ class BBCode
 			$text = preg_replace_callback("/\[audio\](.*?)\[\/audio\]/ism", $try_oembed_callback, $text);
 		} else {
 			$text = preg_replace("/\[video\](.*?)\[\/video\]/ism",
-				'<a href="$1" target="_blank">$1</a>', $text);
+				'<a href="$1">$1</a>', $text);
 			$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism",
-				'<a href="$1" target="_blank">$1</a>', $text);
+				'<a href="$1">$1</a>', $text);
 		}
 
 		// html5 video and audio
@@ -1665,7 +1665,7 @@ class BBCode
 			$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="' . $a->videowidth . '" height="' . $a->videoheight . '" src="https://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $text);
 		} else {
 			$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism",
-				'<a href="https://www.youtube.com/watch?v=$1" target="_blank">https://www.youtube.com/watch?v=$1</a>', $text);
+				'<a href="https://www.youtube.com/watch?v=$1">https://www.youtube.com/watch?v=$1</a>', $text);
 		}
 
 		if ($try_oembed) {
@@ -1680,7 +1680,7 @@ class BBCode
 			$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '<iframe width="' . $a->videowidth . '" height="' . $a->videoheight . '" src="https://player.vimeo.com/video/$1" frameborder="0" ></iframe>', $text);
 		} else {
 			$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism",
-				'<a href="https://vimeo.com/$1" target="_blank">https://vimeo.com/$1</a>', $text);
+				'<a href="https://vimeo.com/$1">https://vimeo.com/$1</a>', $text);
 		}
 
 		// oembed tag
@@ -1801,17 +1801,17 @@ class BBCode
 				. '</a>';
 		}, $text);
 
-		// We need no target="_blank" for local links
-		// convert links start with DI::baseUrl() as local link without the target="_blank" attribute
+		// We need no for local links
+		// convert links start with DI::baseUrl() as local link without the attribute
 		$escapedBaseUrl = preg_quote(DI::baseUrl(), '/');
 		$text = preg_replace("/\[url\](".$escapedBaseUrl.".*?)\[\/url\]/ism", '<a href="$1">$1</a>', $text);
 		$text = preg_replace("/\[url\=(".$escapedBaseUrl.".*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
 
-		$text = preg_replace("/\[url\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank">$1</a>', $text);
-		$text = preg_replace("/\[url\=(.*?)\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank">$2</a>', $text);
+		$text = preg_replace("/\[url\](.*?)\[\/url\]/ism", '<a href="$1">$1</a>', $text);
+		$text = preg_replace("/\[url\=(.*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
 
 		// Red compatibility, though the link can't be authenticated on Friendica
-		$text = preg_replace("/\[zrl\=(.*?)\](.*?)\[\/zrl\]/ism", '<a href="$1" target="_blank">$2</a>', $text);
+		$text = preg_replace("/\[zrl\=(.*?)\](.*?)\[\/zrl\]/ism", '<a href="$1">$2</a>', $text);
 
 
 		// we may need to restrict this further if it picks up too many strays

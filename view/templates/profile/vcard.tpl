@@ -41,7 +41,7 @@
 
 	{{if $updated}}<div class="updated" style="display:none;">{{$updated}}</div>{{/if}}
 
-	{{if $homepage}}<dl class="homepage"><dt class="homepage-label">{{$homepage}}</dt><dd class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me" target="_blank">{{$profile.homepage}}</a></dd></dl>{{/if}}
+	{{if $homepage}}<dl class="homepage"><dt class="homepage-label">{{$homepage}}</dt><dd class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me">{{$profile.homepage}}</a></dd></dl>{{/if}}
 
 	{{if $about}}<dl class="about"><dt class="about-label">{{$about}}</dt><dd class="x-network">{{$profile.about nofilter}}</dd></dl>{{/if}}
 

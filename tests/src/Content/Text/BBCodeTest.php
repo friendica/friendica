@@ -164,7 +164,7 @@ class BBCodeTest extends MockedTest
 	public function testAutoLinking($data, $assertHTML)
 	{
 		$output = BBCode::convert($data);
-		$assert = '<a href="' . $data . '" target="_blank">' . $data . '</a>';
+		$assert = '<a href="' . $data . '">' . $data . '</a>';
 		if ($assertHTML) {
 			$this->assertEquals($assert, $output);
 		} else {
@@ -176,21 +176,21 @@ class BBCodeTest extends MockedTest
 	{
 		return [
 			'bug-7271-condensed-space' => [
-				'expectedHtml' => '<ul class="listdecimal" style="list-style-type: decimal;"><li> <a href="http://example.com/" target="_blank">http://example.com/</a></li></ul>',
+				'expectedHtml' => '<ul class="listdecimal" style="list-style-type: decimal;"><li> <a href="http://example.com/">http://example.com/</a></li></ul>',
 				'text' => '[ol][*] http://example.com/[/ol]',
 			],
 			'bug-7271-condensed-nospace' => [
-				'expectedHtml' => '<ul class="listdecimal" style="list-style-type: decimal;"><li><a href="http://example.com/" target="_blank">http://example.com/</a></li></ul>',
+				'expectedHtml' => '<ul class="listdecimal" style="list-style-type: decimal;"><li><a href="http://example.com/">http://example.com/</a></li></ul>',
 				'text' => '[ol][*]http://example.com/[/ol]',
 			],
 			'bug-7271-indented-space' => [
-				'expectedHtml' => '<ul class="listbullet" style="list-style-type: circle;"><li> <a href="http://example.com/" target="_blank">http://example.com/</a></li></ul>',
+				'expectedHtml' => '<ul class="listbullet" style="list-style-type: circle;"><li> <a href="http://example.com/">http://example.com/</a></li></ul>',
 				'text' => '[ul]
 [*] http://example.com/
 [/ul]',
 			],
 			'bug-7271-indented-nospace' => [
-				'expectedHtml' => '<ul class="listbullet" style="list-style-type: circle;"><li><a href="http://example.com/" target="_blank">http://example.com/</a></li></ul>',
+				'expectedHtml' => '<ul class="listbullet" style="list-style-type: circle;"><li><a href="http://example.com/">http://example.com/</a></li></ul>',
 				'text' => '[ul]
 [*]http://example.com/
 [/ul]',

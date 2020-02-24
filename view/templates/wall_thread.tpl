@@ -84,10 +84,10 @@
 			</div>
 			{{/if}}
 			{{if $item.remote_comment}}
-				<div class="wall-item-links-wrapper"><a href="{{$item.remote_comment.2}}" title="{{$item.remote_comment.0}}" target="_blank" class="icon remote-link{{$item.sparkle}} u-url"></a></div>
+				<div class="wall-item-links-wrapper"><a href="{{$item.remote_comment.2}}" title="{{$item.remote_comment.0}}" class="icon remote-link{{$item.sparkle}} u-url"></a></div>
 			{{/if}}
 			{{if $item.plink}}
-				<div class="wall-item-links-wrapper"><a href="{{$item.plink.href}}" title="{{$item.plink.title}}" target="_blank" class="icon remote-link{{$item.sparkle}} u-url"></a></div>
+				<div class="wall-item-links-wrapper"><a href="{{$item.plink.href}}" title="{{$item.plink.title}}" class="icon remote-link{{$item.sparkle}} u-url"></a></div>
 			{{/if}}
 			{{if $item.edpost}}
 				<a class="editpost icon pencil" href="{{$item.edpost.0}}" title="{{$item.edpost.1}}"></a>

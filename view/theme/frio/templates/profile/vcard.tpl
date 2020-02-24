@@ -94,7 +94,7 @@
 		{{if $profile.xmpp}}
 		<div class="xmpp">
 			<span class="xmpp-label icon"><i class="fa fa-comments"></i></span>
-			<span class="xmpp-data"><a href="xmpp:{{$profile.xmpp}}" rel="me" target="_blank">{{include file="sub/punct_wrap.tpl" text=$profile.xmpp}}</a></span>
+			<span class="xmpp-data"><a href="xmpp:{{$profile.xmpp}}" rel="me">{{include file="sub/punct_wrap.tpl" text=$profile.xmpp}}</a></span>
 		</div>
 		{{/if}}
 
@@ -107,7 +107,7 @@
 		{{if $homepage}}
 		<div class="homepage detail">
 			<span class="homepage-label icon"><i class="fa fa-external-link-square"></i></span>
-			<span class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me" target="_blank">{{include file="sub/punct_wrap.tpl" text=$profile.homepage}}</a></span>
+			<span class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me">{{include file="sub/punct_wrap.tpl" text=$profile.homepage}}</a></span>
 		</div>
 		{{/if}}
 

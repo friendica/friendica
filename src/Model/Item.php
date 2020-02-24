@@ -3630,7 +3630,7 @@ class Item
 			$title .= ' ' . $mtch[2] . ' ' . DI::l10n()->t('bytes');
 
 			$icon = '<div class="attachtype icon s22 type-' . $filetype . ' subtype-' . $filesubtype . '"></div>';
-			$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" >' . $icon . '</a>';
+			$as .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink">' . $icon . '</a>';
 		}
 
 		if ($as != '') {
