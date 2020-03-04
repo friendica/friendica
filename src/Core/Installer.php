@@ -549,11 +549,11 @@ class Installer
 		$help = "";
 		$error_msg = "";
 		if (function_exists('curl_init')) {
-			$fetchResult = HTTPRequest::fetchUrlFull($baseurl . "/install/testrewrite");
+			$fetchResult = DI::httpRequest()->fetchUrlFull($baseurl . "/install/testrewrite");
 
 			$url = Strings::normaliseLink($baseurl . "/install/testrewrite");
 			if ($fetchResult->getReturnCode() != 204) {
-				$fetchResult = HTTPRequest::fetchUrlFull($url);
+				$fetchResult = DI::httpRequest()->fetchUrlFull($url);
 			}
 
 			if ($fetchResult->getReturnCode() != 204) {
