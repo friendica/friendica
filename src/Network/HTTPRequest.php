@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Performs HTTP requests to a given URL
  */
-class HTTPRequest
+class HTTPRequest implements IHTTPRequest
 {
 	/** @var LoggerInterface */
 	private $logger;
@@ -53,22 +53,10 @@ class HTTPRequest
 	}
 
 	/**
-	 * fetches an URL.
+	 * {@inheritDoc}
 	 *
-	 * @param string $url        URL to fetch
-	 * @param bool   $binary     default false
-	 *                           TRUE if asked to return binary results (file download)
-	 * @param array  $opts       (optional parameters) assoziative array with:
-	 *                           'accept_content' => supply Accept: header with 'accept_content' as the value
-	 *                           'timeout' => int Timeout in seconds, default system config value or 60 seconds
-	 *                           'http_auth' => username:password
-	 *                           'novalidate' => do not validate SSL certs, default is to validate using our CA list
-	 *                           'nobody' => only return the header
-	 *                           'cookiejar' => path to cookie jar file
-	 *                           'header' => header array
-	 * @param int    $redirects  The recursion counter for internal use - default 0
+	 * @param int $redirects The recursion counter for internal use - default 0
 	 *
-	 * @return CurlResult
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function get(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
@@ -217,15 +205,10 @@ class HTTPRequest
 	}
 
 	/**
-	 * Send POST request to $url
+	 * {@inheritDoc}
 	 *
-	 * @param string $url       URL to post
-	 * @param mixed  $params    array of POST variables
-	 * @param array  $headers   HTTP headers
-	 * @param int    $redirects Recursion counter for internal use - default = 0
-	 * @param int    $timeout   The timeout in seconds, default system config value or 60 seconds
+	 * @param int $redirects The recursion counter for internal use - default 0
 	 *
-	 * @return CurlResult The content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function post(string $url, $params, array $headers = [], int $timeout = 0, int &$redirects = 0)
@@ -325,21 +308,7 @@ class HTTPRequest
 	}
 
 	/**
-	 * Returns the original URL of the provided URL
-	 *
-	 * This function strips tracking query params and follows redirections, either
-	 * through HTTP code or meta refresh tags. Stops after 10 redirections.
-	 *
-	 * @param string $url       A user-submitted URL
-	 * @param int    $depth     The current redirection recursion level (internal)
-	 * @param bool   $fetchbody Wether to fetch the body or not after the HEAD requests
-	 *
-	 * @return string A canonical URL
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 *@see   ParseUrl::getSiteinfo
-	 *
-	 * @todo  Remove the $fetchbody parameter that generates an extraneous HEAD request
-	 *
+	 * {@inheritDoc}
 	 */
 	public function finalUrl(string $url, int $depth = 1, bool $fetchbody = false)
 	{
@@ -444,21 +413,10 @@ class HTTPRequest
 	}
 
 	/**
-	 * Curl wrapper
+	 * {@inheritDoc}
 	 *
-	 * If binary flag is true, return binary results.
-	 * Set the cookiejar argument to a string (e.g. "/tmp/friendica-cookies.txt")
-	 * to preserve cookies from one request to the next.
+	 * @param int $redirects The recursion counter for internal use - default 0
 	 *
-	 * @param string $url             URL to fetch
-	 * @param bool   $binary          default false
-	 *                                TRUE if asked to return binary results (file download)
-	 * @param int    $timeout         Timeout in seconds, default system config value or 60 seconds
-	 * @param string $accept_content  supply Accept: header with 'accept_content' as the value
-	 * @param string $cookiejar       Path to cookie jar file
-	 * @param int    $redirects       The recursion counter for internal use - default 0
-	 *
-	 * @return string The fetched content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function fetch(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
@@ -469,20 +427,10 @@ class HTTPRequest
 	}
 
 	/**
-	 * Curl wrapper with array of return values.
+	 * {@inheritDoc}
 	 *
-	 * Inner workings and parameters are the same as @ref fetchUrl but returns an array with
-	 * all the information collected during the fetch.
+	 * @param int $redirects The recursion counter for internal use - default 0
 	 *
-	 * @param string $url             URL to fetch
-	 * @param bool   $binary          default false
-	 *                                TRUE if asked to return binary results (file download)
-	 * @param int    $timeout         Timeout in seconds, default system config value or 60 seconds
-	 * @param string $accept_content  supply Accept: header with 'accept_content' as the value
-	 * @param string $cookiejar       Path to cookie jar file
-	 * @param int    $redirects       The recursion counter for internal use - default 0
-	 *
-	 * @return CurlResult With all relevant information, 'body' contains the actual fetched content.
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public function fetchFull(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
@@ -500,9 +448,7 @@ class HTTPRequest
 	}
 
 	/**
-	 * Returns the current UserAgent as a String
-	 *
-	 * @return string the UserAgent as a String
+	 * {@inheritDoc}
 	 */
 	public function getUserAgent()
 	{

@@ -320,11 +320,11 @@ abstract class DI
 	//
 
 	/**
-	 * @return Network\HTTPRequest
+	 * @return Network\IHTTPRequest
 	 */
 	public static function httpRequest()
 	{
-		return self::$dice->create(Network\HTTPRequest::class);
+		return self::$dice->create(Network\IHTTPRequest::class);
 	}
 
 	//

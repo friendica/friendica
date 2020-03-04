@@ -46,6 +46,7 @@ use Friendica\Database\Database;
 use Friendica\Factory;
 use Friendica\Model\Storage\IStorage;
 use Friendica\Model\User\Cookie;
+use Friendica\Network;
 use Friendica\Util;
 use Psr\Log\LoggerInterface;
 
@@ -219,4 +220,7 @@ return [
 			['getBackend', [], Dice::CHAIN_CALL],
 		],
 	],
+	Network\IHTTPRequest::class => [
+		'instanceOf' => Network\HTTPRequest::class,
+	]
 ];
