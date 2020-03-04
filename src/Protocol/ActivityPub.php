@@ -22,6 +22,7 @@
 namespace Friendica\Protocol;
 
 use Friendica\Core\Protocol;
+use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Util\HTTPSignature;
