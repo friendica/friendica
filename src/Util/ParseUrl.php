@@ -27,6 +27,7 @@ use Friendica\Content\OEmbed;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
+use Friendica\DI;
 
 /**
  * Get information about a given URL
@@ -162,7 +163,7 @@ class ParseUrl
 		$siteinfo['url'] = $url;
 		$siteinfo['type'] = 'link';
 
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if (!$curlResult->isSuccess()) {
 			return $siteinfo;
 		}

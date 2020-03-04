@@ -93,7 +93,7 @@ class ActivityPub
 			return HTTPSignature::fetch($url, $uid);
 		}
 
-		$curlResult = DI::httpRequest()->curl($url, false, ['accept_content' => 'application/activity+json, application/ld+json']);
+		$curlResult = DI::httpRequest()->get($url, false, ['accept_content' => 'application/activity+json, application/ld+json']);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 			return false;
 		}
