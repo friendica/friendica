@@ -26,9 +26,9 @@ use Dice\Dice;
 use Friendica\Core\Config\Cache;
 use Friendica\DI;
 use Friendica\Network\CurlResult;
+use Friendica\Network\IHTTPRequest;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Network;
 use Mockery\MockInterface;
 
 class InstallerTest extends MockedTest
@@ -39,6 +39,10 @@ class InstallerTest extends MockedTest
 	 * @var \Friendica\Core\L10n|MockInterface
 	 */
 	private $l10nMock;
+	/**
+	 * @var Dice|MockInterface
+	 */
+	private $dice;
 
 	public function setUp()
 	{
@@ -49,14 +53,14 @@ class InstallerTest extends MockedTest
 		$this->l10nMock = \Mockery::mock(\Friendica\Core\L10n::class);
 
 		/** @var Dice|MockInterface $dice */
-		$dice = \Mockery::mock(Dice::class)->makePartial();
-		$dice = $dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
+		$this->dice = \Mockery::mock(Dice::class)->makePartial();
+		$this->dice = $this->dice->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 
-		$dice->shouldReceive('create')
+		$this->dice->shouldReceive('create')
 		           ->with(\Friendica\Core\L10n::class)
 		           ->andReturn($this->l10nMock);
 
-		DI::init($dice);
+		DI::init($this->dice);
 	}
 
 	private function mockL10nT(string $text, $times = null)
@@ -305,15 +309,21 @@ class InstallerTest extends MockedTest
 			->andReturn('test Error');
 
 		// Mocking the CURL Request
-		$networkMock = \Mockery::mock('alias:' . Network::class);
+		$networkMock = \Mockery::mock(IHTTPRequest::class);
 		$networkMock
-			->shouldReceive('fetchUrlFull')
+			->shouldReceive('fetchFull')
 			->with('https://test/install/testrewrite')
 			->andReturn($curlResult);
 		$networkMock
-			->shouldReceive('fetchUrlFull')
+			->shouldReceive('fetchFull')
 			->with('http://test/install/testrewrite')
 			->andReturn($curlResult);
+
+		$this->dice->shouldReceive('create')
+		     ->with(IHTTPRequest::class)
+		     ->andReturn($networkMock);
+
+		DI::init($this->dice);
 
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
@@ -346,15 +356,21 @@ class InstallerTest extends MockedTest
 			->andReturn('204');
 
 		// Mocking the CURL Request
-		$networkMock = \Mockery::mock('alias:' . Network::class);
+		$networkMock = \Mockery::mock(IHTTPRequest::class);
 		$networkMock
-			->shouldReceive('fetchUrlFull')
+			->shouldReceive('fetchFull')
 			->with('https://test/install/testrewrite')
 			->andReturn($curlResultF);
 		$networkMock
-			->shouldReceive('fetchUrlFull')
+			->shouldReceive('fetchFull')
 			->with('http://test/install/testrewrite')
 			->andReturn($curlResultW);
+
+		$this->dice->shouldReceive('create')
+		           ->with(IHTTPRequest::class)
+		           ->andReturn($networkMock);
+
+		DI::init($this->dice);
 
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
