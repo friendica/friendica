@@ -28,6 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Model\Storage\SystemResource;
+use Friendica\Network\HTTPRequest;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
@@ -420,7 +421,7 @@ class Photo
 
 		$filename = basename($image_url);
 		if (!empty($image_url)) {
-			$ret = Network::curl($image_url, true);
+			$ret = HTTPRequest::curl($image_url, true);
 			$img_str = $ret->getBody();
 			$type = $ret->getContentType();
 		} else {

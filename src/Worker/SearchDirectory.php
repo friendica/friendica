@@ -29,6 +29,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\GContact;
 use Friendica\Model\GServer;
+use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
@@ -52,7 +53,7 @@ class SearchDirectory
 			}
 		}
 
-		$x = Network::fetchUrl(Search::getGlobalDirectory() . '/lsearch?p=1&n=500&search=' . urlencode($search));
+		$x = HTTPRequest::fetchUrl(Search::getGlobalDirectory() . '/lsearch?p=1&n=500&search=' . urlencode($search));
 		$j = json_decode($x);
 
 		if (!empty($j->results)) {

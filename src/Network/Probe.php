@@ -149,7 +149,7 @@ class Probe
 		Logger::log("Probing for ".$host, Logger::DEBUG);
 		$xrd = null;
 
-		$curlResult = Network::curl($ssl_url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
+		$curlResult = HTTPRequest::curl($ssl_url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 		$ssl_connection_error = ($curlResult->getErrorNumber() == CURLE_COULDNT_CONNECT) || ($curlResult->getReturnCode() == 0);
 		if ($curlResult->isSuccess()) {
 			$xml = $curlResult->getBody();
@@ -162,7 +162,7 @@ class Probe
 		}
 
 		if (!is_object($xrd)) {
-			$curlResult = Network::curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
+			$curlResult = HTTPRequest::curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 			$connection_error = ($curlResult->getErrorNumber() == CURLE_COULDNT_CONNECT) || ($curlResult->getReturnCode() == 0);
 			if ($curlResult->isTimeout()) {
 				Logger::info('Probing timeout', ['url' => $url], Logger::DEBUG);
@@ -487,7 +487,7 @@ class Probe
 	 */
 	private static function getHideStatus($url)
 	{
-		$curlResult = Network::curl($url);
+		$curlResult = HTTPRequest::curl($url);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -815,7 +815,7 @@ class Probe
 
 	public static function pollZot($url, $data)
 	{
-		$curlResult = Network::curl($url);
+		$curlResult = HTTPRequest::curl($url);
 		if ($curlResult->isTimeout()) {
 			return $data;
 		}
@@ -912,7 +912,7 @@ class Probe
 	{
 		$xrd_timeout = DI::config()->get('system', 'xrd_timeout', 20);
 
-		$curlResult = Network::curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
+		$curlResult = HTTPRequest::curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -981,7 +981,7 @@ class Probe
 	 */
 	private static function pollNoscrape($noscrape_url, $data)
 	{
-		$curlResult = Network::curl($noscrape_url);
+		$curlResult = HTTPRequest::curl($noscrape_url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1239,7 +1239,7 @@ class Probe
 	 */
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
-		$curlResult = Network::curl($hcard_url);
+		$curlResult = HTTPRequest::curl($hcard_url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1493,7 +1493,7 @@ class Probe
 							$pubkey = substr($pubkey, 5);
 						}
 					} elseif (Strings::normaliseLink($pubkey) == 'http://') {
-						$curlResult = Network::curl($pubkey);
+						$curlResult = HTTPRequest::curl($pubkey);
 						if ($curlResult->isTimeout()) {
 							self::$istimeout = true;
 							return false;
@@ -1526,7 +1526,7 @@ class Probe
 		}
 
 		// Fetch all additional data from the feed
-		$curlResult = Network::curl($data["poll"]);
+		$curlResult = HTTPRequest::curl($data["poll"]);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1579,7 +1579,7 @@ class Probe
 	 */
 	private static function pumpioProfileData($profile_link)
 	{
-		$curlResult = Network::curl($profile_link);
+		$curlResult = HTTPRequest::curl($profile_link);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -1712,7 +1712,7 @@ class Probe
 		$data['network'] = Protocol::TWITTER;
 		$data['baseurl'] = 'https://twitter.com';
 
-		$curlResult = Network::curl($data['url'], false);
+		$curlResult = HTTPRequest::curl($data['url'], false);
 		if (!$curlResult->isSuccess()) {
 			return [];
 		}
@@ -1757,7 +1757,7 @@ class Probe
 	 */
 	private static function getFeedLink($url)
 	{
-		$curlResult = Network::curl($url);
+		$curlResult = HTTPRequest::curl($url);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -1806,7 +1806,7 @@ class Probe
 	 */
 	private static function feed($url, $probe = true)
 	{
-		$curlResult = Network::curl($url);
+		$curlResult = HTTPRequest::curl($url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;

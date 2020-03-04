@@ -21,6 +21,7 @@
 
 namespace Friendica\Protocol;
 
+use Friendica\Network\HTTPRequest;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
 use Friendica\Core\Protocol;
@@ -93,7 +94,7 @@ class ActivityPub
 			return HTTPSignature::fetch($url, $uid);
 		}
 
-		$curlResult = Network::curl($url, false, ['accept_content' => 'application/activity+json, application/ld+json']);
+		$curlResult = HTTPRequest::curl($url, false, ['accept_content' => 'application/activity+json, application/ld+json']);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 			return false;
 		}
