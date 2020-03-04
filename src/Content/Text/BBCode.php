@@ -465,7 +465,7 @@ class BBCode
 					continue;
 				}
 
-				$i = HTTPRequest::fetchUrl($mtch[1]);
+				$i = DI::httpRequest()->fetchUrl($mtch[1]);
 				if (!$i) {
 					return $srctext;
 				}
@@ -1108,7 +1108,7 @@ class BBCode
 				$text = "[url=" . $match[2] . ']' . $match[2] . "[/url]";
 
 				// if its not a picture then look if its a page that contains a picture link
-				$body = HTTPRequest::fetchUrl($match[1]);
+				$body = DI::httpRequest()->fetchUrl($match[1]);
 
 				$doc = new DOMDocument();
 				@$doc->loadHTML($body);
@@ -1187,7 +1187,7 @@ class BBCode
 			}
 
 			// if its not a picture then look if its a page that contains a picture link
-			$body = HTTPRequest::fetchUrl($match[1]);
+			$body = DI::httpRequest()->fetchUrl($match[1]);
 
 			$doc = new DOMDocument();
 			@$doc->loadHTML($body);

@@ -341,9 +341,9 @@ class HTTPRequest
 	 * @return string The fetched content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function fetchUrl(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
+	public function fetchUrl(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
 	{
-		$ret = self::fetchUrlFull($url, $binary, $timeout, $accept_content, $cookiejar, $redirects);
+		$ret = $this->fetchUrlFull($url, $binary, $timeout, $accept_content, $cookiejar, $redirects);
 
 		return $ret->getBody();
 	}

@@ -1415,7 +1415,7 @@ class GServer
 		}
 
 		// Discover federated servers
-		$curlResult = HTTPRequest::fetchUrl("http://the-federation.info/pods.json");
+		$curlResult = DI::httpRequest()->fetchUrl("http://the-federation.info/pods.json");
 
 		if (!empty($curlResult)) {
 			$servers = json_decode($curlResult, true);

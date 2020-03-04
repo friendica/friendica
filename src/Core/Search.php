@@ -129,7 +129,7 @@ class Search
 			$searchUrl .= '&page=' . $page;
 		}
 
-		$resultJson = HTTPRequest::fetchUrl($searchUrl, false, 0, 'application/json');
+		$resultJson = DI::httpRequest()->fetchUrl($searchUrl, false, 0, 'application/json');
 
 		$results = json_decode($resultJson, true);
 

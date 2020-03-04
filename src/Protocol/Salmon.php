@@ -72,7 +72,7 @@ class Salmon
 						$ret[$x] = substr($ret[$x], 5);
 					}
 				} elseif (Strings::normaliseLink($ret[$x]) == 'http://') {
-					$ret[$x] = HTTPRequest::fetchUrl($ret[$x]);
+					$ret[$x] = DI::httpRequest()->fetchUrl($ret[$x]);
 				}
 			}
 		}

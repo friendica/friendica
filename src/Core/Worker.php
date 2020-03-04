@@ -993,7 +993,7 @@ class Worker
 		}
 
 		$url = DI::baseUrl() . '/worker';
-		HTTPRequest::fetchUrl($url, false, 1);
+		DI::httpRequest()->fetchUrl($url, false, 1);
 	}
 
 	/**
