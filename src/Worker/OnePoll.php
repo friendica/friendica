@@ -283,7 +283,7 @@ class OnePoll
 			. '&type=data&last_update=' . $last_update
 			. '&perm=' . $perm;
 
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 
 		if (!$curlResult->isSuccess() && ($curlResult->getErrorNumber() == CURLE_OPERATION_TIMEDOUT)) {
 			// set the last-update so we don't keep polling
@@ -436,7 +436,7 @@ class OnePoll
 		}
 
 		$cookiejar = tempnam(get_temppath(), 'cookiejar-onepoll-');
-		$curlResult = DI::httpRequest()->curl($contact['poll'], false, ['cookiejar' => $cookiejar]);
+		$curlResult = DI::httpRequest()->get($contact['poll'], false, ['cookiejar' => $cookiejar]);
 		unlink($cookiejar);
 
 		if ($curlResult->isTimeout()) {

@@ -52,11 +52,11 @@ class APContact
 
 		$webfinger = 'https://' . $addr_parts[1] . '/.well-known/webfinger?resource=acct:' . urlencode($addr);
 
-		$curlResult = DI::httpRequest()->curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
+		$curlResult = DI::httpRequest()->get($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 			$webfinger = Strings::normaliseLink($webfinger);
 
-			$curlResult = DI::httpRequest()->curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
+			$curlResult = DI::httpRequest()->get($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
 
 			if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 				return false;

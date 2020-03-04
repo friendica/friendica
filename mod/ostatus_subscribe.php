@@ -56,7 +56,7 @@ function ostatus_subscribe_content(App $a)
 		$api = $contact['baseurl'] . '/api/';
 
 		// Fetching friends
-		$curlResult = DI::httpRequest()->curl($api . 'statuses/friends.json?screen_name=' . $contact['nick']);
+		$curlResult = DI::httpRequest()->get($api . 'statuses/friends.json?screen_name=' . $contact['nick']);
 
 		if (!$curlResult->isSuccess()) {
 			DI::pConfig()->delete($uid, 'ostatus', 'legacy_contact');

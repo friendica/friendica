@@ -71,7 +71,7 @@ class HTTPRequest
 	 * @return CurlResult
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function curl(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
+	public function get(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
 	{
 		$stamp1 = microtime(true);
 
@@ -206,7 +206,7 @@ class HTTPRequest
 			$redirects++;
 			$this->logger->notice('Curl redirect.', ['url' => $url, 'to' => $curlResponse->getRedirectUrl()]);
 			@curl_close($ch);
-			return $this->curl($curlResponse->getRedirectUrl(), $binary, $opts, $redirects);
+			return $this->get($curlResponse->getRedirectUrl(), $binary, $opts, $redirects);
 		}
 
 		@curl_close($ch);
@@ -487,7 +487,7 @@ class HTTPRequest
 	 */
 	public function fetchUrlFull(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
 	{
-		return $this->curl(
+		return $this->get(
 			$url,
 			$binary,
 			[

@@ -290,7 +290,7 @@ class Search
 			$return = GContact::searchByName($search, $mode);
 		} else {
 			$p = $page > 1 ? 'p=' . $page : '';
-			$curlResult = DI::httpRequest()->curl(self::getGlobalDirectory() . '/search/people?' . $p . '&q=' . urlencode($search), false, ['accept_content' => 'application/json']);
+			$curlResult = DI::httpRequest()->get(self::getGlobalDirectory() . '/search/people?' . $p . '&q=' . urlencode($search), false, ['accept_content' => 'application/json']);
 			if ($curlResult->isSuccess()) {
 				$searchResult = json_decode($curlResult->getBody(), true);
 				if (!empty($searchResult['profiles'])) {

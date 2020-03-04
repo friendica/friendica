@@ -149,7 +149,7 @@ class Probe
 		Logger::log("Probing for ".$host, Logger::DEBUG);
 		$xrd = null;
 
-		$curlResult = DI::httpRequest()->curl($ssl_url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
+		$curlResult = DI::httpRequest()->get($ssl_url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 		$ssl_connection_error = ($curlResult->getErrorNumber() == CURLE_COULDNT_CONNECT) || ($curlResult->getReturnCode() == 0);
 		if ($curlResult->isSuccess()) {
 			$xml = $curlResult->getBody();
@@ -162,7 +162,7 @@ class Probe
 		}
 
 		if (!is_object($xrd)) {
-			$curlResult = DI::httpRequest()->curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
+			$curlResult = DI::httpRequest()->get($url, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/xrd+xml']);
 			$connection_error = ($curlResult->getErrorNumber() == CURLE_COULDNT_CONNECT) || ($curlResult->getReturnCode() == 0);
 			if ($curlResult->isTimeout()) {
 				Logger::info('Probing timeout', ['url' => $url], Logger::DEBUG);
@@ -487,7 +487,7 @@ class Probe
 	 */
 	private static function getHideStatus($url)
 	{
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -815,7 +815,7 @@ class Probe
 
 	public static function pollZot($url, $data)
 	{
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if ($curlResult->isTimeout()) {
 			return $data;
 		}
@@ -912,7 +912,7 @@ class Probe
 	{
 		$xrd_timeout = DI::config()->get('system', 'xrd_timeout', 20);
 
-		$curlResult = DI::httpRequest()->curl($url, false, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
+		$curlResult = DI::httpRequest()->get($url, false, ['timeout' => $xrd_timeout, 'accept_content' => $type]);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -981,7 +981,7 @@ class Probe
 	 */
 	private static function pollNoscrape($noscrape_url, $data)
 	{
-		$curlResult = DI::httpRequest()->curl($noscrape_url);
+		$curlResult = DI::httpRequest()->get($noscrape_url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1239,7 +1239,7 @@ class Probe
 	 */
 	private static function pollHcard($hcard_url, $data, $dfrn = false)
 	{
-		$curlResult = DI::httpRequest()->curl($hcard_url);
+		$curlResult = DI::httpRequest()->get($hcard_url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1493,7 +1493,7 @@ class Probe
 							$pubkey = substr($pubkey, 5);
 						}
 					} elseif (Strings::normaliseLink($pubkey) == 'http://') {
-						$curlResult = DI::httpRequest()->curl($pubkey);
+						$curlResult = DI::httpRequest()->get($pubkey);
 						if ($curlResult->isTimeout()) {
 							self::$istimeout = true;
 							return false;
@@ -1526,7 +1526,7 @@ class Probe
 		}
 
 		// Fetch all additional data from the feed
-		$curlResult = DI::httpRequest()->curl($data["poll"]);
+		$curlResult = DI::httpRequest()->get($data["poll"]);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;
@@ -1579,7 +1579,7 @@ class Probe
 	 */
 	private static function pumpioProfileData($profile_link)
 	{
-		$curlResult = DI::httpRequest()->curl($profile_link);
+		$curlResult = DI::httpRequest()->get($profile_link);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -1712,7 +1712,7 @@ class Probe
 		$data['network'] = Protocol::TWITTER;
 		$data['baseurl'] = 'https://twitter.com';
 
-		$curlResult = DI::httpRequest()->curl($data['url'], false);
+		$curlResult = DI::httpRequest()->get($data['url'], false);
 		if (!$curlResult->isSuccess()) {
 			return [];
 		}
@@ -1757,7 +1757,7 @@ class Probe
 	 */
 	private static function getFeedLink($url)
 	{
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
@@ -1806,7 +1806,7 @@ class Probe
 	 */
 	private static function feed($url, $probe = true)
 	{
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return false;

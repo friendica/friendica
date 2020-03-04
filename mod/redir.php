@@ -172,7 +172,7 @@ function redir_magic($a, $cid, $url)
 	}
 
 	// Test for magic auth on the target system
-	$serverret = DI::httpRequest()->curl($basepath . '/magic');
+	$serverret = DI::httpRequest()->get($basepath . '/magic');
 	if ($serverret->isSuccess()) {
 		$separator = strpos($target_url, '?') ? '&' : '?';
 		$target_url .= $separator . 'zrl=' . urlencode($visitor) . '&addr=' . urlencode($contact_url);

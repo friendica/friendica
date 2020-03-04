@@ -100,7 +100,7 @@ class Magic extends BaseModule
 				);
 
 				// Try to get an authentication token from the other instance.
-				$curlResult = DI::httpRequest()->curl($basepath . '/owa', false, ['headers' => $headers]);
+				$curlResult = DI::httpRequest()->get($basepath . '/owa', false, ['headers' => $headers]);
 
 				if ($curlResult->isSuccess()) {
 					$j = json_decode($curlResult->getBody(), true);

@@ -463,7 +463,7 @@ class HTTPSignature
 		$curl_opts = $opts;
 		$curl_opts['header'] = $headers;
 
-		$curlResult = DI::httpRequest()->curl($request, false, $curl_opts);
+		$curlResult = DI::httpRequest()->get($request, false, $curl_opts);
 		$return_code = $curlResult->getReturnCode();
 
 		Logger::log('Fetched for user ' . $uid . ' from ' . $request . ' returned ' . $return_code, Logger::DEBUG);

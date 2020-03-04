@@ -419,7 +419,7 @@ class Photo
 
 		$filename = basename($image_url);
 		if (!empty($image_url)) {
-			$ret = DI::httpRequest()->curl($image_url, true);
+			$ret = DI::httpRequest()->get($image_url, true);
 			$img_str = $ret->getBody();
 			$type = $ret->getContentType();
 		} else {

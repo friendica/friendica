@@ -833,7 +833,7 @@ class GContact
 			return false;
 		}
 
-		$curlResult = DI::httpRequest()->curl($gserver['noscrape'] . '/' . $data['nick']);
+		$curlResult = DI::httpRequest()->get($gserver['noscrape'] . '/' . $data['nick']);
 
 		if ($curlResult->isSuccess() && !empty($curlResult->getBody())) {
 			$noscrape = json_decode($curlResult->getBody(), true);
@@ -915,7 +915,7 @@ class GContact
 	private static function updateFromFeed(array $data)
 	{
 		// Search for the newest entry in the feed
-		$curlResult = DI::httpRequest()->curl($data['poll']);
+		$curlResult = DI::httpRequest()->get($data['poll']);
 		if (!$curlResult->isSuccess()) {
 			$fields = ['last_failure' => DateTimeFormat::utcNow()];
 			DBA::update('gcontact', $fields, ['nurl' => Strings::normaliseLink($data['url'])]);
@@ -1192,7 +1192,7 @@ class GContact
 
 		$url = $server . '/main/statistics';
 
-		$curlResult = DI::httpRequest()->curl($url);
+		$curlResult = DI::httpRequest()->get($url);
 		if (!$curlResult->isSuccess()) {
 			return false;
 		}
