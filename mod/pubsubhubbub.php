@@ -24,8 +24,6 @@ use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\PushSubscriber;
-use Friendica\Network\HTTPRequest;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 function post_var($name) {

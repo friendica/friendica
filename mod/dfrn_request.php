@@ -39,7 +39,6 @@ use Friendica\Model\Notify\Type;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;

@@ -34,9 +34,7 @@ use Friendica\Model\GServer;
 use Friendica\Model\Nodeinfo;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
-use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 use Friendica\Util\Strings;
 

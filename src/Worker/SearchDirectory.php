@@ -29,9 +29,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\GContact;
 use Friendica\Model\GServer;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 class SearchDirectory

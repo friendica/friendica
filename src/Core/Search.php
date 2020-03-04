@@ -26,7 +26,6 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GContact;
 use Friendica\Network\HTTPException;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;

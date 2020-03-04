@@ -24,7 +24,6 @@ namespace Friendica\Util;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
 use Imagick;
 
 /**

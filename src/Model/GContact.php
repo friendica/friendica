@@ -30,7 +30,6 @@ use Friendica\Core\Search;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\PortableContact;

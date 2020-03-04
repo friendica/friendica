@@ -33,7 +33,6 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\TwoFactor\AppSpecificPassword;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Object\Image;
 use Friendica\Util\Crypto;

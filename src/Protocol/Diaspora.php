@@ -39,7 +39,6 @@ use Friendica\Model\ItemDeliveryData;
 use Friendica\Model\Mail;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;

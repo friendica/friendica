@@ -22,7 +22,6 @@
 namespace Friendica\Protocol;
 
 use Friendica\Core\Logger;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\Strings;

@@ -26,8 +26,6 @@ use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
-use Friendica\Util\Network;
 
 /**
  * Sends updated profile data to the directory

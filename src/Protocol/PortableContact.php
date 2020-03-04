@@ -30,7 +30,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\GContact;
 use Friendica\Model\GServer;
-use Friendica\Network\HTTPRequest;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 

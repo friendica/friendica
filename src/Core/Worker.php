@@ -25,9 +25,7 @@ use Friendica\Core;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Process;
-use Friendica\Network\HTTPRequest;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Network;
 
 /**
  * Contains the class for the worker background job processing

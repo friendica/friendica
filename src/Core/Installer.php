@@ -27,9 +27,7 @@ use Friendica\Core\Config\Cache;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
 use Friendica\Util\Images;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 /**

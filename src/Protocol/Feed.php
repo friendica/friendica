@@ -29,8 +29,6 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
-use Friendica\Network\HTTPRequest;
-use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\XML;
 

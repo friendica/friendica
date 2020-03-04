@@ -23,8 +23,6 @@ use Friendica\App;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Security\Login;
-use Friendica\Network\HTTPRequest;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 function oexchange_init(App $a) {

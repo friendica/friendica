@@ -25,9 +25,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Model;
-use Friendica\Network\HTTPRequest;
 use Friendica\Protocol;
-use Friendica\Util\Network;
 
 /**
  * Tests a given feed of a contact

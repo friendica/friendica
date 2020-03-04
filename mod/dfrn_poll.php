@@ -25,7 +25,6 @@ use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
 use Friendica\Util\Strings;
