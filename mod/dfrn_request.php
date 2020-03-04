@@ -204,7 +204,7 @@ function dfrn_request_post(App $a)
 				}
 
 				if (!empty($dfrn_request) && strlen($confirm_key)) {
-					DI::httpRequest()->fetchUrl($dfrn_request . '?confirm_key=' . $confirm_key);
+					DI::httpRequest()->fetch($dfrn_request . '?confirm_key=' . $confirm_key);
 				}
 
 				// (ignore reply, nothing we can do it failed)

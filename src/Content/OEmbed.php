@@ -96,7 +96,7 @@ class OEmbed
 
 			if (!in_array($ext, $noexts)) {
 				// try oembed autodiscovery
-				$html_text = DI::httpRequest()->fetchUrl($embedurl, false, 15, 'text/*');
+				$html_text = DI::httpRequest()->fetch($embedurl, false, 15, 'text/*');
 				if ($html_text) {
 					$dom = @DOMDocument::loadHTML($html_text);
 					if ($dom) {
@@ -104,14 +104,14 @@ class OEmbed
 						$entries = $xpath->query("//link[@type='application/json+oembed']");
 						foreach ($entries as $e) {
 							$href = $e->getAttributeNode('href')->nodeValue;
-							$json_string = DI::httpRequest()->fetchUrl($href . '&maxwidth=' . $a->videowidth);
+							$json_string = DI::httpRequest()->fetch($href . '&maxwidth=' . $a->videowidth);
 							break;
 						}
 
 						$entries = $xpath->query("//link[@type='text/json+oembed']");
 						foreach ($entries as $e) {
 							$href = $e->getAttributeNode('href')->nodeValue;
-							$json_string = DI::httpRequest()->fetchUrl($href . '&maxwidth=' . $a->videowidth);
+							$json_string = DI::httpRequest()->fetch($href . '&maxwidth=' . $a->videowidth);
 							break;
 						}
 					}

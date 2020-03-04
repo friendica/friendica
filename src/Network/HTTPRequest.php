@@ -461,9 +461,9 @@ class HTTPRequest
 	 * @return string The fetched content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function fetchUrl(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
+	public function fetch(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
 	{
-		$ret = $this->fetchUrlFull($url, $binary, $timeout, $accept_content, $cookiejar, $redirects);
+		$ret = $this->fetchFull($url, $binary, $timeout, $accept_content, $cookiejar, $redirects);
 
 		return $ret->getBody();
 	}
@@ -485,7 +485,7 @@ class HTTPRequest
 	 * @return CurlResult With all relevant information, 'body' contains the actual fetched content.
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function fetchUrlFull(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
+	public function fetchFull(string $url, bool $binary = false, int $timeout = 0, string $accept_content = '', string $cookiejar = '', int &$redirects = 0)
 	{
 		return $this->get(
 			$url,

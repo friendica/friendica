@@ -524,7 +524,7 @@ class GContact
 		$done[] = DI::baseUrl() . '/poco';
 
 		if (strlen(DI::config()->get('system', 'directory'))) {
-			$x = DI::httpRequest()->fetchUrl(Search::getGlobalDirectory() . '/pubsites');
+			$x = DI::httpRequest()->fetch(Search::getGlobalDirectory() . '/pubsites');
 			if (!empty($x)) {
 				$j = json_decode($x);
 				if (!empty($j->entries)) {
