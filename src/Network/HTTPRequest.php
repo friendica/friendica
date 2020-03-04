@@ -25,9 +25,7 @@ use DOMDocument;
 use DomXPath;
 use Friendica\App;
 use Friendica\Core\Config\IConfig;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -130,7 +128,7 @@ class HTTPRequest
 		}
 
 		@curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		@curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
+		@curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgent());
 
 		$range = intval($this->config->get('system', 'curl_range_bytes', 0));
 
@@ -208,7 +206,7 @@ class HTTPRequest
 			$redirects++;
 			$this->logger->notice('Curl redirect.', ['url' => $url, 'to' => $curlResponse->getRedirectUrl()]);
 			@curl_close($ch);
-			return self::curl($curlResponse->getRedirectUrl(), $binary, $opts, $redirects);
+			return $this->curl($curlResponse->getRedirectUrl(), $binary, $opts, $redirects);
 		}
 
 		@curl_close($ch);
@@ -251,7 +249,7 @@ class HTTPRequest
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-		curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgent());
 
 		if ($this->config->get('system', 'ipv4_resolve', false)) {
 			curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -299,7 +297,7 @@ class HTTPRequest
 			$redirects++;
 			$this->logger->info('Post redirect.', ['url' => $url, 'to' => $curlResponse->getRedirectUrl()]);
 			curl_close($ch);
-			return self::post($curlResponse->getRedirectUrl(), $params, $headers, $redirects, $timeout);
+			return $this->post($curlResponse->getRedirectUrl(), $params, $headers, $redirects, $timeout);
 		}
 
 		curl_close($ch);
@@ -317,11 +315,11 @@ class HTTPRequest
 					array_push($headers, 'Expect:');
 				}
 			}
-			Logger::info('Server responds with 417, applying workaround', ['url' => $url]);
-			return self::post($url, $params, $headers, $redirects, $timeout);
+			$this->logger->info('Server responds with 417, applying workaround', ['url' => $url]);
+			return $this->post($url, $params, $headers, $redirects, $timeout);
 		}
 
-		Logger::log('post_url: end ' . $url, Logger::DATA);
+		$this->logger->debug('Post_url: End.', ['url' => $url]);
 
 		return $curlResponse;
 	}
@@ -343,10 +341,8 @@ class HTTPRequest
 	 * @todo  Remove the $fetchbody parameter that generates an extraneous HEAD request
 	 *
 	 */
-	public static function finalUrl(string $url, int $depth = 1, bool $fetchbody = false)
+	public function finalUrl(string $url, int $depth = 1, bool $fetchbody = false)
 	{
-		$a = DI::app();
-
 		$url = Network::stripTrackingQueryParams($url);
 
 		if ($depth > 10) {
@@ -363,14 +359,14 @@ class HTTPRequest
 		curl_setopt($ch, CURLOPT_NOBODY, 1);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, DI::httpRequest()->getUserAgent());
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgent());
 
 		curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
 		$http_code = $curl_info['http_code'];
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+		$this->profiler->saveTimestamp($stamp1, "network", System::callstack());
 
 		if ($http_code == 0) {
 			return $url;
@@ -378,15 +374,15 @@ class HTTPRequest
 
 		if (in_array($http_code, ['301', '302'])) {
 			if (!empty($curl_info['redirect_url'])) {
-				return self::finalUrl($curl_info['redirect_url'], ++$depth, $fetchbody);
+				return $this->finalUrl($curl_info['redirect_url'], ++$depth, $fetchbody);
 			} elseif (!empty($curl_info['location'])) {
-				return self::finalUrl($curl_info['location'], ++$depth, $fetchbody);
+				return $this->finalUrl($curl_info['location'], ++$depth, $fetchbody);
 			}
 		}
 
 		// Check for redirects in the meta elements of the body if there are no redirects in the header.
 		if (!$fetchbody) {
-			return (self::finalUrl($url, ++$depth, true));
+			return ($this->finalUrl($url, ++$depth, true));
 		}
 
 		// if the file is too large then exit
@@ -407,12 +403,12 @@ class HTTPRequest
 		curl_setopt($ch, CURLOPT_NOBODY, 0);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, DI::httpRequest()->getUserAgent());
+		curl_setopt($ch, CURLOPT_USERAGENT, $this->getUserAgent());
 
 		$body = curl_exec($ch);
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, "network", System::callstack());
+		$this->profiler->saveTimestamp($stamp1, "network", System::callstack());
 
 		if (trim($body) == "") {
 			return $url;
@@ -438,7 +434,7 @@ class HTTPRequest
 				$pathinfo = explode(";", $path);
 				foreach ($pathinfo as $value) {
 					if (substr(strtolower($value), 0, 4) == "url=") {
-						return self::finalUrl(substr($value, 4), ++$depth);
+						return $this->finalUrl(substr($value, 4), ++$depth);
 					}
 				}
 			}

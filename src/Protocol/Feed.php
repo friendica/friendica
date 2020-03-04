@@ -271,7 +271,7 @@ class Feed {
 
 			$orig_plink = $item["plink"];
 
-			$item["plink"] = HTTPRequest::finalUrl($item["plink"]);
+			$item["plink"] = DI::httpRequest()->finalUrl($item["plink"]);
 
 			$item["parent-uri"] = $item["uri"];
 
