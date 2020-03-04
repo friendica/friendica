@@ -21,23 +21,44 @@
 
 namespace Friendica\Network;
 
+use Friendica\App;
+use Friendica\Core\Config\IConfig;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Network;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * Performs HTTP requests to a given URL
  */
 class HTTPRequest
 {
+	/** @var LoggerInterface */
+	private $logger;
+	/** @var Profiler */
+	private $profiler;
+	/** @var IConfig */
+	private $config;
+	/** @var string */
+	private $userAgent;
+
+	public function __construct(LoggerInterface $logger, Profiler $profiler, IConfig $config, App $a)
+	{
+		$this->logger    = $logger;
+		$this->profiler  = $profiler;
+		$this->config    = $config;
+		$this->userAgent = $a->getUserAgent();
+	}
+
 	/**
 	 * fetches an URL.
 	 *
-	 * @param string  $url       URL to fetch
-	 * @param bool    $binary    default false
+	 * @param string $url        URL to fetch
+	 * @param bool   $binary     default false
 	 *                           TRUE if asked to return binary results (file download)
-	 * @param array   $opts      (optional parameters) assoziative array with:
+	 * @param array  $opts       (optional parameters) assoziative array with:
 	 *                           'accept_content' => supply Accept: header with 'accept_content' as the value
 	 *                           'timeout' => int Timeout in seconds, default system config value or 60 seconds
 	 *                           'http_auth' => username:password
@@ -45,7 +66,7 @@ class HTTPRequest
 	 *                           'nobody' => only return the header
 	 *                           'cookiejar' => path to cookie jar file
 	 *                           'header' => header array
-	 * @param int     $redirects The recursion counter for internal use - default 0
+	 * @param int    $redirects  The recursion counter for internal use - default 0
 	 *
 	 * @return CurlResult
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -53,8 +74,6 @@ class HTTPRequest
 	public static function curl(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
 	{
 		$stamp1 = microtime(true);
-
-		$a = DI::app();
 
 		if (strlen($url) > 1000) {
 			Logger::log('URL is longer than 1000 characters. Callstack: ' . System::callstack(20), Logger::DEBUG);
@@ -200,11 +219,11 @@ class HTTPRequest
 	/**
 	 * Send POST request to $url
 	 *
-	 * @param string  $url       URL to post
-	 * @param mixed   $params    array of POST variables
-	 * @param array   $headers   HTTP headers
-	 * @param int     $redirects Recursion counter for internal use - default = 0
-	 * @param int     $timeout   The timeout in seconds, default system config value or 60 seconds
+	 * @param string $url       URL to post
+	 * @param mixed  $params    array of POST variables
+	 * @param array  $headers   HTTP headers
+	 * @param int    $redirects Recursion counter for internal use - default = 0
+	 * @param int    $timeout   The timeout in seconds, default system config value or 60 seconds
 	 *
 	 * @return CurlResult The content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -313,13 +332,13 @@ class HTTPRequest
 	 * Set the cookiejar argument to a string (e.g. "/tmp/friendica-cookies.txt")
 	 * to preserve cookies from one request to the next.
 	 *
-	 * @param string  $url            URL to fetch
-	 * @param bool    $binary         default false
+	 * @param string $url             URL to fetch
+	 * @param bool   $binary          default false
 	 *                                TRUE if asked to return binary results (file download)
-	 * @param int     $timeout        Timeout in seconds, default system config value or 60 seconds
-	 * @param string  $accept_content supply Accept: header with 'accept_content' as the value
-	 * @param string  $cookiejar      Path to cookie jar file
-	 * @param int     $redirects      The recursion counter for internal use - default 0
+	 * @param int    $timeout         Timeout in seconds, default system config value or 60 seconds
+	 * @param string $accept_content  supply Accept: header with 'accept_content' as the value
+	 * @param string $cookiejar       Path to cookie jar file
+	 * @param int    $redirects       The recursion counter for internal use - default 0
 	 *
 	 * @return string The fetched content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -337,13 +356,13 @@ class HTTPRequest
 	 * Inner workings and parameters are the same as @ref fetchUrl but returns an array with
 	 * all the information collected during the fetch.
 	 *
-	 * @param string  $url            URL to fetch
-	 * @param bool    $binary         default false
+	 * @param string $url             URL to fetch
+	 * @param bool   $binary          default false
 	 *                                TRUE if asked to return binary results (file download)
-	 * @param int     $timeout        Timeout in seconds, default system config value or 60 seconds
-	 * @param string  $accept_content supply Accept: header with 'accept_content' as the value
-	 * @param string  $cookiejar      Path to cookie jar file
-	 * @param int     $redirects      The recursion counter for internal use - default 0
+	 * @param int    $timeout         Timeout in seconds, default system config value or 60 seconds
+	 * @param string $accept_content  supply Accept: header with 'accept_content' as the value
+	 * @param string $cookiejar       Path to cookie jar file
+	 * @param int    $redirects       The recursion counter for internal use - default 0
 	 *
 	 * @return CurlResult With all relevant information, 'body' contains the actual fetched content.
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
