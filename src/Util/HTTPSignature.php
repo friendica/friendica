@@ -21,11 +21,11 @@
 
 namespace Friendica\Util;
 
-use Friendica\Database\DBA;
 use Friendica\Core\Logger;
+use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\User;
 use Friendica\Model\APContact;
+use Friendica\Model\User;
 use Friendica\Network\HTTPRequest;
 
 /**
@@ -464,7 +464,7 @@ class HTTPSignature
 		$curl_opts = $opts;
 		$curl_opts['header'] = $headers;
 
-		$curlResult = HTTPRequest::curl($request, false, $curl_opts);
+		$curlResult = DI::httpRequest()->curl($request, false, $curl_opts);
 		$return_code = $curlResult->getReturnCode();
 
 		Logger::log('Fetched for user ' . $uid . ' from ' . $request . ' returned ' . $return_code, Logger::DEBUG);

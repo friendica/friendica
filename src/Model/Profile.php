@@ -27,14 +27,13 @@ use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Cache\Duration;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
-use Friendica\Network\HTTPRequest;
-use Friendica\Network\Probe;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
@@ -755,7 +754,7 @@ class Profile
 			$magic_path = $basepath . '/magic' . '?owa=1&dest=' . $dest . '&' . $addr_request;
 
 			// We have to check if the remote server does understand /magic without invoking something
-			$serverret = HTTPRequest::curl($basepath . '/magic');
+			$serverret = DI::httpRequest()->curl($basepath . '/magic');
 			if ($serverret->isSuccess()) {
 				Logger::log('Doing magic auth for visitor ' . $my_url . ' to ' . $magic_path, Logger::DEBUG);
 				System::externalRedirect($magic_path);

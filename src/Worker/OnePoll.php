@@ -34,7 +34,6 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\PortableContact;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 
@@ -285,7 +284,7 @@ class OnePoll
 			. '&type=data&last_update=' . $last_update
 			. '&perm=' . $perm;
 
-		$curlResult = HTTPRequest::curl($url);
+		$curlResult = DI::httpRequest()->curl($url);
 
 		if (!$curlResult->isSuccess() && ($curlResult->getErrorNumber() == CURLE_OPERATION_TIMEDOUT)) {
 			// set the last-update so we don't keep polling
@@ -438,7 +437,7 @@ class OnePoll
 		}
 
 		$cookiejar = tempnam(get_temppath(), 'cookiejar-onepoll-');
-		$curlResult = HTTPRequest::curl($contact['poll'], false, ['cookiejar' => $cookiejar]);
+		$curlResult = DI::httpRequest()->curl($contact['poll'], false, ['cookiejar' => $cookiejar]);
 		unlink($cookiejar);
 
 		if ($curlResult->isTimeout()) {

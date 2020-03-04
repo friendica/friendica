@@ -25,11 +25,10 @@ use Friendica\Content\Text\HTML;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPRequest;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
-use Friendica\Util\JsonLD;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\JsonLD;
+use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 class APContact
@@ -53,11 +52,11 @@ class APContact
 
 		$webfinger = 'https://' . $addr_parts[1] . '/.well-known/webfinger?resource=acct:' . urlencode($addr);
 
-		$curlResult = HTTPRequest::curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
+		$curlResult = DI::httpRequest()->curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 			$webfinger = Strings::normaliseLink($webfinger);
 
-			$curlResult = HTTPRequest::curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
+			$curlResult = DI::httpRequest()->curl($webfinger, false, ['timeout' => $xrd_timeout, 'accept_content' => 'application/jrd+json,application/json']);
 
 			if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 				return false;

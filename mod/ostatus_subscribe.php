@@ -23,9 +23,7 @@ use Friendica\App;
 use Friendica\Core\Protocol;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
-use Friendica\Util\Network;
 
 function ostatus_subscribe_content(App $a)
 {
@@ -58,7 +56,7 @@ function ostatus_subscribe_content(App $a)
 		$api = $contact['baseurl'] . '/api/';
 
 		// Fetching friends
-		$curlResult = HTTPRequest::curl($api . 'statuses/friends.json?screen_name=' . $contact['nick']);
+		$curlResult = DI::httpRequest()->curl($api . 'statuses/friends.json?screen_name=' . $contact['nick']);
 
 		if (!$curlResult->isSuccess()) {
 			DI::pConfig()->delete($uid, 'ostatus', 'legacy_contact');

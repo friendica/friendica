@@ -71,12 +71,12 @@ class HTTPRequest
 	 * @return CurlResult
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function curl(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
+	public function curl(string $url, bool $binary = false, array $opts = [], int &$redirects = 0)
 	{
 		$stamp1 = microtime(true);
 
 		if (strlen($url) > 1000) {
-			Logger::log('URL is longer than 1000 characters. Callstack: ' . System::callstack(20), Logger::DEBUG);
+			$this->logger->debug('URL is longer than 1000 characters.', ['url' => $url, 'callstack' => System::callstack(20)]);
 			return CurlResult::createErrorCurl(substr($url, 0, 200));
 		}
 
@@ -94,7 +94,7 @@ class HTTPRequest
 		$url           = Network::unparseURL($parts);
 
 		if (Network::isUrlBlocked($url)) {
-			Logger::log('domain of ' . $url . ' is blocked', Logger::DATA);
+			$this->logger->info('Domain is blocked.', ['url' => $url]);
 			return CurlResult::createErrorCurl($url);
 		}
 
@@ -128,9 +128,9 @@ class HTTPRequest
 		}
 
 		@curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		@curl_setopt($ch, CURLOPT_USERAGENT, $a->getUserAgent());
+		@curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
 
-		$range = intval(DI::config()->get('system', 'curl_range_bytes', 0));
+		$range = intval($this->config->get('system', 'curl_range_bytes', 0));
 
 		if ($range > 0) {
 			@curl_setopt($ch, CURLOPT_RANGE, '0-' . $range);
@@ -152,33 +152,33 @@ class HTTPRequest
 		if (!empty($opts['timeout'])) {
 			@curl_setopt($ch, CURLOPT_TIMEOUT, $opts['timeout']);
 		} else {
-			$curl_time = DI::config()->get('system', 'curl_timeout', 60);
+			$curl_time = $this->config->get('system', 'curl_timeout', 60);
 			@curl_setopt($ch, CURLOPT_TIMEOUT, intval($curl_time));
 		}
 
 		// by default we will allow self-signed certs
 		// but you can override this
 
-		$check_cert = DI::config()->get('system', 'verifyssl');
+		$check_cert = $this->config->get('system', 'verifyssl');
 		@curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
 
 		if ($check_cert) {
 			@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		}
 
-		$proxy = DI::config()->get('system', 'proxy');
+		$proxy = $this->config->get('system', 'proxy');
 
-		if (strlen($proxy)) {
+		if (!empty($proxy)) {
 			@curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
 			@curl_setopt($ch, CURLOPT_PROXY, $proxy);
-			$proxyuser = @DI::config()->get('system', 'proxyuser');
+			$proxyuser = $this->config->get('system', 'proxyuser');
 
-			if (strlen($proxyuser)) {
+			if (!empty($proxyuser)) {
 				@curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyuser);
 			}
 		}
 
-		if (DI::config()->get('system', 'ipv4_resolve', false)) {
+		if ($this->config->get('system', 'ipv4_resolve', false)) {
 			curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 		}
 
@@ -204,14 +204,14 @@ class HTTPRequest
 
 		if ($curlResponse->isRedirectUrl()) {
 			$redirects++;
-			Logger::log('curl: redirect ' . $url . ' to ' . $curlResponse->getRedirectUrl());
+			$this->logger->notice('Curl redirect.', ['url' => $url, 'to' => $curlResponse->getRedirectUrl()]);
 			@curl_close($ch);
 			return self::curl($curlResponse->getRedirectUrl(), $binary, $opts, $redirects);
 		}
 
 		@curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
+		$this->profiler->saveTimestamp($stamp1, 'network', System::callstack());
 
 		return $curlResponse;
 	}

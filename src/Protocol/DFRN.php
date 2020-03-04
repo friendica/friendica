@@ -1222,7 +1222,7 @@ class DFRN
 
 		Logger::log('dfrn_deliver: ' . $url);
 
-		$curlResult = HTTPRequest::curl($url);
+		$curlResult = DI::httpRequest()->curl($url);
 
 		if ($curlResult->isTimeout()) {
 			return -2; // timed out
