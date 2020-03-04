@@ -28,7 +28,6 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
-use Friendica\Network\HTTPRequest;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
@@ -398,7 +397,7 @@ class OnePoll
 		$postvars['dfrn_version'] = DFRN_PROTOCOL_VERSION;
 		$postvars['perm'] = 'rw';
 
-		return HTTPRequest::post($contact['poll'], $postvars)->getBody();
+		return DI::httpRequest()->post($contact['poll'], $postvars)->getBody();
 	}
 
 	/**

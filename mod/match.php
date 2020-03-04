@@ -27,8 +27,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Network\HTTPRequest;
-use Friendica\Util\Network;
 use Friendica\Util\Proxy as ProxyUtils;
 
 /**
@@ -77,7 +75,7 @@ function match_content(App $a)
 		$host = DI::baseUrl();
 	}
 
-	$msearch_json = HTTPRequest::post($host . '/msearch', $params)->getBody();
+	$msearch_json = DI::httpRequest()->post($host . '/msearch', $params)->getBody();
 
 	$msearch = json_decode($msearch_json);
 

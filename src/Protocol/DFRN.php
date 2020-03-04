@@ -42,7 +42,6 @@ use Friendica\Model\Notify\Type;
 use Friendica\Model\PermissionSet;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
-use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
@@ -1371,7 +1370,7 @@ class DFRN
 
 		Logger::log('dfrn_deliver: ' . "SENDING: " . print_r($postvars, true), Logger::DATA);
 
-		$postResult = HTTPRequest::post($contact['notify'], $postvars);
+		$postResult = DI::httpRequest()->post($contact['notify'], $postvars);
 
 		$xml = $postResult->getBody();
 
@@ -1468,7 +1467,7 @@ class DFRN
 
 		$content_type = ($public_batch ? "application/magic-envelope+xml" : "application/json");
 
-		$postResult = HTTPRequest::post($dest_url, $envelope, ["Content-Type: " . $content_type]);
+		$postResult = DI::httpRequest()->post($dest_url, $envelope, ["Content-Type: " . $content_type]);
 		$xml = $postResult->getBody();
 
 		$curl_stat = $postResult->getReturnCode();

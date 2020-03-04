@@ -26,7 +26,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\User;
-use Friendica\Network\HTTPRequest;
 
 /**
  * Implements HTTP Signatures per draft-cavage-http-signatures-07.
@@ -319,7 +318,7 @@ class HTTPSignature
 
 		$headers[] = 'Content-Type: application/activity+json';
 
-		$postResult = HTTPRequest::post($target, $content, $headers);
+		$postResult = DI::httpRequest()->post($target, $content, $headers);
 		$return_code = $postResult->getReturnCode();
 
 		Logger::log('Transmit to ' . $target . ' returned ' . $return_code, Logger::DEBUG);

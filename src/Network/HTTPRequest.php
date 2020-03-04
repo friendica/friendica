@@ -25,7 +25,6 @@ use Friendica\App;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -228,23 +227,22 @@ class HTTPRequest
 	 * @return CurlResult The content
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function post(string $url, $params, array $headers = [], int $timeout = 0, int &$redirects = 0)
+	public function post(string $url, $params, array $headers = [], int $timeout = 0, int &$redirects = 0)
 	{
 		$stamp1 = microtime(true);
 
 		if (Network::isUrlBlocked($url)) {
-			Logger::log('post_url: domain of ' . $url . ' is blocked', Logger::DATA);
+			$this->logger->info('Domain is blocked.'. ['url' => $url]);
 			return CurlResult::createErrorCurl($url);
 		}
 
-		$a  = DI::app();
 		$ch = curl_init($url);
 
 		if (($redirects > 8) || (!$ch)) {
 			return CurlResult::createErrorCurl($url);
 		}
 
-		Logger::log('post_url: start ' . $url, Logger::DATA);
+		$this->logger->debug('Post_url: start.', ['url' => $url]);
 
 		curl_setopt($ch, CURLOPT_HEADER, true);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -252,14 +250,14 @@ class HTTPRequest
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
 		curl_setopt($ch, CURLOPT_USERAGENT, $a->getUserAgent());
 
-		if (DI::config()->get('system', 'ipv4_resolve', false)) {
+		if ($this->config->get('system', 'ipv4_resolve', false)) {
 			curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 		}
 
 		if (intval($timeout)) {
 			curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		} else {
-			$curl_time = DI::config()->get('system', 'curl_timeout', 60);
+			$curl_time = $this->config->get('system', 'curl_timeout', 60);
 			curl_setopt($ch, CURLOPT_TIMEOUT, intval($curl_time));
 		}
 
@@ -267,20 +265,20 @@ class HTTPRequest
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		}
 
-		$check_cert = DI::config()->get('system', 'verifyssl');
+		$check_cert = $this->config->get('system', 'verifyssl');
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (($check_cert) ? true : false));
 
 		if ($check_cert) {
 			@curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		}
 
-		$proxy = DI::config()->get('system', 'proxy');
+		$proxy = $this->config->get('system', 'proxy');
 
-		if (strlen($proxy)) {
+		if (!empty($proxy)) {
 			curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
 			curl_setopt($ch, CURLOPT_PROXY, $proxy);
-			$proxyuser = DI::config()->get('system', 'proxyuser');
-			if (strlen($proxyuser)) {
+			$proxyuser = $this->config->get('system', 'proxyuser');
+			if (!empty($proxyuser)) {
 				curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxyuser);
 			}
 		}
@@ -296,14 +294,14 @@ class HTTPRequest
 
 		if ($curlResponse->isRedirectUrl()) {
 			$redirects++;
-			Logger::log('post_url: redirect ' . $url . ' to ' . $curlResponse->getRedirectUrl());
+			$this->logger->info('Post redirect.', ['url' => $url, 'to' => $curlResponse->getRedirectUrl()]);
 			curl_close($ch);
 			return self::post($curlResponse->getRedirectUrl(), $params, $headers, $redirects, $timeout);
 		}
 
 		curl_close($ch);
 
-		DI::profiler()->saveTimestamp($stamp1, 'network', System::callstack());
+		$this->profiler->saveTimestamp($stamp1, 'network', System::callstack());
 
 		// Very old versions of Lighttpd don't like the "Expect" header, so we remove it when needed
 		if ($curlResponse->getReturnCode() == 417) {

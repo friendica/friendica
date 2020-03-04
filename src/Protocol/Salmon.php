@@ -25,7 +25,6 @@ use Friendica\Core\Logger;
 use Friendica\Network\HTTPRequest;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 
@@ -156,7 +155,7 @@ class Salmon
 		$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 		// slap them
-		$postResult = HTTPRequest::post($url, $salmon, [
+		$postResult = DI::httpRequest()->post($url, $salmon, [
 			'Content-type: application/magic-envelope+xml',
 			'Content-length: ' . strlen($salmon)
 		]);
@@ -181,7 +180,7 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			$postResult = HTTPRequest::post($url, $salmon, [
+			$postResult = DI::httpRequest()->post($url, $salmon, [
 				'Content-type: application/magic-envelope+xml',
 				'Content-length: ' . strlen($salmon)
 			]);
@@ -204,7 +203,7 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			$postResult = HTTPRequest::post($url, $salmon, [
+			$postResult = DI::httpRequest()->post($url, $salmon, [
 				'Content-type: application/magic-envelope+xml',
 				'Content-length: ' . strlen($salmon)]);
 			$return_code = $postResult->getReturnCode();

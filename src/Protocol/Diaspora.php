@@ -3171,7 +3171,7 @@ class Diaspora
 		if (!intval(DI::config()->get("system", "diaspora_test"))) {
 			$content_type = (($public_batch) ? "application/magic-envelope+xml" : "application/json");
 
-			$postResult = HTTPRequest::post($dest_url . "/", $envelope, ["Content-Type: " . $content_type]);
+			$postResult = DI::httpRequest()->post($dest_url . "/", $envelope, ["Content-Type: " . $content_type]);
 			$return_code = $postResult->getReturnCode();
 		} else {
 			Logger::log("test_mode");

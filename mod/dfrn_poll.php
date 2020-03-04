@@ -21,14 +21,13 @@
 
 use Friendica\App;
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Core\Session;
+use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\HTTPRequest;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\OStatus;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 
@@ -508,7 +507,7 @@ function dfrn_poll_content(App $a)
 				                           . '&sec=' . $sec
 				);
 			} else {
-				$s = HTTPRequest::post($r[0]['poll'], [
+				$s = DI::httpRequest()->post($r[0]['poll'], [
 					'dfrn_id'      => $encrypted_id,
 					'type'         => 'profile-check',
 					'dfrn_version' => DFRN_PROTOCOL_VERSION,

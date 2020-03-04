@@ -27,11 +27,9 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
-use Friendica\Network\HTTPRequest;
 use Friendica\Protocol\DFRN;
 use Friendica\Protocol\Feed;
 use Friendica\Protocol\OStatus;
-use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
 
@@ -324,7 +322,7 @@ function subscribe_to_hub($url, array $importer, array $contact, $hubmode = 'sub
 		DBA::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
 	}
 
-	$postResult = HTTPRequest::post($url, $params);
+	$postResult = DI::httpRequest()->post($url, $params);
 
 	Logger::log('subscribe_to_hub: returns: ' . $postResult->getReturnCode(), Logger::DEBUG);
 
