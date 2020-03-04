@@ -331,7 +331,7 @@ class Network
 		curl_setopt($ch, CURLOPT_NOBODY, 1);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, $a->getUserAgent());
+		curl_setopt($ch, CURLOPT_USERAGENT, DI::httpRequest()->getUserAgent());
 
 		curl_exec($ch);
 		$curl_info = @curl_getinfo($ch);
@@ -375,7 +375,7 @@ class Network
 		curl_setopt($ch, CURLOPT_NOBODY, 0);
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, $a->getUserAgent());
+		curl_setopt($ch, CURLOPT_USERAGENT, DI::httpRequest()->getUserAgent());
 
 		$body = curl_exec($ch);
 		curl_close($ch);

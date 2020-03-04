@@ -241,22 +241,6 @@ class App
 	}
 
 	/**
-	 * Returns the current UserAgent as a String
-	 *
-	 * @return string the UserAgent as a String
-	 * @throws HTTPException\InternalServerErrorException
-	 */
-	public function getUserAgent()
-	{
-		return
-			FRIENDICA_PLATFORM . " '" .
-			FRIENDICA_CODENAME . "' " .
-			FRIENDICA_VERSION . '-' .
-			DB_UPDATE_VERSION . '; ' .
-			$this->baseURL->get();
-	}
-
-	/**
 	 * Returns the current theme name. May be overriden by the mobile theme name.
 	 *
 	 * @return string

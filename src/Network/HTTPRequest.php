@@ -41,14 +41,14 @@ class HTTPRequest
 	/** @var IConfig */
 	private $config;
 	/** @var string */
-	private $userAgent;
+	private $baseUrl;
 
-	public function __construct(LoggerInterface $logger, Profiler $profiler, IConfig $config, App $a)
+	public function __construct(LoggerInterface $logger, Profiler $profiler, IConfig $config, App\BaseURL $baseUrl)
 	{
-		$this->logger    = $logger;
-		$this->profiler  = $profiler;
-		$this->config    = $config;
-		$this->userAgent = $a->getUserAgent();
+		$this->logger   = $logger;
+		$this->profiler = $profiler;
+		$this->config   = $config;
+		$this->baseUrl  = $baseUrl->get();
 	}
 
 	/**
@@ -232,7 +232,7 @@ class HTTPRequest
 		$stamp1 = microtime(true);
 
 		if (Network::isUrlBlocked($url)) {
-			$this->logger->info('Domain is blocked.'. ['url' => $url]);
+			$this->logger->info('Domain is blocked.' . ['url' => $url]);
 			return CurlResult::createErrorCurl($url);
 		}
 
@@ -377,5 +377,20 @@ class HTTPRequest
 			],
 			$redirects
 		);
+	}
+
+	/**
+	 * Returns the current UserAgent as a String
+	 *
+	 * @return string the UserAgent as a String
+	 */
+	public function getUserAgent()
+	{
+		return
+			FRIENDICA_PLATFORM . " '" .
+			FRIENDICA_CODENAME . "' " .
+			FRIENDICA_VERSION . '-' .
+			DB_UPDATE_VERSION . '; ' .
+			$this->baseUrl;
 	}
 }
