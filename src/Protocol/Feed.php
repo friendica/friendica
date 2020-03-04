@@ -29,6 +29,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Network\HTTPRequest;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\XML;
@@ -270,7 +271,7 @@ class Feed {
 
 			$orig_plink = $item["plink"];
 
-			$item["plink"] = Network::finalUrl($item["plink"]);
+			$item["plink"] = HTTPRequest::finalUrl($item["plink"]);
 
 			$item["parent-uri"] = $item["uri"];
 
