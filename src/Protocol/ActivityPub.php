@@ -87,7 +87,7 @@ class ActivityPub
 	 * @return array
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function fetchContent($url, $uid = 0)
+	public static function fetchContent(string $url, int $uid = 0)
 	{
 		if (!empty($uid)) {
 			return HTTPSignature::fetch($url, $uid);
