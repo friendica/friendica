@@ -1,7 +1,24 @@
 
 var jotcache = ''; //The jot cache. We use it as cache to restore old/original jot content
 
+
 $(document).ready(function(){
+        $('.wall-item-body.limitable').each(function(i, el) {
+                var itemId = $(el).attr('id');
+                addHeightToggleHandler(itemId);
+
+		var mutationObserver = new MutationObserver(function(mutations) {
+                	mutations.forEach(function(mutation) {
+                                processHeightLimit(itemId);
+                        });
+                });
+                mutationObserver.observe(el, { attributes: true, characterData: true, childList: true, subtree: true, attributeOldValue: true, characterDataOldValue: true });
+
+		$(el).imagesLoaded().then(function(){
+			processHeightLimit(itemId);
+            });
+	});
+
 	//fade in/out based on scrollTop value
 	var scrollStart;
 
@@ -402,6 +419,40 @@ $(document).ready(function(){
 		});
 	})
 });
+
+
+function addHeightToggleHandler(id) { 
+    var itemIdSel = "#" + id;
+    var itemId = $(itemIdSel).data("item-id");
+    var toggleIdSel = "#wall-item-body-toggle-" + itemId;
+    if (!$(toggleIdSel).hasClass("new")) {
+	return;
+    }
+    $(toggleIdSel).click(function(el) {
+	$(itemIdSel).toggleClass("limit-height");                                 
+	$(this).hide();
+	$(itemIdSel).removeClass("limitable");
+    });
+    $(toggleIdSel).removeClass("new");
+}
+
+function processHeightLimit(id) {
+    if (!$("#" + id).hasClass("limitable")) {
+        return;
+    }
+
+  	$("#" + id).each(function(i, el) {
+                var itemId = $(this).data("item-id");
+                var toggleSelector = "#wall-item-body-toggle-" + itemId;
+                if ($(this).height() < 250) {
+                        $(this).removeClass("limit-height");
+                        $(toggleSelector).hide();
+                } else {
+                        $(this).addClass("limit-height");
+                        $(toggleSelector).show();
+                }
+        });
+}
 
 function openClose(theID) {
 	var elem = document.getElementById(theID);

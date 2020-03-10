@@ -891,6 +891,23 @@ function loadScrollContent() {
 		}
 
 		document.dispatchEvent(new Event('postprocess_liveupdate'));
+
+
+                $('.wall-item-body.limitable').each(function(i, el) {
+                        var itemId = $(el).attr('id');
+                        addHeightToggleHandler(itemId);
+
+			var mutationObserver = new MutationObserver(function(mutations) {
+				mutations.forEach(function(mutation) {
+                                processHeightLimit(itemId);
+			    });
+			});
+			mutationObserver.observe(el, { attributes: true, characterData: true, childList: true, subtree: true, attributeOldValue: true, characterDataOldValue: true });
+                        
+			$(el).imagesLoaded().then(function(){
+                                processHeightLimit(itemId);
+                        });
+                });
 	});
 }
 

@@ -242,7 +242,10 @@ as the value of $top_child_total (this is done at the end of this file)
 			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h4 class="media-heading"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name">{{$item.title}}</a></h4><br /></span>
 			{{/if}}
 
-			<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" id="wall-item-body-{{$item.id}}">{{$item.body nofilter}}</div>
+                	<div class="wall-item-body-wrapper">
+                		<div class="wall-item-body limitable e-content {{if !$item.title}}p-name{{/if}}" id="wall-item-body-{{$item.id}}" data-item-id="{{$item.id}}">{{$item.body nofilter}}</div>
+		           	<div class="wall-item-body-toggle new" data-item-id="{{$item.id}}" id="wall-item-body-toggle-{{$item.id}}" ><span class="wall-item-body-toggle-text">Show more ...</span></div>
+                       </div>
 		</div>
 
 		<!-- TODO -->
