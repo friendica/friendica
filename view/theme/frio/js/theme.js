@@ -6,6 +6,7 @@ $(document).ready(function(){
         $('.wall-item-body.limitable').each(function(i, el) {
                 var itemId = $(el).attr('id');
                 addHeightToggleHandler(itemId);
+		processHeightLimit(itemId);
 
 		var mutationObserver = new MutationObserver(function(mutations) {
                 	mutations.forEach(function(mutation) {
