@@ -15,7 +15,10 @@ $(document).ready(function(){
 
 		var mutationObserver = new MutationObserver(function(mutations) {
                 	mutations.forEach(function(mutation) {
-                                processHeightLimit(itemId);
+                                var limited = processHeightLimit(itemId);
+                                if (limited) {
+					mutationObserver.disconnect()
+                                }
                         });
                 });
                 mutationObserver.observe(el, { attributes: true, characterData: true, childList: true, subtree: true, attributeOldValue: true, characterDataOldValue: true });
@@ -444,21 +447,22 @@ function addHeightToggleHandler(id) {
 }
 
 function processHeightLimit(id) {
-    if (!$("#" + id).hasClass("limitable")) {
-        return;
-    }
+	if (!$("#" + id).hasClass("limitable")) {
+        	return false;
+    	}
 
-  	$("#" + id).each(function(i, el) {
-                var itemId = $(this).data("item-id");
-                var toggleSelector = "#wall-item-body-toggle-" + itemId;
-                if ($(this).height() < 250) {
-                        $(this).removeClass("limit-height");
-                        $(toggleSelector).hide();
-                } else {
-                        $(this).addClass("limit-height");
-                        $(toggleSelector).show();
-                }
-        });
+	var idSel = "#" + id;
+	var itemId = $(idSel).data("item-id");
+        var toggleSelector = "#wall-item-body-toggle-" + itemId;
+        if ($(idSel).height() < 250) {
+                $(idSel).removeClass("limit-height");
+                $(toggleSelector).hide();
+		return false;
+        } else {
+                $(idSel).addClass("limit-height");
+                $(toggleSelector).show();
+		return true;
+        }
 }
 
 function openClose(theID) {

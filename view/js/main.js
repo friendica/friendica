@@ -905,7 +905,10 @@ function loadScrollContent() {
 
 			var mutationObserver = new MutationObserver(function(mutations) {
 				mutations.forEach(function(mutation) {
-                                processHeightLimit(itemId);
+                                	var limited = processHeightLimit(itemId);
+					if (limited) {
+						mutationObserver.disconnect()
+					}
 			    });
 			});
 			mutationObserver.observe(el, { attributes: true, characterData: true, childList: true, subtree: true, attributeOldValue: true, characterDataOldValue: true });
