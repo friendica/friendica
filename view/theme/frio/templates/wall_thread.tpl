@@ -244,7 +244,7 @@ as the value of $top_child_total (this is done at the end of this file)
 
                 	<div class="wall-item-body-wrapper">
                 		<div class="wall-item-body limitable e-content {{if !$item.title}}p-name{{/if}}" id="wall-item-body-{{$item.id}}" data-item-id="{{$item.id}}">{{$item.body nofilter}}</div>
-		           	<div class="wall-item-body-toggle new" data-item-id="{{$item.id}}" id="wall-item-body-toggle-{{$item.id}}" ><span class="wall-item-body-toggle-text">Show more ...</span></div>
+		           	<div class="wall-item-body-toggle new" data-item-id="{{$item.id}}" id="wall-item-body-toggle-{{$item.id}}" ><a href="javascript:void(0)" class="wall-item-body-toggle-text">Show more ...</a></div>
                        </div>
 		</div>
 
