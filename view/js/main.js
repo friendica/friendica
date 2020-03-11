@@ -894,6 +894,11 @@ function loadScrollContent() {
 
 
                 $('.wall-item-body.limitable').each(function(i, el) {
+			if($(el).has('button.content-filter-button').length > 0) {
+				$(el).removeClass('limitable');
+				return;
+			}
+
                         var itemId = $(el).attr('id');
                         addHeightToggleHandler(itemId);
 			processHeightLimit(itemId);

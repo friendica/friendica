@@ -1781,6 +1781,7 @@ aside .panel-body {
     bottom: 0;
     z-index: 11;
     left: 0;
+    display: none;
 }
 .wall-item-body-toggle-text {
     width: 100%;

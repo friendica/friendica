@@ -4,6 +4,11 @@ var jotcache = ''; //The jot cache. We use it as cache to restore old/original j
 
 $(document).ready(function(){
         $('.wall-item-body.limitable').each(function(i, el) {
+		 if ($(el).has('button.content-filter-button').length > 0) {
+			 $(el).removeClass('limitable');
+			 return;
+		 }
+
                 var itemId = $(el).attr('id');
                 addHeightToggleHandler(itemId);
 		processHeightLimit(itemId);
@@ -429,6 +434,7 @@ function addHeightToggleHandler(id) {
     if (!$(toggleIdSel).hasClass("new")) {
 	return;
     }
+    $(toggleIdSel).show();
     $(toggleIdSel).click(function(el) {
 	$(itemIdSel).toggleClass("limit-height");                                 
 	$(this).hide();
