@@ -1885,7 +1885,8 @@ class Item
 			$item['allow_cid'],
 			$item['allow_gid'],
 			$item['deny_cid'],
-			$item['deny_gid']
+			$item['deny_gid'],
+			false
 		);
 
 		$item['allow_cid'] = null;
@@ -2767,7 +2768,8 @@ class Item
 			$user['allow_cid'],
 			$user['allow_gid'],
 			$user['deny_cid'],
-			$user['deny_gid']
+			$user['deny_gid'],
+			false
 		);
 
 		$forum_mode = ($prvgroup ? 2 : 1);

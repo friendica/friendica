@@ -229,7 +229,8 @@ class PostUpdate
 					$item['allow_cid'],
 					$item['allow_gid'],
 					$item['deny_cid'],
-					$item['deny_gid']
+					$item['deny_gid'],
+					false
 				);
 			}
 

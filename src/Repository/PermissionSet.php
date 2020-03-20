@@ -110,10 +110,11 @@ class PermissionSet extends BaseRepository
 	 * Fetch the id of a given permission set. Generate a new one when needed
 	 *
 	 * @param int         $uid
-	 * @param string|null $allow_cid Allowed contact IDs    - empty = everyone
-	 * @param string|null $allow_gid Allowed group IDs      - empty = everyone
-	 * @param string|null $deny_cid  Disallowed contact IDs - empty = no one
-	 * @param string|null $deny_gid  Disallowed group IDs   - empty = no one
+	 * @param string|null $allow_cid       Allowed contact IDs    - empty = everyone
+	 * @param string|null $allow_gid       Allowed group IDs      - empty = everyone
+	 * @param string|null $deny_cid        Disallowed contact IDs - empty = no one
+	 * @param string|null $deny_gid        Disallowed group IDs   - empty = no one
+	 * @param bool        $public_constant Return the "self::PUBLIC" constant for public ACL
 	 * @return int id
 	 * @throws \Exception
 	 */
@@ -122,7 +123,8 @@ class PermissionSet extends BaseRepository
 		string $allow_cid = null,
 		string $allow_gid = null,
 		string $deny_cid = null,
-		string $deny_gid = null
+		string $deny_gid = null,
+		bool $public_constant = true
 	) {
 		$allow_cid = $this->aclFormatter->sanitize($allow_cid);
 		$allow_gid = $this->aclFormatter->sanitize($allow_gid);
@@ -130,7 +132,7 @@ class PermissionSet extends BaseRepository
 		$deny_gid = $this->aclFormatter->sanitize($deny_gid);
 
 		// Public permission
-		if (!$allow_cid && !$allow_gid && !$deny_cid && !$deny_gid) {
+		if ($public_constant && !$allow_cid && !$allow_gid && !$deny_cid && !$deny_gid) {
 			return self::PUBLIC;
 		}
 
