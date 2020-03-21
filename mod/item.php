@@ -244,10 +244,10 @@ function item_post(App $a) {
 	$body = preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', $body);
 
 	if (!empty($orig_post)) {
-		$str_group_allow   = $orig_post['allow_gid'] ?? '';
-		$str_contact_allow = $orig_post['allow_cid'] ?? '';
-		$str_group_deny    = $orig_post['deny_gid']  ?? '';
-		$str_contact_deny  = $orig_post['deny_cid']  ?? '';
+		$str_group_allow   = $orig_post['allow_gid'];
+		$str_contact_allow = $orig_post['allow_cid'];
+		$str_group_deny    = $orig_post['deny_gid'];
+		$str_contact_deny  = $orig_post['deny_cid'];
 		$location          = $orig_post['location'];
 		$coord             = $orig_post['coord'];
 		$verb              = $orig_post['verb'];
@@ -264,10 +264,10 @@ function item_post(App $a) {
 	} else {
 		$aclFormatter = DI::aclFormatter();
 
-		$str_group_allow   = isset($_REQUEST['group_allow'])   ? $aclFormatter->toString($_REQUEST['group_allow'])    : $user['allow_gid'] ?? '';
-		$str_contact_allow = isset($_REQUEST['contact_allow']) ? $aclFormatter->toString($_REQUEST['contact__allow']) : $user['allow_cid'] ?? '';
-		$str_group_deny    = isset($_REQUEST['group_deny'])    ? $aclFormatter->toString($_REQUEST['group_deny'])     : $user['deny_gid']  ?? '';
-		$str_contact_deny  = isset($_REQUEST['contact_deny'])  ? $aclFormatter->toString($_REQUEST['contact_deny'])   : $user['deny_cid']  ?? '';
+		$str_group_allow   = isset($_REQUEST['group_allow'])   ? $aclFormatter->toString($_REQUEST['group_allow'])    : $user['allow_gid'];
+		$str_contact_allow = isset($_REQUEST['contact_allow']) ? $aclFormatter->toString($_REQUEST['contact__allow']) : $user['allow_cid'];
+		$str_group_deny    = isset($_REQUEST['group_deny'])    ? $aclFormatter->toString($_REQUEST['group_deny'])     : $user['deny_gid'];
+		$str_contact_deny  = isset($_REQUEST['contact_deny'])  ? $aclFormatter->toString($_REQUEST['contact_deny'])   : $user['deny_cid'];
 
 		$title             = Strings::escapeTags(trim($_REQUEST['title']    ?? ''));
 		$location          = Strings::escapeTags(trim($_REQUEST['location'] ?? ''));
@@ -298,10 +298,10 @@ function item_post(App $a) {
 				$network = $toplevel_item['network'];
 			}
 
-			$str_contact_allow = $toplevel_item['allow_cid'] ?? '';
-			$str_group_allow   = $toplevel_item['allow_gid'] ?? '';
-			$str_contact_deny  = $toplevel_item['deny_cid'] ?? '';
-			$str_group_deny    = $toplevel_item['deny_gid'] ?? '';
+			$str_contact_allow = $toplevel_item['allow_cid'];
+			$str_group_allow   = $toplevel_item['allow_gid'];
+			$str_contact_deny  = $toplevel_item['deny_cid'];
+			$str_group_deny    = $toplevel_item['deny_gid'];
 			$private           = $toplevel_item['private'];
 
 			$wall              = $toplevel_item['wall'];
