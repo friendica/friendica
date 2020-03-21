@@ -93,7 +93,12 @@ class Photo extends BaseModule
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
 
-		$cacheable = ($photo["allow_cid"] . $photo["allow_gid"] . $photo["deny_cid"] . $photo["deny_gid"] === "") && (isset($photo["cacheable"]) ? $photo["cacheable"] : true);
+		$cacheable =
+			empty($photo['allow_cid']) &&
+			empty($photo['allow_gid']) &&
+			empty($photo['deny_cid']) &&
+			empty($photo['deny_gid']) &&
+			($photo['cacheable'] ?? true);
 
 		$img = MPhoto::getImageForPhoto($photo);
 
