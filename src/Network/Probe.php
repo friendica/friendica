@@ -614,7 +614,7 @@ class Probe
 				$host .= ':'.$parts["port"];
 			}
 
-			if ($host == 'twitter.com') {
+			if ($host == 'twitter.com' || $host == 'mobile.twitter.com') {
 				return self::twitter($uri);
 			}
 			$lrdd = self::hostMeta($host);
@@ -1706,7 +1706,7 @@ class Probe
 	{
 		if (preg_match('=(.*)@twitter.com=i', $uri, $matches)) {
 			$nick = $matches[1];
-		} elseif (preg_match('=https?://twitter.com/(.*)=i', $uri, $matches)) {
+		} elseif (preg_match('=https?://(?:mobile.)?twitter.com/(.*)=i', $uri, $matches)) {
 			$nick = $matches[1];
 		} else {
 			return [];
