@@ -1706,7 +1706,7 @@ class Probe
 	{
 		if (preg_match('=(.*)@twitter.com=i', $uri, $matches)) {
 			$nick = $matches[1];
-		} elseif (preg_match('=https?://(?:mobile.)?twitter.com/(.*)=i', $uri, $matches)) {
+		} elseif (preg_match('=https?://(?:mobile\.)?twitter.com/(.*)=i', $uri, $matches)) {
 			$nick = $matches[1];
 		} else {
 			return [];
