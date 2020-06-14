@@ -329,6 +329,13 @@ class Probe
 	 */
 	public static function uri($uri, $network = '', $uid = -1, $cache = true)
 	{
+		// Accept the mobile twitter address as well
+		if (!parse_url($uri, PHP_URL_SCHEME)) {
+			$uri = str_replace('@mobile.twitter.com', '@twitter.com', $uri);
+		} else {
+			$uri = str_replace('://mobile.twitter.com', '://twitter.com', $uri);
+		}
+
 		$cachekey = 'Probe::uri:' . $network . ':' . $uri;
 		if ($cache) {
 			$result = DI::cache()->get($cachekey);
