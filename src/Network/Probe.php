@@ -691,9 +691,19 @@ class Probe
 
 		$parts = parse_url($uri);
 
+		$curlResult = null;
 		if (!empty($parts['scheme']) && !empty($parts['host'])) {
 			if ($parts['host'] == 'twitter.com') {
 				return self::twitter($uri);
+			}
+
+			$curlResult = Network::curl($uri);
+			if (
+				$curlResult->isSuccess() &&
+				(Strings::startsWith($curlResult->getContentType(), 'application/rss+xml')
+				|| Strings::startsWith($curlResult->getContentType(), 'application/atom+xml'))
+			) {
+				return self::feed($uri, $curlResult, false);
 			}
 		} elseif (strstr($uri, '@')) {
 			// If the URI starts with "mailto:" then jump directly to the mail detection
@@ -719,7 +729,7 @@ class Probe
 		$data = self::getWebfingerArray($uri);
 		if (empty($data)) {
 			if (!empty($parts['scheme'])) {
-				return self::feed($uri);
+				return self::feed($uri, $curlResult ?? Network::curl($uri));
 			} elseif (!empty($uid)) {
 				return self::mail($uri, $uid);
 			} else {
@@ -750,7 +760,7 @@ class Probe
 			$result = self::pumpio($webfinger, $addr);
 		}
 		if ((!$result && ($network == "")) || ($network == Protocol::FEED)) {
-			$result = self::feed($uri);
+			$result = self::feed($uri, $curlResult ?? Network::curl($uri));
 		} else {
 			// We overwrite the detected nick with our try if the previois routines hadn't detected it.
 			// Additionally it is overwritten when the nickname doesn't make sense (contains spaces).
@@ -1825,19 +1835,20 @@ class Probe
 	/**
 	 * Check for feed contact
 	 *
-	 * @param string  $url   Profile link
-	 * @param boolean $probe Do a probe if the page contains a feed link
+	 * @param string     $url        Profile link
+	 * @param CurlResult $curlResult The Curl result of the provided URL
+	 * @param boolean    $probe      If the feed import fails, probe for a feed link in the page body
 	 *
 	 * @return array feed data
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private static function feed($url, $probe = true)
+	private static function feed(string $url, CurlResult $curlResult, $probe = true)
 	{
-		$curlResult = Network::curl($url);
 		if ($curlResult->isTimeout()) {
 			self::$istimeout = true;
 			return [];
 		}
+
 		$feed = $curlResult->getBody();
 		$feed_data = Feed::import($feed);
 
@@ -1852,7 +1863,8 @@ class Probe
 				return [];
 			}
 
-			return self::feed($feed_url, false);
+			$curlResult = Network::curl($feed_url);
+			return self::feed($feed_url, $curlResult, false);
 		}
 
 		if (!empty($feed_data["header"]["author-name"])) {
