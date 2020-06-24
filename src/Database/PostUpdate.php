@@ -893,7 +893,7 @@ class PostUpdate
 	}
 
 	/**
-	 * update the "gsid" (global server id) field in the contact table 
+	 * update the "gsid" (global server id) field in the contact table
 	 *
 	 * @return bool "true" when the job is done
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -925,7 +925,7 @@ class PostUpdate
 			$id = $contact['id'];
 
 			DBA::update('contact',
-				['gsid' => GServer::getID($contact['baseurl']), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
+				['gsid' => GServer::getID($contact['baseurl'], true), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
 				['id' => $contact['id']]);
 
 			++$rows;
@@ -946,7 +946,7 @@ class PostUpdate
 	}
 
 	/**
-	 * update the "gsid" (global server id) field in the apcontact table 
+	 * update the "gsid" (global server id) field in the apcontact table
 	 *
 	 * @return bool "true" when the job is done
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -959,7 +959,7 @@ class PostUpdate
 			return true;
 		}
 
-		$id = DI::config()->get("system", "post_update_version_1349_id", 0);
+		$id = DI::config()->get("system", "post_update_version_1349_id", '');
 
 		Logger::info('Start', ['apcontact' => $id]);
 
@@ -978,7 +978,7 @@ class PostUpdate
 			$id = $apcontact['url'];
 
 			DBA::update('apcontact',
-				['gsid' => GServer::getID($apcontact['baseurl']), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
+				['gsid' => GServer::getID($apcontact['baseurl'], true), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
 				['url' => $apcontact['url']]);
 
 			++$rows;
@@ -999,7 +999,7 @@ class PostUpdate
 	}
 
 	/**
-	 * update the "gsid" (global server id) field in the gcontact table 
+	 * update the "gsid" (global server id) field in the gcontact table
 	 *
 	 * @return bool "true" when the job is done
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -1031,7 +1031,7 @@ class PostUpdate
 			$id = $gcontact['id'];
 
 			DBA::update('gcontact',
-				['gsid' => GServer::getID($gcontact['server_url']), 'server_url' => GServer::cleanURL($gcontact['server_url'])],
+				['gsid' => GServer::getID($gcontact['server_url'], true), 'server_url' => GServer::cleanURL($gcontact['server_url'])],
 				['id' => $gcontact['id']]);
 
 			++$rows;

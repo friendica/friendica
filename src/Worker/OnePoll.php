@@ -207,7 +207,7 @@ class OnePoll
 							continue;
 						}
 
-						subscribe_to_hub($h, $importer, $contact, $hubmode);
+						self::subscribeToHub($h, $importer, $contact, $hubmode);
 					}
 				}
 			}
@@ -703,5 +703,57 @@ class OnePoll
 
 		Logger::log("Mail: closing connection for ".$mailconf['user']);
 		imap_close($mbox);
+	}
+
+
+	/**
+	 * @param string $url
+	 * @param array  $importer
+	 * @param array  $contact
+	 * @param string $hubmode
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	private static function subscribeToHub(string $url, array $importer, array $contact, $hubmode = 'subscribe')
+	{
+		/*
+		 * Diaspora has different message-ids in feeds than they do
+		 * through the direct Diaspora protocol. If we try and use
+		 * the feed, we'll get duplicates. So don't.
+		 */
+		if ($contact['network'] === Protocol::DIASPORA) {
+			return;
+		}
+
+		// Without an importer we don't have a user id - so we quit
+		if (empty($importer)) {
+			return;
+		}
+
+		$user = DBA::selectFirst('user', ['nickname'], ['uid' => $importer['uid']]);
+
+		// No user, no nickname, we quit
+		if (!DBA::isResult($user)) {
+			return;
+		}
+
+		$push_url = DI::baseUrl() . '/pubsub/' . $user['nickname'] . '/' . $contact['id'];
+
+		// Use a single verify token, even if multiple hubs
+		$verify_token = ((strlen($contact['hub-verify'])) ? $contact['hub-verify'] : Strings::getRandomHex());
+
+		$params = 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode($contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
+
+		Logger::log('subscribe_to_hub: ' . $hubmode . ' ' . $contact['name'] . ' to hub ' . $url . ' endpoint: ' . $push_url . ' with verifier ' . $verify_token);
+
+		if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
+			DBA::update('contact', ['hub-verify' => $verify_token], ['id' => $contact['id']]);
+		}
+
+		$postResult = Network::post($url, $params);
+
+		Logger::log('subscribe_to_hub: returns: ' . $postResult->getReturnCode(), Logger::DEBUG);
+
+		return;
+
 	}
 }

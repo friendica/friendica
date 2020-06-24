@@ -190,6 +190,10 @@ function redir_check_url(string $contact_url, string $url)
 	}
 
 	$url_host = parse_url($url, PHP_URL_HOST);
+	if (empty($url_host)) {
+		$url_host = parse_url(DI::baseUrl(), PHP_URL_HOST);
+	}
+
 	$contact_url_host = parse_url($contact_url, PHP_URL_HOST);
 
 	if ($url_host == $contact_url_host) {

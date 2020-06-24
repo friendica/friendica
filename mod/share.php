@@ -20,6 +20,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 
@@ -42,7 +43,7 @@ function share_init(App $a) {
 		$pos = strpos($item['body'], "[share");
 		$o = substr($item['body'], $pos);
 	} else {
-		$o = share_header($item['author-name'], $item['author-link'], $item['author-avatar'], $item['guid'], $item['created'], $item['plink']);
+		$o = BBCode::getShareOpeningTag($item['author-name'], $item['author-link'], $item['author-avatar'], $item['plink'], $item['created'], $item['guid']);
 
 		if ($item['title']) {
 			$o .= '[h3]'.$item['title'].'[/h3]'."\n";
@@ -54,23 +55,4 @@ function share_init(App $a) {
 
 	echo $o;
 	exit();
-}
-
-/// @TODO Rewrite to handle over whole record array
-function share_header($author, $profile, $avatar, $guid, $posted, $link) {
-	$header = "[share author='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $author).
-		"' profile='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $profile).
-		"' avatar='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $avatar);
-
-	if ($guid) {
-		$header .= "' guid='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $guid);
-	}
-
-	if ($posted) {
-		$header .= "' posted='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $posted);
-	}
-
-	$header .= "' link='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $link)."']";
-
-	return $header;
 }

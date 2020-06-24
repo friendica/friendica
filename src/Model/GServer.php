@@ -1627,15 +1627,18 @@ class GServer
 		}
 
 		// Discover federated servers
-		$curlResult = Network::fetchUrl("http://the-federation.info/pods.json");
-
-		if (!empty($curlResult)) {
-			$servers = json_decode($curlResult, true);
-
-			if (!empty($servers['pods'])) {
-				foreach ($servers['pods'] as $server) {
-					// Using "only_nodeinfo" since servers that are listed on that page should always have it.
-					Worker::add(PRIORITY_LOW, 'UpdateGServer', 'https://' . $server['host'], true);
+		$protocols = ['activitypub', 'diaspora', 'dfrn', 'ostatus'];
+		foreach ($protocols as $protocol) {
+			$query = '{nodes(protocol:"' . $protocol . '"){host}}';
+			$curlResult = Network::fetchUrl('https://the-federation.info/graphql?query=' . urlencode($query));
+			if (!empty($curlResult)) {
+				$data = json_decode($curlResult, true);
+				if (!empty($data['data']['nodes'])) {
+					foreach ($data['data']['nodes'] as $server) {
+						// Using "only_nodeinfo" since servers that are listed on that page should always have it.
+						echo $server['host']."\n";
+						Worker::add(PRIORITY_LOW, 'UpdateGServer', 'https://' . $server['host'], true);
+					}
 				}
 			}
 		}

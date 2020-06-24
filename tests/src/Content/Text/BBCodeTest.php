@@ -236,7 +236,15 @@ class BBCodeTest extends MockedTest
 			'bug-7808-code-amp' => [
 				'expectedHtml' => '<code>&amp;</code>',
 				'text' => '[code]&[/code]',
-			]
+			],
+			'task-8800-pre-spaces-notag' => [
+				'expectedHtml' => '[test] Space',
+				'text' => '[test] Space',
+			],
+			'task-8800-pre-spaces' => [
+				'expectedHtml' => '&nbsp;&nbsp;&nbsp;&nbsp;Spaces',
+				'text' => '[pre]    Spaces[/pre]',
+			],
 		];
 	}
 

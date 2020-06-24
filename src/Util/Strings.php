@@ -379,6 +379,7 @@ class Strings
 	/**
 	 * Check if the first string starts with the second
 	 *
+	 * @see http://maettig.com/code/php/php-performance-benchmarks.php#startswith
 	 * @param string $string
 	 * @param string $start
 	 * @return bool
@@ -386,6 +387,21 @@ class Strings
 	public static function startsWith(string $string, string $start)
 	{
 		$return = substr_compare($string, $start, 0, strlen($start)) === 0;
+
+		return $return;
+	}
+
+	/**
+	 * Checks if the first string ends with the second
+	 *
+	 * @see http://maettig.com/code/php/php-performance-benchmarks.php#endswith
+	 * @param string $string
+	 * @param string $end
+	 * @return bool
+	 */
+	public static function endsWith(string $string, string $end)
+	{
+		$return = substr_compare($string, $end, -strlen($end)) === 0;
 
 		return $return;
 	}

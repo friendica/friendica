@@ -760,7 +760,11 @@ function conversation_fetch_comments($thread_items, $pinned) {
  * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function conversation_add_children(array $parents, $block_authors, $order, $uid) {
-	$max_comments = DI::config()->get('system', 'max_comments', 100);
+	if (count($parents) > 1) {
+		$max_comments = DI::config()->get('system', 'max_comments', 100);
+	} else {
+		$max_comments = DI::config()->get('system', 'max_display_comments', 1000);
+	}
 
 	$params = ['order' => ['uid', 'commented' => true]];
 

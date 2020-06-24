@@ -843,6 +843,7 @@ class Contact
 			// create an unfollow slap
 			$item = [];
 			$item['verb'] = Activity::O_UNFOLLOW;
+			$item['gravity'] = GRAVITY_ACTIVITY;
 			$item['follow'] = $contact["url"];
 			$item['body'] = '';
 			$item['title'] = '';
@@ -2470,6 +2471,7 @@ class Contact
 				// create a follow slap
 				$item = [];
 				$item['verb'] = Activity::FOLLOW;
+				$item['gravity'] = GRAVITY_ACTIVITY;
 				$item['follow'] = $contact["url"];
 				$item['body'] = '';
 				$item['title'] = '';

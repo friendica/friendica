@@ -22,6 +22,7 @@
 namespace Friendica\Module\Debug;
 
 use Friendica\BaseModule;
+use Friendica\Content\PageInfo;
 use Friendica\Content\Text;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -112,6 +113,21 @@ class Babel extends BaseModule
 					$results[] = [
 						'title'   => DI::l10n()->t('Item Tags'),
 						'content' => visible_whitespace(var_export($tags, true)),
+					];
+
+					$body2 = PageInfo::appendToBody($bbcode, true);
+					$results[] = [
+						'title'   => DI::l10n()->t('PageInfo::appendToBody'),
+						'content' => visible_whitespace($body2)
+					];
+					$html3 = Text\BBCode::convert($body2);
+					$results[] = [
+						'title'   => DI::l10n()->t('PageInfo::appendToBody => BBCode::convert (raw HTML)'),
+						'content' => visible_whitespace($html3)
+					];
+					$results[] = [
+						'title'   => DI::l10n()->t('PageInfo::appendToBody => BBCode::convert'),
+						'content' => $html3
 					];
 					break;
 				case 'diaspora':

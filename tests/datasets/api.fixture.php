@@ -192,6 +192,8 @@ return [
 			'allow_gid'   => '',
 			'deny_cid'    => '',
 			'deny_gid'    => '',
+			'guid'        => '1',
+			'plink'       => 'http://localhost/display/1',
 		],
 		[
 			'id'          => 2,
@@ -209,6 +211,8 @@ return [
 			'wall'        => 1,
 			'starred'     => 0,
 			'origin'      => 1,
+			'guid'        => '2',
+			'plink'       => 'http://localhost/display/2',
 		],
 		[
 
@@ -227,6 +231,8 @@ return [
 			'wall'        => 1,
 			'starred'     => 0,
 			'origin'      => 1,
+			'guid'        => '3',
+			'plink'       => 'http://localhost/display/3',
 		],
 		[
 			'id'          => 4,
@@ -244,6 +250,8 @@ return [
 			'wall'        => 1,
 			'starred'     => 0,
 			'origin'      => 1,
+			'guid'        => '4',
+			'plink'       => 'http://localhost/display/4',
 		],
 		[
 
@@ -266,6 +274,8 @@ return [
 			'allow_gid'   => '',
 			'deny_cid'    => '',
 			'deny_gid'    => '',
+			'guid'        => '5',
+			'plink'       => 'http://localhost/display/5',
 		],
 		[
 			'id'          => 6,
@@ -283,6 +293,8 @@ return [
 			'wall'        => 1,
 			'starred'     => 0,
 			'origin'      => 1,
+			'guid'        => '6',
+			'plink'       => 'http://localhost/display/6',
 		],
 	],
 	'notify' => [

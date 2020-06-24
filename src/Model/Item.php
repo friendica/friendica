@@ -3490,9 +3490,7 @@ class Item
 	 */
 	public static function getPlink($item)
 	{
-		$a = DI::app();
-
-		if ($a->user['nickname'] != "") {
+		if (local_user()) {
 			$ret = [
 				'href' => "display/" . $item['guid'],
 				'orig' => "display/" . $item['guid'],
@@ -3504,7 +3502,6 @@ class Item
 				$ret["href"] = DI::baseUrl()->remove($item['plink']);
 				$ret["title"] = DI::l10n()->t('link to source');
 			}
-
 		} elseif (!empty($item['plink']) && ($item['private'] != self::PRIVATE)) {
 			$ret = [
 				'href' => $item['plink'],

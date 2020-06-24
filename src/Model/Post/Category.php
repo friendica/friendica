@@ -73,15 +73,13 @@ class Category
 	public static function storeTextByURIId(int $uri_id, int $uid, string $files)
 	{
 		$message = Item::selectFirst(['deleted'], ['uri-id' => $uri_id, 'uid' => $uid]);
-		if (!DBA::isResult($message)) {
-			return;
-		}
+		if (DBA::isResult($message)) {
+			// Clean up all tags
+			DBA::delete('post-category', ['uri-id' => $uri_id, 'uid' => $uid]);
 
-		// Clean up all tags
-		DBA::delete('post-category', ['uri-id' => $uri_id, 'uid' => $uid]);
-
-		if ($message['deleted']) {
-			return;
+			if ($message['deleted']) {
+				return;
+			}
 		}
 
 		if (preg_match_all("/\[(.*?)\]/ism", $files, $result)) {

@@ -37,7 +37,67 @@ use Friendica\Util\XML;
 /**
  * This class contain functions to import feeds (RSS/RDF/Atom)
  */
-class Feed {
+class Feed
+{
+	/**
+	 * consume - process atom feed and update anything/everything we might need to update
+	 *
+	 * $xml = the (atom) feed to consume - RSS isn't as fully supported but may work for simple feeds.
+	 *
+	 * $importer = the contact_record (joined to user_record) of the local user who owns this relationship.
+	 *             It is this person's stuff that is going to be updated.
+	 * $contact =  the person who is sending us stuff. If not set, we MAY be processing a "follow" activity
+	 *             from an external network and MAY create an appropriate contact record. Otherwise, we MUST
+	 *             have a contact record.
+	 * $hub = should we find a hub declation in the feed, pass it back to our calling process, who might (or
+	 *        might not) try and subscribe to it.
+	 * $datedir sorts in reverse order
+	 * $pass - by default ($pass = 0) we cannot guarantee that a parent item has been
+	 *      imported prior to its children being seen in the stream unless we are certain
+	 *      of how the feed is arranged/ordered.
+	 * With $pass = 1, we only pull parent items out of the stream.
+	 * With $pass = 2, we only pull children (comments/likes).
+	 *
+	 * So running this twice, first with pass 1 and then with pass 2 will do the right
+	 * thing regardless of feed ordering. This won't be adequate in a fully-threaded
+	 * model where comments can have sub-threads. That would require some massive sorting
+	 * to get all the feed items into a mostly linear ordering, and might still require
+	 * recursion.
+	 *
+	 * @param       $xml
+	 * @param array $importer
+	 * @param array $contact
+	 * @param       $hub
+	 * @throws ImagickException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function consume($xml, array $importer, array $contact, &$hub)
+	{
+		if ($contact['network'] === Protocol::OSTATUS) {
+			Logger::info('Consume OStatus messages');
+			OStatus::import($xml, $importer, $contact, $hub);
+
+			return;
+		}
+
+		if ($contact['network'] === Protocol::FEED) {
+			Logger::info('Consume feeds');
+			self::import($xml, $importer, $contact);
+
+			return;
+		}
+
+		if ($contact['network'] === Protocol::DFRN) {
+			Logger::info('Consume DFRN messages');
+			$dfrn_importer = DFRN::getImporter($contact['id'], $importer['uid']);
+			if (!empty($dfrn_importer)) {
+				Logger::info('Now import the DFRN feed');
+				DFRN::import($xml, $dfrn_importer, true);
+				return;
+			}
+		}
+	}
+
 	/**
 	 * Read a RSS/RDF/Atom feed and create an item entry for it
 	 *
@@ -468,7 +528,7 @@ class Feed {
 
 				// We always strip the title since it will be added in the page information
 				$item["title"] = "";
-				$item["body"] = $item["body"] . add_page_info($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_denylist"]);
+				$item["body"] = $item["body"] . add_page_info($item["plink"], false, $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_denylist"] ?? '');
 				$taglist = get_page_keywords($item["plink"], $preview, ($contact["fetch_further_information"] == 2), $contact["ffi_keyword_denylist"]);
 				$item["object-type"] = Activity\ObjectType::BOOKMARK;
 				unset($item["attach"]);

@@ -92,6 +92,9 @@
 		}
 	},
 	"config": {
+		"platform": {
+			"php": "7.0"
+		},
 		"autoloader-suffix": "Friendica",
 		"optimize-autoloader": true,
 		"preferred-install": "dist",

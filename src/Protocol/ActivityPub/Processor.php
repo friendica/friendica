@@ -989,7 +989,7 @@ class Processor
 		$parent_author = Contact::getDetailsByURL($parent['author-link'], 0);
 
 		$implicit_mentions = [];
-		if (empty($parent_author)) {
+		if (empty($parent_author['url'])) {
 			Logger::notice('Author public contact unknown.', ['author-link' => $parent['author-link'], 'item-id' => $parent['id']]);
 		} else {
 			$implicit_mentions[] = $parent_author['url'];
@@ -1003,7 +1003,7 @@ class Processor
 
 		foreach ($parent_terms as $term) {
 			$contact = Contact::getDetailsByURL($term['url'], 0);
-			if (!empty($contact)) {
+			if (!empty($contact['url'])) {
 				$implicit_mentions[] = $contact['url'];
 				$implicit_mentions[] = $contact['nurl'];
 				$implicit_mentions[] = $contact['alias'];

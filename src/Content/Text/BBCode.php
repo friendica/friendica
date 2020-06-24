@@ -978,7 +978,7 @@ class BBCode
 			function ($match) use ($callback) {
 				$attribute_string = $match[2];
 				$attributes = [];
-				foreach (['author', 'profile', 'avatar', 'link', 'posted'] as $field) {
+				foreach (['author', 'profile', 'avatar', 'link', 'posted', 'guid'] as $field) {
 					preg_match("/$field=(['\"])(.+?)\\1/ism", $attribute_string, $matches);
 					$attributes[$field] = html_entity_decode($matches[2] ?? '', ENT_QUOTES, 'UTF-8');
 				}
@@ -1088,6 +1088,7 @@ class BBCode
 					'$link'         => $attributes['link'],
 					'$link_title'   => DI::l10n()->t('link to source'),
 					'$posted'       => $attributes['posted'],
+					'$guid'         => $attributes['guid'],
 					'$network_name' => ContactSelector::networkToName($contact['network'], $attributes['profile']),
 					'$network_icon' => ContactSelector::networkToIcon($contact['network'], $attributes['profile']),
 					'$content'      => self::setMentions(trim($content), 0, $contact['network']),
@@ -1299,9 +1300,9 @@ class BBCode
 				// Remove the abstract element. It is a non visible element.
 				$text = self::stripAbstract($text);
 
-				// Move all spaces out of the tags
-				$text = preg_replace("/\[(\w*)\](\s*)/ism", '$2[$1]', $text);
-				$text = preg_replace("/(\s*)\[\/(\w*)\]/ism", '[/$2]$1', $text);
+				// Move new lines outside of tags
+				$text = preg_replace("#\[(\w*)](\n*)#ism", '$2[$1]', $text);
+				$text = preg_replace("#(\n*)\[/(\w*)]#ism", '[/$2]$1', $text);
 
 				// Extract the private images which use data urls since preg has issues with
 				// large data sizes. Stash them away while we do bbcode conversion, and then put them back
@@ -1878,7 +1879,11 @@ class BBCode
 			// Remove escaping tags
 			$text = preg_replace("/\[noparse\](.*?)\[\/noparse\]/ism", '\1', $text);
 			$text = preg_replace("/\[nobb\](.*?)\[\/nobb\]/ism", '\1', $text);
-			$text = preg_replace("/\[pre\](.*?)\[\/pre\]/ism", '\1', $text);
+
+			// Additionally, [pre] tags preserve spaces
+			$text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", function ($match) {
+				return str_replace(' ', '&nbsp;', $match[1]);
+			}, $text);
 
 			return $text;
 		}); // Escaped code
@@ -2188,7 +2193,7 @@ class BBCode
 	 */
 	public static function setMentions($body, $profile_uid = 0, $network = '')
 	{
-		BBCode::performWithEscapedTags($body, ['noparse', 'pre', 'code'], function ($body) use ($profile_uid, $network) {
+		BBCode::performWithEscapedTags($body, ['noparse', 'pre', 'code', 'img'], function ($body) use ($profile_uid, $network) {
 			$tags = BBCode::getTags($body);
 
 			$tagged = [];
@@ -2211,7 +2216,7 @@ class BBCode
 					}
 				}
 
-			$success = Item::replaceTag($body, $inform, $profile_uid, $tag, $network);
+				$success = Item::replaceTag($body, $inform, $profile_uid, $tag, $network);
 
 				if ($success['replaced']) {
 					$tagged[] = $tag;
@@ -2222,5 +2227,32 @@ class BBCode
 		});
 
 		return $body;
+	}
+
+	/**
+	 * @param string      $author  Author display name
+	 * @param string      $profile Author profile URL
+	 * @param string      $avatar  Author profile picture URL
+	 * @param string      $link    Post source URL
+	 * @param string      $posted  Post created date
+	 * @param string|null $guid    Post guid (if any)
+	 * @return string
+	 * @TODO Rewrite to handle over whole record array
+	 */
+	public static function getShareOpeningTag(string $author, string $profile, string $avatar, string $link, string $posted, string $guid = null)
+	{
+		$header = "[share author='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $author) .
+			"' profile='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $profile) .
+			"' avatar='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $avatar) .
+			"' link='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $link) .
+			"' posted='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $posted);
+
+		if ($guid) {
+			$header .= "' guid='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $guid);
+		}
+
+		$header  .= "']";
+
+		return $header;
 	}
 }

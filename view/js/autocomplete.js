@@ -197,6 +197,38 @@ function string2bb(element) {
  * jQuery plugin 'editor_autocomplete'
  */
 (function( $ ) {
+	/**
+	 * This function should be called immediately after $.textcomplete() to prevent the escape key press to propagate
+	 * after the autocompletion dropdown has closed.
+	 * This avoids the input textarea to lose focus, the modal window to close, etc... when the expected behavior is
+	 * to just close the autocomplete dropdown.
+	 *
+	 * The custom event listener name allows removing this specific event listener, the "real" event this listens to
+	 * is the part before the first dot.
+	 *
+	 * @returns {*}
+	 */
+	$.fn.fixTextcompleteEscape = function () {
+		if (this.data('textcompleteEscapeFixed')) {
+			return this;
+		}
+
+		this.data('textcompleteEscapeFixed', true);
+
+		return this.on({
+			'textComplete:show': function (e) {
+				$(this).on('keydown.friendica.escape', function (e) {
+					if (e.key === 'Escape') {
+						e.stopPropagation();
+					}
+				});
+			},
+			'textComplete:hide': function (e) {
+				$(this).off('keydown.friendica.escape');
+			},
+		});
+	}
+
 	$.fn.editor_autocomplete = function(backend_url) {
 
 		// Autocomplete contacts
@@ -245,6 +277,7 @@ function string2bb(element) {
 
 		this.attr('autocomplete','off');
 		this.textcomplete([contacts, forums, smilies, tags], {className:'acpopup', zIndex:10000});
+		this.fixTextcompleteEscape();
 	};
 })( jQuery );
 
@@ -281,8 +314,9 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete', 'off');
-		var a = this.textcomplete([contacts, community, tags], {className:'acpopup', maxCount:100, zIndex: 10000, appendTo:'nav'});
-		a.on('textComplete:select', function(e, value, strategy) { submit_form(this); });
+		this.textcomplete([contacts, community, tags], {className:'acpopup', maxCount:100, zIndex: 10000, appendTo:'nav'});
+		this.fixTextcompleteEscape();
+		this.on('textComplete:select', function(e, value, strategy) { submit_form(this); });
 	};
 })( jQuery );
 
@@ -301,20 +335,22 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		var a = this.textcomplete([names], {className:'acpopup', zIndex:10000});
+		this.textcomplete([names], {className:'acpopup', zIndex:10000});
+		this.fixTextcompleteEscape();
 
-		if(autosubmit)
-			a.on('textComplete:select', function(e,value,strategy) { submit_form(this); });
+		if(autosubmit) {
+			this.on('textComplete:select', function(e,value,strategy) { submit_form(this); });
+		}
 
-		if(typeof onselect !== 'undefined')
-			a.on('textComplete:select', function(e, value, strategy) { onselect(value); });
+		if(typeof onselect !== 'undefined') {
+			this.on('textComplete:select', function(e, value, strategy) { onselect(value); });
+		}
 	};
 })( jQuery );
 
 (function( $ ) {
 	$.fn.bbco_autocomplete = function(type) {
-
-		if(type=='bbcode') {
+		if (type === 'bbcode') {
 			var open_close_elements = ['bold', 'italic', 'underline', 'overline', 'strike', 'quote', 'code', 'spoiler', 'map', 'img', 'url', 'audio', 'video', 'embed', 'youtube', 'vimeo', 'list', 'ul', 'ol', 'li', 'table', 'tr', 'th', 'td', 'center', 'color', 'font', 'size', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'nobb', 'noparse', 'pre', 'abstract'];
 			var open_elements = ['*', 'hr'];
 
@@ -349,11 +385,12 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		var a = this.textcomplete([bbco], {className:'acpopup', zIndex:10000});
+		this.textcomplete([bbco], {className:'acpopup', zIndex:10000});
+		this.fixTextcompleteEscape();
 
-		a.on('textComplete:select', function(e, value, strategy) { value; });
+		this.on('textComplete:select', function(e, value, strategy) { value; });
 
-		a.keypress(function(e){
+		this.keypress(function(e){
 			if (e.keyCode == 13) {
 				var x = listNewLineAutocomplete(this.id);
 				if(x) {
@@ -364,133 +401,4 @@ function string2bb(element) {
 		});
 	};
 })( jQuery );
-
-/**
- * Friendica people autocomplete legacy code
- *
- * require jQuery, jquery.textareas
- */
-function ACPopup(elm, backend_url){
-	this.idsel = -1;
-	this.element = elm;
-	this.searchText = '';
-	this.ready = true;
-	this.kp_timer = false;
-	this.url = backend_url;
-
-	this.conversation_id = null;
-	var conv_id = this.element.id.match(/\d+$/);
-	if (conv_id) {
-		this.conversation_id = conv_id[0];
-	}
-
-	var w = $(elm).width();
-	var h = $(elm).height();
-
-	var style = $(elm).offset();
-	style.top = style.top + h;
-	style.width = w;
-	style.position = 'absolute';
-	style.display = 'none';
-
-	this.cont = $('<div class="acpopup-mce"></div>');
-	this.cont.css(style);
-
-	$('body').append(this.cont);
-}
-
-ACPopup.prototype.close = function(){
-	$(this.cont).remove();
-	this.ready=false;
-}
-ACPopup.prototype.search = function(text){
-	var that = this;
-	this.searchText=text;
-	if (this.kp_timer) clearTimeout(this.kp_timer);
-	this.kp_timer = setTimeout( function(){that._search();}, 500);
-}
-
-ACPopup.prototype._search = function(){
-	console.log("_search");
-	var that = this;
-	var postdata = {
-		start:0,
-		count:100,
-		search:this.searchText,
-		type:'c',
-		conversation: this.conversation_id,
-	}
-
-	$.ajax({
-		type:'POST',
-		url: this.url,
-		data: postdata,
-		dataType: 'json',
-		success:function(data){
-			that.cont.html("");
-			if (data.tot>0){
-				that.cont.show();
-				$(data.items).each(function(){
-					var html = "<img src='{0}' height='16px' width='16px'>{1} ({2})".format(this.photo, this.name, this.nick);
-					var nick = this.nick.replace(' ','');
-					if (this.id!=='')  nick += '+' + this.id;
-					that.add(html, nick + ' - ' + this.link);
-				});
-			} else {
-				that.cont.hide();
-			}
-		}
-	});
-
-}
-
-ACPopup.prototype.add = function(label, value){
-	var that = this;
-	var elm = $('<div class="acpopupitem" title="' + value + '">' + label + '</div>');
-	elm.click(function(e){
-		t = $(this).attr('title').replace(new RegExp(' \- .*'), '');
-		el = $(that.element);
-		sel = el.getSelection();
-		sel.start = sel.start - that.searchText.length;
-		el.setSelection(sel.start, sel.end).replaceSelectedText(t + ' ').collapseSelection(false);
-		that.close();
-	});
-	$(this.cont).append(elm);
-}
-
-ACPopup.prototype.onkey = function(event){
-	if (event.keyCode == '13') {
-		if(this.idsel > -1) {
-			this.cont.children()[this.idsel].click();
-			event.preventDefault();
-		} else {
-			this.close();
-		}
-	}
-	if (event.keyCode == '38') { //cursor up
-		var cmax = this.cont.children().size() - 1;
-		this.idsel--;
-		if (this.idsel < 0) {
-			this.idsel = cmax;
-		}
-		event.preventDefault();
-	}
-	if (event.keyCode == '40' || event.keyCode == '9') { //cursor down
-		var cmax = this.cont.children().size() - 1;
-		this.idsel++;
-		if (this.idsel > cmax) {
-			this.idsel = 0;
-		}
-		event.preventDefault();
-	}
-
-	if (event.keyCode == '38' || event.keyCode == '40' || event.keyCode == '9') {
-		this.cont.children().removeClass('selected');
-		$(this.cont.children()[this.idsel]).addClass('selected');
-	}
-
-	if (event.keyCode == '27') { //ESC
-		this.close();
-	}
-}
 // @license-end

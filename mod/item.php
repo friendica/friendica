@@ -34,6 +34,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\Renderer;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -67,7 +68,10 @@ function item_post(App $a) {
 
 	if (!empty($_REQUEST['dropitems'])) {
 		$arr_drop = explode(',', $_REQUEST['dropitems']);
-		drop_items($arr_drop);
+		foreach ($arr_drop as $item) {
+			Item::deleteForUser(['id' => $item], $uid);
+		}
+
 		$json = ['success' => 1];
 		System::jsonExit($json);
 	}
@@ -375,7 +379,7 @@ function item_post(App $a) {
 	$only_to_forum = false;
 	$forum_contact = [];
 
-	$body = BBCode::performWithEscapedTags($body, ['noparse', 'pre', 'code'], function ($body) use ($profile_uid, $network, $str_contact_allow, &$inform, &$private_forum, &$private_id, &$only_to_forum, &$forum_contact) {
+	$body = BBCode::performWithEscapedTags($body, ['noparse', 'pre', 'code', 'img'], function ($body) use ($profile_uid, $network, $str_contact_allow, &$inform, &$private_forum, &$private_id, &$only_to_forum, &$forum_contact) {
 		$tags = BBCode::getTags($body);
 
 		$tagged = [];
@@ -850,7 +854,9 @@ function item_content(App $a)
 
 	if (($a->argc >= 3) && ($a->argv[1] === 'drop') && intval($a->argv[2])) {
 		if (DI::mode()->isAjax()) {
-			$o = Item::deleteForUser(['id' => $a->argv[2]], local_user());
+			Item::deleteForUser(['id' => $a->argv[2]], local_user());
+			// ajax return: [<item id>, 0 (no perm) | <owner id>]
+			System::jsonExit([intval($a->argv[2]), local_user()]);
 		} else {
 			if (!empty($a->argv[3])) {
 				$o = drop_item($a->argv[2], $a->argv[3]);
@@ -859,12 +865,110 @@ function item_content(App $a)
 				$o = drop_item($a->argv[2]);
 			}
 		}
-
-		if (DI::mode()->isAjax()) {
-			// ajax return: [<item id>, 0 (no perm) | <owner id>]
-			System::jsonExit([intval($a->argv[2]), intval($o)]);
-		}
 	}
 
 	return $o;
+}
+
+/**
+ * @param int    $id
+ * @param string $return
+ * @return string
+ * @throws HTTPException\InternalServerErrorException
+ */
+function drop_item(int $id, string $return = '')
+{
+	// locate item to be deleted
+	$fields = ['id', 'uid', 'guid', 'contact-id', 'deleted', 'gravity', 'parent'];
+	$item = Item::selectFirstForUser(local_user(), $fields, ['id' => $id]);
+
+	if (!DBA::isResult($item)) {
+		notice(DI::l10n()->t('Item not found.') . EOL);
+		DI::baseUrl()->redirect('network');
+	}
+
+	if ($item['deleted']) {
+		return '';
+	}
+
+	$contact_id = 0;
+
+	// check if logged in user is either the author or owner of this item
+	if (Session::getRemoteContactID($item['uid']) == $item['contact-id']) {
+		$contact_id = $item['contact-id'];
+	}
+
+	if ((local_user() == $item['uid']) || $contact_id) {
+		// Check if we should do HTML-based delete confirmation
+		if (!empty($_REQUEST['confirm'])) {
+			// <form> can't take arguments in its "action" parameter
+			// so add any arguments as hidden inputs
+			$query = explode_querystring(DI::args()->getQueryString());
+			$inputs = [];
+
+			foreach ($query['args'] as $arg) {
+				if (strpos($arg, 'confirm=') === false) {
+					$arg_parts = explode('=', $arg);
+					$inputs[] = ['name' => $arg_parts[0], 'value' => $arg_parts[1]];
+				}
+			}
+
+			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
+				'$method' => 'get',
+				'$message' => DI::l10n()->t('Do you really want to delete this item?'),
+				'$extra_inputs' => $inputs,
+				'$confirm' => DI::l10n()->t('Yes'),
+				'$confirm_url' => $query['base'],
+				'$confirm_name' => 'confirmed',
+				'$cancel' => DI::l10n()->t('Cancel'),
+			]);
+		}
+		// Now check how the user responded to the confirmation query
+		if (!empty($_REQUEST['canceled'])) {
+			DI::baseUrl()->redirect('display/' . $item['guid']);
+		}
+
+		$is_comment = $item['gravity'] == GRAVITY_COMMENT;
+		$parentitem = null;
+		if (!empty($item['parent'])) {
+			$fields = ['guid'];
+			$parentitem = Item::selectFirstForUser(local_user(), $fields, ['id' => $item['parent']]);
+		}
+
+		// delete the item
+		Item::deleteForUser(['id' => $item['id']], local_user());
+
+		$return_url = hex2bin($return);
+
+		// removes update_* from return_url to ignore Ajax refresh
+		$return_url = str_replace("update_", "", $return_url);
+
+		// Check if delete a comment
+		if ($is_comment) {
+			// Return to parent guid
+			if (!empty($parentitem)) {
+				DI::baseUrl()->redirect('display/' . $parentitem['guid']);
+				//NOTREACHED
+			} // In case something goes wrong
+			else {
+				DI::baseUrl()->redirect('network');
+				//NOTREACHED
+			}
+		} else {
+			// if unknown location or deleting top level post called from display
+			if (empty($return_url) || strpos($return_url, 'display') !== false) {
+				DI::baseUrl()->redirect('network');
+				//NOTREACHED
+			} else {
+				DI::baseUrl()->redirect($return_url);
+				//NOTREACHED
+			}
+		}
+	} else {
+		notice(DI::l10n()->t('Permission denied.'));
+		DI::baseUrl()->redirect('display/' . $item['guid']);
+		//NOTREACHED
+	}
+
+	return '';
 }

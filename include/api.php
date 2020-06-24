@@ -264,7 +264,10 @@ function api_login(App $a)
 		throw new UnauthorizedException("This API requires login");
 	}
 
-	DI::auth()->setForUser($a, $record);
+	// Don't refresh the login date more often than twice a day to spare database writes
+	$login_refresh = strcmp(DateTimeFormat::utc('now - 12 hours'), $record['login_date']) > 0;
+
+	DI::auth()->setForUser($a, $record, false, false, $login_refresh);
 
 	$_SESSION["allow_api"] = true;
 
@@ -2043,7 +2046,7 @@ function api_statuses_repeat($type)
 			$pos = strpos($item['body'], "[share");
 			$post = substr($item['body'], $pos);
 		} else {
-			$post = share_header($item['author-name'], $item['author-link'], $item['author-avatar'], $item['guid'], $item['created'], $item['plink']);
+			$post = BBCode::getShareOpeningTag($item['author-name'], $item['author-link'], $item['author-avatar'], $item['plink'], $item['created'], $item['guid']);
 
 			if (!empty($item['title'])) {
 				$post .= '[h3]' . $item['title'] . "[/h3]\n";

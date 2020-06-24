@@ -2087,10 +2087,9 @@ class OStatus
 		$mentioned = $newmentions;
 
 		foreach ($mentioned as $mention) {
-			$condition = ['uid' => $owner['uid'], 'nurl' => Strings::normaliseLink($mention)];
-			$contact = DBA::selectFirst('contact', ['forum', 'prv', 'self', 'contact-type'], $condition);
-			if ($contact["forum"] || $contact["prv"] || ($owner['contact-type'] == Contact::TYPE_COMMUNITY) ||
-				($contact['self'] && ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY))) {
+			$contact = Contact::getDetailsByURL($mention, $owner['uid']);
+			if (!empty($contact) && ($contact["forum"] || $contact["prv"] || ($owner['contact-type'] == Contact::TYPE_COMMUNITY) ||
+				($contact['self'] && ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY)))) {
 				XML::addElement($doc, $entry, "link", "",
 					[
 						"rel" => "mentioned",

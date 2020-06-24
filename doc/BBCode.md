@@ -634,6 +634,14 @@ On Mastodon this field is used for the content warning.
   <td>@user@domain.tld #hashtag</td>
 </tr>
 <tr>
+  <td>Additionally, [pre] blocks preserve spaces:
+    <ul>
+      <li>[pre]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spaces[/pre]</li>
+    </ul>
+  </td>
+  <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spaces</td>
+</tr>
+<tr>
   <td>[nosmile] is used to disable smilies on a post by post basis<br>
     <br>
     [nosmile] ;-) :-O

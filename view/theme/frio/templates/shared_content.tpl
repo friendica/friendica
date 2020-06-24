@@ -18,7 +18,15 @@
 				</a>
 			{{/if}}
 		</div>
-		<div class="shared-wall-item-ago"><small><span class="shared-time">{{$posted}}</span></small></div>
+		<div class="shared-wall-item-ago"><small>
+			{{if $guid}}
+			<a href="/display/{{$guid}}">
+			{{/if}}
+				<span class="shared-time">{{$posted}}</span>
+			{{if $guid}}
+			</a>
+			{{/if}}
+		</small></div>
 	</div>
 	<blockquote class="shared_content">{{$content nofilter}}</blockquote>
 </div>
