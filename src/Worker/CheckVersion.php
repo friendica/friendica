@@ -42,7 +42,8 @@ class CheckVersion
 
 		switch ($checkurl) {
 			case 'master':
-				$checked_url = 'https://raw.githubusercontent.com/friendica/friendica/master/VERSION';
+			case 'stable':
+					$checked_url = 'https://raw.githubusercontent.com/friendica/friendica/stable/VERSION';
 				break;
 			case 'develop':
 				$checked_url = 'https://raw.githubusercontent.com/friendica/friendica/develop/VERSION';

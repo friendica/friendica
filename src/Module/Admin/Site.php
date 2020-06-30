@@ -548,7 +548,7 @@ class Site extends BaseAdmin
 
 		$check_git_version_choices = [
 			'none' => DI::l10n()->t('Don\'t check'),
-			'master' => DI::l10n()->t('check the stable version'),
+			'stable' => DI::l10n()->t('check the stable version'),
 			'develop' => DI::l10n()->t('check the development version')
 		];
 
