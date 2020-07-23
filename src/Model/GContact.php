@@ -599,6 +599,37 @@ class GContact
 	}
 
 	/**
+	 * Get the id of a global contact with the given url
+	 *
+	 * @param string $url
+	 * @return integer gcontact id
+	 */
+	public static function getIdByURL(string $url)
+	{
+		// We first try the nurl (http://server.tld/nick), most common case
+		$options = ['order' => ['id']];
+		$gcontact = DBA::selectFirst('gcontact', ['id'], ['nurl' => Strings::normaliseLink($url)], $options);
+
+		// Then the addr (nick@server.tld)
+		if (!DBA::isResult($gcontact)) {
+			$gcontact = DBA::selectFirst('contact', ['id'], ['addr' => str_replace('acct:', '', $url)], $options);
+		}
+
+		// Then the alias (which could be anything)
+		if (!DBA::isResult($gcontact)) {
+			// The link could be provided as http although we stored it as https
+			$ssl_url = str_replace('http://', 'https://', $url);
+			$gcontact = DBA::selectFirst('contact', ['id'], ["alias" => [$url, Strings::normaliseLink($url), $ssl_url]], $options);
+		}
+
+		if (!DBA::isResult($gcontact)) {
+			return 0;
+		}
+
+		return $gcontact['id'];
+	}
+
+	/**
 	 * Fetch the gcontact id, add an entry if not existed
 	 *
 	 * @param array $contact contact array
@@ -1300,7 +1331,7 @@ class GContact
 		if (!DBA::isResult($gcontact)) {
 			return;
 		}
-
+		/// @TODO use the setting from DI::config()->get('system', 'poco_discovery_since')
 		if ($gcontact['last_discovery'] > DateTimeFormat::utc('now - 1 month')) {
 			Logger::info('Last discovery was less then a month before.', ['url' => $url, 'discovery' => $gcontact['last_discovery']]);
 			return;
@@ -1351,7 +1382,7 @@ class GContact
 
 					if (!empty($fields)) {
 						Logger::info('Set relation between contacts', $fields);
-						DBA::update('gfollower', ['deleted' => false], $fields, true);
+						DBA::update('gfollower', ['deleted' => false, 'updated' => DateTimeFormat::utcNow()], $fields, true);
 						continue;
 					}
 				}
@@ -1432,5 +1463,31 @@ class GContact
 		}
 
 		return '';
+	}
+
+	/**
+	 * Set the relation between two global contacts
+	 *
+	 * @param string $url            Global contact the related global contact had interacted with
+	 * @param string $interactor_url related global contact who had interacted with the global contact
+	 * @param string $interaction    Date of interaction
+	 */
+	public static function setRelation(string $url, string $interactor_url, string $interaction = '')
+	{
+		if (empty($interaction)) {
+			$interaction = DateTimeFormat::utcNow();
+		}
+
+		$gcid = self::getIdByURL($url);
+		if (empty($gcid)) {
+			return;
+		}
+
+		$inter_gcid = self::getIdByURL($interactor_url);
+		if (empty($inter_gcid)) {
+			return;
+		}
+
+		DBA::update('gcontact-relation', ['last-interaction' => $interaction], ['gcid' => $gcid, 'relation-gcid' => $inter_gcid], true);
 	}
 }

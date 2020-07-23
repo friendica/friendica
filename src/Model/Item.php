@@ -1486,7 +1486,7 @@ class Item
 		// find the parent and snarf the item id and ACLs
 		// and anything else we need to inherit
 
-		$fields = ['uri', 'parent-uri', 'id', 'deleted',
+		$fields = ['uri', 'parent-uri', 'id', 'deleted', 'author-link',
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
 			'wall', 'private', 'forum_mode', 'origin', 'author-id'];
 		$condition = ['uri' => $item['parent-uri'], 'uid' => $item['uid']];
@@ -1553,9 +1553,10 @@ class Item
 				Logger::info('tagged thread as mention', ['parent' => $item['parent'], 'uid' => $item['uid']]);
 			}
 
-			// Update the contact relations
+			// Update the contact anf gcontact relations
 			if ($item['author-id'] != $parent['author-id']) {
 				DBA::update('contact-relation', ['last-interaction' => $item['created']], ['cid' => $parent['author-id'], 'relation-cid' => $item['author-id']], true);
+				GContact::setRelation($parent['author-link'], $item['author-link'], $item['created']);
 			}
 		}
 
@@ -1714,16 +1715,6 @@ class Item
 		unset($item['causer-id']);
 		unset($item['causer-link']);
 
-		// We don't store these fields anymore in the item table
-		unset($item['author-link']);
-		unset($item['author-name']);
-		unset($item['author-avatar']);
-		unset($item['author-network']);
-
-		unset($item['owner-link']);
-		unset($item['owner-name']);
-		unset($item['owner-avatar']);
-
 		$item['thr-parent'] = $item['parent-uri'];
 
 		if ($item['parent-uri'] != $item['uri']) {
@@ -1740,6 +1731,16 @@ class Item
 			$parent_id = 0;
 			$parent_origin = $item['origin'];
 		}
+
+		// We don't store these fields anymore in the item table
+		unset($item['author-link']);
+		unset($item['author-name']);
+		unset($item['author-avatar']);
+		unset($item['author-network']);
+
+		unset($item['owner-link']);
+		unset($item['owner-name']);
+		unset($item['owner-avatar']);
 
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
