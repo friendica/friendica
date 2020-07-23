@@ -1553,7 +1553,7 @@ class Item
 				Logger::info('tagged thread as mention', ['parent' => $item['parent'], 'uid' => $item['uid']]);
 			}
 
-			// Update the contact anf gcontact relations
+			// Update the contact and gcontact relations
 			if ($item['author-id'] != $parent['author-id']) {
 				DBA::update('contact-relation', ['last-interaction' => $item['created']], ['cid' => $parent['author-id'], 'relation-cid' => $item['author-id']], true);
 				GContact::setRelation($parent['author-link'], $item['author-link'], $item['created']);
