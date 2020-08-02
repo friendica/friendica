@@ -857,7 +857,7 @@ class Transmitter
 			return false;
 		}
 
-		if ($item['wall'] && ($item['uri'] == $item['parent-uri'])) {
+		if ($item['wall'] && ($item['uri'] == $item['parent-uri']) && !$object_mode) {
 			$owner = User::getOwnerDataById($item['uid']);
 			if (($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) && ($item['author-link'] != $owner['url'])) {
 				$type = 'Announce';
