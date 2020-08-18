@@ -2,28 +2,31 @@ name: Testing PHP
 on: [push, pull_request, pull_request_review]
 
 jobs:
-  services:
-    mysql:
-      image: mysql:5.7
-      env:
-        MYSQL_ALLOW_EMPTY_PASSWORD: true
-        MYSQL_DATABASE: test
-        MYSQL_PASSWORD: ""
-        MYSQL_USERNAME: travis
-      ports:
-        - 3306/tcp
-      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    redis:
-      image: redis
-      ports:
-        - 6379/tcp
-      options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
   build:
     strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macos-latest]
         php-versions: ['7.1', '7.2', '7.3']
+
     runs-on: ${{ matrix.operating-system }}
+
+    services:
+      mysql:
+        image: mariadb:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: test
+          MYSQL_PASSWORD: ""
+          MYSQL_USERNAME: travis
+        ports:
+          - 3306/tcp
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis
+        ports:
+          - 6379/tcp
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -53,6 +56,14 @@ jobs:
 
       - name: Copy default Friendica config
         run: cp config/local-sample.config.php config/local.config.php
+
+      - name: Verify MariaDB connection
+        env:
+          PORT: ${{ job.services.mariadb.ports[3306] }}
+        run: |
+          while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
+            sleep 1
+          done
 
       - name: Setup MYSQL database
         run: |
