@@ -1,0 +1,82 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  services:
+  mysql:
+    image: mysql:5.7
+    env:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: ""
+      MYSQL_USERNAME: travis
+    ports:
+      - 3306/tcp
+    options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+  redis:
+    image: redis
+    ports:
+      - 6379/tcp
+    options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+  build:
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        php-versions: ['7.1', '7.2', '7.3']
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: redis memcache
+          coverage: xdebug
+
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: |
+          composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Copy default Friendica config
+        run: cp config/local-sample.config.php config/local.config.php
+
+      - name: Setup MYSQL database
+        run: |
+          mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
+          mysql -utravis test < database.sql
+        with:
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: test
+          MYSQL_PASSWORD: ""
+          MYSQL_USERNAME: travis
+
+      - name: Test with Parallel-lint
+        run: vendor/bin/parallel-lint --exclude vendor/ --exclude view/asset/ .
+
+      - name: Test with phpunit
+        run: vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover clover.xml
+        env:
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: test
+          MYSQL_PASSWORD: ""
+          MYSQL_USERNAME: travis
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: clover.xml
