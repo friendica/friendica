@@ -5,7 +5,7 @@ jobs:
   build:
     strategy:
       matrix:
-        php-versions: ['7.1', '7.2', '7.3']
+        php-versions: ['7.2', '7.3', '7.4']
 
     runs-on: ubuntu-latest
 
@@ -68,6 +68,12 @@ jobs:
         run: |
           mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
           mysql -utravis test < database.sql
+        env:
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306
+          MYSQL_DATABASE: test
+          MYSQL_PASSWORD: ""
+          MYSQL_USERNAME: travis
 
       - name: Test with Parallel-lint
         run: vendor/bin/parallel-lint --exclude vendor/ --exclude view/asset/ .
