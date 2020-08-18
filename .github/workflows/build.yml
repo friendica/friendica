@@ -69,7 +69,7 @@ jobs:
           PORT: ${{ job.services.mariadb.ports[3306] }}
         run: |
           mysql -h"127.0.0.1" -P"$PORT" -uroot -e 'CREATE DATABASE IF NOT EXISTS test;'
-          mysql -h"127.0.0.1" -P"$PORT" -utravis test < database.sql
+          mysql -h"127.0.0.1" -P"$PORT" -uroot test < database.sql
 
       - name: Test with Parallel-lint
         run: vendor/bin/parallel-lint --exclude vendor/ --exclude view/asset/ .
