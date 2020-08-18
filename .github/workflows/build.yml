@@ -5,10 +5,9 @@ jobs:
   build:
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest, macos-latest]
         php-versions: ['7.1', '7.2', '7.3']
 
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
 
     services:
       mysql:
