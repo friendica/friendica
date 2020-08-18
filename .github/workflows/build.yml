@@ -1,5 +1,4 @@
 name: CI
-on: [push, pull_request]
 
 jobs:
   services:
@@ -35,20 +34,21 @@ jobs:
           extensions: redis memcache
           coverage: xdebug
 
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Validate composer.json and composer.lock
+        run: composer validate
 
-      - name: Cache composer dependencies
+      - name: Cache Composer packages
+        id: composer-cache
         uses: actions/cache@v2
         with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: |
-          composer install --no-progress --prefer-dist --optimize-autoloader
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Copy default Friendica config
         run: cp config/local-sample.config.php config/local.config.php
