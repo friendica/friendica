@@ -1,22 +1,23 @@
 name: CI
+on: [push, pull_request]
 
 jobs:
   services:
-  mysql:
-    image: mysql:5.7
-    env:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
-      MYSQL_DATABASE: test
-      MYSQL_PASSWORD: ""
-      MYSQL_USERNAME: travis
-    ports:
-      - 3306/tcp
-    options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-  redis:
-    image: redis
-    ports:
-      - 6379/tcp
-    options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    mysql:
+      image: mysql:5.7
+      env:
+        MYSQL_ALLOW_EMPTY_PASSWORD: true
+        MYSQL_DATABASE: test
+        MYSQL_PASSWORD: ""
+        MYSQL_USERNAME: travis
+      ports:
+        - 3306/tcp
+      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    redis:
+      image: redis
+      ports:
+        - 6379/tcp
+      options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
   build:
     strategy:
       matrix:
