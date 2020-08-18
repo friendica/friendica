@@ -1,13 +1,27 @@
-name: CI
-on: [push, pull_request]
+name: PHP Composer
+
+on: [push, pull_request, pull_request_review]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        php-versions: ['7.1', '7.2', '7.3']
-    runs-on: ${{ matrix.operating-system }}
+
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-suggest
