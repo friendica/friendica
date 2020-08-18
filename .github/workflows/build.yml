@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
+      mariadb:
         image: mariadb:latest
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
