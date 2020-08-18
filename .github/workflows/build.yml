@@ -65,15 +65,11 @@ jobs:
           done
 
       - name: Setup MYSQL database
-        run: |
-          mysql -e 'CREATE DATABASE IF NOT EXISTS test;'
-          mysql -utravis test < database.sql
         env:
-          MYSQL_HOST: localhost
-          MYSQL_PORT: 3306
-          MYSQL_DATABASE: test
-          MYSQL_PASSWORD: ""
-          MYSQL_USERNAME: travis
+          PORT: ${{ job.services.mariadb.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" -e 'CREATE DATABASE IF NOT EXISTS test;'
+          mysql -h"127.0.0.1" -P"$PORT" -utravis test < database.sql
 
       - name: Test with Parallel-lint
         run: vendor/bin/parallel-lint --exclude vendor/ --exclude view/asset/ .
