@@ -922,7 +922,7 @@ class Transmitter
 
 				// Disguise forum posts as reshares. Will later be converted to a real announce
 				$item['body'] = BBCode::getShareOpeningTag($item['author-name'], $item['author-link'], $item['author-avatar'],
-					$item['plink'], $item['created'], $item['guid']) . $item['body'] . '[/share]';
+					$item['plink'] ?? '', $item['created'], $item['guid']) . $item['body'] . '[/share]';
 			}
 		}
 
