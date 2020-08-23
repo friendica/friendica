@@ -1994,15 +1994,11 @@ class Item
 	}
 
 	/**
-	 * Change the owner of a parent item if it had been shared by a forum or a user contact
+	 * Change the owner of a parent item if it had been shared by a forum
 	 *
 	 * (public) forum posts in the new format consist of the regular post by the author
 	 * followed by an announce message sent from the forum account.
 	 * Changing the owner helps in grouping forum posts.
-	 *
-	 * For other reshared posts this function changes the owner of that post
-	 * if the author is not a user contact but the post had been shared by one.
-	 * This helps in detecting why this post appeared in the timeline.
 	 *
 	 * @param array $item
 	 * @return void
@@ -2022,13 +2018,8 @@ class Item
 			return;
 		}
 
-		if (($author['contact-type'] != Contact::TYPE_COMMUNITY) && (($parent['owner-id'] != $parent['author-id']) || ($item['uid'] == 0))) {
-			logger::info('The resharer is no forum and the parent is reshared or not a personal post: quit', ['resharer' => $item['author-id'], 'owner' => $parent['owner-id'], 'author' => $parent['author-id'], 'uid' => $item['uid']]);
-			return;
-		}
-
-		if (($author['contact-type'] != Contact::TYPE_COMMUNITY) && (Contact::isSharing($parent['author-link'], $item['uid']) || $item['origin'])) {
-			logger::info('The parent author is a following contact: quit', ['author' => $parent['author-link'], 'uid' => $item['uid']]);
+		if ($author['contact-type'] != Contact::TYPE_COMMUNITY) {
+			logger::info('The resharer is no forum: quit', ['resharer' => $item['author-id'], 'owner' => $parent['owner-id'], 'author' => $parent['author-id'], 'uid' => $item['uid']]);
 			return;
 		}
 
@@ -2725,9 +2716,7 @@ class Item
 
 		Worker::add(['priority' => PRIORITY_HIGH, 'dont_fork' => true], 'Notifier', Delivery::POST, $item_id);
 
-		/// @todo This code should be activated by the end of the year 2020
-		// See also "createActivityFromItem"
-		//Item::performActivity($item_id, 'announce', $uid);
+		Item::performActivity($item_id, 'announce', $uid);
 
 		return false;
 	}

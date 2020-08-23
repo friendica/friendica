@@ -914,21 +914,6 @@ class Transmitter
 			return false;
 		}
 
-		/// @todo This code should be removed by the end of the year 2020
-		if ($item['wall'] && ($item['uri'] == $item['parent-uri'])) {
-			$owner = User::getOwnerDataById($item['uid']);
-			if (($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) && ($item['author-link'] != $owner['url'])) {
-				$type = 'Announce';
-
-				// Disguise forum posts as reshares. Will later be converted to a real announce
-				$item['body'] = BBCode::getShareOpeningTag($item['author-name'], $item['author-link'], $item['author-avatar'],
-					$item['plink'] ?? '', $item['created'], $item['guid']) . $item['body'] . '[/share]';
-			}
-		}
-
-		/*
-		/// @todo This code should be activated by the end of the year 2020		
-		// See also "tagDeliver";
 		// In case of a forum post ensure to return the original post if author and forum are on the same machine
 		if (!empty($item['forum_mode'])) {
 			$author = Contact::getById($item['author-id'], ['nurl']);
@@ -939,7 +924,6 @@ class Transmitter
 				}
 			}
 		}
-		*/
 
 		if (empty($type)) {
 			$condition = ['item-uri' => $item['uri'], 'protocol' => Conversation::PARCEL_ACTIVITYPUB];

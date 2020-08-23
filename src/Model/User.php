@@ -118,8 +118,8 @@ class User
 			}
 		}
 
-		$system['spubkey'] = $system['uprvkey'] = $system['prvkey'];
-		$system['username'] = $system['name'];
+		$system['sprvkey'] = $system['uprvkey'] = $system['prvkey'];
+		$system['spubkey'] = $system['upubkey'] = $system['pubkey'];
 		$system['nickname'] = $system['nick'];
 		return $system;
 	}
@@ -332,6 +332,10 @@ class User
 	 */
 	public static function getOwnerDataById(int $uid, bool $check_valid = true)
 	{
+		if ($uid == 0) {
+			return self::getSystemAccount();
+		}
+
 		if (!empty(self::$owner[$uid])) {
 			return self::$owner[$uid];
 		}

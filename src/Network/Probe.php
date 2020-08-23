@@ -712,7 +712,14 @@ class Probe
 
 		Logger::info('Probing start', ['uri' => $uri]);
 
-		$data = self::getWebfingerArray($uri);
+		if (!empty($ap_profile['addr']) && ($ap_profile['addr'] != $uri)) {
+			$data = self::getWebfingerArray($ap_profile['addr']);
+		}
+
+		if (empty($data)) {
+			$data = self::getWebfingerArray($uri);
+		}
+
 		if (empty($data)) {
 			if (!empty($parts['scheme'])) {
 				return self::feed($uri);
