@@ -26,6 +26,7 @@ use Friendica\Core\Cache\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Lock;
 use Friendica\Database\Database;
+use Friendica\Util\Node;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -62,12 +63,18 @@ class LockFactory
 	 */
 	private $logger;
 
-	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger)
+	/**
+	 * @var string The hostname of this node
+	 */
+	private $hostname;
+
+	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger, Node $node)
 	{
 		$this->cacheFactory = $cacheFactory;
 		$this->config       = $config;
 		$this->dba          = $dba;
 		$this->logger       = $logger;
+		$this->hostname     = $node->getHostname();
 	}
 
 	public function create()
@@ -89,7 +96,7 @@ class LockFactory
 					break;
 
 				case 'database':
-					return new Lock\DatabaseLock($this->dba, getmypid());
+					return new Lock\DatabaseLock($this->dba, $this->hostname, getmypid());
 					break;
 
 				case 'semaphore':
@@ -140,6 +147,6 @@ class LockFactory
 		}
 
 		// 3. Use Database Locking as a Fallback
-		return new Lock\DatabaseLock($this->dba, getmypid());
+		return new Lock\DatabaseLock($this->dba, $this->hostname, getmypid());
 	}
 }

@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2021.06-rc (Siberian Iris)
--- DB_UPDATE_VERSION 1421
+-- Friendica 2020.09-dev (Red Hot Poker)
+-- DB_UPDATE_VERSION 1522
 -- ------------------------------------------
 
 
@@ -734,10 +734,12 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT '',
 	`locked` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID',
+	`host-id` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Host id',
+	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'The process id of the worker',
 	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of cache expiration',
 	 PRIMARY KEY(`id`),
-	 INDEX `name_expires` (`name`,`expires`)
+	 INDEX `name_expires` (`name`,`expires`),
+	 INDEX `locked_hostid_pid_expires` (`locked`, `host-id`, `pid`, `expires`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
@@ -1553,7 +1555,7 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 -- VIEW application-view
 --
 DROP VIEW IF EXISTS `application-view`;
-CREATE VIEW `application-view` AS SELECT 
+CREATE VIEW `application-view` AS SELECT
 	`application`.`id` AS `id`,
 	`application-token`.`uid` AS `uid`,
 	`application`.`name` AS `name`,
@@ -1576,7 +1578,7 @@ CREATE VIEW `application-view` AS SELECT
 -- VIEW post-user-view
 --
 DROP VIEW IF EXISTS `post-user-view`;
-CREATE VIEW `post-user-view` AS SELECT 
+CREATE VIEW `post-user-view` AS SELECT
 	`post-user`.`id` AS `id`,
 	`post-user`.`id` AS `post-user-id`,
 	`post-user`.`uid` AS `uid`,
@@ -1738,7 +1740,7 @@ CREATE VIEW `post-user-view` AS SELECT
 -- VIEW post-thread-user-view
 --
 DROP VIEW IF EXISTS `post-thread-user-view`;
-CREATE VIEW `post-thread-user-view` AS SELECT 
+CREATE VIEW `post-thread-user-view` AS SELECT
 	`post-user`.`id` AS `id`,
 	`post-user`.`id` AS `post-user-id`,
 	`post-thread-user`.`uid` AS `uid`,
@@ -1898,7 +1900,7 @@ CREATE VIEW `post-thread-user-view` AS SELECT
 -- VIEW post-view
 --
 DROP VIEW IF EXISTS `post-view`;
-CREATE VIEW `post-view` AS SELECT 
+CREATE VIEW `post-view` AS SELECT
 	`item-uri`.`uri` AS `uri`,
 	`post`.`uri-id` AS `uri-id`,
 	`parent-item-uri`.`uri` AS `parent-uri`,
@@ -1993,7 +1995,7 @@ CREATE VIEW `post-view` AS SELECT
 -- VIEW post-thread-view
 --
 DROP VIEW IF EXISTS `post-thread-view`;
-CREATE VIEW `post-thread-view` AS SELECT 
+CREATE VIEW `post-thread-view` AS SELECT
 	`item-uri`.`uri` AS `uri`,
 	`post-thread`.`uri-id` AS `uri-id`,
 	`parent-item-uri`.`uri` AS `parent-uri`,
@@ -2132,7 +2134,7 @@ CREATE VIEW `network-item-view` AS SELECT
 	`post-user`.`contact-id` AS `contact-id`,
 	`ownercontact`.`contact-type` AS `contact-type`
 	FROM `post-user`
-			STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`			
+			STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
 			INNER JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			LEFT JOIN `user-contact` AS `author` ON `author`.`uid` = `post-thread-user`.`uid` AND `author`.`cid` = `post-thread-user`.`author-id`
 			LEFT JOIN `user-contact` AS `owner` ON `owner`.`uid` = `post-thread-user`.`uid` AND `owner`.`cid` = `post-thread-user`.`owner-id`

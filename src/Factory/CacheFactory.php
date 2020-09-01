@@ -21,11 +21,12 @@
 
 namespace Friendica\Factory;
 
-use Friendica\App\BaseURL;
+use Exception;
 use Friendica\Core\Cache;
 use Friendica\Core\Cache\ICache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Database\Database;
+use Friendica\Util\Node;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -68,9 +69,9 @@ class CacheFactory
 	 */
 	private $logger;
 
-	public function __construct(BaseURL $baseURL, IConfig $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
+	public function __construct(Node $node, IConfig $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
 	{
-		$this->hostname = $baseURL->getHostname();
+		$this->hostname = $node->getHostname();
 		$this->config   = $config;
 		$this->dba      = $dba;
 		$this->profiler = $profiler;
@@ -83,7 +84,7 @@ class CacheFactory
 	 * @param string $type The cache type to create (default is per config)
 	 *
 	 * @return ICache  The instance of the CacheDriver
-	 * @throws \Exception    The exception if something went wrong during the CacheDriver creation
+	 * @throws Exception    The exception if something went wrong during the CacheDriver creation
 	 */
 	public function create(string $type = null)
 	{
