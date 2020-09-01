@@ -221,5 +221,10 @@ return [
 	],
 	Network\IHTTPRequest::class => [
 		'instanceOf' => Network\HTTPRequest::class,
-	]
+	],
+	Util\Node::class => [
+		'constructParams' => [
+			$_SERVER,
+		],
+	],
 ];
