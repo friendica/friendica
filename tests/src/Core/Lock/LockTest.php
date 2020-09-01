@@ -31,6 +31,9 @@ abstract class LockTest extends MockedTest
 	 */
 	protected $startTime = 1417011228;
 
+	/** @var string the test host */
+	protected $hostname = 'test.host';
+
 	/**
 	 * @var ILock
 	 */

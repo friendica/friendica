@@ -89,19 +89,16 @@ class LockFactory
 				case Type::APCU:
 					$cache = $this->cacheFactory->create($lock_type);
 					if ($cache instanceof IMemoryCache) {
-						return new Lock\CacheLock($cache);
+						return new Lock\CacheLock($cache, $this->hostname);
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
-					break;
 
 				case 'database':
 					return new Lock\DatabaseLock($this->dba, $this->hostname, getmypid());
-					break;
 
 				case 'semaphore':
 					return new Lock\SemaphoreLock();
-					break;
 
 				default:
 					return self::useAutoDriver();
@@ -139,7 +136,7 @@ class LockFactory
 			try {
 				$cache = $this->cacheFactory->create($cache_type);
 				if ($cache instanceof IMemoryCache) {
-					return new Lock\CacheLock($cache);
+					return new Lock\CacheLock($cache, $this->hostname);
 				}
 			} catch (\Exception $exception) {
 				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception]);

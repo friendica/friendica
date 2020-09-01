@@ -22,11 +22,11 @@
 namespace Friendica\Factory;
 
 use Exception;
+use Friendica\App\BaseURL;
 use Friendica\Core\Cache;
 use Friendica\Core\Cache\ICache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Database\Database;
-use Friendica\Util\Node;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -69,9 +69,9 @@ class CacheFactory
 	 */
 	private $logger;
 
-	public function __construct(Node $node, IConfig $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
+	public function __construct(BaseURL $baseUrl, IConfig $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
 	{
-		$this->hostname = $node->getHostname();
+		$this->hostname = $baseUrl->getHostname();
 		$this->config   = $config;
 		$this->dba      = $dba;
 		$this->profiler = $profiler;

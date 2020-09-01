@@ -38,13 +38,20 @@ class CacheLock extends BaseLock
 	private $cache;
 
 	/**
+	 * @var string The hostname of this worker
+	 */
+	private $hostname;
+
+	/**
 	 * CacheLock constructor.
 	 *
 	 * @param IMemoryCache $cache The CacheDriver for this type of lock
+	 * @param string       $hostname The hostname of this worker (used for locks)
 	 */
-	public function __construct(IMemoryCache $cache)
+	public function __construct(IMemoryCache $cache, string $hostname)
 	{
-		$this->cache = $cache;
+		$this->cache    = $cache;
+		$this->hostname = $hostname;
 	}
 
 	/**
@@ -55,7 +62,7 @@ class CacheLock extends BaseLock
 		$got_lock = false;
 		$start    = time();
 
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 
 		do {
 			$lock = $this->cache->get($cachekey);
@@ -88,7 +95,7 @@ class CacheLock extends BaseLock
 	 */
 	public function release($key, $override = false)
 	{
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 
 		if ($override) {
 			$return = $this->cache->delete($cachekey);
@@ -105,7 +112,7 @@ class CacheLock extends BaseLock
 	 */
 	public function isLocked($key)
 	{
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 		$lock     = $this->cache->get($cachekey);
 		return isset($lock) && ($lock !== false);
 	}
@@ -155,8 +162,8 @@ class CacheLock extends BaseLock
 	 *
 	 * @return string        The cache key used for the cache
 	 */
-	private static function getLockKey($key)
+	private function getLockKey(string $key)
 	{
-		return self::CACHE_PREFIX . $key;
+		return self::CACHE_PREFIX . $this->hostname . ':' .  $key;
 	}
 }
