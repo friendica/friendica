@@ -34,13 +34,13 @@ class NodeTest extends MockedTest {
 	}
 
 	public function testNodeOverride() {
-		$node = new Node(new NullLogger(), ['NODE_NAME' => 'testserver.test']);
+		$node = new Node(new NullLogger(), [Node::ENV_VARIABLE => 'testserver.test']);
 
 		$this->assertEquals('testserver.test', $node->getHostname());
 	}
 
 	public function testEmptyHostname() {
-		$node = new Node(new NullLogger(), ['NODE_NAME' => " "]);
+		$node = new Node(new NullLogger(), [Node::ENV_VARIABLE => " "]);
 
 		$this->assertEmpty($node->getHostname());
 	}
