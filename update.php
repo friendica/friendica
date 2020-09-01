@@ -834,11 +834,11 @@ function update_1404()
 	$tasks = DBA::select('workerqueue', ['id', 'command', 'parameter'], ['command' => ['notifier', 'delivery', 'apdelivery', 'done' => false]]);
 	while ($task = DBA::fetch($tasks)) {
 		$parameters = json_decode($task['parameter'], true);
-	
+
 		if (is_array($parameters) && count($parameters) && in_array($parameters[0], [Delivery::MAIL, Delivery::SUGGESTION, Delivery::REMOVAL, Delivery::RELOCATION])) {
 			continue;
 		}
-	
+
 		switch (strtolower($task['command'])) {
 			case 'notifier':
 				if (count($parameters) == 3) {
@@ -848,7 +848,7 @@ function update_1404()
 				if (!DBA::isResult($item)) {
 					continue 2;
 				}
-	
+
 				$parameters[1] = $item['uri-id'];
 				$parameters[2] = $item['uid'];
 				break;
@@ -860,7 +860,7 @@ function update_1404()
 				if (!DBA::isResult($item)) {
 					continue 2;
 				}
-	
+
 				$parameters[1] = $item['uri-id'];
 				$parameters[3] = $item['uid'];
 				break;
@@ -868,16 +868,16 @@ function update_1404()
 				if (count($parameters) == 6) {
 					continue 2;
 				}
-	
+
 				if (empty($parameters[4])) {
 					$parameters[4] = [];
 				}
-	
+
 				$item = DBA::selectFirst('item', ['uri-id'], ['id' => $parameters[1]]);
 				if (!DBA::isResult($item)) {
 					continue 2;
 				}
-	
+
 				$parameters[5] = $item['uri-id'];
 				break;
 			default:
@@ -939,5 +939,17 @@ function update_1419()
 
 		DBA::update('mail', $fields, ['id' => $mail['id']]);
 	}
+	return Update::SUCCESS;
+}
+
+function update_1422()
+{
+	$node = new \Friendica\Util\Node(new \Psr\Log\NullLogger(), $_SERVER);
+	$hostname = $node->getHostname();
+
+	if (!DBA::update('locks', ['hostname' => $hostname], [])) {
+		return Update::FAILED;
+	}
+
 	return Update::SUCCESS;
 }

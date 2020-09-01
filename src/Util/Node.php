@@ -30,33 +30,47 @@ use Psr\Log\LoggerInterface;
 class Node
 {
 	/**
+	 * Defines the environment variable, which includes the current node name instead of the detected hostname
+	 *
+	 * @var string
+	 *
+	 * @notice This is used for cluster environments, where the each node defines it own hostname.
+	 */
+	const ENV_VARIABLE = 'NODE_NAME';
+
+	/**
 	 * @var LoggerInterface
 	 */
 	private $logger;
 
-	public function __construct(LoggerInterface $logger)
+	/**
+	 * @var string The hostname of this node
+	 */
+	private $hostname;
+
+	public function __construct(LoggerInterface $logger, array $server = [])
 	{
 		$this->logger = $logger;
+		$this->detectHostname($server);
 	}
 
 	/**
-	 * Returns the OS's hostname if hostnameOverride is empty, otherwise returns hostnameOverride
+	 * Detects the hostname of the current node
 	 *
-	 * @param string|null $overrideHostname Optional hostname to override
-	 *
-	 * @return string The hostname
+	 * @param array $server
 	 *
 	 * @throws InternalServerErrorException If the hostname cannot get detected
 	 */
-	public function getHostname(string $overrideHostname = null)
-	{
-		$hostname = $overrideHostname;
+	private function detectHostname(array $server = []) {
+		$hostname = $server[self::ENV_VARIABLE] ?? null;
+
 		if (empty($hostname)) {
 			try {
 				$nodeName = php_uname('n');
 				if (empty($nodeName)) {
 					throw new InternalServerErrorException('Couldn\'t determine hostname');
 				}
+				$hostname = $nodeName;
 			} catch (\Error $error) {
 				throw new InternalServerErrorException('Couldn\'t determine hostname', $error);
 			}
@@ -67,9 +81,19 @@ class Node
 		$hostname = trim($hostname);
 		if (empty($hostname)) {
 			$this->logger->error('Empty hostname is invalid.');
-			return "";
+			$this->hostname = "";
 		}
 
-		return strtolower($hostname);
+		$this->hostname = strtolower($hostname);
+	}
+
+	/**
+	 * Returns the OS's hostname
+	 *
+	 * @return string The hostname
+	 */
+	public function getHostname()
+	{
+		return $this->hostname;
 	}
 }
