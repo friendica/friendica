@@ -46,10 +46,10 @@ class DatabaseLock extends BaseLock
 	/**
 	 * @param null|int $pid The Id of the current process (null means determine automatically)
 	 */
-	public function __construct(Database $dba, $pid = null)
+	public function __construct(Database $dba, $pid)
 	{
 		$this->dba = $dba;
-		$this->pid = isset($pid) ? $pid : getmypid();
+		$this->pid = $pid;
 	}
 
 	/**

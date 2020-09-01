@@ -89,7 +89,7 @@ class LockFactory
 					break;
 
 				case 'database':
-					return new Lock\DatabaseLock($this->dba);
+					return new Lock\DatabaseLock($this->dba, getmypid());
 					break;
 
 				case 'semaphore':
@@ -140,6 +140,6 @@ class LockFactory
 		}
 
 		// 3. Use Database Locking as a Fallback
-		return new Lock\DatabaseLock($this->dba);
+		return new Lock\DatabaseLock($this->dba, getmypid());
 	}
 }
