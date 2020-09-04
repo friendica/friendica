@@ -40,6 +40,6 @@ class APCuCacheLockTest extends LockTest
 
 	protected function getInstance()
 	{
-		return new CacheLock(new APCuCache('localhost'), $this->hostname);
+		return new CacheLock(new APCuCache('localhost'), $this->hostId);
 	}
 }
