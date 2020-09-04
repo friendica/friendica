@@ -38,8 +38,8 @@ class Host
 	 */
 	const ENV_VARIABLE = 'NODE_NAME';
 
-	/** @var int|null The host id */
-	private $id = null;
+	/** @var integer The host id */
+	private $id = -1;
 	/** @var string The host name */
 	private $name;
 
@@ -66,7 +66,7 @@ class Host
 		$hostname = trim($hostname);
 		if (empty($hostname)) {
 			$this->logger->error('Empty hostname is invalid.');
-			$this->id = null;
+			$this->id = -1;
 			$this->name = "";
 			return;
 		}
@@ -81,6 +81,7 @@ class Host
 
 			$host = $dba->selectFirst(self::TABLE, ['id'], ['name' => $hostname]);
 			if (empty($host['id'])) {
+				$this->id = -1;
 				$this->logger->warning('Host name could not be inserted', ['name' => $hostname]);
 			} else {
 				$this->id = (int)$host['id'];

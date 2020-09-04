@@ -69,7 +69,7 @@ class HostTest extends MockedTest {
 		$host = new Host($this->dba, new NullLogger(), [Host::ENV_VARIABLE => ' ']);
 
 		$this->assertEmpty($host->getName());
-		$this->assertNull($host->getId());
+		$this->assertEquals(-1, $host->getId());
 	}
 
 	public function testNewHostname() {
@@ -95,6 +95,6 @@ class HostTest extends MockedTest {
 		$host = new Host($this->dba, new NullLogger(), []);
 
 		$this->assertEquals(php_uname('n'), $host->getName());
-		$this->assertNull($host->getId());
+		$this->assertEquals(-1, $host->getId());
 	}
 }

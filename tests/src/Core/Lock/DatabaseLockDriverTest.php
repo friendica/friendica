@@ -23,6 +23,7 @@ namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Lock\DatabaseLock;
 use Friendica\Factory\ConfigFactory;
+use Friendica\Model\Host;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;
@@ -60,7 +61,9 @@ class DatabaseLockDriverTest extends LockTest
 
 		$dba = new StaticDatabase($configCache, $profiler, $logger);
 
-		return new DatabaseLock($dba, $this->hostId, $this->pid);
+		$host = new Host($dba, new NullLogger(), []);
+
+		return new DatabaseLock($dba, $host->getId(), $this->pid);
 	}
 
 	protected function tearDown(): void

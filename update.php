@@ -944,16 +944,24 @@ function update_1419()
 
 function pre_update_1422()
 {
-	DBA::e("ALTER TABLE IF EXISTS `host` TO `" . \Friendica\Model\Host::TABLE . "`;");
+	if (DBA::count('locks') > 0 &&
+		!DBStructure::existsColumn('locks', ['host-id'])) {
+
+		// If the locks table doesn't have a host-id, but values, you have to temporary disable the foreign checks!
+		if (!DBA::e('SET FOREIGN_KEY_CHECKS=0')) {
+			return Update::FAILED;
+		}
+	}
 
 	return Update::SUCCESS;
 }
 
 function update_1422()
 {
-	$host = new \Friendica\Model\Host(DI::dba(), new \Psr\Log\NullLogger(), $_SERVER);
+	$host = new \Friendica\Model\Host(DI::dba(), new \Psr\Log\NullLogger(), []);
 
-	if (!DBA::update('locks', ['hostid' => $host->getId()], ['hostid IS NULL'])) {
+	if (!DBA::update('locks', ['host-id' => $host->getId()], ['`host-id` IS NULL']) ||
+		!DBA::e('SET FOREIGN_KEY_CHECKS=1')) {
 		return Update::FAILED;
 	}
 
