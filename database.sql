@@ -684,12 +684,12 @@ CREATE TABLE IF NOT EXISTS `hook` (
 --
 -- TABLE host
 --
-CREATE TABLE IF NOT EXISTS `host` (
+CREATE TABLE IF NOT EXISTS `hosts` (
 	`id` tinyint unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT 'The hostname',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `name` (`name`)
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Hostname';
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Host table';
 
 --
 -- TABLE inbox-status
@@ -734,12 +734,13 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT '',
 	`locked` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`host-id` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Host id',
+	`host-id` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'Host id',
 	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'The process id of the worker',
 	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of cache expiration',
 	 PRIMARY KEY(`id`),
 	 INDEX `name_expires` (`name`,`expires`),
-	 INDEX `locked_hostid_pid_expires` (`locked`, `host-id`, `pid`, `expires`)
+	 INDEX `locked_hostid_pid_expires` (`locked`, `host-id`, `pid`, `expires`),
+      FOREIGN KEY (`host-id`) REFERENCES `hosts` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --

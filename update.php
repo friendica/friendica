@@ -942,12 +942,18 @@ function update_1419()
 	return Update::SUCCESS;
 }
 
+function pre_update_1422()
+{
+	DBA::e("ALTER TABLE IF EXISTS `host` TO `" . \Friendica\Model\Host::TABLE . "`;");
+
+	return Update::SUCCESS;
+}
+
 function update_1422()
 {
-	$node = new \Friendica\Util\Node(new \Psr\Log\NullLogger(), $_SERVER);
-	$hostname = $node->getHostname();
+	$host = new \Friendica\Model\Host(DI::dba(), new \Psr\Log\NullLogger(), $_SERVER);
 
-	if (!DBA::update('locks', ['hostname' => $hostname], [])) {
+	if (!DBA::update('locks', ['hostid' => $host->getId()], ['hostid IS NULL'])) {
 		return Update::FAILED;
 	}
 

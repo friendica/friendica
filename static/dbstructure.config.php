@@ -747,8 +747,8 @@ return [
 			"hook_file_function" => ["UNIQUE", "hook", "file", "function"],
 		]
 	],
-	"host" => [
-		"comment" => "Hostname",
+	"hosts" => [
+		"comment" => "Host table",
 		"fields" => [
 			"id" => ["type" => "tinyint unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"name" => ["type" => "varchar(128)", "not null" => "1", "default" => "", "comment" => "The hostname"],
@@ -800,7 +800,7 @@ return [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"name" => ["type" => "varchar(128)", "not null" => "1", "default" => "", "comment" => ""],
 			"locked" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
-			"host-id" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "foreign" => ["host" => "id"], "comment" => "The host id"],
+			"host-id" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "foreign" => ["hosts" => "id"], "comment" => "Host id"],
 			"pid" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "The process id of the worker"],
 			"expires" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of cache expiration"],
 		],

@@ -26,6 +26,9 @@ use Psr\Log\LoggerInterface;
 
 class Host
 {
+	/** @var string db table of host model */
+	const TABLE = 'hosts';
+
 	/**
 	 * Defines the environment variable, which includes the current node name instead of the detected hostname
 	 *
@@ -70,13 +73,13 @@ class Host
 
 		$this->name = strtolower($hostname);
 
-		$host = $dba->selectFirst('host', ['id'], ['name' => $this->name]);
+		$host = $dba->selectFirst(self::TABLE, ['id'], ['name' => $this->name]);
 		if (!empty($host['id'])) {
 			$this->id = (int)$host['id'];
 		} else {
-			$dba->replace('host', ['name' => $hostname]);
+			$dba->replace(self::TABLE, ['name' => $hostname]);
 
-			$host = $dba->selectFirst('host', ['id'], ['name' => $hostname]);
+			$host = $dba->selectFirst(self::TABLE, ['id'], ['name' => $hostname]);
 			if (empty($host['id'])) {
 				$this->logger->warning('Host name could not be inserted', ['name' => $hostname]);
 			} else {
