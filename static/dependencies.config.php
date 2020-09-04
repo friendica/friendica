@@ -222,7 +222,7 @@ return [
 	Network\IHTTPRequest::class => [
 		'instanceOf' => Network\HTTPRequest::class,
 	],
-	Util\Node::class => [
+	Friendica\Model\Host::class => [
 		'constructParams' => [
 			$_SERVER,
 		],

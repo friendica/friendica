@@ -21,59 +21,87 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Logger;
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
+use Psr\Log\LoggerInterface;
 
 class Host
 {
 	/**
-	 * Get the id for a given hostname
-	 * When empty, the current hostname is used
+	 * Defines the environment variable, which includes the current node name instead of the detected hostname
 	 *
-	 * @param string $hostname
+	 * @var string
 	 *
-	 * @return integer host name id
-	 * @throws \Exception
+	 * @notice This is used for cluster environments, where the each node defines it own hostname.
 	 */
-	public static function getId(string $hostname = '')
+	const ENV_VARIABLE = 'NODE_NAME';
+
+	/** @var int|null The host id */
+	private $id = null;
+	/** @var string The host name */
+	private $name;
+
+	/** @var LoggerInterface */
+	private $logger;
+
+	public function __construct(Database $dba,  LoggerInterface $logger, array $server = [])
 	{
+		$this->logger = $logger;
+
+		$this->detectHostname($dba, $server);
+	}
+
+	private function detectHostname(Database $dba, array $server)
+	{
+		$hostname = $server[self::ENV_VARIABLE] ?? null;
+
 		if (empty($hostname)) {
 			$hostname = php_uname('n');
 		}
 
-		$hostname = strtolower($hostname);
+		// Trim whitespaces first to avoid getting an empty hostname
+		// For linux the hostname is read from file /proc/sys/kernel/hostname directly
+		$hostname = trim($hostname);
+		if (empty($hostname)) {
+			$this->logger->error('Empty hostname is invalid.');
+			$this->id = null;
+			$this->name = "";
+			return;
+		}
 
-		$host = DBA::selectFirst('host', ['id'], ['name' => $hostname]);
+		$this->name = strtolower($hostname);
+
+		$host = $dba->selectFirst('host', ['id'], ['name' => $this->name]);
 		if (!empty($host['id'])) {
-			return $host['id'];
+			$this->id = (int)$host['id'];
+		} else {
+			$dba->replace('host', ['name' => $hostname]);
+
+			$host = $dba->selectFirst('host', ['id'], ['name' => $hostname]);
+			if (empty($host['id'])) {
+				$this->logger->warning('Host name could not be inserted', ['name' => $hostname]);
+			} else {
+				$this->id = (int)$host['id'];
+			}
 		}
-
-		DBA::replace('host', ['name' => $hostname]);
-
-		$host = DBA::selectFirst('host', ['id'], ['name' => $hostname]);
-		if (empty($host['id'])) {
-			Logger::warning('Host name could not be inserted', ['name' => $hostname]);
-			return 0;
-		}
-
-		return $host['id'];
 	}
 
 	/**
-	 * Get the hostname for a given id
+	 * Get the id for a given host
 	 *
-	 * @param int $id
+	 * @return integer host name id
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
+	/**
+	 * Get the name of the hostname
 	 *
 	 * @return string host name
-	 * @throws \Exception
 	 */
-	public static function getName(int $id)
+	public function getName()
 	{
-		$host = DBA::selectFirst('host', ['name'], ['id' => $id]);
-		if (!empty($host['name'])) {
-			return $host['name'];
-		}
-
-		return '';
+		return $this->name;
 	}
 }
