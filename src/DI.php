@@ -395,14 +395,6 @@ abstract class DI
 	}
 
 	/**
-	 * @return Model\Host
-	 */
-	public static function host()
-	{
-		return self::$dice->create(Model\Host::class);
-	}
-
-	/**
 	 * @return Model\Storage\IStorage
 	 */
 	public static function storage()
