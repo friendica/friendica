@@ -800,14 +800,14 @@ return [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"name" => ["type" => "varchar(128)", "not null" => "1", "default" => "", "comment" => ""],
 			"locked" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
-			"hostid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "foreign" => ["host" => "id"], "comment" => "The host id"],
+			"host-id" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "foreign" => ["host" => "id"], "comment" => "The host id"],
 			"pid" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "The process id of the worker"],
 			"expires" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of cache expiration"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"name_expires" => ["name", "expires"],
-			"locked_hostid_pid_expires" => ["locked", "hostid", "pid", "expires"],
+			"locked_hostid_pid_expires" => ["locked", "host-id", "pid", "expires"],
 		]
 	],
 	"mail" => [

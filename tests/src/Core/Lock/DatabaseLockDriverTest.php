@@ -37,7 +37,6 @@ class DatabaseLockDriverTest extends LockTest
 	use DatabaseTestTrait;
 
 	protected $pid = 123;
-	protected $hostname = "localhost.test";
 
 	protected function setUp(): void
 	{
@@ -61,7 +60,7 @@ class DatabaseLockDriverTest extends LockTest
 
 		$dba = new StaticDatabase($configCache, $profiler, $logger);
 
-		return new DatabaseLock($dba, $this->hostname, $this->pid);
+		return new DatabaseLock($dba, $this->hostId, $this->pid);
 	}
 
 	protected function tearDown(): void

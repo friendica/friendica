@@ -26,7 +26,7 @@ use Friendica\Core\Cache\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Lock;
 use Friendica\Database\Database;
-use Friendica\Util\Node;
+use Friendica\Model\Host;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -68,13 +68,13 @@ class LockFactory
 	 */
 	private $hostname;
 
-	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger, Node $node)
+	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger, Host $node)
 	{
 		$this->cacheFactory = $cacheFactory;
 		$this->config       = $config;
 		$this->dba          = $dba;
 		$this->logger       = $logger;
-		$this->hostname     = $node->getHostname();
+		$this->hostname     = $node->getName();
 	}
 
 	public function create()

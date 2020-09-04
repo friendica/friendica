@@ -38,20 +38,38 @@ class CacheLock extends BaseLock
 	private $cache;
 
 	/**
-	 * @var string The hostname of this worker
+	 * @var int The id of this host
 	 */
-	private $hostname;
+	private $hostId;
 
 	/**
 	 * CacheLock constructor.
 	 *
 	 * @param IMemoryCache $cache The CacheDriver for this type of lock
-	 * @param string       $hostname The hostname of this worker (used for locks)
+	 * @param int       $hostId   The id of the current host (used for locks)
 	 */
-	public function __construct(IMemoryCache $cache, string $hostname)
+	public function __construct(IMemoryCache $cache, int $hostId)
 	{
-		$this->cache    = $cache;
-		$this->hostname = $hostname;
+		$this->cache  = $cache;
+		$this->hostId = $hostId;
+	}
+
+	/**
+	 * @param string $key The original key
+	 *
+	 * @return string        The cache key used for the cache
+	 */
+	private function getLockKey(string $key)
+	{
+		return $this->getLockPrefix() . $key;
+	}
+
+	/**
+	 * @return string Returns the prefix of this lock instance
+	 */
+	private function getLockPrefix()
+	{
+		return self::CACHE_PREFIX . $this->hostId . ':';
 	}
 
 	/**
@@ -130,10 +148,10 @@ class CacheLock extends BaseLock
 	 */
 	public function getLocks(string $prefix = '')
 	{
-		$locks = $this->cache->getAllKeys(self::CACHE_PREFIX . $prefix);
+		$locks = $this->cache->getAllKeys($this->getLockPrefix() . $prefix);
 
 		array_walk($locks, function (&$lock, $key) {
-			$lock = substr($lock, strlen(self::CACHE_PREFIX));
+			$lock = substr($lock, strlen($this->getLockPrefix()));
 		});
 
 		return $locks;
@@ -155,15 +173,5 @@ class CacheLock extends BaseLock
 		}
 
 		return $success;
-	}
-
-	/**
-	 * @param string $key The original key
-	 *
-	 * @return string        The cache key used for the cache
-	 */
-	private function getLockKey(string $key)
-	{
-		return self::CACHE_PREFIX . $this->hostname . ':' .  $key;
 	}
 }
