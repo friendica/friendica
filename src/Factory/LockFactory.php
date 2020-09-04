@@ -64,17 +64,17 @@ class LockFactory
 	private $logger;
 
 	/**
-	 * @var string The hostname of this node
+	 * @var int The id of this host
 	 */
-	private $hostname;
+	private $hostId;
 
-	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger, Host $node)
+	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger, Host $host)
 	{
 		$this->cacheFactory = $cacheFactory;
 		$this->config       = $config;
 		$this->dba          = $dba;
 		$this->logger       = $logger;
-		$this->hostname     = $node->getName();
+		$this->hostId       = $host->getId();
 	}
 
 	public function create()
@@ -89,13 +89,13 @@ class LockFactory
 				case Type::APCU:
 					$cache = $this->cacheFactory->create($lock_type);
 					if ($cache instanceof IMemoryCache) {
-						return new Lock\CacheLock($cache, $this->hostname);
+						return new Lock\CacheLock($cache, $this->hostId);
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
 
 				case 'database':
-					return new Lock\DatabaseLock($this->dba, $this->hostname, getmypid());
+					return new Lock\DatabaseLock($this->dba, $this->hostId, getmypid());
 
 				case 'semaphore':
 					return new Lock\SemaphoreLock();
@@ -136,7 +136,7 @@ class LockFactory
 			try {
 				$cache = $this->cacheFactory->create($cache_type);
 				if ($cache instanceof IMemoryCache) {
-					return new Lock\CacheLock($cache, $this->hostname);
+					return new Lock\CacheLock($cache, $this->hostId);
 				}
 			} catch (\Exception $exception) {
 				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception]);
@@ -144,6 +144,6 @@ class LockFactory
 		}
 
 		// 3. Use Database Locking as a Fallback
-		return new Lock\DatabaseLock($this->dba, $this->hostname, getmypid());
+		return new Lock\DatabaseLock($this->dba, $this->hostId, getmypid());
 	}
 }
