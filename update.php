@@ -960,7 +960,7 @@ function update_1422()
 {
 	$host = new \Friendica\Model\Host(DI::dba(), new \Psr\Log\NullLogger(), []);
 
-	if (!DBA::update('locks', ['host-id' => $host->getId()], ['`host-id` IS NULL']) ||
+	if (!DBA::update('locks', ['host-id' => $host->getId()], ['host-id' => 0]) ||
 		!DBA::e('SET FOREIGN_KEY_CHECKS=1')) {
 		return Update::FAILED;
 	}

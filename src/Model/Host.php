@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
 class Host
 {
 	/** @var string db table of host model */
-	const TABLE = 'hosts';
+	const TABLE = 'host';
 
 	/**
 	 * Defines the environment variable, which includes the current node name instead of the detected hostname
