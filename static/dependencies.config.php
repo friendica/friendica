@@ -44,6 +44,7 @@ use Friendica\Core\Session\ISession;
 use Friendica\Core\StorageManager;
 use Friendica\Database\Database;
 use Friendica\Factory;
+use Friendica\Repository;
 use Friendica\Model\Storage\IStorage;
 use Friendica\Model\User\Cookie;
 use Friendica\Network;
@@ -223,8 +224,9 @@ return [
 		'instanceOf' => Network\HTTPRequest::class,
 	],
 	Friendica\Model\Host::class => [
-		'constructParams' => [
-			$_SERVER,
+		'instanceOf' => Repository\Host::class,
+		'call' => [
+			['selectCurrentHost', [$_SERVER], Dice::CHAIN_CALL],
 		],
 	],
 ];

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2020, Friendica
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -19,14 +19,11 @@
  *
  */
 
-namespace Friendica\Model;
+namespace Friendica\Collection;
 
-use Friendica\BaseModel;
+use Friendica\BaseCollection;
 
-/**
- * @property string name
- */
-class Host extends BaseModel
+class Hosts extends BaseCollection
 {
 
 }
