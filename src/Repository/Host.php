@@ -77,12 +77,12 @@ class Host extends BaseRepository
 		$hostname = strtolower($hostname);
 
 		$data = $this->dba->selectFirst(self::$table_name, ['id', 'name'], ['name' => $hostname]);
-		if (!empty($host['id'])) {
-			return new Model\Host($this->dba, $this->logger, $data);
+		if (!empty($data['id'])) {
+			return $this->create($data);
 		} else {
 			$this->dba->replace(self::$table_name, ['name' => $hostname]);
 
-			return parent::selectFirst(['name' => $hostname]);
+			return $this->selectFirst(['name' => $hostname]);
 		}
 	}
 
