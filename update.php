@@ -944,24 +944,11 @@ function update_1419()
 
 function pre_update_1422()
 {
-	if (DBA::count('locks') > 0 &&
-		!DBStructure::existsColumn('locks', ['host-id'])) {
-
-		// If the locks table doesn't have a host-id, but values, you have to temporary disable the foreign checks!
-		if (!DBA::e('SET FOREIGN_KEY_CHECKS=0')) {
-			return Update::FAILED;
-		}
-	}
-
-	return Update::SUCCESS;
-}
-
-function update_1422()
-{
-	$host = new \Friendica\Model\Host(DI::dba(), new \Psr\Log\NullLogger(), []);
-
-	if (!DBA::update('locks', ['host-id' => $host->getId()], ['host-id' => 0]) ||
-		!DBA::e('SET FOREIGN_KEY_CHECKS=1')) {
+	// Lock cleanup to avoid constraint violations during foreign key creation
+	if (DBStructure::existsTable('locks') &&
+		DBA::lock('locks') &&
+		!DBA::e("DELETE FROM `locks`") &&
+		DBA::unlock()) {
 		return Update::FAILED;
 	}
 

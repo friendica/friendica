@@ -427,6 +427,14 @@ abstract class DI
 	}
 
 	/**
+	 * @return Repository\Host
+	 */
+	public static function hostRepo()
+	{
+		return self::$dice->create(Repository\Host::class);
+	}
+
+	/**
 	 * @return Repository\Introduction
 	 */
 	public static function intro()
