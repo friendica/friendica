@@ -61,9 +61,9 @@ class DatabaseLockDriverTest extends LockTest
 
 		$dba = new StaticDatabase($configCache, $profiler, $logger);
 
-		$host = new Host($dba, new NullLogger(), []);
+		$host = new Host($dba, new NullLogger(), ['name' => 'test', 'id' => 1]);
 
-		return new DatabaseLock($dba, $host->getId(), $this->pid);
+		return new DatabaseLock($dba, $host->id, $this->pid);
 	}
 
 	protected function tearDown(): void

@@ -74,7 +74,7 @@ class LockFactory
 		$this->config       = $config;
 		$this->dba          = $dba;
 		$this->logger       = $logger;
-		$this->hostId       = $host->getId();
+		$this->hostId       = $host->id;
 	}
 
 	public function create()
