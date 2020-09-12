@@ -37,15 +37,15 @@ doSomething($intros);
 
 After:
 ```php
-function doSomething(\Friendica\Collection\Introductions $intros)
+function doSomething(\Friendica\Domain\Collection\Introductions $intros)
 {
     foreach ($intros as $intro) {
-        /** @var $intro \Friendica\Model\Introduction */
+        /** @var $intro \Friendica\Domain\Model\Introduction */
         $introId = $intro->id;
     }
 }
 
-/** @var $intros \Friendica\Collection\Introductions */
+/** @var $intros \Friendica\Domain\Collection\Introductions */
 $intros = \Friendica\DI::intro()->select(['uid' => local_user()]);
 
 doSomething($intros);

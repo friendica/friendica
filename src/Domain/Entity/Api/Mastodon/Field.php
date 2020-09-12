@@ -19,23 +19,29 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain\Entity\Api\Mastodon;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Domain\BaseEntity;
 
 /**
- * @see https://docs.joinmastodon.org/api/rest/instances/
+ * Class Field
+ *
+ * @see https://docs.joinmastodon.org/entities/field/
  */
-class Instance extends BaseApi
+class Field extends BaseEntity
 {
-	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function rawContent(array $parameters = [])
+	/** @var string */
+	protected $name;
+	/** @var string (HTML) */
+	protected $value;
+	/** @var string (Datetime)*/
+	protected $verified_at;
+
+	public function __construct(string $name, string $value)
 	{
-		System::jsonExit(InstanceEntity::get());
+		$this->name = $name;
+		$this->value = $value;
+		// Link verification unsupported
+		$this->verified_at = null;
 	}
 }

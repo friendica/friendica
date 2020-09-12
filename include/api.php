@@ -39,7 +39,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Mail;
-use Friendica\Model\Notify;
+use Friendica\Domain\Model\Notify;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
 use Friendica\Model\UserItem;

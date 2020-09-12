@@ -33,6 +33,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
+use Friendica\Domain\Model\PermissionSet;
 use Friendica\Model\Post\Category;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
@@ -43,7 +44,7 @@ use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Worker\Delivery;
 use Text_LanguageDetect;
-use Friendica\Repository\PermissionSet as RepPermissionSet;
+use Friendica\Domain\Repository\PermissionSet as RepPermissionSet;
 
 class Item
 {

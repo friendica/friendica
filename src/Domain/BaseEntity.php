@@ -19,23 +19,34 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
-
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+namespace Friendica\Domain;
 
 /**
- * @see https://docs.joinmastodon.org/api/rest/instances/
+ * The API entity classes are meant as data transfer objects. As such, their member should be protected.
+ * Then the JsonSerializable interface ensures the protected members will be included in a JSON encode situation.
+ *
+ * Constructors are supposed to take as arguments the Friendica dependencies/model/collection/data it needs to
+ * populate the class members.
  */
-class Instance extends BaseApi
+abstract class BaseEntity implements \JsonSerializable
 {
 	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * Returns the current entity as an json array
+	 *
+	 * @return array
 	 */
-	public static function rawContent(array $parameters = [])
+	public function jsonSerialize()
 	{
-		System::jsonExit(InstanceEntity::get());
+		return $this->toArray();
+	}
+
+	/**
+	 * Returns the current entity as an array
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		return get_object_vars($this);
 	}
 }

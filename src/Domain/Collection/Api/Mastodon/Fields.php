@@ -19,23 +19,21 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain\Collection\Api\Mastodon;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Domain\Entity\Api\Mastodon\Field;
+use Friendica\Domain\BaseCollection;
 
-/**
- * @see https://docs.joinmastodon.org/api/rest/instances/
- */
-class Instance extends BaseApi
+class Fields extends BaseCollection
 {
 	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @param Field[]  $entities
+	 * @param int|null $totalCount
 	 */
-	public static function rawContent(array $parameters = [])
+	public function __construct(array $entities = [], int $totalCount = null)
 	{
-		System::jsonExit(InstanceEntity::get());
+		parent::__construct($entities);
+
+		$this->totalCount = $totalCount ?? count($entities);
 	}
 }

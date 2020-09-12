@@ -19,23 +19,23 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Psr\Log\LoggerInterface;
 
 /**
- * @see https://docs.joinmastodon.org/api/rest/instances/
+ * Factories act as an intermediary to avoid direct Entitiy instanciation.
+ *
+ * @see BaseModel
+ * @see BaseCollection
  */
-class Instance extends BaseApi
+abstract class BaseFactory
 {
-	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function rawContent(array $parameters = [])
+	/** @var LoggerInterface */
+	protected $logger;
+
+	public function __construct(LoggerInterface $logger)
 	{
-		System::jsonExit(InstanceEntity::get());
+		$this->logger = $logger;
 	}
 }

@@ -19,23 +19,28 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain\Collection;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Domain\BaseCollection;
 
-/**
- * @see https://docs.joinmastodon.org/api/rest/instances/
- */
-class Instance extends BaseApi
+class ProfileFields extends BaseCollection
 {
 	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @param callable $callback
+	 * @return ProfileFields
 	 */
-	public static function rawContent(array $parameters = [])
+	public function map(callable $callback)
 	{
-		System::jsonExit(InstanceEntity::get());
+		return parent::map($callback);
+	}
+
+	/**
+	 * @param callable|null $callback
+	 * @param int           $flag
+	 * @return ProfileFields
+	 */
+	public function filter(callable $callback = null, int $flag = 0)
+	{
+		return parent::filter($callback, $flag);
 	}
 }

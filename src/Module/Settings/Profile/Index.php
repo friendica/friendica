@@ -32,7 +32,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Model\ProfileField;
+use Friendica\Domain\Model\ProfileField;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;

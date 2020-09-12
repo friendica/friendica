@@ -32,7 +32,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Notify;
+use Friendica\Domain\Model\Notify;
 use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 

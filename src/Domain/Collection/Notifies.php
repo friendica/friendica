@@ -19,23 +19,18 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain\Collection;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Domain\BaseCollection;
+use Friendica\Domain\Model\Notify;
 
-/**
- * @see https://docs.joinmastodon.org/api/rest/instances/
- */
-class Instance extends BaseApi
+class Notifies extends BaseCollection
 {
 	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @return Notify
 	 */
-	public static function rawContent(array $parameters = [])
+	public function current()
 	{
-		System::jsonExit(InstanceEntity::get());
+		return parent::current();
 	}
 }

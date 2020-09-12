@@ -28,7 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\ItemContent;
-use Friendica\Model\Notify;
+use Friendica\Domain\Model\Notify;
 use Friendica\Model\User;
 use Friendica\Model\UserItem;
 use Friendica\Protocol\Activity;

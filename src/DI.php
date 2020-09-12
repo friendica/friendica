@@ -240,75 +240,75 @@ abstract class DI
 	//
 
 	/**
-	 * @return Factory\Api\Mastodon\Account
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\Account
 	 */
 	public static function mstdnAccount()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Account::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\Account::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Emoji
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\Emoji
 	 */
 	public static function mstdnEmoji()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Emoji::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\Emoji::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Field
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\Field
 	 */
 	public static function mstdnField()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Field::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\Field::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\FollowRequest
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\FollowRequest
 	 */
 	public static function mstdnFollowRequest()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\FollowRequest::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\FollowRequest::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Relationship
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\Relationship
 	 */
 	public static function mstdnRelationship()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Relationship::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\Relationship::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Status
+	 * @return \Friendica\Domain\Factory\Api\Mastodon\Status
 	 */
 	public static function mstdnStatus()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Status::class);
+		return self::$dice->create(Domain\Factory\Api\Mastodon\Status::class);
 	}
 
 	/**
-	 * @return Factory\Api\Twitter\User
+	 * @return \Friendica\Domain\Factory\Api\Twitter\User
 	 */
 	public static function twitterUser()
 	{
-		return self::$dice->create(Factory\Api\Twitter\User::class);
+		return self::$dice->create(Domain\Factory\Api\Twitter\User::class);
 	}
 
 	/**
-	 * @return Factory\Notification\Notification
+	 * @return \Friendica\Domain\Factory\Notification\Notification
 	 */
 	public static function notification()
 	{
-		return self::$dice->create(Factory\Notification\Notification::class);
+		return self::$dice->create(Domain\Factory\Notification\Notification::class);
 	}
 
 	/**
-	 * @return Factory\Notification\Introduction
+	 * @return \Friendica\Domain\Factory\Notification\Introduction
 	 */
 	public static function notificationIntro()
 	{
-		return self::$dice->create(Factory\Notification\Introduction::class);
+		return self::$dice->create(Domain\Factory\Notification\Introduction::class);
 	}
 
 	//
@@ -348,43 +348,43 @@ abstract class DI
 	//
 
 	/**
-	 * @return Repository\FSuggest;
+	 * @return \Friendica\Domain\Repository\FSuggest;
 	 */
 	public static function fsuggest()
 	{
-		return self::$dice->create(Repository\FSuggest::class);
+		return self::$dice->create(Domain\Repository\FSuggest::class);
 	}
 
 	/**
-	 * @return Repository\Introduction
+	 * @return \Friendica\Domain\Repository\Introduction
 	 */
 	public static function intro()
 	{
-		return self::$dice->create(Repository\Introduction::class);
+		return self::$dice->create(Domain\Repository\Introduction::class);
 	}
 
 	/**
-	 * @return Repository\PermissionSet
+	 * @return \Friendica\Domain\Repository\PermissionSet
 	 */
 	public static function permissionSet()
 	{
-		return self::$dice->create(Repository\PermissionSet::class);
+		return self::$dice->create(Domain\Repository\PermissionSet::class);
 	}
 
 	/**
-	 * @return Repository\ProfileField
+	 * @return \Friendica\Domain\Repository\ProfileField
 	 */
 	public static function profileField()
 	{
-		return self::$dice->create(Repository\ProfileField::class);
+		return self::$dice->create(Domain\Repository\ProfileField::class);
 	}
 
 	/**
-	 * @return Repository\Notify
+	 * @return \Friendica\Domain\Repository\Notify
 	 */
 	public static function notify()
 	{
-		return self::$dice->create(Repository\Notify::class);
+		return self::$dice->create(Domain\Repository\Notify::class);
 	}
 
 	//

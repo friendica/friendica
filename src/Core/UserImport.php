@@ -28,7 +28,7 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Object\Image;
-use Friendica\Repository\PermissionSet;
+use Friendica\Domain\Repository\PermissionSet;
 use Friendica\Util\Strings;
 use Friendica\Worker\Delivery;
 

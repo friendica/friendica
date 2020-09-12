@@ -38,7 +38,7 @@ use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Mail;
 use Friendica\Model\Notify\Type;
-use Friendica\Model\PermissionSet;
+use Friendica\Domain\Model\PermissionSet;
 use Friendica\Model\Post\Category;
 use Friendica\Model\Profile;
 use Friendica\Model\Tag;

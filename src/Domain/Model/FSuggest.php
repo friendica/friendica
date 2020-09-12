@@ -19,23 +19,23 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Domain\Model;
 
-use Friendica\Core\System;
-use Friendica\Module\BaseApi;
-use Friendica\Domain\Entity\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Domain\BaseModel;
 
 /**
- * @see https://docs.joinmastodon.org/api/rest/instances/
+ * Model for interacting with a friend suggestion
+ *
+ * @property int uid
+ * @property int cid
+ * @property string name
+ * @property string url
+ * @property string request
+ * @property string photo
+ * @property string note
+ * @property string created
  */
-class Instance extends BaseApi
+class FSuggest extends BaseModel
 {
-	/**
-	 * @param array $parameters
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function rawContent(array $parameters = [])
-	{
-		System::jsonExit(InstanceEntity::get());
-	}
+
 }
