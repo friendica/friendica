@@ -40,7 +40,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;

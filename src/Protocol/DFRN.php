@@ -37,7 +37,7 @@ use Friendica\Model\FContact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Mail;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Domain\Model\PermissionSet;
 use Friendica\Model\Post\Category;
 use Friendica\Model\Profile;

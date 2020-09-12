@@ -26,7 +26,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Database\DBA;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\Delivery;

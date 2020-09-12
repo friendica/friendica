@@ -29,7 +29,7 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;

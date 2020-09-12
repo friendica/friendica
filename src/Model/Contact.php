@@ -31,7 +31,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;

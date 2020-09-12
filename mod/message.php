@@ -29,7 +29,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Module\Security\Login;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;

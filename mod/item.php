@@ -46,7 +46,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\FileTag;
 use Friendica\Model\Item;
-use Friendica\Model\Notify\Type;
+use Friendica\Domain\Model\Notify\Type;
 use Friendica\Model\Photo;
 use Friendica\Model\Tag;
 use Friendica\Network\HTTPException;
