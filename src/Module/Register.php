@@ -367,18 +367,18 @@ class Register extends BaseModule
 			// send notification to admins
 			while ($admin = DBA::fetch($admins_stmt)) {
 				\notification([
-								  'type'         => \Friendica\Domain\Model\Notify\Type::SYSTEM,
-								  'event'        => 'SYSTEM_REGISTER_REQUEST',
-								  'source_name'  => $user['username'],
-								  'source_mail'  => $user['email'],
-								  'source_nick'  => $user['nickname'],
-								  'source_link'  => $base_url . '/admin/users/',
-								  'link'         => $base_url . '/admin/users/',
-								  'source_photo' => $base_url . '/photo/avatar/' . $user['uid'] . '.jpg',
-								  'to_email'     => $admin['email'],
-								  'uid'          => $admin['uid'],
-								  'language'     => ($admin['language'] ?? '') ?: 'en',
-								  'show_in_notification_page' => false
+					'type'         => \Friendica\Domain\Model\Notify\Type::SYSTEM,
+					'event'        => 'SYSTEM_REGISTER_REQUEST',
+					'source_name'  => $user['username'],
+					'source_mail'  => $user['email'],
+					'source_nick'  => $user['nickname'],
+					'source_link'  => $base_url . '/admin/users/',
+					'link'         => $base_url . '/admin/users/',
+					'source_photo' => $base_url . '/photo/avatar/' . $user['uid'] . '.jpg',
+					'to_email'     => $admin['email'],
+					'uid'          => $admin['uid'],
+					'language'     => ($admin['language'] ?? '') ?: 'en',
+					'show_in_notification_page' => false
 				]);
 			}
 			DBA::close($admins_stmt);
