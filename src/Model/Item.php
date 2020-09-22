@@ -992,7 +992,9 @@ class Item
 				}
 			}
 
-			Post\DeliveryData::update($item['uri-id'], $delivery_data);
+			if ($item['uri-id']) {
+				Post\DeliveryData::update($item['uri-id'], $delivery_data);
+			}
 
 			self::updateThread($item['id']);
 
