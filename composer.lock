@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cd2011a7e93f6f64524d1663651c016",
+    "content-hash": "744827edc867db110530c378e051db9b",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -460,6 +460,7 @@
                     "jsonld.php"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -477,11 +478,11 @@
             "description": "A JSON-LD Processor and API implementation in PHP.",
             "homepage": "https://git.friendi.ca/friendica/php-json-ld",
             "keywords": [
-                "JSON",
                 "JSON-LD",
                 "Linked Data",
                 "RDF",
                 "Semantic Web",
+                "json",
                 "jsonld"
             ],
             "time": "2018-10-08T20:41:00+00:00"
@@ -4451,7 +4452,7 @@
                 }
             ],
             "description": "Provides the functionality to compare PHP values for equality",
-            "homepage": "http://www.github.com/sebastianbergmann/comparator",
+            "homepage": "https://github.com/sebastianbergmann/comparator",
             "keywords": [
                 "comparator",
                 "compare",
@@ -4553,7 +4554,7 @@
                 }
             ],
             "description": "Provides functionality to handle HHVM/PHP environments",
-            "homepage": "http://www.github.com/sebastianbergmann/environment",
+            "homepage": "https://github.com/sebastianbergmann/environment",
             "keywords": [
                 "Xdebug",
                 "environment",
@@ -4621,7 +4622,7 @@
                 }
             ],
             "description": "Provides the functionality to export PHP variables for visualization",
-            "homepage": "http://www.github.com/sebastianbergmann/exporter",
+            "homepage": "https://github.com/sebastianbergmann/exporter",
             "keywords": [
                 "export",
                 "exporter"
@@ -4673,7 +4674,7 @@
                 }
             ],
             "description": "Snapshotting of global state",
-            "homepage": "http://www.github.com/sebastianbergmann/global-state",
+            "homepage": "https://github.com/sebastianbergmann/global-state",
             "keywords": [
                 "global state"
             ],
@@ -4775,7 +4776,7 @@
                 }
             ],
             "description": "Provides functionality to recursively process PHP variables",
-            "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
+            "homepage": "https://github.com/sebastianbergmann/recursion-context",
             "time": "2016-11-19T07:33:16+00:00"
         },
         {
