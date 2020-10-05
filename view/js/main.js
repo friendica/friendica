@@ -972,6 +972,26 @@ function notificationMarkAll() {
 	});
 }
 
+function notificationPause() {
+	$.get('notification/pause', function(data) {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(NavUpdate,1000);
+		force_update = true;
+	});
+}
+
+function notificationUnpause() {
+	$.get('notification/unpause', function(data) {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(NavUpdate,1000);
+		force_update = true;
+	});
+}
+
 /**
  * sprintf in javascript
  *	"{0} and {1}".format('zero','uno');

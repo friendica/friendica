@@ -51,6 +51,8 @@
 				<span id="notification-update" class="nav-ajax-left"></span>
 				<ul id="nav-notifications-menu" class="menu-popup">
 					<li id="nav-notifications-see-all"><a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a></li>
+					{{if $nav.notifications.pause}}<li id="nav-notifications-pause"><a onclick="notificationPause(); return false;">{{$nav.notifications.pause}}</a></li>{{/if}}
+					{{if $nav.notifications.unpause}}<li id="nav-notifications-unpause"><a onclick="notificationUnpause(); return false;">{{$nav.notifications.unpause}}</a></li>{{/if}}
 					<li id="nav-notifications-mark-all"><a href="#" onclick="notificationMarkAll(); return false;">{{$nav.notifications.mark.3}}</a></li>
 					<li class="empty">{{$emptynotifications}}</li>
 				</ul>

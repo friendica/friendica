@@ -370,6 +370,10 @@ function ping_init(App $a)
 			'info' => $sysmsgs_info
 		];
 
+		if (DI::pConfig()->get(local_user(), 'system', 'pause_notification')) {
+			$data = [];
+		}
+
 		$json_payload = json_encode(["result" => $data]);
 
 		if (isset($_GET['callback'])) {

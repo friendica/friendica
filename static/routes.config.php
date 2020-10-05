@@ -231,9 +231,12 @@ return [
 
 	'/notification'         => [
 		'[/]'       => [Module\Notifications\Notification::class, [R::GET]],
+		'/pause'    => [Module\Notifications\Notification::class, [R::GET]],
+		'/unpause'  => [Module\Notifications\Notification::class, [R::GET]],
 		'/mark/all' => [Module\Notifications\Notification::class, [R::GET]],
 		'/{id:\d+}' => [Module\Notifications\Notification::class, [R::GET, R::POST]],
 	],
+
 	'/objects/{guid}[/{activity}]' => [Module\Objects::class, [R::GET]],
 
 	'/oembed'         => [
