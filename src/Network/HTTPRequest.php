@@ -205,7 +205,7 @@ class HTTPRequest implements IHTTPRequest
 				'referer' => true,
 			],
 			'on_headers' => $onHeaders,
-			'sink' => tempnam(get_temppath(), 'guzzle'),
+			'sink' => fopen('php://temp', 'w+'),
 			'curl' => $curlOptions
 		]);
 
