@@ -85,7 +85,7 @@ class Directory extends BaseModule
 			foreach ($profiles['entries'] as $entry) {
 				$contact = Model\Contact::getByURLForUser($entry['url'], local_user());
 				if (!empty($contact)) {
-					$entries[] = Contact::getContactTemplateVars($contact);
+					$entries[] = Model\Contact::getContactTemplateVars($contact);
 				}
 			}
 		}
