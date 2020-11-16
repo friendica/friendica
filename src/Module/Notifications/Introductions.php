@@ -23,6 +23,7 @@ namespace Friendica\Module\Notifications;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
+use Friendica\Content\Text\BBCode;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
@@ -122,9 +123,11 @@ class Introductions extends BaseNotifications
 						$knowyou = '';
 					}
 
+					$convertedName = BBCode::convert($notification->getName());
+
 					$helptext  = DI::l10n()->t('Shall your connection be bidirectional or not?');
-					$helptext2 = DI::l10n()->t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $notification->getName(), $notification->getName());
-					$helptext3 = DI::l10n()->t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $notification->getName());
+					$helptext2 = DI::l10n()->t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $convertedName, $convertedName);
+					$helptext3 = DI::l10n()->t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $convertedName);
 
 					$friend = ['duplex', DI::l10n()->t('Friend'), '1', $helptext2, true];
 					$follower = ['duplex', DI::l10n()->t('Subscriber'), '0', $helptext3, false];
