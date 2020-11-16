@@ -3,9 +3,10 @@
 	$(function(){
 		$("nav").bind('nav-update', function(e,data){
 			var elm = $('#pending-update');
-			var register = $(data).find('register').text();
-			if (register=="0") { register = ""; }
-			elm.html(register);
+			var register = parseInt($(data).find('register').text());
+			if (register > 0) {
+				elm.html(register);
+			}
 		});
 	});
 </script>

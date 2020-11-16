@@ -145,7 +145,7 @@ $(document).ready(function(){
 	if( $(".search-content-wrapper").length ) {
 		// get the text of the heading (we catch the plain text because we don't
 		// want to have a h4 heading in the navbar
-		var searchText = $(".section-title-wrapper > h2").text();
+		var searchText = $(".section-title-wrapper > h2").html();
 		// insert the plain text in a <h4> heading and give it a class
 		var newText = '<h4 class="search-heading">'+searchText+'</h4>';
 		// append the new heading to the navbar
@@ -207,7 +207,7 @@ $(document).ready(function(){
 		// get the heading element
 		var heading = $(".network-content-wrapper > .section-title-wrapper > h2");
 		// get the text of the heading
-		var headingContent = heading.text();
+		var headingContent = heading.html();
 		// create a new element with the content of the heading
 		var newText = '<h4 class="heading" data-toggle="tooltip" title="'+headingContent+'">'+headingContent+'</h4>';
 		// remove the old heading element
@@ -220,7 +220,7 @@ $(document).ready(function(){
 		// get the heading element
 		var heading = $(".community-content-wrapper > h3").first();
 		// get the text of the heading
-		var headingContent = heading.text();
+		var headingContent = heading.html();
 		// create a new element with the content of the heading
 		var newText = '<h4 class="heading">'+headingContent+'</h4>';
 		// remove the old heading element
@@ -789,7 +789,7 @@ function bin2hex (s) {
 // Dropdown menus with the class "dropdown-head" will display the active tab
 // as button text
 function toggleDropdownText(elm) {
-		$(elm).closest(".dropdown").find('.btn').html($(elm).text() + ' <span class="caret"></span>');
+		$(elm).closest(".dropdown").find('.btn').html($(elm).html() + ' <span class="caret"></span>');
 		$(elm).closest(".dropdown").find('.btn').val($(elm).data('value'));
 		$(elm).closest("ul").children("li").show();
 		$(elm).parent("li").hide();

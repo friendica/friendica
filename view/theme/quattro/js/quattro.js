@@ -2,8 +2,8 @@
 $(document).ready(function(){
 	$('nav').bind('nav-update', function(e,data){
 		var notifCount = $(data).find('notif').attr('count');
-		var intro = $(data).find('intro').text();
-		var mail = $(data).find('mail').text();
+		var intro = parseInt($(data).find('intro').text());
+		var mail = parseInt($(data).find('mail').text());
 
 		$(".tool .notify").removeClass("on");
 		$(data).find("group").each(function() {
