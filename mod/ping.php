@@ -133,7 +133,7 @@ function ping_init(App $a)
 			exit();
 		}
 
-		$notifs = ping_get_notifications(local_user());
+		$notifications = ping_get_notifications(local_user());
 
 		$condition = ["`unseen` AND `uid` = ? AND NOT `origin` AND (`vid` != ? OR `vid` IS NULL)",
 			local_user(), Verb::getID(Activity::FOLLOW)];
@@ -263,8 +263,8 @@ function ping_init(App $a)
 		$data['birthdays']        = $birthdays;
 		$data['birthdays-today']  = $birthdays_today;
 
-		if (DBA::isResult($notifs)) {
-			foreach ($notifs as $notif) {
+		if (DBA::isResult($notifications)) {
+			foreach ($notifications as $notif) {
 				if ($notif['seen'] == 0) {
 					$sysnotify_count ++;
 				}
@@ -277,14 +277,14 @@ function ping_init(App $a)
 				$notif = [
 					'id'      => 0,
 					'href'    => DI::baseUrl() . '/notifications/intros/' . $intro['id'],
-					'name'    => $intro['name'],
+					'name'    => BBCode::convert($intro['name']),
 					'url'     => $intro['url'],
 					'photo'   => $intro['photo'],
 					'date'    => $intro['datetime'],
 					'seen'    => false,
 					'message' => DI::l10n()->t('{0} wants to be your friend'),
 				];
-				$notifs[] = $notif;
+				$notifications[] = $notif;
 			}
 		}
 
@@ -300,7 +300,7 @@ function ping_init(App $a)
 					'seen'    => false,
 					'message' => DI::l10n()->t('{0} requested registration'),
 				];
-				$notifs[] = $notif;
+				$notifications[] = $notif;
 			}
 		}
 
@@ -323,28 +323,16 @@ function ping_init(App $a)
 			}
 			return ($adate < $bdate) ? 1 : -1;
 		};
-		usort($notifs, $sort_function);
+		usort($notifications, $sort_function);
 
-		if (DBA::isResult($notifs)) {
-			foreach ($notifs as $notif) {
-				$contact = Contact::getByURL($notif['url'], false, ['micro', 'id', 'avatar']);
-				$notif['photo'] = Contact::getMicro($contact, $notif['photo']);
-
-				$local_time = DateTimeFormat::local($notif['date']);
-
-				$notifications[] = [
-					'id'        => $notif['id'],
-					'href'      => $notif['href'],
-					'name'      => $notif['name'],
-					'url'       => $notif['url'],
-					'photo'     => $notif['photo'],
-					'date'      => Temporal::getRelativeDate($notif['date']),
-					'message'   => $notif['message'],
-					'seen'      => $notif['seen'],
-					'timestamp' => strtotime($local_time)
-				];
+		array_walk($notifications, function (&$notification) {
+			if (empty($notification['photo'])) {
+				$contact = Contact::getByURL($notification['url'], false, ['micro', 'id', 'avatar']);
+				$notification['photo'] = Contact::getMicro($contact, $notif['photo']);
 			}
-		}
+
+			$notification['timestamp'] = DateTimeFormat::local($notification['date']);
+		});
 	}
 
 	$sysmsgs = [];
