@@ -1185,7 +1185,7 @@ class Diaspora
 	private static function parentItem($uid, $guid, $author, array $contact)
 	{
 		$fields = ['id', 'parent', 'body', 'wall', 'uri', 'guid', 'private', 'origin',
-			'author-name', 'author-link', 'author-avatar', 'gravity',
+			'author-name', 'author-link', 'author-avatar', 'gravity', 'parent-uri',
 			'owner-name', 'owner-link', 'owner-avatar'];
 		$condition = ['uid' => $uid, 'guid' => $guid];
 		$item = Item::selectFirst($fields, $condition);
@@ -2339,7 +2339,7 @@ class Diaspora
 	 */
 	private static function addReshareActivity($item, $parent_message_id, $guid, $author)
 	{
-		$parent = Item::selectFirst(['uri', 'guid'], ['id' => $parent_message_id]);
+		$parent = Item::selectFirst(['uri', 'guid', 'parent-uri'], ['id' => $parent_message_id]);
 
 		$datarray = [];
 
