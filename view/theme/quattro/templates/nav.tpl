@@ -63,6 +63,8 @@
 				<span id="notification-update" class="nav-notification"></span>
 				<ul id="nav-notifications-menu" class="menu-popup">
 					<!-- TODO: better icons! -->
+					{{if $nav.notifications.pause}}<li id="nav-notifications-pause"><a onclick="notificationPause(); return false;" title="{{$nav.notifications.pause}}"><span class="icon s10 edit"></span></a></li>{{/if}}
+					{{if $nav.notifications.unpause}}<li id="nav-notifications-unpause"><a onclick="notificationUnpause(); return false;" title="{{$nav.notifications.unpause}}"><span class="icon s10 edit"></span></a></li>{{/if}}
 					<li id="nav-notifications-mark-all" class="toolbar"><a href="#" onclick="notificationMarkAll(); return false;" title="{{$nav.notifications.mark.3}}"><span class="icon s10 edit"></span></a></a><a href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.all.1}}"><span class="icon s10 plugin"></span></a></li>
 					<li class="empty">{{$emptynotifications}}</li>
 				</ul>

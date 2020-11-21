@@ -268,6 +268,12 @@ class Nav
 				$nav['notifications'] = ['notifications',	DI::l10n()->t('Notifications'), '', DI::l10n()->t('Notifications')];
 				$nav['notifications']['all'] = ['notifications/system', DI::l10n()->t('See all notifications'), '', ''];
 				$nav['notifications']['mark'] = ['', DI::l10n()->t('Mark as seen'), '', DI::l10n()->t('Mark all system notifications seen')];
+
+				if (DI::pConfig()->get(local_user(), 'system', 'pause_notification')) {
+					$nav['notifications']['unpause'] = DI::l10n()->t('Unpause');
+				} else {
+					$nav['notifications']['pause'] = DI::l10n()->t('Pause');
+				}
 			}
 
 			$nav['messages'] = ['message', DI::l10n()->t('Messages'), '', DI::l10n()->t('Private mail')];

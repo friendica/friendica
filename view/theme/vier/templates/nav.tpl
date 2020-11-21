@@ -69,6 +69,8 @@
 					<span id="notification-update" class="nav-notification"></span>
 				</a>
 				<ul id="nav-notifications-menu" class="menu-popup">
+					{{if $nav.notifications.pause}}<li role="menuitem" id="nav-notifications-pause"><a onclick="notificationPause(); return false;">{{$nav.notifications.pause}}</a></li>{{/if}}
+					{{if $nav.notifications.unpause}}<li role="menuitem" id="nav-notifications-unpause"><a onclick="notificationUnpause(); return false;">{{$nav.notifications.unpause}}</a></li>{{/if}}
 					<li role="menuitem" id="nav-notifications-mark-all"><a onclick="notificationMarkAll(); return false;">{{$nav.notifications.mark.1}}</a></li>
 					<li role="menuitem" id="nav-notifications-see-all"><a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a></li>
 					<li role="menuitem" class="empty">{{$emptynotifications}}</li>

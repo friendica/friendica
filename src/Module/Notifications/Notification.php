@@ -22,6 +22,7 @@
 namespace Friendica\Module\Notifications;
 
 use Friendica\BaseModule;
+use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Module\Security\Login;
@@ -74,6 +75,16 @@ class Notification extends BaseModule
 	{
 		if (!local_user()) {
 			throw new HTTPException\UnauthorizedException(DI::l10n()->t('Permission denied.'));
+		}
+
+		if (DI::args()->get(1) === 'pause') {
+			DI::pConfig()->set(local_user(), 'system', 'pause_notification', true);
+			$success = true;
+		}
+
+		if (DI::args()->get(1) === 'unpause') {
+			DI::pConfig()->set(local_user(), 'system', 'pause_notification', false);
+			$success = true;
 		}
 
 		if (DI::args()->get(1) === 'mark' && DI::args()->get(2) === 'all') {

@@ -87,6 +87,8 @@
 									<div class="arrow"></div>
 									{{$nav.notifications.1}}
 									<div class="dropdown-header-link">
+										{{if $nav.notifications.pause}}<button role="menuitem" type="button" class="btn-link" onclick="notificationPause();" data-toggle="tooltip" aria-label="{{$nav.notifications.pause}}" title="{{$nav.notifications.pause}}"><i class="fa fa-pause" aria-hidden="true"></i></button>{{/if}}
+										{{if $nav.notifications.unpause}}<button role="menuitem" type="button" class="btn-link" onclick="notificationUnpause();" data-toggle="tooltip" aria-label="{{$nav.notifications.unpause}}" title="{{$nav.notifications.unpause}}"><i class="fa fa-play" aria-hidden="true"></i></button>{{/if}}
 										<button role="menuitem" type="button" class="btn-link" onclick="notificationMarkAll();" data-toggle="tooltip" aria-label="{{$nav.notifications.mark.3}}" title="{{$nav.notifications.mark.3}}">{{$nav.notifications.mark.1}}</button>
 									</div>
 
