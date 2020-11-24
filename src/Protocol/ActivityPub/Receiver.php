@@ -104,7 +104,9 @@ class Receiver
 			return;
 		}
 
-		APContact::unMarkForArchival($apcontact);
+		if (!empty($apcontact)) {
+			APContact::unMarkForArchival($apcontact);
+		}
 
 		$http_signer = HTTPSignature::getSigner($body, $header);
 		if (empty($http_signer)) {
