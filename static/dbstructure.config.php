@@ -441,7 +441,7 @@ return [
 	"cache" => [
 		"comment" => "Stores temporary data",
 		"fields" => [
-			"k" => ["type" => "varbinary(255)", "not null" => "1", "primary" => "1", "comment" => "cache key"],
+			"k" => ["type" => "varchar(255)", "not null" => "1", "primary" => "1", "comment" => "cache key"],
 			"v" => ["type" => "mediumtext", "comment" => "cached serialized value"],
 			"expires" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of cache expiration"],
 			"updated" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of cache insertion"],
@@ -469,8 +469,8 @@ return [
 		"comment" => "main configuration storage",
 		"fields" => [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
-			"cat" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
-			"k" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
+			"cat" => ["type" => "varchar(50)", "not null" => "1", "default" => "", "comment" => ""],
+			"k" => ["type" => "varchar(50)", "not null" => "1", "default" => "", "comment" => ""],
 			"v" => ["type" => "mediumtext", "comment" => ""],
 		],
 		"indexes" => [
