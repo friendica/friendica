@@ -1378,6 +1378,9 @@ class BBCode
 					} while ($oldtext != $text);
 				}
 
+				// Add HTML new lines
+				$text = str_replace("\n", '<br>', $text);
+
 				/// @todo Have a closer look at the different html modes
 				// Handle attached links or videos
 				if ($simple_html == self::ACTIVITYPUB) {
@@ -1856,9 +1859,6 @@ class BBCode
 			$text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", function ($match) {
 				return str_replace(' ', '&nbsp;', htmlentities($match[1], ENT_NOQUOTES,'UTF-8'));
 			}, $text);
-
-			// Add HTML new lines
-			$text = str_replace("\n", '<br>', $text);
 
 			return $text;
 		}); // Escaped code
