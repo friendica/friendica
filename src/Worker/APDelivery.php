@@ -83,16 +83,18 @@ class APDelivery
 		$item = Item::selectFirst(['uri-id'], ['id' => $target_id]);
 		$uriid = $item['uri-id'] ?? 0;
 
-		foreach ($receivers as $receiver) {
-			$contact = Contact::getById($receiver);
-			if (empty($contact)) {
-				continue;
-			}
+		if (is_array($receivers)) {
+			foreach ($receivers as $receiver) {
+				$contact = Contact::getById($receiver);
+				if (empty($contact)) {
+					continue;
+				}
 
-			if ($success) {
-				Contact::unmarkForArchival($contact);
-			} else {
-				Contact::markForArchival($contact);
+				if ($success) {
+					Contact::unmarkForArchival($contact);
+				} else {
+					Contact::markForArchival($contact);
+				}
 			}
 		}
 
