@@ -185,9 +185,9 @@ function notification($params)
 		// First go for the general message
 
 		// "George Bull's post"
-		if ($params['activity']['origin_comment']) {
+		if (!empty($params['activity']['origin_comment'])) {
 			$message = $l10n->t('%1$s replied to you on %2$s\'s %3$s %4$s');
-		} elseif ($params['activity']['explicit_tagged']) {
+		} elseif (!empty($params['activity']['explicit_tagged'])) {
 			$message = $l10n->t('%1$s tagged you on %2$s\'s %3$s %4$s');
 		} else {
 			$message = $l10n->t('%1$s commented on %2$s\'s %3$s %4$s');
@@ -198,10 +198,10 @@ function notification($params)
 		// Then look for the special cases
 
 		// "your post"
-		if ($params['activity']['origin_thread']) {
-			if ($params['activity']['origin_comment']) {
+		if (!empty($params['activity']['origin_thread'])) {
+			if (!empty($params['activity']['origin_comment'])) {
 				$message = $l10n->t('%1$s replied to you on your %2$s %3$s');
-			} elseif ($params['activity']['explicit_tagged']) {
+			} elseif (!empty($params['activity']['explicit_tagged'])) {
 				$message = $l10n->t('%1$s tagged you on your %2$s %3$s');
 			} else {
 				$message = $l10n->t('%1$s commented on your %2$s %3$s');
@@ -210,9 +210,9 @@ function notification($params)
 			$dest_str = sprintf($message, $params['source_name'], $item_post_type, $title);
 		// "their post"
 		} elseif ($item['author-link'] == $params['source_link']) {
-			if ($params['activity']['origin_comment']) {
+			if (!empty($params['activity']['origin_comment'])) {
 				$message = $l10n->t('%1$s replied to you on their %2$s %3$s');
-			} elseif ($params['activity']['explicit_tagged']) {
+			} elseif (!empty($params['activity']['explicit_tagged'])) {
 				$message = $l10n->t('%1$s tagged you on their %2$s %3$s');
 			} else {
 				$message = $l10n->t('%1$s commented on their %2$s %3$s');
@@ -225,7 +225,7 @@ function notification($params)
 		// So, we cannot have different subjects for notifications of the same thread.
 		// Before this we have the name of the replier on the subject rendering
 		// different subjects for messages on the same thread.
-		if ($params['activity']['explicit_tagged']) {
+		if (!empty($params['activity']['explicit_tagged'])) {
 			$subject = $l10n->t('%s %s tagged you', $subjectPrefix, $params['source_name']);
 
 			$preamble = $l10n->t('%1$s tagged you at %2$s', $params['source_name'], $sitename);
