@@ -123,7 +123,10 @@ class Session
 				continue;
 			}
 
-			$session->set('remote', [$contact['uid'] => $contact['id']]);
+			/* get+set to append */
+			$remote_value = $session->get('remote', null);
+			$remote_value[$contact['uid']] = $contact['id'];
+			$session->set('remote', $remote_value);
 		}
 		DBA::close($remote_contacts);
 	}
