@@ -124,7 +124,7 @@ class Session
 			}
 
 			/* get+set to append */
-			$remote_value = $session->get('remote', null);
+			$remote_value = $session->get('remote', []);
 			$remote_value[$contact['uid']] = $contact['id'];
 			$session->set('remote', $remote_value);
 		}
