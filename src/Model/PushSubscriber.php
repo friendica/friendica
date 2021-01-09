@@ -25,6 +25,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 
 class PushSubscriber
 {
@@ -170,5 +171,13 @@ class PushSubscriber
 		$fields = ['push' => 0, 'next_try' => DBA::NULL_DATETIME, 'last_update' => $last_update];
 		DBA::update('push_subscriber', $fields, ['id' => $id]);
 		Logger::log('Subscriber ' . $subscriber['callback_url'] . ' for ' . $subscriber['nickname'] . ' is marked as vital', Logger::DEBUG);
+
+		$parts = parse_url($subscriber['callback_url']);
+		unset($parts['path']);
+		$server_url = Network::unparseURL($parts);
+		$gsid = GServer::getID($server_url, true);
+		if (!empty($gsid)) {
+			GServer::setProtocol($gsid, Post\DeliveryData::OSTATUS);
+		}
 	}
 }

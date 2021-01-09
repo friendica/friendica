@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2020.12-rc (Red Hot Poker)
--- DB_UPDATE_VERSION 1384
+-- Friendica 2021.03-dev (Red Hot Poker)
+-- DB_UPDATE_VERSION 1385
 -- ------------------------------------------
 
 
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`poco` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`noscrape` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`network` char(4) NOT NULL DEFAULT '' COMMENT '',
+	`protocol` tinyint unsigned COMMENT 'The protocol of the server',
 	`platform` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`relay-subscribe` boolean NOT NULL DEFAULT '0' COMMENT 'Has the server subscribed to the relay system',
 	`relay-scope` varchar(10) NOT NULL DEFAULT '' COMMENT 'The scope of messages that the server wants to get',

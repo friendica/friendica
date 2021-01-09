@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1384);
+	define('DB_UPDATE_VERSION', 1385);
 }
 
 return [
@@ -75,6 +75,7 @@ return [
 			"poco" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 			"noscrape" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 			"network" => ["type" => "char(4)", "not null" => "1", "default" => "", "comment" => ""],
+			"protocol" => ["type" => "tinyint unsigned", "comment" => "The protocol of the server"],
 			"platform" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 			"relay-subscribe" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Has the server subscribed to the relay system"],
 			"relay-scope" => ["type" => "varchar(10)", "not null" => "1", "default" => "", "comment" => "The scope of messages that the server wants to get"],

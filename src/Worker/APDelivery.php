@@ -24,6 +24,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Model\Contact;
+use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Protocol\ActivityPub;
@@ -82,6 +83,7 @@ class APDelivery
 		// This should never fail and is temporariy (until the move to the "post" structure)
 		$item = Item::selectFirst(['uri-id'], ['id' => $item_id]);
 		$uriid = $item['uri-id'] ?? 0;
+		$gsid = null;
 
 		foreach ($receivers as $receiver) {
 			$contact = Contact::getById($receiver);
@@ -89,11 +91,17 @@ class APDelivery
 				continue;
 			}
 
+			$gsid = $gsid ?: $contact['gsid'];
+
 			if ($success) {
 				Contact::unmarkForArchival($contact);
 			} else {
 				Contact::markForArchival($contact);
 			}
+		}
+
+		if (!empty($gsid)) {
+			GServer::setProtocol($gsid, Post\DeliveryData::ACTIVITYPUB);
 		}
 
 		if (!$success && !Worker::defer() && in_array($cmd, [Delivery::POST])) {

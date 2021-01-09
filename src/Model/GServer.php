@@ -23,6 +23,7 @@ namespace Friendica\Model;
 
 use DOMDocument;
 use DOMXPath;
+use Exception;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -1733,5 +1734,66 @@ class GServer
 		}
 
 		DI::config()->set('poco', 'last_federation_discovery', time());
+	}
+
+	/**
+	 * Set the protocol for the given server
+	 *
+	 * @param int $gsid     Server id
+	 * @param int $protocol Protocol id
+	 * @return void 
+	 * @throws Exception 
+	 */
+	static function setProtocol(int $gsid, int $protocol)
+	{
+		if (empty($gsid)) {
+			return;
+		}
+
+		$gserver = DBA::selectFirst('gserver', ['protocol', 'url'], ['id' => $gsid]);
+		if (!DBA::isResult($gserver)) {
+			return;
+		}
+
+		$old = $gserver['protocol'];
+
+		if (!is_null($old)) {
+			/*
+			The priority for the protocols is:
+				1. ActivityPub
+				2. DFRN via Diaspora
+				3. Legacy DFRN
+				4. Diaspora
+				5. OStatus
+			*/
+
+			// We don't need to change it when nothing is to be changed
+			if ($old == $protocol) {
+				return;
+			}
+
+			// We don't want to mark a server as OStatus when it had been marked with any other protocol before
+			if ($protocol == Post\DeliveryData::OSTATUS) {
+				return;
+			}
+
+			// If the server is marked as ActivityPub then we won't change it to anything different
+			if ($old == Post\DeliveryData::ACTIVITYPUB) {
+				return;
+			}
+
+			// Don't change it to anything lower than DFRN if the new one wasn't ActivityPub
+			if (($old == Post\DeliveryData::DFRN) && ($protocol != Post\DeliveryData::ACTIVITYPUB)) {
+				return;
+			}
+
+			// Don't change it to Diaspora when it is a legacy DFRN server
+			if (($old == Post\DeliveryData::LEGACY_DFRN) && ($protocol == Post\DeliveryData::DIASPORA)) {
+				return;
+			}
+		}
+
+		Logger::info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url']]);
+		DBA::update('gserver', ['protocol' => $protocol], ['id' => $gsid]);
 	}
 }

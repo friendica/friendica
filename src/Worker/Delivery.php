@@ -360,6 +360,8 @@ class Delivery
 				if (in_array($cmd, [Delivery::POST, Delivery::POKE])) {
 					if (($deliver_status >= 200) && ($deliver_status <= 299)) {
 						Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], $protocol);
+
+						Model\GServer::setProtocol($contact['gsid'], $protocol);
 					} else {
 						Model\Post\DeliveryData::incrementQueueFailed($target_item['uri-id']);
 					}
@@ -390,6 +392,8 @@ class Delivery
 		if (($deliver_status >= 200) && ($deliver_status <= 299)) {
 			// We successfully delivered a message, the contact is alive
 			Model\Contact::unmarkForArchival($contact);
+
+			Model\GServer::setProtocol($contact['gsid'], $protocol);
 
 			if (in_array($cmd, [Delivery::POST, Delivery::POKE])) {
 				Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], $protocol);
@@ -475,6 +479,8 @@ class Delivery
 		if (($deliver_status >= 200) && ($deliver_status <= 299)) {
 			// We successfully delivered a message, the contact is alive
 			Model\Contact::unmarkForArchival($contact);
+
+			Model\GServer::setProtocol($contact['gsid'], Model\Post\DeliveryData::DIASPORA);
 
 			if (in_array($cmd, [Delivery::POST, Delivery::POKE])) {
 				Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], Model\Post\DeliveryData::DIASPORA);
