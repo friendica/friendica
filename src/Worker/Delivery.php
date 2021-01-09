@@ -202,6 +202,8 @@ class Delivery
 			return;
 		}
 
+		$protocol = Model\GServer::getProtocol($contact['gsid']);
+
 		// Transmit via Diaspora if the thread had started as Diaspora post.
 		// Also transmit via Diaspora if this is a direct answer to a Diaspora comment.
 		// This is done since the uri wouldn't match (Diaspora doesn't transmit it)
@@ -219,7 +221,7 @@ class Delivery
 
 		switch ($contact['network']) {
 			case Protocol::DFRN:
-				self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
+				self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup, $protocol);
 				break;
 
 			case Protocol::DIASPORA:
@@ -255,18 +257,19 @@ class Delivery
 	/**
 	 * Deliver content via DFRN
 	 *
-	 * @param string  $cmd            Command
-	 * @param array   $contact        Contact record of the receiver
-	 * @param array   $owner          Owner record of the sender
-	 * @param array   $items          Item record of the content and the parent
-	 * @param array   $target_item    Item record of the content
-	 * @param boolean $public_message Is the content public?
-	 * @param boolean $top_level      Is it a thread starter?
-	 * @param boolean $followup       Is it an answer to a remote post?
+	 * @param string  $cmd             Command
+	 * @param array   $contact         Contact record of the receiver
+	 * @param array   $owner           Owner record of the sender
+	 * @param array   $items           Item record of the content and the parent
+	 * @param array   $target_item     Item record of the content
+	 * @param boolean $public_message  Is the content public?
+	 * @param boolean $top_level       Is it a thread starter?
+	 * @param boolean $followup        Is it an answer to a remote post?
+	 * @param int     $server_protocol The protocol of the server
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup)
+	private static function deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup, $server_protocol)
 	{
 		// Transmit Diaspora reshares via Diaspora if the Friendica contact support Diaspora
 		if (Diaspora::isReshare($target_item['body']) && !empty(FContact::getByURL($contact['addr'], false))) {
@@ -369,7 +372,7 @@ class Delivery
 				return;
 			}
 
-			if (($deliver_status < 200) || ($deliver_status > 299)) {
+			if ((($deliver_status < 200) || ($deliver_status > 299)) && (empty($server_protocol) || ($server_protocol == Model\Post\DeliveryData::LEGACY_DFRN))) {
 				// Transmit via Diaspora if not possible via Friendica
 				self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 				return;
@@ -377,7 +380,7 @@ class Delivery
 		} elseif ($cmd != self::RELOCATION) {
 			// DFRN payload over Diaspora transport layer
 			$deliver_status = DFRN::transmit($owner, $contact, $atom);
-			if ($deliver_status < 200) {
+			if (($deliver_status < 200) && (empty($server_protocol) || ($server_protocol == Model\Post\DeliveryData::LEGACY_DFRN))) {
 				// Legacy DFRN
 				$deliver_status = DFRN::deliver($owner, $contact, $atom);
 				$protocol = Model\Post\DeliveryData::LEGACY_DFRN;

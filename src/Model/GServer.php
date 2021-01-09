@@ -1744,7 +1744,7 @@ class GServer
 	 * @return void 
 	 * @throws Exception 
 	 */
-	static function setProtocol(int $gsid, int $protocol)
+	public static function setProtocol(int $gsid, int $protocol)
 	{
 		if (empty($gsid)) {
 			return;
@@ -1795,5 +1795,26 @@ class GServer
 
 		Logger::info('Protocol for server', ['protocol' => $protocol, 'old' => $old, 'id' => $gsid, 'url' => $gserver['url']]);
 		DBA::update('gserver', ['protocol' => $protocol], ['id' => $gsid]);
+	}
+
+	/**
+	 * Fetch the protocol of the given server
+	 *
+	 * @param int $gsid Server id
+	 * @return int 
+	 * @throws Exception 
+	 */
+	public static function getProtocol(int $gsid)
+	{
+		if (empty($gsid)) {
+			return null;
+		}
+
+		$gserver = DBA::selectFirst('gserver', ['protocol'], ['id' => $gsid]);
+		if (DBA::isResult($gserver)) {
+			return $gserver['protocol'];
+		}
+
+		return null;
 	}
 }
