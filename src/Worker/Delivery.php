@@ -202,7 +202,7 @@ class Delivery
 			return;
 		}
 
-		$protocol = Model\GServer::getProtocol($contact['gsid']);
+		$protocol = Model\GServer::getProtocol($contact['gsid'] ?? 0);
 
 		// Transmit via Diaspora if the thread had started as Diaspora post.
 		// Also transmit via Diaspora if this is a direct answer to a Diaspora comment.
@@ -364,7 +364,7 @@ class Delivery
 					if (($deliver_status >= 200) && ($deliver_status <= 299)) {
 						Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], $protocol);
 
-						Model\GServer::setProtocol($contact['gsid'], $protocol);
+						Model\GServer::setProtocol($contact['gsid'] ?? 0, $protocol);
 					} else {
 						Model\Post\DeliveryData::incrementQueueFailed($target_item['uri-id']);
 					}
@@ -396,7 +396,7 @@ class Delivery
 			// We successfully delivered a message, the contact is alive
 			Model\Contact::unmarkForArchival($contact);
 
-			Model\GServer::setProtocol($contact['gsid'], $protocol);
+			Model\GServer::setProtocol($contact['gsid'] ?? 0, $protocol);
 
 			if (in_array($cmd, [Delivery::POST, Delivery::POKE])) {
 				Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], $protocol);
@@ -483,7 +483,7 @@ class Delivery
 			// We successfully delivered a message, the contact is alive
 			Model\Contact::unmarkForArchival($contact);
 
-			Model\GServer::setProtocol($contact['gsid'], Model\Post\DeliveryData::DIASPORA);
+			Model\GServer::setProtocol($contact['gsid'] ?? 0, Model\Post\DeliveryData::DIASPORA);
 
 			if (in_array($cmd, [Delivery::POST, Delivery::POKE])) {
 				Model\Post\DeliveryData::incrementQueueDone($target_item['uri-id'], Model\Post\DeliveryData::DIASPORA);
