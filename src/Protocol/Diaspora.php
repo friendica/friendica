@@ -2326,8 +2326,6 @@ class Diaspora
 			}
 
 			if ($stored) {
-				$fields = ['body', 'title', 'app', 'created', 'object-type', 'uri', 'guid',
-					'author-name', 'author-link', 'author-avatar', 'plink', 'uri-id'];
 				$condition = ['guid' => $guid, 'visible' => true, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
 				$item = Item::selectFirst($fields, $condition);
 
@@ -2465,7 +2463,7 @@ class Diaspora
 			$original_item["author-name"],
 			$original_item["author-link"],
 			$original_item["author-avatar"],
-			$original_item["plink"],
+			$original_item["plink"] ?? '',
 			$original_item["created"],
 			$original_item["guid"]
 		);
