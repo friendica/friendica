@@ -91,8 +91,8 @@ HELP;
 
 		if ((count($this->args) == 1) && ($this->getArgument(0) == 'list')) {
 			$contacts = $this->dba->select('apcontact', ['url'],
-			["`type` = ? AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?))",
-				'Application', 0, Contact::FOLLOWER, Contact::FRIEND]);
+			["`type` = ? AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)",
+				'Application', 0, Contact::FRIEND]);
 			while ($contact = $this->dba->fetch($contacts)) {
 				$this->out($contact['url']);
 			}

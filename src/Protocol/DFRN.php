@@ -2635,7 +2635,7 @@ class DFRN
 		$header["contact-id"] = $importer["id"];
 		$header["direction"] = $direction;
 
-		if ($direction == Conversation::RELAY) {
+		if ($direction === Conversation::RELAY) {
 			$header['post-type'] = Item::PT_RELAY;
 		}
 

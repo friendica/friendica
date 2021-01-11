@@ -33,6 +33,7 @@ use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
+use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Profile;
@@ -68,8 +69,8 @@ class Transmitter
 	public static function addRelayServerInboxes(array $inboxes = [])
 	{
 		$contacts = DBA::select('apcontact', ['inbox'],
-			["`type` = ? AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?))",
-				'Application', 0, Contact::FOLLOWER, Contact::FRIEND]);
+			["`type` = ? AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)",
+				'Application', 0, Contact::FRIEND]);
 		while ($contact = DBA::fetch($contacts)) {
 			$inboxes[$contact['inbox']] = $contact['inbox'];
 		}
@@ -119,8 +120,7 @@ class Transmitter
 		$activity_id = ActivityPub\Transmitter::activityIDFromContact($contact['id']);
 		$success = ActivityPub\Transmitter::sendActivity('Follow', $url, 0, $activity_id);
 		if ($success) {
-			$rel = $contact['rel'] == Contact::SHARING ? Contact::FRIEND : Contact::FOLLOWER;
-			DBA::update('contact', ['rel' => $rel], ['id' => $contact['id']]);
+			DBA::update('contact', ['rel' => Contact::FRIEND], ['id' => $contact['id']]);
 		}
 
 		return $success;
@@ -142,8 +142,7 @@ class Transmitter
 
 		$success = self::sendContactUndo($url, $contact['id'], 0);
 		if ($success || $force) {
-			$rel = $contact['rel'] == Contact::FRIEND ? Contact::SHARING : Contact::NOTHING;
-			DBA::update('contact', ['rel' => $rel], ['id' => $contact['id']]);
+			DBA::update('contact', ['rel' => Contact::NOTHING], ['id' => $contact['id']]);
 		}
 
 		return $success;
@@ -566,8 +565,8 @@ class Transmitter
 			foreach ($terms as $term) {
 				$cid = Contact::getIdForURL($term['url'], $item['uid']);
 				if (!empty($cid) && in_array($cid, $receiver_list)) {
-					$contact = DBA::selectFirst('contact', ['url', 'network', 'protocol'], ['id' => $cid]);
-					if (!DBA::isResult($contact) || (!in_array($contact['network'], $networks) && ($contact['protocol'] != Protocol::ACTIVITYPUB))) {
+					$contact = DBA::selectFirst('contact', ['url', 'network', 'protocol', 'gsid'], ['id' => $cid, 'network' => Protocol::FEDERATED]);
+					if (!DBA::isResult($contact) || !self::isAPContact($contact, $networks)) {
 						continue;
 					}
 
@@ -578,8 +577,8 @@ class Transmitter
 			}
 
 			foreach ($receiver_list as $receiver) {
-				$contact = DBA::selectFirst('contact', ['url', 'hidden', 'network', 'protocol'], ['id' => $receiver]);
-				if (!DBA::isResult($contact) || (!in_array($contact['network'], $networks) && ($contact['protocol'] != Protocol::ACTIVITYPUB))) {
+				$contact = DBA::selectFirst('contact', ['url', 'hidden', 'network', 'protocol', 'gsid'], ['id' => $receiver, 'network' => Protocol::FEDERATED]);
+				if (!DBA::isResult($contact) || !self::isAPContact($contact, $networks)) {
 					continue;
 				}
 
@@ -692,6 +691,23 @@ class Transmitter
 	}
 
 	/**
+	 * Check if a given contact should be delivered via AP
+	 *
+	 * @param array $contact 
+	 * @param array $networks 
+	 * @return bool 
+	 * @throws Exception 
+	 */
+	private static function isAPContact(array $contact, array $networks)
+	{
+		if (in_array($contact['network'], $networks) || ($contact['protocol'] == Protocol::ACTIVITYPUB)) {
+			return true;
+		}
+
+		return GServer::getProtocol($contact['gsid'] ?? 0) == Post\DeliveryData::ACTIVITYPUB;
+	}
+
+	/**
 	 * Fetches a list of inboxes of followers of a given user
 	 *
 	 * @param integer $uid      User ID
@@ -723,19 +739,19 @@ class Transmitter
 			$networks = [Protocol::ACTIVITYPUB, Protocol::OSTATUS];
 		}
 
-		$condition = ['uid' => $uid, 'archive' => false, 'pending' => false, 'blocked' => false];
+		$condition = ['uid' => $uid, 'archive' => false, 'pending' => false, 'blocked' => false, 'network' => Protocol::FEDERATED];
 
 		if (!empty($uid)) {
 			$condition['rel'] = [Contact::FOLLOWER, Contact::FRIEND];
 		}
 
-		$contacts = DBA::select('contact', ['id', 'url', 'network', 'protocol'], $condition);
+		$contacts = DBA::select('contact', ['id', 'url', 'network', 'protocol', 'gsid'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
 			if (Contact::isLocal($contact['url'])) {
 				continue;
 			}
 
-			if (!in_array($contact['network'], $networks) && ($contact['protocol'] != Protocol::ACTIVITYPUB)) {
+			if (!self::isAPContact($contact, $networks)) {
 				continue;
 			}
 
