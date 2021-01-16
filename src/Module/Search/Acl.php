@@ -31,6 +31,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Strings;
 
@@ -314,7 +315,7 @@ class Acl extends BaseModule
 
 		if ($conv_id) {
 			// In multi threaded posts the conv_id is not the parent of the whole thread
-			$parent_item = Item::selectFirst(['parent'], ['id' => $conv_id]);
+			$parent_item = Post::selectFirst(['parent'], ['id' => $conv_id]);
 			if (DBA::isResult($parent_item)) {
 				$conv_id = $parent_item['parent'];
 			}

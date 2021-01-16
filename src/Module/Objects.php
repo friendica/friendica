@@ -28,6 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\HTTPSignature;
@@ -68,7 +69,7 @@ class Objects extends BaseModule
 			}
 		}
 
-		$item = Item::selectFirst(['id', 'uid', 'origin', 'author-link', 'changed', 'private', 'psid', 'gravity'],
+		$item = Post::selectFirst(['id', 'uid', 'origin', 'author-link', 'changed', 'private', 'psid', 'gravity'],
 			['uri-id' => $itemuri['id']], ['order' => ['origin' => true]]);
 
 		if (!DBA::isResult($item)) {

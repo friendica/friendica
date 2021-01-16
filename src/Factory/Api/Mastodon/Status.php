@@ -27,6 +27,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
@@ -60,7 +61,7 @@ class Status extends BaseFactory
 	 */
 	public function createFromUriId(int $uriId, $uid = 0)
 	{
-		$item = Item::selectFirst([], ['uri-id' => $uriId, 'uid' => $uid]);
+		$item = Post::selectFirst([], ['uri-id' => $uriId, 'uid' => $uid]);
 		if (!$item) {
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . 'not found' . ($uid ? ' for user ' . $uid : '.'));
 		}
@@ -93,7 +94,7 @@ class Status extends BaseFactory
 
 		if ($item['vid'] == Verb::getID(Activity::ANNOUNCE)) {
 			$reshare = $this->createFromUriId($item['thr-parent-id'], $uid)->toArray();
-			$reshared_item = Item::selectFirst(['title', 'body'], ['uri-id' => $item['thr-parent-id'], 'uid' => $uid]);
+			$reshared_item = Post::selectFirst(['title', 'body'], ['uri-id' => $item['thr-parent-id'], 'uid' => $uid]);
 			$item['title'] = $reshared_item['title'] ?? $item['title'];
 			$item['body'] = $reshared_item['body'] ?? $item['body'];
 		} else {

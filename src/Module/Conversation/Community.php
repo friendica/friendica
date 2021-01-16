@@ -35,6 +35,7 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 
@@ -237,7 +238,7 @@ class Community extends BaseModule
 		}
 
 		if (!empty($_GET['item'])) {
-			$item = Item::selectFirst(['parent'], ['id' => $_GET['item']]);
+			$item = Post::selectFirst(['parent'], ['id' => $_GET['item']]);
 			self::$item_id = $item['parent'] ?? 0;
 		} else {
 			self::$item_id = 0;

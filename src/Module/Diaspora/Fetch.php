@@ -26,6 +26,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Diaspora;
@@ -55,10 +56,10 @@ class Fetch extends BaseModule
 			'event-id', 'resource-id', 'author-link', 'author-avatar', 'author-name', 'plink', 'owner-link', 'uri-id'
 		];
 		$condition = ['wall' => true, 'private' => [Item::PUBLIC, Item::UNLISTED], 'guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
-		$item = Item::selectFirst($fields, $condition);
+		$item = Post::selectFirst($fields, $condition);
 		if (empty($item)) {
 			$condition = ['guid' => $guid, 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
-			$item = Item::selectFirst(['author-link'], $condition);
+			$item = Post::selectFirst(['author-link'], $condition);
 			if (!empty($item["author-link"])) {
 				$parts = parse_url($item["author-link"]);
 				if (empty($parts["scheme"]) || empty($parts["host"])) {

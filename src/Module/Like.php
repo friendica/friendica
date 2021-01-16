@@ -29,6 +29,7 @@ use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Core\Session;
 use Friendica\Database\DBA;
+use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Strings;
 
@@ -55,7 +56,7 @@ class Like extends BaseModule
 		$itemId = (($app->argc > 1) ? Strings::escapeTags(trim($app->argv[1])) : 0);
 
 		if (in_array($verb, ['announce', 'unannounce'])) {
-			$item = Item::selectFirst(['network'], ['id' => $itemId]);
+			$item = Post::selectFirst(['network'], ['id' => $itemId]);
 			if ($item['network'] == Protocol::DIASPORA) {
 				self::performDiasporaReshare($itemId);
 			}
@@ -86,7 +87,7 @@ class Like extends BaseModule
 	private static function performDiasporaReshare(int $itemId)
 	{
 		$fields = ['uri-id', 'body', 'title', 'author-name', 'author-link', 'author-avatar', 'guid', 'created', 'plink'];
-		$item = Item::selectFirst($fields, ['id' => $itemId, 'private' => [Item::PUBLIC, Item::UNLISTED]]);
+		$item = Post::selectFirst($fields, ['id' => $itemId, 'private' => [Item::PUBLIC, Item::UNLISTED]]);
 		if (!DBA::isResult($item) || ($item['body'] == '')) {
 			return;
 		}

@@ -17,6 +17,7 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Contact as ModuleContact;
@@ -215,7 +216,7 @@ class Network extends BaseModule
 			return;
 		}
 
-		$unseen = Item::exists($condition);
+		$unseen = Post::exists($condition);
 
 		if ($unseen) {
 			/// @todo handle huge "unseen" updates in the background to avoid timeout errors

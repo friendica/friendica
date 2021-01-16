@@ -24,6 +24,7 @@ namespace Friendica\Module\Debug;
 use Friendica\BaseModule;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 
 /**
@@ -46,7 +47,7 @@ class ItemBody extends BaseModule
 			throw new HTTPException\NotFoundException(DI::l10n()->t('Item not found.'));
 		}
 
-		$item = Item::selectFirst(['body'], ['uid' => local_user(), 'id' => $itemId]);
+		$item = Post::selectFirst(['body'], ['uid' => local_user(), 'id' => $itemId]);
 
 		if (!empty($item)) {
 			if (DI::mode()->isAjax()) {

@@ -7,6 +7,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Group;
+use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 
 /**
@@ -27,7 +28,7 @@ class PermissionTooltip extends \Friendica\BaseModule
 		$condition = ['id' => $referenceId];
 		if ($type == 'item') {
 			$fields = ['uid', 'psid', 'private'];
-			$model = Item::selectFirst($fields, $condition);
+			$model = Post::selectFirst($fields, $condition);
 		} else {
 			$fields = ['uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'];
 			$model = DBA::selectFirst($type, $fields, $condition);

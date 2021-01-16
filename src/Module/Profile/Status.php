@@ -30,6 +30,7 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Post\Category;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\User;
@@ -206,7 +207,7 @@ class Status extends BaseProfile
 		}
 
 		if ($is_owner) {
-			$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+			$unseen = Post::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 			if ($unseen) {
 				Item::update(['unseen' => false], ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 			}

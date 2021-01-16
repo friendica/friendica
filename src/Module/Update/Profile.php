@@ -22,12 +22,12 @@
 namespace Friendica\Module\Update;
 
 use Friendica\BaseModule;
-use Friendica\Content\Pager;
 use Friendica\Core\Session;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\DateTimeFormat;
@@ -111,7 +111,7 @@ class Profile extends BaseModule
 		}
 
 		if ($is_owner) {
-			$unseen = Item::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
+			$unseen = Post::exists(['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 			if ($unseen) {
 				Item::update(['unseen' => false], ['wall' => true, 'unseen' => true, 'uid' => local_user()]);
 			}

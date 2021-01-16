@@ -40,7 +40,7 @@ class Source extends BaseAdmin
 		$item_id = '';
 		$terms = [];
 		if (!empty($guid)) {
-			$item = Model\Item::selectFirst(['id', 'uri-id', 'guid', 'uri'], ['guid' => $guid]);
+			$item = Model\Post::selectFirst(['id', 'uri-id', 'guid', 'uri'], ['guid' => $guid]);
 
 			if ($item) {
 				$conversation = Model\Conversation::getByItemUri($item['uri']);

@@ -5,6 +5,7 @@ namespace Friendica\Module\Update;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Module\Conversation\Network as NetworkModule;
 
 class Network extends NetworkModule
@@ -23,7 +24,7 @@ class Network extends NetworkModule
 
 		if (!DI::pConfig()->get($profile_uid, 'system', 'no_auto_update') || ($_GET['force'] == 1)) {
 			if (!empty($_GET['item'])) {
-				$item = Item::selectFirst(['parent'], ['id' => $_GET['item']]);
+				$item = Post::selectFirst(['parent'], ['id' => $_GET['item']]);
 				$parent = $item['parent'] ?? 0;
 			} else {
 				$parent = 0;

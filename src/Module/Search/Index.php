@@ -35,6 +35,7 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemContent;
+use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Module\BaseSearch;
 use Friendica\Network\HTTPException;
@@ -288,7 +289,7 @@ class Index extends BaseSearch
 		}
 
 		if (!empty($item_id)) {
-			$item = Item::selectFirst(['guid'], ['id' => $item_id]);
+			$item = Post::selectFirst(['guid'], ['id' => $item_id]);
 			if (DBA::isResult($item)) {
 				DI::baseUrl()->redirect('display/' . $item['guid']);
 			}
