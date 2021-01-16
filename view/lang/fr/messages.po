@@ -153,7 +153,7 @@ msgstr "%s a partagé ceci."
 #: include/conversation.php:728
 #, php-format
 msgid "%s commented on this."
-msgstr ""
+msgstr "%S a commenté ceci"
 
 #: include/conversation.php:734
 msgid "Tagged"
@@ -2761,7 +2761,7 @@ msgstr "Faire expirer les photos"
 
 #: mod/settings.php:905
 msgid "When activated, photos will be expired."
-msgstr " "
+msgstr "Si activé, les photos expireront"
 
 #: mod/settings.php:906
 msgid "Only expire posts by others"
@@ -3097,7 +3097,7 @@ msgstr "Contact mutuels"
 
 #: src/BaseModule.php:202
 msgid "Common"
-msgstr ""
+msgstr "Commun"
 
 #: src/Console/ArchiveContact.php:105
 #, php-format
@@ -3106,7 +3106,7 @@ msgstr "Aucune entrée de contact non archivé n'a été trouvé pour cette URL 
 
 #: src/Console/ArchiveContact.php:108
 msgid "The contact entries have been archived"
-msgstr ""
+msgstr "Le profil distant a été archivé"
 
 #: src/Console/GlobalCommunityBlock.php:96
 #: src/Module/Admin/Blocklist/Contact.php:49
@@ -3117,7 +3117,7 @@ msgstr "Aucun profil distant n'a été trouvé à cette URL (%s)"
 #: src/Console/GlobalCommunityBlock.php:101
 #: src/Module/Admin/Blocklist/Contact.php:47
 msgid "The contact has been blocked from the node"
-msgstr "Le profile distant a été bloqué"
+msgstr "Le profil distant a été bloqué"
 
 #: src/Console/PostUpdate.php:87
 #, php-format
@@ -7261,11 +7261,11 @@ msgstr "Nouvelle photo depuis cette URL"
 
 #: src/Module/Contact/Contacts.php:46
 msgid "No known contacts."
-msgstr ""
+msgstr "Aucun contact connu"
 
 #: src/Module/Contact/Contacts.php:64 src/Module/Profile/Common.php:99
 msgid "No common contacts."
-msgstr ""
+msgstr "Aucun contact an commun"
 
 #: src/Module/Contact/Contacts.php:76 src/Module/Profile/Contacts.php:96
 #, php-format
@@ -7291,21 +7291,21 @@ msgstr[1] "Contacts mutuels (%s)"
 #: src/Module/Contact/Contacts.php:86 src/Module/Profile/Contacts.php:104
 #, php-format
 msgid "These contacts both follow and are followed by <strong>%s</strong>."
-msgstr ""
+msgstr "Ces contacts suivent et sont suivis par <strong>%s</strong>."
 
 #: src/Module/Contact/Contacts.php:92 src/Module/Profile/Common.php:87
 #, php-format
 msgid "Common contact (%s)"
 msgid_plural "Common contacts (%s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Contact en commun (%s)"
+msgstr[1] "Contacts en commun (%s)"
 
 #: src/Module/Contact/Contacts.php:94 src/Module/Profile/Common.php:89
 #, php-format
 msgid ""
 "Both <strong>%s</strong> and yourself have publicly interacted with these "
 "contacts (follow, comment or likes on public posts)."
-msgstr ""
+msgstr "<strong>%s</strong> et vous avez publiquement interragi avec ces contacts (suivre, commenter ou aimer leur publications publiques)"
 
 #: src/Module/Contact/Contacts.php:100 src/Module/Profile/Contacts.php:110
 #, php-format
@@ -7316,7 +7316,7 @@ msgstr[1] "Contacts (%s)"
 
 #: src/Module/Contact/Poke.php:114
 msgid "Error while sending poke, please retry."
-msgstr ""
+msgstr "Erreur lors de l'envoi de la sollicitation, veuillez réessayer."
 
 #: src/Module/Contact/Poke.php:127 src/Module/Search/Acl.php:55
 msgid "You must be logged in to use this module."
@@ -7446,7 +7446,7 @@ msgstr "Récupérer informations"
 
 #: src/Module/Contact.php:554
 msgid "Fetch keywords"
-msgstr ""
+msgstr "Récupérer les mots clés"
 
 #: src/Module/Contact.php:555
 msgid "Fetch information and keywords"
@@ -7520,7 +7520,7 @@ msgstr "Actuellement archivé"
 
 #: src/Module/Contact.php:609
 msgid "Awaiting connection acknowledge"
-msgstr ""
+msgstr "En attente de l'approbation de la connexion"
 
 #: src/Module/Contact.php:610 src/Module/Notifications/Introductions.php:105
 #: src/Module/Notifications/Introductions.php:171
@@ -7560,11 +7560,11 @@ msgstr "Montrer tous les contacts"
 
 #: src/Module/Contact.php:763 src/Module/Contact.php:823
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 #: src/Module/Contact.php:766
 msgid "Only show pending contacts"
-msgstr ""
+msgstr "N'afficher que les contacts en attente"
 
 #: src/Module/Contact.php:771 src/Module/Contact.php:824
 msgid "Blocked"
@@ -7600,7 +7600,7 @@ msgstr "Ne montrer que les contacts masqués"
 
 #: src/Module/Contact.php:806
 msgid "Organize your contact groups"
-msgstr ""
+msgstr "Organiser vos groupes de contacts"
 
 #: src/Module/Contact.php:838
 msgid "Search your contacts"
@@ -7625,15 +7625,15 @@ msgstr "Actions multiples"
 
 #: src/Module/Contact.php:887
 msgid "Conversations started by this contact"
-msgstr ""
+msgstr "Conversations débutées par ce contact"
 
 #: src/Module/Contact.php:892
 msgid "Posts and Comments"
-msgstr ""
+msgstr "Publications et commentaires"
 
 #: src/Module/Contact.php:910
 msgid "View all known contacts"
-msgstr ""
+msgstr "Voir tous les contacts connus"
 
 #: src/Module/Contact.php:920
 msgid "Advanced Contact Settings"
@@ -7730,7 +7730,7 @@ msgstr ""
 
 #: src/Module/Debug/ActivityPubConversion.php:70
 msgid "Activity"
-msgstr ""
+msgstr "Activité"
 
 #: src/Module/Debug/ActivityPubConversion.php:118
 msgid "Object data"
@@ -7870,7 +7870,7 @@ msgstr ""
 
 #: src/Module/Debug/Babel.php:259
 msgid "Post converted"
-msgstr ""
+msgstr "Publication convertie"
 
 #: src/Module/Debug/Babel.php:264
 msgid "Converted body"
@@ -7898,7 +7898,7 @@ msgstr "HTML"
 
 #: src/Module/Debug/Babel.php:286
 msgid "Twitter Source"
-msgstr ""
+msgstr "Source Twitter"
 
 #: src/Module/Debug/Feed.php:38 src/Module/Filer/SaveTag.php:38
 #: src/Module/Settings/Profile/Index.php:158
@@ -8150,11 +8150,11 @@ msgstr "Aucun profil"
 
 #: src/Module/HTTPException/MethodNotAllowed.php:32
 msgid "Method Not Allowed."
-msgstr ""
+msgstr "Méthode non permise"
 
 #: src/Module/Install.php:177
 msgid "Friendica Communications Server - Setup"
-msgstr ""
+msgstr "Serveur de Communications Friendica - Paramétrage"
 
 #: src/Module/Install.php:188
 msgid "System check"
