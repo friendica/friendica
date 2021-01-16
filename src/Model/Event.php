@@ -311,7 +311,7 @@ class Event
 			$existing_event = DBA::selectFirst('event', ['edited'], ['id' => $event['id'], 'uid' => $event['uid']]);
 			if (!DBA::isResult($existing_event) || ($existing_event['edited'] === $event['edited'])) {
 
-				$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
+				$item = Post::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 
 				return DBA::isResult($item) ? $item['id'] : 0;
 			}
@@ -330,7 +330,7 @@ class Event
 
 			DBA::update('event', $updated_fields, ['id' => $event['id'], 'uid' => $event['uid']]);
 
-			$item = Item::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
+			$item = Post::selectFirst(['id'], ['event-id' => $event['id'], 'uid' => $event['uid']]);
 			if (DBA::isResult($item)) {
 				$object = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
 				$object .= '<content>' . XML::escape(self::getBBCode($event)) . '</content>';
@@ -592,7 +592,7 @@ class Event
 		$last_date = '';
 		$fmt = DI::l10n()->t('l, F j');
 		foreach ($event_result as $event) {
-			$item = Item::selectFirst(['plink', 'author-name', 'author-avatar', 'author-link'], ['id' => $event['itemid']]);
+			$item = Post::selectFirst(['plink', 'author-name', 'author-avatar', 'author-link'], ['id' => $event['itemid']]);
 			if (!DBA::isResult($item)) {
 				// Using default values when no item had been found
 				$item = ['plink' => '', 'author-name' => '', 'author-avatar' => '', 'author-link' => ''];

@@ -592,7 +592,7 @@ class Profile
 				$condition = ['parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => public_contact(),
 					'vid' => [Verb::getID(Activity::ATTEND), Verb::getID(Activity::ATTENDMAYBE)],
 					'visible' => true, 'deleted' => false];
-				if (!Item::exists($condition)) {
+				if (!Post::exists($condition)) {
 					continue;
 				}
 

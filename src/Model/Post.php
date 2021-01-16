@@ -21,10 +21,8 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\Protocol\Activity;
-use Friendica\Repository\PermissionSet;
 
 class Post
 {

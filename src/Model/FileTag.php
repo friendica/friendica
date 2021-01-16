@@ -259,7 +259,7 @@ class FileTag
 			return false;
 		}
 
-		$item = Item::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
+		$item = Post::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
 		if (DBA::isResult($item)) {
 			if (!stristr($item['file'], '[' . self::encode($file) . ']')) {
 				$fields = ['file' => $item['file'] . '[' . self::encode($file) . ']'];
@@ -301,7 +301,7 @@ class FileTag
 			$termtype = Category::FILE;
 		}
 
-		$item = Item::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
+		$item = Post::selectFirst(['file'], ['id' => $item_id, 'uid' => $uid]);
 
 		if (!DBA::isResult($item)) {
 			return false;

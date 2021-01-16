@@ -23,6 +23,7 @@ namespace Friendica\Model\Post;
 
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Tag;
 
 /**
@@ -72,7 +73,7 @@ class Category
 	 */
 	public static function storeTextByURIId(int $uri_id, int $uid, string $files)
 	{
-		$message = Item::selectFirst(['deleted'], ['uri-id' => $uri_id, 'uid' => $uid]);
+		$message = Post::selectFirst(['deleted'], ['uri-id' => $uri_id, 'uid' => $uid]);
 		if (DBA::isResult($message)) {
 			// Clean up all tags
 			DBA::delete('post-category', ['uri-id' => $uri_id, 'uid' => $uid]);

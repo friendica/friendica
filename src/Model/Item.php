@@ -406,7 +406,7 @@ class Item
 		$params['uid'] = $uid;
 
 		if (empty($selected)) {
-			$selected = Item::DISPLAY_FIELDLIST;
+			$selected = self::DISPLAY_FIELDLIST;
 		}
 
 		return self::selectFirst($selected, $condition, $params);
@@ -428,7 +428,7 @@ class Item
 		$params['uid'] = $uid;
 
 		if (empty($selected)) {
-			$selected = Item::DISPLAY_FIELDLIST;
+			$selected = self::DISPLAY_FIELDLIST;
 		}
 
 		return self::select($selected, $condition, $params);
@@ -543,7 +543,7 @@ class Item
 		$params['uid'] = $uid;
 
 		if (empty($selected)) {
-			$selected = Item::DISPLAY_FIELDLIST;
+			$selected = self::DISPLAY_FIELDLIST;
 		}
 
 		return self::selectThread($selected, $condition, $params);
@@ -565,7 +565,7 @@ class Item
 		$params['uid'] = $uid;
 
 		if (empty($selected)) {
-			$selected = Item::DISPLAY_FIELDLIST;
+			$selected = self::DISPLAY_FIELDLIST;
 		}
 
 		return self::selectFirstThread($selected, $condition, $params);
@@ -1041,8 +1041,8 @@ class Item
 	 */
 	public static function markForDeletion($condition, $priority = PRIORITY_HIGH)
 	{
-		$items = self::select(['id'], $condition);
-		while ($item = self::fetch($items)) {
+		$items = Post::select(['id'], $condition);
+		while ($item = Post::fetch($items)) {
 			self::markForDeletionById($item['id'], $priority);
 		}
 		DBA::close($items);
@@ -1061,8 +1061,8 @@ class Item
 			return;
 		}
 
-		$items = self::select(['id', 'uid', 'uri-id'], $condition);
-		while ($item = self::fetch($items)) {
+		$items = Post::select(['id', 'uid', 'uri-id'], $condition);
+		while ($item = Post::fetch($items)) {
 			Post\User::update($item['uri-id'], $item['uid'], ['hidden' => true]);
 
 			// "Deleting" global items just means hiding them
@@ -1094,7 +1094,7 @@ class Item
 			'deleted', 'file', 'resource-id', 'event-id',
 			'verb', 'object-type', 'object', 'target', 'contact-id',
 			'icid', 'psid', 'gravity'];
-		$item = self::selectFirst($fields, ['id' => $item_id]);
+		$item = Post::selectFirst($fields, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
 			Logger::info('Item not found.', ['id' => $item_id]);
 			return false;
@@ -1105,7 +1105,7 @@ class Item
 			return false;
 		}
 
-		$parent = self::selectFirst(['origin'], ['id' => $item['parent']]);
+		$parent = Post::selectFirst(['origin'], ['id' => $item['parent']]);
 		if (!DBA::isResult($parent)) {
 			$parent = ['origin' => false];
 		}
@@ -1162,7 +1162,7 @@ class Item
 		Post\Category::storeTextByURIId($item['uri-id'], $item['uid'], '');
 		self::deleteThread($item['id'], $item['parent-uri']);
 
-		if (!self::exists(["`uri` = ? AND `uid` != 0 AND NOT `deleted`", $item['uri']])) {
+		if (!Post::exists(["`uri` = ? AND `uid` != 0 AND NOT `deleted`", $item['uri']])) {
 			self::markForDeletion(['uri' => $item['uri'], 'uid' => 0, 'deleted' => false], $priority);
 		}
 
@@ -1194,7 +1194,7 @@ class Item
 			Post\User::update($item['uri-id'], $item['uid'], ['hidden' => true]);
 
 			// When we delete just our local user copy of an item, we have to set a marker to hide it
-			$global_item = self::selectFirst(['id'], ['uri' => $item['uri'], 'uid' => 0, 'deleted' => false]);
+			$global_item = Post::selectFirst(['id'], ['uri' => $item['uri'], 'uid' => 0, 'deleted' => false]);
 			if (DBA::isResult($global_item)) {
 				DBA::update('user-item', ['hidden' => true], ['iid' => $global_item['id'], 'uid' => $item['uid']], true);
 			}
@@ -1286,8 +1286,8 @@ class Item
 		 *
 		$data = BBCode::getAttachmentData($item['body']);
 		if ((preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $item['body'], $match, PREG_SET_ORDER) || isset($data["type"]))
-			&& ($posttype != Item::PT_PERSONAL_NOTE)) {
-			$posttype = Item::PT_PAGE;
+			&& ($posttype != self::PT_PERSONAL_NOTE)) {
+			$posttype = self::PT_PAGE;
 			$objecttype = ACTIVITY_OBJ_BOOKMARK;
 		}
 		 */
@@ -1325,7 +1325,7 @@ class Item
 	{
 		// Checking if there is already an item with the same guid
 		$condition = ['guid' => $item['guid'], 'network' => $item['network'], 'uid' => $item['uid']];
-		if (self::exists($condition)) {
+		if (Post::exists($condition)) {
 			Logger::notice('Found already existing item', [
 				'guid' => $item['guid'],
 				'uid' => $item['uid'],
@@ -1336,7 +1336,7 @@ class Item
 
 		$condition = ["`uri` = ? AND `network` IN (?, ?) AND `uid` = ?",
 			$item['uri'], $item['network'], Protocol::DFRN, $item['uid']];
-		if (self::exists($condition)) {
+		if (Post::exists($condition)) {
 			Logger::notice('duplicated item with the same uri found.', $item);
 			return true;
 		}
@@ -1344,7 +1344,7 @@ class Item
 		// On Friendica and Diaspora the GUID is unique
 		if (in_array($item['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
 			$condition = ['guid' => $item['guid'], 'uid' => $item['uid']];
-			if (self::exists($condition)) {
+			if (Post::exists($condition)) {
 				Logger::notice('duplicated item with the same guid found.', $item);
 				return true;
 			}
@@ -1352,7 +1352,7 @@ class Item
 			// Check for an existing post with the same content. There seems to be a problem with OStatus.
 			$condition = ["`body` = ? AND `network` = ? AND `created` = ? AND `contact-id` = ? AND `uid` = ?",
 					$item['body'], $item['network'], $item['created'], $item['contact-id'], $item['uid']];
-			if (self::exists($condition)) {
+			if (Post::exists($condition)) {
 				Logger::notice('duplicated item with the same body found.', $item);
 				return true;
 			}
@@ -1363,7 +1363,7 @@ class Item
 		 * There is a timing issue here that sometimes creates double postings.
 		 * An unique index would help - but the limitations of MySQL (maximum size of index values) prevent this.
 		 */
-		if (($item['uid'] == 0) && self::exists(['uri' => trim($item['uri']), 'uid' => 0])) {
+		if (($item['uid'] == 0) && Post::exists(['uri' => trim($item['uri']), 'uid' => 0])) {
 			Logger::notice('Global item already stored.', ['uri' => $item['uri'], 'network' => $item['network']]);
 			return true;
 		}
@@ -1431,7 +1431,7 @@ class Item
 
 			$condition = ['verb' => Activity::FOLLOW, 'uid' => $item['uid'],
 				'parent-uri' => $item['parent-uri'], 'author-id' => $item['author-id']];
-			if (self::exists($condition)) {
+			if (Post::exists($condition)) {
 				// It happens that we receive multiple follow requests by the same author - we only store one.
 				Logger::info('Follow: Found existing follow request from author', ['author-id' => $item['author-id'], 'parent-uri' => $item['parent-uri']]);
 				return false;
@@ -1485,7 +1485,7 @@ class Item
 			$condition = ["`uri` = ? AND `uid` = ? AND `network` IN (?, ?, ?, ?)",
 				trim($item['uri']), $item['uid'],
 				Protocol::ACTIVITYPUB, Protocol::DIASPORA, Protocol::DFRN, Protocol::OSTATUS];
-			$existing = self::selectFirst(['id', 'network'], $condition);
+			$existing = Post::selectFirst(['id', 'network'], $condition);
 			if (DBA::isResult($existing)) {
 				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
 				if ($item['uid'] != 0) {
@@ -1716,7 +1716,7 @@ class Item
 
 			// If the thread originated from this node, we check the permission against the thread starter
 			$condition = ['uri' => $toplevel_parent['uri'], 'wall' => true];
-			$localTopLevelParent = self::selectFirst(['uid'], $condition);
+			$localTopLevelParent = Post::selectFirst(['uid'], $condition);
 			if (!empty($localTopLevelParent['uid']) && !self::isAllowedByUser($item, $localTopLevelParent['uid'])) {
 				return 0;
 			}
@@ -1793,7 +1793,7 @@ class Item
 			// Set the global flag on all items if this was a global item entry
 			DBA::update('item', ['global' => true], ['uri' => $item["uri"]]);
 		} else {
-			$item["global"] = self::exists(['uid' => 0, 'uri' => $item["uri"]]);
+			$item["global"] = Post::exists(['uid' => 0, 'uri' => $item["uri"]]);
 		}
 
 		// ACL settings
@@ -1986,7 +1986,7 @@ class Item
 		}
 
 		if (!$dontcache) {
-			$posted_item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $current_post]);
+			$posted_item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $current_post]);
 			if (DBA::isResult($posted_item)) {
 				if ($notify) {
 					Hook::callAll('post_local_end', $posted_item);
@@ -2019,7 +2019,7 @@ class Item
 		$transmit = $notify || ($item['visible'] && ($parent_origin || $item['origin']));
 
 		if ($transmit) {
-			$transmit_item = Item::selectFirst(['verb', 'origin'], ['id' => $item['id']]);
+			$transmit_item = self::selectFirst(['verb', 'origin'], ['id' => $item['id']]);
 			// Don't relay participation messages
 			if (($transmit_item['verb'] == Activity::FOLLOW) && 
 				(!$transmit_item['origin'] || ($item['author-id'] != Contact::getPublicIdByUserId($uid)))) {
@@ -2047,7 +2047,7 @@ class Item
 	 */
 	private static function setOwnerforResharedItem(array $item)
 	{
-		$parent = self::selectFirst(['id', 'causer-id', 'owner-id', 'author-id', 'author-link', 'origin', 'post-type'],
+		$parent = Post::selectFirst(['id', 'causer-id', 'owner-id', 'author-id', 'author-link', 'origin', 'post-type'],
 			['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
 		if (!DBA::isResult($parent)) {
 			Logger::error('Parent not found', ['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
@@ -2181,7 +2181,7 @@ class Item
 	public static function distribute($itemid, $signed_text = '')
 	{
 		$condition = ["`id` IN (SELECT `parent` FROM `item` WHERE `id` = ?)", $itemid];
-		$parent = self::selectFirst(['owner-id'], $condition);
+		$parent = Post::selectFirst(['owner-id'], $condition);
 		if (!DBA::isResult($parent)) {
 			return;
 		}
@@ -2190,7 +2190,7 @@ class Item
 		$condition = ['id' => $itemid, 'uid' => 0,
 			'network' => array_merge(Protocol::FEDERATED ,['']),
 			'visible' => true, 'deleted' => false, 'moderated' => false, 'private' => [self::PUBLIC, self::UNLISTED]];
-		$item = self::selectFirst(self::ITEM_FIELDLIST, $condition);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, $condition);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -2243,13 +2243,14 @@ class Item
 		$origin_uid = 0;
 
 		if ($item['uri'] != $item['parent-uri']) {
-			$parents = self::select(['uid', 'origin'], ["`uri` = ? AND `uid` != 0", $item['parent-uri']]);
-			while ($parent = self::fetch($parents)) {
+			$parents = Post::select(['uid', 'origin'], ["`uri` = ? AND `uid` != 0", $item['parent-uri']]);
+			while ($parent = Post::fetch($parents)) {
 				$users[$parent['uid']] = $parent['uid'];
 				if ($parent['origin'] && !$origin) {
 					$origin_uid = $parent['uid'];
 				}
 			}
+			DBA::close($parents);
 		}
 
 		foreach ($users as $uid) {
@@ -2270,7 +2271,7 @@ class Item
 	 */
 	public static function storeForUserByUriId(int $uri_id, int $uid, array $fields = [])
 	{
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['uri-id' => $uri_id, 'uid' => 0]);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['uri-id' => $uri_id, 'uid' => 0]);
 		if (!DBA::isResult($item)) {
 			return 0;
 		}
@@ -2299,7 +2300,7 @@ class Item
 	 */
 	private static function storeForUser(array $item, int $uid)
 	{
-		if (self::exists(['uri-id' => $item['uri-id'], 'uid' => $uid])) {
+		if (Post::exists(['uri-id' => $item['uri-id'], 'uid' => $uid])) {
 			Logger::info('Item already exists', ['uri-id' => $item['uri-id'], 'uid' => $uid]);
 			return 0;
 		}
@@ -2369,7 +2370,7 @@ class Item
 	{
 		$fields = ['uid', 'private', 'moderated', 'visible', 'deleted', 'network', 'uri'];
 		$condition = ['id' => $itemid, 'parent' => [0, $itemid]];
-		$item = self::selectFirst($fields, $condition);
+		$item = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
 			return;
@@ -2381,7 +2382,7 @@ class Item
 		}
 
 		// Is it a visible public post?
-		if (!$item["visible"] || $item["deleted"] || $item["moderated"] || ($item["private"] == Item::PRIVATE)) {
+		if (!$item["visible"] || $item["deleted"] || $item["moderated"] || ($item["private"] == self::PRIVATE)) {
 			return;
 		}
 
@@ -2390,11 +2391,11 @@ class Item
 			return;
 		}
 
-		if (self::exists(['uri' => $item['uri'], 'uid' => 0])) {
+		if (Post::exists(['uri' => $item['uri'], 'uid' => 0])) {
 			return;
 		}
 
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
 
 		if (DBA::isResult($item)) {
 			// Preparing public shadow (removing user specific data)
@@ -2430,7 +2431,7 @@ class Item
 	 */
 	private static function addShadowPost($itemid)
 	{
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $itemid]);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -2447,12 +2448,12 @@ class Item
 		}
 
 		// Is there a shadow parent?
-		if (!self::exists(['uri' => $item['parent-uri'], 'uid' => 0])) {
+		if (!Post::exists(['uri' => $item['parent-uri'], 'uid' => 0])) {
 			return;
 		}
 
 		// Is there already a shadow entry?
-		if (self::exists(['uri' => $item['uri'], 'uid' => 0])) {
+		if (Post::exists(['uri' => $item['uri'], 'uid' => 0])) {
 			return;
 		}
 
@@ -2479,7 +2480,7 @@ class Item
 
 		// If this was a comment to a Diaspora post we don't get our comment back.
 		// This means that we have to distribute the comment by ourselves.
-		if ($origin && self::exists(['id' => $parent, 'network' => Protocol::DIASPORA])) {
+		if ($origin && Post::exists(['id' => $parent, 'network' => Protocol::DIASPORA])) {
 			self::distribute($public_shadow);
 		}
 	}
@@ -2727,7 +2728,7 @@ class Item
 		$community_page = (($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY) ? true : false);
 		$prvgroup = (($user['page-flags'] == User::PAGE_FLAGS_PRVGROUP) ? true : false);
 
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
 			return false;
 		}
@@ -2815,7 +2816,7 @@ class Item
 
 		Worker::add(['priority' => PRIORITY_HIGH, 'dont_fork' => true], 'Notifier', Delivery::POST, $item_id);
 
-		Item::performActivity($item_id, 'announce', $uid);
+		self::performActivity($item_id, 'announce', $uid);
 
 		return false;
 	}
@@ -2842,7 +2843,7 @@ class Item
 
 		Logger::info('Automatically reshare item', ['uid' => $item['uid'], 'id' => $item['id'], 'guid' => $item['guid'], 'uri-id' => $item['uri-id']]);
 
-		Item::performActivity($item['id'], 'announce', $item['uid']);
+		self::performActivity($item['id'], 'announce', $item['uid']);
 	}
 
 	public static function isRemoteSelf($contact, &$datarray)
@@ -3115,7 +3116,7 @@ class Item
 		$condition[0] .= " AND `received` < UTC_TIMESTAMP() - INTERVAL ? DAY";
 		$condition[] = $days;
 
-		$items = self::select(['file', 'resource-id', 'starred', 'type', 'id', 'post-type'], $condition);
+		$items = Post::select(['file', 'resource-id', 'starred', 'type', 'id', 'post-type'], $condition);
 
 		if (!DBA::isResult($items)) {
 			return;
@@ -3136,7 +3137,7 @@ class Item
 
 		$priority = DI::config()->get('system', 'expire-notify-priority');
 
-		while ($item = Item::fetch($items)) {
+		while ($item = Post::fetch($items)) {
 			// don't expire filed items
 
 			if (strpos($item['file'], '[') !== false) {
@@ -3149,9 +3150,9 @@ class Item
 				continue;
 			} elseif (!$expire_starred && intval($item['starred'])) {
 				continue;
-			} elseif (!$expire_notes && (($item['type'] == 'note') || ($item['post-type'] == Item::PT_PERSONAL_NOTE))) {
+			} elseif (!$expire_notes && (($item['type'] == 'note') || ($item['post-type'] == self::PT_PERSONAL_NOTE))) {
 				continue;
-			} elseif (!$expire_items && ($item['type'] != 'note') && ($item['post-type'] != Item::PT_PERSONAL_NOTE)) {
+			} elseif (!$expire_items && ($item['type'] != 'note') && ($item['post-type'] != self::PT_PERSONAL_NOTE)) {
 				continue;
 			}
 
@@ -3200,7 +3201,7 @@ class Item
 
 		Logger::notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid]);
 
-		$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
+		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
 			Logger::log('like: unknown item ' . $item_id);
 			return false;
@@ -3212,10 +3213,10 @@ class Item
 			return false;
 		}
 
-		if (!Item::exists(['uri-id' => $item['parent-uri-id'], 'uid' => $uid])) {
+		if (!Post::exists(['uri-id' => $item['parent-uri-id'], 'uid' => $uid])) {
 			$stored = self::storeForUserByUriId($item['parent-uri-id'], $uid);
 			if (($item['parent-uri-id'] == $item['uri-id']) && !empty($stored)) {
-				$item = self::selectFirst(self::ITEM_FIELDLIST, ['id' => $stored]);
+				$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $stored]);
 				if (!DBA::isResult($item)) {
 					Logger::info('Could not fetch just created item - should not happen', ['stored' => $stored, 'uid' => $uid, 'item-uri' => $item_uri]);
 					return false;
@@ -3293,7 +3294,7 @@ class Item
 
 		$condition = ['vid' => $vids, 'deleted' => false, 'gravity' => GRAVITY_ACTIVITY,
 			'author-id' => $author_id, 'uid' => $item['uid'], 'thr-parent' => $item_uri];
-		$like_item = self::selectFirst(['id', 'guid', 'verb'], $condition);
+		$like_item = Post::selectFirst(['id', 'guid', 'verb'], $condition);
 
 		if (DBA::isResult($like_item)) {
 			/**
@@ -3386,7 +3387,7 @@ class Item
 			'moderated', 'visible', 'starred', 'contact-id', 'post-type', 'uri-id',
 			'deleted', 'origin', 'forum_mode', 'mention', 'network', 'author-id', 'owner-id'];
 		$condition = ["`id` = ? AND (`parent` = ? OR `parent` = 0)", $itemid, $itemid];
-		$item = self::selectFirst($fields, $condition);
+		$item = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
 			return;
@@ -3407,7 +3408,7 @@ class Item
 			'wall', 'private', 'pubmail', 'moderated', 'visible', 'starred', 'contact-id', 'uri-id',
 			'deleted', 'origin', 'forum_mode', 'network', 'author-id', 'owner-id'];
 
-		$item = self::selectFirst($fields, ['id' => $itemid, 'gravity' => GRAVITY_PARENT]);
+		$item = Post::selectFirst($fields, ['id' => $itemid, 'gravity' => GRAVITY_PARENT]);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -3443,7 +3444,7 @@ class Item
 
 		if ($itemuri != "") {
 			$condition = ["`uri` = ? AND NOT `deleted` AND NOT (`uid` IN (?, 0))", $itemuri, $item["uid"]];
-			if (!self::exists($condition)) {
+			if (!Post::exists($condition)) {
 				DBA::delete('item', ['uri' => $itemuri, 'uid' => 0]);
 				Logger::debug('Deleted shadow item', ['id' => $itemid, 'uri' => $itemuri]);
 			}
@@ -3473,7 +3474,7 @@ class Item
 			if (!empty($set)) {
 				$condition = ["(`private` != ? OR (`private` = ? AND `wall`
 					AND `psid` IN (" . implode(', ', array_fill(0, count($set), '?')) . ")))",
-					Item::PRIVATE, Item::PRIVATE];
+					self::PRIVATE, self::PRIVATE];
 				$condition = array_merge($condition, $set);
 			}
 		}
@@ -3972,7 +3973,7 @@ class Item
 		$uid = $item['uid'] ?? 0;
 
 		// first try to fetch the item via the GUID. This will work for all reshares that had been created on this system
-		$shared_item = self::selectFirst(['title', 'body'], ['guid' => $shared['guid'], 'uid' => [0, $uid]]);
+		$shared_item = Post::selectFirst(['title', 'body'], ['guid' => $shared['guid'], 'uid' => [0, $uid]]);
 		if (!DBA::isResult($shared_item)) {
 			if (empty($shared['link'])) {
 				return $item;
@@ -3985,7 +3986,7 @@ class Item
 				return $item;
 			}
 
-			$shared_item = self::selectFirst(['title', 'body'], ['id' => $id]);
+			$shared_item = Post::selectFirst(['title', 'body'], ['id' => $id]);
 			if (!DBA::isResult($shared_item)) {
 				return $item;
 			}

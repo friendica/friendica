@@ -51,9 +51,9 @@ class UserItem
 	 */
 	public static function setNotification(int $iid)
 	{
-		$fields = ['id', 'uri-id', 'parent-uri-id', 'uid', 'body', 'parent', 'gravity', 'tag',
+		$fields = ['id', 'uri-id', 'parent-uri-id', 'uid', 'body', 'parent', 'gravity',
 			'private', 'contact-id', 'thr-parent', 'parent-uri', 'author-id', 'verb'];
-		$item = Item::selectFirst($fields, ['id' => $iid, 'origin' => false]);
+		$item = Post::selectFirst($fields, ['id' => $iid, 'origin' => false]);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -298,7 +298,7 @@ class UserItem
 	private static function checkCommentedThread(array $item, array $contacts)
 	{
 		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => GRAVITY_PARENT];
-		return Item::exists($condition);
+		return Post::exists($condition);
 	}
 
 	/**
@@ -310,7 +310,7 @@ class UserItem
 	private static function checkDirectComment(array $item, array $contacts)
 	{
 		$condition = ['uri' => $item['thr-parent'], 'uid' => $item['uid'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => GRAVITY_COMMENT];
-		return Item::exists($condition);
+		return Post::exists($condition);
 	}
 
 	/**
@@ -322,7 +322,7 @@ class UserItem
 	private static function checkDirectCommentedThread(array $item, array $contacts)
 	{
 		$condition = ['uri' => $item['thr-parent'], 'uid' => $item['uid'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => GRAVITY_PARENT];
-		return Item::exists($condition);
+		return Post::exists($condition);
 	}
 
 	/**
@@ -334,7 +334,7 @@ class UserItem
 	private static function checkCommentedParticipation(array $item, array $contacts)
 	{
 		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => GRAVITY_COMMENT];
-		return Item::exists($condition);
+		return Post::exists($condition);
 	}
 
 	/**
@@ -346,6 +346,6 @@ class UserItem
 	private static function checkActivityParticipation(array $item, array $contacts)
 	{
 		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => GRAVITY_ACTIVITY];
-		return Item::exists($condition);
+		return Post::exists($condition);
 	}
 }

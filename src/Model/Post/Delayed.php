@@ -27,6 +27,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Util\DateTimeFormat;
 
@@ -151,7 +152,7 @@ class Delayed
 		}
 
 		if (!empty($id) && (!empty($taglist) || !empty($attachments))) {
-			$feeditem = Item::selectFirst(['uri-id'], ['id' => $id]);
+			$feeditem = Post::selectFirst(['uri-id'], ['id' => $id]);
 
 			foreach ($taglist as $tag) {
 				Tag::store($feeditem['uri-id'], Tag::HASHTAG, $tag);
