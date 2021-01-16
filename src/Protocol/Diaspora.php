@@ -76,9 +76,9 @@ class Diaspora
 			return $contacts;
 		}
 
-		$items = Item::select(['author-id', 'author-link', 'parent-author-link', 'parent-guid', 'guid'],
+		$items = Post::select(['author-id', 'author-link', 'parent-author-link', 'parent-guid', 'guid'],
 			['parent' => $item['parent'], 'gravity' => [GRAVITY_COMMENT, GRAVITY_ACTIVITY]]);
-		while ($item = DBA::fetch($items)) {
+		while ($item = Post::fetch($items)) {
 			$contact = DBA::selectFirst('contact', ['id', 'url', 'name', 'protocol', 'batch', 'network'],
 				['id' => $item['author-id']]);
 			if (!DBA::isResult($contact) || empty($contact['batch']) ||
@@ -931,7 +931,7 @@ class Diaspora
 	 */
 	private static function messageExists($uid, $guid)
 	{
-		$item = Item::selectFirst(['id'], ['uid' => $uid, 'guid' => $guid]);
+		$item = Post::selectFirst(['id'], ['uid' => $uid, 'guid' => $guid]);
 		if (DBA::isResult($item)) {
 			Logger::log("message ".$guid." already exists for user ".$uid);
 			return $item["id"];
@@ -1151,7 +1151,7 @@ class Diaspora
 
 		$guid = urldecode($matches[2]);
 
-		$item = Item::selectFirst(['id'], ['guid' => $guid, 'uid' => $uid]);
+		$item = Post::selectFirst(['id'], ['guid' => $guid, 'uid' => $uid]);
 		if (DBA::isResult($item)) {
 			Logger::info('Found', ['id' => $item['id']]);
 			return $item['id'];
@@ -1161,7 +1161,7 @@ class Diaspora
 		$ret = self::storeByGuid($guid, $matches[1], $uid);
 		Logger::info('Result', ['ret' => $ret]);
 
-		$item = Item::selectFirst(['id'], ['guid' => $guid, 'uid' => $uid]);
+		$item = Post::selectFirst(['id'], ['guid' => $guid, 'uid' => $uid]);
 		if (DBA::isResult($item)) {
 			Logger::info('Found', ['id' => $item['id']]);
 			return $item['id'];
@@ -1188,7 +1188,7 @@ class Diaspora
 			'author-name', 'author-link', 'author-avatar', 'gravity',
 			'owner-name', 'owner-link', 'owner-avatar'];
 		$condition = ['uid' => $uid, 'guid' => $guid];
-		$item = Item::selectFirst($fields, $condition);
+		$item = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
 			$person = FContact::getByURL($author);
@@ -1202,7 +1202,7 @@ class Diaspora
 			if ($result) {
 				Logger::log("Fetched missing item ".$guid." - result: ".$result, Logger::DEBUG);
 
-				$item = Item::selectFirst($fields, $condition);
+				$item = Post::selectFirst($fields, $condition);
 			}
 		}
 
@@ -1410,7 +1410,7 @@ class Diaspora
 	 */
 	private static function getUriFromGuid($author, $guid, $onlyfound = false)
 	{
-		$item = Item::selectFirst(['uri'], ['guid' => $guid]);
+		$item = Post::selectFirst(['uri'], ['guid' => $guid]);
 		if (DBA::isResult($item)) {
 			return $item["uri"];
 		} elseif (!$onlyfound) {
@@ -1424,25 +1424,6 @@ class Diaspora
 		}
 
 		return "";
-	}
-
-	/**
-	 * Fetch the guid from our database with a given uri
-	 *
-	 * @param string $uri Message uri
-	 * @param string $uid Author handle
-	 *
-	 * @return string The post guid
-	 * @throws \Exception
-	 */
-	private static function getGuidFromUri($uri, $uid)
-	{
-		$item = Item::selectFirst(['guid'], ['uri' => $uri, 'uid' => $uid]);
-		if (DBA::isResult($item)) {
-			return $item["guid"];
-		} else {
-			return false;
-		}
 	}
 
 	/**
@@ -1815,7 +1796,7 @@ class Diaspora
 
 		// like on comments have the comment as parent. So we need to fetch the toplevel parent
 		if ($toplevel_parent_item['gravity'] != GRAVITY_PARENT) {
-			$toplevel = Item::selectFirst(['origin'], ['id' => $toplevel_parent_item['parent']]);
+			$toplevel = Post::selectFirst(['origin'], ['id' => $toplevel_parent_item['parent']]);
 			$origin = $toplevel["origin"];
 		} else {
 			$origin = $toplevel_parent_item["origin"];
@@ -1993,9 +1974,9 @@ class Diaspora
 		Logger::info('Participation stored', ['id' => $message_id, 'guid' => $guid, 'parent_guid' => $parent_guid, 'author' => $author]);
 
 		// Send all existing comments and likes to the requesting server
-		$comments = Item::select(['id', 'uri-id', 'parent-author-network', 'author-network', 'verb'],
+		$comments = Post::select(['id', 'uri-id', 'parent-author-network', 'author-network', 'verb'],
 			['parent' => $toplevel_parent_item['id'], 'gravity' => [GRAVITY_COMMENT, GRAVITY_ACTIVITY]]);
-		while ($comment = Item::fetch($comments)) {
+		while ($comment = Post::fetch($comments)) {
 			if (in_array($comment['verb'], [Activity::FOLLOW, Activity::TAG])) {
 				Logger::info('participation messages are not relayed', ['item' => $comment['id']]);
 				continue;
@@ -2285,7 +2266,7 @@ class Diaspora
 		$fields = ['body', 'title', 'app', 'created', 'object-type', 'uri', 'guid',
 			'author-name', 'author-link', 'author-avatar', 'plink', 'uri-id'];
 		$condition = ['guid' => $guid, 'visible' => true, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
-		$item = Item::selectFirst($fields, $condition);
+		$item = Post::selectFirst($fields, $condition);
 
 		if (DBA::isResult($item)) {
 			Logger::log("reshared message ".$guid." already exists on system.");
@@ -2329,7 +2310,7 @@ class Diaspora
 				$fields = ['body', 'title', 'app', 'created', 'object-type', 'uri', 'guid',
 					'author-name', 'author-link', 'author-avatar', 'plink', 'uri-id'];
 				$condition = ['guid' => $guid, 'visible' => true, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
-				$item = Item::selectFirst($fields, $condition);
+				$item = Post::selectFirst($fields, $condition);
 
 				if (DBA::isResult($item)) {
 					// If it is a reshared post from another network then reformat to avoid display problems with two share elements
@@ -2355,7 +2336,7 @@ class Diaspora
 	 */
 	private static function addReshareActivity($item, $parent_message_id, $guid, $author)
 	{
-		$parent = Item::selectFirst(['uri', 'guid'], ['id' => $parent_message_id]);
+		$parent = Post::selectFirst(['uri', 'guid'], ['id' => $parent_message_id]);
 
 		$datarray = [];
 
@@ -2554,20 +2535,20 @@ class Diaspora
 			$condition = ['guid' => $target_guid, 'deleted' => false, 'uid' => $importer['uid']];
 		}
 
-		$r = Item::select($fields, $condition);
+		$r = Post::select($fields, $condition);
 		if (!DBA::isResult($r)) {
 			Logger::log("Target guid ".$target_guid." was not found on this system for user ".$importer['uid'].".");
 			return false;
 		}
 
-		while ($item = Item::fetch($r)) {
+		while ($item = Post::fetch($r)) {
 			if (strstr($item['file'], '[')) {
 				Logger::log("Target guid " . $target_guid . " for user " . $item['uid'] . " is filed. So it won't be deleted.", Logger::DEBUG);
 				continue;
 			}
 
 			// Fetch the parent item
-			$parent = Item::selectFirst(['author-link'], ['id' => $item['parent']]);
+			$parent = Post::selectFirst(['author-link'], ['id' => $item['parent']]);
 
 			// Only delete it if the parent author really fits
 			if (!Strings::compareLink($parent["author-link"], $contact["url"]) && !Strings::compareLink($item["author-link"], $contact["url"])) {
@@ -2579,6 +2560,7 @@ class Diaspora
 
 			Logger::log("Deleted target ".$target_guid." (".$item["id"].") from user ".$item["uid"]." parent: ".$item['parent'], Logger::DEBUG);
 		}
+		DBA::close($r);
 
 		return true;
 	}
@@ -3263,7 +3245,7 @@ class Diaspora
 
 		if (!empty($reshared['guid']) && $complete) {
 			$condition = ['guid' => $reshared['guid'], 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
-			$item = Item::selectFirst(['contact-id'], $condition);
+			$item = Post::selectFirst(['contact-id'], $condition);
 			if (DBA::isResult($item)) {
 				$ret = [];
 				$ret["root_handle"] = self::handleFromContact($item["contact-id"]);
@@ -3540,7 +3522,7 @@ class Diaspora
 	 */
 	private static function constructLike(array $item, array $owner)
 	{
-		$parent = Item::selectFirst(['guid', 'uri', 'thr-parent'], ['uri' => $item["thr-parent"]]);
+		$parent = Post::selectFirst(['guid', 'uri', 'thr-parent'], ['uri' => $item["thr-parent"]]);
 		if (!DBA::isResult($parent)) {
 			return false;
 		}
@@ -3572,7 +3554,7 @@ class Diaspora
 	 */
 	private static function constructAttend(array $item, array $owner)
 	{
-		$parent = Item::selectFirst(['guid'], ['uri' => $item['thr-parent']]);
+		$parent = Post::selectFirst(['guid'], ['uri' => $item['thr-parent']]);
 		if (!DBA::isResult($parent)) {
 			return false;
 		}
@@ -3617,7 +3599,7 @@ class Diaspora
 			return $result;
 		}
 
-		$toplevel_item = Item::selectFirst(['guid', 'author-id', 'author-link'], ['id' => $item['parent'], 'parent' => $item['parent']]);
+		$toplevel_item = Post::selectFirst(['guid', 'author-id', 'author-link'], ['id' => $item['parent'], 'parent' => $item['parent']]);
 		if (!DBA::isResult($toplevel_item)) {
 			Logger::error('Missing parent conversation item', ['parent' => $item['parent']]);
 			return false;
@@ -3625,7 +3607,7 @@ class Diaspora
 
 		$thread_parent_item = $toplevel_item;
 		if ($item['thr-parent'] != $item['parent-uri']) {
-			$thread_parent_item = Item::selectFirst(['guid', 'author-id', 'author-link'], ['uri' => $item['thr-parent'], 'uid' => $item['uid']]);
+			$thread_parent_item = Post::selectFirst(['guid', 'author-id', 'author-link'], ['uri' => $item['thr-parent'], 'uid' => $item['uid']]);
 		}
 
 		$body = $item["body"];
@@ -4056,7 +4038,7 @@ class Diaspora
 			return false;
 		}
 
-		$parent = Item::selectFirst(['parent-uri'], ['uri' => $item['thr-parent']]);
+		$parent = Post::selectFirst(['parent-uri'], ['uri' => $item['thr-parent']]);
 		if (!DBA::isResult($parent)) {
 			return;
 		}

@@ -23,6 +23,7 @@ namespace Friendica\Worker;
 
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 
 /**
  * Removes orphaned data from deleted users
@@ -39,11 +40,11 @@ class RemoveUser {
 		// Now we delete all user items
 		$condition = ['uid' => $uid, 'deleted' => false];
 		do {
-			$items = Item::select(['id'], $condition, ['limit' => 100]);
-			while ($item = Item::fetch($items)) {
+			$items = Post::select(['id'], $condition, ['limit' => 100]);
+			while ($item = Post::fetch($items)) {
 				Item::markForDeletionById($item['id'], PRIORITY_NEGLIGIBLE);
 			}
 			DBA::close($items);
-		} while (Item::exists($condition));
+		} while (Post::exists($condition));
 	}
 }

@@ -23,8 +23,8 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
-use Friendica\Model\Item;
 use Friendica\Model\Photo;
+use Friendica\Model\Post;
 
 /**
  * Removes orphaned data from deleted contacts
@@ -47,13 +47,13 @@ class RemoveContact {
 			$condition = ['uid' => $contact['uid'], 'contact-id' => $id];
 		}
 		do {
-			$items = Item::select(['id', 'guid'], $condition, ['limit' => 100]);
-			while ($item = Item::fetch($items)) {
+			$items = Post::select(['id', 'guid'], $condition, ['limit' => 100]);
+			while ($item = Post::fetch($items)) {
 				Logger::info('Delete removed contact item', ['id' => $item['id'], 'guid' => $item['guid']]);
 				DBA::delete('item', ['id' => $item['id']]);
 			}
 			DBA::close($items);
-		} while (Item::exists($condition));
+		} while (Post::exists($condition));
 
 		Photo::delete(['contact-id' => $id]);
 		$ret = DBA::delete('contact', ['id' => $id]);

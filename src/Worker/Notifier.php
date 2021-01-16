@@ -101,7 +101,7 @@ class Notifier
 		} else {
 			// find ancestors
 			$condition = ['id' => $target_id, 'visible' => true, 'moderated' => false];
-			$target_item = Item::selectFirst([], $condition);
+			$target_item = Post::selectFirst([], $condition);
 
 			if (!DBA::isResult($target_item) || !intval($target_item['parent'])) {
 				Logger::info('No target item', ['cmd' => $cmd, 'target' => $target_id]);
@@ -119,13 +119,13 @@ class Notifier
 
 			$condition = ['parent' => $target_item['parent'], 'visible' => true, 'moderated' => false];
 			$params = ['order' => ['id']];
-			$items_stmt = Item::select([], $condition, $params);
+			$items_stmt = Post::select([], $condition, $params);
 			if (!DBA::isResult($items_stmt)) {
 				Logger::info('No item found', ['cmd' => $cmd, 'target' => $target_id]);
 				return;
 			}
 
-			$items = Item::inArray($items_stmt);
+			$items = Post::inArray($items_stmt);
 
 			// avoid race condition with deleting entries
 			if ($items[0]['deleted']) {
@@ -165,7 +165,7 @@ class Notifier
 
 			$fields = ['network', 'author-id', 'author-link', 'author-network', 'owner-id'];
 			$condition = ['uri' => $target_item["thr-parent"], 'uid' => $target_item["uid"]];
-			$thr_parent = Item::selectFirst($fields, $condition);
+			$thr_parent = Post::selectFirst($fields, $condition);
 			if (empty($thr_parent)) {
 				$thr_parent = $parent;
 			}

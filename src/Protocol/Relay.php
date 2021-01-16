@@ -30,6 +30,7 @@ use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Search;
 use Friendica\Model\Tag;
 use Friendica\Util\DateTimeFormat;
@@ -253,7 +254,7 @@ class Relay
 
 		if (DI::config()->get("system", "relay_directly", false)) {
 			// We distribute our stuff based on the parent to ensure that the thread will be complete
-			$parent = Item::selectFirst(['uri-id'], ['id' => $item_id]);
+			$parent = Post::selectFirst(['uri-id'], ['id' => $item_id]);
 			if (!DBA::isResult($parent)) {
 				return;
 			}

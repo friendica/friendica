@@ -48,7 +48,7 @@ class APDelivery
 		if (ActivityPub\Transmitter::archivedInbox($inbox)) {
 			Logger::info('Inbox is archived', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uid' => $uid]);
 			if (in_array($cmd, [Delivery::POST])) {
-				$item = Item::selectFirst(['uri-id'], ['id' => $item_id]);
+				$item = Post::selectFirst(['uri-id'], ['id' => $item_id]);
 				Post\DeliveryData::incrementQueueFailed($item['uri-id'] ?? 0);
 			}
 			return;
@@ -81,7 +81,7 @@ class APDelivery
 		}
 
 		// This should never fail and is temporariy (until the move to the "post" structure)
-		$item = Item::selectFirst(['uri-id'], ['id' => $item_id]);
+		$item = Post::selectFirst(['uri-id'], ['id' => $item_id]);
 		$uriid = $item['uri-id'] ?? 0;
 		$gsid = null;
 

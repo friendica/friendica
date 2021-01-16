@@ -74,7 +74,7 @@ class Delivery
 			$uid = $target_id;
 			$target_item = [];
 		} else {
-			$item = Model\Item::selectFirst(['parent'], ['id' => $target_id]);
+			$item = Model\Post::selectFirst(['parent'], ['id' => $target_id]);
 			if (!DBA::isResult($item) || empty($item['parent'])) {
 				return;
 			}
@@ -82,9 +82,9 @@ class Delivery
 
 			$condition = ['id' => [$target_id, $parent_id], 'visible' => true, 'moderated' => false];
 			$params = ['order' => ['id']];
-			$itemdata = Model\Item::select([], $condition, $params);
+			$itemdata = Model\Post::select([], $condition, $params);
 
-			while ($item = Model\Item::fetch($itemdata)) {
+			while ($item = Model\Post::fetch($itemdata)) {
 				if ($item['verb'] == Activity::ANNOUNCE) {
 					continue;
 				}
@@ -121,7 +121,7 @@ class Delivery
 			}
 
 			$condition = ['uri' => $target_item['thr-parent'], 'uid' => $target_item['uid']];
-			$thr_parent = Model\Item::selectFirst(['network', 'object'], $condition);
+			$thr_parent = Model\Post::selectFirst(['network', 'object'], $condition);
 			if (!DBA::isResult($thr_parent)) {
 				// Shouldn't happen. But when this does, we just take the parent as thread parent.
 				// That's totally okay for what we use this variable here.
@@ -593,13 +593,13 @@ class Delivery
 
 			if (empty($target_item['title'])) {
 				$condition = ['uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
-				$title = Model\Item::selectFirst(['title'], $condition);
+				$title = Model\Post::selectFirst(['title'], $condition);
 
 				if (DBA::isResult($title) && ($title['title'] != '')) {
 					$subject = $title['title'];
 				} else {
 					$condition = ['parent-uri' => $target_item['parent-uri'], 'uid' => $owner['uid']];
-					$title = Model\Item::selectFirst(['title'], $condition);
+					$title = Model\Post::selectFirst(['title'], $condition);
 
 					if (DBA::isResult($title) && ($title['title'] != '')) {
 						$subject = $title['title'];

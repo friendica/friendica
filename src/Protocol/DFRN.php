@@ -273,8 +273,7 @@ class DFRN
 		}
 
 		if (!empty($ids)) {
-			$ret = Item::select(Item::DELIVER_FIELDLIST, ['id' => $ids]);
-			$items = Item::inArray($ret);
+			$items = Post::selectToArray(Item::DELIVER_FIELDLIST, ['id' => $ids]);
 		} else {
 			$items = [];
 		}
@@ -361,8 +360,7 @@ class DFRN
 			$condition = ['id' => $item_id];
 		}
 
-		$ret = Item::select(Item::DELIVER_FIELDLIST, $condition);
-		$items = Item::inArray($ret);
+		$items = Post::selectToArray(Item::DELIVER_FIELDLIST, $condition);
 		if (!DBA::isResult($items)) {
 			return '';
 		}
@@ -957,7 +955,7 @@ class DFRN
 		$entry->appendChild($dfrnowner);
 
 		if ($item['gravity'] != GRAVITY_PARENT) {
-			$parent = Item::selectFirst(['guid', 'plink'], ['uri' => $item['thr-parent'], 'uid' => $item['uid']]);
+			$parent = Post::selectFirst(['guid', 'plink'], ['uri' => $item['thr-parent'], 'uid' => $item['uid']]);
 			if (DBA::isResult($parent)) {
 				$attributes = ["ref" => $item['thr-parent'], "type" => "text/html",
 					"href" => $parent['plink'],
@@ -1934,7 +1932,7 @@ class DFRN
 
 			$is_a_remote_action = false;
 
-			$parent = Item::selectFirst(['thr-parent'], ['uri' => $item["thr-parent"]]);
+			$parent = Post::selectFirst(['thr-parent'], ['uri' => $item["thr-parent"]]);
 			if (DBA::isResult($parent)) {
 				$r = q(
 					"SELECT `item`.`forum_mode`, `item`.`wall` FROM `item`
@@ -2008,7 +2006,7 @@ class DFRN
 			if ($Blink && Strings::compareLink($Blink, DI::baseUrl() . "/profile/" . $importer["nickname"])) {
 				$author = DBA::selectFirst('contact', ['id', 'name', 'thumb', 'url'], ['id' => $item['author-id']]);
 
-				$parent = Item::selectFirst(['id'], ['uri' => $item['thr-parent'], 'uid' => $importer["importer_uid"]]);
+				$parent = Post::selectFirst(['id'], ['uri' => $item['thr-parent'], 'uid' => $importer["importer_uid"]]);
 				$item['parent'] = $parent['id'];
 
 				// send a notification
@@ -2087,13 +2085,13 @@ class DFRN
 				// split into two queries for performance issues
 				$condition = ['uid' => $item["uid"], 'author-id' => $item["author-id"], 'gravity' => GRAVITY_ACTIVITY,
 					'verb' => $item['verb'], 'parent-uri' => $item['thr-parent']];
-				if (Item::exists($condition)) {
+				if (Post::exists($condition)) {
 					return false;
 				}
 
 				$condition = ['uid' => $item["uid"], 'author-id' => $item["author-id"], 'gravity' => GRAVITY_ACTIVITY,
 					'verb' => $item['verb'], 'thr-parent' => $item['thr-parent']];
-				if (Item::exists($condition)) {
+				if (Post::exists($condition)) {
 					return false;
 				}
 
@@ -2111,7 +2109,7 @@ class DFRN
 				$xt = XML::parseString($item["target"]);
 
 				if ($xt->type == Activity\ObjectType::NOTE) {
-					$item_tag = Item::selectFirst(['id', 'uri-id', 'tag'], ['uri' => $xt->id, 'uid' => $importer["importer_uid"]]);
+					$item_tag = Post::selectFirst(['id', 'uri-id', 'tag'], ['uri' => $xt->id, 'uid' => $importer["importer_uid"]]);
 
 					if (!DBA::isResult($item_tag)) {
 						Logger::log("Query failed to execute, no result returned in " . __FUNCTION__);
@@ -2214,7 +2212,7 @@ class DFRN
 
 		$item["edited"] = XML::getFirstNodeValue($xpath, "atom:updated/text()", $entry);
 
-		$current = Item::selectFirst(['id', 'uid', 'edited', 'body'],
+		$current = Post::selectFirst(['id', 'uid', 'edited', 'body'],
 			['uri' => $item["uri"], 'uid' => $importer["importer_uid"]]
 		);
 		// Is there an existing item?
@@ -2559,7 +2557,7 @@ class DFRN
 		}
 
 		$condition = ['uri' => $uri, 'uid' => $importer["importer_uid"]];
-		$item = Item::selectFirst(['id', 'parent', 'contact-id', 'file', 'deleted', 'gravity'], $condition);
+		$item = Post::selectFirst(['id', 'parent', 'contact-id', 'file', 'deleted', 'gravity'], $condition);
 		if (!DBA::isResult($item)) {
 			Logger::log("Item with uri " . $uri . " for user " . $importer["importer_uid"] . " wasn't found.", Logger::DEBUG);
 			return;
@@ -2579,7 +2577,7 @@ class DFRN
 		// Comments can be deleted by the thread owner or comment owner
 		if (($item['gravity'] != GRAVITY_PARENT) && ($item['contact-id'] != $importer["id"])) {
 			$condition = ['id' => $item['parent'], 'contact-id' => $importer["id"]];
-			if (!Item::exists($condition)) {
+			if (!Post::exists($condition)) {
 				Logger::log("Item with uri " . $uri . " wasn't found or mustn't be deleted by contact " . $importer["id"] . " - ignoring deletion.", Logger::DEBUG);
 				return;
 			}

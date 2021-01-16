@@ -445,7 +445,7 @@ class OStatus
 			}
 
 			// Deletions come with the same uri, so we check for duplicates after processing deletions
-			if (Item::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]])) {
+			if (Post::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]])) {
 				Logger::log('Post with URI '.$item["uri"].' already existed for user '.$importer["uid"].'.', Logger::DEBUG);
 				continue;
 			} else {
@@ -533,7 +533,7 @@ class OStatus
 						}
 					}
 					foreach (self::$itemlist as $item) {
-						$found = Item::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]]);
+						$found = Post::exists(['uid' => $importer["uid"], 'uri' => $item["uri"]]);
 						if ($found) {
 							Logger::log("Item with uri ".$item["uri"]." for user ".$importer["uid"]." already exists.", Logger::DEBUG);
 						} elseif ($item['contact-id'] < 0) {
@@ -561,7 +561,7 @@ class OStatus
 	private static function deleteNotice(array $item)
 	{
 		$condition = ['uid' => $item['uid'], 'author-id' => $item['author-id'], 'uri' => $item['uri']];
-		if (!Item::exists($condition)) {
+		if (!Post::exists($condition)) {
 			Logger::log('Item from '.$item['author-link'].' with uri '.$item['uri'].' for user '.$item['uid']." wasn't found. We don't delete it.");
 			return;
 		}
@@ -697,7 +697,7 @@ class OStatus
 		}
 
 		if (isset($item["thr-parent"])) {
-			if (!Item::exists(['uid' => $importer["uid"], 'uri' => $item['thr-parent']])) {
+			if (!Post::exists(['uid' => $importer["uid"], 'uri' => $item['thr-parent']])) {
 				if ($related != '') {
 					self::fetchRelated($related, $item["thr-parent"], $importer);
 				}
@@ -1593,7 +1593,7 @@ class OStatus
 
 		$condition = ['uid' => $owner["uid"], 'guid' => $repeated_guid, 'private' => [Item::PUBLIC, Item::UNLISTED],
 			'network' => [Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS]];
-		$repeated_item = Item::selectFirst([], $condition);
+		$repeated_item = Post::selectFirst([], $condition);
 		if (!DBA::isResult($repeated_item)) {
 			return false;
 		}
@@ -1659,7 +1659,7 @@ class OStatus
 		$verb = ActivityNamespace::ACTIVITY_SCHEMA . "favorite";
 		self::entryContent($doc, $entry, $item, $owner, "Favorite", $verb, false);
 
-		$parent = Item::selectFirst([], ['uri' => $item["thr-parent"], 'uid' => $item["uid"]]);
+		$parent = Post::selectFirst([], ['uri' => $item["thr-parent"], 'uid' => $item["uid"]]);
 		if (DBA::isResult($parent)) {
 			$as_object = $doc->createElement("activity:object");
 
@@ -1927,9 +1927,9 @@ class OStatus
 		$mentioned = [];
 
 		if ($item['gravity'] != GRAVITY_PARENT) {
-			$parent = Item::selectFirst(['guid', 'author-link', 'owner-link'], ['id' => $item['parent']]);
+			$parent = Post::selectFirst(['guid', 'author-link', 'owner-link'], ['id' => $item['parent']]);
 
-			$thrparent = Item::selectFirst(['guid', 'author-link', 'owner-link', 'plink'], ['uid' => $owner["uid"], 'uri' => $item['thr-parent']]);
+			$thrparent = Post::selectFirst(['guid', 'author-link', 'owner-link', 'plink'], ['uid' => $owner["uid"], 'uri' => $item['thr-parent']]);
 
 			if (DBA::isResult($thrparent)) {
 				$mentioned[$thrparent["author-link"]] = $thrparent["author-link"];

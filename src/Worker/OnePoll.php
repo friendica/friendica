@@ -27,6 +27,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
@@ -249,7 +250,7 @@ class OnePoll
 					// Have we seen it before?
 					$fields = ['deleted', 'id'];
 					$condition = ['uid' => $importer_uid, 'uri' => $datarray['uri']];
-					$item = Item::selectFirst($fields, $condition);
+					$item = Post::selectFirst($fields, $condition);
 					if (DBA::isResult($item)) {
 						Logger::log("Mail: Seen before ".$msg_uid." for ".$mailconf['user']." UID: ".$importer_uid." URI: ".$datarray['uri'],Logger::DEBUG);
 
@@ -298,7 +299,7 @@ class OnePoll
 							}
 						}
 						$condition = ['uri' => $refs_arr, 'uid' => $importer_uid];
-						$parent = Item::selectFirst(['uri'], $condition);
+						$parent = Post::selectFirst(['uri'], $condition);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}
@@ -331,7 +332,7 @@ class OnePoll
 					if (empty($datarray['thr-parent']) && $reply) {
 						$condition = ['title' => $datarray['title'], 'uid' => $importer_uid, 'network' => Protocol::MAIL];
 						$params = ['order' => ['created' => true]];
-						$parent = Item::selectFirst(['uri'], $condition, $params);
+						$parent = Post::selectFirst(['uri'], $condition, $params);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}

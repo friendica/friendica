@@ -30,6 +30,7 @@ use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 use Friendica\Model\APContact;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
@@ -230,7 +231,7 @@ class Receiver
 			}
 		}
 
-		if (Item::exists(['uri' => $object_id, 'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]])) {
+		if (Post::exists(['uri' => $object_id, 'gravity' => [GRAVITY_PARENT, GRAVITY_COMMENT]])) {
 			// We just assume "note" since it doesn't make a difference for the further processing
 			return 'as:Note';
 		}
@@ -650,10 +651,11 @@ class Receiver
 		}
 
 		if (!empty($reply)) {
-			$parents = Item::select(['uid'], ['uri' => $reply]);
-			while ($parent = Item::fetch($parents)) {
+			$parents = Post::select(['uid'], ['uri' => $reply]);
+			while ($parent = Post::fetch($parents)) {
 				$receivers[$parent['uid']] = ['uid' => $parent['uid'], 'type' => self::TARGET_ANSWER];
 			}
+			DBA::close($parents);
 		}
 
 		if (!empty($actor)) {
@@ -928,7 +930,7 @@ class Receiver
 			} else {
 				Logger::log('Empty content for ' . $object_id . ', check if content is available locally.', Logger::DEBUG);
 
-				$item = Item::selectFirst([], ['uri' => $object_id]);
+				$item = Post::selectFirst([], ['uri' => $object_id]);
 				if (!DBA::isResult($item)) {
 					Logger::log('Object with url ' . $object_id . ' was not found locally.', Logger::DEBUG);
 					return false;

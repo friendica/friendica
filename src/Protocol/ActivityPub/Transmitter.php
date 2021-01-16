@@ -87,7 +87,7 @@ class Transmitter
 	 */
 	public static function addRelayServerInboxesForItem(int $item_id, array $inboxes = [])
 	{
-		$item = Item::selectFirst(['uid'], ['id' => $item_id]);
+		$item = Post::selectFirst(['uid'], ['id' => $item_id]);
 		if (empty($item)) {
 			return $inboxes;
 		}
@@ -275,8 +275,8 @@ class Transmitter
 
 			$condition['parent-network'] = Protocol::NATIVE_SUPPORT;
 
-			$items = Item::select(['id'], $condition, ['limit' => [($page - 1) * 20, 20], 'order' => ['created' => true]]);
-			while ($item = Item::fetch($items)) {
+			$items = Post::select(['id'], $condition, ['limit' => [($page - 1) * 20, 20], 'order' => ['created' => true]]);
+			while ($item = Post::fetch($items)) {
 				$activity = self::createActivityFromItem($item['id'], true);
 				$activity['type'] = $activity['type'] == 'Update' ? 'Create' : $activity['type'];
 
@@ -285,6 +285,7 @@ class Transmitter
 					$list[] = $activity['object'];
 				}
 			}
+			DBA::close($items);
 
 			if (!empty($list)) {
 				$data['next'] = DI::baseUrl() . '/outbox/' . $owner['nickname'] . '?page=' . ($page + 1);
@@ -481,7 +482,7 @@ class Transmitter
 			return false;
 		}
 
-		return Item::exists(['id' => $item_id, 'network' => Protocol::ACTIVITYPUB]);
+		return Post::exists(['id' => $item_id, 'network' => Protocol::ACTIVITYPUB]);
 	}
 
 	/**
@@ -593,8 +594,8 @@ class Transmitter
 		}
 
 		if (!empty($item['parent'])) {
-			$parents = Item::select(['id', 'author-link', 'owner-link', 'gravity', 'uri'], ['parent' => $item['parent']]);
-			while ($parent = Item::fetch($parents)) {
+			$parents = Post::select(['id', 'author-link', 'owner-link', 'gravity', 'uri'], ['parent' => $item['parent']]);
+			while ($parent = Post::fetch($parents)) {
 				if ($parent['gravity'] == GRAVITY_PARENT) {
 					$profile = APContact::getByURL($parent['owner-link'], false);
 					if (!empty($profile)) {
@@ -1044,7 +1045,7 @@ class Transmitter
 	public static function createActivityFromItem(int $item_id, bool $object_mode = false)
 	{
 		Logger::info('Fetching activity', ['item' => $item_id]);
-		$item = Item::selectFirst([], ['id' => $item_id, 'parent-network' => Protocol::NATIVE_SUPPORT]);
+		$item = Post::selectFirst([], ['id' => $item_id, 'parent-network' => Protocol::NATIVE_SUPPORT]);
 		if (!DBA::isResult($item)) {
 			return false;
 		}
@@ -1055,7 +1056,7 @@ class Transmitter
 			if (!empty($author['nurl'])) {
 				$self = Contact::selectFirst(['uid'], ['nurl' => $author['nurl'], 'self' => true]);
 				if (!empty($self['uid'])) {
-					$forum_item = Item::selectFirst([], ['uri-id' => $item['uri-id'], 'uid' => $self['uid']]);
+					$forum_item = Post::selectFirst([], ['uri-id' => $item['uri-id'], 'uid' => $self['uid']]);
 					if (DBA::isResult($item)) {
 						$item = $forum_item; 
 					}
@@ -1644,7 +1645,7 @@ class Transmitter
 			return [];
 		}
 
-		$reshared_item = Item::selectFirst([], ['guid' => $reshared['guid']]);
+		$reshared_item = Post::selectFirst([], ['guid' => $reshared['guid']]);
 		if (!DBA::isResult($reshared_item)) {
 			return [];
 		}
@@ -1903,7 +1904,7 @@ class Transmitter
 
 		$condition = ['verb' => Activity::FOLLOW, 'uid' => 0, 'parent-uri' => $object,
 			'author-id' => Contact::getPublicIdByUserId($uid)];
-		if (Item::exists($condition)) {
+		if (Post::exists($condition)) {
 			Logger::log('Follow for ' . $object . ' for user ' . $uid . ' does already exist.', Logger::DEBUG);
 			return false;
 		}

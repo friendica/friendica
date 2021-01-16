@@ -341,7 +341,7 @@ class Feed
 			if (!$dryRun) {
 				$condition = ["`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
 					$importer["uid"], $item["uri"], Protocol::FEED, Protocol::DFRN];
-				$previous = Item::selectFirst(['id', 'created'], $condition);
+				$previous = Post::selectFirst(['id', 'created'], $condition);
 				if (DBA::isResult($previous)) {
 					// Use the creation date when the post had been stored. It can happen this date changes in the feed.
 					$creation_dates[] = $previous['created'];
@@ -556,7 +556,7 @@ class Feed
 			}
 
 			$condition = ['uid' => $item['uid'], 'uri' => $item['uri']];
-			if (!Item::exists($condition) && !Post\Delayed::exists($item["uri"], $item['uid'])) {
+			if (!Post::exists($condition) && !Post\Delayed::exists($item["uri"], $item['uid'])) {
 				if (!$notify) {
 					Post\Delayed::publish($item, $notify, $taglist, $attachments);
 				} else {
@@ -1041,7 +1041,7 @@ class Feed
 
 		$condition = ['uid' => $owner["uid"], 'guid' => $repeated_guid, 'private' => [Item::PUBLIC, Item::UNLISTED],
 			'network' => Protocol::FEDERATED];
-		$repeated_item = Item::selectFirst([], $condition);
+		$repeated_item = Post::selectFirst([], $condition);
 		if (!DBA::isResult($repeated_item)) {
 			return false;
 		}
@@ -1133,9 +1133,9 @@ class Feed
 		$mentioned = [];
 
 		if ($item['gravity'] != GRAVITY_PARENT) {
-			$parent = Item::selectFirst(['guid', 'author-link', 'owner-link'], ['id' => $item['parent']]);
+			$parent = Post::selectFirst(['guid', 'author-link', 'owner-link'], ['id' => $item['parent']]);
 
-			$thrparent = Item::selectFirst(['guid', 'author-link', 'owner-link', 'plink'], ['uid' => $owner["uid"], 'uri' => $item['thr-parent']]);
+			$thrparent = Post::selectFirst(['guid', 'author-link', 'owner-link', 'plink'], ['uid' => $owner["uid"], 'uri' => $item['thr-parent']]);
 
 			if (DBA::isResult($thrparent)) {
 				$mentioned[$thrparent["author-link"]] = $thrparent["author-link"];

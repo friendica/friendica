@@ -215,7 +215,7 @@ class Processor
 	 */
 	public static function updateItem($activity)
 	{
-		$item = Item::selectFirst(['uri', 'uri-id', 'thr-parent', 'gravity'], ['uri' => $activity['id']]);
+		$item = Post::selectFirst(['uri', 'uri-id', 'thr-parent', 'gravity'], ['uri' => $activity['id']]);
 		if (!DBA::isResult($item)) {
 			Logger::warning('No existing item, item will be created', ['uri' => $activity['id']]);
 			$item = self::createItem($activity);
@@ -259,7 +259,7 @@ class Processor
 			$item['object-type'] = Activity\ObjectType::COMMENT;
 		}
 
-		if (empty($activity['directmessage']) && ($activity['id'] != $activity['reply-to-id']) && !Item::exists(['uri' => $activity['reply-to-id']])) {
+		if (empty($activity['directmessage']) && ($activity['id'] != $activity['reply-to-id']) && !Post::exists(['uri' => $activity['reply-to-id']])) {
 			Logger::notice('Parent not found. Try to refetch it.', ['parent' => $activity['reply-to-id']]);
 			self::fetchMissingActivity($activity['reply-to-id'], $activity);
 		}
@@ -267,7 +267,7 @@ class Processor
 		$item['diaspora_signed_text'] = $activity['diaspora:comment'] ?? '';
 
 		/// @todo What to do with $activity['context']?
-		if (empty($activity['directmessage']) && ($item['gravity'] != GRAVITY_PARENT) && !Item::exists(['uri' => $item['thr-parent']])) {
+		if (empty($activity['directmessage']) && ($item['gravity'] != GRAVITY_PARENT) && !Post::exists(['uri' => $item['thr-parent']])) {
 			Logger::info('Parent not found, message will be discarded.', ['thr-parent' => $item['thr-parent']]);
 			return [];
 		}
@@ -378,7 +378,7 @@ class Processor
 		}
 
 		foreach ($activity['receiver'] as $receiver) {
-			$item = Item::selectFirst(['id', 'uri-id', 'tag', 'origin', 'author-link'], ['uri' => $activity['target_id'], 'uid' => $receiver]);
+			$item = Post::selectFirst(['id', 'uri-id', 'tag', 'origin', 'author-link'], ['uri' => $activity['target_id'], 'uid' => $receiver]);
 			if (!DBA::isResult($item)) {
 				// We don't fetch missing content for this purpose
 				continue;
@@ -479,7 +479,7 @@ class Processor
 		} else {
 			if (empty($activity['directmessage']) && ($item['thr-parent'] != $item['uri']) && ($item['gravity'] == GRAVITY_COMMENT)) {
 				$item_private = !in_array(0, $activity['item_receiver']);
-				$parent = Item::selectFirst(['id', 'uri-id', 'private', 'author-link', 'alias'], ['uri' => $item['thr-parent']]);
+				$parent = Post::selectFirst(['id', 'uri-id', 'private', 'author-link', 'alias'], ['uri' => $item['thr-parent']]);
 				if (!DBA::isResult($parent)) {
 					Logger::warning('Unknown parent item.', ['uri' => $item['thr-parent']]);
 					return false;
@@ -868,7 +868,7 @@ class Processor
 		}
 
 		$replyto = JsonLD::fetchElement($activity['as:object'], 'as:inReplyTo', '@id');
-		if (Item::exists(['uri' => $replyto])) {
+		if (Post::exists(['uri' => $replyto])) {
 			Logger::info('Post is a reply to an existing post - accepted', ['id' => $id, 'replyto' => $replyto]);
 			return true;
 		}
