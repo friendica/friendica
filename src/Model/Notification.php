@@ -48,13 +48,12 @@ use Psr\Log\LoggerInterface;
  * @property-read string name_cache Full name of the contact subject
  * @property-read string msg_cache  Plaintext version of the notification text with a placeholder (`{0}`) for the subject contact's name.
  */
-class Notify extends BaseModel
+class Notification extends BaseModel
 {
-
-	/** @var \Friendica\Repository\Notify */
+	/** @var \Friendica\Repository\Notification */
 	private $repo;
 
-	public function __construct(Database $dba, LoggerInterface $logger, \Friendica\Repository\Notify $repo, array $data = [])
+	public function __construct(Database $dba, LoggerInterface $logger, \Friendica\Repository\Notification $repo, array $data = [])
 	{
 		parent::__construct($dba, $logger, $data);
 

@@ -28,7 +28,7 @@ use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\ForbiddenException;
 
@@ -131,7 +131,7 @@ class Delegation extends BaseModule
 
 			$identities[$key]['selected'] = ($identity['nickname'] === DI::app()->user['nickname']);
 
-			$condition = ["`uid` = ? AND `msg` != '' AND NOT (`type` IN (?, ?)) AND NOT `seen`", $identity['uid'], Type::INTRO, Type::MAIL];
+			$condition = ["`uid` = ? AND `msg` != '' AND NOT (`type` IN (?, ?)) AND NOT `seen`", $identity['uid'], Notification\Type::INTRO, Notification\Type::MAIL];
 			$params = ['distinct' => true, 'expression' => 'parent'];
 			$notifications = DBA::count('notify', $condition, $params);
 

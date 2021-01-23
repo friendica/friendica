@@ -39,13 +39,12 @@ use Friendica\Model\Contact;
 use Friendica\Model\Group;
 use Friendica\Model\Item;
 use Friendica\Model\Mail;
-use Friendica\Model\Notify;
+use Friendica\Model\Notification;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Model\UserItem;
 use Friendica\Model\Verb;
-use Friendica\Security\FKOAuth1;
 use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\ExpectationFailedException;
@@ -53,12 +52,12 @@ use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
-use Friendica\Network\HTTPException\NotImplementedException;
 use Friendica\Network\HTTPException\TooManyRequestsException;
 use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
+use Friendica\Security\FKOAuth1;
 use Friendica\Security\OAuth1\OAuthRequest;
 use Friendica\Security\OAuth1\OAuthUtil;
 use Friendica\Util\DateTimeFormat;
@@ -5809,7 +5808,7 @@ function api_friendica_notification_seen($type)
 		$notify = DI::notify()->getByID($id, api_user());
 		DI::notify()->setSeen(true, $notify);
 
-		if ($notify->otype === Notify\ObjectType::ITEM) {
+		if ($notify->otype === Notification\ObjectType::ITEM) {
 			$item = Post::selectFirstForUser(api_user(), [], ['id' => $notify->iid, 'uid' => api_user()]);
 			if (DBA::isResult($item)) {
 				// we found the item, return it to the user

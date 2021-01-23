@@ -37,8 +37,7 @@ use Friendica\Model\FContact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Mail;
-use Friendica\Model\Notify;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\PermissionSet;
 use Friendica\Model\Post;
 use Friendica\Model\Post\Category;
@@ -1963,8 +1962,8 @@ class DFRN
 				// send a notification
 				notification(
 					[
-					"type"     => Type::POKE,
-					"otype"    => Notify\ObjectType::PERSON,
+					"type"     => Notification\Type::POKE,
+					"otype"    => Notification\ObjectType::PERSON,
 					"activity" => $verb,
 					"verb"     => $item["verb"],
 					"uid"      => $importer["importer_uid"],

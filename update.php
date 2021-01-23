@@ -40,7 +40,6 @@
  * If you need to run a script before the database update, name the function "pre_update_4712()"
  */
 
-use Friendica\Core\Addon;
 use Friendica\Core\Logger;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
@@ -50,7 +49,7 @@ use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Model\Notify;
+use Friendica\Model\Notification;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Model\Storage;
@@ -655,12 +654,12 @@ function pre_update_1377()
 function update_1380()
 {
 	if (!DBA::e("UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`iid` SET `notify`.`uri-id` = `item`.`uri-id` WHERE `notify`.`uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
-		Notify\ObjectType::ITEM, Notify\ObjectType::PERSON)) {
+		Notification\ObjectType::ITEM, Notification\ObjectType::PERSON)) {
 		return Update::FAILED;
 	}
 
 	if (!DBA::e("UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`parent` SET `notify`.`parent-uri-id` = `item`.`uri-id` WHERE `notify`.`parent-uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
-		Notify\ObjectType::ITEM, Notify\ObjectType::PERSON)) {
+		Notification\ObjectType::ITEM, Notification\ObjectType::PERSON)) {
 		return Update::FAILED;
 	}
 

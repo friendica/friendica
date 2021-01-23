@@ -56,7 +56,7 @@ class Notification extends BaseFactory
 {
 	/** @var Database */
 	private $dba;
-	/** @var Repository\Notify */
+	/** @var Repository\Notification */
 	private $notification;
 	/** @var BaseURL */
 	private $baseUrl;
@@ -65,7 +65,7 @@ class Notification extends BaseFactory
 	/** @var string */
 	private $nurl;
 
-	public function __construct(LoggerInterface $logger, Database $dba, Repository\Notify $notification, BaseURL $baseUrl, L10n $l10n, App $app, IPConfig $pConfig, ISession $session)
+	public function __construct(LoggerInterface $logger, Database $dba, Repository\Notification $notification, BaseURL $baseUrl, L10n $l10n, App $app, IPConfig $pConfig, ISession $session)
 	{
 		parent::__construct($logger);
 

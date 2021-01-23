@@ -25,7 +25,6 @@ use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Notify\Type;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
@@ -181,8 +180,8 @@ class FContact
 		DBA::insert('intro', $fields);
 
 		notification([
-			'type'  => Type::SUGGEST,
-			'otype' => Notify\ObjectType::INTRO,
+			'type'  => Notification\Type::SUGGEST,
+			'otype' => Notification\ObjectType::INTRO,
 			'verb'  => Activity::REQ_FRIEND,
 			'uid'   => $owner['uid'],
 			'cid'   => $from_contact['uid'],

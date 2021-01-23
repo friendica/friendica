@@ -19,15 +19,18 @@
  *
  */
 
-namespace Friendica\Model\Notify;
+namespace Friendica\Collection;
 
-/**
- * Enum for different otypes of the Notify
- */
-class ObjectType
+use Friendica\BaseCollection;
+use Friendica\Model;
+
+class Notifications extends BaseCollection
 {
-	const PERSON = 'person';
-	const MAIL   = 'mail';
-	const ITEM   = 'item';
-	const INTRO  = 'intro';
+	/**
+	 * @return Model\Notification
+	 */
+	public function current()
+	{
+		return parent::current();
+	}
 }

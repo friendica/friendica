@@ -28,7 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
@@ -418,8 +418,8 @@ function ping_get_notifications($uid)
 			AND NOT (`notify`.`type` IN (%d, %d))
 			AND $seensql `notify`.`seen` ORDER BY `notify`.`date` $order LIMIT %d, 50",
 			intval($uid),
-			intval(Type::INTRO),
-			intval(Type::MAIL),
+			intval(Notification\Type::INTRO),
+			intval(Notification\Type::MAIL),
 			intval($offset)
 		);
 
@@ -448,7 +448,7 @@ function ping_get_notifications($uid)
 				$notification["message"] = $notification["msg_cache"];
 			} else {
 				$notification["name"] = strip_tags(BBCode::convert($notification["name"]));
-				$notification["message"] = Friendica\Model\Notify::formatMessage($notification["name"], strip_tags(BBCode::convert($notification["msg"])));
+				$notification["message"] = Notification::formatMessage($notification["name"], strip_tags(BBCode::convert($notification["msg"])));
 
 				q(
 					"UPDATE `notify` SET `name_cache` = '%s', `msg_cache` = '%s' WHERE `id` = %d",

@@ -45,8 +45,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\FileTag;
 use Friendica\Model\Item;
-use Friendica\Model\Notify;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
@@ -55,8 +54,8 @@ use Friendica\Network\HTTPException;
 use Friendica\Object\EMail\ItemCCEMail;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Security\Security;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\Delivery;
 
 function item_post(App $a) {
@@ -743,8 +742,8 @@ function item_post(App $a) {
 	if ($contact_record != $author) {
 		if ($toplevel_item_id) {
 			notification([
-				'type'  => Type::COMMENT,
-				'otype' => Notify\ObjectType::ITEM,
+				'type'  => Notification\Type::COMMENT,
+				'otype' => Notification\ObjectType::ITEM,
 				'verb'  => Activity::POST,
 				'uid'   => $profile_uid,
 				'cid'   => $datarray['author-id'],
@@ -753,8 +752,8 @@ function item_post(App $a) {
 			]);
 		} elseif (empty($forum_contact)) {
 			notification([
-				'type'  => Type::WALL,
-				'otype' => Notify\ObjectType::ITEM,
+				'type'  => Notification\Type::WALL,
+				'otype' => Notification\ObjectType::ITEM,
 				'verb'  => Activity::POST,
 				'uid'   => $profile_uid,
 				'cid'   => $datarray['author-id'],

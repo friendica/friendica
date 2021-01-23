@@ -24,9 +24,8 @@ namespace Friendica\Model;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\DI;
 use Friendica\Database\DBA;
-use Friendica\Model\Notify\Type;
+use Friendica\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\Delivery;
@@ -84,8 +83,8 @@ class Mail
 
 		// send notifications.
 		$notif_params = [
-			'type'  => Type::MAIL,
-			'otype' => Notify\ObjectType::MAIL,
+			'type'  => Notification\Type::MAIL,
+			'otype' => Notification\ObjectType::MAIL,
 			'verb'  => Activity::POST,
 			'uid'   => $user['uid'],
 			'cid'   => $msg['contact-id'],

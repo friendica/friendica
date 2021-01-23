@@ -411,11 +411,11 @@ abstract class DI
 	}
 
 	/**
-	 * @return Repository\Notify
+	 * @return Repository\Notification
 	 */
 	public static function notify()
 	{
-		return self::$dice->create(Repository\Notify::class);
+		return self::$dice->create(Repository\Notification::class);
 	}
 
 	//

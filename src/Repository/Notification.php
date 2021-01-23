@@ -30,28 +30,28 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\DateTimeFormat;
 
-class Notify extends BaseRepository
+class Notification extends BaseRepository
 {
 	protected static $table_name = 'notify';
 
-	protected static $model_class = Model\Notify::class;
+	protected static $model_class = Model\Notification::class;
 
-	protected static $collection_class = Collection\Notifies::class;
+	protected static $collection_class = Collection\Notifications::class;
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @return Model\Notify
+	 * @return Model\Notification
 	 */
 	protected function create(array $data)
 	{
-		return new Model\Notify($this->dba, $this->logger, $this, $data);
+		return new Model\Notification($this->dba, $this->logger, $this, $data);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @return Collection\Notifies
+	 * @return Collection\Notifications
 	 */
 	public function select(array $condition = [], array $params = [])
 	{
@@ -66,7 +66,7 @@ class Notify extends BaseRepository
 	 * @param int $id The ID of the notify instance
 	 * @param int $uid The user ID, bound to this notify instance (= security check)
 	 *
-	 * @return Model\Notify
+	 * @return Model\Notification
 	 * @throws NotFoundException
 	 */
 	public function getByID(int $id, int $uid)
@@ -77,14 +77,14 @@ class Notify extends BaseRepository
 	/**
 	 * Set seen state of notifications of the local_user()
 	 *
-	 * @param bool         $seen   optional true or false. default true
-	 * @param Model\Notify $notify optional a notify, which should be set seen (including his parents)
+	 * @param bool               $seen   optional true or false. default true
+	 * @param Model\Notification $notify optional a notify, which should be set seen (including his parents)
 	 *
 	 * @return bool true on success, false on error
 	 *
 	 * @throws Exception
 	 */
-	public function setSeen(bool $seen = true, Model\Notify $notify = null)
+	public function setSeen(bool $seen = true, Model\Notification $notify = null)
 	{
 		if (empty($notify)) {
 			$conditions = ['uid' => local_user()];
@@ -102,7 +102,7 @@ class Notify extends BaseRepository
 	/**
 	 * @param array $fields
 	 *
-	 * @return Model\Notify|false
+	 * @return Model\Notification|false
 	 *
 	 * @throws InternalServerErrorException
 	 * @throws Exception

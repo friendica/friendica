@@ -29,7 +29,7 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemContent;
-use Friendica\Model\Notify;
+use Friendica\Model\Notification;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Model\UserItem;
@@ -132,7 +132,7 @@ function notification($params)
 	$hsitelink = '';
 	$itemlink  = '';
 
-	if ($params['type'] == Notify\Type::MAIL) {
+	if ($params['type'] == Notification\Type::MAIL) {
 		$itemlink = $params['link'];
 
 		$subject = $l10n->t('%s New mail received at %s', $subjectPrefix, $sitename);
@@ -148,7 +148,7 @@ function notification($params)
 		$show_in_notification_page = false;
 	}
 
-	if ($params['type'] == Notify\Type::COMMENT || $params['type'] == Notify\Type::TAG_SELF) {
+	if ($params['type'] == Notification\Type::COMMENT || $params['type'] == Notification\Type::TAG_SELF) {
 		$thread = Post::selectFirstThreadForUser($params['uid'], ['ignored'], ['iid' => $parent_id, 'deleted' => false]);
 		if (DBA::isResult($thread) && $thread['ignored']) {
 			Logger::log('Thread ' . $parent_id . ' will be ignored', Logger::DEBUG);
@@ -158,7 +158,7 @@ function notification($params)
 		// Check to see if there was already a tag notify or comment notify for this post.
 		// If so don't create a second notification
 		/// @todo In the future we should store the notification with the highest "value" and replace notifications
-		$condition = ['type' => [Notify\Type::TAG_SELF, Notify\Type::COMMENT, Notify\Type::SHARE],
+		$condition = ['type' => [Notification\Type::TAG_SELF, Notification\Type::COMMENT, Notification\Type::SHARE],
 			'link' => $params['link'], 'uid' => $params['uid']];
 		if (DBA::exists('notify', $condition)) {
 			return false;
@@ -166,7 +166,7 @@ function notification($params)
 
 		// if it's a post figure out who's post it is.
 		$item = null;
-		if ($params['otype'] === Notify\ObjectType::ITEM && $parent_id) {
+		if ($params['otype'] === Notification\ObjectType::ITEM && $parent_id) {
 			$item = Post::selectFirstForUser($params['uid'], Item::ITEM_FIELDLIST, ['id' => $parent_id, 'deleted' => false]);
 		}
 
@@ -244,7 +244,7 @@ function notification($params)
 		$itemlink =  $params['link'];
 	}
 
-	if ($params['type'] == Notify\Type::WALL) {
+	if ($params['type'] == Notification\Type::WALL) {
 		$subject = $l10n->t('%s %s posted to your profile wall', $subjectPrefix, $params['source_name']);
 
 		$preamble = $l10n->t('%1$s posted to your profile wall at %2$s', $params['source_name'], $sitename);
@@ -259,7 +259,7 @@ function notification($params)
 		$itemlink =  $params['link'];
 	}
 
-	if ($params['type'] == Notify\Type::SHARE) {
+	if ($params['type'] == Notification\Type::SHARE) {
 		if ($params['origin_link'] == $params['source_link']) {
 			$subject = $l10n->t('%s %s shared a new post', $subjectPrefix, $params['source_name']);
 
@@ -284,7 +284,7 @@ function notification($params)
 		$itemlink =  $params['link'];
 	}
 
-	if ($params['type'] == Notify\Type::POKE) {
+	if ($params['type'] == Notification\Type::POKE) {
 		$subject = $l10n->t('%1$s %2$s poked you', $subjectPrefix, $params['source_name']);
 
 		$preamble = $l10n->t('%1$s poked you at %2$s', $params['source_name'], $sitename);
@@ -303,7 +303,7 @@ function notification($params)
 		$itemlink =  $params['link'];
 	}
 
-	if ($params['type'] == Notify\Type::TAG_SHARE) {
+	if ($params['type'] == Notification\Type::TAG_SHARE) {
 		$itemlink =  $params['link'];
 		$subject = $l10n->t('%s %s tagged your post', $subjectPrefix, $params['source_name']);
 
@@ -318,7 +318,7 @@ function notification($params)
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
 	}
 
-	if ($params['type'] == Notify\Type::INTRO) {
+	if ($params['type'] == Notification\Type::INTRO) {
 		$itemlink = $params['link'];
 		$subject = $l10n->t('%s Introduction received', $subjectPrefix);
 
@@ -361,7 +361,7 @@ function notification($params)
 		}
 	}
 
-	if ($params['type'] == Notify\Type::SUGGEST) {
+	if ($params['type'] == Notification\Type::SUGGEST) {
 		$itemlink =  $params['link'];
 		$subject = $l10n->t('%s Friend suggestion received', $subjectPrefix);
 
@@ -381,7 +381,7 @@ function notification($params)
 		$hsitelink = sprintf($sitelink, '<a href="'.$siteurl.'">'.$sitename.'</a>');
 	}
 
-	if ($params['type'] == Notify\Type::CONFIRM) {
+	if ($params['type'] == Notification\Type::CONFIRM) {
 		if ($params['verb'] == Activity::FRIEND) { // mutual connection
 			$itemlink =  $params['link'];
 			$subject = $l10n->t('%s Connection accepted', $subjectPrefix);
@@ -417,7 +417,7 @@ function notification($params)
 		}
 	}
 
-	if ($params['type'] == Notify\Type::SYSTEM) {
+	if ($params['type'] == Notification\Type::SYSTEM) {
 		switch($params['event']) {
 			case "SYSTEM_REGISTER_REQUEST":
 				$itemlink =  $params['link'];
@@ -514,7 +514,7 @@ function notification($params)
 
 	// send email notification if notification preferences permit
 	if ((intval($params['notify_flags']) & intval($params['type']))
-		|| $params['type'] == Notify\Type::SYSTEM) {
+		|| $params['type'] == Notification\Type::SYSTEM) {
 
 		Logger::log('sending notification email');
 
@@ -626,7 +626,7 @@ function check_item_notification($itemid, $uid, $notification_type) {
 
 	// Generate the notification array
 	$params = [];
-	$params['otype'] = Notify\ObjectType::ITEM;
+	$params['otype'] = Notification\ObjectType::ITEM;
 	$params['uid'] = $uid;
 	$params['origin_cid'] = $params['cid'] = $item['author-id'];
 	$params['item'] = $item;
@@ -646,7 +646,7 @@ function check_item_notification($itemid, $uid, $notification_type) {
 	}
 
 	if ($notification_type & UserItem::NOTIF_SHARED) {
-		$params['type'] = Notify\Type::SHARE;
+		$params['type'] = Notification\Type::SHARE;
 		$params['verb'] = Activity::POST;
 
 		// Special treatment for posts that had been shared via "announce"
@@ -663,22 +663,22 @@ function check_item_notification($itemid, $uid, $notification_type) {
 			}
 		}
 	} elseif ($notification_type & UserItem::NOTIF_EXPLICIT_TAGGED) {
-		$params['type'] = Notify\Type::TAG_SELF;
+		$params['type'] = Notification\Type::TAG_SELF;
 		$params['verb'] = Activity::TAG;
 	} elseif ($notification_type & UserItem::NOTIF_IMPLICIT_TAGGED) {
-		$params['type'] = Notify\Type::COMMENT;
+		$params['type'] = Notification\Type::COMMENT;
 		$params['verb'] = Activity::POST;
 	} elseif ($notification_type & UserItem::NOTIF_THREAD_COMMENT) {
-		$params['type'] = Notify\Type::COMMENT;
+		$params['type'] = Notification\Type::COMMENT;
 		$params['verb'] = Activity::POST;
 	} elseif ($notification_type & UserItem::NOTIF_DIRECT_COMMENT) {
-		$params['type'] = Notify\Type::COMMENT;
+		$params['type'] = Notification\Type::COMMENT;
 		$params['verb'] = Activity::POST;
 	} elseif ($notification_type & UserItem::NOTIF_COMMENT_PARTICIPATION) {
-		$params['type'] = Notify\Type::COMMENT;
+		$params['type'] = Notification\Type::COMMENT;
 		$params['verb'] = Activity::POST;
 	} elseif ($notification_type & UserItem::NOTIF_ACTIVITY_PARTICIPATION) {
-		$params['type'] = Notify\Type::COMMENT;
+		$params['type'] = Notification\Type::COMMENT;
 		$params['verb'] = Activity::POST;
 	} else {
 		return false;

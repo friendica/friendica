@@ -32,7 +32,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
@@ -892,14 +892,14 @@ function settings_content(App $a)
 
 		'$h_not' 	=> DI::l10n()->t('Notification Settings'),
 		'$lbl_not' 	=> DI::l10n()->t('Send a notification email when:'),
-		'$notify1'	=> ['notify1', DI::l10n()->t('You receive an introduction'), ($notify & Type::INTRO), Type::INTRO, ''],
-		'$notify2'	=> ['notify2', DI::l10n()->t('Your introductions are confirmed'), ($notify & Type::CONFIRM), Type::CONFIRM, ''],
-		'$notify3'	=> ['notify3', DI::l10n()->t('Someone writes on your profile wall'), ($notify & Type::WALL), Type::WALL, ''],
-		'$notify4'	=> ['notify4', DI::l10n()->t('Someone writes a followup comment'), ($notify & Type::COMMENT), Type::COMMENT, ''],
-		'$notify5'	=> ['notify5', DI::l10n()->t('You receive a private message'), ($notify & Type::MAIL), Type::MAIL, ''],
-		'$notify6'  => ['notify6', DI::l10n()->t('You receive a friend suggestion'), ($notify & Type::SUGGEST), Type::SUGGEST, ''],
-		'$notify7'  => ['notify7', DI::l10n()->t('You are tagged in a post'), ($notify & Type::TAG_SELF), Type::TAG_SELF, ''],
-		'$notify8'  => ['notify8', DI::l10n()->t('You are poked/prodded/etc. in a post'), ($notify & Type::POKE), Type::POKE, ''],
+		'$notify1'	=> ['notify1', DI::l10n()->t('You receive an introduction'), ($notify & Notification\Type::INTRO), Notification\Type::INTRO, ''],
+		'$notify2'	=> ['notify2', DI::l10n()->t('Your introductions are confirmed'), ($notify & Notification\Type::CONFIRM), Notification\Type::CONFIRM, ''],
+		'$notify3'	=> ['notify3', DI::l10n()->t('Someone writes on your profile wall'), ($notify & Notification\Type::WALL), Notification\Type::WALL, ''],
+		'$notify4'	=> ['notify4', DI::l10n()->t('Someone writes a followup comment'), ($notify & Notification\Type::COMMENT), Notification\Type::COMMENT, ''],
+		'$notify5'	=> ['notify5', DI::l10n()->t('You receive a private message'), ($notify & Notification\Type::MAIL), Notification\Type::MAIL, ''],
+		'$notify6'  => ['notify6', DI::l10n()->t('You receive a friend suggestion'), ($notify & Notification\Type::SUGGEST), Notification\Type::SUGGEST, ''],
+		'$notify7'  => ['notify7', DI::l10n()->t('You are tagged in a post'), ($notify & Notification\Type::TAG_SELF), Notification\Type::TAG_SELF, ''],
+		'$notify8'  => ['notify8', DI::l10n()->t('You are poked/prodded/etc. in a post'), ($notify & Notification\Type::POKE), Notification\Type::POKE, ''],
 
 		'$desktop_notifications' => ['desktop_notifications', DI::l10n()->t('Activate desktop notifications') , false, DI::l10n()->t('Show desktop popup on new notifications')],
 

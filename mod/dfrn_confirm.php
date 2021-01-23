@@ -40,8 +40,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Model\Notify;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;
@@ -540,11 +539,11 @@ function dfrn_confirm_post(App $a, $handsfree = null)
 		if (DBA::isResult($r)) {
 			$combined = $r[0];
 
-			if ($combined['notify-flags'] & Type::CONFIRM) {
+			if ($combined['notify-flags'] & Notification\Type::CONFIRM) {
 				$mutual = ($new_relation == Contact::FRIEND);
 				notification([
-					'type'  => Type::CONFIRM,
-					'otype' => Notify\ObjectType::INTRO,
+					'type'  => Notification\Type::CONFIRM,
+					'otype' => Notification\ObjectType::INTRO,
 					'verb'  => ($mutual ? Activity::FRIEND : Activity::FOLLOW),
 					'uid'   => $combined['uid'],
 					'cid'   => $combined['id'],

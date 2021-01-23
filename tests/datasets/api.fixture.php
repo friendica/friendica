@@ -19,7 +19,7 @@
  *
  */
 
-use Friendica\Model\Notify;
+use Friendica\Model\Notification;
 
 return [
 	// Empty these tables
@@ -375,7 +375,7 @@ return [
 			'iid' => 4,
 			'seen' => 0,
 			'verb' => '',
-			'otype' => Notify\ObjectType::ITEM,
+			'otype' => Notification\ObjectType::ITEM,
 			'name_cache' => 'Reply to',
 			'msg_cache' => 'A test reply from an item',
 		],

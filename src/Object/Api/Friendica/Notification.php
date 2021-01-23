@@ -24,7 +24,7 @@ namespace Friendica\Object\Api\Friendica;
 use Friendica\BaseEntity;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Model\Notify;
+use Friendica\Model\Notification as NotificationModel;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Temporal;
 
@@ -78,7 +78,7 @@ class Notification extends BaseEntity
 	/** @var string Message (Plaintext) */
 	protected $msg_plain;
 
-	public function __construct(Notify $notify)
+	public function __construct(NotificationModel $notify)
 	{
 		// map each notify attribute to the entity
 		foreach ($notify->toArray() as $key => $value) {

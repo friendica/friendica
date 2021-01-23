@@ -35,8 +35,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Group;
-use Friendica\Model\Notify;
-use Friendica\Model\Notify\Type;
+use Friendica\Model\Notification;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
@@ -560,8 +559,8 @@ function dfrn_request_content(App $a)
 
 				if (!$auto_confirm) {
 					notification([
-						'type'  => Type::INTRO,
-						'otype' => Notify\ObjectType::INTRO,
+						'type'  => Notification\Type::INTRO,
+						'otype' => Notification\ObjectType::INTRO,
 						'verb'  => Activity::REQ_FRIEND,
 						'uid'   => $r[0]['uid'],
 						'cid'   => $r[0]['id'],

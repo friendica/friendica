@@ -32,7 +32,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Notify;
+use Friendica\Model\Notification;
 use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 
@@ -145,36 +145,36 @@ $netgroup_ids = [
 define('MAX_LIKERS',    75);
 
 /**
- * @name Notify
+ * @name Notification
  *
  * Email notification options
  * @{
  */
-/** @deprecated since 2020.03, use Notify\Type::INTRO instead */
-define('NOTIFY_INTRO',        Notify\Type::INTRO);
-/** @deprecated since 2020.03, use Notify\Type::CONFIRM instead */
-define('NOTIFY_CONFIRM',      Notify\Type::CONFIRM);
-/** @deprecated since 2020.03, use Notify\Type::WALL instead */
-define('NOTIFY_WALL',         Notify\Type::WALL);
-/** @deprecated since 2020.03, use Notify\Type::COMMENT instead */
-define('NOTIFY_COMMENT',      Notify\Type::COMMENT);
-/** @deprecated since 2020.03, use Notify\Type::MAIL instead */
-define('NOTIFY_MAIL',        Notify\Type::MAIL);
-/** @deprecated since 2020.03, use Notify\Type::SUGGEST instead */
-define('NOTIFY_SUGGEST',     Notify\Type::SUGGEST);
-/** @deprecated since 2020.03, use Notify\Type::PROFILE instead */
-define('NOTIFY_PROFILE',     Notify\Type::PROFILE);
-/** @deprecated since 2020.03, use Notify\Type::TAG_SELF instead */
-define('NOTIFY_TAGSELF',     Notify\Type::TAG_SELF);
-/** @deprecated since 2020.03, use Notify\Type::TAG_SHARE instead */
-define('NOTIFY_TAGSHARE',    Notify\Type::TAG_SHARE);
-/** @deprecated since 2020.03, use Notify\Type::POKE instead */
-define('NOTIFY_POKE',        Notify\Type::POKE);
-/** @deprecated since 2020.03, use Notify\Type::SHARE instead */
-define('NOTIFY_SHARE',       Notify\Type::SHARE);
+/** @deprecated since 2020.03, use Notification\Type::INTRO instead */
+define('NOTIFY_INTRO',        Notification\Type::INTRO);
+/** @deprecated since 2020.03, use Notification\Type::CONFIRM instead */
+define('NOTIFY_CONFIRM',      Notification\Type::CONFIRM);
+/** @deprecated since 2020.03, use Notification\Type::WALL instead */
+define('NOTIFY_WALL',         Notification\Type::WALL);
+/** @deprecated since 2020.03, use Notification\Type::COMMENT instead */
+define('NOTIFY_COMMENT',      Notification\Type::COMMENT);
+/** @deprecated since 2020.03, use Notification\Type::MAIL instead */
+define('NOTIFY_MAIL',        Notification\Type::MAIL);
+/** @deprecated since 2020.03, use Notification\Type::SUGGEST instead */
+define('NOTIFY_SUGGEST',     Notification\Type::SUGGEST);
+/** @deprecated since 2020.03, use Notification\Type::PROFILE instead */
+define('NOTIFY_PROFILE',     Notification\Type::PROFILE);
+/** @deprecated since 2020.03, use Notification\Type::TAG_SELF instead */
+define('NOTIFY_TAGSELF',     Notification\Type::TAG_SELF);
+/** @deprecated since 2020.03, use Notification\Type::TAG_SHARE instead */
+define('NOTIFY_TAGSHARE',    Notification\Type::TAG_SHARE);
+/** @deprecated since 2020.03, use Notification\Type::POKE instead */
+define('NOTIFY_POKE',        Notification\Type::POKE);
+/** @deprecated since 2020.03, use Notification\Type::SHARE instead */
+define('NOTIFY_SHARE',       Notification\Type::SHARE);
 
-/** @deprecated since 2020.12, use Notify\Type::SYSTEM instead */
-define('NOTIFY_SYSTEM',      Notify\Type::SYSTEM);
+/** @deprecated since 2020.12, use Notification\Type::SYSTEM instead */
+define('NOTIFY_SYSTEM',      Notification\Type::SYSTEM);
 /* @}*/
 
 /**

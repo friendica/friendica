@@ -34,7 +34,6 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Notify\Type;
 use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Protocol\Activity;
@@ -2499,12 +2498,12 @@ class Contact
 
 				Group::addMember(User::getDefaultGroup($importer['uid'], $contact_record["network"]), $contact_record['id']);
 
-				if (($user['notify-flags'] & Type::INTRO) &&
+				if (($user['notify-flags'] & Notification\Type::INTRO) &&
 					in_array($user['page-flags'], [User::PAGE_FLAGS_NORMAL])) {
 
 					notification([
-						'type'  => Type::INTRO,
-						'otype' => Notify\ObjectType::INTRO,
+						'type'  => Notification\Type::INTRO,
+						'otype' => Notification\ObjectType::INTRO,
 						'verb'  => ($sharing ? Activity::FRIEND : Activity::FOLLOW),
 						'uid'   => $user['uid'],
 						'cid'   => $contact_record['id'],

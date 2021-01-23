@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Model\Notify;
+namespace Friendica\Model\Notification;
 
 /**
  * Enum for different types of the Notify
