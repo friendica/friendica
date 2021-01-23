@@ -81,6 +81,11 @@ function notification($params)
 	$l10n = DI::l10n()->withLang($params['language']);
 
 	if (!empty($params['cid'])) {
+		if (Contact\User::isIgnored($params['cid'], $params['uid'])) {
+			Logger::info('Source contact ignored, dropping notification', ['origin_cid' => $params['origin_cid'], 'uid' =>  $params['uid']]);
+			return false;
+		}
+
 		$contact = Contact::getById($params['cid'], ['url', 'name', 'photo']);
 		if (DBA::isResult($contact)) {
 			$params['source_link'] = $contact['url'];
@@ -90,6 +95,11 @@ function notification($params)
 	}
 
 	if (!empty($params['origin_cid'])) {
+		if (Contact\User::isIgnored($params['origin_cid'], $params['uid'])) {
+			Logger::info('Origin contact ignored, dropping notification', ['origin_cid' => $params['origin_cid'], 'uid' =>  $params['uid']]);
+			return false;
+		}
+
 		$contact = Contact::getById($params['origin_cid'], ['url', 'name', 'photo']);
 		if (DBA::isResult($contact)) {
 			$params['origin_link'] = $contact['url'];
