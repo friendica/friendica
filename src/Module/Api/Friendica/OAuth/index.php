@@ -24,7 +24,7 @@ use Friendica\Core\Session;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Module\BaseApi;
+use Friendica\Module\OAuthApi;
 use Friendica\Network\HTTPException;
 
 
@@ -41,12 +41,12 @@ use Friendica\Network\HTTPException;
 /**
  * @see 
  */
-class OAuthLocal extends BaseApi
+class OAuthLocal extends OAuthApi
 {
 	/**
 	 * @param array $parameters
 	 * @throws HTTPException\InternalServerErrorException
-	 * @throws \ImagickException
+	 * @throws 
 	 * @see 
 	 */
 	public static function rawContent(array $parameters = [])
