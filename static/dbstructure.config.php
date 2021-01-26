@@ -426,6 +426,23 @@ return [
 			"uid" => ["uid"],
 		]
 	],
+	"authtokens" => [
+		"comment" => "OAuth tokens",
+		"fields" => [
+			"uid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => ""],
+			"tid" => ["type" => "varchar(20)", "not null" => "1", "comment" => ""],
+			"expires" => ["type" => "datetime", "not null" => "1", "comment" => ""],
+			"created" => ["type" => "datetime", "not null" => "1", "comment" => ""],
+			"createdByIp" => ["type" => "varchar(10)", "not null" => "1", "default" => "", "comment" => ""],
+			"client" => ["type" => "varchar(30)", "not null" => "1", "comment" => ""],
+			"revoked" => ["type" => "boolean", "not null" => "1", "default" => "false", "comment" => ""],
+			"revokedByIp" => ["type" => "varchar(10)", "comment" => ""],
+			"replacedByToken" => ["type" => "varchar(32)", "foreign" => ["authtokens" => "tid"], "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY" => ["id"]
+		]
+	],
 	"auth_codes" => [
 		"comment" => "OAuth usage",
 		"fields" => [
