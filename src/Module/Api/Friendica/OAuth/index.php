@@ -18,7 +18,60 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
+namespace Friendica\Module\Api\OAuth\Local;
 
+use Friendica\Core\Session;
+use Friendica\Core\Logger;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException;
+
+
+// 
+/**
+ * For local oauth, we should still use php session id too, so we need
+ * to tie this and the normal login process.
+ * This will maximize compatibility as a theme (client) can easily use
+ * PASETO tokens while also use the current system
+ * 
+ * Check: Module/Security/Login
+ */
+
+/**
+ * @see 
+ */
+class OAuthLocal extends BaseApi
+{
+	/**
+	 * @param array $parameters
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 * @see 
+	 */
+	public static function rawContent(array $parameters = [])
+	{
+
+		if(empty($_POST['username']) || empty($_POST['password'])) {
+			// Return error
+		}
+
+		$username = trim($_POST['username']);
+		$password = trim($_POST['password']);
+		$remember_me = !empty($_POST['remember'])
+
+		Logger::info('OAuth/Local', ['username' => $username]);
+
+		if (!empty($_POST['auth-params']) && $_POST['auth-params'] === 'login') {
+			DI::auth()->withPassword(
+				DI::app(),
+				trim($_POST['username']),
+				trim($_POST['password']),
+				!empty($_POST['remember'])
+			);
+		}
+
+		DBA::close($contacts);
+
+	}
+}
