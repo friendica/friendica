@@ -159,6 +159,14 @@ return [
 		'/friends/ids'                           => [Module\Api\Twitter\FriendsIds::class     , [R::GET         ]],
 		'/friends/list'                          => [Module\Api\Twitter\FriendsList::class    , [R::GET         ]],
 		'/oembed'                                => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
+		'/oauth' => [
+			'/local' => [
+				'/getAccessToken'                => [Module\Api\Friendica\OAuth::class,         [R::GET         ]],
+				'/refreshAccessToken'            => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
+				'/renewRefreshToken'             => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
+				'/revokeRefreshToken'            => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
+			]
+		],
 	],
 
 	'/admin'               => [
