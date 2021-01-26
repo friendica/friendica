@@ -127,6 +127,9 @@ class Install extends BaseModule
 				self::checkSetting($configCache, $_POST, 'database', 'password', '');
 				self::checkSetting($configCache, $_POST, 'database', 'database', '');
 
+				self::checkSetting($configCache, $_POST, 'api', 'enable');
+				self::checkSetting($configCache, $_POST, 'api', 'paseto_synchronous_key');
+
 				// If we cannot connect to the database, return to the previous step
 				if (!self::$installer->checkDB(DI::dba())) {
 					self::$currentWizardStep = self::DATABASE_CONFIG;
@@ -273,6 +276,10 @@ class Install extends BaseModule
 						DI::l10n()->t('Required')],
 					'$lbl_10'     => DI::l10n()->t('Please select a default timezone for your website'),
 					'$php_path'   => $configCache->get('config', 'php_path'),
+					'$api_enable' => ['api-enable',
+						DI::l10n()->t('Enable experimental OAuth API'),
+						$configCache->get('api', 'enable'),
+						''],
 					'$submit'     => DI::l10n()->t('Submit')
 				]);
 				break;
