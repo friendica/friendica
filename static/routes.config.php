@@ -161,10 +161,10 @@ return [
 		'/oembed'                                => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
 		'/oauth' => [
 			'/local' => [
-				'/getAccessToken'                => [Module\Api\Friendica\OAuth::class,         [R::GET         ]],
-				'/refreshAccessToken'            => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
-				'/renewRefreshToken'             => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
-				'/revokeRefreshToken'            => [Module\Api\Mastodon\Unimplemented::class,  [R::GET         ]],
+				'/getAccessToken'                => [Module\Api\Friendica\OAuth\Local\getAccessToken::class      , [        R::POST]],
+				'/refreshAccessToken'            => [Module\Api\Friendica\OAuth\Local\refreshAccessToken::class  , [R::GET         ]],
+				'/renewRefreshToken'             => [Module\Api\Friendica\OAuth\Local\renewRefreshToken::class   , [R::GET         ]],
+				'/revokeRefreshToken'            => [Module\Api\Friendica\OAuth\Local\revokeRefreshToken::class  , [R::GET         ]],
 			]
 		],
 	],

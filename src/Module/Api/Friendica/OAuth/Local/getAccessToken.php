@@ -27,15 +27,15 @@ use Friendica\DI;
 use Friendica\Module\OAuthApi;
 use Friendica\Network\HTTPException;
 use Friendica\Core\System;
+use Friendica\Module\Special\HTTPException as SpecialHTTPException;
 
-// 
 /**
  * For local oauth, we should still use php session id too, so we need
  * to tie this and the normal login process.
  * This will maximize compatibility as a theme (client) can easily use
- * PASETO tokens while also use the current system
+ * PASETO tokens while also use the current session system. Win-Win
  * 
- * Check: Module/Security/Login
+ * For reference: Module/Security/Login, Security/Authentication
  */
 
 /**
@@ -46,34 +46,37 @@ class getAccessToken extends OAuthApi
 
 	//public static function rawContent(array $parameters = [])
 
-	// POST?!
-	public static function content(array $parameters = [])
+	public static function post(array $parameters = [])
 	{
-		$arguments = DI::args();
+		// Check if OAuth API is enabled
+		parent::checkOAuthSupport();
+
+		// $arguments = DI::args();
 		// var_dump($parameters);
 		// var_dump($arguments);
 		// var_dump($_REQUEST);
 
 		if(empty($_POST['username']) || empty($_POST['password'])) {
-			// Return error
+			// FIXME: Needs to return JSON
+			throw new HTTPException\NonAcceptableException();
 		}
 
-		// $username = trim($_POST['username']);
-		// $password = trim($_POST['password']);
-		// $remember_me = !empty($_POST['remember']);
+		$username = trim($_POST['username']);
+		$password = trim($_POST['password']);
+		$remember = !empty($_POST['remember']);
 
 		$token = parent::generateAccessToken();
 
-		//Logger::info('OAuth/Local', ['username' => $username]);
+		// Logger::info('OAuth/Local', ['username' => $username]);
 
-		// if (!empty($_POST['auth-params']) && $_POST['auth-params'] === 'login') {
-		// 	DI::auth()->withPassword(
-		// 		DI::app(),
-		// 		trim($_POST['username']),
-		// 		trim($_POST['password']),
-		// 		!empty($_POST['remember'])
-		// 	);
-		// }
+		$what = DI::auth()->withPassword(
+			DI::app(),
+			trim($_POST['username']),
+			trim($_POST['password']),
+			!empty($_POST['remember'])
+		);
+
+		var_dump($what); // Error 405 RIP
 
 		// DBA::close($contacts);
 

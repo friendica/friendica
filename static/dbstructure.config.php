@@ -427,7 +427,7 @@ return [
 		]
 	],
 	"authtokens" => [
-		"comment" => "OAuth tokens",
+		"comment" => "OAuth Refresh tokens",
 		"fields" => [
 			"uid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => ""],
 			"tid" => ["type" => "varchar(20)", "not null" => "1", "comment" => ""],
