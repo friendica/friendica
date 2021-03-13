@@ -34,7 +34,6 @@ use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
@@ -1882,13 +1881,7 @@ class BBCode
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
 		$config->set('HTML.SafeIframe', true);
-		$config->set('URI.SafeIframeRegexp', '%^(?:
-			https://www.youtube.com/embed/
-			|
-			https://player.vimeo.com/video/
-			|
-			' . DI::baseUrl() . '/oembed/ # Has to change with the source in Content\Oembed::iframe
-		)%xi');
+		$config->set('URI.SafeIframeRegexp', self::getIFrameFilter());
 		$config->set('Attr.AllowedRel', [
 			'noreferrer' => true,
 			'noopener' => true,
@@ -1901,6 +1894,32 @@ class BBCode
 		$text = $HTMLPurifier->purify($text);
 
 		return $text;
+	}
+
+	/**
+	 * Get IFrame filter text
+	 *
+	 * @return string IFrame filter text
+	 */
+	private static function getIFrameFilter()
+	{
+		$filter = '%^(?:https://www.youtube.com/embed/|https://player.vimeo.com/video/';
+	
+		if (!DI::config()->get('system', 'no_oembed_rich_content')) {
+			$filter .= '|https:// ';
+		}
+		
+		$str_allowed = DI::config()->get('system', 'allowed_oembed', '');
+		if (!empty($str_allowed)) {
+			$allowed = explode(',', $str_allowed);
+			foreach ($allowed as $site) {
+				$filter .= '|https://.*' . trim($site);
+			}
+		}
+		
+		$filter .= '|' . DI::baseUrl() . '/oembed/)%xi';
+
+		return $filter;
 	}
 
 	/**
