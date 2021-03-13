@@ -1908,7 +1908,7 @@ class BBCode
 		if (!DI::config()->get('system', 'no_oembed_rich_content')) {
 			$filter .= '|https:// ';
 		}
-		
+
 		$str_allowed = DI::config()->get('system', 'allowed_oembed', '');
 		if (!empty($str_allowed)) {
 			$allowed = explode(',', $str_allowed);
@@ -1916,7 +1916,7 @@ class BBCode
 				$filter .= '|https://.*' . trim($site);
 			}
 		}
-		
+
 		$filter .= '|' . DI::baseUrl() . '/oembed/)%xi';
 
 		return $filter;
