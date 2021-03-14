@@ -63,6 +63,12 @@ class BBCodeTest extends MockedTest
 		$this->configMock->shouldReceive('get')
 			->with('system', 'big_emojis')
 			->andReturn(false);
+		$this->configMock->shouldReceive('get')
+			->with('system', 'no_oembed_rich_content')
+			->andReturn(false);
+			$this->configMock->shouldReceive('get')
+			->with('system', 'allowed_oembed')
+			->andReturn('');
 
 		$l10nMock = Mockery::mock(L10n::class);
 		$l10nMock->shouldReceive('t')->withAnyArgs()->andReturnUsing(function ($args) { return $args; });
