@@ -66,7 +66,7 @@ class BBCodeTest extends MockedTest
 		$this->configMock->shouldReceive('get')
 			->with('system', 'no_oembed_rich_content')
 			->andReturn(false);
-			$this->configMock->shouldReceive('get')
+		$this->configMock->shouldReceive('get')
 			->with('system', 'allowed_oembed')
 			->andReturn('');
 
