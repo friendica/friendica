@@ -1906,14 +1906,14 @@ class BBCode
 		$filter = '%^(?:https://www.youtube.com/embed/|https://player.vimeo.com/video/';
 	
 		if (!DI::config()->get('system', 'no_oembed_rich_content')) {
-			$filter .= '|https:// ';
-		}
-
-		$str_allowed = DI::config()->get('system', 'allowed_oembed', '');
-		if (!empty($str_allowed)) {
-			$allowed = explode(',', $str_allowed);
-			foreach ($allowed as $site) {
-				$filter .= '|https://.*' . trim($site);
+			$filter .= '|https://';
+		} else {
+			$str_allowed = DI::config()->get('system', 'allowed_oembed', '');
+			if (!empty($str_allowed)) {
+				$allowed = explode(',', $str_allowed);
+				foreach ($allowed as $site) {
+					$filter .= '|https://[^/]*\.' . trim($site) . '/|https://' . trim($site) . '/';
+				}
 			}
 		}
 
