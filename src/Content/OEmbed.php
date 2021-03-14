@@ -161,11 +161,11 @@ class OEmbed
 			}
 		}
 
-		if (isset($data['title']) && empty($oembed->title)) {
+		if (!empty($data['title']) && empty($oembed->title)) {
 			$oembed->title = $data['title'];
 		}
 
-		if (isset($data['text']) && empty($oembed->description)) {
+		if (!empty($data['text']) && empty($oembed->description)) {
 			$oembed->description = $data['text'];
 		}
 
