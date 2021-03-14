@@ -1912,7 +1912,7 @@ class BBCode
 			if (!empty($str_allowed)) {
 				$allowed = explode(',', $str_allowed);
 				foreach ($allowed as $site) {
-					$filter .= '|https://[^/]*\.' . trim($site) . '/|https://' . trim($site) . '/';
+					$filter .= '|https://[\d\w\.]*\.' . trim($site) . '/|https://' . trim($site) . '/';
 				}
 			}
 		}
