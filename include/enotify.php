@@ -604,7 +604,7 @@ function check_user_notification(int $uri_id, int $uid) {
 
 	$usernotifications = DBA::select('post-user-notification', ['uri-id', 'uid', 'notification-type'], $condition);
 	while ($usernotification = DBA::fetch($usernotifications)) {
-		check_item_notification($usernotification['uri-id'], $usernotification['uid'], $usernotification['notification-type']);
+		check_item_notification($usernotification['uri-id'], $usernotification['uid'], $usernotification['notification-type'], $uid);
 	}
 	DBA::close($usernotifications);
 }
@@ -618,11 +618,11 @@ function check_user_notification(int $uri_id, int $uid) {
  * @return bool
  * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
-function check_item_notification(int $uri_id, int $uid, int $notification_type) {
+function check_item_notification(int $uri_id, int $uid, int $notification_type, $post_uid) {
 	$fields = ['id', 'uri-id', 'mention', 'parent', 'parent-uri-id', 'thr-parent-id',
 		'title', 'body', 'author-link', 'author-name', 'author-avatar', 'author-id',
 		'gravity', 'guid', 'parent-uri', 'uri', 'contact-id', 'network'];
-	$condition = ['uri-id' => $uri_id, 'uid' => $uid, 'deleted' => false];
+	$condition = ['uri-id' => $uri_id, 'uid' => [$uid, $post_uid], 'deleted' => false];
 	$item = Post::selectFirstForUser($uid, $fields, $condition);
 	if (!DBA::isResult($item)) {
 		return false;
