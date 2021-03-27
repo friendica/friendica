@@ -35,6 +35,7 @@ return [
 	'FRIENDICA_TZ' => ['config', 'timezone'],
 	'FRIENDICA_LANG' => ['config', 'language'],
 	'FRIENDICA_SITENAME' => ['config', 'sitename'],
+	'FRIENDICA_SENDER_MAIL' => ['config', 'sender_email'],
 
 	// Storage
 	'FRIENDICA_DATA' => ['storage', 'name'],
