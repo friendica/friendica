@@ -121,7 +121,7 @@ abstract class MailBuilder
 		try {
 			$this->l10n = $user['language'] ? $this->l10n->withLang($user['language']) : $this->l10n;
 		} catch (Exception $e) {
-			$this->logger->warning('cannot use language.', ['user' => $user, 'exception' => $e]);
+			$this->logger->warning('cannot use language.', ['user' => $user, 'exception' => $e->__toString()]);
 		}
 
 		return $this;

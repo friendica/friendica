@@ -180,7 +180,7 @@ class Introduction extends BaseFactory
 				}
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Select failed.', ['uid' => $_SESSION['uid'], 'exception' => $e]);
+			$this->logger->warning('Select failed.', ['uid' => $_SESSION['uid'], 'exception' => $e->__toString()]);
 		}
 
 		return $formattedNotifications;

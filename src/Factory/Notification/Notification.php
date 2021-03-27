@@ -247,7 +247,7 @@ class Notification extends BaseFactory
 					'seen'  => $notification->seen]);
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Select failed.', ['conditions' => $conditions, 'exception' => $e]);
+			$this->logger->warning('Select failed.', ['conditions' => $conditions, 'exception' => $e->__toString()]);
 		}
 
 		return $formattedNotifications;
@@ -284,7 +284,7 @@ class Notification extends BaseFactory
 				$formattedNotifications[] = $this->createFromItem($item);
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Select failed.', ['conditions' => $conditions, 'exception' => $e]);
+			$this->logger->warning('Select failed.', ['conditions' => $conditions, 'exception' => $e->__toString()]);
 		}
 
 		return $formattedNotifications;
@@ -321,7 +321,7 @@ class Notification extends BaseFactory
 				$formattedNotifications[] = $this->createFromItem($item);
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Select failed.', ['conditions' => $condition, 'exception' => $e]);
+			$this->logger->warning('Select failed.', ['conditions' => $condition, 'exception' => $e->__toString()]);
 		}
 
 		return $formattedNotifications;
@@ -364,7 +364,7 @@ class Notification extends BaseFactory
 				$formattedNotifications[] = $this->createFromItem($item);
 			}
 		} catch (Exception $e) {
-			$this->logger->warning('Select failed.', ['conditions' => $condition, 'exception' => $e]);
+			$this->logger->warning('Select failed.', ['conditions' => $condition, 'exception' => $e->__toString()]);
 		}
 
 		return $formattedNotifications;

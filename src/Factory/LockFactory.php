@@ -100,7 +100,7 @@ class LockFactory
 					return self::useAutoDriver();
 			}
 		} catch (\Exception $exception) {
-			$this->logger->alert('Driver \'' . $lock_type . '\' failed - Fallback to \'useAutoDriver()\'', ['exception' => $exception]);
+			$this->logger->alert('Driver \'' . $lock_type . '\' failed - Fallback to \'useAutoDriver()\'', ['exception' => $exception->__toString()]);
 			return self::useAutoDriver();
 		}
 	}
@@ -122,7 +122,7 @@ class LockFactory
 			try {
 				return new Lock\SemaphoreLock();
 			} catch (\Exception $exception) {
-				$this->logger->warning('Using Semaphore driver for locking failed.', ['exception' => $exception]);
+				$this->logger->warning('Using Semaphore driver for locking failed.', ['exception' => $exception->__toString()]);
 			}
 		}
 
@@ -135,7 +135,7 @@ class LockFactory
 					return new Lock\CacheLock($cache);
 				}
 			} catch (\Exception $exception) {
-				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception]);
+				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception->__toString()]);
 			}
 		}
 

@@ -80,7 +80,7 @@ class Notification extends BaseModule
 			try {
 				$success = DI::notify()->setSeen();
 			} catch (\Exception $e) {
-				DI::logger()->warning('set all seen failed.', ['exception' => $e]);
+				DI::logger()->warning('set all seen failed.', ['exception' => $e->__toString()]);
 				$success = false;
 			}
 
