@@ -25,6 +25,7 @@ use Console_Table;
 use Friendica\App;
 use Friendica\Content\Pager;
 use Friendica\Core\L10n;
+use Friendica\Core\PConfig\IPConfig;
 use Friendica\Database\Database;
 use Friendica\Model\Register;
 use Friendica\Model\User as UserModel;
@@ -72,6 +73,10 @@ Usage
 	bin/console user search nick <nick> [-h|--help|-?] [-v]
 	bin/console user search mail <mail> [-h|--help|-?] [-v]
 	bin/console user search guid <GUID> [-h|--help|-?] [-v]
+	bin/console user config list [<nickname>] [<category>] [-h|--help|-?] [-v]
+	bin/console user config get [<nickname>] [<category>] [<key>] [-h|--help|-?] [-v]
+	bin/console user config set [<nickname>] [<category>] [<key>] [<value>] [-h|--help|-?] [-v]
+	bin/console user config delete [<nickname>] [<category>] [<key>] [-h|--help|-?] [-v]
 
 Description
 	Modify user settings per console commands.
@@ -131,6 +136,8 @@ HELP;
 				return $this->listUser();
 			case 'search':
 				return $this->searchUser();
+			case 'config':
+				return $this->configUser();
 			default:
 				throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.');
 		}
@@ -423,5 +430,95 @@ HELP;
 		$this->out($table->getTable());
 
 		return true;
+	}
+
+	/**
+	 * Queries and modifies user-specific configuration
+	 *
+	 * @return bool True, if the command was successful
+	 */
+	private function configUser()
+	{
+		$subCmd = $this->getArgument(1);
+
+		$user = $this->getUserByNick(2);
+
+		$category = $this->getArgument(3);
+
+		if (is_null($category)) {
+			$this->out($this->l10n->t('Enter category: '), false);
+			$category = CliPrompt::prompt();
+			if (empty($category)) {
+				throw new RuntimeException('A category must be selected.');
+			}
+		}
+
+		$key = $this->getArgument(4);
+
+		if ($subCmd != 'list' and is_null($key)) {
+			$this->out($this->l10n->t('Enter key: '), false);
+			$key = CliPrompt::prompt();
+			if (empty($key)) {
+				throw new RuntimeException('A key must be selected.');
+			}
+		}
+
+		$pconfig = \Friendica\DI::pConfig();
+		$values = $pconfig->load($user['uid'], $category);
+
+		switch ($subCmd) {
+			case 'list':
+				$table = new Console_Table();
+				$table->setHeaders(['Key', 'Value']);
+				if (array_key_exists($category, $values)) {
+					foreach (array_keys($values[$category]) as $key) {
+						$table->addRow([$key, $values[$category][$key]]);
+					}
+				}
+				$this->out($table->getTable());
+				break;
+			case 'get':
+				if (!array_key_exists($category, $values)) {
+					throw new RuntimeException('Category does not exist');
+				}
+				if (!array_key_exists($key, $values[$category])) {
+					throw new RuntimeException('Key does not exist');
+				}
+
+				$this->out($pconfig->get($user['uid'], $category, $key));
+				break;
+			case 'set':
+				$value = $this->getArgument(5);
+
+				if (is_null($value)) {
+					$this->out($this->l10n->t('Enter value: '), false);
+					$value = CliPrompt::prompt();
+					if (empty($value)) {
+						throw new RuntimeException('A value must be specified.');
+					}
+				}
+
+				if (array_key_exists($category, $values) and
+				    array_key_exists($key, $values[$category]) and
+				    $values[$category][$key] == $value) {
+					throw new RuntimeException('Value not changed');
+				}
+
+				$pconfig->set($user['uid'], $category, $key, $value);
+				break;
+			case 'delete':
+				if (!array_key_exists($category, $values)) {
+					throw new RuntimeException('Category does not exist');
+				}
+				if (!array_key_exists($key, $values[$category])) {
+					throw new RuntimeException('Key does not exist');
+				}
+
+				$pconfig->delete($user['uid'], $category, $key);
+				break;
+			default:
+				$this->out($this->getHelp());
+				return false;
+		}
 	}
 }
