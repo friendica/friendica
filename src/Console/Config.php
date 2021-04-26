@@ -128,6 +128,10 @@ HELP;
 				throw new RuntimeException("$cat.$key is an array and can't be set using this command.");
 			}
 
+			if ($this->config->get($cat, $key) == $value) {
+				throw new RuntimeException("$cat.$key already set to $value.");
+			}
+
 			$result = $this->config->set($cat, $key, $value);
 			if ($result) {
 				$this->out("{$cat}.{$key} <= " .
