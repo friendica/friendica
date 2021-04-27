@@ -171,7 +171,7 @@ CONF;
 			->shouldReceive('get')
 			->with('test', 'it')
 			->andReturn(null)
-			->once();
+			->exactly(2);
 		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
