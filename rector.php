@@ -18,11 +18,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 		__DIR__ . '/static',
 		__DIR__ . '/bin',
 		__DIR__ . '/view',
-		__DIR__
 	]);
 
 	$parameters->set(Option::SKIP, [
 		__DIR__ . '/view/asset',
+		__DIR__ . '/vendor',
 	]);
 
 	// here we can define, what sets of rules will be applied
@@ -34,4 +34,5 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
 	// is your PHP version different from the one your refactor to? [default: your PHP version]
 	$parameters->set(Option::PHP_VERSION_FEATURES, '7.0');
+	$parameters->set(Option::ENABLE_CACHE, true);
 };
