@@ -17,7 +17,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 		__DIR__ . '/mod',
 		__DIR__ . '/static',
 		__DIR__ . '/bin',
-		__DIR__ . '/addon',
 		__DIR__ . '/view',
 		__DIR__
 	]);

@@ -10,23 +10,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: pecl, composer:v1
+
       - name: Retrieve version
         id: release
-        run: echo "::set-output name=version::$(echo VERSION)"
+        run: echo "::set-output name=version::$(cat VERSION)"
 
-      - name: Build project for production
-        run: |
-          composer install --no-dev --optimize-autoloader
-          mkdir build
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
 
       - name: Create artifact
-        run: tar -xvjf build/friendica-full-${{ steps.release.outputs.version }}.tar.gz -T mods/release-list.txt
+        run: |
+          mkdir build
+          tar -cvjf build/friendica-full-${{ steps.release.outputs.version }}.tar.gz -T mods/release-list.txt
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: friendica
-          path: build/build/friendica-full-${{ steps.release.outputs.version }}.tar.gz
+          path: build/friendica-full-${{ steps.release.outputs.version }}.tar.gz
 
 #      - name: Upload to release
 #        uses: JasonEtco/upload-to-release@master
@@ -41,28 +60,47 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          tools: pecl, composer:v1
+
       - name: Retrieve version
         id: release
-        run: echo "::set-output name=version::$(echo VERSION)"
+        run: echo "::set-output name=version::$(cat VERSION)"
 
       - name: Downgrade code for production (to PHP 7.0)
         run: |
           composer install
           vendor/bin/rector process
 
-      - name: Build project for production
-        run: |
-          composer install --no-dev --optimize-autoloader
-          mkdir build
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
 
       - name: Create artifact
-        run: tar -xvjf build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz -T mods/release-list.txt
+        run: |
+          mkdir build
+          tar -cvjf build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz -T mods/release-list.txt
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: friendica
-          path: build/build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz
+          path: build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz
 
 #      - name: Upload to release
 #        uses: JasonEtco/upload-to-release@master
