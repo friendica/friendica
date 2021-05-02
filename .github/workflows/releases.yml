@@ -1,0 +1,72 @@
+name: Generate release packages
+on: [pull_request]
+#  release:
+#    types: [published]
+jobs:
+  release:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Retrieve version
+        id: release
+        run: echo "::set-output name=version::$(echo VERSION)"
+
+      - name: Build project for production
+        run: |
+          composer install --no-dev --optimize-autoloader
+          mkdir build
+
+      - name: Create artifact
+        run: tar -xvjf build/friendica-full-${{ steps.release.outputs.version }}.tar.gz -T mods/release-list.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: friendica
+          path: build/build/friendica-full-${{ steps.release.outputs.version }}.tar.gz
+
+#      - name: Upload to release
+#        uses: JasonEtco/upload-to-release@master
+#        with:
+#          args: build/friendica-full-${{ steps.release.outputs.version }}.tar.gz application/zip
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  php70:
+    name: Create legacy release for PRE PHP 7.3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Retrieve version
+        id: release
+        run: echo "::set-output name=version::$(echo VERSION)"
+
+      - name: Downgrade code for production (to PHP 7.0)
+        run: |
+          composer install
+          vendor/bin/rector process
+
+      - name: Build project for production
+        run: |
+          composer install --no-dev --optimize-autoloader
+          mkdir build
+
+      - name: Create artifact
+        run: tar -xvjf build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz -T mods/release-list.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: friendica
+          path: build/build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz
+
+#      - name: Upload to release
+#        uses: JasonEtco/upload-to-release@master
+#        with:
+#          args: build/friendica-full-${{ steps.release.outputs.version }}-legacy.tar.gz application/zip
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

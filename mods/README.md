@@ -34,3 +34,7 @@ Sample systemd unit files to start worker.php periodically.
 Please place them in the correct location for your system, typically this is `/etc/systemd/system/friendicaworker.timer` and `/etc/systemd/system/friendicaworker.service`.
 Please report problems and improvements to `!helpers@forum.friendi.ca` and `@utzer@social.yl.ms` or open an issue in [the Github Friendica page](https://github.com/friendica/friendica/issues).
 This is for usage of systemd instead of cron to start the worker periodically, the solution is a work-in-progress and can surely be improved.
+
+## `release-list.txt`
+
+Contains all directories and files, which are necessary for a Friendica release. 
