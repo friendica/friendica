@@ -196,3 +196,47 @@ services:
 
   - name: redis
     image: redis
+---
+kind: pipeline
+type: docker
+name: php-release
+
+trigger:
+  event:
+    - cron
+  cron:
+    - release
+
+steps:
+  - name: Check changes
+    image: alpine/git
+    commands:
+      - if [[ $(git rev-list --count --since="15 minutes ago" --all) -eq 0 ]]; then exit 78; fi
+  - name: Create artifacts
+    image: friendicaci/php7.3:php7.3.28
+    commands:
+      - composer validate
+      - composer install --no-dev --optimize-autoloader
+      - export VERSION="$(cat VERSION)"
+      - export ARTIFACT="friendica-full-$VERSION.tar.gz"
+      - # Create artifact
+      - mkdir build
+      - tar -cvjf build/$ARTIFACT -T mods/release-list.txt
+      - # calculate SHA256 checksum
+      - cd build
+      - sha256sum "$ARTIFACT" > "$ARTIFACT.sha256"
+  - name: Upload artifacts
+    image: appleboy/drone-scp
+    settings:
+      host: "sample-host"
+      user: "sample-user"
+      key:
+        from_secret: ssh_key
+      passphrase:
+        from_secret: ssh_passphrase
+      port: 22
+      command_timeout: 2m
+      target: /home/deploy/files
+      source:
+        - build/$ARTIFACT
+        - build/$ARTIFACT.sha256
