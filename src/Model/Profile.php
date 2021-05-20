@@ -334,7 +334,7 @@ class Profile
 
 			if (Contact::canReceivePrivateMessages($profile)) {
 				if ($visitor_is_followed || $visitor_is_following) {
-					$wallmessage_link = $visitor_base_path . '/message/new/' . base64_encode($profile['addr'] ?? '');
+					$wallmessage_link = $visitor_base_path . '/message/new/' . base64_encode($profile['cid'] ?? '');
 				} elseif ($visitor_is_authenticated && !empty($profile['unkmail'])) {
 					$wallmessage_link = 'wallmessage/' . $profile['nickname'];
 				}
