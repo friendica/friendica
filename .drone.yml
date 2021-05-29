@@ -205,13 +205,12 @@ trigger:
   event:
     - cron
   cron:
-    - release
+    - nightly
+
+node:
+  node: releaser # This prevents executing this pipeline at other servers than drone.friendi.ca
 
 steps:
-  - name: Check changes
-    image: alpine/git
-    commands:
-      - if [[ $(git rev-list --count --since="15 minutes ago" --all) -eq 0 ]]; then exit 78; fi
   - name: Create artifacts
     image: friendicaci/php7.3:php7.3.28
     commands:
