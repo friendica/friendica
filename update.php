@@ -941,16 +941,3 @@ function update_1419()
 	}
 	return Update::SUCCESS;
 }
-
-function pre_update_1422()
-{
-	// Lock cleanup to avoid constraint violations during foreign key creation
-	if (DBStructure::existsTable('locks') &&
-		DBA::lock('locks') &&
-		!DBA::e("DELETE FROM `locks`") &&
-		DBA::unlock()) {
-		return Update::FAILED;
-	}
-
-	return Update::SUCCESS;
-}

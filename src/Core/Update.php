@@ -130,6 +130,9 @@ class Update
 			if ($stored < $current || $force) {
 				DI::config()->load('database');
 
+				// Check for updates for the lock & host table itself (necessary before used for locks ..)
+				DBStructure::updateLockTable(DI::app()->getBasePath(), $verbose, true, false);
+
 				// Compare the current structure with the defined structure
 				// If the Lock is acquired, never release it automatically to avoid double updates
 				if (DI::lock()->acquire('dbupdate', 0, Cache\Duration::INFINITE)) {

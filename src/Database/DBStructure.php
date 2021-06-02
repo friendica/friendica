@@ -426,6 +426,38 @@ class DBStructure
 	}
 
 	/**
+	 * Explicit updates the Lock table
+	 * This is necessary in case of self-updating the lock table
+	 *
+	 * @param string  $basePath
+	 * @param boolean $verbose
+	 * @param boolean $action
+	 * @param boolean $install
+	 *
+	 * @throws Exception
+	 */
+	public static function updateLockTable(string $basePath, bool $verbose, bool $action, bool $install)
+	{
+		if (DBStructure::existsTable('host')) {
+			$lockTable = [['tables_in_friendica' => 'host']];
+		} else {
+			$lockTable = [];
+		}
+
+		$definition          = self::definition($basePath);
+		$lockTableDefinition = ['host' => $definition['host']];
+
+		self::update($basePath, $verbose, $action, $install, $lockTable, $lockTableDefinition);
+
+
+		$lockTable           = [['tables_in_friendica' => 'locks']];
+		$definition          = self::definition($basePath);
+		$lockTableDefinition = ['locks' => $definition['locks']];
+
+		self::update($basePath, $verbose, $action, $install, $lockTable, $lockTableDefinition);
+	}
+
+	/**
 	 * Updates DB structure and returns eventual errors messages
 	 *
 	 * @param string $basePath   The base path of this application
@@ -449,9 +481,14 @@ class DBStructure
 			DI::config()->set('system', 'maintenance_reason', DI::l10n()->t('%s: Database update', DateTimeFormat::utcNow() . ' ' . date('e')));
 		}
 
+		// If true, the update routine just updates the tables and no other steps, like initial values, views, ..
+		$straightUpdate = !is_null($tables) && !is_null($definition);
+
 		// ensure that all initial values exist. This test has to be done prior and after the structure check.
 		// Prior is needed if the specific tables already exists - after is needed when they had been created.
-		self::checkInitialValues();
+		if (!$straightUpdate) {
+			self::checkInitialValues();
+		}
 
 		$errors = '';
 
@@ -797,9 +834,11 @@ class DBStructure
 			}
 		}
 
-		View::create(false, $action);
+		if (!$straightUpdate) {
+			View::create(false, $action);
 
-		self::checkInitialValues();
+			self::checkInitialValues();
+		}
 
 		if ($action && !$install) {
 			if ($errors) {
