@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 2020.09-dev (Red Hot Poker)
+-- Friendica 2021.06-rc (Siberian Iris)
 -- DB_UPDATE_VERSION 1422
 -- ------------------------------------------
 
