@@ -15,40 +15,44 @@ class HostRepositoryTest extends MockedTest
 	/** @var Database|MockInterface */
 	private $dba;
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 
 		$this->dba = \Mockery::mock(Database::class);
 	}
 
-	public function testInstance() {
+	public function testInstance()
+	{
 		$hostRepo = new Repository\Host($this->dba, new NullLogger());
 
 		$this->assertInstanceOf(Repository\Host::class, $hostRepo);
 	}
 
-	public function testExistingHost() {
+	public function testExistingHost()
+	{
 		$this->dba->shouldReceive('selectFirst')->andReturn(['id' => 1, 'name' => gethostname()])->once();
 
 		$hostRepo = new Repository\Host($this->dba, new NullLogger());
-		$host = $hostRepo->selectCurrentHost();
+		$host     = $hostRepo->selectCurrentHost();
 
 		$this->assertEquals(gethostname(), $host->name);
 		$this->assertEquals(1, $host->id);
 	}
 
-	public function testHostOverride() {
+	public function testHostOverride()
+	{
 		$this->dba->shouldReceive('selectFirst')->andReturn(['id' => 1, 'name' => 'testserver.test'])->once();
 
 		$hostRepo = new Repository\Host($this->dba, new NullLogger());
-		$host = $hostRepo->selectCurrentHost([Repository\Host::ENV_VARIABLE => 'testserver.test']);
+		$host     = $hostRepo->selectCurrentHost([Repository\Host::ENV_VARIABLE => 'testserver.test']);
 
 		$this->assertEquals('testserver.test', $host->name);
 		$this->assertEquals(1, $host->id);
 	}
 
-	public function testExceptionForEmptyHostname() {
+	public function testExceptionForEmptyHostname()
+	{
 		$this->expectException(InternalServerErrorException::class);
 		$this->expectExceptionMessage('Empty hostname is invalid.');
 
@@ -56,19 +60,21 @@ class HostRepositoryTest extends MockedTest
 		$hostRepo->selectCurrentHost([Repository\Host::ENV_VARIABLE => ' ']);
 	}
 
-	public function testNewHostname() {
+	public function testNewHostname()
+	{
 		$this->dba->shouldReceive('selectFirst')->andReturn([])->once();
 		$this->dba->shouldReceive('replace')->once();
-		$this->dba->shouldReceive('selectFirst')->andReturn(['id' =>  1, 'name' => gethostname()])->once();
+		$this->dba->shouldReceive('selectFirst')->andReturn(['id' => 1, 'name' => gethostname()])->once();
 
 		$hostRepo = new Repository\Host($this->dba, new NullLogger());
-		$host = $hostRepo->selectCurrentHost();
+		$host     = $hostRepo->selectCurrentHost();
 
 		$this->assertEquals(gethostname(), $host->name);
 		$this->assertEquals(1, $host->id);
 	}
 
-	public function testBadInsert() {
+	public function testBadInsert()
+	{
 		$this->expectException(NotFoundException::class);
 
 		$this->dba->shouldReceive('selectFirst')->andReturn([])->once();

@@ -25,5 +25,4 @@ use Friendica\BaseCollection;
 
 class Hosts extends BaseCollection
 {
-
 }
