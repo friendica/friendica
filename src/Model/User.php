@@ -492,7 +492,7 @@ class User
 	 * @deprecated since version 3.6
 	 * @see        User::getIdFromPasswordAuthentication()
 	 */
-	public static function authenticate($user_info, $password, $third_party = false)
+	public static function authenticate($user_info, string $password, bool $third_party = false)
 	{
 		try {
 			return self::getIdFromPasswordAuthentication($user_info, $password, $third_party);
@@ -513,7 +513,7 @@ class User
 	 * @throws HTTPException\ForbiddenException
 	 * @throws HTTPException\NotFoundException
 	 */
-	public static function getIdFromPasswordAuthentication($user_info, $password, $third_party = false)
+	public static function getIdFromPasswordAuthentication($user_info, string $password, bool $third_party = false)
 	{
 		// Addons registered with the "authenticate" hook may create the user on the
 		// fly. `getAuthenticationInfo` will fail if the user doesn't exist yet. If
