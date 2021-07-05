@@ -21,50 +21,70 @@
 
 namespace Friendica\Module\Admin\Logs;
 
-use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Core\Renderer;
+use Friendica\Core\Theme;
 use Friendica\Module\BaseAdmin;
-use Friendica\Util\Strings;
+use Friendica\Model\Log\ParsedLogIterator;
+use Psr\Log\LogLevel;
 
 class View extends BaseAdmin
 {
+	const LIMIT = 500;
+
 	public static function content(array $parameters = [])
 	{
 		parent::content($parameters);
 
 		$t = Renderer::getMarkupTemplate('admin/logs/view.tpl');
-		$f = DI::config()->get('system', 'logfile');
-		$data = '';
+		DI::page()->registerFooterScript(Theme::getPathForFile('js/module/admin/logs/view.js'));
+
+		$f     = DI::config()->get('system', 'logfile');
+		$data  = null;
+		$error = null;
+
+		$search = $_GET['q'] ?? '';
+
+		$filters_valid_values = [
+			'level' => [
+				'',
+				LogLevel::CRITICAL,
+				LogLevel::ERROR,
+				LogLevel::WARNING,
+				LogLevel::NOTICE,
+				LogLevel::INFO,
+				LogLevel::DEBUG,
+			],
+			'context' => ['', 'index', 'worker'],
+		];
+		$filters = [
+			'level'   => $_GET['level'] ?? '',
+			'context' => $_GET['context'] ?? '',
+		];
+		foreach ($filters as $k => $v) {
+			if ($v == '' || !in_array($v, $filters_valid_values[$k])) {
+				unset($filters[$k]);
+			}
+		}
 
 		if (!file_exists($f)) {
-			$data = DI::l10n()->t('Error trying to open <strong>%1$s</strong> log file.\r\n<br/>Check to see if file %1$s exist and is readable.', $f);
+			$error = DI::l10n()->t('Error trying to open <strong>%1$s</strong> log file.\r\n<br/>Check to see if file %1$s exist and is readable.', $f);
 		} else {
-			$fp = fopen($f, 'r');
-			if (!$fp) {
-				$data = DI::l10n()->t('Couldn\'t open <strong>%1$s</strong> log file.\r\n<br/>Check to see if file %1$s is readable.', $f);
-			} else {
-				$fstat = fstat($fp);
-				$size = $fstat['size'];
-				if ($size != 0) {
-					if ($size > 5000000 || $size < 0) {
-						$size = 5000000;
-					}
-					$seek = fseek($fp, 0 - $size, SEEK_END);
-					if ($seek === 0) {
-						$data = Strings::escapeHtml(fread($fp, $size));
-						while (!feof($fp)) {
-							$data .= Strings::escapeHtml(fread($fp, 4096));
-						}
-					}
-				}
-				fclose($fp);
+			try {
+				$data = new ParsedLogIterator($f, self::LIMIT, $filters, $search);
+			} catch (Exception $e) {
+				$error = DI::l10n()->t('Couldn\'t open <strong>%1$s</strong> log file.\r\n<br/>Check to see if file %1$s is readable.', $f);
 			}
 		}
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('View Logs'),
-			'$data' => $data,
-			'$logname' => DI::config()->get('system', 'logfile')
+			'$title'         => DI::l10n()->t('Administration'),
+			'$page'          => DI::l10n()->t('View Logs'),
+			'$data'          => $data,
+			'$q'             => $search,
+			'$filters'       => $filters,
+			'$filtersvalues' => $filters_valid_values,
+			'$error'         => $error,
+			'$logname'       => DI::config()->get('system', 'logfile'),
 		]);
 	}
 }

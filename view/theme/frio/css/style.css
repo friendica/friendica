@@ -85,6 +85,20 @@ blockquote {
 }
 
 /**
+ * details tag
+ */
+details {
+	padding: .5em .5em 0;
+}
+details details {
+	padding-left: .5em;
+}
+details summary {
+	font-weight: bold;
+	display: list-item;
+}
+
+/**
  * mobile aside
  */
 @media screen and (max-width: 990px) {
