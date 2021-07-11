@@ -46,7 +46,7 @@ steps:
     settings:
       backend: "filesystem"
       restore: true
-      cache_key: '{{ .Repo.Name }}_php71_lint_{{ arch }}_{{ os }}'
+      cache_key: '{{ .Repo.Name }}_php70_lint_{{ arch }}_{{ os }}'
       archive_format: "gzip"
       mount:
         - '.composer'
@@ -63,7 +63,7 @@ steps:
     settings:
       backend: "filesystem"
       rebuild: true
-      cache_key: '{{ .Repo.Name }}_php71_lint_{{ arch }}_{{ os }}'
+      cache_key: '{{ .Repo.Name }}_php70_lint_{{ arch }}_{{ os }}'
       archive_format: "gzip"
       mount:
         - '.composer'
@@ -372,6 +372,82 @@ services:
   - name: redis
     image: redis
 
+volumes:
+  - name: cache
+    host:
+      path: /tmp/drone-cache
+---
+kind: pipeline
+type: docker
+name: php7.0-artifact
+
+node_selector:
+  - node: opensocial
+
+steps:
+  - name: Restore cache
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: '{{ .Repo.Name }}_php70_artifact_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - name: cache
+        path: /tmp/cache
+  - name: Composer install
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - export COMPOSER_HOME=.composer
+      - ./bin/composer.phar install --no-progress --ansi
+  - name: Rebuild cache
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: '{{ .Repo.Name }}_php70_artifact_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - name: cache
+        path: /tmp/cache
+  - name: Downgrade
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - ./vendor/bin/rector process --ansi
+  - name: Downgrade vendor
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - ./bin/dev/downgrade_vendor.sh
+  - name: Create artifacts
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - export VERSION="$(cat VERSION)"
+      - export ARTIFACT="friendica-full-$VERSION-php70.tar.gz"
+      - # Create artifact
+      - mkdir build
+      - tar -cvjf build/$ARTIFACT -T mods/release-list.txt
+      - # calculate SHA256 checksum
+      - cd build
+      - sha256sum "$ARTIFACT" > "$ARTIFACT.sha256"
+  - name: Upload artifacts
+    image: appleboy/drone-scp
+    settings:
+      host: "sample-host"
+      user: "sample-user"
+      key:
+        from_secret: ssh_key
+      passphrase:
+        from_secret: ssh_passphrase
+      port: 22
+      command_timeout: 2m
+      target: /home/deploy/files
+      source:
+        - build/$ARTIFACT
+        - build/$ARTIFACT.sha256
 volumes:
   - name: cache
     host:
