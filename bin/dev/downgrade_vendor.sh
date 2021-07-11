@@ -3,9 +3,6 @@
 # Print array helpers (https://stackoverflow.com/a/17841619)
 function join_by { local d=$1; shift; local f=$1; shift; printf %s "$f" "${@/#/$d}"; }
 
-# Fail fast
-set -e
-
 package_paths=()
 rootPackage=$(./bin/composer.phar info -s -N)
 
