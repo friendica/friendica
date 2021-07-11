@@ -35,57 +35,6 @@ steps:
 ---
 kind: pipeline
 type: docker
-name: php7.0-lint
-
-node_selector:
-  - node: opensocial
-
-steps:
-  - name: Restore cache
-    image: meltwater/drone-cache:dev
-    settings:
-      backend: "filesystem"
-      restore: true
-      cache_key: '{{ .Repo.Name }}_php70_lint_{{ arch }}_{{ os }}'
-      archive_format: "gzip"
-      mount:
-        - '.composer'
-    volumes:
-      - name: cache
-        path: /tmp/cache
-  - name: Composer install
-    image: friendicaci/php7.4:php7.4.18
-    commands:
-      - export COMPOSER_HOME=.composer
-      - ./bin/composer.phar install --no-progress --ansi
-  - name: Rebuild cache
-    image: meltwater/drone-cache:dev
-    settings:
-      backend: "filesystem"
-      rebuild: true
-      cache_key: '{{ .Repo.Name }}_php70_lint_{{ arch }}_{{ os }}'
-      archive_format: "gzip"
-      mount:
-        - '.composer'
-    volumes:
-      - name: cache
-        path: /tmp/cache
-  - name: Downgrade
-    image: php:7.4
-    commands:
-      - ./vendor/bin/rector process
-  - name: Test
-    image: php:7.0
-    commands:
-      - ./bin/composer.phar run lint
-
-volumes:
-  - name: cache
-    host:
-      path: /tmp/drone-cache
----
-kind: pipeline
-type: docker
 name: php8.0-lint
 
 steps:
