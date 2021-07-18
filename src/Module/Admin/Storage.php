@@ -111,9 +111,9 @@ class Storage extends BaseAdmin
 
 			if (count($storage_form) > 0) {
 				$available_storage_forms[] = [
-					'name' => $name,
+					'name'   => $name,
 					'prefix' => $storage_form_prefix,
-					'form' => $storage_form,
+					'form'   => $storage_form,
 				];
 			}
 		}
