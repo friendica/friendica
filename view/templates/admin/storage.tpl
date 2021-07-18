@@ -7,7 +7,7 @@
 		<h2>Storage Backend</h2>
 
 		{{include file="field_select.tpl" field=$storagebackend}}
-		<div class="submit"><input type="submit" name="page_logs" value="{{$submit}}" /></div>
+		<div class="submit"><input type="submit" name="page_storage" value="{{$submit}}" /></div>
 
 		<h2>Storage Configuration</h2>
 
@@ -18,7 +18,7 @@
 		{{/foreach}}
 		{{/foreach}}
 
-		<div class="submit"><input type="submit" name="page_logs" value="{{$submit}}" /></div>
+		<div class="submit"><input type="submit" name="page_storage" value="{{$submit}}" /></div>
 
 	</form>
 </div>

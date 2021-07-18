@@ -23,6 +23,7 @@ namespace Friendica\Module\Admin;
 
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Model\Storage\IStorage;
 use Friendica\Module\BaseAdmin;
 use Friendica\Util\Strings;
 
@@ -35,35 +36,37 @@ class Storage extends BaseAdmin
 		self::checkFormSecurityTokenRedirectOnError('/admin/storage', 'admin_storage');
 
 		$storagebackend = Strings::escapeTags(trim($_POST['storagebackend'] ?? ''));
+		/** @var IStorage $newstorage */
+		$newstorage = DI::storageManager()->getByName($storagebackend);
 
 		// save storage backend form
-		if (DI::storageManager()->setBackend($storagebackend)) {
-			$storage_opts        = DI::storage()->getOptions();
-			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $storagebackend);
-			$storage_opts_data   = [];
-			foreach ($storage_opts as $name => $info) {
-				$fieldname = $storage_form_prefix . '_' . $name;
-				switch ($info[0]) { // type
-					case 'checkbox':
-					case 'yesno':
-						$value = !empty($_POST[$fieldname]);
-						break;
-					default:
-						$value = $_POST[$fieldname] ?? '';
-				}
-				$storage_opts_data[$name] = $value;
+		$storage_opts        = $newstorage->getOptions();
+		$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $storagebackend);
+		$storage_opts_data   = [];
+		foreach ($storage_opts as $name => $info) {
+			$fieldname = $storage_form_prefix . '_' . $name;
+			switch ($info[0]) { // type
+				case 'checkbox':
+				case 'yesno':
+					$value = !empty($_POST[$fieldname]);
+					break;
+				default:
+					$value = $_POST[$fieldname] ?? '';
 			}
-			unset($name);
-			unset($info);
+			$storage_opts_data[$name] = $value;
+		}
+		unset($name);
+		unset($info);
 
-			$storage_form_errors = DI::storage()->saveOptions($storage_opts_data);
-			if (count($storage_form_errors)) {
-				foreach ($storage_form_errors as $name => $err) {
-					notice('Storage backend, ' . $storage_opts[$name][1] . ': ' . $err);
-				}
-				DI::baseUrl()->redirect('admin/storage');
+		$storage_form_errors = $newstorage->saveOptions($storage_opts_data);
+		if (count($storage_form_errors)) {
+			foreach ($storage_form_errors as $name => $err) {
+				notice('Storage backend, ' . $storage_opts[$name][1] . ': ' . $err);
 			}
-		} elseif (!empty($storagebackend)) {
+			DI::baseUrl()->redirect('admin/storage');
+		}
+
+		if (empty($storagebackend) || !DI::storageManager()->setBackend($storagebackend)) {
 			notice(DI::l10n()->t('Invalid storage backend setting value.'));
 		}
 
@@ -88,7 +91,7 @@ class Storage extends BaseAdmin
 			$available_storage_backends[$name] = $name;
 
 			// build storage config form,
-			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $current_storage_backend);
+			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $name);
 
 			$storage_form = [];
 			foreach (DI::storageManager()->getByName($name)->getOptions() as $option => $info) {
@@ -109,6 +112,7 @@ class Storage extends BaseAdmin
 			if (count($storage_form) > 0) {
 				$available_storage_forms[] = [
 					'name' => $name,
+					'prefix' => $storage_form_prefix,
 					'form' => $storage_form,
 				];
 			}
