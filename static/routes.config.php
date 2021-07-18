@@ -197,6 +197,8 @@ return [
 
 		'/site' => [Module\Admin\Site::class, [R::GET, R::POST]],
 
+		'/storage' => [Module\Admin\Storage::class, [R::GET, R::POST]],
+
 		'/themes'               => [Module\Admin\Themes\Index::class,   [R::GET, R::POST]],
 		'/themes/{theme}'       => [Module\Admin\Themes\Details::class, [R::GET, R::POST]],
 		'/themes/{theme}/embed' => [Module\Admin\Themes\Embed::class,   [R::GET, R::POST]],

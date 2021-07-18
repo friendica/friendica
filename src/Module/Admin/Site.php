@@ -212,39 +212,6 @@ class Site extends BaseAdmin
 		$relay_user_tags   = !empty($_POST['relay_user_tags']);
 		$active_panel      = (!empty($_POST['active_panel'])      ? "#" . Strings::escapeTags(trim($_POST['active_panel'])) : '');
 
-		$storagebackend    = Strings::escapeTags(trim($_POST['storagebackend'] ?? ''));
-
-		// save storage backend form
-		if (DI::storageManager()->setBackend($storagebackend)) {
-			$storage_opts     = DI::storage()->getOptions();
-			$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|', '', $storagebackend);
-			$storage_opts_data   = [];
-			foreach ($storage_opts as $name => $info) {
-				$fieldname = $storage_form_prefix . '_' . $name;
-				switch ($info[0]) { // type
-					case 'checkbox':
-					case 'yesno':
-						$value = !empty($_POST[$fieldname]);
-						break;
-					default:
-						$value = $_POST[$fieldname] ?? '';
-				}
-				$storage_opts_data[$name] = $value;
-			}
-			unset($name);
-			unset($info);
-
-			$storage_form_errors = DI::storage()->saveOptions($storage_opts_data);
-			if (count($storage_form_errors)) {
-				foreach ($storage_form_errors as $name => $err) {
-					notice('Storage backend, ' . $storage_opts[$name][1] . ': ' . $err);
-				}
-				DI::baseUrl()->redirect('admin/site' . $active_panel);
-			}
-		} elseif (!empty($storagebackend)) {
-			notice(DI::l10n()->t('Invalid storage backend setting value.'));
-		}
-
 		// Has the directory url changed? If yes, then resubmit the existing profiles there
 		if ($global_directory != DI::config()->get('system', 'directory') && ($global_directory != '')) {
 			DI::config()->set('system', 'directory', $global_directory);
@@ -526,40 +493,6 @@ class Site extends BaseAdmin
 
 		$diaspora_able = (DI::baseUrl()->getUrlPath() == '');
 
-		$current_storage_backend = DI::storage();
-		$available_storage_backends = [];
-
-		// show legacy option only if it is the current backend:
-		// once changed can't be selected anymore
-		if ($current_storage_backend == null) {
-			$available_storage_backends[''] = DI::l10n()->t('Database (legacy)');
-		}
-
-		foreach (DI::storageManager()->listBackends() as $name => $class) {
-			$available_storage_backends[$name] = $name;
-		}
-
-		// build storage config form,
-		$storage_form_prefix = preg_replace('|[^a-zA-Z0-9]|' ,'', $current_storage_backend);
-
-		$storage_form = [];
-		if (!is_null($current_storage_backend) && $current_storage_backend != '') {
-			foreach ($current_storage_backend->getOptions() as $name => $info) {
-				$type = $info[0];
-				// Backward compatibilty with yesno field description
-				if ($type == 'yesno') {
-					$type = 'checkbox';
-					// Remove translated labels Yes No from field info
-					unset($info[4]);
-				}
-
-				$info[0] = $storage_form_prefix . '_' . $name;
-				$info['type'] = $type;
-				$info['field'] = 'field_' . $type . '.tpl';
-				$storage_form[$name] = $info;
-			}
-		}
-
 		$t = Renderer::getMarkupTemplate('admin/site.tpl');
 		return Renderer::replaceMacros($t, [
 			'$title'             => DI::l10n()->t('Administration'),
@@ -600,8 +533,6 @@ class Site extends BaseAdmin
 			'$hide_help'        => ['hide_help', DI::l10n()->t('Hide help entry from navigation menu'), DI::config()->get('system', 'hide_help'), DI::l10n()->t('Hides the menu entry for the Help pages from the navigation menu. You can still access it calling /help directly.')],
 			'$singleuser'       => ['singleuser', DI::l10n()->t('Single user instance'), DI::config()->get('system', 'singleuser', '---'), DI::l10n()->t('Make this instance multi-user or single-user for the named user'), $user_names],
 
-			'$storagebackend'   => ['storagebackend', DI::l10n()->t('File storage backend'), $current_storage_backend, DI::l10n()->t('The backend used to store uploaded data. If you change the storage backend, you can manually move the existing files. If you do not do so, the files uploaded before the change will still be available at the old backend. Please see <a href="/help/Settings#1_2_3_1">the settings documentation</a> for more information about the choices and the moving procedure.'), $available_storage_backends],
-			'$storageform'      => $storage_form,
 			'$maximagesize'     => ['maximagesize', DI::l10n()->t('Maximum image size'), DI::config()->get('system', 'maximagesize'), DI::l10n()->t('Maximum size in bytes of uploaded images. Default is 0, which means no limits.')],
 			'$maximagelength'   => ['maximagelength', DI::l10n()->t('Maximum image length'), DI::config()->get('system', 'max_image_length'), DI::l10n()->t('Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.')],
 			'$jpegimagequality' => ['jpegimagequality', DI::l10n()->t('JPEG image quality'), DI::config()->get('system', 'jpeg_quality'), DI::l10n()->t('Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.')],
