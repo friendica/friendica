@@ -124,8 +124,8 @@ class Storage extends BaseAdmin
 		return Renderer::replaceMacros($t, [
 			'$title'                 => DI::l10n()->t('Administration'),
 			'$page'                  => DI::l10n()->t('Storage'),
-			'$save'                  => DI::l10n()->t('Save Settings'),
-			'$save_set'              => DI::l10n()->t('Set Backend'),
+			'$save'                  => DI::l10n()->t('Save'),
+			'$save_set'              => DI::l10n()->t('Save & Activate'),
 			'$clear'                 => DI::l10n()->t('Clear'),
 			'$baseurl'               => DI::baseUrl()->get(true),
 			'$form_security_token'   => self::getFormSecurityToken("admin_storage"),

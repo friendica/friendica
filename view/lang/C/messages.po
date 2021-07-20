@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2021.09-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-20 23:36+0200\n"
+"POT-Creation-Date: 2021-07-20 23:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -962,7 +962,7 @@ msgid "Edit post"
 msgstr ""
 
 #: mod/editpost.php:88 mod/notes.php:63 src/Content/Text/HTML.php:893
-#: src/Module/Filer/SaveTag.php:70
+#: src/Module/Admin/Storage.php:127 src/Module/Filer/SaveTag.php:70
 msgid "Save"
 msgstr ""
 
@@ -1934,9 +1934,8 @@ msgstr ""
 #: mod/settings.php:482 mod/settings.php:578 mod/settings.php:713
 #: src/Module/Admin/Addons/Index.php:69 src/Module/Admin/Features.php:87
 #: src/Module/Admin/Logs/Settings.php:82 src/Module/Admin/Site.php:501
-#: src/Module/Admin/Storage.php:127 src/Module/Admin/Themes/Index.php:113
-#: src/Module/Admin/Tos.php:66 src/Module/Settings/Delegation.php:170
-#: src/Module/Settings/Display.php:189
+#: src/Module/Admin/Themes/Index.php:113 src/Module/Admin/Tos.php:66
+#: src/Module/Settings/Delegation.php:170 src/Module/Settings/Display.php:189
 msgid "Save Settings"
 msgstr ""
 
@@ -6466,7 +6465,7 @@ msgid "Storage"
 msgstr ""
 
 #: src/Module/Admin/Storage.php:128
-msgid "Set Backend"
+msgid "Save & Activate"
 msgstr ""
 
 #: src/Module/Admin/Summary.php:53
