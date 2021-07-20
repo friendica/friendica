@@ -174,7 +174,7 @@ function api_register_func($path, $func, $auth = false, $method = API_METHOD_ANY
 }
 
 /**
- * Log in user via OAuth1 or Simple HTTP Auth.
+ * Log in user via Simple HTTP Auth.
  * Simple Auth allow username in form of <pre>user@server</pre>, ignoring server part
  *
  * @param App $a App

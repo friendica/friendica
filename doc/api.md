@@ -20,9 +20,7 @@ Using an invalid method results in HTTP error 405 "Method Not Allowed".
 
 ### Authentication
 
-Friendica supports basic HTTP Auth and OAuth 1 to authenticate the user to the APIs.
-
-OAuth settings can be added by the user in web UI under [/settings/oauth/](/settings/oauth/).
+Friendica supports basic HTTP Auth and OAuth to authenticate the user to the APIs.
 
 ### Errors
 

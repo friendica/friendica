@@ -2,6 +2,7 @@ Version 2021.09 (unreleased)
   Friendica Core
     Simplified the proxy mechanism. The proxy cache directory (/proxy) can now be removed [annando]
     DFRN is now always handled with the Diaspora transport layer. The legacy DFRN transport layer is removed [annando]
+    Legacy OAuth server is removed [annando]
 
 Version 2021.07 (2021-07-04)
   Friendica Core

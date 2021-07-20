@@ -619,10 +619,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Hook::callAll('jot_tool', $jotplugins);
 
-### src/Network/FKOAuth1.php
-
-    Hook::callAll('logged_in', $a->user);
-
 ### src/Render/FriendicaSmartyEngine.php
 
     Hook::callAll("template_vars", $arr);

@@ -58,7 +58,7 @@ class Search extends BaseApi
 			'offset'             => 0,     // Offset in search results. Used for pagination. Defaults to 0.
 			'following'          => false, // Only include accounts that the user is following. Defaults to false.
 		]);
-		
+
 		if (empty($request['q'])) {
 			DI::mstdnError()->UnprocessableEntity();
 		}
@@ -74,7 +74,7 @@ class Search extends BaseApi
 			$result['statuses'] = self::searchStatuses($uid, $request['q'], $request['account_id'], $request['max_id'], $request['min_id'], $limit, $request['offset']);
 		}
 		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (strpos($request['q'], '@') == false)) {
-			$result['hashtags'] = self::searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset']);
+			$result['hashtags'] = self::searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $parameters['version']);
 		}
 
 		System::jsonExit($result);
@@ -175,7 +175,7 @@ class Search extends BaseApi
 		return $statuses;
 	}
 
-	private static function searchHashtags(string $q, bool $exclude_unreviewed, int $limit, int $offset)
+	private static function searchHashtags(string $q, bool $exclude_unreviewed, int $limit, int $offset, int $version)
 	{
 		$q = ltrim($q, '#');
 
@@ -187,7 +187,11 @@ class Search extends BaseApi
 
 		$hashtags = [];
 		foreach ($tags as $tag) {
-			$hashtags[] = new \Friendica\Object\Api\Mastodon\Tag(DI::baseUrl(), $tag);
+			if ($version == 1) {
+				$hashtags[] = $tag['name'];
+			} else {
+				$hashtags[] = new \Friendica\Object\Api\Mastodon\Tag(DI::baseUrl(), $tag);
+			}
 		}
 
 		return $hashtags;

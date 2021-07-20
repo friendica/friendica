@@ -30,8 +30,6 @@ These endpoints use the [Friendica API entities](help/API-Entities).
 - POST api/friendships/destroy
 - GET api/friends/ids
 - GET/POST api/help/test
-- POST api/oauth/access_token
-- POST api/oauth/request_token
 - GET api/search
 - GET api/statuses/show/:id
 - POST api/statuses/destroy/:id
@@ -67,6 +65,8 @@ These endpoints use the [Friendica API entities](help/API-Entities).
 - blocks/exists
 - blocks/blocking
 - oauth/authorize
+- oauth/access_token
+- oauth/request_token
 - statusnet/groups/timeline
 - statusnet/groups/show
 - statusnet/groups/create

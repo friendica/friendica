@@ -131,6 +131,7 @@ return [
 			'/scheduled_statuses/{id:\d+}'       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::PUT, R::DELETE]], // not supported
 			'/statuses'                          => [Module\Api\Mastodon\Statuses::class,                 [        R::POST]],
 			'/statuses/{id:\d+}'                 => [Module\Api\Mastodon\Statuses::class,                 [R::GET, R::DELETE]],
+			'/statuses/{id:\d+}/card'            => [Module\Api\Mastodon\Statuses\Card::class,            [R::GET         ]],
 			'/statuses/{id:\d+}/context'         => [Module\Api\Mastodon\Statuses\Context::class,         [R::GET         ]],
 			'/statuses/{id:\d+}/reblogged_by'    => [Module\Api\Mastodon\Statuses\RebloggedBy::class,     [R::GET         ]],
 			'/statuses/{id:\d+}/favourited_by'   => [Module\Api\Mastodon\Statuses\FavouritedBy::class,    [R::GET         ]],
@@ -154,7 +155,7 @@ return [
 			'/timelines/tag/{hashtag}'           => [Module\Api\Mastodon\Timelines\Tag::class,            [R::GET         ]],
 			'/trends'                            => [Module\Api\Mastodon\Trends::class,                   [R::GET         ]],
 		],
-		'/v2' => [
+		'/v{version:\d+}' => [
 			'/search'                            => [Module\Api\Mastodon\Search::class,                   [R::GET         ]],
 		],
 		'/friendica' => [
