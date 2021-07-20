@@ -35,7 +35,8 @@ class Storage extends BaseAdmin
 
 		self::checkFormSecurityTokenRedirectOnError('/admin/storage', 'admin_storage');
 
-		$storagebackend = Strings::escapeTags(trim($_POST['storagebackend'] ?? ''));
+		$storagebackend = Strings::escapeTags(trim($parameters['name'] ?? ''));
+
 		/** @var IStorage $newstorage */
 		$newstorage = DI::storageManager()->getByName($storagebackend);
 
@@ -66,8 +67,10 @@ class Storage extends BaseAdmin
 			DI::baseUrl()->redirect('admin/storage');
 		}
 
-		if (empty($storagebackend) || !DI::storageManager()->setBackend($storagebackend)) {
-			notice(DI::l10n()->t('Invalid storage backend setting value.'));
+		if (!empty($_POST['submit_save_set'])) {
+			if (empty($storagebackend) || !DI::storageManager()->setBackend($storagebackend)) {
+				notice(DI::l10n()->t('Invalid storage backend setting value.'));
+			}
 		}
 
 		DI::baseUrl()->redirect('admin/storage');
@@ -109,13 +112,11 @@ class Storage extends BaseAdmin
 				$storage_form[$option] = $info;
 			}
 
-			if (count($storage_form) > 0) {
-				$available_storage_forms[] = [
-					'name'   => $name,
-					'prefix' => $storage_form_prefix,
-					'form'   => $storage_form,
-				];
-			}
+			$available_storage_forms[] = [
+				'name'   => $name,
+				'prefix' => $storage_form_prefix,
+				'form'   => $storage_form,
+			];
 		}
 
 		$t = Renderer::getMarkupTemplate('admin/storage.tpl');
@@ -123,11 +124,12 @@ class Storage extends BaseAdmin
 		return Renderer::replaceMacros($t, [
 			'$title'                 => DI::l10n()->t('Administration'),
 			'$page'                  => DI::l10n()->t('Storage'),
-			'$submit'                => DI::l10n()->t('Save Settings'),
+			'$save'                  => DI::l10n()->t('Save Settings'),
+			'$save_set'              => DI::l10n()->t('Set Backend'),
 			'$clear'                 => DI::l10n()->t('Clear'),
 			'$baseurl'               => DI::baseUrl()->get(true),
 			'$form_security_token'   => self::getFormSecurityToken("admin_storage"),
-			'$storagebackend'        => ['storagebackend', DI::l10n()->t('File storage backend'), $current_storage_backend, DI::l10n()->t('The backend used to store uploaded data. If you change the storage backend, you can manually move the existing files. If you do not do so, the files uploaded before the change will still be available at the old backend. Please see <a href="/help/Settings#1_2_3_1">the settings documentation</a> for more information about the choices and the moving procedure.'), $available_storage_backends],
+			'$storagebackend'        => $current_storage_backend,
 			'$availablestorageforms' => $available_storage_forms,
 		]);
 	}
