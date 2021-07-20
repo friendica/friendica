@@ -318,6 +318,10 @@ class Transmitter
 	{
 		$owner = User::getOwnerDataById($uid);
 
+		if (!isset($owner['id'])) {
+			throw new \RuntimeException('Missing id property User::getOwnerDataById return for uid: ' . $uid);
+		}
+
 		$data = ['@context' => ActivityPub::CONTEXT];
 		$data['id'] = $owner['url'];
 
