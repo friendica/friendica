@@ -88,6 +88,7 @@ abstract class BaseAdmin extends BaseModule
 			]],
 			'configuration' => [DI::l10n()->t('Configuration'), [
 				'site'         => ['admin/site'        , DI::l10n()->t('Site')                    , 'site'],
+				'storage'      => ['admin/storage'     , DI::l10n()->t('Storage')                 , 'storage'],
 				'users'        => ['admin/users'       , DI::l10n()->t('Users')                   , 'users'],
 				'addons'       => ['admin/addons'      , DI::l10n()->t('Addons')                  , 'addons'],
 				'themes'       => ['admin/themes'      , DI::l10n()->t('Themes')                  , 'themes'],

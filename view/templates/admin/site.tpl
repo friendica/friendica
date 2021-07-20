@@ -40,11 +40,6 @@
 		<div class="submit"><input type="submit" name="page_site" value="{{$submit}}"/></div>
 
 		<h2>{{$upload}}</h2>
-		{{include file="field_select.tpl" field=$storagebackend}}
-		{{foreach from=$storageform item=$field}}
-			{{include file=$field.field field=$field}}
-		{{/foreach}}
-		<hr>
 		{{include file="field_input.tpl" field=$maximagesize}}
 		{{include file="field_input.tpl" field=$maximagelength}}
 		{{include file="field_input.tpl" field=$jpegimagequality}}
