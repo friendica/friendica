@@ -2243,7 +2243,7 @@ class BBCode
 			$string = str_replace(['[', ']'], ["\n[", "]\n"], $string);
 
 			// ignore anything in a bbtag
-			$string = preg_replace('/\[(.*?)\]/sm', '', $string);
+			$string = preg_replace('/\[(.*?)\]/gsm', '', $string);
 
 			// Match full names against @tags including the space between first and last
 			// We will look these up afterward to see if they are full names or not recognisable.
@@ -2263,8 +2263,8 @@ class BBCode
 				}
 			}
 
-			// Otherwise pull out single word tags. These can be @nickname, @first_last
-			// and #hash tags.
+			// Otherwise pull out single word tags. These can be @nickname, @first_last,
+			// !nickname (for addressing forums) and #hash tags.
 
 			if (preg_match_all('/([!#@][^\^ \x0D\x0A,;:?\']*[^\^ \x0D\x0A,;:?!\'.])/', $string, $matches)) {
 				foreach ($matches[1] as $match) {
