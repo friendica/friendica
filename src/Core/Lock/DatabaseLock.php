@@ -44,12 +44,20 @@ class DatabaseLock extends BaseLock
 	private $dba;
 
 	/**
+	 * The id of the current host
+	 *
+	 * @var int
+	 */
+	private $hostId;
+
+	/**
 	 * @param null|int $pid The Id of the current process (null means determine automatically)
 	 */
-	public function __construct(Database $dba, $pid = null)
+	public function __construct(Database $dba, int $hostId, $pid = null)
 	{
-		$this->dba = $dba;
-		$this->pid = isset($pid) ? $pid : getmypid();
+		$this->dba    = $dba;
+		$this->hostId = $hostId;
+		$this->pid    = isset($pid) ? $pid : getmypid();
 	}
 
 	/**
@@ -62,21 +70,21 @@ class DatabaseLock extends BaseLock
 
 		do {
 			$this->dba->lock('locks');
-			$lock = $this->dba->selectFirst('locks', ['locked', 'pid'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
+			$lock = $this->dba->selectFirst('locks', ['locked', 'host-id', 'pid'], ['`name` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow()]);
 
 			if ($this->dba->isResult($lock)) {
 				if ($lock['locked']) {
 					// We want to lock something that was already locked by us? So we got the lock.
-					if ($lock['pid'] == $this->pid) {
+					if ($lock['pid'] == $this->pid && $lock['host-id'] == $this->hostId) {
 						$got_lock = true;
 					}
 				}
 				if (!$lock['locked']) {
-					$this->dba->update('locks', ['locked' => true, 'pid' => $this->pid, 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')], ['name' => $key]);
+					$this->dba->update('locks', ['locked' => true, 'host-id' => $this->hostId, 'pid' => $this->pid, 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')], ['name' => $key]);
 					$got_lock = true;
 				}
 			} else {
-				$this->dba->insert('locks', ['name' => $key, 'locked' => true, 'pid' => $this->pid, 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')]);
+				$this->dba->insert('locks', ['name' => $key, 'locked' => true, 'host-id' => $this->hostId, 'pid' => $this->pid, 'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds')]);
 				$got_lock = true;
 				$this->markAcquire($key);
 			}
@@ -99,7 +107,7 @@ class DatabaseLock extends BaseLock
 		if ($override) {
 			$where = ['name' => $key];
 		} else {
-			$where = ['name' => $key, 'pid' => $this->pid];
+			$where = ['name' => $key, 'host-id' => $this->hostId, 'pid' => $this->pid];
 		}
 
 		if ($this->dba->exists('locks', $where)) {
@@ -123,7 +131,7 @@ class DatabaseLock extends BaseLock
 		if ($override) {
 			$where = ['1 = 1'];
 		} else {
-			$where = ['pid' => $this->pid];
+			$where = ['host-id' => $this->hostId, 'pid' => $this->pid];
 		}
 		$return = $this->dba->delete('locks', $where);
 

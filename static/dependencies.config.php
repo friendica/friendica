@@ -227,4 +227,10 @@ return [
 			$_SERVER
 		],
 	],
+	Friendica\Model\Host::class => [
+		'instanceOf' => Friendica\Repository\Host::class,
+		'call' => [
+			['selectCurrentHost', [$_SERVER], Dice::CHAIN_CALL],
+		],
+	],
 ];

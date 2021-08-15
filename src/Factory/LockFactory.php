@@ -26,6 +26,7 @@ use Friendica\Core\Cache\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Lock;
 use Friendica\Database\Database;
+use Friendica\Model\Host;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,6 +54,11 @@ class LockFactory
 	private $dba;
 
 	/**
+	 * @var int The id of the current host
+	 */
+	private $hostId;
+
+	/**
 	 * @var CacheFactory The memory cache driver in case we use it
 	 */
 	private $cacheFactory;
@@ -62,11 +68,12 @@ class LockFactory
 	 */
 	private $logger;
 
-	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, LoggerInterface $logger)
+	public function __construct(CacheFactory $cacheFactory, IConfig $config, Database $dba, Host $host, LoggerInterface $logger)
 	{
 		$this->cacheFactory = $cacheFactory;
 		$this->config       = $config;
 		$this->dba          = $dba;
+		$this->hostId       = $host->id;
 		$this->logger       = $logger;
 	}
 
@@ -82,19 +89,16 @@ class LockFactory
 				case Type::APCU:
 					$cache = $this->cacheFactory->create($lock_type);
 					if ($cache instanceof IMemoryCache) {
-						return new Lock\CacheLock($cache);
+						return new Lock\CacheLock($cache, $this->hostId);
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
-					break;
 
 				case 'database':
-					return new Lock\DatabaseLock($this->dba);
-					break;
+					return new Lock\DatabaseLock($this->dba, $this->hostId);
 
 				case 'semaphore':
 					return new Lock\SemaphoreLock();
-					break;
 
 				default:
 					return self::useAutoDriver();
@@ -132,7 +136,7 @@ class LockFactory
 			try {
 				$cache = $this->cacheFactory->create($cache_type);
 				if ($cache instanceof IMemoryCache) {
-					return new Lock\CacheLock($cache);
+					return new Lock\CacheLock($cache, $this->hostId);
 				}
 			} catch (\Exception $exception) {
 				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception]);
@@ -140,6 +144,6 @@ class LockFactory
 		}
 
 		// 3. Use Database Locking as a Fallback
-		return new Lock\DatabaseLock($this->dba);
+		return new Lock\DatabaseLock($this->dba, $this->hostId);
 	}
 }

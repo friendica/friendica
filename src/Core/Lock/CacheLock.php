@@ -38,13 +38,37 @@ class CacheLock extends BaseLock
 	private $cache;
 
 	/**
+	 * @var int The id of this host
+	 */
+	private $hostId;
+
+	/**
 	 * CacheLock constructor.
 	 *
 	 * @param IMemoryCache $cache The CacheDriver for this type of lock
 	 */
-	public function __construct(IMemoryCache $cache)
+	public function __construct(IMemoryCache $cache, int $hostId)
 	{
-		$this->cache = $cache;
+		$this->cache  = $cache;
+		$this->hostId = $hostId;
+	}
+
+	/**
+	 * @param string $key The original key
+	 *
+	 * @return string        The cache key used for the cache
+	 */
+	private function getLockKey(string $key)
+	{
+		return $this->getLockPrefix() . $key;
+	}
+
+	/**
+	 * @return string Returns the prefix of this lock instance
+	 */
+	private function getLockPrefix()
+	{
+		return self::CACHE_PREFIX . $this->hostId . ':';
 	}
 
 	/**
@@ -55,7 +79,7 @@ class CacheLock extends BaseLock
 		$got_lock = false;
 		$start    = time();
 
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 
 		do {
 			$lock = $this->cache->get($cachekey);
@@ -88,7 +112,7 @@ class CacheLock extends BaseLock
 	 */
 	public function release($key, $override = false)
 	{
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 
 		if ($override) {
 			$return = $this->cache->delete($cachekey);
@@ -105,7 +129,7 @@ class CacheLock extends BaseLock
 	 */
 	public function isLocked($key)
 	{
-		$cachekey = self::getLockKey($key);
+		$cachekey = $this->getLockKey($key);
 		$lock     = $this->cache->get($cachekey);
 		return isset($lock) && ($lock !== false);
 	}
@@ -123,10 +147,10 @@ class CacheLock extends BaseLock
 	 */
 	public function getLocks(string $prefix = '')
 	{
-		$locks = $this->cache->getAllKeys(self::CACHE_PREFIX . $prefix);
+		$locks = $this->cache->getAllKeys($this->getLockPrefix() . $prefix);
 
 		array_walk($locks, function (&$lock, $key) {
-			$lock = substr($lock, strlen(self::CACHE_PREFIX));
+			$lock = substr($lock, strlen($this->getLockPrefix()));
 		});
 
 		return $locks;
@@ -148,15 +172,5 @@ class CacheLock extends BaseLock
 		}
 
 		return $success;
-	}
-
-	/**
-	 * @param string $key The original key
-	 *
-	 * @return string        The cache key used for the cache
-	 */
-	private static function getLockKey($key)
-	{
-		return self::CACHE_PREFIX . $key;
 	}
 }
