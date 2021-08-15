@@ -28,7 +28,7 @@ class ArrayCacheLockTest extends LockTest
 {
 	protected function getInstance()
 	{
-		return new CacheLock(new ArrayCache('localhost'));
+		return new CacheLock(new ArrayCache('localhost'), $this->hostId);
 	}
 
 	/**
