@@ -21,59 +21,12 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Logger;
-use Friendica\Database\DBA;
+use Friendica\BaseModel;
 
-class Host
+/**
+ * @property string name
+ */
+class Host extends BaseModel
 {
-	/**
-	 * Get the id for a given hostname
-	 * When empty, the current hostname is used
-	 *
-	 * @param string $hostname
-	 *
-	 * @return integer host name id
-	 * @throws \Exception
-	 */
-	public static function getId(string $hostname = '')
-	{
-		if (empty($hostname)) {
-			$hostname = php_uname('n');
-		}
 
-		$hostname = strtolower($hostname);
-
-		$host = DBA::selectFirst('host', ['id'], ['name' => $hostname]);
-		if (!empty($host['id'])) {
-			return $host['id'];
-		}
-
-		DBA::replace('host', ['name' => $hostname]);
-
-		$host = DBA::selectFirst('host', ['id'], ['name' => $hostname]);
-		if (empty($host['id'])) {
-			Logger::warning('Host name could not be inserted', ['name' => $hostname]);
-			return 0;
-		}
-
-		return $host['id'];
-	}
-
-	/**
-	 * Get the hostname for a given id
-	 *
-	 * @param int $id
-	 *
-	 * @return string host name
-	 * @throws \Exception
-	 */
-	public static function getName(int $id)
-	{
-		$host = DBA::selectFirst('host', ['name'], ['id' => $id]);
-		if (!empty($host['name'])) {
-			return $host['name'];
-		}
-
-		return '';
-	}
 }
