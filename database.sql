@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2021.09-dev (Siberian Iris)
--- DB_UPDATE_VERSION 1433
+-- DB_UPDATE_VERSION 1435
 -- ------------------------------------------
 
 
@@ -735,10 +735,13 @@ CREATE TABLE IF NOT EXISTS `locks` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`name` varchar(128) NOT NULL DEFAULT '' COMMENT '',
 	`locked` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'Process ID',
+	`pid` int unsigned NOT NULL DEFAULT 0 COMMENT 'The process id of the current worker',
+	`host-id` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'Host id',
 	`expires` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of cache expiration',
 	 PRIMARY KEY(`id`),
-	 INDEX `name_expires` (`name`,`expires`)
+	 INDEX `name_expires` (`name`,`expires`),
+	 INDEX `locked_hostid_pid_expires` (`locked`, `host-id`, `pid`, `expires`),
+		FOREIGN KEY (`host-id`) REFERENCES `host` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
