@@ -43,7 +43,7 @@ class DiasporaContact
 			return [];
 		}
 
-		$fetched_contact = false;
+		$fetched_contact = [];
 
 		if (empty($update)) {
 			if (is_null($update)) {
