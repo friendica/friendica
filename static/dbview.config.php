@@ -155,7 +155,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-user", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -332,7 +331,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-thread-user", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -495,7 +493,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -634,7 +631,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-thread", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -1000,7 +996,7 @@
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `contact`.`uri-id`
 			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = contact.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`
-			WHERE `contact`.`uid` = 0"			
+			WHERE `contact`.`uid` = 0"
 	],
 	"account-user-view" => [
 		"fields" => [
@@ -1171,5 +1167,34 @@
 		"query" => "FROM `profile_field`
 			INNER JOIN `permissionset` ON `permissionset`.`id` = `profile_field`.`psid`"
 	],
+	"diaspora-contact-view" => [
+		"fields" => [
+			"uri-id" => ["diaspora-contact", "uri-id"],
+			"url" => ["item-uri", "uri"],
+			"guid" => ["item-uri", "guid"],
+			"addr" => ["diaspora-contact", "addr"],
+			"alias" => ["diaspora-contact", "alias"],
+			"nick" => ["diaspora-contact", "nick"],
+			"name" => ["diaspora-contact", "name"],
+			"given-name" => ["diaspora-contact", "given-name"],
+			"family-name" => ["diaspora-contact", "family-name"],
+			"photo" => ["diaspora-contact", "photo"],
+			"photo-medium" => ["diaspora-contact", "photo-medium"],
+			"photo-small" => ["diaspora-contact", "photo-small"],
+			"batch" => ["diaspora-contact", "batch"],
+			"notify" => ["diaspora-contact", "notify"],
+			"poll" => ["diaspora-contact", "poll"],
+			"subscribe" => ["diaspora-contact", "subscribe"],
+			"searchable" => ["diaspora-contact", "searchable"],
+			"pubkey" => ["diaspora-contact", "pubkey"],
+			"baseurl" => ["diaspora-contact", "baseurl"],
+			"gsid" => ["diaspora-contact", "gsid"],
+			"updated" => ["diaspora-contact", "updated"],
+			"interacting_count" => ["diaspora-contact", "interacting_count"],
+			"interacted_count" => ["diaspora-contact", "interacted_count"],
+			"post_count" => ["diaspora-contact", "post_count"],
+		],
+		"query" => "FROM `diaspora-contact`
+			INNER JOIN `item-uri` ON `item-uri`.`id` = `diaspora-contact`.`uri-id`"
+	],
 ];
-

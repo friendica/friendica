@@ -22,6 +22,7 @@ Database Tables
 | [contact-relation](help/database/db_contact-relation) | Contact relations |
 | [conv](help/database/db_conv) | private messages |
 | [delayed-post](help/database/db_delayed-post) | Posts that are about to be distributed at a later time |
+| [diaspora-contact](help/database/db_diaspora-contact) | Diaspora compatible contacts - used in the Diaspora implementation |
 | [diaspora-interaction](help/database/db_diaspora-interaction) | Signed Diaspora Interaction |
 | [endpoint](help/database/db_endpoint) | ActivityPub endpoints - used in the ActivityPub implementation |
 | [event](help/database/db_event) | Events |

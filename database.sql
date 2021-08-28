@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2022.12-dev (Giant Rhubarb)
--- DB_UPDATE_VERSION 1490
+-- DB_UPDATE_VERSION 1491
 -- ------------------------------------------
 
 
@@ -562,6 +562,40 @@ CREATE TABLE IF NOT EXISTS `delayed-post` (
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`wid`) REFERENCES `workerqueue` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Posts that are about to be distributed at a later time';
+
+--
+-- TABLE diaspora-contact
+--
+CREATE TABLE IF NOT EXISTS `diaspora-contact` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the contact URL',
+	`addr` varchar(255) COMMENT '',
+	`alias` varchar(255) COMMENT '',
+	`nick` varchar(255) COMMENT '',
+	`name` varchar(255) COMMENT '',
+	`given-name` varchar(255) COMMENT '',
+	`family-name` varchar(255) COMMENT '',
+	`photo` varchar(255) COMMENT '',
+	`photo-medium` varchar(255) COMMENT '',
+	`photo-small` varchar(255) COMMENT '',
+	`batch` varchar(255) COMMENT '',
+	`notify` varchar(255) COMMENT '',
+	`poll` varchar(255) COMMENT '',
+	`subscribe` varchar(255) COMMENT '',
+	`searchable` boolean COMMENT '',
+	`pubkey` text COMMENT '',
+	`baseurl` varchar(255) COMMENT 'baseurl of the diaspora contact',
+	`gsid` int unsigned COMMENT 'Global Server ID',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`interacting_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts this contact interactes with',
+	`interacted_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts that interacted with this contact',
+	`post_count` int unsigned DEFAULT 0 COMMENT 'Number of posts and comments',
+	 PRIMARY KEY(`uri-id`),
+	 UNIQUE INDEX `addr` (`addr`),
+	 INDEX `alias` (`alias`),
+	 INDEX `gsid` (`gsid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Diaspora compatible contacts - used in the Diaspora implementation';
 
 --
 -- TABLE diaspora-interaction
@@ -2966,3 +3000,35 @@ CREATE VIEW `profile_field-view` AS SELECT
 	`profile_field`.`edited` AS `edited`
 	FROM `profile_field`
 			INNER JOIN `permissionset` ON `permissionset`.`id` = `profile_field`.`psid`;
+
+--
+-- VIEW diaspora-contact-view
+--
+DROP VIEW IF EXISTS `diaspora-contact-view`;
+CREATE VIEW `diaspora-contact-view` AS SELECT 
+	`diaspora-contact`.`uri-id` AS `uri-id`,
+	`item-uri`.`uri` AS `url`,
+	`item-uri`.`guid` AS `guid`,
+	`diaspora-contact`.`addr` AS `addr`,
+	`diaspora-contact`.`alias` AS `alias`,
+	`diaspora-contact`.`nick` AS `nick`,
+	`diaspora-contact`.`name` AS `name`,
+	`diaspora-contact`.`given-name` AS `given-name`,
+	`diaspora-contact`.`family-name` AS `family-name`,
+	`diaspora-contact`.`photo` AS `photo`,
+	`diaspora-contact`.`photo-medium` AS `photo-medium`,
+	`diaspora-contact`.`photo-small` AS `photo-small`,
+	`diaspora-contact`.`batch` AS `batch`,
+	`diaspora-contact`.`notify` AS `notify`,
+	`diaspora-contact`.`poll` AS `poll`,
+	`diaspora-contact`.`subscribe` AS `subscribe`,
+	`diaspora-contact`.`searchable` AS `searchable`,
+	`diaspora-contact`.`pubkey` AS `pubkey`,
+	`diaspora-contact`.`baseurl` AS `baseurl`,
+	`diaspora-contact`.`gsid` AS `gsid`,
+	`diaspora-contact`.`updated` AS `updated`,
+	`diaspora-contact`.`interacting_count` AS `interacting_count`,
+	`diaspora-contact`.`interacted_count` AS `interacted_count`,
+	`diaspora-contact`.`post_count` AS `post_count`
+	FROM `diaspora-contact`
+			INNER JOIN `item-uri` ON `item-uri`.`id` = `diaspora-contact`.`uri-id`;

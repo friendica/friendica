@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1490);
+	define('DB_UPDATE_VERSION', 1491);
 }
 
 return [
@@ -622,6 +622,39 @@ return [
 			"PRIMARY" => ["id"],
 			"uid_uri" => ["UNIQUE", "uid", "uri(190)"],
 			"wid" => ["wid"],
+		]
+	],
+	"diaspora-contact" => [
+		"comment" => "Diaspora compatible contacts - used in the Diaspora implementation",
+		"fields" => [
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the contact URL"],
+			"addr" => ["type" => "varchar(255)", "comment" => ""],
+			"alias" => ["type" => "varchar(255)", "comment" => ""],
+			"nick" => ["type" => "varchar(255)", "comment" => ""],
+			"name" => ["type" => "varchar(255)", "comment" => ""],
+			"given-name" => ["type" => "varchar(255)", "comment" => ""],
+			"family-name" => ["type" => "varchar(255)", "comment" => ""],
+			"photo" => ["type" => "varchar(255)", "comment" => ""],
+			"photo-medium" => ["type" => "varchar(255)", "comment" => ""],
+			"photo-small" => ["type" => "varchar(255)", "comment" => ""],
+			"batch" => ["type" => "varchar(255)", "comment" => ""],
+			"notify" => ["type" => "varchar(255)", "comment" => ""],
+			"poll" => ["type" => "varchar(255)", "comment" => ""],
+			"subscribe" => ["type" => "varchar(255)", "comment" => ""],
+			"searchable" => ["type" => "boolean", "comment" => ""],
+			"pubkey" => ["type" => "text", "comment" => ""],
+			"baseurl" => ["type" => "varchar(255)", "comment" => "baseurl of the diaspora contact"],
+			"gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id", "on delete" => "restrict"], "comment" => "Global Server ID"],
+			"updated" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"interacting_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of contacts this contact interactes with"],
+			"interacted_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of contacts that interacted with this contact"],
+			"post_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of posts and comments"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["uri-id"],
+			"addr" => ["UNIQUE", "addr"],
+			"alias" => ["alias"],
+			"gsid" => ["gsid"],
 		]
 	],
 	"diaspora-interaction" => [
