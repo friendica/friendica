@@ -39,7 +39,7 @@ class DiasporaContact
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function getByURL(string $url, bool $update = null):array
+	public static function getByURL(string $url, bool $update = null): array
 	{
 		if (empty($url)) {
 			return [];
