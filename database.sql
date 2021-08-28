@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2021.09-dev (Siberian Iris)
--- DB_UPDATE_VERSION 1434
+-- DB_UPDATE_VERSION 1435
 -- ------------------------------------------
 
 
@@ -519,6 +519,40 @@ CREATE TABLE IF NOT EXISTS `workerqueue` (
 	 INDEX `done_pid_retrial` (`done`,`pid`,`retrial`),
 	 INDEX `done_pid_priority_created` (`done`,`pid`,`priority`,`created`)
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Background tasks queue entries';
+
+--
+-- TABLE dcontact
+--
+CREATE TABLE IF NOT EXISTS `dcontact` (
+	`url` varbinary(255) NOT NULL COMMENT 'URL of the contact',
+	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the dcontact url',
+	`guid` varbinary(255) COMMENT 'unique id',
+	`addr` varchar(255) COMMENT '',
+	`alias` varchar(255) COMMENT '',
+	`nick` varchar(255) COMMENT '',
+	`name` varchar(255) COMMENT '',
+	`given-name` varchar(255) COMMENT '',
+	`family-name` varchar(255) COMMENT '',
+	`photo` varchar(255) COMMENT '',
+	`photo-medium` varchar(255) COMMENT '',
+	`photo-small` varchar(255) COMMENT '',
+	`batch` varchar(255) COMMENT '',
+	`notify` varchar(255) COMMENT '',
+	`poll` varchar(255) COMMENT '',
+	`subscribe` varchar(255) COMMENT '',
+	`searchable` boolean COMMENT '',
+	`pubkey` text COMMENT '',
+	`baseurl` varchar(255) COMMENT 'baseurl of the diaspora contact',
+	`gsid` int unsigned COMMENT 'Global Server ID',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	 PRIMARY KEY(`url`),
+	 INDEX `addr` (`addr`(32)),
+	 INDEX `gsid` (`gsid`),
+	 UNIQUE INDEX `uri-id` (`uri-id`),
+	 UNIQUE INDEX `guid` (`guid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Diaspora compatible contacts - used in the Diaspora implementation';
 
 --
 -- TABLE delayed-post

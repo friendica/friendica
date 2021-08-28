@@ -88,7 +88,8 @@ class Probe
 	 */
 	private static function rearrangeData($data)
 	{
-		$fields = ["name", "nick", "guid", "url", "addr", "alias", "photo", "header",
+		$fields = ["name", "given_name", "family_name", "nick", "guid", "url", "addr", "alias",
+				"photo", "photo_medium", "photo_small", "header",
 				"account-type", "community", "keywords", "location", "about", "xmpp", "matrix",
 				"hide", "batch", "notify", "poll", "request", "confirm", "subscribe", "poco",
 				"following", "followers", "inbox", "outbox", "sharedinbox",
@@ -102,7 +103,7 @@ class Probe
 				if (in_array($field, $numeric_fields)) {
 					$newdata[$field] = (int)$data[$field];
 				} else {	
-					$newdata[$field] = $data[$field];
+					$newdata[$field] = trim($data[$field]);
 				}
 			} elseif (!in_array($field, $numeric_fields)) {
 				$newdata[$field] = "";
@@ -738,19 +739,19 @@ class Probe
 
 		$result = [];
 
-		if (in_array($network, ["", Protocol::DFRN])) {
+		if (in_array($network, ['', Protocol::DFRN])) {
 			$result = self::dfrn($webfinger);
 		}
-		if ((!$result && ($network == "")) || ($network == Protocol::DIASPORA)) {
+		if (!$result && in_array($network, ['', Protocol::DIASPORA])) {
 			$result = self::diaspora($webfinger);
 		}
-		if ((!$result && ($network == "")) || ($network == Protocol::OSTATUS)) {
+		if (!$result && in_array($network, ['', Protocol::OSTATUS])) {
 			$result = self::ostatus($webfinger);
 		}
 		if (in_array($network, ['', Protocol::ZOT])) {
 			$result = self::zot($webfinger, $result, $baseurl);
 		}
-		if ((!$result && ($network == "")) || ($network == Protocol::PUMPIO)) {
+		if (!$result && in_array($network, ['', Protocol::PUMPIO])) {
 			$result = self::pumpio($webfinger, $addr);
 		}
 		if (empty($result['network']) && empty($ap_profile['network']) || ($network == Protocol::FEED)) {
@@ -1321,9 +1322,19 @@ class Probe
 				$data["name"] = $search->item(0)->nodeValue;
 			}
 
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' given_name ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["given_name"] = $search->item(0)->nodeValue;
+			}
+
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' family_name ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["family_name"] = $search->item(0)->nodeValue;
+			}
+
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
 			if ($search->length > 0) {
-				$data["searchable"] = $search->item(0)->nodeValue;
+				$data["hide"] = (strtolower($search->item(0)->nodeValue) != 'true');
 			}
 
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
@@ -1350,20 +1361,26 @@ class Probe
 				}
 
 				if (isset($attr["src"]) && isset($attr["width"])) {
-					$avatar[$attr["width"]] = $attr["src"];
+					$avatar[$attr["width"]] = self::fixAvatar($attr["src"], $data["baseurl"]);
 				}
 
 				// We don't have a width. So we just take everything that we got.
 				// This is a Hubzilla workaround which doesn't send a width.
 				if ((sizeof($avatar) == 0) && !empty($attr["src"])) {
-					$avatar[] = $attr["src"];
+					$avatar[] = self::fixAvatar($attr["src"], $data["baseurl"]);
 				}
 			}
 		}
 
 		if (sizeof($avatar)) {
 			ksort($avatar);
-			$data["photo"] = self::fixAvatar(array_pop($avatar), $data["baseurl"]);
+			$data["photo"] = array_pop($avatar);
+			if ($avatar) {
+				$data["photo_medium"] = array_pop($avatar);
+			}
+			if ($avatar) {
+				$data["photo_small"] = array_pop($avatar);
+			}
 		}
 
 		if ($dfrn) {

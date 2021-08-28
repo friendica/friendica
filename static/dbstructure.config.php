@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1434);
+	define('DB_UPDATE_VERSION', 1435);
 }
 
 return [
@@ -581,6 +581,39 @@ return [
 			"done_pid_next_try" => ["done", "pid", "next_try"],
 			"done_pid_retrial" => ["done", "pid", "retrial"],
 			"done_pid_priority_created" => ["done", "pid", "priority", "created"]
+		]
+	],
+	"dcontact" => [
+		"comment" => "Diaspora compatible contacts - used in the Diaspora implementation",
+		"fields" => [
+			"url" => ["type" => "varbinary(255)", "not null" => "1", "primary" => "1", "comment" => "URL of the contact"],
+			"uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the dcontact url"],
+			"guid" => ["type" => "varbinary(255)", "comment" => "unique id"],
+			"addr" => ["type" => "varchar(255)", "comment" => ""],
+			"alias" => ["type" => "varchar(255)", "comment" => ""],
+			"nick" => ["type" => "varchar(255)", "comment" => ""],
+			"name" => ["type" => "varchar(255)", "comment" => ""],
+			"given-name" => ["type" => "varchar(255)", "comment" => ""],
+			"family-name" => ["type" => "varchar(255)", "comment" => ""],
+			"photo" => ["type" => "varchar(255)", "comment" => ""],
+			"photo-medium" => ["type" => "varchar(255)", "comment" => ""],
+			"photo-small" => ["type" => "varchar(255)", "comment" => ""],
+			"batch" => ["type" => "varchar(255)", "comment" => ""],
+			"notify" => ["type" => "varchar(255)", "comment" => ""],
+			"poll" => ["type" => "varchar(255)", "comment" => ""],
+			"subscribe" => ["type" => "varchar(255)", "comment" => ""],
+			"searchable" => ["type" => "boolean", "comment" => ""],
+			"pubkey" => ["type" => "text", "comment" => ""],
+			"baseurl" => ["type" => "varchar(255)", "comment" => "baseurl of the diaspora contact"],
+			"gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id", "on delete" => "restrict"], "comment" => "Global Server ID"],
+			"updated" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+		],
+		"indexes" => [
+			"PRIMARY" => ["url"],
+			"addr" => ["addr(32)"],
+			"gsid" => ["gsid"],
+			"uri-id" => ["UNIQUE", "uri-id"],
+			"guid" => ["UNIQUE", "guid"],
 		]
 	],
 	"delayed-post" => [

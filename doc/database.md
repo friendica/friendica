@@ -19,6 +19,7 @@ Database Tables
 | [contact-relation](help/database/db_contact-relation) | Contact relations |
 | [conv](help/database/db_conv) | private messages |
 | [conversation](help/database/db_conversation) | Raw data and structure information for messages |
+| [dcontact](help/database/db_dcontact) | Diaspora compatible contacts - used in the Diaspora implementation |
 | [delayed-post](help/database/db_delayed-post) | Posts that are about to be distributed at a later time |
 | [diaspora-interaction](help/database/db_diaspora-interaction) | Signed Diaspora Interaction |
 | [event](help/database/db_event) | Events |
