@@ -72,7 +72,7 @@ class Salmon
 						$ret[$x] = substr($ret[$x], 5);
 					}
 				} elseif (Strings::normaliseLink($ret[$x]) == 'http://') {
-					$ret[$x] = DI::httpRequest()->fetch($ret[$x]);
+					$ret[$x] = DI::httpClient()->fetch($ret[$x]);
 				}
 			}
 		}
@@ -155,9 +155,9 @@ class Salmon
 		$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 		// slap them
-		$postResult = DI::httpRequest()->post($url, $salmon, [
-			'Content-type: application/magic-envelope+xml',
-			'Content-length: ' . strlen($salmon)
+		$postResult = DI::httpClient()->post($url, $salmon, [
+			'Content-type' => 'application/magic-envelope+xml',
+			'Content-length' => strlen($salmon),
 		]);
 
 		$return_code = $postResult->getReturnCode();
@@ -180,9 +180,9 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			$postResult = DI::httpRequest()->post($url, $salmon, [
-				'Content-type: application/magic-envelope+xml',
-				'Content-length: ' . strlen($salmon)
+			$postResult = DI::httpClient()->post($url, $salmon, [
+				'Content-type' => 'application/magic-envelope+xml',
+				'Content-length' => strlen($salmon),
 			]);
 			$return_code = $postResult->getReturnCode();
 		}
@@ -203,9 +203,9 @@ class Salmon
 			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
 
 			// slap them
-			$postResult = DI::httpRequest()->post($url, $salmon, [
-				'Content-type: application/magic-envelope+xml',
-				'Content-length: ' . strlen($salmon)]);
+			$postResult = DI::httpClient()->post($url, $salmon, [
+				'Content-type' => 'application/magic-envelope+xml',
+				'Content-length' => strlen($salmon)]);
 			$return_code = $postResult->getReturnCode();
 		}
 

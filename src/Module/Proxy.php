@@ -75,7 +75,7 @@ class Proxy extends BaseModule
 		$request['url'] = str_replace(' ', '+', $request['url']);
 
 		// Fetch the content with the local user
-		$fetchResult = HTTPSignature::fetchRaw($request['url'], local_user(), ['accept_content' => '', 'timeout' => 10]);
+		$fetchResult = HTTPSignature::fetchRaw($request['url'], local_user(), ['accept_content' => [], 'timeout' => 10]);
 		$img_str = $fetchResult->getBody();
 
 		if (!$fetchResult->isSuccess() || empty($img_str)) {

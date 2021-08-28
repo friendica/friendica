@@ -35,7 +35,7 @@ class UpdateServerPeers
 	 */
 	public static function execute(string $url)
 	{
-		$ret = DI::httpRequest()->get($url . '/api/v1/instance/peers');
+		$ret = DI::httpClient()->get($url . '/api/v1/instance/peers');
 		if (!$ret->isSuccess() || empty($ret->getBody())) {
 			Logger::info('Server is not reachable or does not offer the "peers" endpoint', ['url' => $url]);
 			return;

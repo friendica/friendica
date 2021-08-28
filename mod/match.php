@@ -83,7 +83,7 @@ function match_content(App $a)
 			continue;
 		}
 
-		$msearch = json_decode(DI::httpRequest()->post($server . '/msearch', $params)->getBody());
+		$msearch = json_decode(DI::httpClient()->post($server . '/msearch', $params)->getBody());
 		if (!empty($msearch)) {
 			$entries = match_get_contacts($msearch, $entries, $limit);
 		}

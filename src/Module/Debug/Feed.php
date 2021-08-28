@@ -48,7 +48,7 @@ class Feed extends BaseModule
 
 			$contact = Model\Contact::getByURLForUser($url, local_user(), null);
 
-			$xml = DI::httpRequest()->fetch($contact['poll']);
+			$xml = DI::httpClient()->fetch($contact['poll']);
 
 			$import_result = Protocol\Feed::import($xml);
 

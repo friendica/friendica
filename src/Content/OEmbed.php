@@ -97,7 +97,7 @@ class OEmbed
 
 			if (!in_array($ext, $noexts)) {
 				// try oembed autodiscovery
-				$html_text = DI::httpRequest()->fetch($embedurl, 15, 'text/*');
+				$html_text = DI::httpClient()->fetch($embedurl, 15, 'text/*');
 				if (!empty($html_text)) {
 					$dom = new DOMDocument();
 					if (@$dom->loadHTML($html_text)) {
@@ -111,7 +111,7 @@ class OEmbed
 							// but their OEmbed endpoint is only accessible by HTTPS ¯\_(ツ)_/¯
 							$href = str_replace(['http://www.youtube.com/', 'http://player.vimeo.com/'],
 								['https://www.youtube.com/', 'https://player.vimeo.com/'], $href);
-							$result = DI::httpRequest()->fetchFull($href . '&maxwidth=' . $a->getThemeInfoValue('videowidth'));
+							$result = DI::httpClient()->fetchFull($href . '&maxwidth=' . $a->getThemeInfoValue('videowidth'));
 							if ($result->getReturnCode() === 200) {
 								$json_string = $result->getBody();
 								break;

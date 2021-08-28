@@ -26,7 +26,7 @@ use Dice\Dice;
 use Friendica\Core\Config\Cache;
 use Friendica\DI;
 use Friendica\Network\IHTTPResult;
-use Friendica\Network\IHTTPRequest;
+use Friendica\Network\IHTTPClient;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;
 use Mockery;
@@ -331,7 +331,7 @@ class InstallerTest extends MockedTest
 			->andReturn('test Error');
 
 		// Mocking the CURL Request
-		$networkMock = Mockery::mock(IHTTPRequest::class);
+		$networkMock = Mockery::mock(IHTTPClient::class);
 		$networkMock
 			->shouldReceive('fetchFull')
 			->with('https://test/install/testrewrite')
@@ -342,7 +342,7 @@ class InstallerTest extends MockedTest
 			->andReturn($IHTTPResult);
 
 		$this->dice->shouldReceive('create')
-		     ->with(IHTTPRequest::class)
+		     ->with(IHTTPClient::class)
 		     ->andReturn($networkMock);
 
 		DI::init($this->dice);
@@ -378,7 +378,7 @@ class InstallerTest extends MockedTest
 			->andReturn('204');
 
 		// Mocking the CURL Request
-		$networkMock = Mockery::mock(IHTTPRequest::class);
+		$networkMock = Mockery::mock(IHTTPClient::class);
 		$networkMock
 			->shouldReceive('fetchFull')
 			->with('https://test/install/testrewrite')
@@ -389,7 +389,7 @@ class InstallerTest extends MockedTest
 			->andReturn($IHTTPResultW);
 
 		$this->dice->shouldReceive('create')
-		           ->with(IHTTPRequest::class)
+		           ->with(IHTTPClient::class)
 		           ->andReturn($networkMock);
 
 		DI::init($this->dice);

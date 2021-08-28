@@ -69,7 +69,8 @@
 		"npm-asset/perfect-scrollbar": "0.6.16",
 		"npm-asset/textcomplete": "^0.18.2",
 		"npm-asset/typeahead.js": "^0.11.1",
-		"minishlink/web-push": "^6.0"
+		"minishlink/web-push": "^6.0",
+		"mattwright/urlresolver": "^2.0"
 	},
 	"repositories": [
 		{

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d6dee6e449da931e8fe209e61b2e78e",
+    "content-hash": "c9e0a9eacc23d884012042eeab01cc8b",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1132,6 +1132,52 @@
                 "laravel"
             ],
             "time": "2017-07-19T15:11:19+00:00"
+        },
+        {
+            "name": "mattwright/urlresolver",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mattwright/URLResolver.php.git",
+                "reference": "416039192cb6d9158bdacd68349bceff8739b857"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mattwright/URLResolver.php/zipball/416039192cb6d9158bdacd68349bceff8739b857",
+                "reference": "416039192cb6d9158bdacd68349bceff8739b857",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "mattwright\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Wright",
+                    "email": "mw@mattwright.com"
+                }
+            ],
+            "description": "PHP class that attempts to resolve URLs to a final, canonical link.",
+            "homepage": "https://github.com/mattwright/URLResolver.php",
+            "keywords": [
+                "canonical",
+                "link",
+                "redirect",
+                "resolve",
+                "url"
+            ],
+            "time": "2019-01-18T00:59:34+00:00"
         },
         {
             "name": "michelf/php-markdown",

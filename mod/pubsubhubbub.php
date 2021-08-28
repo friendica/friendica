@@ -125,7 +125,7 @@ function pubsubhubbub_init(App $a) {
 		$hub_callback = rtrim($hub_callback, ' ?&#');
 		$separator = parse_url($hub_callback, PHP_URL_QUERY) === null ? '?' : '&';
 
-		$fetchResult = DI::httpRequest()->fetchFull($hub_callback . $separator . $params);
+		$fetchResult = DI::httpClient()->fetchFull($hub_callback . $separator . $params);
 		$body = $fetchResult->getBody();
 		$ret = $fetchResult->getReturnCode();
 

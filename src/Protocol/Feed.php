@@ -297,7 +297,7 @@ class Feed
 
 			$orig_plink = $item["plink"];
 
-			$item["plink"] = DI::httpRequest()->finalUrl($item["plink"]);
+			$item["plink"] = DI::httpClient()->finalUrl($item["plink"]);
 
 			$item["title"] = XML::getFirstNodeValue($xpath, 'atom:title/text()', $entry);
 

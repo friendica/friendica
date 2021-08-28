@@ -1098,7 +1098,7 @@ class User
 			$photo_failure = false;
 
 			$filename = basename($photo);
-			$curlResult = DI::httpRequest()->get($photo);
+			$curlResult = DI::httpClient()->get($photo);
 			if ($curlResult->isSuccess()) {
 				$img_str = $curlResult->getBody();
 				$type = $curlResult->getContentType();

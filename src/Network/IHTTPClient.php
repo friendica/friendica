@@ -24,7 +24,7 @@ namespace Friendica\Network;
 /**
  * Interface for calling HTTP requests and returning their responses
  */
-interface IHTTPRequest
+interface IHTTPClient
 {
 	/**
 	 * Fetches the content of an URL
@@ -60,8 +60,8 @@ interface IHTTPRequest
 	 * Send a HEAD to an URL.
 	 *
 	 * @param string $url        URL to fetch
-	 * @param array  $opts       (optional parameters) assoziative array with:
-	 *                           'accept_content' => supply Accept: header with 'accept_content' as the value
+	 * @param array  $opts       (optional parameters) associative array with:
+	 *                           'accept_content' => (string array) supply Accept: header with 'accept_content' as the value
 	 *                           'timeout' => int Timeout in seconds, default system config value or 60 seconds
 	 *                           'cookiejar' => path to cookie jar file
 	 *                           'header' => header array
@@ -74,8 +74,8 @@ interface IHTTPRequest
 	 * Send a GET to an URL.
 	 *
 	 * @param string $url        URL to fetch
-	 * @param array  $opts       (optional parameters) assoziative array with:
-	 *                           'accept_content' => supply Accept: header with 'accept_content' as the value
+	 * @param array  $opts       (optional parameters) associative array with:
+	 *                           'accept_content' => (string array) supply Accept: header with 'accept_content' as the value
 	 *                           'timeout' => int Timeout in seconds, default system config value or 60 seconds
 	 *                           'cookiejar' => path to cookie jar file
 	 *                           'header' => header array
@@ -84,6 +84,24 @@ interface IHTTPRequest
 	 * @return IHTTPResult
 	 */
 	public function get(string $url, array $opts = []);
+
+	/**
+	 * Sends a HTTP request to a given url
+	 *
+	 * @param string $method A HTTP request
+	 * @param string $url    Url to send to
+	 * @param array  $opts   (optional parameters) associative array with:
+	 *                       	 'body' => (mixed) setting the body for sending data
+	 *                           'accept_content' => (string array) supply Accept: header with 'accept_content' as the value
+	 *                           'timeout' => int Timeout in seconds, default system config value or 60 seconds
+	 *                           'cookiejar' => path to cookie jar file
+	 *                           'header' => header array
+	 *                           'content_length' => int maximum File content length
+	 *                           'auth' => array authentication settings
+	 *
+	 * @return IHTTPResult
+	 */
+	public function request(string $method, string $url, array $opts = []);
 
 	/**
 	 * Send POST request to an URL
@@ -104,21 +122,9 @@ interface IHTTPRequest
 	 * through HTTP code or meta refresh tags. Stops after 10 redirections.
 	 *
 	 * @param string $url       A user-submitted URL
-	 * @param int    $depth     The current redirection recursion level (internal)
-	 * @param bool   $fetchbody Wether to fetch the body or not after the HEAD requests
 	 *
 	 * @return string A canonical URL
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 * @see   ParseUrl::getSiteinfo
-	 *
-	 * @todo  Remove the $fetchbody parameter that generates an extraneous HEAD request
 	 */
-	public function finalUrl(string $url, int $depth = 1, bool $fetchbody = false);
-
-	/**
-	 * Returns the current UserAgent as a String
-	 *
-	 * @return string the UserAgent as a String
-	 */
-	public function getUserAgent();
+	public function finalUrl(string $url);
 }

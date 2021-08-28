@@ -59,15 +59,16 @@ class PubSubPublish
 
 		$hmac_sig = hash_hmac("sha1", $params, $subscriber['secret']);
 
-		$headers = ["Content-type: application/atom+xml",
-				sprintf("Link: <%s>;rel=hub,<%s>;rel=self",
+		$headers = [
+			'Content-type' => 'application/atom+xml',
+			'Link' => sprintf("<%s>;rel=hub,<%s>;rel=self",
 					DI::baseUrl() . '/pubsubhubbub/' . $subscriber['nickname'],
 					$subscriber['topic']),
-				"X-Hub-Signature: sha1=" . $hmac_sig];
+			'X-Hub-Signature' => 'sha1=' . $hmac_sig];
 
 		Logger::log('POST ' . print_r($headers, true) . "\n" . $params, Logger::DATA);
 
-		$postResult = DI::httpRequest()->post($subscriber['callback_url'], $params, $headers);
+		$postResult = DI::httpClient()->post($subscriber['callback_url'], $params, $headers);
 		$ret = $postResult->getReturnCode();
 
 		if ($ret >= 200 && $ret <= 299) {

@@ -47,7 +47,7 @@ class PullDirectory
 
 		Logger::info('Synchronization started.', ['now' => $now, 'directory' => $directory]);
 
-		$result = DI::httpRequest()->fetch($directory . '/sync/pull/since/' . $now);
+		$result = DI::httpClient()->fetch($directory . '/sync/pull/since/' . $now);
 		if (empty($result)) {
 			Logger::info('Directory server return empty result.', ['directory' => $directory]);
 			return;

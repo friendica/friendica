@@ -28,6 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
+use Friendica\Network\HTTPClientOptions;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Strings;
 
@@ -88,9 +89,10 @@ class Magic extends BaseModule
 			$exp = explode('/profile/', $contact['url']);
 			$basepath = $exp[0];
 
-			$header = [];
-			$header['Accept'] = 'application/x-dfrn+json, application/x-zot+json';
-			$header['X-Open-Web-Auth'] = Strings::getRandomHex();
+			$header = [
+				'Accept'		  => ['application/x-dfrn+json', 'application/x-zot+json'],
+				'X-Open-Web-Auth' => [Strings::getRandomHex()],
+			];
 
 			// Create a header that is signed with the local users private key.
 			$header = HTTPSignature::createSig(
@@ -100,7 +102,7 @@ class Magic extends BaseModule
 			);
 
 			// Try to get an authentication token from the other instance.
-			$curlResult = DI::httpRequest()->get($basepath . '/owa', ['header' => $header]);
+			$curlResult = DI::httpClient()->get($basepath . '/owa', [HTTPClientOptions::HEADERS => $header]);
 
 			if ($curlResult->isSuccess()) {
 				$j = json_decode($curlResult->getBody(), true);

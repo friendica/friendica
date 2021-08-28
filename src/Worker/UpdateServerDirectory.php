@@ -45,7 +45,7 @@ class UpdateServerDirectory
 
 	private static function discoverPoCo(array $gserver)
 	{
-		$result = DI::httpRequest()->fetch($gserver['poco'] . '?fields=urls');
+		$result = DI::httpClient()->fetch($gserver['poco'] . '?fields=urls');
 		if (empty($result)) {
 			Logger::info('Empty result', ['url' => $gserver['url']]);
 			return;
@@ -78,7 +78,7 @@ class UpdateServerDirectory
 
 	private static function discoverMastodonDirectory(array $gserver)
 	{		
-		$result = DI::httpRequest()->fetch($gserver['url'] . '/api/v1/directory?order=new&local=true&limit=200&offset=0');
+		$result = DI::httpClient()->fetch($gserver['url'] . '/api/v1/directory?order=new&local=true&limit=200&offset=0');
 		if (empty($result)) {
 			Logger::info('Empty result', ['url' => $gserver['url']]);
 			return;

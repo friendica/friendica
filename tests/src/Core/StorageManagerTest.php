@@ -34,7 +34,7 @@ use Friendica\Factory\ConfigFactory;
 use Friendica\Model\Config\Config;
 use Friendica\Model\Storage;
 use Friendica\Core\Session;
-use Friendica\Network\HTTPRequest;
+use Friendica\Network\HTTPClient;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;
@@ -55,7 +55,7 @@ class StorageManagerTest extends DatabaseTest
 	private $logger;
 	/** @var L10n */
 	private $l10n;
-	/** @var HTTPRequest */
+	/** @var HTTPClient */
 	private $httpRequest;
 
 	protected function setUp(): void
@@ -84,7 +84,7 @@ class StorageManagerTest extends DatabaseTest
 
 		$this->l10n = \Mockery::mock(L10n::class);
 
-		$this->httpRequest = \Mockery::mock(HTTPRequest::class);
+		$this->httpRequest = \Mockery::mock(HTTPClient::class);
 	}
 
 	/**

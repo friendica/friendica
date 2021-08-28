@@ -220,8 +220,11 @@ return [
 			['getBackend', [], Dice::CHAIN_CALL],
 		],
 	],
-	Network\IHTTPRequest::class => [
-		'instanceOf' => Network\HTTPRequest::class,
+	Network\IHTTPClient::class => [
+		'instanceOf' => Factory\HTTPClientFactory::class,
+		'call'       => [
+			['createClient', [], Dice::CHAIN_CALL],
+		],
 	],
 	Factory\Api\Mastodon\Error::class => [
 		'constructParams' => [
@@ -232,5 +235,5 @@ return [
 		'constructParams' => [
 			[Dice::INSTANCE => Util\ReversedFileReader::class],
 		]
-	]
+	],
 ];

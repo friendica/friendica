@@ -1077,7 +1077,7 @@ class Diaspora
 
 		Logger::log("Fetch post from ".$source_url, Logger::DEBUG);
 
-		$envelope = DI::httpRequest()->fetch($source_url);
+		$envelope = DI::httpClient()->fetch($source_url);
 		if ($envelope) {
 			Logger::log("Envelope was fetched.", Logger::DEBUG);
 			$x = self::verifyMagicEnvelope($envelope);
@@ -3022,7 +3022,7 @@ class Diaspora
 		if (!intval(DI::config()->get("system", "diaspora_test"))) {
 			$content_type = (($public_batch) ? "application/magic-envelope+xml" : "application/json");
 
-			$postResult = DI::httpRequest()->post($dest_url . "/", $envelope, ["Content-Type: " . $content_type]);
+			$postResult = DI::httpClient()->post($dest_url . "/", $envelope, ['Content-Type' => $content_type]);
 			$return_code = $postResult->getReturnCode();
 		} else {
 			Logger::log("test_mode");
@@ -3933,7 +3933,7 @@ class Diaspora
 			$dob = '';
 
 			if ($profile['dob'] && ($profile['dob'] > '0000-00-00')) {
-				list($year, $month, $day) = sscanf($profile['dob'], '%4d-%2d-%2d');
+				[$year, $month, $day] = sscanf($profile['dob'], '%4d-%2d-%2d');
 				if ($year < 1004) {
 					$year = 1004;
 				}

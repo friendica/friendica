@@ -30,6 +30,7 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPClientOptions;
 
 /**
  * Get information about a given URL
@@ -58,7 +59,7 @@ class ParseUrl
 	 */
 	public static function getContentType(string $url)
 	{
-		$curlResult = DI::httpRequest()->head($url);
+		$curlResult = DI::httpClient()->head($url);
 		if (!$curlResult->isSuccess()) {
 			return [];
 		}
@@ -213,7 +214,7 @@ class ParseUrl
 			return $siteinfo;
 		}
 
-		$curlResult = DI::httpRequest()->get($url, ['content_length' => 1000000]);
+		$curlResult = DI::httpClient()->get($url, [HTTPClientOptions::CONTENT_LENGTH => 1000000]);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
 			return $siteinfo;
 		}

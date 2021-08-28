@@ -193,7 +193,7 @@ class Images
 		}
 
 		if (empty($img_str)) {
-			$img_str = DI::httpRequest()->fetch($url, 4);
+			$img_str = DI::httpClient()->fetch($url, 4);
 		}
 
 		if (!$img_str) {
