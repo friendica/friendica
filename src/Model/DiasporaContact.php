@@ -36,8 +36,6 @@ class DiasporaContact
 	 * @param string  $url    profile url
 	 * @param boolean $update true = always update, false = never update, null = update when not found or outdated
 	 * @return array profile array
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 * @throws \ImagickException
 	 */
 	public static function getByURL(string $url, bool $update = null): array
 	{
@@ -76,12 +74,23 @@ class DiasporaContact
 			}
 		}
 
-		$dcontact = [];
-
 		$data = Probe::uri($url, Protocol::DIASPORA);
 		if (empty($data) || ($data['network'] == Protocol::PHANTOM)) {
 			return $fetched_contact;
 		}
+		self::updateFromProbeArray($data);
+
+		return DBA::selectFirst('dcontact', [], ['url' => $data['url']]) ?: [];
+	}
+
+	/**
+	 * Update or create a dcontact entry via a probe array
+	 * @param array $data Probe array
+	 * @return void
+	 */
+	public static function updateFromProbeArray(array $data)
+	{
+		$dcontact = [];
 
 		$dcontact['url']          = $data['url'];
 		$dcontact['guid']         = $data['guid'];
@@ -120,9 +129,7 @@ class DiasporaContact
 			DBA::replace('dcontact', $dcontact);
 		}
 
-		Logger::info('Updated profile', ['url' => $url]);
-
-		return DBA::selectFirst('dcontact', [], ['url' => $dcontact['url']]) ?: [];
+		Logger::info('Updated profile', ['url' => $dcontact['url']]);
 	}
 
 	/**

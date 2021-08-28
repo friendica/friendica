@@ -2092,6 +2092,10 @@ class Contact
 			return true;
 		}
 
+		if ($ret['network'] == Protocol::DIASPORA) {
+			DiasporaContact::updateFromProbeArray($ret);
+		}
+
 		$uid = $contact['uid'];
 		unset($contact['uid']);
 
