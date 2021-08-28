@@ -42,7 +42,7 @@ class FContact
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function getByURL($handle, $update = null, $network = Protocol::DIASPORA)
+	private static function getByURL($handle, $update = null, $network = Protocol::DIASPORA)
 	{
 		$person = DBA::selectFirst('fcontact', [], ['network' => $network, 'addr' => $handle]);
 		if (!DBA::isResult($person)) {
@@ -106,32 +106,6 @@ class FContact
 		$condition = ['url' => $arr["url"], 'network' => $arr["network"]];
 
 		DBA::update('fcontact', $fields, $condition, true);
-	}
-
-	/**
-	 * get a url (scheme://domain.tld/u/user) from a given Diaspora*
-	 * fcontact guid
-	 *
-	 * @param mixed $fcontact_guid Hexadecimal string guid
-	 *
-	 * @return string the contact url or null
-	 * @throws \Exception
-	 */
-	public static function getUrlByGuid($fcontact_guid)
-	{
-		Logger::info('fcontact', ['guid' => $fcontact_guid]);
-
-		$r = q(
-			"SELECT `url` FROM `fcontact` WHERE `url` != '' AND `network` = '%s' AND `guid` = '%s'",
-			DBA::escape(Protocol::DIASPORA),
-			DBA::escape($fcontact_guid)
-		);
-
-		if (DBA::isResult($r)) {
-			return $r[0]['url'];
-		}
-
-		return null;
 	}
 
 	/**

@@ -33,7 +33,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
-use Friendica\Model\FContact;
+use Friendica\Model\DiasporaContact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -749,7 +749,7 @@ class Diaspora
 
 		Logger::log("Fetching diaspora key for: ".$handle);
 
-		$r = FContact::getByURL($handle);
+		$r = DiasporaContact::getByURL($handle);
 		if ($r) {
 			return $r["pubkey"];
 		}
@@ -832,7 +832,7 @@ class Diaspora
 	 */
 	public static function isSupportedByContactUrl($url, $update = null)
 	{
-		return !empty(FContact::getByURL($url, $update));
+		return !empty(DiasporaContact::getByURL($url, $update));
 	}
 
 	/**
@@ -984,7 +984,7 @@ class Diaspora
 				// 0 => '[url=/people/0123456789abcdef]Foo Bar[/url]'
 				// 1 => '0123456789abcdef'
 				// 2 => 'Foo Bar'
-				$handle = FContact::getUrlByGuid($match[1]);
+				$handle = DiasporaContact::getUrlByGuid($match[1]);
 
 				if ($handle) {
 					$return = '@[url='.$handle.']'.$match[2].'[/url]';
@@ -1191,7 +1191,7 @@ class Diaspora
 		$item = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
-			$person = FContact::getByURL($author);
+			$person = DiasporaContact::getByURL($author);
 			$result = self::storeByGuid($guid, $person["url"], $uid);
 
 			// We don't have an url for items that arrived at the public dispatcher
@@ -1414,7 +1414,7 @@ class Diaspora
 		if (DBA::isResult($item)) {
 			return $item["uri"];
 		} elseif (!$onlyfound) {
-			$person = FContact::getByURL($author);
+			$person = DiasporaContact::getByURL($author);
 
 			$parts = parse_url($person['url']);
 			unset($parts['path']);
@@ -1451,7 +1451,7 @@ class Diaspora
 				continue;
 			}
 
-			$person = FContact::getByURL($match[3]);
+			$person = DiasporaContact::getByURL($match[3]);
 			if (empty($person)) {
 				continue;
 			}
@@ -1512,7 +1512,7 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
+		$person = DiasporaContact::getByURL($author);
 		if (!is_array($person)) {
 			Logger::log("unable to find author details");
 			return false;
@@ -1639,7 +1639,7 @@ class Diaspora
 		$body = Markdown::toBBCode($msg_text);
 		$message_uri = $msg_author.":".$msg_guid;
 
-		$person = FContact::getByURL($msg_author);
+		$person = DiasporaContact::getByURL($msg_author);
 
 		return Mail::insert([
 			'uid'        => $importer['uid'],
@@ -1764,7 +1764,7 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
+		$person = DiasporaContact::getByURL($author);
 		if (!is_array($person)) {
 			Logger::log("unable to find author details");
 			return false;
@@ -1880,7 +1880,7 @@ class Diaspora
 
 		$message_uri = $author.":".$guid;
 
-		$person = FContact::getByURL($author);
+		$person = DiasporaContact::getByURL($author);
 		if (!$person) {
 			Logger::log("unable to find author details");
 			return false;
@@ -1950,7 +1950,7 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
+		$person = DiasporaContact::getByURL($author);
 		if (!is_array($person)) {
 			Logger::log("Person not found: ".$author);
 			return false;
@@ -2230,7 +2230,7 @@ class Diaspora
 			Logger::log("Author ".$author." wants to listen to us.", Logger::DEBUG);
 		}
 
-		$ret = FContact::getByURL($author);
+		$ret = DiasporaContact::getByURL($author);
 
 		if (!$ret || ($ret["network"] != Protocol::DIASPORA)) {
 			Logger::log("Cannot resolve diaspora handle ".$author." for ".$recipient);
@@ -2536,7 +2536,7 @@ class Diaspora
 		$target_guid = Strings::escapeTags(XML::unescape($data->target_guid));
 		$target_type = Strings::escapeTags(XML::unescape($data->target_type));
 
-		$person = FContact::getByURL($author);
+		$person = DiasporaContact::getByURL($author);
 		if (!is_array($person)) {
 			Logger::log("unable to find author detail for ".$author);
 			return false;
@@ -3002,7 +3002,7 @@ class Diaspora
 		// We always try to use the data from the fcontact table.
 		// This is important for transmitting data to Friendica servers.
 		if (!empty($contact['addr'])) {
-			$fcontact = FContact::getByURL($contact['addr']);
+			$fcontact = DiasporaContact::getByURL($contact['addr']);
 			if (!empty($fcontact)) {
 				$dest_url = ($public_batch ? $fcontact["batch"] : $fcontact["notify"]);
 			}
@@ -3078,7 +3078,7 @@ class Diaspora
 		// This is due to the fact that legacy DFRN had unique keys for every contact.
 		$pubkey = $contact['pubkey'];
 		if (!empty($contact['addr'])) {
-			$fcontact = FContact::getByURL($contact['addr']);
+			$fcontact = DiasporaContact::getByURL($contact['addr']);
 			if (!empty($fcontact)) {
 				$pubkey = $fcontact['pubkey'];
 			}

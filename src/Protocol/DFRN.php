@@ -30,6 +30,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
+use Friendica\Model\DiasporaContact;
 use Friendica\Model\Event;
 use Friendica\Model\FContact;
 use Friendica\Model\GServer;
@@ -946,7 +947,7 @@ class DFRN
 				}
 			}
 
-			$fcontact = FContact::getByURL($contact['addr']);
+			$fcontact = DiasporaContact::getByURL($contact['addr']);
 			if (empty($fcontact)) {
 				Logger::log('Unable to find contact details for ' . $contact['id'] . ' - ' . $contact['addr']);
 				return -22;
