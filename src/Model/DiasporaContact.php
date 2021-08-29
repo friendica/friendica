@@ -23,6 +23,7 @@ namespace Friendica\Model;
 
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Network\Probe;
@@ -95,22 +96,22 @@ class DiasporaContact
 		$dcontact['url']          = $data['url'];
 		$dcontact['guid']         = $data['guid'];
 		$dcontact['addr']         = $data['addr'];
-		$dcontact['alias']        = $data['alias'] ?? null;
+		$dcontact['alias']        = $data['alias'];
 		$dcontact['nick']         = $data['nick'];
-		$dcontact['name']         = $data['name'] ?? null;
-		$dcontact['given-name']   = $data['given_name'] ?? null;
-		$dcontact['family-name']  = $data['family_name'] ?? null;
-		$dcontact['photo']        = $data['photo'] ?? null;
-		$dcontact['photo-medium'] = $data['photo_medium'] ?? null;
-		$dcontact['photo-small']  = $data['photo_small'] ?? null;
-		$dcontact['batch']        = $data['batch'] ?? null;
-		$dcontact['notify']       = $data['notify'] ?? null;
-		$dcontact['poll']         = $data['poll'] ?? null;
-		$dcontact['subscribe']    = $data['subscribe'] ?? null;
-		$dcontact['searchable']   = !($data['hide'] ?? true);
-		$dcontact['pubkey']       = $data['pubkey'] ?? null;
-		$dcontact['baseurl']      = $data['baseurl'] ?? null;
-		$dcontact['gsid']         = $data['gsid'] ?? null;
+		$dcontact['name']         = $data['name'];
+		$dcontact['given-name']   = $data['given_name'];
+		$dcontact['family-name']  = $data['family_name'];
+		$dcontact['photo']        = $data['photo'];
+		$dcontact['photo-medium'] = $data['photo_medium'];
+		$dcontact['photo-small']  = $data['photo_small'];
+		$dcontact['batch']        = $data['batch'];
+		$dcontact['notify']       = $data['notify'];
+		$dcontact['poll']         = $data['poll'];
+		$dcontact['subscribe']    = $data['subscribe'];
+		$dcontact['searchable']   = !$data['hide'];
+		$dcontact['pubkey']       = $data['pubkey'];
+		$dcontact['baseurl']      = $data['baseurl'];
+		$dcontact['gsid']         = $data['gsid'];
 
 		if ($dcontact['url'] == $dcontact['alias']) {
 			$dcontact['alias'] = null;
@@ -129,7 +130,7 @@ class DiasporaContact
 			DBA::replace('dcontact', $dcontact);
 		}
 
-		Logger::info('Updated profile', ['url' => $dcontact['url']]);
+		Logger::info('Updated profile', ['url' => $dcontact['url'], 'callstack' => System::callstack(20)]);
 	}
 
 	/**
