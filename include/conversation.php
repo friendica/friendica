@@ -20,6 +20,7 @@
  */
 
 use Friendica\App;
+use Friendica\BaseModule;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
 use Friendica\Core\ACL;
@@ -396,6 +397,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 	$threadsid = -1;
 
 	$page_template = Renderer::getMarkupTemplate("conversation.tpl");
+	$formSecurityToken = BaseModule::getFormSecurityToken('contact_action');
 
 	if (!empty($items)) {
 		if (in_array($mode, ['community', 'contacts'])) {
@@ -502,7 +504,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 					'network_icon' => ContactSelector::networkToIcon($item['network'], $item['author-link']),
 					'linktitle' => DI::l10n()->t('View %s\'s profile @ %s', $profile_name, $item['author-link']),
 					'profile_url' => $profile_link,
-					'item_photo_menu_html' => item_photo_menu($item),
+					'item_photo_menu_html' => item_photo_menu($item, $formSecurityToken),
 					'name' => $profile_name,
 					'sparkle' => $sparkle,
 					'lock' => false,
@@ -590,7 +592,7 @@ function conversation(App $a, array $items, $mode, $update, $preview = false, $o
 				}
 			}
 
-			$threads = $conv->getTemplateData($conv_responses);
+			$threads = $conv->getTemplateData($conv_responses, $formSecurityToken);
 			if (!$threads) {
 				Logger::log('[ERROR] conversation : Failed to get template data.', Logger::DEBUG);
 				$threads = [];
@@ -782,7 +784,7 @@ function conversation_add_children(array $parents, $block_authors, $order, $uid)
 	return $items;
 }
 
-function item_photo_menu($item)
+function item_photo_menu($item, string $formSecurityToken)
 {
 	DI::profiler()->startRecording('rendering');
 	$sub_link = '';
@@ -825,8 +827,8 @@ function item_photo_menu($item)
 	if (!empty($pcid)) {
 		$contact_url = 'contact/' . $pcid;
 		$posts_link  = $contact_url . '/posts';
-		$block_link  = $item['self'] ? '' : $contact_url . '/block';
-		$ignore_link = $item['self'] ? '' : $contact_url . '/ignore';
+		$block_link  = $item['self'] ? '' : $contact_url . '/block?t=' . $formSecurityToken;
+		$ignore_link = $item['self'] ? '' : $contact_url . '/ignore?t=' . $formSecurityToken;
 	}
 
 	if ($cid && !$item['self']) {
@@ -1068,10 +1070,13 @@ function format_activity(array $links, $verb, $id) {
 
 function status_editor(App $a, array $x = [], $notes_cid = 0, $popup = false)
 {
+	$user = User::getById($a->getLoggedInUserId(), ['uid', 'nickname', 'allow_location', 'default-location']);
+	if (empty($user['uid'])) {
+		return '';
+	}
+
 	DI::profiler()->startRecording('rendering');
 	$o = '';
-
-	$user = User::getById($a->getLoggedInUserId(), ['uid', 'nickname', 'allow_location', 'default-location']);
 
 	$x['allow_location']   = $x['allow_location']   ?? $user['allow_location'];
 	$x['default_location'] = $x['default_location'] ?? $user['default-location'];

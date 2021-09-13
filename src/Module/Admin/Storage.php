@@ -129,10 +129,12 @@ class Storage extends BaseAdmin
 
 		return Renderer::replaceMacros($t, [
 			'$title'                 => DI::l10n()->t('Administration'),
+			'$label_current'         => DI::l10n()->t('Current Storage Backend'),
+			'$label_config'          => DI::l10n()->t('Storage Configuration'),
 			'$page'                  => DI::l10n()->t('Storage'),
 			'$save'                  => DI::l10n()->t('Save'),
-			'$save_activate'         => DI::l10n()->t('Save & Activate'),
-			'$activate'              => DI::l10n()->t('Activate'),
+			'$save_use'              => DI::l10n()->t('Save & Use storage backend'),
+			'$use'                   => DI::l10n()->t('Use storage backend'),
 			'$save_reload'           => DI::l10n()->t('Save & Reload'),
 			'$noconfig'              => DI::l10n()->t('This backend doesn\'t have custom settings'),
 			'$baseurl'               => DI::baseUrl()->get(true),

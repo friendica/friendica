@@ -82,6 +82,10 @@ class Proxy
 	 */
 	public static function proxifyUrl($url, $size = '')
 	{
+		if (!DI::config()->get('system', 'proxify_content')) {
+			return $url;
+		}
+
 		// Trim URL first
 		$url = trim($url);
 

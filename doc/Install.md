@@ -20,9 +20,6 @@ If you encounter installation issues, please let us know via the [helper](http:/
 Please be as clear as you can about your operating environment and provide as much detail as possible about any error messages you may see, so that we can prevent it from happening in the future.
 Due to the large variety of operating systems and PHP platforms in existence we may have only limited ability to debug your PHP installation or acquire any missing modules - but we will do our best to solve any general code issues.
 
-If you do not have a Friendica account yet, you can register a temporary one at [tryfriendica.de](https://tryfriendica.de) and join the forums mentioned above from there.
-The account will expire after 7 days, but you can ask the server admin to keep your account longer, should the problem not be resolved after that.
-
 ## Prerequisites
 
 * Choose a domain name or subdomain name for your server. Put some thought into this. While changing it after installation is supported, things still might break.
@@ -31,7 +28,7 @@ The account will expire after 7 days, but you can ask the server admin to keep y
 ### Requirements
 
 * Apache with mod-rewrite enabled and "Options All" so you can use a local `.htaccess` file
-* PHP 7+ (PHP 7.1+ is recommended for performance and official support)
+* PHP 7.2+ (PHP8 is not fully supported yet)
   * PHP *command line* access with register_argc_argv set to true in the php.ini file
   * Curl, GD, PDO, mbstrings, MySQLi, hash, xml, zip and OpenSSL extensions
   * The POSIX module of PHP needs to be activated (e.g. [RHEL, CentOS](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) have disabled it)

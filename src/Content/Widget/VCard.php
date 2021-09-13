@@ -75,7 +75,7 @@ class VCard
 				$pending = $pcontact['pending'] ?? false;
 			}
 
-			if (in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
+			if (!$contact['self'] && in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 				if (in_array($rel, [Contact::SHARING, Contact::FRIEND])) {
 					$unfollow_link = 'unfollow?url=' . urlencode($contact['url']) . '&auto=1';
 				} elseif (!$pending) {

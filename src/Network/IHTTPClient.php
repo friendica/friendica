@@ -21,6 +21,8 @@
 
 namespace Friendica\Network;
 
+use GuzzleHttp\Exception\TransferException;
+
 /**
  * Interface for calling HTTP requests and returning their responses
  */
@@ -124,7 +126,8 @@ interface IHTTPClient
 	 * @param string $url       A user-submitted URL
 	 *
 	 * @return string A canonical URL
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 *
+	 * @throws TransferException In case there's an error during the resolving
 	 */
 	public function finalUrl(string $url);
 }

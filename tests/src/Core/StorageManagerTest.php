@@ -73,7 +73,7 @@ class StorageManagerTest extends DatabaseTest
 
 		// load real config to avoid mocking every config-entry which is related to the Database class
 		$configFactory = new ConfigFactory();
-		$loader        = new ConfigFileLoader($this->root->url());
+		$loader        = $configFactory->createConfigFileLoader($this->root->url(), []);
 		$configCache   = $configFactory->createCache($loader);
 
 		$this->dba = new StaticDatabase($configCache, $profiler, $this->logger);

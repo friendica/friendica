@@ -20,9 +20,9 @@
 					<div class="panel-body">
 						{{include file="field_checkbox.tpl" field=$accept_only_sharer}}
 
-						{{include file="field_checkbox.tpl" field=$disable_cw}}
+						{{include file="field_checkbox.tpl" field=$enable_cw}}
 
-						{{include file="field_checkbox.tpl" field=$no_intelligent_shortening}}
+						{{include file="field_checkbox.tpl" field=$enable_smart_shortening}}
 
 						{{include file="field_checkbox.tpl" field=$simple_shortening}}
 

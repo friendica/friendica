@@ -27,7 +27,6 @@
 							{{/if}}
 							<li role="presentation"><a role="menuitem" href="{{$contact_actions.block.url}}" title="{{$contact_actions.block.title}}">{{$contact_actions.block.label}}</a></li>
 							<li role="presentation"><a role="menuitem" href="{{$contact_actions.ignore.url}}" title="{{$contact_actions.ignore.title}}">{{$contact_actions.ignore.label}}</a></li>
-							{{if $contact_actions.archive.url}}<li role="presentation"><a role="menuitem" href="{{$contact_actions.archive.url}}" title="{{$contact_actions.archive.title}}">{{$contact_actions.archive.label}}</a></li>{{/if}}
 							{{if $contact_actions.delete.url}}<li role="presentation"><button role="menuitem" type="button" class="btn-link" title="{{$contact_actions.delete.title}}" onclick="addToModal('{{$contact_actions.delete.url}}?confirm=1');">{{$contact_actions.delete.label}}</button></li>{{/if}}
 						</ul>
 					</li>

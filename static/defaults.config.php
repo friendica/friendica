@@ -429,10 +429,6 @@ return [
 		// Enable internal timings to help optimize code. Needed for "rendertime" addon.
 		'profiler' => false,
 
-		// proxy_cache_time (Integer)
-		// Period in seconds after which the cache is cleared.
-		'proxy_cache_time' => 86400,
-
 		// pushpoll_frequency (Integer)
 		// Frequency of contact poll for subhub contact using the DFRM or OStatus network.
 		// Available values:

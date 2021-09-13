@@ -63,7 +63,10 @@ class Statuses extends BaseApi
 		// The imput is defined as text. So we can use Markdown for some enhancements
 		$body = Markdown::toBBCode($request['status']);
 
-		$body = BBCode::expandTags($body);
+		// Avoids potential double expansion of existing links
+		$body = BBCode::performWithEscapedTags($body, ['url'], function ($body) {
+			return BBCode::expandTags($body);
+		});
 
 		$item = [];
 		$item['uid']        = $uid;

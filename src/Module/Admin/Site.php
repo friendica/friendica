@@ -162,10 +162,11 @@ class Site extends BaseAdmin
 		$disable_embedded       = !empty($_POST['disable_embedded']);
 		$allow_users_remote_self = !empty($_POST['allow_users_remote_self']);
 		$explicit_content       = !empty($_POST['explicit_content']);
+		$proxify_content        = !empty($_POST['proxify_content']);
 
-		$no_multi_reg           = !empty($_POST['no_multi_reg']);
-		$no_openid              = !empty($_POST['no_openid']);
-		$no_regfullname         = !empty($_POST['no_regfullname']);
+		$enable_multi_reg       = !empty($_POST['enable_multi_reg']);
+		$enable_openid          = !empty($_POST['enable_openid']);
+		$enable_regfullname     = !empty($_POST['enable_regfullname']);
 		$community_page_style   = (!empty($_POST['community_page_style']) ? intval(trim($_POST['community_page_style'])) : 0);
 		$max_author_posts_community_page = (!empty($_POST['max_author_posts_community_page']) ? intval(trim($_POST['max_author_posts_community_page'])) : 0);
 
@@ -183,12 +184,12 @@ class Site extends BaseAdmin
 		$poco_discovery         = (!empty($_POST['poco_discovery'])         ? intval(trim($_POST['poco_discovery']))         : false);
 		$poco_local_search      = !empty($_POST['poco_local_search']);
 		$nodeinfo               = !empty($_POST['nodeinfo']);
-		$dfrn_only              = !empty($_POST['dfrn_only']);
-		$ostatus_disabled       = !empty($_POST['ostatus_disabled']);
+		$mail_enabled           = !empty($_POST['mail_enabled']);
+		$ostatus_enabled        = !empty($_POST['ostatus_enabled']);
 		$diaspora_enabled       = !empty($_POST['diaspora_enabled']);
 		$ssl_policy             = (!empty($_POST['ssl_policy'])             ? intval($_POST['ssl_policy'])                    : 0);
 		$force_ssl              = !empty($_POST['force_ssl']);
-		$hide_help              = !empty($_POST['hide_help']);
+		$show_help              = !empty($_POST['show_help']);
 		$dbclean                = !empty($_POST['dbclean']);
 		$dbclean_expire_days    = (!empty($_POST['dbclean_expire_days'])    ? intval($_POST['dbclean_expire_days'])           : 0);
 		$dbclean_unclaimed      = (!empty($_POST['dbclean_unclaimed'])      ? intval($_POST['dbclean_unclaimed'])             : 0);
@@ -199,7 +200,6 @@ class Site extends BaseAdmin
 		$temppath               = (!empty($_POST['temppath'])               ? Strings::escapeTags(trim($_POST['temppath']))   : '');
 		$singleuser             = (!empty($_POST['singleuser'])             ? Strings::escapeTags(trim($_POST['singleuser'])) : '');
 		$only_tag_search        = !empty($_POST['only_tag_search']);
-		$rino                   = (!empty($_POST['rino'])                   ? intval($_POST['rino'])                          : 0);
 		$check_new_version_url  = (!empty($_POST['check_new_version_url'])  ? Strings::escapeTags(trim($_POST['check_new_version_url'])) : 'none');
 
 		$worker_queues    = (!empty($_POST['worker_queues'])                ? intval($_POST['worker_queues'])                 : 10);
@@ -329,25 +329,26 @@ class Site extends BaseAdmin
 		DI::config()->set('system', 'disable_embedded'       , $disable_embedded);
 		DI::config()->set('system', 'allow_users_remote_self', $allow_users_remote_self);
 		DI::config()->set('system', 'explicit_content'       , $explicit_content);
+		DI::config()->set('system', 'proxify_content'        , $proxify_content);
 		DI::config()->set('system', 'check_new_version_url'  , $check_new_version_url);
 
-		DI::config()->set('system', 'block_extended_register', $no_multi_reg);
-		DI::config()->set('system', 'no_openid'              , $no_openid);
-		DI::config()->set('system', 'no_regfullname'         , $no_regfullname);
+		DI::config()->set('system', 'block_extended_register', !$enable_multi_reg);
+		DI::config()->set('system', 'no_openid'              , !$enable_openid);
+		DI::config()->set('system', 'no_regfullname'         , !$enable_regfullname);
 		DI::config()->set('system', 'community_page_style'   , $community_page_style);
 		DI::config()->set('system', 'max_author_posts_community_page', $max_author_posts_community_page);
 		DI::config()->set('system', 'verifyssl'              , $verifyssl);
 		DI::config()->set('system', 'proxyuser'              , $proxyuser);
 		DI::config()->set('system', 'proxy'                  , $proxy);
 		DI::config()->set('system', 'curl_timeout'           , $timeout);
-		DI::config()->set('system', 'dfrn_only'              , $dfrn_only);
-		DI::config()->set('system', 'ostatus_disabled'       , $ostatus_disabled);
+		DI::config()->set('system', 'imap_disabled'          , !$mail_enabled && function_exists('imap_open'));
+		DI::config()->set('system', 'ostatus_disabled'       , !$ostatus_enabled);
 		DI::config()->set('system', 'diaspora_enabled'       , $diaspora_enabled);
 
 		DI::config()->set('config', 'private_addons'         , $private_addons);
 
 		DI::config()->set('system', 'force_ssl'              , $force_ssl);
-		DI::config()->set('system', 'hide_help'              , $hide_help);
+		DI::config()->set('system', 'hide_help'              , !$show_help);
 
 		DI::config()->set('system', 'dbclean'                , $dbclean);
 		DI::config()->set('system', 'dbclean-expire-days'    , $dbclean_expire_days);
@@ -378,8 +379,6 @@ class Site extends BaseAdmin
 		DI::config()->set('system', 'relay_server_tags', $relay_server_tags);
 		DI::config()->set('system', 'relay_deny_tags'  , $relay_deny_tags);
 		DI::config()->set('system', 'relay_user_tags'  , $relay_user_tags);
-
-		DI::config()->set('system', 'rino_encrypt'     , $rino);
 
 		DI::baseUrl()->redirect('admin/site' . $active_panel);
 	}
@@ -530,7 +529,7 @@ class Site extends BaseAdmin
 			'$theme_mobile'     => ['theme_mobile', DI::l10n()->t('Mobile system theme'), DI::config()->get('system', 'mobile-theme', '---'), DI::l10n()->t('Theme for mobile devices'), $theme_choices_mobile],
 			'$ssl_policy'       => ['ssl_policy', DI::l10n()->t('SSL link policy'), DI::config()->get('system', 'ssl_policy'), DI::l10n()->t('Determines whether generated links should be forced to use SSL'), $ssl_choices],
 			'$force_ssl'        => ['force_ssl', DI::l10n()->t('Force SSL'), DI::config()->get('system', 'force_ssl'), DI::l10n()->t('Force all Non-SSL requests to SSL - Attention: on some systems it could lead to endless loops.')],
-			'$hide_help'        => ['hide_help', DI::l10n()->t('Hide help entry from navigation menu'), DI::config()->get('system', 'hide_help'), DI::l10n()->t('Hides the menu entry for the Help pages from the navigation menu. You can still access it calling /help directly.')],
+			'$show_help'        => ['show_help', DI::l10n()->t('Show help entry from navigation menu'), !DI::config()->get('system', 'hide_help'), DI::l10n()->t('Displays the menu entry for the Help pages from the navigation menu. It is always accessible by calling /help directly.')],
 			'$singleuser'       => ['singleuser', DI::l10n()->t('Single user instance'), DI::config()->get('system', 'singleuser', '---'), DI::l10n()->t('Make this instance multi-user or single-user for the named user'), $user_names],
 
 			'$maximagesize'     => ['maximagesize', DI::l10n()->t('Maximum image size'), DI::config()->get('system', 'maximagesize'), DI::l10n()->t('Maximum size in bytes of uploaded images. Default is 0, which means no limits.')],
@@ -554,18 +553,20 @@ class Site extends BaseAdmin
 			'$private_addons'         => ['private_addons', DI::l10n()->t('Disallow public access to addons listed in the apps menu.'), DI::config()->get('config', 'private_addons'), DI::l10n()->t('Checking this box will restrict addons listed in the apps menu to members only.')],
 			'$disable_embedded'       => ['disable_embedded', DI::l10n()->t('Don\'t embed private images in posts'), DI::config()->get('system', 'disable_embedded'), DI::l10n()->t('Don\'t replace locally-hosted private photos in posts with an embedded copy of the image. This means that contacts who receive posts containing private photos will have to authenticate and load each image, which may take a while.')],
 			'$explicit_content'       => ['explicit_content', DI::l10n()->t('Explicit Content'), DI::config()->get('system', 'explicit_content'), DI::l10n()->t('Set this to announce that your node is used mostly for explicit content that might not be suited for minors. This information will be published in the node information and might be used, e.g. by the global directory, to filter your node from listings of nodes to join. Additionally a note about this will be shown at the user registration page.')],
+			'$proxify_content'        => ['proxify_content', DI::l10n()->t('Proxify external content'), DI::config()->get('system', 'proxify_content'), DI::l10n()->t('Route external content via the proxy functionality. This is used for example for some OEmbed accesses and in some other rare cases.')],
 			'$allow_users_remote_self'=> ['allow_users_remote_self', DI::l10n()->t('Allow Users to set remote_self'), DI::config()->get('system', 'allow_users_remote_self'), DI::l10n()->t('With checking this, every user is allowed to mark every contact as a remote_self in the repair contact dialog. Setting this flag on a contact causes mirroring every posting of that contact in the users stream.')],
-			'$no_multi_reg'           => ['no_multi_reg', DI::l10n()->t('Block multiple registrations'), DI::config()->get('system', 'block_extended_register'), DI::l10n()->t('Disallow users to register additional accounts for use as pages.')],
-			'$no_openid'              => ['no_openid', DI::l10n()->t('Disable OpenID'), DI::config()->get('system', 'no_openid'), DI::l10n()->t('Disable OpenID support for registration and logins.')],
-			'$no_regfullname'         => ['no_regfullname', DI::l10n()->t('No Fullname check'), DI::config()->get('system', 'no_regfullname'), DI::l10n()->t('Allow users to register without a space between the first name and the last name in their full name.')],
+			'$enable_multi_reg'       => ['enable_multi_reg', DI::l10n()->t('Enable multiple registrations'), !DI::config()->get('system', 'block_extended_register'), DI::l10n()->t('Enable users to register additional accounts for use as pages.')],
+			'$enable_openid'          => ['enable_openid', DI::l10n()->t('Enable OpenID'), !DI::config()->get('system', 'no_openid'), DI::l10n()->t('Enable OpenID support for registration and logins.')],
+			'$enable_regfullname'     => ['enable_regfullname', DI::l10n()->t('Enable Fullname check'), !DI::config()->get('system', 'no_regfullname'), DI::l10n()->t('Enable check to only allow users to register with a space between the first name and the last name in their full name.')],
 			'$community_page_style'   => ['community_page_style', DI::l10n()->t('Community pages for visitors'), DI::config()->get('system', 'community_page_style'), DI::l10n()->t('Which community pages should be available for visitors. Local users always see both pages.'), $community_page_style_choices],
 			'$max_author_posts_community_page' => ['max_author_posts_community_page', DI::l10n()->t('Posts per user on community page'), DI::config()->get('system', 'max_author_posts_community_page'), DI::l10n()->t('The maximum number of posts per user on the community page. (Not valid for "Global Community")')],
-			'$ostatus_disabled'       => ['ostatus_disabled', DI::l10n()->t('Disable OStatus support'), DI::config()->get('system', 'ostatus_disabled'), DI::l10n()->t('Disable built-in OStatus (StatusNet, GNU Social etc.) compatibility. All communications in OStatus are public, so privacy warnings will be occasionally displayed.')],
-			'$ostatus_not_able'       => DI::l10n()->t('OStatus support can only be enabled if threading is enabled.'),
+			'$mail_able'              => function_exists('imap_open'),
+			'$mail_enabled'           => ['mail_enabled', DI::l10n()->t('Enable Mail support'), !DI::config()->get('system', 'imap_disabled', !function_exists('imap_open')), DI::l10n()->t('Enable built-in mail support to poll IMAP folders and to reply via mail.')],
+			'$mail_not_able'          => DI::l10n()->t('Mail support can\'t be enabled because the PHP IMAP module is not installed.'),
+			'$ostatus_enabled'        => ['ostatus_enabled', DI::l10n()->t('Enable OStatus support'), !DI::config()->get('system', 'ostatus_disabled'), DI::l10n()->t('Enable built-in OStatus (StatusNet, GNU Social etc.) compatibility. All communications in OStatus are public.')],
 			'$diaspora_able'          => $diaspora_able,
 			'$diaspora_not_able'      => DI::l10n()->t('Diaspora support can\'t be enabled because Friendica was installed into a sub directory.'),
-			'$diaspora_enabled'       => ['diaspora_enabled', DI::l10n()->t('Enable Diaspora support'), DI::config()->get('system', 'diaspora_enabled', $diaspora_able), DI::l10n()->t('Provide built-in Diaspora network compatibility.')],
-			'$dfrn_only'              => ['dfrn_only', DI::l10n()->t('Only allow Friendica contacts'), DI::config()->get('system', 'dfrn_only'), DI::l10n()->t('All contacts must use Friendica protocols. All other built-in communication protocols disabled.')],
+			'$diaspora_enabled'       => ['diaspora_enabled', DI::l10n()->t('Enable Diaspora support'), DI::config()->get('system', 'diaspora_enabled', $diaspora_able), DI::l10n()->t('Enable built-in Diaspora network compatibility for communicating with diaspora servers.')],
 			'$verifyssl'              => ['verifyssl', DI::l10n()->t('Verify SSL'), DI::config()->get('system', 'verifyssl'), DI::l10n()->t('If you wish, you can turn on strict certificate checking. This will mean you cannot connect (at all) to self-signed SSL sites.')],
 			'$proxyuser'              => ['proxyuser', DI::l10n()->t('Proxy user'), DI::config()->get('system', 'proxyuser'), ''],
 			'$proxy'                  => ['proxy', DI::l10n()->t('Proxy URL'), DI::config()->get('system', 'proxy'), ''],
@@ -600,8 +601,6 @@ class Site extends BaseAdmin
 			'$only_tag_search'        => ['only_tag_search', DI::l10n()->t('Only search in tags'), DI::config()->get('system', 'only_tag_search'), DI::l10n()->t('On large systems the text search can slow down the system extremely.')],
 
 			'$relocate_url'           => ['relocate_url', DI::l10n()->t('New base url'), DI::baseUrl()->get(), DI::l10n()->t('Change base url for this server. Sends relocate message to all Friendica and Diaspora* contacts of all users.')],
-
-			'$rino'                   => ['rino', DI::l10n()->t('RINO Encryption'), intval(DI::config()->get('system', 'rino_encrypt')), DI::l10n()->t('Encryption layer between nodes.'), [0 => DI::l10n()->t('Disabled'), 1 => DI::l10n()->t('Enabled')]],
 
 			'$worker_queues'          => ['worker_queues', DI::l10n()->t('Maximum number of parallel workers'), DI::config()->get('system', 'worker_queues'), DI::l10n()->t('On shared hosters set this to %d. On larger systems, values of %d are great. Default value is %d.', 5, 20, 10)],
 			'$worker_fastlane'        => ['worker_fastlane', DI::l10n()->t('Enable fastlane'), DI::config()->get('system', 'worker_fastlane'), DI::l10n()->t('When enabed, the fastlane mechanism starts an additional worker if processes with higher priority are blocked by processes of lower priority.')],

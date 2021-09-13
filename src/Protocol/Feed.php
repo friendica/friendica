@@ -42,6 +42,7 @@ use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * This class contain functions to import feeds (RSS/RDF/Atom)
@@ -297,7 +298,11 @@ class Feed
 
 			$orig_plink = $item["plink"];
 
-			$item["plink"] = DI::httpClient()->finalUrl($item["plink"]);
+			try {
+				$item["plink"] = DI::httpClient()->finalUrl($item["plink"]);
+			} catch (TransferException $exception) {
+				Logger::notice('Item URL couldn\'t get expanded', ['url' => $item["plink"], 'exception' => $exception]);
+			}
 
 			$item["title"] = XML::getFirstNodeValue($xpath, 'atom:title/text()', $entry);
 

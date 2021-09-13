@@ -76,8 +76,8 @@ function settings_post(App $a)
 
 		if (!empty($_POST['general-submit'])) {
 			DI::pConfig()->set(local_user(), 'system', 'accept_only_sharer', intval($_POST['accept_only_sharer']));
-			DI::pConfig()->set(local_user(), 'system', 'disable_cw', intval($_POST['disable_cw']));
-			DI::pConfig()->set(local_user(), 'system', 'no_intelligent_shortening', intval($_POST['no_intelligent_shortening']));
+			DI::pConfig()->set(local_user(), 'system', 'disable_cw', !intval($_POST['enable_cw']));
+			DI::pConfig()->set(local_user(), 'system', 'no_intelligent_shortening', !intval($_POST['enable_smart_shortening']));
 			DI::pConfig()->set(local_user(), 'system', 'simple_shortening', intval($_POST['simple_shortening']));
 			DI::pConfig()->set(local_user(), 'system', 'attach_link_title', intval($_POST['attach_link_title']));
 			DI::pConfig()->set(local_user(), 'ostatus', 'legacy_contact', $_POST['legacy_contact']);
@@ -92,11 +92,7 @@ function settings_post(App $a)
 			$mail_replyto      =                 $_POST['mail_replyto']      ?? '';
 			$mail_pubmail      =                 $_POST['mail_pubmail']      ?? '';
 
-			if (
-				!DI::config()->get('system', 'dfrn_only')
-				&& function_exists('imap_open')
-				&& !DI::config()->get('system', 'imap_disabled')
-			) {
+			if (function_exists('imap_open') && !DI::config()->get('system', 'imap_disabled')) {
 				$failed = false;
 				$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 					intval(local_user())
@@ -490,8 +486,8 @@ function settings_content(App $a)
 
 	if ((DI::args()->getArgc() > 1) && (DI::args()->getArgv()[1] === 'connectors')) {
 		$accept_only_sharer        = intval(DI::pConfig()->get(local_user(), 'system', 'accept_only_sharer'));
-		$disable_cw                = intval(DI::pConfig()->get(local_user(), 'system', 'disable_cw'));
-		$no_intelligent_shortening = intval(DI::pConfig()->get(local_user(), 'system', 'no_intelligent_shortening'));
+		$enable_cw                 = !intval(DI::pConfig()->get(local_user(), 'system', 'disable_cw'));
+		$enable_smart_shortening   = !intval(DI::pConfig()->get(local_user(), 'system', 'no_intelligent_shortening'));
 		$simple_shortening         = intval(DI::pConfig()->get(local_user(), 'system', 'simple_shortening'));
 		$attach_link_title         = intval(DI::pConfig()->get(local_user(), 'system', 'attach_link_title'));
 		$legacy_contact            = DI::pConfig()->get(local_user(), 'ostatus', 'legacy_contact');
@@ -513,9 +509,6 @@ function settings_content(App $a)
 		}
 
 		$mail_disabled = ((function_exists('imap_open') && (!DI::config()->get('system', 'imap_disabled'))) ? 0 : 1);
-		if (DI::config()->get('system', 'dfrn_only')) {
-			$mail_disabled = 1;
-		}
 		if (!$mail_disabled) {
 			$r = q("SELECT * FROM `mailacct` WHERE `uid` = %d LIMIT 1",
 				local_user()
@@ -555,8 +548,8 @@ function settings_content(App $a)
 
 			'$general_settings' => DI::l10n()->t('General Social Media Settings'),
 			'$accept_only_sharer' => ['accept_only_sharer', DI::l10n()->t('Accept only top level posts by contacts you follow'), $accept_only_sharer, DI::l10n()->t('The system does an auto completion of threads when a comment arrives. This has got the side effect that you can receive posts that had been started by a non-follower but had been commented by someone you follow. This setting deactivates this behaviour. When activated, you strictly only will receive posts from people you really do follow.')],
-			'$disable_cw' => ['disable_cw', DI::l10n()->t('Disable Content Warning'), $disable_cw, DI::l10n()->t('Users on networks like Mastodon or Pleroma are able to set a content warning field which collapse their post by default. This disables the automatic collapsing and sets the content warning as the post title. Doesn\'t affect any other content filtering you eventually set up.')],
-			'$no_intelligent_shortening' => ['no_intelligent_shortening', DI::l10n()->t('Disable intelligent shortening'), $no_intelligent_shortening, DI::l10n()->t('Normally the system tries to find the best link to add to shortened posts. If this option is enabled then every shortened post will always point to the original friendica post.')],
+			'$enable_cw' => ['enable_cw', DI::l10n()->t('Enable Content Warning'), $enable_cw, DI::l10n()->t('Users on networks like Mastodon or Pleroma are able to set a content warning field which collapse their post by default. This enables the automatic collapsing instead of setting the content warning as the post title. Doesn\'t affect any other content filtering you eventually set up.')],
+			'$enable_smart_shortening' => ['enable_smart_shortening', DI::l10n()->t('Enable intelligent shortening'), $enable_smart_shortening, DI::l10n()->t('Normally the system tries to find the best link to add to shortened posts. If disabled, every shortened post will always point to the original friendica post.')],
 			'$simple_shortening' => ['simple_shortening', DI::l10n()->t('Enable simple text shortening'), $simple_shortening, DI::l10n()->t('Normally the system shortens posts at the next line feed. If this option is enabled then the system will shorten the text at the maximum character limit.')],
 			'$attach_link_title' => ['attach_link_title', DI::l10n()->t('Attach the link title'), $attach_link_title, DI::l10n()->t('When activated, the title of the attached link will be added as a title on posts to Diaspora. This is mostly helpful with "remote-self" contacts that share feed content.')],
 			'$legacy_contact' => ['legacy_contact', DI::l10n()->t('Your legacy ActivityPub/GNU Social account'), $legacy_contact, DI::l10n()->t("If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.")],

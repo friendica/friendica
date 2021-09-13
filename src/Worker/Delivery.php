@@ -209,7 +209,8 @@ class Delivery
 		// Also transmit via Diaspora if this is a direct answer to a Diaspora comment.
 		// This is done since the uri wouldn't match (Diaspora doesn't transmit it)
 		// Also transmit relayed posts from Diaspora contacts via Diaspora.
-		if (!empty($parent) && !empty($thr_parent) && in_array(Protocol::DIASPORA, [$parent['network'], $thr_parent['network'], $target_item['network']])) {
+		if (($contact['network'] != Protocol::DIASPORA) && in_array(Protocol::DIASPORA, [$parent['network'] ?? '', $thr_parent['network'] ?? '', $target_item['network']])) {
+			Logger::info('Enforcing the Diaspora protocol', ['id' => $contact['id'], 'network' => $contact['network'], 'parent' => $parent['network'], 'thread-parent' => $thr_parent['network'], 'post' => $target_item['network']]);
 			$contact['network'] = Protocol::DIASPORA;
 		}
 
@@ -393,7 +394,7 @@ class Delivery
 
 		Logger::notice('Deliver via Diaspora', ['target' => $target_item['id'], 'guid' => $target_item['guid'], 'to' => $loc]);
 
-		if (DI::config()->get('system', 'dfrn_only') || !DI::config()->get('system', 'diaspora_enabled')) {
+		if (!DI::config()->get('system', 'diaspora_enabled')) {
 			return;
 		}
 
@@ -476,7 +477,7 @@ class Delivery
 	 */
 	private static function deliverMail($cmd, $contact, $owner, $target_item, $thr_parent)
 	{
-		if (DI::config()->get('system','dfrn_only')) {
+		if (DI::config()->get('system','imap_disabled')) {
 			return;
 		}
 

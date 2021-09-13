@@ -31,6 +31,45 @@ use Friendica\Util\ConfigFileLoader;
 class ConfigFactory
 {
 	/**
+	 * The key of the $_SERVER variable to override the config directory
+	 *
+	 * @var string
+	 */
+	const CONFIG_DIR_ENV = 'FRIENDICA_CONFIG_DIR';
+
+	/**
+	 * The Sub directory of the config-files
+	 *
+	 * @var string
+	 */
+	const CONFIG_DIR = 'config';
+
+	/**
+	 * The Sub directory of the static config-files
+	 *
+	 * @var string
+	 */
+	const STATIC_DIR = 'static';
+
+	/**
+	 * @param string $basePath The basepath of FRIENDICA
+	 * @param array $serer the $_SERVER array
+	 *
+	 * @return ConfigFileLoader
+	 */
+	public function createConfigFileLoader(string $basePath, array $server = [])
+	{
+		if (!empty($server[self::CONFIG_DIR_ENV]) && is_dir($server[self::CONFIG_DIR_ENV])) {
+			$configDir = $server[self::CONFIG_DIR_ENV];
+		} else {
+			$configDir = $basePath . DIRECTORY_SEPARATOR . self::CONFIG_DIR;
+		}
+		$staticDir = $basePath . DIRECTORY_SEPARATOR . self::STATIC_DIR;
+
+		return new ConfigFileLoader($basePath, $configDir, $staticDir);
+	}
+
+	/**
 	 * @param ConfigFileLoader $loader The Config Cache loader (INI/config/.htconfig)
 	 *
 	 * @return Cache

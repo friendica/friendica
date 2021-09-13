@@ -72,7 +72,7 @@ class NodeInfo120 extends BaseModule
 		$nodeinfo['services']['inbound'][]  = 'rss2.0';
 		$nodeinfo['services']['outbound'][] = 'atom1.0';
 
-		if (function_exists('imap_open') && !$config->get('system', 'imap_disabled') && !$config->get('system', 'dfrn_only')) {
+		if (function_exists('imap_open') && !$config->get('system', 'imap_disabled')) {
 			$nodeinfo['services']['inbound'][] = 'imap';
 		}
 

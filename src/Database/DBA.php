@@ -421,7 +421,7 @@ class DBA
 	 * @param string|array  $table      Table name or array [schema => table]
 	 * @param array         $fields     contains the fields that are updated
 	 * @param array         $condition  condition array with the key values
-	 * @param array|boolean $old_fields array with the old field values that are about to be replaced (true = update on duplicate)
+	 * @param array|boolean $old_fields array with the old field values that are about to be replaced (true = update on duplicate, false = don't update identical fields)
 	 *
 	 * @return boolean was the update successfull?
 	 * @throws \Exception

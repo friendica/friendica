@@ -4,10 +4,10 @@
 	<h1>{{$title}} - {{$page}}</h1>
 
 	<div class="well well-lg">
-			Current Storage Backend: <b>{{$storagebackend}}</b>
+        	{{$label_current}}: <b>{{$storagebackend}}</b>
 	</div>
 
-		<h2>Storage Configuration</h2>
+		<h2>{{$label_config}}</h2>
 
 		{{foreach from=$availablestorageforms item=$storage}}
 	<form action="{{$baseurl}}/admin/storage/{{$storage.prefix}}" method="post">
@@ -36,10 +36,10 @@
 						{{if $storage.active}}
 					<input type="submit" name="submit_save_set" class="btn btn-primary" value="{{$save_reload}}"/>
 						{{else}}
-					<input type="submit" name="submit_save_set" class="btn btn-primary" value="{{$save_activate}}"/>
+					<input type="submit" name="submit_save_set" class="btn btn-primary" value="{{$save_use}}"/>
 						{{/if}}
 					{{else}}
-					<input type="submit" name="submit_save_set" class="btn btn-primary" {{if $storage.active}}disabled="disabled"{{/if}} value="{{$activate}}"/>
+					<input type="submit" name="submit_save_set" class="btn btn-primary" {{if $storage.active}}disabled="disabled"{{/if}} value="{{$use}}"/>
 					{{/if}}
 				</div>
 			</div>

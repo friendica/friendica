@@ -29,6 +29,7 @@ use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
+use Friendica\Factory\ConfigFactory;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdmin;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -151,7 +152,7 @@ class Summary extends BaseAdmin
 		}
 
 		// check legacy basepath settings
-		$configLoader = new ConfigFileLoader($a->getBasePath());
+		$configLoader = (new ConfigFactory())->createConfigFileLoader($a->getBasePath(), $_SERVER);
 		$configCache = new Cache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');

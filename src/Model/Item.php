@@ -659,6 +659,12 @@ class Item
 		$params = ['order' => ['id' => false]];
 		$parent = Post::selectFirst($fields, $condition, $params);
 
+		if (!DBA::isResult($parent) && $item['origin']) {
+			$stored = Item::storeForUserByUriId($item['thr-parent-id'], $item['uid']);
+			Logger::info('Stored thread parent item for user', ['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid'], 'stored' => $stored]);
+			$parent = Post::selectFirst($fields, $condition, $params);
+		}
+
 		if (!DBA::isResult($parent)) {
 			Logger::notice('item parent was not found - ignoring item', ['thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
 			return [];
@@ -673,6 +679,13 @@ class Item
 			'uid' => $parent['uid']];
 		$params = ['order' => ['id' => false]];
 		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
+
+		if (!DBA::isResult($toplevel_parent) && $item['origin']) {
+			$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid']);
+			Logger::info('Stored parent item for user', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid'], 'stored' => $stored]);
+			$toplevel_parent = Post::selectFirst($fields, $condition, $params);
+		}
+
 		if (!DBA::isResult($toplevel_parent)) {
 			Logger::notice('item top level parent was not found - ignoring item', ['parent-uri-id' => $parent['parent-uri-id'], 'uid' => $parent['uid']]);
 			return [];

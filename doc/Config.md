@@ -42,6 +42,9 @@ Some examples of common known configuration files:
 
 Addons can define their own default configuration values in `addon/[addon]/config/[addon].config.php` which is loaded when the addon is activated.
 
+If needed, an alternative `config` path can be used by using the `FRIENDICA_CONFIG_DIR` environment variable (full path required!).
+This is useful in case of hardening the system by separating configuration from program binaries. 
+
 ### Static Configuration location
 
 The `static` directory holds the codebase default configurations files.

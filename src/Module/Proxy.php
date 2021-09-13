@@ -24,6 +24,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
+use Friendica\DI;
 use Friendica\Object\Image;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Images;
@@ -44,6 +45,13 @@ class Proxy extends BaseModule
 	 */
 	public static function rawContent(array $parameters = [])
 	{
+		$request = self::getRequestInfo($parameters);
+
+		if (!DI::config()->get('system', 'proxify_content')) {
+			Logger::notice('Proxy access is forbidden', ['request' => $request, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'accept' => $_SERVER['HTTP_ACCEPT'] ?? '']);
+			throw new \Friendica\Network\HTTPException\NotFoundException();
+		}
+
 		if (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) {
 			header("HTTP/1.1 304 Not Modified");
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()) . " GMT");
@@ -59,8 +67,6 @@ class Proxy extends BaseModule
 			}
 			exit;
 		}
-
-		$request = self::getRequestInfo($parameters);
 
 		if (empty($request['url'])) {
 			throw new \Friendica\Network\HTTPException\BadRequestException();

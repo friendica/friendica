@@ -43,6 +43,7 @@ trait VFSTrait
 			'static' => [],
 			'test' => [],
 			'logs' => [],
+			'config2' => [],
 		];
 
 		// create a virtual directory and copy all needed files and folders to it

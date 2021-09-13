@@ -877,6 +877,9 @@ class Transmitter
 		}
 
 		$reply = DBA::selectFirst('mail', ['uri', 'uri-id', 'from-url'], ['parent-uri' => $mail['parent-uri'], 'reply' => false]);
+		if (!DBA::isResult($reply)) {
+			$reply = $mail;
+		}
 
 		// Making the post more compatible for Mastodon by:
 		// - Making it a note and not an article (no title)

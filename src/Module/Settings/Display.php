@@ -47,17 +47,17 @@ class Display extends BaseSettings
 
 		$user = User::getById(local_user());
 
-		$theme              = !empty($_POST['theme'])              ? Strings::escapeTags(trim($_POST['theme'])) : $user['theme'];
-		$mobile_theme       = !empty($_POST['mobile_theme'])       ? Strings::escapeTags(trim($_POST['mobile_theme'])) : '';
-		$nosmile            = !empty($_POST['nosmile'])            ? intval($_POST['nosmile'])            : 0;
-		$first_day_of_week  = !empty($_POST['first_day_of_week'])  ? intval($_POST['first_day_of_week'])  : 0;
-		$infinite_scroll    = !empty($_POST['infinite_scroll'])    ? intval($_POST['infinite_scroll'])    : 0;
-		$no_auto_update     = !empty($_POST['no_auto_update'])     ? intval($_POST['no_auto_update'])     : 0;
-		$no_smart_threading = !empty($_POST['no_smart_threading']) ? intval($_POST['no_smart_threading']) : 0;
-		$hide_dislike       = !empty($_POST['hide_dislike'])       ? intval($_POST['hide_dislike'])       : 0;
-		$display_resharer   = !empty($_POST['display_resharer'])   ? intval($_POST['display_resharer'])   : 0;
-		$stay_local         = !empty($_POST['stay_local'])         ? intval($_POST['stay_local'])         : 0;
-		$browser_update     = !empty($_POST['browser_update'])     ? intval($_POST['browser_update'])     : 0;
+		$theme                  = !empty($_POST['theme'])                  ? Strings::escapeTags(trim($_POST['theme'])) : $user['theme'];
+		$mobile_theme           = !empty($_POST['mobile_theme'])           ? Strings::escapeTags(trim($_POST['mobile_theme'])) : '';
+		$enable_smile           = !empty($_POST['enable_smile'])           ? intval($_POST['enable_smile'])            : 0;
+		$first_day_of_week      = !empty($_POST['first_day_of_week'])      ? intval($_POST['first_day_of_week'])  : 0;
+		$infinite_scroll        = !empty($_POST['infinite_scroll'])        ? intval($_POST['infinite_scroll'])    : 0;
+		$no_auto_update         = !empty($_POST['no_auto_update'])         ? intval($_POST['no_auto_update'])     : 0;
+		$enable_smart_threading = !empty($_POST['enable_smart_threading']) ? intval($_POST['enable_smart_threading']) : 0;
+		$enable_dislike         = !empty($_POST['enable_dislike'])         ? intval($_POST['enable_dislike'])       : 0;
+		$display_resharer       = !empty($_POST['display_resharer'])       ? intval($_POST['display_resharer'])   : 0;
+		$stay_local             = !empty($_POST['stay_local'])             ? intval($_POST['stay_local'])         : 0;
+		$browser_update         = !empty($_POST['browser_update'])         ? intval($_POST['browser_update'])     : 0;
 		if ($browser_update != -1) {
 			$browser_update = $browser_update * 1000;
 			if ($browser_update < 10000) {
@@ -86,10 +86,10 @@ class Display extends BaseSettings
 		DI::pConfig()->set(local_user(), 'system', 'itemspage_mobile_network', $itemspage_mobile_network);
 		DI::pConfig()->set(local_user(), 'system', 'update_interval'         , $browser_update);
 		DI::pConfig()->set(local_user(), 'system', 'no_auto_update'          , $no_auto_update);
-		DI::pConfig()->set(local_user(), 'system', 'no_smilies'              , $nosmile);
+		DI::pConfig()->set(local_user(), 'system', 'no_smilies'              , !$enable_smile);
 		DI::pConfig()->set(local_user(), 'system', 'infinite_scroll'         , $infinite_scroll);
-		DI::pConfig()->set(local_user(), 'system', 'no_smart_threading'      , $no_smart_threading);
-		DI::pConfig()->set(local_user(), 'system', 'hide_dislike'            , $hide_dislike);
+		DI::pConfig()->set(local_user(), 'system', 'no_smart_threading'      , !$enable_smart_threading);
+		DI::pConfig()->set(local_user(), 'system', 'hide_dislike'            , !$enable_dislike);
 		DI::pConfig()->set(local_user(), 'system', 'display_resharer'        , $display_resharer);
 		DI::pConfig()->set(local_user(), 'system', 'stay_local'              , $stay_local);
 		DI::pConfig()->set(local_user(), 'system', 'first_day_of_week'       , $first_day_of_week);
@@ -170,13 +170,13 @@ class Display extends BaseSettings
 			$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
 		}
 
-		$no_auto_update     = DI::pConfig()->get(local_user(), 'system', 'no_auto_update', 0);
-		$nosmile            = DI::pConfig()->get(local_user(), 'system', 'no_smilies', 0);
-		$infinite_scroll    = DI::pConfig()->get(local_user(), 'system', 'infinite_scroll', 0);
-		$no_smart_threading = DI::pConfig()->get(local_user(), 'system', 'no_smart_threading', 0);
-		$hide_dislike       = DI::pConfig()->get(local_user(), 'system', 'hide_dislike', 0);
-		$display_resharer   = DI::pConfig()->get(local_user(), 'system', 'display_resharer', 0);
-		$stay_local         = DI::pConfig()->get(local_user(), 'system', 'stay_local', 0);
+		$no_auto_update         = DI::pConfig()->get(local_user(), 'system', 'no_auto_update', 0);
+		$enable_smile           = !DI::pConfig()->get(local_user(), 'system', 'no_smilies', 0);
+		$infinite_scroll        = DI::pConfig()->get(local_user(), 'system', 'infinite_scroll', 0);
+		$enable_smart_threading = !DI::pConfig()->get(local_user(), 'system', 'no_smart_threading', 0);
+		$enable_dislike         = !DI::pConfig()->get(local_user(), 'system', 'hide_dislike', 0);
+		$display_resharer       = DI::pConfig()->get(local_user(), 'system', 'display_resharer', 0);
+		$stay_local             = DI::pConfig()->get(local_user(), 'system', 'stay_local', 0);
 
 
 		$first_day_of_week = DI::pConfig()->get(local_user(), 'system', 'first_day_of_week', 0);
@@ -210,10 +210,10 @@ class Display extends BaseSettings
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', DI::l10n()->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, DI::l10n()->t('Maximum of 100 items')],
 			'$ajaxint'                  => ['browser_update'          , DI::l10n()->t('Update browser every xx seconds'), $browser_update, DI::l10n()->t('Minimum of 10 seconds. Enter -1 to disable it.')],
 			'$no_auto_update'           => ['no_auto_update'          , DI::l10n()->t('Automatic updates only at the top of the post stream pages'), $no_auto_update, DI::l10n()->t('Auto update may add new posts at the top of the post stream pages, which can affect the scroll position and perturb normal reading if it happens anywhere else the top of the page.')],
-			'$nosmile'	                => ['nosmile'                 , DI::l10n()->t('Don\'t show emoticons'), $nosmile, DI::l10n()->t('Normally emoticons are replaced with matching symbols. This setting disables this behaviour.')],
+			'$enable_smile'	            => ['enable_smile'            , DI::l10n()->t('Display emoticons'), $enable_smile, DI::l10n()->t('When enabled, emoticons are replaced with matching symbols.')],
 			'$infinite_scroll'          => ['infinite_scroll'         , DI::l10n()->t('Infinite scroll'), $infinite_scroll, DI::l10n()->t('Automatic fetch new items when reaching the page end.')],
-			'$no_smart_threading'       => ['no_smart_threading'      , DI::l10n()->t('Disable Smart Threading'), $no_smart_threading, DI::l10n()->t('Disable the automatic suppression of extraneous thread indentation.')],
-			'$hide_dislike'             => ['hide_dislike'            , DI::l10n()->t('Hide the Dislike feature'), $hide_dislike, DI::l10n()->t('Hides the Dislike button and dislike reactions on posts and comments.')],
+			'$enable_smart_threading'   => ['enable_smart_threading'  , DI::l10n()->t('Enable Smart Threading'), $enable_smart_threading, DI::l10n()->t('Enable the automatic suppression of extraneous thread indentation.')],
+			'$enable_dislike'           => ['enable_dislike'          , DI::l10n()->t('Display the Dislike feature'), $enable_dislike, DI::l10n()->t('Display the Dislike button and dislike reactions on posts and comments.')],
 			'$display_resharer'         => ['display_resharer'        , DI::l10n()->t('Display the resharer'), $display_resharer, DI::l10n()->t('Display the first resharer as icon and text on a reshared item.')],
 			'$stay_local'               => ['stay_local'              , DI::l10n()->t('Stay local'), $stay_local, DI::l10n()->t("Don't go to a remote system when following a contact link.")],
 

@@ -1933,11 +1933,6 @@ class Contact
 	 */
 	private static function updateContact(int $id, int $uid, string $old_url, string $new_url, array $fields)
 	{
-		if (Strings::normaliseLink($new_url) != Strings::normaliseLink($old_url)) {
-			Logger::notice('New URL differs from old URL', ['old' => $old_url, 'new' => $new_url]);
-			return;
-		}
-
 		if (!DBA::update('contact', $fields, ['id' => $id])) {
 			Logger::info('Couldn\'t update contact.', ['id' => $id, 'fields' => $fields]);
 			return;
@@ -2114,6 +2109,12 @@ class Contact
 		unset($contact['avatar']);
 
 		$updated = DateTimeFormat::utcNow();
+
+		if (Strings::normaliseLink($contact['url']) != Strings::normaliseLink($ret['url'])) {
+			Logger::notice('New URL differs from old URL', ['id' => $id, 'uid' => $uid, 'old' => $contact['url'], 'new' => $ret['url']]);
+			self::updateContact($id, $uid, $contact['url'], $ret['url'], ['failed' => true, 'last-update' => $updated, 'failure_update' => $updated]);
+			return false;
+		}
 
 		// We must not try to update relay contacts via probe. They are no real contacts.
 		// We check after the probing to be able to correct falsely detected contact types.

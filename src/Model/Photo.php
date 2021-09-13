@@ -413,7 +413,7 @@ class Photo
 		while ($photo = DBA::fetch($photos)) {
 			try {
 				$backend_class = DI::storageManager()->getWritableStorageByName($photo['backend-class'] ?? '');
-				$backend_class->delete($item['backend-ref'] ?? '');
+				$backend_class->delete($photo['backend-ref'] ?? '');
 				// Delete the photos after they had been deleted successfully
 				DBA::delete("photo", ['id' => $photo['id']]);
 			} catch (InvalidClassStorageException $storageException) {

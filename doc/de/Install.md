@@ -15,9 +15,6 @@ Viele hingegen können es. Aber **bitte** prüfe die Voraussetzungen deines Serv
 Wenn dir Fehler während der Installation auffallen, sag uns bitte über [Helper](http://forum.friendi.ca/profile/helpers) oder das [Entwickler Forum](https://forum.friendi.ca/profile/developers) Bescheid oder [erstelle ein Issue](https://github.com/friendica/friendica/issues).
 Gib uns bitte so viele Infos zu deinem System, wie du kannst, und beschreibe den Fehler mit allen Details und Fehlermeldungen, so dass wir den Fehler zukünftig verhindern können.
 Aufgrund der großen Anzahl an verschiedenen Betriebssystemen und PHP-Plattformen haben wir nur geringe Kapazitäten, um deine PHP-Installation zu debuggen oder fehlende Module zu ersetzen, aber wir tun unser Bestes, um allgemeine Code-Fehler zu beheben.
-Falls du noch keinen Friendica-Account hast, kannst du dir einen temporären Account hier erstellen: [tryfriendica.de](https://tryfriendica.de).
-Darüber kannst du den genannten Forum beitreten.
-Der Account wird nach 7 Tagen ablaufen, aber du kannst einen Server-Admin fragen, diesen Account länger zu erhalten, sollte das  Problem nicht innerhalb dieser Zeit gelöst sein.
 
 Bevor du anfängst: suche dir einen Domain- oder Subdomainnamen für deinen Server.
 Dinge verändern sich und einige deiner Freunde haben möglicherweise Probleme, mit dir zu kommunizieren.
@@ -28,7 +25,7 @@ Requirements
 ---
 
 * Apache mit einer aktiverten mod-rewrite-Funktion und dem Eintrag "Options All", so dass du die lokale .htaccess-Datei nutzen kannst
-* PHP  7+ (PHP 7.1+ wird für Performance und offiziellen Support empfohlen)
+* PHP  7.2+ (PHP 8 wird noch nicht komplett unterstützt)
   * PHP *Kommandozeilen*-Zugang mit register_argc_argv auf "true" gesetzt in der php.ini-Datei
   * Curl, GD, PDO, MySQLi, xml, zip und OpenSSL-Erweiterung
   * Das POSIX Modul muss aktiviert sein ([CentOS, RHEL](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) haben dies z.B. deaktiviert)

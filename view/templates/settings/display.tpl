@@ -14,10 +14,10 @@
 	{{include file="field_input.tpl" field=$itemspage_mobile_network}}
 	{{include file="field_input.tpl" field=$ajaxint}}
 	{{include file="field_checkbox.tpl" field=$no_auto_update}}
-	{{include file="field_checkbox.tpl" field=$nosmile}}
+	{{include file="field_checkbox.tpl" field=$enable_smile}}
 	{{include file="field_checkbox.tpl" field=$infinite_scroll}}
-	{{include file="field_checkbox.tpl" field=$no_smart_threading}}
-	{{include file="field_checkbox.tpl" field=$hide_dislike}}
+	{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
+	{{include file="field_checkbox.tpl" field=$enable_dislike}}
 	{{include file="field_checkbox.tpl" field=$display_resharer}}
 	{{include file="field_checkbox.tpl" field=$stay_local}}
 

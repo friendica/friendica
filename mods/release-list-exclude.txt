@@ -1,0 +1,2 @@
+view/lang/*/messages.po
+view/smarty3/compiled/*

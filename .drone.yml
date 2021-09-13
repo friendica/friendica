@@ -96,6 +96,9 @@ kind: pipeline
 type: docker
 name: php7.3-mariadb
 
+depends_on:
+  - php7.3-lint
+
 steps:
   - name: Restore cache
     image: meltwater/drone-cache:dev
@@ -169,6 +172,9 @@ volumes:
 kind: pipeline
 type: docker
 name: php7.4-mariadb
+
+depends_on:
+  - php7.4-lint
 
 steps:
   - name: Restore cache
@@ -256,6 +262,9 @@ kind: pipeline
 type: docker
 name: php8.0-mariadb
 
+depends_on:
+  - php8.0-lint
+
 steps:
   - name: Restore cache
     image: meltwater/drone-cache:dev
@@ -320,6 +329,223 @@ services:
 
   - name: redis
     image: redis
+
+volumes:
+  - name: cache
+    host:
+      path: /tmp/drone-cache
+---
+kind: pipeline
+type: docker
+name: continuous-deployment
+
+depends_on:
+  - php7.3-mariadb
+  - php7.4-mariadb
+  - php8.0-mariadb
+
+trigger:
+  repo:
+    - friendica/friendica
+  branch:
+    - develop
+    - 20*-rc
+  event:
+    - push
+
+node:
+  node: releaser # This prevents executing this pipeline at other servers than drone.friendi.ca
+
+steps:
+  - name: Restore cache
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: '{{ .Repo.Name }}_php74_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - name: cache
+        path:
+          /tmp/cache
+  - name: Composer install
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - export COMPOSER_HOME=.composer
+      - composer validate
+      - composer install --no-dev --optimize-autoloader
+  - name: Create artifacts
+    image: debian
+    commands:
+      - apt-get update
+      - apt-get install bzip2
+      - mkdir ./build
+      - export VERSION="$(cat VERSION)"
+      - # Create artifact
+      - export RELEASE="friendica-full-$VERSION"
+      - export ARTIFACT="$RELEASE.tar.gz"
+      - tar
+        --transform "s,^,$RELEASE/,"
+        -X mods/release-list-exclude.txt
+        -T mods/release-list-include.txt
+        -cvzf ./build/$ARTIFACT
+      - # calculate SHA256 checksum
+      - cd ./build
+      - sha256sum "$ARTIFACT" > "$ARTIFACT.sum256"
+      - ls -lh
+      - # output the sha256 sum for checking
+      - cat "$ARTIFACT.sum256"
+      - sha256sum "$ARTIFACT"
+  - name: Sign artifacts
+    image: plugins/gpgsign
+    settings:
+      key:
+        from_secret: gpg_key
+      passphrase:
+        from_secret: gpg_password
+      files:
+        - build/*
+      exclude:
+        - build/*.sum256
+      detach_sign: true
+  - name: Upload artifacts
+    image: alpine
+    environment:
+      LFTP_HOST:
+        from_secret: sftp_host
+      LFTP_USER:
+        from_secret: sftp_user
+      LFTP_KEY:
+        from_secret: ssh_key
+      LFTP_PORT: "22"
+      LFTP_SOURCE: "build"
+      LFTP_TARGET: "/http"
+    commands:
+      - apk add lftp openssh openssl
+      - touch drone.key
+      - chmod 400 drone.key
+      - echo "$LFTP_KEY" | openssl base64 -A -d > drone.key
+      - lftp -c "
+          set net:timeout 5;
+          set net:max-retries 2;
+          set net:reconnect-interval-base 5;
+          set sftp:auto-confirm true;
+          set sftp:connect-program 'ssh -q -a -x -i drone.key';
+          connect sftp://$LFTP_USER:@$LFTP_HOST:$LFTP_PORT;
+          cd $LFTP_TARGET;
+          mput $LFTP_SOURCE/*;
+        "
+      - rm drone.key
+
+volumes:
+  - name: cache
+    host:
+      path: /tmp/drone-cache
+---
+kind: pipeline
+type: docker
+name: release-deployment
+
+depends_on:
+  - php7.3-mariadb
+  - php7.4-mariadb
+  - php8.0-mariadb
+
+trigger:
+  repo:
+    - friendica/friendica
+  branch:
+    - stable
+  event:
+    - tag
+
+node:
+  node: releaser # This prevents executing this pipeline at other servers than drone.friendi.ca
+
+steps:
+  - name: Restore cache
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: '{{ .Repo.Name }}_php74_{{ arch }}_{{ os }}'
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - name: cache
+        path:
+          /tmp/cache
+  - name: Composer install
+    image: friendicaci/php7.4:php7.4.18
+    commands:
+      - export COMPOSER_HOME=.composer
+      - composer validate
+      - composer install --no-dev --optimize-autoloader
+  - name: Create artifacts
+    image: debian
+    commands:
+      - apt-get update
+      - apt-get install bzip2
+      - mkdir ./build
+      - export VERSION="$(cat VERSION)"
+      - # Create artifact
+      - export RELEASE="friendica-full-$VERSION"
+      - export ARTIFACT="$RELEASE.tar.gz"
+      - tar
+        --transform "s,^,$RELEASE/,"
+        -X mods/release-list-exclude.txt
+        -T mods/release-list-include.txt
+        -cvzf ./build/$ARTIFACT
+      - # calculate SHA256 checksum
+      - cd ./build
+      - sha256sum "$ARTIFACT" > "$ARTIFACT.sum256"
+      - ls -lh
+      - # output the sha256 sum for checking
+      - cat "$ARTIFACT.sum256"
+      - sha256sum "$ARTIFACT"
+  - name: Sign artifacts
+    image: plugins/gpgsign
+    settings:
+      key:
+        from_secret: gpg_key
+      passphrase:
+        from_secret: gpg_password
+      files:
+        - build/*
+      exclude:
+        - build/*.sum256
+      detach_sign: true
+  - name: Upload artifacts
+    image: alpine
+    environment:
+      LFTP_HOST:
+        from_secret: sftp_host
+      LFTP_USER:
+        from_secret: sftp_user
+      LFTP_KEY:
+        from_secret: ssh_key
+      LFTP_PORT: "22"
+      LFTP_SOURCE: "build"
+      LFTP_TARGET: "/http"
+    commands:
+      - apk add lftp openssh openssl
+      - touch drone.key
+      - chmod 400 drone.key
+      - echo "$LFTP_KEY" | openssl base64 -A -d > drone.key
+      - lftp -c "
+        set net:timeout 5;
+        set net:max-retries 2;
+        set net:reconnect-interval-base 5;
+        set sftp:auto-confirm true;
+        set sftp:connect-program 'ssh -q -a -x -i drone.key';
+        connect sftp://$LFTP_USER:@$LFTP_HOST:$LFTP_PORT;
+        cd $LFTP_TARGET;
+        mput $LFTP_SOURCE/*;
+        "
+      - rm drone.key
 
 volumes:
   - name: cache

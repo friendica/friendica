@@ -59,33 +59,37 @@ class Contact extends BaseModule
 			return;
 		}
 
-		$contacts_id = $_POST['contact_batch'];
+		$redirectUrl = $_POST['redirect_url'] ?? 'contact';
 
-		$stmt = DBA::select('contact', ['id', 'archive'], ['id' => $contacts_id, 'uid' => local_user(), 'self' => false, 'deleted' => false]);
-		$orig_records = DBA::toArray($stmt);
+		self::checkFormSecurityTokenRedirectOnError($redirectUrl, 'contact_batch_actions');
+
+		$orig_records = Model\Contact::selectToArray(['id', 'uid'], ['id' => $_POST['contact_batch'], 'uid' => [0, local_user()], 'self' => false, 'deleted' => false]);
 
 		$count_actions = 0;
 		foreach ($orig_records as $orig_record) {
-			$contact_id = $orig_record['id'];
-			if (!empty($_POST['contacts_batch_update'])) {
-				self::updateContactFromPoll($contact_id);
+			$cdata = Model\Contact::getPublicAndUserContactID($orig_record['id'], local_user());
+			if (empty($cdata)) {
+				continue;
+			}
+
+			if (!empty($_POST['contacts_batch_update']) && $cdata['user']) {
+				self::updateContactFromPoll($cdata['user']);
 				$count_actions++;
 			}
+
 			if (!empty($_POST['contacts_batch_block'])) {
-				self::blockContact($contact_id);
+				self::toggleBlockContact($cdata['public']);
 				$count_actions++;
 			}
+
 			if (!empty($_POST['contacts_batch_ignore'])) {
-				self::ignoreContact($contact_id);
+				self::toggleIgnoreContact($cdata['public']);
 				$count_actions++;
 			}
-			if (!empty($_POST['contacts_batch_archive'])
-				&& self::archiveContact($contact_id, $orig_record)
+
+			if (!empty($_POST['contacts_batch_drop']) && $cdata['user']
+				&& self::dropContact($cdata['user'], local_user())
 			) {
-				$count_actions++;
-			}
-			if (!empty($_POST['contacts_batch_drop'])) {
-				self::dropContact($orig_record);
 				$count_actions++;
 			}
 		}
@@ -93,13 +97,11 @@ class Contact extends BaseModule
 			info(DI::l10n()->tt('%d contact edited.', '%d contacts edited.', $count_actions));
 		}
 
-		DI::baseUrl()->redirect('contact');
+		DI::baseUrl()->redirect($redirectUrl);
 	}
 
 	public static function post(array $parameters = [])
 	{
-		$a = DI::app();
-
 		if (!local_user()) {
 			return;
 		}
@@ -160,7 +162,13 @@ class Contact extends BaseModule
 
 	/* contact actions */
 
-	private static function updateContactFromPoll($contact_id)
+	/**
+	 * @param int $contact_id Id of contact with uid != 0
+	 * @throws NotFoundException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	private static function updateContactFromPoll(int $contact_id)
 	{
 		$contact = DBA::selectFirst('contact', ['uid', 'url', 'network'], ['id' => $contact_id, 'uid' => local_user(), 'deleted' => false]);
 		if (!DBA::isResult($contact)) {
@@ -181,9 +189,14 @@ class Contact extends BaseModule
 		}
 	}
 
-	private static function updateContactFromProbe($contact_id)
+	/**
+	 * @param int $contact_id Id of the contact with uid != 0
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 */
+	private static function updateContactFromProbe(int $contact_id)
 	{
-		$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id, 'uid' => [0, local_user()], 'deleted' => false]);
+		$contact = DBA::selectFirst('contact', ['url'], ['id' => $contact_id, 'uid' => local_user(), 'deleted' => false]);
 		if (!DBA::isResult($contact)) {
 			return;
 		}
@@ -195,10 +208,10 @@ class Contact extends BaseModule
 	/**
 	 * Toggles the blocked status of a contact identified by id.
 	 *
-	 * @param $contact_id
+	 * @param int $contact_id Id of the contact with uid = 0
 	 * @throws \Exception
 	 */
-	private static function blockContact($contact_id)
+	private static function toggleBlockContact(int $contact_id)
 	{
 		$blocked = !Model\Contact\User::isBlocked($contact_id, local_user());
 		Model\Contact\User::setBlocked($contact_id, local_user(), $blocked);
@@ -207,41 +220,38 @@ class Contact extends BaseModule
 	/**
 	 * Toggles the ignored status of a contact identified by id.
 	 *
-	 * @param $contact_id
+	 * @param int $contact_id Id of the contact with uid = 0
 	 * @throws \Exception
 	 */
-	private static function ignoreContact($contact_id)
+	private static function toggleIgnoreContact(int $contact_id)
 	{
 		$ignored = !Model\Contact\User::isIgnored($contact_id, local_user());
 		Model\Contact\User::setIgnored($contact_id, local_user(), $ignored);
 	}
 
 	/**
-	 * Toggles the archived status of a contact identified by id.
-	 * If the current status isn't provided, this will always archive the contact.
-	 *
-	 * @param $contact_id
-	 * @param $orig_record
+	 * @param int $contact_id Id for contact with uid != 0
+	 * @param int $uid        Id for user we want to drop the contact for
 	 * @return bool
-	 * @throws \Exception
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
-	private static function archiveContact($contact_id, $orig_record)
+	private static function dropContact(int $contact_id, int $uid): bool
 	{
-		$archived = empty($orig_record['archive']);
-		$r = DBA::update('contact', ['archive' => $archived], ['id' => $contact_id, 'uid' => local_user()]);
-
-		return DBA::isResult($r);
-	}
-
-	private static function dropContact($orig_record)
-	{
-		$owner = Model\User::getOwnerDataById(local_user());
-		if (!DBA::isResult($owner)) {
-			return;
+		$contact = Model\Contact::getContactForUser($contact_id, $uid);
+		if (!DBA::isResult($contact)) {
+			return false;
 		}
 
-		Model\Contact::terminateFriendship($owner, $orig_record, true);
-		Model\Contact::remove($orig_record['id']);
+		$owner = Model\User::getOwnerDataById($uid);
+		if (!DBA::isResult($owner)) {
+			return false;
+		}
+
+		Model\Contact::terminateFriendship($owner, $contact, true);
+		Model\Contact::remove($contact['id']);
+
+		return true;
 	}
 
 	public static function content(array $parameters = [], $update = 0)
@@ -355,58 +365,62 @@ class Contact extends BaseModule
 				throw new NotFoundException(DI::l10n()->t('Contact not found'));
 			}
 
-			if ($cmd === 'update' && ($orig_record['uid'] != 0)) {
-				self::updateContactFromPoll($contact_id);
-				DI::baseUrl()->redirect('contact/' . $contact_id);
+			if ($cmd === 'posts') {
+				return self::getPostsHTML($a, $contact_id);
+			}
+
+			if ($cmd === 'conversations') {
+				return self::getConversationsHMTL($a, $contact_id, $update);
+			}
+
+			self::checkFormSecurityTokenRedirectOnError('contact/' . $contact_id, 'contact_action', 't');
+
+			$cdata = Model\Contact::getPublicAndUserContactID($orig_record['id'], local_user());
+			if (empty($cdata)) {
+				throw new NotFoundException(DI::l10n()->t('Contact not found'));
+			}
+
+			if ($cmd === 'update' && $cdata['user']) {
+				self::updateContactFromPoll($cdata['user']);
+				DI::baseUrl()->redirect('contact/' . $cdata['public']);
 				// NOTREACHED
 			}
 
-			if ($cmd === 'updateprofile') {
-				self::updateContactFromProbe($contact_id);
-				DI::baseUrl()->redirect('contact/' . $contact_id);
+			if ($cmd === 'updateprofile' && $cdata['user']) {
+				self::updateContactFromProbe($cdata['user']);
+				DI::baseUrl()->redirect('contact/' . $cdata['public']);
 				// NOTREACHED
 			}
 
 			if ($cmd === 'block') {
-				if (public_contact() === $contact_id) {
+				if (public_contact() === $cdata['public']) {
 					throw new BadRequestException(DI::l10n()->t('You can\'t block yourself'));
 				}
 
-				self::blockContact($contact_id);
+				self::toggleBlockContact($cdata['public']);
 
 				$blocked = Model\Contact\User::isBlocked($contact_id, local_user());
 				info(($blocked ? DI::l10n()->t('Contact has been blocked') : DI::l10n()->t('Contact has been unblocked')));
 
-				DI::baseUrl()->redirect('contact/' . $contact_id);
+				DI::baseUrl()->redirect('contact/' . $cdata['public']);
 				// NOTREACHED
 			}
 
 			if ($cmd === 'ignore') {
-				if (public_contact() === $contact_id) {
+				if (public_contact() === $cdata['public']) {
 					throw new BadRequestException(DI::l10n()->t('You can\'t ignore yourself'));
 				}
 
-				self::ignoreContact($contact_id);
+				self::toggleIgnoreContact($cdata['public']);
 
-				$ignored = Model\Contact\User::isIgnored($contact_id, local_user());
+				$ignored = Model\Contact\User::isIgnored($cdata['public'], local_user());
 				info(($ignored ? DI::l10n()->t('Contact has been ignored') : DI::l10n()->t('Contact has been unignored')));
 
-				DI::baseUrl()->redirect('contact/' . $contact_id);
+				DI::baseUrl()->redirect('contact/' . $cdata['public']);
 				// NOTREACHED
 			}
 
-			if ($cmd === 'archive' && ($orig_record['uid'] != 0)) {
-				$r = self::archiveContact($contact_id, $orig_record);
-				if ($r) {
-					$archived = (($orig_record['archive']) ? 0 : 1);
-					info((($archived) ? DI::l10n()->t('Contact has been archived') : DI::l10n()->t('Contact has been unarchived')));
-				}
-
-				DI::baseUrl()->redirect('contact/' . $contact_id);
-				// NOTREACHED
-			}
-
-			if ($cmd === 'drop' && ($orig_record['uid'] != 0)) {
+			if ($cmd === 'drop' && $cdata['user']) {
 				// Check if we should do HTML-based delete confirmation
 				if (!empty($_REQUEST['confirm'])) {
 					DI::page()['aside'] = '';
@@ -427,17 +441,12 @@ class Contact extends BaseModule
 					DI::baseUrl()->redirect('contact');
 				}
 
-				self::dropContact($orig_record);
-				info(DI::l10n()->t('Contact has been removed.'));
+				if (self::dropContact($cdata['user'], local_user())) {
+					info(DI::l10n()->t('Contact has been removed.'));
+				}
 
 				DI::baseUrl()->redirect('contact');
 				// NOTREACHED
-			}
-			if ($cmd === 'posts') {
-				return self::getPostsHTML($a, $contact_id);
-			}
-			if ($cmd === 'conversations') {
-				return self::getConversationsHMTL($a, $contact_id, $update);
 			}
 		}
 
@@ -543,7 +552,7 @@ class Contact extends BaseModule
 			}
 
 			$poll_interval = null;
-			if ((($contact['network'] == Protocol::FEED) && !DI::config()->get('system', 'adjust_poll_frequency')) || ($contact['network']== Protocol::MAIL)) {
+			if ((($contact['network'] == Protocol::FEED) && !DI::config()->get('system', 'adjust_poll_frequency')) || ($contact['network'] == Protocol::MAIL)) {
 				$poll_interval = ContactSelector::pollInterval($contact['priority'], !$poll_enabled);
 			}
 
@@ -839,13 +848,13 @@ class Contact extends BaseModule
 			'$submit'     => DI::l10n()->t('Find'),
 			'$cmd'        => DI::args()->getCommand(),
 			'$contacts'   => $contacts,
+			'$form_security_token'  => BaseModule::getFormSecurityToken('contact_batch_actions'),
 			'$contact_drop_confirm' => DI::l10n()->t('Do you really want to delete this contact?'),
 			'multiselect' => 1,
 			'$batch_actions' => [
 				'contacts_batch_update'  => DI::l10n()->t('Update'),
 				'contacts_batch_block'   => DI::l10n()->t('Block') . '/' . DI::l10n()->t('Unblock'),
 				'contacts_batch_ignore'  => DI::l10n()->t('Ignore') . '/' . DI::l10n()->t('Unignore'),
-				'contacts_batch_archive' => DI::l10n()->t('Archive') . '/' . DI::l10n()->t('Unarchive'),
 				'contacts_batch_drop'    => DI::l10n()->t('Delete'),
 			],
 			'$h_batch_actions' => DI::l10n()->t('Batch Actions'),
@@ -1070,7 +1079,7 @@ class Contact extends BaseModule
 	/**
 	 * Gives a array with actions which can performed to a given contact
 	 *
-	 * This includes actions like e.g. 'block', 'hide', 'archive', 'delete' and others
+	 * This includes actions like e.g. 'block', 'hide', 'delete' and others
 	 *
 	 * @param array $contact Data about the Contact
 	 * @return array with contact related actions
@@ -1079,6 +1088,8 @@ class Contact extends BaseModule
 	{
 		$poll_enabled = in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL]);
 		$contact_actions = [];
+
+		$formSecurityToken = self::getFormSecurityToken('contact_action');
 
 		// Provide friend suggestion only for Friendica contacts
 		if ($contact['network'] === Protocol::DFRN) {
@@ -1094,7 +1105,7 @@ class Contact extends BaseModule
 		if ($poll_enabled) {
 			$contact_actions['update'] = [
 				'label' => DI::l10n()->t('Update now'),
-				'url'   => 'contact/' . $contact['id'] . '/update',
+				'url'   => 'contact/' . $contact['id'] . '/update?t=' . $formSecurityToken,
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'update',
@@ -1104,7 +1115,7 @@ class Contact extends BaseModule
 		if (in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
 			$contact_actions['updateprofile'] = [
 				'label' => DI::l10n()->t('Refetch contact data'),
-				'url'   => 'contact/' . $contact['id'] . '/updateprofile',
+				'url'   => 'contact/' . $contact['id'] . '/updateprofile?t=' . $formSecurityToken,
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'updateprofile',
@@ -1113,7 +1124,7 @@ class Contact extends BaseModule
 
 		$contact_actions['block'] = [
 			'label' => (intval($contact['blocked']) ? DI::l10n()->t('Unblock') : DI::l10n()->t('Block')),
-			'url'   => 'contact/' . $contact['id'] . '/block',
+			'url'   => 'contact/' . $contact['id'] . '/block?t=' . $formSecurityToken,
 			'title' => DI::l10n()->t('Toggle Blocked status'),
 			'sel'   => (intval($contact['blocked']) ? 'active' : ''),
 			'id'    => 'toggle-block',
@@ -1121,24 +1132,16 @@ class Contact extends BaseModule
 
 		$contact_actions['ignore'] = [
 			'label' => (intval($contact['readonly']) ? DI::l10n()->t('Unignore') : DI::l10n()->t('Ignore')),
-			'url'   => 'contact/' . $contact['id'] . '/ignore',
+			'url'   => 'contact/' . $contact['id'] . '/ignore?t=' . $formSecurityToken,
 			'title' => DI::l10n()->t('Toggle Ignored status'),
 			'sel'   => (intval($contact['readonly']) ? 'active' : ''),
 			'id'    => 'toggle-ignore',
 		];
 
 		if ($contact['uid'] != 0) {
-			$contact_actions['archive'] = [
-				'label' => (intval($contact['archive']) ? DI::l10n()->t('Unarchive') : DI::l10n()->t('Archive')),
-				'url'   => 'contact/' . $contact['id'] . '/archive',
-				'title' => DI::l10n()->t('Toggle Archive status'),
-				'sel'   => (intval($contact['archive']) ? 'active' : ''),
-				'id'    => 'toggle-archive',
-			];
-
 			$contact_actions['delete'] = [
 				'label' => DI::l10n()->t('Delete'),
-				'url'   => 'contact/' . $contact['id'] . '/drop',
+				'url'   => 'contact/' . $contact['id'] . '/drop?t=' . $formSecurityToken,
 				'title' => DI::l10n()->t('Delete contact'),
 				'sel'   => '',
 				'id'    => 'delete',

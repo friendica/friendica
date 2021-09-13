@@ -57,7 +57,7 @@ class DatabaseLockDriverTest extends LockTest
 
 		// load real config to avoid mocking every config-entry which is related to the Database class
 		$configFactory = new ConfigFactory();
-		$loader        = new ConfigFileLoader($this->root->url());
+		$loader        = (new ConfigFactory())->createConfigFileLoader($this->root->url(), []);
 		$configCache   = $configFactory->createCache($loader);
 
 		$dba = new StaticDatabase($configCache, $profiler, $logger);

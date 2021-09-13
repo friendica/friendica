@@ -1,3 +1,4 @@
+bin/.htaccess
 bin/auth_ejabberd.php
 bin/console
 bin/console.bat

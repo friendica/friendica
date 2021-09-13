@@ -285,7 +285,7 @@ function vier_community_info()
 			$r[] = ["photo" => "images/wordpress.png", "name" => "Wordpress"];
 		}
 
-		if (function_exists("imap_open") && !DI::config()->get("system", "imap_disabled") && !DI::config()->get("system", "dfrn_only")) {
+		if (function_exists("imap_open") && !DI::config()->get("system", "imap_disabled")) {
 			$r[] = ["photo" => "images/mail.png", "name" => "E-Mail"];
 		}
 

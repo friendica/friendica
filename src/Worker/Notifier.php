@@ -179,7 +179,7 @@ class Notifier
 				$thr_parent = $parent;
 			}
 
-			Logger::log('GUID: ' . $target_item["guid"] . ': Parent is ' . $parent['network'] . '. Thread parent is ' . $thr_parent['network'], Logger::DEBUG);
+			Logger::info('Got post', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id'], 'network' => $target_item['network'], 'parent-network' => $parent['network'], 'thread-parent-network' => $thr_parent['network']]);
 
 			if (!self::isRemovalActivity($cmd, $owner, Protocol::ACTIVITYPUB)) {
 				$apdelivery = self::activityPubDelivery($cmd, $target_item, $parent, $thr_parent, $a->getQueueValue('priority'), $a->getQueueValue('created'), $owner);
@@ -615,7 +615,7 @@ class Notifier
 		$url_recipients = array_filter($url_recipients);
 		// send salmon slaps to mentioned remote tags (@foo@example.com) in OStatus posts
 		// They are especially used for notifications to OStatus users that don't follow us.
-		if (!DI::config()->get('system', 'dfrn_only') && count($url_recipients) && ($public_message || $push_notify) && !empty($target_item)) {
+		if (count($url_recipients) && ($public_message || $push_notify) && !empty($target_item)) {
 			$slap = OStatus::salmon($target_item, $owner);
 			foreach ($url_recipients as $url) {
 				Logger::info('Salmon delivery', ['item' => $target_id, 'to' => $url]);
@@ -732,21 +732,25 @@ class Notifier
 	{
 		// Don't deliver via AP when the starting post isn't from a federated network
 		if (!in_array($parent['network'], Protocol::FEDERATED)) {
+			Logger::info('Parent network is no federated network, so no AP delivery', ['network' => $parent['network']]);
 			return ['count' => 0, 'contacts' => []];
 		}
 
 		// Don't deliver via AP when the starting post is delivered via Diaspora
 		if ($parent['network'] == Protocol::DIASPORA) {
+			Logger::info('Parent network is Diaspora, so no AP delivery');
 			return ['count' => 0, 'contacts' => []];
 		}
 
 		// Also don't deliver when the direct thread parent was delivered via Diaspora
 		if ($thr_parent['network'] == Protocol::DIASPORA) {
+			Logger::info('Thread parent network is Diaspora, so no AP delivery');
 			return ['count' => 0, 'contacts' => []];
 		}
 
 		// Posts from Diaspora contacts are transmitted via Diaspora
 		if ($target_item['network'] == Protocol::DIASPORA) {
+			Logger::info('Post network is Diaspora, so no AP delivery');
 			return ['count' => 0, 'contacts' => []];
 		}
 

@@ -129,10 +129,10 @@
 					</td>
 					<td class="text-right">
 				{{if $u.is_deletable}}
-						<a href="{{$baseurl}}/admin/users/block/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link" title="{{$block}}">
+						<a href="{{$baseurl}}/admin/users/active/block/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link" title="{{$block}}">
 							<i class="fa fa-ban" aria-hidden="true"></i>
 						</a>
-						<a href="{{$baseurl}}/admin/users/delete/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link" title="{{$delete}}" onclick="return confirm_delete('{{$confirm_delete}}','{{$u.name}}')">
+						<a href="{{$baseurl}}/admin/users/active/delete/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link" title="{{$delete}}" onclick="return confirm_delete('{{$confirm_delete}}','{{$u.name}}')">
 							<i class="fa fa-trash" aria-hidden="true"></i>
 						</a>
 				{{else}}

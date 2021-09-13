@@ -146,11 +146,11 @@ class HTTPClient implements IHTTPClient
 				$exception->hasResponse()) {
 				return new GuzzleResponse($exception->getResponse(), $url, $exception->getCode(), '');
 			} else {
-				return new CurlResult($url, '', ['http_code' => $exception->getCode()], $exception->getCode(), '');
+				return new CurlResult($url, '', ['http_code' => 500], $exception->getCode(), '');
 			}
-		} catch (InvalidArgumentException $argumentException) {
+		} catch (InvalidArgumentException | \InvalidArgumentException $argumentException) {
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
-			return new CurlResult($url, '', ['http_code' => $argumentException->getCode()], $argumentException->getCode(), $argumentException->getMessage());
+			return new CurlResult($url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
 		} finally {
 			$this->logger->debug('Request stop.', ['url' => $url, 'method' => $method]);
 			$this->profiler->stopRecording();
@@ -220,7 +220,7 @@ class HTTPClient implements IHTTPClient
 		$urlResult = $this->resolver->resolveURL($url);
 
 		if ($urlResult->didErrorOccur()) {
-			throw new TransferException($urlResult->getErrorMessageString());
+			throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode());
 		}
 
 		return $urlResult->getURL();

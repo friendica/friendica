@@ -48,7 +48,7 @@
 						{{include file="field_select.tpl" field=$theme_mobile}}
 						{{include file="field_select.tpl" field=$ssl_policy}}
 						{{if $ssl_policy.2 == 1}}{{include file="field_checkbox.tpl" field=$force_ssl}}{{/if}}
-						{{include file="field_checkbox.tpl" field=$hide_help}}
+						{{include file="field_checkbox.tpl" field=$show_help}}
 						{{include file="field_select.tpl" field=$singleuser}}
 					</div>
 					<div class="panel-footer">
@@ -74,9 +74,9 @@
 						{{include file="field_input.tpl" field=$register_text}}
 						{{include file="field_select.tpl" field=$register_policy}}
 						{{include file="field_input.tpl" field=$daily_registrations}}
-						{{include file="field_checkbox.tpl" field=$no_multi_reg}}
-						{{include file="field_checkbox.tpl" field=$no_openid}}
-						{{include file="field_checkbox.tpl" field=$no_regfullname}}
+						{{include file="field_checkbox.tpl" field=$enable_multi_reg}}
+						{{include file="field_checkbox.tpl" field=$enable_openid}}
+						{{include file="field_checkbox.tpl" field=$enable_regfullname}}
 					</div>
 					<div class="panel-footer">
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
@@ -135,17 +135,25 @@
 						{{include file="field_select.tpl" field=$community_page_style}}
 						{{include file="field_input.tpl" field=$max_author_posts_community_page}}
 
-						{{include file="field_checkbox.tpl" field=$ostatus_disabled}}
+						{{if $mail_able}}
+							{{include file="field_checkbox.tpl" field=$mail_enabled}}
+						{{else}}
+							<div class="field checkbox" id="div_id_{{$mail_enabled.0}}">
+								<label for="id_{{$mail_enabled.0}}">{{$mail_enabled.1}}</label>
+								<span class="help-block" id="id_{{$mail_enabled.0}}" role="tooltip">{{$mail_not_able}}</span>
+							</div>
+						{{/if}}
+
+						{{include file="field_checkbox.tpl" field=$ostatus_enabled}}
 
 						{{if $diaspora_able}}
 							{{include file="field_checkbox.tpl" field=$diaspora_enabled}}
 						{{else}}
 							<div class="field checkbox" id="div_id_{{$diaspora_enabled.0}}">
 								<label for="id_{{$diaspora_enabled.0}}">{{$diaspora_enabled.1}}</label>
-								<span id="id_{{$diaspora_enabled.0}}">{{$diaspora_not_able}}</span>
+								<span class="help-block" id="id_{{$diaspora_enabled.0}}" role="tooltip">{{$diaspora_not_able}}</span>
 							</div>
 						{{/if}}
-						{{include file="field_checkbox.tpl" field=$dfrn_only}}
 						{{include file="field_input.tpl" field=$global_directory}}
 						<p>
 							<input type="submit" name="republish_directory" class="btn btn-primary" value="{{$republish}}"/>
@@ -156,6 +164,7 @@
 						{{include file="field_checkbox.tpl" field=$disable_embedded}}
 						{{include file="field_checkbox.tpl" field=$allow_users_remote_self}}
 						{{include file="field_checkbox.tpl" field=$explicit_content}}
+						{{include file="field_checkbox.tpl" field=$proxify_content}}
 					</div>
 					<div class="panel-footer">
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
@@ -177,7 +186,6 @@
 				</div>
 				<div id="admin-settings-advanced-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-advanced">
 					<div class="panel-body">
-						{{include file="field_select.tpl" field=$rino}}
 						{{include file="field_checkbox.tpl" field=$verifyssl}}
 						{{include file="field_input.tpl" field=$proxy}}
 						{{include file="field_input.tpl" field=$proxyuser}}

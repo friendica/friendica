@@ -190,12 +190,13 @@ class Thread
 	 * We should find a way to avoid using those arguments (at least most of them)
 	 *
 	 * @param array $conv_responses data
+	 * @param string $formSecurityToken A security Token to avoid CSF attacks
 	 *
 	 * @return mixed The data requested on success
 	 *               false on failure
 	 * @throws \Exception
 	 */
-	public function getTemplateData($conv_responses)
+	public function getTemplateData($conv_responses, string $formSecurityToken)
 	{
 		$result = [];
 
@@ -204,7 +205,7 @@ class Thread
 				continue;
 			}
 
-			$item_data = $item->getTemplateData($conv_responses);
+			$item_data = $item->getTemplateData($conv_responses, $formSecurityToken);
 
 			if (!$item_data) {
 				Logger::log('[ERROR] Conversation::getTemplateData : Failed to get item template data ('. $item->getId() .').', Logger::DEBUG);

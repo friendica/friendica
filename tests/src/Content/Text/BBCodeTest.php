@@ -75,6 +75,7 @@ class BBCodeTest extends MockedTest
 		           ->andReturn($baseUrlMock);
 		$baseUrlMock->shouldReceive('getHostname')->withNoArgs()->andReturn('friendica.local');
 		$baseUrlMock->shouldReceive('getUrlPath')->withNoArgs()->andReturn('');
+		$baseUrlMock->shouldReceive('__toString')->withNoArgs()->andReturn('friendica.local');
 
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
@@ -336,6 +337,33 @@ class BBCodeTest extends MockedTest
 	public function testToMarkdown(string $expected, string $text, $for_diaspora = false)
 	{
 		$actual = BBCode::toMarkdown($text, $for_diaspora);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataExpandTags()
+	{
+		return [
+			'bug-10692-non-word' => [
+				'[url=https://github.com/friendica/friendica/blob/2021.09-rc/src/Util/Logger/StreamLogger.php#L160]https://github.com/friendica/friendica/blob/2021.09-rc/src/Util/Logger/StreamLogger.php#L160[/url]',
+				'[url=https://github.com/friendica/friendica/blob/2021.09-rc/src/Util/Logger/StreamLogger.php#L160]https://github.com/friendica/friendica/blob/2021.09-rc/src/Util/Logger/StreamLogger.php#L160[/url]',
+			],
+			'bug-10692-start-line' => [
+				'#[url=https://friendica.local/search?tag=L160]L160[/url]',
+				'#L160',
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataExpandTags
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testExpandTags(string $expected, string $text)
+	{
+		$actual = BBCode::expandTags($text);
 
 		self::assertEquals($expected, $actual);
 	}

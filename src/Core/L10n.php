@@ -314,7 +314,7 @@ class L10n
 
 		if (is_null($s) && $this->stringPluralSelectDefault($count)) {
 			$s = $plural;
-		} else {
+		} elseif (is_null($s)) {
 			$s = $singular;
 		}
 

@@ -25,6 +25,7 @@ use Exception;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Module;
+use Friendica\Factory\ConfigFactory;
 use Friendica\Module\Maintenance;
 use Friendica\Security\Authentication;
 use Friendica\Core\Config\Cache;
@@ -352,7 +353,7 @@ class App
 			$this->profiler->update($this->config);
 
 			Core\Hook::loadHooks();
-			$loader = new ConfigFileLoader($this->getBasePath());
+			$loader = (new ConfigFactory())->createConfigFileLoader($this->getBasePath(), $_SERVER);
 			Core\Hook::callAll('load_config', $loader);
 		}
 

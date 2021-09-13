@@ -74,9 +74,12 @@ return [
 		]
 	],
 	Util\ConfigFileLoader::class => [
-		'shared'          => true,
-		'constructParams' => [
-			[Dice::INSTANCE => '$basepath'],
+		'instanceOf' => Factory\ConfigFactory::class,
+		'call'       => [
+			['createConfigFileLoader', [
+				[Dice::INSTANCE => '$basepath'],
+				$_SERVER,
+			], Dice::CHAIN_CALL],
 		],
 	],
 	Config\Cache::class          => [

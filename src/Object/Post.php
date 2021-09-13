@@ -125,6 +125,7 @@ class Post
 	 * Get data in a form usable by a conversation template
 	 *
 	 * @param array   $conv_responses conversation responses
+	 * @param string $formSecurityToken A security Token to avoid CSF attacks
 	 * @param integer $thread_level   default = 1
 	 *
 	 * @return mixed The data requested on success
@@ -132,7 +133,7 @@ class Post
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function getTemplateData(array $conv_responses, $thread_level = 1)
+	public function getTemplateData(array $conv_responses, string $formSecurityToken, $thread_level = 1)
 	{
 		$a = DI::app();
 
@@ -458,7 +459,7 @@ class Post
 			'vwall'           => DI::l10n()->t('via Wall-To-Wall:'),
 			'profile_url'     => $profile_link,
 			'name'            => $profile_name,
-			'item_photo_menu_html' => item_photo_menu($item),
+			'item_photo_menu_html' => item_photo_menu($item, $formSecurityToken),
 			'thumb'           => DI::baseUrl()->remove(Contact::getAvatarUrlForUrl($item['author-link'], $item['uid'], Proxy::SIZE_THUMB)),
 			'osparkle'        => $osparkle,
 			'sparkle'         => $sparkle,
@@ -532,7 +533,7 @@ class Post
 		$nb_children = count($children);
 		if ($nb_children > 0) {
 			foreach ($children as $child) {
-				$result['children'][] = $child->getTemplateData($conv_responses, $thread_level + 1);
+				$result['children'][] = $child->getTemplateData($conv_responses, $formSecurityToken, $thread_level + 1);
 			}
 
 			// Collapse
