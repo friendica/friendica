@@ -971,11 +971,11 @@
 			"blocked" => ["contact", "blocked"],
 			"dfrn-notify" => ["contact", "notify"],
 			"dfrn-poll" => ["contact", "poll"],
-			"diaspora-guid" => ["fcontact", "guid"],
-			"diaspora-batch" => ["fcontact", "batch"],
-			"diaspora-notify" => ["fcontact", "notify"],
-			"diaspora-poll" => ["fcontact", "poll"],
-			"diaspora-alias" => ["fcontact", "alias"],
+			"diaspora-guid" => ["item-uri", "guid"],
+			"diaspora-batch" => ["diaspora-contact", "batch"],
+			"diaspora-notify" => ["diaspora-contact", "notify"],
+			"diaspora-poll" => ["diaspora-contact", "poll"],
+			"diaspora-alias" => ["diaspora-contact", "alias"],
 			"ap-uuid" => ["apcontact", "uuid"],
 			"ap-type" => ["apcontact", "type"],
 			"ap-following" => ["apcontact", "following"],
@@ -994,7 +994,7 @@
 		"query" => "FROM `contact`
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `contact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `contact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = contact.`uri-id`
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = contact.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`
 			WHERE `contact`.`uid` = 0"
 	],
@@ -1070,14 +1070,14 @@
 			"reason" => ["ucontact", "reason"],
 			"dfrn-notify" => ["contact", "notify"],
 			"dfrn-poll" => ["contact", "poll"],
-			"diaspora-guid" => ["fcontact", "guid"],
-			"diaspora-batch" => ["fcontact", "batch"],
-			"diaspora-notify" => ["fcontact", "notify"],
-			"diaspora-poll" => ["fcontact", "poll"],
-			"diaspora-alias" => ["fcontact", "alias"],
-			"diaspora-interacting_count" => ["fcontact", "interacting_count"],
-			"diaspora-interacted_count" => ["fcontact", "interacted_count"],
-			"diaspora-post_count" => ["fcontact", "post_count"],
+			"diaspora-guid" => ["item-uri", "guid"],
+			"diaspora-batch" => ["diaspora-contact", "batch"],
+			"diaspora-notify" => ["diaspora-contact", "notify"],
+			"diaspora-poll" => ["diaspora-contact", "poll"],
+			"diaspora-alias" => ["diaspora-contact", "alias"],
+			"diaspora-interacting_count" => ["diaspora-contact", "interacting_count"],
+			"diaspora-interacted_count" => ["diaspora-contact", "interacted_count"],
+			"diaspora-post_count" => ["diaspora-contact", "post_count"],
 			"ap-uuid" => ["apcontact", "uuid"],
 			"ap-type" => ["apcontact", "type"],
 			"ap-following" => ["apcontact", "following"],
@@ -1097,7 +1097,7 @@
 			INNER JOIN `contact` ON `contact`.`uri-id` = `ucontact`.`uri-id` AND `contact`.`uid` = 0
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `ucontact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `ucontact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = `ucontact`.`uri-id` AND `fcontact`.`network` = 'dspr'
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = `ucontact`.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`"
 	],
 	"pending-view" => [

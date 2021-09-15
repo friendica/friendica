@@ -1383,7 +1383,7 @@ class Contact
 		}
 
 		if ($data['network'] == Protocol::DIASPORA) {
-			FContact::updateFromProbeArray($data);
+			DI::dsprContact()->updateFromProbeArray($data);
 		}
 
 		self::updateFromProbeArray($contact_id, $data);
@@ -2456,7 +2456,7 @@ class Contact
 		$ret = Probe::uri($contact['url'], $network, $contact['uid']);
 
 		if ($ret['network'] == Protocol::DIASPORA) {
-			FContact::updateFromProbeArray($ret);
+			DI::dsprContact()->updateFromProbeArray($ret);
 		}
 
 		return self::updateFromProbeArray($id, $ret);

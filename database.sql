@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2022.12-dev (Giant Rhubarb)
--- DB_UPDATE_VERSION 1491
+-- DB_UPDATE_VERSION 1492
 -- ------------------------------------------
 
 
@@ -2796,11 +2796,11 @@ CREATE VIEW `account-view` AS SELECT
 	`contact`.`blocked` AS `blocked`,
 	`contact`.`notify` AS `dfrn-notify`,
 	`contact`.`poll` AS `dfrn-poll`,
-	`fcontact`.`guid` AS `diaspora-guid`,
-	`fcontact`.`batch` AS `diaspora-batch`,
-	`fcontact`.`notify` AS `diaspora-notify`,
-	`fcontact`.`poll` AS `diaspora-poll`,
-	`fcontact`.`alias` AS `diaspora-alias`,
+	`item-uri`.`guid` AS `diaspora-guid`,
+	`diaspora-contact`.`batch` AS `diaspora-batch`,
+	`diaspora-contact`.`notify` AS `diaspora-notify`,
+	`diaspora-contact`.`poll` AS `diaspora-poll`,
+	`diaspora-contact`.`alias` AS `diaspora-alias`,
 	`apcontact`.`uuid` AS `ap-uuid`,
 	`apcontact`.`type` AS `ap-type`,
 	`apcontact`.`following` AS `ap-following`,
@@ -2818,7 +2818,7 @@ CREATE VIEW `account-view` AS SELECT
 	FROM `contact`
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `contact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `contact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = contact.`uri-id`
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = contact.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`
 			WHERE `contact`.`uid` = 0;
 
@@ -2897,14 +2897,14 @@ CREATE VIEW `account-user-view` AS SELECT
 	`ucontact`.`reason` AS `reason`,
 	`contact`.`notify` AS `dfrn-notify`,
 	`contact`.`poll` AS `dfrn-poll`,
-	`fcontact`.`guid` AS `diaspora-guid`,
-	`fcontact`.`batch` AS `diaspora-batch`,
-	`fcontact`.`notify` AS `diaspora-notify`,
-	`fcontact`.`poll` AS `diaspora-poll`,
-	`fcontact`.`alias` AS `diaspora-alias`,
-	`fcontact`.`interacting_count` AS `diaspora-interacting_count`,
-	`fcontact`.`interacted_count` AS `diaspora-interacted_count`,
-	`fcontact`.`post_count` AS `diaspora-post_count`,
+	`item-uri`.`guid` AS `diaspora-guid`,
+	`diaspora-contact`.`batch` AS `diaspora-batch`,
+	`diaspora-contact`.`notify` AS `diaspora-notify`,
+	`diaspora-contact`.`poll` AS `diaspora-poll`,
+	`diaspora-contact`.`alias` AS `diaspora-alias`,
+	`diaspora-contact`.`interacting_count` AS `diaspora-interacting_count`,
+	`diaspora-contact`.`interacted_count` AS `diaspora-interacted_count`,
+	`diaspora-contact`.`post_count` AS `diaspora-post_count`,
 	`apcontact`.`uuid` AS `ap-uuid`,
 	`apcontact`.`type` AS `ap-type`,
 	`apcontact`.`following` AS `ap-following`,
@@ -2923,7 +2923,7 @@ CREATE VIEW `account-user-view` AS SELECT
 			INNER JOIN `contact` ON `contact`.`uri-id` = `ucontact`.`uri-id` AND `contact`.`uid` = 0
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `ucontact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `ucontact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = `ucontact`.`uri-id` AND `fcontact`.`network` = 'dspr'
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = `ucontact`.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`;
 
 --
