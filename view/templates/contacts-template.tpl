@@ -38,20 +38,6 @@
      return false;
     }
   });
- 
-  // add javascript confirm dialog to "drop" links. Plain html url have "?confirm=1" to show confirmation form, we need to remove it
-  $(".drop").each(function() {
-   $(this).attr('href', $(this).attr('href').replace("confirm=1","") );
-   $(this).click(function(e){
-    if (confirm("{{$contact_drop_confirm}}")) {
-     return true;
-    } else {
-     e.preventDefault();
-     return false;
-    }
-   });
-   
-  });
  });
  </script>
 

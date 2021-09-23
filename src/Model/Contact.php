@@ -963,7 +963,6 @@ class Contact
 		$pm_url = '';
 		$status_link = '';
 		$photos_link = '';
-		$contact_drop_link = '';
 		$poke_link = '';
 
 		if ($uid == 0) {
@@ -1015,10 +1014,6 @@ class Contact
 
 		$posts_link = DI::baseUrl() . '/contact/' . $contact['id'] . '/conversations';
 
-		if (!$contact['self']) {
-			$contact_drop_link = DI::baseUrl() . '/contact/' . $contact['id'] . '/drop?confirm=1';
-		}
-
 		$follow_link = '';
 		$unfollow_link = '';
 		if (!$contact['self'] && in_array($contact['network'], Protocol::NATIVE_SUPPORT)) {
@@ -1027,10 +1022,6 @@ class Contact
 			} elseif(!$contact['pending']) {
 				$follow_link = 'follow?url=' . urlencode($contact['url']) . '&auto=1';
 			}
-		}
-
-		if (!empty($follow_link) || !empty($unfollow_link)) {
-			$contact_drop_link = '';
 		}
 
 		/**
@@ -1052,7 +1043,6 @@ class Contact
 				'photos'  => [DI::l10n()->t('View Photos')   , $photos_link      , true],
 				'network' => [DI::l10n()->t('Network Posts') , $posts_link       , false],
 				'edit'    => [DI::l10n()->t('View Contact')  , $contact_url      , false],
-				'drop'    => [DI::l10n()->t('Drop Contact')  , $contact_drop_link, false],
 				'pm'      => [DI::l10n()->t('Send PM')       , $pm_url           , false],
 				'poke'    => [DI::l10n()->t('Poke')          , $poke_link        , false],
 				'follow'  => [DI::l10n()->t('Connect/Follow'), $follow_link      , true],

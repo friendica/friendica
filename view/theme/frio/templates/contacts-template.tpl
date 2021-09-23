@@ -1,8 +1,4 @@
 
-<script type="text/javascript">
-	var dropContact = "{{$contact_drop_confirm}}";
-</script>
-
 {{$tabs nofilter}}
 
 <div id="contacts" class="generic-page-wrapper">

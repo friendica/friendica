@@ -65,11 +65,6 @@
 					<i class="fa fa-user" aria-hidden="true"></i>
 				</a>
 				{{/if}}
-				{{if $contact.photo_menu.drop}}
-				<button type="button" class="contact-action-link btn-link" onclick="addToModal('{{$contact.photo_menu.drop.1}}'); return false;" data-toggle="tooltip" title="{{$contact.photo_menu.drop.0}}">
-					<i class="fa fa-user-times" aria-hidden="true"></i>
-				</button>
-				{{/if}}
 				{{if $contact.photo_menu.follow}}
 				<a class="contact-action-link btn-link" href="{{$contact.photo_menu.follow.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.follow.0}}">
 					<i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -196,11 +191,6 @@ We use this part to filter the contacts with jquery.textcomplete *}}
 				{if $photo_menu.edit}
 				<a class="contact-action-link btn-link" href="{$photo_menu.edit.1}" data-toggle="tooltip" title="{$photo_menu.edit.0}">
 					<i class="fa fa-user" aria-hidden="true"></i>
-				</a>
-				{/if}
-				{if $photo_menu.drop}
-				<a class="contact-action-link btn-link" href="{$photo_menu.drop.1}" data-toggle="tooltip" title="{$photo_menu.drop.0}">
-					<i class="fa fa-user-times" aria-hidden="true"></i>
 				</a>
 				{/if}
 				{if $photo_menu.follow}

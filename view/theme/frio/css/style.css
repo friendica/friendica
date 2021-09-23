@@ -2504,14 +2504,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #directory-search-wrapper {
 	padding: 10px 0;
 }
-#contact-drop-confirm .contact-actions,
-#contact-drop-confirm .contact-photo-overlay,
-#contact-drop-confirm .contact-photo-menu {
-	display: none;
-}
-#contact-drop-confirm #confirm-form {
-	margin-top: 20px;
-}
 
 /* contact-edit */
 #contact-edit-actions {
