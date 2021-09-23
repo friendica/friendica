@@ -68,7 +68,8 @@ class Contact extends BaseModule
 		$count_actions = 0;
 		foreach ($orig_records as $orig_record) {
 			$cdata = Model\Contact::getPublicAndUserContactID($orig_record['id'], local_user());
-			if (empty($cdata)) {
+			if (empty($cdata) || public_contact() === $cdata['public']) {
+				// No action available on your own contact
 				continue;
 			}
 
@@ -78,7 +79,7 @@ class Contact extends BaseModule
 			}
 
 			if (!empty($_POST['contacts_batch_block'])) {
-				self::toggleBlockContact($cdata['public']);
+				self::toggleBlockContact($cdata, local_user());
 				$count_actions++;
 			}
 
@@ -206,15 +207,26 @@ class Contact extends BaseModule
 	}
 
 	/**
-	 * Toggles the blocked status of a contact identified by id.
+	 * Toggles the blocked status of a contact identified by a public or private id.
+	 * Also dissolves any existing relationship when a contact is blocked.
 	 *
-	 * @param int $contact_id Id of the contact with uid = 0
-	 * @throws \Exception
+	 * @param array $cdata    Result of Model\Contact::getPublicAndUserContactID for the target contact
+	 * @param int   $owner_id Id of the user we want to block the contact for
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
 	 */
-	private static function toggleBlockContact(int $contact_id)
+	private static function toggleBlockContact(array $cdata, int $owner_id)
 	{
-		$blocked = !Model\Contact\User::isBlocked($contact_id, local_user());
-		Model\Contact\User::setBlocked($contact_id, local_user(), $blocked);
+		$newBlockedState = !Model\Contact\User::isBlocked($cdata['public'], local_user());
+		if ($newBlockedState && $cdata['user']) {
+			$contact = Model\Contact::getContactForUser($cdata['user'], $owner_id);
+			$owner = Model\User::getOwnerDataById($owner_id);
+			if (DBA::isResult($contact) && DBA::isResult($owner)) {
+				Model\Contact::terminateFriendship($owner, $contact, true);
+			}
+		}
+
+		Model\Contact\User::setBlocked($cdata['public'], $owner_id, $newBlockedState);
 	}
 
 	/**
@@ -403,7 +415,7 @@ class Contact extends BaseModule
 					throw new BadRequestException(DI::l10n()->t('You can\'t block yourself'));
 				}
 
-				self::toggleBlockContact($cdata['public']);
+				self::toggleBlockContact($cdata, local_user());
 
 				$blocked = Model\Contact\User::isBlocked($contact_id, local_user());
 				info(($blocked ? DI::l10n()->t('Contact has been blocked') : DI::l10n()->t('Contact has been unblocked')));
