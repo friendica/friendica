@@ -845,6 +845,12 @@ class Contact
 			if ($dissolve) {
 				ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $user['uid']);
 			}
+		} else {
+			$hook_data = [
+				'contact' => $contact,
+				'dissolve' => $dissolve,
+			];
+			Hook::callAll('unfollow', $hook_data);
 		}
 	}
 

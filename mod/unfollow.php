@@ -144,7 +144,7 @@ function unfollow_process(string $url)
 		Contact::terminateFriendship($owner, $contact, $dissolve);
 	}
 
-	// Sharing-only contacts get deleted as there no relationship any more
+	// Sharing-only contacts get deleted as there no relationship anymore
 	if ($dissolve) {
 		Contact::remove($contact['id']);
 		$return_path = $base_return_path;

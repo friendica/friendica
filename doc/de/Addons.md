@@ -356,6 +356,7 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('contact_photo_menu', $args);
     Hook::callAll('follow', $arr);
+    Hook::callAll('unfollow', $hook_data);
 
 ### src/Model/Profile.php
 
