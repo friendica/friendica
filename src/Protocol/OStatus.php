@@ -1400,31 +1400,31 @@ class OStatus
 	 * Adds the author element to the XML document
 	 *
 	 * @param DOMDocument $doc          XML document
-	 * @param array       $owner        Contact data of the poster
+	 * @param array       $contact      Contact data of the poster
 	 * @param bool        $show_profile Whether to show profile
 	 *
 	 * @return \DOMElement author element
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function addAuthor(DOMDocument $doc, array $owner, $show_profile = true)
+	private static function addAuthor(DOMDocument $doc, array $contact, bool $show_profile = true): \DOMElement
 	{
-		$profile = DBA::selectFirst('profile', ['homepage', 'publish'], ['uid' => $owner['uid']]);
+		$profile = DBA::selectFirst('profile', ['homepage', 'publish'], ['uid' => $contact['uid']]);
 		$author = $doc->createElement("author");
-		XML::addElement($doc, $author, "id", $owner["url"]);
-		if ($owner['contact-type'] == Contact::TYPE_COMMUNITY) {
+		XML::addElement($doc, $author, "id", $contact["url"]);
+		if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
 			XML::addElement($doc, $author, "activity:object-type", Activity\ObjectType::GROUP);
 		} else {
 			XML::addElement($doc, $author, "activity:object-type", Activity\ObjectType::PERSON);
 		}
 
-		XML::addElement($doc, $author, "uri", $owner["url"]);
-		XML::addElement($doc, $author, "name", $owner["nick"]);
-		XML::addElement($doc, $author, "email", $owner["addr"]);
+		XML::addElement($doc, $author, "uri", $contact["url"]);
+		XML::addElement($doc, $author, "name", $contact["nick"]);
+		XML::addElement($doc, $author, "email", $contact["addr"]);
 		if ($show_profile) {
-			XML::addElement($doc, $author, "summary", BBCode::convertForUriId($owner['uri-id'], $owner["about"], BBCode::OSTATUS));
+			XML::addElement($doc, $author, "summary", BBCode::convertForUriId($contact['uri-id'], $contact["about"], BBCode::OSTATUS));
 		}
 
-		$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $owner["url"]];
+		$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $contact["url"]];
 		XML::addElement($doc, $author, "link", "", $attributes);
 
 		$attributes = [
@@ -1432,27 +1432,27 @@ class OStatus
 				"type" => "image/jpeg", // To-Do?
 				"media:width" => ProxyUtils::PIXEL_SMALL,
 				"media:height" => ProxyUtils::PIXEL_SMALL,
-				"href" => User::getAvatarUrl($owner, ProxyUtils::SIZE_SMALL)];
+				"href" => Contact::getAvatarUrlForUrl($contact["url"], ProxyUtils::SIZE_SMALL)];
 		XML::addElement($doc, $author, "link", "", $attributes);
 
-		if (isset($owner["thumb"])) {
+		if (isset($contact["thumb"])) {
 			$attributes = [
 					"rel" => "avatar",
 					"type" => "image/jpeg", // To-Do?
 					"media:width" => ProxyUtils::PIXEL_THUMB,
 					"media:height" => ProxyUtils::PIXEL_THUMB,
-					"href" => User::getAvatarUrl($owner, ProxyUtils::SIZE_THUMB)];
+					"href" => User::getAvatarUrl($contact, ProxyUtils::SIZE_THUMB)];
 			XML::addElement($doc, $author, "link", "", $attributes);
 		}
 
-		XML::addElement($doc, $author, "poco:preferredUsername", $owner["nick"]);
-		XML::addElement($doc, $author, "poco:displayName", $owner["name"]);
+		XML::addElement($doc, $author, "poco:preferredUsername", $contact["nick"]);
+		XML::addElement($doc, $author, "poco:displayName", $contact["name"]);
 		if ($show_profile) {
-			XML::addElement($doc, $author, "poco:note", BBCode::convertForUriId($owner['uri-id'], $owner["about"], BBCode::OSTATUS));
+			XML::addElement($doc, $author, "poco:note", BBCode::convertForUriId($contact['uri-id'], $contact["about"], BBCode::OSTATUS));
 
-			if (trim($owner["location"]) != "") {
+			if (trim($contact["location"]) != "") {
 				$element = $doc->createElement("poco:address");
-				XML::addElement($doc, $element, "poco:formatted", $owner["location"]);
+				XML::addElement($doc, $element, "poco:formatted", $contact["location"]);
 				$author->appendChild($element);
 			}
 		}
@@ -1466,8 +1466,8 @@ class OStatus
 				$author->appendChild($urls);
 			}
 
-			XML::addElement($doc, $author, "followers", "", ["url" => DI::baseUrl() . "/profile/" . $owner["nick"] . "/contacts/followers"]);
-			XML::addElement($doc, $author, "statusnet:profile_info", "", ["local_id" => $owner["uid"]]);
+			XML::addElement($doc, $author, "followers", "", ["url" => DI::baseUrl() . "/profile/" . $contact["nick"] . "/contacts/followers"]);
+			XML::addElement($doc, $author, "statusnet:profile_info", "", ["local_id" => $contact["uid"]]);
 
 			if ($profile["publish"]) {
 				XML::addElement($doc, $author, "mastodon:scope", "public");
