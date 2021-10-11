@@ -52,6 +52,10 @@ class Markdown
 			return  $url;
 		};
 
+		// Escape chevron to allow them in the output. Disable literal HTML along Markdown syntax
+		// See https://github.com/friendica/friendica/issues/10862
+		$text = htmlspecialchars($text);
+
 		$text = self::convertDiasporaMentionsToHtml($text);
 
 		$html = $MarkdownParser->transform($text);
