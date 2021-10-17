@@ -1339,8 +1339,9 @@ class Worker
 	 * Defers the current worker entry
 	 *
 	 * @return boolean had the entry been deferred?
+	 * @throws \Exception
 	 */
-	public static function defer()
+	public static function defer(): bool
 	{
 		$queue = DI::app()->getQueue();
 
@@ -1348,7 +1349,6 @@ class Worker
 			return false;
 		}
 
-		$retrial = $queue['retrial'];
 		$id = $queue['id'];
 		$priority = $queue['priority'];
 
