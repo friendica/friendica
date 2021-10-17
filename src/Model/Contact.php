@@ -831,21 +831,18 @@ class Contact
 	 *
 	 * @param array   $user    User unfriending
 	 * @param array   $contact Contact (uid != 0) unfriended
-	 * @return bool|null true if successful, false if not, null if no remote action was performed
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function terminateFriendship(array $user, array $contact): ?bool
+	public static function terminateFriendship(array $user, array $contact): void
 	{
-		$result = Protocol::terminateFriendship($user, $contact);
+		Worker::add(PRIORITY_HIGH, 'Contact\Unfollow', $user['uid'], $contact['id']);
 
 		if ($contact['rel'] == Contact::SHARING || in_array($contact['network'], [Protocol::FEED, Protocol::MAIL])) {
 			self::remove($contact['id']);
 		} else {
 			self::update(['rel' => Contact::FOLLOWER], ['id' => $contact['id']]);
 		}
-
-		return $result;
 	}
 
 	/**

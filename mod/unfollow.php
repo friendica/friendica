@@ -140,13 +140,8 @@ function unfollow_process(string $url)
 	$return_path = $base_return_path . '/' . $contact['id'];
 
 	try {
-		$result = Contact::terminateFriendship($owner, $contact);
-
-		if ($result === false) {
-			$notice_message = DI::l10n()->t('Unable to unfollow this contact, please retry in a few minutes or contact your administrator.');
-		} else {
-			$notice_message = DI::l10n()->t('Contact was successfully unfollowed');
-		}
+		Contact::terminateFriendship($owner, $contact);
+		$notice_message = DI::l10n()->t('Contact was successfully unfollowed');
 	} catch (Exception $e) {
 		DI::logger()->error($e->getMessage(), ['owner' => $owner, 'contact' => $contact]);
 		$notice_message = DI::l10n()->t('Unable to unfollow this contact, please contact your administrator');

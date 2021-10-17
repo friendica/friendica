@@ -202,10 +202,7 @@ HELP;
 		$user = UserModel::getById($contact['uid']);
 
 		try {
-			$result = ContactModel::terminateFriendship($user, $contact);
-			if ($result === false) {
-				throw new RuntimeException('Unable to unfollow this contact, please retry in a few minutes or check the logs.');
-			}
+			ContactModel::terminateFriendship($user, $contact);
 
 			$this->out('Contact was successfully unfollowed');
 
