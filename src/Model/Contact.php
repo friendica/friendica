@@ -831,7 +831,6 @@ class Contact
 	 *
 	 * @param array   $user    User unfriending
 	 * @param array   $contact Contact (uid != 0) unfriended
-	 * @param boolean $two_way Revoke eventual inbound follow as well
 	 * @return bool|null true if successful, false if not, null if no remote action was performed
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
@@ -853,11 +852,10 @@ class Contact
 	 * Revoke follow privileges of the remote user contact
 	 *
 	 * @param array   $contact  Contact unfriended
-	 * @return bool|null Whether the remote operation is successful or null if no remote operation was performed
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function revokeFollow(array $contact): ?bool
+	public static function revokeFollow(array $contact)
 	{
 		if (empty($contact['network'])) {
 			throw new \InvalidArgumentException('Empty network in contact array');
@@ -867,21 +865,16 @@ class Contact
 			throw new \InvalidArgumentException('Unexpected public contact record');
 		}
 
-		$result = Protocol::revokeFollow($contact);
+		Worker::add(PRIORITY_HIGH, 'Contact\RevokeFollow', $contact['id']);
 
 		// A null value here means the remote network doesn't support explicit follow revocation, we can still
 		// break the locally recorded relationship
-		if ($result !== false) {
-			if ($contact['rel'] == self::FRIEND) {
-				self::update(['rel' => self::SHARING], ['id' => $contact['id']]);
-			} else {
-				self::remove($contact['id']);
-			}
+		if ($contact['rel'] == self::FRIEND) {
+			self::update(['rel' => self::SHARING], ['id' => $contact['id']]);
+		} else {
+			self::remove($contact['id']);
 		}
-
-		return $result;
 	}
-
 
 	/**
 	 * Marks a contact for archival after a communication issue delay

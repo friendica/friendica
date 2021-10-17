@@ -71,14 +71,9 @@ class Revoke extends BaseModule
 
 		self::checkFormSecurityTokenRedirectOnError('contact/' . $parameters['id'], 'contact_revoke');
 
-		$result = Model\Contact::revokeFollow(self::$contact);
-		if ($result === true) {
-			notice(DI::l10n()->t('Follow was successfully revoked.'));
-		} elseif ($result === null) {
-			notice(DI::l10n()->t('Follow was successfully revoked, however the remote contact won\'t be aware of this revokation.'));
-		} else {
-			notice(DI::l10n()->t('Unable to revoke follow, please try again later or contact the administrator.'));
-		}
+		Model\Contact::revokeFollow(self::$contact);
+
+		notice(DI::l10n()->t('Follow was successfully revoked.'));
 
 		DI::baseUrl()->redirect('contact/' . $parameters['id']);
 	}
