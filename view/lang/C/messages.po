@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2021.12-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-16 19:31-0400\n"
+"POT-Creation-Date: 2021-10-17 20:27-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -509,7 +509,7 @@ msgstr ""
 msgid "Permission settings"
 msgstr ""
 
-#: mod/editpost.php:116 src/Core/ACL.php:327
+#: mod/editpost.php:116 src/Core/ACL.php:325
 msgid "CC: email addresses"
 msgstr ""
 
@@ -527,7 +527,7 @@ msgstr ""
 msgid "Categories (comma-separated list)"
 msgstr ""
 
-#: mod/editpost.php:123 src/Core/ACL.php:328
+#: mod/editpost.php:123 src/Core/ACL.php:326
 msgid "Example: bob@example.com, mary@example.com"
 msgstr ""
 
@@ -540,7 +540,7 @@ msgstr ""
 #: mod/editpost.php:130 mod/fbrowser.php:100 mod/fbrowser.php:127
 #: mod/follow.php:144 mod/photos.php:1017 mod/photos.php:1122 mod/tagrm.php:37
 #: mod/tagrm.php:129 mod/unfollow.php:97 src/Content/Conversation.php:373
-#: src/Module/Contact/Revoke.php:99 src/Module/RemoteFollow.php:116
+#: src/Module/Contact/Revoke.php:94 src/Module/RemoteFollow.php:116
 msgid "Cancel"
 msgstr ""
 
@@ -701,7 +701,7 @@ msgid "OStatus support is disabled. Contact can't be added."
 msgstr ""
 
 #: mod/follow.php:138 src/Content/Item.php:463 src/Content/Widget.php:76
-#: src/Model/Contact.php:1071 src/Model/Contact.php:1083
+#: src/Model/Contact.php:1061 src/Model/Contact.php:1073
 #: view/theme/vier/theme.php:172
 msgid "Connect/Follow"
 msgstr ""
@@ -2272,17 +2272,11 @@ msgstr ""
 msgid "Disconnect/Unfollow"
 msgstr ""
 
-#: mod/unfollow.php:146
-msgid ""
-"Unable to unfollow this contact, please retry in a few minutes or contact "
-"your administrator."
-msgstr ""
-
-#: mod/unfollow.php:148
+#: mod/unfollow.php:144
 msgid "Contact was successfully unfollowed"
 msgstr ""
 
-#: mod/unfollow.php:152
+#: mod/unfollow.php:147
 msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
@@ -2374,7 +2368,7 @@ msgstr ""
 msgid "All contacts"
 msgstr ""
 
-#: src/BaseModule.php:212 src/Content/Widget.php:231 src/Core/ACL.php:195
+#: src/BaseModule.php:212 src/Content/Widget.php:231 src/Core/ACL.php:193
 #: src/Module/Contact.php:756 src/Module/PermissionTooltip.php:75
 #: src/Module/PermissionTooltip.php:97
 msgid "Followers"
@@ -2982,31 +2976,31 @@ msgstr ""
 msgid "Follow Thread"
 msgstr ""
 
-#: src/Content/Item.php:443 src/Model/Contact.php:1076
+#: src/Content/Item.php:443 src/Model/Contact.php:1066
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:444 src/Content/Item.php:466 src/Model/Contact.php:1010
-#: src/Model/Contact.php:1068 src/Model/Contact.php:1077
+#: src/Content/Item.php:444 src/Content/Item.php:466 src/Model/Contact.php:1000
+#: src/Model/Contact.php:1058 src/Model/Contact.php:1067
 #: src/Module/Directory.php:160 src/Module/Settings/Profile/Index.php:226
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:445 src/Model/Contact.php:1078
+#: src/Content/Item.php:445 src/Model/Contact.php:1068
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:446 src/Model/Contact.php:1069
-#: src/Model/Contact.php:1079
+#: src/Content/Item.php:446 src/Model/Contact.php:1059
+#: src/Model/Contact.php:1069
 msgid "Network Posts"
 msgstr ""
 
-#: src/Content/Item.php:447 src/Model/Contact.php:1070
-#: src/Model/Contact.php:1080
+#: src/Content/Item.php:447 src/Model/Contact.php:1060
+#: src/Model/Contact.php:1070
 msgid "View Contact"
 msgstr ""
 
-#: src/Content/Item.php:448 src/Model/Contact.php:1081
+#: src/Content/Item.php:448 src/Model/Contact.php:1071
 msgid "Send PM"
 msgstr ""
 
@@ -3029,7 +3023,7 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
-#: src/Content/Item.php:458 src/Model/Contact.php:1082
+#: src/Content/Item.php:458 src/Model/Contact.php:1072
 msgid "Poke"
 msgstr ""
 
@@ -3479,7 +3473,7 @@ msgstr ""
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:522 src/Model/Contact.php:1503
+#: src/Content/Widget.php:522 src/Model/Contact.php:1493
 msgid "News"
 msgstr ""
 
@@ -3552,49 +3546,49 @@ msgstr ""
 msgid "Unfollow"
 msgstr ""
 
-#: src/Core/ACL.php:166 src/Module/Profile/Profile.php:242
+#: src/Core/ACL.php:164 src/Module/Profile/Profile.php:242
 msgid "Yourself"
 msgstr ""
 
-#: src/Core/ACL.php:202 src/Module/PermissionTooltip.php:81
+#: src/Core/ACL.php:200 src/Module/PermissionTooltip.php:81
 #: src/Module/PermissionTooltip.php:103
 msgid "Mutuals"
 msgstr ""
 
-#: src/Core/ACL.php:294
+#: src/Core/ACL.php:292
 msgid "Post to Email"
 msgstr ""
 
-#: src/Core/ACL.php:321
+#: src/Core/ACL.php:319
 msgid "Public"
 msgstr ""
 
-#: src/Core/ACL.php:322
+#: src/Core/ACL.php:320
 msgid ""
 "This content will be shown to all your followers and can be seen in the "
 "community pages and by anyone with its link."
 msgstr ""
 
-#: src/Core/ACL.php:323
+#: src/Core/ACL.php:321
 msgid "Limited/Private"
 msgstr ""
 
-#: src/Core/ACL.php:324
+#: src/Core/ACL.php:322
 msgid ""
 "This content will be shown only to the people in the first box, to the "
 "exception of the people mentioned in the second box. It won't appear "
 "anywhere public."
 msgstr ""
 
-#: src/Core/ACL.php:325
+#: src/Core/ACL.php:323
 msgid "Show to:"
 msgstr ""
 
-#: src/Core/ACL.php:326
+#: src/Core/ACL.php:324
 msgid "Except to:"
 msgstr ""
 
-#: src/Core/ACL.php:329
+#: src/Core/ACL.php:327
 msgid "Connectors"
 msgstr ""
 
@@ -4290,81 +4284,81 @@ msgstr ""
 msgid "Legacy module file not found: %s"
 msgstr ""
 
-#: src/Model/Contact.php:1072 src/Model/Contact.php:1084
+#: src/Model/Contact.php:1062 src/Model/Contact.php:1074
 msgid "UnFollow"
 msgstr ""
 
-#: src/Model/Contact.php:1090 src/Module/Admin/Users/Pending.php:107
+#: src/Model/Contact.php:1080 src/Module/Admin/Users/Pending.php:107
 #: src/Module/Notifications/Introductions.php:110
 #: src/Module/Notifications/Introductions.php:182
 msgid "Approve"
 msgstr ""
 
-#: src/Model/Contact.php:1499
+#: src/Model/Contact.php:1489
 msgid "Organisation"
 msgstr ""
 
-#: src/Model/Contact.php:1507
+#: src/Model/Contact.php:1497
 msgid "Forum"
 msgstr ""
 
-#: src/Model/Contact.php:2366
+#: src/Model/Contact.php:2356
 msgid "Disallowed profile URL."
 msgstr ""
 
-#: src/Model/Contact.php:2371 src/Module/Friendica.php:81
+#: src/Model/Contact.php:2361 src/Module/Friendica.php:81
 msgid "Blocked domain"
 msgstr ""
 
-#: src/Model/Contact.php:2376
+#: src/Model/Contact.php:2366
 msgid "Connect URL missing."
 msgstr ""
 
-#: src/Model/Contact.php:2385
+#: src/Model/Contact.php:2375
 msgid ""
 "The contact could not be added. Please check the relevant network "
 "credentials in your Settings -> Social Networks page."
 msgstr ""
 
-#: src/Model/Contact.php:2422
+#: src/Model/Contact.php:2412
 msgid "The profile address specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:2424
+#: src/Model/Contact.php:2414
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:2427
+#: src/Model/Contact.php:2417
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:2430
+#: src/Model/Contact.php:2420
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:2433
+#: src/Model/Contact.php:2423
 msgid ""
 "Unable to match @-style Identity Address with a known protocol or email "
 "contact."
 msgstr ""
 
-#: src/Model/Contact.php:2434
+#: src/Model/Contact.php:2424
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:2440
+#: src/Model/Contact.php:2430
 msgid ""
 "The profile address specified belongs to a network which has been disabled "
 "on this site."
 msgstr ""
 
-#: src/Model/Contact.php:2445
+#: src/Model/Contact.php:2435
 msgid ""
 "Limited profile. This person will be unable to receive direct/personal "
 "notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:2504
+#: src/Model/Contact.php:2494
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -7472,7 +7466,7 @@ msgstr ""
 msgid "Toggle Ignored status"
 msgstr ""
 
-#: src/Module/Contact.php:1081 src/Module/Contact/Revoke.php:96
+#: src/Module/Contact.php:1081 src/Module/Contact/Revoke.php:91
 msgid "Revoke Follow"
 msgstr ""
 
@@ -7635,24 +7629,13 @@ msgstr ""
 msgid "Follow was successfully revoked."
 msgstr ""
 
-#: src/Module/Contact/Revoke.php:78
-msgid ""
-"Follow was successfully revoked, however the remote contact won't be aware "
-"of this revokation."
-msgstr ""
-
-#: src/Module/Contact/Revoke.php:80
-msgid ""
-"Unable to revoke follow, please try again later or contact the administrator."
-msgstr ""
-
-#: src/Module/Contact/Revoke.php:97
+#: src/Module/Contact/Revoke.php:92
 msgid ""
 "Do you really want to revoke this contact's follow? This cannot be undone "
 "and they will have to manually follow you back again."
 msgstr ""
 
-#: src/Module/Contact/Revoke.php:98
+#: src/Module/Contact/Revoke.php:93
 #: src/Module/Notifications/Introductions.php:122
 #: src/Module/OAuth/Acknowledge.php:47 src/Module/Register.php:117
 msgid "Yes"
@@ -10124,15 +10107,15 @@ msgstr ""
 msgid "%s created a new post"
 msgstr ""
 
-#: src/Navigation/Notifications/Factory/Introduction.php:134
+#: src/Navigation/Notifications/Factory/Introduction.php:133
 msgid "Friend Suggestion"
 msgstr ""
 
-#: src/Navigation/Notifications/Factory/Introduction.php:160
+#: src/Navigation/Notifications/Factory/Introduction.php:159
 msgid "Friend/Connect Request"
 msgstr ""
 
-#: src/Navigation/Notifications/Factory/Introduction.php:160
+#: src/Navigation/Notifications/Factory/Introduction.php:159
 msgid "New Follower"
 msgstr ""
 
