@@ -25,7 +25,7 @@ use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Config\Type\JitConfig;
-use Friendica\Core\Lock\SemaphoreLock;
+use Friendica\Core\Lock\Type\SemaphoreLock;
 use Friendica\DI;
 use Mockery;
 use Mockery\MockInterface;
@@ -56,7 +56,7 @@ class SemaphoreLockTest extends LockTest
 
 	protected function getInstance()
 	{
-		return new SemaphoreLock();
+		return new \Friendica\Core\Lock\Type\SemaphoreLock();
 	}
 
 	/**

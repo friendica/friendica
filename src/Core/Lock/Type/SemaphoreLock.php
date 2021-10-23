@@ -19,10 +19,11 @@
  *
  */
 
-namespace Friendica\Core\Lock;
+namespace Friendica\Core\Lock\Type;
 
-use Friendica\Core\BaseLock;
 use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Lock\Enum\Type;
+use function get_temppath;
 
 class SemaphoreLock extends BaseLock
 {

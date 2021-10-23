@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-use Friendica\Core\Lock\DatabaseLock;
+use Friendica\Core\Lock\Type\DatabaseLock;
 use Friendica\Core\Config\Factory\ConfigFactory;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;

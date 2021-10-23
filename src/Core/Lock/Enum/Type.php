@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\Lock;
+namespace Friendica\Core\Lock\Enum;
 
 use Friendica\Core\Cache\Enum\Type as CacheType;
 

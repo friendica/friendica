@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Cache\Type\APCuCache;
-use Friendica\Core\Lock\CacheLock;
+use Friendica\Core\Lock\Type\CacheLock;
 
 /**
  * @group APCU
@@ -40,6 +40,6 @@ class APCuCacheLockTest extends LockTest
 
 	protected function getInstance()
 	{
-		return new CacheLock(new APCuCache('localhost'));
+		return new \Friendica\Core\Lock\Type\CacheLock(new APCuCache('localhost'));
 	}
 }

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core;
+namespace Friendica\Core\Lock\Type;
 
 use Friendica\Core\Lock\ILock;
 

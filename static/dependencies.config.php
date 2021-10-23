@@ -39,7 +39,7 @@ use Friendica\Core\Cache;
 use Friendica\Core\Config;
 use Friendica\Core\PConfig;
 use Friendica\Core\L10n;
-use Friendica\Core\Lock\ILock;
+use Friendica\Core\Lock;
 use Friendica\Core\Process;
 use Friendica\Core\Session\ISession;
 use Friendica\Core\StorageManager;
@@ -101,7 +101,7 @@ return [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
-	\Friendica\Core\PConfig\IPConfig::class => [
+	PConfig\IPConfig::class => [
 		'instanceOf' => PConfig\Factory\PConfigFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
@@ -170,8 +170,8 @@ return [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
-	ILock::class                    => [
-		'instanceOf' => Factory\LockFactory::class,
+	Lock\ILock::class                    => [
+		'instanceOf' => Lock\Factory\LockFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],

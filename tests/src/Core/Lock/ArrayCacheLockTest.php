@@ -22,13 +22,13 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Cache\Type\ArrayCache;
-use Friendica\Core\Lock\CacheLock;
+use Friendica\Core\Lock\Type\CacheLock;
 
 class ArrayCacheLockTest extends LockTest
 {
 	protected function getInstance()
 	{
-		return new CacheLock(new ArrayCache('localhost'));
+		return new \Friendica\Core\Lock\Type\CacheLock(new ArrayCache('localhost'));
 	}
 
 	/**

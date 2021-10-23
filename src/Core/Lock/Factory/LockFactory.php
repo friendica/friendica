@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Factory;
+namespace Friendica\Core\Lock\Factory;
 
 use Friendica\Core\Cache\Factory\CacheFactory;
 use Friendica\Core\Cache\IMemoryCache;
@@ -83,18 +83,18 @@ class LockFactory
 				case Type::APCU:
 					$cache = $this->cacheFactory->create($lock_type);
 					if ($cache instanceof IMemoryCache) {
-						return new Lock\CacheLock($cache);
+						return new Lock\Type\CacheLock($cache);
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
 					break;
 
 				case 'database':
-					return new Lock\DatabaseLock($this->dba);
+					return new Lock\Type\DatabaseLock($this->dba);
 					break;
 
 				case 'semaphore':
-					return new Lock\SemaphoreLock();
+					return new Lock\Type\SemaphoreLock();
 					break;
 
 				default:
@@ -121,7 +121,7 @@ class LockFactory
 		// 1. Try to use Semaphores for - local - locking
 		if (function_exists('sem_get')) {
 			try {
-				return new Lock\SemaphoreLock();
+				return new Lock\Type\SemaphoreLock();
 			} catch (\Exception $exception) {
 				$this->logger->warning('Using Semaphore driver for locking failed.', ['exception' => $exception]);
 			}
@@ -133,7 +133,7 @@ class LockFactory
 			try {
 				$cache = $this->cacheFactory->create($cache_type);
 				if ($cache instanceof IMemoryCache) {
-					return new Lock\CacheLock($cache);
+					return new Lock\Type\CacheLock($cache);
 				}
 			} catch (\Exception $exception) {
 				$this->logger->warning('Using Cache driver for locking failed.', ['exception' => $exception]);
@@ -141,6 +141,6 @@ class LockFactory
 		}
 
 		// 3. Use Database Locking as a Fallback
-		return new Lock\DatabaseLock($this->dba);
+		return new Lock\Type\DatabaseLock($this->dba);
 	}
 }
