@@ -21,7 +21,7 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Logger;
 use Exception;
 use Friendica\DI;

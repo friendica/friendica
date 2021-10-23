@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Factory;
+namespace Friendica\Core\Cache\Factory;
 
 use Friendica\App\BaseURL;
 use Friendica\Core\Cache;
@@ -41,7 +41,7 @@ class CacheFactory
 	/**
 	 * @var string The default cache if nothing set
 	 */
-	const DEFAULT_TYPE = Cache\Type::DATABASE;
+	const DEFAULT_TYPE = Cache\Enum\Type::DATABASE;
 
 	/**
 	 * @var IConfig The IConfiguration to read parameters out of the config
@@ -92,27 +92,27 @@ class CacheFactory
 		}
 
 		switch ($type) {
-			case Cache\Type::MEMCACHE:
-				$cache = new Cache\MemcacheCache($this->hostname, $this->config);
+			case Cache\Enum\Type::MEMCACHE:
+				$cache = new Cache\Type\MemcacheCache($this->hostname, $this->config);
 				break;
-			case Cache\Type::MEMCACHED:
-				$cache = new Cache\MemcachedCache($this->hostname, $this->config, $this->logger);
+			case Cache\Enum\Type::MEMCACHED:
+				$cache = new Cache\Type\MemcachedCache($this->hostname, $this->config, $this->logger);
 				break;
-			case Cache\Type::REDIS:
-				$cache = new Cache\RedisCache($this->hostname, $this->config);
+			case Cache\Enum\Type::REDIS:
+				$cache = new Cache\Type\RedisCache($this->hostname, $this->config);
 				break;
-			case Cache\Type::APCU:
-				$cache = new Cache\APCuCache($this->hostname);
+			case Cache\Enum\Type::APCU:
+				$cache = new Cache\Type\APCuCache($this->hostname);
 				break;
 			default:
-				$cache = new Cache\DatabaseCache($this->hostname, $this->dba);
+				$cache = new Cache\Type\DatabaseCache($this->hostname, $this->dba);
 		}
 
 		$profiling = $this->config->get('system', 'profiling', false);
 
 		// In case profiling is enabled, wrap the ProfilerCache around the current cache
 		if (isset($profiling) && $profiling !== false) {
-			return new Cache\ProfilerCache($cache, $this->profiler);
+			return new Cache\Type\ProfilerCache($cache, $this->profiler);
 		} else {
 			return $cache;
 		}

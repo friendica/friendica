@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
-use Friendica\Core\Cache\APCuCache;
+use Friendica\Core\Cache\Type\APCuCache;
 use Friendica\Core\Lock\CacheLock;
 
 /**

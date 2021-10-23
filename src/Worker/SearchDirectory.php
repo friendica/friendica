@@ -21,7 +21,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Logger;
 use Friendica\Core\Search;
 use Friendica\DI;

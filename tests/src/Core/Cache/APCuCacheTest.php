@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Cache;
 
-use Friendica\Core\Cache\APCuCache;
+use Friendica\Core\Cache\Type\APCuCache;
 
 /**
  * @group APCU

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
 use Friendica\Network\HTTPException\InternalServerErrorException;
 

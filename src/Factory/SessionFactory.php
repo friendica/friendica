@@ -23,7 +23,7 @@ namespace Friendica\Factory;
 
 use Friendica\App;
 use Friendica\Core\Cache\ICache;
-use Friendica\Core\Cache\Type;
+use Friendica\Core\Cache\Enum\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Session;
 use Friendica\Core\System;

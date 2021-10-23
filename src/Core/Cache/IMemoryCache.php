@@ -21,6 +21,8 @@
 
 namespace Friendica\Core\Cache;
 
+use Friendica\Core\Cache\Enum\Duration;
+
 /**
  * This interface defines methods for Memory-Caches only
  */

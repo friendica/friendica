@@ -22,7 +22,7 @@
 namespace Friendica\Content;
 
 use Friendica\Core\Addon;
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;

@@ -23,7 +23,7 @@ namespace Friendica\Protocol\ActivityPub;
 
 use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;

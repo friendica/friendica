@@ -19,10 +19,12 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
 use Exception;
-use Friendica\Core\BaseCache;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Cache\IMemoryCache;
+use Friendica\Core\Cache\Enum\Type;
 use Friendica\Core\Config\IConfig;
 use Redis;
 

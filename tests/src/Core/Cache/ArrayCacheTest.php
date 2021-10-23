@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Cache;
 
-use Friendica\Core\Cache\ArrayCache;
+use Friendica\Core\Cache\Type\ArrayCache;
 
 class ArrayCacheTest extends MemoryCacheTest
 {

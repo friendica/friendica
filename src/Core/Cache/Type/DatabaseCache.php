@@ -19,11 +19,13 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Cache\ICache;
+use Friendica\Core\Cache\Enum\Type;
 use Friendica\Database\Database;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Core\BaseCache;
 
 /**
  * Database Cache

@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Exception;
-use Friendica\Core\Cache\MemcachedCache;
+use Friendica\Core\Cache\Type\MemcachedCache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Lock\CacheLock;
 use Mockery;

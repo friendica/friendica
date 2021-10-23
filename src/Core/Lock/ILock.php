@@ -21,7 +21,7 @@
 
 namespace Friendica\Core\Lock;
 
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 
 /**
  * Lock Interface

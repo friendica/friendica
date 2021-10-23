@@ -158,13 +158,13 @@ return [
 		]
 	],
 	Cache\ICache::class             => [
-		'instanceOf' => Factory\CacheFactory::class,
+		'instanceOf' => Cache\Factory\CacheFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],
 	],
 	Cache\IMemoryCache::class       => [
-		'instanceOf' => Factory\CacheFactory::class,
+		'instanceOf' => Cache\Factory\CacheFactory::class,
 		'call'       => [
 			['create', [], Dice::CHAIN_CALL],
 		],

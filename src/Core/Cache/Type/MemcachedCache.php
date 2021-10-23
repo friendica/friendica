@@ -19,10 +19,15 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
 use Exception;
-use Friendica\Core\BaseCache;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Cache\IMemoryCache;
+use Friendica\Core\Cache\Type\TraitCompareDelete;
+use Friendica\Core\Cache\Type\TraitCompareSet;
+use Friendica\Core\Cache\Type\TraitMemcacheCommand;
+use Friendica\Core\Cache\Enum\Type;
 use Friendica\Core\Config\IConfig;
 use Memcached;
 use Psr\Log\LoggerInterface;

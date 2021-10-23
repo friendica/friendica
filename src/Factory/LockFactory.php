@@ -21,8 +21,9 @@
 
 namespace Friendica\Factory;
 
+use Friendica\Core\Cache\Factory\CacheFactory;
 use Friendica\Core\Cache\IMemoryCache;
-use Friendica\Core\Cache\Type;
+use Friendica\Core\Cache\Enum\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Lock;
 use Friendica\Database\Database;

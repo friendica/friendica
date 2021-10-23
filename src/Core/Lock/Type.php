@@ -21,7 +21,7 @@
 
 namespace Friendica\Core\Lock;
 
-use Friendica\Core\Cache\Type as CacheType;
+use Friendica\Core\Cache\Enum\Type as CacheType;
 
 /**
  * Enumeration for lock types

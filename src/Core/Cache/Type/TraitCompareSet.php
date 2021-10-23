@@ -19,7 +19,9 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
+
+use Friendica\Core\Cache\Enum\Duration;
 
 /**
  * Trait TraitCompareSetDelete

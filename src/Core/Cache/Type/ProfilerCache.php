@@ -19,9 +19,11 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
-use Friendica\Core\System;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Cache\ICache;
+use Friendica\Core\Cache\IMemoryCache;
 use Friendica\Util\Profiler;
 
 /**

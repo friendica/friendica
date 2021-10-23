@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Enum;
 
 /**
  * Enumeration for cache types

@@ -22,7 +22,7 @@
 namespace Friendica\Core\Lock;
 
 use Friendica\Core\BaseLock;
-use Friendica\Core\Cache\Duration;
+use Friendica\Core\Cache\Enum\Duration;
 
 class SemaphoreLock extends BaseLock
 {

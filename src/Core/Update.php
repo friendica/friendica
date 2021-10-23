@@ -132,7 +132,7 @@ class Update
 
 				// Compare the current structure with the defined structure
 				// If the Lock is acquired, never release it automatically to avoid double updates
-				if (DI::lock()->acquire('dbupdate', 0, Cache\Duration::INFINITE)) {
+				if (DI::lock()->acquire('dbupdate', 0, Cache\Enum\Duration::INFINITE)) {
 
 					Logger::notice('Update starting.', ['from' => $stored, 'to' => $current]);
 
@@ -246,7 +246,7 @@ class Update
 			// If the update fails or times-out completely you may need to
 			// delete the config entry to try again.
 
-			if (DI::lock()->acquire('dbupdate_function', 120, Cache\Duration::INFINITE)) {
+			if (DI::lock()->acquire('dbupdate_function', 120, Cache\Enum\Duration::INFINITE)) {
 
 				// call the specific update
 				Logger::notice('Pre update function start.', ['function' => $funcname]);

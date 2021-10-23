@@ -60,7 +60,7 @@ class DatabaseCacheTest extends CacheTest
 
 		$dba = new StaticDatabase($configCache, $profiler, $logger);
 
-		$this->cache = new Cache\DatabaseCache('database', $dba);
+		$this->cache = new Cache\Type\DatabaseCache('database', $dba);
 		return $this->cache;
 	}
 

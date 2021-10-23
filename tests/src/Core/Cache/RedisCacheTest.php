@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Exception;
-use Friendica\Core\Cache\RedisCache;
+use Friendica\Core\Cache\Type\RedisCache;
 use Friendica\Core\Config\IConfig;
 use Mockery;
 
@@ -58,7 +58,7 @@ class RedisCacheTest extends MemoryCacheTest
 			->andReturn(null);
 
 		try {
-			$this->cache = new RedisCache($host, $configMock);
+			$this->cache = new \Friendica\Core\Cache\Type\RedisCache($host, $configMock);
 		} catch (Exception $e) {
 			static::markTestSkipped('Redis is not available. Failure: ' . $e->getMessage());
 		}

@@ -19,9 +19,12 @@
  *
  */
 
-namespace Friendica\Core\Cache;
+namespace Friendica\Core\Cache\Type;
 
-use Friendica\Core\BaseCache;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\Cache\IMemoryCache;
+use Friendica\Core\Cache\Type\TraitCompareDelete;
+use Friendica\Core\Cache\Enum\Type;
 
 /**
  * Implementation of the IMemoryCache mainly for testing purpose

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core;
+namespace Friendica\Core\Cache\Type;
 
 use Friendica\Core\Cache\ICache;
 
