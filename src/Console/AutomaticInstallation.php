@@ -25,7 +25,7 @@ use Asika\SimpleConsole\Console;
 use Friendica\App;
 use Friendica\App\BaseURL;
 use Friendica\Core\Config\IConfig;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Installer;
 use Friendica\Core\Theme;
 use Friendica\Database\Database;
@@ -36,7 +36,7 @@ class AutomaticInstallation extends Console
 {
 	/** @var App\Mode */
 	private $appMode;
-	/** @var Cache */
+	/** @var \Friendica\Core\Config\Cache\Cache */
 	private $configCache;
 	/** @var IConfig */
 	private $config;

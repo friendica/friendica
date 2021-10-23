@@ -2,12 +2,11 @@
 
 namespace Friendica\Test\src\Model;
 
-use Friendica\Factory\ConfigFactory;
+use Friendica\Core\Config\Factory\ConfigFactory;
 use Friendica\Model\Process;
 use Friendica\Test\DatabaseTest;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\Profiler;
 use Psr\Log\NullLogger;
 

@@ -22,11 +22,10 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache;
-use Friendica\Factory\ConfigFactory;
+use Friendica\Core\Config\Factory\ConfigFactory;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\ConfigFileLoader;
 use Friendica\Util\Profiler;
 use Mockery;
 use Psr\Log\NullLogger;

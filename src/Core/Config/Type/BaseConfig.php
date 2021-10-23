@@ -19,20 +19,19 @@
  *
  */
 
-namespace Friendica\Core;
+namespace Friendica\Core\Config\Type;
 
-use Friendica\Core\PConfig\Cache;
-use Friendica\Core\PConfig\IPConfig;
+use Friendica\Core\Config\Cache\Cache;
+use Friendica\Core\Config\IConfig;
 use Friendica\Model;
 
 /**
- * This class is responsible for the user-specific configuration values in Friendica
- * The values are set through the Config-DB-Table (per Config-DB-model @see Model\Config\PConfig)
- *
- * The configuration cache (@see Cache\PConfigCache) is used for temporary caching of database calls. This will
- * increase the performance.
+ * This class is responsible for all system-wide configuration values in Friendica
+ * There are two types of storage
+ * - The Config-Files    (loaded into the FileCache @see ConfigCache)
+ * - The Config-DB-Table (per Config-DB-model @see Model\Config\Config)
  */
-abstract class BasePConfig implements IPConfig
+abstract class BaseConfig implements IConfig
 {
 	/**
 	 * @var Cache
@@ -40,24 +39,22 @@ abstract class BasePConfig implements IPConfig
 	protected $configCache;
 
 	/**
-	 * @var Model\Config\PConfig
+	 * @var \Friendica\Core\Config\Model\Config
 	 */
 	protected $configModel;
 
 	/**
-	 * @param Cache $configCache The configuration cache
-	 * @param Model\Config\PConfig          $configModel The configuration model
+	 * @param Cache                               $configCache The configuration cache (based on the config-files)
+	 * @param \Friendica\Core\Config\Model\Config $configModel The configuration model
 	 */
-	public function __construct(Cache $configCache, Model\Config\PConfig $configModel)
+	public function __construct(Cache $configCache, \Friendica\Core\Config\Model\Config $configModel)
 	{
 		$this->configCache = $configCache;
 		$this->configModel = $configModel;
 	}
 
 	/**
-	 * Returns the Config Cache
-	 *
-	 * @return Cache
+	 * {@inheritDoc}
 	 */
 	public function getCache()
 	{

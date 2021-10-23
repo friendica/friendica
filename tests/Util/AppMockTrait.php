@@ -74,19 +74,19 @@ trait AppMockTrait
 		$this->dice = \Mockery::mock(Dice::class)->makePartial();
 		$this->dice = $this->dice->addRules(include __DIR__ . '/../../static/dependencies.config.php');
 
-		$this->configMock = \Mockery::mock(Config\Cache::class);
+		$this->configMock = \Mockery::mock(Config\Cache\Cache::class);
 		$this->dice->shouldReceive('create')
-		           ->with(Config\Cache::class)
+		           ->with(Config\Cache\Cache::class)
 		           ->andReturn($this->configMock);
 		$this->mode = \Mockery::mock(App\Mode::class);
 		$this->dice->shouldReceive('create')
 		           ->with(App\Mode::class)
 		           ->andReturn($this->mode);
-		$configModel= \Mockery::mock(\Friendica\Model\Config\Config::class);
+		$configModel= \Mockery::mock(Config\Model\Config::class);
 		// Disable the adapter
 		$configModel->shouldReceive('isConnected')->andReturn(false);
 
-		$config = new Config\JitConfig($this->configMock, $configModel);
+		$config = new Config\Type\JitConfig($this->configMock, $configModel);
 		$this->dice->shouldReceive('create')
 		           ->with(Config\IConfig::class)
 		           ->andReturn($config);

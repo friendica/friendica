@@ -21,7 +21,7 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\System;
 use Psr\Container\ContainerExceptionInterface;
@@ -78,7 +78,7 @@ class Profiler implements ContainerInterface
 	}
 
 	/**
-	 * @param Cache $configCache The configuration cache
+	 * @param \Friendica\Core\Config\Cache\Cache $configCache The configuration cache
 	 */
 	public function __construct(Cache $configCache)
 	{

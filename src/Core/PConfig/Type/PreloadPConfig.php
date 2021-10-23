@@ -19,53 +19,52 @@
  *
  */
 
-namespace Friendica\Core\PConfig;
+namespace Friendica\Core\PConfig\Type;
 
-use Friendica\Core\BasePConfig;
+use Friendica\Core\PConfig\Cache\Cache;
 use Friendica\Model;
 
 /**
- * This class implements the Just-In-Time configuration, which will cache
- * user config values in a cache, once they are retrieved.
+ * This class implements the preload configuration, which will cache
+ * all user config values per call in a cache.
  *
- * Default Configuration type.
- * Provides the best performance for pages loading few configuration variables.
+ * Minimizes the number of database queries to retrieve configuration values at the cost of memory.
  */
-class JitPConfig extends BasePConfig
+class PreloadPConfig extends BasePConfig
 {
-	/**
-	 * @var array Array of already loaded db values (even if there was no value)
-	 */
-	private $db_loaded;
+	/** @var array */
+	private $config_loaded;
 
 	/**
-	 * @param Cache                $configCache The configuration cache
-	 * @param Model\Config\PConfig $configModel The configuration model
+	 * @param \Friendica\Core\PConfig\Cache\Cache   $configCache The configuration cache
+	 * @param \Friendica\Core\PConfig\Model\PConfig $configModel The configuration model
 	 */
-	public function __construct(Cache $configCache, Model\Config\PConfig $configModel)
+	public function __construct(Cache $configCache, \Friendica\Core\PConfig\Model\PConfig $configModel)
 	{
 		parent::__construct($configCache, $configModel);
-		$this->db_loaded = [];
+		$this->config_loaded = [];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
+	 * This loads all config values everytime load is called
+	 *
 	 */
 	public function load(int $uid, string $cat = 'config')
 	{
-		// If not connected or no uid, do nothing
-		if (!$uid || !$this->configModel->isConnected()) {
+		// Don't load the whole configuration twice or with invalid uid
+		if (!$uid || !empty($this->config_loaded[$uid])) {
 			return;
 		}
 
-		$config = $this->configModel->load($uid, $cat);
-
-		if (!empty($config[$cat])) {
-			foreach ($config[$cat] as $key => $value) {
-				$this->db_loaded[$uid][$cat][$key] = true;
-			}
+		// If not connected, do nothing
+		if (!$this->configModel->isConnected()) {
+			return;
 		}
+
+		$config                    = $this->configModel->load($uid);
+		$this->config_loaded[$uid] = true;
 
 		// load the whole category out of the DB into the cache
 		$this->configCache->load($uid, $config);
@@ -82,19 +81,15 @@ class JitPConfig extends BasePConfig
 			return $default_value;
 		}
 
-		// if the value isn't loaded or refresh is needed, load it to the cache
-		if ($this->configModel->isConnected() &&
-		    (empty($this->db_loaded[$uid][$cat][$key]) ||
-		     $refresh)) {
-
-			$dbvalue = $this->configModel->get($uid, $cat, $key);
-
-			if (isset($dbvalue)) {
-				$this->configCache->set($uid, $cat, $key, $dbvalue);
-				unset($dbvalue);
+		if (empty($this->config_loaded[$uid])) {
+			$this->load($uid);
+		} elseif ($refresh) {
+			if ($this->configModel->isConnected()) {
+				$config = $this->configModel->get($uid, $cat, $key);
+				if (isset($config)) {
+					$this->configCache->set($uid, $cat, $key, $config);
+				}
 			}
-
-			$this->db_loaded[$uid][$cat][$key] = true;
 		}
 
 		// use the config cache for return
@@ -112,6 +107,10 @@ class JitPConfig extends BasePConfig
 			return false;
 		}
 
+		if (empty($this->config_loaded[$uid])) {
+			$this->load($uid);
+		}
+
 		// set the cache first
 		$cached = $this->configCache->set($uid, $cat, $key, $value);
 
@@ -121,8 +120,6 @@ class JitPConfig extends BasePConfig
 		}
 
 		$stored = $this->configModel->set($uid, $cat, $key, $value);
-
-		$this->db_loaded[$uid][$cat][$key] = $stored;
 
 		return $cached && $stored;
 	}
@@ -136,11 +133,11 @@ class JitPConfig extends BasePConfig
 			return false;
 		}
 
-		$cacheRemoved = $this->configCache->delete($uid, $cat, $key);
-
-		if (isset($this->db_loaded[$uid][$cat][$key])) {
-			unset($this->db_loaded[$uid][$cat][$key]);
+		if (empty($this->config_loaded[$uid])) {
+			$this->load($uid);
 		}
+
+		$cacheRemoved = $this->configCache->delete($uid, $cat, $key);
 
 		if (!$this->configModel->isConnected()) {
 			return $cacheRemoved;

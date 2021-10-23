@@ -22,8 +22,8 @@
 namespace Friendica\Test\src\Core\PConfig;
 
 use Friendica\Core\PConfig\Cache;
-use Friendica\Core\BasePConfig;
-use Friendica\Model\Config\PConfig as PConfigModel;
+use Friendica\Core\PConfig\Type\BasePConfig;
+use Friendica\Core\PConfig\Model\PConfig as PConfigModel;
 use Friendica\Test\MockedTest;
 use Mockery;
 use Mockery\MockInterface;
@@ -33,7 +33,7 @@ abstract class PConfigTest extends MockedTest
 	/** @var PConfigModel|MockInterface */
 	protected $configModel;
 
-	/** @var Cache */
+	/** @var Cache\Cache */
 	protected $configCache;
 
 	/** @var BasePConfig */
@@ -63,11 +63,11 @@ abstract class PConfigTest extends MockedTest
 
 		// Create the config model
 		$this->configModel = Mockery::mock(PConfigModel::class);
-		$this->configCache = new Cache();
+		$this->configCache = new Cache\Cache();
 	}
 
 	/**
-	 * @return BasePConfig
+	 * @return \Friendica\Core\PConfig\Type\BasePConfig
 	 */
 	abstract public function getInstance();
 
@@ -163,7 +163,7 @@ abstract class PConfigTest extends MockedTest
 	public function testSetUp()
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertEmpty($this->testedConfig->getCache()->getAll());
 	}
@@ -174,7 +174,7 @@ abstract class PConfigTest extends MockedTest
 	public function testLoad(int $uid, array $data, array $possibleCats, array $load)
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		foreach ($load as $loadedCats) {
 			$this->testedConfig->load($uid, $loadedCats);
@@ -257,7 +257,7 @@ abstract class PConfigTest extends MockedTest
 	public function testCacheLoadDouble(int $uid, array $data1, array $data2, array $expect)
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		foreach ($data1 as $cat => $data) {
 			$this->testedConfig->load($uid, $cat);
@@ -281,7 +281,7 @@ abstract class PConfigTest extends MockedTest
 	public function testSetGetWithoutDB(int $uid, $data)
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertTrue($this->testedConfig->set($uid, 'test', 'it', $data));
 
@@ -302,7 +302,7 @@ abstract class PConfigTest extends MockedTest
 		                  ->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertTrue($this->testedConfig->set($uid, 'test', 'it', $data));
 
@@ -316,7 +316,7 @@ abstract class PConfigTest extends MockedTest
 	public function testGetWrongWithoutDB()
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// without refresh
 		self::assertNull($this->testedConfig->get(0, 'test', 'it'));
@@ -341,7 +341,7 @@ abstract class PConfigTest extends MockedTest
 		$this->configCache->load($uid, ['test' => ['it' => 'now']]);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// without refresh
 		self::assertEquals('now', $this->testedConfig->get($uid, 'test', 'it'));
@@ -366,7 +366,7 @@ abstract class PConfigTest extends MockedTest
 		$this->configCache->load($uid, ['test' => ['it' => $data]]);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertEquals($data, $this->testedConfig->get($uid, 'test', 'it'));
 		self::assertEquals($data, $this->testedConfig->getCache()->get($uid, 'test', 'it'));
@@ -405,7 +405,7 @@ abstract class PConfigTest extends MockedTest
 		                  ->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// directly set the value to the cache
 		$this->testedConfig->getCache()->set($uid, 'test', 'it', 'now');
@@ -465,7 +465,7 @@ abstract class PConfigTest extends MockedTest
 		$this->configCache->load($data2['uid'], $data2['data']);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertConfig($data1['uid'], 'cat1', $data1['data']['cat1']);
 		self::assertConfig($data1['uid'], 'cat2', $data1['data']['cat2']);

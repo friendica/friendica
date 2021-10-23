@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\PConfig;
 
-use Friendica\Core\PConfig\JitPConfig;
+use Friendica\Core\PConfig\Type\JitPConfig;
 
 class JitPConfigTest extends PConfigTest
 {

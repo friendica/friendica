@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\PConfig;
+namespace Friendica\Core\PConfig\Cache;
 
 use ParagonIE\HiddenString\HiddenString;
 

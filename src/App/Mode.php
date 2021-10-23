@@ -22,7 +22,7 @@
 namespace Friendica\App;
 
 use Detection\MobileDetect;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Database\Database;
 use Friendica\Util\BasePath;
 

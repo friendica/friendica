@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Core\PConfig;
+namespace Friendica\Test\src\Core\PConfig\Cache;
 
 use Friendica\Core\PConfig\Cache;
 use Friendica\Test\MockedTest;
@@ -47,7 +47,7 @@ class CacheTest extends MockedTest
 		];
 	}
 
-	private function assertConfigValues($data, Cache $configCache, $uid)
+	private function assertConfigValues($data, Cache\Cache $configCache, $uid)
 	{
 		foreach ($data as $cat => $values) {
 			foreach ($values as $key => $value) {
@@ -63,7 +63,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testSetGet($data)
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 		$uid         = 345;
 
 		foreach ($data as $cat => $values) {
@@ -81,7 +81,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testGetCat()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 		$uid         = 345;
 
 		$configCache->load($uid, [
@@ -113,7 +113,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testDelete($data)
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 		$uid         = 345;
 
 		foreach ($data as $cat => $values) {
@@ -136,7 +136,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testKeyDiffWithResult()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$diffConfig = [
 			'fakeCat' => [
@@ -154,7 +154,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testKeyDiffWithoutResult($data)
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, $data);
 
@@ -168,7 +168,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testPasswordHide()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, [
 			'database' => [
@@ -187,7 +187,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testPasswordShow()
 	{
-		$configCache = new Cache(false);
+		$configCache = new Cache\Cache(false);
 
 		$configCache->load(1, [
 			'database' => [
@@ -206,7 +206,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testEmptyPassword()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, [
 			'database' => [
@@ -221,7 +221,7 @@ class CacheTest extends MockedTest
 
 	public function testWrongTypePassword()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, [
 			'database' => [
@@ -233,7 +233,7 @@ class CacheTest extends MockedTest
 		self::assertNotEmpty($configCache->get(1, 'database', 'password'));
 		self::assertEmpty($configCache->get(1, 'database', 'username'));
 
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, [
 			'database' => [
@@ -251,7 +251,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testTwoUid()
 	{
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		$configCache->load(1, [
 			'cat1' => [
@@ -282,7 +282,7 @@ class CacheTest extends MockedTest
 		// bad UID!
 		$uid = null;
 
-		$configCache = new Cache();
+		$configCache = new Cache\Cache();
 
 		self::assertNull($configCache->get($uid, 'cat1', 'cat2'));
 

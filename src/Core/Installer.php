@@ -23,7 +23,7 @@ namespace Friendica\Core;
 
 use DOMDocument;
 use Exception;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
@@ -278,7 +278,7 @@ class Installer
 			$cmd = "$phppath -v";
 			$result = trim(shell_exec($cmd));
 			$passed2 = (strpos($result, "(cli)") !== false);
-			list($result) = explode("\n", $result);
+			[$result] = explode("\n", $result);
 			$help = "";
 			if (!$passed2) {
 				$help .= DI::l10n()->t("PHP executable is not the php cli binary \x28could be cgi-fgci version\x29") . EOL;
@@ -678,8 +678,8 @@ class Installer
 	/**
 	 * Setup the default cache for a new installation
 	 *
-	 * @param Cache  $configCache The configuration cache
-	 * @param string $basePath    The determined basepath
+	 * @param \Friendica\Core\Config\Cache\Cache $configCache The configuration cache
+	 * @param string                             $basePath    The determined basepath
 	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */

@@ -37,6 +37,7 @@ use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\PConfig;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock\ILock;
 use Friendica\Core\Process;
@@ -73,8 +74,8 @@ return [
 			$_SERVER
 		]
 	],
-	Util\ConfigFileLoader::class => [
-		'instanceOf' => Factory\ConfigFactory::class,
+	Config\Cache\ConfigFileLoader::class => [
+		'instanceOf' => Config\Factory\ConfigFactory::class,
 		'call'       => [
 			['createConfigFileLoader', [
 				[Dice::INSTANCE => '$basepath'],
@@ -82,8 +83,8 @@ return [
 			], Dice::CHAIN_CALL],
 		],
 	],
-	Config\Cache::class          => [
-		'instanceOf' => Factory\ConfigFactory::class,
+	Config\Cache\Cache::class => [
+		'instanceOf' => Config\Factory\ConfigFactory::class,
 		'call'       => [
 			['createCache', [$_SERVER], Dice::CHAIN_CALL],
 		],
@@ -95,15 +96,15 @@ return [
 		],
 	],
 	Config\IConfig::class                   => [
-		'instanceOf' => Factory\ConfigFactory::class,
+		'instanceOf' => Config\Factory\ConfigFactory::class,
 		'call'       => [
-			['createConfig', [], Dice::CHAIN_CALL],
+			['create', [], Dice::CHAIN_CALL],
 		],
 	],
 	\Friendica\Core\PConfig\IPConfig::class => [
-		'instanceOf' => Factory\ConfigFactory::class,
+		'instanceOf' => PConfig\Factory\PConfigFactory::class,
 		'call'       => [
-			['createPConfig', [], Dice::CHAIN_CALL],
+			['create', [], Dice::CHAIN_CALL],
 		]
 	],
 	Database::class                         => [

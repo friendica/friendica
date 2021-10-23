@@ -22,18 +22,18 @@
 namespace Friendica\Module\Admin;
 
 use Friendica\Core\Addon;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
-use Friendica\Factory\ConfigFactory;
+use Friendica\Core\Config\Factory\ConfigFactory;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdmin;
 use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Util\ConfigFileLoader;
+use Friendica\Core\Config\Cache\ConfigFileLoader;
 use Friendica\Util\DateTimeFormat;
 
 class Summary extends BaseAdmin

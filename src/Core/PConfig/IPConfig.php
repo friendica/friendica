@@ -21,6 +21,8 @@
 
 namespace Friendica\Core\PConfig;
 
+use Friendica\Core\Config\Cache\Cache;
+
 /**
  * Interface for accessing user specific configurations
  */
@@ -95,7 +97,7 @@ interface IPConfig
 	/**
 	 * Returns the Config Cache
 	 *
-	 * @return Cache
+	 * @return \Friendica\Core\PConfig\Cache\Cache
 	 */
 	function getCache();
 }

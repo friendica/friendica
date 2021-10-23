@@ -19,14 +19,13 @@
  *
  */
 
-namespace Friendica\Factory;
+namespace Friendica\Core\Config\Factory;
 
 use Exception;
 use Friendica\Core\Config;
-use Friendica\Core\Config\Cache;
-use Friendica\Model\Config\Config as ConfigModel;
-use Friendica\Model\Config\PConfig as PConfigModel;
-use Friendica\Util\ConfigFileLoader;
+use Friendica\Core\Config\Cache\Cache;
+use Friendica\Core\Config\Model\Config as ConfigModel;
+use Friendica\Core\Config\Cache\ConfigFileLoader;
 
 class ConfigFactory
 {
@@ -55,7 +54,7 @@ class ConfigFactory
 	 * @param string $basePath The basepath of FRIENDICA
 	 * @param array $serer the $_SERVER array
 	 *
-	 * @return ConfigFileLoader
+	 * @return \Friendica\Core\Config\Cache\ConfigFileLoader
 	 */
 	public function createConfigFileLoader(string $basePath, array $server = [])
 	{
@@ -70,7 +69,7 @@ class ConfigFactory
 	}
 
 	/**
-	 * @param ConfigFileLoader $loader The Config Cache loader (INI/config/.htconfig)
+	 * @param \Friendica\Core\Config\Cache\ConfigFileLoader $loader The Config Cache loader (INI/config/.htconfig)
 	 *
 	 * @return Cache
 	 *
@@ -85,37 +84,19 @@ class ConfigFactory
 	}
 
 	/**
-	 * @param Cache       $configCache The config cache of this adapter
-	 * @param ConfigModel $configModel The configuration model
+	 * @param \Friendica\Core\Config\Cache\Cache $configCache The config cache of this adapter
+	 * @param ConfigModel                        $configModel The configuration model
 	 *
 	 * @return Config\IConfig
 	 */
-	public function createConfig(Cache $configCache, ConfigModel $configModel)
+	public function create(Cache $configCache, ConfigModel $configModel)
 	{
 		if ($configCache->get('system', 'config_adapter') === 'preload') {
-			$configuration = new Config\PreloadConfig($configCache, $configModel);
+			$configuration = new Config\Type\PreloadConfig($configCache, $configModel);
 		} else {
-			$configuration = new Config\JitConfig($configCache, $configModel);
+			$configuration = new Config\Type\JitConfig($configCache, $configModel);
 		}
 
-
-		return $configuration;
-	}
-
-	/**
-	 * @param Cache                         $configCache  The config cache
-	 * @param \Friendica\Core\PConfig\Cache $pConfigCache The personal config cache
-	 * @param PConfigModel                  $configModel  The configuration model
-	 *
-	 * @return \Friendica\Core\PConfig\IPConfig
-	 */
-	public function createPConfig(Cache $configCache, \Friendica\Core\PConfig\Cache $pConfigCache, PConfigModel $configModel)
-	{
-		if ($configCache->get('system', 'config_adapter') === 'preload') {
-			$configuration = new \Friendica\Core\PConfig\PreloadPConfig($pConfigCache, $configModel);
-		} else {
-			$configuration = new \Friendica\Core\PConfig\JitPConfig($pConfigCache, $configModel);
-		}
 
 		return $configuration;
 	}

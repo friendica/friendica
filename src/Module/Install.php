@@ -24,7 +24,7 @@ namespace Friendica\Module;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
 use Friendica\DI;

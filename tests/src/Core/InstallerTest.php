@@ -23,7 +23,7 @@
 namespace Friendica\Core;
 
 use Dice\Dice;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\DI;
 use Friendica\Network\IHTTPResult;
 use Friendica\Network\IHTTPClient;

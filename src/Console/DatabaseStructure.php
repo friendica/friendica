@@ -21,7 +21,7 @@
 
 namespace Friendica\Console;
 
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Update;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;

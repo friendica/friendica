@@ -19,10 +19,10 @@
  *
  */
 
-namespace Friendica\Core\Config;
+namespace Friendica\Core\Config\Type;
 
-use Friendica\Core\BaseConfig;
-use Friendica\Model;
+use Friendica\Core\Config\Cache\Cache;
+use Friendica\Core\Config\Model\Config;
 
 /**
  * This class implements the Just-In-Time configuration, which will cache
@@ -39,10 +39,10 @@ class JitConfig extends BaseConfig
 	private $db_loaded;
 
 	/**
-	 * @param Cache               $configCache The configuration cache (based on the config-files)
-	 * @param Model\Config\Config $configModel The configuration model
+	 * @param Cache                               $configCache The configuration cache (based on the config-files)
+	 * @param Config $configModel The configuration model
 	 */
-	public function __construct(Cache $configCache, Model\Config\Config $configModel)
+	public function __construct(Cache $configCache, Config $configModel)
 	{
 		parent::__construct($configCache, $configModel);
 		$this->db_loaded = [];

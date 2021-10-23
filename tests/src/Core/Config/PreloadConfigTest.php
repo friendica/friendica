@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Config;
 
-use Friendica\Core\Config\PreloadConfig;
+use Friendica\Core\Config\Type\PreloadConfig;
 
 class PreloadConfigTest extends ConfigTest
 {

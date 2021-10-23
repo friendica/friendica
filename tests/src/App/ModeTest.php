@@ -24,7 +24,7 @@ namespace Friendica\Test\src\App;
 use Detection\MobileDetect;
 use Friendica\App\Mode;
 use Friendica\App\Module;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Database\Database;
 use Friendica\Test\MockedTest;
 use Friendica\Test\Util\VFSTrait;

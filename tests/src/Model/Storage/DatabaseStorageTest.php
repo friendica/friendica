@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Model\Storage;
 
-use Friendica\Factory\ConfigFactory;
+use Friendica\Core\Config\Factory\ConfigFactory;
 use Friendica\Model\Storage\Database;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;

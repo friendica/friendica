@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Config;
 
-use Friendica\Core\Config\JitConfig;
+use Friendica\Core\Config\Type\JitConfig;
 
 class JitConfigTest extends ConfigTest
 {

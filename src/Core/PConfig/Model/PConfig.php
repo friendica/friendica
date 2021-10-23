@@ -19,14 +19,37 @@
  *
  */
 
-namespace Friendica\Model\Config;
+namespace Friendica\Core\PConfig\Model;
 
+use Friendica\Core\Config\Model\DbaUtils;
+use Friendica\Database\Database;
 
 /**
  * The Config model backend for users, which is using the general DB-model backend for user-configs
  */
-class PConfig extends DbaConfig
+class PConfig
 {
+	/** @var Database */
+	protected $dba;
+
+	/**
+	 * @param Database $dba The database connection of this model
+	 */
+	public function __construct(Database $dba)
+	{
+		$this->dba = $dba;
+	}
+
+	/**
+	 * Checks if the model is currently connected
+	 *
+	 * @return bool
+	 */
+	public function isConnected()
+	{
+		return $this->dba->isConnected();
+	}
+
 	/**
 	 * Loads all configuration values and returns the loaded category as an array.
 	 *
@@ -49,7 +72,7 @@ class PConfig extends DbaConfig
 
 		while ($config = $this->dba->fetch($configs)) {
 			$key   = $config['k'];
-			$value = $this->toConfigValue($config['v']);
+			$value = DbaUtils::toConfigValue($config['v']);
 
 			// just save it in case it is set
 			if (isset($value)) {
@@ -83,7 +106,7 @@ class PConfig extends DbaConfig
 
 		$config = $this->dba->selectFirst('pconfig', ['v'], ['uid' => $uid, 'cat' => $cat, 'k' => $key]);
 		if ($this->dba->isResult($config)) {
-			$value = $this->toConfigValue($config['v']);
+			$value = DbaUtils::toConfigValue($config['v']);
 
 			// just return it in case it is set
 			if (isset($value)) {
@@ -125,7 +148,7 @@ class PConfig extends DbaConfig
 			return true;
 		}
 
-		$dbvalue = $this->toDbValue($value);
+		$dbvalue = DbaUtils::toDbValue($value);
 
 		$result = $this->dba->update('pconfig', ['v' => $dbvalue], ['uid' => $uid, 'cat' => $cat, 'k' => $key], true);
 

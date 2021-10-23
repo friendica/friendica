@@ -19,11 +19,11 @@
  *
  */
 
-namespace Friendica\Util;
+namespace Friendica\Core\Config\Cache;
 
 use Exception;
 use Friendica\Core\Addon;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 
 /**
  * The ConfigFileLoader loads config-files and stores them in a ConfigCache ( @see Cache )

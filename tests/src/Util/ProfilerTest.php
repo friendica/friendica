@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Util;
 
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Test\MockedTest;
 use Friendica\Util\Profiler;

@@ -23,7 +23,7 @@ namespace Friendica\Test\src\Core\Config;
 
 use Friendica\Core\Config\Cache;
 use Friendica\Core\Config\IConfig;
-use Friendica\Model\Config\Config as ConfigModel;
+use Friendica\Core\Config\Model\Config as ConfigModel;
 use Friendica\Test\MockedTest;
 use Mockery\MockInterface;
 use Mockery;
@@ -33,7 +33,7 @@ abstract class ConfigTest extends MockedTest
 	/** @var ConfigModel|MockInterface */
 	protected $configModel;
 
-	/** @var Cache */
+	/** @var Cache\Cache */
 	protected $configCache;
 
 	/** @var IConfig */
@@ -61,7 +61,7 @@ abstract class ConfigTest extends MockedTest
 
 		// Create the config model
 		$this->configModel = Mockery::mock(ConfigModel::class);
-		$this->configCache = new Cache();
+		$this->configCache = new Cache\Cache();
 	}
 
 	/**
@@ -161,7 +161,7 @@ abstract class ConfigTest extends MockedTest
 		                  ->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// assert config is loaded everytime
 		self::assertConfig('config', $data['config']);
@@ -176,7 +176,7 @@ abstract class ConfigTest extends MockedTest
 	public function testLoad(array $data, array $load)
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		foreach ($load as $loadedCats) {
 			$this->testedConfig->load($loadedCats);
@@ -257,7 +257,7 @@ abstract class ConfigTest extends MockedTest
 	public function testCacheLoadDouble(array $data1, array $data2, array $expect = [])
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		foreach ($data1 as $cat => $data) {
 			$this->testedConfig->load($cat);
@@ -282,7 +282,7 @@ abstract class ConfigTest extends MockedTest
 		$this->configModel->shouldReceive('load')->withAnyArgs()->andReturn([])->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertEmpty($this->testedConfig->getCache()->getAll());
 	}
@@ -299,7 +299,7 @@ abstract class ConfigTest extends MockedTest
 		                  ->times(3);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertTrue($this->testedConfig->set('test', 'it', $data));
 
@@ -317,7 +317,7 @@ abstract class ConfigTest extends MockedTest
 		$this->configModel->shouldReceive('set')->with('test', 'it', $data)->andReturn(true)->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertTrue($this->testedConfig->set('test', 'it', $data));
 
@@ -331,7 +331,7 @@ abstract class ConfigTest extends MockedTest
 	public function testGetWrongWithoutDB()
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// without refresh
 		self::assertNull($this->testedConfig->get('test', 'it'));
@@ -353,10 +353,10 @@ abstract class ConfigTest extends MockedTest
 	 */
 	public function testGetWithRefresh($data)
 	{
-		$this->configCache->load(['test' => ['it' => 'now']], Cache::SOURCE_FILE);
+		$this->configCache->load(['test' => ['it' => 'now']], Cache\Cache::SOURCE_FILE);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// without refresh
 		self::assertEquals('now', $this->testedConfig->get('test', 'it'));
@@ -378,10 +378,10 @@ abstract class ConfigTest extends MockedTest
 	 */
 	public function testDeleteWithoutDB($data)
 	{
-		$this->configCache->load(['test' => ['it' => $data]], Cache::SOURCE_FILE);
+		$this->configCache->load(['test' => ['it' => $data]], Cache\Cache::SOURCE_FILE);
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		self::assertEquals($data, $this->testedConfig->get('test', 'it'));
 		self::assertEquals($data, $this->testedConfig->getCache()->get('test', 'it'));
@@ -398,7 +398,7 @@ abstract class ConfigTest extends MockedTest
 	 */
 	public function testDeleteWithDB()
 	{
-		$this->configCache->load(['test' => ['it' => 'now', 'quarter' => 'true']], Cache::SOURCE_FILE);
+		$this->configCache->load(['test' => ['it' => 'now', 'quarter' => 'true']], Cache\Cache::SOURCE_FILE);
 
 		$this->configModel->shouldReceive('delete')
 		                  ->with('test', 'it')
@@ -418,7 +418,7 @@ abstract class ConfigTest extends MockedTest
 		                  ->once();
 
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
 		// directly set the value to the cache
 		$this->testedConfig->getCache()->set('test', 'it', 'now');
@@ -444,9 +444,9 @@ abstract class ConfigTest extends MockedTest
 	public function testSetGetHighPrio()
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 
-		$this->testedConfig->getCache()->set('config', 'test', 'prio', Cache::SOURCE_FILE);
+		$this->testedConfig->getCache()->set('config', 'test', 'prio', Cache\Cache::SOURCE_FILE);
 		self::assertEquals('prio', $this->testedConfig->get('config', 'test'));
 
 		// now you have to get the new variable entry because of the new set the get refresh succeed as well
@@ -460,10 +460,10 @@ abstract class ConfigTest extends MockedTest
 	public function testSetGetLowPrio()
 	{
 		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
+		self::assertInstanceOf(Cache\Cache::class, $this->testedConfig->getCache());
 		self::assertEquals('it', $this->testedConfig->get('config', 'test'));
 
-		$this->testedConfig->getCache()->set('config', 'test', 'prio', Cache::SOURCE_ENV);
+		$this->testedConfig->getCache()->set('config', 'test', 'prio', Cache\Cache::SOURCE_ENV);
 		// now you have to get the env variable entry as output, even with a new set (which failed) and a get refresh
 		self::assertFalse($this->testedConfig->set('config', 'test', '123'));
 		self::assertEquals('prio', $this->testedConfig->get('config', 'test', '', true));

@@ -24,7 +24,7 @@ namespace Friendica\Test\src\Core\Lock;
 use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Config\IConfig;
-use Friendica\Core\Config\JitConfig;
+use Friendica\Core\Config\Type\JitConfig;
 use Friendica\Core\Lock\SemaphoreLock;
 use Friendica\DI;
 use Mockery;

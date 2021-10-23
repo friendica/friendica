@@ -19,14 +19,36 @@
  *
  */
 
-namespace Friendica\Model\Config;
+namespace Friendica\Core\Config\Model;
 
+use Friendica\Database\Database;
 
 /**
  * The Config model backend, which is using the general DB-model backend for configs
  */
-class Config extends DbaConfig
+class Config
 {
+	/** @var Database */
+	protected $dba;
+
+	/**
+	 * @param Database $dba The database connection of this model
+	 */
+	public function __construct(Database $dba)
+	{
+		$this->dba = $dba;
+	}
+
+	/**
+	 * Checks if the model is currently connected
+	 *
+	 * @return bool
+	 */
+	public function isConnected()
+	{
+		return $this->dba->isConnected();
+	}
+
 	/**
 	 * Loads all configuration values and returns the loaded category as an array.
 	 *
@@ -49,7 +71,7 @@ class Config extends DbaConfig
 		while ($config = $this->dba->fetch($configs)) {
 
 			$key   = $config['k'];
-			$value = $this->toConfigValue($config['v']);
+			$value = DbaUtils::toConfigValue($config['v']);
 
 			// just save it in case it is set
 			if (isset($value)) {
@@ -82,7 +104,7 @@ class Config extends DbaConfig
 
 		$config = $this->dba->selectFirst('config', ['v'], ['cat' => $cat, 'k' => $key]);
 		if ($this->dba->isResult($config)) {
-			$value = $this->toConfigValue($config['v']);
+			$value = DbaUtils::toConfigValue($config['v']);
 
 			// just return it in case it is set
 			if (isset($value)) {
@@ -122,7 +144,7 @@ class Config extends DbaConfig
 			return true;
 		}
 
-		$dbvalue = $this->toDbValue($value);
+		$dbvalue = DbaUtils::toDbValue($value);
 
 		$result = $this->dba->update('config', ['v' => $dbvalue], ['cat' => $cat, 'k' => $key], true);
 

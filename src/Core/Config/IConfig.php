@@ -21,6 +21,8 @@
 
 namespace Friendica\Core\Config;
 
+use Friendica\Core\Config\Cache\Cache;
+
 /**
  * Interface for accessing system wide configurations
  */

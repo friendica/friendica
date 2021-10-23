@@ -6,7 +6,7 @@
 namespace Friendica\Test;
 
 use Dice\Dice;
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\Cache\Cache;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Session;
 use Friendica\Core\Session\ISession;
