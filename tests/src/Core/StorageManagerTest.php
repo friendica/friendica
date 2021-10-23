@@ -253,7 +253,7 @@ class StorageManagerTest extends DatabaseTest
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
+			->addRule(ISession::class, ['instanceOf' => Session\Type\Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
 		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);
@@ -281,7 +281,7 @@ class StorageManagerTest extends DatabaseTest
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule(ISession::class, ['instanceOf' => Session\Memory::class, 'shared' => true, 'call' => null]);
+			->addRule(ISession::class, ['instanceOf' => Session\Type\Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
 		$storageManager = new StorageManager($this->dba, $this->config, $this->logger, $this->l10n);

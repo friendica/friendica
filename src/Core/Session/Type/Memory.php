@@ -19,7 +19,9 @@
  *
  */
 
-namespace Friendica\Core\Session;
+namespace Friendica\Core\Session\Type;
+
+use Friendica\Core\Session\ISession;
 
 /**
  * Usable for backend processes (daemon/worker) and testing

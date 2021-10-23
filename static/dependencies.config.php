@@ -207,7 +207,7 @@ return [
 		],
 	],
 	ISession::class => [
-		'instanceOf' => Factory\SessionFactory::class,
+		'instanceOf' => \Friendica\Core\Session\Factory\SessionFactory::class,
 		'call' => [
 			['createSession', [$_SERVER], Dice::CHAIN_CALL],
 			['start', [], Dice::CHAIN_CALL],

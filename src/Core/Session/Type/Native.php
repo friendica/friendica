@@ -19,9 +19,10 @@
  *
  */
 
-namespace Friendica\Core\Session;
+namespace Friendica\Core\Session\Type;
 
 use Friendica\App;
+use Friendica\Core\Session\ISession;
 use Friendica\Model\User\Cookie;
 use SessionHandlerInterface;
 

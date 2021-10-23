@@ -19,14 +19,13 @@
  *
  */
 
-namespace Friendica\Factory;
+namespace Friendica\Core\Session\Factory;
 
 use Friendica\App;
 use Friendica\Core\Cache\ICache;
 use Friendica\Core\Cache\Enum\Type;
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Session;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -63,7 +62,7 @@ class SessionFactory
 
 		try {
 			if ($mode->isInstall() || $mode->isBackend()) {
-				$session = new Session\Memory();
+				$session = new Session\Type\Memory();
 			} else {
 				$session_handler = $config->get('system', 'session_handler', self::HANDLER_DEFAULT);
 				$handler = null;
@@ -82,7 +81,7 @@ class SessionFactory
 						break;
 				}
 
-				$session = new Session\Native($baseURL, $handler);
+				$session = new Session\Type\Native($baseURL, $handler);
 			}
 		} finally {
 			$profiler->stopRecording();

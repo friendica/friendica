@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\Session;
+namespace Friendica\Core\Session\Type;
 
 /**
  * Contains the base methods for $_SESSION interaction
