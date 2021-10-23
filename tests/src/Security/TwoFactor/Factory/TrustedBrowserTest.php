@@ -5,14 +5,14 @@ namespace Friendica\Test\src\Security\TwoFactor\Factory;
 use Friendica\Security\TwoFactor\Factory\TrustedBrowser;
 use Friendica\Test\MockedTest;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Core\Logger\Type\VoidLogger;
 use Friendica\Util\Strings;
+use Psr\Log\NullLogger;
 
 class TrustedBrowserTest extends MockedTest
 {
 	public function testCreateFromTableRowSuccess()
 	{
-		$factory = new TrustedBrowser(new VoidLogger());
+		$factory = new TrustedBrowser(new NullLogger());
 
 		$row = [
 			'cookie_hash' => Strings::getRandomHex(),
@@ -31,7 +31,7 @@ class TrustedBrowserTest extends MockedTest
 	{
 		$this->expectException(\TypeError::class);
 
-		$factory = new TrustedBrowser(new VoidLogger());
+		$factory = new TrustedBrowser(new NullLogger());
 
 		$row = [
 			'cookie_hash' => null,
@@ -48,7 +48,7 @@ class TrustedBrowserTest extends MockedTest
 
 	public function testCreateForUserWithUserAgent()
 	{
-		$factory = new TrustedBrowser(new VoidLogger());
+		$factory = new TrustedBrowser(new NullLogger());
 
 		$uid = 42;
 		$userAgent = 'PHPUnit';

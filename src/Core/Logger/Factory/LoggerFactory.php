@@ -32,11 +32,11 @@ use Friendica\Core\Logger\Type\Monolog\IntrospectionProcessor;
 use Friendica\Core\Logger\Type\ProfilerLogger;
 use Friendica\Core\Logger\Type\StreamLogger;
 use Friendica\Core\Logger\Type\SyslogLogger;
-use Friendica\Core\Logger\Type\VoidLogger;
 use Friendica\Util\Profiler;
 use Monolog;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 
 /**
  * A logger factory
@@ -78,7 +78,7 @@ class LoggerFactory
 	public function create(Database $database, IConfig $config, Profiler $profiler, FileSystem $fileSystem)
 	{
 		if (empty($config->get('system', 'debugging', false))) {
-			$logger = new VoidLogger();
+			$logger = new NullLogger();
 			$database->setLogger($logger);
 			return $logger;
 		}
@@ -106,7 +106,7 @@ class LoggerFactory
 						static::addStreamHandler($logger, $stream, $loglevel);
 					} catch (\Throwable $e) {
 						// No Logger ..
-						$logger = new VoidLogger();
+						$logger = new NullLogger();
 					}
 				}
 				break;
@@ -116,7 +116,7 @@ class LoggerFactory
 					$logger = new SyslogLogger($this->channel, $introspection, $loglevel);
 				} catch (\Throwable $e) {
 					// No logger ...
-					$logger = new VoidLogger();
+					$logger = new NullLogger();
 				}
 				break;
 
@@ -129,10 +129,10 @@ class LoggerFactory
 						$logger = new StreamLogger($this->channel, $stream, $introspection, $fileSystem, $loglevel);
 					} catch (\Throwable $t) {
 						// No logger ...
-						$logger = new VoidLogger();
+						$logger = new NullLogger();
 					}
 				} else {
-					$logger = new VoidLogger();
+					$logger = new NullLogger();
 				}
 				break;
 		}
@@ -173,7 +173,7 @@ class LoggerFactory
 
 		if ((!isset($developerIp) || !$debugging) &&
 		    (!is_file($stream) || is_writable($stream))) {
-			$logger = new VoidLogger();
+			$logger = new NullLogger();
 			return $logger;
 		}
 

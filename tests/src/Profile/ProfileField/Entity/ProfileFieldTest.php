@@ -11,8 +11,8 @@ use Friendica\Security\PermissionSet\Factory\PermissionSet as PermissionSetFacto
 use Friendica\Test\MockedTest;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Core\Logger\Type\VoidLogger;
 use Mockery\MockInterface;
+use Psr\Log\NullLogger;
 
 class ProfileFieldTest extends MockedTest
 {
@@ -28,8 +28,8 @@ class ProfileFieldTest extends MockedTest
 		parent::setUp();
 
 		$this->permissionSetRepository = \Mockery::mock(PermissionSetRepository::class);
-		$this->permissionSetFactory    = new PermissionSetFactory(new VoidLogger(), new ACLFormatter());
-		$this->profileFieldFactory     = new ProfileFieldFactory(new VoidLogger(), $this->permissionSetFactory);
+		$this->permissionSetFactory    = new PermissionSetFactory(new NullLogger(), new ACLFormatter());
+		$this->profileFieldFactory     = new ProfileFieldFactory(new NullLogger(), $this->permissionSetFactory);
 	}
 
 	public function dataEntity()

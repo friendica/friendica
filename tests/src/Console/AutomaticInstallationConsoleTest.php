@@ -32,11 +32,11 @@ use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\Util\RendererMockTrait;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Core\Logger\Type\VoidLogger;
 use Mockery;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+use Psr\Log\NullLogger;
 
 class AutomaticInstallationConsoleTest extends ConsoleTest
 {
@@ -117,7 +117,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTest
 		});
 
 		$this->mode->shouldReceive('isInstall')->andReturn(true);
-		Logger::init(new VoidLogger());
+		Logger::init(new NullLogger());
 	}
 
 	/**

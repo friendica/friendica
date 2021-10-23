@@ -5,7 +5,7 @@ namespace Friendica\Test\src\Contact\FriendSuggest\Factory;
 use Friendica\Contact\FriendSuggest\Factory\FriendSuggest;
 use Friendica\Contact\FriendSuggest\Entity;
 use Friendica\Test\MockedTest;
-use Friendica\Core\Logger\Type\VoidLogger;
+use Psr\Log\NullLogger;
 
 class FriendSuggestTest extends MockedTest
 {
@@ -91,7 +91,7 @@ class FriendSuggestTest extends MockedTest
 
 	public function testCreateNew()
 	{
-		$factory = new FriendSuggest(new VoidLogger());
+		$factory = new FriendSuggest(new NullLogger());
 
 		$this->assertFriendSuggest(
 			$factory->createNew(12, 13),
@@ -106,14 +106,14 @@ class FriendSuggestTest extends MockedTest
 	 */
 	public function testCreateFromTableRow(array $input, Entity\FriendSuggest $assertion)
 	{
-		$factory = new FriendSuggest(new VoidLogger());
+		$factory = new FriendSuggest(new NullLogger());
 
 		$this->assertFriendSuggest($factory->createFromTableRow($input), $assertion);
 	}
 
 	public function testCreateEmpty()
 	{
-		$factory = new FriendSuggest(new VoidLogger());
+		$factory = new FriendSuggest(new NullLogger());
 
 		$this->assertFriendSuggest($factory->createEmpty(66), new Entity\FriendSuggest(0, 0, '', '', '', '', '',
 			new \DateTime('now', new \DateTimeZone('UTC')), 66
