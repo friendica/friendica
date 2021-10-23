@@ -22,9 +22,9 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\Core\StorageManager;
-use Friendica\Model\Storage\ReferenceStorageException;
-use Friendica\Model\Storage\StorageException;
+use Friendica\Core\Storage\Repository\StorageManager;
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
+use Friendica\Core\Storage\Exception\StorageException;
 
 /**
  * tool to manage storage backend and stored data from CLI
@@ -33,7 +33,7 @@ class Storage extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var StorageManager */
+	/** @var \Friendica\Core\Storage\Repository\StorageManager */
 	private $storageManager;
 
 	/**

@@ -19,9 +19,11 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage\Type;
 
 use Exception;
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
+use Friendica\Core\Storage\IStorage;
 use Friendica\Util\HTTPSignature;
 
 /**

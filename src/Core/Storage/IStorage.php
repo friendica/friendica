@@ -19,11 +19,39 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage;
+
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
+use Friendica\Core\Storage\Exception\StorageException;
 
 /**
- * Storage Exception in case of invalid references
+ * Interface for basic storage backends
  */
-class ReferenceStorageException extends StorageException
+interface IStorage
 {
+	/**
+	 * Get data from backend
+	 *
+	 * @param string $reference Data reference
+	 *
+	 * @return string
+	 *
+	 * @throws StorageException in case there's an unexpected error
+	 * @throws ReferenceStorageException in case the reference doesn't exist
+	 */
+	public function get(string $reference): string;
+
+	/**
+	 * The name of the backend
+	 *
+	 * @return string
+	 */
+	public function __toString();
+
+	/**
+	 * The name of the backend
+	 *
+	 * @return string
+	 */
+	public static function getName(): string;
 }

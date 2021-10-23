@@ -19,11 +19,11 @@
  *
  */
 
-namespace Friendica\Test\src\Model\Storage;
+namespace Friendica\Test\src\Core\Storage;
 
-use Friendica\Model\Storage\IWritableStorage;
-use Friendica\Model\Storage\IStorage;
-use Friendica\Model\Storage\ReferenceStorageException;
+use Friendica\Core\Storage\IStorage;
+use Friendica\Core\Storage\IWritableStorage;
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
 use Friendica\Test\MockedTest;
 
 abstract class StorageTest extends MockedTest

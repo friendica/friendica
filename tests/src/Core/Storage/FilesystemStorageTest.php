@@ -19,11 +19,11 @@
  *
  */
 
-namespace Friendica\Test\src\Model\Storage;
+namespace Friendica\Test\src\Core\Storage;
 
-use Friendica\Model\Storage\Filesystem;
-use Friendica\Model\Storage\FilesystemConfig;
-use Friendica\Model\Storage\StorageException;
+use Friendica\Core\Storage\Exception\StorageException;
+use Friendica\Core\Storage\Type\Filesystem;
+use Friendica\Core\Storage\Type\FilesystemConfig;
 use Friendica\Test\Util\VFSTrait;
 use org\bovigo\vfs\vfsStream;
 

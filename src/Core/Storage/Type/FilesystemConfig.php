@@ -19,10 +19,11 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage\Type;
 
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\L10n;
+use Friendica\Core\Storage\IStorageConfiguration;
 
 /**
  * Filesystem based storage backend configuration

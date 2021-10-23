@@ -19,7 +19,10 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage;
+
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
+use Friendica\Core\Storage\Exception\StorageException;
 
 /**
  * Interface for writable storage backends
@@ -46,8 +49,8 @@ interface IWritableStorage extends IStorage
 	 *
 	 * @param string $reference Data reference
 	 *
-	 * @throws StorageException in case there's an unexpected error
-	 * @throws ReferenceStorageException in case the reference doesn't exist
+	 * @throws \Friendica\Core\Storage\Exception\StorageException in case there's an unexpected error
+	 * @throws \Friendica\Core\Storage\Exception\ReferenceStorageException in case the reference doesn't exist
 	 */
 	public function delete(string $reference);
 }

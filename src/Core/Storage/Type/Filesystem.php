@@ -19,9 +19,13 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage\Type;
 
 use Exception;
+use Friendica\Core\Storage\Exception\ReferenceStorageException;
+use Friendica\Core\Storage\Exception\StorageException;
+use Friendica\Core\Storage\IWritableStorage;
+use Friendica\Core\Storage\Type\FilesystemConfig;
 use Friendica\Util\Strings;
 
 /**

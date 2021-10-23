@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Core\Storage;
 
 /**
  * The interface to use for configurable storage backends

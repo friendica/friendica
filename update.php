@@ -183,7 +183,7 @@ function update_1330()
 
 	// set the name of the storage instead of the classpath as config
 	if (!empty($currStorage)) {
-		/** @var Storage\IStorage $currStorage */
+		/** @var \Friendica\Core\Storage\IStorage $currStorage */
 		if (!DI::config()->set('storage', 'name', $currStorage::getName())) {
 			return Update::FAILED;
 		}
@@ -989,7 +989,7 @@ function update_1434()
 
 	// in case of an empty config, set "Database" as default storage backend
 	if (empty($name)) {
-		DI::config()->set('storage', 'name', Storage\Database::getName());
+		DI::config()->set('storage', 'name', \Friendica\Core\Storage\Type\Database::getName());
 	}
 
 	// In case of a Using deprecated storage class value, set the right name for it

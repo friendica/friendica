@@ -544,7 +544,7 @@ Called when a custom storage is used (e.g. webdav_storage)
 
 Hook data:
 - **name** (input): the name of the used storage backend
-- **data['storage']** (output): the storage instance to use (**must** implement `\Friendica\Model\Storage\IWritableStorage`) 
+- **data['storage']** (output): the storage instance to use (**must** implement `\Friendica\Core\Storage\IWritableStorage`) 
 
 ### storage_config
 
@@ -552,7 +552,7 @@ Called when the admin of the node wants to configure a custom storage (e.g. webd
 
 Hook data:
 - **name** (input): the name of the used storage backend
-- **data['storage_config']** (output): the storage configuration instance to use (**must** implement `\Friendica\Model\Storage\IStorageConfiguration`)
+- **data['storage_config']** (output): the storage configuration instance to use (**must** implement `\Friendica\Core\Storage\IStorageConfiguration`)
 
 ## Complete list of hook callbacks
 

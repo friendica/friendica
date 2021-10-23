@@ -19,10 +19,10 @@
  *
  */
 
-namespace Friendica\Test\src\Model\Storage;
+namespace Friendica\Test\src\Core\Storage;
 
 use Friendica\Core\Config\Factory\ConfigFactory;
-use Friendica\Model\Storage\Database;
+use Friendica\Core\Storage\Type\Database;
 use Friendica\Test\DatabaseTestTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;

@@ -22,7 +22,7 @@
 namespace Friendica\Test\Util;
 
 use Friendica\Core\Hook;
-use Friendica\Model\Storage\IWritableStorage;
+use Friendica\Core\Storage\IWritableStorage;
 
 use Friendica\Core\L10n;
 

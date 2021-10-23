@@ -19,13 +19,25 @@
  *
  */
 
-namespace Friendica\Model\Storage;
+namespace Friendica\Test\src\Core\Storage;
 
-use Exception;
+use Friendica\Core\Storage\IStorageConfiguration;
+use Friendica\Test\MockedTest;
 
-/**
- * Storage Exception for unexpected failures
- */
-class StorageException extends Exception
+abstract class StorageConfigTest extends MockedTest
 {
+	/** @return IStorageConfiguration */
+	abstract protected function getInstance();
+
+	abstract protected function assertOption(IStorageConfiguration $storage);
+
+	/**
+	 * Test if the "getOption" is asserted
+	 */
+	public function testGetOptions()
+	{
+		$instance = $this->getInstance();
+
+		$this->assertOption($instance);
+	}
 }

@@ -211,11 +211,11 @@ abstract class DI
 	}
 
 	/**
-	 * @return Core\StorageManager
+	 * @return \Friendica\Core\Storage\Repository\StorageManager
 	 */
 	public static function storageManager()
 	{
-		return self::$dice->create(Core\StorageManager::class);
+		return self::$dice->create(Core\Storage\Repository\StorageManager::class);
 	}
 
 	//
@@ -395,11 +395,11 @@ abstract class DI
 	}
 
 	/**
-	 * @return Model\Storage\IWritableStorage
+	 * @return \Friendica\Core\Storage\IWritableStorage
 	 */
 	public static function storage()
 	{
-		return self::$dice->create(Model\Storage\IWritableStorage::class);
+		return self::$dice->create(Core\Storage\IWritableStorage::class);
 	}
 
 	/**

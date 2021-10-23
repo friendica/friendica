@@ -14,10 +14,10 @@ There are two different interfaces you need to implement.
 
 ### `IWritableStorage`
 
-The class must implement `Friendica\Model\Storage\IWritableStorage` interface. All method in the interface must be implemented:
+The class must implement `Friendica\Core\Storage\IWritableStorage` interface. All method in the interface must be implemented:
 
 ```php
-namespace Friendica\Model\Storage\IWritableStorage;
+namespace Friendica\Core\Storage\IWritableStorage;
 
 interface IWritableStorage
 {
@@ -36,12 +36,12 @@ interface IWritableStorage
 ### `IStorageConfiguration`
 
 Each storage backend can have options the admin can set in admin page.
-To make the options possible, you need to implement the `Friendica\Model\Storage\IStorageConfiguration` interface.
+To make the options possible, you need to implement the `Friendica\Core\Storage\IStorageConfiguration` interface.
 
 All methods in the interface must be implemented:
 
 ```php
-namespace Friendica\Model\Storage\IStorageConfiguration;
+namespace Friendica\Core\Storage\IStorageConfiguration;
 
 interface IStorageConfiguration
 {
@@ -108,7 +108,7 @@ When the plugin is uninstalled, registered backends must be unregistered using
 `DI::facStorage()->unregister(string $class)`.
 
 You have to register a new hook in your addon, listening on `storage_instance(App $a, array $data)`.
-In case `$data['name']` is your storage class name, you have to instance a new instance of your `Friendica\Model\Storage\IStorage` class.
+In case `$data['name']` is your storage class name, you have to instance a new instance of your `Friendica\Core\Storage\IStorage` class.
 Set the instance of your class as `$data['storage']` to pass it back to the backend.
 
 This is necessary because it isn't always clear, if you need further construction arguments.
@@ -124,7 +124,7 @@ Add a new test class which's naming convention is `StorageClassTest`, which exte
 Override the two necessary instances:
 
 ```php
-use Friendica\Model\Storage\IWritableStorage;
+use Friendica\Core\Storage\IWritableStorage;
 
 abstract class StorageTest 
 {
@@ -156,7 +156,7 @@ If there's a predecessor to this exception (e.g. you caught an exception and are
 Example:
 
 ```php
-use Friendica\Model\Storage\IWritableStorage;
+use Friendica\Core\Storage\IWritableStorage;
 
 class ExampleStorage implements IWritableStorage 
 {
@@ -165,7 +165,7 @@ class ExampleStorage implements IWritableStorage
 		try {
 			throw new Exception('a real bad exception');
 		} catch (Exception $exception) {
-			throw new \Friendica\Model\Storage\StorageException(sprintf('The Example Storage throws an exception for reference %s', $reference), 500, $exception);
+			throw new \Friendica\Core\Storage\Exception\StorageException(sprintf('The Example Storage throws an exception for reference %s', $reference), 500, $exception);
 		}
 	}
 } 
@@ -186,7 +186,7 @@ The file will be `addon/samplestorage/SampleStorageBackend.php`:
 <?php
 namespace Friendica\Addon\samplestorage;
 
-use Friendica\Model\Storage\IWritableStorage;
+use Friendica\Core\Storage\IWritableStorage;
 
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\L10n;
@@ -247,7 +247,7 @@ class SampleStorageBackend implements IWritableStorage
 <?php
 namespace Friendica\Addon\samplestorage;
 
-use Friendica\Model\Storage\IStorageConfiguration;
+use Friendica\Core\Storage\IStorageConfiguration;
 
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\L10n;
@@ -357,8 +357,8 @@ function samplestorage_storage_config(App $a, array &$data)
 **Theoretically - until tests for Addons are enabled too - create a test class with the name `addon/tests/SampleStorageTest.php`:
 
 ```php
-use Friendica\Model\Storage\IWritableStorage;
-use Friendica\Test\src\Model\Storage\StorageTest;
+use Friendica\Core\Storage\IWritableStorage;
+use Friendica\Test\src\Core\Storage\StorageTest;
 
 class SampleStorageTest extends StorageTest 
 {
