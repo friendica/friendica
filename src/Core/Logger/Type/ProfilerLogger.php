@@ -19,9 +19,8 @@
  *
  */
 
-namespace Friendica\Util\Logger;
+namespace Friendica\Core\Logger\Type;
 
-use Friendica\Core\System;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

@@ -19,34 +19,42 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
-use Friendica\Test\MockedTest;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\SyslogLogger;
+use Friendica\Util\Introspection;
 use Psr\Log\LogLevel;
 
-class VoidLoggerTest extends MockedTest
+/**
+ * Wraps the SyslogLogger for replacing the syslog call with a string field.
+ */
+class SyslogLoggerWrapper extends SyslogLogger
 {
-	use LoggerDataTrait;
+	private $content;
 
-	/**
-	 * Test if the profiler is profiling data
-	 * @dataProvider dataTests
-	 * @doesNotPerformAssertions
-	 */
-	public function testNormal($function, $message, array $context)
+	public function __construct($channel, Introspection $introspection, $level = LogLevel::NOTICE, $logOpts = LOG_PID, $logFacility = LOG_USER)
 	{
-		$logger = new VoidLogger();
-		$logger->$function($message, $context);
+		parent::__construct($channel, $introspection, $level, $logOpts, $logFacility);
+
+		$this->content = '';
 	}
 
 	/**
-	 * Test the log() function
-	 * @doesNotPerformAssertions
+	 * Gets the content from the wrapped Syslog
+	 *
+	 * @return string
 	 */
-	public function testProfilingLog()
+	public function getContent()
 	{
-		$logger = new VoidLogger();
-		$logger->log(LogLevel::WARNING, 'test', ['a' => 'context']);
+		return $this->content;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 * @noinspection PhpMissingParentCallCommonInspection
+	 */
+	protected function syslogWrapper($level, $entry)
+	{
+		$this->content .= $entry . PHP_EOL;
 	}
 }

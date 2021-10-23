@@ -11,7 +11,7 @@ use Friendica\Security\PermissionSet\Factory\PermissionSet as PermissionSetFacto
 use Friendica\Test\MockedTest;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\VoidLogger;
 use Mockery\MockInterface;
 
 class ProfileFieldTest extends MockedTest

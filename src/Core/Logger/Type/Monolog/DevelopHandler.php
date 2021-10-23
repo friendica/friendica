@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Util\Logger\Monolog;
+namespace Friendica\Core\Logger\Type\Monolog;
 
 use Monolog\Handler;
 use Monolog\Logger;

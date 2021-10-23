@@ -19,10 +19,10 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
 use Friendica\Test\MockedTest;
-use Friendica\Util\Logger\ProfilerLogger;
+use Friendica\Core\Logger\Type\ProfilerLogger;
 use Friendica\Util\Profiler;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;

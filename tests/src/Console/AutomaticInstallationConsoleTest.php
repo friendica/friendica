@@ -32,7 +32,7 @@ use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\Util\RendererMockTrait;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\VoidLogger;
 use Mockery;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;

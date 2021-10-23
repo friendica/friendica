@@ -5,7 +5,7 @@ namespace Friendica\Test\src\Contact\FriendSuggest\Factory;
 use Friendica\Contact\FriendSuggest\Factory\FriendSuggest;
 use Friendica\Contact\FriendSuggest\Entity;
 use Friendica\Test\MockedTest;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\VoidLogger;
 
 class FriendSuggestTest extends MockedTest
 {

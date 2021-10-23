@@ -141,7 +141,7 @@ return [
 	 *    and is automatically passed as an argument with the same name
 	 */
 	LoggerInterface::class          => [
-		'instanceOf' => Factory\LoggerFactory::class,
+		'instanceOf' => \Friendica\Core\Logger\Factory\LoggerFactory::class,
 		'constructParams' => [
 			'index',
 		],
@@ -150,7 +150,7 @@ return [
 		],
 	],
 	'$devLogger'                    => [
-		'instanceOf' => Factory\LoggerFactory::class,
+		'instanceOf' => \Friendica\Core\Logger\Factory\LoggerFactory::class,
 		'constructParams' => [
 			'dev',
 		],

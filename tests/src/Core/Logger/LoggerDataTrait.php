@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
 trait LoggerDataTrait
 {

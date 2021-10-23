@@ -22,7 +22,7 @@
 namespace Friendica\Core;
 
 use Friendica\DI;
-use Friendica\Util\Logger\WorkerLogger;
+use Friendica\Core\Logger\Type\WorkerLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 

@@ -5,7 +5,7 @@ namespace Friendica\Test\src\Security\TwoFactor\Factory;
 use Friendica\Security\TwoFactor\Factory\TrustedBrowser;
 use Friendica\Test\MockedTest;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\VoidLogger;
 use Friendica\Util\Strings;
 
 class TrustedBrowserTest extends MockedTest

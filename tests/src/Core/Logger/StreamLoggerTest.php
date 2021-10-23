@@ -19,11 +19,11 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
 use Friendica\Util\FileSystem;
 use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Logger\StreamLogger;
+use Friendica\Core\Logger\Type\StreamLogger;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use Psr\Log\LogLevel;
@@ -82,7 +82,7 @@ class StreamLoggerTest extends AbstractLoggerTest
 
 		$filehandler = fopen($logfile->url(), 'ab');
 
-		$logger = new StreamLogger('test', $filehandler, $this->introspection, $this->fileSystem);
+		$logger = new \Friendica\Core\Logger\Type\StreamLogger('test', $filehandler, $this->introspection, $this->fileSystem);
 		$logger->emergency('working');
 
 		$text = $logfile->getContent();

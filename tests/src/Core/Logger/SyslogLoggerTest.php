@@ -19,9 +19,9 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
-use Friendica\Util\Logger\SyslogLogger;
+use Friendica\Core\Logger\Type\SyslogLogger;
 use Psr\Log\LogLevel;
 
 class SyslogLoggerTest extends AbstractLoggerTest

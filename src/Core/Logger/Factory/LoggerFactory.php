@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Factory;
+namespace Friendica\Core\Logger\Factory;
 
 use Friendica\Core\Config\IConfig;
 use Friendica\Core\Logger;
@@ -27,12 +27,12 @@ use Friendica\Database\Database;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\FileSystem;
 use Friendica\Util\Introspection;
-use Friendica\Util\Logger\Monolog\DevelopHandler;
-use Friendica\Util\Logger\Monolog\IntrospectionProcessor;
-use Friendica\Util\Logger\ProfilerLogger;
-use Friendica\Util\Logger\StreamLogger;
-use Friendica\Util\Logger\SyslogLogger;
-use Friendica\Util\Logger\VoidLogger;
+use Friendica\Core\Logger\Type\Monolog\DevelopHandler;
+use Friendica\Core\Logger\Type\Monolog\IntrospectionProcessor;
+use Friendica\Core\Logger\Type\ProfilerLogger;
+use Friendica\Core\Logger\Type\StreamLogger;
+use Friendica\Core\Logger\Type\SyslogLogger;
+use Friendica\Core\Logger\Type\VoidLogger;
 use Friendica\Util\Profiler;
 use Monolog;
 use Psr\Log\LoggerInterface;

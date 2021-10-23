@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Util\Logger;
+namespace Friendica\Core\Logger\Type;
 
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Introspection;

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Util\Logger;
+namespace Friendica\Core\Logger\Type;
 
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;

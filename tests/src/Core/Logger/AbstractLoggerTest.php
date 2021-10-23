@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Util\Logger;
+namespace Friendica\Test\src\Core\Logger;
 
 use Friendica\Test\MockedTest;
 use Friendica\Util\Introspection;
