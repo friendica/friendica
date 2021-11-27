@@ -8,7 +8,6 @@ use Friendica\Core\L10n;
 use Friendica\Module\Response;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\HTTPInputData;
 use Friendica\Util\XML;
 use Psr\Log\LoggerInterface;
 use Friendica\Factory\Api\Twitter\User as TwitterUser;
@@ -226,11 +225,12 @@ class ApiResponse extends Response
 	 * Quit execution with the message that the endpoint isn't implemented
 	 *
 	 * @param string $method
+	 * @param array $request optional the request array
 	 *
 	 * @return void
 	 * @throws \Exception
 	 */
-	public function unsupported(string $method = 'all')
+	public function unsupported(string $method = 'all', array $request = [])
 	{
 		$path = $this->args->getQueryString();
 		$this->logger->info('Unimplemented API call',
@@ -238,7 +238,7 @@ class ApiResponse extends Response
 				'method'  => $method,
 				'path'    => $path,
 				'agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
-				'request' => HTTPInputData::process()
+				'request' => $request,
 			]);
 		$error             = $this->l10n->t('API endpoint %s %s is not implemented', strtoupper($method), $path);
 		$error_description = $this->l10n->t('The API endpoint is currently not implemented but might be in the future.');

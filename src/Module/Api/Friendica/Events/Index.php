@@ -37,7 +37,7 @@ class Index extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'since_id' => 0,
 			'count'    => 0,
 		], $request);

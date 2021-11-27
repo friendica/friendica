@@ -45,7 +45,7 @@ class Search extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'account_id'         => 0,     // If provided, statuses returned will be authored only by this account
 			'max_id'             => 0,     // Return results older than this id
 			'min_id'             => 0,     // Return results immediately newer than this id

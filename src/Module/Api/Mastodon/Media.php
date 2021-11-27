@@ -53,17 +53,17 @@ class Media extends BaseApi
 		System::jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
 	}
 
-	public function put()
+	public function put(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = $this->checkDefaults([
 			'file'        => [], // The file to be attached, using multipart form data.
 			'thumbnail'   => [], // The custom thumbnail of the media to be attached, using multipart form data.
 			'description' => '', // A plain-text description of the media, for accessibility purposes.
 			'focus'       => '', // Two floating points (x,y), comma-delimited ranging from -1.0 to 1.0
-		]);
+		], $request);
 
 		if (empty($this->parameters['id'])) {
 			DI::mstdnError()->UnprocessableEntity();

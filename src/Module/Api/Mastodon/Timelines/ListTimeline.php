@@ -45,7 +45,7 @@ class ListTimeline extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'max_id'          => 0,     // Return results older than id
 			'since_id'        => 0,     // Return results newer than id
 			'min_id'          => 0,     // Return results immediately newer than id

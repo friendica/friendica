@@ -37,7 +37,7 @@ class Index extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);		
 	}
 
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 	}

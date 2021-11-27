@@ -45,5 +45,6 @@ $a->runFrontend(
 	$dice->create(\Friendica\Core\PConfig\Capability\IManagePersonalConfigValues::class),
 	$dice->create(\Friendica\Security\Authentication::class),
 	$dice->create(\Friendica\App\Page::class),
+	new \Friendica\Util\HTTPInputData($_SERVER),
 	$start_time
 );

@@ -37,7 +37,7 @@ class Apps extends BaseApi
 	 */
 	protected function post(array $request = [], array $post = [])
 	{
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'client_name'   => '',
 			'redirect_uris' => '',
 			'scopes'        => 'read',

@@ -39,7 +39,7 @@ class Authorize extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'force_login'   => '', // Forces the user to re-login, which is necessary for authorizing with multiple accounts from the same instance.
 			'response_type' => '', // Should be set equal to "code".
 			'client_id'     => '', // Client ID, obtained during app registration.

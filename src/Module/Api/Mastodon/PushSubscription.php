@@ -39,7 +39,7 @@ class PushSubscription extends BaseApi
 		$uid         = self::getCurrentUserID();
 		$application = self::getCurrentApplication();
 
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'subscription' => [],
 			'data'         => [],
 		], $post);
@@ -66,15 +66,15 @@ class PushSubscription extends BaseApi
 		return DI::mstdnSubscription()->createForApplicationIdAndUserId($application['id'], $uid)->toArray();
 	}
 
-	public function put()
+	public function put(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_PUSH);
 		$uid         = self::getCurrentUserID();
 		$application = self::getCurrentApplication();
 
-		$request = self::getRequest([
+		$request = $this->checkDefaults([
 			'data' => [],
-		]);
+		], $request);
 
 		$subscription = Subscription::select($application['id'], $uid, ['id']);
 		if (empty($subscription)) {
@@ -99,7 +99,7 @@ class PushSubscription extends BaseApi
 		return DI::mstdnSubscription()->createForApplicationIdAndUserId($application['id'], $uid)->toArray();
 	}
 
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_PUSH);
 		$uid         = self::getCurrentUserID();

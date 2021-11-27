@@ -21,7 +21,6 @@
 
 namespace Friendica\Module\Api\Friendica\Photo;
 
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
@@ -33,37 +32,54 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
  */
 class Delete extends BaseApi
 {
-	protected function rawContent(array $request = [])
+	/** @var bool mark if the photo is already deleted because of a differen execution path */
+	protected $deleted = false;
+
+	protected function post(array $request = [], array $post = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->deletePhoto($post);
+	}
+
+	protected function delete(array $request = [])
+	{
+		$this->deletePhoto($request);
+	}
+
+	private function deletePhoto(array $input = [])
+	{
+		if ($this->deleted) {
+			return;
+		}
+
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$input = $this->checkDefaults([
 			'photo_id' => null, // Photo id
-		]);
+		], $input);
 
 		// do several checks on input parameters
 		// we do not allow calls without photo id
-		if (empty($request['photo_id'])) {
+		if (empty($input['photo_id'])) {
 			throw new BadRequestException("no photo_id specified");
 		}
 
 		// check if photo is existing in database
-		if (!Photo::exists(['resource-id' => $request['photo_id'], 'uid' => $uid])) {
+		if (!Photo::exists(['resource-id' => $input['photo_id'], 'uid' => $uid])) {
 			throw new BadRequestException("photo not available");
 		}
 
 		// now we can perform on the deletion of the photo
-		$result = Photo::delete(['uid' => $uid, 'resource-id' => $request['photo_id']]);
+		$result = Photo::delete(['uid' => $uid, 'resource-id' => $input['photo_id']]);
 
 		// return success of deletion or error message
 		if ($result) {
 			// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 			// to the user and the contacts of the users (drop_items() do all the necessary magic to avoid orphans in database and federate deletion)
-			$condition = ['uid' => $uid, 'resource-id' => $request['photo_id'], 'type' => 'photo'];
+			$condition = ['uid' => $uid, 'resource-id' => $input['photo_id']];
 			Item::deleteForUser($condition, $uid);
 
-			$result = ['result' => 'deleted', 'message' => 'photo with id `' . $request['photo_id'] . '` has been deleted from server.'];
+			$this->deleted = true;
+			$result = ['result' => 'deleted', 'message' => 'photo with id `' . $input['photo_id'] . '` has been deleted from server.'];
 			$this->response->exit('photo_delete', ['$result' => $result], $this->parameters['extension'] ?? null);
 		} else {
 			throw new InternalServerErrorException("unknown error on deleting photo from database table");

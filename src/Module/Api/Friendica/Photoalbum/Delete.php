@@ -22,7 +22,6 @@
 namespace Friendica\Module\Api\Friendica\Photoalbum;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
@@ -34,22 +33,38 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
  */
 class Delete extends BaseApi
 {
-	protected function rawContent(array $request = [])
+	/** @var bool Marks, if the deletion was already done */
+	protected $deleted = false;
+
+	protected function post(array $request = [], array $post = [])
 	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
+		$this->deletePhoto($post);
+	}
+
+	protected function delete(array $request = [])
+	{
+		$this->deletePhoto($request);
+	}
+
+	private function deletePhoto(array $input = [])
+	{
+		if ($this->deleted) {
+			return;
+		}
+
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$input = $this->checkDefaults([
 			'album' => '', // Album name
-		]);
+		], $input);
 
 		// we do not allow calls without album string
-		if (empty($request['album'])) {
+		if (empty($input['album'])) {
 			throw new BadRequestException("no albumname specified");
 		}
 		// check if album is existing
 
-		$photos = DBA::selectToArray('photo', ['resource-id'], ['uid' => $uid, 'album' => $request['album']], ['group_by' => ['resource-id']]);
+		$photos = DBA::selectToArray('photo', ['resource-id'], ['uid' => $uid, 'album' => $input['album']], ['group_by' => ['resource-id']]);
 		if (!DBA::isResult($photos)) {
 			throw new BadRequestException("album not available");
 		}
@@ -58,15 +73,16 @@ class Delete extends BaseApi
 
 		// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 		// to the user and the contacts of the users (drop_items() performs the federation of the deletion to other networks
-		$condition = ['uid' => $uid, 'resource-id' => $resourceIds, 'type' => 'photo'];
+		$condition = ['uid' => $uid, 'resource-id' => $resourceIds];
 		Item::deleteForUser($condition, $uid);
 
 		// now let's delete all photos from the album
-		$result = Photo::delete(['uid' => $uid, 'album' => $request['album']]);
+		$result = Photo::delete(['uid' => $uid, 'album' => $input['album']]);
 
 		// return success of deletion or error message
 		if ($result) {
-			$answer = ['result' => 'deleted', 'message' => 'album `' . $request['album'] . '` with all containing photos has been deleted.'];
+			$this->deleted = true;
+			$answer = ['result' => 'deleted', 'message' => 'album `' . $input['album'] . '` with all containing photos has been deleted.'];
 			$this->response->exit('photoalbum_delete', ['$result' => $answer], $this->parameters['extension'] ?? null);
 		} else {
 			throw new InternalServerErrorException("unknown error - deleting from database failed");

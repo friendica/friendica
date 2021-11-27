@@ -129,7 +129,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * Extend this method if the module is supposed to process DELETE requests.
 	 * Doesn't display any content
 	 */
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 	}
 
@@ -139,7 +139,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * Extend this method if the module is supposed to process PATCH requests.
 	 * Doesn't display any content
 	 */
-	protected function patch()
+	protected function patch(array $request = [])
 	{
 	}
 
@@ -164,7 +164,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * Extend this method if the module is supposed to process PUT requests.
 	 * Doesn't display any content
 	 */
-	protected function put()
+	protected function put(array $request = [])
 	{
 	}
 
@@ -208,17 +208,17 @@ abstract class BaseModule implements ICanHandleRequests
 
 		switch ($this->server['REQUEST_METHOD'] ?? Router::GET) {
 			case Router::DELETE:
-				$this->delete();
+				$this->delete($request);
 				break;
 			case Router::PATCH:
-				$this->patch();
+				$this->patch($request);
 				break;
 			case Router::POST:
 				Core\Hook::callAll($this->args->getModuleName() . '_mod_post', $post);
 				$this->post($request, $post);
 				break;
 			case Router::PUT:
-				$this->put();
+				$this->put($request);
 				break;
 		}
 
@@ -239,6 +239,48 @@ abstract class BaseModule implements ICanHandleRequests
 		}
 
 		return $this->response->generate();
+	}
+
+	/**
+	 * Checks default parameter keys for modules
+	 *
+	 * @param array $defaults The expected keys with corresponding default values
+	 * @param array $input    The input (e.g. $_POST, $_REQUEST)
+	 *
+	 * @return array The input merged with defaults and if it was missing, the corresponding default values
+	 */
+	protected function checkDefaults(array $defaults, array $input): array
+	{
+		$request = [];
+
+		foreach ($defaults as $parameter => $defaultvalue) {
+			if (is_string($defaultvalue)) {
+				$request[$parameter] = $input[$parameter] ?? $defaultvalue;
+			} elseif (is_int($defaultvalue)) {
+				$request[$parameter] = (int)($input[$parameter] ?? $defaultvalue);
+			} elseif (is_float($defaultvalue)) {
+				$request[$parameter] = (float)($input[$parameter] ?? $defaultvalue);
+			} elseif (is_array($defaultvalue)) {
+				$request[$parameter] = $input[$parameter] ?? [];
+			} elseif (is_bool($defaultvalue)) {
+				$request[$parameter] = in_array(strtolower($input[$parameter] ?? ''), ['true', '1']);
+			} else {
+				$request[$parameter] = $input[$parameter] ?? $defaultvalue;
+				$this->logger->notice('Unhandled default value type', ['parameter' => $parameter, 'type' => gettype($defaultvalue)]);
+			}
+		}
+
+		foreach ($input ?? [] as $parameter => $value) {
+			if ($parameter == 'pagename') {
+				continue;
+			}
+			if (!in_array($parameter, array_keys($defaults))) {
+				$this->logger->notice('Unhandled request field', ['parameter' => $parameter, 'value' => $value, 'command' => $this->args->getCommand()]);
+			}
+		}
+
+		$this->logger->debug('Got request parameters', ['request' => $request, 'command' => $this->args->getCommand()]);
+		return $request;
 	}
 
 	/*

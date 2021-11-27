@@ -23,7 +23,6 @@ namespace Friendica\Test\src\Module\Api\Friendica\Photoalbum;
 
 use Friendica\App\Router;
 use Friendica\DI;
-use Friendica\Model\Photo;
 use Friendica\Module\Api\Friendica\Photoalbum\Update;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Test\src\Module\Api\ApiTest;
@@ -33,19 +32,19 @@ class UpdateTest extends ApiTest
 	public function testEmpty()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run();
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run();
 	}
 
 	public function testTooFewArgs()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run(['album' => 'album_name']);
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run(['album' => 'album_name']);
 	}
 
 	public function testWrongUpdate()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run(['album' => 'album_name', 'album_new' => 'album_name']);
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run(['album' => 'album_name', 'album_new' => 'album_name']);
 	}
 
 	public function testWithoutAuthenticatedUser()
@@ -57,12 +56,6 @@ class UpdateTest extends ApiTest
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
-		$albums = Photo::getAlbums(42);
-
-		self::assertCount(1, $albums);
-		self::assertEquals('test_album', $albums[0]['album']);
-		self::assertEquals(1, $albums[0]['total']);
-
 		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run(['album' => 'test_album', 'album_new' => 'test_album_2']);
 
 		$responseBody = (string)$response->getBody();
@@ -73,11 +66,5 @@ class UpdateTest extends ApiTest
 
 		self::assertEquals('updated', $json->result);
 		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
-
-		$albums = Photo::getAlbums(42);
-
-		self::assertCount(1, $albums);
-		self::assertEquals('test_album_2', $albums[0]['album']);
-		self::assertEquals(1, $albums[0]['total']);
 	}
 }
