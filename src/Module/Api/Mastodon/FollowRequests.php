@@ -87,7 +87,7 @@ class FollowRequests extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'min_id' => 0,
 			'max_id' => 0,
 			'limit'  => 40, // Maximum number of results to return. Defaults to 40. Paginate using the HTTP Link header.

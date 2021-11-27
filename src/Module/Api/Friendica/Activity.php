@@ -44,7 +44,7 @@ class Activity extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'id' => 0, // Id of the post
 		], $request);
 

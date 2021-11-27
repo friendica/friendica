@@ -33,15 +33,15 @@ use Friendica\Module\BaseApi;
  */
 class ScheduledStatuses extends BaseApi
 {
-	public function put()
+	public function put(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$this->response->unsupported(Router::PUT);
+		$this->response->unsupported(Router::PUT, $request);
 	}
 
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
@@ -71,7 +71,7 @@ class ScheduledStatuses extends BaseApi
 			System::jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($this->parameters['id'], $uid)->toArray());
 		}
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'limit'           => 20, // Max number of results to return. Defaults to 20.
 			'max_id'          => 0,  // Return results older than ID
 			'since_id'        => 0,  // Return results newer than ID

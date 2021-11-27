@@ -32,17 +32,17 @@ class Unimplemented extends BaseApi
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function delete()
+	protected function delete(array $request = [])
 	{
-		$this->response->unsupported(Router::DELETE);
+		$this->response->unsupported(Router::DELETE, $request);
 	}
 
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	protected function patch()
+	protected function patch(array $request = [])
 	{
-		$this->response->unsupported(Router::PATCH);
+		$this->response->unsupported(Router::PATCH, $request);
 	}
 
 	/**
@@ -50,15 +50,15 @@ class Unimplemented extends BaseApi
 	 */
 	protected function post(array $request = [], array $post = [])
 	{
-		$this->response->unsupported(Router::POST);
+		$this->response->unsupported(Router::POST, $post);
 	}
 
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function put()
+	public function put(array $request = [])
 	{
-		$this->response->unsupported(Router::PUT);
+		$this->response->unsupported(Router::PUT, $request);
 	}
 
 	/**
@@ -66,6 +66,6 @@ class Unimplemented extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$this->response->unsupported(Router::GET);
+		$this->response->unsupported(Router::GET, $request);
 	}
 }

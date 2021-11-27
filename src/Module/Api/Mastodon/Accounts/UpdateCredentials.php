@@ -22,24 +22,20 @@
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
 use Friendica\App\Router;
-use Friendica\Core\Logger;
 use Friendica\Module\BaseApi;
-use Friendica\Util\HTTPInputData;
 
 /**
  * @see https://docs.joinmastodon.org/methods/accounts/
  */
 class UpdateCredentials extends BaseApi
 {
-	protected function patch()
+	protected function patch(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$data = HTTPInputData::process();
+		$this->logger->info('Patch data', ['data' => $request]);
 
-		Logger::info('Patch data', ['data' => $data]);
-
-		$this->response->unsupported(Router::PATCH);
+		$this->response->unsupported(Router::PATCH, $request);
 	}
 }

@@ -34,7 +34,7 @@ class Setseen extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'id' => 0, // Id of the direct message
 		], $post);
 

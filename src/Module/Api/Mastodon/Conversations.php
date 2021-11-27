@@ -31,7 +31,7 @@ use Friendica\Module\BaseApi;
  */
 class Conversations extends BaseApi
 {
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
@@ -54,7 +54,7 @@ class Conversations extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'limit'    => 20, // Maximum number of results. Defaults to 20. Max 40.
 			'max_id'   => 0,  // Return results older than this ID. Use HTTP Link header to paginate.
 			'since_id' => 0,  // Return results newer than this ID. Use HTTP Link header to paginate.

@@ -35,7 +35,7 @@ class Filters extends BaseApi
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 
-		$this->response->unsupported(Router::POST);
+		$this->response->unsupported(Router::POST, $post);
 	}
 
 	/**

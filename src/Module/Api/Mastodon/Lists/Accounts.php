@@ -34,14 +34,14 @@ use Friendica\Module\BaseApi;
  */
 class Accounts extends BaseApi
 {
-	protected function delete()
+	protected function delete(array $request = [])
 	{
-		$this->response->unsupported(Router::DELETE);
+		$this->response->unsupported(Router::DELETE, $request);
 	}
 
 	protected function post(array $request = [], array $post = [])
 	{
-		$this->response->unsupported(Router::POST);
+		$this->response->unsupported(Router::POST, $post);
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Accounts extends BaseApi
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'max_id'   => 0,  // Return results older than this id
 			'since_id' => 0,  // Return results newer than this id
 			'min_id'   => 0,  // Return results immediately newer than id			

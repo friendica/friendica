@@ -34,7 +34,7 @@ class Revoke extends BaseApi
 {
 	protected function post(array $request = [], array $post = [])
 	{
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'client_id'     => '', // Client ID, obtained during app registration
 			'client_secret' => '', // Client secret, obtained during app registration
 			'token'         => '', // The previously obtained token, to be invalidated

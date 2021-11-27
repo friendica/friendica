@@ -37,10 +37,10 @@ class Delete extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = $this->checkDefaults([
 			'gid'  => 0,
 			'name' => ''
-		]);
+		], $request);
 
 		// params
 

@@ -36,7 +36,7 @@ class Token extends BaseApi
 {
 	protected function post(array $request = [], array $post = [])
 	{
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'client_id'     => '', // Client ID, obtained during app registration
 			'client_secret' => '', // Client secret, obtained during app registration
 			'redirect_uri'  => '', // Set a URI to redirect the user to. If this parameter is set to "urn:ietf:wg:oauth:2.0:oob" then the token will be shown instead. Must match one of the redirect URIs declared during app registration.

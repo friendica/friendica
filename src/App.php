@@ -40,6 +40,7 @@ use Friendica\Model\Profile;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\HTTPInputData;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
@@ -562,13 +563,14 @@ class App
 	 *
 	 * @param App\Router                  $router
 	 * @param IManagePersonalConfigValues $pconfig
-	 * @param Authentication              $auth   The Authentication backend of the node
-	 * @param App\Page                    $page   The Friendica page printing container
+	 * @param Authentication              $auth      The Authentication backend of the node
+	 * @param App\Page                    $page      The Friendica page printing container
+	 * @param HTTPInputData               $inputData A library for fetching the whole $_REQUEST content, including PHP input streams
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function runFrontend(App\Router $router, IManagePersonalConfigValues $pconfig, Authentication $auth, App\Page $page, float $start_time)
+	public function runFrontend(App\Router $router, IManagePersonalConfigValues $pconfig, Authentication $auth, App\Page $page, HTTPInputData $inputData, float $start_time)
 	{
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
@@ -702,8 +704,12 @@ class App
 				$module = $router->getModule();
 			}
 
+			// Processes data from GET requests
+			$httpInput = $inputData->process();
+			$request   = array_merge($httpInput['variables'], $httpInput['files'], $_REQUEST);
+
 			// Let the module run it's internal process (init, get, post, ...)
-			$response = $module->run($_POST, $_REQUEST);
+			$response = $module->run($_POST, $request);
 			if ($response->getHeaderLine(ICanCreateResponses::X_HEADER) === ICanCreateResponses::TYPE_HTML) {
 				$page->run($this, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig);
 			} else {

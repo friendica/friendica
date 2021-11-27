@@ -41,7 +41,7 @@ class Directory extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'offset' => 0,        // How many accounts to skip before returning results. Default 0.
 			'limit'  => 40,       // How many accounts to load. Default 40.
 			'order'  => 'active', // active to sort by most recently posted statuses (default) or new to sort by most recently created profiles.

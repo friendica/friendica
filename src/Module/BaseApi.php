@@ -22,6 +22,7 @@
 namespace Friendica\Module;
 
 use Friendica\App;
+use Friendica\App\Router;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
@@ -35,8 +36,8 @@ use Friendica\Network\HTTPException;
 use Friendica\Security\BasicAuth;
 use Friendica\Security\OAuth;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\HTTPInputData;
 use Friendica\Util\Profiler;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 class BaseApi extends BaseModule
@@ -67,95 +68,33 @@ class BaseApi extends BaseModule
 	public function __construct(App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-	}
 
-	protected function delete()
-	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
-
-		if (!$this->app->isLoggedIn()) {
-			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
-		}
-	}
-
-	protected function patch()
-	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
-
-		if (!$this->app->isLoggedIn()) {
-			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
-		}
-	}
-
-	protected function post(array $request = [], array $post = [])
-	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
-
-		if (!$this->app->isLoggedIn()) {
-			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
-		}
-	}
-
-	public function put()
-	{
-		self::checkAllowedScope(self::SCOPE_WRITE);
-
-		if (!$this->app->isLoggedIn()) {
-			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
-		}
-	}
-
-	protected static function checkDefaults(array $defaults, $input): array
-	{
-		$request = [];
-
-		foreach ($defaults as $parameter => $defaultvalue) {
-			if (is_string($defaultvalue)) {
-				$request[$parameter] = $input[$parameter] ?? $defaultvalue;
-			} elseif (is_int($defaultvalue)) {
-				$request[$parameter] = (int)($input[$parameter] ?? $defaultvalue);
-			} elseif (is_float($defaultvalue)) {
-				$request[$parameter] = (float)($input[$parameter] ?? $defaultvalue);
-			} elseif (is_array($defaultvalue)) {
-				$request[$parameter] = $input[$parameter] ?? [];
-			} elseif (is_bool($defaultvalue)) {
-				$request[$parameter] = in_array(strtolower($input[$parameter] ?? ''), ['true', '1']);
-			} else {
-				Logger::notice('Unhandled default value type', ['parameter' => $parameter, 'type' => gettype($defaultvalue)]);
-			}
-		}
-
-		return $request;
+		$this->app = $app;
 	}
 
 	/**
-	 * Processes data from GET requests and sets defaults
+	 * Additional check during run if the corresponding request method needs authorization first
 	 *
-	 * @return array request data
+	 * {@inheritDoc}
+	 *
+	 * @throws HTTPException\ForbiddenException
 	 */
-	public static function getRequest(array $defaults)
+	public function run(array $post = [], array $request = []): ResponseInterface
 	{
-		$httpinput = HTTPInputData::process();
-		$input = array_merge($httpinput['variables'], $httpinput['files'], $_REQUEST);
+		switch ($this->server['REQUEST_METHOD'] ?? Router::GET) {
+			case Router::DELETE:
+			case Router::PATCH:
+			case Router::POST:
+			case Router::PUT:
+				self::checkAllowedScope(self::SCOPE_WRITE);
 
-		self::$request    = $input;
-		self::$boundaries = [];
-
-		unset(self::$request['pagename']);
-
-		$request = self::checkDefaults($defaults, $input);
-
-		foreach ($input ?? [] as $parameter => $value) {
-			if ($parameter == 'pagename') {
-				continue;
-			}
-			if (!in_array($parameter, array_keys($defaults))) {
-				Logger::notice('Unhandled request field', ['parameter' => $parameter, 'value' => $value, 'command' => DI::args()->getCommand()]);
-			}
+				if (!$this->app->isLoggedIn()) {
+					throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
+				}
+				break;
 		}
 
-		Logger::debug('Got request parameters', ['request' => $request, 'command' => DI::args()->getCommand()]);
-		return $request;
+		return parent::run($post, $request);
 	}
 
 	/**

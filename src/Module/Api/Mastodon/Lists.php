@@ -31,7 +31,7 @@ use Friendica\Model\Group;
  */
 class Lists extends BaseApi
 {
-	protected function delete()
+	protected function delete(array $request = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
@@ -56,7 +56,7 @@ class Lists extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'title' => '',
 		], $post);
 
@@ -74,12 +74,12 @@ class Lists extends BaseApi
 		System::jsonExit(DI::mstdnList()->createFromGroupId($id));
 	}
 
-	public function put()
+	public function put(array $request = [])
 	{
-		$request = self::getRequest([
+		$request = $this->checkDefaults([
 			'title'          => '', // The title of the list to be updated.
 			'replies_policy' => '', // One of: "followed", "list", or "none".
-		]);
+		], $request);
 
 		if (empty($request['title']) || empty($this->parameters['id'])) {
 			DI::mstdnError()->UnprocessableEntity();

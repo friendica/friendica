@@ -41,7 +41,7 @@ class Note extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$post = self::checkDefaults([
+		$post = $this->checkDefaults([
 			'comment' => '',
 		], $post);
 

@@ -53,7 +53,7 @@ class Tag extends BaseApi
 		 * There seem to be the parameters "any", "all", and "none".
 		 */
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'local'           => false, // If true, return only local statuses. Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'only_media'      => false, // If true, return only statuses with media attachments. Defaults to false.

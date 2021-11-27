@@ -42,7 +42,7 @@ class Search extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::checkDefaults([
+		$request = $this->checkDefaults([
 			'q'         => '',    // What to search for
 			'limit'     => 40,    // Maximum number of results. Defaults to 40.
 			'resolve'   => false, // Attempt WebFinger lookup. Defaults to false. Use this when q is an exact address.
