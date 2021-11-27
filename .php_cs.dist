@@ -15,7 +15,8 @@ $finder = PhpCsFixer\Finder::create()
 	->notPath('vendor')
 	->notPath('view/asset')
 	->notPath('lang')
-	->notPath('view/smarty3/compiled');
+	->notPath('view/smarty3/compiled')
+	->notPath('tests/datasets');
 
 $config = new PhpCsFixer\Config();
 return $config
