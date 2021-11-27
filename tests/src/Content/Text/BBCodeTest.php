@@ -77,6 +77,8 @@ class BBCodeTest extends MockedTest
 		$baseUrlMock->shouldReceive('getUrlPath')->withNoArgs()->andReturn('');
 		$baseUrlMock->shouldReceive('__toString')->withNoArgs()->andReturn('friendica.local');
 
+		DI::baseUrl()->save('friendica.local', DI::baseUrl()::SSL_POLICY_FULL);
+
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
 		$config->set('Attr.AllowedRel', [
