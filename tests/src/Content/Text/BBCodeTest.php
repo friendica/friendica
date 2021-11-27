@@ -51,7 +51,7 @@ class BBCodeTest extends MockedTest
 			->andReturn(null);
 		$this->configMock->shouldReceive('get')
 			->with('system', 'url')
-			->andReturn('friendica.local');
+			->andReturn('https://friendica.local');
 		$this->configMock->shouldReceive('get')
 			->with('system', 'no_smilies')
 			->andReturn(false);

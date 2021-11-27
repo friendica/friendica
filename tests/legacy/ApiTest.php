@@ -7,18 +7,13 @@ namespace Friendica\Test\legacy;
 
 use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Core\Protocol;
 use Friendica\DI;
-use Friendica\Model\Post;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
-use Friendica\Network\HTTPException;
 use Friendica\Security\BasicAuth;
 use Friendica\Test\FixtureTest;
 use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Temporal;
 use Monolog\Handler\TestHandler;
 
 require_once __DIR__ . '/../../include/api.php';
@@ -78,6 +73,7 @@ class ApiTest extends FixtureTest
 		$this->config->set('system', 'throttle_limit_month', 100);
 		$this->config->set('system', 'theme', 'system_theme');
 
+		$this->config->set('system', 'allowed_link_protocols', []);
 
 		/** @var App app */
 		$this->app = DI::app();

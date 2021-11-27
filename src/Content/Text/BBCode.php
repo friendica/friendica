@@ -2322,7 +2322,7 @@ class BBCode
 						break;
 					case '#':
 					default:
-						return $match[1] . '[url=' . 'https://' . DI::baseUrl() . '/search?tag=' . $match[2] . ']' . $match[2] . '[/url]';
+						return $match[1] . '[url=' . DI::baseUrl() . '/search?tag=' . $match[2] . ']' . $match[2] . '[/url]';
 				}
 			}, $body);
 	}
