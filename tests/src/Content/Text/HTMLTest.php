@@ -24,22 +24,10 @@ namespace Friendica\Test\src\Content\Text;
 use Exception;
 use Friendica\Content\Text\HTML;
 use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Test\MockedTest;
-use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\VFSTrait;
+use Friendica\Test\DatabaseTest;
 
-class HTMLTest extends MockedTest
+class HTMLTest extends DatabaseTest
 {
-	use VFSTrait;
-	use AppMockTrait;
-
-	protected function setUp(): void
-	{
-		parent::setUp();
-		$this->setUpVfsDir();
-		$this->mockApp($this->root);
-	}
-
 	public function dataHTML()
 	{
 		$inputFiles = glob(__DIR__ . '/../../../datasets/content/text/html/*.html');
