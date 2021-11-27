@@ -9,27 +9,17 @@
 namespace Friendica\Test\src\Content;
 
 use Friendica\Content\Smilies;
+use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Test\MockedTest;
-use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\VFSTrait;
+use Friendica\Test\DatabaseTest;
 
-class SmiliesTest extends MockedTest
+class SmiliesTest extends DatabaseTest
 {
-	use VFSTrait;
-	use AppMockTrait;
-
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpVfsDir();
-		$this->mockApp($this->root);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'no_smilies')
-			->andReturn(false);
-		$this->configMock->shouldReceive('get')
-			->with(false, 'system', 'no_smilies')
-			->andReturn(false);
+		DI::config()->set('system', 'no_smilies', false);
+		DI::config()->set('system', 'no_smilies', false);
 	}
 
 	public function dataLinks()

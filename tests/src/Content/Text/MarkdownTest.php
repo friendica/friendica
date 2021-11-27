@@ -23,22 +23,10 @@ namespace Friendica\Test\src\Content\Text;
 
 use Exception;
 use Friendica\Content\Text\Markdown;
-use Friendica\Test\MockedTest;
-use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\VFSTrait;
+use Friendica\Test\DatabaseTest;
 
-class MarkdownTest extends MockedTest
+class MarkdownTest extends DatabaseTest
 {
-	use VFSTrait;
-	use AppMockTrait;
-
-	protected function setUp(): void
-	{
-		parent::setUp();
-		$this->setUpVfsDir();
-		$this->mockApp($this->root);
-	}
-
 	public function dataMarkdown()
 	{
 		$inputFiles = glob(__DIR__ . '/../../../datasets/content/text/markdown/*.md');

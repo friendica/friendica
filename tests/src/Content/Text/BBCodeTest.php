@@ -21,61 +21,23 @@
 
 namespace Friendica\Test\src\Content\Text;
 
-use Friendica\App\BaseURL;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\L10n;
+use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Test\MockedTest;
-use Friendica\Test\Util\AppMockTrait;
-use Friendica\Test\Util\VFSTrait;
-use Mockery;
+use Friendica\Test\DatabaseTest;
 
-class BBCodeTest extends MockedTest
+class BBCodeTest extends DatabaseTest
 {
-	use VFSTrait;
-	use AppMockTrait;
-
 	protected function setUp(): void
 	{
 		parent::setUp();
-		$this->setUpVfsDir();
-		$this->mockApp($this->root);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'remove_multiplicated_lines')
-			->andReturn(false);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'no_oembed')
-			->andReturn(false);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'allowed_link_protocols')
-			->andReturn(null);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'url')
-			->andReturn('friendica.local');
-		$this->configMock->shouldReceive('get')
-			->with('system', 'no_smilies')
-			->andReturn(false);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'big_emojis')
-			->andReturn(false);
-		$this->configMock->shouldReceive('get')
-			->with('system', 'allowed_oembed')
-			->andReturn('');
-
-		$l10nMock = Mockery::mock(L10n::class);
-		$l10nMock->shouldReceive('t')->withAnyArgs()->andReturnUsing(function ($args) { return $args; });
-		$this->dice->shouldReceive('create')
-		           ->with(L10n::class)
-		           ->andReturn($l10nMock);
-
-		$baseUrlMock = Mockery::mock(BaseURL::class);
-		$baseUrlMock->shouldReceive('get')->withAnyArgs()->andReturn('friendica.local');
-		$this->dice->shouldReceive('create')
-		           ->with(BaseURL::class)
-		           ->andReturn($baseUrlMock);
-		$baseUrlMock->shouldReceive('getHostname')->withNoArgs()->andReturn('friendica.local');
-		$baseUrlMock->shouldReceive('getUrlPath')->withNoArgs()->andReturn('');
-		$baseUrlMock->shouldReceive('__toString')->withNoArgs()->andReturn('friendica.local');
+		DI::config()->set('system', 'remove_multiplicated_lines', false);
+		DI::config()->set('system', 'no_oembed', false);
+		DI::config()->set('system', 'allowed_link_protocols', null);
+		DI::config()->set('system', 'url', 'friendica.local');
+		DI::config()->set('system', 'no_smilies', false);
+		DI::config()->set('system', 'big_emojis', false);
+		DI::config()->set('system', 'allowed_oembed', '');
 
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
