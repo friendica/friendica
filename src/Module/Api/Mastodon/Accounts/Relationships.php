@@ -39,9 +39,9 @@ class Relationships extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'id' => [],
-		]);
+		], $request);
 
 		if (empty($request['id'])) {
 			DI::mstdnError()->UnprocessableEntity();

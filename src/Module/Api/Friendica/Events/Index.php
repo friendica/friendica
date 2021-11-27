@@ -23,7 +23,6 @@ namespace Friendica\Module\Api\Friendica\Events;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\BaseApi;
 
 /**
@@ -38,10 +37,10 @@ class Index extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'since_id' => 0,
 			'count'    => 0,
-		]);
+		], $request);
 
 		$condition = ["`id` > ? AND `uid` = ?", $request['since_id'], $uid];
 		$params = ['limit' => $request['count']];

@@ -22,7 +22,6 @@
 namespace Friendica\Module\Api\Friendica\DirectMessages;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\BaseApi;
 
 /**
@@ -30,31 +29,31 @@ use Friendica\Module\BaseApi;
  */
 class Setseen extends BaseApi
 {
-	protected function rawContent(array $request = [])
+	protected function post(array $request = [], array $post = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'id' => 0, // Id of the direct message
-		]);
+		], $post);
 
 		// return error if id is zero
-		if (empty($request['id'])) {
+		if (empty($post['id'])) {
 			$answer = ['result' => 'error', 'message' => 'message id not specified'];
 			$this->response->exit('direct_messages_setseen', ['$result' => $answer], $this->parameters['extension'] ?? null);
 			return;
 		}
 
 		// error message if specified id is not in database
-		if (!DBA::exists('mail', ['id' => $request['id'], 'uid' => $uid])) {
+		if (!DBA::exists('mail', ['id' => $post['id'], 'uid' => $uid])) {
 			$answer = ['result' => 'error', 'message' => 'message id not in database'];
 			$this->response->exit('direct_messages_setseen', ['$result' => $answer], $this->parameters['extension'] ?? null);
 			return;
 		}
 
 		// update seen indicator
-		if (DBA::update('mail', ['seen' => true], ['id' => $request['id']])) {
+		if (DBA::update('mail', ['seen' => true], ['id' => $post['id']])) {
 			$answer = ['result' => 'ok', 'message' => 'message set to seen'];
 		} else {
 			$answer = ['result' => 'error', 'message' => 'unknown error'];

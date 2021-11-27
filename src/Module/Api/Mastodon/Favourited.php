@@ -42,12 +42,12 @@ class Favourited extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'limit'      => 20,    // Maximum number of results to return. Defaults to 20.
 			'min_id'     => 0,     // Return results immediately newer than id
 			'max_id'     => 0,     // Return results older than id
 			'with_muted' => false, // Pleroma extension: return activities by muted (not by blocked!) users.
-		]);
+		], $request);
 
 		$params = ['order' => ['thr-parent-id' => true], 'limit' => $request['limit']];
 

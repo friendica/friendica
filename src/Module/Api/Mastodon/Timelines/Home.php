@@ -41,7 +41,7 @@ class Home extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'max_id'          => 0,     // Return results older than id
 			'since_id'        => 0,     // Return results newer than id
 			'min_id'          => 0,     // Return results immediately newer than id
@@ -51,7 +51,7 @@ class Home extends BaseApi
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'exclude_replies' => false, // Don't show comments
-		]);
+		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 

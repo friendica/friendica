@@ -40,12 +40,12 @@ class Direct extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'max_id'   => 0,  // Return results older than id
 			'since_id' => 0,  // Return results newer than id
 			'min_id'   => 0,  // Return results immediately newer than id
 			'limit'    => 20, // Maximum number of results to return. Defaults to 20.
-		]);
+		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 

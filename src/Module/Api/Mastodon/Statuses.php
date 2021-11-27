@@ -46,7 +46,7 @@ class Statuses extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'status'         => '',    // Text content of the status. If media_ids is provided, this becomes optional. Attaching a poll is optional while status is provided.
 			'media_ids'      => [],    // Array of Attachment ids to be attached as media. If provided, status becomes optional, and poll cannot be used.
 			'poll'           => [],    // Poll data. If provided, media_ids cannot be used, and poll[expires_in] must be provided.
@@ -56,12 +56,12 @@ class Statuses extends BaseApi
 			'visibility'     => '',    // Visibility of the posted status. One of: "public", "unlisted", "private" or "direct".
 			'scheduled_at'   => '',    // ISO 8601 Datetime at which to schedule a status. Providing this paramter will cause ScheduledStatus to be returned instead of Status. Must be at least 5 minutes in the future.
 			'language'       => '',    // ISO 639 language code for this status.
-		]);
+		], $post);
 
 		$owner = User::getOwnerDataById($uid);
 
 		// The imput is defined as text. So we can use Markdown for some enhancements
-		$body = Markdown::toBBCode($request['status']);
+		$body = Markdown::toBBCode($post['status']);
 
 		// Avoids potential double expansion of existing links
 		$body = BBCode::performWithEscapedTags($body, ['url'], function ($body) {
@@ -73,7 +73,7 @@ class Statuses extends BaseApi
 		$item['verb']       = Activity::POST;
 		$item['contact-id'] = $owner['id'];
 		$item['author-id']  = $item['owner-id'] = Contact::getPublicIdByUserId($uid);
-		$item['title']      = $request['spoiler_text'];
+		$item['title']      = $post['spoiler_text'];
 		$item['body']       = $body;
 
 		if (!empty(self::getCurrentApplication()['name'])) {
@@ -84,7 +84,7 @@ class Statuses extends BaseApi
 			$item['app'] = 'API';
 		}
 
-		switch ($request['visibility']) {
+		switch ($post['visibility']) {
 			case 'public':
 				$item['allow_cid'] = '';
 				$item['allow_gid'] = '';
@@ -133,12 +133,12 @@ class Statuses extends BaseApi
 				break;
 		}
 
-		if (!empty($request['language'])) {
-			$item['language'] = json_encode([$request['language'] => 1]);
+		if (!empty($post['language'])) {
+			$item['language'] = json_encode([$post['language'] => 1]);
 		}
 
-		if ($request['in_reply_to_id']) {
-			$parent = Post::selectFirst(['uri'], ['uri-id' => $request['in_reply_to_id'], 'uid' => [0, $uid]]);
+		if ($post['in_reply_to_id']) {
+			$parent = Post::selectFirst(['uri'], ['uri-id' => $post['in_reply_to_id'], 'uid' => [0, $uid]]);
 			$item['thr-parent']  = $parent['uri'];
 			$item['gravity']     = GRAVITY_COMMENT;
 			$item['object-type'] = Activity\ObjectType::COMMENT;
@@ -149,12 +149,12 @@ class Statuses extends BaseApi
 			$item['object-type'] = Activity\ObjectType::NOTE;
 		}
 
-		if (!empty($request['media_ids'])) {
+		if (!empty($post['media_ids'])) {
 			$item['object-type'] = Activity\ObjectType::IMAGE;
 			$item['post-type']   = Item::PT_IMAGE;
 			$item['attachments'] = [];
 
-			foreach ($request['media_ids'] as $id) {
+			foreach ($post['media_ids'] as $id) {
 				$media = DBA::toArray(DBA::p("SELECT `resource-id`, `scale`, `type`, `desc`, `filename`, `datasize`, `width`, `height` FROM `photo`
 						WHERE `resource-id` IN (SELECT `resource-id` FROM `photo` WHERE `id` = ?) AND `photo`.`uid` = ?
 						ORDER BY `photo`.`width` DESC LIMIT 2", $id, $uid));
@@ -186,10 +186,10 @@ class Statuses extends BaseApi
 			}
 		}
 
-		if (!empty($request['scheduled_at'])) {
+		if (!empty($post['scheduled_at'])) {
 			$item['guid'] = Item::guid($item, true);
 			$item['uri'] = Item::newURI($item['uid'], $item['guid']);
-			$id = Post\Delayed::add($item['uri'], $item, PRIORITY_HIGH, Post\Delayed::PREPARED, $request['scheduled_at']);
+			$id = Post\Delayed::add($item['uri'], $item, PRIORITY_HIGH, Post\Delayed::PREPARED, $post['scheduled_at']);
 			if (empty($id)) {
 				DI::mstdnError()->InternalError();
 			}

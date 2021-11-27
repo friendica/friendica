@@ -52,7 +52,7 @@ class Statuses extends BaseApi
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'max_id'          => 0,     // Return results older than this id
 			'since_id'        => 0,     // Return results newer than this id
@@ -63,7 +63,7 @@ class Statuses extends BaseApi
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 			'exclude_reblogs' => false, // Undocumented parameter
 			'tagged'          => false, // Undocumented parameter
-		]);
+		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 

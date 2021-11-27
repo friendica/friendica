@@ -21,7 +21,6 @@
 
 namespace Friendica\Module\Api\Friendica;
 
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Module\BaseApi;
 
@@ -40,14 +39,14 @@ use Friendica\Module\BaseApi;
  */
 class Activity extends BaseApi
 {
-	protected function rawContent(array $request = [])
+	protected function post(array $request = [], array $post = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'id' => 0, // Id of the post
-		]);
+		], $request);
 
 		$res = Item::performActivity($request['id'], $this->parameters['verb'], $uid);
 

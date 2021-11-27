@@ -41,16 +41,16 @@ class Note extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'comment' => '',
-		]);
+		], $post);
 
 		$cdata = Contact::getPublicAndUserContactID($this->parameters['id'], $uid);
 		if (empty($cdata['user'])) {
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		Contact::update(['info' => $request['comment']], ['id' => $cdata['user']]);
+		Contact::update(['info' => $post['comment']], ['id' => $cdata['user']]);
 
 		System::jsonExit(DI::mstdnRelationship()->createFromContactId($this->parameters['id'], $uid)->toArray());
 	}

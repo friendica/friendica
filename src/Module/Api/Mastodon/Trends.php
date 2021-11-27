@@ -36,9 +36,9 @@ class Trends extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'limit' => 20, // Maximum number of results to return. Defaults to 10.
-		]);
+		], $request);
 
 		$trending = [];
 		$tags = Tag::getGlobalTrendingHashtags(24, 20);

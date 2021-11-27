@@ -39,9 +39,9 @@ class Suggestions extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'limit' => 40, // Maximum number of results to return. Defaults to 40.
-		]);
+		], $request);
 
 		$suggestions = Contact\Relation::getSuggestions($uid, 0, $request['limit']);
 

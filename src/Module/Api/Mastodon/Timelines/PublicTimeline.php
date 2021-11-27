@@ -43,7 +43,7 @@ class PublicTimeline extends BaseApi
 	{
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'local'           => false, // Show only local statuses? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
@@ -53,7 +53,7 @@ class PublicTimeline extends BaseApi
 			'limit'           => 20,    // Maximum number of results to return. Defaults to 20.
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 			'exclude_replies' => false, // Don't show comments
-		]);
+		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 

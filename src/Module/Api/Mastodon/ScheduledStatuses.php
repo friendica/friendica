@@ -71,12 +71,12 @@ class ScheduledStatuses extends BaseApi
 			System::jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($this->parameters['id'], $uid)->toArray());
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'limit'           => 20, // Max number of results to return. Defaults to 20.
 			'max_id'          => 0,  // Return results older than ID
 			'since_id'        => 0,  // Return results newer than ID
 			'min_id'          => 0,  // Return results immediately newer than ID
-		]);
+		], $request);
 
 		$params = ['order' => ['id' => true], 'limit' => $request['limit']];
 

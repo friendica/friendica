@@ -56,17 +56,17 @@ class Lists extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'title' => '',
-		]);
+		], $post);
 
-		if (empty($request['title'])) {
+		if (empty($post['title'])) {
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		Group::create($uid, $request['title']);
+		Group::create($uid, $post['title']);
 
-		$id = Group::getIdByName($uid, $request['title']);
+		$id = Group::getIdByName($uid, $post['title']);
 		if (!$id) {
 			DI::mstdnError()->InternalError();
 		}

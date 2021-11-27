@@ -37,42 +37,42 @@ class Apps extends BaseApi
 	 */
 	protected function post(array $request = [], array $post = [])
 	{
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'client_name'   => '',
 			'redirect_uris' => '',
 			'scopes'        => 'read',
 			'website'       => '',
-		]);
+		], $post);
 
 		// Workaround for AndStatus, see issue https://github.com/andstatus/andstatus/issues/538
 		$postdata = Network::postdata();
 		if (!empty($postdata)) {
 			$postrequest = json_decode($postdata, true);
 			if (!empty($postrequest) && is_array($postrequest)) {
-				$request = array_merge($request, $postrequest);
+				$post = array_merge($post, $postrequest);
 			}
 		}
 			
-		if (empty($request['client_name']) || empty($request['redirect_uris'])) {
+		if (empty($post['client_name']) || empty($post['redirect_uris'])) {
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Missing parameters'));
 		}
 
 		$client_id     = bin2hex(random_bytes(32));
 		$client_secret = bin2hex(random_bytes(32));
 
-		$fields = ['client_id' => $client_id, 'client_secret' => $client_secret, 'name' => $request['client_name'], 'redirect_uri' => $request['redirect_uris']];
+		$fields = ['client_id' => $client_id, 'client_secret' => $client_secret, 'name' => $post['client_name'], 'redirect_uri' => $post['redirect_uris']];
 
-		if (!empty($request['scopes'])) {
-			$fields['scopes'] = $request['scopes'];
+		if (!empty($post['scopes'])) {
+			$fields['scopes'] = $post['scopes'];
 		}
 
-		$fields['read']   = (stripos($request['scopes'], self::SCOPE_READ) !== false);
-		$fields['write']  = (stripos($request['scopes'], self::SCOPE_WRITE) !== false);
-		$fields['follow'] = (stripos($request['scopes'], self::SCOPE_FOLLOW) !== false);
-		$fields['push']   = (stripos($request['scopes'], self::SCOPE_PUSH) !== false);
+		$fields['read']   = (stripos($post['scopes'], self::SCOPE_READ) !== false);
+		$fields['write']  = (stripos($post['scopes'], self::SCOPE_WRITE) !== false);
+		$fields['follow'] = (stripos($post['scopes'], self::SCOPE_FOLLOW) !== false);
+		$fields['push']   = (stripos($post['scopes'], self::SCOPE_PUSH) !== false);
 
-		if (!empty($request['website'])) {
-			$fields['website'] = $request['website'];
+		if (!empty($post['website'])) {
+			$fields['website'] = $post['website'];
 		}
 
 		if (!DBA::insert('application', $fields)) {

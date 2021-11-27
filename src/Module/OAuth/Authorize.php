@@ -39,7 +39,7 @@ class Authorize extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'force_login'   => '', // Forces the user to re-login, which is necessary for authorizing with multiple accounts from the same instance.
 			'response_type' => '', // Should be set equal to "code".
 			'client_id'     => '', // Client ID, obtained during app registration.
@@ -47,7 +47,7 @@ class Authorize extends BaseApi
 			'redirect_uri'  => '', // Set a URI to redirect the user to. If this parameter is set to "urn:ietf:wg:oauth:2.0:oob" then the authorization code will be shown instead. Must match one of the redirect URIs declared during app registration.
 			'scope'         => 'read', // List of requested OAuth scopes, separated by spaces (or by pluses, if using query parameters). Must be a subset of scopes declared during app registration. If not provided, defaults to "read".
 			'state'         => '',
-		]);
+		], $request);
 
 		if ($request['response_type'] != 'code') {
 			Logger::warning('Unsupported or missing response type', ['request' => $_REQUEST]);

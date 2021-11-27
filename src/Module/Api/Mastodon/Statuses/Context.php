@@ -43,9 +43,9 @@ class Context extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'limit'    => 40, // Maximum number of results to return. Defaults to 40.
-		]);
+		], $request);
 
 		$id = $this->parameters['id'];
 

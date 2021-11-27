@@ -41,12 +41,12 @@ class Directory extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'offset' => 0,        // How many accounts to skip before returning results. Default 0.
 			'limit'  => 40,       // How many accounts to load. Default 40.
 			'order'  => 'active', // active to sort by most recently posted statuses (default) or new to sort by most recently created profiles.
 			'local'  => false,    // Only return local accounts.
-		]);
+		], $request);
 
 		Logger::info('directory', ['offset' => $request['offset'], 'limit' => $request['limit'], 'order' => $request['order'], 'local' => $request['local']]);
 

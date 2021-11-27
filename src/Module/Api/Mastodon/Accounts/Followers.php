@@ -48,12 +48,12 @@ class Followers extends BaseApi
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'max_id'   => 0,  // Return results older than this id
 			'since_id' => 0,  // Return results newer than this id
 			'min_id'   => 0,  // Return results immediately newer than id
 			'limit'    => 40, // Maximum number of results to return. Defaults to 40.
-		]);
+		], $request);
 
 		$params = ['order' => ['relation-cid' => true], 'limit' => $request['limit']];
 

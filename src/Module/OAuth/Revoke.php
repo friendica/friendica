@@ -34,13 +34,13 @@ class Revoke extends BaseApi
 {
 	protected function post(array $request = [], array $post = [])
 	{
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'client_id'     => '', // Client ID, obtained during app registration
 			'client_secret' => '', // Client secret, obtained during app registration
 			'token'         => '', // The previously obtained token, to be invalidated
-		]);
+		], $post);
 
-		$condition = ['client_id' => $request['client_id'], 'client_secret' => $request['client_secret'], 'access_token' => $request['token']];
+		$condition = ['client_id' => $post['client_id'], 'client_secret' => $post['client_secret'], 'access_token' => $post['token']];
 		$token = DBA::selectFirst('application-view', ['id'], $condition);
 		if (empty($token['id'])) {
 			Logger::warning('Token not found', $condition);

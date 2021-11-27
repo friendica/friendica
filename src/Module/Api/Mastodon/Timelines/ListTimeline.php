@@ -45,7 +45,7 @@ class ListTimeline extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'max_id'          => 0,     // Return results older than id
 			'since_id'        => 0,     // Return results newer than id
 			'min_id'          => 0,     // Return results immediately newer than id
@@ -55,7 +55,7 @@ class ListTimeline extends BaseApi
 			'local'           => false, // Show only local statuses? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'exclude_replies' => false, // Don't show comments
-		]);
+		], $request);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 

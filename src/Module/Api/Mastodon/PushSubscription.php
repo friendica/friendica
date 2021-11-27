@@ -39,24 +39,24 @@ class PushSubscription extends BaseApi
 		$uid         = self::getCurrentUserID();
 		$application = self::getCurrentApplication();
 
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'subscription' => [],
 			'data'         => [],
-		]);
+		], $post);
 
 		$subscription = [
 			'application-id'                => $application['id'],
 			'uid'                           => $uid,
-			'endpoint'                      => $request['subscription']['endpoint'] ?? '',
-			'pubkey'                        => $request['subscription']['keys']['p256dh'] ?? '',
-			'secret'                        => $request['subscription']['keys']['auth'] ?? '',
-			Notification::TYPE_FOLLOW       => $request['data']['alerts'][Notification::TYPE_FOLLOW] ?? false,
-			Notification::TYPE_LIKE         => $request['data']['alerts'][Notification::TYPE_LIKE] ?? false,
-			Notification::TYPE_RESHARE      => $request['data']['alerts'][Notification::TYPE_RESHARE] ?? false,
-			Notification::TYPE_MENTION      => $request['data']['alerts'][Notification::TYPE_MENTION] ?? false,
-			Notification::TYPE_POLL         => $request['data']['alerts'][Notification::TYPE_POLL] ?? false,
-			Notification::TYPE_INTRODUCTION => $request['data']['alerts'][Notification::TYPE_INTRODUCTION] ?? false,
-			Notification::TYPE_POST         => $request['data']['alerts'][Notification::TYPE_POST] ?? false,
+			'endpoint'                      => $post['subscription']['endpoint'] ?? '',
+			'pubkey'                        => $post['subscription']['keys']['p256dh'] ?? '',
+			'secret'                        => $post['subscription']['keys']['auth'] ?? '',
+			Notification::TYPE_FOLLOW       => $post['data']['alerts'][Notification::TYPE_FOLLOW] ?? false,
+			Notification::TYPE_LIKE         => $post['data']['alerts'][Notification::TYPE_LIKE] ?? false,
+			Notification::TYPE_RESHARE      => $post['data']['alerts'][Notification::TYPE_RESHARE] ?? false,
+			Notification::TYPE_MENTION      => $post['data']['alerts'][Notification::TYPE_MENTION] ?? false,
+			Notification::TYPE_POLL         => $post['data']['alerts'][Notification::TYPE_POLL] ?? false,
+			Notification::TYPE_INTRODUCTION => $post['data']['alerts'][Notification::TYPE_INTRODUCTION] ?? false,
+			Notification::TYPE_POST         => $post['data']['alerts'][Notification::TYPE_POST] ?? false,
 		];
 
 		$ret = Subscription::replace($subscription);

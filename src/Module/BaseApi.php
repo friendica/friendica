@@ -105,21 +105,8 @@ class BaseApi extends BaseModule
 		}
 	}
 
-	/**
-	 * Processes data from GET requests and sets defaults
-	 *
-	 * @return array request data
-	 */
-	public static function getRequest(array $defaults)
+	protected static function checkDefaults(array $defaults, $input): array
 	{
-		$httpinput = HTTPInputData::process();
-		$input = array_merge($httpinput['variables'], $httpinput['files'], $_REQUEST);
-
-		self::$request    = $input;
-		self::$boundaries = [];
-
-		unset(self::$request['pagename']);
-
 		$request = [];
 
 		foreach ($defaults as $parameter => $defaultvalue) {
@@ -137,6 +124,26 @@ class BaseApi extends BaseModule
 				Logger::notice('Unhandled default value type', ['parameter' => $parameter, 'type' => gettype($defaultvalue)]);
 			}
 		}
+
+		return $request;
+	}
+
+	/**
+	 * Processes data from GET requests and sets defaults
+	 *
+	 * @return array request data
+	 */
+	public static function getRequest(array $defaults)
+	{
+		$httpinput = HTTPInputData::process();
+		$input = array_merge($httpinput['variables'], $httpinput['files'], $_REQUEST);
+
+		self::$request    = $input;
+		self::$boundaries = [];
+
+		unset(self::$request['pagename']);
+
+		$request = self::checkDefaults($defaults, $input);
 
 		foreach ($input ?? [] as $parameter => $value) {
 			if ($parameter == 'pagename') {

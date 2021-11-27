@@ -45,7 +45,7 @@ class Search extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'account_id'         => 0,     // If provided, statuses returned will be authored only by this account
 			'max_id'             => 0,     // Return results older than this id
 			'min_id'             => 0,     // Return results immediately newer than this id
@@ -56,7 +56,7 @@ class Search extends BaseApi
 			'limit'              => 20,    // Maximum number of results to load, per type. Defaults to 20. Max 40.
 			'offset'             => 0,     // Offset in search results. Used for pagination. Defaults to 0.
 			'following'          => false, // Only include accounts that the user is following. Defaults to false.
-		]);
+		], $request);
 
 		if (empty($request['q'])) {
 			DI::mstdnError()->UnprocessableEntity();

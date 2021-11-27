@@ -28,7 +28,6 @@ use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Module\BaseApi;
-use Friendica\Navigation\Notifications\Entity;
 use Friendica\Object\Api\Mastodon\Notification;
 use Friendica\Protocol\Activity;
 
@@ -55,7 +54,7 @@ class Notifications extends BaseApi
 			}
 		}
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'max_id'        => 0,     // Return results older than this ID
 			'since_id'      => 0,     // Return results newer than this ID
 			'min_id'        => 0,     // Return results immediately newer than this ID
@@ -64,7 +63,7 @@ class Notifications extends BaseApi
 			'account_id'    => 0,     // Return only notifications received from this account
 			'with_muted'    => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 			'count'         => 0,     // Unknown parameter
-		]);
+		], $request);
 
 		$params = ['order' => ['id' => true]];
 

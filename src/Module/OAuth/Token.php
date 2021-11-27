@@ -36,14 +36,14 @@ class Token extends BaseApi
 {
 	protected function post(array $request = [], array $post = [])
 	{
-		$request = self::getRequest([
+		$post = self::checkDefaults([
 			'client_id'     => '', // Client ID, obtained during app registration
 			'client_secret' => '', // Client secret, obtained during app registration
 			'redirect_uri'  => '', // Set a URI to redirect the user to. If this parameter is set to "urn:ietf:wg:oauth:2.0:oob" then the token will be shown instead. Must match one of the redirect URIs declared during app registration.
 			'scope'         => 'read', // List of requested OAuth scopes, separated by spaces. Must be a subset of scopes declared during app registration. If not provided, defaults to "read".
 			'code'          => '', // A user authorization code, obtained via /oauth/authorize
 			'grant_type'    => '', // Set equal to "authorization_code" if code is provided in order to gain user-level access. Otherwise, set equal to "client_credentials" to obtain app-level access only.
-		]);
+		], $post);
 
 		// AndStatus transmits the client data in the AUTHORIZATION header field, see https://github.com/andstatus/andstatus/issues/530
 		$authorization = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
@@ -52,32 +52,32 @@ class Token extends BaseApi
 			$authorization = $_SERVER['REDIRECT_REMOTE_USER'] ?? '';
 		}
 
-		if (empty($request['client_id']) && substr($authorization, 0, 6) == 'Basic ') {
+		if (empty($post['client_id']) && substr($authorization, 0, 6) == 'Basic ') {
 			$datapair = explode(':', base64_decode(trim(substr($authorization, 6))));
 			if (count($datapair) == 2) {
-				$request['client_id']     = $datapair[0];
-				$request['client_secret'] = $datapair[1];
+				$post['client_id']     = $datapair[0];
+				$post['client_secret'] = $datapair[1];
 			}
 		}
 
-		if (empty($request['client_id']) || empty($request['client_secret'])) {
+		if (empty($post['client_id']) || empty($post['client_secret'])) {
 			Logger::warning('Incomplete request data', ['request' => $_REQUEST]);
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Incomplete request data'));
 		}
 
-		$application = OAuth::getApplication($request['client_id'], $request['client_secret'], $request['redirect_uri']);
+		$application = OAuth::getApplication($post['client_id'], $post['client_secret'], $post['redirect_uri']);
 		if (empty($application)) {
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		if ($request['grant_type'] == 'client_credentials') {
+		if ($post['grant_type'] == 'client_credentials') {
 			// the "client_credentials" are used as a token for the application itself.
 			// see https://aaronparecki.com/oauth-2-simplified/#client-credentials
 			$token = OAuth::createTokenForUser($application, 0, '');
-		} elseif ($request['grant_type'] == 'authorization_code') {
+		} elseif ($post['grant_type'] == 'authorization_code') {
 			// For security reasons only allow freshly created tokens
 			$condition = ["`redirect_uri` = ? AND `id` = ? AND `code` = ? AND `created_at` > UTC_TIMESTAMP() - INTERVAL ? MINUTE",
-				$request['redirect_uri'], $application['id'], $request['code'], 5];
+						  $post['redirect_uri'], $application['id'], $post['code'], 5];
 
 			$token = DBA::selectFirst('application-view', ['access_token', 'created_at'], $condition);
 			if (!DBA::isResult($token)) {

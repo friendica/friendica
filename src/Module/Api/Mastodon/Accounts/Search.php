@@ -42,12 +42,12 @@ class Search extends BaseApi
 		self::checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
+		$request = self::checkDefaults([
 			'q'         => '',    // What to search for
 			'limit'     => 40,    // Maximum number of results. Defaults to 40.
 			'resolve'   => false, // Attempt WebFinger lookup. Defaults to false. Use this when q is an exact address.
 			'following' => false, // Only who the user is following. Defaults to false.
-		]);
+		], $request);
 
 		$accounts = [];
 
