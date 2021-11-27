@@ -32,33 +32,28 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
  */
 class Update extends BaseApi
 {
-	protected function rawContent(array $request = [])
+	protected function post(array $request = [], array $post = [])
 	{
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		$request = self::getRequest([
-			'album'     => '', // Current album name
-			'album_new' => '', // New album name
-		]);
-
 		// we do not allow calls without album string
-		if (empty($request['album'])) {
+		if (empty($post['album'])) {
 			throw new BadRequestException("no albumname specified");
 		}
-		if (empty($request['album_new'])) {
+		if (empty($post['album_new'])) {
 			throw new BadRequestException("no new albumname specified");
 		}
 		// check if album is existing
-		if (!Photo::exists(['uid' => $uid, 'album' => $request['album']])) {
+		if (!Photo::exists(['uid' => $uid, 'album' => $post['album']])) {
 			throw new BadRequestException("album not available");
 		}
 		// now let's update all photos to the albumname
-		$result = Photo::update(['album' => $request['album_new']], ['uid' => $uid, 'album' => $request['album']]);
+		$result = Photo::update(['album' => $post['album_new']], ['uid' => $uid, 'album' => $post['album']]);
 
 		// return success of updating or error message
 		if ($result) {
-			$answer = ['result' => 'updated', 'message' => 'album `' . $request['album'] . '` with all containing photos has been renamed to `' . $request['album_new'] . '`.'];
+			$answer = ['result' => 'updated', 'message' => 'album `' . $post['album'] . '` with all containing photos has been renamed to `' . $post['album_new'] . '`.'];
 			$this->response->exit('photoalbum_update', ['$result' => $answer], $this->parameters['extension'] ?? null);
 		} else {
 			throw new InternalServerErrorException("unknown error - updating in database failed");

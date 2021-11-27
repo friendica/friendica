@@ -21,7 +21,9 @@
 
 namespace Friendica\Test\src\Module\Api\Friendica\Photoalbum;
 
+use Friendica\App\Router;
 use Friendica\DI;
+use Friendica\Model\Photo;
 use Friendica\Module\Api\Friendica\Photoalbum\Update;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Test\src\Module\Api\ApiTest;
@@ -53,6 +55,29 @@ class UpdateTest extends ApiTest
 
 	public function testValid()
 	{
-		self::markTestIncomplete('We need to add a dataset for this.');
+		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
+
+		$albums = Photo::getAlbums(42);
+
+		self::assertCount(1, $albums);
+		self::assertEquals('test_album', $albums[0]['album']);
+		self::assertEquals(1, $albums[0]['total']);
+
+		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run(['album' => 'test_album', 'album_new' => 'test_album_2']);
+
+		$responseBody = (string)$response->getBody();
+
+		self::assertJson($responseBody);
+
+		$json = json_decode($responseBody);
+
+		self::assertEquals('updated', $json->result);
+		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
+
+		$albums = Photo::getAlbums(42);
+
+		self::assertCount(1, $albums);
+		self::assertEquals('test_album_2', $albums[0]['album']);
+		self::assertEquals(1, $albums[0]['total']);
 	}
 }
