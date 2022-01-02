@@ -268,7 +268,7 @@ class BaseURL
 		       intval($this->getSSLPolicy()) == BaseURL::SSL_POLICY_FULL &&
 		       strpos($this->get(), 'https://') === 0 &&
 		       !empty($this->server['REQUEST_METHOD']) &&
-		       $this->server['REQUEST_METHOD'] === 'GET';
+		       $this->server['REQUEST_METHOD'] === Router::GET;
 	}
 
 	/**

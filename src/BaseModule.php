@@ -178,30 +178,6 @@ abstract class BaseModule implements ICanHandleRequests
 	 */
 	public function run(array $request = []): ResponseInterface
 	{
-		// @see https://github.com/tootsuite/mastodon/blob/c3aef491d66aec743a3a53e934a494f653745b61/config/initializers/cors.rb
-		if (substr($request['pagename'] ?? '', 0, 12) == '.well-known/') {
-			$this->response->setHeader('*', 'Access-Control-Allow-Origin');
-			$this->response->setHeader('*', 'Access-Control-Allow-Headers');
-			$this->response->setHeader(Router::GET, 'Access-Control-Allow-Methods');
-			$this->response->setHeader('false', 'Access-Control-Allow-Credentials');
-		} elseif (substr($request['pagename'] ?? '', 0, 8) == 'profile/') {
-			$this->response->setHeader('*', 'Access-Control-Allow-Origin');
-			$this->response->setHeader('*', 'Access-Control-Allow-Headers');
-			$this->response->setHeader(Router::GET, 'Access-Control-Allow-Methods');
-			$this->response->setHeader('false', 'Access-Control-Allow-Credentials');
-		} elseif (substr($request['pagename'] ?? '', 0, 4) == 'api/') {
-			$this->response->setHeader('*', 'Access-Control-Allow-Origin');
-			$this->response->setHeader('*', 'Access-Control-Allow-Headers');
-			$this->response->setHeader(implode(',', Router::ALLOWED_METHODS), 'Access-Control-Allow-Methods');
-			$this->response->setHeader('false', 'Access-Control-Allow-Credentials');
-			$this->response->setHeader('Link', 'Access-Control-Expose-Headers');
-		} elseif (substr($request['pagename'] ?? '', 0, 11) == 'oauth/token') {
-			$this->response->setHeader('*', 'Access-Control-Allow-Origin');
-			$this->response->setHeader('*', 'Access-Control-Allow-Headers');
-			$this->response->setHeader(Router::POST, 'Access-Control-Allow-Methods');
-			$this->response->setHeader('false', 'Access-Control-Allow-Credentials');
-		}
-
 		$placeholder = '';
 
 		$this->profiler->set(microtime(true), 'ready');
@@ -211,7 +187,7 @@ abstract class BaseModule implements ICanHandleRequests
 
 		$this->profiler->set(microtime(true) - $timestamp, 'init');
 
-		switch ($this->server['REQUEST_METHOD'] ?? Router::GET) {
+		switch ($this->args->getMethod()) {
 			case Router::DELETE:
 				$this->delete($request);
 				break;

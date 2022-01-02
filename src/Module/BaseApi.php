@@ -82,7 +82,7 @@ class BaseApi extends BaseModule
 	public function run(array $request = [], bool $scopecheck = true): ResponseInterface
 	{
 		if ($scopecheck) {
-			switch ($this->server['REQUEST_METHOD'] ?? Router::GET) {
+			switch ($this->args->getMethod()) {
 				case Router::DELETE:
 				case Router::PATCH:
 				case Router::POST:

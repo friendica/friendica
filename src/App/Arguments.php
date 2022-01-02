@@ -52,14 +52,19 @@ class Arguments
 	 * @var int The count of arguments
 	 */
 	private $argc;
+	/**
+	 * @var string The used HTTP method
+	 */
+	private $method;
 
-	public function __construct(string $queryString = '', string $command = '', string $moduleName = '', array $argv = [], int $argc = 0)
+	public function __construct(string $queryString = '', string $command = '', string $moduleName = '', array $argv = [], int $argc = 0, string $method = Router::GET)
 	{
 		$this->queryString = $queryString;
 		$this->command     = $command;
 		$this->moduleName  = $moduleName;
 		$this->argv        = $argv;
 		$this->argc        = $argc;
+		$this->method      = $method;
 	}
 
 	/**
@@ -76,6 +81,14 @@ class Arguments
 	public function getCommand()
 	{
 		return $this->command;
+	}
+
+	/**
+	 * @return string The HTTP method of this call
+	 */
+	public function getMethod()
+	{
+		return $this->method;
 	}
 
 	/**
@@ -199,6 +212,8 @@ class Arguments
 			$module = "login";
 		}
 
-		return new Arguments($queryString, $command, $module, $argv, $argc);
+		$httpMethod = in_array($server['REQUEST_METHOD'], Router::ALLOWED_METHODS) ? $server['REQUEST_METHOD'] : Router::GET;
+
+		return new Arguments($queryString, $command, $module, $argv, $argc, $httpMethod);
 	}
 }

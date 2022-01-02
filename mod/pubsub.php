@@ -20,6 +20,7 @@
  */
 
 use Friendica\App;
+use Friendica\App\Router;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
@@ -53,7 +54,7 @@ function pubsub_init(App $a)
 	$nick       = ((DI::args()->getArgc() > 1) ? trim(DI::args()->getArgv()[1])   : '');
 	$contact_id = ((DI::args()->getArgc() > 2) ? intval(DI::args()->getArgv()[2]) : 0 );
 
-	if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+	if (DI::args()->getMethod() == Router::GET) {
 		$hub_mode      = trim($_GET['hub_mode']         ?? '');
 		$hub_topic     = trim($_GET['hub_topic']        ?? '');
 		$hub_challenge = trim($_GET['hub_challenge']    ?? '');

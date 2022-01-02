@@ -75,11 +75,6 @@ class Router
 	protected $routeCollector;
 
 	/**
-	 * @var string The HTTP method
-	 */
-	private $httpMethod;
-
-	/**
 	 * @var array Module parameters
 	 */
 	private $parameters = [];
@@ -139,16 +134,37 @@ class Router
 		$this->logger = $logger;
 		$this->dice_profiler_threshold = $config->get('system', 'dice_profiler_threshold', 0);
 
-		$httpMethod = $this->server['REQUEST_METHOD'] ?? self::GET;
+		// @see https://github.com/tootsuite/mastodon/blob/c3aef491d66aec743a3a53e934a494f653745b61/config/initializers/cors.rb
+		if (substr($this->args->getQueryString(), 0, 12) == '.well-known/') {
+			header('Access-Control-Allow-Origin: *');
+			header('Access-Control-Allow-Headers: *');
+			header('Access-Control-Allow-Methods: ' . self::GET);
+			header('Access-Control-Allow-Credentials: false');
+		} elseif (substr($this->args->getQueryString(), 0, 8) == 'profile/') {
+			header('Access-Control-Allow-Origin: *');
+			header('Access-Control-Allow-Headers: *');
+			header('Access-Control-Allow-Methods: ' . self::GET);
+			header('Access-Control-Allow-Credentials: false');
+		} elseif (substr($this->args->getQueryString(), 0, 4) == 'api/') {
+			header('Access-Control-Allow-Origin: *');
+			header('Access-Control-Allow-Headers: *');
+			header('Access-Control-Allow-Methods: ' . implode(',', self::ALLOWED_METHODS));
+			header('Access-Control-Allow-Credentials: false');
+			header('Access-Control-Expose-Headers: Link');
+		} elseif (substr($this->args->getQueryString(), 0, 11) == 'oauth/token') {
+			header('Access-Control-Allow-Origin: *');
+			header('Access-Control-Allow-Headers: *');
+			header('Access-Control-Allow-Methods: ' . self::POST);
+			header('Access-Control-Allow-Credentials: false');
+		}
 
 		// @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS
 		// @todo Check allowed methods per requested path
-		if ($httpMethod === static::OPTIONS) {
-			header('Allow: ' . implode(',', Router::ALLOWED_METHODS));
-			throw new NoContentException();
+		if ($this->args->getMethod() == self::OPTIONS) {
+			header('HTTP/1.1 204 No Content');
+			header('Allow: ' . implode(',', self::ALLOWED_METHODS));
+			exit();
 		}
-
-		$this->httpMethod = in_array($httpMethod, self::ALLOWED_METHODS) ? $httpMethod : self::GET;
 
 		$this->routeCollector = isset($routeCollector) ?
 			$routeCollector :
@@ -278,7 +294,7 @@ class Router
 
 		$this->parameters = [];
 
-		$routeInfo  = $dispatcher->dispatch($this->httpMethod, $cmd);
+		$routeInfo  = $dispatcher->dispatch($this->args->getMethod(), $cmd);
 		if ($routeInfo[0] === Dispatcher::FOUND) {
 			$moduleClass = $routeInfo[1];
 			$this->parameters = $routeInfo[2];
