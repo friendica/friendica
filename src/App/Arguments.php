@@ -212,7 +212,7 @@ class Arguments
 			$module = "login";
 		}
 
-		$httpMethod = in_array($server['REQUEST_METHOD'], Router::ALLOWED_METHODS) ? $server['REQUEST_METHOD'] : Router::GET;
+		$httpMethod = in_array($server['REQUEST_METHOD'] ?? '', Router::ALLOWED_METHODS) ? $server['REQUEST_METHOD'] : Router::GET;
 
 		return new Arguments($queryString, $command, $module, $argv, $argc, $httpMethod);
 	}
