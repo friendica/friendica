@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -50,8 +50,10 @@ class DeleteTest extends ApiTest
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
-		$delete   = new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$response = $delete->run(['photo_id' => '709057080661a283a6aa598501504178']);
+		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run([
+				'photo_id' => '709057080661a283a6aa598501504178'
+			]);
 
 		$json = $this->toJson($response);
 
@@ -63,8 +65,10 @@ class DeleteTest extends ApiTest
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
-		$delete   = new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$response = $delete->run(['photo_id' => '709057080661a283a6aa598501504178']);
+		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run([
+				'photo_id' => '709057080661a283a6aa598501504178'
+			]);
 
 		$responseText = (string)$response->getBody();
 

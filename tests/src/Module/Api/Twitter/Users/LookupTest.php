@@ -19,8 +19,8 @@ class LookupTest extends ApiTest
 	{
 		$this->expectException(NotFoundException::class);
 
-		$lookup = new Lookup(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$lookup->run();
+		(new Lookup(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 	}
 
 	/**
@@ -30,8 +30,10 @@ class LookupTest extends ApiTest
 	 */
 	public function testApiUsersLookupWithUserId()
 	{
-		$lookup = new Lookup(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$respone = $lookup->run(['user_id' => static::OTHER_USER['id']]);
+		$respone = (new Lookup(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'user_id' => static::OTHER_USER['id']
+			]);
 
 		$json = $this->toJson($respone);
 

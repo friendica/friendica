@@ -10,8 +10,8 @@ return [
 			'thr-parent-id' => 44,
 			'guid'          => '123456',
 			'from-name'     => 'Tester',
-			'title'         => 'test message',
-			'body'          => 'this is a test',
+			'title'         => 'item_title',
+			'body'          => '[b]item_body[/b]',
 		],
 	],
 ];

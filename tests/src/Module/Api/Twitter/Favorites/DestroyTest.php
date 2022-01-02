@@ -19,8 +19,8 @@ class DestroyTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 
-		$destroy = new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$destroy->run();
+		(new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run();
 	}
 
 	/**
@@ -30,8 +30,10 @@ class DestroyTest extends ApiTest
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction()
 	{
-		$destroy  = new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$response = $destroy->run(['id' => 3]);
+		$response = (new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run([
+				'id' => 3
+			]);
 
 		$json = $this->toJson($response);
 

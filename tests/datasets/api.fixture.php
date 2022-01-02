@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -105,7 +105,11 @@ return [
 			'uri'  => '6',
 			'guid' => '6',
 		],
-
+		[
+			'id'   => 7,
+			'uri'  => '7',
+			'guid' => '7',
+		],
 		[
 			'id'   => 42,
 			'uri'  => 'http://localhost/profile/selfcontact',
@@ -342,6 +346,34 @@ return [
 			'body'   => 'Friend user status',
 			'plink'  => 'http://localhost/display/6',
 		],
+		[
+			'uri-id' => 7,
+			'title'  => 'item_title',
+			'body'   => 'perspiciatis impedit voluptatem quis molestiae ea qui ' .
+						'reiciendis dolorum aut ducimus sunt consequatur inventore dolor ' .
+						'officiis pariatur doloremque nemo culpa aut quidem qui dolore ' .
+						'laudantium atque commodi alias voluptatem non possimus aperiam ' .
+						'ipsum rerum consequuntur aut amet fugit quia aliquid praesentium ' .
+						'repellendus quibusdam et et inventore mollitia rerum sit autem ' .
+						'pariatur maiores ipsum accusantium perferendis vel sit possimus ' .
+						'veritatis nihil distinctio qui eum repellat officia illum quos ' .
+						'impedit quam iste esse unde qui suscipit aut facilis ut inventore ' .
+						'omnis exercitationem quo magnam consequatur maxime aut illum ' .
+						'soluta quaerat natus unde aspernatur et sed beatae nihil ullam ' .
+						'temporibus corporis ratione blanditiis perspiciatis impedit ' .
+						'voluptatem quis molestiae ea qui reiciendis dolorum aut ducimus ' .
+						'sunt consequatur inventore dolor officiis pariatur doloremque ' .
+						'nemo culpa aut quidem qui dolore laudantium atque commodi alias ' .
+						'voluptatem non possimus aperiam ipsum rerum consequuntur aut ' .
+						'amet fugit quia aliquid praesentium repellendus quibusdam et et ' .
+						'inventore mollitia rerum sit autem pariatur maiores ipsum accusantium ' .
+						'perferendis vel sit possimus veritatis nihil distinctio qui eum ' .
+						'repellat officia illum quos impedit quam iste esse unde qui ' .
+						'suscipit aut facilis ut inventore omnis exercitationem quo magnam ' .
+						'consequatur maxime aut illum soluta quaerat natus unde aspernatur ' .
+						'et sed beatae nihil ullam temporibus corporis ratione blanditiis',
+			'plink'  => 'http://localhost/display/6',
+		],
 	],
 	'post' => [
 		[
@@ -423,6 +455,21 @@ return [
 			'uri-id'        => 6,
 			'parent-uri-id' => 6,
 			'thr-parent-id' => 6,
+			'gravity'       => GRAVITY_PARENT,
+			'network'       => Protocol::DFRN,
+			'owner-id'      => 42,
+			'author-id'     => 44,
+			'causer-id'     => 44,
+			'vid'           => 8,
+			'private'       => Item::PUBLIC,
+			'global'        => true,
+			'visible'       => 1,
+			'deleted'       => 0,
+		],
+		[
+			'uri-id'        => 7,
+			'parent-uri-id' => 7,
+			'thr-parent-id' => 7,
 			'gravity'       => GRAVITY_PARENT,
 			'network'       => Protocol::DFRN,
 			'owner-id'      => 42,
@@ -687,6 +734,27 @@ return [
 			'deleted'       => 0,
 			'wall'          => 0,
 		],
+		[
+			'id'            => 13,
+			'uri-id'        => 7,
+			'visible'       => 1,
+			'contact-id'    => 44,
+			'author-id'     => 44,
+			'owner-id'      => 42,
+			'causer-id'     => 44,
+			'uid'           => 0,
+			'vid'           => 8,
+			'unseen'        => 0,
+			'parent-uri-id' => 7,
+			'thr-parent-id' => 7,
+			'private'       => Item::PUBLIC,
+			'global'        => true,
+			'gravity'       => GRAVITY_PARENT,
+			'network'       => Protocol::DFRN,
+			'origin'        => 0,
+			'deleted'       => 0,
+			'wall'          => 0,
+		],
 	],
 	'post-thread' => [
 		[
@@ -705,6 +773,13 @@ return [
 		],
 		[
 			'uri-id'    => 6,
+			'author-id' => 44,
+			'owner-id'  => 44,
+			'causer-id' => 44,
+			'network'   => Protocol::DFRN,
+		],
+		[
+			'uri-id'    => 7,
 			'author-id' => 44,
 			'owner-id'  => 44,
 			'causer-id' => 44,
@@ -779,6 +854,32 @@ return [
 		],
 		[
 			'uri-id'       => 6,
+			'uid'          => 0,
+			'wall'         => 0,
+			'post-user-id' => 12,
+			'author-id'    => 44,
+			'owner-id'     => 44,
+			'causer-id'    => 44,
+			'contact-id'   => 44,
+			'network'      => Protocol::DFRN,
+			'starred'      => 0,
+			'origin'       => 0,
+		],
+		[
+			'uri-id'       => 7,
+			'uid'          => 42,
+			'wall'         => 1,
+			'post-user-id' => 7,
+			'author-id'    => 44,
+			'owner-id'     => 44,
+			'causer-id'    => 44,
+			'contact-id'   => 44,
+			'network'      => Protocol::DFRN,
+			'starred'      => 0,
+			'origin'       => 1,
+		],
+		[
+			'uri-id'       => 7,
 			'uid'          => 0,
 			'wall'         => 0,
 			'post-user-id' => 12,

@@ -51,7 +51,7 @@ class DirectMessage extends BaseFactory
 	 *
 	 * @param int    $id        Mail id
 	 * @param int    $uid       Mail user
-	 * @param string $text_mode Either empty, "html" or "text"
+	 * @param string $text_mode Either empty, "html" or "plain"
 	 *
 	 * @return \Friendica\Object\Api\Twitter\DirectMessage
 	 */

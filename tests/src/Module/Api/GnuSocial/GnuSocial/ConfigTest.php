@@ -17,8 +17,8 @@ class ConfigTest extends ApiTest
 	{
 		DI::config()->set('system', 'ssl_policy', BaseURL::SSL_POLICY_FULL);
 
-		$config   = new Config(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $config->run();
+		$response = (new Config(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 
 		$json = $this->toJson($response);
 

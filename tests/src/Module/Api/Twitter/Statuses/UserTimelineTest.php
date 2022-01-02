@@ -17,14 +17,13 @@ class UserTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesUserTimeline()
 	{
-		$networkPublicTimeline = new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-
-		$response = $networkPublicTimeline->run([
-			'user_id'         => 42,
-			'max_id'          => 10,
-			'exclude_replies' => true,
-			'conversation_id' => 7,
-		]);
+		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'user_id'         => 42,
+				'max_id'          => 10,
+				'exclude_replies' => true,
+				'conversation_id' => 7,
+			]);
 
 		$json = $this->toJson($response);
 
@@ -43,12 +42,11 @@ class UserTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesUserTimelineWithNegativePage()
 	{
-		$networkPublicTimeline = new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-
-		$response = $networkPublicTimeline->run([
-			'user_id' => 42,
-			'page'    => -2,
-		]);
+		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'user_id' => 42,
+				'page'    => -2,
+			]);
 
 		$json = $this->toJson($response);
 
@@ -67,9 +65,9 @@ class UserTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesUserTimelineWithRss()
 	{
-		$networkPublicTimeline = new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => ICanCreateResponses::TYPE_RSS]);
-
-		$response = $networkPublicTimeline->run();
+		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], [
+			'extension' => ICanCreateResponses::TYPE_RSS
+		]))->run();
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

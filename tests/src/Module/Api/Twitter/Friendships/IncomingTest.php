@@ -16,8 +16,8 @@ class IncomingTest extends ApiTest
 	 */
 	public function testApiFriendshipsIncoming()
 	{
-		$lists    = new Incoming(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $lists->run();
+		$response = (new Incoming(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 
 		$json = $this->toJson($response);
 

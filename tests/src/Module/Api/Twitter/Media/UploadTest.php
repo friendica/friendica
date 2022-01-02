@@ -19,8 +19,9 @@ class UploadTest extends ApiTest
 	public function testApiMediaUpload()
 	{
 		$this->expectException(BadRequestException::class);
-		$upload = new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$upload->run();
+
+		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run();
 	}
 
 	/**
@@ -32,7 +33,9 @@ class UploadTest extends ApiTest
 	{
 		$this->expectException(UnauthorizedException::class);
 		AuthTestConfig::$authenticated = false;
-		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run();
+
+		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run();
 	}
 
 	/**
@@ -49,7 +52,9 @@ class UploadTest extends ApiTest
 				'tmp_name' => 'tmp_name'
 			]
 		];
-		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run();
+
+		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run();
 	}
 
 	/**
@@ -71,7 +76,8 @@ class UploadTest extends ApiTest
 			]
 		];
 
-		$response = (new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))->run();
+		$response = (new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run();
 
 		$media = $this->toJson($response);
 

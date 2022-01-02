@@ -14,10 +14,8 @@ class NodeInfoTest extends FixtureTest
 {
 	public function testNodeInfo110()
 	{
-		$response = new Response();
-
-		$nodeinfo = new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), $response, DI::config(), []);
-		$response = $nodeinfo->run();
+		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->run();
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -37,10 +35,8 @@ class NodeInfoTest extends FixtureTest
 
 	public function testNodeInfo120()
 	{
-		$response = new Response();
-
-		$nodeinfo = new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), $response, DI::config(), []);
-		$response = $nodeinfo->run();
+		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->run();
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -59,10 +55,8 @@ class NodeInfoTest extends FixtureTest
 
 	public function testNodeInfo210()
 	{
-		$response = new Response();
-
-		$nodeinfo = new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), $response, DI::config(), []);
-		$response = $nodeinfo->run();
+		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->run();
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());

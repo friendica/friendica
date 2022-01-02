@@ -11,10 +11,13 @@ class VersionTest extends ApiTest
 {
 	public function test()
 	{
-		$version = new Version(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
-		$response = $version->run();
+		$response = (new Version(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+			->run();
 
-		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+		self::assertEquals([
+			'Content-type'                => ['application/json'],
+			ICanCreateResponses::X_HEADER => ['json']
+		], $response->getHeaders());
 		self::assertEquals('"0.9.7"', $response->getBody());
 	}
 }

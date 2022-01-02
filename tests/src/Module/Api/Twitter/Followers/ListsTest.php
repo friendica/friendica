@@ -14,8 +14,8 @@ class ListsTest extends ApiTest
 	 */
 	public function testApiStatusesFWithFollowers()
 	{
-		$lists    = new Lists(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $lists->run();
+		$response = (new Lists(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 
 		$json = $this->toJson($response);
 

@@ -19,8 +19,9 @@ class ShowTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 
-		$show = new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$show->run();
+
+		(new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 	}
 
 	/**
@@ -30,8 +31,10 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiStatusesShowWithId()
 	{
-		$show = new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $show->run(['id' => 1]);
+		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'id' => 1
+			]);
 
 		$json = $this->toJson($response);
 
@@ -46,8 +49,11 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiStatusesShowWithConversation()
 	{
-		$show = new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $show->run(['id' => 1, 'conversation' => 1]);
+		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'id'           => 1,
+				'conversation' => 1
+			]);
 
 		$json = $this->toJson($response);
 

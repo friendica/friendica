@@ -19,8 +19,8 @@ class StatusesTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 
-		$lists = new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$lists->run();
+		(new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 	}
 
 	/**
@@ -28,8 +28,12 @@ class StatusesTest extends ApiTest
 	 */
 	public function testApiListsStatusesWithListId()
 	{
-		$lists    = new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $lists->run(['list_id' => 1, 'page' => -1, 'max_id' => 10]);
+		$response = (new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'list_id' => 1,
+				'page'    => -1,
+				'max_id'  => 10
+			]);
 
 		$json = $this->toJson($response);
 
@@ -44,8 +48,10 @@ class StatusesTest extends ApiTest
 	 */
 	public function testApiListsStatusesWithListIdAndRss()
 	{
-		$lists    = new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => 'rss']);
-		$response = $lists->run(['list_id' => 1]);
+		$response = (new Statuses(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => 'rss']))
+			->run([
+				'list_id' => 1
+			]);
 
 		self::assertXml((string)$response->getBody());
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -119,7 +119,19 @@ class Status extends BaseFactory
 
 		$friendica_comments = Post::countPosts(['thr-parent-id' => $item['uri-id'], 'deleted' => false, 'gravity' => GRAVITY_COMMENT]);
 
-		$text = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
+		$text  = '';
+		$title = '';
+
+		// Add the title to text / html if set
+		if (!empty($item['title'])) {
+			$text .= $item['title'] . ' ';
+			$title = sprintf("[h4]%s[/h4]\n", $item['title']);
+		}
+
+		$statusnetHtml = BBCode::convertForUriId($item['uri-id'], BBCode::setMentionsToNicknames($title . ($item['raw-body'] ?? $item['body'])), BBCode::API);
+		$friendicaHtml = BBCode::convertForUriId($item['uri-id'], $title . $item['body'], BBCode::EXTERNAL);
+
+		$text .= Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
 
 		$text = trim(HTML::toPlaintext(BBCode::convertForUriId($item['uri-id'], $text, BBCode::API), 0));
 
@@ -190,6 +202,6 @@ class Status extends BaseFactory
 			$entities = [];
 		}
 
-		return new \Friendica\Object\Api\Twitter\Status($text, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments,  $friendica_comments, $liked);
+		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments,  $friendica_comments, $liked);
 	}
 }

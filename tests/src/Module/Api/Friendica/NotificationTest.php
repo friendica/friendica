@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -66,17 +66,20 @@ class NotificationTest extends ApiTest
 </notes>
 XML;
 
-		$notification = new Notification(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']);
-		$response = $notification->run();
+		$response = (new Notification(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
+			->run();
 
 		self::assertXmlStringEqualsXmlString($assertXml, (string)$response->getBody());
-		self::assertEquals(['Content-type' => ['text/xml'], ICanCreateResponses::X_HEADER => ['xml']], $response->getHeaders());
+		self::assertEquals([
+			'Content-type'                => ['text/xml'],
+			ICanCreateResponses::X_HEADER => ['xml']
+		], $response->getHeaders());
 	}
 
 	public function testWithJsonResult()
 	{
-		$notification = new Notification(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
-		$response = $notification->run();
+		$response = (new Notification(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+			->run();
 
 		$json = $this->toJson($response);
 
@@ -88,6 +91,9 @@ XML;
 			self::assertIsString($note->msg);
 		}
 
-		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+		self::assertEquals([
+			'Content-type'                => ['application/json'],
+			ICanCreateResponses::X_HEADER => ['json']
+		], $response->getHeaders());
 	}
 }

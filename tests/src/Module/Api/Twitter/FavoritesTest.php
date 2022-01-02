@@ -17,11 +17,11 @@ class FavoritesTest extends ApiTest
 	 */
 	public function testApiFavorites()
 	{
-		$favorites = new Favorites(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $favorites->run([
-			'page' => -1,
-			'max_id' => 10,
-		]);
+		$response = (new Favorites(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'page'   => -1,
+				'max_id' => 10,
+			]);
 
 		$json = $this->toJson($response);
 
@@ -37,8 +37,9 @@ class FavoritesTest extends ApiTest
 	 */
 	public function testApiFavoritesWithRss()
 	{
-		$favorites = new Favorites(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => ICanCreateResponses::TYPE_RSS]);
-		$response = $favorites->run();
+		$response = (new Favorites(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], [
+			'extension' => ICanCreateResponses::TYPE_RSS
+		]))->run();
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

@@ -17,8 +17,8 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiUsersShow()
 	{
-		$show = new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $show->run();
+		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run();
 
 		$json = $this->toJson($response);
 
@@ -37,8 +37,9 @@ class ShowTest extends ApiTest
 	 */
 	public function testApiUsersShowWithXml()
 	{
-		$show = new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => ICanCreateResponses::TYPE_XML]);
-		$response = $show->run();
+		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], [
+			'extension' => ICanCreateResponses::TYPE_XML
+		]))->run();
 
 		self::assertEquals(ICanCreateResponses::TYPE_XML, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

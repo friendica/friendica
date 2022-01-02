@@ -1,5 +1,5 @@
 # FRIENDICA Distributed Social Network
-# Copyright (C) 2010-2021, the Friendica project
+# Copyright (C) 2010-2022, the Friendica project
 # This file is distributed under the same license as the Friendica package.
 # Mike Macgirvin, 2010
 #

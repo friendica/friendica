@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2021, Friendica
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *

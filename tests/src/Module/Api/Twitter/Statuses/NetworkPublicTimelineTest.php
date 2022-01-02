@@ -17,8 +17,10 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimeline()
 	{
-		$networkPublicTimeline = new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $networkPublicTimeline->run(['max_id' => 10]);
+		$response = (new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'max_id' => 10
+			]);
 
 		$json = $this->toJson($response);
 
@@ -37,8 +39,10 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithNegativePage()
 	{
-		$networkPublicTimeline = new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]);
-		$response = $networkPublicTimeline->run(['page' => -2]);
+		$response = (new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+			->run([
+				'page' => -2
+			]);
 
 		$json = $this->toJson($response);
 
@@ -71,8 +75,11 @@ class NetworkPublicTimelineTest extends ApiTest
 	 */
 	public function testApiStatusesNetworkpublicTimelineWithRss()
 	{
-		$networkPublicTimeline = new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], ['extension' => ICanCreateResponses::TYPE_RSS]);
-		$response = $networkPublicTimeline->run(['page' => -2]);
+		$response = (new NetworkPublicTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET], [
+			'extension' => ICanCreateResponses::TYPE_RSS
+		]))->run([
+			'page' => -2
+		]);
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

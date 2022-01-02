@@ -11,8 +11,8 @@ class SavedSearchesTest extends ApiTest
 {
 	public function test()
 	{
-		$savedSearch = new SavedSearches(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
-		$response = $savedSearch->run();
+		$response = (new SavedSearches(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+			->run();
 
 		$result = $this->toJson($response);
 

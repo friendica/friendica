@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2021, the Friendica project
+ * @copyright Copyright (C) 2010-2022, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,7 +23,6 @@ namespace Friendica\Object\Api\Twitter;
 
 use Friendica\BaseDataTransferObject;
 use Friendica\Content\ContactSelector;
-use Friendica\Content\Text\BBCode;
 use Friendica\Model\Item;
 use Friendica\Util\DateTimeFormat;
 
@@ -99,7 +98,7 @@ class Status extends BaseDataTransferObject
 	 * @param array   $item
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(string $text, array $item, User $author, User $owner, array $retweeted, array $quoted, array $geo, array $friendica_activities, array $entities, array $attachments, int $friendica_comments, bool $liked)
+	public function __construct(string $text, string $statusnetHtml, string $friendicaHtml, array $item, User $author, User $owner, array $retweeted, array $quoted, array $geo, array $friendica_activities, array $entities, array $attachments, int $friendica_comments, bool $liked)
 	{
 		$this->id                        = (int)$item['id'];
 		$this->id_str                    = (string)$item['id'];
@@ -117,8 +116,8 @@ class Status extends BaseDataTransferObject
 
 		$this->text                 = $text;
 		$this->friendica_title      = $item['title'];
-		$this->statusnet_html       = BBCode::convertForUriId($item['uri-id'], BBCode::setMentionsToNicknames($item['raw-body'] ?? $item['body']), BBCode::API);
-		$this->friendica_html       = BBCode::convertForUriId($item['uri-id'], $item['body'], BBCode::EXTERNAL);
+		$this->statusnet_html       = $statusnetHtml;
+		$this->friendica_html       = $friendicaHtml;
 		$this->user                 = $author->toArray();
 		$this->friendica_author     = $author->toArray();
 		$this->friendica_owner      = $owner->toArray();

@@ -28,13 +28,13 @@ class UpdateTest extends ApiTest
 			]
 		];
 
-		$show     = new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$response = $show->run([
-			'status'                => 'Status content #friendica',
-			'in_reply_to_status_id' => 0,
-			'lat'                   => 48,
-			'long'                  => 7,
-		]);
+		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run([
+				'status'                => 'Status content #friendica',
+				'in_reply_to_status_id' => 0,
+				'lat'                   => 48,
+				'long'                  => 7,
+			]);
 
 		$json = $this->toJson($response);
 
@@ -50,10 +50,10 @@ class UpdateTest extends ApiTest
 	 */
 	public function testApiStatusesUpdateWithHtml()
 	{
-		$show     = new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]);
-		$response = $show->run([
-			'htmlstatus' => '<b>Status content</b>',
-		]);
+		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+			->run([
+				'htmlstatus' => '<b>Status content</b>',
+			]);
 
 		$json = $this->toJson($response);
 
