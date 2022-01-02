@@ -14,7 +14,8 @@ class UpdateProfileTest extends ApiTest
 	 */
 	public function testApiAccountUpdateProfile()
 	{
-		$response = (new UpdateProfile(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST], ['extension' => 'json']))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new UpdateProfile(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER, ['extension' => 'json']))
 			->run([
 				'name'        => 'new_name',
 				'description' => 'new_description'

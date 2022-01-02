@@ -18,8 +18,8 @@ class DestroyTest extends ApiTest
 	public function testApiFavoritesCreateDestroyWithInvalidId()
 	{
 		$this->expectException(BadRequestException::class);
-
-		(new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 	}
 
@@ -30,7 +30,8 @@ class DestroyTest extends ApiTest
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction()
 	{
-		$response = (new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Destroy(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'id' => 3
 			]);

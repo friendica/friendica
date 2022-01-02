@@ -32,14 +32,16 @@ class UpdateTest extends ApiTest
 	public function testEmpty()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 	}
 
 	public function testTooFewArgs()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'album' => 'album_name'
 			]);
@@ -48,7 +50,8 @@ class UpdateTest extends ApiTest
 	public function testWrongUpdate()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'album'     => 'album_name',
 				'album_new' => 'album_name'
@@ -63,8 +66,8 @@ class UpdateTest extends ApiTest
 	public function testValid()
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
-
-		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'album'     => 'test_album',
 				'album_new' => 'test_album_2'

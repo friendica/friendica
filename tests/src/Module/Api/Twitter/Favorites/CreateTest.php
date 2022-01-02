@@ -19,8 +19,8 @@ class CreateTest extends ApiTest
 	public function testApiFavoritesCreateDestroyWithInvalidId()
 	{
 		$this->expectException(BadRequestException::class);
-
-		(new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 	}
 
@@ -31,7 +31,8 @@ class CreateTest extends ApiTest
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateAction()
 	{
-		$response = (new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'id' => 3
 			]);
@@ -48,7 +49,8 @@ class CreateTest extends ApiTest
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss()
 	{
-		$response = (new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST], ['extension' => ICanCreateResponses::TYPE_RSS]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Create(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER, ['extension' => ICanCreateResponses::TYPE_RSS]))
 			->run([
 				'id' => 3
 			]);

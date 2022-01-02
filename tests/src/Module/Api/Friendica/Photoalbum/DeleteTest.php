@@ -32,7 +32,8 @@ class DeleteTest extends ApiTest
 	public function testEmpty()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 
 	}
@@ -40,7 +41,8 @@ class DeleteTest extends ApiTest
 	public function testWrong()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'album' => 'album_name'
 			]);
@@ -49,8 +51,8 @@ class DeleteTest extends ApiTest
 	public function testValidWithDelete()
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
-
-		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'album' => 'test_album']
 			);

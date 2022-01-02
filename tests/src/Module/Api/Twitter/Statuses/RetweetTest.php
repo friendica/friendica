@@ -18,8 +18,8 @@ class RetweetTest extends ApiTest
 	public function testApiStatusesRepeat()
 	{
 		$this->expectException(BadRequestException::class);
-
-		(new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		(new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 	}
 
@@ -45,7 +45,8 @@ class RetweetTest extends ApiTest
 	 */
 	public function testApiStatusesRepeatWithId()
 	{
-		$response = (new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'id' => 1
 			]);
@@ -62,7 +63,8 @@ class RetweetTest extends ApiTest
 	 */
 	public function testApiStatusesRepeatWithSharedId()
 	{
-		$response = (new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::POST]))
+		$_SERVER['REQUEST_METHOD'] = Router::POST;
+		$response = (new Retweet(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'id' => 5
 			]);

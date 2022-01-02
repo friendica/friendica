@@ -34,7 +34,9 @@ class SearchTest extends ApiTest
 	{
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+		$_SERVER['REQUEST_METHOD'] = Router::GET;
+
+		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run();
 
 		$json = $this->toJson($response);
@@ -52,7 +54,9 @@ class SearchTest extends ApiTest
 
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+		$_SERVER['REQUEST_METHOD'] = Router::GET;
+
+		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'searchstring' => 'item_body'
 			]);
@@ -73,7 +77,9 @@ class SearchTest extends ApiTest
 	{
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), ['REQUEST_METHOD' => Router::GET]))
+		$_SERVER['REQUEST_METHOD'] = Router::GET;
+
+		$response = (new Search($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), $_SERVER))
 			->run([
 				'searchstring' => 'test'
 			]);
