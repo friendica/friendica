@@ -52,15 +52,15 @@ class TrustedBrowser extends BaseEntity
 	 * @param int         $uid
 	 * @param string      $user_agent
 	 * @param string      $created
-	 * @param string|null $last_used
+	 * @param string      $last_used
 	 */
-	public function __construct(string $cookie_hash, int $uid, string $user_agent, string $created, string $last_used = null)
+	public function __construct(string $cookie_hash, int $uid, string $user_agent, string $created, string $last_used)
 	{
 		$this->cookie_hash = $cookie_hash;
-		$this->uid = $uid;
-		$this->user_agent = $user_agent;
-		$this->created = $created;
-		$this->last_used = $last_used;
+		$this->uid         = $uid;
+		$this->user_agent  = $user_agent;
+		$this->created     = $created;
+		$this->last_used   = $last_used;
 	}
 
 	public function recordUse()

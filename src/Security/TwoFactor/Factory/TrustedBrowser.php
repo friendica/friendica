@@ -22,6 +22,7 @@
 namespace Friendica\Security\TwoFactor\Factory;
 
 use Friendica\BaseFactory;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
@@ -35,7 +36,8 @@ class TrustedBrowser extends BaseFactory
 			$trustedHash,
 			$uid,
 			$userAgent,
-			DateTimeFormat::utcNow()
+			DateTimeFormat::utcNow(),
+			DBA::NULL_DATETIME
 		);
 	}
 
@@ -46,7 +48,7 @@ class TrustedBrowser extends BaseFactory
 			$row['uid'],
 			$row['user_agent'],
 			$row['created'],
-			$row['last_used']
+			$row['last_used'] ?? DBA::NULL_DATETIME
 		);
 	}
 }

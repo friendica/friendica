@@ -327,7 +327,7 @@ return [
 			"description" => ["type" => "varchar(255)", "comment" => "Description of the usage of the password"],
 			"hashed_password" => ["type" => "varchar(255)", "not null" => "1", "comment" => "Hashed password"],
 			"generated" => ["type" => "datetime", "not null" => "1", "comment" => "Datetime the password was generated"],
-			"last_used" => ["type" => "datetime", "comment" => "Datetime the password was last used"],
+			"last_used" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Datetime the password was last used"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],

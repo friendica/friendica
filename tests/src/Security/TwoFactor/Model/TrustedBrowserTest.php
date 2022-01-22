@@ -21,6 +21,7 @@
 
 namespace Friendica\Test\src\Security\TwoFactor\Model;
 
+use Friendica\Database\DBA;
 use Friendica\Security\TwoFactor\Model\TrustedBrowser;
 use Friendica\Test\MockedTest;
 use Friendica\Util\DateTimeFormat;
@@ -36,13 +37,15 @@ class TrustedBrowserTest extends MockedTest
 			$hash,
 			42,
 			'PHPUnit',
-			DateTimeFormat::utcNow()
+			DateTimeFormat::utcNow(),
+			DBA::NULL_DATETIME
 		);
 
 		$this->assertEquals($hash, $trustedBrowser->cookie_hash);
 		$this->assertEquals(42, $trustedBrowser->uid);
 		$this->assertEquals('PHPUnit', $trustedBrowser->user_agent);
 		$this->assertNotEmpty($trustedBrowser->created);
+		$this->assertEquals($trustedBrowser->last_used, DBA::NULL_DATETIME);
 	}
 
 	public function testRecordUse()

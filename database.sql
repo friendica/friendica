@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `2fa_app_specific_password` (
 	`description` varchar(255) COMMENT 'Description of the usage of the password',
 	`hashed_password` varchar(255) NOT NULL COMMENT 'Hashed password',
 	`generated` datetime NOT NULL COMMENT 'Datetime the password was generated',
-	`last_used` datetime COMMENT 'Datetime the password was last used',
+	`last_used` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Datetime the password was last used',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_description` (`uid`,`description`(190)),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
