@@ -21,6 +21,7 @@
 
 namespace Friendica\Test\src\Security\TwoFactor\Factory;
 
+use Friendica\Database\DBA;
 use Friendica\Security\TwoFactor\Factory\TrustedBrowser;
 use Friendica\Test\MockedTest;
 use Friendica\Util\DateTimeFormat;
@@ -38,7 +39,7 @@ class TrustedBrowserTest extends MockedTest
 			'uid' => 42,
 			'user_agent' => 'PHPUnit',
 			'created' => DateTimeFormat::utcNow(),
-			'last_used' => null,
+			'last_used' => DBA::NULL_DATETIME,
 		];
 
 		$trustedBrowser = $factory->createFromTableRow($row);
