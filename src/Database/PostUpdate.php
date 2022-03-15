@@ -1038,7 +1038,6 @@ class PostUpdate
 
 		Logger::info('Start', ['uri-id' => $id]);
 
-		$start_id = $id;
 		$rows     = 0;
 		$received = '';
 
@@ -1078,7 +1077,7 @@ class PostUpdate
 
 		Logger::info('Processed', ['rows' => $rows, 'last' => $id, 'last-received' => $received]);
 
-		if ($start_id == $id) {
+		if ($rows <= 100) {
 			DI::config()->set('system', 'post_update_version', 1452);
 			Logger::info('Done');
 			return true;
