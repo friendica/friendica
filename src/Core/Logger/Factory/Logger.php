@@ -51,14 +51,14 @@ class Logger
 	 *
 	 * @var string[]
 	 */
-	private static $ignoreClassList = [
+	public static $ignoreClassList = [
 		Core\Logger::class,
 		Profiler::class,
 		'Friendica\\Core\\Logger\\Type',
 	];
 
 	/** @var string The log-channel (app, worker, ...) */
-	private $channel;
+	protected $channel;
 
 	public function __construct(string $channel)
 	{

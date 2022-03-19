@@ -24,7 +24,6 @@ namespace Friendica\Security;
 use Exception;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
-use Friendica\Core\Session;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\User;
