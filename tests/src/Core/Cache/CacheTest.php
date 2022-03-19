@@ -22,9 +22,7 @@
 namespace Friendica\Test\src\Core\Cache;
 
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Test\MockedTest;
-use Friendica\Util\PidFile;
 
 abstract class CacheTest extends MockedTest
 {
@@ -57,7 +55,7 @@ abstract class CacheTest extends MockedTest
 			'boolFalse' => ['data' => false],
 			'float'     => ['data' => 4.6634234],
 			'array'     => ['data' => ['1', '2', '3', '4', '5']],
-			'object'    => ['data' => new PidFile()],
+			'object'    => ['data' => new class(){}],
 			'null'      => ['data' => null],
 		];
 	}

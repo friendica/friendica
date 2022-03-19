@@ -58,7 +58,9 @@ if (php_sapi_name() !== 'cli') {
 
 use Dice\Dice;
 use Friendica\App\Mode;
-use Friendica\Security\ExAuth;
+use Friendica\Core\Logger\Handler\ErrorHandler;
+use Friendica\DI;
+use Friendica\Security\EJabberd;
 use Psr\Log\LoggerInterface;
 
 if (sizeof($_SERVER["argv"]) == 0) {
@@ -78,14 +80,19 @@ chdir($directory);
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
-$dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['auth_ejabberd']]);
+$dice = $dice->addRule(LoggerInterface::class,[
+	'instanceOf' => EJabberd\Factory\Logger::class,
+	'call'       => [
+		['create', [], Dice::CHAIN_CALL],
+	],
+]);
 
-\Friendica\DI::init($dice);
-\Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
+DI::init($dice);
+ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
 $appMode = $dice->create(Mode::class);
 
 if ($appMode->isNormal()) {
-	/** @var ExAuth $oAuth */
-	$oAuth = $dice->create(ExAuth::class);
-	$oAuth->readStdin();
+	/** @var EJabberd\Entity\ExternalAuth $oAuth */
+	$oAuth = $dice->create(EJabberd\Entity\ExternalAuth::class);
+	$oAuth->execute();
 }
