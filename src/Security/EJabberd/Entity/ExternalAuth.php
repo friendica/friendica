@@ -29,6 +29,7 @@ use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
+use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException;
 use Friendica\Security\EJabberd\Exception\EjabberdAuthenticationException;
 use Friendica\Security\EJabberd\Exception\EjabberdInvalidCommandException;
@@ -310,9 +311,9 @@ class ExternalAuth
 
 			// If the hostnames doesn't match or there is some failure, we try to check remotely
 			if ($Error && !$this->checkCredentials($aCommand[2], $aCommand[1], $aCommand[3], true)) {
-				throw new EJabberdInvalidUserException(sprintf('authentification failed for user: %s@%s', $sUser, $aCommand[2]));
+				throw new EJabberdInvalidUserException(sprintf('authentication failed for user: %s@%s', $sUser, $aCommand[2]));
 			} else {
-				$this->logger->notice('authenificated user.', ['user' => $sUser, 'host' => $aCommand[2]]);
+				$this->logger->notice('authenticated user.', ['user' => $sUser, 'host' => $aCommand[2]]);
 				$this->loginSuccess();
 			}
 		} finally {
@@ -336,7 +337,14 @@ class ExternalAuth
 
 		$url = ($ssl ? 'https' : 'http') . '://' . $host . '/api/account/verify_credentials.json?skip_status=true';
 
-		$curlResponse = $this->httpClient->head($url);
+		$curlResponse = $this->httpClient->head($url, [
+			HttpClientOptions::TIMEOUT => 5,
+			HttpClientOptions::AUTH    => [
+				$user,
+				$password,
+				'basic'
+			]
+		]);
 
 		$http_code = $curlResponse->getReturnCode();
 
