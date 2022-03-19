@@ -34,6 +34,7 @@ use Friendica\BaseEntity;
  * @property-read $parentUriId
  * @property-read $created
  * @property-read $seen
+ * @property-read $dismissed
  */
 class Notification extends BaseEntity
 {
@@ -72,11 +73,11 @@ class Notification extends BaseEntity
 	 * @param int|null      $parentUriId
 	 * @param DateTime|null $created
 	 * @param bool          $seen
-	 * @param int|null      $id
 	 * @param bool          $dismissed
+	 * @param int|null      $id
 	 * @see \Friendica\Navigation\Notifications\Factory\Notification
 	 */
-	public function __construct(int $uid, string $verb, int $type, int $actorId, int $targetUriId = null, int $parentUriId = null, DateTime $created = null, bool $seen = false, int $id = null, bool $dismissed = false)
+	public function __construct(int $uid, string $verb, int $type, int $actorId, int $targetUriId = null, int $parentUriId = null, DateTime $created = null, bool $seen = false, bool $dismissed = false, int $id = null)
 	{
 		$this->uid         = $uid;
 		$this->verb        = $verb;
@@ -86,8 +87,9 @@ class Notification extends BaseEntity
 		$this->parentUriId = $parentUriId ?: $targetUriId;
 		$this->created     = $created;
 		$this->seen        = $seen;
-		$this->id          = $id;
 		$this->dismissed   = $dismissed;
+
+		$this->id          = $id;
 	}
 
 	public function setSeen()

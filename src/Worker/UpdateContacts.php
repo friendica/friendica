@@ -52,7 +52,7 @@ class UpdateContacts
 		$condition = DBA::mergeConditions($base_condition,
 			["`uid` != ? AND (`last-update` < ? OR (NOT `failed` AND `last-update` < ?))",
 			0, DateTimeFormat::utc('now - 1 month'), DateTimeFormat::utc('now - 1 week')]);
-		$ids = self::getContactsToUpdate($condition, [], $limit);
+		$ids = self::getContactsToUpdate($condition, $limit, []);
 		Logger::info('Fetched federated user contacts', ['count' => count($ids)]);
 
 		$conditions = ["`id` IN (SELECT `author-id` FROM `post` WHERE `author-id` = `contact`.`id`)",
@@ -65,7 +65,7 @@ class UpdateContacts
 			$condition = DBA::mergeConditions($base_condition,
 				[$contact_condition . " AND (`last-update` < ? OR (NOT `failed` AND `last-update` < ?))",
 				DateTimeFormat::utc('now - 1 month'), DateTimeFormat::utc('now - 1 week')]);
-			$ids = self::getContactsToUpdate($condition, $ids, $limit);
+			$ids = self::getContactsToUpdate($condition, $limit, $ids);
 			Logger::info('Fetched interacting federated contacts', ['count' => count($ids), 'condition' => $contact_condition]);
 		}
 
@@ -80,7 +80,7 @@ class UpdateContacts
 				["(`last-update` < ? OR (NOT `failed` AND `last-update` < ?))",
 					DateTimeFormat::utc('now - 6 month'), DateTimeFormat::utc('now - 1 month')]);
 			$previous = count($ids);
-			$ids = self::getContactsToUpdate($condition, $ids, $limit - $previous);
+			$ids = self::getContactsToUpdate($condition, $limit - $previous, $ids);
 			Logger::info('Fetched federated contacts', ['count' => count($ids) - $previous]);
 		}
 
@@ -98,10 +98,11 @@ class UpdateContacts
 	 * Returns contact ids based on a given condition
 	 *
 	 * @param array $condition
+	 * @param int $limit
 	 * @param array $ids
 	 * @return array contact ids
 	 */
-	private static function getContactsToUpdate(array $condition, array $ids = [], int $limit)
+	private static function getContactsToUpdate(array $condition, int $limit, array $ids = [])
 	{
 		$contacts = DBA::select('contact', ['id'], $condition, ['limit' => $limit]);
 		while ($contact = DBA::fetch($contacts)) {

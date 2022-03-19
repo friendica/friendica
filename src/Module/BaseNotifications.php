@@ -29,7 +29,7 @@ use Friendica\Content\Pager;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
-use Friendica\Navigation\Notifications\ValueObject\FormattedNotification;
+use Friendica\Navigation\Notifications\ValueObject\FormattedNotify;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -43,29 +43,29 @@ abstract class BaseNotifications extends BaseModule
 {
 	/** @var array Array of URL parameters */
 	const URL_TYPES = [
-		FormattedNotification::NETWORK  => 'network',
-		FormattedNotification::SYSTEM   => 'system',
-		FormattedNotification::HOME     => 'home',
-		FormattedNotification::PERSONAL => 'personal',
-		FormattedNotification::INTRO    => 'intros',
+		FormattedNotify::NETWORK  => 'network',
+		FormattedNotify::SYSTEM   => 'system',
+		FormattedNotify::HOME     => 'home',
+		FormattedNotify::PERSONAL => 'personal',
+		FormattedNotify::INTRO    => 'intros',
 	];
 
 	/** @var array Array of the allowed notifications and their printable name */
 	const PRINT_TYPES = [
-		FormattedNotification::NETWORK  => 'Network',
-		FormattedNotification::SYSTEM   => 'System',
-		FormattedNotification::HOME     => 'Home',
-		FormattedNotification::PERSONAL => 'Personal',
-		FormattedNotification::INTRO    => 'Introductions',
+		FormattedNotify::NETWORK  => 'Network',
+		FormattedNotify::SYSTEM   => 'System',
+		FormattedNotify::HOME     => 'Home',
+		FormattedNotify::PERSONAL => 'Personal',
+		FormattedNotify::INTRO    => 'Introductions',
 	];
 
 	/** @var array The array of access keys for notification pages */
 	const ACCESS_KEYS = [
-		FormattedNotification::NETWORK  => 'w',
-		FormattedNotification::SYSTEM   => 'y',
-		FormattedNotification::HOME     => 'h',
-		FormattedNotification::PERSONAL => 'r',
-		FormattedNotification::INTRO    => 'i',
+		FormattedNotify::NETWORK  => 'w',
+		FormattedNotify::SYSTEM   => 'y',
+		FormattedNotify::HOME     => 'h',
+		FormattedNotify::PERSONAL => 'r',
+		FormattedNotify::INTRO    => 'i',
 	];
 
 	/** @var int The default count of items per page */

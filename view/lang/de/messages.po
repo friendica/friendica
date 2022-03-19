@@ -49,8 +49,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-11 22:56-0500\n"
-"PO-Revision-Date: 2022-03-12 13:16+0000\n"
+"POT-Creation-Date: 2022-03-16 06:27+0100\n"
+"PO-Revision-Date: 2022-03-16 06:31+0000\n"
 "Last-Translator: Tobias Diekershoff <tobias.diekershoff@gmx.net>\n"
 "Language-Team: German (http://www.transifex.com/Friendica/friendica/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -172,8 +172,8 @@ msgstr "Der Feed für diesen Beitrag ist nicht verfügbar."
 #: src/Module/Delegation.php:119 src/Module/FollowConfirm.php:38
 #: src/Module/FriendSuggest.php:56 src/Module/Group.php:42
 #: src/Module/Group.php:85 src/Module/Invite.php:41 src/Module/Invite.php:130
-#: src/Module/Notifications/Notification.php:48
-#: src/Module/Notifications/Notification.php:79
+#: src/Module/Notifications/Notification.php:75
+#: src/Module/Notifications/Notification.php:106
 #: src/Module/Profile/Common.php:56 src/Module/Profile/Contacts.php:56
 #: src/Module/Profile/Schedule.php:39 src/Module/Profile/Schedule.php:56
 #: src/Module/Register.php:77 src/Module/Register.php:90
@@ -445,7 +445,7 @@ msgstr "Veranstaltung teilen"
 #: mod/photos.php:1342 mod/photos.php:1398 mod/photos.php:1472
 #: src/Module/Admin/Item/Source.php:65 src/Module/Contact/Advanced.php:132
 #: src/Module/Contact/Poke.php:177 src/Module/Contact/Profile.php:327
-#: src/Module/Debug/ActivityPubConversion.php:141
+#: src/Module/Debug/ActivityPubConversion.php:145
 #: src/Module/Debug/Babel.php:313 src/Module/Debug/Localtime.php:64
 #: src/Module/Debug/Probe.php:54 src/Module/Debug/WebFinger.php:51
 #: src/Module/Delegation.php:148 src/Module/FriendSuggest.php:144
@@ -745,7 +745,7 @@ msgstr "Konnte Nachrichten nicht abrufen."
 
 #: mod/message.php:120 src/Module/Notifications/Introductions.php:133
 #: src/Module/Notifications/Introductions.php:168
-#: src/Module/Notifications/Notification.php:57
+#: src/Module/Notifications/Notification.php:84
 msgid "Discard"
 msgstr "Verwerfen"
 
@@ -1148,19 +1148,6 @@ msgstr "Karte"
 msgid "View Album"
 msgstr "Album betrachten"
 
-#: mod/ping.php:275
-msgid "{0} wants to be your friend"
-msgstr "{0} möchte mit dir in Kontakt treten"
-
-#: mod/ping.php:292
-msgid "{0} requested registration"
-msgstr "{0} möchte sich registrieren"
-
-#: mod/ping.php:305
-#, php-format
-msgid "{0} and %d others requested registration"
-msgstr "{0} und %d weitere möchten sich registrieren"
-
 #: mod/redir.php:49 mod/redir.php:102
 msgid "Bad Request."
 msgstr "Ungültige Anfrage."
@@ -1178,7 +1165,7 @@ msgstr "Ungültige Anfrage."
 msgid "Contact not found."
 msgstr "Kontakt nicht gefunden."
 
-#: mod/removeme.php:63 src/Navigation/Notifications/Repository/Notify.php:473
+#: mod/removeme.php:63 src/Navigation/Notifications/Repository/Notify.php:476
 msgid "[Friendica System Notify]"
 msgstr "[Friendica-Systembenachrichtigung]"
 
@@ -1215,7 +1202,7 @@ msgstr "Bitte gib dein Passwort zur Verifikation ein:"
 msgid "Resubscribing to OStatus contacts"
 msgstr "Erneuern der OStatus-Abonements"
 
-#: mod/repair_ostatus.php:46 src/Module/Debug/ActivityPubConversion.php:130
+#: mod/repair_ostatus.php:46 src/Module/Debug/ActivityPubConversion.php:134
 #: src/Module/Debug/Babel.php:293 src/Module/Security/TwoFactor/Verify.php:97
 msgid "Error"
 msgid_plural "Errors"
@@ -2817,7 +2804,7 @@ msgstr "Sperren"
 #: src/Module/Contact/Profile.php:349 src/Module/Contact/Profile.php:457
 #: src/Module/Notifications/Introductions.php:132
 #: src/Module/Notifications/Introductions.php:204
-#: src/Module/Notifications/Notification.php:61
+#: src/Module/Notifications/Notification.php:88
 msgid "Ignore"
 msgstr "Ignorieren"
 
@@ -7017,7 +7004,7 @@ msgstr "Webfinger überprüfen"
 msgid "Babel"
 msgstr "Babel"
 
-#: src/Module/BaseAdmin.php:118 src/Module/Debug/ActivityPubConversion.php:138
+#: src/Module/BaseAdmin.php:118 src/Module/Debug/ActivityPubConversion.php:142
 msgid "ActivityPub Conversion"
 msgstr "Umwandlung nach ActivityPub"
 
@@ -7708,15 +7695,15 @@ msgstr "Formatiert"
 msgid "Activity"
 msgstr "Aktivität"
 
-#: src/Module/Debug/ActivityPubConversion.php:118
+#: src/Module/Debug/ActivityPubConversion.php:122
 msgid "Object data"
 msgstr "Objekt Daten"
 
-#: src/Module/Debug/ActivityPubConversion.php:125
+#: src/Module/Debug/ActivityPubConversion.php:129
 msgid "Result Item"
 msgstr "Resultierender Eintrag"
 
-#: src/Module/Debug/ActivityPubConversion.php:139
+#: src/Module/Debug/ActivityPubConversion.php:143
 msgid "Source activity"
 msgstr "Quelle der Aktivität"
 
@@ -8541,7 +8528,7 @@ msgstr "Keine Kontaktanfragen."
 msgid "No more %s notifications."
 msgstr "Keine weiteren %s-Benachrichtigungen"
 
-#: src/Module/Notifications/Notification.php:107
+#: src/Module/Notifications/Notification.php:134
 msgid "You must be logged in to show this page."
 msgstr "Du musst eingeloggt sein damit diese Seite angezeigt werden kann."
 
@@ -8564,6 +8551,15 @@ msgstr "Pinnwandbenachrichtigungen"
 #: src/Module/Notifications/Notifications.php:139
 msgid "Show unread"
 msgstr "Ungelesene anzeigen"
+
+#: src/Module/Notifications/Ping.php:214
+msgid "{0} requested registration"
+msgstr "{0} möchte sich registrieren"
+
+#: src/Module/Notifications/Ping.php:225
+#, php-format
+msgid "{0} and %d others requested registration"
+msgstr "{0} und %d weitere möchten sich registrieren"
 
 #: src/Module/OAuth/Acknowledge.php:50
 msgid "Authorize application connection"
@@ -8717,19 +8713,19 @@ msgstr "Betrachten als"
 
 #: src/Module/Profile/Profile.php:326 src/Module/Profile/Profile.php:329
 #: src/Module/Profile/Status.php:65 src/Module/Profile/Status.php:68
-#: src/Protocol/Feed.php:990 src/Protocol/OStatus.php:1245
+#: src/Protocol/Feed.php:1017 src/Protocol/OStatus.php:1245
 #, php-format
 msgid "%s's timeline"
 msgstr "Timeline von %s"
 
 #: src/Module/Profile/Profile.php:327 src/Module/Profile/Status.php:66
-#: src/Protocol/Feed.php:994 src/Protocol/OStatus.php:1249
+#: src/Protocol/Feed.php:1021 src/Protocol/OStatus.php:1249
 #, php-format
 msgid "%s's posts"
 msgstr "Beiträge von %s"
 
 #: src/Module/Profile/Profile.php:328 src/Module/Profile/Status.php:67
-#: src/Protocol/Feed.php:997 src/Protocol/OStatus.php:1252
+#: src/Protocol/Feed.php:1024 src/Protocol/OStatus.php:1252
 #, php-format
 msgid "%s's comments"
 msgstr "Kommentare von %s"
@@ -10009,43 +10005,47 @@ msgid ""
 " features and resources."
 msgstr "Unsere <strong>Hilfe</strong>-Seiten können herangezogen werden, um weitere Einzelheiten zu anderen Programm-Features zu erhalten."
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:89
+#: src/Navigation/Notifications/Factory/FormattedNavNotification.php:135
+msgid "{0} wants to follow you"
+msgstr "{0} möchte dir folgen"
+
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:91
 #, php-format
 msgid "%s liked %s's post"
 msgstr "%s mag %ss Beitrag"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:101
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:103
 #, php-format
 msgid "%s disliked %s's post"
 msgstr "%s mag %ss Beitrag nicht"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:113
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:115
 #, php-format
 msgid "%s is attending %s's event"
 msgstr "%s nimmt an %s's Event teil"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:125
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:127
 #, php-format
 msgid "%s is not attending %s's event"
 msgstr "%s nimmt nicht an %s's Event teil"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:137
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:139
 #, php-format
 msgid "%s may attending %s's event"
 msgstr "%s nimmt eventuell an %s's Veranstaltung teil"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:167
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:169
 #, php-format
 msgid "%s is now friends with %s"
 msgstr "%s ist jetzt mit %s befreundet"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:334
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:372
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:336
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:374
 #, php-format
 msgid "%s commented on %s's post"
 msgstr "%s hat %ss Beitrag kommentiert"
 
-#: src/Navigation/Notifications/Factory/FormattedNotification.php:371
+#: src/Navigation/Notifications/Factory/FormattedNotify.php:373
 #, php-format
 msgid "%s created a new post"
 msgstr "%s hat einen neuen Beitrag erstellt"
@@ -10062,330 +10062,330 @@ msgstr "Kontakt-/Freundschaftsanfrage"
 msgid "New Follower"
 msgstr "Neuer Bewunderer"
 
-#: src/Navigation/Notifications/Factory/Notification.php:93
+#: src/Navigation/Notifications/Factory/Notification.php:119
 #, php-format
 msgid "%1$s wants to follow you"
 msgstr "%1$s möchte dir folgen"
 
-#: src/Navigation/Notifications/Factory/Notification.php:95
+#: src/Navigation/Notifications/Factory/Notification.php:121
 #, php-format
-msgid "%1$s had started following you"
+msgid "%1$s has started following you"
 msgstr "%1$s hat angefangen dir zu folgen"
 
-#: src/Navigation/Notifications/Factory/Notification.php:149
+#: src/Navigation/Notifications/Factory/Notification.php:178
 #, php-format
-msgid "%1$s liked your comment %2$s"
+msgid "%1$s liked your comment on %2$s"
 msgstr "%1$s mag deinen Kommentar %2$s"
 
-#: src/Navigation/Notifications/Factory/Notification.php:152
+#: src/Navigation/Notifications/Factory/Notification.php:181
 #, php-format
 msgid "%1$s liked your post %2$s"
 msgstr "%1$s mag deinen Beitrag %2$s"
 
-#: src/Navigation/Notifications/Factory/Notification.php:159
+#: src/Navigation/Notifications/Factory/Notification.php:188
 #, php-format
-msgid "%1$s disliked your comment %2$s"
-msgstr "%1$s mag deinen Kommentar %2$s nicht"
+msgid "%1$s disliked your comment on %2$s"
+msgstr "%1$s mag deinen Kommentar %2$s  nicht"
 
-#: src/Navigation/Notifications/Factory/Notification.php:162
+#: src/Navigation/Notifications/Factory/Notification.php:191
 #, php-format
 msgid "%1$s disliked your post %2$s"
 msgstr "%1$s mag deinen Beitrag %2$s nicht"
 
-#: src/Navigation/Notifications/Factory/Notification.php:169
+#: src/Navigation/Notifications/Factory/Notification.php:198
 #, php-format
 msgid "%1$s shared your comment %2$s"
 msgstr "%1$s hat deinen Kommentar %2$s geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:172
+#: src/Navigation/Notifications/Factory/Notification.php:201
 #, php-format
 msgid "%1$s shared your post %2$s"
 msgstr "%1$s hat deinen Beitrag %2$s geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:176
-#: src/Navigation/Notifications/Factory/Notification.php:245
+#: src/Navigation/Notifications/Factory/Notification.php:205
+#: src/Navigation/Notifications/Factory/Notification.php:274
 #, php-format
 msgid "%1$s shared the post %2$s from %3$s"
 msgstr "%1$s hat den Beitrag %2$s von %3$s geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:178
-#: src/Navigation/Notifications/Factory/Notification.php:247
+#: src/Navigation/Notifications/Factory/Notification.php:207
+#: src/Navigation/Notifications/Factory/Notification.php:276
 #, php-format
 msgid "%1$s shared a post from %3$s"
 msgstr "%1$s hat einen Beitrag von %3$s geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:180
-#: src/Navigation/Notifications/Factory/Notification.php:249
+#: src/Navigation/Notifications/Factory/Notification.php:209
+#: src/Navigation/Notifications/Factory/Notification.php:278
 #, php-format
 msgid "%1$s shared the post %2$s"
 msgstr "%1$s hat den Beitrag %2$s geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:182
-#: src/Navigation/Notifications/Factory/Notification.php:251
+#: src/Navigation/Notifications/Factory/Notification.php:211
+#: src/Navigation/Notifications/Factory/Notification.php:280
 #, php-format
 msgid "%1$s shared a post"
 msgstr "%1$s hat einen Beitrag geteilt"
 
-#: src/Navigation/Notifications/Factory/Notification.php:190
+#: src/Navigation/Notifications/Factory/Notification.php:219
 #, php-format
 msgid "%1$s wants to attend your event %2$s"
 msgstr "%1$s möchte an deiner Veranstaltung %2$s teilnehmen"
 
-#: src/Navigation/Notifications/Factory/Notification.php:197
+#: src/Navigation/Notifications/Factory/Notification.php:226
 #, php-format
 msgid "%1$s does not want to attend your event %2$s"
 msgstr "%1$s möchte nicht an deiner Veranstaltung %2$s teilnehmen"
 
-#: src/Navigation/Notifications/Factory/Notification.php:204
+#: src/Navigation/Notifications/Factory/Notification.php:233
 #, php-format
 msgid "%1$s maybe wants to attend your event %2$s"
 msgstr "%1$s nimmt eventuell an deiner Veranstaltung %2$s teil"
 
-#: src/Navigation/Notifications/Factory/Notification.php:211
+#: src/Navigation/Notifications/Factory/Notification.php:240
 #, php-format
 msgid "%1$s tagged you on %2$s"
 msgstr "%1$s erwähnte dich auf %2$s"
 
-#: src/Navigation/Notifications/Factory/Notification.php:215
+#: src/Navigation/Notifications/Factory/Notification.php:244
 #, php-format
 msgid "%1$s replied to you on %2$s"
 msgstr "%1$s hat dir auf %2$s geantwortet"
 
-#: src/Navigation/Notifications/Factory/Notification.php:219
+#: src/Navigation/Notifications/Factory/Notification.php:248
 #, php-format
 msgid "%1$s commented in your thread %2$s"
 msgstr "%1$s hat deine Unterhaltung %2$s kommentiert"
 
-#: src/Navigation/Notifications/Factory/Notification.php:223
+#: src/Navigation/Notifications/Factory/Notification.php:252
 #, php-format
 msgid "%1$s commented on your comment %2$s"
 msgstr "%1$s hat deinen Kommentar %2$s kommentiert"
 
-#: src/Navigation/Notifications/Factory/Notification.php:229
+#: src/Navigation/Notifications/Factory/Notification.php:258
 #, php-format
 msgid "%1$s commented in their thread %2$s"
 msgstr "%1$s hat in der eigenen Unterhaltung %2$s kommentiert"
 
-#: src/Navigation/Notifications/Factory/Notification.php:231
+#: src/Navigation/Notifications/Factory/Notification.php:260
 #, php-format
 msgid "%1$s commented in their thread"
 msgstr "%1$s kommentierte in der eigenen Unterhaltung"
 
-#: src/Navigation/Notifications/Factory/Notification.php:233
+#: src/Navigation/Notifications/Factory/Notification.php:262
 #, php-format
 msgid "%1$s commented in the thread %2$s from %3$s"
 msgstr "%1$s hat in der Unterhaltung %2$s von %3$s kommentiert"
 
-#: src/Navigation/Notifications/Factory/Notification.php:235
+#: src/Navigation/Notifications/Factory/Notification.php:264
 #, php-format
 msgid "%1$s commented in the thread from %3$s"
 msgstr "%1$s hat in der Unterhaltung von %3$s kommentiert"
 
-#: src/Navigation/Notifications/Factory/Notification.php:240
+#: src/Navigation/Notifications/Factory/Notification.php:269
 #, php-format
 msgid "%1$s commented on your thread %2$s"
 msgstr "%1$s hat in deiner Unterhaltung %2$s kommentiert"
 
-#: src/Navigation/Notifications/Repository/Notify.php:211
-#: src/Navigation/Notifications/Repository/Notify.php:694
+#: src/Navigation/Notifications/Repository/Notify.php:214
+#: src/Navigation/Notifications/Repository/Notify.php:697
 msgid "[Friendica:Notify]"
 msgstr "[Friendica Meldung]"
 
-#: src/Navigation/Notifications/Repository/Notify.php:275
+#: src/Navigation/Notifications/Repository/Notify.php:278
 #, php-format
 msgid "%s New mail received at %s"
 msgstr "%sNeue Nachricht auf %s empfangen"
 
-#: src/Navigation/Notifications/Repository/Notify.php:277
+#: src/Navigation/Notifications/Repository/Notify.php:280
 #, php-format
 msgid "%1$s sent you a new private message at %2$s."
 msgstr "%1$s hat dir eine neue, private Nachricht auf %2$s geschickt."
 
-#: src/Navigation/Notifications/Repository/Notify.php:278
+#: src/Navigation/Notifications/Repository/Notify.php:281
 msgid "a private message"
 msgstr "eine private Nachricht"
 
-#: src/Navigation/Notifications/Repository/Notify.php:278
+#: src/Navigation/Notifications/Repository/Notify.php:281
 #, php-format
 msgid "%1$s sent you %2$s."
 msgstr "%1$s schickte dir %2$s."
 
-#: src/Navigation/Notifications/Repository/Notify.php:280
+#: src/Navigation/Notifications/Repository/Notify.php:283
 #, php-format
 msgid "Please visit %s to view and/or reply to your private messages."
 msgstr "Bitte besuche %s, um Deine privaten Nachrichten anzusehen und/oder zu beantworten."
 
-#: src/Navigation/Notifications/Repository/Notify.php:311
+#: src/Navigation/Notifications/Repository/Notify.php:314
 #, php-format
 msgid "%1$s commented on %2$s's %3$s %4$s"
 msgstr "%1$s kommentierte %2$s's %3$s%4$s"
 
-#: src/Navigation/Notifications/Repository/Notify.php:316
+#: src/Navigation/Notifications/Repository/Notify.php:319
 #, php-format
 msgid "%1$s commented on your %2$s %3$s"
 msgstr "%1$s kommentierte auf  (%2$s) %3$s"
 
-#: src/Navigation/Notifications/Repository/Notify.php:320
+#: src/Navigation/Notifications/Repository/Notify.php:323
 #, php-format
 msgid "%1$s commented on their %2$s %3$s"
 msgstr "%1$s hat den eigenen %2$s %3$s kommentiert"
 
-#: src/Navigation/Notifications/Repository/Notify.php:324
-#: src/Navigation/Notifications/Repository/Notify.php:729
+#: src/Navigation/Notifications/Repository/Notify.php:327
+#: src/Navigation/Notifications/Repository/Notify.php:732
 #, php-format
 msgid "%1$s Comment to conversation #%2$d by %3$s"
 msgstr "%1$sKommentar von %3$s auf Unterhaltung %2$d"
 
-#: src/Navigation/Notifications/Repository/Notify.php:326
+#: src/Navigation/Notifications/Repository/Notify.php:329
 #, php-format
 msgid "%s commented on an item/conversation you have been following."
 msgstr "%s hat einen Beitrag kommentiert, dem du folgst."
 
-#: src/Navigation/Notifications/Repository/Notify.php:330
-#: src/Navigation/Notifications/Repository/Notify.php:345
-#: src/Navigation/Notifications/Repository/Notify.php:364
-#: src/Navigation/Notifications/Repository/Notify.php:744
+#: src/Navigation/Notifications/Repository/Notify.php:333
+#: src/Navigation/Notifications/Repository/Notify.php:348
+#: src/Navigation/Notifications/Repository/Notify.php:367
+#: src/Navigation/Notifications/Repository/Notify.php:747
 #, php-format
 msgid "Please visit %s to view and/or reply to the conversation."
 msgstr "Bitte besuche %s, um die Konversation anzusehen und/oder zu kommentieren."
 
-#: src/Navigation/Notifications/Repository/Notify.php:337
+#: src/Navigation/Notifications/Repository/Notify.php:340
 #, php-format
 msgid "%s %s posted to your profile wall"
 msgstr "%s%s hat auf deine Pinnwand gepostet"
 
-#: src/Navigation/Notifications/Repository/Notify.php:339
+#: src/Navigation/Notifications/Repository/Notify.php:342
 #, php-format
 msgid "%1$s posted to your profile wall at %2$s"
 msgstr "%1$s schrieb um %2$s auf Deine Pinnwand"
 
-#: src/Navigation/Notifications/Repository/Notify.php:340
+#: src/Navigation/Notifications/Repository/Notify.php:343
 #, php-format
 msgid "%1$s posted to [url=%2$s]your wall[/url]"
 msgstr "%1$s hat etwas auf [url=%2$s]Deiner Pinnwand[/url] gepostet"
 
-#: src/Navigation/Notifications/Repository/Notify.php:352
+#: src/Navigation/Notifications/Repository/Notify.php:355
 #, php-format
 msgid "%1$s %2$s poked you"
 msgstr "%1$s%2$shat dich angestubst"
 
-#: src/Navigation/Notifications/Repository/Notify.php:354
+#: src/Navigation/Notifications/Repository/Notify.php:357
 #, php-format
 msgid "%1$s poked you at %2$s"
 msgstr "%1$s hat dich auf %2$s angestupst"
 
-#: src/Navigation/Notifications/Repository/Notify.php:355
+#: src/Navigation/Notifications/Repository/Notify.php:358
 #, php-format
 msgid "%1$s [url=%2$s]poked you[/url]."
 msgstr "%1$s [url=%2$s]hat dich angestupst[/url]."
 
-#: src/Navigation/Notifications/Repository/Notify.php:372
+#: src/Navigation/Notifications/Repository/Notify.php:375
 #, php-format
 msgid "%s Introduction received"
 msgstr "%sVorstellung erhalten"
 
-#: src/Navigation/Notifications/Repository/Notify.php:374
+#: src/Navigation/Notifications/Repository/Notify.php:377
 #, php-format
 msgid "You've received an introduction from '%1$s' at %2$s"
 msgstr "Du hast eine Kontaktanfrage von '%1$s' auf %2$s erhalten"
 
-#: src/Navigation/Notifications/Repository/Notify.php:375
+#: src/Navigation/Notifications/Repository/Notify.php:378
 #, php-format
 msgid "You've received [url=%1$s]an introduction[/url] from %2$s."
 msgstr "Du hast eine [url=%1$s]Kontaktanfrage[/url] von %2$s erhalten."
 
-#: src/Navigation/Notifications/Repository/Notify.php:380
-#: src/Navigation/Notifications/Repository/Notify.php:426
+#: src/Navigation/Notifications/Repository/Notify.php:383
+#: src/Navigation/Notifications/Repository/Notify.php:429
 #, php-format
 msgid "You may visit their profile at %s"
 msgstr "Hier kannst du das Profil betrachten: %s"
 
-#: src/Navigation/Notifications/Repository/Notify.php:382
+#: src/Navigation/Notifications/Repository/Notify.php:385
 #, php-format
 msgid "Please visit %s to approve or reject the introduction."
 msgstr "Bitte besuche %s, um die Kontaktanfrage anzunehmen oder abzulehnen."
 
-#: src/Navigation/Notifications/Repository/Notify.php:389
+#: src/Navigation/Notifications/Repository/Notify.php:392
 #, php-format
 msgid "%s A new person is sharing with you"
 msgstr "%sEine neue Person teilt nun mit dir"
 
-#: src/Navigation/Notifications/Repository/Notify.php:391
-#: src/Navigation/Notifications/Repository/Notify.php:392
+#: src/Navigation/Notifications/Repository/Notify.php:394
+#: src/Navigation/Notifications/Repository/Notify.php:395
 #, php-format
 msgid "%1$s is sharing with you at %2$s"
 msgstr "%1$s teilt mit dir auf %2$s"
 
-#: src/Navigation/Notifications/Repository/Notify.php:399
+#: src/Navigation/Notifications/Repository/Notify.php:402
 #, php-format
 msgid "%s You have a new follower"
 msgstr "%sDu hast einen neuen Kontakt"
 
-#: src/Navigation/Notifications/Repository/Notify.php:401
-#: src/Navigation/Notifications/Repository/Notify.php:402
+#: src/Navigation/Notifications/Repository/Notify.php:404
+#: src/Navigation/Notifications/Repository/Notify.php:405
 #, php-format
 msgid "You have a new follower at %2$s : %1$s"
 msgstr "Du hast einen neuen Kontakt auf %2$s: %1$s"
 
-#: src/Navigation/Notifications/Repository/Notify.php:415
+#: src/Navigation/Notifications/Repository/Notify.php:418
 #, php-format
 msgid "%s Friend suggestion received"
 msgstr "%sKontaktvorschlag erhalten"
 
-#: src/Navigation/Notifications/Repository/Notify.php:417
+#: src/Navigation/Notifications/Repository/Notify.php:420
 #, php-format
 msgid "You've received a friend suggestion from '%1$s' at %2$s"
 msgstr "Du hast einen Kontakt-Vorschlag von '%1$s' auf %2$s erhalten"
 
-#: src/Navigation/Notifications/Repository/Notify.php:418
+#: src/Navigation/Notifications/Repository/Notify.php:421
 #, php-format
 msgid ""
 "You've received [url=%1$s]a friend suggestion[/url] for %2$s from %3$s."
 msgstr "Du hast einen [url=%1$s]Kontakt-Vorschlag[/url] %2$s von %3$s erhalten."
 
-#: src/Navigation/Notifications/Repository/Notify.php:424
+#: src/Navigation/Notifications/Repository/Notify.php:427
 msgid "Name:"
 msgstr "Name:"
 
-#: src/Navigation/Notifications/Repository/Notify.php:425
+#: src/Navigation/Notifications/Repository/Notify.php:428
 msgid "Photo:"
 msgstr "Foto:"
 
-#: src/Navigation/Notifications/Repository/Notify.php:428
+#: src/Navigation/Notifications/Repository/Notify.php:431
 #, php-format
 msgid "Please visit %s to approve or reject the suggestion."
 msgstr "Bitte besuche %s, um den Vorschlag zu akzeptieren oder abzulehnen."
 
-#: src/Navigation/Notifications/Repository/Notify.php:436
-#: src/Navigation/Notifications/Repository/Notify.php:451
+#: src/Navigation/Notifications/Repository/Notify.php:439
+#: src/Navigation/Notifications/Repository/Notify.php:454
 #, php-format
 msgid "%s Connection accepted"
 msgstr "%sKontaktanfrage bestätigt"
 
-#: src/Navigation/Notifications/Repository/Notify.php:438
-#: src/Navigation/Notifications/Repository/Notify.php:453
+#: src/Navigation/Notifications/Repository/Notify.php:441
+#: src/Navigation/Notifications/Repository/Notify.php:456
 #, php-format
 msgid "'%1$s' has accepted your connection request at %2$s"
 msgstr "'%1$s' hat Deine Kontaktanfrage auf  %2$s bestätigt"
 
-#: src/Navigation/Notifications/Repository/Notify.php:439
-#: src/Navigation/Notifications/Repository/Notify.php:454
+#: src/Navigation/Notifications/Repository/Notify.php:442
+#: src/Navigation/Notifications/Repository/Notify.php:457
 #, php-format
 msgid "%2$s has accepted your [url=%1$s]connection request[/url]."
 msgstr "%2$s hat Deine [url=%1$s]Kontaktanfrage[/url] akzeptiert."
 
-#: src/Navigation/Notifications/Repository/Notify.php:444
+#: src/Navigation/Notifications/Repository/Notify.php:447
 msgid ""
 "You are now mutual friends and may exchange status updates, photos, and "
 "email without restriction."
 msgstr "Ihr seid nun beidseitige Kontakte und könnt Statusmitteilungen, Bilder und E-Mails ohne Einschränkungen austauschen."
 
-#: src/Navigation/Notifications/Repository/Notify.php:446
+#: src/Navigation/Notifications/Repository/Notify.php:449
 #, php-format
 msgid "Please visit %s if you wish to make any changes to this relationship."
 msgstr "Bitte besuche %s, wenn du Änderungen an eurer Beziehung vornehmen willst."
 
-#: src/Navigation/Notifications/Repository/Notify.php:459
+#: src/Navigation/Notifications/Repository/Notify.php:462
 #, php-format
 msgid ""
 "'%1$s' has chosen to accept you a fan, which restricts some forms of "
@@ -10394,33 +10394,33 @@ msgid ""
 "automatically."
 msgstr "'%1$s' hat sich entschieden dich als Fan zu akzeptieren, dies schränkt einige Kommunikationswege - wie private Nachrichten und einige Interaktionsmöglichkeiten auf der Profilseite - ein. Wenn dies eine Berühmtheiten- oder Gemeinschaftsseite ist, werden diese Einstellungen automatisch vorgenommen."
 
-#: src/Navigation/Notifications/Repository/Notify.php:461
+#: src/Navigation/Notifications/Repository/Notify.php:464
 #, php-format
 msgid ""
 "'%1$s' may choose to extend this into a two-way or more permissive "
 "relationship in the future."
 msgstr "'%1$s' kann den Kontaktstatus zu einem späteren Zeitpunkt erweitern und diese Einschränkungen aufheben. "
 
-#: src/Navigation/Notifications/Repository/Notify.php:463
+#: src/Navigation/Notifications/Repository/Notify.php:466
 #, php-format
 msgid "Please visit %s  if you wish to make any changes to this relationship."
 msgstr "Bitte besuche %s, wenn du Änderungen an eurer Beziehung vornehmen willst."
 
-#: src/Navigation/Notifications/Repository/Notify.php:473
+#: src/Navigation/Notifications/Repository/Notify.php:476
 msgid "registration request"
 msgstr "Registrierungsanfrage"
 
-#: src/Navigation/Notifications/Repository/Notify.php:475
+#: src/Navigation/Notifications/Repository/Notify.php:478
 #, php-format
 msgid "You've received a registration request from '%1$s' at %2$s"
 msgstr "Du hast eine Registrierungsanfrage von %2$s auf '%1$s' erhalten"
 
-#: src/Navigation/Notifications/Repository/Notify.php:476
+#: src/Navigation/Notifications/Repository/Notify.php:479
 #, php-format
 msgid "You've received a [url=%1$s]registration request[/url] from %2$s."
 msgstr "Du hast eine [url=%1$s]Registrierungsanfrage[/url] von %2$s erhalten."
 
-#: src/Navigation/Notifications/Repository/Notify.php:481
+#: src/Navigation/Notifications/Repository/Notify.php:484
 #, php-format
 msgid ""
 "Full Name:\t%s\n"
@@ -10428,17 +10428,17 @@ msgid ""
 "Login Name:\t%s (%s)"
 msgstr "Kompletter Name: %s\nURL der Seite: %s\nLogin Name: %s(%s)"
 
-#: src/Navigation/Notifications/Repository/Notify.php:487
+#: src/Navigation/Notifications/Repository/Notify.php:490
 #, php-format
 msgid "Please visit %s to approve or reject the request."
 msgstr "Bitte besuche %s, um die Anfrage zu bearbeiten."
 
-#: src/Navigation/Notifications/Repository/Notify.php:723
+#: src/Navigation/Notifications/Repository/Notify.php:726
 #, php-format
 msgid "%s %s tagged you"
 msgstr "%s %s hat dich erwähnt"
 
-#: src/Navigation/Notifications/Repository/Notify.php:726
+#: src/Navigation/Notifications/Repository/Notify.php:729
 #, php-format
 msgid "%s %s shared a new post"
 msgstr "%s%shat einen Beitrag geteilt"

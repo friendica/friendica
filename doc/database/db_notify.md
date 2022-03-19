@@ -1,7 +1,7 @@
 Table notify
 ===========
 
-notifications
+[Deprecated] User notifications
 
 Fields
 ------

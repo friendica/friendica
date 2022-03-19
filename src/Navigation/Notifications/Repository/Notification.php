@@ -24,6 +24,7 @@ namespace Friendica\Navigation\Notifications\Repository;
 use Exception;
 use Friendica\BaseCollection;
 use Friendica\BaseRepository;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Verb;
@@ -41,9 +42,14 @@ class Notification extends BaseRepository
 
 	protected static $table_name = 'notification';
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\Notification $factory = null)
+	/** @var IManagePersonalConfigValues */
+	private $pconfig;
+
+	public function __construct(IManagePersonalConfigValues $pconfig, Database $database, LoggerInterface $logger, Factory\Notification $factory)
 	{
-		parent::__construct($database, $logger, $factory ?? new Factory\Notification($logger));
+		parent::__construct($database, $logger, $factory);
+
+		$this->pconfig = $pconfig;
 	}
 
 	/**
@@ -98,6 +104,74 @@ class Notification extends BaseRepository
 		$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 
 		return $this->select($condition, $params);
+	}
+
+
+	/**
+	 * Returns only the most recent notifications for the same conversation or contact
+	 *
+	 * @param int $uid
+	 * @return Collection\Notifications
+	 * @throws Exception
+	 */
+	public function selectDetailedForUser(int $uid): Collection\Notifications
+	{
+		$condition = [];
+		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
+			$condition = DBA::mergeConditions($condition, ['`vid` != ?', Verb::getID(\Friendica\Protocol\Activity::LIKE)]);
+		}
+
+		if (!$this->pconfig->get($uid, 'system', 'notify_announce')) {
+			$condition = DBA::mergeConditions($condition, ['`vid` != ?', Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE)]);
+		}
+
+		return $this->selectForUser($uid, $condition, ['limit' => 50, 'order' => ['id' => true]]);
+	}
+
+	/**
+	 * Returns only the most recent notifications for the same conversation or contact
+	 *
+	 * @param int $uid
+	 * @return Collection\Notifications
+	 * @throws Exception
+	 */
+	public function selectDigestForUser(int $uid): Collection\Notifications
+	{
+		$values = [$uid];
+
+		$like_condition = '';
+		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
+			$like_condition = 'AND vid != ?';
+			$values[] = Verb::getID(\Friendica\Protocol\Activity::LIKE);
+		}
+
+		$announce_condition = '';
+		if (!$this->pconfig->get($uid, 'system', 'notify_announce')) {
+			$announce_condition = 'AND vid != ?';
+			$values[] = Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE);
+		}
+
+		$rows = $this->db->p("
+		SELECT notification.*
+		FROM notification
+		WHERE id IN (
+		    SELECT MAX(`id`)
+		    FROM notification
+		    WHERE uid = ?
+		    $like_condition
+		    $announce_condition
+		    GROUP BY IFNULL(`parent-uri-id`, `actor-id`)
+		)
+		ORDER BY `seen`, `id` DESC
+		LIMIT 50
+		", ...$values);
+
+		$Entities = new Collection\Notifications();
+		foreach ($rows as $fields) {
+			$Entities[] = $this->factory->createFromTableRow($fields);
+		}
+
+		return $Entities;
 	}
 
 	public function selectAllForUser(int $uid): Collection\Notifications
@@ -164,5 +238,15 @@ class Notification extends BaseRepository
 		}
 
 		return $Notification;
+	}
+
+	public function deleteForUserByVerb(int $uid, string $verb, array $condition = []): bool
+	{
+		$condition['uid'] = $uid;
+		$condition['vid'] = Verb::getID($verb);
+
+		$this->logger->notice('deleteForUserByVerb', ['condition' => $condition]);
+
+		return $this->db->delete(self::$table_name, $condition);
 	}
 }

@@ -24,12 +24,15 @@ namespace Friendica\Navigation\Notifications\Collection;
 use Friendica\BaseCollection;
 use Friendica\Navigation\Notifications\ValueObject;
 
-class FormattedNotifications extends BaseCollection
+/**
+ * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Collection\FormattedNotifications instead
+ */
+class FormattedNotifies extends BaseCollection
 {
 	/**
-	 * @return ValueObject\FormattedNotification
+	 * @return ValueObject\FormattedNotify
 	 */
-	public function current(): ValueObject\FormattedNotification
+	public function current(): ValueObject\FormattedNotify
 	{
 		return parent::current();
 	}

@@ -65,7 +65,3 @@
 	<span id="nav-end"></span>
 	<span id="banner">{{$banner nofilter}}</span>
 </nav>
-
-<ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li class="{4}"><a href="{0}" title="{5}"><img data-src="{1}" height="24" width="24" alt="" />{2} <span class="notif-when">{3}</span></a></li>
-</ul>

@@ -553,7 +553,7 @@ class Processor
 	}
 
 	/**
-	 * Generate a GUID out of an URL
+	 * Generate a GUID out of an URL of an ActivityPub post.
 	 *
 	 * @param string $url message URL
 	 * @return string with GUID

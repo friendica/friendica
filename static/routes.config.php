@@ -449,6 +449,8 @@ return [
 		'/{id:\d+}' => [Module\Notifications\Notification::class, [R::GET, R::POST]],
 	],
 
+	'/notify/{notify_id:\d+}' => [Module\Notifications\Notification::class, [R::GET]],
+
 	'/oauth' => [
 		'/acknowledge' => [Module\OAuth\Acknowledge::class, [R::GET, R::POST]],
 		'/authorize'   => [Module\OAuth\Authorize::class,   [R::GET]],
@@ -487,6 +489,7 @@ return [
 		'/{type}/{customsize:\d+}/{nickname_ext}'                  => [Module\Photo::class, [R::GET]],
 	],
 
+	'/ping'              => [Module\Notifications\Ping::class, [R::GET]],
 	'/pretheme'          => [Module\ThemeDetails::class, [R::GET]],
 	'/probe'             => [Module\Debug\Probe::class,  [R::GET]],
 

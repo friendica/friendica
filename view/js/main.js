@@ -239,7 +239,6 @@ $(function() {
 	});
 
 	/* notifications template */
-	var notifications_tpl= unescape($("#nav-notifications-template[rel=template]").html());
 	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
@@ -315,34 +314,20 @@ $(function() {
 			var notification_id = 0;
 
 			// Insert notifs into the notifications-menu
-			$(data.notifications).each(function(key, notification) {
-				var text = notification.message.format('<span class="contactname">' + notification.name + '</span>');
-				var contact = ('<a href="' + notification.url + '"><span class="contactname">' + notification.name + '</span></a>');
-				var seenclass = (notification.seen == 1) ? "notification-seen" : "notification-unseen";
-				var html = notifications_tpl.format(
-					notification.href,                     // {0}  // link to the source
-					notification.photo,                    // {1}  // photo of the contact
-					text,                           // {2}  // preformatted text (autor + text)
-					notification.date,                     // {3}  // date of notification (time ago)
-					seenclass,                      // {4}  // visited status of the notification
-					new Date(notification.timestamp*1000), // {5}  // date of notification
-					notification.url,                      // {6}  // profile url of the contact
-					notification.message.format(contact),  // {7}  // preformatted html (text including author profile url)
-					''                              // {8}  // Deprecated
-				);
-				nnm.append(html);
+			$(data.notifications).each(function(key, navNotif) {
+				nnm.append(navNotif.html);
 			});
 
 			// Desktop Notifications
-			$(data.notifications.reverse()).each(function(key, e) {
-				notification_id = parseInt(e.timestamp);
-				if (notification_lastitem !== null && notification_id > notification_lastitem && Number(e.seen) === 0) {
+			$(data.notifications.reverse()).each(function(key, navNotif) {
+				notification_id = parseInt(navNotif.timestamp);
+				if (notification_lastitem !== null && notification_id > notification_lastitem && Number(navNotif.seen) === 0) {
 					if (getNotificationPermission() === "granted") {
 						var notification = new Notification(document.title, {
-										  body: decodeHtml(e.message.replace('&rarr; ', '').format(e.name)),
-										  icon: e.photo,
-										});
-						notification['url'] = e.href;
+							body: decodeHtml(navNotif.plaintext),
+							icon: navNotif.contact.photo,
+						});
+						notification['url'] = navNotif.href;
 						notification.addEventListener("click", function(ev) {
 							window.location = ev.target.url;
 						});
@@ -514,7 +499,7 @@ function insertBBCodeInTextarea(BBCode, textarea) {
 
 function NavUpdate() {
 	if (!stopped) {
-		var pingCmd = 'ping?format=json' + ((localUser != 0) ? '&uid=' + localUser : '');
+		var pingCmd = 'ping';
 		$.get(pingCmd, function(data) {
 			if (data.result) {
 				// send nav-update event

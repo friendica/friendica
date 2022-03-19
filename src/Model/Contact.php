@@ -2617,7 +2617,7 @@ class Contact
 			return false;
 		}
 
-		$fields = ['url', 'name', 'nick', 'avatar', 'photo', 'network', 'blocked'];
+		$fields = ['id', 'url', 'name', 'nick', 'avatar', 'photo', 'network', 'blocked'];
 		$pub_contact = DBA::selectFirst('contact', $fields, ['id' => $datarray['author-id']]);
 		if (!DBA::isResult($pub_contact)) {
 			// Should never happen
@@ -2665,7 +2665,7 @@ class Contact
 			// Ensure to always have the correct network type, independent from the connection request method
 			self::updateFromProbe($contact['id']);
 
-			Post\UserNotification::insertNotification($contact['id'], Activity::FOLLOW, $importer['uid']);
+			Post\UserNotification::insertNotification($pub_contact['id'], Activity::FOLLOW, $importer['uid']);
 
 			return true;
 		} else {
@@ -2696,7 +2696,7 @@ class Contact
 
 			self::updateAvatar($contact_id, $photo, true);
 
-			Post\UserNotification::insertNotification($contact_id, Activity::FOLLOW, $importer['uid']);
+			Post\UserNotification::insertNotification($pub_contact['id'], Activity::FOLLOW, $importer['uid']);
 
 			$contact_record = DBA::selectFirst('contact', ['id', 'network', 'name', 'url', 'photo'], ['id' => $contact_id]);
 
@@ -2716,9 +2716,7 @@ class Contact
 
 				Group::addMember(User::getDefaultGroup($importer['uid']), $contact_record['id']);
 
-				if (($user['notify-flags'] & Notification\Type::INTRO) &&
-					in_array($user['page-flags'], [User::PAGE_FLAGS_NORMAL])) {
-
+				if (($user['notify-flags'] & Notification\Type::INTRO) && $user['page-flags'] == User::PAGE_FLAGS_NORMAL) {
 					DI::notify()->createFromArray([
 						'type'  => Notification\Type::INTRO,
 						'otype' => Notification\ObjectType::INTRO,
@@ -2764,6 +2762,10 @@ class Contact
 		} else {
 			DI::logger()->info('Couldn\'t remove follower because of invalid contact array', ['contact' => $contact, 'callstack' => System::callstack()]);
 		}
+
+		$cdata = Contact::getPublicAndUserContactID($contact['id'], $contact['uid']);
+
+		DI::notification()->deleteForUserByVerb($contact['uid'], Activity::FOLLOW, ['actor-id' => $cdata['public']]);
 	}
 
 	/**

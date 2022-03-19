@@ -24,16 +24,35 @@ namespace Friendica\Navigation\Notifications\Factory;
 use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
 use Friendica\Capabilities\ICanCreateFromTableRow;
+use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\L10n;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Navigation\Notifications\Entity;
+use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
+use Psr\Log\LoggerInterface;
 
 class Notification extends BaseFactory implements ICanCreateFromTableRow
 {
+	/** @var BaseURL */
+	private $baseUrl;
+	/** @var L10n */
+	private $l10n;
+	/** @var LocalRelationship */
+	private $localRelationshipRepo;
+
+	public function __construct(\Friendica\App\BaseURL $baseUrl, \Friendica\Core\L10n $l10n, \Friendica\Contact\LocalRelationship\Repository\LocalRelationship $localRelationshipRepo, LoggerInterface $logger)
+	{
+		parent::__construct($logger);
+
+		$this->baseUrl = $baseUrl;
+		$this->l10n = $l10n;
+		$this->localRelationshipRepo = $localRelationshipRepo;
+	}
+
 	public function createFromTableRow(array $row): Entity\Notification
 	{
 		return new Entity\Notification(
@@ -45,7 +64,8 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 			$row['parent-uri-id'],
 			new \DateTime($row['created'], new \DateTimeZone('UTC')),
 			$row['seen'],
-			$row['id']
+			$row['dismissed'],
+			$row['id'],
 		);
 	}
 
@@ -61,6 +81,12 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 		);
 	}
 
+	/**
+	 * @param int    $uid
+	 * @param int    $contactId Public contact id
+	 * @param string $verb
+	 * @return Entity\Notification
+	 */
 	public function createForRelationship(int $uid, int $contactId, string $verb): Entity\Notification
 	{
 		return new Entity\Notification(
@@ -73,12 +99,11 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 	/**
 	 * @param Entity\Notification $Notification
-	 * @param BaseURL             $baseUrl
-	 * @param L10n                $userL10n Seeded with the language of the user we mean the notification for
 	 * @return array
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\NotFoundException
 	 */
-	public function getMessageFromNotification(Entity\Notification $Notification, BaseURL $baseUrl, L10n $userL10n)
+	public function getMessageFromNotification(Entity\Notification $Notification): array
 	{
 		$message = [];
 
@@ -89,23 +114,33 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 		}
 
 		if ($Notification->type === Post\UserNotification::TYPE_NONE) {
-			if ($causer['pending']) {
-				$msg = $userL10n->t('%1$s wants to follow you');
+			$localRelationship = $this->localRelationshipRepo->getForUserContact($Notification->uid, $Notification->actorId);
+			if ($localRelationship->pending) {
+				$msg = $this->l10n->t('%1$s wants to follow you');
 			} else {
-				$msg = $userL10n->t('%1$s had started following you');
+				$msg = $this->l10n->t('%1$s has started following you');
 			}
+
 			$title = $causer['name'];
-			$link  = $baseUrl . '/contact/' . $causer['id'];
+			$link  = $this->baseUrl . '/contact/' . $causer['id'];
 		} else {
 			if (!$Notification->targetUriId) {
 				return $message;
 			}
 
+			if (Post\ThreadUser::getIgnored($Notification->parentUriId, $Notification->uid)) {
+				$this->logger->info('Thread is ignored', ['parent-uri-id' => $Notification->parentUriId, 'type' => $Notification->type]);
+				return $message;
+			}
+	
 			if (in_array($Notification->type, [Post\UserNotification::TYPE_THREAD_COMMENT, Post\UserNotification::TYPE_COMMENT_PARTICIPATION, Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION, Post\UserNotification::TYPE_EXPLICIT_TAGGED])) {
 				$item = Post::selectFirst([], ['uri-id' => $Notification->parentUriId, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
 				if (empty($item)) {
 					$this->logger->info('Parent post not found', ['uri-id' => $Notification->parentUriId]);
 					return $message;
+				}
+				if ($Notification->type == Post\UserNotification::TYPE_COMMENT_PARTICIPATION) {
+					$link_item = Post::selectFirst(['guid'], ['uri-id' => $Notification->targetUriId, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
 				}
 			} else {
 				$item = Post::selectFirst([], ['uri-id' => $Notification->targetUriId, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
@@ -131,7 +166,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 				}
 			}
 
-			$link = $baseUrl . '/display/' . urlencode($item['guid']);
+			$link = $this->baseUrl . '/display/' . urlencode($link_item['guid'] ?? $item['guid']);
 
 			$content = Plaintext::getPost($item, 70);
 			if (!empty($content['text'])) {
@@ -146,40 +181,40 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 				case Activity::LIKE:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_COMMENT:
-							$msg = $userL10n->t('%1$s liked your comment %2$s');
+							$msg = $this->l10n->t('%1$s liked your comment on %2$s');
 							break;
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s liked your post %2$s');
+							$msg = $this->l10n->t('%1$s liked your post %2$s');
 							break;
 					}
 					break;
 				case Activity::DISLIKE:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_COMMENT:
-							$msg = $userL10n->t('%1$s disliked your comment %2$s');
+							$msg = $this->l10n->t('%1$s disliked your comment on %2$s');
 							break;
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s disliked your post %2$s');
+							$msg = $this->l10n->t('%1$s disliked your post %2$s');
 							break;
 					}
 					break;
 				case Activity::ANNOUNCE:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_COMMENT:
-							$msg = $userL10n->t('%1$s shared your comment %2$s');
+							$msg = $this->l10n->t('%1$s shared your comment %2$s');
 							break;
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s shared your post %2$s');
+							$msg = $this->l10n->t('%1$s shared your post %2$s');
 							break;
 						case Post\UserNotification::TYPE_SHARED:
 							if (($causer['id'] != $author['id']) && ($title != '')) {
-								$msg = $userL10n->t('%1$s shared the post %2$s from %3$s');
+								$msg = $this->l10n->t('%1$s shared the post %2$s from %3$s');
 							} elseif ($causer['id'] != $author['id']) {
-								$msg = $userL10n->t('%1$s shared a post from %3$s');
+								$msg = $this->l10n->t('%1$s shared a post from %3$s');
 							} elseif ($title != '') {
-								$msg = $userL10n->t('%1$s shared the post %2$s');
+								$msg = $this->l10n->t('%1$s shared the post %2$s');
 							} else {
-								$msg = $userL10n->t('%1$s shared a post');
+								$msg = $this->l10n->t('%1$s shared a post');
 							}
 							break;
 					}
@@ -187,68 +222,68 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 				case Activity::ATTEND:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s wants to attend your event %2$s');
+							$msg = $this->l10n->t('%1$s wants to attend your event %2$s');
 							break;
 					}
 					break;
 				case Activity::ATTENDNO:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s does not want to attend your event %2$s');
+							$msg = $this->l10n->t('%1$s does not want to attend your event %2$s');
 							break;
 					}
 					break;
 				case Activity::ATTENDMAYBE:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s maybe wants to attend your event %2$s');
+							$msg = $this->l10n->t('%1$s maybe wants to attend your event %2$s');
 							break;
 					}
 					break;
 				case Activity::POST:
 					switch ($Notification->type) {
 						case Post\UserNotification::TYPE_EXPLICIT_TAGGED:
-							$msg = $userL10n->t('%1$s tagged you on %2$s');
+							$msg = $this->l10n->t('%1$s tagged you on %2$s');
 							break;
 
 						case Post\UserNotification::TYPE_IMPLICIT_TAGGED:
-							$msg = $userL10n->t('%1$s replied to you on %2$s');
+							$msg = $this->l10n->t('%1$s replied to you on %2$s');
 							break;
 
 						case Post\UserNotification::TYPE_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s commented in your thread %2$s');
+							$msg = $this->l10n->t('%1$s commented in your thread %2$s');
 							break;
 
 						case Post\UserNotification::TYPE_DIRECT_COMMENT:
-							$msg = $userL10n->t('%1$s commented on your comment %2$s');
+							$msg = $this->l10n->t('%1$s commented on your comment %2$s');
 							break;
 
 						case Post\UserNotification::TYPE_COMMENT_PARTICIPATION:
 						case Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION:
 							if (($causer['id'] == $author['id']) && ($title != '')) {
-								$msg = $userL10n->t('%1$s commented in their thread %2$s');
+								$msg = $this->l10n->t('%1$s commented in their thread %2$s');
 							} elseif ($causer['id'] == $author['id']) {
-								$msg = $userL10n->t('%1$s commented in their thread');
+								$msg = $this->l10n->t('%1$s commented in their thread');
 							} elseif ($title != '') {
-								$msg = $userL10n->t('%1$s commented in the thread %2$s from %3$s');
+								$msg = $this->l10n->t('%1$s commented in the thread %2$s from %3$s');
 							} else {
-								$msg = $userL10n->t('%1$s commented in the thread from %3$s');
+								$msg = $this->l10n->t('%1$s commented in the thread from %3$s');
 							}
 							break;
 
 						case Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
-							$msg = $userL10n->t('%1$s commented on your thread %2$s');
+							$msg = $this->l10n->t('%1$s commented on your thread %2$s');
 							break;
 
 						case Post\UserNotification::TYPE_SHARED:
 							if (($causer['id'] != $author['id']) && ($title != '')) {
-								$msg = $userL10n->t('%1$s shared the post %2$s from %3$s');
+								$msg = $this->l10n->t('%1$s shared the post %2$s from %3$s');
 							} elseif ($causer['id'] != $author['id']) {
-								$msg = $userL10n->t('%1$s shared a post from %3$s');
+								$msg = $this->l10n->t('%1$s shared a post from %3$s');
 							} elseif ($title != '') {
-								$msg = $userL10n->t('%1$s shared the post %2$s');
+								$msg = $this->l10n->t('%1$s shared the post %2$s');
 							} else {
-								$msg = $userL10n->t('%1$s shared a post');
+								$msg = $this->l10n->t('%1$s shared a post');
 							}
 							break;
 					}
@@ -268,6 +303,9 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 				'[url=' . $causer['url'] . ']' . $causer['name'] . '[/url]',
 				'[url=' . $link . ']' . $title . '[/url]',
 				'[url=' . $author['url'] . ']' . $author['name'] . '[/url]');
+			$message['link'] = $link;
+		} else {
+			$this->logger->debug('Unhandled notification', ['notification' => $Notification]);
 		}
 
 		return $message;

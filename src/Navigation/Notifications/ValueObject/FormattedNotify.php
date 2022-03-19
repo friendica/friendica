@@ -25,8 +25,10 @@ use Friendica\BaseDataTransferObject;
 
 /**
  * A view-only object for printing item notifications to the frontend
+ *
+ * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\ValueObject\FormattedNotification instead
  */
-class FormattedNotification extends BaseDataTransferObject
+class FormattedNotify extends BaseDataTransferObject
 {
 	const SYSTEM   = 'system';
 	const PERSONAL = 'personal';

@@ -31,7 +31,7 @@ use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Module\BaseNotifications;
-use Friendica\Navigation\Notifications\Collection\FormattedNotifications;
+use Friendica\Navigation\Notifications\Collection\FormattedNotifies;
 use Friendica\Navigation\Notifications\Repository;
 use Friendica\Navigation\Notifications\ValueObject;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -49,8 +49,10 @@ use Psr\Log\LoggerInterface;
  * - system
  * - home
  * - personal
+ *
+ * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Factory\FormattedNotification instead
  */
-class FormattedNotification extends BaseFactory
+class FormattedNotify extends BaseFactory
 {
 	/** @var Database */
 	private $dba;
@@ -61,12 +63,12 @@ class FormattedNotification extends BaseFactory
 	/** @var L10n */
 	private $l10n;
 
-	public function __construct(LoggerInterface $logger, Database $dba, Repository\Notify $notify, BaseURL $baseUrl, L10n $l10n)
+	public function __construct(LoggerInterface $logger, Database $dba, Repository\Notify $notification, BaseURL $baseUrl, L10n $l10n)
 	{
 		parent::__construct($logger);
 
 		$this->dba     = $dba;
-		$this->notify  = $notify;
+		$this->notify  = $notification;
 		$this->baseUrl = $baseUrl;
 		$this->l10n    = $l10n;
 	}
@@ -74,14 +76,14 @@ class FormattedNotification extends BaseFactory
 	/**
 	 * @param array $formattedItem The return of $this->formatItem
 	 *
-	 * @return ValueObject\FormattedNotification
+	 * @return ValueObject\FormattedNotify
 	 */
-	private function createFromFormattedItem(array $formattedItem): ValueObject\FormattedNotification
+	private function createFromFormattedItem(array $formattedItem): ValueObject\FormattedNotify
 	{
 		// Transform the different types of notification in a usable array
 		switch ($formattedItem['verb'] ?? '') {
 			case Activity::LIKE:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'like',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -93,7 +95,7 @@ class FormattedNotification extends BaseFactory
 				);
 
 			case Activity::DISLIKE:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'dislike',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -105,7 +107,7 @@ class FormattedNotification extends BaseFactory
 				);
 
 			case Activity::ATTEND:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'attend',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -117,7 +119,7 @@ class FormattedNotification extends BaseFactory
 				);
 
 			case Activity::ATTENDNO:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'attendno',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -129,7 +131,7 @@ class FormattedNotification extends BaseFactory
 				);
 
 			case Activity::ATTENDMAYBE:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'attendmaybe',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -142,7 +144,7 @@ class FormattedNotification extends BaseFactory
 
 			case Activity::FRIEND:
 				if (!isset($formattedItem['object'])) {
-					return new ValueObject\FormattedNotification(
+					return new ValueObject\FormattedNotify(
 						'friend',
 						$formattedItem['link'],
 						$formattedItem['image'],
@@ -159,7 +161,7 @@ class FormattedNotification extends BaseFactory
 
 				$formattedItem['fname'] = $obj->title;
 
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					'friend',
 					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
@@ -171,7 +173,7 @@ class FormattedNotification extends BaseFactory
 				);
 
 			default:
-				return new ValueObject\FormattedNotification(
+				return new ValueObject\FormattedNotify(
 					$formattedItem['label'] ?? '',
 					$formattedItem['link'] ?? '',
 					$formattedItem['image'] ?? '',
@@ -192,9 +194,9 @@ class FormattedNotification extends BaseFactory
 	 * @param int  $start         Start the query at this point
 	 * @param int  $limit         Maximum number of query results
 	 *
-	 * @return FormattedNotifications
+	 * @return FormattedNotifies
 	 */
-	public function getSystemList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifications
+	public function getSystemList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifies
 	{
 		$conditions = [];
 		if (!$seen) {
@@ -205,14 +207,14 @@ class FormattedNotification extends BaseFactory
 		$params['order'] = ['date' => 'DESC'];
 		$params['limit'] = [$start, $limit];
 
-		$formattedNotifications = new FormattedNotifications();
+		$formattedNotifications = new FormattedNotifies();
 		try {
 			$Notifies = $this->notify->selectForUser(local_user(), $conditions, $params);
 
 			foreach ($Notifies as $Notify) {
-				$formattedNotifications[] = new ValueObject\FormattedNotification(
+				$formattedNotifications[] = new ValueObject\FormattedNotify(
 					'notification',
-					$this->baseUrl->get(true) . '/notification/' . $Notify->id,
+					$this->baseUrl->get(true) . '/notify/' . $Notify->id,
 					Contact::getAvatarUrlForUrl($Notify->url, $Notify->uid, Proxy::SIZE_MICRO),
 					$Notify->url,
 					strip_tags(BBCode::toPlaintext($Notify->msg)),
@@ -236,9 +238,9 @@ class FormattedNotification extends BaseFactory
 	 * @param int  $start         Start the query at this point
 	 * @param int  $limit         Maximum number of query results
 	 *
-	 * @return FormattedNotifications
+	 * @return FormattedNotifies
 	 */
-	public function getNetworkList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifications
+	public function getNetworkList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifies
 	{
 		$condition = ['wall' => false, 'uid' => local_user()];
 
@@ -250,7 +252,7 @@ class FormattedNotification extends BaseFactory
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid', 'gravity'];
 		$params = ['order' => ['received' => true], 'limit' => [$start, $limit]];
 
-		$formattedNotifications = new FormattedNotifications();
+		$formattedNotifications = new FormattedNotifies();
 
 		try {
 			$userPosts = Post::selectForUser(local_user(), $fields, $condition, $params);
@@ -272,9 +274,9 @@ class FormattedNotification extends BaseFactory
 	 * @param int  $start         Start the query at this point
 	 * @param int  $limit         Maximum number of query results
 	 *
-	 * @return FormattedNotifications
+	 * @return FormattedNotifies
 	 */
-	public function getPersonalList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifications
+	public function getPersonalList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifies
 	{
 		$condition = ['wall' => false, 'uid' => local_user(), 'author-id' => public_contact()];
 
@@ -286,7 +288,7 @@ class FormattedNotification extends BaseFactory
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid', 'gravity'];
 		$params = ['order' => ['received' => true], 'limit' => [$start, $limit]];
 
-		$formattedNotifications = new FormattedNotifications();
+		$formattedNotifications = new FormattedNotifies();
 
 		try {
 			$userPosts = Post::selectForUser(local_user(), $fields, $condition, $params);
@@ -308,9 +310,9 @@ class FormattedNotification extends BaseFactory
 	 * @param int  $start         Start the query at this point
 	 * @param int  $limit         Maximum number of query results
 	 *
-	 * @return FormattedNotifications
+	 * @return FormattedNotifies
 	 */
-	public function getHomeList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifications
+	public function getHomeList(bool $seen = false, int $start = 0, int $limit = BaseNotifications::DEFAULT_PAGE_LIMIT): FormattedNotifies
 	{
 		$condition = ['wall' => true, 'uid' => local_user()];
 
@@ -322,7 +324,7 @@ class FormattedNotification extends BaseFactory
 			'network', 'created', 'object', 'parent-author-name', 'parent-author-link', 'parent-guid', 'gravity'];
 		$params = ['order' => ['received' => true], 'limit' => [$start, $limit]];
 
-		$formattedNotifications = new FormattedNotifications();
+		$formattedNotifications = new FormattedNotifies();
 
 		try {
 			$userPosts = Post::selectForUser(local_user(), $fields, $condition, $params);

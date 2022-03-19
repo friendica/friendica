@@ -461,22 +461,6 @@
 	</div>
 </div>
 
-{{*The second part of the notifications dropdown menu. It handles the notifications *}}
-{{if $nav.notifications}}
-	<ul id="nav-notifications-template" class="media-list" style="display:none;" rel="template">
-		<li class="{4} notif-entry">
-			<div class="notif-entry-wrapper media">
-				<div class="notif-photo-wrapper media-object pull-left" aria-hidden="true"><a href="{6}"
-						class="userinfo click-card" tabIndex="-1"><img data-src="{1}"></a></div>
-				<a href="{0}" class="notif-desc-wrapper media-body">
-					{2}
-					<div><time class="notif-when time" data-toggle="tooltip" title="{5}">{3}</time></div>
-				</a>
-			</div>
-		</li>
-	</ul>
-{{/if}}
-
 {{* This is the mask of the firefox logo. We set the background of #logo-img to the user icon color and apply this mask to it
 The result is a friendica logo in the user icon color.*}}
 <svg id="friendica-logo-mask" x="0px" y="0px" width="0px" height="0px" viewBox="0 0 250 250">

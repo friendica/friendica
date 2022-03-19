@@ -28,7 +28,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Module\BaseNotifications;
 use Friendica\Module\Response;
-use Friendica\Navigation\Notifications\ValueObject\FormattedNotification;
+use Friendica\Navigation\Notifications\ValueObject\FormattedNotify;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -41,14 +41,14 @@ use Psr\Log\LoggerInterface;
  */
 class Notifications extends BaseNotifications
 {
-	/** @var \Friendica\Navigation\Notifications\Factory\FormattedNotification */
-	protected $formattedNotificationFactory;
+	/** @var \Friendica\Navigation\Notifications\Factory\FormattedNotify */
+	protected $formattedNotifyFactory;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, \Friendica\Navigation\Notifications\Factory\FormattedNotification $formattedNotificationFactory, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, \Friendica\Navigation\Notifications\Factory\FormattedNotify $formattedNotifyFactory, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->formattedNotificationFactory = $formattedNotificationFactory;
+		$this->formattedNotifyFactory = $formattedNotifyFactory;
 	}
 
 	/**
@@ -59,30 +59,30 @@ class Notifications extends BaseNotifications
 		$notificationHeader = '';
 		$notifications = [];
 
-		$factory = $this->formattedNotificationFactory;
+		$factory = $this->formattedNotifyFactory;
 
 		if (($this->args->get(1) == 'network')) {
 			$notificationHeader = $this->t('Network Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotification::NETWORK,
+				'ident'        => FormattedNotify::NETWORK,
 				'notifications' => $factory->getNetworkList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'system')) {
 			$notificationHeader = $this->t('System Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotification::SYSTEM,
+				'ident'        => FormattedNotify::SYSTEM,
 				'notifications' => $factory->getSystemList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'personal')) {
 			$notificationHeader = $this->t('Personal Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotification::PERSONAL,
+				'ident'        => FormattedNotify::PERSONAL,
 				'notifications' => $factory->getPersonalList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'home')) {
 			$notificationHeader = $this->t('Home Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotification::HOME,
+				'ident'        => FormattedNotify::HOME,
 				'notifications' => $factory->getHomeList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} else {
@@ -120,7 +120,7 @@ class Notifications extends BaseNotifications
 			];
 			// Loop trough ever notification This creates an array with the output html for each
 			// notification and apply the correct template according to the notificationtype (label).
-			/** @var FormattedNotification $Notification */
+			/** @var FormattedNotify $Notification */
 			foreach ($notifications['notifications'] as $Notification) {
 				$notificationArray = $Notification->toArray();
 

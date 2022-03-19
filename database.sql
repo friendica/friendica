@@ -882,7 +882,7 @@ CREATE TABLE IF NOT EXISTS `notify` (
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`parent-uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='notifications';
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='[Deprecated] User notifications';
 
 --
 -- TABLE notify-threads

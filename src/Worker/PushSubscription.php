@@ -82,7 +82,7 @@ class PushSubscription
 			}
 		}
 
-		$message = DI::notificationFactory()->getMessageFromNotification($Notification, DI::baseUrl(), $l10n);
+		$message = DI::notificationFactory()->getMessageFromNotification($Notification);
 		$title = $message['plain'] ?: '';
 
 		$push = Subscription::create([

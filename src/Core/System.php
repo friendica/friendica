@@ -334,9 +334,10 @@ class System
 	 * and adds an application/json HTTP header to the output.
 	 * After finishing the process is getting killed.
 	 *
-	 * @param mixed   $x The input content.
-	 * @param string  $content_type Type of the input (Default: 'application/json').
-	 * @param integer $options JSON options
+	 * @param mixed   $x            The input content
+	 * @param string  $content_type Type of the input (Default: 'application/json')
+	 * @param integer $options      JSON options
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function jsonExit($x, $content_type = 'application/json', int $options = 0) {
 		DI::apiResponse()->setType(Response::TYPE_JSON, $content_type);

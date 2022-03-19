@@ -236,10 +236,6 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('personal_xrd', $arr);
 
-### mod/ping.php
-
-    Hook::callAll('network_ping', $arr);
-
 ### mod/parse_url.php
 
     Hook::callAll("parse_link", $arr);
@@ -425,6 +421,10 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('storage_instance', $data);
     Hook::callAll('storage_config', $data);
+
+### src/Module/Notifications/Ping.php
+
+    Hook::callAll('network_ping', $arr);
 
 ### src/Module/PermissionTooltip.php
 

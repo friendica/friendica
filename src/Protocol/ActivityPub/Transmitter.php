@@ -529,7 +529,7 @@ class Transmitter
 		$parent = Post::selectFirst(['causer-link', 'post-reason'], ['id' => $item['parent']]);
 		if (($parent['post-reason'] == Item::PR_ANNOUNCEMENT) && !empty($parent['causer-link'])) {
 			$profile = APContact::getByURL($parent['causer-link'], false);
-			$is_forum_thread = ($profile['type'] == 'Group');
+			$is_forum_thread = isset($profile['type']) && $profile['type'] == 'Group';
 		} else {
 			$is_forum_thread = false;
 		}

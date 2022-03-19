@@ -46,6 +46,8 @@ use Psr\Http\Message\UriInterface;
  * @property-read $uriId
  * @property-read $parentUriId
  * @property-read $id
+ *
+ * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Entity\Notification instead
  */
 class Notify extends BaseEntity
 {
@@ -132,16 +134,6 @@ class Notify extends BaseEntity
 	 */
 	public static function formatMessage(string $name, string $message): string
 	{
-		if ($name != '') {
-			$pos = strpos($message, $name);
-		} else {
-			$pos = false;
-		}
-
-		if ($pos !== false) {
-			$message = substr_replace($message, '{0}', $pos, strlen($name));
-		}
-
-		return $message;
+		return str_replace('{0}', '<span class="contactname">' . strip_tags(BBCode::convert($name)) . '</span>', $message);
 	}
 }

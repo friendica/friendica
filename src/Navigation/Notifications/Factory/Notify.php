@@ -26,6 +26,9 @@ use Friendica\Capabilities\ICanCreateFromTableRow;
 use Friendica\Content\Text\BBCode;
 use GuzzleHttp\Psr7\Uri;
 
+/**
+ * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Factory\Notification instead
+ */
 class Notify extends BaseFactory implements ICanCreateFromTableRow
 {
 	public function createFromTableRow(array $row): \Friendica\Navigation\Notifications\Entity\Notify

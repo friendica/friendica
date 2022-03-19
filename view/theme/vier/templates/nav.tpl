@@ -141,17 +141,7 @@
 	</ul>
 
 </nav>
-<ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li class="{4}" onclick="location.href='{0}';">
-		<div class="notif-entry-wrapper">
-			<div class="notif-photo-wrapper"><a href="{6}"><img data-src="{1}"></a></div>
-			<div class="notif-desc-wrapper">
-				{8}{7}
-				<div><time class="notif-when" title="{5}">{3}</time></div>
-			</div>
-		</div>
-	</li>
-</ul>
+
 <!--
 <div class="icon-flag" style="position: fixed; bottom: 10px; left: 20px; z-index:9;">{{$langselector}}</div>
 -->

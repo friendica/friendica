@@ -21,18 +21,45 @@
 
 namespace Friendica\Module\Notifications;
 
+use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Contact\Introduction\Repository\Introduction;
+use Friendica\Core\L10n;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
+use Friendica\Navigation\Notifications\Factory;
+use Friendica\Navigation\Notifications\Repository;
 use Friendica\Network\HTTPException;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
-/**
- * Interacting with the /notification command
- */
 class Notification extends BaseModule
 {
+	/** @var Introduction */
+	private $introductionRepo;
+	/** @var Repository\Notification */
+	private $notificationRepo;
+	/** @var Repository\Notify */
+	private $notifyRepo;
+	/** @var IManagePersonalConfigValues */
+	private $pconfig;
+	/** @var Factory\Notification */
+	private $notificationFactory;
+
+	public function __construct(Introduction $introductionRepo, Repository\Notification $notificationRepo, Factory\Notification $notificationFactory, Repository\Notify $notifyRepo, IManagePersonalConfigValues $pconfig, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	{
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+
+		$this->introductionRepo    = $introductionRepo;
+		$this->notificationRepo    = $notificationRepo;
+		$this->notificationFactory = $notificationFactory;
+		$this->notifyRepo          = $notifyRepo;
+		$this->pconfig             = $pconfig;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -45,26 +72,26 @@ class Notification extends BaseModule
 	protected function post(array $request = [])
 	{
 		if (!local_user()) {
-			throw new HTTPException\UnauthorizedException(DI::l10n()->t('Permission denied.'));
+			throw new HTTPException\UnauthorizedException($this->l10n->t('Permission denied.'));
 		}
 
 		$request_id = $this->parameters['id'] ?? false;
 
 		if ($request_id) {
-			$intro = DI::intro()->selectOneById($request_id, local_user());
+			$intro = $this->introductionRepo->selectOneById($request_id, local_user());
 
 			switch ($_POST['submit']) {
-				case DI::l10n()->t('Discard'):
+				case $this->l10n->t('Discard'):
 					Contact\Introduction::discard($intro);
-					DI::intro()->delete($intro);
+					$this->introductionRepo->delete($intro);
 					break;
-				case DI::l10n()->t('Ignore'):
+				case $this->l10n->t('Ignore'):
 					$intro->ignore();
-					DI::intro()->save($intro);
+					$this->introductionRepo->save($intro);
 					break;
 			}
 
-			DI::baseUrl()->redirect('notifications/intros');
+			$this->baseUrl->redirect('notifications/intros');
 		}
 	}
 
@@ -76,15 +103,15 @@ class Notification extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		if (!local_user()) {
-			throw new HTTPException\UnauthorizedException(DI::l10n()->t('Permission denied.'));
+			throw new HTTPException\UnauthorizedException($this->l10n->t('Permission denied.'));
 		}
 
-		if (DI::args()->get(1) === 'mark' && DI::args()->get(2) === 'all') {
+		if ($this->args->get(1) === 'mark' && $this->args->get(2) === 'all') {
 			try {
-				DI::notification()->setAllSeenForUser(local_user());
-				$success = DI::notify()->setAllSeenForUser(local_user());
+				$this->notificationRepo->setAllSeenForUser(local_user());
+				$success = $this->notifyRepo->setAllSeenForUser(local_user());
 			} catch (\Exception $e) {
-				DI::logger()->warning('set all seen failed.', ['exception' => $e]);
+				$this->logger->warning('set all seen failed.', ['exception' => $e]);
 				$success = false;
 			}
 
@@ -104,38 +131,71 @@ class Notification extends BaseModule
 	protected function content(array $request = []): string
 	{
 		if (!local_user()) {
-			notice(DI::l10n()->t('You must be logged in to show this page.'));
+			notice($this->l10n->t('You must be logged in to show this page.'));
 			return Login::form();
 		}
 
-		$request_id = $this->parameters['id'] ?? false;
-
-		if ($request_id) {
-			$Notify = DI::notify()->selectOneById($request_id);
-			if ($Notify->uid !== local_user()) {
-				throw new HTTPException\ForbiddenException();
-			}
-
-			if (DI::pConfig()->get(local_user(), 'system', 'detailed_notif')) {
-				$Notify->setSeen();
-				DI::notify()->save($Notify);
-			} else {
-				if ($Notify->uriId) {
-					DI::notification()->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
-				}
-
-				DI::notify()->setAllSeenForRelatedNotify($Notify);
-			}
-
-			if ((string)$Notify->link) {
-				System::externalRedirect($Notify->link);
-			}
-
-			DI::baseUrl()->redirect();
+		if (isset($this->parameters['notify_id'])) {
+			$this->handleNotify($this->parameters['notify_id']);
+		} elseif (isset($this->parameters['id'])) {
+			$this->handleNotification($this->parameters['id']);
 		}
 
-		DI::baseUrl()->redirect('notifications/system');
+		$this->baseUrl->redirect('notifications/system');
 
 		return '';
+	}
+
+	private function handleNotify(int $notifyId)
+	{
+		$Notify = $this->notifyRepo->selectOneById($notifyId);
+		if ($Notify->uid !== local_user()) {
+			throw new HTTPException\ForbiddenException();
+		}
+
+		if ($this->pconfig->get(local_user(), 'system', 'detailed_notif')) {
+			$Notify->setSeen();
+			$this->notifyRepo->save($Notify);
+		} else {
+			if ($Notify->uriId) {
+				$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
+			}
+
+			$this->notifyRepo->setAllSeenForRelatedNotify($Notify);
+		}
+
+		if ((string)$Notify->link) {
+			System::externalRedirect($Notify->link);
+		}
+
+		$this->baseUrl->redirect();
+	}
+
+	private function handleNotification(int $notificationId)
+	{
+		$Notification = $this->notificationRepo->selectOneById($notificationId);
+		if ($Notification->uid !== local_user()) {
+			throw new HTTPException\ForbiddenException();
+		}
+
+		if ($this->pconfig->get(local_user(), 'system', 'detailed_notif')) {
+			$Notification->setSeen();
+			$this->notificationRepo->save($Notification);
+		} else {
+			if ($Notification->parentUriId) {
+				$this->notificationRepo->setAllSeenForUser($Notification->uid, ['parent-uri-id' => $Notification->parentUriId]);
+			} else {
+				$Notification->setSeen();
+				$this->notificationRepo->save($Notification);
+			}
+		}
+
+		$message = $this->notificationFactory->getMessageFromNotification($Notification);
+
+		if ($message['link']) {
+			System::externalRedirect($message['link']);
+		}
+
+		$this->baseUrl->redirect();
 	}
 }

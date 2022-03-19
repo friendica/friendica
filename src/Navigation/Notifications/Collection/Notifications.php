@@ -47,4 +47,11 @@ class Notifications extends BaseCollection
 			$Notification->setDismissed();
 		});
 	}
+
+	public function countUnseen(): int
+	{
+		return array_reduce($this->getArrayCopy(), function (int $carry, Entity\Notification $Notification) {
+			return $carry + ($Notification->seen ? 0 : 1);
+		}, 0);
+	}
 }

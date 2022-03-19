@@ -35,8 +35,10 @@ use Friendica\Model\Item;
 use Friendica\Model\Notification;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
+use Friendica\Model\Verb;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
+use Friendica\Protocol\Activity;
 use Friendica\Protocol\Email;
 use Friendica\Util\Temporal;
 use Friendica\Worker\Delivery;
@@ -352,7 +354,18 @@ function settings_post(App $a)
 	DI::pConfig()->set(local_user(), 'expire', 'photos', $expire_photos);
 	DI::pConfig()->set(local_user(), 'expire', 'network_only', $expire_network_only);
 
+	// Reset like notifications when they are going to be shown again
+	if (!DI::pConfig()->get(local_user(), 'system', 'notify_like') && $notify_like) {
+		DI::notification()->setAllSeenForUser(local_user(), ['vid' => Verb::getID(Activity::LIKE)]);
+	}
+
 	DI::pConfig()->set(local_user(), 'system', 'notify_like', $notify_like);
+
+	// Reset share notifications when they are going to be shown again
+	if (!DI::pConfig()->get(local_user(), 'system', 'notify_announce') && $notify_announce) {
+		DI::notification()->setAllSeenForUser(local_user(), ['vid' => Verb::getID(Activity::ANNOUNCE)]);
+	}
+
 	DI::pConfig()->set(local_user(), 'system', 'notify_announce', $notify_announce);
 
 	DI::pConfig()->set(local_user(), 'system', 'email_textonly', $email_textonly);

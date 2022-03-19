@@ -108,8 +108,5 @@
 	</ul>
 
 </nav>
-<ul id="nav-notifications-template" style="display:none;" rel="template">
-	<li class="{4}"><a href="{0}" title="{5}"><img data-src="{1}">{2} <span class="notif-when">{3}</span></a></li>
-</ul>
 
 <div style="position: fixed; top: 3px; left: 5px; z-index:9999">{{$langselector}}</div>

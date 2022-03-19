@@ -168,7 +168,7 @@ class APContact
 
 		// Detect multiple fast repeating request to the same address
 		// See https://github.com/friendica/friendica/issues/9303
-		$cachekey = 'apcontact:getByURL:' . $url;
+		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
 		$result = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
 			Logger::notice('Multiple requests for the address', ['url' => $url, 'update' => $update, 'callstack' => System::callstack(20), 'result' => $result]);

@@ -37,7 +37,7 @@ Database Tables
 | [mailacct](help/database/db_mailacct) | Mail account data for fetching mails |
 | [manage](help/database/db_manage) | table of accounts that can manage each other |
 | [notification](help/database/db_notification) | notifications |
-| [notify](help/database/db_notify) | notifications |
+| [notify](help/database/db_notify) | [Deprecated] User notifications |
 | [notify-threads](help/database/db_notify-threads) |  |
 | [oembed](help/database/db_oembed) | cache for OEmbed queries |
 | [openwebauth-token](help/database/db_openwebauth-token) | Store OpenWebAuth token to verify contacts |

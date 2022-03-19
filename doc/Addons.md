@@ -719,10 +719,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Hook::callAll('personal_xrd', $arr);
 
-### mod/ping.php
-
-    Hook::callAll('network_ping', $arr);
-
 ### mod/parse_url.php
 
     Hook::callAll("parse_link", $arr);
@@ -864,6 +860,10 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
     Hook::callAll('authenticate', $addon_auth);
     Hook::callAll('register_account', $uid);
     Hook::callAll('remove_user', $user);
+
+### src/Module/Notifications/Ping.php
+
+    Hook::callAll('network_ping', $arr);
 
 ### src/Module/PermissionTooltip.php
 

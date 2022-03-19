@@ -904,7 +904,7 @@ return [
 		]
 	],
 	"notify" => [
-		"comment" => "notifications",
+		"comment" => "[Deprecated] User notifications",
 		"fields" => [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"type" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
