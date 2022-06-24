@@ -1357,14 +1357,15 @@ class GServer
 	private static function detectFromContacts(string $url, array $serverdata): array
 	{
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => Strings::normaliseLink($url)]);
-		if (empty($gserver)) {
-			return $serverdata;	
+
+		if (!DBA::isResult($gserver)) {
+			return $serverdata;
 		}
 
 		$contact = Contact::selectFirst(['id'], ['uid' => 0, 'failed' => false, 'gsid' => $gserver['id']]);
 
 		// Via probing we can be sure that the server is responding
-		if (!empty($contact['id']) && Contact::updateFromProbe($contact['id'])) {
+		if (DBA::isResult($contact) && ($contact['id'] > 0) && Contact::updateFromProbe($contact['id'])) {
 			$contact = Contact::selectFirst(['network', 'failed'], ['id' => $contact['id']]);
 			if (!$contact['failed'] && in_array($contact['network'], Protocol::FEDERATED)) {
 				$serverdata['network'] = $contact['network'];
