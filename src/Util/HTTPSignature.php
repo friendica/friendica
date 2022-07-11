@@ -271,10 +271,10 @@ class HTTPSignature
 	 * @param string  $target The URL of the inbox
 	 * @param integer $uid    User id of the sender
 	 *
-	 * @return ICanHandleHttpResponses
+	 * @return ?ICanHandleHttpResponses
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function post(array $data, string $target, int $uid): ICanHandleHttpResponses
+	public static function post(array $data, string $target, int $uid): ?ICanHandleHttpResponses
 	{
 		$owner = User::getOwnerDataById($uid);
 
