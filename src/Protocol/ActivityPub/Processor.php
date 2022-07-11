@@ -291,13 +291,6 @@ class Processor
 		}
 
 		$item['diaspora_signed_text'] = $activity['diaspora:comment'] ?? '';
-
-		/// @todo What to do with $activity['context']?
-		if (empty($activity['directmessage']) && ($item['gravity'] != GRAVITY_PARENT) && !Post::exists(['uri' => $item['thr-parent']])) {
-			Logger::info('Parent not found, message will be discarded.', ['thr-parent' => $item['thr-parent']]);
-			return [];
-		}
-
 		$item['network'] = Protocol::ACTIVITYPUB;
 		$item['author-link'] = $activity['author'];
 		$item['author-id'] = Contact::getIdForURL($activity['author']);

@@ -48,6 +48,11 @@ class FetchQueueItem
 		$this->completion  = $completion;
 	}
 
+	public function getUrl(): string
+	{
+		return $this->url;
+	}
+
 	/**
 	 * Array meant to be used in call_user_function_array([Processor::class, 'fetchMissingActivity']). Caller needs to
 	 * provide an instance of a FetchQueue that isn't included in these parameters.

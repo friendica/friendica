@@ -21,6 +21,8 @@
 
 namespace Friendica\Protocol\ActivityPub;
 
+use Friendica\Model\Post;
+
 /**
  * This class prevents maximum function nesting errors by flattening recursive calls to Processor::fetchMissingActivity
  */
@@ -48,10 +50,17 @@ class FetchQueue
 	 */
 	public function process()
 	{
+		$failedIds = [];
+
 		while (count($this->queue)) {
 			$fetchQueueItem = array_pop($this->queue);
 
-			call_user_func_array([Processor::class, 'fetchMissingActivity'], array_merge([$this], $fetchQueueItem->toParameters()));
+			if (!call_user_func_array([Processor::class, 'fetchMissingActivity'], array_merge([$this], $fetchQueueItem->toParameters()))) {
+				$failedIds[] = $fetchQueueItem->getUrl();
+			}
 		}
+
+		// Removing orphans if fetch failed
+		Post::delete(['thr-parent' => $failedIds]);
 	}
 }
