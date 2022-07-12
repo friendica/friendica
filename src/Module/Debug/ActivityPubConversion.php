@@ -27,6 +27,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\JsonLD;
@@ -123,7 +124,13 @@ class ActivityPubConversion extends BaseModule
 					'content' => visible_whitespace(var_export($object_data, true))
 				];
 
-				$item = ActivityPub\Processor::createItem(new ActivityPub\FetchQueue(), $object_data);
+				$fetchQueue = new ActivityPub\FetchQueue(DI::logger());
+				$fetchQueue->push(new ActivityPub\FetchQueueItem($activity['id']));
+				$item_uri = $fetchQueue->process();
+
+				$item_id = Item::searchByLink($item_uri);
+
+				$item = Post::selectFirst(['guid'], ['id' => $item_id]);
 
 				$results[] = [
 					'title'   => DI::l10n()->t('Result Item'),

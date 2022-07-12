@@ -30,6 +30,13 @@ class FetchQueue
 {
 	/** @var FetchQueueItem[] */
 	protected $queue = [];
+	/** @var \Psr\Log\LoggerInterface */
+	private $logger;
+
+	public function __construct(\Psr\Log\LoggerInterface $logger)
+	{
+		$this->logger = $logger;
+	}
 
 	public function push(FetchQueueItem $item)
 	{
@@ -50,17 +57,31 @@ class FetchQueue
 	 */
 	public function process()
 	{
+		$lastId = null;
 		$failedIds = [];
 
-		while (count($this->queue)) {
-			$fetchQueueItem = array_pop($this->queue);
-
+		// First pass, we fetch the ancestors
+		for ($i = 0; $i < count($this->queue); $i++) {
+			$fetchQueueItem = $this->queue[$i];
 			if (!call_user_func_array([Processor::class, 'fetchMissingActivity'], array_merge([$this], $fetchQueueItem->toParameters()))) {
 				$failedIds[] = $fetchQueueItem->getUrl();
 			}
 		}
 
+		// Second pass for the conversation in reverse order to ensure we have parents starting with the top-level
+		// We use a foreach so that if an activity was missing and the item wasn't created, we don't keep adding
+		// the missing parent to the queue
+		foreach(array_reverse($this->queue) as $fetchQueueItem) {
+			if (!$lastId = call_user_func_array([Processor::class, 'fetchMissingActivity'], array_merge([$this], $fetchQueueItem->toParameters()))) {
+				$failedIds[] = $fetchQueueItem->getUrl();
+			}
+		}
+
+		$this->logger->notice('Deleting orphan items (dry run)', ['thr-parent' => $failedIds]);
 		// Removing orphans if fetch failed
-		Post::delete(['thr-parent' => $failedIds]);
+		//Post::delete(['thr-parent' => $failedIds]);
+
+		// Returns the object id of the first item that was meant to be fetched in the first place
+		return $lastId;
 	}
 }

@@ -23,9 +23,11 @@ namespace Friendica\Protocol;
 
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
+use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub\FetchQueue;
+use Friendica\Protocol\ActivityPub\FetchQueueItem;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 
@@ -224,11 +226,14 @@ class ActivityPub
 			$items = [];
 		}
 
-		$fetchQueue = new FetchQueue();
+		$fetchQueue = new FetchQueue(DI::logger());
 
 		foreach ($items as $activity) {
-			$ldactivity = JsonLD::compact($activity);
-			ActivityPub\Receiver::processActivity($fetchQueue, $ldactivity, '', $uid, true);
+			// This should replace the below commented out code but I'm not sure it can be replaced as is.
+			$fetchQueue->push(new FetchQueueItem($activity['id']));
+
+			//$ldactivity = JsonLD::compact($activity);
+			//ActivityPub\Receiver::processActivity($fetchQueue, $ldactivity, '', $uid, true);
 		}
 
 		$fetchQueue->process();

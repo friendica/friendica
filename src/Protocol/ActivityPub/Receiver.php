@@ -152,8 +152,10 @@ class Receiver
 			$trust_source = false;
 		}
 
-		$fetchQueue = new FetchQueue();
-		self::processActivity($fetchQueue, $ldactivity, $body, $uid, $trust_source, true, $signer);
+		$fetchQueue = new FetchQueue(DI::logger());
+		// This is supposed to replace the below commented out code but I'm not sure we can safely do so
+		$fetchQueue->push(new FetchQueueItem($activity['id']));
+		//self::processActivity($fetchQueue, $ldactivity, $body, $uid, $trust_source, true, $signer);
 		$fetchQueue->process();
 	}
 
@@ -202,15 +204,12 @@ class Receiver
 			return;
 		}
 
-		$fetchQueue = new FetchQueue();
-
-		$id = Processor::fetchMissingActivity($fetchQueue, $object_id, [], $actor, self::COMPLETION_RELAY);
-		if (empty($id)) {
+		$fetchQueue = new FetchQueue(DI::logger());
+		$fetchQueue->push(new FetchQueueItem($object_id, [], $actor, self::COMPLETION_RELAY));
+		if (!$fetchQueue->process()) {
 			Logger::notice('Relayed message had not been fetched', ['id' => $object_id]);
 			return;
 		}
-
-		$fetchQueue->process();
 
 		$item_id = Item::searchByLink($object_id);
 		if ($item_id) {

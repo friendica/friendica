@@ -288,6 +288,10 @@ class Processor
 			 * caller is responsible for processing the remaining queue once the original activity has been processed.
 			 */
 			$fetchQueue->push(new FetchQueueItem($activity['reply-to-id'], $activity));
+
+			// We exit here because we need the parent later, so the item creation would fail anyway. The ancestors will
+			// be processed in FetchQueue->process()
+			return [];
 		}
 
 		$item['diaspora_signed_text'] = $activity['diaspora:comment'] ?? '';
