@@ -50,6 +50,7 @@ class L10n
 		'et'    => 'Eesti',
 		'fi-fi' => 'Suomi',
 		'fr'    => 'Français',
+		'gd'    => 'Gàidhlig',
 		'hu'    => 'Magyar',
 		'is'    => 'Íslenska',
 		'it'    => 'Italiano',
