@@ -311,7 +311,7 @@ class Temporal
 	 *
 	 * @return string with relative date
 	 */
-	public static function getRelativeDate(string $posted_date, string $format = null): string
+	public static function getRelativeDate(string $posted_date = null, string $format = null): string
 	{
 		$localtime = $posted_date . ' UTC';
 
