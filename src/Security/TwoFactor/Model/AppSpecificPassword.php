@@ -86,7 +86,7 @@ class AppSpecificPassword
 		$appSpecificPasswords = DBA::toArray($appSpecificPasswordsStmt);
 
 		array_walk($appSpecificPasswords, function (&$value) {
-			$value['ago']   = Temporal::getRelativeDate($value['last_used']);
+			$value['ago']   = Temporal::getRelativeDate($value['last_used'] ?? '');
 			$value['utc']   = $value['last_used'] ? DateTimeFormat::utc($value['last_used'], 'c') : '';
 			$value['local'] = $value['last_used'] ? DateTimeFormat::local($value['last_used'], 'r') : '';
 		});
