@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Contact\FriendSuggest\Factory;
+namespace Friendica\Test\src\Library\Contact\FriendSuggest\Factory;
 
 use Friendica\Library\Contact\FriendSuggest\Factory\FriendSuggest;
 use Friendica\Library\Contact\FriendSuggest\Entity;

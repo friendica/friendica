@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Security\TwoFactor\Model;
+namespace Friendica\Test\src\Library\Security\TwoFactor\Model;
 
 use Friendica\Library\Security\TwoFactor\Entity\TrustedBrowser;
 use Friendica\Test\MockedTest;

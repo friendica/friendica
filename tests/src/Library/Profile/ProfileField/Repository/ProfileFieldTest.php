@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Profile\ProfileField\Repository;
+namespace Friendica\Test\src\Library\Profile\ProfileField\Repository;
 
 use Friendica\Library\Profile\ProfileField\Collection\ProfileFields;
 use Friendica\Library\Profile\ProfileField\Repository\ProfileField as ProfileFieldRepository;

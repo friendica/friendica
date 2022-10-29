@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Network\HTTPClient\Response;
+namespace Friendica\Test\src\Library\Network\HTTPClient\Response;
 
 use Dice\Dice;
 use Friendica\DI;

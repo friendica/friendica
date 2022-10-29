@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Security\PermissionSet\Repository;
+namespace Friendica\Test\src\Library\Security\PermissionSet\Repository;
 
 use Friendica\Database\Database;
 use Friendica\Library\Security\PermissionSet\Collection\PermissionSets;
@@ -29,6 +29,7 @@ use Friendica\Library\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Library\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
 use Friendica\Test\FixtureTest;
 use Friendica\DI;
+use const Friendica\Test\src\Security\PermissionSet\Repository\PHP_EOL;
 
 class PermissionSetTest extends FixtureTest
 {

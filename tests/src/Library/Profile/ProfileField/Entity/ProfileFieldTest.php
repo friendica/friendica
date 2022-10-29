@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Profile\ProfileField\Entity;
+namespace Friendica\Test\src\Library\Profile\ProfileField\Entity;
 
 use Friendica\Library\Profile\ProfileField\Entity\ProfileField;
 use Friendica\Library\Profile\ProfileField\Exception\ProfileFieldNotFoundException;

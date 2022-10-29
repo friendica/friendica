@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Contact\Introduction\Factory;
+namespace Friendica\Test\src\Library\Contact\Introduction\Factory;
 
 use Friendica\Library\Contact\Introduction\Factory\Introduction;
 use PHPUnit\Framework\TestCase;

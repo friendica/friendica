@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Security\PermissionSet\Entity;
+namespace Friendica\Test\src\Library\Security\PermissionSet\Entity;
 
 use Friendica\Library\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Test\MockedTest;

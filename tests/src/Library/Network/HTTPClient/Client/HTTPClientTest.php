@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Network\HTTPClient\Client;
+namespace Friendica\Test\src\Library\Network\HTTPClient\Client;
 
 use Friendica\DI;
 use Friendica\Test\DiceHttpMockHandlerTrait;

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Test\src\Security\PermissionSet\Factory;
+namespace Friendica\Test\src\Library\Security\PermissionSet\Factory;
 
 use Friendica\Library\Security\PermissionSet\Factory\PermissionSet;
 use Friendica\Test\MockedTest;
