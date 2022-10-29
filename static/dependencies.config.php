@@ -239,13 +239,13 @@ return [
 			['getBackend', [], Dice::CHAIN_CALL],
 		],
 	],
-	Network\HTTPClient\Capability\ICanSendHttpRequests::class => [
-		'instanceOf' => Network\HTTPClient\Factory\HttpClient::class,
+	\Friendica\Library\Network\HTTPClient\Capability\ICanSendHttpRequests::class => [
+		'instanceOf' => \Friendica\Library\Network\HTTPClient\Factory\HttpClient::class,
 		'call'       => [
 			['createClient', [], Dice::CHAIN_CALL],
 		],
 	],
-	Factory\Api\Mastodon\Error::class => [
+	\Friendica\Library\Api\Mastodon\Factory\Error::class => [
 		'constructParams' => [
 			$_SERVER
 		],

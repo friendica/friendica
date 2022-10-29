@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\Util;
 
-use Friendica\BaseEntity;
+use Friendica\Library\BaseEntity;
 
 /**
  * @property-read string $protString

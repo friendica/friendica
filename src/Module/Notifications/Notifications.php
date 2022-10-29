@@ -29,7 +29,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\BaseNotifications;
 use Friendica\Module\Response;
-use Friendica\Navigation\Notifications\ValueObject\FormattedNotify;
+use Friendica\Library\Navigation\Notifications\ValueObject\FormattedNotify;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -42,10 +42,10 @@ use Psr\Log\LoggerInterface;
  */
 class Notifications extends BaseNotifications
 {
-	/** @var \Friendica\Navigation\Notifications\Factory\FormattedNotify */
+	/** @var \Friendica\Library\Navigation\Notifications\Factory\FormattedNotify */
 	protected $formattedNotifyFactory;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, \Friendica\Navigation\Notifications\Factory\FormattedNotify $formattedNotifyFactory, IHandleUserSessions $userSession, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, \Friendica\Library\Navigation\Notifications\Factory\FormattedNotify $formattedNotifyFactory, IHandleUserSessions $userSession, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $userSession, $server, $parameters);
 

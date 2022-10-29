@@ -96,7 +96,7 @@ class Token extends BaseApi
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Unsupported or missing grant type'));
 		}
 
-		$object = new \Friendica\Object\Api\Mastodon\Token($token['access_token'], 'Bearer', $application['scopes'], $token['created_at']);
+		$object = new \Friendica\Library\Api\Mastodon\Object\Token($token['access_token'], 'Bearer', $application['scopes'], $token['created_at']);
 
 		System::jsonExit($object->toArray());
 	}

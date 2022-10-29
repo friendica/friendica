@@ -23,7 +23,7 @@ namespace Friendica\Test\src\Network\HTTPClient\Response;
 
 use Dice\Dice;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Response\CurlResult;
+use Friendica\Library\Network\HTTPClient\Response\CurlResult;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -57,7 +57,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -85,7 +85,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
 			'http_code' => 301,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it',
@@ -112,7 +112,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
 			'http_code' => 500,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it',
@@ -141,7 +141,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new CurlResult('https://test.local/test/it?key=value', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local/test/it?key=value', $header . $body, [
 			'http_code' => 301,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it?key=value',
@@ -165,7 +165,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -182,7 +182,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -202,7 +202,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Library\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'

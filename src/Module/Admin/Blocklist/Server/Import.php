@@ -24,9 +24,9 @@ namespace Friendica\Module\Admin\Blocklist\Server;
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Moderation\DomainPatternBlocklist;
+use Friendica\Library\Moderation\DomainPatternBlocklist;
 use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
+use Friendica\Library\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

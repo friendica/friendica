@@ -31,7 +31,7 @@ use Friendica\Core\Storage\Exception\InvalidClassStorageException;
 use Friendica\Core\Storage\Exception\ReferenceStorageException;
 use Friendica\Core\Storage\Exception\StorageException;
 use Friendica\Core\Storage\Type\SystemResource;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;

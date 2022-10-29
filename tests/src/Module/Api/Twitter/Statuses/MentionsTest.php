@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Module\Api\Twitter\Statuses;
 
 use Friendica\App\Router;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Statuses\Mentions;
 use Friendica\Test\src\Module\Api\ApiTest;

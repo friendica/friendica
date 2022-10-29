@@ -21,8 +21,8 @@
 
 namespace Friendica\Test\src\Contact\FriendSuggest\Factory;
 
-use Friendica\Contact\FriendSuggest\Factory\FriendSuggest;
-use Friendica\Contact\FriendSuggest\Entity;
+use Friendica\Library\Contact\FriendSuggest\Factory\FriendSuggest;
+use Friendica\Library\Contact\FriendSuggest\Entity;
 use Friendica\Test\MockedTest;
 use Psr\Log\NullLogger;
 

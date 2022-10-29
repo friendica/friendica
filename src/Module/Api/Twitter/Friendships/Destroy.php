@@ -25,7 +25,7 @@ use Exception;
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
-use Friendica\Factory\Api\Twitter\User as TwitterUser;
+use Friendica\Library\Api\Twitter\Factory\User as TwitterUser;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Api\ApiResponse;

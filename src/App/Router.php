@@ -26,7 +26,7 @@ use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Friendica\Capabilities\ICanHandleRequests;
+use Friendica\Module\Capabilities\ICanHandleRequests;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;

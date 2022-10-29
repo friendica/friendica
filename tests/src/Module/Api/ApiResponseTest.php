@@ -24,7 +24,7 @@ namespace Friendica\Test\src\Module\Api;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\Core\L10n;
-use Friendica\Factory\Api\Twitter\User;
+use Friendica\Library\Api\Twitter\Factory\User;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Test\MockedTest;
 use Psr\Log\NullLogger;
@@ -290,7 +290,7 @@ class ApiResponseTest extends MockedTest
 
 		/*
 		$user_info = ['url' => 'user_url', 'lang' => 'en'];
-		$userMock = \Mockery::mock(\Friendica\Object\Api\Twitter\User::class);
+		$userMock = \Mockery::mock(\Friendica\Library\Api\Twitter\Object\User::class);
 		$userMock->shouldReceive('toArray')->andReturn($user_info);
 
 		$l10n = \Mockery::mock(L10n::class);

@@ -29,9 +29,9 @@ use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientOptions;
 
 /**
  * Get information about a given URL

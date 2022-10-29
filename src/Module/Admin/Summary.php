@@ -33,7 +33,7 @@ use Friendica\DI;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Model\Register;
 use Friendica\Module\BaseAdmin;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;

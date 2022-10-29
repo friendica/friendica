@@ -23,8 +23,8 @@ namespace Friendica\Test;
 
 use Dice\Dice;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Factory\HttpClient;
-use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
+use Friendica\Library\Network\HTTPClient\Factory\HttpClient;
+use Friendica\Library\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use GuzzleHttp\HandlerStack;
 
 /**

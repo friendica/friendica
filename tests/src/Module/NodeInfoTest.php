@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Module;
 
 use Friendica\App;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\NodeInfo110;
 use Friendica\Module\NodeInfo120;

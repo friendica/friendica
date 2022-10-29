@@ -26,8 +26,8 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Util\Strings;
 
 function redir_init(App $a) {

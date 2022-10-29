@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Module\Api;
 
 use Friendica\App;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Database\Database;

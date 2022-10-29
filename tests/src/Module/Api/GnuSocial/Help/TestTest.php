@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Module\Api\GnuSocial\Help;
 
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\GNUSocial\Help\Test;
 use Friendica\Test\src\Module\Api\ApiTest;

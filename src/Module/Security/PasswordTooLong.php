@@ -28,7 +28,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
 use Friendica\Model\User;
 use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
+use Friendica\Library\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

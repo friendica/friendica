@@ -45,7 +45,7 @@ class Trends extends BaseApi
 		foreach ($tags as $tag) {
 			$tag['name'] = $tag['term'];
 			$history = [['day' => (string)time(), 'uses' => (string)$tag['score'], 'accounts' => (string)$tag['authors']]];
-			$hashtag = new \Friendica\Object\Api\Mastodon\Tag(DI::baseUrl(), $tag, $history);
+			$hashtag = new \Friendica\Library\Api\Mastodon\Object\Tag(DI::baseUrl(), $tag, $history);
 			$trending[] = $hashtag->toArray();
 		}
 

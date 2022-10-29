@@ -40,7 +40,7 @@ use Friendica\Model\ItemURI;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;

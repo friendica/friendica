@@ -21,7 +21,7 @@
 
 namespace Friendica\Core\Worker\Repository;
 
-use Friendica\BaseRepository;
+use Friendica\Library\BaseRepository;
 use Friendica\Core\Worker\Exception\ProcessPersistenceException;
 use Friendica\Database\Database;
 use Friendica\Util\DateTimeFormat;

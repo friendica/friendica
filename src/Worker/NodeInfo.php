@@ -24,7 +24,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Nodeinfo as ModelNodeInfo;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 
 class NodeInfo
 {

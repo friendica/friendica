@@ -27,7 +27,7 @@ use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Object\Image;
-use Friendica\Security\PermissionSet\Repository\PermissionSet;
+use Friendica\Library\Security\PermissionSet\Repository\PermissionSet;
 use Friendica\Util\Strings;
 use Friendica\Worker\Delivery;
 

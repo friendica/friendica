@@ -44,12 +44,12 @@ class FriendSuggest extends BaseModule
 {
 	/** @var Database */
 	protected $dba;
-	/** @var \Friendica\Contact\FriendSuggest\Repository\FriendSuggest */
+	/** @var \Friendica\Library\Contact\FriendSuggest\Repository\FriendSuggest */
 	protected $friendSuggestRepo;
-	/** @var \Friendica\Contact\FriendSuggest\Factory\FriendSuggest */
+	/** @var \Friendica\Library\Contact\FriendSuggest\Factory\FriendSuggest */
 	protected $friendSuggestFac;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Database $dba, \Friendica\Contact\FriendSuggest\Repository\FriendSuggest $friendSuggestRepo, \Friendica\Contact\FriendSuggest\Factory\FriendSuggest $friendSuggestFac, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Database $dba, \Friendica\Library\Contact\FriendSuggest\Repository\FriendSuggest $friendSuggestRepo, \Friendica\Library\Contact\FriendSuggest\Factory\FriendSuggest $friendSuggestFac, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 

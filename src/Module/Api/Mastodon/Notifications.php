@@ -28,8 +28,8 @@ use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Module\BaseApi;
-use Friendica\Navigation\Notifications\Entity;
-use Friendica\Object\Api\Mastodon\Notification;
+use Friendica\Library\Navigation\Notifications\Entity;
+use Friendica\Library\Api\Mastodon\Object\Notification;
 use Friendica\Protocol\Activity;
 
 /**

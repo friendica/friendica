@@ -29,7 +29,7 @@ use Friendica\Util\Arrays;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\XML;
 use Psr\Log\LoggerInterface;
-use Friendica\Factory\Api\Twitter\User as TwitterUser;
+use Friendica\Library\Api\Twitter\Factory\User as TwitterUser;
 
 /**
  * This class is used to format and create API responses

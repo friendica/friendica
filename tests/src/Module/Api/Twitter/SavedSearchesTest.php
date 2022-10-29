@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Module\Api\Twitter;
 
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\SavedSearches;
 use Friendica\Test\src\Module\Api\ApiTest;

@@ -21,8 +21,8 @@
 
 namespace Friendica\Core\Worker\Factory;
 
-use Friendica\BaseFactory;
-use Friendica\Capabilities\ICanCreateFromTableRow;
+use Friendica\Library\BaseFactory;
+use Friendica\Library\Capabilities\ICanCreateFromTableRow;
 use Friendica\Core\Worker\Entity;
 
 class Process extends BaseFactory implements ICanCreateFromTableRow

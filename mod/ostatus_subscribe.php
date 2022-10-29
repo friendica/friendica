@@ -24,7 +24,7 @@ use Friendica\Core\Protocol;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Protocol\ActivityPub;
 
 function ostatus_subscribe_content(App $a): string

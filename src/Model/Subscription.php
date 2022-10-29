@@ -25,9 +25,9 @@ use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
-use Friendica\Navigation\Notifications\Entity;
-use Friendica\Object\Api\Mastodon\Notification;
+use Friendica\Library\Api\Mastodon\Factory\Notification as NotificationFactory;
+use Friendica\Library\Navigation\Notifications\Entity;
+use Friendica\Library\Api\Mastodon\Object\Notification;
 use Minishlink\WebPush\VAPID;
 
 class Subscription

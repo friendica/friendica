@@ -23,7 +23,7 @@ namespace Friendica\Module\Api\Friendica;
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Factory\Api\Friendica\Photo as FriendicaPhoto;
+use Friendica\Library\Api\Friendica\Factory\Photo as FriendicaPhoto;
 use Friendica\Module\BaseApi;
 use Friendica\Model\Contact;
 use Friendica\Module\Api\ApiResponse;

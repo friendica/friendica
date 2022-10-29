@@ -21,7 +21,7 @@
 
 namespace Friendica\Module\Api\Friendica\Profile;
 
-use Friendica\Profile\ProfileField\Collection\ProfileFields;
+use Friendica\Library\Profile\ProfileField\Collection\ProfileFields;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Search;
 use Friendica\DI;

@@ -24,7 +24,7 @@ namespace Friendica\Module\Api\Twitter\DirectMessages;
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
-use Friendica\Factory\Api\Twitter\DirectMessage;
+use Friendica\Library\Api\Twitter\Factory\DirectMessage;
 use Friendica\Model\Contact;
 use Friendica\Model\Mail;
 use Friendica\Module\Api\ApiResponse;

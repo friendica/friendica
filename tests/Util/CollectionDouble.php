@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\Util;
 
-use Friendica\BaseCollection;
+use Friendica\Library\BaseCollection;
 
 class CollectionDouble extends BaseCollection
 {

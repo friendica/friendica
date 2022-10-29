@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Security\TwoFactor\Model;
 
-use Friendica\Security\TwoFactor\Model\TrustedBrowser;
+use Friendica\Library\Security\TwoFactor\Entity\TrustedBrowser;
 use Friendica\Test\MockedTest;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;

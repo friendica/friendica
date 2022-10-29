@@ -34,10 +34,10 @@ use Friendica\Network\HTTPException\FoundException;
 use Friendica\Network\HTTPException\MovedPermanentlyException;
 use Friendica\Network\HTTPException\TemporaryRedirectException;
 use Friendica\Security\Authentication;
-use Friendica\Security\TwoFactor\Exception\TrustedBrowserNotFoundException;
-use Friendica\Security\TwoFactor\Exception\TrustedBrowserPersistenceException;
+use Friendica\Library\Security\TwoFactor\Exception\TrustedBrowserNotFoundException;
+use Friendica\Library\Security\TwoFactor\Exception\TrustedBrowserPersistenceException;
 use Friendica\Util\Profiler;
-use Friendica\Security\TwoFactor;
+use Friendica\Library\Security\TwoFactor;
 use Psr\Log\LoggerInterface;
 
 /**

@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Module\Special;
 
 use Friendica\App\Router;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Special\Options;
 use Friendica\Test\FixtureTest;

@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Factory\Api\Twitter;
 
 use Friendica\DI;
-use Friendica\Factory\Api\Twitter\User;
+use Friendica\Library\Api\Twitter\Factory\User;
 use Friendica\Test\FixtureTest;
 use Friendica\Test\src\Module\Api\ApiTest;
 

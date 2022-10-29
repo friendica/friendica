@@ -30,7 +30,7 @@ use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Security\Authentication;
-use Friendica\Security\TwoFactor\Model\RecoveryCode;
+use Friendica\Library\Security\TwoFactor\Model\RecoveryCode;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

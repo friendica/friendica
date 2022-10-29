@@ -30,7 +30,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
-use Friendica\Navigation\Notifications\ValueObject\FormattedNotify;
+use Friendica\Library\Navigation\Notifications\ValueObject\FormattedNotify;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;

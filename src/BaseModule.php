@@ -22,8 +22,8 @@
 namespace Friendica;
 
 use Friendica\App\Router;
-use Friendica\Capabilities\ICanHandleRequests;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanHandleRequests;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;

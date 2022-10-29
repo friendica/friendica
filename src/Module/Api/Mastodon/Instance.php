@@ -28,7 +28,7 @@ use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
-use Friendica\Object\Api\Mastodon\Instance as InstanceEntity;
+use Friendica\Library\Api\Mastodon\Object\Instance as InstanceEntity;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

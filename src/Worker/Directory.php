@@ -27,7 +27,7 @@ use Friendica\Core\Search;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 
 /**
  * Sends updated profile data to the directory

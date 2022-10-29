@@ -23,7 +23,7 @@ namespace Friendica\Module\Contact;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
+use Friendica\Library\Contact\LocalRelationship\Repository\LocalRelationship;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;

@@ -23,7 +23,7 @@ namespace Friendica\Protocol;
 
 use Friendica\Core\Logger;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\Strings;

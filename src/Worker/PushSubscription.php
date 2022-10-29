@@ -26,7 +26,7 @@ use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
+use Friendica\Library\Api\Mastodon\Factory\Notification as NotificationFactory;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\Subscription as ModelSubscription;

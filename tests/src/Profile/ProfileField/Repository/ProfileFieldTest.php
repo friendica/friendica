@@ -21,13 +21,13 @@
 
 namespace Friendica\Test\src\Profile\ProfileField\Repository;
 
-use Friendica\Profile\ProfileField\Collection\ProfileFields;
-use Friendica\Profile\ProfileField\Repository\ProfileField as ProfileFieldRepository;
-use Friendica\Profile\ProfileField\Exception\ProfileFieldPersistenceException;
-use Friendica\Profile\ProfileField\Factory\ProfileField as ProfileFieldFactory;
-use Friendica\Security\PermissionSet\Repository\PermissionSet;
-use Friendica\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
-use Friendica\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
+use Friendica\Library\Profile\ProfileField\Collection\ProfileFields;
+use Friendica\Library\Profile\ProfileField\Repository\ProfileField as ProfileFieldRepository;
+use Friendica\Library\Profile\ProfileField\Exception\ProfileFieldPersistenceException;
+use Friendica\Library\Profile\ProfileField\Factory\ProfileField as ProfileFieldFactory;
+use Friendica\Library\Security\PermissionSet\Repository\PermissionSet;
+use Friendica\Library\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
+use Friendica\Library\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
 use Friendica\Test\FixtureTest;
 use Friendica\DI;
 

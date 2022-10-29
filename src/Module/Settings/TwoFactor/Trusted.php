@@ -28,7 +28,7 @@ use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
-use Friendica\Security\TwoFactor;
+use Friendica\Library\Security\TwoFactor;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
@@ -106,7 +106,7 @@ class Trusted extends BaseSettings
 
 		$parser = Parser::create();
 
-		$trustedBrowserDisplay = array_map(function (TwoFactor\Model\TrustedBrowser $trustedBrowser) use ($parser) {
+		$trustedBrowserDisplay = array_map(function (TwoFactor\Entity\TrustedBrowser $trustedBrowser) use ($parser) {
 			$dates = [
 				'created_ago'     => Temporal::getRelativeDate($trustedBrowser->created),
 				'created_utc'     => DateTimeFormat::utc($trustedBrowser->created, 'c'),

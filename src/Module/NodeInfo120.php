@@ -23,7 +23,7 @@ namespace Friendica\Module;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;

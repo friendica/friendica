@@ -22,7 +22,7 @@
 namespace Friendica\Core\Worker\Entity;
 
 use DateTime;
-use Friendica\BaseEntity;
+use Friendica\Library\BaseEntity;
 
 /**
  * @property-read int $pid

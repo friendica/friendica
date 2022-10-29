@@ -24,7 +24,7 @@ namespace Friendica\Console;
 use Asika\SimpleConsole\CommandArgsException;
 use Asika\SimpleConsole\Console;
 use Console_Table;
-use Friendica\Moderation\DomainPatternBlocklist;
+use Friendica\Library\Moderation\DomainPatternBlocklist;
 
 /**
  * Manage blocked servers

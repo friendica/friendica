@@ -25,7 +25,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Factory\Api\Twitter\DirectMessage;
+use Friendica\Library\Api\Twitter\Factory\DirectMessage;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
 use Friendica\Util\Profiler;

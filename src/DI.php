@@ -24,7 +24,7 @@ namespace Friendica;
 use Dice\Dice;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Navigation\SystemMessages;
+use Friendica\Library\Navigation\SystemMessages;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -240,7 +240,7 @@ abstract class DI
 	}
 
 	/**
-	 * @return \Friendica\Navigation\SystemMessages
+	 * @return \Friendica\Library\Navigation\SystemMessages
 	 */
 	public static function sysmsg()
 	{
@@ -292,144 +292,144 @@ abstract class DI
 	//
 
 	/**
-	 * @return Factory\Api\Mastodon\Account
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Account
 	 */
 	public static function mstdnAccount()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Account::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Account::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Application
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Application
 	 */
 	public static function mstdnApplication()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Application::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Application::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Attachment
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Attachment
 	 */
 	public static function mstdnAttachment()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Attachment::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Attachment::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Card
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Card
 	 */
 	public static function mstdnCard()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Card::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Card::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Conversation
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Conversation
 	 */
 	public static function mstdnConversation()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Conversation::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Conversation::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Emoji
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Emoji
 	 */
 	public static function mstdnEmoji()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Emoji::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Emoji::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Error
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Error
 	 */
 	public static function mstdnError()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Error::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Error::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\FollowRequest
+	 * @return \Friendica\Library\Api\Mastodon\Factory\FollowRequest
 	 */
 	public static function mstdnFollowRequest()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\FollowRequest::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\FollowRequest::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Poll
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Poll
 	 */
 	public static function mstdnPoll()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Poll::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Poll::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Relationship
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Relationship
 	 */
 	public static function mstdnRelationship()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Relationship::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Relationship::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Status
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Status
 	 */
 	public static function mstdnStatus()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Status::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Status::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\ScheduledStatus
+	 * @return \Friendica\Library\Api\Mastodon\Factory\ScheduledStatus
 	 */
 	public static function mstdnScheduledStatus()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\ScheduledStatus::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\ScheduledStatus::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Subscription
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Subscription
 	 */
 	public static function mstdnSubscription()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Subscription::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Subscription::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\ListEntity
+	 * @return \Friendica\Library\Api\Mastodon\Factory\ListEntity
 	 */
 	public static function mstdnList()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\ListEntity::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\ListEntity::class);
 	}
 
 	/**
-	 * @return Factory\Api\Mastodon\Notification
+	 * @return \Friendica\Library\Api\Mastodon\Factory\Notification
 	 */
 	public static function mstdnNotification()
 	{
-		return self::$dice->create(Factory\Api\Mastodon\Notification::class);
+		return self::$dice->create(Library\Api\Mastodon\Factory\Notification::class);
 	}
 
 	/**
-	 * @return Factory\Api\Twitter\Status
+	 * @return \Friendica\Library\Api\Twitter\Factory\Status
 	 */
 	public static function twitterStatus()
 	{
-		return self::$dice->create(Factory\Api\Twitter\Status::class);
+		return self::$dice->create(Library\Api\Twitter\Factory\Status::class);
 	}
 
 	/**
-	 * @return Factory\Api\Twitter\User
+	 * @return \Friendica\Library\Api\Twitter\Factory\User
 	 */
 	public static function twitterUser()
 	{
-		return self::$dice->create(Factory\Api\Twitter\User::class);
+		return self::$dice->create(Library\Api\Twitter\Factory\User::class);
 	}
 
-	public static function notificationIntro(): Navigation\Notifications\Factory\Introduction
+	public static function notificationIntro(): Library\Navigation\Notifications\Factory\Introduction
 	{
-		return self::$dice->create(Navigation\Notifications\Factory\Introduction::class);
+		return self::$dice->create(Library\Navigation\Notifications\Factory\Introduction::class);
 	}
 
 	//
@@ -481,11 +481,11 @@ abstract class DI
 	//
 
 	/**
-	 * @return Network\HTTPClient\Capability\ICanSendHttpRequests
+	 * @return \Friendica\Library\Network\HTTPClient\Capability\ICanSendHttpRequests
 	 */
 	public static function httpClient()
 	{
-		return self::$dice->create(Network\HTTPClient\Capability\ICanSendHttpRequests::class);
+		return self::$dice->create(Library\Network\HTTPClient\Capability\ICanSendHttpRequests::class);
 	}
 
 	//
@@ -493,90 +493,90 @@ abstract class DI
 	//
 
 	/**
-	 * @return Contact\FriendSuggest\Repository\FriendSuggest;
+	 * @return \Friendica\Library\Contact\FriendSuggest\Repository\FriendSuggest;
 	 */
 	public static function fsuggest()
 	{
-		return self::$dice->create(Contact\FriendSuggest\Repository\FriendSuggest::class);
+		return self::$dice->create(Library\Contact\FriendSuggest\Repository\FriendSuggest::class);
 	}
 
 	/**
-	 * @return Contact\FriendSuggest\Factory\FriendSuggest;
+	 * @return \Friendica\Library\Contact\FriendSuggest\Factory\FriendSuggest;
 	 */
 	public static function fsuggestFactory()
 	{
-		return self::$dice->create(Contact\FriendSuggest\Factory\FriendSuggest::class);
+		return self::$dice->create(Library\Contact\FriendSuggest\Factory\FriendSuggest::class);
 	}
 
 	/**
-	 * @return Contact\Introduction\Repository\Introduction
+	 * @return \Friendica\Library\Contact\Introduction\Repository\Introduction
 	 */
 	public static function intro()
 	{
-		return self::$dice->create(Contact\Introduction\Repository\Introduction::class);
+		return self::$dice->create(Library\Contact\Introduction\Repository\Introduction::class);
 	}
 
 	/**
-	 * @return Contact\Introduction\Factory\Introduction
+	 * @return \Friendica\Library\Contact\Introduction\Factory\Introduction
 	 */
 	public static function introFactory()
 	{
-		return self::$dice->create(Contact\Introduction\Factory\Introduction::class);
+		return self::$dice->create(Library\Contact\Introduction\Factory\Introduction::class);
 	}
 
-	public static function localRelationship(): Contact\LocalRelationship\Repository\LocalRelationship
+	public static function localRelationship(): Library\Contact\LocalRelationship\Repository\LocalRelationship
 	{
-		return self::$dice->create(Contact\LocalRelationship\Repository\LocalRelationship::class);
+		return self::$dice->create(Library\Contact\LocalRelationship\Repository\LocalRelationship::class);
 	}
 
-	public static function permissionSet(): Security\PermissionSet\Repository\PermissionSet
+	public static function permissionSet(): Library\Security\PermissionSet\Repository\PermissionSet
 	{
-		return self::$dice->create(Security\PermissionSet\Repository\PermissionSet::class);
+		return self::$dice->create(Library\Security\PermissionSet\Repository\PermissionSet::class);
 	}
 
-	public static function permissionSetFactory(): Security\PermissionSet\Factory\PermissionSet
+	public static function permissionSetFactory(): Library\Security\PermissionSet\Factory\PermissionSet
 	{
-		return self::$dice->create(Security\PermissionSet\Factory\PermissionSet::class);
+		return self::$dice->create(Library\Security\PermissionSet\Factory\PermissionSet::class);
 	}
 
-	public static function profileField(): Profile\ProfileField\Repository\ProfileField
+	public static function profileField(): Library\Profile\ProfileField\Repository\ProfileField
 	{
-		return self::$dice->create(Profile\ProfileField\Repository\ProfileField::class);
+		return self::$dice->create(Library\Profile\ProfileField\Repository\ProfileField::class);
 	}
 
-	public static function profileFieldFactory(): Profile\ProfileField\Factory\ProfileField
+	public static function profileFieldFactory(): Library\Profile\ProfileField\Factory\ProfileField
 	{
-		return self::$dice->create(Profile\ProfileField\Factory\ProfileField::class);
+		return self::$dice->create(Library\Profile\ProfileField\Factory\ProfileField::class);
 	}
 
-	public static function notification(): Navigation\Notifications\Repository\Notification
+	public static function notification(): Library\Navigation\Notifications\Repository\Notification
 	{
-		return self::$dice->create(Navigation\Notifications\Repository\Notification::class);
+		return self::$dice->create(Library\Navigation\Notifications\Repository\Notification::class);
 	}
 
-	public static function notificationFactory(): Navigation\Notifications\Factory\Notification
+	public static function notificationFactory(): Library\Navigation\Notifications\Factory\Notification
 	{
-		return self::$dice->create(Navigation\Notifications\Factory\Notification::class);
+		return self::$dice->create(Library\Navigation\Notifications\Factory\Notification::class);
 	}
 
-	public static function notify(): Navigation\Notifications\Repository\Notify
+	public static function notify(): Library\Navigation\Notifications\Repository\Notify
 	{
-		return self::$dice->create(Navigation\Notifications\Repository\Notify::class);
+		return self::$dice->create(Library\Navigation\Notifications\Repository\Notify::class);
 	}
 
-	public static function notifyFactory(): Navigation\Notifications\Factory\Notify
+	public static function notifyFactory(): Library\Navigation\Notifications\Factory\Notify
 	{
-		return self::$dice->create(Navigation\Notifications\Factory\Notify::class);
+		return self::$dice->create(Library\Navigation\Notifications\Factory\Notify::class);
 	}
 
-	public static function formattedNotificationFactory(): Navigation\Notifications\Factory\FormattedNotify
+	public static function formattedNotificationFactory(): Library\Navigation\Notifications\Factory\FormattedNotify
 	{
-		return self::$dice->create(Navigation\Notifications\Factory\FormattedNotify::class);
+		return self::$dice->create(Library\Navigation\Notifications\Factory\FormattedNotify::class);
 	}
 
-	public static function formattedNavNotificationFactory(): Navigation\Notifications\Factory\FormattedNavNotification
+	public static function formattedNavNotificationFactory(): Library\Navigation\Notifications\Factory\FormattedNavNotification
 	{
-		return self::$dice->create(Navigation\Notifications\Factory\FormattedNavNotification::class);
+		return self::$dice->create(Library\Navigation\Notifications\Factory\FormattedNavNotification::class);
 	}
 
 	//

@@ -21,7 +21,7 @@
 
 namespace Friendica\Module;
 
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Psr\Http\Message\ResponseInterface;
 

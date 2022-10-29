@@ -21,7 +21,7 @@
 
 namespace Friendica\Model\Contact;
 
-use Friendica\Contact\Introduction\Entity;
+use Friendica\Library\Contact\Introduction\Entity;
 use Friendica\Core\Protocol;
 use Friendica\DI;
 use Friendica\Network\HTTPException;

@@ -25,7 +25,7 @@ use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Moderation\DomainPatternBlocklist;
+use Friendica\Library\Moderation\DomainPatternBlocklist;
 use Friendica\Module\BaseAdmin;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;

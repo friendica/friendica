@@ -23,7 +23,7 @@ namespace Friendica\Core;
 
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;

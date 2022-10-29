@@ -39,7 +39,7 @@ class SavedSearches extends BaseApi
 
 		$result = [];
 		while ($term = DBA::fetch($terms)) {
-			$result[] = new \Friendica\Object\Api\Twitter\SavedSearch($term);
+			$result[] = new \Friendica\Library\Api\Twitter\Object\SavedSearch($term);
 		}
 
 		DBA::close($terms);

@@ -26,7 +26,7 @@ use Friendica\Core\Logger;
 use Friendica\Core\Search;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 
 class SearchDirectory
 {

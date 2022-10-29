@@ -29,7 +29,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Protocol\ActivityNamespace;

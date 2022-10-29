@@ -24,7 +24,7 @@ namespace Friendica\Module\Api\Twitter\Lists;
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
-use Friendica\Factory\Api\Friendica\Group as FriendicaGroup;
+use Friendica\Library\Api\Friendica\Factory\Group as FriendicaGroup;
 use Friendica\Module\BaseApi;
 use Friendica\Model\Contact;
 use Friendica\Module\Api\ApiResponse;

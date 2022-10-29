@@ -21,8 +21,8 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Contact\FriendSuggest\Collection\FriendSuggests;
-use Friendica\Contact\FriendSuggest\Exception\FriendSuggestNotFoundException;
+use Friendica\Library\Contact\FriendSuggest\Collection\FriendSuggests;
+use Friendica\Library\Contact\FriendSuggest\Exception\FriendSuggestNotFoundException;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;

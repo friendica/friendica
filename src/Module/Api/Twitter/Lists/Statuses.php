@@ -25,7 +25,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Factory\Api\Twitter\Status as TwitterStatus;
+use Friendica\Library\Api\Twitter\Factory\Status as TwitterStatus;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;

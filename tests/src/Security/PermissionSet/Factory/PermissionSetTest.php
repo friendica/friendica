@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Security\PermissionSet\Factory;
 
-use Friendica\Security\PermissionSet\Factory\PermissionSet;
+use Friendica\Library\Security\PermissionSet\Factory\PermissionSet;
 use Friendica\Test\MockedTest;
 use Friendica\Util\ACLFormatter;
 use Psr\Log\NullLogger;
@@ -108,7 +108,7 @@ class PermissionSetTest extends MockedTest
 		];
 	}
 
-	protected function assertPermissionSet(\Friendica\Security\PermissionSet\Entity\PermissionSet $permissionSet, array $assertion)
+	protected function assertPermissionSet(\Friendica\Library\Security\PermissionSet\Entity\PermissionSet $permissionSet, array $assertion)
 	{
 		self::assertEquals($assertion['id'] ?? null, $permissionSet->id);
 		self::assertNotNull($permissionSet->uid);

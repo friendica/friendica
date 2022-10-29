@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Contact\Introduction\Factory;
 
-use Friendica\Contact\Introduction\Factory\Introduction;
+use Friendica\Library\Contact\Introduction\Factory\Introduction;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
@@ -70,7 +70,7 @@ class IntroductionTest extends TestCase
 		];
 	}
 
-	public function assertIntro(\Friendica\Contact\Introduction\Entity\Introduction $intro, array $assertion)
+	public function assertIntro(\Friendica\Library\Contact\Introduction\Entity\Introduction $intro, array $assertion)
 	{
 		self::assertEquals($intro->id, $assertion['id'] ?? null);
 		self::assertEquals($intro->uid, $assertion['uid'] ?? 0);

@@ -24,7 +24,7 @@ namespace Friendica;
 use Exception;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\Maintenance;
@@ -388,7 +388,7 @@ class App
 
 		$this->loadDefaultTimezone();
 		// Register template engines
-		Core\Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Core\Renderer::registerTemplateEngine('Friendica\Core\Render\FriendicaSmartyEngine');
 	}
 
 	/**

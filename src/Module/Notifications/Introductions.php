@@ -35,8 +35,8 @@ use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Module\BaseNotifications;
 use Friendica\Module\Response;
-use Friendica\Navigation\Notifications\Factory\Introduction as IntroductionFactory;
-use Friendica\Navigation\Notifications\ValueObject\Introduction;
+use Friendica\Library\Navigation\Notifications\Factory\Introduction as IntroductionFactory;
+use Friendica\Library\Navigation\Notifications\ValueObject\Introduction;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

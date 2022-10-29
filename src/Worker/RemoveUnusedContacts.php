@@ -21,7 +21,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Contact\Avatar;
+use Friendica\Library\Contact\Avatar;
 use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;

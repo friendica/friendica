@@ -23,7 +23,7 @@ namespace Friendica\Test\src\Console;
 
 use Friendica\Console\ServerBlock;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Moderation\DomainPatternBlocklist;
+use Friendica\Library\Moderation\DomainPatternBlocklist;
 use Mockery;
 
 class ServerBlockConsoleTest extends ConsoleTest

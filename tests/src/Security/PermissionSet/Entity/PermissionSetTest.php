@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Security\PermissionSet\Entity;
 
-use Friendica\Security\PermissionSet\Entity\PermissionSet;
+use Friendica\Library\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Test\MockedTest;
 
 class PermissionSetTest extends MockedTest

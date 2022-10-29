@@ -30,7 +30,7 @@ use Friendica\DI;
 use Friendica\Model\User\Cookie;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
-use Friendica\Security\TwoFactor;
+use Friendica\Library\Security\TwoFactor;
 use Psr\Log\LoggerInterface;
 
 /**

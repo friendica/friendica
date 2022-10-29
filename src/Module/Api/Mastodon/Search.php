@@ -189,7 +189,7 @@ class Search extends BaseApi
 			if ($version == 1) {
 				$hashtags[] = $tag['name'];
 			} else {
-				$hashtags[] = new \Friendica\Object\Api\Mastodon\Tag(DI::baseUrl(), $tag);
+				$hashtags[] = new \Friendica\Library\Api\Mastodon\Object\Tag(DI::baseUrl(), $tag);
 			}
 		}
 

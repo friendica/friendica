@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Module\Api\Twitter\Favorites;
 
 use Friendica\App\Router;
-use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Module\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Favorites\Create;
 use Friendica\Network\HTTPException\BadRequestException;

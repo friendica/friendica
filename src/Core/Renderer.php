@@ -24,7 +24,7 @@ namespace Friendica\Core;
 use Exception;
 use Friendica\DI;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
-use Friendica\Render\TemplateEngine;
+use Friendica\Core\Render\TemplateEngine;
 
 /**
  * This class handles Renderer related functions.

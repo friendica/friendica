@@ -23,12 +23,12 @@ namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Factory\Api\Mastodon\Error;
-use Friendica\Factory\Api\Mastodon\Subscription as SubscriptionFactory;
+use Friendica\Library\Api\Mastodon\Factory\Error;
+use Friendica\Library\Api\Mastodon\Factory\Subscription as SubscriptionFactory;
 use Friendica\Model\Subscription;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
-use Friendica\Object\Api\Mastodon\Notification;
+use Friendica\Library\Api\Mastodon\Object\Notification;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 

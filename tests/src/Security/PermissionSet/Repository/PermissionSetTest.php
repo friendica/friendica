@@ -22,11 +22,11 @@
 namespace Friendica\Test\src\Security\PermissionSet\Repository;
 
 use Friendica\Database\Database;
-use Friendica\Security\PermissionSet\Collection\PermissionSets;
-use Friendica\Security\PermissionSet\Exception\PermissionSetNotFoundException;
-use Friendica\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
-use Friendica\Security\PermissionSet\Entity\PermissionSet;
-use Friendica\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
+use Friendica\Library\Security\PermissionSet\Collection\PermissionSets;
+use Friendica\Library\Security\PermissionSet\Exception\PermissionSetNotFoundException;
+use Friendica\Library\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
+use Friendica\Library\Security\PermissionSet\Entity\PermissionSet;
+use Friendica\Library\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
 use Friendica\Test\FixtureTest;
 use Friendica\DI;
 

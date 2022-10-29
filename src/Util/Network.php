@@ -25,8 +25,8 @@ use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException\NotModifiedException;
 use GuzzleHttp\Psr7\Uri;
 

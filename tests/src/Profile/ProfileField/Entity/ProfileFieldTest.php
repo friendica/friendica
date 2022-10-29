@@ -21,12 +21,12 @@
 
 namespace Friendica\Test\src\Profile\ProfileField\Entity;
 
-use Friendica\Profile\ProfileField\Entity\ProfileField;
-use Friendica\Profile\ProfileField\Exception\ProfileFieldNotFoundException;
-use Friendica\Profile\ProfileField\Exception\UnexpectedPermissionSetException;
-use Friendica\Profile\ProfileField\Factory\ProfileField as ProfileFieldFactory;
-use Friendica\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
-use Friendica\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
+use Friendica\Library\Profile\ProfileField\Entity\ProfileField;
+use Friendica\Library\Profile\ProfileField\Exception\ProfileFieldNotFoundException;
+use Friendica\Library\Profile\ProfileField\Exception\UnexpectedPermissionSetException;
+use Friendica\Library\Profile\ProfileField\Factory\ProfileField as ProfileFieldFactory;
+use Friendica\Library\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
+use Friendica\Library\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
 use Friendica\Test\MockedTest;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;

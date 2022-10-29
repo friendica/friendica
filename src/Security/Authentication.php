@@ -33,7 +33,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
-use Friendica\Security\TwoFactor\Repository\TrustedBrowser;
+use Friendica\Library\Security\TwoFactor\Repository\TrustedBrowser;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use LightOpenID;

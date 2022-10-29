@@ -57,7 +57,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Model\User;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException;
 use Friendica\Util\PidFile;
 

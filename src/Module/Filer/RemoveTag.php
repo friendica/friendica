@@ -29,7 +29,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
+use Friendica\Library\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;

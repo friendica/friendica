@@ -24,7 +24,7 @@ namespace Friendica\Util;
 use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Photo;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 
 /**
  * Image utilities

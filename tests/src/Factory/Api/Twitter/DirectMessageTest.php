@@ -22,7 +22,7 @@
 namespace Friendica\Test\src\Factory\Api\Twitter;
 
 use Friendica\DI;
-use Friendica\Factory\Api\Twitter\DirectMessage;
+use Friendica\Library\Api\Twitter\Factory\DirectMessage;
 use Friendica\Test\FixtureTest;
 use Friendica\Test\src\Module\Api\ApiTest;
 
@@ -62,7 +62,7 @@ class DirectMessageTest extends FixtureTest
 		$ids = DI::dba()->selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 
-		$directMessage = (new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser()))
+		$directMessage = (new \Friendica\Library\Api\Twitter\Factory\DirectMessage(DI::logger(), DI::dba(), DI::twitterUser()))
 			->createFromMailId($id, ApiTest::SELF_USER['id'], 'html')
 			->toArray();
 

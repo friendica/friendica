@@ -21,8 +21,8 @@
 
 namespace Friendica\Model;
 
-use Friendica\Contact\Avatar;
-use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
+use Friendica\Library\Contact\Avatar;
+use Friendica\Library\Contact\Introduction\Exception\IntroductionNotFoundException;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Hook;

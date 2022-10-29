@@ -21,10 +21,10 @@
 
 namespace Friendica\Module\Api\Friendica;
 
-use Friendica\Collection\Api\Notifications as ApiNotifications;
+use Friendica\Library\Api\Friendica\Collection\Notifications as ApiNotifications;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
-use Friendica\Object\Api\Friendica\Notification as ApiNotification;
+use Friendica\Library\Api\Friendica\Object\Notification as ApiNotification;
 
 /**
  * API endpoint: /api/friendica/notification

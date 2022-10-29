@@ -22,13 +22,13 @@
 namespace Friendica\Test\src\Factory\Api\Twitter;
 
 use Friendica\DI;
-use Friendica\Factory\Api\Friendica\Activities;
-use Friendica\Factory\Api\Twitter\Attachment;
-use Friendica\Factory\Api\Twitter\Hashtag;
-use Friendica\Factory\Api\Twitter\Media;
-use Friendica\Factory\Api\Twitter\Mention;
-use Friendica\Factory\Api\Twitter\Status;
-use Friendica\Factory\Api\Twitter\Url;
+use Friendica\Library\Api\Friendica\Factory\Activities;
+use Friendica\Library\Api\Twitter\Factory\Attachment;
+use Friendica\Library\Api\Twitter\Factory\Hashtag;
+use Friendica\Library\Api\Twitter\Factory\Media;
+use Friendica\Library\Api\Twitter\Factory\Mention;
+use Friendica\Library\Api\Twitter\Factory\Status;
+use Friendica\Library\Api\Twitter\Factory\Url;
 use Friendica\Test\FixtureTest;
 use Friendica\Test\src\Module\Api\ApiTest;
 

@@ -22,7 +22,7 @@
 namespace Friendica\Console;
 
 use Friendica\App\BaseURL;
-use Friendica\Contact\Avatar;
+use Friendica\Library\Contact\Avatar;
 use Friendica\Core\L10n;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
@@ -39,12 +39,12 @@ class MoveToAvatarCache extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/**
-	 * @var $dba Friendica\Database\Database
+	 * @var $dba \Friendica\Database\Database
 	 */
 	private $dba;
 
 	/**
-	 * @var $baseurl Friendica\App\BaseURL
+	 * @var $baseurl \Friendica\App\BaseURL
 	 */
 	private $baseUrl;
 

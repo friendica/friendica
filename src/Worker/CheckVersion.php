@@ -24,7 +24,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
 
 /**
  * Check the git repository VERSION file and save the version to the DB

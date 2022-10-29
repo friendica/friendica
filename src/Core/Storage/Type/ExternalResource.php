@@ -25,8 +25,8 @@ use Exception;
 use Friendica\Core\Logger;
 use Friendica\Core\Storage\Exception\ReferenceStorageException;
 use Friendica\Core\Storage\Capability\ICanReadFromStorage;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Util\HTTPSignature;
 
 /**

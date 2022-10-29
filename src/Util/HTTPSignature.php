@@ -29,9 +29,9 @@ use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\ItemURI;
 use Friendica\Model\User;
-use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Library\Network\HTTPClient\Capability\ICanHandleHttpResponses;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Library\Network\HTTPClient\Client\HttpClientOptions;
 
 /**
  * Implements HTTP Signatures per draft-cavage-http-signatures-07.
@@ -435,7 +435,7 @@ class HTTPSignature
 	 *                         'nobody' => only return the header
 	 *                         'cookiejar' => path to cookie jar file
 	 *
-	 * @return \Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses CurlResult
+	 * @return \Friendica\Library\Network\HTTPClient\Capability\ICanHandleHttpResponses CurlResult
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
 	public static function fetchRaw(string $request, int $uid = 0, array $opts = [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::JSON_AS]])

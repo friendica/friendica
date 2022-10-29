@@ -23,7 +23,7 @@ namespace Friendica\Test\src\Module\Api\Friendica\DirectMessages;
 
 use Friendica\App\Router;
 use Friendica\DI;
-use Friendica\Factory\Api\Twitter\DirectMessage;
+use Friendica\Library\Api\Twitter\Factory\DirectMessage;
 use Friendica\Module\Api\Friendica\DirectMessages\Search;
 use Friendica\Test\src\Module\Api\ApiTest;
 use Psr\Log\NullLogger;

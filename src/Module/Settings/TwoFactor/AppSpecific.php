@@ -27,7 +27,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Response;
-use Friendica\Security\TwoFactor\Model\AppSpecificPassword;
+use Friendica\Library\Security\TwoFactor\Model\AppSpecificPassword;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
 use Friendica\Util\Profiler;

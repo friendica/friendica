@@ -23,8 +23,8 @@ namespace Friendica\Module\Contact;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Contact\LocalRelationship\Entity;
-use Friendica\Contact\LocalRelationship\Repository;
+use Friendica\Library\Contact\LocalRelationship\Entity;
+use Friendica\Library\Contact\LocalRelationship\Repository;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;

@@ -27,7 +27,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\Response;
-use Friendica\Security\TwoFactor\Model\RecoveryCode;
+use Friendica\Library\Security\TwoFactor\Model\RecoveryCode;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
 use Friendica\Util\Profiler;
