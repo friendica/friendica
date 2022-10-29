@@ -29,7 +29,6 @@ use Friendica\Library\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Library\Security\PermissionSet\Factory\PermissionSet as PermissionSetFactory;
 use Friendica\Test\FixtureTest;
 use Friendica\DI;
-use const Friendica\Test\src\Security\PermissionSet\Repository\PHP_EOL;
 
 class PermissionSetTest extends FixtureTest
 {

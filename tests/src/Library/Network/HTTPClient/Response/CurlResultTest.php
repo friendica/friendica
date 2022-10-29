@@ -37,7 +37,7 @@ class CurlResultTest extends TestCase
 
 		/** @var Dice|MockInterface $dice */
 		$dice = \Mockery::mock(Dice::class)->makePartial();
-		$dice = $dice->addRules(include __DIR__ . '/../../../../../static/dependencies.config.php');
+		$dice = $dice->addRules(include __DIR__ . '/../../../../../../static/dependencies.config.php');
 
 		$logger = new NullLogger();
 		$dice->shouldReceive('create')
@@ -53,7 +53,7 @@ class CurlResultTest extends TestCase
 	public function testNormal()
 	{
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
-		$headerArray = include(__DIR__ . '/../../../../datasets/curl/about.head.php');
+		$headerArray = include(__DIR__ . '/../../../../../datasets/curl/about.head.php');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
@@ -81,7 +81,7 @@ class CurlResultTest extends TestCase
 	public function testRedirect()
 	{
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
-		$headerArray = include(__DIR__ . '/../../../../datasets/curl/about.head.php');
+		$headerArray = include(__DIR__ . '/../../../../../datasets/curl/about.head.php');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
@@ -108,7 +108,7 @@ class CurlResultTest extends TestCase
 	public function testTimeout()
 	{
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
-		$headerArray = include(__DIR__ . '/../../../../datasets/curl/about.head.php');
+		$headerArray = include(__DIR__ . '/../../../../../datasets/curl/about.head.php');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
@@ -137,7 +137,7 @@ class CurlResultTest extends TestCase
 	public function testRedirectHeader()
 	{
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.redirect');
-		$headerArray = include(__DIR__ . '/../../../../datasets/curl/about.redirect.php');
+		$headerArray = include(__DIR__ . '/../../../../../datasets/curl/about.redirect.php');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
