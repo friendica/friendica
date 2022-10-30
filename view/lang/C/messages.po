@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2022.12-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-25 19:06-0400\n"
+"POT-Creation-Date: 2022-10-30 10:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,8 +32,8 @@ msgstr ""
 #: src/Module/HCard.php:51 src/Module/Profile/Common.php:40
 #: src/Module/Profile/Common.php:51 src/Module/Profile/Contacts.php:39
 #: src/Module/Profile/Contacts.php:49 src/Module/Profile/Media.php:38
-#: src/Module/Profile/Status.php:58 src/Module/Register.php:267
-#: src/Module/RemoteFollow.php:59
+#: src/Module/Profile/Photos/Upload.php:87 src/Module/Profile/Status.php:58
+#: src/Module/Register.php:267 src/Module/RemoteFollow.php:59
 msgid "User not found."
 msgstr ""
 
@@ -119,29 +119,28 @@ msgid "The feed for this item is unavailable."
 msgstr ""
 
 #: mod/editpost.php:38 mod/events.php:218 mod/follow.php:56 mod/follow.php:130
-#: mod/item.php:181 mod/item.php:186 mod/item.php:864 mod/message.php:69
+#: mod/item.php:181 mod/item.php:186 mod/item.php:870 mod/message.php:69
 #: mod/message.php:114 mod/notes.php:44 mod/ostatus_subscribe.php:33
 #: mod/photos.php:159 mod/photos.php:886 mod/repair_ostatus.php:31
 #: mod/settings.php:40 mod/settings.php:50 mod/settings.php:156
 #: mod/suggest.php:34 mod/uimport.php:33 mod/unfollow.php:35
 #: mod/unfollow.php:50 mod/unfollow.php:82 mod/wall_attach.php:70
-#: mod/wall_attach.php:72 mod/wall_upload.php:90 mod/wallmessage.php:37
-#: mod/wallmessage.php:56 mod/wallmessage.php:90 mod/wallmessage.php:110
-#: src/Module/Attach.php:56 src/Module/BaseApi.php:94
-#: src/Module/BaseNotifications.php:98 src/Module/Contact/Advanced.php:60
-#: src/Module/Delegation.php:118 src/Module/FollowConfirm.php:38
-#: src/Module/FriendSuggest.php:57 src/Module/Group.php:40
-#: src/Module/Group.php:83 src/Module/Invite.php:42 src/Module/Invite.php:131
-#: src/Module/Notifications/Notification.php:76
+#: mod/wall_attach.php:72 mod/wallmessage.php:37 mod/wallmessage.php:56
+#: mod/wallmessage.php:90 mod/wallmessage.php:110 src/Module/Attach.php:56
+#: src/Module/BaseApi.php:94 src/Module/BaseNotifications.php:98
+#: src/Module/Contact/Advanced.php:60 src/Module/Delegation.php:118
+#: src/Module/FollowConfirm.php:38 src/Module/FriendSuggest.php:57
+#: src/Module/Group.php:40 src/Module/Group.php:83 src/Module/Invite.php:42
+#: src/Module/Invite.php:131 src/Module/Notifications/Notification.php:76
 #: src/Module/Notifications/Notification.php:107
 #: src/Module/Profile/Common.php:55 src/Module/Profile/Contacts.php:55
-#: src/Module/Profile/Schedule.php:39 src/Module/Profile/Schedule.php:56
-#: src/Module/Register.php:77 src/Module/Register.php:90
-#: src/Module/Register.php:206 src/Module/Register.php:245
-#: src/Module/Search/Directory.php:37 src/Module/Settings/Account.php:50
-#: src/Module/Settings/Account.php:410 src/Module/Settings/Delegation.php:41
-#: src/Module/Settings/Delegation.php:69 src/Module/Settings/Display.php:41
-#: src/Module/Settings/Display.php:119
+#: src/Module/Profile/Photos/Upload.php:108 src/Module/Profile/Schedule.php:39
+#: src/Module/Profile/Schedule.php:56 src/Module/Register.php:77
+#: src/Module/Register.php:90 src/Module/Register.php:206
+#: src/Module/Register.php:245 src/Module/Search/Directory.php:37
+#: src/Module/Settings/Account.php:50 src/Module/Settings/Account.php:410
+#: src/Module/Settings/Delegation.php:41 src/Module/Settings/Delegation.php:69
+#: src/Module/Settings/Display.php:41 src/Module/Settings/Display.php:119
 #: src/Module/Settings/Profile/Photo/Crop.php:165
 #: src/Module/Settings/Profile/Photo/Index.php:111
 #: src/Module/Settings/UserExport.php:84 src/Module/Settings/UserExport.php:118
@@ -165,7 +164,7 @@ msgid "Save"
 msgstr ""
 
 #: mod/editpost.php:92 mod/photos.php:1333 src/Content/Conversation.php:341
-#: src/Object/Post.php:992
+#: src/Object/Post.php:987
 msgid "Loading..."
 msgstr ""
 
@@ -263,7 +262,7 @@ msgstr ""
 
 #: mod/editpost.php:128 mod/events.php:514 mod/photos.php:1332
 #: mod/photos.php:1388 mod/photos.php:1462 src/Content/Conversation.php:386
-#: src/Module/Item/Compose.php:199 src/Object/Post.php:1002
+#: src/Module/Item/Compose.php:199 src/Object/Post.php:997
 msgid "Preview"
 msgstr ""
 
@@ -276,37 +275,37 @@ msgid "Cancel"
 msgstr ""
 
 #: mod/editpost.php:134 src/Content/Conversation.php:346
-#: src/Module/Item/Compose.php:190 src/Object/Post.php:993
+#: src/Module/Item/Compose.php:190 src/Object/Post.php:988
 msgid "Bold"
 msgstr ""
 
 #: mod/editpost.php:135 src/Content/Conversation.php:347
-#: src/Module/Item/Compose.php:191 src/Object/Post.php:994
+#: src/Module/Item/Compose.php:191 src/Object/Post.php:989
 msgid "Italic"
 msgstr ""
 
 #: mod/editpost.php:136 src/Content/Conversation.php:348
-#: src/Module/Item/Compose.php:192 src/Object/Post.php:995
+#: src/Module/Item/Compose.php:192 src/Object/Post.php:990
 msgid "Underline"
 msgstr ""
 
 #: mod/editpost.php:137 src/Content/Conversation.php:349
-#: src/Module/Item/Compose.php:193 src/Object/Post.php:996
+#: src/Module/Item/Compose.php:193 src/Object/Post.php:991
 msgid "Quote"
 msgstr ""
 
 #: mod/editpost.php:138 src/Content/Conversation.php:350
-#: src/Module/Item/Compose.php:194 src/Object/Post.php:997
+#: src/Module/Item/Compose.php:194 src/Object/Post.php:992
 msgid "Code"
 msgstr ""
 
 #: mod/editpost.php:139 src/Content/Conversation.php:352
-#: src/Module/Item/Compose.php:196 src/Object/Post.php:999
+#: src/Module/Item/Compose.php:196 src/Object/Post.php:994
 msgid "Link"
 msgstr ""
 
 #: mod/editpost.php:140 src/Content/Conversation.php:353
-#: src/Module/Item/Compose.php:197 src/Object/Post.php:1000
+#: src/Module/Item/Compose.php:197 src/Object/Post.php:995
 msgid "Link or Media"
 msgstr ""
 
@@ -416,7 +415,7 @@ msgstr ""
 #: src/Module/Install.php:252 src/Module/Install.php:294
 #: src/Module/Install.php:331 src/Module/Invite.php:178
 #: src/Module/Item/Compose.php:189 src/Module/Profile/Profile.php:246
-#: src/Module/Settings/Profile/Index.php:222 src/Object/Post.php:991
+#: src/Module/Settings/Profile/Index.php:222 src/Object/Post.php:986
 #: view/theme/duepuntozero/config.php:85 view/theme/frio/config.php:171
 #: view/theme/quattro/config.php:87 view/theme/vier/config.php:135
 msgid "Submit"
@@ -523,19 +522,19 @@ msgstr ""
 msgid "Empty post discarded."
 msgstr ""
 
-#: mod/item.php:674
+#: mod/item.php:680
 msgid "Post updated."
 msgstr ""
 
-#: mod/item.php:684 mod/item.php:689
+#: mod/item.php:690 mod/item.php:695
 msgid "Item wasn't stored."
 msgstr ""
 
-#: mod/item.php:700
+#: mod/item.php:706
 msgid "Item couldn't be fetched."
 msgstr ""
 
-#: mod/item.php:840 src/Module/Admin/Themes/Details.php:39
+#: mod/item.php:846 src/Module/Admin/Themes/Details.php:39
 #: src/Module/Admin/Themes/Index.php:59 src/Module/Debug/ItemBody.php:42
 #: src/Module/Debug/ItemBody.php:57
 msgid "Item not found."
@@ -908,7 +907,8 @@ msgid "%1$s was tagged in %2$s by %3$s"
 msgstr ""
 
 #: mod/photos.php:631 mod/photos.php:634 mod/photos.php:661
-#: mod/wall_upload.php:212 src/Module/Settings/Profile/Photo/Index.php:59
+#: src/Module/Profile/Photos/Upload.php:213
+#: src/Module/Settings/Profile/Photo/Index.php:59
 #, php-format
 msgid "Image exceeds size limit of %s"
 msgstr ""
@@ -931,12 +931,13 @@ msgstr ""
 msgid "Image file is empty."
 msgstr ""
 
-#: mod/photos.php:684 mod/wall_upload.php:173
+#: mod/photos.php:684 src/Module/Profile/Photos/Upload.php:179
+#: src/Module/Profile/Photos/Upload.php:180
 #: src/Module/Settings/Profile/Photo/Index.php:68
 msgid "Unable to process image."
 msgstr ""
 
-#: mod/photos.php:710 mod/wall_upload.php:237
+#: mod/photos.php:710 src/Module/Profile/Photos/Upload.php:231
 #: src/Module/Settings/Profile/Photo/Index.php:95
 msgid "Image upload failed."
 msgstr ""
@@ -1071,12 +1072,12 @@ msgstr ""
 
 #: mod/photos.php:1328 mod/photos.php:1384 mod/photos.php:1458
 #: src/Module/Contact.php:547 src/Module/Item/Compose.php:188
-#: src/Object/Post.php:988
+#: src/Object/Post.php:983
 msgid "This is you"
 msgstr ""
 
 #: mod/photos.php:1330 mod/photos.php:1386 mod/photos.php:1460
-#: src/Object/Post.php:531 src/Object/Post.php:990
+#: src/Object/Post.php:531 src/Object/Post.php:985
 msgid "Comment"
 msgstr ""
 
@@ -1411,7 +1412,7 @@ msgstr ""
 msgid "Friend Suggestions"
 msgstr ""
 
-#: mod/tagger.php:77 src/Content/Item.php:304 src/Model/Item.php:2860
+#: mod/tagger.php:77 src/Content/Item.php:304 src/Model/Item.php:2877
 msgid "photo"
 msgstr ""
 
@@ -1503,8 +1504,8 @@ msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
 #: mod/wall_attach.php:41 mod/wall_attach.php:48 mod/wall_attach.php:79
-#: mod/wall_upload.php:54 mod/wall_upload.php:64 mod/wall_upload.php:101
-#: mod/wall_upload.php:152
+#: src/Module/Profile/Photos/Upload.php:113
+#: src/Module/Profile/Photos/Upload.php:162
 msgid "Invalid request."
 msgstr ""
 
@@ -1523,10 +1524,6 @@ msgstr ""
 
 #: mod/wall_attach.php:123
 msgid "File upload failed."
-msgstr ""
-
-#: mod/wall_upload.php:229 src/Model/Photo.php:1086
-msgid "Wall Photos"
 msgstr ""
 
 #: mod/wallmessage.php:62 mod/wallmessage.php:116
@@ -2021,7 +2018,7 @@ msgid "Visible to <strong>everybody</strong>"
 msgstr ""
 
 #: src/Content/Conversation.php:311 src/Module/Item/Compose.php:198
-#: src/Object/Post.php:1001
+#: src/Object/Post.php:996
 msgid "Please enter a image/video/audio/webpage URL:"
 msgstr ""
 
@@ -2054,7 +2051,7 @@ msgid "Share"
 msgstr ""
 
 #: src/Content/Conversation.php:351 src/Module/Item/Compose.php:195
-#: src/Object/Post.php:998
+#: src/Object/Post.php:993
 msgid "Image"
 msgstr ""
 
@@ -2292,7 +2289,7 @@ msgstr ""
 msgid "show more"
 msgstr ""
 
-#: src/Content/Item.php:295 src/Model/Item.php:2858
+#: src/Content/Item.php:295 src/Model/Item.php:2875
 msgid "event"
 msgstr ""
 
@@ -2628,39 +2625,39 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1002 src/Content/Text/BBCode.php:1879
-#: src/Content/Text/BBCode.php:1880
+#: src/Content/Text/BBCode.php:1002 src/Content/Text/BBCode.php:1863
+#: src/Content/Text/BBCode.php:1864
 msgid "Image/photo"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1234
+#: src/Content/Text/BBCode.php:1218
 #, php-format
 msgid ""
 "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1259 src/Model/Item.php:3461
-#: src/Model/Item.php:3467 src/Model/Item.php:3468
+#: src/Content/Text/BBCode.php:1243 src/Model/Item.php:3476
+#: src/Model/Item.php:3482 src/Model/Item.php:3483
 msgid "Link to source"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1797 src/Content/Text/HTML.php:940
+#: src/Content/Text/BBCode.php:1781 src/Content/Text/HTML.php:940
 msgid "Click to open/close"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1828
+#: src/Content/Text/BBCode.php:1812
 msgid "$1 wrote:"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1884 src/Content/Text/BBCode.php:1885
+#: src/Content/Text/BBCode.php:1868 src/Content/Text/BBCode.php:1869
 msgid "Encrypted content"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2105
+#: src/Content/Text/BBCode.php:2089
 msgid "Invalid source protocol"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2120
+#: src/Content/Text/BBCode.php:2104
 msgid "Invalid link protocol"
 msgstr ""
 
@@ -3782,71 +3779,75 @@ msgstr ""
 msgid "Edit groups"
 msgstr ""
 
-#: src/Model/Item.php:1970
+#: src/Model/Item.php:1987
 #, php-format
 msgid "Detected languages in this post:\\n%s"
 msgstr ""
 
-#: src/Model/Item.php:2862
+#: src/Model/Item.php:2879
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2864
+#: src/Model/Item.php:2881
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2867
+#: src/Model/Item.php:2884
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3010
+#: src/Model/Item.php:3025
 #, php-format
 msgid "Content warning: %s"
 msgstr ""
 
-#: src/Model/Item.php:3373
+#: src/Model/Item.php:3388
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3404
+#: src/Model/Item.php:3419
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3406
+#: src/Model/Item.php:3421
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3411
+#: src/Model/Item.php:3426
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3413
+#: src/Model/Item.php:3428
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3415
+#: src/Model/Item.php:3430
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3449 src/Model/Item.php:3450
+#: src/Model/Item.php:3464 src/Model/Item.php:3465
 msgid "View on separate page"
 msgstr ""
 
 #: src/Model/Mail.php:137 src/Model/Mail.php:265
 msgid "[no subject]"
+msgstr ""
+
+#: src/Model/Photo.php:1086 src/Module/Profile/Photos/Upload.php:223
+msgid "Wall Photos"
 msgstr ""
 
 #: src/Model/Profile.php:361 src/Module/Profile/Profile.php:255
@@ -11065,7 +11066,7 @@ msgstr ""
 msgid "%1$d %2$s ago"
 msgstr ""
 
-#: src/Worker/Delivery.php:527
+#: src/Worker/Delivery.php:534
 msgid "(no subject)"
 msgstr ""
 
