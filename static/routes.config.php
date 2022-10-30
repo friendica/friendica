@@ -31,13 +31,14 @@ use Friendica\App\Router as R;
 use Friendica\Module;
 
 $profileRoutes = [
-	''                                         => [Module\Profile\Index::class,    [R::GET]],
-	'/profile'                                 => [Module\Profile\Profile::class,  [R::GET]],
-	'/schedule'                                => [Module\Profile\Schedule::class, [R::GET, R::POST]],
-	'/contacts/common'                         => [Module\Profile\Common::class,   [R::GET]],
-	'/contacts[/{type}]'                       => [Module\Profile\Contacts::class, [R::GET]],
-	'/status[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Status::class,   [R::GET]],
-	'/media'                                   => [Module\Profile\Media::class,    [R::GET]],
+	''                                         => [Module\Profile\Index::class,         [R::GET]],
+	'/profile'                                 => [Module\Profile\Profile::class,       [R::GET]],
+	'/schedule'                                => [Module\Profile\Schedule::class,      [R::GET, R::POST]],
+	'/contacts/common'                         => [Module\Profile\Common::class,        [R::GET]],
+	'/contacts[/{type}]'                       => [Module\Profile\Contacts::class,      [R::GET]],
+	'/status[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Status::class,        [R::GET]],
+	'/media'                                   => [Module\Profile\Media::class,         [R::GET]],
+	'/photos/upload'                           => [Module\Profile\Photos\Upload::class, [        R::POST]],
 ];
 
 $apiRoutes = [

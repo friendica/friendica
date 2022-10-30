@@ -167,9 +167,9 @@ var FileBrowser = {
 			//AjaxUpload for images
 			var image_uploader = new window.AjaxUpload("upload-image", {
 				action:
-					"wall_upload/" +
+					"profile/" +
 					FileBrowser.nickname +
-					"?response=json&album=" +
+					"/photos/upload?response=json&album=" +
 					encodeURIComponent(FileBrowser.folder),
 				name: "userfile",
 				responseType: "json",

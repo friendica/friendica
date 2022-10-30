@@ -103,7 +103,7 @@ var FileBrowser = {
 		if ($("#upload-image").length)
 			var image_uploader = new window.AjaxUpload(
 				'upload-image',
-				{ action: 'wall_upload/'+FileBrowser.nickname+'?response=json',
+				{ action: 'profile/' + FileBrowser.nickname + '/photos/upload?response=json',
 					name: 'userfile',
 					responseType: 'json',
 					onSubmit: function(file,ext) { $('#profile-rotator').show(); $(".error").addClass('hidden'); },

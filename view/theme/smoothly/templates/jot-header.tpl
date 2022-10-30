@@ -57,12 +57,13 @@ function enableOnUser(){
 	$(document).ready(function() {
 
 		/* enable editor on focus and click */
-		$("#profile-jot-text").focus(enableOnUser);
-		$("#profile-jot-text").click(enableOnUser);
+		$("#profile-jot-text")
+			.focus(enableOnUser)
+			.click(enableOnUser);
 
 		var uploader = new window.AjaxUpload(
 			'wall-image-upload',
-			{ action: 'wall_upload/{{$nickname}}',
+			{ action: 'profile/{{$nickname}}/photos/upload',
 				name: 'userfile',
 				onSubmit: function(file,ext) { $('#profile-rotator').show(); },
 				onComplete: function(file,response) {

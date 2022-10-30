@@ -6,7 +6,7 @@
 	$(document).ready(function() {
 		var uploader = new window.AjaxUpload(
 			'prvmail-upload',
-			{ action: 'wall_upload/{{$nickname}}',
+			{ action: 'profile/{{$nickname}}/photos/upload',
 				name: 'userfile',
 				onSubmit: function(file,ext) { $('#profile-rotator').show(); },
 				onComplete: function(file,response) {
