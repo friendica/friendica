@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1491);
+	define('DB_UPDATE_VERSION', 1493);
 }
 
 return [
@@ -710,39 +710,6 @@ return [
 			"uri-id" => ["uri-id"],
 		]
 	],
-	"fcontact" => [
-		"comment" => "Diaspora compatible contacts - used in the Diaspora implementation",
-		"fields" => [
-			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
-			"guid" => ["type" => "varbinary(255)", "not null" => "1", "default" => "", "comment" => "unique id"],
-			"url" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the fcontact url"],
-			"name" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-			"photo" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"request" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"nick" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-			"addr" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
-			"batch" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"notify" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"poll" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"confirm" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"priority" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
-			"network" => ["type" => "char(4)", "not null" => "1", "default" => "", "comment" => ""],
-			"alias" => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"pubkey" => ["type" => "text", "comment" => ""],
-			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
-			"updated" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
-			"interacting_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of contacts this contact interactes with"],
-			"interacted_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of contacts that interacted with this contact"],
-			"post_count" => ["type" => "int unsigned", "default" => 0, "comment" => "Number of posts and comments"],
-		],
-		"indexes" => [
-			"PRIMARY" => ["id"],
-			"addr" => ["addr(32)"],
-			"url" => ["UNIQUE", "url(190)"],
-			"uri-id" => ["UNIQUE", "uri-id"],
-		]
-	],
 	"fetch-entry" => [
 		"comment" => "",
 		"fields" => [
@@ -890,7 +857,7 @@ return [
 		"fields" => [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "default" => "0", "foreign" => ["user" => "uid"], "comment" => "User id"],
-			"fid" => ["type" => "int unsigned", "relation" => ["fcontact" => "id"], "comment" => "deprecated"],
+			"fid" => ["type" => "int unsigned", "comment" => "deprecated"],
 			"contact-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => ""],
 			"suggest-cid" => ["type" => "int unsigned", "foreign" => ["contact" => "id"], "comment" => "Suggested contact"],
 			"knowyou" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],

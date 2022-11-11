@@ -974,7 +974,7 @@ function update_1429()
 		return Update::FAILED;
 	}
 
-	if (!DBA::e("UPDATE `fcontact` SET `uri-id` = null WHERE NOT `uri-id` IS NULL")) {
+	if (DBStructure::existsTable('fcontact') && !DBA::e("UPDATE `fcontact` SET `uri-id` = null WHERE NOT `uri-id` IS NULL")) {
 		return Update::FAILED;
 	}
 
@@ -1013,6 +1013,10 @@ function update_1438()
 
 function update_1439()
 {
+	if (!DBStructure::existsTable('fcontact')) {
+		return Update::SUCCESS;
+	}
+
 	$intros = DBA::select('intro', ['id', 'fid'], ["NOT `fid` IS NULL AND `fid` != ?", 0]);
 	while ($intro = DBA::fetch($intros)) {
 		$fcontact = DBA::selectFirst('fcontact', ['url'], ['id' => $intro['fid']]);
@@ -1024,6 +1028,8 @@ function update_1439()
 		}
 	}
 	DBA::close($intros);
+
+	return Update::SUCCESS;
 }
 
 function update_1440()

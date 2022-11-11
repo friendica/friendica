@@ -26,7 +26,6 @@ Database Tables
 | [diaspora-interaction](help/database/db_diaspora-interaction) | Signed Diaspora Interaction |
 | [endpoint](help/database/db_endpoint) | ActivityPub endpoints - used in the ActivityPub implementation |
 | [event](help/database/db_event) | Events |
-| [fcontact](help/database/db_fcontact) | Diaspora compatible contacts - used in the Diaspora implementation |
 | [fetch-entry](help/database/db_fetch-entry) |  |
 | [fetched-activity](help/database/db_fetched-activity) | Id of fetched activities |
 | [fsuggest](help/database/db_fsuggest) | friend suggestion stuff |

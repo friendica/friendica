@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2022.12-dev (Giant Rhubarb)
--- DB_UPDATE_VERSION 1492
+-- DB_UPDATE_VERSION 1493
 -- ------------------------------------------
 
 
@@ -651,39 +651,6 @@ CREATE TABLE IF NOT EXISTS `event` (
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Events';
-
---
--- TABLE fcontact
---
-CREATE TABLE IF NOT EXISTS `fcontact` (
-	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
-	`guid` varbinary(255) NOT NULL DEFAULT '' COMMENT 'unique id',
-	`url` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the fcontact url',
-	`name` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`photo` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`request` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`nick` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`addr` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`batch` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`notify` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`poll` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`confirm` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`priority` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
-	`network` char(4) NOT NULL DEFAULT '' COMMENT '',
-	`alias` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`pubkey` text COMMENT '',
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
-	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
-	`interacting_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts this contact interactes with',
-	`interacted_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts that interacted with this contact',
-	`post_count` int unsigned DEFAULT 0 COMMENT 'Number of posts and comments',
-	 PRIMARY KEY(`id`),
-	 INDEX `addr` (`addr`(32)),
-	 UNIQUE INDEX `url` (`url`(190)),
-	 UNIQUE INDEX `uri-id` (`uri-id`),
-	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Diaspora compatible contacts - used in the Diaspora implementation';
 
 --
 -- TABLE fetch-entry

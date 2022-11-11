@@ -899,6 +899,11 @@ class PostUpdate
 			return true;
 		}
 
+		if (!DBStructure::existsTable('fcontact')) {
+			DI::config()->set('system', 'post_update_version', 1425);
+			return true;
+		}
+
 		$condition = ["`uri-id` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('fcontact', $condition)]);
 
