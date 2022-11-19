@@ -187,9 +187,8 @@ class Contact
 		} elseif ($account_user['id'] != $contact['id']) {
 			$duplicate = DBA::selectFirst('contact', [], ['id' => $account_user['id'], 'deleted' => false]);
 			if (!empty($duplicate['id'])) {
-				$ret = Contact::deleteById($contact['id']);
+				$ret = Contact::deleteById($duplicate['id']);
 				Logger::notice('Deleted duplicated contact', ['ret' => $ret, 'account-user' => $account_user, 'cid' => $duplicate['id'], 'uid' => $duplicate['uid'], 'uri-id' => $duplicate['uri-id'], 'url' => $duplicate['url']]);
-				$contact = $duplicate;
 			} else {
 				$ret = DBA::update('account-user', ['id' => $contact['id']], ['uid' => $contact['uid'], 'uri-id' => $contact['uri-id']]);
 				Logger::notice('Updated account-user', ['ret' => $ret, 'account-user' => $account_user, 'cid' => $contact['id'], 'uid' => $contact['uid'], 'uri-id' => $contact['uri-id'], 'url' => $contact['url']]);
