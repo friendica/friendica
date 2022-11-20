@@ -22,12 +22,14 @@
 namespace Friendica\Module\Calendar\Event;
 
 use Friendica\App;
+use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
@@ -52,17 +54,24 @@ class Get extends \Friendica\BaseModule
 
 	protected function rawContent(array $request = [])
 	{
-		if (!$this->session->getLocalUserId()) {
+		$calenderOwner= User::getOwnerDataByNick(!empty($this->parameters['nickname']) ? $this->parameters['nickname'] : '');
+		if (Feature::isEnabled($calenderOwner['uid'] ?? $this->session->getLocalUserId(), 'public_calendar') ){
+			if (!empty($request['id'])) {
+				$events = [Event::getPublicById($this->session->getLocalUserId(), $request['id'], $this->parameters['nickname'] ?? null)];
+			} else {
+				$events = Event::getListByDate($this->session->getLocalUserId(), $request['start'] ?? '', $request['end'] ?? '', false, $this->parameters['nickname'] ?? null);
+			}
+		} elseif (!$this->session->getLocalUserId() && !Feature::isEnabled($calenderOwner['uid'], 'public_calendar') ) {
 			throw new HTTPException\UnauthorizedException();
-		}
+		} elseif (!Feature::isEnabled($this->session->getLocalUserId(), 'public_calendar') ){
 
 		// get events by id or by date
-		if (!empty($request['id'])) {
-			$events = [Event::getByIdAndUid($this->session->getLocalUserId(), $request['id'], $this->parameters['nickname'] ?? null)];
-		} else {
-			$events = Event::getListByDate($this->session->getLocalUserId(), $request['start'] ?? '', $request['end'] ?? '', false, $this->parameters['nickname'] ?? null);
+			if (!empty($request['id'])) {
+				$events = [Event::getByIdAndUid($this->session->getLocalUserId(), $request['id'], $this->parameters['nickname'] ?? null)];
+			} else {
+				$events = Event::getListByDate($this->session->getLocalUserId(), $request['start'] ?? '', $request['end'] ?? '', false, $this->parameters['nickname'] ?? null);
+			}
 		}
-
 		System::jsonExit($events ? self::map($events) : []);
 	}
 
