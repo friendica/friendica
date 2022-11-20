@@ -1,11 +1,12 @@
 <?php
 
 /**
- * Author: Arlo Carreon <http://arlocarreon.com>
- * Info: http://mexitek.github.io/phpColors/
- * License: http://arlo.mit-license.org/
- */
-
+ * @copyright Copyright (c) 2020 Arlo Carreon, http://arlocarreon.com
+ *
+ * @license MIT http://arlo.mit-license.org/
+ *
+ * Find more information at http://mexitek.github.io/phpColors/
+ **/
 
 /**
  * A color utility that helps manipulate HEX colors
