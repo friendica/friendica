@@ -23,7 +23,6 @@ namespace Friendica\Module\Calendar;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
@@ -31,7 +30,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Model\Event;
-use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
@@ -62,9 +60,7 @@ class Show extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		// check if the user is authenticated or the calendar is public
-		$calenderOwner= User::getOwnerDataByNick(!empty($this->parameters['nickname']) ? $this->parameters['nickname'] : '') ;
-		if (!$this->session->getLocalUserId() && !Feature::isEnabled($calenderOwner['uid'], 'public_calendar')) {
+		if (!$this->session->getLocalUserId()) {
 			$this->sysMessages->addNotice($this->t('Permission denied.'));
 			return Login::form();
 		}

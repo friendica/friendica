@@ -23,13 +23,11 @@ namespace Friendica\Module\Calendar\Event;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Model\Event;
-use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
@@ -52,15 +50,11 @@ class Show extends BaseModule
 
 	protected function rawContent(array $request = [])
 	{
-		$calenderOwner= User::getOwnerDataByNick(!empty($this->parameters['nickname']) ? $this->parameters['nickname'] : '')['uid'] ?? 0;
-		if (Feature::isEnabled($calenderOwner, 'public_calendar') ){
-			$event = Event::getPublicbyId($this->parameters['id'] ?? 0);
-		} elseif (!$this->session->getLocalUserId()) {
+		if (!$this->session->getLocalUserId()) {
 			throw new HTTPException\UnauthorizedException($this->t('Permission denied.'));
-		} else {
-			$event = Event::getByIdAndUid($this->session->getLocalUserId(), (int)$this->parameters['id'] ?? 0, $this->parameters['nickname'] ?? '');
 		}
 
+		$event = Event::getByIdAndUid($this->session->getLocalUserId(), (int)$this->parameters['id'] ?? 0, $this->parameters['nickname'] ?? '');
 
 		if (empty($event)) {
 			throw new HTTPException\NotFoundException($this->t('Event not found.'));

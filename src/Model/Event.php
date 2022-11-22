@@ -520,7 +520,7 @@ class Event
 			$remote_contact = $contact_id && DBA::exists('contact', ['id' => $contact_id, 'uid' => $owner['uid']]);
 
 			$is_owner = DI::userSession()->getLocalUserId() == $owner['uid'];
-			
+
 			if ($owner['hidewall'] && !$is_owner && !$remote_contact) {
 				throw new UnauthorizedException(DI::l10n()->t('Access to this profile has been restricted.'));
 			}
@@ -547,7 +547,7 @@ class Event
 			// get the permissions
 			$sql_perms = Item::getPermissionsSQLByUserId($owner_uid);
 			// we only want to have the events of the profile owner
-			$sql_extra = " AND `event`.`cid` = 0 AND `event`.`uid` = '$owner_uid' " . $sql_perms;
+			$sql_extra = " AND `event`.`cid` = 0 " . $sql_perms;
 		} else {
 			$sql_extra = "";
 		}
@@ -557,38 +557,18 @@ class Event
 			return [];
 		}
 
-		$events = self::getById ( $event_id, $sql_extra );
-		return $events[0];
-
-	}
-
-
-	public static function getPublicById( int $event_id ): array
-	{
-		/* To prevent from requesting private events via api we must add something like
-		 * $sql_perms = $sql_extra = and allow_cid is null and allow_gid is null and deny_cid is null and deny_gid is null
-		 * but I guess there is a methode alredy implemented for this?
-		 */
-		$events = self::getById( $event_id, '' );
-		return $events[0];
-	}
-
-	private static function getById ( int $event_id, string $additionalCondition) : array
-	{
 		// Query for the event by event id
 		$events = DBA::toArray(DBA::p("SELECT `event`.*, `post-user`.`id` AS `itemid` FROM `event`
-			LEFT JOIN `post-user` 
-				ON `post-user`.`event-id` = `event`.`id` 
-				AND `post-user`.`uid` = `event`.`uid`
-			WHERE  `event`.`id`  = ? $additionalCondition ",
-			$event_id));
+			LEFT JOIN `post-user` ON `post-user`.`event-id` = `event`.`id` AND `post-user`.`uid` = `event`.`uid`
+			WHERE `event`.`uid` = ? AND `event`.`id` = ? $sql_extra",
+			$owner_uid, $event_id));
+
 		if (empty($events)) {
 			throw new NotFoundException(DI::l10n()->t('Event not found.'));
 		} else {
 			$events = self::removeDuplicates($events);
-			return $events;
+			return $events[0];
 		}
-
 	}
 
 	/**
@@ -613,14 +593,7 @@ class Event
 			// get the permissions
 			$sql_perms = Item::getPermissionsSQLByUserId($owner_uid);
 			// we only want to have the events of the profile owner
-			
-			//@todo -> check privacy policy
-			if (true) {
-				$sql_extra =  $sql_perms;
-			} else {
-				$sql_extra = " AND `event`.`cid` = 0 " . $sql_perms;
-			}
-
+			$sql_extra = " AND `event`.`cid` = 0 " . $sql_perms;
 		} else {
 			$sql_extra = "";
 		}
