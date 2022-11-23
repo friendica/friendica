@@ -431,7 +431,7 @@ class Processor
 			$item['owner-id'] = $item['author-id'];
 		} else {
 			$actor = APContact::getByURL($item['owner-link'], false);
-			$item['isForum'] = ($actor['type'] == 'Group');
+			$item['isForum'] = ($actor['type'] ?? 'Person') == 'Group';
 		}
 
 		$item['uri'] = $activity['id'];

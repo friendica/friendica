@@ -22,6 +22,8 @@
 namespace Friendica\Object\Api\Mastodon;
 
 use Friendica\BaseDataTransferObject;
+use Friendica\Core\Logger;
+use Friendica\Core\System;
 
 /**
  * Class Attachment
@@ -50,8 +52,12 @@ class Attachment extends BaseDataTransferObject
 	/**
 	 * Creates an attachment
 	 *
-	 * @param array $attachment
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @param array $attachment Expected keys: id, description
+	 *                          If $type == 'image': width, height[, preview-width, preview-height]
+	 * @param string $type      One of: audio, video, gifv, image, unknown
+	 * @param string $url
+	 * @param string $preview
+	 * @param string $remote
 	 */
 	public function __construct(array $attachment, string $type, string $url, string $preview, string $remote)
 	{
@@ -70,7 +76,7 @@ class Attachment extends BaseDataTransferObject
 				$this->meta['original']['aspect'] = (float) ((int)  $attachment['width'] / (int) $attachment['height']);
 			}
 
-			if ((int) $attachment['preview-width'] > 0 && (int) $attachment['preview-height'] > 0) {
+			if (isset($attachment['preview-width']) && (int) $attachment['preview-width'] > 0 && (int) $attachment['preview-height'] > 0) {
 				$this->meta['small']['width'] = (int) $attachment['preview-width'];
 				$this->meta['small']['height'] = (int) $attachment['preview-height'];
 				$this->meta['small']['size'] = (int) $attachment['preview-width'] . 'x' . (int) $attachment['preview-height'];
