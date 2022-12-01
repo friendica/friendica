@@ -43,12 +43,15 @@ class Suggestions extends BaseApi
 			'limit' => 40, // Maximum number of results to return. Defaults to 40.
 		], $request);
 
-		$suggestions = Contact\Relation::getSuggestions($uid, 0, $request['limit']);
+		$suggestions = Contact\Relation::getCachedSuggestions($uid, 0, $request['limit']);
 
 		$accounts = [];
 
 		foreach ($suggestions as $suggestion) {
-			$accounts[] = DI::mstdnAccount()->createFromContactId($suggestion['id'], $uid);
+			$accounts[] = [
+				'source'  => 'past_interactions',
+				'account' => DI::mstdnAccount()->createFromContactId($suggestion['id'], $uid)
+			];
 		}
 
 		System::jsonExit($accounts);

@@ -14,6 +14,7 @@ Fields
 | comment | Report                                  | text               | YES  |     | NULL                |                |
 | forward | Forward the report to the remote server | boolean            | YES  |     | NULL                |                |
 | created |                                         | datetime           | NO   |     | 0001-01-01 00:00:00 |                |
+| status  | Status of the report                    | tinyint unsigned   | YES  |     | NULL                |                |
 
 Indexes
 ------------

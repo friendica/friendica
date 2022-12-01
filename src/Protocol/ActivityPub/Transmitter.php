@@ -657,7 +657,7 @@ class Transmitter
 			$is_forum_thread = false;
 		}
 
-		if (self::isAnnounce($item) || DI::config()->get('debug', 'total_ap_delivery') || self::isAPPost($last_id)) {
+		if (self::isAnnounce($item) || self::isAPPost($last_id)) {
 			// Will be activated in a later step
 			$networks = Protocol::FEDERATED;
 		} else {
@@ -902,7 +902,7 @@ class Transmitter
 			}
 		}
 
-		if (DI::config()->get('debug', 'total_ap_delivery') || $all_ap) {
+		if ($all_ap) {
 			// Will be activated in a later step
 			$networks = Protocol::FEDERATED;
 		} else {
@@ -2031,6 +2031,10 @@ class Transmitter
 		}
 
 		$owner = User::getOwnerDataById($uid);
+		if (empty($owner)) {
+			Logger::warning('No user found for actor, aborting', ['uid' => $uid]);
+			return false;
+		}
 
 		if (empty($id)) {
 			$id = DI::baseUrl() . '/activity/' . System::createGUID();
@@ -2167,6 +2171,11 @@ class Transmitter
 		}
 
 		$owner = User::getOwnerDataById($uid);
+		if (empty($owner)) {
+			Logger::notice('No user found for actor', ['uid' => $uid]);
+			return false;
+		}
+
 		$data = [
 			'@context' => ActivityPub::CONTEXT,
 			'id' => DI::baseUrl() . '/activity/' . System::createGUID(),

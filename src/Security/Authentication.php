@@ -38,6 +38,8 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use LightOpenID;
 use Friendica\Core\L10n;
+use Friendica\Core\Worker;
+use Friendica\Model\Contact;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -351,11 +353,16 @@ class Authentication
 		$this->setXAccMgmtStatusHeader($user_record);
 
 		if ($login_initial || $login_refresh) {
-			$this->dba->update('user', ['login_date' => DateTimeFormat::utcNow()], ['uid' => $user_record['uid']]);
+			$this->dba->update('user', ['last-activity' => DateTimeFormat::utcNow('Y-m-d'), 'login_date' => DateTimeFormat::utcNow()], ['uid' => $user_record['uid']]);
 
 			// Set the login date for all identities of the user
 			$this->dba->update('user', ['login_date' => DateTimeFormat::utcNow()],
 				['parent-uid' => $user_record['uid'], 'account_removed' => false]);
+
+			// Regularly update suggestions
+			if (Contact\Relation::areSuggestionsOutdated($user_record['uid'])) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateSuggestions', $user_record['uid']);
+			}
 		}
 
 		if ($login_initial) {

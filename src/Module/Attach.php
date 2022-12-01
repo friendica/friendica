@@ -37,7 +37,6 @@ class Attach extends BaseModule
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$a = DI::app();
 		if (empty($this->parameters['item'])) {
 			throw new \Friendica\Network\HTTPException\BadRequestException();
 		}

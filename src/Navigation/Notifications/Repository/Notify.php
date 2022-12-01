@@ -807,4 +807,10 @@ class Notify extends BaseRepository
 
 		return $this->storeAndSend($params, $sitelink, $tsitelink, $hsitelink, $title, $subject, $preamble, $epreamble, $item['body'], $itemlink, true);
 	}
+
+	public function deleteForItem(int $itemUriId): void
+	{
+		$this->db->delete('notify', ['otype' => 'item', 'uri-id' => $itemUriId]);
+		$this->db->delete('notify', ['otype' => 'item', 'parent-uri-id' => $itemUriId]);
+	}
 }

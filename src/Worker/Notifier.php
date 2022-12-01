@@ -336,7 +336,7 @@ class Notifier
 				foreach ($items as $item) {
 					$recipients[] = $item['contact-id'];
 					// pull out additional tagged people to notify (if public message)
-					if ($public_message && strlen($item['inform'])) {
+					if ($public_message && $item['inform']) {
 						$people = explode(',',$item['inform']);
 						foreach ($people as $person) {
 							if (substr($person,0,4) === 'cid:') {

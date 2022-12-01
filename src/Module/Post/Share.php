@@ -24,6 +24,7 @@ namespace Friendica\Module\Post;
 use Friendica\App;
 use Friendica\Content;
 use Friendica\Core\L10n;
+use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Model\Item;
@@ -59,7 +60,7 @@ class Share extends \Friendica\BaseModule
 			System::httpError(403);
 		}
 
-		$item = Post::selectFirst(['private', 'body', 'uri'], ['id' => $post_id]);
+		$item = Post::selectFirst(['private', 'body', 'uri', 'plink', 'network'], ['id' => $post_id]);
 		if (!$item || $item['private'] == Item::PRIVATE) {
 			System::httpError(404);
 		}
@@ -67,6 +68,8 @@ class Share extends \Friendica\BaseModule
 		$shared = $this->contentItem->getSharedPost($item, ['uri']);
 		if ($shared && empty($shared['comment'])) {
 			$content = '[share]' . $shared['post']['uri'] . '[/share]';
+		} elseif ($item['network'] == Protocol::FEED) {
+			$content = '[attachment]' . $item['plink'] . '[/attachment]';
 		} else {
 			$content = '[share]' . $item['uri'] . '[/share]';
 		}

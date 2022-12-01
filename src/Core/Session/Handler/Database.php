@@ -57,6 +57,7 @@ class Database extends AbstractSessionHandler
 		return true;
 	}
 
+	#[\ReturnTypeWillChange]
 	public function read($id)
 	{
 		if (empty($id)) {
@@ -136,6 +137,7 @@ class Database extends AbstractSessionHandler
 		}
 	}
 
+	#[\ReturnTypeWillChange]
 	public function gc($max_lifetime): bool
 	{
 		try {

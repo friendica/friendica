@@ -119,7 +119,6 @@ function oexchange_content(App $a)
 
 	$post = [];
 
-	$post['profile_uid'] = DI::userSession()->getLocalUserId();
 	$post['return'] = '/oexchange/done';
 	$post['body'] = HTML::toBBCode($s);
 

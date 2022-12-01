@@ -174,6 +174,64 @@ class Photo
 	}
 
 	/**
+	 * Returns all browsable albums for a given user
+	 *
+	 * @param int $uid The given user
+	 *
+	 * @return array An array of albums
+	 * @throws \Exception
+	 */
+	public static function getBrowsableAlbumsForUser(int $uid): array
+	{
+		$photos = DBA::toArray(
+			DBA::p(
+				"SELECT DISTINCT(`album`) AS `album` FROM `photo` WHERE `uid` = ? AND NOT `photo-type` IN (?, ?)",
+				$uid,
+				static::CONTACT_AVATAR,
+				static::CONTACT_BANNER
+			)
+		);
+
+		return array_column($photos, 'album');
+	}
+
+	/**
+	 * Returns browsable photos for a given user (optional and a given album)
+	 *
+	 * @param int         $uid   The given user id
+	 * @param string|null $album (optional) The given album
+	 *
+	 * @return array All photos of the user/album
+	 * @throws \Exception
+	 */
+	public static function getBrowsablePhotosForUser(int $uid, string $album = null): array
+	{
+		$values = [
+			$uid,
+			Photo::CONTACT_AVATAR,
+			Photo::CONTACT_BANNER
+		];
+
+		if (!empty($album)) {
+			$sqlExtra  = "AND `album` = ? ";
+			$values[] = $album;
+			$sqlExtra2 = "";
+		} else {
+			$sqlExtra  = '';
+			$sqlExtra2 = ' ORDER BY created DESC LIMIT 0, 10';
+		}
+
+		return DBA::toArray(
+			DBA::p(
+				"SELECT `resource-id`, ANY_VALUE(`id`) AS `id`, ANY_VALUE(`filename`) AS `filename`, ANY_VALUE(`type`) AS `type`,
+					min(`scale`) AS `hiq`, max(`scale`) AS `loq`, ANY_VALUE(`desc`) AS `desc`, ANY_VALUE(`created`) AS `created`
+					FROM `photo` WHERE `uid` = ? AND NOT `photo-type` IN (?, ?) $sqlExtra 
+					GROUP BY `resource-id` $sqlExtra2",
+				$values
+			));
+	}
+
+	/**
 	 * Check if photo with given conditions exists
 	 *
 	 * @param array $conditions Array of extra conditions
@@ -517,8 +575,9 @@ class Photo
 			$image->scaleToSquare(300);
 
 			$filesize = strlen($image->asString());
-			$maximagesize = DI::config()->get('system', 'maximagesize');
-			if (!empty($maximagesize) && ($filesize > $maximagesize)) {
+			$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize'));
+
+			if ($maximagesize && ($filesize > $maximagesize)) {
 				Logger::info('Avatar exceeds image limit', ['uid' => $uid, 'cid' => $cid, 'maximagesize' => $maximagesize, 'size' => $filesize, 'type' => $image->getType()]);
 				if ($image->getType() == 'image/gif') {
 					$image->toStatic();
@@ -908,9 +967,9 @@ class Photo
 		$width    = $image->getWidth();
 		$height   = $image->getHeight();
 
-		$maximagesize = DI::config()->get('system', 'maximagesize');
+		$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize'));
 
-		if (!empty($maximagesize) && ($filesize > $maximagesize)) {
+		if ($maximagesize && ($filesize > $maximagesize)) {
 			// Scale down to multiples of 640 until the maximum size isn't exceeded anymore
 			foreach ([5120, 2560, 1280, 640] as $pixels) {
 				if (($filesize > $maximagesize) && (max($width, $height) > $pixels)) {
@@ -1130,8 +1189,8 @@ class Photo
 		$picture['height']      = $photo['height'];
 		$picture['type']        = $photo['type'];
 		$picture['albumpage']   = DI::baseUrl() . '/photos/' . $user['nickname'] . '/image/' . $resource_id;
-		$picture['picture']     = DI::baseUrl() . '/photo/{$resource_id}-0.' . $image->getExt();
-		$picture['preview']     = DI::baseUrl() . '/photo/{$resource_id}-{$smallest}.' . $image->getExt();
+		$picture['picture']     = DI::baseUrl() . '/photo/' . $resource_id . '-0.' . $image->getExt();
+		$picture['preview']     = DI::baseUrl() . '/photo/' . $resource_id . '-' . $smallest . '.' . $image->getExt();
 
 		Logger::info('upload done', ['picture' => $picture]);
 		return $picture;
@@ -1272,4 +1331,3 @@ class Photo
 		return $resource_id;
 	}
 }
-

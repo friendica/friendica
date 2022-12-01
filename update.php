@@ -1121,3 +1121,9 @@ function update_1481()
 	DBA::e("UPDATE `post-collection` INNER JOIN `post` ON `post`.`uri-id` = `post-collection`.`uri-id` SET `post-collection`.`author-id` = `post`.`author-id` WHERE `post-collection`.`author-id` IS null");
 	return Update::SUCCESS;
 }
+
+function update_1491()
+{
+	DBA::update('contact', ['remote_self' => Contact::MIRROR_OWN_POST], ['remote_self' => Contact::MIRROR_FORWARDED]);
+	return Update::SUCCESS;
+}

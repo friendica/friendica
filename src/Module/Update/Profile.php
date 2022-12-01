@@ -49,7 +49,7 @@ class Profile extends BaseModule
 		$is_owner = DI::userSession()->getLocalUserId() == $a->getProfileOwner();
 		$last_updated_key = "profile:" . $a->getProfileOwner() . ":" . DI::userSession()->getLocalUserId() . ":" . $remote_contact;
 
-		if (!$is_owner && !$remote_contact) {
+		if (!DI::userSession()->isAuthenticated()) {
 			$user = User::getById($a->getProfileOwner(), ['hidewall']);
 			if ($user['hidewall']) {
 				throw new ForbiddenException(DI::l10n()->t('Access to this profile has been restricted.'));

@@ -69,7 +69,6 @@ class App
 	private $theme_info = [
 		'videowidth'        => 425,
 		'videoheight'       => 350,
-		'events_in_profile' => true
 	];
 
 	private $user_id       = 0;

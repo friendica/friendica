@@ -192,7 +192,7 @@ class Nav
 			// user menu
 			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname(), DI::l10n()->t('Status'), '', DI::l10n()->t('Your posts and conversations')];
 			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/profile', DI::l10n()->t('Profile'), '', DI::l10n()->t('Your profile page')];
-			$nav['usermenu'][] = ['photos/' . $a->getLoggedInUserNickname(), DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
+			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/photos', DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
 			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/media', DI::l10n()->t('Media'), '', DI::l10n()->t('Your postings with media')];
 			$nav['usermenu'][] = ['calendar/', DI::l10n()->t('Calendar'), '', DI::l10n()->t('Your calendar')];
 			$nav['usermenu'][] = ['notes/', DI::l10n()->t('Personal notes'), '', DI::l10n()->t('Your personal notes')];
@@ -244,12 +244,8 @@ class Nav
 		}
 
 		$gdirpath = 'directory';
-
-		if (strlen(DI::config()->get('system', 'singleuser'))) {
-			$gdir = DI::config()->get('system', 'directory');
-			if (strlen($gdir)) {
-				$gdirpath = Profile::zrl($gdir, true);
-			}
+		if (DI::config()->get('system', 'singleuser') && DI::config()->get('system', 'directory')) {
+			$gdirpath = Profile::zrl(DI::config()->get('system', 'directory'), true);
 		}
 
 		if ((DI::userSession()->getLocalUserId() || DI::config()->get('system', 'community_page_style') != Community::DISABLED_VISITOR) &&

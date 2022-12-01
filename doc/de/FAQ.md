@@ -69,7 +69,7 @@ Andere erlauben nur kostenpflichtige Zertifikate als eigenes Angebot bzw. von an
 ### Wie kann ich Bilder, Dateien, Links, Video und Audio in Beiträge einfügen?
 
 Bilder können direkt im [Beitragseditor](help/Text_editor) vom Computer hochgeladen werden.
-Eine Übersicht aller Bilder, die auf Deinem Server liegen, findest Du unter <i>deineSeite.de/photos/profilname</i>.
+Eine Übersicht aller Bilder, die auf Deinem Server liegen, findest Du unter <i>deineSeite.de/profile/profilname/photos</i>.
 Dort kannst Du auch direkt Bilder hochladen und festlegen, ob Deine Kontakte eine Nachricht über das neue Bild bekommen.
 
 Alle Arten von Dateien können grundsätzlich als Anhang in Friendica hochgeladen werden.

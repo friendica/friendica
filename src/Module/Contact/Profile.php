@@ -285,7 +285,6 @@ class Profile extends BaseModule
 		if ($contact['network'] == Protocol::FEED) {
 			$remote_self_options = [
 				Contact::MIRROR_DEACTIVATED => $this->t('No mirroring'),
-				Contact::MIRROR_FORWARDED   => $this->t('Mirror as forwarded posting'),
 				Contact::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
 			];
 		} elseif ($contact['network'] == Protocol::ACTIVITYPUB) {
@@ -328,7 +327,7 @@ class Profile extends BaseModule
 			'$submit'                    => $this->t('Submit'),
 			'$lbl_info1'                 => $lbl_info1,
 			'$lbl_info2'                 => $this->t('Their personal note'),
-			'$reason'                    => trim($contact['reason']),
+			'$reason'                    => trim($contact['reason'] ?? ''),
 			'$infedit'                   => $this->t('Edit contact notes'),
 			'$common_link'               => 'contact/' . $contact['id'] . '/contacts/common',
 			'$relation_text'             => $relation_text,

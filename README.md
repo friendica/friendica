@@ -9,7 +9,7 @@ Our mission is to free friends, family and colleagues from data-harvesting corpo
 
 Friendica connects you effortlessly to a federated communications network of several thousand servers, with more than half a million user registrations. You can directly connect to anyone on [Friendica]( https://friendi.ca), [Mastodon](https://joinmastodon.org/), [Diaspora](https://diasporafoundation.org/), [GnuSocial](https://gnu.io/social/), [Pleroma](https://pleroma.social/), or [Hubzilla](https://hubzilla.org/), regardless where each user profile is hosted.
 
-With Friendica, you can also fully interact with anyone on Twitter, post on Facebook and receive any content on Tumblr, Wordpress or RSS. Friendica allows you to integrate most things on the web via a range of addons such as ITTT, Buffer; you will be able to easily control your own data as you decide.
+With Friendica, you can also fully interact with anyone on Twitter and receive any content from Tumblr, Wordpress or RSS. Friendica allows you to integrate most things on the web via a range of addons such as ITTT, Buffer; you will be able to easily control your own data as you decide.
 
 Join today and [get your Friendica profile!](https://dir.friendica.social/servers 'Join Friendica today!')
 

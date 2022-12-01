@@ -48,25 +48,27 @@ class BaseCollection extends \ArrayIterator
 	/**
 	 * @inheritDoc
 	 */
-	public function offsetSet($offset, $value)
+	#[\ReturnTypeWillChange]
+	public function offsetSet($key, $value): void
 	{
-		if (is_null($offset)) {
+		if (is_null($key)) {
 			$this->totalCount++;
 		}
 
-		parent::offsetSet($offset, $value);
+		parent::offsetSet($key, $value);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	public function offsetUnset($offset)
+	#[\ReturnTypeWillChange]
+	public function offsetUnset($key): void
 	{
-		if ($this->offsetExists($offset)) {
+		if ($this->offsetExists($key)) {
 			$this->totalCount--;
 		}
 
-		parent::offsetUnset($offset);
+		parent::offsetUnset($key);
 	}
 
 	/**

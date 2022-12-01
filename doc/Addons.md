@@ -790,10 +790,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
     Hook::callAll('post_local', $datarray);
     Hook::callAll('post_local_end', $datarray);
 
-### mod/editpost.php
-
-    Hook::callAll('jot_tool', $jotplugins);
-
 ### src/Render/FriendicaSmartyEngine.php
 
     Hook::callAll("template_vars", $arr);
@@ -854,6 +850,10 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 ### src/Module/PermissionTooltip.php
 
     Hook::callAll('lockview_content', $item);
+
+### src/Module/Post/Edit.php
+
+    Hook::callAll('jot_tool', $jotplugins);
 
 ### src/Module/Settings/Delegation.php
 

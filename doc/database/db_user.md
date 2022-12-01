@@ -21,6 +21,7 @@ Fields
 | language                 | default language                                                                  | varchar(32)        | NO   |     | en                  |                |
 | register_date            | timestamp of registration                                                         | datetime           | NO   |     | 0001-01-01 00:00:00 |                |
 | login_date               | timestamp of last login                                                           | datetime           | NO   |     | 0001-01-01 00:00:00 |                |
+| last-activity            | Day of the last activity                                                          | date               | YES  |     | NULL                |                |
 | default-location         | Default for item.location                                                         | varchar(255)       | NO   |     |                     |                |
 | allow_location           | 1 allows to display the location                                                  | boolean            | NO   |     | 0                   |                |
 | theme                    | user theme preference                                                             | varchar(255)       | NO   |     |                     |                |

@@ -70,6 +70,7 @@ class GServer
 	const DETECT_UNSPECIFIC = [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META, self::DETECT_CONTACTS, self::DETECT_AP_ACTOR];
 
 	// Implementation specific endpoints
+	// @todo Possibly add Lemmy detection via the endpoint /api/v3/site
 	const DETECT_FRIENDIKA = 10;
 	const DETECT_FRIENDICA = 11;
 	const DETECT_STATUSNET = 12;
@@ -115,11 +116,11 @@ class GServer
 	 */
 	public static function getID(string $url, bool $no_check = false): ?int
 	{
+		$url = self::cleanURL($url);
+
 		if (empty($url)) {
 			return null;
 		}
-
-		$url = self::cleanURL($url);
 
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => Strings::normaliseLink($url)]);
 		if (DBA::isResult($gserver)) {
@@ -323,6 +324,10 @@ class GServer
 		$url = str_replace('/index.php', '', $url);
 
 		$urlparts = parse_url($url);
+		if (empty($urlparts)) {
+			return '';
+		}
+
 		unset($urlparts['user']);
 		unset($urlparts['pass']);
 		unset($urlparts['query']);
@@ -1209,7 +1214,7 @@ class GServer
 
 		if (!empty($data['url'])) {
 			$serverdata['platform'] = strtolower($data['platform']);
-			$serverdata['version'] = $data['version'];
+			$serverdata['version'] = $data['version'] ?? 'N/A';
 		}
 
 		if (!empty($data['plugins'])) {
@@ -2168,7 +2173,7 @@ class GServer
 					foreach ($servers['instances'] as $server) {
 						$url = (is_null($server['https_score']) ? 'http' : 'https') . '://' . $server['name'];
 						self::add($url);
-					}	
+					}
 				}
 			}
 		}

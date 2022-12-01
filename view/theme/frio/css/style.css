@@ -1563,10 +1563,10 @@ textarea.comment-edit-text:focus + .comment-edit-form .preview {
 		max-height: calc(100vh - 220px);
 	}
 }
-.fbrowser.image .photo-album-image-wrapper {
+.fbrowser.photo .photo-album-image-wrapper {
 	box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.2);
 }
-.fbrowser.image .photo-album-image-wrapper .caption {
+.fbrowser.photo .photo-album-image-wrapper .caption {
 	pointer-events: none;
 }
 .fbrowser .profile-rotator-wrapper {
@@ -3603,6 +3603,11 @@ section .profile-match-wrapper {
 .event-card .event-hover-location .location {
 	color: $font_color;
 	font-size: 13px;
+}
+
+
+.generic-page-wrapper.contact-follow-wrapper {
+	min-height: auto;
 }
 
 /* Medium devices (desktops, 992px and up) */

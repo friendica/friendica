@@ -23,6 +23,7 @@ namespace Friendica\Util;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Logger;
+use ParagonIE\ConstantTime\Base64;
 
 /**
  * This class handles string functions
@@ -219,7 +220,12 @@ class Strings
 	 */
 	public static function formatBytes(int $bytes, int $precision = 2): string
 	{
-		$units = ['B', 'KB', 'MB', 'GB', 'TB'];
+		// If this method is called for an infinite (== unlimited) amount of bytes:
+		if ($bytes == INF) {
+			return INF;
+		}
+
+		$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 		$bytes = max($bytes, 0);
 		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
 		$pow = min($pow, count($units) - 1);
@@ -245,16 +251,17 @@ class Strings
 	 * @param string $s					URL to encode
 	 * @param boolean $strip_padding	Optional. Default false
 	 * @return string	Encoded URL
+	 * @see https://web.archive.org/web/20160506073138/http://salmon-protocol.googlecode.com:80/svn/trunk/draft-panzer-magicsig-01.html#params
 	 */
 	public static function base64UrlEncode(string $s, bool $strip_padding = false): string
 	{
-		$s = strtr(base64_encode($s), '+/', '-_');
-
 		if ($strip_padding) {
-			$s = str_replace('=', '', $s);
+			$s = Base64::encodeUnpadded($s);
+		} else {
+			$s = Base64::encode($s);
 		}
 
-		return $s;
+		return strtr($s, '+/', '-_');
 	}
 
 	/**
@@ -263,26 +270,11 @@ class Strings
 	 * @param string $s URL to decode
 	 * @return string	Decoded URL
 	 * @throws \Exception
+	 * @see https://web.archive.org/web/20160506073138/http://salmon-protocol.googlecode.com:80/svn/trunk/draft-panzer-magicsig-01.html#params
 	 */
 	public static function base64UrlDecode(string $s): string
 	{
-		/*
-		*  // Placeholder for new rev of salmon which strips base64 padding.
-		*  // PHP base64_decode handles the un-padded input without requiring this step
-		*  // Uncomment if you find you need it.
-		*
-		*	$l = strlen($s);
-		*	if (!strpos($s,'=')) {
-		*		$m = $l % 4;
-		*		if ($m == 2)
-		*			$s .= '==';
-		*		if ($m == 3)
-		*			$s .= '=';
-		*	}
-		*
-		*/
-
-		return base64_decode(strtr($s, '-_', '+/'));
+		return Base64::decode(strtr($s, '-_', '+/'));
 	}
 
 	/**
@@ -515,4 +507,35 @@ class Strings
 
 		return $text;
 	}
+
+	/**
+	 * This function converts a PHP's shorhand notation string for file sizes in to an integer number of total bytes.
+	 * For example: The string for shorthand notation of '2M' (which is 2,097,152 Bytes) is converted to 2097152
+	 * @see https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes
+	 * @param string $shorthand
+	 * @return int
+	 */
+	public static function getBytesFromShorthand(string $shorthand): int
+	{
+		$shorthand = trim($shorthand);
+
+		if (is_numeric($shorthand)) {
+			return $shorthand;
+		}
+
+		$last      = strtolower($shorthand[strlen($shorthand)-1]);
+		$shorthand = substr($shorthand, 0, -1);
+
+		switch($last) {
+			case 'g':
+				$shorthand *= 1024;
+			case 'm':
+				$shorthand *= 1024;
+			case 'k':
+				$shorthand *= 1024;
+		}
+
+		return $shorthand;
+	}
+
 }

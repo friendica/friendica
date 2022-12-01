@@ -44,7 +44,7 @@ class Media extends BaseProfile
 
 		$is_owner = DI::userSession()->getLocalUserId() == $profile['uid'];
 
-		$o = self::getTabsHTML($a, 'media', $is_owner, $profile['nickname'], $profile['hide-friends']);
+		$o = self::getTabsHTML('media', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
 		$o .= Contact::getPostsFromUrl($profile['url'], false, 0, 0, true);
 

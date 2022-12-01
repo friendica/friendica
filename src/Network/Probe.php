@@ -40,6 +40,7 @@ use Friendica\Protocol\ActivityNamespace;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
+use Friendica\Protocol\Salmon;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
@@ -1512,12 +1513,10 @@ class Probe
 						$pubkey = $curlResult->getBody();
 					}
 
-					$key = explode('.', $pubkey);
+					try {
+						$data['pubkey'] = Salmon::magicKeyToPem($pubkey);
+					} catch (\Throwable $e) {
 
-					if (sizeof($key) >= 3) {
-						$m = Strings::base64UrlDecode($key[1]);
-						$e = Strings::base64UrlDecode($key[2]);
-						$data['pubkey'] = Crypto::meToPem($m, $e);
 					}
 				}
 			}

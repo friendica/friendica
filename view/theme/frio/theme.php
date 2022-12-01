@@ -53,8 +53,6 @@ function frio_init(App $a)
 	global $frio;
 	$frio = 'view/theme/frio';
 
-	// disable the events module link in the profile tab
-	$a->setThemeInfoValue('events_in_profile', false);
 	$a->setThemeInfoValue('videowidth', 622);
 
 	Renderer::setActiveTemplateEngine('smarty3');
@@ -179,7 +177,7 @@ function frio_contact_photo_menu(App $a, &$args)
 
 	// Add to pm link a new key with the value 'modal'.
 	// Later we can make conditions in the corresponding templates (e.g.
-	// contact_template.tpl)
+	// contact/entry.tpl)
 	if (strpos($pmlink, 'message/new/' . $cid) !== false) {
 		$args['menu']['pm'][3] = 'modal';
 	}
@@ -236,6 +234,9 @@ function frio_remote_nav(App $a, array &$nav_info)
 			// user menu
 			$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'], DI::l10n()->t('Status'), '', DI::l10n()->t('Your posts and conversations')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/profile', DI::l10n()->t('Profile'), '', DI::l10n()->t('Your profile page')];
+			// Kept for backwards-compatibility reasons, the remote server may not have updated to version 2022.12 yet
+			// @TODO Switch with the new routes by version 2023.12
+			//$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/photos', DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/photos/' . $remoteUser['nick'], DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/media', DI::l10n()->t('Media'), '', DI::l10n()->t('Your postings with media')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/calendar/', DI::l10n()->t('Calendar'), '', DI::l10n()->t('Your calendar')];

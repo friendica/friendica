@@ -261,6 +261,59 @@ class Relation
 	}
 
 	/**
+	 * Check if the cached suggestion is outdated
+	 *
+	 * @param integer $uid
+	 * @return boolean
+	 */
+	static public function areSuggestionsOutdated(int $uid): bool
+	{
+		return DI::pConfig()->get($uid, 'suggestion', 'last_update') + 3600 < time();
+	}
+
+	/**
+	 * Update contact suggestions for a given user
+	 *
+	 * @param integer $uid
+	 * @return void
+	 */
+	static public function updateCachedSuggestions(int $uid)
+	{
+		if (!self::areSuggestionsOutdated($uid)) {
+			return;
+		}
+
+		DBA::delete('account-suggestion', ['uid' => $uid, 'ignore' => false]);
+
+		foreach (self::getSuggestions($uid) as $contact) {
+			DBA::insert('account-suggestion', ['uri-id' => $contact['uri-id'], 'uid' => $uid, 'level' => 1], Database::INSERT_IGNORE);
+		}
+
+		DI::pConfig()->set($uid, 'suggestion', 'last_update', time());
+	}
+
+	/**
+	 * Returns a cached array of suggested contacts for given user id
+	 *
+	 * @param int $uid   User id
+	 * @param int $start optional, default 0
+	 * @param int $limit optional, default 80
+	 * @return array
+	 */
+	static public function getCachedSuggestions(int $uid, int $start = 0, int $limit = 80): array
+	{
+		$condition = ["`uid` = ? AND `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE NOT `ignore` AND `uid` = ?)", 0, $uid];
+		$params = ['limit' => [$start, $limit]];
+		$cached = DBA::selectToArray('contact', [], $condition, $params);
+
+		if (!empty($cached)) {
+			return $cached;
+		} else {
+			return self::getSuggestions($uid, $start, $limit);
+		}
+	}
+
+	/**
 	 * Returns an array of suggested contacts for given user id
 	 *
 	 * @param int $uid   User id
@@ -270,6 +323,10 @@ class Relation
 	 */
 	static public function getSuggestions(int $uid, int $start = 0, int $limit = 80): array
 	{
+		if ($uid == 0) {
+			return [];
+		}
+
 		$cid = Contact::getPublicIdByUserId($uid);
 		$totallimit = $start + $limit;
 		$contacts = [];
@@ -285,11 +342,12 @@ class Relation
 				(SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ?)
 					AND NOT `cid` IN (SELECT `id` FROM `contact` WHERE `uid` = ? AND `nurl` IN
 						(SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?))) AND `id` = `cid`)
-			AND NOT `hidden` AND `network` IN (?, ?, ?, ?)",
+			AND NOT `hidden` AND `network` IN (?, ?, ?, ?)
+			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 			$cid,
 			0,
 			$uid, Contact::FRIEND, Contact::SHARING,
-			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus,
+			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid
 			], [
 				'order' => ['last-item' => true],
 				'limit' => $totallimit,
@@ -315,9 +373,10 @@ class Relation
 				(SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ?)
 					AND NOT `cid` IN (SELECT `id` FROM `contact` WHERE `uid` = ? AND `nurl` IN
 						(SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?))) AND `id` = `cid`)
-			AND NOT `hidden` AND `network` IN (?, ?, ?, ?)",
+			AND NOT `hidden` AND `network` IN (?, ?, ?, ?)
+			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 			$cid, 0, $uid, Contact::FRIEND, Contact::SHARING,
-			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus],
+			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid],
 			['order' => ['last-item' => true], 'limit' => $totallimit]
 		);
 
@@ -335,9 +394,10 @@ class Relation
 		// The query returns contacts that follow the given user but aren't followed by that user.
 		$results = DBA::select('contact', [],
 			["`nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` = ?)
-			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)",
+			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)
+			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 			$uid, Contact::FOLLOWER, 0, 
-			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus],
+			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid],
 			['order' => ['last-item' => true], 'limit' => $totallimit]
 		);
 
@@ -355,9 +415,10 @@ class Relation
 		// The query returns any contact that isn't followed by that user.
 		$results = DBA::select('contact', [],
 			["NOT `nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?) AND `nurl` = `nurl`)
-			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)",
+			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)
+			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 			$uid, Contact::FRIEND, Contact::SHARING, 0, 
-			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus],
+			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid],
 			['order' => ['last-item' => true], 'limit' => $totallimit]
 		);
 

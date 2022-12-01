@@ -22,12 +22,14 @@
 namespace Friendica\Module\Calendar\Event;
 
 use Friendica\App;
+use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Model\Event;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
@@ -43,24 +45,27 @@ class Get extends \Friendica\BaseModule
 	/** @var IHandleUserSessions */
 	protected $session;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, array $server, array $parameters = [])
+	public function __construct(App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session = $session;
+		$this->app     = $app;
 	}
 
 	protected function rawContent(array $request = [])
 	{
-		if (!$this->session->getLocalUserId()) {
+		$nickname = $this->parameters['nickname'] ?? $this->app->getLoggedInUserNickname();
+		if (!$nickname) {
 			throw new HTTPException\UnauthorizedException();
 		}
 
-		// get events by id or by date
+		$owner = Event::getOwnerForNickname($nickname);
+
 		if (!empty($request['id'])) {
-			$events = [Event::getByIdAndUid($this->session->getLocalUserId(), $request['id'], $this->parameters['nickname'] ?? null)];
+			$events = [Event::getByIdAndUid($owner['uid'], $request['id'])];
 		} else {
-			$events = Event::getListByDate($this->session->getLocalUserId(), $request['start'] ?? '', $request['end'] ?? '', false, $this->parameters['nickname'] ?? null);
+			$events = Event::getListByDate($owner['uid'], $request['start'] ?? '', $request['end'] ?? '');
 		}
 
 		System::jsonExit($events ? self::map($events) : []);

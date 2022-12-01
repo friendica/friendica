@@ -233,7 +233,7 @@ class PortableContacts extends BaseModule
 			}
 
 			if ($selectedFields['tags']) {
-				$tags = str_replace(',', ' ', $contact['keywords']);
+				$tags = str_replace(',', ' ', $contact['keywords'] ?? '');
 				$tags = explode(' ', $tags);
 
 				$cleaned = [];

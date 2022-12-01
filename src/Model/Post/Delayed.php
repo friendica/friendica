@@ -39,12 +39,6 @@ class Delayed
 	 */
 	const PREPARED = 0;
 	/**
-	 * The content is posted like a manual post. Means some processing of body will be done.
-	 * Also it is posted with default permissions and default connector settings.
-	 * This is used for mirrored connector posts.
-	 */
-	const UNPREPARED = 1;
-	/**
 	 * Like PREPARED, but additionally the connector settings can differ.
 	 * This is used when manually publishing scheduled posts.
 	 */
@@ -199,37 +193,9 @@ class Delayed
 			$item['attachments'] = $attachments;
 		}
 
-		if ($preparation_mode == self::UNPREPARED) {
-			$_SESSION['authenticated'] = true;
-			$_SESSION['uid'] = $item['uid'];
-
-			$_REQUEST = $item;
-			$_REQUEST['api_source'] = true;
-			$_REQUEST['profile_uid'] = $item['uid'];
-			$_REQUEST['title'] = $item['title'] ?? '';
-
-			if (!empty($item['app'])) {
-				$_REQUEST['source'] = $item['app'];
-			}
-
-			require_once 'mod/item.php';
-			$id = item_post(DI::app());
-
-			if (empty($uri) && !empty($item['extid'])) {
-				$uri = $item['extid'];
-			}
-
-			Logger::notice('Unprepared post stored', ['id' => $id, 'uid' => $item['uid'], 'uri' => $uri]);
-			if (self::exists($uri, $item['uid'])) {
-				self::delete($uri, $item['uid']);
-			}
-
-			return $id;
-		}
-
 		$id = Item::insert($item, $notify, $preparation_mode == self::PREPARED);
 
-		Logger::notice('Post stored', ['id' => $id, 'uid' => $item['uid'], 'cid' => $item['contact-id']]);
+		Logger::notice('Post stored', ['id' => $id, 'uid' => $item['uid'], 'cid' => $item['contact-id'] ?? 'N/A']);
 
 		if (empty($uri) && !empty($item['uri'])) {
 			$uri = $item['uri'];

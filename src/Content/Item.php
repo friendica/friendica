@@ -361,7 +361,7 @@ class Item
 
 		if ($sparkle) {
 			$status_link = $profile_link . '/status';
-			$photos_link = str_replace('/profile/', '/photos/', $profile_link);
+			$photos_link = $profile_link . '/photos';
 			$profile_link = $profile_link . '/profile';
 		}
 
@@ -729,7 +729,7 @@ class Item
 					'message_id' => $shared['uri'],
 					'comment'    => $item['body'],
 					'shared'     => $shared['body'],
-				];				
+				];
 			}
 		}
 
@@ -737,7 +737,7 @@ class Item
 	}
 
 	/**
-	 * Add a link to a shared post at the end of the post 
+	 * Add a link to a shared post at the end of the post
 	 *
 	 * @param string  $body
 	 * @param integer $quote_uri_id

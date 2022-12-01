@@ -25,9 +25,11 @@ use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\Probe;
+use Friendica\Protocol\Salmon\Format\Magic;
 use Friendica\Util\Crypto;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
+use phpseclib3\Crypt\PublicKeyLoader;
 
 /**
  * Salmon Protocol class
@@ -243,7 +245,19 @@ class Salmon
 	 */
 	public static function salmonKey(string $pubkey): string
 	{
-		Crypto::pemToMe($pubkey, $modulus, $exponent);
-		return 'RSA' . '.' . Strings::base64UrlEncode($modulus, true) . '.' . Strings::base64UrlEncode($exponent, true);
+		\phpseclib3\Crypt\RSA::addFileFormat(Magic::class);
+
+		return PublicKeyLoader::load($pubkey)->toString('Magic');
+	}
+
+	/**
+	 * @param string $magic Magic key format starting with "RSA."
+	 * @return string
+	 */
+	public static function magicKeyToPem(string $magic): string
+	{
+		\phpseclib3\Crypt\RSA::addFileFormat(Magic::class);
+
+		return (string) PublicKeyLoader::load($magic);
 	}
 }

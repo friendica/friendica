@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1490);
+	define('DB_UPDATE_VERSION', 1496);
 }
 
 return [
@@ -115,6 +115,7 @@ return [
 			"language" => ["type" => "varchar(32)", "not null" => "1", "default" => "en", "comment" => "default language"],
 			"register_date" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "timestamp of registration"],
 			"login_date" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "timestamp of last login"],
+			"last-activity" => ["type" => "date", "comment" => "Day of the last activity"],
 			"default-location" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "Default for item.location"],
 			"allow_location" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "1 allows to display the location"],
 			"theme" => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => "user theme preference"],
@@ -369,6 +370,18 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["cookie_hash"],
 			"uid" => ["uid"],
+		]
+	],
+	"account-suggestion" => [
+		"comment" => "Account suggestion",
+		"fields" => [
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the account url"],
+			"uid" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
+			"level" => ["type" => "smallint unsigned", "comment" => "level of closeness"],
+			"ignore" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "If set, this account will not be suggested again"],		],
+		"indexes" => [
+			"PRIMARY" => ["uid", "uri-id"],
+			"uri-id_uid" => ["uri-id", "uid"],
 		]
 	],
 	"account-user" => [
@@ -1658,6 +1671,7 @@ return [
 			"comment" => ["type" => "text", "comment" => "Report"],
 			"forward" => ["type" => "boolean", "comment" => "Forward the report to the remote server"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
+			"status" => ["type" => "tinyint unsigned", "comment" => "Status of the report"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
@@ -1670,6 +1684,7 @@ return [
 		"fields" => [
 			"rid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["report" => "id"], "comment" => "Report id"],
 			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Uri-id of the reported post"],
+			"status" => ["type" => "tinyint unsigned", "comment" => "Status of the reported post"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["rid", "uri-id"],

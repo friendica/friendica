@@ -210,7 +210,7 @@ class Item
 						$fields['raw-body'] = BBCode::removeSharedData($fields['raw-body']);
 					}
 				}
-		
+
 				Post\Media::insertFromAttachmentData($item['uri-id'], $fields['body']);
 
 				$content_fields = ['raw-body' => trim($fields['raw-body'] ?? $fields['body'])];
@@ -337,7 +337,7 @@ class Item
 		 * generate a resource-id and therefore aren't intimately linked to the item.
 		 */
 		/// @TODO: this should first check if photo is used elsewhere
-		if (strlen($item['resource-id'])) {
+		if ($item['resource-id']) {
 			Photo::delete(['resource-id' => $item['resource-id'], 'uid' => $item['uid']]);
 		}
 
@@ -384,6 +384,9 @@ class Item
 			Post\User::update($item['uri-id'], $item['uid'], ['hidden' => true]);
 			Post\ThreadUser::update($item['uri-id'], $item['uid'], ['hidden' => true]);
 		}
+
+		DI::notify()->deleteForItem($item['uri-id']);
+		DI::notification()->deleteForItem($item['uri-id']);
 
 		Logger::info('Item has been marked for deletion.', ['id' => $item_id]);
 
@@ -815,6 +818,49 @@ class Item
 		return self::GRAVITY_UNKNOWN;   // Should not happen
 	}
 
+	private static function prepareOriginPost(array $item): array
+	{
+		$item['wall'] = 1;
+		$item['origin'] = 1;
+		$item['network'] = Protocol::DFRN;
+		$item['protocol'] = Conversation::PARCEL_DIRECT;
+		$item['direction'] = Conversation::PUSH;
+
+		$owner = User::getOwnerDataById($item['uid']);
+
+		if (empty($item['contact-id'])) {
+			$item['contact-id'] = $owner['id'];
+		}
+
+		if (empty($item['author-link']) && empty($item['author-id'])) {
+			$item['author-link']   = $owner['url'];
+			$item['author-name']   = $owner['name'];
+			$item['author-avatar'] = $owner['thumb'];
+		}
+
+		if (empty($item['owner-link']) && empty($item['owner-id'])) {
+			$item['owner-link']   = $item['author-link'];
+			$item['owner-name']   = $item['author-name'];
+			$item['owner-avatar'] = $item['author-avatar'];
+		}
+
+		// Setting the object type if not defined before
+		if (empty($item['object-type'])) {
+			$item['object-type'] = Activity\ObjectType::NOTE; // Default value
+			$objectdata = BBCode::getAttachedData($item['body']);
+
+			if ($objectdata['type'] == 'link') {
+				$item['object-type'] = Activity\ObjectType::BOOKMARK;
+			} elseif ($objectdata['type'] == 'video') {
+				$item['object-type'] = Activity\ObjectType::VIDEO;
+			} elseif ($objectdata['type'] == 'photo') {
+				$item['object-type'] = Activity\ObjectType::IMAGE;
+			}
+		}
+
+		return $item;
+	}
+
 	/**
 	 * Inserts item record
 	 *
@@ -831,11 +877,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
-			$item['wall'] = 1;
-			$item['origin'] = 1;
-			$item['network'] = Protocol::DFRN;
-			$item['protocol'] = Conversation::PARCEL_DIRECT;
-			$item['direction'] = Conversation::PUSH;
+			$item = self::prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
 				$priority = $notify;
@@ -993,6 +1035,7 @@ class Item
 			$item['parent-uri']    = $toplevel_parent['uri'];
 			$item['parent-uri-id'] = $toplevel_parent['uri-id'];
 			$item['deleted']       = $toplevel_parent['deleted'];
+			$item['wall']          = $toplevel_parent['wall'];
 
 			// Reshares have to keep their permissions to allow forums to work
 			if (!$item['origin'] || ($item['verb'] != Activity::ANNOUNCE)) {
@@ -2228,6 +2271,11 @@ class Item
 			return;
 		}
 
+		$cdata = Contact::getPublicAndUserContactID($item['author-id'], $item['uid']);
+		if (empty($cdata['user']) || ($cdata['user'] != $item['contact-id'])) {
+			return;
+		}
+
 		if (!DBA::exists('contact', ['id' => $item['contact-id'], 'remote_self' => Contact::MIRROR_NATIVE_RESHARE])) {
 			return;
 		}
@@ -2318,8 +2366,8 @@ class Item
 			$result = self::insert($datarray2);
 			Logger::info('remote-self post original item', ['contact' => $contact['url'], 'result'=> $result, 'item' => $datarray2]);
 		} else {
-			$datarray["app"] = "Feed";
-			$result = true;
+			Logger::info('No valid mirroring option', ['uid' => $contact['uid'], 'id' => $contact['id'], 'network' => $contact['network'], 'remote_self' => $contact['remote_self']]);
+			return false;
 		}
 
 		return (bool)$result;
@@ -2693,7 +2741,7 @@ class Item
 		}
 
 		$condition = ['vid' => $vids, 'deleted' => false, 'gravity' => self::GRAVITY_ACTIVITY,
-			'author-id' => $author_id, 'uid' => $item['uid'], 'thr-parent-id' => $uri_id];
+			'author-id' => $author_id, 'uid' => $uid, 'thr-parent-id' => $uri_id];
 		$like_item = Post::selectFirst(['id', 'guid', 'verb'], $condition);
 
 		if (DBA::isResult($like_item)) {
@@ -2974,7 +3022,7 @@ class Item
 			$quote_uri_id = $shared['post']['uri-id'];
 			$shared_links[] = strtolower($shared['post']['uri']);
 			$item['body'] = BBCode::removeSharedData($item['body']);
-		} elseif (empty($shared_item['uri-id']) && empty($item['quote-uri-id'])) {
+		} elseif (empty($shared_item['uri-id']) && empty($item['quote-uri-id']) && ($item['network'] != Protocol::DIASPORA)) {
 			$media = Post\Media::getByURIId($item['uri-id'], [Post\Media::ACTIVITY]);
 			if (!empty($media)) {
 				$shared_item = Post::selectFirst($fields, ['plink' => $media[0]['url'], 'uid' => [$item['uid'], 0]]);

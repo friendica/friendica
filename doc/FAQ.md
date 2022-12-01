@@ -50,7 +50,7 @@ We recommend to talk to the admin(s) of the affected friendica server. (Admins, 
 ### How can I upload images, files, links, videos and sound files to posts?
 
 You can upload images from your computer using the [editor](help/Text_editor).
-An overview of all uploaded images is listed at *yourpage.com/photos/profilename*.
+An overview of all uploaded images is listed at *yourpage.com/profile/profilename/photos*.
 On that page, you can also upload images directly and choose if your contacts will receive a message about this upload.
 
 Generally, you can attach any kind of file to a post.

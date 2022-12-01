@@ -4,7 +4,7 @@
 
 	<div id="photos-usage-message">{{$usage}}</div>
 
-	<form action="photos/{{$nickname}}" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
+	<form action="profile/{{$nickname}}/photos" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
 		<div id="photos-upload-div" class="form-group">
 			<label id="photos-upload-text" for="photos-upload-newalbum">{{$newalbum}}</label>
 
@@ -40,7 +40,7 @@
 			<div class="photos-upload-wrapper">
 				<div id="photos-upload-perms" class="btn-group pull-right">
 					<button class="btn btn-default" data-toggle="modal" data-target="#aclModal" onclick="return false;">
-						<i id="jot-perms-icon" class="fa {{$lockstate}}"></i> 
+						<i id="jot-perms-icon" class="fa {{$lockstate}}"></i>
 					</button>
 
 					{{$default_upload_submit nofilter}}

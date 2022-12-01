@@ -24,6 +24,7 @@ namespace Friendica\Util;
 use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\DI;
+use GuzzleHttp\Psr7\Uri;
 
 /**
  * Proxy utilities class
@@ -173,12 +174,15 @@ class Proxy
 	 */
 	private static function parseQuery(string $url): array
 	{
-		$query = parse_url($url, PHP_URL_QUERY);
-		$query = html_entity_decode($query);
+		try {
+			$uri = new Uri($url);
 
-		parse_str($query, $arr);
+			parse_str($uri->getQuery(), $arr);
 
-		return $arr;
+			return $arr;
+		} catch (\Throwable $e) {
+			return [];
+		}
 	}
 
 	/**

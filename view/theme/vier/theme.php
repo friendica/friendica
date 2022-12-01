@@ -42,8 +42,6 @@ use Friendica\Util\Strings;
 
 function vier_init(App $a)
 {
-	$a->setThemeInfoValue('events_in_profile', false);
-
 	Renderer::setActiveTemplateEngine('smarty3');
 
 	$args = DI::args();
@@ -144,7 +142,7 @@ function vier_community_info()
 
 	// comunity_profiles
 	if ($show_profiles) {
-		$contacts = Contact\Relation::getSuggestions(DI::userSession()->getLocalUserId(), 0, 9);
+		$contacts = Contact\Relation::getCachedSuggestions(DI::userSession()->getLocalUserId(), 0, 9);
 
 		$tpl = Renderer::getMarkupTemplate('ch_directory_item.tpl');
 		if (DBA::isResult($contacts)) {

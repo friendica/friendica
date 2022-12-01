@@ -88,7 +88,9 @@ class Follow extends BaseModule
 		}
 
 		$uid = $this->session->getLocalUserId();
-		$url = Probe::cleanURI(trim($request['url'] ?? ''));
+
+		// uri is used by the /authorize_interaction Mastodon route
+		$url = Probe::cleanURI(trim($request['uri'] ?? $request['url'] ?? ''));
 
 		// Issue 6874: Allow remote following from Peertube
 		if (strpos($url, 'acct:') === 0) {

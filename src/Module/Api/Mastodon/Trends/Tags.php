@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon;
+namespace Friendica\Module\Api\Mastodon\Trends;
 
 use Friendica\Core\System;
 use Friendica\DI;
@@ -29,7 +29,7 @@ use Friendica\Module\BaseApi;
 /**
  * @see https://docs.joinmastodon.org/methods/instance/trends/
  */
-class Trends extends BaseApi
+class Tags extends BaseApi
 {
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException

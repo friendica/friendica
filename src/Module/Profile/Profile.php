@@ -76,21 +76,19 @@ class Profile extends BaseProfile
 	{
 		$a = DI::app();
 
-		$profile = ProfileModel::load($a, $this->parameters['nickname']);
+		$profile = ProfileModel::load($a, $this->parameters['nickname'] ?? '');
 		if (!$profile) {
 			throw new HTTPException\NotFoundException(DI::l10n()->t('Profile not found.'));
 		}
 
 		$remote_contact_id = DI::userSession()->getRemoteContactID($profile['uid']);
 
-		if (DI::config()->get('system', 'block_public') && !DI::userSession()->getLocalUserId() && !$remote_contact_id) {
+		if (DI::config()->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) {
 			return Login::form();
 		}
 
-		$is_owner = DI::userSession()->getLocalUserId() == $profile['uid'];
-
-		if (!empty($profile['hidewall']) && !$is_owner && !$remote_contact_id) {
-			throw new HTTPException\ForbiddenException(DI::l10n()->t('Access to this profile has been restricted.'));
+		if (!empty($profile['hidewall']) && !DI::userSession()->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
 		}
 
 		if (!empty($profile['page-flags']) && $profile['page-flags'] == User::PAGE_FLAGS_COMMUNITY) {
@@ -102,12 +100,7 @@ class Profile extends BaseProfile
 		Nav::setSelected('home');
 
 		$is_owner = DI::userSession()->getLocalUserId() == $profile['uid'];
-		$o = self::getTabsHTML($a, 'profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
-
-		if (!empty($profile['hidewall']) && !$is_owner && !$remote_contact_id) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('Access to this profile has been restricted.'));
-			return '';
-		}
+		$o = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
 		$view_as_contacts = [];
 		$view_as_contact_id = 0;
@@ -307,8 +300,8 @@ class Profile extends BaseProfile
 		}
 
 		// site block
-		$blocked   = !DI::userSession()->getLocalUserId() && !$remote_contact_id && DI::config()->get('system', 'block_public');
-		$userblock = !DI::userSession()->getLocalUserId() && !$remote_contact_id && $profile['hidewall'];
+		$blocked   = !DI::userSession()->isAuthenticated() && DI::config()->get('system', 'block_public');
+		$userblock = !DI::userSession()->isAuthenticated() && $profile['hidewall'];
 		if (!$blocked && !$userblock) {
 			$keywords = str_replace(['#', ',', ' ', ',,'], ['', ' ', ',', ','], $profile['pub_keywords'] ?? '');
 			if (strlen($keywords)) {

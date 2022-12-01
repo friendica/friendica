@@ -23,6 +23,7 @@ namespace Friendica\Module\Calendar;
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
@@ -30,9 +31,11 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Model\Event;
+use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
+use Friendica\Network\HTTPException;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -60,7 +63,21 @@ class Show extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		if (!$this->session->getLocalUserId()) {
+		$nickname = $this->parameters['nickname'] ?? $this->app->getLoggedInUserNickname();
+		if (!$nickname) {
+			throw new HTTPException\UnauthorizedException();
+		}
+
+		$owner = User::getOwnerDataByNick($nickname);
+		if (!$owner || $owner['account_expired'] || $owner['account_removed']) {
+			throw new HTTPException\NotFoundException($this->t('User not found.'));
+		}
+
+		if (!$this->session->isAuthenticated() && $owner['hidewall']) {
+			$this->baseUrl->redirect('profile/' . $nickname . '/restricted');
+		}
+
+		if (!$this->session->isAuthenticated() && !Feature::isEnabled($owner['uid'], 'public_calendar')) {
 			$this->sysMessages->addNotice($this->t('Permission denied.'));
 			return Login::form();
 		}
@@ -73,41 +90,25 @@ class Show extends BaseModule
 		$this->page->registerFooterScript('view/asset/moment/min/moment-with-locales.min.js');
 		$this->page->registerFooterScript('view/asset/fullcalendar/dist/fullcalendar.min.js');
 
-		$htpl = Renderer::getMarkupTemplate('calendar/calendar_head.tpl');
+		$is_owner = $nickname == $this->app->getLoggedInUserNickname();
 
+		$htpl = Renderer::getMarkupTemplate('calendar/calendar_head.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($htpl, [
-			'$calendar_api' => 'calendar/api/get' . (!empty($this->parameters['nickname']) ? '/' . $this->parameters['nickname'] : ''),
-			'$event_api'    => 'calendar/event/show' . (!empty($this->parameters['nickname']) ? '/' . $this->parameters['nickname'] : ''),
+			'$calendar_api' => 'calendar/api/get' . ($is_owner ? '' : '/' . $nickname),
+			'$event_api'    => 'calendar/event/show' . ($is_owner ? '' : '/' . $nickname),
 			'$modparams'    => 2,
 			'$i18n'         => $i18n,
 		]);
 
-		$tabs = '';
+		Nav::setSelected($is_owner ? 'home' : 'calendar');
 
-		if (empty($this->parameters['nickname'])) {
-			if ($this->app->getThemeInfoValue('events_in_profile')) {
-				Nav::setSelected('home');
-			} else {
-				Nav::setSelected('calendar');
-			}
-
-			// tabs
-			if ($this->app->getThemeInfoValue('events_in_profile')) {
-				$tabs = BaseProfile::getTabsHTML($this->app, 'calendar', true, $this->app->getLoggedInUserNickname(), false);
-			}
-
-			$this->page['aside'] .= Widget\CalendarExport::getHTML($this->session->getLocalUserId());
-		} else {
-			$owner = Event::getOwnerForNickname($this->parameters['nickname'], true);
-
-			Nav::setSelected('calendar');
-
-			// get the tab navigation bar
-			$tabs = BaseProfile::getTabsHTML($this->app, 'calendar', false, $owner['nickname'], $owner['hide-friends']);
-
+		if (!$is_owner) {
 			$this->page['aside'] .= Widget\VCard::getHTML($owner);
-			$this->page['aside'] .= Widget\CalendarExport::getHTML($owner['uid']);
 		}
+
+		$this->page['aside'] .= Widget\CalendarExport::getHTML($owner['uid']);
+
+		$tabs = BaseProfile::getTabsHTML('calendar', $is_owner, $nickname, !$is_owner && $owner['hide-friends']);
 
 		// ACL blocks are loaded in modals in frio
 		$this->page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));

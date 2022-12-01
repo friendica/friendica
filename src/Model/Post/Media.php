@@ -279,7 +279,7 @@ class Media
 		if (!empty($contact['gsid'])) {
 			$gserver = DBA::selectFirst('gserver', ['url', 'site_name'], ['id' => $contact['gsid']]);
 		}
-		
+
 		$media['type'] = self::ACTIVITY;
 		$media['media-uri-id'] = $item['uri-id'];
 		$media['height'] = null;
@@ -687,7 +687,7 @@ class Media
 				$previews[] = $medium['preview'];
 			}
 
-			$type = explode('/', current(explode(';', $medium['mimetype'])));
+			$type = explode('/', explode(';', $medium['mimetype'] ?? '')[0]);
 			if (count($type) < 2) {
 				Logger::info('Unknown MimeType', ['type' => $type, 'media' => $medium]);
 				$filetype = 'unkn';

@@ -106,7 +106,7 @@ class Contact
 	 */
 
 	 const MIRROR_DEACTIVATED = 0;
-	 const MIRROR_FORWARDED = 1;
+	 const MIRROR_FORWARDED = 1; // Deprecated, now does the same like MIRROR_OWN_POST
 	 const MIRROR_OWN_POST = 2;
 	 const MIRROR_NATIVE_RESHARE = 3;
 
@@ -1158,7 +1158,7 @@ class Contact
 
 		if ($sparkle) {
 			$status_link = $profile_link . '/status';
-			$photos_link = str_replace('/profile/', '/photos/', $profile_link);
+			$photos_link = $profile_link . '/photos';
 			$profile_link = $profile_link . '/profile';
 		}
 
@@ -3420,8 +3420,7 @@ class Contact
 			["(NOT `unsearchable` OR `nurl` IN (SELECT `nurl` FROM `owner-view` WHERE `publish` OR `net-publish`))
 			AND (`addr` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)", $search, $search, $search]);
 
-		$contacts = self::selectToArray([], $condition, $params);
-		return $contacts;
+		return self::selectToArray([], $condition, $params);
 	}
 
 	/**

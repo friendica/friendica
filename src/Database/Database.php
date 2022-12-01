@@ -43,12 +43,12 @@ use Psr\Log\NullLogger;
  */
 class Database
 {
-	const PDO = 'pdo';
+	const PDO    = 'pdo';
 	const MYSQLI = 'mysqli';
 
 	const INSERT_DEFAULT = 0;
-	const INSERT_UPDATE = 1;
-	const INSERT_IGNORE = 2;
+	const INSERT_UPDATE  = 1;
+	const INSERT_IGNORE  = 2;
 
 	protected $connected = false;
 
@@ -64,18 +64,18 @@ class Database
 	 * @var LoggerInterface
 	 */
 	protected $logger;
-	protected $server_info    = '';
+	protected $server_info = '';
 	/** @var PDO|mysqli */
 	protected $connection;
 	protected $driver = '';
 	protected $pdo_emulate_prepares = false;
-	private $error          = '';
-	private $errorno        = 0;
-	private $affected_rows  = 0;
+	private $error = '';
+	private $errorno = 0;
+	private $affected_rows = 0;
 	protected $in_transaction = false;
-	protected $in_retrial     = false;
-	protected $testmode       = false;
-	private $relation       = [];
+	protected $in_retrial = false;
+	protected $testmode = false;
+	private $relation = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -110,25 +110,24 @@ class Database
 		$this->connected = false;
 
 		$port       = 0;
-		$serveraddr = trim($this->configCache->get('database', 'hostname'));
+		$serveraddr = trim($this->configCache->get('database', 'hostname') ?? '');
 		$serverdata = explode(':', $serveraddr);
-		$server     = $serverdata[0];
+		$host       = trim($serverdata[0]);
 		if (count($serverdata) > 1) {
 			$port = trim($serverdata[1]);
 		}
 
-		if (!empty(trim($this->configCache->get('database', 'port')))) {
-			$port = trim($this->configCache->get('database', 'port'));
+		if (trim($this->configCache->get('database', 'port') ?? 0)) {
+			$port = trim($this->configCache->get('database', 'port') ?? 0);
 		}
 
-		$server  = trim($server);
-		$user    = trim($this->configCache->get('database', 'username'));
-		$pass    = trim($this->configCache->get('database', 'password'));
-		$db      = trim($this->configCache->get('database', 'database'));
-		$charset = trim($this->configCache->get('database', 'charset'));
-		$socket  = trim($this->configCache->get('database', 'socket')); 
+		$user     = trim($this->configCache->get('database', 'username'));
+		$pass     = trim($this->configCache->get('database', 'password'));
+		$database = trim($this->configCache->get('database', 'database'));
+		$charset  = trim($this->configCache->get('database', 'charset'));
+		$socket   = trim($this->configCache->get('database', 'socket'));
 
-		if (!(strlen($server) && strlen($user))) {
+		if (!$host && !$socket || !$user) {
 			return false;
 		}
 
@@ -138,19 +137,20 @@ class Database
 
 		if (!$this->configCache->get('database', 'disable_pdo') && class_exists('\PDO') && in_array('mysql', PDO::getAvailableDrivers())) {
 			$this->driver = self::PDO;
-			$connect      = "mysql:host=" . $server . ";dbname=" . $db;
-
-			if ($port > 0) {
-				$connect .= ";port=" . $port;
+			if ($socket) {
+				$connect = 'mysql:unix_socket=' . $socket;
+			} else {
+				$connect = 'mysql:host=' . $host;
+				if ($port > 0) {
+					$connect .= ';port=' . $port;
+				}
 			}
 
 			if ($charset) {
-				$connect .= ";charset=" . $charset;
+				$connect .= ';charset=' . $charset;
 			}
 
-			if ($socket) {
-				$connect .= ";$unix_socket=" . $socket;
-			}
+			$connect .= ';dbname=' . $database;
 
 			try {
 				$this->connection = @new PDO($connect, $user, $pass, [PDO::ATTR_PERSISTENT => $persistent]);
@@ -165,10 +165,12 @@ class Database
 		if (!$this->connected && class_exists('\mysqli')) {
 			$this->driver = self::MYSQLI;
 
-			if ($port > 0) {
-				$this->connection = @new mysqli($server, $user, $pass, $db, $port);
+			if ($socket) {
+				$this->connection = @new mysqli(null, $user, $pass, $database, null, $socket);
+			} elseif ($port > 0) {
+				$this->connection = @new mysqli($host, $user, $pass, $database, $port);
 			} else {
-				$this->connection = @new mysqli($server, $user, $pass, $db);
+				$this->connection = @new mysqli($host, $user, $pass, $database);
 			}
 
 			if (!mysqli_connect_errno()) {
@@ -177,11 +179,6 @@ class Database
 				if ($charset) {
 					$this->connection->set_charset($charset);
 				}
-
-				if ($socket) {
-					$this->connection->set_socket($socket);
-				}
-
 			}
 		}
 
@@ -198,6 +195,7 @@ class Database
 	{
 		$this->testmode = $test;
 	}
+
 	/**
 	 * Sets the logger for DBA
 	 *
@@ -222,6 +220,7 @@ class Database
 	{
 		$this->profiler = $profiler;
 	}
+
 	/**
 	 * Disconnects the current database connection
 	 */
@@ -338,12 +337,12 @@ class Database
 		}
 
 		$watchlist = explode(',', $this->configCache->get('system', 'db_log_index_watch'));
-		$denylist = explode(',', $this->configCache->get('system', 'db_log_index_denylist'));
+		$denylist  = explode(',', $this->configCache->get('system', 'db_log_index_denylist'));
 
 		while ($row = $this->fetch($r)) {
 			if ((intval($this->configCache->get('system', 'db_loglimit_index')) > 0)) {
 				$log = (in_array($row['key'], $watchlist) &&
-				        ($row['rows'] >= intval($this->configCache->get('system', 'db_loglimit_index'))));
+					($row['rows'] >= intval($this->configCache->get('system', 'db_loglimit_index'))));
 			} else {
 				$log = false;
 			}
@@ -358,11 +357,15 @@ class Database
 
 			if ($log) {
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents($this->configCache->get('system', 'db_log_index'), DateTimeFormat::utcNow() . "\t" .
-				                                                                      $row['key'] . "\t" . $row['rows'] . "\t" . $row['Extra'] . "\t" .
-				                                                                      basename($backtrace[1]["file"]) . "\t" .
-				                                                                      $backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t" .
-				                                                                      substr($query, 0, 4000) . "\n", FILE_APPEND);
+				@file_put_contents(
+					$this->configCache->get('system', 'db_log_index'),
+					DateTimeFormat::utcNow() . "\t" .
+					$row['key'] . "\t" . $row['rows'] . "\t" . $row['Extra'] . "\t" .
+					basename($backtrace[1]["file"]) . "\t" .
+					$backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t" .
+					substr($query, 0, 4000) . "\n",
+					FILE_APPEND
+				);
 			}
 		}
 	}
@@ -449,7 +452,7 @@ class Database
 	{
 		$server_info = $this->serverInfo();
 		if (version_compare($server_info, '5.7.5', '<') ||
-		    (stripos($server_info, 'MariaDB') !== false)) {
+			(stripos($server_info, 'MariaDB') !== false)) {
 			$sql = str_ireplace('ANY_VALUE(', 'MIN(', $sql);
 		}
 		return $sql;
@@ -647,7 +650,7 @@ class Database
 					} elseif (is_string($args[$param])) {
 						$param_types .= 's';
 					} elseif (is_object($args[$param]) && method_exists($args[$param], '__toString')) {
-						$param_types .= 's';
+						$param_types  .= 's';
 						$args[$param] = (string)$args[$param];
 					} else {
 						$param_types .= 'b';
@@ -743,10 +746,14 @@ class Database
 				$duration  = round($duration, 3);
 				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-				@file_put_contents($this->configCache->get('system', 'db_log'), DateTimeFormat::utcNow() . "\t" . $duration . "\t" .
-				                                                                basename($backtrace[1]["file"]) . "\t" .
-				                                                                $backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t" .
-				                                                                substr($this->replaceParameters($sql, $args), 0, 4000) . "\n", FILE_APPEND);
+				@file_put_contents(
+					$this->configCache->get('system', 'db_log'),
+					DateTimeFormat::utcNow() . "\t" . $duration . "\t" .
+					basename($backtrace[1]["file"]) . "\t" .
+					$backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t" .
+					substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
+					FILE_APPEND
+				);
 			}
 		}
 		return $retval;
@@ -1365,7 +1372,7 @@ class Database
 			. $condition_string;
 
 		// Combines the updated fields parameter values with the condition parameter values
-		$params  = array_merge(array_values($fields), $condition);
+		$params = array_merge(array_values($fields), $condition);
 
 		return $this->e($sql, $params);
 	}
@@ -1415,8 +1422,8 @@ class Database
 	/**
 	 * Escape fields, adding special treatment for "group by" handling
 	 *
-	 * @param array $fields 
-	 * @param array $options 
+	 * @param array $fields
+	 * @param array $options
 	 * @return array Escaped fields
 	 */
 	private function escapeFields(array $fields, array $options): array
@@ -1438,8 +1445,7 @@ class Database
 			}
 		}
 
-		array_walk($fields, function(&$value, $key) use ($options)
-		{
+		array_walk($fields, function (&$value, $key) use ($options) {
 			$field = $value;
 			$value = DBA::quoteIdentifier($field);
 
@@ -1487,7 +1493,7 @@ class Database
 		}
 
 		if (count($fields) > 0) {
-			$fields = $this->escapeFields($fields, $params);
+			$fields        = $this->escapeFields($fields, $params);
 			$select_string = implode(', ', $fields);
 		} else {
 			$select_string = '*';
@@ -1827,16 +1833,16 @@ class Database
 	/**
 	 * Replaces a string in the provided fields of the provided table
 	 *
-	 * @param string $table  Table name
-	 * @param array  $fields List of field names in the provided table
-	 * @param string $search String to search for
+	 * @param string $table   Table name
+	 * @param array  $fields  List of field names in the provided table
+	 * @param string $search  String to search for
 	 * @param string $replace String to replace with
 	 * @return void
 	 * @throws \Exception
 	 */
 	public function replaceInTableFields(string $table, array $fields, string $search, string $replace)
 	{
-		$search = $this->escape($search);
+		$search  = $this->escape($search);
 		$replace = $this->escape($replace);
 
 		$upd = [];

@@ -65,7 +65,7 @@ class Seen extends BaseApi
 			DI::notify()->save($Notify);
 
 			if ($Notify->otype === Notification\ObjectType::ITEM) {
-				$item = Post::selectFirstForUser($uid, [], ['id' => $Notify->iid, 'uid' => $uid]);
+				$item = Post::selectFirstForUser($uid, [], ['id' => $Notify->itemId, 'uid' => $uid]);
 				if (DBA::isResult($item)) {
 					// we found the item, return it to the user
 					$ret  = [DI::twitterStatus()->createFromUriId($item['uri-id'], $item['uid'], $include_entities)->toArray()];

@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
+use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -69,6 +70,8 @@ class Statuses extends BaseApi
 
 		if ($request['pinned']) {
 			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => Post\Collection::FEATURED];
+		} elseif ($request['only_media']) {
+			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO]];
 		} elseif (!$uid) {
 			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED],
 				'uid' => 0, 'network' => Protocol::FEDERATED];
@@ -76,16 +79,11 @@ class Statuses extends BaseApi
 			$condition = ["`author-id` = ? AND (`uid` = 0 OR (`uid` = ? AND NOT `global`))", $id, $uid];
 		}
 
-		if (!$request['pinned']) {
+		if (!$request['pinned'] && !$request['only_media']) {
 			$condition = DBA::mergeConditions($condition, ["(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ?))",
 				Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
 		}
 
-		if ($request['only_media']) {
-			$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
-				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO]);
-		}
-	
 		if (!empty($request['max_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` < ?", $request['max_id']]);
 		}
@@ -99,12 +97,16 @@ class Statuses extends BaseApi
 			$params['order'] = ['uri-id'];
 		}
 
-		if ($request['exclude_replies']) {
+		if (($request['pinned'] || $request['only_media']) && $request['exclude_replies']) {
 			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_PARENT]);
 		}
 
 		if ($request['pinned']) {
 			$items = DBA::select('collection-view', ['uri-id'], $condition, $params);
+		} elseif ($request['only_media']) {
+			$items = DBA::select('media-view', ['uri-id'], $condition, $params);
+		} elseif ($request['exclude_replies']) {
+			$items = Post::selectThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectForUser($uid, ['uri-id'], $condition, $params);
 		}
@@ -112,7 +114,11 @@ class Statuses extends BaseApi
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
-			$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+			try {
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+			} catch (\Throwable $th) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
+			}
 		}
 		DBA::close($items);
 

@@ -59,7 +59,7 @@ class Card extends BaseDataTransferObject
 	 * @param array   $attachment Attachment record
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(array $attachment)
+	public function __construct(array $attachment, array $history = [])
 	{
 		$this->url           = $attachment['url'] ?? '';
 		$this->title         = $attachment['title'] ?? '';
@@ -72,6 +72,7 @@ class Card extends BaseDataTransferObject
 		$this->width         = $attachment['width'] ?? 0;
 		$this->height        = $attachment['height'] ?? 0;
 		$this->image         = $attachment['image'] ?? '';
+		$this->history       = $history;
 	}
 
 	/**

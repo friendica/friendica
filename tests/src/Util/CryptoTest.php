@@ -65,7 +65,7 @@ class CryptoTest extends TestCase
 		self::assertEquals(11111111, $test);
 	}
 
-	public function dataRsa()
+	public function dataRsa(): array
 	{
 		return [
 			'diaspora' => [
@@ -91,34 +91,6 @@ class CryptoTest extends TestCase
 				'key' => file_get_contents(__DIR__ . '/../../datasets/crypto/rsa/diaspora-public-pem'),
 			],
 		];
-	}
-
-	/**
-	 * @dataProvider dataPEM
-	 */
-	public function testPemToMe(string $key)
-	{
-		Crypto::pemToMe($key, $m, $e);
-
-		$expectedRSA = new RSA();
-		$expectedRSA->loadKey([
-			'e' => new BigInteger($e, 256),
-			'n' => new BigInteger($m, 256)
-		]);
-
-		self::assertEquals($expectedRSA->getPublicKey(), $key);
-	}
-
-	/**
-	 * @dataProvider dataPEM
-	 */
-	public function testMeToPem(string $key)
-	{
-		Crypto::pemToMe($key, $m, $e);
-
-		$checkKey = Crypto::meToPem($m, $e);
-
-		self::assertEquals($key, $checkKey);
 	}
 }
 

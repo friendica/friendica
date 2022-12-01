@@ -375,6 +375,21 @@ class Post
 	}
 
 	/**
+	 * Select rows from the post-thread-view view
+	 *
+	 * @param array $selected  Array of selected fields, empty for all
+	 * @param array $condition Array of fields for condition
+	 * @param array $params    Array of several parameters
+	 *
+	 * @return boolean|object
+	 * @throws \Exception
+	 */
+	public static function selectPostThread(array $selected = [], array $condition = [], array $params = [])
+	{
+		return self::selectView('post-thread-view', $selected, $condition, $params);
+	}
+
+	/**
 	 * Select rows from the given view for a given user
 	 *
 	 * @param string  $view      View (post-user-view or post-thread-user-view)

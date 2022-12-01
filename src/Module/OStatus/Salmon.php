@@ -142,14 +142,9 @@ class Salmon extends \Friendica\BaseModule
 			throw new HTTPException\BadRequestException();
 		}
 
-		$key_info = explode('.', $key);
+		$this->logger->info('Key details', ['info' => $key]);
 
-		$m = Strings::base64UrlDecode($key_info[1]);
-		$e = Strings::base64UrlDecode($key_info[2]);
-
-		$this->logger->info('Key details', ['info' => $key_info]);
-
-		$pubkey = Crypto::meToPem($m, $e);
+		$pubkey = SalmonProtocol::magicKeyToPem($key);
 
 		// We should have everything we need now. Let's see if it verifies.
 

@@ -166,7 +166,7 @@ $(function() {
 
 	/* event from comment textarea button popups */
 	/* insert returned bbcode at cursor position or replace selected text */
-	$("body").on("fbrowser.image.comment", function(e, filename, bbcode, id) {
+	$('body').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
 		$.colorbox.close();
 		var textarea = document.getElementById("comment-edit-text-" +id);
 		var start = textarea.selectionStart;
@@ -590,7 +590,7 @@ function liveUpdate(src) {
 
 	var orgHeight = $("section").height();
 
-	var udargs = ((netargs.length) ? netargs : '');
+	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = 'update_' + src + udargs + '&p=' + profile_uid + '&force=' + (force ? 1 : 0) + '&item=' + update_item;
 
@@ -1069,7 +1069,7 @@ var Dialog = {
 	 * to the event handler
 	 */
 	doImageBrowser : function (name, id) {
-		var url = Dialog._get_url("image",name,id);
+		var url = Dialog._get_url('photo', name, id);
 		return Dialog.show(url);
 	},
 
@@ -1086,7 +1086,7 @@ var Dialog = {
 	 * to the event handler
 	 */
 	doFileBrowser : function (name, id) {
-		var url = Dialog._get_url("file",name,id);
+		var url = Dialog._get_url('attachment', name, id);
 		return Dialog.show(url);
 	},
 
@@ -1095,7 +1095,7 @@ var Dialog = {
 		if (id !== undefined) {
 			hash = hash + "-" + id;
 		}
-		return baseurl + "/fbrowser/"+type+"/?mode=minimal#"+hash;
+		return 'media/' + type + '/browser?mode=minimal#' + hash;
 	},
 
 	_get_size: function() {

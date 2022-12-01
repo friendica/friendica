@@ -664,6 +664,8 @@
 			"question-end-time" => ["post-question", "end-time"],
 			"has-categories" => "0",
 			"has-media" => "EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-thread`.`uri-id`)",
+			"total-comments" => "(SELECT COUNT(*) FROM `post` WHERE `parent-uri-id` = `post-thread`.`uri-id` AND `gravity` = 6)",
+			"total-actors" => "(SELECT COUNT(DISTINCT(`author-id`)) FROM `post` WHERE `parent-uri-id` = `post-thread`.`uri-id` AND `gravity` = 6)",
 			"signed_text" => ["diaspora-interaction", "interaction"],
 			"parent-guid" => ["parent-item-uri", "guid"],
 			"parent-network" => ["parent-post", "network"],
@@ -720,6 +722,22 @@
 		"query" => "FROM `post-collection`
 			INNER JOIN `post` ON `post-collection`.`uri-id` = `post`.`uri-id`
 			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `post`.`parent-uri-id`"
+	],
+	"media-view" => [
+		"fields" => [
+			"uri-id" => ["post-media", "uri-id"],
+			"type" => ["post-media", "type"],
+			"received" => ["post", "received"],
+			"created" => ["post", "created"],
+			"private" => ["post", "private"],
+			"visible" => ["post", "visible"],
+			"deleted" => ["post", "deleted"],
+			"thr-parent-id" => ["post", "thr-parent-id"],
+			"author-id" => ["post", "author-id"],
+			"gravity" => ["post", "gravity"],
+		],
+		"query" => "FROM `post-media`
+			INNER JOIN `post` ON `post-media`.`uri-id` = `post`.`uri-id`"
 	],
 	"tag-view" => [
 		"fields" => [

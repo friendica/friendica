@@ -92,7 +92,7 @@
 		{{if !$additional}}
 			<h3>{{$importh}}</h3>
 			<div id ="import-profile">
-				<a href="uimport">{{$importt}}</a>
+				<a href="user/import">{{$importt}}</a>
 			</div>
 		{{/if}}
 	</form>

@@ -136,7 +136,7 @@ class Display extends BaseModule
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
-			$parent = Post::selectFirstForUser($itemUid, $fields, [
+			$parent = Post::selectFirst($fields, [
 				'uid'    => [0, $itemUid],
 				'uri-id' => $item['parent-uri-id']
 			], ['order' => ['uid' => true]]);
@@ -196,8 +196,7 @@ class Display extends BaseModule
 
 	protected function getDisplayData(array $item, bool $update = false, int $updateUid = 0, bool $force = false): string
 	{
-		$isRemoteContact = false;
-		$itemUid         = $this->session->getLocalUserId();
+		$itemUid = $this->session->getLocalUserId();
 
 		$parent = null;
 		if (!$this->session->getLocalUserId() && !empty($item['parent-uri-id'])) {
@@ -206,8 +205,7 @@ class Display extends BaseModule
 
 		if (!empty($parent)) {
 			$pageUid         = $parent['uid'];
-			$isRemoteContact = $this->session->getRemoteContactID($pageUid);
-			if ($isRemoteContact) {
+			if ($this->session->getRemoteContactID($pageUid)) {
 				$itemUid = $parent['uid'];
 			}
 		} else {
@@ -215,13 +213,11 @@ class Display extends BaseModule
 		}
 
 		if (!empty($pageUid) && ($pageUid != $this->session->getLocalUserId())) {
-			$page_user = User::getById($pageUid, ['hidewall']);
+			$page_user = User::getById($pageUid, ['nickname', 'hidewall']);
 		}
 
-		$is_owner = $this->session->getLocalUserId() && (in_array($pageUid, [$this->session->getLocalUserId(), 0]));
-
-		if (!empty($page_user['hidewall']) && !$is_owner && !$isRemoteContact) {
-			throw new HTTPException\ForbiddenException($this->t('Access to this profile has been restricted.'));
+		if (!empty($page_user['hidewall']) && !$this->session->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $page_user['nickname'] . '/restricted');
 		}
 
 		$sql_extra = Item::getPermissionsSQLByUserId($pageUid);
@@ -249,7 +245,15 @@ class Display extends BaseModule
 		$item = Post::selectFirstForUser($pageUid, $fields, $condition);
 
 		if (empty($item)) {
-			throw new HTTPException\NotFoundException($this->t('The requested item doesn\'t exist or has been deleted.'));
+			$this->page['aside'] = '';
+			throw new HTTPException\NotFoundException($this->t('Unfortunately, the requested conversation isn\'t available to you.</p>
+<p>Possible reasons include:</p>
+<ul>
+	<li>The top-level post isn\'t visible.</li>
+	<li>The top-level post was deleted.</li>
+	<li>The node has blocked the top-level author or the author of the shared post.</li>
+	<li>You have ignored or blocked the top-level author or the author of the shared post.</li>
+</ul><p>'));
 		}
 
 		$item['uri-id'] = $item['parent-uri-id'];
@@ -266,6 +270,8 @@ class Display extends BaseModule
 		$this->addMetaTags($item);
 
 		$output = '';
+
+		$is_owner = $this->session->getLocalUserId() && (in_array($pageUid, [$this->session->getLocalUserId(), 0]));
 
 		// We need the editor here to be able to reshare an item.
 		if ($is_owner && !$update) {

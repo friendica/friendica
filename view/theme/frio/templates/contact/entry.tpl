@@ -6,7 +6,7 @@
 			<div class="contact-entry-photo mframe" id="contact-entry-photo-{{$contact.id}}">
 
 				<div class="contact-photo-image-wrapper hidden-xs">
-					<a href="{{if $contact.photo_menu.edit}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">
+					<a href="{{if !empty($contact.photo_menu.edit)}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">
 						<img class="contact-photo media-object xl" src="{{$contact.thumb}}" {{$contact.sparkle}} alt="{{$contact.name}}" />
 					</a>
 				</div>

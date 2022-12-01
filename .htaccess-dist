@@ -51,6 +51,6 @@ AddType audio/ogg .oga
 
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^(.*)$ index.php?pagename=$1 [E=REMOTE_USER:%{HTTP:Authorization},L,QSA]
+  RewriteRule ^(.*)$ index.php?pagename=$1 [E=REMOTE_USER:%{HTTP:Authorization},L,QSA,B]
 
 </IfModule>

@@ -33,6 +33,7 @@ use Friendica\Navigation\Notifications\Collection;
 use Friendica\Navigation\Notifications\Entity;
 use Friendica\Navigation\Notifications\Factory;
 use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
@@ -267,5 +268,24 @@ class Notification extends BaseRepository
 		$this->logger->notice('deleteForUserByVerb', ['condition' => $condition]);
 
 		return $this->db->delete(self::$table_name, $condition);
+	}
+
+	public function deleteForItem(int $itemUriId): bool
+	{
+		$conditionTarget = [
+			'vid' => Verb::getID(Activity::POST),
+			'target-uri-id' => $itemUriId,
+		];
+
+		$conditionParent = [
+			'vid' => Verb::getID(Activity::POST),
+			'parent-uri-id' => $itemUriId,
+		];
+
+		$this->logger->notice('deleteForItem', ['conditionTarget' => $conditionTarget, 'conditionParent' => $conditionParent]);
+
+		return
+			$this->db->delete(self::$table_name, $conditionTarget)
+			&& $this->db->delete(self::$table_name, $conditionParent);
 	}
 }

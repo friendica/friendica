@@ -70,7 +70,7 @@ class Notification extends BaseFactory
 			$status = null;
 		}
 
-		return new MstdnNotification($Notification->id, $type, $Notification->created, $account, $status);
+		return new MstdnNotification($Notification->id, $type, $Notification->created, $account, $status, $Notification->dismissed);
 	}
 
 	/**
@@ -87,6 +87,11 @@ class Notification extends BaseFactory
 			if (($contact['uid'] == 0) && !empty($contact['uri-id'])) {
 				$contact = Contact::selectFirst(['pending'], ['uri-id' => $contact['uri-id'], 'uid' => $Notification->uid]);
 			}
+
+			if (!isset($contact['pending'])) {
+				return '';
+			}
+
 			$type = $contact['pending'] ? MstdnNotification::TYPE_INTRODUCTION : MstdnNotification::TYPE_FOLLOW;
 		} elseif (($Notification->verb == Activity::ANNOUNCE) &&
 			in_array($Notification->type, [Post\UserNotification::TYPE_DIRECT_COMMENT, Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT])) {

@@ -23,6 +23,7 @@ namespace Friendica\Model;
 
 use Friendica\Content\Pager;
 use Friendica\Database\DBA;
+use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 
@@ -113,21 +114,27 @@ class Register
 	}
 
 	/**
-	 * Creates a register record for approval and returns the success of the database insert
+	 * Creates a register record for approval
 	 * Checks for the existence of the provided user id
 	 *
-	 * @param  integer $uid      The ID of the user needing approval
-	 * @param  string  $language The registration language
-	 * @param  string  $note     An additional message from the user
-	 * @return boolean
-	 * @throws \Exception
+	 * @param integer $uid      The ID of the user needing approval
+	 * @param string  $language The registration language
+	 * @param string  $note     An additional message from the user
+	 * @return void
+	 * @throws \OutOfBoundsException
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\NotFoundException
 	 */
-	public static function createForApproval(int $uid, string $language, string $note = ''): bool
+	public static function createForApproval(int $uid, string $language, string $note = ''): void
 	{
 		$hash = Strings::getRandomHex();
 
+		if (!$uid) {
+			throw new \OutOfBoundsException("User ID can't be empty");
+		}
+
 		if (!User::exists($uid)) {
-			return false;
+			throw new HTTPException\NotFoundException("User ID doesn't exist");
 		}
 
 		$fields = [
@@ -139,7 +146,9 @@ class Register
 			'note'     => $note
 		];
 
-		return DBA::insert('register', $fields);
+		if (!DBA::insert('register', $fields)) {
+			throw new HTTPException\InternalServerErrorException('Unable to insert a `register` record');
+		}
 	}
 
 	/**

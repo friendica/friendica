@@ -353,6 +353,7 @@ class Register extends BaseModule
 			}
 		} elseif (intval(DI::config()->get('config', 'register_policy')) === self::APPROVE) {
 			if (!User::getAdminEmailList()) {
+				$this->logger->critical('Registration policy is set to APPROVE but no admin email address has been set in config.admin_email');
 				DI::sysmsg()->addNotice(DI::l10n()->t('Your registration can not be processed.'));
 				DI::baseUrl()->redirect();
 			}
@@ -362,10 +363,17 @@ class Register extends BaseModule
 				DI::sysmsg()->addNotice(DI::l10n()->t('You have to leave a request note for the admin.')
 					. DI::l10n()->t('Your registration can not be processed.'));
 
-				DI::baseUrl()->redirect('register/');
+				$this->baseUrl->redirect('register');
 			}
 
-			Model\Register::createForApproval($user['uid'], DI::config()->get('system', 'language'), $_POST['permonlybox']);
+			try {
+				Model\Register::createForApproval($user['uid'], DI::config()->get('system', 'language'), $_POST['permonlybox']);
+			} catch (\Throwable $e) {
+				$this->logger->error('Unable to create a `register` record.', ['user' => $user]);
+				DI::sysmsg()->addNotice(DI::l10n()->t('An internal error occured.')
+					. DI::l10n()->t('Your registration can not be processed.'));
+				$this->baseUrl->redirect('register');
+			}
 
 			// invite system
 			if ($using_invites && $invite_id) {

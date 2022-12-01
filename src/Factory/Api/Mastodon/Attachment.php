@@ -94,12 +94,17 @@ class Attachment extends BaseFactory
 	 */
 	public function createFromPhoto(int $id): array
 	{
-		$photo = Photo::selectFirst(['resource-id', 'uid', 'id', 'title', 'type'], ['id' => $id]);
+		$photo = Photo::selectFirst(['resource-id', 'uid', 'id', 'title', 'type', 'width', 'height'], ['id' => $id]);
 		if (empty($photo)) {
 			return [];
 		}
 
-		$attachment = ['id' => $photo['id'], 'description' => $photo['title']];
+		$attachment = [
+			'id'          => $photo['id'],
+			'description' => $photo['title'],
+			'width'       => $photo['width'],
+			'height'      => $photo['height'],
+		];
 
 		$photoTypes = Images::supportedTypes();
 		$ext        = $photoTypes[$photo['type']];
@@ -112,7 +117,6 @@ class Attachment extends BaseFactory
 		} else {
 			$preview_url = '';
 		}
-
 
 		$object = new \Friendica\Object\Api\Mastodon\Attachment($attachment, 'image', $url, $preview_url, '');
 		return $object->toArray();

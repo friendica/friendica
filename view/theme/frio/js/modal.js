@@ -82,7 +82,7 @@ $(document).ready(function () {
 	});
 
 	// Insert filebrowser images into the input field (field_fileinput.tpl).
-	$("body").on("fbrowser.image.input", function (e, filename, embedcode, id, img) {
+	$("body").on("fbrowser.photo.input", function (e, filename, embedcode, id, img) {
 		// Select the clicked button by it's attribute.
 		var elm = $("[image-input='select']");
 		// Select the input field which belongs to this button.
@@ -132,12 +132,12 @@ Dialog.show = function (url, title) {
 Dialog._get_url = function (type, name, id) {
 	var hash = name;
 	if (id !== undefined) hash = hash + "-" + id;
-	return "fbrowser/" + type + "/?mode=none&theme=frio#" + hash;
+	return 'media/' + type + '/browser?mode=none&theme=frio#' + hash;
 };
 
 // Does load the filebrowser into the jot modal.
 Dialog.showJot = function () {
-	var type = "image";
+	var type = "photo";
 	var name = "main";
 
 	var url = Dialog._get_url(type, name);
@@ -159,15 +159,15 @@ Dialog._load = function (url) {
 	let filebrowser = document.getElementById("filebrowser");
 
 	// Try to fetch the hash form the url.
-	let match = url.match(/fbrowser\/[a-z]+\/.*(#.*)/);
+	let match = url.match(/media\/[a-z]+\/.*(#.*)/);
 	if (!filebrowser || match === null) {
 		return; //not fbrowser
 	}
 
 	// Initialize the filebrowser.
 	loadScript("view/js/ajaxupload.js");
-	loadScript("view/theme/frio/js/filebrowser.js", function () {
-		FileBrowser.init(filebrowser.dataset.nickname, filebrowser.dataset.type, match[1]);
+	loadScript("view/theme/frio/js/module/media/browser.js", function () {
+		Browser.init(filebrowser.dataset.nickname, filebrowser.dataset.type, match[1]);
 	});
 };
 

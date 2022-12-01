@@ -81,7 +81,7 @@ final class FriendicaSmartyEngine extends TemplateEngine
 
 		// "middleware": inject variables into templates
 		$arr = [
-			'template' => basename($this->smarty->filename),
+			'template' => basename($this->smarty->filename ?? ''),
 			'vars' => $vars
 		];
 		Hook::callAll('template_vars', $arr);

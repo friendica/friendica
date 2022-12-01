@@ -41,7 +41,8 @@ class Dismiss extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		$Notification = DI::notification()->selectOneForUser($uid, $this->parameters['id']);
+		$condition = ['id' => $this->parameters['id']];
+		$Notification = DI::notification()->selectOneForUser($uid, $condition);
 		$Notification->setDismissed();
 		DI::notification()->save($Notification);
 

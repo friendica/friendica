@@ -3261,7 +3261,7 @@ img.photo-album-photo {
 }
 
 /* upload/select popup */
-fbrowser.image .photo-album-image-wrapper { margin-left: 10px; }
+fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 #message-preview { margin-top: 15px; }
 #message-preview span { width: 100%; }
 #message-preview .mail-count, #message-preview .mail-delete { display:none; }

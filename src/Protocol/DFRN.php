@@ -538,7 +538,7 @@ class DFRN
 
 			XML::addElement($doc, $author, 'poco:utcOffset', DateTimeFormat::timezoneNow($profile['timezone'], 'P'));
 
-			if (trim($profile['homepage']) != '') {
+			if (trim($profile['homepage'])) {
 				$urls = $doc->createElement('poco:urls');
 				XML::addElement($doc, $urls, 'poco:type', 'homepage');
 				XML::addElement($doc, $urls, 'poco:value', $profile['homepage']);
@@ -546,7 +546,7 @@ class DFRN
 				$author->appendChild($urls);
 			}
 
-			if (trim($profile['pub_keywords']) != '') {
+			if (trim($profile['pub_keywords'] ?? '')) {
 				$keywords = explode(',', $profile['pub_keywords']);
 
 				foreach ($keywords as $keyword) {
@@ -554,7 +554,7 @@ class DFRN
 				}
 			}
 
-			if (trim($profile['xmpp']) != '') {
+			if (trim($profile['xmpp'])) {
 				$ims = $doc->createElement('poco:ims');
 				XML::addElement($doc, $ims, 'poco:type', 'xmpp');
 				XML::addElement($doc, $ims, 'poco:value', $profile['xmpp']);
@@ -562,7 +562,7 @@ class DFRN
 				$author->appendChild($ims);
 			}
 
-			if (trim($profile['locality'] . $profile['region'] . $profile['country-name']) != '') {
+			if (trim($profile['locality'] . $profile['region'] . $profile['country-name'])) {
 				$element = $doc->createElement('poco:address');
 
 				XML::addElement($doc, $element, 'poco:formatted', Profile::formatLocation($profile));

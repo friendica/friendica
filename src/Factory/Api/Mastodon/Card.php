@@ -30,13 +30,14 @@ use Friendica\Util\Strings;
 class Card extends BaseFactory
 {
 	/**
-	 * @param int $uriId Uri-ID of the item
+	 * @param int   $uriId   Uri-ID of the item
+	 * @param array $history Link request history
 	 *
 	 * @return \Friendica\Object\Api\Mastodon\Card
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException*@throws \Exception
 	 */
-	public function createFromUriId(int $uriId): \Friendica\Object\Api\Mastodon\Card
+	public function createFromUriId(int $uriId, array $history = []): \Friendica\Object\Api\Mastodon\Card
 	{
 		$item = Post::selectFirst(['body'], ['uri-id' => $uriId]);
 		if (!empty($item['body'])) {
@@ -76,6 +77,6 @@ class Card extends BaseFactory
 			}
 		}
 
-		return new \Friendica\Object\Api\Mastodon\Card($data);
+		return new \Friendica\Object\Api\Mastodon\Card($data, $history);
 	}
 }

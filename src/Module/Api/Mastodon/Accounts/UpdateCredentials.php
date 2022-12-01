@@ -21,8 +21,12 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
-use Friendica\App\Router;
 use Friendica\Core\Logger;
+use Friendica\DI;
+use Friendica\Model\Contact;
+use Friendica\Model\Photo;
+use Friendica\Model\Profile;
+use Friendica\Model\User;
 use Friendica\Module\BaseApi;
 
 /**
@@ -35,8 +39,72 @@ class UpdateCredentials extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		Logger::info('Patch data', ['data' => $request]);
+		$owner = User::getOwnerDataById($uid);
 
-		$this->response->unsupported(Router::PATCH, $request);
+		$request = $this->getRequest([
+			'bot'               => ($owner['contact-type'] == Contact::TYPE_NEWS),
+			'discoverable'      => $owner['net-publish'],
+			'display_name'      => $owner['name'],
+			'fields_attributes' => [],
+			'locked'            => $owner['manually-approve'],
+			'note'              => $owner['about'],
+			'avatar'            => [],
+			'header'            => [],
+		], $request);
+
+		$user    = [];
+		$profile = [];
+
+		if ($request['bot']) {
+			$user['account-type'] = Contact::TYPE_NEWS;
+			$user['page-flags']   = User::PAGE_FLAGS_SOAPBOX;
+		} elseif ($owner['contact-type'] == Contact::TYPE_NEWS) {
+			$user['account-type'] = Contact::TYPE_PERSON;
+		} else {
+			$user['account-type'] = $owner['contact-type'];
+		}
+
+		$profile['net-publish'] = $request['discoverable'];
+
+		if (!empty($request['display_name'])) {
+			$user['username'] = $request['display_name'];
+		}
+
+		if ($user['account-type'] == Contact::TYPE_COMMUNITY) {
+			$user['page-flags'] = $request['locked'] ? User::PAGE_FLAGS_PRVGROUP : User::PAGE_FLAGS_COMMUNITY;
+		} elseif ($user['account-type'] == Contact::TYPE_PERSON) {
+			if ($request['locked']) {
+				$user['page-flags'] = User::PAGE_FLAGS_NORMAL;
+			} elseif ($owner['page-flags'] == User::PAGE_FLAGS_NORMAL) {
+				$user['page-flags'] = User::PAGE_FLAGS_SOAPBOX;
+			}
+		}
+
+		if (!empty($request['note'])) {
+			$profile['about'] = $request['note'];
+		}
+
+		Logger::debug('Patch data', ['data' => $request, 'files' => $_FILES]);
+
+		Logger::info('Update profile and user', ['uid' => $uid, 'user' => $user, 'profile' => $profile]);
+
+		if (!empty($request['avatar'])) {
+			Photo::uploadAvatar(1, $request['avatar']);
+		}
+
+		if (!empty($request['header'])) {
+			Photo::uploadBanner(1, $request['header']);
+		}
+
+		User::update($user, $uid);
+		Profile::update($profile, $uid);
+
+		$cdata = Contact::getPublicAndUserContactID($owner['id'], $uid);
+		if (empty($cdata)) {
+			DI::mstdnError()->InternalError();
+		}
+
+		$account = DI::mstdnAccount()->createFromContactId($cdata['user'], $uid);
+		$this->response->exitWithJson($account->toArray());
 	}
 }

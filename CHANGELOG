@@ -1,5 +1,6 @@
 Version 2022.12 (unreleased)
   Friendica Core
+    The rewrite rule in .htaccess-dist has been changed. The change has to be applied manually to the existing .htaccess
 
   Friendica Addons
     BREAKING: The functions from the boot.php file have been moved into better fitting classes

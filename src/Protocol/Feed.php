@@ -40,6 +40,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
+use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
@@ -915,28 +916,23 @@ class Feed
 	 * Updates the provided last_update parameter if the result comes from the
 	 * cache or it is empty
 	 *
-	 * @param string  $owner_nick  Nickname of the feed owner
+	 * @param array   $owner       owner-view record of the feed owner
 	 * @param string  $last_update Date of the last update
 	 * @param integer $max_items   Number of maximum items to fetch
 	 * @param string  $filter      Feed items filter (activity, posts or comments)
 	 * @param boolean $nocache     Wether to bypass caching
 	 *
 	 * @return string Atom feed
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function atom(string $owner_nick, string $last_update, int $max_items = 300, string $filter = 'activity', bool $nocache = false)
+	public static function atom(array $owner, string $last_update, int $max_items = 300, string $filter = 'activity', bool $nocache = false)
 	{
 		$stamp = microtime(true);
 
-		$owner = User::getOwnerDataByNick($owner_nick);
-		if (!$owner) {
-			return;
-		}
+		$cachekey = 'feed:feed:' . $owner['nickname'] . ':' . $filter . ':' . $last_update;
 
-		$cachekey = 'feed:feed:' . $owner_nick . ':' . $filter . ':' . $last_update;
-
-		// Display events in the users's timezone
+		// Display events in the user's timezone
 		if (strlen($owner['timezone'])) {
 			DI::app()->setTimeZone($owner['timezone']);
 		}

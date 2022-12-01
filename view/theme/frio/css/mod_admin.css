@@ -40,3 +40,11 @@ tr.details th {
 .adminpage td {
 	word-break: break-all;
 }
+
+.adminpage input[id=id_maximagesize]:valid {
+	background-color: palegreen;
+}
+
+.adminpage input[id=id_maximagesize]:invalid {
+	background-color: lightpink;
+}

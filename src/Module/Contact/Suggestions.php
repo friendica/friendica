@@ -57,7 +57,7 @@ class Suggestions extends \Friendica\BaseModule
 		$this->page['aside'] .= Widget::findPeople();
 		$this->page['aside'] .= Widget::follow();
 
-		$contacts = Contact\Relation::getSuggestions($this->session->getLocalUserId());
+		$contacts = Contact\Relation::getCachedSuggestions($this->session->getLocalUserId());
 		if (!$contacts) {
 			return $this->t('No suggestions available. If this is a new site, please try again in 24 hours.');
 		}

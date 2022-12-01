@@ -220,7 +220,7 @@ class Post
 				if ($item['event-id'] != 0) {
 					$edpost = ['calendar/event/edit/' . $item['event-id'], DI::l10n()->t('Edit')];
 				} else {
-					$edpost = ['editpost/' . $item['id'], DI::l10n()->t('Edit')];
+					$edpost = [sprintf('post/%s/edit', $item['id']), DI::l10n()->t('Edit')];
 				}
 			}
 			$dropping = in_array($item['uid'], [0, DI::userSession()->getLocalUserId()]);
@@ -622,7 +622,7 @@ class Post
 	public function addChild(Post $item)
 	{
 		if (!$item->getId()) {
-			Logger::fatal('Post object has no id', ['post' => $item]);
+			Logger::error('Post object has no id', ['post' => $item]);
 			return false;
 		} elseif ($this->getChild($item->getId())) {
 			Logger::warning('Post object already exists', ['post' => $item]);
@@ -633,7 +633,7 @@ class Post
 		 * Only add what will be displayed
 		 */
 		if ($item->getDataValue('network') === Protocol::MAIL && DI::userSession()->getLocalUserId() != $item->getDataValue('uid')) {
-			Logger::warning('Post object does not belong to local user', ['post' => $item, 'local_user' => $local_user]);
+			Logger::warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
 			return false;
 		} elseif (DI::activity()->match($item->getDataValue('verb'), Activity::LIKE) ||
 		          DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)) {

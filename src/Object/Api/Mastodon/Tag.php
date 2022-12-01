@@ -37,18 +37,23 @@ class Tag extends BaseDataTransferObject
 	protected $url = null;
 	/** @var array */
 	protected $history = [];
+	/** @var bool */
+	protected $following = false;
 
 	/**
 	 * Creates a hashtag record from an tag-view record.
 	 *
 	 * @param BaseURL $baseUrl
-	 * @param array   $tag     tag-view record
+	 * @param array   $tag       tag-view record
+	 * @param array   $history
+	 * @param array   $following "true" if the user is following this tag
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(BaseURL $baseUrl, array $tag, array $history = [])
+	public function __construct(BaseURL $baseUrl, array $tag, array $history = [], bool $following = false)
 	{
-		$this->name    = strtolower($tag['name']);
-		$this->url     = $baseUrl . '/search?tag=' . urlencode($this->name);
-		$this->history = $history;
+		$this->name      = strtolower($tag['name']);
+		$this->url       = $baseUrl . '/search?tag=' . urlencode($this->name);
+		$this->history   = $history;
+		$this->following = $following;
 	}
 }

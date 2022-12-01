@@ -23,7 +23,9 @@ namespace Friendica\Module\DFRN;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
+use Friendica\Model\User;
 use Friendica\Module\Response;
+use Friendica\Network\HTTPException;
 use Friendica\Protocol\OStatus;
 
 /**
@@ -33,7 +35,19 @@ class Poll extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
+		$owner = User::getByNickname(
+			$this->parameters['nickname'] ?? '',
+			['nickname', 'blocked', 'account_expired', 'account_removed', 'hidewall']
+		);
+		if (!$owner || $owner['account_expired'] || $owner['account_removed']) {
+			throw new HTTPException\NotFoundException($this->t('User not found.'));
+		}
+
+		if ($owner['blocked'] || $owner['hidewall']) {
+			throw new HTTPException\UnauthorizedException($this->t('Access to this profile has been restricted.'));
+		}
+
 		$last_update = $request['last_update'] ?? '';
-		System::httpExit(OStatus::feed($this->parameters['nickname'], $last_update, 10) ?? '', Response::TYPE_ATOM);
+		System::httpExit(OStatus::feed($owner['nickname'], $last_update, 10) ?? '', Response::TYPE_ATOM);
 	}
 }

@@ -105,12 +105,11 @@ class Status extends BaseProfile
 		$is_owner = DI::userSession()->getLocalUserId() == $profile['uid'];
 		$last_updated_key = "profile:" . $profile['uid'] . ":" . DI::userSession()->getLocalUserId() . ":" . $remote_contact;
 
-		if (!empty($profile['hidewall']) && !$is_owner && !$remote_contact) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('Access to this profile has been restricted.'));
-			return '';
+		if (!empty($profile['hidewall']) && !DI::userSession()->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
 		}
 
-		$o .= self::getTabsHTML($a, 'status', $is_owner, $profile['nickname'], $profile['hide-friends']);
+		$o .= self::getTabsHTML('status', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
 		$o .= Widget::commonFriendsVisitor($profile['uid'], $profile['nickname']);
 
@@ -174,8 +173,8 @@ class Status extends BaseProfile
 
 		$condition = DBA::mergeConditions($condition, ["((`gravity` = ? AND `wall`) OR
 			(`gravity` = ? AND `vid` = ? AND `origin`
-			AND `thr-parent-id` IN (SELECT `uri-id` FROM `post` WHERE `gravity` = ? AND `network` = ?)))",
-			Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Item::GRAVITY_PARENT, Protocol::ACTIVITYPUB]);
+			AND `thr-parent-id` IN (SELECT `uri-id` FROM `post` WHERE `gravity` = ? AND `network` IN (?, ?))))",
+			Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Item::GRAVITY_PARENT, Protocol::ACTIVITYPUB, Protocol::DFRN]);
 
 		$condition = DBA::mergeConditions($condition, ['uid' => $profile['uid'], 'network' => Protocol::FEDERATED,
 			'visible' => true, 'deleted' => false]);

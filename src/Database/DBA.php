@@ -218,7 +218,7 @@ class DBA
 	/**
 	 * Check if data exists
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format schema.table (where schema is optional)
 	 * @param array  $condition Array of fields for condition
 	 * @return boolean Are there rows for that condition?
 	 * @throws \Exception
@@ -289,7 +289,7 @@ class DBA
 	/**
 	 * Insert a row into a table
 	 *
-	 * @param string $table          Table name in format schema.table (while scheme is optiona)
+	 * @param string $table          Table name in format schema.table (where schema is optional)
 	 * @param array  $param          parameter array
 	 * @param int    $duplicate_mode What to do on a duplicated entry
 	 * @return boolean was the insert successful?
@@ -304,7 +304,7 @@ class DBA
 	 * Inserts a row with the provided data in the provided table.
 	 * If the data corresponds to an existing row through a UNIQUE or PRIMARY index constraints, it updates the row instead.
 	 *
-	 * @param string $table Table name in format schema.table (while scheme is optiona)
+	 * @param string $table Table name in format schema.table (where schema is optional)
 	 * @param array  $param parameter array
 	 * @return boolean was the insert successful?
 	 * @throws \Exception
@@ -329,7 +329,7 @@ class DBA
 	 *
 	 * This function can be extended in the future to accept a table array as well.
 	 *
-	 * @param string $table Table name in format schema.table (while scheme is optiona)
+	 * @param string $table Table name in format schema.table (where schema is optional)
 	 * @return boolean was the lock successful?
 	 * @throws \Exception
 	 */
@@ -414,7 +414,7 @@ class DBA
 	 * Only set $old_fields to a boolean value when you are sure that you will update a single row.
 	 * When you set $old_fields to "true" then $fields must contain all relevant fields!
 	 *
-	 * @param string        $table      Table name in format schema.table (while scheme is optiona)
+	 * @param string        $table      Table name in format schema.table (where schema is optional)
 	 * @param array         $fields     contains the fields that are updated
 	 * @param array         $condition  condition array with the key values
 	 * @param array|boolean $old_fields array with the old field values that are about to be replaced (true = update on duplicate, false = don't update identical fields)
@@ -431,7 +431,7 @@ class DBA
 	/**
 	 * Retrieve a single record from a table and returns it in an associative array
 	 *
-	 * @param string|array $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string|array $table     Table name in format schema.table (where schema is optional)
 	 * @param array        $fields
 	 * @param array        $condition
 	 * @param array        $params
@@ -447,7 +447,7 @@ class DBA
 	/**
 	 * Select rows from a table and fills an array with the data
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format schema.table (where schema is optional)
 	 * @param array  $fields    Array of selected fields, empty for all
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
@@ -464,7 +464,7 @@ class DBA
 	/**
 	 * Select rows from a table
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format schema.table (where schema is optional)
 	 * @param array  $fields    Array of selected fields, empty for all
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
@@ -492,7 +492,7 @@ class DBA
 	/**
 	 * Counts the rows from a table satisfying the provided condition
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format schema.table (where schema is optional)
 	 * @param array  $condition array of fields for condition
 	 * @param array  $params    Array of several parameters
 	 *

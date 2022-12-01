@@ -46,7 +46,7 @@ class Home extends BaseModule
 			DI::baseUrl()->redirect('network');
 		}
 
-		if (strlen($config->get('system', 'singleuser'))) {
+		if ($config->get('system', 'singleuser')) {
 			DI::baseUrl()->redirect('/profile/' . $config->get('system', 'singleuser'));
 		}
 

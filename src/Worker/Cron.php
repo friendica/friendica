@@ -130,6 +130,8 @@ class Cron
 
 			Worker::add(Worker::PRIORITY_LOW, 'CheckDeletedContacts');
 
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateAllSuggestions');
+
 			if (DI::config()->get('system', 'optimize_tables')) {
 				Worker::add(Worker::PRIORITY_LOW, 'OptimizeTables');
 			}

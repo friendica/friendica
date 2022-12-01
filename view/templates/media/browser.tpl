@@ -1,11 +1,11 @@
 <!--
 	This is the template used by mod/fbrowser.php
 -->
-<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="{{$baseurl}}/view/js/filebrowser.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/js/ajaxupload.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/js/module/media/browser.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
 <script>
 	$(function() {
-		FileBrowser.init("{{$nickname}}", "{{$type}}");
+		Browser.init("{{$nickname}}", "{{$type}}");
 	});
 </script>
 <div class="fbrowser {{$type}}">
@@ -33,7 +33,7 @@
 		{{foreach $files as $f}}
 		<div class="photo-album-image-wrapper">
 			<a href="#" class="photo-album-photo-link" data-link="{{$f.0}}" data-filename="{{$f.1}}" data-img="{{$f.2}}" data-alt="{{$f.3}}">
-				<img src="{{$f.2}}">
+				<img alt="{{$f.3}}" src="{{$f.1}}">
 				<p>{{$f.1}}</p>
 			</a>
 		</div>

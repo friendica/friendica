@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Module\Profile\Photos;
+namespace Friendica\Module\Media\Photo;
 
 use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -76,36 +76,11 @@ class Upload extends \Friendica\BaseModule
 
 		$album = trim($request['album'] ?? '');
 
-		if (empty($_FILES['media'])) {
-			$user = $this->database->selectFirst('owner-view', ['id', 'uid', 'nickname', 'page-flags'], ['nickname' => $this->parameters['nickname'], 'blocked' => false]);
-		} else {
-			$user = $this->database->selectFirst('owner-view', ['id', 'uid', 'nickname', 'page-flags'], ['uid' => BaseApi::getCurrentUserID() ?: null, 'blocked' => false]);
-		}
+		$owner = User::getOwnerDataById($this->userSession->getLocalUserId());
 
-		if (!$this->database->isResult($user)) {
-			$this->logger->warning('User is not valid', ['nickname' => $this->parameters['nickname'], 'user' => $user]);
-			return $this->return(404, $this->t('User not found.'));
-		}
-
-		/*
-		 * Setup permissions structures
-		 */
-		$can_post       = false;
-		$visitor        = 0;
-		$contact_id     = 0;
-		$page_owner_uid = $user['uid'];
-
-		if ($this->userSession->getLocalUserId() && $this->userSession->getLocalUserId() == $page_owner_uid) {
-			$can_post = true;
-		} elseif ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY && !$this->userSession->getRemoteContactID($page_owner_uid)) {
-			$contact_id = $this->userSession->getRemoteContactID($page_owner_uid);
-			$can_post   = $this->database->exists('contact', ['blocked' => false, 'pending' => false, 'id' => $contact_id, 'uid' => $page_owner_uid]);
-			$visitor    = $contact_id;
-		}
-
-		if (!$can_post) {
-			$this->logger->warning('No permission to upload files', ['contact_id' => $contact_id, 'page_owner_uid' => $page_owner_uid]);
-			return $this->return(403, $this->t('Permission denied.'), true);
+		if (!$owner) {
+			$this->logger->warning('Owner not found.', ['uid' => $this->userSession->getLocalUserId()]);
+			return $this->return(401, $this->t('Invalid request.'));
 		}
 
 		if (empty($_FILES['userfile']) && empty($_FILES['media'])) {
@@ -193,9 +168,9 @@ class Upload extends \Friendica\BaseModule
 		$width  = $image->getWidth();
 		$height = $image->getHeight();
 
-		$maximagesize = $this->config->get('system', 'maximagesize');
+		$maximagesize = Strings::getBytesFromShorthand($this->config->get('system', 'maximagesize'));
 
-		if (!empty($maximagesize) && $filesize > $maximagesize) {
+		if ($maximagesize && $filesize > $maximagesize) {
 			// Scale down to multiples of 640 until the maximum size isn't exceeded anymore
 			foreach ([5120, 2560, 1280, 640] as $pixels) {
 				if ($filesize > $maximagesize && max($width, $height) > $pixels) {
@@ -223,9 +198,9 @@ class Upload extends \Friendica\BaseModule
 			$album = $this->t('Wall Photos');
 		}
 
-		$allow_cid = '<' . $user['id'] . '>';
+		$allow_cid = '<' . $owner['id'] . '>';
 
-		$result = Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 0, Photo::DEFAULT, $allow_cid);
+		$result = Photo::store($image, $owner['uid'], 0, $resource_id, $filename, $album, 0, Photo::DEFAULT, $allow_cid);
 		if (!$result) {
 			$this->logger->warning('Photo::store() failed', ['result' => $result]);
 			return $this->return(401, $this->t('Image upload failed.'));
@@ -233,7 +208,7 @@ class Upload extends \Friendica\BaseModule
 
 		if ($width > 640 || $height > 640) {
 			$image->scaleDown(640);
-			$result = Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 1, Photo::DEFAULT, $allow_cid);
+			$result = Photo::store($image, $owner['uid'], 0, $resource_id, $filename, $album, 1, Photo::DEFAULT, $allow_cid);
 			if ($result) {
 				$smallest = 1;
 			}
@@ -241,14 +216,14 @@ class Upload extends \Friendica\BaseModule
 
 		if ($width > 320 || $height > 320) {
 			$image->scaleDown(320);
-			$result = Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 2, Photo::DEFAULT, $allow_cid);
+			$result = Photo::store($image, $owner['uid'], 0, $resource_id, $filename, $album, 2, Photo::DEFAULT, $allow_cid);
 			if ($result && ($smallest == 0)) {
 				$smallest = 2;
 			}
 		}
 
 		$this->logger->info('upload done');
-		return $this->return(200, "\n\n" . '[url=' . $this->baseUrl . '/photos/' . $user['nickname'] . '/image/' . $resource_id . '][img]' . $this->baseUrl . "/photo/$resource_id-$smallest." . $image->getExt() . "[/img][/url]\n\n");
+		return $this->return(200, "\n\n" . '[url=' . $this->baseUrl . '/photos/' . $owner['nickname'] . '/image/' . $resource_id . '][img]' . $this->baseUrl . "/photo/$resource_id-$smallest." . $image->getExt() . "[/img][/url]\n\n");
 	}
 
 	/**

@@ -435,7 +435,7 @@ class UserNotification
 		// Don't notify about reshares by communities of our own posts or each time someone comments
 		if (($item['verb'] == Activity::ANNOUNCE) && DBA::exists('contact', ['id' => $item['contact-id'], 'contact-type' => Contact::TYPE_COMMUNITY])) {
 			$post = Post::selectFirst(['origin', 'gravity'], ['uri-id' => $item['thr-parent-id'], 'uid' => $uid]);
-			if ($post['origin'] || ($post['gravity'] != Item::GRAVITY_PARENT)) {
+			if (!$post || $post['origin'] || ($post['gravity'] != Item::GRAVITY_PARENT)) {
 				return false;
 			}
 		}

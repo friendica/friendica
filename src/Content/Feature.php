@@ -120,6 +120,12 @@ class Feature
 				['tagadelic',           DI::l10n()->t('Tag Cloud'),               DI::l10n()->t('Provide a personal tag cloud on your profile page'), false, DI::config()->get('feature_lock', 'tagadelic', false)],
 				['profile_membersince', DI::l10n()->t('Display Membership Date'), DI::l10n()->t('Display membership date in profile'), false, DI::config()->get('feature_lock', 'profile_membersince', false)],
 			],
+
+			//Advanced Calendar Settings
+			'advanced_calendar' => [
+				DI::l10n()->t('Advanced Calendar Settings'),
+				['public_calendar',     DI::l10n()->t('Allow anonymous access to your calendar'), DI::l10n()->t('Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you.'), false, DI::config()->get('feature_lock', 'public_calendar', false)],
+			]
 		];
 
 		// removed any locked features and remove the entire category if this makes it empty

@@ -305,8 +305,8 @@ class APContact
 
 		$apcontact['pubkey'] = null;
 		if (!empty($compacted['w3id:publicKey'])) {
-			$apcontact['pubkey'] = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value'));
-			if (strstr($apcontact['pubkey'], 'RSA ')) {
+			$apcontact['pubkey'] = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value') ?? '');
+			if (strpos($apcontact['pubkey'], 'RSA ') !== false) {
 				$apcontact['pubkey'] = Crypto::rsaToPem($apcontact['pubkey']);
 			}
 		}
@@ -383,7 +383,7 @@ class APContact
 		// kroeg:blocks, updated
 
 		// When the photo is too large, try to shorten it by removing parts
-		if (strlen($apcontact['photo']) > 255) {
+		if (strlen($apcontact['photo'] ?? '') > 255) {
 			$parts = parse_url($apcontact['photo']);
 			unset($parts['fragment']);
 			$apcontact['photo'] = (string)Uri::fromParts($parts);
@@ -574,7 +574,7 @@ class APContact
 	 *
 	 * @param array $apcontact
 	 *
-	 * @return bool 
+	 * @return bool
 	 */
 	public static function isRelay(array $apcontact): bool
 	{

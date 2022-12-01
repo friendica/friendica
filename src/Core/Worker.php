@@ -568,7 +568,15 @@ class Worker
 
 		// Set the workerLogger as new default logger
 		if ($method_call) {
-			call_user_func_array(sprintf('Friendica\Worker\%s::execute', $funcname), $argv);
+			try {
+				call_user_func_array(sprintf('Friendica\Worker\%s::execute', $funcname), $argv);
+			} catch (\TypeError $e) {
+				// No need to defer a worker queue entry if the arguments are invalid
+				Logger::notice('Wrong worker arguments', ['class' => $funcname, 'argv' => $argv, 'queue' => $queue, 'message' => $e->getMessage()]);
+			} catch (\Throwable $e) {
+				Logger::error('Uncaught exception in worker execution', ['class' => get_class($e), 'message' => $e->getMessage(), 'code' => $e->getCode(), 'file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTraceAsString()]);
+				Worker::defer();
+			}
 		} else {
 			$funcname($argv, count($argv));
 		}

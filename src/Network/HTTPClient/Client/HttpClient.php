@@ -254,7 +254,7 @@ class HttpClient implements ICanSendHttpRequests
 		$urlResult = $this->resolver->resolveURL($url);
 
 		if ($urlResult->didErrorOccur()) {
-			throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode());
+			throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode() ?? 0);
 		}
 
 		return $urlResult->getURL();

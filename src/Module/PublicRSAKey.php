@@ -23,11 +23,9 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\BadRequestException;
-use Friendica\Util\Crypto;
-use Friendica\Util\Strings;
+use Friendica\Protocol\Salmon;
 
 /**
  * prints the public RSA key of a user
@@ -47,9 +45,10 @@ class PublicRSAKey extends BaseModule
 			throw new BadRequestException();
 		}
 
-		Crypto::pemToMe($user['spubkey'], $modulus, $exponent);
-
-		$content = 'RSA' . '.' . Strings::base64UrlEncode($modulus, true) . '.' . Strings::base64UrlEncode($exponent, true);
-		System::httpExit($content, Response::TYPE_BLANK, 'application/magic-public-key');
+		System::httpExit(
+			Salmon::salmonKey($user['spubkey']),
+			Response::TYPE_BLANK,
+			'application/magic-public-key'
+		);
 	}
 }

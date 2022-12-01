@@ -8,6 +8,7 @@ Database Tables
 | [2fa_app_specific_password](help/database/db_2fa_app_specific_password) | Two-factor app-specific _password |
 | [2fa_recovery_codes](help/database/db_2fa_recovery_codes) | Two-factor authentication recovery codes |
 | [2fa_trusted_browser](help/database/db_2fa_trusted_browser) | Two-factor authentication trusted browsers |
+| [account-suggestion](help/database/db_account-suggestion) | Account suggestion |
 | [account-user](help/database/db_account-user) | Remote and local accounts |
 | [addon](help/database/db_addon) | registered addons |
 | [apcontact](help/database/db_apcontact) | ActivityPub compatible contacts - used in the ActivityPub implementation |

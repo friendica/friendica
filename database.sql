@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2022.12-dev (Giant Rhubarb)
--- DB_UPDATE_VERSION 1490
+-- DB_UPDATE_VERSION 1496
 -- ------------------------------------------
 
 
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`language` varchar(32) NOT NULL DEFAULT 'en' COMMENT 'default language',
 	`register_date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'timestamp of registration',
 	`login_date` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'timestamp of last login',
+	`last-activity` date COMMENT 'Day of the last activity',
 	`default-location` varchar(255) NOT NULL DEFAULT '' COMMENT 'Default for item.location',
 	`allow_location` boolean NOT NULL DEFAULT '0' COMMENT '1 allows to display the location',
 	`theme` varchar(255) NOT NULL DEFAULT '' COMMENT 'user theme preference',
@@ -308,6 +309,20 @@ CREATE TABLE IF NOT EXISTS `2fa_trusted_browser` (
 	 INDEX `uid` (`uid`),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Two-factor authentication trusted browsers';
+
+--
+-- TABLE account-suggestion
+--
+CREATE TABLE IF NOT EXISTS `account-suggestion` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the account url',
+	`uid` mediumint unsigned NOT NULL COMMENT 'User ID',
+	`level` smallint unsigned COMMENT 'level of closeness',
+	`ignore` boolean NOT NULL DEFAULT '0' COMMENT 'If set, this account will not be suggested again',
+	 PRIMARY KEY(`uid`,`uri-id`),
+	 INDEX `uri-id_uid` (`uri-id`,`uid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Account suggestion';
 
 --
 -- TABLE account-user
@@ -1656,6 +1671,7 @@ CREATE TABLE IF NOT EXISTS `report` (
 	`comment` text COMMENT 'Report',
 	`forward` boolean COMMENT 'Forward the report to the remote server',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`status` tinyint unsigned COMMENT 'Status of the report',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `cid` (`cid`),
@@ -1669,6 +1685,7 @@ CREATE TABLE IF NOT EXISTS `report` (
 CREATE TABLE IF NOT EXISTS `report-post` (
 	`rid` int unsigned NOT NULL COMMENT 'Report id',
 	`uri-id` int unsigned NOT NULL COMMENT 'Uri-id of the reported post',
+	`status` tinyint unsigned COMMENT 'Status of the reported post',
 	 PRIMARY KEY(`rid`,`uri-id`),
 	 INDEX `uri-id` (`uri-id`),
 	FOREIGN KEY (`rid`) REFERENCES `report` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
@@ -2437,6 +2454,8 @@ CREATE VIEW `post-thread-view` AS SELECT
 	`post-question`.`end-time` AS `question-end-time`,
 	0 AS `has-categories`,
 	EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-thread`.`uri-id`) AS `has-media`,
+	(SELECT COUNT(*) FROM `post` WHERE `parent-uri-id` = `post-thread`.`uri-id` AND `gravity` = 6) AS `total-comments`,
+	(SELECT COUNT(DISTINCT(`author-id`)) FROM `post` WHERE `parent-uri-id` = `post-thread`.`uri-id` AND `gravity` = 6) AS `total-actors`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
 	`parent-post`.`network` AS `parent-network`,
@@ -2496,6 +2515,24 @@ CREATE VIEW `collection-view` AS SELECT
 	FROM `post-collection`
 			INNER JOIN `post` ON `post-collection`.`uri-id` = `post`.`uri-id`
 			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `post`.`parent-uri-id`;
+
+--
+-- VIEW media-view
+--
+DROP VIEW IF EXISTS `media-view`;
+CREATE VIEW `media-view` AS SELECT 
+	`post-media`.`uri-id` AS `uri-id`,
+	`post-media`.`type` AS `type`,
+	`post`.`received` AS `received`,
+	`post`.`created` AS `created`,
+	`post`.`private` AS `private`,
+	`post`.`visible` AS `visible`,
+	`post`.`deleted` AS `deleted`,
+	`post`.`thr-parent-id` AS `thr-parent-id`,
+	`post`.`author-id` AS `author-id`,
+	`post`.`gravity` AS `gravity`
+	FROM `post-media`
+			INNER JOIN `post` ON `post-media`.`uri-id` = `post`.`uri-id`;
 
 --
 -- VIEW tag-view

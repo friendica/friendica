@@ -182,7 +182,8 @@ class Protocol
 	public static function unfollow(array $contact, array $user): ?bool
 	{
 		if (empty($contact['network'])) {
-			throw new \InvalidArgumentException('Missing network key in contact array');
+			Logger::notice('Contact has got no network, we quit here', ['id' => $contact['id']]);
+			return null;
 		}
 
 		$protocol = $contact['network'];
@@ -205,7 +206,8 @@ class Protocol
 			$slap = OStatus::salmon($item, $user);
 
 			if (empty($contact['notify'])) {
-				throw new \InvalidArgumentException('Missing expected "notify" key in OStatus/DFRN contact');
+				Logger::notice('OStatus/DFRN Contact is missing notify, we quit here', ['id' => $contact['id']]);
+				return null;
 			}
 
 			return Salmon::slapper($user, $contact['notify'], $slap) === 0;

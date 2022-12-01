@@ -23,9 +23,9 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Core\System;
-use Friendica\DI;
-use Friendica\Protocol\Feed as ProtocolFeed;
+use Friendica\Model\User;
 use Friendica\Network\HTTPException;
+use Friendica\Protocol\Feed as ProtocolFeed;
 
 /**
  * Provides public Atom feeds
@@ -37,23 +37,14 @@ use Friendica\Network\HTTPException;
  * - /feed/[nickname]/replies => comments
  * - /feed/[nickname]/activity => activity
  *
- * The nocache GET parameter is provided mainly for debug purposes, requires auth
- *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
 class Feed extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
-		$last_update = $this->getRequestValue($request, 'last_update', '');
-		$nocache     = !empty($request['nocache']) && DI::userSession()->getLocalUserId();
-
-		$type = null;
-		// @TODO: Replace with parameter from router
-		if (DI::args()->getArgc() > 2) {
-			$type = DI::args()->getArgv()[2];
-		}
-
+		$nick = $this->parameters['nickname'] ?? '';
+		$type = $this->parameters['type'] ?? null;
 		switch ($type) {
 			case 'posts':
 			case 'comments':
@@ -67,10 +58,18 @@ class Feed extends BaseModule
 				$type = 'posts';
 		}
 
-		$feed = ProtocolFeed::atom($this->parameters['nickname'], $last_update, 10, $type, $nocache, true);
-		if (empty($feed)) {
-			throw new HTTPException\NotFoundException(DI::l10n()->t('User not found.'));
+		$last_update = $this->getRequestValue($request, 'last_update', '');
+
+		$owner = User::getOwnerDataByNick($nick);
+		if (!$owner || $owner['account_expired'] || $owner['account_removed']) {
+			throw new HTTPException\NotFoundException($this->t('User not found.'));
 		}
+
+		if ($owner['blocked'] || $owner['hidewall']) {
+			throw new HTTPException\UnauthorizedException($this->t('Access to this profile has been restricted.'));
+		}
+
+		$feed = ProtocolFeed::atom($owner, $last_update, 10, $type);
 
 		System::httpExit($feed, Response::TYPE_ATOM);
 	}

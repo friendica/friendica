@@ -461,7 +461,7 @@ class Profile
 			'$unfollow' => DI::l10n()->t('Unfollow'),
 			'$unfollow_link' => $unfollow_link,
 			'$subscribe_feed' => DI::l10n()->t('Atom feed'),
-			'$subscribe_feed_link' => $profile['poll'],
+			'$subscribe_feed_link' => $profile['hidewall'] ? '' : $profile['poll'],
 			'$wallmessage' => DI::l10n()->t('Message'),
 			'$wallmessage_link' => $wallmessage_link,
 			'$account_type' => $account_type,

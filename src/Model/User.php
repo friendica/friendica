@@ -666,6 +666,26 @@ class User
 	}
 
 	/**
+	 * Update the day of the last activity of the given user
+	 *
+	 * @param integer $uid
+	 * @return void
+	 */
+	public static function updateLastActivity(int $uid)
+	{
+		$user = User::getById($uid, ['last-activity']);
+		if (empty($user)) {
+			return;
+		}
+
+		$current_day = DateTimeFormat::utcNow('Y-m-d');
+
+		if ($user['last-activity'] != $current_day) {
+			User::update(['last-activity' => $current_day], $uid);
+		}
+	}
+
+	/**
 	 * Generates a human-readable random password
 	 *
 	 * @return string

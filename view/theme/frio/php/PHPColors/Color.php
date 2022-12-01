@@ -132,16 +132,16 @@ class Color {
 
             $var_1 = 2 * $L - $var_2;
 
-            $r = round(255 * self::_huetorgb( $var_1, $var_2, $H + (1/3) ));
-            $g = round(255 * self::_huetorgb( $var_1, $var_2, $H ));
-            $b = round(255 * self::_huetorgb( $var_1, $var_2, $H - (1/3) ));
+            $r = 255 * self::_huetorgb( $var_1, $var_2, $H + (1/3) );
+            $g = 255 * self::_huetorgb( $var_1, $var_2, $H );
+            $b = 255 * self::_huetorgb( $var_1, $var_2, $H - (1/3) );
 
         }
 
         // Convert to hex
-        $r = dechex($r);
-        $g = dechex($g);
-        $b = dechex($b);
+        $r = dechex(round($r));
+        $g = dechex(round($g));
+        $b = dechex(round($b));
 
         // Make sure we get 2 digits for decimals
         $r = (strlen("".$r)===1) ? "0".$r:$r;

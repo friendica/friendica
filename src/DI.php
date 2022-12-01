@@ -380,6 +380,14 @@ abstract class DI
 	}
 
 	/**
+	 * @return Factory\Api\Mastodon\StatusSource
+	 */
+	public static function mstdnStatusSource()
+	{
+		return self::$dice->create(Factory\Api\Mastodon\StatusSource::class);
+	}
+
+	/**
 	 * @return Factory\Api\Mastodon\ScheduledStatus
 	 */
 	public static function mstdnScheduledStatus()

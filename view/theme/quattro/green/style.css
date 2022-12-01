@@ -2516,29 +2516,29 @@ footer {
 .fbrowser .list {
   padding: 10px;
 }
-.fbrowser.image .photo-album-image-wrapper {
+.fbrowser.photo .photo-album-image-wrapper {
   width: 48px;
   height: 48px;
 }
-.fbrowser.image a img {
+.fbrowser.photo a img {
   width: auto;
   height: 48px;
 }
-.fbrowser.image a p {
+.fbrowser.photo a p {
   display: none;
 }
-.fbrowser.file .photo-album-image-wrapper {
+.fbrowser.attachment .photo-album-image-wrapper {
   float: none;
   white-space: nowrap;
   width: 100%;
   height: auto;
 }
-.fbrowser.file img {
+.fbrowser.attachment img {
   display: inline;
   width: 16px;
   height: 16px;
 }
-.fbrowser.file p {
+.fbrowser.attachment p {
   display: inline;
   white-space: nowrap;
 }

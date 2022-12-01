@@ -44,23 +44,15 @@ class Hovercard extends BaseModule
 			throw new HTTPException\ForbiddenException();
 		}
 
-		// If a contact is connected the url is internally changed to 'contact/redir/CID'. We need the pure url to search for
-		// the contact. So we strip out the contact id from the internal url and look in the contact table for
-		// the real url (nurl)
-		if (strpos($contact_url, 'contact/redir/') === 0) {
-			$cid = intval(substr($contact_url, 6));
-		} elseif (strpos($contact_url, 'contact/') === 0) {
-			$cid = intval(substr($contact_url, 8));
-		}
-
-		if (!empty($cid)) {			
-			$remote_contact = Contact::selectFirst(['nurl'], ['id' => $cid]);
+		/* Possible formats for relative URLs that need to be converted to the absolute contact URL:
+		 * - contact/redir/123456
+		 * - contact/123456/conversations
+		 */
+		if (strpos($contact_url, 'contact/') === 0 && preg_match('/(\d+)/', $contact_url, $matches)) {
+			$remote_contact = Contact::selectFirst(['nurl'], ['id' => $matches[1]]);
 			$contact_url = $remote_contact['nurl'] ?? '';
 		}
 
-		$contact = [];
-
-		// if it's the url containing https it should be converted to http
 		if (!$contact_url) {
 			throw new HTTPException\BadRequestException();
 		}

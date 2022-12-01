@@ -80,19 +80,17 @@ class Nodeinfo
 		$config = DI::config();
 
 		$usage = new stdClass();
-		$usage->users = [];
+		$usage->users = new \stdClass;
 
 		if (!empty($config->get('system', 'nodeinfo'))) {
-			$usage->users = [
-				'total'          => intval($config->get('nodeinfo', 'total_users')),
-				'activeHalfyear' => intval($config->get('nodeinfo', 'active_users_halfyear')),
-				'activeMonth'    => intval($config->get('nodeinfo', 'active_users_monthly'))
-			];
+			$usage->users->total = intval($config->get('nodeinfo', 'total_users'));
+			$usage->users->activeHalfyear = intval($config->get('nodeinfo', 'active_users_halfyear'));
+			$usage->users->activeMonth = intval($config->get('nodeinfo', 'active_users_monthly'));
 			$usage->localPosts = intval($config->get('nodeinfo', 'local_posts'));
 			$usage->localComments = intval($config->get('nodeinfo', 'local_comments'));
 
 			if ($version2) {
-				$usage->users['activeWeek'] = intval($config->get('nodeinfo', 'active_users_weekly'));
+				$usage->users->activeWeek = intval($config->get('nodeinfo', 'active_users_weekly'));
 			}
 		}
 

@@ -77,8 +77,6 @@ function item_post(App $a) {
 
 	Logger::debug('postvars', ['_REQUEST' => $_REQUEST]);
 
-	$api_source = $_REQUEST['api_source'] ?? false;
-
 	$return_path = $_REQUEST['return'] ?? '';
 	$preview = intval($_REQUEST['preview'] ?? 0);
 
@@ -90,7 +88,7 @@ function item_post(App $a) {
 	if (!$preview && !empty($_REQUEST['post_id_random'])) {
 		if (!empty($_SESSION['post-random']) && $_SESSION['post-random'] == $_REQUEST['post_id_random']) {
 			Logger::warning('duplicate post');
-			item_post_return(DI::baseUrl(), $api_source, $return_path);
+			item_post_return(DI::baseUrl(), $return_path);
 		} else {
 			$_SESSION['post-random'] = $_REQUEST['post_id_random'];
 		}
@@ -106,7 +104,7 @@ function item_post(App $a) {
 	$toplevel_user_id = null;
 
 	$objecttype = null;
-	$profile_uid = ($_REQUEST['profile_uid'] ?? 0) ?: DI::userSession()->getLocalUserId();
+	$profile_uid = DI::userSession()->getLocalUserId();
 	$posttype = ($_REQUEST['post_type'] ?? '') ?: Item::PT_ARTICLE;
 
 	if ($parent_item_id || $thr_parent_uri) {
@@ -177,7 +175,7 @@ function item_post(App $a) {
 
 	// Now check that valid personal details have been provided
 	if (!Security::canWriteToUserWall($profile_uid) && !$allow_comment) {
-		Logger::warning('Permission denied.', ['local' => DI::userSession()->getLocalUserId(), 'profile_uid' => $profile_uid, 'toplevel_item_id' => $toplevel_item_id, 'network' => $toplevel_item['network']]);
+		Logger::warning('Permission denied.', ['local' => DI::userSession()->getLocalUserId(), 'toplevel_item_id' => $toplevel_item_id, 'network' => $toplevel_item['network']]);
 		DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 		if ($return_path) {
 			DI::baseUrl()->redirect($return_path);
@@ -241,6 +239,8 @@ function item_post(App $a) {
 
 		$att_bbcode = "\n" . PageInfo::getFooterFromData($attachment);
 		$body .= $att_bbcode;
+	} elseif (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", $body, $matches)) {
+		$body = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), $body);
 	}
 
 	// Convert links with empty descriptions to links without an explicit description
@@ -321,13 +321,6 @@ function item_post(App $a) {
 		}
 
 		$pubmail_enabled = ($_REQUEST['pubmail_enable'] ?? false) && !$private;
-
-		// if using the API, we won't see pubmail_enable - figure out if it should be set
-		if ($api_source && $profile_uid && $profile_uid == DI::userSession()->getLocalUserId() && !$private) {
-			if (function_exists('imap_open') && !DI::config()->get('system', 'imap_disabled')) {
-				$pubmail_enabled = DBA::exists('mailacct', ["`uid` = ? AND `server` != ? AND `pubmail`", DI::userSession()->getLocalUserId(), '']);
-			}
-		}
 
 		if (!strlen($body)) {
 			if ($preview) {
@@ -579,7 +572,7 @@ function item_post(App $a) {
 		'parent'        => $toplevel_item_id,
 		'self'          => $self,
 		// This triggers posts via API and the mirror functions
-		'api_source'    => $api_source,
+		'api_source'    => false,
 		// This field is for storing the raw conversation data
 		'protocol'      => Conversation::PARCEL_DIRECT,
 		'direction'     => Conversation::PUSH,
@@ -634,7 +627,7 @@ function item_post(App $a) {
 			unset($datarray['api_source']);
 
 			Post\Delayed::add($datarray['uri'], $datarray, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED_NO_HOOK, $scheduled_at);
-			item_post_return(DI::baseUrl(), $api_source, $return_path);
+			item_post_return(DI::baseUrl(), $return_path);
 		}
 	}
 
@@ -755,20 +748,12 @@ function item_post(App $a) {
 
 	Logger::debug('post_complete');
 
-	if ($api_source) {
-		return $post_id;
-	}
-
-	item_post_return(DI::baseUrl(), $api_source, $return_path);
+	item_post_return(DI::baseUrl(), $return_path);
 	// NOTREACHED
 }
 
-function item_post_return($baseurl, $api_source, $return_path)
+function item_post_return($baseurl, $return_path)
 {
-	if ($api_source) {
-		return;
-	}
-
 	if ($return_path) {
 		DI::baseUrl()->redirect($return_path);
 	}

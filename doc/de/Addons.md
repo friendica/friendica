@@ -309,10 +309,6 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
     Hook::callAll('post_local', $datarray);
     Hook::callAll('post_local_end', $datarray);
 
-### mod/editpost.php
-
-    Hook::callAll('jot_tool', $jotplugins);
-
 ### src/Network/FKOAuth1.php
 
     Hook::callAll('logged_in', $a->user);
@@ -421,6 +417,10 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 ### src/Module/PermissionTooltip.php
 
     Hook::callAll('lockview_content', $item);
+
+### src/Module/Post/Edit.php
+
+    Hook::callAll('jot_tool', $jotplugins);
 
 ### src/Worker/Directory.php
 

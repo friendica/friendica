@@ -230,7 +230,7 @@ class Index extends BaseSettings
 			'$banner' => DI::l10n()->t('Edit Profile Details'),
 			'$submit' => DI::l10n()->t('Submit'),
 			'$profpic' => DI::l10n()->t('Change Profile Photo'),
-			'$profpiclink' => '/photos/' . $profile['nickname'],
+			'$profpiclink' => '/profile/' . $profile['nickname'] . '/photos',
 			'$viewprof' => DI::l10n()->t('View Profile'),
 
 			'$lbl_personal_section' => DI::l10n()->t('Personal'),

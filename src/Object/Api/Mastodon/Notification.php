@@ -56,6 +56,8 @@ class Notification extends BaseDataTransferObject
 	protected $type;
 	/** @var string (Datetime) */
 	protected $created_at;
+	/** @var bool */
+	protected $dismissed;
 	/** @var Account */
 	protected $account;
 	/** @var Status|null */
@@ -66,12 +68,13 @@ class Notification extends BaseDataTransferObject
 	 *
 	 * @throws HttpException\InternalServerErrorException|Exception
 	 */
-	public function __construct(int $id, string $type, \DateTime $created_at, Account $account = null, Status $status = null)
+	public function __construct(int $id, string $type, \DateTime $created_at, Account $account = null, Status $status = null, bool $dismissed = false)
 	{
 		$this->id         = (string)$id;
 		$this->type       = $type;
 		$this->created_at = $created_at->format(DateTimeFormat::JSON);
 		$this->account    = $account->toArray();
+		$this->dismissed  = $dismissed;
 
 		if (!empty($status)) {
 			$this->status = $status->toArray();

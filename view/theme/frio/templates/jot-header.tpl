@@ -61,13 +61,13 @@
 		 **/
 
 		/* callback */
-		$('body').on('fbrowser.image.main', function(e, filename, embedcode, id) {
+		$('body').on('fbrowser.photo.main', function(e, filename, embedcode, id) {
 			///@todo this part isn't ideal and need to be done in a better way
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);
 		})
-		.on('fbrowser.file.main', function(e, filename, embedcode, id) {
+		.on('fbrowser.attachment.main', function(e, filename, embedcode, id) {
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);

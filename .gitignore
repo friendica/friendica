@@ -10,10 +10,9 @@ home.html
 robots.txt
 
 #ignore local config
-/config/local.config.php
-/config/addon.config.php
-/config/local.ini.php
-/config/addon.ini.php
+!/config/local-sample.config.php
+/config/*.config.php
+/config/*.ini.php
 
 #ignore documentation, it should be newly built
 /doc/api

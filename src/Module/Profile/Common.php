@@ -61,7 +61,7 @@ class Common extends BaseProfile
 			$a->redirect('profile/' . $nickname . '/contacts');
 		};
 
-		$o = self::getTabsHTML($a, 'contacts', false, $profile['nickname'], $profile['hide-friends']);
+		$o = self::getTabsHTML('contacts', false, $profile['nickname'], $profile['hide-friends']);
 
 		$tabs = self::getContactFilterTabs('profile/' . $nickname, 'common', $displayCommonTab);
 

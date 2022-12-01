@@ -38,12 +38,12 @@ return [
 		'port' => null,
 
 		// socket (String)
-                // Socket of the database server.
-                // Can be used instead of adding a socket location to the hostname
-                'socket' => '',
+		// Socket of the database server.
+		// Can be used instead of adding a socket location to the hostname
+		'socket' => '',
 
 		// user (String)
-		// Database user name. Please don't use "root".
+		// Database username. Please don't use "root".
 		'username' => '',
 
 		// pass (String)
@@ -64,7 +64,7 @@ return [
 		'pdo_emulate_prepares' => true,
 
 		// disable_pdo (Boolean)
-		// PDO is used by default (if available). Otherwise MySQLi will be used.
+		// PDO is used by default (if available). Otherwise, MySQLi will be used.
 		'disable_pdo' => false,
 
 		// persistent (Boolean)
@@ -145,7 +145,7 @@ return [
 		'block_local_dir' => false,
 
 		// blocked_tags (String)
-		// Comma separated list of hash tags that shouldn't be displayed in the trending tags
+		// Comma separated list of hashtags that shouldn't be displayed in the trending tags
 		'blocked_tags' => '',
 
 		// community_no_sharer (Boolean)
@@ -153,7 +153,7 @@ return [
 		'community_no_sharer' => false,
 
 		// contact_update_limit (Integer)
-		// How much contacts should be checked at a time?
+		// How many contacts should be checked at a time?
 		'contact_update_limit' => 100,
 
 		// cron_interval (Integer)
@@ -259,7 +259,7 @@ return [
 		'disable_implicit_mentions' => false,
 
 		// disable_url_validation (Boolean)
-		// Disables the DNS lookup of an URL.
+		// Disables the DNS lookup of a URL.
 		'disable_url_validation' => false,
 
 		// disable_password_exposed (Boolean)
@@ -283,7 +283,7 @@ return [
 		'dlogip' => '',
 
 		// expire-notify-priority (integer)
-		// Priority for the expirary notification 
+		// Priority for the expirary notification
 		'expire-notify-priority' => Friendica\Core\Worker::PRIORITY_LOW,
 
 		// fetch_by_worker (Boolean)
@@ -300,11 +300,11 @@ return [
 
 		// groupedit_image_limit (Integer)
 		// Number of contacts at which the group editor should switch from display the profile pictures of the contacts to only display the names.
-		// This can alternatively be set on a per account basis in the pconfig table.
+		// This can alternatively be set on a per-account basis in the pconfig table.
 		'groupedit_image_limit' => 400,
 
 		// gserver_update_limit (Integer)
-		// How much servers should be checked at a time?
+		// How many servers should be checked at a time?
 		'gserver_update_limit' => 100,
 
 		// hsts (Boolean)
@@ -330,7 +330,7 @@ return [
 		'ipv4_resolve' => false,
 
 		// invitation_only (Boolean)
-		// If set true registration is only possible after a current member of the node has send an invitation.
+		// If set true registration is only possible after a current member of the node has sent an invitation.
 		'invitation_only' => false,
 
 		// itemspage_network (Integer)
@@ -343,7 +343,7 @@ return [
 		'itemspage_network_mobile' => 20,
 
 		// jpeg_quality (Integer)
-		// 
+		//
 		// Lower numbers save space at cost of image detail
 		// where n is between 1 and 100, and with very poor results below about 50
 		'jpeg_quality' => 100,
@@ -415,13 +415,13 @@ return [
 
 		// max_image_length (Integer)
 		// An alternate way of limiting picture upload sizes.
-		// Specify the maximum pixel  length that pictures are allowed to be (for non-square pictures, it will apply to the longest side).
+		// Specify the maximum pixel length that pictures are allowed to be (for non-square pictures, it will apply to the longest side).
 		// Pictures longer than this length will be resized to be this length (on the longest side, the other side will be scaled appropriately).
 		// If you don't want to set a maximum length, set to -1.
 		'max_image_length' => -1,
 
 		// max_likers (Integer)
-		// Maximum number of "people who like (or don't like) this"  that we will list by name
+		// Maximum number of "people who like (or don't like) this" that we will list by name
 		'max_likers' => 75,
 
 		// max_processes_backend (Integer)
@@ -471,7 +471,7 @@ return [
 		'no_oembed' => false,
 
 		// no_redirect_list (Array)
-		// List of domains where HTTP redirects should be ignored. 
+		// List of domains where HTTP redirects should be ignored.
 		'no_redirect_list' => [],
 
 		// no_smilies (Boolean)
@@ -483,7 +483,7 @@ return [
 		'paranoia' => false,
 
 		// permit_crawling (Boolean)
-		// Restricts the search for not logged in users to one search per minute.
+		// Restricts the search for not logged-in users to one search per minute.
 		'permit_crawling' => false,
 
 		// pidfile (Path)
@@ -491,7 +491,7 @@ return [
 		'pidfile' => '',
 
 		// png_quality (Integer)
-		// Sets the ImageMagick compression level for PNG images. Values ranges from 0 (uncompressed) to 9 (most compressed).
+		// Sets the ImageMagick compression level for PNG images. Values range from 0 (uncompressed) to 9 (most compressed).
 		'png_quality' => 8,
 
 		// profiler (Boolean)
@@ -568,11 +568,11 @@ return [
 		'set_creation_date' => false,
 
 		// show_global_community_hint (Boolean)
-		// When the global community page is enabled, use this option to display a hint above the stream, that this is a collection of all public top-level postings that arrive on your node.
+		// When the global community page is enabled, use this option to display a hint above the stream, that this is a collection of all public top-level postings that arrive at your node.
 		'show_global_community_hint' => false,
 
 		// show_received (Boolean)
-		// Show the receive data along with the post creation date
+		// Show the received date along with the post creation date
 		'show_received' => true,
 
 		// show_received_seconds (Integer)
@@ -609,13 +609,13 @@ return [
 
 		// username_min_length (Integer)
 		// The minimum character length a username can be.
-		// This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
+		// This length is checked once the username has been trimmed and multiple spaces have been collapsed into one.
 		// Minimum for this config value is 1. Maximum is 64 as the resulting profile URL mustn't be longer than 255 chars.
 		'username_min_length' => 3,
 
 		// username_max_length (Integer)
 		// The maximum character length a username can be.
-		// This length is check once the username has been trimmed and multiple spaces have been collapsed into one.
+		// This length is checked once the username has been trimmed and multiple spaces have been collapsed into one.
 		// Minimum for this config value is 1. Maximum is 64 as the resulting profile URL mustn't be longer than 255 chars.
 		'username_max_length' => 48,
 
@@ -720,10 +720,6 @@ return [
 		// Store untrusted content in the inbox entries
 		'ap_inbox_store_untrusted' => false,
 
-		// total_ap_delivery (Boolean)
-		// Deliver via AP to every possible receiver and we suppress the delivery to these contacts with other protocols
-		'total_ap_delivery' => false,
-
 		// ap_log_unknown (Boolean)
 		// Logs every unknown ActivityPub activity
 		'ap_log_unknown' => false,
@@ -742,8 +738,7 @@ return [
 		'config_dir' => 'view/smarty3',
 
 		// use_sub_dirs (Boolean)
-		// By default the template cache is stored in several sub directories.
-		// 
+		// By default the template cache is stored in several subdirectories.
 		'use_sub_dirs' => true,
 	],
 ];

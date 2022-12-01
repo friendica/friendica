@@ -85,6 +85,8 @@ class Arguments
 
 	/**
 	 * @return string The module name based on the arguments
+	 * @deprecated 2022.12 - With the new (sub-)routes, it's not trustworthy anymore, use the ModuleClass instead
+	 * @see Router::getModuleClass()
 	 */
 	public function getModuleName(): string
 	{

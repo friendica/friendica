@@ -6,10 +6,11 @@ Table report-post
 Fields
 ------
 
-| Field  | Description                 | Type         | Null | Key | Default | Extra |
-| ------ | --------------------------- | ------------ | ---- | --- | ------- | ----- |
-| rid    | Report id                   | int unsigned | NO   | PRI | NULL    |       |
-| uri-id | Uri-id of the reported post | int unsigned | NO   | PRI | NULL    |       |
+| Field  | Description                 | Type             | Null | Key | Default | Extra |
+| ------ | --------------------------- | ---------------- | ---- | --- | ------- | ----- |
+| rid    | Report id                   | int unsigned     | NO   | PRI | NULL    |       |
+| uri-id | Uri-id of the reported post | int unsigned     | NO   | PRI | NULL    |       |
+| status | Status of the reported post | tinyint unsigned | YES  |     | NULL    |       |
 
 Indexes
 ------------

@@ -120,27 +120,27 @@ class Index extends BaseSearch
 		if (strpos($search, '#') === 0) {
 			$tag = true;
 			$search = substr($search, 1);
-		}
+		} else {
+			if (strpos($search, '@') === 0 || strpos($search, '!') === 0) {
+				return self::performContactSearch($search);
+			}
 
-		self::tryRedirectToProfile($search);
+			self::tryRedirectToPost($search);
 
-		if (strpos($search, '@') === 0 || strpos($search, '!') === 0) {
-			return self::performContactSearch($search);
-		}
+			self::tryRedirectToProfile($search);
 
-		self::tryRedirectToPost($search);
-
-		if (!empty($_GET['search-option'])) {
-			switch ($_GET['search-option']) {
-				case 'fulltext':
-					break;
-				case 'tags':
-					$tag = true;
-					break;
-				case 'contacts':
-					return self::performContactSearch($search, '@');
-				case 'forums':
-					return self::performContactSearch($search, '!');
+			if (!empty($_GET['search-option'])) {
+				switch ($_GET['search-option']) {
+					case 'fulltext':
+						break;
+					case 'tags':
+						$tag = true;
+						break;
+					case 'contacts':
+						return self::performContactSearch($search, '@');
+					case 'forums':
+						return self::performContactSearch($search, '!');
+				}
 			}
 		}
 

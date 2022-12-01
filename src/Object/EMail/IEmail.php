@@ -80,7 +80,7 @@ interface IEmail extends JsonSerializable
 	 *
 	 * @return string
 	 */
-	function getMessage(bool $plain = false);
+	function getMessage(bool $plain = false): string;
 
 	/**
 	 * Gets the additional mail header array

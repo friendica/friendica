@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Module\Profile\Attachment;
+namespace Friendica\Module\Media\Attachment;
 
 use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -73,28 +73,10 @@ class Upload extends \Friendica\BaseModule
 			$this->response->setType(Response::TYPE_JSON, 'application/json');
 		}
 
-		$nick  = $this->parameters['nickname'];
-		$owner = User::getOwnerDataByNick($nick);
+		$owner = User::getOwnerDataById($this->userSession->getLocalUserId());
 		if (!$owner) {
-			$this->logger->warning('owner is not a valid record:', ['owner' => $owner, 'nick' => $nick]);
+			$this->logger->warning('Owner not found.', ['uid' => $this->userSession->getLocalUserId()]);
 			return $this->return(401, $this->t('Invalid request.'));
-		}
-
-		$can_post       = false;
-		$contact_id     = 0;
-		$page_owner_uid = $owner['uid'];
-		$community_page = $owner['page-flags'] == User::PAGE_FLAGS_COMMUNITY;
-
-		if ($this->userSession->getLocalUserId() && $this->userSession->getLocalUserId() == $page_owner_uid) {
-			$can_post = true;
-		} elseif ($community_page && !empty($this->userSession->getRemoteContactID($page_owner_uid))) {
-			$contact_id = $this->userSession->getRemoteContactID($page_owner_uid);
-			$can_post   = $this->database->exists('contact', ['blocked' => false, 'pending' => false, 'id' => $contact_id, 'uid' => $page_owner_uid]);
-		}
-
-		if (!$can_post) {
-			$this->logger->warning('User does not have required permissions', ['contact_id' => $contact_id, 'page_owner_uid' => $page_owner_uid]);
-			return $this->return(403, $this->t('Permission denied.'), true);
 		}
 
 		if (empty($_FILES['userfile'])) {
@@ -126,7 +108,7 @@ class Upload extends \Friendica\BaseModule
 			return $this->return(401, $msg);
 		}
 
-		$newid = Attach::storeFile($tempFileName, $page_owner_uid, $fileName, '<' . $owner['id'] . '>');
+		$newid = Attach::storeFile($tempFileName, $owner['uid'], $fileName, '<' . $owner['id'] . '>');
 
 		@unlink($tempFileName);
 

@@ -22,8 +22,11 @@
 namespace Friendica\Security;
 
 use Friendica\Core\Logger;
+use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
+use Friendica\Model\User;
 use Friendica\Module\BaseApi;
 use Friendica\Util\DateTimeFormat;
 
@@ -100,6 +103,14 @@ class OAuth
 			return [];
 		}
 		Logger::debug('Token found', $token);
+
+		User::updateLastActivity($token['uid']);
+
+		// Regularly update suggestions
+		if (Contact\Relation::areSuggestionsOutdated($token['uid'])) {
+			Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateSuggestions', $token['uid']);
+		}
+		
 		return $token;
 	}
 

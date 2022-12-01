@@ -37,7 +37,7 @@ class SavedSearches
 	public static function getHTML(string $return_url, string $search = ''): string
 	{
 		$saved = [];
-		$saved_searches = DBA::select('search', ['id', 'term'], ['uid' => DI::userSession()->getLocalUserId()]);
+		$saved_searches = DBA::select('search', ['id', 'term'], ['uid' => DI::userSession()->getLocalUserId()], ['order' => ['term']]);
 		while ($saved_search = DBA::fetch($saved_searches)) {
 			$saved[] = [
 				'id'          => $saved_search['id'],

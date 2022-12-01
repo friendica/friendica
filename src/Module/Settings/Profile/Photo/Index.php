@@ -53,7 +53,7 @@ class Index extends BaseSettings
 
 		$filetype = Images::getMimeTypeBySource($src, $filename, $filetype);
 
-		$maximagesize = DI::config()->get('system', 'maximagesize', 0);
+		$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize', 0));
 
 		if ($maximagesize && $filesize > $maximagesize) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Image exceeds size limit of %s', Strings::formatBytes($maximagesize)));
@@ -132,7 +132,7 @@ class Index extends BaseSettings
 				DI::l10n()->t('or'),
 				($newuser) ?
 					'<a href="' . DI::baseUrl() . '">' . DI::l10n()->t('skip this step') . '</a>'
-					: '<a href="' . DI::baseUrl() . '/photos/' . DI::app()->getLoggedInUserNickname() . '">'
+					: '<a href="' . DI::baseUrl() . '/profile/' . DI::app()->getLoggedInUserNickname() . '/photos">'
 						. DI::l10n()->t('select a photo from your photo albums') . '</a>'
 			),
 		]);
