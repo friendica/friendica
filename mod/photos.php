@@ -20,7 +20,6 @@
  */
 
 use Friendica\App;
-use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
@@ -41,18 +40,17 @@ use Friendica\Model\Profile;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
+use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
-use Friendica\Object\Image;
 use Friendica\Protocol\Activity;
+use Friendica\Security\Security;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Map;
-use Friendica\Security\Security;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
-use Friendica\Network\HTTPException;
 
 function photos_init(App $a)
 {
@@ -565,213 +563,6 @@ function photos_post(App $a)
 		DI::baseUrl()->redirect($_SESSION['photo_return']);
 		return; // NOTREACHED
 	}
-
-
-	// default post action - upload a photo
-	Hook::callAll('photo_post_init', $_POST);
-
-	// Determine the album to use
-	$album    = trim($_REQUEST['album'] ?? '');
-	$newalbum = trim($_REQUEST['newalbum'] ?? '');
-
-	Logger::debug('album= ' . $album . ' newalbum= ' . $newalbum);
-
-	if (!strlen($album)) {
-		if (strlen($newalbum)) {
-			$album = $newalbum;
-		} else {
-			$album = DateTimeFormat::localNow('Y');
-		}
-	}
-
-	/*
-	 * We create a wall item for every photo, but we don't want to
-	 * overwhelm the data stream with a hundred newly uploaded photos.
-	 * So we will make the first photo uploaded to this album in the last several hours
-	 * visible by default, the rest will become visible over time when and if
-	 * they acquire comments, likes, dislikes, and/or tags
-	 */
-
-	$r = Photo::selectToArray([], ['`album` = ? AND `uid` = ? AND `created` > ?', $album, $page_owner_uid, DateTimeFormat::utc('now - 3 hours')]);
-
-	if (!DBA::isResult($r) || ($album == DI::l10n()->t(Photo::PROFILE_PHOTOS))) {
-		$visible = 1;
-	} else {
-		$visible = 0;
-	}
-
-	if (!empty($_REQUEST['not_visible']) && $_REQUEST['not_visible'] !== 'false') {
-		$visible = 0;
-	}
-
-	$ret = ['src' => '', 'filename' => '', 'filesize' => 0, 'type' => ''];
-
-	Hook::callAll('photo_post_file', $ret);
-
-	if (!empty($ret['src']) && !empty($ret['filesize'])) {
-		$src      = $ret['src'];
-		$filename = $ret['filename'];
-		$filesize = $ret['filesize'];
-		$type     = $ret['type'];
-		$error    = UPLOAD_ERR_OK;
-	} elseif (!empty($_FILES['userfile'])) {
-		$src      = $_FILES['userfile']['tmp_name'];
-		$filename = basename($_FILES['userfile']['name']);
-		$filesize = intval($_FILES['userfile']['size']);
-		$type     = $_FILES['userfile']['type'];
-		$error    = $_FILES['userfile']['error'];
-	} else {
-		$error    = UPLOAD_ERR_NO_FILE;
-	}
-
-	if ($error !== UPLOAD_ERR_OK) {
-		switch ($error) {
-			case UPLOAD_ERR_INI_SIZE:
-				DI::sysmsg()->addNotice(DI::l10n()->t('Image exceeds size limit of %s', ini_get('upload_max_filesize')));
-				break;
-			case UPLOAD_ERR_FORM_SIZE:
-				DI::sysmsg()->addNotice(DI::l10n()->t('Image exceeds size limit of %s', Strings::formatBytes($_REQUEST['MAX_FILE_SIZE'] ?? 0)));
-				break;
-			case UPLOAD_ERR_PARTIAL:
-				DI::sysmsg()->addNotice(DI::l10n()->t('Image upload didn\'t complete, please try again'));
-				break;
-			case UPLOAD_ERR_NO_FILE:
-				DI::sysmsg()->addNotice(DI::l10n()->t('Image file is missing'));
-				break;
-			case UPLOAD_ERR_NO_TMP_DIR:
-			case UPLOAD_ERR_CANT_WRITE:
-			case UPLOAD_ERR_EXTENSION:
-				DI::sysmsg()->addNotice(DI::l10n()->t('Server can\'t accept new file upload at this time, please contact your administrator'));
-				break;
-		}
-		@unlink($src);
-		$foo = 0;
-		Hook::callAll('photo_post_end', $foo);
-		return;
-	}
-
-	$type = Images::getMimeTypeBySource($src, $filename, $type);
-
-	Logger::info('photos: upload: received file: ' . $filename . ' as ' . $src . ' ('. $type . ') ' . $filesize . ' bytes');
-
-	$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize'));
-
-	if ($maximagesize && ($filesize > $maximagesize)) {
-		DI::sysmsg()->addNotice(DI::l10n()->t('Image exceeds size limit of %s', Strings::formatBytes($maximagesize)));
-		@unlink($src);
-		$foo = 0;
-		Hook::callAll('photo_post_end', $foo);
-		return;
-	}
-
-	if (!$filesize) {
-		DI::sysmsg()->addNotice(DI::l10n()->t('Image file is empty.'));
-		@unlink($src);
-		$foo = 0;
-		Hook::callAll('photo_post_end', $foo);
-		return;
-	}
-
-	Logger::debug('loading contents', ['src' => $src]);
-
-	$imagedata = @file_get_contents($src);
-
-	$image = new Image($imagedata, $type);
-
-	if (!$image->isValid()) {
-		Logger::notice('unable to process image');
-		DI::sysmsg()->addNotice(DI::l10n()->t('Unable to process image.'));
-		@unlink($src);
-		$foo = 0;
-		Hook::callAll('photo_post_end',$foo);
-		return;
-	}
-
-	$exif = $image->orient($src);
-	@unlink($src);
-
-	$max_length = DI::config()->get('system', 'max_image_length');
-	if ($max_length > 0) {
-		$image->scaleDown($max_length);
-	}
-
-	$width  = $image->getWidth();
-	$height = $image->getHeight();
-
-	$smallest = 0;
-
-	$resource_id = Photo::newResource();
-
-	$r = Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 0 , Photo::DEFAULT, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
-
-	if (!$r) {
-		Logger::warning('image store failed');
-		DI::sysmsg()->addNotice(DI::l10n()->t('Image upload failed.'));
-		return;
-	}
-
-	if ($width > 640 || $height > 640) {
-		$image->scaleDown(640);
-		Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 1, Photo::DEFAULT, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
-		$smallest = 1;
-	}
-
-	if ($width > 320 || $height > 320) {
-		$image->scaleDown(320);
-		Photo::store($image, $page_owner_uid, $visitor, $resource_id, $filename, $album, 2, Photo::DEFAULT, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
-		$smallest = 2;
-	}
-
-	$uri = Item::newURI();
-
-	// Create item container
-	$lat = $lon = null;
-	if (!empty($exif['GPS']) && Feature::isEnabled($page_owner_uid, 'photo_location')) {
-		$lat = Photo::getGps($exif['GPS']['GPSLatitude'], $exif['GPS']['GPSLatitudeRef']);
-		$lon = Photo::getGps($exif['GPS']['GPSLongitude'], $exif['GPS']['GPSLongitudeRef']);
-	}
-
-	$arr = [];
-	if ($lat && $lon) {
-		$arr['coord'] = $lat . ' ' . $lon;
-	}
-
-	$arr['guid']          = System::createUUID();
-	$arr['uid']           = $page_owner_uid;
-	$arr['uri']           = $uri;
-	$arr['post-type']     = Item::PT_IMAGE;
-	$arr['wall']          = 1;
-	$arr['resource-id']   = $resource_id;
-	$arr['contact-id']    = $owner_record['id'];
-	$arr['owner-name']    = $owner_record['name'];
-	$arr['owner-link']    = $owner_record['url'];
-	$arr['owner-avatar']  = $owner_record['thumb'];
-	$arr['author-name']   = $owner_record['name'];
-	$arr['author-link']   = $owner_record['url'];
-	$arr['author-avatar'] = $owner_record['thumb'];
-	$arr['title']         = '';
-	$arr['allow_cid']     = $str_contact_allow;
-	$arr['allow_gid']     = $str_group_allow;
-	$arr['deny_cid']      = $str_contact_deny;
-	$arr['deny_gid']      = $str_group_deny;
-	$arr['visible']       = $visible;
-	$arr['origin']        = 1;
-
-	$arr['body']          = '[url=' . DI::baseUrl() . '/photos/' . $owner_record['nickname'] . '/image/' . $resource_id . ']'
-				. '[img]' . DI::baseUrl() . "/photo/{$resource_id}-{$smallest}.".$image->getExt() . '[/img]'
-				. '[/url]';
-
-	$item_id = Item::insert($arr);
-	// Update the photo albums cache
-	Photo::clearAlbumCache($page_owner_uid);
-
-	Hook::callAll('photo_post_end', $item_id);
-
-	// addon uploaders should call "exit()" within the photo_post_end hook
-	// if they do not wish to be redirected
-
-	DI::baseUrl()->redirect($_SESSION['photo_return']);
-	// NOTREACHED
 }
 
 function photos_content(App $a)
@@ -883,6 +674,9 @@ function photos_content(App $a)
 			DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 			return;
 		}
+
+		// This prevents the photo upload form to return to itself without a hint the picture has been correctly uploaded.
+		DI::session()->remove('photo_return');
 
 		$selname = (!is_null($datum) && Strings::isHex($datum)) ? hex2bin($datum) : '';
 
