@@ -445,7 +445,7 @@ class System
 		if (@is_readable('/proc/loadavg')) {
 			$content = @file_get_contents('/proc/loadavg');
 			if (empty($content)) {
-				$content = shell_exec('uptime | sed "s/.*e: //" | sed "s/,//"');
+				$content = shell_exec('uptime | sed "s/.*averages*: //" | sed "s/,//"');
 			}
 		}
 
