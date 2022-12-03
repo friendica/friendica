@@ -69,6 +69,26 @@ class Relation
 	}
 
 	/**
+	 * Fetch the followers of a given user
+	 *
+	 * @param integer $uid User ID
+	 * @return void
+	 */
+	public static function discoverByUser(int $uid)
+	{
+		$contact = Contact::selectFirst(['id', 'url'], ['uid' => $uid, 'self' => true]);
+		if (empty($contact)) {
+			Logger::warning('Self contact for user not found', ['uid' => $uid]);
+			return;
+		}
+
+		$followers = self::getContacts($uid, [Contact::FOLLOWER, Contact::FRIEND]);
+		$followings = self::getContacts($uid, [Contact::SHARING, Contact::FRIEND]);
+
+		self::updateFollowersFollowings($contact, $followers, $followings);
+	}
+
+	/**
 	 * Fetches the followers of a given profile and adds them
 	 *
 	 * @param string $url URL of a profile
@@ -113,13 +133,27 @@ class Relation
 			$followings = [];
 		}
 
+		self::updateFollowersFollowings($contact, $followers, $followings);
+	}
+
+	/**
+	 * Update followers and followings for the given contact
+	 *
+	 * @param array $contact
+	 * @param array $followers
+	 * @param array $followings
+	 * @return void
+	 */
+	private static function updateFollowersFollowings(array $contact, array $followers, array $followings)
+	{
 		if (empty($followers) && empty($followings)) {
 			Contact::update(['last-discovery' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
-			Logger::info('The contact does not offer discoverable data', ['id' => $contact['id'], 'url' => $url, 'network' => $contact['network']]);
+			Logger::info('The contact does not offer discoverable data', ['id' => $contact['id'], 'url' => $contact['url'], 'network' => $contact['network']]);
 			return;
 		}
 
 		$target = $contact['id'];
+		$url    = $contact['url'];
 
 		if (!empty($followers)) {
 			// Clear the follower list, since it will be recreated in the next step

@@ -24,6 +24,7 @@ namespace Friendica\Module\Api\Mastodon\Accounts;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Module\BaseApi;
 
 /**
@@ -55,32 +56,59 @@ class Following extends BaseApi
 			'limit'    => 40, // Maximum number of results to return. Defaults to 40.
 		], $request);
 
-		$params = ['order' => ['cid' => true], 'limit' => $request['limit']];
+		if ($id == Contact::getPublicIdByUserId($uid)) {
+			$params = ['order' => ['pid' => true], 'limit' => $request['limit']];
 
-		$condition = ['relation-cid' => $id, 'follows' => true];
+			$condition = ['uid' => $uid, 'self' => false, 'rel' => [Contact::SHARING, Contact::FRIEND]];
+	
+			if (!empty($request['max_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`pid` < ?", $request['max_id']]);
+			}
+	
+			if (!empty($request['since_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`pid` > ?", $request['since_id']]);
+			}
+	
+			if (!empty($request['min_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`pid` > ?", $request['min_id']]);
+	
+				$params['order'] = ['pid'];
+			}
+	
+			$accounts = [];
+	
+			foreach (Contact::selectAccountToArray(['pid'], $condition, $params) as $follower) {
+				self::setBoundaries($follower['pid']);
+				$accounts[] = DI::mstdnAccount()->createFromContactId($follower['pid'], $uid);
+			}
+		} else {
+			$params = ['order' => ['cid' => true], 'limit' => $request['limit']];
 
-		if (!empty($request['max_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`cid` < ?", $request['max_id']]);
+			$condition = ['relation-cid' => $id, 'follows' => true];
+
+			if (!empty($request['max_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`cid` < ?", $request['max_id']]);
+			}
+
+			if (!empty($request['since_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`cid` > ?", $request['since_id']]);
+			}
+
+			if (!empty($request['min_id'])) {
+				$condition = DBA::mergeConditions($condition, ["`cid` > ?", $request['min_id']]);
+
+				$params['order'] = ['cid'];
+			}
+
+			$accounts = [];
+
+			$followers = DBA::select('contact-relation', ['cid'], $condition, $params);
+			while ($follower = DBA::fetch($followers)) {
+				self::setBoundaries($follower['cid']);
+				$accounts[] = DI::mstdnAccount()->createFromContactId($follower['cid'], $uid);
+			}
+			DBA::close($followers);
 		}
-
-		if (!empty($request['since_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`cid` > ?", $request['since_id']]);
-		}
-
-		if (!empty($request['min_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`cid` > ?", $request['min_id']]);
-
-			$params['order'] = ['cid'];
-		}
-
-		$accounts = [];
-
-		$followers = DBA::select('contact-relation', ['cid'], $condition, $params);
-		while ($follower = DBA::fetch($followers)) {
-			self::setBoundaries($follower['cid']);
-			$accounts[] = DI::mstdnAccount()->createFromContactId($follower['cid'], $uid);
-		}
-		DBA::close($followers);
 
 		if (!empty($request['min_id'])) {
 			$accounts = array_reverse($accounts);

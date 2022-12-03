@@ -140,6 +140,18 @@ class Contact
 	 * @param array $fields    Array of selected fields, empty for all
 	 * @param array $condition Array of fields for condition
 	 * @param array $params    Array of several parameters
+	 * @return array
+	 * @throws \Exception
+	 */
+	public static function selectAccountToArray(array $fields = [], array $condition = [], array $params = []): array
+	{
+		return DBA::selectToArray('account-user-view', $fields, $condition, $params);
+	}
+
+	/**
+	 * @param array $fields    Array of selected fields, empty for all
+	 * @param array $condition Array of fields for condition
+	 * @param array $params    Array of several parameters
 	 * @return array|bool
 	 * @throws \Exception
 	 */
@@ -3154,6 +3166,8 @@ class Contact
 			return;
 		}
 
+		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+
 		self::clearFollowerFollowingEndpointCache($contact['uid']);
 
 		$cdata = self::getPublicAndUserContactID($contact['id'], $contact['uid']);
@@ -3177,6 +3191,8 @@ class Contact
 		} else {
 			self::update(['rel' => self::FOLLOWER], ['id' => $contact['id']]);
 		}
+
+		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
 	}
 
 	/**
