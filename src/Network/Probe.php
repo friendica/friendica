@@ -110,7 +110,8 @@ class Probe
 	 */
 	private static function rearrangeData(array $data): array
 	{
-		$fields = ['name', 'nick', 'guid', 'url', 'addr', 'alias', 'photo', 'header',
+		$fields = ['name', 'given_name', 'family_name', 'nick', 'guid', 'url', 'addr', 'alias',
+		        'photo', 'photo_medium', 'photo_small', 'header',
 				'account-type', 'community', 'keywords', 'location', 'about', 'xmpp', 'matrix',
 				'hide', 'batch', 'notify', 'poll', 'request', 'confirm', 'subscribe', 'poco',
 				'following', 'followers', 'inbox', 'outbox', 'sharedinbox',
@@ -124,7 +125,7 @@ class Probe
 				if (in_array($field, $numeric_fields)) {
 					$newdata[$field] = (int)$data[$field];
 				} else {
-					$newdata[$field] = $data[$field];
+					$newdata[$field] = trim($data[$field]);
 				}
 			} elseif (!in_array($field, $numeric_fields)) {
 				$newdata[$field] = '';
@@ -1290,9 +1291,19 @@ class Probe
 				$data['name'] = $search->item(0)->nodeValue;
 			}
 
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' given_name ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["given_name"] = $search->item(0)->nodeValue;
+			}
+
+			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' family_name ')]", $vcard); // */
+			if ($search->length > 0) {
+				$data["family_name"] = $search->item(0)->nodeValue;
+			}
+
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' searchable ')]", $vcard); // */
 			if ($search->length > 0) {
-				$data['searchable'] = $search->item(0)->nodeValue;
+				$data['hide'] = (strtolower($search->item(0)->nodeValue) != 'true');
 			}
 
 			$search = $xpath->query("//*[contains(concat(' ', @class, ' '), ' key ')]", $vcard); // */
@@ -1309,7 +1320,7 @@ class Probe
 			}
 		}
 
-		$avatar = [];
+		$avatars = [];
 		if (!empty($vcard)) {
 			$photos = $xpath->query("//*[contains(concat(' ', @class, ' '), ' photo ') or contains(concat(' ', @class, ' '), ' avatar ')]", $vcard); // */
 			foreach ($photos as $photo) {
@@ -1319,20 +1330,27 @@ class Probe
 				}
 
 				if (isset($attr['src']) && isset($attr['width'])) {
-					$avatar[$attr['width']] = $attr['src'];
+					$avatars[$attr['width']] = self::fixAvatar($attr['src'], $data['baseurl']);
 				}
 
 				// We don't have a width. So we just take everything that we got.
 				// This is a Hubzilla workaround which doesn't send a width.
-				if ((sizeof($avatar) == 0) && !empty($attr['src'])) {
-					$avatar[] = $attr['src'];
+				if (!$avatars && !empty($attr['src'])) {
+					$avatars[] = self::fixAvatar($attr['src'], $data['baseurl']);
 				}
 			}
 		}
 
-		if (sizeof($avatar)) {
-			ksort($avatar);
-			$data['photo'] = self::fixAvatar(array_pop($avatar), $data['baseurl']);
+		if ($avatars) {
+			ksort($avatars);
+			$data['photo'] = array_pop($avatars);
+			if ($avatars) {
+				$data['photo_medium'] = array_pop($avatars);
+			}
+
+			if ($avatars) {
+				$data['photo_small'] = array_pop($avatars);
+			}
 		}
 
 		if ($dfrn) {
@@ -1355,7 +1373,6 @@ class Probe
 				unset($data['guid']);
 			}
 		}
-
 
 		return $data;
 	}

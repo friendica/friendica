@@ -155,7 +155,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-user", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -332,7 +331,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-thread-user", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -495,7 +493,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -634,7 +631,6 @@
 			"author-hidden" => ["author", "hidden"],
 			"author-updated" => ["author", "updated"],
 			"author-gsid" => ["author", "gsid"],
-			"author-uri-id" => ["author", "uri-id"],
 			"owner-id" => ["post-thread", "owner-id"],
 			"owner-uri-id" => ["owner", "uri-id"],
 			"owner-link" => ["owner", "url"],
@@ -889,6 +885,7 @@
 			"language" => ["user", "language"],
 			"register_date" => ["user", "register_date"],
 			"login_date" => ["user", "login_date"],
+			"last-activity" => ["user", "last-activity"],
 			"default-location" => ["user", "default-location"],
 			"allow_location" => ["user", "allow_location"],
 			"theme" => ["user", "theme"],
@@ -993,11 +990,11 @@
 			"blocked" => ["contact", "blocked"],
 			"dfrn-notify" => ["contact", "notify"],
 			"dfrn-poll" => ["contact", "poll"],
-			"diaspora-guid" => ["fcontact", "guid"],
-			"diaspora-batch" => ["fcontact", "batch"],
-			"diaspora-notify" => ["fcontact", "notify"],
-			"diaspora-poll" => ["fcontact", "poll"],
-			"diaspora-alias" => ["fcontact", "alias"],
+			"diaspora-guid" => ["item-uri", "guid"],
+			"diaspora-batch" => ["diaspora-contact", "batch"],
+			"diaspora-notify" => ["diaspora-contact", "notify"],
+			"diaspora-poll" => ["diaspora-contact", "poll"],
+			"diaspora-alias" => ["diaspora-contact", "alias"],
 			"ap-uuid" => ["apcontact", "uuid"],
 			"ap-type" => ["apcontact", "type"],
 			"ap-following" => ["apcontact", "following"],
@@ -1016,9 +1013,9 @@
 		"query" => "FROM `contact`
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `contact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `contact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = contact.`uri-id`
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = contact.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`
-			WHERE `contact`.`uid` = 0"			
+			WHERE `contact`.`uid` = 0"
 	],
 	"account-user-view" => [
 		"fields" => [
@@ -1092,14 +1089,14 @@
 			"reason" => ["ucontact", "reason"],
 			"dfrn-notify" => ["contact", "notify"],
 			"dfrn-poll" => ["contact", "poll"],
-			"diaspora-guid" => ["fcontact", "guid"],
-			"diaspora-batch" => ["fcontact", "batch"],
-			"diaspora-notify" => ["fcontact", "notify"],
-			"diaspora-poll" => ["fcontact", "poll"],
-			"diaspora-alias" => ["fcontact", "alias"],
-			"diaspora-interacting_count" => ["fcontact", "interacting_count"],
-			"diaspora-interacted_count" => ["fcontact", "interacted_count"],
-			"diaspora-post_count" => ["fcontact", "post_count"],
+			"diaspora-guid" => ["item-uri", "guid"],
+			"diaspora-batch" => ["diaspora-contact", "batch"],
+			"diaspora-notify" => ["diaspora-contact", "notify"],
+			"diaspora-poll" => ["diaspora-contact", "poll"],
+			"diaspora-alias" => ["diaspora-contact", "alias"],
+			"diaspora-interacting_count" => ["diaspora-contact", "interacting_count"],
+			"diaspora-interacted_count" => ["diaspora-contact", "interacted_count"],
+			"diaspora-post_count" => ["diaspora-contact", "post_count"],
 			"ap-uuid" => ["apcontact", "uuid"],
 			"ap-type" => ["apcontact", "type"],
 			"ap-following" => ["apcontact", "following"],
@@ -1119,7 +1116,7 @@
 			INNER JOIN `contact` ON `contact`.`uri-id` = `ucontact`.`uri-id` AND `contact`.`uid` = 0
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `ucontact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `ucontact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = `ucontact`.`uri-id` AND `fcontact`.`network` = 'dspr'
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = `ucontact`.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`"
 	],
 	"pending-view" => [
@@ -1189,5 +1186,36 @@
 		"query" => "FROM `profile_field`
 			INNER JOIN `permissionset` ON `permissionset`.`id` = `profile_field`.`psid`"
 	],
+	"diaspora-contact-view" => [
+		"fields" => [
+			"uri-id" => ["diaspora-contact", "uri-id"],
+			"url" => ["item-uri", "uri"],
+			"guid" => ["item-uri", "guid"],
+			"addr" => ["diaspora-contact", "addr"],
+			"alias" => ["diaspora-contact", "alias"],
+			"nick" => ["diaspora-contact", "nick"],
+			"name" => ["diaspora-contact", "name"],
+			"given-name" => ["diaspora-contact", "given-name"],
+			"family-name" => ["diaspora-contact", "family-name"],
+			"photo" => ["diaspora-contact", "photo"],
+			"photo-medium" => ["diaspora-contact", "photo-medium"],
+			"photo-small" => ["diaspora-contact", "photo-small"],
+			"batch" => ["diaspora-contact", "batch"],
+			"notify" => ["diaspora-contact", "notify"],
+			"poll" => ["diaspora-contact", "poll"],
+			"subscribe" => ["diaspora-contact", "subscribe"],
+			"searchable" => ["diaspora-contact", "searchable"],
+			"pubkey" => ["diaspora-contact", "pubkey"],
+			"baseurl" => ["gserver", "url"],
+			"gsid" => ["diaspora-contact", "gsid"],
+			"created" => ["diaspora-contact", "created"],
+			"updated" => ["diaspora-contact", "updated"],
+			"interacting_count" => ["diaspora-contact", "interacting_count"],
+			"interacted_count" => ["diaspora-contact", "interacted_count"],
+			"post_count" => ["diaspora-contact", "post_count"],
+		],
+		"query" => "FROM `diaspora-contact`
+			INNER JOIN `item-uri` ON `item-uri`.`id` = `diaspora-contact`.`uri-id`
+			LEFT JOIN `gserver` ON `gserver`.`id` = `diaspora-contact`.`gsid`"
+	],
 ];
-

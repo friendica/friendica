@@ -943,7 +943,7 @@ class Feed
 		if ((time() - strtotime($owner['last-item'])) < 15*60) {
 			$result = DI::cache()->get($cachekey);
 			if (!$nocache && !is_null($result)) {
-				Logger::info('Cached feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner_nick, 'filter' => $filter, 'created' => $previous_created]);
+				Logger::info('Cached feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner['nickname'], 'filter' => $filter, 'created' => $previous_created]);
 				return $result['feed'];
 			}
 		}
@@ -997,7 +997,7 @@ class Feed
 		$msg = ['feed' => $feeddata, 'last_update' => $last_update];
 		DI::cache()->set($cachekey, $msg, Duration::QUARTER_HOUR);
 
-		Logger::info('Feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner_nick, 'filter' => $filter, 'created' => $previous_created]);
+		Logger::info('Feed duration', ['seconds' => number_format(microtime(true) - $stamp, 3), 'nick' => $owner['nickname'], 'filter' => $filter, 'created' => $previous_created]);
 
 		return $feeddata;
 	}

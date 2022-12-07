@@ -46,6 +46,8 @@ class Attachment extends BaseDataTransferObject
 	protected $text_url;
 	/** @var string */
 	protected $description;
+	/** @var string */
+	protected $blurhash;
 	/** @var array */
 	protected $meta;
 
@@ -68,6 +70,7 @@ class Attachment extends BaseDataTransferObject
 		$this->remote_url = $remote;
 		$this->text_url = $this->remote_url ?? $this->url;
 		$this->description = $attachment['description'];
+		$this->blurhash = $attachment['blurhash'];
 		if ($type === 'image') {
 			if ((int) $attachment['width'] > 0 && (int) $attachment['height'] > 0) {
 				$this->meta['original']['width'] = (int) $attachment['width'];

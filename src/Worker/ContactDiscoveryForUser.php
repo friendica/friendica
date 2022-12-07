@@ -21,21 +21,16 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
-use Friendica\Model\FContact;
+use Friendica\Model\Contact;
 
-class UpdateFContact
+class ContactDiscoveryForUser
 {
 	/**
-	 * Update fcontact data via probe
-	 *
-	 * @param string $handle Contact handle
-	 * @return void
+	 * Discover contact relations
+	 * @param string $url
 	 */
-	public static function execute(string $handle)
+	public static function execute(int $uid)
 	{
-		$success = FContact::getByURL($handle, true);
-
-		Logger::info('Updated from probe', ['handle' => $handle, 'success' => $success]);
+		Contact\Relation::discoverByUser($uid);
 	}
 }

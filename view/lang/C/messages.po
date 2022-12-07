@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2022.12-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-01 18:01-0500\n"
+"POT-Creation-Date: 2022-12-04 06:41-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1262,7 +1262,7 @@ msgid "Public post"
 msgstr ""
 
 #: src/Content/Conversation.php:396 src/Content/Widget/VCard.php:113
-#: src/Model/Profile.php:465 src/Module/Admin/Logs/View.php:93
+#: src/Model/Profile.php:469 src/Module/Admin/Logs/View.php:93
 #: src/Module/Post/Edit.php:177
 msgid "Message"
 msgstr ""
@@ -1516,7 +1516,7 @@ msgstr ""
 msgid "show more"
 msgstr ""
 
-#: src/Content/Item.php:294 src/Model/Item.php:2919
+#: src/Content/Item.php:294 src/Model/Item.php:2914
 msgid "event"
 msgstr ""
 
@@ -1525,7 +1525,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-#: src/Content/Item.php:303 src/Model/Item.php:2921
+#: src/Content/Item.php:303 src/Model/Item.php:2916
 #: src/Module/Post/Tag/Add.php:123
 msgid "photo"
 msgstr ""
@@ -1539,31 +1539,31 @@ msgstr ""
 msgid "Follow Thread"
 msgstr ""
 
-#: src/Content/Item.php:387 src/Model/Contact.php:1197
+#: src/Content/Item.php:387 src/Model/Contact.php:1209
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:388 src/Content/Item.php:406 src/Model/Contact.php:1135
-#: src/Model/Contact.php:1189 src/Model/Contact.php:1198
+#: src/Content/Item.php:388 src/Content/Item.php:406 src/Model/Contact.php:1147
+#: src/Model/Contact.php:1201 src/Model/Contact.php:1210
 #: src/Module/Directory.php:157 src/Module/Settings/Profile/Index.php:234
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:389 src/Model/Contact.php:1199
+#: src/Content/Item.php:389 src/Model/Contact.php:1211
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:390 src/Model/Contact.php:1190
-#: src/Model/Contact.php:1200
+#: src/Content/Item.php:390 src/Model/Contact.php:1202
+#: src/Model/Contact.php:1212
 msgid "Network Posts"
 msgstr ""
 
-#: src/Content/Item.php:391 src/Model/Contact.php:1191
-#: src/Model/Contact.php:1201
+#: src/Content/Item.php:391 src/Model/Contact.php:1203
+#: src/Model/Contact.php:1213
 msgid "View Contact"
 msgstr ""
 
-#: src/Content/Item.php:392 src/Model/Contact.php:1202
+#: src/Content/Item.php:392 src/Model/Contact.php:1214
 msgid "Send PM"
 msgstr ""
 
@@ -1588,7 +1588,7 @@ msgid "Languages"
 msgstr ""
 
 #: src/Content/Item.php:403 src/Content/Widget.php:80
-#: src/Model/Contact.php:1192 src/Model/Contact.php:1203
+#: src/Model/Contact.php:1204 src/Model/Contact.php:1215
 #: src/Module/Contact/Follow.php:167 view/theme/vier/theme.php:196
 msgid "Connect/Follow"
 msgstr ""
@@ -1774,9 +1774,9 @@ msgstr ""
 msgid "Information about this friendica instance"
 msgstr ""
 
-#: src/Content/Nav.php:265 src/Module/Admin/Tos.php:76
+#: src/Content/Nav.php:265 src/Module/Admin/Tos.php:78
 #: src/Module/BaseAdmin.php:95 src/Module/Register.php:176
-#: src/Module/Tos.php:87
+#: src/Module/Tos.php:98
 msgid "Terms of Service"
 msgstr ""
 
@@ -1920,8 +1920,8 @@ msgid ""
 "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1245 src/Model/Item.php:3541
-#: src/Model/Item.php:3547 src/Model/Item.php:3548
+#: src/Content/Text/BBCode.php:1245 src/Model/Item.php:3536
+#: src/Model/Item.php:3542 src/Model/Item.php:3543
 msgid "Link to source"
 msgstr ""
 
@@ -1954,7 +1954,7 @@ msgid "The end"
 msgstr ""
 
 #: src/Content/Text/HTML.php:882 src/Content/Widget/VCard.php:109
-#: src/Model/Profile.php:459 src/Module/Contact/Profile.php:427
+#: src/Model/Profile.php:463 src/Module/Contact/Profile.php:427
 msgid "Follow"
 msgstr ""
 
@@ -2081,7 +2081,7 @@ msgstr ""
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:523 src/Model/Contact.php:1629
+#: src/Content/Widget.php:523 src/Model/Contact.php:1641
 msgid "News"
 msgstr ""
 
@@ -2150,21 +2150,20 @@ msgid "Matrix:"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:104 src/Model/Event.php:82
-#: src/Model/Event.php:109 src/Model/Event.php:471 src/Model/Event.php:961
-#: src/Model/Profile.php:373 src/Module/Calendar/Event/Form.php:239
-#: src/Module/Contact/Profile.php:369 src/Module/Directory.php:147
-#: src/Module/Notifications/Introductions.php:187
+#: src/Model/Event.php:109 src/Model/Event.php:471 src/Model/Event.php:958
+#: src/Model/Profile.php:373 src/Module/Contact/Profile.php:369
+#: src/Module/Directory.php:147 src/Module/Notifications/Introductions.php:187
 #: src/Module/Profile/Profile.php:186
 msgid "Location:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:107 src/Model/Profile.php:472
+#: src/Content/Widget/VCard.php:107 src/Model/Profile.php:476
 #: src/Module/Notifications/Introductions.php:201
 msgid "Network:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:111 src/Model/Contact.php:1193
-#: src/Model/Contact.php:1204 src/Model/Profile.php:461
+#: src/Content/Widget/VCard.php:111 src/Model/Contact.php:1205
+#: src/Model/Contact.php:1216 src/Model/Profile.php:465
 #: src/Module/Contact/Profile.php:419
 msgid "Unfollow"
 msgstr ""
@@ -2861,77 +2860,77 @@ msgstr ""
 msgid "Legacy module file not found: %s"
 msgstr ""
 
-#: src/Model/Contact.php:1210 src/Module/Moderation/Users/Pending.php:102
+#: src/Model/Contact.php:1222 src/Module/Moderation/Users/Pending.php:102
 #: src/Module/Notifications/Introductions.php:132
 #: src/Module/Notifications/Introductions.php:204
 msgid "Approve"
 msgstr ""
 
-#: src/Model/Contact.php:1625
+#: src/Model/Contact.php:1637
 msgid "Organisation"
 msgstr ""
 
-#: src/Model/Contact.php:1633
+#: src/Model/Contact.php:1645
 msgid "Forum"
 msgstr ""
 
-#: src/Model/Contact.php:2819
+#: src/Model/Contact.php:2831
 msgid "Disallowed profile URL."
 msgstr ""
 
-#: src/Model/Contact.php:2824 src/Module/Friendica.php:82
+#: src/Model/Contact.php:2836 src/Module/Friendica.php:82
 msgid "Blocked domain"
 msgstr ""
 
-#: src/Model/Contact.php:2829
+#: src/Model/Contact.php:2841
 msgid "Connect URL missing."
 msgstr ""
 
-#: src/Model/Contact.php:2838
+#: src/Model/Contact.php:2850
 msgid ""
 "The contact could not be added. Please check the relevant network "
 "credentials in your Settings -> Social Networks page."
 msgstr ""
 
-#: src/Model/Contact.php:2880
+#: src/Model/Contact.php:2892
 msgid "The profile address specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:2882
+#: src/Model/Contact.php:2894
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:2885
+#: src/Model/Contact.php:2897
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:2888
+#: src/Model/Contact.php:2900
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:2891
+#: src/Model/Contact.php:2903
 msgid ""
 "Unable to match @-style Identity Address with a known protocol or email "
 "contact."
 msgstr ""
 
-#: src/Model/Contact.php:2892
+#: src/Model/Contact.php:2904
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:2898
+#: src/Model/Contact.php:2910
 msgid ""
 "The profile address specified belongs to a network which has been disabled "
 "on this site."
 msgstr ""
 
-#: src/Model/Contact.php:2903
+#: src/Model/Contact.php:2915
 msgid ""
 "Limited profile. This person will be unable to receive direct/personal "
 "notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:2962
+#: src/Model/Contact.php:2974
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -2940,12 +2939,12 @@ msgid "l F d, Y \\@ g:i A \\G\\M\\TP (e)"
 msgstr ""
 
 #: src/Model/Event.php:75 src/Model/Event.php:92 src/Model/Event.php:469
-#: src/Model/Event.php:943
+#: src/Model/Event.php:940
 msgid "Starts:"
 msgstr ""
 
 #: src/Model/Event.php:78 src/Model/Event.php:98 src/Model/Event.php:470
-#: src/Model/Event.php:947
+#: src/Model/Event.php:944
 msgid "Finishes:"
 msgstr ""
 
@@ -3005,32 +3004,32 @@ msgstr ""
 msgid "Delete event"
 msgstr ""
 
-#: src/Model/Event.php:899 src/Module/Debug/Localtime.php:38
+#: src/Model/Event.php:896 src/Module/Debug/Localtime.php:38
 msgid "l F d, Y \\@ g:i A"
 msgstr ""
 
-#: src/Model/Event.php:900
+#: src/Model/Event.php:897
 msgid "D g:i A"
 msgstr ""
 
-#: src/Model/Event.php:901
+#: src/Model/Event.php:898
 msgid "g:i A"
 msgstr ""
 
-#: src/Model/Event.php:962 src/Model/Event.php:964
+#: src/Model/Event.php:959 src/Model/Event.php:961
 msgid "Show map"
 msgstr ""
 
-#: src/Model/Event.php:963
+#: src/Model/Event.php:960
 msgid "Hide map"
 msgstr ""
 
-#: src/Model/Event.php:1056
+#: src/Model/Event.php:1053
 #, php-format
 msgid "%s's birthday"
 msgstr ""
 
-#: src/Model/Event.php:1057
+#: src/Model/Event.php:1054
 #, php-format
 msgid "Happy Birthday %s"
 msgstr ""
@@ -3084,61 +3083,61 @@ msgstr ""
 msgid "Detected languages in this post:\\n%s"
 msgstr ""
 
-#: src/Model/Item.php:2923
+#: src/Model/Item.php:2918
 msgid "activity"
 msgstr ""
 
-#: src/Model/Item.php:2925
+#: src/Model/Item.php:2920
 msgid "comment"
 msgstr ""
 
-#: src/Model/Item.php:2928
+#: src/Model/Item.php:2923
 msgid "post"
 msgstr ""
 
-#: src/Model/Item.php:3069
+#: src/Model/Item.php:3064
 #, php-format
 msgid "Content warning: %s"
 msgstr ""
 
-#: src/Model/Item.php:3453
+#: src/Model/Item.php:3448
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3484
+#: src/Model/Item.php:3479
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3486
+#: src/Model/Item.php:3481
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3491
+#: src/Model/Item.php:3486
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3493
+#: src/Model/Item.php:3488
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3495
+#: src/Model/Item.php:3490
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3529 src/Model/Item.php:3530
+#: src/Model/Item.php:3524 src/Model/Item.php:3525
 msgid "View on separate page"
 msgstr ""
 
@@ -3169,133 +3168,133 @@ msgstr ""
 msgid "About:"
 msgstr ""
 
-#: src/Model/Profile.php:463
+#: src/Model/Profile.php:467
 msgid "Atom feed"
 msgstr ""
 
-#: src/Model/Profile.php:470
+#: src/Model/Profile.php:474
 msgid "This website has been verified to belong to the same person."
 msgstr ""
 
-#: src/Model/Profile.php:507
+#: src/Model/Profile.php:511
 msgid "F d"
 msgstr ""
 
-#: src/Model/Profile.php:571 src/Model/Profile.php:660
+#: src/Model/Profile.php:575 src/Model/Profile.php:664
 msgid "[today]"
 msgstr ""
 
-#: src/Model/Profile.php:580
+#: src/Model/Profile.php:584
 msgid "Birthday Reminders"
 msgstr ""
 
-#: src/Model/Profile.php:581
+#: src/Model/Profile.php:585
 msgid "Birthdays this week:"
 msgstr ""
 
-#: src/Model/Profile.php:609
+#: src/Model/Profile.php:613
 msgid "g A l F d"
 msgstr ""
 
-#: src/Model/Profile.php:647
+#: src/Model/Profile.php:651
 msgid "[No description]"
 msgstr ""
 
-#: src/Model/Profile.php:673
+#: src/Model/Profile.php:677
 msgid "Event Reminders"
 msgstr ""
 
-#: src/Model/Profile.php:674
+#: src/Model/Profile.php:678
 msgid "Upcoming events the next 7 days:"
 msgstr ""
 
-#: src/Model/Profile.php:869
+#: src/Model/Profile.php:873
 #, php-format
 msgid "OpenWebAuth: %1$s welcomes %2$s"
 msgstr ""
 
-#: src/Model/Profile.php:1009
+#: src/Model/Profile.php:1013
 msgid "Hometown:"
 msgstr ""
 
-#: src/Model/Profile.php:1010
+#: src/Model/Profile.php:1014
 msgid "Marital Status:"
 msgstr ""
 
-#: src/Model/Profile.php:1011
+#: src/Model/Profile.php:1015
 msgid "With:"
 msgstr ""
 
-#: src/Model/Profile.php:1012
+#: src/Model/Profile.php:1016
 msgid "Since:"
 msgstr ""
 
-#: src/Model/Profile.php:1013
+#: src/Model/Profile.php:1017
 msgid "Sexual Preference:"
 msgstr ""
 
-#: src/Model/Profile.php:1014
+#: src/Model/Profile.php:1018
 msgid "Political Views:"
 msgstr ""
 
-#: src/Model/Profile.php:1015
+#: src/Model/Profile.php:1019
 msgid "Religious Views:"
 msgstr ""
 
-#: src/Model/Profile.php:1016
+#: src/Model/Profile.php:1020
 msgid "Likes:"
 msgstr ""
 
-#: src/Model/Profile.php:1017
+#: src/Model/Profile.php:1021
 msgid "Dislikes:"
 msgstr ""
 
-#: src/Model/Profile.php:1018
+#: src/Model/Profile.php:1022
 msgid "Title/Description:"
 msgstr ""
 
-#: src/Model/Profile.php:1019 src/Module/Admin/Summary.php:217
+#: src/Model/Profile.php:1023 src/Module/Admin/Summary.php:217
 #: src/Module/Moderation/Summary.php:77
 msgid "Summary"
 msgstr ""
 
-#: src/Model/Profile.php:1020
+#: src/Model/Profile.php:1024
 msgid "Musical interests"
 msgstr ""
 
-#: src/Model/Profile.php:1021
+#: src/Model/Profile.php:1025
 msgid "Books, literature"
 msgstr ""
 
-#: src/Model/Profile.php:1022
+#: src/Model/Profile.php:1026
 msgid "Television"
 msgstr ""
 
-#: src/Model/Profile.php:1023
+#: src/Model/Profile.php:1027
 msgid "Film/dance/culture/entertainment"
 msgstr ""
 
-#: src/Model/Profile.php:1024
+#: src/Model/Profile.php:1028
 msgid "Hobbies/Interests"
 msgstr ""
 
-#: src/Model/Profile.php:1025
+#: src/Model/Profile.php:1029
 msgid "Love/romance"
 msgstr ""
 
-#: src/Model/Profile.php:1026
+#: src/Model/Profile.php:1030
 msgid "Work/employment"
 msgstr ""
 
-#: src/Model/Profile.php:1027
+#: src/Model/Profile.php:1031
 msgid "School/education"
 msgstr ""
 
-#: src/Model/Profile.php:1028
+#: src/Model/Profile.php:1032
 msgid "Contact information and Social Networks"
 msgstr ""
 
-#: src/Model/User.php:212 src/Model/User.php:1100
+#: src/Model/User.php:212 src/Model/User.php:1102
 msgid "SERIOUS ERROR: Generation of security keys failed."
 msgstr ""
 
@@ -3307,134 +3306,134 @@ msgstr ""
 msgid "Not enough information to authenticate"
 msgstr ""
 
-#: src/Model/User.php:750
+#: src/Model/User.php:752
 msgid "Password can't be empty"
 msgstr ""
 
-#: src/Model/User.php:792
+#: src/Model/User.php:794
 msgid "Empty passwords are not allowed."
 msgstr ""
 
-#: src/Model/User.php:796
+#: src/Model/User.php:798
 msgid ""
 "The new password has been exposed in a public data dump, please choose "
 "another."
 msgstr ""
 
-#: src/Model/User.php:800
+#: src/Model/User.php:802
 msgid "The password length is limited to 72 characters."
 msgstr ""
 
-#: src/Model/User.php:804
+#: src/Model/User.php:806
 msgid ""
 "The password can't contain accentuated letters, white spaces or colons (:)"
 msgstr ""
 
-#: src/Model/User.php:983
+#: src/Model/User.php:985
 msgid "Passwords do not match. Password unchanged."
 msgstr ""
 
-#: src/Model/User.php:990
+#: src/Model/User.php:992
 msgid "An invitation is required."
 msgstr ""
 
-#: src/Model/User.php:994
+#: src/Model/User.php:996
 msgid "Invitation could not be verified."
 msgstr ""
 
-#: src/Model/User.php:1002
+#: src/Model/User.php:1004
 msgid "Invalid OpenID url"
 msgstr ""
 
-#: src/Model/User.php:1015 src/Security/Authentication.php:241
+#: src/Model/User.php:1017 src/Security/Authentication.php:241
 msgid ""
 "We encountered a problem while logging in with the OpenID you provided. "
 "Please check the correct spelling of the ID."
 msgstr ""
 
-#: src/Model/User.php:1015 src/Security/Authentication.php:241
+#: src/Model/User.php:1017 src/Security/Authentication.php:241
 msgid "The error message was:"
 msgstr ""
 
-#: src/Model/User.php:1021
+#: src/Model/User.php:1023
 msgid "Please enter the required information."
 msgstr ""
 
-#: src/Model/User.php:1035
+#: src/Model/User.php:1037
 #, php-format
 msgid ""
 "system.username_min_length (%s) and system.username_max_length (%s) are "
 "excluding each other, swapping values."
 msgstr ""
 
-#: src/Model/User.php:1042
+#: src/Model/User.php:1044
 #, php-format
 msgid "Username should be at least %s character."
 msgid_plural "Username should be at least %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1046
+#: src/Model/User.php:1048
 #, php-format
 msgid "Username should be at most %s character."
 msgid_plural "Username should be at most %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1054
+#: src/Model/User.php:1056
 msgid "That doesn't appear to be your full (First Last) name."
 msgstr ""
 
-#: src/Model/User.php:1059
+#: src/Model/User.php:1061
 msgid "Your email domain is not among those allowed on this site."
 msgstr ""
 
-#: src/Model/User.php:1063
+#: src/Model/User.php:1065
 msgid "Not a valid email address."
 msgstr ""
 
-#: src/Model/User.php:1066
+#: src/Model/User.php:1068
 msgid "The nickname was blocked from registration by the nodes admin."
 msgstr ""
 
-#: src/Model/User.php:1070 src/Model/User.php:1076
+#: src/Model/User.php:1072 src/Model/User.php:1078
 msgid "Cannot use that email."
 msgstr ""
 
-#: src/Model/User.php:1082
+#: src/Model/User.php:1084
 msgid "Your nickname can only contain a-z, 0-9 and _."
 msgstr ""
 
-#: src/Model/User.php:1090 src/Model/User.php:1147
+#: src/Model/User.php:1092 src/Model/User.php:1149
 msgid "Nickname is already registered. Please choose another."
 msgstr ""
 
-#: src/Model/User.php:1134 src/Model/User.php:1138
+#: src/Model/User.php:1136 src/Model/User.php:1140
 msgid "An error occurred during registration. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1161
+#: src/Model/User.php:1163
 msgid "An error occurred creating your default profile. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1168
+#: src/Model/User.php:1170
 msgid "An error occurred creating your self contact. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1173
+#: src/Model/User.php:1175
 msgid "Friends"
 msgstr ""
 
-#: src/Model/User.php:1177
+#: src/Model/User.php:1179
 msgid ""
 "An error occurred creating your default contact group. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1216
+#: src/Model/User.php:1218
 msgid "Profile Photos"
 msgstr ""
 
-#: src/Model/User.php:1409
+#: src/Model/User.php:1411
 #, php-format
 msgid ""
 "\n"
@@ -3442,7 +3441,7 @@ msgid ""
 "\t\t\tthe administrator of %2$s has set up an account for you."
 msgstr ""
 
-#: src/Model/User.php:1412
+#: src/Model/User.php:1414
 #, php-format
 msgid ""
 "\n"
@@ -3480,12 +3479,12 @@ msgid ""
 "\t\tThank you and welcome to %4$s."
 msgstr ""
 
-#: src/Model/User.php:1445 src/Model/User.php:1552
+#: src/Model/User.php:1447 src/Model/User.php:1554
 #, php-format
 msgid "Registration details for %s"
 msgstr ""
 
-#: src/Model/User.php:1465
+#: src/Model/User.php:1467
 #, php-format
 msgid ""
 "\n"
@@ -3501,12 +3500,12 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: src/Model/User.php:1484
+#: src/Model/User.php:1486
 #, php-format
 msgid "Registration at %s"
 msgstr ""
 
-#: src/Model/User.php:1508
+#: src/Model/User.php:1510
 #, php-format
 msgid ""
 "\n"
@@ -3515,7 +3514,7 @@ msgid ""
 "\t\t\t"
 msgstr ""
 
-#: src/Model/User.php:1516
+#: src/Model/User.php:1518
 #, php-format
 msgid ""
 "\n"
@@ -3583,7 +3582,7 @@ msgstr ""
 #: src/Module/Admin/Logs/View.php:84 src/Module/Admin/Queue.php:72
 #: src/Module/Admin/Site.php:437 src/Module/Admin/Storage.php:138
 #: src/Module/Admin/Summary.php:216 src/Module/Admin/Themes/Details.php:90
-#: src/Module/Admin/Themes/Index.php:111 src/Module/Admin/Tos.php:75
+#: src/Module/Admin/Themes/Index.php:111 src/Module/Admin/Tos.php:77
 #: src/Module/Moderation/Users/Create.php:61
 #: src/Module/Moderation/Users/Pending.php:96
 msgid "Administration"
@@ -3620,7 +3619,7 @@ msgstr ""
 
 #: src/Module/Admin/Addons/Index.php:69 src/Module/Admin/Features.php:87
 #: src/Module/Admin/Logs/Settings.php:81 src/Module/Admin/Site.php:440
-#: src/Module/Admin/Themes/Index.php:113 src/Module/Admin/Tos.php:83
+#: src/Module/Admin/Themes/Index.php:113 src/Module/Admin/Tos.php:86
 #: src/Module/Settings/Account.php:560 src/Module/Settings/Addons.php:81
 #: src/Module/Settings/Connectors.php:159
 #: src/Module/Settings/Connectors.php:244
@@ -5154,21 +5153,21 @@ msgstr ""
 msgid "[Unsupported]"
 msgstr ""
 
-#: src/Module/Admin/Tos.php:77
+#: src/Module/Admin/Tos.php:79
 msgid "Display Terms of Service"
 msgstr ""
 
-#: src/Module/Admin/Tos.php:77
+#: src/Module/Admin/Tos.php:79
 msgid ""
 "Enable the Terms of Service page. If this is enabled a link to the terms "
 "will be added to the registration form and the general information page."
 msgstr ""
 
-#: src/Module/Admin/Tos.php:78
+#: src/Module/Admin/Tos.php:80
 msgid "Display Privacy Statement"
 msgstr ""
 
-#: src/Module/Admin/Tos.php:78
+#: src/Module/Admin/Tos.php:80
 #, php-format
 msgid ""
 "Show some informations regarding the needed information to operate the node "
@@ -5176,18 +5175,26 @@ msgid ""
 "\">EU-GDPR</a>."
 msgstr ""
 
-#: src/Module/Admin/Tos.php:79
+#: src/Module/Admin/Tos.php:81
 msgid "Privacy Statement Preview"
 msgstr ""
 
-#: src/Module/Admin/Tos.php:81
+#: src/Module/Admin/Tos.php:83
 msgid "The Terms of Service"
 msgstr ""
 
-#: src/Module/Admin/Tos.php:81
+#: src/Module/Admin/Tos.php:83
 msgid ""
 "Enter the Terms of Service for your node here. You can use BBCode. Headers "
 "of sections should be [h2] and below."
+msgstr ""
+
+#: src/Module/Admin/Tos.php:84
+msgid "The rules"
+msgstr ""
+
+#: src/Module/Admin/Tos.php:84
+msgid "Enter your system rules here. Each line represents one rule."
 msgstr ""
 
 #: src/Module/Api/ApiResponse.php:279
@@ -5484,7 +5491,7 @@ msgid "Event Starts:"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:209
-#: src/Module/Calendar/Event/Form.php:241 src/Module/Debug/Probe.php:59
+#: src/Module/Calendar/Event/Form.php:237 src/Module/Debug/Probe.php:59
 #: src/Module/Install.php:207 src/Module/Install.php:240
 #: src/Module/Install.php:245 src/Module/Install.php:264
 #: src/Module/Install.php:275 src/Module/Install.php:280
@@ -5515,14 +5522,17 @@ msgstr ""
 msgid "Event Finishes:"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:237 src/Module/Profile/Profile.php:164
-#: src/Module/Settings/Profile/Index.php:247
-msgid "Description:"
+#: src/Module/Calendar/Event/Form.php:237
+#: src/Module/Calendar/Event/Form.php:243
+msgid "Title (BBCode not allowed)"
+msgstr ""
+
+#: src/Module/Calendar/Event/Form.php:239
+msgid "Description (BBCode allowed)"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:241
-#: src/Module/Calendar/Event/Form.php:243
-msgid "Title:"
+msgid "Location (BBCode not allowed)"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:244
@@ -8231,6 +8241,10 @@ msgid_plural "%d years old"
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/Module/Profile/Profile.php:164 src/Module/Settings/Profile/Index.php:247
+msgid "Description:"
+msgstr ""
+
 #: src/Module/Profile/Profile.php:226
 msgid "Forums:"
 msgstr ""
@@ -10238,7 +10252,7 @@ msgstr ""
 msgid "Exception thrown in %s:%d"
 msgstr ""
 
-#: src/Module/Tos.php:57 src/Module/Tos.php:91
+#: src/Module/Tos.php:57 src/Module/Tos.php:104
 msgid ""
 "At the time of registration, and for providing communications between the "
 "user account and their contacts, the user has to provide a display name (pen "
@@ -10251,14 +10265,14 @@ msgid ""
 "settings, it is not necessary for communication."
 msgstr ""
 
-#: src/Module/Tos.php:58 src/Module/Tos.php:92
+#: src/Module/Tos.php:58 src/Module/Tos.php:105
 msgid ""
 "This data is required for communication and is passed on to the nodes of the "
 "communication partners and is stored there. Users can enter additional "
 "private data that may be transmitted to the communication partners accounts."
 msgstr ""
 
-#: src/Module/Tos.php:59 src/Module/Tos.php:93
+#: src/Module/Tos.php:59 src/Module/Tos.php:106
 #, php-format
 msgid ""
 "At any point in time a logged in user can export their account data from the "
@@ -10269,8 +10283,12 @@ msgid ""
 "communication partners."
 msgstr ""
 
-#: src/Module/Tos.php:62 src/Module/Tos.php:90
+#: src/Module/Tos.php:62 src/Module/Tos.php:103
 msgid "Privacy Statement"
+msgstr ""
+
+#: src/Module/Tos.php:100
+msgid "Rules"
 msgstr ""
 
 #: src/Module/Update/Display.php:45

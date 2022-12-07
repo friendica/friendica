@@ -682,6 +682,8 @@ class User
 
 		if ($user['last-activity'] != $current_day) {
 			User::update(['last-activity' => $current_day], $uid);
+			// Set the last actitivy for all identities of the user
+			DBA::update('user', ['last-activity' => $current_day], ['parent-uid' => $uid, 'account_removed' => false]);
 		}
 	}
 
@@ -1729,8 +1731,8 @@ class User
 			'active_users_weekly'   => 0,
 		];
 
-		$userStmt = DBA::select('owner-view', ['uid', 'login_date', 'last-item'],
-			["`verified` AND `login_date` > ? AND NOT `blocked`
+		$userStmt = DBA::select('owner-view', ['uid', 'last-activity', 'last-item'],
+			["`verified` AND `last-activity` > ? AND NOT `blocked`
 			AND NOT `account_removed` AND NOT `account_expired`",
 			DBA::NULL_DATETIME]);
 		if (!DBA::isResult($userStmt)) {
@@ -1744,17 +1746,17 @@ class User
 		while ($user = DBA::fetch($userStmt)) {
 			$statistics['total_users']++;
 
-			if ((strtotime($user['login_date']) > $halfyear) || (strtotime($user['last-item']) > $halfyear)
+			if ((strtotime($user['last-activity']) > $halfyear) || (strtotime($user['last-item']) > $halfyear)
 			) {
 				$statistics['active_users_halfyear']++;
 			}
 
-			if ((strtotime($user['login_date']) > $month) || (strtotime($user['last-item']) > $month)
+			if ((strtotime($user['last-activity']) > $month) || (strtotime($user['last-item']) > $month)
 			) {
 				$statistics['active_users_monthly']++;
 			}
 
-			if ((strtotime($user['login_date']) > $week) || (strtotime($user['last-item']) > $week)
+			if ((strtotime($user['last-activity']) > $week) || (strtotime($user['last-item']) > $week)
 			) {
 				$statistics['active_users_weekly']++;
 			}

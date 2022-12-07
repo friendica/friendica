@@ -137,7 +137,7 @@ abstract class BaseUsers extends BaseModeration
 			$user['account_type']     = ($user['page_flags_raw'] == 0) ? $account_types[$user['account-type']] : '';
 
 			$user['register_date'] = Temporal::getRelativeDate($user['register_date']);
-			$user['login_date']    = Temporal::getRelativeDate($user['login_date']);
+			$user['login_date']    = Temporal::getRelativeDate($user['last-activity']);
 			$user['lastitem_date'] = Temporal::getRelativeDate($user['last-item']);
 			$user['is_admin']      = in_array($user['email'], $adminlist);
 			$user['is_deletable']  = !$user['account_removed'] && intval($user['uid']) != $this->session->getLocalUserId();

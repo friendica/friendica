@@ -94,7 +94,7 @@ class Attachment extends BaseFactory
 	 */
 	public function createFromPhoto(int $id): array
 	{
-		$photo = Photo::selectFirst(['resource-id', 'uid', 'id', 'title', 'type', 'width', 'height'], ['id' => $id]);
+		$photo = Photo::selectFirst(['resource-id', 'uid', 'id', 'title', 'type', 'width', 'height', 'blurhash'], ['id' => $id]);
 		if (empty($photo)) {
 			return [];
 		}
@@ -104,6 +104,7 @@ class Attachment extends BaseFactory
 			'description' => $photo['title'],
 			'width'       => $photo['width'],
 			'height'      => $photo['height'],
+			'blurhash'    => $photo['blurhash'],
 		];
 
 		$photoTypes = Images::supportedTypes();

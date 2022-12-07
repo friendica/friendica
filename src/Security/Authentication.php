@@ -356,7 +356,7 @@ class Authentication
 			$this->dba->update('user', ['last-activity' => DateTimeFormat::utcNow('Y-m-d'), 'login_date' => DateTimeFormat::utcNow()], ['uid' => $user_record['uid']]);
 
 			// Set the login date for all identities of the user
-			$this->dba->update('user', ['login_date' => DateTimeFormat::utcNow()],
+			$this->dba->update('user', ['last-activity' => DateTimeFormat::utcNow('Y-m-d'), 'login_date' => DateTimeFormat::utcNow()],
 				['parent-uid' => $user_record['uid'], 'account_removed' => false]);
 
 			// Regularly update suggestions

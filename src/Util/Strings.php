@@ -23,6 +23,7 @@ namespace Friendica\Util;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Logger;
+use Friendica\Core\System;
 use ParagonIE\ConstantTime\Base64;
 
 /**
@@ -480,7 +481,7 @@ class Strings
 
 		$blocks = [];
 
-		$text = preg_replace_callback($regex,
+		$return = preg_replace_callback($regex,
 			function ($matches) use ($executionId, &$blocks) {
 				$return = '«block-' . $executionId . '-' . count($blocks) . '»';
 
@@ -491,7 +492,11 @@ class Strings
 			$text
 		);
 
-		$text = $callback($text) ?? '';
+		if (is_null($return)) {
+			Logger::warning('Received null value from preg_replace_callback', ['text' => $text, 'regex' => $regex, 'blocks' => $blocks, 'executionId' => $executionId, 'callstack' => System::callstack(10)]);
+		}
+
+		$text = $callback($return ?? $text) ?? '';
 
 		// Restore code blocks
 		$text = preg_replace_callback('/«block-' . $executionId . '-([0-9]+)»/iU',

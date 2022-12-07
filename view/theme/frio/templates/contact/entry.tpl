@@ -89,7 +89,7 @@
 			{{* The contact description (e.g. Name, Network, kind of connection and so on *}}
 			<div class="contact-entry-desc">
 				<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
-					<h4 class="media-heading"><a href="{{if $contact.photo_menu.edit}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">{{$contact.name}}</a>
+					<h4 class="media-heading"><a href="{{if !empty($contact.photo_menu.edit)}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">{{$contact.name}}</a>
 					{{if $contact.account_type}} <small class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">({{$contact.account_type}})</small>{{/if}}
 					{{if $contact.account_type == 'Forum'}}<i class="fa fa-comments-o" aria-hidden="true"></i>{{/if}}
 					{{* @todo this needs some changing in core because $contact.account_type contains a translated string which may notbe the same in every language *}}

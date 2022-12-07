@@ -599,6 +599,11 @@ abstract class DI
 		return self::$dice->create(Protocol\Activity::class);
 	}
 
+	public static function dsprContact(): Protocol\Diaspora\Repository\DiasporaContact
+	{
+		return self::$dice->create(Protocol\Diaspora\Repository\DiasporaContact::class);
+	}
+
 	//
 	// "Security" namespace instances
 	//

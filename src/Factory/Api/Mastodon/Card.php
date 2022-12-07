@@ -74,6 +74,7 @@ class Card extends BaseFactory
 				$data['image']         = $attached['preview'];
 				$data['width']         = $attached['preview-width'];
 				$data['height']        = $attached['preview-height'];
+				$data['blurhash']      = $attached['blurhash'];
 			}
 		}
 

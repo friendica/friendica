@@ -33,7 +33,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
-use Friendica\Model\FContact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -42,6 +41,7 @@ use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
@@ -161,8 +161,12 @@ class Diaspora
 			return false;
 		}
 
-		$key = self::key($handle);
-		if ($key == '') {
+		try {
+			$key = self::key(WebFingerUri::fromString($handle));
+			if ($key == '') {
+				throw new \InvalidArgumentException();
+			}
+		} catch (\InvalidArgumentException $e) {
 			Logger::notice("Couldn't get a key for handle " . $handle . ". Discarding.");
 			return false;
 		}
@@ -300,8 +304,13 @@ class Diaspora
 			}
 		}
 
-		$key = self::key($author_addr);
-		if ($key == '') {
+		try {
+			$author = WebFingerUri::fromString($author_addr);
+			$key = self::key($author);
+			if ($key == '') {
+				throw new \InvalidArgumentException();
+			}
+		} catch (\InvalidArgumentException $e) {
 			Logger::notice("Couldn't get a key for handle " . $author_addr . ". Discarding.");
 			if ($no_exit) {
 				return false;
@@ -322,8 +331,8 @@ class Diaspora
 
 		return [
 			'message' => (string)Strings::base64UrlDecode($base->data),
-			'author' => XML::unescape($author_addr),
-			'key' => (string)$key
+			'author'  => $author->getAddr(),
+			'key'     => (string)$key
 		];
 	}
 
@@ -356,7 +365,7 @@ class Diaspora
 
 		if ($children->header) {
 			$public = true;
-			$author_link = str_replace('acct:', '', $children->header->author_id);
+			$idom = $children->header;
 		} else {
 			// This happens with posts from a relais
 			if (empty($privKey)) {
@@ -384,8 +393,13 @@ class Diaspora
 
 			$inner_iv = base64_decode($idom->iv);
 			$inner_aes_key = base64_decode($idom->aes_key);
+		}
 
-			$author_link = str_replace('acct:', '', $idom->author_id);
+		try {
+			$author = WebFingerUri::fromString($idom->author_id);
+		} catch (\Throwable $e) {
+			Logger::notice('Could not retrieve author URI.', ['idom' => $idom]);
+			throw new \Friendica\Network\HTTPException\BadRequestException();
 		}
 
 		$dom = $basedom->children(ActivityNamespace::SALMON_ME);
@@ -439,17 +453,11 @@ class Diaspora
 			$inner_decrypted = self::aesDecrypt($inner_aes_key, $inner_iv, $inner_encrypted);
 		}
 
-		if (!$author_link) {
-			Logger::notice('Could not retrieve author URI.');
-			throw new \Friendica\Network\HTTPException\BadRequestException();
-		}
 		// Once we have the author URI, go to the web and try to find their public key
-		// (first this will look it up locally if it is in the fcontact cache)
+		// (first this will look it up locally if it is in the diaspora-contact cache)
 		// This will also convert diaspora public key from pkcs#1 to pkcs#8
-
-		Logger::notice('Fetching key for '.$author_link);
-		$key = self::key($author_link);
-
+		Logger::notice('Fetching key for ' . $author);
+		$key = self::key($author);
 		if (!$key) {
 			Logger::notice('Could not retrieve author key.');
 			throw new \Friendica\Network\HTTPException\BadRequestException();
@@ -465,9 +473,9 @@ class Diaspora
 		Logger::notice('Message verified.');
 
 		return [
-			'message' => (string)$inner_decrypted,
-			'author' => XML::unescape($author_link),
-			'key' => (string)$key
+			'message' => $inner_decrypted,
+			'author'  => $author->getAddr(),
+			'key'     => $key
 		];
 	}
 
@@ -520,7 +528,7 @@ class Diaspora
 	{
 		// The sender is the handle of the contact that sent the message.
 		// This will often be different with relayed messages (for example "like" and "comment")
-		$sender = $msg['author'];
+		$sender = WebFingerUri::fromString($msg['author']);
 
 		// This is only needed for private postings since this is already done for public ones before
 		if (is_null($fields)) {
@@ -535,7 +543,7 @@ class Diaspora
 
 		$type = $fields->getName();
 
-		Logger::info('Received message', ['type' => $type, 'sender' => $sender, 'user' => $importer['uid']]);
+		Logger::info('Received message', ['type' => $type, 'sender' => $sender->getAddr(), 'user' => $importer['uid']]);
 
 		switch ($type) {
 			case 'account_migration':
@@ -743,7 +751,7 @@ class Diaspora
 		}
 
 		if (isset($parent_author_signature)) {
-			$key = self::key($msg['author']);
+			$key = self::key(WebFingerUri::fromString($msg['author']));
 			if (empty($key)) {
 				Logger::info('No key found for parent', ['author' => $msg['author']]);
 				return false;
@@ -755,8 +763,12 @@ class Diaspora
 			}
 		}
 
-		$key = self::key($fields->author);
-		if (empty($key)) {
+		try {
+			$key = self::key(WebFingerUri::fromString($fields->author));
+			if (empty($key)) {
+				throw new \InvalidArgumentException();
+			}
+		} catch (\Throwable $e) {
 			Logger::info('No key found', ['author' => $fields->author]);
 			return false;
 		}
@@ -772,55 +784,51 @@ class Diaspora
 	/**
 	 * Fetches the public key for a given handle
 	 *
-	 * @param string $handle The handle
+	 * @param WebFingerUri $uri The handle
 	 *
 	 * @return string The public key
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function key(string $handle = null): string
+	private static function key(WebFingerUri $uri): string
 	{
-		$handle = strval($handle);
-
-		Logger::notice('Fetching diaspora key', ['handle' => $handle, 'callstack' => System::callstack(20)]);
-
-		$fcontact = FContact::getByURL($handle);
-		if (!empty($fcontact['pubkey'])) {
-			return $fcontact['pubkey'];
+		Logger::notice('Fetching diaspora key', ['handle' => $uri->getAddr(), 'callstack' => System::callstack(20)]);
+		try {
+			return DI::dsprContact()->getByAddr($uri)->pubKey;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			return '';
 		}
-
-		return '';
 	}
 
 	/**
 	 * Get a contact id for a given handle
 	 *
-	 * @todo  Move to Friendica\Model\Contact
-	 *
-	 * @param int    $uid    The user id
-	 * @param string $handle The handle in the format user@domain.tld
+	 * @param int          $uid The user id
+	 * @param WebFingerUri $uri
 	 *
 	 * @return array Contact data
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function contactByHandle(int $uid, string $handle): array
+	private static function contactByHandle(int $uid, WebFingerUri $uri): array
 	{
-		return Contact::getByURL($handle, null, [], $uid);
+		return Contact::getByURL($uri->getAddr(), null, [], $uid);
 	}
 
 	/**
 	 * Checks if the given contact url does support ActivityPub
 	 *
-	 * @param string  $url    profile url
-	 * @param boolean $update true = always update, false = never update, null = update when not found or outdated
+	 * @param string       $url    profile url or WebFinger address
+	 * @param boolean|null $update true = always update, false = never update, null = update when not found or outdated
 	 * @return boolean
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function isSupportedByContactUrl(string $url, $update = null)
+	public static function isSupportedByContactUrl(string $url, ?bool $update = null): bool
 	{
-		return !empty(FContact::getByURL($url, $update));
+		$contact = Contact::getByURL($url, $update);
+
+		return DI::dsprContact()->existsByUriId($contact['uri-id'] ?? 0);
 	}
 
 	/**
@@ -874,21 +882,22 @@ class Diaspora
 	/**
 	 * Fetches the contact id for a handle and checks if posting is allowed
 	 *
-	 * @param array  $importer   Array of the importer user
-	 * @param string $handle     The checked handle in the format user@domain.tld
-	 * @param bool   $is_comment Is the check for a comment?
+	 * @param array        $importer    Array of the importer user
+	 * @param WebFingerUri $contact_uri The checked contact
+	 * @param bool         $is_comment  Is the check for a comment?
 	 *
 	 * @return array|bool The contact data or false on error
-	 * @throws \Exception
+	 * @throws InternalServerErrorException
+	 * @throws \ImagickException
 	 */
-	private static function allowedContactByHandle(array $importer, string $handle, bool $is_comment = false)
+	private static function allowedContactByHandle(array $importer, WebFingerUri $contact_uri, bool $is_comment = false)
 	{
-		$contact = self::contactByHandle($importer['uid'], $handle);
+		$contact = self::contactByHandle($importer['uid'], $contact_uri);
 		if (!$contact) {
-			Logger::notice('A Contact for handle ' . $handle . ' and user ' . $importer['uid'] . ' was not found');
+			Logger::notice('A Contact for handle ' . $contact_uri . ' and user ' . $importer['uid'] . ' was not found');
 			// If a contact isn't found, we accept it anyway if it is a comment
 			if ($is_comment && ($importer['uid'] != 0)) {
-				return self::contactByHandle(0, $handle);
+				return self::contactByHandle(0, $contact_uri);
 			} elseif ($is_comment) {
 				return $importer;
 			} else {
@@ -897,7 +906,7 @@ class Diaspora
 		}
 
 		if (!self::postAllow($importer, $contact, $is_comment)) {
-			Logger::notice('The handle: ' . $handle . ' is not allowed to post to user ' . $importer['uid']);
+			Logger::notice('The handle: ' . $contact_uri . ' is not allowed to post to user ' . $importer['uid']);
 			return false;
 		}
 		return $contact;
@@ -966,7 +975,7 @@ class Diaspora
 				// 0 => '[url=/people/0123456789abcdef]Foo Bar[/url]'
 				// 1 => '0123456789abcdef'
 				// 2 => 'Foo Bar'
-				$handle = FContact::getUrlByGuid($match[1]);
+				$handle = DI::dsprContact()->getUrlByGuid($match[1]);
 
 				if ($handle) {
 					$return = '@[url=' . $handle . ']' . $match[2] . '[/url]';
@@ -1011,7 +1020,7 @@ class Diaspora
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function storeByGuid(string $guid, string $server, bool $force)
+	private static function storeByGuid(string $guid, string $server, bool $force)
 	{
 		$serverparts = parse_url($server);
 
@@ -1092,25 +1101,27 @@ class Diaspora
 			return self::message($source_xml->root_guid, $server, ++$level);
 		}
 
-		$author = '';
+		$author_handle = '';
 
 		// Fetch the author - for the old and the new Diaspora version
 		if ($source_xml->post->status_message && $source_xml->post->status_message->diaspora_handle) {
-			$author = (string)$source_xml->post->status_message->diaspora_handle;
+			$author_handle = (string)$source_xml->post->status_message->diaspora_handle;
 		} elseif ($source_xml->author && ($source_xml->getName() == 'status_message')) {
-			$author = (string)$source_xml->author;
+			$author_handle = (string)$source_xml->author;
 		}
 
-		// If this isn't a "status_message" then quit
-		if (!$author) {
+		try {
+			$author = WebFingerUri::fromString($author_handle);
+		} catch (\InvalidArgumentException $e) {
+			// If this isn't a "status_message" then quit
 			Logger::info("Message doesn't seem to be a status message");
 			return false;
 		}
 
 		return [
 			'message' => $x,
-			'author' => $author,
-			'key' => self::key($author)
+			'author'  => $author->getAddr(),
+			'key'     => self::key($author)
 		];
 	}
 
@@ -1157,15 +1168,15 @@ class Diaspora
 	/**
 	 * Fetches the item record of a given guid
 	 *
-	 * @param int    $uid     The user id
-	 * @param string $guid    message guid
-	 * @param string $author  The handle of the item
-	 * @param array  $contact The contact of the item owner
+	 * @param int          $uid     The user id
+	 * @param string       $guid    message guid
+	 * @param WebFingerUri $author
+	 * @param array        $contact The contact of the item owner
 	 *
 	 * @return array|bool the item record or false on failure
 	 * @throws \Exception
 	 */
-	private static function parentItem(int $uid, string $guid, string $author, array $contact)
+	private static function parentItem(int $uid, string $guid, WebFingerUri $author, array $contact)
 	{
 		$fields = ['id', 'parent', 'body', 'wall', 'uri', 'guid', 'private', 'origin',
 			'author-name', 'author-link', 'author-avatar', 'gravity',
@@ -1175,18 +1186,21 @@ class Diaspora
 		$item = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
-			$person = FContact::getByURL($author);
-			$result = self::storeByGuid($guid, $person['url'], false);
+			try {
+				$result = self::storeByGuid($guid, DI::dsprContact()->getByAddr($author)->url, false);
 
-			// We don't have an url for items that arrived at the public dispatcher
-			if (!$result && !empty($contact['url'])) {
-				$result = self::storeByGuid($guid, $contact['url'], false);
-			}
+				// We don't have an url for items that arrived at the public dispatcher
+				if (!$result && !empty($contact['url'])) {
+					$result = self::storeByGuid($guid, $contact['url'], false);
+				}
 
-			if ($result) {
-				Logger::info('Fetched missing item ' . $guid . ' - result: ' . $result);
+				if ($result) {
+					Logger::info('Fetched missing item ' . $guid . ' - result: ' . $result);
 
-				$item = Post::selectFirst($fields, $condition);
+					$item = Post::selectFirst($fields, $condition);
+				}
+			} catch (HTTPException\NotFoundException $e) {
+				Logger::notice('Unable to retrieve author details', ['author' => $author->getAddr()]);
 			}
 		}
 
@@ -1200,20 +1214,20 @@ class Diaspora
 	}
 
 	/**
-	 * returns contact details
+	 * returns contact details for the given user
 	 *
-	 * @param array $def_contact The default contact if the person isn't found
-	 * @param array $person      The record of the person
-	 * @param int   $uid         The user id
+	 * @param array  $def_contact The default details if the contact isn't found
+	 * @param string $contact_url The url of the contact
+	 * @param int    $uid         The user id
 	 *
 	 * @return array
 	 *      'cid' => contact id
 	 *      'network' => network type
 	 * @throws \Exception
 	 */
-	private static function authorContactByUrl(array $def_contact, array $person, int $uid): array
+	private static function authorContactByUrl(array $def_contact, string $contact_url, int $uid): array
 	{
-		$condition = ['nurl' => Strings::normaliseLink($person['url']), 'uid' => $uid];
+		$condition = ['nurl' => Strings::normaliseLink($contact_url), 'uid' => $uid];
 		$contact = DBA::selectFirst('contact', ['id', 'network'], $condition);
 		if (DBA::isResult($contact)) {
 			$cid = $contact['id'];
@@ -1318,21 +1332,27 @@ class Diaspora
 	 */
 	private static function receiveAccountMigration(array $importer, SimpleXMLElement $data): bool
 	{
-		$old_handle = XML::unescape($data->author);
-		$new_handle = XML::unescape($data->profile->author);
-		$signature = XML::unescape($data->signature);
-
-		$contact = self::contactByHandle($importer['uid'], $old_handle);
-		if (!$contact) {
-			Logger::notice('Cannot find contact for sender: ' . $old_handle . ' and user ' . $importer['uid']);
+		try {
+			$old_author = WebFingerUri::fromString(XML::unescape($data->author));
+			$new_author = WebFingerUri::fromString(XML::unescape($data->profile->author));
+		} catch (\Throwable $e) {
+			Logger::notice('Cannot find handles for sender and user', ['data' => $data]);
 			return false;
 		}
 
-		Logger::notice('Got migration for ' . $old_handle . ', to ' . $new_handle . ' with user ' . $importer['uid']);
+		$signature = XML::unescape($data->signature);
+
+		$contact = self::contactByHandle($importer['uid'], $old_author);
+		if (!$contact) {
+			Logger::notice('Cannot find contact for sender: ' . $old_author . ' and user ' . $importer['uid']);
+			return false;
+		}
+
+		Logger::notice('Got migration for ' . $old_author . ', to ' . $new_author . ' with user ' . $importer['uid']);
 
 		// Check signature
-		$signed_text = 'AccountMigration:' . $old_handle . ':' . $new_handle;
-		$key = self::key($old_handle);
+		$signed_text = 'AccountMigration:' . $old_author . ':' . $new_author;
+		$key = self::key($old_author);
 		if (!Crypto::rsaVerify($signed_text, $signature, $key, 'sha256')) {
 			Logger::notice('No valid signature for migration.');
 			return false;
@@ -1342,9 +1362,9 @@ class Diaspora
 		self::receiveProfile($importer, $data->profile);
 
 		// change the technical stuff in contact
-		$data = Probe::uri($new_handle);
+		$data = Probe::uri($new_author);
 		if ($data['network'] == Protocol::PHANTOM) {
-			Logger::notice("Account for " . $new_handle . " couldn't be probed.");
+			Logger::notice("Account for " . $new_author . " couldn't be probed.");
 			return false;
 		}
 
@@ -1360,7 +1380,7 @@ class Diaspora
 			'network' => $data['network'],
 		];
 
-		Contact::update($fields, ['addr' => $old_handle]);
+		Contact::update($fields, ['addr' => $old_author->getAddr()]);
 
 		Logger::notice('Contacts are updated.');
 
@@ -1377,15 +1397,15 @@ class Diaspora
 	 */
 	private static function receiveAccountDeletion(SimpleXMLElement $data): bool
 	{
-		$author = XML::unescape($data->author);
+		$author_handle = XML::unescape($data->author);
 
-		$contacts = DBA::select('contact', ['id'], ['addr' => $author]);
+		$contacts = DBA::select('contact', ['id'], ['addr' => $author_handle]);
 		while ($contact = DBA::fetch($contacts)) {
 			Contact::remove($contact['id']);
 		}
 		DBA::close($contacts);
 
-		Logger::notice('Removed contacts for ' . $author);
+		Logger::notice('Removed contacts for ' . $author_handle);
 
 		return true;
 	}
@@ -1393,27 +1413,24 @@ class Diaspora
 	/**
 	 * Fetch the uri from our database if we already have this item (maybe from ourselves)
 	 *
-	 * @param string  $author    Author handle
-	 * @param string  $guid      Message guid
-	 * @param boolean $onlyfound Only return uri when found in the database
+	 * @param string            $guid       Message guid
+	 * @param WebFingerUri|null $person_uri Optional person to derive the base URL from
 	 *
-	 * @return string The constructed uri or the one from our database or empty string on if $onlyfound is true
+	 * @return string The constructed uri or the one from our database or empty string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function getUriFromGuid(string $author, string $guid, bool $onlyfound = false): string
+	private static function getUriFromGuid(string $guid, WebFingerUri $person_uri = null): string
 	{
 		$item = Post::selectFirst(['uri'], ['guid' => $guid]);
-		if (DBA::isResult($item)) {
+		if ($item) {
 			return $item['uri'];
-		} elseif (!$onlyfound) {
-			$person = FContact::getByURL($author);
-
-			$parts = parse_url($person['url']);
-			unset($parts['path']);
-			$host_url = (string)Uri::fromParts($parts);
-
-			return $host_url . '/objects/' . $guid;
+		} elseif ($person_uri) {
+			try {
+				return DI::dsprContact()->selectOneByAddr($person_uri)->baseurl . '/objects/' . $guid;
+			} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+				return '';
+			}
 		}
 
 		return '';
@@ -1444,31 +1461,31 @@ class Diaspora
 				continue;
 			}
 
-			$person = FContact::getByURL($match[3]);
-			if (empty($person)) {
-				continue;
-			}
+			try {
+				$contact = DI::dsprContact()->getByUrl(new Uri($match[3]));
+				Tag::storeByHash($uriid, $match[1], $contact->name ?: $contact->nick, $contact->url);
+			} catch (\Throwable $e) {
 
-			Tag::storeByHash($uriid, $match[1], $person['name'] ?: $person['nick'], $person['url']);
+			}
 		}
 	}
 
 	/**
 	 * Processes an incoming comment
 	 *
-	 * @param array  $importer  Array of the importer user
-	 * @param string $sender    The sender of the message
+	 * @param array            $importer  Array of the importer user
+	 * @param WebFingerUri     $sender    The sender of the message
 	 * @param SimpleXMLElement $data      The message object
-	 * @param string $xml       The original XML of the message
-	 * @param int    $direction Indicates if the message had been fetched or pushed (self::PUSHED, self::FETCHED, self::FORCED_FETCH)
+	 * @param string           $xml       The original XML of the message
+	 * @param int              $direction Indicates if the message had been fetched or pushed (self::PUSHED, self::FETCHED, self::FORCED_FETCH)
 	 *
-	 * @return int The message id of the generated comment or "false" if there was an error
+	 * @return bool The message id of the generated comment or "false" if there was an error
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function receiveComment(array $importer, string $sender, SimpleXMLElement $data, string $xml, int $direction): bool
+	private static function receiveComment(array $importer, WebFingerUri $sender, SimpleXMLElement $data, string $xml, int $direction): bool
 	{
-		$author = XML::unescape($data->author);
+		$author = WebFingerUri::fromString(XML::unescape($data->author));
 		$guid = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
 		$text = XML::unescape($data->text);
@@ -1481,7 +1498,7 @@ class Diaspora
 
 		if (isset($data->thread_parent_guid)) {
 			$thread_parent_guid = XML::unescape($data->thread_parent_guid);
-			$thr_parent = self::getUriFromGuid('', $thread_parent_guid, true);
+			$thr_parent = self::getUriFromGuid($thread_parent_guid);
 		} else {
 			$thr_parent = '';
 		}
@@ -1505,14 +1522,15 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
-		if (!is_array($person)) {
-			Logger::notice('Unable to find author details');
+		try {
+			$author_url = (string)DI::dsprContact()->getByAddr($author)->url;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('Unable to find author details', ['author' => $author->getAddr()]);
 			return false;
 		}
 
 		// Fetch the contact id - if we know this contact
-		$author_contact = self::authorContactByUrl($contact, $person, $importer['uid']);
+		$author_contact = self::authorContactByUrl($contact, $author_url, $importer['uid']);
 
 		$datarray = [];
 
@@ -1520,17 +1538,17 @@ class Diaspora
 		$datarray['contact-id'] = $author_contact['cid'];
 		$datarray['network']  = $author_contact['network'];
 
-		$datarray['author-link'] = $person['url'];
-		$datarray['author-id'] = Contact::getIdForURL($person['url'], 0);
+		$datarray['author-link'] = $author_url;
+		$datarray['author-id'] = Contact::getIdForURL($author_url);
 
 		$datarray['owner-link'] = $contact['url'];
-		$datarray['owner-id'] = Contact::getIdForURL($contact['url'], 0);
+		$datarray['owner-id'] = Contact::getIdForURL($contact['url']);
 
 		// Will be overwritten for sharing accounts in Item::insert
 		$datarray = self::setDirection($datarray, $direction);
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($author, $guid);
+		$datarray['uri'] = self::getUriFromGuid($guid, $author);
 		$datarray['uri-id'] = ItemURI::insert(['uri' => $datarray['uri'], 'guid' => $datarray['guid']]);
 
 		$datarray['verb'] = Activity::POST;
@@ -1551,7 +1569,7 @@ class Diaspora
 		$datarray['plink'] = self::plink($author, $guid, $toplevel_parent_item['guid']);
 		$body = Markdown::toBBCode($text);
 
-		$datarray['body'] = self::replacePeopleGuid($body, $person['url']);
+		$datarray['body'] = self::replacePeopleGuid($body, $author_url);
 
 		self::storeMentions($datarray['uri-id'], $text);
 		Tag::storeRawTagsFromBody($datarray['uri-id'], $datarray['body']);
@@ -1601,17 +1619,23 @@ class Diaspora
 	 */
 	private static function receiveConversationMessage(array $importer, array $contact, SimpleXMLElement $data, array $msg, $mesg, array $conversation): bool
 	{
-		$author = XML::unescape($data->author);
+		$author_handle = XML::unescape($data->author);
 		$guid = XML::unescape($data->guid);
 		$subject = XML::unescape($data->subject);
 
 		// "diaspora_handle" is the element name from the old version
 		// "author" is the element name from the new version
 		if ($mesg->author) {
-			$msg_author = XML::unescape($mesg->author);
+			$msg_author_handle = XML::unescape($mesg->author);
 		} elseif ($mesg->diaspora_handle) {
-			$msg_author = XML::unescape($mesg->diaspora_handle);
+			$msg_author_handle = XML::unescape($mesg->diaspora_handle);
 		} else {
+			return false;
+		}
+
+		try {
+			$msg_author_uri = WebFingerUri::fromString($msg_author_handle);
+		} catch (\InvalidArgumentException $e) {
 			return false;
 		}
 
@@ -1625,23 +1649,20 @@ class Diaspora
 			return false;
 		}
 
-		$body = Markdown::toBBCode($msg_text);
-		$message_uri = $msg_author . ':' . $msg_guid;
-
-		$person = FContact::getByURL($msg_author);
+		$msg_author = DI::dsprContact()->getByAddr($msg_author_uri);
 
 		return Mail::insert([
 			'uid'        => $importer['uid'],
 			'guid'       => $msg_guid,
 			'convid'     => $conversation['id'],
-			'from-name'  => $person['name'],
-			'from-photo' => $person['photo'],
-			'from-url'   => $person['url'],
+			'from-name'  => $msg_author->name,
+			'from-photo' => (string)$msg_author->photo,
+			'from-url'   => (string)$msg_author->url,
 			'contact-id' => $contact['id'],
 			'title'      => $subject,
-			'body'       => $body,
-			'uri'        => $message_uri,
-			'parent-uri' => $author . ':' . $guid,
+			'body'       => Markdown::toBBCode($msg_text),
+			'uri'        => $msg_author_handle . ':' . $msg_guid,
+			'parent-uri' => $author_handle . ':' . $guid,
 			'created'    => $msg_created_at
 		]);
 	}
@@ -1658,7 +1679,7 @@ class Diaspora
 	 */
 	private static function receiveConversation(array $importer, array $msg, SimpleXMLElement $data)
 	{
-		$author = XML::unescape($data->author);
+		$author_handle = XML::unescape($data->author);
 		$guid = XML::unescape($data->guid);
 		$subject = XML::unescape($data->subject);
 		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
@@ -1671,7 +1692,7 @@ class Diaspora
 			return false;
 		}
 
-		$contact = self::allowedContactByHandle($importer, $msg['author'], true);
+		$contact = self::allowedContactByHandle($importer, WebFingerUri::fromString($msg['author']), true);
 		if (!$contact) {
 			return false;
 		}
@@ -1685,7 +1706,7 @@ class Diaspora
 			$r = DBA::insert('conv', [
 				'uid'     => $importer['uid'],
 				'guid'    => $guid,
-				'creator' => $author,
+				'creator' => $author_handle,
 				'created' => $created_at,
 				'updated' => DateTimeFormat::utcNow(),
 				'subject' => $subject,
@@ -1711,18 +1732,18 @@ class Diaspora
 	/**
 	 * Processes "like" messages
 	 *
-	 * @param array  $importer  Array of the importer user
-	 * @param string $sender    The sender of the message
+	 * @param array            $importer  Array of the importer user
+	 * @param WebFingerUri     $sender    The sender of the message
 	 * @param SimpleXMLElement $data      The message object
-	 * @param int    $direction Indicates if the message had been fetched or pushed (self::PUSHED, self::FETCHED, self::FORCED_FETCH)
+	 * @param int              $direction Indicates if the message had been fetched or pushed (self::PUSHED, self::FETCHED, self::FORCED_FETCH)
 	 *
 	 * @return bool Success or failure
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function receiveLike(array $importer, string $sender, SimpleXMLElement $data, int $direction): bool
+	private static function receiveLike(array $importer, WebFingerUri $sender, SimpleXMLElement $data, int $direction): bool
 	{
-		$author = XML::unescape($data->author);
+		$author = WebFingerUri::fromString(XML::unescape($data->author));
 		$guid = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
 		$parent_type = XML::unescape($data->parent_type);
@@ -1753,14 +1774,15 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
-		if (!is_array($person)) {
-			Logger::notice('Unable to find author details');
+		try {
+			$author_url = (string)DI::dsprContact()->getByAddr($author)->url;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('Unable to find author details', ['author' => $author->getAddr()]);
 			return false;
 		}
 
 		// Fetch the contact id - if we know this contact
-		$author_contact = self::authorContactByUrl($contact, $person, $importer['uid']);
+		$author_contact = self::authorContactByUrl($contact, $author_url, $importer['uid']);
 
 		// "positive" = "false" would be a Dislike - wich isn't currently supported by Diaspora
 		// We would accept this anyhow.
@@ -1780,11 +1802,11 @@ class Diaspora
 
 		$datarray = self::setDirection($datarray, $direction);
 
-		$datarray['owner-link'] = $datarray['author-link'] = $person['url'];
-		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($person['url'], 0);
+		$datarray['owner-link'] = $datarray['author-link'] = $author_url;
+		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($author_url);
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($author, $guid);
+		$datarray['uri'] = self::getUriFromGuid($guid, $author);
 
 		$datarray['verb'] = $verb;
 		$datarray['gravity'] = Item::GRAVITY_ACTIVITY;
@@ -1843,13 +1865,13 @@ class Diaspora
 	 */
 	private static function receiveMessage(array $importer, SimpleXMLElement $data): bool
 	{
-		$author = XML::unescape($data->author);
+		$author_uri = WebFingerUri::fromString(XML::unescape($data->author));
 		$guid = XML::unescape($data->guid);
 		$conversation_guid = XML::unescape($data->conversation_guid);
 		$text = XML::unescape($data->text);
 		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
 
-		$contact = self::allowedContactByHandle($importer, $author, true);
+		$contact = self::allowedContactByHandle($importer, $author_uri, true);
 		if (!$contact) {
 			return false;
 		}
@@ -1858,41 +1880,37 @@ class Diaspora
 			GServer::setProtocol($contact['gsid'], Post\DeliveryData::DIASPORA);
 		}
 
-		$conversation = null;
-
 		$condition = ['uid' => $importer['uid'], 'guid' => $conversation_guid];
 		$conversation = DBA::selectFirst('conv', [], $condition);
-
 		if (!DBA::isResult($conversation)) {
 			Logger::notice('Conversation not available.');
 			return false;
 		}
 
-		$message_uri = $author . ':' . $guid;
-
-		$person = FContact::getByURL($author);
-		if (!$person) {
-			Logger::notice('Unable to find author details');
+		try {
+			$author = DI::dsprContact()->getByAddr($author_uri);
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('Unable to find author details', ['author' => $author_uri->getAddr()]);
 			return false;
 		}
 
 		$body = Markdown::toBBCode($text);
 
-		$body = self::replacePeopleGuid($body, $person['url']);
+		$body = self::replacePeopleGuid($body, $author->url);
 
 		return Mail::insert([
 			'uid'        => $importer['uid'],
 			'guid'       => $guid,
 			'convid'     => $conversation['id'],
-			'from-name'  => $person['name'],
-			'from-photo' => $person['photo'],
-			'from-url'   => $person['url'],
+			'from-name'  => $author->name,
+			'from-photo' => (string)$author->photo,
+			'from-url'   => (string)$author->url,
 			'contact-id' => $contact['id'],
 			'title'      => $conversation['subject'],
 			'body'       => $body,
 			'reply'      => 1,
-			'uri'        => $message_uri,
-			'parent-uri' => $author . ':' . $conversation['guid'],
+			'uri'        => $author_uri . ':' . $guid,
+			'parent-uri' => $author_uri . ':' . $conversation['guid'],
 			'created'    => $created_at
 		]);
 	}
@@ -1910,7 +1928,7 @@ class Diaspora
 	 */
 	private static function receiveParticipation(array $importer, SimpleXMLElement $data, int $direction): bool
 	{
-		$author = strtolower(XML::unescape($data->author));
+		$author = WebFingerUri::fromString(strtolower(XML::unescape($data->author)));
 		$guid = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
 
@@ -1941,13 +1959,14 @@ class Diaspora
 			return false;
 		}
 
-		$person = FContact::getByURL($author);
-		if (!is_array($person)) {
-			Logger::notice('Person not found: ' . $author);
+		try {
+			$author_url = (string)DI::dsprContact()->getByAddr($author)->url;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('unable to find author details', ['author' => $author->getAddr()]);
 			return false;
 		}
 
-		$author_contact = self::authorContactByUrl($contact, $person, $importer['uid']);
+		$author_contact = self::authorContactByUrl($contact, $author_url, $importer['uid']);
 
 		// Store participation
 		$datarray = [];
@@ -1960,11 +1979,11 @@ class Diaspora
 
 		$datarray = self::setDirection($datarray, $direction);
 
-		$datarray['owner-link'] = $datarray['author-link'] = $person['url'];
-		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($person['url'], 0);
+		$datarray['owner-link'] = $datarray['author-link'] = $author_url;
+		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($author_url);
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($author, $guid);
+		$datarray['uri'] = self::getUriFromGuid($guid, $author);
 
 		$datarray['verb'] = Activity::FOLLOW;
 		$datarray['gravity'] = Item::GRAVITY_ACTIVITY;
@@ -2056,7 +2075,7 @@ class Diaspora
 	 */
 	private static function receiveProfile(array $importer, SimpleXMLElement $data): bool
 	{
-		$author = strtolower(XML::unescape($data->author));
+		$author = WebFingerUri::fromString(strtolower(XML::unescape($data->author)));
 
 		$contact = self::contactByHandle($importer['uid'], $author);
 		if (!$contact) {
@@ -2084,16 +2103,13 @@ class Diaspora
 
 		$keywords = implode(', ', $keywords);
 
-		$handle_parts = explode('@', $author);
-		$nick = $handle_parts[0];
-
 		if ($name === '') {
-			$name = $handle_parts[0];
+			$name = $author->getUser();
 		}
 
 		if (preg_match('|^https?://|', $image_url) === 0) {
 			// @TODO No HTTPS here?
-			$image_url = 'http://' . $handle_parts[1] . $image_url;
+			$image_url = 'http://' . $author->getFullHost() . $image_url;
 		}
 
 		Contact::updateAvatar($contact['id'], $image_url);
@@ -2115,7 +2131,7 @@ class Diaspora
 
 		$fields = ['name' => $name, 'location' => $location,
 			'name-date' => DateTimeFormat::utcNow(), 'about' => $about,
-			'addr' => $author, 'nick' => $nick, 'keywords' => $keywords,
+			'addr' => $author->getAddr(), 'nick' => $author->getUser(), 'keywords' => $keywords,
 			'unsearchable' => !$searchable, 'sensitive' => $nsfw];
 
 		if (!empty($birthday)) {
@@ -2158,12 +2174,14 @@ class Diaspora
 	 */
 	private static function receiveContactRequest(array $importer, SimpleXMLElement $data): bool
 	{
-		$author = XML::unescape($data->author);
+		$author_handle = XML::unescape($data->author);
 		$recipient = XML::unescape($data->recipient);
 
-		if (!$author || !$recipient) {
+		if (!$author_handle || !$recipient) {
 			return false;
 		}
+
+		$author = WebFingerUri::fromString($author_handle);
 
 		// the current protocol version doesn't know these fields
 		// That means that we will assume their existance
@@ -2222,22 +2240,24 @@ class Diaspora
 			Logger::info("Author " . $author . " wants to listen to us.");
 		}
 
-		$ret = FContact::getByURL($author);
-
-		if (!$ret || ($ret['network'] != Protocol::DIASPORA)) {
-			Logger::notice("Cannot resolve diaspora handle " . $author . " for ".$recipient);
+		try {
+			$author_url = (string)DI::dsprContact()->getByAddr($author)->url;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('Cannot resolve diaspora handle for recipient', ['author' => $author->getAddr(), 'recipient' => $recipient]);
 			return false;
 		}
 
-		$cid = Contact::getIdForURL($ret['url'], $importer['uid']);
+		$cid = Contact::getIdForURL($author_url, $importer['uid']);
 		if (!empty($cid)) {
 			$contact = DBA::selectFirst('contact', [], ['id' => $cid, 'network' => Protocol::NATIVE_SUPPORT]);
 		} else {
 			$contact = [];
 		}
 
-		$item = ['author-id' => Contact::getIdForURL($ret['url']),
-			'author-link' => $ret['url']];
+		$item = [
+			'author-id'   => Contact::getIdForURL($author_url),
+			'author-link' => $author_url
+		];
 
 		$result = Contact::addRelationship($importer, $contact, $item, false);
 		if ($result === true) {
@@ -2262,12 +2282,15 @@ class Diaspora
 	/**
 	 * Stores a reshare activity
 	 *
-	 * @param array   $item              Array of reshare post
-	 * @param integer $parent_message_id Id of the parent post
-	 * @param string  $guid              GUID string of reshare action
-	 * @param string  $author            Author handle
+	 * @param array        $item              Array of reshare post
+	 * @param integer      $parent_message_id Id of the parent post
+	 * @param string       $guid              GUID string of reshare action
+	 * @param WebFingerUri $author            Author handle
+	 * @return false|void
+	 * @throws InternalServerErrorException
+	 * @throws \ImagickException
 	 */
-	private static function addReshareActivity(array $item, int $parent_message_id, string $guid, string $author)
+	private static function addReshareActivity(array $item, int $parent_message_id, string $guid, WebFingerUri $author)
 	{
 		$parent = Post::selectFirst(['uri', 'guid'], ['id' => $parent_message_id]);
 
@@ -2284,7 +2307,7 @@ class Diaspora
 		$datarray['owner-id'] = $datarray['author-id'];
 
 		$datarray['guid'] = $parent['guid'] . '-' . $guid;
-		$datarray['uri'] = self::getUriFromGuid($author, $datarray['guid']);
+		$datarray['uri'] = self::getUriFromGuid($datarray['guid'], $author);
 		$datarray['thr-parent'] = $parent['uri'];
 
 		$datarray['verb'] = $datarray['body'] = Activity::ANNOUNCE;
@@ -2329,15 +2352,20 @@ class Diaspora
 	 */
 	private static function receiveReshare(array $importer, SimpleXMLElement $data, string $xml, int $direction): bool
 	{
-		$author = XML::unescape($data->author);
+		$author = WebFingerUri::fromString(XML::unescape($data->author));
 		$guid = XML::unescape($data->guid);
 		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
-		$root_author = XML::unescape($data->root_author);
+		try {
+			$root_author = WebFingerUri::fromString(XML::unescape($data->root_author));
+		} catch (\InvalidArgumentException $e) {
+			return false;
+		}
+
 		$root_guid = XML::unescape($data->root_guid);
 		/// @todo handle unprocessed property "provider_display_name"
 		$public = XML::unescape($data->public);
 
-		$contact = self::allowedContactByHandle($importer, $author, false);
+		$contact = self::allowedContactByHandle($importer, $author);
 		if (!$contact) {
 			return false;
 		}
@@ -2351,8 +2379,9 @@ class Diaspora
 			return true;
 		}
 
-		$original_person = FContact::getByURL($root_author);
-		if (!$original_person) {
+		try {
+			$original_person = DI::dsprContact()->getByAddr($root_author);
+		} catch (HTTPException\NotFoundException $e) {
 			return false;
 		}
 
@@ -2369,7 +2398,7 @@ class Diaspora
 		$datarray['owner-id'] = $datarray['author-id'];
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = $datarray['thr-parent'] = self::getUriFromGuid($author, $guid);
+		$datarray['uri'] = $datarray['thr-parent'] = self::getUriFromGuid($guid, $author);
 		$datarray['uri-id'] = ItemURI::insert(['uri' => $datarray['uri'], 'guid' => $datarray['guid']]);
 
 		$datarray['verb'] = Activity::POST;
@@ -2380,7 +2409,7 @@ class Diaspora
 
 		$datarray = self::setDirection($datarray, $direction);
 
-		$datarray['quote-uri-id'] = self::getQuoteUriId($root_guid, $importer['uid'], $original_person['url']);
+		$datarray['quote-uri-id'] = self::getQuoteUriId($root_guid, $importer['uid'], $original_person->url);
 		if (empty($datarray['quote-uri-id'])) {
 			return false;
 		}
@@ -2448,19 +2477,18 @@ class Diaspora
 	 */
 	private static function itemRetraction(array $importer, array $contact, SimpleXMLElement $data): bool
 	{
-		$author = XML::unescape($data->author);
+		$author_uri  = WebFingerUri::fromString(XML::unescape($data->author));
 		$target_guid = XML::unescape($data->target_guid);
 		$target_type = XML::unescape($data->target_type);
 
-		$person = FContact::getByURL($author);
-		if (!is_array($person)) {
-			Logger::notice('Unable to find author detail for ' . $author);
+		try {
+			$author = DI::dsprContact()->getByAddr($author_uri);
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			Logger::notice('Unable to find details for author', ['author' => $author_uri->getAddr()]);
 			return false;
 		}
 
-		if (empty($contact['url'])) {
-			$contact['url'] = $person['url'];
-		}
+		$contact_url = $contact['url'] ?? '' ?: (string)$author->url;
 
 		// Fetch items that are about to be deleted
 		$fields = ['uid', 'id', 'parent', 'author-link', 'uri-id'];
@@ -2488,8 +2516,8 @@ class Diaspora
 			$parent = Post::selectFirst(['author-link'], ['id' => $item['parent']]);
 
 			// Only delete it if the parent author really fits
-			if (!Strings::compareLink($parent['author-link'], $contact['url']) && !Strings::compareLink($item['author-link'], $contact['url'])) {
-				Logger::info("Thread author " . $parent['author-link'] . " and item author " . $item['author-link'] . " don't fit to expected contact " . $contact['url']);
+			if (!Strings::compareLink($parent['author-link'], $contact_url) && !Strings::compareLink($item['author-link'], $contact_url)) {
+				Logger::info("Thread author " . $parent['author-link'] . " and item author " . $item['author-link'] . " don't fit to expected contact " . $contact_url);
 				continue;
 			}
 
@@ -2505,14 +2533,14 @@ class Diaspora
 	/**
 	 * Receives retraction messages
 	 *
-	 * @param array  $importer Array of the importer user
-	 * @param string $sender   The sender of the message
+	 * @param array            $importer Array of the importer user
+	 * @param WebFingerUri     $sender   The sender of the message
 	 * @param SimpleXMLElement $data     The message object
 	 *
 	 * @return bool Success
 	 * @throws \Exception
 	 */
-	private static function receiveRetraction(array $importer, string $sender, SimpleXMLElement $data)
+	private static function receiveRetraction(array $importer, WebFingerUri $sender, SimpleXMLElement $data)
 	{
 		$target_type = XML::unescape($data->target_type);
 
@@ -2639,14 +2667,14 @@ class Diaspora
 	 */
 	private static function receiveStatusMessage(array $importer, SimpleXMLElement $data, string $xml, int $direction)
 	{
-		$author = XML::unescape($data->author);
+		$author = WebFingerUri::fromString(XML::unescape($data->author));
 		$guid = XML::unescape($data->guid);
 		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
 		$public = XML::unescape($data->public);
 		$text = XML::unescape($data->text);
 		$provider_display_name = XML::unescape($data->provider_display_name);
 
-		$contact = self::allowedContactByHandle($importer, $author, false);
+		$contact = self::allowedContactByHandle($importer, $author);
 		if (!$contact) {
 			return false;
 		}
@@ -2672,7 +2700,7 @@ class Diaspora
 		$datarray = [];
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = $datarray['thr-parent'] = self::getUriFromGuid($author, $guid);
+		$datarray['uri'] = $datarray['thr-parent'] = self::getUriFromGuid($guid, $author);
 		$datarray['uri-id'] = ItemURI::insert(['uri' => $datarray['uri'], 'guid' => $datarray['guid']]);
 
 		// Attach embedded pictures to the body
@@ -2954,13 +2982,13 @@ class Diaspora
 
 		$logid = Strings::getRandomHex(4);
 
-		// We always try to use the data from the fcontact table.
+		// We always try to use the data from the diaspora-contact table.
 		// This is important for transmitting data to Friendica servers.
-		if (!empty($contact['addr'])) {
-			$fcontact = FContact::getByURL($contact['addr']);
-			if (!empty($fcontact)) {
-				$dest_url = ($public_batch ? $fcontact['batch'] : $fcontact['notify']);
-			}
+		try {
+			$target = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']));
+			$dest_url = $public_batch ? $target->batch : $target->notify;
+		} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+
 		}
 
 		if (empty($dest_url)) {
@@ -3029,18 +3057,19 @@ class Diaspora
 		}
 
 		// When sending content to Friendica contacts using the Diaspora protocol
-		// we have to fetch the public key from the fcontact.
+		// we have to fetch the public key from the diaspora-contact.
 		// This is due to the fact that legacy DFRN had unique keys for every contact.
 		$pubkey = $contact['pubkey'];
 		if (!empty($contact['addr'])) {
-			$fcontact = FContact::getByURL($contact['addr']);
-			if (!empty($fcontact)) {
-				$pubkey = $fcontact['pubkey'];
+			try {
+				$pubkey = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']))->pubKey;
+			} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+
 			}
 		} else {
 			// The "addr" field should always be filled.
 			// If this isn't the case, it will raise a notice some lines later.
-			// And in the log we will see where it came from and we can handle it there.
+			// And in the log we will see where it came from, and we can handle it there.
 			Logger::notice('Empty addr', ['contact' => $contact ?? [], 'callstack' => System::callstack(20)]);
 		}
 
@@ -3089,16 +3118,16 @@ class Diaspora
 			$owner = User::getOwnerDataById($item['uid']);
 		}
 
-		$author = self::myHandle($owner);
+		$author_handle = self::myHandle($owner);
 
 		$message = [
-			'author' => $author,
+			'author' => $author_handle,
 			'guid' => System::createUUID(),
 			'parent_type' => 'Post',
 			'parent_guid' => $item['guid']
 		];
 
-		Logger::info('Send participation for ' . $item['guid'] . ' by ' . $author);
+		Logger::info('Send participation for ' . $item['guid'] . ' by ' . $author_handle);
 
 		// It doesn't matter what we store, we only want to avoid sending repeated notifications for the same item
 		DI::cache()->set($cachekey, $item['guid'], Duration::QUARTER_HOUR);
@@ -4024,6 +4053,8 @@ class Diaspora
 	 *
 	 * @param integer $parent_id
 	 * @return boolean
+	 * @throws InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	private static function parentSupportDiaspora(int $parent_id): bool
 	{
@@ -4033,7 +4064,7 @@ class Diaspora
 			return false;
 		}
 
-		if (empty(FContact::getByURL($parent_post['author-link'], false))) {
+		if (!self::isSupportedByContactUrl($parent_post['author-link'], false)) {
 			Logger::info('Parent author is no Diaspora contact.', ['parent-id' => $parent_id]);
 			return false;
 		}

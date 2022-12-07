@@ -109,9 +109,9 @@ class Account extends BaseDataTransferObject
 		$this->note            = BBCode::convertForUriId($account['uri-id'], $account['about'], BBCode::EXTERNAL);
 		$this->url             = $account['url'];
 		$this->avatar          = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '');
-		$this->avatar_static   = $this->avatar;
+		$this->avatar_static   = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '', true);
 		$this->header          = Contact::getHeaderUrlForId($account['id'] ?? 0 ?: $account['pid'], '', $account['updated'], $account['guid'] ?? '');
-		$this->header_static   = $this->header;
+		$this->header_static   = Contact::getHeaderUrlForId($account['id'] ?? 0 ?: $account['pid'], '', $account['updated'], $account['guid'] ?? '', true);
 		$this->followers_count = $account['ap-followers_count'] ?? $account['diaspora-interacted_count'] ?? 0;
 		$this->following_count = $account['ap-following_count'] ?? $account['diaspora-interacting_count'] ?? 0;
 		$this->statuses_count  = $account['ap-statuses_count'] ?? $account['diaspora-post_count'] ?? 0;

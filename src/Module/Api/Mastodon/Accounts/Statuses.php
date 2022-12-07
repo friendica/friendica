@@ -80,8 +80,15 @@ class Statuses extends BaseApi
 		}
 
 		if (!$request['pinned'] && !$request['only_media']) {
-			$condition = DBA::mergeConditions($condition, ["(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ?))",
-				Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
+			if ($request['exclude_replies']) {
+				$condition = DBA::mergeConditions($condition, ["(`gravity` = ? OR (`gravity` = ? AND `vid` = ?))",
+					Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
+			} else {
+				$condition = DBA::mergeConditions($condition, ["(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ?))",
+					Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
+			}
+		} elseif ($request['exclude_replies']) {
+			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_PARENT]);
 		}
 
 		if (!empty($request['max_id'])) {
@@ -97,16 +104,10 @@ class Statuses extends BaseApi
 			$params['order'] = ['uri-id'];
 		}
 
-		if (($request['pinned'] || $request['only_media']) && $request['exclude_replies']) {
-			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_PARENT]);
-		}
-
 		if ($request['pinned']) {
 			$items = DBA::select('collection-view', ['uri-id'], $condition, $params);
 		} elseif ($request['only_media']) {
 			$items = DBA::select('media-view', ['uri-id'], $condition, $params);
-		} elseif ($request['exclude_replies']) {
-			$items = Post::selectThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectForUser($uid, ['uri-id'], $condition, $params);
 		}

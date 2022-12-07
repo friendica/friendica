@@ -833,7 +833,7 @@ class Database
 	/**
 	 * Check if data exists
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format [schema.]table
 	 * @param array  $condition Array of fields for condition
 	 *
 	 * @return boolean Are there rows for that condition?
@@ -1017,7 +1017,7 @@ class Database
 	/**
 	 * Insert a row into a table. Field value objects will be cast as string.
 	 *
-	 * @param string $table          Table name in format schema.table (while scheme is optiona)
+	 * @param string $table          Table name in format [schema.]table
 	 * @param array  $param          parameter array
 	 * @param int    $duplicate_mode What to do on a duplicated entry
 	 *
@@ -1068,7 +1068,7 @@ class Database
 	 * Inserts a row with the provided data in the provided table.
 	 * If the data corresponds to an existing row through a UNIQUE or PRIMARY index constraints, it updates the row instead.
 	 *
-	 * @param string $table Table name in format schema.table (while scheme is optiona)
+	 * @param string $table Table name in format [schema.]table
 	 * @param array  $param parameter array
 	 * @return boolean was the insert successful?
 	 * @throws \Exception
@@ -1116,7 +1116,7 @@ class Database
 	 *
 	 * This function can be extended in the future to accept a table array as well.
 	 *
-	 * @param string $table Table name in format schema.table (while scheme is optiona)
+	 * @param string $table Table name in format [schema.]table
 	 * @return boolean was the lock successful?
 	 * @throws \Exception
 	 */
@@ -1314,7 +1314,7 @@ class Database
 	 * Only set $old_fields to a boolean value when you are sure that you will update a single row.
 	 * When you set $old_fields to "true" then $fields must contain all relevant fields!
 	 *
-	 * @param string        $table      Table name in format schema.table (while scheme is optiona)
+	 * @param string        $table      Table name in format [schema.]table
 	 * @param array         $fields     contains the fields that are updated
 	 * @param array         $condition  condition array with the key values
 	 * @param array|boolean $old_fields array with the old field values that are about to be replaced (true = update on duplicate, false = don't update identical fields)
@@ -1380,7 +1380,7 @@ class Database
 	/**
 	 * Retrieve a single record from a table and returns it in an associative array
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format [schema.]table
 	 * @param array  $fields    Array of selected fields, empty for all
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
@@ -1406,7 +1406,7 @@ class Database
 	/**
 	 * Select rows from a table and fills an array with the data
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format [schema.]table
 	 * @param array  $fields    Array of selected fields, empty for all
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
@@ -1479,7 +1479,7 @@ class Database
 	 *
 	 * $data = DBA::select($table, $fields, $condition, $params);
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format [schema.]table
 	 * @param array  $fields    Array of selected fields, empty for all
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
@@ -1519,7 +1519,7 @@ class Database
 	/**
 	 * Counts the rows from a table satisfying the provided condition
 	 *
-	 * @param string $table     Table name in format schema.table (while scheme is optiona)
+	 * @param string $table     Table name in format [schema.]table
 	 * @param array  $condition Array of fields for condition
 	 * @param array  $params    Array of several parameters
 	 *

@@ -21,6 +21,8 @@
 
 namespace Friendica\Core;
 
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\DI;
 use Friendica\Module\Response;
@@ -438,14 +440,15 @@ class System
 	/**
 	 * Fetch the load and number of processes
 	 *
+	 * @param bool $get_processes
 	 * @return array
 	 */
-	public static function getLoadAvg(): array
+	public static function getLoadAvg(bool $get_processes = true): array
 	{
-		if (@is_readable('/proc/loadavg')) {
+		if ($get_processes && @is_readable('/proc/loadavg')) {
 			$content = @file_get_contents('/proc/loadavg');
 			if (empty($content)) {
-				$content = shell_exec('cat /proc/loadavg');
+				$content = shell_exec('uptime | sed "s/.*averages*: //" | sed "s/,//g"');
 			}
 		}
 
@@ -658,5 +661,31 @@ class System
 
 		// Reaching this point means that the operating system is configured badly.
 		return "";
+	}
+
+	/**
+	 * Fetch the system rules
+	 *
+	 * @return array
+	 */
+	public static function getRules(): array
+	{
+		$rules = [];
+		$id    = 0;
+
+		if (DI::config()->get('system', 'tosdisplay')) {
+			$rulelist = DI::config()->get('system', 'tosrules') ?: DI::config()->get('system', 'tostext');
+			$html = BBCode::convert($rulelist, false, BBCode::EXTERNAL);
+
+			$msg = HTML::toPlaintext($html, 0, true);
+			foreach (explode("\n", $msg) as $line) {
+				$line = trim($line);
+				if ($line) {
+					$rules[] = ['id' => (string)++$id, 'text' => $line];
+				}
+			}
+		}
+
+		return $rules;
 	}
 }

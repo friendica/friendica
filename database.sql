@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2022.12-dev (Giant Rhubarb)
--- DB_UPDATE_VERSION 1496
+-- DB_UPDATE_VERSION 1500
 -- ------------------------------------------
 
 
@@ -579,6 +579,40 @@ CREATE TABLE IF NOT EXISTS `delayed-post` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Posts that are about to be distributed at a later time';
 
 --
+-- TABLE diaspora-contact
+--
+CREATE TABLE IF NOT EXISTS `diaspora-contact` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the contact URL',
+	`addr` varchar(255) COMMENT '',
+	`alias` varchar(255) COMMENT '',
+	`nick` varchar(255) COMMENT '',
+	`name` varchar(255) COMMENT '',
+	`given-name` varchar(255) COMMENT '',
+	`family-name` varchar(255) COMMENT '',
+	`photo` varchar(255) COMMENT '',
+	`photo-medium` varchar(255) COMMENT '',
+	`photo-small` varchar(255) COMMENT '',
+	`batch` varchar(255) COMMENT '',
+	`notify` varchar(255) COMMENT '',
+	`poll` varchar(255) COMMENT '',
+	`subscribe` varchar(255) COMMENT '',
+	`searchable` boolean COMMENT '',
+	`pubkey` text COMMENT '',
+	`gsid` int unsigned COMMENT 'Global Server ID',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
+	`interacting_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts this contact interactes with',
+	`interacted_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts that interacted with this contact',
+	`post_count` int unsigned DEFAULT 0 COMMENT 'Number of posts and comments',
+	 PRIMARY KEY(`uri-id`),
+	 UNIQUE INDEX `addr` (`addr`),
+	 INDEX `alias` (`alias`),
+	 INDEX `gsid` (`gsid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Diaspora compatible contacts - used in the Diaspora implementation';
+
+--
 -- TABLE diaspora-interaction
 --
 CREATE TABLE IF NOT EXISTS `diaspora-interaction` (
@@ -632,39 +666,6 @@ CREATE TABLE IF NOT EXISTS `event` (
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Events';
-
---
--- TABLE fcontact
---
-CREATE TABLE IF NOT EXISTS `fcontact` (
-	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
-	`guid` varbinary(255) NOT NULL DEFAULT '' COMMENT 'unique id',
-	`url` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the fcontact url',
-	`name` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`photo` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`request` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`nick` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`addr` varchar(255) NOT NULL DEFAULT '' COMMENT '',
-	`batch` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`notify` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`poll` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`confirm` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`priority` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
-	`network` char(4) NOT NULL DEFAULT '' COMMENT '',
-	`alias` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`pubkey` text COMMENT '',
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
-	`updated` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT '',
-	`interacting_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts this contact interactes with',
-	`interacted_count` int unsigned DEFAULT 0 COMMENT 'Number of contacts that interacted with this contact',
-	`post_count` int unsigned DEFAULT 0 COMMENT 'Number of posts and comments',
-	 PRIMARY KEY(`id`),
-	 INDEX `addr` (`addr`(32)),
-	 UNIQUE INDEX `url` (`url`(190)),
-	 UNIQUE INDEX `uri-id` (`uri-id`),
-	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Diaspora compatible contacts - used in the Diaspora implementation';
 
 --
 -- TABLE fetch-entry
@@ -1088,6 +1089,7 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`height` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`width` smallint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`datasize` int unsigned NOT NULL DEFAULT 0 COMMENT '',
+	`blurhash` varbinary(255) COMMENT 'BlurHash representation of the photo',
 	`data` mediumblob NOT NULL COMMENT '',
 	`scale` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`profile` boolean NOT NULL DEFAULT '0' COMMENT '',
@@ -1313,6 +1315,7 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	`height` smallint unsigned COMMENT 'Height of the media',
 	`width` smallint unsigned COMMENT 'Width of the media',
 	`size` bigint unsigned COMMENT 'Media size',
+	`blurhash` varbinary(255) COMMENT 'BlurHash representation of the image',
 	`preview` varbinary(512) COMMENT 'Preview URL',
 	`preview-height` smallint unsigned COMMENT 'Height of the preview picture',
 	`preview-width` smallint unsigned COMMENT 'Width of the preview picture',
@@ -2693,6 +2696,7 @@ CREATE VIEW `owner-view` AS SELECT
 	`user`.`language` AS `language`,
 	`user`.`register_date` AS `register_date`,
 	`user`.`login_date` AS `login_date`,
+	`user`.`last-activity` AS `last-activity`,
 	`user`.`default-location` AS `default-location`,
 	`user`.`allow_location` AS `allow_location`,
 	`user`.`theme` AS `theme`,
@@ -2799,11 +2803,11 @@ CREATE VIEW `account-view` AS SELECT
 	`contact`.`blocked` AS `blocked`,
 	`contact`.`notify` AS `dfrn-notify`,
 	`contact`.`poll` AS `dfrn-poll`,
-	`fcontact`.`guid` AS `diaspora-guid`,
-	`fcontact`.`batch` AS `diaspora-batch`,
-	`fcontact`.`notify` AS `diaspora-notify`,
-	`fcontact`.`poll` AS `diaspora-poll`,
-	`fcontact`.`alias` AS `diaspora-alias`,
+	`item-uri`.`guid` AS `diaspora-guid`,
+	`diaspora-contact`.`batch` AS `diaspora-batch`,
+	`diaspora-contact`.`notify` AS `diaspora-notify`,
+	`diaspora-contact`.`poll` AS `diaspora-poll`,
+	`diaspora-contact`.`alias` AS `diaspora-alias`,
 	`apcontact`.`uuid` AS `ap-uuid`,
 	`apcontact`.`type` AS `ap-type`,
 	`apcontact`.`following` AS `ap-following`,
@@ -2821,7 +2825,7 @@ CREATE VIEW `account-view` AS SELECT
 	FROM `contact`
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `contact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `contact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = contact.`uri-id`
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = contact.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`
 			WHERE `contact`.`uid` = 0;
 
@@ -2900,14 +2904,14 @@ CREATE VIEW `account-user-view` AS SELECT
 	`ucontact`.`reason` AS `reason`,
 	`contact`.`notify` AS `dfrn-notify`,
 	`contact`.`poll` AS `dfrn-poll`,
-	`fcontact`.`guid` AS `diaspora-guid`,
-	`fcontact`.`batch` AS `diaspora-batch`,
-	`fcontact`.`notify` AS `diaspora-notify`,
-	`fcontact`.`poll` AS `diaspora-poll`,
-	`fcontact`.`alias` AS `diaspora-alias`,
-	`fcontact`.`interacting_count` AS `diaspora-interacting_count`,
-	`fcontact`.`interacted_count` AS `diaspora-interacted_count`,
-	`fcontact`.`post_count` AS `diaspora-post_count`,
+	`item-uri`.`guid` AS `diaspora-guid`,
+	`diaspora-contact`.`batch` AS `diaspora-batch`,
+	`diaspora-contact`.`notify` AS `diaspora-notify`,
+	`diaspora-contact`.`poll` AS `diaspora-poll`,
+	`diaspora-contact`.`alias` AS `diaspora-alias`,
+	`diaspora-contact`.`interacting_count` AS `diaspora-interacting_count`,
+	`diaspora-contact`.`interacted_count` AS `diaspora-interacted_count`,
+	`diaspora-contact`.`post_count` AS `diaspora-post_count`,
 	`apcontact`.`uuid` AS `ap-uuid`,
 	`apcontact`.`type` AS `ap-type`,
 	`apcontact`.`following` AS `ap-following`,
@@ -2926,7 +2930,7 @@ CREATE VIEW `account-user-view` AS SELECT
 			INNER JOIN `contact` ON `contact`.`uri-id` = `ucontact`.`uri-id` AND `contact`.`uid` = 0
 			LEFT JOIN `item-uri` ON `item-uri`.`id` = `ucontact`.`uri-id`
 			LEFT JOIN `apcontact` ON `apcontact`.`uri-id` = `ucontact`.`uri-id`
-			LEFT JOIN `fcontact` ON `fcontact`.`uri-id` = `ucontact`.`uri-id` AND `fcontact`.`network` = 'dspr'
+			LEFT JOIN `diaspora-contact` ON `diaspora-contact`.`uri-id` = `ucontact`.`uri-id`
 			LEFT JOIN `gserver` ON `gserver`.`id` = contact.`gsid`;
 
 --
@@ -3003,3 +3007,37 @@ CREATE VIEW `profile_field-view` AS SELECT
 	`profile_field`.`edited` AS `edited`
 	FROM `profile_field`
 			INNER JOIN `permissionset` ON `permissionset`.`id` = `profile_field`.`psid`;
+
+--
+-- VIEW diaspora-contact-view
+--
+DROP VIEW IF EXISTS `diaspora-contact-view`;
+CREATE VIEW `diaspora-contact-view` AS SELECT 
+	`diaspora-contact`.`uri-id` AS `uri-id`,
+	`item-uri`.`uri` AS `url`,
+	`item-uri`.`guid` AS `guid`,
+	`diaspora-contact`.`addr` AS `addr`,
+	`diaspora-contact`.`alias` AS `alias`,
+	`diaspora-contact`.`nick` AS `nick`,
+	`diaspora-contact`.`name` AS `name`,
+	`diaspora-contact`.`given-name` AS `given-name`,
+	`diaspora-contact`.`family-name` AS `family-name`,
+	`diaspora-contact`.`photo` AS `photo`,
+	`diaspora-contact`.`photo-medium` AS `photo-medium`,
+	`diaspora-contact`.`photo-small` AS `photo-small`,
+	`diaspora-contact`.`batch` AS `batch`,
+	`diaspora-contact`.`notify` AS `notify`,
+	`diaspora-contact`.`poll` AS `poll`,
+	`diaspora-contact`.`subscribe` AS `subscribe`,
+	`diaspora-contact`.`searchable` AS `searchable`,
+	`diaspora-contact`.`pubkey` AS `pubkey`,
+	`gserver`.`url` AS `baseurl`,
+	`diaspora-contact`.`gsid` AS `gsid`,
+	`diaspora-contact`.`created` AS `created`,
+	`diaspora-contact`.`updated` AS `updated`,
+	`diaspora-contact`.`interacting_count` AS `interacting_count`,
+	`diaspora-contact`.`interacted_count` AS `interacted_count`,
+	`diaspora-contact`.`post_count` AS `post_count`
+	FROM `diaspora-contact`
+			INNER JOIN `item-uri` ON `item-uri`.`id` = `diaspora-contact`.`uri-id`
+			LEFT JOIN `gserver` ON `gserver`.`id` = `diaspora-contact`.`gsid`;

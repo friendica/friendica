@@ -45,7 +45,7 @@ class PollContacts
 
 		if (!empty($abandon_days)) {
 			$condition = DBA::mergeConditions($condition,
-				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed`  AND `login_date` > ?)", 0, DateTimeFormat::utc('now - ' . $abandon_days . ' days')]);
+				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed` AND `last-activity` > ?)", 0, DateTimeFormat::utc('now - ' . $abandon_days . ' days')]);
 		} else 	{
 			$condition = DBA::mergeConditions($condition,
 				["`uid` != ? AND `uid` IN (SELECT `uid` FROM `user` WHERE NOT `account_expired` AND NOT `account_removed`)", 0]);

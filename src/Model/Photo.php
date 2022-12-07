@@ -346,11 +346,14 @@ class Photo
 	 * @param string $url      Image URL
 	 * @param int    $uid      User ID of the requesting person
 	 * @param string $mimetype Image mime type. Is guessed by file name when empty.
+	 * @param string $blurhash The blurhash that will be used to generate a picture when the original picture can't be fetched
+	 * @param int    $width    Image width
+	 * @param int    $height   Image height
 	 *
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function createPhotoForExternalResource(string $url, int $uid = 0, string $mimetype = ''): array
+	public static function createPhotoForExternalResource(string $url, int $uid = 0, string $mimetype = '', string $blurhash = null, int $width = null, int $height = null): array
 	{
 		if (empty($mimetype)) {
 			$mimetype = Images::guessTypeByExtension($url);
@@ -364,6 +367,9 @@ class Photo
 		$photo['backend-ref']   = json_encode(['url' => $url, 'uid' => $uid]);
 		$photo['type']          = $mimetype;
 		$photo['cacheable']     = true;
+		$photo['blurhash']      = $blurhash;
+		$photo['width']         = $width;
+		$photo['height']        = $height;
 
 		return $photo;
 	}
@@ -436,6 +442,7 @@ class Photo
 			'height' => $image->getHeight(),
 			'width' => $image->getWidth(),
 			'datasize' => strlen($image->asString()),
+			'blurhash' => $image->getBlurHash(),
 			'data' => $data,
 			'scale' => $scale,
 			'photo-type' => $type,
@@ -1318,7 +1325,7 @@ class Photo
 			logger::warning('profile banner upload with scale 3 (960) failed');
 		}
 
-		logger::info('new profile banner upload ended');
+		logger::info('new profile banner upload ended', ['uid' => $uid, 'resource_id' => $resource_id, 'filename' => $filename]);
 
 		$condition = ["`photo-type` = ? AND `resource-id` != ? AND `uid` = ?", self::USER_BANNER, $resource_id, $uid];
 		self::update(['photo-type' => self::DEFAULT], $condition);

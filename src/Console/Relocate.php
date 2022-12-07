@@ -131,9 +131,9 @@ HELP;
 			$this->out('Updating event table fields');
 			$this->database->replaceInTableFields('event', ['uri'], $old_url, $new_url);
 
-			$this->out('Updating fcontact table fields');
-			$this->database->replaceInTableFields('fcontact', ['url', 'photo', 'request', 'batch', 'poll', 'confirm', 'alias'], $old_url, $new_url);
-			$this->database->replaceInTableFields('fcontact', ['addr'], $old_host, $new_host);
+			$this->out('Updating diaspora-contact table fields');
+			$this->database->replaceInTableFields('diaspora-contact', ['alias', 'photo', 'photo-medium', 'photo-small', 'batch', 'notify', 'poll', 'subscribe'], $old_url, $new_url);
+			$this->database->replaceInTableFields('diaspora-contact', ['addr'], $old_host, $new_host);
 
 			$this->out('Updating fsuggest table fields');
 			$this->database->replaceInTableFields('fsuggest', ['url', 'request', 'photo'], $old_url, $new_url);

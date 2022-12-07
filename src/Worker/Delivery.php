@@ -29,7 +29,6 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\FContact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -94,7 +93,7 @@ class Delivery
 				if ($item['verb'] == Activity::ANNOUNCE) {
 					continue;
 				}
-	
+
 				if ($item['id'] == $parent_id) {
 					$parent = $item;
 				}
@@ -278,7 +277,7 @@ class Delivery
 	private static function deliverDFRN(string $cmd, array $contact, array $owner, array $items, array $target_item, bool $public_message, bool $top_level, bool $followup, int $server_protocol = null)
 	{
 		// Transmit Diaspora reshares via Diaspora if the Friendica contact support Diaspora
-		if (Diaspora::getReshareDetails($target_item ?? []) && !empty(FContact::getByURL($contact['addr'], false))) {
+		if (Diaspora::getReshareDetails($target_item ?? []) && Diaspora::isSupportedByContactUrl($contact['addr'], false)) {
 			Logger::info('Reshare will be transmitted via Diaspora', ['url' => $contact['url'], 'guid' => ($target_item['guid'] ?? '') ?: $target_item['id']]);
 			self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
 			return;

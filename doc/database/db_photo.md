@@ -25,6 +25,7 @@ Fields
 | height        |                                                                     | smallint unsigned  | NO   |     | 0                   |                |
 | width         |                                                                     | smallint unsigned  | NO   |     | 0                   |                |
 | datasize      |                                                                     | int unsigned       | NO   |     | 0                   |                |
+| blurhash      | BlurHash representation of the photo                                | varbinary(255)     | YES  |     | NULL                |                |
 | data          |                                                                     | mediumblob         | NO   |     | NULL                |                |
 | scale         |                                                                     | tinyint unsigned   | NO   |     | 0                   |                |
 | profile       |                                                                     | boolean            | NO   |     | 0                   |                |

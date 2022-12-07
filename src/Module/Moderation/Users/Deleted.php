@@ -49,7 +49,7 @@ class Deleted extends BaseUsers
 			'name',
 			'email',
 			'register_date',
-			'login_date',
+			'last-activity',
 			'last-item',
 			'page-flags',
 		];

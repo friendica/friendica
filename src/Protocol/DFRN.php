@@ -34,7 +34,6 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
 use Friendica\Model\Event;
-use Friendica\Model\FContact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -45,6 +44,7 @@ use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
+use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
@@ -981,12 +981,12 @@ class DFRN
 				}
 			}
 
-			$fcontact = FContact::getByURL($contact['addr']);
-			if (empty($fcontact)) {
+			try {
+				$pubkey = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']))->pubKey;
+			} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
 				Logger::notice('Unable to find contact details for ' . $contact['id'] . ' - ' . $contact['addr']);
 				return -22;
 			}
-			$pubkey = $fcontact['pubkey'] ?? '';
 		} else {
 			$pubkey = '';
 		}

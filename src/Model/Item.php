@@ -2291,24 +2291,24 @@ class Item
 
 	public static function isRemoteSelf(array $contact, array &$datarray): bool
 	{
-		if (!$contact['remote_self']) {
+		if ($contact['remote_self'] != Contact::MIRROR_OWN_POST) {
 			return false;
 		}
 
 		// Prevent the forwarding of posts that are forwarded
-		if (!empty($datarray["extid"]) && ($datarray["extid"] == Protocol::DFRN)) {
+		if (!empty($datarray['extid']) && ($datarray['extid'] == Protocol::DFRN)) {
 			Logger::info('Already forwarded');
 			return false;
 		}
 
 		// Prevent to forward already forwarded posts
-		if ($datarray["app"] == DI::baseUrl()->getHostname()) {
+		if ($datarray['app'] == DI::baseUrl()->getHostname()) {
 			Logger::info('Already forwarded (second test)');
 			return false;
 		}
 
 		// Only forward posts
-		if ($datarray["verb"] != Activity::POST) {
+		if ($datarray['verb'] != Activity::POST) {
 			Logger::info('No post');
 			return false;
 		}
@@ -2320,54 +2320,49 @@ class Item
 
 		$datarray2 = $datarray;
 		Logger::info('remote-self start', ['contact' => $contact['url'], 'remote_self'=> $contact['remote_self'], 'item' => $datarray]);
-		if ($contact['remote_self'] == Contact::MIRROR_OWN_POST) {
-			$self = DBA::selectFirst('contact', ['id', 'name', 'url', 'thumb'],
+
+		$self = DBA::selectFirst('contact', ['id', 'name', 'url', 'thumb'],
 					['uid' => $contact['uid'], 'self' => true]);
-			if (DBA::isResult($self)) {
-				$datarray['contact-id'] = $self["id"];
-
-				$datarray['owner-name'] = $self["name"];
-				$datarray['owner-link'] = $self["url"];
-				$datarray['owner-avatar'] = $self["thumb"];
-
-				$datarray['author-name']   = $datarray['owner-name'];
-				$datarray['author-link']   = $datarray['owner-link'];
-				$datarray['author-avatar'] = $datarray['owner-avatar'];
-
-				unset($datarray['edited']);
-
-				unset($datarray['network']);
-				unset($datarray['owner-id']);
-				unset($datarray['author-id']);
-			}
-
-			if ($contact['network'] != Protocol::FEED) {
-				$old_uri_id = $datarray["uri-id"] ?? 0;
-				$datarray["guid"] = System::createUUID();
-				unset($datarray["plink"]);
-				$datarray["uri"] = self::newURI($datarray["guid"]);
-				$datarray["uri-id"] = ItemURI::getIdByURI($datarray["uri"]);
-				$datarray["extid"] = Protocol::DFRN;
-				$urlpart = parse_url($datarray2['author-link']);
-				$datarray["app"] = $urlpart["host"];
-				if (!empty($old_uri_id)) {
-					Post\Media::copy($old_uri_id, $datarray["uri-id"]);
-				}
-
-				unset($datarray["parent-uri"]);
-				unset($datarray["thr-parent"]);
-			} else {
-				$datarray['private'] = self::PUBLIC;
-			}
+		if (!DBA::isResult($self)) {
+			Logger::error('Self contact not found', ['uid' => $contact['uid']]);
+			return false;
 		}
 
+		$datarray['contact-id'] = $self['id'];
+
+		$datarray['author-name']   = $datarray['owner-name']   = $self['name'];
+		$datarray['author-link']   = $datarray['owner-link']   = $self['url'];
+		$datarray['author-avatar'] = $datarray['owner-avatar'] = $self['thumb'];
+
+		unset($datarray['edited']);
+
+		unset($datarray['network']);
+		unset($datarray['owner-id']);
+		unset($datarray['author-id']);
+
 		if ($contact['network'] != Protocol::FEED) {
+			$old_uri_id = $datarray['uri-id'] ?? 0;
+			$datarray['guid'] = System::createUUID();
+			unset($datarray['plink']);
+			$datarray['uri'] = self::newURI($datarray['guid']);
+			$datarray['uri-id'] = ItemURI::getIdByURI($datarray['uri']);
+			$datarray['extid'] = Protocol::DFRN;
+			$urlpart = parse_url($datarray2['author-link']);
+			$datarray['app'] = $urlpart['host'];
+			if (!empty($old_uri_id)) {
+				Post\Media::copy($old_uri_id, $datarray['uri-id']);
+			}
+
+			unset($datarray['parent-uri']);
+			unset($datarray['thr-parent']);
+
 			// Store the original post
 			$result = self::insert($datarray2);
 			Logger::info('remote-self post original item', ['contact' => $contact['url'], 'result'=> $result, 'item' => $datarray2]);
 		} else {
-			Logger::info('No valid mirroring option', ['uid' => $contact['uid'], 'id' => $contact['id'], 'network' => $contact['network'], 'remote_self' => $contact['remote_self']]);
-			return false;
+			$datarray['private'] = self::PUBLIC;
+			$datarray['app'] = 'Feed';
+			$result = true;
 		}
 
 		return (bool)$result;

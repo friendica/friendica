@@ -17,6 +17,7 @@ Fields
 | height          | Height of the media                                                | smallint unsigned | YES  |     | NULL    |                |
 | width           | Width of the media                                                 | smallint unsigned | YES  |     | NULL    |                |
 | size            | Media size                                                         | bigint unsigned   | YES  |     | NULL    |                |
+| blurhash        | BlurHash representation of the image                               | varbinary(255)    | YES  |     | NULL    |                |
 | preview         | Preview URL                                                        | varbinary(512)    | YES  |     | NULL    |                |
 | preview-height  | Height of the preview picture                                      | smallint unsigned | YES  |     | NULL    |                |
 | preview-width   | Width of the preview picture                                       | smallint unsigned | YES  |     | NULL    |                |

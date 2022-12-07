@@ -451,6 +451,10 @@ class Profile
 
 		$p['url'] = Contact::magicLinkById($cid, $profile['url']);
 
+		if (!isset($profile['hidewall'])) {
+			Logger::warning('Missing hidewall key in profile array', ['profile' => $profile, 'callstack' => System::callstack(10)]);
+		}
+
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$profile' => $p,
@@ -461,7 +465,7 @@ class Profile
 			'$unfollow' => DI::l10n()->t('Unfollow'),
 			'$unfollow_link' => $unfollow_link,
 			'$subscribe_feed' => DI::l10n()->t('Atom feed'),
-			'$subscribe_feed_link' => $profile['hidewall'] ? '' : $profile['poll'],
+			'$subscribe_feed_link' => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
 			'$wallmessage' => DI::l10n()->t('Message'),
 			'$wallmessage_link' => $wallmessage_link,
 			'$account_type' => $account_type,

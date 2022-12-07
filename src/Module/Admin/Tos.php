@@ -57,11 +57,13 @@ class Tos extends BaseAdmin
 
 		$displaytos = !empty($_POST['displaytos']);
 		$displayprivstatement = !empty($_POST['displayprivstatement']);
-		$tostext = (!empty($_POST['tostext']) ? strip_tags(trim($_POST['tostext'])) : '');
+		$tostext  = (!empty($_POST['tostext']) ? strip_tags(trim($_POST['tostext'])) : '');
+		$tosrules = (!empty($_POST['tosrules']) ? strip_tags(trim($_POST['tosrules'])) : '');
 
 		$this->config->set('system', 'tosdisplay', $displaytos);
 		$this->config->set('system', 'tosprivstatement', $displayprivstatement);
 		$this->config->set('system', 'tostext', $tostext);
+		$this->config->set('system', 'tosrules', $tosrules);
 
 		$this->baseUrl->redirect('admin/tos');
 	}
@@ -79,6 +81,7 @@ class Tos extends BaseAdmin
 			'$preview' => $this->t('Privacy Statement Preview'),
 			'$privtext' => $this->tos->privacy_complete,
 			'$tostext' => ['tostext', $this->t('The Terms of Service'), $this->config->get('system', 'tostext'), $this->t('Enter the Terms of Service for your node here. You can use BBCode. Headers of sections should be [h2] and below.')],
+			'$tosrules' => ['tosrules', $this->t('The rules'), $this->config->get('system', 'tosrules'), $this->t('Enter your system rules here. Each line represents one rule.')],
 			'$form_security_token' => self::getFormSecurityToken('admin_tos'),
 			'$submit' => $this->t('Save Settings'),
 		]);

@@ -70,7 +70,8 @@
 		"npm-asset/moment": "^2.24",
 		"npm-asset/perfect-scrollbar": "0.6.16",
 		"npm-asset/textcomplete": "^0.18.2",
-		"npm-asset/typeahead.js": "^0.11.1"
+		"npm-asset/typeahead.js": "^0.11.1",
+		"kornrunner/blurhash": "^1.2"
 	},
 	"repositories": [
 		{

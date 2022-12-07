@@ -34,6 +34,7 @@ use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -82,12 +83,12 @@ class Get extends \Friendica\BaseModule
 
 			return [
 				'id'       => $event['id'],
-				'title'    => $event['summary'],
+				'title'    => Strings::escapeHtml($event['summary']),
 				'start'    => DateTimeFormat::local($event['start']),
 				'end'      => DateTimeFormat::local($event['finish']),
 				'nofinish' => $event['nofinish'],
-				'desc'     => $event['desc'],
-				'location' => $event['location'],
+				'desc'     => Strings::escapeHtml($event['desc']),
+				'location' => Strings::escapeHtml($event['location']),
 				'item'     => $item,
 			];
 		}, $events);

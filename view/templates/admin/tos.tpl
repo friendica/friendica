@@ -6,6 +6,7 @@
 		{{include file="field_checkbox.tpl" field=$displaytos}}
 		{{include file="field_checkbox.tpl" field=$displayprivstatement}}
 		{{include file="field_textarea.tpl" field=$tostext}}
+		{{include file="field_textarea.tpl" field=$tosrules}}
 		<div class="submit"><input type="submit" name="page_tos" value="{{$submit}}" /></div>
 	</form>
 	<h2>{{$preview}}</h2>

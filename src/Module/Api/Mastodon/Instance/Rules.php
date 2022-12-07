@@ -38,21 +38,6 @@ class Rules extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$rules = [];
-		$id    = 0;
-
-		if (DI::config()->get('system', 'tosdisplay')) {
-			$html = BBCode::convert(DI::config()->get('system', 'tostext'), false, BBCode::EXTERNAL);
-
-			$msg = HTML::toPlaintext($html, 0, true);
-			foreach (explode("\n", $msg) as $line) {
-				$line = trim($line);
-				if ($line) {
-					$rules[] = ['id' => (string)++$id, 'text' => $line];
-				}
-			}
-		}
-
-		System::jsonExit($rules);
+		System::jsonExit(System::getRules());
 	}
 }

@@ -117,7 +117,7 @@ class Media
 	 */
 	private static function unsetEmptyFields(array $media): array
 	{
-		$fields = ['mimetype', 'height', 'width', 'size', 'preview', 'preview-height', 'preview-width', 'description'];
+		$fields = ['mimetype', 'height', 'width', 'size', 'preview', 'preview-height', 'preview-width', 'blurhash', 'description'];
 		foreach ($fields as $field) {
 			if (empty($media[$field])) {
 				unset($media[$field]);
@@ -203,6 +203,7 @@ class Media
 				$media['size'] = $imagedata['size'];
 				$media['width'] = $imagedata[0];
 				$media['height'] = $imagedata[1];
+				$media['blurhash'] = $imagedata['blurhash'] ?? null;
 			} else {
 				Logger::notice('No image data', ['media' => $media]);
 			}
@@ -232,6 +233,7 @@ class Media
 			$media['preview'] = $data['images'][0]['src'] ?? null;
 			$media['preview-height'] = $data['images'][0]['height'] ?? null;
 			$media['preview-width'] = $data['images'][0]['width'] ?? null;
+			$media['blurhash'] = $data['images'][0]['blurhash'] ?? null;
 			$media['description'] = $data['text'] ?? null;
 			$media['name'] = $data['title'] ?? null;
 			$media['author-url'] = $data['author_url'] ?? null;
@@ -287,6 +289,7 @@ class Media
 		$media['preview'] = null;
 		$media['preview-height'] = null;
 		$media['preview-width'] = null;
+		$media['blurhash'] = null;
 		$media['description'] = $item['body'];
 		$media['name'] = $item['title'];
 		$media['author-url'] = $item['author-link'];
@@ -328,6 +331,7 @@ class Media
 		$media['preview'] = null;
 		$media['preview-height'] = null;
 		$media['preview-width'] = null;
+		$media['blurhash'] = null;
 		$media['description'] = $contact['about'];
 		$media['name'] = $contact['name'];
 		$media['author-url'] = $contact['url'];
@@ -357,6 +361,7 @@ class Media
 			$media['size'] = $photo['datasize'];
 			$media['width'] = $photo['width'];
 			$media['height'] = $photo['height'];
+			$media['blurhash'] = $photo['blurhash'];
 		}
 
 		if (!preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $media['preview'] ?? '', $matches)) {

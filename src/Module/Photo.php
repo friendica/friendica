@@ -153,8 +153,12 @@ class Photo extends BaseModule
 		$stamp = microtime(true);
 
 		$imgdata = MPhoto::getImageDataForPhoto($photo);
-		if (empty($imgdata)) {
+		if (empty($imgdata) && empty($photo['blurhash'])) {
 			throw new HTTPException\NotFoundException();
+		} elseif (empty($imgdata) && !empty($photo['blurhash'])) {
+			$image = New Image('', 'image/png');
+			$image->getFromBlurHash($photo['blurhash'], $photo['width'], $photo['height']);
+			$imgdata = $image->asString();
 		}
 
 		// The mimetype for an external or system resource can only be known reliably after it had been fetched
@@ -176,6 +180,12 @@ class Photo extends BaseModule
 				$error = DI::l10n()->t('Invalid photo with id %s.', $photo['id']);
 			}
 			throw new HTTPException\InternalServerErrorException($error);
+		}
+
+		if (!empty($request['static'])) {
+			$img = new Image($imgdata, $photo['type']);
+			$img->toStatic();
+			$imgdata = $img->asString();
 		}
 
 		// if customsize is set and image is not a gif, resize it
@@ -240,14 +250,18 @@ class Photo extends BaseModule
 	{
 		switch($type) {
 			case 'preview':
-				$media = DBA::selectFirst('post-media', ['preview', 'url', 'mimetype', 'type', 'uri-id'], ['id' => $id]);
+				$media = DBA::selectFirst('post-media', ['preview', 'url', 'preview-height', 'preview-width', 'height', 'width', 'mimetype', 'type', 'uri-id', 'blurhash'], ['id' => $id]);
 				if (empty($media)) {
 					return false;
 				}
-				$url = $media['preview'];
+				$url    = $media['preview'];
+				$width  = $media['preview-width'];
+				$height = $media['preview-height'];
 
 				if (empty($url) && ($media['type'] == Post\Media::IMAGE)) {
-					$url = $media['url'];
+					$url    = $media['url'];
+					$width  = $media['width'];
+					$height = $media['height'];
 				}
 
 				if (empty($url)) {
@@ -258,9 +272,9 @@ class Photo extends BaseModule
 					return MPhoto::getPhoto($matches[1], $matches[2]);
 				}
 
-				return MPhoto::createPhotoForExternalResource($url, (int)DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '');
+				return MPhoto::createPhotoForExternalResource($url, (int)DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $width, $height);
 			case 'media':
-				$media = DBA::selectFirst('post-media', ['url', 'mimetype', 'uri-id'], ['id' => $id, 'type' => Post\Media::IMAGE]);
+				$media = DBA::selectFirst('post-media', ['url', 'height', 'width', 'mimetype', 'uri-id', 'blurhash'], ['id' => $id, 'type' => Post\Media::IMAGE]);
 				if (empty($media)) {
 					return false;
 				}
@@ -269,7 +283,7 @@ class Photo extends BaseModule
 					return MPhoto::getPhoto($matches[1], $matches[2]);
 				}
 
-				return MPhoto::createPhotoForExternalResource($media['url'], (int)DI::userSession()->getLocalUserId(), $media['mimetype']);
+				return MPhoto::createPhotoForExternalResource($media['url'], (int)DI::userSession()->getLocalUserId(), $media['mimetype'], $media['blurhash'], $media['width'], $media['height']);
 			case 'link':
 				$link = DBA::selectFirst('post-link', ['url', 'mimetype'], ['id' => $id]);
 				if (empty($link)) {

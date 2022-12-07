@@ -567,6 +567,7 @@ class ParseUrl
 						$image['width'] = $photodata[0];
 						$image['height'] = $photodata[1];
 						$image['contenttype'] = $photodata['mime'];
+						$image['blurhash'] = $photodata['blurhash'] ?? null;
 						unset($image['url']);
 						ksort($image);
 					} else {

@@ -89,11 +89,11 @@ class UpdateCredentials extends BaseApi
 		Logger::info('Update profile and user', ['uid' => $uid, 'user' => $user, 'profile' => $profile]);
 
 		if (!empty($request['avatar'])) {
-			Photo::uploadAvatar(1, $request['avatar']);
+			Photo::uploadAvatar($uid, $request['avatar']);
 		}
 
 		if (!empty($request['header'])) {
-			Photo::uploadBanner(1, $request['header']);
+			Photo::uploadBanner($uid, $request['header']);
 		}
 
 		User::update($user, $uid);

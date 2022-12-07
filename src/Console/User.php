@@ -370,7 +370,7 @@ HELP;
 						$contact['url'],
 						$contact['email'],
 						Temporal::getRelativeDate($contact['created']),
-						Temporal::getRelativeDate($contact['login_date']),
+						Temporal::getRelativeDate($contact['last-activity']),
 						Temporal::getRelativeDate($contact['last-item']),
 					]);
 				}
@@ -396,7 +396,7 @@ HELP;
 			'nickname',
 			'email',
 			'register_date',
-			'login_date',
+			'last-activity',
 			'verified',
 			'blocked',
 		];

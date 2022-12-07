@@ -86,7 +86,7 @@ class Status extends BaseFactory
 	 */
 	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true): \Friendica\Object\Api\Mastodon\Status
 	{
-		$fields = ['uri-id', 'uid', 'author-id', 'author-uri-id', 'author-link', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
+		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
 		if (!$item) {
@@ -97,9 +97,18 @@ class Status extends BaseFactory
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
 		}
 
-		$is_reshare = $reblog && !is_null($item['causer-uri-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT);
-
-		$account = $this->mstdnAccountFactory->createFromUriId($is_reshare ? $item['causer-uri-id']:$item['author-uri-id'], $uid);
+		if (($item['gravity'] == Item::GRAVITY_ACTIVITY) && ($item['vid'] == Verb::getID(Activity::ANNOUNCE))) {
+			$is_reshare = true;
+			$account    = $this->mstdnAccountFactory->createFromUriId($item['author-uri-id'], $uid);
+			$uriId      = $item['thr-parent-id'];
+			$item       = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
+			if (!$item) {
+				throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
+			}
+		} else {
+			$is_reshare = $reblog && !is_null($item['causer-uri-id']) && ($item['causer-id'] != $item['author-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT);
+			$account    = $this->mstdnAccountFactory->createFromUriId($is_reshare ? $item['causer-uri-id'] : $item['author-uri-id'], $uid);
+		}
 
 		$count_announce = Post::countPosts([
 			'thr-parent-id' => $uriId,
@@ -190,19 +199,13 @@ class Status extends BaseFactory
 			}
 		}
 
-		if ($item['vid'] == Verb::getID(Activity::ANNOUNCE)) {
-			$reshare       = $this->createFromUriId($item['thr-parent-id'], $uid)->toArray();
-			$reshared_item = Post::selectFirst(['title', 'body'], ['uri-id' => $item['thr-parent-id'],'uid' => [0, $uid]]);
-			$item['title'] = $reshared_item['title'] ?? $item['title'];
-			$item['body']  = $reshared_item['body'] ?? $item['body'];
-		} else {
-			$item['body']     = $this->contentItem->addSharedPost($item);
-			$item['raw-body'] = $this->contentItem->addSharedPost($item, $item['raw-body']);
-			$reshare = [];
-		}
+		$item['body']     = $this->contentItem->addSharedPost($item);
+		$item['raw-body'] = $this->contentItem->addSharedPost($item, $item['raw-body']);
 
 		if ($is_reshare) {
 			$reshare = $this->createFromUriId($uriId, $uid, false)->toArray();
+		} else {
+			$reshare = [];
 		}
 
 		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $reshare, $poll);

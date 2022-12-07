@@ -59,6 +59,6 @@ class Instance extends BaseApi
 	 */
 	protected function rawContent(array $request = [])
 	{
-		System::jsonExit(new InstanceEntity($this->config, $this->baseUrl, $this->database));
+		System::jsonExit(new InstanceEntity($this->config, $this->baseUrl, $this->database, System::getRules()));
 	}
 }

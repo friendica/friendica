@@ -75,11 +75,12 @@ class Instance extends BaseDataTransferObject
 	 * @param IManageConfigValues $config
 	 * @param BaseURL             $baseUrl
 	 * @param Database            $database
+	 * @param array               $rules
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database)
+	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database, array $rules = [])
 	{
 		$register_policy = intval($config->get('config', 'register_policy'));
 
@@ -97,6 +98,7 @@ class Instance extends BaseDataTransferObject
 		$this->approval_required = ($register_policy == Register::APPROVE);
 		$this->invites_enabled   = false;
 		$this->contact_account   = [];
+		$this->rules             = $rules;
 
 		$administrator = User::getFirstAdmin(['nickname']);
 		if ($administrator) {

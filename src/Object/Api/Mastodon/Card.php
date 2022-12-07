@@ -52,6 +52,8 @@ class Card extends BaseDataTransferObject
 	protected $height;
 	/** @var string */
 	protected $image;
+	/** @var string */
+	protected $blurhash;
 
 	/**
 	 * Creates a card record from an attachment array.
@@ -72,6 +74,7 @@ class Card extends BaseDataTransferObject
 		$this->width         = $attachment['width'] ?? 0;
 		$this->height        = $attachment['height'] ?? 0;
 		$this->image         = $attachment['image'] ?? '';
+		$this->blurhash      = $attachment['blurhash'] ?? '';
 		$this->history       = $history;
 	}
 

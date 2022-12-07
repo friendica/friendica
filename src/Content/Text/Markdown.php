@@ -21,6 +21,8 @@
 
 namespace Friendica\Content\Text;
 
+use Friendica\Core\Logger;
+use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Contact;
 
@@ -106,8 +108,18 @@ class Markdown
 	 * So we'll use that to convert to HTML, then convert the HTML back to bbcode,
 	 * and then clean up a few Diaspora specific constructs.
 	 */
-	public static function toBBCode($s)
+	public static function toBBCode($s): string
 	{
+		// @TODO Temporary until we find the source of the null value to finally set the correct type-hint
+		if (is_null($s)) {
+			Logger::warning('Received null value', ['callstack' => System::callstack()]);
+			return '';
+		}
+
+		if (!$s) {
+			return $s;
+		}
+
 		DI::profiler()->startRecording('rendering');
 
 		// The parser cannot handle paragraphs correctly

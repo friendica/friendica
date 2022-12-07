@@ -25,6 +25,7 @@ use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
+use Friendica\Object\Image;
 
 /**
  * Image utilities
@@ -244,7 +245,10 @@ class Images
 		}
 
 		if ($data) {
-			$data['size'] = $filesize;
+			$image = new Image($img_str);
+
+			$data['blurhash'] = $image->getBlurHash();
+			$data['size']     = $filesize;
 		}
 
 		return is_array($data) ? $data : [];

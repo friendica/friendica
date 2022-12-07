@@ -140,6 +140,18 @@ class Contact
 	 * @param array $fields    Array of selected fields, empty for all
 	 * @param array $condition Array of fields for condition
 	 * @param array $params    Array of several parameters
+	 * @return array
+	 * @throws \Exception
+	 */
+	public static function selectAccountToArray(array $fields = [], array $condition = [], array $params = []): array
+	{
+		return DBA::selectToArray('account-user-view', $fields, $condition, $params);
+	}
+
+	/**
+	 * @param array $fields    Array of selected fields, empty for all
+	 * @param array $condition Array of fields for condition
+	 * @param array $params    Array of several parameters
 	 * @return array|bool
 	 * @throws \Exception
 	 */
@@ -1383,7 +1395,7 @@ class Contact
 		}
 
 		if ($data['network'] == Protocol::DIASPORA) {
-			FContact::updateFromProbeArray($data);
+			DI::dsprContact()->updateFromProbeArray($data);
 		}
 
 		self::updateFromProbeArray($contact_id, $data);
@@ -2045,9 +2057,10 @@ class Contact
 	 * @param integer $cid     contact id
 	 * @param string  $size    One of the Proxy::SIZE_* constants
 	 * @param string  $updated Contact update date
+	 * @param bool    $static  If "true" a parameter is added to convert the avatar to a static one
 	 * @return string avatar link
 	 */
-	public static function getAvatarUrlForId(int $cid, string $size = '', string $updated = '', string $guid = ''): string
+	public static function getAvatarUrlForId(int $cid, string $size = '', string $updated = '', string $guid = '', bool $static = false): string
 	{
 		// We have to fetch the "updated" variable when it wasn't provided
 		// The parameter can be provided to improve performance
@@ -2077,7 +2090,15 @@ class Contact
 				$url .= Proxy::PIXEL_LARGE . '/';
 				break;
 		}
-		return $url . ($guid ?: $cid) . ($updated ? '?ts=' . strtotime($updated) : '');
+		$query_params = [];
+		if ($updated) {
+			$query_params['ts'] = strtotime($updated);
+		}
+		if ($static) {
+			$query_params['static'] = true;
+		}
+		
+		return $url . ($guid ?: $cid) . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
 	}
 
 	/**
@@ -2102,9 +2123,10 @@ class Contact
 	 * @param integer $cid     contact id
 	 * @param string  $size    One of the Proxy::SIZE_* constants
 	 * @param string  $updated Contact update date
+	 * @param bool    $static  If "true" a parameter is added to convert the header to a static one
 	 * @return string header link
 	 */
-	public static function getHeaderUrlForId(int $cid, string $size = '', string $updated = '', string $guid = ''): string
+	public static function getHeaderUrlForId(int $cid, string $size = '', string $updated = '', string $guid = '', bool $static = false): string
 	{
 		// We have to fetch the "updated" variable when it wasn't provided
 		// The parameter can be provided to improve performance
@@ -2135,7 +2157,15 @@ class Contact
 				break;
 		}
 
-		return $url . ($guid ?: $cid) . ($updated ? '?ts=' . strtotime($updated) : '');
+		$query_params = [];
+		if ($updated) {
+			$query_params['ts'] = strtotime($updated);
+		}
+		if ($static) {
+			$query_params['static'] = true;
+		}
+
+		return $url . ($guid ?: $cid) . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
 	}
 
 	/**
@@ -2456,7 +2486,7 @@ class Contact
 		$ret = Probe::uri($contact['url'], $network, $contact['uid']);
 
 		if ($ret['network'] == Protocol::DIASPORA) {
-			FContact::updateFromProbeArray($ret);
+			DI::dsprContact()->updateFromProbeArray($ret);
 		}
 
 		return self::updateFromProbeArray($id, $ret);
@@ -3154,6 +3184,8 @@ class Contact
 			return;
 		}
 
+		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+
 		self::clearFollowerFollowingEndpointCache($contact['uid']);
 
 		$cdata = self::getPublicAndUserContactID($contact['id'], $contact['uid']);
@@ -3177,6 +3209,8 @@ class Contact
 		} else {
 			self::update(['rel' => self::FOLLOWER], ['id' => $contact['id']]);
 		}
+
+		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
 	}
 
 	/**

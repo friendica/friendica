@@ -83,9 +83,22 @@ class Tos extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('tos.tpl');
 		if ($this->config->get('system', 'tosdisplay')) {
+			$lines = $this->config->get('system', 'tosrules');
+			if (!empty($lines)) {
+				$rules = "[list=1]";
+				foreach (explode("\n", $lines) as $line) {
+					$rules .= "\n[*]" . $line;
+				}
+				$rules .= "\n[/list]\n";
+			} else {
+				$rules = '';
+			}
+
 			return Renderer::replaceMacros($tpl, [
 				'$title'                => $this->t('Terms of Service'),
 				'$tostext'              => BBCode::convert($this->config->get('system', 'tostext')),
+				'$rulestitle'           => $this->t('Rules'),
+				'$rules'                => BBCode::convert($rules),
 				'$displayprivstatement' => $this->config->get('system', 'tosprivstatement'),
 				'$privstatementtitle'   => $this->t('Privacy Statement'),
 				'$privacy_operate'      => $this->t('At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name (pen name), an username (nickname) and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.'),

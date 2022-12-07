@@ -179,26 +179,22 @@ The available features are client specific and may differ.
 
 * [AndStatus](http://andstatus.org) ([F-Droid](https://f-droid.org/repository/browse/?fdid=org.andstatus.app), [Google Play](https://play.google.com/store/apps/details?id=org.andstatus.app))
 * [B4X for Pleroma & Mastodon](https://github.com/AnywhereSoftware/B4X-Pleroma)
-* [Fedi](https://play.google.com/store/apps/details?id=com.fediverse.app)
+* [Fedi](https://github.com/Big-Fig/Fediverse.app) ([Google Play](https://play.google.com/store/apps/details?id=com.fediverse.app)
 * [Fedilab](https://fedilab.app) ([F-Droid](https://f-droid.org/app/fr.gouv.etalab.mastodon), [Google Play](https://play.google.com/store/apps/details?id=app.fedilab.android))
 * [Friendiqa](https://git.friendi.ca/lubuwest/Friendiqa) ([F-Droid](https://git.friendi.ca/lubuwest/Friendiqa#install), [Google Play](https://play.google.com/store/apps/details?id=org.qtproject.friendiqa))
 * [Husky](https://git.sr.ht/~captainepoch/husky) ([F-Droid](https://f-droid.org/repository/browse/?fdid=su.xash.husky), [Google Play](https://play.google.com/store/apps/details?id=su.xash.husky))
-* [Mastodon for Android](https://github.com/mastodon/mastodon-android) (F-Droid: Pending, [Google-Play](https://play.google.com/store/apps/details?id=org.joinmastodon.android))
-* [Subway Tooter](https://github.com/tateisu/SubwayTooter)
-* [Tooot](https://tooot.app/)
+* [Mastodon](https://github.com/mastodon/mastodon-android) ([F-Droid](https://f-droid.org/en/packages/org.joinmastodon.android/), [Google Play](https://play.google.com/store/apps/details?id=org.joinmastodon.android))
+* [Subway Tooter](https://github.com/tateisu/SubwayTooter) ([F-Droid](https://android.izzysoft.de/repo/apk/jp.juggler.subwaytooter))
+* [Tooot](https://tooot.app/) ([Google Play](https://play.google.com/store/apps/details?id=com.xmflsct.app.tooot))
 * [Tusky](https://tusky.app) ([F-Droid](https://f-droid.org/repository/browse/?fdid=com.keylesspalace.tusky), [Google Play](https://play.google.com/store/apps/details?id=com.keylesspalace.tusky))
 * [Twidere](https://github.com/TwidereProject/Twidere-Android) ([F-Droid](https://f-droid.org/repository/browse/?fdid=org.mariotaku.twidere), [Google Play](https://play.google.com/store/apps/details?id=com.twidere.twiderex))
 * [TwidereX](https://github.com/TwidereProject/TwidereX-Android) ([F-Droid](https://f-droid.org/en/packages/com.twidere.twiderex/), [Google Play](https://play.google.com/store/apps/details?id=com.twidere.twiderex))
 * [Yuito](https://github.com/accelforce/Yuito) ([Google Play](https://play.google.com/store/apps/details?id=net.accelf.yuito))
 
-#### SailfishOS
-
-* [Friendly](https://openrepos.net/content/fabrixxm/friendly), last update: 2018
-
 #### iOS
 
 * [B4X for Pleroma & Mastodon](https://github.com/AnywhereSoftware/B4X-Pleroma) ([AppStore](https://apps.apple.com/app/b4x-pleroma/id1538396871))
-* [Fedi](https://fediapp.com) ([AppStore](https://apps.apple.com/de/app/fedi-for-pleroma-and-mastodon/id1478806281))
+* [Fedi](https://github.com/Big-Fig/Fediverse.app) ([AppStore](https://apps.apple.com/de/app/fedi-for-pleroma-and-mastodon/id1478806281))
 * [Mastodon for iPhone and iPad](https://joinmastodon.org/apps) ([AppStore](https://apps.apple.com/us/app/mastodon-for-iphone/id1571998974))
 * [Stella*](https://www.stella-app.net/) ([AppStore](https://apps.apple.com/us/app/stella-for-mastodon-twitter/id921372048))
 * [Tooot](https://github.com/tooot-app) ([AppStore](https://apps.apple.com/app/id1549772269), Data collection (not linked to identity)
@@ -207,18 +203,19 @@ The available features are client specific and may differ.
 #### Linux
 
 * [Choqok](https://choqok.kde.org)
-* [Whalebird](https://whalebird.social)
-* [TheDesk](https://ja.mstdn.wiki/TheDesk)
+* [Whalebird](https://whalebird.social/en/desktop/contents) ([GitHub](https://github.com/h3poteto/whalebird-desktop))
+* [TheDesk](https://thedesk.top/en/) ([GitHub](https://github.com/cutls/TheDesk))
 * [Toot](https://toot.readthedocs.io/en/latest/)
 * [Tootle](https://github.com/bleakgrey/tootle)
 
 #### macOS
 
-* [Mastonaut](https://mastonaut.app/) ([AppStore](https://apps.apple.com/us/app/mastonaut/id1450757574)), closed source
+* [TheDesk](https://thedesk.top/en/) ([GitHub](https://github.com/cutls/TheDesk))
 * [Whalebird](https://whalebird.social/en/desktop/contents) ([AppStore](https://apps.apple.com/de/app/whalebird/id1378283354), [GitHub](https://github.com/h3poteto/whalebird-desktop))
 
 #### Windows
 
+* [TheDesk](https://thedesk.top/en/) ([GitHub](https://github.com/cutls/TheDesk))
 * [Whalebird](https://whalebird.social/en/desktop/contents) ([Website Download](https://whalebird.social/en/desktop/contents/downloads#windows), [GitHub](https://github.com/h3poteto/whalebird-desktop))
 
 #### Web Frontend

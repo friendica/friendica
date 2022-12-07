@@ -462,7 +462,7 @@ class Worker
 			return false;
 		}
 
-		$load = System::getLoadAvg();
+		$load = System::getLoadAvg($processes_cooldown != 0);
 		if (empty($load)) {
 			return false;
 		}
@@ -508,7 +508,7 @@ class Worker
 
 		$sleeping = false;
 
-		while ($load = System::getLoadAvg()) {
+		while ($load = System::getLoadAvg($processes_cooldown != 0)) {
 			if (($load_cooldown > 0) && ($load['average1'] > $load_cooldown)) {
 				if (!$sleeping) {
 					Logger::notice('Load induced pre execution cooldown.', ['max' => $load_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
