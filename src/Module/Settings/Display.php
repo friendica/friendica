@@ -49,7 +49,7 @@ class Display extends BaseSettings
 		$mobile_theme           = !empty($_POST['mobile_theme'])           ? trim($_POST['mobile_theme'])         : '';
 		$enable_smile           = !empty($_POST['enable_smile'])           ? intval($_POST['enable_smile'])       : 0;
 		$first_day_of_week      = !empty($_POST['first_day_of_week'])      ? intval($_POST['first_day_of_week'])  : 0;
-		$calendar_defaultView   = !empty($_POST['calendar_defaultView'])   ? trim($_POST['calendar_defaultView']): 'listMonth';
+		$calendar_defaultView   = !empty($_POST['calendar_defaultView'])   ? trim($_POST['calendar_defaultView']): 'month';
 		$infinite_scroll        = !empty($_POST['infinite_scroll'])        ? intval($_POST['infinite_scroll'])    : 0;
 		$no_auto_update         = !empty($_POST['no_auto_update'])         ? intval($_POST['no_auto_update'])     : 0;
 		$enable_smart_threading = !empty($_POST['enable_smart_threading']) ? intval($_POST['enable_smart_threading']) : 0;
