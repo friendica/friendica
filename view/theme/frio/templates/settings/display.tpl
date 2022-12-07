@@ -85,6 +85,7 @@
 				<div id="calendar-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="calendar-settings">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$first_day_of_week}}
+						{{include file="field_select.tpl" field=$calendar_defaultView}}
 					</div>
 					<div class="panel-footer">
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>

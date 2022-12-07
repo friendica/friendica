@@ -63,6 +63,7 @@
 	aStr.dtendLabel = '{{$i18n.dtend_label|escape:'quotes'}}';
 	aStr.locationLabel = '{{$i18n.location_label|escape:'quotes'}}';
 
+	aStr.defaultView = '{{$i18n.defaultView|escape:'quotes'}}';
 	var calendar_api = '{{$calendar_api}}';
 	var event_api = '{{$event_api}}';
 

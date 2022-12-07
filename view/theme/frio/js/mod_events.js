@@ -39,7 +39,7 @@ $(document).ready(function () {
 				});
 			}
 		},
-		defaultView: "month",
+		defaultView: aStr.defaultView,
 		aspectRatio: 1,
 		eventRender: function (event, element, view) {
 			switch (view.name) {

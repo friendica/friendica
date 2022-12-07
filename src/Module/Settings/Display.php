@@ -49,6 +49,7 @@ class Display extends BaseSettings
 		$mobile_theme           = !empty($_POST['mobile_theme'])           ? trim($_POST['mobile_theme'])         : '';
 		$enable_smile           = !empty($_POST['enable_smile'])           ? intval($_POST['enable_smile'])       : 0;
 		$first_day_of_week      = !empty($_POST['first_day_of_week'])      ? intval($_POST['first_day_of_week'])  : 0;
+		$calendar_defaultView   = !empty($_POST['calendar_defaultView'])   ? trim($_POST['calendar_defaultView']): 'listMonth';
 		$infinite_scroll        = !empty($_POST['infinite_scroll'])        ? intval($_POST['infinite_scroll'])    : 0;
 		$no_auto_update         = !empty($_POST['no_auto_update'])         ? intval($_POST['no_auto_update'])     : 0;
 		$enable_smart_threading = !empty($_POST['enable_smart_threading']) ? intval($_POST['enable_smart_threading']) : 0;
@@ -91,6 +92,7 @@ class Display extends BaseSettings
 		DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'display_resharer'        , $display_resharer);
 		DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'stay_local'              , $stay_local);
 		DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'first_day_of_week'       , $first_day_of_week);
+		DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'calendar_defaultView'    , $calendar_defaultView);
 
 		if (in_array($theme, Theme::getAllowedList())) {
 			if ($theme == $user['theme']) {
@@ -176,7 +178,6 @@ class Display extends BaseSettings
 		$display_resharer       =  DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'display_resharer', 0);
 		$stay_local             =  DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local', 0);
 
-
 		$first_day_of_week = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'first_day_of_week', 0);
 		$weekdays = [
 			0 => DI::l10n()->t("Sunday"),
@@ -186,6 +187,14 @@ class Display extends BaseSettings
 			4 => DI::l10n()->t("Thursday"),
 			5 => DI::l10n()->t("Friday"),
 			6 => DI::l10n()->t("Saturday")
+		];
+
+		$calendar_defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'calendar_defaultView', 'month');
+		$calendarViews = [
+			'month'		=> DI::l10n()->t("month"),
+			'agendaWeek'=> DI::l10n()->t("week"),
+			'agendaDay'	=> DI::l10n()->t("day"),
+			'listMonth' => DI::l10n()->t("list")
 		];
 
 		$theme_config = '';
@@ -224,6 +233,7 @@ class Display extends BaseSettings
 			'$stay_local'               => ['stay_local'              , DI::l10n()->t('Stay local'), $stay_local, DI::l10n()->t("Don't go to a remote system when following a contact link.")],
 
 			'$first_day_of_week' => ['first_day_of_week', DI::l10n()->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
+			'calendar_defaultView' => ['calendar_defaultView', DI::l10n()->t('Default calendar view:'), $calendar_defaultView, '', $calendarViews, false],
 		]);
 
 		return $o;

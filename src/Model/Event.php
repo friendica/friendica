@@ -412,10 +412,12 @@ class Event
 	public static function getStrings(): array
 	{
 		// First day of the week (0 = Sunday).
-		$firstDay = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'first_day_of_week', 0);
+		$firstDay		= DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'first_day_of_week', 0);
+		$calendar_defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'calendar_defaultView', 'listMonth');
 
 		$i18n = [
 			"firstDay" => $firstDay,
+			"defaultView" => $calendar_defaultView,
 			"allday"   => DI::l10n()->t("all-day"),
 
 			"Sun" => DI::l10n()->t("Sun"),
