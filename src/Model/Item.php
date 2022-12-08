@@ -3387,6 +3387,7 @@ class Item
 		DI::profiler()->stopRecording();
 
 		if (isset($data['url']) && !in_array(strtolower($data['url']), $ignore_links)) {
+			$rendered = '';
 			if (!empty($data['description']) || !empty($data['image']) || !empty($data['preview'])) {
 				$parts = parse_url($data['url']);
 				if (!empty($parts['scheme']) && !empty($parts['host'])) {
