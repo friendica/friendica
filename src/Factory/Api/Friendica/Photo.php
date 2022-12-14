@@ -74,8 +74,9 @@ class Photo extends BaseFactory
 		if (empty($photos)) {
 			throw new HTTPException\NotFoundException();
 		}
-		$data       = $photos[0];
-		$data['id'] = $data['resource-id'];
+		$data           = $photos[0];
+		$data['int_id'] = $data['id'];
+		$data['id']     = $data['resource-id'];
 		if (is_int($scale)) {
 			$data['data'] = base64_encode(ModelPhoto::getImageDataForPhoto($data));
 		} else {
