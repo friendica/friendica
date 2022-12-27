@@ -98,10 +98,7 @@ return [
 		],
 	],
 	Config\Capability\IManageConfigValues::class => [
-		'instanceOf' => Config\Factory\Config::class,
-		'call'       => [
-			['create', [], Dice::CHAIN_CALL],
-		],
+		'instanceOf' => Config\Model\Config::class,
 	],
 	PConfig\Capability\IManagePersonalConfigValues::class => [
 		'instanceOf' => PConfig\Factory\PConfig::class,
