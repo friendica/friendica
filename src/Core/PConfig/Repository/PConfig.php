@@ -22,7 +22,7 @@
 namespace Friendica\Core\PConfig\Repository;
 
 use Friendica\App\Mode;
-use Friendica\Core\Config\Util\ValueConversion;
+use Friendica\Core\PConfig\Util\ValueConversion;
 use Friendica\Core\PConfig\Exception\PConfigPersistenceException;
 use Friendica\Database\Database;
 

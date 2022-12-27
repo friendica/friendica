@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Core\Config\Util;
+namespace Friendica\Core\PConfig\Util;
 
 /**
  * Util class to help to convert from/to (p)config values
