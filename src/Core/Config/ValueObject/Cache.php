@@ -182,6 +182,8 @@ class Cache
 			$key == 'password' &&
 			is_string($value)) {
 			$this->config[$cat][$key] = new HiddenString((string)$value);
+		} else if (is_string($value)) {
+			$this->config[$cat][$key] = self::toConfigValue($value);
 		} else {
 			$this->config[$cat][$key] = $value;
 		}
@@ -189,6 +191,35 @@ class Cache
 		$this->source[$cat][$key] = $source;
 
 		return true;
+	}
+
+	/**
+	 * Formats a DB value to a config value
+	 * - null   = The db-value isn't set
+	 * - bool   = The db-value is either '0' or '1'
+	 * - array  = The db-value is a serialized array
+	 * - string = The db-value is a string
+	 *
+	 * Keep in mind that there aren't any numeric/integer config values in the database
+	 *
+	 * @param string|null $value
+	 *
+	 * @return null|array|string
+	 */
+	public static function toConfigValue(?string $value)
+	{
+		if (!isset($value)) {
+			return null;
+		}
+
+		switch (true) {
+			// manage array value
+			case preg_match("|^a:[0-9]+:{.*}$|s", $value):
+				return unserialize($value);
+
+			default:
+				return $value;
+		}
 	}
 
 	/**
