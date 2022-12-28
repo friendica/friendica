@@ -26,6 +26,7 @@ use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Module\Api\GNUSocial\GNUSocial\Config;
 use Friendica\Test\src\Module\Api\ApiTest;
+use Friendica\Test\Util\VFSTrait;
 
 class ConfigTest extends ApiTest
 {

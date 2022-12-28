@@ -52,10 +52,7 @@ class DBATest extends DatabaseTest
 	 */
 	public function testExists() {
 
-		self::assertTrue(DBA::exists('config', []));
+		self::assertTrue(DBA::exists('user', []));
 		self::assertFalse(DBA::exists('notable', []));
-
-		self::assertTrue(DBA::exists('config', ['k' => 'hostname']));
-		self::assertFalse(DBA::exists('config', ['k' => 'nonsense']));
 	}
 }

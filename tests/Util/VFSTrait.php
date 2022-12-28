@@ -54,6 +54,21 @@ trait VFSTrait
 		$this->setConfigFile('defaults.config.php', true);
 		$this->setConfigFile('settings.config.php', true);
 		$this->setConfigFile('local.config.php');
+		$this->setDataFile('data.json');
+	}
+
+	protected function setDataFile(string $filename)
+	{
+		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
+				'datasets' . DIRECTORY_SEPARATOR .
+				'config' . DIRECTORY_SEPARATOR .
+				$filename;
+
+		if (file_exists($file)) {
+			vfsStream::newFile($filename)
+				->at($this->root->getChild('config'))
+				->setContent(file_get_contents($file));
+		}
 	}
 
 	/**

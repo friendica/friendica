@@ -199,24 +199,34 @@ class BaseURLTest extends MockedTest
 		$configMock->shouldReceive('get')->with('system', 'ssl_policy')->andReturn($input['sslPolicy']);
 		$configMock->shouldReceive('get')->with('system', 'url')->andReturn($input['url']);
 
+		$savable = false;
+
 		// If we don't have an urlPath as an input, we assert it, we will save it to the DB for the next time
 		if (!isset($input['urlPath']) && isset($assert['urlPath'])) {
-			$configMock->shouldReceive('set')->with('system', 'urlpath', $assert['urlPath'])->once();
+			$configMock->shouldReceive('set')->with('system', 'urlpath', $assert['urlPath'], false)->once();
+			$savable = true;
 		}
 
 		// If we don't have the ssl_policy as an input, we assert it, we will save it to the DB for the next time
 		if (!isset($input['sslPolicy']) && isset($assert['sslPolicy'])) {
-			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $assert['sslPolicy'])->once();
+			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $assert['sslPolicy'], false)->once();
+			$savable = true;
 		}
 
 		// If we don't have the hostname as an input, we assert it, we will save it to the DB for the next time
 		if (empty($input['hostname']) && !empty($assert['hostname'])) {
-			$configMock->shouldReceive('set')->with('config', 'hostname', $assert['hostname'])->once();
+			$configMock->shouldReceive('set')->with('config', 'hostname', $assert['hostname'], false)->once();
+			$savable = true;
 		}
 
 		// If we don't have an URL at first, but we assert it, we will save it to the DB for the next time
 		if (empty($input['url']) && !empty($assert['url'])) {
-			$configMock->shouldReceive('set')->with('system', 'url', $assert['url'])->once();
+			$configMock->shouldReceive('set')->with('system', 'url', $assert['url'], false)->once();
+			$savable = true;
+		}
+
+		if ($savable) {
+			$configMock->shouldReceive('save')->once();
 		}
 
 		$baseUrl = new BaseURL($configMock, $server);
@@ -325,18 +335,20 @@ class BaseURLTest extends MockedTest
 		$baseUrl = new BaseURL($configMock, []);
 
 		if (isset($save['hostname'])) {
-			$configMock->shouldReceive('set')->with('config', 'hostname', $save['hostname'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('config', 'hostname', $save['hostname'], false)->andReturn(true)->once();
 		}
 
 		if (isset($save['urlPath'])) {
-			$configMock->shouldReceive('set')->with('system', 'urlpath', $save['urlPath'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('system', 'urlpath', $save['urlPath'], false)->andReturn(true)->once();
 		}
 
 		if (isset($save['sslPolicy'])) {
-			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $save['sslPolicy'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $save['sslPolicy'], false)->andReturn(true)->once();
 		}
 
-		$configMock->shouldReceive('set')->with('system', 'url', $url)->andReturn(true)->once();
+		$configMock->shouldReceive('set')->with('system', 'url', $url, false)->andReturn(true)->once();
+
+		$configMock->shouldReceive('save')->once();
 
 		$baseUrl->save($save['hostname'], $save['sslPolicy'], $save['urlPath']);
 
@@ -363,18 +375,20 @@ class BaseURLTest extends MockedTest
 		$baseUrl = new BaseURL($configMock, []);
 
 		if (isset($save['hostname'])) {
-			$configMock->shouldReceive('set')->with('config', 'hostname', $save['hostname'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('config', 'hostname', $save['hostname'], false)->andReturn(true)->once();
 		}
 
 		if (isset($save['urlPath'])) {
-			$configMock->shouldReceive('set')->with('system', 'urlpath', $save['urlPath'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('system', 'urlpath', $save['urlPath'], false)->andReturn(true)->once();
 		}
 
 		if (isset($save['sslPolicy'])) {
-			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $save['sslPolicy'])->andReturn(true)->once();
+			$configMock->shouldReceive('set')->with('system', 'ssl_policy', $save['sslPolicy'], false)->andReturn(true)->once();
 		}
 
-		$configMock->shouldReceive('set')->with('system', 'url', $url)->andReturn(true)->once();
+		$configMock->shouldReceive('set')->with('system', 'url', $url, false)->andReturn(true)->once();
+
+		$configMock->shouldReceive('save')->once();
 
 		$baseUrl->saveByURL($url);
 
@@ -531,22 +545,25 @@ class BaseURLTest extends MockedTest
 
 		switch ($fail) {
 			case 'hostname':
-				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any())->andReturn(false)->once();
+				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any(), false)->andReturn(false)->once();
 				break;
 			case 'sslPolicy':
-				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any())->andReturn(false)->once();
+				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any(), false)->andReturn(false)->once();
+				$configMock->shouldReceive('save')->once();
 				break;
 			case 'urlPath':
-				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'urlpath', \Mockery::any())->andReturn(false)->once();
+				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'urlpath', \Mockery::any(), false)->andReturn(false)->once();
+				$configMock->shouldReceive('save')->once();
 				break;
 			case 'url':
-				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'urlpath', \Mockery::any())->andReturn(true)->twice();
-				$configMock->shouldReceive('set')->with('system', 'url', \Mockery::any())->andReturn(false)->once();
+				$configMock->shouldReceive('set')->with('config', 'hostname', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'ssl_policy', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'urlpath', \Mockery::any(), false)->andReturn(true)->twice();
+				$configMock->shouldReceive('set')->with('system', 'url', \Mockery::any(), false)->andReturn(false)->once();
+				$configMock->shouldReceive('save')->once();
 				break;
 		}
 

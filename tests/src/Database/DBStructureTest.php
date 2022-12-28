@@ -44,30 +44,30 @@ class DBStructureTest extends DatabaseTest
 	 * @small
 	 */
 	public function testExists() {
-		self::assertTrue(DBStructure::existsTable('config'));
+		self::assertTrue(DBStructure::existsTable('user'));
 		self::assertFalse(DBStructure::existsTable('notatable'));
 
-		self::assertTrue(DBStructure::existsColumn('config', ['k']));
-		self::assertFalse(DBStructure::existsColumn('config', ['nonsense']));
-		self::assertFalse(DBStructure::existsColumn('config', ['k', 'nonsense']));
+		self::assertTrue(DBStructure::existsColumn('user', ['uid']));
+		self::assertFalse(DBStructure::existsColumn('user', ['nonsense']));
+		self::assertFalse(DBStructure::existsColumn('user', ['uid', 'nonsense']));
 	}
 
 	/**
 	 * @small
 	 */
 	public function testRename() {
-		$fromColumn = 'k';
-		$toColumn = 'key';
-		$fromType = 'varbinary(255) not null';
-		$toType = 'varbinary(255) not null comment \'Test To Type\'';
+		$fromColumn = 'email';
+		$toColumn = 'email_key';
+		$fromType = 'varchar(255) NOT NULL DEFAULT \'\' COMMENT \'the users email address\'';
+		$toType = 'varchar(255) NOT NULL DEFAULT \'\' COMMENT \'Adapted column\'';
 
-		self::assertTrue(DBStructure::rename('config', [ $fromColumn => [ $toColumn, $toType ]]));
-		self::assertTrue(DBStructure::existsColumn('config', [ $toColumn ]));
-		self::assertFalse(DBStructure::existsColumn('config', [ $fromColumn ]));
+		self::assertTrue(DBStructure::rename('user', [ $fromColumn => [ $toColumn, $toType ]]));
+		self::assertTrue(DBStructure::existsColumn('user', [ $toColumn ]));
+		self::assertFalse(DBStructure::existsColumn('user', [ $fromColumn ]));
 
-		self::assertTrue(DBStructure::rename('config', [ $toColumn => [ $fromColumn, $fromType ]]));
-		self::assertTrue(DBStructure::existsColumn('config', [ $fromColumn ]));
-		self::assertFalse(DBStructure::existsColumn('config', [ $toColumn ]));
+		self::assertTrue(DBStructure::rename('user', [ $toColumn => [ $fromColumn, $fromType ]]));
+		self::assertTrue(DBStructure::existsColumn('user', [ $fromColumn ]));
+		self::assertFalse(DBStructure::existsColumn('user', [ $toColumn ]));
 	}
 
 	/**

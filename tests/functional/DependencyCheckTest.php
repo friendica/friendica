@@ -31,7 +31,7 @@ use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Database\Database;
 use Friendica\Test\Util\VFSTrait;
 use Friendica\Util\BasePath;
-use Friendica\Core\Config\Util\ConfigFileLoader;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Util\Profiler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -73,13 +73,13 @@ class DependencyCheckTest extends TestCase
 	 */
 	public function testConfigFileLoader()
 	{
-		/** @var ConfigFileLoader $configFileLoader */
-		$configFileLoader = $this->dice->create(ConfigFileLoader::class);
+		/** @var ConfigFileManager $configFileManager */
+		$configFileManager = $this->dice->create(ConfigFileManager::class);
 
-		self::assertInstanceOf(ConfigFileLoader::class, $configFileLoader);
+		self::assertInstanceOf(ConfigFileManager::class, $configFileManager);
 
 		$configCache = new Cache();
-		$configFileLoader->setupCache($configCache);
+		$configFileManager->setupCache($configCache);
 
 		self::assertNotEmpty($configCache->getAll());
 		self::assertArrayHasKey('database', $configCache->getAll());

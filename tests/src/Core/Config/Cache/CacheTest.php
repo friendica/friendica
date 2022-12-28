@@ -84,7 +84,7 @@ class CacheTest extends MockedTest
 		];
 
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA);
 		// doesn't override - Low Priority due Config file
 		$configCache->load($override, \Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE);
 
@@ -97,7 +97,7 @@ class CacheTest extends MockedTest
 		self::assertEquals($override['system']['boolTrue'], $configCache->get('system', 'boolTrue'));
 
 		// Don't overwrite server ENV variables - even in load mode
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA);
 
 		self::assertEquals($override['system']['test'], $configCache->get('system', 'test'));
 		self::assertEquals($override['system']['boolTrue'], $configCache->get('system', 'boolTrue'));
@@ -328,18 +328,34 @@ class CacheTest extends MockedTest
 	{
 
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA);
 
 		// test with wrong override
 		self::assertFalse($configCache->set('system', 'test', '1234567', \Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE));
 		self::assertEquals($data['system']['test'], $configCache->get('system', 'test'));
 
 		// test with override (equal)
-		self::assertTrue($configCache->set('system', 'test', '8910', \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB));
+		self::assertTrue($configCache->set('system', 'test', '8910', \Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA));
 		self::assertEquals('8910', $configCache->get('system', 'test'));
 
 		// test with override (over)
 		self::assertTrue($configCache->set('system', 'test', '111213', \Friendica\Core\Config\ValueObject\Cache::SOURCE_ENV));
 		self::assertEquals('111213', $configCache->get('system', 'test'));
+	}
+
+	/**
+	 * @dataProvider dataTests
+	 *
+	 * @return void
+	 */
+	public function testSetData($data)
+	{
+		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE);
+
+		$configCache->set('system', 'test_2','with_data', \Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA);
+
+		$this->assertEquals(['system' => ['test_2' => 'with_data']], $configCache->getDataBySource(\Friendica\Core\Config\ValueObject\Cache::SOURCE_DATA));
+		$this->assertEquals($data, $configCache->getDataBySource(\Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE));
 	}
 }

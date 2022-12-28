@@ -24,7 +24,10 @@ namespace Friendica\Test\src\Core\Lock;
 use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Config\Model\Config;
 use Friendica\Core\Config\Type\JitConfig;
+use Friendica\Core\Config\Util\ConfigFileManager;
+use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Lock\Type\SemaphoreLock;
 use Friendica\Core\System;
 use Friendica\DI;
@@ -42,11 +45,8 @@ class SemaphoreLockTest extends LockTest
 		$app->shouldReceive('getHostname')->andReturn('friendica.local');
 		$dice->shouldReceive('create')->with(App::class)->andReturn($app);
 
-		$configMock = Mockery::mock(JitConfig::class);
-		$configMock
-			->shouldReceive('get')
-			->with('system', 'temppath')
-			->andReturn('/tmp/');
+		$configCache = new Cache(['system' => ['temppath' => '/tmp']]);
+		$configMock = new Config(Mockery::mock(ConfigFileManager::class), $configCache);
 		$dice->shouldReceive('create')->with(IManageConfigValues::class)->andReturn($configMock);
 
 		// @todo Because "get_temppath()" is using static methods, we have to initialize the BaseObject

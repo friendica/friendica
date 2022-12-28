@@ -25,20 +25,24 @@ namespace Friendica\Test;
 use Dice\Dice;
 use Friendica\App\Arguments;
 use Friendica\App\Router;
+use Friendica\Core\Config\Factory\Config;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
-use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Type\Memory;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Test\Util\Database\StaticDatabase;
+use Friendica\Test\Util\VFSTrait;
 
 /**
  * Parent class for test cases requiring fixtures
  */
 abstract class FixtureTest extends DatabaseTest
 {
+	use VFSTrait;
+
 	/** @var Dice */
 	protected $dice;
 
@@ -47,6 +51,8 @@ abstract class FixtureTest extends DatabaseTest
 	 */
 	protected function setUp(): void
 	{
+		$this->setUpVfsDir();
+
 		parent::setUp();
 
 		$server                   = $_SERVER;
@@ -54,6 +60,10 @@ abstract class FixtureTest extends DatabaseTest
 
 		$this->dice = (new Dice())
 			->addRules(include __DIR__ . '/../static/dependencies.config.php')
+			->addRule(ConfigFileManager::class, [
+				'instanceOf' => Config::class,
+				'call'       => [['createConfigFileLoader', [$this->root->url(), $server,],
+								  Dice::CHAIN_CALL]]])
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
 			->addRule(Arguments::class, [
@@ -64,7 +74,6 @@ abstract class FixtureTest extends DatabaseTest
 			]);
 		DI::init($this->dice);
 
-		/** @var IManageConfigValues $config */
 		$configCache = $this->dice->create(Cache::class);
 		$configCache->set('database', 'disable_pdo', true);
 
