@@ -149,16 +149,7 @@ class Mode
 
 		$mode |= Mode::DBAVAILABLE;
 
-		if ($database->fetchFirst("SHOW TABLES LIKE 'config'") === false) {
-			return new Mode($mode);
-		}
-
-		$mode |= Mode::DBCONFIGAVAILABLE;
-
-		if (!empty($configCache->get('system', 'maintenance')) ||
-		    // Don't use Config or Configuration here because we're possibly BEFORE initializing the Configuration,
-		    // so this could lead to a dependency circle
-		    !empty($database->selectFirst('config', ['v'], ['cat' => 'system', 'k' => 'maintenance'])['v'])) {
+		if (!empty($configCache->get('system', 'maintenance'))) {
 			return new Mode($mode);
 		}
 
@@ -232,14 +223,14 @@ class Mode
 	}
 
 	/**
-	 * Install mode is when the local config file is missing or the DB schema hasn't been installed yet.
+	 * Install mode is when the local config file is missing or the database isn't available.
 	 *
 	 * @return bool Whether installation mode is active (local/database configuration files present or not)
 	 */
 	public function isInstall(): bool
 	{
 		return !$this->has(Mode::LOCALCONFIGPRESENT) ||
-		       !$this->has(MODE::DBCONFIGAVAILABLE);
+		       !$this->has(MODE::DBAVAILABLE);
 	}
 
 	/**
@@ -251,7 +242,6 @@ class Mode
 	{
 		return $this->has(Mode::LOCALCONFIGPRESENT) &&
 		       $this->has(Mode::DBAVAILABLE) &&
-		       $this->has(Mode::DBCONFIGAVAILABLE) &&
 		       $this->has(Mode::MAINTENANCEDISABLED);
 	}
 

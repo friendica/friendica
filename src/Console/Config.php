@@ -115,10 +115,6 @@ HELP;
 			throw new CommandArgsException('Too many arguments');
 		}
 
-		if (!$this->appMode->has(App\Mode::DBCONFIGAVAILABLE)) {
-			$this->out('Database isn\'t ready or populated yet, showing file config only');
-		}
-
 		if (count($this->args) == 3) {
 			$cat = $this->getArgument(0);
 			$key = $this->getArgument(1);
@@ -179,10 +175,6 @@ HELP;
 
 		if (count($this->args) == 0) {
 			$this->config->reload();
-
-			if ($this->config->get('system', 'config_adapter') == 'jit' && $this->appMode->has(App\Mode::DBCONFIGAVAILABLE)) {
-				$this->out('Warning: The JIT (Just In Time) Config adapter doesn\'t support loading the entire configuration, showing file config only');
-			}
 
 			$config = $this->config->getCache()->getAll();
 			foreach ($config as $cat => $section) {
