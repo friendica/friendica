@@ -72,7 +72,8 @@
 		"npm-asset/textcomplete": "^0.18.2",
 		"npm-asset/typeahead.js": "^0.11.1",
 		"kornrunner/blurhash": "^1.2",
-		"psr/clock": "^1.0"
+		"psr/clock": "^1.0",
+		"nette/neon": "^3.3"
 	},
 	"repositories": [
 		{
