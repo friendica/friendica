@@ -81,21 +81,4 @@ class Config
 
 		return $configCache;
 	}
-
-	/**
-	 * @param Cache $configCache The config cache of this adapter
-	 * @param Repository\Config $configRepo  The configuration repository
-	 *
-	 * @return Capability\IManageConfigValues
-	 */
-	public function create(Util\ConfigFileManager $loader, Cache $configCache, Repository\Config $configRepo)
-	{
-		if ($configCache->get('system', 'config_adapter') === 'preload') {
-			$configuration = new Type\PreloadConfig($loader, $configCache, $configRepo);
-		} else {
-			$configuration = new Type\JitConfig($loader, $configCache, $configRepo);
-		}
-
-		return $configuration;
-	}
 }

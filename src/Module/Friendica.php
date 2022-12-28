@@ -157,7 +157,7 @@ class Friendica extends BaseModule
 
 		$visible_addons = Addon::getVisibleList();
 
-		$config->load('feature_lock');
+		$config->reload();
 		$locked_features = [];
 		$featureLocks = $config->get('config', 'feature_lock');
 		if (isset($featureLocks)) {

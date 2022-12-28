@@ -99,6 +99,9 @@ return [
 	],
 	Config\Capability\IManageConfigValues::class => [
 		'instanceOf' => Config\Model\Config::class,
+		'constructParams' => [
+			$_SERVER,
+		],
 	],
 	PConfig\Capability\IManagePersonalConfigValues::class => [
 		'instanceOf' => PConfig\Factory\PConfig::class,

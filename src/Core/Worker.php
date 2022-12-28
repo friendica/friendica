@@ -331,7 +331,7 @@ class Worker
 		$mypid = getmypid();
 
 		// Quit when in maintenance
-		if (DI::config()->get('system', 'maintenance', false, true)) {
+		if (DI::config()->get('system', 'maintenance', false)) {
 			Logger::notice('Maintenance mode - quit process', ['pid' => $mypid]);
 			return false;
 		}

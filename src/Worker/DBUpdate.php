@@ -32,7 +32,7 @@ class DBUpdate
 	public static function execute()
 	{
 		// Just in case the last update wasn't failed
-		if (DI::config()->get('system', 'update', Update::SUCCESS, true) != Update::FAILED) {
+		if (DI::config()->get('system', 'update', Update::SUCCESS) != Update::FAILED) {
 			Update::run(DI::app()->getBasePath());
 		}
 	}

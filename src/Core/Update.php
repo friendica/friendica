@@ -54,7 +54,7 @@ class Update
 		}
 
 		// Don't check the status if the last update was failed
-		if (DI::config()->get('system', 'update', Update::SUCCESS, true) == Update::FAILED) {
+		if (DI::config()->get('system', 'update', Update::SUCCESS) == Update::FAILED) {
 			return;
 		}
 
@@ -119,7 +119,7 @@ class Update
 			DI::lock()->release('dbupdate', true);
 		}
 
-		$build = DI::config()->get('system', 'build', null, true);
+		$build = DI::config()->get('system', 'build', null);
 
 		if (empty($build) || ($build > DB_UPDATE_VERSION)) {
 			$build = DB_UPDATE_VERSION - 1;
@@ -132,7 +132,7 @@ class Update
 			$stored = intval($build);
 			$current = intval(DB_UPDATE_VERSION);
 			if ($stored < $current || $force) {
-				DI::config()->load('database');
+				DI::config()->reload();
 
 				// Compare the current structure with the defined structure
 				// If the Lock is acquired, never release it automatically to avoid double updates
@@ -141,7 +141,7 @@ class Update
 					Logger::notice('Update starting.', ['from' => $stored, 'to' => $current]);
 
 					// Checks if the build changed during Lock acquiring (so no double update occurs)
-					$retryBuild = DI::config()->get('system', 'build', null, true);
+					$retryBuild = DI::config()->get('system', 'build', null);
 					if ($retryBuild !== $build) {
 						Logger::notice('Update already done.', ['from' => $stored, 'to' => $current]);
 						DI::lock()->release('dbupdate');

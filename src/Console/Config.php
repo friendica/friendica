@@ -157,7 +157,7 @@ HELP;
 
 		if (count($this->args) == 1) {
 			$cat = $this->getArgument(0);
-			$this->config->load($cat);
+			$this->config->reload();
 			$configCache = $this->config->getCache();
 
 			if ($configCache->get($cat) !== null) {
@@ -178,7 +178,7 @@ HELP;
 		}
 
 		if (count($this->args) == 0) {
-			$this->config->load();
+			$this->config->reload();
 
 			if ($this->config->get('system', 'config_adapter') == 'jit' && $this->appMode->has(App\Mode::DBCONFIGAVAILABLE)) {
 				$this->out('Warning: The JIT (Just In Time) Config adapter doesn\'t support loading the entire configuration, showing file config only');

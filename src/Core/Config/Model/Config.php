@@ -22,6 +22,8 @@
 namespace Friendica\Core\Config\Model;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Config\Exception\ConfigFileException;
+use Friendica\Core\Config\Exception\ConfigPersistenceException;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 
@@ -38,14 +40,19 @@ class Config implements IManageConfigValues
 	/** @var ConfigFileManager */
 	protected $configFileManager;
 
+	/** @var array */
+	protected $server;
+
 	/**
 	 * @param ConfigFileManager $configFileManager The configuration file manager to save back configs
-	 * @param Cache  $configCache The configuration cache (based on the config-files)
+	 * @param Cache             $configCache       The configuration cache (based on the config-files)
+	 * @param array             $server            The $_SERVER variable
 	 */
-	public function __construct(ConfigFileManager $configFileManager, Cache $configCache)
+	public function __construct(ConfigFileManager $configFileManager, Cache $configCache, array $server = [])
 	{
 		$this->configFileManager = $configFileManager;
 		$this->configCache       = $configCache;
+		$this->server            = $server;
 	}
 
 	/**
@@ -56,24 +63,36 @@ class Config implements IManageConfigValues
 		return $this->configCache;
 	}
 
+	/** {@inheritDoc} */
 	public function save()
 	{
-		$this->configFileManager->saveData($this->configCache);
+		try {
+			$this->configFileManager->saveData($this->configCache);
+		} catch (ConfigFileException $e) {
+			throw new ConfigPersistenceException('Cannot save config', $e);
+		}
 	}
 
-	public function load(string $cat = 'config')
+	/** {@inheritDoc} */
+	public function reload()
 	{
 		$configCache = new Cache();
 
-		$this->configFileManager->setupCache($configCache, $_SERVER);
+		try {
+			$this->configFileManager->setupCache($configCache, $this->server);
+		} catch (ConfigFileException $e) {
+			throw new ConfigPersistenceException('Cannot reload config', $e);
+		}
 		$this->configCache = $configCache;
 	}
 
-	public function get(string $cat, string $key, $default_value = null, bool $refresh = false)
+	/** {@inheritDoc} */
+	public function get(string $cat, string $key, $default_value = null)
 	{
 		return $this->configCache->get($cat, $key) ?? $default_value;
 	}
 
+	/** {@inheritDoc} */
 	public function set(string $cat, string $key, $value, bool $autosave = true): bool
 	{
 		$stored = $this->configCache->set($cat, $key, $value, Cache::SOURCE_DATA);
@@ -85,6 +104,7 @@ class Config implements IManageConfigValues
 		return $stored;
 	}
 
+	/** {@inheritDoc} */
 	public function delete(string $cat, string $key, bool $autosave = true): bool
 	{
 		$removed = $this->configCache->delete($cat, $key);

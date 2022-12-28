@@ -71,7 +71,7 @@ if (DI::mode()->isInstall()) {
 
 DI::mode()->setExecutor(Mode::DAEMON);
 
-DI::config()->load();
+DI::config()->reload();
 
 if (empty(DI::config()->get('system', 'pidfile'))) {
 	die(<<<TXT
