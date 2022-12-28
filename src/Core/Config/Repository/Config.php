@@ -51,7 +51,7 @@ class Config
 	 */
 	public function isConnected(): bool
 	{
-		return $this->db->isConnected() && !$this->mode->isInstall();
+		return true;
 	}
 
 	/**
@@ -65,31 +65,7 @@ class Config
 	 */
 	public function load(?string $cat = null): array
 	{
-		$return = [];
-
-		try {
-			if (empty($cat)) {
-				$configs = $this->db->select(static::$table_name, ['cat', 'v', 'k']);
-			} else {
-				$configs = $this->db->select(static::$table_name, ['cat', 'v', 'k'], ['cat' => $cat]);
-			}
-
-			while ($config = $this->db->fetch($configs)) {
-				$key   = $config['k'];
-				$value = ValueConversion::toConfigValue($config['v']);
-
-				// just save it in case it is set
-				if (isset($value)) {
-					$return[$config['cat']][$key] = $value;
-				}
-			}
-		} catch (\Exception $exception) {
-			throw new ConfigPersistenceException(sprintf('Cannot load config category %s', $cat), $exception);
-		} finally {
-			$this->db->close($configs);
-		}
-
-		return $return;
+		return [];
 	}
 
 	/**
@@ -107,24 +83,6 @@ class Config
 	 */
 	public function get(string $cat, string $key)
 	{
-		if (!$this->isConnected()) {
-			return null;
-		}
-
-		try {
-			$config = $this->db->selectFirst(static::$table_name, ['v'], ['cat' => $cat, 'k' => $key]);
-			if ($this->db->isResult($config)) {
-				$value = ValueConversion::toConfigValue($config['v']);
-
-				// just return it in case it is set
-				if (isset($value)) {
-					return $value;
-				}
-			}
-		} catch (\Exception $exception) {
-			throw new ConfigPersistenceException(sprintf('Cannot get config with category %s and key %s', $cat, $key), $exception);
-		}
-
 		return null;
 	}
 
@@ -143,27 +101,7 @@ class Config
 	 */
 	public function set(string $cat, string $key, $value): bool
 	{
-		if (!$this->isConnected()) {
-			return false;
-		}
-
-		// We store our setting values in a string variable.
-		// So we have to do the conversion here so that the compare below works.
-		// The exception are array values.
-		$compare_value = (!is_array($value) ? (string)$value : $value);
-		$stored_value  = $this->get($cat, $key);
-
-		if (isset($stored_value) && ($stored_value === $compare_value)) {
-			return true;
-		}
-
-		$dbValue = ValueConversion::toDbValue($value);
-
-		try {
-			return $this->db->update(static::$table_name, ['v' => $dbValue], ['cat' => $cat, 'k' => $key], true);
-		} catch (\Exception $exception) {
-			throw new ConfigPersistenceException(sprintf('Cannot set config with category %s and key %s', $cat, $key), $exception);
-		}
+		return true;
 	}
 
 	/**
@@ -178,14 +116,6 @@ class Config
 	 */
 	public function delete(string $cat, string $key): bool
 	{
-		if (!$this->isConnected()) {
-			return false;
-		}
-
-		try {
-			return $this->db->delete(static::$table_name, ['cat' => $cat, 'k' => $key]);
-		} catch (\Exception $exception) {
-			throw new ConfigPersistenceException(sprintf('Cannot delete config with category %s and key %s', $cat, $key), $exception);
-		}
+		return true;
 	}
 }

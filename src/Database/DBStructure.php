@@ -74,7 +74,7 @@ class DBStructure
 		$old_tables = ['fserver', 'gcign', 'gcontact', 'gcontact-relation', 'gfollower' ,'glink', 'item-delivery-data',
 			'item-activity', 'item-content', 'item_id', 'participation', 'poll', 'poll_result', 'queue', 'retriever_rule',
 			'deliverq', 'dsprphotoq', 'ffinder', 'sign', 'spam', 'term', 'user-item', 'thread', 'item', 'challenge',
-			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact'];
+			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact', 'config'];
 
 		$tables = DBA::selectToArray('INFORMATION_SCHEMA.TABLES', ['TABLE_NAME'],
 			['TABLE_SCHEMA' => DBA::databaseName(), 'TABLE_TYPE' => 'BASE TABLE']);
@@ -176,14 +176,15 @@ class DBStructure
 	public static function performUpdate(bool $enable_maintenance_mode = true, bool $verbose = false): string
 	{
 		if ($enable_maintenance_mode) {
-			DI::config()->set('system', 'maintenance', 1);
+			DI::config()->set('system', 'maintenance', true);
 		}
 
 		$status = self::update($verbose, true);
 
 		if ($enable_maintenance_mode) {
-			DI::config()->set('system', 'maintenance', 0);
-			DI::config()->set('system', 'maintenance_reason', '');
+			DI::config()->set('system', 'maintenance', false, false);
+			DI::config()->delete('system', 'maintenance_reason', false);
+			DI::config()->save();
 		}
 
 		return $status;

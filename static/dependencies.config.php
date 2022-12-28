@@ -76,7 +76,7 @@ return [
 			$_SERVER
 		]
 	],
-	Config\Util\ConfigFileLoader::class => [
+	Config\Util\ConfigFileManager::class => [
 		'instanceOf' => Config\Factory\Config::class,
 		'call'       => [
 			['createConfigFileLoader', [

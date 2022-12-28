@@ -1175,3 +1175,22 @@ function update_1505()
 
 	return DBA::delete('config', $conditions) ? Update::SUCCESS : Update::FAILED;
 }
+
+function update_1506()
+{
+	$categories = DBA::toArray(DBA::p("SELECT DISTINCT `cat` AS 'cat' FROM `config`"));
+
+	foreach ($categories as $category) {
+		DI::config()->load($category['cat']);
+	}
+
+	$config = DBA::selectToArray('config');
+
+	foreach ($config as $entry) {
+		DI::config()->set($entry['cat'], $entry['k'], $entry['v'], false);
+	}
+
+	DI::config()->save();
+
+	DBA::e("DELETE FROM `config`");
+}

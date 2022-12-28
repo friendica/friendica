@@ -24,30 +24,31 @@ namespace Friendica\Core\Config\Util;
 use Friendica\Core\Addon;
 use Friendica\Core\Config\Exception\ConfigFileException;
 use Friendica\Core\Config\ValueObject\Cache;
+use Nette\Neon;
 
 /**
- * The ConfigFileLoader loads config-files and stores them in a ConfigCache ( @see Cache )
+ * The ConfigFileLoader loads and saves config-files and stores them in a ConfigCache ( @see Cache )
  *
  * It is capable of loading the following config files:
  * - *.config.php   (current)
  * - *.ini.php      (deprecated)
  * - *.htconfig.php (deprecated)
  */
-class ConfigFileLoader
+class ConfigFileManager
 {
-	/**
-	 * The default name of the user defined ini file
-	 *
-	 * @var string
-	 */
-	const CONFIG_INI = 'local';
-
 	/**
 	 * The default name of the user defined legacy config file
 	 *
 	 * @var string
 	 */
 	const CONFIG_HTCONFIG = 'htconfig';
+
+	/**
+	 * The config file, where overrides per admin page/console are saved at
+	 *
+	 * @var string
+	 */
+	const CONFIG_DATA_FILE = 'node.config.neon';
 
 	/**
 	 * The sample string inside the configs, which shouldn't get loaded
@@ -89,7 +90,7 @@ class ConfigFileLoader
 	 *
 	 * @param Cache $config The config cache to load to
 	 * @param array $server The $_SERVER array
-	 * @param bool  $raw    Setup the raw config format
+	 * @param bool  $raw    Set up the raw config format
 	 *
 	 * @throws ConfigFileException
 	 */
@@ -105,6 +106,9 @@ class ConfigFileLoader
 
 		// Now load every other config you find inside the 'config/' directory
 		$this->loadCoreConfig($config);
+
+		// Now load the data.config.php file with the overriden data
+		$this->loadDataConfig($config);
 
 		$config->load($this->loadEnvConfig($server), Cache::SOURCE_ENV);
 
@@ -155,6 +159,54 @@ class ConfigFileLoader
 		// try to load supported config at last to overwrite it
 		foreach ($this->getConfigFiles() as $configFile) {
 			$config->load($this->loadConfigFile($configFile), Cache::SOURCE_FILE);
+		}
+	}
+
+	/**
+	 * Tries to load the data config file with the overridden data
+	 *
+	 * @param Cache $config The Config cache
+	 *
+	 * @throws ConfigFileException In case the config file isn't loadable
+	 */
+	private function loadDataConfig(Cache $config)
+	{
+		$filename = $this->configDir . '/' . self::CONFIG_DATA_FILE;
+
+		if (file_exists($filename)) {
+			$dataArray = Neon\Neon::decodeFile($filename);
+
+			if (!is_array($dataArray)) {
+				throw new ConfigFileException(sprintf('Error loading config file %s',  $filename));
+			}
+
+			$config->load($dataArray, Cache::SOURCE_DATA);
+		}
+	}
+
+	/**
+	 * Saves overridden config entries back into the data.config.phpR
+	 *
+	 * @param Cache $config The config cache
+	 *
+	 * @throws ConfigFileException In case the config file isn't writeable or the data is invalid
+	 */
+	public function saveData(Cache $config)
+	{
+		$data = $config->getDataBySource(Cache::SOURCE_DATA);
+
+		try {
+			$encodedData = Neon\Neon::encode($data, true);
+		} catch (Neon\Exception $exception) {
+			throw new ConfigFileException('cannot encode data', $exception);
+		}
+
+		if (!$encodedData) {
+			throw new ConfigFileException('config source cannot get encoded');
+		}
+
+		if (!file_put_contents($this->configDir . '/' . self::CONFIG_DATA_FILE, $encodedData)) {
+			throw new ConfigFileException(sprintf('Cannot save data to file %s/%s', $this->configDir, self::CONFIG_DATA_FILE));
 		}
 	}
 
@@ -231,7 +283,8 @@ class ConfigFileLoader
 		$sampleEnd = self::SAMPLE_END . ($ini ? '.ini.php' : '.config.php');
 
 		foreach ($files as $filename) {
-			if (fnmatch($filePattern, $filename) && substr_compare($filename, $sampleEnd, -strlen($sampleEnd))) {
+			if (fnmatch($filePattern, $filename) &&
+				substr_compare($filename, $sampleEnd, -strlen($sampleEnd))) {
 				$found[] = $this->configDir . '/' . $filename;
 			}
 		}

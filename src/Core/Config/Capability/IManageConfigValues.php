@@ -71,12 +71,18 @@ interface IManageConfigValues
 	 * @param string $cat The category of the configuration value
 	 * @param string $key    The configuration key to set
 	 * @param mixed  $value  The value to store
+	 * @param bool   $autosave If true, implicit save the value
 	 *
 	 * @return bool Operation success
 	 *
 	 * @throws ConfigPersistenceException In case the persistence layer throws errors
 	 */
-	public function set(string $cat, string $key, $value): bool;
+	public function set(string $cat, string $key, $value, bool $autosave = true): bool;
+
+	/**
+	 * Save back the overridden values of the config cache
+	 */
+	public function save();
 
 	/**
 	 * Deletes the given key from the system configuration.
@@ -85,13 +91,14 @@ interface IManageConfigValues
 	 *
 	 * @param string $cat The category of the configuration value
 	 * @param string $key    The configuration key to delete
+	 * @param bool   $autosave If true, implicit save the value
 	 *
 	 * @return bool
 	 *
 	 * @throws ConfigPersistenceException In case the persistence layer throws errors
 	 *
 	 */
-	public function delete(string $cat, string $key): bool;
+	public function delete(string $cat, string $key, bool $autosave = true): bool;
 
 	/**
 	 * Returns the Config Cache

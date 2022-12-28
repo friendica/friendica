@@ -21,6 +21,7 @@
 
 namespace Friendica\Core\Config\Type;
 
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Repository\Config;
 
@@ -39,12 +40,13 @@ class JitConfig extends AbstractConfig
 	private $db_loaded;
 
 	/**
-	 * @param Cache  $configCache The configuration cache (based on the config-files)
-	 * @param Config $configRepo  The configuration model
+	 * @param ConfigFileManager $configFileManager The configuration file manager to save back configs
+	 * @param Cache             $configCache       The configuration cache (based on the config-files)
+	 * @param Config            $configRepo        The configuration model
 	 */
-	public function __construct(Cache $configCache, Config $configRepo)
+	public function __construct(ConfigFileManager $configFileManager, Cache $configCache, Config $configRepo)
 	{
-		parent::__construct($configCache, $configRepo);
+		parent::__construct($configFileManager, $configCache, $configRepo);
 		$this->db_loaded = [];
 
 		$this->load();
@@ -69,7 +71,7 @@ class JitConfig extends AbstractConfig
 		}
 
 		// load the whole category out of the DB into the cache
-		$this->configCache->load($config, Cache::SOURCE_DB);
+		$this->configCache->load($config, Cache::SOURCE_DATA);
 	}
 
 	/**
@@ -84,7 +86,7 @@ class JitConfig extends AbstractConfig
 			$dbValue = $this->configRepo->get($cat, $key);
 
 			if (isset($dbValue)) {
-				$this->configCache->set($cat, $key, $dbValue, Cache::SOURCE_DB);
+				$this->configCache->set($cat, $key, $dbValue, Cache::SOURCE_DATA);
 				unset($dbValue);
 			}
 
@@ -100,10 +102,10 @@ class JitConfig extends AbstractConfig
 	/**
 	 * {@inheritDoc}
 	 */
-	public function set(string $cat, string $key, $value): bool
+	public function set(string $cat, string $key, $value, bool $autosave = true): bool
 	{
 		// set the cache first
-		$cached = $this->configCache->set($cat, $key, $value, Cache::SOURCE_DB);
+		$cached = $this->configCache->set($cat, $key, $value, Cache::SOURCE_DATA);
 
 		// If there is no connected adapter, we're finished
 		if (!$this->configRepo->isConnected()) {
@@ -114,13 +116,17 @@ class JitConfig extends AbstractConfig
 
 		$this->db_loaded[$cat][$key] = $stored;
 
+		if ($autosave) {
+			$this->save();
+		}
+
 		return $cached && $stored;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function delete(string $cat, string $key): bool
+	public function delete(string $cat, string $key, bool $autosave = true): bool
 	{
 		$cacheRemoved = $this->configCache->delete($cat, $key);
 
@@ -133,6 +139,10 @@ class JitConfig extends AbstractConfig
 		}
 
 		$storeRemoved = $this->configRepo->delete($cat, $key);
+
+		if ($autosave) {
+			$this->save();
+		}
 
 		return $cacheRemoved || $storeRemoved;
 	}

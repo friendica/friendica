@@ -495,18 +495,6 @@ CREATE TABLE IF NOT EXISTS `cache` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Stores temporary data';
 
 --
--- TABLE config
---
-CREATE TABLE IF NOT EXISTS `config` (
-	`id` int unsigned NOT NULL auto_increment COMMENT '',
-	`cat` varbinary(50) NOT NULL DEFAULT '' COMMENT '',
-	`k` varbinary(50) NOT NULL DEFAULT '' COMMENT '',
-	`v` mediumtext COMMENT '',
-	 PRIMARY KEY(`id`),
-	 UNIQUE INDEX `cat_k` (`cat`,`k`)
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='main configuration storage';
-
---
 -- TABLE contact-relation
 --
 CREATE TABLE IF NOT EXISTS `contact-relation` (

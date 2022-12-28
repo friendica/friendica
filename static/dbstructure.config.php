@@ -553,19 +553,6 @@ return [
 			"k_expires" => ["k", "expires"],
 		]
 	],
-	"config" => [
-		"comment" => "main configuration storage",
-		"fields" => [
-			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
-			"cat" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
-			"k" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
-			"v" => ["type" => "mediumtext", "comment" => ""],
-		],
-		"indexes" => [
-			"PRIMARY" => ["id"],
-			"cat_k" => ["UNIQUE", "cat", "k"],
-		]
-	],
 	"contact-relation" => [
 		"comment" => "Contact relations",
 		"fields" => [

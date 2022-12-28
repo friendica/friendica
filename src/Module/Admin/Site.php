@@ -148,7 +148,7 @@ class Site extends BaseAdmin
 
 		// Has the directory url changed? If yes, then resubmit the existing profiles there
 		if ($global_directory != DI::config()->get('system', 'directory') && ($global_directory != '')) {
-			DI::config()->set('system', 'directory', $global_directory);
+			DI::config()->set('system', 'directory', $global_directory, false);
 			Worker::add(Worker::PRIORITY_LOW, 'Directory');
 		}
 
@@ -194,131 +194,133 @@ class Site extends BaseAdmin
 				);
 			}
 		}
-		DI::config()->set('system', 'ssl_policy'            , $ssl_policy);
-		DI::config()->set('system', 'maxloadavg'            , $maxloadavg);
-		DI::config()->set('system', 'min_memory'            , $min_memory);
-		DI::config()->set('system', 'optimize_tables'       , $optimize_tables);
-		DI::config()->set('system', 'contact_discovery'     , $contact_discovery);
-		DI::config()->set('system', 'synchronize_directory' , $synchronize_directory);
-		DI::config()->set('system', 'poco_requery_days'     , $poco_requery_days);
-		DI::config()->set('system', 'poco_discovery'        , $poco_discovery);
-		DI::config()->set('system', 'poco_local_search'     , $poco_local_search);
-		DI::config()->set('system', 'nodeinfo'              , $nodeinfo);
-		DI::config()->set('config', 'sitename'              , $sitename);
-		DI::config()->set('config', 'sender_email'          , $sender_email);
-		DI::config()->set('system', 'suppress_tags'         , $suppress_tags);
-		DI::config()->set('system', 'shortcut_icon'         , $shortcut_icon);
-		DI::config()->set('system', 'touch_icon'            , $touch_icon);
+		DI::config()->set('system', 'ssl_policy'            , $ssl_policy, false);
+		DI::config()->set('system', 'maxloadavg'            , $maxloadavg, false);
+		DI::config()->set('system', 'min_memory'            , $min_memory, false);
+		DI::config()->set('system', 'optimize_tables'       , $optimize_tables, false);
+		DI::config()->set('system', 'contact_discovery'     , $contact_discovery, false);
+		DI::config()->set('system', 'synchronize_directory' , $synchronize_directory, false);
+		DI::config()->set('system', 'poco_requery_days'     , $poco_requery_days, false);
+		DI::config()->set('system', 'poco_discovery'        , $poco_discovery, false);
+		DI::config()->set('system', 'poco_local_search'     , $poco_local_search, false);
+		DI::config()->set('system', 'nodeinfo'              , $nodeinfo, false);
+		DI::config()->set('config', 'sitename'              , $sitename, false);
+		DI::config()->set('config', 'sender_email'          , $sender_email, false);
+		DI::config()->set('system', 'suppress_tags'         , $suppress_tags, false);
+		DI::config()->set('system', 'shortcut_icon'         , $shortcut_icon, false);
+		DI::config()->set('system', 'touch_icon'            , $touch_icon, false);
 
 		if ($banner == "") {
-			DI::config()->delete('system', 'banner');
+			DI::config()->set('system', 'banner', false);
 		} else {
-			DI::config()->set('system', 'banner', $banner);
+			DI::config()->set('system', 'banner', $banner, false);
 		}
 
 		if (empty($email_banner)) {
-			DI::config()->delete('system', 'email_banner');
+			DI::config()->set('system', 'email_banner', false);
 		} else {
-			DI::config()->set('system', 'email_banner', $email_banner);
+			DI::config()->set('system', 'email_banner', $email_banner, false);
 		}
 
 		if (empty($additional_info)) {
-			DI::config()->delete('config', 'info');
+			DI::config()->set('config', 'info', false);
 		} else {
-			DI::config()->set('config', 'info', $additional_info);
+			DI::config()->set('config', 'info', $additional_info, false);
 		}
-		DI::config()->set('system', 'language', $language);
-		DI::config()->set('system', 'theme', $theme);
+		DI::config()->set('system', 'language', $language, false);
+		DI::config()->set('system', 'theme', $theme, false);
 		Theme::install($theme);
 
 		if ($theme_mobile == '---') {
-			DI::config()->delete('system', 'mobile-theme');
+			DI::config()->set('system', 'mobile-theme', false);
 		} else {
-			DI::config()->set('system', 'mobile-theme', $theme_mobile);
+			DI::config()->set('system', 'mobile-theme', $theme_mobile, false);
 		}
 		if ($singleuser == '---') {
-			DI::config()->delete('system', 'singleuser');
+			DI::config()->set('system', 'singleuser', false);
 		} else {
-			DI::config()->set('system', 'singleuser', $singleuser);
+			DI::config()->set('system', 'singleuser', $singleuser, false);
 		}
 		if (preg_match('/\d+(?:\s*[kmg])?/i', $maximagesize)) {
-			DI::config()->set('system', 'maximagesize', $maximagesize);
+			DI::config()->set('system', 'maximagesize', $maximagesize, false);
 		} else {
 			DI::sysmsg()->addNotice(DI::l10n()->t('%s is no valid input for maximum image size', $maximagesize));
 		}
-		DI::config()->set('system', 'max_image_length'       , $maximagelength);
-		DI::config()->set('system', 'jpeg_quality'           , $jpegimagequality);
+		DI::config()->set('system', 'max_image_length'       , $maximagelength, false);
+		DI::config()->set('system', 'jpeg_quality'           , $jpegimagequality, false);
 
-		DI::config()->set('config', 'register_policy'        , $register_policy);
-		DI::config()->set('system', 'max_daily_registrations', $daily_registrations);
-		DI::config()->set('system', 'account_abandon_days'   , $abandon_days);
-		DI::config()->set('config', 'register_text'          , $register_text);
-		DI::config()->set('system', 'allowed_sites'          , $allowed_sites);
-		DI::config()->set('system', 'allowed_email'          , $allowed_email);
-		DI::config()->set('system', 'forbidden_nicknames'    , $forbidden_nicknames);
-		DI::config()->set('system', 'system_actor_name'      , $system_actor_name);
-		DI::config()->set('system', 'no_oembed_rich_content' , $no_oembed_rich_content);
-		DI::config()->set('system', 'allowed_oembed'         , $allowed_oembed);
-		DI::config()->set('system', 'block_public'           , $block_public);
-		DI::config()->set('system', 'publish_all'            , $force_publish);
-		DI::config()->set('system', 'newuser_private'        , $newuser_private);
-		DI::config()->set('system', 'enotify_no_content'     , $enotify_no_content);
-		DI::config()->set('system', 'disable_embedded'       , $disable_embedded);
-		DI::config()->set('system', 'allow_users_remote_self', $allow_users_remote_self);
-		DI::config()->set('system', 'explicit_content'       , $explicit_content);
-		DI::config()->set('system', 'proxify_content'        , $proxify_content);
-		DI::config()->set('system', 'cache_contact_avatar'   , $cache_contact_avatar);
-		DI::config()->set('system', 'check_new_version_url'  , $check_new_version_url);
+		DI::config()->set('config', 'register_policy'        , $register_policy, false);
+		DI::config()->set('system', 'max_daily_registrations', $daily_registrations, false);
+		DI::config()->set('system', 'account_abandon_days'   , $abandon_days, false);
+		DI::config()->set('config', 'register_text'          , $register_text, false);
+		DI::config()->set('system', 'allowed_sites'          , $allowed_sites, false);
+		DI::config()->set('system', 'allowed_email'          , $allowed_email, false);
+		DI::config()->set('system', 'forbidden_nicknames'    , $forbidden_nicknames, false);
+		DI::config()->set('system', 'system_actor_name'      , $system_actor_name, false);
+		DI::config()->set('system', 'no_oembed_rich_content' , $no_oembed_rich_content, false);
+		DI::config()->set('system', 'allowed_oembed'         , $allowed_oembed, false);
+		DI::config()->set('system', 'block_public'           , $block_public, false);
+		DI::config()->set('system', 'publish_all'            , $force_publish, false);
+		DI::config()->set('system', 'newuser_private'        , $newuser_private, false);
+		DI::config()->set('system', 'enotify_no_content'     , $enotify_no_content, false);
+		DI::config()->set('system', 'disable_embedded'       , $disable_embedded, false);
+		DI::config()->set('system', 'allow_users_remote_self', $allow_users_remote_self, false);
+		DI::config()->set('system', 'explicit_content'       , $explicit_content, false);
+		DI::config()->set('system', 'proxify_content'        , $proxify_content, false);
+		DI::config()->set('system', 'cache_contact_avatar'   , $cache_contact_avatar, false);
+		DI::config()->set('system', 'check_new_version_url'  , $check_new_version_url, false);
 
-		DI::config()->set('system', 'block_extended_register', !$enable_multi_reg);
-		DI::config()->set('system', 'no_openid'              , !$enable_openid);
-		DI::config()->set('system', 'no_regfullname'         , !$enable_regfullname);
-		DI::config()->set('system', 'register_notification'  , $register_notification);
-		DI::config()->set('system', 'community_page_style'   , $community_page_style);
-		DI::config()->set('system', 'max_author_posts_community_page', $max_author_posts_community_page);
-		DI::config()->set('system', 'verifyssl'              , $verifyssl);
-		DI::config()->set('system', 'proxyuser'              , $proxyuser);
-		DI::config()->set('system', 'proxy'                  , $proxy);
-		DI::config()->set('system', 'curl_timeout'           , $timeout);
-		DI::config()->set('system', 'imap_disabled'          , !$mail_enabled && function_exists('imap_open'));
-		DI::config()->set('system', 'ostatus_disabled'       , !$ostatus_enabled);
-		DI::config()->set('system', 'diaspora_enabled'       , $diaspora_enabled);
+		DI::config()->set('system', 'block_extended_register', !$enable_multi_reg, false);
+		DI::config()->set('system', 'no_openid'              , !$enable_openid, false);
+		DI::config()->set('system', 'no_regfullname'         , !$enable_regfullname, false);
+		DI::config()->set('system', 'register_notification'  , $register_notification, false);
+		DI::config()->set('system', 'community_page_style'   , $community_page_style, false);
+		DI::config()->set('system', 'max_author_posts_community_page', $max_author_posts_community_page, false);
+		DI::config()->set('system', 'verifyssl'              , $verifyssl, false);
+		DI::config()->set('system', 'proxyuser'              , $proxyuser, false);
+		DI::config()->set('system', 'proxy'                  , $proxy, false);
+		DI::config()->set('system', 'curl_timeout'           , $timeout, false);
+		DI::config()->set('system', 'imap_disabled'          , !$mail_enabled && function_exists('imap_open'), false);
+		DI::config()->set('system', 'ostatus_disabled'       , !$ostatus_enabled, false);
+		DI::config()->set('system', 'diaspora_enabled'       , $diaspora_enabled, false);
 
-		DI::config()->set('config', 'private_addons'         , $private_addons);
+		DI::config()->set('config', 'private_addons'         , $private_addons, false);
 
-		DI::config()->set('system', 'force_ssl'              , $force_ssl);
-		DI::config()->set('system', 'hide_help'              , !$show_help);
+		DI::config()->set('system', 'force_ssl'              , $force_ssl, false);
+		DI::config()->set('system', 'hide_help'              , !$show_help, false);
 
-		DI::config()->set('system', 'dbclean'                , $dbclean);
-		DI::config()->set('system', 'dbclean-expire-days'    , $dbclean_expire_days);
-		DI::config()->set('system', 'dbclean_expire_conversation', $dbclean_expire_conv);
+		DI::config()->set('system', 'dbclean'                , $dbclean, false);
+		DI::config()->set('system', 'dbclean-expire-days'    , $dbclean_expire_days, false);
+		DI::config()->set('system', 'dbclean_expire_conversation', $dbclean_expire_conv, false);
 
 		if ($dbclean_unclaimed == 0) {
 			$dbclean_unclaimed = $dbclean_expire_days;
 		}
 
-		DI::config()->set('system', 'dbclean-expire-unclaimed', $dbclean_unclaimed);
+		DI::config()->set('system', 'dbclean-expire-unclaimed', $dbclean_unclaimed, false);
 
-		DI::config()->set('system', 'max_comments', $max_comments);
-		DI::config()->set('system', 'max_display_comments', $max_display_comments);
+		DI::config()->set('system', 'max_comments', $max_comments, false);
+		DI::config()->set('system', 'max_display_comments', $max_display_comments, false);
 
 		if ($temppath != '') {
 			$temppath = BasePath::getRealPath($temppath);
 		}
 
-		DI::config()->set('system', 'temppath', $temppath);
+		DI::config()->set('system', 'temppath', $temppath, false);
 
-		DI::config()->set('system', 'only_tag_search'  , $only_tag_search);
-		DI::config()->set('system', 'compute_group_counts', $compute_group_counts);
+		DI::config()->set('system', 'only_tag_search'  , $only_tag_search, false);
+		DI::config()->set('system', 'compute_group_counts', $compute_group_counts, false);
 
-		DI::config()->set('system', 'worker_queues'    , $worker_queues);
-		DI::config()->set('system', 'worker_fastlane'  , $worker_fastlane);
+		DI::config()->set('system', 'worker_queues'    , $worker_queues, false);
+		DI::config()->set('system', 'worker_fastlane'  , $worker_fastlane, false);
 
-		DI::config()->set('system', 'relay_directly'   , $relay_directly);
-		DI::config()->set('system', 'relay_scope'      , $relay_scope);
-		DI::config()->set('system', 'relay_server_tags', $relay_server_tags);
-		DI::config()->set('system', 'relay_deny_tags'  , $relay_deny_tags);
-		DI::config()->set('system', 'relay_user_tags'  , $relay_user_tags);
+		DI::config()->set('system', 'relay_directly'   , $relay_directly, false);
+		DI::config()->set('system', 'relay_scope'      , $relay_scope, false);
+		DI::config()->set('system', 'relay_server_tags', $relay_server_tags, false);
+		DI::config()->set('system', 'relay_deny_tags'  , $relay_deny_tags, false);
+		DI::config()->set('system', 'relay_user_tags'  , $relay_user_tags, false);
+
+		DI::config()->save();
 
 		DI::baseUrl()->redirect('admin/site' . $active_panel);
 	}
@@ -332,8 +334,8 @@ class Site extends BaseAdmin
 
 		if (DI::config()->get('system', 'directory_submit_url') &&
 			!DI::config()->get('system', 'directory')) {
-			DI::config()->set('system', 'directory', dirname(DI::config()->get('system', 'directory_submit_url')));
-			DI::config()->delete('system', 'directory_submit_url');
+			DI::config()->set('system', 'directory', dirname(DI::config()->get('system', 'directory_submit_url')), false);
+			DI::config()->delete('system', 'directory_submit_url', false);
 		}
 
 		/* Installed themes */

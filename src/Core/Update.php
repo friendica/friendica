@@ -160,8 +160,9 @@ class Update
 							Logger::warning('Pre update failed', ['version' => $version]);
 							DI::config()->set('system', 'update', Update::FAILED);
 							DI::lock()->release('dbupdate');
-							DI::config()->set('system', 'maintenance', 0);
-							DI::config()->set('system', 'maintenance_reason', '');
+							DI::config()->set('system', 'maintenance', false, false);
+							DI::config()->delete('system', 'maintenance_reason', false);
+							DI::config()->save();
 							return $r;
 						} else {
 							Logger::notice('Pre update executed.', ['version' => $version]);
@@ -181,8 +182,9 @@ class Update
 						Logger::error('Update ERROR.', ['from' => $stored, 'to' => $current, 'retval' => $retval]);
 						DI::config()->set('system', 'update', Update::FAILED);
 						DI::lock()->release('dbupdate');
-						DI::config()->set('system', 'maintenance', 0);
-						DI::config()->set('system', 'maintenance_reason', '');
+						DI::config()->set('system', 'maintenance', false, false);
+						DI::config()->delete('system', 'maintenance_reason', false);
+						DI::config()->save();
 						return $retval;
 					} else {
 						Logger::notice('Database structure update finished.', ['from' => $stored, 'to' => $current]);
@@ -198,8 +200,9 @@ class Update
 							Logger::warning('Post update failed', ['version' => $version]);
 							DI::config()->set('system', 'update', Update::FAILED);
 							DI::lock()->release('dbupdate');
-							DI::config()->set('system', 'maintenance', 0);
-							DI::config()->set('system', 'maintenance_reason', '');
+							DI::config()->set('system', 'maintenance', false, false);
+							DI::config()->delete('system', 'maintenance_reason', false);
+							DI::config()->save();
 							return $r;
 						} else {
 							DI::config()->set('system', 'build', $version);
@@ -210,8 +213,9 @@ class Update
 					DI::config()->set('system', 'build', $current);
 					DI::config()->set('system', 'update', Update::SUCCESS);
 					DI::lock()->release('dbupdate');
-					DI::config()->set('system', 'maintenance', 0);
-					DI::config()->set('system', 'maintenance_reason', '');
+					DI::config()->set('system', 'maintenance', false, false);
+					DI::config()->delete('system', 'maintenance_reason',  false);
+					DI::config()->save();
 
 					Logger::notice('Update success.', ['from' => $stored, 'to' => $current]);
 					if ($sendMail) {

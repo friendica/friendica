@@ -13,6 +13,7 @@ robots.txt
 !/config/local-sample.config.php
 /config/*.config.php
 /config/*.ini.php
+/config/data.config.neon
 
 #ignore documentation, it should be newly built
 /doc/api

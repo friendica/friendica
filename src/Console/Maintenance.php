@@ -100,15 +100,17 @@ HELP;
 
 		$enabled = intval($this->getArgument(0));
 
-		$this->config->set('system', 'maintenance', $enabled);
+		$this->config->set('system', 'maintenance', $enabled, false);
 
 		$reason = $this->getArgument(1);
 
 		if ($enabled && $this->getArgument(1)) {
-			$this->config->set('system', 'maintenance_reason', $this->getArgument(1));
+			$this->config->set('system', 'maintenance_reason', $this->getArgument(1), false);
 		} else {
-			$this->config->set('system', 'maintenance_reason', '');
+			$this->config->set('system', 'maintenance_reason', '', false);
 		}
+
+		$this->config->save();
 
 		if ($enabled) {
 			$mode_str = "maintenance mode";

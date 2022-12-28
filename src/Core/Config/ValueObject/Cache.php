@@ -21,13 +21,13 @@
 
 namespace Friendica\Core\Config\ValueObject;
 
-use Friendica\Core\Config\Util\ConfigFileLoader;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use ParagonIE\HiddenString\HiddenString;
 
 /**
  * The Friendica config cache for the application
  * Initial, all *.config.php files are loaded into this cache with the
- * ConfigFileLoader ( @see ConfigFileLoader )
+ * ConfigFileManager ( @see ConfigFileManager )
  */
 class Cache
 {
@@ -35,8 +35,8 @@ class Cache
 	const SOURCE_STATIC = 0;
 	/** @var int Indicates that the cache entry is set by file - Low Priority */
 	const SOURCE_FILE = 1;
-	/** @var int Indicates that the cache entry is set by the DB config table - Middle Priority */
-	const SOURCE_DB = 2;
+	/** @var int Indicates that the cache entry is manually set by the application (per admin page/console) - Middle Priority */
+	const SOURCE_DATA = 2;
 	/** @var int Indicates that the cache entry is set by a server environment variable - High Priority */
 	const SOURCE_ENV = 3;
 	/** @var int Indicates that the cache entry is fixed and must not be changed */
@@ -126,6 +126,34 @@ class Cache
 	public function getSource(string $cat, string $key): int
 	{
 		return $this->source[$cat][$key] ?? -1;
+	}
+
+	/**
+	 * Returns the whole config array based on the given source type
+	 *
+	 * @param int $source Indicates the source of the config entry
+	 *
+	 * @return array The config array part of the given source
+	 */
+	public function getDataBySource(int $source): array
+	{
+		$data = [];
+
+		$categories = array_keys($this->source);
+
+		foreach ($categories as $category) {
+			if (is_array($this->source[$category])) {
+				$keys = array_keys($this->source[$category]);
+
+				foreach ($keys as $key) {
+					if ($this->source[$category][$key] === $source) {
+						$data[$category][$key] = $this->config[$category][$key];
+					}
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	/**

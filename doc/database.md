@@ -18,7 +18,6 @@ Database Tables
 | [arrived-activity](help/database/db_arrived-activity) | Id of arrived activities |
 | [attach](help/database/db_attach) | file attachments |
 | [cache](help/database/db_cache) | Stores temporary data |
-| [config](help/database/db_config) | main configuration storage |
 | [contact](help/database/db_contact) | contact table |
 | [contact-relation](help/database/db_contact-relation) | Contact relations |
 | [conv](help/database/db_conv) | private messages |

@@ -22,8 +22,10 @@
 namespace Friendica\Core\Config\Type;
 
 use Friendica\Core\Config\Repository\Config;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\DI;
 
 /**
  * This class is responsible for all system-wide configuration values in Friendica
@@ -43,14 +45,19 @@ abstract class AbstractConfig implements IManageConfigValues
 	 */
 	protected $configRepo;
 
+	/** @var ConfigFileManager */
+	protected $configFileManager;
+
 	/**
+	 * @param ConfigFileManager $configFileManager The configuration file manager to save back configs
 	 * @param Cache  $configCache The configuration cache (based on the config-files)
 	 * @param Config $configRepo  The configuration repository
 	 */
-	public function __construct(Cache $configCache, Config $configRepo)
+	public function __construct(ConfigFileManager $configFileManager, Cache $configCache, Config $configRepo)
 	{
-		$this->configCache = $configCache;
-		$this->configRepo  = $configRepo;
+		$this->configFileManager = $configFileManager;
+		$this->configCache       = $configCache;
+		$this->configRepo        = $configRepo;
 	}
 
 	/**
@@ -59,5 +66,10 @@ abstract class AbstractConfig implements IManageConfigValues
 	public function getCache(): Cache
 	{
 		return $this->configCache;
+	}
+
+	public function save()
+	{
+		$this->configFileManager->saveData($this->configCache);
 	}
 }

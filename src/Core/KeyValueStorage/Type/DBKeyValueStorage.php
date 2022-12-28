@@ -21,7 +21,7 @@
 
 namespace Friendica\Core\KeyValueStorage\Type;
 
-use Friendica\Core\Config\Util\ValueConversion;
+use Friendica\Core\PConfig\Util\ValueConversion;
 use Friendica\Core\KeyValueStorage\Exceptions\KeyValueStoragePersistenceException;
 use Friendica\Database\Database;
 

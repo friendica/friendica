@@ -101,8 +101,8 @@ HELP;
 		$old_host = str_replace('http://', '@', Strings::normaliseLink($old_url));
 
 		$this->out('Entering maintenance mode');
-		$this->config->set('system', 'maintenance', true);
-		$this->config->set('system', 'maintenance_reason', 'Relocating node to ' . $new_url);
+		$this->config->set('system', 'maintenance', true, false);
+		$this->config->set('system', 'maintenance_reason', 'Relocating node to ' . $new_url, false);
 
 		try {
 			if (!$this->database->transaction()) {
@@ -189,8 +189,9 @@ HELP;
 			return 1;
 		} finally {
 			$this->out('Leaving maintenance mode');
-			$this->config->set('system', 'maintenance', false);
-			$this->config->set('system', 'maintenance_reason', '');
+			$this->config->set('system', 'maintenance', false, false);
+			$this->config->set('system', 'maintenance_reason', '', false);
+			$this->config->save();
 		}
 
 		// send relocate

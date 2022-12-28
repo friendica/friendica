@@ -21,6 +21,7 @@
 
 namespace Friendica\Core\Config\Type;
 
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Repository\Config;
 
@@ -36,12 +37,13 @@ class PreloadConfig extends AbstractConfig
 	private $config_loaded;
 
 	/**
-	 * @param Cache  $configCache The configuration cache (based on the config-files)
-	 * @param Config $configRepo  The configuration model
+	 * @param ConfigFileManager $configFileManager The configuration file manager to save back configs
+	 * @param Cache             $configCache       The configuration cache (based on the config-files)
+	 * @param Config            $configRepo        The configuration model
 	 */
-	public function __construct(Cache $configCache, Config $configRepo)
+	public function __construct(ConfigFileManager $configFileManager, Cache $configCache, Config $configRepo)
 	{
-		parent::__construct($configCache, $configRepo);
+		parent::__construct($configFileManager, $configCache, $configRepo);
 		$this->config_loaded = false;
 
 		$this->load();
@@ -68,7 +70,7 @@ class PreloadConfig extends AbstractConfig
 		$this->config_loaded = true;
 
 		// load the whole category out of the DB into the cache
-		$this->configCache->load($config, Cache::SOURCE_DB);
+		$this->configCache->load($config, Cache::SOURCE_DATA);
 	}
 
 	/**
@@ -80,7 +82,7 @@ class PreloadConfig extends AbstractConfig
 			if ($this->configRepo->isConnected()) {
 				$config = $this->configRepo->get($cat, $key);
 				if (isset($config)) {
-					$this->configCache->set($cat, $key, $config, Cache::SOURCE_DB);
+					$this->configCache->set($cat, $key, $config, Cache::SOURCE_DATA);
 				}
 			}
 		}
@@ -94,14 +96,14 @@ class PreloadConfig extends AbstractConfig
 	/**
 	 * {@inheritDoc}
 	 */
-	public function set(string $cat, string $key, $value): bool
+	public function set(string $cat, string $key, $value, bool $autosave = true): bool
 	{
 		if (!$this->config_loaded) {
 			$this->load();
 		}
 
 		// set the cache first
-		$cached = $this->configCache->set($cat, $key, $value, Cache::SOURCE_DB);
+		$cached = $this->configCache->set($cat, $key, $value, Cache::SOURCE_DATA);
 
 		// If there is no connected adapter, we're finished
 		if (!$this->configRepo->isConnected()) {
@@ -110,13 +112,17 @@ class PreloadConfig extends AbstractConfig
 
 		$stored = $this->configRepo->set($cat, $key, $value);
 
+		if ($autosave) {
+			$this->save();
+		}
+
 		return $cached && $stored;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function delete(string $cat, string $key): bool
+	public function delete(string $cat, string $key, bool $autosave = true): bool
 	{
 		if ($this->config_loaded) {
 			$this->load();
@@ -129,6 +135,10 @@ class PreloadConfig extends AbstractConfig
 		}
 
 		$storeRemoved = $this->configRepo->delete($cat, $key);
+
+		if ($autosave) {
+			$this->save();
+		}
 
 		return $cacheRemoved || $storeRemoved;
 	}
