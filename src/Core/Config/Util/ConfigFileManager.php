@@ -173,14 +173,18 @@ class ConfigFileManager
 	{
 		$filename = $this->configDir . '/' . self::CONFIG_DATA_FILE;
 
-		if (file_exists($filename)) {
-			$dataArray = Neon\Neon::decodeFile($filename);
+		try {
+			if (file_exists($filename)) {
+				$dataArray = Neon\Neon::decodeFile($filename);
 
-			if (!is_array($dataArray)) {
-				throw new ConfigFileException(sprintf('Error loading config file %s',  $filename));
+				if (!is_array($dataArray)) {
+					throw new ConfigFileException(sprintf('Error loading config file %s', $filename));
+				}
+
+				$config->load($dataArray, Cache::SOURCE_DATA);
 			}
-
-			$config->load($dataArray, Cache::SOURCE_DATA);
+		} catch (Neon\Exception $exception) {
+			throw new ConfigFileException(sprintf('Couldn\'t load config cache for file %s', $filename), $exception);
 		}
 	}
 
