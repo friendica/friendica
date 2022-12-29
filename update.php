@@ -1176,7 +1176,7 @@ function update_1505()
 	return DBA::delete('config', $conditions) ? Update::SUCCESS : Update::FAILED;
 }
 
-function update_1505()
+function update_1506()
 {
 	$config = DBA::selectToArray('config');
 
