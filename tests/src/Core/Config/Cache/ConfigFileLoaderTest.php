@@ -375,9 +375,9 @@ class ConfigFileLoaderTest extends MockedTest
 				   'datasets' . DIRECTORY_SEPARATOR .
 				   'config' . DIRECTORY_SEPARATOR;
 
-		vfsStream::newFile('B.config.neon')
+		vfsStream::newFile('B.config.php')
 				 ->at($this->root->getChild('config2'))
-				 ->setContent(file_get_contents($fileDir . 'B.config.neon'));
+				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
 
 		$configFileLoader = (new Config())->createConfigFileLoader($this->root->url(), ['FRIENDICA_CONFIG_DIR' => $this->root->getChild('config2')->url()]);
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
@@ -398,9 +398,9 @@ class ConfigFileLoaderTest extends MockedTest
 				   'datasets' . DIRECTORY_SEPARATOR .
 				   'config' . DIRECTORY_SEPARATOR;
 
-		vfsStream::newFile('B.config.neon')
+		vfsStream::newFile('B.config.php')
 				 ->at($this->root->getChild('config2'))
-				 ->setContent(file_get_contents($fileDir . 'B.config.neon'));
+				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
 
 		$configFileLoader = (new Config())->createConfigFileLoader($this->root->url(), ['FRIENDICA_CONFIG_DIR' => $this->root->getChild('config2')->url()]);
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
