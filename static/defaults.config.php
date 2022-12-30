@@ -19,7 +19,7 @@
  *
  * This file declares the default values for the base config of Friendica.
  *
- * These configuration values aren't accessible from the admin settings page and custom values must be set in config/local.config.php
+ * These configuration values aren't accessible from the admin settings page and custom values must be set in config/local.config.neon
  *
  * Please don't edit this file directly as its content may change in the upcoming versions.
  *

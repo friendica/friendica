@@ -87,7 +87,7 @@ class Source extends BaseModeration
 				'error'       => $this->t('Error'),
 				'notfound'    => $this->t('Item not found'),
 				'nosource'    => $this->t('No source recorded'),
-				'noconfig'    => !$this->config->get('debug', 'store_source') ? $this->t('Please make sure the <code>debug.store_source</code> config key is set in <code>config/local.config.php</code> for future items to have sources.') : '',
+				'noconfig'    => !$this->config->get('debug', 'store_source') ? $this->t('Please make sure the <code>debug.store_source</code> config key is set in <code>config/local.config.neon</code> for future items to have sources.') : '',
 			],
 			'$guid_field' => ['guid', $this->t('Item Guid'), $guid, ''],
 			'$guid'       => $guid,

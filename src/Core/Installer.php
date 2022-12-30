@@ -146,7 +146,7 @@ class Installer
 
 	/**
 	 * Executes the installation of Friendica in the given environment.
-	 * - Creates `config/local.config.php`
+	 * - Creates `config/local.config.neon`
 	 * - Installs Database Structure
 	 *
 	 * @param Cache $configCache The config cache with all config relevant information
@@ -177,10 +177,10 @@ class Installer
 			'$language'  => $configCache->get('system', 'language'),
 		]);
 
-		$result = file_put_contents($basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.php', $txt);
+		$result = file_put_contents($basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.neon', $txt);
 
 		if (!$result) {
-			$this->addCheck(DI::l10n()->t('The database configuration file "config/local.config.php" could not be written. Please use the enclosed text to create a configuration file in your web server root.'), false, false, htmlentities($txt, ENT_COMPAT, 'UTF-8'));
+			$this->addCheck(DI::l10n()->t('The database configuration file "config/local.config.neon" could not be written. Please use the enclosed text to create a configuration file in your web server root.'), false, false, htmlentities($txt, ENT_COMPAT, 'UTF-8'));
 		}
 
 		return $result;
@@ -497,9 +497,9 @@ class Installer
 	}
 
 	/**
-	 * "config/local.config.php" - Check
+	 * "config/local.config.neon" - Check
 	 *
-	 * Checks if it's possible to create the "config/local.config.php"
+	 * Checks if it's possible to create the "config/local.config.neon"
 	 *
 	 * @return bool false if something required failed
 	 */
@@ -507,17 +507,17 @@ class Installer
 	{
 		$status = true;
 		$help = "";
-		if ((file_exists('config/local.config.php') && !is_writable('config/local.config.php')) ||
-			(!file_exists('config/local.config.php') && !is_writable('.'))) {
+		if ((file_exists('config/local.config.neon') && !is_writable('config/local.config.neon')) ||
+			(!file_exists('config/local.config.neon') && !is_writable('.'))) {
 
 			$status = false;
-			$help = DI::l10n()->t('The web installer needs to be able to create a file called "local.config.php" in the "config" folder of your web server and it is unable to do so.') . '<br />';
+			$help = DI::l10n()->t('The web installer needs to be able to create a file called "local.config.neon" in the "config" folder of your web server and it is unable to do so.') . '<br />';
 			$help .= DI::l10n()->t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.') . '<br />';
-			$help .= DI::l10n()->t('At the end of this procedure, we will give you a text to save in a file named local.config.php in your Friendica "config" folder.') . '<br />';
+			$help .= DI::l10n()->t('At the end of this procedure, we will give you a text to save in a file named local.config.neon in your Friendica "config" folder.') . '<br />';
 			$help .= DI::l10n()->t('You can alternatively skip this procedure and perform a manual installation. Please see the file "doc/INSTALL.md" for instructions.') . '<br />';
 		}
 
-		$this->addCheck(DI::l10n()->t('config/local.config.php is writable'), $status, false, $help);
+		$this->addCheck(DI::l10n()->t('config/local.config.neon is writable'), $status, false, $help);
 
 		// Local INI File is not required
 		return true;

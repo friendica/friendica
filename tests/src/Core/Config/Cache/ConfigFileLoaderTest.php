@@ -44,7 +44,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testLoadConfigFiles()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$configFileLoader = new ConfigFileManager(
 			$this->root->url(),
@@ -59,16 +59,16 @@ class ConfigFileLoaderTest extends MockedTest
 	}
 
 	/**
-	 * Test the loadConfigFiles() method with a wrong local.config.php
+	 * Test the loadConfigFiles() method with a wrong local.config.neon
 	 *
 	 */
 	public function testLoadConfigWrong()
 	{
 		$this->expectExceptionMessageMatches("/Error loading config file \w+/");
 		$this->expectException(\Exception::class);
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
-		vfsStream::newFile('local.config.php')
+		vfsStream::newFile('local.config.neon')
 			->at($this->root->getChild('config'))
 			->setContent('<?php return true;');
 
@@ -83,11 +83,11 @@ class ConfigFileLoaderTest extends MockedTest
 	}
 
 	/**
-	 * Test the loadConfigFiles() method with a local.config.php file
+	 * Test the loadConfigFiles() method with a local.config.neon file
 	 */
 	public function testLoadConfigFilesLocal()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 			'..' . DIRECTORY_SEPARATOR .
@@ -124,7 +124,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testLoadConfigFilesINI()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 			'..' . DIRECTORY_SEPARATOR .
@@ -156,11 +156,11 @@ class ConfigFileLoaderTest extends MockedTest
 	}
 
 	/**
-	 * Test the loadConfigFile() method with a .htconfig.php file
+	 * Test the loadConfigFile() method with a .htconfig.neon file
 	 */
 	public function testLoadConfigFilesHtconfig()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 			'..' . DIRECTORY_SEPARATOR .
@@ -249,7 +249,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testLoadMultipleConfigs()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 		        '..' . DIRECTORY_SEPARATOR .
@@ -283,7 +283,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testLoadMultipleInis()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 		           '..' . DIRECTORY_SEPARATOR .
@@ -313,11 +313,11 @@ class ConfigFileLoaderTest extends MockedTest
 	}
 
 	/**
-	 * Test that sample-files (e.g. local-sample.config.php) is never loaded
+	 * Test that sample-files (e.g. local-sample.config.neon) is never loaded
 	 */
 	public function testNotLoadingSamples()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 		           '..' . DIRECTORY_SEPARATOR .
@@ -351,7 +351,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testWrongEnvDir()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$configFileLoader = (new Config())->createConfigFileLoader($this->root->url(), ['FRIENDICA_CONFIG_DIR' => '/a/wrong/dir/']);
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
@@ -366,7 +366,7 @@ class ConfigFileLoaderTest extends MockedTest
 	 */
 	public function testRightEnvDir()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 				   '..' . DIRECTORY_SEPARATOR .
@@ -375,9 +375,9 @@ class ConfigFileLoaderTest extends MockedTest
 				   'datasets' . DIRECTORY_SEPARATOR .
 				   'config' . DIRECTORY_SEPARATOR;
 
-		vfsStream::newFile('B.config.php')
+		vfsStream::newFile('B.config.neon')
 				 ->at($this->root->getChild('config2'))
-				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
+				 ->setContent(file_get_contents($fileDir . 'B.config.neon'));
 
 		$configFileLoader = (new Config())->createConfigFileLoader($this->root->url(), ['FRIENDICA_CONFIG_DIR' => $this->root->getChild('config2')->url()]);
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
@@ -389,7 +389,7 @@ class ConfigFileLoaderTest extends MockedTest
 
 	public function testSaveData()
 	{
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
 		$fileDir = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 				   '..' . DIRECTORY_SEPARATOR .
@@ -398,9 +398,9 @@ class ConfigFileLoaderTest extends MockedTest
 				   'datasets' . DIRECTORY_SEPARATOR .
 				   'config' . DIRECTORY_SEPARATOR;
 
-		vfsStream::newFile('B.config.php')
+		vfsStream::newFile('B.config.neon')
 				 ->at($this->root->getChild('config2'))
-				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
+				 ->setContent(file_get_contents($fileDir . 'B.config.neon'));
 
 		$configFileLoader = (new Config())->createConfigFileLoader($this->root->url(), ['FRIENDICA_CONFIG_DIR' => $this->root->getChild('config2')->url()]);
 		$configCache = new \Friendica\Core\Config\ValueObject\Cache();

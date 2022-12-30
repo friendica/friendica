@@ -53,8 +53,8 @@ trait VFSTrait
 		$this->setConfigFile('dbview.config.php', true);
 		$this->setConfigFile('defaults.config.php', true);
 		$this->setConfigFile('settings.config.php', true);
-		$this->setConfigFile('local.config.php');
-		$this->setDataFile('data.json');
+		$this->setConfigFile('local.config.neon');
+		$this->setDataFile('node.config.neon');
 	}
 
 	protected function setDataFile(string $filename)

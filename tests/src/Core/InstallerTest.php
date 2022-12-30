@@ -312,14 +312,14 @@ class InstallerTest extends MockedTest
 	{
 		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
-		self::assertTrue($this->root->hasChild('config/local.config.php'));
+		self::assertTrue($this->root->hasChild('config/local.config.neon'));
 
 		$install = new Installer();
 		self::assertTrue($install->checkLocalIni());
 
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
-		self::assertFalse($this->root->hasChild('config/local.config.php'));
+		self::assertFalse($this->root->hasChild('config/local.config.neon'));
 
 		$install = new Installer();
 		self::assertTrue($install->checkLocalIni());

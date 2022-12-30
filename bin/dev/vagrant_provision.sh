@@ -8,11 +8,6 @@
 #
 ##
 
-ADMIN_NICK="admin"
-ADMIN_PASSW="admin"
-
-USER_NICK="user"
-USER_PASSW="user"
 
 ##
 
@@ -112,7 +107,7 @@ cp /vagrant/.htaccess-dist /vagrant/.htaccess
 echo "create database friendica DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci" | $MYSQL -u root -proot
 
 # install friendica
-bin/console autoinstall -f /vagrant/mods/local.config.vagrant.php
+bin/console autoinstall -f /vagrant/mods/local.config.vagrant.neon
 
 # add users
 # (disable a bunch of validation because this is a dev install, deh, it needs invalid emails and stupid passwords)

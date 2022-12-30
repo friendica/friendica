@@ -86,7 +86,7 @@ class ConfigFileManager
 	 * Load the configuration files into an configuration cache
 	 *
 	 * First loads the default value for all the configuration keys, then the legacy configuration files, then the
-	 * expected local.config.php
+	 * expected local.config.neon
 	 *
 	 * @param Cache $config The config cache to load to
 	 * @param array $server The $_SERVER array
@@ -107,7 +107,7 @@ class ConfigFileManager
 		// Now load every other config you find inside the 'config/' directory
 		$this->loadCoreConfig($config);
 
-		// Now load the data.config.php file with the overriden data
+		// Now load the node.config.neon file with the node specific config values (based on admin gui/console actions)
 		$this->loadDataConfig($config);
 
 		$config->load($this->loadEnvConfig($server), Cache::SOURCE_ENV);
@@ -134,7 +134,7 @@ class ConfigFileManager
 		$iniName    = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.ini.php';
 
 		if (file_exists($configName)) {
-			return $this->loadConfigFile($configName);
+			return $this->loadPhpConfigFile($configName);
 		} elseif (file_exists($iniName)) {
 			return $this->loadINIConfigFile($iniName);
 		} else {
@@ -152,13 +152,18 @@ class ConfigFileManager
 	private function loadCoreConfig(Cache $config)
 	{
 		// try to load legacy ini-files first
-		foreach ($this->getConfigFiles(true) as $configFile) {
+		foreach ($this->getConfigFiles('ini.php') as $configFile) {
 			$config->load($this->loadINIConfigFile($configFile), Cache::SOURCE_FILE);
 		}
 
-		// try to load supported config at last to overwrite it
+		// try to load legacy php-config-files next
+		foreach ($this->getConfigFiles('config.php') as $configFile) {
+			$config->load($this->loadPhpConfigFile($configFile), Cache::SOURCE_FILE);
+		}
+
+		// try to load supported neon-config at last to overwrite it
 		foreach ($this->getConfigFiles() as $configFile) {
-			$config->load($this->loadConfigFile($configFile), Cache::SOURCE_FILE);
+			$config->load($this->loadNeonConfigFile($configFile), Cache::SOURCE_FILE);
 		}
 	}
 
@@ -232,7 +237,7 @@ class ConfigFileManager
 					$name . ".config.php";                   // openstreetmap.config.php
 
 		if (file_exists($filepath)) {
-			return $this->loadConfigFile($filepath);
+			return $this->loadPhpConfigFile($filepath);
 		} else {
 			return [];
 		}
@@ -256,7 +261,7 @@ class ConfigFileManager
 			return [];
 		}
 
-		$envConfig = $this->loadConfigFile($filepath);
+		$envConfig = $this->loadPhpConfigFile($filepath);
 
 		$return = [];
 
@@ -272,19 +277,19 @@ class ConfigFileManager
 	/**
 	 * Get the config files of the config-directory
 	 *
-	 * @param bool $ini True, if scan for ini-files instead of config files
+	 * @param string $format The format, which should get loaded (default is neon)
 	 *
 	 * @return array
 	 */
-	private function getConfigFiles(bool $ini = false): array
+	private function getConfigFiles(string $format = 'neon'): array
 	{
 		$files = scandir($this->configDir);
 		$found = [];
 
-		$filePattern = ($ini ? '*.ini.php' : '*.config.php');
+		$filePattern = sprintf('*.%s', $format);
 
 		// Don't load sample files
-		$sampleEnd = self::SAMPLE_END . ($ini ? '.ini.php' : '.config.php');
+		$sampleEnd = sprintf('%s.%s', self::SAMPLE_END, $format);
 
 		foreach ($files as $filename) {
 			if (fnmatch($filePattern, $filename) &&
@@ -408,9 +413,36 @@ class ConfigFileManager
 	 *
 	 * @throws ConfigFileException if the config cannot get loaded.
 	 */
-	private function loadConfigFile(string $filepath): array
+	private function loadPhpConfigFile(string $filepath): array
 	{
 		$config = include($filepath);
+
+		if (!is_array($config)) {
+			throw new ConfigFileException('Error loading config file ' . $filepath);
+		}
+
+		return $config;
+	}
+
+	/**
+	 * Tries to load the specific neon config file and returns the config array
+	 *
+	 * The config format is NEON
+	 * @see https://doc.nette.org/en/neon/format
+	 *
+	 * @param string $filepath The filepath of the *.neon file
+	 *
+	 * @return array The config array
+	 *
+	 * @throws ConfigFileException if the config cannot get loaded.
+	 */
+	private function loadNeonConfigFile(string $filepath): array
+	{
+		try {
+			$config = Neon\Neon::decodeFile($filepath);
+		} catch (Neon\Exception $exception) {
+			throw new ConfigFileException('Error loading config file ' . $filepath, $exception);
+		}
 
 		if (!is_array($config)) {
 			throw new ConfigFileException('Error loading config file ' . $filepath);

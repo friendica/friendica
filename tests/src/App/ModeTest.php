@@ -73,11 +73,11 @@ class ModeTest extends MockedTest
 	{
 		$this->basePathMock->shouldReceive('getPath')->andReturn($this->root->url())->once();
 
-		self::assertTrue($this->root->hasChild('config/local.config.php'));
+		self::assertTrue($this->root->hasChild('config/local.config.neon'));
 
-		$this->delConfigFile('local.config.php');
+		$this->delConfigFile('local.config.neon');
 
-		self::assertFalse($this->root->hasChild('config/local.config.php'));
+		self::assertFalse($this->root->hasChild('config/local.config.neon'));
 
 		$mode = (new Mode())->determine($this->basePathMock, $this->databaseMock, $this->configCacheMock);
 

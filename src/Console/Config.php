@@ -22,7 +22,6 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use RuntimeException;
 
@@ -52,10 +51,6 @@ class Config extends \Asika\SimpleConsole\Console
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/**
-	 * @var App\Mode
-	 */
-	private $appMode;
-	/**
 	 * @var IManageConfigValues
 	 */
 	private $config;
@@ -84,8 +79,8 @@ Description
 		Sets the value of the provided key in the category
 
 Notes:
-	Setting config entries which are manually set in config/local.config.php may result in
-	conflict between database settings and the manual startup settings.
+	Setting config entries which are manually set in config/local.config.neon may result in
+	conflict between config/node.config.neon settings and the manual startup settings.
 
 Options
     -h|--help|-? Show help information
@@ -94,11 +89,10 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(App\Mode $appMode, IManageConfigValues $config, array $argv = null)
+	public function __construct(IManageConfigValues $config, array $argv = null)
 	{
 		parent::__construct($argv);
 
-		$this->appMode = $appMode;
 		$this->config = $config;
 	}
 

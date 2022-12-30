@@ -31,10 +31,6 @@ use Mockery\MockInterface;
 
 class ConfigConsoleTest extends ConsoleTest
 {
-	/**
-	 * @var App\Mode|MockInterface $appMode
-	 */
-	private $appMode;
 	/** @var IManageConfigValues|LegacyMockInterface|MockInterface */
 	private $configMock;
 
@@ -47,10 +43,6 @@ class ConfigConsoleTest extends ConsoleTest
 				'DBCONFIGAVAILABLE' => 0,
 			],
 		]);
-
-		$this->appMode = Mockery::mock(App\Mode::class);
-		$this->appMode->shouldReceive('has')
-					  ->andReturn(true);
 
 		$this->configMock = Mockery::mock(IManageConfigValues::class);
 	}
@@ -73,7 +65,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->andReturn('now')
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -86,7 +78,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->andReturn('now')
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$txt = $this->dumpExecute($console);
@@ -98,7 +90,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->andReturn(null)
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$txt = $this->dumpExecute($console);
@@ -114,7 +106,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->andReturn($testArray)
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -131,7 +123,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->andReturn('now')
 			->twice();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -142,7 +134,7 @@ class ConfigConsoleTest extends ConsoleTest
 
 	public function testTooManyArguments()
 	{
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'it');
@@ -160,7 +152,7 @@ class ConfigConsoleTest extends ConsoleTest
 			->with('test', 'it')
 			->andReturn('now')
 			->once();
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
 		$console->setOption('v', 1);
@@ -194,7 +186,7 @@ CONF;
 			->with('test', 'it')
 			->andReturn(null)
 			->twice();
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
 		$console->setArgument(2, 'now');
@@ -227,15 +219,15 @@ Description
 		Sets the value of the provided key in the category
 
 Notes:
-	Setting config entries which are manually set in config/local.config.php may result in
-	conflict between database settings and the manual startup settings.
+	Setting config entries which are manually set in config/local.config.neon may result in
+	conflict between config/node.config.neon settings and the manual startup settings.
 
 Options
     -h|--help|-? Show help information
     -v           Show more debug information.
 
 HELP;
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setOption('help', true);
 
 		$txt = $this->dumpExecute($console);

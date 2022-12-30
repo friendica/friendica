@@ -135,7 +135,8 @@ class Mode
 
 		$basepathName = $basepath->getPath();
 
-		if (!file_exists($basepathName . '/config/local.config.php')
+		if (!file_exists($basepathName . '/config/local.config.neon')
+			&& !file_exists($basepathName . '/config/local.config.php')
 		    && !file_exists($basepathName . '/config/local.ini.php')
 		    && !file_exists($basepathName . '/.htconfig.php')) {
 			return new Mode($mode);

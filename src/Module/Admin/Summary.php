@@ -107,11 +107,15 @@ class Summary extends BaseAdmin
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.neon, please copy config/local-sample.config.neon and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.neon, please copy config/local-sample.config.neon and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+		}
+
+		if (file_exists('config/local.config.php')) {
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.neon, please copy config/local-sample.config.neon and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
 		}
 
 		// Check server vitality

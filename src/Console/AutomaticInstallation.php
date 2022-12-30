@@ -30,6 +30,7 @@ use Friendica\Core\Installer;
 use Friendica\Core\Theme;
 use Friendica\Database\Database;
 use Friendica\Util\BasePath;
+use Nette\Neon\Neon;
 use RuntimeException;
 
 class AutomaticInstallation extends Console
@@ -51,7 +52,7 @@ Synopsis
 	bin/console autoinstall [-h|--help|-?] [-v] [-a] [-f]
 
 Description
-    Installs Friendica with data based on the local.config.php file or environment variables
+    Installs Friendica with data based on the local.config.neon file or environment variables
 
 Notes
     Not checking .htaccess/URL-Rewrite during CLI installation.
@@ -60,7 +61,7 @@ Options
     -h|--help|-?            Show help information
     -v                      Show more debug information.
     -a                      All setup checks are required (except .htaccess)
-    -f|--file <config>      prepared config file (e.g. "config/local.config.php" itself) which will override every other config option - except the environment variables)
+    -f|--file <config>      prepared config file (e.g. "config/local.config.neon" itself) which will override every other config option - except the environment variables)
     -s|--savedb               Save the DB credentials to the file (if environment variables is used)
     -H|--dbhost <host>        The host of the mysql/mariadb database (env MYSQL_HOST)
     -p|--dbport <port>        The port of the mysql/mariadb database (env MYSQL_PORT)
@@ -93,7 +94,7 @@ Examples
 		Installs Friendica with the prepared 'input.config.php' file
 
 	bin/console autoinstall --savedb
-		Installs Friendica with environment variables and saves them to the 'config/local.config.php' file
+		Installs Friendica with environment variables and saves them to the 'config/local.config.neon' file
 
 	bin/console autoinstall -H localhost -p 3365 -u user -P passwort1234 -d friendica -U https://friendica.fqdn
 		Installs Friendica with a local mysql database with credentials
@@ -146,9 +147,9 @@ HELP;
 			}
 
 			//append config file to the config cache
-			$config = include($config_file);
+			$config = Neon::decodeFile($config_file);
 			if (!is_array($config)) {
-				throw new Exception('Error loading config file ' . $config_file);
+				throw new \Exception('Error loading config file ' . $config_file);
 			}
 			$configCache->load($config, Cache::SOURCE_FILE);
 		} else {
@@ -230,11 +231,11 @@ HELP;
 			throw new RuntimeException($errorMessage);
 		}
 
-		if (!empty($config_file) && $config_file != 'config' . DIRECTORY_SEPARATOR . 'local.config.php') {
+		if (!empty($config_file) && $config_file != 'config' . DIRECTORY_SEPARATOR . 'local.config.neon') {
 			// Copy config file
 			$this->out("Copying config file...");
-			if (!copy($config_file, $basePathConf . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.php')) {
-				throw new RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to '" . $basePathConf . "'" . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "local.config.php' manually.\n");
+			if (!copy($config_file, $basePathConf . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.neon')) {
+				throw new RuntimeException("ERROR: Saving config file failed. Please copy '$config_file' to '" . $basePathConf . "'" . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "local.config.neon' manually.\n");
 			}
 		}
 
@@ -246,7 +247,7 @@ HELP;
 			Theme::install($this->config->get('system', 'theme'));
 			$this->out(" Complete\n");
 		} else {
-			$this->out(" Theme setting is empty. Please check the file 'config/local.config.php'\n");
+			$this->out(" Theme setting is empty. Please check the file 'config/local.config.neon'\n");
 		}
 
 		$this->out("\nInstallation is finished");

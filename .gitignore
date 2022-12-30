@@ -10,10 +10,10 @@ home.html
 robots.txt
 
 #ignore local config
-!/config/local-sample.config.php
+!/config/local-sample.config.neon
 /config/*.config.php
 /config/*.ini.php
-/config/data.config.neon
+/config/*.config.neon
 
 #ignore documentation, it should be newly built
 /doc/api
