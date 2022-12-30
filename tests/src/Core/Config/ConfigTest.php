@@ -402,4 +402,20 @@ class ConfigTest extends MockedTest
 		self::assertFalse($this->testedConfig->set('config', 'test', '123'));
 		self::assertEquals('prio', $this->testedConfig->get('config', 'test', '', true));
 	}
+
+	/**
+	 * This test performs neon linter functions for known neon-files
+	 */
+	public function testNeonFiles()
+	{
+		$output = [];
+		$returnCode = 0;
+		exec(sprintf('%s/vendor/bin/neon-lint %s/%s 2>&1 >/dev/null', dirname(__DIR__, 4), dirname(__DIR__, 4), '/config/'), $output, $returnCode);
+
+		self::assertEmpty($returnCode, implode(' / ', $output));
+
+		exec(sprintf('%s/vendor/bin/neon-lint %s/%s 2>&1 >/dev/null', dirname(__DIR__, 4), dirname(__DIR__, 4), '/static/'), $output, $returnCode);
+
+		self::assertEmpty($returnCode, implode(' / ', $output));
+	}
 }
