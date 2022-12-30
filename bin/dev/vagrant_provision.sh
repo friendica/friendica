@@ -8,6 +8,11 @@
 #
 ##
 
+ADMIN_NICK="admin"
+ADMIN_PASSW="admin"
+
+USER_NICK="user"
+USER_PASSW="user"
 
 ##
 
