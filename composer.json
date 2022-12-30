@@ -33,6 +33,7 @@
 		"friendica/json-ld": "^1.0",
 		"geekwright/po": "^2.0",
 		"guzzlehttp/guzzle": "^6.5",
+		"kornrunner/blurhash": "^1.2",
 		"league/html-to-markdown": "^4.8",
 		"level-2/dice": "^4",
 		"lightopenid/lightopenid": "dev-master",
@@ -41,6 +42,7 @@
 		"michelf/php-markdown": "^1.7",
 		"minishlink/web-push": "^6.0",
 		"mobiledetect/mobiledetectlib": "^2.8",
+		"nette/neon": "^3.3",
 		"nikic/fast-route": "^1.3",
 		"paragonie/hidden-string": "^1.0",
 		"patrickschur/language-detection": "^5.0.0",
@@ -48,6 +50,7 @@
 		"phpseclib/phpseclib": "^3.0",
 		"pragmarx/google2fa": "^5.0",
 		"pragmarx/recovery": "^0.2",
+		"psr/clock": "^1.0",
 		"psr/container": "^1.0",
 		"psr/log": "^1.1",
 		"seld/cli-prompt": "^1.0",
@@ -70,10 +73,7 @@
 		"npm-asset/moment": "^2.24",
 		"npm-asset/perfect-scrollbar": "0.6.16",
 		"npm-asset/textcomplete": "^0.18.2",
-		"npm-asset/typeahead.js": "^0.11.1",
-		"kornrunner/blurhash": "^1.2",
-		"psr/clock": "^1.0",
-		"nette/neon": "^3.3"
+		"npm-asset/typeahead.js": "^0.11.1"
 	},
 	"repositories": [
 		{
