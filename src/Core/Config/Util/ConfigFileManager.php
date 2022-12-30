@@ -130,11 +130,14 @@ class ConfigFileManager
 	 */
 	private function loadStaticConfig(string $name): array
 	{
-		$configName = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.config.php';
-		$iniName    = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.ini.php';
+		$configNeonName = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.config.neon';
+		$configPhpName  = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.config.php';
+		$iniName        = $this->staticDir . DIRECTORY_SEPARATOR . $name . '.ini.php';
 
-		if (file_exists($configName)) {
-			return $this->loadPhpConfigFile($configName);
+		if (file_exists($configNeonName)) {
+			return $this->loadNeonConfigFile($configNeonName);
+		} elseif (file_exists($configPhpName)) {
+			return $this->loadPhpConfigFile($configPhpName);
 		} elseif (file_exists($iniName)) {
 			return $this->loadINIConfigFile($iniName);
 		} else {

@@ -52,7 +52,7 @@ They must not be changed by users, because they can get changed from release to 
 
 Currently, the following configurations are included:
 - `defaults.config.php` holds the default values for all the configuration keys that can only be set in `local.config.php`.
-- `settings.config.php` holds the default values for some configuration keys that are set through the admin settings page.
+- `settings.config.neon` holds the default values for some configuration keys that are set through the admin settings page.
 
 #### Migrating from .htconfig.php to config/local.config.php
 

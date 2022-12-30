@@ -52,7 +52,7 @@ trait VFSTrait
 		$this->setConfigFile('dbstructure.config.php', true);
 		$this->setConfigFile('dbview.config.php', true);
 		$this->setConfigFile('defaults.config.php', true);
-		$this->setConfigFile('settings.config.php', true);
+		$this->setConfigFile('settings.config.neon', true);
 		$this->setConfigFile('local.config.neon');
 		$this->setDataFile('node.config.neon');
 	}
