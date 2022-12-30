@@ -61,7 +61,7 @@ pipeline:
       MEMCACHED_HOST: "memcached"
       MEMCACHE_HOST: "memcached"
     commands:
-      - cp config/local-sample.config.php config/local.config.php
+      - cp config/local-sample.config.neon config/local.config.neon
       - if ! bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300; then echo "[ERROR] Waited 300 seconds, no response" >&2; exit 1; fi
       - mysql -h$MYSQL_HOST -P$MYSQL_PORT -p$MYSQL_PASSWORD -u$MYSQL_USER $MYSQL_DATABASE < database.sql
       - if [ "${PHP_MAJOR_VERSION}" = "7.4" -a "${CI_REPO}" = "friendica/friendica" ]; then
