@@ -77,8 +77,8 @@ if (empty(DI::config()->get('system', 'pidfile'))) {
 	die(<<<TXT
 Please set system.pidfile in config/local.config.neon. For example:
     
-    'system:
-        pidfile: /path/to/daemon.pid
+system:
+	pidfile: /path/to/daemon.pid
 TXT
     );
 }

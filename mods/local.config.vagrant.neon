@@ -20,8 +20,6 @@ database:
 
 ##
 # The configuration below will be overruled by the admin panel.
-# Changes made below will only have an effect if the database does
-# not contain any configuration for the friendica system.
 ##
 
 config:
