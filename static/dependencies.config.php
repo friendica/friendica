@@ -78,10 +78,22 @@ return [
 			$_SERVER
 		]
 	],
+	\Friendica\Core\Addons\Capabilities\ILoadAddonDependencies::class => [
+		'instanceOf'      => \Friendica\Core\Addons\Model\AddonDependencyLoader::class,
+	],
+	\Friendica\Core\Addons\Capabilities\IManageAddons::class => [
+		'instanceOf' => \Friendica\Core\Addons\Model\AddonManager::class,
+		'call' => [
+			['load', [], Dice::CHAIN_CALL],
+		],
+	],
 	ICanManageInstances::class => [
 		'instanceOf' => InstanceManager::class,
 		'constructParams' => [
 			[Dice::INSTANCE => Dice::SELF],
+		],
+		'call' => [
+			['loadAddons', [], Dice::CHAIN_CALL],
 		],
 	],
 	Config\Util\ConfigFileManager::class => [

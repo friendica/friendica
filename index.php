@@ -31,6 +31,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 $dice = (new Dice())->addRules(include __DIR__ . '/static/dependencies.config.php');
 $dice = $dice->addRule(Friendica\App\Mode::class, ['call' => [['determineRunMode', [false, $_SERVER], Dice::CHAIN_CALL]]]);
+$dice = $dice->create(Friendica\Core\Addons\Capabilities\ILoadAddonDependencies::class)->withAddonDependencies($dice);
 
 \Friendica\DI::init($dice);
 

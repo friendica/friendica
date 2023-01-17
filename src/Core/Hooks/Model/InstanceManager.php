@@ -22,6 +22,7 @@
 namespace Friendica\Core\Hooks\Model;
 
 use Dice\Dice;
+use Friendica\Core\Addons\Capabilities\IManageAddons;
 use Friendica\Core\Hooks\Capabilities\IAmAStrategy;
 use Friendica\Core\Hooks\Capabilities\ICanManageInstances;
 use Friendica\Core\Hooks\Exceptions\HookInstanceException;
@@ -36,19 +37,26 @@ class InstanceManager implements ICanManageInstances
 
 	/** @var Dice */
 	protected $dice;
+	/** @var IManageAddons */
+	protected $addonManager;
 
-	public function __construct(Dice $dice)
+	public function __construct(Dice $dice, IManageAddons $addonManager)
 	{
-		$this->dice = $dice;
+		$this->dice         = $dice;
+		$this->addonManager = $addonManager;
+	}
+
+	public function loadAddons(): self
+	{
+		$this->addonManager->loadStrategies($this);
+		$this->addonManager->loadDecorators($this);
+
+		return $this;
 	}
 
 	/** {@inheritDoc} */
 	public function registerStrategy(string $interface, string $name, string $class, array $arguments = null): ICanManageInstances
 	{
-		if (!is_a($class, $interface, true)) {
-			throw new HookRegisterArgumentException(sprintf('%s is not a valid class for the interface %s', $class, $interface));
-		}
-
 		if (!is_a($class, IAmAStrategy::class, true)) {
 			throw new HookRegisterArgumentException(sprintf('%s does not inherit from the marker interface %s', $class, IAmAStrategy::class));
 		}
