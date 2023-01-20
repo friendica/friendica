@@ -55,6 +55,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['worker']]);
+$dice = $dice->create(Friendica\Core\Addons\Capabilities\ILoadAddonDependencies::class)->withAddonDependencies($dice);
 
 DI::init($dice);
 \Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));

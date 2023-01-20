@@ -33,6 +33,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 $dice = (new Dice())->addRules(include __DIR__ . '/../static/dependencies.config.php');
 $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['console']]);
+$dice = $dice->create(Friendica\Core\Addons\Capabilities\ILoadAddonDependencies::class)->withAddonDependencies($dice);
 
 /// @fixme Necessary until Hooks inside the Logger can get loaded without the DI-class
 DI::init($dice);
