@@ -22,7 +22,7 @@
 namespace Friendica\Core\Hooks\Model;
 
 use Dice\Dice;
-use Friendica\Core\Addons\Capabilities\IManageAddons;
+use Friendica\Core\Addons\Capabilities\ILoadAddonHooks;
 use Friendica\Core\Hooks\Capabilities\IAmAStrategy;
 use Friendica\Core\Hooks\Capabilities\ICanManageInstances;
 use Friendica\Core\Hooks\Exceptions\HookInstanceException;
@@ -37,10 +37,10 @@ class InstanceManager implements ICanManageInstances
 
 	/** @var Dice */
 	protected $dice;
-	/** @var IManageAddons */
+	/** @var ILoadAddonHooks */
 	protected $addonManager;
 
-	public function __construct(Dice $dice, IManageAddons $addonManager)
+	public function __construct(Dice $dice, ILoadAddonHooks $addonManager)
 	{
 		$this->dice         = $dice;
 		$this->addonManager = $addonManager;

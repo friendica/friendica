@@ -17,6 +17,7 @@ class AddonDependencyLoader implements ILoadAddonDependencies
 		$this->config = $config;
 	}
 
+	/** {@inheritDoc} */
 	public function withAddonDependencies(Dice $dice): Dice
 	{
 		$rules = [];

@@ -81,8 +81,8 @@ return [
 	\Friendica\Core\Addons\Capabilities\ILoadAddonDependencies::class => [
 		'instanceOf'      => \Friendica\Core\Addons\Model\AddonDependencyLoader::class,
 	],
-	\Friendica\Core\Addons\Capabilities\IManageAddons::class => [
-		'instanceOf' => \Friendica\Core\Addons\Model\AddonManager::class,
+	\Friendica\Core\Addons\Capabilities\ILoadAddonHooks::class => [
+		'instanceOf' => \Friendica\Core\Addons\Model\AddonHookLoader::class,
 		'call' => [
 			['load', [], Dice::CHAIN_CALL],
 		],
