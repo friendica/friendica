@@ -57,7 +57,7 @@ button .btn-link {
     #main-menu,
     #nav-notifications-menu-btn,
     button:hover {
-	color: #fff !important;
+	//color: #fff !important;
         filter: brightness(1);
     }
     button:active {
@@ -70,7 +70,7 @@ button .btn-link {
     #main-menu,
     #nav-notifications-menu-btn,
     button:hover{
-	color: #fff !important;
+	//color: #fff !important;
         filter: brightness(1);
     }
     button:active {
@@ -80,7 +80,7 @@ button .btn-link {
 }
 
 #contact-edit-actions-button {
-  color: #fff;
+  //color: #fff;
   filter: none !important;
 }
 
