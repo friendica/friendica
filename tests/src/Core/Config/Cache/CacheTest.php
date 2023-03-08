@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Core\Config\Cache;
 
-use Friendica\Core\Config\Cache;
+use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Test\MockedTest;
 use ParagonIE\HiddenString\HiddenString;
 use stdClass;
@@ -49,7 +49,7 @@ class CacheTest extends MockedTest
 		];
 	}
 
-	private function assertConfigValues($data, \Friendica\Core\Config\ValueObject\Cache $configCache)
+	private function assertConfigValues($data, Cache $configCache)
 	{
 		foreach ($data as $cat => $values) {
 			foreach ($values as $key => $value) {
@@ -64,7 +64,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testLoadConfigArray($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache = new Cache();
 		$configCache->load($data);
 
 		self::assertConfigValues($data, $configCache);
@@ -83,27 +83,27 @@ class CacheTest extends MockedTest
 			]
 		];
 
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache = new Cache();
+		$configCache->load($data, Cache::SOURCE_DATA);
 		// doesn't override - Low Priority due Config file
-		$configCache->load($override, \Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE);
+		$configCache->load($override, Cache::SOURCE_FILE);
 
 		self::assertConfigValues($data, $configCache);
 
 		// override the value - High Prio due Server Env
-		$configCache->load($override, \Friendica\Core\Config\ValueObject\Cache::SOURCE_ENV);
+		$configCache->load($override, Cache::SOURCE_ENV);
 
 		self::assertEquals($override['system']['test'], $configCache->get('system', 'test'));
 		self::assertEquals($override['system']['boolTrue'], $configCache->get('system', 'boolTrue'));
 
 		// Don't overwrite server ENV variables - even in load mode
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache->load($data, Cache::SOURCE_DATA);
 
 		self::assertEquals($override['system']['test'], $configCache->get('system', 'test'));
 		self::assertEquals($override['system']['boolTrue'], $configCache->get('system', 'boolTrue'));
 
 		// Overwrite ENV variables with ENV variables
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_ENV);
+		$configCache->load($data, Cache::SOURCE_ENV);
 
 		self::assertConfigValues($data, $configCache);
 		self::assertNotEquals($override['system']['test'], $configCache->get('system', 'test'));
@@ -111,11 +111,11 @@ class CacheTest extends MockedTest
 	}
 
 	/**
-	 * Test the loadConfigArray() method with wrong/empty datasets
+	 * Test the loadConfigArray() method with only a category
 	 */
-	public function testLoadConfigArrayWrong()
+	public function testLoadConfigArrayWithOnlyCategory()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache = new Cache();
 
 		// empty dataset
 		$configCache->load([]);
@@ -123,9 +123,10 @@ class CacheTest extends MockedTest
 
 		// wrong dataset
 		$configCache->load(['system' => 'not_array']);
-		self::assertEmpty($configCache->getAll());
+		self::assertEquals([], $configCache->getAll());
 
 		// incomplete dataset (key is integer ID of the array)
+		$configCache = new Cache();
 		$configCache->load(['system' => ['value']]);
 		self::assertEquals('value', $configCache->get('system', 0));
 	}
@@ -136,7 +137,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testGetAll($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache = new Cache();
 		$configCache->load($data);
 
 		$all = $configCache->getAll();
@@ -151,7 +152,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testSetGet($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache = new Cache();
 
 		foreach ($data as $cat => $values) {
 			foreach ($values as $key => $value) {
@@ -167,7 +168,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testGetEmpty()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
+		$configCache = new Cache();
 
 		self::assertNull($configCache->get('something', 'value'));
 	}
@@ -177,7 +178,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testGetCat()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'system' => [
 				'key1' => 'value1',
 				'key2' => 'value2',
@@ -205,7 +206,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testDelete($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache($data);
+		$configCache = new Cache($data);
 
 		foreach ($data as $cat => $values) {
 			foreach ($values as $key => $value) {
@@ -222,7 +223,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testKeyDiffWithResult($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache($data);
+		$configCache = new Cache($data);
 
 		$diffConfig = [
 			'fakeCat' => [
@@ -239,7 +240,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testKeyDiffWithoutResult($data)
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache($data);
+		$configCache = new Cache($data);
 
 		$diffConfig = $configCache->getAll();
 
@@ -251,7 +252,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testPasswordHide()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'database' => [
 				'password' => 'supersecure',
 				'username' => 'notsecured',
@@ -268,7 +269,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testPasswordShow()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'database' => [
 				'password' => 'supersecure',
 				'username' => 'notsecured',
@@ -285,7 +286,7 @@ class CacheTest extends MockedTest
 	 */
 	public function testEmptyPassword()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'database' => [
 				'password' => '',
 				'username' => '',
@@ -299,7 +300,7 @@ class CacheTest extends MockedTest
 
 	public function testWrongTypePassword()
 	{
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'database' => [
 				'password' => new stdClass(),
 				'username' => '',
@@ -309,7 +310,7 @@ class CacheTest extends MockedTest
 		self::assertNotEmpty($configCache->get('database', 'password'));
 		self::assertEmpty($configCache->get('database', 'username'));
 
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache([
+		$configCache = new Cache([
 			'database' => [
 				'password' => 23,
 				'username' => '',
@@ -327,19 +328,273 @@ class CacheTest extends MockedTest
 	public function testSetOverrides($data)
 	{
 
-		$configCache = new \Friendica\Core\Config\ValueObject\Cache();
-		$configCache->load($data, \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB);
+		$configCache = new Cache();
+		$configCache->load($data, Cache::SOURCE_DATA);
 
 		// test with wrong override
-		self::assertFalse($configCache->set('system', 'test', '1234567', \Friendica\Core\Config\ValueObject\Cache::SOURCE_FILE));
+		self::assertFalse($configCache->set('system', 'test', '1234567', Cache::SOURCE_FILE));
 		self::assertEquals($data['system']['test'], $configCache->get('system', 'test'));
 
 		// test with override (equal)
-		self::assertTrue($configCache->set('system', 'test', '8910', \Friendica\Core\Config\ValueObject\Cache::SOURCE_DB));
+		self::assertTrue($configCache->set('system', 'test', '8910', Cache::SOURCE_DATA));
 		self::assertEquals('8910', $configCache->get('system', 'test'));
 
 		// test with override (over)
-		self::assertTrue($configCache->set('system', 'test', '111213', \Friendica\Core\Config\ValueObject\Cache::SOURCE_ENV));
+		self::assertTrue($configCache->set('system', 'test', '111213', Cache::SOURCE_ENV));
 		self::assertEquals('111213', $configCache->get('system', 'test'));
+	}
+
+	/**
+	 * @dataProvider dataTests
+	 *
+	 * @return void
+	 */
+	public function testSetData($data)
+	{
+		$configCache = new Cache();
+		$configCache->load($data, Cache::SOURCE_FILE);
+
+		$configCache->set('system', 'test_2','with_data', Cache::SOURCE_DATA);
+
+		$this->assertEquals(['system' => ['test_2' => 'with_data']], $configCache->getDataBySource(Cache::SOURCE_DATA));
+		$this->assertEquals($data, $configCache->getDataBySource(Cache::SOURCE_FILE));
+	}
+
+	/**
+	 * @dataProvider dataTests
+	 */
+	public function testMerge($data)
+	{
+		$configCache = new Cache();
+		$configCache->load($data, Cache::SOURCE_FILE);
+
+		$configCache->set('system', 'test_2','with_data', Cache::SOURCE_DATA);
+		$configCache->set('config', 'test_override','with_another_data', Cache::SOURCE_DATA);
+		$configCache->set('old_category', 'test_45','given category', Cache::SOURCE_DATA);
+
+		$newCache = new Cache();
+		$newCache->set('config', 'test_override','override it again', Cache::SOURCE_DATA);
+		$newCache->set('system', 'test_3','new value', Cache::SOURCE_DATA);
+		$newCache->set('new_category', 'test_23','added category', Cache::SOURCE_DATA);
+
+		$mergedCache = $configCache->merge($newCache);
+
+		self::assertEquals('with_data', $mergedCache->get('system', 'test_2'));
+		self::assertEquals('override it again', $mergedCache->get('config', 'test_override'));
+		self::assertEquals('new value', $mergedCache->get('system', 'test_3'));
+		self::assertEquals('given category', $mergedCache->get('old_category', 'test_45'));
+		self::assertEquals('added category', $mergedCache->get('new_category', 'test_23'));
+	}
+
+	public function dataTestCat()
+	{
+		return [
+			'test_with_hashmap'     => [
+				'data'      => [
+					'test_with_hashmap' => [
+						'notifyall' => [
+							'last_update' => 1671051565,
+							'admin'       => true,
+						],
+						'blockbot'  => [
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'            => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'            => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_hashmap',
+				'assertion' => [
+					'notifyall' => [
+						'last_update' => 1671051565,
+						'admin'       => true,
+					],
+					'blockbot'  => [
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+			'test_with_keys'        => [
+				'data'      => [
+					'test_with_keys' => [
+						[
+							'last_update' => 1671051565,
+							'admin'       => true,
+						],
+						[
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'            => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'            => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_keys',
+				'assertion' => [
+					[
+						'last_update' => 1671051565,
+						'admin'       => true,
+					],
+					[
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+			'test_with_inner_array' => [
+				'data'      => [
+					'test_with_inner_array' => [
+						'notifyall' => [
+							'last_update' => 1671051565,
+							'admin'       => [
+								'yes' => true,
+								'no'  => 1.5,
+							],
+						],
+						'blogbot'   => [
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'                => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'                => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_inner_array',
+				'assertion' => [
+					'notifyall' => [
+						'last_update' => 1671051565,
+						'admin'       => [
+							'yes' => true,
+							'no'  => 1.5,
+						],
+					],
+					'blogbot'   => [
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+			/** @see https://github.com/friendica/friendica/issues/12486#issuecomment-1374609349 */
+			'test_with_null' => [
+				'data'      => [
+					'test_with_null' => null,
+					'config'                => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'                => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_null',
+				'assertion' => null,
+			],
+		];
+	}
+
+	/**
+	 * Tests that the Cache can return a whole category at once
+	 *
+	 * @dataProvider dataTestCat
+	 */
+	public function testGetCategory($data, string $category, $assertion)
+	{
+		$cache = new Cache($data);
+
+		self::assertEquals($assertion, $cache->get($category));
+	}
+
+	/**
+	 * Test that the cache can get merged with different categories
+	 *
+	 * @dataProvider dataTestCat
+	 */
+	public function testCatMerge($data, string $category)
+	{
+		$cache = new Cache($data);
+
+		$newCache = $cache->merge(new Cache([
+			$category => [
+				'new_key' => 'new_value',
+			],
+		]));
+
+		self::assertEquals('new_value', $newCache->get($category, 'new_key'));
+	}
+
+	/**
+	 * Test that keys are removed after a deletion
+	 *
+	 * @dataProvider dataTests
+	 *
+	 */
+	public function testDeleteRemovesKey($data)
+	{
+		$cache = new Cache();
+		$cache->load($data, Cache::SOURCE_FILE);
+
+		$cache->set('system', 'test', 'overwrite!', Cache::SOURCE_DATA);
+		self::assertEquals('overwrite!', $cache->get('system', 'test'));
+
+		// array should now be removed
+		$cache->delete('system', 'test');
+		self::assertArrayNotHasKey('test', $cache->getAll()['system']);
+
+		self::assertArrayHasKey('config', $cache->getAll());
+		self::assertArrayHasKey('a', $cache->getAll()['config']);
+
+		// category should now be removed
+		$cache->delete('config', 'a');
+		self::assertArrayNotHasKey('config', $cache->getAll());
+	}
+
+	/**
+	 * Test that deleted keys are working with merge
+	 *
+	 * @dataProvider dataTests
+	 */
+	public function testDeleteAndMergeWithDefault($data)
+	{
+		$cache = new Cache();
+		$cache->load($data, Cache::SOURCE_FILE);
+
+		$cache2 = new Cache();
+		$cache2->set('system', 'test', 'overrride');
+		$cache2->delete('system', 'test');
+
+		self::assertEquals('it', $cache->get('system', 'test'));
+		self::assertNull($cache2->get('system', 'test'));
+
+		$mergedCache = $cache->merge($cache2);
+		self::assertNull($mergedCache->get('system', 'test'));
 	}
 }

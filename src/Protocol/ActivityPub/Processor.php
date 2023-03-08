@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -44,13 +44,13 @@ use Friendica\Model\User;
 use Friendica\Model\Post;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
-use Friendica\Worker\Delivery;
 
 /**
  * ActivityPub Processor Protocol class
@@ -242,6 +242,7 @@ class Processor
 		$item['changed'] = DateTimeFormat::utcNow();
 		$item['edited'] = DateTimeFormat::utc($activity['updated']);
 
+		Post\Media::deleteByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]);
 		$item = self::processContent($activity, $item);
 		if (empty($item)) {
 			Queue::remove($activity);
@@ -505,7 +506,7 @@ class Processor
 		$recursion_depth = $activity['recursion-depth'] ?? 0;
 
 		if (!$in_background && ($recursion_depth < DI::config()->get('system', 'max_recursion_depth'))) {
-			Logger::notice('Parent not found. Try to refetch it.', ['parent' => $activity['reply-to-id'], 'recursion-depth' => $recursion_depth]);
+			Logger::info('Parent not found. Try to refetch it.', ['parent' => $activity['reply-to-id'], 'recursion-depth' => $recursion_depth]);
 			$result = self::fetchMissingActivity($activity['reply-to-id'], $activity, '', Receiver::COMPLETION_AUTO);
 			if (empty($result) && self::isActivityGone($activity['reply-to-id'])) {
 				Logger::notice('The activity is gone, the queue entry will be deleted', ['parent' => $activity['reply-to-id']]);
@@ -516,10 +517,10 @@ class Processor
 			} elseif (!empty($result)) {
 				$exists = Post::exists(['uri' => [$result, $activity['reply-to-id']]]);
 				if ($exists) {
-					Logger::notice('The activity has been fetched and created.', ['parent' => $result]);
+					Logger::info('The activity has been fetched and created.', ['parent' => $result]);
 					return $result;
 				} elseif (DI::config()->get('system', 'fetch_by_worker') || DI::config()->get('system', 'decoupled_receiver')) {
-					Logger::notice('The activity has been fetched and will hopefully be created later.', ['parent' => $result]);
+					Logger::info('The activity has been fetched and will hopefully be created later.', ['parent' => $result]);
 				} else {
 					Logger::notice('The activity exists but has not been created, the queue entry will be deleted.', ['parent' => $result]);
 					if (!empty($activity['entry-id'])) {
@@ -570,7 +571,12 @@ class Processor
 	 */
 	public static function isActivityGone(string $url): bool
 	{
-		$curlResult = HTTPSignature::fetchRaw($url, 0);
+		try {
+			$curlResult = HTTPSignature::fetchRaw($url, 0);
+		} catch (\Exception $exception) {
+			Logger::notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
+			return true;
+		}
 
 		if (Network::isUrlBlocked($url)) {
 			return true;
@@ -1467,13 +1473,14 @@ class Processor
 	 * @param array      $child       activity array with the child of this message
 	 * @param string     $relay_actor Relay actor
 	 * @param int        $completion  Completion mode, see Receiver::COMPLETION_*
+	 * @param int        $uid         User id that is used to fetch the activity
 	 * @return string fetched message URL
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function fetchMissingActivity(string $url, array $child = [], string $relay_actor = '', int $completion = Receiver::COMPLETION_MANUAL): string
+	public static function fetchMissingActivity(string $url, array $child = [], string $relay_actor = '', int $completion = Receiver::COMPLETION_MANUAL, int $uid = 0): string
 	{
-		$object = self::fetchCachedActivity($url, 0);
+		$object = self::fetchCachedActivity($url, $uid);
 		if (empty($object)) {
 			return '';
 		}
@@ -1530,15 +1537,25 @@ class Processor
 
 		$ldactivity['recursion-depth'] = !empty($child['recursion-depth']) ? $child['recursion-depth'] + 1 : 0;
 
-		if (!empty($relay_actor)) {
-			$ldactivity['thread-completion'] = $ldactivity['from-relay'] = Contact::getIdForURL($relay_actor);
-			$ldactivity['completion-mode']   = Receiver::COMPLETION_RELAY;
-		} elseif (!empty($child['thread-completion'])) {
+		if ($object_actor != $actor) {
+			Contact::updateByUrlIfNeeded($object_actor);
+		}
+
+		Contact::updateByUrlIfNeeded($actor);
+
+		if (!empty($child['thread-completion'])) {
 			$ldactivity['thread-completion'] = $child['thread-completion'];
 			$ldactivity['completion-mode']   = $child['completion-mode'] ?? Receiver::COMPLETION_NONE;
 		} else {
-			$ldactivity['thread-completion'] = Contact::getIdForURL($actor);
+			$ldactivity['thread-completion'] = Contact::getIdForURL($relay_actor ?: $actor);
 			$ldactivity['completion-mode']   = $completion;
+		}
+
+		if ($completion == Receiver::COMPLETION_RELAY) {
+			$ldactivity['from-relay'] = $ldactivity['thread-completion'];
+			if (!self::acceptIncomingMessage($ldactivity, $object['id'])) {
+				return '';
+			}
 		}
 
 		if (!empty($child['thread-children-type'])) {
@@ -1549,16 +1566,12 @@ class Processor
 			$ldactivity['thread-children-type'] = 'as:Create';
 		}
 
-		if (!empty($relay_actor) && !self::acceptIncomingMessage($ldactivity, $object['id'])) {
-			return '';
-		}
-
 		if (($completion == Receiver::COMPLETION_RELAY) && Queue::exists($url, 'as:Create')) {
-			Logger::notice('Activity has already been queued.', ['url' => $url, 'object' => $activity['id']]);
-		} elseif (ActivityPub\Receiver::processActivity($ldactivity, json_encode($activity), 0, true, false, $signer, '', $completion)) {
-			Logger::notice('Activity had been fetched and processed.', ['url' => $url, 'entry' => $child['entry-id'] ?? 0, 'completion' => $completion, 'object' => $activity['id']]);
+			Logger::info('Activity has already been queued.', ['url' => $url, 'object' => $activity['id']]);
+		} elseif (ActivityPub\Receiver::processActivity($ldactivity, json_encode($activity), $uid, true, false, $signer, '', $completion)) {
+			Logger::info('Activity had been fetched and processed.', ['url' => $url, 'entry' => $child['entry-id'] ?? 0, 'completion' => $completion, 'object' => $activity['id']]);
 		} else {
-			Logger::notice('Activity had been fetched and will be processed later.', ['url' => $url, 'entry' => $child['entry-id'] ?? 0, 'completion' => $completion, 'object' => $activity['id']]);
+			Logger::info('Activity had been fetched and will be processed later.', ['url' => $url, 'entry' => $child['entry-id'] ?? 0, 'completion' => $completion, 'object' => $activity['id']]);
 		}
 
 		return $activity['id'];
@@ -1715,11 +1728,13 @@ class Processor
 	{
 		if (empty($activity['object_id']) || empty($activity['actor'])) {
 			Logger::info('Empty object id or actor.');
+			Queue::remove($activity);
 			return;
 		}
 
 		if ($activity['object_id'] != $activity['actor']) {
 			Logger::info('Object id does not match actor.');
+			Queue::remove($activity);
 			return;
 		}
 
@@ -1730,6 +1745,42 @@ class Processor
 		DBA::close($contacts);
 
 		Logger::info('Deleted contact', ['object' => $activity['object_id']]);
+		Queue::remove($activity);
+	}
+
+	/**
+	 * Add moved contacts as followers for all subscribers of the old contact
+	 *
+	 * @param array $activity
+	 * @return void
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function movePerson(array $activity)
+	{
+		if (empty($activity['target_id']) || empty($activity['object_id'])) {
+			Queue::remove($activity);
+			return;
+		}
+
+		if ($activity['object_id'] != $activity['actor']) {
+			Logger::notice('Object is not the actor', ['activity' => $activity]);
+			Queue::remove($activity);
+			return;
+		}
+
+		$from = Contact::getByURL($activity['object_id'], false, ['uri-id']);
+		if (empty($from['uri-id'])) {
+			Logger::info('Object not found', ['activity' => $activity]);
+			Queue::remove($activity);
+			return;
+		}
+
+		$contacts = DBA::select('contact', ['uid', 'url'], ["`uri-id` = ? AND `uid` != ? AND `rel` IN (?, ?)", $from['uri-id'], 0, Contact::FRIEND, Contact::SHARING]);
+		while ($from_contact = DBA::fetch($contacts)) {
+			$result = Contact::createFromProbeForUser($from_contact['uid'], $activity['target_id']);
+			Logger::debug('Follower added', ['from' => $from_contact, 'result' => $result]);
+		}
+		DBA::close($contacts);
 		Queue::remove($activity);
 	}
 
@@ -1784,6 +1835,43 @@ class Processor
 	}
 
 	/**
+	 * Report a user
+	 *
+	 * @param array $activity
+	 * @return void
+	 * @throws \Exception
+	 */
+	public static function ReportAccount(array $activity)
+	{
+		$account_id = Contact::getIdForURL($activity['object_id']);
+		if (empty($account_id)) {
+			Logger::info('Unknown account', ['activity' => $activity]);
+			Queue::remove($activity);
+			return;
+		}
+
+		$reporter_id = Contact::getIdForURL($activity['actor']);
+		if (empty($reporter_id)) {
+			Logger::info('Unknown actor', ['activity' => $activity]);
+			Queue::remove($activity);
+			return;
+		}
+
+		$uri_ids = [];
+		foreach ($activity['object_ids'] as $status_id) {
+			$post = Post::selectFirst(['uri-id'], ['uri' => $status_id]);
+			if (!empty($post['uri-id'])) {
+				$uri_ids[] = $post['uri-id'];
+			}
+		}
+
+		$report = DI::reportFactory()->createFromReportsRequest($reporter_id, $account_id, $activity['content'], null, '', false, $uri_ids);
+		DI::report()->save($report);
+
+		Logger::info('Stored report', ['reporter' => $reporter_id, 'account_id' => $account_id, 'comment' => $activity['content'], 'object_ids' => $activity['object_ids']]);
+	}
+
+	/**
 	 * Accept a follow request
 	 *
 	 * @param array $activity
@@ -1792,15 +1880,36 @@ class Processor
 	 */
 	public static function acceptFollowUser(array $activity)
 	{
-		$uid = User::getIdForURL($activity['object_actor']);
+		if (!empty($activity['object_actor'])) {
+			$uid      = User::getIdForURL($activity['object_actor']);
+			$check_id = false;
+		} elseif (!empty($activity['receiver']) && (count($activity['receiver']) == 1)) {
+			$uid      = array_shift($activity['receiver']);
+			$check_id = true;
+		}
+
 		if (empty($uid)) {
+			Logger::notice('User could not be detected', ['activity' => $activity]);
+			Queue::remove($activity);
 			return;
 		}
 
 		$cid = Contact::getIdForURL($activity['actor'], $uid);
 		if (empty($cid)) {
-			Logger::info('No contact found', ['actor' => $activity['actor']]);
+			Logger::notice('No contact found', ['actor' => $activity['actor']]);
+			Queue::remove($activity);
 			return;
+		}
+
+		$id = Transmitter::activityIDFromContact($cid);
+		if ($id == $activity['object_id']) {
+			Logger::info('Successful id check', ['uid' => $uid, 'cid' => $cid]);
+		} else {
+			Logger::info('Unsuccessful id check', ['uid' => $uid, 'cid' => $cid, 'id' => $id, 'object_id' => $activity['object_id']]);
+			if ($check_id) {
+				Queue::remove($activity);
+				return;
+			}
 		}
 
 		self::switchContact($cid);

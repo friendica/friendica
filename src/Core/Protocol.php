@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -174,12 +174,12 @@ class Protocol
 	 * Sends an unfollow message. Does not remove the contact
 	 *
 	 * @param array $contact Target public contact (uid = 0) array
-	 * @param array $user    Source local user array
+	 * @param array $owner   Source owner-view record
 	 * @return bool|null true if successful, false if not, null if no remote action was performed
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function unfollow(array $contact, array $user): ?bool
+	public static function unfollow(array $contact, array $owner): ?bool
 	{
 		if (empty($contact['network'])) {
 			Logger::notice('Contact has got no network, we quit here', ['id' => $contact['id']]);
@@ -203,24 +203,24 @@ class Protocol
 				'uri-id'  => 0,
 			];
 
-			$slap = OStatus::salmon($item, $user);
+			$slap = OStatus::salmon($item, $owner);
 
 			if (empty($contact['notify'])) {
 				Logger::notice('OStatus/DFRN Contact is missing notify, we quit here', ['id' => $contact['id']]);
 				return null;
 			}
 
-			return Salmon::slapper($user, $contact['notify'], $slap) === 0;
+			return Salmon::slapper($owner, $contact['notify'], $slap) === 0;
 		} elseif ($protocol == Protocol::DIASPORA) {
-			return Diaspora::sendUnshare($user, $contact) > 0;
+			return Diaspora::sendUnshare($owner, $contact) > 0;
 		} elseif ($protocol == Protocol::ACTIVITYPUB) {
-			return ActivityPub\Transmitter::sendContactUndo($contact['url'], $contact['id'], $user['uid']);
+			return ActivityPub\Transmitter::sendContactUndo($contact['url'], $contact['id'], $owner);
 		}
 
 		// Catch-all hook for connector addons
 		$hook_data = [
 			'contact' => $contact,
-			'uid'     => $user['uid'],
+			'uid'     => $owner['uid'],
 			'result'  => null,
 		];
 		Hook::callAll('unfollow', $hook_data);
@@ -232,12 +232,12 @@ class Protocol
 	 * Revoke an incoming follow from the provided contact
 	 *
 	 * @param array $contact Target public contact (uid == 0) array
-	 * @param int   $uid     Source local user id
+	 * @param array $owner   Source owner-view record
 	 * @return bool|null true if successful, false if not, null if no action was performed
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function revokeFollow(array $contact, int $uid): ?bool
+	public static function revokeFollow(array $contact, array $owner): ?bool
 	{
 		if (empty($contact['network'])) {
 			throw new \InvalidArgumentException('Missing network key in contact array');
@@ -249,13 +249,13 @@ class Protocol
 		}
 
 		if ($protocol == Protocol::ACTIVITYPUB) {
-			return ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $uid);
+			return ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $owner);
 		}
 
 		// Catch-all hook for connector addons
 		$hook_data = [
 			'contact' => $contact,
-			'uid'     => $uid,
+			'uid'     => $owner['uid'],
 			'result'  => null,
 		];
 		Hook::callAll('revoke_follow', $hook_data);

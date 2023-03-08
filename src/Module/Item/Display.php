@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,6 +37,7 @@ use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Response;
+use Friendica\Module\Special\DisplayNotFound;
 use Friendica\Navigation\Notifications\Repository\Notification;
 use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Protocol\ActivityPub;
@@ -246,14 +247,8 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			throw new HTTPException\NotFoundException($this->t('Unfortunately, the requested conversation isn\'t available to you.</p>
-<p>Possible reasons include:</p>
-<ul>
-	<li>The top-level post isn\'t visible.</li>
-	<li>The top-level post was deleted.</li>
-	<li>The node has blocked the top-level author or the author of the shared post.</li>
-	<li>You have ignored or blocked the top-level author or the author of the shared post.</li>
-</ul><p>'));
+			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			return $displayNotFound->content();
 		}
 
 		$item['uri-id'] = $item['parent-uri-id'];
@@ -278,7 +273,7 @@ class Display extends BaseModule
 			$output .= $this->conversation->statusEditor([], 0, true);
 		}
 
-		$output .= $this->conversation->create([$item], 'display', $updateUid, false, 'commented', $itemUid);
+		$output .= $this->conversation->create([$item], Conversation::MODE_DISPLAY, $updateUid, false, 'commented', $itemUid);
 
 		return $output;
 	}

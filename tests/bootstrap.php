@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -20,8 +20,6 @@
  * This file is loaded by PHPUnit before any test.
  */
 
-use Dice\Dice;
-use Friendica\DI;
 use PHPUnit\Framework\TestCase;
 
 if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
@@ -34,8 +32,3 @@ require __DIR__ . '/../vendor/autoload.php';
 if (!class_exists(TestCase::class)) {
 	class_alias(\PHPUnit\Framework\TestCase::class, TestCase::class);
 }
-
-$dice = new Dice();
-$dice = $dice->addRules(include  __DIR__ . '/../static/dependencies.config.php');
-
-DI::init($dice);

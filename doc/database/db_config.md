@@ -6,12 +6,12 @@ main configuration storage
 Fields
 ------
 
-| Field | Description | Type          | Null | Key | Default | Extra          |
-| ----- | ----------- | ------------- | ---- | --- | ------- | -------------- |
-| id    |             | int unsigned  | NO   | PRI | NULL    | auto_increment |
-| cat   |             | varbinary(50) | NO   |     |         |                |
-| k     |             | varbinary(50) | NO   |     |         |                |
-| v     |             | mediumtext    | YES  |     | NULL    |                |
+| Field | Description               | Type          | Null | Key | Default | Extra          |
+| ----- | ------------------------- | ------------- | ---- | --- | ------- | -------------- |
+| id    |                           | int unsigned  | NO   | PRI | NULL    | auto_increment |
+| cat   | The category of the entry | varbinary(50) | NO   |     |         |                |
+| k     | The key of the entry      | varbinary(50) | NO   |     |         |                |
+| v     |                           | mediumtext    | YES  |     | NULL    |                |
 
 Indexes
 ------------

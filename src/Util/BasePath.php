@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -43,7 +43,7 @@ class BasePath
 	}
 
 	/**
-	 * Returns the base filesystem path of the App
+	 * Returns the base Friendica filesystem path without trailing slash
 	 *
 	 * It first checks for the internal variable, then for DOCUMENT_ROOT and
 	 * finally for PWD
@@ -71,7 +71,7 @@ class BasePath
 			throw new \Exception(sprintf('\'%s\' is not a valid basepath', $baseDir));
 		}
 
-		return $baseDir;
+		return rtrim($baseDir, '/');
 	}
 
 	/**

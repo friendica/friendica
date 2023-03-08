@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,10 +38,10 @@ use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Image;
+use Friendica\Protocol\Delivery;
 use Friendica\Security\PermissionSet\Repository\PermissionSet;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
-use Friendica\Worker\Delivery;
 use Psr\Log\LoggerInterface;
 
 class Import extends \Friendica\BaseModule

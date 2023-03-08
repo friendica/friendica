@@ -666,15 +666,16 @@
                 "x509",
                 "x690"
             ],
+            "abandoned": true,
             "time": "2021-12-11T12:41:06+00:00"
         },
         {
             "name": "friendica/json-ld",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://git.friendi.ca/friendica/php-json-ld",
-                "reference": "ca3916d10d2ad9073b3b1eae383978dbe828e1e1"
+                "reference": "5f6ea87b261d346e57f03457ae906e6835f0205f"
             },
             "require": {
                 "ext-json": "*",
@@ -710,7 +711,7 @@
                 "Semantic Web",
                 "jsonld"
             ],
-            "time": "2018-10-08T20:41:00+00:00"
+            "time": "2023-02-20T21:56:16+00:00"
         },
         {
             "name": "fxp/composer-asset-plugin",
@@ -1244,16 +1245,16 @@
         },
         {
             "name": "level-2/dice",
-            "version": "4.0.3",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Level-2/Dice.git",
-                "reference": "3e9a8548398c01e2527110c916a93f6efa17ac9c"
+                "reference": "e04c98d96bcc932a917b2b7e7944887e4839056a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Level-2/Dice/zipball/3e9a8548398c01e2527110c916a93f6efa17ac9c",
-                "reference": "3e9a8548398c01e2527110c916a93f6efa17ac9c",
+                "url": "https://api.github.com/repos/Level-2/Dice/zipball/e04c98d96bcc932a917b2b7e7944887e4839056a",
+                "reference": "e04c98d96bcc932a917b2b7e7944887e4839056a",
                 "shasum": ""
             },
             "require": {
@@ -1263,6 +1264,9 @@
                 "phpunit/phpunit": "^6.5"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": []
+            },
             "autoload": {
                 "psr-4": {
                     "Dice\\": "./"
@@ -1286,7 +1290,7 @@
                 "di",
                 "ioc"
             ],
-            "time": "2021-04-20T14:06:06+00:00"
+            "time": "2022-03-28T21:20:23+00:00"
         },
         {
             "name": "lightopenid/lightopenid",

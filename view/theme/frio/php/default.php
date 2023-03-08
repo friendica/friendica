@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -35,7 +35,7 @@ if (!isset($minimal)) {
 	$minimal = false;
 }
 
-$basepath = DI::baseUrl()->getUrlPath() ? "/" . DI::baseUrl()->getUrlPath() . "/" : "/";
+$basepath = DI::baseUrl()->getPath() ? "/" . DI::baseUrl()->getPath() . "/" : "/";
 $frio = "view/theme/frio";
 $view_mode_class = (DI::mode()->isMobile() || DI::mode()->isMobile()) ? 'mobile-view' : 'desktop-view';
 $is_singleuser = DI::config()->get('system', 'singleuser');

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -40,7 +40,7 @@ class ShowTest extends ApiTest
 
 
 		(new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -51,7 +51,7 @@ class ShowTest extends ApiTest
 	public function testApiStatusesShowWithId()
 	{
 		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'id' => 1
 			]);
 
@@ -69,7 +69,7 @@ class ShowTest extends ApiTest
 	public function testApiStatusesShowWithConversation()
 	{
 		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'id'           => 1,
 				'conversation' => 1
 			]);

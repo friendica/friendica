@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -43,7 +43,7 @@ class OpenID extends BaseModule
 
 		if (!empty($_GET['openid_mode']) && !empty($session->get('openid'))) {
 
-			$openid = new LightOpenID(DI::baseUrl()->getHostname());
+			$openid = new LightOpenID(DI::baseUrl()->getHost());
 
 			$l10n = DI::l10n();
 
@@ -82,7 +82,7 @@ class OpenID extends BaseModule
 				$session->set('openid_identity', $authId);
 
 				// Detect the server URL
-				$open_id_obj = new LightOpenID(DI::baseUrl()->getHostname());
+				$open_id_obj = new LightOpenID(DI::baseUrl()->getHost());
 				$open_id_obj->identity = $authId;
 				$session->set('openid_server', $open_id_obj->discover($open_id_obj->identity));
 

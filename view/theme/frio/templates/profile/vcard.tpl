@@ -42,12 +42,12 @@
 			{{if $follow_link || $unfollow_link}}
 			<div id="dfrn-request-link-button">
 				{{if $unfollow_link}}
-				<a id="dfrn-request-link" class="btn btn-labeled btn-primary btn-sm" href="{{$unfollow_link}}">
+				<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
 					<span class=""><i class="fa fa-user-times"></i></span>
 					<span class="">{{$unfollow}}</span>
 				</a>
 				{{else}}
-				<a id="dfrn-request-link" class="btn btn-labeled btn-primary btn-sm" href="{{$follow_link}}">
+				<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$follow_link}}">
 					<span class=""><i class="fa fa-user-plus"></i></span>
 					<span class="">{{$follow}}</span>
 				</a>
@@ -56,7 +56,7 @@
 			{{/if}}
 			{{if $subscribe_feed_link}}
 			<div id="subscribe-feed-link-button">
-				<a id="subscribe-feed-link" class="btn btn-labeled btn-primary btn-sm" href="{{$subscribe_feed_link}}">
+				<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
 					<span class=""><i class="fa fa-rss"></i></span>
 					<span class="">{{$subscribe_feed}}</span>
 				</a>
@@ -64,7 +64,7 @@
 			{{/if}}
 			{{if $wallmessage_link}}
 			<div id="wallmessage-link-botton">
-				<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary btn-sm" onclick="openWallMessage('{{$wallmessage_link}}')">
+				<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$wallmessage_link}}')">
 					<span class=""><i class="fa fa-envelope"></i></span>
 					<span class="">{{$wallmessage}}</span>
 				</button>

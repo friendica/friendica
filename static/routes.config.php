@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -31,17 +31,17 @@ use Friendica\App\Router as R;
 use Friendica\Module;
 
 $profileRoutes = [
-	''                                         => [Module\Profile\Index::class,        [R::GET]],
-	'/contacts/common'                         => [Module\Profile\Common::class,       [R::GET]],
-	'/contacts[/{type}]'                       => [Module\Profile\Contacts::class,     [R::GET]],
-	'/media'                                   => [Module\Profile\Media::class,        [R::GET]],
-	'/photos'                                  => [Module\Profile\Photos::class,       [R::GET, R::POST]],
-	'/profile'                                 => [Module\Profile\Profile::class,      [R::GET]],
-	'/remote_follow'                           => [Module\Profile\RemoteFollow::class, [R::GET, R::POST]],
-	'/restricted'                              => [Module\Profile\Restricted::class,   [R::GET         ]],
-	'/schedule'                                => [Module\Profile\Schedule::class,     [R::GET, R::POST]],
-	'/status[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Status::class,       [R::GET]],
-	'/unkmail'                                 => [Module\Profile\UnkMail::class,      [R::GET, R::POST]],
+	''                                                => [Module\Profile\Index::class,         [R::GET]],
+	'/contacts/common'                                => [Module\Profile\Common::class,        [R::GET]],
+	'/contacts[/{type}]'                              => [Module\Profile\Contacts::class,      [R::GET]],
+	'/media'                                          => [Module\Profile\Media::class,         [R::GET]],
+	'/photos'                                         => [Module\Profile\Photos::class,        [R::GET, R::POST]],
+	'/profile'                                        => [Module\Profile\Profile::class,       [R::GET]],
+	'/remote_follow'                                  => [Module\Profile\RemoteFollow::class,  [R::GET, R::POST]],
+	'/restricted'                                     => [Module\Profile\Restricted::class,    [R::GET         ]],
+	'/schedule'                                       => [Module\Profile\Schedule::class,      [R::GET, R::POST]],
+	'/conversations[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Conversations::class, [R::GET]],
+	'/unkmail'                                        => [Module\Profile\UnkMail::class,       [R::GET, R::POST]],
 ];
 
 $apiRoutes = [
@@ -80,6 +80,9 @@ $apiRoutes = [
 	'/friendica' => [
 		'/activity/{verb:attendmaybe|attendno|attendyes|dislike|like|unattendmaybe|unattendno|unattendyes|undislike|unlike}[.{extension:json|xml|rss|atom}]'
 			=> [Module\Api\Friendica\Activity::class, [        R::POST]],
+		'/statuses/{id:\d+}/dislike'                               => [Module\Api\Friendica\Statuses\Dislike::class,       [        R::POST]],
+		'/statuses/{id:\d+}/disliked_by'                           => [Module\Api\Friendica\Statuses\DislikedBy::class,    [R::GET         ]],
+		'/statuses/{id:\d+}/undislike'                             => [Module\Api\Friendica\Statuses\Undislike::class,     [        R::POST]],
 		'/notification/seen[.{extension:json|xml|rss|atom}]'       => [Module\Api\Friendica\Notification\Seen::class,      [        R::POST]],
 		'/notification[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Notification::class,           [R::GET         ]],
 		'/notifications[.{extension:json|xml|rss|atom}]'           => [Module\Api\Friendica\Notification::class,           [R::GET         ]],
@@ -156,6 +159,7 @@ $apiRoutes = [
 		'/show[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
 		'/show/{id:\d+}[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
 	],
+	'/whoami'                                                      => [Module\ActivityPub\Whoami::class, [R::GET         ]],
 ];
 
 return [
@@ -306,7 +310,7 @@ return [
 			'/trends/tags'                       => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
 		],
 		'/v2' => [
-			'/instance'                          => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/instance'                          => [Module\Api\Mastodon\InstanceV2::class,            [R::GET         ]], // not supported
 		],
 		'/v{version:\d+}' => [
 			'/admin/accounts'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
@@ -386,7 +390,7 @@ return [
 	'/contact'   => [
 		'[/]'                         => [Module\Contact::class,                [R::GET]],
 		'/{id:\d+}[/]'                => [Module\Contact\Profile::class,        [R::GET, R::POST]],
-		'/{id:\d+}/{action:block|ignore|update|updateprofile}'
+		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile}'
 		                              => [Module\Contact\Profile::class,        [R::GET]],
 		'/{id:\d+}/advanced'          => [Module\Contact\Advanced::class,       [R::GET, R::POST]],
 		'/{id:\d+}/conversations'     => [Module\Contact\Conversations::class,  [R::GET]],
@@ -401,6 +405,7 @@ return [
 		'/hidden'                     => [Module\Contact::class,                [R::GET]],
 		'/hovercard'                  => [Module\Contact\Hovercard::class,      [R::GET]],
 		'/ignored'                    => [Module\Contact::class,                [R::GET]],
+		'/collapsed'                  => [Module\Contact::class,                [R::GET]],
 		'/match'                      => [Module\Contact\MatchInterests::class, [R::GET]],
 		'/pending'                    => [Module\Contact::class,                [R::GET]],
 		'/redir/{id:\d+}'             => [Module\Contact\Redir::class,          [R::GET]],
@@ -545,7 +550,7 @@ return [
 		'/h2b'    => [Module\Oembed::class, [R::GET]],
 		'/{hash}' => [Module\Oembed::class, [R::GET]],
 	],
-	'/outbox/{nickname}' => [Module\ActivityPub\Outbox::class, [R::GET]],
+	'/outbox/{nickname}' => [Module\ActivityPub\Outbox::class, [R::GET, R::POST]],
 	'/owa'               => [Module\Owa::class,                [R::GET]],
 	'/openid'            => [Module\Security\OpenID::class,    [R::GET]],
 	'/opensearch'        => [Module\OpenSearch::class,         [R::GET]],
@@ -554,6 +559,7 @@ return [
 	'/permission/tooltip/{type}/{id:\d+}' => [Module\PermissionTooltip::class, [R::GET]],
 
 	'/photo' => [
+		'/{size:thumb_small|scaled_full}_{name}'                   => [Module\Photo::class, [R::GET]],
 		'/{name}'                                                  => [Module\Photo::class, [R::GET]],
 		'/{type}/{id:\d+}'                                         => [Module\Photo::class, [R::GET]],
 		'/{type:contact|header}/{guid}'                            => [Module\Photo::class, [R::GET]],
@@ -597,12 +603,13 @@ return [
 	],
 
 	// OStatus stack modules
-	'/ostatus/repair'              => [Module\OStatus\Repair::class,           [R::GET         ]],
-	'/ostatus/subscribe'           => [Module\OStatus\Subscribe::class,        [R::GET         ]],
-	'/poco'                        => [Module\User\PortableContacts::class,    [R::GET         ]],
-	'/pubsub/{nickname}/{cid:\d+}' => [Module\OStatus\PubSub::class,           [R::GET, R::POST]],
-	'/pubsubhubbub/{nickname}'     => [Module\OStatus\PubSubHubBub::class,     [        R::POST]],
-	'/salmon/{nickname}'           => [Module\OStatus\Salmon::class,           [        R::POST]],
+	'/ostatus/repair'                => [Module\OStatus\Repair::class,           [R::GET         ]],
+	'/ostatus/subscribe'             => [Module\OStatus\Subscribe::class,        [R::GET         ]],
+	'/poco'                          => [Module\User\PortableContacts::class,    [R::GET         ]],
+	'/pubsub'                        => [Module\OStatus\PubSub::class,           [R::GET, R::POST]],
+	'/pubsub/{nickname}[/{cid:\d+}]' => [Module\OStatus\PubSub::class,           [R::GET, R::POST]],
+	'/pubsubhubbub[/{nickname}]'     => [Module\OStatus\PubSubHubBub::class,     [        R::POST]],
+	'/salmon[/{nickname}]'           => [Module\OStatus\Salmon::class,           [        R::POST]],
 
 	'/search' => [
 		'[/]'                  => [Module\Search\Index::class, [R::GET         ]],

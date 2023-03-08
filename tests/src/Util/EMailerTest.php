@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -68,8 +68,8 @@ class EMailerTest extends MockedTest
 		$this->pConfig = \Mockery::mock(IManagePersonalConfigValues::class);
 		$this->l10n    = \Mockery::mock(L10n::class);
 		$this->baseUrl = \Mockery::mock(BaseURL::class);
-		$this->baseUrl->shouldReceive('getHostname')->andReturn('friendica.local');
-		$this->baseUrl->shouldReceive('get')->andReturn('http://friendica.local');
+		$this->baseUrl->shouldReceive('getHost')->andReturn('friendica.local');
+		$this->baseUrl->shouldReceive('__toString')->andReturn('http://friendica.local');
 	}
 
 	protected function tearDown(): void

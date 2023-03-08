@@ -34,6 +34,7 @@ Fields
 | last_poco_query       |                                                    | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
 | last_contact          | Last successful connection request                 | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
 | last_failure          | Last failed connection request                     | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
+| blocked               | Server is blocked                                  | boolean          | YES  |     | NULL                |                |
 | failed                | Connection failed                                  | boolean          | YES  |     | NULL                |                |
 | next_contact          | Next connection request                            | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
 

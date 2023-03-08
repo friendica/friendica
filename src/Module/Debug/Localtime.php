@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -58,7 +58,7 @@ class Localtime extends BaseModule
 			$output .= '<p>' . DI::l10n()->t('Converted localtime: %s', self::$mod_localtime) . '</p>';
 		}
 
-		$output .= '<form action ="' . DI::baseUrl()->get() . '/localtime?time=' . $time . '" method="post" >';
+		$output .= '<form action ="localtime?time=' . $time . '" method="post">';
 		$output .= '<p>' . DI::l10n()->t('Please select your timezone:') . '</p>';
 		$output .= Temporal::getTimezoneSelect(($_REQUEST['timezone'] ?? '') ?: Installer::DEFAULT_TZ);
 		$output .= '<input type="submit" name="submit" value="' . DI::l10n()->t('Submit') . '" /></form>';

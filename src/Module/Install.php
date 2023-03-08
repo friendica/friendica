@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -34,6 +34,7 @@ use Friendica\Util\BasePath;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
 use Psr\Log\LoggerInterface;
+use GuzzleHttp\Psr7\Uri;
 
 class Install extends BaseModule
 {
@@ -73,7 +74,7 @@ class Install extends BaseModule
 	/** @var App\Mode */
 	protected $mode;
 
-	public function __construct(App $app, App\Mode $mode, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Core\Installer $installer, array $server, array $parameters = [])
+	public function __construct(App $app, BasePath $basePath, App\Mode $mode, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Core\Installer $installer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -94,12 +95,11 @@ class Install extends BaseModule
 
 		// get basic installation information and save them to the config cache
 		$configCache = $this->app->getConfigCache();
-		$basePath = new BasePath($this->app->getBasePath());
 		$this->installer->setUpCache($configCache, $basePath->getPath());
 
 		// We overwrite current theme css, because during install we may not have a working mod_rewrite
 		// so we may not have a css at all. Here we set a static css file for the install procedure pages
-		Renderer::$theme['stylesheet'] = $this->baseUrl->get() . '/view/install/style.css';
+		Renderer::$theme['stylesheet'] = $this->baseUrl . '/view/install/style.css';
 
 		$this->currentWizardStep = ($_POST['pass'] ?? '') ?: self::SYSTEM_CHECK;
 	}
@@ -117,19 +117,15 @@ class Install extends BaseModule
 			case self::DATABASE_CONFIG:
 				$this->checkSetting($configCache, $_POST, 'config', 'php_path');
 
-				$this->checkSetting($configCache, $_POST, 'config', 'hostname');
-				$this->checkSetting($configCache, $_POST, 'system', 'ssl_policy');
 				$this->checkSetting($configCache, $_POST, 'system', 'basepath');
-				$this->checkSetting($configCache, $_POST, 'system', 'urlpath');
+				$this->checkSetting($configCache, $_POST, 'system', 'url');
 				break;
 
 			case self::SITE_SETTINGS:
 				$this->checkSetting($configCache, $_POST, 'config', 'php_path');
 
-				$this->checkSetting($configCache, $_POST, 'config', 'hostname');
-				$this->checkSetting($configCache, $_POST, 'system', 'ssl_policy');
 				$this->checkSetting($configCache, $_POST, 'system', 'basepath');
-				$this->checkSetting($configCache, $_POST, 'system', 'urlpath');
+				$this->checkSetting($configCache, $_POST, 'system', 'url');
 
 				$this->checkSetting($configCache, $_POST, 'database', 'hostname', Core\Installer::DEFAULT_HOST);
 				$this->checkSetting($configCache, $_POST, 'database', 'username', '');
@@ -146,10 +142,8 @@ class Install extends BaseModule
 			case self::FINISHED:
 				$this->checkSetting($configCache, $_POST, 'config', 'php_path');
 
-				$this->checkSetting($configCache, $_POST, 'config', 'hostname');
-				$this->checkSetting($configCache, $_POST, 'system', 'ssl_policy');
 				$this->checkSetting($configCache, $_POST, 'system', 'basepath');
-				$this->checkSetting($configCache, $_POST, 'system', 'urlpath');
+				$this->checkSetting($configCache, $_POST, 'system', 'url');
 
 				$this->checkSetting($configCache, $_POST, 'database', 'hostname', Core\Installer::DEFAULT_HOST);
 				$this->checkSetting($configCache, $_POST, 'database', 'username', '');
@@ -171,7 +165,7 @@ class Install extends BaseModule
 				}
 
 				$this->installer->installDatabase();
-			
+
 				// install allowed themes to register theme hooks
 				// this is same as "Reload active theme" in /admin/themes
 				$allowed_themes = Theme::getAllowedList();
@@ -198,9 +192,9 @@ class Install extends BaseModule
 			case self::SYSTEM_CHECK:
 				$php_path = $configCache->get('config', 'php_path');
 
-				$status = $this->installer->checkEnvironment($this->baseUrl->get(), $php_path);
+				$status = $this->installer->checkEnvironment($this->baseUrl, $php_path);
 
-				$tpl    = Renderer::getMarkupTemplate('install_checks.tpl');
+				$tpl    = Renderer::getMarkupTemplate('install/01_checks.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'       => $install_title,
 					'$pass'        => $this->t('System check'),
@@ -218,43 +212,31 @@ class Install extends BaseModule
 				break;
 
 			case self::BASE_CONFIG:
-				$ssl_choices = [
-					App\BaseURL::SSL_POLICY_NONE     => $this->t("No SSL policy, links will track page SSL state"),
-					App\BaseURL::SSL_POLICY_FULL     => $this->t("Force all links to use SSL"),
-					App\BaseURL::SSL_POLICY_SELFSIGN => $this->t("Self-signed certificate, use SSL for local links only \x28discouraged\x29")
-				];
+				$baseUrl = $configCache->get('system', 'url') ?
+					new Uri($configCache->get('system', 'url')) :
+					$this->baseUrl;
 
-				$tpl    = Renderer::getMarkupTemplate('install_base.tpl');
+				$tpl    = Renderer::getMarkupTemplate('install/02_base_config.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'      => $install_title,
 					'$pass'       => $this->t('Base settings'),
-					'$ssl_policy' => ['system-ssl_policy',
-						$this->t("SSL link policy"),
-						$configCache->get('system', 'ssl_policy'),
-						$this->t("Determines whether generated links should be forced to use SSL"),
-						$ssl_choices],
-					'$hostname'   => ['config-hostname',
-						$this->t('Host name'),
-						$configCache->get('config', 'hostname'),
-						$this->t('Overwrite this field in case the determinated hostname isn\'t right, otherweise leave it as is.'),
-						$this->t('Required')],
 					'$basepath'   => ['system-basepath',
 						$this->t("Base path to installation"),
 						$configCache->get('system', 'basepath'),
 						$this->t("If the system cannot detect the correct path to your installation, enter the correct path here. This setting should only be set if you are using a restricted system and symbolic links to your webroot."),
 						$this->t('Required')],
-					'$urlpath'    => ['system-urlpath',
-						$this->t('Sub path of the URL'),
-						$configCache->get('system', 'urlpath'),
-						$this->t('Overwrite this field in case the sub path determination isn\'t right, otherwise leave it as is. Leaving this field blank means the installation is at the base URL without sub path.'),
-						''],
+					'$system_url'    => ['system-url',
+						$this->t('The Friendica system URL'),
+						(string)$baseUrl,
+						$this->t("Overwrite this field in case the system URL determination isn't right, otherwise leave it as is."),
+						$this->t('Required')],
 					'$php_path'   => $configCache->get('config', 'php_path'),
 					'$submit'     => $this->t('Submit'),
 				]);
 				break;
 
 			case self::DATABASE_CONFIG:
-				$tpl    = Renderer::getMarkupTemplate('install_db.tpl');
+				$tpl    = Renderer::getMarkupTemplate('install/03_database_config.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'      => $install_title,
 					'$pass'       => $this->t('Database connection'),
@@ -264,10 +246,8 @@ class Install extends BaseModule
 					'$required'   => $this->t('Required'),
 					'$requirement_not_satisfied' => $this->t('Requirement not satisfied'),
 					'$checks'     => $this->installer->getChecks(),
-					'$hostname'   => $configCache->get('config', 'hostname'),
-					'$ssl_policy' => $configCache->get('system', 'ssl_policy'),
 					'$basepath'   => $configCache->get('system', 'basepath'),
-					'$urlpath'    => $configCache->get('system', 'urlpath'),
+					'$system_url' => $configCache->get('system', 'url'),
 					'$dbhost'     => ['database-hostname',
 						$this->t('Database Server Name'),
 						$configCache->get('database', 'hostname'),
@@ -299,16 +279,14 @@ class Install extends BaseModule
 				/* Installed langs */
 				$lang_choices = $this->l10n->getAvailableLanguages();
 
-				$tpl    = Renderer::getMarkupTemplate('install_settings.tpl');
+				$tpl    = Renderer::getMarkupTemplate('install/04_site_settings.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'      => $install_title,
 					'$required'   => $this->t('Required'),
 					'$checks'     => $this->installer->getChecks(),
 					'$pass'       => $this->t('Site settings'),
-					'$hostname'   => $configCache->get('config', 'hostname'),
-					'$ssl_policy' => $configCache->get('system', 'ssl_policy'),
 					'$basepath'   => $configCache->get('system', 'basepath'),
-					'$urlpath'    => $configCache->get('system', 'urlpath'),
+					'$system_url' => $configCache->get('system', 'url'),
 					'$dbhost'     => $configCache->get('database', 'hostname'),
 					'$dbuser'     => $configCache->get('database', 'username'),
 					'$dbpass'     => $configCache->get('database', 'password'),
@@ -341,7 +319,7 @@ class Install extends BaseModule
 					$db_return_text .= $txt;
 				}
 
-				$tpl    = Renderer::getMarkupTemplate('install_finished.tpl');
+				$tpl    = Renderer::getMarkupTemplate('install/05_finished.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'    => $install_title,
 					'$required' => $this->t('Required'),
@@ -365,7 +343,7 @@ class Install extends BaseModule
 	 */
 	private function whatNext(): string
 	{
-		$baseurl = $this->baseUrl->get();
+		$baseurl = $this->baseUrl;
 		return
 			$this->t('<h1>What next</h1>')
 			. "<p>" . $this->t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')

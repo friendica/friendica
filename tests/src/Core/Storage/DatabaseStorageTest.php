@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,20 +21,12 @@
 
 namespace Friendica\Test\src\Core\Storage;
 
-use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Storage\Type\Database;
-use Friendica\Database\Definition\DbaDefinition;
-use Friendica\Database\Definition\ViewDefinition;
-use Friendica\Test\DatabaseTestTrait;
-use Friendica\Test\Util\Database\StaticDatabase;
-use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Profiler;
-use Psr\Log\NullLogger;
+use Friendica\Test\Util\CreateDatabaseTrait;
 
 class DatabaseStorageTest extends StorageTest
 {
-	use DatabaseTestTrait;
-	use VFSTrait;
+	use CreateDatabaseTrait;
 
 	protected function setUp(): void
 	{
@@ -47,28 +39,13 @@ class DatabaseStorageTest extends StorageTest
 
 	protected function getInstance()
 	{
-		$profiler = \Mockery::mock(Profiler::class);
-		$profiler->shouldReceive('startRecording');
-		$profiler->shouldReceive('stopRecording');
-		$profiler->shouldReceive('saveTimestamp')->withAnyArgs()->andReturn(true);
-
-		// load real config to avoid mocking every config-entry which is related to the Database class
-		$configFactory = new Config();
-		$loader        = (new Config())->createConfigFileLoader($this->root->url(), []);
-		$configCache   = $configFactory->createCache($loader);
-
-		$dbaDefinition = (new DbaDefinition($configCache->get('system', 'basepath')))->load();
-		$viewDefinition = (new ViewDefinition($configCache->get('system', 'basepath')))->load();
-
-		$dba = new StaticDatabase($configCache, $profiler, $dbaDefinition, $viewDefinition);
-
-		return new Database($dba);
+		return new Database($this->getDbInstance());
 	}
 
 	protected function tearDown(): void
 	{
-		$this->tearDownDb();
-
 		parent::tearDown();
+
+		$this->tearDownDb();
 	}
 }

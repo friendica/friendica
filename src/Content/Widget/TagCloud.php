@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -144,7 +144,7 @@ class TagCloud
 			$x ++;
 		}
 
-		usort($tags, 'self::tagsSort');
+		usort($tags, [self::class, 'tagsSort']);
 		$range = max(0.01, $max - $min) * 1.0001;
 
 		for ($x = 0; $x < count($tags); $x ++) {

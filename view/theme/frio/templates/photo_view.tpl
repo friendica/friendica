@@ -1,4 +1,4 @@
-{{* Template for singele photo view *}}
+{{* Template for single photo view *}}
 
 {{* "live-photos" is needed for js autoupdate *}}
 <div id="live-photos"></div>

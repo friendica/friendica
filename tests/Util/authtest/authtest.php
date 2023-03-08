@@ -14,7 +14,7 @@ function authtest_install()
 	Hook::register('authenticate', 'tests/Util/authtest/authtest.php', 'authtest_authenticate');
 }
 
-function authtest_authenticate($a,&$b)
+function authtest_authenticate(&$b)
 {
 	$b['authenticated'] = \Friendica\Test\Util\AuthTestConfig::$authenticated;
 	$b['user_record']   = User::getById(\Friendica\Test\Util\AuthTestConfig::$user_id);

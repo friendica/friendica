@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -64,17 +64,17 @@ class XSocialRelay extends BaseModule
 			'tags'      => $tagList,
 			'protocols' => [
 				'activitypub' => [
-					'actor' => DI::baseUrl()->get() . '/friendica',
-					'receive' => DI::baseUrl()->get() . '/inbox'
+					'actor' => DI::baseUrl() . '/friendica',
+					'receive' => DI::baseUrl() . '/inbox'
 				],
 				'dfrn'     => [
-					'receive' => DI::baseUrl()->get() . '/dfrn_notify'
+					'receive' => DI::baseUrl() . '/dfrn_notify'
 				]
 			]
 		];
 
 		if (DI::config()->get("system", "diaspora_enabled")) {
-			$relay['protocols']['diaspora'] = ['receive' => DI::baseUrl()->get() . '/receive/public'];
+			$relay['protocols']['diaspora'] = ['receive' => DI::baseUrl() . '/receive/public'];
 		}
 
 		System::jsonExit($relay);

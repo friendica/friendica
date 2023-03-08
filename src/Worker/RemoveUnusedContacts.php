@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -73,7 +73,7 @@ class RemoveUnusedContacts
 			DBA::delete('post', ['owner-id' => $contact['id']]);
 			DBA::delete('post', ['author-id' => $contact['id']]);
 			DBA::delete('post', ['causer-id' => $contact['id']]);
-			
+
 			DBA::delete('post-thread', ['owner-id' => $contact['id']]);
 			DBA::delete('post-thread', ['author-id' => $contact['id']]);
 			DBA::delete('post-thread', ['causer-id' => $contact['id']]);

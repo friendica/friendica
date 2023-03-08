@@ -160,7 +160,11 @@
 	</div>
 	<div class="wall-item-bottom">
 		<div class="wall-item-links"></div>
-		{{if $item.responses}}
+		{{if $item.emojis}}
+			{{foreach $item.emojis as $emoji}}
+				<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
+			{{/foreach}}
+		{{elseif $item.responses}}
 			{{foreach $item.responses as $verb=>$response}}
 				<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
 			{{/foreach}}

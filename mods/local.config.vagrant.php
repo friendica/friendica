@@ -29,7 +29,6 @@ return [
 	// ****************************************************************
 
 	'config' => [
-		'hostname' => '192.168.56.10',
 		'admin_email' => 'admin@friendica.local',
 		'sitename' => 'Friendica Social Network',
 		'register_policy' => \Friendica\Module\Register::OPEN,
@@ -39,6 +38,6 @@ return [
 		'default_timezone' => 'UTC',
 		'language' => 'en',
 		'basepath' => '/vagrant',
-		'ssl_policy' => \Friendica\App\BaseURL::SSL_POLICY_SELFSIGN,
+		'url' => 'https://192.168.56.10',
 	],
 ];

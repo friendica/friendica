@@ -45,8 +45,7 @@
 						{{include file="field_select.tpl" field=$language}}
 						{{include file="field_select.tpl" field=$theme}}
 						{{include file="field_select.tpl" field=$theme_mobile}}
-						{{include file="field_select.tpl" field=$ssl_policy}}
-						{{if $ssl_policy.2 == 1}}{{include file="field_checkbox.tpl" field=$force_ssl}}{{/if}}
+						{{include file="field_checkbox.tpl" field=$force_ssl}}
 						{{include file="field_checkbox.tpl" field=$show_help}}
 						{{include file="field_select.tpl" field=$singleuser}}
 					</div>
@@ -70,7 +69,7 @@
 				</div>
 				<div id="admin-settings-registration-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-registration">
 					<div class="panel-body">
-						{{include file="field_input.tpl" field=$register_text}}
+						{{include file="field_textarea.tpl" field=$register_text}}
 						{{include file="field_select.tpl" field=$register_policy}}
 						{{include file="field_input.tpl" field=$daily_registrations}}
 						{{include file="field_checkbox.tpl" field=$enable_multi_reg}}

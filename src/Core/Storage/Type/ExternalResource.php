@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,12 +22,12 @@
 namespace Friendica\Core\Storage\Type;
 
 use Exception;
-use Friendica\Core\Logger;
 use Friendica\Core\Storage\Exception\ReferenceStorageException;
 use Friendica\Core\Storage\Capability\ICanReadFromStorage;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Util\HTTPSignature;
+use Psr\Log\LoggerInterface;
 
 /**
  * External resource storage class
@@ -38,6 +38,14 @@ use Friendica\Util\HTTPSignature;
 class ExternalResource implements ICanReadFromStorage
 {
 	const NAME = 'ExternalResource';
+
+	/** @var LoggerInterface */
+	protected $logger;
+
+	public function __construct(LoggerInterface $logger)
+	{
+		$this->logger = $logger;
+	}
 
 	/**
 	 * @inheritDoc
@@ -57,13 +65,18 @@ class ExternalResource implements ICanReadFromStorage
 		try {
 			$fetchResult = HTTPSignature::fetchRaw($data->url, $data->uid, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
 		} catch (Exception $exception) {
+			$this->logger->notice('URL is invalid', ['url' => $data->url, 'error' => $exception]);
 			throw new ReferenceStorageException(sprintf('External resource failed to get %s', $reference), $exception->getCode(), $exception);
 		}
 		if (!empty($fetchResult) && $fetchResult->isSuccess()) {
-			Logger::debug('Got picture', ['Content-Type' => $fetchResult->getHeader('Content-Type'), 'uid' => $data->uid, 'url' => $data->url]);
+			$this->logger->debug('Got picture', ['Content-Type' => $fetchResult->getHeader('Content-Type'), 'uid' => $data->uid, 'url' => $data->url]);
 			return $fetchResult->getBody();
 		} else {
-			throw new ReferenceStorageException(sprintf('External resource failed to get %s', $reference), $fetchResult->getReturnCode(), new Exception($fetchResult->getBody()));
+			if (empty($fetchResult)) {
+				throw new ReferenceStorageException(sprintf('External resource failed to get %s', $reference));
+			} else {
+				throw new ReferenceStorageException(sprintf('External resource failed to get %s', $reference), $fetchResult->getReturnCode(), new Exception($fetchResult->getBody()));
+			}
 		}
 	}
 

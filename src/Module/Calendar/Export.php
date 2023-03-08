@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,11 +23,14 @@ namespace Friendica\Module\Calendar;
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Model\Event;
+use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Response;
+use Friendica\Module\Security\Login;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
@@ -47,25 +50,39 @@ class Export extends BaseModule
 	protected $session;
 	/** @var SystemMessages */
 	protected $sysMessages;
+	/** @var App */
+	protected $app;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, array $server, array $parameters = [])
+	public function __construct(App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session     = $session;
 		$this->sysMessages = $sysMessages;
+		$this->app         = $app;
 	}
 
 	protected function rawContent(array $request = [])
 	{
-		if (!$this->session->getLocalUserId()) {
-			throw new HTTPException\UnauthorizedException($this->t('Permission denied.'));
+		$nickname = $this->parameters['nickname'] ?? null;
+		if (!$nickname) {
+			throw new HTTPException\BadRequestException();
 		}
 
-		$owner = User::getByNickname($this->parameters['nickname'], ['uid']);
-		if (empty($owner)) {
+		$owner = Profile::load($this->app, $nickname, false);
+		if (!$owner || $owner['account_expired'] || $owner['account_removed']) {
 			throw new HTTPException\NotFoundException($this->t('User not found.'));
 		}
+
+		if (!$this->session->isAuthenticated() && $owner['hidewall']) {
+			$this->baseUrl->redirect('profile/' . $nickname . '/restricted');
+		}
+
+		if (!$this->session->isAuthenticated() && !Feature::isEnabled($owner['uid'], 'public_calendar')) {
+			$this->sysMessages->addNotice($this->t('Permission denied.'));
+			$this->baseUrl->redirect('profile/' . $nickname);
+		}
+
 		$ownerUid = $owner['uid'];
 		$format   = $this->parameters['format'] ?: static::DEFAULT_EXPORT;
 

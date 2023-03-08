@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -45,6 +45,32 @@ class OptimizeTables
 		DBA::e("OPTIMIZE TABLE `oembed`");
 		DBA::e("OPTIMIZE TABLE `parsed_url`");
 		DBA::e("OPTIMIZE TABLE `session`");
+
+		if (DI::config()->get('system', 'optimize_all_tables')) {
+			DBA::e("OPTIMIZE TABLE `apcontact`");
+			DBA::e("OPTIMIZE TABLE `contact`");
+			DBA::e("OPTIMIZE TABLE `contact-relation`");
+			DBA::e("OPTIMIZE TABLE `conversation`");
+			DBA::e("OPTIMIZE TABLE `diaspora-contact`");
+			DBA::e("OPTIMIZE TABLE `diaspora-interaction`");
+			DBA::e("OPTIMIZE TABLE `fcontact`");
+			DBA::e("OPTIMIZE TABLE `gserver`");
+			DBA::e("OPTIMIZE TABLE `gserver-tag`");
+			DBA::e("OPTIMIZE TABLE `inbox-status`");
+			DBA::e("OPTIMIZE TABLE `item-uri`");
+			DBA::e("OPTIMIZE TABLE `notification`");
+			DBA::e("OPTIMIZE TABLE `notify`");
+			DBA::e("OPTIMIZE TABLE `photo`");
+			DBA::e("OPTIMIZE TABLE `post`");
+			DBA::e("OPTIMIZE TABLE `post-content`");
+			DBA::e("OPTIMIZE TABLE `post-delivery-data`");
+			DBA::e("OPTIMIZE TABLE `post-link`");
+			DBA::e("OPTIMIZE TABLE `post-thread`");
+			DBA::e("OPTIMIZE TABLE `post-thread-user`");
+			DBA::e("OPTIMIZE TABLE `post-user`");
+			DBA::e("OPTIMIZE TABLE `storage`");
+			DBA::e("OPTIMIZE TABLE `tag`");
+		}
 
 		Logger::info('Optimize end');
 

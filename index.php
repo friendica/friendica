@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -45,6 +45,9 @@ $a->runFrontend(
 	$dice->create(\Friendica\Core\PConfig\Capability\IManagePersonalConfigValues::class),
 	$dice->create(\Friendica\Security\Authentication::class),
 	$dice->create(\Friendica\App\Page::class),
+	$dice->create(\Friendica\Content\Nav::class),
+	$dice->create(Friendica\Module\Special\HTTPException::class),
 	new \Friendica\Util\HTTPInputData($_SERVER),
-	$start_time
+	$start_time,
+	$_SERVER
 );

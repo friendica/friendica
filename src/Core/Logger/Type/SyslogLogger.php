@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,16 +21,18 @@
 
 namespace Friendica\Core\Logger\Type;
 
+use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Hooks\Capabilities\IAmAStrategy;
+use Friendica\Core\Logger\Capabilities\IHaveCallIntrospections;
 use Friendica\Core\Logger\Exception\LoggerException;
 use Friendica\Core\Logger\Exception\LogLevelException;
-use Friendica\Core\Logger\Util\Introspection;
 use Psr\Log\LogLevel;
 
 /**
  * A Logger instance for syslogging (fast, but simple)
  * @see http://php.net/manual/en/function.syslog.php
  */
-class SyslogLogger extends AbstractLogger
+class SyslogLogger extends AbstractLogger implements IAmAStrategy
 {
 	const IDENT = 'Friendica';
 
@@ -100,17 +102,16 @@ class SyslogLogger extends AbstractLogger
 	/**
 	 * {@inheritdoc}
 	 * @param string $level       The minimum loglevel at which this logger will be triggered
-	 * @param int    $logOpts     Indicates what logging options will be used when generating a log message
-	 * @param int    $logFacility Used to specify what type of program is logging the message
 	 *
 	 * @throws LogLevelException
 	 * @throws LoggerException
 	 */
-	public function __construct($channel, Introspection $introspection, string $level = LogLevel::NOTICE, int $logOpts = self::DEFAULT_FLAGS, int $logFacility = self::DEFAULT_FACILITY )
+	public function __construct(string $channel, IManageConfigValues $config, IHaveCallIntrospections $introspection, string $level = LogLevel::NOTICE)
 	{
 		parent::__construct($channel, $introspection);
-		$this->logOpts     = $logOpts;
-		$this->logFacility = $logFacility;
+
+		$this->logOpts     = $config->get('system', 'syslog_flags') ?? static::DEFAULT_FLAGS;
+		$this->logFacility = $config->get('system', 'syslog_facility') ?? static::DEFAULT_FACILITY;
 		$this->logLevel    = $this->mapLevelToPriority($level);
 		$this->introspection->addClasses([self::class]);
 	}

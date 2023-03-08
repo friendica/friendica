@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -49,10 +49,8 @@ class Connectors extends BaseSettings
 	private $database;
 	/** @var SystemMessages */
 	private $systemMessages;
-	/** @var App */
-	private $app;
 
-	public function __construct(App $app, SystemMessages $systemMessages, Database $database, IManagePersonalConfigValues $pconfig, IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(SystemMessages $systemMessages, Database $database, IManagePersonalConfigValues $pconfig, IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -60,7 +58,6 @@ class Connectors extends BaseSettings
 		$this->pconfig        = $pconfig;
 		$this->database       = $database;
 		$this->systemMessages = $systemMessages;
-		$this->app            = $app;
 	}
 
 	protected function post(array $request = [])
@@ -75,6 +72,7 @@ class Connectors extends BaseSettings
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'no_intelligent_shortening', !intval($request['enable_smart_shortening']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'simple_shortening', intval($request['simple_shortening']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'attach_link_title', intval($request['attach_link_title']));
+			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'api_spoiler_title', intval($request['api_spoiler_title']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'ostatus', 'legacy_contact', $request['legacy_contact']);
 		} elseif (!empty($request['mail-submit']) && function_exists('imap_open') && !$this->config->get('system', 'imap_disabled')) {
 			$mail_server       =                 $request['mail_server'] ?? '';
@@ -137,6 +135,7 @@ class Connectors extends BaseSettings
 		$enable_smart_shortening = !intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'no_intelligent_shortening'));
 		$simple_shortening       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'simple_shortening'));
 		$attach_link_title       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'attach_link_title'));
+		$api_spoiler_title       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_spoiler_title', true));
 		$legacy_contact          =         $this->pconfig->get($this->session->getLocalUserId(), 'ostatus', 'legacy_contact');
 
 		if (!empty($legacy_contact)) {
@@ -146,7 +145,7 @@ class Connectors extends BaseSettings
 		$connector_settings_forms = [];
 		foreach ($this->database->selectToArray('hook', ['file', 'function'], ['hook' => 'connector_settings']) as $hook) {
 			$data = [];
-			Hook::callSingle($this->app, 'connector_settings', [$hook['file'], $hook['function']], $data);
+			Hook::callSingle('connector_settings', [$hook['file'], $hook['function']], $data);
 
 			$tpl                                          = Renderer::getMarkupTemplate('settings/addons/connector.tpl');
 			$connector_settings_forms[$data['connector']] = Renderer::replaceMacros($tpl, [
@@ -160,7 +159,7 @@ class Connectors extends BaseSettings
 			]);
 		}
 
-		if ($this->app->isSiteAdmin()) {
+		if ($this->session->isSiteAdmin()) {
 			$diasp_enabled = $this->config->get('system', 'diaspora_enabled') ?
 				$this->t('Built-in support for %s connectivity is enabled', $this->t('Diaspora (Socialhome, Hubzilla)')) :
 				$this->t('Built-in support for %s connectivity is disabled', $this->t('Diaspora (Socialhome, Hubzilla)'));
@@ -221,8 +220,8 @@ class Connectors extends BaseSettings
 			'$enable_smart_shortening' => ['enable_smart_shortening', $this->t('Enable intelligent shortening'), $enable_smart_shortening, $this->t('Normally the system tries to find the best link to add to shortened posts. If disabled, every shortened post will always point to the original friendica post.')],
 			'$simple_shortening'       => ['simple_shortening', $this->t('Enable simple text shortening'), $simple_shortening, $this->t('Normally the system shortens posts at the next line feed. If this option is enabled then the system will shorten the text at the maximum character limit.')],
 			'$attach_link_title'       => ['attach_link_title', $this->t('Attach the link title'), $attach_link_title, $this->t('When activated, the title of the attached link will be added as a title on posts to Diaspora. This is mostly helpful with "remote-self" contacts that share feed content.')],
+			'$api_spoiler_title'       => ['api_spoiler_title', $this->t('API: Use spoiler field as title'), $api_spoiler_title, $this->t('When activated, the "spoiler_text" field in the API will be used for the title on standalone posts. When deactivated it will be used for spoiler text. For comments it will always be used for spoiler text.')],
 			'$legacy_contact'          => ['legacy_contact', $this->t('Your legacy ActivityPub/GNU Social account'), $legacy_contact, $this->t('If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.')],
-
 			'$repair_ostatus_url'  => 'ostatus/repair',
 			'$repair_ostatus_text' => $this->t('Repair OStatus subscriptions'),
 

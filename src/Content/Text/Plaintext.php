@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -122,8 +122,11 @@ class Plaintext
 		$body = preg_replace("/([#@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
 
 		// Add an URL element if the text contains a raw link
-		$body = preg_replace('/([^\]\=\'"]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism',
-			'$1[url]$2[/url]', $body);
+		$body = preg_replace(
+			'/([^\]\=\'"]|^)(https?\:\/\/[a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism',
+			'$1[url]$2[/url]',
+			$body
+		);
 
 		// Remove the abstract
 		$body = BBCode::stripAbstract($body);
@@ -149,7 +152,7 @@ class Plaintext
 			if (($limit == 0) && ($abstract == $default_abstract)) {
 				$abstract = '';
 			}
-		} else {// Try to guess the correct target network
+		} else { // Try to guess the correct target network
 			switch ($htmlmode) {
 				case BBCode::TWITTER:
 					$abstract = BBCode::getAbstract($item['body'], Protocol::TWITTER);

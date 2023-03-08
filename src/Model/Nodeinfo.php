@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -55,17 +55,17 @@ class Nodeinfo
 
 		$userStats = User::getStatistics();
 
-		$config->set('nodeinfo', 'total_users', $userStats['total_users']);
-		$config->set('nodeinfo', 'active_users_halfyear', $userStats['active_users_halfyear']);
-		$config->set('nodeinfo', 'active_users_monthly', $userStats['active_users_monthly']);
-		$config->set('nodeinfo', 'active_users_weekly', $userStats['active_users_weekly']);
+		DI::keyValue()->set('nodeinfo_total_users', $userStats['total_users']);
+		DI::keyValue()->set('nodeinfo_active_users_halfyear', $userStats['active_users_halfyear']);
+		DI::keyValue()->set('nodeinfo_active_users_monthly', $userStats['active_users_monthly']);
+		DI::keyValue()->set('nodeinfo_active_users_weekly', $userStats['active_users_weekly']);
 
 		$logger->info('user statistics', $userStats);
 
 		$posts = DBA::count('post-thread', ["`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE NOT `deleted` AND `origin`)"]);
 		$comments = DBA::count('post', ["NOT `deleted` AND `gravity` = ? AND `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin`)", Item::GRAVITY_COMMENT]);
-		$config->set('nodeinfo', 'local_posts', $posts);
-		$config->set('nodeinfo', 'local_comments', $comments);
+		DI::keyValue()->set('nodeinfo_local_posts', $posts);
+		DI::keyValue()->set('nodeinfo_local_comments', $comments);
 
 		$logger->info('User actitivy', ['posts' => $posts, 'comments' => $comments]);
 	}
@@ -83,14 +83,14 @@ class Nodeinfo
 		$usage->users = new \stdClass;
 
 		if (!empty($config->get('system', 'nodeinfo'))) {
-			$usage->users->total = intval($config->get('nodeinfo', 'total_users'));
-			$usage->users->activeHalfyear = intval($config->get('nodeinfo', 'active_users_halfyear'));
-			$usage->users->activeMonth = intval($config->get('nodeinfo', 'active_users_monthly'));
-			$usage->localPosts = intval($config->get('nodeinfo', 'local_posts'));
-			$usage->localComments = intval($config->get('nodeinfo', 'local_comments'));
+			$usage->users->total = intval(DI::keyValue()->get('nodeinfo_total_users'));
+			$usage->users->activeHalfyear = intval(DI::keyValue()->get('nodeinfo_active_users_halfyear'));
+			$usage->users->activeMonth = intval(DI::keyValue()->get('nodeinfo_active_users_monthly'));
+			$usage->localPosts = intval(DI::keyValue()->get('nodeinfo_local_posts'));
+			$usage->localComments = intval(DI::keyValue()->get('nodeinfo_local_comments'));
 
 			if ($version2) {
-				$usage->users->activeWeek = intval($config->get('nodeinfo', 'active_users_weekly'));
+				$usage->users->activeWeek = intval(DI::keyValue()->get('nodeinfo_active_users_weekly'));
 			}
 		}
 
@@ -171,7 +171,7 @@ class Nodeinfo
 		return [
 			'name'    => $administrator['username'] ?? null,
 			'contact' => $administrator['email']    ?? null,
-			'account' => $administrator['nickname'] ?? '' ? DI::baseUrl()->get() . '/profile/' . $administrator['nickname'] : null,
+			'account' => $administrator['nickname'] ?? '' ? DI::baseUrl() . '/profile/' . $administrator['nickname'] : null,
 		];
 	}
 }

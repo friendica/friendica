@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,16 +22,11 @@
 namespace Friendica\Core\Logger\Factory;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core;
+use Friendica\Core\Hooks\Capabilities\ICanManageInstances;
 use Friendica\Core\Logger\Exception\LogLevelException;
-use Friendica\Database\Database;
-use Friendica\Network\HTTPException\InternalServerErrorException;
-use Friendica\Util\FileSystem;
-use Friendica\Core\Logger\Util\Introspection;
 use Friendica\Core\Logger\Type\ProfilerLogger;
 use Friendica\Core\Logger\Type\StreamLogger;
 use Friendica\Core\Logger\Type\SyslogLogger;
-use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
@@ -43,128 +38,56 @@ class Logger
 {
 	const DEV_CHANNEL = 'dev';
 
-	/**
-	 * A list of classes, which shouldn't get logged
-	 *
-	 * @var string[]
-	 */
-	private static $ignoreClassList = [
-		Core\Logger::class,
-		Profiler::class,
-		'Friendica\\Core\\Logger\\Type',
-	];
-
 	/** @var string The log-channel (app, worker, ...) */
-	private $channel;
+	protected $channel;
+	/** @var ICanManageInstances */
+	protected $instanceManager;
+	/** @var IManageConfigValues */
+	protected $config;
 
-	public function __construct(string $channel, bool $includeAddon = true)
+	public function __construct(string $channel, ICanManageInstances $instanceManager, IManageConfigValues $config, string $logfile = null)
 	{
-		$this->channel = $channel;
+		$this->channel         = $channel;
+		$this->instanceManager = $instanceManager;
+		$this->config          = $config;
 
-		/// @fixme clean solution = Making Addon & Hook dynamic and load them inside the constructor, so there's no custom load logic necessary anymore
-		if ($includeAddon) {
-			Core\Addon::loadAddons();
-			Core\Hook::loadHooks();
+		$this->instanceManager
+			->registerStrategy(LoggerInterface::class, 'syslog', SyslogLogger::class)
+			->registerStrategy(LoggerInterface::class, 'stream', StreamLogger::class, isset($logfile) ? [$logfile] : null);
+
+		if ($this->config->get('system', 'profiling') ?? false) {
+			$this->instanceManager->registerDecorator(LoggerInterface::class, ProfilerLogger::class);
 		}
 	}
 
 	/**
 	 * Creates a new PSR-3 compliant logger instances
 	 *
-	 * @param Database            $database   The Friendica Database instance
-	 * @param IManageConfigValues $config     The config
-	 * @param Profiler            $profiler   The profiler of the app
-	 * @param FileSystem          $fileSystem FileSystem utils
-	 * @param string|null         $minLevel   (optional) Override minimum Loglevel to log
+	 * @param string|null $loglevel (optional) A given loglevel in case the loglevel in the config isn't applicable
 	 *
 	 * @return LoggerInterface The PSR-3 compliant logger instance
 	 */
-	public function create(Database $database, IManageConfigValues $config, Profiler $profiler, FileSystem $fileSystem, ?string $minLevel = null): LoggerInterface
+	public function create(string $loglevel = null): LoggerInterface
 	{
-		if (empty($config->get('system', 'debugging', false))) {
-			$logger = new NullLogger();
-			$database->setLogger($logger);
+		if (empty($this->config->get('system', 'debugging') ?? false)) {
+			return new NullLogger();
+		}
+
+		$loglevel = $loglevel ?? static::mapLegacyConfigDebugLevel($this->config->get('system', 'loglevel'));
+		$name     = $this->config->get('system', 'logger_config') ?? 'stream';
+
+		try {
+			/** @var LoggerInterface */
+			return $this->instanceManager->getInstance(LoggerInterface::class, $name, [$this->channel, $loglevel]);
+		} catch (LogLevelException $exception) {
+			// If there's a wrong config value for loglevel, try again with standard
+			$logger = $this->create(LogLevel::NOTICE);
+			$logger->warning('Invalid loglevel set in config.', ['loglevel' => $loglevel]);
 			return $logger;
+		} catch (\Throwable $e) {
+			// No logger ...
+			return new NullLogger();
 		}
-
-		$introspection = new Introspection(self::$ignoreClassList);
-		$minLevel      = $minLevel ?? $config->get('system', 'loglevel');
-		$loglevel      = self::mapLegacyConfigDebugLevel((string)$minLevel);
-
-		$name = $config->get('system', 'logger_config', 'stream');
-
-		switch ($name) {
-			case 'syslog':
-				try {
-					$logger = new SyslogLogger($this->channel, $introspection, $loglevel, $config->get('system', 'syslog_flags', SyslogLogger::DEFAULT_FLAGS), $config->get('system', 'syslog_facility', SyslogLogger::DEFAULT_FACILITY));
-				} catch (LogLevelException $exception) {
-					// If there's a wrong config value for loglevel, try again with standard
-					$logger = $this->create($database, $config, $profiler, $fileSystem, LogLevel::NOTICE);
-					$logger->warning('Invalid loglevel set in config.', ['loglevel' => $loglevel]);
-				} catch (\Throwable $e) {
-					// No logger ...
-					$logger = new NullLogger();
-				}
-				break;
-
-			case 'stream':
-			default:
-				$data = [
-					'name'          => $name,
-					'channel'       => $this->channel,
-					'introspection' => $introspection,
-					'loglevel'      => $loglevel,
-					'logger'        => null,
-				];
-				try {
-					Core\Hook::callAll('logger_instance', $data);
-				} catch (InternalServerErrorException $exception) {
-					$data['logger'] = null;
-				}
-
-				if (($data['logger'] ?? null) instanceof LoggerInterface) {
-					$logger = $data['logger'];
-				}
-
-				if (empty($logger)) {
-					$stream = $config->get('system', 'logfile');
-					// just add a stream in case it's either writable or not file
-					if (!is_file($stream) || is_writable($stream)) {
-						try {
-							$logger = new StreamLogger($this->channel, $stream, $introspection, $fileSystem, $loglevel);
-						} catch (LogLevelException $exception) {
-							// If there's a wrong config value for loglevel, try again with standard
-							$logger = $this->create($database, $config, $profiler, $fileSystem, LogLevel::NOTICE);
-							$logger->warning('Invalid loglevel set in config.', ['loglevel' => $loglevel]);
-						} catch (\Throwable $t) {
-							// No logger ...
-							$logger = new NullLogger();
-						}
-					} else {
-						try {
-							$logger = new SyslogLogger($this->channel, $introspection, $loglevel);
-						} catch (LogLevelException $exception) {
-							// If there's a wrong config value for loglevel, try again with standard
-							$logger = $this->create($database, $config, $profiler, $fileSystem, LogLevel::NOTICE);
-							$logger->warning('Invalid loglevel set in config.', ['loglevel' => $loglevel]);
-						} catch (\Throwable $e) {
-							// No logger ...
-							$logger = new NullLogger();
-						}
-					}
-				}
-				break;
-		}
-
-		$profiling = $config->get('system', 'profiling', false);
-
-		// In case profiling is enabled, wrap the ProfilerLogger around the current logger
-		if (isset($profiling) && $profiling !== false) {
-			$logger = new ProfilerLogger($logger, $profiler);
-		}
-
-		$database->setLogger($logger);
-		return $logger;
 	}
 
 	/**
@@ -175,65 +98,24 @@ class Logger
 	 *
 	 * It should never get filled during normal usage of Friendica
 	 *
-	 * @param IManageConfigValues $config     The config
-	 * @param Profiler            $profiler   The profiler of the app
-	 * @param FileSystem          $fileSystem FileSystem utils
-	 *
 	 * @return LoggerInterface The PSR-3 compliant logger instance
 	 * @throws \Exception
 	 */
-	public static function createDev(IManageConfigValues $config, Profiler $profiler, FileSystem $fileSystem)
+	public function createDev()
 	{
-		$debugging   = $config->get('system', 'debugging');
-		$stream      = $config->get('system', 'dlogfile');
-		$developerIp = $config->get('system', 'dlogip');
+		$debugging   = $this->config->get('system', 'debugging');
+		$stream      = $this->config->get('system', 'dlogfile');
+		$developerIp = $this->config->get('system', 'dlogip');
 
 		if ((!isset($developerIp) || !$debugging) &&
 			(!is_file($stream) || is_writable($stream))) {
 			return new NullLogger();
 		}
 
-		$introspection = new Introspection(self::$ignoreClassList);
+		$name = $this->config->get('system', 'logger_config') ?? 'stream';
 
-		$name = $config->get('system', 'logger_config', 'stream');
-
-		switch ($name) {
-
-			case 'syslog':
-				$logger = new SyslogLogger(self::DEV_CHANNEL, $introspection, LogLevel::DEBUG);
-				break;
-
-			case 'stream':
-			default:
-				$data = [
-					'name'          => $name,
-					'channel'       => self::DEV_CHANNEL,
-					'introspection' => $introspection,
-					'loglevel'      => LogLevel::DEBUG,
-					'logger'        => null,
-				];
-				try {
-					Core\Hook::callAll('logger_instance', $data);
-				} catch (InternalServerErrorException $exception) {
-					$data['logger'] = null;
-				}
-
-				if (($data['logger'] ?? null) instanceof LoggerInterface) {
-					return $data['logger'];
-				}
-
-				$logger = new StreamLogger(self::DEV_CHANNEL, $stream, $introspection, $fileSystem, LogLevel::DEBUG);
-				break;
-		}
-
-		$profiling = $config->get('system', 'profiling', false);
-
-		// In case profiling is enabled, wrap the ProfilerLogger around the current logger
-		if (isset($profiling) && $profiling !== false) {
-			$logger = new ProfilerLogger($logger, $profiler);
-		}
-
-		return $logger;
+		/** @var LoggerInterface */
+		return $this->instanceManager->getInstance(LoggerInterface::class, $name, [self::DEV_CHANNEL, LogLevel::DEBUG, $stream]);
 	}
 
 	/**

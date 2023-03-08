@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -27,18 +27,18 @@ use DOMXPath;
 use Friendica\App;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Logger;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Network;
-use Friendica\Util\Strings;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -247,6 +247,7 @@ class Page implements ArrayAccess
 			'$generator'       => 'Friendica' . ' ' . App::VERSION,
 			'$delitem'         => $l10n->t('Delete this item?'),
 			'$blockAuthor'     => $l10n->t('Block this author? They won\'t be able to follow you nor see your public posts, and you won\'t be able to see their posts and their notifications.'),
+			'$ignoreAuthor'    => $l10n->t('Ignore this author? You won\'t be able to see their posts and their notifications.'),
 			'$update_interval' => $interval,
 			'$shortcut_icon'   => $shortcut_icon,
 			'$touch_icon'      => $touch_icon,
@@ -408,13 +409,16 @@ class Page implements ArrayAccess
 	 * @param Mode                        $mode     The current node mode
 	 * @param ResponseInterface           $response The Response of the module class, including type, content & headers
 	 * @param L10n                        $l10n     The l10n language class
+	 * @param Profiler                    $profiler
 	 * @param IManageConfigValues         $config   The Configuration of this node
 	 * @param IManagePersonalConfigValues $pconfig  The personal/user configuration
-	 * @param int                         $localUID The UID of the local user
-	 *
-	 * @throws HTTPException\InternalServerErrorException|HTTPException\ServiceUnavailableException
+	 * @param Nav                         $nav
+	 * @param int                         $localUID
+	 * @throws HTTPException\MethodNotAllowedException
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\ServiceUnavailableException
 	 */
-	public function run(App $app, BaseURL $baseURL, Arguments $args, Mode $mode, ResponseInterface $response, L10n $l10n, Profiler $profiler, IManageConfigValues $config, IManagePersonalConfigValues $pconfig, int $localUID)
+	public function run(App $app, BaseURL $baseURL, Arguments $args, Mode $mode, ResponseInterface $response, L10n $l10n, Profiler $profiler, IManageConfigValues $config, IManagePersonalConfigValues $pconfig, Nav $nav, int $localUID)
 	{
 		$moduleName = $args->getModuleName();
 
@@ -464,7 +468,7 @@ class Page implements ArrayAccess
 		// Add the navigation (menu) template
 		if ($moduleName != 'install' && $moduleName != 'maintenance') {
 			$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('nav_head.tpl'), []);
-			$this->page['nav']      = Nav::build($app);
+			$this->page['nav']      = $nav->getHtml();
 		}
 
 		foreach ($response->getHeaders() as $key => $header) {
@@ -519,7 +523,7 @@ class Page implements ArrayAccess
 		header("X-Friendica-Version: " . App::VERSION);
 		header("Content-type: text/html; charset=utf-8");
 
-		if ($config->get('system', 'hsts') && ($baseURL->getSSLPolicy() == BaseURL::SSL_POLICY_FULL)) {
+		if ($config->get('system', 'hsts') && ($baseURL->getScheme() === 'https')) {
 			header("Strict-Transport-Security: max-age=31536000");
 		}
 

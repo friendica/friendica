@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -59,7 +59,7 @@ class Download extends \Friendica\BaseModule
 
 		header('Content-Type: text/csv');
 		header('Content-Transfer-Encoding: Binary');
-		header('Content-disposition: attachment; filename="' . $this->baseUrl->getHostname() . '_domain_blocklist_' . substr($hash, 0, 6) . '.csv"');
+		header('Content-disposition: attachment; filename="' . $this->baseUrl->getHost() . '_domain_blocklist_' . substr($hash, 0, 6) . '.csv"');
 		header("Etag: $etag");
 
 		$this->blocklist->exportToFile('php://output');

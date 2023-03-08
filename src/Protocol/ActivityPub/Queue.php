@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -236,7 +236,7 @@ class Queue
 		}
 		DBA::close($receivers);
 
-		if (!Receiver::routeActivities($activity, $type, $push, $fetch_parents)) {
+		if (!Receiver::routeActivities($activity, $type, $push, $fetch_parents, $activity['receiver'][0] ?? 0)) {
 			self::remove($activity);
 		}
 

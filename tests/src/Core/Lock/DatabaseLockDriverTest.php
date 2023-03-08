@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,19 +22,11 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Friendica\Core\Lock\Type\DatabaseLock;
-use Friendica\Core\Config\Factory\Config;
-use Friendica\DI;
-use Friendica\Test\DatabaseTestTrait;
-use Friendica\Test\Util\Database\StaticDatabase;
-use Friendica\Test\Util\VFSTrait;
-use Friendica\Util\Profiler;
-use Mockery;
-use Psr\Log\NullLogger;
+use Friendica\Test\Util\CreateDatabaseTrait;
 
 class DatabaseLockDriverTest extends LockTest
 {
-	use VFSTrait;
-	use DatabaseTestTrait;
+	use CreateDatabaseTrait;
 
 	protected $pid = 123;
 
@@ -49,13 +41,13 @@ class DatabaseLockDriverTest extends LockTest
 
 	protected function getInstance()
 	{
-		return new DatabaseLock(DI::dba(), $this->pid);
+		return new DatabaseLock($this->getDbInstance(), $this->pid);
 	}
 
 	protected function tearDown(): void
 	{
-		$this->tearDownDb();
-
 		parent::tearDown();
+
+		$this->tearDownDb();
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -46,15 +46,14 @@ class HostMeta extends BaseModule
 			$config->set('system', 'site_pubkey', $res['pubkey']);
 		}
 
-		$domain = DI::baseUrl()->get();
+		$domain = DI::baseUrl();
 
-		$xml = null;
 		XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
 					'xmlns'    => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
 				],
-				'hm:Host' => DI::baseUrl()->getHostname(),
+				'hm:Host' => DI::baseUrl()->getHost(),
 				'1:link' => [
 					'@attributes' => [
 						'rel'      => 'lrdd',
@@ -81,13 +80,6 @@ class HostMeta extends BaseModule
 						'href' => $domain . '/amcd'
 					]
 				],
-				'5:link' => [
-					'@attributes' => [
-						'rel'  => 'http://oexchange.org/spec/0.8/rel/resident-target',
-						'type' => 'application/xrd+xml', 
-						'href' => $domain . '/oexchange/xrd'
-					]
-				],
 				'Property' => [
 					'@attributes' => [
 						'type'      => 'http://salmon-protocol.org/ns/magic-key',
@@ -97,7 +89,7 @@ class HostMeta extends BaseModule
 				]
 			],
 		], $xml, false, ['hm' => 'http://host-meta.net/xrd/1.0', 'mk' => 'http://salmon-protocol.org/ns/magic-key']);
-		
+
 		System::httpExit($xml->saveXML(), Response::TYPE_XML, 'application/xrd+xml');
 	}
 }

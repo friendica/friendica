@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -125,8 +125,8 @@ class Introduction extends BaseFactory
 						continue;
 					}
 					$return_addr = bin2hex($this->nick . '@' .
-					                       $this->baseUrl->getHostname() .
-					                       (($this->baseUrl->getUrlPath()) ? '/' . $this->baseUrl->getUrlPath() : ''));
+					                       $this->baseUrl->getHost() .
+										   (($this->baseUrl->getPath()) ? '/' . $this->baseUrl->getPath() : ''));
 
 					$formattedIntroductions[] = new ValueObject\Introduction([
 						'label'          => 'friend_suggestion',

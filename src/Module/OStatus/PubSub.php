@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -58,6 +58,7 @@ class PubSub extends \Friendica\BaseModule
 
 		$this->logger->info('Feed arrived.', ['from' =>  $this->request->getRemoteAddress(), 'for' => $this->args->getCommand(), 'user-agent' => $this->server['HTTP_USER_AGENT']]);
 		$this->logger->debug('Data stream.', ['xml' => $xml]);
+		$this->logger->debug('Got request data.', ['request' => $request]);
 
 		$nickname   = $this->parameters['nickname'] ?? '';
 		$contact_id = $this->parameters['cid']      ?? 0;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,6 +25,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Moderation\DomainPatternBlocklist;
 use Friendica\Module\BaseModeration;
 use Friendica\Module\Response;
@@ -70,6 +71,8 @@ class Index extends BaseModeration
 
 		$this->blocklist->set($blocklist);
 
+		Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+
 		$this->baseUrl->redirect('moderation/blocklist/server');
 	}
 
@@ -112,7 +115,7 @@ class Index extends BaseModeration
 			'$listfile'  => ['listfile', $this->t('Server domain pattern blocklist CSV file'), '', '', $this->t('Required'), '', 'file'],
 			'$newdomain' => ['pattern', $this->t('Server Domain Pattern'), '', $this->t('The domain pattern of the new server to add to the blocklist. Do not include the protocol.'), $this->t('Required'), '', ''],
 			'$entries'   => $blocklistform,
-			'$baseurl'   => $this->baseUrl->get(true),
+			'$baseurl'   => $this->baseUrl,
 
 			'$form_security_token'        => self::getFormSecurityToken('moderation_blocklist'),
 			'$form_security_token_import' => self::getFormSecurityToken('moderation_blocklist_import'),

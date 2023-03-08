@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -45,8 +46,9 @@ class Favourited extends BaseApi
 
 		$request = $this->getRequest([
 			'limit'      => 20,    // Maximum number of results to return. Defaults to 20.
-			'min_id'     => 0,     // Return results immediately newer than id
 			'max_id'     => 0,     // Return results older than id
+			'since_id'   => 0,     // Return results newer than this ID. Use HTTP Link header to paginate.
+			'min_id'     => 0,     // Return results immediately newer than id
 			'with_muted' => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 		], $request);
 
@@ -58,6 +60,10 @@ class Favourited extends BaseApi
 			$condition = DBA::mergeConditions($condition, ["`thr-parent-id` < ?", $request['max_id']]);
 		}
 
+		if (!empty($request['since_id'])) {
+			$condition = DBA::mergeConditions($condition, ["`thr-parent-id` > ?", $request['since_id']]);
+		}
+
 		if (!empty($request['min_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`thr-parent-id` > ?", $request['min_id']]);
 
@@ -66,10 +72,16 @@ class Favourited extends BaseApi
 
 		$items = Post::selectForUser($uid, ['thr-parent-id'], $condition, $params);
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['thr-parent-id']);
-			$statuses[] = DI::mstdnStatus()->createFromUriId($item['thr-parent-id'], $uid);
+			try {
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['thr-parent-id'], $uid, $display_quotes);
+			} catch (\Exception $exception) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['thr-parent-id'], 'uid' => $uid, 'exception' => $exception]);
+			}
 		}
 		DBA::close($items);
 

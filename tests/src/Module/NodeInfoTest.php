@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -27,14 +27,26 @@ use Friendica\DI;
 use Friendica\Module\NodeInfo110;
 use Friendica\Module\NodeInfo120;
 use Friendica\Module\NodeInfo210;
+use Friendica\Module\Special\HTTPException;
 use Friendica\Test\FixtureTest;
+use Mockery\MockInterface;
 
 class NodeInfoTest extends FixtureTest
 {
+	/** @var MockInterface|HTTPException */
+	protected $httpExceptionMock;
+
+	protected function setUp(): void
+	{
+		parent::setUp();
+
+		$this->httpExceptionMock = \Mockery::mock(HTTPException::class);
+	}
+
 	public function testNodeInfo110()
 	{
 		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -55,7 +67,7 @@ class NodeInfoTest extends FixtureTest
 	public function testNodeInfo120()
 	{
 		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -75,7 +87,7 @@ class NodeInfoTest extends FixtureTest
 	public function testNodeInfo210()
 	{
 		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());

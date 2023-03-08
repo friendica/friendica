@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -35,12 +35,15 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 	public function createFromTableRow(array $row, array $postUriIds = []): Entity\Report
 	{
 		return new Entity\Report(
-			$row['uid'],
+			$row['reporter-id'],
 			$row['cid'],
 			new \DateTime($row['created'] ?? 'now', new \DateTimeZone('UTC')),
 			$row['comment'],
+			$row['category'],
+			$row['rules'],
 			$row['forward'],
 			$postUriIds,
+			$row['uid'],
 			$row['id'],
 		);
 	}
@@ -51,6 +54,7 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 	 * @see \Friendica\Module\Api\Mastodon\Reports::post()
 	 *
 	 * @param int    $uid
+	 * @param int    $reporterId
 	 * @param int    $cid
 	 * @param string $comment
 	 * @param bool   $forward
@@ -58,15 +62,18 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 	 * @return Entity\Report
 	 * @throws \Exception
 	 */
-	public function createFromReportsRequest(int $uid, int $cid, string $comment = '', bool $forward = false, array $postUriIds = []): Entity\Report
+	public function createFromReportsRequest(int $reporterId, int $cid, string $comment = '', string $category = null, string $rules = '', bool $forward = false, array $postUriIds = [], int $uid = null): Entity\Report
 	{
 		return new Entity\Report(
-			$uid,
+			$reporterId,
 			$cid,
 			new \DateTime('now', new \DateTimeZone('UTC')),
 			$comment,
+			$category,
+			$rules,
 			$forward,
 			$postUriIds,
+			$uid,
 		);
 	}
 }

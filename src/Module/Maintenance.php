@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -36,7 +36,7 @@ class Maintenance extends BaseModule
 {
 	protected function content(array $request = []): string
 	{
-		$reason = DI::config()->get('system', 'maintenance_reason');
+		$reason = DI::config()->get('system', 'maintenance_reason') ?? '';
 
 		if ((substr(Strings::normaliseLink($reason), 0, 7) === 'http://') ||
 			(substr(Strings::normaliseLink($reason), 0, 8) === 'https://')) {

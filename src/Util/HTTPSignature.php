@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,11 +22,13 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Logger;
+use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
+use Friendica\Model\GServer;
 use Friendica\Model\ItemURI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
@@ -267,21 +269,14 @@ class HTTPSignature
 	/**
 	 * Post given data to a target for a user, returns the result class
 	 *
-	 * @param array   $data   Data that is about to be send
-	 * @param string  $target The URL of the inbox
-	 * @param integer $uid    User id of the sender
+	 * @param array  $data   Data that is about to be sent
+	 * @param string $target The URL of the inbox
+	 * @param array  $owner  Sender owner-view record
 	 *
 	 * @return ICanHandleHttpResponses
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function post(array $data, string $target, int $uid): ICanHandleHttpResponses
+	public static function post(array $data, string $target, array $owner): ICanHandleHttpResponses
 	{
-		$owner = User::getOwnerDataById($uid);
-
-		if (!$owner) {
-			return null;
-		}
-
 		$content = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 		// Header data that is about to be signed.
@@ -319,16 +314,15 @@ class HTTPSignature
 	/**
 	 * Transmit given data to a target for a user
 	 *
-	 * @param array   $data   Data that is about to be send
-	 * @param string  $target The URL of the inbox
-	 * @param integer $uid    User id of the sender
+	 * @param array  $data   Data that is about to be sent
+	 * @param string $target The URL of the inbox
+	 * @param array  $owner  Sender owner-vew record
 	 *
 	 * @return boolean Was the transmission successful?
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function transmit(array $data, string $target, int $uid): bool
+	public static function transmit(array $data, string $target, array $owner): bool
 	{
-		$postResult = self::post($data, $target, $uid);
+		$postResult = self::post($data, $target, $owner);
 		$return_code = $postResult->getReturnCode();
 
 		return ($return_code >= 200) && ($return_code <= 299);
@@ -340,21 +334,36 @@ class HTTPSignature
 	 * @param string  $url     The URL of the inbox
 	 * @param boolean $success Transmission status
 	 * @param boolean $shared  The inbox is a shared inbox
+	 * @param int     $gsid    Server ID
+	 * @throws \Exception
 	 */
-	static public function setInboxStatus(string $url, bool $success, bool $shared = false)
+	static public function setInboxStatus(string $url, bool $success, bool $shared = false, int $gsid = null)
 	{
 		$now = DateTimeFormat::utcNow();
 
 		$status = DBA::selectFirst('inbox-status', [], ['url' => $url]);
 		if (!DBA::isResult($status)) {
-			DBA::insert('inbox-status', ['url' => $url, 'uri-id' => ItemURI::getIdByURI($url), 'created' => $now, 'shared' => $shared], Database::INSERT_IGNORE);
+			$insertFields = ['url' => $url, 'uri-id' => ItemURI::getIdByURI($url), 'created' => $now, 'shared' => $shared];
+			if (!empty($gsid)) {
+				$insertFields['gsid'] = $gsid;
+			}
+			DBA::insert('inbox-status', $insertFields, Database::INSERT_IGNORE);
+
 			$status = DBA::selectFirst('inbox-status', [], ['url' => $url]);
+			if (empty($status)) {
+				Logger::warning('Unable to insert inbox-status row', $insertFields);
+				return;
+			}
 		}
 
 		if ($success) {
 			$fields = ['success' => $now];
 		} else {
 			$fields = ['failure' => $now];
+		}
+
+		if (!empty($gsid)) {
+			$fields['gsid'] = $gsid;
 		}
 
 		if ($status['failure'] > DBA::NULL_DATETIME) {
@@ -392,6 +401,14 @@ class HTTPSignature
 		}
 
 		DBA::update('inbox-status', $fields, ['url' => $url]);
+
+		if (!empty($status['gsid'])) {
+			if ($success) {
+				GServer::setReachableById($status['gsid'], Protocol::ACTIVITYPUB);
+			} elseif ($status['shared']) {
+				GServer::setFailureById($status['gsid']);
+			}
+		}
 	}
 
 	/**
@@ -405,7 +422,12 @@ class HTTPSignature
 	 */
 	public static function fetch(string $request, int $uid): array
 	{
-		$curlResult = self::fetchRaw($request, $uid);
+		try {
+			$curlResult = self::fetchRaw($request, $uid);
+		} catch (\Exception $exception) {
+			Logger::notice('Error fetching url', ['url' => $request, 'exception' => $exception]);
+			return [];
+		}
 
 		if (empty($curlResult)) {
 			return [];

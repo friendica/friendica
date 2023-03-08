@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -54,10 +54,10 @@ class BaseProfile extends BaseModule
 				'accesskey' => 'r',
 			],
 			[
-				'label' => DI::l10n()->t('Status'),
-				'url'   => $baseProfileUrl . '/status',
+				'label' => DI::l10n()->t('Conversations'),
+				'url'   => $baseProfileUrl . '/conversations',
 				'sel'   => $current == 'status' ? 'active' : '',
-				'title' => DI::l10n()->t('Status Messages and Posts'),
+				'title' => DI::l10n()->t('Conversations started'),
 				'id'    => 'status-tab',
 				'accesskey' => 'm',
 			],

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -80,7 +80,6 @@ class Settings extends BaseAdmin
 			'$page' => DI::l10n()->t('Logs'),
 			'$submit' => DI::l10n()->t('Save Settings'),
 			'$clear' => DI::l10n()->t('Clear'),
-			'$baseurl' => DI::baseUrl()->get(true),
 			'$logname' => DI::config()->get('system', 'logfile'),
 			// see /help/smarty3-templates#1_1 on any Friendica node
 			'$debugging' => ['debugging', DI::l10n()->t("Enable Debugging"), DI::config()->get('system', 'debugging'), ""],

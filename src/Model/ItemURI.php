@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -80,5 +80,15 @@ class ItemURI
 		}
 
 		return $itemuri['id'] ?? 0;
+	}
+
+	/**
+	 * @param int $uriId
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public static function exists(int $uriId): bool
+	{
+		return DBA::exists('item-uri', ['id' => $uriId]);
 	}
 }

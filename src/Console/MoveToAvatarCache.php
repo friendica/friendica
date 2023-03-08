@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -94,7 +94,7 @@ HELP;
 
 		$fields = ['id', 'avatar', 'photo', 'thumb', 'micro', 'uri-id', 'url', 'avatar', 'network'];
 		$condition = ["NOT `self` AND `avatar` != ? AND `photo` LIKE ? AND `uid` = ? AND `uri-id` != ? AND NOT `uri-id` IS NULL AND NOT `network` IN (?, ?)",
-			'', $this->baseUrl->get() . '/photo/%', 0, 0, Protocol::MAIL, Protocol::FEED];
+			'', $this->baseUrl . '/photo/%', 0, 0, Protocol::MAIL, Protocol::FEED];
 
 		$count    = 0;
 		$total    = $this->dba->count('contact', $condition);

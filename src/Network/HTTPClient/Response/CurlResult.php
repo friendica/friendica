@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,6 +25,7 @@ use Friendica\Core\Logger;
 use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use Friendica\Network\HTTPException\UnprocessableEntityException;
 use Friendica\Util\Network;
+use Psr\Log\LoggerInterface;
 
 /**
  * A content class for Curl call results
@@ -97,6 +98,11 @@ class CurlResult implements ICanHandleHttpResponses
 	private $error;
 
 	/**
+	 * @var LoggerInterface
+	 */
+	protected $logger;
+
+	/**
 	 * Creates an errored CURL response
 	 *
 	 * @param string $url optional URL
@@ -104,9 +110,9 @@ class CurlResult implements ICanHandleHttpResponses
 	 * @return ICanHandleHttpResponses a CURL with error response
 	 * @throws UnprocessableEntityException
 	 */
-	public static function createErrorCurl(string $url = '')
+	public static function createErrorCurl(LoggerInterface $logger, string $url = '')
 	{
-		return new CurlResult($url, '', ['http_code' => 0]);
+		return new CurlResult($logger, $url, '', ['http_code' => 0]);
 	}
 
 	/**
@@ -120,8 +126,10 @@ class CurlResult implements ICanHandleHttpResponses
 	 *
 	 * @throws UnprocessableEntityException when HTTP code of the CURL response is missing
 	 */
-	public function __construct(string $url, string $result, array $info, int $errorNumber = 0, string $error = '')
+	public function __construct(LoggerInterface $logger, string $url, string $result, array $info, int $errorNumber = 0, string $error = '')
 	{
+		$this->logger = $logger;
+
 		if (!array_key_exists('http_code', $info)) {
 			throw new UnprocessableEntityException('CURL response doesn\'t contains a response HTTP code');
 		}
@@ -132,7 +140,7 @@ class CurlResult implements ICanHandleHttpResponses
 		$this->errorNumber = $errorNumber;
 		$this->error       = $error;
 
-		Logger::debug('construct', ['url' => $url, 'returncode' => $this->returnCode, 'result' => $result]);
+		$this->logger->debug('construct', ['url' => $url, 'returncode' => $this->returnCode, 'result' => $result]);
 
 		$this->parseBodyHeader($result);
 		$this->checkSuccess();
@@ -172,7 +180,7 @@ class CurlResult implements ICanHandleHttpResponses
 		}
 
 		if (!$this->isSuccess) {
-			Logger::debug('debug', ['info' => $this->info]);
+			$this->logger->debug('debug', ['info' => $this->info]);
 		}
 
 		if (!$this->isSuccess && $this->errorNumber == CURLE_OPERATION_TIMEDOUT) {

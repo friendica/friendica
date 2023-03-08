@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -31,7 +31,7 @@ class VersionTest extends ApiTest
 	public function test()
 	{
 		$response = (new Version(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run();
+			->run($this->httpExceptionMock);
 
 		self::assertEquals([
 			'Content-type'                => ['application/json'],

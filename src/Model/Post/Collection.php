@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -81,7 +81,7 @@ class Collection
 	 * @param array $fields
 	 * @return array
 	 */
-	public static function selectToArrayForContact(int $cid, int $type = self::FEATURED, array $fields = []) 
+	public static function selectToArrayForContact(int $cid, int $type = self::FEATURED, array $fields = [])
 	{
 		return DBA::selectToArray('collection-view', $fields, ['cid' => $cid, 'private' => [Item::PUBLIC, Item::UNLISTED], 'deleted' => false, 'type' => $type]);
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,6 +22,7 @@
 namespace Friendica\Module\Search;
 
 use Friendica\App;
+use Friendica\Content\Conversation;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
@@ -212,7 +213,7 @@ class Index extends BaseSearch
 
 		Logger::info('Start Conversation.', ['q' => $search]);
 
-		$o .= DI::conversation()->create($items, 'search', false, false, 'commented', DI::userSession()->getLocalUserId());
+		$o .= DI::conversation()->create($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
 			$o .= HTML::scrollLoader();

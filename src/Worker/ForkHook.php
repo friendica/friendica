@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,8 +28,6 @@ Class ForkHook
 {
 	public static function execute($name, $hook, $data)
 	{
-		$a = DI::app();
-
-		Hook::callSingle($a, $name, $hook, $data);
+		Hook::callSingle($name, $hook, $data);
 	}
 }

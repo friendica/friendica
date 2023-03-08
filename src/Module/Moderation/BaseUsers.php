@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -137,7 +137,7 @@ abstract class BaseUsers extends BaseModeration
 			$user['account_type']     = ($user['page_flags_raw'] == 0) ? $account_types[$user['account-type']] : '';
 
 			$user['register_date'] = Temporal::getRelativeDate($user['register_date']);
-			$user['login_date']    = Temporal::getRelativeDate($user['last-activity'], null, false);
+			$user['login_date']    = Temporal::getRelativeDate($user['last-activity'], false);
 			$user['lastitem_date'] = Temporal::getRelativeDate($user['last-item']);
 			$user['is_admin']      = in_array($user['email'], $adminlist);
 			$user['is_deletable']  = !$user['account_removed'] && intval($user['uid']) != $this->session->getLocalUserId();

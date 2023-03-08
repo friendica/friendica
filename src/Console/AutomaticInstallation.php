@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -199,8 +199,7 @@ HELP;
 				$this->out('The Friendica URL has to be set during CLI installation.');
 				return 1;
 			} else {
-				$baseUrl = new BaseURL($this->config, []);
-				$baseUrl->saveByURL($url);
+				$configCache->set('system', 'url', $url);
 			}
 
 			$installer->createConfig($configCache);

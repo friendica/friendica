@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -83,7 +83,7 @@ class Index extends BaseUsers
 		switch ($action) {
 			case 'delete':
 				if ($this->session->getLocalUserId() != $uid) {
-					self::checkFormSecurityTokenRedirectOnError($this->baseUrl->get(true), 'moderation_users', 't');
+					self::checkFormSecurityTokenRedirectOnError($this->baseUrl, 'moderation_users', 't');
 					// delete user
 					User::remove($uid);
 
@@ -168,7 +168,6 @@ class Index extends BaseUsers
 			'$form_security_token' => self::getFormSecurityToken('moderation_users'),
 
 			// values //
-			'$baseurl'      => $this->baseUrl->get(true),
 			'$query_string' => $this->args->getQueryString(),
 
 			'$users' => $users,

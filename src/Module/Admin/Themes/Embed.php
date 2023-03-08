@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -95,7 +95,7 @@ class Embed extends BaseAdmin
 
 		$t = Renderer::getMarkupTemplate('admin/addons/embed.tpl');
 		return Renderer::replaceMacros($t, [
-			'$action' => DI::baseUrl()->get(true) . '/admin/themes/' . $theme . '/embed?mode=minimal',
+			'$action' => 'admin/themes/' . $theme . '/embed?mode=minimal',
 			'$form' => $admin_form,
 			'$form_security_token' => self::getFormSecurityToken("admin_theme_settings"),
 		]);

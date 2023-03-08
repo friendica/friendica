@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -47,11 +47,12 @@ class Notification extends BaseFactory
 
 	/**
 	 * @param Notifications\Entity\Notification $Notification
+	 * @param bool $display_quote Display quoted posts
 	 *
 	 * @return MstdnNotification
 	 * @throws UnexpectedNotificationTypeException
 	 */
-	public function createFromNotification(Notifications\Entity\Notification $Notification): MstdnNotification
+	public function createFromNotification(Notifications\Entity\Notification $Notification, bool $display_quotes): MstdnNotification
 	{
 		$type = self::getType($Notification);
 		if (empty($type)) {
@@ -62,8 +63,8 @@ class Notification extends BaseFactory
 
 		if ($Notification->targetUriId) {
 			try {
-				$status = $this->mstdnStatusFactory->createFromUriId($Notification->targetUriId, $Notification->uid);
-			} catch (\Throwable $th) {
+				$status = $this->mstdnStatusFactory->createFromUriId($Notification->targetUriId, $Notification->uid, $display_quotes);
+			} catch (\Exception $exception) {
 				$status = null;
 			}
 		} else {

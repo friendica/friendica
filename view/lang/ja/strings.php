@@ -675,7 +675,7 @@ $a->strings['Page not found.'] = 'ページが見つかりません。';
 $a->strings['The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it.'] = 'フォームセキュリティトークンが正しくありませんでした。これは、フォームを送信する前にフォームが長時間（3時間以上）開かれたために発生した可能性があります。';
 $a->strings['All contacts'] = 'すべてのコンタクト';
 $a->strings['Followers'] = 'フォロワー';
-$a->strings['Following'] = '以下';
+$a->strings['Following'] = 'フォロー中';
 $a->strings['Mutual friends'] = '共通の友人';
 $a->strings['Could not find any unarchived contact entry for this URL (%s)'] = 'このURL（ %s ）のアーカイブされていないコンタクトエントリが見つかりませんでした';
 $a->strings['The contact entries have been archived'] = 'コンタクトエントリがアーカイブされました';
@@ -837,7 +837,7 @@ $a->strings['%d contact in common'] = [
 ];
 $a->strings['Archives'] = 'アーカイブ';
 $a->strings['News'] = 'ニュース';
-$a->strings['Export'] = '輸出する';
+$a->strings['Export'] = 'エクスポート';
 $a->strings['Export calendar as ical'] = 'カレンダーをicalとしてエクスポート';
 $a->strings['Export calendar as csv'] = 'カレンダーをcsvとしてエクスポート';
 $a->strings['No contacts'] = 'コンタクトなし';

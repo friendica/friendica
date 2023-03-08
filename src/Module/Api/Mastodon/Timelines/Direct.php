@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -63,6 +63,13 @@ class Direct extends BaseApi
 			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
 
 			$params['order'] = ['uri-id'];
+		}
+
+		if (!empty($uid)) {
+			$condition = DBA::mergeConditions(
+				$condition,
+				["NOT `parent-author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`) AND `cid` = `parent-author-id`)", $uid]
+			);
 		}
 
 		$mails = DBA::select('mail', ['id', 'uri-id'], $condition, $params);

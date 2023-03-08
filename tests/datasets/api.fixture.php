@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -36,33 +36,6 @@ return [
 	'mail',
 	'post-delivery-data',
 	// Base test config to avoid notice messages
-	'config' => [
-		[
-			'cat' => 'system',
-			'k'   => 'url',
-			'v'   => 'http://localhost',
-		],
-		[
-			'cat' => 'config',
-			'k'   => 'hostname',
-			'v'   => 'localhost',
-		],
-		[
-			'cat' => 'system',
-			'k'   => 'worker_dont_fork',
-			'v'   => '1',
-		],
-		[
-			'cat' => 'system',
-			'k'   => 'curl_timeout',
-			'v'   => '1',
-		],
-		[
-			'cat' => 'system',
-			'k'   => 'xrd_timeout',
-			'v'   => '1',
-		],
-	],
 	'user' => [
 		[
 			'uid'      => 42,

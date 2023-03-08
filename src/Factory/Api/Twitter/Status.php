@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -124,6 +124,7 @@ class Status extends BaseFactory
 	 */
 	private function createFromArray(array $item, int $uid, bool $include_entities): \Friendica\Object\Api\Twitter\Status
 	{
+		$item = Post\Media::addHTMLAttachmentToItem($item);
 		$author = $this->twitterUser->createFromContactId($item['author-id'], $uid, true);
 
 		if (!empty($item['causer-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT)) {

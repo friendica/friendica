@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,6 +37,8 @@ use Dice\Dice;
 use Friendica\App;
 use Friendica\Core\Cache;
 use Friendica\Core\Config;
+use Friendica\Core\Hooks\Capabilities\ICanManageInstances;
+use Friendica\Core\Hooks\Model\InstanceManager;
 use Friendica\Core\PConfig;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock;
@@ -76,10 +78,16 @@ return [
 			$_SERVER
 		]
 	],
-	Config\Util\ConfigFileLoader::class => [
+	ICanManageInstances::class => [
+		'instanceOf' => InstanceManager::class,
+		'constructParams' => [
+			[Dice::INSTANCE => Dice::SELF],
+		],
+	],
+	Config\Util\ConfigFileManager::class => [
 		'instanceOf' => Config\Factory\Config::class,
 		'call'       => [
-			['createConfigFileLoader', [
+			['createConfigFileManager', [
 				[Dice::INSTANCE => '$basepath'],
 				$_SERVER,
 			], Dice::CHAIN_CALL],
@@ -88,19 +96,21 @@ return [
 	Config\ValueObject\Cache::class => [
 		'instanceOf' => Config\Factory\Config::class,
 		'call'       => [
-			['createCache', [$_SERVER], Dice::CHAIN_CALL],
+			['createCache', [], Dice::CHAIN_CALL],
 		],
 	],
 	App\Mode::class              => [
 		'call' => [
 			['determineRunMode', [true, $_SERVER], Dice::CHAIN_CALL],
-			['determine', [], Dice::CHAIN_CALL],
+			['determine', [
+				[Dice::INSTANCE => '$basepath']
+			], Dice::CHAIN_CALL],
 		],
 	],
 	Config\Capability\IManageConfigValues::class => [
-		'instanceOf' => Config\Factory\Config::class,
-		'call'       => [
-			['create', [], Dice::CHAIN_CALL],
+		'instanceOf' => Config\Model\DatabaseConfig::class,
+		'constructParams' => [
+			$_SERVER,
 		],
 	],
 	PConfig\Capability\IManagePersonalConfigValues::class => [
@@ -127,7 +137,7 @@ return [
 	],
 	Database::class                         => [
 		'constructParams' => [
-			[Dice::INSTANCE => \Psr\Log\NullLogger::class],
+			[Dice::INSTANCE => Config\Model\ReadOnlyFileConfig::class],
 		],
 	],
 	/**
@@ -175,6 +185,12 @@ return [
 		'call'       => [
 			['createDev', [], Dice::CHAIN_CALL],
 		]
+	],
+	\Friendica\Core\Logger\Capabilities\IHaveCallIntrospections::class => [
+		'instanceOf' => \Friendica\Core\Logger\Util\Introspection::class,
+		'constructParams' => [
+			\Friendica\Core\Logger\Util\Introspection::IGNORE_CLASS_LIST,
+		],
 	],
 	Cache\Capability\ICanCache::class => [
 		'instanceOf' => Cache\Factory\Cache::class,
@@ -239,6 +255,9 @@ return [
 			['getBackend', [], Dice::CHAIN_CALL],
 		],
 	],
+	\Friendica\Core\KeyValueStorage\Capabilities\IManageKeyValuePairs::class => [
+		'instanceOf' => \Friendica\Core\KeyValueStorage\Type\DBKeyValueStorage::class,
+	],
 	Network\HTTPClient\Capability\ICanSendHttpRequests::class => [
 		'instanceOf' => Network\HTTPClient\Factory\HttpClient::class,
 		'call'       => [
@@ -267,5 +286,10 @@ return [
 	],
 	\Psr\Clock\ClockInterface::class => [
 		'instanceOf' => Util\Clock\SystemClock::class
-	]
+	],
+	\Friendica\Module\Special\HTTPException::class => [
+		'constructParams' => [
+			$_SERVER
+		],
+	],
 ];

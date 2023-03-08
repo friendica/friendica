@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -42,9 +42,12 @@ class Federation extends BaseAdmin
 			'akkoma'       => ['name' => 'Akkoma', 'color' => '#9574cd'], // Color from the page
 			'birdsitelive' => ['name' => 'BirdsiteLIVE', 'color' => '#1b6ec2'], // Color from the page
 			'bookwyrm'     => ['name' => 'BookWyrm', 'color' => '#00d1b2'], // Color from the page
+			'calckey'      => ['name' => 'Calckey', 'color' => '#286983'], // Color from the page
 			'castopod'     => ['name' => 'Castopod', 'color' => '#00564a'], // Background color from the page
 			'diaspora'     => ['name' => 'Diaspora', 'color' => '#a1a1a1'], // logo is black and white, makes a gray
+			'foundkey'     => ['name' => 'Foundkey', 'color' => '#609926'], // Some random color from the repository
 			'funkwhale'    => ['name' => 'Funkwhale', 'color' => '#4082B4'], // From the homepage
+			'gancio'       => ['name' => 'Gancio', 'color' => '#7253ed'], // Fontcolor from the page
 			'gnusocial'    => ['name' => 'GNU Social/Statusnet', 'color' => '#a22430'], // dark red from the logo
 			'gotosocial'   => ['name' => 'GoToSocial', 'color' => '#df8958'], // Some color from their mascot
 			'hometown'     => ['name' => 'Hometown', 'color' => '#1f70c1'], // Color from the Patreon page
@@ -128,6 +131,8 @@ class Federation extends BaseAdmin
 				$platform = 'pleroma';
 			} elseif(stristr($platform, 'statusnet')) {
 				$platform = 'gnusocial';
+			} elseif(stristr($platform, 'nextcloud')) {
+				$platform = 'nextcloud';
 			} elseif(stristr($platform, 'wordpress')) {
 				$platform = 'wordpress';
 			} elseif (in_array($platform, ['activityrelay', 'pub-relay', 'selective-relay', 'aoderelay'])) {

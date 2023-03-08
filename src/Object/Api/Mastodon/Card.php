@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -54,6 +54,8 @@ class Card extends BaseDataTransferObject
 	protected $image;
 	/** @var string */
 	protected $blurhash;
+	/** @var array */
+	protected $history;
 
 	/**
 	 * Creates a card record from an attachment array.

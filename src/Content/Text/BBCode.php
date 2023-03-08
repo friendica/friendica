@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -75,77 +75,6 @@ class BBCode
 	const PREVIEW_SMALL    = 3;
 
 	/**
-	 * Fetches attachment data that were generated the old way
-	 *
-	 * @param string $body Message body
-	 * @return array
-	 *                     'type' -> Message type ('link', 'video', 'photo')
-	 *                     'text' -> Text before the shared message
-	 *                     'after' -> Text after the shared message
-	 *                     'image' -> Preview image of the message
-	 *                     'url' -> Url to the attached message
-	 *                     'title' -> Title of the attachment
-	 *                     'description' -> Description of the attachment
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	private static function getOldAttachmentData(string $body): array
-	{
-		$post = [];
-
-		// Simplify image codes
-		$body = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $body);
-
-		if (preg_match_all("(\[class=(.*?)\](.*?)\[\/class\])ism", $body, $attached, PREG_SET_ORDER)) {
-			foreach ($attached as $data) {
-				if (!in_array($data[1], ['type-link', 'type-video', 'type-photo'])) {
-					continue;
-				}
-
-				$post['type'] = substr($data[1], 5);
-
-				$pos = strpos($body, $data[0]);
-				if ($pos > 0) {
-					$post['text'] = trim(substr($body, 0, $pos));
-					$post['after'] = trim(substr($body, $pos + strlen($data[0])));
-				} else {
-					$post['text'] = trim(str_replace($data[0], '', $body));
-					$post['after'] = '';
-				}
-
-				$attacheddata = $data[2];
-
-				if (preg_match("/\[img\](.*?)\[\/img\]/ism", $attacheddata, $matches)) {
-
-					$picturedata = Images::getInfoFromURLCached($matches[1]);
-
-					if ($picturedata) {
-						if (($picturedata[0] >= 500) && ($picturedata[0] >= $picturedata[1])) {
-							$post['image'] = $matches[1];
-						} else {
-							$post['preview'] = $matches[1];
-						}
-					}
-				}
-
-				if (preg_match("/\[bookmark\=(.*?)\](.*?)\[\/bookmark\]/ism", $attacheddata, $matches)) {
-					$post['url'] = $matches[1];
-					$post['title'] = $matches[2];
-				}
-				if (!empty($post['url']) && (in_array($post['type'], ['link', 'video']))
-					&& preg_match("/\[url\=(.*?)\](.*?)\[\/url\]/ism", $attacheddata, $matches)) {
-					$post['url'] = $matches[1];
-				}
-
-				// Search for description
-				if (preg_match("/\[quote\](.*?)\[\/quote\]/ism", $attacheddata, $matches)) {
-					$post['description'] = $matches[1];
-				}
-			}
-		}
-		return $post;
-	}
-
-	/**
 	 * Fetches attachment data that were generated with the "attachment" element
 	 *
 	 * @param string $body Message body
@@ -178,7 +107,7 @@ class BBCode
 
 		if (!preg_match("/(.*)\[attachment(.*?)\](.*?)\[\/attachment\](.*)/ism", $body, $match)) {
 			DI::profiler()->stopRecording();
-			return self::getOldAttachmentData($body);
+			return [];
 		}
 
 		$attributes = $match[2];
@@ -251,6 +180,33 @@ class BBCode
 
 		DI::profiler()->stopRecording();
 		return $data;
+	}
+
+	/**
+	 * Remove [attachment] BBCode and replaces it with a regular [url]
+	 *
+	 * @param string  $body
+	 * @param boolean $no_link_desc No link description
+	 * @return string with replaced body
+	 */
+	public static function replaceAttachment(string $body, bool $no_link_desc = false): string
+	{
+		return preg_replace_callback(
+			"/\s*\[attachment (.*?)\](.*?)\[\/attachment\]\s*/ism",
+			function ($match) use ($body, $no_link_desc) {
+				$attach_data = self::getAttachmentData($match[0]);
+				if (empty($attach_data['url'])) {
+					return $match[0];
+				} elseif (strpos(str_replace($match[0], '', $body), $attach_data['url']) !== false) {
+					return '';
+				} elseif (empty($attach_data['title']) || $no_link_desc) {
+					return " \n[url]" . $attach_data['url'] . "[/url]\n";
+				} else {
+					return " \n[url=" . $attach_data['url'] . ']' . $attach_data['title'] . "[/url]\n";
+				}
+			},
+			$body
+		);
 	}
 
 	public static function getAttachedData(string $body, array $item = []): array
@@ -431,27 +387,14 @@ class BBCode
 	}
 
 	/**
-	 * Remove [attachment] BBCode and replaces it with a regular [url]
+	 * Remove [attachment] BBCode
 	 *
 	 * @param string  $body
-	 * @param boolean $no_link_desc No link description
-	 * @return string with replaced body
+	 * @return string with removed attachment
 	 */
-	public static function removeAttachment(string $body, bool $no_link_desc = false): string
+	public static function removeAttachment(string $body): string
 	{
-		return preg_replace_callback("/\s*\[attachment (.*?)\](.*?)\[\/attachment\]\s*/ism",
-			function ($match) use ($body, $no_link_desc) {
-				$attach_data = self::getAttachmentData($match[0]);
-				if (empty($attach_data['url'])) {
-					return $match[0];
-				} elseif (strpos(str_replace($match[0], '', $body), $attach_data['url']) !== false) {
-					return '';
-				} elseif (empty($attach_data['title']) || $no_link_desc) {
-					return " \n[url]" . $attach_data['url'] . "[/url]\n";
-				} else {
-					return " \n[url=" . $attach_data['url'] . ']' . $attach_data['title'] . "[/url]\n";
-				}
-		}, $body);
+		return trim(preg_replace("/\s*\[attachment .*?\].*?\[\/attachment\]\s*/ism", '', $body));
 	}
 
 	/**
@@ -469,7 +412,7 @@ class BBCode
 		$text = preg_replace("/\[img.*?\[\/img\]/ism", ' ', $text);
 
 		// Remove attachment
-		$text = self::removeAttachment($text);
+		$text = self::replaceAttachment($text);
 
 		$naked_text = HTML::toPlaintext(self::convert($text, false, 0, true), 0, !$keep_urls);
 
@@ -487,72 +430,6 @@ class BBCode
 		} else {
 			return Proxy::proxifyUrl($image, $size);
 		}
-	}
-
-	/**
-	 * This function changing the visual size (not the real size) of images.
-	 * The function does not work for pictures with an alternate text description.
-	 * This could only be changed by using some new "img" BBCode format.
-	 *
-	 * @param string $srctext The body with images
-	 * @return string The body with possibly scaled images
-	 */
-	public static function scaleExternalImages(string $srctext): string
-	{
-		DI::profiler()->startRecording('rendering');
-		$s = $srctext;
-
-		// Simplify image links
-		$s = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $s);
-
-		$matches = null;
-		$c = preg_match_all('/\[img.*?\](.*?)\[\/img\]/ism', $s, $matches, PREG_SET_ORDER);
-		if ($c) {
-			foreach ($matches as $mtch) {
-				Logger::debug('scale_external_image', ['image' => $mtch[1]]);
-
-				$hostname = str_replace('www.', '', substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3));
-				if (stristr($mtch[1], $hostname)) {
-					continue;
-				}
-
-				$curlResult = DI::httpClient()->get($mtch[1], HttpClientAccept::IMAGE);
-				if (!$curlResult->isSuccess()) {
-					continue;
-				}
-
-				Logger::debug('Got picture', ['Content-Type' => $curlResult->getHeader('Content-Type'), 'url' => $mtch[1]]);
-
-				$i = $curlResult->getBody();
-				$type = $curlResult->getContentType();
-				$type = Images::getMimeTypeByData($i, $mtch[1], $type);
-
-				if ($i) {
-					$Image = new Image($i, $type);
-					if ($Image->isValid()) {
-						$orig_width = $Image->getWidth();
-						$orig_height = $Image->getHeight();
-
-						if ($orig_width > 640 || $orig_height > 640) {
-							$Image->scaleDown(640);
-							$new_width = $Image->getWidth();
-							$new_height = $Image->getHeight();
-							Logger::debug('External images scaled', ['orig_width' => $orig_width, 'new_width' => $new_width, 'orig_height' => $orig_height, 'new_height' => $new_height, 'match' => $mtch[0]]);
-							$s = str_replace(
-								$mtch[0],
-								'[img=' . $new_width . 'x' . $new_height. ']' . $mtch[1] . '[/img]'
-								. "\n",
-								$s
-							);
-							Logger::debug('New string', ['image' => $s]);
-						}
-					}
-				}
-			}
-		}
-
-		DI::profiler()->stopRecording();
-		return $s;
 	}
 
 	/**
@@ -1011,8 +888,11 @@ class BBCode
 			// We're depending on the property of 'foreach' (specified on the PHP website) that
 			// it loops over the array starting from the first element and going sequentially
 			// to the last element
-			$newbody = str_replace('[$#saved_image' . $cnt . '#$]',
-				'<img src="' . self::proxyUrl($image, self::INTERNAL, $uriid) . '" alt="' . DI::l10n()->t('Image/photo') . '" />', $newbody);
+			$newbody = str_replace(
+				'[$#saved_image' . $cnt . '#$]',
+				'<img src="' . self::proxyUrl($image, self::INTERNAL, $uriid) . '" alt="' . DI::l10n()->t('Image/photo') . '" />',
+				$newbody
+			);
 			$cnt++;
 		}
 
@@ -1167,8 +1047,7 @@ class BBCode
 					$attributes[$field] = html_entity_decode($matches[2] ?? '', ENT_QUOTES, 'UTF-8');
 				}
 
-				$img_str = '<img src="' .
-				self::proxyUrl($match[2], $simplehtml, $uriid) . '"';
+				$img_str = '<img src="' . self::proxyUrl($match[2], $simplehtml, $uriid) . '"';
 				foreach ($attributes as $key => $value) {
 					if (!empty($value)) {
 						$img_str .= ' ' . $key . '="' . htmlspecialchars($value, ENT_COMPAT) . '"';
@@ -1205,13 +1084,13 @@ class BBCode
 		switch ($simplehtml) {
 			case self::MASTODON_API:
 			case self::TWITTER_API:
-				$text = ($is_quote_share? '<br>' : '') .
-				'<b><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . ' ' . $author_contact['addr'] . "</a>:</b><br>\n" .
-				'<blockquote class="shared_content" dir="auto">' . $content . '</blockquote>';
+				$text = ($is_quote_share ? '<br>' : '') .
+					'<b><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . ' ' . $author_contact['addr'] . "</a>:</b><br>\n" .
+					'<blockquote class="shared_content" dir="auto">' . $content . '</blockquote>';
 				break;
 			case self::DIASPORA:
 				if (stripos(Strings::normaliseLink($attributes['link']), 'http://twitter.com/') === 0) {
-					$text = ($is_quote_share? '<hr />' : '') . '<p><a href="' . $attributes['link'] . '">' . $attributes['link'] . '</a></p>' . "\n";
+					$text = ($is_quote_share ? '<hr />' : '') . '<p><a href="' . $attributes['link'] . '">' . $attributes['link'] . '</a></p>' . "\n";
 				} else {
 					$headline = '<p><b>♲ <a href="' . $attributes['profile'] . '">' . $attributes['author'] . '</a>:</b></p>' . "\n";
 
@@ -1219,7 +1098,7 @@ class BBCode
 						$headline = '<p><b>♲ <a href="' . $attributes['profile'] . '">' . $attributes['author'] . '</a></b> - <a href="' . $attributes['link'] . '">' . $attributes['posted'] . ' GMT</a></p>' . "\n";
 					}
 
-					$text = ($is_quote_share? '<hr />' : '') . $headline . '<blockquote>' . trim($content) . '</blockquote>' . "\n";
+					$text = ($is_quote_share ? '<hr />' : '') . $headline . '<blockquote>' . trim($content) . '</blockquote>' . "\n";
 
 					if (empty($attributes['posted']) && !empty($attributes['link'])) {
 						$text .= '<p><a href="' . $attributes['link'] . '">[Source]</a></p>' . "\n";
@@ -1232,18 +1111,18 @@ class BBCode
 				$headline .= DI::l10n()->t('<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> %3$s', $attributes['link'], $mention, $attributes['posted']);
 				$headline .= ':</b></p>' . "\n";
 
-				$text = ($is_quote_share? '<hr />' : '') . $headline . '<blockquote class="shared_content" dir="auto">' . trim($content) . '</blockquote>' . "\n";
+				$text = ($is_quote_share ? '<hr />' : '') . $headline . '<blockquote class="shared_content" dir="auto">' . trim($content) . '</blockquote>' . "\n";
 
 				break;
 			case self::OSTATUS:
-				$text = ($is_quote_share? '<br>' : '') . '<p>' . html_entity_decode('&#x2672; ', ENT_QUOTES, 'UTF-8') . ' @' . $author_contact['addr'] . ': ' . $content . '</p>' . "\n";
+				$text = ($is_quote_share ? '<br>' : '') . '<p>' . html_entity_decode('&#x2672; ', ENT_QUOTES, 'UTF-8') . ' @' . $author_contact['addr'] . ': ' . $content . '</p>' . "\n";
 				break;
 			case self::ACTIVITYPUB:
 				$author = '@<span class="vcard"><a href="' . $author_contact['url'] . '" class="url u-url mention" title="' . $author_contact['addr'] . '"><span class="fn nickname mention">' . $author_contact['addr'] . '</span></a>:</span>';
 				$text = '<div><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . '</a> ' . $author . '<blockquote>' . $content . '</blockquote></div>' . "\n";
 				break;
 			default:
-				$text = ($is_quote_share? "\n" : '');
+				$text = ($is_quote_share ? "\n" : '');
 
 				$contact = Contact::getByURL($attributes['profile'], false, ['network']);
 				$network = $contact['network'] ?? Protocol::PHANTOM;
@@ -1340,7 +1219,7 @@ class BBCode
 	private static function cleanPictureLinksCallback(array $match): string
 	{
 		// When the picture link is the own photo path then we can avoid fetching the link
-		$own_photo_url = preg_quote(Strings::normaliseLink(DI::baseUrl()->get()) . '/photos/');
+		$own_photo_url = preg_quote(Strings::normaliseLink(DI::baseUrl()) . '/photos/');
 		if (preg_match('|' . $own_photo_url . '.*?/image/|', Strings::normaliseLink($match[1]))) {
 			if (!empty($match[3])) {
 				$text = '[img=' . str_replace('-1.', '-0.', $match[2]) . ']' . $match[3] . '[/img]';
@@ -1415,8 +1294,8 @@ class BBCode
 	public static function cleanPictureLinks(string $text): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$return = preg_replace_callback("&\[url=([^\[\]]*)\]\[img=(.*)\](.*)\[\/img\]\[\/url\]&Usi", 'self::cleanPictureLinksCallback', $text);
-		$return = preg_replace_callback("&\[url=([^\[\]]*)\]\[img\](.*)\[\/img\]\[\/url\]&Usi", 'self::cleanPictureLinksCallback', $return);
+		$return = preg_replace_callback("&\[url=([^\[\]]*)\]\[img=(.*)\](.*)\[\/img\]\[\/url\]&Usi", [self::class, 'cleanPictureLinksCallback'], $text);
+		$return = preg_replace_callback("&\[url=([^\[\]]*)\]\[img\](.*)\[\/img\]\[\/url\]&Usi", [self::class, 'cleanPictureLinksCallback'], $return);
 		DI::profiler()->stopRecording();
 		return $return;
 	}
@@ -1450,7 +1329,7 @@ class BBCode
 	{
 		DI::profiler()->startRecording('rendering');
 		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
-		$body = preg_replace_callback($regexp, ['self', 'mentionCallback'], $body);
+		$body = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
 	}
@@ -1555,8 +1434,7 @@ class BBCode
 				 * $match[1] = $url
 				 * $match[2] = $title or absent
 				 */
-				$try_oembed_callback = function (array $match)
-				{
+				$try_oembed_callback = function (array $match) {
 					$url = $match[1];
 					$title = $match[2] ?? '';
 
@@ -1609,18 +1487,22 @@ class BBCode
 				}
 
 				// Remove linefeeds inside of the table elements. See issue #6799
-				$search = ["\n[th]", "[th]\n", " [th]", "\n[/th]", "[/th]\n", "[/th] ",
+				$search = [
+					"\n[th]", "[th]\n", " [th]", "\n[/th]", "[/th]\n", "[/th] ",
 					"\n[td]", "[td]\n", " [td]", "\n[/td]", "[/td]\n", "[/td] ",
 					"\n[tr]", "[tr]\n", " [tr]", "[tr] ", "\n[/tr]", "[/tr]\n", " [/tr]", "[/tr] ",
 					"\n[hr]", "[hr]\n", " [hr]", "[hr] ",
 					"\n[attachment ", " [attachment ", "\n[/attachment]", "[/attachment]\n", " [/attachment]", "[/attachment] ",
-					"[table]\n", "[table] ", " [table]", "\n[/table]", " [/table]", "[/table] "];
-				$replace = ["[th]", "[th]", "[th]", "[/th]", "[/th]", "[/th]",
+					"[table]\n", "[table] ", " [table]", "\n[/table]", " [/table]", "[/table] "
+				];
+				$replace = [
+					"[th]", "[th]", "[th]", "[/th]", "[/th]", "[/th]",
 					"[td]", "[td]", "[td]", "[/td]", "[/td]", "[/td]",
 					"[tr]", "[tr]", "[tr]", "[tr]", "[/tr]", "[/tr]", "[/tr]", "[/tr]",
 					"[hr]", "[hr]", "[hr]", "[hr]",
 					"[attachment ", "[attachment ", "[/attachment]", "[/attachment]", "[/attachment]", "[/attachment]",
-					"[table]", "[table]", "[table]", "[/table]", "[/table]", "[/table]"];
+					"[table]", "[table]", "[table]", "[/table]", "[/table]", "[/table]"
+				];
 				do {
 					$oldtext = $text;
 					$text = str_replace($search, $replace, $text);
@@ -1636,10 +1518,14 @@ class BBCode
 
 				// removing multiplicated newlines
 				if (DI::config()->get('system', 'remove_multiplicated_lines')) {
-					$search = ["\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]", "[/li]\n", "\n[li]", "\n[*]", "\n[ul]", "[/ul]\n", "\n\n[share ", "[/attachment]\n",
-							"\n[h1]", "[/h1]\n", "\n[h2]", "[/h2]\n", "\n[h3]", "[/h3]\n", "\n[h4]", "[/h4]\n", "\n[h5]", "[/h5]\n", "\n[h6]", "[/h6]\n"];
-					$replace = ["\n\n", "\n", "\n", "[/quote]\n", "[/quote]", "[/li]", "[li]", "[*]", "[ul]", "[/ul]", "\n[share ", "[/attachment]",
-							"[h1]", "[/h1]", "[h2]", "[/h2]", "[h3]", "[/h3]", "[h4]", "[/h4]", "[h5]", "[/h5]", "[h6]", "[/h6]"];
+					$search = [
+						"\n\n\n", "\n ", " \n", "[/quote]\n\n", "\n[/quote]", "[/li]\n", "\n[li]", "\n[*]", "\n[ul]", "[/ul]\n", "\n\n[share ", "[/attachment]\n",
+						"\n[h1]", "[/h1]\n", "\n[h2]", "[/h2]\n", "\n[h3]", "[/h3]\n", "\n[h4]", "[/h4]\n", "\n[h5]", "[/h5]\n", "\n[h6]", "[/h6]\n"
+					];
+					$replace = [
+						"\n\n", "\n", "\n", "[/quote]\n", "[/quote]", "[/li]", "[li]", "[*]", "[ul]", "[/ul]", "\n[share ", "[/attachment]",
+						"[h1]", "[/h1]", "[h2]", "[/h2]", "[h3]", "[/h3]", "[h4]", "[/h4]", "[h5]", "[/h5]", "[h6]", "[/h6]"
+					];
 					do {
 						$oldtext = $text;
 						$text = str_replace($search, $replace, $text);
@@ -1649,9 +1535,9 @@ class BBCode
 				/// @todo Have a closer look at the different html modes
 				// Handle attached links or videos
 				if (in_array($simple_html, [self::MASTODON_API, self::TWITTER_API, self::ACTIVITYPUB])) {
-					$text = self::removeAttachment($text);
+					$text = self::replaceAttachment($text);
 				} elseif (!in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::CONNECTORS])) {
-					$text = self::removeAttachment($text, true);
+					$text = self::replaceAttachment($text, true);
 				} else {
 					$text = self::convertAttachment($text, $simple_html, $try_oembed, [], $uriid);
 				}
@@ -1757,9 +1643,9 @@ class BBCode
 				$endlessloop = 0;
 
 				while ((((strpos($text, "[/list]") !== false) && (strpos($text, "[list") !== false)) ||
-						((strpos($text, "[/ol]") !== false) && (strpos($text, "[ol]") !== false)) ||
-						((strpos($text, "[/ul]") !== false) && (strpos($text, "[ul]") !== false)) ||
-						((strpos($text, "[/li]") !== false) && (strpos($text, "[li]") !== false))) && (++$endlessloop < 20)) {
+					((strpos($text, "[/ol]") !== false) && (strpos($text, "[ol]") !== false)) ||
+					((strpos($text, "[/ul]") !== false) && (strpos($text, "[ul]") !== false)) ||
+					((strpos($text, "[/li]") !== false) && (strpos($text, "[li]") !== false))) && (++$endlessloop < 20)) {
 					$text = preg_replace("/\[list\](.*?)\[\/list\]/ism", '<ul class="listbullet" style="list-style-type: circle;">$1</ul>', $text);
 					$text = preg_replace("/\[list=\](.*?)\[\/list\]/ism", '<ul class="listnone" style="list-style-type: none;">$1</ul>', $text);
 					$text = preg_replace("/\[list=1\](.*?)\[\/list\]/ism", '<ul class="listdecimal" style="list-style-type: decimal;">$1</ul>', $text);
@@ -1805,10 +1691,12 @@ class BBCode
 
 				// handle nested quotes
 				$endlessloop = 0;
-				while ((strpos($text, "[/spoiler]")!== false)  && (strpos($text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
-					$text = preg_replace("/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
+				while ((strpos($text, "[/spoiler]") !== false)  && (strpos($text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
+					$text = preg_replace(
+						"/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
 						'<details class="spoiler"><summary>$1</summary>$2</details>',
-						$text);
+						$text
+					);
 				}
 
 				// Declare the format for [quote] layout
@@ -1827,10 +1715,12 @@ class BBCode
 
 				// handle nested quotes
 				$endlessloop = 0;
-				while ((strpos($text, "[/quote]")!== false)  && (strpos($text, "[quote=") !== false) && (++$endlessloop < 20)) {
-					$text = preg_replace("/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
-						"<p><strong class=".'"author"'.">" . $t_wrote . "</strong></p><blockquote>$2</blockquote>",
-						$text);
+				while ((strpos($text, "[/quote]") !== false)  && (strpos($text, "[quote=") !== false) && (++$endlessloop < 20)) {
+					$text = preg_replace(
+						"/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
+						"<p><strong class=" . '"author"' . ">" . $t_wrote . "</strong></p><blockquote>$2</blockquote>",
+						$text
+					);
 				}
 
 
@@ -1851,13 +1741,15 @@ class BBCode
 				$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="width: $1px;" >', $text);
 				$text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="zrl" src="$3" style="width: $1px;" >', $text);
 
-				$text = preg_replace_callback("/\[img\=(.*?)\](.*?)\[\/img\]/ism",
+				$text = preg_replace_callback(
+					"/\[img\=(.*?)\](.*?)\[\/img\]/ism",
 					function ($matches) use ($simple_html, $uriid) {
 						$matches[1] = self::proxyUrl($matches[1], $simple_html, $uriid);
 						$matches[2] = htmlspecialchars($matches[2], ENT_COMPAT);
 						return '<img src="' . $matches[1] . '" alt="' . $matches[2] . '" title="' . $matches[2] . '">';
 					},
-					$text);
+					$text
+				);
 
 				// Images
 				// [img]pathtoimage[/img]
@@ -1879,8 +1771,8 @@ class BBCode
 
 				$text = self::convertImages($text, $simple_html, $uriid);
 
-				$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
-				$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . '$1' . ' ' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
+				$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
+				$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . '$1' . ' ' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
 				//$text = preg_replace("/\[crypt=(.*?)\](.*?)\[\/crypt\]/ism", '<br><img src="' .DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . '$1' . ' ' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
 
 				// Simplify "video" element
@@ -1888,20 +1780,32 @@ class BBCode
 
 				if ($try_oembed) {
 					// html5 video and audio
-					$text = preg_replace("/\[video\](.*?\.(ogg|ogv|oga|ogm|webm|mp4).*?)\[\/video\]/ism",
-						'<video src="$1" controls width="100%" height="auto"><a href="$1">$1</a></video>', $text);
+					$text = preg_replace(
+						"/\[video\](.*?\.(ogg|ogv|oga|ogm|webm|mp4).*?)\[\/video\]/ism",
+						'<video src="$1" controls width="100%" height="auto"><a href="$1">$1</a></video>',
+						$text
+					);
 
 					$text = preg_replace_callback("/\[video\](.*?)\[\/video\]/ism", $try_oembed_callback, $text);
 					$text = preg_replace_callback("/\[audio\](.*?)\[\/audio\]/ism", $try_oembed_callback, $text);
 
-					$text = preg_replace("/\[video\](.*?)\[\/video\]/ism",
-						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $text);
+					$text = preg_replace(
+						"/\[video\](.*?)\[\/video\]/ism",
+						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+						$text
+					);
 					$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism", '<audio src="$1" controls><a href="$1">$1</a></audio>', $text);
 				} else {
-					$text = preg_replace("/\[video\](.*?)\[\/video\]/ism",
-						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $text);
-					$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism",
-						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $text);
+					$text = preg_replace(
+						"/\[video\](.*?)\[\/video\]/ism",
+						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+						$text
+					);
+					$text = preg_replace(
+						"/\[audio\](.*?)\[\/audio\]/ism",
+						'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+						$text
+					);
 				}
 
 				// Backward compatibility, [iframe] support has been removed in version 2020.12
@@ -1923,8 +1827,11 @@ class BBCode
 				if ($try_oembed) {
 					$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="' . $a->getThemeInfoValue('videowidth') . '" height="' . $a->getThemeInfoValue('videoheight') . '" src="https://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $text);
 				} else {
-					$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism",
-						'<a href="https://www.youtube.com/watch?v=$1" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=$1</a>', $text);
+					$text = preg_replace(
+						"/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism",
+						'<a href="https://www.youtube.com/watch?v=$1" target="_blank" rel="noopener noreferrer">https://www.youtube.com/watch?v=$1</a>',
+						$text
+					);
 				}
 
 				if ($try_oembed) {
@@ -1938,8 +1845,11 @@ class BBCode
 				if ($try_oembed) {
 					$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '<iframe width="' . $a->getThemeInfoValue('videowidth') . '" height="' . $a->getThemeInfoValue('videoheight') . '" src="https://player.vimeo.com/video/$1" frameborder="0" ></iframe>', $text);
 				} else {
-					$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism",
-						'<a href="https://vimeo.com/$1" target="_blank" rel="noopener noreferrer">https://vimeo.com/$1</a>', $text);
+					$text = preg_replace(
+						"/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism",
+						'<a href="https://vimeo.com/$1" target="_blank" rel="noopener noreferrer">https://vimeo.com/$1</a>',
+						$text
+					);
 				}
 
 				// oembed tag
@@ -1975,49 +1885,64 @@ class BBCode
 				// Handle mentions and hashtag links
 				if ($simple_html == self::DIASPORA) {
 					// The ! is converted to @ since Diaspora only understands the @
-					$text = preg_replace("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+					$text = preg_replace(
+						"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'@<a href="$2">$3</a>',
-						$text);
+						$text
+					);
 				} elseif (in_array($simple_html, [self::OSTATUS, self::ACTIVITYPUB])) {
-					$text = preg_replace("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+					$text = preg_replace(
+						"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'<span class="h-card"><a href="$2" class="u-url mention">$1<span>$3</span></a></span>',
-						$text);
-					$text = preg_replace("/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+						$text
+					);
+					$text = preg_replace(
+						"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'<a href="$2" class="mention hashtag" rel="tag">$1<span>$3</span></a>',
-						$text);
+						$text
+					);
 				} elseif (in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::TWITTER_API])) {
-					$text = preg_replace("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+					$text = preg_replace(
+						"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'<bdi>$1<a href="$2" class="userinfo mention" title="$3">$3</a></bdi>',
-						$text);
+						$text
+					);
 				} elseif ($simple_html == self::MASTODON_API) {
-					$text = preg_replace("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+					$text = preg_replace(
+						"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'<a class="u-url mention status-link" href="$2" rel="nofollow noopener noreferrer" target="_blank" title="$3">$1<span>$3</span></a>',
-						$text);
-					$text = preg_replace("/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
+						$text
+					);
+					$text = preg_replace(
+						"/([#])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 						'<a class="mention hashtag status-link" href="$2" rel="tag">$1<span>$3</span></a>',
-						$text);
+						$text
+					);
 				} else {
 					$text = preg_replace("/([#@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", '$1$3', $text);
 				}
 
 				if (!$for_plaintext) {
 					if (in_array($simple_html, [self::OSTATUS, self::MASTODON_API, self::TWITTER_API, self::ACTIVITYPUB])) {
-						$text = preg_replace_callback("/\[url\](.*?)\[\/url\]/ism", 'self::convertUrlForActivityPubCallback', $text);
-						$text = preg_replace_callback("/\[url\=(.*?)\](.*?)\[\/url\]/ism", 'self::convertUrlForActivityPubCallback', $text);
+						$text = preg_replace_callback("/\[url\](.*?)\[\/url\]/ism", [self::class, 'convertUrlForActivityPubCallback'], $text);
+						$text = preg_replace_callback("/\[url\=(.*?)\](.*?)\[\/url\]/ism", [self::class, 'convertUrlForActivityPubCallback'], $text);
 					}
 				} else {
 					$text = preg_replace("(\[url\](.*?)\[\/url\])ism", " $1 ", $text);
-					$text = preg_replace_callback("&\[url=([^\[\]]*)\]\[img\](.*)\[\/img\]\[\/url\]&Usi", 'self::removePictureLinksCallback', $text);
+					$text = preg_replace_callback("&\[url=([^\[\]]*)\]\[img\](.*)\[\/img\]\[\/url\]&Usi", [self::class, 'removePictureLinksCallback'], $text);
 				}
 
 				// Bookmarks in red - will be converted to bookmarks in friendica
 				$text = preg_replace("/#\^\[url\](.*?)\[\/url\]/ism", '[bookmark=$1]$1[/bookmark]', $text);
 				$text = preg_replace("/#\^\[url\=(.*?)\](.*?)\[\/url\]/ism", '[bookmark=$1]$2[/bookmark]', $text);
-				$text = preg_replace("/#\[url\=.*?\]\^\[\/url\]\[url\=(.*?)\](.*?)\[\/url\]/i",
-							"[bookmark=$1]$2[/bookmark]", $text);
+				$text = preg_replace(
+					"/#\[url\=.*?\]\^\[\/url\]\[url\=(.*?)\](.*?)\[\/url\]/i",
+					"[bookmark=$1]$2[/bookmark]",
+					$text
+				);
 
 				if (in_array($simple_html, [self::OSTATUS, self::TWITTER])) {
-					$text = preg_replace_callback("/([^#@!])\[url\=([^\]]*)\](.*?)\[\/url\]/ism", "self::expandLinksCallback", $text);
+					$text = preg_replace_callback("/([^#@!])\[url\=([^\]]*)\](.*?)\[\/url\]/ism", [self::class, 'expandLinksCallback'], $text);
 					//$text = preg_replace("/[^#@!]\[url\=([^\]]*)\](.*?)\[\/url\]/ism", ' $2 [url]$1[/url]', $text);
 					$text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", ' $2 [url]$1[/url]', $text);
 				}
@@ -2034,20 +1959,22 @@ class BBCode
 					"&\[url=/?posts/([^\[\]]*)\](.*)\[\/url\]&Usi",
 					function ($match) {
 						return "[url=" . DI::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
-					}, $text
+					},
+					$text
 				);
 
 				$text = preg_replace_callback(
 					"&\[url=/people\?q\=(.*)\](.*)\[\/url\]&Usi",
 					function ($match) {
 						return "[url=" . DI::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
-					}, $text
+					},
+					$text
 				);
 
 				// Server independent link to posts and comments
 				// See issue: https://github.com/diaspora/diaspora_federation/issues/75
 				$expression = "=diaspora://.*?/post/([0-9A-Za-z\-_@.:]{15,254}[0-9A-Za-z])=ism";
-				$text = preg_replace($expression, DI::baseUrl()."/display/$1", $text);
+				$text = preg_replace($expression, DI::baseUrl() . "/display/$1", $text);
 
 				/* Tag conversion
 				 * Supports:
@@ -2055,7 +1982,7 @@ class BBCode
 				 * - [url=<anything>]#<term>[/url]
 				 */
 				self::performWithEscapedTags($text, ['url', 'share'], function ($text) use ($simple_html) {
-					$text = preg_replace_callback("/(?:#\[url\=[^\[\]]*\]|\[url\=[^\[\]]*\]#)(.*?)\[\/url\]/ism", function($matches) use ($simple_html) {
+					$text = preg_replace_callback("/(?:#\[url\=[^\[\]]*\]|\[url\=[^\[\]]*\]#)(.*?)\[\/url\]/ism", function ($matches) use ($simple_html) {
 						if ($simple_html == self::ACTIVITYPUB) {
 							return '<a href="' . DI::baseUrl() . '/search?tag=' . rawurlencode($matches[1])
 								. '" data-tag="' . XML::escape($matches[1]) . '" rel="tag ugc">#'
@@ -2072,8 +1999,8 @@ class BBCode
 				// We need no target="_blank" rel="noopener noreferrer" for local links
 				// convert links start with DI::baseUrl() as local link without the target="_blank" rel="noopener noreferrer" attribute
 				$escapedBaseUrl = preg_quote(DI::baseUrl(), '/');
-				$text = preg_replace("/\[url\](".$escapedBaseUrl.".*?)\[\/url\]/ism", '<a href="$1">$1</a>', $text);
-				$text = preg_replace("/\[url\=(".$escapedBaseUrl.".*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
+				$text = preg_replace("/\[url\](" . $escapedBaseUrl . ".*?)\[\/url\]/ism", '<a href="$1">$1</a>', $text);
+				$text = preg_replace("/\[url\=(" . $escapedBaseUrl . ".*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
 
 				$text = preg_replace("/\[url\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>', $text);
 				$text = preg_replace("/\[url\=(.*?)\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>', $text);
@@ -2104,10 +2031,15 @@ class BBCode
 				// sanitizes src attributes (http and redir URLs for displaying in a web page, cid used for inline images in emails)
 				$allowed_src_protocols = ['//', 'http://', 'https://', 'contact/redir/', 'cid:'];
 
-				array_walk($allowed_src_protocols, function(&$value) { $value = preg_quote($value, '#');});
+				array_walk($allowed_src_protocols, function (&$value) {
+					$value = preg_quote($value, '#');
+				});
 
-				$text = preg_replace('#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
-							 '<$1$2=""$4 data-original-src="$3" class="invalid-src" title="' . DI::l10n()->t('Invalid source protocol') . '">', $text);
+				$text = preg_replace(
+					'#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
+					'<$1$2=""$4 data-original-src="$3" class="invalid-src" title="' . DI::l10n()->t('Invalid source protocol') . '">',
+					$text
+				);
 
 				// sanitize href attributes (only allowlisted protocols URLs)
 				// default value for backward compatibility
@@ -2119,7 +2051,9 @@ class BBCode
 				$allowed_link_protocols[] = 'https://';
 				$allowed_link_protocols[] = 'contact/redir/';
 
-				array_walk($allowed_link_protocols, function(&$value) { $value = preg_quote($value, '#');});
+				array_walk($allowed_link_protocols, function (&$value) {
+					$value = preg_quote($value, '#');
+				});
 
 				$regex = '#<([^>]*?)(href)="(?!' . implode('|', $allowed_link_protocols) . ')(.*?)"(.*?)>#ism';
 				$text = preg_replace($regex, '<$1$2="javascript:void(0)"$4 data-original-href="$3" class="invalid-href" title="' . DI::l10n()->t('Invalid link protocol') . '">', $text);
@@ -2129,7 +2063,8 @@ class BBCode
 					$text,
 					function (array $attributes, array $author_contact, $content, $is_quote_share) use ($simple_html) {
 						return self::convertShareCallback($attributes, $author_contact, $content, $is_quote_share, $simple_html);
-					}, $uriid
+					},
+					$uriid
 				);
 
 				$text = self::interpolateSavedImagesIntoItemBody($uriid, $text, $saved_image);
@@ -2144,13 +2079,14 @@ class BBCode
 
 			// Additionally, [pre] tags preserve spaces
 			$text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", function ($match) {
-				return str_replace([' ', "\n"], ['&nbsp;', "<br>"], htmlentities($match[1], ENT_NOQUOTES,'UTF-8'));
+				return str_replace([' ', "\n"], ['&nbsp;', "<br>"], htmlentities($match[1], ENT_NOQUOTES, 'UTF-8'));
 			}, $text);
 
 			return $text;
 		}); // Escaped code
 
-		$text = preg_replace_callback("#\[code(?:=([^\]]*))?\](.*?)\[\/code\]#ism",
+		$text = preg_replace_callback(
+			"#\[code(?:=([^\]]*))?\](.*?)\[\/code\]#ism",
 			function ($matches) {
 				if (strpos($matches[2], "\n") !== false) {
 					$return = '<pre><code class="language-' . trim($matches[1]) . '">' . htmlentities(trim($matches[2], "\n\r"), ENT_NOQUOTES, 'UTF-8') . '</code></pre>';
@@ -2165,9 +2101,9 @@ class BBCode
 
 		// Default iframe allowed domains/path
 		$allowedIframeDomains = [
-			DI::baseUrl()->getHostname()
-			. (DI::baseUrl()->getUrlPath() ? '/' . DI::baseUrl()->getUrlPath() : '')
-			. '/oembed/', # The path part has to change with the source in Content\Oembed::iframe
+			DI::baseUrl()->getHost()
+				. (DI::baseUrl()->getPath() ? '/' . DI::baseUrl()->getPath() : '')
+				. '/oembed/', # The path part has to change with the source in Content\Oembed::iframe
 			'www.youtube.com/embed/',
 			'player.vimeo.com/video/',
 		];
@@ -2280,7 +2216,8 @@ class BBCode
 		 * Transform #tags, strip off the [url] and replace spaces with underscore
 		 */
 		$url_search_string = "^\[\]";
-		$text = preg_replace_callback("/#\[url\=([$url_search_string]*)\](.*?)\[\/url\]/i",
+		$text = preg_replace_callback(
+			"/#\[url\=([$url_search_string]*)\](.*?)\[\/url\]/i",
 			function ($matches) {
 				return '#' . str_replace(' ', '_', $matches[2]);
 			},
@@ -2327,7 +2264,7 @@ class BBCode
 			$url_search_string = "^\[\]";
 			$text = preg_replace_callback(
 				"/([@!])\[(.*?)\]\(([$url_search_string]*?)\)/ism",
-				['self', 'bbCodeMention2DiasporaCallback'],
+				[self::class, 'bbCodeMention2DiasporaCallback'],
 				$text
 			);
 		}
@@ -2415,7 +2352,8 @@ class BBCode
 	 */
 	public static function expandTags(string $body): string
 	{
-		return preg_replace_callback("/(?<=\W|^)([!#@])([^\^ \x0D\x0A,;:?'\"]*[^\^ \x0D\x0A,;:?!'\".])/",
+		return preg_replace_callback(
+			"/(?<=\W|^)([!#@])([^\^ \x0D\x0A,;:?'\"]*[^\^ \x0D\x0A,;:?!'\".])/",
 			function (array $match) {
 				switch ($match[1]) {
 					case '!':
@@ -2432,7 +2370,9 @@ class BBCode
 					default:
 						return $match[1] . '[url=' . DI::baseUrl() . '/search?tag=' . $match[2] . ']' . $match[2] . '[/url]';
 				}
-			}, $body);
+			},
+			$body
+		);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -49,12 +49,21 @@ class Unreblog extends BaseApi
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		if (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::TWITTER])) {
+		if ($item['network'] == Protocol::DIASPORA) {
+			$item = Post::selectFirstForUser($uid, ['id'], ['quote-uri-id' => $this->parameters['id'], 'body' => '', 'origin' => true, 'uid' => $uid]);
+			if (empty($item['id'])) {
+				DI::mstdnError()->RecordNotFound();
+			}
+
+			if (!Item::markForDeletionById($item['id'])) {
+				DI::mstdnError()->RecordNotFound();
+			}
+		} elseif (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::TWITTER])) {
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t("Posts from %s can't be unshared", ContactSelector::networkToName($item['network'])));
+		} else {
+			Item::performActivity($item['id'], 'unannounce', $uid);
 		}
 
-		Item::performActivity($item['id'], 'unannounce', $uid);
-
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid)->toArray());
+		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes())->toArray());
 	}
 }

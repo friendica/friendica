@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,38 +23,49 @@ namespace Friendica\Moderation\Entity;
 
 /**
  * @property-read int            $id
- * @property-read int            $uid
+ * @property-read int            $reporterId
  * @property-read int            $cid
  * @property-read string         $comment
+ * @property-read string|null    $category
  * @property-read bool           $forward
  * @property-read array          $postUriIds
+ * @property-read int            $uid
  * @property-read \DateTime|null $created
  */
 class Report extends \Friendica\BaseEntity
 {
 	/** @var int|null */
 	protected $id;
-	/** @var int ID of the user making a moderation report*/
-	protected $uid;
+	/** @var int ID of the contact making a moderation report*/
+	protected $reporterId;
 	/** @var int ID of the contact being reported*/
 	protected $cid;
 	/** @var string Optional comment */
 	protected $comment;
+	/** @var string Optional category */
+	protected $category;
+	/** @var string Violated rules */
+	protected $rules;
 	/** @var bool Whether this report should be forwarded to the remote server */
 	protected $forward;
 	/** @var \DateTime|null When the report was created */
 	protected $created;
 	/** @var array Optional list of URI IDs of posts supporting the report*/
 	protected $postUriIds;
+	/** @var int ID of the user making a moderation report*/
+	protected $uid;
 
-	public function __construct(int $uid, int $cid, \DateTime $created, string $comment = '', bool $forward = false, array $postUriIds = [], int $id = null)
+	public function __construct(int $reporterId, int $cid, \DateTime $created, string $comment = '', string $category = null, string $rules = '', bool $forward = false, array $postUriIds = [], int $uid = null, int $id = null)
 	{
-		$this->uid        = $uid;
+		$this->reporterId = $reporterId;
 		$this->cid        = $cid;
 		$this->created    = $created;
 		$this->comment    = $comment;
+		$this->category   = $category;
+		$this->rules      = $rules;
 		$this->forward    = $forward;
 		$this->postUriIds = $postUriIds;
+		$this->uid        = $uid;
 		$this->id         = $id;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,73 +25,35 @@ namespace Friendica\Test;
 use Dice\Dice;
 use Friendica\App\Arguments;
 use Friendica\App\Router;
-use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Config\Factory\Config;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Core\Session\Type\Memory;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Test\Util\Database\StaticDatabase;
+use Friendica\Test\Util\VFSTrait;
 
 /**
  * Parent class for test cases requiring fixtures
  */
-abstract class FixtureTest extends DatabaseTest
+abstract class FixtureTest extends MockedTest
 {
-	/** @var Dice */
-	protected $dice;
+	use FixtureTestTrait;
 
-	/**
-	 * Create variables used by tests.
-	 */
 	protected function setUp(): void
 	{
 		parent::setUp();
 
-		$server                   = $_SERVER;
-		$server['REQUEST_METHOD'] = Router::GET;
-
-		$this->dice = (new Dice())
-			->addRules(include __DIR__ . '/../static/dependencies.config.php')
-			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
-			->addRule(Arguments::class, [
-				'instanceOf' => Arguments::class,
-				'call'       => [
-					['determine', [$server, $_GET], Dice::CHAIN_CALL],
-				],
-			]);
-		DI::init($this->dice);
-
-		/** @var IManageConfigValues $config */
-		$configCache = $this->dice->create(Cache::class);
-		$configCache->set('database', 'disable_pdo', true);
-
-		/** @var Database $dba */
-		$dba = $this->dice->create(Database::class);
-
-		$dba->setTestmode(true);
-
-		DBStructure::checkInitialValues();
-
-		// Load the API dataset for the whole API
-		$this->loadFixture(__DIR__ . '/datasets/api.fixture.php', $dba);
+		$this->setUpFixtures();
 	}
 
-	protected function useHttpMethod(string $method = Router::GET)
+	protected function tearDown(): void
 	{
-		$server                   = $_SERVER;
-		$server['REQUEST_METHOD'] = $method;
+		$this->tearDownFixtures();
 
-		$this->dice = $this->dice
-			->addRule(Arguments::class, [
-				'instanceOf' => Arguments::class,
-				'call'       => [
-					['determine', [$server, $_GET], Dice::CHAIN_CALL],
-				],
-			]);
-
-		DI::init($this->dice);
+		parent::tearDown();
 	}
 }

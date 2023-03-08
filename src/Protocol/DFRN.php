@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -301,15 +301,14 @@ class DFRN
 			DI::config()->set('system', 'site_pubkey', $res['pubkey']);
 		}
 
-		$profilephotos = Photo::selectToArray(['resource-id' , 'scale'], ['profile' => true, 'uid' => $uid], ['order' => ['scale']]);
+		$profilephotos = Photo::selectToArray(['resource-id', 'scale', 'type'], ['profile' => true, 'uid' => $uid], ['order' => ['scale']]);
 
 		$photos = [];
 		$ext = Images::supportedTypes();
 
 		foreach ($profilephotos as $p) {
-			$photos[$p['scale']] = DI::baseUrl().'/photo/'.$p['resource-id'].'-'.$p['scale'].'.'.$ext[$p['type']];
+			$photos[$p['scale']] = DI::baseUrl() . '/photo/' . $p['resource-id'] . '-' . $p['scale'] . '.' . $ext[$p['type']];
 		}
-
 
 		$doc = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
@@ -775,6 +774,7 @@ class DFRN
 		}
 
 		$body = Post\Media::addAttachmentsToBody($item['uri-id'], DI::contentItem()->addSharedPost($item));
+		$body = Post\Media::addHTMLAttachmentToBody($item['uri-id'], $body);
 
 		if ($item['private'] == Item::PRIVATE) {
 			$body = Item::fixPrivatePhotos($body, $owner['uid'], $item, $cid);
@@ -1015,6 +1015,10 @@ class DFRN
 		$xml = $postResult->getBody();
 
 		$curl_stat = $postResult->getReturnCode();
+		if (!empty($contact['gsid']) && ($postResult->isTimeout() || empty($curl_stat))) {
+			GServer::setFailureById($contact['gsid']);
+		}
+
 		if (empty($curl_stat) || empty($xml)) {
 			Logger::notice('Empty answer from ' . $contact['id'] . ' - ' . $dest_url);
 			return -9; // timed out
@@ -1034,6 +1038,10 @@ class DFRN
 
 		if (empty($res->status)) {
 			return -23;
+		}
+
+		if (!empty($contact['gsid'])) {
+			GServer::setReachableById($contact['gsid'], Protocol::DFRN);
 		}
 
 		if (!empty($res->message)) {
@@ -1066,8 +1074,8 @@ class DFRN
 
 		$fields = ['id', 'uid', 'url', 'network', 'avatar-date', 'avatar', 'name-date', 'uri-date', 'addr',
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
-		$condition = ["`uid` = ? AND `nurl` = ? AND `network` != ? AND NOT `pending` AND NOT `blocked`",
-			$importer["importer_uid"], Strings::normaliseLink($author["link"]), Protocol::STATUSNET];
+		$condition = ["`uid` = ? AND `nurl` = ? AND NOT `pending` AND NOT `blocked`",
+			$importer["importer_uid"], Strings::normaliseLink($author["link"])];
 
 		if ($importer['account-type'] != User::ACCOUNT_TYPE_COMMUNITY) {
 			$condition = DBA::mergeConditions($condition, ['rel' => [Contact::SHARING, Contact::FRIEND]]);
@@ -2072,6 +2080,7 @@ class DFRN
 			// This is my contact on another system, but it's really me.
 			// Turn this into a wall post.
 			$notify = Item::isRemoteSelf($importer, $item);
+			$item['wall'] = (bool)$notify;
 
 			$posted_id = Item::insert($item, $notify);
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -80,12 +80,12 @@ class Network
 		if (in_array(parse_url($url, PHP_URL_SCHEME), ['https', 'http'])) {
 			$options = [HttpClientOptions::VERIFY => true, HttpClientOptions::TIMEOUT => $xrd_timeout];
 			$curlResult = DI::httpClient()->head($url, $options);
-	
+
 			// Workaround for systems that can't handle a HEAD request. Don't retry on timeouts.
 			if (!$curlResult->isSuccess() && ($curlResult->getReturnCode() >= 400) && !in_array($curlResult->getReturnCode(), [408, 504])) {
 				$curlResult = DI::httpClient()->get($url, HttpClientAccept::DEFAULT, $options);
 			}
-	
+
 			if (!$curlResult->isSuccess()) {
 				Logger::notice('Url not reachable', ['host' => $host, 'url' => $url]);
 				return false;
@@ -376,6 +376,7 @@ class Network
 	 */
 	public static function addBasePath(string $url, string $basepath): string
 	{
+		$url = trim($url);
 		if (!empty(parse_url($url, PHP_URL_SCHEME)) || empty(parse_url($basepath, PHP_URL_SCHEME)) || empty($url) || empty(parse_url($url))) {
 			return $url;
 		}
@@ -499,7 +500,7 @@ class Network
 		$scheme    = $get('scheme');
 		$query     = $get('query');
 		$fragment  = $get('fragment');
-		$authority = ($userinfo !== null ? $userinfo . '@' : '') . 
+		$authority = ($userinfo !== null ? $userinfo . '@' : '') .
 						$get('host') .
 						($port ? ":$port" : '');
 

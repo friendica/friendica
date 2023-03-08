@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -33,6 +33,7 @@ if (php_sapi_name() !== 'cli') {
 use Dice\Dice;
 use Friendica\App\Mode;
 use Friendica\Core\Logger;
+use Friendica\Core\Update;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -63,7 +64,6 @@ $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['daemon']])
 
 DI::init($dice);
 \Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
-$a = DI::app();
 
 if (DI::mode()->isInstall()) {
 	die("Friendica isn't properly installed yet.\n");
@@ -71,7 +71,7 @@ if (DI::mode()->isInstall()) {
 
 DI::mode()->setExecutor(Mode::DAEMON);
 
-DI::config()->load();
+DI::config()->reload();
 
 if (empty(DI::config()->get('system', 'pidfile'))) {
 	die(<<<TXT
@@ -115,7 +115,7 @@ if (is_readable($pidfile)) {
 }
 
 if (empty($pid) && in_array($mode, ['stop', 'status'])) {
-	DI::config()->set('system', 'worker_daemon_mode', false);
+	DI::keyValue()->set('worker_daemon_mode', false);
 	die("Pidfile wasn't found. Is the daemon running?\n");
 }
 
@@ -126,7 +126,7 @@ if ($mode == 'status') {
 
 	unlink($pidfile);
 
-	DI::config()->set('system', 'worker_daemon_mode', false);
+	DI::keyValue()->set('worker_daemon_mode', false);
 	die("Daemon process $pid isn't running.\n");
 }
 
@@ -137,7 +137,7 @@ if ($mode == 'stop') {
 
 	Logger::notice('Worker daemon process was killed', ['pid' => $pid]);
 
-	DI::config()->set('system', 'worker_daemon_mode', false);
+	DI::keyValue()->set('worker_daemon_mode', false);
 	die("Worker daemon process $pid was killed.\n");
 }
 
@@ -181,7 +181,7 @@ if (!$foreground) {
 	DBA::connect();
 }
 
-DI::config()->set('system', 'worker_daemon_mode', true);
+DI::keyValue()->set('worker_daemon_mode', true);
 
 // Just to be sure that this script really runs endlessly
 set_time_limit(0);
@@ -193,6 +193,9 @@ $last_cron = 0;
 
 // Now running as a daemon.
 while (true) {
+	// Check the database structure and possibly fixes it
+	Update::check(DI::basePath(), true);
+
 	if (!$do_cron && ($last_cron + $wait_interval) < time()) {
 		Logger::info('Forcing cron worker call.', ['pid' => $pid]);
 		$do_cron = true;

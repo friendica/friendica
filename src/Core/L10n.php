@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -85,10 +85,15 @@ class L10n
 	 * @var Database
 	 */
 	private $dba;
+	/**
+	 * @var IManageConfigValues
+	 */
+	private $config;
 
 	public function __construct(IManageConfigValues $config, Database $dba, IHandleSessions $session, array $server, array $get)
 	{
 		$this->dba    = $dba;
+		$this->config = $config;
 
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $config->get('system', 'language', self::DEFAULT)));
 		$this->setSessionVariable($session);
@@ -157,9 +162,9 @@ class L10n
 		$a->strings = [];
 
 		// load enabled addons strings
-		$addons = $this->dba->select('addon', ['name'], ['installed' => true]);
-		while ($p = $this->dba->fetch($addons)) {
-			$name = Strings::sanitizeFilePathItem($p['name']);
+		$addons = array_keys($this->config->get('addons') ?? []);
+		foreach ($addons as $addon) {
+			$name = Strings::sanitizeFilePathItem($addon);
 			if (file_exists(__DIR__ . "/../../addon/$name/lang/$lang/strings.php")) {
 				include __DIR__ . "/../../addon/$name/lang/$lang/strings.php";
 			}

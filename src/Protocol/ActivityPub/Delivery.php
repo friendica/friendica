@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -29,9 +29,10 @@ use Friendica\Model\Contact;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\Delivery as ProtocolDelivery;
 use Friendica\Util\HTTPSignature;
-use Friendica\Worker\Delivery as WorkerDelivery;
 
 class Delivery
 {
@@ -48,8 +49,15 @@ class Delivery
 		$serverfail = false;
 
 		foreach ($posts as $post) {
+			$owner = User::getOwnerDataById($post['uid']);
+			if (!$owner) {
+				Post\Delivery::remove($post['uri-id'], $inbox);
+				Post\Delivery::incrementFailed($post['uri-id'], $inbox);
+				continue;
+			}
+
 			if (!$serverfail) {
-				$result = self::deliverToInbox($post['command'], 0, $inbox, $post['uid'], $post['receivers'], $post['uri-id']);
+				$result = self::deliverToInbox($post['command'], 0, $inbox, $owner, $post['receivers'], $post['uri-id']);
 
 				if ($result['serverfailure']) {
 					// In a timeout situation we assume that every delivery to that inbox will time out.
@@ -75,13 +83,16 @@ class Delivery
 	 * @param string $cmd
 	 * @param integer $item_id
 	 * @param string $inbox
-	 * @param integer $uid
+	 * @param array $owner Sender owner-view record
 	 * @param array $receivers
 	 * @param integer $uri_id
 	 * @return array
 	 */
-	public static function deliverToInbox(string $cmd, int $item_id, string $inbox, int $uid, array $receivers, int $uri_id): array
+	public static function deliverToInbox(string $cmd, int $item_id, string $inbox, array $owner, array $receivers, int $uri_id): array
 	{
+		/** @var int $uid */
+		$uid = $owner['uid'];
+
 		if (empty($item_id) && !empty($uri_id) && !empty($uid)) {
 			$item = Post::selectFirst(['id', 'parent', 'origin', 'gravity', 'verb'], ['uri-id' => $uri_id, 'uid' => [$uid, 0]], ['order' => ['uid' => true]]);
 			if (empty($item['id'])) {
@@ -101,24 +112,24 @@ class Delivery
 		$serverfail = false;
 		$drop       = false;
 
-		if ($cmd == WorkerDelivery::MAIL) {
+		if ($cmd == ProtocolDelivery::MAIL) {
 			$data = ActivityPub\Transmitter::createActivityFromMail($item_id);
 			if (!empty($data)) {
-				$success = HTTPSignature::transmit($data, $inbox, $uid);
+				$success = HTTPSignature::transmit($data, $inbox, $owner);
 			}
-		} elseif ($cmd == WorkerDelivery::SUGGESTION) {
-			$success = ActivityPub\Transmitter::sendContactSuggestion($uid, $inbox, $item_id);
-		} elseif ($cmd == WorkerDelivery::RELOCATION) {
+		} elseif ($cmd == ProtocolDelivery::SUGGESTION) {
+			$success = ActivityPub\Transmitter::sendContactSuggestion($owner, $inbox, $item_id);
+		} elseif ($cmd == ProtocolDelivery::RELOCATION) {
 			// @todo Implementation pending
-		} elseif ($cmd == WorkerDelivery::REMOVAL) {
-			$success = ActivityPub\Transmitter::sendProfileDeletion($uid, $inbox);
-		} elseif ($cmd == WorkerDelivery::PROFILEUPDATE) {
-			$success = ActivityPub\Transmitter::sendProfileUpdate($uid, $inbox);
+		} elseif ($cmd == ProtocolDelivery::REMOVAL) {
+			$success = ActivityPub\Transmitter::sendProfileDeletion($owner, $inbox);
+		} elseif ($cmd == ProtocolDelivery::PROFILEUPDATE) {
+			$success = ActivityPub\Transmitter::sendProfileUpdate($owner, $inbox);
 		} else {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item_id);
 			if (!empty($data)) {
 				$timestamp  = microtime(true);
-				$response   = HTTPSignature::post($data, $inbox, $uid);
+				$response   = HTTPSignature::post($data, $inbox, $owner);
 				$runtime    = microtime(true) - $timestamp;
 				$success    = $response->isSuccess();
 				$serverfail = $response->isTimeout();
@@ -149,7 +160,7 @@ class Delivery
 						if (!empty($actor)) {
 							$drop = !ActivityPub\Transmitter::sendRelayFollow($actor);
 							Logger::notice('Resubscribed to relay', ['url' => $actor, 'success' => !$drop]);
-						} elseif ($cmd = WorkerDelivery::DELETION) {
+						} elseif ($cmd = ProtocolDelivery::DELETION) {
 							// Remote systems not always accept our deletion requests, so we drop them if rejected.
 							// Situation is: In Friendica we allow the thread owner to delete foreign comments to their thread.
 							// Most AP systems don't allow this, so they will reject the deletion request.
@@ -176,7 +187,7 @@ class Delivery
 
 		Logger::debug('Delivered', ['uri-id' => $uri_id, 'uid' => $uid, 'item_id' => $item_id, 'cmd' => $cmd, 'inbox' => $inbox, 'success' => $success, 'serverfailure' => $serverfail, 'drop' => $drop]);
 
-		if (($success || $drop) && in_array($cmd, [WorkerDelivery::POST])) {
+		if (($success || $drop) && in_array($cmd, [ProtocolDelivery::POST])) {
 			Post\DeliveryData::incrementQueueDone($uri_id, Post\DeliveryData::ACTIVITYPUB);
 		}
 
@@ -205,9 +216,15 @@ class Delivery
 	 */
 	private static function setSuccess(array $receivers, bool $success)
 	{
-		$gsid = null;
+		$gsid           = null;
+		$update_counter = 0;
 
 		foreach ($receivers as $receiver) {
+			// Only update the first 10 receivers to avoid flooding the remote system with requests
+			if ($success && ($update_counter < 10) && Contact::updateByIdIfNeeded($receiver)) {
+				$update_counter++;
+			}
+
 			$contact = Contact::getById($receiver);
 			if (empty($contact)) {
 				continue;

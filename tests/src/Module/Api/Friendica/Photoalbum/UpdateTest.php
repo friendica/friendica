@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -40,14 +40,14 @@ class UpdateTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	public function testTooFewArgs()
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'album' => 'album_name'
 			]);
 	}
@@ -56,7 +56,7 @@ class UpdateTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'album'     => 'album_name',
 				'album_new' => 'album_name'
 			]);
@@ -72,7 +72,7 @@ class UpdateTest extends ApiTest
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
 		$response = (new Update(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'album'     => 'test_album',
 				'album_new' => 'test_album_2'
 			]);

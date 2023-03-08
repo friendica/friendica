@@ -59,8 +59,7 @@
 
 		{{* This sections contains special settings for contact approval. We hide it by default and load this section in
 		a bootstrap modal in the case of approval *}}
-		<div id="intro-approve-wrapper-{{$intro_id}}" style="display: none;">
-
+		<template id="intro-approve-wrapper-{{$intro_id}}" style="display: none;">
 			<h3 class="heading">{{$fullname}}{{if $addr}}&nbsp;({{$addr}}){{/if}}</h3>
 			<form class="intro-approve-form" {{if $request}}action="{{$request}}" method="get"{{else}}action="{{$action}}" method="post"{{/if}}>
 				{{if $type != "friend_suggestion"}}
@@ -83,7 +82,7 @@
 				</div>
 				<div class="clear"></div>
 			</form>
-		</div>
+		</template>
 	</div>
 </div>
 <div class="intro-end"></div>

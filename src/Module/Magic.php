@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -88,7 +88,7 @@ class Magic extends BaseModule
 		$contact = $this->dba->selectFirst('contact', ['id', 'nurl', 'url'], ['id' => $cid]);
 
 		// Redirect if the contact is already authenticated on this site.
-		if ($this->app->getContactId() && strpos($contact['nurl'], Strings::normaliseLink($this->baseUrl->get())) !== false) {
+		if ($this->app->getContactId() && strpos($contact['nurl'], Strings::normaliseLink($this->baseUrl)) !== false) {
 			$this->logger->info('Contact is already authenticated');
 			System::externalRedirect($dest);
 		}
@@ -113,7 +113,7 @@ class Magic extends BaseModule
 			$header = HTTPSignature::createSig(
 				$header,
 				$user['prvkey'],
-				'acct:' . $user['nickname'] . '@' . $this->baseUrl->getHostname() . ($this->baseUrl->getUrlPath() ? '/' . $this->baseUrl->getUrlPath() : '')
+				'acct:' . $user['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : '')
 			);
 
 			// Try to get an authentication token from the other instance.

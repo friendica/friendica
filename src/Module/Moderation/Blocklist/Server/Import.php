@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,6 +25,7 @@ use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Moderation\DomainPatternBlocklist;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
@@ -95,6 +96,8 @@ class Import extends \Friendica\Module\BaseModeration
 				}
 			}
 
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+
 			$this->baseUrl->redirect('/moderation/blocklist/server');
 		}
 	}
@@ -127,7 +130,7 @@ class Import extends \Friendica\Module\BaseModeration
 			'$mode_append'         => ['mode', $this->t('Append'), 'append', $this->t('Imports patterns from the file that weren\'t already existing in the current blocklist.'), 'checked="checked"'],
 			'$mode_replace'        => ['mode', $this->t('Replace'), 'replace', $this->t('Replaces the current blocklist by the imported patterns.')],
 			'$blocklist'           => $this->blocklist,
-			'$baseurl'             => $this->baseUrl->get(true),
+			'$baseurl'             => $this->baseUrl,
 			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_import')
 		]);
 	}

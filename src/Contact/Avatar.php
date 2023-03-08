@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -73,7 +73,12 @@ class Avatar
 			return $fields;
 		}
 
-		$fetchResult = HTTPSignature::fetchRaw($avatar, 0, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
+		try {
+			$fetchResult = HTTPSignature::fetchRaw($avatar, 0, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
+		} catch (\Exception $exception) {
+			Logger::notice('Avatar is invalid', ['avatar' => $avatar, 'exception' => $exception]);
+			return $fields;
+		}
 
 		$img_str = $fetchResult->getBody();
 		if (empty($img_str)) {
@@ -246,13 +251,16 @@ class Avatar
 	 * Delete locally cached avatar pictures of a contact
 	 *
 	 * @param string $avatar
-	 * @return void
+	 * @return bool
 	 */
-	public static function deleteCache(array $contact)
+	public static function deleteCache(array $contact): bool
 	{
+		$existed = (self::isCacheFile($contact['photo']) || self::isCacheFile($contact['thumb']) || self::isCacheFile($contact['micro']));
 		self::deleteCacheFile($contact['photo']);
 		self::deleteCacheFile($contact['thumb']);
 		self::deleteCacheFile($contact['micro']);
+
+		return $existed;
 	}
 
 	/**

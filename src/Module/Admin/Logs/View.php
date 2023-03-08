@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -80,7 +80,6 @@ class View extends BaseAdmin
 			}
 		}
 		return Renderer::replaceMacros($t, [
-			'$baseurl'       => DI::baseUrl()->get(true),
 			'$title'         => DI::l10n()->t('Administration'),
 			'$page'          => DI::l10n()->t('View Logs'),
 			'$l10n'          => [

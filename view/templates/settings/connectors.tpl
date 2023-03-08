@@ -16,6 +16,7 @@
 		{{include file="field_checkbox.tpl" field=$enable_smart_shortening}}
 		{{include file="field_checkbox.tpl" field=$simple_shortening}}
 		{{include file="field_checkbox.tpl" field=$attach_link_title}}
+		{{include file="field_checkbox.tpl" field=$api_spoiler_title}}
 		{{include file="field_input.tpl" field=$legacy_contact}}
 
 		<p><a href="{{$repair_ostatus_url}}">{{$repair_ostatus_text}}</a></p>

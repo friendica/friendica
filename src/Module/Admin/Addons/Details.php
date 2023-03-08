@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -102,7 +102,7 @@ class Details extends BaseAdmin
 		if (array_key_exists($addon, $addons_admin)) {
 			require_once "addon/$addon/$addon.php";
 			$func = $addon . '_addon_admin';
-			$func($a, $admin_form);
+			$func($admin_form);
 		}
 
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
@@ -112,7 +112,6 @@ class Details extends BaseAdmin
 			'$page' => DI::l10n()->t('Addons'),
 			'$toggle' => DI::l10n()->t('Toggle'),
 			'$settings' => DI::l10n()->t('Settings'),
-			'$baseurl' => DI::baseUrl()->get(true),
 
 			'$addon' => $addon,
 			'$status' => $status,

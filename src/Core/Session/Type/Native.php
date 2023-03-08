@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,7 +37,7 @@ class Native extends AbstractSession implements IHandleSessions
 		ini_set('session.use_only_cookies', 1);
 		ini_set('session.cookie_httponly', (int)Cookie::HTTPONLY);
 
-		if ($baseURL->getSSLPolicy() == App\BaseURL::SSL_POLICY_FULL) {
+		if ($baseURL->getScheme() === 'https') {
 			ini_set('session.cookie_secure', 1);
 		}
 

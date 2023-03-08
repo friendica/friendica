@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -41,7 +41,6 @@ use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
@@ -115,8 +114,8 @@ class Transmitter
 			return false;
 		}
 
-		$activity_id = ActivityPub\Transmitter::activityIDFromContact($contact['id']);
-		$success = ActivityPub\Transmitter::sendActivity('Follow', $url, 0, $activity_id);
+		$activity_id = self::activityIDFromContact($contact['id']);
+		$success = self::sendActivity('Follow', $url, 0, $activity_id);
 		if ($success) {
 			Contact::update(['rel' => Contact::FRIEND], ['id' => $contact['id']]);
 		}
@@ -138,7 +137,7 @@ class Transmitter
 			return false;
 		}
 
-		$success = self::sendContactUndo($url, $contact['id'], 0);
+		$success = self::sendContactUndo($url, $contact['id'], User::getSystemAccount());
 
 		if ($success || $force) {
 			Contact::update(['rel' => Contact::NOTHING], ['id' => $contact['id']]);
@@ -242,90 +241,6 @@ class Transmitter
 	/**
 	 * Public posts for the given owner
 	 *
-	 * @param array   $owner     Owner array
-	 * @param integer $page      Page number
-	 * @param string  $requester URL of requesting account
-	 * @param boolean $nocache   Wether to bypass caching
-	 * @return array of posts
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 * @throws \ImagickException
-	 */
-	public static function getOutbox(array $owner, int $page = null, string $requester = '', bool $nocache = false): array
-	{
-		$condition = ['private' => [Item::PUBLIC, Item::UNLISTED]];
-
-		if (!empty($requester)) {
-			$requester_id = Contact::getIdForURL($requester, $owner['uid']);
-			if (!empty($requester_id)) {
-				$permissionSets = DI::permissionSet()->selectByContactId($requester_id, $owner['uid']);
-				if (!empty($permissionSets)) {
-					$condition = ['psid' => array_merge($permissionSets->column('id'),
-							[DI::permissionSet()->selectPublicForUser($owner['uid'])])];
-				}
-			}
-		}
-
-		$condition = array_merge($condition, [
-			'uid'           => $owner['uid'],
-			'author-id'      => Contact::getIdForURL($owner['url'], 0, false),
-			'gravity'        => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT],
-			'network'        => Protocol::FEDERATED,
-			'parent-network' => Protocol::FEDERATED,
-			'origin'         => true,
-			'deleted'        => false,
-			'visible'        => true
-		]);
-
-		$apcontact = APContact::getByURL($owner['url']);
-
-		$data = ['@context' => ActivityPub::CONTEXT];
-		$data['id'] = DI::baseUrl() . '/outbox/' . $owner['nickname'];
-		$data['type'] = 'OrderedCollection';
-		$data['totalItems'] = $apcontact['statuses_count'] ?? 0;
-
-		if (!empty($page)) {
-			$data['id'] .= '?' . http_build_query(['page' => $page]);
-		}
-
-		if (empty($page)) {
-			$data['first'] = DI::baseUrl() . '/outbox/' . $owner['nickname'] . '?page=1';
-		} else {
-			$data['type'] = 'OrderedCollectionPage';
-			$list = [];
-
-			$items = Post::select(['id'], $condition, ['limit' => [($page - 1) * 20, 20], 'order' => ['created' => true]]);
-			while ($item = Post::fetch($items)) {
-				$activity = self::createActivityFromItem($item['id'], true);
-				$activity['type'] = $activity['type'] == 'Update' ? 'Create' : $activity['type'];
-
-				// Only list "Create" activity objects here, no reshares
-				if (!empty($activity['object']) && ($activity['type'] == 'Create')) {
-					$list[] = $activity['object'];
-				}
-			}
-			DBA::close($items);
-
-			if (count($list) == 20) {
-				$data['next'] = DI::baseUrl() . '/outbox/' . $owner['nickname'] . '?page=' . ($page + 1);
-			}
-
-			// Fix the cached total item count when it is lower than the real count
-			$total = (($page - 1) * 20) + $data['totalItems'];
-			if ($total > $data['totalItems']) {
-				$data['totalItems'] = $total;
-			}
-
-			$data['partOf'] = DI::baseUrl() . '/outbox/' . $owner['nickname'];
-
-			$data['orderedItems'] = $list;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Public posts for the given owner
-	 *
 	 * @param array   $owner   Owner array
 	 * @param integer $page    Page number
 	 * @param boolean $nocache Wether to bypass caching
@@ -382,11 +297,8 @@ class Transmitter
 
 		while ($item = Post::fetch($items)) {
 			$activity = self::createActivityFromItem($item['id'], true);
-			$activity['type'] = $activity['type'] == 'Update' ? 'Create' : $activity['type'];
-
-			// Only list "Create" activity objects here, no reshares
-			if (!empty($activity['object']) && ($activity['type'] == 'Create')) {
-				$list[] = $activity['object'];
+			if (!empty($activity)) {
+				$list[] = $activity;
 			}
 		}
 		DBA::close($items);
@@ -413,12 +325,12 @@ class Transmitter
 	 *
 	 * @return array with service data
 	 */
-	private static function getService(): array
+	public static function getService(): array
 	{
 		return [
 			'type' => 'Service',
 			'name' =>  App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION,
-			'url' => DI::baseUrl()->get()
+			'url' => DI::baseUrl()
 		];
 	}
 
@@ -487,45 +399,75 @@ class Transmitter
 			'owner' => $owner['url'],
 			'publicKeyPem' => $owner['pubkey']];
 		$data['endpoints'] = ['sharedInbox' => DI::baseUrl() . '/inbox'];
-		$data['icon'] = ['type' => 'Image', 'url' => User::getAvatarUrl($owner)];
+		if ($uid != 0) {
+			$data['icon'] = ['type' => 'Image', 'url' => User::getAvatarUrl($owner)];
 
-		$resourceid = Photo::ridFromURI($owner['photo']);
-		if (!empty($resourceid)) {
-			$photo = Photo::selectFirst(['type'], ["resource-id" => $resourceid]);
-			if (!empty($photo['type'])) {
-				$data['icon']['mediaType'] = $photo['type'];
-			}
-		}
-
-		if (!empty($owner['header'])) {
-			$data['image'] = ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($owner['id'], '', $owner['updated'])];
-
-			$resourceid = Photo::ridFromURI($owner['header']);
+			$resourceid = Photo::ridFromURI($owner['photo']);
 			if (!empty($resourceid)) {
 				$photo = Photo::selectFirst(['type'], ["resource-id" => $resourceid]);
 				if (!empty($photo['type'])) {
-					$data['image']['mediaType'] = $photo['type'];
+					$data['icon']['mediaType'] = $photo['type'];
 				}
 			}
-		}
 
-		$custom_fields = [];
+			if (!empty($owner['header'])) {
+				$data['image'] = ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($owner['id'], '', $owner['updated'])];
 
-		foreach (DI::profileField()->selectByContactId(0, $uid) as $profile_field) {
-			$custom_fields[] = [
-				'type' => 'PropertyValue',
-				'name' => $profile_field->label,
-				'value' => BBCode::convertForUriId($owner['uri-id'], $profile_field->value)
-			];
-		};
+				$resourceid = Photo::ridFromURI($owner['header']);
+				if (!empty($resourceid)) {
+					$photo = Photo::selectFirst(['type'], ["resource-id" => $resourceid]);
+					if (!empty($photo['type'])) {
+						$data['image']['mediaType'] = $photo['type'];
+					}
+				}
+			}
 
-		if (!empty($custom_fields)) {
-			$data['attachment'] = $custom_fields;
+			$custom_fields = [];
+
+			foreach (DI::profileField()->selectByContactId(0, $uid) as $profile_field) {
+				$custom_fields[] = [
+					'type' => 'PropertyValue',
+					'name' => $profile_field->label,
+					'value' => BBCode::convertForUriId($owner['uri-id'], $profile_field->value)
+				];
+			};
+
+			if (!empty($custom_fields)) {
+				$data['attachment'] = $custom_fields;
+			}
 		}
 
 		$data['generator'] = self::getService();
 
 		// tags: https://kitty.town/@inmysocks/100656097926961126.json
+		return $data;
+	}
+
+	/**
+	 * Get a minimal actror array for the C2S API
+	 *
+	 * @param integer $cid
+	 * @return array
+	 */
+	private static function getActorArrayByCid(int $cid): array
+	{
+		$contact = Contact::getById($cid);
+		$data = [
+			'id'                        => $contact['url'],
+			'type'                      => $data['type'] = ActivityPub::ACCOUNT_TYPES[$contact['contact-type']],
+			'url'                       => $contact['alias'],
+			'preferredUsername'         => $contact['nick'],
+			'name'                      => $contact['name'],
+			'icon'                      => ['type' => 'Image', 'url' => Contact::getAvatarUrlForId($cid, '', $contact['updated'])],
+			'image'                     => ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($cid, '', $contact['updated'])],
+			'manuallyApprovesFollowers' => (bool)$contact['manually-approve'],
+			'discoverable'              => !$contact['unsearchable'],
+		];
+
+		if (empty($data['url'])) {
+			$data['url'] = $data['id'];
+		}
+
 		return $data;
 	}
 
@@ -1231,36 +1173,75 @@ class Transmitter
 	 *
 	 * @param integer $item_id
 	 * @param boolean $object_mode Is the activity item is used inside another object?
+	 * @param boolean $api_mode    "true" if used for the API
 	 * @return false|array
 	 * @throws \Exception
 	 */
-	public static function createActivityFromItem(int $item_id, bool $object_mode = false)
+	public static function createActivityFromItem(int $item_id, bool $object_mode = false, $api_mode = false)
 	{
-		Logger::info('Fetching activity', ['item' => $item_id]);
-		$item = Post::selectFirst(Item::DELIVER_FIELDLIST, ['id' => $item_id, 'parent-network' => Protocol::NATIVE_SUPPORT]);
+		$condition = ['id' => $item_id];
+		if (!$api_mode) {
+			$condition['parent-network'] = Protocol::NATIVE_SUPPORT;
+		}
+		Logger::info('Fetching activity', $condition);
+		$item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition);
+		if (!DBA::isResult($item)) {
+			return false;
+		}
+		return self::createActivityFromArray($item, $object_mode, $api_mode);
+	}
+
+	/**
+	 * Creates an activity array for a given URI-Id and uid
+	 *
+	 * @param integer $uri_id
+	 * @param integer $uid
+	 * @param boolean $object_mode Is the activity item is used inside another object?
+	 * @param boolean $api_mode    "true" if used for the API
+	 * @return false|array
+	 * @throws \Exception
+	 */
+	public static function createActivityFromUriId(int $uri_id, int $uid, bool $object_mode = false, $api_mode = false)
+	{
+		$condition = ['uri-id' => $uri_id, 'uid' => [0, $uid]];
+		if (!$api_mode) {
+			$condition['parent-network'] = Protocol::NATIVE_SUPPORT;
+		}
+		Logger::info('Fetching activity', $condition);
+		$item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition, ['order' => ['uid' => true]]);
 		if (!DBA::isResult($item)) {
 			return false;
 		}
 
-		if (empty($item['uri-id'])) {
-			Logger::warning('Item without uri-id', ['item' => $item]);
-			return false;
-		}
+		return self::createActivityFromArray($item, $object_mode, $api_mode);
+	}
 
-		if (!$item['deleted']) {
+	/**
+	 * Creates an activity array for a given item id
+	 *
+	 * @param integer $item_id
+	 * @param boolean $object_mode Is the activity item is used inside another object?
+	 * @param boolean $api_mode    "true" if used for the API
+	 * @return false|array
+	 * @throws \Exception
+	 */
+	private static function createActivityFromArray(array $item, bool $object_mode = false, $api_mode = false)
+	{
+		if (!$api_mode && !$item['deleted'] && $item['network'] == Protocol::ACTIVITYPUB) {
 			$data = Post\Activity::getByURIId($item['uri-id']);
 			if (!$item['origin'] && !empty($data)) {
-				if ($object_mode) {
-					unset($data['@context']);
-					unset($data['signature']);
+				if (!$object_mode) {
+					Logger::info('Return stored conversation', ['item' => $item['id']]);
+					return $data;
+				} elseif (!empty($data['object'])) {
+					Logger::info('Return stored conversation object', ['item' => $item['id']]);
+					return $data['object'];
 				}
-				Logger::info('Return stored conversation', ['item' => $item_id]);
-				return $data;
 			}
 		}
 
-		if (!$item['origin'] && empty($object)) {
-			Logger::debug('Post is not ours and is not stored', ['id' => $item_id, 'uri-id' => $item['uri-id']]);
+		if (!$api_mode && !$item['origin']) {
+			Logger::debug('Post is not ours and is not stored', ['id' => $item['id'], 'uri-id' => $item['uri-id']]);
 			return false;
 		}
 
@@ -1289,9 +1270,17 @@ class Transmitter
 		$data['type'] = $type;
 
 		if (($type != 'Announce') || ($item['gravity'] != Item::GRAVITY_PARENT)) {
-			$data['actor'] = $item['author-link'];
+			$link = $item['author-link'];
+			$id   = $item['author-id'];
 		} else {
-			$data['actor'] = $item['owner-link'];
+			$link = $item['owner-link'];
+			$id   = $item['owner-id'];
+		}
+
+		if ($api_mode) {
+			$data['actor'] = self::getActorArrayByCid($id);
+		} else {
+			$data['actor'] = $link;
 		}
 
 		$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
@@ -1301,20 +1290,19 @@ class Transmitter
 		$data = array_merge($data, self::createPermissionBlockForItem($item, false));
 
 		if (in_array($data['type'], ['Create', 'Update', 'Delete'])) {
-			$data['object'] = $object ?? self::createNote($item);
-			$data['published'] = DateTimeFormat::utcNow(DateTimeFormat::ATOM);
+			$data['object'] = self::createNote($item, $api_mode);
 		} elseif ($data['type'] == 'Add') {
 			$data = self::createAddTag($item, $data);
 		} elseif ($data['type'] == 'Announce') {
 			if ($item['verb'] == ACTIVITY::ANNOUNCE) {
 				$data['object'] = $item['thr-parent'];
 			} else {
-				$data = self::createAnnounce($item, $data);
+				$data = self::createAnnounce($item, $data, $api_mode);
 			}
 		} elseif ($data['type'] == 'Follow') {
 			$data['object'] = $item['parent-uri'];
 		} elseif ($data['type'] == 'Undo') {
-			$data['object'] = self::createActivityFromItem($item_id, true);
+			$data['object'] = self::createActivityFromItem($item['id'], true);
 		} else {
 			$data['diaspora:guid'] = $item['guid'];
 			if (!empty($item['signed_text'])) {
@@ -1329,12 +1317,11 @@ class Transmitter
 			$uid = $item['uid'];
 		}
 
-		$owner = User::getOwnerDataById($uid);
+		Logger::info('Fetched activity', ['item' => $item['id'], 'uid' => $uid]);
 
-		Logger::info('Fetched activity', ['item' => $item_id, 'uid' => $uid]);
-
-		// We don't sign if we aren't the actor. This is important for relaying content especially for forums
-		if (!$object_mode && !empty($owner) && ($data['actor'] == $owner['url'])) {
+		// We only sign our own activities
+		if (!$api_mode && !$object_mode && $item['origin']) {
+			$owner = User::getOwnerDataById($uid);
 			return LDSignature::sign($data, $owner);
 		} else {
 			return $data;
@@ -1568,11 +1555,12 @@ class Transmitter
 	 * Creates a note/article object array
 	 *
 	 * @param array $item
+	 * @param bool  $api_mode
 	 * @return array with the object data
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function createNote(array $item): array
+	public static function createNote(array $item, bool $api_mode = false): array
 	{
 		if (empty($item)) {
 			return [];
@@ -1632,7 +1620,11 @@ class Transmitter
 		}
 
 		$data['url'] = $link ?? $item['plink'];
-		$data['attributedTo'] = $item['author-link'];
+		if ($api_mode) {
+			$data['attributedTo'] = self::getActorArrayByCid($item['author-id']);
+		} else {
+			$data['attributedTo'] = $item['author-link'];
+		}
 		$data['sensitive'] = self::isSensitive($item['uri-id']);
 
 		if (!empty($item['conversation']) && ($item['conversation'] != './')) {
@@ -1646,6 +1638,8 @@ class Transmitter
 		$permission_block = self::createPermissionBlockForItem($item, false);
 
 		$real_quote = false;
+
+		$item = Post\Media::addHTMLAttachmentToItem($item);
 
 		$body = $item['body'];
 
@@ -1661,7 +1655,7 @@ class Transmitter
 		 *
 		 * } elseif (($type == 'Article') && empty($data['summary'])) {
 		 * 		$regexp = "/[@!]\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
-		 * 		$summary = preg_replace_callback($regexp, ['self', 'mentionAddrCallback'], $body);
+		 * 		$summary = preg_replace_callback($regexp, [self::class, 'mentionAddrCallback'], $body);
 		 * 		$data['summary'] = BBCode::toPlaintext(Plaintext::shorten(self::removePictures($summary), 1000));
 		 * }
 		 */
@@ -1683,7 +1677,7 @@ class Transmitter
 			if ($type == 'Page') {
 				// When we transmit "Page" posts we have to remove the attachment.
 				// The attachment contains the link that we already transmit in the "url" field.
-				$body = preg_replace("/\s*\[attachment .*?\].*?\[\/attachment\]\s*/ism", '', $body);
+				$body = BBCode::removeAttachment($body);
 			}
 
 			$body = BBCode::setMentionsToNicknames($body);
@@ -1707,6 +1701,7 @@ class Transmitter
 		$language = self::getLanguage($item);
 		if (!empty($language)) {
 			$richbody = BBCode::setMentionsToNicknames($item['body'] ?? '');
+			$richbody = Post\Media::removeFromEndOfBody($richbody);
 			if (!empty($item['quote-uri-id'])) {
 				if ($real_quote) {
 					$richbody = DI::contentItem()->addShareLink($richbody, $item['quote-uri-id']);
@@ -1714,7 +1709,7 @@ class Transmitter
 					$richbody = DI::contentItem()->addSharedPost($item, $richbody);
 				}
 			}
-			$richbody = BBCode::removeAttachment($richbody);
+			$richbody = BBCode::replaceAttachment($richbody);
 
 			$data['contentMap'][$language] = BBCode::convertForUriId($item['uri-id'], $richbody, BBCode::EXTERNAL);
 		}
@@ -1803,17 +1798,18 @@ class Transmitter
 	 *
 	 * @param array $item Item array
 	 * @param array $activity activity data
+	 * @param bool  $api_mode
 	 * @return array with activity data
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function createAnnounce(array $item, array $activity): array
+	private static function createAnnounce(array $item, array $activity, bool $api_mode = false): array
 	{
 		$orig_body = $item['body'];
 		$announce = self::getAnnounceArray($item);
 		if (empty($announce)) {
 			$activity['type'] = 'Create';
-			$activity['object'] = self::createNote($item);
+			$activity['object'] = self::createNote($item, $api_mode);
 			return $activity;
 		}
 
@@ -1827,7 +1823,7 @@ class Transmitter
 		// Quote
 		$activity['type'] = 'Create';
 		$item['body'] = $announce['comment'] . "\n" . $announce['object']['plink'];
-		$activity['object'] = self::createNote($item);
+		$activity['object'] = self::createNote($item, $api_mode);
 
 		/// @todo Finally descide how to implement this in AP. This is a possible way:
 		$activity['object']['attachment'][] = self::createNote($announce['object']);
@@ -1903,16 +1899,14 @@ class Transmitter
 	/**
 	 * Transmits a contact suggestion to a given inbox
 	 *
-	 * @param integer $uid           User ID
+	 * @param array   $owner         Sender owner-view record
 	 * @param string  $inbox         Target inbox
 	 * @param integer $suggestion_id Suggestion ID
 	 * @return boolean was the transmission successful?
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Exception
 	 */
-	public static function sendContactSuggestion(int $uid, string $inbox, int $suggestion_id): bool
+	public static function sendContactSuggestion(array $owner, string $inbox, int $suggestion_id): bool
 	{
-		$owner = User::getOwnerDataById($uid);
-
 		$suggestion = DI::fsuggest()->selectOneById($suggestion_id);
 
 		$data = [
@@ -1929,22 +1923,20 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub');
-		return HTTPSignature::transmit($signed, $inbox, $uid);
+		Logger::info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
 	/**
 	 * Transmits a profile relocation to a given inbox
 	 *
-	 * @param integer $uid   User ID
-	 * @param string  $inbox Target inbox
+	 * @param array  $owner Sender owner-view record
+	 * @param string $inbox Target inbox
 	 * @return boolean was the transmission successful?
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Exception
 	 */
-	public static function sendProfileRelocation(int $uid, string $inbox): bool
+	public static function sendProfileRelocation(array $owner, string $inbox): bool
 	{
-		$owner = User::getOwnerDataById($uid);
-
 		$data = [
 			'@context' => ActivityPub::CONTEXT,
 			'id' => DI::baseUrl() . '/activity/' . System::createGUID(),
@@ -1959,29 +1951,22 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile relocation for user ' . $uid . ' to ' . $inbox . ' via ActivityPub');
-		return HTTPSignature::transmit($signed, $inbox, $uid);
+		Logger::info('Deliver profile relocation for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
 	/**
 	 * Transmits a profile deletion to a given inbox
 	 *
-	 * @param integer $uid   User ID
-	 * @param string  $inbox Target inbox
+	 * @param array  $owner Sender owner-view record
+	 * @param string $inbox Target inbox
 	 * @return boolean was the transmission successful?
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Exception
 	 */
-	public static function sendProfileDeletion(int $uid, string $inbox): bool
+	public static function sendProfileDeletion(array $owner, string $inbox): bool
 	{
-		$owner = User::getOwnerDataById($uid);
-
-		if (empty($owner)) {
-			Logger::error('No owner data found, the deletion message cannot be processed.', ['user' => $uid]);
-			return false;
-		}
-
 		if (empty($owner['uprvkey'])) {
-			Logger::error('No private key for owner found, the deletion message cannot be processed.', ['user' => $uid]);
+			Logger::error('No private key for owner found, the deletion message cannot be processed.', ['user' => $owner['uid']]);
 			return false;
 		}
 
@@ -1997,30 +1982,29 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile deletion for user ' . $uid . ' to ' . $inbox . ' via ActivityPub');
-		return HTTPSignature::transmit($signed, $inbox, $uid);
+		Logger::info('Deliver profile deletion for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
 	/**
 	 * Transmits a profile change to a given inbox
 	 *
-	 * @param integer $uid   User ID
-	 * @param string  $inbox Target inbox
+	 * @param array  $owner Sender owner-view record
+	 * @param string $inbox Target inbox
 	 * @return boolean was the transmission successful?
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	public static function sendProfileUpdate(int $uid, string $inbox): bool
+	public static function sendProfileUpdate(array $owner, string $inbox): bool
 	{
-		$owner = User::getOwnerDataById($uid);
 		$profile = APContact::getByURL($owner['url']);
 
 		$data = ['@context' => ActivityPub::CONTEXT,
 			'id' => DI::baseUrl() . '/activity/' . System::createGUID(),
 			'type' => 'Update',
 			'actor' => $owner['url'],
-			'object' => self::getProfile($uid),
+			'object' => self::getProfile($owner['uid']),
 			'published' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 			'instrument' => self::getService(),
 			'to' => [$profile['followers']],
@@ -2028,8 +2012,8 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 
-		Logger::info('Deliver profile update for user ' . $uid . ' to ' . $inbox . ' via ActivityPub');
-		return HTTPSignature::transmit($signed, $inbox, $uid);
+		Logger::info('Deliver profile update for user ' . $owner['uid'] . ' to ' . $inbox . ' via ActivityPub');
+		return HTTPSignature::transmit($signed, $inbox, $owner);
 	}
 
 	/**
@@ -2075,7 +2059,7 @@ class Transmitter
 		Logger::info('Sending activity ' . $activity . ' to ' . $target . ' for user ' . $uid);
 
 		$signed = LDSignature::sign($data, $owner);
-		return HTTPSignature::transmit($signed, $profile['inbox'], $uid);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
 	}
 
 	/**
@@ -2131,7 +2115,7 @@ class Transmitter
 		Logger::info('Sending follow ' . $object . ' to ' . $target . ' for user ' . $uid);
 
 		$signed = LDSignature::sign($data, $owner);
-		return HTTPSignature::transmit($signed, $profile['inbox'], $uid);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
 	}
 
 	/**
@@ -2153,6 +2137,11 @@ class Transmitter
 		}
 
 		$owner = User::getOwnerDataById($uid);
+		if (!$owner) {
+			Logger::notice('No user found for actor', ['uid' => $uid]);
+			return;
+		}
+
 		$data = [
 			'@context' => ActivityPub::CONTEXT,
 			'id' => DI::baseUrl() . '/activity/' . System::createGUID(),
@@ -2171,7 +2160,7 @@ class Transmitter
 		Logger::debug('Sending accept to ' . $target . ' for user ' . $uid . ' with id ' . $id);
 
 		$signed = LDSignature::sign($data, $owner);
-		HTTPSignature::transmit($signed, $profile['inbox'], $uid);
+		HTTPSignature::transmit($signed, $profile['inbox'], $owner);
 	}
 
 	/**
@@ -2179,22 +2168,16 @@ class Transmitter
 	 *
 	 * @param string $target   Target profile
 	 * @param string $objectId Object id
-	 * @param int    $uid      User ID
+	 * @param array  $owner    Sender owner-view record
 	 * @return bool Operation success
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function sendContactReject(string $target, string $objectId, int $uid): bool
+	public static function sendContactReject(string $target, string $objectId, array $owner): bool
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
 			Logger::warning('No inbox found for target', ['target' => $target, 'profile' => $profile]);
-			return false;
-		}
-
-		$owner = User::getOwnerDataById($uid);
-		if (empty($owner)) {
-			Logger::notice('No user found for actor', ['uid' => $uid]);
 			return false;
 		}
 
@@ -2213,10 +2196,10 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::debug('Sending reject to ' . $target . ' for user ' . $uid . ' with id ' . $objectId);
+		Logger::debug('Sending reject to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
 
 		$signed = LDSignature::sign($data, $owner);
-		return HTTPSignature::transmit($signed, $profile['inbox'], $uid);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
 	}
 
 	/**
@@ -2224,13 +2207,13 @@ class Transmitter
 	 *
 	 * @param string  $target Target profile
 	 * @param integer $cid    Contact id
-	 * @param integer $uid    User ID
+	 * @param array   $owner  Sender owner-view record
 	 * @return bool success
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 * @throws \Exception
 	 */
-	public static function sendContactUndo(string $target, int $cid, int $uid): bool
+	public static function sendContactUndo(string $target, int $cid, array $owner): bool
 	{
 		$profile = APContact::getByURL($target);
 		if (empty($profile['inbox'])) {
@@ -2245,7 +2228,6 @@ class Transmitter
 
 		$objectId = DI::baseUrl() . '/activity/' . System::createGUID();
 
-		$owner = User::getOwnerDataById($uid);
 		$data = [
 			'@context' => ActivityPub::CONTEXT,
 			'id' => $objectId,
@@ -2261,10 +2243,10 @@ class Transmitter
 			'to' => [$profile['url']],
 		];
 
-		Logger::info('Sending undo to ' . $target . ' for user ' . $uid . ' with id ' . $objectId);
+		Logger::info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
 
 		$signed = LDSignature::sign($data, $owner);
-		return HTTPSignature::transmit($signed, $profile['inbox'], $uid);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
 	}
 
 	/**

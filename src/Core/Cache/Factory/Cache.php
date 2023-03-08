@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -73,7 +73,7 @@ class Cache
 
 	public function __construct(BaseURL $baseURL, IManageConfigValues $config, Database $dba, Profiler $profiler, LoggerInterface $logger)
 	{
-		$this->hostname = $baseURL->getHostname();
+		$this->hostname = $baseURL->getHost();
 		$this->config   = $config;
 		$this->dba      = $dba;
 		$this->profiler = $profiler;

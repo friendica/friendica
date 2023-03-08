@@ -3030,7 +3030,7 @@ msgstr "フォロワー"
 #: src/BaseModule.php:219 src/Content/Widget.php:239
 #: src/Module/Contact.php:861
 msgid "Following"
-msgstr "以下"
+msgstr "フォロー中"
 
 #: src/BaseModule.php:224 src/Content/Widget.php:240
 #: src/Module/Contact.php:862
@@ -3810,7 +3810,7 @@ msgstr ""
 
 #: src/Content/Widget/CalendarExport.php:54
 msgid "Export"
-msgstr "輸出する"
+msgstr "エクスポート"
 
 #: src/Content/Widget/CalendarExport.php:55
 msgid "Export calendar as ical"

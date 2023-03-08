@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -33,6 +33,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
@@ -40,7 +41,6 @@ use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
-use Friendica\Worker\Delivery;
 use GuzzleHttp\Psr7\Uri;
 use LanguageDetection\Language;
 
@@ -210,8 +210,6 @@ class Item
 					}
 				}
 
-				Post\Media::insertFromAttachmentData($item['uri-id'], $fields['body']);
-
 				$content_fields = ['raw-body' => trim($fields['raw-body'] ?? $fields['body'])];
 
 				// Remove all media attachments from the body and store them in the post-media table
@@ -220,6 +218,10 @@ class Item
 				$content_fields['raw-body'] = self::setHashtags($content_fields['raw-body']);
 
 				Post\Media::insertFromRelevantUrl($item['uri-id'], $content_fields['raw-body'], $fields['body'], $item['author-network']);
+
+				Post\Media::insertFromAttachmentData($item['uri-id'], $fields['body']);
+				$content_fields['raw-body'] = BBCode::removeAttachment($content_fields['raw-body']);
+
 				Post\Content::update($item['uri-id'], $content_fields);
 			}
 
@@ -408,7 +410,7 @@ class Item
 		if ($notify) {
 			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
 			// We add the hash of our own host because our host is the original creator of the post.
-			$prefix_host = DI::baseUrl()->getHostname();
+			$prefix_host = DI::baseUrl()->getHost();
 		} else {
 			$prefix_host = '';
 
@@ -623,10 +625,6 @@ class Item
 			return false;
 		}
 
-		if (!empty($item['uid']) && !self::isAllowedByUser($item, $item['uid'])) {
-			return false;
-		}
-
 		if ($item['verb'] == Activity::FOLLOW) {
 			if (!$item['origin'] && ($item['author-id'] == Contact::getPublicIdByUserId($item['uid']))) {
 				// Our own follow request can be relayed to us. We don't store it to avoid notification chaos.
@@ -819,43 +817,8 @@ class Item
 
 	private static function prepareOriginPost(array $item): array
 	{
-		$item['wall'] = 1;
-		$item['origin'] = 1;
-		$item['network'] = Protocol::DFRN;
-		$item['protocol'] = Conversation::PARCEL_DIRECT;
-		$item['direction'] = Conversation::PUSH;
-
-		$owner = User::getOwnerDataById($item['uid']);
-
-		if (empty($item['contact-id'])) {
-			$item['contact-id'] = $owner['id'];
-		}
-
-		if (empty($item['author-link']) && empty($item['author-id'])) {
-			$item['author-link']   = $owner['url'];
-			$item['author-name']   = $owner['name'];
-			$item['author-avatar'] = $owner['thumb'];
-		}
-
-		if (empty($item['owner-link']) && empty($item['owner-id'])) {
-			$item['owner-link']   = $item['author-link'];
-			$item['owner-name']   = $item['author-name'];
-			$item['owner-avatar'] = $item['author-avatar'];
-		}
-
-		// Setting the object type if not defined before
-		if (empty($item['object-type'])) {
-			$item['object-type'] = Activity\ObjectType::NOTE; // Default value
-			$objectdata = BBCode::getAttachedData($item['body']);
-
-			if ($objectdata['type'] == 'link') {
-				$item['object-type'] = Activity\ObjectType::BOOKMARK;
-			} elseif ($objectdata['type'] == 'video') {
-				$item['object-type'] = Activity\ObjectType::VIDEO;
-			} elseif ($objectdata['type'] == 'photo') {
-				$item['object-type'] = Activity\ObjectType::IMAGE;
-			}
-		}
+		$item = DI::contentItem()->initializePost($item);
+		$item = DI::contentItem()->finalizePost($item);
 
 		return $item;
 	}
@@ -1023,13 +986,6 @@ class Item
 				return 0;
 			}
 
-			// If the thread originated from this node, we check the permission against the thread starter
-			$condition = ['uri-id' => $toplevel_parent['uri-id'], 'wall' => true];
-			$localTopLevelParent = Post::selectFirst(['uid'], $condition);
-			if (!empty($localTopLevelParent['uid']) && !self::isAllowedByUser($item, $localTopLevelParent['uid'])) {
-				return 0;
-			}
-
 			$parent_id             = $toplevel_parent['id'];
 			$item['parent-uri']    = $toplevel_parent['uri'];
 			$item['parent-uri-id'] = $toplevel_parent['uri-id'];
@@ -1079,6 +1035,14 @@ class Item
 			if ($item['wall'] && empty($item['conversation'])) {
 				$item['conversation'] = $item['parent-uri'] . '#context';
 			}
+		}
+
+		if ($item['origin']) {
+			if (Photo::setPermissionFromBody($item['body'], $item['uid'], $item['contact-id'], $item['allow_cid'], $item['allow_gid'], $item['deny_cid'], $item['deny_gid'])) {
+				$item['object-type'] = Activity\ObjectType::IMAGE;
+			}
+
+			$item = DI::contentItem()->moveAttachmentsFromBodyToAttach($item);
 		}
 
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
@@ -1181,14 +1145,16 @@ class Item
 			$item['body']     = BBCode::removeSharedData($item['body']);
 		}
 
-		Post\Media::insertFromAttachmentData($item['uri-id'], $item['body']);
-
 		// Remove all media attachments from the body and store them in the post-media table
 		$item['raw-body'] = Post\Media::insertFromBody($item['uri-id'], $item['raw-body']);
 		$item['raw-body'] = self::setHashtags($item['raw-body']);
 
 		$author = Contact::getById($item['author-id'], ['network']);
 		Post\Media::insertFromRelevantUrl($item['uri-id'], $item['raw-body'], $item['body'], $author['network'] ?? '');
+
+		Post\Media::insertFromAttachmentData($item['uri-id'], $item['body']);
+		$item['body']     = BBCode::removeAttachment($item['body']);
+		$item['raw-body'] = BBCode::removeAttachment($item['raw-body']);
 
 		// Check for hashtags in the body and repair or add hashtag links
 		$item['body'] = self::setHashtags($item['body']);
@@ -1249,9 +1215,12 @@ class Item
 			Post\Thread::insert($item['uri-id'], $item);
 		}
 
-		if (!in_array($item['verb'], self::ACTIVITIES)) {
+		// The content of activities normally doesn't matter - except for likes from Misskey
+		if (!in_array($item['verb'], self::ACTIVITIES) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE]) && !empty($item['body']) && (mb_strlen($item['body']) == 1)) {
 			Post\Content::insert($item['uri-id'], $item);
 		}
+
+		$item['parent'] = $parent_id;
 
 		// Create Diaspora signature
 		if ($item['origin'] && empty($item['diaspora_signed_text']) && ($item['gravity'] != self::GRAVITY_PARENT)) {
@@ -1336,10 +1305,7 @@ class Item
 		}
 
 		if ($notify) {
-			if (!\Friendica\Content\Feature::isEnabled($posted_item['uid'], 'explicit_mentions') && ($posted_item['gravity'] == self::GRAVITY_COMMENT)) {
-				Tag::createImplicitMentions($posted_item['uri-id'], $posted_item['thr-parent-id']);
-			}
-			Hook::callAll('post_local_end', $posted_item);
+			DI::contentItem()->postProcessPost($posted_item);
 		} else {
 			Hook::callAll('post_remote_end', $posted_item);
 		}
@@ -1363,6 +1329,19 @@ class Item
 		$transmit = $notify || ($posted_item['visible'] && ($parent_origin || $posted_item['origin']));
 
 		if ($transmit) {
+			if ($posted_item['uid'] && Contact\User::isBlocked($posted_item['author-id'], $posted_item['uid'])) {
+				Logger::info('Message from blocked author will not be relayed', ['item' => $posted_item['id'], 'uri' => $posted_item['uri'], 'cid' => $posted_item['author-id']]);
+				$transmit = false;
+			}
+			if ($transmit && $posted_item['uid'] && Contact\User::isBlocked($posted_item['owner-id'], $posted_item['uid'])) {
+				Logger::info('Message from blocked owner will not be relayed', ['item' => $posted_item['id'], 'uri' => $posted_item['uri'], 'cid' => $posted_item['owner-id']]);
+				$transmit = false;
+			}
+			if ($transmit && !empty($posted_item['causer-id']) && $posted_item['uid'] && Contact\User::isBlocked($posted_item['causer-id'], $posted_item['uid'])) {
+				Logger::info('Message from blocked causer will not be relayed', ['item' => $posted_item['id'], 'uri' => $posted_item['uri'], 'cid' => $posted_item['causer-id']]);
+				$transmit = false;
+			}
+
 			// Don't relay participation messages
 			if (($posted_item['verb'] == Activity::FOLLOW) &&
 				(!$posted_item['origin'] || ($posted_item['author-id'] != Contact::getPublicIdByUserId($uid)))) {
@@ -1740,7 +1719,7 @@ class Item
 			if (!empty($item['event-id'])) {
 				$event_post = Post::selectFirst(['event-id'], ['uri-id' => $item['uri-id'], 'uid' => $uid]);
 				if (!empty($event_post['event-id'])) {
-					$event = DBA::selectFirst('event', ['edited', 'start', 'finish', 'summary', 'desc', 'location', 'nofinish', 'adjust'], ['id' => $item['event-id']]);
+					$event = DBA::selectFirst('event', ['edited', 'start', 'finish', 'summary', 'desc', 'location', 'nofinish'], ['id' => $item['event-id']]);
 					if (!empty($event)) {
 						// We aren't using "Event::store" here, since we don't want to trigger any further action
 						$ret = DBA::update('event', $event, ['id' => $event_post['event-id']]);
@@ -1773,16 +1752,16 @@ class Item
 		$item['origin'] = 0;
 		$item['wall'] = 0;
 
-		$item['contact-id'] = self::contactId($item);
-
 		$notify = false;
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
 			$contact = DBA::selectFirst('contact', [], ['id' => $item['contact-id'], 'self' => false]);
 			if (DBA::isResult($contact)) {
 				$notify = self::isRemoteSelf($contact, $item);
+				$item['wall'] = (bool)$notify;
 			}
 		}
 
+		$item['contact-id'] = self::contactId($item);
 		$distributed = self::insert($item, $notify);
 
 		if (!$distributed) {
@@ -2073,7 +2052,7 @@ class Item
 			$guid = System::createUUID();
 		}
 
-		return DI::baseUrl()->get() . '/objects/' . $guid;
+		return DI::baseUrl() . '/objects/' . $guid;
 	}
 
 	/**
@@ -2313,7 +2292,7 @@ class Item
 		}
 
 		// Prevent to forward already forwarded posts
-		if ($datarray['app'] == DI::baseUrl()->getHostname()) {
+		if ($datarray['app'] == DI::baseUrl()->getHost()) {
 			Logger::info('Already forwarded (second test)');
 			return false;
 		}
@@ -3017,15 +2996,20 @@ class Item
 		$item['mentions'] = $tags['mentions'];
 
 		if (!$is_preview) {
+			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", $item['body']);
 			$item['body'] = Post\Media::removeFromEndOfBody($item['body'] ?? '');
 		}
 
 		$body = $item['body'];
+		if ($is_preview) {
+			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", $item['body']);
+		}
 
 		$fields = ['uri-id', 'uri', 'body', 'title', 'author-name', 'author-link', 'author-avatar', 'guid', 'created', 'plink', 'network', 'has-media', 'quote-uri-id', 'post-type'];
 
-		$shared_uri_id = 0;
-		$shared_links  = [];
+		$shared_uri_id      = 0;
+		$shared_links       = [];
+		$quote_shared_links = [];
 
 		$shared = DI::contentItem()->getSharedPost($item, $fields);
 		if (!empty($shared['post'])) {
@@ -3044,7 +3028,14 @@ class Item
 					$shared_links[] = strtolower($media[0]['url']);
 				}
 
-				$quote_uri_id = $shared_item['uri-id'] ?? 0;
+				if (!empty($shared_item['uri-id'])) {
+					$data = BBCode::getAttachmentData($shared_item['body']);
+					if (!empty($data['url'])) {
+						$quote_shared_links[] = $data['url'];
+					}
+
+					$quote_uri_id = $shared_item['uri-id'];
+				}
 			}
 		}
 
@@ -3065,8 +3056,6 @@ class Item
 		$attachments = Post\Media::splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false);
 		$item['body'] = self::replaceVisualAttachments($attachments, $item['body'] ?? '');
 
-		$item['body'] = preg_replace("/\s*\[attachment .*?\].*?\[\/attachment\]\s*/ism", "\n", $item['body']);
-
 		self::putInCache($item);
 		$item['body'] = $body;
 		$s = $item["rendered-html"];
@@ -3078,6 +3067,14 @@ class Item
 		// Compile eventual content filter reasons
 		$filter_reasons = [];
 		if (!$is_preview && DI::userSession()->getPublicContactId() != $item['author-id']) {
+			if (!empty($item['user-blocked-author']) || !empty($item['user-blocked-owner'])) {
+				$filter_reasons[] = DI::l10n()->t('%s is blocked', $item['author-name']);
+			} elseif (!empty($item['user-ignored-author']) || !empty($item['user-ignored-owner'])) {
+				$filter_reasons[] = DI::l10n()->t('%s is ignored', $item['author-name']);
+			} elseif (!empty($item['user-collapsed-author']) || !empty($item['user-collapsed-owner'])) {
+				$filter_reasons[] = DI::l10n()->t('Content from %s is collapsed', $item['author-name']);
+			}
+
 			if (!empty($item['content-warning']) && (!DI::userSession()->getLocalUserId() || !DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'disable_cw', false))) {
 				$filter_reasons[] = DI::l10n()->t('Content warning: %s', $item['content-warning']);
 			}
@@ -3113,7 +3110,7 @@ class Item
 
 		if (!empty($shared_attachments)) {
 			$s = self::addVisualAttachments($shared_attachments, $shared_item, $s, true);
-			$s = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $shared_attachments, $body, $s, true, []);
+			$s = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $shared_attachments, $body, $s, true, $quote_shared_links);
 			$s = self::addNonVisualAttachments($shared_attachments, $item, $s, true);
 			$body = BBCode::removeSharedData($body);
 		}
@@ -3166,7 +3163,7 @@ class Item
 			],
 		]);
 	}
-	
+
 
 	/**
 	 * Check if the body contains a link
@@ -3433,7 +3430,7 @@ class Item
 		DI::profiler()->stopRecording();
 
 		if (isset($data['url']) && !in_array(strtolower($data['url']), $ignore_links)) {
-			if (!empty($data['description']) || !empty($data['image']) || !empty($data['preview'])) {
+			if (!empty($data['description']) || !empty($data['image']) || !empty($data['preview']) || (!empty($data['title']) && !Strings::compareLink($data['title'], $data['url']))) {
 				$parts = parse_url($data['url']);
 				if (!empty($parts['scheme']) && !empty($parts['host'])) {
 					if (empty($data['provider_name'])) {
@@ -3449,13 +3446,15 @@ class Item
 				}
 
 				// @todo Use a template
-				$preview_mode =  DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
+				$preview_mode = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
 				if ($preview_mode != BBCode::PREVIEW_NONE) {
 					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, false, $data, $uriid, $preview_mode);
+				} else {
+					$rendered = '';
 				}
 			} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
 				$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
-					'$url'  => $data['url'],
+					'$url'   => $data['url'],
 					'$title' => $data['title'],
 				]);
 			} else {
@@ -3696,7 +3695,7 @@ class Item
 			return is_numeric($hookData['item_id']) ? $hookData['item_id'] : 0;
 		}
 
-		$fetched_uri = ActivityPub\Processor::fetchMissingActivity($uri);
+		$fetched_uri = ActivityPub\Processor::fetchMissingActivity($uri, [], '', ActivityPub\Receiver::COMPLETION_MANUAL, $uid);
 
 		if ($fetched_uri) {
 			$item_id = self::searchByLink($fetched_uri, $uid);
@@ -3711,43 +3710,6 @@ class Item
 
 		Logger::info('Link not found', ['uid' => $uid, 'uri' => $uri]);
 		return 0;
-	}
-
-	/**
-	 * Check a prospective item array against user-level permissions
-	 *
-	 * @param array $item Expected keys: uri, gravity, and
-	 *                    author-link if is author-id is set,
-	 *                    owner-link if is owner-id is set,
-	 *                    causer-link if is causer-id is set.
-	 * @param int   $user_id Local user ID
-	 * @return bool
-	 * @throws \Exception
-	 */
-	protected static function isAllowedByUser(array $item, int $user_id): bool
-	{
-		if (!empty($item['author-id']) && Contact\User::isBlocked($item['author-id'], $user_id)) {
-			Logger::notice('Author is blocked by user', ['author-link' => $item['author-link'], 'uid' => $user_id, 'item-uri' => $item['uri']]);
-			return false;
-		}
-
-		if (!empty($item['owner-id']) && Contact\User::isBlocked($item['owner-id'], $user_id)) {
-			Logger::notice('Owner is blocked by user', ['owner-link' => $item['owner-link'], 'uid' => $user_id, 'item-uri' => $item['uri']]);
-			return false;
-		}
-
-		// The causer is set during a thread completion, for example because of a reshare. It countains the responsible actor.
-		if (!empty($item['causer-id']) && Contact\User::isBlocked($item['causer-id'], $user_id)) {
-			Logger::notice('Causer is blocked by user', ['causer-link' => $item['causer-link'] ?? $item['causer-id'], 'uid' => $user_id, 'item-uri' => $item['uri']]);
-			return false;
-		}
-
-		if (!empty($item['causer-id']) && ($item['gravity'] === self::GRAVITY_PARENT) && Contact\User::isIgnored($item['causer-id'], $user_id)) {
-			Logger::notice('Causer is ignored by user', ['causer-link' => $item['causer-link'] ?? $item['causer-id'], 'uid' => $user_id, 'item-uri' => $item['uri']]);
-			return false;
-		}
-
-		return true;
 	}
 
 	/**

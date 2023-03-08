@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -130,7 +130,7 @@ class ApiResponseTest extends MockedTest
 		$response = new ApiResponse($l10n, $args, new NullLogger(), $baseUrl, $twitterUser);
 		$response->unsupported();
 
-		self::assertEquals('{"error":"API endpoint %s %s is not implemented","error_description":"The API endpoint is currently not implemented but might be in the future."}', $response->getContent());
+		self::assertEquals('{"error":"API endpoint %s %s is not implemented but might be in the future.","code":"501 Not Implemented","request":""}', $response->getContent());
 	}
 
 	/**

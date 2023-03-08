@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,20 +25,22 @@ use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Model\User;
 use Friendica\Module\BaseApi;
+use Friendica\Module\Special\HTTPException;
 use Friendica\Security\OAuth;
 use Friendica\Util\DateTimeFormat;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * @see https://docs.joinmastodon.org/spec/oauth/
+ * @see https://docs.joinmastodon.org/methods/oauth/#token
  * @see https://aaronparecki.com/oauth-2-simplified/
  */
 class Token extends BaseApi
 {
-	public function run(array $request = [], bool $scopecheck = true): ResponseInterface
+	public function run(HTTPException $httpException, array $request = [], bool $scopecheck = true): ResponseInterface
 	{
-		return parent::run($request, false);
+		return parent::run($httpException, $request, false);
 	}
 
 	protected function post(array $request = [])
@@ -59,8 +61,11 @@ class Token extends BaseApi
 			$authorization = $_SERVER['REDIRECT_REMOTE_USER'] ?? '';
 		}
 
-		if (empty($request['client_id']) && substr($authorization, 0, 6) == 'Basic ') {
-			$datapair = explode(':', base64_decode(trim(substr($authorization, 6))));
+		if ((empty($request['client_id']) || empty($request['client_secret'])) && substr($authorization, 0, 6) == 'Basic ') {
+			// Per RFC2617, usernames can't contain a colon but password can,
+			// so we cut on the first colon to obtain the username and the password
+			// @see https://www.rfc-editor.org/rfc/rfc2617#section-2
+			$datapair = explode(':', base64_decode(trim(substr($authorization, 6))), 2);
 			if (count($datapair) == 2) {
 				$request['client_id']     = $datapair[0];
 				$request['client_secret'] = $datapair[1];
@@ -68,35 +73,38 @@ class Token extends BaseApi
 		}
 
 		if (empty($request['client_id']) || empty($request['client_secret'])) {
-			Logger::warning('Incomplete request data', ['request' => $_REQUEST]);
-			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Incomplete request data'));
+			Logger::warning('Incomplete request data', ['request' => $request]);
+			DI::mstdnError()->Unauthorized('invalid_client', DI::l10n()->t('Incomplete request data'));
 		}
 
 		$application = OAuth::getApplication($request['client_id'], $request['client_secret'], $request['redirect_uri']);
 		if (empty($application)) {
-			DI::mstdnError()->UnprocessableEntity();
+			DI::mstdnError()->Unauthorized('invalid_client', DI::l10n()->t('Invalid data or unknown client'));
 		}
 
 		if ($request['grant_type'] == 'client_credentials') {
 			// the "client_credentials" are used as a token for the application itself.
 			// see https://aaronparecki.com/oauth-2-simplified/#client-credentials
 			$token = OAuth::createTokenForUser($application, 0, '');
+			$me = null;
 		} elseif ($request['grant_type'] == 'authorization_code') {
 			// For security reasons only allow freshly created tokens
 			$condition = ["`redirect_uri` = ? AND `id` = ? AND `code` = ? AND `created_at` > ?",
 				$request['redirect_uri'], $application['id'], $request['code'], DateTimeFormat::utc('now - 5 minutes')];
 
-			$token = DBA::selectFirst('application-view', ['access_token', 'created_at'], $condition);
+			$token = DBA::selectFirst('application-view', ['access_token', 'created_at', 'uid'], $condition);
 			if (!DBA::isResult($token)) {
 				Logger::notice('Token not found or outdated', $condition);
 				DI::mstdnError()->Unauthorized();
 			}
+			$owner = User::getOwnerDataById($token['uid']);
+			$me = $owner['url'];
 		} else {
 			Logger::warning('Unsupported or missing grant type', ['request' => $_REQUEST]);
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Unsupported or missing grant type'));
 		}
 
-		$object = new \Friendica\Object\Api\Mastodon\Token($token['access_token'], 'Bearer', $application['scopes'], $token['created_at']);
+		$object = new \Friendica\Object\Api\Mastodon\Token($token['access_token'], 'Bearer', $application['scopes'], $token['created_at'], $me);
 
 		System::jsonExit($object->toArray());
 	}

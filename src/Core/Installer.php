@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -158,23 +158,20 @@ class Installer
 	{
 		$basepath = $configCache->get('system', 'basepath');
 
-		$tpl = Renderer::getMarkupTemplate('local.config.tpl');
+		$tpl = Renderer::getMarkupTemplate('install/local.config.tpl');
 		$txt = Renderer::replaceMacros($tpl, [
-			'$dbhost'    => $configCache->get('database', 'hostname'),
-			'$dbuser'    => $configCache->get('database', 'username'),
-			'$dbpass'    => $configCache->get('database', 'password'),
-			'$dbdata'    => $configCache->get('database', 'database'),
+			'$dbhost'     => $configCache->get('database', 'hostname'),
+			'$dbuser'     => $configCache->get('database', 'username'),
+			'$dbpass'     => $configCache->get('database', 'password'),
+			'$dbdata'     => $configCache->get('database', 'database'),
 
-			'$phpath'    => $configCache->get('config', 'php_path'),
-			'$adminmail' => $configCache->get('config', 'admin_email'),
-			'$hostname'  => $configCache->get('config', 'hostname'),
+			'$phpath'     => $configCache->get('config', 'php_path'),
+			'$adminmail'  => $configCache->get('config', 'admin_email'),
 
-			'$urlpath'   => $configCache->get('system', 'urlpath'),
-			'$baseurl'   => $configCache->get('system', 'url'),
-			'$sslpolicy' => $configCache->get('system', 'ssl_policy'),
-			'$basepath'  => $basepath,
-			'$timezone'  => $configCache->get('system', 'default_timezone'),
-			'$language'  => $configCache->get('system', 'language'),
+			'$system_url' => $configCache->get('system', 'url'),
+			'$basepath'   => $basepath,
+			'$timezone'   => $configCache->get('system', 'default_timezone'),
+			'$language'   => $configCache->get('system', 'language'),
 		]);
 
 		$result = file_put_contents($basepath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'local.config.php', $txt);
@@ -607,7 +604,7 @@ class Installer
 				$tls = true;
 			}
 		}
-		
+
 		if (!$tls) {
 			$help = DI::l10n()->t('The detection of TLS to secure the communication between the browser and the new Friendica server failed.');
 			$help .= ' ' . DI::l10n()->t('It is highly encouraged to use Friendica only over a secure connection as sensitive information like passwords will be transmitted.');

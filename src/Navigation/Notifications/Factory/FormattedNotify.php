@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -90,7 +90,7 @@ class FormattedNotify extends BaseFactory
 			case Activity::LIKE:
 				return new ValueObject\FormattedNotify(
 					'like',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s liked %s's post", $formattedItem['author-name'], $formattedItem['parent-author-name']),
@@ -102,7 +102,7 @@ class FormattedNotify extends BaseFactory
 			case Activity::DISLIKE:
 				return new ValueObject\FormattedNotify(
 					'dislike',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s disliked %s's post", $formattedItem['author-name'], $formattedItem['parent-author-name']),
@@ -114,7 +114,7 @@ class FormattedNotify extends BaseFactory
 			case Activity::ATTEND:
 				return new ValueObject\FormattedNotify(
 					'attend',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s is attending %s's event", $formattedItem['author-name'], $formattedItem['parent-author-name']),
@@ -126,7 +126,7 @@ class FormattedNotify extends BaseFactory
 			case Activity::ATTENDNO:
 				return new ValueObject\FormattedNotify(
 					'attendno',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s is not attending %s's event", $formattedItem['author-name'], $formattedItem['parent-author-name']),
@@ -138,7 +138,7 @@ class FormattedNotify extends BaseFactory
 			case Activity::ATTENDMAYBE:
 				return new ValueObject\FormattedNotify(
 					'attendmaybe',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s may attending %s's event", $formattedItem['author-name'], $formattedItem['parent-author-name']),
@@ -168,7 +168,7 @@ class FormattedNotify extends BaseFactory
 
 				return new ValueObject\FormattedNotify(
 					'friend',
-					$this->baseUrl->get(true) . '/display/' . $formattedItem['parent-guid'],
+					$this->baseUrl . '/display/' . $formattedItem['parent-guid'],
 					$formattedItem['author-avatar'],
 					$formattedItem['author-link'],
 					$this->l10n->t("%s is now friends with %s", $formattedItem['author-name'], $formattedItem['fname']),
@@ -219,7 +219,7 @@ class FormattedNotify extends BaseFactory
 			foreach ($Notifies as $Notify) {
 				$formattedNotifications[] = new ValueObject\FormattedNotify(
 					'notification',
-					$this->baseUrl->get(true) . '/notify/' . $Notify->id,
+					$this->baseUrl . '/notify/' . $Notify->id,
 					Contact::getAvatarUrlForUrl($Notify->url, $Notify->uid, Proxy::SIZE_MICRO),
 					$Notify->url,
 					strip_tags(BBCode::toPlaintext($Notify->msg)),
@@ -369,7 +369,7 @@ class FormattedNotify extends BaseFactory
 		}
 
 		$item['label'] = (($item['gravity'] == Item::GRAVITY_PARENT) ? 'post' : 'comment');
-		$item['link']  = $this->baseUrl->get(true) . '/display/' . $item['parent-guid'];
+		$item['link']  = $this->baseUrl . '/display/' . $item['parent-guid'];
 		$item['image'] = $item['author-avatar'];
 		$item['url']   = $item['author-link'];
 		$item['when']  = DateTimeFormat::local($item['created'], 'r');

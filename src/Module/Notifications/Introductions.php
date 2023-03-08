@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -100,7 +100,7 @@ class Introductions extends BaseNotifications
 		];
 
 		$owner = User::getOwnerDataById(DI::userSession()->getLocalUserId());
-	
+
 		// Loop through all introduction notifications.This creates an array with the output html for each
 		// introduction
 		/** @var Introduction $Introduction */
@@ -152,7 +152,7 @@ class Introductions extends BaseNotifications
 					$helptext  = $this->t('Shall your connection be bidirectional or not?');
 					$helptext2 = $this->t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $convertedName, $convertedName);
 					$helptext3 = $this->t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $convertedName);
-		
+
 					$friend = ['duplex', $this->t('Friend'), '1', $helptext2, true];
 					$follower = ['duplex', $this->t('Subscriber'), '0', $helptext3, false];
 

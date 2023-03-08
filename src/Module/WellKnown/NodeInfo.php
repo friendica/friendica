@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -46,9 +46,9 @@ class NodeInfo extends BaseModule
 		$nodeinfo = [
 			'links' => [
 				['rel'  => 'http://nodeinfo.diaspora.software/ns/schema/1.0',
-				'href' => DI::baseUrl()->get() . '/nodeinfo/1.0'],
+				'href' => DI::baseUrl() . '/nodeinfo/1.0'],
 				['rel'  => 'http://nodeinfo.diaspora.software/ns/schema/2.0',
-				'href' => DI::baseUrl()->get() . '/nodeinfo/2.0'],
+				'href' => DI::baseUrl() . '/nodeinfo/2.0'],
 			]
 		];
 

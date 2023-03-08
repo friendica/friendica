@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -49,30 +49,38 @@ trait VFSTrait
 		// create a virtual directory and copy all needed files and folders to it
 		$this->root = vfsStream::setup('friendica', 0777, $structure);
 
-		$this->setConfigFile('dbstructure.config.php', true);
-		$this->setConfigFile('dbview.config.php', true);
-		$this->setConfigFile('defaults.config.php', true);
-		$this->setConfigFile('settings.config.php', true);
-		$this->setConfigFile('local.config.php');
+		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'dbstructure.config.php', true);
+		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'dbview.config.php', true);
+		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'defaults.config.php', true);
+		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'settings.config.php', true);
+		$this->setConfigFile(
+			'mods' . DIRECTORY_SEPARATOR . 'local.config.ci.php',
+			false, 'local.config.php'
+		);
 	}
 
 	/**
 	 * Copying a config file from the file system to the Virtual File System
 	 *
-	 * @param string $filename The filename of the config file
-	 * @param bool   $static   True, if the folder `static` instead of `config` should be used
+	 * @param string $sourceFilePath The filename of the config file
+	 * @param bool   $static         True, if the folder `static` instead of `config` should be used
 	 */
-	protected function setConfigFile(string $filename, bool $static = false)
+	protected function setConfigFile(string $sourceFilePath, bool $static = false, string $targetFileName = null)
 	{
 		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
 			'..' . DIRECTORY_SEPARATOR .
-			($static ? 'static' : 'config') . DIRECTORY_SEPARATOR .
-			$filename;
+				$sourceFilePath;
 
 		if (file_exists($file)) {
-			vfsStream::newFile($filename)
+			if (empty($targetFileName)) {
+				$tmpArray = preg_split('/\\' . DIRECTORY_SEPARATOR . '/', $sourceFilePath);
+				$targetFileName = array_pop($tmpArray);
+			}
+			vfsStream::newFile($targetFileName)
 				->at($this->root->getChild(($static ? 'static' : 'config')))
 				->setContent(file_get_contents($file));
+		} else {
+			throw new \Exception(sprintf('Unexpected missing config \'%s\'', $file));
 		}
 	}
 

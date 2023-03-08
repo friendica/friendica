@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -53,7 +53,7 @@ class DBStructure
 			throw new \Asika\SimpleConsole\CommandArgsException('The version number must be numeric');
 		}
 
-		DI::config()->set('system', 'build', $version);
+		DI::keyValue()->set('build', $version);
 		echo DI::l10n()->t('The database version had been set to %s.', $version);
 	}
 
@@ -65,7 +65,7 @@ class DBStructure
 	 */
 	public static function dropTables(bool $execute)
 	{
-		$postupdate = DI::config()->get('system', 'post_update_version', PostUpdate::VERSION);
+		$postupdate = DI::keyValue()->get('post_update_version') ?? PostUpdate::VERSION;
 		if ($postupdate < PostUpdate::VERSION) {
 			echo DI::l10n()->t('The post update is at version %d, it has to be at %d to safely drop the tables.', $postupdate, PostUpdate::VERSION);
 			return;
@@ -74,7 +74,7 @@ class DBStructure
 		$old_tables = ['fserver', 'gcign', 'gcontact', 'gcontact-relation', 'gfollower' ,'glink', 'item-delivery-data',
 			'item-activity', 'item-content', 'item_id', 'participation', 'poll', 'poll_result', 'queue', 'retriever_rule',
 			'deliverq', 'dsprphotoq', 'ffinder', 'sign', 'spam', 'term', 'user-item', 'thread', 'item', 'challenge',
-			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact'];
+			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact', 'addon'];
 
 		$tables = DBA::selectToArray('INFORMATION_SCHEMA.TABLES', ['TABLE_NAME'],
 			['TABLE_SCHEMA' => DBA::databaseName(), 'TABLE_TYPE' => 'BASE TABLE']);
@@ -176,14 +176,16 @@ class DBStructure
 	public static function performUpdate(bool $enable_maintenance_mode = true, bool $verbose = false): string
 	{
 		if ($enable_maintenance_mode) {
-			DI::config()->set('system', 'maintenance', 1);
+			DI::config()->set('system', 'maintenance', true);
 		}
 
 		$status = self::update($verbose, true);
 
 		if ($enable_maintenance_mode) {
-			DI::config()->set('system', 'maintenance', 0);
-			DI::config()->set('system', 'maintenance_reason', '');
+			DI::config()->beginTransaction()
+						->set('system', 'maintenance', false)
+						->delete('system', 'maintenance_reason')
+						->commit();
 		}
 
 		return $status;
@@ -781,7 +783,7 @@ class DBStructure
 			}
 
 			if (!DBA::exists('verb', ['id' => 0])) {
-				DBA::insert('verb', ['name' => '']);
+				DBA::insert('verb', ['name' => ''], Database::INSERT_IGNORE);
 				$lastid = DBA::lastInsertId();
 				if ($lastid != 0) {
 					DBA::update('verb', ['id' => 0], ['id' => $lastid]);
@@ -817,7 +819,7 @@ class DBStructure
 		}
 
 		if (self::existsTable('contact') && !DBA::exists('contact', ['id' => 0])) {
-			DBA::insert('contact', ['nurl' => '']);
+			DBA::insert('contact', ['nurl' => ''], Database::INSERT_IGNORE);
 			$lastid = DBA::lastInsertId();
 			if ($lastid != 0) {
 				DBA::update('contact', ['id' => 0], ['id' => $lastid]);
@@ -832,7 +834,7 @@ class DBStructure
 		}
 
 		if (self::existsTable('tag') && !DBA::exists('tag', ['id' => 0])) {
-			DBA::insert('tag', ['name' => '']);
+			DBA::insert('tag', ['name' => ''], Database::INSERT_IGNORE);
 			$lastid = DBA::lastInsertId();
 			if ($lastid != 0) {
 				DBA::update('tag', ['id' => 0], ['id' => $lastid]);
@@ -848,7 +850,7 @@ class DBStructure
 
 		if (self::existsTable('permissionset')) {
 			if (!DBA::exists('permissionset', ['id' => 0])) {
-				DBA::insert('permissionset', ['allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '']);
+				DBA::insert('permissionset', ['allow_cid' => '', 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => ''], Database::INSERT_IGNORE);
 				$lastid = DBA::lastInsertId();
 				if ($lastid != 0) {
 					DBA::update('permissionset', ['id' => 0], ['id' => $lastid]);
@@ -876,7 +878,7 @@ class DBStructure
 					}
 					$fields = ['id' => $set['psid'], 'uid' => $set['uid'], 'allow_cid' => $permission,
 						'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => ''];
-					DBA::insert('permissionset', $fields);
+					DBA::insert('permissionset', $fields, Database::INSERT_IGNORE);
 				}
 				DBA::close($sets);
 			}

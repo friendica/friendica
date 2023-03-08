@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,9 +22,8 @@
 namespace Friendica\App;
 
 use Detection\MobileDetect;
-use Friendica\Core\Config\ValueObject\Cache;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
-use Friendica\Util\BasePath;
 
 /**
  * Mode of the current Friendica Node
@@ -129,15 +128,13 @@ class Mode
 	 *
 	 * @throws \Exception
 	 */
-	public function determine(BasePath $basepath, Database $database, Cache $configCache): Mode
+	public function determine(string $basePath, Database $database, IManageConfigValues $config): Mode
 	{
 		$mode = 0;
 
-		$basepathName = $basepath->getPath();
-
-		if (!file_exists($basepathName . '/config/local.config.php')
-		    && !file_exists($basepathName . '/config/local.ini.php')
-		    && !file_exists($basepathName . '/.htconfig.php')) {
+		if (!file_exists($basePath . '/config/local.config.php') &&
+			!file_exists($basePath . '/config/local.ini.php') &&
+			!file_exists($basePath . '/.htconfig.php')) {
 			return new Mode($mode);
 		}
 
@@ -149,16 +146,7 @@ class Mode
 
 		$mode |= Mode::DBAVAILABLE;
 
-		if ($database->fetchFirst("SHOW TABLES LIKE 'config'") === false) {
-			return new Mode($mode);
-		}
-
-		$mode |= Mode::DBCONFIGAVAILABLE;
-
-		if (!empty($configCache->get('system', 'maintenance')) ||
-		    // Don't use Config or Configuration here because we're possibly BEFORE initializing the Configuration,
-		    // so this could lead to a dependency circle
-		    !empty($database->selectFirst('config', ['v'], ['cat' => 'system', 'k' => 'maintenance'])['v'])) {
+		if (!empty($config->get('system', 'maintenance'))) {
 			return new Mode($mode);
 		}
 
@@ -232,14 +220,14 @@ class Mode
 	}
 
 	/**
-	 * Install mode is when the local config file is missing or the DB schema hasn't been installed yet.
+	 * Install mode is when the local config file is missing or the database isn't available.
 	 *
 	 * @return bool Whether installation mode is active (local/database configuration files present or not)
 	 */
 	public function isInstall(): bool
 	{
 		return !$this->has(Mode::LOCALCONFIGPRESENT) ||
-		       !$this->has(MODE::DBCONFIGAVAILABLE);
+		       !$this->has(MODE::DBAVAILABLE);
 	}
 
 	/**
@@ -251,7 +239,6 @@ class Mode
 	{
 		return $this->has(Mode::LOCALCONFIGPRESENT) &&
 		       $this->has(Mode::DBAVAILABLE) &&
-		       $this->has(Mode::DBCONFIGAVAILABLE) &&
 		       $this->has(Mode::MAINTENANCEDISABLED);
 	}
 

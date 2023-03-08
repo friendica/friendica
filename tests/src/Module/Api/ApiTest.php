@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,15 +24,18 @@ namespace Friendica\Test\src\Module\Api;
 use Friendica\App;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Addon;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Database\Database;
 use Friendica\DI;
+use Friendica\Module\Special\HTTPException;
 use Friendica\Security\Authentication;
 use Friendica\Security\BasicAuth;
 use Friendica\Test\FixtureTest;
 use Friendica\Test\Util\AppDouble;
 use Friendica\Test\Util\AuthenticationDouble;
 use Friendica\Test\Util\AuthTestConfig;
+use Mockery\MockInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class ApiTest extends FixtureTest
@@ -58,6 +61,9 @@ abstract class ApiTest extends FixtureTest
 		'nick' => 'othercontact',
 		'nurl' => 'http://localhost/profile/othercontact'
 	];
+
+	/** @var HTTPException */
+	protected $httpExceptionMock;
 
 	// User ID that we know is not in the database
 	const WRONG_USER_ID = 666;
@@ -175,6 +181,8 @@ abstract class ApiTest extends FixtureTest
 		// Manual override to bypass API authentication
 		DI::app()->setIsLoggedIn(true);
 
+		$this->httpExceptionMock = $this->dice->create(HTTPException::class);
+
 		AuthTestConfig::$authenticated = true;
 		AuthTestConfig::$user_id       = 42;
 
@@ -205,15 +213,14 @@ abstract class ApiTest extends FixtureTest
 			$func(DI::app());
 		}
 
-		/** @var Database $dba */
-		$dba = $this->dice->create(Database::class);
+		/** @var $config IManageConfigValues */
+		$config = $this->dice->create(IManageConfigValues::class);
 
-		$dba->insert('addon', [
+		$config->set('addons', $addon, [
 			'name'         => $addon,
 			'installed'    => true,
 			'timestamp'    => $t,
 			'plugin_admin' => function_exists($addon . '_addon_admin'),
-			'hidden'       => file_exists('addon/' . $addon . '/.hidden')
 		]);
 
 		Addon::loadAddons();

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -78,7 +78,6 @@ class Schedule extends BaseProfile
 		$tpl = Renderer::getMarkupTemplate('profile/schedule.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseModule::getFormSecurityToken("profile_schedule"),
-			'$baseurl'             => DI::baseUrl()->get(true),
 			'$title'               => DI::l10n()->t('Scheduled Posts'),
 			'$nickname'            => $this->parameters['nickname'] ?? '',
 			'$scheduled_at'        => DI::l10n()->t('Scheduled'),

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,6 +32,8 @@ use GuzzleHttp\HandlerStack;
  */
 trait DiceHttpMockHandlerTrait
 {
+	use FixtureTestTrait;
+
 	/**
 	 * Handler for mocking requests anywhere for testing purpose
 	 *
@@ -41,9 +43,7 @@ trait DiceHttpMockHandlerTrait
 
 	protected function setupHttpMockHandler(): void
 	{
-		if (!empty($this->httpRequestHandler) && $this->httpRequestHandler instanceof HandlerStack) {
-			return;
-		}
+		$this->setUpFixtures();
 
 		$this->httpRequestHandler = HandlerStack::create();
 
@@ -59,10 +59,8 @@ trait DiceHttpMockHandlerTrait
 		DI::init($newDice);
 	}
 
-	protected function tearDown(): void
+	protected function tearDownHandler(): void
 	{
-		\Mockery::close();
-
-		parent::tearDown();
+		$this->tearDownFixtures();
 	}
 }

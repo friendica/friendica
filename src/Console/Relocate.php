@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,8 +24,8 @@ namespace Friendica\Console;
 use Asika\SimpleConsole\Console;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Worker;
+use Friendica\Protocol\Delivery;
 use Friendica\Util\Strings;
-use Friendica\Worker\Delivery;
 
 class Relocate extends Console
 {
@@ -92,18 +92,19 @@ HELP;
 			throw new \InvalidArgumentException('Can not parse new base URL. Must have at least <scheme>://<domain>');
 		}
 
-		$this->out(sprintf('Relocation started from %s to %s. Could take a while to complete.', $this->baseUrl->get(true), $this->getArgument(0)));
+		$this->out(sprintf('Relocation started from %s to %s. Could take a while to complete.', $this->baseUrl, $this->getArgument(0)));
 
-		$old_url = $this->baseUrl->get(true);
+		$old_url = $this->baseUrl;
 
 		// Generate host names for relocation the addresses in the format user@address.tld
 		$new_host = str_replace('http://', '@', Strings::normaliseLink($new_url));
 		$old_host = str_replace('http://', '@', Strings::normaliseLink($old_url));
 
 		$this->out('Entering maintenance mode');
-		$this->config->set('system', 'maintenance', true);
-		$this->config->set('system', 'maintenance_reason', 'Relocating node to ' . $new_url);
-
+		$this->config->beginTransaction()
+					 ->set('system', 'maintenance', true)
+					 ->set('system', 'maintenance_reason', 'Relocating node to ' . $new_url)
+					 ->commit();
 		try {
 			if (!$this->database->transaction()) {
 				throw new \Exception('Unable to start a transaction, please retry later.');
@@ -178,7 +179,6 @@ HELP;
 			// update config
 			$this->out('Updating config values');
 			$this->config->set('system', 'url', $new_url);
-			$this->baseUrl->saveByURL($new_url);
 
 			$this->database->commit();
 		} catch (\Throwable $e) {
@@ -189,8 +189,10 @@ HELP;
 			return 1;
 		} finally {
 			$this->out('Leaving maintenance mode');
-			$this->config->set('system', 'maintenance', false);
-			$this->config->set('system', 'maintenance_reason', '');
+			$this->config->beginTransaction()
+						 ->set('system', 'maintenance', false)
+						 ->delete('system', 'maintenance_reason')
+						 ->commit();
 		}
 
 		// send relocate

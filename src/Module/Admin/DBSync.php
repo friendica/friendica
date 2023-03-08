@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -42,7 +42,7 @@ class DBSync extends BaseAdmin
 		switch ($action) {
 			case 'mark':
 				if ($update) {
-					DI::config()->set('database', 'update_' . $update, 'success');
+					DI::keyValue()->set('database_update_' . $update, 'success');
 					$curr = DI::config()->get('system', 'build');
 					if (intval($curr) == $update) {
 						DI::config()->set('system', 'build', intval($curr) + 1);
@@ -76,13 +76,13 @@ class DBSync extends BaseAdmin
 							$o = DI::l10n()->t("Executing %s failed with error: %s", $func, $retval);
 						} elseif ($retval === Update::SUCCESS) {
 							$o = DI::l10n()->t('Update %s was successfully applied.', $func);
-							DI::config()->set('database', $func, 'success');
+							DI::keyValue()->set(sprintf('database_%s', $func), 'success');
 						} else {
 							$o = DI::l10n()->t('Update %s did not return a status. Unknown if it succeeded.', $func);
 						}
 					} else {
 						$o = DI::l10n()->t('There was no additional update function %s that needed to be called.', $func) . "<br />";
-						DI::config()->set('database', $func, 'success');
+						DI::keyValue()->set(sprintf('database_%s', $func), 'success');
 					}
 
 					return $o;
@@ -102,13 +102,11 @@ class DBSync extends BaseAdmin
 
 				if (!count($failed)) {
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/structure_check.tpl'), [
-						'$base' => DI::baseUrl()->get(true),
 						'$banner' => DI::l10n()->t('No failed updates.'),
 						'$check' => DI::l10n()->t('Check database structure'),
 					]);
 				} else {
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/failed_updates.tpl'), [
-						'$base' => DI::baseUrl()->get(true),
 						'$banner' => DI::l10n()->t('Failed Updates'),
 						'$desc' => DI::l10n()->t('This does not include updates prior to 1139, which did not return a status.'),
 						'$mark' => DI::l10n()->t("Mark success \x28if update was manually applied\x29"),

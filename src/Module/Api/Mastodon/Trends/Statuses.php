@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon\Trends;
 
+use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -43,17 +44,28 @@ class Statuses extends BaseApi
 
 		$request = $this->getRequest([
 			'limit' => 10, // Maximum number of results to return. Defaults to 10.
+			'offset' => 0, // Offset in set, Defaults to 0.
 		], $request);
 
 		$condition = ["NOT `private` AND `commented` > ? AND `created` > ?", DateTimeFormat::utc('now -1 day'), DateTimeFormat::utc('now -1 week')];
 		$condition = DBA::mergeConditions($condition, ['network' => Protocol::FEDERATED]);
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$trending = [];
-		$statuses = Post::selectPostThread(['uri-id'], $condition, ['limit' => $request['limit'], 'order' => ['total-actors' => true]]);
+		$statuses = Post::selectPostThread(['uri-id'], $condition, ['limit' => [$request['offset'], $request['limit']],  'order' => ['total-actors' => true]]);
 		while ($status = Post::fetch($statuses)) {
-			$trending[] = DI::mstdnStatus()->createFromUriId($status['uri-id'], $uid);
+			try {
+				$trending[] = DI::mstdnStatus()->createFromUriId($status['uri-id'], $uid, $display_quotes);
+			} catch (\Exception $exception) {
+				Logger::info('Post not fetchable', ['uri-id' => $status['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+			}
 		}
 		DBA::close($statuses);
+
+		if (!empty($trending)) {
+			self::setLinkHeaderByOffsetLimit($request['offset'], $request['limit']);
+		}
 
 		System::jsonExit($trending);
 	}

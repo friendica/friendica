@@ -51,7 +51,7 @@ In */etc/fail2ban/jail.local* create a section for Friendica:
 	bantime  = 900
 	filter = friendica
 	port = http,https
-	logpath = /var/log/friend.log
+	logpath = /var/log/friendica.log
 	logencoding = utf-8
 
 And create a filter definition in */etc/fail2ban/filter.d/friendica.conf*:

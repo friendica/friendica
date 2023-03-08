@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,7 +37,7 @@ class ShowTest extends ApiTest
 	public function testApiUsersShow()
 	{
 		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);
 
@@ -58,7 +58,7 @@ class ShowTest extends ApiTest
 	{
 		$response = (new Show(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
 			'extension' => ICanCreateResponses::TYPE_XML
-		]))->run();
+		]))->run($this->httpExceptionMock);
 
 		self::assertEquals(ICanCreateResponses::TYPE_XML, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

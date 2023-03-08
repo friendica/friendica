@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -511,7 +511,7 @@ class Strings
 		);
 
 		if (is_null($return)) {
-			Logger::warning('Received null value from preg_replace_callback', ['text' => $text, 'regex' => $regex, 'blocks' => $blocks, 'executionId' => $executionId, 'callstack' => System::callstack(10)]);
+			Logger::notice('Received null value from preg_replace_callback', ['text' => $text, 'regex' => $regex, 'blocks' => $blocks, 'executionId' => $executionId, 'callstack' => System::callstack(10)]);
 		}
 
 		$text = $callback($return ?? $text) ?? '';

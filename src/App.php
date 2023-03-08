@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,11 +25,11 @@ use Exception;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Content\Nav;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
-use Friendica\Model\User;
 use Friendica\Module\Maintenance;
 use Friendica\Security\Authentication;
 use Friendica\Core\Config\ValueObject\Cache;
@@ -64,7 +64,7 @@ class App
 {
 	const PLATFORM = 'Friendica';
 	const CODENAME = 'Giant Rhubarb';
-	const VERSION  = '2023.01';
+	const VERSION  = '2023.03-dev';
 
 	// Allow themes to control internal parameters
 	// by changing App values in theme.php
@@ -73,8 +73,6 @@ class App
 		'videoheight'       => 350,
 	];
 
-	private $user_id       = 0;
-	private $nickname      = '';
 	private $timezone      = '';
 	private $profile_owner = 0;
 	private $contact_id    = 0;
@@ -136,64 +134,39 @@ class App
 	private $session;
 
 	/**
-	 * Set the user ID
-	 *
-	 * @param int $user_id
-	 * @return void
+	 * @deprecated 2022.03
+	 * @see IHandleUserSessions::isAuthenticated()
 	 */
-	public function setLoggedInUserId(int $user_id)
-	{
-		$this->user_id = $user_id;
-	}
-
-	/**
-	 * Set the nickname
-	 *
-	 * @param int $user_id
-	 * @return void
-	 */
-	public function setLoggedInUserNickname(string $nickname)
-	{
-		$this->nickname = $nickname;
-	}
-
 	public function isLoggedIn(): bool
 	{
-		return $this->session->getLocalUserId() && $this->user_id && ($this->user_id == $this->session->getLocalUserId());
+		return $this->session->isAuthenticated();
 	}
 
 	/**
-	 * Check if current user has admin role.
-	 *
-	 * @return bool true if user is an admin
-	 * @throws Exception
+	 * @deprecated 2022.03
+	 * @see IHandleUserSessions::isSiteAdmin()
 	 */
 	public function isSiteAdmin(): bool
 	{
-		return
-			$this->session->getLocalUserId()
-			&& $this->database->exists('user', [
-				'uid'   => $this->getLoggedInUserId(),
-				'email' => User::getAdminEmailList()
-			]);
+		return $this->session->isSiteAdmin();
 	}
 
 	/**
-	 * Fetch the user id
-	 * @return int User id
+	 * @deprecated 2022.03
+	 * @see IHandleUserSessions::getLocalUserId()
 	 */
 	public function getLoggedInUserId(): int
 	{
-		return $this->user_id;
+		return $this->session->getLocalUserId();
 	}
 
 	/**
-	 * Fetch the user nick name
-	 * @return string User's nickname
+	 * @deprecated 2022.03
+	 * @see IHandleUserSessions::getLocalUserNickname()
 	 */
 	public function getLoggedInUserNickname(): string
 	{
-		return $this->nickname;
+		return $this->session->getLocalUserNickname();
 	}
 
 	/**
@@ -324,8 +297,7 @@ class App
 	 */
 	public function getBasePath(): string
 	{
-		// Don't use the basepath of the config table for basepath (it should always be the config-file one)
-		return $this->config->getCache()->get('system', 'basepath');
+		return $this->config->get('system', 'basepath');
 	}
 
 	/**
@@ -385,10 +357,8 @@ class App
 		$this->profiler->reset();
 
 		if ($this->mode->has(App\Mode::DBAVAILABLE)) {
-			$this->profiler->update($this->config);
-
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileLoader($this->getBasePath(), $_SERVER);
+			$loader = (new Config())->createConfigFileManager($this->getBasePath(), $_SERVER);
 			Core\Hook::callAll('load_config', $loader);
 
 			// Hooks are now working, reload the whole definitions with hook enabled
@@ -571,25 +541,6 @@ class App
 	}
 
 	/**
-	 * Sets the base url for use in cmdline programs which don't have
-	 * $_SERVER variables
-	 */
-	public function checkURL()
-	{
-		$url = $this->config->get('system', 'url');
-
-		// if the url isn't set or the stored url is radically different
-		// than the currently visited url, store the current value accordingly.
-		// "Radically different" ignores common variations such as http vs https
-		// and www.example.com vs example.com.
-		// We will only change the url to an ip address if there is no existing setting
-
-		if (empty($url) || (!Util\Strings::compareLink($url, $this->baseURL->get())) && (!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/", $this->baseURL->getHostname()))) {
-			$this->config->set('system', 'url', $this->baseURL->get());
-		}
-	}
-
-	/**
 	 * Frontend App script
 	 *
 	 * The App object behaves like a container and a dispatcher at the same time, including a representation of the
@@ -601,13 +552,15 @@ class App
 	 * @param IManagePersonalConfigValues $pconfig
 	 * @param Authentication              $auth       The Authentication backend of the node
 	 * @param App\Page                    $page       The Friendica page printing container
+	 * @param ModuleHTTPException         $httpException The possible HTTP Exception container
 	 * @param HTTPInputData               $httpInput  A library for processing PHP input streams
 	 * @param float                       $start_time The start time of the overall script execution
+	 * @param array                       $server     The $_SERVER array
 	 *
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function runFrontend(App\Router $router, IManagePersonalConfigValues $pconfig, Authentication $auth, App\Page $page, HTTPInputData $httpInput, float $start_time)
+	public function runFrontend(App\Router $router, IManagePersonalConfigValues $pconfig, Authentication $auth, App\Page $page, Nav $nav, ModuleHTTPException $httpException, HTTPInputData $httpInput, float $start_time, array $server)
 	{
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
@@ -623,10 +576,12 @@ class App
 
 			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
-				if ($this->baseURL->checkRedirectHttps()) {
-					System::externalRedirect($this->baseURL->get() . '/' . $this->args->getQueryString());
+				if ($this->config->get('system', 'force_ssl') &&
+					(empty($server['HTTPS']) || $server['HTTPS'] === 'off') &&
+					!empty($server['REQUEST_METHOD']) &&
+					$server['REQUEST_METHOD'] === 'GET') {
+					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
-
 				Core\Hook::callAll('init_1');
 			}
 
@@ -686,8 +641,7 @@ class App
 			if ($this->mode->isInstall() && $moduleName !== 'install') {
 				$this->baseURL->redirect('install');
 			} else {
-				$this->checkURL();
-				Core\Update::check($this->getBasePath(), false, $this->mode);
+				Core\Update::check($this->getBasePath(), false);
 				Core\Addon::loadAddons();
 				Core\Hook::loadHooks();
 			}
@@ -741,17 +695,17 @@ class App
 			$httpinput = $httpInput->process();
 			$input     = array_merge($httpinput['variables'], $httpinput['files'], $request ?? $_REQUEST);
 
-			// Let the module run it's internal process (init, get, post, ...)
+			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);
-			$response = $module->run($input);
+			$response = $module->run($httpException, $input);
 			$this->profiler->set(microtime(true) - $timestamp, 'content');
 			if ($response->getHeaderLine(ICanCreateResponses::X_HEADER) === ICanCreateResponses::TYPE_HTML) {
-				$page->run($this, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $this->session->getLocalUserId());
+				$page->run($this, $this->baseURL, $this->args, $this->mode, $response, $this->l10n, $this->profiler, $this->config, $pconfig, $nav, $this->session->getLocalUserId());
 			} else {
 				$page->exit($response);
 			}
 		} catch (HTTPException $e) {
-			(new ModuleHTTPException())->rawContent($e);
+			$httpException->rawContent($e);
 		}
 		$page->logRuntime($this->config, 'runFrontend');
 	}

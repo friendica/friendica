@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -244,7 +244,7 @@ class Ping extends BaseModule
 						$registration['url'],
 						$this->l10n->t('{0} requested registration'),
 						new \DateTime($registration['created'], new \DateTimeZone('UTC')),
-						new Uri($this->baseUrl->get(true) . '/moderation/users/pending')
+						new Uri($this->baseUrl . '/moderation/users/pending')
 					);
 				}
 			} else {
@@ -253,7 +253,7 @@ class Ping extends BaseModule
 					$registrations[0]['url'],
 					$this->l10n->t('{0} and %d others requested registration', count($registrations) - 1),
 					new \DateTime($registrations[0]['created'], new \DateTimeZone('UTC')),
-					new Uri($this->baseUrl->get(true) . '/moderation/users/pending')
+					new Uri($this->baseUrl . '/moderation/users/pending')
 				);
 			}
 

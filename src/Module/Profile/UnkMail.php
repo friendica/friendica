@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -141,7 +141,6 @@ class UnkMail extends \Friendica\BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('profile/unkmail-header.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$baseurl'  => $this->baseUrl->get(true),
 			'$nickname' => $user['nickname'],
 			'$linkurl'  => $this->l10n->t('Please enter a link URL:')
 		]);

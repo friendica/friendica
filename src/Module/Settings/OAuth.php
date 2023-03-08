@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -68,7 +68,6 @@ class OAuth extends BaseSettings
 		$tpl = Renderer::getMarkupTemplate('settings/oauth.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token' => BaseSettings::getFormSecurityToken('settings_oauth'),
-			'$baseurl'             => $this->baseUrl->get(true),
 			'$title'               => $this->t('Connected Apps'),
 			'$name'                => $this->t('Name'),
 			'$website'             => $this->t('Home Page'),

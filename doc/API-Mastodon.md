@@ -30,6 +30,100 @@ For supported apps please have a look at the [FAQ](help/FAQ#clients)
 ## Entities
 
 These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/entities/).
+With some additional extensions listed below.
+
+### Instance (Version 2) Entities
+Extensions to the [Mastodon Instance::V2 Entities](https://docs.joinmastodon.org/entities/Instance/)
+* `friendica`: Friendica specific properties of the V2 Instance including:
+    * `version`: The Friendica version string
+    * `codename`: The Friendica version code name
+    * `db_version`: The database schema version number
+
+Example: 
+```json
+{
+  "domain": "friendicadevtest1.myportal.social",
+  "title": "Friendica Social Network",
+  "version": "2.8.0 (compatible; Friendica 2023.03-dev)",
+  ...
+  "friendica": {
+    "version": "2023.03-dev",
+    "codename": "Giant Rhubarb",
+    "db_version": 1516
+  }
+}
+```
+
+### Notification Entities
+Extensions to the [Mastodon Notification Entities](https://docs.joinmastodon.org/entities/Notification/)
+* `dismissed`: whether the object has been dismissed or not
+
+### Status Entities
+Extensions to the [Mastodon Status Entities](https://docs.joinmastodon.org/entities/Status/)
+* `in_reply_to_status`: A fully populated Mastodon Status entity for the replied to status or null it is a post rather than a response
+* `friendica`: Friendica specific properties of a status including:
+  * `title`: The Friendica title for a post, or empty if the status is a comment
+  * `delivery_data`: Information about the state of federating a message from the server
+    * `delivery_queue_count`: Total number of remote servers that the status needs to be federated to.
+    * `delivery_queue_done`: Total number of remote servers that have successfully been federated to so far.
+    * `delivery_queue_failed`: Total number of remote servers that have we failed to federate to so far.
+  * `dislikes_count`: The number of dislikes that a status has accumulated according to the server.
+
+Example:
+```json
+{
+  "id": "358",
+  "created_at": "2023-02-23T02:45:46.000Z",
+  "in_reply_to_id": "356",
+  "in_reply_to_status": {
+    "id": "356",
+    "created_at": "2023-02-23T02:45:35.000Z",
+    "in_reply_to_id": null,
+    "in_reply_to_status": null,
+    "in_reply_to_account_id": null,
+    ...
+    "content": "A post from testuser1",
+    ...
+    "account": {
+      "id": "6",
+      "username": "testuser1",
+      "acct": "testuser1",
+      "display_name": "testuser1",
+      ...
+    },
+    ...
+    "friendica": {
+      "title": "",
+      "dislikes_count": 0
+    }
+  },
+  "in_reply_to_account_id": "6",
+  ...
+  "replies_count": 0,
+  "reblogs_count": 0,
+  "favourites_count": 0,
+  ...
+  "content": "A reply from testuser2",
+  ...
+  "account": {
+    "id": "8",
+    "username": "testuser2",
+    "acct": "testuser2",
+    "display_name": "testuser2",
+    ...
+  },
+  ...
+  "friendica": {
+    "title": "",
+    "delivery_data": {
+      "delivery_queue_count": 10,
+      "delivery_queue_done": 3, 
+      "delivery_queue_failed": 0
+    },
+    "dislikes_count": 0
+  }
+}
+```
 
 ## Implemented endpoints
 
@@ -73,8 +167,8 @@ These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/en
     - `:id` is a follow request ID, not a regular account id
     - Returns a [Relationship](https://docs.joinmastodon.org/entities/relationship) object.
 
-- [`GET /api/v1/followed_tags'](https://docs.joinmastodon.org/methods/followed_tags/)
-- [`GET /api/v1/instance`](https://docs.joinmastodon.org/methods/instance#fetch-instance)
+- [`GET /api/v1/followed_tags`](https://docs.joinmastodon.org/methods/followed_tags/)
+- [`GET /api/v1/instance`](https://docs.joinmastodon.org/methods/instance/#v1)
 - `GET /api/v1/instance/rules` Undocumented, returns Terms of Service
 - [`GET /api/v1/instance/peers`](https://docs.joinmastodon.org/methods/instance#list-of-connected-domains)
 - [`GET /api/v1/lists`](https://docs.joinmastodon.org/methods/timelines/lists/)
@@ -92,6 +186,10 @@ These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/en
 - [`PUT /api/v1/media/:id`](https://docs.joinmastodon.org/methods/statuses/media/)
 - [`GET /api/v1/mutes`](https://docs.joinmastodon.org/methods/accounts/mutes/)
 - [`GET /api/v1/notifications`](https://docs.joinmastodon.org/methods/notifications/)
+    - Additional field `include_all` to return read and unread statuses, defaults to `false`
+    - Additional field `summary` returns a count of all of the statuses that match the type filter
+    - Additional field `with_muted` Pleroma extension to return notifications from muted users, defaults to `false`
+    - Does not support the `type` field, which is the mirror image of the supported `exclude_types` field
 - [`GET /api/v1/notifications/:id`](https://docs.joinmastodon.org/methods/notifications/)
 - [`POST /api/v1/notifications/clear`](https://docs.joinmastodon.org/methods/notifications/)
 - [`POST /api/v1/notifications/:id/dismiss`](https://docs.joinmastodon.org/methods/notifications/)
@@ -106,11 +204,22 @@ These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/en
 - [`DELETE /api/v1/scheduled_statuses/:id`](https://docs.joinmastodon.org/methods/statuses/scheduled_statuses/)
 - [`GET /api/v1/scheduled_statuses/:id`](https://docs.joinmastodon.org/methods/statuses/scheduled_statuses/)
 - [`GET /api/v1/search`](https://docs.joinmastodon.org/methods/search/)
+- [`PUT /api/v1/statuses`](https://docs.joinmastodon.org/methods/statuses/#edit)
+    - Does not support `polls` argument as Friendica does not have polls
+    - Additional fields `friendica` for Friendica specific parameters:
+        - `title`: Explicitly sets the title for a post status, ignored if used on a comment status. For post statuses the legacy behavior is to use any "spoiler text" as the title if it is provided. If both the title and spoiler text are provided for a post status then they will each be used for their respective roles. If no title is provided then the legacy behavior will persist. If you want to create a post with no title but spoiler text then explicitly set the title but set it to an empty string `""`.
 - [`POST /api/v1/statuses`](https://docs.joinmastodon.org/methods/statuses/#create)
+    - Does not support `polls` argument as Friendica does not have polls
     - Additionally to the static values `public`, `unlisted` and `private`, the `visibility` parameter can contain a numeric value with a group id.
+    - Additional field `quote_id` for the post that is being quote reshared
+    - Additional fields `friendica` for Friendica specific parameters:
+       - `title`: Explicitly sets the title for a post status, ignored if used on a comment status. For post statuses the legacy behavior is to use any "spoiler text" as the title if it is provided. If both the title and spoiler text are provided for a post status then they will each be used for their respective roles. If no title is provided then the legacy behavior will persist. If you want to create a post with no title but spoiler text then explicitly set the title but set it to an empty string `""`. 
 - [`GET /api/v1/statuses/:id`](https://docs.joinmastodon.org/methods/statuses/#get)
 - [`DELETE /api/v1/statuses/:id`](https://docs.joinmastodon.org/methods/statuses/#delete)
 - [`GET /api/v1/statuses/:id/context`](https://docs.joinmastodon.org/methods/statuses/#context)
+    - Additional support for paging using `min_id`, `max_id`, `since_id` parameters
+    - Additional support for previous/next Link Headers to support paging
+    - Additional flag `show_all` to allow including posts from blocked and ignored/muted users, defaults to `false`
 - [`GET /api/v1/statuses/:id/reblogged_by`](https://docs.joinmastodon.org/methods/statuses/#reblogged_by)
 - [`GET /api/v1/statuses/:id/favourited_by`](https://docs.joinmastodon.org/methods/statuses/#favourited_by)
 - [`POST /api/v1/statuses/:id/favourite`](https://docs.joinmastodon.org/methods/statuses/#favourite)
@@ -132,13 +241,24 @@ These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/en
 - [`GET /api/v1/tags/:id/unfollow`](https://docs.joinmastodon.org/methods/tags/#unfollow)
 - [`GET /api/v1/timelines/direct`](https://docs.joinmastodon.org/methods/timelines/)
 - [`GET /api/v1/timelines/home`](https://docs.joinmastodon.org/methods/timelines/)
+    - Additional field `with_muted` Pleroma extension to return notifications from muted users, defaults to `false`
+    - Additional field `exclude_replies` to only return post statuses not replies/comments, defaults to `false`
 - [`GET /api/v1/timelines/list/:id`](https://docs.joinmastodon.org/methods/timelines/)
+    - Additional field `with_muted` Pleroma extension to return notifications from muted users, defaults to `false`
+    - Additional field `exclude_replies` to only return post statuses not replies/comments, defaults to `false`
 - [`GET /api/v1/timelines/public`](https://docs.joinmastodon.org/methods/timelines/)
+    - Additional field `with_muted` Pleroma extension to return notifications from muted users, defaults to `false`
+    - Additional field `exclude_replies` to only return post statuses not replies/comments, defaults to `false`
 - [`GET /api/v1/timelines/tag/:hashtag`](https://docs.joinmastodon.org/methods/timelines/)
+    - Additional field `with_muted` Pleroma extension to return notifications from muted users, defaults to `false`
+    - Additional field `exclude_replies` to only return post statuses not replies/comments, defaults to `false`
+    - Does not support the `any[]`, `all[]`, or `none[]` query parameters
 - [`GET /api/v1/trends`](https://docs.joinmastodon.org/methods/instance/trends/)
 - [`GET /api/v1/trends/links`](https://github.com/mastodon/mastodon/pull/16917)
 - [`GET /api/v1/trends/statuses`](https://docs.joinmastodon.org/methods/trends/#statuses)
 - [`GET /api/v1/trends/tags`](https://docs.joinmastodon.org/methods/trends/#tags)
+    - Additional field `friendica_local` to return local trending tags instead of global tags, defaults to `false`
+- [`GET /api/v2/instance`](https://docs.joinmastodon.org/methods/instance/#v2)
 - [`GET /api/v2/search`](https://docs.joinmastodon.org/methods/search/)
 
 

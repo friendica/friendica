@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,10 +21,13 @@
 
 namespace Friendica\Module\Special;
 
-use Friendica\Core\Logger;
+use Friendica\App\Arguments;
+use Friendica\App\Request;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
-use Friendica\DI;
+use Psr\Log\LoggerInterface;
 
 /**
  * This special module displays HTTPException when they are thrown in modules.
@@ -33,27 +36,52 @@ use Friendica\DI;
  */
 class HTTPException
 {
+	/** @var L10n */
+	protected $l10n;
+	/** @var LoggerInterface */
+	protected $logger;
+	/** @var Arguments */
+	protected $args;
+	/** @var bool */
+	protected $isSiteAdmin;
+	/** @var array */
+	protected $server;
+	/** @var string */
+	protected $requestId;
+
+	public function __construct(L10n $l10n, LoggerInterface $logger, Arguments $args, UserSession $session, Request $request, array $server = [])
+	{
+		$this->logger      = $logger;
+		$this->l10n        = $l10n;
+		$this->args        = $args;
+		$this->isSiteAdmin = $session->isSiteAdmin();
+		$this->server      = $server;
+		$this->requestId   = $request->getRequestId();
+	}
+
 	/**
 	 * Generates the necessary template variables from the caught HTTPException.
 	 *
 	 * Fills in the blanks if title or descriptions aren't provided by the exception.
 	 *
 	 * @param \Friendica\Network\HTTPException $e
+	 *
 	 * @return array ['$title' => ..., '$description' => ...]
 	 */
-	private static function getVars(\Friendica\Network\HTTPException $e)
+	private function getVars(\Friendica\Network\HTTPException $e)
 	{
 		// Explanations are mostly taken from https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 		$vars = [
-			'$title' => $e->getDescription() ?: 'Error ' . $e->getCode(),
-			'$message' => $e->getMessage() ?: $e->getExplanation(),
-			'$back' => DI::l10n()->t('Go back'),
-			'$stack_trace' => DI::l10n()->t('Stack trace:'),
+			'$title'       => $e->getDescription() ?: 'Error ' . $e->getCode(),
+			'$message'     => $e->getMessage() ?: $e->getExplanation(),
+			'$back'        => $this->l10n->t('Go back'),
+			'$stack_trace' => $this->l10n->t('Stack trace:'),
+			'$request_id'  => $this->requestId,
 		];
 
-		if (DI::app()->isSiteAdmin()) {
-			$vars['$thrown'] = DI::l10n()->t('Exception thrown in %s:%d', $e->getFile(), $e->getLine());
-			$vars['$trace'] = $e->getTraceAsString();
+		if ($this->isSiteAdmin) {
+			$vars['$thrown'] = $this->l10n->t('Exception thrown in %s:%d', $e->getFile(), $e->getLine());
+			$vars['$trace']  = $e->getTraceAsString();
 		}
 
 		return $vars;
@@ -63,6 +91,7 @@ class HTTPException
 	 * Displays a bare message page with no theming at all.
 	 *
 	 * @param \Friendica\Network\HTTPException $e
+	 *
 	 * @throws \Exception
 	 */
 	public function rawContent(\Friendica\Network\HTTPException $e)
@@ -70,13 +99,14 @@ class HTTPException
 		$content = '';
 
 		if ($e->getCode() >= 400) {
-			$vars = self::getVars($e);
+			$vars = $this->getVars($e);
 			try {
-				$tpl = Renderer::getMarkupTemplate('http_status.tpl');
+				$tpl     = Renderer::getMarkupTemplate('http_status.tpl');
 				$content = Renderer::replaceMacros($tpl, $vars);
 			} catch (\Exception $e) {
+				$vars = array_map('htmlentities', $vars);
 				$content = "<h1>{$vars['$title']}</h1><p>{$vars['$message']}</p>";
-				if (DI::app()->isSiteAdmin()) {
+				if ($this->isSiteAdmin) {
 					$content .= "<p>{$vars['$thrown']}</p>";
 					$content .= "<pre>{$vars['$trace']}</pre>";
 				}
@@ -90,19 +120,28 @@ class HTTPException
 	 * Returns a content string that can be integrated in the current theme.
 	 *
 	 * @param \Friendica\Network\HTTPException $e
+	 *
 	 * @return string
 	 * @throws \Exception
 	 */
 	public function content(\Friendica\Network\HTTPException $e): string
 	{
-		header($_SERVER["SERVER_PROTOCOL"] . ' ' . $e->getCode() . ' ' . $e->getDescription());
+		header($this->server['SERVER_PROTOCOL'] ?? 'HTTP/1.0' . ' ' . $e->getCode() . ' ' . $e->getDescription());
 
 		if ($e->getCode() >= 400) {
-			Logger::debug('Exit with error', ['code' => $e->getCode(), 'description' => $e->getDescription(), 'query' => DI::args()->getQueryString(), 'callstack' => System::callstack(20), 'method' => DI::args()->getMethod(), 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			$this->logger->debug('Exit with error',
+				[
+					'code'        => $e->getCode(),
+					'description' => $e->getDescription(),
+					'query'       => $this->args->getQueryString(),
+					'callstack'   => System::callstack(20),
+					'method'      => $this->args->getMethod(),
+					'agent'       => $this->server['HTTP_USER_AGENT'] ?? ''
+				]);
 		}
 
 		$tpl = Renderer::getMarkupTemplate('exception.tpl');
 
-		return Renderer::replaceMacros($tpl, self::getVars($e));
+		return Renderer::replaceMacros($tpl, $this->getVars($e));
 	}
 }

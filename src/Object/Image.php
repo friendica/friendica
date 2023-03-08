@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -66,6 +66,7 @@ class Image
 		$this->type = $type;
 
 		if ($this->isImagick() && (empty($data) || $this->loadData($data))) {
+			$this->valid = !empty($data);
 			return;
 		} else {
 			// Failed to load with Imagick, fallback
@@ -158,12 +159,11 @@ class Image
 					$this->image->setCompressionQuality($quality);
 			}
 
-			// The 'width' and 'height' properties are only used by non-Imagick routines.
 			$this->width  = $this->image->getImageWidth();
 			$this->height = $this->image->getImageHeight();
-			$this->valid  = true;
+			$this->valid  = !empty($this->image);
 
-			return true;
+			return $this->valid;
 		}
 
 		$this->valid = false;
@@ -196,7 +196,7 @@ class Image
 	public function isValid(): bool
 	{
 		if ($this->isImagick()) {
-			return ($this->image !== false);
+			return !empty($this->image);
 		}
 		return $this->valid;
 	}
@@ -210,9 +210,6 @@ class Image
 			return false;
 		}
 
-		if ($this->isImagick()) {
-			return $this->image->getImageWidth();
-		}
 		return $this->width;
 	}
 
@@ -225,9 +222,6 @@ class Image
 			return false;
 		}
 
-		if ($this->isImagick()) {
-			return $this->image->getImageHeight();
-		}
 		return $this->height;
 	}
 
@@ -291,49 +285,13 @@ class Image
 		$width = $this->getWidth();
 		$height = $this->getHeight();
 
-		if ((! $width)|| (! $height)) {
+		$scale = Images::getScalingDimensions($width, $height, $max);
+		if ($scale) {
+			return $this->scale($scale['width'], $scale['height']);
+		} else {
 			return false;
 		}
 
-		if ($width > $max && $height > $max) {
-			// very tall image (greater than 16:9)
-			// constrain the width - let the height float.
-
-			if ((($height * 9) / 16) > $width) {
-				$dest_width = $max;
-				$dest_height = intval(($height * $max) / $width);
-			} elseif ($width > $height) {
-				// else constrain both dimensions
-				$dest_width = $max;
-				$dest_height = intval(($height * $max) / $width);
-			} else {
-				$dest_width = intval(($width * $max) / $height);
-				$dest_height = $max;
-			}
-		} else {
-			if ($width > $max) {
-				$dest_width = $max;
-				$dest_height = intval(($height * $max) / $width);
-			} else {
-				if ($height > $max) {
-					// very tall image (greater than 16:9)
-					// but width is OK - don't do anything
-
-					if ((($height * 9) / 16) > $width) {
-						$dest_width = $width;
-						$dest_height = $height;
-					} else {
-						$dest_width = intval(($width * $max) / $height);
-						$dest_height = $max;
-					}
-				} else {
-					$dest_width = $width;
-					$dest_height = $height;
-				}
-			}
-		}
-
-		return $this->scale($dest_width, $dest_height);
 	}
 
 	/**
@@ -353,6 +311,9 @@ class Image
 			do {
 				$this->image->rotateImage(new ImagickPixel(), -$degrees); // ImageMagick rotates in the opposite direction of imagerotate()
 			} while ($this->image->nextImage());
+
+			$this->width  = $this->image->getImageWidth();
+			$this->height = $this->image->getImageHeight();
 			return;
 		}
 
@@ -417,13 +378,13 @@ class Image
 			$orientation = $this->image->getImageOrientation();
 			switch ($orientation) {
 				case Imagick::ORIENTATION_BOTTOMRIGHT:
-					$this->image->rotateimage("#000", 180);
+					$this->rotate(180);
 					break;
 				case Imagick::ORIENTATION_RIGHTTOP:
-					$this->image->rotateimage("#000", 90);
+					$this->rotate(-90);
 					break;
 				case Imagick::ORIENTATION_LEFTBOTTOM:
-					$this->image->rotateimage("#000", -90);
+					$this->rotate(90);
 					break;
 			}
 
@@ -576,7 +537,6 @@ class Image
 				}
 			} while ($this->image->nextImage());
 
-			// These may not be necessary anymore
 			$this->width  = $this->image->getImageWidth();
 			$this->height = $this->image->getImageHeight();
 		} else {
@@ -659,7 +619,7 @@ class Image
 		if ($this->image) {
 			imagedestroy($this->image);
 		}
-		$this->image = $dest;
+		$this->image  = $dest;
 		$this->width  = imagesx($this->image);
 		$this->height = imagesy($this->image);
 
@@ -734,17 +694,21 @@ class Image
 	public function getBlurHash(): string
 	{
 		$image = New Image($this->asString());
-		if (empty($image)) {
+		if (empty($image) || !$this->isValid()) {
 			return '';
 		}
 
-		$width = $image->getWidth();
+		$width  = $image->getWidth();
 		$height = $image->getHeight();
 
 		if (max($width, $height) > 90) {
 			$image->scaleDown(90);
-			$width = $image->getWidth();
+			$width  = $image->getWidth();
 			$height = $image->getHeight();
+		}
+
+		if (empty($width) || empty($height)) {
+			return '';
 		}
 
 		$pixels = [];
@@ -754,7 +718,7 @@ class Image
 				if ($image->isImagick()) {
 					try {
 						$colors = $image->image->getImagePixelColor($x, $y)->getColor();
-					} catch (\Throwable $th) {
+					} catch (\Exception $exception) {
 						return '';
 					}
 					$row[] = [$colors['r'], $colors['g'], $colors['b']];
@@ -809,12 +773,14 @@ class Image
 
 		if ($this->isImagick()) {
 			$this->image->drawImage($draw);
+			$this->width  = $this->image->getImageWidth();
+			$this->height = $this->image->getImageHeight();
 		} else {
 			$this->width  = imagesx($this->image);
 			$this->height = imagesy($this->image);
 		}
 
-		$this->valid = true;
+		$this->valid = !empty($this->image);
 
 		$this->scaleUp(min($width, $height));
 	}

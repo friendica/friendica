@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -54,10 +54,12 @@ class Reports extends BaseApi
 		self::checkAllowedScope(self::SCOPE_WRITE);
 
 		$request = $this->getRequest([
-			'account_id' => '',    // ID of the account to report
-			'status_ids' => [],    // Array of Statuses to attach to the report, for context
-			'comment'    => '',    // Reason for the report (default max 1000 characters)
-			'forward'    => false, // If the account is remote, should the report be forwarded to the remote admin?
+			'account_id' => '',      // ID of the account to report
+			'status_ids' => [],      // Array of Statuses to attach to the report, for context
+			'comment'    => '',      // Reason for the report (default max 1000 characters)
+			'category'   => 'other', // Specify if the report is due to spam, violation of enumerated instance rules, or some other reason.
+			'rule_ids'   => [],      // For violation category reports, specify the ID of the exact rules broken.
+			'forward'    => false,   // If the account is remote, should the report be forwarded to the remote admin?
 		], $request);
 
 		$contact = Contact::getById($request['account_id'], ['id']);
@@ -65,7 +67,16 @@ class Reports extends BaseApi
 			throw new HTTPException\NotFoundException('Account ' . $request['account_id'] . ' not found');
 		}
 
-		$report = $this->reportFactory->createFromReportsRequest(self::getCurrentUserID(), $request['account_id'], $request['comment'], $request['forward'], $request['status_ids']);
+		$violation = '';
+		$rules     = System::getRules(true);
+
+		foreach ($request['rule_ids'] as $key) {
+			if (!empty($rules[$key])) {
+				$violation .= $rules[$key] . "\n";
+			}
+		}
+
+		$report = $this->reportFactory->createFromReportsRequest(Contact::getPublicIdByUserId(self::getCurrentUserID()), $request['account_id'], $request['comment'], $request['category'], trim($violation), $request['forward'], $request['status_ids'], self::getCurrentUserID());
 
 		$this->reportRepo->save($report);
 

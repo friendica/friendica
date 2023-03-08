@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -95,7 +95,7 @@ class Account extends BaseDataTransferObject
 		$this->id              = (string)$account['pid'];
 		$this->username        = $account['nick'];
 		$this->acct            =
-			strpos($account['url'], $baseUrl->get() . '/') === 0 ?
+			strpos($account['url'], $baseUrl . '/') === 0 ?
 				$account['nick'] :
 				$account['addr'];
 		$this->display_name    = $account['name'];
@@ -116,8 +116,8 @@ class Account extends BaseDataTransferObject
 		$this->following_count = $account['ap-following_count'] ?? $account['diaspora-interacting_count'] ?? 0;
 		$this->statuses_count  = $account['ap-statuses_count'] ?? $account['diaspora-post_count'] ?? 0;
 
-		$lastItem = $account['last-item'] ?: DBA::NULL_DATETIME;
-		$this->last_status_at  = $lastItem != DBA::NULL_DATETIME ? DateTimeFormat::utc($lastItem, 'Y-m-d') : null;
+		$lastItem = $account['last-item'] ? DateTimeFormat::utc($account['last-item'], 'Y-m-d') : DBA::NULL_DATETIME;
+		$this->last_status_at  = $lastItem != DBA::NULL_DATETIME ? DateTimeFormat::utc($lastItem, DateTimeFormat::JSON) : null;
 
 		// No custom emojis per account in Friendica
 		$this->emojis          = [];

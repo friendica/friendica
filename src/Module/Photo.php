@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -44,11 +44,12 @@ use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
+use Friendica\Worker\UpdateContact;
 
 /**
  * Photo Module
  */
-class Photo extends BaseModule
+class Photo extends BaseApi
 {
 	/**
 	 * Module initializer
@@ -136,7 +137,19 @@ class Photo extends BaseModule
 				$scale = intval(substr($photoid, -1, 1));
 				$photoid = substr($photoid, 0, -2);
 			}
-			$photo = MPhoto::getPhoto($photoid, $scale);
+
+			if (!empty($this->parameters['size'])) {
+				switch ($this->parameters['size']) {
+					case 'thumb_small':
+						$scale = 2;
+						break;
+					case 'scaled_full':
+						$scale = 1;
+						break;
+					}
+			}
+
+			$photo = MPhoto::getPhoto($photoid, $scale, self::getCurrentUserID());
 			if ($photo === false) {
 				throw new HTTPException\NotFoundException(DI::l10n()->t('The Photo with id %s is not available.', $photoid));
 			}
@@ -269,7 +282,7 @@ class Photo extends BaseModule
 				}
 
 				if (Network::isLocalLink($url) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $url, $matches)) {
-					return MPhoto::getPhoto($matches[1], $matches[2]);
+					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
 				return MPhoto::createPhotoForExternalResource($url, (int)DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $width, $height);
@@ -280,7 +293,7 @@ class Photo extends BaseModule
 				}
 
 				if (Network::isLocalLink($media['url']) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $media['url'], $matches)) {
-					return MPhoto::getPhoto($matches[1], $matches[2]);
+					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
 				return MPhoto::createPhotoForExternalResource($media['url'], (int)DI::userSession()->getLocalUserId(), $media['mimetype'], $media['blurhash'], $media['width'], $media['height']);
@@ -336,6 +349,12 @@ class Photo extends BaseModule
 				} elseif (!empty($contact['avatar'])) {
 					$url = $contact['avatar'];
 				}
+
+				// If it is a local link, we save resources by just redirecting to it.
+				if (!empty($url) && Network::isLocalLink($url)) {
+					System::externalRedirect($url);
+				}
+
 				$mimetext = '';
 				if (!empty($url)) {
 					$mime = ParseUrl::getContentType($url, HttpClientAccept::IMAGE);
@@ -351,8 +370,12 @@ class Photo extends BaseModule
 							Logger::debug('Got return code for avatar', ['return code' => $curlResult->getReturnCode(), 'cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
 						if ($update) {
-							Logger::info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
-							Worker::add(Worker::PRIORITY_LOW, 'UpdateContact', $id);
+							try {
+								UpdateContact::add(Worker::PRIORITY_LOW, $id);
+								Logger::info('Invalid file, contact update initiated', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
+							} catch (\InvalidArgumentException $e) {
+								Logger::notice($e->getMessage(), ['id' => $id, 'contact' => $contact]);
+							}
 						} else {
 							Logger::info('Invalid file', ['cid' => $id, 'url' => $contact['url'], 'avatar' => $url]);
 						}
@@ -376,6 +399,9 @@ class Photo extends BaseModule
 					} else {
 						$url = Contact::getDefaultAvatar($contact ?: [], Proxy::SIZE_SMALL);
 					}
+					if (Network::isLocalLink($url)) {
+						System::externalRedirect($url);
+					}
 				}
 				return MPhoto::createPhotoForExternalResource($url, 0, $mimetext, $contact['blurhash'] ?? null, $customsize, $customsize);
 			case 'header':
@@ -384,6 +410,15 @@ class Photo extends BaseModule
 				if (empty($contact)) {
 					return false;
 				}
+
+				if (Network::isLocalLink($contact['url'])) {
+					$header_uid = User::getIdForURL($contact['url']);
+					if (empty($header_uid)) {
+						throw new HTTPException\NotFoundException();
+					}
+					return self::getBannerForUser($header_uid);
+				}
+
 				If (($contact['uid'] != 0) && empty($contact['header'])) {
 					$contact = Contact::getByURL($contact['url'], false, $fields);
 				}
@@ -391,14 +426,13 @@ class Photo extends BaseModule
 					$url = $contact['header'];
 				} else {
 					$url = Contact::getDefaultHeader($contact);
+					if (Network::isLocalLink($url)) {
+						System::externalRedirect($url);
+					}
 				}
 				return MPhoto::createPhotoForExternalResource($url);
 			case 'banner':
-				$photo = MPhoto::selectFirst([], ['scale' => 3, 'uid' => $id, 'photo-type' => MPhoto::USER_BANNER]);
-				if (!empty($photo)) {
-					return $photo;
-				}
-				return MPhoto::createPhotoForExternalResource(DI::baseUrl() . '/images/friendica-banner.jpg');
+				return self::getBannerForUser($id);
 			case 'profile':
 			case 'custom':
 				$scale = 4;
@@ -428,6 +462,10 @@ class Photo extends BaseModule
 					$default = Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB);
 			}
 
+			if (Network::isLocalLink($default)) {
+				System::externalRedirect($default);
+			}
+
 			$parts = parse_url($default);
 			if (!empty($parts['scheme']) || !empty($parts['host'])) {
 				$photo = MPhoto::createPhotoForExternalResource($default);
@@ -436,5 +474,14 @@ class Photo extends BaseModule
 			}
 		}
 		return $photo;
+	}
+
+	private static function getBannerForUser(int $uid): array
+	{
+		$photo = MPhoto::selectFirst([], ['scale' => 3, 'uid' => $uid, 'photo-type' => MPhoto::USER_BANNER]);
+		if (!empty($photo)) {
+			return $photo;
+		}
+		return MPhoto::createPhotoForImageData(file_get_contents(DI::basePath() . '/images/friendica-banner.jpg'));
 	}
 }

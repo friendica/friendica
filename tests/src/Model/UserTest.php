@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -47,7 +47,7 @@ class UserTest extends MockedTest
 		/** @var Dice|MockInterface $diceMock */
 		$diceMock = $diceMock->addRules(include __DIR__ . '/../../../static/dependencies.config.php');
 		$diceMock->shouldReceive('create')->withArgs([Database::class])->andReturn($this->dbMock);
-		DI::init($diceMock);
+		DI::init($diceMock, true);
 
 		$this->parent = [
 			'uid'      => 1,

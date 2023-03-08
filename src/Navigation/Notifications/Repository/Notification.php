@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -282,7 +282,7 @@ class Notification extends BaseRepository
 			'parent-uri-id' => $itemUriId,
 		];
 
-		$this->logger->notice('deleteForItem', ['conditionTarget' => $conditionTarget, 'conditionParent' => $conditionParent]);
+		$this->logger->info('deleteForItem', ['conditionTarget' => $conditionTarget, 'conditionParent' => $conditionParent]);
 
 		return
 			$this->db->delete(self::$table_name, $conditionTarget)

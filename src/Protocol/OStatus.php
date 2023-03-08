@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -103,9 +103,9 @@ class OStatus
 */
 		if ($aliaslink != '') {
 			$contact = DBA::selectFirst('contact', [], [
-				"`uid` = ? AND `alias` = ? AND `network` != ? AND `rel` IN (?, ?)",
+				"`uid` = ? AND `alias` = ? AND `rel` IN (?, ?)",
 				$importer['uid'],
-				$aliaslink, Protocol::STATUSNET,
+				$aliaslink,
 				Contact::SHARING, Contact::FRIEND,
 			]);
 		}
@@ -116,11 +116,10 @@ class OStatus
 			}
 
 			$contact = DBA::selectFirst('contact', [], [
-				"`uid` = ? AND `nurl` IN (?, ?) AND `network` != ? AND `rel` IN (?, ?)",
+				"`uid` = ? AND `nurl` IN (?, ?) AND `rel` IN (?, ?)",
 				$importer['uid'],
 				Strings::normaliseLink($author['author-link']),
 				Strings::normaliseLink($aliaslink),
-				Protocol::STATUSNET,
 				Contact::SHARING,
 				Contact::FRIEND,
 			]);
@@ -128,10 +127,9 @@ class OStatus
 
 		if (!DBA::isResult($contact) && ($addr != '')) {
 			$contact = DBA::selectFirst('contact', [], [
-				"`uid` = ? AND `addr` = ? AND `network` != ? AND `rel` IN (?, ?)",
+				"`uid` = ? AND `addr` = ? AND `rel` IN (?, ?)",
 				$importer['uid'],
 				$addr,
-				Protocol::STATUSNET,
 				Contact::SHARING,
 				Contact::FRIEND,
 			]);
@@ -498,7 +496,7 @@ class OStatus
 				$orig_uri = $xpath->query('activity:object/atom:id', $entry)->item(0)->nodeValue;
 				Logger::notice('Favorite', ['uri' => $orig_uri, 'item' => $item]);
 
-				$item['verb'] = Activity::LIKE;
+				$item['body'] = $item['verb'] = Activity::LIKE;
 				$item['thr-parent'] = $orig_uri;
 				$item['gravity'] = Item::GRAVITY_ACTIVITY;
 				$item['object-type'] = Activity\ObjectType::NOTE;
@@ -979,44 +977,6 @@ class OStatus
 	}
 
 	/**
-	 * Cleans the body of a post if it contains picture links
-	 *
-	 * @param string $body The body
-	 * @param integer $uriId
-	 * @return string The cleaned body
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	public static function formatPicturePost(string $body, int $uriid): string
-	{
-		$siteinfo = BBCode::getAttachedData($body);
-
-		if (($siteinfo['type'] == 'photo') && (!empty($siteinfo['preview']) || !empty($siteinfo['image']))) {
-			if (isset($siteinfo['preview'])) {
-				$preview = $siteinfo['preview'];
-			} else {
-				$preview = $siteinfo['image'];
-			}
-
-			// Is it a remote picture? Then make a smaller preview here
-			$preview = Post\Link::getByLink($uriid, $preview, Proxy::SIZE_SMALL);
-
-			// Is it a local picture? Then make it smaller here
-			$preview = str_replace(['-0.jpg', '-0.png'], ['-2.jpg', '-2.png'], $preview);
-			$preview = str_replace(['-1.jpg', '-1.png'], ['-2.jpg', '-2.png'], $preview);
-
-			if (isset($siteinfo['url'])) {
-				$url = $siteinfo['url'];
-			} else {
-				$url = $siteinfo['image'];
-			}
-
-			$body = trim($siteinfo['text']) . ' [url]' . $url . "[/url]\n[img]" . $preview . '[/img]';
-		}
-
-		return $body;
-	}
-
-	/**
 	 * Adds the header elements to the XML document
 	 *
 	 * @param DOMDocument $doc       XML document
@@ -1142,51 +1102,7 @@ class OStatus
 	 */
 	public static function getAttachment(DOMDocument $doc, DOMElement $root, array $item)
 	{
-		$siteinfo = BBCode::getAttachedData($item['body']);
-
-		switch ($siteinfo['type']) {
-			case 'photo':
-				if (!empty($siteinfo['image'])) {
-					$imgdata = Images::getInfoFromURLCached($siteinfo['image']);
-					if ($imgdata) {
-						$attributes = [
-							'rel' => 'enclosure',
-							'href' => $siteinfo['image'],
-							'type' => $imgdata['mime'],
-							'length' => intval($imgdata['size']),
-						];
-						XML::addElement($doc, $root, 'link', '', $attributes);
-					}
-				}
-				break;
-
-			case 'video':
-				$attributes = [
-					'rel' => 'enclosure',
-					'href' => $siteinfo['url'],
-					'type' => 'text/html; charset=UTF-8',
-					'length' => '0',
-					'title' => ($siteinfo['title'] ?? '') ?: $siteinfo['url'],
-				];
-				XML::addElement($doc, $root, 'link', '', $attributes);
-				break;
-		}
-
-		if (!DI::config()->get('system', 'ostatus_not_attach_preview') && ($siteinfo['type'] != 'photo') && isset($siteinfo['image'])) {
-			$imgdata = Images::getInfoFromURLCached($siteinfo['image']);
-			if ($imgdata) {
-				$attributes = [
-					'rel' => 'enclosure',
-					'href' => $siteinfo['image'],
-					'type' => $imgdata['mime'],
-					'length' => intval($imgdata['size']),
-				];
-
-				XML::addElement($doc, $root, 'link', '', $attributes);
-			}
-		}
-
-		foreach (Post\Media::getByURIId($item['uri-id'], [Post\Media::DOCUMENT, Post\Media::TORRENT]) as $attachment) {
+		foreach (Post\Media::getByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::DOCUMENT, Post\Media::TORRENT]) as $attachment) {
 			$attributes = ['rel' => 'enclosure',
 				'href' => $attachment['url'],
 				'type' => $attachment['mimetype']];
@@ -1479,8 +1395,8 @@ class OStatus
 		}
 
 		$item['uri'] = $item['parent-uri'] = $item['thr-parent']
-				= 'tag:' . DI::baseUrl()->getHostname().
-				','.date('Y-m-d').':'.$action.':'.$owner['uid'].
+				= 'tag:' . DI::baseUrl()->getHost() .
+				  ','.date('Y-m-d').':'.$action.':'.$owner['uid'].
 				':person:'.$connect_id.':'.$item['created'];
 
 		$item['body'] = sprintf($message, $owner['nick'], $contact['nick']);
@@ -1553,7 +1469,7 @@ class OStatus
 
 			if ($owner['contact-type'] == Contact::TYPE_COMMUNITY) {
 				$contact = Contact::getByURL($item['author-link']) ?: $owner;
-				$contact['nickname'] = $contact['nickname'] ?? $contact['nick']; 
+				$contact['nickname'] = $contact['nickname'] ?? $contact['nick'];
 				$author = self::addAuthor($doc, $contact, false);
 				$entry->appendChild($author);
 			}
@@ -1599,7 +1515,7 @@ class OStatus
 		XML::addElement($doc, $entry, 'title', html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
 
 		$body = Post\Media::addAttachmentsToBody($item['uri-id'], DI::contentItem()->addSharedPost($item));
-		$body = self::formatPicturePost($body, $item['uri-id']);
+		$body = Post\Media::addHTMLLinkToBody($item['uri-id'], $body);
 
 		if (!empty($item['title'])) {
 			$body = '[b]' . $item['title'] . "[/b]\n\n" . $body;

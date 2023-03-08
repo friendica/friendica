@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,7 +21,7 @@
 
 namespace Friendica\Console;
 
-use Friendica\Core\Config\ValueObject\Cache;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Update;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
@@ -43,8 +43,8 @@ class DatabaseStructure extends \Asika\SimpleConsole\Console
 	/** @var Database */
 	private $dba;
 
-	/** @var Cache */
-	private $configCache;
+	/** @var IManageConfigValues */
+	private $config;
 
 	/** @var DbaDefinition */
 	private $dbaDefinition;
@@ -83,14 +83,14 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Database $dba, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition, BasePath $basePath, Cache $configCache, $argv = null)
+	public function __construct(Database $dba, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition, BasePath $basePath, IManageConfigValues $config, $argv = null)
 	{
 		parent::__construct($argv);
 
 		$this->dba = $dba;
 		$this->dbaDefinition = $dbaDefinition;
 		$this->viewDefinition = $viewDefinition;
-		$this->configCache = $configCache;
+		$this->config = $config;
 		$this->basePath = $basePath->getPath();
 	}
 
@@ -117,7 +117,7 @@ HELP;
 			throw new RuntimeException('Unable to connect to database');
 		}
 
-		$basePath = $this->configCache->get('system', 'basepath');
+		$basePath = $this->config->get('system', 'basepath');
 
 		switch ($this->getArgument(0)) {
 			case "dryrun":

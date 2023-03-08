@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,9 +21,9 @@
 
 namespace Friendica\Test\src\Content;
 
-use Friendica\Test\MockedTest;
+use Friendica\Test\DatabaseTest;
 
-class PageInfoTest extends MockedTest
+class PageInfoTest extends DatabaseTest
 {
 	public function dataGetRelevantUrlFromBody()
 	{

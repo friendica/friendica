@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -76,7 +76,7 @@ class Details extends BaseAdmin
 			require_once "view/theme/$theme/config.php";
 
 			if (function_exists('theme_admin')) {
-				$admin_form = '<iframe onload="resizeIframe(this);" src="' . DI::baseUrl()->get(true) . '/admin/themes/' . $theme . '/embed?mode=minimal" width="100%" height="600px" frameborder="no"></iframe>';
+				$admin_form = '<iframe onload="resizeIframe(this);" src="' . DI::baseUrl() . '/admin/themes/' . $theme . '/embed?mode=minimal" width="100%" height="600px" frameborder="no"></iframe>';
 			}
 		}
 
@@ -91,7 +91,6 @@ class Details extends BaseAdmin
 			'$page' => DI::l10n()->t('Themes'),
 			'$toggle' => DI::l10n()->t('Toggle'),
 			'$settings' => DI::l10n()->t('Settings'),
-			'$baseurl' => DI::baseUrl()->get(true),
 			'$addon' => $theme,
 			'$status' => $status,
 			'$action' => $action,

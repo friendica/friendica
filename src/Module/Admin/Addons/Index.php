@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -68,7 +68,6 @@ class Index extends BaseAdmin
 			'$page' => DI::l10n()->t('Addons'),
 			'$submit' => DI::l10n()->t('Save Settings'),
 			'$reload' => DI::l10n()->t('Reload active addons'),
-			'$baseurl' => DI::baseUrl()->get(true),
 			'$function' => 'addons',
 			'$addons' => $addons,
 			'$pcount' => count($addons),

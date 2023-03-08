@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -34,7 +34,6 @@ class ReallySimpleDiscovery extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
-		$xml = null;
 		$content = XML::fromArray([
 			'rsd' => [
 				'@attributes' => [
@@ -49,7 +48,7 @@ class ReallySimpleDiscovery extends BaseModule
 							'@attributes' => [
 								'name'      => 'Twitter',
 								'preferred' => 'true',
-								'apiLink'   => DI::baseUrl()->get(),
+								'apiLink'   => DI::baseUrl(),
 								'blogID'    => '',
 							],
 							'settings'    => [
@@ -67,7 +66,7 @@ class ReallySimpleDiscovery extends BaseModule
 					],
 				],
 			],
-		], $xml);
+		]);
 		System::httpExit($content, Response::TYPE_XML);
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,15 +23,14 @@ namespace Friendica\Module\Admin;
 
 use Friendica\App;
 use Friendica\Core\Addon;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Core\Config\Factory\Config;
-use Friendica\Model\Register;
 use Friendica\Module\BaseAdmin;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
@@ -80,7 +79,8 @@ class Summary extends BaseAdmin
 		// Check if github.com/friendica/stable/VERSION is higher then
 		// the local version of Friendica. Check is opt-in, source may be stable or develop branch
 		if (DI::config()->get('system', 'check_new_version_url', 'none') != 'none') {
-			$gitversion = DI::config()->get('system', 'git_friendica_version');
+			$gitversion = DI::keyValue()->get('git_friendica_version') ?? ''; 
+
 			if (version_compare(App::VERSION, $gitversion) < 0) {
 				$warningtext[] = DI::l10n()->t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', App::VERSION, $gitversion);
 			}
@@ -98,7 +98,11 @@ class Summary extends BaseAdmin
 			$warningtext[] = DI::l10n()->t('The last update failed. Please run "php bin/console.php dbstructure update" from the command line and have a look at the errors that might appear. (Some of the errors are possibly inside the logfile.)');
 		}
 
-		$last_worker_call = DI::config()->get('system', 'last_worker_execution', false);
+		if (empty(DI::config()->get('system', 'url'))) {
+			$warningtext[] = DI::l10n()->t('The system.url entry is missing. This is a low level setting and can lead to unexpected behavior. Please add a valid entry as soon as possible in the config file or per console command!');
+		}
+
+		$last_worker_call = DI::keyValue()->get('last_worker_execution');
 		if (!$last_worker_call) {
 			$warningtext[] = DI::l10n()->t('The worker was never executed. Please check your database structure!');
 		} elseif ((strtotime(DateTimeFormat::utcNow()) - strtotime($last_worker_call)) > 60 * 60) {
@@ -107,18 +111,18 @@ class Summary extends BaseAdmin
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl()->get() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
 		}
 
 		// Check server vitality
 		if (!self::checkSelfHostMeta()) {
-			$well_known = DI::baseUrl()->get() . Probe::HOST_META;
+			$well_known = DI::baseUrl() . Probe::HOST_META;
 			$warningtext[] = DI::l10n()->t('<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
-				$well_known, $well_known, DI::baseUrl()->get() . '/help/Install');
+				$well_known, $well_known, DI::baseUrl() . '/help/Install');
 		}
 
 		// Check logfile permission
@@ -154,7 +158,7 @@ class Summary extends BaseAdmin
 		}
 
 		// check legacy basepath settings
-		$configLoader = (new Config())->createConfigFileLoader($a->getBasePath(), $_SERVER);
+		$configLoader = (new Config())->createConfigFileManager($a->getBasePath(), $_SERVER);
 		$configCache = new Cache();
 		$configLoader->setupCache($configCache);
 		$confBasepath = $configCache->get('system', 'basepath');
@@ -229,7 +233,7 @@ class Summary extends BaseAdmin
 	private static function checkSelfHostMeta()
 	{
 		// Fetch the host-meta to check if this really is a vital server
-		return DI::httpClient()->get(DI::baseUrl()->get() . Probe::HOST_META, HttpClientAccept::XRD_XML)->isSuccess();
+		return DI::httpClient()->get(DI::baseUrl() . Probe::HOST_META, HttpClientAccept::XRD_XML)->isSuccess();
 	}
 
 }

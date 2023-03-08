@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -49,7 +49,7 @@ $login_bg_color   = '';
 $modified         = time();
 
 if (DI::mode()->has(\Friendica\App\Mode::MAINTENANCEDISABLED)) {
-	DI::config()->load('frio');
+	DI::config()->reload();
 
 	// Default to hard-coded values for empty settings
 	$scheme           = DI::config()->get('frio', 'scheme', DI::config()->get('frio', 'schema'));

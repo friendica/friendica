@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,12 +39,10 @@ class OpenSearch extends BaseModule
 	 */
 	protected function rawContent(array $request = [])
 	{
-		$hostname = DI::baseUrl()->getHostname();
-		$baseUrl  = DI::baseUrl()->get();
+		$hostname = DI::baseUrl()->getHost();
+		$baseUrl  = DI::baseUrl();
 
 		/** @var DOMDocument $xml */
-		$xml = null;
-
 		XML::fromArray([
 			'OpenSearchDescription' => [
 				'@attributes' => [

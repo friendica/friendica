@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -45,7 +45,7 @@ class PullDirectory
 			return;
 		}
 
-		$now = (int)DI::config()->get('system', 'last-directory-sync', 0);
+		$now = (int)(DI::keyValue()->get('last-directory-sync') ?? 0);
 
 		Logger::info('Synchronization started.', ['now' => $now, 'directory' => $directory]);
 
@@ -64,7 +64,7 @@ class PullDirectory
 		$result = Contact::addByUrls($contacts['results']);
 
 		$now = $contacts['now'] ?? 0;
-		DI::config()->set('system', 'last-directory-sync', $now);
+		DI::keyValue()->set('last-directory-sync', $now);
 
 		Logger::info('Synchronization ended', ['now' => $now, 'count' => $result['count'], 'added' => $result['added'], 'updated' => $result['updated'], 'unchanged' => $result['unchanged'], 'directory' => $directory]);
 	}

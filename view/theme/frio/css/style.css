@@ -76,6 +76,13 @@ blockquote {
 .fakelink {
 	cursor: pointer;
 }
+.btn.btn-link.fakelink {
+	box-shadow: none;
+	padding: 0 2px;
+	vertical-align: baseline;
+	outline-offset: 0;
+}
+
 .hidden {
 	display: none !important;
 }
@@ -359,6 +366,10 @@ btn-eventnav:hover {
 }
 aside .badge {
 	opacity: 0.7;
+}
+.forum-widget-entry .badge,
+.sidebar-group-li .badge {
+	margin-top: 6px;
 }
 
 /* disabled elements */
@@ -800,13 +811,15 @@ nav.navbar .nav > li > button:focus {
 }
 #offcanvasUsermenu a {
 	display: block;
+	margin: -10px -15px;
+	padding: 10px 15px;
 }
 #offcanvasUsermenu li.nav-sitename {
 	font-weight: bold;
 }
 #topbar-first .dropdown.account li#nav-sitename {
-	padding-left: 15px;
-	padding-right: 15px;
+	padding-left: 20px;
+	padding-right: 20px;
 	font-weight: bold;
 	word-break: break-word;
 }
@@ -815,6 +828,10 @@ nav.navbar .nav > li > button:focus {
 	background-color: $nav_bg;
 }
 /* Nav Search */
+.menu-popup {
+	max-height: calc(100vh - 55px);
+	overflow-y: auto;
+}
 #topbar-first #search-box .navbar-form {
 	margin: 0px;
 	padding: 12px 12px;
@@ -956,13 +973,15 @@ ul li .intro-wrapper button.intro-action-link {
 	background-color: $nav_bg;
 	border: none;
 }
+.dropdown-menu .divider {
+	margin: 5px 0;
+}
 .nav-pills .dropdown-menu li.divider,
 .nav-tabs .dropdown-menu li.divider,
 .account .dropdown-menu li.divider,
 .contact-photo-wrapper .dropdown-menu li.divider {
 	background-color: $menu_background_hover_color;
 	border-bottom: none;
-	margin: 9px 1px !important;
 }
 .nav-pills .dropdown-menu li > a,
 .nav-tabs .dropdown-menu li > a,
@@ -980,8 +999,6 @@ ul li .intro-wrapper button.intro-action-link {
 .contact-photo-wrapper .dropdown-menu li .btn-link {
 	color: $nav_icon_color;
 	font-weight: 400;
-	font-size: 13px;
-	padding: 4px 15px;
 	width: 100%;
 	text-align: left;
 }
@@ -1037,7 +1054,6 @@ aside .widget,
 	position: relative;
 	margin-bottom: 20px;
 	padding: 10px;
-	font-size: 13px;
 	overflow: auto;
 }
 aside .widget h3,
@@ -1045,7 +1061,7 @@ aside .widget h3,
 	font-weight: bold;
 	font-size: 16px;
 	margin: 0;
-	padding-bottom: 20px;
+	padding-bottom: 10px;
 }
 
 aside .widget ul,
@@ -1058,10 +1074,11 @@ aside .widget ul,
 	list-style: none;
 }
 
+aside .widget li .label {
+	float: left;
+}
 aside .widget li,
 .nav-container .widget li {
-	padding-top: 2px;
-	padding-bottom: 2px;
 	padding-left: 20px;
 	padding-right: 10px;
 }
@@ -1073,6 +1090,12 @@ aside .widget li.selected,
 	background-color: rgba(247, 247, 247, $contentbg_transp);
 	border-left: 3px solid $link_color !important;
 	padding-left: 17px;
+}
+.side-link-link,
+aside .widget li a {
+	display: block;
+	padding-top: 6px;
+	padding-bottom: 6px;
 }
 aside .widget li a,
 aside .widget li a:hover {
@@ -1293,7 +1316,11 @@ div#sidebar-group-list {
 }
 
 .group-edit-tool {
+	padding-top: 0;
 	color: $font_color_darker;
+}
+.sidebar-widget-header .group-edit-tool {
+	margin-top: -5px;
 }
 
 .faded-icon {
@@ -1309,9 +1336,12 @@ div#sidebar-group-list {
 	margin-left: 20px;
 }
 
-aside #group-sidebar .sidebar-group-li:hover .group-edit-tool.faded-icon,
-aside #saved-search-list .saved-search-li:hover .savedsearchdrop.faded-icon,
-aside .widget:hover .widget-action.faded-icon {
+aside .widget-action {
+	padding: 5px 10px;
+}
+aside #group-sidebar .sidebar-group-li .group-edit-tool.faded-icon:hover,
+aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
+aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
@@ -1321,7 +1351,7 @@ aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
 }
 aside #group-sidebar li .group-checkbox {
-	margin: 0;
+	margin: 6px 0 0;
 }
 aside #group-sidebar li .group-edit-tool {
 	padding-right: 10px;
@@ -1717,13 +1747,13 @@ aside .panel-body {
 }
 
 /* wall items action dropdown menu */
-.media [role="heading"] {
+.media .contact-info {
 	position: relative;
 }
 
 /* Workaround for Firefox where the post heading covers the avatar, preventing hovercard interaction,
  48px is the width of the avatar image and should be adjusted accordingly if it ever changes. */
-.media .dropdown.pull-left + [role="heading"] {
+.media .dropdown.pull-left + .contact-info {
 	margin-left: 48px;
 }
 
@@ -1740,6 +1770,10 @@ aside .panel-body {
 	border-top: none;
 	color: inherit;
 }
+.preferences .plink {
+	margin-left: 5px;
+}
+
 blockquote.shared_content {
 	padding: 0px;
 	margin-inline-start: 0px;
@@ -1751,9 +1785,6 @@ blockquote.shared_content {
 }
 
 /* wall items contact info */
-.media .media-body {
-	font-size: 13px;
-}
 .media .media-body h4.media-heading {
 	font-size: 14px;
 	font-weight: 500;
@@ -1919,6 +1950,9 @@ code > .hl-main {
 	margin: 10px 0;
 	font-size: 13px;
 }
+.wall-item-tags:empty {
+	margin: 0;
+}
 
 .wall-item-tags a {
 	color: $font_color_darker;
@@ -1942,14 +1976,16 @@ code > .hl-main {
 	margin: 0;
 	justify-content: space-between;
 }
+.wall-item-actions .btn,
 .wall-item-actions a,
 .wall-item-actions button {
-	font-size: 13px;
 	color: $font_color_darker;
+	background-color: transparent;
 }
 .wall-item-actions .active {
 	font-weight: bold;
 	color: $link_color;
+	box-shadow: none;
 }
 .wall-item-actions-left {
 	display: table-cell;
@@ -1958,22 +1994,54 @@ code > .hl-main {
 .wall-item-actions-right {
 	display: flex;
 }
+.wall-item-actions-items {
+	flex-grow: 1;
+}
+.wall-item-actions-row {
+	display: flex;
+}
+.wall-item-actions-row .btn {
+	width: 100%;
+}
+.wall-item-actions-row > * {
+	flex: 1 1 0;
+}
 .wall-item-actions .checkbox {
-	margin: 0;
-	margin-left: 20px;
+	margin: 0 0 0 15px;
+}
+@media screen and (max-width: 767px) {
+	.wall-item-actions .btn,
+	.wall-item-actions a,
+	.wall-item-actions button {
+		padding-right: 0;
+		padding-left: 0;
+	}
+	.wall-item-actions .checkbox {
+		margin-top: 8px;
+		flex: 0 1 auto;
+	}
+	.wall-item-actions .like-rotator {
+		position: absolute;
+		top: 8px;
+		right: 0;
+	}
 }
 .wall-item-actions button:hover {
-	color: $font_color_darker;
 	text-decoration: underline;
 }
 .wall-item-actions .separator {
 	margin: 0 0.3em;
 }
-
+.wall-item-responses {
+	margin-top: .3em;
+}
 .wall-item-responses > div > p {
 	margin: 0;
 }
-
+.btn-group-event {
+	display: flex;
+	flex-basis: auto;
+}
 /* wall item hover effects */
 
 @media (min-width: 768px) {
@@ -2058,12 +2126,12 @@ wall-item-comment-wrapper.well hr {
 	margin-top: 0;
 }
 .hide-comments-outer {
+	display: block;
 	background-color: rgba(0, 0, 0, 0.03);
-	padding: 0.5em;
-	border-radius: 0.5em 0.5em 0 0;
-}
-.hide-comments-total {
-	cursor: pointer;
+	padding: 0.3em 10px;
+	width: 100%;
+	border: none;
+	text-align: left;
 }
 
 /*
@@ -2163,6 +2231,10 @@ the section element. Only after we have
 moved it to the nav through js */
 	display: none !important;
 }
+.tabbar-wrapper__link {
+	padding-right: 10px;
+	padding-left: 10px;
+}
 #tabmenu,
 .tabbar-wrapper,
 .tabbar,
@@ -2179,7 +2251,6 @@ ul.tabs {
 	list-style: none;
 	height: 100%;
 	padding: 0;
-	padding-top: 10px;
 	margin: 0;
 }
 ul.tabs li {
@@ -2192,8 +2263,9 @@ ul.tabs li {
 	transition: all 0.15s ease;
 }
 ul.tabs li a {
-	margin-left: 10px;
-	margin-right: 10px;
+	display: block;
+	padding-top: 11px;
+	padding-bottom: 11px;
 }
 ul.tabs li:hover,
 ul.tabs li.active {
@@ -2203,7 +2275,7 @@ ul.tabs li.active {
 	padding-top: 0;
 }
 #dropdownMenuTools-xs {
-	padding: 9px 10px;
+	padding: 9px 15px;
 }
 ul.tabbar ul.tabs-extended:hover li.dropdown {
 	border-bottom: 0;
@@ -2225,6 +2297,12 @@ ul.dropdown-menu li:hover {
 	box-sizing: border-box;
 }
 /* Dropdown Menu */
+.dropdown-menu li .btn-link,
+.dropdown-menu li a,
+.tabs .dropdown-menu li a {
+	padding: 6px 20px;
+	font-size: 14px;
+}
 .dropdown-menu li a,
 .dropdown-menu li .btn-link {
 	color: $font_color_darker;
@@ -2482,20 +2560,18 @@ ul.viewcontact_wrapper > li {
 }
 .contact-wrapper .contact-actions {
 	display: flex;
+	position: relative;
+	margin: -8px -8px 0 0;
 }
 .contact-wrapper .contact-action-link,
 .contact-wrapper .contact-action-link:hover,
 .textcomplete-item .contact-wrapper .contact-action-link {
-	padding: 0 5px;
 	color: $font_color_darker;
 	border: 0;
 }
 .contact-wrapper .contact-action-link {
-	opacity: 0.1;
-	transition: all 0.25s ease-in-out;
-}
-ul li:hover .contact-wrapper .contact-action-link {
-	opacity: 0.8;
+	background-color: transparent;
+	opacity: 0.3;
 	transition: all 0.25s ease-in-out;
 }
 ul li:hover .contact-wrapper .contact-action-link:hover {
@@ -2901,6 +2977,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .section-subtitle-wrapper {
 	padding: 1px 10px;
 }
+.accordion-toggle {
+	width: 100%;
+    text-align: left;
+}
 details.profile-jot-net[open] summary:before,
 .panel .section-subtitle-wrapper .accordion-toggle:before {
 	font-family: ForkAwesome;
@@ -2964,6 +3044,12 @@ details.profile-jot-net[open] summary:before {
 	font-size: 18px;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+.section-subtitle-wrapper > h2 .accordion-toggle {
+	margin-top: -10px;
+	margin-bottom: -10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .section-subtitle-wrapper > h3 {

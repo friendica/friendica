@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -35,6 +35,9 @@ class Counts
 	/** @var int */
 	protected $favourites;
 
+	/** @var int */
+	protected $dislikes;
+
 	/**
 	 * Creates a status count object
 	 *
@@ -43,14 +46,16 @@ class Counts
 	 * @param int $favourites
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(int $replies, int $reblogs, int $favourites)
+	public function __construct(int $replies, int $reblogs, int $favourites, int $dislikes)
 	{
-		$this->replies = $replies;
-		$this->reblogs = $reblogs;
+		$this->replies    = $replies;
+		$this->reblogs    = $reblogs;
 		$this->favourites = $favourites;
+		$this->dislikes   = $dislikes;
 	}
 
-	public function __get($name) {
+	public function __get($name)
+	{
 		return $this->$name;
 	}
 }

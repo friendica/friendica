@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Test\src\Core\Logger;
 
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Test\MockedTest;
 use Friendica\Core\Logger\Util\Introspection;
 use Mockery\MockInterface;
@@ -41,6 +42,10 @@ abstract class AbstractLoggerTest extends MockedTest
 	 * @var Introspection|MockInterface
 	 */
 	protected $introspection;
+	/**
+	 * @var IManageConfigValues|MockInterface
+	 */
+	protected $config;
 
 	/**
 	 * Returns the content of the current logger instance
@@ -68,6 +73,8 @@ abstract class AbstractLoggerTest extends MockedTest
 			'line'     => self::LINE,
 			'function' => self::FUNC
 		]);
+
+		$this->config = \Mockery::mock(IManageConfigValues::class);
 	}
 
 	public function assertLogline($string)

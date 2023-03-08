@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -51,7 +51,7 @@ class Expire
 			foreach (Hook::getByName('expire') as $hook) {
 				if ($hook[1] == $hook_function) {
 					Logger::info('Calling expire hook', ['hook' => $hook[1]]);
-					Hook::callSingle($a, 'expire', $hook, $data);
+					Hook::callSingle('expire', $hook, $data);
 				}
 			}
 			return;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -84,7 +84,7 @@ class Accounts extends BaseApi
 		$request = $this->getRequest([
 			'max_id'   => 0,  // Return results older than this id
 			'since_id' => 0,  // Return results newer than this id
-			'min_id'   => 0,  // Return results immediately newer than id			
+			'min_id'   => 0,  // Return results immediately newer than id
 			'limit'    => 40, // Maximum number of results. Defaults to 40. Max 40. Set to 0 in order to get all accounts without pagination.
 		], $request);
 
@@ -117,7 +117,7 @@ class Accounts extends BaseApi
 			self::setBoundaries($member['contact-id']);
 			try {
 				$accounts[] = DI::mstdnAccount()->createFromContactId($member['contact-id'], $uid);
-			} catch (\Throwable $th) {
+			} catch (\Exception $exception) {
 			}
 		}
 		DBA::close($members);

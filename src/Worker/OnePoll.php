@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,6 +38,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 class OnePoll
@@ -154,6 +155,11 @@ class OnePoll
 		// Are we allowed to import from this person?
 		if ($contact['rel'] == Contact::FOLLOWER || $contact['blocked']) {
 			Logger::notice('Contact is blocked or only a follower');
+			return false;
+		}
+
+		if (!Network::isValidHttpUrl($contact['poll'])) {
+			Logger::warning('Poll address is not valid', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url'], 'poll' => $contact['poll']]);
 			return false;
 		}
 

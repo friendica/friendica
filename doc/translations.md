@@ -24,6 +24,16 @@ For addons, we add support for a language when if we already support the languag
 
 ## Add new translation strings
 
+### Supported gettext version
+
+We currently support the gettext version 0.19.8.1 and actively check new translation strings with this version.
+
+If you don't use this version, it's possible that our checks fail (f.e. because of tiny differences at linebreaks).
+In case you do have a Docker environment, you can easily update the translations with the following command:
+```shell
+docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh
+```
+
 ### Core
 
 Once you have added new translation strings in your code changes, please run `bin/run_xgettext.sh` from the base Friendica directory and commit the updated `view/lang/C/messages.po` to your branch.

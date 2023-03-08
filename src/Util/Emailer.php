@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -65,7 +65,7 @@ class Emailer
 
 		$this->siteEmailAddress = $this->config->get('config', 'sender_email');
 		if (empty($this->siteEmailAddress)) {
-			$hostname = $this->baseUrl->getHostname();
+			$hostname = $this->baseUrl->getHost();
 			if (strpos($hostname, ':')) {
 				$hostname = substr($hostname, 0, strpos($hostname, ':'));
 			}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -29,6 +29,7 @@ use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
+use Friendica\Protocol\Diaspora;
 
 /**
  * @see https://docs.joinmastodon.org/methods/statuses/
@@ -49,12 +50,14 @@ class Reblog extends BaseApi
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		if (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::TWITTER])) {
+		if ($item['network'] == Protocol::DIASPORA) {
+			Diaspora::performReshare($this->parameters['id'], $uid);
+		} elseif (!in_array($item['network'], [Protocol::DFRN, Protocol::ACTIVITYPUB, Protocol::TWITTER])) {
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t("Posts from %s can't be shared", ContactSelector::networkToName($item['network'])));
+		} else {
+			Item::performActivity($item['id'], 'announce', $uid);
 		}
 
-		Item::performActivity($item['id'], 'announce', $uid);
-
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid)->toArray());
+		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes())->toArray());
 	}
 }

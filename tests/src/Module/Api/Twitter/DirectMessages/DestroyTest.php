@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,7 +38,7 @@ class DestroyTest extends ApiTest
 	{
 		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
 		(new Destroy(DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class DestroyTest extends ApiTest
 	public function testApiDirectMessagesDestroyWithVerbose()
 	{
 		$response = (new Destroy(DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'friendica_verbose' => true,
 			]);
 
@@ -85,7 +85,7 @@ class DestroyTest extends ApiTest
 	{
 		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
 		(new Destroy(DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'id' => 1
 			]);
 	}
@@ -98,7 +98,7 @@ class DestroyTest extends ApiTest
 	public function testApiDirectMessagesDestroyWithIdAndVerbose()
 	{
 		$response = (new Destroy(DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'id'                  => 1,
 				'friendica_parenturi' => 'parent_uri',
 				'friendica_verbose'   => true,
@@ -122,7 +122,7 @@ class DestroyTest extends ApiTest
 		$id  = $ids[0]['id'];
 
 		$response = (new Destroy(DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'id'                => $id,
 				'friendica_verbose' => true,
 			]);

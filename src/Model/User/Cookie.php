@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -59,7 +59,7 @@ class Cookie
 	 */
 	public function __construct(App\Request $request, IManageConfigValues $config, App\BaseURL $baseURL, array $COOKIE = [])
 	{
-		$this->sslEnabled     = $baseURL->getSSLPolicy() === App\BaseURL::SSL_POLICY_FULL;
+		$this->sslEnabled     = $baseURL->getScheme() === 'https';
 		$this->sitePrivateKey = $config->get('system', 'site_prvkey');
 
 		$authCookieDays = $config->get('system', 'auth_cookie_lifetime',

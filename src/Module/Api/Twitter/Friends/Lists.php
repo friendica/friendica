@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -52,25 +52,25 @@ class Lists extends ContactEndpoint
 			$params = ['order' => ['pid' => true], 'limit' => $count];
 
 			$condition = ['uid' => $uid, 'self' => false, 'pending' => false, 'rel' => [Contact::SHARING, Contact::FRIEND]];
-	
+
 			$total_count = (int)DBA::count('contact', $condition);
 
 			if (!empty($max_id)) {
 				$condition = DBA::mergeConditions($condition, ["`pid` < ?", $max_id]);
 			}
-	
+
 			if (!empty($since_id)) {
 				$condition = DBA::mergeConditions($condition, ["`pid` > ?", $since_id]);
 			}
-	
+
 			if (!empty($min_id)) {
 				$condition = DBA::mergeConditions($condition, ["`pid` > ?", $min_id]);
-	
+
 				$params['order'] = ['pid'];
 			}
-	
+
 			$ids = [];
-	
+
 			foreach (Contact::selectAccountToArray(['pid'], $condition, $params) as $follower) {
 				self::setBoundaries($follower['pid']);
 				$ids[] = $follower['pid'];
@@ -112,7 +112,7 @@ class Lists extends ContactEndpoint
 
 		$return = self::list($ids, $total_count, $uid, $cursor, $count, $skip_status, $include_user_entities);
 
-		$this->response->setHeader(self::getLinkHeader());	
+		$this->response->setHeader(self::getLinkHeader());
 
 		$this->response->exit('lists', ['lists' => $return]);
 	}

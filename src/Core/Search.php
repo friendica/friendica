@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -233,7 +233,24 @@ class Search
 			if ($curlResult->isSuccess()) {
 				$searchResult = json_decode($curlResult->getBody(), true);
 				if (!empty($searchResult['profiles'])) {
-					$return = $searchResult['profiles'];
+					// Converting Directory Search results into contact-looking records
+					$return = array_map(function ($result) {
+						static $contactType = [
+							'People'       => Contact::TYPE_PERSON,
+							'Forum'        => Contact::TYPE_COMMUNITY,
+							'Organization' => Contact::TYPE_ORGANISATION,
+							'News'         => Contact::TYPE_NEWS,
+						];
+
+						return [
+							'name'         => $result['name'],
+							'addr'         => $result['addr'],
+							'url'          => $result['profile_url'],
+							'network'      => Protocol::DFRN,
+							'micro'        => $result['photo'],
+							'contact-type' => $contactType[$result['account_type']],
+						];
+					}, $searchResult['profiles']);
 				}
 			}
 		}

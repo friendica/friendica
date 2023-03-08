@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,7 +32,7 @@ class DBUpdate
 	public static function execute()
 	{
 		// Just in case the last update wasn't failed
-		if (DI::config()->get('system', 'update', Update::SUCCESS, true) != Update::FAILED) {
+		if (DI::config()->get('system', 'update', Update::SUCCESS) != Update::FAILED) {
 			Update::run(DI::app()->getBasePath());
 		}
 	}

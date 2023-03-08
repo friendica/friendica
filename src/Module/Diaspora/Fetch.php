@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -61,7 +61,7 @@ class Fetch extends BaseModule
 				}
 				$host = $parts["scheme"] . "://" . $parts["host"];
 
-				if (Strings::normaliseLink($host) != Strings::normaliseLink(DI::baseUrl()->get())) {
+				if (Strings::normaliseLink($host) != Strings::normaliseLink(DI::baseUrl())) {
 					$location = $host . "/fetch/" . DI::args()->getArgv()[1] . "/" . urlencode($guid);
 					System::externalRedirect($location, 301);
 				}

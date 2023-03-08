@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -71,24 +71,24 @@ class Statuses extends BaseApi
 		}
 
 		// The imput is defined as text. So we can use Markdown for some enhancements
-		$item = ['body' => Markdown::toBBCode($request['status']), 'app' => $this->getApp()];
+		$item = ['body' => Markdown::toBBCode($request['status']), 'app' => $this->getApp(), 'title' => ''];
 
 		if (!empty($request['language'])) {
 			$item['language'] = json_encode([$request['language'] => 1]);
 		}
 
 		if (!empty($request['spoiler_text'])) {
-			if ($request['in_reply_to_id'] != $post['uri-id']) {
-				$item['body'] = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $request['spoiler_text'] . "[/abstract]\n" . $item['body'];
-			} else {
+			if (($request['in_reply_to_id'] == $post['uri-id']) && DI::pConfig()->get($uid, 'system', 'api_spoiler_title', true)) {
 				$item['title'] = $request['spoiler_text'];
+			} else {
+				$item['body'] = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $request['spoiler_text'] . "[/abstract]\n" . $item['body'];
 			}
 		}
 
 		Item::update($item, ['id' => $post['id']]);
 		Item::updateDisplayCache($post['uri-id']);
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid));
+		System::jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid, self::appSupportsQuotes()));
 	}
 
 	protected function post(array $request = [])
@@ -101,11 +101,13 @@ class Statuses extends BaseApi
 			'media_ids'      => [],    // Array of Attachment ids to be attached as media. If provided, status becomes optional, and poll cannot be used.
 			'poll'           => [],    // Poll data. If provided, media_ids cannot be used, and poll[expires_in] must be provided.
 			'in_reply_to_id' => 0,     // ID of the status being replied to, if status is a reply
+			'quote_id'       => 0,     // ID of the message to quote
 			'sensitive'      => false, // Mark status and attached media as sensitive?
 			'spoiler_text'   => '',    // Text to be shown as a warning or subject before the actual content. Statuses are generally collapsed behind this field.
 			'visibility'     => '',    // Visibility of the posted status. One of: "public", "unlisted", "private" or "direct".
 			'scheduled_at'   => '',    // ISO 8601 Datetime at which to schedule a status. Providing this paramter will cause ScheduledStatus to be returned instead of Status. Must be at least 5 minutes in the future.
 			'language'       => '',    // ISO 639 language code for this status.
+			'friendica'      => [],	   // Friendica extensions to the standard Mastodon API spec
 		], $request);
 
 		$owner = User::getOwnerDataById($uid);
@@ -119,6 +121,7 @@ class Statuses extends BaseApi
 		$item['verb']       = Activity::POST;
 		$item['contact-id'] = $owner['id'];
 		$item['author-id']  = $item['owner-id'] = Contact::getPublicIdByUserId($uid);
+		$item['title']      = '';
 		$item['body']       = $body;
 		$item['app']        = $this->getApp();
 
@@ -152,6 +155,7 @@ class Statuses extends BaseApi
 				$item['private'] = Item::PRIVATE;
 				break;
 			case 'direct':
+				$item['private'] = Item::PRIVATE;
 				// The permissions are assigned in "expandTags"
 				break;
 			default:
@@ -182,18 +186,37 @@ class Statuses extends BaseApi
 		}
 
 		if ($request['in_reply_to_id']) {
-			$parent = Post::selectFirst(['uri'], ['uri-id' => $request['in_reply_to_id'], 'uid' => [0, $uid]]);
+			$parent = Post::selectFirst(['uri', 'private'], ['uri-id' => $request['in_reply_to_id'], 'uid' => [0, $uid]]);
 
 			$item['thr-parent']  = $parent['uri'];
 			$item['gravity']     = Item::GRAVITY_COMMENT;
 			$item['object-type'] = Activity\ObjectType::COMMENT;
-			$item['body']        = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $request['spoiler_text'] . "[/abstract]\n" . $item['body'];
+
+			if (in_array($parent['private'], [Item::UNLISTED, Item::PUBLIC]) && ($item['private'] == Item::PRIVATE)) {
+				throw new HTTPException\NotImplementedException('Private replies for public posts are not implemented.');
+			}
 		} else {
 			self::checkThrottleLimit();
 
 			$item['gravity']     = Item::GRAVITY_PARENT;
 			$item['object-type'] = Activity\ObjectType::NOTE;
-			$item['title']       = $request['spoiler_text'];
+		}
+
+		if ($request['quote_id']) {
+			if (!Post::exists(['uri-id' => $request['quote_id'], 'uid' => [0, $uid]])) {
+				throw new HTTPException\NotFoundException('Item with URI ID ' . $request['quote_id'] . ' not found for user ' . $uid . '.');
+			}
+			$item['quote-uri-id'] = $request['quote_id'];
+		}
+
+		$item['title'] = $request['friendica']['title'] ?? '';
+
+		if (!empty($request['spoiler_text'])) {
+			if (!isset($request['friendica']['title']) && !$request['in_reply_to_id'] && DI::pConfig()->get($uid, 'system', 'api_spoiler_title', true)) {
+				$item['title'] = $request['spoiler_text'];
+			} else {
+				$item['body'] = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $request['spoiler_text'] . "[/abstract]\n" . $item['body'];
+			}
 		}
 
 		$item = DI::contentItem()->expandTags($item, $request['visibility'] == 'direct');
@@ -249,7 +272,7 @@ class Statuses extends BaseApi
 		if (!empty($id)) {
 			$item = Post::selectFirst(['uri-id'], ['id' => $id]);
 			if (!empty($item['uri-id'])) {
-				System::jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid));
+				System::jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes()));
 			}
 		}
 
@@ -288,7 +311,7 @@ class Statuses extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid));
+		System::jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
 	}
 
 	private function getApp(): string

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -105,8 +105,10 @@ class FollowRequests extends BaseApi
 		foreach ($introductions as $key => $introduction) {
 			try {
 				self::setBoundaries($introduction->id);
-				$return[] = DI::mstdnFollowRequest()->createFromIntroduction($introduction);
-			} catch (HTTPException\InternalServerErrorException $exception) {
+				$return[] = DI::mstdnAccount()->createFromContactId($introduction->cid, $introduction->uid);
+			} catch (HTTPException\InternalServerErrorException
+				| HTTPException\NotFoundException
+				| \ImagickException $exception) {
 				DI::intro()->delete($introduction);
 				unset($introductions[$key]);
 			}

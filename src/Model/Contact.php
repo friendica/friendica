@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,6 +23,7 @@ namespace Friendica\Model;
 
 use Friendica\Contact\Avatar;
 use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
+use Friendica\Content\Conversation As ConversationContent;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Hook;
@@ -47,6 +48,7 @@ use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use Friendica\Worker\UpdateContact;
 
 /**
  * functions for interacting with a contact
@@ -241,15 +243,13 @@ class Contact
 	 * @throws \Exception
 	 * @todo Let's get rid of boolean type of $old_fields
 	 */
-	public static function update(array $fields, array $condition, $old_fields = [])
+	public static function update(array $fields, array $condition, $old_fields = []): bool
 	{
-		$fields = DI::dbaDefinition()->truncateFieldsForTable('contact', $fields);
-		$ret = DBA::update('contact', $fields, $condition, $old_fields);
-
 		// Apply changes to the "user-contact" table on dedicated fields
 		Contact\User::updateByContactUpdate($fields, $condition);
 
-		return $ret;
+		$fields = DI::dbaDefinition()->truncateFieldsForTable('contact', $fields);
+		return DBA::update('contact', $fields, $condition, $old_fields);
 	}
 
 	/**
@@ -329,7 +329,7 @@ class Contact
 		// Add internal fields
 		$removal = [];
 		if (!empty($fields)) {
-			foreach (['id', 'next-update', 'network'] as $internal) {
+			foreach (['id', 'next-update', 'network', 'local-data'] as $internal) {
 				if (!in_array($internal, $fields)) {
 					$fields[] = $internal;
 					$removal[] = $internal;
@@ -358,9 +358,15 @@ class Contact
 			return [];
 		}
 
+		$background_update = DI::config()->get('system', 'update_active_contacts') ? $contact['local-data'] : true;
+
 		// Update the contact in the background if needed
-		if (Probe::isProbable($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
-			Worker::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], 'UpdateContact', $contact['id']);
+		if ($background_update && !self::isLocal($url) && Probe::isProbable($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
+			try {
+				UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
+			} catch (\InvalidArgumentException $e) {
+				Logger::notice($e->getMessage(), ['contact' => $contact]);
+			}
 		}
 
 		// Remove the internal fields
@@ -564,7 +570,7 @@ class Contact
 	{
 		if (!parse_url($url, PHP_URL_SCHEME)) {
 			$addr_parts = explode('@', $url);
-			return (count($addr_parts) == 2) && ($addr_parts[1] == DI::baseUrl()->getHostname());
+			return (count($addr_parts) == 2) && ($addr_parts[1] == DI::baseUrl()->getHost());
 		}
 
 		return Strings::compareLink(self::getBasepath($url, true), DI::baseUrl());
@@ -622,7 +628,7 @@ class Contact
 	public static function getPublicAndUserContactID(int $cid, int $uid): array
 	{
 		// We have to use the legacy function as long as the post update hasn't finished
-		if (DI::config()->get('system', 'post_update_version') < 1427) {
+		if (DI::keyValue()->get('post_update_version') < 1427) {
 			return self::legacyGetPublicAndUserContactID($cid, $uid);
 		}
 
@@ -1266,13 +1272,19 @@ class Contact
 			return 0;
 		}
 
-		$contact = self::getByURL($url, false, ['id', 'network', 'uri-id', 'next-update'], $uid);
+		$contact = self::getByURL($url, false, ['id', 'network', 'uri-id', 'next-update', 'local-data'], $uid);
 
 		if (!empty($contact)) {
 			$contact_id = $contact['id'];
 
-			if (Probe::isProbable($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
-				Worker::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], 'UpdateContact', $contact['id']);
+			$background_update = DI::config()->get('system', 'update_active_contacts') ? $contact['local-data'] : true;
+
+			if ($background_update && !self::isLocal($url) && Probe::isProbable($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
+				try {
+					UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
+				} catch (\InvalidArgumentException $e) {
+					Logger::notice($e->getMessage(), ['contact' => $contact]);
+				}
 			}
 
 			if (empty($update) && (!empty($contact['uri-id']) || is_bool($update))) {
@@ -1386,14 +1398,18 @@ class Contact
 		if ($data['network'] == Protocol::DIASPORA) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data);
+			} catch (HTTPException\NotFoundException $e) {
+				Logger::notice($e->getMessage(), ['url' => $url, 'data' => $data]);
 			} catch (\InvalidArgumentException $e) {
-				Logger::error($e->getMessage(), ['url' => $url, 'data' => $data]);
+				Logger::notice($e->getMessage(), ['url' => $url, 'data' => $data]);
 			}
 		} elseif (!empty($data['networks'][Protocol::DIASPORA])) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data['networks'][Protocol::DIASPORA]);
+			} catch (HTTPException\NotFoundException $e) {
+				Logger::notice($e->getMessage(), ['url' => $url, 'data' => $data['networks'][Protocol::DIASPORA]]);
 			} catch (\InvalidArgumentException $e) {
-				Logger::error($e->getMessage(), ['url' => $url, 'data' => $data['networks'][Protocol::DIASPORA]]);
+				Logger::notice($e->getMessage(), ['url' => $url, 'data' => $data['networks'][Protocol::DIASPORA]]);
 			}
 		}
 
@@ -1540,8 +1556,8 @@ class Contact
 		$contact_field = ((($contact["contact-type"] == self::TYPE_COMMUNITY) || ($contact['network'] == Protocol::MAIL)) ? 'owner-id' : 'author-id');
 
 		if ($thread_mode) {
-			$condition = ["((`$contact_field` = ? AND `gravity` = ?) OR (`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `thr-parent-id` = `parent-uri-id`)) AND " . $sql,
-				$cid, Item::GRAVITY_PARENT, $cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), DI::userSession()->getLocalUserId()];
+			$condition = ["((`$contact_field` = ? AND `gravity` = ?) OR (`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`)) AND " . $sql,
+				$cid, Item::GRAVITY_PARENT, $cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA, DI::userSession()->getLocalUserId()];
 		} else {
 			$condition = ["`$contact_field` = ? AND `gravity` IN (?, ?) AND " . $sql,
 				$cid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, DI::userSession()->getLocalUserId()];
@@ -1592,7 +1608,7 @@ class Contact
 				}
 			}
 
-			$o .= DI::conversation()->create($items, 'contacts', $update, false, 'pinned_commented', DI::userSession()->getLocalUserId());
+			$o .= DI::conversation()->create($items, ConversationContent::MODE_CONTACTS, $update, false, 'pinned_commented', DI::userSession()->getLocalUserId());
 		} else {
 			$fields = array_merge(Item::DISPLAY_FIELDLIST, ['featured']);
 			$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), $fields, $condition, $params));
@@ -1607,7 +1623,7 @@ class Contact
 				}
 			}
 
-			$o .= DI::conversation()->create($items, 'contact-posts', $update);
+			$o .= DI::conversation()->create($items, ConversationContent::MODE_CONTACT_POSTS, $update);
 		}
 
 		if (!$update) {
@@ -2188,20 +2204,38 @@ class Contact
 			return;
 		}
 
+		if (!Network::isValidHttpUrl($avatar)) {
+			Logger::warning('Invalid avatar', ['cid' => $cid, 'avatar' => $avatar]);
+			$avatar = '';
+		}
+
 		$uid = $contact['uid'];
 
 		// Only update the cached photo links of public contacts when they already are cached
 		if (($uid == 0) && !$force && empty($contact['thumb']) && empty($contact['micro']) && !$create_cache) {
 			if (($contact['avatar'] != $avatar) || empty($contact['blurhash'])) {
 				$update_fields = ['avatar' => $avatar];
-				$fetchResult = HTTPSignature::fetchRaw($avatar, 0, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
+				if (!Network::isLocalLink($avatar)) {
+					try {
+						$fetchResult = HTTPSignature::fetchRaw($avatar, 0, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
 
-				$img_str = $fetchResult->getBody();
-				if (!empty($img_str)) {
-					$image = new Image($img_str, Images::getMimeTypeByData($img_str));
-					if ($image->isValid()) {
-						$update_fields['blurhash'] = $image->getBlurHash();
+						$img_str = $fetchResult->getBody();
+						if (!empty($img_str)) {
+							$image = new Image($img_str, Images::getMimeTypeByData($img_str));
+							if ($image->isValid()) {
+								$update_fields['blurhash'] = $image->getBlurHash();
+							} else {
+								return;
+							}
+						}
+					} catch (\Exception $exception) {
+						Logger::notice('Error fetching avatar', ['avatar' => $avatar, 'exception' => $exception]);
+						return;
 					}
+				} elseif (!empty($contact['blurhash'])) {
+					$update_fields['blurhash'] = null;
+				} else {
+					return;
 				}
 
 				self::update($update_fields, ['id' => $cid]);
@@ -2234,7 +2268,9 @@ class Contact
 		}
 
 		if (in_array($contact['network'], [Protocol::FEED, Protocol::MAIL]) || $cache_avatar) {
-			Avatar::deleteCache($contact);
+			if (Avatar::deleteCache($contact)) {
+				$force = true;
+			}
 
 			if ($default_avatar && Proxy::isLocalImage($avatar)) {
 				$fields = ['avatar' => $avatar, 'avatar-date' => DateTimeFormat::utcNow(),
@@ -2478,6 +2514,44 @@ class Contact
 	}
 
 	/**
+	 * Perform a contact update if the contact is outdated
+	 *
+	 * @param integer $id contact id
+	 * @return bool
+	 */
+	public static function updateByIdIfNeeded(int $id): bool
+	{
+		$contact = self::selectFirst(['url'], ["`id` = ? AND `next-update` < ?", $id, DateTimeFormat::utcNow()]);
+		if (empty($contact['url'])) {
+			return false;
+		}
+
+		if (self::isLocal($contact['url'])) {
+			return true;
+		}
+
+		$stamp = (float)microtime(true);
+		self::updateFromProbe($id);
+		Logger::debug('Contact data is updated.', ['duration' => round((float)microtime(true) - $stamp, 3), 'id' => $id, 'url' => $contact['url'], 'callstack' => System::callstack(20)]);
+		return true;
+	}
+
+	/**
+	 * Perform a contact update if the contact is outdated
+	 *
+	 * @param string $url contact url
+	 * @return bool
+	 */
+	public static function updateByUrlIfNeeded(string $url): bool
+	{
+		$id = self::getIdForURL($url, 0, false);
+		if (!empty($id)) {
+			return self::updateByIdIfNeeded($id);
+		}
+		return (bool)self::getIdForURL($url);
+	}
+
+	/**
 	 * Updates contact record by provided id and optional network
 	 *
 	 * @param integer $id      contact id
@@ -2498,14 +2572,18 @@ class Contact
 		if ($data['network'] == Protocol::DIASPORA) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data);
+			} catch (HTTPException\NotFoundException $e) {
+				Logger::notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			} catch (\InvalidArgumentException $e) {
-				Logger::error($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
+				Logger::notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			}
 		} elseif (!empty($data['networks'][Protocol::DIASPORA])) {
 			try {
 				DI::dsprContact()->updateFromProbeArray($data['networks'][Protocol::DIASPORA]);
+			} catch (HTTPException\NotFoundException $e) {
+				Logger::notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			} catch (\InvalidArgumentException $e) {
-				Logger::error($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
+				Logger::notice($e->getMessage(), ['id' => $id, 'network' => $network, 'contact' => $contact, 'data' => $data]);
 			}
 		}
 
@@ -2903,12 +2981,12 @@ class Contact
 		}
 
 		if (($network != '') && ($ret['network'] != $network)) {
-			Logger::notice('Expected network ' . $network . ' does not match actual network ' . $ret['network']);
+			$result['message'] = DI::l10n()->t('Expected network %s does not match actual network %s', $network, $ret['network']);
 			return $result;
 		}
 
 		// check if we already have a contact
-		$condition = ['uid' => $uid, 'nurl' => Strings::normaliseLink($ret['url'])];
+		$condition = ['uid' => $uid, 'nurl' => Strings::normaliseLink($ret['url']), 'deleted' => false];
 		$contact = DBA::selectFirst('contact', ['id', 'rel', 'url', 'pending', 'hub-verify'], $condition);
 
 		$protocol = self::getProtocol($ret['url'], $ret['network']);
@@ -3028,7 +3106,11 @@ class Contact
 		if ($probed) {
 			self::updateFromProbeArray($contact_id, $ret);
 		} else {
-			Worker::add(Worker::PRIORITY_HIGH, 'UpdateContact', $contact_id);
+			try {
+				UpdateContact::add(Worker::PRIORITY_HIGH, $contact['id']);
+			} catch (\InvalidArgumentException $e) {
+				Logger::notice($e->getMessage(), ['contact' => $contact]);
+			}
 		}
 
 		$result['success'] = Protocol::follow($uid, $contact, $protocol);
@@ -3227,7 +3309,7 @@ class Contact
 		if ($contact['rel'] == self::SHARING || in_array($contact['network'], [Protocol::FEED, Protocol::MAIL])) {
 			self::remove($contact['id']);
 		} else {
-			self::update(['rel' => self::FOLLOWER], ['id' => $contact['id']]);
+			self::update(['rel' => self::FOLLOWER, 'pending' => false], ['id' => $contact['id']]);
 		}
 
 		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
@@ -3499,8 +3581,12 @@ class Contact
 				Worker::add(Worker::PRIORITY_LOW, 'AddContact', 0, $url);
 				++$added;
 			} elseif (!empty($contact['network']) && Probe::isProbable($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
-				Worker::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], 'UpdateContact', $contact['id']);
-				++$updated;
+				try {
+					UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
+					++$updated;
+				} catch (\InvalidArgumentException $e) {
+					Logger::notice($e->getMessage(), ['contact' => $contact]);
+				}
 			} else {
 				++$unchanged;
 			}

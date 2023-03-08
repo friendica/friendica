@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -55,7 +55,7 @@
 use Friendica\Database\DBA;
 
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1502);
+	define('DB_UPDATE_VERSION', 1516);
 }
 
 return [
@@ -89,6 +89,7 @@ return [
 			"last_poco_query" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => ""],
 			"last_contact" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Last successful connection request"],
 			"last_failure" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Last failed connection request"],
+			"blocked" => ["type" => "boolean", "comment" => "Server is blocked"],
 			"failed" => ["type" => "boolean", "comment" => "Connection failed"],
 			"next_contact" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Next connection request"],
 		],
@@ -398,23 +399,6 @@ return [
 			"uid_uri-id" => ["uid", "uri-id"],
 		]
 	],
-	"addon" => [
-		"comment" => "registered addons",
-		"fields" => [
-			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
-			"name" => ["type" => "varchar(50)", "not null" => "1", "default" => "", "comment" => "addon base (file)name"],
-			"version" => ["type" => "varchar(50)", "not null" => "1", "default" => "", "comment" => "currently unused"],
-			"installed" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "currently always 1"],
-			"hidden" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "currently unused"],
-			"timestamp" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "comment" => "file timestamp to check for reloads"],
-			"plugin_admin" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "1 = has admin config, 0 = has no admin config"],
-		],
-		"indexes" => [
-			"PRIMARY" => ["id"],
-			"installed_name" => ["installed", "name"],
-			"name" => ["UNIQUE", "name"],
-		]
-	],
 	"apcontact" => [
 		"comment" => "ActivityPub compatible contacts - used in the ActivityPub implementation",
 		"fields" => [
@@ -557,8 +541,8 @@ return [
 		"comment" => "main configuration storage",
 		"fields" => [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => ""],
-			"cat" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
-			"k" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => ""],
+			"cat" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => "The category of the entry"],
+			"k" => ["type" => "varbinary(50)", "not null" => "1", "default" => "", "comment" => "The key of the entry"],
 			"v" => ["type" => "mediumtext", "comment" => ""],
 		],
 		"indexes" => [
@@ -636,6 +620,24 @@ return [
 			"PRIMARY" => ["id"],
 			"uid_uri" => ["UNIQUE", "uid", "uri(190)"],
 			"wid" => ["wid"],
+		]
+	],
+	"delivery-queue" => [
+		"comment" => "Delivery data for posts for the batch processing",
+		"fields" => [
+			"gsid" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["gserver" => "id", "on delete" => "restrict"], "comment" => "Target server"],
+			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Delivered post"],
+			"created" => ["type" => "datetime", "comment" => ""],
+			"command" => ["type" => "varbinary(32)", "comment" => ""],
+			"cid" => ["type" => "int unsigned", "foreign" => ["contact" => "id"], "comment" => "Target contact"],
+			"uid" => ["type" => "mediumint unsigned", "foreign" => ["user" => "uid"], "comment" => "Delivering user"],
+			"failed" => ["type" => "tinyint", "default" => 0, "comment" => "Number of times the delivery has failed"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["uri-id", "gsid"],
+			"gsid_created" => ["gsid", "created"],
+			"uid" => ["uid"],
+			"cid" => ["cid"],
 		]
 	],
 	"diaspora-contact" => [
@@ -854,6 +856,7 @@ return [
 		"fields" => [
 			"url" => ["type" => "varbinary(383)", "not null" => "1", "primary" => "1", "comment" => "URL of the inbox"],
 			"uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Item-uri id of inbox url"],
+			"gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id", "on delete" => "restrict"], "comment" => "ID of the related server"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Creation date of this entry"],
 			"success" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last successful delivery"],
 			"failure" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Date of the last failed delivery"],
@@ -864,6 +867,7 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["url"],
 			"uri-id" => ["uri-id"],
+			"gsid" => ["gsid"],
 		]
 	],
 	"intro" => [
@@ -888,6 +892,17 @@ return [
 			"suggest-cid" => ["suggest-cid"],
 			"uid" => ["uid"],
 		]
+	],
+	"key-value" => [
+		"comment" => "A key value storage",
+		"fields" => [
+			"k" => ["type" => "varbinary(50)", "not null" => "1", "primary" => "1", "comment" => ""],
+			"v" => ["type" => "mediumtext", "comment" => ""],
+			"updated_at" => ["type" => "int unsigned", "not null" => "1", "comment" => "timestamp of the last update"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["k"],
+		],
 	],
 	"locks" => [
 		"comment" => "",
@@ -1458,7 +1473,7 @@ return [
 			"event-id" => ["type" => "int unsigned", "foreign" => ["event" => "id"], "comment" => "Used to link to the event.id"],
 			"unseen" => ["type" => "boolean", "not null" => "1", "default" => "1", "comment" => "post has not been seen"],
 			"hidden" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Marker to hide the post from the user"],
-			"notification-type" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
+			"notification-type" => ["type" => "smallint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 			"wall" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "This item was posted to the wall of uid"],
 			"origin" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "item originated at this site"],
 			"psid" => ["type" => "int unsigned", "foreign" => ["permissionset" => "id", "on delete" => "restrict"], "comment" => "ID of the permission set of this post"],
@@ -1673,8 +1688,11 @@ return [
 		"fields" => [
 			"id" => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
 			"uid" => ["type" => "mediumint unsigned", "foreign" => ["user" => "uid"], "comment" => "Reporting user"],
+			"reporter-id" => ["type" => "int unsigned", "foreign" => ["contact" => "id"], "comment" => "Reporting contact"],
 			"cid" => ["type" => "int unsigned", "not null" => "1", "foreign" => ["contact" => "id"], "comment" => "Reported contact"],
 			"comment" => ["type" => "text", "comment" => "Report"],
+			"category" => ["type" => "varchar(20)", "comment" => "Category of the report (spam, violation, other)"],
+			"rules" => ["type" => "text", "comment" => "Violated rules"],
 			"forward" => ["type" => "boolean", "comment" => "Forward the report to the remote server"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => ""],
 			"status" => ["type" => "tinyint unsigned", "comment" => "Status of the report"],
@@ -1683,6 +1701,7 @@ return [
 			"PRIMARY" => ["id"],
 			"uid" => ["uid"],
 			"cid" => ["cid"],
+			"reporter-id" => ["reporter-id"],
 		]
 	],
 	"report-post" => [

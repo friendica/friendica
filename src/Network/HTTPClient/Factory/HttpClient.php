@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -83,14 +83,14 @@ class HttpClient extends BaseFactory
 			ResponseInterface $response,
 			UriInterface $uri
 		) use ($logger) {
-			$logger->notice('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
+			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
 		};
 
 		$userAgent = App::PLATFORM . " '" .
 					 App::CODENAME . "' " .
 					 App::VERSION . '-' .
 					 DB_UPDATE_VERSION . '; ' .
-					 $this->baseUrl->get();
+					 $this->baseUrl;
 
 		$guzzle = new GuzzleHttp\Client([
 			RequestOptions::ALLOW_REDIRECTS => [

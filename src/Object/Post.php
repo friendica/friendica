@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -191,7 +191,7 @@ class Post
 		$pinned = '';
 		$pin = false;
 		$star = false;
-		$ignore = false;
+		$ignore_thread = false;
 		$ispinned = 'unpinned';
 		$isstarred = 'unstarred';
 		$indent = '';
@@ -246,8 +246,9 @@ class Post
 		// Showing the one or the other text, depending upon if we can only hide it or really delete it.
 		$delete = $origin ? DI::l10n()->t('Delete globally') : DI::l10n()->t('Remove locally');
 
-		$drop = false;
-		$block = false;
+		$drop   = false;
+		$block  = false;
+		$ignore = false;
 		if (DI::userSession()->getLocalUserId()) {
 			$drop = [
 				'dropping' => $dropping,
@@ -259,9 +260,14 @@ class Post
 
 		if (!$item['self'] && DI::userSession()->getLocalUserId()) {
 			$block = [
-				'blocking' => true,
-				'block'   => DI::l10n()->t('Block %s', $item['author-name']),
-				'author_id'   => $item['author-id'],
+				'blocking'  => true,
+				'block'     => DI::l10n()->t('Block %s', $item['author-name']),
+				'author_id' => $item['author-id'],
+			];
+			$ignore = [
+				'ignoring'  => true,
+				'ignore'    => DI::l10n()->t('Ignore %s', $item['author-name']),
+				'author_id' => $item['author-id'],
 			];
 		}
 
@@ -327,14 +333,14 @@ class Post
 
 		if ($this->isToplevel()) {
 			if (DI::userSession()->getLocalUserId()) {
-				$ignored = PostModel\ThreadUser::getIgnored($item['uri-id'], DI::userSession()->getLocalUserId());
-				if ($item['mention'] || $ignored) {
-					$ignore = [
+				$ignored_thread = PostModel\ThreadUser::getIgnored($item['uri-id'], DI::userSession()->getLocalUserId());
+				if ($item['mention'] || $ignored_thread) {
+					$ignore_thread = [
 						'do'        => DI::l10n()->t('Ignore thread'),
 						'undo'      => DI::l10n()->t('Unignore thread'),
 						'toggle'    => DI::l10n()->t('Toggle ignore status'),
-						'classdo'   => $ignored ? 'hidden' : '',
-						'classundo' => $ignored ? '' : 'hidden',
+						'classdo'   => $ignored_thread ? 'hidden' : '',
+						'classundo' => $ignored_thread ? '' : 'hidden',
 						'ignored'   => DI::l10n()->t('Ignored'),
 					];
 				}
@@ -518,15 +524,17 @@ class Post
 			'pinned'          => $pinned,
 			'isstarred'       => $isstarred,
 			'star'            => $star,
-			'ignore'          => $ignore,
+			'ignore'          => $ignore_thread,
 			'tagger'          => $tagger,
 			'filer'           => $filer,
 			'language'        => $languages,
 			'drop'            => $drop,
 			'block'           => $block,
+			'ignore_author'   => $ignore,
 			'vote'            => $buttons,
 			'like_html'       => $responses['like']['output'],
 			'dislike_html'    => $responses['dislike']['output'],
+			'emojis'          => $this->getEmojis($item),
 			'responses'       => $responses,
 			'switchcomment'   => DI::l10n()->t('Comment'),
 			'reply_label'     => DI::l10n()->t('Reply to %s', $profile_name),
@@ -593,6 +601,70 @@ class Post
 		$result['threaded']           = $this->isThreaded();
 
 		return $result;
+	}
+
+	/**
+	 * Fetch emojis
+	 *
+	 * @param array $item
+	 * @return array
+	 */
+	private function getEmojis(array $item): array
+	{
+		if (empty($item['emojis'])) {
+			return [];
+		}
+
+		$emojis = [];
+		foreach ($item['emojis'] as $index => $element) {
+			$actors = implode(', ', $element['title']);
+			switch ($element['verb']) {
+				case Activity::ANNOUNCE:
+					$title = DI::l10n()->t('Reshared by: %s', $actors);
+					$icon  = ['fa' => 'fa-retweet', 'icon' => 'icon-retweet'];
+					break;
+
+				case Activity::VIEW:
+					$title = DI::l10n()->t('Viewed by: %s', $actors);
+					$icon  = ['fa' => 'fa-eye', 'icon' => 'icon-eye-open'];
+					break;
+
+				case Activity::LIKE:
+					$title = DI::l10n()->t('Liked by: %s', $actors);
+					$icon  = ['fa' => 'fa-thumbs-up', 'icon' => 'icon-thumbs-up'];
+					break;
+
+				case Activity::DISLIKE:
+					$title = DI::l10n()->t('Disliked by: %s', $actors);
+					$icon  = ['fa' => 'fa-thumbs-down', 'icon' => 'icon-thumbs-down'];
+					break;
+
+				case Activity::ATTEND:
+					$title = DI::l10n()->t('Attended by: %s', $actors);
+					$icon  = ['fa' => 'fa-check', 'icon' => 'icon-ok'];
+					break;
+
+				case Activity::ATTENDMAYBE:
+					$title = DI::l10n()->t('Maybe attended by: %s', $actors);
+					$icon  = ['fa' => 'fa-question', 'icon' => 'icon-question'];
+					break;
+
+				case Activity::ATTENDNO:
+					$title = DI::l10n()->t('Not attended by: %s', $actors);
+					$icon  = ['fa' => 'fa-times', 'icon' => 'icon-remove'];
+					break;
+
+				default:
+					$title = DI::l10n()->t('Reacted with %s by: %s', $element['emoji'], $actors);
+					$icon  = [];
+					break;
+				break;
+			}
+			$emojis[$index] = ['emoji' => $element['emoji'], 'total' => $element['total'], 'title' => $title, 'icon' => $icon];
+		}
+		ksort($emojis);
+
+		return $emojis;
 	}
 
 	/**

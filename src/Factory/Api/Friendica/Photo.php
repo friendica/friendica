@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -90,7 +90,7 @@ class Photo extends BaseFactory
 		}
 
 		foreach ($photos as $id => $photo) {
-			$link = $this->baseUrl->get() . '/photo/' . $data['resource-id'] . '-' . $photo['scale'] . Images::getExtensionByMimeType($data['type']);
+			$link = $this->baseUrl . '/photo/' . $data['resource-id'] . '-' . $photo['scale'] . Images::getExtensionByMimeType($data['type']);
 			if ($type == 'xml') {
 				$data['links'][$photo['scale'] . ':link']['@attributes'] = [
 					'type'  => $data['type'],

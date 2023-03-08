@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,13 +22,13 @@
 namespace Friendica\Module;
 
 use Friendica\App;
-use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\DI;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -37,22 +37,29 @@ use Psr\Log\LoggerInterface;
  */
 class Apps extends BaseModule
 {
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, array $server, array $parameters = [])
+	/** @var Nav */
+	protected $nav;
+	/** @var SystemMessages */
+	protected $systemMessages;
+
+	public function __construct(SystemMessages $systemMessages, Nav $nav, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
+		$this->nav = $nav;
+		$this->systemMessages = $systemMessages;
+
 		$privateaddons = $config->get('config', 'private_addons');
-		if ($privateaddons === "1" && !DI::userSession()->getLocalUserId()) {
+		if ($privateaddons === "1" && !$session->getLocalUserId()) {
 			$baseUrl->redirect();
 		}
 	}
 
 	protected function content(array $request = []): string
 	{
-		$apps = Nav::getAppMenu();
-
+		$apps = $this->nav->getAppMenu();
 		if (count($apps) == 0) {
-			DI::sysmsg()->addNotice($this->t('No installed applications.'));
+			$this->systemMessages->addNotice($this->t('No installed applications.'));
 		}
 
 		$tpl = Renderer::getMarkupTemplate('apps.tpl');

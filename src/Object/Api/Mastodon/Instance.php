@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -34,7 +34,7 @@ use Friendica\Network\HTTPException;
 /**
  * Class Instance
  *
- * @see https://docs.joinmastodon.org/api/entities/#instance
+ * @see https://docs.joinmastodon.org/entities/V1_Instance/
  */
 class Instance extends BaseDataTransferObject
 {
@@ -54,7 +54,7 @@ class Instance extends BaseDataTransferObject
 	protected $urls;
 	/** @var Stats */
 	protected $stats;
-	/** @var string|null */
+	/** @var string|null This is meant as a server banner, default Mastodon "thumbnail" is 1600×620px */
 	protected $thumbnail = null;
 	/** @var array */
 	protected $languages;
@@ -84,14 +84,14 @@ class Instance extends BaseDataTransferObject
 	{
 		$register_policy = intval($config->get('config', 'register_policy'));
 
-		$this->uri               = $baseUrl->get();
+		$this->uri               = $baseUrl->getHost();
 		$this->title             = $config->get('config', 'sitename');
 		$this->short_description = $this->description = $config->get('config', 'info');
 		$this->email             = implode(',', User::getAdminEmailList());
 		$this->version           = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
 		$this->urls              = null; // Not supported
 		$this->stats             = new Stats($config, $database);
-		$this->thumbnail         = $baseUrl->get() . ($config->get('system', 'shortcut_icon') ?? 'images/friendica-32.png');
+		$this->thumbnail         = $baseUrl . '/images/friendica-banner.jpg';
 		$this->languages         = [$config->get('system', 'language')];
 		$this->max_toot_chars    = (int)$config->get('config', 'api_import_size', $config->get('config', 'max_import_size'));
 		$this->registrations     = ($register_policy != Register::CLOSED);

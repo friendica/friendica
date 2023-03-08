@@ -1,4 +1,26 @@
 <?php
+/**
+ * @copyright Copyright (C) 2010-2023, the Friendica project
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Name: smoothly
+ *
+ * BEWARE: currently UNSUPPORTED
+ */
 
 /*
  * Name: Smoothly
@@ -23,7 +45,7 @@ function smoothly_init(App $a) {
 
 	$cssFile = null;
 	$ssl_state = false;
-	$baseurl = DI::baseUrl()->get($ssl_state);
+	$baseurl = DI::baseUrl();
 	DI::page()['htmlhead'] .= <<< EOT
 
 <script>
@@ -90,7 +112,7 @@ if (! function_exists('_js_in_foot')) {
 		/** @purpose insert stuff in bottom of page
 		*/
 		$ssl_state = false;
-		$baseurl = DI::baseUrl()->get($ssl_state);
+		$baseurl = DI::baseUrl();
 		$bottom['$baseurl'] = $baseurl;
 		$tpl = Renderer::getMarkupTemplate('bottom.tpl');
 

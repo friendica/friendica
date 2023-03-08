@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,7 +37,7 @@ class UserTimelineTest extends ApiTest
 	public function testApiStatusesUserTimeline()
 	{
 		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'user_id'         => 42,
 				'max_id'          => 10,
 				'exclude_replies' => true,
@@ -62,7 +62,7 @@ class UserTimelineTest extends ApiTest
 	public function testApiStatusesUserTimelineWithNegativePage()
 	{
 		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'user_id' => 42,
 				'page'    => -2,
 			]);
@@ -86,7 +86,7 @@ class UserTimelineTest extends ApiTest
 	{
 		$response = (new UserTimeline(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
 			'extension' => ICanCreateResponses::TYPE_RSS
-		]))->run();
+		]))->run($this->httpExceptionMock);
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

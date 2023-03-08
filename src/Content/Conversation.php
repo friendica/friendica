@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -53,6 +53,16 @@ use Psr\Log\LoggerInterface;
 
 class Conversation
 {
+	const MODE_COMMUNITY     = 'community';
+	const MODE_CONTACTS      = 'contacts';
+	const MODE_CONTACT_POSTS = 'contact-posts';
+	const MODE_DISPLAY       = 'display';
+	const MODE_FILED         = 'filed';
+	const MODE_NETWORK       = 'network';
+	const MODE_NOTES         = 'notes';
+	const MODE_SEARCH        = 'search';
+	const MODE_PROFILE       = 'profile';
+
 	/** @var Activity */
 	private $activity;
 	/** @var L10n */
@@ -234,32 +244,32 @@ class Conversation
 				$likers .= ' ' . $this->l10n->t('and %d other people', $total - $this->config->get('system', 'max_likers'));
 			}
 
-			$spanatts = "class=\"fakelink\" onclick=\"openClose('{$verb}list-$id');\"";
+			$spanatts = "class=\"btn btn-link fakelink\" onclick=\"openClose('{$verb}list-$id');\"";
 
 			$explikers = '';
 			switch ($verb) {
 				case 'like':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> like this', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> like this', $spanatts, $total);
 					$explikers = $this->l10n->t('%s like this.', $likers);
 					break;
 				case 'dislike':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> don\'t like this', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> don\'t like this', $spanatts, $total);
 					$explikers = $this->l10n->t('%s don\'t like this.', $likers);
 					break;
 				case 'attendyes':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> attend', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> attend', $spanatts, $total);
 					$explikers = $this->l10n->t('%s attend.', $likers);
 					break;
 				case 'attendno':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> don\'t attend', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> don\'t attend', $spanatts, $total);
 					$explikers = $this->l10n->t('%s don\'t attend.', $likers);
 					break;
 				case 'attendmaybe':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> attend maybe', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> attend maybe', $spanatts, $total);
 					$explikers = $this->l10n->t('%s attend maybe.', $likers);
 					break;
 				case 'announce':
-					$phrase    = $this->l10n->t('<span  %1$s>%2$d people</span> reshared this', $spanatts, $total);
+					$phrase    = $this->l10n->t('<button type="button" %1$s>%2$d people</button> reshared this', $spanatts, $total);
 					$explikers = $this->l10n->t('%s reshared this.', $likers);
 					break;
 			}
@@ -304,7 +314,7 @@ class Conversation
 		$tpl = Renderer::getMarkupTemplate('jot-header.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$newpost'   => 'true',
-			'$baseurl'   => $this->baseURL->get(true),
+			'$baseurl'   => $this->baseURL,
 			'$geotag'    => $geotag,
 			'$nickname'  => $x['nickname'],
 			'$ispublic'  => $this->l10n->t('Visible to <strong>everybody</strong>'),
@@ -375,7 +385,7 @@ class Conversation
 			'$posttype'     => $notes_cid ? ItemModel::PT_PERSONAL_NOTE : ItemModel::PT_ARTICLE,
 			'$content'      => $x['content'] ?? '',
 			'$post_id'      => $x['post_id'] ?? '',
-			'$baseurl'      => $this->baseURL->get(true),
+			'$baseurl'      => $this->baseURL,
 			'$defloc'       => $x['default_location'],
 			'$visitor'      => $x['visitor'],
 			'$pvisit'       => $notes_cid ? 'none' : $x['visitor'],
@@ -436,15 +446,13 @@ class Conversation
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
-		$ssl_state = (bool)$this->session->getLocalUserId();
-
 		$live_update_div = '';
 
 		$blocklist = $this->getBlocklist();
 
 		$previewing = (($preview) ? ' preview ' : '');
 
-		if ($mode === 'network') {
+		if ($mode === self::MODE_NETWORK) {
 			$items = $this->addChildren($items, false, $order, $uid, $mode);
 			if (!$update) {
 				/*
@@ -470,7 +478,7 @@ class Conversation
 
 					. "'; </script>\r\n";
 			}
-		} elseif ($mode === 'profile') {
+		} elseif ($mode === self::MODE_PROFILE) {
 			$items = $this->addChildren($items, false, $order, $uid, $mode);
 
 			if (!$update) {
@@ -487,7 +495,7 @@ class Conversation
 						. "; var netargs = '?f='; </script>\r\n";
 				}
 			}
-		} elseif ($mode === 'notes') {
+		} elseif ($mode === self::MODE_NOTES) {
 			$items = $this->addChildren($items, false, $order, $this->session->getLocalUserId(), $mode);
 
 			if (!$update) {
@@ -495,7 +503,7 @@ class Conversation
 					. "<script> var profile_uid = " . $this->session->getLocalUserId()
 					. "; var netargs = '?f='; </script>\r\n";
 			}
-		} elseif ($mode === 'display') {
+		} elseif ($mode === self::MODE_DISPLAY) {
 			$items = $this->addChildren($items, false, $order, $uid, $mode);
 
 			if (!$update) {
@@ -503,7 +511,7 @@ class Conversation
 					. "<script> var profile_uid = " . ($this->session->getLocalUserId() ?: 0) . ";"
 					. "</script>";
 			}
-		} elseif ($mode === 'community') {
+		} elseif ($mode === self::MODE_COMMUNITY) {
 			$items = $this->addChildren($items, true, $order, $uid, $mode);
 
 			if (!$update) {
@@ -514,7 +522,7 @@ class Conversation
 					. (!empty($_GET['accounttype']) ? '&accounttype=' . rawurlencode($_GET['accounttype']) : '')
 					. "'; </script>\r\n";
 			}
-		} elseif ($mode === 'contacts') {
+		} elseif ($mode === self::MODE_CONTACTS) {
 			$items = $this->addChildren($items, false, $order, $uid, $mode);
 
 			if (!$update) {
@@ -522,11 +530,11 @@ class Conversation
 					. "<script> var profile_uid = -1; var netargs = '" . substr($this->args->getCommand(), 8)
 					."?f='; </script>\r\n";
 			}
-		} elseif ($mode === 'search') {
+		} elseif ($mode === self::MODE_SEARCH) {
 			$live_update_div = '<div id="live-search"></div>' . "\r\n";
 		}
 
-		$page_dropping = $this->session->getLocalUserId() && $this->session->getLocalUserId() == $uid && $mode != 'search';
+		$page_dropping = $this->session->getLocalUserId() && $this->session->getLocalUserId() == $uid && $mode != self::MODE_SEARCH;
 
 		if (!$update) {
 			$_SESSION['return_path'] = $this->args->getQueryString();
@@ -558,7 +566,7 @@ class Conversation
 		$formSecurityToken = BaseModule::getFormSecurityToken('contact_action');
 
 		if (!empty($items)) {
-			if (in_array($mode, ['community', 'contacts', 'profile'])) {
+			if (in_array($mode, [self::MODE_COMMUNITY, self::MODE_CONTACTS, self::MODE_PROFILE])) {
 				$writable = true;
 			} else {
 				$writable = $items[0]['writable'] || ($items[0]['uid'] == 0) && in_array($items[0]['network'], Protocol::FEDERATED);
@@ -568,7 +576,7 @@ class Conversation
 				$writable = false;
 			}
 
-			if (in_array($mode, ['filed', 'search', 'contact-posts'])) {
+			if (in_array($mode, [self::MODE_FILED, self::MODE_SEARCH, self::MODE_CONTACT_POSTS])) {
 
 				/*
 				* "New Item View" on network page or search page results
@@ -621,7 +629,7 @@ class Conversation
 					$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
 
 					$this->item->localize($item);
-					if ($mode === 'filed') {
+					if ($mode === self::MODE_FILED) {
 						$dropping = true;
 					} else {
 						$dropping = false;
@@ -774,7 +782,7 @@ class Conversation
 		}
 
 		$o = Renderer::replaceMacros($page_template, [
-			'$baseurl'     => $this->baseURL->get($ssl_state),
+			'$baseurl'     => $this->baseURL,
 			'$return_path' => $this->args->getQueryString(),
 			'$live_update' => $live_update_div,
 			'$remove'      => $this->l10n->t('remove'),
@@ -969,8 +977,18 @@ class Conversation
 			$condition['author-hidden'] = false;
 		}
 
+		if ($this->config->get('system', 'emoji_activities')) {
+			$emojis = $this->getEmojis($uriids);
+			$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
+		}
+
 		$condition = DBA::mergeConditions($condition,
-			["`uid` IN (0, ?) AND (NOT `vid` IN (?, ?) OR `vid` IS NULL)", $uid, Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW)]);
+			["`uid` IN (0, ?) AND (NOT `vid` IN (?, ?, ?) OR `vid` IS NULL)", $uid, Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW), Verb::getID(Activity::READ)]);
+
+		$condition = DBA::mergeConditions($condition,
+			["`visible` AND NOT `deleted` AND NOT `author-blocked` AND NOT `owner-blocked`
+			AND ((NOT `contact-pending` AND (`contact-rel` IN (?, ?))) OR `self` OR `contact-uid` = ?)",
+			Contact::SHARING, Contact::FRIEND, 0]);
 
 		$thread_parents = Post::select(['uri-id', 'causer-id'], $condition, ['order' => ['uri-id' => false, 'uid']]);
 
@@ -983,16 +1001,18 @@ class Conversation
 
 		$params = ['order' => ['uri-id' => true, 'uid' => true]];
 
-		$thread_items = Post::selectForUser($uid, array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
+		$thread_items = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
 
-		$items = [];
+		$items         = [];
+		$quote_uri_ids = [];
+		$authors       = [];
 
 		while ($row = Post::fetch($thread_items)) {
 			if (!empty($items[$row['uri-id']]) && ($row['uid'] == 0)) {
 				continue;
 			}
 
-			if (($mode != 'contacts') && !$row['origin']) {
+			if (($mode != self::MODE_CONTACTS) && !$row['origin']) {
 				$row['featured'] = false;
 			}
 
@@ -1005,15 +1025,133 @@ class Conversation
 				}
 			}
 
+			$authors[] = $row['author-id'];
+			$authors[] = $row['owner-id'];
+
+			if (in_array($row['gravity'], [ItemModel::GRAVITY_PARENT, ItemModel::GRAVITY_COMMENT])) {
+				$quote_uri_ids[$row['uri-id']] = [
+					'uri-id'        => $row['uri-id'],
+					'uri'           => $row['uri'],
+					'parent-uri-id' => $row['parent-uri-id'],
+					'parent-uri'    => $row['parent-uri'],
+				];
+			}
+
 			$items[$row['uri-id']] = $this->addRowInformation($row, $activities[$row['uri-id']] ?? [], $thr_parent[$row['thr-parent-id']] ?? []);
 		}
 
 		DBA::close($thread_items);
 
+		$quotes = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), ['quote-uri-id' => array_column($quote_uri_ids, 'uri-id'), 'body' => '', 'uid' => 0]);
+		while ($quote = Post::fetch($quotes)) {
+			$row = $quote;
+
+			$row['uid']           = $uid;
+			$row['verb']          = $row['body'] = $row['raw-body'] = Activity::ANNOUNCE;
+			$row['gravity']       = ItemModel::GRAVITY_ACTIVITY;
+			$row['object-type']   = Activity\ObjectType::NOTE;
+			$row['parent-uri']    = $quote_uri_ids[$quote['quote-uri-id']]['parent-uri'];
+			$row['parent-uri-id'] = $quote_uri_ids[$quote['quote-uri-id']]['parent-uri-id'];
+			$row['thr-parent']    = $quote_uri_ids[$quote['quote-uri-id']]['uri'];
+			$row['thr-parent-id'] = $quote_uri_ids[$quote['quote-uri-id']]['uri-id'];
+
+			$authors[] = $row['author-id'];
+			$authors[] = $row['owner-id'];
+
+			$items[$row['uri-id']] = $this->addRowInformation($row, [], []);
+		}
+		DBA::close($quotes);
+
+		$authors = array_unique($authors);
+
+		$blocks    = [];
+		$ignores   = [];
+		$collapses = [];
+		if (!empty($authors)) {
+			$usercontacts = DBA::select('user-contact', ['cid', 'blocked', 'ignored', 'collapsed'], ['uid' => $uid, 'cid' => $authors]);
+			while ($usercontact = DBA::fetch($usercontacts)) {
+				if ($usercontact['blocked']) {
+					$blocks[] = $usercontact['cid'];
+				}
+				if ($usercontact['ignored']) {
+					$ignores[] = $usercontact['cid'];
+				}
+				if ($usercontact['collapsed']) {
+					$collapses[] = $usercontact['cid'];
+				}
+			}
+			DBA::close($usercontacts);
+		}
+
+		foreach ($items as $key => $row) {
+			$items[$key]['emojis'] = $emojis[$key] ?? [];
+
+			$always_display = in_array($mode, [self::MODE_CONTACTS, self::MODE_CONTACT_POSTS]);
+
+			$items[$key]['user-blocked-author']   = !$always_display && in_array($row['author-id'], $blocks);
+			$items[$key]['user-ignored-author']   = !$always_display && in_array($row['author-id'], $ignores);
+			$items[$key]['user-blocked-owner']    = !$always_display && in_array($row['owner-id'], $blocks);
+			$items[$key]['user-ignored-owner']    = !$always_display && in_array($row['owner-id'], $ignores);
+			$items[$key]['user-collapsed-author'] = !$always_display && in_array($row['author-id'], $collapses);
+			$items[$key]['user-collapsed-owner']  = !$always_display && in_array($row['owner-id'], $collapses);
+
+			if (in_array($mode, [self::MODE_COMMUNITY, self::MODE_NETWORK]) &&
+				(in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))) {
+				unset($items[$key]);
+			}
+		}
+
 		$items = $this->convSort($items, $order);
 
 		$this->profiler->stopRecording();
 		return $items;
+	}
+
+	/**
+	 * Fetch emoji reaction from the conversation
+	 *
+	 * @param array $uriids
+	 * @return array
+	 */
+	private function getEmojis(array $uriids): array
+	{
+		$activity_emoji = [
+			Activity::LIKE        => '👍',
+			Activity::DISLIKE     => '👎',
+			Activity::ATTEND      => '✔️',
+			Activity::ATTENDMAYBE => '❓',
+			Activity::ATTENDNO    => '❌',
+			Activity::ANNOUNCE    => '♻',
+			Activity::VIEW        => '📺',
+		];
+
+		$index_list = array_values($activity_emoji);
+		$verbs      = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT]);
+
+		$condition = DBA::mergeConditions(['parent-uri-id' => $uriids, 'gravity' => ItemModel::GRAVITY_ACTIVITY, 'verb' => $verbs], ["NOT `deleted`"]);
+		$separator = chr(255) . chr(255) . chr(255);
+
+		$sql = "SELECT `thr-parent-id`, `body`, `verb`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '". $separator ."' LIMIT 50) AS `title` FROM `post-view` WHERE " . array_shift($condition) . " GROUP BY `thr-parent-id`, `verb`, `body`";
+
+		$emojis = [];
+
+		$rows = DBA::p($sql, $condition);
+		while ($row = DBA::fetch($rows)) {
+			$row['verb'] = $row['body'] ? Activity::EMOJIREACT : $row['verb'];
+			$emoji       = $row['body'] ?: $activity_emoji[$row['verb']];
+			if (!isset($index_list[$emoji])) {
+				$index_list[] = $emoji;
+			}
+			$index = array_search($emoji, $index_list);
+
+			$emojis[$row['thr-parent-id']][$index]['emoji'] = $emoji;
+			$emojis[$row['thr-parent-id']][$index]['verb']  = $row['verb'];
+			$emojis[$row['thr-parent-id']][$index]['total'] = ($emojis[$row['thr-parent-id']][$index]['total'] ?? 0) + $row['total'];
+			$emojis[$row['thr-parent-id']][$index]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$index]['title'] ?? [], explode($separator, $row['title'])));
+		}
+		DBA::close($rows);
+
+		return $emojis;
 	}
 
 	/**

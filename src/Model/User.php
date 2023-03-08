@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,13 +39,13 @@ use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Security\TwoFactor\Model\AppSpecificPassword;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Image;
+use Friendica\Protocol\Delivery;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
-use Friendica\Worker\Delivery;
 use ImagickException;
 use LightOpenID;
 
@@ -166,7 +166,7 @@ class User
 		$system['region'] = '';
 		$system['postal-code'] = '';
 		$system['country-name'] = '';
-		$system['homepage'] = DI::baseUrl()->get();
+		$system['homepage'] = DI::baseUrl();
 		$system['dob'] = '0000-00-00';
 
 		// Ensure that the user contains data
@@ -219,7 +219,7 @@ class User
 			'self'         => true,
 			'network'      => Protocol::ACTIVITYPUB,
 			'name'         => 'System Account',
-			'addr'         => $system_actor_name . '@' . DI::baseUrl()->getHostname(),
+			'addr'         => $system_actor_name . '@' . DI::baseUrl()->getHost(),
 			'nick'         => $system_actor_name,
 			'url'          => DI::baseUrl() . '/friendica',
 			'pubkey'       => $keys['pubkey'],
@@ -757,7 +757,7 @@ class User
 	}
 
 	/**
-	 * Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces, accentuated letters and colon (:).
+	 * Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters.
 	 *
 	 * Password length is limited to 72 characters if the current default password hashing algorithm is Blowfish.
 	 * From the manual: "Using the PASSWORD_BCRYPT as the algorithm, will result in the password parameter being
@@ -770,13 +770,13 @@ class User
 	 */
 	public static function getPasswordRegExp(string $delimiter = null): string
 	{
-		$allowed_characters = '!"#$%&\'()*+,-./;<=>?@[\]^_`{|}~';
+		$allowed_characters = ':!"#$%&\'()*+,-./;<=>?@[\]^_`{|}~';
 
 		if ($delimiter) {
 			$allowed_characters = preg_quote($allowed_characters, $delimiter);
 		}
 
-		return '^[a-zA-Z0-9' . $allowed_characters . ']' . (PASSWORD_DEFAULT !== PASSWORD_BCRYPT ? '{1,72}' : '+') . '$';
+		return '^[a-zA-Z0-9' . $allowed_characters . ']' . (PASSWORD_DEFAULT === PASSWORD_BCRYPT ? '{1,72}' : '+') . '$';
 	}
 
 	/**
@@ -804,7 +804,7 @@ class User
 		}
 
 		if (!preg_match('/' . self::getPasswordRegExp('/') . '/', $password)) {
-			throw new Exception(DI::l10n()->t('The password can\'t contain accentuated letters, white spaces or colons (:)'));
+			throw new Exception(DI::l10n()->t("The password can't contain white spaces nor accentuated letters"));
 		}
 
 		return self::updatePasswordHashed($uid, self::hashPassword($password));
@@ -828,6 +828,22 @@ class User
 			'legacy_password' => false
 		];
 		return DBA::update('user', $fields, ['uid' => $uid]);
+	}
+
+	/**
+	 * Returns if the given uid is valid and in the admin list
+	 *
+	 * @param int $uid
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function isSiteAdmin(int $uid): bool
+	{
+		return DBA::exists('user', [
+			'uid'   => $uid,
+			'email' => self::getAdminEmailList()
+		]);
 	}
 
 	/**
@@ -1007,7 +1023,7 @@ class User
 				$_SESSION['register'] = 1;
 				$_SESSION['openid'] = $openid_url;
 
-				$openid = new LightOpenID(DI::baseUrl()->getHostname());
+				$openid = new LightOpenID(DI::baseUrl()->getHost());
 				$openid->identity = $openid_url;
 				$openid->returnUrl = DI::baseUrl() . '/openid';
 				$openid->required = ['namePerson/friendly', 'contact/email', 'namePerson'];
@@ -1344,7 +1360,7 @@ class User
 			$l10n,
 			$user,
 			DI::config()->get('config', 'sitename'),
-			DI::baseUrl()->get(),
+			DI::baseUrl(),
 			($register['password'] ?? '') ?: 'Sent in a previous email'
 		);
 	}
@@ -1441,7 +1457,7 @@ class User
 		Thank you and welcome to %4$s.'));
 
 		$preamble = sprintf($preamble, $user['username'], DI::config()->get('config', 'sitename'));
-		$body = sprintf($body, DI::baseUrl()->get(), $user['nickname'], $result['password'], DI::config()->get('config', 'sitename'));
+		$body = sprintf($body, DI::baseUrl(), $user['nickname'], $result['password'], DI::config()->get('config', 'sitename'));
 
 		$email = DI::emailer()
 			->newSystemMail()

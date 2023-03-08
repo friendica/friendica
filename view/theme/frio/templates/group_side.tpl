@@ -2,7 +2,7 @@
         <h3>{{$title}}</h3>
 </span>
 <div class="widget" id="group-sidebar">
-	<div id="sidebar-group-header">
+	<div id="sidebar-group-header" class="sidebar-widget-header">
 		<span class="fakelink" onclick="openCloseWidget('group-sidebar', 'group-sidebar-inflated');">
 			<h3>{{$title}}</h3>
 		</span>
@@ -22,7 +22,7 @@
 		</form>
 		{{/if}}
 	</div>
-	<div id="sidebar-group-list">
+	<div id="sidebar-group-list" class="sidebar-widget-list">
 		{{* The list of available groups *}}
 		<ul role="menu" id="sidebar-group-ul">
 			{{foreach $groups as $group}}

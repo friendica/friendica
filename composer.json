@@ -132,7 +132,13 @@
 		"test": "phpunit",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
 		"cs:install": "@composer install --working-dir=bin/dev/php-cs-fixer",
-		"cs:check": ["@cs:install", "bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff"],
-		"cs:fix": ["@cs:install", "bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"]
+		"cs:check": [
+			"@cs:install",
+			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff"
+		],
+		"cs:fix": [
+			"@cs:install",
+			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
+		]
 	}
 }

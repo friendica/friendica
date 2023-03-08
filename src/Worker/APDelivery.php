@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,6 +24,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Model\Post;
+use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
 class APDelivery
 {
@@ -69,7 +70,14 @@ class APDelivery
 			$drop    = false;
 			$uri_ids = $result['uri_ids'];
 		} else {
-			$result  = ActivityPub\Delivery::deliverToInbox($cmd, $item_id, $inbox, $uid, $receivers, $uri_id);
+			$owner = User::getOwnerDataById($uid);
+			if (!$owner) {
+				Post\Delivery::remove($uri_id, $inbox);
+				Post\Delivery::incrementFailed($uri_id, $inbox);
+				return;
+			}
+
+			$result  = ActivityPub\Delivery::deliverToInbox($cmd, $item_id, $inbox, $owner, $receivers, $uri_id);
 			$success = $result['success'];
 			$drop    = $result['drop'];
 			$uri_ids = [$uri_id];

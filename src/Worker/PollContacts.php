@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -41,7 +41,7 @@ class PollContacts
 			$abandon_days = 0;
 		}
 
-		$condition = ['network' => [Protocol::FEED, Protocol::MAIL, Protocol::OSTATUS], 'self' => false, 'blocked' => false];
+		$condition = ['network' => [Protocol::FEED, Protocol::MAIL, Protocol::OSTATUS], 'self' => false, 'blocked' => false, 'archive' => false];
 
 		if (!empty($abandon_days)) {
 			$condition = DBA::mergeConditions($condition,

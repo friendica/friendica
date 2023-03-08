@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,14 +22,14 @@
 namespace Friendica\Worker;
 
 use DOMDocument;
-use Friendica\DI;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
-use Friendica\Util\Network;
-use Friendica\Util\Strings;
+use GuzzleHttp\Psr7\Uri;
 
 /* This class is used to verify the homepage link of a user profile.
  * To do so, we look for rel="me" links in the given homepage, if one
@@ -56,43 +56,37 @@ class CheckRelMeProfileLink
 	{
 		Logger::notice('Verifying the homepage', ['uid' => $uid]);
 		Profile::update(['homepage_verified' => false], $uid);
-		$homepageUrlVerified = false;
-		$owner               = User::getOwnerDataById($uid);
-		if (!empty($owner['homepage'])) {
-			$xrd_timeout = DI::config()->get('system', 'xrd_timeout');
-			$curlResult  = DI::httpClient()->get($owner['homepage'], $accept_content = HttpClientAccept::HTML, [HttpClientOptions::TIMEOUT => $xrd_timeout]);
-			if ($curlResult->isSuccess()) {
-				$content = $curlResult->getBody();
-				if (!$content) {
-					Logger::notice('Empty body of the fetched homepage link). Cannot verify the relation to profile of UID %s.', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
-				} else {
-					$doc = new DOMDocument();
-					@$doc->loadHTML($content);
-					if (!$doc) {
-						Logger::notice('Could not parse the content');
-					} else {
-						foreach ($doc->getElementsByTagName('a') as $link) {
-							$rel = $link->getAttribute('rel');
-							if ($rel == 'me') {
-								$href = $link->getAttribute('href');
-								if (!$homepageUrlVerified && Network::isValidHttpUrl($href)) {
-									$homepageUrlVerified = Strings::compareLink($owner['url'], $href);
-								}
-							}
-						}
-					}
-					if ($homepageUrlVerified) {
-						Profile::update(['homepage_verified' => true], $uid);
-						Logger::notice('Homepage URL verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
-					} else {
-						Logger::notice('Homepage URL could not be verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
-					}
-				}
-			} else {
-				Logger::notice('Could not cURL the homepage URL', ['owner homepage' => $owner['homepage']]);
-			}
-		} else {
+
+		$owner = User::getOwnerDataById($uid);
+		if (empty($owner['homepage'])) {
 			Logger::notice('The user has no homepage link.', ['uid' => $uid]);
+			return;
+		}
+
+		$xrd_timeout = DI::config()->get('system', 'xrd_timeout');
+		$curlResult  = DI::httpClient()->get($owner['homepage'], HttpClientAccept::HTML, [HttpClientOptions::TIMEOUT => $xrd_timeout]);
+		if (!$curlResult->isSuccess()) {
+			Logger::notice('Could not cURL the homepage URL', ['owner homepage' => $owner['homepage']]);
+			return;
+		}
+
+		$content = $curlResult->getBody();
+		if (!$content) {
+			Logger::notice('Empty body of the fetched homepage link). Cannot verify the relation to profile of UID %s.', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
+			return;
+		}
+
+		$doc = new DOMDocument();
+		if (!@$doc->loadHTML($content)) {
+			Logger::notice('Could not parse the content');
+			return;
+		}
+
+		if (HTML::checkRelMeLink($doc, new Uri($owner['url']))) {
+			Profile::update(['homepage_verified' => true], $uid);
+			Logger::notice('Homepage URL verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
+		} else {
+			Logger::notice('Homepage URL could not be verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,7 +21,6 @@
 
 namespace Friendica\Test\src\Util;
 
-use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Test\MockedTest;
 use Friendica\Util\Profiler;
@@ -47,12 +46,12 @@ class ProfilerTest extends MockedTest
 	 */
 	public function testSetUp()
 	{
-		$configCache = \Mockery::mock(Cache::class);
-		$configCache->shouldReceive('get')
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')
 		            ->withAnyArgs()
 		            ->andReturn(true)
 		            ->twice();
-		$profiler = new Profiler($configCache);
+		$profiler = new Profiler($config);
 
 		self::assertInstanceOf(Profiler::class, $profiler);
 	}
@@ -124,13 +123,13 @@ class ProfilerTest extends MockedTest
 	 */
 	public function testSaveTimestamp($timestamp, $name, array $functions)
 	{
-		$configCache = \Mockery::mock(Cache::class);
-		$configCache->shouldReceive('get')
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')
 		            ->withAnyArgs()
 		            ->andReturn(true)
 		            ->twice();
 
-		$profiler = new Profiler($configCache);
+		$profiler = new Profiler($config);
 
 		foreach ($functions as $function) {
 			$profiler->saveTimestamp($timestamp, $name, $function);
@@ -145,13 +144,13 @@ class ProfilerTest extends MockedTest
 	 */
 	public function testReset($timestamp, $name)
 	{
-		$configCache = \Mockery::mock(Cache::class);
-		$configCache->shouldReceive('get')
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')
 		            ->withAnyArgs()
 		            ->andReturn(true)
 		            ->twice();
 
-		$profiler = new Profiler($configCache);
+		$profiler = new Profiler($config);
 
 		$profiler->saveTimestamp($timestamp, $name);
 		$profiler->reset();
@@ -208,13 +207,13 @@ class ProfilerTest extends MockedTest
 			->shouldReceive('info')
 			->once();
 
-		$configCache = \Mockery::mock(Cache::class);
-		$configCache->shouldReceive('get')
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')
 		            ->withAnyArgs()
 		            ->andReturn(true)
 		            ->twice();
 
-		$profiler = new Profiler($configCache);
+		$profiler = new Profiler($config);
 
 		foreach ($data as $perf => $items) {
 			foreach ($items['functions'] as $function) {
@@ -232,61 +231,5 @@ class ProfilerTest extends MockedTest
 				self::assertMatchesRegularExpression('/' . $function . ': \d+/', $output);
 			}
 		}
-	}
-
-	/**
-	 * Test different enable and disable states of the profiler
-	 */
-	public function testEnableDisable()
-	{
-		$configCache = \Mockery::mock(Cache::class);
-		$configCache->shouldReceive('get')
-		            ->with('system', 'profiler')
-		            ->andReturn(true)
-		            ->once();
-		$configCache->shouldReceive('get')
-		            ->with('rendertime', 'callstack')
-		            ->andReturn(false)
-		            ->once();
-
-		$profiler = new Profiler($configCache);
-
-		self::assertFalse($profiler->isRendertime());
-		self::assertEmpty($profiler->getRendertimeString());
-
-		$profiler->saveTimestamp(time(), 'network', 'test1');
-
-		$config = \Mockery::mock(IManageConfigValues::class);
-		$config->shouldReceive('get')
-		            ->with('system', 'profiler')
-		            ->andReturn(false)
-		            ->once();
-		$config->shouldReceive('get')
-		            ->with('rendertime', 'callstack')
-		            ->andReturn(false)
-		            ->once();
-
-		$profiler->update($config);
-
-		self::assertFalse($profiler->isRendertime());
-		self::assertEmpty($profiler->getRendertimeString());
-
-		$config->shouldReceive('get')
-		       ->with('system', 'profiler')
-		       ->andReturn(true)
-		       ->once();
-		$config->shouldReceive('get')
-		       ->with('rendertime', 'callstack')
-		       ->andReturn(true)
-		       ->once();
-
-		$profiler->update($config);
-
-		$profiler->saveTimestamp(time(), 'database', 'test2');
-
-		self::assertTrue($profiler->isRendertime());
-		$output = $profiler->getRendertimeString();
-		self::assertMatchesRegularExpression('/test1: \d+/', $output);
-		self::assertMatchesRegularExpression('/test2: \d+/', $output);
 	}
 }

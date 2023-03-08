@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,7 +21,6 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\System;
 use Psr\Container\ContainerExceptionInterface;
@@ -66,30 +65,10 @@ class Profiler implements ContainerInterface
 		return $this->rendertime;
 	}
 
-	/**
-	 * Updates the enabling of the current profiler
-	 *
-	 * Note: The reason there are two different ways of updating the configuration of this class is because it can
-	 * be used even with no available database connection which IManageConfigValues doesn't ensure.
-	 *
-	 * @param IManageConfigValues $config
-	 */
-	public function update(IManageConfigValues $config)
+	public function __construct(IManageConfigValues $config)
 	{
-		$this->enabled = (bool) $config->get('system', 'profiler') ?? false;
-		$this->rendertime = (bool) $config->get('rendertime', 'callstack') ?? false;
-	}
-
-	/**
-	 * Note: The reason we are using a Config Cache object to initialize this class is to ensure it'll work even with no
-	 * available database connection.
-	 *
-	 * @param \Friendica\Core\Config\ValueObject\Cache $configCache The configuration cache
-	 */
-	public function __construct(Cache $configCache)
-	{
-		$this->enabled = (bool) $configCache->get('system', 'profiler') ?? false;
-		$this->rendertime = (bool) $configCache->get('rendertime', 'callstack') ?? false;
+		$this->enabled    = (bool)$config->get('system', 'profiler') ?? false;
+		$this->rendertime = (bool)$config->get('rendertime', 'callstack') ?? false;
 		$this->reset();
 	}
 
@@ -125,7 +104,7 @@ class Profiler implements ContainerInterface
 		$timestamp = array_pop($this->timestamps);
 
 		$duration = floatval(microtime(true) - $timestamp['stamp'] - $timestamp['credit']);
-		$value = $timestamp['value'];
+		$value    = $timestamp['value'];
 
 		foreach ($this->timestamps as $key => $stamp) {
 			$this->timestamps[$key]['credit'] += $duration;
@@ -137,15 +116,15 @@ class Profiler implements ContainerInterface
 			$this->performance[$value] = 0;
 		}
 
-		$this->performance[$value] += (float) $duration;
-		$this->performance['marktime'] += (float) $duration;
+		$this->performance[$value]     += (float)$duration;
+		$this->performance['marktime'] += (float)$duration;
 
 		if (!isset($this->callstack[$value][$callstack])) {
 			// Prevent ugly E_NOTICE
 			$this->callstack[$value][$callstack] = 0;
 		}
 
-		$this->callstack[$value][$callstack] += (float) $duration;
+		$this->callstack[$value][$callstack] += (float)$duration;
 	}
 
 	/**
@@ -173,15 +152,15 @@ class Profiler implements ContainerInterface
 			$this->performance[$value] = 0;
 		}
 
-		$this->performance[$value] += (float) $duration;
-		$this->performance['marktime'] += (float) $duration;
+		$this->performance[$value]     += (float)$duration;
+		$this->performance['marktime'] += (float)$duration;
 
 		if (!isset($this->callstack[$value][$callstack])) {
 			// Prevent ugly E_NOTICE
 			$this->callstack[$value][$callstack] = 0;
 		}
 
-		$this->callstack[$value][$callstack] += (float) $duration;
+		$this->callstack[$value][$callstack] += (float)$duration;
 	}
 
 	/**
@@ -202,23 +181,22 @@ class Profiler implements ContainerInterface
 	 */
 	public function resetPerformance()
 	{
-		$this->performance = [];
-		$this->performance['start'] = microtime(true);
-		$this->performance['ready'] = 0;
-		$this->performance['database'] = 0;
+		$this->performance                   = [];
+		$this->performance['start']          = microtime(true);
+		$this->performance['ready']          = 0;
+		$this->performance['database']       = 0;
 		$this->performance['database_write'] = 0;
-		$this->performance['cache'] = 0;
-		$this->performance['cache_write'] = 0;
-		$this->performance['network'] = 0;
-		$this->performance['file'] = 0;
-		$this->performance['rendering'] = 0;
-		$this->performance['session'] = 0;
-		$this->performance['marktime'] = 0;
-		$this->performance['marktime'] = microtime(true);
-		$this->performance['classcreate'] = 0;
-		$this->performance['classinit'] = 0;
-		$this->performance['init'] = 0;
-		$this->performance['content'] = 0;
+		$this->performance['cache']          = 0;
+		$this->performance['cache_write']    = 0;
+		$this->performance['network']        = 0;
+		$this->performance['file']           = 0;
+		$this->performance['rendering']      = 0;
+		$this->performance['session']        = 0;
+		$this->performance['marktime']       = microtime(true);
+		$this->performance['classcreate']    = 0;
+		$this->performance['classinit']      = 0;
+		$this->performance['init']           = 0;
+		$this->performance['content']        = 0;
 	}
 
 	/**
@@ -228,19 +206,20 @@ class Profiler implements ContainerInterface
 	 */
 	public function resetCallstack()
 	{
-		$this->callstack = [];
-		$this->callstack['database'] = [];
+		$this->callstack                   = [];
+		$this->callstack['database']       = [];
 		$this->callstack['database_write'] = [];
-		$this->callstack['cache'] = [];
-		$this->callstack['cache_write'] = [];
-		$this->callstack['network'] = [];
-		$this->callstack['file'] = [];
-		$this->callstack['rendering'] = [];
-		$this->callstack['session'] = [];
+		$this->callstack['cache']          = [];
+		$this->callstack['cache_write']    = [];
+		$this->callstack['network']        = [];
+		$this->callstack['file']           = [];
+		$this->callstack['rendering']      = [];
+		$this->callstack['session']        = [];
 	}
 
 	/**
 	 * Returns the rendertime string
+	 *
 	 * @param float $limit Minimal limit for displaying the execution duration
 	 *
 	 * @return string the rendertime
@@ -330,17 +309,17 @@ class Profiler implements ContainerInterface
 		$logger->info(
 			$message,
 			[
-				'action' => 'profiling',
-				'database_read' => round($this->get('database') - $this->get('database_write'), 3),
+				'action'         => 'profiling',
+				'database_read'  => round($this->get('database') - $this->get('database_write'), 3),
 				'database_write' => round($this->get('database_write'), 3),
-				'cache_read' => round($this->get('cache'), 3),
-				'cache_write' => round($this->get('cache_write'), 3),
-				'network_io' => round($this->get('network'), 2),
-				'file_io' => round($this->get('file'), 2),
-				'other_io' => round($duration - ($this->get('database')
-						+ $this->get('cache') + $this->get('cache_write')
-						+ $this->get('network') + $this->get('file')), 2),
-				'total' => round($duration, 2)
+				'cache_read'     => round($this->get('cache'), 3),
+				'cache_write'    => round($this->get('cache_write'), 3),
+				'network_io'     => round($this->get('network'), 2),
+				'file_io'        => round($this->get('file'), 2),
+				'other_io'       => round($duration - ($this->get('database')
+													   + $this->get('cache') + $this->get('cache_write')
+													   + $this->get('network') + $this->get('file')), 2),
+				'total'          => round($duration, 2)
 			]
 		);
 
@@ -355,10 +334,10 @@ class Profiler implements ContainerInterface
 	 *
 	 * @param string $id Identifier of the entry to look for.
 	 *
-	 * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
+	 * @return float Entry.
 	 * @throws ContainerExceptionInterface Error while retrieving the entry.
 	 *
-	 * @return float Entry.
+	 * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
 	 */
 	public function get(string $id): float
 	{

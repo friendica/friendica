@@ -312,17 +312,21 @@ a:hover {
 }
 .fakelink {
 	color: #36c;
-	/* color: #3e3e8c; */
-	/* color: #3465A4; */
-	/* color: #3E3E8C; */
 	text-decoration: none;
 	cursor: pointer;
 }
 .fakelink:hover {
-	/* color: blue;*/
-	/* color: #005c94; */
 	text-decoration: underline;
 }
+.btn.btn-link.fakelink {
+	background: none;
+	border: none;
+	box-shadow: none;
+	padding: 0 2px;
+	vertical-align: baseline;
+	outline-offset: 0;
+}
+
 pre code {
 	font-family: Courier, monospace;
 	white-space: pre;

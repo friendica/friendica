@@ -11,14 +11,14 @@
 	</form>
 
 	{{* Directory links *}}
-	<div class="side-link" id="side-directory-link"><a href="directory">{{$nv.local_directory}}</a></div>
-	<div class="side-link" id="side-directory-link"><a href="{{$nv.global_dir}}" target="extlink">{{$nv.directory}}</a></div>
+	<div class="side-link" id="side-directory-link"><a href="directory" class="side-link-link">{{$nv.local_directory}}</a></div>
+	<div class="side-link" id="side-directory-link"><a href="{{$nv.global_dir}}" class="side-link-link" target="extlink">{{$nv.directory}}</a></div>
 	{{* Additional links *}}
-	<div class="side-link" id="side-match-link"><a href="contact/match">{{$nv.similar}}</a></div>
-	<div class="side-link" id="side-suggest-link"><a href="contact/suggestions">{{$nv.suggest}}</a></div>
-	<div class="side-link" id="side-random-profile-link"><a href="randprof" target="extlink">{{$nv.random}}</a></div>
+	<div class="side-link" id="side-match-link"><a href="contact/match" class="side-link-link">{{$nv.similar}}</a></div>
+	<div class="side-link" id="side-suggest-link"><a href="contact/suggestions" class="side-link-link">{{$nv.suggest}}</a></div>
+	<div class="side-link" id="side-random-profile-link"><a href="randprof" class="side-link-link" target="extlink">{{$nv.random}}</a></div>
 
 	{{if $nv.inv}} 
-	<div class="side-link" id="side-invite-link"><button type="button" class="btn-link" onclick="addToModal('invite'); return false;">{{$nv.inv}}</button></div>
+	<div class="side-link" id="side-invite-link"><button type="button" class="btn-link side-link-link" onclick="addToModal('invite'); return false;">{{$nv.inv}}</button></div>
 	{{/if}}
 </div>

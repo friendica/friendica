@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -99,10 +99,10 @@ class ThreadUser
 	}
 
 	/**
-	 * @param int $uri_id 
-	 * @param int $uid 
-	 * @return bool 
-	 * @throws Exception 
+	 * @param int $uri_id
+	 * @param int $uid
+	 * @return bool
+	 * @throws Exception
 	 */
 	public static function getIgnored(int $uri_id, int $uid)
 	{
@@ -114,11 +114,11 @@ class ThreadUser
 	}
 
 	/**
-	 * @param int $uri_id 
-	 * @param int $uid 
-	 * @param int $ignored 
-	 * @return void 
-	 * @throws Exception 
+	 * @param int $uri_id
+	 * @param int $uid
+	 * @param int $ignored
+	 * @return void
+	 * @throws Exception
 	 */
 	public static function setIgnored(int $uri_id, int $uid, int $ignored)
 	{

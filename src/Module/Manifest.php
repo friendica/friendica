@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -35,7 +35,7 @@ class Manifest extends BaseModule
 
 		$manifest = [
 			'name'          => $config->get('config', 'sitename', 'Friendica'),
-			'start_url'     => DI::baseUrl()->get(),
+			'start_url'     => DI::baseUrl(),
 			'display'       => 'standalone',
 			'description'   => $config->get('config', 'info', DI::l10n()->t('A Decentralized Social Network')),
 			'short_name'    => 'Friendica',
@@ -74,12 +74,12 @@ class Manifest extends BaseModule
 		if($touch_icon){
 			$manifest['icons'] = [
 				[
-					'src'   => DI::baseUrl()->get() . '/' . $touch_icon,
+					'src'   => DI::baseUrl() . '/' . $touch_icon,
 					'sizes' => '192x192',
 					'type'  => 'image/png',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/' . $touch_icon,
+					'src'   => DI::baseUrl() . '/' . $touch_icon,
 					'sizes' => '512x512',
 					'type'  => 'image/png',
 				],
@@ -87,37 +87,37 @@ class Manifest extends BaseModule
 		} else {
 			$manifest['icons'] = [
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica.svg',
+					'src'   => DI::baseUrl() . '/images/friendica.svg',
 					'sizes' => 'any',
 					'type'  => 'image/svg+xml',
 					'purpose' => 'any',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica-192.png',
+					'src'   => DI::baseUrl() . '/images/friendica-192.png',
 					'sizes' => '192x192',
 					'type'  => 'image/png',
 					'purpose' => 'any',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica-512.png',
+					'src'   => DI::baseUrl() . '/images/friendica-512.png',
 					'sizes' => '512x512',
 					'type'  => 'image/png',
 					'purpose' => 'any',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica-maskable.svg',
+					'src'   => DI::baseUrl() . '/images/friendica-maskable.svg',
 					'sizes' => 'any',
 					'type'  => 'image/svg+xml',
 					'purpose' => 'maskable',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica-maskable-192.png',
+					'src'   => DI::baseUrl() . '/images/friendica-maskable-192.png',
 					'sizes' => '192x192',
 					'type'  => 'image/png',
 					'purpose' => 'maskable',
 				],
 				[
-					'src'   => DI::baseUrl()->get() . '/images/friendica-maskable-512.png',
+					'src'   => DI::baseUrl() . '/images/friendica-maskable-512.png',
 					'sizes' => '512x512',
 					'type'  => 'image/png',
 					'purpose' => 'maskable',

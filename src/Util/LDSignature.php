@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -69,7 +69,7 @@ class LDSignature
 		$dhash = self::hash(self::signableData($data));
 
 		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode($data['signature']['signatureValue']), $pubkey);
-		Logger::notice('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
+		Logger::info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
 
 		if (empty($x)) {
 			return false;

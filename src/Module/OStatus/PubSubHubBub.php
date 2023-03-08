@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -70,6 +70,8 @@ class PubSubHubBub extends \Friendica\BaseModule
 		if ($this->config->get('system', 'block_public')) {
 			throw new HTTPException\ForbiddenException();
 		}
+
+		$this->logger->debug('Got request data.', ['request' => $request]);
 
 		// Subscription request from subscriber
 		// https://pubsubhubbub.github.io/PubSubHubbub/pubsubhubbub-core-0.4.html#rfc.section.5.1

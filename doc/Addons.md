@@ -60,24 +60,13 @@ This *should* be 'addon/*addon_name*/*addon_name*.php' in most cases and can be 
 `$function` is a string and is the name of the function which will be executed when the hook is called.
 
 ### Arguments
-Your hook callback functions will be called with at least one and possibly two arguments
+Your hook callback functions will be called with at most one argument
 
-    function <addon>_<hookname>(App $a, &$b) {
+    function <addon>_<hookname>(&$b) {
 
     }
 
 If you wish to make changes to the calling data, you must declare them as reference variables (with `&`) during function declaration.
-
-#### $a
-$a is the Friendica `App` class.
-It contains a wealth of information about the current state of Friendica:
-
-* which module has been called,
-* configuration information,
-* the page contents at the point the hook was invoked,
-* profile and user information, etc.
-
-It is recommeded you call this `$a` to match its usage elsewhere.
 
 #### $b
 $b can be called anything you like.
@@ -88,7 +77,7 @@ Remember to declare it with `&` if you wish to alter it.
 
 Your addon can provide user-specific settings via the `addon_settings` PHP hook, but it can also provide node-wide settings in the administration page of your addon.
 
-Simply declare a `<addon>_addon_admin(App $a)` function to display the form and a `<addon>_addon_admin_post(App $a)` function to process the data from the form.
+Simply declare a `<addon>_addon_admin()` function to display the form and a `<addon>_addon_admin_post()` function to process the data from the form.0
 
 ## Global stylesheets
 
@@ -102,7 +91,7 @@ function <addon>_install()
 }
 
 
-function <addon>_head(App $a)
+function <addon>_head()
 {
 	\Friendica\DI::page()->registerStylesheet(__DIR__ . '/relative/path/to/addon/stylesheet.css');
 }
@@ -124,7 +113,7 @@ function <addon>_install()
 	...
 }
 
-function <addon>_footer(App $a)
+function <addon>_footer()
 {
 	\Friendica\DI::page()->registerFooterScript(__DIR__ . '/relative/path/to/addon/script.js');
 }
@@ -167,9 +156,9 @@ DI::args()->get(1); // = 'arg1'
 DI::args()->get(2); // = 'arg2'
 ```
 
-To display a module page, you need to declare the function `<addon>_content(App $a)`, which defines and returns the page body content.
-They may also contain `<addon>_post(App $a)` which is called before the `<addon>_content` function and typically handles the results of POST forms.
-You may also have `<addon>_init(App $a)` which is called before `<addon>_content` and should include common logic to your module.
+To display a module page, you need to declare the function `<addon>_content()`, which defines and returns the page body content.
+They may also contain `<addon>_post()` which is called before the `<addon>_content` function and typically handles the results of POST forms.
+You may also have `<addon>_init()` which is called before `<addon>_content` and should include common logic to your module.
 
 ## Templates
 
@@ -209,7 +198,7 @@ Called when a user attempts to login.
 
 ### logged_in
 Called after a user has successfully logged in.
-`$b` contains the `$a->user` array.
+`$b` contains the `App->user` array.
 
 ### display_item
 Called when formatting a post for display.
@@ -360,7 +349,7 @@ Called prior to output of profile edit page.
 ### profile_advanced
 Called when the HTML is generated for the Advanced profile, corresponding to the Profile tab within a person's profile page.
 `$b` is the HTML string representation of the generated profile.
-The profile array details are in `$a->profile`.
+The profile array details are in `App->profile`.
 
 ### directory_item
 Called from the Directory page when formatting an item for display.

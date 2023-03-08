@@ -6,7 +6,8 @@ They are loaded into the html <head> so that js functions can use them *}}
 
 	var localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
 	var aStr = {
-		'delitem'     : "{{$delitem|escape:'javascript' nofilter}}",
-		'blockAuthor' : "{{$blockAuthor|escape:'javascript' nofilter}}",
+		'delitem'      : "{{$delitem|escape:'javascript' nofilter}}",
+		'blockAuthor'  : "{{$blockAuthor|escape:'javascript' nofilter}}",
+		'ignoreAuthor' : "{{$ignoreAuthor|escape:'javascript' nofilter}}",
 	};
 </script>

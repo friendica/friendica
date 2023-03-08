@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -45,7 +45,7 @@ class Report extends \Friendica\BaseRepository
 		$this->factory = $factory;
 	}
 
-	public function selectOneById(int $lastInsertId): \Friendica\Moderation\Factory\Report
+	public function selectOneById(int $lastInsertId): \Friendica\Moderation\Entity\Report
 	{
 		return $this->_selectOne(['id' => $lastInsertId]);
 	}
@@ -53,11 +53,16 @@ class Report extends \Friendica\BaseRepository
 	public function save(\Friendica\Moderation\Entity\Report $Report)
 	{
 		$fields = [
-			'uid'     => $Report->uid,
-			'cid'     => $Report->cid,
-			'comment' => $Report->comment,
-			'forward' => $Report->forward,
+			'uid'         => $Report->uid,
+			'reporter-id' => $Report->reporterId,
+			'cid'         => $Report->cid,
+			'comment'     => $Report->comment,
+			'category'    => $Report->category,
+			'rules'       => $Report->rules,
+			'forward'     => $Report->forward,
 		];
+
+		$postUriIds = $Report->postUriIds;
 
 		if ($Report->id) {
 			$this->db->update(self::$table_name, $fields, ['id' => $Report->id]);
@@ -70,7 +75,7 @@ class Report extends \Friendica\BaseRepository
 
 		$this->db->delete('report-post', ['rid' => $Report->id]);
 
-		foreach ($Report->postUriIds as $uriId) {
+		foreach ($postUriIds as $uriId) {
 			if (Post::exists(['uri-id' => $uriId])) {
 				$this->db->insert('report-post', ['rid' => $Report->id, 'uri-id' => $uriId]);
 			} else {

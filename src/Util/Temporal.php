@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -26,6 +26,8 @@ use DateTimeZone;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Util\Clock\SystemClock;
+use Psr\Clock\ClockInterface;
 
 /**
  * Temporal class
@@ -238,7 +240,7 @@ class Temporal
 		bool $required = false): string
 	{
 		// First day of the week (0 = Sunday)
-		$firstDay = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'first_day_of_week', 0);
+		$firstDay = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'first_day_of_week', 0);
 
 		$lang = substr(DI::l10n()->getCurrentLang(), 0, 2);
 
@@ -305,18 +307,20 @@ class Temporal
 	 * Results relative to current timezone.
 	 * Limited to range of timestamps.
 	 *
-	 * @param string $posted_date  MySQL-formatted date string (YYYY-MM-DD HH:MM:SS)
-	 * @param string $format       (optional) Parsed with sprintf()
-	 * @param bool   $compare_time Compare date (false) or date and time (true). "true" is default.
-	 *    <tt>%1$d %2$s ago</tt>, e.g. 22 hours ago, 1 minute ago
+	 * @param string|null         $posted_date  MySQL-formatted date string (YYYY-MM-DD HH:MM:SS)
+	 * @param bool                $compare_time Compare date (false) or date and time (true). "true" is default.
+	 * @param ClockInterface|null $clock
+	 *                                  <tt>%1$d %2$s ago</tt>, e.g. 22 hours ago, 1 minute ago
 	 *
 	 * @return string with relative date
 	 */
-	public static function getRelativeDate(string $posted_date = null, string $format = null, bool $compare_time = true): string
+	public static function getRelativeDate(string $posted_date = null, bool $compare_time = true, ClockInterface $clock = null): string
 	{
 		if (empty($posted_date) || $posted_date <= DBA::NULL_DATETIME) {
 			return DI::l10n()->t('never');
 		}
+
+		$clock = $clock ?? new SystemClock();
 
 		$localtime = $posted_date . ' UTC';
 		$abs = strtotime($localtime);
@@ -325,8 +329,8 @@ class Temporal
 			return DI::l10n()->t('never');
 		}
 
-		$now = time();
-	
+		$now = $clock->now()->getTimestamp();
+
 		if (!$compare_time) {
 			$now = mktime(0, 0, 0, date('m', $now), date('d', $now), date('Y', $now));
 			$abs = mktime(0, 0, 0, date('m', $abs), date('d', $abs), date('Y', $abs));
@@ -335,7 +339,7 @@ class Temporal
 		$isfuture = false;
 		$etime = $now - $abs;
 
-		if ($etime < 1 && $etime >= 0) {
+		if ($etime >= 0 && $etime < 1) {
 			return $compare_time ? DI::l10n()->t('less than a second ago') : DI::l10n()->t('today');
 		}
 
@@ -357,15 +361,13 @@ class Temporal
 		foreach ($a as $secs => $str) {
 			$d = $etime / $secs;
 			if ($d >= 1) {
-				$r = round($d);
+				$r = floor($d);
 				// translators - e.g. 22 hours ago, 1 minute ago
-				if (!$format) {
-					if($isfuture){
-						$format = DI::l10n()->t('in %1$d %2$s');
-					}
-					else {
-						$format = DI::l10n()->t('%1$d %2$s ago');
-					}
+				if($isfuture){
+					$format = DI::l10n()->t('in %1$d %2$s');
+				}
+				else {
+					$format = DI::l10n()->t('%1$d %2$s ago');
 				}
 
 				return sprintf($format, $r, (($r == 1) ? $str[0] : $str[1]));

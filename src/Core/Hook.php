@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -167,7 +167,7 @@ class Hook
 						if ($hook[0] != $fork_hook[0]) {
 							continue;
 						}
-						self::callSingle(DI::app(), 'hook_fork', $fork_hook, $hookdata);
+						self::callSingle('hook_fork', $fork_hook, $hookdata);
 					}
 
 					if (!$hookdata['execute']) {
@@ -195,7 +195,7 @@ class Hook
 	{
 		if (array_key_exists($name, self::$hooks)) {
 			foreach (self::$hooks[$name] as $hook) {
-				self::callSingle(DI::app(), $name, $hook, $data);
+				self::callSingle($name, $hook, $data);
 			}
 		}
 	}
@@ -203,24 +203,23 @@ class Hook
 	/**
 	 * Calls a single hook.
 	 *
-	 * @param App             $a
 	 * @param string          $name of the hook to call
 	 * @param array           $hook Hook data
 	 * @param string|array   &$data to transmit to the callback handler
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function callSingle(App $a, string $name, array $hook, &$data = null)
+	public static function callSingle(string $name, array $hook, &$data = null)
 	{
 		// Don't run a theme's hook if the user isn't using the theme
-		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . $a->getCurrentTheme()) === false) {
+		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . DI::app()->getCurrentTheme()) === false) {
 			return;
 		}
 
 		@include_once($hook[0]);
 		if (function_exists($hook[1])) {
 			$func = $hook[1];
-			$func($a, $data);
+			$func($data);
 		} else {
 			// remove orphan hooks
 			$condition = ['hook' => $name, 'file' => $hook[0], 'function' => $hook[1]];

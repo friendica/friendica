@@ -98,6 +98,9 @@ span.connector {
   margin-right: 0px;
 }
 
+.wall-item-emoji {
+  margin-right: 5px;
+}
 
 .wall-item-like-expanded,
 .wall-item-dislike-expanded,

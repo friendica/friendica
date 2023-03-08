@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -42,7 +42,7 @@ class Media extends BaseApi
 		if (empty($_FILES['file'])) {
 			DI::mstdnError()->UnprocessableEntity();
 		}
-	
+
 		$media = Photo::upload($uid, $_FILES['file']);
 		if (empty($media)) {
 			DI::mstdnError()->UnprocessableEntity();

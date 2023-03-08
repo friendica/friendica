@@ -17,7 +17,7 @@
 			{{* The dropdown to change the callendar view *}}
 			<ul class="nav nav-pills">
 				<li class="dropdown pull-right">
-					<button class="btn btn-link btn-sm dropdown-toggle" type="button" id="event-calendar-views" data-toggle="dropdown" aria-expanded="false">
+					<button class="btn btn-link dropdown-toggle" type="button" id="event-calendar-views" data-toggle="dropdown" aria-expanded="false">
 						<i class="fa fa-angle-down" aria-hidden="true"></i> {{$view}}
 					</button>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="event-calendar-views">

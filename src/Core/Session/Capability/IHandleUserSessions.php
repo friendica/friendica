@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,6 +32,13 @@ interface IHandleUserSessions extends IHandleSessions
 	 * @return int|bool user id or false
 	 */
 	public function getLocalUserId();
+
+	/**
+	 * Returns the user nickname of locally logged-in user.
+	 *
+	 * @return string|false User's nickname or false
+	 */
+	public function getLocalUserNickname();
 
 	/**
 	 * Returns the public contact id of logged-in user or false.
@@ -78,6 +85,13 @@ interface IHandleUserSessions extends IHandleSessions
 	 * @return bool "true" when visitor is either a local or remote user
 	 */
 	public function isAuthenticated(): bool;
+
+	/**
+	 * Check if current user has admin role.
+	 *
+	 * @return bool true if user is an admin
+	 */
+	public function isSiteAdmin(): bool;
 
 	/**
 	 * Returns User ID of the managed user in case it's a different identity

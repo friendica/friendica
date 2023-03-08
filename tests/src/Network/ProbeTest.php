@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,10 +23,10 @@ namespace Friendica\Test\src\Network;
 
 use Friendica\Network\Probe;
 use Friendica\Test\DiceHttpMockHandlerTrait;
-use Friendica\Test\FixtureTest;
+use Friendica\Test\MockedTest;
 use GuzzleHttp\Middleware;
 
-class ProbeTest extends FixtureTest
+class ProbeTest extends MockedTest
 {
 	use DiceHttpMockHandlerTrait;
 
@@ -35,6 +35,13 @@ class ProbeTest extends FixtureTest
 		parent::setUp();
 
 		$this->setupHttpMockHandler();
+	}
+
+	protected function tearDown(): void
+	{
+		$this->tearDownHandler();
+
+		parent::tearDown();
 	}
 
 	const TEMPLATENOBASE = '

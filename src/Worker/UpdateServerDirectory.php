@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -31,7 +31,7 @@ class UpdateServerDirectory
 {
 	/**
 	 * Query the given server for their users
-	 * 
+	 *
 	 * @param array $gserver Server record
 	 */
 	public static function execute(array $gserver)
@@ -77,7 +77,7 @@ class UpdateServerDirectory
 	}
 
 	private static function discoverMastodonDirectory(array $gserver)
-	{		
+	{
 		$result = DI::httpClient()->fetch($gserver['url'] . '/api/v1/directory?order=new&local=true&limit=200&offset=0', HttpClientAccept::JSON);
 		if (empty($result)) {
 			Logger::info('Empty result', ['url' => $gserver['url']]);

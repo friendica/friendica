@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,6 +24,8 @@ namespace Friendica\Factory\Api\Mastodon;
 use Friendica\BaseFactory;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Item as ContentItem;
+use Friendica\Content\Text\BBCode;
+use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
@@ -31,6 +33,8 @@ use Friendica\Model\Post;
 use Friendica\Model\Tag as TagModel;
 use Friendica\Model\Verb;
 use Friendica\Network\HTTPException;
+use Friendica\Object\Api\Mastodon\Status\FriendicaDeliveryData;
+use Friendica\Object\Api\Mastodon\Status\FriendicaExtension;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use ImagickException;
@@ -57,12 +61,18 @@ class Status extends BaseFactory
 	/** @var ContentItem */
 	private $contentItem;
 
-	public function __construct(LoggerInterface $logger, Database $dba,
-		Account $mstdnAccountFactory, Mention $mstdnMentionFactory,
-		Tag $mstdnTagFactory, Card $mstdnCardFactory,
-		Attachment $mstdnAttachementFactory, Error $mstdnErrorFactory,
-		Poll $mstdnPollFactory, ContentItem $contentItem)
-	{
+	public function __construct(
+		LoggerInterface $logger,
+		Database $dba,
+		Account $mstdnAccountFactory,
+		Mention $mstdnMentionFactory,
+		Tag $mstdnTagFactory,
+		Card $mstdnCardFactory,
+		Attachment $mstdnAttachementFactory,
+		Error $mstdnErrorFactory,
+		Poll $mstdnPollFactory,
+		ContentItem $contentItem
+	) {
 		parent::__construct($logger);
 		$this->dba                     = $dba;
 		$this->mstdnAccountFactory     = $mstdnAccountFactory;
@@ -76,18 +86,21 @@ class Status extends BaseFactory
 	}
 
 	/**
-	 * @param int  $uriId  Uri-ID of the item
-	 * @param int  $uid    Item user
-	 * @param bool $reblog Check for reblogged post
+	 * @param int  $uriId           Uri-ID of the item
+	 * @param int  $uid             Item user
+	 * @param bool $display_quote   Display quoted posts
+	 * @param bool $reblog          Check for reblogged post
+	 * @param bool $in_reply_status Add an "in_reply_status" element
 	 *
 	 * @return \Friendica\Object\Api\Mastodon\Status
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws ImagickException|HTTPException\NotFoundException
 	 */
-	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true): \Friendica\Object\Api\Mastodon\Status
+	public function createFromUriId(int $uriId, int $uid = 0, bool $display_quote = false, bool $reblog = true, bool $in_reply_status = true): \Friendica\Object\Api\Mastodon\Status
 	{
 		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
-			'created', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id'];
+			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
+			'delivery_queue_count', 'delivery_queue_done','delivery_queue_failed'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
 		if (!$item) {
 			$mail = DBA::selectFirst('mail', ['id'], ['uri-id' => $uriId, 'uid' => $uid]);
@@ -97,17 +110,29 @@ class Status extends BaseFactory
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
 		}
 
+		$activity_fields = ['uri-id', 'thr-parent-id', 'uri', 'author-id', 'author-uri-id', 'author-link', 'app', 'created', 'network', 'parent-author-id', 'private'];
+
 		if (($item['gravity'] == Item::GRAVITY_ACTIVITY) && ($item['vid'] == Verb::getID(Activity::ANNOUNCE))) {
 			$is_reshare = true;
 			$account    = $this->mstdnAccountFactory->createFromUriId($item['author-uri-id'], $uid);
 			$uriId      = $item['thr-parent-id'];
+			$activity   = $item;
 			$item       = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
 			if (!$item) {
 				throw new HTTPException\NotFoundException('Item with URI ID ' . $uriId . ' not found' . ($uid ? ' for user ' . $uid : '.'));
 			}
+			foreach ($activity_fields as $field) {
+				$item[$field] = $activity[$field];
+			}
 		} else {
 			$is_reshare = $reblog && !is_null($item['causer-uri-id']) && ($item['causer-id'] != $item['author-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT);
 			$account    = $this->mstdnAccountFactory->createFromUriId($is_reshare ? $item['causer-uri-id'] : $item['author-uri-id'], $uid);
+			if ($is_reshare) {
+				$activity = Post::selectFirstPost($activity_fields, ['thr-parent-id' => $item['uri-id'], 'author-id' => $item['causer-id'], 'verb' => Activity::ANNOUNCE]);
+				if ($activity) {
+					$item = array_merge($item, $activity);
+				}
+			}
 		}
 
 		$count_announce = Post::countPosts([
@@ -115,18 +140,31 @@ class Status extends BaseFactory
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::ANNOUNCE),
 			'deleted'       => false
-		], []);
+		]) + Post::countPosts([
+			'quote-uri-id' => $uriId,
+			'body'         => '',
+			'deleted'      => false
+		]);
+
 		$count_like = Post::countPosts([
 			'thr-parent-id' => $uriId,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::LIKE),
 			'deleted'       => false
-		], []);
+		]);
+
+		$count_dislike = Post::countPosts([
+			'thr-parent-id' => $uriId,
+			'gravity'       => Item::GRAVITY_ACTIVITY,
+			'vid'           => Verb::getID(Activity::DISLIKE),
+			'deleted'       => false
+		]);
 
 		$counts = new \Friendica\Object\Api\Mastodon\Status\Counts(
 			Post::countPosts(['thr-parent-id' => $uriId, 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false], []),
 			$count_announce,
-			$count_like
+			$count_like,
+			$count_dislike
 		);
 
 		$origin_like = ($count_like == 0) ? false : Post::exists([
@@ -143,6 +181,12 @@ class Status extends BaseFactory
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::ANNOUNCE),
+			'deleted'       => false
+		]) || Post::exists([
+			'quote-uri-id' => $uriId,
+			'uid'           => $uid,
+			'origin'        => true,
+			'body'          => '',
 			'deleted'       => false
 		]);
 		$userAttributes = new \Friendica\Object\Api\Mastodon\Status\UserAttributes(
@@ -172,46 +216,115 @@ class Status extends BaseFactory
 			$poll = null;
 		}
 
-		$shared = $this->contentItem->getSharedPost($item, ['uri-id']);
-		if (!empty($shared)) {
-			$shared_uri_id = $shared['post']['uri-id'];
+		if ($display_quote) {
+			$quote = self::createQuote($item, $uid);
 
-			foreach ($this->mstdnMentionFactory->createFromUriId($shared_uri_id)->getArrayCopy() as $mention) {
-				if (!in_array($mention, $mentions)) {
-					$mentions[] = $mention;
+			$item['body'] = BBCode::removeSharedData($item['body']);
+
+			if (!is_null($item['raw-body'])) {
+				$item['raw-body'] = BBCode::removeSharedData($item['raw-body']);
+			}
+		} else {
+			// We can always safely add attached activities. Real quotes are added to the body via "addSharedPost".
+			if (empty($item['quote-uri-id'])) {
+				$quote = self::createQuote($item, $uid);
+			} else {
+				$quote = [];
+			}
+
+			$shared = $this->contentItem->getSharedPost($item, ['uri-id']);
+			if (!empty($shared)) {
+				$shared_uri_id = $shared['post']['uri-id'];
+
+				foreach ($this->mstdnMentionFactory->createFromUriId($shared_uri_id)->getArrayCopy() as $mention) {
+					if (!in_array($mention, $mentions)) {
+						$mentions[] = $mention;
+					}
+				}
+
+				foreach ($this->mstdnTagFactory->createFromUriId($shared_uri_id) as $tag) {
+					if (!in_array($tag, $tags)) {
+						$tags[] = $tag;
+					}
+				}
+
+				foreach ($this->mstdnAttachementFactory->createFromUriId($shared_uri_id) as $attachment) {
+					if (!in_array($attachment, $attachments)) {
+						$attachments[] = $attachment;
+					}
+				}
+
+				if (empty($card->toArray())) {
+					$card = $this->mstdnCardFactory->createFromUriId($shared_uri_id);
 				}
 			}
 
-			foreach ($this->mstdnTagFactory->createFromUriId($shared_uri_id) as $tag) {
-				if (!in_array($tag, $tags)) {
-					$tags[] = $tag;
-				}
+			if (!is_null($item['raw-body'])) {
+				$item['raw-body'] = $this->contentItem->addSharedPost($item, $item['raw-body']);
+				$item['raw-body'] = Post\Media::addHTMLLinkToBody($uriId, $item['raw-body']);
+			} else {
+				$item['body'] = $this->contentItem->addSharedPost($item);
+				$item['body'] = Post\Media::addHTMLLinkToBody($uriId, $item['body']);
 			}
-
-			foreach ($this->mstdnAttachementFactory->createFromUriId($shared_uri_id) as $attachment) {
-				if (!in_array($attachment, $attachments)) {
-					$attachments[] = $attachment;
-				}
-			}
-
-			if (empty($card->toArray())) {
-				$card = $this->mstdnCardFactory->createFromUriId($shared_uri_id);
-			}
-		}
-
-		$item['body'] = $this->contentItem->addSharedPost($item);
-
-		if (!is_null($item['raw-body'])) {
-			$item['raw-body'] = $this->contentItem->addSharedPost($item, $item['raw-body']);
 		}
 
 		if ($is_reshare) {
-			$reshare = $this->createFromUriId($uriId, $uid, false)->toArray();
+			try {
+				$reshare = $this->createFromUriId($uriId, $uid, $display_quote, false, false)->toArray();
+			} catch (\Exception $exception) {
+				Logger::info('Reshare not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+				$reshare = [];
+			}
 		} else {
 			$reshare = [];
 		}
 
-		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $reshare, $poll);
+		if ($in_reply_status && ($item['gravity'] == Item::GRAVITY_COMMENT)) {
+			try {
+				$in_reply = $this->createFromUriId($item['thr-parent-id'], $uid, $display_quote, false, false)->toArray();
+			} catch (\Exception $exception) {
+				Logger::info('Reply post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+				$in_reply = [];
+			}
+		} else {
+			$in_reply = [];
+		}
+
+		$delivery_data = new FriendicaDeliveryData($item['delivery_queue_count'], $item['delivery_queue_done'], $item['delivery_queue_failed']);
+		$friendica     = new FriendicaExtension($item['title'], $item['changed'], $item['commented'], $item['received'], $counts->dislikes, $delivery_data);
+
+		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $in_reply, $reshare, $friendica, $quote, $poll);
+	}
+
+	/**
+	 * Create a quote status object
+	 *
+	 * @param array $item
+	 * @param integer $uid
+	 * @return array
+	 */
+	private function createQuote(array $item, int $uid): array
+	{
+		if (empty($item['quote-uri-id'])) {
+			$media = Post\Media::getByURIId($item['uri-id'], [Post\Media::ACTIVITY]);
+			if (!empty($media) && $shared_item = Post::selectFirst(['uri-id'], ['plink' => $media[0]['url'], 'uid' => [$uid, 0]])) {
+				$quote_id = $shared_item['uri-id'];
+			}
+		} else {
+			$quote_id = $item['quote-uri-id'];
+		}
+
+		if (!empty($quote_id)) {
+			try {
+				$quote = $this->createFromUriId($quote_id, $uid, false, false, false)->toArray();
+			} catch (\Exception $exception) {
+				Logger::info('Quote not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+				$quote = [];
+			}
+		} else {
+			$quote = [];
+		}
+		return $quote;
 	}
 
 	/**
@@ -232,7 +345,7 @@ class Status extends BaseFactory
 
 		$replies = $this->dba->count('mail', ['thr-parent-id' => $item['uri-id'], 'reply' => true]);
 
-		$counts = new \Friendica\Object\Api\Mastodon\Status\Counts($replies, 0, 0);
+		$counts = new \Friendica\Object\Api\Mastodon\Status\Counts($replies, 0, 0, 0);
 
 		$userAttributes = new \Friendica\Object\Api\Mastodon\Status\UserAttributes(false, false, false, false, false);
 
@@ -242,8 +355,10 @@ class Status extends BaseFactory
 		$tags        = [];
 		$card        = new \Friendica\Object\Api\Mastodon\Card([]);
 		$attachments = [];
+		$in_reply    = [];
 		$reshare     = [];
+		$friendica   = new FriendicaExtension('', null, null, null, 0, new FriendicaDeliveryData(0, 0, 0));
 
-		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $reshare);
+		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $in_reply, $reshare, $friendica);
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -85,7 +85,6 @@ class Deleted extends BaseUsers
 			'$form_security_token' => self::getFormSecurityToken('moderation_users_deleted'),
 
 			// values //
-			'$baseurl'      => $this->baseUrl->get(true),
 			'$query_string' => $this->args->getQueryString(),
 
 			'$users' => $users,

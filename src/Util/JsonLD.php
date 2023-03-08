@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -44,26 +44,26 @@ class JsonLD
 	{
 		switch ($url) {
 			case 'https://w3id.org/security/v1':
-				$url = DI::baseUrl() . '/static/security-v1.jsonld';
+				$url = DI::basePath() . '/static/security-v1.jsonld';
 				break;
 			case 'https://w3id.org/identity/v1':
-				$url = DI::baseUrl() . '/static/identity-v1.jsonld';
+				$url = DI::basePath() . '/static/identity-v1.jsonld';
 				break;
 			case 'https://www.w3.org/ns/activitystreams':
-				$url = DI::baseUrl() . '/static/activitystreams.jsonld';
+				$url = DI::basePath() . '/static/activitystreams.jsonld';
 				break;
 			case 'https://funkwhale.audio/ns':
-				$url = DI::baseUrl() . '/static/funkwhale.audio.jsonld';
+				$url = DI::basePath() . '/static/funkwhale.audio.jsonld';
 				break;
 			default:
 				switch (parse_url($url, PHP_URL_PATH)) {
 					case '/schemas/litepub-0.1.jsonld';
-						$url = DI::baseUrl() . '/static/litepub-0.1.jsonld';
+						$url = DI::basePath() . '/static/litepub-0.1.jsonld';
 						break;
 					case '/apschema/v1.2':
 					case '/apschema/v1.9':
 					case '/apschema/v1.10':
-							$url = DI::baseUrl() . '/static/apschema.jsonld';
+						$url = DI::basePath() . '/static/apschema.jsonld';
 						break;
 					default:
 						Logger::info('Got url', ['url' =>$url]);

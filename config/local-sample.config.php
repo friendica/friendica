@@ -40,5 +40,6 @@ return [
 	'system' => [
 		'default_timezone' => 'UTC',
 		'language' => 'en',
+		'url' => 'https://friendica.local',
 	],
 ];

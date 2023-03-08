@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -83,13 +83,18 @@ class Proxy extends BaseModule
 		$request['url'] = str_replace(' ', '+', $request['url']);
 
 		// Fetch the content with the local user
-		$fetchResult = HTTPSignature::fetchRaw($request['url'], DI::userSession()->getLocalUserId(), [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE], 'timeout' => 10]);
-		$img_str = $fetchResult->getBody();
+		try {
+			$fetchResult = HTTPSignature::fetchRaw($request['url'], DI::userSession()->getLocalUserId(), [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE], 'timeout' => 10]);
+			$img_str = $fetchResult->getBody();
 
-		if (!$fetchResult->isSuccess() || empty($img_str)) {
-			Logger::notice('Error fetching image', ['image' => $request['url'], 'return' => $fetchResult->getReturnCode(), 'empty' => empty($img_str)]);
+			if (!$fetchResult->isSuccess() || empty($img_str)) {
+				Logger::notice('Error fetching image', ['image' => $request['url'], 'return' => $fetchResult->getReturnCode(), 'empty' => empty($img_str)]);
+				self::responseError();
+				// stop.
+			}
+		} catch (\Exception $exception) {
+			Logger::notice('Error fetching image', ['image' => $request['url'], 'exception' => $exception]);
 			self::responseError();
-			// stop.
 		}
 
 		Logger::debug('Got picture', ['Content-Type' => $fetchResult->getHeader('Content-Type'), 'uid' => DI::userSession()->getLocalUserId(), 'image' => $request['url']]);

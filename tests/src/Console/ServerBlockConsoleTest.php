@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,12 +22,14 @@
 namespace Friendica\Test\src\Console;
 
 use Friendica\Console\ServerBlock;
-use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Moderation\DomainPatternBlocklist;
+use Friendica\Test\FixtureTestTrait;
 use Mockery;
 
 class ServerBlockConsoleTest extends ConsoleTest
 {
+	use FixtureTestTrait;
+
 	protected $defaultBlockList = [
 		[
 			'domain' => 'social.nobodyhasthe.biz',
@@ -47,7 +49,16 @@ class ServerBlockConsoleTest extends ConsoleTest
 	{
 		parent::setUp();
 
+		$this->setUpFixtures();
+
 		$this->blocklistMock = Mockery::mock(DomainPatternBlocklist::class);
+	}
+
+	protected function tearDown(): void
+	{
+		$this->tearDownFixtures();
+
+		parent::tearDown();
 	}
 
 	/**

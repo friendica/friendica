@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -63,7 +63,7 @@ class InstallerTest extends MockedTest
 		           ->with(L10n::class)
 		           ->andReturn($this->l10nMock);
 
-		DI::init($this->dice);
+		DI::init($this->dice, true);
 	}
 
 	public static function tearDownAfterClass(): void
@@ -361,7 +361,7 @@ class InstallerTest extends MockedTest
 		     ->with(ICanSendHttpRequests::class)
 		     ->andReturn($networkMock);
 
-		DI::init($this->dice);
+		DI::init($this->dice, true);
 
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);
@@ -408,7 +408,7 @@ class InstallerTest extends MockedTest
 		           ->with(ICanSendHttpRequests::class)
 		           ->andReturn($networkMock);
 
-		DI::init($this->dice);
+		DI::init($this->dice, true);
 
 		// Mocking that we can use CURL
 		$this->setFunctions(['curl_init' => true]);

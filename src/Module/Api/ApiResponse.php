@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -99,7 +99,7 @@ class ApiResponse extends Response
 
 		$data3 = [$root_element => $data2];
 
-		return XML::fromArray($data3, $xml, false, $namespaces);
+		return XML::fromArray($data3, $dummy, false, $namespaces);
 	}
 
 	/**
@@ -276,9 +276,8 @@ class ApiResponse extends Response
 				'agent'   => $_SERVER['HTTP_USER_AGENT'] ?? '',
 				'request' => $request,
 			]);
-		$error             = $this->l10n->t('API endpoint %s %s is not implemented', strtoupper($method), $path);
-		$error_description = $this->l10n->t('The API endpoint is currently not implemented but might be in the future.');
+		$error = $this->l10n->t('API endpoint %s %s is not implemented but might be in the future.', strtoupper($method), $path);
 
-		$this->exit('error', ['error' => ['error' => $error, 'error_description' => $error_description]]);
+		$this->error(501, 'Not Implemented', $error);
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,14 +38,14 @@ class Relationship extends BaseFactory
 	public function createFromContactId(int $contactId, int $uid): RelationshipEntity
 	{
 		$cdata = Contact::getPublicAndUserContactID($contactId, $uid);
-		if (!empty($cdata)) {
-			$cid  = $cdata['user'];
-			$pcid = $cdata['public'];
-		} else {
-			$pcid = $cid = $contactId;
-		}
+		$pcid  = !empty($cdata['public']) ? $cdata['public'] : $contactId;
+		$cid   = !empty($cdata['user']) ? $cdata['user'] : $contactId;
 
-		return new RelationshipEntity($pcid, Contact::getById($cid),
-			Contact\User::isBlocked($cid, $uid), Contact\User::isIgnored($cid, $uid));
+		return new RelationshipEntity(
+			$pcid,
+			Contact::getById($cid),
+			Contact\User::isBlocked($cid, $uid),
+			Contact\User::isIgnored($cid, $uid)
+		);
 	}
 }

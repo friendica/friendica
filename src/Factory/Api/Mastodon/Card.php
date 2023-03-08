@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,44 +39,39 @@ class Card extends BaseFactory
 	 */
 	public function createFromUriId(int $uriId, array $history = []): \Friendica\Object\Api\Mastodon\Card
 	{
-		$item = Post::selectFirst(['body'], ['uri-id' => $uriId]);
-		if (!empty($item['body'])) {
-			$data = BBCode::getAttachmentData($item['body']);
-		} else {
-			$data = [];
+		$media = Post\Media::getByURIId($uriId, [Post\Media::HTML]);
+		if (empty($media) || (empty($media[0]['description']) && empty($media[0]['image']) && empty($media[0]['preview']))) {
+			return new \Friendica\Object\Api\Mastodon\Card([], $history);
 		}
 
-		foreach (Post\Media::getByURIId($uriId, [Post\Media::HTML]) as $attached) {
-			if ((empty($data['url']) || Strings::compareLink($data['url'], $attached['url'])) &&
-				(!empty($attached['description']) || !empty($attached['image']) || !empty($attached['preview']))) {
-				$parts = parse_url($attached['url']);
-				if (!empty($parts['scheme']) && !empty($parts['host'])) {
-					if (empty($attached['publisher-name'])) {
-						$attached['publisher-name'] = $parts['host'];
-					}
-					if (empty($attached['publisher-url']) || empty(parse_url($attached['publisher-url'], PHP_URL_SCHEME))) {
-						$attached['publisher-url'] = $parts['scheme'] . '://' . $parts['host'];
+		$parts = parse_url($media[0]['url']);
+		if (!empty($parts['scheme']) && !empty($parts['host'])) {
+			if (empty($media[0]['publisher-name'])) {
+				$media[0]['publisher-name'] = $parts['host'];
+			}
+			if (empty($media[0]['publisher-url']) || empty(parse_url($media[0]['publisher-url'], PHP_URL_SCHEME))) {
+				$media[0]['publisher-url'] = $parts['scheme'] . '://' . $parts['host'];
 
-						if (!empty($parts['port'])) {
-							$attached['publisher-url'] .= ':' . $parts['port'];
-						}
-					}
+				if (!empty($parts['port'])) {
+					$media[0]['publisher-url'] .= ':' . $parts['port'];
 				}
-
-				$data['url']           = $attached['url'];
-				$data['title']         = $attached['name'];
-				$data['description']   = $attached['description'];
-				$data['type']          = 'link';
-				$data['author_name']   = $attached['author-name'];
-				$data['author_url']    = $attached['author-url'];
-				$data['provider_name'] = $attached['publisher-name'];
-				$data['provider_url']  = $attached['publisher-url'];
-				$data['image']         = $attached['preview'];
-				$data['width']         = $attached['preview-width'];
-				$data['height']        = $attached['preview-height'];
-				$data['blurhash']      = $attached['blurhash'];
 			}
 		}
+
+		$data = [];
+
+		$data['url']           = $media[0]['url'];
+		$data['title']         = $media[0]['name'];
+		$data['description']   = $media[0]['description'];
+		$data['type']          = 'link';
+		$data['author_name']   = $media[0]['author-name'];
+		$data['author_url']    = $media[0]['author-url'];
+		$data['provider_name'] = $media[0]['publisher-name'];
+		$data['provider_url']  = $media[0]['publisher-url'];
+		$data['image']         = $media[0]['preview'];
+		$data['width']         = $media[0]['preview-width'];
+		$data['height']        = $media[0]['preview-height'];
+		$data['blurhash']      = $media[0]['blurhash'];
 
 		return new \Friendica\Object\Api\Mastodon\Card($data, $history);
 	}

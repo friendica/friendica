@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,11 +37,18 @@ class Tags extends BaseApi
 	protected function rawContent(array $request = [])
 	{
 		$request = $this->getRequest([
-			'limit' => 20, // Maximum number of results to return. Defaults to 10.
+			'limit' => 20, // Maximum number of results to return. Defaults to 20.
+			'offset' => 0, // Offset in set. Defaults to 0.
+			'friendica_local' => false, // Whether to return local tag trends instead of global, defaults to false
 		], $request);
 
 		$trending = [];
-		$tags = Tag::getGlobalTrendingHashtags(24, 20);
+		if ($request['friendica_local']) {
+			$tags = Tag::getLocalTrendingHashtags(24, $request['limit'], $request['offset']);
+		} else {
+			$tags = Tag::getGlobalTrendingHashtags(24, $request['limit'], $request['offset']);
+		}
+
 		foreach ($tags as $tag) {
 			$tag['name'] = $tag['term'];
 			$history = [['day' => (string)time(), 'uses' => (string)$tag['score'], 'accounts' => (string)$tag['authors']]];
@@ -49,6 +56,10 @@ class Tags extends BaseApi
 			$trending[] = $hashtag->toArray();
 		}
 
-		System::jsonExit(array_slice($trending, 0, $request['limit']));
+		if (!empty($trending)) {
+			self::setLinkHeaderByOffsetLimit($request['offset'], $request['limit']);
+		}
+
+		System::jsonExit($trending);
 	}
 }

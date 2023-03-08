@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -93,7 +93,7 @@ HELP;
 			$this->out('Options: ' . var_export($this->options, true));
 		}
 
-		if (!$this->appMode->has(App\Mode::DBCONFIGAVAILABLE)) {
+		if (!$this->appMode->has(App\Mode::DBAVAILABLE)) {
 			$this->out('Database isn\'t ready or populated yet, database cache won\'t be available');
 		}
 

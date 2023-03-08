@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -120,6 +120,15 @@ class Probe
 
 		$numeric_fields = ['gsid', 'hide', 'account-type', 'manually-approve'];
 
+		if (!empty($data['photo'])) {
+			$data['photo'] = Network::addBasePath($data['photo'], $data['url']);
+
+			if (!Network::isValidHttpUrl($data['photo'])) {
+				Logger::warning('Invalid URL for photo', ['url' => $data['url'], 'photo' => $data['photo']]);
+				unset($data['photo']);
+			}
+		}
+
 		$newdata = [];
 		foreach ($fields as $field) {
 			if (isset($data[$field])) {
@@ -139,8 +148,17 @@ class Probe
 		foreach ([Protocol::DIASPORA, Protocol::OSTATUS] as $network) {
 			if (!empty($data['networks'][$network])) {
 				$data['networks'][$network]['subscribe'] = $newdata['subscribe'] ?? '';
-				$data['networks'][$network]['baseurl'] = $newdata['baseurl'] ?? '';
-				$data['networks'][$network]['gsid'] = $newdata['gsid'] ?? 0;
+				if (empty($data['networks'][$network]['baseurl'])) {
+					$data['networks'][$network]['baseurl'] = $newdata['baseurl'] ?? '';
+				} else {
+					$newdata['baseurl'] = $data['networks'][$network]['baseurl'];
+				}
+				if (!empty($newdata['baseurl'])) {
+					$newdata['gsid'] = $data['networks'][$network]['gsid'] = GServer::getID($newdata['baseurl']);
+				} else {
+					$newdata['gsid'] = $data['networks'][$network]['gsid'] = null;
+				}
+
 				$newdata['networks'][$network] = self::rearrangeData($data['networks'][$network]);
 				unset($newdata['networks'][$network]['networks']);
 			}
@@ -160,7 +178,7 @@ class Probe
 	 */
 	private static function ownHost(string $host): bool
 	{
-		$own_host = DI::baseUrl()->getHostname();
+		$own_host = DI::baseUrl()->getHost();
 
 		$parts = parse_url($host);
 
@@ -510,7 +528,7 @@ class Probe
 	 * @return array Webfinger data
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private static function getWebfingerArray(string $uri): array
+	public static function getWebfingerArray(string $uri): array
 	{
 		$parts = parse_url($uri);
 
@@ -746,13 +764,13 @@ class Probe
 			$result = self::zot($webfinger, $result, $baseurl);
 		}
 		if ((!$result && ($network == '')) || ($network == Protocol::PUMPIO)) {
-			$result = self::pumpio($webfinger, $addr);
+			$result = self::pumpio($webfinger, $addr, $baseurl);
 		}
 		if (empty($result['network']) && empty($ap_profile['network']) || ($network == Protocol::FEED)) {
 			$result = self::feed($uri);
 		} else {
 			// We overwrite the detected nick with our try if the previois routines hadn't detected it.
-			// Additionally it is overwritten when the nickname doesn't make sense (contains spaces).
+			// Additionally, it is overwritten when the nickname doesn't make sense (contains spaces).
 			if ((empty($result['nick']) || (strstr($result['nick'], ' '))) && ($nick != '')) {
 				$result['nick'] = $nick;
 			}
@@ -1626,7 +1644,7 @@ class Probe
 	 *
 	 * @return array Profile data
 	 */
-	private static function pumpioProfileData(string $profile_link): array
+	private static function pumpioProfileData(string $profile_link, string $baseurl): array
 	{
 		$curlResult = DI::httpClient()->get($profile_link, HttpClientAccept::HTML);
 		if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
@@ -1670,8 +1688,8 @@ class Probe
 		}
 		if ($avatar) {
 			foreach ($avatar->attributes as $attribute) {
-				if ($attribute->name == 'src') {
-					$data['photo'] = trim($attribute->value);
+				if (($attribute->name == 'src') && !empty($attribute->value)) {
+					$data['photo'] = Network::addBasePath($attribute->value, $baseurl);
 				}
 			}
 		}
@@ -1687,7 +1705,7 @@ class Probe
 	 *
 	 * @return array pump.io data
 	 */
-	private static function pumpio(array $webfinger, string $addr): array
+	private static function pumpio(array $webfinger, string $addr, string $baseurl): array
 	{
 		$data = [];
 		// The array is reversed to take into account the order of preference for same-rel links
@@ -1719,7 +1737,7 @@ class Probe
 			return [];
 		}
 
-		$profile_data = self::pumpioProfileData($data['url']);
+		$profile_data = self::pumpioProfileData($data['url'], $baseurl);
 
 		if (!$profile_data) {
 			return [];
@@ -1844,11 +1862,18 @@ class Probe
 	 */
 	private static function feed(string $url, bool $probe = true): array
 	{
-		$curlResult = DI::httpClient()->get($url, HttpClientAccept::FEED_XML);
+		try {
+			$curlResult = DI::httpClient()->get($url, HttpClientAccept::FEED_XML);
+		} catch(\Throwable $e) {
+			DI::logger()->info('Error requesting feed URL', ['url' => $url, 'exception' => $e]);
+			return [];
+		}
+
 		if ($curlResult->isTimeout()) {
 			self::$isTimeout = true;
 			return [];
 		}
+
 		$feed = $curlResult->getBody();
 		$feed_data = Feed::import($feed);
 
@@ -2211,7 +2236,7 @@ class Probe
 			$approfile = ActivityPub\Transmitter::getProfile($uid);
 
 			$split_name = Diaspora::splitName($owner['name']);
-	
+
 			if (empty($owner['gsid'])) {
 				$owner['gsid'] = GServer::getID($approfile['generator']['url']);
 			}
@@ -2248,7 +2273,7 @@ class Probe
 						'batch'        => $approfile['generator']['url'] . '/receive/public',
 						'notify'       => $owner['notify'],
 						'poll'         => $owner['poll'],
-						'poco'         => $owner['poco'],						
+						'poco'         => $owner['poco'],
 						'network'      => Protocol::DIASPORA,
 						'pubkey'       => $owner['upubkey'],
 					]

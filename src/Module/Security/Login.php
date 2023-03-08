@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -132,7 +132,6 @@ class Login extends BaseModule
 			DI::page()['htmlhead'] .= Renderer::replaceMacros(
 				Renderer::getMarkupTemplate('login_head.tpl'),
 				[
-					'$baseurl' => DI::baseUrl()->get(true)
 				]
 			);
 
@@ -154,7 +153,7 @@ class Login extends BaseModule
 		$o = Renderer::replaceMacros(
 			$tpl,
 			[
-				'$dest_url'     => DI::baseUrl()->get(true) . '/login',
+				'$dest_url'     => DI::baseUrl() . '/login',
 				'$logout'       => DI::l10n()->t('Logout'),
 				'$login'        => DI::l10n()->t('Login'),
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -33,9 +33,9 @@ use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Module\Response;
 use Friendica\Protocol\Activity;
+use Friendica\Protocol\Delivery;
 use Friendica\Util\Profiler;
 use Friendica\Util\XML;
-use Friendica\Worker\Delivery;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -120,7 +120,7 @@ EOT;
 
 		$tagger_link  = '[url=' . $contact['url'] . ']' . $contact['name'] . '[/url]';
 		$aauthor_link = '[url=' . $item['author-link'] . ']' . $item['author-name'] . '[/url]';
-		$post_link    = '[url=' . $item['plink'] . ']' . ($item['resource-id'] ? $this->t('photo') : $this->t('status')) . '[/url]';
+		$post_link    = '[url=' . $item['plink'] . ']' . ($item['resource-id'] ? $this->t('photo') : $this->t('post')) . '[/url]';
 		$term_link    = '#[url=' . $tagid . ']' . $term . '[/url]';
 
 		$post = [

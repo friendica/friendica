@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -42,7 +42,7 @@ class Peers extends BaseApi
 		$return = [];
 
 		// We only select for Friendica and ActivityPub servers, since it is expected to only deliver AP compatible systems here.
-		$instances = DBA::select('gserver', ['url'], ["`network` in (?, ?) AND NOT `failed` AND NOT `detection-method` IN (?, ?, ?, ?)",
+		$instances = DBA::select('gserver', ['url'], ["`network` in (?, ?) AND NOT `blocked` AND NOT `failed` AND NOT `detection-method` IN (?, ?, ?, ?)",
 			Protocol::DFRN, Protocol::ACTIVITYPUB,
 			GServer::DETECT_MANUAL, GServer::DETECT_HEADER, GServer::DETECT_BODY, GServer::DETECT_HOST_META]);
 		while ($instance = DBA::fetch($instances)) {

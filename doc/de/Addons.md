@@ -38,16 +38,13 @@ $function ist ein String und der Name der Funktion, die ausgeführt wird, wenn d
 Argumente
 ---
 
-Deine Hook-Callback-Funktion wird mit mindestens einem und bis zu zwei Argumenten aufgerufen
+Deine Hook-Callback-Funktion wird mit höchstens einem Argumenten aufgerufen
 
-    function myhook_function(App $a, &$b) {
+    function myhook_function(&$b) {
 
     }
 
 Wenn du Änderungen an den aufgerufenen Daten vornehmen willst, musst du diese als Referenzvariable (mit "&") während der Funktionsdeklaration deklarieren.
-
-$a ist die Friendica "App"-Klasse, die eine Menge an Informationen über den aktuellen Friendica-Status beinhaltet, u.a. welche Module genutzt werden, Konfigurationsinformationen, Inhalte der Seite zum Zeitpunkt des Hook-Aufrufs.
-Es ist empfohlen, diese Funktion "$a" zu nennen, um seine Nutzung an den Gebrauch an anderer Stelle anzugleichen.
 
 $b kann frei benannt werden.
 Diese Information ist speziell auf den Hook bezogen, der aktuell bearbeitet wird, und beinhaltet normalerweise Daten, die du sofort nutzen, anzeigen oder bearbeiten kannst.
@@ -70,9 +67,9 @@ DI::args()->get(1); // = 'arg1'
 DI::args()->get(2); // = 'arg2'
 ```
 
-Deine Modulfunktionen umfassen oft die Funktion addon_name_content(App $a), welche den Seiteninhalt definiert und zurückgibt.
-Sie können auch addon_name_post(App $a) umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
-Du kannst ebenso addon_name_init(App $a) nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
+Deine Modulfunktionen umfassen oft die Funktion `addon_name_content()`, welche den Seiteninhalt definiert und zurückgibt.
+Sie können auch `addon_name_post()` umfassen, welches vor der content-Funktion aufgerufen wird und normalerweise die Resultate der POST-Formulare handhabt.
+Du kannst ebenso `addon_name_init()` nutzen, was oft frühzeitig aufgerufen wird und das Modul initialisert.
 
 
 Derzeitige Hooks
@@ -86,7 +83,7 @@ Derzeitige Hooks
         'user_record' => die erfolgreiche Authentifizierung muss auch einen gültigen Nutzereintrag aus der Datenbank zurückgeben
 
 **'logged_in'** - wird aufgerufen, sobald ein Nutzer sich erfolgreich angemeldet hat.
-    $b beinhaltet den $a->Nutzer-Array
+    $b beinhaltet den `App->user`
 
 
 **'display_item'** - wird aufgerufen, wenn ein Beitrag für die Anzeige formatiert wird.
@@ -122,7 +119,7 @@ Derzeitige Hooks
 
 **'profile_advanced'** - wird aufgerufen, wenn die HTML-Ausgabe für das "Advanced profile" generiert wird; stimmt mit dem "Profil"-Tab auf der Profilseite der Nutzer überein.
     $b ist die HTML-Ausgabe (String) des erstellten Profils
-    (Die Details des Profil-Arrays sind in $a->profile)
+    (Die Details des Profil-Arrays sind in `App->profile`)
 
 **'directory_item'** - wird von der Verzeichnisseite aufgerufen, wenn ein Item für die Anzeige formatiert wird.
     $b ist ein Array

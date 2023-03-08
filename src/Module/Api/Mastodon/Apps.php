@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,17 +25,19 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
+use Friendica\Module\Special\HTTPException;
 use Friendica\Util\Network;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Apps class to register new OAuth clients
+ * @see https://docs.joinmastodon.org/methods/apps/#create
  */
 class Apps extends BaseApi
 {
-	public function run(array $request = [], bool $scopecheck = true): ResponseInterface
+	public function run(HTTPException $httpException, array $request = [], bool $scopecheck = true): ResponseInterface
 	{
-		return parent::run($request, false);
+		return parent::run($httpException, $request, false);
 	}
 
 	/**
@@ -43,6 +45,10 @@ class Apps extends BaseApi
 	 */
 	protected function post(array $request = [])
 	{
+		if (!empty($request['redirect_uris']) && is_array($request['redirect_uris'])) {
+			$request['redirect_uris'] = $request['redirect_uris'][0];
+		}
+
 		$request = $this->getRequest([
 			'client_name'   => '',
 			'redirect_uris' => '',
@@ -57,8 +63,12 @@ class Apps extends BaseApi
 			if (!empty($postrequest) && is_array($postrequest)) {
 				$request = array_merge($request, $postrequest);
 			}
+
+			if (!empty($request['redirect_uris']) && is_array($request['redirect_uris'])) {
+				$request['redirect_uris'] = $request['redirect_uris'][0];
+			}	
 		}
-			
+
 		if (empty($request['client_name']) || empty($request['redirect_uris'])) {
 			DI::mstdnError()->UnprocessableEntity(DI::l10n()->t('Missing parameters'));
 		}

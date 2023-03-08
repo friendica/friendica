@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -69,10 +70,16 @@ class Bookmarks extends BaseApi
 
 		$items = Post::selectThreadForUser($uid, ['uri-id'], $condition, $params);
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
-			$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+			try {
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+			} catch (\Exception $exception) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+			}
 		}
 		DBA::close($items);
 

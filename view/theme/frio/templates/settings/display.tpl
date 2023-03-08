@@ -60,7 +60,6 @@
 						{{include file="field_input.tpl" field=$itemspage_network}}
 						{{include file="field_input.tpl" field=$itemspage_mobile_network}}
 						{{include file="field_input.tpl" field=$ajaxint}}
-						{{include file="field_checkbox.tpl" field=$no_auto_update}}
 						{{include file="field_checkbox.tpl" field=$enable_smile}}
 						{{include file="field_checkbox.tpl" field=$infinite_scroll}}
 						{{include file="field_checkbox.tpl" field=$enable_smart_threading}}

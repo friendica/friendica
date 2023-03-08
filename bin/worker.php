@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -58,19 +58,16 @@ $dice = $dice->addRule(LoggerInterface::class,['constructParams' => ['worker']])
 
 DI::init($dice);
 \Friendica\Core\Logger\Handler\ErrorHandler::register($dice->create(\Psr\Log\LoggerInterface::class));
-$a = DI::app();
 
 DI::mode()->setExecutor(Mode::WORKER);
 
 // Check the database structure and possibly fixes it
-Update::check($a->getBasePath(), true, DI::mode());
+Update::check(DI::basePath(), true);
 
 // Quit when in maintenance
 if (!DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 	return;
 }
-
-DI::baseUrl()->saveByURL(DI::config()->get('system', 'url'));
 
 $spawn = array_key_exists('s', $options) || array_key_exists('spawn', $options);
 

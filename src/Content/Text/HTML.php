@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,6 +23,7 @@ namespace Friendica\Content\Text;
 
 use DOMDocument;
 use DOMXPath;
+use Friendica\Protocol\HTTP\MediaType;
 use Friendica\Content\Widget\ContactBlock;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
@@ -33,6 +34,7 @@ use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
 use League\HTMLToMarkdown\HtmlConverter;
+use Psr\Http\Message\UriInterface;
 
 class HTML
 {
@@ -1006,5 +1008,78 @@ class HTML
 		//var_dump($errorCollector->getRaw());
 
 		return $text;
+	}
+
+	/**
+	 * XPath arbitrary string quoting
+	 *
+	 * @see https://stackoverflow.com/a/45228168
+	 * @param string $value
+	 * @return string
+	 */
+	public static function xpathQuote(string $value): string
+	{
+		if (false === strpos($value, '"')) {
+			return '"' . $value . '"';
+		}
+
+		if (false === strpos($value, "'")) {
+			return "'" . $value . "'";
+		}
+
+		// if the value contains both single and double quotes, construct an
+		// expression that concatenates all non-double-quote substrings with
+		// the quotes, e.g.:
+		//
+		//    concat("'foo'", '"', "bar")
+		return 'concat(' . implode(', \'"\', ', array_map([self::class, 'xpathQuote'], explode('"', $value))) . ')';
+	}
+
+	/**
+	 * Checks if the provided URL is present in the DOM document in an element with the rel="me" attribute
+	 *
+	 * XHTML Friends Network http://gmpg.org/xfn/
+	 *
+	 * @param DOMDocument  $doc
+	 * @param UriInterface $meUrl
+	 * @return bool
+	 */
+	public static function checkRelMeLink(DOMDocument $doc, UriInterface $meUrl): bool
+	{
+		$xpath = new \DOMXpath($doc);
+
+		// This expression checks that "me" is among the space-delimited values of the "rel" attribute.
+		// And that the href attribute contains exactly the provided URL
+		$expression = "//*[contains(concat(' ', normalize-space(@rel), ' '), ' me ')][@href = " . self::xpathQuote($meUrl) . "]";
+
+		$result = $xpath->query($expression);
+
+		return $result !== false && $result->length > 0;
+	}
+
+	/**
+	 * @param DOMDocument $doc
+	 * @return string|null Lowercase charset
+	 */
+	public static function extractCharset(DOMDocument $doc): ?string
+	{
+		$xpath = new DOMXPath($doc);
+
+		$expression = "string(//meta[@charset]/@charset)";
+		if ($charset = $xpath->evaluate($expression)) {
+			return strtolower($charset);
+		}
+
+		try {
+			// This expression looks for a meta tag with the http-equiv attribute set to "content-type" ignoring case
+			// whose content attribute contains a "charset" string and returns its value
+			$expression = "string(//meta[@http-equiv][translate(@http-equiv, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = 'content-type'][contains(translate(@content, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'charset')]/@content)";
+			$mediaType = MediaType::fromContentType($xpath->evaluate($expression));
+			if (isset($mediaType->parameters['charset'])) {
+				return strtolower($mediaType->parameters['charset']);
+			}
+		} catch(\InvalidArgumentException $e) {}
+
+		return null;
 	}
 }

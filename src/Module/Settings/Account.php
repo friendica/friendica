@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,9 +38,9 @@ use Friendica\Model\Verb;
 use Friendica\Module\BaseSettings;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
+use Friendica\Protocol\Delivery;
 use Friendica\Util\Network;
 use Friendica\Util\Temporal;
-use Friendica\Worker\Delivery;
 
 class Account extends BaseSettings
 {
@@ -549,16 +549,15 @@ class Account extends BaseSettings
 
 		$notify_type = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'notify_type');
 
-		$passwordRules = DI::l10n()->t('Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces, accentuated letters and colon (:).')
+		$passwordRules = DI::l10n()->t('Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters.')
 			. (PASSWORD_DEFAULT === PASSWORD_BCRYPT ? ' ' . DI::l10n()->t('Password length is limited to 72 characters.') : '');
 
 		$tpl = Renderer::getMarkupTemplate('settings/account.tpl');
 		$o   = Renderer::replaceMacros($tpl, [
 			'$ptitle' => DI::l10n()->t('Account Settings'),
-			'$desc'   => DI::l10n()->t("Your Identity Address is <strong>'%s'</strong> or '%s'.", $nickname . '@' . DI::baseUrl()->getHostname() . DI::baseUrl()->getUrlPath(), DI::baseUrl() . '/profile/' . $nickname),
+			'$desc'   => DI::l10n()->t("Your Identity Address is <strong>'%s'</strong> or '%s'.", $nickname . '@' . DI::baseUrl()->getHost() . DI::baseUrl()->getPath(), DI::baseUrl() . '/profile/' . $nickname),
 
 			'$submit'              => DI::l10n()->t('Save Settings'),
-			'$baseurl'             => DI::baseUrl()->get(true),
 			'$uid'                 => DI::userSession()->getLocalUserId(),
 			'$form_security_token' => self::getFormSecurityToken('settings'),
 			'$open'                => $this->parameters['open'] ?? 'password',

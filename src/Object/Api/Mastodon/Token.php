@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -38,20 +38,40 @@ class Token extends BaseDataTransferObject
 	protected $scope;
 	/** @var int (timestamp) */
 	protected $created_at;
+	/** @var string */
+	protected $me;
 
 	/**
 	 * Creates a token record
 	 *
-	 * @param string $access_token
-	 * @param string $token_type
-	 * @param string $scope
-	 * @param string $created_at
+	 * @param string $access_token Token string
+	 * @param string $token_type   Always "Bearer"
+	 * @param string $scope        Combination of "read write follow push"
+	 * @param string $created_at   Creation date of the token 
+	 * @param string $me           Actor profile of the token owner
 	 */
-	public function __construct(string $access_token, string $token_type, string $scope, string $created_at)
+	public function __construct(string $access_token, string $token_type, string $scope, string $created_at, string $me = null)
 	{
 		$this->access_token = $access_token;
 		$this->token_type   = $token_type;
 		$this->scope        = $scope;
 		$this->created_at   = strtotime($created_at);
+		$this->me           = $me;
+	}
+
+	/**
+	 * Returns the current entity as an array
+	 *
+	 * @return array
+	 */
+	public function toArray(): array
+	{
+		$token = parent::toArray();
+
+		if (empty($token['me'])) {
+			unset($token['me']);
+		}
+
+		return $token;
 	}
 }

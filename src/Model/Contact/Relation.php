@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -430,7 +430,7 @@ class Relation
 			["`nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` = ?)
 			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)
 			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
-			$uid, Contact::FOLLOWER, 0, 
+			$uid, Contact::FOLLOWER, 0,
 			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid],
 			['order' => ['last-item' => true], 'limit' => $totallimit]
 		);
@@ -451,7 +451,7 @@ class Relation
 			["NOT `nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` = ? AND `rel` IN (?, ?) AND `nurl` = `nurl`)
 			AND NOT `hidden` AND `uid` = ? AND `network` IN (?, ?, ?, ?)
 			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
-			$uid, Contact::FRIEND, Contact::SHARING, 0, 
+			$uid, Contact::FRIEND, Contact::SHARING, 0,
 			Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $ostatus, $uid],
 			['order' => ['last-item' => true], 'limit' => $totallimit]
 		);
@@ -477,7 +477,7 @@ class Relation
 	public static function countFollows(int $cid, array $condition = []): int
 	{
 		$condition = DBA::mergeConditions($condition, [
-			'`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)', 
+			'`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)',
 			$cid,
 		]);
 
@@ -498,7 +498,7 @@ class Relation
 	public static function listFollows(int $cid, array $condition = [], int $count = 30, int $offset = 0, bool $shuffle = false)
 	{
 		$condition = DBA::mergeConditions($condition,
-			['`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)', 
+			['`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)',
 			$cid]
 		);
 

@@ -10,7 +10,6 @@ Database Tables
 | [2fa_trusted_browser](help/database/db_2fa_trusted_browser) | Two-factor authentication trusted browsers |
 | [account-suggestion](help/database/db_account-suggestion) | Account suggestion |
 | [account-user](help/database/db_account-user) | Remote and local accounts |
-| [addon](help/database/db_addon) | registered addons |
 | [apcontact](help/database/db_apcontact) | ActivityPub compatible contacts - used in the ActivityPub implementation |
 | [application](help/database/db_application) | OAuth application |
 | [application-marker](help/database/db_application-marker) | Timeline marker |
@@ -23,6 +22,7 @@ Database Tables
 | [contact-relation](help/database/db_contact-relation) | Contact relations |
 | [conv](help/database/db_conv) | private messages |
 | [delayed-post](help/database/db_delayed-post) | Posts that are about to be distributed at a later time |
+| [delivery-queue](help/database/db_delivery-queue) | Delivery data for posts for the batch processing |
 | [diaspora-contact](help/database/db_diaspora-contact) | Diaspora compatible contacts - used in the Diaspora implementation |
 | [diaspora-interaction](help/database/db_diaspora-interaction) | Signed Diaspora Interaction |
 | [endpoint](help/database/db_endpoint) | ActivityPub endpoints - used in the ActivityPub implementation |
@@ -40,6 +40,7 @@ Database Tables
 | [inbox-status](help/database/db_inbox-status) | Status of ActivityPub inboxes |
 | [intro](help/database/db_intro) |  |
 | [item-uri](help/database/db_item-uri) | URI and GUID for items |
+| [key-value](help/database/db_key-value) | A key value storage |
 | [locks](help/database/db_locks) |  |
 | [mail](help/database/db_mail) | private messages |
 | [mailacct](help/database/db_mailacct) | Mail account data for fetching mails |

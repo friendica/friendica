@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,6 +22,7 @@
 namespace Friendica\App;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\System;
 
 /**
  * Container for the whole request
@@ -38,9 +39,17 @@ class Request
 	 * @var string
 	 */
 	const DEFAULT_FORWARD_FOR_HEADER = 'HTTP_X_FORWARDED_FOR';
+	/**
+	 * The default Request-ID header to retrieve the current transaction ID from the HTTP header (if set)
+	 *
+	 * @var string
+	 */
+	const DEFAULT_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID';
 
 	/** @var string The remote IP address of the current request */
 	protected $remoteAddress;
+	/** @var string The request-id of the current request */
+	protected $requestId;
 
 	/**
 	 * @return string The remote IP address of the current request
@@ -52,9 +61,20 @@ class Request
 		return $this->remoteAddress;
 	}
 
+	/**
+	 * @return string The request ID of the current request
+	 *
+	 * Do always use this instead of $_SERVER['X_REQUEST_ID']
+	 */
+	public function getRequestId(): string
+	{
+		return $this->requestId;
+	}
+
 	public function __construct(IManageConfigValues $config, array $server = [])
 	{
 		$this->remoteAddress = $this->determineRemoteAddress($config, $server);
+		$this->requestId = $server[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
 	}
 
 	/**

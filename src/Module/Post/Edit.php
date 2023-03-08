@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -114,6 +114,9 @@ class Edit extends BaseModule
 		} else {
 			$lockstate = 'unlock';
 		}
+
+		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
+		$item = Post\Media::addHTMLAttachmentToItem($item);
 
 		$jotplugins = '';
 

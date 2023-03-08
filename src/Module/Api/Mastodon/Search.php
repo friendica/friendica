@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -76,7 +77,7 @@ class Search extends BaseApi
 			}
 		}
 
-		if ((empty($request['type']) || ($request['type'] == 'statuses')) && (strpos($request['q'], '@') == false)) {
+		if (empty($request['type']) || ($request['type'] == 'statuses')) {
 			$result['statuses'] = self::searchStatuses($uid, $request['q'], $request['account_id'], $request['max_id'], $request['min_id'], $limit, $request['offset']);
 
 			if (!is_array($result['statuses'])) {
@@ -107,8 +108,7 @@ class Search extends BaseApi
 	 */
 	private static function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
 	{
-		if (
-			($offset == 0) && (strrpos($q, '@') > 0 || Network::isValidHttpUrl($q))
+		if (($offset == 0) && (strrpos($q, '@') > 0 || Network::isValidHttpUrl($q))
 			&& $id = Contact::getIdForURL($q, 0, $resolve ? null : false)
 		) {
 			return DI::mstdnAccount()->createFromContactId($id, $uid);
@@ -142,7 +142,7 @@ class Search extends BaseApi
 			// If the user-specific search failed, we search and probe a public post
 			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
 			if ($item_id && $item = Post::selectFirst(['uri-id'], ['id' => $item_id])) {
-				return DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+				return DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes());
 			}
 		}
 
@@ -176,10 +176,16 @@ class Search extends BaseApi
 
 		$items = DBA::select($table, ['uri-id'], $condition, $params);
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
-			$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+			try {
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+			} catch (\Exception $exception) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+			}
 		}
 		DBA::close($items);
 

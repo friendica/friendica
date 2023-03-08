@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,21 +23,26 @@ namespace Friendica\Test\src\Core\Config;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Config\Repository\Config as ConfigModel;
+use Friendica\Core\Config\Model\DatabaseConfig;
+use Friendica\Core\Config\Model\ReadOnlyFileConfig;
+use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
-use Friendica\Test\MockedTest;
-use Mockery\MockInterface;
-use Mockery;
+use Friendica\Test\DatabaseTest;
+use Friendica\Test\Util\CreateDatabaseTrait;
+use Friendica\Test\Util\VFSTrait;
+use org\bovigo\vfs\vfsStream;
 
-abstract class ConfigTest extends MockedTest
+class ConfigTest extends DatabaseTest
 {
 	use ArraySubsetAsserts;
-
-	/** @var ConfigModel|MockInterface */
-	protected $configModel;
+	use VFSTrait;
+	use CreateDatabaseTrait;
 
 	/** @var Cache */
 	protected $configCache;
+
+	/** @var ConfigFileManager */
+	protected $configFileManager;
 
 	/** @var IManageConfigValues */
 	protected $testedConfig;
@@ -60,17 +65,22 @@ abstract class ConfigTest extends MockedTest
 
 	protected function setUp(): void
 	{
+		$this->setUpVfsDir();
+
 		parent::setUp();
 
-		// Create the config model
-		$this->configModel = Mockery::mock(ConfigModel::class);
 		$this->configCache = new Cache();
+		$this->configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
 	}
 
 	/**
 	 * @return IManageConfigValues
 	 */
-	abstract public function getInstance();
+	public function getInstance()
+	{
+		$this->configFileManager->setupCache($this->configCache);
+		return new DatabaseConfig($this->getDbInstance(), $this->configCache);
+	}
 
 	public function dataTests()
 	{
@@ -154,14 +164,30 @@ abstract class ConfigTest extends MockedTest
 		];
 	}
 
+	public function configToDbArray(array $config): array
+	{
+		$dbarray = [];
+
+		foreach ($config as $category => $data) {
+			foreach ($data as $key => $value) {
+				$dbarray[] = [
+					'cat' => $category,
+					'k'   => $key,
+					'v'   => $value,
+				];
+			}
+		}
+
+		return ['config' => $dbarray];
+	}
+
 	/**
 	 * Test the configuration initialization
+	 * @dataProvider dataConfigLoad
 	 */
 	public function testSetUp(array $data)
 	{
-		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->once();
+		$this->loadDirectFixture($this->configToDbArray($data) , $this->getDbInstance());
 
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -171,19 +197,21 @@ abstract class ConfigTest extends MockedTest
 	}
 
 	/**
-	 * Test the configuration load() method
+	 * Test the configuration reload() method
 	 *
 	 * @param array $data
 	 * @param array $load
+	 *
+	 * @dataProvider dataConfigLoad
 	 */
-	public function testLoad(array $data, array $load)
+	public function testReload(array $data, array $load)
 	{
+		$this->loadDirectFixture($this->configToDbArray($data), $this->getDbInstance());
+
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
 
-		foreach ($load as $loadedCats) {
-			$this->testedConfig->load($loadedCats);
-		}
+		$this->testedConfig->reload();
 
 		// Assert at least loaded cats are loaded
 		foreach ($load as $loadedCats) {
@@ -256,23 +284,27 @@ abstract class ConfigTest extends MockedTest
 
 	/**
 	 * Test the configuration load() method with overwrite
+	 *
+	 * @dataProvider dataDoubleLoad
 	 */
 	public function testCacheLoadDouble(array $data1, array $data2, array $expect = [])
 	{
+		$this->loadDirectFixture($this->configToDbArray($data1), $this->getDbInstance());
+
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
-
-		foreach ($data1 as $cat => $data) {
-			$this->testedConfig->load($cat);
-		}
 
 		// Assert at least loaded cats are loaded
 		foreach ($data1 as $cat => $data) {
 			self::assertConfig($cat, $data);
 		}
 
+		$this->loadDirectFixture($this->configToDbArray($data2), $this->getDbInstance());
+
+		$this->testedConfig->reload();
+
 		foreach ($data2 as $cat => $data) {
-			$this->testedConfig->load($cat);
+			self::assertConfig($cat, $data);
 		}
 	}
 
@@ -281,44 +313,19 @@ abstract class ConfigTest extends MockedTest
 	 */
 	public function testLoadWrong()
 	{
-		$this->configModel->shouldReceive('isConnected')->andReturn(true)->once();
-		$this->configModel->shouldReceive('load')->withAnyArgs()->andReturn([])->once();
-
-		$this->testedConfig = $this->getInstance();
+		$this->testedConfig = new ReadOnlyFileConfig(new Cache());
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
 
 		self::assertEmpty($this->testedConfig->getCache()->getAll());
 	}
 
 	/**
-	 * Test the configuration get() and set() methods without adapter
+	 * Test the configuration get() and set() methods
 	 *
 	 * @dataProvider dataTests
 	 */
-	public function testSetGetWithoutDB($data)
+	public function testSetGet($data)
 	{
-		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(false)
-		                  ->times(3);
-
-		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
-
-		self::assertTrue($this->testedConfig->set('test', 'it', $data));
-
-		self::assertEquals($data, $this->testedConfig->get('test', 'it'));
-		self::assertEquals($data, $this->testedConfig->getCache()->get('test', 'it'));
-	}
-
-	/**
-	 * Test the configuration get() and set() methods with a model/db
-	 *
-	 * @dataProvider dataTests
-	 */
-	public function testSetGetWithDB($data)
-	{
-		$this->configModel->shouldReceive('set')->with('test', 'it', $data)->andReturn(true)->once();
-
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
 
@@ -350,40 +357,15 @@ abstract class ConfigTest extends MockedTest
 	}
 
 	/**
-	 * Test the configuration get() method with refresh
-	 *
-	 * @dataProvider dataTests
-	 */
-	public function testGetWithRefresh($data)
-	{
-		$this->configCache->load(['test' => ['it' => 'now']], Cache::SOURCE_FILE);
-
-		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
-
-		// without refresh
-		self::assertEquals('now', $this->testedConfig->get('test', 'it'));
-		self::assertEquals('now', $this->testedConfig->getCache()->get('test', 'it'));
-
-		// with refresh
-		self::assertEquals($data, $this->testedConfig->get('test', 'it', null, true));
-		self::assertEquals($data, $this->testedConfig->getCache()->get('test', 'it'));
-
-		// without refresh and wrong value and default
-		self::assertEquals('default', $this->testedConfig->get('test', 'not', 'default'));
-		self::assertNull($this->testedConfig->getCache()->get('test', 'not'));
-	}
-
-	/**
 	 * Test the configuration delete() method without a model/db
 	 *
 	 * @dataProvider dataTests
 	 */
-	public function testDeleteWithoutDB($data)
+	public function testDelete($data)
 	{
 		$this->configCache->load(['test' => ['it' => $data]], Cache::SOURCE_FILE);
 
-		$this->testedConfig = $this->getInstance();
+		$this->testedConfig = new DatabaseConfig($this->getDbInstance(), $this->configCache);
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
 
 		self::assertEquals($data, $this->testedConfig->get('test', 'it'));
@@ -392,53 +374,6 @@ abstract class ConfigTest extends MockedTest
 		self::assertTrue($this->testedConfig->delete('test', 'it'));
 		self::assertNull($this->testedConfig->get('test', 'it'));
 		self::assertNull($this->testedConfig->getCache()->get('test', 'it'));
-
-		self::assertEmpty($this->testedConfig->getCache()->getAll());
-	}
-
-	/**
-	 * Test the configuration delete() method with a model/db
-	 */
-	public function testDeleteWithDB()
-	{
-		$this->configCache->load(['test' => ['it' => 'now', 'quarter' => 'true']], Cache::SOURCE_FILE);
-
-		$this->configModel->shouldReceive('delete')
-		                  ->with('test', 'it')
-		                  ->andReturn(false)
-		                  ->once();
-		$this->configModel->shouldReceive('delete')
-		                  ->with('test', 'second')
-		                  ->andReturn(true)
-		                  ->once();
-		$this->configModel->shouldReceive('delete')
-		                  ->with('test', 'third')
-		                  ->andReturn(false)
-		                  ->once();
-		$this->configModel->shouldReceive('delete')
-		                  ->with('test', 'quarter')
-		                  ->andReturn(true)
-		                  ->once();
-
-		$this->testedConfig = $this->getInstance();
-		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
-
-		// directly set the value to the cache
-		$this->testedConfig->getCache()->set('test', 'it', 'now');
-
-		self::assertEquals('now', $this->testedConfig->get('test', 'it'));
-		self::assertEquals('now', $this->testedConfig->getCache()->get('test', 'it'));
-
-		// delete from cache only
-		self::assertTrue($this->testedConfig->delete('test', 'it'));
-		// delete from db only
-		self::assertTrue($this->testedConfig->delete('test', 'second'));
-		// no delete
-		self::assertFalse($this->testedConfig->delete('test', 'third'));
-		// delete both
-		self::assertTrue($this->testedConfig->delete('test', 'quarter'));
-
-		self::assertEmpty($this->testedConfig->getCache()->getAll());
 	}
 
 	/**
@@ -462,13 +397,173 @@ abstract class ConfigTest extends MockedTest
 	 */
 	public function testSetGetLowPrio()
 	{
+		$this->loadDirectFixture(['config' => [['cat' => 'config', 'k' => 'test', 'v' => 'it']]], $this->getDbInstance());
+
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
 		self::assertEquals('it', $this->testedConfig->get('config', 'test'));
 
 		$this->testedConfig->getCache()->set('config', 'test', 'prio', Cache::SOURCE_ENV);
-		// now you have to get the env variable entry as output, even with a new set (which failed) and a get refresh
-		self::assertFalse($this->testedConfig->set('config', 'test', '123'));
+		// You can set a config value, but if there's a value with a higher priority (environment), this value will persist when retrieving
+		self::assertTrue($this->testedConfig->set('config', 'test', '123'));
 		self::assertEquals('prio', $this->testedConfig->get('config', 'test', '', true));
+	}
+
+
+	public function dataTestCat()
+	{
+		return [
+			'test_with_hashmap'     => [
+				'data'      => [
+					'test_with_hashmap' => [
+						'notifyall' => [
+							'last_update' => 1671051565,
+							'admin'       => true,
+						],
+						'blockbot'  => [
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'            => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'            => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_hashmap',
+				'assertion' => [
+					'notifyall' => [
+						'last_update' => 1671051565,
+						'admin'       => true,
+					],
+					'blockbot'  => [
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+			'test_with_keys'        => [
+				'data'      => [
+					'test_with_keys' => [
+						[
+							'last_update' => 1671051565,
+							'admin'       => true,
+						],
+						[
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'            => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'            => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_keys',
+				'assertion' => [
+					[
+						'last_update' => 1671051565,
+						'admin'       => true,
+					],
+					[
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+			'test_with_inner_array' => [
+				'data'      => [
+					'test_with_inner_array' => [
+						'notifyall' => [
+							'last_update' => 1671051565,
+							'admin'       => [
+								'yes' => true,
+								'no'  => 1.5,
+							],
+						],
+						'blogbot'   => [
+							'last_update' => 1658952852,
+							'admin'       => true,
+						],
+					],
+					'config'                => [
+						'register_policy' => 2,
+						'register_text'   => '',
+						'sitename'        => 'Friendica Social Network23',
+						'hostname'        => 'friendica.local',
+						'private_addons'  => false,
+					],
+					'system'                => [
+						'dbclean_expire_conversation' => 90,
+					],
+				],
+				'cat'       => 'test_with_inner_array',
+				'assertion' => [
+					'notifyall' => [
+						'last_update' => 1671051565,
+						'admin'       => [
+							'yes' => true,
+							'no'  => 1.5,
+						],
+					],
+					'blogbot'   => [
+						'last_update' => 1658952852,
+						'admin'       => true,
+					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataTestCat
+	 */
+	public function testGetCategory(array $data, string $category, array $assertion)
+	{
+		$this->configCache = new Cache($data);
+		$config = new ReadOnlyFileConfig($this->configCache);
+
+		self::assertEquals($assertion, $config->get($category));
+	}
+
+	public function dataSerialized(): array
+	{
+		return [
+			'default' => [
+				'value' => ['test' => ['array']],
+				'assertion' => ['test' => ['array']],
+			],
+			'issue-12803' => [
+				'value' => 's:48:"s:40:"s:32:"https://punkrock-underground.com";";";',
+				'assertion' => 'https://punkrock-underground.com',
+			],
+			'double-serialized-array' => [
+				'value' => 's:53:"a:1:{s:9:"testArray";a:1:{s:4:"with";s:7:"entries";}}";',
+				'assertion' => ['testArray' => ['with' => 'entries']],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataSerialized
+	 */
+	public function testSerializedValues($value, $assertion)
+	{
+		$config = $this->getInstance();
+
+		$config->set('test', 'it', $value);
+		self:self::assertEquals($assertion, $config->get('test', 'it'));
 	}
 }

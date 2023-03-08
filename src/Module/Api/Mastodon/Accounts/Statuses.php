@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -26,6 +26,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Model\Conversation;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
@@ -81,11 +82,11 @@ class Statuses extends BaseApi
 
 		if (!$request['pinned'] && !$request['only_media']) {
 			if ($request['exclude_replies']) {
-				$condition = DBA::mergeConditions($condition, ["(`gravity` = ? OR (`gravity` = ? AND `vid` = ?))",
-					Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
+				$condition = DBA::mergeConditions($condition, ["(`gravity` = ? OR (`gravity` = ? AND `vid` = ? AND `protocol` != ?))",
+					Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA]);
 			} else {
-				$condition = DBA::mergeConditions($condition, ["(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ?))",
-					Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE)]);
+				$condition = DBA::mergeConditions($condition, ["(`gravity` IN (?, ?) OR (`gravity` = ? AND `vid` = ? AND `protocol` != ?))",
+					Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA]);
 			}
 		} elseif ($request['exclude_replies']) {
 			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_PARENT]);
@@ -112,13 +113,15 @@ class Statuses extends BaseApi
 			$items = Post::selectForUser($uid, ['uri-id'], $condition, $params);
 		}
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
 			try {
-				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
-			} catch (\Throwable $th) {
-				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+			} catch (\Exception $exception) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}
 		}
 		DBA::close($items);

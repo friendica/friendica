@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -99,7 +99,7 @@ HELP;
 
 		$out = '';
 		$out .= "# FRIENDICA Distributed Social Network\n";
-		$out .= "# Copyright (C) 2010-2022, the Friendica project\n";
+		$out .= "# Copyright (C) 2010-2023, the Friendica project\n";
 		$out .= "# This file is distributed under the same license as the Friendica package.\n";
 		$out .= "# \n";
 		$out .= 'msgid ""' . "\n";

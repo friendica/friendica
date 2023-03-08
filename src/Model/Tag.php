@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -31,6 +31,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 /**
@@ -119,7 +120,7 @@ class Tag
 				$tag = DBA::selectFirst('tag', ['name', 'type'], ['url' => $url]);
 				if (!empty($tag)) {
 					if ($tag['name'] != substr($name, 0, 96)) {
-						DBA::update('tag', ['name' => substr($name, 0, 96)], ['url' => $url]);
+						DBA::update('tag', ['name' => substr($name, 0, 96)], ['url' => $url, 'type' => $tag['type']]);
 					}
 					if (!empty($target) && ($tag['type'] != $target)) {
 						DBA::update('tag', ['type' => $target], ['url' => $url]);
@@ -533,8 +534,11 @@ class Tag
 
 		$searchpath = DI::baseUrl() . '/search?tag=';
 
-		$taglist = DBA::select('tag-view', ['type', 'name', 'url', 'cid'],
-			['uri-id' => $item['uri-id'], 'type' => [self::HASHTAG, self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION]]);
+		$taglist = DBA::select(
+			'tag-view',
+			['type', 'name', 'url', 'cid'],
+			['uri-id' => $item['uri-id'], 'type' => [self::HASHTAG, self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION]]
+		);
 		while ($tag = DBA::fetch($taglist)) {
 			if ($tag['url'] == '') {
 				$tag['url'] = $searchpath . rawurlencode($tag['name']);
@@ -543,7 +547,7 @@ class Tag
 			$orig_tag = $tag['url'];
 
 			$prefix = self::TAG_CHARACTER[$tag['type']];
-			switch($tag['type']) {
+			switch ($tag['type']) {
 				case self::HASHTAG:
 					if ($orig_tag != $tag['url']) {
 						$item['body'] = str_replace($orig_tag, $tag['url'], $item['body']);
@@ -638,17 +642,17 @@ class Tag
 	 *
 	 * @param int $period Period in hours to consider posts
 	 * @param int $limit  Number of returned tags
+	 * @param int $offset  Page offset in results
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function getGlobalTrendingHashtags(int $period, $limit = 10): array
+	public static function getGlobalTrendingHashtags(int $period, int $limit = 10, int $offset = 0): array
 	{
-		$tags = DI::cache()->get('global_trending_tags-' . $period . '-' . $limit);
-		if (!empty($tags)) {
-			return $tags;
-		} else {
-			return self::setGlobalTrendingHashtags($period, $limit);
+		$tags = DI::cache()->get("global_trending_tags-$period");
+		if (empty($tags)) {
+			$tags = self::setGlobalTrendingHashtags($period, 1000);
 		}
+		return array_slice($tags, $offset, $limit);
 	}
 
 	/**
@@ -664,7 +668,9 @@ class Tag
 		}
 
 		$blocked = explode(',', $blocked_txt);
-		array_walk($blocked, function(&$value) { $value = "'" . DBA::escape(trim($value)) . "'";});
+		array_walk($blocked, function (&$value) {
+			$value = "'" . DBA::escape(trim($value)) . "'";
+		});
 		return ' AND NOT `name` IN (' . implode(',', $blocked) . ')';
 	}
 
@@ -682,8 +688,11 @@ class Tag
 		* Get a uri-id that is at least X hours old.
 		* We use the uri-id in the query for the hash tags since this is much faster
 		*/
-		$post = Post::selectFirstThread(['uri-id'], ["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
-			['order' => ['received' => true]]);
+		$post = Post::selectFirstThread(
+			['uri-id'],
+			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
+			['order' => ['received' => true]]
+		);
 
 		if (empty($post['uri-id'])) {
 			return [];
@@ -691,17 +700,20 @@ class Tag
 
 		$block_sql = self::getBlockedSQL();
 
-		$tagsStmt = DBA::p("SELECT `name` AS `term`, COUNT(*) AS `score`, COUNT(DISTINCT(`author-id`)) as `authors`
+		$tagsStmt = DBA::p(
+			"SELECT `name` AS `term`, COUNT(*) AS `score`, COUNT(DISTINCT(`author-id`)) as `authors`
 			FROM `tag-search-view`
 			WHERE `private` = ? AND `uid` = ? AND `uri-id` > ? $block_sql
 			GROUP BY `term` ORDER BY `authors` DESC, `score` DESC LIMIT ?",
-			Item::PUBLIC, 0, $post['uri-id'],
+			Item::PUBLIC,
+			0,
+			$post['uri-id'],
 			$limit
 		);
 
 		if (DBA::isResult($tagsStmt)) {
 			$tags = DBA::toArray($tagsStmt);
-			DI::cache()->set('global_trending_tags-' . $period . '-' . $limit, $tags, Duration::DAY);
+			DI::cache()->set("global_trending_tags-$period", $tags, Duration::HOUR);
 			return $tags;
 		}
 
@@ -713,17 +725,17 @@ class Tag
 	 *
 	 * @param int $period Period in hours to consider posts
 	 * @param int $limit  Number of returned tags
+	 * @param int $offset  Page offset in results
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function getLocalTrendingHashtags(int $period, $limit = 10): array
+	public static function getLocalTrendingHashtags(int $period, $limit = 10, int $offset = 0): array
 	{
-		$tags = DI::cache()->get('local_trending_tags-' . $period . '-' . $limit);
-		if (!empty($tags)) {
-			return $tags;
-		} else {
-			return self::setLocalTrendingHashtags($period, $limit);
+		$tags = DI::cache()->get("local_trending_tags-$period");
+		if (empty($tags)) {
+			$tags = self::setLocalTrendingHashtags($period, 1000);
 		}
+		return array_slice($tags, $offset, $limit);
 	}
 
 	/**
@@ -738,25 +750,30 @@ class Tag
 	{
 		// Get a uri-id that is at least X hours old.
 		// We use the uri-id in the query for the hash tags since this is much faster
-		$post = Post::selectFirstThread(['uri-id'], ["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
-			['order' => ['received' => true]]);
+		$post = Post::selectFirstThread(
+			['uri-id'],
+			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
+			['order' => ['received' => true]]
+		);
 		if (empty($post['uri-id'])) {
 			return [];
 		}
 
 		$block_sql = self::getBlockedSQL();
 
-		$tagsStmt = DBA::p("SELECT `name` AS `term`, COUNT(*) AS `score`, COUNT(DISTINCT(`author-id`)) as `authors`
+		$tagsStmt = DBA::p(
+			"SELECT `name` AS `term`, COUNT(*) AS `score`, COUNT(DISTINCT(`author-id`)) as `authors`
 			FROM `tag-search-view`
 			WHERE `private` = ? AND `wall` AND `origin` AND `uri-id` > ? $block_sql
 			GROUP BY `term` ORDER BY `authors` DESC, `score` DESC LIMIT ?",
-			Item::PUBLIC, $post['uri-id'],
+			Item::PUBLIC,
+			$post['uri-id'],
 			$limit
 		);
 
 		if (DBA::isResult($tagsStmt)) {
 			$tags = DBA::toArray($tagsStmt);
-			DI::cache()->set('local_trending_tags-' . $period . '-' . $limit, $tags, Duration::DAY);
+			DI::cache()->set("local_trending_tags-$period", $tags, Duration::HOUR);
 			return $tags;
 		}
 

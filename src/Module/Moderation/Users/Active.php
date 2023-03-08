@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,7 +32,7 @@ class Active extends BaseUsers
 	{
 		$this->checkModerationAccess();
 
-		self::checkFormSecurityTokenRedirectOnError($this->baseUrl->get(true), 'moderation_users_active');
+		self::checkFormSecurityTokenRedirectOnError($this->baseUrl, 'moderation_users_active');
 
 		$users = $request['user'] ?? [];
 
@@ -150,7 +150,7 @@ class Active extends BaseUsers
 			'$form_security_token' => self::getFormSecurityToken('moderation_users_active'),
 
 			// values //
-			'$baseurl'      => $this->baseUrl->get(true),
+			'$baseurl'      => $this->baseUrl,
 			'$query_string' => $this->args->getQueryString(),
 
 			'$users' => $users,

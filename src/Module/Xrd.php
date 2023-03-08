@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -105,7 +105,7 @@ class Xrd extends BaseModule
 
 	private function printSystemJSON(array $owner)
 	{
-		$baseURL = $this->baseUrl->get();
+		$baseURL = $this->baseUrl;
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [$owner['url']],
@@ -151,7 +151,7 @@ class Xrd extends BaseModule
 
 	private function printJSON(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = $this->baseUrl->get();
+		$baseURL = $this->baseUrl;
 
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
@@ -228,11 +228,9 @@ class Xrd extends BaseModule
 
 	private function printXML(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = $this->baseUrl->get();
+		$baseURL = $this->baseUrl;
 
-		$xml = null;
-
-		XML::fromArray([
+		$xmlString = XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
 					'xmlns'    => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
@@ -319,10 +317,10 @@ class Xrd extends BaseModule
 					]
 				],
 			],
-		], $xml);
+		]);
 
 		header('Access-Control-Allow-Origin: *');
 
-		System::httpExit($xml->saveXML(), Response::TYPE_XML, 'application/xrd+xml');
+		System::httpExit($xmlString, Response::TYPE_XML, 'application/xrd+xml');
 	}
 }

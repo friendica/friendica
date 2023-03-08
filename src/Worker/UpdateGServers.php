@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -49,7 +49,7 @@ class UpdateGServers
 		}
 
 		$total = DBA::count('gserver');
-		$condition = ["`next_contact` < ? AND (`nurl` != ? OR `url` != ?)",  DateTimeFormat::utcNow(), '', ''];
+		$condition = ["NOT `blocked` AND `next_contact` < ? AND (`nurl` != ? OR `url` != ?)",  DateTimeFormat::utcNow(), '', ''];
 		$outdated = DBA::count('gserver', $condition);
 		Logger::info('Server status', ['total' => $total, 'outdated' => $outdated, 'updating' => $limit]);
 

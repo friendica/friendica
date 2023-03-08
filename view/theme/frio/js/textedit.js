@@ -202,6 +202,10 @@ function confirmBlock() {
 	return confirm(aStr.blockAuthor);
 }
 
+function confirmIgnore() {
+	return confirm(aStr.ignoreAuthor);
+}
+
 /**
  * Hide and removes an item element from the DOM after the deletion url is
  * successful, restore it else.
@@ -239,6 +243,36 @@ function dropItem(url, elementId) {
  */
 function blockAuthor(url, elementId) {
 	if (confirmBlock()) {
+		$("body").css("cursor", "wait");
+
+		var $el = $(document.getElementById(elementId));
+
+		$el.fadeTo("fast", 0.33, function () {
+			$.get(url)
+				.then(function () {
+					$el.remove();
+				})
+				.fail(function () {
+					// @todo Show related error message
+					$el.show();
+				})
+				.always(function () {
+					$("body").css("cursor", "auto");
+				});
+		});
+	}
+}
+
+/**
+ * Ignored an author and hide and removes an item element from the DOM after the block is
+ * successful, restore it else.
+ *
+ * @param {string} url The item removal URL
+ * @param {string} elementId The DOM id of the item element
+ * @returns {undefined}
+ */
+function ignoreAuthor(url, elementId) {
+	if (confirmIgnore()) {
 		$("body").css("cursor", "wait");
 
 		var $el = $(document.getElementById(elementId));

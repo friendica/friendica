@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -40,7 +40,7 @@ class DeleteTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 	}
 
@@ -48,7 +48,7 @@ class DeleteTest extends ApiTest
 	{
 		$this->expectException(BadRequestException::class);
 		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'album' => 'album_name'
 			]);
 	}
@@ -58,7 +58,7 @@ class DeleteTest extends ApiTest
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
 		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'album' => 'test_album']
 			);
 

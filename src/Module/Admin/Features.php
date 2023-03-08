@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -81,7 +81,6 @@ class Features extends BaseAdmin
 		$tpl = Renderer::getMarkupTemplate('admin/features.tpl');
 		$o = Renderer::replaceMacros($tpl, [
 			'$form_security_token' => self::getFormSecurityToken("admin_manage_features"),
-			'$baseurl'             => DI::baseUrl()->get(true),
 			'$title'               => DI::l10n()->t('Manage Additional Features'),
 			'$features'            => $features,
 			'$submit'              => DI::l10n()->t('Save Settings'),

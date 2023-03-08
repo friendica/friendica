@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,16 +21,17 @@
 
 namespace Friendica\Module\ActivityPub;
 
-use Friendica\BaseModule;
 use Friendica\Core\System;
 use Friendica\Model\User;
+use Friendica\Module\BaseApi;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\HTTPSignature;
+use Friendica\Util\Network;
 
 /**
  * ActivityPub Outbox
  */
-class Outbox extends BaseModule
+class Outbox extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
@@ -43,11 +44,41 @@ class Outbox extends BaseModule
 			throw new \Friendica\Network\HTTPException\NotFoundException();
 		}
 
-		$page = !empty($request['page']) ? (int)$request['page'] : null;
+		$uid  = self::getCurrentUserID();
+		$page = $request['page'] ?? null;
 
-		$requester = HTTPSignature::getSigner('', $_SERVER);
-		$outbox = ActivityPub\Transmitter::getOutbox($owner, $page, $requester);
+		if (empty($page) && empty($request['max_id']) && !empty($uid)) {
+			$page = 1;
+		}
+
+		$outbox = ActivityPub\ClientToServer::getOutbox($owner, $uid, $page, $request['max_id'] ?? null, HTTPSignature::getSigner('', $_SERVER));
 
 		System::jsonExit($outbox, 'application/activity+json');
+	}
+
+	protected function post(array $request = [])
+	{
+		self::checkAllowedScope(self::SCOPE_WRITE);
+		$uid      = self::getCurrentUserID();
+		$postdata = Network::postdata();
+
+		if (empty($postdata) || empty($this->parameters['nickname'])) {
+			throw new \Friendica\Network\HTTPException\BadRequestException();
+		}
+
+		$owner = User::getOwnerDataByNick($this->parameters['nickname']);
+		if (empty($owner)) {
+			throw new \Friendica\Network\HTTPException\NotFoundException();
+		}
+		if ($owner['uid'] != $uid) {
+			throw new \Friendica\Network\HTTPException\ForbiddenException();
+		}
+
+		$activity = json_decode($postdata, true);
+		if (empty($activity)) {
+			throw new \Friendica\Network\HTTPException\BadRequestException();
+		}
+
+		System::jsonExit(ActivityPub\ClientToServer::processActivity($activity, $uid, self::getCurrentApplication() ?? []));
 	}
 }

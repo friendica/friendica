@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,7 +25,6 @@ use Friendica\BaseDataTransferObject;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
-use Friendica\Database\DBA;
 use Friendica\DI;
 
 /**
@@ -45,9 +44,9 @@ class Stats extends BaseDataTransferObject
 	public function __construct(IManageConfigValues $config, Database $database)
 	{
 		if (!empty($config->get('system', 'nodeinfo'))) {
-			$this->user_count   = intval($config->get('nodeinfo', 'total_users'));
-			$this->status_count = $config->get('nodeinfo', 'local_posts') + $config->get('nodeinfo', 'local_comments');
-			$this->domain_count = $database->count('gserver', ["`network` in (?, ?) AND NOT `failed`", Protocol::DFRN, Protocol::ACTIVITYPUB]);
+			$this->user_count   = intval(DI::keyValue()->get('nodeinfo_total_users'));
+			$this->status_count = (int)DI::keyValue()->get('nodeinfo_local_posts') + (int)DI::keyValue()->get('nodeinfo_local_comments');
+			$this->domain_count = $database->count('gserver', ["`network` in (?, ?) AND NOT `failed` AND NOT `blocked`", Protocol::DFRN, Protocol::ACTIVITYPUB]);
 		}
 	}
 }

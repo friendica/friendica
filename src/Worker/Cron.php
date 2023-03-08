@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -27,9 +27,9 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Tag;
-use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub\Queue;
 use Friendica\Protocol\Relay;
+use Friendica\Util\DateTimeFormat;
 
 class Cron
 {
@@ -37,7 +37,7 @@ class Cron
 	{
 		$a = DI::app();
 
-		$last = DI::config()->get('system', 'last_cron');
+		$last = DI::keyValue()->get('last_cron');
 
 		$poll_interval = intval(DI::config()->get('system', 'cron_interval'));
 
@@ -84,9 +84,7 @@ class Cron
 		Worker::add(Worker::PRIORITY_LOW, 'PostUpdate');
 
 		// Hourly cron calls
-		if (DI::config()->get('system', 'last_cron_hourly', 0) + 3600 < time()) {
-
-
+		if ((DI::keyValue()->get('last_cron_hourly') ?? 0) + 3600 < time()) {
 			// Update trending tags cache for the community page
 			Tag::setLocalTrendingHashtags(24, 20);
 			Tag::setGlobalTrendingHashtags(24, 20);
@@ -105,7 +103,7 @@ class Cron
 			// Clear cache entries
 			Worker::add(Worker::PRIORITY_LOW, 'ClearCache');
 
-			DI::config()->set('system', 'last_cron_hourly', time());
+			DI::keyValue()->set('last_cron_hourly', time());
 		}
 
 		// Daily maintenance cron calls
@@ -136,19 +134,24 @@ class Cron
 				Worker::add(Worker::PRIORITY_LOW, 'OptimizeTables');
 			}
 
-			foreach (User::getList(1, PHP_INT_MAX, 'active') as $user) {
+			$users = DBA::select('owner-view', ['uid'], ["`homepage_verified` OR (`last-activity` > ? AND `homepage` != ?)", DateTimeFormat::utc('now - 7 days', 'Y-m-d'), '']);
+			while ($user = DBA::fetch($users)) {
 				Worker::add(Worker::PRIORITY_LOW, 'CheckRelMeProfileLink', $user['uid']);
 			}
+			DBA::close($users);
 
 			// Resubscribe to relay servers
 			Relay::reSubscribe();
 
-			DI::config()->set('system', 'last_cron_daily', time());
+			// Update "blocked" status of servers
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+
+			DI::keyValue()->set('last_cron_daily', time());
 		}
 
 		Logger::notice('end');
 
-		DI::config()->set('system', 'last_cron', time());
+		DI::keyValue()->set('last_cron', time());
 	}
 
 	/**
@@ -159,7 +162,7 @@ class Cron
 	private static function deleteSleepingProcesses()
 	{
 		Logger::info('Looking for sleeping processes');
-		
+
 		$processes = DBA::p("SHOW FULL PROCESSLIST");
 		while ($process = DBA::fetch($processes)) {
 			if (($process['Command'] != 'Sleep') || ($process['Time'] < 300) || ($process['db'] != DBA::databaseName())) {

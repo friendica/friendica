@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -75,6 +75,8 @@ class Add extends BaseModeration
 		//  Add new item to blocklist
 		$this->blocklist->addPattern($pattern, trim($request['reason']));
 
+		Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+
 		$this->systemMessages->addInfo($this->t('Server domain pattern added to the blocklist.'));
 
 		if (!empty($request['purge'])) {
@@ -136,7 +138,7 @@ class Add extends BaseModeration
 			'$newreason'           => ['reason', $this->t('Block reason'), $request['reason'] ?? '', $this->t('The reason why you blocked this server domain pattern. This reason will be shown publicly in the server information page.'), $this->t('Required'), '', ''],
 			'$pattern'             => $pattern,
 			'$gservers'            => $gservers,
-			'$baseurl'             => $this->baseUrl->get(true),
+			'$baseurl'             => $this->baseUrl,
 			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_add')
 		]);
 	}

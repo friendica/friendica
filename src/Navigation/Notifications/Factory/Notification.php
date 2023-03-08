@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -122,7 +122,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 		$user = User::getById($Notification->uid, ['language']);
 		$l10n = $this->l10n->withLang($user['language']);
-	
+
 		$causer = $author = Contact::getById($Notification->actorId, ['id', 'name', 'url', 'contact-type', 'pending']);
 		if (empty($causer)) {
 			$this->logger->info('Causer not found', ['contact' => $Notification->actorId]);
@@ -310,6 +310,10 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 							} else {
 								$msg = $l10n->t('%1$s shared a post');
 							}
+							break;
+
+						case Post\UserNotification::TYPE_QUOTED:
+							$msg = $l10n->t('%1$s shared your post %2$s');
 							break;
 					}
 					break;

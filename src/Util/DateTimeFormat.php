@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -182,8 +182,8 @@ class DateTimeFormat
 	 */
 	public static function fix(string $dateString): string
 	{
-		$search  = ['Mär', 'März', 'Mai', 'Juni', 'Juli', 'Okt', 'Dez', 'ET' , 'ZZ', ' - ', '&#x2B;'];
-		$replace = ['Mar', 'Mar' , 'May', 'Jun' , 'Jul' , 'Oct', 'Dec', 'EST', 'Z' , ', ' , '+'     ];
+		$search  = ['Mär', 'März', 'Mai', 'Juni', 'Juli', 'Okt', 'Dez', 'ET' , 'ZZ', ' - ', '&#x2B;', '&amp;#43;', ' (Coordinated Universal Time)'];
+		$replace = ['Mar', 'Mar' , 'May', 'Jun' , 'Jul' , 'Oct', 'Dec', 'EST', 'Z' , ', ' , '+'     , '+'        , ''];
 
 		$dateString = str_replace($search, $replace, $dateString);
 

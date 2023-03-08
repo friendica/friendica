@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Api\Mastodon\Timelines;
 
+use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -28,6 +29,7 @@ use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException;
+use Friendica\Object\Api\Mastodon\TimelineOrderByTypes;
 
 /**
  * @see https://docs.joinmastodon.org/methods/timelines/
@@ -47,35 +49,23 @@ class ListTimeline extends BaseApi
 		}
 
 		$request = $this->getRequest([
-			'max_id'          => 0,     // Return results older than id
-			'since_id'        => 0,     // Return results newer than id
-			'min_id'          => 0,     // Return results immediately newer than id
+			'max_id'          => null,  // Return results older than id
+			'since_id'        => null,  // Return results newer than id
+			'min_id'          => null,  // Return results immediately newer than id
 			'limit'           => 20,    // Maximum number of results to return. Defaults to 20.Return results older than this ID.
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'local'           => false, // Show only local statuses? Defaults to false.
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'exclude_replies' => false, // Don't show comments
+			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
-
-		$params = ['order' => ['uri-id' => true], 'limit' => $request['limit']];
 
 		$condition = ["`uid` = ? AND `gravity` IN (?, ?) AND `contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)",
 			$uid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, $this->parameters['id']];
 
-		if (!empty($request['max_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`uri-id` < ?", $request['max_id']]);
-		}
-
-		if (!empty($request['since_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['since_id']]);
-		}
-
-		if (!empty($request['min_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
-
-			$params['order'] = ['uri-id'];
-		}
+		$condition = $this->addPagingConditions($request, $condition);
+		$params = $this->buildOrderAndLimitParams($request);
 
 		if ($request['only_media']) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
@@ -96,10 +86,17 @@ class ListTimeline extends BaseApi
 
 		$items = Post::selectForUser($uid, ['uri-id'], $condition, $params);
 
+		$display_quotes = self::appSupportsQuotes();
+
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
-			self::setBoundaries($item['uri-id']);
-			$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
+			try {
+				$status =  DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$this->updateBoundaries($status, $item, $request['friendica_order']);
+				$statuses[] = $status;
+			} catch (\Throwable $th) {
+				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
+			}
 		}
 		DBA::close($items);
 

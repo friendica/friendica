@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,12 +21,12 @@
 
 namespace Friendica\Core\Config\Factory;
 
-use Friendica\Core\Config\Capability;
-use Friendica\Core\Config\Repository;
-use Friendica\Core\Config\Type;
 use Friendica\Core\Config\Util;
 use Friendica\Core\Config\ValueObject\Cache;
 
+/**
+ * The config factory for creating either the cache or the whole model
+ */
 class Config
 {
 	/**
@@ -54,9 +54,9 @@ class Config
 	 * @param string $basePath The basepath of FRIENDICA
 	 * @param array  $server   The $_SERVER array
 	 *
-	 * @return Util\ConfigFileLoader
+	 * @return Util\ConfigFileManager
 	 */
-	public function createConfigFileLoader(string $basePath, array $server = []): Util\ConfigFileLoader
+	public function createConfigFileManager(string $basePath, array $server = []): Util\ConfigFileManager
 	{
 		if (!empty($server[self::CONFIG_DIR_ENV]) && is_dir($server[self::CONFIG_DIR_ENV])) {
 			$configDir = $server[self::CONFIG_DIR_ENV];
@@ -65,37 +65,19 @@ class Config
 		}
 		$staticDir = $basePath . DIRECTORY_SEPARATOR . self::STATIC_DIR;
 
-		return new Util\ConfigFileLoader($basePath, $configDir, $staticDir);
+		return new Util\ConfigFileManager($basePath, $configDir, $staticDir, $server);
 	}
 
 	/**
-	 * @param Util\ConfigFileLoader $loader The Config Cache loader (INI/config/.htconfig)
-	 * @param array                 $server
+	 * @param Util\ConfigFileManager $configFileManager The Config Cache manager (INI/config/.htconfig)
 	 *
 	 * @return Cache
 	 */
-	public function createCache(Util\ConfigFileLoader $loader, array $server = []): Cache
+	public function createCache(Util\ConfigFileManager $configFileManager): Cache
 	{
 		$configCache = new Cache();
-		$loader->setupCache($configCache, $server);
+		$configFileManager->setupCache($configCache);
 
 		return $configCache;
-	}
-
-	/**
-	 * @param Cache $configCache The config cache of this adapter
-	 * @param Repository\Config $configRepo  The configuration repository
-	 *
-	 * @return Capability\IManageConfigValues
-	 */
-	public function create(Cache $configCache, Repository\Config $configRepo)
-	{
-		if ($configCache->get('system', 'config_adapter') === 'preload') {
-			$configuration = new Type\PreloadConfig($configCache, $configRepo);
-		} else {
-			$configuration = new Type\JitConfig($configCache, $configRepo);
-		}
-
-		return $configuration;
 	}
 }

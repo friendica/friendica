@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -166,7 +166,7 @@ class System
 		$load = System::currentLoad();
 		if ($load) {
 			if (intval($load) > $maxsysload) {
-				$this->logger->warning('system load for process too high.', ['load' => $load, 'process' => 'backend', 'maxsysload' => $maxsysload]);
+				$this->logger->notice('system load for process too high.', ['load' => $load, 'process' => 'backend', 'maxsysload' => $maxsysload]);
 				return true;
 			}
 		}
@@ -253,12 +253,12 @@ class System
 				$func['database'] = in_array($func['class'], ['Friendica\Database\DBA', 'Friendica\Database\Database']);
 				if (!$previous['database'] || !$func['database']) {
 					$classparts = explode("\\", $func['class']);
-					$callstack[] = array_pop($classparts).'::'.$func['function'];
+					$callstack[] = array_pop($classparts).'::'.$func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
 					$previous = $func;
 				}
 			} elseif (!in_array($func['function'], $ignore)) {
 				$func['database'] = ($func['function'] == 'q');
-				$callstack[] = $func['function'];
+				$callstack[] = $func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
 				$func['class'] = '';
 				$previous = $func;
 			}
@@ -294,7 +294,7 @@ class System
 		}
 
 		DI::apiResponse()->setType(Response::TYPE_XML);
-		DI::apiResponse()->addContent(XML::fromArray(["result" => $result], $xml));
+		DI::apiResponse()->addContent(XML::fromArray(['result' => $result]));
 		DI::page()->exit(DI::apiResponse()->generate());
 
 		self::exit();
@@ -401,7 +401,7 @@ class System
 		if (is_bool($prefix) && !$prefix) {
 			$prefix = '';
 		} elseif (empty($prefix)) {
-			$prefix = hash('crc32', DI::baseUrl()->getHostname());
+			$prefix = hash('crc32', DI::baseUrl()->getHost());
 		}
 
 		while (strlen($prefix) < ($size - 13)) {
@@ -604,7 +604,7 @@ class System
 			$temppath = BasePath::getRealPath($temppath);
 
 			// To avoid any interferences with other systems we create our own directory
-			$new_temppath = $temppath . "/" . DI::baseUrl()->getHostname();
+			$new_temppath = $temppath . "/" . DI::baseUrl()->getHost();
 			if (!is_dir($new_temppath)) {
 				/// @TODO There is a mkdir()+chmod() upwards, maybe generalize this (+ configurable) into a function/method?
 				mkdir($new_temppath);
@@ -665,10 +665,11 @@ class System
 
 	/**
 	 * Fetch the system rules
+	 * @param bool $numeric_id If set to "true", the rules are returned with a numeric id as key.
 	 *
 	 * @return array
 	 */
-	public static function getRules(): array
+	public static function getRules(bool $numeric_id = false): array
 	{
 		$rules = [];
 		$id    = 0;
@@ -681,7 +682,11 @@ class System
 			foreach (explode("\n", trim($msg)) as $line) {
 				$line = trim($line);
 				if ($line) {
-					$rules[] = ['id' => (string)++$id, 'text' => $line];
+					if ($numeric_id) {
+						$rules[++$id] = $line;
+					} else {
+						$rules[] = ['id' => (string)++$id, 'text' => $line];
+					}
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -32,11 +32,11 @@ class SystemTest extends TestCase
 	private function useBaseUrl()
 	{
 		$baseUrl = \Mockery::mock(BaseURL::class);
-		$baseUrl->shouldReceive('getHostname')->andReturn('friendica.local')->once();
+		$baseUrl->shouldReceive('getHost')->andReturn('friendica.local')->once();
 		$dice = \Mockery::mock(Dice::class);
 		$dice->shouldReceive('create')->with(BaseURL::class)->andReturn($baseUrl);
 
-		DI::init($dice);
+		DI::init($dice, true);
 	}
 
 	private function assertGuid($guid, $length, $prefix = '')

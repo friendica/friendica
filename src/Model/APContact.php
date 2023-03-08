@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -71,21 +71,14 @@ class APContact
 			return $data;
 		}
 
-		$data = ['addr' => $addr];
-		$template = 'https://' . $addr_parts[1] . '/.well-known/webfinger?resource=acct:' . urlencode($addr);
-		$webfinger = Probe::webfinger(str_replace('{uri}', urlencode($addr), $template), HttpClientAccept::JRD_JSON);
-		if (empty($webfinger['links'])) {
-			$template = 'http://' . $addr_parts[1] . '/.well-known/webfinger?resource=acct:' . urlencode($addr);
-			$webfinger = Probe::webfinger(str_replace('{uri}', urlencode($addr), $template), HttpClientAccept::JRD_JSON);
-			if (empty($webfinger['links'])) {
-				return [];
-			}
-			$data['baseurl'] = 'http://' . $addr_parts[1];
-		} else {
-			$data['baseurl'] = 'https://' . $addr_parts[1];
+		$webfinger = Probe::getWebfingerArray($addr);
+		if (empty($webfinger['webfinger']['links'])) {
+			return [];
 		}
 
-		foreach ($webfinger['links'] as $link) {
+		$data['baseurl'] = $webfinger['baseurl'];
+
+		foreach ($webfinger['webfinger']['links'] as $link) {
 			if (empty($link['rel'])) {
 				continue;
 			}
@@ -176,7 +169,7 @@ class APContact
 		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
 		$result = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
-			Logger::notice('Multiple requests for the address', ['url' => $url, 'update' => $update, 'callstack' => System::callstack(20), 'result' => $result]);
+			Logger::info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'callstack' => System::callstack(20), 'result' => $result]);
 			if (!empty($fetched_contact)) {
 				return $fetched_contact;
 			}
@@ -196,17 +189,22 @@ class APContact
 		if (empty($data)) {
 			$local_owner = [];
 
-			$curlResult = HTTPSignature::fetchRaw($url);
-			$failed = empty($curlResult) || empty($curlResult->getBody()) ||
-				(!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
+			try {
+				$curlResult = HTTPSignature::fetchRaw($url);
+				$failed = empty($curlResult) || empty($curlResult->getBody()) ||
+					(!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
+	
+				if (!$failed) {
+					$data = json_decode($curlResult->getBody(), true);
+					$failed = empty($data) || !is_array($data);
+				}
 
-			if (!$failed) {
-				$data = json_decode($curlResult->getBody(), true);
-				$failed = empty($data) || !is_array($data);
-			}
-
-			if (!$failed && ($curlResult->getReturnCode() == 410)) {
-				$data = ['@context' => ActivityPub::CONTEXT, 'id' => $url, 'type' => 'Tombstone'];
+				if (!$failed && ($curlResult->getReturnCode() == 410)) {
+					$data = ['@context' => ActivityPub::CONTEXT, 'id' => $url, 'type' => 'Tombstone'];
+				}
+			} catch (\Exception $exception) {
+				Logger::notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
+				$failed = true;
 			}
 
 			if ($failed) {
@@ -226,14 +224,11 @@ class APContact
 		$apcontact['following'] = JsonLD::fetchElement($compacted, 'as:following', '@id');
 		$apcontact['followers'] = JsonLD::fetchElement($compacted, 'as:followers', '@id');
 		$apcontact['inbox'] = (JsonLD::fetchElement($compacted, 'ldp:inbox', '@id') ?? '');
-		self::unarchiveInbox($apcontact['inbox'], false);
-
 		$apcontact['outbox'] = JsonLD::fetchElement($compacted, 'as:outbox', '@id');
 
 		$apcontact['sharedinbox'] = '';
 		if (!empty($compacted['as:endpoints'])) {
 			$apcontact['sharedinbox'] = (JsonLD::fetchElement($compacted['as:endpoints'], 'as:sharedInbox', '@id') ?? '');
-			self::unarchiveInbox($apcontact['sharedinbox'], true);
 		}
 
 		$apcontact['featured']      = JsonLD::fetchElement($compacted, 'toot:featured', '@id');
@@ -368,16 +363,14 @@ class APContact
 
 		$apcontact['discoverable'] = JsonLD::fetchElement($compacted, 'toot:discoverable', '@value');
 
-		// To-Do
+		if (!empty($apcontact['photo'])) {
+			$apcontact['photo'] = Network::addBasePath($apcontact['photo'], $apcontact['url']);
 
-		// Unhandled
-		// tag, attachment, image, nomadicLocations, signature, movedTo, liked
-
-		// Unhandled from Misskey
-		// sharedInbox, isCat
-
-		// Unhandled from Kroeg
-		// kroeg:blocks, updated
+			if (!Network::isValidHttpUrl($apcontact['photo'])) {
+				Logger::warning('Invalid URL for photo', ['url' => $apcontact['url'], 'photo' => $apcontact['photo']]);
+				$apcontact['photo'] = '';
+			}
+		}
 
 		// When the photo is too large, try to shorten it by removing parts
 		if (strlen($apcontact['photo'] ?? '') > 255) {
@@ -425,6 +418,12 @@ class APContact
 			$apcontact['gsid'] = $fetched_contact['gsid'];
 		} else {
 			$apcontact['gsid'] = null;
+		}
+
+		self::unarchiveInbox($apcontact['inbox'], false, $apcontact['gsid']);
+
+		if (!empty($apcontact['sharedinbox'])) {
+			self::unarchiveInbox($apcontact['sharedinbox'], true, $apcontact['gsid']);
 		}
 
 		if ($apcontact['url'] == $apcontact['alias']) {
@@ -517,7 +516,7 @@ class APContact
 	{
 		if (!empty($apcontact['inbox'])) {
 			Logger::info('Set inbox status to failure', ['inbox' => $apcontact['inbox']]);
-			HTTPSignature::setInboxStatus($apcontact['inbox'], false);
+			HTTPSignature::setInboxStatus($apcontact['inbox'], false, false, $apcontact['gsid']);
 		}
 
 		if (!empty($apcontact['sharedinbox'])) {
@@ -527,7 +526,7 @@ class APContact
 			if (!$available) {
 				// If all known personal inboxes are failing then set their shared inbox to failure as well
 				Logger::info('Set shared inbox status to failure', ['sharedinbox' => $apcontact['sharedinbox']]);
-				HTTPSignature::setInboxStatus($apcontact['sharedinbox'], false, true);
+				HTTPSignature::setInboxStatus($apcontact['sharedinbox'], false, true, $apcontact['gsid']);
 			}
 		}
 	}
@@ -542,11 +541,11 @@ class APContact
 	{
 		if (!empty($apcontact['inbox'])) {
 			Logger::info('Set inbox status to success', ['inbox' => $apcontact['inbox']]);
-			HTTPSignature::setInboxStatus($apcontact['inbox'], true);
+			HTTPSignature::setInboxStatus($apcontact['inbox'], true, false, $apcontact['gsid']);
 		}
 		if (!empty($apcontact['sharedinbox'])) {
 			Logger::info('Set shared inbox status to success', ['sharedinbox' => $apcontact['sharedinbox']]);
-			HTTPSignature::setInboxStatus($apcontact['sharedinbox'], true, true);
+			HTTPSignature::setInboxStatus($apcontact['sharedinbox'], true, true, $apcontact['gsid']);
 		}
 	}
 
@@ -555,15 +554,16 @@ class APContact
 	 *
 	 * @param string  $url    inbox url
 	 * @param boolean $shared Shared Inbox
+	 * @param int     $gsid   Global server id
 	 * @return void
 	 */
-	private static function unarchiveInbox(string $url, bool $shared)
+	private static function unarchiveInbox(string $url, bool $shared, int $gsid = null)
 	{
 		if (empty($url)) {
 			return;
 		}
 
-		HTTPSignature::setInboxStatus($url, true, $shared);
+		HTTPSignature::setInboxStatus($url, true, $shared, $gsid);
 	}
 
 	/**

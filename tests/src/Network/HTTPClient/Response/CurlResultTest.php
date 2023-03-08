@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,32 +21,12 @@
 
 namespace Friendica\Test\src\Network\HTTPClient\Response;
 
-use Dice\Dice;
-use Friendica\DI;
 use Friendica\Network\HTTPClient\Response\CurlResult;
-use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 class CurlResultTest extends TestCase
 {
-	protected function setUp(): void
-	{
-		parent::setUp();
-
-		/** @var Dice|MockInterface $dice */
-		$dice = \Mockery::mock(Dice::class)->makePartial();
-		$dice = $dice->addRules(include __DIR__ . '/../../../../../static/dependencies.config.php');
-
-		$logger = new NullLogger();
-		$dice->shouldReceive('create')
-		           ->with(LoggerInterface::class)
-		           ->andReturn($logger);
-
-		DI::init($dice);
-	}
-
 	/**
 	 * @small
 	 */
@@ -57,7 +37,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult(new NullLogger(),'https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -85,7 +65,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
+		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult(new NullLogger(),'https://test.local/test/it', $header . $body, [
 			'http_code' => 301,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it',
@@ -112,7 +92,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local/test/it', $header . $body, [
+		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult(new NullLogger(),'https://test.local/test/it', $header . $body, [
 			'http_code' => 500,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it',
@@ -141,7 +121,7 @@ class CurlResultTest extends TestCase
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
 
-		$curlResult = new CurlResult('https://test.local/test/it?key=value', $header . $body, [
+		$curlResult = new CurlResult(new NullLogger(),'https://test.local/test/it?key=value', $header . $body, [
 			'http_code' => 301,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local/test/it?key=value',
@@ -165,7 +145,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult(new NullLogger(),'https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -182,7 +162,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult('https://test.local', $header . $body, [
+		$curlResult = new \Friendica\Network\HTTPClient\Response\CurlResult(new NullLogger(), 'https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'
@@ -202,7 +182,7 @@ class CurlResultTest extends TestCase
 		$header = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.head');
 		$body = file_get_contents(__DIR__ . '/../../../../datasets/curl/about.body');
 
-		$curlResult = new CurlResult('https://test.local', $header . $body, [
+		$curlResult = new CurlResult(new NullLogger(),'https://test.local', $header . $body, [
 			'http_code' => 200,
 			'content_type' => 'text/html; charset=utf-8',
 			'url' => 'https://test.local'

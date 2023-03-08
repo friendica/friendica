@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -102,7 +102,7 @@ class Help extends BaseModule
 
 					$idNum[$level] ++;
 
-					$href = DI::baseUrl()->get() . "/help/{$filename}#{$anchor}";
+					$href = "help/{$filename}#{$anchor}";
 					$toc .= "<li><a href=\"{$href}\">" . strip_tags($line) . "</a></li>";
 					$id = implode("_", array_slice($idNum, 1, $level));
 					$line = "<a name=\"{$id}\"></a>" . $line;

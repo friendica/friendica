@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -47,7 +47,7 @@ class Daemon
 			return true;
 		}
 
-		$daemon_mode = DI::config()->get('system', 'worker_daemon_mode', false, true);
+		$daemon_mode = DI::keyValue()->get('worker_daemon_mode') ?? false;
 		if ($daemon_mode) {
 			return $daemon_mode;
 		}
@@ -93,11 +93,11 @@ class Daemon
 		}
 
 		// Check every minute if the daemon is running
-		if (DI::config()->get('system', 'last_daemon_check', 0) + 60 > time()) {
+		if ((DI::keyValue()->get('last_daemon_check') ?? 0) + 60 > time()) {
 			return;
 		}
 
-		DI::config()->set('system', 'last_daemon_check', time());
+		DI::keyValue()->set('last_daemon_check', time());
 
 		$pidfile = DI::config()->get('system', 'pidfile');
 		if (empty($pidfile)) {

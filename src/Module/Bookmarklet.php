@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -47,7 +47,7 @@ class Bookmarklet extends BaseModule
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page = Strings::normaliseLink(DI::baseUrl()->get() . "/bookmarklet");
+		$page = Strings::normaliseLink(DI::baseUrl() . "/bookmarklet");
 
 		if (!strstr($referer, $page)) {
 			if (empty($_REQUEST["url"])) {

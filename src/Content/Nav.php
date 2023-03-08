@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,15 +21,21 @@
 
 namespace Friendica\Content;
 
-use Friendica\App;
+use Friendica\App\BaseURL;
+use Friendica\App\Router;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
-use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
+use Friendica\Module\Home;
+use Friendica\Module\Security\Login;
+use Friendica\Network\HTTPException;
 
 class Nav
 {
@@ -53,9 +59,32 @@ class Nav
 	/**
 	 * An array of HTML links provided by addons providing a module via the app_menu hook
 	 *
-	 * @var array
+	 * @var array|null
 	 */
-	private static $app_menu = null;
+	private $appMenu = null;
+
+	/** @var BaseURL */
+	private $baseUrl;
+	/** @var L10n */
+	private $l10n;
+	/** @var IHandleUserSessions */
+	private $session;
+	/** @var Database */
+	private $database;
+	/** @var IManageConfigValues */
+	private $config;
+	/** @var Router */
+	private $router;
+
+	public function __construct(BaseURL $baseUrl, L10n $l10n, IHandleUserSessions $session, Database $database, IManageConfigValues $config, Router $router)
+	{
+		$this->baseUrl  = $baseUrl;
+		$this->l10n     = $l10n;
+		$this->session  = $session;
+		$this->database = $database;
+		$this->config   = $config;
+		$this->router   = $router;
+	}
 
 	/**
 	 * Set a menu item in navbar as selected
@@ -70,16 +99,17 @@ class Nav
 	/**
 	 * Build page header and site navigation bars
 	 *
-	 * @param  App    $a
 	 * @return string
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\MethodNotAllowedException
+	 * @throws HTTPException\ServiceUnavailableException
 	 */
-	public static function build(App $a): string
+	public function getHtml(): string
 	{
 		// Placeholder div for popup panel
 		$nav = '<div id="panel" style="display: none;"></div>';
 
-		$nav_info = self::getInfo($a);
+		$nav_info = $this->getInfo();
 
 		$tpl = Renderer::getMarkupTemplate('nav.tpl');
 
@@ -87,13 +117,13 @@ class Nav
 			'$sitelocation' => $nav_info['sitelocation'],
 			'$nav'          => $nav_info['nav'],
 			'$banner'       => $nav_info['banner'],
-			'$emptynotifications' => DI::l10n()->t('Nothing new here'),
+			'$emptynotifications' => $this->l10n->t('Nothing new here'),
 			'$userinfo'     => $nav_info['userinfo'],
 			'$sel'          => self::$selected,
-			'$apps'         => self::getAppMenu(),
-			'$home'         => DI::l10n()->t('Go back'),
-			'$clear_notifs' => DI::l10n()->t('Clear notifications'),
-			'$search_hint'  => DI::l10n()->t('@name, !forum, #tags, content')
+			'$apps'         => $this->getAppMenu(),
+			'$home'         => $this->l10n->t('Go back'),
+			'$clear_notifs' => $this->l10n->t('Clear notifications'),
+			'$search_hint'  => $this->l10n->t('@name, !forum, #tags, content')
 		]);
 
 		Hook::callAll('page_header', $nav);
@@ -105,60 +135,64 @@ class Nav
 	 * Returns the addon app menu
 	 *
 	 * @return array
+	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public static function getAppMenu(): array
+	public function getAppMenu(): array
 	{
-		if (is_null(self::$app_menu)) {
-			self::populateAppMenu();
+		if (is_null($this->appMenu)) {
+			$this->appMenu = $this->populateAppMenu();
 		}
 
-		return self::$app_menu;
+		return $this->appMenu;
 	}
 
 	/**
-	 * Fills the apps static variable with apps that require a menu
+	 * Returns menus for apps that require one
 	 *
-	 * @return void
+	 * @return array
+	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private static function populateAppMenu()
+	private function populateAppMenu(): array
 	{
-		self::$app_menu = [];
+		$appMenu = [];
 
 		//Don't populate apps_menu if apps are private
-		$privateapps = DI::config()->get('config', 'private_addons', false);
-		if (DI::userSession()->getLocalUserId() || !$privateapps) {
-			$arr = ['app_menu' => self::$app_menu];
+		if (
+			$this->session->getLocalUserId()
+			|| !$this->config->get('config', 'private_addons', false)
+		) {
+			$arr = ['app_menu' => $appMenu];
 
 			Hook::callAll('app_menu', $arr);
 
-			self::$app_menu = $arr['app_menu'];
+			$appMenu = $arr['app_menu'];
 		}
+
+		return $appMenu;
 	}
 
 	/**
 	 * Prepares a list of navigation links
 	 *
-	 * @param  App   $a
 	 * @return array Navigation links
 	 *    string 'sitelocation' => The webbie (username@site.com)
 	 *    array 'nav' => Array of links used in the nav menu
 	 *    string 'banner' => Formatted html link with banner image
 	 *    array 'userinfo' => Array of user information (name, icon)
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\MethodNotAllowedException
 	 */
-	private static function getInfo(App $a): array
+	private function getInfo(): array
 	{
-		$ssl_state = (bool) DI::userSession()->getLocalUserId();
-
 		/*
-		 * Our network is distributed, and as you visit friends some of the
+		 * Our network is distributed, and as you visit friends some
 		 * sites look exactly the same - it isn't always easy to know where you are.
 		 * Display the current site location as a navigation aid.
 		 */
 
-		$myident = !empty($a->getLoggedInUserNickname()) ? $a->getLoggedInUserNickname() . '@' : '';
+		$myident = !empty($this->session->getLocalUserNickname()) ? $this->session->getLocalUserNickname() . '@' : '';
 
-		$sitelocation = $myident . substr(DI::baseUrl()->get($ssl_state), strpos(DI::baseUrl()->get($ssl_state), '//') + 2);
+		$sitelocation = $myident . substr($this->baseUrl, strpos($this->baseUrl, '//') + 2);
 
 		$nav = [
 			'admin'         => null,
@@ -182,23 +216,23 @@ class Nav
 		$userinfo = null;
 
 		// nav links: array of array('href', 'text', 'extra css classes', 'title')
-		if (DI::userSession()->isAuthenticated()) {
-			$nav['logout'] = ['logout', DI::l10n()->t('Logout'), '', DI::l10n()->t('End this session')];
+		if ($this->session->isAuthenticated()) {
+			$nav['logout'] = ['logout', $this->l10n->t('Logout'), '', $this->l10n->t('End this session')];
 		} else {
-			$nav['login'] = ['login', DI::l10n()->t('Login'), (DI::args()->getModuleName() == 'login' ? 'selected' : ''), DI::l10n()->t('Sign in')];
+			$nav['login'] = ['login', $this->l10n->t('Login'), ($this->router->getModuleClass() == Login::class ? 'selected' : ''), $this->l10n->t('Sign in')];
 		}
 
-		if ($a->isLoggedIn()) {
+		if ($this->session->isAuthenticated()) {
 			// user menu
-			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname(), DI::l10n()->t('Status'), '', DI::l10n()->t('Your posts and conversations')];
-			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/profile', DI::l10n()->t('Profile'), '', DI::l10n()->t('Your profile page')];
-			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/photos', DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
-			$nav['usermenu'][] = ['profile/' . $a->getLoggedInUserNickname() . '/media', DI::l10n()->t('Media'), '', DI::l10n()->t('Your postings with media')];
-			$nav['usermenu'][] = ['calendar/', DI::l10n()->t('Calendar'), '', DI::l10n()->t('Your calendar')];
-			$nav['usermenu'][] = ['notes/', DI::l10n()->t('Personal notes'), '', DI::l10n()->t('Your personal notes')];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started')];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('Your profile page')];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('Your photos')];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/media', $this->l10n->t('Media'), '', $this->l10n->t('Your postings with media')];
+			$nav['usermenu'][] = ['calendar/', $this->l10n->t('Calendar'), '', $this->l10n->t('Your calendar')];
+			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes')];
 
 			// user info
-			$contact = DBA::selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $a->getLoggedInUserId(), 'self' => true]);
+			$contact = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
 			$userinfo = [
 				'icon' => Contact::getMicro($contact),
 				'name' => $contact['name'],
@@ -206,103 +240,103 @@ class Nav
 		}
 
 		// "Home" should also take you home from an authenticated remote profile connection
-		$homelink = Profile::getMyURL();
-		if (! $homelink) {
-			$homelink = DI::session()->get('visitor_home', '');
+		$homelink = $this->session->getMyUrl();
+		if (!$homelink) {
+			$homelink = $this->session->get('visitor_home', '');
 		}
 
-		if (DI::args()->getModuleName() != 'home' && ! DI::userSession()->getLocalUserId()) {
-			$nav['home'] = [$homelink, DI::l10n()->t('Home'), '', DI::l10n()->t('Home Page')];
+		if ($this->router->getModuleClass() != Home::class && !$this->session->getLocalUserId()) {
+			$nav['home'] = [$homelink, $this->l10n->t('Home'), '', $this->l10n->t('Home Page')];
 		}
 
-		if (intval(DI::config()->get('config', 'register_policy')) === \Friendica\Module\Register::OPEN && !DI::userSession()->isAuthenticated()) {
-			$nav['register'] = ['register', DI::l10n()->t('Register'), '', DI::l10n()->t('Create an account')];
+		if (intval($this->config->get('config', 'register_policy')) === \Friendica\Module\Register::OPEN && !$this->session->isAuthenticated()) {
+			$nav['register'] = ['register', $this->l10n->t('Register'), '', $this->l10n->t('Create an account')];
 		}
 
 		$help_url = 'help';
 
-		if (!DI::config()->get('system', 'hide_help')) {
-			$nav['help'] = [$help_url, DI::l10n()->t('Help'), '', DI::l10n()->t('Help and documentation')];
+		if (!$this->config->get('system', 'hide_help')) {
+			$nav['help'] = [$help_url, $this->l10n->t('Help'), '', $this->l10n->t('Help and documentation')];
 		}
 
-		if (count(self::getAppMenu()) > 0) {
-			$nav['apps'] = ['apps', DI::l10n()->t('Apps'), '', DI::l10n()->t('Addon applications, utilities, games')];
+		if (count($this->getAppMenu()) > 0) {
+			$nav['apps'] = ['apps', $this->l10n->t('Apps'), '', $this->l10n->t('Addon applications, utilities, games')];
 		}
 
-		if (DI::userSession()->getLocalUserId() || !DI::config()->get('system', 'local_search')) {
-			$nav['search'] = ['search', DI::l10n()->t('Search'), '', DI::l10n()->t('Search site content')];
+		if ($this->session->getLocalUserId() || !$this->config->get('system', 'local_search')) {
+			$nav['search'] = ['search', $this->l10n->t('Search'), '', $this->l10n->t('Search site content')];
 
 			$nav['searchoption'] = [
-				DI::l10n()->t('Full Text'),
-				DI::l10n()->t('Tags'),
-				DI::l10n()->t('Contacts')
+				$this->l10n->t('Full Text'),
+				$this->l10n->t('Tags'),
+				$this->l10n->t('Contacts')
 			];
 
-			if (DI::config()->get('system', 'poco_local_search')) {
-				$nav['searchoption'][] = DI::l10n()->t('Forums');
+			if ($this->config->get('system', 'poco_local_search')) {
+				$nav['searchoption'][] = $this->l10n->t('Forums');
 			}
 		}
 
 		$gdirpath = 'directory';
-		if (DI::config()->get('system', 'singleuser') && DI::config()->get('system', 'directory')) {
-			$gdirpath = Profile::zrl(DI::config()->get('system', 'directory'), true);
+		if ($this->config->get('system', 'singleuser') && $this->config->get('system', 'directory')) {
+			$gdirpath = Profile::zrl($this->config->get('system', 'directory'), true);
 		}
 
-		if ((DI::userSession()->getLocalUserId() || DI::config()->get('system', 'community_page_style') != Community::DISABLED_VISITOR) &&
-			!(DI::config()->get('system', 'community_page_style') == Community::DISABLED)) {
-			$nav['community'] = ['community', DI::l10n()->t('Community'), '', DI::l10n()->t('Conversations on this and other servers')];
+		if (($this->session->getLocalUserId() || $this->config->get('system', 'community_page_style') != Community::DISABLED_VISITOR) &&
+			!($this->config->get('system', 'community_page_style') == Community::DISABLED)) {
+			$nav['community'] = ['community', $this->l10n->t('Community'), '', $this->l10n->t('Conversations on this and other servers')];
 		}
 
-		if (DI::userSession()->getLocalUserId()) {
-			$nav['calendar'] = ['calendar', DI::l10n()->t('Calendar'), '', DI::l10n()->t('Calendar')];
+		if ($this->session->getLocalUserId()) {
+			$nav['calendar'] = ['calendar', $this->l10n->t('Calendar'), '', $this->l10n->t('Calendar')];
 		}
 
-		$nav['directory'] = [$gdirpath, DI::l10n()->t('Directory'), '', DI::l10n()->t('People directory')];
+		$nav['directory'] = [$gdirpath, $this->l10n->t('Directory'), '', $this->l10n->t('People directory')];
 
-		$nav['about'] = ['friendica', DI::l10n()->t('Information'), '', DI::l10n()->t('Information about this friendica instance')];
+		$nav['about'] = ['friendica', $this->l10n->t('Information'), '', $this->l10n->t('Information about this friendica instance')];
 
-		if (DI::config()->get('system', 'tosdisplay')) {
-			$nav['tos'] = ['tos', DI::l10n()->t('Terms of Service'), '', DI::l10n()->t('Terms of Service of this Friendica instance')];
+		if ($this->config->get('system', 'tosdisplay')) {
+			$nav['tos'] = ['tos', $this->l10n->t('Terms of Service'), '', $this->l10n->t('Terms of Service of this Friendica instance')];
 		}
 
-		// The following nav links are only show to logged in users
-		if (DI::userSession()->getLocalUserId() && !empty($a->getLoggedInUserNickname())) {
-			$nav['network'] = ['network', DI::l10n()->t('Network'), '', DI::l10n()->t('Conversations from your friends')];
+		// The following nav links are only show to logged-in users
+		if ($this->session->getLocalUserNickname()) {
+			$nav['network'] = ['network', $this->l10n->t('Network'), '', $this->l10n->t('Conversations from your friends')];
 
-			$nav['home'] = ['profile/' . $a->getLoggedInUserNickname(), DI::l10n()->t('Home'), '', DI::l10n()->t('Your posts and conversations')];
+			$nav['home'] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Home'), '', $this->l10n->t('Your posts and conversations')];
 
 			// Don't show notifications for public communities
-			if (DI::session()->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
-				$nav['introductions'] = ['notifications/intros', DI::l10n()->t('Introductions'), '', DI::l10n()->t('Friend Requests')];
-				$nav['notifications'] = ['notifications',	DI::l10n()->t('Notifications'), '', DI::l10n()->t('Notifications')];
-				$nav['notifications']['all'] = ['notifications/system', DI::l10n()->t('See all notifications'), '', ''];
-				$nav['notifications']['mark'] = ['', DI::l10n()->t('Mark as seen'), '', DI::l10n()->t('Mark all system notifications as seen')];
+			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
+				$nav['introductions'] = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
+				$nav['notifications'] = ['notifications',	$this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
+				$nav['notifications']['all'] = ['notifications/system', $this->l10n->t('See all notifications'), '', ''];
+				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as seen'), '', $this->l10n->t('Mark all system notifications as seen')];
 			}
 
-			$nav['messages'] = ['message', DI::l10n()->t('Messages'), '', DI::l10n()->t('Private mail')];
-			$nav['messages']['inbox'] = ['message', DI::l10n()->t('Inbox'), '', DI::l10n()->t('Inbox')];
-			$nav['messages']['outbox'] = ['message/sent', DI::l10n()->t('Outbox'), '', DI::l10n()->t('Outbox')];
-			$nav['messages']['new'] = ['message/new', DI::l10n()->t('New Message'), '', DI::l10n()->t('New Message')];
+			$nav['messages'] = ['message', $this->l10n->t('Messages'), '', $this->l10n->t('Private mail')];
+			$nav['messages']['inbox'] = ['message', $this->l10n->t('Inbox'), '', $this->l10n->t('Inbox')];
+			$nav['messages']['outbox'] = ['message/sent', $this->l10n->t('Outbox'), '', $this->l10n->t('Outbox')];
+			$nav['messages']['new'] = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
-			if (User::hasIdentities(DI::userSession()->getSubManagedUserId() ?: DI::userSession()->getLocalUserId())) {
-				$nav['delegation'] = ['delegation', DI::l10n()->t('Accounts'), '', DI::l10n()->t('Manage other pages')];
+			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
+				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other pages')];
 			}
 
-			$nav['settings'] = ['settings', DI::l10n()->t('Settings'), '', DI::l10n()->t('Account settings')];
+			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
 
-			$nav['contacts'] = ['contact', DI::l10n()->t('Contacts'), '', DI::l10n()->t('Manage/edit friends and contacts')];
+			$nav['contacts'] = ['contact', $this->l10n->t('Contacts'), '', $this->l10n->t('Manage/edit friends and contacts')];
 		}
 
 		// Show the link to the admin configuration page if user is admin
-		if ($a->isSiteAdmin()) {
-			$nav['admin']      = ['admin/', DI::l10n()->t('Admin'), '', DI::l10n()->t('Site setup and configuration')];
-			$nav['moderation'] = ['moderation/', DI::l10n()->t('Moderation'), '', DI::l10n()->t('Content and user moderation')];
+		if ($this->session->isSiteAdmin()) {
+			$nav['admin']      = ['admin/', $this->l10n->t('Admin'), '', $this->l10n->t('Site setup and configuration')];
+			$nav['moderation'] = ['moderation/', $this->l10n->t('Moderation'), '', $this->l10n->t('Content and user moderation')];
 		}
 
-		$nav['navigation'] = ['navigation/', DI::l10n()->t('Navigation'), '', DI::l10n()->t('Site map')];
+		$nav['navigation'] = ['navigation/', $this->l10n->t('Navigation'), '', $this->l10n->t('Site map')];
 
 		// Provide a banner/logo/whatever
-		$banner = DI::config()->get('system', 'banner');
+		$banner = $this->config->get('system', 'banner');
 		if (is_null($banner)) {
 			$banner = '<a href="https://friendi.ca"><img id="logo-img" width="32" height="32" src="images/friendica.svg" alt="logo" /></a><span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>';
 		}

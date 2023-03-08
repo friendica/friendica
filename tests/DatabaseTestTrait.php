@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -53,16 +53,14 @@ trait DatabaseTestTrait
 	/**
 	 * Loads a given DB fixture for this DB test
 	 *
-	 * @param string   $fixture The path to the fixture
+	 * @param string[][] $fixture The fixture array
 	 * @param Database $dba     The DB connection
 	 *
 	 * @throws \Exception
 	 */
-	protected function loadFixture(string $fixture, Database $dba)
+	protected function loadDirectFixture(array $fixture, Database $dba)
 	{
-		$data = include $fixture;
-
-		foreach ($data as $tableName => $rows) {
+		foreach ($fixture as $tableName => $rows) {
 			if (is_numeric($tableName)) {
 				continue;
 			}
@@ -73,8 +71,27 @@ trait DatabaseTestTrait
 			}
 
 			foreach ($rows as $row) {
-				$dba->insert($tableName, $row, true);
+				if (is_array($row)) {
+					$dba->insert($tableName, $row, true);
+				} else {
+					throw new \Exception('row isn\'t an array');
+				}
 			}
 		}
+	}
+
+	/**
+	 * Loads a given DB fixture-file for this DB test
+	 *
+	 * @param string   $fixture The path to the fixture
+	 * @param Database $dba     The DB connection
+	 *
+	 * @throws \Exception
+	 */
+	protected function loadFixture(string $fixture, Database $dba)
+	{
+		$data = include $fixture;
+
+		$this->loadDirectFixture($data, $dba);
 	}
 }

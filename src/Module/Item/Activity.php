@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -46,17 +46,26 @@ class Activity extends BaseModule
 			throw new HTTPException\BadRequestException();
 		}
 
-		$verb = $this->parameters['verb'];
-		$itemId =  $this->parameters['id'];
+		$verb    = $this->parameters['verb'];
+		$itemId  = $this->parameters['id'];
+		$handled = false;
 
 		if (in_array($verb, ['announce', 'unannounce'])) {
 			$item = Post::selectFirst(['network', 'uri-id'], ['id' => $itemId, 'uid' => [DI::userSession()->getLocalUserId(), 0]]);
 			if ($item['network'] == Protocol::DIASPORA) {
-				Diaspora::performReshare($item['uri-id'], DI::userSession()->getLocalUserId());
+				$quote = Post::selectFirst(['id'], ['quote-uri-id' => $item['uri-id'], 'body' => '', 'origin' => true, 'uid' => DI::userSession()->getLocalUserId()]);
+				if (!empty($quote['id'])) {
+					if (!Item::markForDeletionById($quote['id'])) {
+						throw new HTTPException\BadRequestException();
+					}
+				} else {
+					Diaspora::performReshare($item['uri-id'], DI::userSession()->getLocalUserId());
+				}
+				$handled = true;
 			}
 		}
 
-		if (!Item::performActivity($itemId, $verb, DI::userSession()->getLocalUserId())) {
+		if (!$handled && !Item::performActivity($itemId, $verb, DI::userSession()->getLocalUserId())) {
 			throw new HTTPException\BadRequestException();
 		}
 

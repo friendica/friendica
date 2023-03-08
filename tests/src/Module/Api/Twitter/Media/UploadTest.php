@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -47,7 +47,7 @@ class UploadTest extends ApiTest
 		$this->expectException(BadRequestException::class);
 
 		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -61,7 +61,7 @@ class UploadTest extends ApiTest
 		AuthTestConfig::$authenticated = false;
 
 		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -80,7 +80,7 @@ class UploadTest extends ApiTest
 		];
 
 		(new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -103,7 +103,7 @@ class UploadTest extends ApiTest
 		];
 
 		$response = (new Upload(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run();
+			->run($this->httpExceptionMock);
 
 		$media = $this->toJson($response);
 

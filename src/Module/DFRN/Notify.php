@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -80,7 +80,7 @@ class Notify extends BaseModule
 		$msg = Diaspora::decodeRaw($postdata, '', true);
 		if (!is_array($msg)) {
 			// We have to fail silently to be able to hand it over to the salmon parser
-			$this->logger->warning('Diaspora::decodeRaw() has failed for some reason.');
+			$this->logger->warning('Diaspora::decodeRaw() has failed for some reason.', ['post-data' => $postdata]);
 			return false;
 		}
 

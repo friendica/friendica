@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,7 +21,6 @@
 
 namespace Friendica\Core;
 
-use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Util\Strings;
@@ -52,7 +51,7 @@ class Addon
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function getAvailableList()
+	public static function getAvailableList(): array
 	{
 		$addons = [];
 		$files = glob('addon/*/');
@@ -82,18 +81,23 @@ class Addon
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function getAdminList()
+	public static function getAdminList(): array
 	{
 		$addons_admin = [];
-		$addonsAdminStmt = DBA::select('addon', ['name'], ['plugin_admin' => 1], ['order' => ['name']]);
-		while ($addon = DBA::fetch($addonsAdminStmt)) {
-			$addons_admin[$addon['name']] = [
-				'url' => 'admin/addons/' . $addon['name'],
-				'name' => $addon['name'],
+		$addons = array_filter(DI::config()->get('addons') ?? []);
+
+		ksort($addons);
+		foreach ($addons as $name => $data) {
+			if (empty($data['admin'])) {
+				continue;
+			}
+
+			$addons_admin[$name] = [
+				'url' => 'admin/addons/' . $name,
+				'name' => $name,
 				'class' => 'addon'
 			];
 		}
-		DBA::close($addonsAdminStmt);
 
 		return $addons_admin;
 	}
@@ -113,8 +117,7 @@ class Addon
 	 */
 	public static function loadAddons()
 	{
-		$installed_addons = DBA::selectToArray('addon', ['name'], ['installed' => true]);
-		self::$addons = array_column($installed_addons, 'name');
+		self::$addons = array_keys(array_filter(DI::config()->get('addons') ?? []));
 	}
 
 	/**
@@ -129,7 +132,7 @@ class Addon
 		$addon = Strings::sanitizeFilePathItem($addon);
 
 		Logger::debug("Addon {addon}: {action}", ['action' => 'uninstall', 'addon' => $addon]);
-		DBA::delete('addon', ['name' => $addon]);
+		DI::config()->delete('addons', $addon);
 
 		@include_once('addon/' . $addon . '/' . $addon . '.php');
 		if (function_exists($addon . '_uninstall')) {
@@ -168,12 +171,9 @@ class Addon
 			$func(DI::app());
 		}
 
-		DBA::insert('addon', [
-			'name' => $addon,
-			'installed' => true,
-			'timestamp' => $t,
-			'plugin_admin' => function_exists($addon . '_addon_admin'),
-			'hidden' => file_exists('addon/' . $addon . '/.hidden')
+		DI::config()->set('addons', $addon, [
+			'last_update' => $t,
+			'admin' => function_exists($addon . '_addon_admin'),
 		]);
 
 		if (!self::isEnabled($addon)) {
@@ -187,23 +187,25 @@ class Addon
 	 * reload all updated addons
 	 *
 	 * @return void
+	 * @throws \Exception
+	 *
 	 */
 	public static function reload()
 	{
-		$addons = DBA::selectToArray('addon', [], ['installed' => true]);
+		$addons = array_filter(DI::config()->get('addons') ?? []);
 
-		foreach ($addons as $addon) {
-			$addonname = Strings::sanitizeFilePathItem(trim($addon['name']));
+		foreach ($addons as $name => $data) {
+			$addonname = Strings::sanitizeFilePathItem(trim($name));
 			$addon_file_path = 'addon/' . $addonname . '/' . $addonname . '.php';
-			if (file_exists($addon_file_path) && $addon['timestamp'] == filemtime($addon_file_path)) {
+			if (file_exists($addon_file_path) && $data['last_update'] == filemtime($addon_file_path)) {
 				// Addon unmodified, skipping
 				continue;
 			}
 
-			Logger::debug("Addon {addon}: {action}", ['action' => 'reload', 'addon' => $addon['name']]);
+			Logger::debug("Addon {addon}: {action}", ['action' => 'reload', 'addon' => $name]);
 
-			self::uninstall($addon['name']);
-			self::install($addon['name']);
+			self::uninstall($name);
+			self::install($name);
 		}
 	}
 
@@ -313,11 +315,10 @@ class Addon
 	public static function getVisibleList(): array
 	{
 		$visible_addons = [];
-		$stmt = DBA::select('addon', ['name'], ['hidden' => false, 'installed' => true]);
-		if (DBA::isResult($stmt)) {
-			foreach (DBA::toArray($stmt) as $addon) {
-				$visible_addons[] = $addon['name'];
-			}
+		$addons = array_filter(DI::config()->get('addons') ?? []);
+
+		foreach ($addons as $name => $data) {
+			$visible_addons[] = $name;
 		}
 
 		return $visible_addons;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -333,7 +333,7 @@ class Relay
 	 *
 	 * @param array $fields Field list
 	 * @return array List of relay servers
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static function getList(array $fields = []): array
 	{
@@ -382,6 +382,6 @@ class Relay
 		foreach (self::getList() as $server) {
 			$success = ActivityPub\Transmitter::sendRelayFollow($server['url']);
 			Logger::debug('Resubscribed', ['profile' => $server['url'], 'success' => $success]);
-		}	
+		}
 	}
 }

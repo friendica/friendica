@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -24,6 +24,7 @@ namespace Friendica\Worker;
 use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\DI;
+use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Protocol\ActivityPub;
 

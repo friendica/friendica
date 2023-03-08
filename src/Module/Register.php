@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -161,7 +161,7 @@ class Register extends BaseModule
 			'$ask_password' => $ask_password,
 			'$password1'    => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
 			'$password2'    => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
-			'$nickdesc'     => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHostname()),
+			'$nickdesc'     => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
 			'$nicklabel'    => DI::l10n()->t('Choose a nickname: '),
 			'$photo'        => $photo,
 			'$publish'      => $profile_publish,
@@ -169,7 +169,7 @@ class Register extends BaseModule
 			'$username'     => $username,
 			'$email'        => $email,
 			'$nickname'     => $nickname,
-			'$sitename'     => DI::baseUrl()->getHostname(),
+			'$sitename'     => DI::baseUrl()->getHost(),
 			'$importh'      => DI::l10n()->t('Import'),
 			'$importt'      => DI::l10n()->t('Import your profile to this friendica instance'),
 			'$showtoslink'  => DI::config()->get('system', 'tosdisplay'),
@@ -298,7 +298,7 @@ class Register extends BaseModule
 
 		$user = $result['user'];
 
-		$base_url = DI::baseUrl()->get();
+		$base_url = DI::baseUrl();
 
 		if ($netpublish && intval(DI::config()->get('config', 'register_policy')) !== self::APPROVE) {
 			$url = $base_url . '/profile/' . $user['nickname'];
@@ -404,11 +404,11 @@ class Register extends BaseModule
 				'type'                      => Model\Notification\Type::SYSTEM,
 				'event'                     => $event,
 				'uid'                       => $admin['uid'],
-				'link'                      => DI::baseUrl()->get(true) . '/moderation/users/',
+				'link'                      => DI::baseUrl() . '/moderation/users/',
 				'source_name'               => $user['username'],
 				'source_mail'               => $user['email'],
 				'source_nick'               => $user['nickname'],
-				'source_link'               => DI::baseUrl()->get(true) . '/moderation/users/',
+				'source_link'               => DI::baseUrl() . '/moderation/users/',
 				'source_photo'              => User::getAvatarUrl($user, Proxy::SIZE_THUMB),
 				'show_in_notification_page' => false
 			]);

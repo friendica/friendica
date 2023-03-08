@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -126,6 +126,14 @@ class DateTimeFormatTest extends MockedTest
 			'German date time string' => [
 				'expectedDate' => '2022-10-05T16:34:00+02:00',
 				'dateString' => '05 Okt 2022 16:34:00 +0200',
+			],
+			'(Coordinated Universal Time)' => [
+				'expectedDate' => '2022-12-30T14:29:10+00:00',
+				'dateString' => 'Fri Dec 30 2022 14:29:10 GMT+0000 (Coordinated Universal Time)',
+			],
+			'Double HTML encode' => [
+				'expectedDate' => '2015-05-22T08:48:00+12:00',
+				'dateString' => '2015-05-22T08:48:00&amp;#43;12:00'
 			]
 		];
 	}

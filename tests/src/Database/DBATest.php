@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -52,10 +52,7 @@ class DBATest extends DatabaseTest
 	 */
 	public function testExists() {
 
-		self::assertTrue(DBA::exists('config', []));
+		self::assertTrue(DBA::exists('user', []));
 		self::assertFalse(DBA::exists('notable', []));
-
-		self::assertTrue(DBA::exists('config', ['k' => 'hostname']));
-		self::assertFalse(DBA::exists('config', ['k' => 'nonsense']));
 	}
 }

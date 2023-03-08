@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,7 +39,7 @@ class NewDMTest extends ApiTest
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
 		$response = (new NewDM($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run();
+			->run($this->httpExceptionMock);
 
 		self::assertEmpty((string)$response->getBody());
 	}
@@ -71,7 +71,7 @@ class NewDMTest extends ApiTest
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
 		$response = (new NewDM($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 43
 			]);
@@ -88,12 +88,12 @@ class NewDMTest extends ApiTest
 	 */
 	public function testApiDirectMessagesNewWithScreenName()
 	{
-		DI::app()->setLoggedInUserNickname('selfcontact');
+		DI::session()->set('nickname', 'selfcontact');
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
 		$response = (new NewDM($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44
 			]);
@@ -112,12 +112,12 @@ class NewDMTest extends ApiTest
 	 */
 	public function testApiDirectMessagesNewWithTitle()
 	{
-		DI::app()->setLoggedInUserNickname('selfcontact');
+		DI::session()->set('nickname', 'selfcontact');
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
 		$response = (new NewDM($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44,
 				'title'   => 'message_title',
@@ -138,12 +138,12 @@ class NewDMTest extends ApiTest
 	 */
 	public function testApiDirectMessagesNewWithRss()
 	{
-		DI::app()->setLoggedInUserNickname('selfcontact');
+		DI::session()->set('nickname', 'selfcontact');
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
 		$response = (new NewDM($directMessage, DI::dba(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
-			->run([
+			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44,
 				'title'   => 'message_title',

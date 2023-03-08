@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -124,7 +124,7 @@ class Contact extends BaseModeration
 			'$form_security_token' => self::getFormSecurityToken('moderation_contactblock'),
 
 			// values //
-			'$baseurl' => $this->baseUrl->get(true),
+			'$baseurl' => $this->baseUrl,
 
 			'$contacts'       => $contacts,
 			'$total_contacts' => $this->tt('%s total blocked contact', '%s total blocked contacts', $total),

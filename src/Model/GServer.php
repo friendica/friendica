@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -127,6 +127,13 @@ class GServer
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => Strings::normaliseLink($url)]);
 		if (DBA::isResult($gserver)) {
 			Logger::debug('Got ID for URL', ['id' => $gserver['id'], 'url' => $url, 'callstack' => System::callstack(20)]);
+
+			if (Network::isUrlBlocked($url)) {
+				self::setBlockedById($gserver['id']);
+			} else {
+				self::setUnblockedById($gserver['id']);
+			}
+
 			return $gserver['id'];
 		}
 
@@ -247,11 +254,11 @@ class GServer
 			$condition = ['nurl' => Strings::normaliseLink($server)];
 		}
 
-		$gserver = DBA::selectFirst('gserver', ['url', 'next_contact', 'failed'], $condition);
+		$gserver = DBA::selectFirst('gserver', ['url', 'next_contact', 'failed', 'network'], $condition);
 		if (empty($gserver)) {
 			$reachable = true;
 		} else {
-			$reachable = !$gserver['failed'];
+			$reachable = !$gserver['failed'] && in_array($gserver['network'], Protocol::FEDERATED);
 			$server    = $gserver['url'];
 		}
 
@@ -341,6 +348,12 @@ class GServer
 			return false;
 		}
 
+		if (Network::isUrlBlocked($server_url)) {
+			Logger::info('Server is blocked', ['url' => $server_url]);
+			self::setBlockedByUrl($server_url);
+			return false;
+		}
+
 		$gserver = DBA::selectFirst('gserver', [], ['nurl' => Strings::normaliseLink($server_url)]);
 		if (DBA::isResult($gserver)) {
 			if ($gserver['created'] <= DBA::NULL_DATETIME) {
@@ -370,8 +383,13 @@ class GServer
 	public static function setReachableById(int $gsid, string $network)
 	{
 		$gserver = DBA::selectFirst('gserver', ['url', 'failed', 'next_contact', 'network'], ['id' => $gsid]);
-		if (DBA::isResult($gserver) && $gserver['failed']) {
-			$fields = ['failed' => false, 'last_contact' => DateTimeFormat::utcNow()];
+		if (!DBA::isResult($gserver)) {
+			return;
+		}
+
+		$blocked = Network::isUrlBlocked($gserver['url']);
+		if ($gserver['failed']) {
+			$fields = ['failed' => false, 'blocked' => $blocked, 'last_contact' => DateTimeFormat::utcNow()];
 			if (!empty($network) && !in_array($gserver['network'], Protocol::FEDERATED)) {
 				$fields['network'] = $network;
 			}
@@ -381,6 +399,10 @@ class GServer
 			if (strtotime($gserver['next_contact']) < time()) {
 				UpdateGServer::add(Worker::PRIORITY_LOW, $gserver['url']);
 			}
+		} elseif ($blocked) {
+			self::setBlockedById($gsid);
+		} else {
+			self::setUnblockedById($gsid);
 		}
 	}
 
@@ -393,7 +415,7 @@ class GServer
 	{
 		$gserver = DBA::selectFirst('gserver', ['url', 'failed', 'next_contact'], ['id' => $gsid]);
 		if (DBA::isResult($gserver) && !$gserver['failed']) {
-			self::update(['failed' => true, 'last_failure' => DateTimeFormat::utcNow()], ['id' => $gsid]);
+			self::update(['failed' => true, 'blocked' => Network::isUrlBlocked($gserver['url']), 'last_failure' => DateTimeFormat::utcNow()], ['id' => $gsid]);
 			Logger::info('Set failed status for server', ['url' => $gserver['url']]);
 
 			if (strtotime($gserver['next_contact']) < time()) {
@@ -402,26 +424,72 @@ class GServer
 		}
 	}
 
+	public static function setUnblockedById(int $gsid)
+	{
+		$gserver = DBA::selectFirst('gserver', ['url'], ["(`blocked` OR `blocked` IS NULL) AND `id` = ?", $gsid]);
+		if (DBA::isResult($gserver)) {
+			self::update(['blocked' => false], ['id' => $gsid]);
+			Logger::info('Set unblocked status for server', ['url' => $gserver['url']]);
+		}
+	}
+
+	public static function setBlockedById(int $gsid)
+	{
+		$gserver = DBA::selectFirst('gserver', ['url'], ["(NOT `blocked` OR `blocked` IS NULL) AND `id` = ?", $gsid]);
+		if (DBA::isResult($gserver)) {
+			self::update(['blocked' => true, 'failed' => true], ['id' => $gsid]);
+			Logger::info('Set blocked status for server', ['url' => $gserver['url']]);
+		}
+	}
+
+	public static function setBlockedByUrl(string $url)
+	{
+		$gserver = DBA::selectFirst('gserver', ['url', 'id'], ["(NOT `blocked` OR `blocked` IS NULL) AND `nurl` = ?", Strings::normaliseLink($url)]);
+		if (DBA::isResult($gserver)) {
+			self::update(['blocked' => true, 'failed' => true], ['id' => $gserver['id']]);
+			Logger::info('Set blocked status for server', ['url' => $gserver['url']]);
+		}
+	}
+
 	/**
 	 * Set failed server status
 	 *
 	 * @param string $url
+	 * @return void
 	 */
-	public static function setFailure(string $url)
+	public static function setFailureByUrl(string $url)
 	{
-		$gserver = DBA::selectFirst('gserver', [], ['nurl' => Strings::normaliseLink($url)]);
+		$nurl = Strings::normaliseLink($url);
+
+		$gserver = DBA::selectFirst('gserver', [], ['nurl' => $nurl]);
 		if (DBA::isResult($gserver)) {
 			$next_update = self::getNextUpdateDate(false, $gserver['created'], $gserver['last_contact']);
-			self::update(['url' => $url, 'failed' => true, 'last_failure' => DateTimeFormat::utcNow(),
+			self::update(['url' => $url, 'failed' => true, 'blocked' => Network::isUrlBlocked($url), 'last_failure' => DateTimeFormat::utcNow(),
 			'next_contact' => $next_update, 'network' => Protocol::PHANTOM, 'detection-method' => null],
-			['nurl' => Strings::normaliseLink($url)]);
+			['nurl' => $nurl]);
 			Logger::info('Set failed status for existing server', ['url' => $url]);
+			if (self::isDefunct($gserver)) {
+				self::archiveContacts($gserver['id']);
+			}
 			return;
 		}
-		self::insert(['url' => $url, 'nurl' => Strings::normaliseLink($url),
+
+		self::insert(['url' => $url, 'nurl' => $nurl,
 			'network' => Protocol::PHANTOM, 'created' => DateTimeFormat::utcNow(),
 			'failed' => true, 'last_failure' => DateTimeFormat::utcNow()]);
 		Logger::info('Set failed status for new server', ['url' => $url]);
+	}
+
+	/**
+	 * Archive server related contacts and inboxes
+	 *
+	 * @param integer $gsid
+	 * @return void
+	 */
+	private static function archiveContacts(int $gsid)
+	{
+		Contact::update(['archive' => true], ['gsid' => $gsid]);
+		DBA::update('inbox-status', ['archive' => true], ['gsid' => $gsid]);
 	}
 
 	/**
@@ -476,7 +544,7 @@ class GServer
 	 *
 	 * @return boolean 'true' if server could be detected
 	 */
-	public static function detect(string $url, string $network = '', bool $only_nodeinfo = false): bool
+	private static function detect(string $url, string $network = '', bool $only_nodeinfo = false): bool
 	{
 		Logger::info('Detect server type', ['server' => $url]);
 
@@ -491,8 +559,8 @@ class GServer
 
 		// If the URL missmatches, then we mark the old entry as failure
 		if (!Strings::compareLink($url, $original_url)) {
-			self::setFailure($original_url);
-			if (!self::getID($url, true)) {
+			self::setFailureByUrl($original_url);
+			if (!self::getID($url, true) && !Network::isUrlBlocked($url)) {
 				self::detect($url, $network, $only_nodeinfo);
 			}
 			return false;
@@ -500,7 +568,7 @@ class GServer
 
 		$valid_url = Network::isUrlValid($url);
 		if (!$valid_url) {
-			self::setFailure($url);
+			self::setFailureByUrl($url);
 			return false;
 		} else {
 			$valid_url = rtrim($valid_url, '/');
@@ -512,8 +580,8 @@ class GServer
 			if (((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) && (parse_url($url, PHP_URL_PATH) == parse_url($valid_url, PHP_URL_PATH))) ||
 				(((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
 				Logger::debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
-				self::setFailure($url);
-				if (!self::getID($valid_url, true)) {
+				self::setFailureByUrl($url);
+				if (!self::getID($valid_url, true) && !Network::isUrlBlocked($valid_url)) {
 					self::detect($valid_url, $network, $only_nodeinfo);
 				}
 				return false;
@@ -526,8 +594,8 @@ class GServer
 				unset($parts['path']);
 				$valid_url = (string)Uri::fromParts($parts);
 
-				self::setFailure($url);
-				if (!self::getID($valid_url, true)) {
+				self::setFailureByUrl($url);
+				if (!self::getID($valid_url, true) && !Network::isUrlBlocked($valid_url)) {
 					self::detect($valid_url, $network, $only_nodeinfo);
 				}
 				return false;
@@ -546,7 +614,7 @@ class GServer
 		// When a nodeinfo is present, we don't need to dig further
 		$curlResult = DI::httpClient()->get($url . '/.well-known/x-nodeinfo2', HttpClientAccept::JSON);
 		if ($curlResult->isTimeout()) {
-			self::setFailure($url);
+			self::setFailureByUrl($url);
 			return false;
 		}
 
@@ -558,7 +626,7 @@ class GServer
 
 		if ($only_nodeinfo && empty($serverdata)) {
 			Logger::info('Invalid nodeinfo in nodeinfo-mode, server is marked as failure', ['url' => $url]);
-			self::setFailure($url);
+			self::setFailureByUrl($url);
 			return false;
 		} elseif (empty($serverdata)) {
 			$serverdata = ['detection-method' => self::DETECT_MANUAL, 'network' => Protocol::PHANTOM, 'platform' => '', 'version' => '', 'site_name' => '', 'info' => ''];
@@ -597,7 +665,7 @@ class GServer
 				}
 
 				if (!$curlResult->isSuccess() || empty($curlResult->getBody())) {
-					self::setFailure($url);
+					self::setFailureByUrl($url);
 					return false;
 				}
 
@@ -666,7 +734,7 @@ class GServer
 
 		// Most servers aren't installed in a subdirectory, so we declare this entry as failed
 		if (($serverdata['network'] == Protocol::PHANTOM) && !empty(parse_url($url, PHP_URL_PATH)) && in_array($serverdata['detection-method'], [self::DETECT_MANUAL])) {
-			self::setFailure($url);
+			self::setFailureByUrl($url);
 			return false;
 		}
 
@@ -680,6 +748,11 @@ class GServer
 		if (self::getID($url, true) && (in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED]) ||
 			in_array($serverdata['detection-method'], [self::DETECT_MANUAL, self::DETECT_HEADER, self::DETECT_BODY, self::DETECT_HOST_META]))) {
 			$serverdata = self::detectNetworkViaContacts($url, $serverdata);
+		}
+
+		if (($serverdata['network'] == Protocol::PHANTOM) && in_array($serverdata['detection-method'], [self::DETECT_MANUAL, self::DETECT_BODY])) {
+			self::setFailureByUrl($url);
+			return false;
 		}
 
 		// Detect the directory type
@@ -712,9 +785,9 @@ class GServer
 		}
 
 		$serverdata['next_contact'] = self::getNextUpdateDate(true, '', '', in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED]));
-
 		$serverdata['last_contact'] = DateTimeFormat::utcNow();
-		$serverdata['failed'] = false;
+		$serverdata['failed']       = false;
+		$serverdata['blocked']      = false;
 
 		$gserver = DBA::selectFirst('gserver', ['network'], ['nurl' => Strings::normaliseLink($url)]);
 		if (!DBA::isResult($gserver)) {
@@ -987,10 +1060,11 @@ class GServer
 				Logger::info('Invalid nodeinfo format', ['url' => $url]);
 				continue;
 			}
+
 			if ($link['rel'] == 'http://nodeinfo.diaspora.software/ns/schema/1.0') {
-				$nodeinfo1_url = $link['href'];
+				$nodeinfo1_url = Network::addBasePath($link['href'], $httpResult->getUrl());
 			} elseif ($link['rel'] == 'http://nodeinfo.diaspora.software/ns/schema/2.0') {
-				$nodeinfo2_url = $link['href'];
+				$nodeinfo2_url = Network::addBasePath($link['href'], $httpResult->getUrl());
 			}
 		}
 
@@ -1343,7 +1417,7 @@ class GServer
 			$serverdata['detection-method'] = self::DETECT_SITEINFO_JSON;
 		}
 
-		if (!empty($data['url'])) {
+		if (!empty($data['platform'])) {
 			$serverdata['platform'] = strtolower($data['platform']);
 			$serverdata['version'] = $data['version'] ?? 'N/A';
 		}
@@ -2239,7 +2313,7 @@ class GServer
 		$last_update = date('c', time() - (60 * 60 * 24 * $requery_days));
 
 		$gservers = DBA::select('gserver', ['id', 'url', 'nurl', 'network', 'poco', 'directory-type'],
-			["NOT `failed` AND `directory-type` != ? AND `last_poco_query` < ?", GServer::DT_NONE, $last_update],
+			["NOT `blocked` AND NOT `failed` AND `directory-type` != ? AND `last_poco_query` < ?", GServer::DT_NONE, $last_update],
 			['order' => ['RAND()']]);
 
 		while ($gserver = DBA::fetch($gservers)) {
@@ -2265,7 +2339,7 @@ class GServer
 	 */
 	private static function discoverFederation()
 	{
-		$last = DI::config()->get('poco', 'last_federation_discovery');
+		$last = DI::keyValue()->get('poco_last_federation_discovery');
 
 		if ($last) {
 			$next = $last + (24 * 60 * 60);
@@ -2309,7 +2383,7 @@ class GServer
 			}
 		}
 
-		DI::config()->set('poco', 'last_federation_discovery', time());
+		DI::keyValue()->set('poco_last_federation_discovery', time());
 	}
 
 	/**

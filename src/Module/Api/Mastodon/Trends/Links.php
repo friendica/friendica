@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -41,6 +41,7 @@ class Links extends BaseApi
 	{
 		$request = $this->getRequest([
 			'limit' => 10, // Maximum number of results to return. Defaults to 10.
+			'offset' => 0, // Offset in set, Defaults to 0.
 		], $request);
 
 		$condition = ["EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-thread-view`.`uri-id` AND `type` = ? AND NOT `name` IS NULL AND NOT `description` IS NULL) AND NOT `private` AND `commented` > ? AND `created` > ?",
@@ -48,12 +49,16 @@ class Links extends BaseApi
 		$condition = DBA::mergeConditions($condition, ['network' => Protocol::FEDERATED]);
 
 		$trending = [];
-		$statuses = Post::selectPostThread(['uri-id', 'total-comments', 'total-actors'], $condition, ['limit' => $request['limit'], 'order' => ['total-actors' => true]]);
+		$statuses = Post::selectPostThread(['uri-id', 'total-comments', 'total-actors'], $condition, ['limit' => [$request['offset'], $request['limit']], 'offset' => $request['offset'], 'order' => ['total-actors' => true]]);
 		while ($status = Post::fetch($statuses)) {
 			$history    = [['day' => (string)time(), 'uses' => (string)$status['total-comments'], 'accounts' => (string)$status['total-actors']]];
 			$trending[] = DI::mstdnCard()->createFromUriId($status['uri-id'], $history)->toArray();
 		}
 		DBA::close($statuses);
+
+		if (!empty($trending)) {
+			self::setLinkHeaderByOffsetLimit($request['offset'], $request['limit']);
+		}
 
 		System::jsonExit($trending);
 	}

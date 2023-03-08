@@ -34,7 +34,7 @@ Fields
 | event-id          | Used to link to the event.id                                                      | int unsigned       | YES  |     | NULL                |                |
 | unseen            | post has not been seen                                                            | boolean            | NO   |     | 1                   |                |
 | hidden            | Marker to hide the post from the user                                             | boolean            | NO   |     | 0                   |                |
-| notification-type |                                                                                   | tinyint unsigned   | NO   |     | 0                   |                |
+| notification-type |                                                                                   | smallint unsigned  | NO   |     | 0                   |                |
 | wall              | This item was posted to the wall of uid                                           | boolean            | NO   |     | 0                   |                |
 | origin            | item originated at this site                                                      | boolean            | NO   |     | 0                   |                |
 | psid              | ID of the permission set of this post                                             | int unsigned       | YES  |     | NULL                |                |

@@ -4,12 +4,12 @@ Friendica mods files
 ## `bookmarklet-share2friendica`
 
 Browser bookmarklet to share any page with your Friendica account.
-Please see `bookmarklet-share2friendica/README.md` for detailed instruction. 
+Please see `bookmarklet-share2friendica/README.md` for detailed instruction.
 
 ## `fpostit`
 
 Node-agnostic Friendica bookmarklet by Devlon Duthie.
-Unmaintained and unsupported. 
+Unmaintained and unsupported.
 
 ## `home.css` and `home.html`
 
@@ -30,7 +30,11 @@ Please check software documentation to know how modify these examples to make th
 ## `sample-systemd.timer` and `sample-systemd.service`
 
 Sample systemd unit files to start worker.php periodically.
-		
+
 Please place them in the correct location for your system, typically this is `/etc/systemd/system/friendicaworker.timer` and `/etc/systemd/system/friendicaworker.service`.
 Please report problems and improvements to `!helpers@forum.friendi.ca` and `@utzer@social.yl.ms` or open an issue in [the Github Friendica page](https://github.com/friendica/friendica/issues).
 This is for usage of systemd instead of cron to start the worker periodically, the solution is a work-in-progress and can surely be improved.
+
+## `phpstorm-code-style.xml`
+
+PHP Storm Code Style settings, used for this codebase

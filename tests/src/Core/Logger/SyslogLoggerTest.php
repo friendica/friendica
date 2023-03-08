@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,6 +39,10 @@ class SyslogLoggerTest extends AbstractLoggerTest
 		parent::setUp();
 
 		$this->introspection->shouldReceive('addClasses')->with([SyslogLogger::class]);
+		$this->config->shouldReceive('get')->with('system', 'syslog_flags')->andReturn(SyslogLogger::DEFAULT_FLAGS)
+					 ->once();
+		$this->config->shouldReceive('get')->with('system', 'syslog_facility')
+					 ->andReturn(SyslogLogger::DEFAULT_FACILITY)->once();
 	}
 
 	/**
@@ -54,7 +58,7 @@ class SyslogLoggerTest extends AbstractLoggerTest
 	 */
 	protected function getInstance($level = LogLevel::DEBUG)
 	{
-		$this->logger = new SyslogLoggerWrapper('test', $this->introspection, $level);
+		$this->logger = new SyslogLoggerWrapper('test', $this->config, $this->introspection, $level);
 
 		return $this->logger;
 	}
@@ -68,7 +72,7 @@ class SyslogLoggerTest extends AbstractLoggerTest
 		$this->expectException(LogLevelException::class);
 		$this->expectExceptionMessageMatches("/The level \".*\" is not valid./");
 		
-		$logger = new SyslogLoggerWrapper('test', $this->introspection, 'NOPE');
+		$logger = new SyslogLoggerWrapper('test', $this->config, $this->introspection, 'NOPE');
 	}
 
 	/**
@@ -79,7 +83,7 @@ class SyslogLoggerTest extends AbstractLoggerTest
 		$this->expectException(LogLevelException::class);
 		$this->expectExceptionMessageMatches("/The level \".*\" is not valid./");
 
-		$logger = new SyslogLoggerWrapper('test', $this->introspection);
+		$logger = new SyslogLoggerWrapper('test', $this->config, $this->introspection);
 
 		$logger->log('NOPE', 'a test');
 	}
@@ -90,7 +94,7 @@ class SyslogLoggerTest extends AbstractLoggerTest
 	 */
 	public function testClose()
 	{
-		$logger = new SyslogLoggerWrapper('test', $this->introspection);
+		$logger = new SyslogLoggerWrapper('test', $this->config, $this->introspection);
 		$logger->emergency('test');
 		$logger->close();
 		// Reopened itself

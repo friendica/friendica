@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -160,7 +160,7 @@ class Salmon
 
 		$namespaces = ['me' => ActivityNamespace::SALMON_ME];
 
-		$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
+		$salmon = XML::fromArray($xmldata, $dummy, false, $namespaces);
 
 		// slap them
 		$postResult = DI::httpClient()->post($url, $salmon, [
@@ -187,9 +187,7 @@ class Salmon
 				]
 			];
 
-			$namespaces = ['me' => ActivityNamespace::SALMON_ME];
-
-			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
+			$salmon = XML::fromArray($xmldata, $dummy, false, $namespaces);
 
 			// slap them
 			$postResult = DI::httpClient()->post($url, $salmon, [
@@ -214,9 +212,7 @@ class Salmon
 				]
 			];
 
-			$namespaces = ['me' => ActivityNamespace::SALMON_ME];
-
-			$salmon = XML::fromArray($xmldata, $xml, false, $namespaces);
+			$salmon = XML::fromArray($xmldata, $dummy, false, $namespaces);
 
 			// slap them
 			$postResult = DI::httpClient()->post($url, $salmon, [

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -59,8 +59,9 @@ use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
+use Friendica\Protocol\Activity;
+use Friendica\Protocol\Delivery;
 use Friendica\Security\PermissionSet\Repository\PermissionSet;
-use Friendica\Worker\Delivery;
 
 // Post-update script of PR 5751
 function update_1298()
@@ -982,7 +983,7 @@ function update_1429()
 		return Update::FAILED;
 	}
 
-	DI::config()->set('system', 'post_update_version', 1423);
+	DI::keyValue()->set('post_update_version', 1423);
 
 	return Update::SUCCESS;
 }
@@ -1143,5 +1144,174 @@ function update_1497()
 function update_1502()
 {
 	DBA::e("UPDATE `pconfig` SET `cat` = 'calendar' WHERE `k` = 'first_day_of_week'");
+	return Update::SUCCESS;
+}
+
+function update_1505()
+{
+	if (!DBStructure::existsTable('config')) {
+		return Update::SUCCESS;
+	}
+
+	$conditions = [
+		"((`cat`  = ?) AND ((`k` LIKE ?) OR (`k` = ?) OR (`k` LIKE ?) OR (`k` = ?))) OR " .
+		"((`cat` != ?) AND  (`k` LIKE ?)) OR " .
+		"((`cat`  = ?) AND  (`k` LIKE ?))",
+		"system",
+		"post_update_%",
+		"worker_last_cleaned",
+		"last%",
+		"worker_daemon_mode",
+		"system",
+		"last_%",
+		"database",
+		"update_%",
+	];
+
+	$postUpdateEntries = DBA::selectToArray('config', ['cat', 'k', 'v'], $conditions);
+
+	foreach ($postUpdateEntries as $postUpdateEntry) {
+		if ($postUpdateEntry['cat'] === 'system') {
+			DI::keyValue()->set($postUpdateEntry['k'], $postUpdateEntry['v']);
+		} else {
+			DI::keyValue()->set(sprintf('%s_%s', $postUpdateEntry['cat'], $postUpdateEntry['k']), $postUpdateEntry['v']);
+		}
+	}
+
+	return DBA::delete('config', $conditions) ? Update::SUCCESS : Update::FAILED;
+}
+
+function update_1508()
+{
+	$config = DBA::selectToArray('config');
+
+	$newConfig = DI::config()->beginTransaction();
+
+	foreach ($config as $entry) {
+		$newConfig->set($entry['cat'], $entry['k'], $entry['v']);
+	}
+
+	$newConfig->commit();
+
+	return Update::SUCCESS;
+}
+
+function update_1509()
+{
+	$addons = DBA::selectToArray('addon');
+
+	$newConfig = DI::config()->beginTransaction();
+
+	foreach ($addons as $addon) {
+		$newConfig->set('addons', $addon['name'], [
+			'last_update' => $addon['timestamp'],
+			'admin' => (bool)$addon['plugin_admin'],
+		]);
+	}
+
+	$newConfig->commit();
+
+	return Update::SUCCESS;
+}
+
+function update_1510()
+{
+	$blocks = DBA::select('pconfig', ['uid', 'v'], ['cat' => 'blockem', 'k' => 'words']);
+	while ($block = DBA::fetch($blocks)) {
+		foreach (explode(',', $block['v']) as $account) {
+			$id = Contact::getIdForURL(trim($account), 0, false);
+			if (empty($id)) {
+				continue;
+			}
+			Contact\User::setCollapsed($id, $block['uid'], true);
+		}
+	}
+	return Update::SUCCESS;
+}
+
+function update_1512()
+{
+	DI::keyValue()->set('nodeinfo_total_users', DI::config()->get('nodeinfo', 'total_users'));
+	DI::keyValue()->set('nodeinfo_active_users_halfyear', DI::config()->get('nodeinfo', 'active_users_halfyear'));
+	DI::keyValue()->set('nodeinfo_active_users_monthly', DI::config()->get('nodeinfo', 'active_users_monthly'));
+	DI::keyValue()->set('nodeinfo_active_users_weekly', DI::config()->get('nodeinfo', 'active_users_weekly'));
+	DI::keyValue()->set('nodeinfo_local_posts', DI::config()->get('nodeinfo', 'local_posts'));
+	DI::keyValue()->set('nodeinfo_local_comments', DI::config()->get('nodeinfo', 'local_comments'));
+
+	DI::config()->delete('nodeinfo', 'total_users');
+	DI::config()->delete('nodeinfo', 'active_users_halfyear');
+	DI::config()->delete('nodeinfo', 'active_users_monthly');
+	DI::config()->delete('nodeinfo', 'active_users_weekly');
+	DI::config()->delete('nodeinfo', 'local_posts');
+	DI::config()->delete('nodeinfo', 'local_comments');
+}
+
+function update_1513()
+{
+	DI::keyValue()->set('git_friendica_version', DI::config()->get('system', 'git_friendica_version'));
+	DI::keyValue()->set('twitter_application_name', DI::config()->get('twitter', 'application_name'));
+
+	DI::config()->delete('system', 'git_friendica_version');
+	DI::config()->delete('twitter', 'application_name');
+}
+
+function update_1514()
+{
+	if (file_exists(dirname(__FILE__) . '/config/node.config.php')) {
+
+		$transactionalConfig = DI::config()->beginTransaction();
+		$oldConfig = include dirname(__FILE__) . '/config/node.config.php';
+
+		if (is_array($oldConfig)) {
+			$categories = array_keys($oldConfig);
+
+			foreach ($categories as $category) {
+				if (is_array($oldConfig[$category])) {
+					$keys = array_keys($oldConfig[$category]);
+
+					foreach ($keys as $key) {
+						$transactionalConfig->set($category, $key, $oldConfig[$category][$key]);
+					}
+				}
+			}
+		}
+
+		$transactionalConfig->commit();
+
+		// Rename the node.config.php so it won't get used, but it isn't deleted.
+		if (rename(dirname(__FILE__) . '/config/node.config.php', dirname(__FILE__) . '/config/node.config.php.bak')) {
+			return Update::SUCCESS;
+		} else {
+			return Update::FAILED;
+		}
+	}
+
+	return Update::SUCCESS;
+}
+
+function update_1515()
+{
+	DBA::update('verb', ['name' => Activity::READ], ['name' => 'https://www.w3.org/ns/activitystreams#read']);
+	DBA::update('verb', ['name' => Activity::VIEW], ['name' => 'https://joinpeertube.org/view']);
+	return Update::SUCCESS;
+}
+
+function update_1516()
+{
+	// Fixes https://github.com/friendica/friendica/issues/12803
+	// de-serialize multiple serialized values
+	$configTrans = DI::config()->beginTransaction();
+	$configArray = DI::config()->getCache()->getDataBySource(Cache::SOURCE_DATA);
+
+	foreach ($configArray as $category => $keyValues) {
+		if (is_array($keyValues)) {
+			foreach ($keyValues as $key => $value) {
+				$configTrans->set($category, $key, $value);
+			}
+		}
+	}
+
+	$configTrans->commit();
+
 	return Update::SUCCESS;
 }

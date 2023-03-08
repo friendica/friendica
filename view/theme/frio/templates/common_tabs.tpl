@@ -6,7 +6,7 @@
 			<ul class="tabs flex-nav" role="menu">
 				{{foreach $tabs as $tab}}
 					<li id="{{$tab.id}}" role="presentation" {{if $tab.sel}} class="{{$tab.sel}}" {{/if}}>
-						<a role="menuitem" href="{{$tab.url}}" {{if $tab.accesskey}}accesskey="{{$tab.accesskey}}" {{/if}}
+						<a role="menuitem" class="tabbar-wrapper__link" href="{{$tab.url}}" {{if $tab.accesskey}}accesskey="{{$tab.accesskey}}" {{/if}}
 							{{if $tab.title}} title="{{$tab.title}}" {{/if}}>
 							{{$tab.label}}
 						</a>
@@ -37,7 +37,7 @@
 				{{foreach $tabs as $tab}}
 					{{if $tab.sel}}
 						<li id="{{$tab.id}}-xs" role="presentation" {{if $tab.sel}} class="{{$tab.sel}}" {{/if}}>
-							<a role="menuitem" href="{{$tab.url}}" {{if $tab.title}} title="{{$tab.title}}" {{/if}}>
+							<a role="menuitem" class="tabbar-wrapper__link" href="{{$tab.url}}" {{if $tab.title}} title="{{$tab.title}}" {{/if}}>
 								{{$tab.label}}
 							</a>
 						</li>

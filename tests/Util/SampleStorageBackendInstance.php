@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,7 +25,7 @@ use Friendica\Core\L10n;
 use Friendica\Test\Util\SampleStorageBackend;
 use Mockery\MockInterface;
 
-function create_instance(App $a, &$data)
+function create_instance(&$data)
 {
 	/** @var L10n|MockInterface $l10n */
 	$l10n = \Mockery::mock(L10n::class);

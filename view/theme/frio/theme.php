@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -26,18 +26,14 @@
 
 use Friendica\App;
 use Friendica\Content\Text\Plaintext;
-use Friendica\Content\Widget;
 use Friendica\Core\Hook;
 use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model;
-use Friendica\Model\Item;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Profile;
-use Friendica\Module;
-use Friendica\Util\Strings;
 
 const FRIO_SCHEME_ACCENT_BLUE   = '#1e87c2';
 const FRIO_SCHEME_ACCENT_RED    = '#b50404';
@@ -89,10 +85,9 @@ function frio_install()
  *  to the photo file. This function is nessesary to use colorbox
  *  in the network stream
  *
- * @param App $a Unused but required by hook definition
  * @param array $body_info The item and its html output
  */
-function frio_item_photo_links(App $a, &$body_info)
+function frio_item_photo_links(&$body_info)
 {
 	$occurence = 0;
 	$p = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
@@ -125,10 +120,9 @@ function frio_item_photo_links(App $a, &$body_info)
  *  to call the addToModal javascript function so this pages can
  *  be loaded in a bootstrap modal
  *
- * @param App $a Unused but required by the hook definition
  * @param array $arr Contains item data and the original photo_menu
  */
-function frio_item_photo_menu(App $a, &$arr)
+function frio_item_photo_menu(&$arr)
 {
 	foreach ($arr['menu'] as $k => $v) {
 		if (strpos($v, 'message/new/') === 0) {
@@ -147,10 +141,9 @@ function frio_item_photo_menu(App $a, &$arr)
  *  Additionally the profile, status and photo page links  will be changed
  *  to don't open in a new tab if the contact is a friendica contact.
  *
- * @param App $a The app data
  * @param array $args Contains contact data and the original photo_menu
  */
-function frio_contact_photo_menu(App $a, &$args)
+function frio_contact_photo_menu(&$args)
 {
 	$cid = $args['contact']['id'];
 
@@ -199,7 +192,7 @@ function frio_contact_photo_menu(App $a, &$args)
  * @param array $nav_info The original nav info array: nav, banner, userinfo, sitelocation
  * @throws Exception
  */
-function frio_remote_nav(App $a, array &$nav_info)
+function frio_remote_nav(array &$nav_info)
 {
 	if (DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 		// get the homelink from $_SESSION
@@ -211,8 +204,8 @@ function frio_remote_nav(App $a, array &$nav_info)
 		// since $userinfo isn't available for the hook we write it to the nav array
 		// this isn't optimal because the contact query will be done now twice
 		$fields = ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'];
-		if ($a->isLoggedIn()) {
-			$remoteUser = Contact::selectFirst($fields, ['uid' => $a->getLoggedInUserId(), 'self' => true]);
+		if (DI::userSession()->isAuthenticated()) {
+			$remoteUser = Contact::selectFirst($fields, ['uid' => DI::userSession()->getLocalUserId(), 'self' => true]);
 		} elseif (!DI::userSession()->getLocalUserId() && DI::userSession()->getRemoteUserId()) {
 			$remoteUser                = Contact::getById(DI::userSession()->getRemoteUserId(), $fields);
 			$nav_info['nav']['remote'] = DI::l10n()->t('Guest');
@@ -253,7 +246,7 @@ function frio_remote_nav(App $a, array &$nav_info)
 	}
 }
 
-function frio_display_item(App $a, &$arr)
+function frio_display_item(&$arr)
 {
 	// Add follow to the item menu
 	$followThread = [];

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -21,6 +21,7 @@
 
 namespace Friendica\Module\Search;
 
+use Friendica\Content\Conversation;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
@@ -98,7 +99,7 @@ class Filed extends BaseSearch
 
 		$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $item_condition, $item_params));
 
-		$o .= DI::conversation()->create($items, 'filed', false, false, '', DI::userSession()->getLocalUserId());
+		$o .= DI::conversation()->create($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
 			$o .= HTML::scrollLoader();

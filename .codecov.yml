@@ -1,7 +1,7 @@
 codecov:
   branch: develop
   ci:
-    - drone.friendi.ca
+    - ci.friendi.ca
 
 coverage:
   precision: 2

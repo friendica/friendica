@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -163,23 +163,37 @@ final class Activity
 	 * @var string
 	 */
 	const ANNOUNCE   = ActivityNamespace::ACTIVITY2 . 'Announce';
+	/**
+	 * Indicates that the actor has read the object.
+	 *
+	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-read
+	 * @var string
+	 */
+	const READ       = ActivityNamespace::ACTIVITY2 . 'Read';
+	/**
+	 *  Indicates that the actor has listened to the object. 
+	 *
+	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-listen
+	 * @var string
+	 */
+	const LISTEN     = ActivityNamespace::ACTIVITY2 . 'Listen';
+	/**
+	 * Indicates that the actor has viewed the object.
+	 *
+	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-view
+	 * @var string
+	 */
+	const VIEW       = ActivityNamespace::ACTIVITY2 . 'View';
 
 	const O_UNFOLLOW    = ActivityNamespace::OSTATUS . '/unfollow';
 	const O_UNFAVOURITE = ActivityNamespace::OSTATUS . '/unfavorite';
 
 	/**
-	 * React to a post via an emoji 
+	 * React to a post via an emoji
 	 *
 	 * @var string
 	 */
 	const EMOJIREACT = ActivityNamespace::LITEPUB . '/emojireact';
-
-	/**
-	 * View notification from Peertube
-	 *
-	 * @var string
-	 */
-	const VIEW       = ActivityNamespace::PEERTUBE . '/view';
 
 	/**
 	 * likes (etc.) can apply to other things besides posts. Check if they are post children,
@@ -194,6 +208,7 @@ final class Activity
 		self::ANNOUNCE,
 		self::EMOJIREACT,
 		self::VIEW,
+		self::READ,
 	];
 
 	/**

@@ -1,13 +1,9 @@
-Version 2023.01 (2023-01-15)
+Version 2023.03 (unreleased)
   Friendica Core
-    Improved the global server updating if domains are blocked [MrPetovan]
-    Improved the forum distribution for comments [annando]
-    Improved the handling of forum mentions [annando]
-    Fixed the forum post distribution [annando]
-    Fixed a security bug in the 404 page [nupplaphil]
+
+  Friendica Addons
 
   Closed Issues
-    12539, 12540, 12655, 12615, 12663
 
 Version 2022.12 (2022-12-20)
   Friendica Core
@@ -30,7 +26,7 @@ Version 2022.12 (2022-12-20)
     Added a moderation section to the admin panel [annando]
     Added an option to make the calendar public [matthiasmoritz]
     Fixed a bug in the federation with Diaspora* [annando]
-    Fixec a problem in the federation with GoTo Social and Owncast [annando]
+    Fixed a problem in the federation with GoTo Social and Owncast [annando]
     Deprecated old themes (duepuntozero, quattro, smoothy)
 
     NOTE: The Apache2 rewrite rule in the .htaccess-dist has been changed.

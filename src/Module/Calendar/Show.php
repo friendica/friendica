@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -64,7 +64,7 @@ class Show extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$nickname = $this->parameters['nickname'] ?? $this->app->getLoggedInUserNickname();
+		$nickname = $this->parameters['nickname'] ?? $this->session->getLocalUserNickname();
 		if (!$nickname) {
 			throw new HTTPException\UnauthorizedException();
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -60,7 +60,7 @@ class CookieTest extends MockedTest
 	 */
 	public function testInstance()
 	{
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn('1235')->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
@@ -127,7 +127,7 @@ class CookieTest extends MockedTest
 	 */
 	public function testGet(array $cookieData, bool $hasValues, $uid, $hash, $ip)
 	{
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn('1235')->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
@@ -188,7 +188,7 @@ class CookieTest extends MockedTest
 	 */
 	public function testCheck(string $serverPrivateKey, string $userPrivateKey, string $password, string $assertHash, bool $assertTrue)
 	{
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverPrivateKey)->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
@@ -248,7 +248,7 @@ class CookieTest extends MockedTest
 	 */
 	public function testSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray)
 	{
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverKey)->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn(Cookie::DEFAULT_EXPIRE)->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
@@ -275,7 +275,7 @@ class CookieTest extends MockedTest
 	 */
 	public function testDoubleSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray)
 	{
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverKey)->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn(Cookie::DEFAULT_EXPIRE)->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
@@ -301,7 +301,7 @@ class CookieTest extends MockedTest
 			Cookie::NAME => 'test'
 		];
 
-		$this->baseUrl->shouldReceive('getSSLPolicy')->andReturn(true)->once();
+		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn(24)->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn(Cookie::DEFAULT_EXPIRE)->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();

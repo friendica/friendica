@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,16 +22,20 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Logger;
+use Friendica\Core\Worker;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Util\Network;
 
 class UpdateContact
 {
 	/**
 	 * Update contact data via probe
 	 *
-	 * @param int    $contact_id Contact ID
+	 * @param int $contact_id Contact ID
 	 * @return void
+	 * @throws InternalServerErrorException
+	 * @throws \ImagickException
 	 */
 	public static function execute(int $contact_id)
 	{

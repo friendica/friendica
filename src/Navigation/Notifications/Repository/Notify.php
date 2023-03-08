@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -264,7 +264,7 @@ class Notify extends BaseRepository
 			}
 		}
 
-		$siteurl = $this->baseUrl->get(true);
+		$siteurl = $this->baseUrl;
 		$sitename = $this->config->get('config', 'sitename');
 
 		// with $params['show_in_notification_page'] == false, the notification isn't inserted into
@@ -539,7 +539,7 @@ class Notify extends BaseRepository
 
 		$nickname = $user['nickname'];
 
-		$hostname = $this->baseUrl->getHostname();
+		$hostname = $this->baseUrl->getHost();
 		if (strpos($hostname, ':')) {
 			$hostname = substr($hostname, 0, strpos($hostname, ':'));
 		}
@@ -590,7 +590,7 @@ class Notify extends BaseRepository
 			$Notify->updateMsgFromPreamble($epreamble);
 			$Notify = $this->save($Notify);
 
-			$itemlink  = $this->baseUrl->get() . '/notify/' . $Notify->id;
+			$itemlink  = $this->baseUrl . '/notify/' . $Notify->id;
 			$notify_id = $Notify->id;
 		}
 
@@ -614,7 +614,7 @@ class Notify extends BaseRepository
 
 					$emailBuilder->setHeader('Message-ID', $message_id);
 					$log_msg = "No previous notification found for this parent:\n" .
-						"  parent: ${params['parent']}\n" . "  uid   : ${params['uid']}\n";
+						"  parent: {$params['parent']}\n" . "  uid   : {$params['uid']}\n";
 					$this->logger->info($log_msg);
 				} else {
 					// If not, just "follow" the thread.
@@ -747,7 +747,7 @@ class Notify extends BaseRepository
 
 		$params['item']   = $item;
 		$params['parent'] = $item['parent'];
-		$params['link']   = $this->baseUrl->get() . '/display/' . urlencode($item['guid']);
+		$params['link']   = $this->baseUrl . '/display/' . urlencode($item['guid']);
 
 		$subjectPrefix = $l10n->t('[Friendica:Notify]');
 
@@ -771,7 +771,7 @@ class Notify extends BaseRepository
 			$title = '"' . trim(str_replace("\n", " ", $title)) . '"';
 		}
 
-		// Some mail software relies on subject field for threading.
+		// Some mail software relies on the subject field for threading.
 		// So, we cannot have different subjects for notifications of the same thread.
 		// Before this we have the name of the replier on the subject rendering
 		// different subjects for messages on the same thread.
@@ -784,6 +784,17 @@ class Notify extends BaseRepository
 		} else {
 			$params['type'] = Model\Notification\Type::COMMENT;
 			$subject        = $l10n->t('%1$s Comment to conversation #%2$d by %3$s', $subjectPrefix, $item['parent'], $contact['name']);
+
+			if ($params['verb'] = Activity::LIKE) {
+				switch ($Notification->type) {
+					case Model\Post\UserNotification::TYPE_DIRECT_COMMENT:
+						$subject = $l10n->t('%1$s %2$s liked your post #%3$d', $subjectPrefix, $contact['name'], $item['parent']);
+						break;
+					case Model\Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT:
+						$subject = $l10n->t('%1$s %2$s liked your comment on #%3$d', $subjectPrefix, $contact['name'], $item['parent']);
+						break;
+				}
+			}
 		}
 
 		$msg = $this->notification->getMessageFromNotification($Notification);
@@ -796,7 +807,7 @@ class Notify extends BaseRepository
 		$epreamble = $msg['rich'];
 
 		$sitename = $this->config->get('config', 'sitename');
-		$siteurl  = $this->baseUrl->get(true);
+		$siteurl  = $this->baseUrl;
 
 		$sitelink  = $l10n->t('Please visit %s to view and/or reply to the conversation.');
 		$tsitelink = sprintf($sitelink, $siteurl);

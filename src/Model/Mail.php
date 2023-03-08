@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,8 +28,8 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Protocol\Activity;
+use Friendica\Protocol\Delivery;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Worker\Delivery;
 
 /**
  * Class to handle private messages

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -37,14 +37,15 @@ class XML
 	/**
 	 * Creates an XML structure out of a given array
 	 *
-	 * @param array  $array         The array of the XML structure that will be generated
-	 * @param object $xml           The created XML will be returned by reference
-	 * @param bool   $remove_header Should the XML header be removed or not?
-	 * @param array  $namespaces    List of namespaces
-	 * @param bool   $root          interally used parameter. Mustn't be used from outside.
+	 * @param array       $array         The array of the XML structure that will be generated
+	 * @param object|null $xml           The created XML will be returned by reference
+	 * @param bool        $remove_header Should the XML header be removed or not?
+	 * @param array       $namespaces    List of namespaces
+	 * @param bool        $root          interally used parameter. Mustn't be used from outside.
 	 * @return string
+	 * @throws \Exception
 	 */
-	public static function fromArray(array $array, &$xml, bool $remove_header = false, array $namespaces = [], bool $root = true): string
+	public static function fromArray(array $array, object &$xml = null, bool $remove_header = false, array $namespaces = [], bool $root = true): string
 	{
 		if ($root) {
 			foreach ($array as $key => $value) {
@@ -125,7 +126,7 @@ class XML
 
 			if (!is_array($value)) {
 				$element = $xml->addChild($key, self::escape($value ?? ''), $namespace);
-			} elseif (is_array($value)) {
+			} else {
 				$element = $xml->addChild($key, null, $namespace);
 				self::fromArray($value, $element, $remove_header, $namespaces, false);
 			}

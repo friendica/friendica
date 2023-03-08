@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,6 +25,7 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\KeyValueStorage\Capabilities\IManageKeyValuePairs;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Network\HTTPException\NotFoundException;
@@ -35,13 +36,15 @@ class Statistics extends BaseModule
 {
 	/** @var IManageConfigValues */
 	protected $config;
-
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, IManageConfigValues $config, Response $response, array $server, array $parameters = [])
+	/** @var IManageKeyValuePairs */
+	protected $keyValue;
+	
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, IManageConfigValues $config, IManageKeyValuePairs $keyValue, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config = $config;
-
+		$this->config   = $config;
+		$this->keyValue = $keyValue;
 		if (!$this->config->get("system", "nodeinfo")) {
 			throw new NotFoundException();
 		}
@@ -72,10 +75,10 @@ class Statistics extends BaseModule
 			'network'               => App::PLATFORM,
 			'version'               => App::VERSION . '-' . DB_UPDATE_VERSION,
 			'registrations_open'    => $registration_open,
-			'total_users'           => $this->config->get('nodeinfo', 'total_users'),
-			'active_users_halfyear' => $this->config->get('nodeinfo', 'active_users_halfyear'),
-			'active_users_monthly'  => $this->config->get('nodeinfo', 'active_users_monthly'),
-			'local_posts'           => $this->config->get('nodeinfo', 'local_posts'),
+			'total_users'           => $this->keyValue->get('nodeinfo_total_users'),
+			'active_users_halfyear' => $this->keyValue->get('nodeinfo_active_users_halfyear'),
+			'active_users_monthly'  => $this->keyValue->get('nodeinfo_active_users_monthly'),
+			'local_posts'           => $this->keyValue->get('nodeinfo_local_posts'),
 			'services'              => $services,
 		], $services);
 

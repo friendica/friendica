@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -62,7 +62,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 		$this->logfile = vfsStream::newFile('friendica.log')
 			->at($this->root);
 
-		$logger = new StreamLogger('test', $this->logfile->url(), $this->introspection, $this->fileSystem, $level);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn($this->logfile->url())->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem, $level);
 
 		return $logger;
 	}
@@ -76,43 +78,6 @@ class StreamLoggerTest extends AbstractLoggerTest
 	}
 
 	/**
-	 * Test if a stream is working
-	 */
-	public function testStream()
-	{
-		$logfile = vfsStream::newFile('friendica.log')
-			->at($this->root);
-
-		$filehandler = fopen($logfile->url(), 'ab');
-
-		$logger = new \Friendica\Core\Logger\Type\StreamLogger('test', $filehandler, $this->introspection, $this->fileSystem);
-		$logger->emergency('working');
-
-		$text = $logfile->getContent();
-
-		self::assertLogline($text);
-	}
-
-	/**
-	 * Test if the close statement is working
-	 */
-	public function testClose()
-	{
-		$logfile = vfsStream::newFile('friendica.log')
-			->at($this->root);
-
-		$logger = new StreamLogger('test', $logfile->url(), $this->introspection, $this->fileSystem);
-		$logger->emergency('working');
-		$logger->close();
-		// close doesn't affect
-		$logger->emergency('working too');
-
-		$text = $logfile->getContent();
-
-		self::assertLoglineNums(2, $text);
-	}
-
-	/**
 	 * Test when a file isn't set
 	 */
 	public function testNoUrl()
@@ -120,7 +85,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 		$this->expectException(LoggerArgumentException::class);
 		$this->expectExceptionMessage("Missing stream URL.");
 
-		$logger = new StreamLogger('test', '', $this->introspection, $this->fileSystem);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn('')->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem);
 
 		$logger->emergency('not working');
 	}
@@ -130,13 +97,14 @@ class StreamLoggerTest extends AbstractLoggerTest
 	 */
 	public function testWrongUrl()
 	{
-		$this->expectException(LoggerException::class);
-		$this->expectExceptionMessage("Cannot create stream.");
+		$this->expectException(LoggerArgumentException::class);
 
 		$logfile = vfsStream::newFile('friendica.log')
 			->at($this->root)->chmod(0);
 
-		$logger = new StreamLogger('test', $logfile->url(), $this->introspection, $this->fileSystem);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn($logfile->url())->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem);
 
 		$logger->emergency('not working');
 	}
@@ -164,7 +132,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 		$this->expectException(LogLevelException::class);
 		$this->expectExceptionMessageMatches("/The level \".*\" is not valid./");
 
-		$logger = new StreamLogger('test', 'file.text', $this->introspection, $this->fileSystem, 'NOPE');
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn('file.text')->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem, 'NOPE');
 	}
 
 	/**
@@ -178,7 +148,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 		$logfile = vfsStream::newFile('friendica.log')
 			->at($this->root);
 
-		$logger = new StreamLogger('test', $logfile->url(), $this->introspection, $this->fileSystem);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn($logfile->url())->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem);
 
 		$logger->log('NOPE', 'a test');
 	}
@@ -191,7 +163,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 		$this->expectException(LoggerArgumentException::class);
 		$this->expectExceptionMessage("A stream must either be a resource or a string.");
 
-		$logger = new StreamLogger('test', null, $this->introspection, $this->fileSystem);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn(null)->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem);
 	}
 
 	/**
@@ -207,7 +181,9 @@ class StreamLoggerTest extends AbstractLoggerTest
 
 		chdir($this->root->getChild('logs')->url());
 
-		$logger = new StreamLogger('test', '../friendica.log' , $this->introspection, $this->fileSystem);
+		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn('../friendica.log')->once();
+
+		$logger = new StreamLogger('test', $this->config, $this->introspection, $this->fileSystem);
 
 		$logger->info('Test');
 	}

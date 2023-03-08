@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -412,13 +412,13 @@ class Post
 			AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND (NOT `causer-blocked` OR `causer-id` = ? OR `causer-id` IS NULL) AND NOT `contact-blocked`
 			AND ((NOT `contact-readonly` AND NOT `contact-pending` AND (`contact-rel` IN (?, ?)))
-				OR `self` OR `gravity` != ? OR `contact-uid` = ?)
+				OR `self` OR `contact-uid` = ?)
 			AND NOT `" . $view . "`.`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ? AND `hidden`)
 			AND NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `blocked` AND `cid` = `author-id`)
 			AND NOT `owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `blocked` AND `cid` = `owner-id`)
-			AND NOT (`gravity` = ? AND `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `author-id`))
-			AND NOT (`gravity` = ? AND `owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `owner-id`))",
-				0, Contact::SHARING, Contact::FRIEND, Item::GRAVITY_PARENT, 0, $uid, $uid, $uid, Item::GRAVITY_PARENT, $uid, Item::GRAVITY_PARENT, $uid]);
+			AND NOT `author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `author-id`)
+			AND NOT `owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND `ignored` AND `cid` = `owner-id`)",
+				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid, $uid, $uid]);
 
 		$select_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $selected));
 

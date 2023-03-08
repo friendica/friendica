@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -144,7 +144,6 @@ class Storage extends BaseAdmin
 			'$use'                   => DI::l10n()->t('Use storage backend'),
 			'$save_reload'           => DI::l10n()->t('Save & Reload'),
 			'$noconfig'              => DI::l10n()->t('This backend doesn\'t have custom settings'),
-			'$baseurl'               => DI::baseUrl()->get(true),
 			'$form_security_token'   => self::getFormSecurityToken("admin_storage"),
 			'$storagebackend'        => $current_storage_backend instanceof ICanWriteToStorage ? $current_storage_backend::getName() : DI::l10n()->t('Database (legacy)'),
 			'$availablestorageforms' => $available_storage_forms,

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -36,15 +36,12 @@ class Addons extends BaseSettings
 {
 	/** @var Database */
 	private $database;
-	/** @var App */
-	private $app;
 
-	public function __construct(App $app, Database $database, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(Database $database, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database = $database;
-		$this->app      = $app;
 	}
 
 	protected function post(array $request = [])
@@ -62,7 +59,7 @@ class Addons extends BaseSettings
 		$addon_settings_forms = [];
 		foreach ($this->database->selectToArray('hook', ['file', 'function'], ['hook' => 'addon_settings']) as $hook) {
 			$data = [];
-			Hook::callSingle($this->app, 'addon_settings', [$hook['file'], $hook['function']], $data);
+			Hook::callSingle('addon_settings', [$hook['file'], $hook['function']], $data);
 
 			if (!empty($data['href'])) {
 				$tpl                    = Renderer::getMarkupTemplate('settings/addons/link.tpl');

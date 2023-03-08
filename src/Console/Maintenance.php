@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -100,15 +100,19 @@ HELP;
 
 		$enabled = intval($this->getArgument(0));
 
-		$this->config->set('system', 'maintenance', $enabled);
+		$transactionConfig = $this->config->beginTransaction();
+
+		$transactionConfig->set('system', 'maintenance', $enabled);
 
 		$reason = $this->getArgument(1);
 
 		if ($enabled && $this->getArgument(1)) {
-			$this->config->set('system', 'maintenance_reason', $this->getArgument(1));
+			$transactionConfig->set('system', 'maintenance_reason', $this->getArgument(1));
 		} else {
-			$this->config->set('system', 'maintenance_reason', '');
+			$transactionConfig->delete('system', 'maintenance_reason');
 		}
+
+		$transactionConfig->commit();
 
 		if ($enabled) {
 			$mode_str = "maintenance mode";

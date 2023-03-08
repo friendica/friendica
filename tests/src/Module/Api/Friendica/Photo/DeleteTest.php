@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -39,7 +39,7 @@ class DeleteTest extends ApiTest
 	public function testEmpty()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run();
+		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock);
 	}
 
 	public function testWithoutAuthenticatedUser()
@@ -50,7 +50,7 @@ class DeleteTest extends ApiTest
 	public function testWrong()
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run(['photo_id' => 1]);
+		(new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock, ['photo_id' => 1]);
 	}
 
 	public function testValidWithPost()
@@ -58,7 +58,7 @@ class DeleteTest extends ApiTest
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
 		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'photo_id' => '709057080661a283a6aa598501504178'
 			]);
 
@@ -73,7 +73,7 @@ class DeleteTest extends ApiTest
 		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
 
 		$response = (new Delete(DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run([
+			->run($this->httpExceptionMock, [
 				'photo_id' => '709057080661a283a6aa598501504178'
 			]);
 

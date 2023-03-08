@@ -1,3 +1,4 @@
+
 <div id="contact-edit-wrapper">
 
 	{{* Insert Tab-Nav *}}
@@ -12,7 +13,7 @@
 
 					{{* This is the Action menu where contact related actions like 'ignore', 'hide' can be performed *}}
 					<div id="contact-edit-actions">
-						<a class="btn" rel="#contact-actions-menu" href="#" id="contact-edit-actions-button">{{$contact_action_button}}</a>
+						<button class="btn" id="contact-edit-actions-button">{{$contact_action_button}}</button>
 
 						<ul role="menu" aria-haspopup="true" id="contact-actions-menu" class="menu-popup">
 							{{if $contact_actions.follow}}<li role="menuitem"><a href="{{$contact_actions.follow.url}}" title="{{$contact_actions.follow.title}}">{{$contact_actions.follow.label}}</a></li>{{/if}}
@@ -33,9 +34,9 @@
 
 						{{if $poll_enabled}}
 							<li><div id="contact-edit-last-update-text">{{$lastupdtext}} <span id="contact-edit-last-updated">{{$last_update}}</span></div>
-							{{if $poll_interval}}
-								<span id="contact-edit-poll-text">{{$updpub}}</span> {{$poll_interval nofilter}}
-							{{/if}}
+								{{if $poll_interval}}
+									<span id="contact-edit-poll-text">{{$updpub}}</span> {{$poll_interval nofilter}}
+								{{/if}}
 							</li>
 						{{/if}}
 
@@ -49,7 +50,7 @@
 				</div> {{* End of contact-edit-status-wrapper *}}
 
 				{{* Some information about the contact from the profile *}}
-				<dl><dt>{{$profileurllabel}}</dt><dd><a target="blank" href="{{$url}}">{{$profileurl}}</a></dd></dl>
+				<dl><dt>{{$profileurllabel}}</dt><dd><a target="blank" href="{{$profileurl}}">{{$profileurl}}</a></dd></dl>
 				{{if $location}}<dl><dt>{{$location_label}}</dt><dd>{{$location nofilter}}</dd></dl>{{/if}}
 				{{if $xmpp}}<dl><dt>{{$xmpp_label}}</dt><dd>{{$xmpp}}</dd></dl>{{/if}}
 				{{if $matrix}}<dl><dt>{{$matrix_label}}</dt><dd>{{$matrix}}</dd></dl>{{/if}}
@@ -61,40 +62,39 @@
 
 			<hr />
 
-			{{if $contact_settings_label}}
+		{{if $contact_settings_label}}
 			<h4 id="contact-edit-settings-label" class="fakelink" onclick="openClose('contact-edit-settings')">{{$contact_settings_label}}</h4>
 			<div id="contact-edit-settings">
 				<input type="hidden" name="contact_id" value="{{$contact_id}}">
 
-					<div id="contact-edit-end"></div>
-					{{include file="field_checkbox.tpl" field=$notify_new_posts}}
-					{{if $fetch_further_information}}
-						{{include file="field_select.tpl" field=$fetch_further_information}}
-						{{if $fetch_further_information.2 == 2 || $fetch_further_information.2 == 3}} {{include file="field_textarea.tpl" field=$ffi_keyword_denylist}} {{/if}}
-					{{/if}}
-					{{if $allow_remote_self}}
-						{{include file="field_select.tpl" field=$remote_self}}
-					{{/if}}
+				<div id="contact-edit-end"></div>
 
-					{{include file="field_checkbox.tpl" field=$hidden}}
+				{{include file="field_checkbox.tpl" field=$notify_new_posts}}
 
-				<div id="contact-edit-info-wrapper">
-					<h4>{{$lbl_info1}}</h4>
-					<textarea id="contact-edit-info" rows="8" cols="60" name="info">{{$info}}</textarea>
-				</div>
-				<div id="contact-edit-info-end"></div>
+			{{if $fetch_further_information}}
+				{{include file="field_select.tpl" field=$fetch_further_information}}
+				{{if $fetch_further_information.2 == 2 || $fetch_further_information.2 == 3}} {{include file="field_textarea.tpl" field=$ffi_keyword_denylist}} {{/if}}
+			{{/if}}
 
-				{{if $reason}}
+			{{if $allow_remote_self}}
+				{{include file="field_select.tpl" field=$remote_self}}
+			{{/if}}
+
+				{{include file="field_checkbox.tpl" field=$hidden}}
+
+				{{include file="field_textarea.tpl" field=$cinfo}}
+
+			{{if $reason}}
 				<div id="contact-info-wrapper">
 					<h4>{{$lbl_info2}}</h4>
 					<p>{{$reason}}</p>
 				</div>
 				<div id="contact-info-end"></div>
-				{{/if}}
-			</div>
-
-			<input class="contact-edit-submit" type="submit" name="submit" value="{{$submit}}" />
 			{{/if}}
+			</div>
+			<input class="contact-edit-submit" type="submit" name="submit" value="{{$submit}}" />
+		{{/if}}
+
 			<div class="contact-edit-submit-end clearfix"></div>
 
 		</form>{{* End of the form *}}

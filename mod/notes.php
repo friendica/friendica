@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright (C) 2010-2022, the Friendica project
+ * @copyright Copyright (C) 2010-2023, the Friendica project
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -20,6 +20,7 @@
  */
 
 use Friendica\App;
+use Friendica\Content\Conversation;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Database\DBA;
@@ -84,7 +85,7 @@ function notes_content(App $a, bool $update = false)
 
 		$count = count($notes);
 
-		$o .= DI::conversation()->create($notes, 'notes', $update);
+		$o .= DI::conversation()->create($notes, Conversation::MODE_NOTES, $update);
 	}
 
 	$o .= $pager->renderMinimal($count);
