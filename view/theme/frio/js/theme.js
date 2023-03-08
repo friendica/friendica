@@ -811,11 +811,13 @@ function doActivityItemAction(ident, verb, un) {
           $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
         }
       } else {
+        $.jGrowl("No connection to host for like or share", {sticky: false, theme: 'info', life: 5000});
         console.err("No connection to host");
       }
 	})
   .error(
     function(data){
+      $.jGrowl("Network not reachable", {sticky: false, theme: 'info', life: 5000});
       console.log("POST unsuccessfull " + data.toString());
     });
 
