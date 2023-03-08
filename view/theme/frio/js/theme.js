@@ -35,6 +35,11 @@ $(document).ready(function () {
 		);
 		return false;
 	});
+	
+	// test for touch events support and if not supported, attach .no-touch class to the HTML tag.
+	if (!("ontouchstart" in document.documentElement)) {
+	document.documentElement.className += " no-touch";
+	}
 
 	// add the class "selected" to group widges li if li > a does have the class group-selected
 	if ($("#sidebar-group-ul li a").hasClass("group-selected")) {
@@ -764,12 +769,56 @@ function htmlToText(htmlString) {
  * @param {boolean} un    Whether to perform an activity removal instead of creation
  */
 function doActivityItemAction(ident, verb, un) {
-	if (verb.indexOf("attend") === 0) {
-		$(".item-" + ident + " .button-event:not(#" + verb + "-" + ident + ")").removeClass("active");
-	}
-	$("#" + verb + "-" + ident).toggleClass("active");
+//	if (verb.indexOf("attend") === 0) {
+//		$(".item-" + ident + " .button-event:not(#" + verb + "-" + ident + ")").removeClass("active");
+//	}
+//	$("#" + verb + "-" + ident).toggleClass("active");
+//
+//	doActivityItem(ident, verb, un);
 
-	doActivityItem(ident, verb, un);
+	console.log(ident, verb, un);
+	_verb = un ? 'un' + verb : verb;
+	$('#like-rotator-' + ident.toString()).show();
+	$.post('item/' + ident.toString() + '/activity/' + _verb)
+	.success(
+		function(data){
+      console.log("data.status: " + data.status);
+      if (data.status == "ok") {
+        console.log("connection: " + data.status);
+        $('#like-rotator-' + ident.toString()).hide();
+        if (verb.indexOf("announce") === 0 ) {
+          console.log("announce")
+          if (data.verb == "un" + verb) {
+            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).removeClass("active");
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+          } else {
+            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).addClass("active");
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+          }
+        } else {
+          console.log("likes")
+          if (data.verb == "un" + verb) {
+            console.log(data.state);
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).removeClass("active");
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+            
+
+          } else {
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).addClass("active");
+            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+
+          }
+          $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
+        }
+      } else {
+        console.err("No connection to host");
+      }
+	})
+  .error(
+    function(data){
+      console.log("POST unsuccessfull " + data.toString());
+    });
+
 }
 
 // Decodes a hexadecimally encoded binary string
