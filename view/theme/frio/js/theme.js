@@ -808,67 +808,64 @@ function doActivityItemAction(ident, verb, un) {
 
 	// do request for activity
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
-	.success(
-		function(data){
+	.success(function(data){
+		//$('#like-rotator-' + ident.toString()).hide();
+		$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
+		if (data.status == 'ok') {
+			// response from server was ok
+			if (data.verb == 'un' + verb) {
+				// like/dislike buttons
+				$('button[id^=' + verb + '-' + ident.toString() + ']' )
+					.removeClass('active')
+					.attr('onclick', 'doActivityItemAction(' + ident +', "' + verb + '",false )').change();
+				// link in share-menu
+				$('a[id^=' + verb + '-' + ident.toString() + ']' )
+					.removeClass('active')
+					.attr('href', 'javascript:doActivityItemAction(' + ident +', "' + verb + '",false )').change();
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).addClass('fa-retweet').removeClass('fa-ban');
+			} else {
+				// like/dislike buttons
+				$('button[id^=' + verb + '-' + ident.toString() + ']' )
+					.addClass('active')
+					.attr('onclick', 'doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
+				// link in share-menu
+				$('a[id^=' + verb + '-' + ident.toString() + ']' )
+					.addClass('active')
+					.attr('href', 'javascript:doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).removeClass('fa-retweet').addClass('fa-ban');
+			}
+			$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass).show();
+			if (verb.indexOf('announce') === 0 ) {
+				// ShareMenuButton
+				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+				if (data.verb == 'un' + verb) {
+					$('button[id^=shareMenuOptions-' + ident.toString() + ']').removeClass('active');
+				} else {
+					$('button[id^=shareMenuOptions-' + ident.toString() + ']').addClass('active');
+				}
+			}
+		} else {
+			/* server-response was not ok. Database-problems or some changes in
+			 * data?
+			 * reset all buttons
+			 */
+			$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
+			$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+			$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+			$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+			$.jGrowl(verb + ' not successful (server error)', {sticky: false, theme: 'info', life: 5000});
+		}
+	})
+	.error(function(data){
+			/* Server could not be reaches successfully */
+			// remindert to remove the like-rotator from templates
 			//$('#like-rotator-' + ident.toString()).hide();
 			$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
-			if (data.status == 'ok') {
-				// response from server was ok
-				if (data.verb == 'un' + verb) {
-					// like/dislike buttons
-					$('button[id^=' + verb + '-' + ident.toString() + ']' )
-						.removeClass('active')
-						.attr('onclick', 'doActivityItemAction(' + ident +', "' + verb + '",false )').change();
-					// link in share-menu
-					$('a[id^=' + verb + '-' + ident.toString() + ']' )
-						.removeClass('active')
-						.attr('href', 'javascript:doActivityItemAction(' + ident +', "' + verb + '",false )').change();
-					$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).addClass('fa-retweet').removeClass('fa-ban');
-				} else {
-					// like/dislike buttons
-					$('button[id^=' + verb + '-' + ident.toString() + ']' )
-						.addClass('active')
-						.attr('onclick', 'doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
-					// link in share-menu
-					$('a[id^=' + verb + '-' + ident.toString() + ']' )
-						.addClass('active')
-						.attr('href', 'javascript:doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
-					$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).removeClass('fa-retweet').addClass('fa-ban');
-				}
-				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass).show();
-				if (verb.indexOf('announce') === 0 ) {
-					// ShareMenuButton
-					$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
-					if (data.verb == 'un' + verb) {
-						$('button[id^=shareMenuOptions-' + ident.toString() + ']').removeClass('active');
-					} else {
-						$('button[id^=shareMenuOptions-' + ident.toString() + ']').addClass('active');
-					}
-
-				} 
-			} else {
-				/* server-response was not ok. Database-problems or some changes in
-				 * data?
-				 * reset all buttons
-				 */
-				$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
-				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
-				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
-				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
-				$.jGrowl(verb + ' not successful (server error)', {sticky: false, theme: 'info', life: 5000});
-			}
-		})
-	.error(
-			function(data){
-				/* Server could not be reaches successfully */
-				// remindert to remove the like-rotator from templates
-				//$('#like-rotator-' + ident.toString()).hide();
-				$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
-				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
-				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
-				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
-				$.jGrowl(verb + ' not successful (network error)', {sticky: false, theme: 'info', life: 5000});
-		});
+			$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+			$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+			$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+			$.jGrowl(verb + ' not successful (network error)', {sticky: false, theme: 'info', life: 5000});
+	});
 }
 
 // Decodes a hexadecimally encoded binary string
