@@ -154,6 +154,8 @@ class OAuthUtil
 
 	public static function build_http_query($params)
 	{
+		// Parameters are sorted by name, using lexicographical byte value ordering.
+		// Ref: Spec: 9.1.1 (1)
 		uksort($params, 'strcmp');
 		return http_build_query($params, '', null, PHP_QUERY_RFC3986);
 	}
