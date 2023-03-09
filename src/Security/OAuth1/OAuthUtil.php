@@ -154,32 +154,9 @@ class OAuthUtil
 
 	public static function build_http_query($params)
 	{
-		if (!$params) return '';
-
-		// Urlencode both keys and values
-		$keys   = OAuthUtil::urlencode_rfc3986(array_keys($params));
-		$values = OAuthUtil::urlencode_rfc3986(array_values($params));
-		$params = array_combine($keys, $values);
-
 		// Parameters are sorted by name, using lexicographical byte value ordering.
 		// Ref: Spec: 9.1.1 (1)
 		uksort($params, 'strcmp');
-
-		$pairs = [];
-		foreach ($params as $parameter => $value) {
-			if (is_array($value)) {
-				// If two or more parameters share the same name, they are sorted by their value
-				// Ref: Spec: 9.1.1 (1)
-				natsort($value);
-				foreach ($value as $duplicate_value) {
-					$pairs[] = $parameter . '=' . $duplicate_value;
-				}
-			} else {
-				$pairs[] = $parameter . '=' . $value;
-			}
-		}
-		// For each parameter, the name is separated from the corresponding value by an '=' character (ASCII code 61)
-		// Each name-value pair is separated by an '&' character (ASCII code 38)
-		return implode('&', $pairs);
+		return http_build_query($params, '', null, PHP_QUERY_RFC3986);
 	}
 }
