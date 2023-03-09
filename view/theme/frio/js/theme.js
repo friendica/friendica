@@ -765,48 +765,85 @@ function htmlToText(htmlString) {
  */
 function doActivityItemAction(ident, verb, un) {
 	_verb = un ? 'un' + verb : verb;
-	$('#like-rotator-' + ident.toString()).show();
+	var rot = $('<img id="waitfor-' + verb + '-' + ident.toString() + '">')
+		.attr('src', 'images/rotator.gif')
+		.addClass("fa");
+	//$('#like-rotator-' + ident.toString()).show();
+	if (verb.indexOf("announce") === 0 ) {
+		$("button[id^=shareMenuOptions-" + ident.toString() + "]").off('click');
+//		$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").hide();
+		$("button[id^=announce-" + ident.toString() + "]").off('click');
+//		$("button[id^=announce-" + ident.toString() + "] i:first-child").hide();
+		if ($('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").length == 0) {
+			rot.addClass("fa-share").appendTo($("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child" )).show();
+			rot.removeClass("fa-share").addClass("fa-retweet").appendTo($("button[id^=announce-" + ident.toString() + "] i:first-child" )).show();
+		} else {
+			$('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").show()
+		}
+	} else {
+		$("button[id^=" + verb + "-" + ident.toString() + "]").off('click');
+//		$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").hide();
+		if ($('#waitfor-' + verb + "-" + ident.toString()).length == 0) {
+			rot.addClass("fa-thumbs-up").appendTo($("button[id^=" + verb + "-" + ident.toString() + "] i:first-child")).show();
+		} else {
+			$('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").show()
+		}
+	}
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
 	.success(
 		function(data){
+			//$('#like-rotator-' + ident.toString()).hide();
+			$("img[id^=waitfor-" + verb + "-" + ident.toString() + "]").hide();
 			if (data.status == "ok") {
-					$('#like-rotator-' + ident.toString()).hide();
-					if (verb.indexOf("announce") === 0 ) {
-							if (data.verb == "un" + verb) {
-									$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-										.removeClass("active")
-										.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-									$("button[id^=" + verb + "-" + ident.toString() + "]" )
-										.removeClass("active")
-										.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-							} else {
-									$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-											.addClass("active")
-											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-									$("button[id^=" + verb + "-" + ident.toString() + "]" )
-											.addClass("active")
-											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-							}
+				if (verb.indexOf("announce") === 0 ) {
+					if (data.verb == "un" + verb) {
+						$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+							.removeClass("active")
+							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+						$("button[id^=" + verb + "-" + ident.toString() + "]" )
+							.removeClass("active")
+							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
 					} else {
-							if (data.verb == "un" + verb) {
-									$("button[id^=" + verb + "-" + ident.toString() + "]" )
-											.removeClass("active")
-											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-							} else {
-									$("button[id^=" + verb + "-" + ident.toString() + "]" )
-											.addClass("active")
-											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-							}
-	//      		  $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
+						$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+								.addClass("active")
+								.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+						$("button[id^=" + verb + "-" + ident.toString() + "]" )
+								.addClass("active")
+								.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
 					}
+					$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
+					$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
+				} else {
+					if (data.verb == "un" + verb) {
+						$("button[id^=" + verb + "-" + ident.toString() + "]" )
+							.removeClass("active")
+							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+					} else {
+						$("button[id^=" + verb + "-" + ident.toString() + "]" )
+							.addClass("active")
+							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+					}
+					$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
+					$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
+				}
 			} else {
-					$.jGrowl("No connection to host for " + verb, {sticky: false, theme: 'info', life: 5000});
+				$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
+				$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
+				$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
+				$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
+				$.jGrowl(verb + " not successful", {sticky: false, theme: 'info', life: 5000});
 			}
 		})
-		.error(
-				function(data){
-						$.jGrowl("Activity " + verb + "unsuccessful", {sticky: false, theme: 'info', life: 5000});
-				});
+	.error(
+			function(data){
+				//$('#like-rotator-' + ident.toString()).hide();
+				$("img[id^=waitfor-" + verb + "-" + ident.toString() + "]").remove();
+				$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
+				$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
+				$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
+				$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
+				$.jGrowl(verb + " not successful", {sticky: false, theme: 'info', life: 5000});
+		});
 }
 
 // Decodes a hexadecimally encoded binary string
