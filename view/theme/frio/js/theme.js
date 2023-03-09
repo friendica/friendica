@@ -765,84 +765,109 @@ function htmlToText(htmlString) {
  */
 function doActivityItemAction(ident, verb, un) {
 	_verb = un ? 'un' + verb : verb;
-	var rot = $('<img id="waitfor-' + verb + '-' + ident.toString() + '">')
-		.attr('src', 'images/rotator.gif')
-		.addClass("fa");
+	var thumbsClass = '';
+	switch (verb) {
+		case 'like':
+			thumbsClass = 'fa-thumbs-up';
+			break;
+		case 'dislike':
+			thumbsClass = 'fa-thumbs-down';
+			break;
+		case 'announce':
+			thumbsClass = 'fa-retweet';
+	}
+	// remindert to remove the like-rotator from templates
 	//$('#like-rotator-' + ident.toString()).show();
-	if (verb.indexOf("announce") === 0 ) {
-		$("button[id^=shareMenuOptions-" + ident.toString() + "]").off('click');
-//		$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").hide();
-		$("button[id^=announce-" + ident.toString() + "]").off('click');
-//		$("button[id^=announce-" + ident.toString() + "] i:first-child").hide();
-		if ($('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").length == 0) {
-			rot.addClass("fa-share").appendTo($("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child" )).show();
-			rot.removeClass("fa-share").addClass("fa-retweet").appendTo($("button[id^=announce-" + ident.toString() + "] i:first-child" )).show();
+	if (verb.indexOf('announce') === 0 ) {
+		// Share-Button(s)
+		// remove share-symbol, to replace it by rotator
+		$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').removeClass('fa-share');
+		$('button[id^=announce-' + ident.toString() + '] i:first-child').removeClass('fa-retweet');
+		// if no wait-rotator for activity(verb) is added, add it. or just show it, if exists
+		if ($('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').length == 0) {
+			// append rotator to the shareMenu-button for small media
+			$('<img id="waitfor-' + verb + '-' + ident.toString() + '">')
+				.attr('src', 'images/rotator.gif')
+				.addClass('fa')
+				.appendTo($('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child' )).show();
 		} else {
-			$('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").show()
-		}
-	} else {
-		$("button[id^=" + verb + "-" + ident.toString() + "]").off('click');
-//		$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").hide();
-		if ($('#waitfor-' + verb + "-" + ident.toString()).length == 0) {
-			rot.addClass("fa-thumbs-up").appendTo($("button[id^=" + verb + "-" + ident.toString() + "] i:first-child")).show();
-		} else {
-			$('img[id^=waitfor-' + verb + "-" + ident.toString() + "]").show()
+			$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').show()
 		}
 	}
+	$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').removeClass(thumbsClass);
+	// if verb is announce, then one rotator is added above to the shareMedia-dropdown button
+	if ($('button:not(button.dropdown-toggle) img#waitfor-' + verb + '-' + ident.toString()).length == 0) {
+		$('<img id="waitfor-' + verb + '-' + ident.toString() + '">')
+			.attr('src', 'images/rotator.gif')
+			.addClass('fa')
+			.appendTo($('button[id^=' + verb + '-' + ident.toString() + '] i:first-child')).show();
+	} else {
+		// show existing rotator for activity
+		$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').show()
+	}
+
+	// do request for activity
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
 	.success(
 		function(data){
 			//$('#like-rotator-' + ident.toString()).hide();
-			$("img[id^=waitfor-" + verb + "-" + ident.toString() + "]").hide();
-			if (data.status == "ok") {
-				if (verb.indexOf("announce") === 0 ) {
-					if (data.verb == "un" + verb) {
-						$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-							.removeClass("active")
-							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-						$("button[id^=" + verb + "-" + ident.toString() + "]" )
-							.removeClass("active")
-							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-					} else {
-						$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-								.addClass("active")
-								.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-						$("button[id^=" + verb + "-" + ident.toString() + "]" )
-								.addClass("active")
-								.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-					}
-					$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
-					$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
+			$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
+			if (data.status == 'ok') {
+				// response from server was ok
+				if (data.verb == 'un' + verb) {
+					// like/dislike buttons
+					$('button[id^=' + verb + '-' + ident.toString() + ']' )
+						.removeClass('active')
+						.attr('onclick', 'doActivityItemAction(' + ident +', "' + verb + '",false )').change();
+					// link in share-menu
+					$('a[id^=' + verb + '-' + ident.toString() + ']' )
+						.removeClass('active')
+						.attr('href', 'javascript:doActivityItemAction(' + ident +', "' + verb + '",false )').change();
+					$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).addClass('fa-retweet').removeClass('fa-ban');
 				} else {
-					if (data.verb == "un" + verb) {
-						$("button[id^=" + verb + "-" + ident.toString() + "]" )
-							.removeClass("active")
-							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-					} else {
-						$("button[id^=" + verb + "-" + ident.toString() + "]" )
-							.addClass("active")
-							.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-					}
-					$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
-					$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
+					// like/dislike buttons
+					$('button[id^=' + verb + '-' + ident.toString() + ']' )
+						.addClass('active')
+						.attr('onclick', 'doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
+					// link in share-menu
+					$('a[id^=' + verb + '-' + ident.toString() + ']' )
+						.addClass('active')
+						.attr('href', 'javascript:doActivityItemAction(' + ident + ', "' + verb + '", true )').change();
+					$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).removeClass('fa-retweet').addClass('fa-ban');
 				}
+				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass).show();
+				if (verb.indexOf('announce') === 0 ) {
+					// ShareMenuButton
+					$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+					if (data.verb == 'un' + verb) {
+						$('button[id^=shareMenuOptions-' + ident.toString() + ']').removeClass('active');
+					} else {
+						$('button[id^=shareMenuOptions-' + ident.toString() + ']').addClass('active');
+					}
+
+				} 
 			} else {
-				$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
-				$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
-				$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
-				$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
-				$.jGrowl(verb + " not successful", {sticky: false, theme: 'info', life: 5000});
+				/* server-response was not ok. Database-problems or some changes in
+				 * data?
+				 * reset all buttons
+				 */
+				$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
+				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+				$.jGrowl(verb + ' not successful (server error)', {sticky: false, theme: 'info', life: 5000});
 			}
 		})
 	.error(
 			function(data){
+				/* Server could not be reaches successfully */
+				// remindert to remove the like-rotator from templates
 				//$('#like-rotator-' + ident.toString()).hide();
-				$("img[id^=waitfor-" + verb + "-" + ident.toString() + "]").remove();
-				$("button[id^=shareMenuOptions-" + ident.toString() + "]").on('click');
-				$("button[id^=shareMenuOptions-" + ident.toString() + "] i:first-child").show();
-				$("button[id^=" + verb + "-" + ident.toString() + "]").on('click');
-				$("button[id^=" + verb + "-" + ident.toString() + "] i:first-child").show();
-				$.jGrowl(verb + " not successful", {sticky: false, theme: 'info', life: 5000});
+				$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
+				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+				$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
+				$.jGrowl(verb + ' not successful (network error)', {sticky: false, theme: 'info', life: 5000});
 		});
 }
 
