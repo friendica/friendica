@@ -285,13 +285,13 @@ as the value of $top_child_total (this is done at the end of this file)
 			{{* Buttons for like and dislike *}}
 			{{if $item.vote}}
 				{{if $item.vote.like}}
-				<button type="button" class="btn-link button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});" data-toggle="button"><i class="fa fa-thumbs-up" aria-hidden="true"></i>&nbsp;{{$item.vote.like.1}}</button>
+				<button type="button" class="btn-link button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});" ><i class="fa fa-thumbs-up" aria-hidden="true"></i>&nbsp;{{$item.vote.like.1}}</button>
 				{{/if}}
 				{{if $item.vote.like AND $item.vote.dislike}}
 				<span role="presentation" class="separator"></span>
 				{{/if}}
 				{{if $item.vote.dislike}}
-				<button type="button" class="btn-link button-likes{{if $item.responses.dislike.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});" data-toggle="button"><i class="fa fa-thumbs-down" aria-hidden="true"></i>&nbsp;{{$item.vote.dislike.1}}</button>
+				<button type="button" class="btn-link button-likes{{if $item.responses.dislike.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});" ><i class="fa fa-thumbs-down" aria-hidden="true"></i>&nbsp;{{$item.vote.dislike.1}}</button>
 				{{/if}}
 
 				{{if ($item.vote.like OR $item.vote.dislike) AND $item.comment_html}}
@@ -316,7 +316,7 @@ as the value of $top_child_total (this is done at the end of this file)
 					{{/if}}
 				{{/if}}
 				{{if $item.vote.announce}}
-				<button type="button" class="btn-link button-announces{{if $item.responses.announce.self}} active" aria-pressed="true{{/if}}" id="announce-{{$item.id}}" title="{{$item.vote.announce.0}}" onclick="doActivityItemAction({{$item.id}}, 'announce'{{if $item.responses.announce.self}}, true{{/if}});" data-toggle="button"><i class="fa fa-retweet" aria-hidden="true"></i>&nbsp;{{$item.vote.announce.1}}</button>
+				<button type="button" class="btn-link button-announces{{if $item.responses.announce.self}} active" aria-pressed="true{{/if}}" id="announce-{{$item.id}}" title="{{$item.vote.announce.0}}" onclick="doActivityItemAction({{$item.id}}, 'announce'{{if $item.responses.announce.self}}, true{{/if}});" ><i class="fa fa-retweet" aria-hidden="true"></i>&nbsp;{{$item.vote.announce.1}}</button>
 				<span role="presentation" class="separator"></span>
 				{{/if}}
 				{{if $item.vote.share}}
@@ -441,10 +441,10 @@ as the value of $top_child_total (this is done at the end of this file)
 					{{* Buttons for like and dislike *}}
 					{{if $item.vote}}
 						{{if $item.vote.like}}
-							<button type="button" class="btn button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});" data-toggle="button"><i class="fa fa-thumbs-up" aria-hidden="true"></i></button>
+							<button type="button" class="btn button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});" ><i class="fa fa-thumbs-up" aria-hidden="true"></i></button>
 						{{/if}}
 						{{if $item.vote.dislike}}
-							<button type="button" class="btn button-likes{{if $item.responses.dislike.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});" data-toggle="button"><i class="fa fa-thumbs-down" aria-hidden="true"></i></button>
+							<button type="button" class="btn button-likes{{if $item.responses.dislike.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});" ><i class="fa fa-thumbs-down" aria-hidden="true"></i></button>
 						{{/if}}
 					{{/if}}
 
