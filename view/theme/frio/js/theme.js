@@ -764,50 +764,48 @@ function htmlToText(htmlString) {
  * @param {boolean} un    Whether to perform an activity removal instead of creation
  */
 function doActivityItemAction(ident, verb, un) {
-  console.log(ident, verb, un);
 	_verb = un ? 'un' + verb : verb;
 	$('#like-rotator-' + ident.toString()).show();
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
 	.success(
 		function(data){
-      console.log("data.status: " + data.status);
       if (data.status == "ok") {
-        console.log("connection: " + data.status);
         $('#like-rotator-' + ident.toString()).hide();
         if (verb.indexOf("announce") === 0 ) {
-          console.log("announce")
           if (data.verb == "un" + verb) {
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).removeClass("active");
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).removeClass("active");
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+            $("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+              .removeClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+            $("button[id^=" + verb + "-" + ident.toString() + "]" )
+              .removeClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
           } else {
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).addClass("active");
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).addClass("active");
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+            $("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+              .addClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+            $("button[id^=" + verb + "-" + ident.toString() + "]" )
+              .addClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
           }
         } else {
-          console.log("likes")
           if (data.verb == "un" + verb) {
-            console.log(data.state);
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).removeClass("active");
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+            $("button[id^=" + verb + "-" + ident.toString() + "]" )
+              .removeClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
           } else {
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).addClass("active");
-            $("button[id^=" + verb + "-" + ident.toString() + "]" ).attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+            $("button[id^=" + verb + "-" + ident.toString() + "]" )
+              .addClass("active")
+              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
           }
-          $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
+//          $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
         }
       } else {
-        $.jGrowl("No connection to host for like or share", {sticky: false, theme: 'info', life: 5000});
-        console.err("No connection to host");
+        $.jGrowl("No connection to host for " + verb, {sticky: false, theme: 'info', life: 5000});
       }
 	})
   .error(
     function(data){
-      $.jGrowl("Network not reachable", {sticky: false, theme: 'info', life: 5000});
-      console.log("POST unsuccessfull " + data.toString());
+      $.jGrowl("Activity " + verb + "unsuccessful", {sticky: false, theme: 'info', life: 5000});
     });
 
 }
