@@ -769,45 +769,44 @@ function doActivityItemAction(ident, verb, un) {
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
 	.success(
 		function(data){
-      if (data.status == "ok") {
-        $('#like-rotator-' + ident.toString()).hide();
-        if (verb.indexOf("announce") === 0 ) {
-          if (data.verb == "un" + verb) {
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-              .removeClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-            $("button[id^=" + verb + "-" + ident.toString() + "]" )
-              .removeClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-          } else {
-            $("button[id^=shareMenuOptions-" + ident.toString() + "]" )
-              .addClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-            $("button[id^=" + verb + "-" + ident.toString() + "]" )
-              .addClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-          }
-        } else {
-          if (data.verb == "un" + verb) {
-            $("button[id^=" + verb + "-" + ident.toString() + "]" )
-              .removeClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
-          } else {
-            $("button[id^=" + verb + "-" + ident.toString() + "]" )
-              .addClass("active")
-              .attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
-          }
-//          $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
-        }
-      } else {
-        $.jGrowl("No connection to host for " + verb, {sticky: false, theme: 'info', life: 5000});
-      }
-	})
-  .error(
-    function(data){
-      $.jGrowl("Activity " + verb + "unsuccessful", {sticky: false, theme: 'info', life: 5000});
-    });
-
+			if (data.status == "ok") {
+					$('#like-rotator-' + ident.toString()).hide();
+					if (verb.indexOf("announce") === 0 ) {
+							if (data.verb == "un" + verb) {
+									$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+										.removeClass("active")
+										.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+									$("button[id^=" + verb + "-" + ident.toString() + "]" )
+										.removeClass("active")
+										.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+							} else {
+									$("button[id^=shareMenuOptions-" + ident.toString() + "]" )
+											.addClass("active")
+											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+									$("button[id^=" + verb + "-" + ident.toString() + "]" )
+											.addClass("active")
+											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+							}
+					} else {
+							if (data.verb == "un" + verb) {
+									$("button[id^=" + verb + "-" + ident.toString() + "]" )
+											.removeClass("active")
+											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + false + ")").change();
+							} else {
+									$("button[id^=" + verb + "-" + ident.toString() + "]" )
+											.addClass("active")
+											.attr("onclick", "doActivityItemAction(" + ident +", '" + verb + "', " + true + ")").change();
+							}
+	//      		  $("button[id^=" + verb + "-" + ident.toString() + "]" ).button('refresh');
+					}
+			} else {
+					$.jGrowl("No connection to host for " + verb, {sticky: false, theme: 'info', life: 5000});
+			}
+		})
+		.error(
+				function(data){
+						$.jGrowl("Activity " + verb + "unsuccessful", {sticky: false, theme: 'info', life: 5000});
+				});
 }
 
 // Decodes a hexadecimally encoded binary string
