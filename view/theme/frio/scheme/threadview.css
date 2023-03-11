@@ -1,0 +1,174 @@
+/*
+    Licence    : AGPL
+
+    Created on : Sun 26 Feb 2023 08:20:14 PM CET
+    Author     : jakob@soc.schuerz.at
+    Color picker   : https://www.w3schools.com/colors/colors_names.asp
+    CSS UTF8 icons : https://www.utf8icons.com 
+
+
+*/
+:root {
+    --main-border-radius: 10px;
+    --second-border-radius: 7px;
+    --third-border-radius: 4px;
+    --active_btn_color: #cc9f0d;   // Gelb
+    --inactive_btn_color: #000055;   // Gelb
+}
+
+/* Radius arount boxes */
+.section,
+.widget,
+.media,
+.wall-item-container, 
+.thread-wrapper,
+div[class^="thread_level"],
+div[class*=" thread_level"],
+.toplevel_item,
+.apub,
+.panel-default,
+.panel_body,
+.panel {
+    border-bottom-left-radius: var(--main-border-radius) !important;
+    border-bottom-right-radius: var(--main-border-radius) !important;
+    border-top-right-radius: var(--main-border-radius) !important;
+}
+
+.btn,
+.label {
+    border-radius: var(--second-border-radius) !important;
+}
+
+i .btn-link {
+    color: #fff !important;
+}
+
+button .btn-link {
+    color: #000 !important;
+}
+
+#contact-edit-actions-button,
+#contact-edit-actions-button.active {
+    background-color: $nav_bg;
+    color: #fff !important;
+}
+
+@media (hover: hover) {
+    #main-menu,
+    #nav-notifications-menu-btn,
+    button:hover {
+	//color: #fff !important;
+        filter: brightness(1);
+    }
+    button:active {
+        filter: brightness(1);
+	color: var(--active_btn_color) !important;
+    }
+}
+
+@media (hover: none) {
+    #main-menu,
+    #nav-notifications-menu-btn,
+    button:hover{
+	//color: #fff !important;
+        filter: brightness(1);
+    }
+    button:active {
+        filter: brightness(1);
+	color: var(--active_btn_color) !important;
+    }
+}
+
+#contact-edit-actions-button {
+  //color: #fff;
+  filter: none !important;
+}
+
+audio, canvas, progress, video, img {
+	max-height: 75vh;
+}
+
+.wall-item-actions {
+    background-color: #b7b7b75c;
+    padding: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-radius: var(--third-border-radius) !important;
+
+}
+
+/* Thread-Lines left on comments
+.wall-item-container {
+    border-top: 1px solid;
+    border-top-color: $nav_bg;
+    border-image: linear-gradient(to right, $nav_bg, transparent) 30;
+}
+*/
+/*.tread-wrapper,*/
+div[class^="thread_level"],
+div[class*=" thread_level"] {
+  border-left: 1px solid;
+  margin-left: 2px;
+  border-left-color: $nav_bg;
+}
+
+.media,
+{
+  border-left: 1px solid;
+}
+
+.wall-item-container {
+  margin-left: 3px !important;
+}
+
+@media screen and (max-width: 767px) {
+
+    button[id^=like-] { margin-right: 5px !important;}
+    .button,
+    .btn {
+        padding: 1px;
+        padding-inline: 22px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+	background-color: $nav_bg;
+        filter: brightness(1.25); 
+    }
+    .wall-item-container {
+        margin-top: 10px;
+    }
+    .contact-info-comment {
+        display: contents !important;
+    }
+    .fakelink,
+    .media-heading,
+    .wall-item-name-link {
+        word-wrap: anywhere !important;
+    }
+    .dropdown-toggle.active,
+    .button-likes.active,
+    .button-announces.active {
+        color: var(--active_btn_color) !important;
+    }
+    .dropdown-toggle,
+    .button-likes,
+    .button-announces {
+        color: #000;
+    }
+    .dropdown-menu {
+	    max-width: 40vh;
+    }
+    /* Thread-Lines left on comments */
+    div[class^="thread_level"],
+    div[class*=" thread_level"] {
+      border-left: 1px solid;
+      margin-left: 2px;
+	  border-left-color: $nav_bg;
+    }
+    .media,
+    {
+      border-left: 1px solid;
+    }
+    .wall-item-container {
+      margin-left: 3px solid !important;
+    }
+}
