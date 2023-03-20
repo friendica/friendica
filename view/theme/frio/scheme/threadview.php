@@ -10,7 +10,6 @@
 require_once 'view/theme/frio/php/PHPColors/Color.php';
 
 $accentColor = new Color($scheme_accent);
-
 $nav_bg = '#' . $accentColor->darken(10);
 $menu_background_hover_color = '#' . $accentColor->darken(5);
 $nav_icon_color = "#fff";
