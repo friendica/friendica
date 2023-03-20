@@ -2,7 +2,7 @@
 /*
  * Name: Light
  * Licence: AGPL
- * Author: Hypolite Petovan <hypolite@friendica.mrpetovan.com>
+ * Author: Jakob Schürz <jakob@schuerz.at>
  * Overwrites: nav_bg, nav_icon_color, link_color, background_color, background_image, login_bg_color, contentbg_transp
  * Accented: yes
  */
