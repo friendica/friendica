@@ -213,6 +213,7 @@ $options = [
 ];
 
 $css_tpl = file_get_contents('view/theme/frio/css/style.css');
+$css_tpl .= file_get_contents('view/theme/frio/css/dropzone.min.frio.css');
 
 // Get the content of the scheme css file and the time of the last file change.
 if ($schemecssfile) {

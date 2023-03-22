@@ -210,6 +210,8 @@
 }
 .dropzone.dz-clickable {
 	cursor: pointer;
+	border-radius: 4px;
+	background-color: $background_color;
 }
 .dropzone.dz-clickable * {
 	cursor: default;
