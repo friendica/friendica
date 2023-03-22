@@ -43,9 +43,11 @@ i .btn-link {
 	color: #fff !important;
 }
 
+/*
 button .btn-link {
 	color: #000 !important;
 }
+*/
 
 #contact-edit-actions-button,
 #contact-edit-actions-button.active {
@@ -121,15 +123,17 @@ div[class*=" thread_level"] {
 
 @media screen and (max-width: 767px) {
 
-	button[id^=like-] { margin-right: 5px !important;}
+	button[id^=like-] {
+		margin-right: 5px !important;
+	}
 	.button,
 	.btn {
 		padding: 1px;
 		padding-inline: 22px;
 		margin-top: 5px;
 		margin-bottom: 5px;
-		background-color: $nav_bg;
-		filter: brightness(1.25); 
+//		background-color: $nav_bg;
+//		filter: brightness(1.25); 
 	}
 	.wall-item-container {
 		margin-top: 10px;
