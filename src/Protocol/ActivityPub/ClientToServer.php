@@ -264,7 +264,7 @@ class ClientToServer
 		$item['contact-id'] = $owner['id'];
 		$item['author-id']  = $item['owner-id']  = Contact::getPublicIdByUserId($uid);
 		$item['title']      = $object_data['name'];
-		$item['body']       = Markdown::toBBCode($object_data['content']);
+		$item['body']       = Markdown::toBBCode($object_data['content'] ?? '');
 		$item['app']        = $application['name'] ?? 'API';
 
 		if (!empty($object_data['target'][Receiver::TARGET_GLOBAL])) {
