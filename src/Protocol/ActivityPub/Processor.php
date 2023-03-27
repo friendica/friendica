@@ -1278,8 +1278,10 @@ class Processor
 						$name = Receiver::PUBLIC_COLLECTION;
 					} elseif ($path = parse_url($receiver, PHP_URL_PATH)) {
 						$name = trim($path, '/');
+					} elseif ($host = parse_url($receiver, PHP_URL_HOST)) {
+						$name = $host;
 					} else {
-						Logger::warning('Unable to coerce name from receiver', ['receiver' => $receiver]);
+						Logger::warning('Unable to coerce name from receiver', ['element' => $element, 'type' => $type, 'receiver' => $receiver]);
 						$name = '';
 					}
 
