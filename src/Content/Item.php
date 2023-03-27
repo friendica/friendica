@@ -508,7 +508,7 @@ class Item
 			}
 			$item['inform'] .= 'cid:' . $contact['id'];
 
-			if (($item['gravity'] == ItemModel::GRAVITY_COMMENT) || empty($contact['cid']) || ($contact['contact-type'] != Contact::TYPE_COMMUNITY)) {
+			if ((isset($item['gravity']) && $item['gravity'] == ItemModel::GRAVITY_COMMENT) || empty($contact['cid']) || ($contact['contact-type'] != Contact::TYPE_COMMUNITY)) {
 				continue;
 			}
 

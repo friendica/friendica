@@ -57,6 +57,7 @@ class Statuses extends BaseApi
 			'media_ids'      => [],    // Array of Attachment ids to be attached as media. If provided, status becomes optional, and poll cannot be used.
 			'in_reply_to_id' => 0,     // ID of the status being replied to, if status is a reply
 			'spoiler_text'   => '',    // Text to be shown as a warning or subject before the actual content. Statuses are generally collapsed behind this field.
+			'visibility'     => '',    // Visibility of the posted status. One of: "public", "unlisted", "private" or "direct".
 			'language'       => '',    // ISO 639 language code for this status.
 			'friendica'      => [],
 		], $request);

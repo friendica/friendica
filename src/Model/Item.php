@@ -625,7 +625,7 @@ class Item
 			return false;
 		}
 
-		if ($item['verb'] == Activity::FOLLOW) {
+		if (isset($item['verb']) && $item['verb'] == Activity::FOLLOW) {
 			if (!$item['origin'] && ($item['author-id'] == Contact::getPublicIdByUserId($item['uid']))) {
 				// Our own follow request can be relayed to us. We don't store it to avoid notification chaos.
 				Logger::info("Follow: Don't store not origin follow request", ['parent-uri' => $item['parent-uri']]);
