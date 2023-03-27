@@ -354,7 +354,7 @@ class ClientToServer
 
 		$apcontact = APContact::getByURL($owner['url']);
 
-		return self::getCollection($condition, DI::baseUrl() . '/outbox/' . $owner['nickname'], $page, $max_id, $uid, $apcontact['statuses_count']);
+		return self::getCollection($condition, DI::baseUrl() . '/outbox/' . $owner['nickname'], $page, $max_id, $uid, $apcontact['statuses_count'] ?? 0);
 	}
 
 	public static function getInbox(int $uid, int $page = null, int $max_id = null)
