@@ -19,6 +19,7 @@ function showHideForumlist() {
 	<span class="fakelink" onclick="openCloseWidget('forumlist-sidebar', 'forumlist-sidebar-inflated');">
 		<h3 id="forumlist">{{$title}}</h3>
 	</span>
+	
 	<ul id="forumlist-sidebar-ul" role="menu">
 		{{foreach $forums as $forum}}
 		{{if $forum.id <= $visible_forums}}
@@ -45,6 +46,11 @@ function showHideForumlist() {
 		{{if $total > $visible_forums }}
 		<li onclick="showHideForumlist(); return false;" id="forum-widget-collapse" class="forum-widget-link fakelink tool">{{$showmore}}</li>
 		{{/if}}
+
+		<a href='register' class= "createforum">{{$create_forum}} </a>
+		
+
+
 	</ul>
 </div>
 </span>

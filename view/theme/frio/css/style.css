@@ -76,6 +76,11 @@ blockquote {
 .fakelink {
 	cursor: pointer;
 }
+.createforum {
+	padding: 25px;
+	cursor: pointer;
+}
+
 .btn.btn-link.fakelink {
 	box-shadow: none;
 	padding: 0 2px;
