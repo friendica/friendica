@@ -60,6 +60,42 @@ class DbaDefinition
 		return $this->definition;
 	}
 
+	public function hasTable(string $table): bool
+	{
+		return !empty($this->definition[$table]);
+	}
+
+	public function castFields(string $table, array $fields): array
+	{
+		$definition = $this->definition;
+		if (empty($definition[$table])) {
+			return [];
+		}
+
+		$types = [];
+
+		foreach ($definition[$table]['fields'] as $field => $fields) {
+			$types[$field] = $fields['type'];
+		}
+
+		foreach ($fields as $field => $content) {
+			if (is_null($content) || empty($types[$field])) {
+				continue;
+			}
+
+			if ((substr($types[$field], 0, 7) == 'tinyint') || (substr($types[$field], 0, 8) == 'smallint') ||
+				(substr($types[$field], 0, 9) == 'mediumint') || (substr($types[$field], 0, 3) == 'int') ||
+				(substr($types[$field], 0, 6) == 'bigint') || (substr($types[$field], 0, 7) == 'boolean')) {
+				$fields[$field] = (int)$content;
+			}
+			if ((substr($types[$field], 0, 5) == 'float') || (substr($types[$field], 0, 6) == 'double')) {
+				$fields[$field] = (float)$content;
+			}
+		}
+
+		return $fields;
+	}
+
 	/**
 	 * Truncate field data for the given table
 	 *

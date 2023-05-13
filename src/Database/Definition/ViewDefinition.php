@@ -60,6 +60,47 @@ class ViewDefinition
 		return $this->definition;
 	}
 
+	public function hasView(string $view): bool
+	{
+		return !empty($this->definition[$view]);
+	}
+
+	public function castFields(string $view, array $fields): array
+	{
+		$definition = $this->definition;
+		if (empty($definition[$view])) {
+			return [];
+		}
+
+		foreach ($fields as $field => $content) {
+			if (is_null($content)) {
+				continue;
+			}
+
+			if (!empty($views[$view]['fields'][$field])) {
+				$viewdef = $views[$view]['fields'][$field];
+				if (!empty($tables[$viewdef[0]]['fields'][$viewdef[1]]['type'])) {
+					$type = $tables[$viewdef[0]]['fields'][$viewdef[1]]['type'];
+				} else {
+					continue;
+				}
+			} else {
+				continue;
+			}
+
+			if ((substr($type, 0, 7) == 'tinyint') || (substr($type, 0, 8) == 'smallint') ||
+				(substr($type, 0, 9) == 'mediumint') || (substr($type, 0, 3) == 'int') ||
+				(substr($type, 0, 6) == 'bigint') || (substr($type, 0, 7) == 'boolean')) {
+				$fields[$field] = (int)$content;
+			}
+			if ((substr($type, 0, 5) == 'float') || (substr($type, 0, 6) == 'double')) {
+				$fields[$field] = (float)$content;
+			}
+		}
+
+		return $fields;
+	}
+
 	/**
 	 * Loads the database structure definition from the static/dbview.config.php file.
 	 * On first pass, defines DB_UPDATE_VERSION constant.

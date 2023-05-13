@@ -343,7 +343,7 @@ class Database
 		while ($row = $this->fetch($r)) {
 			if ((intval($this->config->get('system', 'db_loglimit_index')) > 0)) {
 				$log = (in_array($row['key'], $watchlist) &&
-					($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index'))));
+						($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index'))));
 			} else {
 				$log = false;
 			}
@@ -1369,8 +1369,8 @@ class Database
 		}
 
 		$sql = "UPDATE " . $ignore . $table_string . " SET "
-			. implode(" = ?, ", array_map([DBA::class, 'quoteIdentifier'], array_keys($fields))) . " = ?"
-			. $condition_string;
+			   . implode(" = ?, ", array_map([DBA::class, 'quoteIdentifier'], array_keys($fields))) . " = ?"
+			   . $condition_string;
 
 		// Combines the updated fields parameter values with the condition parameter values
 		$params = array_merge(array_values($fields), $condition);
