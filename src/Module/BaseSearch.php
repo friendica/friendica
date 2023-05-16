@@ -62,6 +62,7 @@ class BaseSearch extends BaseModule
 		}
 
 		$header = '';
+		$results = new ResultList();
 
 		if (strpos($search, '@') === 0) {
 			$search  = trim(substr($search, 1));
@@ -91,14 +92,14 @@ class BaseSearch extends BaseModule
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		if ($localSearch && empty($results)) {
-			$pager->setItemsPerPage(80);
-			$results = Search::getContactsFromLocalDirectory($search, $type, $pager->getStart(), $pager->getItemsPerPage());
-		} elseif (Search::getGlobalDirectory() && empty($results)) {
-			$results = Search::getContactsFromGlobalDirectory($search, $type, $pager->getPage());
-			$pager->setItemsPerPage($results->getItemsPage());
-		} else {
-			$results = new ResultList();
+		if (!$results->getTotal()) {
+			if ($localSearch) {
+				$pager->setItemsPerPage(80);
+				$results = Search::getContactsFromLocalDirectory($search, $type, $pager->getStart(), $pager->getItemsPerPage());
+			} elseif (Search::getGlobalDirectory()) {
+				$results = Search::getContactsFromGlobalDirectory($search, $type, $pager->getPage());
+				$pager->setItemsPerPage($results->getItemsPage());
+			}
 		}
 
 		return self::printResult($results, $pager, $header);

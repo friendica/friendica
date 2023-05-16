@@ -57,38 +57,36 @@ class Search
 	 */
 	public static function getContactsFromProbe(string $user): ResultList
 	{
-		$emptyResultList = new ResultList(1, 0, 1);
+		$emptyResultList = new ResultList();
 
-		if ((filter_var($user, FILTER_VALIDATE_EMAIL) && Network::isEmailDomainValid($user)) ||
-		    (substr(Strings::normaliseLink($user), 0, 7) == 'http://')) {
-
-			$user_data = Contact::getByURL($user);
-			if (empty($user_data)) {
-				return $emptyResultList;
-			}
-
-			if (!in_array($user_data['network'], Protocol::FEDERATED)) {
-				return $emptyResultList;
-			}
-
-			$contactDetails = Contact::getByURLForUser($user_data['url'] ?? '', DI::userSession()->getLocalUserId());
-
-			$result = new ContactResult(
-				$user_data['name'] ?? '',
-				$user_data['addr'] ?? '',
-				($contactDetails['addr'] ?? '') ?: ($user_data['url'] ?? ''),
-				new Uri($user_data['url'] ?? ''),
-				$user_data['photo'] ?? '',
-				$user_data['network'] ?? '',
-				$contactDetails['cid'] ?? 0,
-				$user_data['id'] ?? 0,
-				$user_data['tags'] ?? ''
-			);
-
-			return new ResultList(1, 1, 1, [$result]);
-		} else {
+		if (empty(parse_url($user, PHP_URL_SCHEME)) && !(filter_var($user, FILTER_VALIDATE_EMAIL) || Network::isEmailDomainValid($user))) {
 			return $emptyResultList;
 		}
+
+		$user_data = Contact::getByURL($user);
+		if (empty($user_data)) {
+			return $emptyResultList;
+		}
+
+		if (!Protocol::supportsProbe($user_data['network'])) {
+			return $emptyResultList;
+		}
+
+		$contactDetails = Contact::getByURLForUser($user_data['url'], DI::userSession()->getLocalUserId());
+
+		$result = new ContactResult(
+			$user_data['name'],
+			$user_data['addr'],
+			$user_data['addr'] ?: $user_data['url'],
+			new Uri($user_data['url']),
+			$user_data['photo'],
+			$user_data['network'],
+			$contactDetails['cid'] ?? 0,
+			$user_data['id'],
+			$user_data['tags']
+		);
+
+		return new ResultList(1, 1, 1, [$result]);
 	}
 
 	/**
