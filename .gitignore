@@ -45,7 +45,8 @@ Ignore config files from VSCode
 /proxy/
 nbproject
 
-#ignore vagrant dir
+#ignore vagrant file and  dir
+Vagrantfile
 .vagrant/
 
 #ignore local folder
