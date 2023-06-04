@@ -21,7 +21,7 @@
 
 namespace Friendica\Util;
 
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 
 /**
  * Util class for ACL formatting
@@ -29,7 +29,7 @@ use Friendica\Model\Group;
 final class ACLFormatter
 {
 	/**
-	 * Turn user/group ACLs stored as angle bracketed text into arrays
+	 * Turn user/circle ACLs stored as angle bracketed text into arrays
 	 *
 	 * @param string|null $acl_string A angle-bracketed list of IDs
 	 *
@@ -44,7 +44,7 @@ final class ACLFormatter
 
 		// turn string array of angle-bracketed elements into numeric array
 		// e.g. "<1><2><3>" => array(1,2,3);
-		preg_match_all('/<(' . Group::FOLLOWERS . '|'. Group::MUTUALS . '|[0-9]+)>/', $acl_string, $matches, PREG_PATTERN_ORDER);
+		preg_match_all('/<(' . Circle::FOLLOWERS . '|'. Circle::MUTUALS . '|[0-9]+)>/', $acl_string, $matches, PREG_PATTERN_ORDER);
 
 		return $matches[1];
 	}
@@ -86,7 +86,7 @@ final class ACLFormatter
 		if (intval($item)) {
 			$item = '<' . intval($item) . '>';
 		// The item is a allowed ACL character
-		} elseif (in_array($item, [Group::FOLLOWERS, Group::MUTUALS])) {
+		} elseif (in_array($item, [Circle::FOLLOWERS, Circle::MUTUALS])) {
 			$item = '<' . $item . '>';
 		// The item is already a ACL string
 		} elseif (preg_match('/<\d+?>/', $item)) {

@@ -50,9 +50,9 @@
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
 
-		// When clicking on a forum in acl we should remove the profile jot textarea
-		// default value before inserting the forum mention
-		$("body").on('click', '#jot-modal .acl-list-item.forum', function(){
+		// When clicking on a group in acl we should remove the profile jot textarea
+		// default value before inserting the group mention
+		$("body").on('click', '#jot-modal .acl-list-item.group', function(){
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 		});
 

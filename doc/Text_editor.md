@@ -88,11 +88,11 @@ Click on "show" under contact name to hide the post to everyone but selected.
 
 Click on "Visible to everybody" to make the post public again.
 
-If you have defined some groups, you can check "show" for groups also. All contact in that group will see the post.
-If you want to hide the post to one contact of a group selected for "show", click "don't show" under contact name.
+If you have defined some circles, you can check "show" for circles also. All contact in that circle will see the post.
+If you want to hide the post to one contact of a circle selected for "show", click "don't show" under contact name.
 
 Click again on "show" or "don't show" to switch it off.
 
-You can search for contacts or groups with the search box.
+You can search for contacts or circles with the search box.
 
-See also [Group and Privacy](help/Groups-and-Privacy)
+See also [Circles and Privacy](help/Circles-and-Privacy)

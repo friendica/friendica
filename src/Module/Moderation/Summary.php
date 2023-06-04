@@ -52,10 +52,10 @@ class Summary extends BaseModeration
 		$accounts = [
 			[$this->t('Normal Account'), 0],
 			[$this->t('Automatic Follower Account'), 0],
-			[$this->t('Public Forum Account'), 0],
+			[$this->t('Public Group Account'), 0],
 			[$this->t('Automatic Friend Account'), 0],
 			[$this->t('Blog Account'), 0],
-			[$this->t('Private Forum Account'), 0]
+			[$this->t('Private Group Account'), 0]
 		];
 
 		$users = 0;

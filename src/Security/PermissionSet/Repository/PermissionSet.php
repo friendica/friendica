@@ -25,7 +25,7 @@ use Exception;
 use Friendica\BaseRepository;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Security\PermissionSet\Exception\PermissionSetNotFoundException;
 use Friendica\Security\PermissionSet\Exception\PermissionSetPersistenceException;
@@ -140,29 +140,29 @@ class PermissionSet extends BaseRepository
 				$user_contact_str   = '';
 			}
 
-			$groups = [];
+			$circle_ids = [];
 			if (!empty($user_contact_str) && $this->db->exists('contact', [
 				'id' => $cid,
 				'uid' => $uid,
 				'blocked' => false
 			])) {
-				$groups = Group::getIdsByContactId($cid);
+				$circle_ids = Circle::getIdsByContactId($cid);
 			}
 
-			$group_str = '<<>>'; // should be impossible to match
-			foreach ($groups as $group_id) {
-				$group_str .= '|<' . preg_quote($group_id) . '>';
+			$circle_str = '<<>>'; // should be impossible to match
+			foreach ($circle_ids as $circle_id) {
+				$circle_str .= '|<' . preg_quote($circle_id) . '>';
 			}
 
 			if (!empty($user_contact_str)) {
 				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
 				AND (LOCATE(?, allow_cid) OR LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
-					$uid, $user_contact_str, $public_contact_str, $group_str,
-					$user_contact_str, $public_contact_str, $group_str];
+					$uid, $user_contact_str, $public_contact_str, $circle_str,
+					$user_contact_str, $public_contact_str, $circle_str];
 			} else {
 				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
 				AND (LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
-					$uid, $public_contact_str, $group_str, $public_contact_str, $group_str];
+					$uid, $public_contact_str, $circle_str, $public_contact_str, $circle_str];
 			}
 
 			return $this->select($condition);

@@ -40,9 +40,9 @@ class ListEntity extends BaseFactory
 	/**
 	 * @throws InternalServerErrorException
 	 */
-	public function createFromGroupId(int $id): \Friendica\Object\Api\Mastodon\ListEntity
+	public function createFromCircleId(int $id): \Friendica\Object\Api\Mastodon\ListEntity
 	{
-		$group = $this->dba->selectFirst('group', ['name'], ['id' => $id, 'deleted' => false]);
-		return new \Friendica\Object\Api\Mastodon\ListEntity($id, $group['name'] ?? '', 'list');
+		$circle = $this->dba->selectFirst('group', ['name'], ['id' => $id, 'deleted' => false]);
+		return new \Friendica\Object\Api\Mastodon\ListEntity($id, $circle['name'] ?? '', 'list');
 	}
 }

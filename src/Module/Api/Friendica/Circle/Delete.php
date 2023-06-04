@@ -19,15 +19,16 @@
  *
  */
 
-namespace Friendica\Module\Api\Friendica\Group;
+namespace Friendica\Module\Api\Friendica\Circle;
 
 use Friendica\Database\DBA;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;
 
 /**
  * API endpoint: /api/friendica/group/delete
+ * API endpoint: /api/friendica/circle/delete
  */
 class Delete extends BaseApi
 {
@@ -55,16 +56,16 @@ class Delete extends BaseApi
 
 		// error message if specified gid is not in database
 		if (!DBA::exists('group', ['uid' => $uid, 'id' => $request['gid'], 'name' => $request['name']])) {
-			throw new BadRequestException('wrong group name');
+			throw new BadRequestException('wrong circle name');
 		}
 
-		// delete group
-		$gid = Group::getIdByName($uid, $request['name']);
+		// delete circle
+		$gid = Circle::getIdByName($uid, $request['name']);
 		if (empty($request['gid'])) {
 			throw new BadRequestException('other API error');
 		}
 
-		$ret = Group::remove($gid);
+		$ret = Circle::remove($gid);
 
 		if ($ret) {
 			// return success

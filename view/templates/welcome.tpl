@@ -55,16 +55,16 @@
 				{{$finding_txt nofilter}}
 			</li>
 		</ul>
-		<h4>{{$groups nofilter}}</h4>
+		<h4>{{$circles nofilter}}</h4>
 		<ul>
 			<li>
-				<a target="newmember" href="contact">{{$group_contact_link}}</a><br />
-				{{$group_contact_txt nofilter}}
+				<a target="newmember" href="contact">{{$circle_contact_link}}</a><br />
+				{{$circle_contact_txt nofilter}}
 			</li>
 
 			{{if $newuser_private}}
 			<li>
-				<a target="newmember" href="help/Groups-and-Privacy">{{$private_link}}</a><br />
+				<a target="newmember" href="help/Circles-and-Privacy">{{$private_link}}</a><br />
 				{{$private_txt nofilter}}
 			</li>
 			{{/if}}

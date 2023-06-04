@@ -52,4 +52,8 @@ Starte dazu bitte vom Grundverzeichnis deiner Friendica Instanz folgendes Komman
 
     bin/console dbstructure update
 
+<<<<<<< HEAD
 sollten bei der Ausführung Fehler auftreten, kontaktiere bitte das [Support Forum](https://forum.friendi.ca/profile/helpers).
+=======
+sollten bei der Ausführung Fehler auftreten, kontaktiere bitte die [Support Gruppe](https://forum.friendi.ca/profile/helpers).
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2

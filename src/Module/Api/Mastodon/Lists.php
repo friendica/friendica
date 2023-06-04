@@ -24,7 +24,7 @@ namespace Friendica\Module\Api\Mastodon;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 
 /**
  * @see https://docs.joinmastodon.org/methods/timelines/lists/
@@ -40,11 +40,11 @@ class Lists extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		if (!Group::exists($this->parameters['id'], $uid)) {
+		if (!Circle::exists($this->parameters['id'], $uid)) {
 			DI::mstdnError()->RecordNotFound();
 		}
 
-		if (!Group::remove($this->parameters['id'])) {
+		if (!Circle::remove($this->parameters['id'])) {
 			DI::mstdnError()->InternalError();
 		}
 
@@ -64,14 +64,14 @@ class Lists extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		Group::create($uid, $request['title']);
+		Circle::create($uid, $request['title']);
 
-		$id = Group::getIdByName($uid, $request['title']);
+		$id = Circle::getIdByName($uid, $request['title']);
 		if (!$id) {
 			DI::mstdnError()->InternalError();
 		}
 
-		System::jsonExit(DI::mstdnList()->createFromGroupId($id));
+		System::jsonExit(DI::mstdnList()->createFromCircleId($id));
 	}
 
 	public function put(array $request = [])
@@ -85,7 +85,7 @@ class Lists extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		Group::update($this->parameters['id'], $request['title']);
+		Circle::update($this->parameters['id'], $request['title']);
 	}
 
 	/**
@@ -99,18 +99,16 @@ class Lists extends BaseApi
 		if (empty($this->parameters['id'])) {
 			$lists = [];
 
-			$groups = Group::getByUserId($uid);
-
-			foreach ($groups as $group) {
-				$lists[] = DI::mstdnList()->createFromGroupId($group['id']);
+			foreach (Circle::getByUserId($uid) as $circle) {
+				$lists[] = DI::mstdnList()->createFromCircleId($circle['id']);
 			}
 		} else {
 			$id = $this->parameters['id'];
 
-			if (!Group::exists($id, $uid)) {
+			if (!Circle::exists($id, $uid)) {
 				DI::mstdnError()->RecordNotFound();
 			}
-			$lists = DI::mstdnList()->createFromGroupId($id);
+			$lists = DI::mstdnList()->createFromCircleId($id);
 		}
 
 		System::jsonExit($lists);

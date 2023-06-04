@@ -88,7 +88,7 @@ function theme_admin(App $a) {
 
 	$t = Renderer::getMarkupTemplate("theme_admin_settings.tpl");
 	$o = Renderer::replaceMacros($t, [
-		'$helperlist' => ['vier_helperlist', DI::l10n()->t('Comma separated list of helper forums'), $helperlist, '', ''],
+		'$helperlist' => ['vier_helperlist', DI::l10n()->t('Comma separated list of helper groups'), $helperlist, '', ''],
 		]);
 
 	$show_pages = get_vier_config('show_pages', true, true);

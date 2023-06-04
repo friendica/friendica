@@ -1326,3 +1326,10 @@ function update_1518()
 
 	return Update::SUCCESS;
 }
+
+function update_1520(): int
+{
+	DBA::update('user', ['parent-uid' => null], ['parent-uid' => 0]);
+
+	return Update::SUCCESS;
+}

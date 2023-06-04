@@ -53,9 +53,9 @@ class Create extends BaseApi
 			'place'      => '', //location of the event
 			'publish'    => 0,  //publish message
 			'allow_cid'  => '', //array of allowed person, if access restricted
-			'allow_gid'  => '', //array of allowed groups, if access restricted
+			'allow_gid'  => '', //array of allowed circles, if access restricted
 			'deny_cid'   => '', //array of denied person, if access restricted
-			'deny_gid'   => '', //array of denied groups, if access restricted
+			'deny_gid'   => '', //array of denied circles, if access restricted
 		], $request);
 
 		// error if no name specified

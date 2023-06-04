@@ -46,13 +46,13 @@ use Psr\Log\LoggerInterface;
  */
 class Acl extends BaseModule
 {
-	const TYPE_GLOBAL_CONTACT        = 'x';
-	const TYPE_MENTION_CONTACT       = 'c';
-	const TYPE_MENTION_GROUP         = 'g';
-	const TYPE_MENTION_CONTACT_GROUP = '';
-	const TYPE_MENTION_FORUM         = 'f';
-	const TYPE_PRIVATE_MESSAGE       = 'm';
-	const TYPE_ANY_CONTACT           = 'a';
+	const TYPE_GLOBAL_CONTACT         = 'x';
+	const TYPE_MENTION_CONTACT        = 'c';
+	const TYPE_MENTION_CIRCLE         = 'g';
+	const TYPE_MENTION_CONTACT_CIRCLE = '';
+	const TYPE_MENTION_GROUP          = 'f';
+	const TYPE_PRIVATE_MESSAGE        = 'm';
+	const TYPE_ANY_CONTACT            = 'a';
 
 	/** @var IHandleUserSessions */
 	private $session;
@@ -73,7 +73,7 @@ class Acl extends BaseModule
 			throw new HTTPException\UnauthorizedException($this->t('You must be logged in to use this module.'));
 		}
 
-		$type = $request['type'] ?? self::TYPE_MENTION_CONTACT_GROUP;
+		$type = $request['type'] ?? self::TYPE_MENTION_CONTACT_CIRCLE;
 		if ($type === self::TYPE_GLOBAL_CONTACT) {
 			$o = $this->globalContactSearch($request);
 		} else {
@@ -100,7 +100,7 @@ class Acl extends BaseModule
 				'nick'    => $contact['addr'] ?: $contact['url'],
 				'network' => $contact['network'],
 				'link'    => $contact['url'],
-				'forum'   => $contact['contact-type'] == Contact::TYPE_COMMUNITY,
+				'group'   => $contact['contact-type'] == Contact::TYPE_COMMUNITY,
 			];
 		}
 
@@ -128,28 +128,28 @@ class Acl extends BaseModule
 
 		$this->logger->info('ACL {action} - {subaction} - start', ['module' => 'acl', 'action' => 'content', 'subaction' => 'search', 'search' => $search, 'type' => $type, 'conversation' => $conv_id]);
 
-		$sql_extra       = '';
-		$condition       = ["`uid` = ? AND NOT `deleted` AND NOT `pending` AND NOT `archive`", $this->session->getLocalUserId()];
-		$condition_group = ["`uid` = ? AND NOT `deleted`", $this->session->getLocalUserId()];
+		$sql_extra        = '';
+		$condition        = ["`uid` = ? AND NOT `deleted` AND NOT `pending` AND NOT `archive`", $this->session->getLocalUserId()];
+		$condition_circle = ["`uid` = ? AND NOT `deleted`", $this->session->getLocalUserId()];
 
 		if ($search != '') {
-			$sql_extra       = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
-			$condition       = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
+			$sql_extra        = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
+			$condition        = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
 			                                                     '%' . $search . '%', '%' . $search . '%', '%' . $search . '%']);
-			$condition_group = DBA::mergeConditions($condition_group, ["`name` LIKE ?", '%' . $search . '%']);
+			$condition_circle = DBA::mergeConditions($condition_circle, ["`name` LIKE ?", '%' . $search . '%']);
 		}
 
-		// count groups and contacts
-		$group_count = 0;
-		if ($type == self::TYPE_MENTION_CONTACT_GROUP || $type == self::TYPE_MENTION_GROUP) {
-			$group_count = $this->database->count('group', $condition_group);
+		// count circles and contacts
+		$circle_count = 0;
+		if ($type == self::TYPE_MENTION_CONTACT_CIRCLE || $type == self::TYPE_MENTION_CIRCLE) {
+			$circle_count = $this->database->count('group', $condition_circle);
 		}
 
 		$networks  = Widget::unavailableNetworks();
 		$condition = DBA::mergeConditions($condition, array_merge(["NOT `network` IN (" . substr(str_repeat("?, ", count($networks)), 0, -2) . ")"], $networks));
 
 		switch ($type) {
-			case self::TYPE_MENTION_CONTACT_GROUP:
+			case self::TYPE_MENTION_CONTACT_CIRCLE:
 				$condition = DBA::mergeConditions($condition,
 					["NOT `self` AND NOT `blocked` AND `notify` != ? AND `network` != ?", '', Protocol::OSTATUS
 					]);
@@ -161,7 +161,7 @@ class Acl extends BaseModule
 					]);
 				break;
 
-			case self::TYPE_MENTION_FORUM:
+			case self::TYPE_MENTION_GROUP:
 				$condition = DBA::mergeConditions($condition,
 					["NOT `self` AND NOT `blocked` AND `notify` != ? AND `contact-type` = ?", '', Contact::TYPE_COMMUNITY
 					]);
@@ -176,52 +176,52 @@ class Acl extends BaseModule
 
 		$contact_count = $this->database->count('contact', $condition);
 
-		$resultTotal = $group_count + $contact_count;
+		$resultTotal = $circle_count + $contact_count;
 
-		$resultGroups   = [];
+		$resultCircles  = [];
 		$resultContacts = [];
 
-		if ($type == self::TYPE_MENTION_CONTACT_GROUP || $type == self::TYPE_MENTION_GROUP) {
+		if ($type == self::TYPE_MENTION_CONTACT_CIRCLE || $type == self::TYPE_MENTION_CIRCLE) {
 			/// @todo We should cache this query.
 			// This can be done when we can delete cache entries via wildcard
-			$groups = $this->database->toArray($this->database->p("SELECT `group`.`id`, `group`.`name`, GROUP_CONCAT(DISTINCT `group_member`.`contact-id` SEPARATOR ',') AS uids
-				FROM `group`
-				INNER JOIN `group_member` ON `group_member`.`gid`=`group`.`id`
-				WHERE NOT `group`.`deleted` AND `group`.`uid` = ?
+			$circles = $this->database->toArray($this->database->p("SELECT `circle`.`id`, `circle`.`name`, GROUP_CONCAT(DISTINCT `circle_member`.`contact-id` SEPARATOR ',') AS uids
+				FROM `group` AS `circle`
+				INNER JOIN `group_member` AS `circle_member` ON `circle_member`.`gid` = `circle`.`id`
+				WHERE NOT `circle`.`deleted` AND `circle`.`uid` = ?
 					$sql_extra
-				GROUP BY `group`.`name`, `group`.`id`
-				ORDER BY `group`.`name`
+				GROUP BY `circle`.`name`, `circle`.`id`
+				ORDER BY `circle`.`name`
 				LIMIT ?, ?",
 				$this->session->getLocalUserId(),
 				$start,
 				$count
 			));
 
-			foreach ($groups as $group) {
-				$resultGroups[] = [
-					'type'  => 'g',
+			foreach ($circles as $circle) {
+				$resultCircles[] = [
+					'type'  => self::TYPE_MENTION_CIRCLE,
 					'photo' => 'images/twopeople.png',
-					'name'  => htmlspecialchars($group['name']),
-					'id'    => intval($group['id']),
-					'uids'  => array_map('intval', explode(',', $group['uids'])),
+					'name'  => htmlspecialchars($circle['name']),
+					'id'    => intval($circle['id']),
+					'uids'  => array_map('intval', explode(',', $circle['uids'])),
 					'link'  => '',
-					'forum' => '0'
+					'group' => '0'
 				];
 			}
-			if ((count($resultGroups) > 0) && ($search == '')) {
-				$resultGroups[] = ['separator' => true];
+			if ((count($resultCircles) > 0) && ($search == '')) {
+				$resultCircles[] = ['separator' => true];
 			}
 		}
 
 		$contacts = [];
-		if ($type != self::TYPE_MENTION_GROUP) {
+		if ($type != self::TYPE_MENTION_CIRCLE) {
 			$contacts = Contact::selectToArray([], $condition, ['order' => ['name']]);
 		}
 
-		$forums = [];
+		$groups = [];
 		foreach ($contacts as $contact) {
 			$entry = [
-				'type'    => 'c',
+				'type'    => self::TYPE_MENTION_CONTACT,
 				'photo'   => Contact::getMicro($contact, true),
 				'name'    => htmlspecialchars($contact['name']),
 				'id'      => intval($contact['id']),
@@ -229,24 +229,24 @@ class Acl extends BaseModule
 				'link'    => $contact['url'],
 				'nick'    => htmlentities(($contact['attag'] ?? '') ?: $contact['nick']),
 				'addr'    => htmlentities(($contact['addr'] ?? '') ?: $contact['url']),
-				'forum'   => $contact['contact-type'] == Contact::TYPE_COMMUNITY,
+				'group'   => $contact['contact-type'] == Contact::TYPE_COMMUNITY,
 			];
-			if ($entry['forum']) {
-				$forums[] = $entry;
+			if ($entry['group']) {
+				$groups[] = $entry;
 			} else {
 				$resultContacts[] = $entry;
 			}
 		}
 
-		if ($forums) {
+		if ($groups) {
 			if ($search == '') {
-				$forums[] = ['separator' => true];
+				$groups[] = ['separator' => true];
 			}
 
-			$resultContacts = array_merge($forums, $resultContacts);
+			$resultContacts = array_merge($groups, $resultContacts);
 		}
 
-		$resultItems = array_merge($resultGroups, $resultContacts);
+		$resultItems = array_merge($resultCircles, $resultContacts);
 
 		if ($conv_id) {
 			// In multithreaded posts the conv_id is not the parent of the whole thread
@@ -277,7 +277,7 @@ class Acl extends BaseModule
 				$contact = Contact::getByURL($author, false, ['micro', 'name', 'id', 'network', 'nick', 'addr', 'url', 'forum', 'avatar']);
 				if ($contact) {
 					$unknown_contacts[] = [
-						'type'    => 'c',
+						'type'    => self::TYPE_MENTION_CONTACT,
 						'photo'   => Contact::getMicro($contact, true),
 						'name'    => htmlspecialchars($contact['name']),
 						'id'      => intval($contact['id']),
@@ -285,7 +285,7 @@ class Acl extends BaseModule
 						'link'    => $contact['url'],
 						'nick'    => htmlentities(($contact['nick'] ?? '') ?: $contact['addr']),
 						'addr'    => htmlentities(($contact['addr'] ?? '') ?: $contact['url']),
-						'forum'   => $contact['forum']
+						'group'   => $contact['forum']
 					];
 				}
 			}
@@ -298,7 +298,7 @@ class Acl extends BaseModule
 			'tot'      => $resultTotal,
 			'start'    => $start,
 			'count'    => $count,
-			'groups'   => $resultGroups,
+			'circles'  => $resultCircles,
 			'contacts' => $resultContacts,
 			'items'    => $resultItems,
 			'type'     => $type,

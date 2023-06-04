@@ -30,7 +30,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
@@ -230,7 +230,7 @@ class Statuses extends BaseApi
 					$item['deny_gid']  = $owner['deny_gid'];
 				} else {
 					$item['allow_cid'] = '';
-					$item['allow_gid'] = '<' . Group::FOLLOWERS . '>';
+					$item['allow_gid'] = '<' . Circle::FOLLOWERS . '>';
 					$item['deny_cid']  = '';
 					$item['deny_gid']  = '';
 				}
@@ -241,7 +241,7 @@ class Statuses extends BaseApi
 				// The permissions are assigned in "expandTags"
 				break;
 			default:
-				if (is_numeric($request['visibility']) && Group::exists($request['visibility'], $uid)) {
+				if (is_numeric($request['visibility']) && Circle::exists($request['visibility'], $uid)) {
 					$item['allow_cid'] = '';
 					$item['allow_gid'] = '<' . $request['visibility'] . '>';
 					$item['deny_cid']  = '';

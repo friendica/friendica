@@ -36,7 +36,7 @@ class ExpireAndRemoveUsers
 {
 	public static function execute()
 	{
-		// expire any expired regular accounts. Don't expire forums.
+		// expire any expired regular accounts. Don't expire groups.
 		$condition = ["NOT `account_expired` AND `account_expires_on` > ? AND `account_expires_on` < ? AND `page-flags` = ? AND `uid` != ?",
 			DBA::NULL_DATETIME, DateTimeFormat::utcNow(), User::PAGE_FLAGS_NORMAL, 0];
 		DBA::update('user', ['account_expired' => true], $condition);

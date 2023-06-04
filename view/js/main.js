@@ -289,18 +289,18 @@ $(function() {
 
 		$('#mail-update-li').html(mail);
 
-		$(".sidebar-group-li .notify").removeClass("show");
-		$(data.groups).each(function(key, group) {
-			var gid = group.id;
-			var gcount = group.count;
-			$(".group-"+gid+" .notify").addClass("show").text(gcount);
+		$(".sidebar-circle-li .notify").removeClass("show");
+		$(data.circles).each(function(key, circle) {
+			var gid = circle.id;
+			var gcount = circle.count;
+			$(".circle-"+gid+" .notify").addClass("show").text(gcount);
 		});
 
-		$(".forum-widget-entry .notify").removeClass("show");
-		$(data.forums).each(function(key, forum) {
-			var fid = forum.id;
-			var fcount = forum.count;
-			$(".forum-"+fid+" .notify").addClass("show").text(fcount);
+		$(".group-widget-entry .notify").removeClass("show");
+		$(data.groups).each(function(key, group) {
+			var fid = group.id;
+			var fcount = group.count;
+			$(".group-"+fid+" .notify").addClass("show").text(fcount);
 		});
 
 		if (data.notifications.length == 0) {
@@ -946,21 +946,21 @@ function bin2hex(s) {
 	return a.join('');
 }
 
-function groupChangeMember(gid, cid, sec_token) {
+function circleChangeMember(gid, cid, sec_token) {
 	$('body .fakelink').css('cursor', 'wait');
-	$.get('group/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
-			$('#group-update-wrapper').html(data);
+	$.get('circle/' + gid + '/' + cid + "?t=" + sec_token, function(data) {
+			$('#circle-update-wrapper').html(data);
 			$('body .fakelink').css('cursor', 'auto');
 	});
 }
 
-function contactgroupChangeMember(checkbox, gid, cid) {
+function contactCircleChangeMember(checkbox, gid, cid) {
 	let url;
 	// checkbox.checked is the checkbox state after the click
 	if (checkbox.checked) {
-		url = 'group/' + gid + '/add/' + cid;
+		url = 'circle/' + gid + '/add/' + cid;
 	} else {
-		url = 'group/' + gid + '/remove/' + cid;
+		url = 'circle/' + gid + '/remove/' + cid;
 	}
 	$('body').css('cursor', 'wait');
 	$.post(url)

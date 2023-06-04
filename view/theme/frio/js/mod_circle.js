@@ -1,67 +1,67 @@
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPLv3-or-later
 
 /**
- * @file view/theme/frio/js/mod_group.js
- * The javascript for the group module
+ * @file view/theme/frio/js/mod_circle.js
+ * The javascript for the circle module
  */
 
 $(document).ready(function () {
 	// Add an event listeners on buttons for switching the contact list view
-	$("body").on("click", ".group-list-switcher", function () {
-		switchGroupViewMode(this);
+	$("body").on("click", ".circle-list-switcher", function () {
+		switchCircleViewMode(this);
 	});
 });
 
 /**
- * Change the group membership of the contacts and fetch the new grup list
+ * Change the circle membership of the contacts and fetch the new grup list
  * as html
  *
- * @param {int} gid The group ID
+ * @param {int} gid The circle ID
  * @param {int} cid The contact ID
  * @param {string} sec_token The security token
  *
  * @returns {undefined}
  */
-function groupChangeMember(gid, cid, sec_token) {
+function circleChangeMember(gid, cid, sec_token) {
 	$("#contact-entry-wrapper-" + cid).fadeTo("fast", 0.33);
 	$(".tooltip").tooltip("hide");
 	$("body").css("cursor", "wait");
 
-	$.get("group/" + gid + "/" + cid + "?t=" + sec_token, function (data) {
-		// Insert the new group member list
-		$("#group-update-wrapper").html(data);
+	$.get("circle/" + gid + "/" + cid + "?t=" + sec_token, function (data) {
+		// Insert the new circle member list
+		$("#circle-update-wrapper").html(data);
 
-		// Apply the actual group list view mode to the new
-		// group list html
-		var activeMode = $(".group-list-switcher.active");
-		switchGroupViewMode(activeMode[0]);
+		// Apply the actual circle list view mode to the new
+		// circle list html
+		var activeMode = $(".circle-list-switcher.active");
+		switchCircleViewMode(activeMode[0]);
 
 		$("body").css("cursor", "auto");
 	});
 }
 
 /**
- * Change the group list view mode
+ * Change the circle list view mode
  *
  * @param {object} elm The button element of the view mode switcher
  * @returns {undefined}
  */
-function switchGroupViewMode(elm) {
-	// Remove the active class from group list switcher buttons
-	$(".group-list-switcher").removeClass("active");
+function switchCircleViewMode(elm) {
+	// Remove the active class from circle list switcher buttons
+	$(".circle-list-switcher").removeClass("active");
 	// And add it to the active button element
 	$(elm).addClass("active");
 
-	// Add or remove the css classes for the group list with regard to the active view mode
-	if (elm.id === "group-list-small") {
-		$("#contact-group-list > li").addClass("shortmode col-lg-6 col-md-6 col-sm-6 col-xs-12");
+	// Add or remove the css classes for the circle list with regard to the active view mode
+	if (elm.id === "circle-list-small") {
+		$("#contact-circle-list > li").addClass("shortmode col-lg-6 col-md-6 col-sm-6 col-xs-12");
 	} else {
-		$("#contact-group-list > li").removeClass("shortmode col-lg-6 col-md-6 col-sm-6 col-xs-12");
+		$("#contact-circle-list > li").removeClass("shortmode col-lg-6 col-md-6 col-sm-6 col-xs-12");
 	}
 }
 
 /**
- * Filter the group member list for contacts
+ * Filter the circle member list for contacts
  *
  * @returns {undefined}
  */
@@ -70,7 +70,7 @@ function filterList() {
 	var input, filter, ul, li, a, i;
 	input = document.getElementById("contacts-search");
 	filter = input.value.toUpperCase();
-	li = document.querySelectorAll("#contact-group-list>li");
+	li = document.querySelectorAll("#contact-circle-list>li");
 
 	// Loop through all list items, and hide those who don't match the search query
 	for (i = 0; i < li.length; i++) {

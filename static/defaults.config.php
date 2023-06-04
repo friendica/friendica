@@ -306,10 +306,10 @@ return [
 		// Number of "free" searches when system => permit_crawling is enabled.
 		'free_crawls' => 10,
 
-		// groupedit_image_limit (Integer)
-		// Number of contacts at which the group editor should switch from display the profile pictures of the contacts to only display the names.
+		// circle_edit_image_limit (Integer)
+		// Number of contacts at which the circle editor should switch from display the profile pictures of the contacts to only display the names.
 		// This can alternatively be set on a per-account basis in the pconfig table.
-		'groupedit_image_limit' => 400,
+		'circle_edit_image_limit' => 400,
 
 		// gserver_update_limit (Integer)
 		// How many servers should be checked at a time?
@@ -621,7 +621,7 @@ return [
 		'throttle_limit_month' => 0,
 
 		// transmit_pending_events (Boolean)
-		// Transmit pending events upon accepted contact request for forums
+		// Transmit pending events upon accepted contact request for groups
 		'transmit_pending_events' => false,
 
 		// update_active_contacts (Boolean)

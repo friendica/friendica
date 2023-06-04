@@ -63,7 +63,7 @@ class Profile extends BaseModule
 			System::htmlUpdateExit($o);
 		}
 
-		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched his/her groups
+		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched their circles
 		$sql_extra = Item::getPermissionsSQLByUserId($a->getProfileOwner());
 
 		$last_updated_array = DI::session()->get('last_updated', []);

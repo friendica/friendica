@@ -81,7 +81,7 @@ Fields
 | confirm                   |                                                                                                                | varbinary(383)     | YES  |     | NULL                |                |
 | poco                      |                                                                                                                | varbinary(383)     | YES  |     | NULL                |                |
 | writable                  |                                                                                                                | boolean            | NO   |     | 0                   |                |
-| forum                     | contact is a forum. Deprecated, use 'contact-type' = 'community' and 'manually-approve' = false instead        | boolean            | NO   |     | 0                   |                |
+| forum                     | contact is a group. Deprecated, use 'contact-type' = 'community' and 'manually-approve' = false instead        | boolean            | NO   |     | 0                   |                |
 | prv                       | contact is a private group. Deprecated, use 'contact-type' = 'community' and 'manually-approve' = true instead | boolean            | NO   |     | 0                   |                |
 | bdyear                    |                                                                                                                | varchar(4)         | NO   |     |                     |                |
 | site-pubkey               | Deprecated                                                                                                     | text               | YES  |     | NULL                |                |

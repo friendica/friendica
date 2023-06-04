@@ -123,7 +123,7 @@ class Nav
 			'$apps'         => $this->getAppMenu(),
 			'$home'         => $this->l10n->t('Go back'),
 			'$clear_notifs' => $this->l10n->t('Clear notifications'),
-			'$search_hint'  => $this->l10n->t('@name, !forum, #tags, content')
+			'$search_hint'  => $this->l10n->t('@name, !group, #tags, content')
 		]);
 
 		Hook::callAll('page_header', $nav);
@@ -273,7 +273,7 @@ class Nav
 			];
 
 			if ($this->config->get('system', 'poco_local_search')) {
-				$nav['searchoption'][] = $this->l10n->t('Forums');
+				$nav['searchoption'][] = $this->l10n->t('Groups');
 			}
 		}
 

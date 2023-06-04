@@ -62,9 +62,9 @@ class Update extends BaseApi
 			'source'                => '',
 			'include_entities'      => false,
 			'contact_allow'         => $owner['allow_cid'],
-			'group_allow'           => $owner['allow_gid'],
+			'circle_allow'          => $owner['allow_gid'],
 			'contact_deny'          => $owner['deny_cid'],
-			'group_deny'            => $owner['deny_gid'],
+			'circle_deny'           => $owner['deny_gid'],
 		], $request);
 
 		if (!empty($request['htmlstatus'])) {
@@ -102,9 +102,9 @@ class Update extends BaseApi
 
 		$aclFormatter = DI::aclFormatter();
 		$item['allow_cid'] = $aclFormatter->toString($request['contact_allow']);
-		$item['allow_gid'] = $aclFormatter->toString($request['group_allow']);
+		$item['allow_gid'] = $aclFormatter->toString($request['circle_allow']);
 		$item['deny_cid']  = $aclFormatter->toString($request['contact_deny']);
-		$item['deny_gid']  = $aclFormatter->toString($request['group_deny']);
+		$item['deny_gid']  = $aclFormatter->toString($request['circle_deny']);
 
 		if (!empty($item['allow_cid'] . $item['allow_gid'] . $item['deny_cid'] . $item['deny_gid'])) {
 			$item['private'] = Item::PRIVATE;

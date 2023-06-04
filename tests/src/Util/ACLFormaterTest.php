@@ -21,7 +21,7 @@
 
 namespace Friendica\Test\src\Util;
 
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Util\ACLFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -56,8 +56,8 @@ class ACLFormatterTest extends TestCase
 	{
 		return [
 			'normal' => [
-				'input' => '<1><2><3><' . Group::FOLLOWERS . '><' . Group::MUTUALS . '>',
-				'assert' => ['1', '2', '3', Group::FOLLOWERS, Group::MUTUALS],
+				'input' => '<1><2><3><' . Circle::FOLLOWERS . '><' . Circle::MUTUALS . '>',
+				'assert' => ['1', '2', '3', Circle::FOLLOWERS, Circle::MUTUALS],
 			],
 			'nigNumber' => [
 				'input' => '<1><' . PHP_INT_MAX . '><15>',
@@ -128,12 +128,12 @@ class ACLFormatterTest extends TestCase
 		$aclFormatter = new ACLFormatter();
 
 		$allow_people = $aclFormatter->expand();
-		$allow_groups = $aclFormatter->expand();
+		$allow_circles = $aclFormatter->expand();
 
 		self::assertEmpty($aclFormatter->expand(null));
 		self::assertEmpty($aclFormatter->expand());
 
-		$recipients   = array_unique(array_merge($allow_people, $allow_groups));
+		$recipients   = array_unique(array_merge($allow_people, $allow_circles));
 		self::assertEmpty($recipients);
 	}
 
@@ -165,13 +165,13 @@ class ACLFormatterTest extends TestCase
 				'input' => ["<40195>"],
 				'assert' => "<40195>",
 			],
-			Group::FOLLOWERS => [
-				'input' => [Group::FOLLOWERS, 1],
-				'assert' => '<' . Group::FOLLOWERS . '><1>',
+			Circle::FOLLOWERS => [
+				'input' => [Circle::FOLLOWERS, 1],
+				'assert' => '<' . Circle::FOLLOWERS . '><1>',
 			],
-			Group::MUTUALS => [
-				'input' => [Group::MUTUALS, 1],
-				'assert' => '<' . Group::MUTUALS . '><1>',
+			Circle::MUTUALS   => [
+				'input' => [Circle::MUTUALS, 1],
+				'assert' => '<' . Circle::MUTUALS . '><1>',
 			],
 			'wrong-angle-brackets' => [
 				'input' => ["<asd>","<123>"],

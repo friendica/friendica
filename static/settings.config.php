@@ -114,9 +114,9 @@ return [
 		// Default value comprises classic role names from RFC 2142.
 		'forbidden_nicknames' => 'info, marketing, sales, support, abuse, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, root, sysop',
 
-		// compute_group_counts (Boolean)
-		// Compute contact group level when counting unseen network posts.
-		'compute_group_counts' => true,
+		// compute_circle_counts (Boolean)
+		// Compute contact circle level when counting unseen network posts.
+		'compute_circle_counts' => true,
 
 		// jpeg_quality (Integer)
 		// Sets the ImageMagick quality level for JPEG images. Values ranges from 50 (awful) to 100 (near perfect).

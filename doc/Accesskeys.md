@@ -48,7 +48,7 @@ General
 * i - Only show ignored contacts
 * y - Only show archived contacts
 * h - Only show hidden contacts
-* e - Edit contact groups
+* e - Edit contact circles
 
 ../contact (single contact view)
 -------------------------------

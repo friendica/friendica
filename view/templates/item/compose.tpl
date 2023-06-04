@@ -87,14 +87,18 @@
 			{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 			{{if $created_at}}{{$created_at nofilter}}{{/if}}
 {{else}}
-			<input type="hidden" name="group_allow" value="{{$group_allow}}"/>
+			<input type="hidden" name="circle_allow" value="{{$circle_allow}}"/>
 			<input type="hidden" name="contact_allow" value="{{$contact_allow}}"/>
-			<input type="hidden" name="group_deny" value="{{$group_deny}}"/>
+			<input type="hidden" name="circle_deny" value="{{$circle_deny}}"/>
 			<input type="hidden" name="contact_deny" value="{{$contact_deny}}"/>
 {{/if}}
 		</form>
 	</div>
 </div>
 <script>
+<<<<<<< HEAD
 	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}'); 
+=======
+	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 </script>

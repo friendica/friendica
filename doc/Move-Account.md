@@ -8,7 +8,7 @@ How to move your account between servers
 
 * Go to "Settings" -> "[Export personal data](uexport)"
 * Click on "Export account" to save your account data.
-* **Save the file in a secure place!** It contains your details, your contacts, groups, and personal settings. It also contains your secret keys to authenticate yourself to your contacts.
+* **Save the file in a secure place!** It contains your details, your contacts, circles, and personal settings. It also contains your secret keys to authenticate yourself to your contacts.
 * Go to your new server, and open *http://newserver.com/user/import* (there is not a direct link to this page at the moment). Please consider that this is only possible on servers with open registration. On other systems only the administrator can add accounts with an uploaded file.
 * Do NOT create a new account prior to importing your old settings - user import should be used *instead* of register.
 * Load your saved account file and click "Import".
@@ -17,7 +17,7 @@ How to move your account between servers
 
 Friendica contacts
 ---
-Friendica will recreate your account on the new server, with your contacts and groups.
+Friendica will recreate your account on the new server, with your contacts and circles.
 A message is sent to Friendica contacts, to inform them about your move:
 If your contacts are running on an updated server, your details on their side will be automatically updated.
 

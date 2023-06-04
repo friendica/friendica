@@ -13,14 +13,14 @@ Whether you feel like an expert or like a newbie - join us with your ideas!
 
 ## Contact us
 
-The discussion of Friendica development takes place in the following Friendica forums:
+The discussion of Friendica development takes place in the following Friendica groups:
 
-* The main [forum for Friendica development](https://forum.friendi.ca/profile/developers)
+* The main [group for Friendica development](https://forum.friendi.ca/profile/developers)
 
 ## Help other users
 
 Remember the questions you had when you first tried Friendica?
-A good place to start can be to help new people find their way around Friendica in the [general support forum](https://forum.friendi.ca/profile/helpers).
+A good place to start can be to help new people find their way around Friendica in the [general support group](https://forum.friendi.ca/profile/helpers).
 Welcome them, answer their questions, point them to documentation or ping other helpers directly if you can't help but think you know who can.
 
 ## Translation
@@ -33,10 +33,10 @@ If you don't want to translate the UI, or it is already done to your satisfactio
 Are you good at designing things?
 If you have seen Friendica you probably have ideas to improve it, haven't you?
 
-* If you would like to work with us on enhancing the user interface, please join the [forum for Friendica development](https://forum.friendi.ca/profile/developers).
+* If you would like to work with us on enhancing the user interface, please join the [group for Friendica development](https://forum.friendi.ca/profile/developers).
 * Make plans for a better Friendica interface design and share them with us.
 * Tell us if you are able to realize your ideas or what kind of help you need.
-	We can't promise we have the right skills in the group but we'll try.
+	We can't promise we have the right skills in the group, but we'll try.
 * Choose a thing to start with, e.g. work on the icon set of your favorite theme
 
 ## Programming
@@ -72,7 +72,7 @@ just place it into `.git/hooks/post-merge` and make it executable.
 
 ### Coding standards
 
-For the sake of consistency between contribution and general code readability, Friendica follows the widespread [PSR-2 coding standards](http://www.php-fig.org/psr/psr-2/) to the exception of a few rules.
+For the sake of consistency between contribution and general code readability, Friendica follows the widespread [PSR-2 coding standards](http://www.php-fig.org/psr/psr-2/) excepted a few rules.
 Here's a few primers if you are new to Friendica or to the PSR-2 coding standards:
 
 * Indentation is tabs, period (not PSR-2).
@@ -88,7 +88,7 @@ Here's a few primers if you are new to Friendica or to the PSR-2 coding standard
 Don't worry, you don't have to know by heart the PSR-2 coding standards to start contributing to Friendica.
 There are a few tools you can use to check or fix your files before you commit.
 
-For documentation we use the standard of *one sentence per line* for the `md` files in the `/doc` and `/doc/$lng` subdirectories.
+For documentation, we use the standard of *one sentence per line* for the `md` files in the `/doc` and `/doc/$lng` subdirectories.
 
 #### Check with [PHP Code Sniffer](https://github.com/squizlabs/PHP_CodeSniffer)
 
@@ -113,7 +113,7 @@ If the command-line tools `diff` and `patch` are unavailable for you, `phpcbf` c
 
 ### Code documentation
 
-If you are interested in having the documentation of the Friendica code outside of the code files, you can use [Doxygen](http://doxygen.org) to generate it.
+If you are interested in having the documentation of the Friendica code outside the code files, you can use [Doxygen](http://doxygen.org) to generate it.
 The configuration file for Doxygen is located in the base directory of the project sources.
 Run
 
@@ -126,7 +126,7 @@ If you find missing documentation, don't hesitate to contact us and write it dow
 
 ### Issues
 
-Have a look at our [issue tracker](https://github.com/friendica/friendica) on github!
+Have a look at our [issue tracker](https://github.com/friendica/friendica) on GitHub!
 
 * Try to reproduce a bug that needs more inquiries and write down what you find out.
 * If a bug looks fixed, ask the bug reporters for feedback to find out if the bug can be closed.
@@ -143,13 +143,13 @@ If you want to get involved here:
 * Look at the first steps that were made (e.g. the clean theme).
 	Ask us to find out whom to talk to about their experiences.
 * Talk to design people if you know any.
-* Let us know about your plans [in the dev forum](https://forum.friendi.ca/profile/developers)
+* Let us know about your plans [in the dev group](https://forum.friendi.ca/profile/developers)
 	Do not worry about cross-posting.
 
 ### Client software
 
 As Friendica is using a [Twitter/GNU Social compatible API](help/api) any of the clients for those platforms should work with Friendica as well.
-Furthermore there are several client projects, especially for use with Friendica.
+Furthermore, there are several client projects, especially for use with Friendica.
 If you are interested in improving those clients, please contact the developers of the clients directly.
 
 * Android / LinageOS: **Friendiqa** [src](https://git.friendi.ca/lubuwest/Friendiqa)/[Google Play](https://play.google.com/store/apps/details?id=org.qtproject.friendiqa) developed by [Marco R](https://freunde.ma-nic.de/profile/marco)

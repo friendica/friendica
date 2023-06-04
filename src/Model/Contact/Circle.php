@@ -26,12 +26,12 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 
 /**
- * This class provides information about contact groups based on the "group_member" table.
+ * This class provides information about contact circles based on the "group_member" table.
  */
-class Group
+class Circle
 {
 	/**
-	 * Returns a list of contacts belonging in a group
+	 * Returns a list of contacts belonging in a circle
 	 *
 	 * @param int $gid
 	 * @return array
@@ -42,10 +42,10 @@ class Group
 		$return = [];
 
 		if (intval($gid)) {
-			$stmt = DBA::p('SELECT `group_member`.`contact-id`, `contact`.*
+			$stmt = DBA::p('SELECT `circle_member`.`contact-id`, `contact`.*
 				FROM `contact`
-				INNER JOIN `group_member`
-					ON `contact`.`id` = `group_member`.`contact-id`
+				INNER JOIN `group_member` AS `circle_member`
+					ON `contact`.`id` = `circle_member`.`contact-id`
 				WHERE `gid` = ?
 				AND `contact`.`uid` = ?
 				AND NOT `contact`.`self`
@@ -66,24 +66,24 @@ class Group
 	}
 
 	/**
-	 * Returns ungrouped contact count or list for user
+	 * Returns uncircled contact count or list for user
 	 *
-	 * Returns either the total number of ungrouped contacts for the given user
-	 * id or a paginated list of ungrouped contacts.
+	 * Returns either the total number of uncircled contacts for the given user
+	 * id or a paginated list of uncircled contacts.
 	 *
 	 * @param int $uid uid
 	 * @return array
 	 * @throws \Exception
 	 */
-	public static function listUngrouped(int $uid)
+	public static function listUncircled(int $uid)
 	{
 		return Contact::selectToArray([], ["`uid` = ? AND NOT `self` AND NOT `deleted` AND NOT `blocked` AND NOT `pending` AND NOT `failed`
-			AND `id` NOT IN (SELECT DISTINCT(`contact-id`) FROM `group_member` INNER JOIN `group` ON `group`.`id` = `group_member`.`gid`
-			   	WHERE `group`.`uid` = ? AND `contact-id` = `contact`.`id`)", $uid, $uid]);
+			AND `id` NOT IN (SELECT DISTINCT(`contact-id`) FROM `group_member` AS `circle_member` INNER JOIN `group` AS `circle` ON `circle`.`id` = `circle_member`.`gid`
+			   	WHERE `circle`.`uid` = ? AND `contact-id` = `contact`.`id`)", $uid, $uid]);
 	}
 
 	/**
-	 * Remove a contact from all groups
+	 * Remove a contact from all circles
 	 *
 	 * @param integer $contact_id
 	 *

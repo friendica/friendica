@@ -212,14 +212,14 @@ class API extends BaseModule
 			}
 
 			$strAclContactAllow = isset($request['contact_allow']) ? $aclFormatter->toString($request['contact_allow']) : $user['allow_cid'] ?? '';
-			$strAclGroupAllow   = isset($request['group_allow']) ? $aclFormatter->toString($request['group_allow']) : $user['allow_gid']     ?? '';
-			$strContactDeny     = isset($request['contact_deny']) ? $aclFormatter->toString($request['contact_deny']) : $user['deny_cid']    ?? '';
-			$strGroupDeny       = isset($request['group_deny']) ? $aclFormatter->toString($request['group_deny']) : $user['deny_gid']        ?? '';
+			$strAclCircleAllow  = isset($request['circle_allow'])  ? $aclFormatter->toString($request['circle_allow'])  : $user['allow_gid'] ?? '';
+			$strContactDeny     = isset($request['contact_deny'])  ? $aclFormatter->toString($request['contact_deny'])  : $user['deny_cid']  ?? '';
+			$strCircleDeny      = isset($request['circle_deny'])   ? $aclFormatter->toString($request['circle_deny'])   : $user['deny_gid']  ?? '';
 
 			$visibility = $request['visibility'] ?? '';
 			if ($visibility === 'public') {
 				// The ACL selector introduced in version 2019.12 sends ACL input data even when the Public visibility is selected
-				$strAclContactAllow = $strAclGroupAllow = $strContactDeny = $strGroupDeny = '';
+				$strAclContactAllow = $strAclCircleAllow = $strContactDeny = $strCircleDeny = '';
 			} elseif ($visibility === 'custom') {
 				// Since we know from the visibility parameter the item should be private, we have to prevent the empty ACL
 				// case that would make it public. So we always append the author's contact id to the allowed contacts.
@@ -228,9 +228,9 @@ class API extends BaseModule
 			}
 		} else {
 			$strAclContactAllow = $aclFormatter->toString($self);
-			$strAclGroupAllow   = '';
+			$strAclCircleAllow  = '';
 			$strContactDeny     = '';
-			$strGroupDeny       = '';
+			$strCircleDeny      = '';
 		}
 
 		$datarray = [
@@ -244,9 +244,9 @@ class API extends BaseModule
 			'uid'       => $uid,
 			'cid'       => $cid,
 			'allow_cid' => $strAclContactAllow,
-			'allow_gid' => $strAclGroupAllow,
+			'allow_gid' => $strAclCircleAllow,
 			'deny_cid'  => $strContactDeny,
-			'deny_gid'  => $strGroupDeny,
+			'deny_gid'  => $strCircleDeny,
 			'id'        => $eventId,
 		];
 

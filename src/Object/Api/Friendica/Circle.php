@@ -23,12 +23,7 @@ namespace Friendica\Object\Api\Friendica;
 
 use Friendica\BaseDataTransferObject;
 
-/**
- * Class Group
- *
- *
- */
-class Group extends BaseDataTransferObject
+class Circle extends BaseDataTransferObject
 {
 	/** @var string */
 	protected $name;
@@ -42,18 +37,16 @@ class Group extends BaseDataTransferObject
 	protected $mode;
 
 	/**
-	 * Creates an Group entity array
-	 *
-	 * @param array $group
+	 * @param array $circle Circle row array
 	 * @param array $user
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(array $group, array $user)
+	public function __construct(array $circle, array $user)
 	{
-		$this->name   = $group['name'];
-		$this->id     = $group['id'];
-		$this->id_str = (string)$group['id'];
+		$this->name   = $circle['name'];
+		$this->id     = $circle['id'];
+		$this->id_str = (string)$circle['id'];
 		$this->user   = $user;
-		$this->mode   = $group['visible'] ? 'public' : 'private';
+		$this->mode   = $circle['visible'] ? 'public' : 'private';
 	}
 }

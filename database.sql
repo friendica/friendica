@@ -1,6 +1,11 @@
 -- ------------------------------------------
+<<<<<<< HEAD
 -- Friendica 2023.06-dev (Giant Rhubarb)
 -- DB_UPDATE_VERSION 1518
+=======
+-- Friendica 2023.09-dev (Giant Rhubarb)
+-- DB_UPDATE_VERSION 1520
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 -- ------------------------------------------
 
 
@@ -190,7 +195,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`confirm` varbinary(383) COMMENT '',
 	`poco` varbinary(383) COMMENT '',
 	`writable` boolean NOT NULL DEFAULT '0' COMMENT '',
-	`forum` boolean NOT NULL DEFAULT '0' COMMENT 'contact is a forum. Deprecated, use \'contact-type\' = \'community\' and \'manually-approve\' = false instead',
+	`forum` boolean NOT NULL DEFAULT '0' COMMENT 'contact is a group. Deprecated, use \'contact-type\' = \'community\' and \'manually-approve\' = false instead',
 	`prv` boolean NOT NULL DEFAULT '0' COMMENT 'contact is a private group. Deprecated, use \'contact-type\' = \'community\' and \'manually-approve\' = true instead',
 	`bdyear` varchar(4) NOT NULL DEFAULT '' COMMENT '',
 	`site-pubkey` text COMMENT 'Deprecated',
@@ -252,9 +257,9 @@ CREATE TABLE IF NOT EXISTS `permissionset` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner id of this permission set',
 	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
-	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
+	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed circles',
 	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
-	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
+	`deny_gid` mediumtext COMMENT 'Access Control - list of denied circles',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_allow_cid_allow_gid_deny_cid_deny_gid` (`uid`,`allow_cid`(50),`allow_gid`(30),`deny_cid`(50),`deny_gid`(30)),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
@@ -457,9 +462,9 @@ CREATE TABLE IF NOT EXISTS `attach` (
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'creation time',
 	`edited` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'last edit time',
 	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>',
-	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
+	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed circles',
 	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
-	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
+	`deny_gid` mediumtext COMMENT 'Access Control - list of denied circles',
 	`backend-class` tinytext COMMENT 'Storage backend class',
 	`backend-ref` text COMMENT 'Storage backend data reference',
 	 PRIMARY KEY(`id`),
@@ -662,9 +667,9 @@ CREATE TABLE IF NOT EXISTS `event` (
 	`nofinish` boolean NOT NULL DEFAULT '0' COMMENT 'if event does have no end this is 1',
 	`ignore` boolean NOT NULL DEFAULT '0' COMMENT '0 or 1',
 	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
-	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
+	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed circles',
 	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
-	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
+	`deny_gid` mediumtext COMMENT 'Access Control - list of denied circles',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid_start` (`uid`,`start`),
 	 INDEX `cid` (`cid`),
@@ -716,29 +721,29 @@ CREATE TABLE IF NOT EXISTS `group` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner User id',
 	`visible` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the member list is not private',
-	`deleted` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the group has been deleted',
-	`cid` int unsigned COMMENT 'Contact id of forum. When this field is filled then the members are synced automatically.',
-	`name` varchar(255) NOT NULL DEFAULT '' COMMENT 'human readable name of group',
+	`deleted` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the circle has been deleted',
+	`cid` int unsigned COMMENT 'Contact id of group. When this field is filled then the members are synced automatically.',
+	`name` varchar(255) NOT NULL DEFAULT '' COMMENT 'human readable name of circle',
 	 PRIMARY KEY(`id`),
 	 INDEX `uid` (`uid`),
 	 INDEX `cid` (`cid`),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`cid`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='privacy groups, group info';
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='privacy circles, circle info';
 
 --
 -- TABLE group_member
 --
 CREATE TABLE IF NOT EXISTS `group_member` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
-	`gid` int unsigned NOT NULL DEFAULT 0 COMMENT 'groups.id of the associated group',
-	`contact-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact.id of the member assigned to the associated group',
+	`gid` int unsigned NOT NULL DEFAULT 0 COMMENT 'group.id of the associated circle',
+	`contact-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact.id of the member assigned to the associated circle',
 	 PRIMARY KEY(`id`),
 	 INDEX `contactid` (`contact-id`),
 	 UNIQUE INDEX `gid_contactid` (`gid`,`contact-id`),
 	FOREIGN KEY (`gid`) REFERENCES `group` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
 	FOREIGN KEY (`contact-id`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='privacy groups, member info';
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='privacy circles, member info';
 
 --
 -- TABLE gserver-tag
@@ -1114,9 +1119,9 @@ CREATE TABLE IF NOT EXISTS `photo` (
 	`scale` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`profile` boolean NOT NULL DEFAULT '0' COMMENT '',
 	`allow_cid` mediumtext COMMENT 'Access Control - list of allowed contact.id \'<19><78>\'',
-	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed groups',
+	`allow_gid` mediumtext COMMENT 'Access Control - list of allowed circles',
 	`deny_cid` mediumtext COMMENT 'Access Control - list of denied contact.id',
-	`deny_gid` mediumtext COMMENT 'Access Control - list of denied groups',
+	`deny_gid` mediumtext COMMENT 'Access Control - list of denied circles',
 	`accessible` boolean NOT NULL DEFAULT '0' COMMENT 'Make photo publicly accessible, ignoring permissions',
 	`backend-class` tinytext COMMENT 'Storage backend class',
 	`backend-ref` text COMMENT 'Storage backend data reference',
@@ -1882,7 +1887,7 @@ CREATE VIEW `post-user-view` AS SELECT
 	`post-user`.`id` AS `id`,
 	`post-user`.`id` AS `post-user-id`,
 	`post-user`.`uid` AS `uid`,
-	`parent-post`.`id` AS `parent`,
+	`post-thread-user`.`post-user-id` AS `parent`,
 	`item-uri`.`uri` AS `uri`,
 	`post-user`.`uri-id` AS `uri-id`,
 	`parent-item-uri`.`uri` AS `parent-uri`,
@@ -2025,14 +2030,14 @@ CREATE VIEW `post-user-view` AS SELECT
 	EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-user`.`uri-id`) AS `has-media`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
-	`parent-post`.`network` AS `parent-network`,
-	`parent-post`.`author-id` AS `parent-author-id`,
+	`post-thread-user`.`network` AS `parent-network`,
+	`post-thread-user`.`author-id` AS `parent-author-id`,
 	`parent-post-author`.`url` AS `parent-author-link`,
 	`parent-post-author`.`name` AS `parent-author-name`,
 	`parent-post-author`.`nick` AS `parent-author-nick`,
 	`parent-post-author`.`network` AS `parent-author-network`
 	FROM `post-user`
-			STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `owner` ON `owner`.`id` = `post-user`.`owner-id`
@@ -2050,8 +2055,7 @@ CREATE VIEW `post-user-view` AS SELECT
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-user`.`uri-id` AND `post-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-user`.`uri-id`
 			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-user`.`psid`
-			LEFT JOIN `post-user` AS `parent-post` ON `parent-post`.`uri-id` = `post-user`.`parent-uri-id` AND `parent-post`.`uid` = `post-user`.`uid`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `parent-post`.`author-id`;
+			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread-user`.`author-id`;
 
 --
 -- VIEW post-thread-user-view
@@ -2061,7 +2065,7 @@ CREATE VIEW `post-thread-user-view` AS SELECT
 	`post-user`.`id` AS `id`,
 	`post-user`.`id` AS `post-user-id`,
 	`post-thread-user`.`uid` AS `uid`,
-	`parent-post`.`id` AS `parent`,
+	`post-thread-user`.`post-user-id` AS `parent`,
 	`item-uri`.`uri` AS `uri`,
 	`post-thread-user`.`uri-id` AS `uri-id`,
 	`parent-item-uri`.`uri` AS `parent-uri`,
@@ -2203,11 +2207,12 @@ CREATE VIEW `post-thread-user-view` AS SELECT
 	EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post-thread-user`.`uri-id`) AS `has-media`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
-	`parent-post`.`network` AS `parent-network`,
-	`parent-post`.`author-id` AS `parent-author-id`,
-	`parent-post-author`.`url` AS `parent-author-link`,
-	`parent-post-author`.`name` AS `parent-author-name`,
-	`parent-post-author`.`network` AS `parent-author-network`
+	`post-thread-user`.`network` AS `parent-network`,
+	`post-thread-user`.`author-id` AS `parent-author-id`,
+	`author`.`url` AS `parent-author-link`,
+	`author`.`name` AS `parent-author-name`,
+	`author`.`nick` AS `parent-author-nick`,
+	`author`.`network` AS `parent-author-network`
 	FROM `post-thread-user`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
@@ -2226,9 +2231,7 @@ CREATE VIEW `post-thread-user-view` AS SELECT
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-thread-user`.`uri-id` AND `post-thread-user`.`origin`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-thread-user`.`uri-id`
-			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`
-			LEFT JOIN `post-user` AS `parent-post` ON `parent-post`.`uri-id` = `post-user`.`parent-uri-id` AND `parent-post`.`uid` = `post-thread-user`.`uid`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `parent-post`.`author-id`;
+			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`;
 
 --
 -- VIEW post-view
@@ -2347,10 +2350,11 @@ CREATE VIEW `post-view` AS SELECT
 	EXISTS(SELECT `id` FROM `post-media` WHERE `post-media`.`uri-id` = `post`.`uri-id`) AS `has-media`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
-	`parent-post`.`network` AS `parent-network`,
-	`parent-post`.`author-id` AS `parent-author-id`,
+	`post-thread`.`network` AS `parent-network`,
+	`post-thread`.`author-id` AS `parent-author-id`,
 	`parent-post-author`.`url` AS `parent-author-link`,
 	`parent-post-author`.`name` AS `parent-author-name`,
+	`parent-post-author`.`nick` AS `parent-author-nick`,
 	`parent-post-author`.`network` AS `parent-author-network`
 	FROM `post`
 			STRAIGHT_JOIN `post-thread` ON `post-thread`.`uri-id` = `post`.`parent-uri-id`
@@ -2367,8 +2371,7 @@ CREATE VIEW `post-view` AS SELECT
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post`.`uri-id`
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post`.`uri-id`
-			LEFT JOIN `post` AS `parent-post` ON `parent-post`.`uri-id` = `post`.`parent-uri-id`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `parent-post`.`author-id`;
+			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `post-thread`.`author-id`;
 
 --
 -- VIEW post-thread-view
@@ -2489,11 +2492,12 @@ CREATE VIEW `post-thread-view` AS SELECT
 	(SELECT COUNT(DISTINCT(`author-id`)) FROM `post` WHERE `parent-uri-id` = `post-thread`.`uri-id` AND `gravity` = 6) AS `total-actors`,
 	`diaspora-interaction`.`interaction` AS `signed_text`,
 	`parent-item-uri`.`guid` AS `parent-guid`,
-	`parent-post`.`network` AS `parent-network`,
-	`parent-post`.`author-id` AS `parent-author-id`,
-	`parent-post-author`.`url` AS `parent-author-link`,
-	`parent-post-author`.`name` AS `parent-author-name`,
-	`parent-post-author`.`network` AS `parent-author-network`
+	`post-thread`.`network` AS `parent-network`,
+	`post-thread`.`author-id` AS `parent-author-id`,
+	`author`.`url` AS `parent-author-link`,
+	`author`.`name` AS `parent-author-name`,
+	`author`.`nick` AS `parent-author-nick`,
+	`author`.`network` AS `parent-author-network`
 	FROM `post-thread`
 			INNER JOIN `post` ON `post`.`uri-id` = `post-thread`.`uri-id`
 			STRAIGHT_JOIN `contact` AS `author` ON `author`.`id` = `post-thread`.`author-id`
@@ -2508,9 +2512,7 @@ CREATE VIEW `post-thread-view` AS SELECT
 			LEFT JOIN `diaspora-interaction` ON `diaspora-interaction`.`uri-id` = `post-thread`.`uri-id`
 			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread`.`uri-id`
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-content`.`quote-uri-id`
-			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-thread`.`uri-id`
-			LEFT JOIN `post` AS `parent-post` ON `parent-post`.`uri-id` = `post`.`parent-uri-id`
-			LEFT JOIN `contact` AS `parent-post-author` ON `parent-post-author`.`id` = `parent-post`.`author-id`;
+			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-thread`.`uri-id`;
 
 --
 -- VIEW category-view
@@ -2587,7 +2589,7 @@ CREATE VIEW `tag-view` AS SELECT
 DROP VIEW IF EXISTS `network-item-view`;
 CREATE VIEW `network-item-view` AS SELECT 
 	`post-user`.`uri-id` AS `uri-id`,
-	`parent-post`.`id` AS `parent`,
+	`post-thread-user`.`post-user-id` AS `parent`,
 	`post-user`.`received` AS `received`,
 	`post-thread-user`.`commented` AS `commented`,
 	`post-user`.`created` AS `created`,
@@ -2600,12 +2602,11 @@ CREATE VIEW `network-item-view` AS SELECT
 	`post-user`.`contact-id` AS `contact-id`,
 	`ownercontact`.`contact-type` AS `contact-type`
 	FROM `post-user`
-			STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`			
+			INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`			
 			INNER JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			LEFT JOIN `user-contact` AS `author` ON `author`.`uid` = `post-thread-user`.`uid` AND `author`.`cid` = `post-thread-user`.`author-id`
 			LEFT JOIN `user-contact` AS `owner` ON `owner`.`uid` = `post-thread-user`.`uid` AND `owner`.`cid` = `post-thread-user`.`owner-id`
 			INNER JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			LEFT JOIN `post-user` AS `parent-post` ON `parent-post`.`uri-id` = `post-user`.`parent-uri-id` AND `parent-post`.`uid` = `post-user`.`uid`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-user`.`hidden` IS NULL OR NOT `post-user`.`hidden`)
@@ -2618,7 +2619,7 @@ CREATE VIEW `network-item-view` AS SELECT
 DROP VIEW IF EXISTS `network-thread-view`;
 CREATE VIEW `network-thread-view` AS SELECT 
 	`post-thread-user`.`uri-id` AS `uri-id`,
-	`parent-post`.`id` AS `parent`,
+	`post-thread-user`.`post-user-id` AS `parent`,
 	`post-thread-user`.`received` AS `received`,
 	`post-thread-user`.`commented` AS `commented`,
 	`post-thread-user`.`created` AS `created`,
@@ -2634,7 +2635,6 @@ CREATE VIEW `network-thread-view` AS SELECT
 			LEFT JOIN `user-contact` AS `author` ON `author`.`uid` = `post-thread-user`.`uid` AND `author`.`cid` = `post-thread-user`.`author-id`
 			LEFT JOIN `user-contact` AS `owner` ON `owner`.`uid` = `post-thread-user`.`uid` AND `owner`.`cid` = `post-thread-user`.`owner-id`
 			LEFT JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
-			LEFT JOIN `post-user` AS `parent-post` ON `parent-post`.`uri-id` = `post-user`.`parent-uri-id` AND `parent-post`.`uid` = `post-user`.`uid`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)

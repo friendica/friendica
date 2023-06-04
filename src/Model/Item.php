@@ -1003,7 +1003,7 @@ class Item
 			$item['deleted']       = $toplevel_parent['deleted'];
 			$item['wall']          = $toplevel_parent['wall'];
 
-			// Reshares have to keep their permissions to allow forums to work
+			// Reshares have to keep their permissions to allow groups to work
 			if (!$defined_permissions && (!$item['origin'] || ($item['verb'] != Activity::ANNOUNCE))) {
 				$item['allow_cid']     = $toplevel_parent['allow_cid'];
 				$item['allow_gid']     = $toplevel_parent['allow_gid'];
@@ -1306,7 +1306,7 @@ class Item
 
 		Post::update($fields, ['uri-id' => $posted_item['parent-uri-id'], 'uid' => $posted_item['uid']]);
 
-		// In that function we check if this is a forum post. Additionally we delete the item under certain circumstances
+		// In that function we check if this is a group post. Additionally we delete the item under certain circumstances
 		if (self::tagDeliver($posted_item['uid'], $post_user_id)) {
 			// Get the user information for the logging
 			$user = User::getById($uid);
@@ -1417,11 +1417,11 @@ class Item
 	}
 
 	/**
-	 * Change the owner of a parent item if it had been shared by a forum
+	 * Change the owner of a parent item if it had been shared by a group
 	 *
-	 * (public) forum posts in the new format consist of the regular post by the author
-	 * followed by an announce message sent from the forum account.
-	 * Changing the owner helps in grouping forum posts.
+	 * (public) group posts in the new format consist of the regular post by the author
+	 * followed by an announce message sent from the group account.
+	 * Changing the owner helps in grouping group posts.
 	 *
 	 * @param array $item
 	 * @return void
@@ -1457,7 +1457,7 @@ class Item
 			}
 
 			if (Contact::isSharing($parent['owner-id'], $item['uid'])) {
-				Logger::info('The resharer is no forum: quit', ['resharer' => $item['author-id'], 'owner' => $parent['owner-id'], 'author' => $parent['author-id'], 'uid' => $item['uid']]);
+				Logger::info('The resharer is no group: quit', ['resharer' => $item['author-id'], 'owner' => $parent['owner-id'], 'author' => $parent['author-id'], 'uid' => $item['uid']]);
 				return;
 			}
 		}
@@ -1602,7 +1602,7 @@ class Item
 		if (($uid != 0) && ($item['gravity'] == self::GRAVITY_PARENT)) {
 			$owner = User::getOwnerDataById($uid);
 			if (($owner['contact-type'] == User::ACCOUNT_TYPE_COMMUNITY) && !Tag::isMentioned($uri_id, $owner['url'])) {
-				Logger::info('Target user is a forum but is not mentioned here, thread will not be stored', ['uid' => $uid, 'uri-id' => $uri_id]);
+				Logger::info('Target user is a group but is not mentioned here, thread will not be stored', ['uid' => $uid, 'uri-id' => $uri_id]);
 				return 0;
 			}
 		}
@@ -1708,7 +1708,7 @@ class Item
 			return 0;
 		}
 
-		// When the post belongs to a a forum then all forum users are allowed to access it
+		// When the post belongs to a a group then all group users are allowed to access it
 		foreach (Tag::getByURIId($uriid, [Tag::MENTION, Tag::EXCLUSIVE_MENTION]) as $tag) {
 			if (DBA::exists('contact', ['uid' => $uid, 'nurl' => Strings::normaliseLink($tag['url']), 'contact-type' => Contact::TYPE_COMMUNITY])) {
 				$target_uid = User::getIdForURL($tag['url']);
@@ -2099,7 +2099,7 @@ class Item
 		/// @todo On private posts we could obfuscate the date
 		$update = ($arr['private'] != self::PRIVATE) || in_array($arr['network'], Protocol::FEDERATED);
 
-		// Is it a forum? Then we don't care about the rules from above
+		// Is it a group? Then we don't care about the rules from above
 		if (!$update && in_array($arr["network"], [Protocol::ACTIVITYPUB, Protocol::DFRN]) && ($arr["parent-uri-id"] === $arr["uri-id"])) {
 			if (DBA::exists('contact', ['id' => $arr['contact-id'], 'forum' => true])) {
 				$update = true;
@@ -2195,7 +2195,7 @@ class Item
 	}
 
 	/**
-	 * look for mention tags and setup a second delivery chain for forum/community posts if appropriate
+	 * look for mention tags and setup a second delivery chain for group/community posts if appropriate
 	 *
 	 * @param int $uid
 	 * @param int $item_id
@@ -2249,7 +2249,7 @@ class Item
 
 		if ($owner['page-flags'] == User::PAGE_FLAGS_PRVGROUP) {
 			$allow_cid = '';
-			$allow_gid = '<' . Group::FOLLOWERS . '>';
+			$allow_gid = '<' . Circle::FOLLOWERS . '>';
 			$deny_cid  = '';
 			$deny_gid  = '';
 			self::performActivity($item['id'], 'announce', $uid, $allow_cid, $allow_gid, $deny_cid, $deny_gid);
@@ -2518,6 +2518,7 @@ class Item
 	{
 		$aclFormatter = DI::aclFormatter();
 
+<<<<<<< HEAD
 		$allow_people = $aclFormatter->expand($obj['allow_cid']);
 		$allow_groups = Group::expand($obj['uid'], $aclFormatter->expand($obj['allow_gid']), $check_dead);
 		$deny_people  = $aclFormatter->expand($obj['deny_cid']);
@@ -2525,6 +2526,19 @@ class Item
 		$recipients   = array_unique(array_merge($allow_people, $allow_groups));
 		$deny         = array_unique(array_merge($deny_people, $deny_groups));
 		$recipients   = array_diff($recipients, $deny);
+=======
+		if (!$expand_followers && (!empty($obj['deny_cid']) || !empty($obj['deny_gid']))) {
+			$expand_followers = true;
+		}
+
+		$allow_people  = $aclFormatter->expand($obj['allow_cid']);
+		$allow_circles = Circle::expand($obj['uid'], $aclFormatter->expand($obj['allow_gid']), $check_dead, $expand_followers);
+		$deny_people   = $aclFormatter->expand($obj['deny_cid']);
+		$deny_circles  = Circle::expand($obj['uid'], $aclFormatter->expand($obj['deny_gid']), $check_dead);
+		$recipients    = array_unique(array_merge($allow_people, $allow_circles));
+		$deny          = array_unique(array_merge($deny_people, $deny_circles));
+		$recipients    = array_diff($recipients, $deny);
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 		return $recipients;
 	}
 
@@ -2890,9 +2904,9 @@ class Item
 			/*
 			 * Authenticated visitor. Unless pre-verified,
 			 * check that the contact belongs to this $owner_id
-			 * and load the groups the visitor belongs to.
+			 * and load the circles the visitor belongs to.
 			 * If pre-verified, the caller is expected to have already
-			 * done this and passed the groups into this function.
+			 * done this and passed the circles into this function.
 			 */
 			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
 
@@ -3620,13 +3634,13 @@ class Item
 	}
 
 	/**
-	 * Does the given uri-id belongs to a post that is sent as starting post to a forum?
+	 * Does the given uri-id belongs to a post that is sent as starting post to a group?
 	 *
 	 * @param int $uri_id
 	 *
-	 * @return boolean "true" when it is a forum post
+	 * @return boolean "true" when it is a group post
 	 */
-	public static function isForumPost(int $uri_id): bool
+	public static function isGroupPost(int $uri_id): bool
 	{
 		foreach (Tag::getByURIId($uri_id, [Tag::EXCLUSIVE_MENTION]) as $tag) {
 			if (DBA::exists('contact', ['uid' => 0, 'nurl' => Strings::normaliseLink($tag['url']), 'contact-type' => Contact::TYPE_COMMUNITY])) {

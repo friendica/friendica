@@ -17,29 +17,29 @@ Have a look at the [installation documentation](doc/Install.md) for further info
 
 ### Friendica Screenshots
 
-| ![Frio theme in mobile browser](images/screenshots/friendica-frio-mobile-profile-1.png?raw=true "Frio theme in mobile browser") ![Frio theme in mobile browser](images/screenshots/friendica-frio-mobile-profile-2.png?raw=true "Frio theme in mobile browser")
-|:--:|
-|*Frio theme, mobile browser. Timeline and composer view.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-green-profile-1.png?raw=true "Frio theme in desktop browser")
-|*Frio theme, desktop browser. Timeline view, contact info popped up, control menu open.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-green-profile-2.png?raw=true "Frio theme in desktop browser")
-|*Frio theme, desktop browser. Menu open for controlling individual posts.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-3.png?raw=true "Frio theme in desktop browser")
-|*Frio theme, desktop browser. Profile view, notification menu open.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-2.png?raw=true "Frio theme in desktop browser")
-|*Number of new posts, in total and by group.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-1.png?raw=true "Frio theme in desktop browser")
-|*Calender with popup of event.*|
-|![Frio theme default colour in standard browser on tablet](images/screenshots/friendica-frio-default-profile-1.png?raw=true "Frio theme default colour in standard browser on tablet")
-|*Notifications menu and private messages counter, standard browser on tablet.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-brown-profile-2.png?raw=true "Frio theme in desktop browser")
-|*Number of visible contacts, standard browser.*|
-|![Frio theme in desktop browser](images/screenshots/friendica-frio-brown-profile-1.png?raw=true "Frio theme in desktop browser")
-|*Network posts chronologically ordered, standard browser.*|
-|![Vier theme in desktop browser](images/screenshots/friendica-vier-profile.png?raw=true "Vier theme in desktop browser")
-|*Vier theme, desktop browser. Public timeline view.*|
-|![Vier theme in desktop browser](images/screenshots/friendica-vier-community.png?raw=true "Vier theme in desktop browser")
-|*Vier theme, desktop browser. Community post displayed.*|
+| ![Frio theme in mobile browser](images/screenshots/friendica-frio-mobile-profile-1.png?raw=true "Frio theme in mobile browser") ![Frio theme in mobile browser](images/screenshots/friendica-frio-mobile-profile-2.png?raw=true "Frio theme in mobile browser") |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                                                                                    *Frio theme, mobile browser. Timeline and composer view.*                                                                                                    |
+|                                                                ![Frio theme in desktop browser](images/screenshots/friendica-frio-green-profile-1.png?raw=true "Frio theme in desktop browser")                                                                 |
+|                                                                                    *Frio theme, desktop browser. Timeline view, contact info popped up, control menu open.*                                                                                     |
+|                                                                ![Frio theme in desktop browser](images/screenshots/friendica-frio-green-profile-2.png?raw=true "Frio theme in desktop browser")                                                                 |
+|                                                                                           *Frio theme, desktop browser. Menu open for controlling individual posts.*                                                                                            |
+|                                                                 ![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-3.png?raw=true "Frio theme in desktop browser")                                                                  |
+|                                                                                              *Frio theme, desktop browser. Profile view, notification menu open.*                                                                                               |
+|                                                                 ![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-2.png?raw=true "Frio theme in desktop browser")                                                                  |
+|                                                                                                         *Number of new posts, in total and by circle.*                                                                                                          |
+|                                                                 ![Frio theme in desktop browser](images/screenshots/friendica-frio-red-profile-1.png?raw=true "Frio theme in desktop browser")                                                                  |
+|                                                                                                                 *Calendar with popup of event.*                                                                                                                 |
+|                                     ![Frio theme default colour in standard browser on tablet](images/screenshots/friendica-frio-default-profile-1.png?raw=true "Frio theme default colour in standard browser on tablet")                                      |
+|                                                                                         *Notifications menu and private messages counter, standard browser on tablet.*                                                                                          |
+|                                                                ![Frio theme in desktop browser](images/screenshots/friendica-frio-brown-profile-2.png?raw=true "Frio theme in desktop browser")                                                                 |
+|                                                                                                         *Number of visible contacts, standard browser.*                                                                                                         |
+|                                                                ![Frio theme in desktop browser](images/screenshots/friendica-frio-brown-profile-1.png?raw=true "Frio theme in desktop browser")                                                                 |
+|                                                                                                   *Network posts chronologically ordered, standard browser.*                                                                                                    |
+|                                                                    ![Vier theme in desktop browser](images/screenshots/friendica-vier-profile.png?raw=true "Vier theme in desktop browser")                                                                     |
+|                                                                                                      *Vier theme, desktop browser. Public timeline view.*                                                                                                       |
+|                                                                   ![Vier theme in desktop browser](images/screenshots/friendica-vier-community.png?raw=true "Vier theme in desktop browser")                                                                    |
+|                                                                                                    *Vier theme, desktop browser. Community post displayed.*                                                                                                     |
 
 ## Endorsements
 

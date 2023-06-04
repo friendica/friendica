@@ -454,7 +454,7 @@ Ex: Wed May 23 06:01:13 +0000 2007
 <tr>
 <td><code>allow_gid</code></td>
 <td>String (angle-brackets escaped integers)</td>
-<td>Optional. List of allowed group ids</td>
+<td>Optional. List of allowed circle ids</td>
 </tr>
 
 <tr>
@@ -466,7 +466,7 @@ Ex: Wed May 23 06:01:13 +0000 2007
 <tr>
 <td><code>deny_gid</code></td>
 <td>String (angle-brackets escaped integers)</td>
-<td>Optional. List of disallowed group ids</td>
+<td>Optional. List of disallowed circle ids</td>
 </tr>
 
 </tbody>
@@ -583,7 +583,7 @@ Ex: Wed May 23 06:01:13 +0000 2007
 <tr>
 <td><code>friendica_owner</code></td>
 <td>
- 
+
 <a href="help/API-Entities#Contact">Contact</a></td>
 <td align="center">No</td>
 </tr>
@@ -984,7 +984,7 @@ Identical to [the Twitter Media Object](https://developer.twitter.com/en/docs/tw
 <tr>
 <td><code>allow_gid</code></td>
 <td>String (ACL)</td>
-<td>List of contact group ids wrapped in angle brackets allowed to access the photo.</td>
+<td>List of contact circle ids wrapped in angle brackets allowed to access the photo.</td>
 </tr>
 
 <tr>
@@ -996,7 +996,7 @@ Identical to [the Twitter Media Object](https://developer.twitter.com/en/docs/tw
 <tr>
 <td><code>deny_gid</code></td>
 <td>String (ACL)</td>
-<td>List of contact group ids wrapped in angle brackets forbidden to access the photo.</td>
+<td>List of contact circle ids wrapped in angle brackets forbidden to access the photo.</td>
 </tr>
 
 <tr>

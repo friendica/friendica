@@ -404,7 +404,7 @@ class Delivery
 	 */
 	private static function deliverDiaspora(string $cmd, array $contact, array $owner, array $items, array $target_item, bool $public_message, bool $top_level, bool $followup): bool
 	{
-		// We don't treat Forum posts as "wall-to-wall" to be able to post them via Diaspora
+		// We don't treat group posts as "wall-to-wall" to be able to post them via Diaspora
 		$walltowall = $top_level && ($owner['id'] != $items[0]['contact-id']) & ($owner['account-type'] != User::ACCOUNT_TYPE_COMMUNITY);
 
 		if ($public_message) {

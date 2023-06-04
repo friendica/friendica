@@ -29,7 +29,7 @@ use Friendica\Core\Search;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Profile;
@@ -190,29 +190,29 @@ class Widget
 	}
 
 	/**
-	 * Return group membership widget
+	 * Return circle membership widget
 	 *
 	 * @param string $baseurl
 	 * @param string $selected
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function groups(string $baseurl, string $selected = ''): string
+	public static function circles(string $baseurl, string $selected = ''): string
 	{
 		if (!DI::userSession()->getLocalUserId()) {
 			return '';
 		}
 
-		$options = array_map(function ($group) {
+		$options = array_map(function ($circle) {
 			return [
-				'ref'  => $group['id'],
-				'name' => $group['name']
+				'ref'  => $circle['id'],
+				'name' => $circle['name']
 			];
-		}, Group::getByUserId(DI::userSession()->getLocalUserId()));
+		}, Circle::getByUserId(DI::userSession()->getLocalUserId()));
 
 		return self::filter(
-			'group',
-			DI::l10n()->t('Groups'),
+			'circle',
+			DI::l10n()->t('Circles'),
 			'',
 			DI::l10n()->t('Everyone'),
 			$baseurl,
@@ -239,6 +239,7 @@ class Widget
 			['ref' => 'followers', 'name' => DI::l10n()->t('Followers')],
 			['ref' => 'following', 'name' => DI::l10n()->t('Following')],
 			['ref' => 'mutuals', 'name' => DI::l10n()->t('Mutual friends')],
+			['ref' => 'nothing', 'name' => DI::l10n()->t('No relationship')],
 		];
 
 		return self::filter(
@@ -525,7 +526,7 @@ class Widget
 			['ref' => 'person', 'name' => DI::l10n()->t('Persons')],
 			['ref' => 'organisation', 'name' => DI::l10n()->t('Organisations')],
 			['ref' => 'news', 'name' => DI::l10n()->t('News')],
-			['ref' => 'community', 'name' => DI::l10n()->t('Forums')],
+			['ref' => 'community', 'name' => DI::l10n()->t('Groups')],
 		];
 
 		return self::filter('accounttype', DI::l10n()->t('Account Types'), '',

@@ -19,7 +19,7 @@
  *
  */
 
-namespace Friendica\Module\Api\Friendica\Group;
+namespace Friendica\Module\Api\Friendica\Circle;
 
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -28,6 +28,7 @@ use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException;
 
 /**
+ * API endpoint: /api/friendica/circle_show
  * API endpoint: /api/friendica/group_show
  */
 class Show extends BaseApi
@@ -41,22 +42,22 @@ class Show extends BaseApi
 		// params
 		$gid = $this->getRequestValue($request, 'gid', 0);
 
-		// get data of the specified group id or all groups if not specified
+		// get data of the specified circle id or all circles if not specified
 		if ($gid != 0) {
-			$groups = DBA::selectToArray('group', [], ['deleted' => false, 'uid' => $uid, 'id' => $gid]);
+			$circles = DBA::selectToArray('group', [], ['deleted' => false, 'uid' => $uid, 'id' => $gid]);
 
 			// error message if specified gid is not in database
-			if (!DBA::isResult($groups)) {
+			if (!DBA::isResult($circles)) {
 				throw new HTTPException\BadRequestException('gid not available');
 			}
 		} else {
-			$groups = DBA::selectToArray('group', [], ['deleted' => false, 'uid' => $uid]);
+			$circles = DBA::selectToArray('group', [], ['deleted' => false, 'uid' => $uid]);
 		}
 
-		// loop through all groups and retrieve all members for adding data in the user array
+		// loop through all circles and retrieve all members for adding data in the user array
 		$grps = [];
-		foreach ($groups as $rr) {
-			$members = Contact\Group::getById($rr['id']);
+		foreach ($circles as $circle) {
+			$members = Contact\Circle::getById($circle['id']);
 			$users   = [];
 
 			if ($type == 'xml') {
@@ -71,7 +72,7 @@ class Show extends BaseApi
 					$users[] = DI::twitterUser()->createFromContactId($member['contact-id'], $uid, true)->toArray();
 				}
 			}
-			$grps[] = ['name' => $rr['name'], 'gid' => $rr['id'], $user_element => $users];
+			$grps[] = ['name' => $circle['name'], 'gid' => $circle['id'], $user_element => $users];
 		}
 
 		$this->response->exit('group_update', ['group' => $grps], $this->parameters['extension'] ?? null);

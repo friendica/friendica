@@ -23,7 +23,7 @@ Wenn Du Deinen Account nicht nutzen kannst, kannst Du einen Account auf einer ö
 
 Wenn du dir keinen weiteren Friendica Account einrichten willst, kannst du auch gerne über einen der folgenden alternativen Kanäle Hilfe suchen:
 
-  * Friendica Support Forum: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
+  * Friendica Support Gruppe: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
   * Chats der Friendica Community (die IRC, Matrix und XMPP Räume sind mit einer Brücke verbunden) Logs dieser öffentlichen Chaträume können [hier aus dem IRC](https://gnusociarg.nsupdate.info/2021/%23friendica/) und [hier aus der Matrix](https://view.matrix.org/alias/%23friendi.ca:matrix.org/) gefunden werden.
     * XMPP: support(at)forum.friendi.ca
     * IRC: #friendica auf [libera.chat](https://web.libera.chat/?channels=#friendica)
@@ -108,7 +108,7 @@ Zwischen der URL und dem Parameter muss ein Fragezeichen als Trennzeichen verwen
 
 Ein Beispiel:
 
-     https://social.example.com/profile/example 
+     https://social.example.com/profile/example
 
 auf Deutsch:
 

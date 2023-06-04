@@ -492,13 +492,13 @@ class Transmitter
 	 * Returns an array with permissions of the thread parent of the given item array
 	 *
 	 * @param array $item
-	 * @param bool  $is_forum_thread
+	 * @param bool  $is_group_thread
 	 *
 	 * @return array with permissions
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function fetchPermissionBlockFromThreadParent(array $item, bool $is_forum_thread): array
+	private static function fetchPermissionBlockFromThreadParent(array $item, bool $is_group_thread): array
 	{
 		if (empty($item['thr-parent-id'])) {
 			return [];
@@ -528,7 +528,7 @@ class Transmitter
 		$type = [Tag::TO => 'to', Tag::CC => 'cc', Tag::BTO => 'bto', Tag::BCC => 'bcc'];
 		foreach (Tag::getByURIId($item['thr-parent-id'], [Tag::TO, Tag::CC, Tag::BTO, Tag::BCC]) as $receiver) {
 			if (!empty($parent_profile['followers']) && $receiver['url'] == $parent_profile['followers'] && !empty($item_profile['followers'])) {
-				if (!$is_forum_thread) {
+				if (!$is_group_thread) {
 					$permissions[$type[$receiver['type']]][] = $item_profile['followers'];
 				}
 			} elseif (!in_array($receiver['url'], $exclude)) {
@@ -572,7 +572,7 @@ class Transmitter
 		}
 
 		$always_bcc = false;
-		$is_forum   = false;
+		$is_group   = false;
 		$follower   = '';
 
 		// Check if we should always deliver our stuff via BCC
@@ -580,7 +580,7 @@ class Transmitter
 			$owner = User::getOwnerDataById($item['uid']);
 			if (!empty($owner)) {
 				$always_bcc = $owner['hide-friends'];
-				$is_forum   = ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) && $owner['manually-approve'];
+				$is_group   = ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) && $owner['manually-approve'];
 
 				$profile  = APContact::getByURL($owner['url'], false);
 				$follower = $profile['followers'] ?? '';
@@ -594,9 +594,9 @@ class Transmitter
 		$parent = Post::selectFirst(['causer-link', 'post-reason'], ['id' => $item['parent']]);
 		if (!empty($parent) && ($parent['post-reason'] == Item::PR_ANNOUNCEMENT) && !empty($parent['causer-link'])) {
 			$profile = APContact::getByURL($parent['causer-link'], false);
-			$is_forum_thread = isset($profile['type']) && $profile['type'] == 'Group';
+			$is_group_thread = isset($profile['type']) && $profile['type'] == 'Group';
 		} else {
-			$is_forum_thread = false;
+			$is_group_thread = false;
 		}
 
 		if (self::isAnnounce($item) || self::isAPPost($last_id)) {
@@ -618,7 +618,7 @@ class Transmitter
 		$exclusive = false;
 		$mention   = false;
 
-		if ($is_forum_thread) {
+		if ($is_group_thread) {
 			foreach (Tag::getByURIId($item['parent-uri-id'], [Tag::MENTION, Tag::EXCLUSIVE_MENTION]) as $term) {
 				$profile = APContact::getByURL($term['url'], false);
 				if (!empty($profile) && ($profile['type'] == 'Group')) {
@@ -643,7 +643,7 @@ class Transmitter
 				$data['cc'][] = $announce['actor']['url'];
 			}
 
-			$data = array_merge($data, self::fetchPermissionBlockFromThreadParent($item, $is_forum_thread));
+			$data = array_merge($data, self::fetchPermissionBlockFromThreadParent($item, $is_group_thread));
 
 			// Check if the item is completely public or unlisted
 			if ($item['private'] == Item::PUBLIC) {
@@ -696,7 +696,7 @@ class Transmitter
 				$exclusive = false;
 			}
 
-			if ($is_forum && !$exclusive && !empty($follower)) {
+			if ($is_group && !$exclusive && !empty($follower)) {
 				$data['cc'][] = $follower;
 			} elseif (!$exclusive) {
 				foreach ($receiver_list as $receiver) {
@@ -728,19 +728,19 @@ class Transmitter
 					$profile = APContact::getByURL($parent['owner-link'], false);
 					if (!empty($profile)) {
 						if ($item['gravity'] != Item::GRAVITY_PARENT) {
-							// Comments to forums are directed to the forum
-							// But comments to forums aren't directed to the followers collection
-							// This rule is only valid when the actor isn't the forum.
-							// The forum needs to transmit their content to their followers.
+							// Comments to groups are directed to the group
+							// But comments to groups aren't directed to the followers collection
+							// This rule is only valid when the actor isn't the group.
+							// The group needs to transmit their content to their followers.
 							if (($profile['type'] == 'Group') && ($profile['url'] != ($actor_profile['url'] ?? ''))) {
 								$data['to'][] = $profile['url'];
 							} else {
 								$data['cc'][] = $profile['url'];
-								if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers']) && (!$exclusive || !$is_forum_thread)) {
+								if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers']) && (!$exclusive || !$is_group_thread)) {
 									$data['cc'][] = $actor_profile['followers'];
 								}
 							}
-						} elseif (!$exclusive && !$is_forum_thread) {
+						} elseif (!$exclusive && !$is_group_thread) {
 							// Public thread parent post always are directed to the followers.
 							if ($item['private'] != Item::PRIVATE) {
 								$data['cc'][] = $actor_profile['followers'];
@@ -862,12 +862,11 @@ class Transmitter
 	{
 		$inboxes = [];
 
-		$isforum = false;
-
+		$isGroup = false;
 		if (!empty($item['uid'])) {
 			$profile = User::getOwnerDataById($item['uid']);
 			if (!empty($profile)) {
-				$isforum = $profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY;
+				$isGroup = $profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY;
 			}
 		}
 
@@ -897,7 +896,7 @@ class Transmitter
 				continue;
 			}
 
-			if ($isforum && ($contact['network'] == Protocol::DFRN)) {
+			if ($isGroup && ($contact['network'] == Protocol::DFRN)) {
 				continue;
 			}
 

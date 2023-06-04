@@ -75,8 +75,8 @@ class BaseSearch extends BaseModule
 
 		if (strpos($search, '!') === 0) {
 			$search = trim(substr($search, 1));
-			$type   = Search::TYPE_FORUM;
-			$header = DI::l10n()->t('Forum Search - %s', $search);
+			$type   = Search::TYPE_GROUP;
+			$header = DI::l10n()->t('Group Search - %s', $search);
 		}
 
 		$search = Network::convertToIdn($search);
@@ -94,11 +94,18 @@ class BaseSearch extends BaseModule
 		if ($localSearch && empty($results)) {
 			$pager->setItemsPerPage(80);
 			$results = Search::getContactsFromLocalDirectory($search, $type, $pager->getStart(), $pager->getItemsPerPage());
+<<<<<<< HEAD
 		} elseif (Search::getGlobalDirectory() && empty($results)) {
 			$results = Search::getContactsFromGlobalDirectory($search, $type, $pager->getPage());
 			$pager->setItemsPerPage($results->getItemsPage());
 		} else {
 			$results = new ResultList();
+=======
+		}
+
+		if (!$results->getTotal()) {
+			$results = Search::getContactsFromProbe(Network::convertToIdn($search), $type == Search::TYPE_GROUP);
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 		}
 
 		return self::printResult($results, $pager, $header);

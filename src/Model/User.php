@@ -88,7 +88,7 @@ class User
 	 * ACCOUNT_TYPE_NEWS - the account is a news reflector
 	 *	Associated page type: PAGE_FLAGS_SOAPBOX
 	 *
-	 * ACCOUNT_TYPE_COMMUNITY - the account is community forum
+	 * ACCOUNT_TYPE_COMMUNITY - the account is community group
 	 *	Associated page types: PAGE_COMMUNITY, PAGE_FLAGS_PRVGROUP
 	 *
 	 * ACCOUNT_TYPE_RELAY - the account is a relay
@@ -483,23 +483,23 @@ class User
 	}
 
 	/**
-	 * Returns the default group for a given user and network
+	 * Returns the default circle for a given user and network
 	 *
 	 * @param int $uid User id
 	 *
-	 * @return int group id
+	 * @return int circle id
 	 * @throws Exception
 	 */
-	public static function getDefaultGroup(int $uid): int
+	public static function getDefaultCircle(int $uid): int
 	{
 		$user = DBA::selectFirst('user', ['def_gid'], ['uid' => $uid]);
 		if (DBA::isResult($user)) {
-			$default_group = $user["def_gid"];
+			$default_circle = $user['def_gid'];
 		} else {
-			$default_group = 0;
+			$default_circle = 0;
 		}
 
-		return $default_group;
+		return $default_circle;
 	}
 
 	/**
@@ -675,6 +675,10 @@ class User
 	 */
 	public static function updateLastActivity(int $uid)
 	{
+		if (!$uid) {
+			return;
+		}
+
 		$user = User::getById($uid, ['last-activity']);
 		if (empty($user)) {
 			return;
@@ -1188,13 +1192,13 @@ class User
 			throw new Exception(DI::l10n()->t('An error occurred creating your self contact. Please try again.'));
 		}
 
-		// Create a group with no members. This allows somebody to use it
-		// right away as a default group for new contacts.
-		$def_gid = Group::create($uid, DI::l10n()->t('Friends'));
+		// Create a circle with no members. This allows somebody to use it
+		// right away as a default circle for new contacts.
+		$def_gid = Circle::create($uid, DI::l10n()->t('Friends'));
 		if (!$def_gid) {
 			DBA::delete('user', ['uid' => $uid]);
 
-			throw new Exception(DI::l10n()->t('An error occurred creating your default contact group. Please try again.'));
+			throw new Exception(DI::l10n()->t('An error occurred creating your default contact circle. Please try again.'));
 		}
 
 		$fields = ['def_gid' => $def_gid];
@@ -1640,7 +1644,7 @@ class User
 	 */
 	public static function identities(int $uid): array
 	{
-		if (empty($uid)) {
+		if (!$uid) {
 			return [];
 		}
 
@@ -1651,7 +1655,7 @@ class User
 			return $identities;
 		}
 
-		if ($user['parent-uid'] == 0) {
+		if (!$user['parent-uid']) {
 			// First add our own entry
 			$identities = [[
 				'uid' => $user['uid'],
@@ -1712,7 +1716,7 @@ class User
 	 */
 	public static function hasIdentities(int $uid): bool
 	{
-		if (empty($uid)) {
+		if (!$uid) {
 			return false;
 		}
 
@@ -1721,7 +1725,7 @@ class User
 			return false;
 		}
 
-		if ($user['parent-uid'] != 0) {
+		if ($user['parent-uid']) {
 			return true;
 		}
 
@@ -1848,8 +1852,8 @@ class User
 	{
 		$condition = [
 			'email'           => self::getAdminEmailList(),
-			'parent-uid'      => 0,
-			'blocked'         => 0,
+			'parent-uid'      => null,
+			'blocked'         => false,
 			'verified'        => true,
 			'account_removed' => false,
 			'account_expired' => false,

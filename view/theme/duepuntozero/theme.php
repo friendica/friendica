@@ -69,14 +69,14 @@ $(document).ready(function() {
 
 	$('html').click(function() { $("#nav-notifications-menu" ).hide(); });
 
-	$('.group-edit-icon').hover(
+	$('.circle-edit-icon').hover(
 		function() {
 			$(this).addClass('icon'); $(this).removeClass('iconspacer');},
 		function() {
 			$(this).removeClass('icon'); $(this).addClass('iconspacer');}
 	);
 
-	$('.sidebar-group-element').hover(
+	$('.sidebar-circle-element').hover(
 		function() {
 			id = $(this).attr('id');
 			$('#edit-' + id).addClass('icon'); $('#edit-' + id).removeClass('iconspacer');},

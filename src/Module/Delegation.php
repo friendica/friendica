@@ -53,7 +53,7 @@ class Delegation extends BaseModule
 			}
 		}
 
-		$identity = intval($_POST['identity'] ?? 0);
+		$identity = intval($request['identity'] ?? 0);
 		if (!$identity) {
 			return;
 		}
@@ -76,16 +76,16 @@ class Delegation extends BaseModule
 			$user = DBA::selectFirst('user', [], ['uid' => $identity, 'parent-uid' => $orig_record['uid']]);
 
 			// Check if the target user is one of our siblings
-			if (!DBA::isResult($user) && ($orig_record['parent-uid'] != 0)) {
+			if (!DBA::isResult($user) && $orig_record['parent-uid']) {
 				$user = DBA::selectFirst('user', [], ['uid' => $identity, 'parent-uid' => $orig_record['parent-uid']]);
 			}
 
 			// Check if it's our parent or our own user
 			if (!DBA::isResult($user)
 				&& (
-					$orig_record['parent-uid'] != 0 && $orig_record['parent-uid'] == $identity
+					$orig_record['parent-uid'] && $orig_record['parent-uid'] === $identity
 					||
-					$orig_record['uid'] != 0 && $orig_record['uid'] == $identity
+					$orig_record['uid'] && $orig_record['uid'] === $identity
 				)
 			) {
 				$user = User::getById($identity);

@@ -415,7 +415,7 @@ class Processor
 			$item['post-type'] = Item::PT_NOTE;
 		}
 
-		$item['isForum'] = false;
+		$item['isGroup'] = false;
 
 		if (!empty($activity['thread-completion'])) {
 			if ($activity['thread-completion'] != $item['owner-id']) {
@@ -434,7 +434,7 @@ class Processor
 			$item['owner-id'] = $item['author-id'];
 		} else {
 			$actor = APContact::getByURL($item['owner-link'], false);
-			$item['isForum'] = ($actor['type'] ?? 'Person') == 'Group';
+			$item['isGroup'] = ($actor['type'] ?? 'Person') == 'Group';
 		}
 
 		$item['uri'] = $activity['id'];
@@ -1056,7 +1056,7 @@ class Processor
 				$item['causer-id'] = ($item['gravity'] == Item::GRAVITY_PARENT) ? $item['owner-id'] : $item['author-id'];
 			}
 
-			if ($item['isForum'] ?? false) {
+			if ($item['isGroup'] ?? false) {
 				$item['contact-id'] = Contact::getIdForURL($activity['actor'], $receiver);
 			} else {
 				$item['contact-id'] = Contact::getIdForURL($activity['author'], $receiver);
@@ -1071,8 +1071,13 @@ class Processor
 				continue;
 			}
 
+<<<<<<< HEAD
 			if (($receiver != 0) && ($item['gravity'] == Item::GRAVITY_PARENT) && !in_array($item['post-reason'], [Item::PR_FOLLOWER, Item::PR_TAG, item::PR_TO, Item::PR_CC])) {
 				if (!($item['isForum'] ?? false)) {
+=======
+			if (($receiver != 0) && ($item['gravity'] == Item::GRAVITY_PARENT) && !in_array($item['post-reason'], [Item::PR_FOLLOWER, Item::PR_TAG, item::PR_TO, Item::PR_CC, Item::PR_AUDIENCE])) {
+				if (!($item['isGroup'] ?? false)) {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 					if ($item['post-reason'] == Item::PR_BCC) {
 						Logger::info('Top level post via BCC from a non sharer, ignoring', ['uid' => $receiver, 'contact' => $item['contact-id'], 'url' => $item['uri']]);
 						continue;
@@ -1086,16 +1091,16 @@ class Processor
 					}
 				}
 
-				$is_forum = false;
+				$isGroup = false;
 				$user = User::getById($receiver, ['account-type']);
 				if (!empty($user['account-type'])) {
-					$is_forum = ($user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
+					$isGroup = ($user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
 				}
 
 				if ((DI::pConfig()->get($receiver, 'system', 'accept_only_sharer') == Item::COMPLETION_NONE)
-					&& ((!$is_forum && !($item['isForum'] ?? false) && ($activity['type'] != 'as:Announce'))
+					&& ((!$isGroup && !($item['isGroup'] ?? false) && ($activity['type'] != 'as:Announce'))
 					|| !Contact::isSharingByURL($activity['actor'], $receiver))) {
-					Logger::info('Actor is a non sharer, is no forum or it is no announce', ['uid' => $receiver, 'actor' => $activity['actor'], 'url' => $item['uri'], 'type' => $activity['type']]);
+					Logger::info('Actor is a non sharer, is no group or it is no announce', ['uid' => $receiver, 'actor' => $activity['actor'], 'url' => $item['uri'], 'type' => $activity['type']]);
 					continue;
 				}
 
@@ -1138,7 +1143,7 @@ class Processor
 		// Store send a follow request for every reshare - but only when the item had been stored
 		if ($stored && ($item['private'] != Item::PRIVATE) && ($item['gravity'] == Item::GRAVITY_PARENT) && !empty($item['author-link']) && ($item['author-link'] != $item['owner-link'])) {
 			$author = APContact::getByURL($item['owner-link'], false);
-			// We send automatic follow requests for reshared messages. (We don't need though for forum posts)
+			// We send automatic follow requests for reshared messages. (We don't need though for group posts)
 			if ($author['type'] != 'Group') {
 				Logger::info('Send follow request', ['uri' => $item['uri'], 'stored' => $stored, 'to' => $item['author-link']]);
 				ActivityPub\Transmitter::sendFollowObject($item['uri'], $item['author-link']);

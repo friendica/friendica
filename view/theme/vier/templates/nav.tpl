@@ -121,7 +121,7 @@
 						<option value="fulltext">{{$nav.searchoption.0}}</option>
 						<option value="tags">{{$nav.searchoption.1}}</option>
 						<option value="contacts">{{$nav.searchoption.2}}</option>
-						{{if $nav.searchoption.3}}<option value="forums">{{$nav.searchoption.3}}</option>{{/if}}
+						{{if $nav.searchoption.3}}<option value="groups">{{$nav.searchoption.3}}</option>{{/if}}
 					</select>
 				</form>
 			</li>

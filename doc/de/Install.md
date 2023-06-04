@@ -12,7 +12,7 @@ Diese Funktionalität benötigt ein wenig mehr als die normalen Blogs.
 Nicht jeder PHP/MySQL-Hosting-Anbieter kann Friendica unterstützen.
 Viele hingegen können es. Aber **bitte** prüfe die Voraussetzungen deines Servers vor der Installation.
 
-Wenn dir Fehler während der Installation auffallen, sag uns bitte über [Helper](http://forum.friendi.ca/profile/helpers) oder das [Entwickler Forum](https://forum.friendi.ca/profile/developers) Bescheid oder [erstelle ein Issue](https://github.com/friendica/friendica/issues).
+Wenn dir Fehler während der Installation auffallen, sag uns bitte über [Helper](http://forum.friendi.ca/profile/helpers) oder die [Entwickler Gruppe](https://forum.friendi.ca/profile/developers) Bescheid oder [erstelle ein Issue](https://github.com/friendica/friendica/issues).
 Gib uns bitte so viele Infos zu deinem System, wie du kannst, und beschreibe den Fehler mit allen Details und Fehlermeldungen, so dass wir den Fehler zukünftig verhindern können.
 Aufgrund der großen Anzahl an verschiedenen Betriebssystemen und PHP-Plattformen haben wir nur geringe Kapazitäten, um deine PHP-Installation zu debuggen oder fehlende Module zu ersetzen, aber wir tun unser Bestes, um allgemeine Code-Fehler zu beheben.
 
@@ -182,7 +182,7 @@ Sie werden stattdessen direkt in `config/local.config.php` gespeichert.
 Gehe im Anschluss in den Friendica-Hauptordner und führe den Kommandozeilen Befehl aus:
 
     bin/console autoinstall [--savedb]
-    
+
 #### B.3: Optionen
 
 Alle Optionen werden in `config/local.config.php` gespeichert und überschreiben etwaige, zugehörige Umgebungsvariablen.

@@ -242,7 +242,7 @@ class Notify extends BaseRepository
 			return false;
 		}
 
-		// There is no need to create notifications for forum accounts
+		// There is no need to create notifications for group accounts
 		if ($user['account-type'] == Model\User::ACCOUNT_TYPE_COMMUNITY) {
 			return false;
 		}

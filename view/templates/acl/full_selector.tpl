@@ -41,9 +41,9 @@
 				<i class="fa fa-lock"></i> {{$custom_title}}
 			</label>
 			<fieldset id="visibility-custom-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-custom-heading-{{$input_group_id}}" {{if $visibility != 'custom'}}disabled{{/if}}>
-				<input type="hidden" name="{{$input_names.group_allow}}" value="{{$group_allow}}"/>
+				<input type="hidden" name="{{$input_names.circle_allow}}" value="{{$circle_allow}}"/>
 				<input type="hidden" name="{{$input_names.contact_allow}}" value="{{$contact_allow}}"/>
-				<input type="hidden" name="{{$input_names.group_deny}}" value="{{$group_deny}}"/>
+				<input type="hidden" name="{{$input_names.circle_deny}}" value="{{$circle_deny}}"/>
 				<input type="hidden" name="{{$input_names.contact_deny}}" value="{{$contact_deny}}"/>
 				<div class="panel-body">
 					<p>{{$custom_desc}}</p>
@@ -75,10 +75,10 @@
 	$(function() {
 		let $acl_allow_input = $('#acl_allow-{{$input_group_id}}');
 		let $contact_allow_input = $('[name="{{$input_names.contact_allow}}"]');
-		let $group_allow_input = $('[name="{{$input_names.group_allow}}"]');
+		let $circle_allow_input = $('[name="{{$input_names.circle_allow}}"]');
 		let $acl_deny_input = $('#acl_deny-{{$input_group_id}}');
 		let $contact_deny_input = $('[name="{{$input_names.contact_deny}}"]');
-		let $group_deny_input = $('[name="{{$input_names.group_deny}}"]');
+		let $circle_deny_input = $('[name="{{$input_names.circle_deny}}"]');
 		let $visibility_public_panel = $('#visibility-public-panel-{{$input_group_id}}');
 		let $visibility_custom_panel = $('#visibility-custom-panel-{{$input_group_id}}');
 		let $visibility_public_radio = $('#visibility-public-{{$input_group_id}}');
@@ -125,8 +125,8 @@
 		});
 
 		// Custom visibility tags inputs
-		let acl_groups = new Bloodhound({
-			local: {{$acl_groups nofilter}},
+		let acl_circles = new Bloodhound({
+			local: {{$acl_circles nofilter}},
 			identify: function(obj) { return obj.type + '-' + obj.id.toString(); },
 			datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['name']),
 			queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -163,7 +163,7 @@
 			freeInput: false,
 			tagClass: function(item) {
 				switch (item.type) {
-					case 'group'   : return 'label label-primary';
+					case 'circle'   : return 'label label-primary';
 					case 'contact'  :
 					default:
 						return 'label label-info';
@@ -191,7 +191,7 @@
 				freeInput: false,
 				tagClass: function(item) {
 					switch (item.type) {
-						case 'group'   : return 'label label-primary';
+						case 'circle'   : return 'label label-primary';
 						case 'contact'  :
 						default:
 							return 'label label-info';
@@ -215,14 +215,14 @@
 
 		// Import existing ACL into the tags input fields.
 
-		$group_allow_input.val().split(',').forEach(function (group_id) {
-			$acl_allow_input.tagsinput('add', acl_groups.get('group-' + group_id)[0]);
+		$circle_allow_input.val().split(',').forEach(function (circle_id) {
+			$acl_allow_input.tagsinput('add', acl_circles.get('circle-' + circle_id)[0]);
 		});
 		$contact_allow_input.val().split(',').forEach(function (contact_id) {
 			$acl_allow_input.tagsinput('add', acl_contacts.get('contact-' + contact_id)[0]);
 		});
-		$group_deny_input.val().split(',').forEach(function (group_id) {
-			$acl_deny_input.tagsinput('add', acl_groups.get('group-' + group_id)[0]);
+		$circle_deny_input.val().split(',').forEach(function (circle_id) {
+			$acl_deny_input.tagsinput('add', acl_circles.get('circle-' + circle_id)[0]);
 		});
 		$contact_deny_input.val().split(',').forEach(function (contact_id) {
 			$acl_deny_input.tagsinput('add', acl_contacts.get('contact-' + contact_id)[0]);
@@ -237,11 +237,11 @@
 			}
 
 			// Update the real acl field
-			$group_allow_input.val('');
+			$circle_allow_input.val('');
 			$contact_allow_input.val('');
 			[].forEach.call($acl_allow_input.tagsinput('items'), function (item) {
-				if (item.type === 'group') {
-					$group_allow_input.val($group_allow_input.val() + ',' + item.id);
+				if (item.type === 'circle') {
+					$circle_allow_input.val($circle_allow_input.val() + ',' + item.id);
 				} else {
 					$contact_allow_input.val($contact_allow_input.val() + ',' + item.id);
 				}
@@ -255,11 +255,11 @@
 			}
 
 			// Update the real acl field
-			$group_deny_input.val('');
+			$circle_deny_input.val('');
 			$contact_deny_input.val('');
 			[].forEach.call($acl_deny_input.tagsinput('items'), function (item) {
-				if (item.type === 'group') {
-					$group_deny_input.val($group_deny_input.val() + ',' + item.id);
+				if (item.type === 'circle') {
+					$circle_deny_input.val($circle_deny_input.val() + ',' + item.id);
 				} else {
 					$contact_deny_input.val($contact_deny_input.val() + ',' + item.id);
 				}

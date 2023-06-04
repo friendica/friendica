@@ -190,9 +190,9 @@ class Attach
 	 * @param string  $filetype  Mimetype. optional, default = ''
 	 * @param integer $filesize  File size in bytes. optional, default = null
 	 * @param string  $allow_cid Permissions, allowed contacts. optional, default = ''
-	 * @param string  $allow_gid Permissions, allowed groups. optional, default = ''
-	 * @param string  $deny_cid  Permissions, denied contacts.optional, default = ''
-	 * @param string  $deny_gid  Permissions, denied group.optional, default = ''
+	 * @param string  $allow_gid Permissions, allowed circles. optional, default = ''
+	 * @param string  $deny_cid  Permissions, denied contacts. optional, default = ''
+	 * @param string  $deny_gid  Permissions, denied circle. optional, default = ''
 	 *
 	 * @return boolean|integer Row id on success, False on errors
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException

@@ -260,7 +260,7 @@ class Index extends BaseSettings
 				<p>You can use BBCodes in the field values.</p>
 				<p>Reorder by dragging the field title.</p>
 				<p>Empty the label field to remove a custom field.</p>
-				<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected groups.</p>",
+				<p>Non-public fields can only be seen by the selected Friendica contacts or the Friendica contacts in the selected circles.</p>",
 				'profile/' . $profile['nickname'] . '/profile'
 			),
 			'$custom_fields' => $custom_fields,
@@ -284,9 +284,9 @@ class Index extends BaseSettings
 			$permissionSet = DI::permissionSet()->selectOrCreate(DI::permissionSetFactory()->createFromString(
 				$uid,
 				DI::aclFormatter()->toString($profileFieldInputs['new']['contact_allow'] ?? ''),
-				DI::aclFormatter()->toString($profileFieldInputs['new']['group_allow'] ?? ''),
+				DI::aclFormatter()->toString($profileFieldInputs['new']['circle_allow'] ?? ''),
 				DI::aclFormatter()->toString($profileFieldInputs['new']['contact_deny'] ?? ''),
-				DI::aclFormatter()->toString($profileFieldInputs['new']['group_deny'] ?? '')
+				DI::aclFormatter()->toString($profileFieldInputs['new']['circle_deny'] ?? '')
 			));
 
 			$profileFields->append(DI::profileFieldFactory()->createFromValues(
@@ -305,9 +305,9 @@ class Index extends BaseSettings
 			$permissionSet = DI::permissionSet()->selectOrCreate(DI::permissionSetFactory()->createFromString(
 				$uid,
 				DI::aclFormatter()->toString($profileFieldInput['contact_allow'] ?? ''),
-				DI::aclFormatter()->toString($profileFieldInput['group_allow'] ?? ''),
+				DI::aclFormatter()->toString($profileFieldInput['circle_allow'] ?? ''),
 				DI::aclFormatter()->toString($profileFieldInput['contact_deny'] ?? ''),
-				DI::aclFormatter()->toString($profileFieldInput['group_deny'] ?? '')
+				DI::aclFormatter()->toString($profileFieldInput['circle_deny'] ?? '')
 			));
 
 			$profileFields->append(DI::profileFieldFactory()->createFromValues(

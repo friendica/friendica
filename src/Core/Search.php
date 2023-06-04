@@ -42,7 +42,7 @@ class Search
 	const DEFAULT_DIRECTORY = 'https://dir.friendica.social';
 
 	const TYPE_PEOPLE = 0;
-	const TYPE_FORUM  = 1;
+	const TYPE_GROUP  = 1;
 	const TYPE_ALL    = 2;
 
 	/**
@@ -55,7 +55,11 @@ class Search
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
+<<<<<<< HEAD
 	public static function getContactsFromProbe(string $user): ResultList
+=======
+	public static function getContactsFromProbe(string $user, $only_group = false): ResultList
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	{
 		$emptyResultList = new ResultList(1, 0, 1);
 
@@ -89,6 +93,38 @@ class Search
 		} else {
 			return $emptyResultList;
 		}
+<<<<<<< HEAD
+=======
+
+		$user_data = Contact::getByURL($user);
+		if (empty($user_data)) {
+			return $emptyResultList;
+		}
+
+		if ($only_group && ($user_data['contact-type'] != Contact::TYPE_COMMUNITY)) {
+			return $emptyResultList;
+		}
+
+		if (!Protocol::supportsProbe($user_data['network'])) {
+			return $emptyResultList;
+		}
+
+		$contactDetails = Contact::getByURLForUser($user_data['url'], DI::userSession()->getLocalUserId());
+
+		$result = new ContactResult(
+			$user_data['name'],
+			$user_data['addr'],
+			$user_data['addr'] ?: $user_data['url'],
+			new Uri($user_data['url']),
+			$user_data['photo'],
+			$user_data['network'],
+			$contactDetails['cid'] ?? 0,
+			$user_data['id'],
+			$user_data['keywords']
+		);
+
+		return new ResultList(1, 1, 1, [$result]);
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	}
 
 	/**
@@ -110,8 +146,8 @@ class Search
 		$searchUrl = $server . '/search';
 
 		switch ($type) {
-			case self::TYPE_FORUM:
-				$searchUrl .= '/forum';
+			case self::TYPE_GROUP:
+				$searchUrl .= '/group';
 				break;
 			case self::TYPE_PEOPLE:
 				$searchUrl .= '/people';
@@ -172,7 +208,7 @@ class Search
 	{
 		Logger::info('Searching', ['search' => $search, 'type' => $type, 'start' => $start, 'itempage' => $itemPage]);
 
-		$contacts = Contact::searchByName($search, $type == self::TYPE_FORUM ? 'community' : '', true);
+		$contacts = Contact::searchByName($search, $type == self::TYPE_GROUP ? 'community' : '', true);
 
 		$resultList = new ResultList($start, $itemPage, count($contacts));
 
@@ -238,7 +274,9 @@ class Search
 					$return = array_map(function ($result) {
 						static $contactType = [
 							'People'       => Contact::TYPE_PERSON,
+							// Kept for backward compatibility
 							'Forum'        => Contact::TYPE_COMMUNITY,
+							'Group'        => Contact::TYPE_COMMUNITY,
 							'Organization' => Contact::TYPE_ORGANISATION,
 							'News'         => Contact::TYPE_NEWS,
 						];

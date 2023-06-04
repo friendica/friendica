@@ -231,6 +231,10 @@ class Import extends \Friendica\BaseModule
 			return;
 		}
 
+		// Backward compatibility
+		$account['circle'] = $account['circle'] ?? $account['group'];
+		$account['circle_member'] = $account['circle_member'] ?? $account['group_member'];
+
 		$oldBaseUrl = $account['baseurl'];
 		$newBaseUrl = (string)$this->baseUrl;
 
@@ -312,35 +316,35 @@ class Import extends \Friendica\BaseModule
 			$this->systemMessages->addNotice($this->tt('%d contact not imported', '%d contacts not imported', $errorCount));
 		}
 
-		array_walk($account['group'], function (&$group) use ($newUid) {
-			$group['uid'] = $newUid;
-			if ($this->dbImportAssoc('group', $group) === false) {
-				$this->logger->warning('Error inserting group', ['name' => $group['name'], 'error' => $this->database->errorMessage()]);
+		array_walk($account['circle'], function (&$circle) use ($newUid) {
+			$circle['uid'] = $newUid;
+			if ($this->dbImportAssoc('group', $circle) === false) {
+				$this->logger->warning('Error inserting circle', ['name' => $circle['name'], 'error' => $this->database->errorMessage()]);
 			} else {
-				$group['newid'] = $this->lastInsertId();
+				$circle['newid'] = $this->lastInsertId();
 			}
 		});
 
-		foreach ($account['group_member'] as $group_member) {
+		foreach ($account['circle_member'] as $circle_member) {
 			$import = 0;
-			foreach ($account['group'] as $group) {
-				if ($group['id'] == $group_member['gid'] && isset($group['newid'])) {
-					$group_member['gid'] = $group['newid'];
+			foreach ($account['circle'] as $circle) {
+				if ($circle['id'] == $circle_member['gid'] && isset($circle['newid'])) {
+					$circle_member['gid'] = $circle['newid'];
 					$import++;
 					break;
 				}
 			}
 
 			foreach ($account['contact'] as $contact) {
-				if ($contact['id'] == $group_member['contact-id'] && isset($contact['newid'])) {
-					$group_member['contact-id'] = $contact['newid'];
+				if ($contact['id'] == $circle_member['contact-id'] && isset($contact['newid'])) {
+					$circle_member['contact-id'] = $contact['newid'];
 					$import++;
 					break;
 				}
 			}
 
-			if ($import == 2 && $this->dbImportAssoc('group_member', $group_member) === false) {
-				$this->logger->warning('Error inserting group member', ['gid' => $group_member['id'], 'error' => $this->database->errorMessage()]);
+			if ($import == 2 && $this->dbImportAssoc('group_member', $circle_member) === false) {
+				$this->logger->warning('Error inserting circle member', ['gid' => $circle_member['id'], 'error' => $this->database->errorMessage()]);
 			}
 		}
 

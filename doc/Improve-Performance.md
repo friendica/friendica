@@ -3,7 +3,7 @@ How to improve the performance of a Friendica site
 
 * [Home](help)
 
-Feel free to ask in the [Friendica support forum](https://forum.friendi.ca/profile/helpers) if you need some clarification about the following instructions or if you need help in any other way.
+Feel free to ask in the [Friendica support group](https://forum.friendi.ca/profile/helpers) if you need some clarification about the following instructions or if you need help in any other way.
 
 System configuration
 --------
@@ -31,7 +31,7 @@ Active the following addons:
 
 ### rendertime
 
-This addon doesn't speed up your system. 
+This addon doesn't speed up your system.
 It helps to analyze your bottlenecks.
 
 When enabled you see some values at the bottom of every page.

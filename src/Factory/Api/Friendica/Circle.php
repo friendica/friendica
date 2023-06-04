@@ -27,7 +27,7 @@ use Friendica\Network\HTTPException;
 use Psr\Log\LoggerInterface;
 use Friendica\Factory\Api\Twitter\User as TwitterUser;
 
-class Group extends BaseFactory
+class Circle extends BaseFactory
 {
 	/** @var twitterUser entity */
 	private $twitterUser;
@@ -43,19 +43,19 @@ class Group extends BaseFactory
 	}
 
 	/**
-	 * @param int $id id of the group
+	 * @param int $id id of the circle
 	 * @return array
 	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public function createFromId(int $id): array
 	{
-		$group = $this->dba->selectFirst('group', [], ['id' => $id, 'deleted' => false]);
-		if (empty($group)) {
+		$circle = $this->dba->selectFirst('group', [], ['id' => $id, 'deleted' => false]);
+		if (empty($circle)) {
 			return [];
 		}
 
-		$user   = $this->twitterUser->createFromUserId($group['uid'])->toArray();
-		$object = new \Friendica\Object\Api\Friendica\Group($group, $user);
+		$user   = $this->twitterUser->createFromUserId($circle['uid'])->toArray();
+		$object = new \Friendica\Object\Api\Friendica\Circle($circle, $user);
 
 		return $object->toArray();
 	}

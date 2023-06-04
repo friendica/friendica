@@ -68,8 +68,8 @@ xml:
 The [RSStoFriendika](https://github.com/pafcu/RSStoFriendika) code can be used as an example of how to use the API with python.
 The lines for posting are located at [line 21](https://github.com/pafcu/RSStoFriendika/blob/master/RSStoFriendika.py#L21) and following.
 
-def tweet(server, message, group_allow=None):
+def tweet(server, message, circle_allow=None):
 url = server + '/api/statuses/update'
-urllib2.urlopen(url, urllib.urlencode({'status': message,'group_allow[]':group_allow}, doseq=True))
+urllib2.urlopen(url, urllib.urlencode({'status': message, 'circle_allow[]': circle_allow}, doseq=True))
 
 There is also a [module for python 3](https://bitbucket.org/tobiasd/python-friendica) for using the API.

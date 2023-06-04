@@ -4,14 +4,14 @@ Frequently Asked Questions - FAQ
 * [Home](help)
 
 * **[Where I can find help?](help/FAQ#help)**
-* **[Why do I getting warnings about certificates?](help/FAQ#ssl)**
+* **[Why do I get warnings about certificates?](help/FAQ#ssl)**
 * **[How can I upload images, files, links, videos and sound files to posts?](help/FAQ#upload)**
 * **[Is it possible to have different avatars per profile?](help/FAQ#avatars)**
 * **[How can I view Friendica in a certain language?](help/FAQ#language)**
 * **[How do blocked, ignored, archived and hidden contacts behave?](help/FAQ#contacts)**
 * **[What happens when an account is removed? Is it truly deleted?](help/FAQ#removed)**
 * **[Can I subscribe to a hashtag?](help/FAQ#hashtag)**
-* **[How to create a RSS feed of the stream?](help/FAQ#rss)**
+* **[How to create an RSS feed of the stream?](help/FAQ#rss)**
 * **[What friendica clients can I use?](help/FAQ#clients)**
 
 
@@ -21,7 +21,7 @@ Frequently Asked Questions - FAQ
 
 If this FAQ does not answer your question you can always reach out to the community via the following options:
 
-  * Friendica Support Forum: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
+  * Friendica Support Group: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
   * Community chat rooms (the IRC, Matrix and XMPP rooms are bridged) these public chats are logged [from IRC](https://gnusociarg.nsupdate.info/2021/%23friendica/) and [Matrix](https://view.matrix.org/alias/%23friendi.ca:matrix.org/)
     * XMPP: support(at)forum.friendi.ca
     * IRC: #friendica at [libera.chat](https://web.libera.chat/?channels=#friendica)
@@ -66,7 +66,7 @@ If this doesn't work, try to add the link by typing: [url=http://example.com]*se
 You can also add video and audio files to posts.
 However, instead of a direct upload you have to use one of the following methods:
 
-1. Add the video or audio link of a hoster (Youtube, Vimeo, Soundcloud and anyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start. SoundCloud directly inserts a player to your post.
+1. Add the video or audio link of a hoster (YouTube, Vimeo, Soundcloud and anyone else with oembed/opengraph-support). Videos will be shown with a preview image you can click on to start. SoundCloud directly inserts a player to your post.
 
 2. If you have your own server, you can upload multimedia files via FTP and insert the URL.
 
@@ -92,7 +92,7 @@ A question mark is required for the separation between url and parameters.
 
 Example:
 
-    https://social.example.com/profile/example 
+    https://social.example.com/profile/example
 
 in German:
 
@@ -107,48 +107,48 @@ When a certain language is forced, the language remains until session is closed.
 
 Direct communication will be blocked.
 Blocked contacts are not included in delivery, and their own posts to you are not imported.
-However their conversations with your friends will still be visible in your stream.
+However, their conversations with your friends will still be visible in your stream.
 If you remove a contact completely, they can send you another friend request.
 Blocked contacts cannot do this. They cannot communicate with you directly, only through friends.
 
 ##### Ignored
 
 Ignored contacts are included in delivery and will receive your posts and private messages.
-However we do not import their posts or private messages to you.
-Like blocking you will still see this person's comments to posts made by your friends.
+However, we do not import their posts or private messages to you.
+Like blocking, you will still see this person's comments to posts made by your friends.
 
 An addon called "blockem" can be installed to collapse/hide all posts from a particular person in your stream if you desire complete blocking of an individual, including their conversations with your other friends.
 
 ##### Archived
 
 Communication is not possible and will not be attempted.
-However unlike blocking, existing posts this person made before being archived will be visible in your stream.
+However, unlike blocking, existing posts this person made before being archived will be visible in your stream.
 
 ##### Hidden
 
 Contact not be displayed in your public friend list.
-However a hidden contact will appear normally in conversations and this may expose their hidden status to anybody who can see the conversation.
+However, a hidden contact will appear normally in conversations and this may expose their hidden status to anybody who can see the conversation.
 
 <a name="removed"></a>
 ### What happens when an account is removed?
 
-If you remove your account, it will be scheduled for permanent deletion in *seven days*. 
-As soon as you activate the deletion process you won't be able to login any more. 
+If you remove your account, it will be scheduled for permanent deletion in *seven days*.
+As soon as you activate the deletion process you won't be able to log in anymore.
 Only the administrator of your node can halt this process prior to permanent deletion.
 
-After the elapsed time of seven days, all your posts, messages, photos, and personal information stored on your node will be deleted. 
-Your node will also issue removal requests to all your contacts; this will also remove your profile from the global directory if you are listed. 
+After the elapsed time of seven days, all your posts, messages, photos, and personal information stored on your node will be deleted.
+Your node will also issue removal requests to all your contacts; this will also remove your profile from the global directory if you are listed.
 Your username cannot be reissued for future sign-ups for security reasons.
 
 <a name="hashtag"></a>
 ### Can I follow a hashtag?
 
-Yes. Simply add the hash tag to your saved searches.
+Yes. Simply add the hashtag to your saved searches.
 The posts will appear on your network page.
 For technical reasons, your answers to such posts won't appear on the "personal" tab in the network page and the whole thread isn't accessible via the API.
 
 <a name="rss"></a>
-### How to create a RSS feed of the stream?
+### How to create an RSS feed of the stream?
 
 If you want to share your public page via rss you can use one of the following links:
 
@@ -191,10 +191,10 @@ The available features are client specific and may differ.
 
 #### iOS
 
-* [Mastodon](https://joinmastodon.org/apps) ([AppStore](https://apps.apple.com/us/app/mastodon-for-iphone/id1571998974))
-* [Stella*](https://www.stella-app.net/) ([AppStore](https://apps.apple.com/us/app/stella-for-mastodon-twitter/id921372048))
-* [Tooot](https://github.com/tooot-app) ([AppStore](https://apps.apple.com/app/id1549772269)
-* [TwidereX](https://github.com/TwidereProject/TwidereX-iOS) ([AppStore](https://apps.apple.com/app/twidere-x/id1530314034))
+* [Mastodon](https://joinmastodon.org/apps) ([App Store](https://apps.apple.com/us/app/mastodon-for-iphone/id1571998974))
+* [Stella*](https://www.stella-app.net/) ([App Store](https://apps.apple.com/us/app/stella-for-mastodon-twitter/id921372048))
+* [Tooot](https://github.com/tooot-app) ([App Store](https://apps.apple.com/app/id1549772269)
+* [TwidereX](https://github.com/TwidereProject/TwidereX-iOS) ([App Store](https://apps.apple.com/app/twidere-x/id1530314034))
 
 #### Linux
 
@@ -206,7 +206,7 @@ The available features are client specific and may differ.
 #### macOS
 
 * [TheDesk](https://thedesk.top/en/) ([GitHub](https://github.com/cutls/TheDesk))
-* [Whalebird](https://whalebird.social/en/desktop/contents) ([AppStore](https://apps.apple.com/de/app/whalebird/id1378283354), [GitHub](https://github.com/h3poteto/whalebird-desktop))
+* [Whalebird](https://whalebird.social/en/desktop/contents) ([App Store](https://apps.apple.com/de/app/whalebird/id1378283354), [GitHub](https://github.com/h3poteto/whalebird-desktop))
 
 #### Windows
 

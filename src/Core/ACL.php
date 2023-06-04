@@ -25,7 +25,7 @@ use Friendica\App\Page;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\User;
 
 /**
@@ -166,12 +166,12 @@ class ACL
 
 		$acl_contacts[] = $acl_yourself;
 
-		$acl_forums = Contact::selectToArray($fields,
+		$acl_groups = Contact::selectToArray($fields,
 			['uid' => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
 			'network' => Protocol::FEDERATED, 'pending' => false, 'contact-type' => Contact::TYPE_COMMUNITY], $params
 		);
 
-		$acl_contacts = array_merge($acl_forums, $acl_contacts);
+		$acl_contacts = array_merge($acl_groups, $acl_contacts);
 
 		array_walk($acl_contacts, function (&$value) {
 			$value['type'] = 'contact';
@@ -181,40 +181,40 @@ class ACL
 	}
 
 	/**
-	 * Returns the ACL list of groups (including meta-groups) for a given user id
+	 * Returns the ACL list of circles (including meta-circles) for a given user id
 	 *
 	 * @param int $user_id
 	 * @return array
 	 */
-	public static function getGroupListByUserId(int $user_id)
+	public static function getCircleListByUserId(int $user_id)
 	{
-		$acl_groups = [
+		$acl_circles = [
 			[
-				'id' => Group::FOLLOWERS,
+				'id' => Circle::FOLLOWERS,
 				'name' => DI::l10n()->t('Followers'),
 				'addr' => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'group',
+				'type' => 'circle',
 			],
 			[
-				'id' => Group::MUTUALS,
+				'id' => Circle::MUTUALS,
 				'name' => DI::l10n()->t('Mutuals'),
 				'addr' => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'group',
+				'type' => 'circle',
 			]
 		];
-		foreach (Group::getByUserId($user_id) as $group) {
-			$acl_groups[] = [
-				'id' => $group['id'],
-				'name' => $group['name'],
+		foreach (Circle::getByUserId($user_id) as $circle) {
+			$acl_circles[] = [
+				'id' => $circle['id'],
+				'name' => $circle['name'],
 				'addr' => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'group',
+				'type' => 'circle',
 			];
 		}
 
-		return $acl_groups;
+		return $acl_circles;
 	}
 
 	/**
@@ -278,7 +278,7 @@ class ACL
 		} else {
 			$visibility = 'public';
 			// Default permission display for custom panel
-			$default_permissions['allow_gid'] = [Group::FOLLOWERS];
+			$default_permissions['allow_gid'] = [Circle::FOLLOWERS];
 		}
 
 		$jotnets_fields = [];
@@ -302,15 +302,15 @@ class ACL
 
 		$acl_contacts = self::getContactListByUserId($user['uid'], $condition);
 
-		$acl_groups = self::getGroupListByUserId($user['uid']);
+		$acl_circles = self::getCircleListByUserId($user['uid']);
 
-		$acl_list = array_merge($acl_groups, $acl_contacts);
+		$acl_list = array_merge($acl_circles, $acl_contacts);
 
 		$input_names = [
 			'visibility'    => $form_prefix ? $form_prefix . '[visibility]'    : 'visibility',
-			'group_allow'   => $form_prefix ? $form_prefix . '[group_allow]'   : 'group_allow',
+			'circle_allow'  => $form_prefix ? $form_prefix . '[circle_allow]'  : 'circle_allow',
 			'contact_allow' => $form_prefix ? $form_prefix . '[contact_allow]' : 'contact_allow',
-			'group_deny'    => $form_prefix ? $form_prefix . '[group_deny]'    : 'group_deny',
+			'circle_deny'   => $form_prefix ? $form_prefix . '[circle_deny]'   : 'circle_deny',
 			'contact_deny'  => $form_prefix ? $form_prefix . '[contact_deny]'  : 'contact_deny',
 			'emailcc'       => $form_prefix ? $form_prefix . '[emailcc]'       : 'emailcc',
 		];
@@ -320,7 +320,7 @@ class ACL
 			'$public_title'   => DI::l10n()->t('Public'),
 			'$public_desc'    => DI::l10n()->t('This content will be shown to all your followers and can be seen in the community pages and by anyone with its link.'),
 			'$custom_title'   => DI::l10n()->t('Limited/Private'),
-			'$custom_desc'    => DI::l10n()->t('This content will be shown only to the people in the first box, to the exception of the people mentioned in the second box. It won\'t appear anywhere public.') . DI::l10n()->t('Start typing the name of a contact or a group to show a filtered list. You can also mention the special groups "Followers" and "Mutuals".'),
+			'$custom_desc'    => DI::l10n()->t('This content will be shown only to the people in the first box, to the exception of the people mentioned in the second box. It won\'t appear anywhere public.') . DI::l10n()->t('Start typing the name of a contact or a circle to show a filtered list. You can also mention the special circles "Followers" and "Mutuals".'),
 			'$allow_label'    => DI::l10n()->t('Show to:'),
 			'$deny_label'     => DI::l10n()->t('Except to:'),
 			'$emailcc'        => DI::l10n()->t('CC: email addresses'),
@@ -328,12 +328,12 @@ class ACL
 			'$jotnets_summary' => DI::l10n()->t('Connectors'),
 			'$visibility'     => $visibility,
 			'$acl_contacts'   => json_encode($acl_contacts),
-			'$acl_groups'     => json_encode($acl_groups),
+			'$acl_circles'    => json_encode($acl_circles),
 			'$acl_list'       => json_encode($acl_list),
 			'$contact_allow'  => implode(',', $default_permissions['allow_cid']),
-			'$group_allow'    => implode(',', $default_permissions['allow_gid']),
+			'$circle_allow'   => implode(',', $default_permissions['allow_gid']),
 			'$contact_deny'   => implode(',', $default_permissions['deny_cid']),
-			'$group_deny'     => implode(',', $default_permissions['deny_gid']),
+			'$circle_deny'    => implode(',', $default_permissions['deny_gid']),
 			'$for_federation' => $for_federation,
 			'$jotnets_fields' => $jotnets_fields,
 			'$input_names'    => $input_names,
@@ -380,7 +380,7 @@ class ACL
 	 * @return bool
 	 * @throws Exception
 	 */
-	public static function isValidGroup($acl_string, $uid)
+	public static function isValidCircle($acl_string, $uid)
 	{
 		if (empty($acl_string)) {
 			return true;
@@ -393,7 +393,7 @@ class ACL
 		$gid_array = $array[0];
 		foreach ($gid_array as $gid) {
 			$gid = str_replace(['<', '>'], ['', ''], $gid);
-			if (!DBA::exists('group', ['id' => $gid, 'uid' => $uid, 'deleted' => false])) {
+			if (!DBA::exists('circle', ['id' => $gid, 'uid' => $uid, 'deleted' => false])) {
 				return false;
 			}
 		}

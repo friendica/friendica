@@ -91,7 +91,7 @@ as the value of $top_child_total (this is done at the end of this file)
 				</a>
 			</div>
 
-			{{* The little overlay avatar picture if someone is posting directly to a wall or a forum *}}
+			{{* The little overlay avatar picture if someone is posting directly to a wall or a group *}}
 			{{if $item.owner_url}}
 			<div aria-hidden="true" class="contact-photo-wrapper mframe wwto" id="wall-item-ownerphoto-wrapper-{{$item.id}}">
 				<a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="contact-photo-link" id="wall-item-ownerphoto-link-{{$item.id}}">

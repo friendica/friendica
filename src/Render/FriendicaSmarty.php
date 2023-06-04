@@ -53,6 +53,10 @@ class FriendicaSmarty extends Smarty
 		$this->setConfigDir($work_dir . '/');
 		$this->setCacheDir($work_dir . '/');
 
+		$this->registerPlugin('modifier', 'is_string', function ($value) {
+			return is_string($value);
+		});
+
 		/*
 		 * Enable sub-directory splitting for reducing directory descriptor
 		 * size. The default behavior is to put all compiled/cached files into

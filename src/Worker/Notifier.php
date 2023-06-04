@@ -29,7 +29,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Conversation;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -167,8 +167,8 @@ class Notifier
 		// Do a PuSH
 		$push_notify = false;
 
-		// Deliver directly to a forum, don't PuSH
-		$direct_forum_delivery = false;
+		// Deliver directly to a group, don't PuSH
+		$direct_group_delivery = false;
 
 		$only_ap_delivery = false;
 
@@ -249,15 +249,15 @@ class Notifier
 				$relay_to_owner = false;
 			}
 
-			// Special treatment for forum posts
-			if (Item::isForumPost($target_item['uri-id'])) {
+			// Special treatment for group posts
+			if (Item::isGroupPost($target_item['uri-id'])) {
 				$relay_to_owner = true;
-				$direct_forum_delivery = true;
+				$direct_group_delivery = true;
 			}
 
-			// Avoid that comments in a forum thread are sent to OStatus
-			if (Item::isForumPost($parent['uri-id'])) {
-				$direct_forum_delivery = true;
+			// Avoid that comments in a group thread are sent to OStatus
+			if (Item::isGroupPost($parent['uri-id'])) {
+				$direct_group_delivery = true;
 			}
 
 			$exclusive_delivery = false;
@@ -303,7 +303,7 @@ class Notifier
 					}
 				}
 
-				if ($direct_forum_delivery) {
+				if ($direct_group_delivery) {
 					$push_notify = false;
 				}
 
@@ -340,9 +340,9 @@ class Notifier
 				$aclFormatter = DI::aclFormatter();
 
 				$allow_people = $aclFormatter->expand($parent['allow_cid']);
-				$allow_groups = Group::expand($uid, $aclFormatter->expand($parent['allow_gid']),true);
+				$allow_circles = Circle::expand($uid, $aclFormatter->expand($parent['allow_gid']),true);
 				$deny_people  = $aclFormatter->expand($parent['deny_cid']);
-				$deny_groups  = Group::expand($uid, $aclFormatter->expand($parent['deny_gid']));
+				$deny_circles  = Circle::expand($uid, $aclFormatter->expand($parent['deny_gid']));
 
 				foreach ($items as $item) {
 					$recipients[] = $item['contact-id'];
@@ -363,8 +363,8 @@ class Notifier
 					Logger::notice('Deliver', ['target' => $target_id, 'guid' => $target_item['guid'], 'recipients' => $url_recipients]);
 				}
 
-				$recipients = array_unique(array_merge($recipients, $allow_people, $allow_groups));
-				$deny = array_unique(array_merge($deny_people, $deny_groups));
+				$recipients = array_unique(array_merge($recipients, $allow_people, $allow_circles));
+				$deny = array_unique(array_merge($deny_people, $deny_circles));
 				$recipients = array_diff($recipients, $deny);
 
 				// If this is a public message and pubmail is set on the parent, include all your email contacts
@@ -793,11 +793,11 @@ class Notifier
 
 		$uid = $target_item['contact-uid'] ?: $target_item['uid'];
 
-		// Update the locally stored follower list when we deliver to a forum
+		// Update the locally stored follower list when we deliver to a group
 		foreach (Tag::getByURIId($target_item['uri-id'], [Tag::MENTION, Tag::EXCLUSIVE_MENTION]) as $tag) {
 			$target_contact = Contact::getByURL(Strings::normaliseLink($tag['url']), null, [], $uid);
 			if ($target_contact && $target_contact['contact-type'] == Contact::TYPE_COMMUNITY && $target_contact['manually-approve']) {
-				Group::updateMembersForForum($target_contact['id']);
+				Circle::updateMembersForGroup($target_contact['id']);
 			}
 		}
 
@@ -822,7 +822,7 @@ class Notifier
 			}
 
 			Logger::info('Remote item will be distributed', ['id' => $target_item['id'], 'url' => $target_item['uri'], 'verb' => $target_item['verb']]);
-			$check_signature = ($target_item['gravity'] == Item::GRAVITY_ACTIVITY); 
+			$check_signature = ($target_item['gravity'] == Item::GRAVITY_ACTIVITY);
 		} else {
 			Logger::info('Remote activity will not be distributed', ['id' => $target_item['id'], 'url' => $target_item['uri'], 'verb' => $target_item['verb']]);
 			return ['count' => 0, 'contacts' => []];

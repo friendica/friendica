@@ -34,16 +34,16 @@ use Friendica\Protocol\ActivityPub;
 /**
  * functions for interacting with the group database table
  */
-class Group
+class Circle
 {
 	const FOLLOWERS = '~';
 	const MUTUALS = '&';
 
 	/**
-	 * Fetches group record by user id and maybe includes deleted groups as well
+	 * Fetches circle record by user id and maybe includes deleted circles as well
 	 *
-	 * @param int  $uid User id to fetch group(s) for
-	 * @param bool $includesDeleted Whether deleted groups should be included
+	 * @param int  $uid User id to fetch circle(s) for
+	 * @param bool $includesDeleted Whether deleted circles should be included
 	 * @return array|bool Array on success, bool on error
 	 */
 	public static function getByUserId(int $uid, bool $includesDeleted = false)
@@ -58,16 +58,16 @@ class Group
 	}
 
 	/**
-	 * Checks whether given group id is found in database
+	 * Checks whether given circle id is found in database
 	 *
-	 * @param int $group_id Group id
+	 * @param int $circle_id Circle id
 	 * @param int $uid Optional user id
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public static function exists(int $group_id, int $uid = null): bool
+	public static function exists(int $circle_id, int $uid = null): bool
 	{
-		$condition = ['id' => $group_id, 'deleted' => false];
+		$condition = ['id' => $circle_id, 'deleted' => false];
 
 		if (!is_null($uid)) {
 			$condition = [
@@ -79,13 +79,13 @@ class Group
 	}
 
 	/**
-	 * Create a new contact group
+	 * Create a new contact circle
 	 *
-	 * Note: If we found a deleted group with the same name, we restore it
+	 * Note: If we found a deleted circle with the same name, we restore it
 	 *
-	 * @param int    $uid User id to create group for
-	 * @param string $name Name of group
-	 * @return int|boolean Id of newly created group or false on error
+	 * @param int    $uid User id to create circle for
+	 * @param string $name Name of circle
+	 * @return int|boolean Id of newly created circle or false on error
 	 * @throws \Exception
 	 */
 	public static function create(int $uid, string $name)
@@ -95,14 +95,14 @@ class Group
 			$gid = self::getIdByName($uid, $name); // check for dupes
 			if ($gid !== false) {
 				// This could be a problem.
-				// Let's assume we've just created a group which we once deleted
-				// all the old members are gone, but the group remains so we don't break any security
-				// access lists. What we're doing here is reviving the dead group, but old content which
-				// was restricted to this group may now be seen by the new group members.
-				$group = DBA::selectFirst('group', ['deleted'], ['id' => $gid]);
-				if (DBA::isResult($group) && $group['deleted']) {
+				// Let's assume we've just created a circle which we once deleted
+				// all the old members are gone, but the circle remains, so we don't break any security
+				// access lists. What we're doing here is reviving the dead circle, but old content which
+				// was restricted to this circle may now be seen by the new circle members.
+				$circle = DBA::selectFirst('group', ['deleted'], ['id' => $gid]);
+				if (DBA::isResult($circle) && $circle['deleted']) {
 					DBA::update('group', ['deleted' => 0], ['id' => $gid]);
-					DI::sysmsg()->addNotice(DI::l10n()->t('A deleted group with this name was revived. Existing item permissions <strong>may</strong> apply to this group and any future members. If this is not what you intended, please create another group with a different name.'));
+					DI::sysmsg()->addNotice(DI::l10n()->t('A deleted circle with this name was revived. Existing item permissions <strong>may</strong> apply to this circle and any future members. If this is not what you intended, please create another circle with a different name.'));
 				}
 				return true;
 			}
@@ -116,10 +116,10 @@ class Group
 	}
 
 	/**
-	 * Update group information.
+	 * Update circle information.
 	 *
-	 * @param int    $id   Group ID
-	 * @param string $name Group name
+	 * @param int    $id   Circle ID
+	 * @param string $name Circle name
 	 *
 	 * @return bool Was the update successful?
 	 * @throws \Exception
@@ -130,10 +130,10 @@ class Group
 	}
 
 	/**
-	 * Get a list of group ids a contact belongs to
+	 * Get a list of circle ids a contact belongs to
 	 *
 	 * @param int $cid Contact id
-	 * @return array Group ids
+	 * @return array Circle ids
 	 * @throws \Exception
 	 */
 	public static function getIdsByContactId(int $cid): array
@@ -143,50 +143,50 @@ class Group
 			return [];
 		}
 
-		$groupIds = [];
+		$circleIds = [];
 
 		$stmt = DBA::select('group_member', ['gid'], ['contact-id' => $cid]);
-		while ($group = DBA::fetch($stmt)) {
-			$groupIds[] = $group['gid'];
+		while ($circle = DBA::fetch($stmt)) {
+			$circleIds[] = $circle['gid'];
 		}
 		DBA::close($stmt);
 
-		// Meta-groups
+		// Meta-circles
 		if ($contact['rel'] == Contact::FOLLOWER || $contact['rel'] == Contact::FRIEND) {
-			$groupIds[] = self::FOLLOWERS;
+			$circleIds[] = self::FOLLOWERS;
 		}
 
 		if ($contact['rel'] == Contact::FRIEND) {
-			$groupIds[] = self::MUTUALS;
+			$circleIds[] = self::MUTUALS;
 		}
 
-		return $groupIds;
+		return $circleIds;
 	}
 
 	/**
-	 * count unread group items
+	 * count unread circle items
 	 *
-	 * Count unread items of each groups of the local user
+	 * Count unread items of each circle of the local user
 	 *
 	 * @return array
-	 *    'id' => group id
-	 *    'name' => group name
-	 *    'count' => counted unseen group items
+	 *    'id' => circle id
+	 *    'name' => circle name
+	 *    'count' => counted unseen circle items
 	 * @throws \Exception
 	 */
 	public static function countUnseen()
 	{
-		$stmt = DBA::p("SELECT `group`.`id`, `group`.`name`,
+		$stmt = DBA::p("SELECT `circle`.`id`, `circle`.`name`,
 				(SELECT COUNT(*) FROM `post-user`
 					WHERE `uid` = ?
 					AND `unseen`
 					AND `contact-id` IN
 						(SELECT `contact-id`
-						FROM `group_member`
-						WHERE `group_member`.`gid` = `group`.`id`)
+						FROM `group_member` AS `circle_member`
+						WHERE `circle_member`.`gid` = `circle`.`id`)
 					) AS `count`
-				FROM `group`
-				WHERE `group`.`uid` = ?;",
+				FROM `group` AS `circle`
+				WHERE `circle`.`uid` = ?;",
 			DI::userSession()->getLocalUserId(),
 			DI::userSession()->getLocalUserId()
 		);
@@ -195,13 +195,13 @@ class Group
 	}
 
 	/**
-	 * Get the group id for a user/name couple
+	 * Get the circle id for a user/name couple
 	 *
-	 * Returns false if no group has been found.
+	 * Returns false if no circle has been found.
 	 *
 	 * @param int    $uid User id
-	 * @param string $name Group name
-	 * @return int|boolean Groups' id number or false on error
+	 * @param string $name Circle name
+	 * @return int|boolean Circle's id number or false on error
 	 * @throws \Exception
 	 */
 	public static function getIdByName(int $uid, string $name)
@@ -210,16 +210,16 @@ class Group
 			return false;
 		}
 
-		$group = DBA::selectFirst('group', ['id'], ['uid' => $uid, 'name' => $name]);
-		if (DBA::isResult($group)) {
-			return $group['id'];
+		$circle = DBA::selectFirst('group', ['id'], ['uid' => $uid, 'name' => $name]);
+		if (DBA::isResult($circle)) {
+			return $circle['id'];
 		}
 
 		return false;
 	}
 
 	/**
-	 * Mark a group as deleted
+	 * Mark a circle as deleted
 	 *
 	 * @param int $gid
 	 * @return boolean
@@ -231,13 +231,13 @@ class Group
 			return false;
 		}
 
-		$group = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
-		if (!DBA::isResult($group)) {
+		$circle = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
+		if (!DBA::isResult($circle)) {
 			return false;
 		}
 
-		// remove group from default posting lists
-		$user = DBA::selectFirst('user', ['def_gid', 'allow_gid', 'deny_gid'], ['uid' => $group['uid']]);
+		// remove circle from default posting lists
+		$user = DBA::selectFirst('user', ['def_gid', 'allow_gid', 'deny_gid'], ['uid' => $circle['uid']]);
 		if (DBA::isResult($user)) {
 			$change = false;
 
@@ -255,21 +255,21 @@ class Group
 			}
 
 			if ($change) {
-				DBA::update('user', $user, ['uid' => $group['uid']]);
+				DBA::update('user', $user, ['uid' => $circle['uid']]);
 			}
 		}
 
 		// remove all members
 		DBA::delete('group_member', ['gid' => $gid]);
 
-		// remove group
+		// remove circle
 		$return = DBA::update('group', ['deleted' => 1], ['id' => $gid]);
 
 		return $return;
 	}
 
 	/**
-	 * Adds a contact to a group
+	 * Adds a contact to a circle
 	 *
 	 * @param int $gid
 	 * @param int $cid
@@ -283,12 +283,12 @@ class Group
 		}
 
 		// @TODO Backward compatibility with user contacts, remove by version 2022.03
-		$group = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
-		if (empty($group)) {
-			throw new HTTPException\NotFoundException('Group not found.');
+		$circle = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
+		if (empty($circle)) {
+			throw new HTTPException\NotFoundException('Circle not found.');
 		}
 
-		$cdata = Contact::getPublicAndUserContactID($cid, $group['uid']);
+		$cdata = Contact::getPublicAndUserContactID($cid, $circle['uid']);
 		if (empty($cdata['user'])) {
 			throw new HTTPException\NotFoundException('Invalid contact.');
 		}
@@ -297,7 +297,7 @@ class Group
 	}
 
 	/**
-	 * Removes a contact from a group
+	 * Removes a contact from a circle
 	 *
 	 * @param int $gid
 	 * @param int $cid
@@ -311,12 +311,12 @@ class Group
 		}
 
 		// @TODO Backward compatibility with user contacts, remove by version 2022.03
-		$group = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
-		if (empty($group)) {
-			throw new HTTPException\NotFoundException('Group not found.');
+		$circle = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
+		if (empty($circle)) {
+			throw new HTTPException\NotFoundException('Circle not found.');
 		}
 
-		$cdata = Contact::getPublicAndUserContactID($cid, $group['uid']);
+		$cdata = Contact::getPublicAndUserContactID($cid, $circle['uid']);
 		if (empty($cdata['user'])) {
 			throw new HTTPException\NotFoundException('Invalid contact.');
 		}
@@ -325,7 +325,7 @@ class Group
 	}
 
 	/**
-	 * Adds contacts to a group
+	 * Adds contacts to a circle
 	 *
 	 * @param int $gid
 	 * @param array $contacts Array with contact ids
@@ -339,13 +339,13 @@ class Group
 		}
 
 		// @TODO Backward compatibility with user contacts, remove by version 2022.03
-		$group = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
-		if (empty($group)) {
-			throw new HTTPException\NotFoundException('Group not found.');
+		$circle = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
+		if (empty($circle)) {
+			throw new HTTPException\NotFoundException('Circle not found.');
 		}
 
 		foreach ($contacts as $cid) {
-			$cdata = Contact::getPublicAndUserContactID($cid, $group['uid']);
+			$cdata = Contact::getPublicAndUserContactID($cid, $circle['uid']);
 			if (empty($cdata['user'])) {
 				throw new HTTPException\NotFoundException('Invalid contact.');
 			}
@@ -355,9 +355,9 @@ class Group
 	}
 
 	/**
-	 * Removes contacts from a group
+	 * Removes contacts from a circle
 	 *
-	 * @param int $gid Group id
+	 * @param int $gid Circle id
 	 * @param array $contacts Contact ids
 	 * @return bool
 	 * @throws \Exception
@@ -369,15 +369,15 @@ class Group
 		}
 
 		// @TODO Backward compatibility with user contacts, remove by version 2022.03
-		$group = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
-		if (empty($group)) {
-			throw new HTTPException\NotFoundException('Group not found.');
+		$circle = DBA::selectFirst('group', ['uid'], ['id' => $gid]);
+		if (empty($circle)) {
+			throw new HTTPException\NotFoundException('Circle not found.');
 		}
 
 		$contactIds = [];
 
 		foreach ($contacts as $cid) {
-			$cdata = Contact::getPublicAndUserContactID($cid, $group['uid']);
+			$cdata = Contact::getPublicAndUserContactID($cid, $circle['uid']);
 			if (empty($cdata['user'])) {
 				throw new HTTPException\NotFoundException('Invalid contact.');
 			}
@@ -390,8 +390,9 @@ class Group
 	}
 
 	/**
-	 * Returns the combined list of contact ids from a group id list
+	 * Returns the combined list of contact ids from a circle id list
 	 *
+<<<<<<< HEAD:src/Model/Group.php
 	 * @param int     $uid User id
 	 * @param array   $group_ids Groups ids
 	 * @param boolean $check_dead Whether check "dead" records (?)
@@ -399,8 +400,18 @@ class Group
 	 * @throws \Exception
 	 */
 	public static function expand(int $uid, array $group_ids, bool $check_dead = false): array
+=======
+	 * @param int     $uid              User id
+	 * @param array   $circle_ids        Circles ids
+	 * @param boolean $check_dead       Whether check "dead" records (?)
+	 * @param boolean $expand_followers Expand the list of followers
+	 * @return array
+	 * @throws \Exception
+	 */
+	public static function expand(int $uid, array $circle_ids, bool $check_dead = false, bool $expand_followers = true): array
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Model/Circle.php
 	{
-		if (!is_array($group_ids) || !count($group_ids)) {
+		if (!is_array($circle_ids) || !count($circle_ids)) {
 			return [];
 		}
 
@@ -417,7 +428,7 @@ class Group
 			$networks = array_diff($networks, [Protocol::MAIL]);
 		}
 
-		$key = array_search(self::FOLLOWERS, $group_ids);
+		$key = array_search(self::FOLLOWERS, $circle_ids);
 		if ($key !== false) {
 			$followers = Contact::selectToArray(['id'], [
 				'uid' => $uid,
@@ -432,11 +443,15 @@ class Group
 			foreach ($followers as $follower) {
 				$return[] = $follower['id'];
 			}
+<<<<<<< HEAD:src/Model/Group.php
 
 			unset($group_ids[$key]);
+=======
+			unset($circle_ids[$key]);
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Model/Circle.php
 		}
 
-		$key = array_search(self::MUTUALS, $group_ids);
+		$key = array_search(self::MUTUALS, $circle_ids);
 		if ($key !== false) {
 			$mutuals = Contact::selectToArray(['id'], [
 				'uid' => $uid,
@@ -452,12 +467,12 @@ class Group
 				$return[] = $mutual['id'];
 			}
 
-			unset($group_ids[$key]);
+			unset($circle_ids[$key]);
 		}
 
-		$stmt = DBA::select('group_member', ['contact-id'], ['gid' => $group_ids]);
-		while ($group_member = DBA::fetch($stmt)) {
-			$return[] = $group_member['contact-id'];
+		$stmt = DBA::select('group_member', ['contact-id'], ['gid' => $circle_ids]);
+		while ($circle_member = DBA::fetch($stmt)) {
+			$return[] = $circle_member['contact-id'];
 		}
 		DBA::close($stmt);
 
@@ -469,17 +484,17 @@ class Group
 	}
 
 	/**
-	 * Returns a templated group selection list
+	 * Returns a templated circle selection list
 	 *
 	 * @param int    $uid User id
-	 * @param int    $gid   An optional pre-selected group
+	 * @param int    $gid   An optional pre-selected circle
 	 * @param string $label An optional label of the list
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function displayGroupSelection(int $uid, int $gid = 0, string $label = ''): string
+	public static function getSelectorHTML(int $uid, int $gid = 0, string $label = ''): string
 	{
-		$display_groups = [
+		$display_circles = [
 			[
 				'name' => '',
 				'id' => '0',
@@ -488,53 +503,53 @@ class Group
 		];
 
 		$stmt = DBA::select('group', [], ['deleted' => false, 'uid' => $uid, 'cid' => null], ['order' => ['name']]);
-		while ($group = DBA::fetch($stmt)) {
-			$display_groups[] = [
-				'name' => $group['name'],
-				'id' => $group['id'],
-				'selected' => $gid == $group['id'] ? 'true' : ''
+		while ($circle = DBA::fetch($stmt)) {
+			$display_circles[] = [
+				'name' => $circle['name'],
+				'id' => $circle['id'],
+				'selected' => $gid == $circle['id'] ? 'true' : ''
 			];
 		}
 		DBA::close($stmt);
 
-		Logger::info('Got groups', $display_groups);
+		Logger::info('Got circles', $display_circles);
 
 		if ($label == '') {
-			$label = DI::l10n()->t('Default privacy group for new contacts');
+			$label = DI::l10n()->t('Default privacy circle for new contacts');
 		}
 
-		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('group_selection.tpl'), [
+		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('circle_selection.tpl'), [
 			'$label' => $label,
-			'$groups' => $display_groups
+			'$circles' => $display_circles
 		]);
 		return $o;
 	}
 
 	/**
-	 * Create group sidebar widget
+	 * Create circle sidebar widget
 	 *
 	 * @param string $every
 	 * @param string $each
 	 * @param string $editmode
-	 *    'standard' => include link 'Edit groups'
-	 *    'extended' => include link 'Create new group'
-	 *    'full' => include link 'Create new group' and provide for each group a link to edit this group
-	 * @param string|int $group_id Distinct group id or 'everyone'
+	 *    'standard' => include link 'Edit circles'
+	 *    'extended' => include link 'Create new circle'
+	 *    'full' => include link 'Create new circle' and provide for each circle a link to edit this circle
+	 * @param string|int $circle_id Distinct circle id or 'everyone'
 	 * @param int    $cid Contact id
 	 * @return string Sidebar widget HTML code
 	 * @throws \Exception
 	 */
-	public static function sidebarWidget(string $every = 'contact', string $each = 'group', string $editmode = 'standard', $group_id = '', int $cid = 0)
+	public static function sidebarWidget(string $every = 'contact', string $each = 'circle', string $editmode = 'standard', $circle_id = '', int $cid = 0)
 	{
 		if (!DI::userSession()->getLocalUserId()) {
 			return '';
 		}
 
-		$display_groups = [
+		$display_circles = [
 			[
 				'text' => DI::l10n()->t('Everybody'),
 				'id' => 0,
-				'selected' => (($group_id === 'everyone') ? 'group-selected' : ''),
+				'selected' => (($circle_id === 'everyone') ? 'circle-selected' : ''),
 				'href' => $every,
 			]
 		];
@@ -545,77 +560,77 @@ class Group
 		}
 
 		$stmt = DBA::select('group', [], ['deleted' => false, 'uid' => DI::userSession()->getLocalUserId(), 'cid' => null], ['order' => ['name']]);
-		while ($group = DBA::fetch($stmt)) {
-			$selected = (($group_id == $group['id']) ? ' group-selected' : '');
+		while ($circle = DBA::fetch($stmt)) {
+			$selected = (($circle_id == $circle['id']) ? ' circle-selected' : '');
 
 			if ($editmode == 'full') {
-				$groupedit = [
-					'href' => 'group/' . $group['id'],
+				$circleedit = [
+					'href' => 'circle/' . $circle['id'],
 					'title' => DI::l10n()->t('edit'),
 				];
 			} else {
-				$groupedit = null;
+				$circleedit = null;
 			}
 
-			if ($each == 'group') {
-				$count = DBA::count('group_member', ['gid' => $group['id']]);
-				$group_name = sprintf('%s (%d)', $group['name'], $count);
+			if ($each == 'circle') {
+				$count = DBA::count('group_member', ['gid' => $circle['id']]);
+				$circle_name = sprintf('%s (%d)', $circle['name'], $count);
 			} else {
-				$group_name = $group['name'];
+				$circle_name = $circle['name'];
 			}
 
-			$display_groups[] = [
-				'id'   => $group['id'],
+			$display_circles[] = [
+				'id'   => $circle['id'],
 				'cid'  => $cid,
-				'text' => $group_name,
-				'href' => $each . '/' . $group['id'],
-				'edit' => $groupedit,
+				'text' => $circle_name,
+				'href' => $each . '/' . $circle['id'],
+				'edit' => $circleedit,
 				'selected' => $selected,
-				'ismember' => in_array($group['id'], $member_of),
+				'ismember' => in_array($circle['id'], $member_of),
 			];
 		}
 		DBA::close($stmt);
 
-		// Don't show the groups on the network page when there is only one
-		if ((count($display_groups) <= 2) && ($each == 'network')) {
+		// Don't show the circles on the network page when there is only one
+		if ((count($display_circles) <= 2) && ($each == 'network')) {
 			return '';
 		}
 
-		$tpl = Renderer::getMarkupTemplate('group_side.tpl');
+		$tpl = Renderer::getMarkupTemplate('circle_side.tpl');
 		$o = Renderer::replaceMacros($tpl, [
 			'$add' => DI::l10n()->t('add'),
-			'$title' => DI::l10n()->t('Groups'),
-			'$groups' => $display_groups,
-			'newgroup' => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
-			'grouppage' => 'group/',
-			'$edittext' => DI::l10n()->t('Edit group'),
-			'$ungrouped' => $every === 'contact' ? DI::l10n()->t('Contacts not in any group') : '',
-			'$ungrouped_selected' => (($group_id === 'none') ? 'group-selected' : ''),
-			'$createtext' => DI::l10n()->t('Create a new group'),
-			'$creategroup' => DI::l10n()->t('Group Name: '),
-			'$editgroupstext' => DI::l10n()->t('Edit groups'),
-			'$form_security_token' => BaseModule::getFormSecurityToken('group_edit'),
+			'$title' => DI::l10n()->t('Circles'),
+			'$circles' => $display_circles,
+			'$new_circle' => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
+			'$circle_page' => 'circle/',
+			'$edittext' => DI::l10n()->t('Edit circle'),
+			'$uncircled' => $every === 'contact' ? DI::l10n()->t('Contacts not in any circle') : '',
+			'$uncircled_selected' => (($circle_id === 'none') ? 'circle-selected' : ''),
+			'$createtext' => DI::l10n()->t('Create a new circle'),
+			'$create_circle' => DI::l10n()->t('Circle Name: '),
+			'$edit_circles_text' => DI::l10n()->t('Edit circles'),
+			'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
 		]);
 
 		return $o;
 	}
 
 	/**
-	 * Fetch the group id for the given contact id
+	 * Fetch the circle id for the given contact id
 	 *
 	 * @param integer $id Contact ID
-	 * @return integer Group IO
+	 * @return integer Circle ID
 	 */
-	public static function getIdForForum(int $id): int
+	public static function getIdForGroup(int $id): int
 	{
-		Logger::info('Get id for forum id', ['id' => $id]);
+		Logger::info('Get id for group id', ['id' => $id]);
 		$contact = Contact::getById($id, ['uid', 'name', 'contact-type', 'manually-approve']);
 		if (empty($contact) || ($contact['contact-type'] != Contact::TYPE_COMMUNITY) || !$contact['manually-approve']) {
 			return 0;
 		}
 
-		$group = DBA::selectFirst('group', ['id'], ['uid' => $contact['uid'], 'cid' => $id]);
-		if (empty($group)) {
+		$circle = DBA::selectFirst('group', ['id'], ['uid' => $contact['uid'], 'cid' => $id]);
+		if (empty($circle)) {
 			$fields = [
 				'uid'  => $contact['uid'],
 				'name' => $contact['name'],
@@ -624,21 +639,21 @@ class Group
 			DBA::insert('group', $fields);
 			$gid = DBA::lastInsertId();
 		} else {
-			$gid = $group['id'];
+			$gid = $circle['id'];
 		}
 
 		return $gid;
 	}
 
 	/**
-	 * Fetch the followers of a given contact id and store them as group members
+	 * Fetch the followers of a given contact id and store them as circle members
 	 *
 	 * @param integer $id Contact ID
 	 * @return void
 	 */
-	public static function updateMembersForForum(int $id)
+	public static function updateMembersForGroup(int $id)
 	{
-		Logger::info('Update forum members', ['id' => $id]);
+		Logger::info('Update group members', ['id' => $id]);
 
 		$contact = Contact::getById($id, ['uid', 'url']);
 		if (empty($contact)) {
@@ -650,14 +665,14 @@ class Group
 			return;
 		}
 
-		$gid = self::getIdForForum($id);
+		$gid = self::getIdForGroup($id);
 		if (empty($gid)) {
 			return;
 		}
 
-		$group_members = DBA::selectToArray('group_member', ['contact-id'], ['gid' => $gid]);
-		if (!empty($group_members)) {
-			$current = array_unique(array_column($group_members, 'contact-id'));
+		$circle_members = DBA::selectToArray('group_member', ['contact-id'], ['gid' => $gid]);
+		if (!empty($circle_members)) {
+			$current = array_unique(array_column($circle_members, 'contact-id'));
 		} else {
 			$current = [];
 		}
@@ -673,6 +688,6 @@ class Group
 		}
 
 		DBA::delete('group_member', ['gid' => $gid, 'contact-id' => $current]);
-		Logger::info('Updated forum members', ['id' => $id, 'count' => DBA::count('group_member', ['gid' => $gid])]);
+		Logger::info('Updated group members', ['id' => $id, 'count' => DBA::count('group_member', ['gid' => $gid])]);
 	}
 }

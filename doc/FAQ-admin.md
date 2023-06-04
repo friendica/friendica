@@ -48,4 +48,8 @@ You can manually execute the structure update from the CLI in the base directory
 
     bin/console dbstructure update
 
+<<<<<<< HEAD
 if there occur any errors, please contact the [support forum](https://forum.friendi.ca/profile/helpers).
+=======
+if there occur any errors, please contact the [support group](https://forum.friendi.ca/profile/helpers).
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2

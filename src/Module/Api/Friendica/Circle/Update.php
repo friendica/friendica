@@ -19,17 +19,19 @@
  *
  */
 
-namespace Friendica\Module\Api\Friendica\Group;
+namespace Friendica\Module\Api\Friendica\Circle;
 
 use Friendica\Database\DBA;
-use Friendica\Model\Group;
+use Friendica\Model\Contact;
+use Friendica\Model\Circle;
 use Friendica\Module\BaseApi;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\BadRequestException;
 
 /**
- * API endpoint: /api/friendica/group_create
+ * API endpoint: /api/friendica/circle_update
+ * API endpoint: /api/friendica/group_update
  */
-class Create extends BaseApi
+class Update extends BaseApi
 {
 	protected function post(array $request = [])
 	{
@@ -37,31 +39,32 @@ class Create extends BaseApi
 		$uid = BaseApi::getCurrentUserID();
 
 		// params
+		$gid   = $this->getRequestValue($request, 'gid', 0);
 		$name  = $this->getRequestValue($request, 'name', '');
 		$json  = json_decode($request['json'], true);
 		$users = $json['user'];
 
 		// error if no name specified
-		if ($name == '') {
-			throw new HTTPException\BadRequestException('group name not specified');
+		if (!$name) {
+			throw new BadRequestException('circle name not specified');
 		}
 
-		// error message if specified group name already exists
-		if (DBA::exists('group', ['uid' => $uid, 'name' => $name, 'deleted' => false])) {
-			throw new HTTPException\BadRequestException('group name already exists');
+		// error if no gid specified
+		if (!$gid) {
+			throw new BadRequestException('gid not specified');
 		}
 
-		// Check if the group needs to be reactivated
-		if (DBA::exists('group', ['uid' => $uid, 'name' => $name, 'deleted' => true])) {
-			$reactivate_group = true;
-		}
-
-		// create group
-		$ret = Group::create($uid, $name);
-		if ($ret) {
-			$gid = Group::getIdByName($uid, $name);
-		} else {
-			throw new HTTPException\BadRequestException('other API error');
+		// remove members
+		$members = Contact\Circle::getById($gid);
+		foreach ($members as $member) {
+			$cid = $member['id'];
+			foreach ($users as $user) {
+				$found = $user['cid'] == $cid;
+			}
+			if (!isset($found) || !$found) {
+				$gid = Circle::getIdByName($uid, $name);
+				Circle::removeMember($gid, $cid);
+			}
 		}
 
 		// add members
@@ -69,8 +72,9 @@ class Create extends BaseApi
 		$errorusers      = [];
 		foreach ($users as $user) {
 			$cid = $user['cid'];
+
 			if (DBA::exists('contact', ['id' => $cid, 'uid' => $uid])) {
-				Group::addMember($gid, $cid);
+				Circle::addMember($gid, $cid);
 			} else {
 				$erroraddinguser = true;
 				$errorusers[]    = $cid;
@@ -78,10 +82,8 @@ class Create extends BaseApi
 		}
 
 		// return success message incl. missing users in array
-		$status = ($erroraddinguser ? 'missing user' : ((isset($reactivate_group) && $reactivate_group) ? 'reactivated' : 'ok'));
-
-		$result = ['success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers];
-
-		$this->response->exit('group_create', ['$result' => $result], $this->parameters['extension'] ?? null);
+		$status  = ($erroraddinguser ? 'missing user' : 'ok');
+		$success = ['success' => true, 'gid' => $gid, 'name' => $name, 'status' => $status, 'wrong users' => $errorusers];
+		$this->response->exit('group_update', ['$result' => $success], $this->parameters['extension'] ?? null);
 	}
 }

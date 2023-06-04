@@ -165,7 +165,7 @@ class Conversations extends BaseProfile
 			$o .= $this->conversation->statusEditor($x);
 		}
 
-		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched his/her groups
+		// Get permissions SQL - if $remote_contact is true, our remote user has been pre-verified and we already have fetched their circles
 		$condition = Item::getPermissionsConditionArrayByUserId($profile['uid']);
 
 		$last_updated_array = $this->session->get('last_updated', []);
@@ -188,7 +188,7 @@ class Conversations extends BaseProfile
 			$condition = DBA::mergeConditions($condition, ["`received` >= ?", DateTimeFormat::convert($datequery2, 'UTC', $this->app->getTimeZone())]);
 		}
 
-		// Does the profile page belong to a forum?
+		// Does the profile page belong to a group?
 		// If not then we can improve the performance with an additional condition
 		if ($profile['account-type'] != User::ACCOUNT_TYPE_COMMUNITY) {
 			$condition = DBA::mergeConditions($condition, ['contact-id' => $profile['id']]);

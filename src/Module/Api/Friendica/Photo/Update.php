@@ -79,8 +79,8 @@ class Update extends BaseApi
 		$acl_input_error = false;
 		$acl_input_error |= !ACL::isValidContact($allow_cid, $uid);
 		$acl_input_error |= !ACL::isValidContact($deny_cid, $uid);
-		$acl_input_error |= !ACL::isValidGroup($allow_gid, $uid);
-		$acl_input_error |= !ACL::isValidGroup($deny_gid, $uid);
+		$acl_input_error |= !ACL::isValidCircle($allow_gid, $uid);
+		$acl_input_error |= !ACL::isValidCircle($deny_gid, $uid);
 		if ($acl_input_error) {
 			throw new HTTPException\BadRequestException('acl data invalid');
 		}

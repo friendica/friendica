@@ -29,21 +29,21 @@ use Friendica\DI;
 use Friendica\Model\Contact;
 
 /**
- * This class handles methods related to the forum functionality
+ * This class handles methods related to the group functionality
  */
-class ForumManager
+class GroupManager
 {
 	/**
-	 * Function to list all forums a user is connected with
+	 * Function to list all groups a user is connected with
 	 *
 	 * @param int     $uid         of the profile owner
 	 * @param boolean $lastitem    Sort by lastitem
-	 * @param boolean $showhidden  Show forums which are not hidden
+	 * @param boolean $showhidden  Show groups which are not hidden
 	 * @param boolean $showprivate Show private groups
 	 *
 	 * @return array
-	 *    'url'    => forum url
-	 *    'name'    => forum name
+	 *    'url'    => group url
+	 *    'name'    => group name
 	 *    'id'    => number of the key from the array
 	 *    'micro' => contact photo in format micro
 	 *    'thumb' => contact photo in format thumb
@@ -76,16 +76,16 @@ class ForumManager
 			$condition = DBA::mergeConditions($condition, ['hidden' => false]);
 		}
 
-		$forumlist = [];
+		$groupList = [];
 
 		$fields = ['id', 'url', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
 		$contacts = DBA::select('account-user-view', $fields, $condition, $params);
 		if (!$contacts) {
-			return($forumlist);
+			return $groupList;
 		}
 
 		while ($contact = DBA::fetch($contacts)) {
-			$forumlist[] = [
+			$groupList[] = [
 				'url'	=> $contact['url'],
 				'name'	=> $contact['name'],
 				'id'	=> $contact['id'],
@@ -95,19 +95,19 @@ class ForumManager
 		}
 		DBA::close($contacts);
 
-		return($forumlist);
+		return($groupList);
 	}
 
 
 	/**
-	 * Forumlist widget
+	 * Group list widget
 	 *
-	 * Sidebar widget to show subscribed friendica forums. If activated
-	 * in the settings, it appears at the notwork page sidebar
+	 * Sidebar widget to show subscribed Friendica groups. If activated
+	 * in the settings, it appears in the network page sidebar
 	 *
 	 * @param string $baseurl Base module path
 	 * @param int    $uid     The ID of the User
-	 * @param int    $cid     The contact id which is used to mark a forum as "selected"
+	 * @param int    $cid     The contact id which is used to mark a group as "selected"
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
@@ -121,7 +121,7 @@ class ForumManager
 
 		$contacts = self::getList($uid, $lastitem, true, true);
 		$total = count($contacts);
-		$visible_forums = 10;
+		$visibleGroups = 10;
 
 		if (DBA::isResult($contacts)) {
 			$id = 0;
@@ -129,7 +129,7 @@ class ForumManager
 			$entries = [];
 
 			foreach ($contacts as $contact) {
-				$selected = (($cid == $contact['id']) ? ' forum-selected' : '');
+				$selected = (($cid == $contact['id']) ? ' group-selected' : '');
 
 				$entry = [
 					'url' => $baseurl . '/' . $contact['id'],
@@ -143,17 +143,23 @@ class ForumManager
 				$entries[] = $entry;
 			}
 
-			$tpl = Renderer::getMarkupTemplate('widget_forumlist.tpl');
+			$tpl = Renderer::getMarkupTemplate('widget/group_list.tpl');
 
 			$o .= Renderer::replaceMacros(
 				$tpl,
 				[
+<<<<<<< HEAD:src/Content/ForumManager.php
 					'$title'	=> DI::l10n()->t('Forums'),
 					'$forums'	=> $entries,
 					'$forums_page' => 'register/',
 					'$link_desc'	=> DI::l10n()->t('External link to forum'),
+=======
+					'$title'	=> DI::l10n()->t('Groups'),
+					'$groups'	=> $entries,
+					'$link_desc'	=> DI::l10n()->t('External link to group'),
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Content/GroupManager.php
 					'$total'	=> $total,
-					'$visible_forums' => $visible_forums,
+					'$visible_groups' => $visibleGroups,
 					'$showless'	=> DI::l10n()->t('show less'),
 					'$showmore'	=> DI::l10n()->t('show more'),
 					'$create_new_forum' => DI::l10n()->t('Create new forum')]
@@ -164,9 +170,9 @@ class ForumManager
 	}
 
 	/**
-	 * Format forumlist as contact block
+	 * Format group list as contact block
 	 *
-	 * This function is used to show the forumlist in
+	 * This function is used to show the group list in
 	 * the advanced profile.
 	 *
 	 * @param int $uid The ID of the User
@@ -183,7 +189,7 @@ class ForumManager
 
 		$o = '';
 
-		// place holder in case somebody wants configurability
+		// placeholder in case somebody wants configurability
 		$show_total = 9999;
 
 		//don't sort by last updated item
@@ -193,7 +199,7 @@ class ForumManager
 
 		$total_shown = 0;
 		foreach ($contacts as $contact) {
-			$o .= HTML::micropro($contact, true, 'forumlist-profile-advanced');
+			$o .= HTML::micropro($contact, true, 'grouplist-profile-advanced');
 			$total_shown++;
 			if ($total_shown == $show_total) {
 				break;
@@ -204,14 +210,14 @@ class ForumManager
 	}
 
 	/**
-	 * count unread forum items
+	 * count unread group items
 	 *
-	 * Count unread items of connected forums and private groups
+	 * Count unread items of connected groups and private groups
 	 *
 	 * @return array
 	 *    'id' => contact id
-	 *    'name' => contact/forum name
-	 *    'count' => counted unseen forum items
+	 *    'name' => contact/group name
+	 *    'count' => counted unseen group items
 	 * @throws \Exception
 	 */
 	public static function countUnseenItems()

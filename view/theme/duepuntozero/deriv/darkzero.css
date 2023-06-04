@@ -23,13 +23,13 @@ nav #banner #logo-text a { color: #ffffff; }
 /* Contact-Header for the Network Stream */
 #viewcontact_wrapper-network {background-image: url('imgdarkzero/head.jpg');}
 
-.wall-item-content-wrapper { 
-	border: 1px solid #444444; 
-	background: #444444;  
+.wall-item-content-wrapper {
+	border: 1px solid #444444;
+	background: #444444;
 }
 .wall-item-outside-wrapper.threaded > .wall-item-content-wrapper {
 	-moz-border-radius: 3px 3px 0px;
-	border-radius: 3px 3px 0px;	
+	border-radius: 3px 3px 0px;
 }
 .wall-item-tools {	background-color: #444444;   background-image: none;}
 .comment-wwedit-wrapper{
@@ -39,7 +39,7 @@ nav #banner #logo-text a { color: #ffffff; }
 	border: solid #444444;
 	border-width: 0px 3px 3px;
 	-moz-border-radius: 0px 0px 3px 3px;
-	border-radius: 0px 0px 3px 3px;	
+	border-radius: 0px 0px 3px 3px;
 }
 .editicon {
     	background-color: #333;
@@ -91,7 +91,7 @@ footer {
 	background-image: url('imgdarkzero/sectionend.jpg');
 	background-position: top left;
 	background-repeat: repeat-x;
-	height: 25px;	
+	height: 25px;
 }
 
 
@@ -117,13 +117,13 @@ input#dfrn-url {
 #jot-title:-moz-placeholder{color: #555555!important;}
 #jot-category::-webkit-input-placeholder{ color: #555555!important;}
 #jot-category:-moz-placeholder{color: #555555!important;}
-		
-	
+
+
 #jot-title:hover,
 #jot-title:focus,
 #jot-category:hover,
 #jot-category:focus {
-	border: 1px solid #cccccc; 
+	border: 1px solid #cccccc;
 }
 
 #profile-jot-email-label, div#jot-preview-content, div.profile-jot-net {
@@ -149,7 +149,7 @@ input#dfrn-url {
   background:#2e2f2e;
 }
 
-.widget .selected, .group-selected {
+.widget .selected, .circle-selected {
   background:#2e2f2e;
 }
 

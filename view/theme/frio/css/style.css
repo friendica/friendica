@@ -367,7 +367,11 @@ btn-eventnav:hover {
 aside .badge {
 	opacity: 0.7;
 }
+<<<<<<< HEAD
 .forum-widget-entry .badge,
+=======
+.group-widget-entry .badge,
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 .sidebar-circle-li .badge {
 	margin-top: 6px;
 }
@@ -1102,7 +1106,7 @@ aside .widget li a:hover {
 	color: $font_color_darker;
 }
 
-/* forumlist widget */
+/* group-list widget */
 aside > #datebrowse-sidebar li.posted-date-selector-months {
 	margin-bottom: 10px;
 	padding: 0;
@@ -1122,7 +1126,7 @@ aside > #datebrowse-sidebar .posted-date-selector-months > ul > li:hover {
 	padding-left: 27px;
 }
 
-.forumlist-img {
+.group-list-img {
 	-webkit-filter: grayscale(100%);
 	filter: grayscale(100%);
 	opacity: 0.5;
@@ -1133,7 +1137,7 @@ aside > #datebrowse-sidebar .posted-date-selector-months > ul > li:hover {
 	-ms-transition: all 0.2s ease-in-out;
 	transition: all 0.2s ease-in-out;
 }
-#forumlist-sidebar-ul li:hover a > .forumlist-img {
+#group-list-sidebar-ul li:hover a > .group-list-img {
 	-webkit-filter: unset;
 	filter: unset;
 	opacity: unset;
@@ -1303,6 +1307,7 @@ aside #follow-sidebar .form-group-search .form-button-search {
 	padding: 2px 8px;
 }
 
+<<<<<<< HEAD
 div#sidebar-circle-header h3, 
 div#sidebar-forum-header h3
 {
@@ -1311,6 +1316,13 @@ div#sidebar-forum-header h3
 
 div#sidebar-circle-list,
 div#sidebar-forum-list {
+=======
+div#sidebar-circle-header h3 {
+	float: left;
+}
+
+div#sidebar-circle-list {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	clear: both;
 }
 
@@ -1318,6 +1330,7 @@ div#sidebar-forum-list {
 	clear: both;
 }
 
+<<<<<<< HEAD
 .circle-edit-tool,
 .forum-new-tool
 {
@@ -1326,6 +1339,13 @@ div#sidebar-forum-list {
 }
 .sidebar-widget-header .circle-edit-tool,
 .forum-new-tool {
+=======
+.circle-edit-tool {
+	padding-top: 0;
+	color: $font_color_darker;
+}
+.sidebar-widget-header .circle-edit-tool {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	margin-top: -5px;
 }
 
@@ -1346,14 +1366,20 @@ aside .widget-action {
 	padding: 5px 10px;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
+<<<<<<< HEAD
 aside #forum-sidebar .forum-new-tool.faded-icon:hover,
+=======
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
+<<<<<<< HEAD
 aside #forum-sidebar .forum-new-tool.faded-icon:hover,
+=======
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
@@ -2200,7 +2226,7 @@ nav .acpopup {
 	border-left: 3px solid $link_color;
 	padding-left: 17px !important;
 }
-.textcomplete-item a .forum {
+.textcomplete-item a .group {
 	color: $link_color;
 }
 img.acpopup-img {
@@ -2502,7 +2528,7 @@ body.mod-login .navbar #nav-login {
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
-.contact-block-div.forumlist-profile-advanced {
+.contact-block-div.group-list-profile-advanced {
 	float: left;
 }
 
@@ -3071,8 +3097,12 @@ details.profile-jot-net[open] summary:before {
 	content: "\f0da"; /* Right Plain Pointer */
 }
 .widget > .fakelink > h3:before,
+<<<<<<< HEAD
 #sidebar-circle-header > .fakelink > h3:before, 
 #sidebar-forum-header > .fakelink > h3:before{
+=======
+#sidebar-circle-header > .fakelink > h3:before {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	font-family: ForkAwesome;
 	content: "\f0d7"; /* Bottom Plain Pointer */
 }

@@ -14,9 +14,9 @@ Friendica Documentation and Resources
 * You and other users
 	* [Connectors](help/Connectors)
 	* [Making Friends](help/Making-Friends)
-	* [Groups and Privacy](help/Groups-and-Privacy)
+	* [Circles and Privacy](help/Circles-and-Privacy)
 	* [Tags and Mentions](help/Tags-and-Mentions)
-	* [Community Forums](help/Forums)
+	* [Community Groups](help/Groups)
 	* [Chats](help/Chats)
 * Further information
 	* [Move your account](help/Move-Account)
@@ -67,7 +67,7 @@ Friendica Documentation and Resources
 
 * [Main Website](https://friendi.ca)
 * Ways to get Support
-  * Friendica Support Forum: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
+  * Friendica Support Group: [@helpers@forum.friendi.ca](https://forum.friendi.ca/~helpers)
   * [Mailing List Archive](http://mailman.friendi.ca/mailman/listinfo/support-friendi.ca) you can subscribe to the list by sending an email to ``support-request(at)friendi.ca?subject=subscribe``
   * Community chat rooms (the IRC, Matrix and XMPP rooms are bridged) these public chats are logged [from IRC](https://gnusociarg.nsupdate.info/2021/%23friendica/) and [Matrix](https://view.matrix.org/alias/%23friendi.ca:matrix.org/)
     * XMPP/Jabber MUC: support(at)forum.friendi.ca

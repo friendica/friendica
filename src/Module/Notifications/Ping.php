@@ -24,7 +24,7 @@ namespace Friendica\Module\Notifications;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Contact\Introduction\Repository\Introduction;
-use Friendica\Content\ForumManager;
+use Friendica\Content\GroupManager;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -35,7 +35,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Model\Verb;
@@ -108,15 +108,15 @@ class Ping extends BaseModule
 		$network_count   = 0;
 		$register_count  = 0;
 		$sysnotify_count = 0;
+		$circles_unseen   = [];
 		$groups_unseen   = [];
-		$forums_unseen   = [];
 
 		$event_count          = 0;
 		$today_event_count    = 0;
 		$birthday_count       = 0;
 		$today_birthday_count = 0;
 
-		// Suppress notification display for forum accounts
+		// Suppress notification display for group accounts
 		if ($this->session->getLocalUserId() && $this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
 			if ($this->pconfig->get($this->session->getLocalUserId(), 'system', 'detailed_notif')) {
 				$notifications = $this->notificationRepo->selectDetailedForUser($this->session->getLocalUserId());
@@ -151,18 +151,18 @@ class Ping extends BaseModule
 				}
 			}
 
-			$compute_group_counts = $this->config->get('system','compute_group_counts');
-			if ($network_count && $compute_group_counts) {
-				// Find out how unseen network posts are spread across groups
-				foreach (Group::countUnseen() as $group_count) {
-					if ($group_count['count'] > 0) {
-						$groups_unseen[] = $group_count;
+			$compute_circle_counts = $this->config->get('system','compute_group_counts') ?? $this->config->get('system','compute_circle_counts');
+			if ($network_count && $compute_circle_counts) {
+				// Find out how unseen network posts are spread across circles
+				foreach (Circle::countUnseen() as $circle_count) {
+					if ($circle_count['count'] > 0) {
+						$circles_unseen[] = $circle_count;
 					}
 				}
 
-				foreach (ForumManager::countUnseenItems() as $forum_count) {
-					if ($forum_count['count'] > 0) {
-						$forums_unseen[] = $forum_count;
+				foreach (GroupManager::countUnseenItems() as $group_count) {
+					if ($group_count['count'] > 0) {
+						$groups_unseen[] = $group_count;
 					}
 				}
 			}
@@ -289,8 +289,8 @@ class Ping extends BaseModule
 		$data['events-today']    = $today_event_count;
 		$data['birthdays']       = $birthday_count;
 		$data['birthdays-today'] = $today_birthday_count;
+		$data['circles']         = $circles_unseen;
 		$data['groups']          = $groups_unseen;
-		$data['forums']          = $forums_unseen;
 		$data['notification']    = ($notification_count < 50) ? $notification_count : '49+';
 
 		$data['notifications'] = $navNotifications;

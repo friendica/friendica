@@ -15,7 +15,7 @@ Many will.
 But **please** review the [requirements](#Requirements) and confirm these with your hosting provider prior to installation.
 
 ## Support
-If you encounter installation issues, please let us know via the [helper](http://forum.friendi.ca/profile/helpers) or the [developer](https://forum.friendi.ca/profile/developers) forum or [file an issue](https://github.com/friendica/friendica/issues).
+If you encounter installation issues, please let us know via the [helper](http://forum.friendi.ca/profile/helpers) or the [developer](https://forum.friendi.ca/profile/developers) group or [file an issue](https://github.com/friendica/friendica/issues).
 
 Please be as clear as you can about your operating environment and provide as much detail as possible about any error messages you may see, so that we can prevent it from happening in the future.
 Due to the large variety of operating systems and PHP platforms in existence we may have only limited ability to debug your PHP installation or acquire any missing modules - but we will do our best to solve any general code issues.
@@ -23,7 +23,7 @@ Due to the large variety of operating systems and PHP platforms in existence we 
 ## Prerequisites
 
 * Choose a domain name or subdomain name for your server. Put some thought into this. While changing it after installation is supported, things still might break.
-* Setup HTTPS on your domain. 
+* Setup HTTPS on your domain.
 
 ### Requirements
 
@@ -42,7 +42,7 @@ Due to the large variety of operating systems and PHP platforms in existence we 
 
 For alternative server configurations (such as Nginx server and MariaDB database engine), refer to the [Friendica wiki](https://github.com/friendica/friendica/wiki).
 
-### Optional 
+### Optional
 
 * PHP ImageMagick extension (php-imagick) for animated GIF support.
 
@@ -105,11 +105,11 @@ If you encounter a bug, please let us know.
 
 ### Create a database
 
-Create an empty database and note the access details (hostname, username, password, database name). 
+Create an empty database and note the access details (hostname, username, password, database name).
 Generate a strong password, then enter mysql with:
 
     mysql
-    
+
 Then use the following script using the password you just generated:
 
     CREATE DATABASE friendicadb;
@@ -148,7 +148,7 @@ You have the following options to automatically install Friendica:
 -	using environment variables (f.e. `MYSQL_HOST`)
 -	using options (f.e. `--dbhost <host>`)
 
-You can combine environment variables and options, but be aware that options are prioritized over environment variables. 
+You can combine environment variables and options, but be aware that options are prioritized over environment variables.
 
 For more information during the installation, you can use this command line option
 
@@ -157,7 +157,7 @@ For more information during the installation, you can use this command line opti
 If you wish to include all optional checks, use `-a` like this statement:
 
     bin/console autoinstall -a
-    
+
 *If* the automatic installation fails for any reason, check the following:
 
 *	Does `config/local.config.php` already exist? If yes, the automatic installation won't start
@@ -171,7 +171,7 @@ You can use a prepared config file like [local-sample.config.php](/config/local-
 Navigate to the main Friendica directory and execute the following command:
 
     bin/console autoinstall -f <prepared.config.php>
-    
+
 #### B.2: Environment variables
 
 There are two types of environment variables.
@@ -194,7 +194,7 @@ if you don't use the option `--savedb` during installation, the DB credentials w
 **Friendica settings**
 
 This variables wont be used at normal Friendica runtime.
-Instead, they get saved into `config/local.config.php`. 
+Instead, they get saved into `config/local.config.php`.
 
 -	`FRIENDICA_URL_PATH` The URL path of Friendica (f.e. '/friendica')
 -	`FRIENDICA_PHP_PATH` The path of the PHP binary
@@ -238,7 +238,7 @@ Example:
 ### Verify the "host-meta" page is working
 
 Friendica should respond automatically to important addresses under the */.well-known/* rewrite path.
-One critical URL would look like, for example: https://example.com/.well-known/host-meta   
+One critical URL would look like, for example: https://example.com/.well-known/host-meta
 It must be visible to the public and must respond with an XML file that is automatically customized to your site.
 
 If that URL is not working, it is possible that some other software is using the /.well-known/ path.
@@ -257,7 +257,7 @@ It may be necessary to chmod the /.well-known/.htaccess file if you were not giv
 At this point visit your website again, and register your personal account with the same email as in the `config.admin_email` config value.
 Registration errors should all be recoverable automatically.
 
-If you get any *critical* failure at this point, it generally indicates the database was not installed correctly. 
+If you get any *critical* failure at this point, it generally indicates the database was not installed correctly.
 You might wish to delete/rename `config/local.config.php` to another name and drop all the database tables so that you can start fresh.
 
 ## Post Install Configuration
@@ -295,7 +295,7 @@ Once started, you can check the daemon status using the following command:
 
     cd /path/to/friendica; php bin/daemon.php status
 
-After a server restart or any other failure, the daemon needs to be restarted. 
+After a server restart or any other failure, the daemon needs to be restarted.
 This could be achieved by a cronjob.
 
 ### (RECOMMENDED) Logging & Log Rotation
@@ -408,7 +408,7 @@ provided by one of our members.
 > On my server I use the php protection system Suhosin [http://www.hardened-php.net/suhosin/].
 > One of the things it does is to block certain functions like proc_open, as
 > configured in `/etc/php5/conf.d/suhosin.ini`:
-> 
+>
 >     suhosin.executor.func.blacklist = proc_open, ...
 >
 > For those sites like Friendica that really need these functions they can be
@@ -418,34 +418,34 @@ provided by one of our members.
 > 	  php_admin_value suhosin.executor.func.blacklist none
 > 	  php_admin_value suhosin.executor.eval.blacklist none
 > 	</Directory>
-> 
+>
 > This enables every function for Friendica if accessed via browser, but not for
 > the cronjob that is called via php command line. I attempted to enable it for
 > cron by using something like:
-> 
+>
 > 	*/10 * * * * cd /var/www/friendica/friendica/ && sudo -u www-data /usr/bin/php \
 >       -d suhosin.executor.func.blacklist=none \
 >       -d suhosin.executor.eval.blacklist=none -f bin/worker.php
-> 
+>
 > This worked well for simple test cases, but the friendica-cron still failed
 > with a fatal error:
-> 
+>
 > 	suhosin[22962]: ALERT - function within blacklist called: proc_open()
 >     (attacker 'REMOTE_ADDR not set', file '/var/www/friendica/friendica/boot.php',
 >     line 1341)
-> 
+>
 > After a while I noticed, that `bin/worker.php` calls further PHP script via `proc_open`.
 > These scripts themselves also use `proc_open` and fail, because they are NOT
 > called with `-d suhosin.executor.func.blacklist=none`.
-> 
+>
 >  So the simple solution is to put the correct parameters into `config/local.config.php`:
-> 
+>
 > 	'config' => [
 > 		//Location of PHP command line processor
 > 		'php_path' => '/usr/bin/php -d suhosin.executor.func.blacklist=none \
 >               -d suhosin.executor.eval.blacklist=none',
 > 	],
-> 
+>
 > This is obvious as soon as you notice that the friendica-cron uses `proc_open`
 > to execute PHP scripts that also use `proc_open`, but it took me quite some time to find that out.
 > I hope this saves some time for other people using suhosin with function blocklists.

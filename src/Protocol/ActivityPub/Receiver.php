@@ -1090,7 +1090,7 @@ class Receiver
 		if (!empty($actor)) {
 			$profile   = APContact::getByURL($actor);
 			$followers = $profile['followers'] ?? '';
-			$is_forum  = ($actor['type'] ?? '') == 'Group';
+			$isGroup  = ($profile['type'] ?? '') == 'Group';
 			if ($push) {
 				Contact::updateByUrlIfNeeded($actor);
 			}
@@ -1098,7 +1098,7 @@ class Receiver
 		} else {
 			Logger::info('Empty actor', ['activity' => $activity]);
 			$followers = '';
-			$is_forum  = false;
+			$isGroup  = false;
 		}
 
 		// We have to prevent false follower assumptions upon thread completions
@@ -1121,7 +1121,7 @@ class Receiver
 				}
 
 				// Fetch the receivers for the public and the followers collection
-				if ((($receiver == $followers) || (($receiver == self::PUBLIC_COLLECTION) && !$is_forum)) && !empty($actor)) {
+				if ((($receiver == $followers) || (($receiver == self::PUBLIC_COLLECTION) && !$isGroup)) && !empty($actor)) {
 					$receivers = self::getReceiverForActor($actor, $tags, $receivers, $follower_target, $profile);
 					continue;
 				}
@@ -1140,7 +1140,7 @@ class Receiver
 					$condition = ['nurl' => Strings::normaliseLink($actor), 'rel' => [Contact::SHARING, Contact::FRIEND],
 						'network' => $networks, 'archive' => false, 'pending' => false, 'uid' => $contact['uid']];
 
-					// Forum posts are only accepted from forum contacts
+					// Group posts are only accepted from group contacts
 					if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
 						$condition['rel'] = [Contact::SHARING, Contact::FRIEND, Contact::FOLLOWER];
 					}

@@ -918,7 +918,7 @@ class Post
 
 		if ($conv) {
 			// This will allow us to comment on wall-to-wall items owned by our friends
-			// and community forums even if somebody else wrote the post.
+			// and community groups even if somebody else wrote the post.
 			// bug #517 - this fixes for conversation owner
 			if ($conv->getMode() == 'profile' && $conv->getProfileOwner() == DI::userSession()->getLocalUserId()) {
 				return true;

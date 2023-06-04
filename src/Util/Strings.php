@@ -561,4 +561,22 @@ class Strings
 		return $shorthand;
 	}
 
+	/**
+	 * Converts an URL in a nicer format (without the scheme and possibly shortened)
+	 *
+	 * @param string $url URL that is about to be reformatted
+	 * @return string reformatted link
+	 */
+	public static function getStyledURL(string $url): string
+	{
+		$parts = parse_url($url);
+		$scheme = $parts['scheme'] . '://';
+		$styled_url = str_replace($scheme, '', $url);
+
+		if (strlen($styled_url) > 30) {
+			$styled_url = substr($styled_url, 0, 30) . "…";
+		}
+
+		return $styled_url;
+	}
 }

@@ -382,11 +382,11 @@ div.wall-item-content-wrapper.shiny {
 	cursor: pointer;
 }
 
-#group-sidebar {
+#circle-sidebar {
 	margin-bottom: 10px;
 }
 
-.widget .selected, .group-selected, .forum-selected {
+.widget .selected, .circle-selected, .group-selected {
 	padding: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -1695,46 +1695,46 @@ input#dfrn-url {
 	overflow: auto;
 }
 
-#group-new-submit-wrapper {
+#circle-new-submit-wrapper {
 	margin-top: 30px;
 }
 
-#group-edit-name-label {
+#circle-edit-name-label {
 	float: left;
 	width: 175px;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-#group-edit-name {
+#circle-edit-name {
 	float: left;
 	width: 225px;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-#group-edit-name-wrapper {
+#circle-edit-name-wrapper {
 
 
 }
 
 
-#group_members_select_label {
+#circle_members_select_label {
 	display: block;
 	float: left;
 	width: 175px;
 }
 
-.group_members_select {
+.circle_members_select {
 	float: left;
 	width: 230px;
 	overflow: auto;
 }
 
-#group_members_select_end {
+#circle_members_select_end {
 	clear: both;
 }
-#group-edit-name-end {
+#circle-edit-name-end {
 	clear: both;
 }
 
@@ -1856,10 +1856,10 @@ a.mail-list-link {
 	clear: both;
 }
 
-#sidebar-group-list ul {
+#sidebar-circle-list ul {
 	list-style-type: none;
 }
-.sidebar-group-li .notify, .forum-widget-entry .notify {
+.sidebar-circle-li .notify, .group-widget-entry .notify {
 	display: none;
 	font-size: 9px;
 	border: 1px solid rgb(221, 221, 221);
@@ -1867,21 +1867,21 @@ a.mail-list-link {
 	float: right;
 	background-color: #BABDB6;
 }
-.sidebar-group-li .notify.show, .forum-widget-entry .notify.show {
+.sidebar-circle-li .notify.show, .group-widget-entry .notify.show {
 	display: block;
 }
 
-#sidebar-group-list .icon, #sidebar-group-list .iconspacer {
+#sidebar-circle-list .icon, #sidebar-circle-list .iconspacer {
 	display: inline-block;
 	height: 12px;
 	width: 12px;
 }
 
-#sidebar-group-list li {
+#sidebar-circle-list li {
 	margin-top: 10px;
 }
 
-#forumlist-sidebar ul {
+#group-list-sidebar ul {
 	list-style: none;
 }
 
@@ -1911,7 +1911,7 @@ a.mail-list-link {
 #search-save {
 	margin-left: 5px;
 }
-.groupsideedit {
+.circlesideedit {
 	margin-right: 10px;
 }
 #saved-search-ul {
@@ -2180,7 +2180,7 @@ aside input[type='text'] {
 	margin-left: 200px;
 }
 
-.group-delete-wrapper {
+.circle-delete-wrapper {
 	float: right;
 	margin-right: 50px;
 }
@@ -2546,7 +2546,7 @@ aside input[type='text'] {
 	margin-bottom: 15px;
 }
 
-#group-members {
+#circle-members {
 	margin-top: 20px;
 	padding: 10px;
 	height: 250px;
@@ -2554,28 +2554,28 @@ aside input[type='text'] {
 	border: 1px solid #ddd;
 }
 
-#group-members-end {
+#circle-members-end {
 	clear: both;
 }
 
-#group-separator {
+#circle-separator {
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
 
-#group-all-contacts {
+#circle-all-contacts {
 	padding: 10px;
 	height: 450px;
 	overflow: auto;
 	border: 1px solid #ddd;
 }
 
-#group-all-contacts-end {
+#circle-all-contacts-end {
 	clear: both;
 	margin-bottom: 10px;
 }
 
-#group-edit-desc {
+#circle-edit-desc {
 	margin-top: 15px;
 }
 

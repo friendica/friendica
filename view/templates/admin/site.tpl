@@ -108,7 +108,7 @@
 		<div class="submit"><input type="submit" name="page_site" value="{{$submit}}"/></div>
 
 		<h2>{{$performance}}</h2>
-		{{include file="field_checkbox.tpl" field=$compute_group_counts}}
+		{{include file="field_checkbox.tpl" field=$compute_circle_counts}}
 		{{include file="field_checkbox.tpl" field=$only_tag_search}}
 		{{include file="field_input.tpl" field=$max_comments}}
 		{{include file="field_input.tpl" field=$max_display_comments}}

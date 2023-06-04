@@ -36,7 +36,7 @@ use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
- * Returns recent statuses from users in the specified group.
+ * Returns recent statuses from users in the specified circle.
  *
  * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/get-lists-ownerships
  */
@@ -76,9 +76,9 @@ class Statuses extends BaseApi
 
 		$start = max(0, ($page - 1) * $count);
 
-		$groups    = $this->dba->selectToArray('group_member', ['contact-id'], ['gid' => $request['list_id']]);
-		$gids      = array_column($groups, 'contact-id');
-		$condition = ['uid' => $uid, 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT], 'contact-id' => $gids];
+		$members   = $this->dba->selectToArray('group_member', ['contact-id'], ['gid' => $request['list_id']]);
+		$cids      = array_column($members, 'contact-id');
+		$condition = ['uid' => $uid, 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT], 'contact-id' => $cids];
 		$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $since_id]);
 
 		if ($max_id > 0) {

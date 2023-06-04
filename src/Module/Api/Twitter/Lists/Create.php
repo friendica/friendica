@@ -24,34 +24,34 @@ namespace Friendica\Module\Api\Twitter\Lists;
 use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
-use Friendica\Factory\Api\Friendica\Group as FriendicaGroup;
+use Friendica\Factory\Api\Friendica\Circle as FriendicaCircle;
 use Friendica\Module\BaseApi;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
- * Update information about a group.
+ * Update information about a circle.
  *
  * @see https://developer.twitter.com/en/docs/accounts-and-users/create-manage-lists/api-reference/post-lists-update
  */
 class Create extends BaseApi
 {
-	/** @var friendicaGroup */
-	private $friendicaGroup;
+	/** @var FriendicaCircle */
+	private $friendicaCircle;
 
 	/** @var Database */
 	private $dba;
 
-	public function __construct(Database $dba, FriendicaGroup $friendicaGroup, App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(Database $dba, FriendicaCircle $friendicaCircle, App $app, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($app, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->dba            = $dba;
-		$this->friendicaGroup = $friendicaGroup;
+		$this->dba             = $dba;
+		$this->friendicaCircle = $friendicaCircle;
 	}
 
 	protected function rawContent(array $request = [])
@@ -63,22 +63,22 @@ class Create extends BaseApi
 		$name = $this->getRequestValue($request, 'name', '');
 
 		if ($name == '') {
-			throw new HTTPException\BadRequestException('group name not specified');
+			throw new HTTPException\BadRequestException('circle name not specified');
 		}
 
-		// error message if specified group name already exists
+		// error message if specified circle name already exists
 		if ($this->dba->exists('group', ['uid' => $uid, 'name' => $name, 'deleted' => false])) {
-			throw new HTTPException\BadRequestException('group name already exists');
+			throw new HTTPException\BadRequestException('circle name already exists');
 		}
 
-		$ret = Group::create($uid, $name);
+		$ret = Circle::create($uid, $name);
 		if ($ret) {
-			$gid = Group::getIdByName($uid, $name);
+			$gid = Circle::getIdByName($uid, $name);
 		} else {
 			throw new HTTPException\BadRequestException('other API error');
 		}
 
-		$grp = $this->friendicaGroup->createFromId($gid);
+		$grp = $this->friendicaCircle->createFromId($gid);
 
 		$this->response->exit('statuses', ['lists' => ['lists' => $grp]], $this->parameters['extension'] ?? null, Contact::getPublicIdByUserId($uid));
 	}

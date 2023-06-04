@@ -39,8 +39,8 @@ Create a new event for the current logged in user.
 - `publish` : (optional) create message for event
 - `allow_cid` : (optional) ACL-formatted list of allowed contact ids if private event
 - `allow_gid` : (optional) ACL-formatted list of disallowed contact ids if private event
-- `deny_cid` : (optional) ACL-formatted list of allowed group ids if private event
-- `deny_gid` : (optional) ACL-formatted list of disallowed group ids if private event
+- `deny_cid` : (optional) ACL-formatted list of allowed circle ids if private event
+- `deny_gid` : (optional) ACL-formatted list of disallowed circle ids if private event
 
 ### POST api/friendica/event_delete
 
@@ -323,33 +323,37 @@ On error:
 
 ---
 
-### GET api/friendica/group_show
+### GET api/friendica/circle_show
 
-Return all or a specified group of the user with the containing contacts as array.
+Alternatively: GET api/friendica/group_show (Backward compatibility)
+
+Return all or a specified circle of the user with the containing contacts as array.
 
 #### Parameters
 
-* `gid`: optional, if not given, API returns all groups of the user
+* `gid`: optional, if not given, API returns all circles of the user
 
 #### Return values
 
 Array of:
 
-* `name`: name of the group
-* `gid`: id of the group
+* `name`: name of the circle
+* `gid`: id of the circle
 * `user`: array of [Contacts](help/API-Entities#Contact)
 
-### POST api/friendica/group_create
+### POST api/friendica/circle_create
 
-Create the group with the posted array of contacts as members.
+Alternatively: POST api/friendica/group_create
+
+Create the circle with the posted array of contacts as members.
 
 #### Parameters
 
-* `name`: name of the group to be created
+* `name`: name of the circle to be created
 
 #### POST data
 
-JSON data as Array like the result of [GET api/friendica/group_show](#GET+api%2Ffriendica%2Fgroup_show):
+JSON data as Array like the result of [GET api/friendica/circle_show](#GET+api%2Ffriendica%2Fcircle_show):
 
 * `gid`
 * `name`
@@ -360,23 +364,25 @@ JSON data as Array like the result of [GET api/friendica/group_show](#GET+api%2F
 Array of:
 
 * `success`: true if successfully created or reactivated
-* `gid`: gid of the created group
-* `name`: name of the created group
+* `gid`: gid of the created circle
+* `name`: name of the created circle
 * `status`: "missing user" | "reactivated" | "ok"
 * `wrong users`: array of users, which were not available in the contact table
 
-### POST api/friendica/group_update
+### POST api/friendica/circle_update
 
-Update the group with the posted array of contacts as members (post all members of the group to the call; function will remove members not posted).
+Alternatively: POST api/friendica/group_update
+
+Update the circle with the posted array of contacts as members (post all members of the circle to the call; function will remove members not posted).
 
 #### Parameters
 
-* `gid`: id of the group to be changed
-* `name`: name of the group to be changed
+* `gid`: id of the circle to be changed
+* `name`: name of the circle to be changed
 
 #### POST data
 
-JSON data as array like the result of [GET api/friendica/group_show](#GET+api%2Ffriendica%2Fgroup_show):
+JSON data as array like the result of [GET api/friendica/circle_show](#GET+api%2Ffriendica%2Fcircle_show):
 
 * `gid`
 * `name`
@@ -387,27 +393,29 @@ JSON data as array like the result of [GET api/friendica/group_show](#GET+api%2F
 Array of:
 
 * `success`: true if successfully updated
-* `gid`: gid of the changed group
-* `name`: name of the changed group
+* `gid`: gid of the changed circle
+* `name`: name of the changed circle
 * `status`: "missing user" | "ok"
 * `wrong users`: array of users, which were not available in the contact table
 
-### POST api/friendica/group_delete
+### POST api/friendica/circle_delete
 
-Delete the specified group of contacts; API call need to include the correct gid AND name of the group to be deleted.
+Alternatively: POST api/friendica/group_delete
+
+Delete the specified circle of contacts; API call need to include the correct gid AND name of the circle to be deleted.
 
 #### Parameters
 
-* `gid`: id of the group to be deleted
-* `name`: name of the group to be deleted
+* `gid`: id of the circle to be deleted
+* `name`: name of the circle to be deleted
 
 #### Return values
 
 Array of:
 
 * `success`: true if successfully deleted
-* `gid`: gid of the deleted group
-* `name`: name of the deleted group
+* `gid`: gid of the deleted circle
+* `name`: name of the deleted circle
 * `status`: "deleted" if successfully deleted
 * `wrong users`: empty array
 
@@ -556,7 +564,7 @@ Alias of [`api/friendica/photo/update`](#POST+api%2Ffriendica%2Fphoto%2Fupdate)
 
 Saves data for the scales 0-2 to database (see above for scale description).
 Call adds non-public entries to items table to enable authenticated contacts to comment/like the photo.
-Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited group.
+Client should pay attention to the fact that updated access rights are not transferred to the contacts. i.e. public photos remain publicly visible if they have been commented/liked before setting visibility back to a limited circle.
 Currently it is best to inform user that updating rights is not the right way to do this, and offer a solution to add photo as a new photo with the new rights instead.
 
 #### Parameters

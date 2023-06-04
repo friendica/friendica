@@ -136,11 +136,11 @@ $(document).ready(function () {
 		.trigger("change");
 
 	// JS for the permission section.
-	$("#contact_allow, #contact_deny, #group_allow, #group_deny")
+	$("#contact_allow, #contact_deny, #circle_allow, #circle_deny")
 		.change(function () {
 			var selstr;
 			$(
-				"#contact_allow option:selected, #contact_deny option:selected, #group_allow option:selected, #group_deny option:selected",
+				"#contact_allow option:selected, #contact_deny option:selected, #circle_allow option:selected, #circle_deny option:selected",
 			).each(function () {
 				selstr = $(this).html();
 				$("#jot-public").hide();

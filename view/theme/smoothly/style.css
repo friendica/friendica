@@ -931,8 +931,12 @@ li.widget-list {
 }
 
 #sidebar-new-circle,
+<<<<<<< HEAD
 #sidebar-edit-circles, 
 #sidebar-new-forum {
+=======
+#sidebar-edit-circles {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 	padding: 7px;
 	width: 165px;
 	margin: auto;

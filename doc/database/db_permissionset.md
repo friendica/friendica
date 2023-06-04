@@ -11,9 +11,9 @@ Fields
 | id        | sequential ID                                          | int unsigned       | NO   | PRI | NULL    | auto_increment |
 | uid       | Owner id of this permission set                        | mediumint unsigned | NO   |     | 0       |                |
 | allow_cid | Access Control - list of allowed contact.id '<19><78>' | mediumtext         | YES  |     | NULL    |                |
-| allow_gid | Access Control - list of allowed groups                | mediumtext         | YES  |     | NULL    |                |
+| allow_gid | Access Control - list of allowed circles               | mediumtext         | YES  |     | NULL    |                |
 | deny_cid  | Access Control - list of denied contact.id             | mediumtext         | YES  |     | NULL    |                |
-| deny_gid  | Access Control - list of denied groups                 | mediumtext         | YES  |     | NULL    |                |
+| deny_gid  | Access Control - list of denied circles                | mediumtext         | YES  |     | NULL    |                |
 
 Indexes
 ------------

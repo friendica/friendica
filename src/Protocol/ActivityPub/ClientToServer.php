@@ -28,7 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\User;
@@ -281,7 +281,7 @@ class ClientToServer
 			$item['private']   = Item::UNLISTED;
 		} elseif (!empty($object_data['target'][Receiver::TARGET_FOLLOWER])) {
 			$item['allow_cid'] = '';
-			$item['allow_gid'] = '<' . Group::FOLLOWERS . '>';
+			$item['allow_gid'] = '<' . Circle::FOLLOWERS . '>';
 			$item['deny_cid']  = '';
 			$item['deny_gid']  = '';
 			$item['private']   = Item::PRIVATE;

@@ -1,15 +1,15 @@
-{{* This template is for the "group" module. It provides the user the possibility to
-    modify a specific contact group (remove contact group, edit contact group name,
-    add or remove contacts to the contact group.
+{{* This template is for the "circle" module. It provides the user the possibility to
+    modify a specific contact circle (remove contact circle, edit contact circle name,
+    add or remove contacts to the contact circle.
 *}}
 
-<script type="text/javascript" src="view/theme/frio/js/mod_group.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/theme/frio/js/mod_circle.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
 
 <div class="generic-page-wrapper">
 	{{if $editable == 1}}
-	{{* The buttons for editing the contact group (edit name / remove contact group) *}}
-	<div class="group-actions pull-right">
-		<button type="button" id="group-rename" class="btn btn-clear" onclick="showHide('group-edit-wrapper'); showHide('group-edit-header'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
+	{{* The buttons for editing the contact circle (edit name / remove contact circle) *}}
+	<div class="circle-actions pull-right">
+		<button type="button" id="circle-rename" class="btn btn-clear" onclick="showHide('circle-edit-wrapper'); showHide('circle-edit-header'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
 			<i class="fa fa-pencil" aria-hidden="true"></i>
 		</button>
 		{{if $drop}}{{$drop nofilter}}{{/if}}
@@ -17,20 +17,20 @@
 	{{/if}}
 
 	<div class="section-title-wrapper">
-		<div id="group-edit-header">
+		<div id="circle-edit-header">
 			<h2>{{$title}}</h2>
 		</div>
 
-		{{* Edit the name of the group *}}
-		<div id="group-edit-wrapper">
+		{{* Edit the name of the circle *}}
+		<div id="circle-edit-wrapper">
 
-			<form action="group/{{$gid}}" id="group-edit-form" method="post">
+			<form action="circle/{{$gid}}" id="circle-edit-form" method="post">
 				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
 				<div class="pull-left">
 				{{include file="field_input.tpl" field=$gname label=false}}
 				</div>
-				<div id="group-edit-submit-wrapper" class="form-group pull-right">
+				<div id="circle-edit-submit-wrapper" class="form-group pull-right">
 					<button class="btn btn-primary btn-small" type="submit" name="submit" value="{{$submit}}">
 						{{$submit}}
 					</button>
@@ -55,21 +55,21 @@
 
 	<div id="contacts-search-end"></div>
 
-	{{if $groupeditor}}
+	{{if $circle_editor}}
 	{{* The buttons to switch between the different view modes *}}
-	<div id="group-list-view-switcher" class="btn-group btn-group-sm pull-right">
-		<button type="button" id="group-list-big" class="active group-list-switcher btn btn-default">
+	<div id="circle-list-view-switcher" class="btn-group btn-group-sm pull-right">
+		<button type="button" id="circle-list-big" class="active circle-list-switcher btn btn-default">
 			<i class="fa fa-align-justify" aria-hidden="true"></i>
 		</button>
-		<button type="button" id="group-list-small" class="btn btn-default group-list-switcher">
+		<button type="button" id="circle-list-small" class="btn btn-default circle-list-switcher">
 			<i class="fa fa-th-large" aria-hidden="true"></i>
 		</button>
 	</div>
 	<div class="clear"></div>
 
-	{{* The contact group list *}}
-	<div id="group-update-wrapper">
-		{{include file="groupeditor.tpl"}}
+	{{* The contact circle list *}}
+	<div id="circle-update-wrapper">
+		{{include file="circle_editor.tpl"}}
 	</div>
 	{{/if}}
 </div>

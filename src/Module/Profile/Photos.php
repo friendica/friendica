@@ -93,14 +93,14 @@ class Photos extends \Friendica\Module\BaseProfile
 		}
 
 		$str_contact_allow = isset($request['contact_allow']) ? $this->aclFormatter->toString($request['contact_allow']) : $this->owner['allow_cid'] ?? '';
-		$str_group_allow   = isset($request['group_allow'])   ? $this->aclFormatter->toString($request['group_allow'])   : $this->owner['allow_gid'] ?? '';
+		$str_circle_allow  = isset($request['circle_allow'])  ? $this->aclFormatter->toString($request['circle_allow'])  : $this->owner['allow_gid'] ?? '';
 		$str_contact_deny  = isset($request['contact_deny'])  ? $this->aclFormatter->toString($request['contact_deny'])  : $this->owner['deny_cid']  ?? '';
-		$str_group_deny    = isset($request['group_deny'])    ? $this->aclFormatter->toString($request['group_deny'])    : $this->owner['deny_gid']  ?? '';
+		$str_circle_deny   = isset($request['circle_deny'])   ? $this->aclFormatter->toString($request['circle_deny'])   : $this->owner['deny_gid']  ?? '';
 
 		$visibility = $request['visibility'] ?? '';
 		if ($visibility === 'public') {
 			// The ACL selector introduced in version 2019.12 sends ACL input data even when the Public visibility is selected
-			$str_contact_allow = $str_group_allow = $str_contact_deny = $str_group_deny = '';
+			$str_contact_allow = $str_circle_allow = $str_contact_deny = $str_circle_deny = '';
 		} else if ($visibility === 'custom') {
 			// Since we know from the visibility parameter the item should be private, we have to prevent the empty ACL
 			// case that would make it public. So we always append the author's contact id to the allowed contacts.
@@ -236,9 +236,14 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$resource_id = Photo::newResource();
 
+<<<<<<< HEAD
 		$r = Photo::store($image, $this->owner['uid'], 0, $resource_id, $filename, $album, 0 , Photo::DEFAULT, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);
 
 		if (!$r) {
+=======
+		$preview = Photo::storeWithPreview($image, $this->owner['uid'], $resource_id, $filename, $filesize, $album, '', $str_contact_allow, $str_circle_allow, $str_contact_deny, $str_circle_deny);
+		if ($preview < 0) {
+>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 			$this->logger->warning('image store failed');
 			$this->systemMessages->addNotice($this->t('Image upload failed.'));
 			return;
@@ -285,9 +290,9 @@ class Photos extends \Friendica\Module\BaseProfile
 		$arr['author-avatar'] = $this->owner['thumb'];
 		$arr['title']         = '';
 		$arr['allow_cid']     = $str_contact_allow;
-		$arr['allow_gid']     = $str_group_allow;
+		$arr['allow_gid']     = $str_circle_allow;
 		$arr['deny_cid']      = $str_contact_deny;
-		$arr['deny_gid']      = $str_group_deny;
+		$arr['deny_gid']      = $str_circle_deny;
 		$arr['visible']       = $visible;
 		$arr['origin']        = 1;
 

@@ -28,7 +28,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model;
 
-class Group extends BaseModule
+class Circle extends BaseModule
 {
 	protected function post(array $request = [])
 	{
@@ -43,34 +43,34 @@ class Group extends BaseModule
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'new')) {
-			BaseModule::checkFormSecurityTokenRedirectOnError('/group/new', 'group_edit');
+			BaseModule::checkFormSecurityTokenRedirectOnError('/circle/new', 'circle_edit');
 
-			$name = trim($request['groupname']);
-			$r = Model\Group::create(DI::userSession()->getLocalUserId(), $name);
+			$name = trim($request['circle_name']);
+			$r = Model\Circle::create(DI::userSession()->getLocalUserId(), $name);
 			if ($r) {
-				$r = Model\Group::getIdByName(DI::userSession()->getLocalUserId(), $name);
+				$r = Model\Circle::getIdByName(DI::userSession()->getLocalUserId(), $name);
 				if ($r) {
-					DI::baseUrl()->redirect('group/' . $r);
+					DI::baseUrl()->redirect('circle/' . $r);
 				}
 			} else {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Could not create group.'));
+				DI::sysmsg()->addNotice(DI::l10n()->t('Could not create circle.'));
 			}
-			DI::baseUrl()->redirect('group');
+			DI::baseUrl()->redirect('circle');
 		}
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 2) && intval(DI::args()->getArgv()[1])) {
-			BaseModule::checkFormSecurityTokenRedirectOnError('/group', 'group_edit');
+			BaseModule::checkFormSecurityTokenRedirectOnError('/circle', 'circle_edit');
 
-			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => DI::args()->getArgv()[1], 'uid' => DI::userSession()->getLocalUserId()]);
-			if (!DBA::isResult($group)) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Group not found.'));
+			$circle = DBA::selectFirst('group', ['id', 'name'], ['id' => DI::args()->getArgv()[1], 'uid' => DI::userSession()->getLocalUserId()]);
+			if (!DBA::isResult($circle)) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Circle not found.'));
 				DI::baseUrl()->redirect('contact');
 			}
-			$groupname = trim($_POST['groupname']);
-			if (strlen($groupname) && ($groupname != $group['name'])) {
-				if (!Model\Group::update($group['id'], $groupname)) {
-					DI::sysmsg()->addNotice(DI::l10n()->t('Group name was not changed.'));
+			$circlename = trim($_POST['circle_name']);
+			if (strlen($circlename) && ($circlename != $circle['name'])) {
+				if (!Model\Circle::update($circle['id'], $circlename)) {
+					DI::sysmsg()->addNotice(DI::l10n()->t('Circle name was not changed.'));
 				}
 			}
 		}
@@ -84,11 +84,11 @@ class Group extends BaseModule
 			}
 
 			if (isset($this->parameters['command'])) {
-				$group_id = $this->parameters['group'];
+				$circle_id = $this->parameters['circle'];
 				$contact_id = $this->parameters['contact'];
 
-				if (!Model\Group::exists($group_id, DI::userSession()->getLocalUserId())) {
-					throw new \Exception(DI::l10n()->t('Unknown group.'), 404);
+				if (!Model\Circle::exists($circle_id, DI::userSession()->getLocalUserId())) {
+					throw new \Exception(DI::l10n()->t('Unknown circle.'), 404);
 				}
 
 				// @TODO Backward compatibility with user contacts, remove by version 2022.03
@@ -112,18 +112,18 @@ class Group extends BaseModule
 
 				switch($this->parameters['command']) {
 					case 'add':
-						if (!Model\Group::addMember($group_id, $cdata['user'])) {
-							throw new \Exception(DI::l10n()->t('Unable to add the contact to the group.'), 500);
+						if (!Model\Circle::addMember($circle_id, $cdata['user'])) {
+							throw new \Exception(DI::l10n()->t('Unable to add the contact to the circle.'), 500);
 						}
 
-						$message = DI::l10n()->t('Contact successfully added to group.');
+						$message = DI::l10n()->t('Contact successfully added to circle.');
 						break;
 					case 'remove':
-						if (!Model\Group::removeMember($group_id, $cdata['user'])) {
-							throw new \Exception(DI::l10n()->t('Unable to remove the contact from the group.'), 500);
+						if (!Model\Circle::removeMember($circle_id, $cdata['user'])) {
+							throw new \Exception(DI::l10n()->t('Unable to remove the contact from the circle.'), 500);
 						}
 
-						$message = DI::l10n()->t('Contact successfully removed from group.');
+						$message = DI::l10n()->t('Contact successfully removed from circle.');
 						break;
 				}
 			} else {
@@ -148,56 +148,58 @@ class Group extends BaseModule
 
 		$a = DI::app();
 
-		DI::page()['aside'] = Model\Group::sidebarWidget('contact', 'group', 'extended', ((DI::args()->getArgc() > 1) ? DI::args()->getArgv()[1] : 'everyone'));
+		DI::page()['aside'] = Model\Circle::sidebarWidget('contact', 'circle', 'extended', ((DI::args()->getArgc() > 1) ? DI::args()->getArgv()[1] : 'everyone'));
 
-		// With no group number provided we jump to the unassigned contacts as a starting point
+		// With no circle number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgc() == 1) {
-			DI::baseUrl()->redirect('group/none');
+			DI::baseUrl()->redirect('circle/none');
 		}
 
-		// Switch to text mode interface if we have more than 'n' contacts or group members
-		$switchtotext = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'groupedit_image_limit');
+		// Switch to text mode interface if we have more than 'n' contacts or circle members
+		$switchtotext = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'circle_edit_image_limit') ??
+			DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'groupedit_image_limit');
 		if (is_null($switchtotext)) {
-			$switchtotext = DI::config()->get('system', 'groupedit_image_limit', 200);
+			$switchtotext = DI::config()->get('system', 'groupedit_image_limit') ??
+				DI::config()->get('system', 'circle_edit_image_limit');
 		}
 
-		$tpl = Renderer::getMarkupTemplate('group_edit.tpl');
+		$tpl = Renderer::getMarkupTemplate('circle_edit.tpl');
 
 
 		$context = [
-			'$submit' => DI::l10n()->t('Save Group'),
+			'$submit' => DI::l10n()->t('Save Circle'),
 			'$submit_filter' => DI::l10n()->t('Filter'),
 		];
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'new')) {
 			return Renderer::replaceMacros($tpl, $context + [
-				'$title' => DI::l10n()->t('Create a group of contacts/friends.'),
-				'$gname' => ['groupname', DI::l10n()->t('Group Name: '), '', ''],
+				'$title' => DI::l10n()->t('Create a circle of contacts/friends.'),
+				'$gname' => ['circle_name', DI::l10n()->t('Circle Name: '), '', ''],
 				'$gid' => 'new',
-				'$form_security_token' => BaseModule::getFormSecurityToken("group_edit"),
+				'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
 			]);
 		}
 
-		$nogroup = false;
+		$nocircle = false;
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'none') ||
-			(DI::args()->getArgc() == 1) && (DI::args()->getArgv()[0] === 'nogroup')) {
+			(DI::args()->getArgc() == 1) && (DI::args()->getArgv()[0] === 'nocircle')) {
 			$id = -1;
-			$nogroup = true;
-			$group = [
+			$nocircle = true;
+			$circle = [
 				'id' => $id,
-				'name' => DI::l10n()->t('Contacts not in any group'),
+				'name' => DI::l10n()->t('Contacts not in any circle'),
 			];
 
 			$members = [];
 			$preselected = [];
 
 			$context = $context + [
-				'$title' => $group['name'],
-				'$gname' => ['groupname', DI::l10n()->t('Group Name: '), $group['name'], ''],
+				'$title' => $circle['name'],
+				'$gname' => ['circle_name', DI::l10n()->t('Circle Name: '), $circle['name'], ''],
 				'$gid' => $id,
 				'$editable' => 0,
 			];
@@ -205,25 +207,25 @@ class Group extends BaseModule
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 3) && (DI::args()->getArgv()[1] === 'drop')) {
-			BaseModule::checkFormSecurityTokenRedirectOnError('/group', 'group_drop', 't');
+			BaseModule::checkFormSecurityTokenRedirectOnError('/circle', 'circle_drop', 't');
 
 			// @TODO: Replace with parameter from router
 			if (intval(DI::args()->getArgv()[2])) {
-				if (!Model\Group::exists(DI::args()->getArgv()[2], DI::userSession()->getLocalUserId())) {
-					DI::sysmsg()->addNotice(DI::l10n()->t('Group not found.'));
+				if (!Model\Circle::exists(DI::args()->getArgv()[2], DI::userSession()->getLocalUserId())) {
+					DI::sysmsg()->addNotice(DI::l10n()->t('Circle not found.'));
 					DI::baseUrl()->redirect('contact');
 				}
 
-				if (!Model\Group::remove(DI::args()->getArgv()[2])) {
-					DI::sysmsg()->addNotice(DI::l10n()->t('Unable to remove group.'));
+				if (!Model\Circle::remove(DI::args()->getArgv()[2])) {
+					DI::sysmsg()->addNotice(DI::l10n()->t('Unable to remove circle.'));
 				}
 			}
-			DI::baseUrl()->redirect('group');
+			DI::baseUrl()->redirect('circle');
 		}
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() > 2) && intval(DI::args()->getArgv()[1]) && intval(DI::args()->getArgv()[2])) {
-			BaseModule::checkFormSecurityTokenForbiddenOnError('group_member_change', 't');
+			BaseModule::checkFormSecurityTokenForbiddenOnError('circle_member_change', 't');
 
 			if (DBA::exists('contact', ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId(), 'self' => false, 'pending' => false, 'blocked' => false])) {
 				$change = intval(DI::args()->getArgv()[2]);
@@ -232,13 +234,13 @@ class Group extends BaseModule
 
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() > 1) && intval(DI::args()->getArgv()[1])) {
-			$group = DBA::selectFirst('group', ['id', 'name'], ['id' => DI::args()->getArgv()[1], 'uid' => DI::userSession()->getLocalUserId(), 'deleted' => false]);
-			if (!DBA::isResult($group)) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Group not found.'));
+			$circle = DBA::selectFirst('group', ['id', 'name'], ['id' => DI::args()->getArgv()[1], 'uid' => DI::userSession()->getLocalUserId(), 'deleted' => false]);
+			if (!DBA::isResult($circle)) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Circle not found.'));
 				DI::baseUrl()->redirect('contact');
 			}
 
-			$members = Model\Contact\Group::getById($group['id']);
+			$members = Model\Contact\Circle::getById($circle['id']);
 			$preselected = [];
 
 			if (count($members)) {
@@ -249,12 +251,12 @@ class Group extends BaseModule
 
 			if ($change) {
 				if (in_array($change, $preselected)) {
-					Model\Group::removeMember($group['id'], $change);
+					Model\Circle::removeMember($circle['id'], $change);
 				} else {
-					Model\Group::addMember($group['id'], $change);
+					Model\Circle::addMember($circle['id'], $change);
 				}
 
-				$members = Model\Contact\Group::getById($group['id']);
+				$members = Model\Contact\Circle::getById($circle['id']);
 				$preselected = [];
 				if (count($members)) {
 					foreach ($members as $member) {
@@ -263,59 +265,59 @@ class Group extends BaseModule
 				}
 			}
 
-			$drop_tpl = Renderer::getMarkupTemplate('group_drop.tpl');
+			$drop_tpl = Renderer::getMarkupTemplate('circle_drop.tpl');
 			$drop_txt = Renderer::replaceMacros($drop_tpl, [
-				'$id' => $group['id'],
-				'$delete' => DI::l10n()->t('Delete Group'),
-				'$form_security_token' => BaseModule::getFormSecurityToken("group_drop"),
+				'$id' => $circle['id'],
+				'$delete' => DI::l10n()->t('Delete Circle'),
+				'$form_security_token' => BaseModule::getFormSecurityToken('circle_drop'),
 			]);
 
 			$context = $context + [
-				'$title' => $group['name'],
-				'$gname' => ['groupname', DI::l10n()->t('Group Name: '), $group['name'], ''],
-				'$gid' => $group['id'],
+				'$title' => $circle['name'],
+				'$gname' => ['circle_name', DI::l10n()->t('Circle Name: '), $circle['name'], ''],
+				'$gid' => $circle['id'],
 				'$drop' => $drop_txt,
-				'$form_security_token' => BaseModule::getFormSecurityToken('group_edit'),
-				'$edit_name' => DI::l10n()->t('Edit Group Name'),
+				'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
+				'$edit_name' => DI::l10n()->t('Edit Circle Name'),
 				'$editable' => 1,
 			];
 		}
 
-		if (!isset($group)) {
+		if (!isset($circle)) {
 			throw new \Friendica\Network\HTTPException\BadRequestException();
 		}
 
-		$groupeditor = [
+		$circle_editor = [
 			'label_members' => DI::l10n()->t('Members'),
 			'members' => [],
 			'label_contacts' => DI::l10n()->t('All Contacts'),
-			'group_is_empty' => DI::l10n()->t('Group is empty'),
+			'circle_is_empty' => DI::l10n()->t('Circle is empty'),
 			'contacts' => [],
 		];
 
-		$sec_token = addslashes(BaseModule::getFormSecurityToken('group_member_change'));
+		$sec_token = addslashes(BaseModule::getFormSecurityToken('circle_member_change'));
 
-		// Format the data of the group members
+		// Format the data of the circle members
 		foreach ($members as $member) {
 			if ($member['url']) {
 				$entry = Contact::getContactTemplateVars($member);
 				$entry['label'] = 'members';
 				$entry['photo_menu'] = '';
 				$entry['change_member'] = [
-					'title'     => DI::l10n()->t("Remove contact from group"),
-					'gid'       => $group['id'],
+					'title'     => DI::l10n()->t('Remove contact from circle'),
+					'gid'       => $circle['id'],
 					'cid'       => $member['id'],
 					'sec_token' => $sec_token
 				];
 
-				$groupeditor['members'][] = $entry;
+				$circle_editor['members'][] = $entry;
 			} else {
-				Model\Group::removeMember($group['id'], $member['id']);
+				Model\Circle::removeMember($circle['id'], $member['id']);
 			}
 		}
 
-		if ($nogroup) {
-			$contacts = Model\Contact\Group::listUngrouped(DI::userSession()->getLocalUserId());
+		if ($nocircle) {
+			$contacts = Model\Contact\Circle::listUncircled(DI::userSession()->getLocalUserId());
 		} else {
 			$contacts_stmt = DBA::select('contact', [],
 				['rel' => [Model\Contact::FOLLOWER, Model\Contact::FRIEND, Model\Contact::SHARING],
@@ -327,36 +329,36 @@ class Group extends BaseModule
 		}
 
 		if (DBA::isResult($contacts)) {
-			// Format the data of the contacts who aren't in the contact group
+			// Format the data of the contacts who aren't in the contact circle
 			foreach ($contacts as $member) {
 				if (!in_array($member['id'], $preselected)) {
 					$entry = Contact::getContactTemplateVars($member);
 					$entry['label'] = 'contacts';
-					if (!$nogroup)
+					if (!$nocircle)
 						$entry['photo_menu'] = [];
 
-					if (!$nogroup) {
+					if (!$nocircle) {
 						$entry['change_member'] = [
-							'title'     => DI::l10n()->t("Add contact to group"),
-							'gid'       => $group['id'],
+							'title'     => DI::l10n()->t('Add contact to circle'),
+							'gid'       => $circle['id'],
 							'cid'       => $member['id'],
 							'sec_token' => $sec_token
 						];
 					}
 
-					$groupeditor['contacts'][] = $entry;
+					$circle_editor['contacts'][] = $entry;
 				}
 			}
 		}
 
-		$context['$groupeditor'] = $groupeditor;
+		$context['$circle_editor'] = $circle_editor;
 
 		// If there are to many contacts we could provide an alternative view mode
-		$total = count($groupeditor['members']) + count($groupeditor['contacts']);
+		$total = count($circle_editor['members']) + count($circle_editor['contacts']);
 		$context['$shortmode'] = (($switchtotext && ($total > $switchtotext)) ? true : false);
 
 		if ($change) {
-			$tpl = Renderer::getMarkupTemplate('groupeditor.tpl');
+			$tpl = Renderer::getMarkupTemplate('circle_editor.tpl');
 			echo Renderer::replaceMacros($tpl, $context);
 			System::exit();
 		}

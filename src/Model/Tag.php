@@ -50,7 +50,7 @@ class Tag
 	 */
 	const IMPLICIT_MENTION  = 8;
 	/**
-	 * An exclusive mention transmits the post only to the target account without transmitting it to the followers, usually a forum.
+	 * An exclusive mention transmits the post only to the target account without transmitting it to the followers, usually a group.
 	 */
 	const EXCLUSIVE_MENTION = 9;
 

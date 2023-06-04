@@ -191,7 +191,7 @@ class Contact extends BaseModule
 		$search = trim($_GET['search'] ?? '');
 		$nets   = trim($_GET['nets']   ?? '');
 		$rel    = trim($_GET['rel']    ?? '');
-		$group  = trim($_GET['group']  ?? '');
+		$circle = trim($_GET['circle'] ?? '');
 
 		$accounttype = $_GET['accounttype'] ?? '';
 		$accounttypeid = User::getAccountTypeByString($accounttype);
@@ -211,12 +211,12 @@ class Contact extends BaseModule
 			$follow_widget = Widget::follow();
 		}
 
-		$account_widget = Widget::accountTypes($_SERVER['REQUEST_URI'], $accounttype);
+		$account_widget  = Widget::accountTypes($_SERVER['REQUEST_URI'], $accounttype);
 		$networks_widget = Widget::networks($_SERVER['REQUEST_URI'], $nets);
-		$rel_widget = Widget::contactRels($_SERVER['REQUEST_URI'], $rel);
-		$groups_widget = Widget::groups($_SERVER['REQUEST_URI'], $group);
+		$rel_widget      = Widget::contactRels($_SERVER['REQUEST_URI'], $rel);
+		$circles_widget  = Widget::circles($_SERVER['REQUEST_URI'], $circle);
 
-		DI::page()['aside'] .= $vcard_widget . $findpeople_widget . $follow_widget . $rel_widget . $groups_widget . $networks_widget . $account_widget;
+		DI::page()['aside'] .= $vcard_widget . $findpeople_widget . $follow_widget . $rel_widget . $circles_widget . $networks_widget . $account_widget;
 
 		$tpl = Renderer::getMarkupTemplate('contacts-head.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
@@ -304,11 +304,19 @@ class Contact extends BaseModule
 				$sql_extra .= " AND `rel` = ?";
 				$sql_values[] = Model\Contact::FRIEND;
 				break;
+			case 'nothing':
+				$sql_extra .= " AND `rel` = ?";
+				$sql_values[] = Model\Contact::NOTHING;
+				break;
+			default:
+				$sql_extra .= " AND `rel` != ?";
+				$sql_values[] = Model\Contact::NOTHING;
+				break;
 		}
 
-		if ($group) {
+		if ($circle) {
 			$sql_extra .= " AND `id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)";
-			$sql_values[] = $group;
+			$sql_values[] = $circle;
 		}
 
 		$networks = Widget::unavailableNetworks();
@@ -391,11 +399,11 @@ class Contact extends BaseModule
 				'accesskey' => 'h',
 			],
 			[
-				'label' => DI::l10n()->t('Groups'),
-				'url'   => 'group',
+				'label' => DI::l10n()->t('Circles'),
+				'url'   => 'circle',
 				'sel'   => '',
-				'title' => DI::l10n()->t('Organize your contact groups'),
-				'id'    => 'contactgroups-tab',
+				'title' => DI::l10n()->t('Organize your contact circles'),
+				'id'    => 'contactcircles-tab',
 				'accesskey' => 'e',
 			],
 		];
@@ -407,6 +415,7 @@ class Contact extends BaseModule
 			case 'followers': $header = DI::l10n()->t('Followers'); break;
 			case 'following': $header = DI::l10n()->t('Following'); break;
 			case 'mutuals':   $header = DI::l10n()->t('Mutual friends'); break;
+			case 'nothing':   $header = DI::l10n()->t('No relationship'); break;
 			default:          $header = DI::l10n()->t('Contacts');
 		}
 

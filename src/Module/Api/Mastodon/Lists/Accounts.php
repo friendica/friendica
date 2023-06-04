@@ -24,7 +24,7 @@ namespace Friendica\Module\Api\Mastodon\Lists;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Module\BaseApi;
 
 /**
@@ -46,7 +46,7 @@ class Accounts extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		return Group::removeMembers($this->parameters['id'], $request['account_ids']);
+		return Circle::removeMembers($this->parameters['id'], $request['account_ids']);
 	}
 
 	protected function post(array $request = [])
@@ -61,7 +61,7 @@ class Accounts extends BaseApi
 			DI::mstdnError()->UnprocessableEntity();
 		}
 
-		Group::addMembers($this->parameters['id'], $request['account_ids']);
+		Circle::addMembers($this->parameters['id'], $request['account_ids']);
 	}
 
 	/**

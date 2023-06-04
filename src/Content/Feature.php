@@ -102,7 +102,7 @@ class Feature
 			// Post composition
 			'composition' => [
 				DI::l10n()->t('Post Composition Features'),
-				['aclautomention', DI::l10n()->t('Auto-mention Forums'), DI::l10n()->t('Add/remove mention when a forum page is selected/deselected in ACL window.'), false, DI::config()->get('feature_lock', 'aclautomention', false)],
+				['aclautomention', DI::l10n()->t('Auto-mention Groups'), DI::l10n()->t('Add/remove mention when a group page is selected/deselected in ACL window.'), false, DI::config()->get('feature_lock', 'aclautomention', false)],
 				['explicit_mentions', DI::l10n()->t('Explicit Mentions'), DI::l10n()->t('Add explicit mentions to comment box for manual control over who gets mentioned in replies.'), false, DI::config()->get('feature_lock', 'explicit_mentions', false)],
 				['add_abstract', DI::l10n()->t('Add an abstract from ActivityPub content warnings'), DI::l10n()->t('Add an abstract when commenting on ActivityPub posts with a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma.'), false, DI::config()->get('feature_lock', 'add_abstract', false)],
 			],
@@ -116,7 +116,7 @@ class Feature
 			// Advanced Profile Settings
 			'advanced_profile' => [
 				DI::l10n()->t('Advanced Profile Settings'),
-				['forumlist_profile',   DI::l10n()->t('List Forums'),             DI::l10n()->t('Show visitors public community forums at the Advanced Profile Page'), false, DI::config()->get('feature_lock', 'forumlist_profile', false)],
+				['forumlist_profile',   DI::l10n()->t('List Groups'),             DI::l10n()->t('Show visitors public groups at the Advanced Profile Page'), false, DI::config()->get('feature_lock', 'forumlist_profile', false)],
 				['tagadelic',           DI::l10n()->t('Tag Cloud'),               DI::l10n()->t('Provide a personal tag cloud on your profile page'), false, DI::config()->get('feature_lock', 'tagadelic', false)],
 				['profile_membersince', DI::l10n()->t('Display Membership Date'), DI::l10n()->t('Display membership date in profile'), false, DI::config()->get('feature_lock', 'profile_membersince', false)],
 			],

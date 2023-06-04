@@ -20,7 +20,7 @@ This theme should be the start of a discussion in the friendica community (users
 What frameworks do we want to use? How should default friendica look like? And how do we want to use friendica? What do we need in the core code (At the present time some stuff this is done with ugly javascript hacks and own php code)?
 
 Coding a theme is much work but you will get a really good insight of the limitations of friendica and can start a discussion about doing things differently.
-So join the discussion at the friendica forums ;-)
+So join the discussion at the friendica groups ;-)
 
 If anyone wants to contribute to this theme he/she is welcome to do this.
 

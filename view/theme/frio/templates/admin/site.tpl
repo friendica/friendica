@@ -242,7 +242,7 @@
 				</div>
 				<div id="admin-settings-performance-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-performance">
 					<div class="panel-body">
-						{{include file="field_checkbox.tpl" field=$compute_group_counts}}
+						{{include file="field_checkbox.tpl" field=$compute_circle_counts}}
 						{{include file="field_checkbox.tpl" field=$only_tag_search}}
 						{{include file="field_input.tpl" field=$max_comments}}
 						{{include file="field_input.tpl" field=$max_display_comments}}

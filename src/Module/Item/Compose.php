@@ -113,9 +113,9 @@ class Compose extends BaseModule
 		$user = User::getById(DI::userSession()->getLocalUserId(), ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'default-location']);
 
 		$contact_allow_list = $this->ACLFormatter->expand($user['allow_cid']);
-		$group_allow_list   = $this->ACLFormatter->expand($user['allow_gid']);
+		$circle_allow_list  = $this->ACLFormatter->expand($user['allow_gid']);
 		$contact_deny_list  = $this->ACLFormatter->expand($user['deny_cid']);
-		$group_deny_list    = $this->ACLFormatter->expand($user['deny_gid']);
+		$circle_deny_list   = $this->ACLFormatter->expand($user['deny_gid']);
 
 		switch ($posttype) {
 			case Item::PT_PERSONAL_NOTE:
@@ -123,9 +123,9 @@ class Compose extends BaseModule
 				$type = 'note';
 				$doesFederate = false;
 				$contact_allow_list = [$a->getContactId()];
-				$group_allow_list = [];
+				$circle_allow_list = [];
 				$contact_deny_list = [];
-				$group_deny_list = [];
+				$circle_deny_list = [];
 				break;
 			default:
 				$compose_title = $this->l10n->t('Compose new post');
@@ -133,19 +133,19 @@ class Compose extends BaseModule
 				$doesFederate = true;
 
 				$contact_allow = $_REQUEST['contact_allow'] ?? '';
-				$group_allow = $_REQUEST['group_allow'] ?? '';
+				$circle_allow = $_REQUEST['circle_allow'] ?? '';
 				$contact_deny = $_REQUEST['contact_deny'] ?? '';
-				$group_deny = $_REQUEST['group_deny'] ?? '';
+				$circle_deny = $_REQUEST['circle_deny'] ?? '';
 
 				if ($contact_allow
-					. $group_allow
+					. $circle_allow
 					. $contact_deny
-				    . $group_deny)
+				    . $circle_deny)
 				{
 					$contact_allow_list = $contact_allow ? explode(',', $contact_allow) : [];
-					$group_allow_list   = $group_allow   ? explode(',', $group_allow)   : [];
+					$circle_allow_list  = $circle_allow  ? explode(',', $circle_allow)  : [];
 					$contact_deny_list  = $contact_deny  ? explode(',', $contact_deny)  : [];
-					$group_deny_list    = $group_deny    ? explode(',', $group_deny)    : [];
+					$circle_deny_list   = $circle_deny   ? explode(',', $circle_deny)   : [];
 				}
 
 				break;
@@ -228,18 +228,18 @@ class Compose extends BaseModule
 			'$body'         => $body,
 			'$location'     => $location,
 
-			'$contact_allow'=> implode(',', $contact_allow_list),
-			'$group_allow'  => implode(',', $group_allow_list),
-			'$contact_deny' => implode(',', $contact_deny_list),
-			'$group_deny'   => implode(',', $group_deny_list),
+			'$contact_allow' => implode(',', $contact_allow_list),
+			'$circle_allow'  => implode(',', $circle_allow_list),
+			'$contact_deny'  => implode(',', $contact_deny_list),
+			'$circle_deny'   => implode(',', $circle_deny_list),
 
 			'$jotplugins'   => $jotplugins,
 			'$rand_num'     => Crypto::randomDigits(12),
 			'$acl_selector'  => ACL::getFullSelectorHTML($this->page, $a->getLoggedInUserId(), $doesFederate, [
 				'allow_cid' => $contact_allow_list,
-				'allow_gid' => $group_allow_list,
+				'allow_gid' => $circle_allow_list,
 				'deny_cid'  => $contact_deny_list,
-				'deny_gid'  => $group_deny_list,
+				'deny_gid'  => $circle_deny_list,
 			]),
 		]);
 	}

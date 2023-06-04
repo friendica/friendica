@@ -24,7 +24,7 @@ namespace Friendica\Security;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Group;
+use Friendica\Model\Circle;
 use Friendica\Model\User;
 
 /**
@@ -117,17 +117,13 @@ class Security
 		if ($local_user && $local_user == $owner_id) {
 			$sql = '';
 		/*
-		 * Authenticated visitor. Load the groups the visitor belongs to.
+		 * Authenticated visitor. Load the circles the visitor belongs to.
 		 */
 		} elseif ($remote_contact) {
-			$gs = '<<>>'; // should be impossible to match
+			$circleIds = '<<>>'; // should be impossible to match
 
-			$groups = Group::getIdsByContactId($remote_contact);
-
-			if (is_array($groups)) {
-				foreach ($groups as $g) {
-					$gs .= '|<' . intval($g) . '>';
-				}
+			foreach (Circle::getIdsByContactId($remote_contact) as $circleId) {
+				$circleIds .= '|<' . intval($circleId) . '>';
 			}
 
 			$sql = sprintf(
@@ -135,9 +131,9 @@ class Security
 				  AND (allow_cid REGEXP '<%d>' OR allow_gid REGEXP '%s'
 				  OR (allow_cid = '' AND allow_gid = ''))" . $acc_sql . ") ",
 				intval($remote_contact),
-				DBA::escape($gs),
+				DBA::escape($circleIds),
 				intval($remote_contact),
-				DBA::escape($gs)
+				DBA::escape($circleIds)
 			);
 		}
 		return $sql;

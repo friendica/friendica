@@ -30,8 +30,8 @@ Database Tables
 | [fetch-entry](help/database/db_fetch-entry) |  |
 | [fetched-activity](help/database/db_fetched-activity) | Id of fetched activities |
 | [fsuggest](help/database/db_fsuggest) | friend suggestion stuff |
-| [group](help/database/db_group) | privacy groups, group info |
-| [group_member](help/database/db_group_member) | privacy groups, member info |
+| [group](help/database/db_group) | privacy circles, circle info |
+| [group_member](help/database/db_group_member) | privacy circles, member info |
 | [gserver](help/database/db_gserver) | Global servers |
 | [gserver-tag](help/database/db_gserver-tag) | Tags that the server has subscribed |
 | [hook](help/database/db_hook) | addon hook registry |

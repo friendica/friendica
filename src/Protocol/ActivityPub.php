@@ -52,8 +52,8 @@ use Friendica\Util\JsonLD;
  * - Polling the outboxes for missing content?
  *
  * Missing parts from DFRN:
- * - Public Forum
- * - Private Forum
+ * - Public Group
+ * - Private Group
  * - Relocation
  */
 class ActivityPub

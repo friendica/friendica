@@ -41,9 +41,9 @@ This is the only bit of personal information that has to be accurate.
 ### Nickname
 
 A nickname is used to generate web addresses for many of your personal pages, and is also treated like an email address when establishing communications with others.
-Due to the way that the nickname is used, it has some limitations. 
+Due to the way that the nickname is used, it has some limitations.
 It must contain only US-ASCII text characters and numbers, and must also start with a text character.
-It also must be unique on this system. 
+It also must be unique on this system.
 This is used in many places to identify your account, and once set it cannot be changed.
 
 
@@ -53,28 +53,28 @@ The registration form also allows you to choose whether or not to list your acco
 This is like a "phone book" and you may choose to be unlisted.
 We recommend that you select 'Yes' so that other people (friends, family, etc.) will be able to find you.
 If you choose 'No', you will essentially be invisible and have few opportunities for interaction.
-Whichever you choose, this can be changed any time from your Settings page after you login. 
+Whichever you choose, this can be changed any time from your Settings page after you login.
 
 ### Register
 
 Once you have provided the necessary details, click the 'Register' button.
 An email will be sent to you providing your account login details.
-Please check your email (including spam folders) for your registration details and initial password. 
+Please check your email (including spam folders) for your registration details and initial password.
 
 Login Page
 ---
 
 On the 'Login' page, please enter your login information that was provided during registration.
-You may use either your nickname or email address as a Login Name. 
+You may use either your nickname or email address as a Login Name.
 
 If you use your account to manage other accounts and these all have the same email address, please enter the nickname for the account you wish to manage.
 
 If your account has been OpenID enabled, you may use your OpenID address as a login name and leave the password blank.
-You will be redirected to your OpenID provider to complete your authorisation. 
+You will be redirected to your OpenID provider to complete your authorisation.
 
 Otherwise, enter your password.
 This will have been initially provided in your registration email message.
-Your password is case-sensitive, so please check your 'Caps Lock' key if you are having difficulty logging in. 
+Your password is case-sensitive, so please check your 'Caps Lock' key if you are having difficulty logging in.
 
 Changing Your Password
 ---
@@ -99,9 +99,9 @@ See Also
 
 * [Profiles](help/Profiles)
 
-* [Global Directory](help/Making-Friends#The+Directories) 
+* [Global Directory](help/Making-Friends#The+Directories)
 
-* [Groups and Privacy](help/Groups-and-Privacy)
+* [Circles and Privacy](help/Circles-and-Privacy)
 
 * [Move Account](help/Move-Account)
 

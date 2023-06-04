@@ -1,0 +1,1547 @@
+[1mdiff --cc database.sql[m
+[1mindex 334b35f77,2528b0145..000000000[m
+[1m--- a/database.sql[m
+[1m+++ b/database.sql[m
+[36m@@@ -1,6 -1,6 +1,11 @@@[m
+  -- ------------------------------------------[m
+[32m++<<<<<<< HEAD[m
+[32m +-- Friendica 2023.06-dev (Giant Rhubarb)[m
+[32m +-- DB_UPDATE_VERSION 1518[m
+[32m++=======[m
+[32m+ -- Friendica 2023.09-dev (Giant Rhubarb)[m
+[32m+ -- DB_UPDATE_VERSION 1520[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  -- ------------------------------------------[m
+  [m
+  [m
+[1mdiff --cc doc/FAQ-admin.md[m
+[1mindex 82caa940c,e5f4f2a9f..000000000[m
+[1m--- a/doc/FAQ-admin.md[m
+[1m+++ b/doc/FAQ-admin.md[m
+[36m@@@ -48,4 -52,4 +48,8 @@@[m [mYou can manually execute the structure [m
+  [m
+      bin/console dbstructure update[m
+  [m
+[31m- if there occur any errors, please contact the [support forum](https://forum.friendi.ca/profile/helpers).[m
+[32m++<<<<<<< HEAD[m
+[32m++if there occur any errors, please contact the [support forum](https://forum.friendi.ca/profile/helpers).[m
+[32m++=======[m
+[32m+ if there occur any errors, please contact the [support group](https://forum.friendi.ca/profile/helpers).[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+[1mdiff --cc doc/de/FAQ-admin.md[m
+[1mindex 5b355e142,2441a5130..000000000[m
+[1m--- a/doc/de/FAQ-admin.md[m
+[1m+++ b/doc/de/FAQ-admin.md[m
+[36m@@@ -52,4 -56,4 +52,8 @@@[m [mStarte dazu bitte vom Grundverzeichnis [m
+  [m
+      bin/console dbstructure update[m
+  [m
+[31m- sollten bei der Ausführung Fehler auftreten, kontaktiere bitte das [Support Forum](https://forum.friendi.ca/profile/helpers).[m
+[32m++<<<<<<< HEAD[m
+[32m++sollten bei der Ausführung Fehler auftreten, kontaktiere bitte das [Support Forum](https://forum.friendi.ca/profile/helpers).[m
+[32m++=======[m
+[32m+ sollten bei der Ausführung Fehler auftreten, kontaktiere bitte die [Support Gruppe](https://forum.friendi.ca/profile/helpers).[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+[1mdiff --cc src/Content/GroupManager.php[m
+[1mindex eb39c11cb,9377ea32e..000000000[m
+[1m--- a/src/Content/GroupManager.php[m
+[1m+++ b/src/Content/GroupManager.php[m
+[36m@@@ -148,15 -148,13 +148,21 @@@[m [mclass GroupManage[m
+  			$o .= Renderer::replaceMacros([m
+  				$tpl,[m
+  				[[m
+[32m++<<<<<<< HEAD:src/Content/ForumManager.php[m
+[32m +					'$title'	=> DI::l10n()->t('Forums'),[m
+[32m +					'$forums'	=> $entries,[m
+[32m +					'$forums_page' => 'register/',[m
+[32m +					'$link_desc'	=> DI::l10n()->t('External link to forum'),[m
+[32m++=======[m
+[32m+ 					'$title'	=> DI::l10n()->t('Groups'),[m
+[32m+ 					'$groups'	=> $entries,[m
+[32m+ 					'$link_desc'	=> DI::l10n()->t('External link to group'),[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Content/GroupManager.php[m
+  					'$total'	=> $total,[m
+[31m- 					'$visible_forums' => $visible_forums,[m
+[32m+ 					'$visible_groups' => $visibleGroups,[m
+  					'$showless'	=> DI::l10n()->t('show less'),[m
+[31m -					'$showmore'	=> DI::l10n()->t('show more')][m
+[32m +					'$showmore'	=> DI::l10n()->t('show more'),[m
+[32m +					'$create_new_forum' => DI::l10n()->t('Create new forum')][m
+  			);[m
+  		}[m
+  [m
+[1mdiff --cc src/Core/Search.php[m
+[1mindex 45b64eb51,98517361e..000000000[m
+[1m--- a/src/Core/Search.php[m
+[1m+++ b/src/Core/Search.php[m
+[36m@@@ -55,40 -55,42 +55,76 @@@[m [mclass Searc[m
+  	 * @throws HTTPException\InternalServerErrorException[m
+  	 * @throws \ImagickException[m
+  	 */[m
+[32m++<<<<<<< HEAD[m
+[32m +	public static function getContactsFromProbe(string $user): ResultList[m
+[32m++=======[m
+[32m+ 	public static function getContactsFromProbe(string $user, $only_group = false): ResultList[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	{[m
+[31m -		$emptyResultList = new ResultList();[m
+[32m +		$emptyResultList = new ResultList(1, 0, 1);[m
+  [m
+[31m -		if (empty(parse_url($user, PHP_URL_SCHEME)) && !(filter_var($user, FILTER_VALIDATE_EMAIL) || Network::isEmailDomainValid($user))) {[m
+[32m +		if ((filter_var($user, FILTER_VALIDATE_EMAIL) && Network::isEmailDomainValid($user)) ||[m
+[32m +		    (substr(Strings::normaliseLink($user), 0, 7) == 'http://')) {[m
+[32m +[m
+[32m +			$user_data = Contact::getByURL($user);[m
+[32m +			if (empty($user_data)) {[m
+[32m +				return $emptyResultList;[m
+[32m +			}[m
+[32m +[m
+[32m +			if (!in_array($user_data['network'], Protocol::FEDERATED)) {[m
+[32m +				return $emptyResultList;[m
+[32m +			}[m
+[32m +[m
+[32m +			$contactDetails = Contact::getByURLForUser($user_data['url'] ?? '', DI::userSession()->getLocalUserId());[m
+[32m +[m
+[32m +			$result = new ContactResult([m
+[32m +				$user_data['name'] ?? '',[m
+[32m +				$user_data['addr'] ?? '',[m
+[32m +				($contactDetails['addr'] ?? '') ?: ($user_data['url'] ?? ''),[m
+[32m +				new Uri($user_data['url'] ?? ''),[m
+[32m +				$user_data['photo'] ?? '',[m
+[32m +				$user_data['network'] ?? '',[m
+[32m +				$contactDetails['cid'] ?? 0,[m
+[32m +				$user_data['id'] ?? 0,[m
+[32m +				$user_data['tags'] ?? ''[m
+[32m +			);[m
+[32m +[m
+[32m +			return new ResultList(1, 1, 1, [$result]);[m
+[32m +		} else {[m
+  			return $emptyResultList;[m
+  		}[m
+[32m++<<<<<<< HEAD[m
+[32m++=======[m
+[32m+ [m
+[32m+ 		$user_data = Contact::getByURL($user);[m
+[32m+ 		if (empty($user_data)) {[m
+[32m+ 			return $emptyResultList;[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		if ($only_group && ($user_data['contact-type'] != Contact::TYPE_COMMUNITY)) {[m
+[32m+ 			return $emptyResultList;[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		if (!Protocol::supportsProbe($user_data['network'])) {[m
+[32m+ 			return $emptyResultList;[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		$contactDetails = Contact::getByURLForUser($user_data['url'], DI::userSession()->getLocalUserId());[m
+[32m+ [m
+[32m+ 		$result = new ContactResult([m
+[32m+ 			$user_data['name'],[m
+[32m+ 			$user_data['addr'],[m
+[32m+ 			$user_data['addr'] ?: $user_data['url'],[m
+[32m+ 			new Uri($user_data['url']),[m
+[32m+ 			$user_data['photo'],[m
+[32m+ 			$user_data['network'],[m
+[32m+ 			$contactDetails['cid'] ?? 0,[m
+[32m+ 			$user_data['id'],[m
+[32m+ 			$user_data['keywords'][m
+[32m+ 		);[m
+[32m+ [m
+[32m+ 		return new ResultList(1, 1, 1, [$result]);[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	}[m
+  [m
+  	/**[m
+[36m@@@ -172,9 -174,9 +208,9 @@@[m
+  	{[m
+  		Logger::info('Searching', ['search' => $search, 'type' => $type, 'start' => $start, 'itempage' => $itemPage]);[m
+  [m
+[31m- 		$contacts = Contact::searchByName($search, $type == self::TYPE_FORUM ? 'community' : '', true);[m
+[32m+ 		$contacts = Contact::searchByName($search, $type == self::TYPE_GROUP ? 'community' : '', true);[m
+  [m
+[31m -		$resultList = new ResultList($start, count($contacts), $itemPage);[m
+[32m +		$resultList = new ResultList($start, $itemPage, count($contacts));[m
+  [m
+  		foreach ($contacts as $contact) {[m
+  			$result = new ContactResult([m
+[1mdiff --cc src/Model/Circle.php[m
+[1mindex e54d598eb,89453a0e8..000000000[m
+[1m--- a/src/Model/Circle.php[m
+[1m+++ b/src/Model/Circle.php[m
+[36m@@@ -390,17 -390,18 +390,28 @@@[m [mclass Circl[m
+  	}[m
+  [m
+  	/**[m
+[31m- 	 * Returns the combined list of contact ids from a group id list[m
+[32m+ 	 * Returns the combined list of contact ids from a circle id list[m
+  	 *[m
+[32m++<<<<<<< HEAD:src/Model/Group.php[m
+[32m +	 * @param int     $uid User id[m
+[32m +	 * @param array   $group_ids Groups ids[m
+[32m +	 * @param boolean $check_dead Whether check "dead" records (?)[m
+[32m +	 * @return array[m
+[32m +	 * @throws \Exception[m
+[32m +	 */[m
+[32m +	public static function expand(int $uid, array $group_ids, bool $check_dead = false): array[m
+[32m++=======[m
+[32m+ 	 * @param int     $uid              User id[m
+[32m+ 	 * @param array   $circle_ids        Circles ids[m
+[32m+ 	 * @param boolean $check_dead       Whether check "dead" records (?)[m
+[32m+ 	 * @param boolean $expand_followers Expand the list of followers[m
+[32m+ 	 * @return array[m
+[32m+ 	 * @throws \Exception[m
+[32m+ 	 */[m
+[32m+ 	public static function expand(int $uid, array $circle_ids, bool $check_dead = false, bool $expand_followers = true): array[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Model/Circle.php[m
+  	{[m
+[31m- 		if (!is_array($group_ids) || !count($group_ids)) {[m
+[32m+ 		if (!is_array($circle_ids) || !count($circle_ids)) {[m
+  			return [];[m
+  		}[m
+  [m
+[36m@@@ -417,26 -419,29 +428,30 @@@[m
+  			$networks = array_diff($networks, [Protocol::MAIL]);[m
+  		}[m
+  [m
+[31m- 		$key = array_search(self::FOLLOWERS, $group_ids);[m
+[32m+ 		$key = array_search(self::FOLLOWERS, $circle_ids);[m
+  		if ($key !== false) {[m
+[31m -			if ($expand_followers) {[m
+[31m -				$followers = Contact::selectToArray(['id'], [[m
+[31m -					'uid' => $uid,[m
+[31m -					'rel' => [Contact::FOLLOWER, Contact::FRIEND],[m
+[31m -					'network' => $networks,[m
+[31m -					'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON],[m
+[31m -					'archive' => false,[m
+[31m -					'pending' => false,[m
+[31m -					'blocked' => false,[m
+[31m -				]);[m
+[31m -[m
+[31m -				foreach ($followers as $follower) {[m
+[31m -					$return[] = $follower['id'];[m
+[31m -				}[m
+[31m -			} else {[m
+[31m -				$followers_collection = true;[m
+[32m +			$followers = Contact::selectToArray(['id'], [[m
+[32m +				'uid' => $uid,[m
+[32m +				'rel' => [Contact::FOLLOWER, Contact::FRIEND],[m
+[32m +				'network' => $networks,[m
+[32m +				'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON],[m
+[32m +				'archive' => false,[m
+[32m +				'pending' => false,[m
+[32m +				'blocked' => false,[m
+[32m +			]);[m
+[32m +[m
+[32m +			foreach ($followers as $follower) {[m
+[32m +				$return[] = $follower['id'];[m
+  			}[m
+[32m++<<<<<<< HEAD:src/Model/Group.php[m
+[32m +[m
+[32m +			unset($group_ids[$key]);[m
+[32m++=======[m
+[32m+ 			unset($circle_ids[$key]);[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Model/Circle.php[m
+  		}[m
+  [m
+[31m- 		$key = array_search(self::MUTUALS, $group_ids);[m
+[32m+ 		$key = array_search(self::MUTUALS, $circle_ids);[m
+  		if ($key !== false) {[m
+  			$mutuals = Contact::selectToArray(['id'], [[m
+  				'uid' => $uid,[m
+[1mdiff --cc src/Model/Item.php[m
+[1mindex d7de9ca49,fad8ffeff..000000000[m
+[1m--- a/src/Model/Item.php[m
+[1m+++ b/src/Model/Item.php[m
+[36m@@@ -2518,13 -2524,17 +2518,27 @@@[m [mclass Ite[m
+  	{[m
+  		$aclFormatter = DI::aclFormatter();[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +		$allow_people = $aclFormatter->expand($obj['allow_cid']);[m
+[32m +		$allow_groups = Group::expand($obj['uid'], $aclFormatter->expand($obj['allow_gid']), $check_dead);[m
+[32m +		$deny_people  = $aclFormatter->expand($obj['deny_cid']);[m
+[32m +		$deny_groups  = Group::expand($obj['uid'], $aclFormatter->expand($obj['deny_gid']), $check_dead);[m
+[32m +		$recipients   = array_unique(array_merge($allow_people, $allow_groups));[m
+[32m +		$deny         = array_unique(array_merge($deny_people, $deny_groups));[m
+[32m +		$recipients   = array_diff($recipients, $deny);[m
+[32m++=======[m
+[32m+ 		if (!$expand_followers && (!empty($obj['deny_cid']) || !empty($obj['deny_gid']))) {[m
+[32m+ 			$expand_followers = true;[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		$allow_people  = $aclFormatter->expand($obj['allow_cid']);[m
+[32m+ 		$allow_circles = Circle::expand($obj['uid'], $aclFormatter->expand($obj['allow_gid']), $check_dead, $expand_followers);[m
+[32m+ 		$deny_people   = $aclFormatter->expand($obj['deny_cid']);[m
+[32m+ 		$deny_circles  = Circle::expand($obj['uid'], $aclFormatter->expand($obj['deny_gid']), $check_dead);[m
+[32m+ 		$recipients    = array_unique(array_merge($allow_people, $allow_circles));[m
+[32m+ 		$deny          = array_unique(array_merge($deny_people, $deny_circles));[m
+[32m+ 		$recipients    = array_diff($recipients, $deny);[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  		return $recipients;[m
+  	}[m
+  [m
+[1mdiff --cc src/Model/Photo.php[m
+[1mindex 29ae473ab,2235137be..000000000[m
+[1m--- a/src/Model/Photo.php[m
+[1m+++ b/src/Model/Photo.php[m
+[36m@@@ -1241,6 -1218,81 +1241,84 @@@[m [mclass Phot[m
+  	}[m
+  [m
+  	/**[m
+[32m++<<<<<<< HEAD[m
+[32m++=======[m
+[32m+ 	 * store photo metadata in db and binary with preview photos in default backend[m
+[32m+ 	 *[m
+[32m+ 	 * @param Image   $image       Image object with data[m
+[32m+ 	 * @param integer $uid         User ID[m
+[32m+ 	 * @param string  $resource_id Resource ID[m
+[32m+ 	 * @param string  $filename    Filename[m
+[32m+ 	 * @param integer $filesize    Filesize[m
+[32m+ 	 * @param string  $album       Album name[m
+[32m+ 	 * @param string  $description Photo caption[m
+[32m+ 	 * @param string  $allow_cid   Permissions, allowed contacts[m
+[32m+ 	 * @param string  $allow_gid   Permissions, allowed circles[m
+[32m+ 	 * @param string  $deny_cid    Permissions, denied contacts[m
+[32m+ 	 * @param string  $deny_gid    Permissions, denied circles[m
+[32m+ 	 *[m
+[32m+ 	 * @return integer preview photo size[m
+[32m+ 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException[m
+[32m+ 	 */[m
+[32m+ 	public static function storeWithPreview(Image $image, int $uid, string $resource_id, string $filename, int $filesize, string $album, string $description, string $allow_cid, string $allow_gid, string $deny_cid, string $deny_gid): int[m
+[32m+ 	{[m
+[32m+ 		if ($filesize == 0) {[m
+[32m+ 			$filesize = strlen($image->asString());[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		$width  = $image->getWidth();[m
+[32m+ 		$height = $image->getHeight();[m
+[32m+ [m
+[32m+ 		$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize'));[m
+[32m+ [m
+[32m+ 		if ($maximagesize && $filesize > $maximagesize) {[m
+[32m+ 			// Scale down to multiples of 640 until the maximum size isn't exceeded anymore[m
+[32m+ 			foreach ([5120, 2560, 1280, 640, 320] as $pixels) {[m
+[32m+ 				if ($filesize > $maximagesize && max($width, $height) > $pixels) {[m
+[32m+ 					DI::logger()->info('Resize', ['size' => $filesize, 'width' => $width, 'height' => $height, 'max' => $maximagesize, 'pixels' => $pixels]);[m
+[32m+ 					$image->scaleDown($pixels);[m
+[32m+ 					$filesize = strlen($image->asString());[m
+[32m+ 					$width    = $image->getWidth();[m
+[32m+ 					$height   = $image->getHeight();[m
+[32m+ 				}[m
+[32m+ 			}[m
+[32m+ [m
+[32m+ 			if ($filesize > $maximagesize) {[m
+[32m+ 				DI::logger()->notice('Image size is too big', ['size' => $filesize, 'max' => $maximagesize]);[m
+[32m+ 				return -1;[m
+[32m+ 			}[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		$width   = $image->getWidth();[m
+[32m+ 		$height  = $image->getHeight();[m
+[32m+ 		$preview = 0;[m
+[32m+ [m
+[32m+ 		$result = self::store($image, $uid, 0, $resource_id, $filename, $album, 0, self::DEFAULT, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $description);[m
+[32m+ 		if (!$result) {[m
+[32m+ 			Logger::warning('Photo could not be stored', ['uid' => $uid, 'resource_id' => $resource_id, 'filename' => $filename, 'album' => $album]);[m
+[32m+ 			return -1;[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		if ($width > 640 || $height > 640) {[m
+[32m+ 			$image->scaleDown(640);[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		if ($width > 320 || $height > 320) {[m
+[32m+ 			$result = self::store($image, $uid, 0, $resource_id, $filename, $album, 1, self::DEFAULT, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $description);[m
+[32m+ 			if ($result) {[m
+[32m+ 				$preview = 1;[m
+[32m+ 			}[m
+[32m+ 			$image->scaleDown(320);[m
+[32m+ 			$result = self::store($image, $uid, 0, $resource_id, $filename, $album, 2, self::DEFAULT, $allow_cid, $allow_gid, $deny_cid, $deny_gid, $description);[m
+[32m+ 			if ($result && ($preview == 0)) {[m
+[32m+ 				$preview = 2;[m
+[32m+ 			}[m
+[32m+ 		}[m
+[32m+ 		return $preview;[m
+[32m+ 	}[m
+[32m+ [m
+[32m+ 	/**[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	 * Upload a user avatar[m
+  	 *[m
+  	 * @param int    $uid   User ID[m
+[1mdiff --cc src/Module/BaseSearch.php[m
+[1mindex 675deb8fb,4a25b71a5..000000000[m
+[1m--- a/src/Module/BaseSearch.php[m
+[1m+++ b/src/Module/BaseSearch.php[m
+[36m@@@ -67,16 -69,10 +67,16 @@@[m [mclass BaseSearch extends BaseModul[m
+  			$search  = trim(substr($search, 1));[m
+  			$type    = Search::TYPE_PEOPLE;[m
+  			$header  = DI::l10n()->t('People Search - %s', $search);[m
+[31m -		} elseif (strpos($search, '!') === 0) {[m
+[32m +[m
+[32m +			if (strrpos($search, '@') > 0) {[m
+[32m +				$results = Search::getContactsFromProbe(Network::convertToIdn($search));[m
+[32m +			}[m
+[32m +		}[m
+[32m +[m
+[32m +		if (strpos($search, '!') === 0) {[m
+  			$search = trim(substr($search, 1));[m
+[31m- 			$type   = Search::TYPE_FORUM;[m
+[31m- 			$header = DI::l10n()->t('Forum Search - %s', $search);[m
+[32m+ 			$type   = Search::TYPE_GROUP;[m
+[32m+ 			$header = DI::l10n()->t('Group Search - %s', $search);[m
+  		}[m
+  [m
+  		$search = Network::convertToIdn($search);[m
+[36m@@@ -91,14 -87,18 +91,21 @@@[m
+  [m
+  		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);[m
+  [m
+[31m -		if (!$results->getTotal() && !$localSearch && Search::getGlobalDirectory()) {[m
+[31m -			$results = Search::getContactsFromGlobalDirectory($search, $type, $pager->getPage());[m
+[31m -			$pager->setItemsPerPage($results->getItemsPage());[m
+[31m -		}[m
+[31m -[m
+[31m -		if (!$results->getTotal()) {[m
+[32m +		if ($localSearch && empty($results)) {[m
+  			$pager->setItemsPerPage(80);[m
+  			$results = Search::getContactsFromLocalDirectory($search, $type, $pager->getStart(), $pager->getItemsPerPage());[m
+[32m++<<<<<<< HEAD[m
+[32m +		} elseif (Search::getGlobalDirectory() && empty($results)) {[m
+[32m +			$results = Search::getContactsFromGlobalDirectory($search, $type, $pager->getPage());[m
+[32m +			$pager->setItemsPerPage($results->getItemsPage());[m
+[32m +		} else {[m
+[32m +			$results = new ResultList();[m
+[32m++=======[m
+[32m+ 		}[m
+[32m+ [m
+[32m+ 		if (!$results->getTotal()) {[m
+[32m+ 			$results = Search::getContactsFromProbe(Network::convertToIdn($search), $type == Search::TYPE_GROUP);[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  		}[m
+  [m
+  		return self::printResult($results, $pager, $header);[m
+[1mdiff --cc src/Module/Profile/Photos.php[m
+[1mindex 3e5b9d604,fcd0b78b0..000000000[m
+[1m--- a/src/Module/Profile/Photos.php[m
+[1m+++ b/src/Module/Profile/Photos.php[m
+[36m@@@ -229,16 -229,10 +229,21 @@@[m [mclass Photos extends \Friendica\Module\[m
+  			$image->scaleDown($max_length);[m
+  		}[m
+  [m
+[32m +		$width  = $image->getWidth();[m
+[32m +		$height = $image->getHeight();[m
+[32m +[m
+[32m +		$smallest = 0;[m
+[32m +[m
+  		$resource_id = Photo::newResource();[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +		$r = Photo::store($image, $this->owner['uid'], 0, $resource_id, $filename, $album, 0 , Photo::DEFAULT, $str_contact_allow, $str_group_allow, $str_contact_deny, $str_group_deny);[m
+[32m +[m
+[32m +		if (!$r) {[m
+[32m++=======[m
+[32m+ 		$preview = Photo::storeWithPreview($image, $this->owner['uid'], $resource_id, $filename, $filesize, $album, '', $str_contact_allow, $str_circle_allow, $str_contact_deny, $str_circle_deny);[m
+[32m+ 		if ($preview < 0) {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  			$this->logger->warning('image store failed');[m
+  			$this->systemMessages->addNotice($this->t('Image upload failed.'));[m
+  			return;[m
+[1mdiff --cc src/Protocol/ActivityPub/Processor.php[m
+[1mindex 86394bd91,453525454..000000000[m
+[1m--- a/src/Protocol/ActivityPub/Processor.php[m
+[1m+++ b/src/Protocol/ActivityPub/Processor.php[m
+[36m@@@ -1071,8 -1074,8 +1071,13 @@@[m [mclass Processo[m
+  				continue;[m
+  			}[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +			if (($receiver != 0) && ($item['gravity'] == Item::GRAVITY_PARENT) && !in_array($item['post-reason'], [Item::PR_FOLLOWER, Item::PR_TAG, item::PR_TO, Item::PR_CC])) {[m
+[32m +				if (!($item['isForum'] ?? false)) {[m
+[32m++=======[m
+[32m+ 			if (($receiver != 0) && ($item['gravity'] == Item::GRAVITY_PARENT) && !in_array($item['post-reason'], [Item::PR_FOLLOWER, Item::PR_TAG, item::PR_TO, Item::PR_CC, Item::PR_AUDIENCE])) {[m
+[32m+ 				if (!($item['isGroup'] ?? false)) {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  					if ($item['post-reason'] == Item::PR_BCC) {[m
+  						Logger::info('Top level post via BCC from a non sharer, ignoring', ['uid' => $receiver, 'contact' => $item['contact-id'], 'url' => $item['uri']]);[m
+  						continue;[m
+[1mdiff --cc view/lang/C/messages.po[m
+[1mindex 6ec5591b7,df736290f..000000000[m
+[1m--- a/view/lang/C/messages.po[m
+[1m+++ b/view/lang/C/messages.po[m
+[36m@@@ -6,9 -6,9 +6,15 @@@[m
+  #, fuzzy[m
+  msgid ""[m
+  msgstr ""[m
+[32m++<<<<<<< HEAD[m
+[32m +"Project-Id-Version: 2023.06-dev\n"[m
+[32m +"Report-Msgid-Bugs-To: \n"[m
+[32m +"POT-Creation-Date: 2023-06-03 20:18-0400\n"[m
+[32m++=======[m
+[32m+ "Project-Id-Version: 2023.09-dev\n"[m
+[32m+ "Report-Msgid-Bugs-To: \n"[m
+[32m+ "POT-Creation-Date: 2023-06-01 19:00-0400\n"[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"[m
+  "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"[m
+  "Language-Team: LANGUAGE <LL@li.org>\n"[m
+[36m@@@ -594,9 -594,9 +600,15 @@@[m [mmsgstr "[m
+  msgid "Rotate CCW (left)"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: mod/photos.php:1135 mod/photos.php:1191 mod/photos.php:1265[m
+[32m +#: src/Module/Contact.php:588 src/Module/Item/Compose.php:188[m
+[32m +#: src/Object/Post.php:1060[m
+[32m++=======[m
+[32m+ #: mod/photos.php:1133 mod/photos.php:1189 mod/photos.php:1263[m
+[32m+ #: src/Module/Contact.php:597 src/Module/Item/Compose.php:188[m
+[32m+ #: src/Object/Post.php:1067[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "This is you"[m
+  msgstr ""[m
+  [m
+[36m@@@ -770,17 -774,17 +782,30 @@@[m [mmsgstr "[m
+  msgid "All contacts"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/BaseModule.php:432 src/Content/Widget.php:239 src/Core/ACL.php:194[m
+[32m +#: src/Module/Contact.php:407 src/Module/PermissionTooltip.php:127[m
+[32m++=======[m
+[32m+ #: src/BaseModule.php:432 src/Content/Widget.php:243 src/Core/ACL.php:195[m
+[32m+ #: src/Module/Contact.php:415 src/Module/PermissionTooltip.php:127[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/PermissionTooltip.php:149[m
+  msgid "Followers"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/BaseModule.php:437 src/Content/Widget.php:240 src/Module/Contact.php:408[m
+[32m +msgid "Following"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/BaseModule.php:442 src/Content/Widget.php:241 src/Module/Contact.php:409[m
+[32m++=======[m
+[32m+ #: src/BaseModule.php:437 src/Content/Widget.php:244 src/Module/Contact.php:416[m
+[32m+ msgid "Following"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/BaseModule.php:442 src/Content/Widget.php:245 src/Module/Contact.php:417[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "Mutual friends"[m
+  msgstr ""[m
+  [m
+[36m@@@ -1582,29 -1596,25 +1607,51 @@@[m [mmsgid "[m
+  "Contact birthday events are private to you."[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/ForumManager.php:151 src/Content/Nav.php:276[m
+[32m +#: src/Content/Text/HTML.php:878 src/Content/Widget.php:528[m
+[32m +msgid "Forums"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/ForumManager.php:154[m
+[32m +msgid "External link to forum"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/ForumManager.php:157 src/Content/Widget.php:507[m
+[32m +msgid "show less"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/ForumManager.php:158 src/Content/Widget.php:409[m
+[32m +#: src/Content/Widget.php:508[m
+[32m +msgid "show more"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/ForumManager.php:159[m
+[32m +msgid "Create new forum"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Item.php:326 src/Model/Item.php:2921[m
+[32m++=======[m
+[32m+ #: src/Content/GroupManager.php:151 src/Content/Nav.php:276[m
+[32m+ #: src/Content/Text/HTML.php:877 src/Content/Widget.php:533[m
+[32m+ msgid "Groups"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/GroupManager.php:153[m
+[32m+ msgid "External link to group"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/GroupManager.php:156 src/Content/Widget.php:512[m
+[32m+ msgid "show less"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/GroupManager.php:157 src/Content/Widget.php:414[m
+[32m+ #: src/Content/Widget.php:513[m
+[32m+ msgid "show more"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Item.php:327 src/Model/Item.php:2931[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "event"[m
+  msgstr ""[m
+  [m
+[36m@@@ -1612,7 -1622,7 +1659,11 @@@[m
+  msgid "status"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Item.php:335 src/Model/Item.php:2923[m
+[32m++=======[m
+[32m+ #: src/Content/Item.php:336 src/Model/Item.php:2933[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/Post/Tag/Add.php:123[m
+  msgid "photo"[m
+  msgstr ""[m
+[36m@@@ -1654,7 -1664,7 +1705,11 @@@[m [mmsgstr "[m
+  msgid "Send PM"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Item.php:426 src/Module/Contact.php:439[m
+[32m++=======[m
+[32m+ #: src/Content/Item.php:425 src/Module/Contact.php:448[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/Contact/Profile.php:477[m
+  #: src/Module/Moderation/Blocklist/Contact.php:116[m
+  #: src/Module/Moderation/Users/Active.php:137[m
+[36m@@@ -1662,7 -1672,7 +1717,11 @@@[m
+  msgid "Block"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Item.php:427 src/Module/Contact.php:440[m
+[32m++=======[m
+[32m+ #: src/Content/Item.php:426 src/Module/Contact.php:449[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/Contact/Profile.php:485[m
+  #: src/Module/Notifications/Introductions.php:134[m
+  #: src/Module/Notifications/Introductions.php:206[m
+[36m@@@ -1670,7 -1680,7 +1729,11 @@@[m
+  msgid "Ignore"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Item.php:428 src/Module/Contact.php:441[m
+[32m++=======[m
+[32m+ #: src/Content/Item.php:427 src/Module/Contact.php:450[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/Contact/Profile.php:493[m
+  msgid "Collapse"[m
+  msgstr ""[m
+[36m@@@ -1701,8 -1711,8 +1764,13 @@@[m [mmsgstr "[m
+  msgid "Clear notifications"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Nav.php:126 src/Content/Text/HTML.php:865[m
+[32m +msgid "@name, !forum, #tags, content"[m
+[32m++=======[m
+[32m+ #: src/Content/Nav.php:126 src/Content/Text/HTML.php:864[m
+[32m+ msgid "@name, !group, #tags, content"[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgstr ""[m
+  [m
+  #: src/Content/Nav.php:220 src/Module/Security/Login.php:157[m
+[36m@@@ -1837,9 -1847,9 +1905,15 @@@[m [mmsgid "Tags[m
+  msgstr ""[m
+  [m
+  #: src/Content/Nav.php:272 src/Content/Nav.php:327[m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Text/HTML.php:874 src/Module/BaseProfile.php:127[m
+[32m +#: src/Module/BaseProfile.php:130 src/Module/Contact.php:410[m
+[32m +#: src/Module/Contact.php:506 view/theme/frio/theme.php:243[m
+[32m++=======[m
+[32m+ #: src/Content/Text/HTML.php:873 src/Module/BaseProfile.php:127[m
+[32m+ #: src/Module/BaseProfile.php:130 src/Module/Contact.php:419[m
+[32m+ #: src/Module/Contact.php:515 view/theme/frio/theme.php:243[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "Contacts"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2007,8 -2017,8 +2081,13 @@@[m [mmsgstr "[m
+  msgid "last"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Text/BBCode.php:713 src/Content/Text/BBCode.php:1599[m
+[32m +#: src/Content/Text/BBCode.php:1600[m
+[32m++=======[m
+[32m+ #: src/Content/Text/BBCode.php:694 src/Content/Text/BBCode.php:1600[m
+[32m+ #: src/Content/Text/BBCode.php:1601[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "Image/photo"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2018,28 -2028,28 +2097,53 @@@[m [mmsgid "[m
+  "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Text/BBCode.php:956 src/Model/Item.php:3606[m
+[32m +#: src/Model/Item.php:3612 src/Model/Item.php:3613[m
+[32m +msgid "Link to source"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Text/BBCode.php:1506 src/Content/Text/HTML.php:902[m
+[32m +msgid "Click to open/close"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Text/BBCode.php:1539[m
+[32m +msgid "$1 wrote:"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Text/BBCode.php:1604 src/Content/Text/BBCode.php:1605[m
+[32m +msgid "Encrypted content"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Text/BBCode.php:1869[m
+[32m +msgid "Invalid source protocol"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Text/BBCode.php:1888[m
+[32m++=======[m
+[32m+ #: src/Content/Text/BBCode.php:937 src/Model/Item.php:3649[m
+[32m+ #: src/Model/Item.php:3655 src/Model/Item.php:3656[m
+[32m+ msgid "Link to source"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Text/BBCode.php:1507 src/Content/Text/HTML.php:901[m
+[32m+ msgid "Click to open/close"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Text/BBCode.php:1540[m
+[32m+ msgid "$1 wrote:"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Text/BBCode.php:1605 src/Content/Text/BBCode.php:1606[m
+[32m+ msgid "Encrypted content"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Text/BBCode.php:1870[m
+[32m+ msgid "Invalid source protocol"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Text/BBCode.php:1889[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "Invalid link protocol"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2091,8 -2101,8 +2195,13 @@@[m [mmsgstr "[m
+  msgid "Examples: Robert Morgenstein, Fishing"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Widget.php:82 src/Module/Contact.php:432[m
+[32m +#: src/Module/Directory.php:96 view/theme/vier/theme.php:198[m
+[32m++=======[m
+[32m+ #: src/Content/Widget.php:82 src/Module/Contact.php:441[m
+[32m+ #: src/Module/Directory.php:96 view/theme/vier/theme.php:197[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "Find"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2122,72 -2132,76 +2231,139 @@@[m [mmsgstr "[m
+  msgid "Local Directory"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Widget.php:215 src/Model/Group.php:587[m
+[32m +#: src/Module/Contact.php:394 src/Module/Welcome.php:76[m
+[32m +msgid "Groups"[m
+[32m++=======[m
+[32m+ #: src/Content/Widget.php:219 src/Model/Circle.php:596[m
+[32m+ #: src/Module/Contact.php:402 src/Module/Welcome.php:76[m
+[32m+ msgid "Circles"[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgstr ""[m
+  [m
+[31m -#: src/Content/Widget.php:221[m
+[32m +#: src/Content/Widget.php:217[m
+  msgid "Everyone"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Widget.php:246[m
+[32m +msgid "Relationships"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:248 src/Module/Contact.php:338[m
+[32m +#: src/Module/Group.php:291[m
+[32m +msgid "All Contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:287[m
+[32m +msgid "Protocols"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:289[m
+[32m +msgid "All Protocols"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:317[m
+[32m +msgid "Saved Folders"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:319 src/Content/Widget.php:350[m
+[32m +msgid "Everything"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:348[m
+[32m +msgid "Categories"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:405[m
+[32m++=======[m
+[32m+ #: src/Content/Widget.php:246 src/Module/Contact.php:418[m
+[32m+ msgid "No relationship"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:251[m
+[32m+ msgid "Relationships"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:253 src/Module/Circle.php:293[m
+[32m+ #: src/Module/Contact.php:346[m
+[32m+ msgid "All Contacts"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:292[m
+[32m+ msgid "Protocols"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:294[m
+[32m+ msgid "All Protocols"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:322[m
+[32m+ msgid "Saved Folders"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:324 src/Content/Widget.php:355[m
+[32m+ msgid "Everything"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:353[m
+[32m+ msgid "Categories"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:410[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%d contact in common"[m
+  msgid_plural "%d contacts in common"[m
+  msgstr[0] ""[m
+  msgstr[1] ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Content/Widget.php:501[m
+[32m +msgid "Archives"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:525[m
+[32m +msgid "Persons"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:526[m
+[32m +msgid "Organisations"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:527 src/Model/Contact.php:1656[m
+[32m +msgid "News"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:531 src/Module/Settings/Account.php:453[m
+[32m +msgid "Account Types"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Content/Widget.php:532 src/Module/Moderation/BaseUsers.php:69[m
+[32m++=======[m
+[32m+ #: src/Content/Widget.php:506[m
+[32m+ msgid "Archives"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:530[m
+[32m+ msgid "Persons"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:531[m
+[32m+ msgid "Organisations"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:532 src/Model/Contact.php:1651[m
+[32m+ msgid "News"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:536 src/Module/Settings/Account.php:453[m
+[32m+ msgid "Account Types"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Content/Widget.php:537 src/Module/Moderation/BaseUsers.php:69[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "All"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2301,13 -2315,13 +2477,13 @@@[m [mmsgid "[m
+  "anywhere public."[m
+  msgstr ""[m
+  [m
+[31m -#: src/Core/ACL.php:324[m
+[32m +#: src/Core/ACL.php:323[m
+  msgid ""[m
+[31m- "Start typing the name of a contact or a group to show a filtered list. You "[m
+[31m- "can also mention the special groups \"Followers\" and \"Mutuals\"."[m
+[32m+ "Start typing the name of a contact or a circle to show a filtered list. You "[m
+[32m+ "can also mention the special circles \"Followers\" and \"Mutuals\"."[m
+  msgstr ""[m
+  [m
+[31m -#: src/Core/ACL.php:325[m
+[32m +#: src/Core/ACL.php:324[m
+  msgid "Show to:"[m
+  msgstr ""[m
+  [m
+[36m@@@ -2964,7 -2978,51 +3140,55 @@@[m [mmsgstr "[m
+  msgid "Legacy module file not found: %s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Contact.php:1217 src/Module/Moderation/Users/Pending.php:102[m
+[32m++=======[m
+[32m+ #: src/Model/Circle.php:105[m
+[32m+ msgid ""[m
+[32m+ "A deleted circle with this name was revived. Existing item permissions "[m
+[32m+ "<strong>may</strong> apply to this circle and any future members. If this is "[m
+[32m+ "not what you intended, please create another circle with a different name."[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:512[m
+[32m+ msgid "Default privacy circle for new contacts"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:544[m
+[32m+ msgid "Everybody"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:563[m
+[32m+ msgid "edit"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:595[m
+[32m+ msgid "add"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:600[m
+[32m+ msgid "Edit circle"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:601 src/Module/Circle.php:194[m
+[32m+ msgid "Contacts not in any circle"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:603[m
+[32m+ msgid "Create a new circle"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:604 src/Module/Circle.php:179 src/Module/Circle.php:202[m
+[32m+ #: src/Module/Circle.php:277[m
+[32m+ msgid "Circle Name: "[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Circle.php:605[m
+[32m+ msgid "Edit circles"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Contact.php:1212 src/Module/Moderation/Users/Pending.php:102[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Module/Notifications/Introductions.php:132[m
+  #: src/Module/Notifications/Introductions.php:204[m
+  msgid "Approve"[m
+[36m@@@ -2974,11 -3032,11 +3198,16 @@@[m [mmsgstr "[m
+  msgid "Organisation"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Contact.php:1660[m
+[32m +msgid "Forum"[m
+[32m++=======[m
+[32m+ #: src/Model/Contact.php:1655[m
+[32m+ msgid "Group"[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgstr ""[m
+  [m
+[31m -#: src/Model/Contact.php:2951[m
+[32m +#: src/Model/Contact.php:2947[m
+  msgid "Disallowed profile URL."[m
+  msgstr ""[m
+  [m
+[36m@@@ -3144,125 -3202,81 +3373,183 @@@[m [mmsgstr "[m
+  msgid "Happy Birthday %s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Group.php:105[m
+[32m +msgid ""[m
+[32m +"A deleted group with this name was revived. Existing item permissions "[m
+[32m +"<strong>may</strong> apply to this group and any future members. If this is "[m
+[32m +"not what you intended, please create another group with a different name."[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:503[m
+[32m +msgid "Default privacy group for new contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:535[m
+[32m +msgid "Everybody"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:554[m
+[32m +msgid "edit"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:586[m
+[32m +msgid "add"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:591[m
+[32m +msgid "Edit group"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:592 src/Module/Group.php:192[m
+[32m +msgid "Contacts not in any group"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:594[m
+[32m +msgid "Create a new group"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:595 src/Module/Group.php:177 src/Module/Group.php:200[m
+[32m +#: src/Module/Group.php:275[m
+[32m +msgid "Group Name: "[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Group.php:596[m
+[32m +msgid "Edit groups"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:2022[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:2023[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "Detected languages in this post:\\n%s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:2925[m
+[32m +msgid "activity"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:2927[m
+[32m +msgid "comment"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:2930 src/Module/Post/Tag/Add.php:123[m
+[32m +msgid "post"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:3092[m
+[32m +#, php-format[m
+[32m +msgid "%s is blocked"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:3094[m
+[32m +#, php-format[m
+[32m +msgid "%s is ignored"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:3096[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:2935[m
+[32m+ msgid "activity"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:2937[m
+[32m+ msgid "comment"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:2940 src/Module/Post/Tag/Add.php:123[m
+[32m+ msgid "post"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:3109[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+[31m- msgid "Content from %s is collapsed"[m
+[32m+ msgid "%s is blocked"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:3111[m
+[32m+ #, php-format[m
+[32m+ msgid "%s is ignored"[m
+  msgstr ""[m
+  [m
+[31m -#: src/Model/Item.php:3113[m
+[32m +#: src/Model/Item.php:3100[m
+  #, php-format[m
+[32m+ msgid "Content from %s is collapsed"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:3117[m
+[32m+ #, php-format[m
+  msgid "Content warning: %s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3518[m
+[32m +msgid "bytes"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Model/Item.php:3549[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3561[m
+[32m+ msgid "bytes"[m
+[32m+ msgstr ""[m
+[32m+ [m
+[32m+ #: src/Model/Item.php:3592[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%2$s (%3$d%%, %1$d vote)"[m
+  msgid_plural "%2$s (%3$d%%, %1$d votes)"[m
+  msgstr[0] ""[m
+  msgstr[1] ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3551[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3594[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%2$s (%1$d vote)"[m
+  msgid_plural "%2$s (%1$d votes)"[m
+  msgstr[0] ""[m
+  msgstr[1] ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3556[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3599[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%d voter. Poll end: %s"[m
+  msgid_plural "%d voters. Poll end: %s"[m
+  msgstr[0] ""[m
+  msgstr[1] ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3558[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3601[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%d voter."[m
+  msgid_plural "%d voters."[m
+  msgstr[0] ""[m
+  msgstr[1] ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3560[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3603[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "Poll end: %s"[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Model/Item.php:3594 src/Model/Item.php:3595[m
+[32m++=======[m
+[32m+ #: src/Model/Item.php:3637 src/Model/Item.php:3638[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgid "View on separate page"[m
+  msgstr ""[m
+  [m
+[36m@@@ -5539,9 -5553,9 +5826,9 @@@[m [mmsgstr "[m
+  msgid "People Search - %s"[m
+  msgstr ""[m
+  [m
+[31m -#: src/Module/BaseSearch.php:75[m
+[32m +#: src/Module/BaseSearch.php:79[m
+  #, php-format[m
+[31m- msgid "Forum Search - %s"[m
+[32m+ msgid "Group Search - %s"[m
+  msgstr ""[m
+  [m
+  #: src/Module/BaseSearch.php:121 src/Module/Contact/MatchInterests.php:139[m
+[36m@@@ -5714,153 -5728,23 +6001,151 @@@[m [mmsgstr "[m
+  msgid "list"[m
+  msgstr ""[m
+  [m
+[31m- #: src/Module/Contact.php:97[m
+[31m- #, php-format[m
+[31m- msgid "%d contact edited."[m
+[31m- msgid_plural "%d contacts edited."[m
+[31m- msgstr[0] ""[m
+[31m- msgstr[1] ""[m
+[31m- [m
+[31m- #: src/Module/Contact.php:341[m
+[31m- msgid "Show all contacts"[m
+[32m+ #: src/Module/Circle.php:56[m
+[32m+ msgid "Could not create circle."[m
+  msgstr ""[m
+  [m
+[31m- #: src/Module/Contact.php:346 src/Module/Contact.php:414[m
+[31m- #: src/Module/Moderation/BaseUsers.php:85[m
+[31m- msgid "Pending"[m
+[32m+ #: src/Module/Circle.php:67 src/Module/Circle.php:215 src/Module/Circle.php:239[m
+[32m+ msgid "Circle not found."[m
+  msgstr ""[m
+  [m
+[31m- #: src/Module/Contact.php:349[m
+[31m- msgid "Only show pending contacts"[m
+[32m+ #: src/Module/Circle.php:73[m
+[32m+ msgid "Circle name was not changed."[m
+  msgstr ""[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Module/Contact.php:354 src/Module/Contact.php:415[m
+[32m +#: src/Module/Moderation/BaseUsers.php:93[m
+[32m +msgid "Blocked"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:357[m
+[32m +msgid "Only show blocked contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:362 src/Module/Contact.php:417[m
+[32m +#: src/Object/Post.php:345[m
+[32m +msgid "Ignored"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:365[m
+[32m +msgid "Only show ignored contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:370 src/Module/Contact.php:418[m
+[32m +msgid "Collapsed"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:373[m
+[32m +msgid "Only show collapsed contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:378 src/Module/Contact.php:419[m
+[32m +msgid "Archived"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:381[m
+[32m +msgid "Only show archived contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:386 src/Module/Contact.php:416[m
+[32m +msgid "Hidden"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:389[m
+[32m +msgid "Only show hidden contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:397[m
+[32m +msgid "Organize your contact groups"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:430[m
+[32m +msgid "Search your contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:431 src/Module/Search/Index.php:207[m
+[32m +#, php-format[m
+[32m +msgid "Results for: %s"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:438[m
+[32m +msgid "Update"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:439 src/Module/Contact/Profile.php:477[m
+[32m +#: src/Module/Moderation/Blocklist/Contact.php:117[m
+[32m +#: src/Module/Moderation/Users/Blocked.php:138[m
+[32m +#: src/Module/Moderation/Users/Index.php:154[m
+[32m +msgid "Unblock"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:440 src/Module/Contact/Profile.php:485[m
+[32m +msgid "Unignore"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:441 src/Module/Contact/Profile.php:493[m
+[32m +msgid "Uncollapse"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:443[m
+[32m +msgid "Batch Actions"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:486[m
+[32m +msgid "Conversations started by this contact"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:491[m
+[32m +msgid "Posts and Comments"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:494[m
+[32m +msgid "Individual Posts and Replies"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:502[m
+[32m +msgid "Posts containing media objects"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:509[m
+[32m +msgid "View all known contacts"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:519[m
+[32m +msgid "Advanced Contact Settings"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:555[m
+[32m +msgid "Mutual Friendship"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:559[m
+[32m +msgid "is a fan of yours"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:563[m
+[32m +msgid "you are a fan of"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:581[m
+[32m +msgid "Pending outgoing contact request"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:583[m
+[32m +msgid "Pending incoming contact request"[m
+[32m +msgstr ""[m
+[32m +[m
+[32m +#: src/Module/Contact.php:596 src/Module/Contact/Profile.php:346[m
+[32m +#, php-format[m
+[32m +msgid "Visit %s's profile [%s]"[m
+[32m++=======[m
+[32m+ #: src/Module/Circle.php:91[m
+[32m+ msgid "Unknown circle."[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  msgstr ""[m
+  [m
+[32m+ #: src/Module/Circle.php:97 src/Module/Circle.php:106[m
+  #: src/Module/Contact/Advanced.php:70 src/Module/Contact/Advanced.php:109[m
+  #: src/Module/Contact/Contacts.php:71 src/Module/Contact/Conversations.php:84[m
+  #: src/Module/Contact/Conversations.php:89[m
+[36m@@@ -8337,20 -8354,20 +8752,32 @@@[m [mmsgstr "[m
+  [m
+  #: src/Module/Profile/Conversations.php:106[m
+  #: src/Module/Profile/Conversations.php:109 src/Module/Profile/Profile.php:351[m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Module/Profile/Profile.php:354 src/Protocol/Feed.php:1032[m
+[32m++=======[m
+[32m+ #: src/Module/Profile/Profile.php:354 src/Protocol/Feed.php:1090[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #: src/Protocol/OStatus.php:1007[m
+  #, php-format[m
+  msgid "%s's timeline"[m
+  msgstr ""[m
+  [m
+  #: src/Module/Profile/Conversations.php:107 src/Module/Profile/Profile.php:352[m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Protocol/Feed.php:1036 src/Protocol/OStatus.php:1012[m
+[32m++=======[m
+[32m+ #: src/Protocol/Feed.php:1094 src/Protocol/OStatus.php:1012[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%s's posts"[m
+  msgstr ""[m
+  [m
+  #: src/Module/Profile/Conversations.php:108 src/Module/Profile/Profile.php:353[m
+[32m++<<<<<<< HEAD[m
+[32m +#: src/Protocol/Feed.php:1039 src/Protocol/OStatus.php:1016[m
+[32m++=======[m
+[32m+ #: src/Protocol/Feed.php:1097 src/Protocol/OStatus.php:1016[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  #, php-format[m
+  msgid "%s's comments"[m
+  msgstr ""[m
+[1mdiff --cc view/templates/item/compose.tpl[m
+[1mindex 60c27da35,c127e317e..000000000[m
+[1m--- a/view/templates/item/compose.tpl[m
+[1m+++ b/view/templates/item/compose.tpl[m
+[36m@@@ -96,5 -99,5 +96,9 @@@[m
+  	</div>[m
+  </div>[m
+  <script>[m
+[32m++<<<<<<< HEAD[m
+[32m +	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}'); [m
+[32m++=======[m
+[32m+ 	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  </script>[m
+[1mdiff --cc view/theme/frio/css/style.css[m
+[1mindex d6b7b63d5,f9e0e5ee7..000000000[m
+[1m--- a/view/theme/frio/css/style.css[m
+[1m+++ b/view/theme/frio/css/style.css[m
+[36m@@@ -367,7 -367,7 +367,11 @@@[m [mbtn-eventnav:hover [m
+  aside .badge {[m
+  	opacity: 0.7;[m
+  }[m
+[32m++<<<<<<< HEAD[m
+[32m +.forum-widget-entry .badge,[m
+[32m++=======[m
+[32m+ .group-widget-entry .badge,[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  .sidebar-circle-li .badge {[m
+  	margin-top: 6px;[m
+  }[m
+[36m@@@ -1303,14 -1303,11 +1307,22 @@@[m [maside #follow-sidebar .form-group-searc[m
+  	padding: 2px 8px;[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +div#sidebar-circle-header h3, [m
+[32m +div#sidebar-forum-header h3[m
+[32m +{[m
+[32m +	float: left;[m
+[32m +}[m
+[32m +[m
+[32m +div#sidebar-circle-list,[m
+[32m +div#sidebar-forum-list {[m
+[32m++=======[m
+[32m+ div#sidebar-circle-header h3 {[m
+[32m+ 	float: left;[m
+[32m+ }[m
+[32m+ [m
+[32m+ div#sidebar-circle-list {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	clear: both;[m
+  }[m
+  [m
+[36m@@@ -1318,14 -1315,11 +1330,22 @@@[m
+  	clear: both;[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +.circle-edit-tool,[m
+[32m +.forum-new-tool[m
+[32m +{[m
+[32m +	padding-top: 0;[m
+[32m +	color: $font_color_darker;[m
+[32m +}[m
+[32m +.sidebar-widget-header .circle-edit-tool,[m
+[32m +.forum-new-tool {[m
+[32m++=======[m
+[32m+ .circle-edit-tool {[m
+[32m+ 	padding-top: 0;[m
+[32m+ 	color: $font_color_darker;[m
+[32m+ }[m
+[32m+ .sidebar-widget-header .circle-edit-tool {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	margin-top: -5px;[m
+  }[m
+  [m
+[36m@@@ -1346,14 -1340,12 +1366,20 @@@[m [maside .widget-action [m
+  	padding: 5px 10px;[m
+  }[m
+  aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,[m
+[32m++<<<<<<< HEAD[m
+[32m +aside #forum-sidebar .forum-new-tool.faded-icon:hover,[m
+[32m++=======[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,[m
+  aside .widget.widget-action.faded-icon:hover {[m
+  	opacity: 0.8;[m
+  	transition: all 0.25s ease-in-out;[m
+  }[m
+  aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,[m
+[32m++<<<<<<< HEAD[m
+[32m +aside #forum-sidebar .forum-new-tool.faded-icon:hover,[m
+[32m++=======[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,[m
+  aside .widget .widget-action.faded-icon:hover {[m
+  	opacity: 1;[m
+[36m@@@ -3071,8 -3063,7 +3097,12 @@@[m [mdetails.profile-jot-net[open] summary:b[m
+  	content: "\f0da"; /* Right Plain Pointer */[m
+  }[m
+  .widget > .fakelink > h3:before,[m
+[32m++<<<<<<< HEAD[m
+[32m +#sidebar-circle-header > .fakelink > h3:before, [m
+[32m +#sidebar-forum-header > .fakelink > h3:before{[m
+[32m++=======[m
+[32m+ #sidebar-circle-header > .fakelink > h3:before {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	font-family: ForkAwesome;[m
+  	content: "\f0d7"; /* Bottom Plain Pointer */[m
+  }[m
+[1mdiff --cc view/theme/smoothly/style.css[m
+[1mindex f12123a6f,3ede3a8da..000000000[m
+[1m--- a/view/theme/smoothly/style.css[m
+[1m+++ b/view/theme/smoothly/style.css[m
+[36m@@@ -931,8 -931,7 +931,12 @@@[m [mli.widget-list [m
+  }[m
+  [m
+  #sidebar-new-circle,[m
+[32m++<<<<<<< HEAD[m
+[32m +#sidebar-edit-circles, [m
+[32m +#sidebar-new-forum {[m
+[32m++=======[m
+[32m+ #sidebar-edit-circles {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	padding: 7px;[m
+  	width: 165px;[m
+  	margin: auto;[m
+[1mdiff --cc view/theme/vier/style.css[m
+[1mindex e669b18e9,dd310af32..000000000[m
+[1m--- a/view/theme/vier/style.css[m
+[1m+++ b/view/theme/vier/style.css[m
+[36m@@@ -435,8 -435,8 +435,13 @@@[m [mpre code [m
+  	opacity: 1;[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +.sidebar-circle-li:hover, #sidebar-new-circle:hover, #sidebar-edit-circles:hover, #sidebar-new-forum:hover, #forum-widget-collapse:hover,[m
+[32m +#sidebar-uncircled:hover, .side-link:hover, .nets-ul li:hover, #forumlist-sidebar li:hover, #forumlist-sidebar-right li:hover,[m
+[32m++=======[m
+[32m+ .sidebar-circle-li:hover, #sidebar-new-circle:hover, #sidebar-edit-circles:hover,#group-widget-collapse:hover,[m
+[32m+ #sidebar-uncircled:hover, .side-link:hover, .nets-ul li:hover, #group-list-sidebar li:hover, #group-list-sidebar-right li:hover,[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  .nets-all:hover, .saved-search-li:hover, li.tool:hover, .admin.link:hover, aside h4 a:hover, right_aside h4 a:hover, #message-new:hover,[m
+  #sidebar-photos-albums li:hover, .photos-upload-link:hover, .textcomplete-item.active {[m
+  	/* background-color: #ddd; */[m
+[36m@@@ -456,7 -456,7 +461,11 @@@[m
+  	font-weight: bold;[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +#forum-widget-showmore, #sidebar-new-circle, #sidebar-edit-circles, #sidebar-new-forum, #forum-widget-collapse, #forumlist-rsidebar-right, #sidebar-uncircled,[m
+[32m++=======[m
+[32m+ #group-widget-showmore, #sidebar-new-circle, #sidebar-edit-circles, #group-widget-collapse, #group-list-rsidebar-right, #sidebar-uncircled,[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  .side-link, #peoplefind-desc, #connect-desc, .nets-all, .admin.link, #message-new {[m
+  	padding-left: 10px;[m
+  	padding-top: 3px;[m
+[36m@@@ -490,7 -490,7 +499,11 @@@[m
+  	display: inline-block;[m
+  }[m
+  [m
+[32m++<<<<<<< HEAD[m
+[32m +a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, #sidebar-new-forum a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {[m
+[32m++=======[m
+[32m+ a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {[m
+[32m++>>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2[m
+  	display: block;[m
+  	color: #737373;[m
+  }[m
+* Unmerged path view/templates/widget_forumlist.tpl

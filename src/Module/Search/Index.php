@@ -139,7 +139,7 @@ class Index extends BaseSearch
 						break;
 					case 'contacts':
 						return self::performContactSearch($search, '@');
-					case 'forums':
+					case 'groups':
 						return self::performContactSearch($search, '!');
 				}
 			}

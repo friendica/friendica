@@ -76,7 +76,7 @@
 			{{* The button to add or remove contacts from a contact group - group edit page *}}
 			{{if $contact.change_member}}
 			<div class="contact-group-actions pull-right nav-pills preferences">
-				<button type="button" class="contact-action-link btn contact-group-link btn-default" onclick="groupChangeMember({{$contact.change_member.gid}},{{$contact.change_member.cid}},'{{$contact.change_member.sec_token}}'); return true;" data-toggle="tooltip" title="{{$contact.change_member.title}}">
+				<button type="button" class="contact-action-link btn contact-group-link btn-default" onclick="circleChangeMember({{$contact.change_member.gid}},{{$contact.change_member.cid}},'{{$contact.change_member.sec_token}}'); return true;" data-toggle="tooltip" title="{{$contact.change_member.title}}">
 					{{if $contact.label == "members"}}
 					<i class="fa fa-times-circle" aria-hidden="true"></i>
 					{{elseif $contact.label == "contacts"}}
@@ -91,7 +91,7 @@
 				<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
 					<h4 class="media-heading"><a href="{{if !empty($contact.photo_menu.edit)}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">{{$contact.name}}</a>
 					{{if $contact.account_type}} <small class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">({{$contact.account_type}})</small>{{/if}}
-					{{if $contact.account_type == 'Forum'}}<i class="fa fa-comments-o" aria-hidden="true"></i>{{/if}}
+					{{if $contact.account_type == 'Group'}}<i class="fa fa-comments-o" aria-hidden="true"></i>{{/if}}
 					{{* @todo this needs some changing in core because $contact.account_type contains a translated string which may not be the same in every language *}}
 					</h4>
 				</div>

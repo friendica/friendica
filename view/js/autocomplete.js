@@ -24,8 +24,8 @@ function contact_search(term, callback, backend_url, type, mode) {
 	for(var t in contact_search.cache[bt]) {
 		if(lterm.indexOf(t) >= 0) { // A more broad search has been performed already, so use those results
 			// Filter old results locally
-			var matching = contact_search.cache[bt][t].filter(function (x) { return (x.name.toLowerCase().indexOf(lterm) >= 0 || (typeof x.nick !== 'undefined' && x.nick.toLowerCase().indexOf(lterm) >= 0)); }); // Need to check that nick exists because groups don't have one
-			matching.unshift({forum:false, text: term, replace: term});
+			var matching = contact_search.cache[bt][t].filter(function (x) { return (x.name.toLowerCase().indexOf(lterm) >= 0 || (typeof x.nick !== 'undefined' && x.nick.toLowerCase().indexOf(lterm) >= 0)); }); // Need to check that nick exists because circles don't have one
+			matching.unshift({group: false, text: term, replace: term});
 			setTimeout(function() { callback(matching); } , 1); // Use "pseudo-thread" to avoid some problems
 			return;
 		}
@@ -69,10 +69,10 @@ function contact_format(item) {
 	// Show contact information if not explicitly told to show something else
 	if(typeof item.text === 'undefined') {
 		var desc = ((item.label) ? item.nick + ' ' + item.label : item.nick);
-		var forum = ((item.forum) ? 'forum' : '');
+		var group = ((item.group) ? 'group' : '');
 		if(typeof desc === 'undefined') desc = '';
 		if(desc) desc = ' ('+desc+')';
-		return "<div class='{0}' title='{4}'><img class='acpopup-img' src='{1}'><span class='acpopup-contactname'>{2}</span><span class='acpopup-sub-text'>{3}</span><div class='clear'></div></div>".format(forum, item.photo, item.name, desc, item.link);
+		return "<div class='{0}' title='{4}'><img class='acpopup-img' src='{1}'><span class='acpopup-contactname'>{2}</span><span class='acpopup-sub-text'>{3}</span><div class='clear'></div></div>".format(group, item.photo, item.name, desc, item.link);
 	}
 	else
 		return "<div>" + item.text + "</div>";
@@ -258,8 +258,8 @@ function string2bb(element) {
 			template: contact_format,
 		};
 
-		// Autocomplete forums
-		forums = {
+		// Autocomplete groups
+		groups = {
 			match: /(^|\s)(!\!*)([^ \n]+)$/,
 			index: 3,
 			search: function(term, callback) { contact_search(term, callback, backend_url, 'f'); },
@@ -294,7 +294,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([contacts, forums, smilies, tags], {dropdown: {className:'acpopup'}});
+		this.textcomplete([contacts, groups, smilies, tags], {dropdown: {className:'acpopup'}});
 		this.fixTextcompleteEscape();
 
 		return this;
@@ -310,7 +310,7 @@ function string2bb(element) {
 			template: contact_format,
 		};
 
-		// Autocomplete forum accounts
+		// Autocomplete group accounts
 		community = {
 			match: /(^!)([^\n]{2,})$/,
 			index: 2,

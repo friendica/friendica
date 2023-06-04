@@ -27,7 +27,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\ItemURI;
@@ -95,13 +94,14 @@ class User
 
 		$update_fields = self::preparedFields($fields);
 		if (!empty($update_fields)) {
-			$contacts = DBA::select('contact', ['uri-id', 'uid'], $condition);
+			$contacts = DBA::select('account-user-view', ['pid', 'uri-id', 'uid'], $condition);
 			while ($contact = DBA::fetch($contacts)) {
 				if (empty($contact['uri-id']) || empty($contact['uid'])) {
 					continue;
 				}
-				$ret = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']]);
-				Logger::info('Updated user contact', ['uid' => $contact['uid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
+				$update_fields['cid'] = $contact['pid'];
+				$ret = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
+				Logger::info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 			}
 
 			DBA::close($contacts);

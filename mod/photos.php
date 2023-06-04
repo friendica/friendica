@@ -163,14 +163,14 @@ function photos_post(App $a)
 
 	$aclFormatter = DI::aclFormatter();
 	$str_contact_allow = isset($_REQUEST['contact_allow']) ? $aclFormatter->toString($_REQUEST['contact_allow']) : $owner_record['allow_cid'] ?? '';
-	$str_group_allow   = isset($_REQUEST['group_allow'])   ? $aclFormatter->toString($_REQUEST['group_allow'])   : $owner_record['allow_gid'] ?? '';
+	$str_circle_allow  = isset($_REQUEST['circle_allow'])  ? $aclFormatter->toString($_REQUEST['circle_allow'])  : $owner_record['allow_gid'] ?? '';
 	$str_contact_deny  = isset($_REQUEST['contact_deny'])  ? $aclFormatter->toString($_REQUEST['contact_deny'])  : $owner_record['deny_cid']  ?? '';
-	$str_group_deny    = isset($_REQUEST['group_deny'])    ? $aclFormatter->toString($_REQUEST['group_deny'])    : $owner_record['deny_gid']  ?? '';
+	$str_circle_deny   = isset($_REQUEST['circle_deny'])   ? $aclFormatter->toString($_REQUEST['circle_deny'])   : $owner_record['deny_gid']  ?? '';
 
 	$visibility = $_REQUEST['visibility'] ?? '';
 	if ($visibility === 'public') {
 		// The ACL selector introduced in version 2019.12 sends ACL input data even when the Public visibility is selected
-		$str_contact_allow = $str_group_allow = $str_contact_deny = $str_group_deny = '';
+		$str_contact_allow = $str_circle_allow = $str_contact_deny = $str_circle_deny = '';
 	} else if ($visibility === 'custom') {
 		// Since we know from the visibility parameter the item should be private, we have to prevent the empty ACL
 		// case that would make it public. So we always append the author's contact id to the allowed contacts.
@@ -338,7 +338,7 @@ function photos_post(App $a)
 			$photo = $photos[0];
 			$ext = $phototypes[$photo['type']];
 			Photo::update(
-				['desc' => $desc, 'album' => $albname, 'allow_cid' => $str_contact_allow, 'allow_gid' => $str_group_allow, 'deny_cid' => $str_contact_deny, 'deny_gid' => $str_group_deny],
+				['desc' => $desc, 'album' => $albname, 'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow, 'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny],
 				['resource-id' => $resource_id, 'uid' => $page_owner_uid]
 			);
 

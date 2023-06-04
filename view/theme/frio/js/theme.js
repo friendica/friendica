@@ -36,14 +36,14 @@ $(document).ready(function () {
 		return false;
 	});
 
-	// add the class "selected" to group widgets li if li > a does have the class group-selected
-	if ($("#sidebar-group-ul li a").hasClass("group-selected")) {
-		$("#sidebar-group-ul li a.group-selected").parent("li").addClass("selected");
+	// add the class "selected" to circle widgets li if li > a does have the class circle-selected
+	if ($("#sidebar-circle-ul li a").hasClass("circle-selected")) {
+		$("#sidebar-circle-ul li a.circle-selected").parent("li").addClass("selected");
 	}
 
-	// add the class "selected" to forums widgets li if li > a does have the class forum-selected
-	if ($("#forumlist-sidebar-ul li a").hasClass("forum-selected")) {
-		$("#forumlist-sidebar-ul li a.forum-selected").parent("li").addClass("selected");
+	// add the class "selected" to groups widgets li if li > a does have the class group-selected
+	if ($("#group-list-sidebar-ul li a").hasClass("group-selected")) {
+		$("#group-list-sidebar-ul li a.group-selected").parent("li").addClass("selected");
 	}
 
 	// add the class "active" to tabmenuli if li > a does have the class active
@@ -206,7 +206,7 @@ $(document).ready(function () {
 		});
 	}
 
-	// move the forum contact information of the network page into the second navbar
+	// move the group contact information of the network page into the second navbar
 	if ($(".network-content-wrapper > #viewcontact_wrapper-network").length) {
 		// get the contact-wrapper element and append it to the second nav bar
 		// Note: We need the first() element with this class since at the present time we

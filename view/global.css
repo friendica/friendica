@@ -452,14 +452,14 @@ td.federation-data {
   max-height: 80px;
 }
 
-/* forumlist widget */
-.forumlist-img {
+/* group list widget */
+.grouplist-img {
   height: 20px;
   width: 20px;
   vertical-align: middle;
 }
 
-#forum-widget-collapse {
+#group-widget-collapse {
   opacity: 0.3;
 }
 
@@ -479,7 +479,7 @@ aside .help-aside-wrapper h1 {
   color: #ffffff;
 }
 
-#forum-widget-collapse:hover {
+#group-widget-collapse:hover {
   opacity: 1.0;
 }
 

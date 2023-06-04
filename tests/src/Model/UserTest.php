@@ -82,7 +82,7 @@ class UserTest extends MockedTest
 	public function testIdentitiesAsParent()
 	{
 		$parentSelect               = $this->parent;
-		$parentSelect['parent-uid'] = 0;
+		$parentSelect['parent-uid'] = null;
 
 		// Select the user itself (=parent)
 		$this->dbMock->shouldReceive('selectFirst')->with('user',

@@ -73,9 +73,9 @@ class Welcome extends BaseModule
 			'$finding_link'     => DI::l10n()->t('Finding New People'),
 			'$finding_txt'      => DI::l10n()->t('On the side panel of the Contacts page are several tools to find new friends. We can match people by interest, look up people by name or interest, and provide suggestions based on network relationships. On a brand new site, friend suggestions will usually begin to be populated within 24 hours.'),
 
-			'$groups'             => DI::l10n()->t('Groups'),
-			'$group_contact_link' => DI::l10n()->t('Group Your Contacts'),
-			'$group_contact_txt'  => DI::l10n()->t('Once you have made some friends, organize them into private conversation groups from the sidebar of your Contacts page and then you can interact with each group privately on your Network page.'),
+			'$circles'             => DI::l10n()->t('Circles'),
+			'$circle_contact_link' => DI::l10n()->t('Add Your Contacts To Circle'),
+			'$circle_contact_txt'  => DI::l10n()->t('Once you have made some friends, organize them into private conversation circles from the sidebar of your Contacts page and then you can interact with each circle privately on your Network page.'),
 			'$newuser_private'    => $newuser_private,
 			'$private_link'       => DI::l10n()->t('Why Aren\'t My Posts Public?'),
 			'$private_txt'        => DI::l10n()->t('Friendica respects your privacy. By default, your posts will only show up to people you\'ve added as friends. For more information, see the help section from the link above.'),

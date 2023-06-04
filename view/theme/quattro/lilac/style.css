@@ -957,16 +957,16 @@ aside .posted-date-selector-months {
   width: 48px;
   height: 48px;
 }
-/* group member */
+/* circle member */
 #contact-edit-drop-link,
 .mail-list-delete-wrapper,
-.group-delete-wrapper {
+.circle-delete-wrapper {
   float: right;
   margin-right: 50px;
 }
 #contact-edit-drop-link .drophide,
 .mail-list-delete-wrapper .drophide,
-.group-delete-wrapper .drophide {
+.circle-delete-wrapper .drophide {
   background-image: url('../../../images/icons/22/delete.png');
   display: block;
   width: 22px;
@@ -977,7 +977,7 @@ aside .posted-date-selector-months {
 }
 #contact-edit-drop-link .drop,
 .mail-list-delete-wrapper .drop,
-.group-delete-wrapper .drop {
+.circle-delete-wrapper .drop {
   background-image: url('../../../images/icons/22/delete.png');
   display: block;
   width: 22px;
@@ -986,23 +986,23 @@ aside .posted-date-selector-months {
   top: -50px;
 }
 /*
-#group-members {
+#circle-members {
 	margin-top: 20px;
 	padding: 10px;
 	height: 250px;
 	overflow: auto;
 	border: 1px solid #ddd;
 }
-#group-members-end {
+#circle-members-end {
 	clear: both;
 }
-#group-all-contacts {
+#circle-all-contacts {
 	padding: 10px;
 	height: 450px;
 	overflow: auto;
 	border: 1px solid #ddd;
 }
-#group-all-contacts-end {
+#circle-all-contacts-end {
 	clear: both;
 	margin-bottom: 10px;
 }
@@ -1844,33 +1844,33 @@ ul.tabs li {
 ul.tabs li .active {
   border-bottom: 1px solid #86608e;
 }
-/** group editor **/
-#group-edit-desc {
+/** circle editor **/
+#circle-edit-desc {
   margin-top: 1em;
   color: #999999;
 }
-#group-update-wrapper {
+#circle-update-wrapper {
   height: auto;
   overflow: auto;
 }
-#group-update-wrapper #group {
+#circle-update-wrapper #circle {
   width: 300px;
   float: left;
   margin-right: 20px;
 }
-#group-update-wrapper #contacts {
+#circle-update-wrapper #contacts {
   width: 300px;
   float: left;
 }
-#group-update-wrapper #group-separator {
+#circle-update-wrapper #circle-separator {
   display: none;
 }
-#group-update-wrapper .contact_list {
+#circle-update-wrapper .contact_list {
   height: 300px;
   border: 1px solid #364e59;
   overflow: auto;
 }
-#group-update-wrapper .contact_list .contact-block-div {
+#circle-update-wrapper .contact_list .contact-block-div {
   width: 50px;
   height: 50px;
   float: left;

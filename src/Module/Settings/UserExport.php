@@ -263,12 +263,12 @@ class UserExport extends BaseSettings
 			sprintf("SELECT * FROM `pconfig` WHERE uid = %d", $user_id)
 		);
 
-		$group = $this->exportMultiRow(
+		$circle = $this->exportMultiRow(
 			sprintf("SELECT * FROM `group` WHERE uid = %d", $user_id)
 		);
 
-		$group_member = $this->exportMultiRow(
-			sprintf("SELECT `group_member`.`gid`, `group_member`.`contact-id` FROM `group_member` INNER JOIN `group` ON `group`.`id` = `group_member`.`gid` WHERE `group`.`uid` = %d", $user_id)
+		$circle_member = $this->exportMultiRow(
+			sprintf("SELECT `circle_member`.`gid`, `circle_member`.`contact-id` FROM `group_member` AS `circle_member` INNER JOIN `group` AS `circle` ON `circle`.`id` = `circle_member`.`gid` WHERE `circle`.`uid` = %d", $user_id)
 		);
 
 		$output = [
@@ -281,8 +281,8 @@ class UserExport extends BaseSettings
 			'profile_fields' => $profile_fields,
 			'photo' => $photo,
 			'pconfig' => $pconfig,
-			'group' => $group,
-			'group_member' => $group_member,
+			'circle' => $circle,
+			'circle_member' => $circle_member,
 		];
 
 		echo json_encode($output, JSON_PARTIAL_OUTPUT_ON_ERROR);

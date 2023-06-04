@@ -43,11 +43,13 @@ class Delegation extends BaseSettings
 
 		BaseModule::checkFormSecurityTokenRedirectOnError('settings/delegation', 'delegate');
 
-		$parent_uid = (int)$_POST['parent_user'] ?? 0;
-		$parent_password = $_POST['parent_password'] ?? '';
+		$parent_uid = $request['parent_user'] ?? null;
+		$parent_password = $request['parent_password'] ?? '';
 
-		if ($parent_uid != 0) {
+		if ($parent_uid) {
 			try {
+				// An integer value will trigger the direct user query on uid in User::getAuthenticationInfo
+				$parent_uid = (int)$parent_uid;
 				User::getIdFromPasswordAuthentication($parent_uid, $parent_password);
 				DI::sysmsg()->addInfo(DI::l10n()->t('Delegation successfully granted.'));
 			} catch (\Exception $ex) {
@@ -142,7 +144,7 @@ class Delegation extends BaseSettings
 			$parents = [0 => DI::l10n()->t('No parent user')];
 
 			$fields = ['uid', 'username', 'nickname'];
-			$condition = ['email' => $user['email'], 'verified' => true, 'blocked' => false, 'parent-uid' => 0];
+			$condition = ['email' => $user['email'], 'verified' => true, 'blocked' => false, 'parent-uid' => null];
 			$parent_users = DBA::selectToArray('user', $fields, $condition);
 			foreach($parent_users as $parent) {
 				if ($parent['uid'] != DI::userSession()->getLocalUserId()) {
