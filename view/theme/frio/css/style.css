@@ -367,11 +367,7 @@ btn-eventnav:hover {
 aside .badge {
 	opacity: 0.7;
 }
-<<<<<<< HEAD
-.forum-widget-entry .badge,
-=======
 .group-widget-entry .badge,
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 .sidebar-circle-li .badge {
 	margin-top: 6px;
 }
@@ -1307,22 +1303,13 @@ aside #follow-sidebar .form-group-search .form-button-search {
 	padding: 2px 8px;
 }
 
-<<<<<<< HEAD
 div#sidebar-circle-header h3, 
-div#sidebar-forum-header h3
-{
+div#sidebar-group-header h3 {
 	float: left;
 }
 
 div#sidebar-circle-list,
-div#sidebar-forum-list {
-=======
-div#sidebar-circle-header h3 {
-	float: left;
-}
-
-div#sidebar-circle-list {
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+div#sidebar-group-list {
 	clear: both;
 }
 
@@ -1330,22 +1317,13 @@ div#sidebar-circle-list {
 	clear: both;
 }
 
-<<<<<<< HEAD
 .circle-edit-tool,
-.forum-new-tool
-{
+.group-new-tool {
 	padding-top: 0;
 	color: $font_color_darker;
 }
 .sidebar-widget-header .circle-edit-tool,
-.forum-new-tool {
-=======
-.circle-edit-tool {
-	padding-top: 0;
-	color: $font_color_darker;
-}
-.sidebar-widget-header .circle-edit-tool {
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+.group-new-tool {
 	margin-top: -5px;
 }
 
@@ -1366,20 +1344,14 @@ aside .widget-action {
 	padding: 5px 10px;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-<<<<<<< HEAD
-aside #forum-sidebar .forum-new-tool.faded-icon:hover,
-=======
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+aside #group-sidebar .group-new-tool.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
 aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
-<<<<<<< HEAD
-aside #forum-sidebar .forum-new-tool.faded-icon:hover,
-=======
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+aside #group-sidebar .group-new-tool.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
@@ -3097,12 +3069,8 @@ details.profile-jot-net[open] summary:before {
 	content: "\f0da"; /* Right Plain Pointer */
 }
 .widget > .fakelink > h3:before,
-<<<<<<< HEAD
 #sidebar-circle-header > .fakelink > h3:before, 
-#sidebar-forum-header > .fakelink > h3:before{
-=======
-#sidebar-circle-header > .fakelink > h3:before {
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#sidebar-group-header > .fakelink > h3:before {
 	font-family: ForkAwesome;
 	content: "\f0d7"; /* Bottom Plain Pointer */
 }

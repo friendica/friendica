@@ -436,7 +436,7 @@ pre code {
 }
 
 <<<<<<< HEAD
-.sidebar-circle-li:hover, #sidebar-new-circle:hover, #sidebar-edit-circles:hover, #sidebar-new-forum:hover, #forum-widget-collapse:hover,
+.sidebar-circle-li:hover, #sidebar-new-circle:hover, #sidebar-edit-circles:hover, #sidebar-new-group:hover, #forum-widget-collapse:hover,
 #sidebar-uncircled:hover, .side-link:hover, .nets-ul li:hover, #forumlist-sidebar li:hover, #forumlist-sidebar-right li:hover,
 =======
 .sidebar-circle-li:hover, #sidebar-new-circle:hover, #sidebar-edit-circles:hover,#group-widget-collapse:hover,
@@ -462,7 +462,7 @@ pre code {
 }
 
 <<<<<<< HEAD
-#forum-widget-showmore, #sidebar-new-circle, #sidebar-edit-circles, #sidebar-new-forum, #forum-widget-collapse, #forumlist-rsidebar-right, #sidebar-uncircled,
+#forum-widget-showmore, #sidebar-new-circle, #sidebar-edit-circles, #sidebar-new-group, #forum-widget-collapse, #forumlist-rsidebar-right, #sidebar-uncircled,
 =======
 #group-widget-showmore, #sidebar-new-circle, #sidebar-edit-circles, #group-widget-collapse, #group-list-rsidebar-right, #sidebar-uncircled,
 >>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
@@ -500,7 +500,7 @@ pre code {
 }
 
 <<<<<<< HEAD
-a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, #sidebar-new-forum a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {
+a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, #sidebar-new-group a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {
 =======
 a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {
 >>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2

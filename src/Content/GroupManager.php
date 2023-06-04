@@ -148,21 +148,15 @@ class GroupManager
 			$o .= Renderer::replaceMacros(
 				$tpl,
 				[
-<<<<<<< HEAD:src/Content/ForumManager.php
-					'$title'	=> DI::l10n()->t('Forums'),
-					'$forums'	=> $entries,
-					'$forums_page' => 'register/',
-					'$link_desc'	=> DI::l10n()->t('External link to forum'),
-=======
 					'$title'	=> DI::l10n()->t('Groups'),
 					'$groups'	=> $entries,
 					'$link_desc'	=> DI::l10n()->t('External link to group'),
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2:src/Content/GroupManager.php
+					'$New_group_page' => 'register/',
 					'$total'	=> $total,
 					'$visible_groups' => $visibleGroups,
 					'$showless'	=> DI::l10n()->t('show less'),
 					'$showmore'	=> DI::l10n()->t('show more'),
-					'$create_new_forum' => DI::l10n()->t('Create new forum')]
+					'$create_new_group' => DI::l10n()->t('Create new group')]
 			);
 		}
 
