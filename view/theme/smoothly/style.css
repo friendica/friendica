@@ -843,7 +843,7 @@ h3 #search:before {
 		-moz-border-radius: 5px;
 }
 
-#group-sidebar {
+#circle-sidebar {
 	vertical-align: middle;
 	margin: auto;
 	margin-top: 20px;
@@ -877,20 +877,20 @@ h3 #search:before {
 	margin-left: 10px;
 }
 
-#sidebar-group-list {
+#sidebar-circle-list {
 	margin-left: 0px;
 	margin-right: 30px;
 }
 
-#sidebar-ungrouped {
+#sidebar-uncircled {
 	margin: 10px;
 }
 
-#sidebar-group-list  a {
+#sidebar-circle-list  a {
 }
 
-#sidebar-group-list .icon,
-#sidebar-group-list .iconspacer {
+#sidebar-circle-list .icon,
+#sidebar-circle-list .iconspacer {
 	display: inline-block;
 	height: 12px;
 	width: 12px;
@@ -930,8 +930,9 @@ li.widget-list {
    	padding: 3px 24px;
 }
 
-#sidebar-new-group,
-#sidebar-edit-groups {
+#sidebar-new-circle,
+#sidebar-edit-circles, 
+#sidebar-new-forum {
 	padding: 7px;
 	width: 165px;
 	margin: auto;
@@ -951,7 +952,7 @@ li.widget-list {
 }
 
 
-#sidebar-new-group:hover {
+#sidebar-new-circle:hover {
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
@@ -965,14 +966,14 @@ li.widget-list {
 		-webkit-border-radius: 5px;
 }
 
-#sidebar-new-group:active {
+#sidebar-new-circle:active {
 	position: relative;
 	top: 1px;
 }
 
 
 .widget .selected,
-.group-selected {
+.circle-selected {
 	padding-bottom: 0px;
 	padding-left: 2px;
 	padding-right: 2px;
@@ -995,19 +996,19 @@ li.widget-list {
 	font-weight: bold;
 }
 
-#sidebar-new-group a {
+#sidebar-new-circle a {
 	color: #efefef;
 	font-size: 14px;
 	text-align: center;
 	margin: auto;
 }
 
-ul .sidebar-group-li {
+ul .sidebar-circle-li {
 	list-style: disc;
 	font-size: 1.0em;
 }
 
-ul .sidebar-group-li .icon {
+ul .sidebar-circle-li .icon {
 	display: inline-block;
 	height: 12px;
 	width: 12px;
@@ -1067,8 +1068,8 @@ ul .sidebar-group-li .icon {
 	margin-left: 10px;
 }
 
-#group-sidebar h3:before {
-	content: url("images/groups.png");
+#circle-sidebar h3:before {
+	content: url("images/circles.png");
 	padding-right: 10px;
 	vertical-align: middle;
 }
@@ -1364,8 +1365,8 @@ ul .sidebar-group-li .icon {
 #profile-nolocation-wrapper {
 }
 
-#group_allow_wrapper,
-#group_deny_wrapper,
+#circle_allow_wrapper,
+#circle_deny_wrapper,
 #acl-permit-outer-wrapper {
 	width: 47%;
 	float: left;
@@ -3357,22 +3358,22 @@ margin-left: 0px;
 /* = Contacts Selector = */
 /* ===================== */
 
-#group-edit-wrapper {
+#circle-edit-wrapper {
 	margin-bottom: 10px;
 }
 
-#group-edit-name-wrapper {
+#circle-edit-name-wrapper {
 	margin-bottom: 0px;
 	display: inline;
 }
-#group-edit-submit-wrapper {
+#circle-edit-submit-wrapper {
 	margin-bottom: 10px;
 	margin-right: 400px;
 	float: right;
 	display: inline;
 }
 
-.group-delete-wrapper {
+.circle-delete-wrapper {
 	width: 90px;
 	display: inline;
 	padding: 5px;
@@ -3389,34 +3390,34 @@ margin-left: 0px;
 		-webkit-border-radius: 5px;
 }
 
-.group-delete-wrapper:hover {
+.circle-delete-wrapper:hover {
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
 	background-color: #1873a2;
 }
 
-.group-delete-wrapper:active {
+.circle-delete-wrapper:active {
 	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1873a2), color-stop(1, #6da6c4) );
 	background: -moz-linear-gradient( center top, #1873a2 5%, #6da6c4 100% );
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#1873a2', endColorstr='#6da6c4');
 	background-color: #1873a2;
 }
 
-.group-delete-wrapper a {
+.circle-delete-wrapper a {
 	color: #efefef;
 	font-size: 0.9em;
 }
 
-#group-edit-desc {
+#circle-edit-desc {
 	margin: 10px 0xp;
 }
 
-#group-new-text {
+#circle-new-text {
 	font-size: 1.1em;
 }
 
-#group-members,
+#circle-members,
 #prof-members {
 	width: 83%;
 	height: 200px;
@@ -3429,7 +3430,7 @@ margin-left: 0px;
 	padding: 10px;
 }
 
-#group-all-contacts,
+#circle-all-contacts,
 #prof-all-contacts {
 	width: 83%;
 	height: 200px;
@@ -3439,8 +3440,8 @@ margin-left: 0px;
 	padding: 10px;
 }
 
-#group-members h3,
-#group-all-contacts h3,
+#circle-members h3,
+#circle-all-contacts h3,
 #prof-members h3,
 #prof-all-contacts h3 {
 	color: #555753;
@@ -3448,7 +3449,7 @@ margin-left: 0px;
 	padding: 5px;
 }
 
-#group-separator,
+#circle-separator,
 #prof-separator {
 	display: none;
 }

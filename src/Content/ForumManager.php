@@ -150,13 +150,13 @@ class ForumManager
 				[
 					'$title'	=> DI::l10n()->t('Forums'),
 					'$forums'	=> $entries,
+					'$forums_page' => 'register/',
 					'$link_desc'	=> DI::l10n()->t('External link to forum'),
 					'$total'	=> $total,
 					'$visible_forums' => $visible_forums,
 					'$showless'	=> DI::l10n()->t('show less'),
 					'$showmore'	=> DI::l10n()->t('show more'),
-					'$create_forum'	=> DI::l10n()->t('+ Create a new Forum?')
-					]
+					'$create_new_forum' => DI::l10n()->t('Create new forum')]
 			);
 		}
 

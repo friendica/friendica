@@ -16,10 +16,17 @@ function showHideForumlist() {
 	<h3>{{$title}}</h3>
 </span>
 <div id="forumlist-sidebar" class="widget">
+<div id="sidebar-forum-header" class="sidebar-widget-header">
 	<span class="fakelink" onclick="openCloseWidget('forumlist-sidebar', 'forumlist-sidebar-inflated');">
-		<h3 id="forumlist">{{$title}}</h3>
+		<h3>{{$title}}</h3>
 	</span>
-	
+		<a class="forum-new-tool pull-right widget-action faded-icon" id="sidebar-new-forum" href="{{$forums_page}}" data-toggle="tooltip" title="{{$create_new_forum}}">
+			<i class="fa fa-plus" aria-hidden="true"></i>
+		</a>
+		
+	</div>
+	<div id="sidebar-forum-list" class="sidebar-widget-list">
+		{{* The list of available forums *}}
 	<ul id="forumlist-sidebar-ul" role="menu">
 		{{foreach $forums as $forum}}
 		{{if $forum.id <= $visible_forums}}
@@ -46,12 +53,8 @@ function showHideForumlist() {
 		{{if $total > $visible_forums }}
 		<li onclick="showHideForumlist(); return false;" id="forum-widget-collapse" class="forum-widget-link fakelink tool">{{$showmore}}</li>
 		{{/if}}
-
-		<a href='register' class= "createforum">{{$create_forum}} </a>
-		
-
-
 	</ul>
+	</div>
 </div>
 </span>
 <script>

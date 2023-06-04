@@ -76,11 +76,6 @@ blockquote {
 .fakelink {
 	cursor: pointer;
 }
-.createforum {
-	padding: 25px;
-	cursor: pointer;
-}
-
 .btn.btn-link.fakelink {
 	box-shadow: none;
 	padding: 0 2px;
@@ -373,7 +368,7 @@ aside .badge {
 	opacity: 0.7;
 }
 .forum-widget-entry .badge,
-.sidebar-group-li .badge {
+.sidebar-circle-li .badge {
 	margin-top: 6px;
 }
 
@@ -1308,23 +1303,29 @@ aside #follow-sidebar .form-group-search .form-button-search {
 	padding: 2px 8px;
 }
 
-div#sidebar-group-header h3 {
+div#sidebar-circle-header h3, 
+div#sidebar-forum-header h3
+{
 	float: left;
 }
 
-div#sidebar-group-list {
+div#sidebar-circle-list,
+div#sidebar-forum-list {
 	clear: both;
 }
 
-.group-new-form {
+.circle-new-form {
 	clear: both;
 }
 
-.group-edit-tool {
+.circle-edit-tool,
+.forum-new-tool
+{
 	padding-top: 0;
 	color: $font_color_darker;
 }
-.sidebar-widget-header .group-edit-tool {
+.sidebar-widget-header .circle-edit-tool,
+.forum-new-tool {
 	margin-top: -5px;
 }
 
@@ -1344,24 +1345,26 @@ div#sidebar-group-list {
 aside .widget-action {
 	padding: 5px 10px;
 }
-aside #group-sidebar .sidebar-group-li .group-edit-tool.faded-icon:hover,
+aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
+aside #forum-sidebar .forum-new-tool.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget.widget-action.faded-icon:hover {
 	opacity: 0.8;
 	transition: all 0.25s ease-in-out;
 }
-aside #group-sidebar .sidebar-group-li .group-edit-tool.faded-icon:hover,
+aside #circle-sidebar .sidebar-circle-li .circle-edit-tool.faded-icon:hover,
+aside #forum-sidebar .forum-new-tool.faded-icon:hover,
 aside #saved-search-list .saved-search-li .savedsearchdrop.faded-icon:hover,
 aside .widget .widget-action.faded-icon:hover {
 	opacity: 1;
 }
-aside #group-sidebar li .group-checkbox {
+aside #circle-sidebar li .circle-checkbox {
 	margin: 6px 0 0;
 }
-aside #group-sidebar li .group-edit-tool {
+aside #circle-sidebar li .circle-edit-tool {
 	padding-right: 10px;
 }
-aside #group-sidebar li .group-edit-tool:first-child {
+aside #circle-sidebar li .circle-edit-tool:first-child {
 	padding-right: 0px;
 }
 
@@ -2453,7 +2456,7 @@ section > .generic-page-wrapper,
 .dfrn_request-content-wrapper,
 .friendica-content-wrapper,
 .credits-content-wrapper,
-.nogroup-content-wrapper,
+.nocircle-content-wrapper,
 .profperm-content-wrapper,
 .invite-content-wrapper,
 .tos-content-wrapper,
@@ -2602,70 +2605,70 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	padding-top: 10px;
 }
 
-/* group edit page */
-.group-actions {
+/* circle edit page */
+.circle-actions {
 	margin-top: 4px;
 	margin-bottom: 10px;
 	font-size: 30px;
 }
-.group-actions button,
-.group-actions a {
+.circle-actions button,
+.circle-actions a {
 	font-size: 18px;
 }
 
-.contact-group-actions .fa-times-circle {
+.contact-circle-actions .fa-times-circle {
 	color: #d00000;
 }
-.contact-group-actions .fa-plus-circle {
+.contact-circle-actions .fa-plus-circle {
 	color: #008000;
 }
 
-#group-edit-wrapper {
+#circle-edit-wrapper {
 	margin-top: 14px;
 	display: none;
 }
-#group-edit-header {
+#circle-edit-header {
 	display: block;
 }
-#group-update-wrapper .contact-photo-overlay {
+#circle-update-wrapper .contact-photo-overlay {
 	display: none;
 }
-#group-update-wrapper .viewcontact_wrapper .contact-group-actions {
+#circle-update-wrapper .viewcontact_wrapper .contact-circle-actions {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 }
-#group-update-wrapper .viewcontact_wrapper .contact-group-link {
+#circle-update-wrapper .viewcontact_wrapper .contact-circle-link {
 	opacity: 0.8;
 	font-size: 20px;
 }
-#group-update-wrapper .viewcontact_wrapper .contact-action-link:hover {
+#circle-update-wrapper .viewcontact_wrapper .contact-action-link:hover {
 	opacity: 1;
 }
-#group-update-wrapper .shortmode {
+#circle-update-wrapper .shortmode {
 	height: 53px;
 	overflow: hidden;
 }
-#group-update-wrapper .shortmode .contact-photo {
+#circle-update-wrapper .shortmode .contact-photo {
 	height: 32px;
 	width: 32px;
 }
-#group-update-wrapper .shortmode .media {
+#circle-update-wrapper .shortmode .media {
 	overflow: hidden;
 }
-#group-update-wrapper .shortmode .contact-entry-desc {
+#circle-update-wrapper .shortmode .contact-entry-desc {
 	font-size: 12px !important;
 }
-#group-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
 	margin: 0;
 }
-#group-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
 	font-size: 13px !important;
 	white-space: nowrap;
 }
-#group-update-wrapper .shortmode .contact-entry-desc .contact-entry-rel,
-#group-update-wrapper .shortmode .contact-entry-desc .contact-entry-network {
+#circle-update-wrapper .shortmode .contact-entry-desc .contact-entry-rel,
+#circle-update-wrapper .shortmode .contact-entry-desc .contact-entry-network {
 	display: none;
 }
 
@@ -3068,7 +3071,8 @@ details.profile-jot-net[open] summary:before {
 	content: "\f0da"; /* Right Plain Pointer */
 }
 .widget > .fakelink > h3:before,
-#sidebar-group-header > .fakelink > h3:before {
+#sidebar-circle-header > .fakelink > h3:before, 
+#sidebar-forum-header > .fakelink > h3:before{
 	font-family: ForkAwesome;
 	content: "\f0d7"; /* Bottom Plain Pointer */
 }
@@ -3809,7 +3813,7 @@ section .profile-match-wrapper {
 	.dfrn_request-content-wrapper,
 	.friendica-content-wrapper,
 	.credits-content-wrapper,
-	.nogroup-content-wrapper,
+	.nocircle-content-wrapper,
 	.profperm-content-wrapper,
 	.invite-content-wrapper,
 	.tos-content-wrapper,
