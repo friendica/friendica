@@ -6,15 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-<<<<<<< HEAD
 "Project-Id-Version: 2023.06-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-03 20:18-0400\n"
-=======
-"Project-Id-Version: 2023.09-dev\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-01 19:00-0400\n"
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+"POT-Creation-Date: 2023-06-04 11:12-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -402,22 +396,18 @@ msgid "User not found."
 msgstr ""
 
 #: mod/photos.php:106 src/Module/BaseProfile.php:68
-#: src/Module/Profile/Photos.php:399
 msgid "Photo Albums"
 msgstr ""
 
-#: mod/photos.php:107 src/Module/Profile/Photos.php:400
-#: src/Module/Profile/Photos.php:420
+#: mod/photos.php:107
 msgid "Recent Photos"
 msgstr ""
 
-#: mod/photos.php:109 mod/photos.php:867 src/Module/Profile/Photos.php:402
-#: src/Module/Profile/Photos.php:422
+#: mod/photos.php:109 mod/photos.php:867
 msgid "Upload New Photos"
 msgstr ""
 
 #: mod/photos.php:121 src/Module/BaseSettings.php:74
-#: src/Module/Profile/Photos.php:383
 msgid "everybody"
 msgstr ""
 
@@ -451,8 +441,7 @@ msgid "%1$s was tagged in %2$s by %3$s"
 msgstr ""
 
 #: mod/photos.php:581 src/Module/Conversation/Community.php:188
-#: src/Module/Directory.php:48 src/Module/Profile/Photos.php:315
-#: src/Module/Search/Index.php:65
+#: src/Module/Directory.php:48 src/Module/Search/Index.php:65
 msgid "Public access denied."
 msgstr ""
 
@@ -520,7 +509,7 @@ msgstr ""
 msgid "Show Oldest First"
 msgstr ""
 
-#: mod/photos.php:852 src/Module/Profile/Photos.php:370
+#: mod/photos.php:852
 msgid "View Photo"
 msgstr ""
 
@@ -600,15 +589,9 @@ msgstr ""
 msgid "Rotate CCW (left)"
 msgstr ""
 
-<<<<<<< HEAD
 #: mod/photos.php:1135 mod/photos.php:1191 mod/photos.php:1265
-#: src/Module/Contact.php:588 src/Module/Item/Compose.php:188
-#: src/Object/Post.php:1060
-=======
-#: mod/photos.php:1133 mod/photos.php:1189 mod/photos.php:1263
 #: src/Module/Contact.php:597 src/Module/Item/Compose.php:188
-#: src/Object/Post.php:1067
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Object/Post.php:1060
 msgid "This is you"
 msgstr ""
 
@@ -782,30 +765,17 @@ msgstr ""
 msgid "All contacts"
 msgstr ""
 
-<<<<<<< HEAD
 #: src/BaseModule.php:432 src/Content/Widget.php:239 src/Core/ACL.php:194
-#: src/Module/Contact.php:407 src/Module/PermissionTooltip.php:127
-=======
-#: src/BaseModule.php:432 src/Content/Widget.php:243 src/Core/ACL.php:195
 #: src/Module/Contact.php:415 src/Module/PermissionTooltip.php:127
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 #: src/Module/PermissionTooltip.php:149
 msgid "Followers"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/BaseModule.php:437 src/Content/Widget.php:240 src/Module/Contact.php:408
+#: src/BaseModule.php:437 src/Content/Widget.php:240 src/Module/Contact.php:416
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:442 src/Content/Widget.php:241 src/Module/Contact.php:409
-=======
-#: src/BaseModule.php:437 src/Content/Widget.php:244 src/Module/Contact.php:416
-msgid "Following"
-msgstr ""
-
-#: src/BaseModule.php:442 src/Content/Widget.php:245 src/Module/Contact.php:417
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/BaseModule.php:442 src/Content/Widget.php:241 src/Module/Contact.php:417
 msgid "Mutual friends"
 msgstr ""
 
@@ -1607,33 +1577,8 @@ msgid ""
 "Contact birthday events are private to you."
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/ForumManager.php:151 src/Content/Nav.php:276
-#: src/Content/Text/HTML.php:878 src/Content/Widget.php:528
-msgid "Forums"
-msgstr ""
-
-#: src/Content/ForumManager.php:154
-msgid "External link to forum"
-msgstr ""
-
-#: src/Content/ForumManager.php:157 src/Content/Widget.php:507
-msgid "show less"
-msgstr ""
-
-#: src/Content/ForumManager.php:158 src/Content/Widget.php:409
-#: src/Content/Widget.php:508
-msgid "show more"
-msgstr ""
-
-#: src/Content/ForumManager.php:159
-msgid "Create new forum"
-msgstr ""
-
-#: src/Content/Item.php:326 src/Model/Item.php:2921
-=======
 #: src/Content/GroupManager.php:151 src/Content/Nav.php:276
-#: src/Content/Text/HTML.php:877 src/Content/Widget.php:533
+#: src/Content/Text/HTML.php:878 src/Content/Widget.php:529
 msgid "Groups"
 msgstr ""
 
@@ -1641,17 +1586,20 @@ msgstr ""
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:156 src/Content/Widget.php:512
+#: src/Content/GroupManager.php:157 src/Content/Widget.php:508
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:157 src/Content/Widget.php:414
-#: src/Content/Widget.php:513
+#: src/Content/GroupManager.php:158 src/Content/Widget.php:410
+#: src/Content/Widget.php:509
 msgid "show more"
 msgstr ""
 
-#: src/Content/Item.php:327 src/Model/Item.php:2931
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/GroupManager.php:159
+msgid "Create new group"
+msgstr ""
+
+#: src/Content/Item.php:326
 msgid "event"
 msgstr ""
 
@@ -1659,12 +1607,7 @@ msgstr ""
 msgid "status"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Item.php:335 src/Model/Item.php:2923
-=======
-#: src/Content/Item.php:336 src/Model/Item.php:2933
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#: src/Module/Post/Tag/Add.php:123
+#: src/Content/Item.php:335 src/Module/Post/Tag/Add.php:123
 msgid "photo"
 msgstr ""
 
@@ -1705,11 +1648,7 @@ msgstr ""
 msgid "Send PM"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Item.php:426 src/Module/Contact.php:439
-=======
-#: src/Content/Item.php:425 src/Module/Contact.php:448
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Item.php:426 src/Module/Contact.php:448
 #: src/Module/Contact/Profile.php:477
 #: src/Module/Moderation/Blocklist/Contact.php:116
 #: src/Module/Moderation/Users/Active.php:137
@@ -1717,11 +1656,7 @@ msgstr ""
 msgid "Block"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Item.php:427 src/Module/Contact.php:440
-=======
-#: src/Content/Item.php:426 src/Module/Contact.php:449
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Item.php:427 src/Module/Contact.php:449
 #: src/Module/Contact/Profile.php:485
 #: src/Module/Notifications/Introductions.php:134
 #: src/Module/Notifications/Introductions.php:206
@@ -1729,11 +1664,7 @@ msgstr ""
 msgid "Ignore"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Item.php:428 src/Module/Contact.php:441
-=======
-#: src/Content/Item.php:427 src/Module/Contact.php:450
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Item.php:428 src/Module/Contact.php:450
 #: src/Module/Contact/Profile.php:493
 msgid "Collapse"
 msgstr ""
@@ -1764,13 +1695,8 @@ msgstr ""
 msgid "Clear notifications"
 msgstr ""
 
-<<<<<<< HEAD
 #: src/Content/Nav.php:126 src/Content/Text/HTML.php:865
-msgid "@name, !forum, #tags, content"
-=======
-#: src/Content/Nav.php:126 src/Content/Text/HTML.php:864
 msgid "@name, !group, #tags, content"
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgstr ""
 
 #: src/Content/Nav.php:220 src/Module/Security/Login.php:157
@@ -1905,15 +1831,9 @@ msgid "Tags"
 msgstr ""
 
 #: src/Content/Nav.php:272 src/Content/Nav.php:327
-<<<<<<< HEAD
 #: src/Content/Text/HTML.php:874 src/Module/BaseProfile.php:127
-#: src/Module/BaseProfile.php:130 src/Module/Contact.php:410
-#: src/Module/Contact.php:506 view/theme/frio/theme.php:243
-=======
-#: src/Content/Text/HTML.php:873 src/Module/BaseProfile.php:127
 #: src/Module/BaseProfile.php:130 src/Module/Contact.php:419
 #: src/Module/Contact.php:515 view/theme/frio/theme.php:243
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgid "Contacts"
 msgstr ""
 
@@ -2081,13 +2001,8 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Text/BBCode.php:713 src/Content/Text/BBCode.php:1599
-#: src/Content/Text/BBCode.php:1600
-=======
-#: src/Content/Text/BBCode.php:694 src/Content/Text/BBCode.php:1600
-#: src/Content/Text/BBCode.php:1601
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Text/BBCode.php:694 src/Content/Text/BBCode.php:1580
+#: src/Content/Text/BBCode.php:1581
 msgid "Image/photo"
 msgstr ""
 
@@ -2097,53 +2012,27 @@ msgid ""
 "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Text/BBCode.php:956 src/Model/Item.php:3606
-#: src/Model/Item.php:3612 src/Model/Item.php:3613
+#: src/Content/Text/BBCode.php:937
 msgid "Link to source"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1506 src/Content/Text/HTML.php:902
+#: src/Content/Text/BBCode.php:1487 src/Content/Text/HTML.php:902
 msgid "Click to open/close"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1539
+#: src/Content/Text/BBCode.php:1520
 msgid "$1 wrote:"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1604 src/Content/Text/BBCode.php:1605
+#: src/Content/Text/BBCode.php:1585 src/Content/Text/BBCode.php:1586
 msgid "Encrypted content"
+msgstr ""
+
+#: src/Content/Text/BBCode.php:1850
+msgid "Invalid source protocol"
 msgstr ""
 
 #: src/Content/Text/BBCode.php:1869
-msgid "Invalid source protocol"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1888
-=======
-#: src/Content/Text/BBCode.php:937 src/Model/Item.php:3649
-#: src/Model/Item.php:3655 src/Model/Item.php:3656
-msgid "Link to source"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1507 src/Content/Text/HTML.php:901
-msgid "Click to open/close"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1540
-msgid "$1 wrote:"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1605 src/Content/Text/BBCode.php:1606
-msgid "Encrypted content"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1870
-msgid "Invalid source protocol"
-msgstr ""
-
-#: src/Content/Text/BBCode.php:1889
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgid "Invalid link protocol"
 msgstr ""
 
@@ -2195,13 +2084,8 @@ msgstr ""
 msgid "Examples: Robert Morgenstein, Fishing"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Widget.php:82 src/Module/Contact.php:432
-#: src/Module/Directory.php:96 view/theme/vier/theme.php:198
-=======
 #: src/Content/Widget.php:82 src/Module/Contact.php:441
-#: src/Module/Directory.php:96 view/theme/vier/theme.php:197
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Module/Directory.php:96 view/theme/vier/theme.php:198
 msgid "Find"
 msgstr ""
 
@@ -2231,139 +2115,76 @@ msgstr ""
 msgid "Local Directory"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Widget.php:215 src/Model/Group.php:587
-#: src/Module/Contact.php:394 src/Module/Welcome.php:76
-msgid "Groups"
-=======
-#: src/Content/Widget.php:219 src/Model/Circle.php:596
-#: src/Module/Contact.php:402 src/Module/Welcome.php:76
+#: src/Content/Widget.php:215 src/Module/Contact.php:402
+#: src/Module/Welcome.php:76
 msgid "Circles"
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgstr ""
 
 #: src/Content/Widget.php:217
 msgid "Everyone"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Content/Widget.php:246
-msgid "Relationships"
-msgstr ""
-
-#: src/Content/Widget.php:248 src/Module/Contact.php:338
-#: src/Module/Group.php:291
-msgid "All Contacts"
-msgstr ""
-
-#: src/Content/Widget.php:287
-msgid "Protocols"
-msgstr ""
-
-#: src/Content/Widget.php:289
-msgid "All Protocols"
-msgstr ""
-
-#: src/Content/Widget.php:317
-msgid "Saved Folders"
-msgstr ""
-
-#: src/Content/Widget.php:319 src/Content/Widget.php:350
-msgid "Everything"
-msgstr ""
-
-#: src/Content/Widget.php:348
-msgid "Categories"
-msgstr ""
-
-#: src/Content/Widget.php:405
-=======
-#: src/Content/Widget.php:246 src/Module/Contact.php:418
+#: src/Content/Widget.php:242 src/Module/Contact.php:418
 msgid "No relationship"
 msgstr ""
 
-#: src/Content/Widget.php:251
+#: src/Content/Widget.php:247
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:253 src/Module/Circle.php:293
+#: src/Content/Widget.php:249 src/Module/Circle.php:293
 #: src/Module/Contact.php:346
 msgid "All Contacts"
 msgstr ""
 
-#: src/Content/Widget.php:292
+#: src/Content/Widget.php:288
 msgid "Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:294
+#: src/Content/Widget.php:290
 msgid "All Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:322
+#: src/Content/Widget.php:318
 msgid "Saved Folders"
 msgstr ""
 
-#: src/Content/Widget.php:324 src/Content/Widget.php:355
+#: src/Content/Widget.php:320 src/Content/Widget.php:351
 msgid "Everything"
 msgstr ""
 
-#: src/Content/Widget.php:353
+#: src/Content/Widget.php:349
 msgid "Categories"
 msgstr ""
 
-#: src/Content/Widget.php:410
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Widget.php:406
 #, php-format
 msgid "%d contact in common"
 msgid_plural "%d contacts in common"
 msgstr[0] ""
 msgstr[1] ""
 
-<<<<<<< HEAD
-#: src/Content/Widget.php:501
+#: src/Content/Widget.php:502
 msgid "Archives"
-msgstr ""
-
-#: src/Content/Widget.php:525
-msgid "Persons"
 msgstr ""
 
 #: src/Content/Widget.php:526
-msgid "Organisations"
-msgstr ""
-
-#: src/Content/Widget.php:527 src/Model/Contact.php:1656
-msgid "News"
-msgstr ""
-
-#: src/Content/Widget.php:531 src/Module/Settings/Account.php:453
-msgid "Account Types"
-msgstr ""
-
-#: src/Content/Widget.php:532 src/Module/Moderation/BaseUsers.php:69
-=======
-#: src/Content/Widget.php:506
-msgid "Archives"
-msgstr ""
-
-#: src/Content/Widget.php:530
 msgid "Persons"
 msgstr ""
 
-#: src/Content/Widget.php:531
+#: src/Content/Widget.php:527
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:532 src/Model/Contact.php:1651
+#: src/Content/Widget.php:528 src/Model/Contact.php:1656
 msgid "News"
 msgstr ""
 
-#: src/Content/Widget.php:536 src/Module/Settings/Account.php:453
+#: src/Content/Widget.php:532 src/Module/Settings/Account.php:453
 msgid "Account Types"
 msgstr ""
 
-#: src/Content/Widget.php:537 src/Module/Moderation/BaseUsers.php:69
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Content/Widget.php:533 src/Module/Moderation/BaseUsers.php:69
 msgid "All"
 msgstr ""
 
@@ -3140,9 +2961,6 @@ msgstr ""
 msgid "Legacy module file not found: %s"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Model/Contact.php:1217 src/Module/Moderation/Users/Pending.php:102
-=======
 #: src/Model/Circle.php:105
 msgid ""
 "A deleted circle with this name was revived. Existing item permissions "
@@ -3150,45 +2968,7 @@ msgid ""
 "not what you intended, please create another circle with a different name."
 msgstr ""
 
-#: src/Model/Circle.php:512
-msgid "Default privacy circle for new contacts"
-msgstr ""
-
-#: src/Model/Circle.php:544
-msgid "Everybody"
-msgstr ""
-
-#: src/Model/Circle.php:563
-msgid "edit"
-msgstr ""
-
-#: src/Model/Circle.php:595
-msgid "add"
-msgstr ""
-
-#: src/Model/Circle.php:600
-msgid "Edit circle"
-msgstr ""
-
-#: src/Model/Circle.php:601 src/Module/Circle.php:194
-msgid "Contacts not in any circle"
-msgstr ""
-
-#: src/Model/Circle.php:603
-msgid "Create a new circle"
-msgstr ""
-
-#: src/Model/Circle.php:604 src/Module/Circle.php:179 src/Module/Circle.php:202
-#: src/Module/Circle.php:277
-msgid "Circle Name: "
-msgstr ""
-
-#: src/Model/Circle.php:605
-msgid "Edit circles"
-msgstr ""
-
-#: src/Model/Contact.php:1212 src/Module/Moderation/Users/Pending.php:102
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
+#: src/Model/Contact.php:1217 src/Module/Moderation/Users/Pending.php:102
 #: src/Module/Notifications/Introductions.php:132
 #: src/Module/Notifications/Introductions.php:204
 msgid "Approve"
@@ -3198,13 +2978,8 @@ msgstr ""
 msgid "Organisation"
 msgstr ""
 
-<<<<<<< HEAD
 #: src/Model/Contact.php:1660
-msgid "Forum"
-=======
-#: src/Model/Contact.php:1655
 msgid "Group"
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgstr ""
 
 #: src/Model/Contact.php:2947
@@ -3373,184 +3148,9 @@ msgstr ""
 msgid "Happy Birthday %s"
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Model/Group.php:105
-msgid ""
-"A deleted group with this name was revived. Existing item permissions "
-"<strong>may</strong> apply to this group and any future members. If this is "
-"not what you intended, please create another group with a different name."
-msgstr ""
-
-#: src/Model/Group.php:503
-msgid "Default privacy group for new contacts"
-msgstr ""
-
-#: src/Model/Group.php:535
-msgid "Everybody"
-msgstr ""
-
-#: src/Model/Group.php:554
-msgid "edit"
-msgstr ""
-
-#: src/Model/Group.php:586
-msgid "add"
-msgstr ""
-
-#: src/Model/Group.php:591
-msgid "Edit group"
-msgstr ""
-
-#: src/Model/Group.php:592 src/Module/Group.php:192
-msgid "Contacts not in any group"
-msgstr ""
-
-#: src/Model/Group.php:594
-msgid "Create a new group"
-msgstr ""
-
-#: src/Model/Group.php:595 src/Module/Group.php:177 src/Module/Group.php:200
-#: src/Module/Group.php:275
-msgid "Group Name: "
-msgstr ""
-
-#: src/Model/Group.php:596
-msgid "Edit groups"
-msgstr ""
-
 #: src/Model/Item.php:2022
-=======
-#: src/Model/Item.php:2023
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 #, php-format
 msgid "Detected languages in this post:\\n%s"
-msgstr ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:2925
-msgid "activity"
-msgstr ""
-
-#: src/Model/Item.php:2927
-msgid "comment"
-msgstr ""
-
-#: src/Model/Item.php:2930 src/Module/Post/Tag/Add.php:123
-msgid "post"
-msgstr ""
-
-#: src/Model/Item.php:3092
-#, php-format
-msgid "%s is blocked"
-msgstr ""
-
-#: src/Model/Item.php:3094
-#, php-format
-msgid "%s is ignored"
-msgstr ""
-
-#: src/Model/Item.php:3096
-=======
-#: src/Model/Item.php:2935
-msgid "activity"
-msgstr ""
-
-#: src/Model/Item.php:2937
-msgid "comment"
-msgstr ""
-
-#: src/Model/Item.php:2940 src/Module/Post/Tag/Add.php:123
-msgid "post"
-msgstr ""
-
-#: src/Model/Item.php:3109
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "%s is blocked"
-msgstr ""
-
-#: src/Model/Item.php:3111
-#, php-format
-msgid "%s is ignored"
-msgstr ""
-
-#: src/Model/Item.php:3100
-#, php-format
-msgid "Content from %s is collapsed"
-msgstr ""
-
-#: src/Model/Item.php:3117
-#, php-format
-msgid "Content warning: %s"
-msgstr ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3518
-msgid "bytes"
-msgstr ""
-
-#: src/Model/Item.php:3549
-=======
-#: src/Model/Item.php:3561
-msgid "bytes"
-msgstr ""
-
-#: src/Model/Item.php:3592
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "%2$s (%3$d%%, %1$d vote)"
-msgid_plural "%2$s (%3$d%%, %1$d votes)"
-msgstr[0] ""
-msgstr[1] ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3551
-=======
-#: src/Model/Item.php:3594
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "%2$s (%1$d vote)"
-msgid_plural "%2$s (%1$d votes)"
-msgstr[0] ""
-msgstr[1] ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3556
-=======
-#: src/Model/Item.php:3599
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "%d voter. Poll end: %s"
-msgid_plural "%d voters. Poll end: %s"
-msgstr[0] ""
-msgstr[1] ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3558
-=======
-#: src/Model/Item.php:3601
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "%d voter."
-msgid_plural "%d voters."
-msgstr[0] ""
-msgstr[1] ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3560
-=======
-#: src/Model/Item.php:3603
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-#, php-format
-msgid "Poll end: %s"
-msgstr ""
-
-<<<<<<< HEAD
-#: src/Model/Item.php:3594 src/Model/Item.php:3595
-=======
-#: src/Model/Item.php:3637 src/Model/Item.php:3638
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
-msgid "View on separate page"
 msgstr ""
 
 #: src/Model/Mail.php:137 src/Model/Mail.php:266
@@ -5831,23 +5431,6 @@ msgstr ""
 msgid "Group Search - %s"
 msgstr ""
 
-#: src/Module/BaseSearch.php:121 src/Module/Contact/MatchInterests.php:139
-msgid "No matches"
-msgstr ""
-
-#: src/Module/BaseSearch.php:147
-#, php-format
-msgid ""
-"%d result was filtered out because your node blocks the domain it is "
-"registered on. You can review the list of domains your node is currently "
-"blocking in the <a href=\"/friendica\">About page</a>."
-msgid_plural ""
-"%d results were filtered out because your node blocks the domain they are "
-"registered on. You can review the list of domains your node is currently "
-"blocking in the <a href=\"/friendica\">About page</a>."
-msgstr[0] ""
-msgstr[1] ""
-
 #: src/Module/BaseSettings.php:80
 msgid "Account"
 msgstr ""
@@ -6013,136 +5596,8 @@ msgstr ""
 msgid "Circle name was not changed."
 msgstr ""
 
-<<<<<<< HEAD
-#: src/Module/Contact.php:354 src/Module/Contact.php:415
-#: src/Module/Moderation/BaseUsers.php:93
-msgid "Blocked"
-msgstr ""
-
-#: src/Module/Contact.php:357
-msgid "Only show blocked contacts"
-msgstr ""
-
-#: src/Module/Contact.php:362 src/Module/Contact.php:417
-#: src/Object/Post.php:345
-msgid "Ignored"
-msgstr ""
-
-#: src/Module/Contact.php:365
-msgid "Only show ignored contacts"
-msgstr ""
-
-#: src/Module/Contact.php:370 src/Module/Contact.php:418
-msgid "Collapsed"
-msgstr ""
-
-#: src/Module/Contact.php:373
-msgid "Only show collapsed contacts"
-msgstr ""
-
-#: src/Module/Contact.php:378 src/Module/Contact.php:419
-msgid "Archived"
-msgstr ""
-
-#: src/Module/Contact.php:381
-msgid "Only show archived contacts"
-msgstr ""
-
-#: src/Module/Contact.php:386 src/Module/Contact.php:416
-msgid "Hidden"
-msgstr ""
-
-#: src/Module/Contact.php:389
-msgid "Only show hidden contacts"
-msgstr ""
-
-#: src/Module/Contact.php:397
-msgid "Organize your contact groups"
-msgstr ""
-
-#: src/Module/Contact.php:430
-msgid "Search your contacts"
-msgstr ""
-
-#: src/Module/Contact.php:431 src/Module/Search/Index.php:207
-#, php-format
-msgid "Results for: %s"
-msgstr ""
-
-#: src/Module/Contact.php:438
-msgid "Update"
-msgstr ""
-
-#: src/Module/Contact.php:439 src/Module/Contact/Profile.php:477
-#: src/Module/Moderation/Blocklist/Contact.php:117
-#: src/Module/Moderation/Users/Blocked.php:138
-#: src/Module/Moderation/Users/Index.php:154
-msgid "Unblock"
-msgstr ""
-
-#: src/Module/Contact.php:440 src/Module/Contact/Profile.php:485
-msgid "Unignore"
-msgstr ""
-
-#: src/Module/Contact.php:441 src/Module/Contact/Profile.php:493
-msgid "Uncollapse"
-msgstr ""
-
-#: src/Module/Contact.php:443
-msgid "Batch Actions"
-msgstr ""
-
-#: src/Module/Contact.php:486
-msgid "Conversations started by this contact"
-msgstr ""
-
-#: src/Module/Contact.php:491
-msgid "Posts and Comments"
-msgstr ""
-
-#: src/Module/Contact.php:494
-msgid "Individual Posts and Replies"
-msgstr ""
-
-#: src/Module/Contact.php:502
-msgid "Posts containing media objects"
-msgstr ""
-
-#: src/Module/Contact.php:509
-msgid "View all known contacts"
-msgstr ""
-
-#: src/Module/Contact.php:519
-msgid "Advanced Contact Settings"
-msgstr ""
-
-#: src/Module/Contact.php:555
-msgid "Mutual Friendship"
-msgstr ""
-
-#: src/Module/Contact.php:559
-msgid "is a fan of yours"
-msgstr ""
-
-#: src/Module/Contact.php:563
-msgid "you are a fan of"
-msgstr ""
-
-#: src/Module/Contact.php:581
-msgid "Pending outgoing contact request"
-msgstr ""
-
-#: src/Module/Contact.php:583
-msgid "Pending incoming contact request"
-msgstr ""
-
-#: src/Module/Contact.php:596 src/Module/Contact/Profile.php:346
-#, php-format
-msgid "Visit %s's profile [%s]"
-=======
 #: src/Module/Circle.php:91
 msgid "Unknown circle."
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 msgstr ""
 
 #: src/Module/Circle.php:97 src/Module/Circle.php:106
@@ -6197,6 +5652,15 @@ msgstr ""
 
 #: src/Module/Circle.php:178
 msgid "Create a circle of contacts/friends."
+msgstr ""
+
+#: src/Module/Circle.php:179 src/Module/Circle.php:202
+#: src/Module/Circle.php:277
+msgid "Circle Name: "
+msgstr ""
+
+#: src/Module/Circle.php:194
+msgid "Contacts not in any circle"
 msgstr ""
 
 #: src/Module/Circle.php:220
@@ -6261,7 +5725,7 @@ msgid "Only show blocked contacts"
 msgstr ""
 
 #: src/Module/Contact.php:370 src/Module/Contact.php:426
-#: src/Object/Post.php:351
+#: src/Object/Post.php:345
 msgid "Ignored"
 msgstr ""
 
@@ -6549,6 +6013,10 @@ msgstr ""
 
 #: src/Module/Contact/MatchInterests.php:101
 msgid "No keywords to match. Please add keywords to your profile."
+msgstr ""
+
+#: src/Module/Contact/MatchInterests.php:139
+msgid "No matches"
 msgstr ""
 
 #: src/Module/Contact/MatchInterests.php:144
@@ -7732,7 +7200,7 @@ msgstr ""
 msgid "Image exceeds size limit of %s"
 msgstr ""
 
-#: src/Module/Media/Photo/Upload.php:205 src/Module/Profile/Photos.php:243
+#: src/Module/Media/Photo/Upload.php:205
 #: src/Module/Settings/Profile/Photo/Index.php:95
 msgid "Image upload failed."
 msgstr ""
@@ -8733,6 +8201,10 @@ msgstr ""
 msgid "audio link"
 msgstr ""
 
+#: src/Module/Post/Tag/Add.php:123
+msgid "post"
+msgstr ""
+
 #: src/Module/Post/Tag/Remove.php:106
 msgid "Remove Item Tag"
 msgstr ""
@@ -8752,32 +8224,20 @@ msgstr ""
 
 #: src/Module/Profile/Conversations.php:106
 #: src/Module/Profile/Conversations.php:109 src/Module/Profile/Profile.php:351
-<<<<<<< HEAD
 #: src/Module/Profile/Profile.php:354 src/Protocol/Feed.php:1032
-=======
-#: src/Module/Profile/Profile.php:354 src/Protocol/Feed.php:1090
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 #: src/Protocol/OStatus.php:1007
 #, php-format
 msgid "%s's timeline"
 msgstr ""
 
 #: src/Module/Profile/Conversations.php:107 src/Module/Profile/Profile.php:352
-<<<<<<< HEAD
 #: src/Protocol/Feed.php:1036 src/Protocol/OStatus.php:1012
-=======
-#: src/Protocol/Feed.php:1094 src/Protocol/OStatus.php:1012
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 #, php-format
 msgid "%s's posts"
 msgstr ""
 
 #: src/Module/Profile/Conversations.php:108 src/Module/Profile/Profile.php:353
-<<<<<<< HEAD
 #: src/Protocol/Feed.php:1039 src/Protocol/OStatus.php:1016
-=======
-#: src/Protocol/Feed.php:1097 src/Protocol/OStatus.php:1016
->>>>>>> 483cc45712a9a3e299f6c2265e3f1ea7e763cfd2
 #, php-format
 msgid "%s's comments"
 msgstr ""
@@ -8798,10 +8258,6 @@ msgstr ""
 
 #: src/Module/Profile/Photos.php:202
 msgid "Image file is empty."
-msgstr ""
-
-#: src/Module/Profile/Photos.php:376
-msgid "View Album"
 msgstr ""
 
 #: src/Module/Profile/Profile.php:112 src/Module/Profile/Restricted.php:50
