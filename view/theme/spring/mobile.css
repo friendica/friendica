@@ -1,0 +1,279 @@
+aside, header, #nav-search-box, #nav-admin-link, #nav-messages-linkmenu, #shared-links-tab, #nav-logout-link,
+.wall-item-location {
+  display: none;
+}
+
+.hide-comments-outer {
+  width: calc(100% - 105px);
+}
+
+section {
+  box-sizing: border-box;
+  left: 0px;
+  width: 100%;
+  max-width: 100%;
+  padding: 5px;
+}
+
+body, section, nav .nav-menu, div.pager, ul.tabs {
+  font-size: 16px;
+}
+
+.wall-item-container .wall-item-ago, .wall-item-network,.type-link blockquote, .type-video blockquote {
+  font-size: 13px;
+}
+
+nav {
+  min-width: 100%;
+}
+
+.wall-item-container .wall-item-content {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+/*  margin-left: -70px;
+  padding-top: 25px; */
+}
+
+nav ul {
+    margin-left: 0px;
+}
+
+
+.wall-item-container .wall-item-content img,
+.children .wall-item-container .wall-item-item .wall-item-content img,
+.wall-item-container .wall-item-content .type-link img.attachment-image, .type-link img.attachment-image, .type-video img.attachment-image {
+  max-width: 650px;
+}
+
+@media screen and (max-width: 800px) {
+  .wall-item-container .wall-item-content img,
+  .children .wall-item-container .wall-item-item .wall-item-content img,
+  .wall-item-container .wall-item-content .type-link img.attachment-image, .type-link img.attachment-image, .type-video img.attachment-image {
+    max-width: 450px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .wall-item-container .wall-item-content img,
+  .children .wall-item-container .wall-item-item .wall-item-content img,
+  .wall-item-container .wall-item-content .type-link img.attachment-image, .type-link img.attachment-image, .type-video img.attachment-image {
+    max-width: 350px;
+  }
+  .desktop-view { display: none; }
+  .mobile-view { display: initial; }
+  #nav-apps-link { display: none; }
+
+  .wall-item-container .wall-item-info { width: auto; }
+  .contact-photo-wrapper { width: 55px; }
+  .wwto { left: 0px; }
+
+  .type-link > a { height: 120px; width: 100%; overflow: hidden; display: block; }
+  .type-link > a > img { display: block; max-width: 100%!important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+
+    /** oembed **/
+  .embed_video {
+    float: none;
+    margin: 0px;
+    width: 100%;
+    overflow: hidden;
+    display: block;
+  }
+  .embed_video > img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
+  }
+  .embed_video > div {
+    background-image: none !important; background-color: transparent !important;
+    width: 100% !important; height: 110px !important;
+  }
+
+  #login-extra-links, #login-form {
+    /* width: 341px; */
+    width: 100%;
+  }
+  #id_remember_label {
+    width: unset;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .wall-item-container .wall-item-content img,
+  .wall-item-container .wall-item-content .type-link img.attachment-image, .type-link img.attachment-image, .type-video img.attachment-image {
+    max-width: 200px;
+  }
+  /* fix img width in threaded view - maybe there exists a better possibility to do this 
+    maybe this needs also to be done for tablet view*/
+  .children .wall-item-container .wall-item-item .wall-item-content img {
+    max-width: 100%;
+  }
+  iframe.embed_rich { width: 100% !important }
+    /* TODO: check if this is needed.
+   * oembedded iframe usually have "width" and "height" as attributes
+   * that override this rule */
+  iframe {
+    max-width: 100%;
+  }
+
+  
+  /* the top-nav notification menu */
+  nav #nav-notifications-linkmenu .menu-popup {
+	position: fixed;
+	left: 10px;
+	right: 10px;
+	top: 44px;
+	bottom: 10px;
+	width: auto;
+	max-width: none;
+	max-height: none;
+  }
+  
+
+}
+
+.wall-item-container.thread_level_2,
+.wall-item-container.thread_level_3,
+.wall-item-container.thread_level_4,
+.wall-item-container.thread_level_5,
+.wall-item-container.thread_level_6,
+.wall-item-container.thread_level_7 {
+  margin-left: 0;
+  width: calc(100% - 10px);
+}
+
+.wall-item-container.thread_level_2 .wall-item-content,
+.wall-item-container.thread_level_3 .wall-item-content,
+.wall-item-container.thread_level_4 .wall-item-content,
+.wall-item-container.thread_level_5 .wall-item-content,
+.wall-item-container.thread_level_6 .wall-item-content,
+.wall-item-container.thread_level_7 .wall-item-content {
+  max-width: 100%;
+}
+
+/* aside in/out */
+.mobile-aside-toggle {
+	display: block !important;
+}
+.mobile-aside-toggle a {
+	line-height: 35px;
+	padding: 0 10px;
+}
+.mobile-aside-toggle a i {
+	font-size: 22px;
+	color: #CCC;
+}
+
+aside {
+	display: block;
+	position: fixed;
+	max-width: 400px;
+	width: 80%;
+	left: -100%;
+	-webkit-transition: left 0.5s;
+	-moz-transition: left 0.5s;
+	-o-transition: left 0.5s;
+	transition: left 0.5s;
+}
+
+aside.show {
+	left: 0;
+}
+
+/* tabs */
+.tabs { position: relative; height: 25px!important; }
+.tabs li { width: 100%; }
+.tabs .tab { display: none;}
+.tabs .tab.active { display: block; }
+.tabs::after {
+	font-family: FontAwesome;
+	text-align: right;
+	content: "\f13a";
+	display: block;
+	position: absolute;
+	left: 0; right:0; top: 0; bottom: 0;
+	padding: 8px 2px 0 0;
+}
+
+.tabs.show {
+	position: fixed;
+	z-index: 1000;
+	left: 10px;
+	right: 10px;
+	top: 0px;
+	bottom: 10px;
+	height: auto !important;
+	border: 1px solid #ccc;
+}
+.tabs.show::after { display: none; }
+.tabs.show .tab { display: block; }
+
+/* jot buttons */
+#profile-jot-submit,
+#jot-preview-link {
+    float: none;
+    display: block;
+    width: 100%;
+    margin: 0 0 1em 0;
+}
+#profile-jot-submit-wrapper > div {
+    margin: 0 1em 1em 0;
+}
+#profile-jot-submit-wrapper > div#profile-jot-perms { margin: 0; }
+ 
+/* ACL window */
+#profile-jot-acl-wrapper, #profile-jot-acl-wrapper * { box-sizing: border-box; }
+#acl-wrapper { width: 100%; float: none; }
+/* flexbox for ACL window */
+#cboxLoadedContent,
+#cboxLoadedContent > div,
+#acl-wrapper {
+  display: -ms-Flexbox !important;
+  -ms-box-orient: vertical;
+
+  display: -webkit-flex !important;
+  display: -moz-flex !important;
+  display: -ms-flex !important;
+  display: flex !important;
+
+  -webkit-flex-flow: column;
+  -moz-flex-flow: column;
+  -ms-flex-flow: column;
+  flex-flow: column;
+  
+  -webkit-flex: 1 100%;
+  -moz-flex: 1 100%;
+  -ms-flex: 1 100%;
+  flex: 1 100%;
+}
+
+/** input elements **/
+input,
+textarea,
+select {
+    font-size: 18px;
+    border: 1px solid #888;
+    padding: 0.2em;
+}
+input:focus,
+textarea:focus,
+select:focus {
+    box-shadow: 1px 1px 10px rgba(46, 151, 255, 0.62);
+}
+
+.field, .field > * {  box-sizing: border-box; }
+.field label { width: 100%; float: none; display: block; }
+.field input, .field textarea, .field select { max-width: 100%; width: 100%; }
+.field.checkbox input { width: auto; float: right; }
+.field.checkbox label { width: 70%; float: left; }
+.field .field_help { margin: 0; }
+
+/** event **/
+.event-start, .event-end { width: auto; }
+.event-start .dtstart, .event-end .dtend { float: none; display: block; }
+
+/** prv mail **/
+.mail-conv-detail { margin-left: 0px; width: 100%; }
+#prvmail-submit, #prvmail-text, #prvmail-subject { box-sizing: border-box; width: 100%; }
