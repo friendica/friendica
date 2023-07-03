@@ -1,7 +1,7 @@
 # FRIENDICA Distributed Social Network
 # Copyright (C) 2010-2023, the Friendica project
 # This file is distributed under the same license as the Friendica package.
-# 
+#
 # Translators:
 # Andreas H., 2015
 # Andreas H., 2015-2018
@@ -3052,11 +3052,11 @@ msgstr "Circle ändern"
 
 #: src/Model/Circle.php:601 src/Module/Circle.php:194
 msgid "Contacts not in any circle"
-msgstr "Kontakte die keinem Circle zugeordnet sind"
+msgstr "Kontakte, die keinem Circle zugeordnet sind"
 
 #: src/Model/Circle.php:603
 msgid "Create a new circle"
-msgstr "Erstelle neuen Cricle"
+msgstr "Erstelle neuen Circle"
 
 #: src/Model/Circle.php:604 src/Module/Circle.php:179
 #: src/Module/Circle.php:202 src/Module/Circle.php:277
