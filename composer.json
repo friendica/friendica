@@ -60,7 +60,6 @@
 		"ua-parser/uap-php": "^3.9",
 		"xemlock/htmlpurifier-html5": "^0.1.11",
 		"fxp/composer-asset-plugin": "^1.4",
-		"bower-asset/base64": "^1.0",
 		"bower-asset/chart-js": "^2.8",
 		"bower-asset/dompurify": "^1.0",
 		"bower-asset/fork-awesome": "^1.1",

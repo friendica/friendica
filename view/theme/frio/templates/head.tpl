@@ -102,7 +102,6 @@
 	</script>
 	<script type="text/javascript"
 		src="view/asset/imagesloaded/imagesloaded.pkgd.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-	<script type="text/javascript" src="view/asset/base64/base64.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
 	<script type="text/javascript" src="view/asset/dompurify/dist/purify.min.js?v={{$smarty.const.FRIENDICA_VERSION}}">
 	</script>
 	<script type="text/javascript">
@@ -162,7 +161,7 @@
 		});
 	};
 	</script>
-	
+
 	{{* Include the strings which are needed for some js functions (e.g. translation)
 They are loaded into the html <head> so that js functions can use them *}}
 	{{include file="js_strings.tpl"}}
