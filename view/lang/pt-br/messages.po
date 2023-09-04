@@ -480,7 +480,7 @@ msgstr "Navegador"
 
 #: include/conversation.php:1475
 msgid "View all"
-msgstr ""
+msgstr "Ver todos"
 
 #: include/conversation.php:1499
 msgid "Like"
@@ -551,7 +551,7 @@ msgstr "Favor visitar %s para ver e/ou responder às suas mensagens privadas."
 #: include/enotify.php:172
 #, php-format
 msgid "%1$s tagged you on [url=%2$s]a %3$s[/url]"
-msgstr ""
+msgstr "%1$s marcou você em [url=%2$s]a %3$s[/url]"
 
 #: include/enotify.php:178
 #, php-format
@@ -742,7 +742,7 @@ msgstr "Foto:"
 #: include/enotify.php:382
 #, php-format
 msgid "Please visit %s to approve or reject the suggestion."
-msgstr "Favor visitar %s para aprovar ou rejeitar a sugestão."
+msgstr "Por favor, visitar %s para aprovar ou rejeitar a sugestão."
 
 #: include/enotify.php:390 include/enotify.php:405
 msgid "[Friendica:Notify] Connection accepted"
@@ -767,7 +767,7 @@ msgstr "Vocês agora são amigos mútuos e podem trocar atualizações de status
 #: include/enotify.php:400
 #, php-format
 msgid "Please visit %s if you wish to make any changes to this relationship."
-msgstr ""
+msgstr "Por favor, visite %s caso deseje realizar alterações a este relacionamento."
 
 #: include/enotify.php:413
 #, php-format
@@ -788,7 +788,7 @@ msgstr ""
 #: include/enotify.php:417
 #, php-format
 msgid "Please visit %s  if you wish to make any changes to this relationship."
-msgstr "Por favor, visite %s se você desejar fazer quaisquer alterações a este relacionamento."
+msgstr "Por favor, visite %s caso deseje realizar alterações a este relacionamento."
 
 #: include/enotify.php:427 mod/removeme.php:46
 msgid "[Friendica System Notify]"
@@ -796,7 +796,7 @@ msgstr ""
 
 #: include/enotify.php:427
 msgid "registration request"
-msgstr ""
+msgstr "pedido de cadastro."
 
 #: include/enotify.php:429
 #, php-format
@@ -882,7 +882,7 @@ msgstr "Informação"
 
 #: mod/admin.php:197
 msgid "Overview"
-msgstr ""
+msgstr "Visão Geral"
 
 #: mod/admin.php:198 mod/admin.php:779
 msgid "Federation Statistics"
@@ -890,7 +890,7 @@ msgstr ""
 
 #: mod/admin.php:199
 msgid "Configuration"
-msgstr ""
+msgstr "Configuração"
 
 #: mod/admin.php:200 mod/admin.php:1581
 msgid "Site"
@@ -902,7 +902,7 @@ msgstr "Usuários"
 
 #: mod/admin.php:202 mod/admin.php:2179 mod/admin.php:2239 mod/settings.php:99
 msgid "Addons"
-msgstr ""
+msgstr "Extensões"
 
 #: mod/admin.php:203 mod/admin.php:2436 mod/admin.php:2480
 msgid "Themes"
@@ -915,11 +915,11 @@ msgstr "Funcionalidades adicionais"
 #: mod/admin.php:205 mod/admin.php:329 src/Content/Nav.php:234
 #: src/Module/Register.php:144 src/Module/Tos.php:73
 msgid "Terms of Service"
-msgstr ""
+msgstr "Termos de Serviço"
 
 #: mod/admin.php:206
 msgid "Database"
-msgstr ""
+msgstr "Banco de Dados"
 
 #: mod/admin.php:207
 msgid "DB updates"
@@ -927,7 +927,7 @@ msgstr "Atualizações do BD"
 
 #: mod/admin.php:208 mod/admin.php:823
 msgid "Inspect Queue"
-msgstr ""
+msgstr "Inspecionar Fila"
 
 #: mod/admin.php:209
 msgid "Inspect Deferred Workers"
@@ -939,7 +939,7 @@ msgstr ""
 
 #: mod/admin.php:211
 msgid "Tools"
-msgstr ""
+msgstr "Ferramentas"
 
 #: mod/admin.php:212
 msgid "Contact Blocklist"
@@ -951,7 +951,7 @@ msgstr ""
 
 #: mod/admin.php:214 mod/admin.php:558
 msgid "Delete Item"
-msgstr ""
+msgstr "Deletar Item"
 
 #: mod/admin.php:215 mod/admin.php:216 mod/admin.php:2556
 msgid "Logs"
@@ -959,7 +959,7 @@ msgstr "Relatórios"
 
 #: mod/admin.php:217 mod/admin.php:2624
 msgid "View Logs"
-msgstr ""
+msgstr "Ver Relatórios"
 
 #: mod/admin.php:219
 msgid "Diagnostics"
@@ -998,7 +998,7 @@ msgstr "Administração"
 
 #: mod/admin.php:330
 msgid "Display Terms of Service"
-msgstr ""
+msgstr "Mostrar Termos de Serviço"
 
 #: mod/admin.php:330
 msgid ""
@@ -1041,23 +1041,23 @@ msgstr "Salvar configurações"
 #: mod/admin.php:386 mod/admin.php:404 mod/dfrn_request.php:346
 #: mod/friendica.php:131 src/Model/Contact.php:1719
 msgid "Blocked domain"
-msgstr ""
+msgstr "Domínio Bloqueado"
 
 #: mod/admin.php:386
 msgid "The blocked domain"
-msgstr ""
+msgstr "O domínio bloqueado"
 
 #: mod/admin.php:387 mod/admin.php:405 mod/friendica.php:131
 msgid "Reason for the block"
-msgstr ""
+msgstr "Motivo do bloqueio"
 
 #: mod/admin.php:387 mod/admin.php:400
 msgid "The reason why you blocked this domain."
-msgstr ""
+msgstr "O motivo pelo bloqueio do domínio."
 
 #: mod/admin.php:388
 msgid "Delete domain"
-msgstr ""
+msgstr "Deletar domínio"
 
 #: mod/admin.php:388
 msgid "Check to delete this entry from the blocklist"
@@ -1098,7 +1098,7 @@ msgstr ""
 
 #: mod/admin.php:401
 msgid "Add Entry"
-msgstr ""
+msgstr "Adicionar Entrada"
 
 #: mod/admin.php:402
 msgid "Save changes to the blocklist"
@@ -1131,7 +1131,7 @@ msgstr ""
 #: mod/admin.php:479 src/Core/Console/GlobalCommunityBlock.php:65
 #, php-format
 msgid "Could not find any contact entry for this URL (%s)"
-msgstr ""
+msgstr "Não foi possível encontrar nenhum contato com essa URL (%s)."
 
 #: mod/admin.php:486
 #, php-format
@@ -1217,7 +1217,7 @@ msgstr ""
 
 #: mod/admin.php:559
 msgid "Delete this Item"
-msgstr ""
+msgstr "Deletar esse Item"
 
 #: mod/admin.php:560
 msgid ""
@@ -1246,7 +1246,7 @@ msgstr ""
 
 #: mod/admin.php:669
 msgid "unknown"
-msgstr ""
+msgstr "desconhecido"
 
 #: mod/admin.php:772
 msgid ""
@@ -1287,11 +1287,11 @@ msgstr "Rede"
 
 #: mod/admin.php:829 mod/admin.php:880
 msgid "Created"
-msgstr ""
+msgstr "Criado"
 
 #: mod/admin.php:830
 msgid "Last Tried"
-msgstr ""
+msgstr "Última Tentativa"
 
 #: mod/admin.php:831
 msgid ""
@@ -1326,7 +1326,7 @@ msgstr ""
 
 #: mod/admin.php:881
 msgid "Priority"
-msgstr ""
+msgstr "Prioridade"
 
 #: mod/admin.php:907
 #, php-format
@@ -1420,7 +1420,7 @@ msgstr "Fila de mensagens"
 
 #: mod/admin.php:990
 msgid "Server Settings"
-msgstr ""
+msgstr "Configuração do Servidor"
 
 #: mod/admin.php:999
 msgid "Summary"
@@ -1440,7 +1440,7 @@ msgstr "Versão"
 
 #: mod/admin.php:1009
 msgid "Active addons"
-msgstr ""
+msgstr "Extensões ativas"
 
 #: mod/admin.php:1042
 msgid "Can not parse base url. Must have at least <scheme>://<domain>"
@@ -1456,7 +1456,7 @@ msgstr "Nenhum tema especial para dispositivos móveis"
 
 #: mod/admin.php:1473
 msgid "No community page for local users"
-msgstr ""
+msgstr "Sem página de comunidade para usuários locais."
 
 #: mod/admin.php:1474
 msgid "No community page"
@@ -1541,7 +1541,7 @@ msgstr ""
 
 #: mod/admin.php:1534
 msgid "check the development version"
-msgstr ""
+msgstr "Verificar a versão de desenvolvimento"
 
 #: mod/admin.php:1556
 msgid "Database (legacy)"
@@ -1590,7 +1590,7 @@ msgstr ""
 
 #: mod/admin.php:1593
 msgid "Warning! Advanced function. Could make this server unreachable."
-msgstr ""
+msgstr "Cuidado! funcão avançada. Pode tornar o servidor inacessível"
 
 #: mod/admin.php:1597
 msgid "Site name"
@@ -1607,7 +1607,7 @@ msgstr "enviador de email"
 #: mod/admin.php:1599
 msgid ""
 "The email address your server shall use to send notification emails from."
-msgstr ""
+msgstr "Endereço  de email que seu servidor utilizará para enviar notificações."
 
 #: mod/admin.php:1600
 msgid "Banner/Logo"
@@ -1619,7 +1619,7 @@ msgstr "ícone de atalho"
 
 #: mod/admin.php:1601
 msgid "Link to an icon that will be used for browsers."
-msgstr ""
+msgstr "Link para o ícone que será usado em navegadores."
 
 #: mod/admin.php:1602
 msgid "Touch icon"
@@ -1627,7 +1627,7 @@ msgstr "ícone de toque"
 
 #: mod/admin.php:1602
 msgid "Link to an icon that will be used for tablets and mobiles."
-msgstr ""
+msgstr "Link para o ícone que será usado em tablets e celulares."
 
 #: mod/admin.php:1603
 msgid "Additional Info"
@@ -1848,7 +1848,7 @@ msgstr "Marque para forçar todos os perfis desse site a serem listados no diret
 
 #: mod/admin.php:1628
 msgid "Enabling this may violate privacy laws like the GDPR"
-msgstr ""
+msgstr "Habilitar isso pode violar leis de privacidade como a RGPD"
 
 #: mod/admin.php:1629
 msgid "Global directory URL"
@@ -1904,7 +1904,7 @@ msgstr "Não substitue fotos privativas guardadas localmente em publicações po
 
 #: mod/admin.php:1634
 msgid "Explicit Content"
-msgstr ""
+msgstr "Conteúdo Explícito"
 
 #: mod/admin.php:1634
 msgid ""
@@ -1936,7 +1936,7 @@ msgstr "Desabilitar o registro de contas adicionais para serem usadas como pági
 
 #: mod/admin.php:1637
 msgid "Disable OpenID"
-msgstr ""
+msgstr "Desativar OpenID"
 
 #: mod/admin.php:1637
 msgid "Disable OpenID support for registration and logins."
@@ -2181,7 +2181,7 @@ msgstr "suprime mostrar uma lista de hashtags no final de cada texto."
 
 #: mod/admin.php:1668
 msgid "Clean database"
-msgstr ""
+msgstr "Limpar Banco de Dados"
 
 #: mod/admin.php:1668
 msgid ""
@@ -2282,7 +2282,7 @@ msgstr ""
 
 #: mod/admin.php:1678
 msgid "Only search in tags"
-msgstr "Somente pesquisa nas estiquetas"
+msgstr "Somente pesquisa em categorias"
 
 #: mod/admin.php:1678
 msgid "On large systems the text search can slow down the system extremely."
@@ -2308,7 +2308,7 @@ msgstr ""
 
 #: mod/admin.php:1682
 msgid "Enabled"
-msgstr ""
+msgstr "Habilitado"
 
 #: mod/admin.php:1684
 msgid "Maximum number of parallel workers"
@@ -2402,7 +2402,7 @@ msgstr ""
 
 #: mod/admin.php:1692
 msgid "tags"
-msgstr ""
+msgstr "Categorias"
 
 #: mod/admin.php:1693
 msgid "Server tags"
@@ -2424,7 +2424,7 @@ msgstr ""
 
 #: mod/admin.php:1697
 msgid "Start Relocation"
-msgstr ""
+msgstr "Iniciar Realocação"
 
 #: mod/admin.php:1724
 msgid "Update has been marked successful"
@@ -2573,7 +2573,7 @@ msgstr "Página de vitrine"
 
 #: mod/admin.php:2001 mod/settings.php:1057
 msgid "Public Forum"
-msgstr ""
+msgstr "Fórum Público"
 
 #: mod/admin.php:2002 mod/settings.php:1061
 msgid "Automatic Friend Page"
@@ -2581,11 +2581,11 @@ msgstr "Página de amigo automático"
 
 #: mod/admin.php:2003
 msgid "Private Forum"
-msgstr ""
+msgstr "Fórum Privado"
 
 #: mod/admin.php:2006 mod/settings.php:1033
 msgid "Personal Page"
-msgstr ""
+msgstr "Página Pessoal"
 
 #: mod/admin.php:2007 mod/settings.php:1037
 msgid "Organisation Page"
@@ -2622,7 +2622,7 @@ msgstr "Último item"
 
 #: mod/admin.php:2056
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: mod/admin.php:2063
 msgid "Add User"
@@ -2646,7 +2646,7 @@ msgstr "Nenhum registro."
 
 #: mod/admin.php:2069
 msgid "Note from the user"
-msgstr ""
+msgstr "Notas do usuário"
 
 #: mod/admin.php:2070 mod/notifications.php:183 mod/notifications.php:269
 msgid "Approve"
@@ -2674,7 +2674,7 @@ msgstr "Novo usuário"
 
 #: mod/admin.php:2081
 msgid "Permanent deletion"
-msgstr ""
+msgstr "Exclusão Permanente"
 
 #: mod/admin.php:2086
 msgid ""
@@ -2707,12 +2707,12 @@ msgstr "Endereço de e-mail do novo usuário."
 #: mod/admin.php:2141
 #, php-format
 msgid "Addon %s disabled."
-msgstr ""
+msgstr "Extensão %s desabilitada."
 
 #: mod/admin.php:2144
 #, php-format
 msgid "Addon %s enabled."
-msgstr ""
+msgstr "Extensão %s habilitada."
 
 #: mod/admin.php:2155 mod/admin.php:2405
 msgid "Disable"
@@ -2741,7 +2741,7 @@ msgstr "Mantenedor: "
 
 #: mod/admin.php:2241
 msgid "Reload active addons"
-msgstr ""
+msgstr "Recarregar extensões ativas"
 
 #: mod/admin.php:2246
 #, php-format
@@ -2761,7 +2761,7 @@ msgstr "Captura de tela"
 
 #: mod/admin.php:2482
 msgid "Reload active themes"
-msgstr ""
+msgstr "Recarregar temas ativos"
 
 #: mod/admin.php:2487
 #, php-format
@@ -3076,7 +3076,7 @@ msgstr ""
 
 #: mod/cal.php:296 src/Core/Console/NewPassword.php:67 src/Model/User.php:324
 msgid "User not found"
-msgstr ""
+msgstr "Usuário não encontrado."
 
 #: mod/cal.php:312
 msgid "This calendar format is not supported"
@@ -3111,7 +3111,7 @@ msgstr ""
 
 #: mod/community.php:92
 msgid "Not available."
-msgstr "Não disponível."
+msgstr "Indisponível."
 
 #: mod/community.php:102
 msgid "Local Community"
@@ -3593,7 +3593,7 @@ msgstr "Pesquisar neste site"
 
 #: mod/directory.php:132
 msgid "Results for:"
-msgstr ""
+msgstr "Resultados para:"
 
 #: mod/directory.php:134
 msgid "Site Directory"
@@ -3707,7 +3707,7 @@ msgstr "Detalhes do evento"
 
 #: mod/events.php:510
 msgid "Starting date and Title are required."
-msgstr ""
+msgstr "Data inicial e Título são obrigatórios."
 
 #: mod/events.php:511 mod/events.php:516
 msgid "Event Starts:"
@@ -3752,11 +3752,11 @@ msgstr "Permissões"
 
 #: mod/events.php:572
 msgid "Failed to remove event"
-msgstr ""
+msgstr "Falha ao remover evento"
 
 #: mod/events.php:574
 msgid "Event removed"
-msgstr ""
+msgstr "Evento removido"
 
 #: mod/fbrowser.php:36 src/Content/Nav.php:158 src/Model/Profile.php:917
 #: view/theme/frio/theme.php:264
@@ -3780,7 +3780,7 @@ msgstr "Arquivos"
 
 #: mod/feedtest.php:18
 msgid "You must be logged in to use this module"
-msgstr ""
+msgstr "Você precisa estar registrado para usar esse módulo."
 
 #: mod/feedtest.php:45
 msgid "Source URL"
@@ -3847,11 +3847,11 @@ msgstr ""
 
 #: mod/friendica.php:106
 msgid "Installed addons/apps:"
-msgstr ""
+msgstr "Extensões/Aplicativos Instalados"
 
 #: mod/friendica.php:120
 msgid "No installed addons/apps"
-msgstr ""
+msgstr "Extensão/Aplicativos Não Instalados"
 
 #: mod/friendica.php:125
 #, php-format
@@ -3901,7 +3901,7 @@ msgstr "Salvar o grupo"
 
 #: mod/group.php:104
 msgid "Filter"
-msgstr ""
+msgstr "Filtar"
 
 #: mod/group.php:109
 msgid "Create a group of contacts/friends."
@@ -3926,11 +3926,11 @@ msgstr "Não foi possível remover o grupo."
 
 #: mod/group.php:217
 msgid "Delete Group"
-msgstr ""
+msgstr "Excluir Grupo"
 
 #: mod/group.php:228
 msgid "Edit Group Name"
-msgstr ""
+msgstr "Editar Nome do Grupo"
 
 #: mod/group.php:239
 msgid "Members"
@@ -3946,7 +3946,7 @@ msgstr "O grupo está vazio"
 
 #: mod/group.php:255
 msgid "Remove contact from group"
-msgstr ""
+msgstr "Remover contato do grupo"
 
 #: mod/group.php:273 mod/profperm.php:119
 msgid "Click on a contact to add or remove."
@@ -3954,7 +3954,7 @@ msgstr "Clique em um contato para adicionar ou remover."
 
 #: mod/group.php:287
 msgid "Add contact to group"
-msgstr ""
+msgstr "Adicionar contato ao grupo"
 
 #: mod/hcard.php:20
 msgid "No profile"
@@ -4286,7 +4286,7 @@ msgstr ""
 #: mod/lostpass.php:170
 #, php-format
 msgid "Your password has been changed at %s"
-msgstr "Sua senha foi modifica às %s"
+msgstr "Sua senha foi modificada às %s"
 
 #: mod/maintenance.php:26
 msgid "System down for maintenance"
@@ -4550,7 +4550,7 @@ msgstr "Gostaríamos de oferecer algumas dicas e links para ajudar a tornar a su
 
 #: mod/newmember.php:16
 msgid "Getting Started"
-msgstr "Do Início"
+msgstr "Começando"
 
 #: mod/newmember.php:18
 msgid "Friendica Walk-Through"
@@ -4748,11 +4748,11 @@ msgstr "Notificações pessoais"
 
 #: mod/notifications.php:142
 msgid "Show unread"
-msgstr ""
+msgstr "Exibir não lidas"
 
 #: mod/notifications.php:142
 msgid "Show all"
-msgstr ""
+msgstr "Exibir todas"
 
 #: mod/notifications.php:153
 msgid "Show Ignored Requests"
@@ -4994,7 +4994,7 @@ msgstr "Nome do novo álbum: "
 
 #: mod/photos.php:1064
 msgid "or select existing album:"
-msgstr ""
+msgstr "ou selecione álbum existente:"
 
 #: mod/photos.php:1065
 msgid "Do not show a status post for this upload"
@@ -5141,7 +5141,7 @@ msgstr "Selecione o que você deseja fazer com o destinatário"
 
 #: mod/poke.php:187
 msgid "Make this post private"
-msgstr "Fazer com que essa publicação se torne privada"
+msgstr "Tornar essa publicação privada"
 
 #: mod/probe.php:14 mod/webfinger.php:17
 msgid "Only logged in users are permitted to perform a probing."
