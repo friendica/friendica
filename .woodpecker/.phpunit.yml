@@ -82,10 +82,10 @@ steps:
       repo:
         - friendica/friendica
     commands:
-      - codecov -t ${CODECOV_TOKEN} -R '.' -Z -f 'clover.xml'
+      - codecov -t $${CODECOV_TOKEN} -R '.' -Z -f 'clover.xml'
     secrets:
       - source: codecov-token
-        target: codecov_token
+        target: CODECOV_TOKEN
 
 services:
   mariadb:
