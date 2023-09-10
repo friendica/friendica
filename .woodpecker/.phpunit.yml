@@ -82,7 +82,7 @@ steps:
       repo:
         - friendica/friendica
     commands:
-      - codecov -R '.' -Z -f 'clover.xml'
+      - codecov -t ${CODECOV_TOKE} -R '.' -Z -f 'clover.xml'
     secrets:
       - source: codecov-token
         target: codecov_token
