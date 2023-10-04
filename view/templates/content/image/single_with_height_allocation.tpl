@@ -5,7 +5,7 @@
 <div style="max-width: {{$allocated_max_width|default:"auto"}};">
 {{/if}}
 
-<figure class="img-allocated-height" style="width: {{$allocated_width|default:"auto"}}; padding-bottom: {{$allocated_height}}">
+<figure class="img-allocated-height" style="width: {{$allocated_width|default:"auto"}}; padding-bottom: {{$allocated_height|default:"auto"}}">
     {{if $image->preview}}
 		<a data-fancybox="uri-id-{{$image->uriId}}" href="{{$image->url}}">
 			<img src="{{$image->preview}}" alt="{{$image->description}}" title="{{$image->description}}" loading="lazy">
