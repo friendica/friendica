@@ -156,15 +156,16 @@ class Post
 	/**
 	 * Get data in a form usable by a conversation template
 	 *
-	 * @param array   $conv_responses conversation responses
-	 * @param string $formSecurityToken A security Token to avoid CSF attacks
-	 * @param integer $thread_level   default = 1
+	 * @param array   $conv_responses    conversation responses
+	 * @param string  $formSecurityToken A security Token to avoid CSF attacks
+	 * @param integer $thread_level      default = 1
+	 * @param array   $thread_parent     Array of parent guid and parent author names
 	 *
 	 * @return mixed The data requested on success, false on failure
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function getTemplateData(array $conv_responses, string $formSecurityToken, int $thread_level = 1, string $parent_guid = "", string $parent_username = "")
+	public function getTemplateData(array $conv_responses, string $formSecurityToken, int $thread_level = 1, array $thread_parent = [])
 	{
 		$item = $this->getData();
 		$edited = false;
@@ -496,6 +497,9 @@ class Post
 			$browsershare = null;
 		}
 
+		$parent_guid     = $thread_parent[$item['thr-parent-id']]['guid'] ?? '';
+		$parent_username = $thread_parent[$item['thr-parent-id']]['name'] ?? '';
+
 		$tmp_item = [
 			'parentguid'      => $parent_guid,
 			'isreplyto'       => DI::l10n()->t('in reply to %s', $parent_username),
@@ -611,8 +615,10 @@ class Post
 		$children = $this->getChildren();
 		$nb_children = count($children);
 		if ($nb_children > 0) {
+			$thread_parent[$item['uri-id']] = ['guid' => $item['guid'], 'name' => $item['author-name']];
 			foreach ($children as $child) {
-				$result['children'][] = $child->getTemplateData($conv_responses, $formSecurityToken, $thread_level + 1, $tmp_item['guid'], $tmp_item['name']);
+				$thread_parent[$child->getDataValue('uri-id')] = ['guid' => $child->getDataValue('guid'), 'name' => $child->getDataValue('author-name')];
+				$result['children'][] = $child->getTemplateData($conv_responses, $formSecurityToken, $thread_level + 1, $thread_parent);
 			}
 
 			// Collapse
