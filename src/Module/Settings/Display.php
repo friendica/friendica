@@ -267,8 +267,8 @@ class Display extends BaseSettings
 			$timelines[] = [
 				'label'        => $timeline->label,
 				'description'  => $timeline->description,
-				'enable'       => ["enable{$timeline->code}", '', in_array($timeline->code, $enabled_timelines)],
-				'bookmark'     => ["bookmark{$timeline->code}", '', in_array($timeline->code, $bookmarked_timelines)],
+				'enable'       => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
+				'bookmark'     => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
 			];
 		}
 

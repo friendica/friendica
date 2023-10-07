@@ -85,7 +85,7 @@ class Channel extends \Friendica\BaseRepository
 		return $this->_select(['uid' => $uid]);
 	}
 
-	public function save(UserDefinedChannel $Channel): UserDefinedChannel
+	public function save(TimelineEntity $Channel): TimelineEntity
 	{
 		$fields = [
 			'label'            => $Channel->label,
