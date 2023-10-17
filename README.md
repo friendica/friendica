@@ -1,5 +1,5 @@
-Friendica Social Communications Server
-======================================
+Friendica - your open and free social network
+=============================================
 
 Welcome to the free social web. Friendica is a decentralised platform for social communication linking to other independent social projects and corporate services.
 
