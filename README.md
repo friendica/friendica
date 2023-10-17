@@ -43,4 +43,4 @@ Have a look at the [installation documentation](doc/Install.md) for further info
 
 ## Endorsements
 
-- [![Awesome Humane Tech](images/humane-tech-badge.svg)](https://github.com/humanetech-community/awesome-humane-tech) On August 12th 2020, Friendica was added to [the curated Awesome Humane Tech directory](https://github.com/humanetech-community/awesome-humane-tech) in [the "Fediverse" category](https://github.com/humanetech-community/awesome-humane-tech#fediverse).
+- [![Awesome Humane Tech](images/humane-tech-badge.svg)](https://codeberg.org/teaserbot-labs/delightful-humane-design) In August 2020 Friendica was added to the curated delightful humane design resources in the [Fediverse category](https://codeberg.org/teaserbot-labs/delightful-humane-design#fediverse).
