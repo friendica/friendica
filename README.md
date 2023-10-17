@@ -1,19 +1,13 @@
 Friendica Social Communications Server
 ======================================
 
-Welcome to the free social web.
+Welcome to the free social web. Friendica is a decentralised platform for social communication linking to other independent social projects and corporate services.
 
-Friendica is a decentralised communications platform that integrates social communication. Our platform links to independent social projects and corporate services.
+Joining the Fediverse allows to free friends, family and colleagues from data-harvesting corporations. Enjoy free and open social communication, independent of any specific provider.
 
-Our mission is to free friends, family and colleagues from data-harvesting corporations; we aim for social communication to be free and open, while flowing between any provider as easily as email does.
+Friendica connects you to a federated communications network of thousands of servers. Through various protocols you can interact with anyone on [Friendica]( https://friendi.ca), [Mastodon](https://joinmastodon.org), [Lemmmy](https://join-lemmy.org/), [Diaspora](https://diasporafoundation.org), [Misskey](https://join.misskey.page), [Peertube](https://joinpeertube.org/), [Pixelfed](https://pixelfed.org/), [Pleroma](https://pleroma.social) and many more. Receiving content from Tumblr, Wordpress and RSS is also possible. Friendica allows to integrate web based content via add-ons such as ITTT, Buffer. You can customize and control how publicly or privatly you want to share your content.
 
-Friendica connects you effortlessly to a federated communications network of several thousand servers, with more than half a million user registrations. You can directly connect to anyone on [Friendica]( https://friendi.ca), [Mastodon](https://joinmastodon.org/), [Diaspora](https://diasporafoundation.org/), [GnuSocial](https://gnu.io/social/), [Pleroma](https://pleroma.social/), or [Hubzilla](https://hubzilla.org/), regardless where each user profile is hosted.
-
-With Friendica, you can also fully interact with anyone on Twitter and receive any content from Tumblr, Wordpress or RSS. Friendica allows you to integrate most things on the web via a range of addons such as ITTT, Buffer; you will be able to easily control your own data as you decide.
-
-Join today and [get your Friendica profile!](https://dir.friendica.social/servers 'Join Friendica today!')
-
-Have a look at the [installation documentation](doc/Install.md) for further information about installing and using Friendica.
+[Join Friendica]((https://dir.friendica.social/servers)) today or setup [your own Friendica instance](doc/Install.md).
 
 ### Friendica Screenshots
 
