@@ -243,7 +243,7 @@ var Browser = {
 
 	_getUrl: function (mode, folder) {
 		let folderValue = folder !== undefined ? folder : Browser.folder;
-		let folderUrl = folderValue !== undefined ? '/' + encodeURIComponent(folderValue) : '';
+		let folderUrl = folderValue !== undefined ? '/' + encodeURIComponent(folderValue).replace('%20','+') : '';
 		return 'media/' + Browser.type + '/browser' + folderUrl + '?mode=' + mode + "&theme=frio";
 	}
 };
