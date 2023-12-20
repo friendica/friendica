@@ -23,6 +23,7 @@ Version 2023.12 (unreleased)
     Fixed a bug that prevented bi-directional delivery of DMs [annando]
     Fixed a bug in privacy settings for remote-self [annando]
     Fixed a bug that prevented the selection of photos with captions [Raroun]
+    Fixed a bug in Magic Auth [git-marijus]
     Improved Bluesky connector core [annando]
     Improved SSL handling of reverse http proxies [MrPetovan]
     Improved performance [annando]
@@ -46,6 +47,7 @@ Version 2023.12 (unreleased)
     Improved the processing of relayed posts [annando]
     Improved compatibility with Mastodon Clients [annando]
     Improved nodeinfo [MrPetovan]
+    Improved the federation statistics in the admin panel [annando]
     General code cleanup [AlfredSK, annando, jlamothe, mexon, MrPetovan, nupplaphil, Quix0r, toddy15]
     Renamed "group" to "circle"
     Renamed "forum" to "group"
@@ -82,7 +84,6 @@ Version 2023.05 (2023-05-23)
     Updates to the translations HU, PL
     Updates to the themes (frio, vier) [MrPetovan, xundeenergie]
     Updates to the documentation [MrPetovan]
-    Improved the federation statistics in the admin panel [annando]
     Improved the probing of remote accounts [Annando, ne20002]
     Improved the OWA implementation [annando, abanink]
     Improved the database handling [nupplaphil]
@@ -94,7 +95,6 @@ Version 2023.05 (2023-05-23)
     Fixed meaning of the limit parameter in the Mastodon API [annando]
     Fixed a bug in the tag cloud [MrPetovan]
     Fixed the magic links in photo menu [MrPetovan]
-    Fixed a bug in Magic Auth [git-marijus]
     Added new hook for addons (support_probe) [annando]
     Added support for special characters in category links [MrPetovan]
     Added possibility to collapse postings [annando]
