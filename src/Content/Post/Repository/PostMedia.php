@@ -27,6 +27,7 @@ use Friendica\Content\Post\Collection;
 use Friendica\Content\Post\Entity;
 use Friendica\Content\Post\Factory;
 use Friendica\Database\Database;
+use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
@@ -45,6 +46,9 @@ class PostMedia extends BaseRepository
 
 		$Entities = new Collection\PostMedias();
 		foreach ($rows as $fields) {
+			if (!Network::createUriFromString($fields['url'])) {
+				continue;
+			}
 			try {
 				$Entities[] = $this->factory->createFromTableRow($fields);
 			} catch (\Exception $e) {
