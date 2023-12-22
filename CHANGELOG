@@ -30,6 +30,8 @@ Version 2022.09 (unreleased)
     Removed the poke functionality [MrPetovan]
 
   Friendica Addons
+    Added Invidious Addon [loma-one, annando]
+    Added Audon Addon [loma-one]
     Added GD translation, updates to the translation AR, FR
     Removed the addons: morechoice, morepokes
     Marked the addon whindowsphonepush as unsupported
