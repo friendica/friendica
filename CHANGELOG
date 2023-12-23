@@ -14,7 +14,7 @@ Version 2023.12 (unreleased)
     Fixed a bug with previewing linked postings [annando]
     Fixed a problem parsing Mastodon WebFingers [MrPetovan]
     Fixed a bug that could lead to deleting your own account unintended [MrPetovan]
-    Fixed redirections in 2FA settings page [MrPetovan]
+    Fixed redirection in 2FA settings page [MrPetovan]
     Fixed a problem with distributing some comments [annando]
     Fixed a bug that caused public groups not being able to hide members [annando]
     Fixed RSS/Atom feed of group accounts [MrPetovan]
@@ -27,7 +27,7 @@ Version 2023.12 (unreleased)
     Improved performance [annando]
     Improved language detection [annando]
     Improved display of contact relationships [annando]
-    Impeoved display of notifications [annando, MrPetovan]
+    Improved display of notifications [annando, MrPetovan]
     Improved Mastodon compatible API [annando, gudzpoz, HankG, MrPetovan, Quix0r]
     Improved federation with Diaspora, Firefish, GoToSocial, Lemmy, Threads [annando]
     Improved display of quoted posts [annando]
@@ -39,7 +39,7 @@ Version 2023.12 (unreleased)
     Improved handling of resizing images [annando]
     Improved the image grid at the end of postings [MrPetovan]
     Improved raw content output [annando]
-    Improved handling of smilies [gudzpoz]
+    Improved handling of smileys [gudzpoz]
     Improved the admin panel [annando]
     Improved handling of the background worker [annando]
     Improved the processing of relayed posts [annando]
@@ -51,9 +51,9 @@ Version 2023.12 (unreleased)
     Renamed "forum" to "group"
     Added possibility to hide the server block list [MrPetovan, Quix0r]
     Added creation of moderation reports [AlfredSK, annando, MrPetovan]
-    Added user controled ignore server functionality [MrPetovan]
+    Added user controlled ignore server functionality [MrPetovan]
     Added support for Unix domain sockets to Redis [MrPetovan]
-    Added user controled channels for the network stream [annando]
+    Added user controlled channels for the network stream [annando]
     Added support of MacOS emoji picker in text fields [MrPetovan]
     Added lazy loading for images [FarisKarim, xundeenergie]
     Added image caption display in Fancybox gallery [MrPetovan]
@@ -61,9 +61,42 @@ Version 2023.12 (unreleased)
     Added support for CORS requests to nodeinfo [palant]
 
   Friendica Addons
+    Updates to the translation AR, CS, DE, ES, ET, FR, HU, IT, JA, NL, PL, RU, SV, ZH CN
+    Advancedcontentfilter
+      General code cleanup [MrPetovan]
+    Audon
+      Added audon addon [loma-one]
+    Blockem
+      Deprecated the addon [AndyHee]
     Bluesky
-      Added bidirectional Bluesky connector [annando]
+      Added bidirectional communication to the Bluesky connector [annando]
+      Added support for pinned postings [annando]
+      Added support for transmitted language [annando]
+      Improved thread handling [annando]
+      Improved handling of hashtags [annando]
+      Improved image uploading [annando]
+    CLD
+      Added addon for detection of the language of postings using CLD2 library [annando]
+    invidious
+      Added addon [loma-one]
+    langfilter
+      Use two letter codes for detected languages [annando]
+    Mailstream
+      Improved error handling [mexon]
+    Monolog
+      General code cleanup [nupplaphil]
+    NSFW
+      General code cleanup [MrPetovan]
+    pageheader
+      Improved styling of message box [loma-one]
+    Showmore Dyn
+      Improved styling on mobile devices [csolisr]
+    Smileybutton
+      Improved conversation from float to int [MrPetovan]
+    Tumblr
+      Improved the import of feeds [annando]
     Twitter
+      Improved image uploading [annando]
       Removed the import of postings from Twitter [annando]
 
   Closed Issues
