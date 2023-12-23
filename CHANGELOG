@@ -22,6 +22,7 @@ Version 2023.12 (unreleased)
     Fixed a bug in privacy settings for remote-self [annando]
     Fixed a bug that prevented the selection of photos with captions [Raroun]
     Fixed a bug in Magic Auth [git-marijus]
+    Fixed a bug convertig local tags to external on receiving updates to the post [annando]
     Improved Bluesky connector core [annando]
     Improved SSL handling of reverse http proxies [MrPetovan]
     Improved performance [annando]
@@ -29,7 +30,7 @@ Version 2023.12 (unreleased)
     Improved display of contact relationships [annando]
     Improved display of notifications [annando, MrPetovan]
     Improved Mastodon compatible API [annando, gudzpoz, HankG, MrPetovan, Quix0r]
-    Improved federation with Diaspora, Firefish, GoToSocial, Lemmy, Threads [annando]
+    Improved federation with Diaspora, Firefish, GoToSocial, Lemmy, Pixelfed, Threads [annando]
     Improved display of quoted posts [annando]
     Improved BBCode conversion [annando]
     Improved addon hook loading [annando, nupplaphil]
@@ -59,6 +60,7 @@ Version 2023.12 (unreleased)
     Added image caption display in Fancybox gallery [MrPetovan]
     Added shortcut (ctrl+enter) to send postings using Frio theme [xundeenergie]
     Added support for CORS requests to nodeinfo [palant]
+    Added setting for servers that should only receive limited profile information [annando]
 
   Friendica Addons
     Updates to the translation AR, CS, DE, ES, ET, FR, HU, IT, JA, NL, PL, RU, SV, ZH CN
@@ -89,6 +91,8 @@ Version 2023.12 (unreleased)
       General code cleanup [MrPetovan]
     pageheader
       Improved styling of message box [loma-one]
+    s3_storage
+      Bumped library version [MrPetovan]
     Showmore Dyn
       Improved styling on mobile devices [csolisr]
     Smileybutton
@@ -108,7 +112,8 @@ Version 2023.12 (unreleased)
     13462, 13467, 13478, 13486, 13506, 13511, 13515, 13520, 13524,
     13534, 13535, 13542, 13556, 13560, 13566, 13573, 13577, 13588,
     13603, 13607, 13621, 13624, 13625, 13627, 13637, 13639, 13640,
-    13649, 13662, 13665, 13676, 13693, 13699, 13719, 13720, 13731
+    13649, 13662, 13665, 13676, 13693, 13699, 13719, 13720, 13731,
+    13548
 
 Version 2023.05 (2023-05-23)
   Friendica Core
