@@ -1,5 +1,6 @@
 Version 2023.12 (unreleased)
   Friendica Core
+    Raised minimal PHP version to 7.4
     Updates to the translations AR, BG, CA, CS, DE, EN GB, EN US, EO, ES, ET, FI, FR, GD, HU, IS, IT, JA, NL, PL, RO, RU, SV
     Updates to the themes (frio, vier) [AlfredSK, annando, anubis2814, haheute, foss-, MrPetovan, Raroun, xundeenergie]
     Updates to the documentation [AndyHee, BirdboyBolu, foss-, MrPetovan]
