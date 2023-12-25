@@ -1,12 +1,12 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <base href="{{$baseurl}}/" />
 <meta name="generator" content="{{$generator}}" />
-<link rel="stylesheet" href="view/global.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="all" />
-<link rel="stylesheet" href="view/asset/jquery-colorbox/example5/colorbox.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen" />
-<link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen" />
-<link rel="stylesheet" href="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen" />
-<link rel="stylesheet" href="view/asset/perfect-scrollbar/dist/css/perfect-scrollbar.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen" />
-<link rel="stylesheet" href="view/js/fancybox/jquery.fancybox.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen" />
+<link rel="stylesheet" href="view/global.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="all" />
+<link rel="stylesheet" href="view/asset/jquery-colorbox/example5/colorbox.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen" />
+<link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen" />
+<link rel="stylesheet" href="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.min.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen" />
+<link rel="stylesheet" href="view/asset/perfect-scrollbar/dist/css/perfect-scrollbar.min.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen" />
+<link rel="stylesheet" href="view/js/fancybox/jquery.fancybox.min.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen" />
 
 {{foreach $stylesheets as $stylesheetUrl => $media}}
 	<link rel="stylesheet" href="{{$stylesheetUrl}}" type="text/css" media="{{$media}}" />
@@ -30,23 +30,23 @@
          title="Search in Friendica" />
 
 <!--[if IE]>
-<script type="text/javascript" src="https://html5shiv.googlecode.com/svn/trunk/html5.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="https://html5shiv.googlecode.com/svn/trunk/html5.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 <![endif]-->
-<script type="text/javascript" src="view/js/modernizr.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/jquery/dist/jquery.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/js/jquery.textinputs.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/textcomplete/dist/textcomplete.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/js/autocomplete.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/jquery-colorbox/jquery.colorbox-min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/jgrowl/jquery.jgrowl.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/imagesloaded/imagesloaded.pkgd.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/base64/base64.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/asset/dompurify/dist/purify.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/js/fancybox/jquery.fancybox.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/js/fancybox/fancybox.config.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="view/js/vanillaEmojiPicker/vanillaEmojiPicker.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/js/modernizr.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/jquery/dist/jquery.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/js/jquery.textinputs.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/textcomplete/dist/textcomplete.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/js/autocomplete.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/jquery-colorbox/jquery.colorbox-min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/jgrowl/jquery.jgrowl.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/perfect-scrollbar/dist/js/perfect-scrollbar.jquery.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/imagesloaded/imagesloaded.pkgd.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/base64/base64.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/asset/dompurify/dist/purify.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/js/fancybox/jquery.fancybox.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/js/fancybox/fancybox.config.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="view/js/vanillaEmojiPicker/vanillaEmojiPicker.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 <script>
 window.onload = function(){
 	new EmojiPicker({
@@ -68,7 +68,7 @@ window.onload = function(){
 	const updateInterval = {{$update_interval}};
 	const localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
 </script>
-<script type="text/javascript" src="view/js/main.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/js/main.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 <script>
 	// Lifted from https://css-tricks.com/snippets/jquery/move-cursor-to-end-of-textarea-or-input/
     jQuery.fn.putCursorAtEnd = function() {

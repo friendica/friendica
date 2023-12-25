@@ -1,7 +1,7 @@
-<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" />
-<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.print.min.css?v={{$smarty.const.FRIENDICA_VERSION}}" media="print" />
-<script type="text/javascript" src="{{$baseurl}}/view/asset/moment/min/moment-with-locales.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.css?v={{constant('\Friendica\App::VERSION')}}" />
+<link rel="stylesheet" type="text/css" href="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.print.min.css?v={{constant('\Friendica\App::VERSION')}}" media="print" />
+<script type="text/javascript" src="{{$baseurl}}/view/asset/moment/min/moment-with-locales.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/asset/fullcalendar/dist/fullcalendar.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <script>
 	function showEvent(eventid) {

@@ -1,4 +1,4 @@
-<script src="{{$baseurl}}/view/asset/Chart-js/dist/Chart.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script src="{{$baseurl}}/view/asset/Chart-js/dist/Chart.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
 

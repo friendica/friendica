@@ -1,5 +1,5 @@
-<script type="text/javascript" src="view/theme/frio/js/mod_admin.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<link rel="stylesheet" href="view/theme/frio/css/mod_admin.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen"/>
+<script type="text/javascript" src="view/theme/frio/js/mod_admin.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<link rel="stylesheet" href="view/theme/frio/css/mod_admin.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen"/>
 
 <div id="admin-users-blocked" class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}} ({{$count}})</h1>

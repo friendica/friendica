@@ -1,7 +1,7 @@
 
-<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="{{$baseurl}}/view/js/linkPreview.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="{{$baseurl}}/view/theme/frio/js/jot.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/linkPreview.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/theme/frio/js/jot.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <script type="text/javascript">
 	var editor = false;

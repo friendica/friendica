@@ -1,5 +1,5 @@
-{{if !$update}}<script type="text/javascript" src="view/theme/frio/frameworks/jquery-color/jquery.color.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>{{/if}}
-{{if $mode == display}}<script type="text/javascript" src="view/theme/frio/js/mod_display.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>{{/if}}
+{{if !$update}}<script type="text/javascript" src="view/theme/frio/frameworks/jquery-color/jquery.color.js?v={{constant('\Friendica\App::VERSION')}}"></script>{{/if}}
+{{if $mode == display}}<script type="text/javascript" src="view/theme/frio/js/mod_display.js?v={{constant('\Friendica\App::VERSION')}}"></script>{{/if}}
 {{$live_update nofilter}}
 {{foreach $threads as $thread}}
 <hr class="sr-only" />

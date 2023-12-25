@@ -1,5 +1,5 @@
 
-<script type="text/javascript" src="view/theme/frio/js/mod_events.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/theme/frio/js/mod_events.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <script type="text/javascript">
 	// pass php translation strings to js variables/arrays so we can make use of it in js files

@@ -17,7 +17,7 @@
 		});
 	});
 </script>
-<link rel="stylesheet" href="view/theme/frio/css/mod_admin.css?v={{$smarty.const.FRIENDICA_VERSION}}" type="text/css" media="screen"/>
+<link rel="stylesheet" href="view/theme/frio/css/mod_admin.css?v={{constant('\Friendica\App::VERSION')}}" type="text/css" media="screen"/>
 
 <div id="adminpage" class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}}</h1>

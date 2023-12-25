@@ -3,7 +3,7 @@
     add or remove contacts to the contact circle.
 *}}
 
-<script type="text/javascript" src="view/theme/frio/js/mod_circle.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="view/theme/frio/js/mod_circle.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <div class="generic-page-wrapper">
 	{{if $editable == 1}}

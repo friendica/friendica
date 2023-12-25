@@ -1,5 +1,5 @@
-<script src="{{$baseurl}}/view/theme/frio/js/jquery.tools.min.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script src="{{$baseurl}}/view/theme/frio/js/jquery.tools.min.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/js/ajaxupload.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <div class="form-group field select">
 	<label for="id_{{$scheme.0}}">{{$scheme.1}}</label>

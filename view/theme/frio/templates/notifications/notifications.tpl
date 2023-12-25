@@ -1,5 +1,5 @@
-<script type="text/javascript" src="../../frameworks/jquery-color/jquery.color.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
-<script type="text/javascript" src="../../js/mod_notifications.js?v={{$smarty.const.FRIENDICA_VERSION}}"></script>
+<script type="text/javascript" src="../../frameworks/jquery-color/jquery.color.js?v={{constant('\Friendica\App::VERSION')}}"></script>
+<script type="text/javascript" src="../../js/mod_notifications.js?v={{constant('\Friendica\App::VERSION')}}"></script>
 
 <div class="generic-page-wrapper">
 	{{include file="section_title.tpl" title=$header}}
