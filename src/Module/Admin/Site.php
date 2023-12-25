@@ -106,6 +106,7 @@ class Site extends BaseAdmin
 		$register_notification  = !empty($_POST['register_notification']);
 		$community_page_style   = (!empty($_POST['community_page_style']) ? intval(trim($_POST['community_page_style'])) : 0);
 		$max_author_posts_community_page = (!empty($_POST['max_author_posts_community_page']) ? intval(trim($_POST['max_author_posts_community_page'])) : 0);
+		$max_server_posts_community_page = (!empty($_POST['max_server_posts_community_page']) ? intval(trim($_POST['max_server_posts_community_page'])) : 0);
 
 		$verifyssl              = !empty($_POST['verifyssl']);
 		$proxyuser              = (!empty($_POST['proxyuser'])              ? trim($_POST['proxyuser']) : '');
@@ -276,6 +277,7 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'register_notification'  , $register_notification);
 		$transactionConfig->set('system', 'community_page_style'   , $community_page_style);
 		$transactionConfig->set('system', 'max_author_posts_community_page', $max_author_posts_community_page);
+		$transactionConfig->set('system', 'max_server_posts_community_page', $max_server_posts_community_page);
 		$transactionConfig->set('system', 'verifyssl'              , $verifyssl);
 		$transactionConfig->set('system', 'proxyuser'              , $proxyuser);
 		$transactionConfig->set('system', 'proxy'                  , $proxy);
@@ -519,7 +521,8 @@ class Site extends BaseAdmin
 			'$enable_regfullname'     => ['enable_regfullname', DI::l10n()->t('Enable full name check'), !DI::config()->get('system', 'no_regfullname'), DI::l10n()->t('Prevents users from registering with a display name with fewer than two parts separated by spaces.')],
 			'$register_notification'  => ['register_notification', DI::l10n()->t('Email administrators on new registration'), DI::config()->get('system', 'register_notification'), DI::l10n()->t('If enabled and the system is set to an open registration, an email for each new registration is sent to the administrators.')],
 			'$community_page_style'   => ['community_page_style', DI::l10n()->t('Community pages for visitors'), DI::config()->get('system', 'community_page_style'), DI::l10n()->t('Which community pages should be available for visitors. Local users always see both pages.'), $community_page_style_choices],
-			'$max_author_posts_community_page' => ['max_author_posts_community_page', DI::l10n()->t('Posts per user on community page'), DI::config()->get('system', 'max_author_posts_community_page'), DI::l10n()->t('The maximum number of posts per user on the community page. (Not valid for "Global Community")')],
+			'$max_author_posts_community_page' => ['max_author_posts_community_page', DI::l10n()->t('Posts per user on community page'), DI::config()->get('system', 'max_author_posts_community_page'), DI::l10n()->t('The maximum number of posts per user on the local community page. This is useful, when a single user floods the local community page.')],
+			'$max_server_posts_community_page' => ['max_server_posts_community_page', DI::l10n()->t('Posts per server on community page'), DI::config()->get('system', 'max_server_posts_community_page'), DI::l10n()->t('The maximum number of posts per server on the global community page. This is useful, when posts from a single server flood the global community page.')],
 			'$mail_able'              => function_exists('imap_open'),
 			'$mail_enabled'           => ['mail_enabled', DI::l10n()->t('Enable Mail support'), !DI::config()->get('system', 'imap_disabled', !function_exists('imap_open')), DI::l10n()->t('Enable built-in mail support to poll IMAP folders and to reply via mail.')],
 			'$mail_not_able'          => DI::l10n()->t('Mail support can\'t be enabled because the PHP IMAP module is not installed.'),

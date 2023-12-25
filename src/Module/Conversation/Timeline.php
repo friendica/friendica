@@ -520,37 +520,54 @@ class Timeline extends BaseModule
 	{
 		$items = $this->selectItems();
 
-		$maxpostperauthor = (int) $this->config->get('system', 'max_author_posts_community_page');
-		if ($maxpostperauthor != 0 && $this->selectedTab == 'local') {
+		if ($this->selectedTab == 'local') {
+			$maxpostperauthor = (int)$this->config->get('system', 'max_author_posts_community_page');
+			$key = 'author-id';
+		} elseif ($this->selectedTab == 'global') {
+			$maxpostperauthor = (int)$this->config->get('system', 'max_server_posts_community_page');
+			$key = 'author-gsid';
+		} else {
+			$maxpostperauthor = 0;
+		}
+		if ($maxpostperauthor != 0) {
 			$count          = 1;
-			$previousauthor = '';
-			$numposts       = 0;
+			$author_posts   = [];
 			$selected_items = [];
 
 			while (count($selected_items) < $this->itemsPerPage && ++$count < 50 && count($items) > 0) {
-				foreach ($items as $item) {
-					if ($previousauthor == $item["author-link"]) {
-						++$numposts;
-					} else {
-						$numposts = 0;
-					}
-					$previousauthor = $item["author-link"];
+				$maxposts = round((count($items) / $this->itemsPerPage) * $maxpostperauthor);
+				$minId = $items[array_key_first($items)]['received'];
+				$maxId = $items[array_key_last($items)]['received'];
+				$this->logger->debug('Blubb', ['tab' => $this->selectedTab, 'count' => $count, 'min' => $minId, 'max' => $maxId]);
 
-					if (($numposts < $maxpostperauthor) && (count($selected_items) < $this->itemsPerPage)) {
-						$selected_items[] = $item;
+				foreach ($items as $item) {
+					$author_posts[$item[$key]][$item['uri-id']] = $item['received'];
+				}
+				foreach ($author_posts as $posts) {
+					if (count($posts) <= $maxposts) {
+						continue;
+					}
+					asort($posts);
+					while (count($posts) > $maxposts) {
+						$uri_id = array_key_first($posts);
+						unset($posts[$uri_id]);
+						unset($items[$uri_id]);
 					}
 				}
+				$selected_items = array_merge($selected_items, $items);
 
 				// If we're looking at a "previous page", the lookup continues forward in time because the list is
 				// sorted in chronologically decreasing order
-				if (isset($this->minId)) {
-					$this->minId = $items[0]['received'];
+				if (!empty($this->minId)) {
+					$this->minId = $minId;
 				} else {
 					// In any other case, the lookup continues backwards in time
-					$this->maxId = $items[count($items) - 1]['received'];
+					$this->maxId = $maxId;
 				}
 
-				$items = $this->selectItems();
+				if (count($selected_items) < $this->itemsPerPage) {
+					$items = $this->selectItems();
+				}
 			}
 		} else {
 			$selected_items = $items;
@@ -606,9 +623,14 @@ class Timeline extends BaseModule
 			}
 		}
 
-		$r = Post::selectThreadForUser($this->session->getLocalUserId() ?: 0, ['uri-id', 'received', 'author-link'], $condition, $params);
+		$items = [];
+		$result = Post::selectThreadForUser($this->session->getLocalUserId() ?: 0, ['uri-id', 'received', 'author-id', 'author-gsid'], $condition, $params);
 
-		$items = Post::toArray($r);
+		while ($item = $this->database->fetch($result)) {
+			$items[$item['uri-id']] = $item;
+		}
+		$this->database->close($result);
+
 		if (empty($items)) {
 			return [];
 		}

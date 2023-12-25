@@ -166,12 +166,20 @@ return [
 		// Has to be one of these values: emergency, alert, critical, error, warning, notice, info, debug
 		'loglevel' => 'notice',
 
+		// max_author_posts_community_page (Integer)
+		// The maximum number of posts on the local community page from a single author.
+		'max_author_posts_community_page' => 0,
+
 		// max_image_length (Integer)
 		// An alternate way of limiting picture upload sizes.
 		// Specify the maximum pixel  length that pictures are allowed to be (for non-square pictures, it will apply to the longest side).
 		// Pictures longer than this length will be resized to be this length (on the longest side, the other side will be scaled appropriately).
 		// If you don't want to set a maximum length, set to -1.
 		'max_image_length' => -1,
+
+		// max_server_posts_community_page (Integer)
+		// The maximum number of posts on the global community page from a single server.
+		'max_server_posts_community_page' => 0,
 
 		// maximagesize (Integer)
 		// Maximum size in bytes of an uploaded photo.

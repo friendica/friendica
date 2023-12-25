@@ -134,6 +134,7 @@
 						{{include file="field_checkbox.tpl" field=$force_publish}}
 						{{include file="field_select.tpl" field=$community_page_style}}
 						{{include file="field_input.tpl" field=$max_author_posts_community_page}}
+						{{include file="field_input.tpl" field=$max_server_posts_community_page}}
 
 						{{if $mail_able}}
 							{{include file="field_checkbox.tpl" field=$mail_enabled}}
