@@ -3259,7 +3259,9 @@ class Diaspora
 		/// @todo - establish "all day" events in Friendica
 		$eventdata['all_day'] = 'false';
 
-		$eventdata['timezone'] = 'UTC';
+		// @todo Should be user timezone - but only if the event is supposed to be displayed
+		// in that specific timezone and not the user's timezone.
+		// $eventdata['timezone'] = 'UTC';
 
 		if ($event['start']) {
 			$eventdata['start'] = DateTimeFormat::utc($event['start'], $mask);
@@ -3403,8 +3405,7 @@ class Diaspora
 			if ($item['event-id'] > 0) {
 				$event = self::buildEvent($item['event-id']);
 				if (count($event)) {
-					// Deactivated, since Diaspora seems to have problems with the processing.
-					// $message['event'] = $event;
+					$message['event'] = $event;
 
 					if (
 						!empty($event['location']['address']) &&
