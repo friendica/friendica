@@ -96,6 +96,8 @@ class Conversation
 	private $session;
 	/** @var Repository\UserGServer */
 	private $userGServer;
+	/** @var Array */
+	private $blockList;
 
 	public function __construct(Repository\UserGServer $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, App\Page $page, App\Mode $mode, App $app, IHandleUserSessions $session)
 	{
@@ -700,21 +702,25 @@ class Conversation
 			return [];
 		}
 
+		if (!empty($this->blockList)) {
+			return $this->blockList;
+		}
+
 		$str_blocked = str_replace(["\n", "\r"], ",", $this->pConfig->get($this->session->getLocalUserId(), 'system', 'blocked') ?? '');
 		if (empty($str_blocked)) {
 			return [];
 		}
 
-		$blocklist = [];
+		$this->blockList = [];
 
 		foreach (explode(',', $str_blocked) as $entry) {
 			$cid = Contact::getIdForURL(trim($entry), 0, false);
 			if (!empty($cid)) {
-				$blocklist[] = $cid;
+				$this->blockList[] = $cid;
 			}
 		}
 
-		return $blocklist;
+		return $this->blockList;
 	}
 
 	/**
