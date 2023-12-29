@@ -96,6 +96,8 @@ class Conversation
 	private $session;
 	/** @var Repository\UserGServer */
 	private $userGServer;
+	/** @var Array */
+	private $blockList;
 
 	public function __construct(Repository\UserGServer $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, App\Page $page, App\Mode $mode, App $app, IHandleUserSessions $session)
 	{
