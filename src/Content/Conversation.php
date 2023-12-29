@@ -658,10 +658,6 @@ class Conversation
 			* But for now, this array respects the old style, just in case
 			*/
 			foreach ($items as $item) {
-				if (in_array($item['author-id'], $this->getBlocklist())) {
-					continue;
-				}
-
 				// Can we put this after the visibility check?
 				$this->builtinActivityPuller($item, $conv_responses);
 
@@ -694,33 +690,6 @@ class Conversation
 		}
 
 		return $threads;
-	}
-
-	private function getBlocklist(): array
-	{
-		if (!$this->session->getLocalUserId()) {
-			return [];
-		}
-
-		if (!empty($this->blockList)) {
-			return $this->blockList;
-		}
-
-		$str_blocked = str_replace(["\n", "\r"], ",", $this->pConfig->get($this->session->getLocalUserId(), 'system', 'blocked') ?? '');
-		if (empty($str_blocked)) {
-			return [];
-		}
-
-		$this->blockList = [];
-
-		foreach (explode(',', $str_blocked) as $entry) {
-			$cid = Contact::getIdForURL(trim($entry), 0, false);
-			if (!empty($cid)) {
-				$this->blockList[] = $cid;
-			}
-		}
-
-		return $this->blockList;
 	}
 
 	/**
@@ -1280,16 +1249,10 @@ class Conversation
 			return $parents;
 		}
 
-		$blocklist = $this->getBlocklist();
-
 		$item_array = [];
 
 		// Dedupes the item list on the uri to prevent infinite loops
 		foreach ($item_list as $item) {
-			if (in_array($item['author-id'], $blocklist)) {
-				continue;
-			}
-
 			$item_array[$item['uri-id']] = $item;
 		}
 
@@ -1475,10 +1438,6 @@ class Conversation
 			$uriids[] = $item['uri-id'];
 
 			if (!$this->item->isVisibleActivity($item)) {
-				continue;
-			}
-
-			if (in_array($item['author-id'], $this->getBlocklist())) {
 				continue;
 			}
 
