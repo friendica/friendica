@@ -41,7 +41,9 @@ use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Post\Engagement;
+use Friendica\Model\Verb;
 use Friendica\Module\Response;
+use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -626,12 +628,20 @@ class Timeline extends BaseModule
 		$result = Post::selectThreadForUser($this->session->getLocalUserId() ?: 0, ['uri-id', 'received', 'author-id', 'author-gsid'], $condition, $params);
 
 		while ($item = $this->database->fetch($result)) {
+			$item['comments'] = 0;
+
 			$items[$item['uri-id']] = $item;
 		}
 		$this->database->close($result);
 
 		if (empty($items)) {
 			return [];
+		}
+
+		$uriids = array_keys($items);
+		
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
+			$items[$count['parent-uri-id']]['comments'] += $count['count'];
 		}
 
 		// Previous page case: once we get the relevant items closest to min_id, we need to restore the expected display order

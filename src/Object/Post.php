@@ -201,7 +201,7 @@ class Post
 		$indent = '';
 		$shiny = '';
 		$osparkle = '';
-		$total_children = $this->countDescendants();
+		$total_children = $item['counts'] ?? $this->countDescendants();
 
 		$conv = $this->getThread();
 
@@ -695,6 +695,11 @@ class Post
 				case Activity::VIEW:
 					$title = DI::l10n()->t('Viewed by: %s', $actors);
 					$icon  = ['fa' => 'fa-eye', 'icon' => 'icon-eye-open'];
+					break;
+
+				case Activity::READ:
+					$title = DI::l10n()->t('Read by: %s', $actors);
+					$icon  = ['fa' => 'fa-book', 'icon' => 'icon-book'];
 					break;
 
 				case Activity::LIKE:

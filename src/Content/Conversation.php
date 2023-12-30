@@ -96,8 +96,6 @@ class Conversation
 	private $session;
 	/** @var Repository\UserGServer */
 	private $userGServer;
-	/** @var Array */
-	private $blockList;
 
 	public function __construct(Repository\UserGServer $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, App\Page $page, App\Mode $mode, App $app, IHandleUserSessions $session)
 	{
@@ -868,6 +866,7 @@ class Conversation
 
 		$emojis      = $this->getEmojis($uriids);
 		$quoteshares = $this->getQuoteShares($uriids);
+		$counts      = $this->getCounts($uriids);
 
 		if (!$this->config->get('system', 'legacy_activities')) {
 			$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
@@ -992,6 +991,7 @@ class Conversation
 
 		foreach ($items as $key => $row) {
 			$items[$key]['emojis']      = $emojis[$key] ?? [];
+			$items[$key]['counts']      = $counts[$key] ?? 0;
 			$items[$key]['quoteshares'] = $quoteshares[$key] ?? [];
 
 			$always_display = in_array($mode, [self::MODE_CONTACTS, self::MODE_CONTACT_POSTS]);
@@ -1025,6 +1025,16 @@ class Conversation
 	 */
 	private function getEmojis(array $uriids): array
 	{
+		$emojis = [];
+
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids]) as $count) {
+			$emojis[$count['uri-id']][$count['reaction']]['emoji'] = $count['reaction'];
+			$emojis[$count['uri-id']][$count['reaction']]['verb']  = Verb::getByID($count['vid']);
+			$emojis[$count['uri-id']][$count['reaction']]['total'] = $count['count'];
+			$emojis[$count['uri-id']][$count['reaction']]['title'] = [];
+		}
+
+		// @todo The following code should be removed, once that we display activity authors on demand 
 		$activity_emoji = [
 			Activity::LIKE        => '👍',
 			Activity::DISLIKE     => '👎',
@@ -1033,40 +1043,50 @@ class Conversation
 			Activity::ATTENDNO    => '❌',
 			Activity::ANNOUNCE    => '♻',
 			Activity::VIEW        => '📺',
+			Activity::READ        => '📖',
 		];
 
-		$index_list = array_values($activity_emoji);
-		$verbs      = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT, Activity::POST]);
-
+		$verbs     = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT, Activity::POST]);
 		$condition = DBA::mergeConditions(['parent-uri-id' => $uriids, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], ["NOT `deleted`"]);
 		$separator = chr(255) . chr(255) . chr(255);
 
-		$sql = "SELECT `thr-parent-id`, `body`, `verb`, `gravity`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-view` WHERE " . array_shift($condition) . " GROUP BY `thr-parent-id`, `verb`, `body`, `gravity`";
-
-		$emojis = [];
+		$sql = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, `body`, `gravity`";
 
 		$rows = DBA::p($sql, $condition);
 		while ($row = DBA::fetch($rows)) {
 			if ($row['gravity'] == ItemModel::GRAVITY_ACTIVITY) {
-				$row['verb'] = $row['body'] ? Activity::EMOJIREACT : $row['verb'];
-				$emoji       = $row['body'] ?: $activity_emoji[$row['verb']];
+				$emoji = $row['body'] ?: $activity_emoji[$row['verb']];
 			} else {
 				$emoji = '';
 			}
 
-			if (!isset($index_list[$emoji])) {
-				$index_list[] = $emoji;
+			if (isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
+				$emojis[$row['thr-parent-id']][$emoji]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$emoji]['title'] ?? [], explode($separator, $row['title'])));
+			} else {
+				Post\Counts::updateForPost($row['thr-parent-id'], $row['parent-uri-id']);
+				$this->logger->debug('Add missing counts', ['thr-parent-id' => $row['thr-parent-id'], 'parent-uri-id' => $row['parent-uri-id'], 'emoji' => $emoji]);
 			}
-			$index = array_search($emoji, $index_list);
-
-			$emojis[$row['thr-parent-id']][$index]['emoji'] = $emoji;
-			$emojis[$row['thr-parent-id']][$index]['verb']  = $row['verb'];
-			$emojis[$row['thr-parent-id']][$index]['total'] = ($emojis[$row['thr-parent-id']][$index]['total'] ?? 0) + $row['total'];
-			$emojis[$row['thr-parent-id']][$index]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$index]['title'] ?? [], explode($separator, $row['title'])));
 		}
 		DBA::close($rows);
 
 		return $emojis;
+	}
+
+	/**
+	 * Fetch comment counts from the conversation
+	 *
+	 * @param array $uriids
+	 * @return array
+	 */
+	private function getCounts(array $uriids): array
+	{
+		$counts = [];
+
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
+			$counts[$count['parent-uri-id']] = ($counts[$count['parent-uri-id']] ?? 0) + $count['count'];
+		}
+
+		return $counts;
 	}
 
 	/**
