@@ -44,7 +44,7 @@ class Counts
 			return true;
 		}
 	
-		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid];
+		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false];
 
 		if ($body == $verb) {
 			$condition['body'] = null;
@@ -67,6 +67,7 @@ class Counts
 		];
 
 		if ($fields['count'] == 0) {
+			DBA::delete('post-counts', ['uri-id' => $uri_id, 'vid' => $vid, 'reaction' => $body]);
 			return true;
 		}
 

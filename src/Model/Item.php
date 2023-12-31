@@ -338,7 +338,7 @@ class Item
 		// locate item to be deleted
 		$fields = [
 			'id', 'uri', 'uri-id', 'uid', 'parent', 'parent-uri-id', 'origin',
-			'deleted', 'resource-id', 'event-id',
+			'thr-parent-id', 'deleted', 'resource-id', 'event-id', 'vid', 'body',
 			'verb', 'object-type', 'object', 'target', 'contact-id', 'psid', 'gravity'
 		];
 		$item = Post::selectFirst($fields, ['id' => $item_id]);
@@ -417,6 +417,10 @@ class Item
 
 		DI::notify()->deleteForItem($item['uri-id']);
 		DI::notification()->deleteForItem($item['uri-id']);
+
+		if (in_array($item['gravity'], [self::GRAVITY_ACTIVITY, self::GRAVITY_COMMENT])) {
+			Post\Counts::update($item['thr-parent-id'], $item['parent-uri-id'], $item['vid'], $item['verb'], $item['body']);
+		}
 
 		Logger::info('Item has been marked for deletion.', ['id' => $item_id]);
 
