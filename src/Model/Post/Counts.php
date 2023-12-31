@@ -106,16 +106,16 @@ class Counts
 			Activity::READ        => '📖',
 		];
 
-		$vids = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT, Activity::POST]);
+		$verbs = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT, Activity::POST]);
 
-		$condition  = DBA::mergeConditions($condition, ['verb' => $vids]);
+		$condition  = DBA::mergeConditions($condition, ['verb' => $verbs]);
 		$countquery = DBA::select('post-counts-view', [], $condition);
 		while ($count = DBA::fetch($countquery)) {
 			if (!empty($count['reaction'])) {
 				$count['verb'] = Activity::EMOJIREACT;
 				$count['vid']  = Verb::getID($count['verb']);
-			} elseif (!empty($activity_emoji[$count['vid']])) {
-				$count['reaction'] = $activity_emoji[$count['vid']];
+			} elseif (!empty($activity_emoji[$count['verb']])) {
+				$count['reaction'] = $activity_emoji[$count['verb']];
 			}
 			$counts[] = $count;
 		}

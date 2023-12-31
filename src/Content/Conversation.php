@@ -1062,9 +1062,6 @@ class Conversation
 
 			if (isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
 				$emojis[$row['thr-parent-id']][$emoji]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$emoji]['title'] ?? [], explode($separator, $row['title'])));
-			} else {
-				Post\Counts::updateForPost($row['thr-parent-id'], $row['parent-uri-id']);
-				$this->logger->debug('Add missing counts', ['thr-parent-id' => $row['thr-parent-id'], 'parent-uri-id' => $row['parent-uri-id'], 'emoji' => $emoji]);
 			}
 		}
 		DBA::close($rows);
