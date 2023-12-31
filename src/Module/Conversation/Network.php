@@ -435,8 +435,8 @@ class Network extends Timeline
 			$conditionStrings = DBA::mergeConditions($conditionStrings, ["`contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)", $this->circleId]);
 		} elseif ($this->groupContactId) {
 			$conditionStrings = DBA::mergeConditions($conditionStrings,
-				["((`contact-id` = ?) OR `uri-id` IN (SELECT `parent-uri-id` FROM `post-user-view` WHERE (`contact-id` = ? AND `gravity` = ? AND `vid` = ? AND `uid` = ?)))",
-				$this->groupContactId, $this->groupContactId, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), $this->session->getLocalUserId()]);
+				["((`contact-id` = ?) OR `uri-id` IN (SELECT `parent-uri-id` FROM `post-user-view` WHERE (`contact-id` = ? AND `gravity` = ? AND `verb` = ? AND `uid` = ?)))",
+				$this->groupContactId, $this->groupContactId, Item::GRAVITY_ACTIVITY, Activity::ANNOUNCE, $this->session->getLocalUserId()]);
 		}
 
 		// Currently only the order modes "received" and "commented" are in use

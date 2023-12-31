@@ -640,7 +640,7 @@ class Timeline extends BaseModule
 
 		$uriids = array_keys($items);
 		
-		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'verb' => Activity::POST]) as $count) {
 			$items[$count['parent-uri-id']]['comments'] += $count['count'];
 		}
 

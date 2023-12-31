@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2024.03-dev (Yellow Archangel)
--- DB_UPDATE_VERSION 1543
+-- DB_UPDATE_VERSION 1544
 -- ------------------------------------------
 
 
@@ -2024,6 +2024,20 @@ CREATE VIEW `circle-member-view` AS SELECT
 	FROM `group_member`
 			INNER JOIN `contact` ON `group_member`.`contact-id` = `contact`.`id`
 			INNER JOIN `group` ON `group_member`.`gid` = `group`.`id`;
+
+--
+-- VIEW post-counts-view
+--
+DROP VIEW IF EXISTS `post-counts-view`;
+CREATE VIEW `post-counts-view` AS SELECT 
+	`post-counts`.`uri-id` AS `uri-id`,
+	`post-counts`.`vid` AS `vid`,
+	`verb`.`name` AS `verb`,
+	`post-counts`.`reaction` AS `reaction`,
+	`post-counts`.`parent-uri-id` AS `parent-uri-id`,
+	`post-counts`.`count` AS `count`
+	FROM `post-counts`
+			INNER JOIN `verb` ON `verb`.`id` = `post-counts`.`vid`;
 
 --
 -- VIEW post-timeline-view

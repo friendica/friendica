@@ -52,7 +52,7 @@ class PostUpdate
 	// Needed for the helper function to read from the legacy term table
 	const OBJECT_TYPE_POST  = 1;
 
-	const VERSION = 1543;
+	const VERSION = 1544;
 
 	/**
 	 * Calls the post update functions
@@ -125,7 +125,7 @@ class PostUpdate
 		if (!self::update1507()) {
 			return false;
 		}
-		if (!self::update1543()) {
+		if (!self::update1544()) {
 			return false;
 		}
 		return true;
@@ -1315,20 +1315,24 @@ class PostUpdate
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function update1543()
+	private static function update1544()
 	{
 		// Was the script completed?
-		if (DI::keyValue()->get('post_update_version') >= 1543) {
+		if (DI::keyValue()->get('post_update_version') >= 1544) {
 			return true;
 		}
 
-		$id = DI::keyValue()->get('post_update_version_1543_id') ?? 0;
+		$id = (int)(DI::keyValue()->get('post_update_version_1544_id') ?? 0);
+		if ($id == 0) {
+			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
+			$id = (int)($post['uri-id'] ?? 0);
+		}
 
 		Logger::info('Start', ['uri-id' => $id]);
 
 		$rows = 0;
 
-		$posts = Post::selectPosts(['uri-id', 'parent-uri-id'], ["`uri-id` > ? AND `gravity` IN (?, ?)", $id, Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], ['order' => ['uri-id'], 'limit' => 1000]);
+		$posts = Post::selectPosts(['uri-id', 'parent-uri-id'], ["`uri-id` < ? AND `gravity` IN (?, ?)", $id, Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], ['order' => ['uri-id' => true], 'limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -1342,12 +1346,12 @@ class PostUpdate
 		}
 		DBA::close($posts);
 
-		DI::keyValue()->set('post_update_version_1543_id', $id);
+		DI::keyValue()->set('post_update_version_1544_id', $id);
 
 		Logger::info('Processed', ['rows' => $rows, 'last' => $id]);
 
 		if ($rows <= 100) {
-			DI::keyValue()->set('post_update_version', 1543);
+			DI::keyValue()->set('post_update_version', 1544);
 			Logger::info('Done');
 			return true;
 		}

@@ -87,6 +87,18 @@
 			INNER JOIN `contact` ON `group_member`.`contact-id` = `contact`.`id`
 			INNER JOIN `group` ON `group_member`.`gid` = `group`.`id`"
 	],
+	"post-counts-view" => [
+		"fields" => [
+			"uri-id" => ["post-counts", "uri-id"],
+			"vid" => ["post-counts", "vid"],
+			"verb" => ["verb", "name"],
+			"reaction" => ["post-counts", "reaction"],
+			"parent-uri-id" => ["post-counts", "parent-uri-id"],
+			"count" => ["post-counts", "count"],
+		],
+		"query" => "FROM `post-counts`
+			INNER JOIN `verb` ON `verb`.`id` = `post-counts`.`vid`"
+	],
 	"post-timeline-view" => [
 		"fields" => [
 			"uid" => ["post-user", "uid"],

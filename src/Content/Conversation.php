@@ -874,7 +874,7 @@ class Conversation
 
 		$condition = DBA::mergeConditions(
 			$condition,
-			["`uid` IN (0, ?) AND (NOT `vid` IN (?, ?, ?) OR `vid` IS NULL)", $uid, Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW), Verb::getID(Activity::READ)]
+			["`uid` IN (0, ?) AND (NOT `verb` IN (?, ?, ?) OR `verb` IS NULL)", $uid, Activity::FOLLOW, Activity::VIEW, Activity::READ]
 		);
 
 		$condition = DBA::mergeConditions($condition, ["(`uid` != ? OR `private` != ?)", 0, ItemModel::PRIVATE]);
@@ -1082,7 +1082,7 @@ class Conversation
 	{
 		$counts = [];
 
-		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'verb' => Activity::POST]) as $count) {
 			$counts[$count['parent-uri-id']] = ($counts[$count['parent-uri-id']] ?? 0) + $count['count'];
 		}
 

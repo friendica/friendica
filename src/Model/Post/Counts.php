@@ -96,23 +96,24 @@ class Counts
 		$counts = [];
 
 		$activity_emoji = [
-			Verb::getID(Activity::LIKE)        => '👍',
-			Verb::getID(Activity::DISLIKE)     => '👎',
-			Verb::getID(Activity::ATTEND)      => '✔️',
-			Verb::getID(Activity::ATTENDMAYBE) => '❓',
-			Verb::getID(Activity::ATTENDNO)    => '❌',
-			Verb::getID(Activity::ANNOUNCE)    => '♻',
-			Verb::getID(Activity::VIEW)        => '📺',
-			Verb::getID(Activity::READ)        => '📖',
+			Activity::LIKE        => '👍',
+			Activity::DISLIKE     => '👎',
+			Activity::ATTEND      => '✔️',
+			Activity::ATTENDMAYBE => '❓',
+			Activity::ATTENDNO    => '❌',
+			Activity::ANNOUNCE    => '♻',
+			Activity::VIEW        => '📺',
+			Activity::READ        => '📖',
 		];
 
-		$vids = array_merge(array_keys($activity_emoji), [Verb::getID(Activity::EMOJIREACT), Verb::getID(Activity::POST)]);
+		$vids = array_merge(array_keys($activity_emoji), [Activity::EMOJIREACT, Activity::POST]);
 
-		$condition  = DBA::mergeConditions($condition, ['vid' => $vids]);
-		$countquery = DBA::select('post-counts', [], $condition);
+		$condition  = DBA::mergeConditions($condition, ['verb' => $vids]);
+		$countquery = DBA::select('post-counts-view', [], $condition);
 		while ($count = DBA::fetch($countquery)) {
 			if (!empty($count['reaction'])) {
-				$count['vid'] = Verb::getID(Activity::EMOJIREACT);
+				$count['verb'] = Activity::EMOJIREACT;
+				$count['vid']  = Verb::getID($count['verb']);
 			} elseif (!empty($activity_emoji[$count['vid']])) {
 				$count['reaction'] = $activity_emoji[$count['vid']];
 			}
