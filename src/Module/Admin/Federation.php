@@ -52,7 +52,7 @@ class Federation extends BaseAdmin
 			'gnusocial'    => ['name' => 'GNU Social/Statusnet', 'color' => '#a22430'], // dark red from the logo
 			'gotosocial'   => ['name' => 'GoToSocial', 'color' => '#df8958'], // Some color from their mascot
 			'hometown'     => ['name' => 'Hometown', 'color' => '#1f70c1'], // Color from the Patreon page
-			'honk'         => ['name' => 'Honk', 'color' => '##0d0d0d'], // Background color from the page
+			'honk'         => ['name' => 'Honk', 'color' => '#0d0d0d'], // Background color from the page
 			'hubzilla'     => ['name' => 'Hubzilla/Red Matrix', 'color' => '#43488a'], // blue from the logo
 			'iceshrimp'    => ['name' => 'iceshrimp', 'color' => 'mediumslateblue'], // Color that is used in their software
 			'kbin'         => ['name' => 'kbin', 'color' => '#61366b'], // Color from their main instance
