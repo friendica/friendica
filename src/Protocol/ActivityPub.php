@@ -295,7 +295,7 @@ class ActivityPub
 			return false;
 		}
 
-		if (empty($apcontact['gsid'] || empty($apcontact['baseurl']))) {
+		if (empty($apcontact['gsid']) || empty($apcontact['baseurl'])) {
 			Logger::debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
 			return false;
 		}
