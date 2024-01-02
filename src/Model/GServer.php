@@ -1247,6 +1247,11 @@ class GServer
 			}
 		}
 
+		// Special treatment for NextCloud, since there you can freely define your software name
+		if (!empty($nodeinfo['rootUrl']) && in_array(parse_url($nodeinfo['rootUrl'], PHP_URL_PATH), ['/index.php/apps/social', '/apps/social'])) {
+			$server['platform'] = 'nextcloud';
+		}
+
 		if (!empty($nodeinfo['metadata']['nodeName'])) {
 			$server['site_name'] = $nodeinfo['metadata']['nodeName'];
 		}
@@ -1565,7 +1570,7 @@ class GServer
 		}
 
 		foreach ($tags as $tag) {
-			if ((($tag['as:name'] ?? '') == 'Protocol') && (($tag['sc:value'] ?? '') == 'nomad')) {
+			if ((($tag['as:name'] ?? '') == 'Protocol') && in_array('nomad', [$tag['sc:value'] ?? '', $tag['as:content'] ?? ''])) {
 				return true;
 			}
 		}

@@ -45,6 +45,7 @@ class Federation extends BaseAdmin
 			'castopod'     => ['name' => 'Castopod', 'color' => '#00564a'], // Background color from the page
 			'diaspora'     => ['name' => 'Diaspora', 'color' => '#a1a1a1'], // logo is black and white, makes a gray
 			'calckey'      => ['name' => 'firefish (Calckey)', 'color' => '#1c4a5c'], // Color from the page
+			'sharkey'      => ['name' => 'Sharkey', 'color' => 'lightpink'], // Font color from the homepage
 			'foundkey'     => ['name' => 'Foundkey', 'color' => '#609926'], // Some random color from the repository
 			'funkwhale'    => ['name' => 'Funkwhale', 'color' => '#4082B4'], // From the homepage
 			'gancio'       => ['name' => 'Gancio', 'color' => '#7253ed'], // Fontcolor from the page
@@ -53,6 +54,7 @@ class Federation extends BaseAdmin
 			'hometown'     => ['name' => 'Hometown', 'color' => '#1f70c1'], // Color from the Patreon page
 			'honk'         => ['name' => 'Honk', 'color' => '##0d0d0d'], // Background color from the page
 			'hubzilla'     => ['name' => 'Hubzilla/Red Matrix', 'color' => '#43488a'], // blue from the logo
+			'iceshrimp'    => ['name' => 'iceshrimp', 'color' => 'mediumslateblue'], // Color that is used in their software
 			'kbin'         => ['name' => 'kbin', 'color' => '#61366b'], // Color from their main instance
 			'lemmy'        => ['name' => 'Lemmy', 'color' => '#00c853'], // Green from the page
 			'mastodon'     => ['name' => 'Mastodon', 'color' => '#1a9df9'], // blue from the Mastodon logo
@@ -66,8 +68,10 @@ class Federation extends BaseAdmin
 			'pixelfed'     => ['name' => 'Pixelfed', 'color' => '#11da47'], // One of the logo colors
 			'pleroma'      => ['name' => 'Pleroma', 'color' => '#E46F0F'], // Orange from the text that is used on Pleroma instances
 			'plume'        => ['name' => 'Plume', 'color' => '#7765e3'], // From the homepage
+			'postmarks'    => ['name' => 'Postmarks', 'color' => 'darkblue'], // Header color from the homepage
 			'relay'        => ['name' => 'ActivityPub Relay', 'color' => '#888888'], // Grey like the second color of the ActivityPub logo
 			'socialhome'   => ['name' => 'SocialHome', 'color' => '#52056b'], // lilac from the Django Image used at the Socialhome homepage
+			'snac'         => ['name' => 'Snac', 'color' => '#2966a8'], // Color from one of their themes
 			'takahe'       => ['name' => 'Takahē', 'color' => '#26323c'], // Background color of the homepage
 			'wildebeest'   => ['name' => 'Wildebeest', 'color' => '#0055dc'], // Color of the mascot
 			'wordpress'    => ['name' => 'WordPress', 'color' => '#016087'], // Background color of the homepage

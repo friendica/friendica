@@ -58,6 +58,9 @@ class JsonLD
 			case 'https://www.w3.org/ns/activitystreams':
 				$url = DI::basePath() . '/static/activitystreams.jsonld';
 				break;
+			case 'https://www.w3.org/ns/did/v1':
+				$url = DI::basePath() . '/static/did-v1.jsonld';
+				break;
 			case 'https://funkwhale.audio/ns':
 				$url = DI::basePath() . '/static/funkwhale.audio.jsonld';
 				break;
