@@ -50,11 +50,7 @@ class VCard
 			Logger::warning('Incomplete contact', ['contact' => $contact ?? []]);
 		}
 
-		if (!Network::isValidHttpUrl($contact['url']) && Network::isValidHttpUrl($contact['alias'])) {
-			$contact_url = $contact['alias'];
-		} else {
-			$contact_url = $contact['url'];
-		}
+		$contact_url = Contact::getProfileLink($contact);
 
 		if ($contact['network'] != '') {
 			$network_link   = Strings::formatNetworkName($contact['network'], $contact_url);

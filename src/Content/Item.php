@@ -383,7 +383,7 @@ class Item
 			'url'     => $item['author-link'],
 			'alias'   => $item['author-alias'],
 		];
-		$profile_link = Contact::magicLinkByContact($author, $item['author-link']);
+		$profile_link = Contact::magicLinkByContact($author, Contact::getProfileLink($author));
 		if (strpos($profile_link, 'contact/redir/') === 0) {
 			$status_link  = $profile_link . '?' . http_build_query(['url' => $item['author-link'] . '/status']);
 			$photos_link  = $profile_link . '?' . http_build_query(['url' => $item['author-link'] . '/photos']);

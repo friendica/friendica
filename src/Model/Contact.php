@@ -3491,6 +3491,21 @@ class Contact
 	}
 
 	/**
+	 * Return the link to the profile
+	 *
+	 * @param array $contact
+	 * @return string
+	 */
+	public static function getProfileLink(array $contact): string
+	{
+		if (!empty($contact['alias']) && Network::isValidHttpUrl($contact['alias']) && (($contact['network'] ?? '') != Protocol::DFRN)) {
+			return $contact['alias'];
+		} else {
+			return $contact['url'];
+		}
+	}
+
+	/**
 	 * Returns a magic link to authenticate remote visitors
 	 *
 	 * @todo  check if the return is either a fully qualified URL or a relative path to Friendica basedir
@@ -3548,7 +3563,7 @@ class Contact
 	 */
 	public static function magicLinkByContact(array $contact, string $url = ''): string
 	{
-		$destination = $url ?: (!Network::isValidHttpUrl($contact['url']) && !empty($contact['alias']) && Network::isValidHttpUrl($contact['alias']) ? $contact['alias'] : $contact['url']);
+		$destination = $url ?: self::getProfileLink($contact);
 
 		if (!DI::userSession()->isAuthenticated()) {
 			return $destination;
