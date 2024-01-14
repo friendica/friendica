@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2024.03-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-03 19:19+0000\n"
+"POT-Creation-Date: 2024-01-14 07:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1377,7 +1377,7 @@ msgstr ""
 msgid "Public post"
 msgstr ""
 
-#: src/Content/Conversation.php:426 src/Content/Widget/VCard.php:131
+#: src/Content/Conversation.php:426 src/Content/Widget/VCard.php:127
 #: src/Model/Profile.php:483 src/Module/Admin/Logs/View.php:92
 #: src/Module/Post/Edit.php:181
 msgid "Message"
@@ -2220,7 +2220,7 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:859 src/Content/Widget/VCard.php:127
+#: src/Content/Text/HTML.php:859 src/Content/Widget/VCard.php:123
 #: src/Model/Profile.php:477 src/Module/Contact/Profile.php:471
 msgid "Follow"
 msgstr ""
@@ -2420,27 +2420,27 @@ msgstr[1] ""
 msgid "More Trending Tags"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:106 src/Model/Contact.php:1204
+#: src/Content/Widget/VCard.php:102 src/Model/Contact.php:1204
 #: src/Model/Profile.php:461
 msgid "Post to group"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:110 src/Model/Contact.php:1209
+#: src/Content/Widget/VCard.php:106 src/Model/Contact.php:1209
 #: src/Model/Profile.php:466 src/Module/Moderation/Item/Source.php:85
 msgid "Mention"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:120 src/Model/Profile.php:380
+#: src/Content/Widget/VCard.php:116 src/Model/Profile.php:380
 #: src/Module/Contact/Profile.php:408 src/Module/Profile/Profile.php:199
 msgid "XMPP:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:121 src/Model/Profile.php:381
+#: src/Content/Widget/VCard.php:117 src/Model/Profile.php:381
 #: src/Module/Contact/Profile.php:410 src/Module/Profile/Profile.php:203
 msgid "Matrix:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:122 src/Model/Event.php:82
+#: src/Content/Widget/VCard.php:118 src/Model/Event.php:82
 #: src/Model/Event.php:109 src/Model/Event.php:471 src/Model/Event.php:963
 #: src/Model/Profile.php:375 src/Module/Contact/Profile.php:406
 #: src/Module/Directory.php:147 src/Module/Notifications/Introductions.php:187
@@ -2448,18 +2448,18 @@ msgstr ""
 msgid "Location:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:125 src/Model/Profile.php:490
+#: src/Content/Widget/VCard.php:121 src/Model/Profile.php:490
 #: src/Module/Notifications/Introductions.php:201
 msgid "Network:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:129 src/Model/Contact.php:1237
+#: src/Content/Widget/VCard.php:125 src/Model/Contact.php:1237
 #: src/Model/Contact.php:1249 src/Model/Profile.php:479
 #: src/Module/Contact/Profile.php:463
 msgid "Unfollow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:135 src/Model/Contact.php:1206
+#: src/Content/Widget/VCard.php:131 src/Model/Contact.php:1206
 #: src/Model/Profile.php:463
 msgid "View group"
 msgstr ""
@@ -3813,9 +3813,9 @@ msgid ""
 "\t\tYou may also wish to add some basic information to your default profile\n"
 "\t\t(on the \"Profiles\" page) so that other people can easily find you.\n"
 "\n"
-"\t\tWe recommend adding a profile photo, adding some profile \"keywords\" \n"
+"\t\tWe recommend adding a profile photo, adding some profile \"keywords\"\n"
 "\t\t(very useful in making new friends) - and perhaps what country you live "
-"in; \n"
+"in;\n"
 "\t\tif you do not wish to be more specific than that.\n"
 "\n"
 "\t\tWe fully respect your right to privacy, and none of these items are "
