@@ -113,6 +113,12 @@ class Relay
 		}
 
 		if (!empty($tagList) || !empty($denyTags)) {
+			$max_tags = $config->get('system', 'relay_max_tags');
+			if ($max_tags && (count($tags) > $max_tags) && preg_match('/[^@!#]\[url\=.*?\].*?\[\/url\]/ism', $body)) {
+				Logger::info('Possible hashtag spam detected - rejected', ['hashtags' => $tags, 'network' => $network, 'url' => $url, 'causer' => $causer, 'body' => $body]);
+				return false;
+			}
+
 			$content = mb_strtolower(BBCode::toPlaintext($body, false));
 
 			foreach ($tags as $tag) {

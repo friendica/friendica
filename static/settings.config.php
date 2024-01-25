@@ -237,6 +237,10 @@ return [
 		// Minimum value for the language detection quality for relay posts. The value must be between 0 and 1.
 		'relay_language_quality' => 0,
 
+		// relay_max_tags (Integer)
+		// Maximum amount of tags in a post before it is rejected as spam.
+		'relay_max_tags' => 10,
+
 		// proxify_content (Boolean)
 		// Use the proxy functionality for fetching external content
 		'proxify_content' => true,

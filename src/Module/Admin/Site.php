@@ -159,6 +159,7 @@ class Site extends BaseAdmin
 		$relay_scope       = (!empty($_POST['relay_scope'])       ? trim($_POST['relay_scope'])        : '');
 		$relay_server_tags = (!empty($_POST['relay_server_tags']) ? trim($_POST['relay_server_tags'])  : '');
 		$relay_deny_tags   = (!empty($_POST['relay_deny_tags'])   ? trim($_POST['relay_deny_tags'])    : '');
+		$relay_max_tags    = (!empty($_POST['relay_max_tags'])    ? intval($_POST['relay_max_tags'])   : 0);
 		$relay_user_tags   = !empty($_POST['relay_user_tags']);
 
 		$relay_deny_undetected_language = !empty($_POST['relay_deny_undetected_language']);
@@ -333,6 +334,7 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'relay_scope'                   , $relay_scope);
 		$transactionConfig->set('system', 'relay_server_tags'             , $relay_server_tags);
 		$transactionConfig->set('system', 'relay_deny_tags'               , $relay_deny_tags);
+		$transactionConfig->set('system', 'relay_max_tags'                , $relay_max_tags);
 		$transactionConfig->set('system', 'relay_user_tags'               , $relay_user_tags);
 		$transactionConfig->set('system', 'relay_deny_undetected_language', $relay_deny_undetected_language);
 		$transactionConfig->set('system', 'relay_language_quality'        , $relay_language_quality);
@@ -586,6 +588,7 @@ class Site extends BaseAdmin
 			'$relay_scope'                    => ['relay_scope', DI::l10n()->t('Relay scope'), DI::config()->get('system', 'relay_scope'), DI::l10n()->t('Can be "all" or "tags". "all" means that every public post should be received. "tags" means that only posts with selected tags should be received.'), [Relay::SCOPE_NONE => DI::l10n()->t('Disabled'), Relay::SCOPE_ALL => DI::l10n()->t('all'), Relay::SCOPE_TAGS => DI::l10n()->t('tags')]],
 			'$relay_server_tags'              => ['relay_server_tags', DI::l10n()->t('Server tags'), DI::config()->get('system', 'relay_server_tags'), DI::l10n()->t('Comma separated list of tags for the "tags" subscription.')],
 			'$relay_deny_tags'                => ['relay_deny_tags', DI::l10n()->t('Deny Server tags'), DI::config()->get('system', 'relay_deny_tags'), DI::l10n()->t('Comma separated list of tags that are rejected.')],
+			'$relay_max_tags'                 => ['relay_max_tags', DI::l10n()->t('Maximum amount of tags'), DI::config()->get('system', 'relay_max_tags'), DI::l10n()->t('Maximum amount of tags in a post before it is rejected as spam. The post has to contain at least one link. Posts from subscribed accounts will not be rejected.')],
 			'$relay_user_tags'                => ['relay_user_tags', DI::l10n()->t('Allow user tags'), DI::config()->get('system', 'relay_user_tags'), DI::l10n()->t('If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".')],
 			'$relay_deny_undetected_language' => ['relay_deny_undetected_language', DI::l10n()->t('Deny undetected languages'), DI::config()->get('system', 'relay_deny_undetected_language'), DI::l10n()->t('If enabled, posts with undetected languages will be rejected.')],
 			'$relay_language_quality'         => ['relay_language_quality', DI::l10n()->t('Language Quality'), DI::config()->get('system', 'relay_language_quality'), DI::l10n()->t('The minimum language quality that is required to accept the post.')],
