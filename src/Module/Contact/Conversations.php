@@ -27,11 +27,13 @@ use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
 use Friendica\Content\Conversation;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
+use Friendica\Core\ACL;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Model;
+use Friendica\Model\Contact as ModelContact;
 use Friendica\Module\Contact;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
@@ -109,8 +111,13 @@ class Conversations extends BaseModule
 
 		Nav::setSelected('contact');
 
-		// We need the editor here to be able to reshare an item.
-		$o = $this->conversation->statusEditor([], 0, true);
+		$options = [
+			'lockstate' => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
+			'acl' => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
+			'bang' => '',
+			'content' => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+		];
+		$o = $this->conversation->statusEditor($options);
 
 		$o .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
 		$o .= Model\Contact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request['last_created'] ?? '');

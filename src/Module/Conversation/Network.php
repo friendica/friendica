@@ -162,8 +162,6 @@ class Network extends Timeline
 
 			Nav::setSelected($this->args->get(0));
 
-			$content = '';
-
 			$default_permissions = [];
 			if ($this->circleId) {
 				$default_permissions['allow_gid'] = [$this->circleId];
@@ -195,7 +193,7 @@ class Network extends Timeline
 				'lockstate' => $this->circleId || $this->network || ACL::getLockstateForUserId($this->session->getLocalUserId()) ? 'lock' : 'unlock',
 				'acl' => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), true, $default_permissions),
 				'bang' => (($this->circleId || $this->network) ? '!' : ''),
-				'content' => $content,
+				'content' => '',
 			];
 
 			$o .= $this->conversation->statusEditor($x);
