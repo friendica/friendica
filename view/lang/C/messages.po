@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2024.03-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 15:26+0100\n"
+"POT-Creation-Date: 2024-02-01 16:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1381,7 +1381,7 @@ msgstr ""
 msgid "Public post"
 msgstr ""
 
-#: src/Content/Conversation.php:426 src/Content/Widget/VCard.php:127
+#: src/Content/Conversation.php:426 src/Content/Widget/VCard.php:130
 #: src/Model/Profile.php:483 src/Module/Admin/Logs/View.php:92
 #: src/Module/Post/Edit.php:181
 msgid "Message"
@@ -1755,26 +1755,26 @@ msgid ""
 "Contact birthday events are private to you."
 msgstr ""
 
-#: src/Content/GroupManager.php:147 src/Content/Nav.php:278
+#: src/Content/GroupManager.php:148 src/Content/Nav.php:278
 #: src/Content/Text/HTML.php:881 src/Content/Widget.php:537
 #: src/Model/User.php:1381
 msgid "Groups"
 msgstr ""
 
-#: src/Content/GroupManager.php:149
+#: src/Content/GroupManager.php:150
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:153 src/Content/Widget.php:512
+#: src/Content/GroupManager.php:154 src/Content/Widget.php:512
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:154 src/Content/Widget.php:410
+#: src/Content/GroupManager.php:155 src/Content/Widget.php:410
 #: src/Content/Widget.php:513
 msgid "show more"
 msgstr ""
 
-#: src/Content/GroupManager.php:155
+#: src/Content/GroupManager.php:156
 msgid "Create new group"
 msgstr ""
 
@@ -2232,7 +2232,7 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:860 src/Content/Widget/VCard.php:123
+#: src/Content/Text/HTML.php:860 src/Content/Widget/VCard.php:126
 #: src/Model/Profile.php:477 src/Module/Contact/Profile.php:471
 msgid "Follow"
 msgstr ""
@@ -2436,27 +2436,27 @@ msgstr[1] ""
 msgid "More Trending Tags"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:102 src/Model/Contact.php:1212
+#: src/Content/Widget/VCard.php:104 src/Model/Contact.php:1212
 #: src/Model/Profile.php:461
 msgid "Post to group"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:106 src/Model/Contact.php:1217
+#: src/Content/Widget/VCard.php:109 src/Model/Contact.php:1217
 #: src/Model/Profile.php:466 src/Module/Moderation/Item/Source.php:85
 msgid "Mention"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:116 src/Model/Profile.php:380
+#: src/Content/Widget/VCard.php:119 src/Model/Profile.php:380
 #: src/Module/Contact/Profile.php:408 src/Module/Profile/Profile.php:199
 msgid "XMPP:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:117 src/Model/Profile.php:381
+#: src/Content/Widget/VCard.php:120 src/Model/Profile.php:381
 #: src/Module/Contact/Profile.php:410 src/Module/Profile/Profile.php:203
 msgid "Matrix:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:118 src/Model/Event.php:82
+#: src/Content/Widget/VCard.php:121 src/Model/Event.php:82
 #: src/Model/Event.php:109 src/Model/Event.php:471 src/Model/Event.php:963
 #: src/Model/Profile.php:375 src/Module/Contact/Profile.php:406
 #: src/Module/Directory.php:147 src/Module/Notifications/Introductions.php:187
@@ -2464,18 +2464,18 @@ msgstr ""
 msgid "Location:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:121 src/Model/Profile.php:490
+#: src/Content/Widget/VCard.php:124 src/Model/Profile.php:490
 #: src/Module/Notifications/Introductions.php:201
 msgid "Network:"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:125 src/Model/Contact.php:1245
+#: src/Content/Widget/VCard.php:128 src/Model/Contact.php:1245
 #: src/Model/Contact.php:1257 src/Model/Profile.php:479
 #: src/Module/Contact/Profile.php:463
 msgid "Unfollow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:131 src/Model/Contact.php:1214
+#: src/Content/Widget/VCard.php:134 src/Model/Contact.php:1214
 #: src/Model/Profile.php:463
 msgid "View group"
 msgstr ""
@@ -2748,8 +2748,8 @@ msgstr ""
 
 #: src/Core/Installer.php:516
 msgid ""
-"The web installer needs to be able to create a file called \"local.config."
-"php\" in the \"config\" folder of your web server and it is unable to do so."
+"The web installer needs to be able to create a file called \"local.config.php"
+"\" in the \"config\" folder of your web server and it is unable to do so."
 msgstr ""
 
 #: src/Core/Installer.php:517
@@ -3909,8 +3909,8 @@ msgid ""
 "profile\n"
 "\t\t\t(on the \"Profiles\" page) so that other people can easily find you.\n"
 "\n"
-"\t\t\tWe recommend adding a profile photo, adding some profile "
-"\"keywords\" (very useful\n"
+"\t\t\tWe recommend adding a profile photo, adding some profile \"keywords"
+"\" (very useful\n"
 "\t\t\tin making new friends) - and perhaps what country you live in; if you "
 "do not wish\n"
 "\t\t\tto be more specific than that.\n"
@@ -5657,9 +5657,9 @@ msgstr ""
 
 #: src/Module/Admin/Summary.php:98
 msgid ""
-"The last update failed. Please run \"php bin/console.php dbstructure "
-"update\" from the command line and have a look at the errors that might "
-"appear. (Some of the errors are possibly inside the logfile.)"
+"The last update failed. Please run \"php bin/console.php dbstructure update"
+"\" from the command line and have a look at the errors that might appear. "
+"(Some of the errors are possibly inside the logfile.)"
 msgstr ""
 
 #: src/Module/Admin/Summary.php:102
@@ -5810,8 +5810,8 @@ msgstr ""
 #, php-format
 msgid ""
 "Show some informations regarding the needed information to operate the node "
-"according e.g. to <a href=\"%s\" target=\"_blank\" rel=\"noopener "
-"noreferrer\">EU-GDPR</a>."
+"according e.g. to <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer"
+"\">EU-GDPR</a>."
 msgstr ""
 
 #: src/Module/Admin/Tos.php:81
@@ -6255,9 +6255,9 @@ msgstr ""
 
 #: src/Module/Circle.php:98 src/Module/Circle.php:107
 #: src/Module/Contact/Advanced.php:70 src/Module/Contact/Advanced.php:109
-#: src/Module/Contact/Contacts.php:71 src/Module/Contact/Conversations.php:84
-#: src/Module/Contact/Conversations.php:89
-#: src/Module/Contact/Conversations.php:94 src/Module/Contact/Media.php:61
+#: src/Module/Contact/Contacts.php:71 src/Module/Contact/Conversations.php:86
+#: src/Module/Contact/Conversations.php:91
+#: src/Module/Contact/Conversations.php:96 src/Module/Contact/Media.php:61
 #: src/Module/Contact/Posts.php:78 src/Module/Contact/Posts.php:83
 #: src/Module/Contact/Posts.php:88 src/Module/Contact/Profile.php:154
 #: src/Module/Contact/Profile.php:159 src/Module/Contact/Profile.php:164
@@ -7052,33 +7052,33 @@ msgstr ""
 msgid "Not available."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:206
+#: src/Module/Conversation/Network.php:204
 msgid "No such circle"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:210
+#: src/Module/Conversation/Network.php:208
 #, php-format
 msgid "Circle: %s"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:229
+#: src/Module/Conversation/Network.php:227
 #, php-format
 msgid "Error %d (%s) while fetching the timeline."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:306
+#: src/Module/Conversation/Network.php:304
 msgid "Network feed not available."
 msgstr ""
 
-#: src/Module/Conversation/Timeline.php:168
+#: src/Module/Conversation/Timeline.php:169
 msgid "Own Contacts"
 msgstr ""
 
-#: src/Module/Conversation/Timeline.php:172
+#: src/Module/Conversation/Timeline.php:173
 msgid "Include"
 msgstr ""
 
-#: src/Module/Conversation/Timeline.php:173
+#: src/Module/Conversation/Timeline.php:174
 msgid "Hide"
 msgstr ""
 
@@ -9123,8 +9123,8 @@ msgstr ""
 #: src/Module/Profile/Profile.php:158
 #, php-format
 msgid ""
-"You're currently viewing your profile as <b>%s</b> <a href=\"%s\" "
-"class=\"btn btn-sm pull-right\">Cancel</a>"
+"You're currently viewing your profile as <b>%s</b> <a href=\"%s\" class="
+"\"btn btn-sm pull-right\">Cancel</a>"
 msgstr ""
 
 #: src/Module/Profile/Profile.php:167
@@ -9361,48 +9361,48 @@ msgstr ""
 msgid "Please enter the identical mail address in the second field."
 msgstr ""
 
-#: src/Module/Register.php:292
+#: src/Module/Register.php:291
 msgid "Nickname cannot start with a digit."
 msgstr ""
 
-#: src/Module/Register.php:295
+#: src/Module/Register.php:293
 msgid "Nickname can only contain US-ASCII characters."
 msgstr ""
 
-#: src/Module/Register.php:324
+#: src/Module/Register.php:322
 msgid "The additional account was created."
 msgstr ""
 
-#: src/Module/Register.php:349
+#: src/Module/Register.php:347
 msgid ""
 "Registration successful. Please check your email for further instructions."
 msgstr ""
 
-#: src/Module/Register.php:356
+#: src/Module/Register.php:354
 #, php-format
 msgid ""
 "Failed to send email message. Here your accout details:<br> login: %s<br> "
 "password: %s<br><br>You can change your password after login."
 msgstr ""
 
-#: src/Module/Register.php:362
+#: src/Module/Register.php:360
 msgid "Registration successful."
 msgstr ""
 
-#: src/Module/Register.php:371 src/Module/Register.php:378
-#: src/Module/Register.php:388
+#: src/Module/Register.php:369 src/Module/Register.php:376
+#: src/Module/Register.php:386
 msgid "Your registration can not be processed."
 msgstr ""
 
-#: src/Module/Register.php:377
+#: src/Module/Register.php:375
 msgid "You have to leave a request note for the admin."
 msgstr ""
 
-#: src/Module/Register.php:387
+#: src/Module/Register.php:385
 msgid "An internal error occured."
 msgstr ""
 
-#: src/Module/Register.php:409
+#: src/Module/Register.php:407
 msgid "Your registration is pending approval by the site owner."
 msgstr ""
 
@@ -9644,8 +9644,8 @@ msgstr ""
 #: src/Module/Security/TwoFactor/Verify.php:100
 #, php-format
 msgid ""
-"If you do not have access to your authentication code you can use a <a "
-"href=\"%s\">two-factor recovery code</a>."
+"If you do not have access to your authentication code you can use a <a href="
+"\"%s\">two-factor recovery code</a>."
 msgstr ""
 
 #: src/Module/Security/TwoFactor/Verify.php:101
@@ -11344,8 +11344,8 @@ msgstr ""
 #: src/Module/Settings/TwoFactor/Verify.php:152
 #, php-format
 msgid ""
-"<p>Or you can open the following URL in your mobile device:</p><p><a "
-"href=\"%s\">%s</a></p>"
+"<p>Or you can open the following URL in your mobile device:</p><p><a href="
+"\"%s\">%s</a></p>"
 msgstr ""
 
 #: src/Module/Settings/TwoFactor/Verify.php:159
@@ -11454,9 +11454,9 @@ msgstr ""
 msgid ""
 "At any point in time a logged in user can export their account data from the "
 "<a href=\"%1$s/settings/userexport\">account settings</a>. If the user wants "
-"to delete their account they can do so at <a href=\"%1$s/settings/"
-"removeme\">%1$s/settings/removeme</a>. The deletion of the account will be "
-"permanent. Deletion of the data will also be requested from the nodes of the "
+"to delete their account they can do so at <a href=\"%1$s/settings/removeme\">"
+"%1$s/settings/removeme</a>. The deletion of the account will be permanent. "
+"Deletion of the data will also be requested from the nodes of the "
 "communication partners."
 msgstr ""
 
