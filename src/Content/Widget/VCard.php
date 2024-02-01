@@ -28,7 +28,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Util\Network;
 use Friendica\Util\Strings;
 
 /**
@@ -42,9 +41,11 @@ class VCard
 	 * Get HTML for vcard block
 	 *
 	 * @template widget/vcard.tpl
+	 * @param array $contact
+	 * @param bool  $hide_mention
 	 * @return string
 	 */
-	public static function getHTML(array $contact): string
+	public static function getHTML(array $contact, bool $hide_mention = false): string
 	{
 		if (!isset($contact['network']) || !isset($contact['id'])) {
 			Logger::warning('Incomplete contact', ['contact' => $contact ?? []]);
@@ -99,10 +100,12 @@ class VCard
 			}
 
 			if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
-				$mention_label  = DI::l10n()->t('Post to group');
-				$mention_link   = 'compose/0?body=!' . $contact['addr'];
+				if (!$hide_mention) {
+					$mention_label  = DI::l10n()->t('Post to group');
+					$mention_link   = 'compose/0?body=!' . $contact['addr'];
+				}
 				$showgroup_link = 'network/group/' . $id;
-			} else {
+			} elseif (!$hide_mention) {
 				$mention_label = DI::l10n()->t('Mention');
 				$mention_link  = 'compose/0?body=@' . $contact['addr'];
 			}

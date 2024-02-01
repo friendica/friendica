@@ -107,7 +107,7 @@ class Conversations extends BaseModule
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
-		$this->page['aside'] .= Widget\VCard::getHTML($contact);
+		$this->page['aside'] .= Widget\VCard::getHTML($contact, true);
 
 		Nav::setSelected('contact');
 
