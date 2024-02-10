@@ -106,6 +106,7 @@ class Display extends BaseSettings
 		$enable_smart_threading = (bool)$request['enable_smart_threading'];
 		$enable_dislike         = (bool)$request['enable_dislike'];
 		$display_resharer       = (bool)$request['display_resharer'];
+		$display_sensitive      = (bool)$request['display_sensitive'];
 		$stay_local             = (bool)$request['stay_local'];
 		$show_page_drop         = (bool)$request['show_page_drop'];
 		$display_eventlist      = (bool)$request['display_eventlist'];
@@ -157,6 +158,7 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'no_smart_threading'      , !$enable_smart_threading);
 		$this->pConfig->set($uid, 'system', 'hide_dislike'            , !$enable_dislike);
 		$this->pConfig->set($uid, 'system', 'display_resharer'        , $display_resharer);
+		$this->pConfig->set($uid, 'system', 'display_sensitive'       , $display_sensitive);
 		$this->pConfig->set($uid, 'system', 'stay_local'              , $stay_local);
 		$this->pConfig->set($uid, 'system', 'show_page_drop'          , $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist'       , $display_eventlist);
@@ -251,6 +253,7 @@ class Display extends BaseSettings
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       =  $this->pConfig->get($uid, 'system', 'display_resharer', false);
+		$display_sensitive      =  $this->pConfig->get($uid, 'system', 'display_sensitive', false);
 		$stay_local             =  $this->pConfig->get($uid, 'system', 'stay_local', false);
 		$show_page_drop         =  $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      =  $this->pConfig->get($uid, 'system', 'display_eventlist', true);
@@ -330,6 +333,7 @@ class Display extends BaseSettings
 			'$enable_smart_threading'   => ['enable_smart_threading'  , $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike'          , $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
 			'$display_resharer'         => ['display_resharer'        , $this->t('Display the resharer'), $display_resharer, $this->t('Display the first resharer as icon and text on a reshared item.')],
+			'$display_sensitive'        => ['display_sensitive'       , $this->t('Display sensitive content'), $display_sensitive, $this->t('If enabled, pictures in posts marked as "sensitive" will not be blurred.')],
 			'$stay_local'               => ['stay_local'              , $this->t('Stay local'), $stay_local, $this->t("Don't go to a remote system when following a contact link.")],
 			'$show_page_drop'           => ['show_page_drop'          , $this->t('Show the post deletion checkbox'), $show_page_drop, $this->t("Display the checkbox for the post deletion on the network page.")],
 			'$display_eventlist'        => ['display_eventlist'       , $this->t('DIsplay the event list'), $display_eventlist, $this->t("Display the birthday reminder and event list on the network page.")],

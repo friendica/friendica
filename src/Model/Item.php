@@ -3330,8 +3330,8 @@ class Item
 	public static function prepareBody(array &$item, bool $attach = false, bool $is_preview = false, bool $only_cache = false): string
 	{
 		$a = DI::app();
+		$uid = DI::userSession()->getLocalUserId();
 		Hook::callAll('prepare_body_init', $item);
-
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
@@ -3345,7 +3345,7 @@ class Item
 		$item['tags'] = $tags['tags'];
 		$item['hashtags'] = $tags['hashtags'];
 		$item['mentions'] = $tags['mentions'];
-		$sensitive = (bool)$item['sensitive'];
+		$sensitive = $item['sensitive'] && !DI::pConfig()->get($uid, 'system', 'display_sensitive', false);
 
 		if (!$is_preview) {
 			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", $item['body']);
@@ -3438,7 +3438,7 @@ class Item
 				$filter_reasons[] = DI::l10n()->t('Content from %s is collapsed', $item['author-name']);
 			}
 
-			if (!empty($item['content-warning']) && (!DI::userSession()->getLocalUserId() || !DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'disable_cw', false))) {
+			if (!empty($item['content-warning']) && (!$uid || !DI::pConfig()->get($uid, 'system', 'disable_cw', false))) {
 				$filter_reasons[] = DI::l10n()->t('Content warning: %s', $item['content-warning']);
 			}
 

@@ -18,6 +18,7 @@
 	{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
 	{{include file="field_checkbox.tpl" field=$enable_dislike}}
 	{{include file="field_checkbox.tpl" field=$display_resharer}}
+	{{include file="field_checkbox.tpl" field=$display_sensitive}}
 	{{include file="field_checkbox.tpl" field=$stay_local}}
 	{{include file="field_checkbox.tpl" field=$show_page_drop}}
 	{{include file="field_checkbox.tpl" field=$display_eventlist}}
