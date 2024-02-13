@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2024.03-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-10 11:45+0000\n"
+"POT-Creation-Date: 2024-02-13 05:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2190,39 +2190,39 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:762 src/Content/Text/BBCode.php:1707
-#: src/Content/Text/BBCode.php:1708
+#: src/Content/Text/BBCode.php:766 src/Content/Text/BBCode.php:1727
+#: src/Content/Text/BBCode.php:1728
 msgid "Image/photo"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:980
+#: src/Content/Text/BBCode.php:984
 #, php-format
 msgid ""
 "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1005 src/Model/Item.php:3993
-#: src/Model/Item.php:3999 src/Model/Item.php:4000
+#: src/Content/Text/BBCode.php:1009 src/Model/Item.php:3999
+#: src/Model/Item.php:4005 src/Model/Item.php:4006
 msgid "Link to source"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1614 src/Content/Text/HTML.php:905
+#: src/Content/Text/BBCode.php:1634 src/Content/Text/HTML.php:905
 msgid "Click to open/close"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1647
+#: src/Content/Text/BBCode.php:1667
 msgid "$1 wrote:"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1712 src/Content/Text/BBCode.php:1713
+#: src/Content/Text/BBCode.php:1732 src/Content/Text/BBCode.php:1733
 msgid "Encrypted content"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1968
+#: src/Content/Text/BBCode.php:1996
 msgid "Invalid source protocol"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1987
+#: src/Content/Text/BBCode.php:2015
 msgid "Invalid link protocol"
 msgstr ""
 
@@ -3289,44 +3289,48 @@ msgid "Expected network %s does not match actual network %s"
 msgstr ""
 
 #: src/Model/Contact.php:3111
+msgid "This seems to be a relay account. They can't be followed by users."
+msgstr ""
+
+#: src/Model/Contact.php:3118
 msgid "The profile address specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:3113
+#: src/Model/Contact.php:3120
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:3116
+#: src/Model/Contact.php:3123
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:3119
+#: src/Model/Contact.php:3126
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:3122
+#: src/Model/Contact.php:3129
 msgid ""
 "Unable to match @-style Identity Address with a known protocol or email "
 "contact."
 msgstr ""
 
-#: src/Model/Contact.php:3123
+#: src/Model/Contact.php:3130
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:3129
+#: src/Model/Contact.php:3136
 msgid ""
 "The profile address specified belongs to a network which has been disabled "
 "on this site."
 msgstr ""
 
-#: src/Model/Contact.php:3134
+#: src/Model/Contact.php:3141
 msgid ""
 "Limited profile. This person will be unable to receive direct/personal "
 "notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:3200
+#: src/Model/Contact.php:3207
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -3478,44 +3482,44 @@ msgstr ""
 msgid "Content warning: %s"
 msgstr ""
 
-#: src/Model/Item.php:3900
+#: src/Model/Item.php:3906
 msgid "bytes"
 msgstr ""
 
-#: src/Model/Item.php:3931
+#: src/Model/Item.php:3937
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3933
+#: src/Model/Item.php:3939
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3938
+#: src/Model/Item.php:3944
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3940
+#: src/Model/Item.php:3946
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3942
+#: src/Model/Item.php:3948
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3976 src/Model/Item.php:3977
+#: src/Model/Item.php:3982 src/Model/Item.php:3983
 msgid "View on separate page"
 msgstr ""
 

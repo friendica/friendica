@@ -3106,6 +3106,13 @@ class Contact
 			$ret['url'] = str_replace('?absolute=true', '', $ret['url']);
 		}
 
+		if (($protocol == Protocol::ACTIVITYPUB) && ($uid != 0)) {
+			if (APContact::isRelay(APContact::getByURL($ret['url']))) {
+				$result['message'] = DI::l10n()->t('This seems to be a relay account. They can\'t be followed by users.');
+				return $result;
+			}
+		}
+
 		// do we have enough information?
 		if (empty($protocol) || ($protocol == Protocol::PHANTOM) || (empty($ret['url']) && empty($ret['addr']))) {
 			$result['message'] .= DI::l10n()->t('The profile address specified does not provide adequate information.') . '<br />';
