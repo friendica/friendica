@@ -621,7 +621,7 @@ class Photo
 				Logger::info('Avatar exceeds image limit', ['uid' => $uid, 'cid' => $cid, 'maximagesize' => $maximagesize, 'size' => $filesize, 'type' => $image->getType()]);
 				if ($image->getImageType() == IMAGETYPE_GIF) {
 					$image->toStatic();
-					$image = new Image($image->asString(), 'image/png');
+					$image = new Image($image->asString(), image_type_to_mime_type(IMAGETYPE_PNG));
 
 					$filesize = strlen($image->asString());
 					Logger::info('Converted gif to a static png', ['uid' => $uid, 'cid' => $cid, 'size' => $filesize, 'type' => $image->getType()]);

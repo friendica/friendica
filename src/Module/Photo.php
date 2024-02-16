@@ -167,14 +167,16 @@ class Photo extends BaseApi
 		$stamp = microtime(true);
 
 		if (empty($request['blur']) || empty($photo['blurhash'])) {
-			$imgdata = MPhoto::getImageDataForPhoto($photo);
+			$imgdata  = MPhoto::getImageDataForPhoto($photo);
+			$mimetype = $photo['type'];
 		}
 		if (empty($imgdata) && empty($photo['blurhash'])) {
 			throw new HTTPException\NotFoundException();
 		} elseif (empty($imgdata) && !empty($photo['blurhash'])) {
-			$image = New Image('', 'image/png');
+			$image = New Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
 			$image->getFromBlurHash($photo['blurhash'], $photo['width'], $photo['height']);
-			$imgdata = $image->asString();
+			$imgdata  = $image->asString();
+			$mimetype = $image->getType();
 		}
 
 		// The mimetype for an external or system resource can only be known reliably after it had been fetched
@@ -201,18 +203,21 @@ class Photo extends BaseApi
 		if (!empty($request['static'])) {
 			$img = new Image($imgdata, $photo['type'], $photo['filename']);
 			$img->toStatic();
-			$imgdata = $img->asString();
+			$imgdata  = $img->asString();
+			$mimetype = $img->getType();
 		}
 
 		// if customsize is set and image is not a gif, resize it
 		if ($photo['type'] !== 'image/gif' && $customsize > 0 && $customsize <= Proxy::PIXEL_THUMB && $square_resize) {
 			$img = new Image($imgdata, $photo['type'], $photo['filename']);
 			$img->scaleToSquare($customsize);
-			$imgdata = $img->asString();
+			$imgdata  = $img->asString();
+			$mimetype = $img->getType();
 		} elseif ($photo['type'] !== 'image/gif' && $customsize > 0) {
 			$img = new Image($imgdata, $photo['type'], $photo['filename']);
 			$img->scaleDown($customsize);
-			$imgdata = $img->asString();
+			$imgdata  = $img->asString();
+			$mimetype = $img->getType();
 		}
 
 		if (function_exists('header_remove')) {
@@ -220,7 +225,7 @@ class Photo extends BaseApi
 			header_remove('pragma');
 		}
 
-		header('Content-type: ' . $photo['type']);
+		header('Content-type: ' . $mimetype);
 
 		$stamp = microtime(true);
 		if (!$cacheable) {
@@ -391,7 +396,7 @@ class Photo extends BaseApi
 					}
 				}
 				if (empty($mimetext) && !empty($contact['blurhash'])) {
-					$image = New Image('', 'image/png');
+					$image = New Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
 					$image->getFromBlurHash($contact['blurhash'], $customsize, $customsize);
 					return MPhoto::createPhotoForImageData($image->asString());
 				} elseif (empty($mimetext)) {
