@@ -84,7 +84,7 @@ class Attachment extends BaseFactory
 			$type = 'audio';
 		} elseif (($filetype == 'video') || ($attachment['type'] == Post\Media::VIDEO)) {
 			$type = 'video';
-		} elseif ($attachment['mimetype'] == 'image/gif') {
+		} elseif ($attachment['mimetype'] == image_type_to_mime_type(IMAGETYPE_GIF)) {
 			$type = 'gifv';
 		} elseif (($filetype == 'image') || ($attachment['type'] == Post\Media::IMAGE)) {
 			$type = 'image';

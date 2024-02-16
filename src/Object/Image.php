@@ -95,7 +95,7 @@ class Image
 	 */
 	private function useImagick(string $data): bool
 	{
-		if (!$this->isImagick()) {
+		if (!class_exists('Imagick')) {
 			return false;
 		}
 
@@ -104,8 +104,30 @@ class Image
 			return ($count > 0);
 		}
 
-		// @todo add check for WebP
-		return ($this->imageType == IMAGETYPE_WEBP);
+		return (($this->imageType == IMAGETYPE_WEBP) && $this->isAnimatedWebP(substr($data, 0, 90)));
+	}
+
+	/**
+	 * Detect if a WebP image is animated.
+	 * @see https://www.php.net/manual/en/function.imagecreatefromwebp.php#126269
+	 * @param string $data
+	 * @return boolean
+	 */
+	private function isAnimatedWebP(string $data) {
+		$header_format = 'A4Riff/I1Filesize/A4Webp/A4Vp/A74Chunk';
+		$header = unpack($header_format, $data);
+
+		if (!isset($header['Riff']) || strtoupper($header['Riff']) !== 'RIFF') {
+			return false;
+		}
+		if (!isset($header['Webp']) || strtoupper($header['Webp']) !== 'WEBP') {
+			return false;
+		}
+		if (!isset($header['Vp']) || strpos(strtoupper($header['Vp']), 'VP8') === false) {
+			return false;
+		}
+
+		return strpos(strtoupper($header['Chunk']), 'ANIM') !== false || strpos(strtoupper($header['Chunk']), 'ANMF') !== false;
 	}
 
 	/**

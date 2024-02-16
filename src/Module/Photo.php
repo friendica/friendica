@@ -208,12 +208,12 @@ class Photo extends BaseApi
 		}
 
 		// if customsize is set and image is not a gif, resize it
-		if ($photo['type'] !== 'image/gif' && $customsize > 0 && $customsize <= Proxy::PIXEL_THUMB && $square_resize) {
+		if ($photo['type'] !== image_type_to_mime_type(IMAGETYPE_GIF) && $customsize > 0 && $customsize <= Proxy::PIXEL_THUMB && $square_resize) {
 			$img = new Image($imgdata, $photo['type'], $photo['filename']);
 			$img->scaleToSquare($customsize);
 			$imgdata  = $img->asString();
 			$mimetype = $img->getType();
-		} elseif ($photo['type'] !== 'image/gif' && $customsize > 0) {
+		} elseif ($photo['type'] !== image_type_to_mime_type(IMAGETYPE_GIF) && $customsize > 0) {
 			$img = new Image($imgdata, $photo['type'], $photo['filename']);
 			$img->scaleDown($customsize);
 			$imgdata  = $img->asString();
