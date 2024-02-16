@@ -395,7 +395,7 @@ class Photo
 		$photo['backend-class'] = ExternalResource::NAME;
 		$photo['backend-ref']   = json_encode(['url' => $url, 'uid' => $uid]);
 		$photo['type']          = $mimetype;
-		$photo['filename'] 		= basename(parse_url($url, PHP_URL_PATH));
+		$photo['filename'] 	    = basename(parse_url($url, PHP_URL_PATH));
 		$photo['cacheable']     = true;
 		$photo['blurhash']      = $blurhash;
 		$photo['width']         = $width;

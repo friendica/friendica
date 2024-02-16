@@ -44,7 +44,7 @@ For alternative server configurations (such as Nginx server and MariaDB database
 
 ### Optional
 
-* PHP ImageMagick extension (php-imagick) for animated GIF support.
+* PHP ImageMagick extension (php-imagick) for animated GIF and animated WebP support.
 
 ## Installation procedure
 
