@@ -213,7 +213,7 @@ class Crop extends BaseSettings
 
 		DI::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('settings/profile/photo/crop_head.tpl'), []);
 
-		$filename = $imagecrop['resource-id'] . '-' . $imagecrop['scale'] . '.' . $imagecrop['ext'];
+		$filename = $imagecrop['resource-id'] . '-' . $imagecrop['scale'] . $imagecrop['ext'];
 		$tpl = Renderer::getMarkupTemplate('settings/profile/photo/crop.tpl');
 		$o = Renderer::replaceMacros($tpl, [
 			'$filename'  => $filename,

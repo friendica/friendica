@@ -452,7 +452,7 @@ class Images
 	{
 		return self::getBBCodeByUrl(
 			DI::baseUrl() . '/photos/' . $nickname . '/image/' . $resource_id,
-			DI::baseUrl() . '/photo/' . $resource_id . '-' . $preview. '.' . $ext,
+			DI::baseUrl() . '/photo/' . $resource_id . '-' . $preview. $ext,
 			$description
 		);
 	}

@@ -662,9 +662,9 @@ class Photo
 
 			$suffix = '?ts=' . time();
 
-			$image_url = DI::baseUrl() . '/photo/' . $resource_id . '-4.' . $image->getExt() . $suffix;
-			$thumb = DI::baseUrl() . '/photo/' . $resource_id . '-5.' . $image->getExt() . $suffix;
-			$micro = DI::baseUrl() . '/photo/' . $resource_id . '-6.' . $image->getExt() . $suffix;
+			$image_url = DI::baseUrl() . '/photo/' . $resource_id . '-4' . $image->getExt() . $suffix;
+			$thumb = DI::baseUrl() . '/photo/' . $resource_id . '-5' . $image->getExt() . $suffix;
+			$micro = DI::baseUrl() . '/photo/' . $resource_id . '-6' . $image->getExt() . $suffix;
 		} else {
 			$photo_failure = true;
 		}

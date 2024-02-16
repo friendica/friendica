@@ -150,7 +150,7 @@ class Avatar
 			return '';
 		}
 
-		$path = $filename . $size . '.' . $image->getExt();
+		$path = $filename . $size . $image->getExt();
 
 		$basepath = self::basePath();
 		if (empty($basepath)) {
