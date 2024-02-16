@@ -1403,9 +1403,7 @@ class User
 				$type = '';
 			}
 
-			$type = Images::getMimeTypeByData($img_str, $photo, $type);
-
-			$image = new Image($img_str, $type);
+			$image = new Image($img_str, $type, $photo);
 			if ($image->isValid()) {
 				$image->scaleToSquare(300);
 

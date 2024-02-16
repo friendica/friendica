@@ -80,13 +80,18 @@ class Avatar
 			return $fields;
 		}
 
+		if (!$fetchResult->isSuccess()) {
+			Logger::debug('Fetching was unsuccessful', ['avatar' => $avatar]);
+			return $fields;
+		}
+
 		$img_str = $fetchResult->getBodyString();
 		if (empty($img_str)) {
 			Logger::debug('Avatar is invalid', ['avatar' => $avatar]);
 			return $fields;
 		}
 
-		$image = new Image($img_str, Images::getMimeTypeByData($img_str));
+		$image = new Image($img_str, $fetchResult->getContentType(), $avatar);
 		if (!$image->isValid()) {
 			Logger::debug('Avatar picture is invalid', ['avatar' => $avatar]);
 			return $fields;

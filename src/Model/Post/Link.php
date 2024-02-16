@@ -134,15 +134,23 @@ class Link
 			Logger::notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
 			return [];
 		}
-		$fields = ['mimetype' => $curlResult->getHeader('Content-Type')[0]];
 
-		$img_str = $curlResult->getBodyString();
-		$image = new Image($img_str, Images::getMimeTypeByData($img_str));
-		if ($image->isValid()) {
-			$fields['mimetype'] = $image->getType();
-			$fields['width']    = $image->getWidth();
-			$fields['height']   = $image->getHeight();
-			$fields['blurhash'] = $image->getBlurHash();
+		if (!$curlResult->isSuccess()) {
+			Logger::notice('Fetching unsuccessful', ['url' => $url]);
+			return [];
+		}
+
+		$fields = ['mimetype' => $curlResult->getContentType()];
+
+		if (Images::isSupportedMimeType($fields['mimetype'])) {
+			$img_str = $curlResult->getBodyString();
+			$image = new Image($img_str, $fields['mimetype'], $url);
+			if ($image->isValid()) {
+				$fields['mimetype'] = $image->getType();
+				$fields['width']    = $image->getWidth();
+				$fields['height']   = $image->getHeight();
+				$fields['blurhash'] = $image->getBlurHash();
+			}
 		}
 
 		return $fields;

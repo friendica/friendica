@@ -196,7 +196,7 @@ class Media
 
 			if ($curlResult->isSuccess()) {
 				if (empty($media['mimetype'])) {
-					$media['mimetype'] = $curlResult->getHeader('Content-Type')[0] ?? '';
+					$media['mimetype'] = $curlResult->getContentType() ?? '';
 				}
 				if (empty($media['size'])) {
 					$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? 0);

@@ -132,8 +132,6 @@ function photos_post(App $a)
 		throw new HTTPException\NotFoundException(DI::l10n()->t('User not found.'));
 	}
 
-	$phototypes = Images::supportedTypes();
-
 	$can_post  = false;
 	$visitor   = 0;
 
@@ -337,7 +335,7 @@ function photos_post(App $a)
 
 		if (DBA::isResult($photos)) {
 			$photo = $photos[0];
-			$ext = $phototypes[$photo['type']];
+			$ext = Images::getExtensionByMimeType($photo['type']);
 			Photo::update(
 				['desc' => $desc, 'album' => $albname, 'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow, 'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny],
 				['resource-id' => $resource_id, 'uid' => $page_owner_uid]
@@ -589,8 +587,6 @@ function photos_content(App $a)
 	}
 
 	$profile = Profile::getByUID($user['uid']);
-
-	$phototypes = Images::supportedTypes();
 
 	$_SESSION['photo_return'] = DI::args()->getCommand();
 
@@ -844,7 +840,7 @@ function photos_content(App $a)
 			foreach ($r as $rr) {
 				$twist = !$twist;
 
-				$ext = $phototypes[$rr['type']];
+				$ext = Images::getExtensionByMimeType($rr['type']);
 
 				$imgalt_e = $rr['filename'];
 				$desc_e = $rr['desc'];
@@ -855,7 +851,7 @@ function photos_content(App $a)
 					'link'  => 'photos/' . $user['nickname'] . '/image/' . $rr['resource-id']
 						. ($order_field === 'created' ? '?order=created' : ''),
 					'title' => DI::l10n()->t('View Photo'),
-					'src'   => 'photo/' . $rr['resource-id'] . '-' . $rr['scale'] . '.' . $ext,
+					'src'   => 'photo/' . $rr['resource-id'] . '-' . $rr['scale'] . $ext,
 					'alt'   => $imgalt_e,
 					'desc'  => $desc_e,
 					'ext'   => $ext,
@@ -1013,9 +1009,9 @@ function photos_content(App $a)
 		}
 
 		$photo = [
-			'href'     => 'photo/' . $hires['resource-id'] . '-' . $hires['scale'] . '.' . $phototypes[$hires['type']],
+			'href'     => 'photo/' . $hires['resource-id'] . '-' . $hires['scale'] . Images::getExtensionByMimeType($hires['type']),
 			'title'    => DI::l10n()->t('View Full Size'),
-			'src'      => 'photo/' . $lores['resource-id'] . '-' . $lores['scale'] . '.' . $phototypes[$lores['type']] . '?_u=' . DateTimeFormat::utcNow('ymdhis'),
+			'src'      => 'photo/' . $lores['resource-id'] . '-' . $lores['scale'] . Images::getExtensionByMimeType($lores['type']) . '?_u=' . DateTimeFormat::utcNow('ymdhis'),
 			'height'   => $hires['height'],
 			'width'    => $hires['width'],
 			'album'    => $hires['album'],

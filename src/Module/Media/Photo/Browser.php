@@ -99,8 +99,7 @@ class Browser extends BaseModule
 
 	protected function map_files(array $record): array
 	{
-		$types      = Images::supportedTypes();
-		$ext        = $types[$record['type']];
+		$ext        = Images::getExtensionByMimeType($record['type']);
 		$filename_e = $record['filename'];
 
 		// Take the largest picture that is smaller or equal 640 pixels
@@ -118,7 +117,7 @@ class Browser extends BaseModule
 		return [
 			sprintf('%s/photos/%s/image/%s', $this->baseUrl, $this->app->getLoggedInUserNickname(), $record['resource-id']),
 			$filename_e,
-			sprintf('%s/photo/%s-%s.%s', $this->baseUrl, $record['resource-id'], $scale, $ext),
+			sprintf('%s/photo/%s-%s%s', $this->baseUrl, $record['resource-id'], $scale, $ext),
 			$record['desc'],
 		];
 	}

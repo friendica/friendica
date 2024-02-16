@@ -155,13 +155,12 @@ class Update extends BaseApi
 
 				Photo::setPermissionForResource($media[0]['resource-id'], $uid, $item['allow_cid'], $item['allow_gid'], $item['deny_cid'], $item['deny_gid']);
 
-				$phototypes = Images::supportedTypes();
-				$ext        = $phototypes[$media[0]['type']];
+				$ext = Images::getExtensionByMimeType($media[0]['type']);
 
 				$attachment = [
 					'type'        => Post\Media::IMAGE,
 					'mimetype'    => $media[0]['type'],
-					'url'         => DI::baseUrl() . '/photo/' . $media[0]['resource-id'] . '-' . $media[0]['scale'] . '.' . $ext,
+					'url'         => DI::baseUrl() . '/photo/' . $media[0]['resource-id'] . '-' . $media[0]['scale'] . $ext,
 					'size'        => $media[0]['datasize'],
 					'name'        => $media[0]['filename'] ?: $media[0]['resource-id'],
 					'description' => $media[0]['desc'] ?? '',
@@ -170,7 +169,7 @@ class Update extends BaseApi
 				];
 
 				if (count($media) > 1) {
-					$attachment['preview']        = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . '.' . $ext;
+					$attachment['preview']        = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . $ext;
 					$attachment['preview-width']  = $media[1]['width'];
 					$attachment['preview-height'] = $media[1]['height'];
 				}

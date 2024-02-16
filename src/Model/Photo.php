@@ -363,6 +363,7 @@ class Photo
 		$photo['backend-class'] = SystemResource::NAME;
 		$photo['backend-ref']   = $filename;
 		$photo['type']          = $mimetype;
+		$photo['filename']      = basename($filename);
 		$photo['cacheable']     = false;
 
 		return $photo;
@@ -394,6 +395,7 @@ class Photo
 		$photo['backend-class'] = ExternalResource::NAME;
 		$photo['backend-ref']   = json_encode(['url' => $url, 'uid' => $uid]);
 		$photo['type']          = $mimetype;
+		$photo['filename'] 		= basename(parse_url($url, PHP_URL_PATH));
 		$photo['cacheable']     = true;
 		$photo['blurhash']      = $blurhash;
 		$photo['width']         = $width;
@@ -608,9 +610,7 @@ class Photo
 			return false;
 		}
 
-		$type = Images::getMimeTypeByData($img_str, $image_url, $type);
-
-		$image = new Image($img_str, $type);
+		$image = new Image($img_str, $type, $image_url);
 		if ($image->isValid()) {
 			$image->scaleToSquare(300);
 
@@ -619,7 +619,7 @@ class Photo
 
 			if ($maximagesize && ($filesize > $maximagesize)) {
 				Logger::info('Avatar exceeds image limit', ['uid' => $uid, 'cid' => $cid, 'maximagesize' => $maximagesize, 'size' => $filesize, 'type' => $image->getType()]);
-				if ($image->getType() == 'image/gif') {
+				if ($image->getImageType() == IMAGETYPE_GIF) {
 					$image->toStatic();
 					$image = new Image($image->asString(), 'image/png');
 
@@ -1060,9 +1060,7 @@ class Photo
 			return [];
 		}
 
-		$type = Images::getMimeTypeByData($img_str, $image_url, $type);
-
-		$image = new Image($img_str, $type);
+		$image = new Image($img_str, $type, $image_url);
 
 		$image = self::fitImageSize($image);
 		if (empty($image)) {
@@ -1132,12 +1130,10 @@ class Photo
 			return [];
 		}
 
-		$filetype = Images::getMimeTypeBySource($src, $filename, $filetype);
-
 		Logger::info('File upload', ['src' => $src, 'filename' => $filename, 'size' => $filesize, 'type' => $filetype]);
 
 		$imagedata = @file_get_contents($src);
-		$image = new Image($imagedata, $filetype);
+		$image = new Image($imagedata, $filetype, $filename);
 		if (!$image->isValid()) {
 			Logger::notice('Image is unvalid', ['files' => $files]);
 			return [];

@@ -842,7 +842,6 @@ class Contact
 			return false;
 		}
 
-		$file_suffix = 'jpg';
 		$url = DI::baseUrl() . '/profile/' . $user['nickname'];
 
 		$fields = [
@@ -875,17 +874,11 @@ class Contact
 				$fields['avatar-date'] = DateTimeFormat::utcNow();
 			}
 
-			// Creating the path to the avatar, beginning with the file suffix
-			$types = Images::supportedTypes();
-			if (isset($types[$avatar['type']])) {
-				$file_suffix = $types[$avatar['type']];
-			}
-
 			// We are adding a timestamp value so that other systems won't use cached content
 			$timestamp = strtotime($fields['avatar-date']);
 
 			$prefix = DI::baseUrl() . '/photo/' . $avatar['resource-id'] . '-';
-			$suffix = '.' . $file_suffix . '?ts=' . $timestamp;
+			$suffix = Images::getExtensionByMimeType($avatar['type']) . '?ts=' . $timestamp;
 
 			$fields['photo'] = $prefix . '4' . $suffix;
 			$fields['thumb'] = $prefix . '5' . $suffix;
@@ -2313,8 +2306,8 @@ class Contact
 						$fetchResult = HTTPSignature::fetchRaw($avatar, 0, [HttpClientOptions::ACCEPT_CONTENT => [HttpClientAccept::IMAGE]]);
 
 						$img_str = $fetchResult->getBodyString();
-						if (!empty($img_str)) {
-							$image = new Image($img_str, Images::getMimeTypeByData($img_str));
+						if ($fetchResult->isSuccess() && !empty($img_str)) {
+							$image = new Image($img_str, $fetchResult->getContentType(), $avatar);
 							if ($image->isValid()) {
 								$update_fields['blurhash'] = $image->getBlurHash();
 							} else {

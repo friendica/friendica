@@ -99,17 +99,15 @@ class Proxy extends BaseModule
 
 		Logger::debug('Got picture', ['Content-Type' => $fetchResult->getHeader('Content-Type'), 'uid' => DI::userSession()->getLocalUserId(), 'image' => $request['url']]);
 
-		$mime = Images::getMimeTypeByData($img_str);
-
-		$image = new Image($img_str, $mime);
+		$image = new Image($img_str, $fetchResult->getContentType(), $request['url']);
 		if (!$image->isValid()) {
-			Logger::notice('The image is invalid', ['image' => $request['url'], 'mime' => $mime]);
+			Logger::notice('The image is invalid', ['image' => $request['url'], 'mime' => $fetchResult->getContentType()]);
 			self::responseError();
 			// stop.
 		}
 
 		// reduce quality - if it isn't a GIF
-		if ($image->getType() != 'image/gif') {
+		if ($image->getImageType() != IMAGETYPE_GIF) {
 			$image->scaleDown($request['size']);
 		}
 

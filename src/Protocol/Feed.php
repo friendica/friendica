@@ -43,6 +43,7 @@ use Friendica\Model\Tag;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
@@ -573,7 +574,7 @@ class Feed
 			if (in_array($fetch_further_information, [LocalRelationship::FFI_INFORMATION, LocalRelationship::FFI_BOTH])) {
 				// Handle enclosures and treat them as preview picture
 				foreach ($attachments as $attachment) {
-					if ($attachment['mimetype'] == 'image/jpeg') {
+					if (Images::isSupportedMimeType($attachment['mimetype'])) {
 						$preview = $attachment['url'];
 					}
 				}

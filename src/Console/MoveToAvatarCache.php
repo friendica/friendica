@@ -150,7 +150,7 @@ HELP;
 
 		if ($valid) {
 			$this->out('3', false);
-			$image = new Image($imgdata, Images::getMimeTypeByData($imgdata));
+			$image = new Image($imgdata);
 			if (!$image->isValid()) {
 				$this->out(' ' . $this->l10n->t('invalid image for id %s', $resourceid) . ' ', false);
 				$valid = false;

@@ -40,6 +40,7 @@ use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
+use Friendica\Util\Images;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
@@ -1027,12 +1028,12 @@ class BBCode
 		if (is_null($text)) {
 			$curlResult = DI::httpClient()->head($match[1], [HttpClientOptions::TIMEOUT => DI::config()->get('system', 'xrd_timeout')]);
 			if ($curlResult->isSuccess()) {
-				$mimetype = $curlResult->getHeader('Content-Type')[0] ?? '';
+				$mimetype = $curlResult->getContentType() ?? '';
 			} else {
 				$mimetype = '';
 			}
 
-			if (substr($mimetype, 0, 6) == 'image/') {
+			if (Images::isSupportedMimeType($mimetype)) {
 				$text = '[url=' . $match[1] . ']' . $match[1] . '[/url]';
 			} else {
 				$text = '[url=' . $match[2] . ']' . $match[2] . '[/url]';
@@ -1125,13 +1126,13 @@ class BBCode
 
 		$curlResult = DI::httpClient()->head($match[1], [HttpClientOptions::TIMEOUT => DI::config()->get('system', 'xrd_timeout')]);
 		if ($curlResult->isSuccess()) {
-			$mimetype = $curlResult->getHeader('Content-Type')[0] ?? '';
+			$mimetype = $curlResult->getContentType() ?? '';
 		} else {
 			$mimetype = '';
 		}
 
 		// if its a link to a picture then embed this picture
-		if (substr($mimetype, 0, 6) == 'image/') {
+		if (Images::isSupportedMimeType($mimetype)) {
 			$text = '[img]' . $match[1] . '[/img]';
 		} else {
 			if (!empty($match[3])) {

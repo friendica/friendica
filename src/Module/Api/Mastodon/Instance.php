@@ -95,7 +95,7 @@ class Instance extends BaseApi
 
 		return new InstanceV2Entity\Configuration(
 			$statuses_config,
-			new InstanceV2Entity\MediaAttachmentsConfig(array_keys(Images::supportedTypes()), $image_size_limit, $image_matrix_limit),
+			new InstanceV2Entity\MediaAttachmentsConfig(Images::supportedMimeTypes(), $image_size_limit, $image_matrix_limit),
 			new InstanceV2Entity\Polls(),
 			new InstanceV2Entity\Accounts(),
 		);
