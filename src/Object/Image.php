@@ -66,7 +66,7 @@ class Image
 
 		if (Images::isSupportedMimeType($type)) {
 			$this->imageType = Images::getImageTypeByMimeType($type);
-		} elseif (($type == '') || substr($type, 0, 6) != 'image/' || substr($type, 0, 12) != ' application/') {
+		} elseif (($type == '') || substr($type, 0, 6) == 'image/' || substr($type, 0, 12) == ' application/') {
 			$this->imageType = IMAGETYPE_WEBP;
 			DI::logger()->debug('Unhandled image mime type, use WebP instead', ['type' => $type, 'filename' => $filename, 'size' => strlen($data)]);
 		} else {

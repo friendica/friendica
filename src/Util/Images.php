@@ -184,6 +184,21 @@ class Images
 	}
 
 	/**
+	 * Checks if the provided mime type can be handled for resizing.
+	 * Only with Imagick installed, animated GIF and WebP keep their animation after resize.
+	 *
+	 * @param string $mimetype
+	 * @return boolean
+	 */
+	public static function canResize(string $mimetype): bool
+	{
+		if (in_array(self::getImageTypeByMimeType($mimetype), [IMAGETYPE_GIF, IMAGETYPE_WEBP])) {
+			return class_exists('Imagick');
+		}
+		return true;
+	}
+
+	/**
 	 * Fetch image mimetype from the image data or guessing from the file name
 	 *
 	 * @param string $image_data Image data
