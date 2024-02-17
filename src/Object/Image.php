@@ -100,7 +100,7 @@ class Image
 		}
 
 		if ($this->imageType == IMAGETYPE_GIF) {
-			$count = preg_match_all("#\x00\x21\xF9\x04.{4}\x00(\x2C|\x21)#s", $data);
+			$count = @preg_match_all("#\x00\x21\xF9\x04.{4}\x00(\x2C|\x21)#s", $data);
 			return ($count > 0);
 		}
 
@@ -115,7 +115,7 @@ class Image
 	 */
 	private function isAnimatedWebP(string $data) {
 		$header_format = 'A4Riff/I1Filesize/A4Webp/A4Vp/A74Chunk';
-		$header = unpack($header_format, $data);
+		$header = @unpack($header_format, $data);
 
 		if (!isset($header['Riff']) || strtoupper($header['Riff']) !== 'RIFF') {
 			return false;
