@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2024.03-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-16 02:33+0000\n"
+"POT-Creation-Date: 2024-02-18 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -792,18 +792,18 @@ msgid "All contacts"
 msgstr ""
 
 #: src/BaseModule.php:439 src/Content/Conversation/Factory/Channel.php:46
-#: src/Content/Widget.php:239 src/Core/ACL.php:195 src/Module/Contact.php:414
+#: src/Content/Widget.php:240 src/Core/ACL.php:195 src/Module/Contact.php:414
 #: src/Module/PermissionTooltip.php:141 src/Module/PermissionTooltip.php:163
 #: src/Module/Settings/Channels.php:154
 msgid "Followers"
 msgstr ""
 
-#: src/BaseModule.php:444 src/Content/Widget.php:240 src/Module/Contact.php:417
+#: src/BaseModule.php:444 src/Content/Widget.php:241 src/Module/Contact.php:417
 #: src/Module/Settings/Channels.php:153
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:449 src/Content/Widget.php:241 src/Module/Contact.php:420
+#: src/BaseModule.php:449 src/Content/Widget.php:242 src/Module/Contact.php:420
 msgid "Mutual friends"
 msgstr ""
 
@@ -1559,29 +1559,37 @@ msgid "Posts from accounts that are followed by accounts that you follow"
 msgstr ""
 
 #: src/Content/Conversation/Factory/Channel.php:48
+msgid "Quiet sharers"
+msgstr ""
+
+#: src/Content/Conversation/Factory/Channel.php:48
+msgid "Posts from accounts that you follow but who don't post very often"
+msgstr ""
+
+#: src/Content/Conversation/Factory/Channel.php:49
 #: src/Module/Settings/Channels.php:193 src/Module/Settings/Channels.php:214
 msgid "Images"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:48
+#: src/Content/Conversation/Factory/Channel.php:49
 msgid "Posts with images"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:49
+#: src/Content/Conversation/Factory/Channel.php:50
 #: src/Module/Settings/Channels.php:195 src/Module/Settings/Channels.php:216
 msgid "Audio"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:49
+#: src/Content/Conversation/Factory/Channel.php:50
 msgid "Posts with audio"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:50
+#: src/Content/Conversation/Factory/Channel.php:51
 #: src/Module/Settings/Channels.php:194 src/Module/Settings/Channels.php:215
 msgid "Videos"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:50
+#: src/Content/Conversation/Factory/Channel.php:51
 msgid "Posts with videos"
 msgstr ""
 
@@ -1759,7 +1767,7 @@ msgid ""
 msgstr ""
 
 #: src/Content/GroupManager.php:147 src/Content/Nav.php:278
-#: src/Content/Text/HTML.php:881 src/Content/Widget.php:537
+#: src/Content/Text/HTML.php:881 src/Content/Widget.php:538
 #: src/Model/User.php:1381
 msgid "Groups"
 msgstr ""
@@ -1768,12 +1776,12 @@ msgstr ""
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:153 src/Content/Widget.php:512
+#: src/Content/GroupManager.php:153 src/Content/Widget.php:513
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:154 src/Content/Widget.php:410
-#: src/Content/Widget.php:513
+#: src/Content/GroupManager.php:154 src/Content/Widget.php:411
+#: src/Content/Widget.php:514
 msgid "show more"
 msgstr ""
 
@@ -2305,88 +2313,88 @@ msgstr ""
 msgid "Local Directory"
 msgstr ""
 
-#: src/Content/Widget.php:215 src/Model/Circle.php:601
+#: src/Content/Widget.php:216 src/Model/Circle.php:601
 #: src/Module/Contact.php:400 src/Module/Welcome.php:76
 msgid "Circles"
 msgstr ""
 
-#: src/Content/Widget.php:217
+#: src/Content/Widget.php:218
 msgid "Everyone"
 msgstr ""
 
-#: src/Content/Widget.php:242 src/Module/Contact.php:423
+#: src/Content/Widget.php:243 src/Module/Contact.php:423
 msgid "No relationship"
 msgstr ""
 
-#: src/Content/Widget.php:247
+#: src/Content/Widget.php:248
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:249 src/Module/Circle.php:292
+#: src/Content/Widget.php:250 src/Module/Circle.php:292
 #: src/Module/Contact.php:344
 msgid "All Contacts"
 msgstr ""
 
-#: src/Content/Widget.php:288
+#: src/Content/Widget.php:289
 msgid "Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:290
+#: src/Content/Widget.php:291
 msgid "All Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:318
+#: src/Content/Widget.php:319
 msgid "Saved Folders"
 msgstr ""
 
-#: src/Content/Widget.php:320 src/Content/Widget.php:351
+#: src/Content/Widget.php:321 src/Content/Widget.php:352
 msgid "Everything"
 msgstr ""
 
-#: src/Content/Widget.php:349
+#: src/Content/Widget.php:350
 msgid "Categories"
 msgstr ""
 
-#: src/Content/Widget.php:406
+#: src/Content/Widget.php:407
 #, php-format
 msgid "%d contact in common"
 msgid_plural "%d contacts in common"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Widget.php:506
+#: src/Content/Widget.php:507
 msgid "Archives"
 msgstr ""
 
-#: src/Content/Widget.php:514
+#: src/Content/Widget.php:515
 msgid "On this date"
 msgstr ""
 
-#: src/Content/Widget.php:534
+#: src/Content/Widget.php:535
 msgid "Persons"
 msgstr ""
 
-#: src/Content/Widget.php:535
+#: src/Content/Widget.php:536
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:536 src/Model/Contact.php:1739
+#: src/Content/Widget.php:537 src/Model/Contact.php:1739
 msgid "News"
 msgstr ""
 
-#: src/Content/Widget.php:538
+#: src/Content/Widget.php:539
 msgid "Relays"
 msgstr ""
 
-#: src/Content/Widget.php:543 src/Module/Settings/Account.php:442
+#: src/Content/Widget.php:544 src/Module/Settings/Account.php:442
 msgid "Account Types"
 msgstr ""
 
-#: src/Content/Widget.php:545 src/Module/Moderation/BaseUsers.php:69
+#: src/Content/Widget.php:546 src/Module/Moderation/BaseUsers.php:69
 msgid "All"
 msgstr ""
 
-#: src/Content/Widget.php:592 src/Module/Admin/Site.php:472
+#: src/Content/Widget.php:593 src/Module/Admin/Site.php:472
 #: src/Module/BaseSettings.php:125 src/Module/Settings/Channels.php:219
 #: src/Module/Settings/Display.php:318
 msgid "Channels"
@@ -9014,12 +9022,12 @@ msgstr ""
 msgid "The Photo with id %s is not available."
 msgstr ""
 
-#: src/Module/Photo.php:194
+#: src/Module/Photo.php:196
 #, php-format
 msgid "Invalid external resource with url %s."
 msgstr ""
 
-#: src/Module/Photo.php:196
+#: src/Module/Photo.php:198
 #, php-format
 msgid "Invalid photo with id %s."
 msgstr ""

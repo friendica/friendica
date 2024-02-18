@@ -34,6 +34,7 @@ General
 * y - for you
 * f - followers
 * r - sharers of sharers
+* q - quiet sharers
 * h - what's hot
 * i - Images
 * v - Videos

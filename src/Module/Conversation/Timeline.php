@@ -345,6 +345,13 @@ class Timeline extends BaseModule
 				AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?))",
 				DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->getMedianRelationThreadScore($cid, 4), $cid
 			];
+		} elseif ($this->selectedTab == ChannelEntity::QUIETSHARERS) {
+			$cid = Contact::getPublicIdByUserId($uid);
+
+			$condition = [
+				"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `post-score` <= ?)",
+				$cid, $this->getMedianPostScore($cid, 2)
+			];
 		} elseif ($this->selectedTab == ChannelEntity::IMAGE) {
 			$condition = ["`media-type` & ?", 1];
 		} elseif ($this->selectedTab == ChannelEntity::VIDEO) {
@@ -625,6 +632,28 @@ class Timeline extends BaseModule
 		$limit    = $this->database->count('contact-relation', $condition) / $divider;
 		$relation = $this->database->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
 		$score    = $relation[0]['relation-thread-score'] ?? 0;
+		if (empty($score)) {
+			return 0;
+		}
+
+		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
+		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
+		return $score;
+	}
+
+	private function getMedianPostScore(int $cid, int $divider): int
+	{
+		$cache_key = 'Channel:getPostScore:' . $cid . ':' . $divider;
+		$score     = $this->cache->get($cache_key);
+		if (!empty($score)) {
+			return $score;
+		}
+
+		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
+
+		$limit    = $this->database->count('contact-relation', $condition) / $divider;
+		$relation = $this->database->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
+		$score    = $relation[0]['post-score'] ?? 0;
 		if (empty($score)) {
 			return 0;
 		}

@@ -33,6 +33,7 @@ Predefined Channels
 * Language: Posts in your language.
 * Followers: Posts from your followers that you don't follow.
 * Sharers of sharers: Posts from accounts that are followed by accounts that you follow.
+* Quiet sharers: Posts from accounts that you follow but who don't post very often.
 * Images: Posts with images.
 * Audio: Posts with audio.
 * Videos: Posts with videos.

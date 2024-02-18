@@ -28,6 +28,7 @@ class Channel extends Timeline
 	const DISCOVER         = 'discover';
 	const FOLLOWERS        = 'followers';
 	const SHARERSOFSHARERS = 'sharersofsharers';
+	const QUIETSHARERS     = 'quietsharers';
 	const IMAGE            = 'image';
 	const VIDEO            = 'video';
 	const AUDIO            = 'audio';
