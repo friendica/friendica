@@ -21,7 +21,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
@@ -39,15 +38,6 @@ class Mutes extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		if (empty($this->parameters['id'])) {
-			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
-		}
-
-		$id = $this->parameters['id'];
-		if (!DBA::exists('contact', ['id' => $id, 'uid' => 0])) {
-			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
-		}
-
 		$request = $this->getRequest([
 			'max_id'   => 0,  // Return results older than this id
 			'since_id' => 0,  // Return results newer than this id
@@ -57,7 +47,7 @@ class Mutes extends BaseApi
 
 		$params = ['order' => ['cid' => true], 'limit' => $request['limit']];
 
-		$condition = ['cid' => $id, 'ignored' => true, 'uid' => $uid];
+		$condition = ['ignored' => true, 'uid' => $uid];
 
 		if (!empty($request['max_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`cid` < ?", $request['max_id']]);
@@ -74,6 +64,7 @@ class Mutes extends BaseApi
 		}
 
 		$followers = DBA::select('user-contact', ['cid'], $condition, $params);
+		$accounts = [];
 		while ($follower = DBA::fetch($followers)) {
 			self::setBoundaries($follower['cid']);
 			$accounts[] = DI::mstdnAccount()->createFromContactId($follower['cid'], $uid);
