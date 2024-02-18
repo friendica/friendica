@@ -211,7 +211,7 @@ return [
 			'/accounts/{id:\d+}/note'            => [Module\Api\Mastodon\Accounts\Note::class,            [        R::POST]],
 			'/accounts/{id:\d+}/remove_from_followers' => [Module\Api\Mastodon\Unimplemented::class,      [        R::POST]], // not supported
 			'/accounts/familiar_followers'       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/accounts/lookup'                   => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/accounts/lookup'                   => [Module\Api\Mastodon\Accounts\Lookup::class,          [R::GET         ]],
 			'/accounts/relationships'            => [Module\Api\Mastodon\Accounts\Relationships::class,   [R::GET         ]],
 			'/accounts/search'                   => [Module\Api\Mastodon\Accounts\Search::class,          [R::GET         ]],
 			'/accounts/update_credentials'       => [Module\Api\Mastodon\Accounts\UpdateCredentials::class, [R::PATCH     ]],
