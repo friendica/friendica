@@ -23,6 +23,7 @@ namespace Friendica\Factory\Api\Mastodon;
 
 use Friendica\BaseFactory;
 use Friendica\Database\Database;
+use Friendica\Model\Subscription;
 use Friendica\Network\HTTPException\UnprocessableEntityException;
 use Psr\Log\LoggerInterface;
 
@@ -56,6 +57,8 @@ class Application extends BaseFactory
 			$application['client_secret'],
 			$application['id'],
 			$application['redirect_uri'],
-			$application['website']);
+			$application['website'],
+			Subscription::getPublicVapidKey(),
+		);
 	}
 }

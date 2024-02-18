@@ -19,25 +19,26 @@
  *
  */
 
-namespace Friendica\Module\Api\Mastodon\Apps;
+namespace Friendica\Object\Api\Mastodon;
 
-use Friendica\DI;
-use Friendica\Module\BaseApi;
+use Friendica\BaseDataTransferObject;
+use Friendica\Util\DateTimeFormat;
 
 /**
- * @see https://docs.joinmastodon.org/methods/apps/
+ * Class ExtendedDescription
+ *
+ * @see https://docs.joinmastodon.org/entities/ExtendedDescription/
  */
-class VerifyCredentials extends BaseApi
+class ExtendedDescription extends BaseDataTransferObject
 {
-	protected function rawContent(array $request = [])
+	/** @var string (Datetime) */
+	protected $updated_at;
+	/** @var string */
+	protected $content;
+
+	public function __construct(\DateTime $updated_at, string $content)
 	{
-		$this->checkAllowedScope(self::SCOPE_READ);
-		$application = self::getCurrentApplication();
-
-		if (empty($application['id'])) {
-			$this->logAndJsonError(401, $this->errorFactory->Unauthorized());
-		}
-
-		$this->jsonExit(DI::mstdnApplication()->createFromApplicationId($application['id']));
+		$this->updated_at = $updated_at->format(DateTimeFormat::JSON);
+		$this->content    = $content;
 	}
 }

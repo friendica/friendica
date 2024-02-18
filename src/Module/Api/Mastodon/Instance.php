@@ -38,7 +38,7 @@ use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
- * @see https://docs.joinmastodon.org/api/rest/instances/
+ * @see https://docs.joinmastodon.org/methods/instance/
  */
 class Instance extends BaseApi
 {

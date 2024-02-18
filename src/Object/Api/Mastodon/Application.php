@@ -42,6 +42,8 @@ class Application extends BaseDataTransferObject
 	protected $redirect_uri;
 	/** @var string */
 	protected $website;
+	/** @var string */
+	protected $vapid_key;
 
 	/**
 	 * Creates an application entry
@@ -49,7 +51,7 @@ class Application extends BaseDataTransferObject
 	 * @param array   $item
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(string $name, string $client_id = null, string $client_secret = null, int $id = null, string $redirect_uri = null, string $website = null)
+	public function __construct(string $name, string $client_id = null, string $client_secret = null, int $id = null, string $redirect_uri = null, string $website = null, string $vapid_key = null)
 	{
 		$this->client_id     = $client_id;
 		$this->client_secret = $client_secret;
@@ -57,6 +59,7 @@ class Application extends BaseDataTransferObject
 		$this->name          = $name;
 		$this->redirect_uri  = $redirect_uri;
 		$this->website       = $website;
+		$this->vapid_key     = $vapid_key;
 	}
 
 	/**

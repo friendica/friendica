@@ -254,7 +254,7 @@ return [
 			'/instance'                          => [Module\Api\Mastodon\Instance::class,                 [R::GET         ]],
 			'/instance/activity'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
 			'/instance/domain_blocks'            => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
-			'/instance/extended_description'     => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
+			'/instance/extended_description'     => [Module\Api\Mastodon\Instance\Extended::class,        [R::GET         ]],
 			'/instance/peers'                    => [Module\Api\Mastodon\Instance\Peers::class,           [R::GET         ]],
 			'/instance/rules'                    => [Module\Api\Mastodon\Instance\Rules::class,           [R::GET         ]],
 			'/lists'                             => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::POST]],

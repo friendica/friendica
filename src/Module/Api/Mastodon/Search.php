@@ -137,6 +137,9 @@ class Search extends BaseApi
 	private static function searchStatuses(int $uid, string $q, string $account_id, int $max_id, int $min_id, int $limit, int $offset)
 	{
 		if (Network::isValidHttpUrl($q)) {
+			if ($offset != 0) {
+				return [];
+			}
 			$q = Network::convertToIdn($q);
 			// If the user-specific search failed, we search and probe a public post
 			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
@@ -156,6 +159,10 @@ class Search extends BaseApi
 			$q = Post\Engagement::escapeKeywords($q);
 			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND (NOT `restricted` OR `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ?))", $q, $uid];
 			$table = 'post-searchindex';
+		}
+
+		if (!empty($account_id)) {
+			$condition = DBA::mergeConditions($condition, ["`author-id` = ?", $account_id]);
 		}
 
 		if (!empty($max_id)) {
