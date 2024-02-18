@@ -65,6 +65,7 @@ class ActivityPub
 	const CONTEXT = [
 		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
 		[
+			'ostatus' => 'http://ostatus.org#',
 			'vcard' => 'http://www.w3.org/2006/vcard/ns#',
 			'dfrn' => 'http://purl.org/macgirvin/dfrn/1.0/',
 			'diaspora' => 'https://diasporafoundation.org/ns/',
