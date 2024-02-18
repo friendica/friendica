@@ -277,6 +277,9 @@ class Engagement
 		$body = self::addResharers($body, $item['uri-id']);
 
 		foreach ($receivers as $receiver) {
+			if (empty($receiver)) {
+				continue;
+			}
 			$contact = Contact::getByURL($receiver, false, ['nick', 'addr', 'contact-type']);
 			if (empty($contact)) {
 				continue;
