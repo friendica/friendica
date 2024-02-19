@@ -380,7 +380,7 @@ class OEmbed
 
 		$allowed = explode(',', $str_allowed);
 
-		return Network::isDomainAllowed($domain, $allowed);
+		return Network::isDomainMatch($domain, $allowed);
 	}
 
 	/**

@@ -38,6 +38,9 @@
 		{{include file="field_checkbox.tpl" field=$enable_openid}}
 		{{include file="field_checkbox.tpl" field=$enable_regfullname}}
 		{{include file="field_checkbox.tpl" field=$register_notification}}
+		{{include file="field_textarea.tpl" field=$allowed_email}}
+		{{include file="field_textarea.tpl" field=$disallowed_email}}
+		{{include file="field_textarea.tpl" field=$forbidden_nicknames}}
 		<div class="submit"><input type="submit" name="page_site" value="{{$submit}}"/></div>
 
 		<h2>{{$upload}}</h2>
@@ -48,8 +51,6 @@
 
 		<h2>{{$corporate}}</h2>
 		{{include file="field_input.tpl" field=$allowed_sites}}
-		{{include file="field_input.tpl" field=$allowed_email}}
-		{{include file="field_input.tpl" field=$forbidden_nicknames}}
 		{{include file="field_checkbox.tpl" field=$no_oembed_rich_content}}
 		{{include file="field_input.tpl" field=$allowed_oembed}}
 		{{include file="field_checkbox.tpl" field=$block_public}}
