@@ -217,7 +217,7 @@ class Network
 		}
 
 		foreach ($domain_blocklist as $domain_block) {
-			if (fnmatch(strtolower($domain_block['domain']), strtolower($uri->getHost()))) {
+			if (!empty($domain_block['domain']) && fnmatch(strtolower($domain_block['domain']), strtolower($uri->getHost()))) {
 				return true;
 			}
 		}
