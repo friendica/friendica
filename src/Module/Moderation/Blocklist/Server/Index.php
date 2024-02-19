@@ -69,7 +69,6 @@ class Index extends BaseModeration
 			}
 		}
 
-		$this->logger->debug('Blubb', ['blocklist' => $blocklist]);
 		$this->blocklist->set($blocklist);
 
 		Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
