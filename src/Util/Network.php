@@ -271,17 +271,17 @@ class Network
 			return false;
 		}
 
+		$allowed = DI::config()->get('system', 'allowed_email');
+		if (!empty($allowed) && self::isDomainMatch($domain, explode(',', $allowed))) {
+			return true;
+		}
+
 		$disallowed = DI::config()->get('system', 'disallowed_email');
 		if (!empty($disallowed) && self::isDomainMatch($domain, explode(',', $disallowed))) {
 			return false;
 		}
 
-		$allowed = DI::config()->get('system', 'allowed_email');
-		if (empty($allowed)) {
-			return true;
-		}
-
-		return self::isDomainMatch($domain, explode(',', $allowed));
+		return true;
 	}
 
 	/**
