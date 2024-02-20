@@ -154,6 +154,7 @@
 			"commented" => ["post-thread-user", "commented"],
 			"received" => ["post-thread-user", "received"],
 			"created" => ["post-thread-user", "created"],
+			"network" => ["post-thread-user", "network"],
 			"restricted" => ["post-searchindex", "language"],
 			"comments" => "0",
 			"activities" => "0",

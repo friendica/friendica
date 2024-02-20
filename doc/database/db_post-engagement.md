@@ -16,6 +16,7 @@ Fields
 | searchtext   | Simplified text for the full text search                              | mediumtext         | YES  |     | NULL    |       |
 | size         | Body size                                                             | int unsigned       | YES  |     | NULL    |       |
 | created      |                                                                       | datetime           | YES  |     | NULL    |       |
+| network      |                                                                       | char(4)            | YES  |     | NULL    |       |
 | restricted   | If true, this post is either unlisted or not from a federated network | boolean            | NO   |     | 0       |       |
 | comments     | Number of comments                                                    | mediumint unsigned | YES  |     | NULL    |       |
 | activities   | Number of activities (like, dislike, ...)                             | mediumint unsigned | YES  |     | NULL    |       |

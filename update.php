@@ -1429,3 +1429,10 @@ function update_1552()
 
 	return Update::SUCCESS;
 }
+
+function update_1554()
+{
+	DBA::e("UPDATE `post-engagement` INNER JOIN `post` ON `post`.`uri-id` = `post-engagement`.`uri-id` SET `post-engagement`.`network` = `post`.`network`");
+
+	return Update::SUCCESS;
+}

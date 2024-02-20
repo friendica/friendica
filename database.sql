@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2024.03-rc (Yellow Archangel)
--- DB_UPDATE_VERSION 1553
+-- DB_UPDATE_VERSION 1554
 -- ------------------------------------------
 
 
@@ -1352,6 +1352,7 @@ CREATE TABLE IF NOT EXISTS `post-engagement` (
 	`searchtext` mediumtext COMMENT 'Simplified text for the full text search',
 	`size` int unsigned COMMENT 'Body size',
 	`created` datetime COMMENT '',
+	`network` char(4) COMMENT '',
 	`restricted` boolean NOT NULL DEFAULT '0' COMMENT 'If true, this post is either unlisted or not from a federated network',
 	`comments` mediumint unsigned COMMENT 'Number of comments',
 	`activities` mediumint unsigned COMMENT 'Number of activities (like, dislike, ...)',
@@ -2123,6 +2124,7 @@ CREATE VIEW `post-searchindex-user-view` AS SELECT
 	`post-thread-user`.`commented` AS `commented`,
 	`post-thread-user`.`received` AS `received`,
 	`post-thread-user`.`created` AS `created`,
+	`post-thread-user`.`network` AS `network`,
 	`post-searchindex`.`language` AS `restricted`,
 	0 AS `comments`,
 	0 AS `activities`

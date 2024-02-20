@@ -118,6 +118,7 @@ class Engagement
 			'searchtext'   => $searchtext,
 			'size'         => self::getContentSize($parent),
 			'created'      => $parent['created'],
+			'network'      => $parent['network'],
 			'restricted'   => !in_array($item['network'], Protocol::FEDERATED) || ($parent['private'] != Item::PUBLIC),
 			'comments'     => DBA::count('post', ['parent-uri-id' => $item['parent-uri-id'], 'gravity' => Item::GRAVITY_COMMENT]),
 			'activities'   => DBA::count('post', [

@@ -74,6 +74,8 @@ class Timeline extends BaseModule
 	protected $raw;
 	/** @var string */
 	protected $order;
+	/** @var string */
+	protected $network;
 
 	/** @var App\Mode $mode */
 	protected $mode;
@@ -371,6 +373,10 @@ class Timeline extends BaseModule
 		}
 
 		$this->setMaxMinByOrder($request);
+
+		if (!empty($this->network)) {
+			$condition = DBA::mergeConditions($condition, ['network' => $this->network]);
+		}
 
 		if (($this->selectedTab != ChannelEntity::LANGUAGE) && !is_numeric($this->selectedTab)) {
 			$condition = $this->addLanguageCondition($uid, $condition);

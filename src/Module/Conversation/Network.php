@@ -65,8 +65,6 @@ class Network extends Timeline
 	/** @var int */
 	protected $circleId;
 	/** @var string */
-	protected $network;
-	/** @var string */
 	protected $dateFrom;
 	/** @var string */
 	protected $dateTo;
