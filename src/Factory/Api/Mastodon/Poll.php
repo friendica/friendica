@@ -67,10 +67,12 @@ class Poll extends BaseFactory
 
 		if (empty($uid)) {
 			$ownvotes = null;
+			$voted    = null;
 		} else {
 			$ownvotes = [];
+			$voted    = false;
 		}
 
-		return new \Friendica\Object\Api\Mastodon\Poll($question, $options, $expired, $votes, $ownvotes);
+		return new \Friendica\Object\Api\Mastodon\Poll($question, $options, $expired, $votes, $ownvotes, $voted);
 	}
 }

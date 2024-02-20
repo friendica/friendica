@@ -61,7 +61,7 @@ class Poll extends BaseDataTransferObject
 	 * @param int   $votes    Number of total votes
 	 * @param array $ownvotes Own vote
 	 */
-	public function __construct(array $question, array $options, bool $expired, int $votes, array $ownvotes = null)
+	public function __construct(array $question, array $options, bool $expired, int $votes, array $ownvotes = null, bool $voted = null)
 	{
 		$this->id           = (string)$question['id'];
 		$this->expires_at   = !empty($question['end-time']) ? DateTimeFormat::utc($question['end-time'], DateTimeFormat::JSON) : null;
@@ -69,9 +69,23 @@ class Poll extends BaseDataTransferObject
 		$this->multiple     = (bool)$question['multiple'];
 		$this->votes_count  = $votes;
 		$this->voters_count = $this->multiple ? $question['voters'] : null;
-		$this->voted        = null;
+		$this->voted        = $voted;
 		$this->own_votes    = $ownvotes;
 		$this->options      = $options;
 		$this->emojis       = [];
+	}
+
+	public function toArray(): array
+	{
+		$status = parent::toArray();
+
+		if (is_null($status['voted'])) {
+			unset($status['voted']);
+		}
+
+		if (is_null($status['own_votes'])) {
+			unset($status['own_votes']);
+		}
+		return $status;
 	}
 }

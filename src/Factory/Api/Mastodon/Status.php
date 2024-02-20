@@ -32,7 +32,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
-use Friendica\Model\Tag as TagModel;
 use Friendica\Model\Verb;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Api\Mastodon\Status\FriendicaDeliveryData;
@@ -60,8 +59,6 @@ class Status extends BaseFactory
 	private $mstdnAttachmentFactory;
 	/** @var Emoji */
 	private $mstdnEmojiFactory;
-	/** @var Error */
-	private $mstdnErrorFactory;
 	/** @var Poll */
 	private $mstdnPollFactory;
 	/** @var ContentItem */
@@ -78,7 +75,6 @@ class Status extends BaseFactory
 		Card $mstdnCardFactory,
 		Attachment $mstdnAttachmentFactory,
 		Emoji $mstdnEmojiFactory,
-		Error $mstdnErrorFactory,
 		Poll $mstdnPollFactory,
 		ContentItem $contentItem,
 		ACLFormatter $aclFormatter
@@ -91,7 +87,6 @@ class Status extends BaseFactory
 		$this->mstdnCardFactory       = $mstdnCardFactory;
 		$this->mstdnAttachmentFactory = $mstdnAttachmentFactory;
 		$this->mstdnEmojiFactory      = $mstdnEmojiFactory;
-		$this->mstdnErrorFactory      = $mstdnErrorFactory;
 		$this->mstdnPollFactory       = $mstdnPollFactory;
 		$this->contentItem            = $contentItem;
 		$this->aclFormatter           = $aclFormatter;
