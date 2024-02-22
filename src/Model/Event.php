@@ -925,9 +925,6 @@ class Event
 			$end_short   = '';
 		}
 
-		// Format the event location.
-		$location = self::locationToArray($item['event-location']);
-
 		// Construct the profile link (magic-auth).
 		$author       = [
 			'uid'     => 0,
@@ -964,7 +961,7 @@ class Event
 			'$show_map_label' => DI::l10n()->t('Show map'),
 			'$hide_map_label' => DI::l10n()->t('Hide map'),
 			'$map_btn_label'  => DI::l10n()->t('Show map'),
-			'$location'       => $location
+			'$location'       => self::locationToTemplateVars($item['event-location']),
 		]);
 
 		return $return;
@@ -984,7 +981,7 @@ class Event
 	 * 'coordinates' => Latitude and longitude (e.g. '48.864716,2.349014').<br>
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	private static function locationToArray(string $s = ''): array
+	private static function locationToTemplateVars(string $s = ''): array
 	{
 		if ($s == '') {
 			return [];
