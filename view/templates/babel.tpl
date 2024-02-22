@@ -1,6 +1,7 @@
 <div id="babel" class="generic-page-wrapper">
 	<h2>{{$title}}</h2>
 	<form action="babel" method="post" class="panel panel-default">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		<div class="panel-body">
 			<div class="form-group">
 				{{include file="field_textarea.tpl" field=$text}}
