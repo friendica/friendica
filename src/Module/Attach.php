@@ -65,11 +65,7 @@ class Attach extends BaseModule
 		// error in Chrome for filenames with commas in them
 		header('Content-type: ' . $item['filetype']);
 		header('Content-length: ' . $item['filesize']);
-		if (isset($_GET['attachment']) && $_GET['attachment'] === '0') {
-			header('Content-disposition: filename="' . $item['filename'] . '"');
-		} else {
-			header('Content-disposition: attachment; filename="' . $item['filename'] . '"');
-		}
+		header('Content-disposition: attachment; filename="' . $item['filename'] . '"');
 
 		echo $data;
 		System::exit();
