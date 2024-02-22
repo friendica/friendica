@@ -29,7 +29,6 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\Definition\DbaDefinition;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -47,8 +46,7 @@ use Psr\Log\LoggerInterface;
  **/
 class UserExport extends BaseSettings
 {
-	/** @var DbaDefinition */
-	private $dbaDefinition;
+	private DbaDefinition $dbaDefinition;
 
 	public function __construct(DbaDefinition $dbaDefinition, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
@@ -86,10 +84,12 @@ class UserExport extends BaseSettings
 		 * options shown on "Export personal data" page
 		 * list of array( 'link url', 'link text', 'help text' )
 		 */
+
+		$t = self::getFormSecurityToken('userexport');
 		$options = [
-			['settings/userexport/account', $this->l10n->t('Export account'), $this->l10n->t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
-			['settings/userexport/backup', $this->l10n->t('Export all'), $this->l10n->t('Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')],
-			['settings/userexport/contact', $this->l10n->t('Export Contacts to CSV'), $this->l10n->t('Export the list of the accounts you are following as CSV file. Compatible to e.g. Mastodon.')],
+			['settings/userexport/account?t=' . $t, $this->l10n->t('Export account'), $this->l10n->t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
+			['settings/userexport/backup?t=' . $t, $this->l10n->t('Export all'), $this->l10n->t('Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')],
+			['settings/userexport/contact?t=' . $t, $this->l10n->t('Export Contacts to CSV'), $this->l10n->t('Export the list of the accounts you are following as CSV file. Compatible to e.g. Mastodon.')],
 		];
 		Hook::callAll('uexport_options', $options);
 
@@ -115,20 +115,21 @@ class UserExport extends BaseSettings
 		}
 
 		if (isset($this->parameters['action'])) {
+			self::checkFormSecurityTokenForbiddenOnError('userexport', 't');
 			switch ($this->parameters['action']) {
 				case 'backup':
 					header('Content-type: application/json');
-					header('Content-Disposition: attachment; filename="' . DI::app()->getLoggedInUserNickname() . '.' . $this->parameters['action'] . '"');
+					header('Content-Disposition: attachment; filename="' . $this->session->getLocalUserNickname() . '.' . $this->parameters['action'] . '"');
 					$this->echoAll($this->session->getLocalUserId());
 					break;
 				case 'account':
 					header('Content-type: application/json');
-					header('Content-Disposition: attachment; filename="' . DI::app()->getLoggedInUserNickname() . '.' . $this->parameters['action'] . '"');
+					header('Content-Disposition: attachment; filename="' . $this->session->getLocalUserNickname() . '.' . $this->parameters['action'] . '"');
 					$this->echoAccount($this->session->getLocalUserId());
 					break;
 				case 'contact':
 					header('Content-type: application/csv');
-					header('Content-Disposition: attachment; filename="' . DI::app()->getLoggedInUserNickname() . '-contacts.csv' . '"');
+					header('Content-Disposition: attachment; filename="' . $this->session->getLocalUserNickname() . '-contacts.csv' . '"');
 					$this->echoContactsAsCSV($this->session->getLocalUserId());
 					break;
 			}
@@ -156,11 +157,8 @@ class UserExport extends BaseSettings
 				if (!isset($row[$column])) {
 					continue;
 				}
-				if ($field['type'] == 'datetime') {
-					$p[$column] = $row[$column] ?? DBA::NULL_DATETIME;
-				} else {
-					$p[$column] = $row[$column];
-				}
+
+				$p[$column] = $row[$column];
 			}
 			$result[] = $p;
 		}
