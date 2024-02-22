@@ -30,6 +30,8 @@ class PhpInfo extends BaseAdmin
 	{
 		self::checkAdminAccess();
 
+		self::checkFormSecurityTokenForbiddenOnError('phpinfo', 't');
+
 		phpinfo();
 		System::exit();
 	}
