@@ -142,7 +142,8 @@ class API extends BaseModule
 	{
 		$eventId = !empty($request['event_id']) ? intval($request['event_id']) : 0;
 		$uid     = (int)$this->session->getLocalUserId();
-		$cid     = !empty($request['cid']) ? intval($request['cid']) : 0;
+		// No overwriting event.cid on edit
+		$cid     = !empty($request['cid']) && !$eventId ? intval($request['cid']) : 0;
 
 		$strStartDateTime  = Strings::escapeHtml($request['start_text'] ?? '');
 		$strFinishDateTime = Strings::escapeHtml($request['finish_text'] ?? '');
