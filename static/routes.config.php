@@ -571,6 +571,7 @@ return [
 		'/{type}/{id:\d+}'                                         => [Module\Photo::class, [R::GET]],
 		'/{type:contact|header}/{guid}'                            => [Module\Photo::class, [R::GET]],
 		'/{type}/{nickname_ext}'                                   => [Module\Photo::class, [R::GET]],
+		// Contact Id Fallback, to remove after version 2024.03
 		'/{type:contact|header}/{customsize:\d+}/{contact_id:\d+}' => [Module\Photo::class, [R::GET]],
 		'/{type:contact|header}/{customsize:\d+}/{guid}'           => [Module\Photo::class, [R::GET]],
 		'/{type}/{customsize:\d+}/{id:\d+}'                        => [Module\Photo::class, [R::GET]],

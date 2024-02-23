@@ -99,11 +99,12 @@ class Introduction extends BaseFactory
 
 		try {
 			$stmtNotifications = $this->dba->p(
-				"SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*,
+				"SELECT `intro`.`id` AS `intro_id`, `intro`.*, `contact`.*, `item-uri`.`guid`
 				`suggest-contact`.`name` AS `fname`, `suggest-contact`.`url` AS `furl`, `suggest-contact`.`addr` AS `faddr`,
 				`suggest-contact`.`photo` AS `fphoto`, `suggest-contact`.`request` AS `frequest`
 			FROM `intro`
 				LEFT JOIN `contact` ON `contact`.`id` = `intro`.`contact-id`
+				LEFT JOIN `item-uri` ON `item-uri`.`id` = `contact`.`uri-id`)
 				LEFT JOIN `contact` AS `suggest-contact` ON `intro`.`suggest-cid` = `suggest-contact`.`id`
 			WHERE `intro`.`uid` = ? $sql_extra
 			LIMIT ?, ?",

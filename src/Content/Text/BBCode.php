@@ -875,23 +875,23 @@ class BBCode
 			function ($match) use ($callback, $uriid) {
 				$attributes = self::extractShareAttributes($match[2]);
 
-				$author_contact = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
-				$author_contact['url'] = ($author_contact['url'] ?? $attributes['profile']);
-				$author_contact['addr'] = ($author_contact['addr'] ?? '');
+				$author_account = Contact::selectFirstAccount(['id', 'url', 'addr', 'name', 'micro', 'guid', 'updated'], ['url' => $attributes['profile']]);
+				$author_account['url'] = ($author_account['url'] ?? $attributes['profile']);
+				$author_account['addr'] = ($author_account['addr'] ?? '');
 
-				$attributes['author']   = ($author_contact['name']  ?? '') ?: $attributes['author'];
-				$attributes['avatar']   = ($author_contact['micro'] ?? '') ?: $attributes['avatar'];
-				$attributes['profile']  = ($author_contact['url']   ?? '') ?: $attributes['profile'];
+				$attributes['author']   = ($author_account['name']  ?? '') ?: $attributes['author'];
+				$attributes['avatar']   = ($author_account['micro'] ?? '') ?: $attributes['avatar'];
+				$attributes['profile']  = ($author_account['url']   ?? '') ?: $attributes['profile'];
 
-				if (!empty($author_contact['id'])) {
-					$attributes['avatar'] = Contact::getAvatarUrlForId($author_contact['id'], Proxy::SIZE_THUMB);
+				if (!empty($author_account['id'])) {
+					$attributes['avatar'] = Contact::getAvatarUrlForId($author_account['guid'], $author_account['updated'], Proxy::SIZE_THUMB);
 				} elseif ($attributes['avatar']) {
 					$attributes['avatar'] = self::proxyUrl($attributes['avatar'], self::INTERNAL, $uriid, Proxy::SIZE_THUMB);
 				}
 
 				$content = preg_replace(Strings::autoLinkRegEx(), '<a href="$1">$1</a>', $match[3]);
 
-				return $match[1] . $callback($attributes, $author_contact, $content, trim($match[1]) != '');
+				return $match[1] . $callback($attributes, $author_account, $content, trim($match[1]) != '');
 			},
 			$text
 		);

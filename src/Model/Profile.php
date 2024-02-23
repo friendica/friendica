@@ -308,12 +308,12 @@ class Profile
 
 		$profile_url = $profile['url'];
 
-		$contact = Contact::selectFirst(['id'], ['uri-id' => $profile['uri-id'], 'uid' => 0]);
-		if (!$contact) {
+		$account = Contact::selectFirstAccount(['id', 'guid', 'updated'], ['uri-id' => $profile['uri-id']]);
+		if (!$account) {
 			return $o;
 		}
 
-		$cid = $contact['id'];
+		$cid = $account['id'];
 
 		$follow_link = null;
 		$unfollow_link = null;
@@ -449,7 +449,7 @@ class Profile
 			$p['address'] = BBCode::convertForUriId($profile['uri-id'] ?? 0, $p['address']);
 		}
 
-		$p['photo'] = Contact::getAvatarUrlForId($cid, Proxy::SIZE_SMALL);
+		$p['photo'] = Contact::getAvatarUrlForId($account['guid'], $account['updated'], Proxy::SIZE_SMALL);
 
 		$p['url'] = Contact::magicLinkById($cid, $profile['url']);
 

@@ -234,10 +234,10 @@ class Nav
 			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes')];
 
 			// user info
-			$contact = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
+			$account = Contact::selectFirstAccountUser(['id', 'url', 'guid', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
 			$userinfo = [
-				'icon' => Contact::getMicro($contact),
-				'name' => $contact['name'],
+				'icon' => Contact::getMicro($account),
+				'name' => $account['name'],
 			];
 		}
 

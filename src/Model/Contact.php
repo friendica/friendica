@@ -1818,72 +1818,72 @@ class Contact
 	/**
 	 * Return the photo path for a given contact array in the given size
 	 *
-	 * @param array  $contact   contact array
+	 * @param array  $account   Account array (from account-* view)
 	 * @param string $size      Size of the avatar picture
 	 * @param bool   $no_update Don't perform an update if no cached avatar was found
 	 * @return string photo path
 	 */
-	private static function getAvatarPath(array $contact, string $size, bool $no_update = false): string
+	private static function getAvatarPath(array $account, string $size, bool $no_update = false): string
 	{
-		$contact = self::checkAvatarCacheByArray($contact, $no_update);
+		$account = self::checkAvatarCacheByArray($account, $no_update);
 
 		if (DI::config()->get('system', 'avatar_cache')) {
 			switch ($size) {
 				case Proxy::SIZE_MICRO:
-					if (!empty($contact['micro']) && !Photo::isPhotoURI($contact['micro'])) {
-						return $contact['micro'];
+					if (!empty($account['micro']) && !Photo::isPhotoURI($account['micro'])) {
+						return $account['micro'];
 					}
 					break;
 				case Proxy::SIZE_THUMB:
-					if (!empty($contact['thumb']) && !Photo::isPhotoURI($contact['thumb'])) {
-						return $contact['thumb'];
+					if (!empty($account['thumb']) && !Photo::isPhotoURI($account['thumb'])) {
+						return $account['thumb'];
 					}
 					break;
 				case Proxy::SIZE_SMALL:
-					if (!empty($contact['photo']) && !Photo::isPhotoURI($contact['photo'])) {
-						return $contact['photo'];
+					if (!empty($account['photo']) && !Photo::isPhotoURI($account['photo'])) {
+						return $account['photo'];
 					}
 					break;
 			}
 		}
 
-		return self::getAvatarUrlForId($contact['id'] ?? 0, $size, $contact['updated'] ?? '');
+		return self::getAvatarUrlForId($account['guid'], $account['updated'], $size);
 	}
 
 	/**
 	 * Return the photo path for a given contact array
 	 *
-	 * @param array  $contact   Contact array
+	 * @param array  $account   Account array (from account-* view)
 	 * @param bool   $no_update Don't perform an update if no cached avatar was found
 	 * @return string photo path
 	 */
-	public static function getPhoto(array $contact, bool $no_update = false): string
+	public static function getPhoto(array $account, bool $no_update = false): string
 	{
-		return self::getAvatarPath($contact, Proxy::SIZE_SMALL, $no_update);
+		return self::getAvatarPath($account, Proxy::SIZE_SMALL, $no_update);
 	}
 
 	/**
 	 * Return the photo path (thumb size) for a given contact array
 	 *
-	 * @param array  $contact   Contact array
+	 * @param array  $account   Account array (from account-* view)
 	 * @param bool   $no_update Don't perform an update if no cached avatar was found
 	 * @return string photo path
 	 */
-	public static function getThumb(array $contact, bool $no_update = false): string
+	public static function getThumb(array $account, bool $no_update = false): string
 	{
-		return self::getAvatarPath($contact, Proxy::SIZE_THUMB, $no_update);
+		return self::getAvatarPath($account, Proxy::SIZE_THUMB, $no_update);
 	}
 
 	/**
 	 * Return the photo path (micro size) for a given contact array
 	 *
-	 * @param array  $contact   Contact array
+	 * @param array  $account   Account array (from account-* view)
 	 * @param bool   $no_update Don't perform an update if no cached avatar was found
 	 * @return string photo path
 	 */
-	public static function getMicro(array $contact, bool $no_update = false): string
+	public static function getMicro(array $account, bool $no_update = false): string
 	{
-		return self::getAvatarPath($contact, Proxy::SIZE_MICRO, $no_update);
+		return self::getAvatarPath($account, Proxy::SIZE_MICRO, $no_update);
 	}
 
 	/**
@@ -2148,24 +2148,16 @@ class Contact
 	}
 
 	/**
-	 * Get avatar link for given contact id
+	 * Get avatar link for given contact guid
 	 *
-	 * @param integer $cid     contact id
-	 * @param string  $size    One of the Proxy::SIZE_* constants
+	 * @param string  $guid    Contact guid (from account-* views)
 	 * @param string  $updated Contact update date
+	 * @param ?string $size    One of the Proxy::SIZE_* constants or empty for original size
 	 * @param bool    $static  If "true" a parameter is added to convert the avatar to a static one
 	 * @return string avatar link
 	 */
-	public static function getAvatarUrlForId(int $cid, string $size = '', string $updated = '', string $guid = '', bool $static = false): string
+	public static function getAvatarUrlForId(string $guid, string $updated, string $size = null, bool $static = false): string
 	{
-		// We have to fetch the "updated" variable when it wasn't provided
-		// The parameter can be provided to improve performance
-		if (empty($updated)) {
-			$account = DBA::selectFirst('account-user-view', ['updated', 'guid'], ['id' => $cid]);
-			$updated = $account['updated'] ?? '';
-			$guid = $account['guid'] ?? '';
-		}
-
 		$guid = urlencode($guid);
 
 		$url = DI::baseUrl() . '/photo/contact/';
@@ -2194,7 +2186,7 @@ class Contact
 			$query_params['static'] = true;
 		}
 
-		return $url . ($guid ?: $cid) . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
+		return $url . $guid . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
 	}
 
 	/**
@@ -2211,29 +2203,21 @@ class Contact
 			"`nurl` = ? AND ((`uid` = ? AND `network` IN (?, ?)) OR `uid` = ?)",
 			Strings::normaliseLink($url), $uid, Protocol::FEED, Protocol::MAIL, 0
 		];
-		$contact = self::selectFirst(['id', 'updated'], $condition, ['order' => ['uid' => true]]);
-		return self::getAvatarUrlForId($contact['id'] ?? 0, $size, $contact['updated'] ?? '');
+		$account = self::selectFirstAccountUser(['id', 'guid', 'updated'], $condition, ['order' => ['uid' => true]]);
+		return self::getAvatarUrlForId($account['guid'] ?? '', $account['updated'] ?? DBA::NULL_DATETIME, $size);
 	}
 
 	/**
-	 * Get header link for given contact id
+	 * Get header link for given contact guid
 	 *
-	 * @param integer $cid     contact id
-	 * @param string  $size    One of the Proxy::SIZE_* constants
+	 * @param string  $guid    Contact guid (from account-* views)
 	 * @param string  $updated Contact update date
+	 * @param ?string $size    One of the Proxy::SIZE_* constants or empty for original size
 	 * @param bool    $static  If "true" a parameter is added to convert the header to a static one
 	 * @return string header link
 	 */
-	public static function getHeaderUrlForId(int $cid, string $size = '', string $updated = '', string $guid = '', bool $static = false): string
+	public static function getHeaderUrlForId(string $guid, string $updated, string $size = null, bool $static = false): string
 	{
-		// We have to fetch the "updated" variable when it wasn't provided
-		// The parameter can be provided to improve performance
-		if (empty($updated) || empty($guid)) {
-			$account = DBA::selectFirst('account-user-view', ['updated', 'guid'], ['id' => $cid]);
-			$updated = $account['updated'] ?? '';
-			$guid = $account['guid'] ?? '';
-		}
-
 		$guid = urlencode($guid);
 
 		$url = DI::baseUrl() . '/photo/header/';
@@ -2263,7 +2247,7 @@ class Contact
 			$query_params['static'] = true;
 		}
 
-		return $url . ($guid ?: $cid) . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
+		return $url . $guid . (!empty($query_params) ? '?' . http_build_query($query_params) : '');
 	}
 
 	/**

@@ -56,16 +56,16 @@ class Media extends BaseModule
 	{
 		$cid = $this->parameters['id'];
 
-		$contact = Model\Contact::selectFirst([], ['id' => $cid]);
-		if (empty($contact)) {
+		$account = Model\Contact::selectFirstAccount([], ['id' => $cid]);
+		if (empty($account)) {
 			throw new BadRequestException(DI::l10n()->t('Contact not found.'));
 		}
 
-		DI::page()['aside'] = Widget\VCard::getHTML($contact);
+		DI::page()['aside'] = Widget\VCard::getHTML($account);
 
-		$o = Contact::getTabsHTML($contact, Contact::TAB_MEDIA);
+		$o = Contact::getTabsHTML($account, Contact::TAB_MEDIA);
 
-		$o .= ModelContact::getPostsFromUrl($contact['url'], $this->userSession->getLocalUserId(), true);
+		$o .= ModelContact::getPostsFromUrl($account['url'], $this->userSession->getLocalUserId(), true);
 
 		return $o;
 	}

@@ -104,37 +104,37 @@ class Advanced extends BaseModule
 	{
 		$cid = $this->parameters['id'];
 
-		$contact = Model\Contact::selectFirst([], ['id' => $cid, 'uid' => DI::userSession()->getLocalUserId()]);
-		if (empty($contact)) {
+		$account = Model\Contact::selectFirstAccountUser([], ['id' => $cid, 'uid' => DI::userSession()->getLocalUserId()]);
+		if (empty($account)) {
 			throw new BadRequestException($this->t('Contact not found.'));
 		}
 
-		$this->page['aside'] = Widget\VCard::getHTML($contact);
+		$this->page['aside'] = Widget\VCard::getHTML($account);
 
 		$returnaddr = "contact/$cid";
 
 		// This data is fetched automatically for most networks.
 		// Editing does only makes sense for mail and feed contacts.
-		if (!in_array($contact['network'], [Protocol::FEED, Protocol::MAIL])) {
+		if (!in_array($account['network'], [Protocol::FEED, Protocol::MAIL])) {
 			$readonly = 'readonly';
 		} else {
 			$readonly = '';
 		}
 
-		$tab_str = Contact::getTabsHTML($contact, Contact::TAB_ADVANCED);
+		$tab_str = Contact::getTabsHTML($account, Contact::TAB_ADVANCED);
 
 		$tpl = Renderer::getMarkupTemplate('contact/advanced.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$tab_str'           => $tab_str,
 			'$returnaddr'        => $returnaddr,
 			'$return'            => $this->t('Return to contact editor'),
-			'$contact_id'        => $contact['id'],
+			'$contact_id'        => $account['id'],
 			'$lbl_submit'        => $this->t('Submit'),
 
-			'$name'    => ['name', $this->t('Name'), $contact['name'], '', '', $readonly],
-			'$nick'    => ['nick', $this->t('Account Nickname'), $contact['nick'], '', '', 'readonly'],
-			'$url'     => ['url', $this->t('Account URL'), $contact['url'], '', '', 'readonly'],
-			'poll'     => ['poll', $this->t('Poll/Feed URL'), $contact['poll'], '', '', ($contact['network'] == Protocol::FEED) ? '' : 'readonly'],
+			'$name'    => ['name', $this->t('Name'), $account['name'], '', '', $readonly],
+			'$nick'    => ['nick', $this->t('Account Nickname'), $account['nick'], '', '', 'readonly'],
+			'$url'     => ['url', $this->t('Account URL'), $account['url'], '', '', 'readonly'],
+			'poll'     => ['poll', $this->t('Poll/Feed URL'), $account['poll'], '', '', ($account['network'] == Protocol::FEED) ? '' : 'readonly'],
 			'photo'    => ['photo', $this->t('New photo from this URL'), '', '', '', $readonly],
 		]);
 	}

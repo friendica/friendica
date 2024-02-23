@@ -86,19 +86,19 @@ class Conversations extends BaseModule
 			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
-		$contact = Model\Contact::getById($data['public']);
-		if (empty($contact)) {
+		$account = Model\Contact::selectFirstAccount([], ['id' => $data['public']]);
+		if (empty($account)) {
 			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
 		// Don't display contacts that are about to be deleted
-		if (!empty($contact['deleted']) || !empty($contact['network']) && $contact['network'] == Protocol::PHANTOM) {
+		if (!empty($account['deleted']) || !empty($account['network']) && $account['network'] == Protocol::PHANTOM) {
 			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
-		$localRelationship = $this->localRelationship->getForUserContact($this->userSession->getLocalUserId(), $contact['id']);
+		$localRelationship = $this->localRelationship->getForUserContact($this->userSession->getLocalUserId(), $account['id']);
 		if ($localRelationship->rel === Model\Contact::SELF) {
-			$this->baseUrl->redirect('profile/' . $contact['nick']);
+			$this->baseUrl->redirect('profile/' . $account['nick']);
 		}
 
 		// Load necessary libraries for the status editor
@@ -107,7 +107,7 @@ class Conversations extends BaseModule
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
 		$this->page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
-		$this->page['aside'] .= Widget\VCard::getHTML($contact, true);
+		$this->page['aside'] .= Widget\VCard::getHTML($account, true);
 
 		Nav::setSelected('contact');
 
@@ -115,12 +115,12 @@ class Conversations extends BaseModule
 			'lockstate' => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
 			'acl' => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
 			'bang' => '',
-			'content' => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+			'content' => ($account['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($account['addr'] ?: $account['url']),
 		];
 		$o = $this->conversation->statusEditor($options);
 
-		$o .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
-		$o .= Model\Contact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request['last_created'] ?? '');
+		$o .= Contact::getTabsHTML($account, Contact::TAB_CONVERSATIONS);
+		$o .= Model\Contact::getThreadsFromId($account['id'], $this->userSession->getLocalUserId(), 0, 0, $request['last_created'] ?? '');
 
 		return $o;
 	}

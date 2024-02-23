@@ -105,13 +105,12 @@ class Directory extends BaseModule
 	 * array for displaying directory entries.
 	 *
 	 * @param array  $contact    The directory entry from the database.
-	 * @param string $photo_size Avatar size (thumb, photo or micro).
 	 *
 	 * @return array
 	 *
 	 * @throws \Exception
 	 */
-	public static function formatEntry(array $contact, string $photo_size = 'photo'): array
+	public static function formatEntry(array $contact): array
 	{
 		$itemurl = (($contact['addr'] != "") ? $contact['addr'] : $contact['url']);
 

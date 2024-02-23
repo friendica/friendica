@@ -308,16 +308,15 @@ function message_content(App $a)
 			$body_e = BBCode::convertForUriId($message['uri-id'], $message['body']);
 			$to_name_e = $message['name'];
 
-			$contact = Contact::getByURL($message['from-url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
-			$from_photo = Contact::getThumb($contact);
+			$account = Contact::selectFirstAccount(['thumb', 'addr', 'id', 'avatar', 'url', 'guid', 'updated'], ['url' => $message['from-url']]);
 
 			$mails[] = [
 				'id'         => $message['id'],
 				'from_name'  => $from_name_e,
 				'from_url'   => $from_url,
-				'from_addr'  => $contact['addr'] ?? $from_url,
+				'from_addr'  => $account['addr'] ?? $from_url,
 				'sparkle'    => $sparkle,
-				'from_photo' => $from_photo,
+				'from_photo' => Contact::getThumb($account),
 				'subject'    => $subject_e,
 				'body'       => $body_e,
 				'delete'     => DI::l10n()->t('Delete message'),
@@ -439,16 +438,15 @@ function render_messages(array $msg, string $t): string
 			continue;
 		}
 
-		$contact = Contact::getByURL($rr['url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
-		$from_photo = Contact::getThumb($contact);
+		$account = Contact::selectFirstAccount(['thumb', 'addr', 'id', 'avatar', 'url', 'guid', 'updated'], ['url' => $rr['url']]);
 
 		$rslt .= Renderer::replaceMacros($tpl, [
 			'$id'         => $rr['id'],
 			'$from_name'  => $participants,
 			'$from_url'   => Contact::magicLink($rr['url']),
-			'$from_addr'  => $contact['addr'] ?? '',
+			'$from_addr'  => $account['addr'] ?? '',
 			'$sparkle'    => ' sparkle',
-			'$from_photo' => $from_photo,
+			'$from_photo' => Contact::getThumb($account),
 			'$subject'    => $rr['title'],
 			'$delete'     => DI::l10n()->t('Delete conversation'),
 			'$body'       => $body_e,

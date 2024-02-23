@@ -56,27 +56,27 @@ class User extends BaseFactory
 	{
 		$cdata = Contact::getPublicAndUserContactID($contactId, $uid);
 		if (!empty($cdata)) {
-			$publicContact = Contact::getById($cdata['public']);
+			$publicAccount = Contact::selectFirstAccount([], ['id' => $cdata['public']]);
 			$userContact = Contact::getById($cdata['user']);
 		} else {
-			$publicContact = Contact::getById($contactId);
+			$publicAccount = Contact::selectFirstAccount([], ['id' => $contactId]);
 			$userContact = [];
 		}
 
-		$apcontact = APContact::getByURL($publicContact['url'], false);
+		$apcontact = APContact::getByURL($publicAccount['url'], false);
 
 		$status = null;
 
 		if (!$skip_status) {
 			$post = Post::selectFirstPost(['uri-id'],
-				['author-id' => $publicContact['id'], 'gravity' => [Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], 'private'  => [Item::PUBLIC, Item::UNLISTED]],
+				['author-id' => $publicAccount['id'], 'gravity' => [Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], 'private'  => [Item::PUBLIC, Item::UNLISTED]],
 				['order' => ['uri-id' => true]]);
 			if (!empty($post['uri-id'])) {
 				$status = $this->status->createFromUriId($post['uri-id'], $uid)->toArray();
 			}
 		}
 
-		return new \Friendica\Object\Api\Twitter\User($publicContact, $apcontact, $userContact, $status, $include_user_entities);
+		return new \Friendica\Object\Api\Twitter\User($publicAccount, $apcontact, $userContact, $status, $include_user_entities);
 	}
 
 	/**

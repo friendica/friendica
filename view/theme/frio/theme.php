@@ -188,29 +188,29 @@ function frio_contact_photo_menu(&$args)
  *  Some links will point to the local pages because the user would expect
  *  local page (these pages are: search, community, help, apps, directory).
  *
- * @param App   $a        The App class
  * @param array $nav_info The original nav info array: nav, banner, userinfo, sitelocation
- * @throws Exception
+ * @throws ImagickException
+ * @throws \Friendica\Network\HTTPException\InternalServerErrorException
  */
 function frio_remote_nav(array &$nav_info)
 {
 	if (DI::mode()->has(App\Mode::MAINTENANCEDISABLED)) {
 		// get the homelink from $_SESSION
-		$homelink = Profile::getMyURL();
+		$homelink = DI::userSession()->getMyUrl();
 		if (!$homelink) {
 			$homelink = DI::session()->get('visitor_home', '');
 		}
 
 		// since $userinfo isn't available for the hook we write it to the nav array
 		// this isn't optimal because the contact query will be done now twice
-		$fields = ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'];
+		$fields = ['id', 'url', 'guid', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'];
 		if (DI::userSession()->isAuthenticated()) {
-			$remoteUser = Contact::selectFirst($fields, ['uid' => DI::userSession()->getLocalUserId(), 'self' => true]);
+			$remoteUser = Contact::selectFirstAccountUser($fields, ['uid' => DI::userSession()->getLocalUserId(), 'self' => true]);
 		} elseif (!DI::userSession()->getLocalUserId() && DI::userSession()->getRemoteUserId()) {
-			$remoteUser                = Contact::getById(DI::userSession()->getRemoteUserId(), $fields);
+			$remoteUser                = Contact::selectFirstAccountUser($fields, ['id' => DI::userSession()->getRemoteUserId()]);
 			$nav_info['nav']['remote'] = DI::l10n()->t('Guest');
-		} elseif (Profile::getMyURL()) {
-			$remoteUser                = Contact::getByURL($homelink, null, $fields);
+		} elseif (DI::userSession()->getMyUrl()) {
+			$remoteUser                = Contact::selectFirstAccount($fields, ['id' => Contact::getIdForURL($homelink)]);
 			$nav_info['nav']['remote'] = DI::l10n()->t('Visitor');
 		} else {
 			$remoteUser = null;

@@ -78,23 +78,25 @@ class GroupManager
 
 		$groupList = [];
 
-		$fields = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
-		$contacts = DBA::select('account-user-view', $fields, $condition, $params);
-		if (!$contacts) {
+		$fields = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid', 'guid', 'updated'];
+		$accounts = DBA::select('account-user-view', $fields, $condition, $params);
+		if (!$accounts) {
 			return $groupList;
 		}
 
-		while ($contact = DBA::fetch($contacts)) {
+		while ($account = DBA::fetch($accounts)) {
 			$groupList[] = [
-				'url'	=> $contact['url'],
-				'alias'	=> $contact['alias'],
-				'name'	=> $contact['name'],
-				'id'	=> $contact['id'],
-				'micro' => $contact['micro'],
-				'thumb' => $contact['thumb'],
+				'url'	=> $account['url'],
+				'alias'	=> $account['alias'],
+				'name'	=> $account['name'],
+				'id'	=> $account['id'],
+				'micro' => $account['micro'],
+				'thumb' => $account['thumb'],
+				'guid'  => $account['guid'],
+				'updated' => $account['updated'],
 			];
 		}
-		DBA::close($contacts);
+		DBA::close($accounts);
 
 		return($groupList);
 	}

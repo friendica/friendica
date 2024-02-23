@@ -100,6 +100,7 @@ class Photo extends BaseApi
 				$id = $account['id'];
 			}
 
+			// Contact Id Fallback, to remove after version 2024.03
 			if (isset($this->parameters['contact_id'])) {
 				$id = intval($this->parameters['contact_id']);
 			}

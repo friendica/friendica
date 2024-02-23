@@ -66,14 +66,14 @@ class Contacts extends BaseModule
 			throw new HTTPException\BadRequestException($this->t('Invalid contact.'));
 		}
 
-		$contact = Model\Contact::getById($cid, []);
-		if (empty($contact)) {
+		$account = Model\Contact::selectFirstAccount([], ['id' => $cid]);
+		if (empty($account)) {
 			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
 		}
 
 		$localContactId = Model\Contact::getPublicIdByUserId($this->userSession->getLocalUserId());
 
-		$this->page['aside'] = Widget\VCard::getHTML($contact);
+		$this->page['aside'] = Widget\VCard::getHTML($account);
 
 		$condition = [
 			'blocked' => false,
@@ -123,7 +123,7 @@ class Contacts extends BaseModule
 				$title = $this->tt('Mutual friend (%s)', 'Mutual friends (%s)', $total);
 				$desc = $this->t(
 					'These contacts both follow and are followed by <strong>%s</strong>.',
-					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
+					htmlentities($account['name'], ENT_COMPAT, 'UTF-8')
 				);
 				break;
 			case 'common':
@@ -131,7 +131,7 @@ class Contacts extends BaseModule
 				$title = $this->tt('Common contact (%s)', 'Common contacts (%s)', $total);
 				$desc = $this->t(
 					'Both <strong>%s</strong> and yourself have publicly interacted with these contacts (follow, comment or likes on public posts).',
-					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
+					htmlentities($account['name'], ENT_COMPAT, 'UTF-8')
 				);
 				break;
 			default:
@@ -139,7 +139,7 @@ class Contacts extends BaseModule
 				$title = $this->tt('Contact (%s)', 'Contacts (%s)', $total);
 		}
 
-		$o = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_CONTACTS);
+		$o = Module\Contact::getTabsHTML($account, Module\Contact::TAB_CONTACTS);
 
 		$tabs = self::getContactFilterTabs('contact/' . $cid, $type, true);
 

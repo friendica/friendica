@@ -2258,7 +2258,7 @@ class Probe
 				'name'             => $owner['name'], 'nick' => $owner['nick'], 'guid' => $approfile['diaspora:guid'] ?? '',
 				'url'              => $owner['url'], 'addr' => $owner['addr'], 'alias' => $owner['alias'],
 				'photo'            => User::getAvatarUrl($owner),
-				'header'           => $owner['header'] ? Contact::getHeaderUrlForId($owner['id'], $owner['updated']) : '',
+				'header'           => $owner['header'] ? Contact::getHeaderUrlForId($owner['guid'], $owner['updated']) : '',
 				'account-type'     => $owner['contact-type'], 'community' => ($owner['contact-type'] == User::ACCOUNT_TYPE_COMMUNITY),
 				'keywords'         => $owner['keywords'], 'location' => $owner['location'], 'about' => $owner['about'],
 				'xmpp'             => $owner['xmpp'], 'matrix' => $owner['matrix'],

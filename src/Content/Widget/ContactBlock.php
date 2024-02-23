@@ -104,19 +104,18 @@ class ContactBlock
 			$contact_uriids = array_column($personal_contacts, 'uri-id');
 
 			if (!empty($contact_uriids)) {
-				$contacts_stmt = DBA::select('contact', ['id', 'uid', 'addr', 'url', 'alias', 'name', 'thumb', 'avatar', 'network'], ['uri-id' => $contact_uriids, 'uid' => $contact_uid]);
+				$accounts_stmt = DBA::select('account-user-view', ['id', 'uid', 'addr', 'url', 'alias', 'name', 'thumb', 'avatar', 'network', 'guid', 'updated'], ['uri-id' => $contact_uriids, 'uid' => $contact_uid]);
 
-				if (DBA::isResult($contacts_stmt)) {
+				if (DBA::isResult($accounts_stmt)) {
 					$contacts_title = DI::l10n()->tt('%d Contact', '%d Contacts', $total);
-					$micropro = [];
 
-					while ($contact = DBA::fetch($contacts_stmt)) {
-						$contacts[] = $contact;
-						$micropro[] = HTML::micropro($contact, true, 'mpfriend');
+					while ($account = DBA::fetch($accounts_stmt)) {
+						$contacts[] = $account;
+						$micropro[] = HTML::micropro($account, true, 'mpfriend');
 					}
 				}
 
-				DBA::close($contacts_stmt);
+				DBA::close($accounts_stmt);
 			}
 		}
 

@@ -116,23 +116,23 @@ class Follow extends BaseModule
 			$submit = '';
 		}
 
-		$contact = Contact::getByURL($url, true);
+		$account = Contact::selectFirstAccount([], ['id' => Contact::getIdForURL($url, 0, true)]);
 
 		// Possibly it is a mail contact
-		if (empty($contact)) {
-			$contact = Probe::uri($url, Protocol::MAIL, $uid);
+		if (empty($account)) {
+			$account = Probe::uri($url, Protocol::MAIL, $uid);
 		}
 
-		if (empty($contact) || ($contact['network'] == Protocol::PHANTOM)) {
+		if (empty($account) || ($account['network'] == Protocol::PHANTOM)) {
 			// Possibly it is a remote item and not an account
 			$this->followRemoteItem($url);
 
 			$this->sysMessages->addNotice($this->t('The network type couldn\'t be detected. Contact can\'t be added.'));
 			$submit  = '';
-			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'keywords' => ''];
+			$account = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'keywords' => ''];
 		}
 
-		$protocol = Contact::getProtocol($contact['url'], $contact['network']);
+		$protocol = Contact::getProtocol($account['url'], $account['network']);
 
 		if (($protocol == Protocol::DIASPORA) && !$this->config->get('system', 'diaspora_enabled')) {
 			$this->sysMessages->addNotice($this->t('Diaspora support isn\'t enabled. Contact can\'t be added.'));
@@ -145,11 +145,11 @@ class Follow extends BaseModule
 		}
 
 		if ($protocol == Protocol::MAIL) {
-			$contact['url'] = $contact['addr'];
+			$account['url'] = $account['addr'];
 		}
 
 		if (!empty($request['auto'])) {
-			$this->process($contact['url']);
+			$this->process($account['url']);
 		}
 
 		$requestUrl = $this->baseUrl . '/contact/follow';
@@ -173,27 +173,27 @@ class Follow extends BaseModule
 			'$cancel'         => $this->t('Cancel'),
 
 			'$action'   => $requestUrl,
-			'$name'     => $contact['name'],
-			'$url'      => $contact['url'],
-			'$zrl'      => Profile::zrl($contact['url']),
+			'$name'     => $account['name'],
+			'$url'      => $account['url'],
+			'$zrl'      => Profile::zrl($account['url']),
 			'$myaddr'   => $myaddr,
-			'$keywords' => $contact['keywords'],
+			'$keywords' => $account['keywords'],
 
-			'$does_know_you' => ['knowyou', $this->t('%s knows you', $contact['name'])],
+			'$does_know_you' => ['knowyou', $this->t('%s knows you', $account['name'])],
 			'$addnote_field' => ['dfrn-request-message', $this->t('Add a personal note:')],
 		]);
 
 		$this->page['aside'] = '';
 
 		if (!in_array($protocol, [Protocol::PHANTOM, Protocol::MAIL])) {
-			$this->page['aside'] = VCard::getHTML($contact);
+			$this->page['aside'] = VCard::getHTML($account);
 
 			$output .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'),
 				['$title' => $this->t('Posts and Replies')]
 			);
 
 			// Show last public posts
-			$output .= Contact::getPostsFromUrl($contact['url'], $this->session->getLocalUserId());
+			$output .= Contact::getPostsFromUrl($account['url'], $this->session->getLocalUserId());
 		}
 
 		return $output;

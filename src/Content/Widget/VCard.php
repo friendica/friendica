@@ -41,21 +41,21 @@ class VCard
 	 * Get HTML for vcard block
 	 *
 	 * @template widget/vcard.tpl
-	 * @param array $contact
+	 * @param array $account Account array (from account-* view)
 	 * @param bool  $hide_mention
 	 * @return string
 	 */
-	public static function getHTML(array $contact, bool $hide_mention = false): string
+	public static function getHTML(array $account, bool $hide_mention = false): string
 	{
-		if (!isset($contact['network']) || !isset($contact['id'])) {
-			Logger::warning('Incomplete contact', ['contact' => $contact ?? []]);
+		if (!isset($account['network']) || !isset($account['id'])) {
+			Logger::warning('Incomplete contact', ['contact' => $account ?? []]);
 		}
 
-		$contact_url = Contact::getProfileLink($contact);
+		$contact_url = Contact::getProfileLink($account);
 
-		if ($contact['network'] != '') {
-			$network_link   = Strings::formatNetworkName($contact['network'], $contact_url);
-			$network_avatar = ContactSelector::networkToIcon($contact['network'], $contact_url);
+		if ($account['network'] != '') {
+			$network_link   = Strings::formatNetworkName($account['network'], $contact_url);
+			$network_avatar = ContactSelector::networkToIcon($account['network'], $contact_url);
 		} else {
 			$network_link   = '';
 			$network_avatar = '';
@@ -68,15 +68,15 @@ class VCard
 		$mention_link     = '';
 		$showgroup_link   = '';
 
-		$photo   = Contact::getPhoto($contact);
+		$photo   = Contact::getPhoto($account);
 
 		if (DI::userSession()->getLocalUserId()) {
-			if ($contact['uid']) {
-				$id      = $contact['id'];
-				$rel     = $contact['rel'];
-				$pending = $contact['pending'];
+			if ($account['uid']) {
+				$id      = $account['id'];
+				$rel     = $account['rel'];
+				$pending = $account['pending'];
 			} else {
-				$pcontact = Contact::selectFirst([], ['uid' => DI::userSession()->getLocalUserId(), 'uri-id' => $contact['uri-id'], 'deleted' => false]);
+				$pcontact = Contact::selectFirst([], ['uid' => DI::userSession()->getLocalUserId(), 'uri-id' => $account['uri-id'], 'deleted' => false]);
 
 				$id      = $pcontact['id'] ?? 0;
 				$rel     = $pcontact['rel'] ?? Contact::NOTHING;
@@ -87,7 +87,7 @@ class VCard
 				}
 			}
 
-			if (empty($contact['self']) && Protocol::supportsFollow($contact['network'])) {
+			if (empty($account['self']) && Protocol::supportsFollow($account['network'])) {
 				if (in_array($rel, [Contact::SHARING, Contact::FRIEND])) {
 					$unfollow_link = 'contact/unfollow?url=' . urlencode($contact_url) . '&auto=1';
 				} elseif (!$pending) {
@@ -95,34 +95,34 @@ class VCard
 				}
 			}
 
-			if (in_array($rel, [Contact::FOLLOWER, Contact::FRIEND]) && Contact::canReceivePrivateMessages($contact)) {
+			if (in_array($rel, [Contact::FOLLOWER, Contact::FRIEND]) && Contact::canReceivePrivateMessages($account)) {
 				$wallmessage_link = 'message/new/' . $id;
 			}
 
-			if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
+			if ($account['contact-type'] == Contact::TYPE_COMMUNITY) {
 				if (!$hide_mention) {
 					$mention_label  = DI::l10n()->t('Post to group');
-					$mention_link   = 'compose/0?body=!' . $contact['addr'];
+					$mention_link   = 'compose/0?body=!' . $account['addr'];
 				}
 				$showgroup_link = 'network/group/' . $id;
 			} elseif (!$hide_mention) {
 				$mention_label = DI::l10n()->t('Mention');
-				$mention_link  = 'compose/0?body=@' . $contact['addr'];
+				$mention_link  = 'compose/0?body=@' . $account['addr'];
 			}
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/vcard.tpl'), [
-			'$contact'          => $contact,
+			'$contact'          => $account,
 			'$photo'            => $photo,
-			'$url'              => Contact::magicLinkByContact($contact, $contact_url),
-			'$about'            => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'] ?? ''),
+			'$url'              => Contact::magicLinkByContact($account, $contact_url),
+			'$about'            => BBCode::convertForUriId($account['uri-id'] ?? 0, $account['about'] ?? ''),
 			'$xmpp'             => DI::l10n()->t('XMPP:'),
 			'$matrix'           => DI::l10n()->t('Matrix:'),
 			'$location'         => DI::l10n()->t('Location:'),
 			'$network_link'     => $network_link,
 			'$network_avatar'   => $network_avatar,
 			'$network'          => DI::l10n()->t('Network:'),
-			'$account_type'     => Contact::getAccountType($contact['contact-type']),
+			'$account_type'     => Contact::getAccountType($account['contact-type']),
 			'$follow'           => DI::l10n()->t('Follow'),
 			'$follow_link'      => $follow_link,
 			'$unfollow'         => DI::l10n()->t('Unfollow'),

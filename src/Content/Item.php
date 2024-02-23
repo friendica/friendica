@@ -590,18 +590,18 @@ class Item
 	public function getAuthorAvatar(array $item): string
 	{
 		if (in_array($item['network'], [Protocol::FEED, Protocol::MAIL])) {
-			$author_avatar  = $item['contact-id'];
+			$author_id      = $item['contact-id'];
 			$author_updated = '';
 			$author_thumb   = $item['contact-avatar'];
 		} else {
-			$author_avatar  = $item['author-id'];
+			$author_id      = $item['author-id'];
 			$author_updated = $item['author-updated'];
 			$author_thumb   = $item['author-avatar'];
 		}
 
-
 		if (empty($author_thumb) || Photo::isPhotoURI($author_thumb)) {
-			$author_thumb = Contact::getAvatarUrlForId($author_avatar, Proxy::SIZE_THUMB, $author_updated);
+			$author = Contact::selectFirstAccount(['guid', 'updated'], ['id' => $author_id]);
+			$author_thumb = Contact::getAvatarUrlForId($author['guid'], $author['updated'] ?? $author_updated, Proxy::SIZE_THUMB);
 		}
 
 		return $author_thumb;
@@ -610,17 +610,18 @@ class Item
 	public function getOwnerAvatar(array $item): string
 	{
 		if (in_array($item['network'], [Protocol::FEED, Protocol::MAIL])) {
-			$owner_avatar  = $item['contact-id'];
+			$owner_id      = $item['contact-id'];
 			$owner_updated = '';
 			$owner_thumb   = $item['contact-avatar'];
 		} else {
-			$owner_avatar   = $item['owner-id'];
-			$owner_updated  = $item['owner-updated'];
-			$owner_thumb    = $item['owner-avatar'];
+			$owner_id      = $item['owner-id'];
+			$owner_updated = $item['owner-updated'];
+			$owner_thumb   = $item['owner-avatar'];
 		}
 
 		if (empty($owner_thumb) || Photo::isPhotoURI($owner_thumb)) {
-			$owner_thumb = Contact::getAvatarUrlForId($owner_avatar, Proxy::SIZE_THUMB, $owner_updated);
+			$owner = Contact::selectFirstAccount(['guid', 'updated'], ['id' => $owner_id]);
+			$owner_thumb = Contact::getAvatarUrlForId($owner['guid'], $owner['updated'] ?? $owner_updated, Proxy::SIZE_THUMB);
 		}
 
 		return $owner_thumb;
@@ -1078,7 +1079,7 @@ class Item
 		$to_author     = DBA::selectFirst('account-view', ['ap-followers'], ['id' => $to['author-id']]);
 		$parent        = Post::selectFirstPost(['author-id'], ['uri-id' => $parentUriId]);
 		$parent_author = DBA::selectFirst('account-view', ['ap-followers'], ['id' => $parent['author-id']]);
-		
+
 		$followers = '';
 		foreach (array_column(Tag::getByURIId($parentUriId, [Tag::TO, Tag::CC, Tag::BCC]), 'url') as $url) {
 			if ($url == $parent_author['ap-followers']) {

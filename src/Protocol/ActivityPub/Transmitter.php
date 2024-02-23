@@ -414,7 +414,7 @@ class Transmitter
 			}
 
 			if (!empty($owner['header'])) {
-				$data['image'] = ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($owner['id'], '', $owner['updated'])];
+				$data['image'] = ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($owner['guid'], $owner['updated'])];
 
 				$resourceid = Photo::ridFromURI($owner['header']);
 				if (!empty($resourceid)) {
@@ -449,22 +449,26 @@ class Transmitter
 	/**
 	 * Get a minimal actor array for the C2S API
 	 *
-	 * @param integer $cid
+	 * @param integer $cid Public contact id
 	 * @return array
+	 * @throws \Exception
 	 */
 	private static function getActorArrayByCid(int $cid): array
 	{
-		$contact = Contact::getById($cid);
+		$account = Contact::selectFirstAccount(
+			['url', 'contact-type', 'alias', 'nick', 'name', 'guid', 'updated', 'manually-approve', 'unsearchable'],
+			['id' => $cid]
+		);
 		$data = [
-			'id'                        => $contact['url'],
-			'type'                      => $data['type'] = ActivityPub::ACCOUNT_TYPES[$contact['contact-type']],
-			'url'                       => $contact['alias'],
-			'preferredUsername'         => $contact['nick'],
-			'name'                      => $contact['name'],
-			'icon'                      => ['type' => 'Image', 'url' => Contact::getAvatarUrlForId($cid, '', $contact['updated'])],
-			'image'                     => ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($cid, '', $contact['updated'])],
-			'manuallyApprovesFollowers' => (bool)$contact['manually-approve'],
-			'discoverable'              => !$contact['unsearchable'],
+			'id'                        => $account['url'],
+			'type'                      => $data['type'] = ActivityPub::ACCOUNT_TYPES[$account['contact-type']],
+			'url'                       => $account['alias'],
+			'preferredUsername'         => $account['nick'],
+			'name'                      => $account['name'],
+			'icon'                      => ['type' => 'Image', 'url' => Contact::getAvatarUrlForId($account['guid'], $account['updated'])],
+			'image'                     => ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($account['guid'], $account['updated'])],
+			'manuallyApprovesFollowers' => (bool)$account['manually-approve'],
+			'discoverable'              => !$account['unsearchable'],
 		];
 
 		if (empty($data['url'])) {

@@ -128,7 +128,7 @@ class User extends BaseDataTransferObject
 	 */
 
 	/**
-	 * @param array $publicContact         Full contact table record with uid = 0
+	 * @param array $publicAccount         Full account-view table record
 	 * @param array $apcontact             Optional full apcontact table record
 	 * @param array $userContact           Optional full contact table record with uid != 0
 	 * @param null  $status
@@ -136,18 +136,18 @@ class User extends BaseDataTransferObject
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function __construct(array $publicContact, array $apcontact = [], array $userContact = [], $status = null, bool $include_user_entities = true)
+	public function __construct(array $publicAccount, array $apcontact = [], array $userContact = [], $status = null, bool $include_user_entities = true)
 	{
 		$uid = $userContact['uid'] ?? 0;
 
-		$this->id                      = (int)$publicContact['id'];
-		$this->id_str                  = (string) $publicContact['id'];
-		$this->name                    = $publicContact['name'] ?: $publicContact['nick'];
-		$this->screen_name             = $publicContact['nick'] ?: $publicContact['name'];
-		$this->location                = $publicContact['location'] ?:
-			ContactSelector::networkToName($publicContact['network'], $publicContact['url'], $publicContact['protocol']);
+		$this->id                      = (int)$publicAccount['id'];
+		$this->id_str                  = (string) $publicAccount['id'];
+		$this->name                    = $publicAccount['name'] ?: $publicAccount['nick'];
+		$this->screen_name             = $publicAccount['nick'] ?: $publicAccount['name'];
+		$this->location                = $publicAccount['location'] ?:
+			ContactSelector::networkToName($publicAccount['network'], $publicAccount['url'], $publicAccount['protocol']);
 		$this->derived                 = [];
-		$this->url                     = $publicContact['url'];
+		$this->url                     = $publicAccount['url'];
 		// No entities needed since we don't perform any shortening in the URL or description
 		$this->entities            = [
 			'url' => ['urls' => []],
@@ -156,17 +156,17 @@ class User extends BaseDataTransferObject
 		if (!$include_user_entities) {
 			unset($this->entities);
 		}
-		$this->description             = (!empty($publicContact['about']) ? BBCode::toPlaintext($publicContact['about']) : '');
-		$this->profile_image_url_https = Contact::getAvatarUrlForUrl($publicContact['url'], $uid, Proxy::SIZE_MICRO);
+		$this->description             = (!empty($publicAccount['about']) ? BBCode::toPlaintext($publicAccount['about']) : '');
+		$this->profile_image_url_https = Contact::getAvatarUrlForUrl($publicAccount['url'], $uid, Proxy::SIZE_MICRO);
 		$this->protected               = false;
 		$this->followers_count         = $apcontact['followers_count'] ?? 0;
 		$this->friends_count           = $apcontact['following_count'] ?? 0;
 		$this->listed_count            = 0;
-		$this->created_at              = DateTimeFormat::utc($publicContact['created'], DateTimeFormat::API);
+		$this->created_at              = DateTimeFormat::utc($publicAccount['created'], DateTimeFormat::API);
 		$this->favourites_count        = 0;
 		$this->verified                = $uid != 0;
 		$this->statuses_count          = $apcontact['statuses_count'] ?? 0;
-		$this->profile_banner_url      = Contact::getHeaderUrlForId($publicContact['id'], '', $publicContact['updated']);
+		$this->profile_banner_url      = Contact::getHeaderUrlForId($publicAccount['guid'], $publicAccount['updated']);
 		$this->default_profile         = false;
 		$this->default_profile_image   = false;
 
@@ -181,9 +181,9 @@ class User extends BaseDataTransferObject
 		unset($this->withheld_scope);
 
 		// Deprecated
-		$this->profile_image_url              = Contact::getAvatarUrlForUrl($publicContact['url'], $uid, Proxy::SIZE_MICRO);
-		$this->profile_image_url_profile_size = Contact::getAvatarUrlForUrl($publicContact['url'], $uid, Proxy::SIZE_THUMB);
-		$this->profile_image_url_large        = Contact::getAvatarUrlForUrl($publicContact['url'], $uid, Proxy::SIZE_LARGE);
+		$this->profile_image_url              = Contact::getAvatarUrlForUrl($publicAccount['url'], $uid, Proxy::SIZE_MICRO);
+		$this->profile_image_url_profile_size = Contact::getAvatarUrlForUrl($publicAccount['url'], $uid, Proxy::SIZE_THUMB);
+		$this->profile_image_url_large        = Contact::getAvatarUrlForUrl($publicAccount['url'], $uid, Proxy::SIZE_LARGE);
 		$this->utc_offset                     = 0;
 		$this->time_zone                      = 'UTC';
 		$this->geo_enabled                    = false;
@@ -199,7 +199,7 @@ class User extends BaseDataTransferObject
 		// Friendica-specific
 		$this->uid                   = (int)$uid;
 		$this->cid                   = (int)($userContact['id'] ?? 0);
-		$this->pid                   = (int)$publicContact['id'];
-		$this->statusnet_profile_url = $publicContact['url'];
+		$this->pid                   = (int)$publicAccount['id'];
+		$this->statusnet_profile_url = $publicAccount['url'];
 	}
 }

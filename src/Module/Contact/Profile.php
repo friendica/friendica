@@ -154,43 +154,43 @@ class Profile extends BaseModule
 			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
 		}
 
-		$contact = Contact::getById($data['public']);
-		if (!$this->db->isResult($contact)) {
+		$account = Contact::selectFirstAccount([], ['id' => $data['public']]);
+		if (!$this->db->isResult($account)) {
 			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
 		}
 
 		// Don't display contacts that are about to be deleted
-		if ($this->db->isResult($contact) && (!empty($contact['deleted']) || !empty($contact['network']) && $contact['network'] == Protocol::PHANTOM)) {
+		if ($this->db->isResult($account) && (!empty($account['deleted']) || !empty($account['network']) && $account['network'] == Protocol::PHANTOM)) {
 			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
 		}
 
-		$localRelationship = $this->localRelationship->getForUserContact($this->session->getLocalUserId(), $contact['id']);
+		$localRelationship = $this->localRelationship->getForUserContact($this->session->getLocalUserId(), $account['id']);
 
 		if ($localRelationship->rel === Contact::SELF) {
-			$this->baseUrl->redirect('profile/' . $contact['nick'] . '/profile');
+			$this->baseUrl->redirect('profile/' . $account['nick'] . '/profile');
 		}
 
 		if (isset($this->parameters['action'])) {
-			self::checkFormSecurityTokenRedirectOnError('contact/' . $contact['id'], 'contact_action', 't');
+			self::checkFormSecurityTokenRedirectOnError('contact/' . $account['id'], 'contact_action', 't');
 
 			$cmd = $this->parameters['action'];
 			if ($cmd === 'update' && $localRelationship->rel !== Contact::NOTHING) {
-				Module\Contact::updateContactFromPoll($contact['id']);
+				Module\Contact::updateContactFromPoll($account['id']);
 			}
 
 			if ($cmd === 'updateprofile') {
-				$this->updateContactFromProbe($contact['id']);
+				$this->updateContactFromProbe($account['id']);
 			}
 
 			if ($cmd === 'block') {
 				if ($localRelationship->blocked) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setBlocked($contact['id'], $this->session->getLocalUserId(), false);
+					Contact\User::setBlocked($account['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been unblocked');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setBlocked($contact['id'], $this->session->getLocalUserId(), true);
+					Contact\User::setBlocked($account['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been blocked');
 				}
 
@@ -201,12 +201,12 @@ class Profile extends BaseModule
 			if ($cmd === 'ignore') {
 				if ($localRelationship->ignored) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setIgnored($contact['id'], $this->session->getLocalUserId(), false);
+					Contact\User::setIgnored($account['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been unignored');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setIgnored($contact['id'], $this->session->getLocalUserId(), true);
+					Contact\User::setIgnored($account['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been ignored');
 				}
 
@@ -217,12 +217,12 @@ class Profile extends BaseModule
 			if ($cmd === 'collapse') {
 				if ($localRelationship->collapsed) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setCollapsed($contact['id'], $this->session->getLocalUserId(), false);
+					Contact\User::setCollapsed($account['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been uncollapsed');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setCollapsed($contact['id'], $this->session->getLocalUserId(), true);
+					Contact\User::setCollapsed($account['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been collapsed');
 				}
 
@@ -230,10 +230,10 @@ class Profile extends BaseModule
 				$this->systemMessages->addInfo($message);
 			}
 
-			$this->baseUrl->redirect('contact/' . $contact['id']);
+			$this->baseUrl->redirect('contact/' . $account['id']);
 		}
 
-		$vcard_widget  = Widget\VCard::getHTML($contact);
+		$vcard_widget  = Widget\VCard::getHTML($account);
 		$circles_widget = '';
 
 		if (!in_array($localRelationship->rel, [Contact::NOTHING, Contact::SELF])) {
@@ -251,18 +251,18 @@ class Profile extends BaseModule
 		]);
 
 		switch ($localRelationship->rel) {
-			case Contact::FRIEND:   $relation_text = $this->t('You are mutual friends with %s', $contact['name']); break;
-			case Contact::FOLLOWER:	$relation_text = $this->t('You are sharing with %s', $contact['name']); break;
-			case Contact::SHARING:  $relation_text = $this->t('%s is sharing with you', $contact['name']); break;
+			case Contact::FRIEND:   $relation_text = $this->t('You are mutual friends with %s', $account['name']); break;
+			case Contact::FOLLOWER:	$relation_text = $this->t('You are sharing with %s', $account['name']); break;
+			case Contact::SHARING:  $relation_text = $this->t('%s is sharing with you', $account['name']); break;
 			default:
 				$relation_text = '';
 		}
 
-		if (!Protocol::supportsFollow($contact['network'])) {
+		if (!Protocol::supportsFollow($account['network'])) {
 			$relation_text = '';
 		}
 
-		$url = Contact::magicLinkByContact($contact);
+		$url = Contact::magicLinkByContact($account);
 		if (strpos($url, 'contact/redir/') === 0) {
 			$sparkle = ' class="sparkle" ';
 		} else {
@@ -272,34 +272,34 @@ class Profile extends BaseModule
 		$insecure = $this->t('Private communications are not available for this contact.');
 
 		// @TODO: Figure out why gsid can be empty
-		if (empty($contact['gsid'])) {
-			$this->logger->notice('Empty gsid for contact', ['contact' => $contact]);
+		if (empty($account['gsid'])) {
+			$this->logger->notice('Empty gsid for contact', ['contact' => $account]);
 		}
 
 		$serverIgnored =
-			$contact['gsid'] &&
-			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid']) ?
+			$account['gsid'] &&
+			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $account['gsid']) ?
 				$this->t('This contact is on a server you ignored.')
 				: '';
 
-		$last_update = (($contact['last-update'] <= DBA::NULL_DATETIME) ? $this->t('Never') : DateTimeFormat::local($contact['last-update'], 'D, j M Y, g:i A'));
+		$last_update = (($account['last-update'] <= DBA::NULL_DATETIME) ? $this->t('Never') : DateTimeFormat::local($account['last-update'], 'D, j M Y, g:i A'));
 
-		if ($contact['last-update'] > DBA::NULL_DATETIME) {
-			$last_update .= ' ' . ($contact['failed'] ? $this->t('(Update was not successful)') : $this->t('(Update was successful)'));
+		if ($account['last-update'] > DBA::NULL_DATETIME) {
+			$last_update .= ' ' . ($account['failed'] ? $this->t('(Update was not successful)') : $this->t('(Update was successful)'));
 		}
-		$lblsuggest = (($contact['network'] === Protocol::DFRN) ? $this->t('Suggest friends') : '');
+		$lblsuggest = (($account['network'] === Protocol::DFRN) ? $this->t('Suggest friends') : '');
 
-		$poll_enabled = in_array($contact['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL]);
+		$poll_enabled = in_array($account['network'], [Protocol::DFRN, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL]);
 
-		$nettype = $this->t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact['url'], $contact['protocol'], $contact['gsid']));
+		$nettype = $this->t('Network type: %s', ContactSelector::networkToName($account['network'], $account['url'], $account['protocol'], $account['gsid']));
 
 		// tabs
-		$tab_str = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_PROFILE);
+		$tab_str = Module\Contact::getTabsHTML($account, Module\Contact::TAB_PROFILE);
 
-		$lost_contact = (($contact['archive'] && $contact['term-date'] > DBA::NULL_DATETIME && $contact['term-date'] < DateTimeFormat::utcNow()) ? $this->t('Communications lost with this contact!') : '');
+		$lost_contact = (($account['archive'] && $account['term-date'] > DBA::NULL_DATETIME && $account['term-date'] < DateTimeFormat::utcNow()) ? $this->t('Communications lost with this contact!') : '');
 
 		$fetch_further_information = null;
-		if ($contact['network'] == Protocol::FEED) {
+		if ($account['network'] == Protocol::FEED) {
 			$fetch_further_information = [
 				'fetch_further_information',
 				$this->t('Fetch further information for feeds'),
@@ -314,20 +314,20 @@ class Profile extends BaseModule
 			];
 		}
 
-		$allow_remote_self = in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::FEED, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER])
+		$allow_remote_self = in_array($account['network'], [Protocol::ACTIVITYPUB, Protocol::FEED, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER])
 			&& $this->config->get('system', 'allow_users_remote_self');
 
-		if ($contact['network'] == Protocol::FEED) {
+		if ($account['network'] == Protocol::FEED) {
 			$remote_self_options = [
 				Contact::MIRROR_DEACTIVATED => $this->t('No mirroring'),
 				Contact::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
 			];
-		} elseif ($contact['network'] == Protocol::ACTIVITYPUB) {
+		} elseif ($account['network'] == Protocol::ACTIVITYPUB) {
 			$remote_self_options = [
 				Contact::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
 				Contact::MIRROR_NATIVE_RESHARE => $this->t('Native reshare')
 			];
-		} elseif ($contact['network'] == Protocol::DFRN) {
+		} elseif ($account['network'] == Protocol::DFRN) {
 			$remote_self_options = [
 				Contact::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
 				Contact::MIRROR_OWN_POST       => $this->t('Mirror as my own posting'),
@@ -340,14 +340,14 @@ class Profile extends BaseModule
 			];
 		}
 
-		$channel_frequency     = Contact\User::getChannelFrequency($contact['id'], $this->session->getLocalUserId());
+		$channel_frequency     = Contact\User::getChannelFrequency($account['id'], $this->session->getLocalUserId());
 
 		$poll_interval = null;
-		if ((($contact['network'] == Protocol::FEED) && !$this->config->get('system', 'adjust_poll_frequency')) || ($contact['network'] == Protocol::MAIL)) {
+		if ((($account['network'] == Protocol::FEED) && !$this->config->get('system', 'adjust_poll_frequency')) || ($account['network'] == Protocol::MAIL)) {
 			$poll_interval = ContactSelector::pollInterval($localRelationship->priority, !$poll_enabled);
 		}
 
-		$contact_actions = $this->getContactActions($contact, $localRelationship);
+		$contact_actions = $this->getContactActions($account, $localRelationship);
 
 		if ($localRelationship->rel !== Contact::NOTHING) {
 			$lbl_info1              = $this->t('Contact Information / Notes');
@@ -364,11 +364,11 @@ class Profile extends BaseModule
 			'$submit'                    => $this->t('Submit'),
 			'$lbl_info1'                 => $lbl_info1,
 			'$lbl_info2'                 => $this->t('Their personal note'),
-			'$reason'                    => trim($contact['reason'] ?? ''),
+			'$reason'                    => trim($account['reason'] ?? ''),
 			'$infedit'                   => $this->t('Edit contact notes'),
-			'$common_link'               => 'contact/' . $contact['id'] . '/contacts/common',
+			'$common_link'               => 'contact/' . $account['id'] . '/contacts/common',
 			'$relation_text'             => $relation_text,
-			'$visit'                     => $this->t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
+			'$visit'                     => $this->t('Visit %s\'s profile [%s]', $account['name'], $account['url']),
 			'$blockunblock'              => $this->t('Block/Unblock contact'),
 			'$ignorecont'                => $this->t('Ignore contact'),
 			'$lblrecent'                 => $this->t('View conversations'),
@@ -381,13 +381,13 @@ class Profile extends BaseModule
 			'$updpub'                    => $this->t('Update public posts'),
 			'$last_update'               => $last_update,
 			'$udnow'                     => $this->t('Update now'),
-			'$contact_id'                => $contact['id'],
+			'$contact_id'                => $account['id'],
 			'$pending'                   => $localRelationship->pending   ? $this->t('Awaiting connection acknowledge') : '',
 			'$blocked'                   => $localRelationship->blocked   ? $this->t('Currently blocked') : '',
 			'$ignored'                   => $localRelationship->ignored   ? $this->t('Currently ignored') : '',
 			'$collapsed'                 => $localRelationship->collapsed ? $this->t('Currently collapsed') : '',
-			'$archived'                  => ($contact['archive'] ? $this->t('Currently archived') : ''),
-			'$insecure'                  => (in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA]) ? '' : $insecure),
+			'$archived'                  => ($account['archive'] ? $this->t('Currently archived') : ''),
+			'$insecure'                  => (in_array($account['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::MAIL, Protocol::DIASPORA]) ? '' : $insecure),
 			'$serverIgnored'             => $serverIgnored,
 			'$manageServers'             => $this->t('Manage remote servers'),
 			'$cinfo'                     => ['info', '', $localRelationship->info, ''],
@@ -395,22 +395,22 @@ class Profile extends BaseModule
 			'$notify_new_posts'          => ['notify_new_posts', $this->t('Notification for new posts'), ($localRelationship->notifyNewPosts), $this->t('Send a notification of every new post of this contact')],
 			'$fetch_further_information' => $fetch_further_information,
 			'$ffi_keyword_denylist'      => ['ffi_keyword_denylist', $this->t('Keyword Deny List'), $localRelationship->ffiKeywordDenylist, $this->t('Comma separated list of keywords that should not be converted to hashtags, when "Fetch information and keywords" is selected')],
-			'$photo'                     => Contact::getPhoto($contact),
-			'$name'                      => $contact['name'],
+			'$photo'                     => Contact::getPhoto($account),
+			'$name'                      => $account['name'],
 			'$sparkle'                   => $sparkle,
 			'$url'                       => $url,
 			'$profileurllabel'           => $this->t('Profile URL'),
-			'$profileurl'                => $contact['url'],
-			'$account_type'              => Contact::getAccountType($contact['contact-type']),
-			'$location'                  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['location']),
+			'$profileurl'                => $account['url'],
+			'$account_type'              => Contact::getAccountType($account['contact-type']),
+			'$location'                  => BBCode::convertForUriId($account['uri-id'] ?? 0, $account['location']),
 			'$location_label'            => $this->t('Location:'),
-			'$xmpp'                      => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['xmpp']),
+			'$xmpp'                      => BBCode::convertForUriId($account['uri-id'] ?? 0, $account['xmpp']),
 			'$xmpp_label'                => $this->t('XMPP:'),
-			'$matrix'                    => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['matrix']),
+			'$matrix'                    => BBCode::convertForUriId($account['uri-id'] ?? 0, $account['matrix']),
 			'$matrix_label'              => $this->t('Matrix:'),
-			'$about'                     => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'], BBCode::EXTERNAL),
+			'$about'                     => BBCode::convertForUriId($account['uri-id'] ?? 0, $account['about'], BBCode::EXTERNAL),
 			'$about_label'               => $this->t('About:'),
-			'$keywords'                  => $contact['keywords'],
+			'$keywords'                  => $account['keywords'],
 			'$keywords_label'            => $this->t('Tags:'),
 			'$contact_action_button'     => $this->t('Actions'),
 			'$contact_actions'           => $contact_actions,
@@ -434,7 +434,7 @@ class Profile extends BaseModule
 			'$frequency_never'        => ['channel_frequency', $this->t('Never display posts'), Contact\User::FREQUENCY_NEVER, $this->t('Posts from this contact will never be displayed in any channel'), $channel_frequency == Contact\User::FREQUENCY_NEVER],
 		]);
 
-		$arr = ['contact' => $contact, 'output' => $o];
+		$arr = ['contact' => $account, 'output' => $o];
 
 		Hook::callAll('contact_edit', $arr);
 

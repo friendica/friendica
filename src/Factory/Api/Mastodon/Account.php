@@ -81,7 +81,7 @@ class Account extends BaseFactory
 	 */
 	public function createFromUriId(int $contactUriId, int $uid = 0): \Friendica\Object\Api\Mastodon\Account
 	{
-		$account = DBA::selectFirst('account-user-view', [], ['uri-id' => $contactUriId, 'uid' => [0, $uid]], ['order' => ['id' => true]]);
+		$account = Contact::selectFirstAccountUser([], ['uri-id' => $contactUriId, 'uid' => [0, $uid]], ['order' => ['id' => true]]);
 		if (empty($account)) {
 			throw new HTTPException\NotFoundException('Contact ' . $contactUriId . ' not found');
 		}

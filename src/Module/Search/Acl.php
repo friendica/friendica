@@ -95,7 +95,7 @@ class Acl extends BaseModule
 		$contacts = [];
 		foreach ($result as $contact) {
 			$contacts[] = [
-				'photo'   => Contact::getMicro($contact, true),
+				'photo'   => $contact['micro'],
 				'name'    => htmlspecialchars($contact['name']),
 				'nick'    => $contact['addr'] ?: $contact['url'],
 				'network' => $contact['network'],
@@ -219,17 +219,17 @@ class Acl extends BaseModule
 		}
 
 		$groups = [];
-		foreach ($contacts as $contact) {
+		foreach ($contacts as $account) {
 			$entry = [
 				'type'    => self::TYPE_MENTION_CONTACT,
-				'photo'   => Contact::getMicro($contact, true),
-				'name'    => htmlspecialchars($contact['name']),
-				'id'      => intval($contact['id']),
-				'network' => $contact['network'],
-				'link'    => $contact['url'],
-				'nick'    => htmlentities(($contact['attag'] ?? '') ?: $contact['nick']),
-				'addr'    => htmlentities(($contact['addr'] ?? '') ?: $contact['url']),
-				'group'   => $contact['contact-type'] == Contact::TYPE_COMMUNITY,
+				'photo'   => Contact::getMicro($account, true),
+				'name'    => htmlspecialchars($account['name']),
+				'id'      => intval($account['id']),
+				'network' => $account['network'],
+				'link'    => $account['url'],
+				'nick'    => htmlentities(($account['attag'] ?? '') ?: $account['nick']),
+				'addr'    => htmlentities(($account['addr'] ?? '') ?: $account['url']),
+				'group'   => $account['contact-type'] == Contact::TYPE_COMMUNITY,
 			];
 			if ($entry['group']) {
 				$groups[] = $entry;
@@ -274,18 +274,18 @@ class Acl extends BaseModule
 			$this->database->close($authors);
 
 			foreach (array_diff($item_authors, $known_contacts) as $author) {
-				$contact = Contact::getByURL($author, false, ['micro', 'name', 'id', 'network', 'nick', 'addr', 'url', 'forum', 'avatar']);
-				if ($contact) {
+				$account = Contact::selectFirstAccount(['micro', 'name', 'id', 'network', 'nick', 'addr', 'url', 'forum', 'avatar', 'guid', 'updated'], ['url' => $author]);
+				if ($account) {
 					$unknown_contacts[] = [
 						'type'    => self::TYPE_MENTION_CONTACT,
-						'photo'   => Contact::getMicro($contact, true),
-						'name'    => htmlspecialchars($contact['name']),
-						'id'      => intval($contact['id']),
-						'network' => $contact['network'],
-						'link'    => $contact['url'],
-						'nick'    => htmlentities(($contact['nick'] ?? '') ?: $contact['addr']),
-						'addr'    => htmlentities(($contact['addr'] ?? '') ?: $contact['url']),
-						'group'   => $contact['forum']
+						'photo'   => Contact::getMicro($account, true),
+						'name'    => htmlspecialchars($account['name']),
+						'id'      => intval($account['id']),
+						'network' => $account['network'],
+						'link'    => $account['url'],
+						'nick'    => htmlentities(($account['nick'] ?? '') ?: $account['addr']),
+						'addr'    => htmlentities(($account['addr'] ?? '') ?: $account['url']),
+						'group'   => $account['forum']
 					];
 				}
 			}
