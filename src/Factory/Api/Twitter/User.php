@@ -24,10 +24,9 @@ namespace Friendica\Factory\Api\Twitter;
 use Friendica\BaseFactory;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
-use Friendica\Network\HTTPException;
-use Friendica\Factory\Api\Twitter\Status;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Network\HTTPException;
 use Psr\Log\LoggerInterface;
 
 class User extends BaseFactory
@@ -85,9 +84,17 @@ class User extends BaseFactory
 	 * @param bool $include_user_entities
 	 *
 	 * @return \Friendica\Object\Api\Twitter\User
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws HTTPException\NotFoundException If the $uid doesn't exist
+	 * @throws \ImagickException
 	 */
 	public function createFromUserId(int $uid, bool $skip_status = true, bool $include_user_entities = true): \Friendica\Object\Api\Twitter\User
 	{
-		return $this->createFromContactId(Contact::getPublicIdByUserId($uid), $uid, $skip_status, $include_user_entities);
+		$cid = Contact::getPublicIdByUserId($uid);
+		if (!$cid) {
+			throw new HTTPException\NotFoundException();
+		}
+
+		return $this->createFromContactId($cid, $uid, $skip_status, $include_user_entities);
 	}
 }
