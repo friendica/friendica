@@ -38,7 +38,7 @@ class UserTimelineTest extends ApiTest
 	{
 		$response = (new UserTimeline(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'user_id'         => 42,
+				'user_id'         => 43, // Public contact id
 				'max_id'          => 10,
 				'exclude_replies' => true,
 				'conversation_id' => 1,
@@ -63,7 +63,7 @@ class UserTimelineTest extends ApiTest
 	{
 		$response = (new UserTimeline(DI::mstdnError(), DI::app(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'user_id' => 42,
+				'user_id' => 43, // Public contact id
 				'page'    => -2,
 			]);
 
