@@ -211,7 +211,7 @@ class StaticDatabase extends Database
 	{
 		if (isset(self::$staticConnection)) {
 			while (self::$staticConnection->getTransactionDepth() > 0) {
-				self::$staticConnection->rollBack();
+				self::$staticConnection->rollback();
 			}
 		}
 	}
