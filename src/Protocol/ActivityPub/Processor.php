@@ -1603,6 +1603,11 @@ class Processor
 			return '';
 		}
 
+		if (!HTTPSignature::isValidContentType($curlResult->getContentType())) {
+			Logger::notice('Unexpected content type', ['content-type' => $curlResult->getContentType(), 'url' => $url]);
+			return '';
+		}
+
 		$object = json_decode($body, true);
 
 		if (!empty($object)) {
@@ -1615,11 +1620,6 @@ class Processor
 		}
 
 		if (!self::isValidObject($object, $url)) {
-			return '';
-		}
-
-		if (!HTTPSignature::isValidContentType($curlResult->getContentType())) {
-			Logger::notice('Unexpected content type', ['content-type' => $curlResult->getContentType(), 'url' => $url]);
 			return '';
 		}
 
