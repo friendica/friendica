@@ -42,6 +42,7 @@ class Feature
 	const PHOTO_LOCATION    = 'photo_location';
 	const PUBLIC_CALENDAR   = 'public_calendar';
 	const SEARCHES          = 'searches';
+	const SUMMARY           = 'summary';
 	const TAGCLOUD          = 'tagadelic';
 	const TRENDING_TAGS     = 'trending_tags';
 
@@ -120,7 +121,8 @@ class Feature
 			// Item tools
 			'tools' => [
 				DI::l10n()->t('Post/Comment Tools'),
-				[self::CATEGORIES, DI::l10n()->t('Post Categories'),         DI::l10n()->t('Add categories to your posts'), false, DI::config()->get('feature_lock', self::CATEGORIES, false)],
+				[self::CATEGORIES, DI::l10n()->t('Post Categories'), DI::l10n()->t('Add categories to your posts'), false, DI::config()->get('feature_lock', self::CATEGORIES, false)],
+				[self::SUMMARY,    DI::l10n()->t('Summary'),         DI::l10n()->t('Add a summary, abstract or spoiler text to your posts'), false, DI::config()->get('feature_lock', self::SUMMARY, false)],
 			],
 
 			// Widget visibility on the network stream

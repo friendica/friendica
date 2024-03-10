@@ -159,6 +159,8 @@ class Compose extends BaseModule
 		}
 
 		$title         = $_REQUEST['title']         ?? '';
+		$summary       = $_REQUEST['summary']       ?? '';
+		$sensitive     = $_REQUEST['sensitive']     ?? false;
 		$category      = $_REQUEST['category']      ?? '';
 		$body          = $_REQUEST['body']          ?? '';
 		$location      = $_REQUEST['location']      ?? $user['default-location'];
@@ -191,6 +193,7 @@ class Compose extends BaseModule
 			'$l10n' => [
 				'compose_title'        => $compose_title,
 				'default'              => '',
+				'summary'              => $this->l10n->t('Summary'),
 				'visibility_title'     => $this->l10n->t('Visibility'),
 				'mytitle'              => $this->l10n->t('This is you'),
 				'submit'               => $this->l10n->t('Submit'),
@@ -212,6 +215,7 @@ class Compose extends BaseModule
 				'location_disabled'    => $this->l10n->t('Location services are disabled. Please check the website\'s permissions on your device'),
 				'wait'                 => $this->l10n->t('Please wait'),
 				'placeholdertitle'     => $this->l10n->t('Set title'),
+				'placeholdersummary'   => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
 				'placeholdercategory'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
 				'always_open_compose'  => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose',
 					$this->config->get('frio', 'always_open_compose', false)) ? '' :
@@ -224,6 +228,7 @@ class Compose extends BaseModule
 			'$wall'         => $wall,
 			'$mylink'       => $this->baseUrl->remove($contact['url']),
 			'$myphoto'      => $this->baseUrl->remove($contact['thumb']),
+			'$sensitive'    => ['sensitive', $this->l10n->t('Sensitive post'), $x['sensitive'] ?? false],
 			'$scheduled_at' => Temporal::getDateTimeField(
 				new DateTime(),
 				new DateTime('now + 6 months'),
@@ -233,6 +238,8 @@ class Compose extends BaseModule
 			),
 			'$created_at'   => $created_at,
 			'$title'        => $title,
+			'$summary'      => $summary,
+			'sensitive'     => $sensitive,
 			'$category'     => $category,
 			'$body'         => $body,
 			'$location'     => $location,

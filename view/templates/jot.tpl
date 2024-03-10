@@ -18,6 +18,9 @@
 		<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 		{{/if}}
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="{{$placeholdertitle}}" value="{{$title}}" class="jothidden" style="display:none" dir="auto"></div>
+		{{if $placeholdersummary}}
+		<div id="jot-summary-wrap"><input name="summary" id="jot-summary" type="text" placeholder="{{$placeholdersummary}}" value="{{$summary}}" class="jothidden" style="display:none" dir="auto"></div>
+	{{/if}}
 		{{if $placeholdercategory}}
 		<div id="jot-category-wrap"><input name="category" id="jot-category" type="text" placeholder="{{$placeholdercategory}}" value="{{$category}}" class="jothidden" style="display:none" dir="auto"></div>
 		{{/if}}
@@ -81,6 +84,7 @@
 	<div style="display: none;">
 		<div id="profile-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;">
 			{{$acl nofilter}}
+			{{if $placeholdersummary}}{{include file="field_checkbox.tpl" field=$sensitive}}{{/if}}
 			{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 			{{if $created_at}}{{$created_at nofilter}}{{/if}}
 		</div>

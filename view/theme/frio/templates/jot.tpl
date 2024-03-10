@@ -94,6 +94,9 @@
 					<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 					{{/if}}
 					<div id="jot-title-wrap"><input name="title" id="jot-title" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" style="display:block;" dir="auto" /></div>
+					{{if $placeholdersummary}}
+					<div id="jot-summary-wrap"><input name="summary" id="jot-summary" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" style="display:block;" dir="auto" /></div>
+					{{/if}}
 					{{if $placeholdercategory}}
 					<div id="jot-category-wrap"><input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdercategory}}" title="{{$placeholdercategory}}" value="{{$category}}" dir="auto" /></div>
 					{{/if}}
@@ -135,6 +138,7 @@
 
 				<div id="profile-jot-acl-wrapper" class="minimize" aria-labelledby="jot-perms-lnk" role="tabpanel" aria-hidden="true">
 					{{$acl nofilter}}
+					{{if $placeholdersummary}}{{include file="field_checkbox.tpl" field=$sensitive}}{{/if}}
 					{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 					{{if $created_at}}{{$created_at nofilter}}{{/if}}
 				</div>
