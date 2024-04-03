@@ -1220,7 +1220,7 @@ msgstr[3] "’S toigh le <button type=\"button\" %2$s>%1$d</button> seo"
 #: src/Content/Conversation.php:279
 #, php-format
 msgid "<button type=\"button\" %2$s>%1$d person</button> doesn't like this"
-msgid_plural "<button type=\"button\" %2$s>%1$d peiple</button> don't like this"
+msgid_plural "<button type=\"button\" %2$s>%1$d people</button> don't like this"
 msgstr[0] "Cha toigh le <button type=\"button\" %2$s>%1$d</button> seo"
 msgstr[1] "Cha toigh le <button type=\"button\" %2$s>%1$d</button> seo"
 msgstr[2] "Cha toigh le <button type=\"button\" %2$s>%1$d</button> seo"

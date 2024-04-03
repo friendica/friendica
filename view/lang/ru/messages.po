@@ -1237,7 +1237,7 @@ msgstr[3] "<button type=\"button\" %2$s>%1$d людям</button> нравитс�
 #: src/Content/Conversation.php:279
 #, php-format
 msgid "<button type=\"button\" %2$s>%1$d person</button> doesn't like this"
-msgid_plural "<button type=\"button\" %2$s>%1$d peiple</button> don't like this"
+msgid_plural "<button type=\"button\" %2$s>%1$d people</button> don't like this"
 msgstr[0] "<button type=\"button\" %2$s>%1$d человеку</button> не нравится это"
 msgstr[1] "<button type=\"button\" %2$s>%1$d людям</button> не нравится это"
 msgstr[2] "<button type=\"button\" %2$s>%1$d людям</button> не нравится это"

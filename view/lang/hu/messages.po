@@ -1210,7 +1210,7 @@ msgstr[1] "<button type=\"button\" %2$s>%1$d személy</button> kedveli ezt"
 #: src/Content/Conversation.php:279
 #, php-format
 msgid "<button type=\"button\" %2$s>%1$d person</button> doesn't like this"
-msgid_plural "<button type=\"button\" %2$s>%1$d peiple</button> don't like this"
+msgid_plural "<button type=\"button\" %2$s>%1$d people</button> don't like this"
 msgstr[0] "<button type=\"button\" %2$s>%1$d személy</button> nem kedveli ezt"
 msgstr[1] "<button type=\"button\" %2$s>%1$d személy</button> nem kedveli ezt"
 
