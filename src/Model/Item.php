@@ -3438,7 +3438,6 @@ class Item
 			} elseif (!empty($item['user-collapsed-author']) || !empty($item['user-collapsed-owner'])) {
 				$filter_reasons[] = DI::l10n()->t('Content from %s is collapsed', $item['author-name']);
 			}
-
 			if ($item['sensitive'] && (!$uid || !DI::pConfig()->get($uid, 'system', 'disable_cw', false))) {
 				$filter_reasons[] = DI::l10n()->t('Sensitive content');
 			}

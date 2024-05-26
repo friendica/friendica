@@ -13,6 +13,11 @@
 			<div id="jot-title-wrap">
 				<input type="text" name="title" id="jot-title" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdertitle}}" title="{{$l10n.placeholdertitle}}" value="{{$title}}" tabindex="1" dir="auto" />
 			</div>
+			{{if $l10n.placeholdersummary}}
+			<div id="jot-summary-wrap">
+				<input type="text" name="summary" id="jot-summary" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdersummary}}" title="{{$l10n.placeholdersummary}}" value="{{$summary}}" tabindex="1" dir="auto" />
+			</div>
+			{{/if}}
 			{{if $l10n.placeholdercategory}}
 				<div id="jot-category-wrap">
 					<input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$l10n.placeholdercategory}}" title="{{$l10n.placeholdercategory}}" value="{{$category}}" tabindex="2" dir="auto" />
@@ -90,6 +95,7 @@
 				{{$jotplugins nofilter}}
 			</div>
 
+			{{if $placeholdersummary}}{{include file="field_checkbox.tpl" field=$sensitive}}{{/if}}
 			{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 			{{if $created_at}}{{$created_at nofilter}}{{/if}}
 {{else}}

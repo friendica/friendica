@@ -111,14 +111,16 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	$post = item_process($post, $request, $preview, $return_path);
 
 	$fields = [
-		'title'    => $post['title'],
-		'body'     => $post['body'],
-		'attach'   => $post['attach'],
-		'file'     => $post['file'],
-		'location' => $post['location'],
-		'coord'    => $post['coord'],
-		'edited'   => DateTimeFormat::utcNow(),
-		'changed'  => DateTimeFormat::utcNow()
+		'title'           => $post['title'],
+		'content-warning' => $post['content-warning'],
+		'sensitive'       => $post['sensitive'],
+		'body'            => $post['body'],
+		'attach'          => $post['attach'],
+		'file'            => $post['file'],
+		'location'        => $post['location'],
+		'coord'           => $post['coord'],
+		'edited'          => DateTimeFormat::utcNow(),
+		'changed'         => DateTimeFormat::utcNow()
 	];
 
 	$fields['body'] = Item::setHashtags($fields['body']);

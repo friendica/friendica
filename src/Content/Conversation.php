@@ -387,8 +387,11 @@ class Conversation
 			'$shortnoloc'          => $this->l10n->t('clear location'),
 			'$title'               => $x['title'] ?? '',
 			'$placeholdertitle'    => $this->l10n->t('Set title'),
+			'$summary'             => $x['summary'] ?? '',
+			'$placeholdersummary'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
 			'$category'            => $x['category'] ?? '',
 			'$placeholdercategory' => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t("Categories \x28comma-separated list\x29") : '',
+			'$sensitive'           => ['sensitive', $this->l10n->t('Sensitive post'), $x['sensitive'] ?? false],
 			'$scheduled_at'        => Temporal::getDateTimeField(
 				new \DateTime(),
 				new \DateTime('now + 6 months'),
