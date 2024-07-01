@@ -56,7 +56,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1569);
+	define('DB_UPDATE_VERSION', 1570);
 }
 
 return [
@@ -867,6 +867,7 @@ return [
 			"activity-id" => ["type" => "varbinary(383)", "comment" => "id of the incoming activity"],
 			"object-id" => ["type" => "varbinary(383)", "comment" => ""],
 			"in-reply-to-id" => ["type" => "varbinary(383)", "comment" => ""],
+			"context" => ["type" => "varbinary(383)", "comment" => ""],
 			"conversation" => ["type" => "varbinary(383)", "comment" => ""],
 			"type" => ["type" => "varchar(64)", "comment" => "Type of the activity"],
 			"object-type" => ["type" => "varchar(64)", "comment" => "Type of the object activity"],
@@ -1555,6 +1556,7 @@ return [
 		"comment" => "Thread related data",
 		"fields" => [
 			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"context-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the endpoint for the context collection"],
 			"conversation-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the conversation uri"],
 			"owner-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id", "on delete" => "restrict"], "comment" => "Item owner"],
 			"author-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id", "on delete" => "restrict"], "comment" => "Item author"],
@@ -1567,6 +1569,7 @@ return [
 		],
 		"indexes" => [
 			"PRIMARY" => ["uri-id"],
+			"context-id" => ["context-id"],
 			"conversation-id" => ["conversation-id"],
 			"owner-id" => ["owner-id"],
 			"author-id" => ["author-id"],
@@ -1641,6 +1644,7 @@ return [
 		"comment" => "Thread related data per user",
 		"fields" => [
 			"uri-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"context-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the endpoint for the context collection"],
 			"conversation-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the conversation uri"],
 			"owner-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id", "on delete" => "restrict"], "comment" => "Item owner"],
 			"author-id" => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id", "on delete" => "restrict"], "comment" => "Item author"],
@@ -1668,6 +1672,7 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["uid", "uri-id"],
 			"uri-id" => ["uri-id"],
+			"context-id" => ["context-id"],
 			"conversation-id" => ["conversation-id"],
 			"owner-id" => ["owner-id"],
 			"author-id" => ["author-id"],

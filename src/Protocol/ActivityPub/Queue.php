@@ -64,8 +64,10 @@ class Queue
 		}
 
 		if (!empty($activity['context'])) {
-			$fields['conversation'] = $activity['context'];
-		} elseif (!empty($activity['conversation'])) {
+			$fields['context'] = $activity['context'];
+		}
+
+		if (!empty($activity['conversation'])) {
 			$fields['conversation'] = $activity['conversation'];
 		}
 
@@ -296,9 +298,15 @@ class Queue
 			return true;
 		}
 
+		if (!empty($entry['context'])) {
+			if (DBA::exists('post-thread', ['context-id' => ItemURI::getIdByURI($entry['context'], false)])) {
+				// We have got the context in the system, so the post can be processed
+				return true;
+			}
+		}
+
 		if (!empty($entry['conversation'])) {
-			$conv_id = ItemURI::getIdByURI($entry['conversation'], false);
-			if (DBA::exists('post-thread', ['conversation-id' => $conv_id])) {
+			if (DBA::exists('post-thread', ['conversation-id' => ItemURI::getIdByURI($entry['conversation'], false)])) {
 				// We have got the conversation in the system, so the post can be processed
 				return true;
 			}

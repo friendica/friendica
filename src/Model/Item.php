@@ -1081,6 +1081,10 @@ class Item
 			$parent_id = 0;
 			$parent_origin = $item['origin'];
 
+			if ($item['wall'] && empty($item['context'])) {
+				$item['context'] = $item['parent-uri'] . '#context';
+			}
+
 			if ($item['wall'] && empty($item['conversation'])) {
 				$item['conversation'] = $item['parent-uri'] . '#context';
 			}
@@ -1100,6 +1104,10 @@ class Item
 
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {
 			$item['conversation-id'] = ItemURI::getIdByURI($item['conversation']);
+		}
+
+		if (!empty($item['context']) && empty($item['context-id'])) {
+			$item['context-id'] = ItemURI::getIdByURI($item['context']);
 		}
 
 		// Is this item available in the global items (with uid=0)?

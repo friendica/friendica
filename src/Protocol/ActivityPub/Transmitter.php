@@ -1865,8 +1865,12 @@ class Transmitter
 		}
 		$data['sensitive'] = (bool)$item['sensitive'];
 
+		if (!empty($item['context']) && ($item['context'] != './')) {
+			$data['context'] = $item['context'];
+		}
+
 		if (!empty($item['conversation']) && ($item['conversation'] != './')) {
-			$data['conversation'] = $data['context'] = $item['conversation'];
+			$data['conversation'] = $item['conversation'];
 		}
 
 		if (!empty($title)) {

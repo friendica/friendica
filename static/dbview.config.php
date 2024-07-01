@@ -261,6 +261,8 @@
 			"thr-parent-id" => ["post-origin", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread-user", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread-user", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -424,6 +426,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-origin`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-origin`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-origin`.`vid`
@@ -450,6 +453,8 @@
 			"thr-parent-id" => ["post-origin", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread-user", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread-user", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -612,6 +617,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-origin`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-origin`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-origin`.`vid`
@@ -637,6 +643,8 @@
 			"thr-parent-id" => ["post-user", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread-user", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread-user", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -799,6 +807,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-user`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-user`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-user`.`vid`
@@ -825,6 +834,8 @@
 			"thr-parent-id" => ["post-user", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread-user", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread-user", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -986,6 +997,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post-user`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post-user`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread-user`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread-user`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post-user`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post-user`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post-user`.`vid`
@@ -1007,6 +1019,8 @@
 			"thr-parent-id" => ["post", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -1136,6 +1150,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post`.`vid`
@@ -1155,6 +1170,8 @@
 			"thr-parent-id" => ["post", "thr-parent-id"],
 			"conversation" => ["conversation-item-uri", "uri"],
 			"conversation-id" => ["post-thread", "conversation-id"],
+			"context" => ["context-item-uri", "uri"],
+			"context-id" => ["post-thread", "context-id"],
 			"quote-uri" => ["quote-item-uri", "uri"],
 			"quote-uri-id" => ["post-content", "quote-uri-id"],
 			"guid" => ["item-uri", "guid"],
@@ -1286,6 +1303,7 @@
 			LEFT JOIN `item-uri` AS `thr-parent-item-uri` ON `thr-parent-item-uri`.`id` = `post`.`thr-parent-id`
 			LEFT JOIN `item-uri` AS `parent-item-uri` ON `parent-item-uri`.`id` = `post`.`parent-uri-id`
 			LEFT JOIN `item-uri` AS `conversation-item-uri` ON `conversation-item-uri`.`id` = `post-thread`.`conversation-id`
+			LEFT JOIN `item-uri` AS `context-item-uri` ON `context-item-uri`.`id` = `post-thread`.`context-id`
 			LEFT JOIN `item-uri` AS `external-item-uri` ON `external-item-uri`.`id` = `post`.`external-id`
 			LEFT JOIN `item-uri` AS `replies-item-uri` ON `replies-item-uri`.`id` = `post`.`replies-id`
 			LEFT JOIN `verb` ON `verb`.`id` = `post`.`vid`

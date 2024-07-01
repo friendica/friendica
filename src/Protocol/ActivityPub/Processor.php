@@ -320,13 +320,22 @@ class Processor
 			$item['object-type'] = Activity\ObjectType::COMMENT;
 		}
 
-		if (!empty($activity['conversation'])) {
-			$item['conversation'] = $activity['conversation'];
-		} elseif (!empty($activity['context'])) {
-			$item['conversation'] = $activity['context'];
+		if (!empty($activity['context'])) {
+			$item['context'] = $activity['context'];
 		}
 
-		if (!empty($item['conversation'])) {
+		if (!empty($activity['conversation'])) {
+			$item['conversation'] = $activity['conversation'];
+		}
+
+		if (!empty($item['context'])) {
+			$conversation = Post::selectFirstThread(['uri'], ['context' => $item['context']]);
+			if (!empty($conversation)) {
+				Logger::debug('Got context', ['context' => $item['context'], 'parent' => $conversation]);
+				$item['parent-uri'] = $conversation['uri'];
+				$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
+			}
+		} elseif (!empty($item['conversation'])) {
 			$conversation = Post::selectFirstThread(['uri'], ['conversation' => $item['conversation']]);
 			if (!empty($conversation)) {
 				Logger::debug('Got conversation', ['conversation' => $item['conversation'], 'parent' => $conversation]);

@@ -9,6 +9,7 @@ Fields
 | Field           | Description                                                                                             | Type               | Null | Key | Default             | Extra |
 | --------------- | ------------------------------------------------------------------------------------------------------- | ------------------ | ---- | --- | ------------------- | ----- |
 | uri-id          | Id of the item-uri table entry that contains the item uri                                               | int unsigned       | NO   | PRI | NULL                |       |
+| context-id      | Id of the item-uri table entry that contains the endpoint for the context collection                    | int unsigned       | YES  |     | NULL                |       |
 | conversation-id | Id of the item-uri table entry that contains the conversation uri                                       | int unsigned       | YES  |     | NULL                |       |
 | owner-id        | Item owner                                                                                              | int unsigned       | NO   |     | 0                   |       |
 | author-id       | Item author                                                                                             | int unsigned       | NO   |     | 0                   |       |
@@ -40,6 +41,7 @@ Indexes
 | -------------------- | --------------------- |
 | PRIMARY              | uid, uri-id           |
 | uri-id               | uri-id                |
+| context-id           | context-id            |
 | conversation-id      | conversation-id       |
 | owner-id             | owner-id              |
 | author-id            | author-id             |
@@ -68,6 +70,7 @@ Foreign Keys
 | Field | Target Table | Target Field |
 |-------|--------------|--------------|
 | uri-id | [item-uri](help/database/db_item-uri) | id |
+| context-id | [item-uri](help/database/db_item-uri) | id |
 | conversation-id | [item-uri](help/database/db_item-uri) | id |
 | owner-id | [contact](help/database/db_contact) | id |
 | author-id | [contact](help/database/db_contact) | id |
