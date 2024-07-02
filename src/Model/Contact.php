@@ -1080,19 +1080,17 @@ class Contact
 			return;
 		}
 
+        $archival_days = DI::config()->get('system', 'archival_days', 32);
+
 		if ($contact['term-date'] <= DBA::NULL_DATETIME) {
 			self::update(['term-date' => DateTimeFormat::utcNow()], ['id' => $contact['id']]);
 			self::update(['term-date' => DateTimeFormat::utcNow()], ['`nurl` = ? AND `term-date` <= ? AND NOT `self`', Strings::normaliseLink($contact['url']), DBA::NULL_DATETIME]);
+            if ($archival_days > 14) {
+                Worker::add(array('priority' => Worker::PRIORITY_LOW, 'delayed' => DateTimeFormat::utc('now + 1 days')), 'Contact\WarnArchive', $contact['url']);
+            }
+            Logger::debug('added item to warn archive', ['delayed' => $delayed, 'url' => $contact['url']]);
 		} else {
-			/* @todo
-			 * We really should send a notification to the owner after 2-3 weeks
-			 * so they won't be surprised when the contact vanishes and can take
-			 * remedial action if this was a serious mistake or glitch
-			 */
-
 			/// @todo Check for contact vitality via probing
-			$archival_days = DI::config()->get('system', 'archival_days', 32);
-
 			$expiry = $contact['term-date'] . ' + ' . $archival_days . ' days ';
 			if (DateTimeFormat::utcNow() > DateTimeFormat::utc($expiry)) {
 				/* Relationship is really truly dead. archive them rather than
