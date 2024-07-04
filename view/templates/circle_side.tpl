@@ -1,4 +1,4 @@
-<span id="circle-sidebar-inflated" class="widget fakelink" onclick="openCloseWidget('circle-sidebar', 'circle-sidebar-inflated');">
+<span id="circle-sidebar-inflated" class="widget inflated fakelink" onclick="openCloseWidget('circle-sidebar', 'circle-sidebar-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div class="widget" id="circle-sidebar">

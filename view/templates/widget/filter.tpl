@@ -1,4 +1,4 @@
-<span id="{{$type}}-sidebar-inflated" class="widget fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');">
+<span id="{{$type}}-sidebar-inflated" class="widget inflated fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="{{$type}}-sidebar" class="widget">

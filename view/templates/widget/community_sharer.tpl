@@ -1,4 +1,4 @@
-<span id="sidebar-community-no-sharer-inflated" class="widget fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');">
+<span id="sidebar-community-no-sharer-inflated" class="widget inflated fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="sidebar-community-no-sharer" class="widget">

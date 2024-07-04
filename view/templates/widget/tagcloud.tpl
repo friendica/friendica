@@ -1,4 +1,4 @@
-<span id="tagblock-inflated" class="widget fakelink" onclick="openCloseWidget('tagblock', 'tagblock-inflated');">
+<span id="tagblock-inflated" class="widget inflated fakelink" onclick="openCloseWidget('tagblock', 'tagblock-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="tagblock" class="tagblock widget">

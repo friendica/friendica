@@ -1,4 +1,4 @@
-<span id="trending-tags-sidebar-inflated" class="widget fakelink" onclick="openCloseWidget('trending-tags-sidebar', 'trending-tags-sidebar-inflated');">
+<span id="trending-tags-sidebar-inflated" class="widget inflated fakelink" onclick="openCloseWidget('trending-tags-sidebar', 'trending-tags-sidebar-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="trending-tags-sidebar" class="widget">

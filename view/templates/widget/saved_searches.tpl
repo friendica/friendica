@@ -1,4 +1,4 @@
-<span id="saved-search-list-inflated" class="widget fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');">
+<span id="saved-search-list-inflated" class="widget inflated fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div class="widget" id="saved-search-list">
@@ -6,7 +6,7 @@
 		<h3 id="search">{{$title}}</h3>
 	</span>
 	{{$searchbox nofilter}}
-	
+
 	<ul role="menu" id="saved-search-ul">
 		{{foreach $saved as $search}}
 		<li role="menuitem" class="saved-search-li clear">

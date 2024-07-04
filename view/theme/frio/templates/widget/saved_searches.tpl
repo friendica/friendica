@@ -1,5 +1,5 @@
 {{if $saved}}
-<span id="saved-search-list-inflated" class="widget fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');">
+<span id="saved-search-list-inflated" class="widget inflated fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div class="widget" id="saved-search-list">

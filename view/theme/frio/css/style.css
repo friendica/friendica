@@ -90,6 +90,9 @@ blockquote {
 	max-height: 0px !important;
 	overflow: hidden !important;
 }
+.inflated {
+	display: none;
+}
 
 /**
  * details tag

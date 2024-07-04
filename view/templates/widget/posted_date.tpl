@@ -11,7 +11,7 @@ function showHideDates() {
 }
 </script>
 
-<span id="datebrowse-sidebar-inflated" class="widget fakelink" onclick="openCloseWidget('datebrowse-sidebar', 'datebrowse-sidebar-inflated');">
+<span id="datebrowse-sidebar-inflated" class="widget inflated fakelink" onclick="openCloseWidget('datebrowse-sidebar', 'datebrowse-sidebar-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="datebrowse-sidebar" class="widget">
@@ -24,7 +24,7 @@ function showHideDates() {
 		{{if $y == $cutoff_year}}
 		</ul>
 		<ul id="posted-date-selector-drop" class="datebrowse-ul" style="display: none;">
-		{{/if}} 
+		{{/if}}
 
 		<li id="posted-date-selector-year-{{$y}}" class="tool">
 			<a class="datebrowse-link" href="#" onclick="openClose('posted-date-selector-{{$y}}'); return false;">{{$y}}</a>
@@ -40,7 +40,7 @@ function showHideDates() {
 				<li class="tool">
 					<a class="datebrowse-link" href="{{$url}}/{{$d.1}}/{{$d.2}}">{{$d.0}}</a>
 				</li>
-				
+
 				{{/foreach}}
 			</ul>
 		</li>

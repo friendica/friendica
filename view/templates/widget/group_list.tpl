@@ -12,7 +12,7 @@ function showHideGroupList() {
 }
 </script>
 <span id="group-list-sidebar-frame">
-<span id="group-list-sidebar-inflated" class="widget fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');">
+<span id="group-list-sidebar-inflated" class="widget inflated fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');">
 	<h3>{{$title}}</h3>
 </span>
 <div id="group-list-sidebar" class="widget">
@@ -25,7 +25,7 @@ function showHideGroupList() {
 		</a>
 	</div>
 	<div id="sidebar-group-list" class="sidebar-widget-list">
-		{{* The list of available groups *}}	
+		{{* The list of available groups *}}
 	<ul id="group-list-sidebar-ul" role="menu">
 		{{foreach $groups as $group}}
 		{{if $group.id <= $visible_groups}}
