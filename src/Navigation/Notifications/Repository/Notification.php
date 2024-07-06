@@ -121,7 +121,7 @@ class Notification extends BaseRepository
 	{
 		$notify_type = $this->pconfig->get($uid, 'system', 'notify_type');
 		if (!is_null($notify_type)) {
-			$condition = ["`type` & ? != 0", $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW];
+			$condition = ["`type` & ? != 0", $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW | Model\Post\UserNotification::TYPE_CONTACT_UNAVAILABLE | Model\Post\UserNotification::TYPE_CONTACT_ALIVE | Model\Post\UserNotification::TYPE_CONTACT_ARCHIVED];
 		} else {
 			$condition = [];
 		}
@@ -153,7 +153,7 @@ class Notification extends BaseRepository
 		$notify_type = $this->pconfig->get($uid, 'system', 'notify_type');
 		if (!is_null($notify_type)) {
 			$type_condition = 'AND `type` & ? != 0';
-			$values[] = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW;
+			$values[] = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW | Model\Post\UserNotification::TYPE_CONTACT_UNAVAILABLE | Model\Post\UserNotification::TYPE_CONTACT_ALIVE | Model\Post\UserNotification::TYPE_CONTACT_ARCHIVED;
 		}
 
 		$like_condition = '';

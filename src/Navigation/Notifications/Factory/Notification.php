@@ -315,6 +315,18 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 						case Post\UserNotification::TYPE_QUOTED:
 							$msg = $l10n->t('%1$s shared your post %2$s');
 							break;
+
+						case Post\UserNotification::TYPE_CONTACT_UNAVAILABLE:
+							$msg = $l10n->t('%1$s is no longer publishing');
+							break;
+
+						case Post\UserNotification::TYPE_CONTACT_ALIVE:
+							$msg = $l10n->t('%1$s has resumed publishing');
+							break;
+
+						case Post\UserNotification::TYPE_CONTACT_ARCHIVED:
+							$msg = $l10n->t('%1$s has been archived');
+							break;
 					}
 					break;
 			}
