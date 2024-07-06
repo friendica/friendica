@@ -21,7 +21,7 @@
  */
 
 ?>
-<!DOCTYPE html >
+<!DOCTYPE html>
 <?php
 
 use Friendica\DI;

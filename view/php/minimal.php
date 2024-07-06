@@ -1,4 +1,4 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html>
 <head>
   <title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
