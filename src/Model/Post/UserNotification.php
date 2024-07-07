@@ -52,9 +52,6 @@ class UserNotification
 	const TYPE_SHARED                 = 128;
 	const TYPE_FOLLOW                 = 256;
 	const TYPE_QUOTED                 = 512;
-	const TYPE_CONTACT_UNAVAILABLE    = 1024;
-	const TYPE_CONTACT_ALIVE          = 2048;
-	const TYPE_CONTACT_ARCHIVED       = 4096;
 
 	/**
 	 * Insert a new user notification entry

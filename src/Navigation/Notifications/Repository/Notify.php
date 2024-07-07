@@ -679,7 +679,7 @@ class Notify extends BaseRepository
 			$type = NotificationFactory::getType($Notification);
 		}
 
-		if (in_array($Notification->type, [Model\Post\UserNotification::TYPE_FOLLOW, Model\Post\UserNotification::TYPE_SHARED, Model\Post\UserNotification::TYPE_CONTACT_UNAVAILABLE, Model\Post\UserNotification::TYPE_CONTACT_ALIVE, Model\Post\UserNotification::TYPE_CONTACT_ARCHIVED])) {
+		if (in_array($Notification->type, [Model\Post\UserNotification::TYPE_FOLLOW, Model\Post\UserNotification::TYPE_SHARED])) {
 			return true;
 		}
 
