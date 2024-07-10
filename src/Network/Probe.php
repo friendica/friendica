@@ -957,7 +957,7 @@ class Probe
 		if (!empty($json['public_forum'])) {
 			$data['community'] = $json['public_forum'];
 			$data['account-type'] = User::ACCOUNT_TYPE_COMMUNITY;
-		} elseif ($json['channel_type'] == 'normal') {
+		} elseif (($json['channel_type'] ?? '') == 'normal') {
 			$data['account-type'] = User::ACCOUNT_TYPE_PERSON;
 		}
 
