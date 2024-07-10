@@ -245,6 +245,7 @@ class Attach
 	 * @param string $src Source file name
 	 * @param int    $uid User id
 	 * @param string $filename Optional file name
+	 * @param string $filetype Optional file type
 	 * @param string $allow_cid
 	 * @param string $allow_gid
 	 * @param string $deny_cid
@@ -252,7 +253,7 @@ class Attach
 	 * @return boolean|int Insert id or false on failure
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function storeFile(string $src, int $uid, string $filename = '', string $allow_cid = '', string $allow_gid = '', string $deny_cid = '', string $deny_gid = '')
+	public static function storeFile(string $src, int $uid, string $filename = '', string $filetype = '', string $allow_cid = '', string $allow_gid = '', string $deny_cid = '', string $deny_gid = '')
 	{
 		if ($filename === '') {
 			$filename = basename($src);
@@ -260,7 +261,7 @@ class Attach
 
 		$data = @file_get_contents($src);
 
-		return self::store($data, $uid, $filename, '', null, $allow_cid, $allow_gid,  $deny_cid, $deny_gid);
+		return self::store($data, $uid, $filename, $filetype, null, $allow_cid, $allow_gid,  $deny_cid, $deny_gid);
 	}
 
 
@@ -343,6 +344,16 @@ class Attach
 				self::update($fields, ['id' => $match[1], 'uid' => $post['uid']]);
 			}
 		}
+	}
+
+	public static function setPermissionForId(int $id, int $uid, string $str_contact_allow, string $str_circle_allow, string $str_contact_deny, string $str_circle_deny)
+	{
+		$fields = [
+			'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow,
+			'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny,
+		];
+
+		self::update($fields, ['id' => $id, 'uid' => $uid]);
 	}
 
 	public static function addAttachmentToBody(string $body, int $uid): string

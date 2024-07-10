@@ -261,7 +261,7 @@ return [
 			'/lists/{id:\d+}'                    => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::PUT, R::DELETE]],
 			'/lists/{id:\d+}/accounts'           => [Module\Api\Mastodon\Lists\Accounts::class,           [R::GET, R::POST, R::DELETE]],
 			'/markers'                           => [Module\Api\Mastodon\Markers::class,                  [R::GET, R::POST]],
-			'/media/{id:\d+}'                    => [Module\Api\Mastodon\Media::class,                    [R::GET, R::PUT ]],
+			'/media/{id}'                        => [Module\Api\Mastodon\Media::class,                    [R::GET, R::PUT ]],
 			'/mutes'                             => [Module\Api\Mastodon\Mutes::class,                    [R::GET         ]],
 			'/notifications'                     => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],
 			'/notifications/{id:\d+}'            => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],

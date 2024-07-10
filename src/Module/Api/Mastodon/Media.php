@@ -22,8 +22,9 @@
 namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\DI;
+use Friendica\Model\Attach;
+use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
@@ -51,14 +52,38 @@ class Media extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		$media = Photo::upload($uid, $_FILES['file'], '', null, null, '', '', $request['description']);
-		if (empty($media)) {
-			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		$type = Post\Media::getType($_FILES['file']['type']);
+
+		if (in_array($type, [Post\Media::IMAGE, Post\Media::UNKNOWN])) {
+			$media = Photo::upload($uid, $_FILES['file'], '', null, null, '', '', $request['description']);
+			if (empty($media)) {
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			}
+
+			Logger::info('Uploaded photo', ['media' => $media]);
+
+			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
+		} else {
+			$tempFileName = $_FILES['file']['tmp_name'];
+			$fileName     = basename($_FILES['file']['name']);
+			$fileSize     = intval($_FILES['file']['size']);
+			$maxFileSize  = DI::config()->get('system', 'maxfilesize');
+
+			if ($fileSize <= 0) {
+				@unlink($tempFileName);
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			}
+
+			if ($maxFileSize && $fileSize > $maxFileSize) {
+				@unlink($tempFileName);
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			}
+
+			$id = Attach::storeFile($tempFileName, self::getCurrentUserID(), $fileName, $_FILES['file']['type'], '<' . Contact::getPublicIdByUserId(self::getCurrentUserID()) . '>');
+			@unlink($tempFileName);
+			Logger::info('Uploaded media', ['id' => $id]);
+			$this->jsonExit(DI::mstdnAttachment()->createFromAttach($id));
 		}
-
-		Logger::info('Uploaded photo', ['media' => $media]);
-
-		$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
 	}
 
 	public function put(array $request = [])
@@ -75,6 +100,10 @@ class Media extends BaseApi
 
 		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		if (DI::mstdnAttachment()->isAttach($this->parameters['id']) && Attach::exists(['id' => substr($this->parameters['id'], 7)])) {
+			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr($this->parameters['id'], 7)));
 		}
 
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $this->parameters['id'], 'uid' => $uid]);
@@ -108,10 +137,15 @@ class Media extends BaseApi
 		}
 
 		$id = $this->parameters['id'];
-		if (!Photo::exists(['id' => $id, 'uid' => $uid])) {
-			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+
+		if (Photo::exists(['id' => $id, 'uid' => $uid])) {
+			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($id));
 		}
 
-		$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($id));
+		if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr($id, 7)])) {
+			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr($id, 7)));
+		}
+
+		$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 	}
 }

@@ -106,7 +106,7 @@ class Upload extends \Friendica\BaseModule
 			$this->return(401, $msg);
 		}
 
-		$newid = Attach::storeFile($tempFileName, $owner['uid'], $fileName, '<' . $owner['id'] . '>');
+		$newid = Attach::storeFile($tempFileName, $_FILES['userfile']['type'] ?? '', $owner['uid'], $fileName, '<' . $owner['id'] . '>');
 
 		@unlink($tempFileName);
 

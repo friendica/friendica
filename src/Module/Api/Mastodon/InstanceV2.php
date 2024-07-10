@@ -131,10 +131,17 @@ class InstanceV2 extends BaseApi
 
 		return new InstanceEntity\Configuration(
 			$statuses_config,
-			new InstanceEntity\MediaAttachmentsConfig(Images::supportedMimeTypes(), $image_size_limit, $image_matrix_limit),
+			new InstanceEntity\MediaAttachmentsConfig($this->supportedMimeTypes(), $image_size_limit, $image_matrix_limit),
 			new InstanceEntity\Polls(),
 			new InstanceEntity\Accounts(),
 		);
+	}
+
+	private function supportedMimeTypes(): array
+	{
+		$mimetypes = ['audio/aac', 'audio/flac', 'audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/wav',
+			'audio/webm', 'video/mp4', 'video/ogg', 'video/webm'];
+		return array_merge(Images::supportedMimeTypes(), $mimetypes);
 	}
 
 	private function buildContactInfo(): InstanceEntity\Contact

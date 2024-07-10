@@ -39,7 +39,7 @@ class MediaAttachmentsConfig extends BaseDataTransferObject
 	/** @var int */
 	protected $video_size_limit = 0;
 	/** @var int */
-	protected $video_frame_rate_limit = 0;
+	protected $video_frame_rate_limit = 60;
 	/** @var int */
 	protected $video_matrix_limit = 0;
 
@@ -51,5 +51,7 @@ class MediaAttachmentsConfig extends BaseDataTransferObject
 		$this->supported_mime_types = $supported_mime_types;
 		$this->image_size_limit     = $image_size_limit;
 		$this->image_matrix_limit   = $image_matrix_limit;
+		$this->video_size_limit     = $image_size_limit;
+		$this->video_matrix_limit   = $image_matrix_limit;
 	}
 }

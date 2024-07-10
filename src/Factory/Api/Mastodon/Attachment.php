@@ -23,6 +23,7 @@ namespace Friendica\Factory\Api\Mastodon;
 
 use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
+use Friendica\Model\Attach;
 use Friendica\Model\Photo;
 use Friendica\Network\HTTPException;
 use Friendica\Model\Post;
@@ -143,5 +144,38 @@ class Attachment extends BaseFactory
 
 		$object = new \Friendica\Object\Api\Mastodon\Attachment($attachment, 'image', $url, $preview_url, '');
 		return $object->toArray();
+	}
+
+	/**
+	 * @param int $id id of the attachment
+	 *
+	 * @return array
+	 * @throws HTTPException\InternalServerErrorException
+	 */
+	public function createFromAttach(int $id): array
+	{
+		$media = Attach::selectFirst(['id', 'filetype'], ['id' => $id]);
+		if (empty($media)) {
+			return [];
+		}
+		$attachment = [
+			'id'          => 'attach:' . $media['id'],
+			'description' => null,
+			'blurhash'    => null,
+		];
+
+		$types = [Post\Media::AUDIO => 'audio', Post\Media::VIDEO => 'video', Post\Media::IMAGE => 'image'];
+
+		$type = Post\Media::getType($media['filetype']);
+
+		$url = $this->baseUrl . '/attach/' . $id;
+
+		$object = new \Friendica\Object\Api\Mastodon\Attachment($attachment, $types[$type] ?? 'unknown', $url, '', '');
+		return $object->toArray();
+	}
+
+	public function isAttach(string $id): bool
+	{
+		return substr($id, 0, 7) == 'attach:';
 	}
 }
