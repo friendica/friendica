@@ -72,7 +72,7 @@ echo "Extract strings to $OUTFILE.."
 [ -f "$OUTFILE" ] && rm "$OUTFILE"; touch "$OUTFILE"
 
 # shellcheck disable=SC2086  # $FINDOPTS is meant to be split
-find_result=$(find "$FINDSTARTDIR" $FINDOPTS -name "*.php" -type f | LC_ALL=C sort --stable)
+find_result=$(find "$FINDSTARTDIR" $FINDOPTS -name "*.php" -type f | LC_ALL=C sort -s)
 
 total_files=$(wc -l <<< "${find_result}")
 
@@ -86,7 +86,7 @@ do
 	if [ ! -d "$file" ]
 	then
 		# shellcheck disable=SC2086  # $KEYWORDS is meant to be split
-		xgettext $KEYWORDS -j -o "$OUTFILE" --from-code=UTF-8 "$file" || exit 1
+		xgettext $KEYWORDS --no-wrap -j -o "$OUTFILE" --from-code=UTF-8 "$file" || exit 1
 		sed -i.bkp "s/CHARSET/UTF-8/g" "$OUTFILE"
 	fi
 	(( count++ ))
