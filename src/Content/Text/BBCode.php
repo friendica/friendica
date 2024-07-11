@@ -1364,7 +1364,7 @@ class BBCode
 				// At a later stage we won't be able to exclude certain parts of the code.
 				$text = self::performWithEscapedTags($text, ['url', 'img', 'audio', 'video', 'youtube', 'vimeo', 'share', 'attachment', 'iframe', 'bookmark', 'map', 'oembed'], function ($text) use ($simple_html, $for_plaintext) {
 					if (!$for_plaintext) {
-						$text = preg_replace(Strings::autoLinkRegEx(), '[url]$1[/url]', $text);
+						$text = preg_replace(Strings::autoLinkRegEx(), '[url]$1[/url]', $text) ?? '';
 					}
 					return self::convertSmileysToHtml($text, $simple_html, $for_plaintext);
 				});
