@@ -828,7 +828,7 @@ class Receiver
 
 			case 'as:Announce':
 				if (in_array($object_data['object_type'], self::CONTENT_TYPES)) {
-					if (!Item::searchByLink($object_data['object_id'], $uid)) {
+					if (!Processor::alreadyKnown($object_data['object_id'], '')) {
 						if (ActivityPub\Processor::fetchMissingActivity($object_data['object_id'], [], $object_data['actor'], self::COMPLETION_ANNOUNCE, $uid)) {
 							Logger::debug('Created announced id', ['uid' => $uid, 'id' => $object_data['object_id']]);
 							Queue::remove($object_data);

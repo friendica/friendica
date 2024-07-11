@@ -4126,6 +4126,10 @@ class Item
 			return $item_id;
 		}
 
+		if (ActivityPub\Processor::alreadyKnown($uri, '')) {
+			return 0;
+		}
+
 		$hookData = [
 			'uri'     => $uri,
 			'uid'     => $uid,

@@ -41,6 +41,10 @@ class FetchMissingActivity
 	public static function execute(string $url, array $child = [], string $relay_actor = '', int $completion = Receiver::COMPLETION_MANUAL)
 	{
 		Logger::info('Start fetching missing activity', ['url' => $url]);
+		if (ActivityPub\Processor::alreadyKnown($url, $child['id'] ?? '')) {
+			Logger::info('Activity is already known.', ['url' => $url]);
+			return;
+		}
 		$result = ActivityPub\Processor::fetchMissingActivity($url, $child, $relay_actor, $completion);
 		if ($result) {
 			Logger::info('Successfully fetched missing activity', ['url' => $url]);

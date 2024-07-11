@@ -1702,7 +1702,9 @@ class Processor
 				}
 				Logger::debug('Fetch announced activity', ['type' => $type, 'id' => $object_id, 'actor' => $relay_actor, 'signer' => $signer]);
 
-				return self::fetchMissingActivity($object_id, $child, $relay_actor, $completion, $uid);
+				if (!self::alreadyKnown($object_id, $child['id'] ?? '')) {
+					return self::fetchMissingActivity($object_id, $child, $relay_actor, $completion, $uid);
+				}
 			}
 			$activity   = $object;
 			$ldactivity = $ldobject;
@@ -1768,14 +1770,7 @@ class Processor
 			if (is_array($reply)) {
 				$ldobject = JsonLD::compact($reply);
 				$id = JsonLD::fetchElement($ldobject, '@id');
-				if ($id == $child['id']) {
-					Logger::debug('Incluced activity is currently processed', ['replies' => $url, 'id' => $id]);
-					continue;
-				} elseif (Item::searchByLink($id)) {
-					Logger::debug('Incluced activity already exists', ['replies' => $url, 'id' => $id]);
-					continue;
-				} elseif (Queue::exists($id, 'as:Create')) {
-					Logger::debug('Incluced activity is already queued', ['replies' => $url, 'id' => $id]);
+				if (Processor::alreadyKnown($id, $child['id'] ?? '')) {
 					continue;
 				}
 				if (parse_url($id, PHP_URL_HOST) == parse_url($url, PHP_URL_HOST)) {
@@ -1787,19 +1782,28 @@ class Processor
 			} elseif (is_string($reply)) {
 				$id = $reply;
 			}
-			if ($id == $child['id']) {
-				Logger::debug('Activity is currently processed', ['replies' => $url, 'id' => $id]);
-			} elseif (Item::searchByLink($id)) {
-				Logger::debug('Activity already exists', ['replies' => $url, 'id' => $id]);
-			} elseif (Queue::exists($id, 'as:Create')) {
-				Logger::debug('Activity is already queued', ['replies' => $url, 'id' => $id]);
-			} else {
-				Logger::debug('Missing Activity will be fetched and processed', ['replies' => $url, 'id' => $id]);
+			if (!self::alreadyKnown($id, $child['id'] ?? '')) {
 				self::fetchMissingActivity($id, $child, '', Receiver::COMPLETION_REPLIES);
 				++$fetched;
 			}
 		}
 		Logger::notice('Fetch replies - done', ['fetched' => $fetched, 'total' => count($replies), 'replies' => $url]);
+	}
+
+	public static function alreadyKnown(string $id, string $child): bool
+	{
+		if ($id == $child) {
+			Logger::debug('Activity is currently processed', ['id' => $id, 'child' => $child]);
+			return true;
+		} elseif (Item::searchByLink($id)) {
+			Logger::debug('Activity already exists', ['id' => $id, 'child' => $child]);
+			return true;
+		} elseif (Queue::exists($id, 'as:Create')) {
+			Logger::debug('Activity is already queued', ['id' => $id, 'child' => $child]);
+			return true;
+		}
+		Logger::debug('Activity is unknown', ['id' => $id, 'child' => $child]);
+		return false;
 	}
 
 	private static function refetchObjectOnHostDifference(array $object, string $url): array
