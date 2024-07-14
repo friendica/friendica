@@ -25,6 +25,9 @@ use Asika\SimpleConsole\CommandArgsException;
 use Friendica\Core\Storage\Repository\StorageManager;
 use Friendica\Core\Storage\Exception\ReferenceStorageException;
 use Friendica\Core\Storage\Exception\StorageException;
+use Friendica\Database\DBA;
+use Friendica\Model\Contact;
+use Friendica\Model\Photo;
 
 /**
  * tool to manage storage backend and stored data from CLI
@@ -57,6 +60,9 @@ Synopsis
     bin/console storage list
         List available storage backends
     
+    bin/console storage clear
+        Remove the contact avatar cache data
+    
     bin/console storage set <name>
         Set current storage backend
             name        storage backend to use. see "list".
@@ -86,6 +92,9 @@ HELP;
 		switch ($this->args[0]) {
 			case 'list':
 				return $this->doList();
+				break;
+			case 'clear':
+				return $this->clear();
 				break;
 			case 'set':
 				return $this->doSet();
@@ -123,6 +132,22 @@ HELP;
 			$this->out();
 			$this->out('The current storage class (' . $current . ') is not registered!');
 		}
+		return 0;
+	}
+
+	protected function clear()
+	{
+		$fields = ['photo' => '', 'thumb' => '', 'micro' => ''];
+		$photos = DBA::select('photo', ['id', 'contact-id'], ['uid' => 0, 'photo-type' => [Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER]]);
+		while ($photo = DBA::fetch($photos)) {
+			if (Photo::delete(['id' => $photo['id']])) {
+				Contact::update($fields, ['id' => $photo['contact-id']]);
+				$this->out('Cleared photo id ' . $photo['id'] . ' - contact id ' . $photo['contact-id']);
+			} else {
+				$this->out('Photo id ' . $photo['id'] . ' was not deleted.');
+			}
+		}
+		DBA::close($photos);
 		return 0;
 	}
 
