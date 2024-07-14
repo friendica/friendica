@@ -48,7 +48,11 @@ class Saved extends BaseModule
 		$action = $this->args->get(2, 'none');
 		$search = trim(rawurldecode($_GET['term'] ?? ''));
 
-		$return_url = $_GET['return_url'] ?? Search::getSearchPath($search);
+		if (!empty($_GET['return_url'])) {
+			$return_url = hex2bin($_GET['return_url']);
+		} else {
+			$return_url = Search::getSearchPath($search);
+		}
 
 		if (DI::userSession()->getLocalUserId() && $search) {
 			switch ($action) {

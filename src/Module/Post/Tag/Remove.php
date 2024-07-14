@@ -68,7 +68,7 @@ class Remove extends \Friendica\BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$returnUrl = $request['return'] ?? '';
+		$returnUrl = hex2bin($request['return'] ?? '');
 
 		if (!$this->session->getLocalUserId()) {
 			$this->baseUrl->redirect($returnUrl);

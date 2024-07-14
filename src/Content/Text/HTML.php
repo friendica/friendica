@@ -868,7 +868,7 @@ class HTML
 			'$save_label'   => $save_label,
 			'$search_hint'  => DI::l10n()->t('@name, !group, #tags, content'),
 			'$mode'         => $mode,
-			'$return_url'   => urlencode(Search::getSearchPath($s)),
+			'$return_url'   => bin2hex(Search::getSearchPath($s)),
 		];
 
 		if (!$aside) {

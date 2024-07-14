@@ -61,7 +61,7 @@ class SavedSearches
 			'$add'        => '',
 			'$searchbox'  => '',
 			'$saved'      => $saved,
-			'$return_url' => urlencode($return_url),
+			'$return_url' => bin2hex($return_url),
 		]);
 	}
 }
