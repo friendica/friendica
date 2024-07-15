@@ -47,6 +47,7 @@ Usage: bin/console [--version] [-h|--help|-?] <command> [<args>] [-v]
 Commands:
 	addon                  Addon management
 	cache                  Manage node cache
+	clearavatarcache       Clear the file based avatar cache
 	config                 Edit site config
 	contact                Contact management
 	createdoxygen          Generate Doxygen headers
@@ -84,6 +85,7 @@ HELP;
 		'archivecontact'         => Friendica\Console\ArchiveContact::class,
 		'autoinstall'            => Friendica\Console\AutomaticInstallation::class,
 		'cache'                  => Friendica\Console\Cache::class,
+		'clearavatarcache'       => Friendica\Console\ClearAvatarCache::class,
 		'config'                 => Friendica\Console\Config::class,
 		'contact'                => Friendica\Console\Contact::class,
 		'createdoxygen'          => Friendica\Console\CreateDoxygen::class,

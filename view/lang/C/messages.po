@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2024.06-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 15:55+0000\n"
+"POT-Creation-Date: 2024-07-16 20:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -810,6 +810,10 @@ msgstr ""
 
 #: src/Console/ArchiveContact.php:109
 msgid "The contact entries have been archived"
+msgstr ""
+
+#: src/Console/ClearAvatarCache.php:87
+msgid "The avatar cache needs to be disabled in local.config.php to use this command."
 msgstr ""
 
 #: src/Console/GlobalCommunityBlock.php:96
@@ -8884,15 +8888,15 @@ msgstr ""
 msgid "Items tagged with: %s"
 msgstr ""
 
-#: src/Module/Search/Saved.php:59
+#: src/Module/Search/Saved.php:63
 msgid "Search term was not saved."
 msgstr ""
 
-#: src/Module/Search/Saved.php:62
+#: src/Module/Search/Saved.php:66
 msgid "Search term already saved."
 msgstr ""
 
-#: src/Module/Search/Saved.php:68
+#: src/Module/Search/Saved.php:72
 msgid "Search term was not removed."
 msgstr ""
 

@@ -23,14 +23,11 @@ namespace Friendica\Contact;
 
 use Friendica\Core\Logger;
 use Friendica\DI;
-use Friendica\Model\Item;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Object\Image;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPSignature;
-use Friendica\Util\Images;
-use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 
 /**
@@ -97,7 +94,7 @@ class Avatar
 			return $fields;
 		}
 
-		$filename  = self::getFilename($contact['url'], $avatar);
+		$filename  = self::getFilename($contact['url']);
 		$timestamp = time();
 
 		$fields['blurhash'] = $image->getBlurHash();
@@ -125,7 +122,7 @@ class Avatar
 			return $fields;
 		}
 
-		$filename  = self::getFilename($contact['url'], $contact['avatar']);
+		$filename  = self::getFilename($contact['url']);
 		$timestamp = time();
 
 		$fields['photo'] = self::storeAvatarCache($image, $filename, Proxy::PIXEL_SMALL, $timestamp);
@@ -135,12 +132,10 @@ class Avatar
 		return $fields;
 	}
 
-	private static function getFilename(string $url, string $host): string
+	private static function getFilename(string $url): string
 	{
-		$guid = Item::guidFromUri($url, $host);
-
-		return substr($guid, 0, 2) . '/' . substr($guid, 3, 2) . '/' . substr($guid, 5, 3) . '/' .
-			substr($guid, 9, 2) .'/' . substr($guid, 11, 2) . '/' . substr($guid, 13, 4). '/' . substr($guid, 18) . '-';
+		$guid = hash('ripemd128', $url);
+		return substr($guid, 0, 3) . '/' . substr($guid, 4) . '-';
 	}
 
 	private static function storeAvatarCache(Image $image, string $filename, int $size, int $timestamp): string
@@ -279,7 +274,7 @@ class Avatar
 		$localFile = self::getCacheFile($avatar);
 		if (!empty($localFile)) {
 			@unlink($localFile);
-			Logger::debug('Unlink avatar', ['avatar' => $avatar]);
+			Logger::debug('Unlink avatar', ['avatar' => $avatar, 'local' => $localFile]);
 		}
 	}
 
@@ -316,7 +311,7 @@ class Avatar
 	 *
 	 * @return string
 	 */
-	private static function baseUrl(): string
+	public static function baseUrl(): string
 	{
 		$baseurl = DI::config()->get('system', 'avatar_cache_url');
 		if (!empty($baseurl)) {
