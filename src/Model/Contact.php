@@ -3568,6 +3568,9 @@ class Contact
 		}
 
 		$contact = DBA::selectFirst('contact', ['id', 'network', 'url', 'alias', 'uid'], ['id' => $cid]);
+		if (empty($contact)) {
+			return $url;
+		}
 
 		return self::magicLinkByContact($contact, $url);
 	}
