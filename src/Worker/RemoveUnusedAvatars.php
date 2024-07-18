@@ -21,8 +21,8 @@
 
 namespace Friendica\Worker;
 
+use Friendica\Contact\Avatar;
 use Friendica\Core\Logger;
-use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
@@ -34,28 +34,26 @@ class RemoveUnusedAvatars
 {
 	public static function execute()
 	{
-		$sql = "FROM `contact` INNER JOIN `photo` ON `contact`.`id` = `contact-id`
-			WHERE `contact`.`uid` = ? AND NOT `self` AND (`photo` != ? OR `thumb` != ? OR `micro` != ?)
-				AND NOT `nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` != ?)
-				AND NOT `contact`.`id` IN (SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id`)
-				AND NOT `contact`.`id` IN (SELECT `owner-id` FROM `post-user` WHERE `owner-id` = `contact`.`id`)
-				AND NOT `contact`.`id` IN (SELECT `causer-id` FROM `post-user` WHERE `causer-id` IS NOT NULL AND `causer-id` = `contact`.`id`)
-				AND NOT `contact`.`id` IN (SELECT `cid` FROM `post-tag` WHERE `cid` = `contact`.`id`)
-				AND NOT `contact`.`id` IN (SELECT `contact-id` FROM `post-user` WHERE `contact-id` = `contact`.`id`);";
+		$condition = [
+			"`id` != ? AND `uid` = ? AND NOT `self` AND (`photo` != ? OR `thumb` != ? OR `micro` != ?)
+			AND NOT `nurl` IN (SELECT `nurl` FROM `contact` WHERE `uid` != ?)
+			AND NOT `id` IN (SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id`)
+			AND NOT `id` IN (SELECT `owner-id` FROM `post-user` WHERE `owner-id` = `contact`.`id`)
+			AND NOT `id` IN (SELECT `causer-id` FROM `post-user` WHERE `causer-id` IS NOT NULL AND `causer-id` = `contact`.`id`)
+			AND NOT `id` IN (SELECT `cid` FROM `post-tag` WHERE `cid` = `contact`.`id`)
+			AND NOT `id` IN (SELECT `contact-id` FROM `post-user` WHERE `contact-id` = `contact`.`id`)",
+			0, 0, '', '', '', 0
+		];
 
-		$ret = DBA::fetchFirst("SELECT COUNT(*) AS `total` " . $sql, 0, '', '', '', 0);
-		$total = $ret['total'] ?? 0;
+		$total = DBA::count('contact', $condition);
 		Logger::notice('Starting removal', ['total' => $total]);
 		$count = 0;
-		$contacts = DBA::p("SELECT `contact`.`id` " . $sql, 0, '', '', '', 0);
+		$contacts = DBA::select('contact', ['id', 'uri-id', 'uid', 'photo', 'thumb', 'micro'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
-			Contact::update(['photo' => '', 'thumb' => '', 'micro' => ''], ['id' => $contact['id']]);
-			Photo::delete(['contact-id' => $contact['id'], 'photo-type' => [Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER]]);
+			if (Avatar::deleteCache($contact) || Photo::delete(['uid' => 0, 'contact-id' => $contact['id'], 'photo-type' => [Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER]])) {
+				Contact::update(['photo' => '', 'thumb' => '', 'micro' => ''], ['id' => $contact['id']]);
+			}
 			if ((++$count % 1000) == 0) {
-				if (!Worker::isInMaintenanceWindow()) {
-					Logger::notice('We are outside of the maintenance window, quitting');
-					return;
-				}
 				Logger::info('In removal', ['count' => $count, 'total' => $total]);
 			}
 		}
