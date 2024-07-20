@@ -563,6 +563,11 @@ class Processor
 			return '';
 		}
 
+		if (in_array($activity['reply-to-id'], $activity['children'] ?? [])) {
+			Logger::notice('reply-to-id is already in the list of children', ['id' => $activity['reply-to-id'], 'children' => $activity['children'], 'depth' => count($activity['children'])]);
+			return '';
+		} 
+
 		self::addActivityId($activity['reply-to-id']);
 
 		$completion = $activity['completion-mode'] ?? Receiver::COMPLETION_NONE;
@@ -1632,6 +1637,11 @@ class Processor
 			return null;
 		}
 
+		if (!empty($child['children']) && in_array($url, $child['children'])) {
+			Logger::notice('id is already in the list of children', ['depth' => count($child['children']), 'children' => $child['children'], 'id' => $url]);
+			return null;
+		}
+
 		try {
 			$curlResult = HTTPSignature::fetchRaw($url, $uid);
 		} catch (\Exception $exception) {
@@ -1725,6 +1735,16 @@ class Processor
 		}
 
 		$ldactivity['recursion-depth'] = !empty($child['recursion-depth']) ? $child['recursion-depth'] + 1 : 0;
+		$ldactivity['children']        = $child['children'] ?? [];
+		// This check ist mostly superflous, since there are similar checks before. This covers the case, when the fetched id doesn't match the url
+		if (in_array($activity['id'], $ldactivity['children'])) {			
+			Logger::notice('Fetched id is already in the list of children. It will not be processed.', ['id' => $activity['id'], 'children' => $ldactivity['children'], 'depth' => count($ldactivity['children'])]);
+			return null;
+		}
+		if (!empty($child['id'])) {
+			$ldactivity['children'][] = $child['id'];
+		}
+
 
 		if ($object_actor != $actor) {
 			Contact::updateByUrlIfNeeded($object_actor);
@@ -1780,6 +1800,10 @@ class Processor
 				$ldobject = JsonLD::compact($reply);
 				$id = JsonLD::fetchElement($ldobject, '@id');
 				if (Processor::alreadyKnown($id, $child['id'] ?? '')) {
+					continue;
+				}
+				if (!empty($child['children']) && in_array($id, $child['children'])) {
+					Logger::debug('Replies id is already in the list of children', ['depth' => count($child['children']), 'children' => $child['children'], 'id' => $id]);
 					continue;
 				}
 				if (parse_url($id, PHP_URL_HOST) == parse_url($url, PHP_URL_HOST)) {

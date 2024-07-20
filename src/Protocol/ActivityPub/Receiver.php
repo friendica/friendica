@@ -757,6 +757,8 @@ class Receiver
 			$object_data['recursion-depth'] = $activity['recursion-depth'];
 		}
 
+		$object_data['children'] = $activity['children'] ?? [];
+
 		if (!self::routeActivities($object_data, $type, $push, true, $uid)) {
 			self::storeUnhandledActivity(true, $type, $object_data, $activity, $body, $uid, $trust_source, $push, $signer);
 			Queue::remove($object_data);

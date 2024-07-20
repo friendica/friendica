@@ -318,7 +318,7 @@ class Queue
 				self::retrial($id);
 				return false;
 			}
-			if (!Post::exists(['uri' => $entry['in-reply-to-id']])) {
+			if (!Processor::alreadyKnown($entry['in-reply-to-id'], '')) {
 				// This entry belongs to some other entry that need to be fetched first
 				if (Fetch::hasWorker($entry['in-reply-to-id'])) {
 					Logger::debug('Fetching of the activity is already queued', ['id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
@@ -327,6 +327,11 @@ class Queue
 				}
 				Fetch::add($entry['in-reply-to-id']);
 				$activity = json_decode($entry['activity'], true);
+				if (in_array($entry['in-reply-to-id'], $activity['children'] ?? [])) {
+					Logger::notice('reply-to-id is already in the list of children', ['id' => $entry['in-reply-to-id'], 'children' => $activity['children'], 'depth' => count($activity['children'])]);
+					self::retrial($id);
+					return false;
+				}
 				$activity['recursion-depth'] = 0;
 				$wid = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $entry['in-reply-to-id'], $activity, '', Receiver::COMPLETION_ASYNC);
 				Fetch::setWorkerId($entry['in-reply-to-id'], $wid);
