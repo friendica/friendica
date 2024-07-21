@@ -453,7 +453,7 @@ class Authentication
 	 */
 	public function setUnauthenticatedVisitor(string $url)
 	{
-		if (Strings::compareLink($this->session->get('visitor_home'), $url)) {
+		if (Strings::compareLink($this->session->get('visitor_home', ''), $url)) {
 			return;
 		}
 		
