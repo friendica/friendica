@@ -398,7 +398,7 @@ class Widget
 			$entries[] = [
 				'url'   => Contact::magicLinkByContact($contact),
 				'name'  => $contact['name'],
-				'photo' => Contact::getThumb($contact),
+				'photo' => Contact::getThumb($contact, true),
 			];
 		}
 
