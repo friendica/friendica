@@ -421,6 +421,14 @@ class Item
 
 		// Is it our comment and/or our thread?
 		if (($item['origin'] || $parent['origin']) && ($item['uid'] != 0)) {
+			if ($item['origin'] && $item['gravity'] == self::GRAVITY_PARENT) {
+				$posts = DI::keyValue()->get('nodeinfo_local_posts') ?? 0;
+				DI::keyValue()->set('nodeinfo_local_posts', $posts - 1);
+			} elseif ($item['origin'] && $item['gravity'] == self::GRAVITY_COMMENT) {
+				$comments = DI::keyValue()->get('nodeinfo_local_comments') ?? 0;
+				DI::keyValue()->set('nodeinfo_local_comments', $comments - 1);
+			}
+	
 			// When we delete the original post we will delete all existing copies on the server as well
 			self::markForDeletion(['uri-id' => $item['uri-id'], 'deleted' => false], $priority);
 
@@ -1348,6 +1356,14 @@ class Item
 			Logger::warning('Could not store item. it will be spooled', ['id' => $post_user_id]);
 			self::spool($orig_item);
 			return 0;
+		}
+
+		if ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_PARENT) {
+			$posts = DI::keyValue()->get('nodeinfo_local_posts') ?? 0;
+			DI::keyValue()->set('nodeinfo_local_posts', $posts + 1);
+		} elseif ($posted_item['origin'] && $posted_item['gravity'] == self::GRAVITY_COMMENT) {
+			$comments = DI::keyValue()->get('nodeinfo_local_comments') ?? 0;
+			DI::keyValue()->set('nodeinfo_local_comments', $comments + 1);
 		}
 
 		Post\Origin::insert($posted_item);

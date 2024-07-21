@@ -658,6 +658,8 @@ return [
 		],
 	],
 
+	'/stats' => [Module\Stats::class, [R::GET]],
+
 	'/network' => [
 		'[/{content}]'                => [Module\Conversation\Network::class, [R::GET]],
 		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d-\d\d-\d\d}]' => [Module\Conversation\Network::class, [R::GET]],

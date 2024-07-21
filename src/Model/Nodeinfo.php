@@ -53,6 +53,8 @@ class Nodeinfo
 			return;
 		}
 
+		$logger->info('User statistics - start');
+
 		$userStats = User::getStatistics();
 
 		DI::keyValue()->set('nodeinfo_total_users', $userStats['total_users']);
@@ -60,14 +62,14 @@ class Nodeinfo
 		DI::keyValue()->set('nodeinfo_active_users_monthly', $userStats['active_users_monthly']);
 		DI::keyValue()->set('nodeinfo_active_users_weekly', $userStats['active_users_weekly']);
 
-		$logger->info('user statistics', $userStats);
+		$logger->info('user statistics - done', $userStats);
 
 		$posts = DBA::count('post-thread', ["`uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE NOT `deleted` AND `origin`)"]);
 		$comments = DBA::count('post', ["NOT `deleted` AND `gravity` = ? AND `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin`)", Item::GRAVITY_COMMENT]);
 		DI::keyValue()->set('nodeinfo_local_posts', $posts);
 		DI::keyValue()->set('nodeinfo_local_comments', $comments);
 
-		$logger->info('User activity', ['posts' => $posts, 'comments' => $comments]);
+		$logger->info('Post statistics - done', ['posts' => $posts, 'comments' => $comments]);
 	}
 
 	/**

@@ -235,7 +235,7 @@ class Worker
 	 * @return integer Number of deferred entries in the worker queue
 	 * @throws \Exception
 	 */
-	private static function deferredEntries(): int
+	public static function deferredEntries(): int
 	{
 		$stamp = (float)microtime(true);
 		$count = DBA::count('workerqueue', ["NOT `done` AND `pid` = 0 AND `retrial` > ?", 0]);
@@ -250,7 +250,7 @@ class Worker
 	 * @return integer Number of non executed entries in the worker queue
 	 * @throws \Exception
 	 */
-	private static function totalEntries(): int
+	public static function totalEntries(): int
 	{
 		$stamp = (float)microtime(true);
 		$count = DBA::count('workerqueue', ['done' => false, 'pid' => 0]);
@@ -862,7 +862,7 @@ class Worker
 	 * @return integer Number of active worker processes
 	 * @throws \Exception
 	 */
-	private static function activeWorkers(): int
+	public static function activeWorkers(): int
 	{
 		$stamp = (float)microtime(true);
 		$count = DI::process()->countCommand('Worker.php');

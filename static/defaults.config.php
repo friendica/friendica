@@ -556,6 +556,10 @@ return [
 		// Show all themes including the unsupported ones.
 		'show_unsupported_themes' => false,
 
+		// stats_key (String)
+		// A random string to be added to the /stats?key=... endpoint to enable the monitoring statistics
+		'stats_key' => '',
+
 		// throttle_limit_day (Integer)
 		// Maximum number of posts that a user can send per day with the API. 0 to disable daily throttling.
 		'throttle_limit_day' => 0,
