@@ -69,6 +69,11 @@ class Nodeinfo
 		DI::keyValue()->set('nodeinfo_local_posts', $posts);
 		DI::keyValue()->set('nodeinfo_local_comments', $comments);
 
+		$posts = DBA::count('post', ['deleted' => false, 'gravity' => Item::GRAVITY_COMMENT]);
+		$comments = DBA::count('post', ['deleted' => false, 'gravity' => Item::GRAVITY_COMMENT]);
+		DI::keyValue()->set('nodeinfo_total_posts', $posts);
+		DI::keyValue()->set('nodeinfo_total_comments', $comments);
+
 		$logger->info('Post statistics - done', ['posts' => $posts, 'comments' => $comments]);
 	}
 
@@ -76,7 +81,7 @@ class Nodeinfo
 	 * Return the supported services
 	 *
 	 * @return Object with supported services
-	*/
+	 */
 	public static function getUsage(bool $version2 = false)
 	{
 		$config = DI::config();
@@ -103,7 +108,7 @@ class Nodeinfo
 	 * Return the supported services
 	 *
 	 * @return array with supported services
-	*/
+	 */
 	public static function getServices(): array
 	{
 		$services = [

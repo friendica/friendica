@@ -28,6 +28,8 @@ use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\L10n;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
+use Friendica\Model\Register;
+use Friendica\Moderation\Entity\Report;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -67,7 +69,22 @@ class Stats extends BaseModule
 			return;
 		}
 
+		$report = $this->dba->selectFirst('report', ['created'], [], ['order' => ['created' => true]]);
+		if (!empty($report)) {
+			$report_datetime  = DateTimeFormat::utc($report['created'], DateTimeFormat::JSON);
+			$report_timestamp = strtotime($report['created']);
+		} else {
+			$report_datetime  = '';
+			$report_timestamp = 0;
+		}
+
 		$statistics = [
+			'cron' => [
+				'lastExecution' => [
+					'datetime'  => DateTimeFormat::utc($this->keyValue->get('last_cron'), DateTimeFormat::JSON),
+					'timestamp' => (int)$this->keyValue->get('last_cron'),
+				],
+			],
 			'worker' => [
 				'lastExecution' => [
 					'datetime'  => DateTimeFormat::utc($this->keyValue->get('last_worker_execution'), DateTimeFormat::JSON),
@@ -84,14 +101,29 @@ class Stats extends BaseModule
 			],
 			'users' => [
 				'total'          => intval($this->keyValue->get('nodeinfo_total_users')),
-				'activeHalfyear' => intval($this->keyValue->get('nodeinfo_active_users_halfyear')),
-				'activeMonth'    => intval($this->keyValue->get('nodeinfo_active_users_monthly')),
 				'activeWeek'     => intval($this->keyValue->get('nodeinfo_active_users_weekly')),
+				'activeMonth'    => intval($this->keyValue->get('nodeinfo_active_users_monthly')),
+				'activeHalfyear' => intval($this->keyValue->get('nodeinfo_active_users_halfyear')),
+				'pending'        => Register::getPendingCount(),
 			],
-			'usage' => [
-				'localPosts'    => intval($this->keyValue->get('nodeinfo_local_posts')),
-				'localComments' => intval($this->keyValue->get('nodeinfo_local_comments')),
+			'posts' => [
+				'inbound' => [
+					'posts'    => intval($this->keyValue->get('nodeinfo_total_posts')) - intval($this->keyValue->get('nodeinfo_local_posts')),
+					'comments' => intval($this->keyValue->get('nodeinfo_total_comments')) - intval($this->keyValue->get('nodeinfo_local_comments')),
+				],
+				'outbound' => [
+					'posts'    => intval($this->keyValue->get('nodeinfo_local_posts')),
+					'comments' => intval($this->keyValue->get('nodeinfo_local_comments')),
+				],
 			],
+			'reports' => [
+				'newest' => [
+					'datetime'  => $report_datetime,
+					'timestamp' => $report_timestamp,
+				],
+				'open'   => $this->dba->count('report', ['status' => Report::STATUS_OPEN]),
+				'closed' => $this->dba->count('report', ['status' => Report::STATUS_CLOSED]),
+			]
 		];
 
 		$statistics = $this->getJobsPerPriority($statistics);

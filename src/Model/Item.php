@@ -419,6 +419,14 @@ class Item
 			self::markForDeletion(['parent' => $item['parent'], 'deleted' => false], $priority);
 		}
 
+		if ($item['uid'] == 0 && $item['gravity'] == self::GRAVITY_PARENT) {
+			$posts = DI::keyValue()->get('nodeinfo_total_posts') ?? 0;
+			DI::keyValue()->set('nodeinfo_total_posts', $posts - 1);
+		} elseif ($item['uid'] == 0 && $item['gravity'] == self::GRAVITY_COMMENT) {
+			$comments = DI::keyValue()->get('nodeinfo_total_comments') ?? 0;
+			DI::keyValue()->set('nodeinfo_total_comments', $comments - 1);
+		}
+
 		// Is it our comment and/or our thread?
 		if (($item['origin'] || $parent['origin']) && ($item['uid'] != 0)) {
 			if ($item['origin'] && $item['gravity'] == self::GRAVITY_PARENT) {
@@ -428,7 +436,7 @@ class Item
 				$comments = DI::keyValue()->get('nodeinfo_local_comments') ?? 0;
 				DI::keyValue()->set('nodeinfo_local_comments', $comments - 1);
 			}
-	
+
 			// When we delete the original post we will delete all existing copies on the server as well
 			self::markForDeletion(['uri-id' => $item['uri-id'], 'deleted' => false], $priority);
 
@@ -1455,6 +1463,14 @@ class Item
 		}
 
 		if ($inserted) {
+			if ($posted_item['gravity'] == self::GRAVITY_PARENT) {
+				$posts = DI::keyValue()->get('nodeinfo_total_posts') ?? 0;
+				DI::keyValue()->set('nodeinfo_total_posts', $posts + 1);
+			} elseif ($posted_item['gravity'] == self::GRAVITY_COMMENT) {
+				$comments = DI::keyValue()->get('nodeinfo_total_comments') ?? 0;
+				DI::keyValue()->set('nodeinfo_total_comments', $comments + 1);
+			}
+
 			// Fill the cache with the rendered content.
 			if (in_array($posted_item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT])) {
 				self::updateDisplayCache($posted_item['uri-id']);
