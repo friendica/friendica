@@ -141,7 +141,7 @@ class Content
 		if ($uid != 0) {
 			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND (NOT `restricted` OR `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ?))", $search, $uid];
 		} else {
-			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND NOT `restricted", $search];
+			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND NOT `restricted`", $search];
 		}
 		return DBA::count(SearchIndex::getSearchTable(), $condition);
 	}
