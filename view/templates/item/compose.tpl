@@ -130,30 +130,92 @@
 		});
 	});
 
-    function togglePermissions() {
-        var permissionsSection = document.getElementById('permissions-section');
-        if (permissionsSection.style.display === 'none' || permissionsSection.style.display === '') {
-            permissionsSection.style.display = 'block';
-        } else {
-            permissionsSection.style.display = 'none';
-        }
-    }
+	function togglePermissions() {
+		var permissionsSection = document.getElementById('permissions-section');
+		if (permissionsSection.style.display === 'none' || permissionsSection.style.display === '') {
+			permissionsSection.style.display = 'block';
+		} else {
+			permissionsSection.style.display = 'none';
+		}
+	}
 
-    // Warn the user before leaving the page
-    var formSubmitting = false;
+	// Warn the user before leaving the page
+	var formSubmitting = false;
 
-    function setFormSubmitting() {
-        formSubmitting = true;
-    }
+	function setFormSubmitting() {
+		formSubmitting = true;
+	}
 
-    window.addEventListener("beforeunload", function (event) {
-        if (!formSubmitting) {
-            var confirmationMessage = 'Are you sure you want to reload the page? All unsaved changes will be lost.';
-            event.returnValue = confirmationMessage;
-            return confirmationMessage;
-        }
-    });
+	document.addEventListener("DOMContentLoaded", function() {
+		var textareas = document.querySelectorAll(".expandable-textarea");
 
-    // Set the formSubmitting flag when the form is submitted
-    document.getElementById('comment-edit-form-{{$id}}').addEventListener('submit', setFormSubmitting);
+		textareas.forEach(function(textarea) {
+			// Set initial height and restore saved content
+			textarea.style.height = "auto";
+			textarea.style.height = (textarea.scrollHeight) + "px";
+
+			const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
+			const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
+
+			if (savedContent && lastSaved) {
+				// Check whether 10 minutes have elapsed since the last save
+				const currentTime = new Date().getTime();
+				const timeElapsed = currentTime - parseInt(lastSaved, 10);
+
+				if (timeElapsed <= 600000) {  // 600000 ms = 10 Minuten
+					textarea.value = savedContent;
+					textarea.style.height = "auto";
+					textarea.style.height = (textarea.scrollHeight) + "px";
+				} else {
+					// Content is older than 10 minutes, therefore delete
+					localStorage.removeItem(`comment-edit-text-${textarea.id}`);
+					localStorage.removeItem(`last-saved-${textarea.id}`);
+				}
+			}
+		});
+	});
+
+	// Auto-save content to localStorage every 5 seconds
+	setInterval(() => {
+		var textareas = document.querySelectorAll(".expandable-textarea");
+		textareas.forEach(function(textarea) {
+			if (textarea.value.trim() !== "") {
+				// Saving the content
+				localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
+
+				// Saving the timestamp of the last save
+				const currentTime = new Date().getTime();
+				localStorage.setItem(`last-saved-${textarea.id}`, currentTime.toString());
+			}
+		});
+	}, 5000);
+
+	// Remove content saved when submitting the form
+	function setFormSubmitting() {
+		formSubmitting = true;
+
+		// Removing the content from localStorage
+		var textareas = document.querySelectorAll(".expandable-textarea");
+		textareas.forEach(function(textarea) {
+			localStorage.removeItem(`comment-edit-text-${textarea.id}`);
+			localStorage.removeItem(`last-saved-${textarea.id}`);
+		});
+	}
+
+	window.addEventListener("beforeunload", function (event) {
+		if (!formSubmitting) {
+			// Get the value of the text field
+			var textField = document.getElementById('comment-edit-text-{{$id}}').value.trim();
+
+			// Check whether the text field contains at least one character
+			if (textField.length > 0) {
+				var confirmationMessage = 'Are you sure you want to reload the page? All unsaved changes will be lost.';
+				event.returnValue = confirmationMessage;
+				return confirmationMessage;
+			}
+		}
+	});
+
+	// Set the formSubmitting flag when the form is submitted
+	document.getElementById('comment-edit-form-{{$id}}').addEventListener('submit', setFormSubmitting);
 </script>
