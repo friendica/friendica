@@ -1,0 +1,46 @@
+
+server_memory = "2048" # MB
+server_timezone = "UTC"
+public_folder = "/vagrant"
+
+Vagrant.configure(2) do |config|
+	# Set server to Debian 11 / Bullseye 64bit
+	config.vm.box = "debian/bullseye64"
+
+	# Disable automatic box update checking. If you disable this, then
+	# boxes will only be checked for updates when the user runs
+	# `vagrant box outdated`. This is not recommended.
+	config.vm.box_check_update = true
+
+	# Create a hostname, don't forget to put it to the `hosts` file
+	# This will point to the server's default virtual host
+	# TO DO: Make this work with virtualhost along-side xip.io URL
+	config.vm.hostname = "friendica.local"
+
+	config.vm.define "libvirt" do |virt|
+		virt.vm.synced_folder './', public_folder, id: "vagrant-root", type: '9p', disabled: false, accessmode: "squash"
+
+
+	virt.vm.provider :libvirt do |libvirt|
+		libvirt.uri = "qemu:///session"
+			libvirt.driver = "kvm"
+			#libvirt.cpu_model = "qemu64"
+			#libvirt.cpus = 1
+			libvirt.cpu_mode = 'host-passthrough'
+			libvirt.nested = true
+			libvirt.disk_bus = "virtio"
+			libvirt.disk_driver :cache => "writeback"
+			libvirt.memory = server_memory
+			libvirt.memorybacking :access, :mode => "shared"
+			libvirt.nic_model_type = "virtio"
+			libvirt.numa_nodes = [{ :cpus => "0-0", :memory => server_memory, :memAccess => "shared" }]
+			libvirt.video_type = "virtio"
+	  end
+	end
+
+  	# Enable provisioning with a shell script.
+	config.vm.provision "shell", path: "./bin/dev/vagrant_provision.sh", privileged: true
+	config.vm.provision "shell", path: "./bin/dev/vagrant_libvirt_provision.sh", privileged: true
+		# run: "always"
+		# run: "once"
+end

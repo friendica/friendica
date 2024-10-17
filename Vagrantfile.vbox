@@ -41,10 +41,6 @@ Vagrant.configure(2) do |config|
     end
   end
 
-  config.vm.provider :libvirt do |libvirt|
-  	libvirt.memory = server_memory
-  end
-
   # Enable provisioning with a shell script.
   config.vm.provision "shell", path: "./bin/dev/vagrant_provision.sh", privileged: true
     # run: "always"

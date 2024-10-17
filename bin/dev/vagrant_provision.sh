@@ -115,6 +115,9 @@ cp /vagrant/.htaccess-dist /vagrant/.htaccess
 # create the friendica database
 echo "create database friendica DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci" | $MYSQL -u root -proot
 
+# install vendor
+bin/composer.phar install
+
 # install friendica
 bin/console autoinstall -f /vagrant/mods/local.config.vagrant.php
 
