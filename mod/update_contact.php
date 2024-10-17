@@ -23,9 +23,7 @@ function update_contact_content(App $a)
 		if (DBA::isResult($contact) && empty($contact['deleted'])) {
 			DI::page()['aside'] = '';
 
-			if (!empty($_GET['item'])) {
-				$item = Post::selectFirst(['parent'], ['id' => $_GET['item']]);
-			}
+			$item = Post::selectFirst(['parent'], ['id' => $_GET['item'] ?? 0]);
 
 			$text = Contact::getThreadsFromId($contact['pid'], DI::userSession()->getLocalUserId(), true, $item['parent'] ?? 0, $_GET['last_received'] ?? '');
 		}

@@ -1151,6 +1151,7 @@ function photos_content()
 						'$comment' => DI::l10n()->t('Comment'),
 						'$submit' => DI::l10n()->t('Submit'),
 						'$preview' => DI::l10n()->t('Preview'),
+						'$loading' => DI::l10n()->t('Loading...'),
 						'$qcomment' => $qcomment,
 						'$rand_num' => Crypto::randomDigits(12),
 					]);
