@@ -47,13 +47,13 @@ class Info extends BaseApi
 		}
 
 		$adminInfo = [
-			'php'    => [
+			'php' => [
 				'version'             => phpversion(),
 				'upload_max_filesize' => ini_get('upload_max_filesize'),
 				'post_max_size'       => ini_get('post_max_size'),
 				'memory_limit'        => ini_get('memory_limit')
 			],
-			'mysql'  => [
+			'mysql' => [
 				'max_allowed_packet' => DBA::getVariable('max_allowed_packet'),
 			],
 			'worker' => [
@@ -64,7 +64,7 @@ class Info extends BaseApi
 			'update' => [
 				'dbupdate_status' => DBStructure::getUpdateStatus(),
 				'update_status'   => Update::getStatus(),
-				'has_update'      => Update::hasUpdate(),
+				'has_update'      => Update::needsUpdate(),
 				'git_version'     => Update::getGitVersion(),
 			]
 		];

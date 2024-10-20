@@ -49,7 +49,7 @@ class Update
 	 *
 	 * @return bool|null
 	 */
-	public static function hasUpdate(): ?bool
+	public static function needsUpdate(): ?bool
 	{
 		if (DI::config()->get('system', 'check_new_version_url', 'none') != 'none') {
 			if (version_compare(App::VERSION, static::getGitVersion()) < 0) {

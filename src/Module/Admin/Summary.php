@@ -65,7 +65,7 @@ class Summary extends BaseAdmin
 
 		// Check if github.com/friendica/stable/VERSION is higher then
 		// the local version of Friendica. Check is opt-in, source may be stable or develop branch
-		if (Update::hasUpdate()) {
+		if (Update::needsUpdate()) {
 			$warningtext[] = DI::l10n()->t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', App::VERSION, Update::getGitVersion());
 		}
 
