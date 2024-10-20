@@ -1,0 +1,18 @@
+name: Run tests
+on:
+- pull_request
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      MARIADB_ROOT_PASSWORD: Iaphu2be
+    services:
+      mysql:
+        image: mariadb:latest
+        ports: 3306:3306
+        options: --health-cmd="mariadb-admin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+      - shell: bash
+        run: mysql "SELECT 1"
