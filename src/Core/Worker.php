@@ -7,6 +7,7 @@
 
 namespace Friendica\Core;
 
+use DateTime;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Worker\Entity\Process;
 use Friendica\Database\DBA;
@@ -54,6 +55,52 @@ class Worker
 	private static $state;
 	/** @var Process */
 	private static $process;
+
+	/**
+	 * Returns the count of deffered messages
+	 *
+	 * @return int
+	 */
+	public static function getDeferredMessagesCount(): int
+	{
+		try {
+			return DBA::count('workerqueue', ['NOT `done` AND `retrial` > ?', 0]);
+		} catch (\Exception $e) {
+			DI::logger()->warning('Cannot count on table workerqueue', ['exception' => $e]);
+			return 0;
+		}
+	}
+
+	/**
+	 * Returns the count of the worker queue
+	 *
+	 * @return int
+	 */
+	public static function getWorkerQueueCount(): int
+	{
+		try {
+			return DBA::count('workerqueue', ['NOT `done` AND `retrial` = ?', 0]);
+		} catch (\Exception $e) {
+			DI::logger()->warning('Cannot count on table workerqueue', ['exception' => $e]);
+			return 0;
+		}
+	}
+
+	/**
+	 * Returns the datetime of the last Worker execution
+	 *
+	 * @return DateTime|null
+	 */
+	public static function getLastCall(): ?DateTime
+	{
+		$lastWorkerCall = DI::keyValue()->get("last_worker_execution");
+
+		if (!$lastWorkerCall) {
+			return null;
+		} else {
+			return DateTime::createFromFormat("Y-m-d H:i:s", $lastWorkerCall) ?? null;
+		}
+	}
 
 	/**
 	 * Processes the tasks that are in the workerqueue table
@@ -830,7 +877,7 @@ class Worker
 					return false;
 				} elseif ($max_idletime > 0) {
 					Logger::debug('Maximum idletime not reached.', ['last' => $last_check, 'last-check' => $last_date, 'seconds' => $max_idletime, 'load' => $load, 'max_load' => $maxsysload, 'active_worker' => $active, 'max_worker' => $maxqueues]);
-				}	
+				}
 			}
 		}
 
@@ -1378,7 +1425,7 @@ class Worker
 	/**
 	 * Defers the current worker entry
 	 *
-	 * @param int $worker_defer_limit Maximum defer limit 
+	 * @param int $worker_defer_limit Maximum defer limit
 	 * @return boolean had the entry been deferred?
 	 * @throws \Exception
 	 */

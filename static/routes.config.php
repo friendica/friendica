@@ -65,6 +65,8 @@ $apiRoutes = [
 	'/friendships/show[.{extension:json|xml|rss|atom}]'            => [Module\Api\Twitter\Friendships\Show::class,         [R::GET         ]],
 
 	'/friendica' => [
+		'/admin/info'                                              => [Module\Api\Friendica\Admin\Info::class,             [R::GET         ]],
+
 		'/activity/{verb:attendmaybe|attendno|attendyes|dislike|like|unattendmaybe|unattendno|unattendyes|undislike|unlike}[.{extension:json|xml|rss|atom}]'
 			=> [Module\Api\Friendica\Activity::class, [        R::POST]],
 		'/statuses/{id:\d+}/dislike'                               => [Module\Api\Friendica\Statuses\Dislike::class,       [        R::POST]],

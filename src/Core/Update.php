@@ -25,6 +25,44 @@ class Update
 	const NEW_TABLE_STRUCTURE_VERSION = 1288;
 
 	/**
+	 * Returns the status of the current update
+	 *
+	 * @return int
+	 */
+	public static function getStatus(): int
+	{
+		return (int)DI::config()->get('system', 'update') ?? static::SUCCESS;
+	}
+
+	/**
+	 * Returns the latest Version of the Friendica git repository and null, if this node doesn't check updates automatically
+	 *
+	 * @return string
+	 */
+	public static function getGitVersion(): ?string
+	{
+		return DI::keyValue()->get('git_friendica_version') ?? null;
+	}
+
+	/**
+	 * Returns true, if there's a new update and null if this node doesn't check updates automatically
+	 *
+	 * @return bool|null
+	 */
+	public static function hasUpdate(): ?bool
+	{
+		if (DI::config()->get('system', 'check_new_version_url', 'none') != 'none') {
+			if (version_compare(App::VERSION, static::getGitVersion()) < 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Function to check if the Database structure needs an update.
 	 *
 	 * @param string   $basePath   The base path of this application

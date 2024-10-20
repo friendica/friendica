@@ -189,6 +189,16 @@ class DBStructure
 	}
 
 	/**
+	 * Returns the current status of the Update
+	 *
+	 * @return int
+	 */
+	public static function getUpdateStatus(): int
+	{
+		return (int)DI::config()->get('system', 'dbupdate') ?? static::UPDATE_NOT_CHECKED;
+	}
+
+	/**
 	 * Updates DB structure from the installation and returns eventual errors messages
 	 *
 	 * @return string Empty string if the update is successful, error messages otherwise

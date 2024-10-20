@@ -13,6 +13,7 @@ use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
+use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
@@ -64,23 +65,19 @@ class Summary extends BaseAdmin
 
 		// Check if github.com/friendica/stable/VERSION is higher then
 		// the local version of Friendica. Check is opt-in, source may be stable or develop branch
-		if (DI::config()->get('system', 'check_new_version_url', 'none') != 'none') {
-			$gitversion = DI::keyValue()->get('git_friendica_version') ?? '';
-
-			if (version_compare(App::VERSION, $gitversion) < 0) {
-				$warningtext[] = DI::l10n()->t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', App::VERSION, $gitversion);
-			}
+		if (Update::hasUpdate()) {
+			$warningtext[] = DI::l10n()->t('There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s', App::VERSION, Update::getGitVersion());
 		}
 
-		if (DI::config()->get('system', 'dbupdate', DBStructure::UPDATE_NOT_CHECKED) == DBStructure::UPDATE_NOT_CHECKED) {
+		if (DBStructure::getUpdateStatus() == DBStructure::UPDATE_NOT_CHECKED) {
 			DBStructure::performUpdate();
 		}
 
-		if (DI::config()->get('system', 'dbupdate') == DBStructure::UPDATE_FAILED) {
+		if (DBStructure::getUpdateStatus() == DBStructure::UPDATE_FAILED) {
 			$warningtext[] = DI::l10n()->t('The database update failed. Please run "php bin/console.php dbstructure update" from the command line and have a look at the errors that might appear.');
 		}
 
-		if (DI::config()->get('system', 'update') == Update::FAILED) {
+		if (Update::getStatus() == Update::FAILED) {
 			$warningtext[] = DI::l10n()->t('The last update failed. Please run "php bin/console.php dbstructure update" from the command line and have a look at the errors that might appear. (Some of the errors are possibly inside the logfile.)');
 		}
 
@@ -88,11 +85,11 @@ class Summary extends BaseAdmin
 			$warningtext[] = DI::l10n()->t('The system.url entry is missing. This is a low level setting and can lead to unexpected behavior. Please add a valid entry as soon as possible in the config file or per console command!');
 		}
 
-		$last_worker_call = DI::keyValue()->get('last_worker_execution');
+		$last_worker_call = Worker::getLastCall();
 		if (!$last_worker_call) {
 			$warningtext[] = DI::l10n()->t('The worker was never executed. Please check your database structure!');
-		} elseif ((strtotime(DateTimeFormat::utcNow()) - strtotime($last_worker_call)) > 60 * 60) {
-			$warningtext[] = DI::l10n()->t('The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings.', $last_worker_call);
+		} elseif ((strtotime(DateTimeFormat::utcNow()) - $last_worker_call->getTimestamp()) > 60 * 60) {
+			$warningtext[] = DI::l10n()->t('The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings.', $last_worker_call->format(DateTimeFormat::utcNow()));
 		}
 
 		// Legacy config file warning
@@ -153,15 +150,12 @@ class Summary extends BaseAdmin
 			}
 		}
 
-		$deferred = DBA::count('workerqueue', ['NOT `done` AND `retrial` > ?', 0]);
+		$deferred = Worker::getDeferredMessagesCount();
 
-		$workerqueue = DBA::count('workerqueue', ['NOT `done` AND `retrial` = ?', 0]);
+		$workerqueue = Worker::getWorkerQueueCount();
 
 		// We can do better, but this is a quick queue status
 		$queues = ['label' => DI::l10n()->t('Message queues'), 'deferred' => $deferred, 'workerq' => $workerqueue];
-
-		$variables = DBA::toArray(DBA::p('SHOW variables LIKE "max_allowed_packet"'));
-		$max_allowed_packet = $variables ? $variables[0]['Value'] : 0;
 
 		$server_settings = [
 			'label' => DI::l10n()->t('Server Settings'),
@@ -173,7 +167,7 @@ class Summary extends BaseAdmin
 				'memory_limit'        => ini_get('memory_limit')
 			],
 			'mysql' => [
-				'max_allowed_packet' => $max_allowed_packet
+				'max_allowed_packet' => DBA::getVariable('max_allowed_packet'),
 			]
 		];
 
