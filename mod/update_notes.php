@@ -16,7 +16,7 @@ require_once 'mod/notes.php';
 
 function update_notes_content(App $a)
 {
-	$profile_uid = intval($_GET['p']);
+	$profile_uid = intval($_GET['p'] ?? 0);
 
 	/**
 	 *
