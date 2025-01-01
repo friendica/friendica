@@ -19,13 +19,13 @@ class FriendSuggest extends BaseFactory implements ICanCreateFromTableRow
 	public function createFromTableRow(array $row): Entity\FriendSuggest
 	{
 		return new Entity\FriendSuggest(
-			$row['uid'] ?? 0,
-			$row['cid'] ?? 0,
-			$row['name'] ?? '',
-			$row['url'] ?? '',
+			$row['uid']     ?? 0,
+			$row['cid']     ?? 0,
+			$row['name']    ?? '',
+			$row['url']     ?? '',
 			$row['request'] ?? '',
-			$row['photo'] ?? '',
-			$row['note'] ?? '',
+			$row['photo']   ?? '',
+			$row['note']    ?? '',
 			new \DateTime($row['created'] ?? 'now', new \DateTimeZone('UTC')),
 			$row['id'] ?? null
 		);

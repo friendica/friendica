@@ -74,10 +74,10 @@ class Community extends Timeline
 
 		$t = Renderer::getMarkupTemplate("community.tpl");
 		$o = Renderer::replaceMacros($t, [
-			'$content' => '',
-			'$header' => '',
+			'$content'                    => '',
+			'$header'                     => '',
 			'$show_global_community_hint' => ($this->selectedTab == CommunityEntity::GLOBAL) && $this->config->get('system', 'show_global_community_hint'),
-			'$global_community_hint' => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
+			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
 		]);
 
 		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
@@ -185,7 +185,7 @@ class Community extends Timeline
 			}
 		}
 
-		$this->maxId = $request['last_received'] ?? $this->maxId;
+		$this->maxId = $request['last_received']  ?? $this->maxId;
 		$this->minId = $request['first_received'] ?? $this->minId;
 	}
 }

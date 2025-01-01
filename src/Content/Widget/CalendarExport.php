@@ -37,7 +37,7 @@ class CalendarExport
 			return '';
 		}
 
-		$tpl = Renderer::getMarkupTemplate('widget/events.tpl');
+		$tpl    = Renderer::getMarkupTemplate('widget/events.tpl');
 		$return = Renderer::replaceMacros($tpl, [
 			'$etitle'      => DI::l10n()->t('Export'),
 			'$export_ical' => DI::l10n()->t('Export calendar as ical'),

@@ -76,7 +76,7 @@ class PushSubscription
 		}
 
 		$message = DI::notificationFactory()->getMessageFromNotification($notification);
-		$title = $message['plain'] ?? '';
+		$title   = $message['plain'] ?? '';
 
 		$push = Subscription::create([
 			'contentEncoding' => 'aesgcm',

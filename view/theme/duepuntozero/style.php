@@ -18,7 +18,7 @@ if (file_exists("$THEMEPATH/style.css")) {
  */
 if (DI::mode()->has(\Friendica\App\Mode::MAINTENANCEDISABLED)) {
 	$s_colorset = DI::config()->get('duepuntozero', 'colorset');
-	$colorset = DI::pConfig()->get($_REQUEST['puid'] ?? 0, 'duepuntozero', 'colorset', $s_colorset);
+	$colorset   = DI::pConfig()->get($_REQUEST['puid'] ?? 0, 'duepuntozero', 'colorset', $s_colorset);
 }
 
 $setcss = '';

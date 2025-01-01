@@ -34,7 +34,7 @@ use Friendica\Util\Strings;
 class Relay
 {
 	const SCOPE_NONE = '';
-	const SCOPE_ALL = 'all';
+	const SCOPE_ALL  = 'all';
 	const SCOPE_TAGS = 'tags';
 
 	/**
@@ -77,7 +77,7 @@ class Relay
 
 		if (!empty($causerid)) {
 			$contact = Contact::getById($causerid, ['url']);
-			$causer = $contact['url'] ?? '';
+			$causer  = $contact['url'] ?? '';
 		} else {
 			$causer = '';
 		}
@@ -87,7 +87,7 @@ class Relay
 		if ($scope == self::SCOPE_TAGS) {
 			$tagList = self::getSubscribedTags();
 		} else {
-			$tagList  = [];
+			$tagList = [];
 		}
 
 		$denyTags = Strings::getTagArrayByString($config->get('system', 'relay_deny_tags'));
@@ -97,7 +97,7 @@ class Relay
 
 			$max_tags = $config->get('system', 'relay_max_tags');
 			if ($max_tags && (count($tags) > $max_tags) && preg_match('/[^@!#]\[url\=.*?\].*?\[\/url\]/ism', $body)) {
-				$cleaned = preg_replace('/[@!#]\[url\=.*?\].*?\[\/url\]/ism', '', $body);
+				$cleaned         = preg_replace('/[@!#]\[url\=.*?\].*?\[\/url\]/ism', '', $body);
 				$content_cleaned = mb_strtolower(BBCode::toPlaintext($cleaned, false));
 
 				if (strlen($content_cleaned) < strlen($content) / 2) {
@@ -224,12 +224,12 @@ class Relay
 		}
 
 		$condition = ['uid' => 0, 'gsid' => $gserver['id'], 'contact-type' => Contact::TYPE_RELAY];
-		$old = DBA::selectFirst('contact', [], $condition);
+		$old       = DBA::selectFirst('contact', [], $condition);
 		if (!DBA::isResult($old)) {
 			$condition = ['uid' => 0, 'nurl' => Strings::normaliseLink($gserver['url'])];
-			$old = DBA::selectFirst('contact', [], $condition);
+			$old       = DBA::selectFirst('contact', [], $condition);
 			if (DBA::isResult($old)) {
-				$fields['gsid'] = $gserver['id'];
+				$fields['gsid']         = $gserver['id'];
 				$fields['contact-type'] = Contact::TYPE_RELAY;
 				Logger::info('Assigning missing data for relay contact', ['server' => $gserver['url'], 'id' => $old['id']]);
 			}
@@ -246,15 +246,15 @@ class Relay
 			Contact::update($fields, ['id' => $old['id']], $old);
 		} else {
 			$default = ['created' => DateTimeFormat::utcNow(),
-				'name' => 'relay', 'nick' => 'relay', 'url' => $gserver['url'],
-				'nurl' => Strings::normaliseLink($gserver['url']),
-				'network' => Protocol::DIASPORA, 'uid' => 0,
-				'batch' => $gserver['url'] . '/receive/public',
-				'rel' => Contact::FOLLOWER, 'blocked' => false,
-				'pending' => false, 'writable' => true,
-				'gsid' => $gserver['id'],
-				'unsearchable' => true,
-				'baseurl' => $gserver['url'], 'contact-type' => Contact::TYPE_RELAY];
+				'name'               => 'relay', 'nick' => 'relay', 'url' => $gserver['url'],
+				'nurl'               => Strings::normaliseLink($gserver['url']),
+				'network'            => Protocol::DIASPORA, 'uid' => 0,
+				'batch'              => $gserver['url'] . '/receive/public',
+				'rel'                => Contact::FOLLOWER, 'blocked' => false,
+				'pending'            => false, 'writable' => true,
+				'gsid'               => $gserver['id'],
+				'unsearchable'       => true,
+				'baseurl'            => $gserver['url'], 'contact-type' => Contact::TYPE_RELAY];
 
 			$fields = array_merge($default, $fields);
 
@@ -279,14 +279,14 @@ class Relay
 			$relay_contact = $contact;
 		} elseif (empty($contact['baseurl'])) {
 			if (!empty($contact['batch'])) {
-				$condition = ['uid' => 0, 'network' => Protocol::FEDERATED, 'batch' => $contact['batch'], 'contact-type' => Contact::TYPE_RELAY];
+				$condition     = ['uid' => 0, 'network' => Protocol::FEDERATED, 'batch' => $contact['batch'], 'contact-type' => Contact::TYPE_RELAY];
 				$relay_contact = DBA::selectFirst('contact', [], $condition);
 			} else {
 				return;
 			}
 		} else {
 			$gserver = ['id' => $contact['gsid'] ?: GServer::getID($contact['baseurl'], true),
-				'url' => $contact['baseurl'], 'network' => $contact['network']];
+				'url'           => $contact['baseurl'], 'network' => $contact['network']];
 			$relay_contact = self::getContact($gserver, []);
 		}
 
@@ -325,7 +325,7 @@ class Relay
 		DBA::close($servers);
 
 		// All tags of the current post
-		$tags = DBA::select('tag-view', ['name'], ['uri-id' => $parent['uri-id'], 'type' => Tag::HASHTAG]);
+		$tags    = DBA::select('tag-view', ['name'], ['uri-id' => $parent['uri-id'], 'type' => Tag::HASHTAG]);
 		$taglist = [];
 		while ($tag = DBA::fetch($tags)) {
 			$taglist[] = $tag['name'];
@@ -377,8 +377,11 @@ class Relay
 	 */
 	public static function getList(array $fields = []): array
 	{
-		return DBA::selectToArray('apcontact', $fields,
-			["`type` IN (?, ?) AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)", 'Application', 'Service', 0, Contact::FRIEND]);
+		return DBA::selectToArray(
+			'apcontact',
+			$fields,
+			["`type` IN (?, ?) AND `url` IN (SELECT `url` FROM `contact` WHERE `uid` = ? AND `rel` = ?)", 'Application', 'Service', 0, Contact::FRIEND]
+		);
 	}
 
 	/**
@@ -393,7 +396,7 @@ class Relay
 	{
 		// Fetch the relay contact
 		$condition = ['uid' => 0, 'gsid' => $gserver['id'], 'contact-type' => Contact::TYPE_RELAY];
-		$contact = DBA::selectFirst('contact', $fields, $condition);
+		$contact   = DBA::selectFirst('contact', $fields, $condition);
 		if (DBA::isResult($contact)) {
 			if ($contact['archive'] || $contact['blocked']) {
 				return false;

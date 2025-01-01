@@ -87,7 +87,7 @@ class Index extends BaseSettings
 
 			if (strpos($dob, '0000-') === 0 || strpos($dob, '0001-') === 0) {
 				$ignore_year = true;
-				$dob = substr($dob, 5);
+				$dob         = substr($dob, 5);
 			}
 
 			if ($ignore_year) {
@@ -221,7 +221,7 @@ class Index extends BaseSettings
 					$this->session->getLocalUserId(),
 					false,
 					['allow_cid' => []],
-					['network' => Protocol::DFRN],
+					['network'   => Protocol::DFRN],
 					'profile_field[new]'
 				),
 			],
@@ -254,7 +254,8 @@ class Index extends BaseSettings
 				'miscellaneous_section'     => $this->t('Miscellaneous'),
 				'custom_fields_section'     => $this->t('Custom Profile Fields'),
 				'profile_photo'             => $this->t('Upload Profile Photo'),
-				'custom_fields_description' => $this->t('<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
+				'custom_fields_description' => $this->t(
+					'<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
 				<p>You can use BBCodes in the field values.</p>
 				<p>Reorder by dragging the field title.</p>
 				<p>Empty the label field to remove a custom field.</p>

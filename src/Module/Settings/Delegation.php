@@ -48,7 +48,7 @@ class Delegation extends BaseSettings
 
 		BaseModule::checkFormSecurityTokenRedirectOnError('settings/delegation', 'delegate');
 
-		$parent_uid      = $request['parent_user'] ?? null;
+		$parent_uid      = $request['parent_user']     ?? null;
 		$parent_password = $request['parent_password'] ?? '';
 
 		if ($parent_uid) {
@@ -76,7 +76,7 @@ class Delegation extends BaseSettings
 			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
 		}
 
-		$action  = $this->parameters['action'] ?? '';
+		$action  = $this->parameters['action']  ?? '';
 		$user_id = $this->parameters['user_id'] ?? 0;
 
 		if ($action === 'add' && $user_id) {

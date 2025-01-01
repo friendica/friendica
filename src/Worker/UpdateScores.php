@@ -13,7 +13,7 @@ use Friendica\Model\Contact\Relation;
 use Friendica\Model\Post;
 
 /**
- * Update the interaction scores 
+ * Update the interaction scores
  */
 class UpdateScores
 {

@@ -207,7 +207,7 @@ class Conversation
 
 		if ($total === 0) {
 			throw new InternalServerErrorException(sprintf('There has to be at least one Liker for verb "%s"', $verb));
-		} else if ($total === 1) {
+		} elseif ($total === 1) {
 			$likerString = $likers[0];
 		} else {
 			if ($total < $this->config->get('system', 'max_likers')) {
@@ -976,8 +976,8 @@ class Conversation
 		}
 
 		foreach ($items as $key => $row) {
-			$items[$key]['emojis']      = $emojis[$key] ?? [];
-			$items[$key]['counts']      = $counts[$key] ?? 0;
+			$items[$key]['emojis']      = $emojis[$key]      ?? [];
+			$items[$key]['counts']      = $counts[$key]      ?? 0;
 			$items[$key]['quoteshares'] = $quoteshares[$key] ?? [];
 
 			$always_display = in_array($mode, [self::MODE_CONTACTS, self::MODE_CONTACT_POSTS]);
@@ -1431,7 +1431,7 @@ class Conversation
 	public function getContextLessThreadList(array $items, string $mode, bool $preview, bool $pagedrop, string $formSecurityToken): array
 	{
 		$threads = [];
-		$uriids = [];
+		$uriids  = [];
 
 		foreach ($items as $item) {
 			if (in_array($item['uri-id'], $uriids)) {
@@ -1456,7 +1456,7 @@ class Conversation
 
 			$tags = Tag::populateFromItem($item);
 
-			$author       = [
+			$author = [
 				'uid'     => 0,
 				'id'      => $item['author-id'],
 				'network' => $item['author-network'],
@@ -1501,7 +1501,7 @@ class Conversation
 
 			$body_html = ItemModel::prepareBody($item, true, $preview);
 
-			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
+			list($categories, $folders) = $this->item->determineCategoriesTerms($item, $this->session->getLocalUserId());
 
 			if (!empty($item['featured'])) {
 				$pinned = $this->l10n->t('Pinned item');

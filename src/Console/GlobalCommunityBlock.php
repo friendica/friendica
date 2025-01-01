@@ -53,7 +53,7 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->l10n = $l10n;
+		$this->l10n    = $l10n;
 	}
 
 	protected function doExecute(): int

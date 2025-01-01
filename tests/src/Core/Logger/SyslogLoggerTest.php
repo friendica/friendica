@@ -46,7 +46,7 @@ class SyslogLoggerTest extends LoggerTestCase
 		$this->config->shouldReceive('get')->with('system', 'loglevel')->andReturn($level);
 
 		$loggerFactory = new SyslogLoggerFactoryWrapper($this->introspection, 'test');
-		$this->logger = $loggerFactory->create($this->config);
+		$this->logger  = $loggerFactory->create($this->config);
 
 		return $this->logger;
 	}

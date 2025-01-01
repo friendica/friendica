@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Module\BaseApi;
 
 /**

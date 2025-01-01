@@ -40,7 +40,7 @@ class BoundariesPager extends Pager
 		parent::__construct($l10n, $queryString, $itemsPerPage);
 
 		$this->first_item_id = $first_item_id;
-		$this->last_item_id = $last_item_id;
+		$this->last_item_id  = $last_item_id;
 
 		$parsed = parse_url($this->getBaseQueryString());
 		if (!empty($parsed['query'])) {
@@ -95,20 +95,22 @@ class BoundariesPager extends Pager
 		$data = [
 			'class' => 'pager',
 			'prev'  => [
-				'url'   => Strings::ensureQueryParameter($this->baseQueryString .
+				'url' => Strings::ensureQueryParameter(
+					$this->baseQueryString .
 					($this->first_item_id >= $this->last_item_id ?
 						'&min_id=' . $this->first_item_id : '&max_id=' . $this->first_item_id)
 				),
 				'text'  => $this->l10n->t('newer'),
 				'class' => 'previous' . ($this->first_page ? ' disabled' : '')
 			],
-			'next'  => [
-				'url'   => Strings::ensureQueryParameter($this->baseQueryString .
+			'next' => [
+				'url' => Strings::ensureQueryParameter(
+					$this->baseQueryString .
 					($this->first_item_id >= $this->last_item_id ?
 					'&max_id=' . $this->last_item_id : '&min_id=' . $this->last_item_id)
 				),
 				'text'  => $this->l10n->t('older'),
-				'class' =>  'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
+				'class' => 'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
 			]
 		];
 

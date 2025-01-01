@@ -20,9 +20,9 @@ class Create extends BaseUsers
 
 		self::checkFormSecurityTokenRedirectOnError('moderation/users/create', 'admin_users_create');
 
-		$nu_name     = $request['new_user_name'] ?? '';
+		$nu_name     = $request['new_user_name']     ?? '';
 		$nu_nickname = $request['new_user_nickname'] ?? '';
-		$nu_email    = $request['new_user_email'] ?? '';
+		$nu_email    = $request['new_user_email']    ?? '';
 		$nu_language = DI::config()->get('system', 'language');
 
 		if ($nu_name !== '' && $nu_email !== '' && $nu_nickname !== '') {

@@ -128,8 +128,8 @@ class PermissionSetTest extends MockedTestCase
 			$input['uid'],
 			$input['allow_cid'] ?? '',
 			$input['allow_gid'] ?? '',
-			$input['deny_cid'] ?? '',
-			$input['deny_gid'] ?? ''
+			$input['deny_cid']  ?? '',
+			$input['deny_gid']  ?? ''
 		);
 
 		unset($assertion['id']);

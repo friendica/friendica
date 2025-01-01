@@ -62,8 +62,8 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->dba = $dba;
-		$this->l10n = $l10n;
+		$this->dba     = $dba;
+		$this->l10n    = $l10n;
 	}
 
 	protected function doExecute(): int

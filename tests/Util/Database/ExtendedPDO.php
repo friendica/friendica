@@ -41,8 +41,10 @@ class ExtendedPDO extends PDO
 	 */
 	protected function hasSavepoint()
 	{
-		return in_array($this->getAttribute(PDO::ATTR_DRIVER_NAME),
-			self::$_supportedDrivers);
+		return in_array(
+			$this->getAttribute(PDO::ATTR_DRIVER_NAME),
+			self::$_supportedDrivers
+		);
 	}
 
 

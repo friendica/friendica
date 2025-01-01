@@ -45,7 +45,7 @@ class View extends BaseAdmin
 			'context' => ['', 'index', 'worker', 'daemon'],
 		];
 		$filters = [
-			'level'   => $_GET['level'] ?? '',
+			'level'   => $_GET['level']   ?? '',
 			'context' => $_GET['context'] ?? '',
 		];
 		foreach ($filters as $k => $v) {
@@ -68,9 +68,9 @@ class View extends BaseAdmin
 			}
 		}
 		return Renderer::replaceMacros($t, [
-			'$title'         => DI::l10n()->t('Administration'),
-			'$page'          => DI::l10n()->t('View Logs'),
-			'$l10n'          => [
+			'$title' => DI::l10n()->t('Administration'),
+			'$page'  => DI::l10n()->t('View Logs'),
+			'$l10n'  => [
 				'Search'                => DI::l10n()->t('Search'),
 				'Search_in_logs'        => DI::l10n()->t('Search in logs'),
 				'Show_all'              => DI::l10n()->t('Show all'),

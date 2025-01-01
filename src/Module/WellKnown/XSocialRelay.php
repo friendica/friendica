@@ -26,7 +26,7 @@ class XSocialRelay extends BaseModule
 		$scope = $config->get('system', 'relay_scope');
 
 		$systemTags = [];
-		$userTags = [];
+		$userTags   = [];
 
 		if ($scope == Relay::SCOPE_TAGS) {
 			$systemTags = Strings::getTagArrayByString($config->get('system', 'relay_server_tags'));
@@ -44,10 +44,10 @@ class XSocialRelay extends BaseModule
 			'tags'      => $tagList,
 			'protocols' => [
 				'activitypub' => [
-					'actor' => DI::baseUrl() . '/friendica',
+					'actor'   => DI::baseUrl() . '/friendica',
 					'receive' => DI::baseUrl() . '/inbox'
 				],
-				'dfrn'     => [
+				'dfrn' => [
 					'receive' => DI::baseUrl() . '/dfrn_notify'
 				]
 			]

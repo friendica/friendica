@@ -89,14 +89,14 @@ class Feed
 		$xpath->registerNamespace('media', 'http://search.yahoo.com/mrss/');
 		$xpath->registerNamespace('poco', ActivityNamespace::POCO);
 
-		$author = [];
-		$atomns = 'atom';
-		$entries = null;
+		$author   = [];
+		$atomns   = 'atom';
+		$entries  = null;
 		$protocol = Conversation::PARCEL_UNKNOWN;
 
 		// Is it RDF?
 		if ($xpath->query('/rdf:RDF/rss:channel')->length > 0) {
-			$protocol = Conversation::PARCEL_RDF;
+			$protocol              = Conversation::PARCEL_RDF;
 			$author['author-link'] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:link/text()');
 			$author['author-name'] = XML::getFirstNodeValue($xpath, '/rdf:RDF/rss:channel/rss:title/text()');
 
@@ -107,9 +107,9 @@ class Feed
 		}
 
 		if ($xpath->query('/opml')->length > 0) {
-			$protocol = Conversation::PARCEL_OPML;
+			$protocol              = Conversation::PARCEL_OPML;
 			$author['author-name'] = XML::getFirstNodeValue($xpath, '/opml/head/title/text()');
-			$entries = $xpath->query('/opml/body/outline');
+			$entries               = $xpath->query('/opml/body/outline');
 		}
 
 		// Is it Atom?
@@ -117,7 +117,7 @@ class Feed
 			$protocol = Conversation::PARCEL_ATOM;
 		} elseif ($xpath->query('/atom03:feed')->length > 0) {
 			$protocol = Conversation::PARCEL_ATOM03;
-			$atomns = 'atom03';
+			$atomns   = 'atom03';
 		}
 
 		if (in_array($protocol, [Conversation::PARCEL_ATOM, Conversation::PARCEL_ATOM03])) {
@@ -204,7 +204,7 @@ class Feed
 
 		// Is it RSS?
 		if ($xpath->query('/rss/channel')->length > 0) {
-			$protocol = Conversation::PARCEL_RSS;
+			$protocol              = Conversation::PARCEL_RSS;
 			$author['author-link'] = XML::getFirstNodeValue($xpath, '/rss/channel/link/text()');
 
 			$author['author-name'] = XML::getFirstNodeValue($xpath, '/rss/channel/title/text()');
@@ -252,8 +252,8 @@ class Feed
 
 			$author['author-avatar'] = $contact['thumb'];
 
-			$author['owner-link'] = $contact['url'];
-			$author['owner-name'] = $contact['name'];
+			$author['owner-link']   = $contact['url'];
+			$author['owner-name']   = $contact['name'];
 			$author['owner-avatar'] = $contact['thumb'];
 		}
 
@@ -270,7 +270,7 @@ class Feed
 			'contact-id'  => $contact['id'] ?? 0,
 		];
 
-		$datarray['protocol'] = $protocol;
+		$datarray['protocol']  = $protocol;
 		$datarray['direction'] = Conversation::PULL;
 
 		if (!is_object($entries)) {
@@ -278,12 +278,12 @@ class Feed
 			return [];
 		}
 
-		$items = [];
+		$items          = [];
 		$creation_dates = [];
 
 		// Limit the number of items that are about to be fetched
 		$total_items = ($entries->length - 1);
-		$max_items = DI::config()->get('system', 'max_feed_items');
+		$max_items   = DI::config()->get('system', 'max_feed_items');
 		if (($max_items > 0) && ($total_items > $max_items)) {
 			$total_items = $max_items;
 		}
@@ -312,7 +312,7 @@ class Feed
 			if ($entry->nodeName == 'outline') {
 				$isrss = false;
 				$plink = '';
-				$uri = '';
+				$uri   = '';
 				foreach ($entry->attributes as $attribute) {
 					switch ($attribute->nodeName) {
 						case 'title':
@@ -337,7 +337,7 @@ class Feed
 					}
 				}
 				$item['plink'] = $plink ?: $uri;
-				$item['uri'] = $uri ?: $plink;
+				$item['uri']   = $uri ?: $plink;
 				if (!$isrss || empty($item['uri'])) {
 					continue;
 				}
@@ -477,9 +477,9 @@ class Feed
 			$enclosures = $xpath->query("enclosure|$atomns:link[@rel='enclosure']", $entry);
 			if (!empty($enclosures)) {
 				foreach ($enclosures as $enclosure) {
-					$href = '';
+					$href   = '';
 					$length = null;
-					$type = null;
+					$type   = null;
 
 					foreach ($enclosure->attributes as $attribute) {
 						if (in_array($attribute->name, ['url', 'href'])) {
@@ -506,7 +506,7 @@ class Feed
 				}
 			}
 
-			$taglist = [];
+			$taglist    = [];
 			$categories = $xpath->query('category', $entry);
 			foreach ($categories as $category) {
 				$taglist[] = $category->nodeValue;
@@ -527,7 +527,7 @@ class Feed
 			}
 
 			if (empty($body)) {
-				$body = $summary;
+				$body    = $summary;
 				$summary = '';
 			}
 
@@ -538,16 +538,16 @@ class Feed
 			}
 
 			$item['body'] = self::formatBody($body, $basepath);
-			$summary = self::formatBody($summary, $basepath);
+			$summary      = self::formatBody($summary, $basepath);
 
 			if (($item['body'] == '') && ($item['title'] != '')) {
-				$item['body'] = $item['title'];
+				$item['body']  = $item['title'];
 				$item['title'] = '';
 			}
 
 			if ($dryRun) {
 				$item['attachments'] = $attachments;
-				$items[] = $item;
+				$items[]             = $item;
 				break;
 			} elseif (!Item::isValid($item)) {
 				Logger::info('Feed item is invalid', ['created' => $item['created'], 'uid' => $item['uid'], 'uri' => $item['uri']]);
@@ -583,7 +583,7 @@ class Feed
 					$summary = '';
 				}
 
-				$saved_body = $item['body'];
+				$saved_body  = $item['body'];
 				$saved_title = $item['title'];
 
 				if (self::replaceBodyWithTitle($item['body'], $item['title'])) {
@@ -613,7 +613,7 @@ class Feed
 					// Take the data that was provided by the feed if the query is empty
 					if (($data['type'] == 'link') && empty($data['title']) && empty($data['text'])) {
 						$data['title'] = $saved_title;
-						$item['body'] = $saved_body;
+						$item['body']  = $saved_body;
 					}
 
 					$data_text = strip_tags(trim($data['text'] ?? ''));
@@ -624,11 +624,11 @@ class Feed
 					}
 
 					// We always strip the title since it will be added in the page information
-					$item['title'] = '';
-					$item['body'] = $item['body'] . "\n" . PageInfo::getFooterFromData($data, false);
-					$taglist = $fetch_further_information == LocalRelationship::FFI_BOTH ? PageInfo::getTagsFromUrl($item['plink'], $preview, $contact['ffi_keyword_denylist'] ?? '') : [];
+					$item['title']       = '';
+					$item['body']        = $item['body'] . "\n" . PageInfo::getFooterFromData($data, false);
+					$taglist             = $fetch_further_information == LocalRelationship::FFI_BOTH ? PageInfo::getTagsFromUrl($item['plink'], $preview, $contact['ffi_keyword_denylist'] ?? '') : [];
 					$item['object-type'] = Activity\ObjectType::BOOKMARK;
-					$attachments = [];
+					$attachments         = [];
 
 					foreach (['audio', 'video'] as $elementname) {
 						if (!empty($data[$elementname])) {
@@ -675,7 +675,7 @@ class Feed
 
 			Logger::info('Stored feed', ['item' => $item]);
 
-			$notify = Item::isRemoteSelf($contact, $item);
+			$notify       = Item::isRemoteSelf($contact, $item);
 			$item['wall'] = (bool)$notify;
 
 			// Distributed items should have a well-formatted URI.
@@ -697,7 +697,7 @@ class Feed
 					Post\Delayed::publish($item, $notify, $taglist, $attachments);
 				} else {
 					$postings[] = [
-						'item' => $item, 'notify' => $notify,
+						'item'    => $item, 'notify' => $notify,
 						'taglist' => $taglist, 'attachments' => $attachments
 					];
 				}
@@ -708,11 +708,11 @@ class Feed
 
 		if (!empty($postings)) {
 			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
-			$total = count($postings);
+			$total       = count($postings);
 			if ($total > 1) {
 				// Posts shouldn't be delayed more than a day
 				$interval = min(1440, self::getPollInterval($contact));
-				$delay = max(round(($interval * 60) / $total), 60 * $min_posting);
+				$delay    = max(round(($interval * 60) / $total), 60 * $min_posting);
 				Logger::info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
 			} else {
 				$delay = 0;
@@ -796,15 +796,15 @@ class Feed
 
 		if (!empty($creation_dates)) {
 			// Count the post frequency and the earliest and latest post date
-			$frequency = [];
-			$oldest = time();
-			$newest = 0;
+			$frequency   = [];
+			$oldest      = time();
+			$newest      = 0;
 			$newest_date = '';
 
 			foreach ($creation_dates as $date) {
 				$timestamp = strtotime($date);
-				$day = intdiv($timestamp, 86400);
-				$hour = $timestamp % 86400;
+				$day       = intdiv($timestamp, 86400);
+				$hour      = $timestamp % 86400;
 
 				// Only have a look at values from the last seven days
 				if (((time() / 86400) - $day) < 7) {
@@ -825,7 +825,7 @@ class Feed
 				}
 
 				if ($newest < $day) {
-					$newest = $day;
+					$newest      = $day;
 					$newest_date = $date;
 				}
 			}
@@ -863,7 +863,7 @@ class Feed
 
 					// Assume at least four hours between oldest and newest post per day - should be okay for news outlets
 					$duration = max($entry['high'] - $entry['low'], 14400);
-					$ppd = (86400 / $duration) * $entry['count'];
+					$ppd      = (86400 / $duration) * $entry['count'];
 					if ($ppd > $max) {
 						$max = $ppd;
 					}
@@ -981,7 +981,7 @@ class Feed
 			$pos = strrpos($title, '...');
 			if ($pos > 0) {
 				$title = substr($title, 0, $pos);
-				$body = substr($body, 0, $pos);
+				$body  = substr($body, 0, $pos);
 			}
 		}
 		return ($title == $body);
@@ -1020,7 +1020,7 @@ class Feed
 		$previous_created = $last_update;
 
 		$check_date = empty($last_update) ? '' : DateTimeFormat::utc($last_update);
-		$authorid = Contact::getIdForURL($owner['url']);
+		$authorid   = Contact::getIdForURL($owner['url']);
 
 		$condition = [
 			"`uid` = ? AND `received` > ? AND NOT `deleted` AND `gravity` IN (?, ?)
@@ -1050,7 +1050,7 @@ class Feed
 
 		$items = Post::toArray($ret);
 
-		$doc = new DOMDocument('1.0', 'utf-8');
+		$doc               = new DOMDocument('1.0', 'utf-8');
 		$doc->formatOutput = true;
 
 		$root = self::addHeader($doc, $owner, $filter);
@@ -1086,7 +1086,7 @@ class Feed
 		$root = $doc->createElementNS(ActivityNamespace::ATOM1, 'feed');
 		$doc->appendChild($root);
 
-		$title = '';
+		$title   = '';
 		$selfUri = '/feed/' . $owner['nick'] . '/';
 		switch ($filter) {
 			case 'activity':
@@ -1199,7 +1199,7 @@ class Feed
 			'link',
 			'',
 			[
-				'rel' => 'alternate', 'type' => 'text/html',
+				'rel'  => 'alternate', 'type' => 'text/html',
 				'href' => DI::baseUrl() . '/display/' . $item['guid']
 			]
 		);
@@ -1291,11 +1291,11 @@ class Feed
 		// Remove the share element before fetching the first line
 		$title = trim(preg_replace("/\[share.*?\](.*?)\[\/share\]/ism", "\n$1\n", $item['body']));
 
-		$title = BBCode::toPlaintext($title) . "\n";
-		$pos = strpos($title, "\n");
+		$title   = BBCode::toPlaintext($title) . "\n";
+		$pos     = strpos($title, "\n");
 		$trailer = '';
 		if (($pos == 0) || ($pos > 100)) {
-			$pos = 100;
+			$pos     = 100;
 			$trailer = '...';
 		}
 
@@ -1348,8 +1348,8 @@ class Feed
 	{
 		foreach (Post\Media::getByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::DOCUMENT, Post\Media::TORRENT]) as $attachment) {
 			$attributes = ['rel' => 'enclosure',
-				'href' => $attachment['url'],
-				'type' => $attachment['mimetype']];
+				'href'              => $attachment['url'],
+				'type'              => $attachment['mimetype']];
 
 			if (!empty($attachment['size'])) {
 				$attributes['length'] = intval($attachment['size']);
@@ -1402,9 +1402,9 @@ class Feed
 			if ($owner['contact-type'] == Contact::TYPE_COMMUNITY) {
 				$entry->setAttribute('xmlns:activity', ActivityNamespace::ACTIVITY);
 
-				$contact = Contact::getByURL($item['author-link']) ?: $owner;
+				$contact             = Contact::getByURL($item['author-link']) ?: $owner;
 				$contact['nickname'] = $contact['nickname'] ?? $contact['nick'];
-				$author = self::addAuthor($doc, $contact);
+				$author              = self::addAuthor($doc, $contact);
 				$entry->appendChild($author);
 			}
 		} else {

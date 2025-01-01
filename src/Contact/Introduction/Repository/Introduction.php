@@ -97,7 +97,10 @@ class Introduction extends BaseRepository
 			$BaseCollection = parent::_selectByBoundaries(
 				['`uid` = ? AND NOT `ignore`',$uid],
 				['order' => ['id' => 'DESC']],
-				$min_id, $max_id, $limit);
+				$min_id,
+				$max_id,
+				$limit
+			);
 		} catch (\Exception $e) {
 			throw new IntroductionPersistenceException(sprintf('Cannot select Introductions for used %d', $uid), $e);
 		}

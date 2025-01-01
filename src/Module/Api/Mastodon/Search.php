@@ -58,7 +58,7 @@ class Search extends BaseApi
 
 			if (!is_array($result['accounts'])) {
 				// Curbing the search if we got an exact result
-				$request['type'] = 'accounts';
+				$request['type']    = 'accounts';
 				$result['accounts'] = [$result['accounts']];
 			}
 		}
@@ -68,7 +68,7 @@ class Search extends BaseApi
 
 			if (!is_array($result['statuses'])) {
 				// Curbing the search if we got an exact result
-				$request['type'] = 'statuses';
+				$request['type']    = 'statuses';
 				$result['statuses'] = [$result['statuses']];
 			}
 		}
@@ -144,9 +144,9 @@ class Search extends BaseApi
 				substr($q, 1), 0, $uid, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, $uid, 0];
 			$table = 'tag-search-view';
 		} else {
-			$q = Post\Engagement::escapeKeywords($q);
+			$q         = Post\Engagement::escapeKeywords($q);
 			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND (NOT `restricted` OR `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ?))", $q, $uid];
-			$table = SearchIndex::getSearchTable();
+			$table     = SearchIndex::getSearchTable();
 		}
 
 		if (!empty($account_id)) {

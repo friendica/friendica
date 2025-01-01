@@ -16,7 +16,6 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
 use PragmaRX\Google2FA\Google2FA;
-use Friendica\Security\TwoFactor;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -37,8 +36,8 @@ class Verify extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session     = $session;
-		$this->pConfig     = $pConfig;
+		$this->session = $session;
+		$this->pConfig = $pConfig;
 	}
 
 	protected function post(array $request = [])

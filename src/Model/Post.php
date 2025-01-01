@@ -213,7 +213,7 @@ class Post
 	public static function selectOriginal(array $fields = [], array $condition = [], array $params = [])
 	{
 		$original_fields = $fields;
-		$remove = [];
+		$remove          = [];
 		if (!empty($fields)) {
 			foreach (['gravity', 'verb', 'thr-parent-id', 'uid'] as $field) {
 				if (!in_array($field, $fields)) {
@@ -448,7 +448,8 @@ class Post
 			$selected = Item::DISPLAY_FIELDLIST;
 		}
 
-		$condition = DBA::mergeConditions($condition,
+		$condition = DBA::mergeConditions(
+			$condition,
 			["`visible` AND NOT `deleted`
 			AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND (NOT `causer-blocked` OR `causer-id` = ? OR `causer-id` IS NULL) AND NOT `contact-blocked`
@@ -457,7 +458,8 @@ class Post
 			AND NOT EXISTS(SELECT `uri-id` FROM `post-user`    WHERE `uid` = ? AND `uri-id` = " . DBA::quoteIdentifier($view) . ".`uri-id` AND `hidden`)
 			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` IN (`author-id`, `owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid`   FROM `user-gserver` WHERE `uid` = ? AND `gsid` IN (`author-gsid`, `owner-gsid`, `causer-gsid`) AND `ignored`)",
-				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid]);
+				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid]
+		);
 
 		$select_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $selected));
 
@@ -582,7 +584,7 @@ class Post
 	public static function selectOriginalForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
 	{
 		$original_selected = $selected;
-		$remove = [];
+		$remove            = [];
 		if (!empty($selected)) {
 			foreach (['gravity', 'verb', 'thr-parent-id'] as $field) {
 				if (!in_array($field, $selected)) {

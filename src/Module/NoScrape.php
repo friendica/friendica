@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\User;
@@ -72,7 +71,7 @@ class NoScrape extends BaseModule
 		}
 
 		if (!($owner['hide-friends'] ?? false)) {
-			$apcontact = APContact::getByURL($owner['url']);
+			$apcontact             = APContact::getByURL($owner['url']);
 			$json_info['contacts'] = max($apcontact['following_count'], $apcontact['followers_count']);
 		}
 

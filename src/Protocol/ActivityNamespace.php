@@ -18,7 +18,7 @@ final class ActivityNamespace
 	 * @var string
 	 * @see https://zotlabs.org/page/zotlabs/specs+zot6+home
 	 */
-	const ZOT             = 'http://purl.org/zot';
+	const ZOT = 'http://purl.org/zot';
 	/**
 	 * Friendica is using ActivityStreams in version 1.0 for its activities and object types.
 	 * Additional types are used for non standard activities.
@@ -26,7 +26,7 @@ final class ActivityNamespace
 	 * @var string
 	 * @see https://github.com/friendica/friendica/wiki/ActivityStreams
 	 */
-	const DFRN            = 'http://purl.org/macgirvin/dfrn/1.0';
+	const DFRN = 'http://purl.org/macgirvin/dfrn/1.0';
 	/**
 	 * This namespace defines an extension for expressing threaded
 	 * discussions within the Atom Syndication Format [RFC4287]
@@ -34,7 +34,7 @@ final class ActivityNamespace
 	 * @see https://tools.ietf.org/rfc/rfc4685.txt
 	 * @var string
 	 */
-	const THREAD          = 'http://purl.org/syndication/thread/1.0';
+	const THREAD = 'http://purl.org/syndication/thread/1.0';
 	/**
 	 * This namespace adds mechanisms to the Atom Syndication Format
 	 * that publishers of Atom Feed and Entry documents can use to
@@ -43,7 +43,7 @@ final class ActivityNamespace
 	 * @see https://tools.ietf.org/html/rfc6721
 	 * @var string
 	 */
-	const TOMB            = 'http://purl.org/atompub/tombstones/1.0';
+	const TOMB = 'http://purl.org/atompub/tombstones/1.0';
 	/**
 	 * This specification details a model for representing potential and completed activities
 	 * using the JSON format.
@@ -51,7 +51,7 @@ final class ActivityNamespace
 	 * @see https://www.w3.org/ns/activitystreams
 	 * @var string
 	 */
-	const ACTIVITY2       = 'https://www.w3.org/ns/activitystreams#';
+	const ACTIVITY2 = 'https://www.w3.org/ns/activitystreams#';
 	/**
 	 * Atom Activities 1.0
 	 *
@@ -61,7 +61,7 @@ final class ActivityNamespace
 	 * @see http://activitystrea.ms/spec/1.0
 	 * @var string
 	 */
-	const ACTIVITY        = 'http://activitystrea.ms/spec/1.0/';
+	const ACTIVITY = 'http://activitystrea.ms/spec/1.0/';
 	/**
 	 * This namespace presents a base set of Object types and Verbs for use with Activity Streams.
 	 *
@@ -74,7 +74,7 @@ final class ActivityNamespace
 	 *
 	 * @var string
 	 */
-	const MEDIA           = 'http://purl.org/syndication/atommedia';
+	const MEDIA = 'http://purl.org/syndication/atommedia';
 	/**
 	 * The Salmon Protocol is an open, simple, standards-based solution that lets
 	 * aggregators and sources unify the conversations.
@@ -82,14 +82,14 @@ final class ActivityNamespace
 	 * @see http://www.salmon-protocol.org/salmon-protocol-summary
 	 * @var string
 	 */
-	const SALMON_ME       = 'http://salmon-protocol.org/ns/magic-env';
+	const SALMON_ME = 'http://salmon-protocol.org/ns/magic-env';
 	/**
 	 * OStatus is a minimal specification for distributed status updates or microblogging.
 	 *
 	 * @see https://ostatus.github.io/spec/OStatus%201.0%20Draft%202.html
 	 * @var string
 	 */
-	const OSTATUSSUB      = 'http://ostatus.org/schema/1.0/subscribe';
+	const OSTATUSSUB = 'http://ostatus.org/schema/1.0/subscribe';
 	/**
 	 * Webfinger avatar
 	 *
@@ -110,26 +110,26 @@ final class ActivityNamespace
 	 * @see http://microformats.org/wiki/hcard
 	 * @var string
 	 */
-	const HCARD           = 'http://microformats.org/profile/hcard';
+	const HCARD = 'http://microformats.org/profile/hcard';
 	/**
 	 * Base url of the Diaspora installation
 	 *
 	 * @var string
 	 */
-	const DIASPORA_SEED   = 'http://joindiaspora.com/seed_location';
+	const DIASPORA_SEED = 'http://joindiaspora.com/seed_location';
 	/**
 	 * Diaspora Guid
 	 *
 	 * @var string
 	 */
-	const DIASPORA_GUID   = 'http://joindiaspora.com/guid';
+	const DIASPORA_GUID = 'http://joindiaspora.com/guid';
 	/**
 	 * GeoRSS was designed as a lightweight, community driven way to extend existing feeds with geographic information.
 	 *
 	 * @see http://www.georss.org/
 	 * @var string
 	 */
-	const GEORSS          = 'http://www.georss.org/georss';
+	const GEORSS = 'http://www.georss.org/georss';
 	/**
 	 * The Portable Contacts specification is designed to make it easier for developers
 	 * to give their users a secure way to access the address books and friends lists
@@ -138,28 +138,28 @@ final class ActivityNamespace
 	 * @see http://portablecontacts.net/draft-spec/
 	 * @var string
 	 */
-	const POCO            = 'http://portablecontacts.net/spec/1.0';
+	const POCO = 'http://portablecontacts.net/spec/1.0';
 	/**
 	 * OpenWebAuth is used by Friendica and Hubzilla to authenticate at remote systems
 	 *
 	 * @var string
 	 */
-	const OPENWEBAUTH     = 'http://purl.org/openwebauth/v1';
+	const OPENWEBAUTH = 'http://purl.org/openwebauth/v1';
 	/**
 	 * @var string
 	 */
-	const FEED            = 'http://schemas.google.com/g/2010#updates-from';
+	const FEED = 'http://schemas.google.com/g/2010#updates-from';
 	/**
 	 * OStatus is a minimal specification for distributed status updates or microblogging.
 	 *
 	 * @see https://ostatus.github.io/spec/OStatus%201.0%20Draft%202.html
 	 * @var string
 	 */
-	const OSTATUS         = 'http://ostatus.org/schema/1.0';
+	const OSTATUS = 'http://ostatus.org/schema/1.0';
 	/**
 	 * @var string
 	 */
-	const STATUSNET       = 'http://status.net/schema/api/1/';
+	const STATUSNET = 'http://status.net/schema/api/1/';
 	/**
 	 * This namespace describes the Atom Activity Streams in RDF Vocabulary (AAIR),
 	 * defined as a dictionary of named properties and classes using W3C's RDF technology,
@@ -168,26 +168,26 @@ final class ActivityNamespace
 	 * @see http://xmlns.notu.be/aair/#RFC4287
 	 * @var string
 	 */
-	const ATOM1           = 'http://www.w3.org/2005/Atom';
+	const ATOM1 = 'http://www.w3.org/2005/Atom';
 
 	/**
 	 * This namespace is used for the (deprecated) Atom 0.3 specification
 	 * @var string
 	 */
-	const ATOM03           = 'http://purl.org/atom/ns#';
-	
-	/**
-	 * @var string
-	 */
-	const MASTODON        = 'http://mastodon.social/schema/1.0';
+	const ATOM03 = 'http://purl.org/atom/ns#';
 
 	/**
 	 * @var string
 	 */
-	const LITEPUB         = 'http://litepub.social';
+	const MASTODON = 'http://mastodon.social/schema/1.0';
 
 	/**
 	 * @var string
 	 */
-	const PEERTUBE        = 'https://joinpeertube.org';
+	const LITEPUB = 'http://litepub.social';
+
+	/**
+	 * @var string
+	 */
+	const PEERTUBE = 'https://joinpeertube.org';
 }

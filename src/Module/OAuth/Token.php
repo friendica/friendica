@@ -58,7 +58,8 @@ class Token extends BaseApi
 
 		if (empty($request['client_id']) || empty($request['client_secret'])) {
 			$this->logger->warning('Incomplete request data', ['request' => $request]);
-			$this->logAndJsonError(401, $this->errorFactory->Unauthorized('invalid_client', $this->t('Incomplete request data')));;
+			$this->logAndJsonError(401, $this->errorFactory->Unauthorized('invalid_client', $this->t('Incomplete request data')));
+			;
 		}
 
 		$application = OAuth::getApplication($request['client_id'], $request['client_secret'], $request['redirect_uri']);
@@ -91,8 +92,8 @@ class Token extends BaseApi
 
 		// now check for $grant_type === 'authorization_code'
 		// For security reasons only allow freshly created tokens
-		$redirect_uri = strtok($request['redirect_uri'],'?');
-		$condition = [
+		$redirect_uri = strtok($request['redirect_uri'], '?');
+		$condition    = [
 			"`redirect_uri` LIKE ? AND `id` = ? AND `code` = ? AND `created_at` > ?",
 			$redirect_uri, $application['id'], $request['code'], DateTimeFormat::utc('now - 5 minutes')
 		];

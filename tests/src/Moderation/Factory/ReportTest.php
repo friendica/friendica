@@ -32,7 +32,7 @@ class ReportTest extends MockedTestCase
 		return [
 			'default' => [
 				'clock' => $clock,
-				'row' => [
+				'row'   => [
 					'id'              => 11,
 					'reporter-id'     => 12,
 					'uid'             => null,
@@ -50,9 +50,9 @@ class ReportTest extends MockedTestCase
 					'created'         => $nowSeconds->format(DateTimeFormat::MYSQL),
 					'edited'          => null,
 				],
-				'posts' => new Collection\Report\Posts(),
-				'rules' => new Collection\Report\Rules(),
-				'assertion'  => new Entity\Report(
+				'posts'     => new Collection\Report\Posts(),
+				'rules'     => new Collection\Report\Rules(),
+				'assertion' => new Entity\Report(
 					12,
 					13,
 					14,
@@ -75,7 +75,7 @@ class ReportTest extends MockedTestCase
 			],
 			'full' => [
 				'clock' => $clock,
-				'row' => [
+				'row'   => [
 					'id'              => 11,
 					'reporter-id'     => 42,
 					'uid'             => 12,
@@ -101,7 +101,7 @@ class ReportTest extends MockedTestCase
 					new Entity\Report\Rule(1, 'No hate speech'),
 					new Entity\Report\Rule(3, 'No commercial promotion'),
 				]),
-				'assertion'  => new Entity\Report(
+				'assertion' => new Entity\Report(
 					42,
 					13,
 					14,

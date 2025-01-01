@@ -21,8 +21,8 @@ class StrategiesFileManager
 	 * -> it's an empty string to cover empty/missing config values
 	 */
 	const STRATEGY_DEFAULT_KEY = '';
-	const STATIC_DIR  = 'static';
-	const CONFIG_NAME = 'strategies';
+	const STATIC_DIR           = 'static';
+	const CONFIG_NAME          = 'strategies';
 
 	/** @var ICanLoadAddons */
 	protected $addonLoader;

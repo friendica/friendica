@@ -49,7 +49,7 @@ class Blocked extends BaseUsers
 		parent::content();
 
 		$action = (string) $this->parameters['action'] ?? '';
-		$uid    = (int) $this->parameters['uid'] ?? 0;
+		$uid    = (int) $this->parameters['uid']       ?? 0;
 
 		if ($uid === 0) {
 			$this->systemMessages->addNotice($this->t('User not found'));

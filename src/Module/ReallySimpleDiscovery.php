@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\XML;
 
@@ -26,7 +25,7 @@ class ReallySimpleDiscovery extends BaseModule
 					'version' => '1.0',
 					'xmlns'   => 'http://archipelago.phrasewise.com/rsd',
 				],
-				'service'     => [
+				'service' => [
 					'engineName' => 'Friendica',
 					'engineLink' => 'http://friendica.com',
 					'apis'       => [
@@ -37,8 +36,8 @@ class ReallySimpleDiscovery extends BaseModule
 								'apiLink'   => DI::baseUrl(),
 								'blogID'    => '',
 							],
-							'settings'    => [
-								'docs'    => [
+							'settings' => [
+								'docs' => [
 									'http://status.net/wiki/TwitterCompatibleAPI',
 								],
 								'setting' => [

@@ -43,8 +43,8 @@ class Instance extends BaseApi
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database = $database;
-		$this->config = $config;
+		$this->database       = $database;
+		$this->config         = $config;
 		$this->accountFactory = $accountFactory;
 	}
 
@@ -58,7 +58,7 @@ class Instance extends BaseApi
 	{
 		$administrator = User::getFirstAdmin(['nickname']);
 		if ($administrator) {
-			$adminContact = $this->database->selectFirst('contact', ['uri-id'], ['nick' => $administrator['nickname'], 'self' => true]);
+			$adminContact    = $this->database->selectFirst('contact', ['uri-id'], ['nick' => $administrator['nickname'], 'self' => true]);
 			$contact_account = $this->accountFactory->createFromUriId($adminContact['uri-id']);
 		}
 

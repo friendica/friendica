@@ -31,7 +31,7 @@ class Revoke extends BaseApi
 		], $request);
 
 		$condition = ['client_id' => $request['client_id'], 'client_secret' => $request['client_secret'], 'access_token' => $request['token']];
-		$token = DBA::selectFirst('application-view', ['id'], $condition);
+		$token     = DBA::selectFirst('application-view', ['id'], $condition);
 		if (empty($token['id'])) {
 			$this->logger->notice('Token not found', $condition);
 			$this->logAndJsonError(401, $this->errorFactory->Unauthorized());

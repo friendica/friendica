@@ -31,7 +31,7 @@ class DatabaseException extends Exception
 	 */
 	public function __construct(string $message, int $code, string $query, Throwable $previous = null)
 	{
-		parent::__construct(sprintf('"%s" at "%s"', $message, $query) , $code, $previous);
+		parent::__construct(sprintf('"%s" at "%s"', $message, $query), $code, $previous);
 		$this->query = $query;
 	}
 

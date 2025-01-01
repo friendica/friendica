@@ -52,7 +52,7 @@ class Statuses extends BaseApi
 		$uid = self::getCurrentUserID();
 
 		$request = $this->getRequest([
-			'limit' => 10, // Maximum number of results to return. Defaults to 10.
+			'limit'  => 10, // Maximum number of results to return. Defaults to 10.
 			'offset' => 0, // Offset in set, Defaults to 0.
 		], $request);
 

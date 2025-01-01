@@ -17,9 +17,9 @@ use Friendica\Util\Strings;
  */
 final class FriendicaSmartyEngine extends TemplateEngine
 {
-	static $name = 'smarty3';
+	public static $name = 'smarty3';
 
-	const FILE_PREFIX = 'file:';
+	const FILE_PREFIX   = 'file:';
 	const STRING_PREFIX = 'string:';
 
 	/** @var FriendicaSmarty */
@@ -68,7 +68,7 @@ final class FriendicaSmartyEngine extends TemplateEngine
 		// "middleware": inject variables into templates
 		$arr = [
 			'template' => basename($this->smarty->filename ?? ''),
-			'vars' => $vars
+			'vars'     => $vars
 		];
 		Hook::callAll('template_vars', $arr);
 		$vars = $arr['vars'];

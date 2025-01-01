@@ -64,18 +64,18 @@ class Statuses extends BaseApi
 			throw new HTTPException\NotFoundException('Item with URI ID ' . $this->parameters['id'] . ' not found for user ' . $uid . '.');
 		}
 
-		$item['title']      = '';
-		$item['uid']        = $post['uid'];
-		$item['body']       = $this->formatStatus($request['status'], $uid);
-		$item['network']    = $post['network'];
-		$item['gravity']    = $post['gravity'];
-		$item['verb']       = $post['verb'];
-		$item['allow_cid']  = $post['allow_cid'];
-		$item['allow_gid']  = $post['allow_gid'];
-		$item['deny_cid']   = $post['deny_cid'];
-		$item['deny_gid']   = $post['deny_gid'];
-		$item['app']        = $this->getApp();
-		$item['sensitive']  = $request['sensitive'];
+		$item['title']     = '';
+		$item['uid']       = $post['uid'];
+		$item['body']      = $this->formatStatus($request['status'], $uid);
+		$item['network']   = $post['network'];
+		$item['gravity']   = $post['gravity'];
+		$item['verb']      = $post['verb'];
+		$item['allow_cid'] = $post['allow_cid'];
+		$item['allow_gid'] = $post['allow_gid'];
+		$item['deny_cid']  = $post['deny_cid'];
+		$item['deny_gid']  = $post['deny_gid'];
+		$item['app']       = $this->getApp();
+		$item['sensitive'] = $request['sensitive'];
 
 		if (!empty($request['language'])) {
 			$item['language'] = json_encode([$request['language'] => 1]);
@@ -91,7 +91,7 @@ class Statuses extends BaseApi
 			if (!isset($request['friendica']['title']) && $post['gravity'] == Item::GRAVITY_PARENT && DI::pConfig()->get($uid, 'system', 'api_spoiler_title', true)) {
 				$item['title'] = $spoiler_text;
 			} else {
-				$item['body'] = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $spoiler_text . "[/abstract]\n" . $item['body'];
+				$item['body']            = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $spoiler_text . "[/abstract]\n" . $item['body'];
 				$item['content-warning'] = BBCode::toPlaintext($spoiler_text);
 			}
 		}
@@ -307,8 +307,8 @@ class Statuses extends BaseApi
 
 		if (!empty($request['scheduled_at'])) {
 			$item['guid'] = Item::guid($item, true);
-			$item['uri'] = Item::newURI($item['guid']);
-			$id = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
+			$item['uri']  = Item::newURI($item['guid']);
+			$id           = Post\Delayed::add($item['uri'], $item, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED, DateTimeFormat::utc($request['scheduled_at']));
 			if (empty($id)) {
 				$this->logAndJsonError(500, $this->errorFactory->InternalError());
 			}
@@ -385,7 +385,7 @@ class Statuses extends BaseApi
 
 		foreach ($media_ids as $id) {
 			if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr($id, 7)])) {
-				$attach = Attach::selectFirst([], ['id' => substr($id, 7)]);
+				$attach     = Attach::selectFirst([], ['id' => substr($id, 7)]);
 				$attachment = [
 					'type'     => Post\Media::getType($attach['filetype']),
 					'mimetype' => $attach['filetype'],
@@ -422,8 +422,8 @@ class Statuses extends BaseApi
 			];
 
 			if (count($media) > 1) {
-				$attachment['preview'] = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . $ext;
-				$attachment['preview-width'] = $media[1]['width'];
+				$attachment['preview']        = DI::baseUrl() . '/photo/' . $media[1]['resource-id'] . '-' . $media[1]['scale'] . $ext;
+				$attachment['preview-width']  = $media[1]['width'];
 				$attachment['preview-height'] = $media[1]['height'];
 			}
 			$item['attachments'][] = $attachment;

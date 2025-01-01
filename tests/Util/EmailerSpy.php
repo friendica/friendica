@@ -28,10 +28,10 @@ class EmailerSpy extends Emailer
 	protected function mail(string $to, string $subject, string $body, string $headers, string $parameters)
 	{
 		self::$MAIL_DATA = [
-			'to' => $to,
-			'subject' => $subject,
-			'body' => $body,
-			'headers' => $headers,
+			'to'         => $to,
+			'subject'    => $subject,
+			'body'       => $body,
+			'headers'    => $headers,
 			'parameters' => $parameters,
 		];
 

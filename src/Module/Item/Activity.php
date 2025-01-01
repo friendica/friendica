@@ -9,7 +9,6 @@ namespace Friendica\Module\Item;
 
 use Friendica\BaseModule;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -69,10 +68,10 @@ class Activity extends BaseModule
 		}
 
 		$return = [
-			'status' => 'ok',
+			'status'  => 'ok',
 			'item_id' => $itemId,
-			'verb' => $verb,
-			'state' => 1,
+			'verb'    => $verb,
+			'state'   => 1,
 		];
 
 		$this->jsonExit($return);

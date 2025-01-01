@@ -20,7 +20,7 @@ class ThemeDetails extends BaseModule
 	{
 		if (!empty($_REQUEST['theme'])) {
 			$theme = $_REQUEST['theme'];
-			$info = Theme::getInfo($theme);
+			$info  = Theme::getInfo($theme);
 
 			// Unfortunately there will be no translation for this string
 			$description = $info['description'] ?? '';

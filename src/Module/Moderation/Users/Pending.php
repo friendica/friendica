@@ -45,7 +45,7 @@ class Pending extends BaseUsers
 		parent::content();
 
 		$action = $this->parameters['action'] ?? '';
-		$uid    = $this->parameters['uid'] ?? 0;
+		$uid    = $this->parameters['uid']    ?? 0;
 
 		if ($uid) {
 			$user = User::getById($uid, ['username', 'blocked']);
@@ -79,14 +79,14 @@ class Pending extends BaseUsers
 		$t = Renderer::getMarkupTemplate('moderation/users/pending.tpl');
 		return self::getTabsHTML('pending') . Renderer::replaceMacros($t, [
 			// strings //
-			'$title' => $this->t('Administration'),
-			'$page' => $this->t('User registrations awaiting review'),
-			'$select_all' => $this->t('select all'),
-			'$th_pending' => [$this->t('Request date'), $this->t('Name'), $this->t('Email')],
-			'$no_pending' => $this->t('No registrations.'),
+			'$title'           => $this->t('Administration'),
+			'$page'            => $this->t('User registrations awaiting review'),
+			'$select_all'      => $this->t('select all'),
+			'$th_pending'      => [$this->t('Request date'), $this->t('Name'), $this->t('Email')],
+			'$no_pending'      => $this->t('No registrations.'),
 			'$pendingnotetext' => $this->t('Note from the user'),
-			'$approve' => $this->t('Approve'),
-			'$deny' => $this->t('Deny'),
+			'$approve'         => $this->t('Approve'),
+			'$deny'            => $this->t('Deny'),
 
 			'$form_security_token' => self::getFormSecurityToken('admin_users_pending'),
 
@@ -94,8 +94,8 @@ class Pending extends BaseUsers
 			'$query_string' => $this->args->getQueryString(),
 
 			'$pending' => $pending,
-			'$count' => $count,
-			'$pager' => $pager->renderFull($count),
+			'$count'   => $count,
+			'$pager'   => $pager->renderFull($count),
 		]);
 	}
 }

@@ -180,20 +180,20 @@ class Install extends BaseModule
 
 				$status = $this->installer->checkEnvironment($this->baseUrl, $php_path);
 
-				$tpl    = Renderer::getMarkupTemplate('install/01_checks.tpl');
+				$tpl = Renderer::getMarkupTemplate('install/01_checks.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
-					'$title'       => $install_title,
-					'$pass'        => $this->t('System check'),
-					'$required'    => $this->t('Required'),
-					'$requirement_not_satisfied' => $this->t('Requirement not satisfied'),
+					'$title'                              => $install_title,
+					'$pass'                               => $this->t('System check'),
+					'$required'                           => $this->t('Required'),
+					'$requirement_not_satisfied'          => $this->t('Requirement not satisfied'),
 					'$optional_requirement_not_satisfied' => $this->t('Optional requirement not satisfied'),
-					'$ok'          => $this->t('OK'),
-					'$checks'      => $this->installer->getChecks(),
-					'$passed'      => $status,
-					'$see_install' => $this->t('Please see the file "doc/INSTALL.md".'),
-					'$next'        => $this->t('Next'),
-					'$reload'      => $this->t('Check again'),
-					'$php_path'    => $php_path,
+					'$ok'                                 => $this->t('OK'),
+					'$checks'                             => $this->installer->getChecks(),
+					'$passed'                             => $status,
+					'$see_install'                        => $this->t('Please see the file "doc/INSTALL.md".'),
+					'$next'                               => $this->t('Next'),
+					'$reload'                             => $this->t('Check again'),
+					'$php_path'                           => $php_path,
 				]);
 				break;
 
@@ -202,62 +202,62 @@ class Install extends BaseModule
 					new Uri($this->configCache->get('system', 'url')) :
 					$this->baseUrl;
 
-				$tpl    = Renderer::getMarkupTemplate('install/02_base_config.tpl');
+				$tpl = Renderer::getMarkupTemplate('install/02_base_config.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
-					'$title'      => $install_title,
-					'$pass'       => $this->t('Base settings'),
-					'$basepath'   => ['system-basepath',
+					'$title'    => $install_title,
+					'$pass'     => $this->t('Base settings'),
+					'$basepath' => ['system-basepath',
 						$this->t("Base path to installation"),
 						$this->configCache->get('system', 'basepath'),
 						$this->t("If the system cannot detect the correct path to your installation, enter the correct path here. This setting should only be set if you are using a restricted system and symbolic links to your webroot."),
 						$this->t('Required')],
-					'$system_url'    => ['system-url',
+					'$system_url' => ['system-url',
 						$this->t('The Friendica system URL'),
 						(string)$baseUrl,
 						$this->t("Overwrite this field in case the system URL determination isn't right, otherwise leave it as is."),
 						$this->t('Required')],
-					'$php_path'   => $this->configCache->get('config', 'php_path'),
-					'$submit'     => $this->t('Submit'),
+					'$php_path' => $this->configCache->get('config', 'php_path'),
+					'$submit'   => $this->t('Submit'),
 				]);
 				break;
 
 			case self::DATABASE_CONFIG:
-				$tpl    = Renderer::getMarkupTemplate('install/03_database_config.tpl');
+				$tpl = Renderer::getMarkupTemplate('install/03_database_config.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
-					'$title'      => $install_title,
-					'$pass'       => $this->t('Database connection'),
-					'$info_01'    => $this->t('In order to install Friendica we need to know how to connect to your database.'),
-					'$info_02'    => $this->t('Please contact your hosting provider or site administrator if you have questions about these settings.'),
-					'$info_03'    => $this->t('The database you specify below should already exist. If it does not, please create it before continuing.'),
-					'$required'   => $this->t('Required'),
+					'$title'                     => $install_title,
+					'$pass'                      => $this->t('Database connection'),
+					'$info_01'                   => $this->t('In order to install Friendica we need to know how to connect to your database.'),
+					'$info_02'                   => $this->t('Please contact your hosting provider or site administrator if you have questions about these settings.'),
+					'$info_03'                   => $this->t('The database you specify below should already exist. If it does not, please create it before continuing.'),
+					'$required'                  => $this->t('Required'),
 					'$requirement_not_satisfied' => $this->t('Requirement not satisfied'),
-					'$checks'     => $this->installer->getChecks(),
-					'$basepath'   => $this->configCache->get('system', 'basepath'),
-					'$system_url' => $this->configCache->get('system', 'url'),
-					'$dbhost'     => ['database-hostname',
+					'$checks'                    => $this->installer->getChecks(),
+					'$basepath'                  => $this->configCache->get('system', 'basepath'),
+					'$system_url'                => $this->configCache->get('system', 'url'),
+					'$dbhost'                    => ['database-hostname',
 						$this->t('Database Server Name'),
 						$this->configCache->get('database', 'hostname'),
 						'',
 						$this->t('Required')],
-					'$dbuser'     => ['database-username',
+					'$dbuser' => ['database-username',
 						$this->t('Database Login Name'),
 						$this->configCache->get('database', 'username'),
 						'',
 						$this->t('Required'),
 						'autofocus'],
-					'$dbpass'     => ['database-password',
+					'$dbpass' => ['database-password',
 						$this->t('Database Login Password'),
 						$this->configCache->get('database', 'password'),
 						$this->t("For security reasons the password must not be empty"),
 						$this->t('Required')],
-					'$dbdata'     => ['database-database',
+					'$dbdata' => ['database-database',
 						$this->t('Database Name'),
 						$this->configCache->get('database', 'database'),
 						'',
 						$this->t('Required')],
-					'$lbl_10'     => $this->t('Please select a default timezone for your website'),
-					'$php_path'   => $this->configCache->get('config', 'php_path'),
-					'$submit'     => $this->t('Submit')
+					'$lbl_10'   => $this->t('Please select a default timezone for your website'),
+					'$php_path' => $this->configCache->get('config', 'php_path'),
+					'$submit'   => $this->t('Submit')
 				]);
 				break;
 
@@ -265,7 +265,7 @@ class Install extends BaseModule
 				/* Installed langs */
 				$lang_choices = $this->l10n->getAvailableLanguages();
 
-				$tpl    = Renderer::getMarkupTemplate('install/04_site_settings.tpl');
+				$tpl = Renderer::getMarkupTemplate('install/04_site_settings.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
 					'$title'      => $install_title,
 					'$required'   => $this->t('Required'),
@@ -282,17 +282,19 @@ class Install extends BaseModule
 						$this->configCache->get('config', 'admin_email'),
 						$this->t('Your account email address must match this in order to use the web admin panel.'),
 						$this->t('Required'), 'autofocus', 'email'],
-					'$timezone'   => Temporal::getTimezoneField('system-default_timezone',
+					'$timezone' => Temporal::getTimezoneField(
+						'system-default_timezone',
 						$this->t('Please select a default timezone for your website'),
 						$this->configCache->get('system', 'default_timezone'),
-						''),
-					'$language'   => ['system-language',
+						''
+					),
+					'$language' => ['system-language',
 						$this->t('System Language:'),
 						$this->configCache->get('system', 'language'),
 						$this->t('Set the default language for your Friendica installation interface and to send emails.'),
 						$lang_choices],
-					'$php_path'   => $this->configCache->get('config', 'php_path'),
-					'$submit'     => $this->t('Submit')
+					'$php_path' => $this->configCache->get('config', 'php_path'),
+					'$submit'   => $this->t('Submit')
 				]);
 				break;
 
@@ -300,19 +302,19 @@ class Install extends BaseModule
 				$db_return_text = "";
 
 				if (count($this->installer->getChecks()) == 0) {
-					$txt            = '<p style="font-size: 130%;">';
-					$txt            .= $this->t('Your Friendica site database has been installed.') . '<br />';
+					$txt = '<p style="font-size: 130%;">';
+					$txt .= $this->t('Your Friendica site database has been installed.') . '<br />';
 					$db_return_text .= $txt;
 				}
 
-				$tpl    = Renderer::getMarkupTemplate('install/05_finished.tpl');
+				$tpl = Renderer::getMarkupTemplate('install/05_finished.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
-					'$title'    => $install_title,
-					'$required' => $this->t('Required'),
+					'$title'                     => $install_title,
+					'$required'                  => $this->t('Required'),
 					'$requirement_not_satisfied' => $this->t('Requirement not satisfied'),
-					'$checks'   => $this->installer->getChecks(),
-					'$pass'     => $this->t('Installation finished'),
-					'$text'     => $db_return_text . $this->whatNext(),
+					'$checks'                    => $this->installer->getChecks(),
+					'$pass'                      => $this->t('Installation finished'),
+					'$text'                      => $db_return_text . $this->whatNext(),
 				]);
 
 				break;

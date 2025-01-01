@@ -42,29 +42,37 @@ function notes_content(bool $update = false)
 
 		$x = [
 			'lockstate' => 'lock',
-			'acl' => \Friendica\Core\ACL::getSelfOnlyHTML(DI::userSession()->getLocalUserId(), DI::l10n()->t('Personal notes are visible only by yourself.')),
-			'button' => DI::l10n()->t('Save'),
-			'acl_data' => '',
+			'acl'       => \Friendica\Core\ACL::getSelfOnlyHTML(DI::userSession()->getLocalUserId(), DI::l10n()->t('Personal notes are visible only by yourself.')),
+			'button'    => DI::l10n()->t('Save'),
+			'acl_data'  => '',
 		];
 
 		$o .= DI::conversation()->statusEditor($x, $contactId);
 	}
 
 	$condition = ['uid' => DI::userSession()->getLocalUserId(), 'post-type' => Item::PT_PERSONAL_NOTE, 'gravity' => Item::GRAVITY_PARENT,
-		'contact-id'=> $contactId];
+		'contact-id'       => $contactId];
 
 	if (DI::mode()->isMobile()) {
-		$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-			DI::config()->get('system', 'itemspage_network_mobile'));
+		$itemsPerPage = DI::pConfig()->get(
+			DI::userSession()->getLocalUserId(),
+			'system',
+			'itemspage_mobile_network',
+			DI::config()->get('system', 'itemspage_network_mobile')
+		);
 	} else {
-		$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-			DI::config()->get('system', 'itemspage_network'));
+		$itemsPerPage = DI::pConfig()->get(
+			DI::userSession()->getLocalUserId(),
+			'system',
+			'itemspage_network',
+			DI::config()->get('system', 'itemspage_network')
+		);
 	}
 
 	$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
 	$params = ['order' => ['created' => true],
-		'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
+		'limit'           => [$pager->getStart(), $pager->getItemsPerPage()]];
 	$r = Post::selectThreadForUser(DI::userSession()->getLocalUserId(), ['uri-id'], $condition, $params);
 
 	$count = 0;

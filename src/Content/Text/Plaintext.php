@@ -37,8 +37,8 @@ class Plaintext
 			return mb_substr(mb_substr(trim($msg), 0, $limit), 0, -3) . $ellipsis;
 		}
 
-		$lines = explode("\n", $msg);
-		$msg = "";
+		$lines   = explode("\n", $msg);
+		$msg     = "";
 		$recycle = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8');
 		foreach ($lines as $row => $line) {
 			if (mb_strlen(trim($msg . "\n" . $line)) <= $limit) {
@@ -138,13 +138,13 @@ class Plaintext
 
 			if ($post['type'] == 'text') {
 				$post['type'] = 'link';
-				$post['url'] = $item['plink'];
+				$post['url']  = $item['plink'];
 			}
 		}
 
 		$html = BBCode::convertForUriId($item['uri-id'], $post['text'] . ($post['after'] ?? ''), $htmlmode);
-		$msg = HTML::toPlaintext($html, 0, true);
-		$msg = trim(html_entity_decode($msg, ENT_QUOTES, 'UTF-8'));
+		$msg  = HTML::toPlaintext($html, 0, true);
+		$msg  = trim(html_entity_decode($msg, ENT_QUOTES, 'UTF-8'));
 
 		$complete_msg = $msg;
 
@@ -215,7 +215,7 @@ class Plaintext
 				if (($post['type'] == 'text') && isset($post['url'])) {
 					$post['url'] = $item['plink'];
 				} elseif (!isset($post['url'])) {
-					$limit = $limit - self::URL_LENGTH;
+					$limit       = $limit - self::URL_LENGTH;
 					$post['url'] = $item['plink'];
 				} elseif (strpos($item['body'], '[share') !== false) {
 					$post['url'] = $item['plink'];
@@ -250,7 +250,7 @@ class Plaintext
 		$limit = $baselimit;
 
 		while ($message) {
-			$pos_word = mb_strpos($message, ' ');
+			$pos_word      = mb_strpos($message, ' ');
 			$pos_paragraph = mb_strpos($message, "\n");
 
 			if (($pos_word !== false) && ($pos_paragraph !== false)) {
@@ -260,8 +260,8 @@ class Plaintext
 			} elseif ($pos_paragraph !== false) {
 				$pos = $pos_paragraph + 1;
 			} else {
-				$word     = $message;
-				$message  = '';
+				$word    = $message;
+				$message = '';
 			}
 
 			if (trim($message)) {
@@ -324,7 +324,7 @@ class Plaintext
 
 		// Remove mentions and hashtag links
 		$URLSearchString = '^\[\]';
-		$post['text'] = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
+		$post['text']    = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
 
 		// Remove abstract
 		$post['text'] = BBCode::stripAbstract($post['text']);
@@ -382,10 +382,10 @@ class Plaintext
 			$page = Post\Media::getByURIId($item['quote-uri-id'], [Post\Media::HTML]);
 		}
 		if (!empty($page)) {
-			$post['type']          = 'link';
-			$post['url']           = $page[0]['url'];
-			$post['description']   = $page[0]['description'];
-			$post['title']         = $page[0]['name'];
+			$post['type']        = 'link';
+			$post['url']         = $page[0]['url'];
+			$post['description'] = $page[0]['description'];
+			$post['title']       = $page[0]['name'];
 
 			if (empty($post['image']) && !empty($page[0]['preview'])) {
 				$post['image'] = $page[0]['preview'];

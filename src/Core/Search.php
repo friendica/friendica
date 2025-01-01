@@ -16,7 +16,6 @@ use Friendica\Network\HTTPException;
 use Friendica\Object\Search\ContactResult;
 use Friendica\Object\Search\ResultList;
 use Friendica\Util\Network;
-use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -118,15 +117,15 @@ class Search
 		$results = json_decode($resultJson, true);
 
 		$resultList = new ResultList(
-			($results['page']         ?? 0) ?: 1,
-			$results['count']        ?? 0,
+			($results['page'] ?? 0) ?: 1,
+			$results['count'] ?? 0,
 			($results['itemsperpage'] ?? 0) ?: 30
 		);
 
 		$profiles = $results['profiles'] ?? [];
 
 		foreach ($profiles as $profile) {
-			$profile_url = $profile['profile_url'] ?? '';
+			$profile_url    = $profile['profile_url'] ?? '';
 			$contactDetails = Contact::getByURLForUser($profile_url, DI::userSession()->getLocalUserId());
 
 			$result = new ContactResult(
@@ -138,7 +137,7 @@ class Search
 				Protocol::DFRN,
 				$contactDetails['cid'] ?? 0,
 				$contactDetails['zid'] ?? 0,
-				$profile['tags'] ?? ''
+				$profile['tags']       ?? ''
 			);
 
 			$resultList->addResult($result);
@@ -232,7 +231,7 @@ class Search
 					// Converting Directory Search results into contact-looking records
 					$return = array_map(function ($result) {
 						static $contactType = [
-							'People'       => Contact::TYPE_PERSON,
+							'People' => Contact::TYPE_PERSON,
 							// Kept for backward compatibility
 							'Forum'        => Contact::TYPE_COMMUNITY,
 							'Group'        => Contact::TYPE_COMMUNITY,

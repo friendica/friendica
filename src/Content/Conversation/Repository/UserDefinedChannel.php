@@ -165,14 +165,14 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 		$uids = array_column($users, 'uid');
 
 		$usercondition = ['uid' => $uids];
-		$condition = DBA::mergeConditions($usercondition, ["`languages` != ? AND `include-tags` = ? AND `full-text-search` = ? AND `circle` = ?", '', '', '', 0]);
+		$condition     = DBA::mergeConditions($usercondition, ["`languages` != ? AND `include-tags` = ? AND `full-text-search` = ? AND `circle` = ?", '', '', '', 0]);
 		foreach ($this->select($condition) as $channel) {
 			if (!empty($channel->languages) && in_array($language, $channel->languages)) {
 				return true;
 			}
 		}
 
-		$search = '';
+		$search    = '';
 		$condition = DBA::mergeConditions($usercondition, ["`full-text-search` != ? AND `circle` = ? AND `valid`", '', 0]);
 		foreach ($this->select($condition) as $channel) {
 			$search .= '(' . $channel->fullTextSearch . ') ';
@@ -197,7 +197,7 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 	{
 		$condition = $this->getUserCondition();
 		$condition = DBA::mergeConditions($condition, ["`account-type` IN (?, ?) AND `uid` != ?", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY, 0]);
-		$users = $this->db->selectToArray('user', ['uid'], $condition);
+		$users     = $this->db->selectToArray('user', ['uid'], $condition);
 		if (empty($users)) {
 			return [];
 		}

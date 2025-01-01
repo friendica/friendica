@@ -87,86 +87,86 @@ class ImagesTest extends MockedTestCase
 	{
 		return [
 			'landscape' => [
-				'width' => 640,
-				'height' => 480,
-				'max' => 320,
+				'width'     => 640,
+				'height'    => 480,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 320,
+					'width'  => 320,
 					'height' => 240,
 				]
 			],
 			'wide_landscape' => [
-				'width' => 640,
-				'height' => 120,
-				'max' => 320,
+				'width'     => 640,
+				'height'    => 120,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 320,
+					'width'  => 320,
 					'height' => 60,
 				]
 			],
 			'landscape_round_up' => [
-				'width' => 640,
-				'height' => 479,
-				'max' => 320,
+				'width'     => 640,
+				'height'    => 479,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 320,
+					'width'  => 320,
 					'height' => 240,
 				]
 			],
 			'landscape_zero_height' => [
-				'width' => 640,
-				'height' => 1,
-				'max' => 160,
+				'width'     => 640,
+				'height'    => 1,
+				'max'       => 160,
 				'assertion' => [
-					'width' => 160,
+					'width'  => 160,
 					'height' => 1,
 				]
 			],
 			'portrait' => [
-				'width' => 480,
-				'height' => 640,
-				'max' => 320,
+				'width'     => 480,
+				'height'    => 640,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 240,
+					'width'  => 240,
 					'height' => 320,
 				]
 			],
 			// For portrait with aspect ratio <= 16:9, constrain height
 			'portrait_16_9' => [
-				'width' => 1080,
-				'height' => 1920,
-				'max' => 320,
+				'width'     => 1080,
+				'height'    => 1920,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 180,
+					'width'  => 180,
 					'height' => 320,
 				]
 			],
 			// For portrait with aspect ratio > 16:9, constrain width
 			'portrait_over_16_9_too_wide' => [
-				'width' => 1080,
-				'height' => 1921,
-				'max' => 320,
+				'width'     => 1080,
+				'height'    => 1921,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 320,
+					'width'  => 320,
 					'height' => 570,
 				]
 			],
 			// For portrait with aspect ratio > 16:9, constrain width
 			'portrait_over_16_9_not_too_wide' => [
-				'width' => 1080,
-				'height' => 1921,
-				'max' => 1080,
+				'width'     => 1080,
+				'height'    => 1921,
+				'max'       => 1080,
 				'assertion' => [
-					'width' => 1080,
+					'width'  => 1080,
 					'height' => 1921,
 				]
 			],
 			'portrait_round_up' => [
-				'width' => 479,
-				'height' => 640,
-				'max' => 320,
+				'width'     => 479,
+				'height'    => 640,
+				'max'       => 320,
 				'assertion' => [
-					'width' => 240,
+					'width'  => 240,
 					'height' => 320,
 				]
 			],

@@ -7,11 +7,8 @@
 
 namespace Friendica\Module\Api\Mastodon\Notifications;
 
-use Friendica\Core\System;
-use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
-use Friendica\Network\HTTPException\ForbiddenException;
 
 /**
  * @see https://docs.joinmastodon.org/methods/notifications/
@@ -27,7 +24,7 @@ class Dismiss extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		$condition = ['id' => $this->parameters['id']];
+		$condition    = ['id' => $this->parameters['id']];
 		$Notification = DI::notification()->selectOneForUser($uid, $condition);
 		$Notification->setDismissed();
 		DI::notification()->save($Notification);

@@ -31,7 +31,7 @@ const FRIO_SCHEME_ACCENT_GREEN  = '#218f39';
 const FRIO_SCHEME_ACCENT_PINK   = '#d900a9';
 
 const FRIO_DEFAULT_SCHEME = 'light';
-const FRIO_CUSTOM_SCHEME = '---';
+const FRIO_CUSTOM_SCHEME  = '---';
 
 /*
  * This script can be included even when the app is in maintenance mode which requires us to avoid any config call
@@ -82,9 +82,9 @@ function frio_install()
 function frio_item_photo_links(&$body_info)
 {
 	$occurence = 0;
-	$p = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
+	$p         = Plaintext::getBoundariesPosition($body_info['html'], '<a', '>');
 	while ($p !== false && ($occurence++ < 500)) {
-		$link = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
+		$link    = substr($body_info['html'], $p['start'], $p['end'] - $p['start']);
 		$matches = [];
 
 		preg_match('/\/photos\/[\w]+\/image\/([\w]+)/', $link, $matches);
@@ -118,7 +118,7 @@ function frio_item_photo_menu(&$arr)
 {
 	foreach ($arr['menu'] as $k => $v) {
 		if (strpos($v, 'message/new/') === 0) {
-			$v = 'javascript:addToModal(\'' . $v . '\'); return false;';
+			$v               = 'javascript:addToModal(\'' . $v . '\'); return false;';
 			$arr['menu'][$k] = $v;
 		}
 	}
@@ -156,7 +156,7 @@ function frio_contact_photo_menu(&$args)
 	// and if it's a friendica contact we set it to false
 	foreach ($args['menu'] as $k => $v) {
 		if ($k === 'status' || $k === 'profile' || $k === 'photos') {
-			$v[2] = (($args['contact']['network'] === 'dfrn') ? false : true);
+			$v[2]                = (($args['contact']['network'] === 'dfrn') ? false : true);
 			$args['menu'][$k][2] = $v[2];
 		}
 	}
@@ -212,7 +212,7 @@ function frio_remote_nav(array &$nav_info)
 				'icon' => Contact::getMicro($remoteUser),
 				'name' => $remoteUser['name'],
 			];
-			$server_url           = $remoteUser['baseurl'];
+			$server_url = $remoteUser['baseurl'];
 		}
 
 		if (!DI::userSession()->getLocalUserId() && !empty($server_url) && !is_null($remoteUser)) {

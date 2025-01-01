@@ -205,10 +205,10 @@ class Probe
 		// Handles the case when the hostname contains the scheme
 		if (!parse_url($host, PHP_URL_SCHEME)) {
 			$ssl_url = 'https://' . $host . self::HOST_META;
-			$url = 'http://' . $host . self::HOST_META;
+			$url     = 'http://' . $host . self::HOST_META;
 		} else {
 			$ssl_url = $host . self::HOST_META;
-			$url = '';
+			$url     = '';
 		}
 
 		$xrd_timeout = DI::config()->get('system', 'xrd_timeout', 20);
@@ -256,8 +256,8 @@ class Probe
 				return [];
 			}
 
-			$xml = $curlResult->getBodyString();
-			$xrd = XML::parseString($xml, true);
+			$xml      = $curlResult->getBodyString();
+			$xrd      = XML::parseString($xml, true);
 			$host_url = 'http://' . $host;
 		}
 		if (!is_object($xrd)) {
@@ -331,7 +331,7 @@ class Probe
 			foreach ($webfinger['aliases'] as $alias) {
 				$data[] = [
 					'@attributes' => [
-						'rel' => 'alias',
+						'rel'  => 'alias',
 						'href' => $alias,
 					]
 				];
@@ -384,18 +384,18 @@ class Probe
 				unset($data['networks']);
 				if (!empty($data['network'])) {
 					$networks[$data['network']] = $data;
-					$ap_profile['guid']        = $ap_profile['guid']  ?? $data['guid'] ?? null;
-					$ap_profile['about']       = $ap_profile['about'] ?? $data['about'] ?? null;
-					$ap_profile['keywords']    = $data['keywords'] ?? null;
-					$ap_profile['location']    = $data['location'] ?? null;
-					$ap_profile['poco']        = $data['poco'] ?? null;
-					$ap_profile['openwebauth'] = $data['openwebauth'] ?? null;
+					$ap_profile['guid']         = $ap_profile['guid']  ?? $data['guid'] ?? null;
+					$ap_profile['about']        = $ap_profile['about'] ?? $data['about'] ?? null;
+					$ap_profile['keywords']     = $data['keywords']    ?? null;
+					$ap_profile['location']     = $data['location']    ?? null;
+					$ap_profile['poco']         = $data['poco']        ?? null;
+					$ap_profile['openwebauth']  = $data['openwebauth'] ?? null;
 				}
-				$data = $ap_profile;
+				$data             = $ap_profile;
 				$data['networks'] = $networks;
 			} elseif (!empty($ap_profile)) {
 				$ap_profile['batch'] = '';
-				$data = array_merge($ap_profile, $data);
+				$data                = array_merge($ap_profile, $data);
 			}
 		} else {
 			$data = $ap_profile;
@@ -583,7 +583,7 @@ class Probe
 
 			if (empty($webfinger) && empty($lrdd)) {
 				while (empty($lrdd) && empty($webfinger) && (count($path_parts) > 1)) {
-					$host    .= '/' . array_shift($path_parts);
+					$host .= '/' . array_shift($path_parts);
 					$baseurl = $parts['scheme'] . '://' . $host;
 
 					if (!empty($nick)) {
@@ -680,8 +680,8 @@ class Probe
 
 		// First try the address because this is the primary purpose of webfinger
 		if ($addr !== '') {
-			$detected = $addr;
-			$path = str_replace('{uri}', urlencode('acct:' . $addr), $template);
+			$detected  = $addr;
+			$path      = str_replace('{uri}', urlencode('acct:' . $addr), $template);
 			$webfinger = self::webfinger($path, $type);
 			if (is_null($webfinger)) {
 				return null;
@@ -690,8 +690,8 @@ class Probe
 
 		// Then try the URI
 		if (empty($webfinger) && $uri != $addr) {
-			$detected = $uri;
-			$path = str_replace('{uri}', urlencode($uri), $template);
+			$detected  = $uri;
+			$path      = str_replace('{uri}', urlencode($uri), $template);
 			$webfinger = self::webfinger($path, $type);
 			if (is_null($webfinger)) {
 				return null;
@@ -773,9 +773,9 @@ class Probe
 		}
 
 		$webfinger = $data['webfinger'];
-		$nick = $data['nick'] ?? '';
-		$addr = $data['addr'] ?? '';
-		$baseurl = $data['baseurl'] ?? '';
+		$nick      = $data['nick']    ?? '';
+		$addr      = $data['addr']    ?? '';
+		$baseurl   = $data['baseurl'] ?? '';
 
 		$result = [];
 
@@ -963,7 +963,7 @@ class Probe
 			$data['hide'] = !$json['searchable'];
 		}
 		if (!empty($json['public_forum'])) {
-			$data['community'] = $json['public_forum'];
+			$data['community']    = $json['public_forum'];
 			$data['account-type'] = User::ACCOUNT_TYPE_COMMUNITY;
 		} elseif (($json['channel_type'] ?? '') == 'normal') {
 			$data['account-type'] = User::ACCOUNT_TYPE_PERSON;
@@ -1190,7 +1190,7 @@ class Probe
 	private static function dfrn(array $webfinger): array
 	{
 		$hcard_url = '';
-		$data = [];
+		$data      = [];
 		// The array is reversed to take into account the order of preference for same-rel links
 		// See: https://tools.ietf.org/html/rfc7033#section-4.4.4
 		foreach (array_reverse($webfinger['links']) as $link) {
@@ -1381,7 +1381,7 @@ class Probe
 	private static function diaspora(array $webfinger): array
 	{
 		$hcard_url = '';
-		$data = [];
+		$data      = [];
 
 		// The array is reversed to take into account the order of preference for same-rel links
 		// See: https://tools.ietf.org/html/rfc7033#section-4.4.4
@@ -1447,7 +1447,7 @@ class Probe
 			&& !empty($data['pubkey'])
 			&& $hcard_url !== ''
 		) {
-			$data['network'] = Protocol::DIASPORA;
+			$data['network']          = Protocol::DIASPORA;
 			$data['manually-approve'] = false;
 
 			// The Diaspora handle must always be lowercase
@@ -1538,7 +1538,7 @@ class Probe
 			&& isset($data['poll'])
 			&& isset($data['url'])
 		) {
-			$data['network'] = Protocol::OSTATUS;
+			$data['network']          = Protocol::OSTATUS;
 			$data['manually-approve'] = false;
 		} else {
 			return $short ? false : [];
@@ -1559,7 +1559,7 @@ class Probe
 			self::$isTimeout = true;
 			return [];
 		}
-		$feed = $curlResult->getBodyString();
+		$feed      = $curlResult->getBodyString();
 		$feed_data = Feed::import($feed);
 		if (!$feed_data) {
 			return [];
@@ -1669,10 +1669,12 @@ class Probe
 
 				// Resolve arbitrary relative path
 				// Lifted from https://www.php.net/manual/en/function.realpath.php#84012
-				$parts = array_filter(explode('/', $path), 'strlen');
+				$parts     = array_filter(explode('/', $path), 'strlen');
 				$absolutes = [];
 				foreach ($parts as $part) {
-					if ('.' == $part) continue;
+					if ('.' == $part) {
+						continue;
+					}
 					if ('..' == $part) {
 						array_pop($absolutes);
 					} else {
@@ -1716,30 +1718,30 @@ class Probe
 		} else {
 			return [];
 		}
-	
+
 		$profile = DI::atProtocol()->XRPCGet('app.bsky.actor.getProfile', ['actor' => $did]);
 		if (empty($profile) || empty($profile->did)) {
 			return [];
 		}
 
-		$nick = $profile->handle ?? $profile->did;
+		$nick = $profile->handle      ?? $profile->did;
 		$name = $profile->displayName ?? $nick;
 
 		$data = [
-			'network'  => Protocol::BLUESKY,
-			'url'      => $profile->did,
-			'alias'    => ATProtocol::WEB . '/profile/' . $nick,
-			'name'     => $name ?: $nick,
-			'nick'     => $nick,
-			'addr'     => $nick,
-			'poll'     => ATProtocol::WEB . '/profile/' . $profile->did . '/rss',
-			'photo'    => $profile->avatar ?? '',
+			'network' => Protocol::BLUESKY,
+			'url'     => $profile->did,
+			'alias'   => ATProtocol::WEB . '/profile/' . $nick,
+			'name'    => $name ?: $nick,
+			'nick'    => $nick,
+			'addr'    => $nick,
+			'poll'    => ATProtocol::WEB . '/profile/' . $profile->did . '/rss',
+			'photo'   => $profile->avatar ?? '',
 		];
-	
+
 		if (!empty($profile->description)) {
 			$data['about'] = HTML::toBBCode($profile->description);
 		}
-	
+
 		if (!empty($profile->banner)) {
 			$data['header'] = $profile->banner;
 		}
@@ -1820,7 +1822,7 @@ class Probe
 			$data['alias'] = $feed_data['header']['author-id'];
 		}
 
-		$data['url'] = $url;
+		$data['url']  = $url;
 		$data['poll'] = $url;
 
 		$data['network'] = Protocol::FEED;
@@ -1850,14 +1852,14 @@ class Probe
 		$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $uid]);
 
 		$condition = ["`uid` = ? AND `server` != ''", $uid];
-		$fields = ['pass', 'user', 'server', 'port', 'ssltype', 'mailbox'];
-		$mailacct = DBA::selectFirst('mailacct', $fields, $condition);
+		$fields    = ['pass', 'user', 'server', 'port', 'ssltype', 'mailbox'];
+		$mailacct  = DBA::selectFirst('mailacct', $fields, $condition);
 
 		if (!DBA::isResult($user) || !DBA::isResult($mailacct)) {
 			return [];
 		}
 
-		$mailbox = Email::constructMailboxName($mailacct);
+		$mailbox  = Email::constructMailboxName($mailacct);
 		$password = '';
 		openssl_private_decrypt(hex2bin($mailacct['pass']), $password, $user['prvkey']);
 		$mbox = Email::connect($mailbox, $mailacct['user'], $password);
@@ -1884,7 +1886,7 @@ class Probe
 			'poll'    => 'email ' . Strings::getRandomHex(),
 		];
 
-		$data['nick']    = $data['name'];
+		$data['nick'] = $data['name'];
 
 		$x = Email::messageMeta($mbox, $msgs[0]);
 
@@ -1900,7 +1902,7 @@ class Probe
 					&& (strcasecmp($feadr->host, $phost) == 0)
 					&& !empty($feadr->personal)
 				) {
-					$personal = imap_mime_header_decode($feadr->personal);
+					$personal     = imap_mime_header_decode($feadr->personal);
 					$data['name'] = '';
 					foreach ($personal as $perspart) {
 						if ($perspart->charset != 'default') {
@@ -2065,9 +2067,9 @@ class Probe
 		$last_updated = '';
 		foreach ($items as $activity) {
 			if (!empty($activity['published'])) {
-				$published =  DateTimeFormat::utc($activity['published']);
+				$published = DateTimeFormat::utc($activity['published']);
 			} elseif (!empty($activity['object']['published'])) {
-				$published =  DateTimeFormat::utc($activity['object']['published']);
+				$published = DateTimeFormat::utc($activity['object']['published']);
 			} else {
 				continue;
 			}
@@ -2183,7 +2185,7 @@ class Probe
 				'sharedinbox'      => $approfile['endpoints']['sharedInbox'], 'network' => Protocol::DFRN,
 				'pubkey'           => $owner['upubkey'], 'baseurl' => $approfile['generator']['url'], 'gsid' => $owner['gsid'],
 				'manually-approve' => in_array($owner['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP, User::PAGE_FLAGS_COMM_MAN]),
-				'networks' => [
+				'networks'         => [
 					Protocol::DIASPORA => [
 						'name'         => $owner['name'],
 						'given_name'   => $split_name['first'],
@@ -2208,7 +2210,7 @@ class Probe
 		} catch (Exception $e) {
 			// Default values for nonexistent targets
 			$data = [
-				'name' => $url, 'nick' => $url, 'url' => $url, 'network' => Protocol::PHANTOM,
+				'name'  => $url, 'nick' => $url, 'url' => $url, 'network' => Protocol::PHANTOM,
 				'photo' => DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO
 			];
 		}

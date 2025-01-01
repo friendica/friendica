@@ -60,9 +60,9 @@ HELP;
 	{
 		parent::__construct($argv);
 
-		$this->appMode     = $appMode;
-		$this->l10n        = $l10n;
-		$this->dba         = $dba;
+		$this->appMode = $appMode;
+		$this->l10n    = $l10n;
+		$this->dba     = $dba;
 
 		AddonCore::loadAddons();
 	}
@@ -123,7 +123,7 @@ HELP;
 		}
 		foreach (AddonCore::getAvailableList() as $addon) {
 			$addon_name = $addon[0];
-			$enabled = AddonCore::isEnabled($addon_name) ? "enabled" : "disabled";
+			$enabled    = AddonCore::isEnabled($addon_name) ? "enabled" : "disabled";
 			switch ($subCmd) {
 				case 'all':
 					$table->addRow([$addon_name, $enabled]);
@@ -133,6 +133,7 @@ HELP;
 						continue 2;
 					}
 					$table->addRow([$addon_name]);
+					// no break
 				case 'disabled':
 					if ($enabled) {
 						continue 2;

@@ -113,7 +113,10 @@ class Cron
 					} elseif ($entry['priority'] != Worker::PRIORITY_CRITICAL) {
 						$new_priority = Worker::PRIORITY_NEGLIGIBLE;
 					}
-					DBA::update('workerqueue', ['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0], ['id' => $entry["id"]]
+					DBA::update(
+						'workerqueue',
+						['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
+						['id'       => $entry["id"]]
 					);
 				} else {
 					Logger::info('Process runtime is okay', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);

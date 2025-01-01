@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\GNUSocial\Help;
 
 use Friendica\Module\BaseApi;
-use Friendica\DI;
 
 /**
  * API endpoint: /api/help/test

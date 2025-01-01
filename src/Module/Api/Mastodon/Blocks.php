@@ -50,7 +50,7 @@ class Blocks extends BaseApi
 		}
 
 		$followers = DBA::select('user-contact', ['cid'], $condition, $params);
-		$accounts = [];
+		$accounts  = [];
 		while ($follower = DBA::fetch($followers)) {
 			self::setBoundaries($follower['cid']);
 			$accounts[] = DI::mstdnAccount()->createFromContactId($follower['cid'], $uid);

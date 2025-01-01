@@ -29,8 +29,8 @@ class Index extends BaseApi
 		], $request);
 
 		$condition = ["`id` > ? AND `uid` = ?", $request['since_id'], $uid];
-		$params = ['limit' => $request['count']];
-		$events = DBA::selectToArray('event', [], $condition, $params);
+		$params    = ['limit' => $request['count']];
+		$events    = DBA::selectToArray('event', [], $condition, $params);
 
 		$items = [];
 		foreach ($events as $event) {

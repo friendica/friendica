@@ -75,7 +75,7 @@ class Notification extends BaseEntity
 		$this->seen        = $seen;
 		$this->dismissed   = $dismissed;
 
-		$this->id          = $id;
+		$this->id = $id;
 	}
 
 	public function setSeen()

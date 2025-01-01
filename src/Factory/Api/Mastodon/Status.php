@@ -222,8 +222,8 @@ class Status extends BaseFactory
 
 		$application = new \Friendica\Object\Api\Mastodon\Application($item['app'] ?: $platform);
 
-		$mentions    = $this->mstdnMentionFactory->createFromUriId($uriId)->getArrayCopy();
-		$tags        = $this->mstdnTagFactory->createFromUriId($uriId);
+		$mentions = $this->mstdnMentionFactory->createFromUriId($uriId)->getArrayCopy();
+		$tags     = $this->mstdnTagFactory->createFromUriId($uriId);
 		if ($item['has-media']) {
 			$card        = $this->mstdnCardFactory->createFromUriId($uriId);
 			$attachments = $this->mstdnAttachmentFactory->createFromUriId($uriId);
@@ -350,7 +350,7 @@ class Status extends BaseFactory
 					$quote_id = $media['media-uri-id'];
 				} else {
 					$shared_item = Post::selectFirst(['uri-id'], ['plink' => $media[0]['url'], 'uid' => [$uid, 0]]);
-					$quote_id = $shared_item['uri-id'] ?? 0;
+					$quote_id    = $shared_item['uri-id'] ?? 0;
 				}
 			}
 		} else {

@@ -8,7 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Module\BaseApi;
@@ -82,7 +81,7 @@ class Whoami extends BaseApi
 			'oauthRegistrationEndpoint'  => DI::baseUrl() . '/api/v1/apps',
 			'oauthTokenEndpoint'         => DI::baseUrl() . '/oauth/token',
 			'sharedInbox'                => DI::baseUrl() . '/inbox',
-//			'uploadMedia'                => DI::baseUrl() . '/api/upload_media' // @todo Endpoint does not exist at the moment
+			//			'uploadMedia'                => DI::baseUrl() . '/api/upload_media' // @todo Endpoint does not exist at the moment
 		];
 
 		$data['generator'] = ActivityPub\Transmitter::getService();

@@ -21,7 +21,7 @@ final class Channel extends Timeline
 	 */
 	public function getTimelines(int $uid): Timelines
 	{
-		$iso639 = new \Matriphe\ISO639\ISO639;
+		$iso639 = new \Matriphe\ISO639\ISO639();
 		$native = $iso639->nativeByCode1(User::getLanguageCode($uid));
 
 		$tabs = [

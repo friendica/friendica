@@ -15,7 +15,7 @@ class L10nTest extends MockedTestCase
 	public function dataDetectLanguage()
 	{
 		return [
-			'empty'   => [
+			'empty' => [
 				'server'  => [],
 				'get'     => [],
 				'default' => 'en',

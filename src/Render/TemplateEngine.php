@@ -13,7 +13,7 @@ namespace Friendica\Render;
 abstract class TemplateEngine
 {
 	/** @var string */
-	static $name;
+	public static $name;
 
 	/** @var string */
 	protected $theme;

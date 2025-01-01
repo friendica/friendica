@@ -90,7 +90,7 @@ class Register
 		$code = Strings::getRandomName(8) . random_int(1000, 9999);
 
 		$fields = [
-			'hash' => $code,
+			'hash'    => $code,
 			'created' => DateTimeFormat::utcNow()
 		];
 

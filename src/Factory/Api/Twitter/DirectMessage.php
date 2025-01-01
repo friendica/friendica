@@ -59,7 +59,7 @@ class DirectMessage extends BaseFactory
 				$text = HTML::toPlaintext(BBCode::convertForUriId($mail['uri-id'], $mail['body'], BBCode::TWITTER_API), 0);
 			}
 		} else {
-			$text  = $mail['title'] . "\n" . HTML::toPlaintext(BBCode::convertForUriId($mail['uri-id'], $mail['body'], BBCode::TWITTER_API), 0);
+			$text = $mail['title'] . "\n" . HTML::toPlaintext(BBCode::convertForUriId($mail['uri-id'], $mail['body'], BBCode::TWITTER_API), 0);
 		}
 
 		$pcid = Contact::getPublicIdByUserId($uid);

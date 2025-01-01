@@ -13,7 +13,6 @@ use Friendica\Core\Storage\Exception\InvalidClassStorageException;
 use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Module\BaseAdmin;
-use Friendica\Util\Strings;
 
 class Storage extends BaseAdmin
 {

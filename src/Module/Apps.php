@@ -33,7 +33,7 @@ class Apps extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->nav = $nav;
+		$this->nav            = $nav;
 		$this->systemMessages = $systemMessages;
 
 		$privateaddons = $config->get('config', 'private_addons');

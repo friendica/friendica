@@ -29,15 +29,15 @@ class UpdateGServers
 		}
 
 		$updating = Worker::countWorkersByCommand('UpdateGServer');
-		$limit = $update_limit - $updating;
+		$limit    = $update_limit - $updating;
 		if ($limit <= 0) {
 			Logger::info('The number of currently running jobs exceed the limit');
 			return;
 		}
 
-		$total = DBA::count('gserver');
+		$total     = DBA::count('gserver');
 		$condition = ["NOT `blocked` AND `next_contact` < ? AND (`nurl` != ? OR `url` != ?)",  DateTimeFormat::utcNow(), '', ''];
-		$outdated = DBA::count('gserver', $condition);
+		$outdated  = DBA::count('gserver', $condition);
 		Logger::info('Server status', ['total' => $total, 'outdated' => $outdated, 'updating' => $limit]);
 
 		$gservers = DBA::select('gserver', ['id', 'url', 'nurl', 'failed', 'created', 'last_contact'], $condition, ['limit' => $limit]);

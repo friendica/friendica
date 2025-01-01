@@ -74,7 +74,7 @@ class DBSync extends BaseAdmin
 
 				break;
 			default:
-				$failed = [];
+				$failed     = [];
 				$configStmt = DBA::select('config', ['k', 'v'], ['cat' => 'database']);
 				while ($config = DBA::fetch($configStmt)) {
 					$upd = intval(substr($config['k'], 7));
@@ -87,14 +87,14 @@ class DBSync extends BaseAdmin
 				if (!count($failed)) {
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/structure_check.tpl'), [
 						'$banner' => DI::l10n()->t('No failed updates.'),
-						'$check' => DI::l10n()->t('Check database structure'),
+						'$check'  => DI::l10n()->t('Check database structure'),
 					]);
 				} else {
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/failed_updates.tpl'), [
 						'$banner' => DI::l10n()->t('Failed Updates'),
-						'$desc' => DI::l10n()->t('This does not include updates prior to 1139, which did not return a status.'),
-						'$mark' => DI::l10n()->t("Mark success \x28if update was manually applied\x29"),
-						'$apply' => DI::l10n()->t('Attempt to execute this update step automatically'),
+						'$desc'   => DI::l10n()->t('This does not include updates prior to 1139, which did not return a status.'),
+						'$mark'   => DI::l10n()->t("Mark success \x28if update was manually applied\x29"),
+						'$apply'  => DI::l10n()->t('Attempt to execute this update step automatically'),
 						'$failed' => $failed
 					]);
 				}

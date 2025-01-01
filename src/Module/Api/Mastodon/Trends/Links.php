@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Mastodon\Trends;
 
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;
@@ -26,7 +25,7 @@ class Links extends BaseApi
 	protected function rawContent(array $request = [])
 	{
 		$request = $this->getRequest([
-			'limit' => 10, // Maximum number of results to return. Defaults to 10.
+			'limit'  => 10, // Maximum number of results to return. Defaults to 10.
 			'offset' => 0, // Offset in set, Defaults to 0.
 		], $request);
 

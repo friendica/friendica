@@ -80,7 +80,7 @@ class Remove extends \Friendica\BaseModule
 		if ($tag_text === '') {
 			$this->baseUrl->redirect($returnUrl);
 		}
-		
+
 		$tags = explode(',', $tag_text);
 
 		$tag_checkboxes = array_map(function ($tag_text) {

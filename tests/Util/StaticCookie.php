@@ -36,7 +36,7 @@ class StaticCookie extends Cookie
 	protected function setCookie(string $value = null, int $expire = null, bool $secure = null): bool
 	{
 		self::$_COOKIE[self::NAME] = $value;
-		self::$_EXPIRE = $expire;
+		self::$_EXPIRE             = $expire;
 
 		return true;
 	}

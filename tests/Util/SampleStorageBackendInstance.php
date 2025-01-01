@@ -5,7 +5,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-use Friendica\App;
 use Friendica\Core\L10n;
 use Friendica\Test\Util\SampleStorageBackend;
 use Mockery\MockInterface;

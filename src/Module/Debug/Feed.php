@@ -54,7 +54,7 @@ class Feed extends BaseModule
 			$import_result = Protocol\Feed::import($xml);
 
 			$result = [
-				'input' => $xml,
+				'input'  => $xml,
 				'output' => var_export($import_result, true),
 			];
 		}

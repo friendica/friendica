@@ -66,7 +66,7 @@ class StreamLoggerTest extends LoggerTestCase
 		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn('')->once();
 
 		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -84,7 +84,7 @@ class StreamLoggerTest extends LoggerTestCase
 		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn($logfile->url())->once();
 
 		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -100,7 +100,7 @@ class StreamLoggerTest extends LoggerTestCase
 		static::markTestIncomplete('We need a platform independent way to set directory to readonly');
 
 		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -138,7 +138,7 @@ class StreamLoggerTest extends LoggerTestCase
 		static::markTestSkipped('vfsStream isn\'t compatible with chdir, so not testable.');
 
 		$logfile = vfsStream::newFile('friendica.log')
-		                    ->at($this->root);
+							->at($this->root);
 
 		chdir($this->root->getChild('logs')->url());
 

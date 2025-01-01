@@ -7,7 +7,6 @@
 
 namespace Friendica\Core\Lock\Type;
 
-use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Exception\CachePersistenceException;

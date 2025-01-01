@@ -29,7 +29,7 @@ class ExpireAndRemoveUsers
 
 		// Ensure to never remove the user with uid=0
 		DBA::update('user', ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false,
-			'account_expires_on' => DBA::NULL_DATETIME], ['uid' => 0]);
+			'account_expires_on'           => DBA::NULL_DATETIME], ['uid' => 0]);
 
 		// Remove any freshly expired account
 		$users = DBA::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);

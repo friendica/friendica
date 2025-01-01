@@ -68,7 +68,7 @@ HELP;
 		$this->dba     = $dba;
 		$this->baseUrl = $baseUrl;
 		$this->l10n    = $l10n;
-		$this->config = $config;
+		$this->config  = $config;
 	}
 
 	protected function doExecute(): int
@@ -78,7 +78,7 @@ HELP;
 			return 2;
 		}
 
-		$fields = ['id', 'avatar', 'photo', 'thumb', 'micro', 'uri-id', 'url', 'avatar', 'network'];
+		$fields    = ['id', 'avatar', 'photo', 'thumb', 'micro', 'uri-id', 'url', 'avatar', 'network'];
 		$condition = ["NOT `self` AND `avatar` != ? AND `photo` LIKE ? AND `uid` = ? AND `uri-id` != ? AND NOT `uri-id` IS NULL AND NOT `network` IN (?, ?)",
 			'', $this->baseUrl . '/photo/%', 0, 0, Protocol::MAIL, Protocol::FEED];
 

@@ -252,8 +252,8 @@ class DiasporaContact extends BaseRepository
 			$uriId,
 			new \DateTime($contact['created'] ?? 'now', new \DateTimeZone('UTC')),
 			$interacting_count ?? 0,
-			$interacted_count ?? 0,
-			$post_count ?? 0
+			$interacted_count  ?? 0,
+			$post_count        ?? 0
 		);
 
 		$DiasporaContact = $this->save($DiasporaContact);

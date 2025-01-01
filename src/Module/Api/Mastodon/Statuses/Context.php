@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -46,7 +45,7 @@ class Context extends BaseApi
 
 		$parent = Post::selectOriginal(['uri-id', 'parent-uri-id'], ['uri-id' => $id]);
 		if (DBA::isResult($parent)) {
-			$id = $parent['uri-id'];
+			$id        = $parent['uri-id'];
 			$params    = ['order' => ['uri-id' => true]];
 			$condition = ['parent-uri-id' => $parent['parent-uri-id'], 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT]];
 
@@ -59,7 +58,7 @@ class Context extends BaseApi
 			}
 
 			if (!empty($request['min_id'])) {
-				$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
+				$condition       = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
 				$params['order'] = ['uri-id'];
 			}
 

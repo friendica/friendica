@@ -90,7 +90,7 @@ class Crypto
 		openssl_pkey_export($result, $response['prvkey']);
 
 		// Get public key
-		$pkey = openssl_pkey_get_details($result);
+		$pkey               = openssl_pkey_get_details($result);
 		$response['pubkey'] = $pkey["key"];
 
 		return $response;
@@ -165,9 +165,9 @@ class Crypto
 		}
 		$fn = 'encrypt' . strtoupper($alg);
 		if (method_exists(__CLASS__, $fn)) {
-			$result = ['encrypted' => true];
-			$key = random_bytes(256);
-			$iv  = random_bytes(256);
+			$result         = ['encrypted' => true];
+			$key            = random_bytes(256);
+			$iv             = random_bytes(256);
 			$result['data'] = Strings::base64UrlEncode(self::$fn($data, $key, $iv), true);
 
 			// log the offending call so we can track it down
@@ -206,9 +206,9 @@ class Crypto
 			Logger::notice('aes_encapsulate: no key. data: ' . $data);
 		}
 
-		$key = random_bytes(32);
-		$iv  = random_bytes(16);
-		$result = ['encrypted' => true];
+		$key            = random_bytes(32);
+		$iv             = random_bytes(16);
+		$result         = ['encrypted' => true];
 		$result['data'] = Strings::base64UrlEncode(self::encryptAES256CBC($data, $key, $iv), true);
 
 		// log the offending call so we can track it down

@@ -25,7 +25,7 @@ class Delivery
 		}
 
 		$fields = ['uri-id' => $uri_id, 'uid' => $uid, 'inbox-id' => ItemURI::getIdByURI($inbox),
-			'created' => $created, 'command' => $command, 'receivers' => json_encode($receivers)];
+			'created'          => $created, 'command' => $command, 'receivers' => json_encode($receivers)];
 
 		DBA::insert('post-delivery', $fields, Database::INSERT_IGNORE);
 	}
@@ -64,7 +64,7 @@ class Delivery
 
 	public static function selectForInbox(string $inbox)
 	{
-		$rows = DBA::select('post-delivery', [], ["`inbox-id` = ? AND `failed` < ?", ItemURI::getIdByURI($inbox), DI::config()->get('system', 'worker_defer_limit')], ['order' => ['created']]);
+		$rows       = DBA::select('post-delivery', [], ["`inbox-id` = ? AND `failed` < ?", ItemURI::getIdByURI($inbox), DI::config()->get('system', 'worker_defer_limit')], ['order' => ['created']]);
 		$deliveries = [];
 		while ($row = DBA::fetch($rows)) {
 			if (!empty($row['receivers'])) {

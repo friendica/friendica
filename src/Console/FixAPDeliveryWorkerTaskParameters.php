@@ -70,8 +70,8 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->dba = $dba;
-		$this->l10n = $l10n;
+		$this->dba     = $dba;
+		$this->l10n    = $l10n;
 	}
 
 	protected function doExecute(): int
@@ -90,9 +90,9 @@ HELP;
 			throw new RuntimeException('Friendica isn\'t properly installed yet.');
 		}
 
-		$this->examined = 0;
+		$this->examined  = 0;
 		$this->processed = 0;
-		$this->errored = 0;
+		$this->errored   = 0;
 
 		do {
 			$result = $this->dba->select('workerqueue', ['id', 'parameter'], ["`command` = ? AND `parameter` LIKE ?", "APDelivery", "[\"%\",\"\",%"], ['limit' => [$this->examined, 100]]);
@@ -134,7 +134,7 @@ HELP;
 
 		if (is_array($parameters[2])) {
 			$parameters[4] = $parameters[2];
-			$contact = Contact::getById(current($parameters[2]), ['url']);
+			$contact       = Contact::getById(current($parameters[2]), ['url']);
 			$parameters[2] = $contact['url'];
 		}
 

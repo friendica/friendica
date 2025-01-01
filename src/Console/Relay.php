@@ -87,7 +87,7 @@ HELP;
 		}
 
 		if (count($this->args) == 2) {
-			$mode = $this->getArgument(0);
+			$mode  = $this->getArgument(0);
 			$actor = $this->getArgument(1);
 
 			$apcontact = APContact::getByURL($actor);

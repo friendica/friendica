@@ -251,7 +251,7 @@ class ClientToServer
 		$item['uid']        = $uid;
 		$item['verb']       = Activity::POST;
 		$item['contact-id'] = $owner['id'];
-		$item['author-id']  = $item['owner-id']  = Contact::getPublicIdByUserId($uid);
+		$item['author-id']  = $item['owner-id'] = Contact::getPublicIdByUserId($uid);
 		$item['title']      = $object_data['name'];
 		$item['body']       = Markdown::toBBCode($object_data['content'] ?? '');
 		$item['app']        = $application['name'] ?? 'API';
@@ -323,8 +323,10 @@ class ClientToServer
 			if (!empty($requester_id)) {
 				$permissionSets = DI::permissionSet()->selectByContactId($requester_id, $owner['uid']);
 				if (count($permissionSets) > 0) {
-					$condition = ['psid' => array_merge($permissionSets->column('id'),
-						[DI::permissionSet()->selectPublicForUser($owner['uid'])])];
+					$condition = ['psid' => array_merge(
+						$permissionSets->column('id'),
+						[DI::permissionSet()->selectPublicForUser($owner['uid'])]
+					)];
 				}
 			}
 		}

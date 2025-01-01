@@ -41,14 +41,14 @@ class Conversation
 	/**
 	 * The message had been pushed to this system
 	 */
-	const PUSH    = 1;
+	const PUSH = 1;
 	/**
 	 * The message had been fetched by our system
 	 */
-	const PULL    = 2;
+	const PULL = 2;
 	/**
 	 * The message had been pushed to this system via a relay server
 	 */
-	const RELAY   = 3;
+	const RELAY = 3;
 
 }

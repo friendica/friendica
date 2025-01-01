@@ -18,33 +18,33 @@ class ActivityTest extends MockedTestCase
 		return [
 			'empty' => [
 				'haystack' => '',
-				'needle' => '',
-				'assert' => true,
+				'needle'   => '',
+				'assert'   => true,
 			],
 			'simple' => [
 				'haystack' => Activity\ObjectType::TAGTERM,
-				'needle' => Activity\ObjectType::TAGTERM,
-				'assert' => true,
+				'needle'   => Activity\ObjectType::TAGTERM,
+				'assert'   => true,
 			],
 			'withNamespace' => [
 				'haystack' => 'tagterm',
-				'needle' => ActivityNamespace::ACTIVITY_SCHEMA . Activity\ObjectType::TAGTERM,
-				'assert' => true,
+				'needle'   => ActivityNamespace::ACTIVITY_SCHEMA . Activity\ObjectType::TAGTERM,
+				'assert'   => true,
 			],
 			'invalidSimple' => [
 				'haystack' => 'tagterm',
-				'needle' => '',
-				'assert' => false,
+				'needle'   => '',
+				'assert'   => false,
 			],
 			'invalidWithOutNamespace' => [
 				'haystack' => 'tagterm',
-				'needle' => Activity\ObjectType::TAGTERM,
-				'assert' => false,
+				'needle'   => Activity\ObjectType::TAGTERM,
+				'assert'   => false,
 			],
 			'withSubPath' => [
 				'haystack' => 'tagterm',
-				'needle' => ActivityNamespace::ACTIVITY_SCHEMA . '/bla/' . Activity\ObjectType::TAGTERM,
-				'assert' => true,
+				'needle'   => ActivityNamespace::ACTIVITY_SCHEMA . '/bla/' . Activity\ObjectType::TAGTERM,
+				'assert'   => true,
 			],
 		];
 	}

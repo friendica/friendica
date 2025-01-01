@@ -60,7 +60,7 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->config = $config;
+		$this->config  = $config;
 	}
 
 	protected function doExecute(): int

@@ -40,7 +40,7 @@ class Hook
 	public static function loadHooks()
 	{
 		self::$hooks = [];
-		$stmt = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
+		$stmt        = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
 
 		while ($hook = DBA::fetch($stmt)) {
 			self::add($hook['hook'], $hook['file'], $hook['function']);

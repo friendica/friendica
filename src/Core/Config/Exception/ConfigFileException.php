@@ -7,8 +7,6 @@
 
 namespace Friendica\Core\Config\Exception;
 
-use Throwable;
-
 class ConfigFileException extends \RuntimeException
 {
 	public function __construct($message = "")

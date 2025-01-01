@@ -93,7 +93,7 @@ class ContactBlock
 
 				if (DBA::isResult($contacts_stmt)) {
 					$contacts_title = DI::l10n()->tt('%d Contact', '%d Contacts', $total);
-					$micropro = [];
+					$micropro       = [];
 
 					while ($contact = DBA::fetch($contacts_stmt)) {
 						$contacts[] = $contact;
@@ -106,11 +106,11 @@ class ContactBlock
 		}
 
 		$tpl = Renderer::getMarkupTemplate('widget/contacts.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$contacts' => $contacts_title,
-			'$nickname' => $profile['nickname'],
+		$o   = Renderer::replaceMacros($tpl, [
+			'$contacts'     => $contacts_title,
+			'$nickname'     => $profile['nickname'],
 			'$viewcontacts' => DI::l10n()->t('View Contacts'),
-			'$micropro' => $micropro,
+			'$micropro'     => $micropro,
 		]);
 
 		$arr = ['contacts' => $contacts, 'output' => $o];

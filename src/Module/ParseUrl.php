@@ -37,10 +37,10 @@ class ParseUrl extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		$format = '';
-		$title = '';
+		$format      = '';
+		$title       = '';
 		$description = '';
-		$ret = ['success' => false, 'contentType' => ''];
+		$ret         = ['success' => false, 'contentType' => ''];
 
 		if (!empty($_GET['binurl']) && Util\Strings::isHex($_GET['binurl'])) {
 			$url = trim(hex2bin($_GET['binurl']));
@@ -109,14 +109,14 @@ class ParseUrl extends BaseModule
 				}
 
 				$ret['contentType'] = $content_type;
-				$ret['data'] = ['url' => $url];
-				$ret['success'] = true;
+				$ret['data']        = ['url' => $url];
+				$ret['success']     = true;
 			} else {
 				unset($siteinfo['keywords']);
 
-				$ret['data'] = $siteinfo;
+				$ret['data']        = $siteinfo;
 				$ret['contentType'] = 'attachment';
-				$ret['success'] = true;
+				$ret['success']     = true;
 			}
 
 			$this->jsonExit($ret);

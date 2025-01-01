@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 
 class DependencyCheckTest extends FixtureTestCase
 {
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 

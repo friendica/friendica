@@ -231,7 +231,7 @@ class L10n
 				// try to mix them so we can get double-code parts too
 				$match_lang = strtolower(join('-', $lang_code));
 				if (file_exists(__DIR__ . "/../../view/lang/$match_lang") &&
-				    is_dir(__DIR__ . "/../../view/lang/$match_lang")) {
+					is_dir(__DIR__ . "/../../view/lang/$match_lang")) {
 					if ($lang_quality > $current_q) {
 						$current_lang = $match_lang;
 						$current_q    = $lang_quality;
@@ -402,8 +402,10 @@ class L10n
 		];
 
 		if (in_array('cld2', get_loaded_extensions())) {
-			$additional_langs = array_merge($additional_langs,
-				['dv', 'kn', 'lo', 'ml', 'or', 'pa', 'sd', 'si', 'te', 'yi']);
+			$additional_langs = array_merge(
+				$additional_langs,
+				['dv', 'kn', 'lo', 'ml', 'or', 'pa', 'sd', 'si', 'te', 'yi']
+			);
 		}
 
 		$langs = array_merge($additional_langs, array_keys($this->getAvailableLanguages()));
@@ -419,7 +421,7 @@ class L10n
 	 */
 	public function getLanguageCodes(bool $international = false): array
 	{
-		$iso639 = new \Matriphe\ISO639\ISO639;
+		$iso639 = new \Matriphe\ISO639\ISO639();
 
 		// In ISO 639-2 undetermined languages have got the code "und".
 		// There is no official code for ISO 639-1, but "un" is not assigned to any language.
@@ -477,13 +479,17 @@ class L10n
 	 */
 	public function getDay(string $s): string
 	{
-		$ret = str_replace(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+		$ret = str_replace(
+			['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 			[$this->t('Monday'), $this->t('Tuesday'), $this->t('Wednesday'), $this->t('Thursday'), $this->t('Friday'), $this->t('Saturday'), $this->t('Sunday')],
-			$s);
+			$s
+		);
 
-		$ret = str_replace(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+		$ret = str_replace(
+			['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 			[$this->t('January'), $this->t('February'), $this->t('March'), $this->t('April'), $this->t('May'), $this->t('June'), $this->t('July'), $this->t('August'), $this->t('September'), $this->t('October'), $this->t('November'), $this->t('December')],
-			$ret);
+			$ret
+		);
 
 		return $ret;
 	}
@@ -496,13 +502,17 @@ class L10n
 	 */
 	public function getDayShort(string $s): string
 	{
-		$ret = str_replace(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+		$ret = str_replace(
+			['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 			[$this->t('Mon'), $this->t('Tue'), $this->t('Wed'), $this->t('Thu'), $this->t('Fri'), $this->t('Sat'), $this->t('Sun')],
-			$s);
+			$s
+		);
 
-		$ret = str_replace(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+		$ret = str_replace(
+			['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 			[$this->t('Jan'), $this->t('Feb'), $this->t('Mar'), $this->t('Apr'), $this->t('May'), $this->t('Jun'), $this->t('Jul'), $this->t('Aug'), $this->t('Sep'), $this->t('Oct'), $this->t('Nov'), $this->t('Dec')],
-			$ret);
+			$ret
+		);
 
 		return $ret;
 	}

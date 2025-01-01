@@ -128,7 +128,7 @@ HELP;
 		}
 
 		$output = [];
-		$ret = 0;
+		$ret    = 0;
 		exec("$php_path -l $file", $output, $ret);
 		if ($ret !== 0) {
 			throw new \RuntimeException('Parse error found in ' . $file . ', scan stopped.');

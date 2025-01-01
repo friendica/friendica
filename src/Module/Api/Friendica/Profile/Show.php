@@ -42,10 +42,10 @@ class Show extends BaseApi
 		}
 
 		$result = [
-			'multi_profiles' => false,
-			'global_dir' => $directory,
+			'multi_profiles'  => false,
+			'global_dir'      => $directory,
 			'friendica_owner' => DI::twitterUser()->createFromUserId($uid),
-			'profiles' => $profiles
+			'profiles'        => $profiles
 		];
 
 		$this->response->addFormattedContent('friendica_profiles', ['$result' => $result], $this->parameters['extension'] ?? null);

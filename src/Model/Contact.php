@@ -75,12 +75,12 @@ class Contact
 	 *      This will only be assigned to contacts, not to user accounts
 	 * @{
 	 */
-	const TYPE_UNKNOWN =     -1;
-	const TYPE_PERSON =       User::ACCOUNT_TYPE_PERSON;
+	const TYPE_UNKNOWN      = -1;
+	const TYPE_PERSON       = User::ACCOUNT_TYPE_PERSON;
 	const TYPE_ORGANISATION = User::ACCOUNT_TYPE_ORGANISATION;
-	const TYPE_NEWS =         User::ACCOUNT_TYPE_NEWS;
-	const TYPE_COMMUNITY =    User::ACCOUNT_TYPE_COMMUNITY;
-	const TYPE_RELAY =        User::ACCOUNT_TYPE_RELAY;
+	const TYPE_NEWS         = User::ACCOUNT_TYPE_NEWS;
+	const TYPE_COMMUNITY    = User::ACCOUNT_TYPE_COMMUNITY;
+	const TYPE_RELAY        = User::ACCOUNT_TYPE_RELAY;
 	/**
 	 * @}
 	 */
@@ -336,7 +336,7 @@ class Contact
 		if (!empty($fields)) {
 			foreach (['id', 'next-update', 'network', 'local-data'] as $internal) {
 				if (!in_array($internal, $fields)) {
-					$fields[] = $internal;
+					$fields[]  = $internal;
 					$removal[] = $internal;
 				}
 			}
@@ -354,9 +354,9 @@ class Contact
 		// Then the alias (which could be anything)
 		if (!DBA::isResult($contact)) {
 			// The link could be provided as http although we stored it as https
-			$ssl_url = str_replace('http://', 'https://', $url);
+			$ssl_url   = str_replace('http://', 'https://', $url);
 			$condition = ['`alias` IN (?, ?, ?) AND `uid` = ? AND NOT `deleted`', $url, Strings::normaliseLink($url), $ssl_url, $uid];
-			$contact = DBA::selectFirst('contact', $fields, $condition, $options);
+			$contact   = DBA::selectFirst('contact', $fields, $condition, $options);
 		}
 
 		if (!DBA::isResult($contact)) {
@@ -838,7 +838,7 @@ class Contact
 		}
 
 		$fields = ['uid', 'username', 'nickname', 'page-flags', 'account-type', 'prvkey', 'pubkey'];
-		$user = DBA::selectFirst('user', $fields, ['uid' => $uid, 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]);
+		$user   = DBA::selectFirst('user', $fields, ['uid' => $uid, 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]);
 		if (!DBA::isResult($user)) {
 			return false;
 		}
@@ -869,11 +869,11 @@ class Contact
 			'network'      => Protocol::DFRN,
 			'url'          => $url,
 			// it seems as if ported accounts can have wrong values, so we make sure that now everything is fine.
-			'nurl'         => Strings::normaliseLink($url),
-			'uri-id'       => ItemURI::getIdByURI($url),
-			'addr'         => $user['nickname'] . '@' . substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3),
-			'notify'       => DI::baseUrl() . '/dfrn_notify/' . $user['nickname'],
-			'poll'         => DI::baseUrl() . '/feed/' . $user['nickname'],
+			'nurl'   => Strings::normaliseLink($url),
+			'uri-id' => ItemURI::getIdByURI($url),
+			'addr'   => $user['nickname'] . '@' . substr(DI::baseUrl(), strpos(DI::baseUrl(), '://') + 3),
+			'notify' => DI::baseUrl() . '/dfrn_notify/' . $user['nickname'],
+			'poll'   => DI::baseUrl() . '/feed/' . $user['nickname'],
 		];
 
 		$avatar = Photo::selectFirst(['resource-id', 'type'], ['uid' => $uid, 'profile' => true]);
@@ -898,14 +898,14 @@ class Contact
 			$fields['micro'] = self::getDefaultAvatar($fields, Proxy::SIZE_MICRO);
 		}
 
-		$fields['avatar'] = User::getAvatarUrl($user);
-		$fields['header'] = User::getBannerUrl($user);
-		$fields['forum'] = in_array($user['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN]);
-		$fields['prv'] = $user['page-flags'] == User::PAGE_FLAGS_PRVGROUP;
-		$fields['unsearchable'] = !$profile['net-publish'];
+		$fields['avatar']           = User::getAvatarUrl($user);
+		$fields['header']           = User::getBannerUrl($user);
+		$fields['forum']            = in_array($user['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN]);
+		$fields['prv']              = $user['page-flags'] == User::PAGE_FLAGS_PRVGROUP;
+		$fields['unsearchable']     = !$profile['net-publish'];
 		$fields['manually-approve'] = in_array($user['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP, User::PAGE_FLAGS_COMM_MAN]);
-		$fields['baseurl'] = DI::baseUrl();
-		$fields['gsid'] = GServer::getID($fields['baseurl'], true);
+		$fields['baseurl']          = DI::baseUrl();
+		$fields['gsid']             = GServer::getID($fields['baseurl'], true);
 
 		$update = false;
 
@@ -1084,7 +1084,7 @@ class Contact
 	public static function markForArchival(array $contact)
 	{
 		if ((!isset($contact['uri-id']) || !isset($contact['url']) || !isset($contact['archive']) || !isset($contact['self']) || !isset($contact['term-date'])) && !empty($contact['id'])) {
-			$fields = ['id', 'uri-id', 'url', 'archive', 'self', 'term-date'];
+			$fields  = ['id', 'uri-id', 'url', 'archive', 'self', 'term-date'];
 			$contact = DBA::selectFirst('contact', $fields, ['id' => $contact['id']]);
 			if (!DBA::isResult($contact)) {
 				return;
@@ -1136,7 +1136,7 @@ class Contact
 	{
 		// Always unarchive the relay contact entry
 		if (!empty($contact['batch']) && !empty($contact['term-date']) && ($contact['term-date'] > DBA::NULL_DATETIME)) {
-			$fields = ['failed' => false, 'term-date' => DBA::NULL_DATETIME, 'archive' => false, 'unsearchable' => true];
+			$fields    = ['failed' => false, 'term-date' => DBA::NULL_DATETIME, 'archive' => false, 'unsearchable' => true];
 			$condition = ['uid' => 0, 'network' => Protocol::FEDERATED, 'batch' => $contact['batch'], 'contact-type' => self::TYPE_RELAY];
 			if (!DBA::exists('contact', array_merge($condition, $fields))) {
 				self::update($fields, $condition);
@@ -1150,7 +1150,7 @@ class Contact
 		}
 
 		if ((!isset($contact['url']) || !isset($contact['uri-id'])) && !empty($contact['id'])) {
-			$fields = ['id', 'uri-id', 'url', 'batch', 'term-date'];
+			$fields  = ['id', 'uri-id', 'url', 'batch', 'term-date'];
 			$contact = DBA::selectFirst('contact', $fields, ['id' => $contact['id']]);
 			if (!DBA::isResult($contact)) {
 				return;
@@ -1206,11 +1206,11 @@ class Contact
 
 		if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
 			$mention_label = DI::l10n()->t('Post to group');
-			$mention_url = 'compose/0?body=!' . $contact['addr'];
+			$mention_url   = 'compose/0?body=!' . $contact['addr'];
 			$network_label = DI::l10n()->t('View group');
 		} else {
 			$mention_label = DI::l10n()->t('Mention');
-			$mention_url = 'compose/0?body=@' . $contact['addr'];
+			$mention_url   = 'compose/0?body=@' . $contact['addr'];
 			$network_label = DI::l10n()->t('Network Posts');
 		}
 		$network_url = 'contact/' . $contact['id'] . '/conversations';
@@ -1370,10 +1370,10 @@ class Contact
 
 			if (DBA::isResult($personal_contact) && !Probe::isProbable($personal_contact['network'])) {
 				Logger::info('Take contact data from personal contact', ['url' => $url, 'update' => $update, 'contact' => $personal_contact]);
-				$data = $personal_contact;
-				$data['photo'] = $personal_contact['avatar'];
+				$data                 = $personal_contact;
+				$data['photo']        = $personal_contact['avatar'];
 				$data['account-type'] = $personal_contact['contact-type'];
-				$data['hide'] = $personal_contact['unsearchable'];
+				$data['hide']         = $personal_contact['unsearchable'];
 				unset($data['avatar']);
 				unset($data['contact-type']);
 				unset($data['unsearchable']);
@@ -1405,17 +1405,17 @@ class Contact
 		if (!$contact_id) {
 			// We only insert the basic data. The rest will be done in "updateFromProbeArray"
 			$fields = [
-				'uid'       => $uid,
-				'url'       => $data['url'],
-				'baseurl'   => $data['baseurl'] ?? '',
-				'nurl'      => Strings::normaliseLink($data['url']),
-				'network'   => $data['network'],
-				'created'   => DateTimeFormat::utcNow(),
-				'rel'       => self::SHARING,
-				'writable'  => 1,
-				'blocked'   => 0,
-				'readonly'  => 0,
-				'pending'   => 0,
+				'uid'      => $uid,
+				'url'      => $data['url'],
+				'baseurl'  => $data['baseurl'] ?? '',
+				'nurl'     => Strings::normaliseLink($data['url']),
+				'network'  => $data['network'],
+				'created'  => DateTimeFormat::utcNow(),
+				'rel'      => self::SHARING,
+				'writable' => 1,
+				'blocked'  => 0,
+				'readonly' => 0,
+				'pending'  => 0,
 			];
 
 			$condition = ['nurl' => Strings::normaliseLink($data['url']), 'uid' => $uid, 'deleted' => false];
@@ -1628,13 +1628,13 @@ class Contact
 
 		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
+			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
 			$o = '';
 		}
 
 		$fields = array_merge(Item::DISPLAY_FIELDLIST, ['featured']);
-		$items = Post::toArray(Post::selectForUser($uid, $fields, $condition, $params));
+		$items  = Post::toArray(Post::selectForUser($uid, $fields, $condition, $params));
 
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACT_POSTS);
 
@@ -1691,7 +1691,7 @@ class Contact
 
 		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
+			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
 			$o = '';
 		}
@@ -1707,7 +1707,7 @@ class Contact
 		$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `created` FROM `post-user-view` WHERE " . array_shift($condition2);
 
 		$union = array_merge($condition1, $condition2);
-		$sql = $sql1 . " UNION " . $sql2;
+		$sql   = $sql1 . " UNION " . $sql2;
 
 		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";
 		$union = array_merge($union, [$pager->getStart(), $pager->getItemsPerPage()]);
@@ -1716,7 +1716,7 @@ class Contact
 		if (empty($last_created) && ($pager->getStart() == 0)) {
 			$fields = ['uri-id', 'thr-parent-id', 'gravity', 'author-id', 'created'];
 			$pinned = Post\Collection::selectToArrayForContact($cid, Post\Collection::FEATURED, $fields);
-			$items = array_merge($items, $pinned);
+			$items  = array_merge($items, $pinned);
 		}
 
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACTS, $update, false, 'pinned_created', $uid);
@@ -1907,9 +1907,9 @@ class Contact
 	 */
 	private static function checkAvatarCacheByArray(array $contact, bool $no_update = false): array
 	{
-		$update = false;
+		$update         = false;
 		$contact_fields = [];
-		$fields = ['photo', 'thumb', 'micro'];
+		$fields         = ['photo', 'thumb', 'micro'];
 		foreach ($fields as $field) {
 			if (isset($contact[$field])) {
 				$contact_fields[] = $field;
@@ -1965,7 +1965,7 @@ class Contact
 
 		if (!empty($contact['gsid'])) {
 			// Use default banners for certain platforms
-			$gserver = DBA::selectFirst('gserver', ['platform'], ['id' => $contact['gsid']]);
+			$gserver  = DBA::selectFirst('gserver', ['platform'], ['id' => $contact['gsid']]);
 			$platform = strtolower($gserver['platform'] ?? '');
 		} else {
 			$platform = '';
@@ -2010,18 +2010,18 @@ class Contact
 		switch ($size) {
 			case Proxy::SIZE_MICRO:
 				$avatar['size'] = 48;
-				$default = self::DEFAULT_AVATAR_MICRO;
+				$default        = self::DEFAULT_AVATAR_MICRO;
 				break;
 
 			case Proxy::SIZE_THUMB:
 				$avatar['size'] = 80;
-				$default = self::DEFAULT_AVATAR_THUMB;
+				$default        = self::DEFAULT_AVATAR_THUMB;
 				break;
 
 			case Proxy::SIZE_SMALL:
 			default:
 				$avatar['size'] = 300;
-				$default = self::DEFAULT_AVATAR_PHOTO;
+				$default        = self::DEFAULT_AVATAR_PHOTO;
 				break;
 		}
 
@@ -2030,14 +2030,14 @@ class Contact
 			$type     = Contact::TYPE_PERSON;
 
 			if (!empty($contact['id'])) {
-				$account = DBA::selectFirst('account-user-view', ['platform', 'contact-type'], ['id' => $contact['id']]);
-				$platform = $account['platform'] ?? '';
+				$account  = DBA::selectFirst('account-user-view', ['platform', 'contact-type'], ['id' => $contact['id']]);
+				$platform = $account['platform']     ?? '';
 				$type     = $account['contact-type'] ?? Contact::TYPE_PERSON;
 			}
 
 			if (empty($platform) && !empty($contact['uri-id'])) {
-				$account = DBA::selectFirst('account-user-view', ['platform', 'contact-type'], ['uri-id' => $contact['uri-id']]);
-				$platform = $account['platform'] ?? '';
+				$account  = DBA::selectFirst('account-user-view', ['platform', 'contact-type'], ['uri-id' => $contact['uri-id']]);
+				$platform = $account['platform']     ?? '';
 				$type     = $account['contact-type'] ?? Contact::TYPE_PERSON;
 			}
 
@@ -2147,7 +2147,7 @@ class Contact
 			return DI::baseUrl() . $default;
 		}
 
-		$avatar['url'] = '';
+		$avatar['url']     = '';
 		$avatar['success'] = false;
 
 		Hook::callAll('avatar_lookup', $avatar);
@@ -2175,7 +2175,7 @@ class Contact
 		if (empty($updated)) {
 			$account = DBA::selectFirst('account-user-view', ['updated', 'guid'], ['id' => $cid]);
 			$updated = $account['updated'] ?? '';
-			$guid = $account['guid'] ?? '';
+			$guid    = $account['guid']    ?? '';
 		}
 
 		$guid = urlencode($guid);
@@ -2243,7 +2243,7 @@ class Contact
 		if (empty($updated) || empty($guid)) {
 			$account = DBA::selectFirst('account-user-view', ['updated', 'guid'], ['id' => $cid]);
 			$updated = $account['updated'] ?? '';
-			$guid = $account['guid'] ?? '';
+			$guid    = $account['guid']    ?? '';
 		}
 
 		$guid = urlencode($guid);
@@ -2374,11 +2374,11 @@ class Contact
 
 			if ($default_avatar && Proxy::isLocalImage($avatar)) {
 				$fields = [
-					'avatar' => $avatar,
+					'avatar'      => $avatar,
 					'avatar-date' => DateTimeFormat::utcNow(),
-					'photo' => $avatar,
-					'thumb' => self::getDefaultAvatar($contact, Proxy::SIZE_THUMB),
-					'micro' => self::getDefaultAvatar($contact, Proxy::SIZE_MICRO)
+					'photo'       => $avatar,
+					'thumb'       => self::getDefaultAvatar($contact, Proxy::SIZE_THUMB),
+					'micro'       => self::getDefaultAvatar($contact, Proxy::SIZE_MICRO)
 				];
 				Logger::debug('Use default avatar', ['id' => $cid, 'uid' => $uid]);
 			}
@@ -2417,11 +2417,11 @@ class Contact
 					$photos = Photo::importProfilePhoto($avatar, $uid, $cid, true);
 					if ($photos) {
 						$fields = [
-							'avatar' => $avatar,
-							'photo' => $photos[0],
-							'thumb' => $photos[1],
-							'micro' => $photos[2],
-							'blurhash' => $photos[3],
+							'avatar'      => $avatar,
+							'photo'       => $photos[0],
+							'thumb'       => $photos[1],
+							'micro'       => $photos[2],
+							'blurhash'    => $photos[3],
 							'avatar-date' => DateTimeFormat::utcNow(),
 						];
 						$update = true;
@@ -2474,7 +2474,7 @@ class Contact
 	{
 		// Update contact data for all users
 		$condition = ['self' => false, 'nurl' => Strings::normaliseLink($url)];
-		$contacts = DBA::select('contact', ['id', 'uid'], $condition);
+		$contacts  = DBA::select('contact', ['id', 'uid'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
 			Logger::info('Deleting contact', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $url]);
 			self::remove($contact['id']);
@@ -2601,7 +2601,7 @@ class Contact
 	public static function removeDuplicates(string $nurl, int $uid)
 	{
 		$condition = ['nurl' => $nurl, 'uid' => $uid, 'self' => false, 'deleted' => false, 'network' => Protocol::FEDERATED];
-		$count = DBA::count('contact', $condition);
+		$count     = DBA::count('contact', $condition);
 		if ($count <= 1) {
 			return false;
 		}
@@ -2616,7 +2616,7 @@ class Contact
 		Logger::info('Found duplicates', ['count' => $count, 'first' => $first, 'uid' => $uid, 'nurl' => $nurl]);
 
 		// Find all duplicates
-		$condition = ["`nurl` = ? AND `uid` = ? AND `id` != ? AND NOT `self` AND NOT `deleted`", $nurl, $uid, $first];
+		$condition  = ["`nurl` = ? AND `uid` = ? AND `id` != ? AND NOT `self` AND NOT `deleted`", $nurl, $uid, $first];
 		$duplicates = DBA::select('contact', ['id', 'network'], $condition);
 		while ($duplicate = DBA::fetch($duplicates)) {
 			if (!in_array($duplicate['network'], Protocol::FEDERATED)) {
@@ -2687,7 +2687,7 @@ class Contact
 		$data = Probe::uri($contact['url'], $network, $contact['uid']);
 
 		if (in_array($data['network'], Protocol::FEDERATED) && (parse_url($data['url'], PHP_URL_SCHEME) == 'http')) {
-			$ssl_url = str_replace('http://', 'https://', $contact['url']);
+			$ssl_url  = str_replace('http://', 'https://', $contact['url']);
 			$ssl_data = Probe::uri($ssl_url, $network, $contact['uid']);
 			if (($ssl_data['network'] == $data['network']) && (parse_url($ssl_data['url'], PHP_URL_SCHEME) != 'http')) {
 				$data = $ssl_data;
@@ -2884,12 +2884,12 @@ class Contact
 		}
 
 		if (isset($ret['account-type']) && is_int($ret['account-type'])) {
-			$ret['forum'] = false;
-			$ret['prv'] = false;
+			$ret['forum']        = false;
+			$ret['prv']          = false;
 			$ret['contact-type'] = $ret['account-type'];
 			if (($ret['contact-type'] == User::ACCOUNT_TYPE_COMMUNITY) && isset($ret['manually-approve'])) {
 				$ret['forum'] = (bool)!$ret['manually-approve'];
-				$ret['prv'] = (bool)!$ret['forum'];
+				$ret['prv']   = (bool)!$ret['forum'];
 			}
 		}
 
@@ -2908,7 +2908,7 @@ class Contact
 		}
 
 		$update = false;
-		$guid = ($ret['guid'] ?? '') ?: Item::guidFromUri($ret['url'], $ret['baseurl'] ?? $ret['alias'] ?? '');
+		$guid   = ($ret['guid'] ?? '') ?: Item::guidFromUri($ret['url'], $ret['baseurl'] ?? $ret['alias'] ?? '');
 
 		// make sure to not overwrite existing values with blank entries except some technical fields
 		$keep = ['batch', 'notify', 'poll', 'request', 'confirm', 'poco', 'baseurl'];
@@ -2975,7 +2975,7 @@ class Contact
 		}
 
 		if (($uid == 0) || in_array($ret['network'], [Protocol::DFRN, Protocol::DIASPORA, Protocol::ACTIVITYPUB])) {
-			$ret['last-update'] = $updated;
+			$ret['last-update']    = $updated;
 			$ret['success_update'] = $updated;
 		}
 
@@ -3107,10 +3107,10 @@ class Contact
 
 		if (!empty($arr['contact']['name'])) {
 			$probed = false;
-			$ret = $arr['contact'];
+			$ret    = $arr['contact'];
 		} else {
 			$probed = true;
-			$ret = Probe::uri($url, $network, $uid);
+			$ret    = Probe::uri($url, $network, $uid);
 
 			// Ensure that the public contact exists
 			if ($ret['network'] != Protocol::PHANTOM) {
@@ -3125,7 +3125,7 @@ class Contact
 
 		// check if we already have a contact
 		$condition = ['uid' => $uid, 'nurl' => Strings::normaliseLink($ret['url']), 'deleted' => false];
-		$contact = DBA::selectFirst('contact', ['id', 'rel', 'url', 'pending', 'hub-verify'], $condition);
+		$contact   = DBA::selectFirst('contact', ['id', 'rel', 'url', 'pending', 'hub-verify'], $condition);
 
 		$protocol = self::getProtocol($ret['url'], $ret['network']);
 
@@ -3204,7 +3204,7 @@ class Contact
 				'nick'         => $ret['nick'],
 				'network'      => $ret['network'],
 				'baseurl'      => $ret['baseurl'],
-				'gsid'         => $ret['gsid'] ?? null,
+				'gsid'         => $ret['gsid']         ?? null,
 				'contact-type' => $ret['account-type'] ?? self::TYPE_PERSON,
 				'protocol'     => $protocol,
 				'pubkey'       => $ret['pubkey'],
@@ -3224,7 +3224,7 @@ class Contact
 			return $result;
 		}
 
-		$contact_id = $contact['id'];
+		$contact_id    = $contact['id'];
 		$result['cid'] = $contact_id;
 
 		if ($contact['contact-type'] == self::TYPE_COMMUNITY) {
@@ -3269,7 +3269,7 @@ class Contact
 			return false;
 		}
 
-		$fields = ['id', 'url', 'name', 'nick', 'avatar', 'photo', 'network', 'blocked', 'baseurl'];
+		$fields      = ['id', 'url', 'name', 'nick', 'avatar', 'photo', 'network', 'blocked', 'baseurl'];
 		$pub_contact = DBA::selectFirst('contact', $fields, ['id' => $datarray['author-id']]);
 		if (!DBA::isResult($pub_contact)) {
 			// Should never happen
@@ -3281,10 +3281,10 @@ class Contact
 			return false;
 		}
 
-		$url = ($datarray['author-link'] ?? '') ?: $pub_contact['url'];
-		$name = $pub_contact['name'];
-		$photo = ($pub_contact['avatar'] ?? '') ?: $pub_contact["photo"];
-		$nick = $pub_contact['nick'];
+		$url     = ($datarray['author-link'] ?? '') ?: $pub_contact['url'];
+		$name    = $pub_contact['name'];
+		$photo   = ($pub_contact['avatar'] ?? '') ?: $pub_contact["photo"];
+		$nick    = $pub_contact['nick'];
 		$network = $pub_contact['network'];
 
 		// Ensure that we don't create a new contact when there already is one
@@ -3362,7 +3362,7 @@ class Contact
 
 			/// @TODO Encapsulate this into a function/method
 			$fields = ['uid', 'username', 'email', 'page-flags', 'notify-flags', 'language'];
-			$user = DBA::selectFirst('user', $fields, ['uid' => $importer['uid']]);
+			$user   = DBA::selectFirst('user', $fields, ['uid' => $importer['uid']]);
 			if (DBA::isResult($user) && !in_array($user['page-flags'], [User::PAGE_FLAGS_SOAPBOX, User::PAGE_FLAGS_FREELOVE, User::PAGE_FLAGS_COMMUNITY])) {
 				// create notification
 				if (is_array($contact_record)) {
@@ -3396,7 +3396,7 @@ class Contact
 				}
 
 				$condition = ['uid' => $importer['uid'], 'url' => $url, 'pending' => true];
-				$fields = ['pending' => false];
+				$fields    = ['pending' => false];
 				if ($user['page-flags'] == User::PAGE_FLAGS_FREELOVE) {
 					$fields['rel'] = self::FRIEND;
 				}
@@ -3501,7 +3501,7 @@ class Contact
 				DBA::update(
 					'contact',
 					['bdyear' => substr($nextbd, 0, 4), 'bd' => $nextbd],
-					['id' => $contact['id']]
+					['id'     => $contact['id']]
 				);
 			}
 		}
@@ -3656,9 +3656,9 @@ class Contact
 	 */
 	public static function isGroup(int $contactid): bool
 	{
-		$fields = ['contact-type'];
+		$fields    = ['contact-type'];
 		$condition = ['id' => $contactid];
-		$contact = DBA::selectFirst('contact', $fields, $condition);
+		$contact   = DBA::selectFirst('contact', $fields, $condition);
 		if (!DBA::isResult($contact)) {
 			return false;
 		}
@@ -3676,7 +3676,7 @@ class Contact
 	public static function canReceivePrivateMessages(array $contact): bool
 	{
 		$protocol = $contact['network'] ?? $contact['protocol'] ?? Protocol::PHANTOM;
-		$self = $contact['self'] ?? false;
+		$self     = $contact['self']    ?? false;
 
 		return in_array($protocol, [Protocol::DFRN, Protocol::DIASPORA, Protocol::ACTIVITYPUB]) && !$self;
 	}
@@ -3707,12 +3707,12 @@ class Contact
 		}
 
 		$condition = [
-			'network'        => $networks,
-			'server-failed'  => false,
-			'failed'         => false,
-			'deleted'        => false,
-			'unsearchable'   => false,
-			'uid'            => $uid
+			'network'       => $networks,
+			'server-failed' => false,
+			'failed'        => false,
+			'deleted'       => false,
+			'unsearchable'  => false,
+			'uid'           => $uid
 		];
 
 		if (!$show_blocked) {
@@ -3756,10 +3756,10 @@ class Contact
 	 */
 	public static function addByUrls(array $urls): array
 	{
-		$added = 0;
-		$updated = 0;
+		$added     = 0;
+		$updated   = 0;
 		$unchanged = 0;
-		$count = 0;
+		$count     = 0;
 
 		foreach ($urls as $url) {
 			if (empty($url) || !is_string($url)) {

@@ -25,7 +25,7 @@ class BasePath
 	public function __construct(string $baseDir, array $server = [])
 	{
 		$this->baseDir = $baseDir;
-		$this->server = $server;
+		$this->server  = $server;
 	}
 
 	/**
@@ -41,7 +41,7 @@ class BasePath
 	public function getPath()
 	{
 		$baseDir = $this->baseDir;
-		$server = $this->server;
+		$server  = $this->server;
 
 		if ((!$baseDir || !is_dir($baseDir)) && !empty($server['DOCUMENT_ROOT'])) {
 			$baseDir = $server['DOCUMENT_ROOT'];

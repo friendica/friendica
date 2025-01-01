@@ -29,8 +29,8 @@ class MimeType extends BaseEntity
 
 	public function __construct(string $type, string $subtype, array $parameters = [])
 	{
-		$this->type = $type;
-		$this->subtype = $subtype;
+		$this->type       = $type;
+		$this->subtype    = $subtype;
 		$this->parameters = $parameters;
 	}
 

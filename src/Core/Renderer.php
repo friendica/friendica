@@ -126,7 +126,7 @@ class Renderer
 		$v = get_class_vars($class);
 
 		if (!empty($v['name'])) {
-			$name = $v['name'];
+			$name                          = $v['name'];
 			self::$template_engines[$name] = $class;
 		} else {
 			$admin_message = DI::l10n()->t('template engine cannot be registered without a name.');
@@ -155,9 +155,9 @@ class Renderer
 			if (isset(self::$template_engine_instance[$template_engine])) {
 				return self::$template_engine_instance[$template_engine];
 			} else {
-				$appHelper = DI::appHelper();
-				$class = self::$template_engines[$template_engine];
-				$obj = new $class($appHelper->getCurrentTheme(), $appHelper->getThemeInfo());
+				$appHelper                                        = DI::appHelper();
+				$class                                            = self::$template_engines[$template_engine];
+				$obj                                              = new $class($appHelper->getCurrentTheme(), $appHelper->getThemeInfo());
 				self::$template_engine_instance[$template_engine] = $obj;
 				return $obj;
 			}

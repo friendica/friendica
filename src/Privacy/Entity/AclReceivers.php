@@ -11,10 +11,10 @@ use Friendica\BaseEntity;
 
 class AclReceivers extends BaseEntity
 {
-	protected array $allowContacts   = [];
-	protected array $allowCircles = [];
-	protected array $denyContacts    = [];
-	protected array $denyCircles  = [];
+	protected array $allowContacts = [];
+	protected array $allowCircles  = [];
+	protected array $denyContacts  = [];
+	protected array $denyCircles   = [];
 
 	public function __construct(array $allowContacts = [], array $allowCircles = [], array $denyContacts = [], array $denyCircles = [])
 	{

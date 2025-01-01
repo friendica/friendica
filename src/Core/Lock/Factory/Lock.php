@@ -74,6 +74,7 @@ class Lock
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
+					// no break
 				case 'database':
 					return new LockType\DatabaseLock($this->dba);
 				case 'semaphore':

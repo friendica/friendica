@@ -8,9 +8,8 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Hook;
-use Friendica\DI;
 
-Class ForkHook
+class ForkHook
 {
 	public static function execute($name, $hook, $data)
 	{

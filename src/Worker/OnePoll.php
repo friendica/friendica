@@ -21,7 +21,6 @@ use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Protocol\Activity;
-use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
 use Friendica\Util\DateTimeFormat;
@@ -169,7 +168,7 @@ class OnePoll
 
 		if ($curlResult->redirectIsPermanent()) {
 			Logger::notice('Poll address permanently changed', [
-				'id' => $contact['id'],
+				'id'  => $contact['id'],
 				'uid' => $contact['uid'],
 				'old' => $contact['poll'],
 				'new' => $curlResult->getRedirectUrl(),
@@ -224,9 +223,9 @@ class OnePoll
 		$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $importer_uid]);
 
 		$condition = ["`server` != ? AND `user` != ? AND `port` != ? AND `uid` = ?", '', '', 0, $importer_uid];
-		$mailconf = DBA::selectFirst('mailacct', [], $condition);
+		$mailconf  = DBA::selectFirst('mailacct', [], $condition);
 		if (DBA::isResult($user) && DBA::isResult($mailconf)) {
-			$mailbox = Email::constructMailboxName($mailconf);
+			$mailbox  = Email::constructMailboxName($mailconf);
 			$password = '';
 			openssl_private_decrypt(hex2bin($mailconf['pass']), $password, $user['prvkey']);
 			$mbox = Email::connect($mailbox, $mailconf['user'], $password);
@@ -280,18 +279,19 @@ class OnePoll
 					// $meta = Email::messageMeta($mbox, $msg_uid);
 
 					// Have we seen it before?
-					$fields = ['deleted', 'id'];
+					$fields    = ['deleted', 'id'];
 					$condition = ['uid' => $importer_uid, 'uri' => $datarray['uri']];
-					$item = Post::selectFirst($fields, $condition);
+					$item      = Post::selectFirst($fields, $condition);
 					if (DBA::isResult($item)) {
 						Logger::info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . ' UID: ' . $importer_uid . ' URI: ' . $datarray['uri']);
 
 						// Only delete when mails aren't automatically moved or deleted
-						if (($mailconf['action'] != 1) && ($mailconf['action'] != 3))
+						if (($mailconf['action'] != 1) && ($mailconf['action'] != 3)) {
 							if ($meta->deleted && ! $item['deleted']) {
 								$fields = ['deleted' => true, 'changed' => $updated];
 								Item::update($fields, ['id' => $item['id']]);
 							}
+						}
 
 						switch ($mailconf['action']) {
 							case 0:
@@ -329,19 +329,19 @@ class OnePoll
 					if ($raw_refs) {
 						$refs_arr = explode(' ', $raw_refs);
 						if (count($refs_arr)) {
-							for ($x = 0; $x < count($refs_arr); $x ++) {
-								$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '],['', '', ''], $refs_arr[$x]));
+							for ($x = 0; $x < count($refs_arr); $x++) {
+								$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '], ['', '', ''], $refs_arr[$x]));
 							}
 						}
 						$condition = ['uri' => $refs_arr, 'uid' => $importer_uid];
-						$parent = Post::selectFirst(['uri'], $condition);
+						$parent    = Post::selectFirst(['uri'], $condition);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}
 					}
 
 					// Decoding the header
-					$subject = imap_mime_header_decode($meta->subject ?? '');
+					$subject           = imap_mime_header_decode($meta->subject ?? '');
 					$datarray['title'] = "";
 					foreach ($subject as $subpart) {
 						if ($subpart->charset != "default") {
@@ -366,8 +366,8 @@ class OnePoll
 					// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 					if (empty($datarray['thr-parent']) && $reply) {
 						$condition = ['title' => $datarray['title'], 'uid' => $importer_uid, 'network' => Protocol::MAIL];
-						$params = ['order' => ['created' => true]];
-						$parent = Post::selectFirst(['uri'], $condition, $params);
+						$params    = ['order' => ['created' => true]];
+						$parent    = Post::selectFirst(['uri'], $condition, $params);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}
@@ -402,12 +402,12 @@ class OnePoll
 						$fromname = $headers->from[0]->personal;
 					}
 
-					$datarray['author-name'] = $fromname;
-					$datarray['author-link'] = 'mailto:' . $frommail;
+					$datarray['author-name']   = $fromname;
+					$datarray['author-link']   = 'mailto:' . $frommail;
 					$datarray['author-avatar'] = $contact['photo'];
 
-					$datarray['owner-name'] = $contact['name'];
-					$datarray['owner-link'] = 'mailto:' . $contact['addr'];
+					$datarray['owner-name']   = $contact['name'];
+					$datarray['owner-link']   = 'mailto:' . $contact['addr'];
 					$datarray['owner-avatar'] = $contact['photo'];
 
 					if (empty($datarray['thr-parent']) || ($datarray['thr-parent'] === $datarray['uri'])) {
@@ -415,7 +415,7 @@ class OnePoll
 					}
 
 					if (!DI::pConfig()->get($importer_uid, 'system', 'allow_public_email_replies')) {
-						$datarray['private'] = Item::PRIVATE;
+						$datarray['private']   = Item::PRIVATE;
 						$datarray['allow_cid'] = '<' . $contact['id'] . '>';
 					}
 

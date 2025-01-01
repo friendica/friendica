@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Lock\Capability\ICanLock;
-use Friendica\Test\MockedTestCase;
 
 abstract class LockTestCase extends MockedTestCase
 {

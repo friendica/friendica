@@ -169,7 +169,7 @@ class Update
 		if ($build != DB_UPDATE_VERSION || $force) {
 			require_once 'update.php';
 
-			$stored = intval($build);
+			$stored  = intval($build);
 			$current = intval(DB_UPDATE_VERSION);
 			if ($stored < $current || $force) {
 				DI::config()->reload();
@@ -203,8 +203,11 @@ class Update
 					// run the pre_update_nnnn functions in update.php
 					for ($version = $stored + 1; $version <= $current; $version++) {
 						Logger::notice('Execute pre update.', ['version' => $version]);
-						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t('%s: executing pre update %d',
-							DateTimeFormat::utcNow() . ' ' . date('e'), $version));
+						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
+							'%s: executing pre update %d',
+							DateTimeFormat::utcNow() . ' ' . date('e'),
+							$version
+						));
 						$r = self::runUpdateFunction($version, 'pre_update', $sendMail);
 						if (!$r) {
 							Logger::warning('Pre update failed', ['version' => $version]);
@@ -245,8 +248,11 @@ class Update
 					// run the update_nnnn functions in update.php
 					for ($version = $stored + 1; $version <= $current; $version++) {
 						Logger::notice('Execute post update.', ['version' => $version]);
-						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t('%s: executing post update %d',
-							DateTimeFormat::utcNow() . ' ' . date('e'), $version));
+						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
+							'%s: executing post update %d',
+							DateTimeFormat::utcNow() . ' ' . date('e'),
+							$version
+						));
 						$r = self::runUpdateFunction($version, 'update', $sendMail);
 						if (!$r) {
 							Logger::warning('Post update failed', ['version' => $version]);
@@ -359,13 +365,15 @@ class Update
 		foreach($adminEmails as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
-			$preamble = Strings::deindent($l10n->t("
+			$preamble = Strings::deindent($l10n->t(
+				"
 				The friendica developers released update %s recently,
 				but when I tried to install it, something went terribly wrong.
 				This needs to be fixed soon and I can't do it alone. Please contact a
 				friendica developer if you can not help me on your own. My database might be invalid.",
-				$update_id));
-			$body     = $l10n->t('The error message is\n[pre]%s[/pre]', $error_message);
+				$update_id
+			));
+			$body = $l10n->t('The error message is\n[pre]%s[/pre]', $error_message);
 
 			$email = DI::emailer()
 				->newSystemMail()
@@ -391,9 +399,12 @@ class Update
 		foreach(User::getAdminListForEmailing(['uid', 'language', 'email']) as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
-			$preamble = Strings::deindent($l10n->t('
+			$preamble = Strings::deindent($l10n->t(
+				'
 				The friendica database was successfully updated from %s to %s.',
-				$from_build, $to_build));
+				$from_build,
+				$to_build
+			));
 
 			$email = DI::emailer()
 				->newSystemMail()

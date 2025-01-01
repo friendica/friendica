@@ -108,8 +108,10 @@ class Form extends BaseModule
 		$share_disabled = '';
 
 		if (empty($orig_event)) {
-			$orig_event = User::getById($this->session->getLocalUserId(),
-				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']);
+			$orig_event = User::getById(
+				$this->session->getLocalUserId(),
+				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']
+			);
 		} elseif ($orig_event['allow_cid'] !== '<' . $this->session->getLocalUserId() . '>'
 				   || $orig_event['allow_gid']
 				   || $orig_event['deny_cid']

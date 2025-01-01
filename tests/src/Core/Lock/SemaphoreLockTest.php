@@ -31,7 +31,7 @@ class SemaphoreLockTest extends LockTestCase
 		$dice->shouldReceive('create')->with(App::class)->andReturn($app);
 
 		$configCache = new Cache(['system' => ['temppath' => '/tmp']]);
-		$configMock = new ReadOnlyFileConfig($configCache);
+		$configMock  = new ReadOnlyFileConfig($configCache);
 		$dice->shouldReceive('create')->with(IManageConfigValues::class)->andReturn($configMock);
 
 		// @todo Because "get_temppath()" is using static methods, we have to initialize the BaseObject

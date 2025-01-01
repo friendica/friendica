@@ -10,7 +10,6 @@ namespace Friendica\Test;
 use Friendica\Core\Storage\Capability\ICanReadFromStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Core\Storage\Exception\ReferenceStorageException;
-use Friendica\Test\MockedTestCase;
 
 abstract class StorageTestCase extends MockedTestCase
 {

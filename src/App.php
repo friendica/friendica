@@ -537,7 +537,7 @@ class App
 		$requeststring = ($serverVars['REQUEST_METHOD'] ?? '') . ' ' . ($serverVars['REQUEST_URI'] ?? '') . ' ' . ($serverVars['SERVER_PROTOCOL'] ?? '');
 		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '']);
 		$request_start = microtime(true);
-		$request = $_REQUEST;
+		$request       = $_REQUEST;
 
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
@@ -701,7 +701,7 @@ class App
 		$router = $this->container->create(Router::class);
 
 		$moduleClass = $moduleClass ?? $router->getModuleClass();
-		$parameters = $router->getParameters();
+		$parameters  = $router->getParameters();
 
 		$dice_profiler_threshold = $this->config->get('system', 'dice_profiler_threshold', 0);
 

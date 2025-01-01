@@ -8,7 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;

@@ -16,10 +16,9 @@ use Friendica\Core\Cache\Exception\InvalidCacheDriverException;
  */
 class APCuCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'apcu';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
+	const NAME = 'apcu';
 
 	/**
 	 * @throws InvalidCacheDriverException

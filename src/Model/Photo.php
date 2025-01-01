@@ -101,7 +101,7 @@ class Photo
 	public static function getPhotosForUser(int $uid, string $resourceid, array $conditions = [], array $params = [])
 	{
 		$conditions['resource-id'] = $resourceid;
-		$conditions['uid'] = $uid;
+		$conditions['uid']         = $uid;
 
 		return self::selectToArray([], $conditions, $params);
 	}
@@ -123,8 +123,8 @@ class Photo
 	public static function getPhotoForUser(int $uid, $resourceid, $scale = 0, array $conditions = [], array $params = [])
 	{
 		$conditions['resource-id'] = $resourceid;
-		$conditions['uid'] = $uid;
-		$conditions['scale'] = $scale;
+		$conditions['uid']         = $uid;
+		$conditions['scale']       = $scale;
 
 		return self::selectFirst([], $conditions, $params);
 	}
@@ -161,8 +161,8 @@ class Photo
 		}
 
 		$conditions = ["`resource-id` = ? AND `scale` <= ? " . $sql_acl, $resourceid, $scale];
-		$params = ['order' => ['scale' => true]];
-		$photo = self::selectFirst([], $conditions, $params);
+		$params     = ['order' => ['scale' => true]];
+		$photo      = self::selectFirst([], $conditions, $params);
 
 		return $photo;
 	}
@@ -208,7 +208,7 @@ class Photo
 
 		if (!empty($album)) {
 			$sqlExtra  = "AND `album` = ? ";
-			$values[] = $album;
+			$values[]  = $album;
 			$sqlExtra2 = "";
 		} else {
 			$sqlExtra  = '';
@@ -303,7 +303,7 @@ class Photo
 	private static function getFields(): array
 	{
 		$allfields = DI::dbaDefinition()->getAll();
-		$fields = array_keys($allfields['photo']['fields']);
+		$fields    = array_keys($allfields['photo']['fields']);
 		array_splice($fields, array_search('data', $fields), 1);
 		return $fields;
 	}
@@ -322,10 +322,10 @@ class Photo
 		$fields = self::getFields();
 		$values = array_fill(0, count($fields), '');
 
-		$photo                  = array_combine($fields, $values);
-		$photo['data']          = $image_data;
-		$photo['type']          = $mimetype ?: Images::getMimeTypeByData($image_data);
-		$photo['cacheable']     = false;
+		$photo              = array_combine($fields, $values);
+		$photo['data']      = $image_data;
+		$photo['type']      = $mimetype ?: Images::getMimeTypeByData($image_data);
+		$photo['cacheable'] = false;
 
 		return $photo;
 	}
@@ -384,7 +384,7 @@ class Photo
 		$photo['backend-class'] = ExternalResource::NAME;
 		$photo['backend-ref']   = json_encode(['url' => $url, 'uid' => $uid]);
 		$photo['type']          = $mimetype;
-		$photo['filename'] 	    = basename(parse_url($url, PHP_URL_PATH));
+		$photo['filename']      = basename(parse_url($url, PHP_URL_PATH));
 		$photo['cacheable']     = true;
 		$photo['blurhash']      = $blurhash;
 		$photo['width']         = $width;
@@ -423,7 +423,7 @@ class Photo
 		}
 
 		$existing_photo = self::selectFirst(['id', 'created', 'backend-class', 'backend-ref'], ['resource-id' => $rid, 'uid' => $uid, 'contact-id' => $cid, 'scale' => $scale]);
-		$created = DateTimeFormat::utcNow();
+		$created        = DateTimeFormat::utcNow();
 		if (DBA::isResult($existing_photo)) {
 			$created = $existing_photo['created'];
 		}
@@ -449,31 +449,31 @@ class Photo
 		}
 
 		$fields = [
-			'uid' => $uid,
-			'contact-id' => $cid,
-			'guid' => $guid,
-			'resource-id' => $rid,
-			'hash' => md5($img_str),
-			'created' => $created,
-			'edited' => DateTimeFormat::utcNow(),
-			'filename' => basename($filename),
-			'type' => $image->getType(),
-			'album' => $album,
-			'height' => $image->getHeight(),
-			'width' => $image->getWidth(),
-			'datasize' => strlen($img_str),
-			'blurhash' => $image->getBlurHash($img_str),
-			'data' => $data,
-			'scale' => $scale,
-			'photo-type' => $type,
-			'profile' => false,
-			'allow_cid' => $allow_cid,
-			'allow_gid' => $allow_gid,
-			'deny_cid' => $deny_cid,
-			'deny_gid' => $deny_gid,
-			'desc' => $desc,
+			'uid'           => $uid,
+			'contact-id'    => $cid,
+			'guid'          => $guid,
+			'resource-id'   => $rid,
+			'hash'          => md5($img_str),
+			'created'       => $created,
+			'edited'        => DateTimeFormat::utcNow(),
+			'filename'      => basename($filename),
+			'type'          => $image->getType(),
+			'album'         => $album,
+			'height'        => $image->getHeight(),
+			'width'         => $image->getWidth(),
+			'datasize'      => strlen($img_str),
+			'blurhash'      => $image->getBlurHash($img_str),
+			'data'          => $data,
+			'scale'         => $scale,
+			'photo-type'    => $type,
+			'profile'       => false,
+			'allow_cid'     => $allow_cid,
+			'allow_gid'     => $allow_gid,
+			'deny_cid'      => $deny_cid,
+			'deny_gid'      => $deny_gid,
+			'desc'          => $desc,
 			'backend-class' => (string)$storage,
-			'backend-ref' => $backend_ref
+			'backend-ref'   => $backend_ref
 		];
 
 		if (DBA::isResult($existing_photo)) {
@@ -594,10 +594,10 @@ class Photo
 			}
 			Logger::debug('Got picture', ['Content-Type' => $ret->getHeader('Content-Type'), 'url' => $image_url]);
 			$img_str = $ret->getBodyString();
-			$type = $ret->getContentType();
+			$type    = $ret->getContentType();
 		} else {
 			$img_str = '';
-			$type = '';
+			$type    = '';
 		}
 
 		if ($quit_on_error && ($img_str == '')) {
@@ -608,7 +608,7 @@ class Photo
 		if ($image->isValid()) {
 			$image->scaleToSquare(300);
 
-			$filesize = strlen($image->asString());
+			$filesize     = strlen($image->asString());
 			$maximagesize = Strings::getBytesFromShorthand(DI::config()->get('system', 'maximagesize'));
 
 			if ($maximagesize && ($filesize > $maximagesize)) {
@@ -657,8 +657,8 @@ class Photo
 			$suffix = '?ts=' . time();
 
 			$image_url = DI::baseUrl() . '/photo/' . $resource_id . '-4' . $image->getExt() . $suffix;
-			$thumb = DI::baseUrl() . '/photo/' . $resource_id . '-5' . $image->getExt() . $suffix;
-			$micro = DI::baseUrl() . '/photo/' . $resource_id . '-6' . $image->getExt() . $suffix;
+			$thumb     = DI::baseUrl() . '/photo/' . $resource_id . '-5' . $image->getExt() . $suffix;
+			$micro     = DI::baseUrl() . '/photo/' . $resource_id . '-6' . $image->getExt() . $suffix;
 		} else {
 			$photo_failure = true;
 		}
@@ -668,10 +668,10 @@ class Photo
 		}
 
 		if ($photo_failure) {
-			$contact = Contact::getById($cid) ?: [];
+			$contact   = Contact::getById($cid) ?: [];
 			$image_url = Contact::getDefaultAvatar($contact, Proxy::SIZE_SMALL);
-			$thumb = Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB);
-			$micro = Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO);
+			$thumb     = Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB);
+			$micro     = Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO);
 		}
 
 		$photo = DBA::selectFirst(
@@ -740,7 +740,7 @@ class Photo
 		$avatar_type = (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserId() == $uid)) ? self::USER_AVATAR : self::DEFAULT;
 		$banner_type = (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserId() == $uid)) ? self::USER_BANNER : self::DEFAULT;
 
-		$key = 'photo_albums:' . $uid . ':' . DI::userSession()->getLocalUserId() . ':' . DI::userSession()->getRemoteUserId();
+		$key    = 'photo_albums:' . $uid . ':' . DI::userSession()->getLocalUserId() . ':' . DI::userSession()->getRemoteUserId();
 		$albums = DI::cache()->get($key);
 
 		if (is_null($albums) || $update) {
@@ -860,7 +860,7 @@ class Photo
 			$srch = '<' . intval($original_contact_id) . '>';
 
 			$condition = [
-				'allow_cid' => $srch, 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '',
+				'allow_cid'   => $srch, 'allow_gid' => '', 'deny_cid' => '', 'deny_gid' => '',
 				'resource-id' => $image_rid, 'uid' => $uid
 			];
 			if (!self::exists($condition)) {
@@ -901,8 +901,8 @@ class Photo
 	public static function setPermissionForResource(string $image_rid, int $uid, string $str_contact_allow, string $str_circle_allow, string $str_contact_deny, string $str_circle_deny)
 	{
 		$fields = [
-			'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow,
-			'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny,
+			'allow_cid'  => $str_contact_allow, 'allow_gid' => $str_circle_allow,
+			'deny_cid'   => $str_contact_deny, 'deny_gid' => $str_circle_deny,
 			'accessible' => DI::pConfig()->get($uid, 'system', 'accessible-photos', false)
 		];
 
@@ -1010,8 +1010,8 @@ class Photo
 					Logger::info('Resize', ['size' => $filesize, 'width' => $width, 'height' => $height, 'max' => $maximagesize, 'pixels' => $pixels]);
 					$image->scaleDown($pixels);
 					$filesize = strlen($image->asString());
-					$width = $image->getWidth();
-					$height = $image->getHeight();
+					$width    = $image->getWidth();
+					$height   = $image->getHeight();
 				}
 			}
 		}
@@ -1054,10 +1054,10 @@ class Photo
 			}
 			Logger::debug('Got picture', ['Content-Type' => $ret->getHeader('Content-Type'), 'url' => $image_url]);
 			$img_str = $ret->getBodyString();
-			$type = $ret->getContentType();
+			$type    = $ret->getContentType();
 		} else {
 			$img_str = '';
-			$type = '';
+			$type    = '';
 		}
 
 		if (empty($img_str)) {
@@ -1138,7 +1138,7 @@ class Photo
 		Logger::info('File upload', ['src' => $src, 'filename' => $filename, 'size' => $filesize, 'type' => $filetype]);
 
 		$imagedata = @file_get_contents($src);
-		$image = new Image($imagedata, $filetype, $filename);
+		$image     = new Image($imagedata, $filetype, $filename);
 		if (!$image->isValid()) {
 			Logger::notice('Image is unvalid', ['files' => $files]);
 			return [];
@@ -1203,7 +1203,7 @@ class Photo
 		}
 
 		$condition = ['resource-id' => $resource_id];
-		$photo = self::selectFirst(['id', 'datasize', 'width', 'height', 'type'], $condition, ['order' => ['width' => true]]);
+		$photo     = self::selectFirst(['id', 'datasize', 'width', 'height', 'type'], $condition, ['order' => ['width' => true]]);
 		if (empty($photo)) {
 			Logger::notice('Photo not found', ['condition' => $condition]);
 			return [];

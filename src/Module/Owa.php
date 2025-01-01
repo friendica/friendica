@@ -63,7 +63,7 @@ class Owa extends BaseModule
 								Logger::debug('OWA header', ['addr' => $contact['addr'], 'data' => $verified]);
 
 								$ret['success'] = true;
-								$token = Strings::getRandomHex(32);
+								$token          = Strings::getRandomHex(32);
 
 								// Store the generated token in the database.
 								OpenWebAuthToken::create('owt', 0, $token, $contact['addr']);

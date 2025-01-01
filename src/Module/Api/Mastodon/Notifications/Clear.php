@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Notifications;
 
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
 

@@ -40,16 +40,16 @@ class PermissionTooltip extends \Friendica\BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->dba = $dba;
-		$this->aclFormatter = $aclFormatter;
-		$this->session = $session;
-		$this->config = $config;
+		$this->dba           = $dba;
+		$this->aclFormatter  = $aclFormatter;
+		$this->session       = $session;
+		$this->config        = $config;
 		$this->permissionSet = $permissionSet;
 	}
 
 	protected function rawContent(array $request = [])
 	{
-		$type = $this->parameters['type'];
+		$type        = $this->parameters['type'];
 		$referenceId = $this->parameters['id'];
 
 		$expectedTypes = ['item', 'photo', 'event'];
@@ -60,10 +60,10 @@ class PermissionTooltip extends \Friendica\BaseModule
 		$condition = ['id' => $referenceId, 'uid' => [0, $this->session->getLocalUserId()]];
 		if ($type == 'item') {
 			$fields = ['uid', 'psid', 'private', 'uri-id', 'origin', 'network'];
-			$model = Model\Post::selectFirst($fields, $condition, ['order' => ['uid' => true]]);
+			$model  = Model\Post::selectFirst($fields, $condition, ['order' => ['uid' => true]]);
 
 			if ($model['origin'] || ($model['network'] != Protocol::ACTIVITYPUB)) {
-				$permissionSet = $this->permissionSet->selectOneById($model['psid'], $model['uid']);
+				$permissionSet      = $this->permissionSet->selectOneById($model['psid'], $model['uid']);
 				$model['allow_cid'] = $permissionSet->allow_cid;
 				$model['allow_gid'] = $permissionSet->allow_gid;
 				$model['deny_cid']  = $permissionSet->deny_cid;
@@ -75,8 +75,8 @@ class PermissionTooltip extends \Friendica\BaseModule
 				$model['deny_gid']  = [];
 			}
 		} else {
-			$fields = ['uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'];
-			$model = $this->dba->selectFirst($type, $fields, $condition);
+			$fields             = ['uid', 'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid'];
+			$model              = $this->dba->selectFirst($type, $fields, $condition);
 			$model['allow_cid'] = $this->aclFormatter->expand($model['allow_cid']);
 			$model['allow_gid'] = $this->aclFormatter->expand($model['allow_gid']);
 			$model['deny_cid']  = $this->aclFormatter->expand($model['deny_cid']);
@@ -90,7 +90,7 @@ class PermissionTooltip extends \Friendica\BaseModule
 		// Kept for backwards compatibility
 		Hook::callAll('lockview_content', $model);
 
-		$aclReceivers = new Entity\AclReceivers();
+		$aclReceivers       = new Entity\AclReceivers();
 		$addressedReceivers = new Entity\AddressedReceivers();
 		if (!empty($model['allow_cid']) || !empty($model['allow_gid']) || !empty($model['deny_cid']) || !empty($model['deny_gid'])) {
 			$aclReceivers = $this->fetchReceiversFromACL($model);
@@ -100,30 +100,32 @@ class PermissionTooltip extends \Friendica\BaseModule
 
 		$privacy = '';
 		switch ($model['private'] ?? null) {
-			case Model\Item::PUBLIC:   $privacy = $this->t('Public'); break;
-			case Model\Item::UNLISTED: $privacy = $this->t('Unlisted'); break;
-			case Model\Item::PRIVATE:  $privacy = $this->t('Limited/Private'); break;
+			case Model\Item::PUBLIC:   $privacy = $this->t('Public');
+				break;
+			case Model\Item::UNLISTED: $privacy = $this->t('Unlisted');
+				break;
+			case Model\Item::PRIVATE:  $privacy = $this->t('Limited/Private');
+				break;
 		}
 
-		if ($aclReceivers->isEmpty() && $addressedReceivers->isEmpty() && empty($privacy))
-		{
+		if ($aclReceivers->isEmpty() && $addressedReceivers->isEmpty() && empty($privacy)) {
 			echo $this->t('Remote privacy information not available.');
 			exit;
 		}
 
-		$tpl = Renderer::getMarkupTemplate('privacy/permission_tooltip.tpl');
+		$tpl    = Renderer::getMarkupTemplate('privacy/permission_tooltip.tpl');
 		$output = Renderer::replaceMacros($tpl, [
 			'$l10n' => [
 				'visible_to' => $this->t('Visible to:'),
-				'to' => $this->t('To:'),
-				'cc' => $this->t('CC:'),
-				'bcc' => $this->t('BCC:'),
-				'audience' => $this->t('Audience:'),
+				'to'         => $this->t('To:'),
+				'cc'         => $this->t('CC:'),
+				'bcc'        => $this->t('BCC:'),
+				'audience'   => $this->t('Audience:'),
 				'attributed' => $this->t('Attributed To:'),
 			],
-			'$aclReceivers' => $aclReceivers,
+			'$aclReceivers'       => $aclReceivers,
 			'$addressedReceivers' => $addressedReceivers,
-			'$privacy' => $privacy,
+			'$privacy'            => $privacy,
 		]);
 
 		$this->httpExit($output);
@@ -197,7 +199,7 @@ class PermissionTooltip extends \Friendica\BaseModule
 	private function fetchAddressedReceivers(int $uriId): Entity\AddressedReceivers
 	{
 		$own_url = '';
-		$uid = $this->session->getLocalUserId();
+		$uid     = $this->session->getLocalUserId();
 		if ($uid) {
 			$owner = Model\User::getOwnerDataById($uid);
 			if (!empty($owner['url'])) {
@@ -220,11 +222,11 @@ class PermissionTooltip extends \Friendica\BaseModule
 					$receivers[$receiver['type']][] = $this->t('Collection (%s)', $receiver['name']);
 					break;
 				case Model\Tag::FOLLOWER_COLLECTION:
-					$apcontact = $this->dba->selectFirst('apcontact', ['name'], ['followers' => $receiver['url']]);
+					$apcontact                      = $this->dba->selectFirst('apcontact', ['name'], ['followers' => $receiver['url']]);
 					$receivers[$receiver['type']][] = $this->t('Followers (%s)', $apcontact['name'] ?? $receiver['name']);
 					break;
 				case Model\Tag::ACCOUNT:
-					$apcontact = Model\APContact::getByURL($receiver['url'], false);
+					$apcontact                      = Model\APContact::getByURL($receiver['url'], false);
 					$receivers[$receiver['type']][] = $apcontact['name'] ?? $receiver['name'];
 					break;
 				default:
@@ -234,19 +236,19 @@ class PermissionTooltip extends \Friendica\BaseModule
 		}
 
 		foreach ($receivers as $type => $receiver) {
-			$max = $this->config->get('system', 'max_receivers');
+			$max   = $this->config->get('system', 'max_receivers');
 			$total = count($receiver);
 			if ($total > $max) {
-				$receivers[$type] = array_slice($receiver, 0, $max);
+				$receivers[$type]   = array_slice($receiver, 0, $max);
 				$receivers[$type][] = $this->t('%d more', $total - $max);
 			}
 		}
 
 		return new Entity\AddressedReceivers(
-			$receivers[Model\Tag::TO] ?? [],
-			$receivers[Model\Tag::CC] ?? [],
-			$receivers[Model\Tag::BCC] ?? [],
-			$receivers[Model\Tag::AUDIENCE] ?? [],
+			$receivers[Model\Tag::TO]         ?? [],
+			$receivers[Model\Tag::CC]         ?? [],
+			$receivers[Model\Tag::BCC]        ?? [],
+			$receivers[Model\Tag::AUDIENCE]   ?? [],
 			$receivers[Model\Tag::ATTRIBUTED] ?? [],
 		);
 	}

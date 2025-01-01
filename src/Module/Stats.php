@@ -85,14 +85,14 @@ class Stats extends BaseModule
 					'datetime'  => DateTimeFormat::utc($this->keyValue->get('last_worker_execution'), DateTimeFormat::JSON),
 					'timestamp' => strtotime($this->keyValue->get('last_worker_execution')),
 				],
-				'jpm'           => [
+				'jpm' => [
 					1 => $this->dba->count('workerqueue', ["`done` AND `executed` > ?", DateTimeFormat::utc('now - 1 minute')]),
 					3 => round($this->dba->count('workerqueue', ["`done` AND `executed` > ?", DateTimeFormat::utc('now - 3 minute')]) / 3),
 					5 => round($this->dba->count('workerqueue', ["`done` AND `executed` > ?", DateTimeFormat::utc('now - 5 minute')]) / 5),
 				],
-				'active'        => [],
-				'deferred'      => [],
-				'total'         => [],
+				'active'   => [],
+				'deferred' => [],
+				'total'    => [],
 			],
 			'jetstream' => [
 				'drift'     => intval($this->keyValue->get('jetstream_drift')),
@@ -145,14 +145,14 @@ class Stats extends BaseModule
 				'closed' => $this->dba->count('report', ['status' => Report::STATUS_CLOSED]),
 			],
 			'update' => [
-				'available' 		=> Update::isAvailable(),
+				'available'         => Update::isAvailable(),
 				'available_version' => Update::getAvailableVersion(),
 				'status'            => Update::getStatus(),
-				'db_status'			=> DBStructure::getUpdateStatus(),
+				'db_status'         => DBStructure::getUpdateStatus(),
 			],
 			'server' => [
-				'version'  => App::VERSION,
-				'php'      => [
+				'version' => App::VERSION,
+				'php'     => [
 					'version'             => phpversion(),
 					'upload_max_filesize' => ini_get('upload_max_filesize'),
 					'post_max_size'       => ini_get('post_max_size'),
@@ -165,11 +165,11 @@ class Stats extends BaseModule
 		];
 
 		if (Addon::isEnabled('bluesky')) {
-			$statistics['packets']['inbound'][Protocol::BLUESKY] = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::BLUESKY) ?? 0);
+			$statistics['packets']['inbound'][Protocol::BLUESKY]  = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::BLUESKY) ?? 0);
 			$statistics['packets']['outbound'][Protocol::BLUESKY] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::BLUESKY) ?? 0);
 		}
 		if (Addon::isEnabled('tumblr')) {
-			$statistics['packets']['inbound'][Protocol::TUMBLR] = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::TUMBLR) ?? 0);
+			$statistics['packets']['inbound'][Protocol::TUMBLR]  = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::TUMBLR) ?? 0);
 			$statistics['packets']['outbound'][Protocol::TUMBLR] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::TUMBLR) ?? 0);
 		}
 
@@ -202,7 +202,7 @@ class Stats extends BaseModule
 
 		$jobs = $this->dba->p("SELECT COUNT(*) AS `entries`, `priority` FROM `workerqueue` WHERE NOT `done` AND `retrial` = ? GROUP BY `priority`", 0);
 		while ($entry = $this->dba->fetch($jobs)) {
-			$running  = $this->dba->count('workerqueue-view', ['priority' => $entry['priority']]);
+			$running = $this->dba->count('workerqueue-view', ['priority' => $entry['priority']]);
 			$statistics['worker']['active']['total'] += $running;
 			$statistics['worker']['active'][$entry['priority']] = $running;
 			$statistics['worker']['total']['total'] += $entry['entries'];

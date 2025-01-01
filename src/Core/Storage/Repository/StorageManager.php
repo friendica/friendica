@@ -138,7 +138,7 @@ class StorageManager
 			// Try the filesystem backend
 			case Type\Filesystem::getName():
 				return new Type\FilesystemConfig($this->config, $this->l10n);
-			// try the database backend
+				// try the database backend
 			case Type\Database::getName():
 				return false;
 			default:
@@ -185,11 +185,11 @@ class StorageManager
 					$storageConfig                 = new Type\FilesystemConfig($this->config, $this->l10n);
 					$this->backendInstances[$name] = new Type\Filesystem($storageConfig->getStoragePath());
 					break;
-				// try the database backend
+					// try the database backend
 				case Type\Database::getName():
 					$this->backendInstances[$name] = new Type\Database($this->dba);
 					break;
-				// at least, try if there's an addon for the backend
+					// at least, try if there's an addon for the backend
 				case Type\SystemResource::getName():
 					$this->backendInstances[$name] = new Type\SystemResource();
 					break;
@@ -228,11 +228,13 @@ class StorageManager
 	 */
 	public function isValidBackend(string $name = null, array $validBackends = null): bool
 	{
-		$validBackends = $validBackends ?? array_merge($this->validBackends,
-				[
-					Type\SystemResource::getName(),
-					Type\ExternalResource::getName(),
-				]);
+		$validBackends = $validBackends ?? array_merge(
+			$this->validBackends,
+			[
+				Type\SystemResource::getName(),
+				Type\ExternalResource::getName(),
+			]
+		);
 		return in_array($name, $validBackends);
 	}
 

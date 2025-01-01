@@ -20,11 +20,10 @@ use Psr\Log\LoggerInterface;
  */
 class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'memcached';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
 	use MemcacheCommandTrait;
+	const NAME = 'memcached';
 
 	/**
 	 * @var \Memcached

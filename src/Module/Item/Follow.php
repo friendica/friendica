@@ -8,10 +8,8 @@
 namespace Friendica\Module\Item;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
-use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 
 /**
@@ -51,10 +49,10 @@ class Follow extends BaseModule
 		}
 
 		$return = [
-			'status' => 'ok',
+			'status'  => 'ok',
 			'item_id' => $itemId,
-			'verb' => 'follow',
-			'state' => 1
+			'verb'    => 'follow',
+			'state'   => 1
 		];
 
 		$this->jsonExit($return);

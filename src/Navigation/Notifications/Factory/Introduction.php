@@ -102,7 +102,7 @@ class Introduction extends BaseFactory
 					continue;
 				}
 
-			// There are two kind of introduction. Contacts suggested by other contacts and normal connection requests.
+				// There are two kind of introduction. Contacts suggested by other contacts and normal connection requests.
 				// We have to distinguish between these two because they use different data.
 				// Contact suggestions
 				if ($intro['suggest-cid'] ?? '') {
@@ -110,7 +110,7 @@ class Introduction extends BaseFactory
 						continue;
 					}
 					$return_addr = bin2hex($this->nick . '@' .
-					                       $this->baseUrl->getHost() .
+										   $this->baseUrl->getHost() .
 										   (($this->baseUrl->getPath()) ? '/' . $this->baseUrl->getPath() : ''));
 
 					$formattedIntroductions[] = new ValueObject\Introduction([
@@ -149,7 +149,7 @@ class Introduction extends BaseFactory
 						'photo'          => Contact::getPhoto($intro),
 						'name'           => $intro['name'],
 						'location'       => BBCode::convertForUriId($intro['uri-id'], $intro['location'], BBCode::EXTERNAL),
-						'about'          => BBCode::convertForUriId ($intro['uri-id'], $intro['about'], BBCode::EXTERNAL),
+						'about'          => BBCode::convertForUriId($intro['uri-id'], $intro['about'], BBCode::EXTERNAL),
 						'keywords'       => $intro['keywords'],
 						'hidden'         => $intro['hidden'] == 1,
 						'post_newfriend' => (intval($this->pConfig->get($this->session->getLocalUserId(), 'system', 'post_newfriend')) ? '1' : 0),

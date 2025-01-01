@@ -161,12 +161,12 @@ class Conversations extends BaseProfile
 
 		if (!empty($category)) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `category-view` WHERE `name` = ? AND `type` = ? AND `uid` = ?)",
-			                                               $category, Category::CATEGORY, $profile['uid']]);
+				$category, Category::CATEGORY, $profile['uid']]);
 		}
 
 		if (!empty($hashtags)) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `tag-search-view` WHERE `name` = ? AND `uid` = ?)",
-			                                               $hashtags, $profile['uid']]);
+				$hashtags, $profile['uid']]);
 		}
 
 		if (!empty($datequery)) {
@@ -184,20 +184,28 @@ class Conversations extends BaseProfile
 		}
 
 		if ($this->mode->isMobile()) {
-			$itemspage_network = $this->pConfig->get($this->session->getLocalUserId(), 'system', 'itemspage_mobile_network',
-				$this->config->get('system', 'itemspage_network_mobile'));
+			$itemspage_network = $this->pConfig->get(
+				$this->session->getLocalUserId(),
+				'system',
+				'itemspage_mobile_network',
+				$this->config->get('system', 'itemspage_network_mobile')
+			);
 		} else {
-			$itemspage_network = $this->pConfig->get($this->session->getLocalUserId(), 'system', 'itemspage_network',
-				$this->config->get('system', 'itemspage_network'));
+			$itemspage_network = $this->pConfig->get(
+				$this->session->getLocalUserId(),
+				'system',
+				'itemspage_network',
+				$this->config->get('system', 'itemspage_network')
+			);
 		}
 
 		$condition = DBA::mergeConditions($condition, ["((`gravity` = ? AND `wall`) OR
 			(`gravity` = ? AND `vid` = ? AND `origin`
 			AND EXISTS(SELECT `uri-id` FROM `post` WHERE `uri-id` = `post-origin-view`.`thr-parent-id` AND `gravity` = ? AND `network` IN (?, ?))))",
-		                                               Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Item::GRAVITY_PARENT, Protocol::ACTIVITYPUB, Protocol::DFRN]);
+			Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Item::GRAVITY_PARENT, Protocol::ACTIVITYPUB, Protocol::DFRN]);
 
-		$condition = DBA::mergeConditions($condition, ['uid'     => $profile['uid'], 'network' => Protocol::FEDERATED,
-		                                               'visible' => true, 'deleted' => false]);
+		$condition = DBA::mergeConditions($condition, ['uid' => $profile['uid'], 'network' => Protocol::FEDERATED,
+			'visible'                                           => true, 'deleted' => false]);
 
 		$pager  = new Pager($this->l10n, $this->args->getQueryString(), $itemspage_network);
 		$params = ['limit' => [$pager->getStart(), $pager->getItemsPerPage()], 'order' => ['received' => true]];

@@ -32,7 +32,7 @@ class User
 
 		// Additionally assign the key fields
 		$fields['uri-id'] = $uri_id;
-		$fields['uid'] = $uid;
+		$fields['uid']    = $uid;
 
 		// Public posts and activities (like, dislike, ...) are always seen
 		if ($uid == 0 || (($data['gravity'] == Item::GRAVITY_ACTIVITY) && ($data['verb'] != Activity::ANNOUNCE))) {

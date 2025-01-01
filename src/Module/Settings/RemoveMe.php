@@ -75,7 +75,8 @@ class RemoveMe extends BaseSettings
 				->withMessage(
 					$l10n->t('[Friendica System Notify]') . ' ' . $l10n->t('User deleted their account'),
 					$l10n->t('On your Friendica node an user deleted their account. Please ensure that their data is removed from the backups.'),
-					$l10n->t('The user id is %d', $this->session->getLocalUserId()))
+					$l10n->t('The user id is %d', $this->session->getLocalUserId())
+				)
 				->forUser($admin)
 				->withRecipient($admin['email'])
 				->build();

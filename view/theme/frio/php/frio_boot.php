@@ -42,12 +42,13 @@ function load_page(AppHelper $appHelper)
  *
  * @return bool
  */
-function is_modal() {
-	$is_modal = false;
+function is_modal()
+{
+	$is_modal   = false;
 	$modalpages = get_modalpage_list();
 
 	foreach ($modalpages as $r => $value) {
-		if(strpos($_REQUEST['pagename'],$value) !== false) {
+		if(strpos($_REQUEST['pagename'], $value) !== false) {
 			$is_modal = true;
 		}
 	}
@@ -63,13 +64,14 @@ function is_modal() {
  *
  * @return array Page names as path
  */
-function get_modalpage_list() {
+function get_modalpage_list()
+{
 	//Array of pages which getting bootstrap modal dialogs
 	$modalpages = [
 		'message/new',
 		'settings/oauth/add',
 		'calendar/event/new',
-//		'fbrowser/image/'
+		//		'fbrowser/image/'
 	];
 
 	return $modalpages;
@@ -83,10 +85,11 @@ function get_modalpage_list() {
  *
  * @return array Pagenames as path
  */
-function get_standard_page_list() {
+function get_standard_page_list()
+{
 	//Arry of pages wich getting the standard page template
 	$standardpages = [//'profile',
-//			'fbrowser/image/'
+		//			'fbrowser/image/'
 	];
 
 	return $standardpages;
@@ -101,12 +104,13 @@ function get_standard_page_list() {
  * @param string $pagetitle Title of the actual page
  * @return bool
  */
-function is_standard_page($pagetitle) {
+function is_standard_page($pagetitle)
+{
 	$is_standard_page = false;
-	$standardpages = get_standard_page_list();
+	$standardpages    = get_standard_page_list();
 
 	foreach ($standardpages as $r => $value) {
-		if(strpos($pagetitle,$value) !== false) {
+		if(strpos($pagetitle, $value) !== false) {
 			$is_standard_page = true;
 		}
 	}
@@ -119,16 +123,20 @@ function is_standard_page($pagetitle) {
  * @param type $pagetitle
  * @return string
  */
-function get_page_type($pagetitle) {
+function get_page_type($pagetitle)
+{
 	$page_type = "";
 
-	if(is_modal())
+	if(is_modal()) {
 		$page_type = "modal";
+	}
 
-	if(is_standard_page($pagetitle))
+	if(is_standard_page($pagetitle)) {
 		$page_type = "standard_page";
+	}
 
-	if($page_type)
+	if($page_type) {
 		return $page_type;
+	}
 
 }

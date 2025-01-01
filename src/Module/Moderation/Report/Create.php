@@ -26,7 +26,6 @@ use Friendica\Moderation\Entity\Report;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -221,11 +220,19 @@ class Create extends BaseModule
 			}
 
 			if (DI::mode()->isMobile()) {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-					DI::config()->get('system', 'itemspage_network_mobile'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_mobile_network',
+					DI::config()->get('system', 'itemspage_network_mobile')
+				);
 			} else {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-					DI::config()->get('system', 'itemspage_network'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_network',
+					DI::config()->get('system', 'itemspage_network')
+				);
 			}
 
 			$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
@@ -294,12 +301,18 @@ class Create extends BaseModule
 		}
 
 		switch ($request['category'] ?? 0) {
-			case Report::CATEGORY_SPAM:      $category = $this->t('Spam'); break;
-			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content'); break;
-			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety'); break;
-			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior'); break;
-			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation'); break;
-			case Report::CATEGORY_OTHER:     $category = $this->t('Other'); break;
+			case Report::CATEGORY_SPAM:      $category = $this->t('Spam');
+				break;
+			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content');
+				break;
+			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety');
+				break;
+			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior');
+				break;
+			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation');
+				break;
+			case Report::CATEGORY_OTHER:     $category = $this->t('Other');
+				break;
 
 			default: $category = '';
 		}

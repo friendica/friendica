@@ -16,16 +16,16 @@ class OAuthRequest
 	private $http_url;
 	// for debug purposes
 	public $base_string;
-	public static $version = '1.0';
+	public static $version    = '1.0';
 	public static $POST_INPUT = 'php://input';
 
-	function __construct($http_method, $http_url, $parameters = null)
+	public function __construct($http_method, $http_url, $parameters = null)
 	{
 		@$parameters or $parameters = [];
-		$parameters        = array_merge(OAuthUtil::parse_parameters(parse_url($http_url, PHP_URL_QUERY)), $parameters);
-		$this->parameters  = $parameters;
-		$this->http_method = $http_method;
-		$this->http_url    = $http_url;
+		$parameters                 = array_merge(OAuthUtil::parse_parameters(parse_url($http_url, PHP_URL_QUERY)), $parameters);
+		$this->parameters           = $parameters;
+		$this->http_method          = $http_method;
+		$this->http_url             = $http_url;
 	}
 
 
@@ -70,7 +70,7 @@ class OAuthRequest
 					"application/x-www-form-urlencoded"
 				)
 			) {
-				$post_data  = OAuthUtil::parse_parameters(
+				$post_data = OAuthUtil::parse_parameters(
 					file_get_contents(self::$POST_INPUT)
 				);
 				$parameters = array_merge($parameters, $post_data);
@@ -82,7 +82,7 @@ class OAuthRequest
 				$header_parameters = OAuthUtil::split_header(
 					$request_headers['Authorization']
 				);
-				$parameters        = array_merge($parameters, $header_parameters);
+				$parameters = array_merge($parameters, $header_parameters);
 			}
 		}
 		// fix for friendica redirect system
@@ -107,14 +107,15 @@ class OAuthRequest
 	public static function from_consumer_and_token(OAuthConsumer $consumer, $http_method, $http_url, array $parameters = null, OAuthToken $token = null)
 	{
 		@$parameters or $parameters = [];
-		$defaults = [
+		$defaults                   = [
 			"oauth_version"      => OAuthRequest::$version,
 			"oauth_nonce"        => OAuthRequest::generate_nonce(),
 			"oauth_timestamp"    => OAuthRequest::generate_timestamp(),
 			"oauth_consumer_key" => $consumer->key,
 		];
-		if ($token)
+		if ($token) {
 			$defaults['oauth_token'] = $token->key;
+		}
 
 		$parameters = array_merge($defaults, $parameters);
 
@@ -244,10 +245,11 @@ class OAuthRequest
 	 */
 	public function to_postdata(bool $raw = false)
 	{
-		if ($raw)
+		if ($raw) {
 			return $this->parameters;
-		else
+		} else {
 			return OAuthUtil::build_http_query($this->parameters);
+		}
 	}
 
 	/**
@@ -264,16 +266,19 @@ class OAuthRequest
 		if ($realm) {
 			$out   = 'Authorization: OAuth realm="' . OAuthUtil::urlencode_rfc3986($realm) . '"';
 			$first = false;
-		} else
+		} else {
 			$out = 'Authorization: OAuth';
+		}
 
 		foreach ($this->parameters as $k => $v) {
-			if (substr($k, 0, 5) != "oauth") continue;
+			if (substr($k, 0, 5) != "oauth") {
+				continue;
+			}
 			if (is_array($v)) {
 				throw new OAuthException('Arrays not supported in headers');
 			}
-			$out   .= ($first) ? ' ' : ',';
-			$out   .= OAuthUtil::urlencode_rfc3986($k) .
+			$out .= ($first) ? ' ' : ',';
+			$out .= OAuthUtil::urlencode_rfc3986($k) .
 					  '="' .
 					  OAuthUtil::urlencode_rfc3986($v) .
 					  '"';

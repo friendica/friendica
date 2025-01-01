@@ -81,7 +81,7 @@ class Page implements ArrayAccess
 	public function __construct(string $basepath)
 	{
 		$this->timestamp = microtime(true);
-		$this->basePath = $basepath;
+		$this->basePath  = $basepath;
 	}
 
 	public function setLogging(string $method, string $module, string $command)
@@ -445,7 +445,7 @@ class Page implements ArrayAccess
 		$this->initContent($response, $mode);
 
 		// Load current theme info after module has been initialized as theme could have been set in module
-		$currentTheme = $appHelper->getCurrentTheme();
+		$currentTheme    = $appHelper->getCurrentTheme();
 		$theme_info_file = 'view/theme/' . $currentTheme . '/theme.php';
 		if (file_exists($theme_info_file)) {
 			require_once $theme_info_file;
@@ -479,7 +479,7 @@ class Page implements ArrayAccess
 		// Add the navigation (menu) template
 		if ($moduleName != 'install' && $moduleName != 'maintenance') {
 			$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('nav_head.tpl'), []);
-			$this->page['nav']      = $nav->getHtml();
+			$this->page['nav'] = $nav->getHtml();
 		}
 
 		// Build the page - now that we have all the components
@@ -512,7 +512,7 @@ class Page implements ArrayAccess
 			}
 		}
 
-		$page    = $this->page;
+		$page = $this->page;
 
 		// add and escape some common but crucial content for direct "echo" in HTML (security)
 		$page['title']   = htmlspecialchars($page['title'] ?? '');

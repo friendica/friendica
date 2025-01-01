@@ -199,7 +199,7 @@ abstract class MailBuilder
 	 *
 	 * @return static
 	 */
-	public function	setHeader(string $name, string $value)
+	public function setHeader(string $name, string $value)
 	{
 		$this->headers[$name] = [$value];
 
@@ -219,7 +219,7 @@ abstract class MailBuilder
 	public function build(bool $raw = false)
 	{
 		if ((empty($this->recipientAddress)) &&
-		    !empty($this->recipientUid)) {
+			!empty($this->recipientUid)) {
 			$user = User::getById($this->recipientUid, ['email']);
 
 			if (!empty($user['email'])) {
@@ -247,8 +247,11 @@ abstract class MailBuilder
 				'$product'     => App::PLATFORM,
 				'$htmlversion' => $msgHtml,
 				'$sitename'    => $this->config->get('config', 'sitename'),
-				'$banner'      => $this->config->get('system', 'email_banner',
-					$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER),
+				'$banner'      => $this->config->get(
+					'system',
+					'email_banner',
+					$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER
+				),
 			]);
 		}
 
@@ -261,6 +264,7 @@ abstract class MailBuilder
 			$msgHtml,
 			$this->getPlaintextMessage() ?? '',
 			$this->headers,
-			$this->recipientUid ?? null);
+			$this->recipientUid ?? null
+		);
 	}
 }

@@ -43,7 +43,7 @@ class Index extends BaseAdmin
 					DI::sysmsg()->addInfo(DI::l10n()->t('Themes reloaded'));
 					break;
 
-				case 'toggle' :
+				case 'toggle':
 					$theme = $_GET['addon'] ?? '';
 					if ($theme) {
 						$theme = Strings::sanitizeFilePathItem($theme);
@@ -70,7 +70,7 @@ class Index extends BaseAdmin
 		}
 
 		$themes = [];
-		$files = glob('view/theme/*');
+		$files  = glob('view/theme/*');
 		if (is_array($files)) {
 			foreach ($files as $file) {
 				$theme = basename($file);
@@ -84,8 +84,8 @@ class Index extends BaseAdmin
 				}
 
 				$is_experimental = intval(file_exists($file . '/experimental'));
-				$is_supported = 1 - (intval(file_exists($file . '/unsupported')));
-				$is_allowed = intval(in_array($theme, $allowed_themes));
+				$is_supported    = 1 - (intval(file_exists($file . '/unsupported')));
+				$is_allowed      = intval(in_array($theme, $allowed_themes));
 
 				if ($is_allowed || $is_supported || DI::config()->get('system', 'show_unsupported_themes')) {
 					$themes[] = ['name' => $theme, 'experimental' => $is_experimental, 'supported' => $is_supported, 'allowed' => $is_allowed];

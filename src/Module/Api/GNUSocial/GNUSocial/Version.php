@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\GNUSocial\GNUSocial;
 
 use Friendica\Module\BaseApi;
-use Friendica\DI;
 
 /**
  * API endpoint: /api/gnusocial/version, /api/statusnet/version

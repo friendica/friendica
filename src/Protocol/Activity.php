@@ -7,8 +7,6 @@
 
 namespace Friendica\Protocol;
 
-use Friendica\Protocol\ActivityNamespace;
-
 /**
  * Base class for the Activity Verbs
  */
@@ -35,14 +33,14 @@ final class Activity
 	 * @see https://github.com/friendica/friendica/wiki/ActivityStreams#activity_attend
 	 * @var string
 	 */
-	const ATTEND      = ActivityNamespace::ZOT . '/activity/attendyes';
+	const ATTEND = ActivityNamespace::ZOT . '/activity/attendyes';
 	/**
 	 * Don't attend an event
 	 *
 	 * @see https://github.com/friendica/friendica/wiki/ActivityStreams#activity_attendno
 	 * @var string
 	 */
-	const ATTENDNO    = ActivityNamespace::ZOT . '/activity/attendno';
+	const ATTENDNO = ActivityNamespace::ZOT . '/activity/attendno';
 	/**
 	 * Attend maybe an event
 	 *
@@ -57,7 +55,7 @@ final class Activity
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const FRIEND      = ActivityNamespace::ACTIVITY_SCHEMA . 'make-friend';
+	const FRIEND = ActivityNamespace::ACTIVITY_SCHEMA . 'make-friend';
 	/**
 	 * Indicates the creation of a friendship that has not yet been reciprocated by the object.
 	 *
@@ -71,56 +69,56 @@ final class Activity
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const UNFRIEND   = ActivityNamespace::ACTIVITY_SCHEMA . 'remove-friend';
+	const UNFRIEND = ActivityNamespace::ACTIVITY_SCHEMA . 'remove-friend';
 	/**
 	 * Indicates that the actor began following the activity of the object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const FOLLOW     = ActivityNamespace::ACTIVITY_SCHEMA . 'follow';
+	const FOLLOW = ActivityNamespace::ACTIVITY_SCHEMA . 'follow';
 	/**
 	 * Indicates that the actor has stopped following the object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const UNFOLLOW   = ActivityNamespace::ACTIVITY_SCHEMA . 'stop-following';
+	const UNFOLLOW = ActivityNamespace::ACTIVITY_SCHEMA . 'stop-following';
 	/**
 	 * Indicates that the actor has become a member of the object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const JOIN       = ActivityNamespace::ACTIVITY_SCHEMA . 'join';
+	const JOIN = ActivityNamespace::ACTIVITY_SCHEMA . 'join';
 	/**
 	 * Implementors SHOULD use verbs such as post where the actor is adding new items to a collection or similar.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const POST       = ActivityNamespace::ACTIVITY_SCHEMA . 'post';
+	const POST = ActivityNamespace::ACTIVITY_SCHEMA . 'post';
 	/**
 	 * The "update" verb indicates that the actor has modified the object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const UPDATE     = ActivityNamespace::ACTIVITY_SCHEMA . 'update';
+	const UPDATE = ActivityNamespace::ACTIVITY_SCHEMA . 'update';
 	/**
 	 * Indicates that the actor has identified the presence of a target inside another object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const TAG        = ActivityNamespace::ACTIVITY_SCHEMA . 'tag';
+	const TAG = ActivityNamespace::ACTIVITY_SCHEMA . 'tag';
 	/**
 	 * Indicates that the actor marked the object as an item of special interest.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const FAVORITE   = ActivityNamespace::ACTIVITY_SCHEMA . 'favorite';
+	const FAVORITE = ActivityNamespace::ACTIVITY_SCHEMA . 'favorite';
 	/**
 	 * Indicates that the actor has removed the object from the collection of favorited items.
 	 *
@@ -134,42 +132,42 @@ final class Activity
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const SHARE      = ActivityNamespace::ACTIVITY_SCHEMA . 'share';
+	const SHARE = ActivityNamespace::ACTIVITY_SCHEMA . 'share';
 	/**
 	 * Indicates that the actor has deleted the object.
 	 *
 	 * @see http://activitystrea.ms/head/activity-schema.html#verbs
 	 * @var string
 	 */
-	const DELETE     = ActivityNamespace::ACTIVITY_SCHEMA . 'delete';
+	const DELETE = ActivityNamespace::ACTIVITY_SCHEMA . 'delete';
 	/**
 	 * Indicates that the actor is calling the target's attention the object.
 	 *
 	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-announce
 	 * @var string
 	 */
-	const ANNOUNCE   = ActivityNamespace::ACTIVITY2 . 'Announce';
+	const ANNOUNCE = ActivityNamespace::ACTIVITY2 . 'Announce';
 	/**
 	 * Indicates that the actor has read the object.
 	 *
 	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-read
 	 * @var string
 	 */
-	const READ       = ActivityNamespace::ACTIVITY2 . 'Read';
+	const READ = ActivityNamespace::ACTIVITY2 . 'Read';
 	/**
-	 *  Indicates that the actor has listened to the object. 
+	 *  Indicates that the actor has listened to the object.
 	 *
 	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-listen
 	 * @var string
 	 */
-	const LISTEN     = ActivityNamespace::ACTIVITY2 . 'Listen';
+	const LISTEN = ActivityNamespace::ACTIVITY2 . 'Listen';
 	/**
 	 * Indicates that the actor has viewed the object.
 	 *
 	 * @see https://www.w3.org/TR/activitystreams-vocabulary/#dfn-view
 	 * @var string
 	 */
-	const VIEW       = ActivityNamespace::ACTIVITY2 . 'View';
+	const VIEW = ActivityNamespace::ACTIVITY2 . 'View';
 
 	const O_UNFOLLOW    = ActivityNamespace::OSTATUS . '/unfollow';
 	const O_UNFAVOURITE = ActivityNamespace::OSTATUS . '/unfavorite';
@@ -226,7 +224,7 @@ final class Activity
 	public function match(string $haystack, string $needle): bool
 	{
 		return (($haystack === $needle) ||
-		        ((basename($needle) === $haystack) &&
-		         strstr($needle, ActivityNamespace::ACTIVITY_SCHEMA)));
+				((basename($needle) === $haystack) &&
+				 strstr($needle, ActivityNamespace::ACTIVITY_SCHEMA)));
 	}
 }

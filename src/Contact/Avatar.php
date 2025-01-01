@@ -216,7 +216,7 @@ class Avatar
 		}
 
 		$avatarpath = parse_url(self::baseUrl(), PHP_URL_PATH);
-		$pos = strpos($parts['path'], $avatarpath);
+		$pos        = strpos($parts['path'], $avatarpath);
 		if ($pos !== 0) {
 			return '';
 		}

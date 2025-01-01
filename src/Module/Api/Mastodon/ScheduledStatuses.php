@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\App\Router;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;
@@ -58,10 +57,10 @@ class ScheduledStatuses extends BaseApi
 		}
 
 		$request = $this->getRequest([
-			'limit'           => 20, // Max number of results to return. Defaults to 20.
-			'max_id'          => 0,  // Return results older than ID
-			'since_id'        => 0,  // Return results newer than ID
-			'min_id'          => 0,  // Return results immediately newer than ID
+			'limit'    => 20, // Max number of results to return. Defaults to 20.
+			'max_id'   => 0,  // Return results older than ID
+			'since_id' => 0,  // Return results newer than ID
+			'min_id'   => 0,  // Return results immediately newer than ID
 		], $request);
 
 		$params = ['order' => ['id' => true], 'limit' => $request['limit']];
@@ -77,7 +76,7 @@ class ScheduledStatuses extends BaseApi
 		}
 
 		if (!empty($request['min_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
+			$condition       = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
 			$params['order'] = ['uri-id'];
 		}
 

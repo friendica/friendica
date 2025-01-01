@@ -44,8 +44,11 @@ class Lists extends BaseApi
 		$uid  = BaseApi::getCurrentUserID();
 		$type = $this->getRequestValue($this->parameters, 'extension', 'json');
 
-		$photos = Photo::selectToArray(['resource-id'], ["`uid` = ? AND NOT `photo-type` IN (?, ?)", $uid, Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER],
-			['order' => ['id'], 'group_by' => ['resource-id']]);
+		$photos = Photo::selectToArray(
+			['resource-id'],
+			["`uid` = ? AND NOT `photo-type` IN (?, ?)", $uid, Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER],
+			['order' => ['id'], 'group_by' => ['resource-id']]
+		);
 
 		$data = ['photo' => []];
 		if (DBA::isResult($photos)) {

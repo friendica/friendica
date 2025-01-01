@@ -79,20 +79,20 @@ class Details extends BaseAdmin
 
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('Themes'),
-			'$toggle' => DI::l10n()->t('Toggle'),
-			'$settings' => DI::l10n()->t('Settings'),
-			'$addon' => $theme,
-			'$status' => $status,
-			'$action' => $action,
-			'$info' => Theme::getInfo($theme),
-			'$function' => 'themes',
-			'$admin_form' => $admin_form,
-			'$str_author' => DI::l10n()->t('Author: '),
+			'$title'          => DI::l10n()->t('Administration'),
+			'$page'           => DI::l10n()->t('Themes'),
+			'$toggle'         => DI::l10n()->t('Toggle'),
+			'$settings'       => DI::l10n()->t('Settings'),
+			'$addon'          => $theme,
+			'$status'         => $status,
+			'$action'         => $action,
+			'$info'           => Theme::getInfo($theme),
+			'$function'       => 'themes',
+			'$admin_form'     => $admin_form,
+			'$str_author'     => DI::l10n()->t('Author: '),
 			'$str_maintainer' => DI::l10n()->t('Maintainer: '),
-			'$screenshot' => $screenshot,
-			'$readme' => $readme,
+			'$screenshot'     => $screenshot,
+			'$readme'         => $readme,
 
 			'$form_security_token' => self::getFormSecurityToken("admin_themes"),
 		]);

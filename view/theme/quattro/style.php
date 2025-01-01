@@ -13,23 +13,23 @@ use Friendica\DI;
  * This script can be included when the maintenance mode is on, which requires us to avoid any config call and
  * use the following hardcoded defaults
  */
-$color = 'dark';
-$quattro_align = false;
+$color              = 'dark';
+$quattro_align      = false;
 $textarea_font_size = '20';
-$post_font_size = '12';
+$post_font_size     = '12';
 
 if (DI::mode()->has(\Friendica\App\Mode::MAINTENANCEDISABLED)) {
-	$site_color = DI::config()->get("quattro", "color", $color);
-	$site_quattro_align = DI::config()->get("quattro", "align", $quattro_align);
+	$site_color              = DI::config()->get("quattro", "color", $color);
+	$site_quattro_align      = DI::config()->get("quattro", "align", $quattro_align);
 	$site_textarea_font_size = DI::config()->get("quattro", "tfs", $textarea_font_size);
-	$site_post_font_size = DI::config()->get("quattro", "pfs", $post_font_size);
+	$site_post_font_size     = DI::config()->get("quattro", "pfs", $post_font_size);
 
 	$uid = $_REQUEST['puid'] ?? 0;
 
-	$color = DI::pConfig()->get($uid, "quattro", "color", $site_color);
-	$quattro_align = DI::pConfig()->get($uid, 'quattro', 'align', $site_quattro_align);
+	$color              = DI::pConfig()->get($uid, "quattro", "color", $site_color);
+	$quattro_align      = DI::pConfig()->get($uid, 'quattro', 'align', $site_quattro_align);
 	$textarea_font_size = DI::pConfig()->get($uid, "quattro", "tfs", $site_textarea_font_size);
-	$post_font_size = DI::pConfig()->get($uid, "quattro", "pfs", $site_post_font_size);
+	$post_font_size     = DI::pConfig()->get($uid, "quattro", "pfs", $site_post_font_size);
 }
 
 $color = \Friendica\Util\Strings::sanitizeFilePathItem($color);

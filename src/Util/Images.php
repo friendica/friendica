@@ -404,19 +404,19 @@ class Images
 			// constrain the width - let the height float.
 
 			if ((($height * 9) / 16) > $width) {
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} elseif ($width > $height) {
 				// else constrain both dimensions
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} else {
-				$dest_width = intval(ceil(($width * $max) / $height));
+				$dest_width  = intval(ceil(($width * $max) / $height));
 				$dest_height = $max;
 			}
 		} else {
 			if ($width > $max) {
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} else {
 				if ($height > $max) {
@@ -424,14 +424,14 @@ class Images
 					// but width is OK - don't do anything
 
 					if ((($height * 9) / 16) > $width) {
-						$dest_width = $width;
+						$dest_width  = $width;
 						$dest_height = $height;
 					} else {
-						$dest_width = intval(ceil(($width * $max) / $height));
+						$dest_width  = intval(ceil(($width * $max) / $height));
 						$dest_height = $max;
 					}
 				} else {
-					$dest_width = $width;
+					$dest_width  = $width;
 					$dest_height = $height;
 				}
 			}

@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter\Blocks;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Module\Api\Twitter\ContactEndpoint;
 use Friendica\Module\BaseApi;

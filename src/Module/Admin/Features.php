@@ -52,17 +52,17 @@ class Features extends BaseAdmin
 		$features  = [];
 		$selection = [DI::l10n()->t('No'), DI::l10n()->t('Yes'), DI::l10n()->t('Locked')];
 		foreach (Feature::get(false) as $fname => $fdata) {
-			$features[$fname] = [];
+			$features[$fname]    = [];
 			$features[$fname][0] = $fdata[0];
 			foreach (array_slice($fdata, 1) as $f) {
-				$set = DI::config()->get('feature', $f[0], $f[3]);
-				$selected = $f[4] ? 2 : (int)$set;
+				$set                   = DI::config()->get('feature', $f[0], $f[3]);
+				$selected              = $f[4] ? 2 : (int)$set;
 				$features[$fname][1][] = ['featureselect_' . $f[0], $f[1], $selected, $f[2], $selection];
 			}
 		}
 
 		$tpl = Renderer::getMarkupTemplate('admin/features.tpl');
-		$o = Renderer::replaceMacros($tpl, [
+		$o   = Renderer::replaceMacros($tpl, [
 			'$form_security_token' => self::getFormSecurityToken("admin_manage_features"),
 			'$title'               => DI::l10n()->t('Manage Additional Features'),
 			'$features'            => $features,

@@ -89,7 +89,7 @@ class NotifyMailBuilder extends MailBuilder
 			$body = $preamble;
 		}
 
-		$this->title = stripslashes($title);
+		$this->title    = stripslashes($title);
 		$this->subject  = $subject;
 		$this->preamble = $preamble;
 		$this->body     = $body;

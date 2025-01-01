@@ -39,7 +39,7 @@ class Revoke extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->dba     = $dba;
+		$this->dba = $dba;
 
 		if (!DI::userSession()->getLocalUserId()) {
 			return;

@@ -136,23 +136,23 @@ class Notification extends BaseRepository
 		$values = [$uid];
 
 		$type_condition = '';
-		$notify_type = $this->pconfig->get($uid, 'system', 'notify_type');
+		$notify_type    = $this->pconfig->get($uid, 'system', 'notify_type');
 		if (!is_null($notify_type)) {
 			$type_condition = 'AND `type` & ? != 0';
-			$values[] = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW;
+			$values[]       = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW;
 		}
 
 		$like_condition = '';
 		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
 			$like_condition = 'AND NOT `vid` IN (?, ?)';
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::LIKE);
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::DISLIKE);
+			$values[]       = Verb::getID(\Friendica\Protocol\Activity::LIKE);
+			$values[]       = Verb::getID(\Friendica\Protocol\Activity::DISLIKE);
 		}
 
 		$announce_condition = '';
 		if (!$this->pconfig->get($uid, 'system', 'notify_announce')) {
 			$announce_condition = 'AND vid != ?';
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE);
+			$values[]           = Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE);
 		}
 
 		$rows = $this->db->p("
@@ -259,12 +259,12 @@ class Notification extends BaseRepository
 	public function deleteForItem(int $itemUriId): bool
 	{
 		$conditionTarget = [
-			'vid' => Verb::getID(Activity::POST),
+			'vid'           => Verb::getID(Activity::POST),
 			'target-uri-id' => $itemUriId,
 		];
 
 		$conditionParent = [
-			'vid' => Verb::getID(Activity::POST),
+			'vid'           => Verb::getID(Activity::POST),
 			'parent-uri-id' => $itemUriId,
 		];
 

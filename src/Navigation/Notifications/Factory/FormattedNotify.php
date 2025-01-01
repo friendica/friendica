@@ -166,13 +166,13 @@ class FormattedNotify extends BaseFactory
 			default:
 				return new ValueObject\FormattedNotify(
 					$formattedItem['label'] ?? '',
-					$formattedItem['link'] ?? '',
+					$formattedItem['link']  ?? '',
 					$formattedItem['image'] ?? '',
-					$formattedItem['url'] ?? '',
-					$formattedItem['text'] ?? '',
-					$formattedItem['when'] ?? '',
-					$formattedItem['ago'] ?? '',
-					$formattedItem['seen'] ?? false
+					$formattedItem['url']   ?? '',
+					$formattedItem['text']  ?? '',
+					$formattedItem['when']  ?? '',
+					$formattedItem['ago']   ?? '',
+					$formattedItem['seen']  ?? false
 				);
 		}
 	}

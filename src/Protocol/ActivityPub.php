@@ -48,28 +48,28 @@ use Friendica\Util\JsonLD;
 class ActivityPub
 {
 	const PUBLIC_COLLECTION = 'https://www.w3.org/ns/activitystreams#Public';
-	const CONTEXT = [
+	const CONTEXT           = [
 		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
 		[
-			'ostatus' => 'http://ostatus.org#',
-			'vcard' => 'http://www.w3.org/2006/vcard/ns#',
-			'dfrn' => 'http://purl.org/macgirvin/dfrn/1.0/',
+			'ostatus'  => 'http://ostatus.org#',
+			'vcard'    => 'http://www.w3.org/2006/vcard/ns#',
+			'dfrn'     => 'http://purl.org/macgirvin/dfrn/1.0/',
 			'diaspora' => 'https://diasporafoundation.org/ns/',
-			'litepub' => 'http://litepub.social/ns#',
-			'toot' => 'http://joinmastodon.org/ns#',
+			'litepub'  => 'http://litepub.social/ns#',
+			'toot'     => 'http://joinmastodon.org/ns#',
 			'featured' => [
-				"@id" => "toot:featured",
+				"@id"   => "toot:featured",
 				"@type" => "@id",
 			],
-			'schema' => 'http://schema.org#',
+			'schema'                    => 'http://schema.org#',
 			'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
-			'sensitive' => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
-			'quoteUrl' => 'as:quoteUrl',
-			'conversation' => 'ostatus:conversation',
-			'directMessage' => 'litepub:directMessage',
-			'discoverable' => 'toot:discoverable',
-			'PropertyValue' => 'schema:PropertyValue',
-			'value' => 'schema:value',
+			'sensitive'                 => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
+			'quoteUrl'                  => 'as:quoteUrl',
+			'conversation'              => 'ostatus:conversation',
+			'directMessage'             => 'litepub:directMessage',
+			'discoverable'              => 'toot:discoverable',
+			'PropertyValue'             => 'schema:PropertyValue',
+			'value'                     => 'schema:value',
 		]
 	];
 	const ACCOUNT_TYPES = ['Person', 'Organization', 'Service', 'Group', 'Application', 'Tombstone'];
@@ -143,35 +143,35 @@ class ActivityPub
 			return [];
 		}
 
-		$profile = ['network' => Protocol::ACTIVITYPUB];
-		$profile['nick'] = $apcontact['nick'];
-		$profile['name'] = $apcontact['name'];
-		$profile['guid'] = $apcontact['uuid'];
-		$profile['url'] = $apcontact['url'];
-		$profile['addr'] = $apcontact['addr'];
-		$profile['alias'] = $apcontact['alias'];
-		$profile['following'] = $apcontact['following'];
-		$profile['followers'] = $apcontact['followers'];
-		$profile['inbox'] = $apcontact['inbox'];
-		$profile['outbox'] = $apcontact['outbox'];
-		$profile['sharedinbox'] = $apcontact['sharedinbox'];
-		$profile['photo'] = $apcontact['photo'];
-		$profile['header'] = $apcontact['header'];
+		$profile                 = ['network' => Protocol::ACTIVITYPUB];
+		$profile['nick']         = $apcontact['nick'];
+		$profile['name']         = $apcontact['name'];
+		$profile['guid']         = $apcontact['uuid'];
+		$profile['url']          = $apcontact['url'];
+		$profile['addr']         = $apcontact['addr'];
+		$profile['alias']        = $apcontact['alias'];
+		$profile['following']    = $apcontact['following'];
+		$profile['followers']    = $apcontact['followers'];
+		$profile['inbox']        = $apcontact['inbox'];
+		$profile['outbox']       = $apcontact['outbox'];
+		$profile['sharedinbox']  = $apcontact['sharedinbox'];
+		$profile['photo']        = $apcontact['photo'];
+		$profile['header']       = $apcontact['header'];
 		$profile['account-type'] = self::getAccountType($apcontact);
-		$profile['community'] = ($profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
+		$profile['community']    = ($profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
 		// $profile['keywords']
 		// $profile['location']
-		$profile['about'] = $apcontact['about'];
-		$profile['xmpp'] = $apcontact['xmpp'];
-		$profile['matrix'] = $apcontact['matrix'];
-		$profile['batch'] = $apcontact['sharedinbox'];
-		$profile['notify'] = $apcontact['inbox'];
-		$profile['poll'] = $apcontact['outbox'];
-		$profile['pubkey'] = $apcontact['pubkey'];
-		$profile['subscribe'] = $apcontact['subscribe'];
+		$profile['about']            = $apcontact['about'];
+		$profile['xmpp']             = $apcontact['xmpp'];
+		$profile['matrix']           = $apcontact['matrix'];
+		$profile['batch']            = $apcontact['sharedinbox'];
+		$profile['notify']           = $apcontact['inbox'];
+		$profile['poll']             = $apcontact['outbox'];
+		$profile['pubkey']           = $apcontact['pubkey'];
+		$profile['subscribe']        = $apcontact['subscribe'];
 		$profile['manually-approve'] = $apcontact['manually-approve'];
-		$profile['baseurl'] = $apcontact['baseurl'];
-		$profile['gsid'] = $apcontact['gsid'];
+		$profile['baseurl']          = $apcontact['baseurl'];
+		$profile['gsid']             = $apcontact['gsid'];
 
 		if (!is_null($apcontact['discoverable'])) {
 			$profile['hide'] = !$apcontact['discoverable'];
@@ -308,7 +308,7 @@ class ActivityPub
 		$limited = DI::config()->get('system', 'limited_servers');
 		if (!empty($limited)) {
 			$servers = explode(',', str_replace(' ', '', $limited));
-			$host = parse_url($apcontact['baseurl'], PHP_URL_HOST);
+			$host    = parse_url($apcontact['baseurl'], PHP_URL_HOST);
 			if (!empty($host) && in_array($host, $servers)) {
 				return false;
 			}

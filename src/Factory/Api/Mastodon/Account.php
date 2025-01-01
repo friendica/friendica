@@ -109,9 +109,9 @@ class Account extends BaseFactory
 	private function getContactRelationCountForUid(int $uid, array $rel): int
 	{
 		$condition = [
-			'uid' => $uid,
-			'rel' => $rel,
-			'self' => false,
+			'uid'     => $uid,
+			'rel'     => $rel,
+			'self'    => false,
 			'deleted' => false,
 			'archive' => false,
 			'pending' => false,

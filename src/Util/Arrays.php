@@ -15,7 +15,8 @@ class Arrays
 	/**
 	 * Private constructor
 	 */
-	private function __construct() {
+	private function __construct()
+	{
 		// Utilities don't have instances
 	}
 
@@ -26,7 +27,8 @@ class Arrays
 	 * @param string $glue  Glue for imploded elements
 	 * @return string String with elements from array
 	 */
-	public static function recursiveImplode(array $array, $glue) {
+	public static function recursiveImplode(array $array, $glue)
+	{
 		// Init returned string
 		$string = '';
 

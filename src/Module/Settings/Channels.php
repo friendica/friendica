@@ -127,7 +127,7 @@ class Channels extends BaseSettings
 			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
 		}
 
-		$user = User::getById($uid, ['account-type']);
+		$user         = User::getById($uid, ['account-type']);
 		$account_type = $user['account-type'];
 
 		if (in_array($account_type, [User::ACCOUNT_TYPE_COMMUNITY, User::ACCOUNT_TYPE_RELAY])) {
@@ -151,7 +151,7 @@ class Channels extends BaseSettings
 			$circles[$circle['id']] = $circle['name'];
 		}
 
-		$languages = $this->l10n->getLanguageCodes(true);
+		$languages         = $this->l10n->getLanguageCodes(true);
 		$channel_languages = User::getWantedLanguages($uid);
 
 		$channels = [];

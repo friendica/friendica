@@ -49,9 +49,9 @@ class PushSubscription extends BaseApi
 		$subscription = [
 			'application-id'                => $application['id'],
 			'uid'                           => $uid,
-			'endpoint'                      => $request['subscription']['endpoint'] ?? '',
+			'endpoint'                      => $request['subscription']['endpoint']       ?? '',
 			'pubkey'                        => $request['subscription']['keys']['p256dh'] ?? '',
-			'secret'                        => $request['subscription']['keys']['auth'] ?? '',
+			'secret'                        => $request['subscription']['keys']['auth']   ?? '',
 			Notification::TYPE_FOLLOW       => filter_var($request['data']['alerts'][Notification::TYPE_FOLLOW] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_LIKE         => filter_var($request['data']['alerts'][Notification::TYPE_LIKE] ?? false, FILTER_VALIDATE_BOOLEAN),
 			Notification::TYPE_RESHARE      => filter_var($request['data']['alerts'][Notification::TYPE_RESHARE] ?? false, FILTER_VALIDATE_BOOLEAN),

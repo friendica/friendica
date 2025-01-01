@@ -63,7 +63,7 @@ class JsonLD
 				break;
 			default:
 				switch (parse_url($url, PHP_URL_PATH)) {
-					case '/schemas/litepub-0.1.jsonld';
+					case '/schemas/litepub-0.1.jsonld':
 						$url = DI::basePath() . '/static/litepub-0.1.jsonld';
 						break;
 					case '/apschema/v1.2':
@@ -118,10 +118,10 @@ class JsonLD
 		$jsonobj = json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
 		try {
-			$normalized = jsonld_normalize($jsonobj, array('algorithm' => 'URDNA2015', 'format' => 'application/nquads'));
+			$normalized = jsonld_normalize($jsonobj, ['algorithm' => 'URDNA2015', 'format' => 'application/nquads']);
 		} catch (Exception $e) {
-			$normalized = false;
-			$messages = [];
+			$normalized       = false;
+			$messages         = [];
 			$currentException = $e;
 			do {
 				$messages[] = $currentException->getMessage();
@@ -149,23 +149,23 @@ class JsonLD
 		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
 
 		$context = (object)[
-			'as' => 'https://www.w3.org/ns/activitystreams#',
-			'w3id' => 'https://w3id.org/security#',
-			'ldp' => (object)['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
-			'vcard' => (object)['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
-			'dfrn' => (object)['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
-			'diaspora' => (object)['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
-			'ostatus' => (object)['@id' => 'http://ostatus.org#', '@type' => '@id'],
-			'dc' => (object)['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
-			'toot' => (object)['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
-			'litepub' => (object)['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
-			'sc' => (object)['@id' => 'http://schema.org#', '@type' => '@id'],
-			'pt' => (object)['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
+			'as'        => 'https://www.w3.org/ns/activitystreams#',
+			'w3id'      => 'https://w3id.org/security#',
+			'ldp'       => (object)['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
+			'vcard'     => (object)['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
+			'dfrn'      => (object)['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
+			'diaspora'  => (object)['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
+			'ostatus'   => (object)['@id' => 'http://ostatus.org#', '@type' => '@id'],
+			'dc'        => (object)['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
+			'toot'      => (object)['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
+			'litepub'   => (object)['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
+			'sc'        => (object)['@id' => 'http://schema.org#', '@type' => '@id'],
+			'pt'        => (object)['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
 			'mobilizon' => (object)['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
-			'fedibird' => (object)['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
-			'misskey' => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
-			'pixelfed' => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
-			'lemmy' => (object)['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
+			'fedibird'  => (object)['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
+			'misskey'   => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
+			'pixelfed'  => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
+			'lemmy'     => (object)['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
 		];
 
 		$orig_json = $json;

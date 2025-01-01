@@ -11,5 +11,4 @@ use Friendica\BaseCollection;
 
 class Emojis extends BaseCollection
 {
-
 }

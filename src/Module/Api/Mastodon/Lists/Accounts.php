@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Lists;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Circle;
@@ -40,7 +39,7 @@ class Accounts extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 
 		$request = $this->getRequest([
-			'account_ids' =>  [], // Array of account IDs to add to the list
+			'account_ids' => [], // Array of account IDs to add to the list
 		], $request);
 
 		if (empty($request['account_ids']) || empty($this->parameters['id'])) {

@@ -33,7 +33,7 @@ class Token extends BaseDataTransferObject
 	 * @param string $access_token Token string
 	 * @param string $token_type   Always "Bearer"
 	 * @param string $scope        Combination of "read write follow push"
-	 * @param string $created_at   Creation date of the token 
+	 * @param string $created_at   Creation date of the token
 	 * @param string $me           Actor profile of the token owner
 	 */
 	public function __construct(string $access_token, string $token_type, string $scope, string $created_at, string $me = null)

@@ -120,7 +120,7 @@ class OAuth
 
 		if (!empty($redirect_uri)) {
 			$redirect_uri = strtok($redirect_uri, '?');
-			$condition = DBA::mergeConditions($condition, ["`redirect_uri` LIKE ?", '%' . $redirect_uri . '%']);
+			$condition    = DBA::mergeConditions($condition, ["`redirect_uri` LIKE ?", '%' . $redirect_uri . '%']);
 		}
 
 		$application = DBA::selectFirst('application', [], $condition);

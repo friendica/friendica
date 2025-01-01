@@ -58,7 +58,7 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->dba  =$dba;
+		$this->dba     = $dba;
 	}
 
 	protected function doExecute(): int

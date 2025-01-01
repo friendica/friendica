@@ -95,7 +95,8 @@ class Export extends BaseModule
 
 		// If nothing went wrong we can echo the export content
 		if ($evexport["success"]) {
-			$this->response->setHeader(sprintf('Content-Disposition: attachment; filename="%s-%s.%s"',
+			$this->response->setHeader(sprintf(
+				'Content-Disposition: attachment; filename="%s-%s.%s"',
 				$this->t('calendar'),
 				$this->parameters['nickname'],
 				$evexport["extension"]

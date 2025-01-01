@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 
 /**
  * Static definition for the Firefox Account Manager
@@ -20,16 +19,16 @@ class AccountManagementControlDocument extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		$output = [
-			'version' => 1,
+			'version'       => 1,
 			'sessionstatus' => [
 				'method' => 'GET',
-				'path' => '/session',
+				'path'   => '/session',
 			],
 			'auth-methods' => [
 				'username-password-form' => [
 					'connect' => [
 						'method' => 'POST',
-						'path' => '/login',
+						'path'   => '/login',
 						'params' => [
 							'username' => 'login-name',
 							'password' => 'password',
@@ -40,7 +39,7 @@ class AccountManagementControlDocument extends BaseModule
 					],
 					'disconnect' => [
 						'method' => 'GET',
-						'path' => '/logout',
+						'path'   => '/logout',
 					],
 				],
 			],
@@ -48,7 +47,7 @@ class AccountManagementControlDocument extends BaseModule
 				'username-password-form' => [
 					'connect' => [
 						'method' => 'POST',
-						'path' => '/login',
+						'path'   => '/login',
 						'params' => [
 							'username' => 'login-name',
 							'password' => 'password',
@@ -59,7 +58,7 @@ class AccountManagementControlDocument extends BaseModule
 					],
 					'disconnect' => [
 						'method' => 'GET',
-						'path' => '/logout',
+						'path'   => '/logout',
 					],
 				],
 			],

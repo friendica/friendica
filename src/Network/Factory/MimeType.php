@@ -21,12 +21,12 @@ class MimeType extends BaseFactory
 	{
 		if ($contentType) {
 			$parameterStrings = explode(';', $contentType);
-			$mimetype = array_shift($parameterStrings);
+			$mimetype         = array_shift($parameterStrings);
 
 			$types = explode('/', $mimetype);
 			if (count($types) >= 2) {
 				$filetype = strtolower($types[0]);
-				$subtype = strtolower($types[1]);
+				$subtype  = strtolower($types[1]);
 			} else {
 				$this->logger->notice('Unknown MimeType', ['type' => $contentType]);
 			}
@@ -34,12 +34,12 @@ class MimeType extends BaseFactory
 			$parameters = [];
 			foreach ($parameterStrings as $parameterString) {
 				$parameterString = trim($parameterString);
-				$parameterParts = explode('=', $parameterString, 2);
+				$parameterParts  = explode('=', $parameterString, 2);
 				if (count($parameterParts) < 2) {
 					continue;
 				}
 
-				$attribute = trim($parameterParts[0]);
+				$attribute   = trim($parameterParts[0]);
 				$valueString = trim($parameterParts[1]);
 
 				if ($valueString[0] == '"' && $valueString[strlen($valueString) - 1] == '"') {
@@ -53,8 +53,8 @@ class MimeType extends BaseFactory
 		}
 
 		return new Entity\MimeType(
-			$filetype ?? 'unkn',
-			$subtype ?? 'unkn',
+			$filetype   ?? 'unkn',
+			$subtype    ?? 'unkn',
 			$parameters ?? [],
 		);
 	}

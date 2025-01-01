@@ -93,7 +93,7 @@ EOT;
 	// Hide the left menu bar
 	/// @TODO maybe move this static array out where it should belong?
 	if (empty(DI::page()['aside']) && in_array($args->get(0), ["community", "calendar", "help", "delegation", "notifications",
-			"probe", "webfinger", "login", "invite", "credits"])) {
+		"probe", "webfinger", "login", "invite", "credits"])) {
 		DI::page()['htmlhead'] .= "<link rel='stylesheet' href='view/theme/vier/hide.css' />";
 	}
 }
@@ -117,12 +117,12 @@ function get_vier_config($key, $default = false, $admin = false)
 
 function vier_community_info()
 {
-	$show_pages      = get_vier_config("show_pages", 1);
-	$show_profiles   = get_vier_config("show_profiles", 1);
-	$show_helpers    = get_vier_config("show_helpers", 1);
-	$show_services   = get_vier_config("show_services", 1);
-	$show_friends    = get_vier_config("show_friends", 1);
-	$show_lastusers  = get_vier_config("show_lastusers", 1);
+	$show_pages     = get_vier_config("show_pages", 1);
+	$show_profiles  = get_vier_config("show_profiles", 1);
+	$show_helpers   = get_vier_config("show_helpers", 1);
+	$show_services  = get_vier_config("show_services", 1);
+	$show_friends   = get_vier_config("show_friends", 1);
+	$show_lastusers = get_vier_config("show_lastusers", 1);
 
 	// get_baseurl
 	$aside['$url'] = $url = (string)DI::baseUrl();
@@ -138,10 +138,10 @@ function vier_community_info()
 
 			foreach ($contacts as $contact) {
 				$entry = Renderer::replaceMacros($tpl, [
-					'$id' => $contact['id'],
+					'$id'           => $contact['id'],
 					'$profile_link' => 'contact/follow?url=' . urlencode($contact['url']),
-					'$photo' => Contact::getMicro($contact),
-					'$alt_text' => $contact['name'],
+					'$photo'        => Contact::getMicro($contact),
+					'$alt_text'     => $contact['name'],
 				]);
 				$aside['$community_profiles_items'][] = $entry;
 			}
@@ -165,11 +165,11 @@ function vier_community_info()
 
 			foreach ($profiles as $profile) {
 				$profile_link = 'profile/' . ((strlen($profile['nickname'])) ? $profile['nickname'] : $profile['uid']);
-				$entry = Renderer::replaceMacros($tpl, [
-					'$id' => $profile['id'],
+				$entry        = Renderer::replaceMacros($tpl, [
+					'$id'           => $profile['id'],
 					'$profile_link' => $profile_link,
-					'$photo' => DI::baseUrl()->remove($profile['thumb']),
-					'$alt_text' => $profile['name']]);
+					'$photo'        => DI::baseUrl()->remove($profile['thumb']),
+					'$alt_text'     => $profile['name']]);
 				$aside['$lastusers_items'][] = $entry;
 			}
 		}
@@ -177,18 +177,18 @@ function vier_community_info()
 
 	//right_aside FIND FRIENDS
 	if ($show_friends && DI::userSession()->getLocalUserId()) {
-		$nv = [];
-		$nv['findpeople'] = DI::l10n()->t('Find People');
-		$nv['desc'] = DI::l10n()->t('Enter name or interest');
-		$nv['label'] = DI::l10n()->t('Connect/Follow');
-		$nv['hint'] = DI::l10n()->t('Examples: Robert Morgenstein, Fishing');
-		$nv['findthem'] = DI::l10n()->t('Find');
-		$nv['suggest'] = DI::l10n()->t('Friend Suggestions');
-		$nv['similar'] = DI::l10n()->t('Similar Interests');
-		$nv['random'] = DI::l10n()->t('Random Profile');
-		$nv['inv'] = DI::l10n()->t('Invite Friends');
-		$nv['directory'] = DI::l10n()->t('Global Directory');
-		$nv['global_dir'] = Search::getGlobalDirectory();
+		$nv                    = [];
+		$nv['findpeople']      = DI::l10n()->t('Find People');
+		$nv['desc']            = DI::l10n()->t('Enter name or interest');
+		$nv['label']           = DI::l10n()->t('Connect/Follow');
+		$nv['hint']            = DI::l10n()->t('Examples: Robert Morgenstein, Fishing');
+		$nv['findthem']        = DI::l10n()->t('Find');
+		$nv['suggest']         = DI::l10n()->t('Friend Suggestions');
+		$nv['similar']         = DI::l10n()->t('Similar Interests');
+		$nv['random']          = DI::l10n()->t('Random Profile');
+		$nv['inv']             = DI::l10n()->t('Invite Friends');
+		$nv['directory']       = DI::l10n()->t('Global Directory');
+		$nv['global_dir']      = Search::getGlobalDirectory();
 		$nv['local_directory'] = DI::l10n()->t('Local Directory');
 
 		$aside['$nv'] = $nv;
@@ -224,14 +224,14 @@ function vier_community_info()
 		$tpl = Renderer::getMarkupTemplate('ch_helpers.tpl');
 
 		if ($r) {
-			$helpers = [];
+			$helpers          = [];
 			$helpers['title'] = ["", DI::l10n()->t('Help'), "", ""];
 
 			$aside['$helpers_items'] = [];
 
 			foreach ($r as $rr) {
 				$entry = Renderer::replaceMacros($tpl, [
-					'$url' => $rr['url'],
+					'$url'   => $rr['url'],
 					'$title' => $rr['name'],
 				]);
 				$aside['$helpers_items'][] = $entry;
@@ -303,14 +303,14 @@ function vier_community_info()
 		$tpl = Renderer::getMarkupTemplate('ch_connectors.tpl');
 
 		if (DBA::isResult($r)) {
-			$con_services = [];
-			$con_services['title'] = ["", DI::l10n()->t('Connect Services'), "", ""];
+			$con_services           = [];
+			$con_services['title']  = ["", DI::l10n()->t('Connect Services'), "", ""];
 			$aside['$con_services'] = $con_services;
 
 			foreach ($r as $rr) {
 				$entry = Renderer::replaceMacros($tpl, [
-					'$url' => $url,
-					'$photo' => $rr['photo'],
+					'$url'      => $url,
+					'$photo'    => $rr['photo'],
 					'$alt_text' => $rr['name'],
 				]);
 				$aside['$connector_items'][] = $entry;
@@ -320,7 +320,7 @@ function vier_community_info()
 	//end connectable services
 
 	//print right_aside
-	$tpl = Renderer::getMarkupTemplate('communityhome.tpl');
+	$tpl                      = Renderer::getMarkupTemplate('communityhome.tpl');
 	DI::page()['right_aside'] = Renderer::replaceMacros($tpl, $aside);
 }
 

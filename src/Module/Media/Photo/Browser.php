@@ -99,7 +99,8 @@ class Browser extends BaseModule
 				Proxy::PIXEL_MEDIUM,
 				Proxy::PIXEL_MEDIUM
 			],
-			['order' => ['scale']]);
+			['order' => ['scale']]
+		);
 		$scale = $photo['scale'] ?? $record['loq'];
 
 		return [

@@ -12,7 +12,6 @@ use Friendica\BaseModule;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Module\Response;

@@ -33,7 +33,7 @@ class RemoveUnusedAvatars
 
 		$total = DBA::count('contact', $condition);
 		Logger::notice('Starting removal', ['total' => $total]);
-		$count = 0;
+		$count    = 0;
 		$contacts = DBA::select('contact', ['id', 'uri-id', 'uid', 'photo', 'thumb', 'micro'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
 			if (Avatar::deleteCache($contact) || Photo::delete(['uid' => 0, 'contact-id' => $contact['id'], 'photo-type' => [Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER]])) {
@@ -52,8 +52,8 @@ class RemoveUnusedAvatars
 
 	private static function fixPhotoContacts()
 	{
-		$total = 0;
-		$deleted = 0;
+		$total    = 0;
+		$deleted  = 0;
 		$updated1 = 0;
 		$updated2 = 0;
 		Logger::notice('Starting contact fix');
@@ -61,7 +61,7 @@ class RemoveUnusedAvatars
 		while ($photo = DBA::fetch($photos)) {
 			$total++;
 			$photo_contact = Contact::getById($photo['contact-id']);
-			$resource = Photo::ridFromURI($photo_contact['photo']);
+			$resource      = Photo::ridFromURI($photo_contact['photo']);
 			if ($photo['resource-id'] == $resource) {
 				$contact = DBA::selectFirst('contact', [], ['nurl' => $photo_contact['nurl'], 'uid' => 0]);
 				if (!empty($contact['photo']) && ($contact['photo'] == $photo_contact['photo'])) {
@@ -70,7 +70,7 @@ class RemoveUnusedAvatars
 					$updated1++;
 				}
 			} else {
-				$updated = false;
+				$updated  = false;
 				$contacts = DBA::select('contact', [], ['nurl' => $photo_contact['nurl']]);
 				while ($contact = DBA::fetch($contacts)) {
 					if ($photo['resource-id'] == Photo::ridFromURI($contact['photo'])) {
@@ -96,7 +96,7 @@ class RemoveUnusedAvatars
 	{
 		$size = [4 => 'photo', 5 => 'thumb', 6 => 'micro'];
 
-		$total = 0;
+		$total   = 0;
 		$deleted = 0;
 		Logger::notice('Starting duplicate removal');
 		$photos = DBA::p("SELECT `photo`.`id`, `photo`.`uid`, `photo`.`scale`, `photo`.`album`, `photo`.`contact-id`, `photo`.`resource-id`, `contact`.`photo`, `contact`.`thumb`, `contact`.`micro` FROM `photo` INNER JOIN `contact` ON `contact`.`id` = `photo`.`contact-id` and `photo`.`contact-id` != ? AND `photo`.`scale` IN (?, ?, ?)", 0, 4, 5, 6);

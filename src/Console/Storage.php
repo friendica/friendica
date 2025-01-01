@@ -96,7 +96,7 @@ HELP;
 
 	protected function doList()
 	{
-		$rowfmt = ' %-3s | %-20s';
+		$rowfmt  = ' %-3s | %-20s';
 		$current = $this->storageManager->getBackend();
 		$this->out(sprintf($rowfmt, 'Sel', 'Name'));
 		$this->out('-----------------------');
@@ -104,7 +104,7 @@ HELP;
 		foreach ($this->storageManager->listBackends() as $name) {
 			$issel = ' ';
 			if ($current && $current::getName() == $name) {
-				$issel = '*';
+				$issel       = '*';
 				$isregisterd = true;
 			};
 			$this->out(sprintf($rowfmt, $issel, $name));
@@ -176,7 +176,7 @@ HELP;
 		}
 
 		$current = $this->storageManager->getBackend();
-		$total = 0;
+		$total   = 0;
 
 		if (is_null($current)) {
 			throw new StorageException(sprintf("Cannot move to legacy storage. Please select a storage backend."));

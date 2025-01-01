@@ -24,7 +24,7 @@ use Friendica\Protocol\ActivityPub;
 class Circle
 {
 	const FOLLOWERS = '~';
-	const MUTUALS = '&';
+	const MUTUALS   = '&';
 
 	/**
 	 * Fetches circle record by user id and maybe includes deleted circles as well
@@ -164,7 +164,8 @@ class Circle
 	 */
 	public static function countUnseen(int $uid)
 	{
-		$stmt = DBA::p("SELECT `circle`.`id`, `circle`.`name`,
+		$stmt = DBA::p(
+			"SELECT `circle`.`id`, `circle`.`name`,
 				(SELECT COUNT(*) FROM `post-user`
 					WHERE `uid` = ?
 					AND `unseen`
@@ -231,15 +232,15 @@ class Circle
 
 			if ($user['def_gid'] == $gid) {
 				$user['def_gid'] = 0;
-				$change = true;
+				$change          = true;
 			}
 			if (strpos($user['allow_gid'], '<' . $gid . '>') !== false) {
 				$user['allow_gid'] = str_replace('<' . $gid . '>', '', $user['allow_gid']);
-				$change = true;
+				$change            = true;
 			}
 			if (strpos($user['deny_gid'], '<' . $gid . '>') !== false) {
 				$user['deny_gid'] = str_replace('<' . $gid . '>', '', $user['deny_gid']);
-				$change = true;
+				$change           = true;
 			}
 
 			if ($change) {
@@ -411,13 +412,13 @@ class Circle
 		if ($key !== false) {
 			if ($expand_followers) {
 				$followers = Contact::selectToArray(['id'], [
-					'uid' => $uid,
-					'rel' => [Contact::FOLLOWER, Contact::FRIEND],
-					'network' => $networks,
+					'uid'          => $uid,
+					'rel'          => [Contact::FOLLOWER, Contact::FRIEND],
+					'network'      => $networks,
 					'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON, Contact::TYPE_NEWS, Contact::TYPE_ORGANISATION],
-					'archive' => false,
-					'pending' => false,
-					'blocked' => false,
+					'archive'      => false,
+					'pending'      => false,
+					'blocked'      => false,
 				]);
 
 				foreach ($followers as $follower) {
@@ -432,13 +433,13 @@ class Circle
 		$key = array_search(self::MUTUALS, $circle_ids);
 		if ($key !== false) {
 			$mutuals = Contact::selectToArray(['id'], [
-				'uid' => $uid,
-				'rel' => [Contact::FRIEND],
-				'network' => $networks,
+				'uid'          => $uid,
+				'rel'          => [Contact::FRIEND],
+				'network'      => $networks,
 				'contact-type' => [Contact::TYPE_UNKNOWN, Contact::TYPE_PERSON],
-				'archive' => false,
-				'pending' => false,
-				'blocked' => false,
+				'archive'      => false,
+				'pending'      => false,
+				'blocked'      => false,
 			]);
 
 			foreach ($mutuals as $mutual) {
@@ -479,8 +480,8 @@ class Circle
 	{
 		$display_circles = [
 			[
-				'name' => '',
-				'id' => '0',
+				'name'     => '',
+				'id'       => '0',
 				'selected' => ''
 			]
 		];
@@ -488,8 +489,8 @@ class Circle
 		$stmt = DBA::select('group', [], ['deleted' => false, 'uid' => $uid, 'cid' => null], ['order' => ['name']]);
 		while ($circle = DBA::fetch($stmt)) {
 			$display_circles[] = [
-				'name' => $circle['name'],
-				'id' => $circle['id'],
+				'name'     => $circle['name'],
+				'id'       => $circle['id'],
 				'selected' => $gid == $circle['id'] ? 'true' : ''
 			];
 		}
@@ -498,8 +499,8 @@ class Circle
 		Logger::info('Got circles', $display_circles);
 
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('circle_selection.tpl'), [
-			'$id' => $id,
-			'$label' => $label,
+			'$id'      => $id,
+			'$label'   => $label,
 			'$circles' => $display_circles
 		]);
 		return $o;
@@ -527,10 +528,10 @@ class Circle
 
 		$display_circles = [
 			[
-				'text' => DI::l10n()->t('Everybody'),
-				'id' => 0,
+				'text'     => DI::l10n()->t('Everybody'),
+				'id'       => 0,
 				'selected' => (($circle_id === 'everyone') ? 'circle-selected' : ''),
-				'href' => $every,
+				'href'     => $every,
 			]
 		];
 
@@ -545,7 +546,7 @@ class Circle
 
 			if ($editmode == 'full') {
 				$circleedit = [
-					'href' => 'circle/' . $circle['id'],
+					'href'  => 'circle/' . $circle['id'],
 					'title' => DI::l10n()->t('edit'),
 				];
 			} else {
@@ -553,23 +554,23 @@ class Circle
 			}
 
 			if ($each == 'circle') {
-				$networks = Widget::unavailableNetworks();
+				$networks   = Widget::unavailableNetworks();
 				$sql_values = array_merge([$circle['id']], $networks);
-				$condition = ["`circle-id` = ? AND NOT `contact-network` IN (" . substr(str_repeat("?, ", count($networks)), 0, -2) . ")"];
-				$condition = array_merge($condition, $sql_values);
+				$condition  = ["`circle-id` = ? AND NOT `contact-network` IN (" . substr(str_repeat("?, ", count($networks)), 0, -2) . ")"];
+				$condition  = array_merge($condition, $sql_values);
 
-				$count = DBA::count('circle-member-view', $condition);
+				$count       = DBA::count('circle-member-view', $condition);
 				$circle_name = sprintf('%s (%d)', $circle['name'], $count);
 			} else {
 				$circle_name = $circle['name'];
 			}
 
 			$display_circles[] = [
-				'id'   => $circle['id'],
-				'cid'  => $cid,
-				'text' => $circle_name,
-				'href' => $each . '/' . $circle['id'],
-				'edit' => $circleedit,
+				'id'       => $circle['id'],
+				'cid'      => $cid,
+				'text'     => $circle_name,
+				'href'     => $each . '/' . $circle['id'],
+				'edit'     => $circleedit,
 				'selected' => $selected,
 				'ismember' => in_array($circle['id'], $member_of),
 			];
@@ -582,18 +583,18 @@ class Circle
 		}
 
 		$tpl = Renderer::getMarkupTemplate('circle_side.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$add' => DI::l10n()->t('add'),
-			'$title' => DI::l10n()->t('Circles'),
-			'$circles' => $display_circles,
-			'$new_circle' => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
-			'$circle_page' => 'circle/',
-			'$edittext' => DI::l10n()->t('Edit circle'),
-			'$uncircled' => $every === 'contact' ? DI::l10n()->t('Contacts not in any circle') : '',
-			'$uncircled_selected' => (($circle_id === 'none') ? 'circle-selected' : ''),
-			'$createtext' => DI::l10n()->t('Create a new circle'),
-			'$create_circle' => DI::l10n()->t('Circle Name: '),
-			'$edit_circles_text' => DI::l10n()->t('Edit circles'),
+		$o   = Renderer::replaceMacros($tpl, [
+			'$add'                 => DI::l10n()->t('add'),
+			'$title'               => DI::l10n()->t('Circles'),
+			'$circles'             => $display_circles,
+			'$new_circle'          => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
+			'$circle_page'         => 'circle/',
+			'$edittext'            => DI::l10n()->t('Edit circle'),
+			'$uncircled'           => $every === 'contact' ? DI::l10n()->t('Contacts not in any circle') : '',
+			'$uncircled_selected'  => (($circle_id === 'none') ? 'circle-selected' : ''),
+			'$createtext'          => DI::l10n()->t('Create a new circle'),
+			'$create_circle'       => DI::l10n()->t('Circle Name: '),
+			'$edit_circles_text'   => DI::l10n()->t('Edit circles'),
 			'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
 		]);
 

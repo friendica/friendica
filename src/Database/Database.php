@@ -62,15 +62,15 @@ class Database
 	protected $server_info = '';
 	/** @var PDO|mysqli */
 	protected $connection;
-	protected $driver = '';
+	protected $driver               = '';
 	protected $pdo_emulate_prepares = false;
-	private $error = '';
-	private $errorno = 0;
-	private $affected_rows = 0;
-	protected $in_transaction = false;
-	protected $in_retrial = false;
-	protected $testmode = false;
-	private $relation = [];
+	private $error                  = '';
+	private $errorno                = 0;
+	private $affected_rows          = 0;
+	protected $in_transaction       = false;
+	protected $in_retrial           = false;
+	protected $testmode             = false;
+	private $relation               = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -86,7 +86,7 @@ class Database
 		$this->viewDefinition = $viewDefinition;
 
 		// Use dummy values - necessary for the first factory call of the logger itself
-		$this->logger = new NullLogger();
+		$this->logger   = new NullLogger();
 		$this->profiler = new Profiler($config);
 
 		$this->connect();
@@ -630,7 +630,7 @@ class Database
 					} elseif (is_string($args[$param])) {
 						$param_types .= 's';
 					} elseif (is_object($args[$param]) && method_exists($args[$param], '__toString')) {
-						$param_types  .= 's';
+						$param_types .= 's';
 						$args[$param] = (string)$args[$param];
 					} else {
 						$param_types .= 'b';
@@ -677,9 +677,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $args),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $args),
 			]);
 
 			// On a lost connection we try to reconnect - but only once.
@@ -784,9 +784,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $params),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $params),
 			]);
 
 			// On a lost connection we simply quit.
@@ -1335,7 +1335,7 @@ class Database
 			return true;
 		}
 
-		$fields = $this->castFields($table, $fields);
+		$fields        = $this->castFields($table, $fields);
 		$direct_fields = [];
 
 		foreach ($fields as $key => $value) {

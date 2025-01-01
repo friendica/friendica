@@ -9,7 +9,6 @@ namespace Friendica\Module\Api\Mastodon\Statuses;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;

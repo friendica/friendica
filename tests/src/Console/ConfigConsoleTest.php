@@ -25,7 +25,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 	/** @var IManageConfigValues|LegacyMockInterface|MockInterface */
 	private $configMock;
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -165,7 +165,7 @@ Options: array (
 test.it => now
 
 CONF;
-		$txt        = $this->dumpExecute($console);
+		$txt = $this->dumpExecute($console);
 		self::assertEquals($assertion, $txt);
 	}
 

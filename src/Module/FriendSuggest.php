@@ -129,7 +129,7 @@ class FriendSuggest extends BaseModule
 				'',
 				$formattedContacts,
 			],
-			'$submit'          => $this->t('Submit'),
+			'$submit' => $this->t('Submit'),
 		]);
 	}
 }

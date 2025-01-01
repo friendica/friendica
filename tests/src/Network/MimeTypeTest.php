@@ -18,47 +18,47 @@ class MimeTypeTest extends TestCase
 	{
 		return [
 			'image/jpg' => [
-				'expected' => new Entity\MimeType('image', 'jpg'),
+				'expected'    => new Entity\MimeType('image', 'jpg'),
 				'contentType' => 'image/jpg',
 			],
 			'image/jpg;charset=utf8' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
 				'contentType' => 'image/jpg; charset=utf8',
 			],
 			'image/jpg; charset=utf8' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
 				'contentType' => 'image/jpg; charset=utf8',
 			],
 			'image/jpg; charset = utf8' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
 				'contentType' => 'image/jpg; charset=utf8',
 			],
 			'image/jpg; charset="utf8"' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
 				'contentType' => 'image/jpg; charset="utf8"',
 			],
 			'image/jpg; charset="\"utf8\""' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => '"utf8"']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => '"utf8"']),
 				'contentType' => 'image/jpg; charset="\"utf8\""',
 			],
 			'image/jpg; charset="\"utf8\" (comment)"' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => '"utf8"']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => '"utf8"']),
 				'contentType' => 'image/jpg; charset="\"utf8\" (comment)"',
 			],
 			'image/jpg; charset=utf8 (comment)' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8']),
 				'contentType' => 'image/jpg; charset="utf8 (comment)"',
 			],
 			'image/jpg; charset=utf8; attribute=value' => [
-				'expected' => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8', 'attribute' => 'value']),
+				'expected'    => new Entity\MimeType('image', 'jpg', ['charset' => 'utf8', 'attribute' => 'value']),
 				'contentType' => 'image/jpg; charset=utf8; attribute=value',
 			],
 			'empty' => [
-				'expected' => new Entity\MimeType('unkn', 'unkn'),
+				'expected'    => new Entity\MimeType('unkn', 'unkn'),
 				'contentType' => '',
 			],
 			'unknown' => [
-				'expected' => new Entity\MimeType('unkn', 'unkn'),
+				'expected'    => new Entity\MimeType('unkn', 'unkn'),
 				'contentType' => 'unknown',
 			],
 		];

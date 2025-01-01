@@ -19,11 +19,10 @@ use Memcache;
  */
 class MemcacheCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'memcache';
-
 	use CompareSetTrait;
 	use CompareDeleteTrait;
 	use MemcacheCommandTrait;
+	const NAME = 'memcache';
 
 	/**
 	 * @var Memcache

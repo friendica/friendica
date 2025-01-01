@@ -125,17 +125,17 @@ class User extends BaseDataTransferObject
 	{
 		$uid = $userContact['uid'] ?? 0;
 
-		$this->id                      = (int)$publicContact['id'];
-		$this->id_str                  = (string) $publicContact['id'];
-		$this->name                    = $publicContact['name'] ?: $publicContact['nick'];
-		$this->screen_name             = $publicContact['nick'] ?: $publicContact['name'];
-		$this->location                = $publicContact['location'] ?:
+		$this->id          = (int)$publicContact['id'];
+		$this->id_str      = (string) $publicContact['id'];
+		$this->name        = $publicContact['name'] ?: $publicContact['nick'];
+		$this->screen_name = $publicContact['nick'] ?: $publicContact['name'];
+		$this->location    = $publicContact['location'] ?:
 			ContactSelector::networkToName($publicContact['network'], $publicContact['protocol'], $publicContact['gsid']);
-		$this->derived                 = [];
-		$this->url                     = $publicContact['url'];
+		$this->derived = [];
+		$this->url     = $publicContact['url'];
 		// No entities needed since we don't perform any shortening in the URL or description
-		$this->entities            = [
-			'url' => ['urls' => []],
+		$this->entities = [
+			'url'         => ['urls' => []],
 			'description' => ['urls' => []],
 		];
 		if (!$include_user_entities) {

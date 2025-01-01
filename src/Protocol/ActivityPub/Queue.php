@@ -193,7 +193,7 @@ class Queue
 
 		if (!empty($entry['wid'])) {
 			$worker = DI::appHelper()->getQueue();
-			$wid = $worker['id'] ?? 0;
+			$wid    = $worker['id'] ?? 0;
 			if ($entry['wid'] != $wid) {
 				$workerqueue = DBA::selectFirst('workerqueue', ['pid'], ['id' => $entry['wid'], 'done' => false]);
 				if (!empty($workerqueue['pid']) && posix_kill($workerqueue['pid'], 0)) {
@@ -328,8 +328,8 @@ class Queue
 					return false;
 				}
 				$activity['recursion-depth'] = 0;
-				$activity['callstack'] = Processor::addToCallstack($activity['callstack'] ?? []);
-				$wid = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $entry['in-reply-to-id'], $activity, '', Receiver::COMPLETION_ASYNC);
+				$activity['callstack']       = Processor::addToCallstack($activity['callstack'] ?? []);
+				$wid                         = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $entry['in-reply-to-id'], $activity, '', Receiver::COMPLETION_ASYNC);
 				Fetch::setWorkerId($entry['in-reply-to-id'], $wid);
 				Logger::debug('Fetch missing activity', ['wid' => $wid, 'id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
 				self::retrial($id);
@@ -349,7 +349,7 @@ class Queue
 	 */
 	public static function processReplyByUri(string $uri, array $parent = []): int
 	{
-		$count = 0;
+		$count   = 0;
 		$entries = DBA::select('inbox-entry', ['id'], ["`in-reply-to-id` = ? AND `object-id` != ?", $uri, $uri]);
 		while ($entry = DBA::fetch($entries)) {
 			$count += 1;

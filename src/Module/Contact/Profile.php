@@ -239,7 +239,7 @@ class Profile extends BaseModule
 			$this->baseUrl->redirect('contact/' . $contact['id']);
 		}
 
-		$vcard_widget  = Widget\VCard::getHTML($contact);
+		$vcard_widget   = Widget\VCard::getHTML($contact);
 		$circles_widget = '';
 
 		if (!in_array($localRelationship->rel, [Contact::NOTHING, Contact::SELF])) {
@@ -257,9 +257,12 @@ class Profile extends BaseModule
 		]);
 
 		switch ($localRelationship->rel) {
-			case Contact::FRIEND:   $relation_text = $this->t('You are mutual friends with %s', $contact['name']); break;
-			case Contact::FOLLOWER:	$relation_text = $this->t('You are sharing with %s', $contact['name']); break;
-			case Contact::SHARING:  $relation_text = $this->t('%s is sharing with you', $contact['name']); break;
+			case Contact::FRIEND:   $relation_text = $this->t('You are mutual friends with %s', $contact['name']);
+				break;
+			case Contact::FOLLOWER:	$relation_text = $this->t('You are sharing with %s', $contact['name']);
+				break;
+			case Contact::SHARING:  $relation_text = $this->t('%s is sharing with you', $contact['name']);
+				break;
 			default:
 				$relation_text = '';
 		}
@@ -282,8 +285,7 @@ class Profile extends BaseModule
 			$this->logger->notice('Empty gsid for contact', ['contact' => $contact]);
 		}
 
-		$serverIgnored =
-			$contact['gsid'] &&
+		$serverIgnored = $contact['gsid'] &&
 			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid']) ?
 				$this->t('This contact is on a server you ignored.')
 				: '';

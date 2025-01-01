@@ -15,7 +15,7 @@ use Friendica\Util\Temporal;
 
 class Localtime extends BaseModule
 {
-	static $mod_localtime = '';
+	public static $mod_localtime = '';
 
 	protected function post(array $request = [])
 	{
@@ -32,7 +32,7 @@ class Localtime extends BaseModule
 	{
 		$time = ($_REQUEST['time'] ?? '') ?: 'now';
 
-		$output  = '<h3>' . DI::l10n()->t('Time Conversion') . '</h3>';
+		$output = '<h3>' . DI::l10n()->t('Time Conversion') . '</h3>';
 		$output .= '<p>' . DI::l10n()->t('Friendica provides this service for sharing events with other networks and friends in unknown timezones.') . '</p>';
 		$output .= '<p>' . DI::l10n()->t('UTC time: %s', $time) . '</p>';
 

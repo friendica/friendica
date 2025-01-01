@@ -22,11 +22,11 @@ use Friendica\Security\Security;
 class Thread
 {
 	/** @var Post[] */
-	private $parents = [];
-	private $mode = null;
-	private $writable = false;
+	private $parents       = [];
+	private $mode          = null;
+	private $writable      = false;
 	private $profile_owner = 0;
-	private $preview = false;
+	private $preview       = false;
 
 	/**
 	 * Constructor
@@ -63,18 +63,18 @@ class Thread
 			case Conversation::MODE_NETWORK:
 			case Conversation::MODE_NOTES:
 				$this->profile_owner = DI::userSession()->getLocalUserId();
-				$this->writable = true;
+				$this->writable      = true;
 				break;
 			case Conversation::MODE_PROFILE:
 			case Conversation::MODE_DISPLAY:
 				$this->profile_owner = $appHelper->getProfileOwner();
-				$this->writable = Security::canWriteToUserWall($this->profile_owner) || $writable;
+				$this->writable      = Security::canWriteToUserWall($this->profile_owner) || $writable;
 				break;
 			case Conversation::MODE_CHANNEL:
 			case Conversation::MODE_COMMUNITY:
 			case Conversation::MODE_CONTACTS:
 				$this->profile_owner = 0;
-				$this->writable = $writable;
+				$this->writable      = $writable;
 				break;
 			default:
 				Logger::info('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').');

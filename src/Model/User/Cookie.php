@@ -49,8 +49,11 @@ class Cookie
 		$this->sslEnabled     = $baseURL->getScheme() === 'https';
 		$this->sitePrivateKey = $config->get('system', 'site_prvkey');
 
-		$authCookieDays = $config->get('system', 'auth_cookie_lifetime',
-			self::DEFAULT_EXPIRE);
+		$authCookieDays = $config->get(
+			'system',
+			'auth_cookie_lifetime',
+			self::DEFAULT_EXPIRE
+		);
 		$this->lifetime = $authCookieDays * 24 * 60 * 60;
 
 		$this->remoteAddr = $request->getRemoteAddress();
@@ -160,9 +163,11 @@ class Cookie
 	 * @return bool If output exists prior to calling this function,
 	 *
 	 */
-	protected function setCookie(string $value = null, int $expire = null,
-								 bool $secure = null): bool
-	{
+	protected function setCookie(
+		string $value = null,
+		int $expire = null,
+		bool $secure = null
+	): bool {
 		return setcookie(self::NAME, $value, $expire, self::PATH, self::DOMAIN, $secure, self::HTTPONLY);
 	}
 

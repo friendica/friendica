@@ -9,7 +9,7 @@ use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 
 return [
-	'user'    => [
+	'user' => [
 		[
 			'uid'      => 42,
 			'username' => 'Test user',
@@ -19,7 +19,7 @@ return [
 			'theme'    => 'frio',
 		],
 	],
-	'item-uri'    => [
+	'item-uri' => [
 		[
 			'id'   => 42,
 			'uri'  => 'http://localhost/profile/selfcontact',
@@ -28,23 +28,23 @@ return [
 	],
 	'contact' => [
 		[
-			'id'      => 42,
-			'uid'     => 42,
-			'uri-id'  => 42,
-			'name'    => 'Self contact',
-			'nick'    => 'selfcontact',
-			'self'    => 1,
-			'nurl'    => 'http://localhost/profile/selfcontact',
-			'url'     => 'http://localhost/profile/selfcontact',
-			'about'   => 'User used in tests',
-			'pending' => 0,
-			'blocked' => 0,
-			'rel'     => Contact::FOLLOWER,
-			'network' => Protocol::DFRN,
+			'id'       => 42,
+			'uid'      => 42,
+			'uri-id'   => 42,
+			'name'     => 'Self contact',
+			'nick'     => 'selfcontact',
+			'self'     => 1,
+			'nurl'     => 'http://localhost/profile/selfcontact',
+			'url'      => 'http://localhost/profile/selfcontact',
+			'about'    => 'User used in tests',
+			'pending'  => 0,
+			'blocked'  => 0,
+			'rel'      => Contact::FOLLOWER,
+			'network'  => Protocol::DFRN,
 			'location' => 'DFRN',
 		],
 	],
-	'photo'   => [
+	'photo' => [
 		// move from data-attribute to storage backend
 		[
 			'id'            => 1,
@@ -72,15 +72,15 @@ return [
 			'backend-ref'   => 'unimported',
 			'data'          => 'invalid data moved',
 		],
-// @todo Check failing test because of this (never loaded) fixture
-//		[
-//			'id'            => 4,
-//			'uid'           => 42,
-//			'contact-id'    => 42,
-//			'backend-class' => 'invalid!',
-//			'backend-ref'   => 'unimported',
-//			'data'          => '',
-//		],
+		// @todo Check failing test because of this (never loaded) fixture
+		//		[
+		//			'id'            => 4,
+		//			'uid'           => 42,
+		//			'contact-id'    => 42,
+		//			'backend-class' => 'invalid!',
+		//			'backend-ref'   => 'unimported',
+		//			'data'          => '',
+		//		],
 	],
 	'storage' => [
 		[

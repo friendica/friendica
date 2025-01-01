@@ -56,7 +56,7 @@ class Protocol
 	const XMPP      = 'xmpp';    // XMPP
 	const ZOT       = 'zot!';    // Zot!
 
-	const PHANTOM   = 'unkn';    // Place holder
+	const PHANTOM = 'unkn';    // Place holder
 
 	/**
 	 * Returns whether the provided protocol supports following
@@ -73,7 +73,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result' => null
+			'result'   => null
 		];
 		Hook::callAll('support_follow', $hook_data);
 
@@ -95,7 +95,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result' => null
+			'result'   => null
 		];
 		Hook::callAll('support_revoke_follow', $hook_data);
 
@@ -241,8 +241,8 @@ class Protocol
 		// Catch-all hook for connector addons
 		$hook_data = [
 			'contact' => $contact,
-			'uid' => $uid,
-			'result' => null,
+			'uid'     => $uid,
+			'result'  => null,
 		];
 		Hook::callAll('block', $hook_data);
 
@@ -280,8 +280,8 @@ class Protocol
 		// Catch-all hook for connector addons
 		$hook_data = [
 			'contact' => $contact,
-			'uid' => $uid,
-			'result' => null,
+			'uid'     => $uid,
+			'result'  => null,
 		];
 		Hook::callAll('unblock', $hook_data);
 
@@ -308,7 +308,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result' => null
+			'result'   => null
 		];
 		Hook::callAll('support_probe', $hook_data);
 

@@ -60,15 +60,15 @@ function update_1298()
 {
 	$keys = ['gender', 'marital', 'sexual'];
 	foreach ($keys as $translateKey) {
-		$allData = DBA::select('profile', ['id', $translateKey]);
+		$allData  = DBA::select('profile', ['id', $translateKey]);
 		$allLangs = DI::l10n()->getAvailableLanguages();
-		$success = 0;
-		$fail = 0;
+		$success  = 0;
+		$fail     = 0;
 		foreach ($allData as $key => $data) {
 			$toTranslate = $data[$translateKey];
 			if ($toTranslate != '') {
 				foreach ($allLangs as $key => $lang) {
-					$a = new \stdClass();
+					$a          = new \stdClass();
 					$a->strings = [];
 
 					// First we get the localizations
@@ -96,7 +96,7 @@ function update_1298()
 				} else {
 					DBA::update('profile', [$translateKey => $key], ['id' => $data['id']]);
 					Logger::notice('Updated contact', ['action' => 'update', 'contact' => $data['id'], "$translateKey" => $key,
-						'was' => $data[$translateKey]]);
+						'was'                                      => $data[$translateKey]]);
 
 					Contact::updateSelfFromUserID($data['id']);
 					Profile::publishUpdate($data['id']);
@@ -191,7 +191,7 @@ function update_1330()
 
 	// Update attachments and photos
 	if (!DBA::e("UPDATE `photo` SET `photo`.`backend-class` = SUBSTR(`photo`.`backend-class`, 25) WHERE `photo`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'") ||
-	    !DBA::e("UPDATE `attach` SET `attach`.`backend-class` = SUBSTR(`attach`.`backend-class`, 25) WHERE `attach`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'")) {
+		!DBA::e("UPDATE `attach` SET `attach`.`backend-class` = SUBSTR(`attach`.`backend-class`, 25) WHERE `attach`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'")) {
 		return Update::FAILED;
 	};
 
@@ -201,7 +201,7 @@ function update_1330()
 function update_1332()
 {
 	$condition = ["`is-default` IS NOT NULL"];
-	$profiles = DBA::select('profile', [], $condition);
+	$profiles  = DBA::select('profile', [], $condition);
 
 	while ($profile = DBA::fetch($profiles)) {
 		Profile::migrate($profile);
@@ -651,13 +651,19 @@ function pre_update_1377()
 
 function update_1380()
 {
-	if (!DBA::e("UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`iid` SET `notify`.`uri-id` = `item`.`uri-id` WHERE `notify`.`uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
-		Notification\ObjectType::ITEM, Notification\ObjectType::PERSON)) {
+	if (!DBA::e(
+		"UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`iid` SET `notify`.`uri-id` = `item`.`uri-id` WHERE `notify`.`uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
+		Notification\ObjectType::ITEM,
+		Notification\ObjectType::PERSON
+	)) {
 		return Update::FAILED;
 	}
 
-	if (!DBA::e("UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`parent` SET `notify`.`parent-uri-id` = `item`.`uri-id` WHERE `notify`.`parent-uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
-		Notification\ObjectType::ITEM, Notification\ObjectType::PERSON)) {
+	if (!DBA::e(
+		"UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`parent` SET `notify`.`parent-uri-id` = `item`.`uri-id` WHERE `notify`.`parent-uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
+		Notification\ObjectType::ITEM,
+		Notification\ObjectType::PERSON
+	)) {
 		return Update::FAILED;
 	}
 
@@ -764,7 +770,7 @@ function update_1398()
 
 	if (!DBA::e("INSERT IGNORE INTO `post-thread` (`uri-id`, `owner-id`, `author-id`, `network`, `created`, `received`, `changed`, `commented`)
 		SELECT `uri-id`, `owner-id`, `author-id`, `network`, `created`, `received`, `changed`, `commented` FROM `thread`")) {
-			return Update::FAILED;
+		return Update::FAILED;
 	}
 
 	if (!DBStructure::existsTable('thread')) {
@@ -773,7 +779,7 @@ function update_1398()
 
 	if (!DBA::e("UPDATE `post-thread-user` INNER JOIN `thread` ON `thread`.`uid` = `post-thread-user`.`uid` AND `thread`.`uri-id` = `post-thread-user`.`uri-id`
 		SET `post-thread-user`.`mention` = `thread`.`mention`")) {
-			return Update::FAILED;
+		return Update::FAILED;
 	}
 
 	return Update::SUCCESS;
@@ -785,7 +791,7 @@ function update_1399()
 		SET `post-thread-user`.`contact-id` = `post-user`.`contact-id`, `post-thread-user`.`unseen` = `post-user`.`unseen`,
 		`post-thread-user`.`hidden` = `post-user`.`hidden`, `post-thread-user`.`origin` = `post-user`.`origin`,
 		`post-thread-user`.`psid` = `post-user`.`psid`, `post-thread-user`.`post-user-id` = `post-user`.`id`")) {
-			return Update::FAILED;
+		return Update::FAILED;
 	}
 
 	return Update::SUCCESS;
@@ -797,7 +803,7 @@ function update_1400()
 		`created`, `received`, `edited`, `gravity`, `causer-id`, `post-type`, `vid`, `private`, `visible`, `deleted`, `global`)
 		SELECT `uri-id`, `parent-uri-id`, `thr-parent-id`, `owner-id`, `author-id`, `network`, `created`, `received`, `edited`,
 			`gravity`, `causer-id`, `post-type`, `vid`, `private`, `visible`, `deleted`, `global` FROM `item`")) {
-			return Update::FAILED;
+		return Update::FAILED;
 	}
 
 	if (!DBA::e("UPDATE `post-user` INNER JOIN `item` ON `item`.`uri-id` = `post-user`.`uri-id` AND `item`.`uid` = `post-user`.`uid`
@@ -937,7 +943,7 @@ function update_1419()
 {
 	$mails = DBA::select('mail', ['id', 'from-url', 'uri', 'parent-uri', 'guid'], [], ['order' => ['id']]);
 	while ($mail = DBA::fetch($mails)) {
-		$fields = [];
+		$fields              = [];
 		$fields['author-id'] = Contact::getIdForURL($mail['from-url'], 0, false);
 		if (empty($fields['author-id'])) {
 			continue;
@@ -1016,7 +1022,7 @@ function update_1439()
 		if (!empty($fcontact['url'])) {
 			$id = Contact::getIdForURL($fcontact['url']);
 			if (!empty($id)) {
-				DBA::update('intro',['suggest-cid' => $id], ['id' => $intro['id']]);
+				DBA::update('intro', ['suggest-cid' => $id], ['id' => $intro['id']]);
 			}
 		}
 	}
@@ -1077,7 +1083,7 @@ function update_1444()
 function update_1446()
 {
 	$distributed_cache_driver_source = DI::config()->getCache()->getSource('system', 'distributed_cache_driver');
-	$cache_driver_source = DI::config()->getCache()->getSource('system', 'cache_driver');
+	$cache_driver_source             = DI::config()->getCache()->getSource('system', 'cache_driver');
 
 	// In case the distributed cache driver is the default value, but the current cache driver isn't default,
 	// we assume that the distributed cache driver should be the same as the current cache driver
@@ -1197,7 +1203,7 @@ function update_1509()
 	foreach ($addons as $addon) {
 		$newConfig->set('addons', $addon['name'], [
 			'last_update' => $addon['timestamp'],
-			'admin' => (bool)$addon['plugin_admin'],
+			'admin'       => (bool)$addon['plugin_admin'],
 		]);
 	}
 
@@ -1252,7 +1258,7 @@ function update_1514()
 	if (file_exists(dirname(__FILE__) . '/config/node.config.php')) {
 
 		$transactionalConfig = DI::config()->beginTransaction();
-		$oldConfig = include dirname(__FILE__) . '/config/node.config.php';
+		$oldConfig           = include dirname(__FILE__) . '/config/node.config.php';
 
 		if (is_array($oldConfig)) {
 			$categories = array_keys($oldConfig);
@@ -1388,7 +1394,7 @@ function update_1535()
 		DI::config()->set('system', 'compute_circle_counts', true);
 	}
 	DI::config()->delete('system', 'compute_group_counts');
-	
+
 	return Update::SUCCESS;
 }
 

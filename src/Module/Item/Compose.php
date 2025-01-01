@@ -115,29 +115,28 @@ class Compose extends BaseModule
 
 		switch ($posttype) {
 			case Item::PT_PERSONAL_NOTE:
-				$compose_title = $this->l10n->t('Compose new personal note');
-				$type = 'note';
-				$doesFederate = false;
+				$compose_title      = $this->l10n->t('Compose new personal note');
+				$type               = 'note';
+				$doesFederate       = false;
 				$contact_allow_list = [$this->appHelper->getContactId()];
-				$circle_allow_list = [];
-				$contact_deny_list = [];
-				$circle_deny_list = [];
+				$circle_allow_list  = [];
+				$contact_deny_list  = [];
+				$circle_deny_list   = [];
 				break;
 			default:
 				$compose_title = $this->l10n->t('Compose new post');
-				$type = 'post';
-				$doesFederate = true;
+				$type          = 'post';
+				$doesFederate  = true;
 
 				$contact_allow = $_REQUEST['contact_allow'] ?? '';
-				$circle_allow = $_REQUEST['circle_allow'] ?? '';
-				$contact_deny = $_REQUEST['contact_deny'] ?? '';
-				$circle_deny = $_REQUEST['circle_deny'] ?? '';
+				$circle_allow  = $_REQUEST['circle_allow']  ?? '';
+				$contact_deny  = $_REQUEST['contact_deny']  ?? '';
+				$circle_deny   = $_REQUEST['circle_deny']   ?? '';
 
 				if ($contact_allow
 					. $circle_allow
 					. $contact_deny
-				    . $circle_deny)
-				{
+					. $circle_deny) {
 					$contact_allow_list = $contact_allow ? explode(',', $contact_allow) : [];
 					$circle_allow_list  = $circle_allow  ? explode(',', $circle_allow)  : [];
 					$contact_deny_list  = $contact_deny  ? explode(',', $contact_deny)  : [];
@@ -147,11 +146,11 @@ class Compose extends BaseModule
 				break;
 		}
 
-		$title         = $_REQUEST['title']         ?? '';
-		$category      = $_REQUEST['category']      ?? '';
-		$body          = $_REQUEST['body']          ?? '';
-		$location      = $_REQUEST['location']      ?? $user['default-location'];
-		$wall          = $_REQUEST['wall']          ?? $type == 'post';
+		$title    = $_REQUEST['title']    ?? '';
+		$category = $_REQUEST['category'] ?? '';
+		$body     = $_REQUEST['body']     ?? '';
+		$location = $_REQUEST['location'] ?? $user['default-location'];
+		$wall     = $_REQUEST['wall']     ?? $type == 'post';
 
 		$jotplugins = '';
 		Hook::callAll('jot_tool', $jotplugins);
@@ -202,8 +201,12 @@ class Compose extends BaseModule
 				'wait'                 => $this->l10n->t('Please wait'),
 				'placeholdertitle'     => $this->l10n->t('Set title'),
 				'placeholdercategory'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
-				'always_open_compose'  => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose',
-					$this->config->get('frio', 'always_open_compose', false)) ? '' :
+				'always_open_compose'  => $this->pConfig->get(
+					$this->session->getLocalUserId(),
+					'frio',
+					'always_open_compose',
+					$this->config->get('frio', 'always_open_compose', false)
+				) ? '' :
 						$this->l10n->t('You can make this page always open when you use the New Post button in the <a href="/settings/display">Theme Customization settings</a>.'),
 			],
 
@@ -220,11 +223,11 @@ class Compose extends BaseModule
 				$this->l10n->t('Scheduled at'),
 				'scheduled_at'
 			),
-			'$created_at'   => $created_at,
-			'$title'        => $title,
-			'$category'     => $category,
-			'$body'         => $body,
-			'$location'     => $location,
+			'$created_at' => $created_at,
+			'$title'      => $title,
+			'$category'   => $category,
+			'$body'       => $body,
+			'$location'   => $location,
 
 			'$contact_allow' => implode(',', $contact_allow_list),
 			'$circle_allow'  => implode(',', $circle_allow_list),
@@ -233,7 +236,7 @@ class Compose extends BaseModule
 
 			'$jotplugins'   => $jotplugins,
 			'$rand_num'     => Crypto::randomDigits(12),
-			'$acl_selector'  => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), $doesFederate, [
+			'$acl_selector' => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), $doesFederate, [
 				'allow_cid' => $contact_allow_list,
 				'allow_gid' => $circle_allow_list,
 				'deny_cid'  => $contact_deny_list,

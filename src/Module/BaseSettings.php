@@ -70,9 +70,9 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
-			'label'     => $this->t('Two-factor authentication'),
-			'url'       => 'settings/2fa',
-			'selected'  => in_array(static::class, [
+			'label'    => $this->t('Two-factor authentication'),
+			'url'      => 'settings/2fa',
+			'selected' => in_array(static::class, [
 				Settings\TwoFactor\AppSpecific::class,
 				Settings\TwoFactor\Index::class,
 				Settings\TwoFactor\Recovery::class,
@@ -83,9 +83,9 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
-			'label'     => $this->t('Profile'),
-			'url'       => 'settings/profile',
-			'selected'  => in_array(static::class, [
+			'label'    => $this->t('Profile'),
+			'url'      => 'settings/profile',
+			'selected' => in_array(static::class, [
 				Settings\Profile\Index::class,
 				Settings\Profile\Photo\Crop::class,
 				Settings\Profile\Photo\Index::class,

@@ -54,7 +54,7 @@ class Emoji extends BaseFactory
 	public function createCollectionFromSmilies(array $smilies): Emojis
 	{
 		$emojis = [];
-		$icons = $smilies['icons'];
+		$icons  = $smilies['icons'];
 		foreach ($smilies['texts'] as $i => $name) {
 			$url = $icons[$i];
 			if (preg_match('/src="(.+?)"/', $url, $matches)) {

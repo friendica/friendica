@@ -51,7 +51,7 @@ class MarkdownTest extends FixtureTestCase
 		return [
 			'bug-8358-double-decode' => [
 				'expectedBBCode' => 'with the <sup> and </sup> tag',
-				'markdown' => 'with the &lt;sup&gt; and &lt;/sup&gt; tag',
+				'markdown'       => 'with the &lt;sup&gt; and &lt;/sup&gt; tag',
 			],
 		];
 	}

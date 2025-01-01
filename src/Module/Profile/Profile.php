@@ -255,7 +255,7 @@ class Profile extends BaseProfile
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/profile.tpl');
-		$o   .= Renderer::replaceMacros($tpl, [
+		$o .= Renderer::replaceMacros($tpl, [
 			'$title'                 => $this->t('Profile'),
 			'$yourself'              => $this->t('Yourself'),
 			'$view_as_contacts'      => $view_as_contacts,
@@ -275,7 +275,7 @@ class Profile extends BaseProfile
 				'title' => '',
 				'label' => $this->t('Edit profile')
 			],
-			'$viewas_link'           => [
+			'$viewas_link' => [
 				'url'   => $this->args->getQueryString() . '#viewas',
 				'title' => '',
 				'label' => $this->t('View as')
@@ -342,7 +342,7 @@ class Profile extends BaseProfile
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/" title="' . $this->t('%s\'s posts', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/comments" title="' . $this->t('%s\'s comments', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/activity" title="' . $this->t('%s\'s timeline', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
-		$uri      = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
+		$uri = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
 		$htmlhead .= '<link rel="lrdd" type="application/xrd+xml" href="' . $this->baseUrl . '/xrd/?uri=' . $uri . '" />' . "\n";
 		header('Link: <' . $this->baseUrl . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 

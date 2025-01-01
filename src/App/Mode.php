@@ -24,9 +24,9 @@ class Mode
 	const MAINTENANCEDISABLED = 8;
 
 	const UNDEFINED = 0;
-	const INDEX = 1;
-	const DAEMON = 2;
-	const WORKER = 3;
+	const INDEX     = 1;
+	const DAEMON    = 2;
+	const WORKER    = 3;
 
 	const BACKEND_CONTENT_TYPES = ['application/jrd+json', 'text/xml',
 		'application/rss+xml', 'application/atom+xml', 'application/activity+json'];
@@ -210,7 +210,7 @@ class Mode
 	public function isInstall(): bool
 	{
 		return !$this->has(Mode::LOCALCONFIGPRESENT) ||
-		       !$this->has(Mode::DBAVAILABLE);
+			   !$this->has(Mode::DBAVAILABLE);
 	}
 
 	/**
@@ -221,8 +221,8 @@ class Mode
 	public function isNormal(): bool
 	{
 		return $this->has(Mode::LOCALCONFIGPRESENT) &&
-		       $this->has(Mode::DBAVAILABLE) &&
-		       $this->has(Mode::MAINTENANCEDISABLED);
+			   $this->has(Mode::DBAVAILABLE) &&
+			   $this->has(Mode::MAINTENANCEDISABLED);
 	}
 
 	/**

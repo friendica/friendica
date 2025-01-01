@@ -17,7 +17,6 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;

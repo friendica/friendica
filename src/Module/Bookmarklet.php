@@ -33,7 +33,7 @@ class Bookmarklet extends BaseModule
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page = Strings::normaliseLink(DI::baseUrl() . "/bookmarklet");
+		$page    = Strings::normaliseLink(DI::baseUrl() . "/bookmarklet");
 
 		if (!strstr($referer, $page)) {
 			if (empty($_REQUEST["url"])) {
@@ -43,8 +43,8 @@ class Bookmarklet extends BaseModule
 			$content = "\n" . PageInfo::getFooterFromUrl($_REQUEST['url']);
 
 			$x = [
-				'title'            => trim($_REQUEST['title'] ?? '', '*'),
-				'content'          => $content
+				'title'   => trim($_REQUEST['title'] ?? '', '*'),
+				'content' => $content
 			];
 			$output = DI::conversation()->statusEditor($x, 0, false);
 			$output .= "<script>window.resizeTo(800,550);</script>";

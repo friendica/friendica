@@ -8,7 +8,6 @@
 namespace Friendica\Module\Item;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;

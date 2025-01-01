@@ -44,21 +44,21 @@ abstract class AbstractLoggerTypeFactory
 			// legacy WARNING
 			case "0":
 				return LogLevel::ERROR;
-			// legacy INFO
+				// legacy INFO
 			case "1":
 				return LogLevel::WARNING;
-			// legacy TRACE
+				// legacy TRACE
 			case "2":
 				return LogLevel::NOTICE;
-			// legacy DEBUG
+				// legacy DEBUG
 			case "3":
 				return LogLevel::INFO;
-			// legacy DATA
+				// legacy DATA
 			case "4":
-			// legacy ALL
+				// legacy ALL
 			case "5":
 				return LogLevel::DEBUG;
-			// default if nothing set
+				// default if nothing set
 			default:
 				return $level;
 		}

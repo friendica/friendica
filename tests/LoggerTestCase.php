@@ -9,7 +9,6 @@ namespace Friendica\Test;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Logger\Util\Introspection;
-use Friendica\Test\MockedTestCase;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -158,7 +157,7 @@ abstract class LoggerTestCase extends MockedTestCase
 	 */
 	public function testExceptionHandling()
 	{
-		$e = new \Exception("Test String", 123);
+		$e         = new \Exception("Test String", 123);
 		$eFollowUp = new \Exception("FollowUp", 456, $e);
 
 		$assertion = $eFollowUp->__toString();

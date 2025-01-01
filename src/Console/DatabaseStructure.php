@@ -73,11 +73,11 @@ HELP;
 	{
 		parent::__construct($argv);
 
-		$this->dba = $dba;
-		$this->dbaDefinition = $dbaDefinition;
+		$this->dba            = $dba;
+		$this->dbaDefinition  = $dbaDefinition;
 		$this->viewDefinition = $viewDefinition;
-		$this->config = $config;
-		$this->basePath = $basePath->getPath();
+		$this->config         = $config;
+		$this->basePath       = $basePath->getPath();
 	}
 
 	protected function doExecute(): int
@@ -112,7 +112,7 @@ HELP;
 			case "update":
 				$force    = $this->getOption(['f', 'force'], false);
 				$override = $this->getOption(['o', 'override'], false);
-				$output = Update::run($basePath, $force, $override,true, false);
+				$output   = Update::run($basePath, $force, $override, true, false);
 				break;
 			case "drop":
 				$execute = $this->getOption(['e', 'execute'], false);

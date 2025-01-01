@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Twitter\Media;
 
 use Friendica\Core\Logger;
-use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;

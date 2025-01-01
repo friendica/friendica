@@ -23,21 +23,21 @@ class LocalRelationship extends BaseFactory implements ICanCreateFromTableRow
 		return new Entity\LocalRelationship(
 			$row['uid'],
 			$row['cid'],
-			$row['blocked'] ?? false,
-			$row['ignored'] ?? false,
-			$row['collapsed'] ?? false,
-			$row['hidden'] ?? false,
-			$row['pending'] ?? false,
-			$row['rel'] ?? Contact::NOTHING,
-			$row['info'] ?? '',
-			$row['notify_new_posts'] ?? false,
-			$row['remote_self'] ?? Entity\LocalRelationship::MIRROR_DEACTIVATED,
+			$row['blocked']                   ?? false,
+			$row['ignored']                   ?? false,
+			$row['collapsed']                 ?? false,
+			$row['hidden']                    ?? false,
+			$row['pending']                   ?? false,
+			$row['rel']                       ?? Contact::NOTHING,
+			$row['info']                      ?? '',
+			$row['notify_new_posts']          ?? false,
+			$row['remote_self']               ?? Entity\LocalRelationship::MIRROR_DEACTIVATED,
 			$row['fetch_further_information'] ?? Entity\LocalRelationship::FFI_NONE,
-			$row['ffi_keyword_denylist'] ?? '',
-			$row['hub-verify'] ?? '',
-			$row['protocol'] ?? Protocol::PHANTOM,
-			$row['rating'] ?? null,
-			$row['priority'] ?? 0
+			$row['ffi_keyword_denylist']      ?? '',
+			$row['hub-verify']                ?? '',
+			$row['protocol']                  ?? Protocol::PHANTOM,
+			$row['rating']                    ?? null,
+			$row['priority']                  ?? 0
 		);
 	}
 }

@@ -101,15 +101,15 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'subject' => 'Subject',
-			'html' => 'Html',
-			'text' => 'text',
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'subject'     => 'Subject',
+			'html'        => 'Html',
+			'text'        => 'text',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'no-reply@friendica.local',
-			'uid' => 100,
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'no-reply@friendica.local',
+			'uid'         => 100,
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 
@@ -155,11 +155,11 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'sender@friendica.local', // no-reply is set same as address in case it's not set
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'sender@friendica.local', // no-reply is set same as address in case it's not set
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 
@@ -176,11 +176,11 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'sender@friendica.local', // no-reply is set same as address in case it's not set,
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'sender@friendica.local', // no-reply is set same as address in case it's not set,
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 }

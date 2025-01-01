@@ -111,7 +111,7 @@ class Status extends BaseFactory
 	 */
 	private function createFromArray(array $item, int $uid, bool $include_entities): \Friendica\Object\Api\Twitter\Status
 	{
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item   = Post\Media::addHTMLAttachmentToItem($item);
 		$author = $this->twitterUser->createFromContactId($item['author-id'], $uid, true);
 
 		if (!empty($item['causer-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT)) {
@@ -203,6 +203,6 @@ class Status extends BaseFactory
 			$entities = [];
 		}
 
-		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments,  $friendica_comments, $liked);
+		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments, $friendica_comments, $liked);
 	}
 }

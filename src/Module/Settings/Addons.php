@@ -60,7 +60,7 @@ class Addons extends BaseSettings
 					'$addon'  => $data['addon'],
 					'$title'  => $data['title'],
 					'$open'   => ($this->parameters['addon'] ?? '') === $data['addon'],
-					'$html'   => $data['html'] ?? '',
+					'$html'   => $data['html']   ?? '',
 					'$submit' => $data['submit'] ?? $this->t('Save Settings'),
 				]);
 			}

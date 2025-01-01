@@ -142,7 +142,7 @@ class UserSession implements IHandleUserSessions
 	{
 		return !$this->session->get('authenticated', false);
 	}
-	
+
 	/** {@inheritDoc} */
 	public function setVisitorsContacts(string $my_url)
 	{

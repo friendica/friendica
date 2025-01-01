@@ -32,9 +32,9 @@ class Activity extends BaseDataTransferObject
 	 */
 	public function __construct(int $week, int $statuses, int $logins, int $registrations)
 	{
-		$this->week = (string)$week;
-		$this->statuses = (string)$statuses;
-		$this->logins = (string)$logins;
+		$this->week          = (string)$week;
+		$this->statuses      = (string)$statuses;
+		$this->logins        = (string)$logins;
 		$this->registrations = (string)$registrations;
 	}
 }

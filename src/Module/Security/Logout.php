@@ -15,7 +15,6 @@ use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\DI;
-use Friendica\Model\Profile;
 use Friendica\Model\User\Cookie;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;

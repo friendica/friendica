@@ -26,7 +26,7 @@ class SerializeUtil
 		// This checks for possible multiple serialized values
 		while (static::isSerialized($value)) {
 			$oldValue = $value;
-			$value = @unserialize($value);
+			$value    = @unserialize($value);
 
 			// If there's no change after the unserialize call, break the loop (avoid endless loops)
 			if ($oldValue === $value) {
@@ -97,8 +97,8 @@ class SerializeUtil
 				} elseif (false === strpos($data, '"')) {
 					return false;
 				}
-			// Or else fall through.
-			// no break
+				// Or else fall through.
+				// no break
 			case 'a':
 			case 'O':
 			case 'E':

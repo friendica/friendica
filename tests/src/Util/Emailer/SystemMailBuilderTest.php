@@ -33,9 +33,9 @@ class SystemMailBuilderTest extends MockedTestCase
 
 		$this->setUpVfsDir();
 
-		$this->config  = \Mockery::mock(IManageConfigValues::class);
+		$this->config = \Mockery::mock(IManageConfigValues::class);
 		$this->config->shouldReceive('get')->with('config', 'admin_name')->andReturn('Admin');
-		$this->l10n    = \Mockery::mock(L10n::class);
+		$this->l10n = \Mockery::mock(L10n::class);
 		$this->l10n->shouldReceive('t')->andReturnUsing(function ($msg) {
 			return $msg;
 		});

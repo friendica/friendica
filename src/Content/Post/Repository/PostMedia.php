@@ -163,7 +163,7 @@ class PostMedia extends BaseRepository
 					// Peertube videos are delivered in many different resolutions. We pick a moderate one.
 					// Since only Peertube provides a "height" parameter, this wouldn't be executed
 					// when someone for example on Mastodon was sharing multiple videos in a single post.
-					$heights[$PostMedia->height] = (string)$PostMedia->url;
+					$heights[$PostMedia->height]     = (string)$PostMedia->url;
 					$video[(string) $PostMedia->url] = $PostMedia;
 				} else {
 					$attachments['visual'][] = $PostMedia;

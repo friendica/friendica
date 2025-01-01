@@ -32,7 +32,6 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\Probe;
-use Friendica\Protocol\Delivery;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Map;
@@ -142,14 +141,14 @@ class Diaspora
 
 		$alg = $children->alg;
 
-		$sig = Strings::base64UrlDecode($children->sig);
+		$sig    = Strings::base64UrlDecode($children->sig);
 		$key_id = $children->sig->attributes()->key_id[0];
 		if ($key_id != '') {
 			$handle = Strings::base64UrlDecode($key_id);
 		}
 
 		$b64url_data = Strings::base64UrlEncode($data);
-		$msg = str_replace(["\n", "\r", " ", "\t"], ['', '', '', ''], $b64url_data);
+		$msg         = str_replace(["\n", "\r", " ", "\t"], ['', '', '', ''], $b64url_data);
 
 		$signable_data = $msg . '.' . Strings::base64UrlEncode($type) . '.' . Strings::base64UrlEncode($encoding) . '.' . Strings::base64UrlEncode($alg);
 
@@ -232,7 +231,7 @@ class Diaspora
 				}
 
 				$encrypted_aes_key_bundle = base64_decode($data->aes_key);
-				$ciphertext = base64_decode($data->encrypted_magic_envelope);
+				$ciphertext               = base64_decode($data->encrypted_magic_envelope);
 
 				$outer_key_bundle = '';
 				@openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $privKey);
@@ -248,7 +247,7 @@ class Diaspora
 					throw new \RuntimeException('Missing keys "iv" and/or "key" from outer Salmon');
 				}
 
-				$outer_iv = base64_decode($j_outer_key_bundle->iv);
+				$outer_iv  = base64_decode($j_outer_key_bundle->iv);
 				$outer_key = base64_decode($j_outer_key_bundle->key);
 
 				$xml = self::aesDecrypt($outer_key, $outer_iv, $ciphertext);
@@ -281,16 +280,16 @@ class Diaspora
 		$data = str_replace([" ", "\t", "\r", "\n"], ['', '', '', ''], $base->data);
 
 		// Build the signed data
-		$type = $base->data[0]->attributes()->type[0];
-		$encoding = $base->encoding;
-		$alg = $base->alg;
+		$type        = $base->data[0]->attributes()->type[0];
+		$encoding    = $base->encoding;
+		$alg         = $base->alg;
 		$signed_data = $data . '.' . Strings::base64UrlEncode($type) . '.' . Strings::base64UrlEncode($encoding) . '.' . Strings::base64UrlEncode($alg);
 
 		// This is the signature
 		$signature = Strings::base64UrlDecode($base->sig);
 
 		// Get the senders' public key
-		$key_id = $base->sig[0]->attributes()->key_id[0];
+		$key_id      = $base->sig[0]->attributes()->key_id[0];
 		$author_addr = base64_decode($key_id);
 		if ($author_addr == '') {
 			Logger::notice('No author could be decoded. Discarding. Message: ' . $xml);
@@ -303,7 +302,7 @@ class Diaspora
 
 		try {
 			$author = WebFingerUri::fromString($author_addr);
-			$key = self::key($author);
+			$key    = self::key($author);
 			if ($key == '') {
 				throw new \InvalidArgumentException();
 			}
@@ -348,7 +347,7 @@ class Diaspora
 	 */
 	public static function decode(string $xml, string $privKey = '')
 	{
-		$public = false;
+		$public  = false;
 		$basedom = XML::parseString($xml);
 
 		if (!is_object($basedom)) {
@@ -358,11 +357,11 @@ class Diaspora
 		$children = $basedom->children('https://joindiaspora.com/protocol');
 
 		$inner_aes_key = null;
-		$inner_iv = null;
+		$inner_iv      = null;
 
 		if ($children->header) {
 			$public = true;
-			$idom = $children->header;
+			$idom   = $children->header;
 		} else {
 			// This happens with posts from a relais
 			if (empty($privKey)) {
@@ -373,14 +372,14 @@ class Diaspora
 			$encrypted_header = json_decode(base64_decode($children->encrypted_header));
 
 			$encrypted_aes_key_bundle = base64_decode($encrypted_header->aes_key);
-			$ciphertext = base64_decode($encrypted_header->ciphertext);
+			$ciphertext               = base64_decode($encrypted_header->ciphertext);
 
 			$outer_key_bundle = '';
 			openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $privKey);
 
 			$j_outer_key_bundle = json_decode($outer_key_bundle);
 
-			$outer_iv = base64_decode($j_outer_key_bundle->iv);
+			$outer_iv  = base64_decode($j_outer_key_bundle->iv);
 			$outer_key = base64_decode($j_outer_key_bundle->key);
 
 			$decrypted = self::aesDecrypt($outer_key, $outer_iv, $ciphertext);
@@ -388,7 +387,7 @@ class Diaspora
 			Logger::info('decrypted', ['data' => $decrypted]);
 			$idom = XML::parseString($decrypted);
 
-			$inner_iv = base64_decode($idom->iv);
+			$inner_iv      = base64_decode($idom->iv);
 			$inner_aes_key = base64_decode($idom->aes_key);
 		}
 
@@ -429,10 +428,10 @@ class Diaspora
 
 		// stash away some other stuff for later
 
-		$type = $base->data[0]->attributes()->type[0];
-		$keyhash = $base->sig[0]->attributes()->keyhash[0];
+		$type     = $base->data[0]->attributes()->type[0];
+		$keyhash  = $base->sig[0]->attributes()->keyhash[0];
 		$encoding = $base->encoding;
-		$alg = $base->alg;
+		$alg      = $base->alg;
 
 		$signed_data = $data . '.' . Strings::base64UrlEncode($type) . '.' . Strings::base64UrlEncode($encoding) . '.' . Strings::base64UrlEncode($alg);
 
@@ -497,7 +496,7 @@ class Diaspora
 		}
 
 		$importer = [
-			'uid' => 0,
+			'uid'        => 0,
 			'page-flags' => User::PAGE_FLAGS_FREELOVE
 		];
 		$success = self::dispatch($importer, $msg, $fields, $direction);
@@ -642,15 +641,16 @@ class Diaspora
 			}
 		}
 
-		$type = $element->getName();
+		$type      = $element->getName();
 		$orig_type = $type;
 
 		Logger::debug('Got message', ['type' => $type, 'message' => $msg['message']]);
 
 		// All retractions are handled identically from now on.
 		// In the new version there will only be "retraction".
-		if (in_array($type, ['signed_retraction', 'relayable_retraction']))
+		if (in_array($type, ['signed_retraction', 'relayable_retraction'])) {
 			$type = 'retraction';
+		}
 
 		if ($type == 'request') {
 			$type = 'contact';
@@ -658,8 +658,8 @@ class Diaspora
 
 		$fields = new SimpleXMLElement('<' . $type . '/>');
 
-		$signed_data = '';
-		$author_signature = null;
+		$signed_data             = '';
+		$author_signature        = null;
 		$parent_author_signature = null;
 
 		foreach ($element->children() as $fieldname => $entry) {
@@ -751,7 +751,7 @@ class Diaspora
 			}
 
 			if (!Crypto::rsaVerify($signed_data, $parent_author_signature, $key, 'sha256')) {
-				Logger::info('No valid parent author signature', ['author' => $msg['author'], 'type' => $type, 'signed data' => $signed_data, 'message'  => $msg['message'], 'signature' => $parent_author_signature]);
+				Logger::info('No valid parent author signature', ['author' => $msg['author'], 'type' => $type, 'signed data' => $signed_data, 'message' => $msg['message'], 'signature' => $parent_author_signature]);
 				return false;
 			}
 		}
@@ -767,7 +767,7 @@ class Diaspora
 		}
 
 		if (!Crypto::rsaVerify($signed_data, $author_signature, $key, 'sha256')) {
-			Logger::info('No valid author signature for author', ['author' => $fields->author, 'type' => $type, 'signed data' => $signed_data, 'message'  => $msg['message'], 'signature' => $author_signature]);
+			Logger::info('No valid author signature for author', ['author' => $fields->author, 'type' => $type, 'signed data' => $signed_data, 'message' => $msg['message'], 'signature' => $author_signature]);
 			return false;
 		} else {
 			return $fields;
@@ -983,7 +983,7 @@ class Diaspora
 				} else {
 					// No local match, restoring absolute remote URL from author scheme and host
 					$author_url = parse_url($author_link);
-					$return = '[url=' . $author_url['scheme'] . '://' . $author_url['host'] . '/people/' . $match[1] . ']' . $match[2] . '[/url]';
+					$return     = '[url=' . $author_url['scheme'] . '://' . $author_url['host'] . '/people/' . $match[1] . ']' . $match[2] . '[/url]';
 				}
 
 				return $return;
@@ -1187,7 +1187,7 @@ class Diaspora
 		];
 
 		$condition = ['uid' => $uid, 'guid' => $guid];
-		$item = Post::selectFirst($fields, $condition);
+		$item      = Post::selectFirst($fields, $condition);
 
 		if (!DBA::isResult($item)) {
 			try {
@@ -1232,17 +1232,17 @@ class Diaspora
 	private static function authorContactByUrl(array $def_contact, string $contact_url, int $uid): array
 	{
 		$condition = ['nurl' => Strings::normaliseLink($contact_url), 'uid' => $uid];
-		$contact = DBA::selectFirst('contact', ['id', 'network'], $condition);
+		$contact   = DBA::selectFirst('contact', ['id', 'network'], $condition);
 		if (DBA::isResult($contact)) {
-			$cid = $contact['id'];
+			$cid     = $contact['id'];
 			$network = $contact['network'];
 		} else {
-			$cid = $def_contact['id'];
+			$cid     = $def_contact['id'];
 			$network = Protocol::DIASPORA;
 		}
 
 		return [
-			'cid' => $cid,
+			'cid'     => $cid,
 			'network' => $network
 		];
 	}
@@ -1284,7 +1284,7 @@ class Diaspora
 		}
 
 		$platform = '';
-		$gserver = DBA::selectFirst('gserver', ['platform'], ['nurl' => Strings::normaliseLink($contact['baseurl'])]);
+		$gserver  = DBA::selectFirst('gserver', ['platform'], ['nurl' => Strings::normaliseLink($contact['baseurl'])]);
 		if (!empty($gserver['platform'])) {
 			$platform = strtolower($gserver['platform']);
 			Logger::info('Detected platform', ['platform' => $platform, 'url' => $contact['url']]);
@@ -1356,7 +1356,7 @@ class Diaspora
 
 		// Check signature
 		$signed_text = 'AccountMigration:' . $old_author . ':' . $new_author;
-		$key = self::key($old_author);
+		$key         = self::key($old_author);
 		if (!Crypto::rsaVerify($signed_text, $signature, $key, 'sha256')) {
 			Logger::notice('No valid signature for migration.');
 			return false;
@@ -1488,10 +1488,10 @@ class Diaspora
 	 */
 	private static function receiveComment(array $importer, WebFingerUri $sender, SimpleXMLElement $data, string $xml, int $direction): bool
 	{
-		$author = WebFingerUri::fromString(XML::unescape($data->author));
-		$guid = XML::unescape($data->guid);
+		$author      = WebFingerUri::fromString(XML::unescape($data->author));
+		$guid        = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
-		$text = XML::unescape($data->text);
+		$text        = XML::unescape($data->text);
 
 		if (isset($data->created_at)) {
 			$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
@@ -1501,7 +1501,7 @@ class Diaspora
 
 		if (isset($data->thread_parent_guid)) {
 			$thread_parent_guid = XML::unescape($data->thread_parent_guid);
-			$thr_parent = self::getUriFromGuid($thread_parent_guid);
+			$thr_parent         = self::getUriFromGuid($thread_parent_guid);
 		} else {
 			$thr_parent = '';
 		}
@@ -1537,24 +1537,24 @@ class Diaspora
 
 		$datarray = [];
 
-		$datarray['uid'] = $importer['uid'];
+		$datarray['uid']        = $importer['uid'];
 		$datarray['contact-id'] = $author_contact['cid'];
-		$datarray['network']  = $author_contact['network'];
+		$datarray['network']    = $author_contact['network'];
 
 		$datarray['author-link'] = $author_url;
-		$datarray['author-id'] = Contact::getIdForURL($author_url);
+		$datarray['author-id']   = Contact::getIdForURL($author_url);
 
 		$datarray['owner-link'] = $contact['url'];
-		$datarray['owner-id'] = Contact::getIdForURL($contact['url']);
+		$datarray['owner-id']   = Contact::getIdForURL($contact['url']);
 
 		// Will be overwritten for sharing accounts in Item::insert
 		$datarray = self::setDirection($datarray, $direction);
 
-		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($guid, $author);
+		$datarray['guid']   = $guid;
+		$datarray['uri']    = self::getUriFromGuid($guid, $author);
 		$datarray['uri-id'] = ItemURI::insert(['uri' => $datarray['uri'], 'guid' => $datarray['guid']]);
 
-		$datarray['verb'] = Activity::POST;
+		$datarray['verb']    = Activity::POST;
 		$datarray['gravity'] = Item::GRAVITY_COMMENT;
 
 		$datarray['private']   = $toplevel_parent_item['private'];
@@ -1566,17 +1566,17 @@ class Diaspora
 		$datarray['thr-parent'] = $thr_parent ?: $toplevel_parent_item['uri'];
 
 		$datarray['object-type'] = Activity\ObjectType::COMMENT;
-		$datarray['post-type'] = Item::PT_NOTE;
+		$datarray['post-type']   = Item::PT_NOTE;
 
 		$datarray['protocol'] = Conversation::PARCEL_DIASPORA;
-		$datarray['source'] = $xml;
+		$datarray['source']   = $xml;
 
 		$datarray = self::setDirection($datarray, $direction);
 
 		$datarray['changed'] = $datarray['created'] = $datarray['edited'] = $created_at;
 
 		$datarray['plink'] = self::plink($author, $guid, $toplevel_parent_item['guid']);
-		$body = Markdown::toBBCode($text);
+		$body              = Markdown::toBBCode($text);
 
 		$datarray['body'] = self::replacePeopleGuid($body, $author_url);
 
@@ -1629,8 +1629,8 @@ class Diaspora
 	private static function receiveConversationMessage(array $importer, array $contact, SimpleXMLElement $data, array $msg, $mesg, array $conversation): bool
 	{
 		$author_handle = XML::unescape($data->author);
-		$guid = XML::unescape($data->guid);
-		$subject = XML::unescape($data->subject);
+		$guid          = XML::unescape($data->guid);
+		$subject       = XML::unescape($data->subject);
 
 		// "diaspora_handle" is the element name from the old version
 		// "author" is the element name from the new version
@@ -1648,10 +1648,10 @@ class Diaspora
 			return false;
 		}
 
-		$msg_guid = XML::unescape($mesg->guid);
+		$msg_guid              = XML::unescape($mesg->guid);
 		$msg_conversation_guid = XML::unescape($mesg->conversation_guid);
-		$msg_text = XML::unescape($mesg->text);
-		$msg_created_at = DateTimeFormat::utc(XML::unescape($mesg->created_at));
+		$msg_text              = XML::unescape($mesg->text);
+		$msg_created_at        = DateTimeFormat::utc(XML::unescape($mesg->created_at));
 
 		if ($msg_conversation_guid != $guid) {
 			Logger::notice('Message conversation guid does not belong to the current conversation.', ['guid' => $guid]);
@@ -1689,10 +1689,10 @@ class Diaspora
 	private static function receiveConversation(array $importer, array $msg, SimpleXMLElement $data)
 	{
 		$author_handle = XML::unescape($data->author);
-		$guid = XML::unescape($data->guid);
-		$subject = XML::unescape($data->subject);
-		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
-		$participants = XML::unescape($data->participants);
+		$guid          = XML::unescape($data->guid);
+		$subject       = XML::unescape($data->subject);
+		$created_at    = DateTimeFormat::utc(XML::unescape($data->created_at));
+		$participants  = XML::unescape($data->participants);
 
 		$messages = $data->message;
 
@@ -1752,11 +1752,11 @@ class Diaspora
 	 */
 	private static function receiveLike(array $importer, WebFingerUri $sender, SimpleXMLElement $data, int $direction): bool
 	{
-		$author = WebFingerUri::fromString(XML::unescape($data->author));
-		$guid = XML::unescape($data->guid);
+		$author      = WebFingerUri::fromString(XML::unescape($data->author));
+		$guid        = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
 		$parent_type = XML::unescape($data->parent_type);
-		$positive = XML::unescape($data->positive);
+		$positive    = XML::unescape($data->positive);
 
 		// likes on comments aren't supported by Diaspora - only on posts
 		// But maybe this will be supported in the future, so we will accept it.
@@ -1805,19 +1805,19 @@ class Diaspora
 
 		$datarray['protocol'] = Conversation::PARCEL_DIASPORA;
 
-		$datarray['uid'] = $importer['uid'];
+		$datarray['uid']        = $importer['uid'];
 		$datarray['contact-id'] = $author_contact['cid'];
-		$datarray['network']  = $author_contact['network'];
+		$datarray['network']    = $author_contact['network'];
 
 		$datarray = self::setDirection($datarray, $direction);
 
 		$datarray['owner-link'] = $datarray['author-link'] = $author_url;
-		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($author_url);
+		$datarray['owner-id']   = $datarray['author-id'] = Contact::getIdForURL($author_url);
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($guid, $author);
+		$datarray['uri']  = self::getUriFromGuid($guid, $author);
 
-		$datarray['verb'] = $verb;
+		$datarray['verb']    = $verb;
 		$datarray['gravity'] = Item::GRAVITY_ACTIVITY;
 
 		$datarray['private']   = $toplevel_parent_item['private'];
@@ -1838,7 +1838,7 @@ class Diaspora
 		// like on comments have the comment as parent. So we need to fetch the toplevel parent
 		if ($toplevel_parent_item['gravity'] != Item::GRAVITY_PARENT) {
 			$toplevel = Post::selectFirst(['origin'], ['id' => $toplevel_parent_item['parent']]);
-			$origin = $toplevel['origin'];
+			$origin   = $toplevel['origin'];
 		} else {
 			$origin = $toplevel_parent_item['origin'];
 		}
@@ -1881,11 +1881,11 @@ class Diaspora
 	 */
 	private static function receiveMessage(array $importer, SimpleXMLElement $data): bool
 	{
-		$author_uri = WebFingerUri::fromString(XML::unescape($data->author));
-		$guid = XML::unescape($data->guid);
+		$author_uri        = WebFingerUri::fromString(XML::unescape($data->author));
+		$guid              = XML::unescape($data->guid);
 		$conversation_guid = XML::unescape($data->conversation_guid);
-		$text = XML::unescape($data->text);
-		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
+		$text              = XML::unescape($data->text);
+		$created_at        = DateTimeFormat::utc(XML::unescape($data->created_at));
 
 		$contact = self::allowedContactByHandle($importer, $author_uri, true);
 		if (!$contact) {
@@ -1896,7 +1896,7 @@ class Diaspora
 			GServer::setProtocol($contact['gsid'], Post\DeliveryData::DIASPORA);
 		}
 
-		$condition = ['uid' => $importer['uid'], 'guid' => $conversation_guid];
+		$condition    = ['uid' => $importer['uid'], 'guid' => $conversation_guid];
 		$conversation = DBA::selectFirst('conv', [], $condition);
 		if (!DBA::isResult($conversation)) {
 			Logger::notice('Conversation not available.');
@@ -1944,8 +1944,8 @@ class Diaspora
 	 */
 	private static function receiveParticipation(array $importer, SimpleXMLElement $data, int $direction): bool
 	{
-		$author = WebFingerUri::fromString(strtolower(XML::unescape($data->author)));
-		$guid = XML::unescape($data->guid);
+		$author      = WebFingerUri::fromString(strtolower(XML::unescape($data->author)));
+		$guid        = XML::unescape($data->guid);
 		$parent_guid = XML::unescape($data->parent_guid);
 
 		$contact = self::allowedContactByHandle($importer, $author, true);
@@ -1989,20 +1989,20 @@ class Diaspora
 
 		$datarray['protocol'] = Conversation::PARCEL_DIASPORA;
 
-		$datarray['uid'] = $importer['uid'];
+		$datarray['uid']        = $importer['uid'];
 		$datarray['contact-id'] = $author_contact['cid'];
-		$datarray['network']  = $author_contact['network'];
+		$datarray['network']    = $author_contact['network'];
 
 		$datarray = self::setDirection($datarray, $direction);
 
 		$datarray['owner-link'] = $datarray['author-link'] = $author_url;
-		$datarray['owner-id'] = $datarray['author-id'] = Contact::getIdForURL($author_url);
+		$datarray['owner-id']   = $datarray['author-id'] = Contact::getIdForURL($author_url);
 
 		$datarray['guid'] = $guid;
-		$datarray['uri'] = self::getUriFromGuid($guid, $author);
+		$datarray['uri']  = self::getUriFromGuid($guid, $author);
 
-		$datarray['verb'] = Activity::FOLLOW;
-		$datarray['gravity'] = Item::GRAVITY_ACTIVITY;
+		$datarray['verb']       = Activity::FOLLOW;
+		$datarray['gravity']    = Item::GRAVITY_ACTIVITY;
 		$datarray['thr-parent'] = $toplevel_parent_item['uri'];
 
 		$datarray['object-type'] = Activity\ObjectType::NOTE;
@@ -2100,14 +2100,14 @@ class Diaspora
 			return false;
 		}
 
-		$name = XML::unescape($data->first_name) . ((strlen($data->last_name)) ? ' ' . XML::unescape($data->last_name) : '');
-		$image_url = XML::unescape($data->image_url);
-		$birthday = XML::unescape($data->birthday);
-		$about = Markdown::toBBCode(XML::unescape($data->bio));
-		$location = Markdown::toBBCode(XML::unescape($data->location));
+		$name       = XML::unescape($data->first_name) . ((strlen($data->last_name)) ? ' ' . XML::unescape($data->last_name) : '');
+		$image_url  = XML::unescape($data->image_url);
+		$birthday   = XML::unescape($data->birthday);
+		$about      = Markdown::toBBCode(XML::unescape($data->bio));
+		$location   = Markdown::toBBCode(XML::unescape($data->location));
 		$searchable = (XML::unescape($data->searchable) == 'true');
-		$nsfw = (XML::unescape($data->nsfw) == 'true');
-		$tags = XML::unescape($data->tag_string);
+		$nsfw       = (XML::unescape($data->nsfw) == 'true');
+		$tags       = XML::unescape($data->tag_string);
 
 		$tags = explode('#', $tags);
 
@@ -2148,9 +2148,9 @@ class Diaspora
 		}
 
 		$fields = [
-			'name' => $name, 'location' => $location,
-			'name-date' => DateTimeFormat::utcNow(), 'about' => $about,
-			'addr' => $author->getAddr(), 'nick' => $author->getUser(), 'keywords' => $keywords,
+			'name'         => $name, 'location' => $location,
+			'name-date'    => DateTimeFormat::utcNow(), 'about' => $about,
+			'addr'         => $author->getAddr(), 'nick' => $author->getUser(), 'keywords' => $keywords,
 			'unsearchable' => !$searchable, 'sensitive' => $nsfw
 		];
 
@@ -2195,7 +2195,7 @@ class Diaspora
 	private static function receiveContactRequest(array $importer, SimpleXMLElement $data): bool
 	{
 		$author_handle = XML::unescape($data->author);
-		$recipient = XML::unescape($data->recipient);
+		$recipient     = XML::unescape($data->recipient);
 
 		if (!$author_handle || !$recipient) {
 			return false;
@@ -2313,8 +2313,8 @@ class Diaspora
 	 */
 	private static function receiveReshare(array $importer, SimpleXMLElement $data, string $xml, int $direction): bool
 	{
-		$author = WebFingerUri::fromString(XML::unescape($data->author));
-		$guid = XML::unescape($data->guid);
+		$author     = WebFingerUri::fromString(XML::unescape($data->author));
+		$guid       = XML::unescape($data->guid);
 		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
 		try {
 			$root_author = WebFingerUri::fromString(XML::unescape($data->root_author));
@@ -2348,25 +2348,25 @@ class Diaspora
 
 		$datarray = [];
 
-		$datarray['uid'] = $importer['uid'];
+		$datarray['uid']        = $importer['uid'];
 		$datarray['contact-id'] = $contact['id'];
-		$datarray['network']  = Protocol::DIASPORA;
+		$datarray['network']    = Protocol::DIASPORA;
 
 		$datarray['author-link'] = $contact['url'];
-		$datarray['author-id'] = Contact::getIdForURL($contact['url'], 0);
+		$datarray['author-id']   = Contact::getIdForURL($contact['url'], 0);
 
 		$datarray['owner-link'] = $datarray['author-link'];
-		$datarray['owner-id'] = $datarray['author-id'];
+		$datarray['owner-id']   = $datarray['author-id'];
 
-		$datarray['guid'] = $guid;
-		$datarray['uri'] = $datarray['thr-parent'] = self::getUriFromGuid($guid, $author);
+		$datarray['guid']   = $guid;
+		$datarray['uri']    = $datarray['thr-parent'] = self::getUriFromGuid($guid, $author);
 		$datarray['uri-id'] = ItemURI::insert(['uri' => $datarray['uri'], 'guid' => $datarray['guid']]);
 
-		$datarray['verb'] = Activity::POST;
+		$datarray['verb']    = Activity::POST;
 		$datarray['gravity'] = Item::GRAVITY_PARENT;
 
 		$datarray['protocol'] = Conversation::PARCEL_DIASPORA;
-		$datarray['source'] = $xml;
+		$datarray['source']   = $xml;
 
 		$datarray = self::setDirection($datarray, $direction);
 
@@ -2625,11 +2625,11 @@ class Diaspora
 	 */
 	private static function receiveStatusMessage(array $importer, SimpleXMLElement $data, string $xml, int $direction)
 	{
-		$author = WebFingerUri::fromString(XML::unescape($data->author));
-		$guid = XML::unescape($data->guid);
-		$created_at = DateTimeFormat::utc(XML::unescape($data->created_at));
-		$public = XML::unescape($data->public);
-		$text = XML::unescape($data->text);
+		$author                = WebFingerUri::fromString(XML::unescape($data->author));
+		$guid                  = XML::unescape($data->guid);
+		$created_at            = DateTimeFormat::utc(XML::unescape($data->created_at));
+		$public                = XML::unescape($data->public);
+		$text                  = XML::unescape($data->text);
 		$provider_display_name = XML::unescape($data->provider_display_name);
 
 		$contact = self::allowedContactByHandle($importer, $author);
@@ -2689,7 +2689,7 @@ class Diaspora
 			}
 
 			$datarray['object-type'] = Activity\ObjectType::IMAGE;
-			$datarray['post-type'] = Item::PT_IMAGE;
+			$datarray['post-type']   = Item::PT_IMAGE;
 		} elseif ($data->poll) {
 			$datarray['post-type'] = Item::PT_POLL;
 		}
@@ -2799,10 +2799,10 @@ class Diaspora
 			return false;
 		}
 
-		$aes_key = random_bytes(32);
+		$aes_key   = random_bytes(32);
 		$b_aes_key = base64_encode($aes_key);
-		$iv = random_bytes(16);
-		$b_iv = base64_encode($iv);
+		$iv        = random_bytes(16);
+		$b_iv      = base64_encode($iv);
 
 		$ciphertext = self::aesEncrypt($aes_key, $iv, $msg);
 
@@ -2815,7 +2815,7 @@ class Diaspora
 
 		$json_object = json_encode(
 			[
-				'aes_key' => base64_encode($encrypted_key_bundle),
+				'aes_key'                  => base64_encode($encrypted_key_bundle),
 				'encrypted_magic_envelope' => base64_encode($ciphertext)
 			]
 		);
@@ -2835,12 +2835,12 @@ class Diaspora
 	public static function buildMagicEnvelope(string $msg, array $user): string
 	{
 		$b64url_data = Strings::base64UrlEncode($msg);
-		$data = str_replace(["\n", "\r", ' ', "\t"], ['', '', '', ''], $b64url_data);
+		$data        = str_replace(["\n", "\r", ' ', "\t"], ['', '', '', ''], $b64url_data);
 
-		$key_id = Strings::base64UrlEncode(self::myHandle($user));
-		$type = 'application/xml';
-		$encoding = 'base64url';
-		$alg = 'RSA-SHA256';
+		$key_id        = Strings::base64UrlEncode(self::myHandle($user));
+		$type          = 'application/xml';
+		$encoding      = 'base64url';
+		$alg           = 'RSA-SHA256';
 		$signable_data = $data . '.' . Strings::base64UrlEncode($type) . '.' . Strings::base64UrlEncode($encoding) . '.' . Strings::base64UrlEncode($alg);
 
 		// Fallback if the private key wasn't transmitted in the expected field
@@ -2849,7 +2849,7 @@ class Diaspora
 		}
 
 		$signature = Crypto::rsaSign($signable_data, $user['uprvkey']);
-		$sig = Strings::base64UrlEncode($signature);
+		$sig       = Strings::base64UrlEncode($signature);
 
 		$xmldata = [
 			'me:env' => [
@@ -2936,7 +2936,7 @@ class Diaspora
 		// We always try to use the data from the diaspora-contact table.
 		// This is important for transmitting data to Friendica servers.
 		try {
-			$target = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']));
+			$target   = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']));
 			$dest_url = $public_batch ? $target->batch : $target->notify;
 		} catch (HTTPException\NotFoundException | \InvalidArgumentException $e) {
 		}
@@ -3070,9 +3070,9 @@ class Diaspora
 		// If the item belongs to a user, we take this user id.
 		if ($item['uid'] == 0) {
 			// @todo Possibly use an administrator account?
-			$condition = ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false, 'account-type' => User::ACCOUNT_TYPE_PERSON];
+			$condition  = ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false, 'account-type' => User::ACCOUNT_TYPE_PERSON];
 			$first_user = DBA::selectFirst('user', ['uid'], $condition, ['order' => ['uid']]);
-			$owner = User::getOwnerDataById($first_user['uid']);
+			$owner      = User::getOwnerDataById($first_user['uid']);
 		} else {
 			$owner = User::getOwnerDataById($item['uid']);
 		}
@@ -3080,8 +3080,8 @@ class Diaspora
 		$author_handle = self::myHandle($owner);
 
 		$message = [
-			'author' => $author_handle,
-			'guid' => System::createUUID(),
+			'author'      => $author_handle,
+			'guid'        => System::createUUID(),
 			'parent_type' => 'Post',
 			'parent_guid' => $item['guid']
 		];
@@ -3108,14 +3108,14 @@ class Diaspora
 	public static function sendAccountMigration(array $owner, array $contact, int $uid): int
 	{
 		$old_handle = DI::pConfig()->get($uid, 'system', 'previous_addr');
-		$profile = self::createProfileData($uid);
+		$profile    = self::createProfileData($uid);
 
 		$signed_text = 'AccountMigration:' . $old_handle . ':' . $profile['author'];
-		$signature = base64_encode(Crypto::rsaSign($signed_text, $owner['uprvkey'], 'sha256'));
+		$signature   = base64_encode(Crypto::rsaSign($signed_text, $owner['uprvkey'], 'sha256'));
 
 		$message = [
-			'author' => $old_handle,
-			'profile' => $profile,
+			'author'    => $old_handle,
+			'profile'   => $profile,
 			'signature' => $signature
 		];
 
@@ -3159,10 +3159,10 @@ class Diaspora
 		*/
 
 		$message = [
-			'author' => self::myHandle($owner),
+			'author'    => self::myHandle($owner),
 			'recipient' => $contact['addr'],
 			'following' => 'true',
-			'sharing' => 'true'
+			'sharing'   => 'true'
 		];
 
 		Logger::info('Send share', ['msg' => $message]);
@@ -3271,9 +3271,9 @@ class Diaspora
 		}
 		if ($event['location']) {
 			$event['location'] = preg_replace("/\[map\](.*?)\[\/map\]/ism", '$1', $event['location']);
-			$coord = Map::getCoordinates($event['location']);
+			$coord             = Map::getCoordinates($event['location']);
 
-			$location = [];
+			$location            = [];
 			$location['address'] = html_entity_decode(BBCode::toMarkdown($event['location']));
 			if (!empty($coord['lat']) && !empty($coord['lon'])) {
 				$location['lat'] = $coord['lat'];
@@ -3311,9 +3311,9 @@ class Diaspora
 
 		$myaddr = self::myHandle($owner);
 
-		$public = ($item['private'] == Item::PRIVATE ? 'false' : 'true');
+		$public  = ($item['private'] == Item::PRIVATE ? 'false' : 'true');
 		$created = DateTimeFormat::utc($item['received'], DateTimeFormat::ATOM);
-		$edited = DateTimeFormat::utc($item['edited'] ?? $item['created'], DateTimeFormat::ATOM);
+		$edited  = DateTimeFormat::utc($item['edited'] ?? $item['created'], DateTimeFormat::ATOM);
 
 		// Detect a share element and do a reshare
 		if (($item['private'] != Item::PRIVATE) && ($ret = self::getReshareDetails($item))) {
@@ -3367,24 +3367,25 @@ class Diaspora
 
 			$location = [];
 
-			if ($item['location'] != '')
+			if ($item['location'] != '') {
 				$location['address'] = $item['location'];
+			}
 
 			if ($item['coord'] != '') {
-				$coord = explode(' ', $item['coord']);
+				$coord           = explode(' ', $item['coord']);
 				$location['lat'] = $coord[0];
 				$location['lng'] = $coord[1];
 			}
 
 			$message = [
-				'author' => $myaddr,
-				'guid' => $item['guid'],
-				'created_at' => $created,
-				'edited_at' => $edited,
-				'public' => $public,
-				'text' => $body,
+				'author'                => $myaddr,
+				'guid'                  => $item['guid'],
+				'created_at'            => $created,
+				'edited_at'             => $edited,
+				'public'                => $public,
+				'text'                  => $body,
 				'provider_display_name' => $item['app'],
-				'location' => $location
+				'location'              => $location
 			];
 
 			if ($native_photos) {
@@ -3515,7 +3516,7 @@ class Diaspora
 		}
 
 		$target_type = ($parent['uri'] === $parent['thr-parent'] ? 'Post' : 'Comment');
-		$positive = null;
+		$positive    = null;
 		if ($item['verb'] === Activity::LIKE) {
 			$positive = 'true';
 		} elseif ($item['verb'] === Activity::DISLIKE) {
@@ -3564,10 +3565,10 @@ class Diaspora
 		}
 
 		return [
-			'author' => self::myHandle($owner),
-			'guid' => $item['guid'],
-			'parent_guid' => $parent['guid'],
-			'status' => $attend_answer,
+			'author'           => self::myHandle($owner),
+			'guid'             => $item['guid'],
+			'parent_guid'      => $parent['guid'],
+			'status'           => $attend_answer,
 			'author_signature' => ''
 		];
 	}
@@ -3617,17 +3618,17 @@ class Diaspora
 			$body = self::prependParentAuthorMention($body, $thread_parent_item['author-link']);
 		}
 
-		$text = html_entity_decode(BBCode::toMarkdown($body));
+		$text    = html_entity_decode(BBCode::toMarkdown($body));
 		$created = DateTimeFormat::utc($item['created'], DateTimeFormat::ATOM);
-		$edited = DateTimeFormat::utc($item['edited'], DateTimeFormat::ATOM);
+		$edited  = DateTimeFormat::utc($item['edited'], DateTimeFormat::ATOM);
 
 		$comment = [
-			'author'      => self::myHandle($owner),
-			'guid'        => $item['guid'],
-			'created_at'  => $created,
-			'edited_at'   => $edited,
-			'parent_guid' => $toplevel_item['guid'],
-			'text'        => $text,
+			'author'           => self::myHandle($owner),
+			'guid'             => $item['guid'],
+			'created_at'       => $created,
+			'edited_at'        => $edited,
+			'parent_guid'      => $toplevel_item['guid'],
+			'text'             => $text,
 			'author_signature' => '',
 		];
 
@@ -3659,13 +3660,13 @@ class Diaspora
 
 		if (in_array($item['verb'], [Activity::ATTEND, Activity::ATTENDNO, Activity::ATTENDMAYBE])) {
 			$message = self::constructAttend($item, $owner);
-			$type = 'event_participation';
+			$type    = 'event_participation';
 		} elseif (in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE])) {
 			$message = self::constructLike($item, $owner);
-			$type = 'like';
+			$type    = 'like';
 		} elseif (!in_array($item['verb'], [Activity::FOLLOW, Activity::TAG])) {
 			$message = self::constructComment($item, $owner);
-			$type = 'comment';
+			$type    = 'comment';
 		}
 
 		if (empty($message)) {
@@ -3754,7 +3755,7 @@ class Diaspora
 		}
 
 		$message = [
-			'author' => $itemaddr,
+			'author'      => $itemaddr,
 			'target_guid' => $item['guid'],
 			'target_type' => $target_type
 		];
@@ -3785,28 +3786,28 @@ class Diaspora
 			return -1;
 		}
 
-		$body = BBCode::toMarkdown($item['body']);
+		$body    = BBCode::toMarkdown($item['body']);
 		$created = DateTimeFormat::utc($item['created'], DateTimeFormat::ATOM);
 
 		$msg = [
-			'author' => $myaddr,
-			'guid' => $item['guid'],
+			'author'            => $myaddr,
+			'guid'              => $item['guid'],
 			'conversation_guid' => $cnv['guid'],
-			'text' => $body,
-			'created_at' => $created,
+			'text'              => $body,
+			'created_at'        => $created,
 		];
 
 		if ($item['reply']) {
 			$message = $msg;
-			$type = 'message';
+			$type    = 'message';
 		} else {
 			$message = [
-				'author' => $cnv['creator'],
-				'guid' => $cnv['guid'],
-				'subject' => $cnv['subject'],
-				'created_at' => DateTimeFormat::utc($cnv['created'], DateTimeFormat::ATOM),
+				'author'       => $cnv['creator'],
+				'guid'         => $cnv['guid'],
+				'subject'      => $cnv['subject'],
+				'created_at'   => DateTimeFormat::utc($cnv['created'], DateTimeFormat::ATOM),
 				'participants' => $cnv['recips'],
-				'message' => $msg
+				'message'      => $msg
 			];
 
 			$type = 'conversation';
@@ -3837,14 +3838,14 @@ class Diaspora
 
 		// Take the first word as first name
 		$first = ((strpos($name, ' ') ? trim(substr($name, 0, strpos($name, ' '))) : $name));
-		$last = (($first === $name) ? '' : trim(substr($name, strlen($first))));
+		$last  = (($first === $name) ? '' : trim(substr($name, strlen($first))));
 		if ((strlen($first) < 32) && (strlen($last) < 32)) {
 			return ['first' => $first, 'last' => $last];
 		}
 
 		// Take the last word as last name
 		$first = ((strrpos($name, ' ') ? trim(substr($name, 0, strrpos($name, ' '))) : $name));
-		$last = (($first === $name) ? '' : trim(substr($name, strlen($first))));
+		$last  = (($first === $name) ? '' : trim(substr($name, strlen($first))));
 
 		if ((strlen($first) < 32) && (strlen($last) < 32)) {
 			return ['first' => $first, 'last' => $last];
@@ -3853,12 +3854,12 @@ class Diaspora
 		// Take the first 32 characters if there is no space in the first 32 characters
 		if ((strpos($name, ' ') > 32) || (strpos($name, ' ') === false)) {
 			$first = substr($name, 0, 32);
-			$last = substr($name, 32);
+			$last  = substr($name, 32);
 			return ['first' => $first, 'last' => $last];
 		}
 
 		$first = trim(substr($name, 0, strrpos(substr($name, 0, 33), ' ')));
-		$last = (($first === $name) ? '' : trim(substr($name, strlen($first))));
+		$last  = (($first === $name) ? '' : trim(substr($name, strlen($first))));
 
 		// Check if the last name is longer than 32 characters
 		if (strlen($last) > 32) {
@@ -3913,7 +3914,7 @@ class Diaspora
 			$data['birthday'] = '';
 
 			if ($profile['dob'] && ($profile['dob'] > '0000-00-00')) {
-				[$year, $month, $day] = sscanf($profile['dob'], '%4d-%2d-%2d');
+				list($year, $month, $day) = sscanf($profile['dob'], '%4d-%2d-%2d');
 				if ($year < 1004) {
 					$year = 1004;
 				}
@@ -3922,12 +3923,12 @@ class Diaspora
 
 			$data['bio'] = BBCode::toMarkdown($profile['about'] ?? '');
 
-			$data['location'] = $profile['location'];
+			$data['location']   = $profile['location'];
 			$data['tag_string'] = '';
 
 			if ($profile['pub_keywords']) {
-				$kw = str_replace(',', ' ', $profile['pub_keywords']);
-				$kw = str_replace('  ', ' ', $kw);
+				$kw  = str_replace(',', ' ', $profile['pub_keywords']);
+				$kw  = str_replace('  ', ' ', $kw);
 				$arr = explode(' ', $kw);
 				if (count($arr)) {
 					for ($x = 0; $x < 5; $x++) {
@@ -4004,7 +4005,8 @@ class Diaspora
 		}
 
 		if (!in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE])) {
-			Logger::warning('Item is neither a like nor a dislike', ['uid' => $uid, 'item[verb]' => $item['verb']]);;
+			Logger::warning('Item is neither a like nor a dislike', ['uid' => $uid, 'item[verb]' => $item['verb']]);
+			;
 			return false;
 		}
 
@@ -4121,8 +4123,8 @@ class Diaspora
 			'quote-uri-id' => $UriId,
 			'allow_cid'    => $owner['allow_cid'] ?? '',
 			'allow_gid'    => $owner['allow_gid'] ?? '',
-			'deny_cid'     => $owner['deny_cid'] ?? '',
-			'deny_gid'     => $owner['deny_gid'] ?? '',
+			'deny_cid'     => $owner['deny_cid']  ?? '',
+			'deny_gid'     => $owner['deny_gid']  ?? '',
 		];
 
 		if (!empty($item['allow_cid'] . $item['allow_gid'] . $item['deny_cid'] . $item['deny_gid'])) {

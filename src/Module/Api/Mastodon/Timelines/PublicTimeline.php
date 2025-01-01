@@ -75,7 +75,7 @@ class PublicTimeline extends BaseApi
 		];
 
 		$condition = $this->addPagingConditions($request, $condition);
-		$params = $this->buildOrderAndLimitParams($request);
+		$params    = $this->buildOrderAndLimitParams($request);
 
 		if ($request['local']) {
 			$condition = DBA::mergeConditions($condition, ['origin' => true]);
@@ -109,7 +109,7 @@ class PublicTimeline extends BaseApi
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			try {
-				$status =  DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {

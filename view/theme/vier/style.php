@@ -51,8 +51,11 @@ header('Last-Modified: '.$modified);
 
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
-	$cached_etag = str_replace(['"', "-gzip"], ['', ''],
-				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
+	$cached_etag     = str_replace(
+		['"', "-gzip"],
+		['', ''],
+		stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])
+	);
 
 	if (($cached_modified == $modified) && ($cached_etag == $etag)) {
 		throw new NotModifiedException();

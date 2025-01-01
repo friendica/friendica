@@ -12,7 +12,6 @@ use Mockery\MockInterface;
 
 trait HookMockTrait
 {
-
 	/**
 	 * @var MockInterface The Interface for mocking a renderer
 	 */

@@ -127,7 +127,7 @@ class Email
 	 */
 	public static function getMessage($mbox, int $uid, string $reply, array $item): array
 	{
-		$ret = $item;
+		$ret   = $item;
 		$struc = (($mbox && $uid) ? @imap_fetchstructure($mbox, $uid, FT_UID) : null);
 
 		if (!$struc) {
@@ -154,7 +154,7 @@ class Email
 
 				$message = ['text' => $text, 'html' => '', 'item' => $ret];
 				Hook::callAll('email_getmessage', $message);
-				$ret = $message['item'];
+				$ret         = $message['item'];
 				$ret['body'] = $message['text'];
 			}
 		} else {
@@ -186,7 +186,7 @@ class Email
 		}
 
 		$ret['body'] = self::removeGPG($ret['body']);
-		$msg = self::removeSig($ret['body']);
+		$msg         = self::removeSig($ret['body']);
 		$ret['body'] = $msg['body'];
 		$ret['body'] = self::convertQuote($ret['body'], $reply);
 
@@ -221,8 +221,8 @@ class Email
 
 		// DECODE DATA
 		$data = ($partno)
-			? @imap_fetchbody($mbox, $uid, $partno, FT_UID|FT_PEEK)
-		: @imap_body($mbox, $uid, FT_UID|FT_PEEK);
+			? @imap_fetchbody($mbox, $uid, $partno, FT_UID | FT_PEEK)
+		: @imap_body($mbox, $uid, FT_UID | FT_PEEK);
 
 		// Any part may be encoded, even plain text messages, so check everything.
 		if ($p->encoding == 4) {
@@ -261,7 +261,7 @@ class Email
 		if ($p->type == 0 && $data) {
 			// Messages may be split in different parts because of inline attachments,
 			// so append parts together with blank row.
-			if (strtolower($p->subtype)==$subtype) {
+			if (strtolower($p->subtype) == $subtype) {
 				$data = iconv($params['charset'], 'UTF-8//IGNORE', $data);
 				return (trim($data) ."\n\n");
 			} else {
@@ -285,7 +285,7 @@ class Email
 		if (isset($p->parts) && $p->parts) {
 			$x = "";
 			foreach ($p->parts as $partno0 => $p2) {
-				$x .=  self::messageGetPart($mbox, $uid, $p2, $partno . '.' . ($partno0+1), $subtype);  // 1.2, 1.2.1, etc.
+				$x .= self::messageGetPart($mbox, $uid, $p2, $partno . '.' . ($partno0 + 1), $subtype);  // 1.2, 1.2.1, etc.
 			}
 			return $x;
 		}
@@ -301,10 +301,10 @@ class Email
 	 */
 	public static function encodeHeader(string $in_str, string $charset): string
 	{
-		$out_str = $in_str;
+		$out_str         = $in_str;
 		$need_to_convert = false;
 
-		for ($x = 0; $x < strlen($in_str); $x ++) {
+		for ($x = 0; $x < strlen($in_str); $x++) {
 			if ((ord($in_str[$x]) == 0) || ((ord($in_str[$x]) > 128))) {
 				$need_to_convert = true;
 			}
@@ -316,8 +316,8 @@ class Email
 
 		if ($out_str && $charset) {
 			// define start delimiter, end delimiter and spacer
-			$end = "?=";
-			$start = "=?" . $charset . "?B?";
+			$end    = "?=";
+			$start  = "=?" . $charset . "?B?";
 			$spacer = $end . "\r\n " . $start;
 
 			// determine length of encoded text within chunks
@@ -344,7 +344,7 @@ class Email
 
 			// remove trailing spacer and
 			// add start and end delimiters
-			$spacer = preg_quote($spacer, '/');
+			$spacer  = preg_quote($spacer, '/');
 			$out_str = preg_replace("/" . $spacer . "$/", "", $out_str);
 			$out_str = $start . $out_str . $end;
 		}
@@ -374,7 +374,7 @@ class Email
 
 		$part = uniqid('', true);
 
-		$html    = Item::prepareBody($item);
+		$html = Item::prepareBody($item);
 
 		$headers .= "Mime-Version: 1.0\n";
 		$headers .= 'Content-Type: multipart/alternative; boundary="=_'.$part.'"'."\n\n";
@@ -571,13 +571,13 @@ class Email
 	 */
 	private static function removeSig(string $message): array
 	{
-		$sigpos = strrpos($message, "\n-- \n");
+		$sigpos   = strrpos($message, "\n-- \n");
 		$quotepos = strrpos($message, "[/quote]");
 
 		if ($sigpos == 0) {
 			// Especially for web.de who are using that as a separator
-			$message = str_replace("\n___________________________________________________________\n", "\n-- \n", $message);
-			$sigpos = strrpos($message, "\n-- \n");
+			$message  = str_replace("\n___________________________________________________________\n", "\n-- \n", $message);
+			$sigpos   = strrpos($message, "\n-- \n");
 			$quotepos = strrpos($message, "[/quote]");
 		}
 
@@ -592,10 +592,10 @@ class Email
 
 		if (!empty($result[1]) && !empty($result[2])) {
 			$cleaned = trim($result[1])."\n";
-			$sig = trim($result[2]);
+			$sig     = trim($result[2]);
 		} else {
 			$cleaned = $message;
-			$sig = '';
+			$sig     = '';
 		}
 
 		return ['body' => $cleaned, 'sig' => $sig];
@@ -611,13 +611,13 @@ class Email
 	{
 		$arrbody = explode("\n", trim($message));
 
-		$lines = [];
+		$lines  = [];
 		$lineno = 0;
 
 		foreach ($arrbody as $i => $line) {
 			$currquotelevel = 0;
-			$currline = $line;
-			while ((strlen($currline)>0) && ((substr($currline, 0, 1) == '>')
+			$currline       = $line;
+			while ((strlen($currline) > 0) && ((substr($currline, 0, 1) == '>')
 				|| (substr($currline, 0, 1) == ' '))) {
 				if (substr($currline, 0, 1) == '>') {
 					$currquotelevel++;
@@ -627,8 +627,8 @@ class Email
 			}
 
 			$quotelevel = 0;
-			$nextline = trim($arrbody[$i + 1] ?? '');
-			while ((strlen($nextline)>0) && ((substr($nextline, 0, 1) == '>')
+			$nextline   = trim($arrbody[$i + 1] ?? '');
+			while ((strlen($nextline) > 0) && ((substr($nextline, 0, 1) == '>')
 				|| (substr($nextline, 0, 1) == ' '))) {
 				if (substr($nextline, 0, 1) == '>') {
 					$quotelevel++;
@@ -642,7 +642,7 @@ class Email
 					$lines[$lineno] .= ' ';
 				}
 
-				while ((strlen($line)>0) && ((substr($line, 0, 1) == '>')
+				while ((strlen($line) > 0) && ((substr($line, 0, 1) == '>')
 					|| (substr($line, 0, 1) == ' '))) {
 
 					$line = ltrim(substr($line, 1));
@@ -663,34 +663,35 @@ class Email
 	private static function convertQuote(string $body, string $reply): string
 	{
 		// Convert Quotes
-		$arrbody = explode("\n", trim($body));
+		$arrbody  = explode("\n", trim($body));
 		$arrlevel = [];
 
 		for ($i = 0; $i < count($arrbody); $i++) {
 			$quotelevel = 0;
-			$quoteline = $arrbody[$i];
+			$quoteline  = $arrbody[$i];
 
-			while ((strlen($quoteline)>0) and ((substr($quoteline, 0, 1) == '>')
+			while ((strlen($quoteline) > 0) and ((substr($quoteline, 0, 1) == '>')
 				|| (substr($quoteline, 0, 1) == ' '))) {
-				if (substr($quoteline, 0, 1) == '>')
+				if (substr($quoteline, 0, 1) == '>') {
 					$quotelevel++;
+				}
 
 				$quoteline = ltrim(substr($quoteline, 1));
 			}
 
 			$arrlevel[$i] = $quotelevel;
-			$arrbody[$i] = $quoteline;
+			$arrbody[$i]  = $quoteline;
 		}
 
-		$quotelevel = 0;
+		$quotelevel    = 0;
 		$arrbodyquoted = [];
 
 		for ($i = 0; $i < count($arrbody); $i++) {
 			$previousquote = $quotelevel;
-			$quotelevel = $arrlevel[$i];
+			$quotelevel    = $arrlevel[$i];
 
 			while ($previousquote < $quotelevel) {
-				$quote = "[quote]";
+				$quote       = "[quote]";
 				$arrbody[$i] = $quote.$arrbody[$i];
 				$previousquote++;
 			}
@@ -726,8 +727,8 @@ class Email
 
 		do {
 			$oldmessage = $message;
-			$message = preg_replace('=\[/quote\][\s](.*?)\[quote\]=i', '$1', $message);
-			$message = str_replace('[/quote][quote]', '', $message);
+			$message    = preg_replace('=\[/quote\][\s](.*?)\[quote\]=i', '$1', $message);
+			$message    = str_replace('[/quote][quote]', '', $message);
 		} while ($message != $oldmessage);
 
 		$quotes = [];
@@ -738,12 +739,12 @@ class Email
 
 		while (($pos = strpos($message, '[quote', $start)) > 0) {
 			$quotes[$pos] = -1;
-			$start = $pos + 7;
+			$start        = $pos + 7;
 			$startquotes++;
 		}
 
 		$endquotes = 0;
-		$start = 0;
+		$start     = 0;
 
 		while (($pos = strpos($message, '[/quote]', $start)) > 0) {
 			$start = $pos + 7;
@@ -759,7 +760,7 @@ class Email
 
 		while (($pos = strpos($message, '[/quote]', $start)) > 0) {
 			$quotes[$pos] = 1;
-			$start = $pos + 7;
+			$start        = $pos + 7;
 		}
 
 		if (strtolower(substr($message, -8)) != '[/quote]') {
@@ -773,12 +774,13 @@ class Email
 		foreach ($quotes as $index => $quote) {
 			$quotelevel += $quote;
 
-			if (($quotelevel == 0) and ($quotestart == 0))
+			if (($quotelevel == 0) and ($quotestart == 0)) {
 				$quotestart = $index;
+			}
 		}
 
 		if ($quotestart != 0) {
-			$message = trim(substr($message, 0, $quotestart))."\n[spoiler]".substr($message, $quotestart+7, -8) . '[/spoiler]';
+			$message = trim(substr($message, 0, $quotestart))."\n[spoiler]".substr($message, $quotestart + 7, -8) . '[/spoiler]';
 		}
 
 		return $message;

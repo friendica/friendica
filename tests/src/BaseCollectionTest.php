@@ -9,7 +9,6 @@ namespace Friendica\Test\src;
 
 use Friendica\BaseCollection;
 use Friendica\BaseEntity;
-use Mockery\Mock;
 use PHPUnit\Framework\TestCase;
 
 class BaseCollectionTest extends TestCase

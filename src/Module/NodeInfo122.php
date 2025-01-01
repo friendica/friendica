@@ -37,12 +37,12 @@ class NodeInfo122 extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		$nodeinfo = [
-			'version'   => '2.2',
-			'instance'  => [
+			'version'  => '2.2',
+			'instance' => [
 				'name'        => $this->config->get('config', 'sitename'),
 				'description' => $this->config->get('config', 'info'),
 			],
-			'software'  => [
+			'software' => [
 				'name'       => 'friendica',
 				'version'    => App::VERSION . '-' . DB_UPDATE_VERSION,
 				'repository' => 'https://github.com/friendica/friendica',

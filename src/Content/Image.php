@@ -24,8 +24,8 @@ class Image
 				$media = self::getHorizontalMasonryHtml($PostMediaImages);
 			} elseif (count($PostMediaImages) == 1) {
 				$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
-					'$image' => $PostMediaImages[0],
-					'$allocated_height' => $PostMediaImages[0]->getAllocatedHeight(),
+					'$image'               => $PostMediaImages[0],
+					'$allocated_height'    => $PostMediaImages[0]->getAllocatedHeight(),
 					'$allocated_max_width' => ($PostMediaImages[0]->previewWidth ?? $PostMediaImages[0]->width) . 'px',
 				]);
 			}
@@ -81,14 +81,14 @@ class Image
 					$PostMediaImages[] = $PostMediaImages[0];
 				}
 
-				$widths = [];
+				$widths  = [];
 				$heights = [];
 				foreach ($PostMediaImages as $PostMediaImage) {
 					if ($PostMediaImage->width && $PostMediaImage->height) {
-						$widths[] = $PostMediaImage->width;
+						$widths[]  = $PostMediaImage->width;
 						$heights[] = $PostMediaImage->height;
 					} else {
-						$widths[] = $PostMediaImage->previewWidth;
+						$widths[]  = $PostMediaImage->previewWidth;
 						$heights[] = $PostMediaImage->previewHeight;
 					}
 				}
@@ -130,7 +130,7 @@ class Image
 		);
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/horizontal_masonry.tpl'), [
-			'$rows' => $rows,
+			'$rows'        => $rows,
 			'$column_size' => $column_size,
 		]);
 	}

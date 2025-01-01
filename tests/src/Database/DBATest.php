@@ -36,7 +36,8 @@ class DBATest extends DatabaseTestCase
 	/**
 	 * @small
 	 */
-	public function testExists() {
+	public function testExists()
+	{
 
 		self::assertTrue(DBA::exists('user', []));
 		self::assertFalse(DBA::exists('notable', []));

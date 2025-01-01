@@ -34,9 +34,9 @@ class ProfilerTest extends MockedTestCase
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 		$profiler = new Profiler($config);
 
 		self::assertInstanceOf(Profiler::class, $profiler);
@@ -51,53 +51,53 @@ class ProfilerTest extends MockedTestCase
 		return [
 			'database' => [
 				'timestamp' => time(),
-				'name' => 'database',
+				'name'      => 'database',
 				'functions' => ['test', 'it'],
 			],
 			'database_write' => [
 				'timestamp' => time(),
-				'name' => 'database_write',
+				'name'      => 'database_write',
 				'functions' => ['test', 'it2'],
 			],
 			'cache' => [
 				'timestamp' => time(),
-				'name' => 'cache',
+				'name'      => 'cache',
 				'functions' => ['test', 'it3'],
 			],
 			'cache_write' => [
 				'timestamp' => time(),
-				'name' => 'cache_write',
+				'name'      => 'cache_write',
 				'functions' => ['test', 'it4'],
 			],
 			'network' => [
 				'timestamp' => time(),
-				'name' => 'network',
+				'name'      => 'network',
 				'functions' => ['test', 'it5'],
 			],
 			'file' => [
 				'timestamp' => time(),
-				'name' => 'file',
+				'name'      => 'file',
 				'functions' => [],
 			],
 			'rendering' => [
 				'timestamp' => time(),
-				'name' => 'rendering',
+				'name'      => 'rendering',
 				'functions' => ['test', 'it7'],
 			],
 			'session' => [
 				'timestamp' => time(),
-				'name' => 'session',
+				'name'      => 'session',
 				'functions' => ['test', 'it8'],
 			],
 			'marktime' => [
 				'timestamp' => time(),
-				'name' => 'session',
+				'name'      => 'session',
 				'functions' => ['test'],
 			],
 			// This one isn't set during reset
 			'unknown' => [
 				'timestamp' => time(),
-				'name' => 'unknown',
+				'name'      => 'unknown',
 				'functions' => ['test'],
 			],
 		];
@@ -111,9 +111,9 @@ class ProfilerTest extends MockedTestCase
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 
@@ -132,9 +132,9 @@ class ProfilerTest extends MockedTestCase
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 
@@ -151,27 +151,27 @@ class ProfilerTest extends MockedTestCase
 				'data' => [
 					'database' => [
 						'timestamp' => time(),
-						'name' => 'database',
+						'name'      => 'database',
 						'functions' => ['test', 'it'],
 					],
 					'database_write' => [
 						'timestamp' => time(),
-						'name' => 'database_write',
+						'name'      => 'database_write',
 						'functions' => ['test', 'it2'],
 					],
 					'cache' => [
 						'timestamp' => time(),
-						'name' => 'cache',
+						'name'      => 'cache',
 						'functions' => ['test', 'it3'],
 					],
 					'cache_write' => [
 						'timestamp' => time(),
-						'name' => 'cache_write',
+						'name'      => 'cache_write',
 						'functions' => ['test', 'it4'],
 					],
 					'network' => [
 						'timestamp' => time(),
-						'name' => 'network',
+						'name'      => 'network',
 						'functions' => ['test', 'it5'],
 					],
 				]
@@ -195,9 +195,9 @@ class ProfilerTest extends MockedTestCase
 
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 

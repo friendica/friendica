@@ -42,57 +42,57 @@ class ACLFormatterTest extends TestCase
 	{
 		return [
 			'normal' => [
-				'input' => '<1><2><3><' . Circle::FOLLOWERS . '><' . Circle::MUTUALS . '>',
+				'input'  => '<1><2><3><' . Circle::FOLLOWERS . '><' . Circle::MUTUALS . '>',
 				'assert' => ['1', '2', '3', Circle::FOLLOWERS, Circle::MUTUALS],
 			],
 			'nigNumber' => [
-				'input' => '<1><' . PHP_INT_MAX . '><15>',
+				'input'  => '<1><' . PHP_INT_MAX . '><15>',
 				'assert' => ['1', (string)PHP_INT_MAX, '15'],
 			],
 			'string' => [
-				'input' => '<1><279012><tt>',
+				'input'  => '<1><279012><tt>',
 				'assert' => ['1', '279012'],
 			],
 			'space' => [
-				'input' => '<1><279 012><32>',
+				'input'  => '<1><279 012><32>',
 				'assert' => ['1', '32'],
 			],
 			'empty' => [
-				'input' => '',
+				'input'  => '',
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'noBrackets' => [
-				'input' => 'According to documentation, that\'s invalid. ', //should be invalid
+				'input'  => 'According to documentation, that\'s invalid. ', //should be invalid
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'justOneBracket' => [
-				'input' => '<Another invalid string', //should be invalid
+				'input'  => '<Another invalid string', //should be invalid
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'justOneBracket2' => [
-				'input' => 'Another invalid> string', //should be invalid
+				'input'  => 'Another invalid> string', //should be invalid
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'closeOnly' => [
-				'input' => 'Another> invalid> string>', //should be invalid
+				'input'  => 'Another> invalid> string>', //should be invalid
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'openOnly' => [
-				'input' => '<Another< invalid string<', //should be invalid
+				'input'  => '<Another< invalid string<', //should be invalid
 				'assert' => [],
 			],
 			/// @todo should there be an exception?
 			'noMatching1' => [
-				'input' => '<Another<> invalid <string>', //should be invalid
+				'input'  => '<Another<> invalid <string>', //should be invalid
 				'assert' => [],
 			],
 			'emptyMatch' => [
-				'input' => '<1><><3>',
+				'input'  => '<1><><3>',
 				'assert' => ['1', '3'],
 			],
 		];
@@ -113,28 +113,28 @@ class ACLFormatterTest extends TestCase
 	{
 		$aclFormatter = new ACLFormatter();
 
-		$allow_people = $aclFormatter->expand();
+		$allow_people  = $aclFormatter->expand();
 		$allow_circles = $aclFormatter->expand();
 
 		self::assertEmpty($aclFormatter->expand(null));
 		self::assertEmpty($aclFormatter->expand());
 
-		$recipients   = array_unique(array_merge($allow_people, $allow_circles));
+		$recipients = array_unique(array_merge($allow_people, $allow_circles));
 		self::assertEmpty($recipients);
 	}
 
 	public function dataAclToString()
 	{
 		return [
-			'empty'   => [
+			'empty' => [
 				'input'  => '',
 				'assert' => '',
 			],
-			'string'  => [
+			'string' => [
 				'input'  => '1,2,3,4',
 				'assert' => '<1><2><3><4>',
 			],
-			'array'   => [
+			'array' => [
 				'input'  => [1, 2, 3, 4],
 				'assert' => '<1><2><3><4>',
 			],
@@ -148,19 +148,19 @@ class ACLFormatterTest extends TestCase
 			],
 			/** @see https://github.com/friendica/friendica/pull/7787 */
 			'bug-7778-angle-brackets' => [
-				'input' => ["<40195>"],
+				'input'  => ["<40195>"],
 				'assert' => "<40195>",
 			],
 			Circle::FOLLOWERS => [
-				'input' => [Circle::FOLLOWERS, 1],
+				'input'  => [Circle::FOLLOWERS, 1],
 				'assert' => '<' . Circle::FOLLOWERS . '><1>',
 			],
-			Circle::MUTUALS   => [
-				'input' => [Circle::MUTUALS, 1],
+			Circle::MUTUALS => [
+				'input'  => [Circle::MUTUALS, 1],
 				'assert' => '<' . Circle::MUTUALS . '><1>',
 			],
 			'wrong-angle-brackets' => [
-				'input' => ["<asd>","<123>"],
+				'input'  => ["<asd>","<123>"],
 				'assert' => "<123>",
 			],
 		];

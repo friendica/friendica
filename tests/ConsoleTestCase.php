@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Asika\SimpleConsole\Console;
-use Friendica\Test\MockedTestCase;
 use Friendica\Test\Util\Intercept;
 
 abstract class ConsoleTestCase extends MockedTestCase
@@ -18,7 +17,7 @@ abstract class ConsoleTestCase extends MockedTestCase
 	 */
 	protected $consoleArgv = [ 'consoleTest.php' ];
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 

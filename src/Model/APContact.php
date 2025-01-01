@@ -14,7 +14,6 @@ use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Item;
 use Friendica\Network\HTTPException;
 use Friendica\Network\Probe;
 use Friendica\Protocol\ActivityNamespace;
@@ -154,7 +153,7 @@ class APContact
 		// Detect multiple fast repeating request to the same address
 		// See https://github.com/friendica/friendica/issues/9303
 		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
-		$result = DI::cache()->get($cachekey);
+		$result   = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
 			Logger::info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'result' => $result]);
 			if (!empty($fetched_contact)) {
@@ -166,7 +165,7 @@ class APContact
 
 		if (DI::baseUrl()->isLocalUrl($url) && ($local_uid = User::getIdForURL($url))) {
 			try {
-				$data = Transmitter::getProfile($local_uid);
+				$data        = Transmitter::getProfile($local_uid);
 				$local_owner = User::getOwnerDataById($local_uid);
 			} catch(HTTPException\NotFoundException $e) {
 				$data = null;
@@ -178,11 +177,11 @@ class APContact
 
 			try {
 				$curlResult = HTTPSignature::fetchRaw($url);
-				$failed = empty($curlResult->getBodyString()) ||
+				$failed     = empty($curlResult->getBodyString()) ||
 					(!$curlResult->isSuccess() && ($curlResult->getReturnCode() != 410));
 
-					if (!$failed) {
-					$data = json_decode($curlResult->getBodyString(), true);
+				if (!$failed) {
+					$data   = json_decode($curlResult->getBodyString(), true);
 					$failed = empty($data) || !is_array($data);
 				}
 
@@ -207,13 +206,13 @@ class APContact
 			return $fetched_contact;
 		}
 
-		$apcontact['url'] = $compacted['@id'];
-		$apcontact['uuid'] = JsonLD::fetchElement($compacted, 'diaspora:guid', '@value');
-		$apcontact['type'] = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
+		$apcontact['url']       = $compacted['@id'];
+		$apcontact['uuid']      = JsonLD::fetchElement($compacted, 'diaspora:guid', '@value');
+		$apcontact['type']      = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
 		$apcontact['following'] = JsonLD::fetchElement($compacted, 'as:following', '@id');
 		$apcontact['followers'] = JsonLD::fetchElement($compacted, 'as:followers', '@id');
-		$apcontact['inbox'] = (JsonLD::fetchElement($compacted, 'ldp:inbox', '@id') ?? '');
-		$apcontact['outbox'] = JsonLD::fetchElement($compacted, 'as:outbox', '@id');
+		$apcontact['inbox']     = (JsonLD::fetchElement($compacted, 'ldp:inbox', '@id') ?? '');
+		$apcontact['outbox']    = JsonLD::fetchElement($compacted, 'as:outbox', '@id');
 
 		$apcontact['sharedinbox'] = '';
 		if (!empty($compacted['as:endpoints'])) {
@@ -304,12 +303,12 @@ class APContact
 			}
 		}
 
-		$apcontact['manually-approve'] = (int)JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
+		$apcontact['manually-approve']   = (int)JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
 		$apcontact['posting-restricted'] = (int)JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
-		$apcontact['suspended'] = (int)JsonLD::fetchElement($compacted, 'toot:suspended');
+		$apcontact['suspended']          = (int)JsonLD::fetchElement($compacted, 'toot:suspended');
 
 		if (!empty($compacted['as:generator'])) {
-			$apcontact['baseurl'] = JsonLD::fetchElement($compacted['as:generator'], 'as:url', '@id');
+			$apcontact['baseurl']   = JsonLD::fetchElement($compacted['as:generator'], 'as:url', '@id');
 			$apcontact['generator'] = JsonLD::fetchElement($compacted['as:generator'], 'as:name', '@value');
 		}
 
@@ -349,7 +348,7 @@ class APContact
 			if (!empty($local_owner)) {
 				$statuses_count = self::getStatusesCount($local_owner);
 			} else {
-				$outbox = HTTPSignature::fetch($apcontact['outbox']);
+				$outbox         = HTTPSignature::fetch($apcontact['outbox']);
 				$statuses_count = $outbox['totalItems'] ?? 0;
 			}
 			if (!empty($statuses_count)) {

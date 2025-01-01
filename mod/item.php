@@ -132,10 +132,10 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 	$post = DI::contentItem()->initializePost($post);
 
 	$post['edit']      = null;
-	$post['post-type'] = $request['post_type'] ?? '';
-	$post['wall']      = $request['wall'] ?? true;
+	$post['post-type'] = $request['post_type']      ?? '';
+	$post['wall']      = $request['wall']           ?? true;
 	$post['pubmail']   = $request['pubmail_enable'] ?? false;
-	$post['created']   = $request['created_at'] ?? DateTimeFormat::utcNow();
+	$post['created']   = $request['created_at']     ?? DateTimeFormat::utcNow();
 	$post['edited']    = $post['changed'] = $post['commented'] = $post['created'];
 	$post['app']       = '';
 	$post['inform']    = '';
@@ -168,15 +168,15 @@ function item_insert(int $uid, array $request, bool $preview, string $return_pat
 			Logger::info('Public item stored for user', ['uri-id' => $toplevel_item['uri-id'], 'uid' => $post['uid'], 'stored' => $stored]);
 		}
 
-		$post['parent']      = $toplevel_item['id'];
-		$post['gravity']     = Item::GRAVITY_COMMENT;
-		$post['thr-parent']  = $parent_item['uri'];
-		$post['wall']        = $toplevel_item['wall'];
+		$post['parent']     = $toplevel_item['id'];
+		$post['gravity']    = Item::GRAVITY_COMMENT;
+		$post['thr-parent'] = $parent_item['uri'];
+		$post['wall']       = $toplevel_item['wall'];
 	} else {
-		$parent_item         = [];
-		$post['parent']      = 0;
-		$post['gravity']     = Item::GRAVITY_PARENT;
-		$post['thr-parent']  = $post['uri'];
+		$parent_item        = [];
+		$post['parent']     = 0;
+		$post['gravity']    = Item::GRAVITY_PARENT;
+		$post['thr-parent'] = $post['uri'];
 	}
 
 	$post = DI::contentItem()->getACL($post, $parent_item, $request);

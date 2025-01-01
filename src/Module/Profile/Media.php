@@ -47,7 +47,7 @@ class Media extends BaseProfile
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->appHelper = $appHelper;
+		$this->appHelper   = $appHelper;
 		$this->userSession = $userSession;
 	}
 

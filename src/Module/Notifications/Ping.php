@@ -92,7 +92,7 @@ class Ping extends BaseModule
 		$home_count      = 0;
 		$register_count  = 0;
 		$sysnotify_count = 0;
-		$circles_unseen   = [];
+		$circles_unseen  = [];
 		$groups_unseen   = [];
 
 		$event_count          = 0;
@@ -115,7 +115,7 @@ class Ping extends BaseModule
 
 			$home_count = Post::count($condition);
 
-			if ($this->config->get('system','compute_circle_counts')) {
+			if ($this->config->get('system', 'compute_circle_counts')) {
 				// Find out how unseen network posts are spread across circles
 				foreach (Circle::countUnseen($this->session->getLocalUserId()) as $circle_count) {
 					if ($circle_count['count'] > 0) {
@@ -138,16 +138,19 @@ class Ping extends BaseModule
 			$mail_count = $this->database->count('mail', ["`uid` = ? AND NOT `seen` AND `from-url` != ?", $this->session->getLocalUserId(), $myurl]);
 
 			if (Register::getPolicy() === Register::APPROVE && $this->session->isSiteAdmin()) {
-				$registrations = \Friendica\Model\Register::getPending();
+				$registrations  = \Friendica\Model\Register::getPending();
 				$register_count = count($registrations);
 			}
 
 			$cachekey = 'ping:events:' . $this->session->getLocalUserId();
 			$events   = $this->cache->get($cachekey);
 			if (is_null($events)) {
-				$events = $this->database->selectToArray('event', ['type', 'start'],
+				$events = $this->database->selectToArray(
+					'event',
+					['type', 'start'],
 					["`uid` = ? AND `start` < ? AND `finish` > ? AND NOT `ignore`",
-						$this->session->getLocalUserId(), DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utcNow()]);
+						$this->session->getLocalUserId(), DateTimeFormat::utc('now + 7 days'), DateTimeFormat::utcNow()]
+				);
 				$this->cache->set($cachekey, $events, Duration::HOUR);
 			}
 

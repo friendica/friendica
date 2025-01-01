@@ -85,7 +85,7 @@ class WorkerLoggerTest extends MockedTestCase
 	{
 		$logger                    = \Mockery::mock(LoggerInterface::class);
 		$workLogger                = new WorkerLogger($logger);
-		$context                   = $testContext                   = ['test' => 'it'];
+		$context                   = $testContext = ['test' => 'it'];
 		$testContext['worker_id']  = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = '';
 		self::assertUid($testContext['worker_id']);
@@ -104,7 +104,7 @@ class WorkerLoggerTest extends MockedTestCase
 	{
 		$logger                    = \Mockery::mock(LoggerInterface::class);
 		$workLogger                = new WorkerLogger($logger);
-		$context                   = $testContext                   = ['test' => 'it'];
+		$context                   = $testContext = ['test' => 'it'];
 		$testContext['worker_id']  = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = '';
 		self::assertUid($testContext['worker_id']);
@@ -118,7 +118,7 @@ class WorkerLoggerTest extends MockedTestCase
 
 		self::assertNotEquals($testContext['worker_id'], $workLogger->getWorkerId());
 
-		$context                   = $testContext                   = ['test' => 'it'];
+		$context                   = $testContext = ['test' => 'it'];
 		$testContext['worker_id']  = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = 'testFunc';
 		self::assertUid($testContext['worker_id']);

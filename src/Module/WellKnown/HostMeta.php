@@ -35,10 +35,10 @@ class HostMeta extends BaseModule
 		XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
-					'xmlns'    => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
+					'xmlns' => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
 				],
 				'hm:Host' => DI::baseUrl()->getHost(),
-				'1:link' => [
+				'1:link'  => [
 					'@attributes' => [
 						'rel'      => 'lrdd',
 						'type'     => 'application/xrd+xml',

@@ -272,7 +272,7 @@ xQIDAQAB
 			//> GET, HEAD
 			if ($transaction['response']) {
 				echo $transaction['response']->getStatusCode() . PHP_EOL;
-			//> 200, 200
+				//> 200, 200
 			} elseif ($transaction['error']) {
 				echo $transaction['error'];
 				//> exception

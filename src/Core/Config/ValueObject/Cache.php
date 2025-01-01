@@ -182,7 +182,7 @@ class Cache
 			$key == 'password' &&
 			is_string($value)) {
 			$this->config[$cat][$key] = new HiddenString((string)$value);
-		} else if (is_string($value)) {
+		} elseif (is_string($value)) {
 			$this->config[$cat][$key] = self::toConfigValue($value);
 		} else {
 			$this->config[$cat][$key] = $value;
@@ -327,7 +327,7 @@ class Cache
 			}
 		}
 
-		$newCache = new Cache();
+		$newCache         = new Cache();
 		$newCache->config = $newConfig;
 		$newCache->source = $newSource;
 

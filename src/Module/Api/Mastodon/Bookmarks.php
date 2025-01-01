@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;

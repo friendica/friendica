@@ -63,8 +63,7 @@ class Import extends \Friendica\Module\BaseModeration
 				$this->systemMessages->addNotice($this->t('Error importing pattern file'));
 				return;
 			}
-		}
-		else if (isset($request['page_blocklist_import'])) {
+		} elseif (isset($request['page_blocklist_import'])) {
 			$this->blocklist = json_decode($request['blocklist'], true);
 			if ($this->blocklist === null) {
 				$this->systemMessages->addNotice($this->t('Error importing pattern file'));

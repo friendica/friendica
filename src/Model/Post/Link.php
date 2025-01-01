@@ -62,9 +62,9 @@ class Link
 			$id = $link['id'];
 			Logger::info('Found', ['id' => $id, 'uri-id' => $uriId, 'url' => $url]);
 		} else {
-			$fields = self::fetchMimeType($url);
+			$fields           = self::fetchMimeType($url);
 			$fields['uri-id'] = $uriId;
-			$fields['url'] = Network::sanitizeUrl($url);
+			$fields['url']    = Network::sanitizeUrl($url);
 
 			DBA::insert('post-link', $fields, Database::INSERT_IGNORE);
 			$id = DBA::lastInsertId();
@@ -127,7 +127,7 @@ class Link
 
 		if (Images::isSupportedMimeType($fields['mimetype'])) {
 			$img_str = $curlResult->getBodyString();
-			$image = new Image($img_str, $fields['mimetype'], $url, false);
+			$image   = new Image($img_str, $fields['mimetype'], $url, false);
 			if ($image->isValid()) {
 				$fields['mimetype'] = $image->getType();
 				$fields['width']    = $image->getWidth();

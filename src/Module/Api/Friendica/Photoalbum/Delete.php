@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Friendica\Photoalbum;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;

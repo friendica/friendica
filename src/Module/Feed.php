@@ -31,7 +31,7 @@ class Feed extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		$nick = $this->parameters['nickname'] ?? '';
-		$type = $this->parameters['type'] ?? null;
+		$type = $this->parameters['type']     ?? null;
 		switch ($type) {
 			case 'posts':
 			case 'comments':

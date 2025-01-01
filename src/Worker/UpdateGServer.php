@@ -15,7 +15,6 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\UriInterface;
 
 class UpdateGServer
 {

@@ -7,7 +7,6 @@
 
 namespace Friendica\Object\Api\Mastodon;
 
-use Friendica\App\BaseURL;
 use Friendica\BaseDataTransferObject;
 
 /**
@@ -50,10 +49,10 @@ class Preferences extends BaseDataTransferObject
 	public function __construct(string $visibility, bool $sensitive, string $language, string $media, bool $spoilers)
 	{
 		$this->visibility = $visibility;
-		$this->sensitive = $sensitive;
-		$this->language = $language;
-		$this->media = $media;
-		$this->spoilers = $spoilers;
+		$this->sensitive  = $sensitive;
+		$this->language   = $language;
+		$this->media      = $media;
+		$this->spoilers   = $spoilers;
 	}
 
 	/**
@@ -65,10 +64,10 @@ class Preferences extends BaseDataTransferObject
 	{
 		return [
 			'posting:default:visibility' => $this->visibility,
-			'posting:default:sensitive' => $this->sensitive,
-			'posting:default:language' => $this->language,
-			'reading:expand:media' => $this->media,
-			'reading:expand:spoilers' => $this->spoilers,
+			'posting:default:sensitive'  => $this->sensitive,
+			'posting:default:language'   => $this->language,
+			'reading:expand:media'       => $this->media,
+			'reading:expand:spoilers'    => $this->spoilers,
 		];
 	}
 }

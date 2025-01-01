@@ -160,8 +160,10 @@ EOF,
 		$hookFileManager = new StrategiesFileManager($this->root->url(), $addonLoader);
 
 		self::expectException(HookConfigException::class);
-		self::expectExceptionMessage(sprintf('config file %s does not exist.',
-				$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'));
+		self::expectExceptionMessage(sprintf(
+			'config file %s does not exist.',
+			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'
+		));
 
 		$hookFileManager->loadConfig();
 	}
@@ -180,8 +182,10 @@ EOF,
 				 ->at($this->root);
 
 		self::expectException(HookConfigException::class);
-		self::expectExceptionMessage(sprintf('Error loading config file %s.',
-			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'));
+		self::expectExceptionMessage(sprintf(
+			'Error loading config file %s.',
+			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'
+		));
 
 		$hookFileManager->loadConfig();
 	}

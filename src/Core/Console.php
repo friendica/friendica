@@ -17,7 +17,7 @@ use Friendica\App;
 class Console extends \Asika\SimpleConsole\Console
 {
 	// Disables the default help handling
-	protected $helpOptions = [];
+	protected $helpOptions       = [];
 	protected $customHelpOptions = ['h', 'help', '?'];
 
 	/**
@@ -68,35 +68,35 @@ HELP;
 	}
 
 	protected $subConsoles = [
-		'addon'                  => Friendica\Console\Addon::class,
-		'archivecontact'         => Friendica\Console\ArchiveContact::class,
-		'autoinstall'            => Friendica\Console\AutomaticInstallation::class,
-		'cache'                  => Friendica\Console\Cache::class,
-		'clearavatarcache'       => Friendica\Console\ClearAvatarCache::class,
-		'config'                 => Friendica\Console\Config::class,
-		'contact'                => Friendica\Console\Contact::class,
-		'createdoxygen'          => Friendica\Console\CreateDoxygen::class,
-		'daemon'                 => Friendica\Console\Daemon::class,
-		'docbloxerrorchecker'    => Friendica\Console\DocBloxErrorChecker::class,
-		'dbstructure'            => Friendica\Console\DatabaseStructure::class,
-		'extract'                => Friendica\Console\Extract::class,
+		'addon'                             => Friendica\Console\Addon::class,
+		'archivecontact'                    => Friendica\Console\ArchiveContact::class,
+		'autoinstall'                       => Friendica\Console\AutomaticInstallation::class,
+		'cache'                             => Friendica\Console\Cache::class,
+		'clearavatarcache'                  => Friendica\Console\ClearAvatarCache::class,
+		'config'                            => Friendica\Console\Config::class,
+		'contact'                           => Friendica\Console\Contact::class,
+		'createdoxygen'                     => Friendica\Console\CreateDoxygen::class,
+		'daemon'                            => Friendica\Console\Daemon::class,
+		'docbloxerrorchecker'               => Friendica\Console\DocBloxErrorChecker::class,
+		'dbstructure'                       => Friendica\Console\DatabaseStructure::class,
+		'extract'                           => Friendica\Console\Extract::class,
 		'fixapdeliveryworkertaskparameters' => Friendica\Console\FixAPDeliveryWorkerTaskParameters::class,
-		'globalcommunityblock'   => Friendica\Console\GlobalCommunityBlock::class,
-		'globalcommunitysilence' => Friendica\Console\GlobalCommunitySilence::class,
-		'lock'                   => Friendica\Console\Lock::class,
-		'maintenance'            => Friendica\Console\Maintenance::class,
-		'mergecontacts'          => Friendica\Console\MergeContacts::class,
-		'movetoavatarcache'      => Friendica\Console\MoveToAvatarCache::class,
-		'php2po'                 => Friendica\Console\PhpToPo::class,
-		'postupdate'             => Friendica\Console\PostUpdate::class,
-		'po2php'                 => Friendica\Console\PoToPhp::class,
-		'relay'                  => Friendica\Console\Relay::class,
-		'relocate'               => Friendica\Console\Relocate::class,
-		'serverblock'            => Friendica\Console\ServerBlock::class,
-		'storage'                => Friendica\Console\Storage::class,
-		'test'                   => Friendica\Console\Test::class,
-		'typo'                   => Friendica\Console\Typo::class,
-		'user'                   => Friendica\Console\User::class,
+		'globalcommunityblock'              => Friendica\Console\GlobalCommunityBlock::class,
+		'globalcommunitysilence'            => Friendica\Console\GlobalCommunitySilence::class,
+		'lock'                              => Friendica\Console\Lock::class,
+		'maintenance'                       => Friendica\Console\Maintenance::class,
+		'mergecontacts'                     => Friendica\Console\MergeContacts::class,
+		'movetoavatarcache'                 => Friendica\Console\MoveToAvatarCache::class,
+		'php2po'                            => Friendica\Console\PhpToPo::class,
+		'postupdate'                        => Friendica\Console\PostUpdate::class,
+		'po2php'                            => Friendica\Console\PoToPhp::class,
+		'relay'                             => Friendica\Console\Relay::class,
+		'relocate'                          => Friendica\Console\Relocate::class,
+		'serverblock'                       => Friendica\Console\ServerBlock::class,
+		'storage'                           => Friendica\Console\Storage::class,
+		'test'                              => Friendica\Console\Test::class,
+		'typo'                              => Friendica\Console\Typo::class,
+		'user'                              => Friendica\Console\User::class,
 	];
 
 	/**

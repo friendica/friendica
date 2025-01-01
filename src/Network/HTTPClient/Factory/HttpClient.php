@@ -95,7 +95,7 @@ class HttpClient extends BaseFactory
 			RequestOptions::VERIFY  => (bool)$this->config->get('system', 'verifyssl'),
 			RequestOptions::PROXY   => $proxy,
 			RequestOptions::HEADERS => [],
-			'handler' => $handlerStack ?? HandlerStack::create(),
+			'handler'               => $handlerStack ?? HandlerStack::create(),
 		]);
 
 		$resolver = new URLResolver();

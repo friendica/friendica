@@ -44,7 +44,7 @@ class Notify extends BaseFactory implements ICanCreateFromTableRow
 	public function createFromParams($params, $itemlink = null, $item_id = null, $uri_id = null, $parent_id = null, $parent_uri_id = null): \Friendica\Navigation\Notifications\Entity\Notify
 	{
 		return new \Friendica\Navigation\Notifications\Entity\Notify(
-			$params['type'] ?? '',
+			$params['type']        ?? '',
 			$params['source_name'] ?? '',
 			new Uri($params['source_link'] ?? ''),
 			new Uri($params['source_photo'] ?? ''),
@@ -52,7 +52,7 @@ class Notify extends BaseFactory implements ICanCreateFromTableRow
 			$params['uid'] ?? 0,
 			new Uri($itemlink ?? ''),
 			false,
-			$params['verb'] ?? '',
+			$params['verb']  ?? '',
 			$params['otype'] ?? '',
 			substr(BBCode::toPlaintext($params['source_name'], false), 0, 255),
 			null,

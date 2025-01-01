@@ -40,10 +40,10 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 	{
 		parent::__construct($logger);
 
-		$this->baseUrl = $baseUrl;
-		$this->l10n = $l10n;
+		$this->baseUrl               = $baseUrl;
+		$this->l10n                  = $l10n;
 		$this->localRelationshipRepo = $localRelationshipRepo;
-		$this->cache = $cache;
+		$this->cache                 = $cache;
 	}
 
 	public function createFromTableRow(array $row): Entity\Notification
@@ -101,7 +101,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 		$message = [];
 
 		$cachekey = 'Notification:' . $Notification->id;
-		$result = $this->cache->get($cachekey);
+		$result   = $this->cache->get($cachekey);
 		if (!is_null($result)) {
 			return $result;
 		}
@@ -150,7 +150,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 				if (($Notification->verb == Activity::POST) || ($Notification->type === Post\UserNotification::TYPE_SHARED)) {
 					$thrparentid = $item['thr-parent-id'];
-					$item = Post::selectFirst([], ['uri-id' => $thrparentid, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
+					$item        = Post::selectFirst([], ['uri-id' => $thrparentid, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
 					if (empty($item)) {
 						$this->logger->info('Thread parent post not found', ['uri-id' => $thrparentid]);
 						return $message;
@@ -179,7 +179,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 			$link = $this->baseUrl . '/display/' . urlencode($link_item['guid']);
 
-			$body = BBCode::toPlaintext($item['body'], false);
+			$body  = BBCode::toPlaintext($item['body'], false);
 			$title = Plaintext::shorten($body, 70);
 			if (!empty($title)) {
 				$title = '"' . trim(str_replace("\n", " ", $title)) . '"';
@@ -270,7 +270,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 						case Post\UserNotification::TYPE_COMMENT_PARTICIPATION:
 						case Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION:
-						case Post\UserNotification::TYPE_FOLLOW;
+						case Post\UserNotification::TYPE_FOLLOW:
 							if (($causer['id'] == $author['id']) && ($title != '')) {
 								$msg = $l10n->t('%1$s commented in their thread %2$s');
 							} elseif ($causer['id'] == $author['id']) {
@@ -314,10 +314,12 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 			// Plain text for the web push api
 			$message['plain'] = sprintf($msg, $causer['name'], $title, $author['name']);
 			// Rich text for other purposes
-			$message['rich'] = sprintf($msg,
+			$message['rich'] = sprintf(
+				$msg,
 				'[url=' . $causer['url'] . ']' . $causer['name'] . '[/url]',
 				'[url=' . $link . ']' . $title . '[/url]',
-				'[url=' . $author['url'] . ']' . $author['name'] . '[/url]');
+				'[url=' . $author['url'] . ']' . $author['name'] . '[/url]'
+			);
 			$message['link'] = $link;
 			$this->cache->set($cachekey, $message, Duration::HOUR);
 		} else {

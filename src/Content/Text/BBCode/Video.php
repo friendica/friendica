@@ -22,7 +22,7 @@ class Video
 	public function transform(string $bbCodeString)
 	{
 		$matches = null;
-		$found = preg_match_all("/\[video\](.*?)\[\/video\]/ism",$bbCodeString,$matches,PREG_SET_ORDER);
+		$found   = preg_match_all("/\[video\](.*?)\[\/video\]/ism", $bbCodeString, $matches, PREG_SET_ORDER);
 		if ($found) {
 			foreach ($matches as $match) {
 				if ((stristr($match[1], 'youtube')) || (stristr($match[1], 'youtu.be'))) {

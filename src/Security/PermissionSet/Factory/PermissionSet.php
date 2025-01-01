@@ -57,8 +57,8 @@ class PermissionSet extends BaseFactory implements ICanCreateFromTableRow
 		string $allow_gid = '',
 		string $deny_cid = '',
 		string $deny_gid = '',
-		int $id = null): Entity\PermissionSet
-	{
+		int $id = null
+	): Entity\PermissionSet {
 		return $this->createFromTableRow([
 			'uid'       => $uid,
 			'allow_cid' => $allow_cid,

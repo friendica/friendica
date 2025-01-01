@@ -57,9 +57,9 @@ class User
 			return false;
 		}
 
-		$fields = self::preparedFields($contact);
-		$fields['cid'] = $pcid;
-		$fields['uid'] = $contact['uid'];
+		$fields           = self::preparedFields($contact);
+		$fields['cid']    = $pcid;
+		$fields['uid']    = $contact['uid'];
 		$fields['uri-id'] = $contact['uri-id'];
 
 		$ret = DBA::insert('user-contact', $fields, Database::INSERT_UPDATE);
@@ -90,7 +90,7 @@ class User
 					continue;
 				}
 				$update_fields['cid'] = $contact['pid'];
-				$ret = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
+				$ret                  = DBA::update('user-contact', $update_fields, ['uri-id' => $contact['uri-id'], 'uid' => $contact['uid']], true);
 				Logger::info('Updated user contact', ['uid' => $contact['uid'], 'id' => $contact['pid'], 'uri-id' => $contact['uri-id'], 'ret' => $ret]);
 			}
 

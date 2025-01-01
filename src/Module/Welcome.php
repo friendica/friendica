@@ -20,8 +20,8 @@ class Welcome extends BaseModule
 	{
 		$config = DI::config();
 
-		$mail_disabled   = ((function_exists('imap_open') &&
-		                     (!$config->get('system', 'imap_disabled'))));
+		$mail_disabled = ((function_exists('imap_open') &&
+							 (!$config->get('system', 'imap_disabled'))));
 		$newuser_private = $config->get('system', 'newuser_private');
 
 		$tpl = Renderer::getMarkupTemplate('welcome.tpl');
@@ -62,9 +62,9 @@ class Welcome extends BaseModule
 			'$circles'             => DI::l10n()->t('Circles'),
 			'$circle_contact_link' => DI::l10n()->t('Add Your Contacts To Circle'),
 			'$circle_contact_txt'  => DI::l10n()->t('Once you have made some friends, organize them into private conversation circles from the sidebar of your Contacts page and then you can interact with each circle privately on your Network page.'),
-			'$newuser_private'    => $newuser_private,
-			'$private_link'       => DI::l10n()->t('Why Aren\'t My Posts Public?'),
-			'$private_txt'        => DI::l10n()->t('Friendica respects your privacy. By default, your posts will only show up to people you\'ve added as friends. For more information, see the help section from the link above.'),
+			'$newuser_private'     => $newuser_private,
+			'$private_link'        => DI::l10n()->t('Why Aren\'t My Posts Public?'),
+			'$private_txt'         => DI::l10n()->t('Friendica respects your privacy. By default, your posts will only show up to people you\'ve added as friends. For more information, see the help section from the link above.'),
 
 			'$help'      => DI::l10n()->t('Getting Help'),
 			'$help_link' => DI::l10n()->t('Go to the Help Section'),

@@ -14,7 +14,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
-use Friendica\Util\DateTimeFormat;
 
 /**
  * Authentication via the basic auth method
@@ -105,7 +104,7 @@ class BasicAuth
 	 *
 	 * @return integer User ID
 	 */
-	private static function getUserIdByAuth(bool $do_login = true):int
+	private static function getUserIdByAuth(bool $do_login = true): int
 	{
 		self::$current_user_id = 0;
 
@@ -113,14 +112,14 @@ class BasicAuth
 		if (!empty($_SERVER['REDIRECT_REMOTE_USER'])) {
 			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6));
 			if (!empty($userpass) && strpos($userpass, ':')) {
-				list($name, $password) = explode(':', $userpass);
+				list($name, $password)    = explode(':', $userpass);
 				$_SERVER['PHP_AUTH_USER'] = $name;
-				$_SERVER['PHP_AUTH_PW'] = $password;
+				$_SERVER['PHP_AUTH_PW']   = $password;
 			}
 		}
 
 		$user     = $_SERVER['PHP_AUTH_USER'] ?? '';
-		$password = $_SERVER['PHP_AUTH_PW'] ?? '';
+		$password = $_SERVER['PHP_AUTH_PW']   ?? '';
 
 		// allow "user@server" login (but ignore 'server' part)
 		$at = strstr($user, "@", true);
@@ -132,10 +131,10 @@ class BasicAuth
 		$record = null;
 
 		$addon_auth = [
-			'username' => trim($user),
-			'password' => trim($password),
+			'username'      => trim($user),
+			'password'      => trim($password),
 			'authenticated' => 0,
-			'user_record' => null,
+			'user_record'   => null,
 		];
 
 		/*
@@ -150,7 +149,7 @@ class BasicAuth
 		} else {
 			try {
 				$user_id = User::getIdFromPasswordAuthentication(trim($user), trim($password), true);
-				$record = DBA::selectFirst('user', [], ['uid' => $user_id]);
+				$record  = DBA::selectFirst('user', [], ['uid' => $user_id]);
 			} catch (Exception $ex) {
 				$record = [];
 			}

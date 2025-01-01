@@ -39,7 +39,7 @@ class Directory extends BaseModule
 			DI::page()['aside'] .= Widget::follow();
 		}
 
-		$output = '';
+		$output  = '';
 		$entries = [];
 
 		Nav::setSelected('directory');
@@ -47,7 +47,7 @@ class Directory extends BaseModule
 		$search = trim(rawurldecode($_REQUEST['search'] ?? ''));
 
 		$gDirPath = '';
-		$dirURL = Search::getGlobalDirectory();
+		$dirURL   = Search::getGlobalDirectory();
 		if (strlen($dirURL)) {
 			$gDirPath = OpenWebAuth::getZrlUrl($dirURL, true);
 		}

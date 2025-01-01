@@ -219,7 +219,7 @@ class Import extends \Friendica\BaseModule
 		}
 
 		// Backward compatibility
-		$account['circle'] = $account['circle'] ?? $account['group'];
+		$account['circle']        = $account['circle']        ?? $account['group'];
 		$account['circle_member'] = $account['circle_member'] ?? $account['group_member'];
 
 		$oldBaseUrl = $account['baseurl'];
@@ -380,9 +380,17 @@ class Import extends \Friendica\BaseModule
 
 			$r = Photo::store(
 				new Image($photo['data'], $photo['type'], $photo['filename']),
-				$photo['uid'], $photo['contact-id'], //0
-				$photo['resource-id'], $photo['filename'], $photo['album'], $photo['scale'], $photo['profile'], //1
-				$photo['allow_cid'], $photo['allow_gid'], $photo['deny_cid'], $photo['deny_gid']
+				$photo['uid'],
+				$photo['contact-id'], //0
+				$photo['resource-id'],
+				$photo['filename'],
+				$photo['album'],
+				$photo['scale'],
+				$photo['profile'], //1
+				$photo['allow_cid'],
+				$photo['allow_gid'],
+				$photo['deny_cid'],
+				$photo['deny_gid']
 			);
 
 			if ($r === false) {

@@ -30,7 +30,6 @@ use Friendica\AppHelper;
  */
 class DocBloxErrorChecker extends \Asika\SimpleConsole\Console
 {
-
 	protected $helpOptions = ['h', 'help', '?'];
 
 	/** @var string */
@@ -108,7 +107,7 @@ HELP;
 
 		//check half of the set and discard if that half is okay
 		$res = $filelist;
-		$i = count($res);
+		$i   = count($res);
 		do {
 			$this->out($i . '/' . count($filelist) . ' elements remaining.');
 			$res = $this->reduce($res, count($res) / 2);
@@ -135,7 +134,7 @@ HELP;
 
 	private function commandExists($command)
 	{
-		$prefix = strpos(strtolower(PHP_OS),'win') > -1 ? 'where' : 'which';
+		$prefix = strpos(strtolower(PHP_OS), 'win') > -1 ? 'where' : 'which';
 		exec("{$prefix} {$command}", $output, $returnVal);
 		return $returnVal === 0;
 	}

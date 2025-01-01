@@ -45,11 +45,11 @@ class GroupManager
 
 		$condition = [
 			'contact-type' => Contact::TYPE_COMMUNITY,
-			'network' => [Protocol::DFRN, Protocol::ACTIVITYPUB],
-			'uid' => $uid,
-			'blocked' => false,
-			'pending' => false,
-			'archive' => false,
+			'network'      => [Protocol::DFRN, Protocol::ACTIVITYPUB],
+			'uid'          => $uid,
+			'blocked'      => false,
+			'pending'      => false,
+			'archive'      => false,
 		];
 
 		$condition = DBA::mergeConditions($condition, ["`platform` NOT IN (?, ?)", 'peertube', 'wordpress']);
@@ -64,7 +64,7 @@ class GroupManager
 
 		$groupList = [];
 
-		$fields = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
+		$fields   = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
 		$contacts = DBA::select('account-user-view', $fields, $condition, $params);
 		if (!$contacts) {
 			return $groupList;
@@ -72,10 +72,10 @@ class GroupManager
 
 		while ($contact = DBA::fetch($contacts)) {
 			$groupList[] = [
-				'url'	=> $contact['url'],
-				'alias'	=> $contact['alias'],
-				'name'	=> $contact['name'],
-				'id'	=> $contact['id'],
+				'url'   => $contact['url'],
+				'alias' => $contact['alias'],
+				'name'  => $contact['name'],
+				'id'    => $contact['id'],
 				'micro' => $contact['micro'],
 				'thumb' => $contact['thumb'],
 			];
@@ -104,8 +104,8 @@ class GroupManager
 		//sort by last updated item
 		$lastitem = true;
 
-		$contacts = self::getList($uid, $lastitem, true, true);
-		$total = count($contacts);
+		$contacts      = self::getList($uid, $lastitem, true, true);
+		$total         = count($contacts);
 		$visibleGroups = 10;
 
 		if (DBA::isResult($contacts)) {
@@ -115,12 +115,12 @@ class GroupManager
 
 			foreach ($contacts as $contact) {
 				$entry = [
-					'url' => 'contact/' . $contact['id'] . '/conversations',
+					'url'          => 'contact/' . $contact['id'] . '/conversations',
 					'external_url' => Contact::magicLinkByContact($contact),
-					'name' => $contact['name'],
-					'cid' => $contact['id'],
-					'micro' => DI::baseUrl()->remove(Contact::getMicro($contact)),
-					'id' => ++$id,
+					'name'         => $contact['name'],
+					'cid'          => $contact['id'],
+					'micro'        => DI::baseUrl()->remove(Contact::getMicro($contact)),
+					'id'           => ++$id,
 				];
 				$entries[] = $entry;
 			}
@@ -130,14 +130,14 @@ class GroupManager
 			$o .= Renderer::replaceMacros(
 				$tpl,
 				[
-					'$title'	=> DI::l10n()->t('Groups'),
-					'$groups'	=> $entries,
-					'$link_desc'	=> DI::l10n()->t('External link to group'),
-					'$new_group_page' => 'register/',
-					'$total'	=> $total,
-					'$visible_groups' => $visibleGroups,
-					'$showless'	=> DI::l10n()->t('show less'),
-					'$showmore'	=> DI::l10n()->t('show more'),
+					'$title'            => DI::l10n()->t('Groups'),
+					'$groups'           => $entries,
+					'$link_desc'        => DI::l10n()->t('External link to group'),
+					'$new_group_page'   => 'register/',
+					'$total'            => $total,
+					'$visible_groups'   => $visibleGroups,
+					'$showless'         => DI::l10n()->t('show less'),
+					'$showmore'         => DI::l10n()->t('show more'),
 					'$create_new_group' => DI::l10n()->t('Create new group')]
 			);
 		}
@@ -206,7 +206,11 @@ class GroupManager
 				AND NOT `contact`.`pending` AND NOT `contact`.`archive`
 				AND `contact`.`uid` = ?
 				GROUP BY `contact`.`id`",
-			DI::userSession()->getLocalUserId(), Protocol::DFRN, Protocol::ACTIVITYPUB, Contact::TYPE_COMMUNITY, DI::userSession()->getLocalUserId()
+			DI::userSession()->getLocalUserId(),
+			Protocol::DFRN,
+			Protocol::ACTIVITYPUB,
+			Contact::TYPE_COMMUNITY,
+			DI::userSession()->getLocalUserId()
 		);
 
 		return DBA::toArray($stmtContacts);

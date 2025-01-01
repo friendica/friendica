@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Friendica\Statuses;
 
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;

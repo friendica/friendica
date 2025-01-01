@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Friendica\DirectMessages;
 
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\BaseApi;
 
 /**

@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Storage\Capability\ICanConfigureStorage;
-use Friendica\Test\MockedTestCase;
 
 abstract class StorageConfigTestCase extends MockedTestCase
 {

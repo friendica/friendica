@@ -25,7 +25,7 @@ class Field extends BaseDataTransferObject
 
 	public function __construct(string $name, string $value)
 	{
-		$this->name = $name;
+		$this->name  = $name;
 		$this->value = $value;
 		// Link verification unsupported
 		$this->verified_at = null;

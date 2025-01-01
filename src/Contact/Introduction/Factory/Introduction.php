@@ -21,8 +21,8 @@ class Introduction extends BaseFactory implements ICanCreateFromTableRow
 	public function createFromTableRow(array $row): Entity\Introduction
 	{
 		return new Entity\Introduction(
-			$row['uid'] ?? 0,
-			$row['contact-id'] ?? 0,
+			$row['uid']         ?? 0,
+			$row['contact-id']  ?? 0,
 			$row['suggest-cid'] ?? null,
 			!empty($row['knowyou']),
 			$row['note'] ?? '',

@@ -27,7 +27,7 @@ class LockConsoleTest extends ConsoleTestCase
 	 */
 	private $lockMock;
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -39,7 +39,7 @@ class LockConsoleTest extends ConsoleTestCase
 
 		$this->appMode = Mockery::mock(App\Mode::class);
 		$this->appMode->shouldReceive('has')
-		        ->andReturn(true);
+				->andReturn(true);
 
 		$this->lockMock = Mockery::mock(ICanLock::class);
 	}

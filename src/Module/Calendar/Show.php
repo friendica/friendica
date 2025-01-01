@@ -21,7 +21,6 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Model\Event;
 use Friendica\Model\Profile;
-use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;

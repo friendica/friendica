@@ -39,9 +39,9 @@ class Common extends BaseProfile
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config = $config;
+		$this->config      = $config;
 		$this->userSession = $userSession;
-		$this->appHelper = $appHelper;
+		$this->appHelper   = $appHelper;
 	}
 
 	protected function content(array $request = []): string
@@ -94,7 +94,7 @@ class Common extends BaseProfile
 				$contact = Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order' => ['uid' => 'DESC']]
+					['order'  => ['uid' => 'DESC']]
 				);
 				return Module\Contact::getContactTemplateVars($contact);
 			},
@@ -102,18 +102,18 @@ class Common extends BaseProfile
 		);
 
 		$title = $this->tt('Common contact (%s)', 'Common contacts (%s)', $total);
-		$desc = $this->t(
+		$desc  = $this->t(
 			'Both <strong>%s</strong> and yourself have publicly interacted with these contacts (follow, comment or likes on public posts).',
 			htmlentities($profile['name'], ENT_COMPAT, 'UTF-8')
 		);
 
 		$tpl = Renderer::getMarkupTemplate('profile/contacts.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$title'    => $title,
-			'$desc'     => $desc,
-			'$tabs'     => $tabs,
+			'$title' => $title,
+			'$desc'  => $desc,
+			'$tabs'  => $tabs,
 
-			'$noresult_label'  => $this->t('No common contacts.'),
+			'$noresult_label' => $this->t('No common contacts.'),
 
 			'$contacts' => $contacts,
 			'$paginate' => $pager->renderFull($total),

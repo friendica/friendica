@@ -32,21 +32,21 @@ class Xrd extends BaseModule
 				throw new BadRequestException();
 			}
 
-			$uri = urldecode(trim($_GET['uri']));
+			$uri  = urldecode(trim($_GET['uri']));
 			$mode = self::getAcceptedContentType($_SERVER['HTTP_ACCEPT'] ?? '', Response::TYPE_XML);
 		} else {
 			if (empty($_GET['resource'])) {
 				throw new BadRequestException();
 			}
 
-			$uri = urldecode(trim($_GET['resource']));
+			$uri  = urldecode(trim($_GET['resource']));
 			$mode = self::getAcceptedContentType($_SERVER['HTTP_ACCEPT'] ?? '', Response::TYPE_JSON);
 		}
 
 		if (Network::isValidHttpUrl($uri)) {
 			$name = ltrim(basename($uri), '~');
 			$host = parse_url($uri, PHP_URL_HOST);
-		} else if (preg_match('/^[[:alpha:]][[:alnum:]+-.]+:/', $uri)) {
+		} elseif (preg_match('/^[[:alpha:]][[:alnum:]+-.]+:/', $uri)) {
 			$local = str_replace('acct:', '', $uri);
 			if (substr($local, 0, 2) == '//') {
 				$local = substr($local, 2);
@@ -128,7 +128,7 @@ class Xrd extends BaseModule
 	private function printSystemJSON(array $owner)
 	{
 		$baseURL = (string)$this->baseUrl;
-		$json = [
+		$json    = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [$owner['url']],
 			'links'   => [
@@ -181,7 +181,7 @@ class Xrd extends BaseModule
 				$alias,
 				$owner['url'],
 			],
-			'links'   => [
+			'links' => [
 				[
 					'rel'  => ActivityNamespace::DFRN,
 					'href' => $owner['url'],
@@ -243,12 +243,12 @@ class Xrd extends BaseModule
 		$xmlString = XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
-					'xmlns'    => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
+					'xmlns' => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
 				],
 				'Subject' => 'acct:' . $owner['addr'],
 				'1:Alias' => $owner['url'],
 				'2:Alias' => $alias,
-				'1:link' => [
+				'1:link'  => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DFRN,
 						'href' => $owner['url']

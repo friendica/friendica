@@ -12,6 +12,7 @@ use Friendica\Core\Worker;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
+
 class APDelivery
 {
 	/**
@@ -31,7 +32,7 @@ class APDelivery
 		if (ActivityPub\Transmitter::archivedInbox($inbox)) {
 			Logger::info('Inbox is archived', ['cmd' => $cmd, 'inbox' => $inbox, 'id' => $item_id, 'uri-id' => $uri_id, 'uid' => $uid]);
 			if (empty($uri_id) && !empty($item_id)) {
-				$item = Post::selectFirst(['uri-id'], ['id' => $item_id]);
+				$item   = Post::selectFirst(['uri-id'], ['id' => $item_id]);
 				$uri_id = $item['uri-id'] ?? 0;
 			}
 			if (empty($uri_id)) {

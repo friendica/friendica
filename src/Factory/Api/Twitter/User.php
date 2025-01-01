@@ -42,10 +42,10 @@ class User extends BaseFactory
 		$cdata = Contact::getPublicAndUserContactID($contactId, $uid);
 		if (!empty($cdata)) {
 			$publicContact = Contact::getById($cdata['public']);
-			$userContact = Contact::getById($cdata['user']);
+			$userContact   = Contact::getById($cdata['user']);
 		} else {
 			$publicContact = Contact::getById($contactId);
-			$userContact = [];
+			$userContact   = [];
 		}
 
 		$apcontact = APContact::getByURL($publicContact['url'], false);
@@ -53,9 +53,11 @@ class User extends BaseFactory
 		$status = null;
 
 		if (!$skip_status) {
-			$post = Post::selectFirstPost(['uri-id'],
-				['author-id' => $publicContact['id'], 'gravity' => [Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], 'private'  => [Item::PUBLIC, Item::UNLISTED]],
-				['order' => ['uri-id' => true]]);
+			$post = Post::selectFirstPost(
+				['uri-id'],
+				['author-id' => $publicContact['id'], 'gravity' => [Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], 'private' => [Item::PUBLIC, Item::UNLISTED]],
+				['order'     => ['uri-id' => true]]
+			);
 			if (!empty($post['uri-id'])) {
 				$status = $this->status->createFromUriId($post['uri-id'], $uid);
 			}

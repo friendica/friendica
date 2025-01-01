@@ -7,7 +7,6 @@
 
 namespace Friendica\Test\Util;
 
-
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -21,14 +20,15 @@ trait VFSTrait
 	/**
 	 * Sets up the Virtual File System for Friendica with common files (config, dbstructure)
 	 */
-	protected function setUpVfsDir() {
+	protected function setUpVfsDir()
+	{
 		// the used directories inside the App class
 		$structure = [
-			'config' => [],
-			'bin' => [],
-			'static' => [],
-			'test' => [],
-			'logs' => [],
+			'config'  => [],
+			'bin'     => [],
+			'static'  => [],
+			'test'    => [],
+			'logs'    => [],
 			'config2' => [],
 		];
 
@@ -41,7 +41,8 @@ trait VFSTrait
 		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'settings.config.php', true);
 		$this->setConfigFile(
 			'mods' . DIRECTORY_SEPARATOR . 'local.config.ci.php',
-			false, 'local.config.php'
+			false,
+			'local.config.php'
 		);
 	}
 
@@ -59,7 +60,7 @@ trait VFSTrait
 
 		if (file_exists($file)) {
 			if (empty($targetFileName)) {
-				$tmpArray = preg_split('/\\' . DIRECTORY_SEPARATOR . '/', $sourceFilePath);
+				$tmpArray       = preg_split('/\\' . DIRECTORY_SEPARATOR . '/', $sourceFilePath);
 				$targetFileName = array_pop($tmpArray);
 			}
 			vfsStream::newFile($targetFileName)

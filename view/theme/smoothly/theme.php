@@ -28,12 +28,13 @@ use Friendica\DI;
  * This script can be included even when the app is in maintenance mode which requires us to avoid any config call
  */
 
-function smoothly_init(AppHelper $appHelper) {
+function smoothly_init(AppHelper $appHelper)
+{
 	Renderer::setActiveTemplateEngine('smarty3');
 
-	$cssFile = null;
+	$cssFile   = null;
 	$ssl_state = false;
-	$baseurl = (string)DI::baseUrl();
+	$baseurl   = (string)DI::baseUrl();
 	DI::page()['htmlhead'] .= <<< EOT
 
 <script>
@@ -96,13 +97,14 @@ EOT;
 }
 
 if (! function_exists('_js_in_foot')) {
-	function _js_in_foot() {
+	function _js_in_foot()
+	{
 		/** @purpose insert stuff in bottom of page
-		*/
-		$ssl_state = false;
-		$baseurl = (string)DI::baseUrl();
+		 */
+		$ssl_state          = false;
+		$baseurl            = (string)DI::baseUrl();
 		$bottom['$baseurl'] = $baseurl;
-		$tpl = Renderer::getMarkupTemplate('bottom.tpl');
+		$tpl                = Renderer::getMarkupTemplate('bottom.tpl');
 
 		return DI::page()['bottom'] = Renderer::replaceMacros($tpl, $bottom);
 	}

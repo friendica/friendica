@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;

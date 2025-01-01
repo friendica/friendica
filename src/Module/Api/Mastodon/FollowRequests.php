@@ -94,9 +94,9 @@ class FollowRequests extends BaseApi
 			} catch (HTTPException\InternalServerErrorException
 				| HTTPException\NotFoundException
 				| \ImagickException $exception) {
-				DI::intro()->delete($introduction);
-				unset($introductions[$key]);
-			}
+					DI::intro()->delete($introduction);
+					unset($introductions[$key]);
+				}
 		}
 
 		self::setLinkHeader();

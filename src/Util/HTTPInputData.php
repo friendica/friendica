@@ -114,7 +114,7 @@ class HTTPInputData
 			if (strpos($header, ':') === false) {
 				continue;
 			}
-			[$name, $value] = explode(':', $header, 2);
+			list($name, $value) = explode(':', $header, 2);
 
 			$headers[strtolower($name)] = ltrim($value, ' ');
 		}

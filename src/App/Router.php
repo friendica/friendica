@@ -7,12 +7,10 @@
 
 namespace Friendica\App;
 
-use Dice\Dice;
 use FastRoute\DataGenerator\GroupCountBased;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
-use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Core\Addon;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -112,15 +110,15 @@ class Router
 	 */
 	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
-		$this->baseRoutesFilepath      = $baseRoutesFilepath;
-		$this->l10n                    = $l10n;
-		$this->cache                   = $cache;
-		$this->lock                    = $lock;
-		$this->args                    = $args;
-		$this->config                  = $config;
-		$this->server                  = $server;
-		$this->logger                  = $logger;
-		$this->isLocalUser             = !empty($userSession->getLocalUserId());
+		$this->baseRoutesFilepath = $baseRoutesFilepath;
+		$this->l10n               = $l10n;
+		$this->cache              = $cache;
+		$this->lock               = $lock;
+		$this->args               = $args;
+		$this->config             = $config;
+		$this->server             = $server;
+		$this->logger             = $logger;
+		$this->isLocalUser        = !empty($userSession->getLocalUserId());
 
 		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
 
@@ -275,14 +273,14 @@ class Router
 		try {
 			// Check if the HTTP method is OPTIONS and return the special Options Module with the possible HTTP methods
 			if ($this->args->getMethod() === static::OPTIONS) {
-				$this->moduleClass = Options::class;
+				$this->moduleClass  = Options::class;
 				$this->parameters[] = ['AllowedMethods' => $dispatcher->getOptions($cmd)];
 			} else {
 				$routeInfo = $dispatcher->dispatch($this->args->getMethod(), $cmd);
 				if ($routeInfo[0] === Dispatcher::FOUND) {
-					$this->moduleClass = $routeInfo[1];
+					$this->moduleClass  = $routeInfo[1];
 					$this->parameters[] = $routeInfo[2];
-				} else if ($routeInfo[0] === Dispatcher::METHOD_NOT_ALLOWED) {
+				} elseif ($routeInfo[0] === Dispatcher::METHOD_NOT_ALLOWED) {
 					throw new HTTPException\MethodNotAllowedException($this->l10n->t('Method not allowed for this module. Allowed method(s): %s', implode(', ', $routeInfo[1])));
 				} else {
 					throw new HTTPException\NotFoundException($this->l10n->t('Page not found.'));

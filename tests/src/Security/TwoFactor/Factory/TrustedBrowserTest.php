@@ -21,11 +21,11 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$row = [
 			'cookie_hash' => Strings::getRandomHex(),
-			'uid' => 42,
-			'user_agent' => 'PHPUnit',
-			'created' => DateTimeFormat::utcNow(),
-			'trusted' => true,
-			'last_used' => null,
+			'uid'         => 42,
+			'user_agent'  => 'PHPUnit',
+			'created'     => DateTimeFormat::utcNow(),
+			'trusted'     => true,
+			'last_used'   => null,
 		];
 
 		$trustedBrowser = $factory->createFromTableRow($row);
@@ -41,11 +41,11 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$row = [
 			'cookie_hash' => null,
-			'uid' => null,
-			'user_agent' => null,
-			'created' => null,
-			'trusted' => true,
-			'last_used' => null,
+			'uid'         => null,
+			'user_agent'  => null,
+			'created'     => null,
+			'trusted'     => true,
+			'last_used'   => null,
 		];
 
 		$trustedBrowser = $factory->createFromTableRow($row);

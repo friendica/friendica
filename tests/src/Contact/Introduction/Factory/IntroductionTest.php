@@ -98,8 +98,8 @@ class IntroductionTest extends TestCase
 		$intro = $factory->createNew($input['uid'] ?? 0, $input['cid'] ?? 0, $input['note'] ?? '');
 
 		$this->assertIntro($intro, [
-			'uid'        => $input['uid'] ?? 0,
-			'contact-id' => $input['cid'] ?? 0,
+			'uid'        => $input['uid']  ?? 0,
+			'contact-id' => $input['cid']  ?? 0,
 			'note'       => $input['note'] ?? '',
 		]);
 	}

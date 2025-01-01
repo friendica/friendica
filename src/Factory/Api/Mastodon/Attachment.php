@@ -63,7 +63,7 @@ class Attachment extends BaseFactory
 	 * @return \Friendica\Object\Api\Mastodon\Attachment
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	private function createFromMediaArray(array $attachment):  \Friendica\Object\Api\Mastodon\Attachment
+	private function createFromMediaArray(array $attachment): \Friendica\Object\Api\Mastodon\Attachment
 	{
 		$filetype = !empty($attachment['mimetype']) ? strtolower(substr($attachment['mimetype'], 0, strpos($attachment['mimetype'], '/'))) : '';
 

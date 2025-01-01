@@ -46,7 +46,7 @@ class HCard extends BaseModule
 			$page['htmlhead'] .= '<link rel="openid.server" href="' . $profile['openidserver'] . '" />' . "\r\n";
 		}
 		if (!empty($profile['openid'])) {
-			$delegate         = ((strstr($profile['openid'], '://')) ? $profile['openid'] : 'http://' . $profile['openid']);
+			$delegate = ((strstr($profile['openid'], '://')) ? $profile['openid'] : 'http://' . $profile['openid']);
 			$page['htmlhead'] .= '<link rel="openid.delegate" href="' . $delegate . '" />' . "\r\n";
 		}
 

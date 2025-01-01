@@ -43,7 +43,8 @@ class ApiResponseTest extends MockedTestCase
 		$response->error(200, 'OK', 'error_message', 'xml');
 
 		self::assertEquals(['Content-type' => 'text/xml', 'HTTP/1.1 200 OK'], $response->getHeaders());
-		self::assertEquals('<?xml version="1.0"?>' . "\n" .
+		self::assertEquals(
+			'<?xml version="1.0"?>' . "\n" .
 						   '<status xmlns="http://api.twitter.com" xmlns:statusnet="http://status.net/schema/api/1/" ' .
 						   'xmlns:friendica="http://friendi.ca/schema/api/1/" ' .
 						   'xmlns:georss="http://www.georss.org/georss">' . "\n" .
@@ -51,7 +52,8 @@ class ApiResponseTest extends MockedTestCase
 						   '  <code>200 OK</code>' . "\n" .
 						   '  <request/>' . "\n" .
 						   '</status>' . "\n",
-			$response->getContent());
+			$response->getContent()
+		);
 	}
 
 	public function testErrorWithRss()
@@ -75,7 +77,8 @@ class ApiResponseTest extends MockedTestCase
 			'  <code>200 OK</code>' . "\n" .
 			'  <request/>' . "\n" .
 			'</status>' . "\n",
-			$response->getContent());
+			$response->getContent()
+		);
 	}
 
 	public function testErrorWithAtom()
@@ -99,7 +102,8 @@ class ApiResponseTest extends MockedTestCase
 			'  <code>200 OK</code>' . "\n" .
 			'  <request/>' . "\n" .
 			'</status>' . "\n",
-			$response->getContent());
+			$response->getContent()
+		);
 	}
 
 	public function testUnsupported()

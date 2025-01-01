@@ -225,11 +225,11 @@ class CurlResult implements ICanHandleHttpResponses
 				}
 			}
 
-			$this->redirectUrl = (string)Uri::fromParts((array)$redirect_parts);
-			$this->isRedirectUrl = true;
+			$this->redirectUrl         = (string)Uri::fromParts((array)$redirect_parts);
+			$this->isRedirectUrl       = true;
 			$this->redirectIsPermanent = $this->returnCode == 301 || $this->returnCode == 308;
 		} else {
-			$this->isRedirectUrl = false;
+			$this->isRedirectUrl       = false;
 			$this->redirectIsPermanent = false;
 		}
 	}

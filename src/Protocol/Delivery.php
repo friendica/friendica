@@ -186,7 +186,9 @@ class Delivery
 		}
 
 		// We don't deliver our items to blocked, archived or pending contacts, and not to ourselves either
-		$contact = DBA::selectFirst('contact', [],
+		$contact = DBA::selectFirst(
+			'contact',
+			[],
 			['id' => $contact_id, 'archive' => false, 'blocked' => false, 'pending' => false, 'self' => false]
 		);
 		if (!DBA::isResult($contact)) {
@@ -534,10 +536,10 @@ class Delivery
 
 		if (($contact['rel'] == Contact::FRIEND) && !$contact['blocked']) {
 			if ($reply_to) {
-				$headers = 'From: ' . Email::encodeHeader($local_user['username'],'UTF-8') . ' <' . $reply_to . '>' . "\n";
+				$headers = 'From: ' . Email::encodeHeader($local_user['username'], 'UTF-8') . ' <' . $reply_to . '>' . "\n";
 				$headers .= 'Sender: ' . $local_user['email'] . "\n";
 			} else {
-				$headers = 'From: ' . Email::encodeHeader($local_user['username'],'UTF-8') . ' <' . $local_user['email'] . '>' . "\n";
+				$headers = 'From: ' . Email::encodeHeader($local_user['username'], 'UTF-8') . ' <' . $local_user['email'] . '>' . "\n";
 			}
 		} else {
 			$sender  = DI::config()->get('config', 'sender_email', 'noreply@' . DI::baseUrl()->getHost());

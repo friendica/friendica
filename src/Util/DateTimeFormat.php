@@ -23,7 +23,7 @@ class DateTimeFormat
 	const JSON  = 'Y-m-d\TH:i:s.v\Z';
 	const API   = 'D M d H:i:s +0000 Y';
 
-	static $localTimezone = 'UTC';
+	public static $localTimezone = 'UTC';
 
 	public static function setLocalTimeZone(string $timezone)
 	{

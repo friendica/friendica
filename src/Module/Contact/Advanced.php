@@ -56,21 +56,21 @@ class Advanced extends BaseModule
 			throw new BadRequestException($this->t('Contact not found.'));
 		}
 
-		$name        = ($_POST['name'] ?? '') ?: $contact['name'];
-		$nick        = $_POST['nick'] ?? '';
-		$url         = $_POST['url'] ?? '';
-		$poll        = $_POST['poll'] ?? '';
-		$photo       = $_POST['photo'] ?? '';
-		$nurl        = Strings::normaliseLink($url);
+		$name  = ($_POST['name'] ?? '') ?: $contact['name'];
+		$nick  = $_POST['nick']  ?? '';
+		$url   = $_POST['url']   ?? '';
+		$poll  = $_POST['poll']  ?? '';
+		$photo = $_POST['photo'] ?? '';
+		$nurl  = Strings::normaliseLink($url);
 
 		$r = $this->dba->update(
 			'contact',
 			[
-				'name'        => $name,
-				'nick'        => $nick,
-				'url'         => $url,
-				'nurl'        => $nurl,
-				'poll'        => $poll,
+				'name' => $name,
+				'nick' => $nick,
+				'url'  => $url,
+				'nurl' => $nurl,
+				'poll' => $poll,
 			],
 			['id' => $contact['id'], 'uid' => DI::userSession()->getLocalUserId()]
 		);
@@ -111,17 +111,17 @@ class Advanced extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('contact/advanced.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$tab_str'           => $tab_str,
-			'$returnaddr'        => $returnaddr,
-			'$return'            => $this->t('Return to contact editor'),
-			'$contact_id'        => $contact['id'],
-			'$lbl_submit'        => $this->t('Submit'),
+			'$tab_str'    => $tab_str,
+			'$returnaddr' => $returnaddr,
+			'$return'     => $this->t('Return to contact editor'),
+			'$contact_id' => $contact['id'],
+			'$lbl_submit' => $this->t('Submit'),
 
-			'$name'    => ['name', $this->t('Name'), $contact['name'], '', '', $readonly],
-			'$nick'    => ['nick', $this->t('Account Nickname'), $contact['nick'], '', '', 'readonly'],
-			'$url'     => ['url', $this->t('Account URL'), $contact['url'], '', '', 'readonly'],
-			'poll'     => ['poll', $this->t('Poll/Feed URL'), $contact['poll'], '', '', ($contact['network'] == Protocol::FEED) ? '' : 'readonly'],
-			'photo'    => ['photo', $this->t('New photo from this URL'), '', '', '', $readonly],
+			'$name' => ['name', $this->t('Name'), $contact['name'], '', '', $readonly],
+			'$nick' => ['nick', $this->t('Account Nickname'), $contact['nick'], '', '', 'readonly'],
+			'$url'  => ['url', $this->t('Account URL'), $contact['url'], '', '', 'readonly'],
+			'poll'  => ['poll', $this->t('Poll/Feed URL'), $contact['poll'], '', '', ($contact['network'] == Protocol::FEED) ? '' : 'readonly'],
+			'photo' => ['photo', $this->t('New photo from this URL'), '', '', '', $readonly],
 		]);
 	}
 }

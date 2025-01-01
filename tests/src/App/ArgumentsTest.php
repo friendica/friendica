@@ -29,20 +29,22 @@ class ArgumentsTest extends TestCase
 	{
 		$arguments = new App\Arguments();
 
-		self::assertArguments([
-			'queryString' => '',
-			'command'     => '',
-			'argv'        => [],
-			'argc'        => 0,
-			'method'      => App\Router::GET
-		],
-			$arguments);
+		self::assertArguments(
+			[
+				'queryString' => '',
+				'command'     => '',
+				'argv'        => [],
+				'argc'        => 0,
+				'method'      => App\Router::GET
+			],
+			$arguments
+		);
 	}
 
 	public function dataArguments()
 	{
 		return [
-			'withPagename'         => [
+			'withPagename' => [
 				'assert' => [
 					'queryString' => 'profile/test/it?arg1=value1&arg2=value2',
 					'command'     => 'profile/test/it',
@@ -53,11 +55,11 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=profile/test/it&arg1=value1&arg2=value2',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'profile/test/it',
 				],
 			],
-			'withUnixHomeDir'      => [
+			'withUnixHomeDir' => [
 				'assert' => [
 					'queryString' => '~test/it?arg1=value1&arg2=value2',
 					'command'     => '~test/it',
@@ -68,11 +70,11 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=~test/it&arg1=value1&arg2=value2',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => '~test/it',
 				],
 			],
-			'withDiasporaHomeDir'  => [
+			'withDiasporaHomeDir' => [
 				'assert' => [
 					'queryString' => 'u/test/it?arg1=value1&arg2=value2',
 					'command'     => 'u/test/it',
@@ -83,11 +85,11 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=u/test/it&arg1=value1&arg2=value2',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'u/test/it',
 				],
 			],
-			'withTrailingSlash'    => [
+			'withTrailingSlash' => [
 				'assert' => [
 					'queryString' => 'profile/test/it?arg1=value1&arg2=value2%2F',
 					'command'     => 'profile/test/it',
@@ -98,7 +100,7 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=profile/test/it&arg1=value1&arg2=value2/',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'profile/test/it',
 				],
 			],
@@ -113,11 +115,11 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'wrong=profile/test/it&arg1=value1&arg2=value2/',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'profile/test/it',
 				],
 			],
-			'withMissingPageName'  => [
+			'withMissingPageName' => [
 				'assert' => [
 					'queryString' => 'notvalid/it?arg1=value1&arg2=value2%2F',
 					'command'     => 'notvalid/it',
@@ -128,10 +130,10 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=notvalid/it&arg1=value1&arg2=value2/',
 				],
-				'get'    => [
+				'get' => [
 				],
 			],
-			'withNothing'  => [
+			'withNothing' => [
 				'assert' => [
 					'queryString' => '?arg1=value1&arg2=value2%2F',
 					'command'     => '',
@@ -142,10 +144,10 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'arg1=value1&arg2=value2/',
 				],
-				'get'    => [
+				'get' => [
 				],
 			],
-			'withFileExtension'  => [
+			'withFileExtension' => [
 				'assert' => [
 					'queryString' => 'api/call.json',
 					'command'     => 'api/call.json',
@@ -156,11 +158,11 @@ class ArgumentsTest extends TestCase
 				'server' => [
 					'QUERY_STRING' => 'pagename=api/call.json',
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'api/call.json'
 				],
 			],
-			'withHTTPMethod'  => [
+			'withHTTPMethod' => [
 				'assert' => [
 					'queryString' => 'api/call.json',
 					'command'     => 'api/call.json',
@@ -169,10 +171,10 @@ class ArgumentsTest extends TestCase
 					'method'      => App\Router::POST,
 				],
 				'server' => [
-					'QUERY_STRING' => 'pagename=api/call.json',
+					'QUERY_STRING'   => 'pagename=api/call.json',
 					'REQUEST_METHOD' => App\Router::POST,
 				],
-				'get'    => [
+				'get' => [
 					'pagename' => 'api/call.json'
 				],
 			],
@@ -215,11 +217,11 @@ class ArgumentsTest extends TestCase
 	public function dataStripped()
 	{
 		return [
-			'strippedZRLFirst'  => [
+			'strippedZRLFirst' => [
 				'assert' => '?arg1=value1',
 				'input'  => '&zrl=nope&arg1=value1',
 			],
-			'strippedZRLLast'   => [
+			'strippedZRLLast' => [
 				'assert' => '?arg1=value1',
 				'input'  => '&arg1=value1&zrl=nope',
 			],
@@ -227,11 +229,11 @@ class ArgumentsTest extends TestCase
 				'assert' => '?arg1=value1&arg2=value2',
 				'input'  => '&arg1=value1&zrl=nope&arg2=value2',
 			],
-			'strippedOWTFirst'  => [
+			'strippedOWTFirst' => [
 				'assert' => '?arg1=value1',
 				'input'  => '&owt=test&arg1=value1',
 			],
-			'strippedOWTLast'   => [
+			'strippedOWTLast' => [
 				'assert' => '?arg1=value1',
 				'input'  => '&arg1=value1&owt=test',
 			],

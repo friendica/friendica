@@ -128,8 +128,8 @@ class PermissionSet extends BaseRepository
 
 			$circle_ids = [];
 			if (!empty($user_contact_str) && $this->db->exists('contact', [
-				'id' => $cid,
-				'uid' => $uid,
+				'id'      => $cid,
+				'uid'     => $uid,
 				'blocked' => false
 			])) {
 				$circle_ids = Circle::getIdsByContactId($cid);

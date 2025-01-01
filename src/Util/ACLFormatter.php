@@ -67,17 +67,18 @@ final class ACLFormatter
 	 *
 	 * @param string $item The item to sanitise
 	 */
-	private function sanitizeItem(string &$item) {
+	private function sanitizeItem(string &$item)
+	{
 		// The item is an ACL int value
 		if (intval($item)) {
 			$item = '<' . intval($item) . '>';
-		// The item is a allowed ACL character
+			// The item is a allowed ACL character
 		} elseif (in_array($item, [Circle::FOLLOWERS, Circle::MUTUALS])) {
 			$item = '<' . $item . '>';
-		// The item is already a ACL string
+			// The item is already a ACL string
 		} elseif (preg_match('/<\d+?>/', $item)) {
 			unset($item);
-		// The item is not supported, so remove it (cleanup)
+			// The item is not supported, so remove it (cleanup)
 		} else {
 			$item = '';
 		}
@@ -93,7 +94,7 @@ final class ACLFormatter
 	 *
 	 * @return string
 	 */
-	function toString($permissions): string
+	public function toString($permissions): string
 	{
 		$return = '';
 		if (is_array($permissions)) {

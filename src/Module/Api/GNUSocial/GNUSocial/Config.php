@@ -40,9 +40,9 @@ class Config extends BaseApi
 				'sslserver'    => null,
 				'ssl'          => DI::baseUrl()->getScheme() === 'https' ? 'always' : '0',
 				'friendica'    => [
-					'FRIENDICA_PLATFORM'    => App::PLATFORM,
-					'FRIENDICA_VERSION'     => App::VERSION,
-					'DB_UPDATE_VERSION'     => DB_UPDATE_VERSION,
+					'FRIENDICA_PLATFORM' => App::PLATFORM,
+					'FRIENDICA_VERSION'  => App::VERSION,
+					'DB_UPDATE_VERSION'  => DB_UPDATE_VERSION,
 				]
 			],
 		];

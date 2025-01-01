@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class MockedTestCase extends TestCase
 {
-	protected function tearDown() : void
+	protected function tearDown(): void
 	{
 		\Mockery::close();
 

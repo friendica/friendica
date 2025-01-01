@@ -10,7 +10,6 @@ namespace Friendica\Module\Search;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Model\User;
 use Friendica\Module\Response;
@@ -68,10 +67,12 @@ class Tags extends BaseModule
 			]);
 		}
 
-		$searchStmt = $this->database->select('owner-view',
+		$searchStmt = $this->database->select(
+			'owner-view',
 			['pub_keywords', 'name', 'nickname', 'uid'],
 			$condition,
-			['limit' => [$startRec, $perPage]]);
+			['limit' => [$startRec, $perPage]]
+		);
 
 		while ($searchResult = $this->database->fetch($searchStmt)) {
 			$results[] = [

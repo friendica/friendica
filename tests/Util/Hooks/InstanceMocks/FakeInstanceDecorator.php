@@ -18,7 +18,7 @@ class FakeInstanceDecorator implements IAmADecoratedInterface
 
 	public function __construct(IAmADecoratedInterface $orig)
 	{
-		$this->orig   = $orig;
+		$this->orig = $orig;
 
 		self::$countInstance++;
 	}

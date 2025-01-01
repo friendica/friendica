@@ -37,8 +37,7 @@ class Statistics extends BaseModule
 
 	protected function rawContent(array $request = [])
 	{
-		$registration_open =
-			Register::getPolicy() !== Register::CLOSED
+		$registration_open = Register::getPolicy() !== Register::CLOSED
 			&& !$this->config->get('config', 'invitation_only');
 
 		/// @todo mark the "service" addons and load them dynamically here

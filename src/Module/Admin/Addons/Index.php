@@ -34,7 +34,7 @@ class Index extends BaseAdmin
 					DI::sysmsg()->addInfo(DI::l10n()->t('Addons reloaded'));
 					break;
 
-				case 'toggle' :
+				case 'toggle':
 					$addon = $_GET['addon'] ?? '';
 					if (Addon::isEnabled($addon)) {
 						Addon::uninstall($addon);
@@ -56,14 +56,14 @@ class Index extends BaseAdmin
 
 		$t = Renderer::getMarkupTemplate('admin/addons/index.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('Addons'),
-			'$submit' => DI::l10n()->t('Save Settings'),
-			'$reload' => DI::l10n()->t('Reload active addons'),
-			'$function' => 'addons',
-			'$addons' => $addons,
-			'$pcount' => count($addons),
-			'$noplugshint' => DI::l10n()->t('There are currently no addons available on your node. You can find the official addon repository at %1$s.', 'https://git.friendi.ca/friendica/friendica-addons'),
+			'$title'               => DI::l10n()->t('Administration'),
+			'$page'                => DI::l10n()->t('Addons'),
+			'$submit'              => DI::l10n()->t('Save Settings'),
+			'$reload'              => DI::l10n()->t('Reload active addons'),
+			'$function'            => 'addons',
+			'$addons'              => $addons,
+			'$pcount'              => count($addons),
+			'$noplugshint'         => DI::l10n()->t('There are currently no addons available on your node. You can find the official addon repository at %1$s.', 'https://git.friendi.ca/friendica/friendica-addons'),
 			'$form_security_token' => self::getFormSecurityToken('admin_addons'),
 		]);
 	}

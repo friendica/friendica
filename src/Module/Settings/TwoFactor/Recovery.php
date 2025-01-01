@@ -36,7 +36,7 @@ class Recovery extends BaseSettings
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->pConfig = $pConfig;
+		$this->pConfig        = $pConfig;
 		$this->systemMessages = $systemMessages;
 
 		if (!$this->session->getLocalUserId()) {

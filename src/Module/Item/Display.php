@@ -28,7 +28,6 @@ use Friendica\Module\Special\DisplayNotFound;
 use Friendica\Navigation\Notifications\Repository\Notification;
 use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Network\HTTPException;
 use Friendica\Content\Widget;
@@ -121,7 +120,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 
@@ -195,7 +194,7 @@ class Display extends BaseModule
 		}
 
 		if (!empty($parent)) {
-			$pageUid         = $parent['uid'];
+			$pageUid = $parent['uid'];
 			if ($this->session->getRemoteContactID($pageUid)) {
 				$itemUid = $parent['uid'];
 			}
@@ -237,7 +236,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 

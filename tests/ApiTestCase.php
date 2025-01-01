@@ -124,7 +124,7 @@ abstract class ApiTestCase extends FixtureTestCase
 		file_put_contents(
 			$tmpFile,
 			base64_decode(
-			// Empty 1x1 px PNG image
+				// Empty 1x1 px PNG image
 				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
 			)
 		);

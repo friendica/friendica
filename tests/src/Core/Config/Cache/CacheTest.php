@@ -20,12 +20,12 @@ class CacheTest extends MockedTestCase
 			'normal' => [
 				'data' => [
 					'system' => [
-						'test' => 'it',
-						'boolTrue' => true,
+						'test'      => 'it',
+						'boolTrue'  => true,
 						'boolFalse' => false,
-						'int' => 235,
-						'dec' => 2.456,
-						'array' => ['1', 2, '3', true, false],
+						'int'       => 235,
+						'dec'       => 2.456,
+						'array'     => ['1', 2, '3', true, false],
 					],
 					'config' => [
 						'a' => 'value',
@@ -64,7 +64,7 @@ class CacheTest extends MockedTestCase
 	{
 		$override = [
 			'system' => [
-				'test' => 'not',
+				'test'     => 'not',
 				'boolTrue' => false,
 			]
 		];
@@ -340,7 +340,7 @@ class CacheTest extends MockedTestCase
 		$configCache = new Cache();
 		$configCache->load($data, Cache::SOURCE_FILE);
 
-		$configCache->set('system', 'test_2','with_data', Cache::SOURCE_DATA);
+		$configCache->set('system', 'test_2', 'with_data', Cache::SOURCE_DATA);
 
 		$this->assertEquals(['system' => ['test_2' => 'with_data']], $configCache->getDataBySource(Cache::SOURCE_DATA));
 		$this->assertEquals($data, $configCache->getDataBySource(Cache::SOURCE_FILE));
@@ -354,14 +354,14 @@ class CacheTest extends MockedTestCase
 		$configCache = new Cache();
 		$configCache->load($data, Cache::SOURCE_FILE);
 
-		$configCache->set('system', 'test_2','with_data', Cache::SOURCE_DATA);
-		$configCache->set('config', 'test_override','with_another_data', Cache::SOURCE_DATA);
-		$configCache->set('old_category', 'test_45','given category', Cache::SOURCE_DATA);
+		$configCache->set('system', 'test_2', 'with_data', Cache::SOURCE_DATA);
+		$configCache->set('config', 'test_override', 'with_another_data', Cache::SOURCE_DATA);
+		$configCache->set('old_category', 'test_45', 'given category', Cache::SOURCE_DATA);
 
 		$newCache = new Cache();
-		$newCache->set('config', 'test_override','override it again', Cache::SOURCE_DATA);
-		$newCache->set('system', 'test_3','new value', Cache::SOURCE_DATA);
-		$newCache->set('new_category', 'test_23','added category', Cache::SOURCE_DATA);
+		$newCache->set('config', 'test_override', 'override it again', Cache::SOURCE_DATA);
+		$newCache->set('system', 'test_3', 'new value', Cache::SOURCE_DATA);
+		$newCache->set('new_category', 'test_23', 'added category', Cache::SOURCE_DATA);
 
 		$mergedCache = $configCache->merge($newCache);
 
@@ -375,26 +375,26 @@ class CacheTest extends MockedTestCase
 	public function dataTestCat()
 	{
 		return [
-			'test_with_hashmap'     => [
-				'data'      => [
+			'test_with_hashmap' => [
+				'data' => [
 					'test_with_hashmap' => [
 						'notifyall' => [
 							'last_update' => 1671051565,
 							'admin'       => true,
 						],
-						'blockbot'  => [
+						'blockbot' => [
 							'last_update' => 1658952852,
 							'admin'       => true,
 						],
 					],
-					'config'            => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'            => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -404,14 +404,14 @@ class CacheTest extends MockedTestCase
 						'last_update' => 1671051565,
 						'admin'       => true,
 					],
-					'blockbot'  => [
+					'blockbot' => [
 						'last_update' => 1658952852,
 						'admin'       => true,
 					],
 				],
 			],
-			'test_with_keys'        => [
-				'data'      => [
+			'test_with_keys' => [
+				'data' => [
 					'test_with_keys' => [
 						[
 							'last_update' => 1671051565,
@@ -422,14 +422,14 @@ class CacheTest extends MockedTestCase
 							'admin'       => true,
 						],
 					],
-					'config'            => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'            => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -446,7 +446,7 @@ class CacheTest extends MockedTestCase
 				],
 			],
 			'test_with_inner_array' => [
-				'data'      => [
+				'data' => [
 					'test_with_inner_array' => [
 						'notifyall' => [
 							'last_update' => 1671051565,
@@ -455,19 +455,19 @@ class CacheTest extends MockedTestCase
 								'no'  => 1.5,
 							],
 						],
-						'blogbot'   => [
+						'blogbot' => [
 							'last_update' => 1658952852,
 							'admin'       => true,
 						],
 					],
-					'config'                => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'                => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -480,7 +480,7 @@ class CacheTest extends MockedTestCase
 							'no'  => 1.5,
 						],
 					],
-					'blogbot'   => [
+					'blogbot' => [
 						'last_update' => 1658952852,
 						'admin'       => true,
 					],
@@ -488,16 +488,16 @@ class CacheTest extends MockedTestCase
 			],
 			/** @see https://github.com/friendica/friendica/issues/12486#issuecomment-1374609349 */
 			'test_with_null' => [
-				'data'      => [
+				'data' => [
 					'test_with_null' => null,
-					'config'                => [
+					'config'         => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'                => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],

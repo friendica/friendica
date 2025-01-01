@@ -9,7 +9,6 @@ namespace Friendica\Model\Post;
 
 use BadMethodCallException;
 use Friendica\Database\DBA;
-use Friendica\Database\DBStructure;
 use Friendica\DI;
 
 class QuestionOption

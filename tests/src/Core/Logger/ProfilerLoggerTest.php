@@ -32,7 +32,7 @@ class ProfilerLoggerTest extends MockedTestCase
 	{
 		parent::setUp();
 
-		$this->logger = \Mockery::mock(LoggerInterface::class);
+		$this->logger   = \Mockery::mock(LoggerInterface::class);
 		$this->profiler = \Mockery::mock(Profiler::class);
 	}
 

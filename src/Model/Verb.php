@@ -12,7 +12,7 @@ use Friendica\Database\DBA;
 
 class Verb
 {
-	static $verbs = [];
+	public static $verbs = [];
 
 	/**
 	 * Insert a verb record and return its id
@@ -41,7 +41,7 @@ class Verb
 
 		DBA::insert('verb', ['name' => $verb], Database::INSERT_IGNORE);
 
-		$id = DBA::lastInsertId();
+		$id               = DBA::lastInsertId();
 		self::$verbs[$id] = $verb;
 		return $id;
 

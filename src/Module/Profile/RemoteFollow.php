@@ -12,15 +12,12 @@ use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
@@ -111,17 +108,17 @@ class RemoteFollow extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('auto_request.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$header'        => $this->t('Friend/Connection Request'),
-			'$page_desc'     => $this->t('Enter your Webfinger address (user@domain.tld) or profile URL here. If this isn\'t supported by your system, you have to subscribe to <strong>%s</strong> or <strong>%s</strong> directly on your system.', $target_addr, $target_url),
-			'$invite_desc'   => $this->t('If you are not yet a member of the free social web, <a href="%s">follow this link to find a public Friendica node and join us today</a>.', Search::getGlobalDirectory() . '/servers'),
-			'$your_address'  => $this->t('Your Webfinger address or profile URL:'),
-			'$pls_answer'    => $this->t('Please answer the following:'),
-			'$submit'        => $this->t('Submit Request'),
-			'$cancel'        => $this->t('Cancel'),
+			'$header'       => $this->t('Friend/Connection Request'),
+			'$page_desc'    => $this->t('Enter your Webfinger address (user@domain.tld) or profile URL here. If this isn\'t supported by your system, you have to subscribe to <strong>%s</strong> or <strong>%s</strong> directly on your system.', $target_addr, $target_url),
+			'$invite_desc'  => $this->t('If you are not yet a member of the free social web, <a href="%s">follow this link to find a public Friendica node and join us today</a>.', Search::getGlobalDirectory() . '/servers'),
+			'$your_address' => $this->t('Your Webfinger address or profile URL:'),
+			'$pls_answer'   => $this->t('Please answer the following:'),
+			'$submit'       => $this->t('Submit Request'),
+			'$cancel'       => $this->t('Cancel'),
 
-			'$action'        => 'profile/' . $this->parameters['nickname'] . '/remote_follow',
-			'$name'          => $this->owner['name'],
-			'$myaddr'        => $this->userSession->getMyUrl(),
+			'$action' => 'profile/' . $this->parameters['nickname'] . '/remote_follow',
+			'$name'   => $this->owner['name'],
+			'$myaddr' => $this->userSession->getMyUrl(),
 		]);
 	}
 }

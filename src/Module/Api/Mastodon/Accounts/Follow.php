@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Module\BaseApi;
@@ -27,7 +26,7 @@ class Follow extends BaseApi
 		}
 
 		$request = $this->getRequest([
-			'notify'   => false, // Notify on new posts.
+			'notify' => false, // Notify on new posts.
 		], $request);
 
 		$contact = Contact::getById($this->parameters['id'], ['url']);

@@ -90,7 +90,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		if ($visibility === 'public') {
 			// The ACL selector introduced in version 2019.12 sends ACL input data even when the Public visibility is selected
 			$str_contact_allow = $str_circle_allow = $str_contact_deny = $str_circle_deny = '';
-		} else if ($visibility === 'custom') {
+		} elseif ($visibility === 'custom') {
 			// Since we know from the visibility parameter the item should be private, we have to prevent the empty ACL
 			// case that would make it public. So we always append the author's contact id to the allowed contacts.
 			// See https://github.com/friendica/friendica/issues/9672
@@ -148,7 +148,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$type     = $_FILES['userfile']['type'];
 			$error    = $_FILES['userfile']['error'];
 		} else {
-			$error    = UPLOAD_ERR_NO_FILE;
+			$error = UPLOAD_ERR_NO_FILE;
 		}
 
 		if ($error !== UPLOAD_ERR_OK) {
@@ -212,7 +212,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->systemMessages->addNotice($this->t('Unable to process image.'));
 			@unlink($src);
 			$foo = 0;
-			Hook::callAll('photo_post_end',$foo);
+			Hook::callAll('photo_post_end', $foo);
 			return;
 		}
 
@@ -268,7 +268,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		$arr['visible']       = $visible;
 		$arr['origin']        = 1;
 
-		$arr['body']          = Images::getBBCodeByResource($resource_id, $this->owner['nickname'], $preview, $image->getExt());
+		$arr['body'] = Images::getBBCodeByResource($resource_id, $this->owner['nickname'], $preview, $image->getExt());
 
 		$item_id = Item::insert($arr);
 		// Update the photo albums cache
@@ -336,7 +336,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$pager->getItemsPerPage()
 		));
 
-		$photos = array_map(function ($photo){
+		$photos = array_map(function ($photo) {
 			return [
 				'id'    => $photo['id'],
 				'link'  => 'photos/' . $this->owner['nickname'] . '/image/' . $photo['resource-id'],

@@ -7,7 +7,6 @@
 
 namespace Friendica\Object\Api\Twitter;
 
-use Friendica\App\BaseURL;
 use Friendica\BaseDataTransferObject;
 
 /**

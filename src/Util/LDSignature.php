@@ -74,14 +74,14 @@ class LDSignature
 	public static function sign(array $data, array $owner): array
 	{
 		$options = [
-			'type' => 'RsaSignature2017',
-			'nonce' => Strings::getRandomHex(64),
+			'type'    => 'RsaSignature2017',
+			'nonce'   => Strings::getRandomHex(64),
 			'creator' => $owner['url'] . '#main-key',
 			'created' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 		];
 
-		$ohash = self::hash(self::signableOptions($options));
-		$dhash = self::hash(self::signableData($data));
+		$ohash                     = self::hash(self::signableOptions($options));
+		$dhash                     = self::hash(self::signableData($data));
 		$options['signatureValue'] = base64_encode(Crypto::rsaSign($ohash . $dhash, $owner['uprvkey']));
 
 		return array_merge($data, ['signature' => $options]);

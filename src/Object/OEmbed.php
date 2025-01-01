@@ -16,7 +16,7 @@ namespace Friendica\Object;
  */
 class OEmbed
 {
-	public $embed_url        = '';
+	public $embed_url = '';
 
 	public $type             = '';
 	public $title            = '';

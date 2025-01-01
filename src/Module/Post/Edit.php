@@ -107,7 +107,7 @@ class Edit extends BaseModule
 		}
 
 		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item         = Post\Media::addHTMLAttachmentToItem($item);
 
 		$jotplugins = '';
 

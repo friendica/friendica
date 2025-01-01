@@ -54,7 +54,7 @@ class Delayed
 
 			$last_publish = DI::pConfig()->get($item['uid'], 'system', 'last_publish', 0, true);
 			$next_publish = max($last_publish + (60 * $min_posting), time());
-			$delayed = date(DateTimeFormat::MYSQL, $next_publish);
+			$delayed      = date(DateTimeFormat::MYSQL, $next_publish);
 			DI::pConfig()->set($item['uid'], 'system', 'last_publish', $next_publish);
 		}
 
@@ -152,13 +152,13 @@ class Delayed
 		}
 
 		return [
-			'parameters' => $delayed,
-			'item' => $parameters[0],
-			'notify' => $parameters[1],
-			'taglist' => $parameters[2],
+			'parameters'  => $delayed,
+			'item'        => $parameters[0],
+			'notify'      => $parameters[1],
+			'taglist'     => $parameters[2],
 			'attachments' => $parameters[3],
-			'unprepared' => $parameters[4],
-			'uri' => $parameters[5],
+			'unprepared'  => $parameters[4],
+			'uri'         => $parameters[5],
 		];
 	}
 

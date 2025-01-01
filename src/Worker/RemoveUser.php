@@ -15,7 +15,8 @@ use Friendica\Model\Post;
 /**
  * Removes orphaned data from deleted users
  */
-class RemoveUser {
+class RemoveUser
+{
 	/**
 	 * Removes user by id
 	 *

@@ -8,7 +8,6 @@
 namespace Friendica\Core\Config\Capability;
 
 use Friendica\Core\Config\Exception\ConfigPersistenceException;
-use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 
 /**

@@ -36,7 +36,7 @@ use GuzzleHttp\Psr7\Uri;
 class PostUpdate
 {
 	// Needed for the helper function to read from the legacy term table
-	const OBJECT_TYPE_POST  = 1;
+	const OBJECT_TYPE_POST = 1;
 
 	const VERSION = 1550;
 
@@ -139,7 +139,7 @@ class PostUpdate
 		}
 
 		$max_item_delivery_data = DBA::selectFirst('item-delivery-data', ['iid'], ['queue_count > 0 OR queue_done > 0'], ['order' => ['iid']]);
-		$max_iid = $max_item_delivery_data['iid'] ?? 0;
+		$max_iid                = $max_item_delivery_data['iid'] ?? 0;
 
 		Logger::info('Start update1297 with max iid: ' . $max_iid);
 
@@ -175,12 +175,19 @@ class PostUpdate
 
 		Logger::info('Start');
 
-		$contacts = DBA::p("SELECT `nurl`, `uid` FROM `contact`
+		$contacts = DBA::p(
+			"SELECT `nurl`, `uid` FROM `contact`
 			WHERE EXISTS (SELECT `nurl` FROM `contact` AS `c2`
 				WHERE `c2`.`nurl` = `contact`.`nurl` AND `c2`.`id` != `contact`.`id` AND `c2`.`uid` = `contact`.`uid` AND `c2`.`network` IN (?, ?, ?) AND NOT `deleted`)
 			AND (`network` IN (?, ?, ?) OR (`uid` = ?)) AND NOT `deleted` GROUP BY `nurl`, `uid`",
-			Protocol::DIASPORA, Protocol::OSTATUS, Protocol::ACTIVITYPUB,
-			Protocol::DIASPORA, Protocol::OSTATUS, Protocol::ACTIVITYPUB, 0);
+			Protocol::DIASPORA,
+			Protocol::OSTATUS,
+			Protocol::ACTIVITYPUB,
+			Protocol::DIASPORA,
+			Protocol::OSTATUS,
+			Protocol::ACTIVITYPUB,
+			0
+		);
 
 		while ($contact = DBA::fetch($contacts)) {
 			Logger::info('Remove duplicates', ['nurl' => $contact['nurl'], 'uid' => $contact['uid']]);
@@ -217,11 +224,11 @@ class PostUpdate
 
 		Logger::info('Start', ['item' => $id]);
 
-		$start_id = $id;
-		$rows = 0;
+		$start_id  = $id;
+		$rows      = 0;
 		$condition = ["`id` > ?", $id];
-		$params = ['order' => ['id'], 'limit' => 10000];
-		$items = DBA::select('item', ['id', 'uri-id', 'uid'], $condition, $params);
+		$params    = ['order' => ['id'], 'limit' => 10000];
+		$items     = DBA::select('item', ['id', 'uri-id', 'uid'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -332,12 +339,18 @@ class PostUpdate
 
 		$rows = 0;
 
-		$terms = DBA::p("SELECT `term`.`tid`, `item`.`uri-id`, `term`.`type`, `term`.`term`, `term`.`url`, `item-content`.`body`
+		$terms = DBA::p(
+			"SELECT `term`.`tid`, `item`.`uri-id`, `term`.`type`, `term`.`term`, `term`.`url`, `item-content`.`body`
 			FROM `term`
 			INNER JOIN `item` ON `item`.`id` = `term`.`oid`
 			INNER JOIN `item-content` ON `item-content`.`uri-id` = `item`.`uri-id`
 			WHERE term.type IN (?, ?, ?, ?) AND `tid` >= ? ORDER BY `tid` LIMIT 100000",
-			Tag::HASHTAG, Tag::MENTION, Tag::EXCLUSIVE_MENTION, Tag::IMPLICIT_MENTION, $id);
+			Tag::HASHTAG,
+			Tag::MENTION,
+			Tag::EXCLUSIVE_MENTION,
+			Tag::IMPLICIT_MENTION,
+			$id
+		);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -346,17 +359,17 @@ class PostUpdate
 
 		while ($term = DBA::fetch($terms)) {
 			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], $term['url'])) {
-                $condition = ['nurl' => Strings::normaliseLink($term['url']), 'uid' => 0, 'deleted' => false];
-                $contact = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
-                if (!DBA::isResult($contact)) {
-                        $ssl_url = str_replace('http://', 'https://', $term['url']);
-                        $condition = ['`alias` IN (?, ?, ?) AND `uid` = ? AND NOT `deleted`', $term['url'], Strings::normaliseLink($term['url']), $ssl_url, 0];
-                        $contact = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
-                }
+				$condition = ['nurl' => Strings::normaliseLink($term['url']), 'uid' => 0, 'deleted' => false];
+				$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
+				if (!DBA::isResult($contact)) {
+					$ssl_url   = str_replace('http://', 'https://', $term['url']);
+					$condition = ['`alias` IN (?, ?, ?) AND `uid` = ? AND NOT `deleted`', $term['url'], Strings::normaliseLink($term['url']), $ssl_url, 0];
+					$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
+				}
 
-                if (DBA::isResult($contact) && (!strstr($term['body'], $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], $contact['alias'])))) {
-                        $term['type'] = Tag::IMPLICIT_MENTION;
-                }
+				if (DBA::isResult($contact) && (!strstr($term['body'], $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], $contact['alias'])))) {
+					$term['type'] = Tag::IMPLICIT_MENTION;
+				}
 			}
 
 			Tag::store($term['uri-id'], $term['type'], $term['term'], $term['url']);
@@ -455,7 +468,7 @@ class PostUpdate
 		$file_text = '';
 
 		$condition = ['otype' => self::OBJECT_TYPE_POST, 'oid' => $item_id, 'type' => [Category::FILE, Category::CATEGORY]];
-		$tags = DBA::selectToArray('term', ['type', 'term', 'url'], $condition);
+		$tags      = DBA::selectToArray('term', ['type', 'term', 'url'], $condition);
 		foreach ($tags as $tag) {
 			if ($tag['type'] == Category::CATEGORY) {
 				$file_text .= '<' . $tag['term'] . '>';
@@ -491,9 +504,12 @@ class PostUpdate
 
 		$rows = 0;
 
-		$terms = DBA::select('term', ['oid'],
+		$terms = DBA::select(
+			'term',
+			['oid'],
 			["`type` IN (?, ?) AND `oid` >= ?", Category::CATEGORY, Category::FILE, $id],
-			['order' => ['oid'], 'limit' => 1000, 'group_by' => ['oid']]);
+			['order' => ['oid'], 'limit' => 1000, 'group_by' => ['oid']]
+		);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -558,7 +574,7 @@ class PostUpdate
 		Logger::info('Start', ['item' => $id]);
 
 		$start_id = $id;
-		$rows = 0;
+		$rows     = 0;
 
 		$items = DBA::p("SELECT `item`.`id`, `item`.`verb` AS `item-verb`, `item-content`.`verb`, `item-activity`.`activity`
 			FROM `item` LEFT JOIN `item-content` ON `item-content`.`uri-id` = `item`.`uri-id`
@@ -571,7 +587,7 @@ class PostUpdate
 		}
 
 		while ($item = DBA::fetch($items)) {
-			$id = $item['id'];
+			$id   = $item['id'];
 			$verb = $item['item-verb'];
 			if (empty($verb)) {
 				$verb = $item['verb'];
@@ -619,11 +635,11 @@ class PostUpdate
 
 		Logger::info('Start', ['contact' => $id]);
 
-		$start_id = $id;
-		$rows = 0;
+		$start_id  = $id;
+		$rows      = 0;
 		$condition = ["`id` > ? AND `gsid` IS NULL AND `baseurl` != '' AND NOT `baseurl` IS NULL", $id];
-		$params = ['order' => ['id'], 'limit' => 10000];
-		$contacts = DBA::select('contact', ['id', 'baseurl'], $condition, $params);
+		$params    = ['order' => ['id'], 'limit' => 10000];
+		$contacts  = DBA::select('contact', ['id', 'baseurl'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -633,9 +649,11 @@ class PostUpdate
 		while ($contact = DBA::fetch($contacts)) {
 			$id = $contact['id'];
 
-			DBA::update('contact',
+			DBA::update(
+				'contact',
 				['gsid' => GServer::getID($contact['baseurl'], true), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
-				['id' => $contact['id']]);
+				['id'   => $contact['id']]
+			);
 
 			++$rows;
 		}
@@ -672,10 +690,10 @@ class PostUpdate
 
 		Logger::info('Start', ['apcontact' => $id]);
 
-		$start_id = $id;
-		$rows = 0;
-		$condition = ["`url` > ? AND `gsid` IS NULL AND `baseurl` != '' AND NOT `baseurl` IS NULL", $id];
-		$params = ['order' => ['url'], 'limit' => 10000];
+		$start_id   = $id;
+		$rows       = 0;
+		$condition  = ["`url` > ? AND `gsid` IS NULL AND `baseurl` != '' AND NOT `baseurl` IS NULL", $id];
+		$params     = ['order' => ['url'], 'limit' => 10000];
 		$apcontacts = DBA::select('apcontact', ['url', 'baseurl'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
@@ -686,9 +704,11 @@ class PostUpdate
 		while ($apcontact = DBA::fetch($apcontacts)) {
 			$id = $apcontact['url'];
 
-			DBA::update('apcontact',
+			DBA::update(
+				'apcontact',
 				['gsid' => GServer::getID($apcontact['baseurl'], true), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
-				['url' => $apcontact['url']]);
+				['url'  => $apcontact['url']]
+			);
 
 			++$rows;
 		}
@@ -724,7 +744,7 @@ class PostUpdate
 		Logger::info('Start');
 
 		$deleted = 0;
-		$avatar = [4 => 'photo', 5 => 'thumb', 6 => 'micro'];
+		$avatar  = [4 => 'photo', 5 => 'thumb', 6 => 'micro'];
 
 		$photos = DBA::select('photo', ['id', 'contact-id', 'resource-id', 'scale'], ["`contact-id` != ? AND `album` = ?", 0, Photo::CONTACT_PHOTOS]);
 		while ($photo = DBA::fetch($photos)) {
@@ -765,7 +785,7 @@ class PostUpdate
 		$condition = ["`hash` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('photo', $condition)]);
 
-		$rows = 0;
+		$rows   = 0;
 		$photos = DBA::select('photo', [], $condition, ['limit' => 100]);
 
 		if (DBA::errorNo() != 0) {
@@ -815,7 +835,7 @@ class PostUpdate
 		$condition = ["`extid` != ? AND EXISTS(SELECT `id` FROM `post-user` WHERE `uri-id` = `item`.`uri-id` AND `uid` = `item`.`uid` AND `external-id` IS NULL)", ''];
 		Logger::info('Start', ['rest' => DBA::count('item', $condition)]);
 
-		$rows = 0;
+		$rows  = 0;
 		$items = DBA::select('item', ['uri-id', 'uid', 'extid'], $condition, ['order' => ['id'], 'limit' => 10000]);
 
 		if (DBA::errorNo() != 0) {
@@ -857,7 +877,7 @@ class PostUpdate
 		$condition = ["`uri-id` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('contact', $condition)]);
 
-		$rows = 0;
+		$rows     = 0;
 		$contacts = DBA::select('contact', ['id', 'url'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
@@ -904,7 +924,7 @@ class PostUpdate
 		$condition = ["`uri-id` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('fcontact', $condition)]);
 
-		$rows = 0;
+		$rows      = 0;
 		$fcontacts = DBA::select('fcontact', ['id', 'url', 'guid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
@@ -951,7 +971,7 @@ class PostUpdate
 		$condition = ["`uri-id` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('apcontact', $condition)]);
 
-		$rows = 0;
+		$rows       = 0;
 		$apcontacts = DBA::select('apcontact', ['url', 'uuid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
@@ -998,7 +1018,7 @@ class PostUpdate
 		$condition = ["`uri-id` IS NULL"];
 		Logger::info('Start', ['rest' => DBA::count('event', $condition)]);
 
-		$rows = 0;
+		$rows   = 0;
 		$events = DBA::select('event', ['id', 'uri', 'guid'], $condition, ['limit' => 1000]);
 
 		if (DBA::errorNo() != 0) {
@@ -1054,10 +1074,14 @@ class PostUpdate
 		$rows     = 0;
 		$received = '';
 
-		$conversations = DBA::p("SELECT `post-view`.`uri-id`, `conversation`.`source`, `conversation`.`received` FROM `conversation`
+		$conversations = DBA::p(
+			"SELECT `post-view`.`uri-id`, `conversation`.`source`, `conversation`.`received` FROM `conversation`
 			INNER JOIN `post-view` ON `post-view`.`uri` = `conversation`.`item-uri`
 			WHERE NOT `source` IS NULL AND `conversation`.`protocol` = ? AND `uri-id` > ? LIMIT ?",
-			Conversation::PARCEL_ACTIVITYPUB, $id, 1000);
+			Conversation::PARCEL_ACTIVITYPUB,
+			$id,
+			1000
+		);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -1200,11 +1224,11 @@ class PostUpdate
 
 		Logger::info('Start', ['contact' => $id]);
 
-		$start_id = $id;
-		$rows = 0;
+		$start_id  = $id;
+		$rows      = 0;
 		$condition = ["`id` > ? AND `gsid` IS NULL AND `network` = ?", $id, Protocol::DIASPORA];
-		$params = ['order' => ['id'], 'limit' => 10000];
-		$contacts = DBA::select('contact', ['id', 'url'], $condition, $params);
+		$params    = ['order' => ['id'], 'limit' => 10000];
+		$contacts  = DBA::select('contact', ['id', 'url'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
 			Logger::error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
@@ -1218,9 +1242,11 @@ class PostUpdate
 			unset($parts['path']);
 			$server = (string)Uri::fromParts($parts);
 
-			DBA::update('contact',
+			DBA::update(
+				'contact',
 				['gsid' => GServer::getID($server, true), 'baseurl' => GServer::cleanURL($server)],
-				['id' => $contact['id']]);
+				['id'   => $contact['id']]
+			);
 
 			++$rows;
 		}
@@ -1257,10 +1283,10 @@ class PostUpdate
 
 		Logger::info('Start', ['apcontact' => $id]);
 
-		$start_id = $id;
-		$rows = 0;
-		$condition = ["`url` > ? AND NOT `gsid` IS NULL", $id];
-		$params = ['order' => ['url'], 'limit' => 10000];
+		$start_id   = $id;
+		$rows       = 0;
+		$condition  = ["`url` > ? AND NOT `gsid` IS NULL", $id];
+		$params     = ['order' => ['url'], 'limit' => 10000];
 		$apcontacts = DBA::select('apcontact', ['url', 'gsid', 'sharedinbox', 'inbox'], $condition, $params);
 
 		if (DBA::errorNo() != 0) {
@@ -1311,7 +1337,7 @@ class PostUpdate
 		$id = (int)(DI::keyValue()->get('post_update_version_1544_id') ?? 0);
 		if ($id == 0) {
 			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
-			$id = (int)($post['uri-id'] ?? 0);
+			$id   = (int)($post['uri-id'] ?? 0);
 		}
 
 		Logger::info('Start', ['uri-id' => $id]);
@@ -1376,7 +1402,7 @@ class PostUpdate
 		$id = (int)(DI::keyValue()->get('post_update_version_1550_id') ?? 0);
 		if ($id == 0) {
 			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
-			$id = (int)($post['uri-id'] ?? 0);
+			$id   = (int)($post['uri-id'] ?? 0);
 		}
 
 		Logger::info('Start', ['uri-id' => $id]);

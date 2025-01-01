@@ -55,18 +55,18 @@ class Card extends BaseDataTransferObject
 	 */
 	public function __construct(array $attachment, array $history = [])
 	{
-		$this->url           = $attachment['url'] ?? '';
-		$this->title         = $attachment['title'] ?? '';
-		$this->description   = $attachment['description'] ?? '';
-		$this->type          = $attachment['type'] ?? '';
-		$this->author_name   = $attachment['author_name'] ?? '';
-		$this->author_url    = $attachment['author_url'] ?? '';
+		$this->url           = $attachment['url']           ?? '';
+		$this->title         = $attachment['title']         ?? '';
+		$this->description   = $attachment['description']   ?? '';
+		$this->type          = $attachment['type']          ?? '';
+		$this->author_name   = $attachment['author_name']   ?? '';
+		$this->author_url    = $attachment['author_url']    ?? '';
 		$this->provider_name = $attachment['provider_name'] ?? '';
-		$this->provider_url  = $attachment['provider_url'] ?? '';
+		$this->provider_url  = $attachment['provider_url']  ?? '';
 		$this->html          = '';
-		$this->width         = $attachment['width'] ?? 0;
+		$this->width         = $attachment['width']  ?? 0;
 		$this->height        = $attachment['height'] ?? 0;
-		$this->image         = $attachment['image'] ?? '';
+		$this->image         = $attachment['image']  ?? '';
 		$this->embed_url     = '';
 		$this->blurhash      = $attachment['blurhash'] ?? '';
 		$this->history       = $history;

@@ -16,7 +16,8 @@ use Friendica\DI;
  * This script can be included even when the app is in maintenance mode which requires us to avoid any config call
  */
 
-function duepuntozero_init(AppHelper $appHelper) {
+function duepuntozero_init(AppHelper $appHelper)
+{
 
 	Renderer::setActiveTemplateEngine('smarty3');
 
@@ -24,25 +25,32 @@ function duepuntozero_init(AppHelper $appHelper) {
 
 	if (DI::mode()->has(Mode::MAINTENANCEDISABLED)) {
 		$colorset = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'duepuntozero', 'colorset');
-		if (!$colorset)
-			$colorset = DI::config()->get('duepuntozero', 'colorset');          // user setting have priority, then node settings
+		if (!$colorset) {
+			$colorset = DI::config()->get('duepuntozero', 'colorset');
+		}          // user setting have priority, then node settings
 	}
 
 	if ($colorset) {
-		if ($colorset == 'greenzero')
+		if ($colorset == 'greenzero') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/greenzero.css" type="text/css" media="screen" />' . "\n";
-		if ($colorset == 'purplezero')
+		}
+		if ($colorset == 'purplezero') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/purplezero.css" type="text/css" media="screen" />' . "\n";
-		if ($colorset == 'easterbunny')
+		}
+		if ($colorset == 'easterbunny') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/easterbunny.css" type="text/css" media="screen" />' . "\n";
-		if ($colorset == 'darkzero')
+		}
+		if ($colorset == 'darkzero') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/darkzero.css" type="text/css" media="screen" />' . "\n";
-		if ($colorset == 'comix')
+		}
+		if ($colorset == 'comix') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/comix.css" type="text/css" media="screen" />' . "\n";
-		if ($colorset == 'slackr')
+		}
+		if ($colorset == 'slackr') {
 			DI::page()['htmlhead'] .= '<link rel="stylesheet" href="view/theme/duepuntozero/deriv/slackr.css" type="text/css" media="screen" />' . "\n";
+		}
 	}
-DI::page()['htmlhead'] .= <<< EOT
+	DI::page()['htmlhead'] .= <<< EOT
 <script>
 function cmtBbOpen(comment, id) {
 	if ($(comment).hasClass('comment-edit-text-full')) {

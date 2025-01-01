@@ -7,8 +7,6 @@
 
 namespace Friendica\Core\Addon\Exception;
 
-use Throwable;
-
 /**
  * Exception in case one or more config files of the addons are invalid
  */

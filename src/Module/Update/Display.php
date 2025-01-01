@@ -52,12 +52,16 @@ class Display extends DisplayModule
 					"`parent-uri-id` = ? AND `uid` IN (?, ?) AND `received` > ?",
 					$parentUriId, 0,
 					$profileUid, $updateDate])) {
-					$this->logger->debug('No updated content. Ending process',
-						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
+					$this->logger->debug(
+						'No updated content. Ending process',
+						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]
+					);
 					return '';
 				} else {
-					$this->logger->debug('Updated content found.',
-						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
+					$this->logger->debug(
+						'Updated content found.',
+						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]
+					);
 				}
 			}
 		} else {

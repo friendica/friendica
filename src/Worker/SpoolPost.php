@@ -14,11 +14,13 @@ use Friendica\Model\Item;
 /**
  * Posts items that where spooled because they couldn't be posted.
  */
-class SpoolPost {
-	public static function execute() {
+class SpoolPost
+{
+	public static function execute()
+	{
 		$path = System::getSpoolPath();
 
-		if (($path != '') && is_writable($path)){
+		if (($path != '') && is_writable($path)) {
 			if ($dh = opendir($path)) {
 				while (($file = readdir($dh)) !== false) {
 

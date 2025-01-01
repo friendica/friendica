@@ -267,7 +267,7 @@ class Profile
 	 */
 	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts): string
 	{
-		$o = '';
+		$o        = '';
 		$location = false;
 
 		$profile_contact = [];
@@ -294,8 +294,8 @@ class Profile
 
 		$cid = $contact['id'];
 
-		$follow_link = null;
-		$unfollow_link = null;
+		$follow_link      = null;
+		$unfollow_link    = null;
 		$wallmessage_link = null;
 
 		// Who is the logged-in user to this profile?
@@ -304,13 +304,11 @@ class Profile
 			$visitor_contact = Contact::selectFirst(['rel'], ['uid' => $profile['uid'], 'nurl' => Strings::normaliseLink(DI::userSession()->getMyUrl())]);
 		}
 
-		$local_user_is_self = DI::userSession()->getMyUrl() && ($profile['url'] == DI::userSession()->getMyUrl());
+		$local_user_is_self       = DI::userSession()->getMyUrl() && ($profile['url'] == DI::userSession()->getMyUrl());
 		$visitor_is_authenticated = (bool)DI::userSession()->getMyUrl();
-		$visitor_is_following =
-			in_array($visitor_contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND])
+		$visitor_is_following     = in_array($visitor_contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND])
 			|| in_array($profile_contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND]);
-		$visitor_is_followed =
-			in_array($visitor_contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND])
+		$visitor_is_followed = in_array($visitor_contact['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND])
 			|| in_array($profile_contact['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND]);
 		$visitor_base_path = DI::userSession()->getMyUrl() ? preg_replace('=/profile/(.*)=ism', '', DI::userSession()->getMyUrl()) : '';
 
@@ -342,15 +340,15 @@ class Profile
 			$profile['edit'] = [DI::baseUrl() . '/settings/profile', DI::l10n()->t('Edit profile'), '', DI::l10n()->t('Edit profile')];
 			$profile['menu'] = [
 				'chg_photo' => DI::l10n()->t('Change profile photo'),
-				'cr_new' => null,
-				'entries' => [],
+				'cr_new'    => null,
+				'entries'   => [],
 			];
 		}
 
 		// Fetch the account type
 		$account_type = Contact::getAccountType($profile['account-type']);
 
-		if (!empty($profile['address'])	|| !empty($profile['location'])) {
+		if (!empty($profile['address']) || !empty($profile['location'])) {
 			$location = DI::l10n()->t('Location:');
 		}
 
@@ -364,8 +362,8 @@ class Profile
 		}
 
 		$split_name = Diaspora::splitName($profile['name']);
-		$firstname = $split_name['first'];
-		$lastname = $split_name['last'];
+		$firstname  = $split_name['first'];
+		$lastname   = $split_name['last'];
 
 		if (!empty($profile['guid'])) {
 			$diaspora = [
@@ -385,7 +383,7 @@ class Profile
 		}
 
 		$contact_block = '';
-		$updated = '';
+		$updated       = '';
 		$contact_count = 0;
 
 		if (!empty($profile['last-item'])) {
@@ -416,7 +414,7 @@ class Profile
 			'upubkey' => null,
 		];
 		foreach ($profile as $k => $v) {
-			$k = str_replace('-', '_', $k);
+			$k     = str_replace('-', '_', $k);
 			$p[$k] = $v;
 		}
 
@@ -445,35 +443,35 @@ class Profile
 			$mention_url   = 'compose/0?body=@' . $profile['addr'];
 			$network_label = DI::l10n()->t('Network Posts');
 		}
-		$network_url   = 'contact/' . $cid . '/conversations';
+		$network_url = 'contact/' . $cid . '/conversations';
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$profile' => $p,
-			'$xmpp' => $xmpp,
-			'$matrix' => $matrix,
-			'$follow' => DI::l10n()->t('Follow'),
-			'$follow_link' => $follow_link,
-			'$unfollow' => DI::l10n()->t('Unfollow'),
-			'$unfollow_link' => $unfollow_link,
-			'$subscribe_feed' => DI::l10n()->t('Atom feed'),
+			'$profile'             => $p,
+			'$xmpp'                => $xmpp,
+			'$matrix'              => $matrix,
+			'$follow'              => DI::l10n()->t('Follow'),
+			'$follow_link'         => $follow_link,
+			'$unfollow'            => DI::l10n()->t('Unfollow'),
+			'$unfollow_link'       => $unfollow_link,
+			'$subscribe_feed'      => DI::l10n()->t('Atom feed'),
 			'$subscribe_feed_link' => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
-			'$wallmessage' => DI::l10n()->t('Message'),
-			'$wallmessage_link' => $wallmessage_link,
-			'$account_type' => $account_type,
-			'$location' => $location,
-			'$homepage' => $homepage,
-			'$homepage_verified' => DI::l10n()->t('This website has been verified to belong to the same person.'),
-			'$about' => $about,
-			'$network' => DI::l10n()->t('Network:'),
-			'$contacts' => $contact_count,
-			'$updated' => $updated,
-			'$diaspora' => $diaspora,
-			'$contact_block' => $contact_block,
-			'$mention_label' => $mention_label,
-			'$mention_url' => $mention_url,
-			'$network_label' => $network_label,
-			'$network_url' => $network_url,
+			'$wallmessage'         => DI::l10n()->t('Message'),
+			'$wallmessage_link'    => $wallmessage_link,
+			'$account_type'        => $account_type,
+			'$location'            => $location,
+			'$homepage'            => $homepage,
+			'$homepage_verified'   => DI::l10n()->t('This website has been verified to belong to the same person.'),
+			'$about'               => $about,
+			'$network'             => DI::l10n()->t('Network:'),
+			'$contacts'            => $contact_count,
+			'$updated'             => $updated,
+			'$diaspora'            => $diaspora,
+			'$contact_block'       => $contact_block,
+			'$mention_label'       => $mention_label,
+			'$mention_url'         => $mention_url,
+			'$network_label'       => $network_label,
+			'$network_url'         => $network_url,
 		]);
 
 		$arr = ['profile' => &$profile, 'entry' => &$o];
@@ -604,7 +602,7 @@ class Profile
 	 */
 	public static function getEventsReminderHTML(int $uid, int $pcid): string
 	{
-		$bd_format = DI::l10n()->t('g A l F d'); // 8 AM Friday January 18
+		$bd_format  = DI::l10n()->t('g A l F d'); // 8 AM Friday January 18
 		$classtoday = '';
 
 		$condition = [
@@ -617,13 +615,13 @@ class Profile
 
 		if (DBA::isResult($s)) {
 			$istoday = false;
-			$total = 0;
+			$total   = 0;
 
 			while ($rr = DBA::fetch($s)) {
 				$condition = [
 					'parent-uri' => $rr['uri'], 'uid' => $rr['uid'], 'author-id' => $pcid,
-					'vid' => [Verb::getID(Activity::ATTEND), Verb::getID(Activity::ATTENDMAYBE)],
-					'visible' => true, 'deleted' => false
+					'vid'        => [Verb::getID(Activity::ATTEND), Verb::getID(Activity::ATTENDMAYBE)],
+					'visible'    => true, 'deleted' => false
 				];
 				if (!Post::exists($condition)) {
 					continue;
@@ -657,11 +655,11 @@ class Profile
 
 				$today = substr($strt, 0, 10) === DateTimeFormat::localNow('Y-m-d');
 
-				$rr['title'] = $title;
+				$rr['title']       = $title;
 				$rr['description'] = $description;
-				$rr['date'] = DI::l10n()->getDay(DateTimeFormat::local($rr['start'], $bd_format)) . (($today) ? ' ' . DI::l10n()->t('[today]') : '');
-				$rr['startime'] = $strt;
-				$rr['today'] = $today;
+				$rr['date']        = DI::l10n()->getDay(DateTimeFormat::local($rr['start'], $bd_format)) . (($today) ? ' ' . DI::l10n()->t('[today]') : '');
+				$rr['startime']    = $strt;
+				$rr['today']       = $today;
 
 				$r[] = $rr;
 			}
@@ -670,11 +668,11 @@ class Profile
 		}
 		$tpl = Renderer::getMarkupTemplate('events_reminder.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$classtoday' => $classtoday,
-			'$count' => count($r),
+			'$classtoday'      => $classtoday,
+			'$count'           => count($r),
 			'$event_reminders' => DI::l10n()->t('Event Reminders'),
-			'$event_title' => DI::l10n()->t('Upcoming events the next 7 days:'),
-			'$events' => $r,
+			'$event_title'     => DI::l10n()->t('Upcoming events the next 7 days:'),
+			'$events'          => $r,
 		]);
 	}
 
@@ -709,9 +707,9 @@ class Profile
 	public static function searchProfiles(int $start = 0, int $count = 100, string $search = null): array
 	{
 		if (!empty($search)) {
-			$publish = (DI::config()->get('system', 'publish_all') ? '' : "AND `publish` ");
+			$publish    = (DI::config()->get('system', 'publish_all') ? '' : "AND `publish` ");
 			$searchTerm = '%' . $search . '%';
-			$condition = [
+			$condition  = [
 				"`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`
 				$publish
 				AND ((`name` LIKE ?) OR
@@ -823,7 +821,7 @@ class Profile
 			$profile['profile-name'] = null;
 			$profile['is-default']   = null;
 			DBA::update('profile', $profile, ['id' => $profile['id']]);
-		} else if (!empty($profile['id'])) {
+		} elseif (!empty($profile['id'])) {
 			DBA::delete('profile', ['id' => $profile['id']]);
 		}
 	}

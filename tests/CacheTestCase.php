@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Test\MockedTestCase;
 use Friendica\Util\PidFile;
 
 abstract class CacheTestCase extends MockedTestCase

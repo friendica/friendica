@@ -98,7 +98,7 @@ class ProfileFieldTest extends MockedTestCase
 	/**
 	 * @dataProvider dataEntity
 	 */
-	public function testUpdate(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet,  $id = null)
+	public function testUpdate(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
 	{
 		$permissionSet = $this->permissionSetFactory->createFromTableRow(['uid' => 2, 'id' => $psid]);
 

@@ -86,7 +86,7 @@ class Update extends BaseApi
 			$item['coord'] = sprintf("%s %s", $request['lat'], $request['long']);
 		}
 
-		$aclFormatter = DI::aclFormatter();
+		$aclFormatter      = DI::aclFormatter();
 		$item['allow_cid'] = $aclFormatter->toString($request['contact_allow']);
 		$item['allow_gid'] = $aclFormatter->toString($request['circle_allow']);
 		$item['deny_cid']  = $aclFormatter->toString($request['contact_deny']);

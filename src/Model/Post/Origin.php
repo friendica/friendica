@@ -8,7 +8,7 @@
 namespace Friendica\Model\Post;
 
 use Friendica\Database\DBA;
-use \BadMethodCallException;
+use BadMethodCallException;
 use Friendica\Database\Database;
 use Friendica\DI;
 

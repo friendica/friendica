@@ -38,7 +38,7 @@ class AppSpecific extends BaseSettings
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->pConfig = $pConfig;
+		$this->pConfig        = $pConfig;
 		$this->systemMessages = $systemMessages;
 
 		if (!$this->session->getLocalUserId()) {
@@ -82,7 +82,7 @@ class AppSpecific extends BaseSettings
 					}
 
 					break;
-				case 'revoke_all' :
+				case 'revoke_all':
 					AppSpecificPassword::deleteAllForUser($this->session->getLocalUserId());
 					$this->systemMessages->addInfo($this->t('App-specific passwords successfully revoked.'));
 					$this->baseUrl->redirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
@@ -115,22 +115,22 @@ class AppSpecific extends BaseSettings
 			'$form_security_token'     => self::getFormSecurityToken('settings_2fa_app_specific'),
 			'$password_security_token' => self::getFormSecurityToken('settings_2fa_password'),
 
-			'$title'                  => $this->t('Two-factor app-specific passwords'),
-			'$help_label'             => $this->t('Help'),
-			'$message'                => $this->t('<p>App-specific passwords are randomly generated passwords used instead your regular password to authenticate your account on third-party applications that don\'t support two-factor authentication.</p>'),
-			'$generated_message'      => $this->t('Make sure to copy your new app-specific password now. You won’t be able to see it again!'),
+			'$title'                           => $this->t('Two-factor app-specific passwords'),
+			'$help_label'                      => $this->t('Help'),
+			'$message'                         => $this->t('<p>App-specific passwords are randomly generated passwords used instead your regular password to authenticate your account on third-party applications that don\'t support two-factor authentication.</p>'),
+			'$generated_message'               => $this->t('Make sure to copy your new app-specific password now. You won’t be able to see it again!'),
 			'$generated_app_specific_password' => $this->appSpecificPassword,
 
-			'$description_label'      => $this->t('Description'),
-			'$last_used_label'        => $this->t('Last Used'),
-			'$revoke_label'           => $this->t('Revoke'),
-			'$revoke_all_label'       => $this->t('Revoke All'),
+			'$description_label' => $this->t('Description'),
+			'$last_used_label'   => $this->t('Last Used'),
+			'$revoke_label'      => $this->t('Revoke'),
+			'$revoke_all_label'  => $this->t('Revoke All'),
 
-			'$app_specific_passwords' => $appSpecificPasswords,
-			'$generate_message'       => $this->t('When you generate a new app-specific password, you must use it right away, it will be shown to you once after you generate it.'),
-			'$generate_title'         => $this->t('Generate new app-specific password'),
+			'$app_specific_passwords'        => $appSpecificPasswords,
+			'$generate_message'              => $this->t('When you generate a new app-specific password, you must use it right away, it will be shown to you once after you generate it.'),
+			'$generate_title'                => $this->t('Generate new app-specific password'),
 			'$description_placeholder_label' => $this->t('Friendiqa on my Fairphone 2...'),
-			'$generate_label' => $this->t('Generate'),
+			'$generate_label'                => $this->t('Generate'),
 		]);
 	}
 }

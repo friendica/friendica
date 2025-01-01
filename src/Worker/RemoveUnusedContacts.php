@@ -64,12 +64,12 @@ class RemoveUnusedContacts
 				"(NOT `network` IN (?, ?, ?, ?, ?, ?) OR `archive`)",
 				Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL, Protocol::ACTIVITYPUB
 			];
-			
+
 			$condition = DBA::mergeConditions($condition2, $condition);
 		}
 
 		$contacts = DBA::select('contact', ['id', 'uid', 'photo', 'thumb', 'micro'], $condition, ['limit' => 1000]);
-		$count = 0;
+		$count    = 0;
 		while ($contact = DBA::fetch($contacts)) {
 			++$count;
 			Photo::delete(['uid' => $contact['uid'], 'contact-id' => $contact['id']]);

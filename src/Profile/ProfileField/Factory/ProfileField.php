@@ -58,7 +58,7 @@ class ProfileField extends BaseFactory implements ICanCreateFromTableRow
 				$row['deny_gid'],
 				$row['psid']
 			),
-			$row['id'] ?? null,
+			$row['id']       ?? null,
 			$owner['uri-id'] ?? null
 		);
 	}

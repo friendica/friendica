@@ -71,7 +71,7 @@ class UserExport extends BaseSettings
 		 * list of array( 'link url', 'link text', 'help text' )
 		 */
 
-		$t = self::getFormSecurityToken('userexport');
+		$t       = self::getFormSecurityToken('userexport');
 		$options = [
 			['settings/userexport/account?t=' . $t, $this->l10n->t('Export account'), $this->l10n->t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
 			['settings/userexport/backup?t=' . $t, $this->l10n->t('Export all'), $this->l10n->t('Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')],
@@ -81,7 +81,7 @@ class UserExport extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/userexport.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$title' => $this->l10n->t('Export personal data'),
+			'$title'   => $this->l10n->t('Export personal data'),
 			'$options' => $options
 		]);
 	}
@@ -136,7 +136,7 @@ class UserExport extends BaseSettings
 		$table = $match[1];
 
 		$result = [];
-		$rows = DBA::p($query);
+		$rows   = DBA::p($query);
 		while ($row = DBA::fetch($rows)) {
 			$p = [];
 			foreach ($dbStructure[$table]['fields'] as $column => $field) {
@@ -165,7 +165,7 @@ class UserExport extends BaseSettings
 		$table = $match[1];
 
 		$result = [];
-		$rows = DBA::p($query);
+		$rows   = DBA::p($query);
 		while ($row = DBA::fetch($rows)) {
 			foreach ($row as $k => $v) {
 				if (empty($dbStructure[$table]['fields'][$k])) {
@@ -256,17 +256,17 @@ class UserExport extends BaseSettings
 		);
 
 		$output = [
-			'version' => App::VERSION,
-			'schema' => DB_UPDATE_VERSION,
-			'baseurl' => $this->baseUrl,
-			'user' => $user,
-			'contact' => $contact,
-			'profile' => $profile,
+			'version'        => App::VERSION,
+			'schema'         => DB_UPDATE_VERSION,
+			'baseurl'        => $this->baseUrl,
+			'user'           => $user,
+			'contact'        => $contact,
+			'profile'        => $profile,
 			'profile_fields' => $profile_fields,
-			'photo' => $photo,
-			'pconfig' => $pconfig,
-			'circle' => $circle,
-			'circle_member' => $circle_member,
+			'photo'          => $photo,
+			'pconfig'        => $pconfig,
+			'circle'         => $circle,
+			'circle_member'  => $circle_member,
 		];
 
 		echo json_encode($output, JSON_PARTIAL_OUTPUT_ON_ERROR);
@@ -291,7 +291,7 @@ class UserExport extends BaseSettings
 		// chunk the output to avoid exhausting memory
 
 		for ($x = 0; $x < $total; $x += 500) {
-			$items = Post::selectToArray(Item::ITEM_FIELDLIST, ['uid' => $user_id], ['limit' => [$x, 500]]);
+			$items  = Post::selectToArray(Item::ITEM_FIELDLIST, ['uid' => $user_id], ['limit' => [$x, 500]]);
 			$output = ['item' => $items];
 			echo json_encode($output, JSON_PARTIAL_OUTPUT_ON_ERROR) . "\n";
 		}

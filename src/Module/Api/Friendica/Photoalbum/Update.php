@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Friendica\Photoalbum;
 
-use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;

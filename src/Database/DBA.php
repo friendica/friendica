@@ -23,7 +23,7 @@ class DBA
 	/**
 	 * Lowest possible date value
 	 */
-	const NULL_DATE     = '0001-01-01';
+	const NULL_DATE = '0001-01-01';
 	/**
 	 * Lowest possible datetime value
 	 */
@@ -130,11 +130,11 @@ class DBA
 	 */
 	public static function cleanQuery(string $sql): string
 	{
-		$search = ["\t", "\n", "\r", "  "];
+		$search  = ["\t", "\n", "\r", "  "];
 		$replace = [' ', ' ', ' ', ' '];
 		do {
 			$oldsql = $sql;
-			$sql = str_replace($search, $replace, $sql);
+			$sql    = str_replace($search, $replace, $sql);
 		} while ($oldsql != $sql);
 
 		return $sql;
@@ -580,7 +580,7 @@ class DBA
 			return $condition;
 		}
 
-		$values = [];
+		$values           = [];
 		$condition_string = "";
 		foreach ($condition as $field => $value) {
 			if ($condition_string != "") {
@@ -594,7 +594,7 @@ class DBA
 					 * In case of mixed types, cast all as string.
 					 * Logic needs to be consistent with DBA::p() data types.
 					 */
-					$is_int = false;
+					$is_int   = false;
 					$is_alpha = false;
 					foreach ($value as $single_value) {
 						if (is_int($single_value)) {
@@ -613,7 +613,7 @@ class DBA
 						unset($ref); //Prevent accidental re-use.
 					}
 
-					$values = array_merge($values, array_values($value));
+					$values       = array_merge($values, array_values($value));
 					$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
 					$condition_string .= self::quoteIdentifier($field) . " IN (" . $placeholders . ")";
 				} else {
@@ -647,7 +647,7 @@ class DBA
 		}
 
 		$conditionStrings = [];
-		$result = [];
+		$result           = [];
 
 		foreach ($conditions as $key => $condition) {
 			if (!$condition) {

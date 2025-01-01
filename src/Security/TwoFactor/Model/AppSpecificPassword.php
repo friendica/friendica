@@ -58,13 +58,13 @@ class AppSpecificPassword
 		return $return;
 	}
 
-    /**
-     * Returns a complete list of all recovery hashed_passwords for the provided user, including the used status
-     *
-     * @param  int $uid User ID
-     * @return array
-     * @throws \Exception
-     */
+	/**
+	 * Returns a complete list of all recovery hashed_passwords for the provided user, including the used status
+	 *
+	 * @param  int $uid User ID
+	 * @return array
+	 * @throws \Exception
+	 */
 	public static function getListForUser(int $uid): array
 	{
 		$appSpecificPasswordsStmt = DBA::select('2fa_app_specific_password', ['id', 'description', 'hashed_password', 'last_used'], ['uid' => $uid]);
@@ -80,14 +80,14 @@ class AppSpecificPassword
 		return $appSpecificPasswords;
 	}
 
-    /**
-     * Generates a new app specific password for the provided user and hashes it in the database.
-     *
-     * @param  int    $uid         User ID
-     * @param  string $description Password description
-     * @return array The new app-specific password data structure with the plaintext password added
-     * @throws \Exception
-     */
+	/**
+	 * Generates a new app specific password for the provided user and hashes it in the database.
+	 *
+	 * @param  int    $uid         User ID
+	 * @param  string $description Password description
+	 * @return array The new app-specific password data structure with the plaintext password added
+	 * @throws \Exception
+	 */
 	public static function generateForUser(int $uid, string $description): array
 	{
 		$Random = (new Random())->size(40);
@@ -105,7 +105,7 @@ class AppSpecificPassword
 
 		DBA::insert('2fa_app_specific_password', $fields);
 
-		$fields['id'] = DBA::lastInsertId();
+		$fields['id']                 = DBA::lastInsertId();
 		$fields['plaintext_password'] = $plaintextPassword;
 
 		return $fields;

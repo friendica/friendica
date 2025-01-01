@@ -107,7 +107,7 @@ class Contacts extends Module\BaseProfile
 				$contact = Model\Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order' => ['uid' => 'DESC']]
+					['order'  => ['uid' => 'DESC']]
 				);
 				return $contact ? Module\Contact::getContactTemplateVars($contact) : null;
 			},
@@ -139,7 +139,7 @@ class Contacts extends Module\BaseProfile
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/contacts.tpl');
-		$o   .= Renderer::replaceMacros($tpl, [
+		$o .= Renderer::replaceMacros($tpl, [
 			'$title' => $title,
 			'$desc'  => $desc,
 			'$tabs'  => $tabs,

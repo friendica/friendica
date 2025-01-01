@@ -122,7 +122,7 @@ class ConfigFileManager
 
 		if (file_exists($configName)) {
 			return $this->loadConfigFile($configName);
-		} else if (file_exists($iniName)) {
+		} elseif (file_exists($iniName)) {
 			return $this->loadINIConfigFile($iniName);
 		} else {
 			return [];

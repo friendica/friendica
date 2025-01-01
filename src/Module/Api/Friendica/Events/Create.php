@@ -68,15 +68,15 @@ class Create extends BaseApi
 		// create event
 		$event = [];
 
-		$event['id']         = $request['id'];
-		$event['uid']        = $uid;
-		$event['type']       = 'event';
-		$event['summary']    = $request['name'];
-		$event['desc']       = $request['desc'];
-		$event['location']   = $request['place'];
-		$event['start']      = $start;
-		$event['finish']     = $finish;
-		$event['nofinish']   = $nofinish;
+		$event['id']       = $request['id'];
+		$event['uid']      = $uid;
+		$event['type']     = 'event';
+		$event['summary']  = $request['name'];
+		$event['desc']     = $request['desc'];
+		$event['location'] = $request['place'];
+		$event['start']    = $start;
+		$event['finish']   = $finish;
+		$event['nofinish'] = $nofinish;
 
 		$event['allow_cid'] = $request['allow_cid'];
 		$event['allow_gid'] = $request['allow_gid'];

@@ -170,7 +170,7 @@ class Processor
 					}
 				}
 				$item['source'] = json_encode($post);
-				$item = $this->addMedia($post->thread->post->embed, $item, 0);
+				$item           = $this->addMedia($post->thread->post->embed, $item, 0);
 			}
 
 			$id = Item::insert($item);
@@ -543,7 +543,7 @@ class Processor
 						'preview'     => $image->thumb,
 						'description' => $image->alt,
 						'height'      => $image->aspectRatio->height ?? null,
-						'width'       => $image->aspectRatio->width ?? null,
+						'width'       => $image->aspectRatio->width  ?? null,
 					];
 					Post\Media::insert($media);
 				}

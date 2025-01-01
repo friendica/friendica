@@ -49,7 +49,7 @@ class Receive extends BaseModule
 
 		if ($this->parameters['type'] === 'public') {
 			$this->receivePublic();
-		} else if ($this->parameters['type'] === 'users') {
+		} elseif ($this->parameters['type'] === 'users') {
 			$this->receiveUser();
 		}
 	}
@@ -61,7 +61,7 @@ class Receive extends BaseModule
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private  function receivePublic()
+	private function receivePublic()
 	{
 		$this->logger->info('Diaspora: Receiving post.');
 

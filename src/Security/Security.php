@@ -79,9 +79,9 @@ class Security
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, bool $accessible = false)
 	{
-		$local_user = DI::userSession()->getLocalUserId();
+		$local_user     = DI::userSession()->getLocalUserId();
 		$remote_contact = DI::userSession()->getRemoteContactID($owner_id);
-		$acc_sql = '';
+		$acc_sql        = '';
 
 		if ($accessible) {
 			$acc_sql = ' OR `accessible`';
@@ -102,9 +102,9 @@ class Security
 		 */
 		if ($local_user && $local_user == $owner_id) {
 			$sql = '';
-		/*
-		 * Authenticated visitor. Load the circles the visitor belongs to.
-		 */
+			/*
+			 * Authenticated visitor. Load the circles the visitor belongs to.
+			 */
 		} elseif ($remote_contact) {
 			$circleIds = '<<>>'; // should be impossible to match
 

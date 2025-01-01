@@ -45,7 +45,7 @@ class Schedule extends BaseProfile
 		$o = self::getTabsHTML('schedule', true, DI::userSession()->getLocalUserNickname(), false);
 
 		$schedule = [];
-		$delayed = DBA::select('delayed-post', [], ['uid' => DI::userSession()->getLocalUserId()]);
+		$delayed  = DBA::select('delayed-post', [], ['uid' => DI::userSession()->getLocalUserId()]);
 		while ($row = DBA::fetch($delayed)) {
 			$parameter = Post\Delayed::getParametersForid($row['id']);
 			if (empty($parameter)) {

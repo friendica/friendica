@@ -28,7 +28,7 @@ class UpdateContacts
 		}
 
 		$updating = Worker::countWorkersByCommand('UpdateContact');
-		$limit = $update_limit - $updating;
+		$limit    = $update_limit - $updating;
 		if ($limit <= 0) {
 			Logger::info('The number of currently running jobs exceed the limit');
 			return;
@@ -43,8 +43,8 @@ class UpdateContacts
 		}
 
 		$condition = DBA::mergeConditions(["`next-update` < ?", DateTimeFormat::utcNow()], $condition);
-		$contacts = DBA::select('contact', ['id', 'url', 'gsid', 'baseurl'], $condition, ['order' => ['next-update'], 'limit' => $limit]);
-		$count = 0;
+		$contacts  = DBA::select('contact', ['id', 'url', 'gsid', 'baseurl'], $condition, ['order' => ['next-update'], 'limit' => $limit]);
+		$count     = 0;
 		while ($contact = DBA::fetch($contacts)) {
 			if (Contact::isLocal($contact['url'])) {
 				continue;
@@ -52,7 +52,7 @@ class UpdateContacts
 
 			try {
 				if ((!empty($contact['gsid']) || !empty($contact['baseurl'])) && GServer::reachable($contact)) {
-					$stamp = (float)microtime(true);
+					$stamp   = (float)microtime(true);
 					$success = Contact::updateFromProbe($contact['id']);
 					Logger::debug('Direct update', ['id' => $contact['id'], 'count' => $count, 'duration' => round((float)microtime(true) - $stamp, 3), 'success' => $success]);
 					++$count;
