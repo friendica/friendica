@@ -63,8 +63,8 @@ use Psr\Log\LoggerInterface;
 class App
 {
 	const PLATFORM = 'Friendica';
-	const CODENAME = 'Yellow Archangel';
-	const VERSION  = '2024.12-dev';
+	const CODENAME = 'Interrupted Fern';
+	const VERSION  = '2025.02-dev';
 
 	public static function fromDice(Dice $dice): self
 	{

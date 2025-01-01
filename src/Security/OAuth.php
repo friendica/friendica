@@ -189,7 +189,7 @@ class OAuth
 			'created_at'     => DateTimeFormat::utcNow()
 		];
 
-		foreach ([BaseApi::SCOPE_READ, BaseApi::SCOPE_WRITE, BaseApi::SCOPE_WRITE, BaseApi::SCOPE_PUSH] as $scope) {
+		foreach ([BaseApi::SCOPE_READ, BaseApi::SCOPE_WRITE, BaseApi::SCOPE_FOLLOW, BaseApi::SCOPE_PUSH] as $scope) {
 			if ($fields[$scope] && !$application[$scope]) {
 				Logger::warning('Requested token scope is not allowed for the application', ['token' => $fields, 'application' => $application]);
 			}

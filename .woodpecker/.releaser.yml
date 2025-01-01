@@ -13,6 +13,11 @@ labels:
 
 skip_clone: true
 
+when:
+  repo: friendica/friendica
+  branch: stable
+  event: tag
+
 steps:
   clone:
     image: alpine/git
@@ -21,10 +26,7 @@ steps:
       - git checkout $CI_COMMIT_BRANCH
       - git fetch origin $CI_COMMIT_REF
       - git merge $CI_COMMIT_SHA
-    when:
-      repo: friendica/friendica
-      branch: stable
-      event: tag
+
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:
@@ -36,10 +38,6 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
-    when:
-      repo: friendica/friendica
-      branch: stable
-      event: tag
   composer_install:
     image: friendicaci/php8.2:php8.2.16
     commands:
@@ -47,10 +45,6 @@ steps:
       - export COMPOSER_HOME=.composer
       - composer validate
       - composer install --no-dev --optimize-autoloader
-    when:
-      repo: friendica/friendica
-      branch: stable
-      event: tag
     volumes:
       - /etc/hosts:/etc/hosts
   create_artifacts:
@@ -73,10 +67,6 @@ steps:
       - ls -lh
       - cat "$ARTIFACT.sum256"
       - sha256sum "$ARTIFACT"
-    when:
-      repo: friendica/friendica
-      branch: stable
-      event: tag
   sign_artifacts:
     image: plugins/gpgsign
     settings:
@@ -99,7 +89,3 @@ steps:
       - cp -fr build/* /tmp/friendica_files/
     volumes:
       - files:/tmp/friendica_files
-    when:
-      repo: friendica/friendica
-      branch: stable
-      event: tag

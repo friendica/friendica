@@ -23,6 +23,7 @@ Andi Stadler
 Andreas H.
 Andreas Neustifter
 Andrej Stieben
+Andrey Esin
 André Alves
 André Lohan
 Andy
@@ -46,6 +47,7 @@ beardyunixer
 Beatriz Vital
 Beluga
 Ben
+Ben Millwood
 Ben Roberts
 ben-utzer
 Beringer Zsolt
@@ -72,6 +74,7 @@ Christian Wiwie
 Cohan Robinson
 Colby Sollars
 Copiis
+cracrayol
 CrystalStiletto
 csolisr
 Cyboulette
@@ -91,9 +94,11 @@ Dean Townsley
 Denis Chenu
 dependabot[bot]
 Devlon Duthie
+dew-git
 Diego Souza
 Domovoy
 Doru  DEACONU
+Dr. Tobias Quathamer
 Dylan Thiedeke
 Développeur égaré
 eddy2508
@@ -188,8 +193,10 @@ Kris
 Kristoffer Grundström
 ktlinux
 KulikAlex
+Laura Hausmann
 Lea1995polish
 Leberwurscht
+Leonard
 Leonard Lausen
 Lionel Triay
 loma-one
@@ -227,9 +234,11 @@ Mike Macgirvin
 miqrogroove
 Morgan McMillian
 mpanhans
+MrPetovan
 mytbk
 nathilia-peirce
 Nicola Spanti
+ne20002
 Nicolas Derive
 nnsrymni
 nobody
@@ -308,7 +317,6 @@ snajafov
 softmetz
 soko1
 Spencer Dub
-SpencerDub
 St John Karp
 Stanislav N.
 Steffen K9
@@ -340,6 +348,7 @@ Tom
 Tom Aurlund
 Tom Hu
 tomamplius
+tommy tomson
 tomtom84
 Tony Baldwin
 Torbjörn Andersson
@@ -370,6 +379,7 @@ Wanting Chen
 Wil Tur
 Wladimir Palant
 Wouter Broers
+www-data
 Xiaofei Xu
 XMPPはいいぞ
 xundeenergie
@@ -382,6 +392,7 @@ Zered
 zotlabs
 zottel
 Zvi ben Yaakov (a.k.a rdc)
+Éibhear Ó hAnluain
 Михаил
 Олексій Замковий
 朱陈锬

@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+
 steps:
   build_xgettext:
     image: friendicaci/transifex
@@ -11,7 +16,3 @@ steps:
     image: friendicaci/transifex
     commands:
       - /check-messages.sh
-
-when:
-  - branch:
-      exclude: [ stable ]

@@ -42,6 +42,18 @@ openssl genrsa -out "$SSL_DIR/xip.io.key" 4096
 openssl req -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -key "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.csr" -passin pass:$PASSPHRASE
 openssl x509 -req -days 365 -in "$SSL_DIR/xip.io.csr" -signkey "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.crt"
 
+#Install php
+echo ">>> Add PHP repository"
+apt-get install -qq -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+wget -qO - https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/php.gpg
+apt update
+
+echo ">>> Installing PHP8"
+apt-get install -qq php libapache2-mod-php php8.3-cli php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml imagemagick php8.3-imagick php8.3-zip php8.3-gmp php8.3-intl
+
+echo ">>> Installing PHP7"
+apt-get install -qq php7.4 php7.4-cli php7.4-mysql php7.4-curl php7.4-gd php7.4-mbstring php7.4-xml php7.4-imagick php7.4-zip php7.4-gmp php7.4-intl
 
 #Install apache2
 echo ">>> Installing Apache2 webserver"
@@ -52,19 +64,6 @@ chmod guo+x /usr/local/bin/vhost
 vhost -s 192.168.56.10.xip.io -d /var/www -p /etc/ssl/xip.io -c xip.io -a friendica.local
 a2dissite 000-default
 service apache2 restart
-
-#Install php
-echo ">>> Installing PHP7"
-apt-get install -qq php libapache2-mod-php php-cli php-mysql php-curl php-gd php-mbstring php-xml imagemagick php-imagick php-zip php-gmp
-systemctl restart apache2
-
-echo ">>> Installing PHP8"
-apt-get install -qq -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
-wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
-apt update
-apt-get install -qq php8.0 php8.0-cli php8.0-mysql php8.0-curl php8.0-gd php8.0-mbstring php8.0-xml php8.0-imagick php8.0-zip php8.0-gmp
-systemctl restart apache2
 
 #Install mysql
 echo ">>> Installing Mysql"

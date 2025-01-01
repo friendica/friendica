@@ -7,7 +7,7 @@ public_folder = "/vagrant"
 
 Vagrant.configure(2) do |config|
   # Set server to Debian 11 / Bullseye 64bit
-  config.vm.box = "debian/bullseye64"
+  config.vm.box = "debian/bookworm64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

@@ -19,6 +19,11 @@ matrix:
 labels:
   location: opensocial
 
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+
 steps:
   php-lint:
     image: php:${PHP_MAJOR_VERSION}

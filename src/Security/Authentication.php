@@ -258,11 +258,17 @@ class Authentication
 			$record = $this->dba->selectFirst(
 				'user',
 				[],
-				['uid' => User::getIdFromPasswordAuthentication($username, $password)]
+				['uid' => User::getIdFromPasswordAuthentication($username, $password, false, true)]
 			);
 		} catch (Exception $e) {
 			$this->logger->warning('authenticate: failed login attempt', ['action' => 'login', 'username' => $username, 'ip' => $this->remoteAddress]);
 			DI::sysmsg()->addNotice($this->l10n->t('Login failed. Please check your credentials.'));
+			$this->baseUrl->redirect();
+		}
+
+		if ($record['blocked']) {
+			$this->logger->warning('authenticate: user is blocked', ['action' => 'login', 'username' => $username, 'ip' => $this->remoteAddress]);
+			DI::sysmsg()->addNotice($this->l10n->t('Login failed because your account is blocked.'));
 			$this->baseUrl->redirect();
 		}
 

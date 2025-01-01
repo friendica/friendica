@@ -2208,8 +2208,6 @@ $a->strings['Normally the system shortens posts at the next line feed. If this o
 $a->strings['Attach the link title'] = 'Cuir tiotal a’ cheangail ris';
 $a->strings['When activated, the title of the attached link will be added as a title on posts to Diaspora. This is mostly helpful with "remote-self" contacts that share feed content.'] = 'Nuair a bhios seo an gnìomh, thèid tiotal a’ cheangail a chur ris mar tiotal air postaichean gu diaspora*. Tha seo as fheumaile dhan luchd-aithne “remote-self” a cho-roinneas susbaint inbhir.';
 $a->strings['When activated, added links at the end of the post react the same way as added links in the web interface.'] = 'Nuair a bhios seo an gnìomh, bidh an t-aon ghiùlan aig ceanglaichean a thèid a chur ri bonn puist ’s a tha aig ceanglaichean a thèid a chur ris san eadar-aghaidh-lìn.';
-$a->strings['Your legacy ActivityPub/GNU Social account'] = 'An cunntas ActivityPub/GNU Social dìleabach agad';
-$a->strings['If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.'] = 'Ma chuireas tu ainm seann-chunntais ris o shiostam stèidhichte air ActivityPub no ainm do chunntais GNU Social/Statusnet an-seo (san fhòrmat cleachdaiche@àrainn.tld), thèid an luchd-aithne agad a chur ris gu fèin-obrachail. Thèid an raon fhalamhachadh nuair a bhios sin deiseil.';
 $a->strings['Email/Mailbox Setup'] = 'Suidheachadh a’ phuist-d/a’ bhogsa-phuist';
 $a->strings['If you wish to communicate with email contacts using this service (optional), please specify how to connect to your mailbox.'] = 'Ma tha thu airson an t-seirbheis seo a chleachdadh airson conaltradh le luchd-aithne air a’ post-d (gu roghainneil), sònraich an dòigh air a nì thu ceangal leis a’ bhogsa-phuist agad.';
 $a->strings['Last successful email check:'] = 'An turas mu dheireadh a chaidh leinn sùil a thoirt air a’ phost-d:';
@@ -2223,6 +2221,8 @@ $a->strings['Send public posts to all email contacts:'] = 'Cuir postaichean pobl
 $a->strings['Action after import:'] = 'Gnìomh às dèid an ion-phortaidh:';
 $a->strings['Move to folder'] = 'Gluais gu pasgan';
 $a->strings['Move to folder:'] = 'Gluais gu pasgan:';
+$a->strings['Your legacy ActivityPub/GNU Social account'] = 'An cunntas ActivityPub/GNU Social dìleabach agad';
+$a->strings['If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added automatically. The field will be emptied when done.'] = 'Ma chuireas tu ainm seann-chunntais ris o shiostam stèidhichte air ActivityPub no ainm do chunntais GNU Social/Statusnet an-seo (san fhòrmat cleachdaiche@àrainn.tld), thèid an luchd-aithne agad a chur ris gu fèin-obrachail. Thèid an raon fhalamhachadh nuair a bhios sin deiseil.';
 $a->strings['Delegation successfully granted.'] = 'Chaidh neach-ionaid a dhèanamh dheth.';
 $a->strings['Delegation successfully revoked.'] = 'Chaidh ceadan neach-ionaid a thoirt air falbh.';
 $a->strings['Delegated administrators can view but not change delegation permissions.'] = 'Chì rianairean a tha ’nan luchd-ionaid na ceadan ach chan urrainn dhaibh an atharrachadh.';

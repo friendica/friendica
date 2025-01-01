@@ -8,8 +8,9 @@ matrix:
       PHP_VERSION: 8.2.16
 
 when:
-  - branch:
-      exclude: [ stable ]
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
 
 # This forces CI executions at the "opensocial" labeled location (because of much more power...)
 labels:

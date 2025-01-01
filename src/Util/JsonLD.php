@@ -227,6 +227,11 @@ class JsonLD
 				Logger::debug('schema.org path fixed');
 				$value = 'http://schema.org#';
 			}
+			// Issue 14630: Wordpress Event Bridge uses a URL that cannot be retrieved
+			if (is_int($key) && $value == 'https://schema.org/') {
+				Logger::debug('https schema.org path fixed');
+				$value = 'https://schema.org/docs/jsonldcontext.json#';
+			}
 		});
 
 		// Bookwyrm transmits "id" fields with "null", which isn't allowed.

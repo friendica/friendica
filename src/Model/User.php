@@ -677,11 +677,12 @@ class User
 	 * @param mixed  $user_info
 	 * @param string $password
 	 * @param bool   $third_party
+	 * @param bool   $with_blocked
 	 * @return int User Id if authentication is successful
 	 * @throws HTTPException\ForbiddenException
 	 * @throws HTTPException\NotFoundException
 	 */
-	public static function getIdFromPasswordAuthentication($user_info, string $password, bool $third_party = false): int
+	public static function getIdFromPasswordAuthentication($user_info, string $password, bool $third_party = false, bool $with_blocked = false): int
 	{
 		// Addons registered with the "authenticate" hook may create the user on the
 		// fly. `getAuthenticationInfo` will fail if the user doesn't exist yet. If
@@ -689,7 +690,7 @@ class User
 		// user in our database, if applicable, before re-throwing the exception if
 		// they fail.
 		try {
-			$user = self::getAuthenticationInfo($user_info);
+			$user = self::getAuthenticationInfo($user_info, $with_blocked);
 		} catch (Exception $e) {
 			$username = (is_string($user_info) ? $user_info : $user_info['nickname'] ?? '');
 
@@ -782,10 +783,11 @@ class User
 	 * - User array with at least the uid and the hashed password
 	 *
 	 * @param mixed $user_info
+	 * @param bool  $with_blocked
 	 * @return array|null Null if not found/determined
 	 * @throws HTTPException\NotFoundException
 	 */
-	public static function getAuthenticationInfo($user_info)
+	public static function getAuthenticationInfo($user_info, bool $with_blocked = false)
 	{
 		$user = null;
 
@@ -804,25 +806,27 @@ class User
 				throw new Exception(DI::l10n()->t('Not enough information to authenticate'));
 			}
 		} elseif (is_int($user_info) || is_string($user_info)) {
+			$fields = ['uid', 'nickname', 'password', 'legacy_password'];
 			if (is_int($user_info)) {
-				$user = DBA::selectFirst(
-					'user',
-					['uid', 'nickname', 'password', 'legacy_password'],
-					[
-						'uid'             => $user_info,
-						'blocked'         => 0,
-						'account_expired' => 0,
-						'account_removed' => 0,
-						'verified'        => 1
-					]
-				);
+				$condition = [
+					'uid'             => $user_info,
+					'account_expired' => false,
+					'account_removed' => false,
+					'verified'        => true
+				];
+				if (!$with_blocked) {
+					$condition = DBA::mergeConditions($condition, ['blocked' => false]);
+				}
+				$user = DBA::selectFirst('user', $fields, $condition);
 			} else {
-				$fields    = ['uid', 'nickname', 'password', 'legacy_password'];
 				$condition = [
 					"(`email` = ? OR `username` = ? OR `nickname` = ?)
-					AND `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`",
+					AND `verified` AND NOT `account_removed` AND NOT `account_expired`",
 					$user_info, $user_info, $user_info
 				];
+				if (!$with_blocked) {
+					$condition = DBA::mergeConditions($condition, ['blocked' => false]);
+				}
 				$user = DBA::selectFirst('user', $fields, $condition);
 			}
 

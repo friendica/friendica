@@ -283,7 +283,7 @@ class Index extends BaseSearch
 	 */
 	private static function tryRedirectToPost(string $search)
 	{
-		if (parse_url($search, PHP_URL_SCHEME) == '') {
+		if (!parse_url($search, PHP_URL_SCHEME) && !preg_match('=^[a-z]+://=', $search)) {
 			return;
 		}
 

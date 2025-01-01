@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 2024.12-dev (Yellow Archangel)
+-- Friendica 2025.02-dev (Interrupted Fern)
 -- DB_UPDATE_VERSION 1576
 -- ------------------------------------------
 

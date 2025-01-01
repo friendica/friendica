@@ -2,6 +2,12 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+# The code standard check is just triggered for PRs and pushes to non-stable branches of Friendica
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+
 steps:
   restore_cache:
     image: meltwater/drone-cache:dev
@@ -31,12 +37,19 @@ steps:
     volumes:
       - /tmp/drone-cache:/tmp/cache
   check:
-    image: friendicaci/php-cs
+    image: php:8.3
     commands:
+      - apt-get update -q
+      - DEBIAN_FRONTEND=noninteractive apt-get install -q -y git
       - if [ ! -z "$${CI_COMMIT_PULL_REQUEST}" ]; then
           git fetch --no-tags origin ${CI_COMMIT_TARGET_BRANCH};
-          export CHANGED_FILES="$(git diff --name-status $(git merge-base FETCH_HEAD origin/${CI_COMMIT_TARGET_BRANCH})..${CI_COMMIT_SHA} | grep ^A | cut -f2)";
+          CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB $(git merge-base FETCH_HEAD origin/${CI_COMMIT_TARGET_BRANCH})..${CI_COMMIT_SHA})";
         else
-          export CHANGED_FILES="$(git diff --name-status ${CI_COMMIT_SHA} | grep ^A | cut -f2)";
+          CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB ${CI_COMMIT_SHA})";
         fi
-      - /check-php-cs.sh
+      - if ! echo "$${CHANGED_FILES}" | grep -qE "^(\\.php-cs-fixer(\\.dist)?\\.php|composer\\.lock)$"; then
+          EXTRA_ARGS=$(printf -- '--path-mode=intersection\n--\n%s' "$${CHANGED_FILES}");
+        else
+          EXTRA_ARGS='';
+        fi
+      - ./bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php -v --diff --using-cache=no $${EXTRA_ARGS}
