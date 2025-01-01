@@ -811,12 +811,12 @@ class Media
 			'uri-id'         => $uriid,
 			'type'           => self::HTML,
 			'url'            => $data['url'],
-			'preview'        => $data['preview']              ?? null,
-			'description'    => $data['description']      ?? null,
-			'name'           => $data['title']                   ?? null,
-			'author-url'     => $data['author_url']        ?? null,
-			'author-name'    => $data['author_name']      ?? null,
-			'publisher-url'  => $data['provider_url']   ?? null,
+			'preview'        => $data['preview']       ?? null,
+			'description'    => $data['description']   ?? null,
+			'name'           => $data['title']         ?? null,
+			'author-url'     => $data['author_url']    ?? null,
+			'author-name'    => $data['author_name']   ?? null,
+			'publisher-url'  => $data['provider_url']  ?? null,
 			'publisher-name' => $data['provider_name'] ?? null,
 		];
 		if (!empty($data['image'])) {

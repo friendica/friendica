@@ -1509,7 +1509,7 @@ class DFRN
 
 			$fields = [
 				'title'   => $item['title'] ?? '',
-				'body'    => $item['body']   ?? '',
+				'body'    => $item['body']  ?? '',
 				'changed' => DateTimeFormat::utcNow(),
 				'edited'  => DateTimeFormat::utc($item['edited']),
 			];
