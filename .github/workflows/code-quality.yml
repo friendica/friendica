@@ -41,7 +41,6 @@ jobs:
         run: composer install --working-dir=bin/dev/php-cs-fixer
 
       - name: Run PHP-CS-Fixer
-        continue-on-error: true
         run: bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix --diff --dry-run
 
   phpstan:
