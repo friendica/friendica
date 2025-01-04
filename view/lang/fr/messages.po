@@ -4350,7 +4350,7 @@ msgid ""
 "the 'error_log' line is relative to the friendica top-level directory and "
 "must be writeable by the web server. The option '1' for 'log_errors' and "
 "'display_errors' is to enable these options, set to '0' to disable them."
-msgstr "Pour activer temporairement la journalisation de PHP vous pouvez insérez les lignes suivantes au début du fichier <code>index.php</code> dans votre répertoire Friendica. The nom de fichier défini dans la ligne <code>'error_log'</code> est relatif au répertoire d'installation de Friendica et le serveur web doit avoir le droit d'écriture sur ce fichier. Les lignes <code>log_errors</code> et <code>display_errors</code> prennent les valeurs <code>0</code>  et <code>1</code> respectivement pour les activer ou désactiver."
+msgstr "Pour activer temporairement la journalisation de PHP vous pouvez insérez les lignes suivantes au début du fichier <code>index.php</code> dans votre répertoire Friendica. The nom de fichier défini dans la ligne <code>'error_log'</code> est relatif au répertoire d'installation de Friendica et le serveur web doit avoir le droit d'écriture sur ce fichier. Les lignes <code>log_errors</code> et <code>display_errors</code> prennent les valeurs <code>1</code>  et <code>0</code> respectivement pour les activer ou désactiver."
 
 #: src/Module/Admin/Logs/View.php:58
 #, php-format
