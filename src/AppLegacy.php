@@ -107,6 +107,7 @@ final class AppLegacy implements AppHelper
 		$this->baseURL  = $baseURL;
 		$this->pConfig  = $pConfig;
 		$this->session  = $session;
+		Core\Hook::loadHooks();
 	}
 
 	/**
