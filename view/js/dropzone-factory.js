@@ -9,7 +9,7 @@ var DzFactory = function (max_imagesize) {
 			paramName: 'userfile', // The name that will be used to transfer the file
 			maxFilesize: max_imagesize, // MB
 			url: '/media/photo/upload?album=',
-			acceptedFiles: 'image/*',
+			acceptedFiles: 'image/*,video/*,audio/*,application/*',
 			clickable: true,
 			dictDefaultMessage: dzStrings.dictDefaultMessage,
 			dictFallbackMessage: dzStrings.dictFallbackMessage,
@@ -25,17 +25,47 @@ var DzFactory = function (max_imagesize) {
 			accept: function(file, done) {
 					const targetTextarea = document.getElementById(textareaElementId);
 					if (targetTextarea.setRangeText) {
-						targetTextarea.setRangeText("\n[upload-" + file.name + "]\n", targetTextarea.selectionStart, targetTextarea.selectionEnd, "end");
+						targetTextarea.setRangeText("\n[!upload-" + file.name + "]\n", targetTextarea.selectionStart, targetTextarea.selectionEnd, "end");
 					}
 				done();
 			},
 			init: function() {
+				this.on("processing", function(file) {
+					switch(file.type) {
+						case String(file.type.match(/image\/.*/)):
+							this.options.url = "/media/photo/upload?album=";
+							break;
+						default:
+							this.options.url = "/media/attachment/upload?response=json";
+					}
+				});
 				this.on('success', function(file, serverResponse) {
 					const targetTextarea = document.getElementById(textareaElementId);
 					if (targetTextarea.setRangeText) {
 						//if setRangeText function is supported by current browser
-						let u = "[upload-" + file.name + "]";
-						targetTextarea.setRangeText(serverResponse, targetTextarea.value.indexOf(u), targetTextarea.value.indexOf(u) + u.length, "end");
+						let u = "[!upload-" + file.name + "]";
+						let srp = serverResponse;
+						if (typeof serverResponse === 'object' &&
+						serverResponse.constructor === Object) {
+							if (serverResponse.ok) {
+								srp = "[attachment]" +
+									window.location.protocol +
+									"//" +
+									window.location.host +
+									"/attach/" +
+									serverResponse.id +
+									"[/attachment]";
+							} else {
+								srp = "Upload failed";
+							}
+						}
+						let c = targetTextarea.selectionStart;
+						if (c > targetTextarea.value.indexOf(u)) {
+							c = c + serverResponse.length - u.length;
+						}
+						targetTextarea.setRangeText(srp, targetTextarea.value.indexOf(u), targetTextarea.value.indexOf(u) + u.length);
+						targetTextarea.selectionStart = c;
+						targetTextarea.selectionEnd = c;
 					} else {
 						targetTextarea.focus();
 						document.execCommand('insertText', false /*no UI*/, serverResponse);

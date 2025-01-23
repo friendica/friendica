@@ -10,7 +10,6 @@ namespace Friendica\Model\Post;
 use BadMethodCallException;
 use Exception;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -119,7 +118,7 @@ class UserNotification
 		$fields = ['id', 'uri-id', 'parent-uri-id', 'uid', 'body', 'parent', 'gravity', 'vid', 'gravity',
 			'contact-id', 'author-id', 'author-gsid', 'owner-id', 'owner-gsid', 'causer-id', 'causer-gsid',
 			'private', 'thr-parent', 'thr-parent-id', 'parent-uri-id', 'parent-uri', 'verb'];
-		$item   = Post::selectFirst($fields, ['uri-id' => $uri_id, 'uid' => $uid, 'origin' => false]);
+		$item = Post::selectFirst($fields, ['uri-id' => $uri_id, 'uid' => $uid, 'origin' => false]);
 		if (!DBA::isResult($item)) {
 			return;
 		}
@@ -174,14 +173,14 @@ class UserNotification
 				continue;
 			}
 			if (Contact\User::isBlocked($author_id, $uid) || Contact\User::isIgnored($author_id, $uid) || Contact\User::isCollapsed($author_id, $uid)) {
-				Logger::debug('Author is blocked/ignored/collapsed by user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
+				DI::logger()->debug('Author is blocked/ignored/collapsed by user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
 				return;
 			}
 		}
 
 		foreach (array_unique([$parent['author-gsid'], $parent['owner-gsid'], $parent['causer-gsid'], $item['author-gsid'], $item['owner-gsid'], $item['causer-gsid']]) as $gsid) {
 			if ($gsid && DI::userGServer()->isIgnoredByUser($uid, $gsid)) {
-				Logger::debug('Server is ignored by user', ['uid' => $uid, 'gsid' => $gsid, 'uri-id' => $item['uri-id']]);
+				DI::logger()->debug('Server is ignored by user', ['uid' => $uid, 'gsid' => $gsid, 'uri-id' => $item['uri-id']]);
 				return;
 			}
 		}
@@ -313,7 +312,7 @@ class UserNotification
 			return;
 		}
 
-		Logger::info('Set notification', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'notification-type' => $notification_type]);
+		DI::logger()->info('Set notification', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'notification-type' => $notification_type]);
 
 		$fields = ['notification-type' => $notification_type];
 		Post\User::update($item['uri-id'], $uid, $fields);

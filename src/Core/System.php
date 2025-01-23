@@ -322,7 +322,7 @@ class System
 		}
 
 		if ($status) {
-			Logger::notice('xml_status returning non_zero: ' . $status . " message=" . $message);
+			DI::logger()->notice('xml_status returning non_zero: ' . $status . " message=" . $message);
 		}
 
 		self::httpExit(XML::fromArray(['result' => $result]), Response::TYPE_XML);
@@ -340,7 +340,7 @@ class System
 	public static function httpError($httpCode, $message = '', $content = '')
 	{
 		if ($httpCode >= 400) {
-			Logger::debug('Exit with error', ['code' => $httpCode, 'message' => $message, 'method' => DI::args()->getMethod(), 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Exit with error', ['code' => $httpCode, 'message' => $message, 'method' => DI::args()->getMethod(), 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 		}
 		DI::apiResponse()->setStatus($httpCode, $message);
 
@@ -373,7 +373,7 @@ class System
 	public static function jsonError($httpCode, $content, $content_type = 'application/json')
 	{
 		if ($httpCode >= 400) {
-			Logger::debug('Exit with error', ['code' => $httpCode, 'content_type' => $content_type, 'method' => DI::args()->getMethod(), 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Exit with error', ['code' => $httpCode, 'content_type' => $content_type, 'method' => DI::args()->getMethod(), 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 		}
 		DI::apiResponse()->setStatus($httpCode);
 		self::jsonExit($content, $content_type);
@@ -520,7 +520,7 @@ class System
 	public static function externalRedirect($url, $code = 302)
 	{
 		if (empty(parse_url($url, PHP_URL_SCHEME))) {
-			Logger::warning('No fully qualified URL provided', ['url' => $url]);
+			DI::logger()->warning('No fully qualified URL provided', ['url' => $url]);
 			DI::baseUrl()->redirect($url);
 		}
 
@@ -564,27 +564,27 @@ class System
 	private static function isDirectoryUsable(string $directory): bool
 	{
 		if (empty($directory)) {
-			Logger::warning('Directory is empty. This shouldn\'t happen.');
+			DI::logger()->warning('Directory is empty. This shouldn\'t happen.');
 			return false;
 		}
 
 		if (!file_exists($directory)) {
-			Logger::info('Path does not exist', ['directory' => $directory, 'user' => static::getUser()]);
+			DI::logger()->info('Path does not exist', ['directory' => $directory, 'user' => static::getUser()]);
 			return false;
 		}
 
 		if (is_file($directory)) {
-			Logger::warning('Path is a file', ['directory' => $directory, 'user' => static::getUser()]);
+			DI::logger()->warning('Path is a file', ['directory' => $directory, 'user' => static::getUser()]);
 			return false;
 		}
 
 		if (!is_dir($directory)) {
-			Logger::warning('Path is not a directory', ['directory' => $directory, 'user' => static::getUser()]);
+			DI::logger()->warning('Path is not a directory', ['directory' => $directory, 'user' => static::getUser()]);
 			return false;
 		}
 
 		if (!is_writable($directory)) {
-			Logger::warning('Path is not writable', ['directory' => $directory, 'user' => static::getUser()]);
+			DI::logger()->warning('Path is not writable', ['directory' => $directory, 'user' => static::getUser()]);
 			return false;
 		}
 

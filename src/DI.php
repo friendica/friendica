@@ -60,7 +60,8 @@ abstract class DI
 
 	/**
 	 * Returns a clone of the current dice instance
-	 * This useful for overloading the current instance with mocked methods during tests
+	 *
+	 * @internal This useful for overloading the current instance with mocked methods during tests
 	 *
 	 * @return Dice
 	 */

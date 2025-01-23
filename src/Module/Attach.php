@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\Attach as MAttach;
@@ -43,7 +42,7 @@ class Attach extends BaseModule
 
 		$data = MAttach::getData($item);
 		if (is_null($data)) {
-			Logger::notice('NULL data for attachment with id ' . $item['id']);
+			$this->logger->notice('NULL data for attachment with id ' . $item['id']);
 			throw new \Friendica\Network\HTTPException\NotFoundException(DI::l10n()->t('Item was not found.'));
 		}
 

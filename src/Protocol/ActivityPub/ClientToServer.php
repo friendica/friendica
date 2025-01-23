@@ -8,7 +8,6 @@
 namespace Friendica\Protocol\ActivityPub;
 
 use Friendica\Content\Text\Markdown;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -39,24 +38,24 @@ class ClientToServer
 	{
 		$ldactivity = JsonLD::compact($activity);
 		if (empty($ldactivity)) {
-			Logger::notice('Invalid activity', ['activity' => $activity, 'uid' => $uid]);
+			DI::logger()->notice('Invalid activity', ['activity' => $activity, 'uid' => $uid]);
 			return [];
 		}
 
 		$type = JsonLD::fetchElement($ldactivity, '@type');
 		if (!$type) {
-			Logger::notice('Empty type', ['activity' => $ldactivity, 'uid' => $uid]);
+			DI::logger()->notice('Empty type', ['activity' => $ldactivity, 'uid' => $uid]);
 			return [];
 		}
 
 		$object_id   = JsonLD::fetchElement($ldactivity, 'as:object', '@id') ?? '';
 		$object_type = Receiver::fetchObjectType($ldactivity, $object_id, $uid);
 		if (!$object_type && !$object_id) {
-			Logger::notice('Empty object type or id', ['activity' => $ldactivity, 'uid' => $uid]);
+			DI::logger()->notice('Empty object type or id', ['activity' => $ldactivity, 'uid' => $uid]);
 			return [];
 		}
 
-		Logger::debug('Processing activity', ['type' => $type, 'object_type' => $object_type, 'object_id' => $object_id, 'activity' => $ldactivity]);
+		DI::logger()->debug('Processing activity', ['type' => $type, 'object_type' => $object_type, 'object_id' => $object_id, 'activity' => $ldactivity]);
 		return self::routeActivities($type, $object_type, $object_id, $uid, $application, $ldactivity);
 	}
 
@@ -105,7 +104,7 @@ class ClientToServer
 	{
 		$object_data = self::processObject($ldactivity['as:object']);
 		$item        = ClientToServer::processContent($object_data, $application, $uid);
-		Logger::debug('Got data', ['item' => $item, 'object' => $object_data]);
+		DI::logger()->debug('Got data', ['item' => $item, 'object' => $object_data]);
 
 		$id = Item::insert($item, true);
 		if (!empty($id)) {
@@ -131,18 +130,18 @@ class ClientToServer
 		$id            = Item::fetchByLink($object_id, $uid, ActivityPub\Receiver::COMPLETION_ASYNC);
 		$original_post = Post::selectFirst(['uri-id'], ['uid' => $uid, 'origin' => true, 'id' => $id]);
 		if (empty($original_post)) {
-			Logger::debug('Item not found or does not belong to the user', ['id' => $id, 'uid' => $uid, 'object_id' => $object_id, 'activity' => $ldactivity]);
+			DI::logger()->debug('Item not found or does not belong to the user', ['id' => $id, 'uid' => $uid, 'object_id' => $object_id, 'activity' => $ldactivity]);
 			return [];
 		}
 
 		$object_data = self::processObject($ldactivity['as:object']);
 		$item        = ClientToServer::processContent($object_data, $application, $uid);
 		if (empty($item['title']) && empty($item['body'])) {
-			Logger::debug('Empty body and title', ['id' => $id, 'uid' => $uid, 'object_id' => $object_id, 'activity' => $ldactivity]);
+			DI::logger()->debug('Empty body and title', ['id' => $id, 'uid' => $uid, 'object_id' => $object_id, 'activity' => $ldactivity]);
 			return [];
 		}
 		$post = ['title' => $item['title'], 'body' => $item['body']];
-		Logger::debug('Got data', ['id' => $id, 'uid' => $uid, 'item' => $post]);
+		DI::logger()->debug('Got data', ['id' => $id, 'uid' => $uid, 'item' => $post]);
 		Item::update($post, ['id' => $id]);
 		Item::updateDisplayCache($original_post['uri-id']);
 
@@ -251,7 +250,7 @@ class ClientToServer
 		$item['uid']        = $uid;
 		$item['verb']       = Activity::POST;
 		$item['contact-id'] = $owner['id'];
-		$item['author-id']  = $item['owner-id']  = Contact::getPublicIdByUserId($uid);
+		$item['author-id']  = $item['owner-id'] = Contact::getPublicIdByUserId($uid);
 		$item['title']      = $object_data['name'];
 		$item['body']       = Markdown::toBBCode($object_data['content'] ?? '');
 		$item['app']        = $application['name'] ?? 'API';
@@ -323,8 +322,10 @@ class ClientToServer
 			if (!empty($requester_id)) {
 				$permissionSets = DI::permissionSet()->selectByContactId($requester_id, $owner['uid']);
 				if (count($permissionSets) > 0) {
-					$condition = ['psid' => array_merge($permissionSets->column('id'),
-						[DI::permissionSet()->selectPublicForUser($owner['uid'])])];
+					$condition = ['psid' => array_merge(
+						$permissionSets->column('id'),
+						[DI::permissionSet()->selectPublicForUser($owner['uid'])]
+					)];
 				}
 			}
 		}

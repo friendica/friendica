@@ -16,7 +16,6 @@ use Friendica\Content\OEmbed;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Smilies;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -131,10 +130,11 @@ class BBCode
 						break;
 
 					case 'title':
-						$value = self::toPlaintext(html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
-						$value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+						$value         = self::toPlaintext(html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+						$value         = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
 						$data['title'] = self::escapeContent($value);
 
+						// no break
 					default:
 						$data[$field] = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
 						break;
@@ -290,7 +290,7 @@ class BBCode
 		// Remove all unneeded white space
 		do {
 			$oldtext = $text;
-			$text = str_replace(['  ', "\n", "\r", '"'], ' ', $text);
+			$text    = str_replace(['  ', "\n", "\r", '"'], ' ', $text);
 		} while ($oldtext != $text);
 
 		return trim($text);
@@ -328,15 +328,15 @@ class BBCode
 		// than the maximum, then don't waste time looking for the images
 		if ($maxlen && (strlen($body) > $maxlen)) {
 
-			Logger::info('the total body length exceeds the limit', ['maxlen' => $maxlen, 'body_len' => strlen($body)]);
+			DI::logger()->info('the total body length exceeds the limit', ['maxlen' => $maxlen, 'body_len' => strlen($body)]);
 
 			$orig_body = $body;
-			$new_body = '';
-			$textlen = 0;
+			$new_body  = '';
+			$textlen   = 0;
 
-			$img_start = strpos($orig_body, '[img');
+			$img_start    = strpos($orig_body, '[img');
 			$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
-			$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+			$img_end      = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 			while (($img_st_close !== false) && ($img_end !== false)) {
 
 				$img_st_close++; // make it point to AFTER the closing bracket
@@ -348,9 +348,9 @@ class BBCode
 
 					if (($textlen + $img_start) > $maxlen) {
 						if ($textlen < $maxlen) {
-							Logger::debug('the limit happens before an embedded image');
+							DI::logger()->debug('the limit happens before an embedded image');
 							$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
-							$textlen = $maxlen;
+							$textlen  = $maxlen;
 						}
 					} else {
 						$new_body = $new_body . substr($orig_body, 0, $img_start);
@@ -362,9 +362,9 @@ class BBCode
 
 					if (($textlen + $img_end) > $maxlen) {
 						if ($textlen < $maxlen) {
-							Logger::debug('the limit happens before the end of a non-embedded image');
+							DI::logger()->debug('the limit happens before the end of a non-embedded image');
 							$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
-							$textlen = $maxlen;
+							$textlen  = $maxlen;
 						}
 					} else {
 						$new_body = $new_body . substr($orig_body, 0, $img_end);
@@ -378,18 +378,18 @@ class BBCode
 					$orig_body = '';
 				}
 
-				$img_start = strpos($orig_body, '[img');
+				$img_start    = strpos($orig_body, '[img');
 				$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
-				$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+				$img_end      = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 			}
 
 			if (($textlen + strlen($orig_body)) > $maxlen) {
 				if ($textlen < $maxlen) {
-					Logger::debug('the limit happens after the end of the last image');
+					DI::logger()->debug('the limit happens after the end of the last image');
 					$new_body = $new_body . substr($orig_body, 0, $maxlen - $textlen);
 				}
 			} else {
-				Logger::debug('the text size with embedded images extracted did not violate the limit');
+				DI::logger()->debug('the text size with embedded images extracted did not violate the limit');
 				$new_body = $new_body . $orig_body;
 			}
 
@@ -434,7 +434,7 @@ class BBCode
 
 		if (((strpos($data['text'], '[img=') !== false) || (strpos($data['text'], '[img]') !== false) || DI::config()->get('system', 'always_show_preview')) && !empty($data['image'])) {
 			$data['preview'] = $data['image'];
-			$data['image'] = '';
+			$data['image']   = '';
 		}
 
 		$return = '';
@@ -507,11 +507,11 @@ class BBCode
 		}
 
 		$title = htmlentities($data['title'] ?? '', ENT_QUOTES, 'UTF-8', false);
-		$text = htmlentities($data['text'], ENT_QUOTES, 'UTF-8', false);
+		$text  = htmlentities($data['text'], ENT_QUOTES, 'UTF-8', false);
 		if ($plaintext || (($title != '') && strstr($text, $title))) {
 			$data['title'] = $data['url'];
 		} elseif (($text != '') && strstr($title, $text)) {
-			$data['text'] = $data['title'];
+			$data['text']  = $data['title'];
 			$data['title'] = $data['url'];
 		}
 
@@ -585,11 +585,11 @@ class BBCode
 
 		$res = [
 			'start' => [
-				'open' => $start_open,
+				'open'  => $start_open,
 				'close' => $start_close
 			],
 			'end' => [
-				'open' => $end_open,
+				'open'  => $end_open,
 				'close' => $end_open + strlen('[/' . $name . ']')
 			],
 		];
@@ -615,17 +615,17 @@ class BBCode
 	{
 		DI::profiler()->startRecording('rendering');
 		$occurrences = 0;
-		$pos = self::getTagPosition($text, $name, $occurrences);
+		$pos         = self::getTagPosition($text, $name, $occurrences);
 		while ($pos !== false && $occurrences++ < 1000) {
-			$start = substr($text, 0, $pos['start']['open']);
+			$start   = substr($text, 0, $pos['start']['open']);
 			$subject = substr($text, $pos['start']['open'], $pos['end']['close'] - $pos['start']['open']);
-			$end = substr($text, $pos['end']['close']);
+			$end     = substr($text, $pos['end']['close']);
 			if ($end === false) {
 				$end = '';
 			}
 
 			$subject = preg_replace($pattern, $replace, $subject);
-			$text = $start . $subject . $end;
+			$text    = $start . $subject . $end;
 
 			$pos = self::getTagPosition($text, $name, $occurrences);
 		}
@@ -637,13 +637,13 @@ class BBCode
 	private static function extractImagesFromItemBody(string $body): array
 	{
 		$saved_image = [];
-		$orig_body = $body;
-		$new_body = '';
+		$orig_body   = $body;
+		$new_body    = '';
 
-		$cnt = 0;
-		$img_start = strpos($orig_body, '[img');
+		$cnt          = 0;
+		$img_start    = strpos($orig_body, '[img');
 		$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
-		$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+		$img_end      = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 		while (($img_st_close !== false) && ($img_end !== false)) {
 			$img_st_close++; // make it point to AFTER the closing bracket
 			$img_end += $img_start;
@@ -651,7 +651,7 @@ class BBCode
 			if (!strcmp(substr($orig_body, $img_start + $img_st_close, 5), 'data:')) {
 				// This is an embedded image
 				$saved_image[$cnt] = substr($orig_body, $img_start + $img_st_close, $img_end - ($img_start + $img_st_close));
-				$new_body = $new_body . substr($orig_body, 0, $img_start) . '[$#saved_image' . $cnt . '#$]';
+				$new_body          = $new_body . substr($orig_body, 0, $img_start) . '[$#saved_image' . $cnt . '#$]';
 
 				$cnt++;
 			} else {
@@ -665,9 +665,9 @@ class BBCode
 				$orig_body = '';
 			}
 
-			$img_start = strpos($orig_body, '[img');
+			$img_start    = strpos($orig_body, '[img');
 			$img_st_close = ($img_start !== false ? strpos(substr($orig_body, $img_start), ']') : false);
-			$img_end = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
+			$img_end      = ($img_start !== false ? strpos(substr($orig_body, $img_start), '[/img]') : false);
 		}
 
 		$new_body = $new_body . $orig_body;
@@ -737,7 +737,7 @@ class BBCode
 		$attributes = self::extractShareAttributes($matches[2]);
 
 		$attributes['comment'] = trim($matches[1]);
-		$attributes['shared'] = trim($matches[3]);
+		$attributes['shared']  = trim($matches[3]);
 
 		DI::profiler()->stopRecording();
 		return $attributes;
@@ -797,13 +797,13 @@ class BBCode
 			function ($match) use ($callback, $uriid) {
 				$attributes = self::extractShareAttributes($match[2]);
 
-				$author_contact = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
-				$author_contact['url'] = ($author_contact['url'] ?? $attributes['profile']);
+				$author_contact         = Contact::getByURL($attributes['profile'], false, ['id', 'url', 'addr', 'name', 'micro']);
+				$author_contact['url']  = ($author_contact['url'] ?? $attributes['profile']);
 				$author_contact['addr'] = ($author_contact['addr'] ?? '');
 
-				$attributes['author']   = ($author_contact['name']  ?? '') ?: $attributes['author'];
-				$attributes['avatar']   = ($author_contact['micro'] ?? '') ?: $attributes['avatar'];
-				$attributes['profile']  = ($author_contact['url']   ?? '') ?: $attributes['profile'];
+				$attributes['author']  = ($author_contact['name'] ?? '') ?: $attributes['author'];
+				$attributes['avatar']  = ($author_contact['micro'] ?? '') ?: $attributes['avatar'];
+				$attributes['profile'] = ($author_contact['url'] ?? '') ?: $attributes['profile'];
 
 				if (!empty($author_contact['id'])) {
 					$attributes['avatar'] = Contact::getAvatarUrlForId($author_contact['id'], Proxy::SIZE_THUMB);
@@ -832,7 +832,7 @@ class BBCode
 			"/\[[zi]mg(.*?)\]([^\[\]]*)\[\/[zi]mg\]/ism",
 			function ($match) use ($simplehtml, $uriid) {
 				$attribute_string = $match[1];
-				$attributes = [];
+				$attributes       = [];
 				foreach (['alt', 'width', 'height'] as $field) {
 					preg_match("/$field=(['\"])(.+?)\\1/ism", $attribute_string, $matches);
 					$attributes[$field] = html_entity_decode($matches[2] ?? '', ENT_QUOTES, 'UTF-8');
@@ -908,7 +908,7 @@ class BBCode
 				break;
 			case self::ACTIVITYPUB:
 				$author = '@<span class="vcard"><a href="' . $author_contact['url'] . '" class="url u-url mention" title="' . $author_contact['addr'] . '"><span class="fn nickname mention">' . $author_contact['addr'] . '</span></a>:</span>';
-				$text = '<div><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . '</a> ' . $author . '<blockquote>' . $content . '</blockquote></div>' . "\n";
+				$text   = '<div><a href="' . $attributes['link'] . '">' . html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8') . '</a> ' . $author . '<blockquote>' . $content . '</blockquote></div>' . "\n";
 				break;
 			default:
 				$text = ($is_quote_share ? "\n" : '');
@@ -917,7 +917,7 @@ class BBCode
 				$network = $contact['network'] ?? Protocol::PHANTOM;
 
 				$gsid = ContactSelector::getServerIdForProfile($attributes['profile']);
-				$tpl = Renderer::getMarkupTemplate('shared_content.tpl');
+				$tpl  = Renderer::getMarkupTemplate('shared_content.tpl');
 				$text .= self::SHARED_ANCHOR . Renderer::replaceMacros($tpl, [
 					'$profile'      => $attributes['profile'],
 					'$avatar'       => $attributes['avatar'],
@@ -939,7 +939,7 @@ class BBCode
 	private static function removePictureLinksCallback(array $match): string
 	{
 		$cache_key = 'remove:' . $match[1];
-		$text = DI::cache()->get($cache_key);
+		$text      = DI::cache()->get($cache_key);
 
 		if (is_null($text)) {
 			$curlResult = DI::httpClient()->head($match[1], [HttpClientOptions::TIMEOUT => DI::config()->get('system', 'xrd_timeout'), HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
@@ -964,7 +964,7 @@ class BBCode
 				$doc = new DOMDocument();
 				@$doc->loadHTML($body);
 				$xpath = new DOMXPath($doc);
-				$list = $xpath->query('//meta[@name]');
+				$list  = $xpath->query('//meta[@name]');
 				foreach ($list as $node) {
 					$attr = [];
 
@@ -1035,7 +1035,7 @@ class BBCode
 		}
 
 		$cache_key = 'clean:' . $match[1];
-		$text = DI::cache()->get($cache_key);
+		$text      = DI::cache()->get($cache_key);
 		if (!is_null($text)) {
 			return $text;
 		}
@@ -1067,7 +1067,7 @@ class BBCode
 			$doc = new DOMDocument();
 			@$doc->loadHTML($body);
 			$xpath = new DOMXPath($doc);
-			$list = $xpath->query('//meta[@name]');
+			$list  = $xpath->query('//meta[@name]');
 			foreach ($list as $node) {
 				$attr = [];
 				if ($node->attributes->length) {
@@ -1135,7 +1135,7 @@ class BBCode
 	{
 		DI::profiler()->startRecording('rendering');
 		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
-		$body = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
+		$body   = preg_replace_callback($regexp, [self::class, 'mentionCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
 	}
@@ -1171,7 +1171,7 @@ class BBCode
 	{
 		DI::profiler()->startRecording('rendering');
 		$regexp = "/([@!])\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
-		$body = preg_replace_callback($regexp, [self::class, 'mentionToAddrCallback'], $body);
+		$body   = preg_replace_callback($regexp, [self::class, 'mentionToAddrCallback'], $body);
 		DI::profiler()->stopRecording();
 		return $body;
 	}
@@ -1311,7 +1311,7 @@ class BBCode
 				 * $match[2] = $title or absent
 				 */
 				$try_oembed_callback = function (array $match) use ($uriid) {
-					$url = $match[1];
+					$url   = $match[1];
 					$title = $match[2] ?? '';
 
 					try {
@@ -1326,7 +1326,7 @@ class BBCode
 				// Extract the private images which use data urls since preg has issues with
 				// large data sizes. Stash them away while we do bbcode conversion, and then put them back
 				// in after we've done all the regex matching. We cannot use any preg functions to do this.
-				$extracted = self::extractImagesFromItemBody($text);
+				$extracted   = self::extractImagesFromItemBody($text);
 				$saved_image = $extracted['images'];
 
 				// General clean up of the content, for example unneeded blanks and new lines
@@ -1475,13 +1475,13 @@ class BBCode
 		];
 		do {
 			$oldtext = $text;
-			$text = str_replace($search, $replace, $text);
+			$text    = str_replace($search, $replace, $text);
 		} while ($oldtext != $text);
 
 		// Replace these here only once
-		$search = ["\n[table]", "[/table]\n"];
+		$search  = ["\n[table]", "[/table]\n"];
 		$replace = ["[table]", "[/table]"];
-		$text = str_replace($search, $replace, $text);
+		$text    = str_replace($search, $replace, $text);
 
 		// Trim new lines regardless of the system.remove_multiplicated_lines config value
 		$text = trim($text, "\n");
@@ -1498,7 +1498,7 @@ class BBCode
 			];
 			do {
 				$oldtext = $text;
-				$text = str_replace($search, $replace, $text);
+				$text    = str_replace($search, $replace, $text);
 			} while ($oldtext != $text);
 		}
 
@@ -1635,7 +1635,7 @@ class BBCode
 			}
 
 			$elements = [
-				'del' => 's', 'ins' => 'em', 'kbd' => 'code', 'mark' => 'strong',
+				'del'  => 's', 'ins' => 'em', 'kbd' => 'code', 'mark' => 'strong',
 				'samp' => 'code', 'u' => 'em', 'var' => 'em'
 			];
 			foreach ($elements as $bbcode => $html) {
@@ -1750,7 +1750,7 @@ class BBCode
 
 		// handle nested quotes
 		$endlessloop = 0;
-		while ((strpos($text, "[/spoiler]") !== false)  && (strpos($text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
+		while ((strpos($text, "[/spoiler]") !== false) && (strpos($text, "[spoiler=") !== false) && (++$endlessloop < 20)) {
 			$text = preg_replace(
 				"/\[spoiler=[\"\']*(.*?)[\"\']*\](.*?)\[\/spoiler\]/ism",
 				'<details class="spoiler"><summary>$1</summary>$2</details>',
@@ -1796,7 +1796,7 @@ class BBCode
 
 		// handle nested quotes
 		$endlessloop = 0;
-		while ((strpos($text, "[/quote]") !== false)  && (strpos($text, "[quote=") !== false) && (++$endlessloop < 20)) {
+		while ((strpos($text, "[/quote]") !== false) && (strpos($text, "[quote=") !== false) && (++$endlessloop < 20)) {
 			$text = preg_replace(
 				"/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
 				"<p><strong class=" . '"author"' . ">" . $t_wrote . "</strong></p><blockquote>$2</blockquote>",
@@ -1830,7 +1830,7 @@ class BBCode
 			"/\[[iz]mg\=(.*?)\](.*?)\[\/[iz]mg\]/ism",
 			function ($matches) use ($simple_html, $uriid) {
 				$matches[1] = self::proxyUrl($matches[1], $simple_html, $uriid);
-				$alt = htmlspecialchars($matches[2], ENT_COMPAT);
+				$alt        = htmlspecialchars($matches[2], ENT_COMPAT);
 				// Fix for Markdown problems with Diaspora, see issue #12701
 				if (($simple_html != self::DIASPORA) || strpos($matches[2], '"') === false) {
 					return '<img src="' . $matches[1] . '" alt="' . $alt . '" title="' . $alt . '" class="' . (empty($alt) ? 'empty-description' : 'has-alt-description') . '">';
@@ -2044,7 +2044,7 @@ class BBCode
 		// Server independent link to posts and comments
 		// See issue: https://github.com/diaspora/diaspora_federation/issues/75
 		$expression = "=diaspora://.*?/post/([0-9A-Za-z\-_@.:]{15,254}[0-9A-Za-z])=ism";
-		$text = preg_replace($expression, DI::baseUrl() . "/display/$1", $text);
+		$text       = preg_replace($expression, DI::baseUrl() . "/display/$1", $text);
 
 		/* Tag conversion
 		 * Supports:
@@ -2107,7 +2107,7 @@ class BBCode
 		try {
 			return (string)Uri::fromParts($parts);
 		} catch (\Throwable $th) {
-			Logger::notice('Exception on unparsing url', ['url' => $url, 'parts' => $parts, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Exception on unparsing url', ['url' => $url, 'parts' => $parts, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return $url;
 		}
 	}
@@ -2219,7 +2219,7 @@ class BBCode
 		});
 
 		$regex = '#<([^>]*?)(href)="(?!' . implode('|', $allowed_link_protocols) . ')(.*?)"(.*?)>#ism';
-		$text = preg_replace($regex, '<$1$2="javascript:void(0)"$4 data-original-href="$3" class="invalid-href" title="' . DI::l10n()->t('Invalid link protocol') . '">', $text);
+		$text  = preg_replace($regex, '<$1$2="javascript:void(0)"$4 data-original-href="$3" class="invalid-href" title="' . DI::l10n()->t('Invalid link protocol') . '">', $text);
 
 		return $text;
 	}
@@ -2319,7 +2319,7 @@ class BBCode
 		 * Transform #tags, strip off the [url] and replace spaces with underscore
 		 */
 		$url_search_string = "^\[\]";
-		$text = preg_replace_callback(
+		$text              = preg_replace_callback(
 			"/#\[url\=([$url_search_string]*)\](.*?)\[\/url\]/i",
 			function ($matches) {
 				return '#' . str_replace(' ', '_', $matches[2]);
@@ -2368,7 +2368,7 @@ class BBCode
 
 		if ($for_diaspora) {
 			$url_search_string = "^\[\]";
-			$text = preg_replace_callback(
+			$text              = preg_replace_callback(
 				"/([@!])\[(.*?)\]\(([$url_search_string]*?)\)/ism",
 				[self::class, 'bbCodeMention2DiasporaCallback'],
 				$text
@@ -2572,7 +2572,7 @@ class BBCode
 			$header .= "' message_id='" . str_replace(["'", "[", "]"], ["&#x27;", "&#x5B;", "&#x5D;"], $uri);
 		}
 
-		$header  .= "']";
+		$header .= "']";
 
 		DI::profiler()->stopRecording();
 		return $header;

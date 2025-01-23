@@ -7,7 +7,6 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
@@ -45,7 +44,7 @@ class Delayed
 	public static function add(string $uri, array $item, int $notify = 0, int $preparation_mode = self::PREPARED, string $delayed = '', array $taglist = [], array $attachments = [])
 	{
 		if (empty($item['uid']) || self::exists($uri, $item['uid'])) {
-			Logger::notice('No uid or already found');
+			DI::logger()->notice('No uid or already found');
 			return 0;
 		}
 
@@ -54,11 +53,11 @@ class Delayed
 
 			$last_publish = DI::pConfig()->get($item['uid'], 'system', 'last_publish', 0, true);
 			$next_publish = max($last_publish + (60 * $min_posting), time());
-			$delayed = date(DateTimeFormat::MYSQL, $next_publish);
+			$delayed      = date(DateTimeFormat::MYSQL, $next_publish);
 			DI::pConfig()->set($item['uid'], 'system', 'last_publish', $next_publish);
 		}
 
-		Logger::notice('Adding post for delayed publishing', ['uid' => $item['uid'], 'delayed' => $delayed, 'uri' => $uri]);
+		DI::logger()->notice('Adding post for delayed publishing', ['uid' => $item['uid'], 'delayed' => $delayed, 'uri' => $uri]);
 
 		$wid = Worker::add(['priority' => Worker::PRIORITY_HIGH, 'delayed' => $delayed], 'DelayedPublish', $item, $notify, $taglist, $attachments, $preparation_mode, $uri);
 		if (!$wid) {
@@ -152,13 +151,13 @@ class Delayed
 		}
 
 		return [
-			'parameters' => $delayed,
-			'item' => $parameters[0],
-			'notify' => $parameters[1],
-			'taglist' => $parameters[2],
+			'parameters'  => $delayed,
+			'item'        => $parameters[0],
+			'notify'      => $parameters[1],
+			'taglist'     => $parameters[2],
 			'attachments' => $parameters[3],
-			'unprepared' => $parameters[4],
-			'uri' => $parameters[5],
+			'unprepared'  => $parameters[4],
+			'uri'         => $parameters[5],
 		];
 	}
 
@@ -181,7 +180,7 @@ class Delayed
 
 		$id = Item::insert($item, $notify, $preparation_mode == self::PREPARED);
 
-		Logger::notice('Post stored', ['id' => $id, 'uid' => $item['uid'], 'cid' => $item['contact-id'] ?? 'N/A']);
+		DI::logger()->notice('Post stored', ['id' => $id, 'uid' => $item['uid'], 'cid' => $item['contact-id'] ?? 'N/A']);
 
 		if (empty($uri) && !empty($item['uri'])) {
 			$uri = $item['uri'];

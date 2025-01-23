@@ -7,7 +7,6 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -53,22 +52,22 @@ class Link
 		}
 
 		if (!in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'])) {
-			Logger::info('Bad URL, quitting', ['uri-id' => $uriId, 'url' => $url]);
+			DI::logger()->info('Bad URL, quitting', ['uri-id' => $uriId, 'url' => $url]);
 			return $url;
 		}
 
 		$link = DBA::selectFirst('post-link', ['id'], ['uri-id' => $uriId, 'url' => $url]);
 		if (!empty($link['id'])) {
 			$id = $link['id'];
-			Logger::info('Found', ['id' => $id, 'uri-id' => $uriId, 'url' => $url]);
+			DI::logger()->info('Found', ['id' => $id, 'uri-id' => $uriId, 'url' => $url]);
 		} else {
-			$fields = self::fetchMimeType($url);
+			$fields           = self::fetchMimeType($url);
 			$fields['uri-id'] = $uriId;
-			$fields['url'] = Network::sanitizeUrl($url);
+			$fields['url']    = Network::sanitizeUrl($url);
 
 			DBA::insert('post-link', $fields, Database::INSERT_IGNORE);
 			$id = DBA::lastInsertId();
-			Logger::info('Inserted', $fields);
+			DI::logger()->info('Inserted', $fields);
 		}
 
 		if (empty($id)) {
@@ -114,12 +113,12 @@ class Link
 		try {
 			$curlResult = HTTPSignature::fetchRaw($url, 0, [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::ACCEPT_CONTENT => $accept]);
 		} catch (\Exception $exception) {
-			Logger::notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
+			DI::logger()->notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
 			return [];
 		}
 
 		if (!$curlResult->isSuccess()) {
-			Logger::notice('Fetching unsuccessful', ['url' => $url]);
+			DI::logger()->notice('Fetching unsuccessful', ['url' => $url]);
 			return [];
 		}
 
@@ -127,7 +126,7 @@ class Link
 
 		if (Images::isSupportedMimeType($fields['mimetype'])) {
 			$img_str = $curlResult->getBodyString();
-			$image = new Image($img_str, $fields['mimetype'], $url, false);
+			$image   = new Image($img_str, $fields['mimetype'], $url, false);
 			if ($image->isValid()) {
 				$fields['mimetype'] = $image->getType();
 				$fields['width']    = $image->getWidth();

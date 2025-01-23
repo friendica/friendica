@@ -32,6 +32,7 @@ use Friendica\Util\Strings;
  * and anything else that might need to be passed around
  * before we spit the page out.
  *
+ * @internal
  */
 final class AppLegacy implements AppHelper
 {

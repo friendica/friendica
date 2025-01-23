@@ -7,9 +7,9 @@
 
 namespace Friendica\Protocol\ActivityPub;
 
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -22,7 +22,7 @@ class Fetch
 		DBA::insert('fetch-entry', ['url' => $url, 'created' => DateTimeFormat::utcNow()], Database::INSERT_IGNORE);
 
 		$fetch = DBA::selectFirst('fetch-entry', ['id'], ['url' => $url]);
-		Logger::debug('Added fetch entry', ['url' => $url, 'fetch' => $fetch]);
+		DI::logger()->debug('Added fetch entry', ['url' => $url, 'fetch' => $fetch]);
 		return $fetch['id'] ?? 0;
 	}
 
@@ -38,7 +38,7 @@ class Fetch
 		}
 
 		DBA::update('fetch-entry', ['wid' => $wid], ['url' => $url]);
-		Logger::debug('Worker id set', ['url' => $url, 'wid' => $wid]);
+		DI::logger()->debug('Worker id set', ['url' => $url, 'wid' => $wid]);
 	}
 
 	/**
@@ -48,14 +48,14 @@ class Fetch
 	{
 		$fetch = DBA::selectFirst('fetch-entry', ['id', 'wid'], ['url' => $url]);
 		if (empty($fetch['id'])) {
-			Logger::debug('No entry found for url', ['url' => $url]);
+			DI::logger()->debug('No entry found for url', ['url' => $url]);
 			return false;
 		}
 
 		// We don't have a workerqueue id yet. So most likely is isn't assigned yet.
 		// To avoid the ramping up of another fetch request we simply claim that there is a waiting worker.
 		if (!empty($fetch['id']) && empty($fetch['wid'])) {
-			Logger::debug('Entry without worker found for url', ['url' => $url]);
+			DI::logger()->debug('Entry without worker found for url', ['url' => $url]);
 			return true;
 		}
 

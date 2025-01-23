@@ -14,7 +14,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
@@ -89,7 +88,7 @@ class Register extends BaseModule
 		if ($max_dailies) {
 			$count = DBA::count('user', ['`register_date` > UTC_TIMESTAMP - INTERVAL 1 day']);
 			if ($count >= $max_dailies) {
-				Logger::notice('max daily registrations exceeded.');
+				$this->logger->notice('max daily registrations exceeded.');
 				DI::sysmsg()->addNotice(DI::l10n()->t('This site has exceeded the number of allowed daily account registrations. Please try again tomorrow.'));
 				return '';
 			}
@@ -115,7 +114,7 @@ class Register extends BaseModule
 		if (DI::config()->get('system', 'publish_all')) {
 			$profile_publish = '<input type="hidden" name="profile_publish_reg" value="1" />';
 		} else {
-			$publish_tpl = Renderer::getMarkupTemplate('profile/publish.tpl');
+			$publish_tpl     = Renderer::getMarkupTemplate('profile/publish.tpl');
 			$profile_publish = Renderer::replaceMacros($publish_tpl, [
 				'$instance'     => 'reg',
 				'$pubdesc'      => DI::l10n()->t('Include your profile in member directory?'),
@@ -137,44 +136,44 @@ class Register extends BaseModule
 		$tpl = $arr['template'];
 
 		$o = Renderer::replaceMacros($tpl, [
-			'$invitations'  => DI::config()->get('system', 'invitation_only'),
-			'$permonly'     => self::getPolicy() === self::APPROVE,
-			'$permonlybox'  => ['permonlybox', DI::l10n()->t('Note for the admin'), '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required')],
-			'$invite_desc'  => DI::l10n()->t('Membership on this site is by invitation only.'),
-			'$invite_label' => DI::l10n()->t('Your invitation code: '),
-			'$invite_id'    => $invite_id,
-			'$regtitle'     => DI::l10n()->t('Registration'),
-			'$registertext' => BBCode::convertForUriId(User::getSystemUriId(), DI::config()->get('config', 'register_text', '')),
-			'$fillwith'     => $fillwith,
-			'$fillext'      => $fillext,
-			'$oidlabel'     => $oidlabel,
-			'$openid'       => $openid_url,
-			'$namelabel'    => DI::l10n()->t('Your Display Name (as you would like it to be displayed on this system'),
-			'$addrlabel'    => DI::l10n()->t('Your Email Address: (Initial information will be send there, so this has to be an existing address.)'),
-			'$addrlabel2'   => DI::l10n()->t('Please repeat your e-mail address:'),
-			'$ask_password' => $ask_password,
-			'$password1'    => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
-			'$password2'    => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
-			'$nickdesc'     => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
-			'$nicklabel'    => DI::l10n()->t('Choose a nickname: '),
-			'$photo'        => $photo,
-			'$publish'      => $profile_publish,
-			'$regbutt'      => DI::l10n()->t('Register'),
-			'$username'     => $username,
-			'$email'        => $email,
-			'$nickname'     => $nickname,
-			'$sitename'     => DI::baseUrl()->getHost(),
-			'$importh'      => DI::l10n()->t('Import'),
-			'$importt'      => DI::l10n()->t('Import your profile to this friendica instance'),
-			'$showtoslink'  => DI::config()->get('system', 'tosdisplay'),
-			'$tostext'      => DI::l10n()->t('Terms of Service'),
-			'$showprivstatement' => DI::config()->get('system', 'tosprivstatement'),
-			'$privstatement'=> $this->tos->privacy_complete,
-			'$form_security_token' => BaseModule::getFormSecurityToken('register'),
-			'$explicit_content' => DI::config()->get('system', 'explicit_content', false),
+			'$invitations'           => DI::config()->get('system', 'invitation_only'),
+			'$permonly'              => self::getPolicy() === self::APPROVE,
+			'$permonlybox'           => ['permonlybox', DI::l10n()->t('Note for the admin'), '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required')],
+			'$invite_desc'           => DI::l10n()->t('Membership on this site is by invitation only.'),
+			'$invite_label'          => DI::l10n()->t('Your invitation code: '),
+			'$invite_id'             => $invite_id,
+			'$regtitle'              => DI::l10n()->t('Registration'),
+			'$registertext'          => BBCode::convertForUriId(User::getSystemUriId(), DI::config()->get('config', 'register_text', '')),
+			'$fillwith'              => $fillwith,
+			'$fillext'               => $fillext,
+			'$oidlabel'              => $oidlabel,
+			'$openid'                => $openid_url,
+			'$namelabel'             => DI::l10n()->t('Your Display Name (as you would like it to be displayed on this system'),
+			'$addrlabel'             => DI::l10n()->t('Your Email Address: (Initial information will be send there, so this has to be an existing address.)'),
+			'$addrlabel2'            => DI::l10n()->t('Please repeat your e-mail address:'),
+			'$ask_password'          => $ask_password,
+			'$password1'             => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
+			'$password2'             => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
+			'$nickdesc'              => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
+			'$nicklabel'             => DI::l10n()->t('Choose a nickname: '),
+			'$photo'                 => $photo,
+			'$publish'               => $profile_publish,
+			'$regbutt'               => DI::l10n()->t('Register'),
+			'$username'              => $username,
+			'$email'                 => $email,
+			'$nickname'              => $nickname,
+			'$sitename'              => DI::baseUrl()->getHost(),
+			'$importh'               => DI::l10n()->t('Import'),
+			'$importt'               => DI::l10n()->t('Import your profile to this friendica instance'),
+			'$showtoslink'           => DI::config()->get('system', 'tosdisplay'),
+			'$tostext'               => DI::l10n()->t('Terms of Service'),
+			'$showprivstatement'     => DI::config()->get('system', 'tosprivstatement'),
+			'$privstatement'         => $this->tos->privacy_complete,
+			'$form_security_token'   => BaseModule::getFormSecurityToken('register'),
+			'$explicit_content'      => DI::config()->get('system', 'explicit_content', false),
 			'$explicit_content_note' => DI::l10n()->t('Note: This node explicitly contains adult content'),
-			'$additional'   => !empty(DI::userSession()->getLocalUserId()),
-			'$parent_password' => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter the password of the parent account to legitimize your request.')]
+			'$additional'            => !empty(DI::userSession()->getLocalUserId()),
+			'$parent_password'       => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter the password of the parent account to legitimize your request.')]
 
 		]);
 
@@ -224,12 +223,12 @@ class Register extends BaseModule
 
 		switch (self::getPolicy()) {
 			case self::OPEN:
-				$blocked = 0;
+				$blocked  = 0;
 				$verified = 1;
 				break;
 
 			case self::APPROVE:
-				$blocked = 1;
+				$blocked  = 1;
 				$verified = 0;
 				break;
 
@@ -239,7 +238,7 @@ class Register extends BaseModule
 					DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 					return;
 				}
-				$blocked = 1;
+				$blocked  = 1;
 				$verified = 0;
 				break;
 		}
@@ -250,7 +249,7 @@ class Register extends BaseModule
 
 		// Is there text in the tar pit?
 		if (!empty($arr['email'])) {
-			Logger::info('Tar pit', $arr);
+			$this->logger->info('Tar pit', $arr);
 			DI::sysmsg()->addNotice(DI::l10n()->t('You have entered too much information.'));
 			DI::baseUrl()->redirect('register/');
 		}
@@ -262,18 +261,18 @@ class Register extends BaseModule
 				DI::baseUrl()->redirect('register');
 			}
 
-			$blocked = 0;
+			$blocked  = 0;
 			$verified = 1;
 
 			$arr['password1'] = $arr['confirm'] = $arr['parent_password'];
-			$arr['repeat'] = $arr['email'] = $user['email'];
+			$arr['repeat']    = $arr['email'] = $user['email'];
 		} else {
 			// Overwriting the "tar pit" field with the real one
 			$arr['email'] = $arr['field1'];
 		}
 
 		if ($arr['email'] != $arr['repeat']) {
-			Logger::info('Mail mismatch', $arr);
+			$this->logger->info('Mail mismatch', $arr);
 			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter the identical mail address in the second field.'));
 			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
@@ -281,9 +280,9 @@ class Register extends BaseModule
 
 		//Check if nickname contains only US-ASCII and do not start with a digit
 		if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $arr['nickname'])) {
-        		if (is_numeric(substr($arr['nickname'], 0, 1))) {
+			if (is_numeric(substr($arr['nickname'], 0, 1))) {
 				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname cannot start with a digit."));
-        		} else {
+			} else {
 				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname can only contain US-ASCII characters."));
 			}
 			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
@@ -291,7 +290,7 @@ class Register extends BaseModule
 			return;
 		}
 
-		$arr['blocked'] = $blocked;
+		$arr['blocked']  = $blocked;
 		$arr['verified'] = $verified;
 		$arr['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
 
@@ -319,7 +318,7 @@ class Register extends BaseModule
 
 		$using_invites = DI::config()->get('system', 'invitation_only');
 		$num_invites   = DI::config()->get('system', 'number_invites');
-		$invite_id = (!empty($_POST['invite_id']) ? trim($_POST['invite_id']) : '');
+		$invite_id     = (!empty($_POST['invite_id']) ? trim($_POST['invite_id']) : '');
 
 		if (self::getPolicy() === self::OPEN) {
 			if ($using_invites && $invite_id) {
@@ -345,9 +344,11 @@ class Register extends BaseModule
 					DI::baseUrl()->redirect();
 				} else {
 					DI::sysmsg()->addNotice(
-						DI::l10n()->t('Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
+						DI::l10n()->t(
+							'Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.',
 							$user['email'],
-							$result['password'])
+							$result['password']
+						)
 					);
 				}
 			} else {
@@ -423,7 +424,7 @@ class Register extends BaseModule
 	public static function getPolicy(): int
 	{
 		$admins = User::getAdminList(['login_date']);
-		$days = DI::config()->get('system', 'admin_inactivity_limit');
+		$days   = DI::config()->get('system', 'admin_inactivity_limit');
 		if ($days == 0 || empty($admins)) {
 			return intval(DI::config()->get('config', 'register_policy'));
 		}

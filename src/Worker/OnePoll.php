@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -21,7 +20,6 @@ use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Protocol\Activity;
-use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Email;
 use Friendica\Protocol\Feed;
 use Friendica\Util\DateTimeFormat;
@@ -32,18 +30,18 @@ class OnePoll
 {
 	public static function execute(int $contact_id = 0, string $command = '')
 	{
-		Logger::notice('Start polling/probing contact', ['id' => $contact_id, 'command' => $command]);
+		DI::logger()->notice('Start polling/probing contact', ['id' => $contact_id, 'command' => $command]);
 
 		$force = ($command == 'force');
 
 		if (empty($contact_id)) {
-			Logger::notice('no contact provided');
+			DI::logger()->notice('no contact provided');
 			return;
 		}
 
 		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id]);
 		if (!DBA::isResult($contact)) {
-			Logger::warning('Contact not found', ['id' => $contact_id]);
+			DI::logger()->warning('Contact not found', ['id' => $contact_id]);
 			return;
 		}
 
@@ -65,14 +63,14 @@ class OnePoll
 			&& in_array($contact['network'], [Protocol::FEED, Protocol::MAIL])) {
 			$importer = User::getOwnerDataById($importer_uid);
 			if (empty($importer)) {
-				Logger::warning('No self contact for user', ['uid' => $importer_uid]);
+				DI::logger()->warning('No self contact for user', ['uid' => $importer_uid]);
 
 				// set the last-update so we don't keep polling
 				Contact::update(['last-update' => $updated], ['id' => $contact['id']]);
 				return;
 			}
 
-			Logger::info('Start polling/subscribing', ['protocol' => $contact['network'], 'id' => $contact['id']]);
+			DI::logger()->info('Start polling/subscribing', ['protocol' => $contact['network'], 'id' => $contact['id']]);
 			if ($contact['network'] === Protocol::FEED) {
 				$success = self::pollFeed($contact, $importer);
 			} elseif ($contact['network'] === Protocol::MAIL) {
@@ -81,7 +79,7 @@ class OnePoll
 				$success = self::subscribeToHub($contact['url'], $importer, $contact, $contact['blocked'] ? 'unsubscribe' : 'subscribe');
 			}
 			if (!$success) {
-				Logger::notice('Probing had been successful, polling/subscribing failed', ['protocol' => $contact['network'], 'id' => $contact['id'], 'url' => $contact['url']]);
+				DI::logger()->notice('Probing had been successful, polling/subscribing failed', ['protocol' => $contact['network'], 'id' => $contact['id'], 'url' => $contact['url']]);
 			}
 		}
 
@@ -93,7 +91,7 @@ class OnePoll
 			Contact::markForArchival($contact);
 		}
 
-		Logger::notice('End');
+		DI::logger()->notice('End');
 		return;
 	}
 
@@ -136,12 +134,12 @@ class OnePoll
 	{
 		// Are we allowed to import from this person?
 		if ($contact['rel'] == Contact::FOLLOWER || $contact['blocked']) {
-			Logger::notice('Contact is blocked or only a follower');
+			DI::logger()->notice('Contact is blocked or only a follower');
 			return false;
 		}
 
 		if (!Network::isValidHttpUrl($contact['poll'])) {
-			Logger::warning('Poll address is not valid', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url'], 'poll' => $contact['poll']]);
+			DI::logger()->warning('Poll address is not valid', ['id' => $contact['id'], 'uid' => $contact['uid'], 'url' => $contact['url'], 'poll' => $contact['poll']]);
 			return false;
 		}
 
@@ -150,26 +148,26 @@ class OnePoll
 		try {
 			$curlResult = DI::httpClient()->get($contact['poll'], HttpClientAccept::FEED_XML, [HttpClientOptions::COOKIEJAR => $cookiejar, HttpClientOptions::REQUEST => HttpClientRequest::FEEDFETCHER]);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return false;
 		}
 		unlink($cookiejar);
-		Logger::debug('Polled feed', ['url' => $contact['poll'], 'http-code' => $curlResult->getReturnCode(), 'redirect-url' => $curlResult->getRedirectUrl()]);
+		DI::logger()->debug('Polled feed', ['url' => $contact['poll'], 'http-code' => $curlResult->getReturnCode(), 'redirect-url' => $curlResult->getRedirectUrl()]);
 
 		if ($curlResult->isTimeout()) {
-			Logger::notice('Polling timed out', ['id' => $contact['id'], 'url' => $contact['poll']]);
+			DI::logger()->notice('Polling timed out', ['id' => $contact['id'], 'url' => $contact['poll']]);
 			return false;
 		}
 
 		if ($curlResult->isGone()) {
-			Logger::notice('URL is permanently gone', ['id' => $contact['id'], 'url' => $contact['poll']]);
+			DI::logger()->notice('URL is permanently gone', ['id' => $contact['id'], 'url' => $contact['poll']]);
 			Contact::remove($contact['id']);
 			return false;
 		}
 
 		if ($curlResult->redirectIsPermanent()) {
-			Logger::notice('Poll address permanently changed', [
-				'id' => $contact['id'],
+			DI::logger()->notice('Poll address permanently changed', [
+				'id'  => $contact['id'],
 				'uid' => $contact['uid'],
 				'old' => $contact['poll'],
 				'new' => $curlResult->getRedirectUrl(),
@@ -179,21 +177,21 @@ class OnePoll
 
 		$xml = $curlResult->getBodyString();
 		if (empty($xml)) {
-			Logger::notice('Empty content', ['id' => $contact['id'], 'url' => $contact['poll']]);
+			DI::logger()->notice('Empty content', ['id' => $contact['id'], 'url' => $contact['poll']]);
 			return false;
 		}
 
 		if (strpos($curlResult->getContentType(), 'xml') === false) {
-			Logger::notice('Unexpected content type.', ['id' => $contact['id'], 'url' => $contact['poll'], 'content-type' => $curlResult->getContentType()]);
+			DI::logger()->notice('Unexpected content type.', ['id' => $contact['id'], 'url' => $contact['poll'], 'content-type' => $curlResult->getContentType()]);
 			return false;
 		}
 
 		if (!strstr($xml, '<')) {
-			Logger::notice('response did not contain XML.', ['id' => $contact['id'], 'url' => $contact['poll']]);
+			DI::logger()->notice('response did not contain XML.', ['id' => $contact['id'], 'url' => $contact['poll']]);
 			return false;
 		}
 
-		Logger::notice('Consume feed of contact', ['id' => $contact['id'], 'url' => $contact['poll'], 'Content-Type' => $curlResult->getHeader('Content-Type')]);
+		DI::logger()->notice('Consume feed of contact', ['id' => $contact['id'], 'url' => $contact['poll'], 'Content-Type' => $curlResult->getHeader('Content-Type')]);
 
 		return !empty(Feed::import($xml, $importer, $contact));
 	}
@@ -210,37 +208,37 @@ class OnePoll
 	 */
 	private static function pollMail(array $contact, int $importer_uid, string $updated): bool
 	{
-		Logger::info('Fetching mails', ['addr' => $contact['addr']]);
+		DI::logger()->info('Fetching mails', ['addr' => $contact['addr']]);
 
 		$mail_disabled = ((function_exists('imap_open') && !DI::config()->get('system', 'imap_disabled')) ? 0 : 1);
 		if ($mail_disabled) {
-			Logger::notice('Mail is disabled');
+			DI::logger()->notice('Mail is disabled');
 			return false;
 		}
 
-		Logger::info('Mail is enabled');
+		DI::logger()->info('Mail is enabled');
 
 		$mbox = false;
 		$user = DBA::selectFirst('user', ['prvkey'], ['uid' => $importer_uid]);
 
 		$condition = ["`server` != ? AND `user` != ? AND `port` != ? AND `uid` = ?", '', '', 0, $importer_uid];
-		$mailconf = DBA::selectFirst('mailacct', [], $condition);
+		$mailconf  = DBA::selectFirst('mailacct', [], $condition);
 		if (DBA::isResult($user) && DBA::isResult($mailconf)) {
-			$mailbox = Email::constructMailboxName($mailconf);
+			$mailbox  = Email::constructMailboxName($mailconf);
 			$password = '';
 			openssl_private_decrypt(hex2bin($mailconf['pass']), $password, $user['prvkey']);
 			$mbox = Email::connect($mailbox, $mailconf['user'], $password);
 			unset($password);
-			Logger::notice('Connect', ['user' => $mailconf['user']]);
+			DI::logger()->notice('Connect', ['user' => $mailconf['user']]);
 
 			if ($mbox === false) {
-				Logger::notice('Connection error', ['user' => $mailconf['user'], 'error' => imap_errors()]);
+				DI::logger()->notice('Connection error', ['user' => $mailconf['user'], 'error' => imap_errors()]);
 				return false;
 			}
 
 			$fields = ['last_check' => $updated];
 			DBA::update('mailacct', $fields, ['id' => $mailconf['id']]);
-			Logger::notice('Connected', ['user' => $mailconf['user']]);
+			DI::logger()->notice('Connected', ['user' => $mailconf['user']]);
 		}
 
 		if ($mbox === false) {
@@ -250,12 +248,12 @@ class OnePoll
 		$msgs = Email::poll($mbox, $contact['addr']);
 
 		if (count($msgs)) {
-			Logger::info('Parsing mails', ['count' => count($msgs), 'addr' => $contact['addr'], 'user' => $mailconf['user']]);
+			DI::logger()->info('Parsing mails', ['count' => count($msgs), 'addr' => $contact['addr'], 'user' => $mailconf['user']]);
 
 			$metas = Email::messageMeta($mbox, implode(',', $msgs));
 
 			if (count($metas) != count($msgs)) {
-				Logger::info("for " . $mailconf['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas");
+				DI::logger()->info("for " . $mailconf['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas");
 			} else {
 				$msgs = array_combine($msgs, $metas);
 
@@ -264,7 +262,7 @@ class OnePoll
 						continue;
 					}
 
-					Logger::info('Parsing mail', ['message-uid' => $msg_uid]);
+					DI::logger()->info('Parsing mail', ['message-uid' => $msg_uid]);
 
 					$datarray = [
 						'uid'         => $importer_uid,
@@ -280,36 +278,37 @@ class OnePoll
 					// $meta = Email::messageMeta($mbox, $msg_uid);
 
 					// Have we seen it before?
-					$fields = ['deleted', 'id'];
+					$fields    = ['deleted', 'id'];
 					$condition = ['uid' => $importer_uid, 'uri' => $datarray['uri']];
-					$item = Post::selectFirst($fields, $condition);
+					$item      = Post::selectFirst($fields, $condition);
 					if (DBA::isResult($item)) {
-						Logger::info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . ' UID: ' . $importer_uid . ' URI: ' . $datarray['uri']);
+						DI::logger()->info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . ' UID: ' . $importer_uid . ' URI: ' . $datarray['uri']);
 
 						// Only delete when mails aren't automatically moved or deleted
-						if (($mailconf['action'] != 1) && ($mailconf['action'] != 3))
+						if (($mailconf['action'] != 1) && ($mailconf['action'] != 3)) {
 							if ($meta->deleted && ! $item['deleted']) {
 								$fields = ['deleted' => true, 'changed' => $updated];
 								Item::update($fields, ['id' => $item['id']]);
 							}
+						}
 
 						switch ($mailconf['action']) {
 							case 0:
-								Logger::info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . '. Doing nothing.');
+								DI::logger()->info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . '. Doing nothing.');
 								break;
 
 							case 1:
-								Logger::notice('Mail: Deleting ' . $msg_uid . ' for ' . $mailconf['user']);
+								DI::logger()->notice('Mail: Deleting ' . $msg_uid . ' for ' . $mailconf['user']);
 								imap_delete($mbox, $msg_uid, FT_UID);
 								break;
 
 							case 2:
-								Logger::notice('Mail: Mark as seen ' . $msg_uid . ' for ' . $mailconf['user']);
+								DI::logger()->notice('Mail: Mark as seen ' . $msg_uid . ' for ' . $mailconf['user']);
 								imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 								break;
 
 							case 3:
-								Logger::notice('Mail: Moving ' . $msg_uid . ' to ' . $mailconf['movetofolder'] . ' for ' . $mailconf['user']);
+								DI::logger()->notice('Mail: Moving ' . $msg_uid . ' to ' . $mailconf['movetofolder'] . ' for ' . $mailconf['user']);
 								imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 								if ($mailconf['movetofolder'] != '') {
 									imap_mail_move($mbox, $msg_uid, $mailconf['movetofolder'], FT_UID);
@@ -329,19 +328,19 @@ class OnePoll
 					if ($raw_refs) {
 						$refs_arr = explode(' ', $raw_refs);
 						if (count($refs_arr)) {
-							for ($x = 0; $x < count($refs_arr); $x ++) {
-								$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '],['', '', ''], $refs_arr[$x]));
+							for ($x = 0; $x < count($refs_arr); $x++) {
+								$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '], ['', '', ''], $refs_arr[$x]));
 							}
 						}
 						$condition = ['uri' => $refs_arr, 'uid' => $importer_uid];
-						$parent = Post::selectFirst(['uri'], $condition);
+						$parent    = Post::selectFirst(['uri'], $condition);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}
 					}
 
 					// Decoding the header
-					$subject = imap_mime_header_decode($meta->subject ?? '');
+					$subject           = imap_mime_header_decode($meta->subject ?? '');
 					$datarray['title'] = "";
 					foreach ($subject as $subpart) {
 						if ($subpart->charset != "default") {
@@ -366,8 +365,8 @@ class OnePoll
 					// If it seems to be a reply but a header couldn't be found take the last message with matching subject
 					if (empty($datarray['thr-parent']) && $reply) {
 						$condition = ['title' => $datarray['title'], 'uid' => $importer_uid, 'network' => Protocol::MAIL];
-						$params = ['order' => ['created' => true]];
-						$parent = Post::selectFirst(['uri'], $condition, $params);
+						$params    = ['order' => ['created' => true]];
+						$parent    = Post::selectFirst(['uri'], $condition, $params);
 						if (DBA::isResult($parent)) {
 							$datarray['thr-parent'] = $parent['uri'];
 						}
@@ -402,12 +401,12 @@ class OnePoll
 						$fromname = $headers->from[0]->personal;
 					}
 
-					$datarray['author-name'] = $fromname;
-					$datarray['author-link'] = 'mailto:' . $frommail;
+					$datarray['author-name']   = $fromname;
+					$datarray['author-link']   = 'mailto:' . $frommail;
 					$datarray['author-avatar'] = $contact['photo'];
 
-					$datarray['owner-name'] = $contact['name'];
-					$datarray['owner-link'] = 'mailto:' . $contact['addr'];
+					$datarray['owner-name']   = $contact['name'];
+					$datarray['owner-link']   = 'mailto:' . $contact['addr'];
 					$datarray['owner-avatar'] = $contact['photo'];
 
 					if (empty($datarray['thr-parent']) || ($datarray['thr-parent'] === $datarray['uri'])) {
@@ -415,37 +414,37 @@ class OnePoll
 					}
 
 					if (!DI::pConfig()->get($importer_uid, 'system', 'allow_public_email_replies')) {
-						$datarray['private'] = Item::PRIVATE;
+						$datarray['private']   = Item::PRIVATE;
 						$datarray['allow_cid'] = '<' . $contact['id'] . '>';
 					}
 
 					$datarray = Email::getMessage($mbox, $msg_uid, $reply, $datarray);
 					if (empty($datarray['body'])) {
-						Logger::warning('Cannot fetch mail', ['msg-id' => $msg_uid, 'uid' => $mailconf['user']]);
+						DI::logger()->warning('Cannot fetch mail', ['msg-id' => $msg_uid, 'uid' => $mailconf['user']]);
 						continue;
 					}
 
-					Logger::notice('Mail: Importing ' . $msg_uid . ' for ' . $mailconf['user']);
+					DI::logger()->notice('Mail: Importing ' . $msg_uid . ' for ' . $mailconf['user']);
 
 					Item::insert($datarray);
 
 					switch ($mailconf['action']) {
 						case 0:
-							Logger::info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . '. Doing nothing.');
+							DI::logger()->info('Mail: Seen before ' . $msg_uid . ' for ' . $mailconf['user'] . '. Doing nothing.');
 							break;
 
 						case 1:
-							Logger::notice('Mail: Deleting ' . $msg_uid . ' for ' . $mailconf['user']);
+							DI::logger()->notice('Mail: Deleting ' . $msg_uid . ' for ' . $mailconf['user']);
 							imap_delete($mbox, $msg_uid, FT_UID);
 							break;
 
 						case 2:
-							Logger::notice('Mail: Mark as seen ' . $msg_uid . ' for ' . $mailconf['user']);
+							DI::logger()->notice('Mail: Mark as seen ' . $msg_uid . ' for ' . $mailconf['user']);
 							imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 							break;
 
 						case 3:
-							Logger::notice('Mail: Moving ' . $msg_uid . ' to ' . $mailconf['movetofolder'] . ' for ' . $mailconf['user']);
+							DI::logger()->notice('Mail: Moving ' . $msg_uid . ' to ' . $mailconf['movetofolder'] . ' for ' . $mailconf['user']);
 							imap_setflag_full($mbox, $msg_uid, "\\Seen", ST_UID);
 							if ($mailconf['movetofolder'] != '') {
 								imap_mail_move($mbox, $msg_uid, $mailconf['movetofolder'], FT_UID);
@@ -455,11 +454,11 @@ class OnePoll
 				}
 			}
 		} else {
-			Logger::notice('No mails', ['user' => $mailconf['user']]);
+			DI::logger()->notice('No mails', ['user' => $mailconf['user']]);
 		}
 
 
-		Logger::info('Closing connection', ['user' => $mailconf['user']]);
+		DI::logger()->info('Closing connection', ['user' => $mailconf['user']]);
 		imap_close($mbox);
 
 		return true;
@@ -492,7 +491,7 @@ class OnePoll
 
 		$params = 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode($contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
 
-		Logger::info('Hub subscription start', ['mode' => $hubmode, 'name' => $contact['name'], 'hub' => $url, 'endpoint' => $push_url, 'verifier' => $verify_token]);
+		DI::logger()->info('Hub subscription start', ['mode' => $hubmode, 'name' => $contact['name'], 'hub' => $url, 'endpoint' => $push_url, 'verifier' => $verify_token]);
 
 		if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
 			Contact::update(['hub-verify' => $verify_token], ['id' => $contact['id']]);
@@ -501,11 +500,11 @@ class OnePoll
 		try {
 			$postResult = DI::httpClient()->post($url, $params, [], 0, HttpClientRequest::PUBSUB);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return false;
 		}
 
-		Logger::info('Hub subscription done', ['result' => $postResult->getReturnCode()]);
+		DI::logger()->info('Hub subscription done', ['result' => $postResult->getReturnCode()]);
 
 		return $postResult->isSuccess();
 	}

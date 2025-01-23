@@ -26,6 +26,8 @@ use Psr\Log\LoggerInterface;
  *
  * @see \Friendica\Core\Logger\Factory\StreamLogger
  * @see \Friendica\Core\Logger\Factory\SyslogLogger
+ *
+ * @internal
  */
 final class LegacyLoggerFactory implements LoggerFactory
 {

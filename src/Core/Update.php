@@ -169,7 +169,7 @@ class Update
 		if ($build != DB_UPDATE_VERSION || $force) {
 			require_once 'update.php';
 
-			$stored = intval($build);
+			$stored  = intval($build);
 			$current = intval(DB_UPDATE_VERSION);
 			if ($stored < $current || $force) {
 				DI::config()->reload();
@@ -178,7 +178,7 @@ class Update
 				// If the Lock is acquired, never release it automatically to avoid double updates
 				if (DI::lock()->acquire('dbupdate', 0, Cache\Enum\Duration::INFINITE)) {
 
-					Logger::notice('Update starting.', ['from' => $stored, 'to' => $current]);
+					DI::logger()->notice('Update starting.', ['from' => $stored, 'to' => $current]);
 
 					// Checks if the build changed during Lock acquiring (so no double update occurs)
 					$retryBuild = DI::config()->get('system', 'build');
@@ -192,7 +192,7 @@ class Update
 						}
 
 						if ($retryBuild != $build) {
-							Logger::notice('Update already done.', ['from' => $build, 'retry' => $retryBuild, 'to' => $current]);
+							DI::logger()->notice('Update already done.', ['from' => $build, 'retry' => $retryBuild, 'to' => $current]);
 							DI::lock()->release('dbupdate');
 							return '';
 						}
@@ -202,12 +202,15 @@ class Update
 
 					// run the pre_update_nnnn functions in update.php
 					for ($version = $stored + 1; $version <= $current; $version++) {
-						Logger::notice('Execute pre update.', ['version' => $version]);
-						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t('%s: executing pre update %d',
-							DateTimeFormat::utcNow() . ' ' . date('e'), $version));
+						DI::logger()->notice('Execute pre update.', ['version' => $version]);
+						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
+							'%s: executing pre update %d',
+							DateTimeFormat::utcNow() . ' ' . date('e'),
+							$version
+						));
 						$r = self::runUpdateFunction($version, 'pre_update', $sendMail);
 						if (!$r) {
-							Logger::warning('Pre update failed', ['version' => $version]);
+							DI::logger()->warning('Pre update failed', ['version' => $version]);
 							DI::config()->set('system', 'update', Update::FAILED);
 							DI::lock()->release('dbupdate');
 							DI::config()->beginTransaction()
@@ -216,12 +219,12 @@ class Update
 										->commit();
 							return $r;
 						} else {
-							Logger::notice('Pre update executed.', ['version' => $version]);
+							DI::logger()->notice('Pre update executed.', ['version' => $version]);
 						}
 					}
 
 					// update the structure in one call
-					Logger::notice('Execute structure update');
+					DI::logger()->notice('Execute structure update');
 					$retval = DBStructure::performUpdate(false, $verbose);
 					if (!empty($retval)) {
 						if ($sendMail) {
@@ -230,7 +233,7 @@ class Update
 								$retval
 							);
 						}
-						Logger::error('Update ERROR.', ['from' => $stored, 'to' => $current, 'retval' => $retval]);
+						DI::logger()->error('Update ERROR.', ['from' => $stored, 'to' => $current, 'retval' => $retval]);
 						DI::config()->set('system', 'update', Update::FAILED);
 						DI::lock()->release('dbupdate');
 						DI::config()->beginTransaction()
@@ -239,17 +242,20 @@ class Update
 									->commit();
 						return $retval;
 					} else {
-						Logger::notice('Database structure update finished.', ['from' => $stored, 'to' => $current]);
+						DI::logger()->notice('Database structure update finished.', ['from' => $stored, 'to' => $current]);
 					}
 
 					// run the update_nnnn functions in update.php
 					for ($version = $stored + 1; $version <= $current; $version++) {
-						Logger::notice('Execute post update.', ['version' => $version]);
-						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t('%s: executing post update %d',
-							DateTimeFormat::utcNow() . ' ' . date('e'), $version));
+						DI::logger()->notice('Execute post update.', ['version' => $version]);
+						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
+							'%s: executing post update %d',
+							DateTimeFormat::utcNow() . ' ' . date('e'),
+							$version
+						));
 						$r = self::runUpdateFunction($version, 'update', $sendMail);
 						if (!$r) {
-							Logger::warning('Post update failed', ['version' => $version]);
+							DI::logger()->warning('Post update failed', ['version' => $version]);
 							DI::config()->set('system', 'update', Update::FAILED);
 							DI::lock()->release('dbupdate');
 							DI::config()->beginTransaction()
@@ -259,7 +265,7 @@ class Update
 							return $r;
 						} else {
 							DI::config()->set('system', 'build', $version);
-							Logger::notice('Post update executed.', ['version' => $version]);
+							DI::logger()->notice('Post update executed.', ['version' => $version]);
 						}
 					}
 
@@ -271,12 +277,12 @@ class Update
 								->delete('system', 'maintenance_reason')
 								->commit();
 
-					Logger::notice('Update success.', ['from' => $stored, 'to' => $current]);
+					DI::logger()->notice('Update success.', ['from' => $stored, 'to' => $current]);
 					if ($sendMail) {
 						self::updateSuccessful($stored, $current);
 					}
 				} else {
-					Logger::warning('Update lock could not be acquired');
+					DI::logger()->warning('Update lock could not be acquired');
 				}
 			}
 		}
@@ -297,7 +303,7 @@ class Update
 	{
 		$funcname = $prefix . '_' . $version;
 
-		Logger::notice('Update function start.', ['function' => $funcname]);
+		DI::logger()->notice('Update function start.', ['function' => $funcname]);
 
 		if (function_exists($funcname)) {
 			// There could be a lot of processes running or about to run.
@@ -310,9 +316,9 @@ class Update
 			if (DI::lock()->acquire('dbupdate_function', 120, Cache\Enum\Duration::INFINITE)) {
 
 				// call the specific update
-				Logger::notice('Pre update function start.', ['function' => $funcname]);
+				DI::logger()->notice('Pre update function start.', ['function' => $funcname]);
 				$retval = $funcname();
-				Logger::notice('Update function done.', ['function' => $funcname]);
+				DI::logger()->notice('Update function done.', ['function' => $funcname]);
 
 				if ($retval) {
 					if ($sendMail) {
@@ -322,20 +328,20 @@ class Update
 							DI::l10n()->t('Update %s failed. See error logs.', $version)
 						);
 					}
-					Logger::error('Update function ERROR.', ['function' => $funcname, 'retval' => $retval]);
+					DI::logger()->error('Update function ERROR.', ['function' => $funcname, 'retval' => $retval]);
 					DI::lock()->release('dbupdate_function');
 					return false;
 				} else {
 					DI::lock()->release('dbupdate_function');
-					Logger::notice('Update function finished.', ['function' => $funcname]);
+					DI::logger()->notice('Update function finished.', ['function' => $funcname]);
 					return true;
 				}
 			} else {
-				Logger::error('Locking failed.', ['function' => $funcname]);
+				DI::logger()->error('Locking failed.', ['function' => $funcname]);
 				return false;
 			}
 		} else {
-			Logger::notice('Update function skipped.', ['function' => $funcname]);
+			DI::logger()->notice('Update function skipped.', ['function' => $funcname]);
 			return true;
 		}
 	}
@@ -352,20 +358,22 @@ class Update
 	{
 		$adminEmails = User::getAdminListForEmailing(['uid', 'language', 'email']);
 		if (!$adminEmails) {
-			Logger::warning('Cannot notify administrators .', ['update' => $update_id, 'message' => $error_message]);
+			DI::logger()->warning('Cannot notify administrators .', ['update' => $update_id, 'message' => $error_message]);
 			return;
 		}
 
 		foreach($adminEmails as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
-			$preamble = Strings::deindent($l10n->t("
+			$preamble = Strings::deindent($l10n->t(
+				"
 				The friendica developers released update %s recently,
 				but when I tried to install it, something went terribly wrong.
 				This needs to be fixed soon and I can't do it alone. Please contact a
 				friendica developer if you can not help me on your own. My database might be invalid.",
-				$update_id));
-			$body     = $l10n->t('The error message is\n[pre]%s[/pre]', $error_message);
+				$update_id
+			));
+			$body = $l10n->t('The error message is\n[pre]%s[/pre]', $error_message);
 
 			$email = DI::emailer()
 				->newSystemMail()
@@ -376,7 +384,7 @@ class Update
 			DI::emailer()->send($email);
 		}
 
-		Logger::alert('Database structure update failed.', ['error' => $error_message]);
+		DI::logger()->alert('Database structure update failed.', ['error' => $error_message]);
 	}
 
 	/**
@@ -391,9 +399,12 @@ class Update
 		foreach(User::getAdminListForEmailing(['uid', 'language', 'email']) as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
-			$preamble = Strings::deindent($l10n->t('
+			$preamble = Strings::deindent($l10n->t(
+				'
 				The friendica database was successfully updated from %s to %s.',
-				$from_build, $to_build));
+				$from_build,
+				$to_build
+			));
 
 			$email = DI::emailer()
 				->newSystemMail()
@@ -404,6 +415,6 @@ class Update
 			DI::emailer()->send($email);
 		}
 
-		Logger::debug('Database structure update successful.');
+		DI::logger()->debug('Database structure update successful.');
 	}
 }

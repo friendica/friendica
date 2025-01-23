@@ -7,9 +7,9 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Model\Contact;
 
 class MergeContact
@@ -28,7 +28,7 @@ class MergeContact
 			return;
 		}
 
-		Logger::info('Handling duplicate', ['search' => $old_cid, 'replace' => $new_cid]);
+		DI::logger()->info('Handling duplicate', ['search' => $old_cid, 'replace' => $new_cid]);
 
 		foreach (['item', 'thread', 'post-user', 'post-thread-user'] as $table) {
 			if (DBStructure::existsTable($table)) {

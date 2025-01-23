@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker\Contact;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
@@ -25,7 +24,7 @@ class RemoveContent
 			return false;
 		}
 
-		Logger::info('Start deleting contact content', ['cid' => $id]);
+		DI::logger()->info('Start deleting contact content', ['cid' => $id]);
 
 		// Now we delete the contact and all depending tables
 		DBA::delete('post-tag', ['cid' => $id]);

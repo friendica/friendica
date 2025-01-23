@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub;
 
 class FetchFeaturedPosts
@@ -18,8 +18,8 @@ class FetchFeaturedPosts
 	 */
 	public static function execute(string $url)
 	{
-		Logger::info('Start fetching featured posts', ['url' => $url]);
+		DI::logger()->info('Start fetching featured posts', ['url' => $url]);
 		ActivityPub\Processor::fetchFeaturedPosts($url);
-		Logger::info('Finished fetching featured posts', ['url' => $url]);
+		DI::logger()->info('Finished fetching featured posts', ['url' => $url]);
 	}
 }

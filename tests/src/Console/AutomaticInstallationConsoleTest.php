@@ -13,7 +13,6 @@ use Friendica\Console\AutomaticInstallation;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\ConsoleTestCase;
@@ -23,7 +22,6 @@ use Mockery;
 use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
-use Psr\Log\NullLogger;
 
 class AutomaticInstallationConsoleTest extends ConsoleTestCase
 {
@@ -59,13 +57,14 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 	 */
 	private $dice;
 
-	public function setUp() : void
+	public function setUp(): void
 	{
 		static::markTestSkipped('Needs class \'Installer\' as constructing argument for console tests');
 
 		parent::setUp();
 
-		$this->setUpVfsDir();;
+		$this->setUpVfsDir();
+		;
 
 		if ($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php')) {
 			$this->root->getChild('config')
@@ -77,8 +76,8 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 		$l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
 
 		$this->dice->shouldReceive('create')
-		           ->with(L10n::class)
-		           ->andReturn($l10nMock);
+				   ->with(L10n::class)
+				   ->andReturn($l10nMock);
 
 		DI::init($this->dice);
 
@@ -104,7 +103,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 		});
 
 		$this->mode->shouldReceive('isInstall')->andReturn(true);
-		Logger::init(new NullLogger());
 	}
 
 	/**
@@ -118,11 +116,11 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 			'empty' => [
 				'data' => [
 					'database' => [
-						'hostname'    => '',
-						'username'    => '',
-						'password'    => '',
-						'database'    => '',
-						'port'        => '',
+						'hostname' => '',
+						'username' => '',
+						'password' => '',
+						'database' => '',
+						'port'     => '',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -130,23 +128,23 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 						'admin_email' => '',
 					],
 					'system' => [
-						'basepath'    => '',
-						'urlpath'     => '',
-						'url'         => 'http://friendica.local',
-						'ssl_policy'  => 0,
+						'basepath'         => '',
+						'urlpath'          => '',
+						'url'              => 'http://friendica.local',
+						'ssl_policy'       => 0,
 						'default_timezone' => '',
-						'language'    => '',
+						'language'         => '',
 					],
 				],
 			],
 			'normal' => [
 				'data' => [
 					'database' => [
-						'hostname'    => 'testhost',
-						'port'        => 3306,
-						'username'    => 'friendica',
-						'password'    => 'a password',
-						'database'    => 'database',
+						'hostname' => 'testhost',
+						'port'     => 3306,
+						'username' => 'friendica',
+						'password' => 'a password',
+						'database' => 'database',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -154,23 +152,23 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'     => 'test/it',
-						'url'         => 'http://friendica.local/test/it',
-						'basepath'    => '',
-						'ssl_policy'  => '2',
+						'urlpath'          => 'test/it',
+						'url'              => 'http://friendica.local/test/it',
+						'basepath'         => '',
+						'ssl_policy'       => '2',
 						'default_timezone' => 'en',
-						'language'    => 'Europe/Berlin',
+						'language'         => 'Europe/Berlin',
 					],
 				],
 			],
 			'special' => [
 				'data' => [
 					'database' => [
-						'hostname'    => 'testhost.new.domain',
-						'port'        => 3341,
-						'username'    => 'fr"§%ica',
-						'password'    => '$%\"gse',
-						'database'    => 'db',
+						'hostname' => 'testhost.new.domain',
+						'port'     => 3341,
+						'username' => 'fr"§%ica',
+						'password' => '$%\"gse',
+						'database' => 'db',
 					],
 					'config' => [
 						'php_path'    => '',
@@ -178,12 +176,12 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'     => 'test/it',
-						'url'         => 'https://friendica.local/test/it',
-						'basepath'    => '',
-						'ssl_policy'  => '1',
+						'urlpath'          => 'test/it',
+						'url'              => 'https://friendica.local/test/it',
+						'basepath'         => '',
+						'ssl_policy'       => '1',
 						'default_timezone' => 'en',
-						'language'    => 'Europe/Berlin',
+						'language'         => 'Europe/Berlin',
 					],
 				],
 			],
@@ -565,22 +563,22 @@ CONF;
 
 		$console = new AutomaticInstallation($this->consoleArgv);
 
-		$option = function($var, $cat, $key) use ($data, $console) {
+		$option = function ($var, $cat, $key) use ($data, $console) {
 			if (!empty($data[$cat][$key])) {
 				$console->setOption($var, $data[$cat][$key]);
 			}
 		};
-		$option('dbhost'    , 'database', 'hostname');
-		$option('dbport'    , 'database', 'port');
-		$option('dbuser'    , 'database', 'username');
-		$option('dbpass'    , 'database', 'password');
-		$option('dbdata'    , 'database', 'database');
-		$option('url'       , 'system'  , 'url');
-		$option('phppath'   , 'config'  , 'php_path');
-		$option('admin'     , 'config'  , 'admin_email');
-		$option('tz'        , 'system'  , 'default_timezone');
-		$option('lang'      , 'system'  , 'language');
-		$option('basepath'  , 'system'  , 'basepath');
+		$option('dbhost', 'database', 'hostname');
+		$option('dbport', 'database', 'port');
+		$option('dbuser', 'database', 'username');
+		$option('dbpass', 'database', 'password');
+		$option('dbdata', 'database', 'database');
+		$option('url', 'system', 'url');
+		$option('phppath', 'config', 'php_path');
+		$option('admin', 'config', 'admin_email');
+		$option('tz', 'system', 'default_timezone');
+		$option('lang', 'system', 'language');
+		$option('basepath', 'system', 'basepath');
 
 		$txt = $this->dumpExecute($console);
 

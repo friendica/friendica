@@ -11,7 +11,6 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\AppHelper;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -73,18 +72,18 @@ class ListTimeline extends BaseApi
 			$items = $this->getStatusesForGroup($uid, $request);
 		} elseif (substr($this->parameters['id'], 0, 8) == 'channel:') {
 			$items = $this->getStatusesForChannel($uid, $request);
-		} else{
+		} else {
 			$items = $this->getStatusesForCircle($uid, $request);
 		}
 
 		$statuses = [];
 		foreach ($items as $item) {
 			try {
-				$status =  DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {
-				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
+				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
 			}
 		}
 
@@ -136,7 +135,7 @@ class ListTimeline extends BaseApi
 		];
 
 		$condition = $this->addPagingConditions($request, $condition);
-		$params = $this->buildOrderAndLimitParams($request);
+		$params    = $this->buildOrderAndLimitParams($request);
 
 		if ($request['only_media']) {
 			$condition = DBA::mergeConditions($condition, [

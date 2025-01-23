@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter\Statuses;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Module\BaseApi;
 use Friendica\DI;
@@ -34,7 +33,7 @@ class Show extends BaseApi
 			throw new BadRequestException('An id is missing.');
 		}
 
-		Logger::notice('API: api_statuses_show: ' . $id);
+		$this->logger->notice('API: api_statuses_show: ' . $id);
 
 		$conversation = !empty($request['conversation']);
 

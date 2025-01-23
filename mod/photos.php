@@ -13,7 +13,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
 use Friendica\Core\Addon;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -115,8 +114,8 @@ function photos_post()
 		throw new HTTPException\NotFoundException(DI::l10n()->t('User not found.'));
 	}
 
-	$can_post  = false;
-	$visitor   = 0;
+	$can_post = false;
+	$visitor  = 0;
 
 	$page_owner_uid = intval($user['uid']);
 	$community_page = in_array($user['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN]);
@@ -125,8 +124,8 @@ function photos_post()
 		$can_post = true;
 	} elseif ($community_page && !empty(DI::userSession()->getRemoteContactID($page_owner_uid))) {
 		$contact_id = DI::userSession()->getRemoteContactID($page_owner_uid);
-		$can_post = true;
-		$visitor = $contact_id;
+		$can_post   = true;
+		$visitor    = $contact_id;
 	}
 
 	if (!$can_post) {
@@ -142,7 +141,7 @@ function photos_post()
 		System::exit();
 	}
 
-	$aclFormatter = DI::aclFormatter();
+	$aclFormatter      = DI::aclFormatter();
 	$str_contact_allow = isset($_REQUEST['contact_allow']) ? $aclFormatter->toString($_REQUEST['contact_allow']) : $owner_record['allow_cid'] ?? '';
 	$str_circle_allow  = isset($_REQUEST['circle_allow'])  ? $aclFormatter->toString($_REQUEST['circle_allow'])  : $owner_record['allow_gid'] ?? '';
 	$str_contact_deny  = isset($_REQUEST['contact_deny'])  ? $aclFormatter->toString($_REQUEST['contact_deny'])  : $owner_record['deny_cid']  ?? '';
@@ -152,7 +151,7 @@ function photos_post()
 	if ($visibility === 'public') {
 		// The ACL selector introduced in version 2019.12 sends ACL input data even when the Public visibility is selected
 		$str_contact_allow = $str_circle_allow = $str_contact_deny = $str_circle_deny = '';
-	} else if ($visibility === 'custom') {
+	} elseif ($visibility === 'custom') {
 		// Since we know from the visibility parameter the item should be private, we have to prevent the empty ACL
 		// case that would make it public. So we always append the author's contact id to the allowed contacts.
 		// See https://github.com/friendica/friendica/issues/9672
@@ -277,7 +276,7 @@ function photos_post()
 		}
 
 		if (!empty($_POST['rotate']) && (intval($_POST['rotate']) == 1 || intval($_POST['rotate']) == 2)) {
-			Logger::debug('rotate');
+			DI::logger()->debug('rotate');
 
 			$photo = Photo::getPhotoForUser($page_owner_uid, $resource_id);
 
@@ -318,7 +317,7 @@ function photos_post()
 
 		if (DBA::isResult($photos)) {
 			$photo = $photos[0];
-			$ext = Images::getExtensionByMimeType($photo['type']);
+			$ext   = Images::getExtensionByMimeType($photo['type']);
 			Photo::update(
 				['desc' => $desc, 'album' => $albname, 'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow, 'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny],
 				['resource-id' => $resource_id, 'uid' => $page_owner_uid]
@@ -333,9 +332,9 @@ function photos_post()
 		if (DBA::isResult($photos) && !$item_id) {
 			// Create item container
 			$title = '';
-			$uri = Item::newURI();
+			$uri   = Item::newURI();
 
-			$arr = [];
+			$arr                  = [];
 			$arr['guid']          = System::createUUID();
 			$arr['uid']           = $page_owner_uid;
 			$arr['uri']           = $uri;
@@ -357,7 +356,7 @@ function photos_post()
 			$arr['visible']       = 0;
 			$arr['origin']        = 1;
 
-			$arr['body']          = Images::getBBCodeByResource($photo['resource-id'], $user['nickname'], $photo['scale'], $ext);
+			$arr['body'] = Images::getBBCodeByResource($photo['resource-id'], $user['nickname'], $photo['scale'], $ext);
 
 			$item_id = Item::insert($arr);
 		}
@@ -371,7 +370,7 @@ function photos_post()
 		}
 
 		if (strlen($rawtags)) {
-			$inform   = '';
+			$inform = '';
 
 			// if the new tag doesn't have a namespace specifier (@foo or #foo) give it a hashtag
 			$x = substr($rawtags, 0, 1);
@@ -380,13 +379,13 @@ function photos_post()
 			}
 
 			$taginfo = [];
-			$tags = BBCode::getTags($rawtags);
+			$tags    = BBCode::getTags($rawtags);
 
 			if (count($tags)) {
 				foreach ($tags as $tag) {
 					if (strpos($tag, '@') === 0) {
 						$profile = '';
-						$name = substr($tag, 1);
+						$name    = substr($tag, 1);
 						$contact = Contact::getByURL($name);
 						if (empty($contact)) {
 							$newname = $name;
@@ -454,7 +453,7 @@ function photos_post()
 			}
 			$newinform .= $inform;
 
-			$fields = ['inform' => $newinform, 'edited' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()];
+			$fields    = ['inform' => $newinform, 'edited' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()];
 			$condition = ['id' => $item_id];
 			Item::update($fields, $condition);
 
@@ -553,7 +552,7 @@ function photos_content()
 	$datum = null;
 	if (DI::args()->getArgc() > 3) {
 		$datatype = DI::args()->getArgv()[2];
-		$datum = DI::args()->getArgv()[3];
+		$datum    = DI::args()->getArgv()[3];
 	} elseif ((DI::args()->getArgc() > 2) && (DI::args()->getArgv()[2] === 'upload')) {
 		$datatype = 'upload';
 	} else {
@@ -583,12 +582,12 @@ function photos_content()
 		$can_post = true;
 	} elseif ($community_page && !empty(DI::userSession()->getRemoteContactID($owner_uid))) {
 		$contact_id = DI::userSession()->getRemoteContactID($owner_uid);
-		$contact = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => $owner_uid, 'blocked' => false, 'pending' => false]);
+		$contact    = DBA::selectFirst('contact', [], ['id' => $contact_id, 'uid' => $owner_uid, 'blocked' => false, 'pending' => false]);
 
 		if (DBA::isResult($contact)) {
-			$can_post = true;
+			$can_post       = true;
 			$remote_contact = true;
-			$visitor = $contact_id;
+			$visitor        = $contact_id;
 		}
 	}
 
@@ -644,14 +643,14 @@ function photos_content()
 		$uploader = '';
 
 		$ret = [
-			'post_url' => 'profile/' . $user['nickname'] . '/photos',
-			'addon_text' => $uploader,
+			'post_url'       => 'profile/' . $user['nickname'] . '/photos',
+			'addon_text'     => $uploader,
 			'default_upload' => true
 		];
 
 		Hook::callAll('photo_upload_form', $ret);
 
-		$default_upload_box = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
+		$default_upload_box    = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
 		$default_upload_submit = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_submit.tpl'), [
 			'$submit' => DI::l10n()->t('Submit'),
 		]);
@@ -676,22 +675,22 @@ function photos_content()
 		$aclselect_e = ($visitor ? '' : ACL::getFullSelectorHTML(DI::page(), DI::userSession()->getLocalUserId()));
 
 		$o .= Renderer::replaceMacros($tpl, [
-			'$pagename' => DI::l10n()->t('Upload Photos'),
-			'$sessid' => session_id(),
-			'$usage' => $usage_message,
-			'$nickname' => $user['nickname'],
-			'$newalbum' => DI::l10n()->t('New album name: '),
-			'$existalbumtext' => DI::l10n()->t('or select existing album:'),
-			'$nosharetext' => DI::l10n()->t('Do not show a status post for this upload'),
-			'$albumselect' => $albumselect,
-			'$selname' => $selname,
-			'$permissions' => DI::l10n()->t('Permissions'),
-			'$aclselect' => $aclselect_e,
-			'$lockstate' => ACL::getLockstateForUserId(DI::userSession()->getLocalUserId()) ? 'lock' : 'unlock',
-			'$alt_uploader' => $ret['addon_text'],
-			'$default_upload_box' => ($ret['default_upload'] ? $default_upload_box : ''),
+			'$pagename'              => DI::l10n()->t('Upload Photos'),
+			'$sessid'                => session_id(),
+			'$usage'                 => $usage_message,
+			'$nickname'              => $user['nickname'],
+			'$newalbum'              => DI::l10n()->t('New album name: '),
+			'$existalbumtext'        => DI::l10n()->t('or select existing album:'),
+			'$nosharetext'           => DI::l10n()->t('Do not show a status post for this upload'),
+			'$albumselect'           => $albumselect,
+			'$selname'               => $selname,
+			'$permissions'           => DI::l10n()->t('Permissions'),
+			'$aclselect'             => $aclselect_e,
+			'$lockstate'             => ACL::getLockstateForUserId(DI::userSession()->getLocalUserId()) ? 'lock' : 'unlock',
+			'$alt_uploader'          => $ret['addon_text'],
+			'$default_upload_box'    => ($ret['default_upload'] ? $default_upload_box : ''),
 			'$default_upload_submit' => ($ret['default_upload'] ? $default_upload_submit : ''),
-			'$uploadurl' => $ret['post_url'],
+			'$uploadurl'             => $ret['post_url'],
 
 			// ACL permissions box
 			'$return_path' => DI::args()->getQueryString(),
@@ -713,7 +712,7 @@ function photos_content()
 		}
 
 		$total = 0;
-		$r = DBA::toArray(DBA::p(
+		$r     = DBA::toArray(DBA::p(
 			"SELECT `resource-id`, MAX(`scale`) AS `scale` FROM `photo` WHERE `uid` = ? AND `album` = ?
 			AND `scale` <= 4 $sql_extra GROUP BY `resource-id`",
 			$owner_uid,
@@ -749,7 +748,7 @@ function photos_content()
 			$drop_url = DI::args()->getQueryString();
 
 			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
-				'$l10n'           => [
+				'$l10n' => [
 					'message' => DI::l10n()->t('Do you really want to delete this photo album and all its photos?'),
 					'confirm' => DI::l10n()->t('Delete Album'),
 					'cancel'  => DI::l10n()->t('Cancel'),
@@ -769,11 +768,11 @@ function photos_content()
 				$album_e = $album;
 
 				$o .= Renderer::replaceMacros($edit_tpl, [
-					'$nametext' => DI::l10n()->t('New album name: '),
-					'$nickname' => $user['nickname'],
-					'$album' => $album_e,
-					'$hexalbum' => bin2hex($album),
-					'$submit' => DI::l10n()->t('Submit'),
+					'$nametext'   => DI::l10n()->t('New album name: '),
+					'$nickname'   => $user['nickname'],
+					'$album'      => $album_e,
+					'$hexalbum'   => bin2hex($album),
+					'$submit'     => DI::l10n()->t('Submit'),
 					'$dropsubmit' => DI::l10n()->t('Delete Album')
 				]);
 			}
@@ -783,7 +782,7 @@ function photos_content()
 		}
 
 		if ($order_field === 'created') {
-			$order =  [DI::l10n()->t('Show Newest First'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album), 'oldest'];
+			$order = [DI::l10n()->t('Show Newest First'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album), 'oldest'];
 		} else {
 			$order = [DI::l10n()->t('Show Oldest First'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '?order=created', 'newest'];
 		}
@@ -799,7 +798,7 @@ function photos_content()
 				$ext = Images::getExtensionByMimeType($rr['type']);
 
 				$imgalt_e = $rr['filename'];
-				$desc_e = $rr['desc'];
+				$desc_e   = $rr['desc'];
 
 				$photos[] = [
 					'id'    => $rr['id'],
@@ -818,13 +817,13 @@ function photos_content()
 
 		$tpl = Renderer::getMarkupTemplate('photo_album.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$photos' => $photos,
-			'$album' => $album,
+			'$photos'   => $photos,
+			'$album'    => $album,
 			'$can_post' => $can_post,
-			'$upload' => [DI::l10n()->t('Upload New Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
-			'$order' => $order,
-			'$edit' => $edit,
-			'$drop' => $drop,
+			'$upload'   => [DI::l10n()->t('Upload New Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
+			'$order'    => $order,
+			'$edit'     => $edit,
+			'$drop'     => $drop,
 			'$paginate' => $pager->renderFull($total),
 		]);
 
@@ -849,7 +848,7 @@ function photos_content()
 			$drop_url = DI::args()->getQueryString();
 
 			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
-				'$l10n'           => [
+				'$l10n' => [
 					'message' => DI::l10n()->t('Do you really want to delete this photo?'),
 					'confirm' => DI::l10n()->t('Delete Photo'),
 					'cancel'  => DI::l10n()->t('Cancel'),
@@ -951,8 +950,8 @@ function photos_content()
 			if ($cmd === 'edit') {
 				$tools['view'] = ['photos/' . $user['nickname'] . '/image/' . $datum, DI::l10n()->t('View photo')];
 			} else {
-				$tools['edit'] = ['photos/' . $user['nickname'] . '/image/' . $datum . '/edit', DI::l10n()->t('Edit photo')];
-				$tools['delete'] = ['photos/' . $user['nickname'] . '/image/' . $datum . '/drop', DI::l10n()->t('Delete photo')];
+				$tools['edit']    = ['photos/' . $user['nickname'] . '/image/' . $datum . '/edit', DI::l10n()->t('Edit photo')];
+				$tools['delete']  = ['photos/' . $user['nickname'] . '/image/' . $datum . '/drop', DI::l10n()->t('Delete photo')];
 				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], DI::l10n()->t('Use as profile photo')];
 			}
 
@@ -974,9 +973,9 @@ function photos_content()
 			'filename' => $hires['filename'],
 		];
 
-		$map = null;
+		$map       = null;
 		$link_item = [];
-		$total = 0;
+		$total     = 0;
 
 		// Do we have an item for this photo?
 
@@ -990,12 +989,12 @@ function photos_content()
 
 		if (!empty($link_item['parent']) && !empty($link_item['uid'])) {
 			$condition = ["`parent` = ? AND `gravity` = ?",  $link_item['parent'], Item::GRAVITY_COMMENT];
-			$total = Post::count($condition);
+			$total     = Post::count($condition);
 
 			$pager = new Pager(DI::l10n(), DI::args()->getQueryString());
 
 			$params = ['order' => ['id'], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
-			$items = Post::toArray(Post::selectForUser($link_item['uid'], array_merge(Item::ITEM_FIELDLIST, ['author-alias']), $condition, $params));
+			$items  = Post::toArray(Post::selectForUser($link_item['uid'], array_merge(Item::ITEM_FIELDLIST, ['author-alias']), $condition, $params));
 
 			if (DI::userSession()->getLocalUserId() == $link_item['uid']) {
 				Item::update(['unseen' => false], ['parent' => $link_item['parent']]);
@@ -1022,51 +1021,51 @@ function photos_content()
 			$tags = ['title' => DI::l10n()->t('Tags: '), 'tags' => $tag_arr];
 			if ($cmd === 'edit') {
 				$tags['removeanyurl'] = 'post/' . $link_item['id'] . '/tag/remove?return=' . urlencode(DI::args()->getCommand());
-				$tags['removetitle'] = DI::l10n()->t('[Select tags to remove]');
+				$tags['removetitle']  = DI::l10n()->t('[Select tags to remove]');
 			}
 		}
 
 
-		$edit = Null;
+		$edit = null;
 		if ($cmd === 'edit' && $can_post) {
 			$edit_tpl = Renderer::getMarkupTemplate('photo_edit.tpl');
 
-			$album_e = $ph[0]['album'];
-			$caption_e = $ph[0]['desc'];
+			$album_e     = $ph[0]['album'];
+			$caption_e   = $ph[0]['desc'];
 			$aclselect_e = ACL::getFullSelectorHTML(DI::page(), DI::userSession()->getLocalUserId(), false, ACL::getDefaultUserPermissions($ph[0]));
 
 			$edit = Renderer::replaceMacros($edit_tpl, [
-				'$id' => $ph[0]['id'],
-				'$album' => ['albname', DI::l10n()->t('New album name'), $album_e, ''],
-				'$caption' => ['desc', DI::l10n()->t('Caption'), $caption_e, ''],
-				'$tags' => ['newtag', DI::l10n()->t('Add a Tag'), "", DI::l10n()->t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping')],
+				'$id'          => $ph[0]['id'],
+				'$album'       => ['albname', DI::l10n()->t('New album name'), $album_e, ''],
+				'$caption'     => ['desc', DI::l10n()->t('Caption'), $caption_e, ''],
+				'$tags'        => ['newtag', DI::l10n()->t('Add a Tag'), "", DI::l10n()->t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping')],
 				'$rotate_none' => ['rotate', DI::l10n()->t('Do not rotate'), 0, '', true],
-				'$rotate_cw' => ['rotate', DI::l10n()->t("Rotate CW \x28right\x29"), 1, ''],
-				'$rotate_ccw' => ['rotate', DI::l10n()->t("Rotate CCW \x28left\x29"), 2, ''],
+				'$rotate_cw'   => ['rotate', DI::l10n()->t("Rotate CW \x28right\x29"), 1, ''],
+				'$rotate_ccw'  => ['rotate', DI::l10n()->t("Rotate CCW \x28left\x29"), 2, ''],
 
-				'$nickname' => $user['nickname'],
+				'$nickname'    => $user['nickname'],
 				'$resource_id' => $ph[0]['resource-id'],
 				'$permissions' => DI::l10n()->t('Permissions'),
-				'$aclselect' => $aclselect_e,
+				'$aclselect'   => $aclselect_e,
 
 				'$item_id' => $link_item['id'] ?? 0,
-				'$submit' => DI::l10n()->t('Submit'),
-				'$delete' => DI::l10n()->t('Delete Photo'),
+				'$submit'  => DI::l10n()->t('Submit'),
+				'$delete'  => DI::l10n()->t('Delete Photo'),
 
 				// ACL permissions box
 				'$return_path' => DI::args()->getQueryString(),
 			]);
 		}
 
-		$like = '';
-		$dislike = '';
+		$like        = '';
+		$dislike     = '';
 		$likebuttons = '';
-		$comments = '';
-		$paginate = '';
+		$comments    = '';
+		$paginate    = '';
 
 		if (!empty($link_item['id']) && !empty($link_item['uri'])) {
-			$cmnt_tpl = Renderer::getMarkupTemplate('comment_item.tpl');
-			$tpl = Renderer::getMarkupTemplate('photo_item.tpl');
+			$cmnt_tpl    = Renderer::getMarkupTemplate('comment_item.tpl');
+			$tpl         = Renderer::getMarkupTemplate('photo_item.tpl');
 			$return_path = DI::args()->getCommand();
 
 			if (!DBA::isResult($items)) {
@@ -1077,25 +1076,25 @@ function photos_content()
 					 */
 					$qcomment = null;
 					if (Addon::isEnabled('qcomment')) {
-						$words = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
+						$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 						$qcomment = $words ? explode("\n", $words) : [];
 					}
 
 					$comments .= Renderer::replaceMacros($cmnt_tpl, [
 						'$return_path' => '',
-						'$jsreload' => $return_path,
-						'$id' => $link_item['id'],
-						'$parent' => $link_item['id'],
-						'$profile_uid' =>  $owner_uid,
-						'$mylink' => $contact['url'],
-						'$mytitle' => DI::l10n()->t('This is you'),
-						'$myphoto' => $contact['thumb'],
-						'$comment' => DI::l10n()->t('Comment'),
-						'$submit' => DI::l10n()->t('Submit'),
-						'$preview' => DI::l10n()->t('Preview'),
-						'$loading' => DI::l10n()->t('Loading...'),
-						'$qcomment' => $qcomment,
-						'$rand_num' => Crypto::randomDigits(12),
+						'$jsreload'    => $return_path,
+						'$id'          => $link_item['id'],
+						'$parent'      => $link_item['id'],
+						'$profile_uid' => $owner_uid,
+						'$mylink'      => $contact['url'],
+						'$mytitle'     => DI::l10n()->t('This is you'),
+						'$myphoto'     => $contact['thumb'],
+						'$comment'     => DI::l10n()->t('Comment'),
+						'$submit'      => DI::l10n()->t('Submit'),
+						'$preview'     => DI::l10n()->t('Preview'),
+						'$loading'     => DI::l10n()->t('Loading...'),
+						'$qcomment'    => $qcomment,
+						'$rand_num'    => Crypto::randomDigits(12),
 					]);
 				}
 			}
@@ -1133,29 +1132,29 @@ function photos_content()
 					 */
 					$qcomment = null;
 					if (Addon::isEnabled('qcomment')) {
-						$words = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
+						$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 						$qcomment = $words ? explode("\n", $words) : [];
 					}
 
 					$comments .= Renderer::replaceMacros($cmnt_tpl, [
 						'$return_path' => '',
-						'$jsreload' => $return_path,
-						'$id' => $link_item['id'],
-						'$parent' => $link_item['id'],
-						'$profile_uid' =>  $owner_uid,
-						'$mylink' => $contact['url'],
-						'$mytitle' => DI::l10n()->t('This is you'),
-						'$myphoto' => $contact['thumb'],
-						'$comment' => DI::l10n()->t('Comment'),
-						'$submit' => DI::l10n()->t('Submit'),
-						'$preview' => DI::l10n()->t('Preview'),
-						'$qcomment' => $qcomment,
-						'$rand_num' => Crypto::randomDigits(12),
+						'$jsreload'    => $return_path,
+						'$id'          => $link_item['id'],
+						'$parent'      => $link_item['id'],
+						'$profile_uid' => $owner_uid,
+						'$mylink'      => $contact['url'],
+						'$mytitle'     => DI::l10n()->t('This is you'),
+						'$myphoto'     => $contact['thumb'],
+						'$comment'     => DI::l10n()->t('Comment'),
+						'$submit'      => DI::l10n()->t('Submit'),
+						'$preview'     => DI::l10n()->t('Preview'),
+						'$qcomment'    => $qcomment,
+						'$rand_num'    => Crypto::randomDigits(12),
 					]);
 				}
 
 				foreach ($items as $item) {
-					$comment = '';
+					$comment  = '';
 					$template = $tpl;
 
 					$activity = DI::activity();
@@ -1182,7 +1181,7 @@ function photos_content()
 					}
 
 					$dropping = (($item['contact-id'] == $contact_id) || ($item['uid'] == DI::userSession()->getLocalUserId()));
-					$drop = [
+					$drop     = [
 						'dropping' => $dropping,
 						'pagedrop' => false,
 						'select'   => DI::l10n()->t('Select'),
@@ -1190,7 +1189,7 @@ function photos_content()
 					];
 
 					$title_e = $item['title'];
-					$body_e = BBCode::convertForUriId($item['uri-id'], $item['body']);
+					$body_e  = BBCode::convertForUriId($item['uri-id'], $item['body']);
 
 					$comments .= Renderer::replaceMacros($template, [
 						'$id'          => $item['id'],
@@ -1213,24 +1212,24 @@ function photos_content()
 						 */
 						$qcomment = null;
 						if (Addon::isEnabled('qcomment')) {
-							$words = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
+							$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 							$qcomment = $words ? explode("\n", $words) : [];
 						}
 
 						$comments .= Renderer::replaceMacros($cmnt_tpl, [
 							'$return_path' => '',
-							'$jsreload' => $return_path,
-							'$id' => $item['id'],
-							'$parent' => $item['parent'],
-							'$profile_uid' =>  $owner_uid,
-							'$mylink' => $contact['url'],
-							'$mytitle' => DI::l10n()->t('This is you'),
-							'$myphoto' => $contact['thumb'],
-							'$comment' => DI::l10n()->t('Comment'),
-							'$submit' => DI::l10n()->t('Submit'),
-							'$preview' => DI::l10n()->t('Preview'),
-							'$qcomment' => $qcomment,
-							'$rand_num' => Crypto::randomDigits(12),
+							'$jsreload'    => $return_path,
+							'$id'          => $item['id'],
+							'$parent'      => $item['parent'],
+							'$profile_uid' => $owner_uid,
+							'$mylink'      => $contact['url'],
+							'$mytitle'     => DI::l10n()->t('This is you'),
+							'$myphoto'     => $contact['thumb'],
+							'$comment'     => DI::l10n()->t('Comment'),
+							'$submit'      => DI::l10n()->t('Submit'),
+							'$preview'     => DI::l10n()->t('Preview'),
+							'$qcomment'    => $qcomment,
+							'$rand_num'    => Crypto::randomDigits(12),
 						]);
 					}
 				}
@@ -1244,17 +1243,17 @@ function photos_content()
 			}
 
 			if ($cmd === 'view' && ($can_post || Security::canWriteToUserWall($owner_uid))) {
-				$like_tpl = Renderer::getMarkupTemplate('like_noshare.tpl');
+				$like_tpl    = Renderer::getMarkupTemplate('like_noshare.tpl');
 				$likebuttons = Renderer::replaceMacros($like_tpl, [
-					'$id' => $link_item['id'],
-					'$like' => DI::l10n()->t('Like'),
-					'$like_title' => DI::l10n()->t('I like this (toggle)'),
-					'$dislike' => DI::l10n()->t('Dislike'),
-					'$wait' => DI::l10n()->t('Please wait'),
+					'$id'            => $link_item['id'],
+					'$like'          => DI::l10n()->t('Like'),
+					'$like_title'    => DI::l10n()->t('I like this (toggle)'),
+					'$dislike'       => DI::l10n()->t('Dislike'),
+					'$wait'          => DI::l10n()->t('Please wait'),
 					'$dislike_title' => DI::l10n()->t('I don\'t like this (toggle)'),
-					'$hide_dislike' => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'hide_dislike'),
-					'$responses' => $responses,
-					'$return_path' => DI::args()->getQueryString(),
+					'$hide_dislike'  => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'hide_dislike'),
+					'$responses'     => $responses,
+					'$return_path'   => DI::args()->getQueryString(),
 				]);
 			}
 
@@ -1263,22 +1262,22 @@ function photos_content()
 
 		$photo_tpl = Renderer::getMarkupTemplate('photo_view.tpl');
 		$o .= Renderer::replaceMacros($photo_tpl, [
-			'$id' => $ph[0]['id'],
-			'$album' => [$album_link, $ph[0]['album']],
-			'$tools' => $tools,
-			'$photo' => $photo,
-			'$prevlink' => $prevlink,
-			'$nextlink' => $nextlink,
-			'$desc' => $ph[0]['desc'],
-			'$tags' => $tags,
-			'$edit' => $edit,
-			'$map' => $map,
-			'$map_text' => DI::l10n()->t('Map'),
+			'$id'          => $ph[0]['id'],
+			'$album'       => [$album_link, $ph[0]['album']],
+			'$tools'       => $tools,
+			'$photo'       => $photo,
+			'$prevlink'    => $prevlink,
+			'$nextlink'    => $nextlink,
+			'$desc'        => $ph[0]['desc'],
+			'$tags'        => $tags,
+			'$edit'        => $edit,
+			'$map'         => $map,
+			'$map_text'    => DI::l10n()->t('Map'),
 			'$likebuttons' => $likebuttons,
-			'$like' => $like,
-			'$dislike' => $dislike,
-			'$comments' => $comments,
-			'$paginate' => $paginate,
+			'$like'        => $like,
+			'$dislike'     => $dislike,
+			'$comments'    => $comments,
+			'$paginate'    => $paginate,
 		]);
 
 		DI::page()['htmlhead'] .= "\n" . '<meta name="twitter:card" content="summary_large_image" />' . "\n";

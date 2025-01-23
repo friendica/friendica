@@ -7,7 +7,6 @@
 
 namespace Friendica\Content\Text;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
 
@@ -25,10 +24,11 @@ class Markdown
 	 * @param string $baseuri  Optional. Prepend anchor links with this URL
 	 * @return string
 	 */
-	public static function convert($text, $hardwrap = true, $baseuri = null) {
+	public static function convert($text, $hardwrap = true, $baseuri = null)
+	{
 		DI::profiler()->startRecording('rendering');
 
-		$MarkdownParser = new MarkdownParser();
+		$MarkdownParser                     = new MarkdownParser();
 		$MarkdownParser->code_class_prefix  = 'language-';
 		$MarkdownParser->hard_wrap          = $hardwrap;
 		$MarkdownParser->hashtag_protection = true;
@@ -97,7 +97,7 @@ class Markdown
 	{
 		// @TODO Temporary until we find the source of the null value to finally set the correct type-hint
 		if (is_null($s)) {
-			Logger::warning('Received null value');
+			DI::logger()->warning('Received null value');
 			return '';
 		}
 
@@ -122,10 +122,10 @@ class Markdown
 
 		//$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3$4]$2$3$4[/url]',$s);
 		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism'   , '[youtube]$1[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/www.youtube.com\/shorts\/(.*?)\].*?\[\/url\]/ism'     , '[youtube]$1[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism'        , '[vimeo]$2[/vimeo]'    , 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism'              , '[vimeo]$1[/vimeo]'    , 'url', $s);
+		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/www.youtube.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism', '[youtube]$1[/youtube]', 'url', $s);
+		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/www.youtube.com\/shorts\/(.*?)\].*?\[\/url\]/ism', '[youtube]$1[/youtube]', 'url', $s);
+		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/url\]/ism', '[vimeo]$2[/vimeo]', 'url', $s);
+		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/vimeo.com\/([0-9]+)\](.*?)\[\/url\]/ism', '[vimeo]$1[/vimeo]', 'url', $s);
 
 		// remove duplicate adjacent code tags
 		$s = preg_replace('/(\[code\])+(.*?)(\[\/code\])+/ism', '[code]$2[/code]', $s);

@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter\Statuses;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -27,7 +26,7 @@ class UserTimeline extends BaseApi
 		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
-		Logger::info('api_statuses_user_timeline', ['api_user' => $uid, '_REQUEST' => $request]);
+		$this->logger->info('api_statuses_user_timeline', ['api_user' => $uid, '_REQUEST' => $request]);
 
 		$cid              = BaseApi::getContactIDForSearchterm($this->getRequestValue($request, 'screen_name', ''), $this->getRequestValue($request, 'profileurl', ''), $this->getRequestValue($request, 'user_id', 0), $uid);
 		$count            = $this->getRequestValue($request, 'count', 20, 1, 100);

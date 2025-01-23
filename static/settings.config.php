@@ -74,7 +74,7 @@ return [
 
 		// curl_timeout (Integer)
 		// Value is in seconds. Set to 0 for unlimited (not recommended).
-		'curl_timeout' =>  60,
+		'curl_timeout' => 60,
 
 		// dbclean (Boolean)
 		// Remove old remote items, orphaned database records and old content from some other helper tables.
@@ -256,6 +256,10 @@ return [
 		// update_active_contacts (Boolean)
 		// When activated, only public contacts will be activated regularly that are used for example in items or tags.
 		'update_active_contacts' => false,
+
+		// update_known_contacts (Boolean)
+		// When activated, only public contacts will be activated regularly that are in a contact list of a local user.
+		'update_known_contacts' => false,
 
 		// url (String)
 		// The fully-qualified URL of this Friendica node.

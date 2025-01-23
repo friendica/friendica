@@ -8,7 +8,7 @@
 namespace Friendica\Util;
 
 use Friendica\Content\ContactSelector;
-use Friendica\Core\Logger;
+use Friendica\DI;
 use ParagonIE\ConstantTime\Base64;
 
 /**
@@ -155,7 +155,7 @@ class Strings
 	{
 		if ($network != '') {
 			if ($url != '') {
-				$gsid = ContactSelector::getServerIdForProfile($url);
+				$gsid         = ContactSelector::getServerIdForProfile($url);
 				$network_name = '<a href="' . $url . '">' . ContactSelector::networkToName($network, '', $gsid) . '</a>';
 			} else {
 				$network_name = ContactSelector::networkToName($network);
@@ -214,8 +214,8 @@ class Strings
 
 		$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 		$bytes = max($bytes, 0);
-		$pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-		$pow = min($pow, count($units) - 1);
+		$pow   = floor(($bytes ? log($bytes) : 0) / log(1024));
+		$pow   = min($pow, count($units) - 1);
 		$bytes /= pow(1024, $pow);
 
 		return round($bytes, $precision) . ' ' . $units[$pow];
@@ -448,13 +448,13 @@ class Strings
 
 		if ($start < 0) {
 			$start = max(0, $string_length + $start);
-		} else if ($start > $string_length) {
+		} elseif ($start > $string_length) {
 			$start = $string_length;
 		}
 
 		if ($length < 0) {
 			$length = max(0, $string_length - $start + $length);
-		} else if ($length > $string_length) {
+		} elseif ($length > $string_length) {
 			$length = $string_length;
 		}
 
@@ -498,7 +498,7 @@ class Strings
 		);
 
 		if (is_null($return)) {
-			Logger::notice('Received null value from preg_replace_callback', ['text' => $text, 'regex' => $regex, 'blocks' => $blocks, 'executionId' => $executionId]);
+			DI::logger()->notice('Received null value from preg_replace_callback', ['text' => $text, 'regex' => $regex, 'blocks' => $blocks, 'executionId' => $executionId]);
 		}
 
 		$text = $callback($return ?? $text) ?? '';
@@ -544,8 +544,10 @@ class Strings
 		switch ($last) {
 			case 'g':
 				$shorthand *= 1024;
+				// no break
 			case 'm':
 				$shorthand *= 1024;
+				// no break
 			case 'k':
 				$shorthand *= 1024;
 		}
@@ -567,7 +569,7 @@ class Strings
 			return $url;
 		}
 
-		$scheme = [$parts['scheme'] . '://www.', $parts['scheme'] . '://'];
+		$scheme     = [$parts['scheme'] . '://www.', $parts['scheme'] . '://'];
 		$styled_url = str_replace($scheme, '', $url);
 
 		if (!empty($max_length) && strlen($styled_url) > $max_length) {

@@ -9,7 +9,6 @@ namespace Friendica\Model\Post;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -28,16 +27,16 @@ class Engagement
 	const KEYWORDS     = ['source', 'server', 'from', 'to', 'group', 'application', 'tag', 'network', 'platform', 'visibility', 'language', 'media'];
 	const SHORTCUTS    = ['lang' => 'language', 'net' => 'network', 'relay' => 'application'];
 	const ALTERNATIVES = ['source:news' => 'source:service', 'source:relay' => 'source:application',
-		'media:picture' => 'media:image', 'media:photo' => 'media:image',
-		'network:activitypub' => 'network:apub', 'network:friendica' => 'network:dfrn',
-		'network:diaspora' => 'network:dspr', 'network:discourse' => 'network:dscs',
-		'network:tumblr' => 'network:tmbl', 'network:bluesky' => 'network:bsky'];
-	const MEDIA_NONE = 0;
+		'media:picture'                    => 'media:image', 'media:photo' => 'media:image',
+		'network:activitypub'              => 'network:apub', 'network:friendica' => 'network:dfrn',
+		'network:diaspora'                 => 'network:dspr', 'network:discourse' => 'network:dscs',
+		'network:tumblr'                   => 'network:tmbl', 'network:bluesky' => 'network:bsky'];
+	const MEDIA_NONE  = 0;
 	const MEDIA_IMAGE = 1;
 	const MEDIA_VIDEO = 2;
 	const MEDIA_AUDIO = 4;
-	const MEDIA_CARD = 8;
-	const MEDIA_POST = 16;
+	const MEDIA_CARD  = 8;
+	const MEDIA_POST  = 16;
 
 	/**
 	 * Store engagement data from an item array
@@ -48,18 +47,20 @@ class Engagement
 	public static function storeFromItem(array $item): int
 	{
 		if (in_array($item['verb'], [Activity::FOLLOW, Activity::VIEW, Activity::READ])) {
-			Logger::debug('Technical activities are not stored', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'verb' => $item['verb']]);
+			DI::logger()->debug('Technical activities are not stored', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'verb' => $item['verb']]);
 			return 0;
 		}
 
-		$parent = Post::selectFirst(['uri-id', 'created', 'uid', 'private', 'quote-uri-id',
-			'contact-contact-type', 'network', 'title', 'content-warning', 'body', 'language',
-			'author-id', 'author-contact-type', 'author-nick', 'author-addr', 'author-gsid',
-			'owner-id', 'owner-contact-type', 'owner-nick', 'owner-addr', 'owner-gsid'],
-			['uri-id' => $item['parent-uri-id']]);
+		$parent = Post::selectFirst(
+			['uri-id', 'created', 'uid', 'private', 'quote-uri-id',
+				'contact-contact-type', 'network', 'title', 'content-warning', 'body', 'language',
+				'author-id', 'author-contact-type', 'author-nick', 'author-addr', 'author-gsid',
+				'owner-id', 'owner-contact-type', 'owner-nick', 'owner-addr', 'owner-gsid'],
+			['uri-id' => $item['parent-uri-id']]
+		);
 
 		if ($parent['created'] < self::getCreationDateLimit(false)) {
-			Logger::debug('Post is too old', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'created' => $parent['created']]);
+			DI::logger()->debug('Post is too old', ['uri-id' => $item['uri-id'], 'parent-uri-id' => $item['parent-uri-id'], 'created' => $parent['created']]);
 			return 0;
 		}
 
@@ -114,16 +115,16 @@ class Engagement
 			])
 		];
 		if (!$store && ($engagement['comments'] == 0) && ($engagement['activities'] == 0)) {
-			Logger::debug('No media, follower, subscribed tags, comments or activities. Engagement not stored', ['fields' => $engagement]);
+			DI::logger()->debug('No media, follower, subscribed tags, comments or activities. Engagement not stored', ['fields' => $engagement]);
 			return 0;
 		}
 		$exists = DBA::exists('post-engagement', ['uri-id' => $engagement['uri-id']]);
 		if ($exists) {
 			$ret = DBA::update('post-engagement', $engagement, ['uri-id' => $engagement['uri-id']]);
-			Logger::debug('Engagement updated', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
+			DI::logger()->debug('Engagement updated', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
 		} else {
 			$ret = DBA::insert('post-engagement', $engagement);
-			Logger::debug('Engagement inserted', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
+			DI::logger()->debug('Engagement inserted', ['uri-id' => $engagement['uri-id'], 'ret' => $ret]);
 		}
 		return ($ret && !$exists) ? $engagement['uri-id'] : 0;
 	}
@@ -135,7 +136,7 @@ class Engagement
 		$body = BBCode::removeSharedData($body);
 		$body = preg_replace('/[^@!#]\[url\=.*?\].*?\[\/url\]/ism', '', $body);
 		$body = BBCode::removeLinks($body);
-		$msg = BBCode::toPlaintext($body, false);
+		$msg  = BBCode::toPlaintext($body, false);
 
 		return mb_strlen($msg);
 	}
@@ -204,7 +205,7 @@ class Engagement
 		$body = '[nosmile]network_' . $item['network'];
 
 		if (!empty($item['author-gsid'])) {
-			$gserver = DBA::selectFirst('gserver', ['platform', 'nurl'], ['id' => $item['author-gsid']]);
+			$gserver  = DBA::selectFirst('gserver', ['platform', 'nurl'], ['id' => $item['author-gsid']]);
 			$platform = preg_replace('/[\W]/', '', $gserver['platform'] ?? '');
 			if (!empty($platform)) {
 				$body .= ' platform_' . $platform;
@@ -213,7 +214,7 @@ class Engagement
 		}
 
 		if (($item['owner-contact-type'] == Contact::TYPE_COMMUNITY) && !empty($item['owner-gsid']) && ($item['owner-gsid'] != ($item['author-gsid'] ?? 0))) {
-			$gserver = DBA::selectFirst('gserver', ['platform', 'nurl'], ['id' => $item['owner-gsid']]);
+			$gserver  = DBA::selectFirst('gserver', ['platform', 'nurl'], ['id' => $item['owner-gsid']]);
 			$platform = preg_replace('/[\W]/', '', $gserver['platform'] ?? '');
 			if (!empty($platform) && !strpos($body, 'platform_' . $platform)) {
 				$body .= ' platform_' . $platform;
@@ -253,7 +254,7 @@ class Engagement
 			$body .= ' from_' . $item['author-nick'] . ' from_' . $item['author-addr'];
 		}
 
-		if ($item['author-id'] !=  $item['owner-id']) {
+		if ($item['author-id'] != $item['owner-id']) {
 			if ($item['owner-contact-type'] == Contact::TYPE_COMMUNITY) {
 				$body .= ' group_' . $item['owner-nick'] . ' group_' . $item['owner-addr'];
 			} elseif (in_array($item['owner-contact-type'], [Contact::TYPE_PERSON, Contact::TYPE_NEWS, Contact::TYPE_ORGANISATION])) {
@@ -315,8 +316,10 @@ class Engagement
 
 	private static function addResharers(string $text, int $uri_id): string
 	{
-		$result = Post::selectPosts(['author-addr', 'author-nick', 'author-contact-type'],
-			['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE, 'author-contact-type' => [Contact::TYPE_RELAY, Contact::TYPE_COMMUNITY]]);
+		$result = Post::selectPosts(
+			['author-addr', 'author-nick', 'author-contact-type'],
+			['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE, 'author-contact-type' => [Contact::TYPE_RELAY, Contact::TYPE_COMMUNITY]]
+		);
 		while ($reshare = Post::fetch($result)) {
 			$prefix = '';
 
@@ -369,11 +372,11 @@ class Engagement
 	{
 		$limit = self::getCreationDateLimit(true);
 		if (empty($limit)) {
-			Logger::notice('Expiration limit not reached');
+			DI::logger()->notice('Expiration limit not reached');
 			return;
 		}
 		DBA::delete('post-engagement', ["`created` < ?", $limit]);
-		Logger::notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
+		DI::logger()->notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
 	}
 
 	private static function getCreationDateLimit(bool $forDeletion): string
@@ -393,11 +396,11 @@ class Engagement
 
 	public static function escapeKeywords(string $fullTextSearch): string
 	{
-		foreach (SELF::SHORTCUTS as $search => $replace) {
+		foreach (self::SHORTCUTS as $search => $replace) {
 			$fullTextSearch = preg_replace('~' . $search . ':(.[\w\*@\.-]+)~', $replace . ':$1', $fullTextSearch);
 		}
 
-		foreach (SELF::ALTERNATIVES as $search => $replace) {
+		foreach (self::ALTERNATIVES as $search => $replace) {
 			$fullTextSearch = str_replace($search, $replace, $fullTextSearch);
 		}
 

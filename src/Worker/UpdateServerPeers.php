@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -35,21 +34,21 @@ class UpdateServerPeers
 		try {
 			$ret = DI::httpClient()->get($url . '/api/v1/instance/peers', HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::SERVERDISCOVER]);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return;
 		}
 		if (!$ret->isSuccess() || empty($ret->getBodyString())) {
-			Logger::info('Server is not reachable or does not offer the "peers" endpoint', ['url' => $url]);
+			DI::logger()->info('Server is not reachable or does not offer the "peers" endpoint', ['url' => $url]);
 			return;
 		}
 
 		$peers = json_decode($ret->getBodyString());
 		if (empty($peers) || !is_array($peers)) {
-			Logger::info('Server does not have any peers listed', ['url' => $url]);
+			DI::logger()->info('Server does not have any peers listed', ['url' => $url]);
 			return;
 		}
 
-		Logger::info('Server peer update start', ['url' => $url]);
+		DI::logger()->info('Server peer update start', ['url' => $url]);
 
 		$total = 0;
 		$added = 0;
@@ -69,6 +68,6 @@ class UpdateServerPeers
 			++$added;
 			Worker::coolDown();
 		}
-		Logger::info('Server peer update ended', ['total' => $total, 'added' => $added, 'url' => $url]);
+		DI::logger()->info('Server peer update ended', ['total' => $total, 'added' => $added, 'url' => $url]);
 	}
 }

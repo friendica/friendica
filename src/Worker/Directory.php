@@ -8,7 +8,6 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Search;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -40,7 +39,7 @@ class Directory
 
 		Hook::callAll('globaldir_update', $arr);
 
-		Logger::info('Updating directory: ' . $arr['url']);
+		DI::logger()->info('Updating directory: ' . $arr['url']);
 		if (strlen($arr['url'])) {
 			DI::httpClient()->fetch($dir . '?url=' . bin2hex($arr['url']), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
 		}
@@ -48,7 +47,8 @@ class Directory
 		return;
 	}
 
-	private static function updateAll() {
+	private static function updateAll()
+	{
 		$users = DBA::select('owner-view', ['url'], ['net-publish' => true, 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]);
 		while ($user = DBA::fetch($users)) {
 			Worker::add(Worker::PRIORITY_LOW, 'Directory', $user['url']);

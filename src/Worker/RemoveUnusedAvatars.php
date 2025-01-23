@@ -8,8 +8,8 @@
 namespace Friendica\Worker;
 
 use Friendica\Contact\Avatar;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 
@@ -32,19 +32,19 @@ class RemoveUnusedAvatars
 		];
 
 		$total = DBA::count('contact', $condition);
-		Logger::notice('Starting removal', ['total' => $total]);
-		$count = 0;
+		DI::logger()->notice('Starting removal', ['total' => $total]);
+		$count    = 0;
 		$contacts = DBA::select('contact', ['id', 'uri-id', 'uid', 'photo', 'thumb', 'micro'], $condition);
 		while ($contact = DBA::fetch($contacts)) {
 			if (Avatar::deleteCache($contact) || Photo::delete(['uid' => 0, 'contact-id' => $contact['id'], 'photo-type' => [Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER]])) {
 				Contact::update(['photo' => '', 'thumb' => '', 'micro' => ''], ['id' => $contact['id']]);
 			}
 			if ((++$count % 1000) == 0) {
-				Logger::info('In removal', ['count' => $count, 'total' => $total]);
+				DI::logger()->info('In removal', ['count' => $count, 'total' => $total]);
 			}
 		}
 		DBA::close($contacts);
-		Logger::notice('Removal done', ['count' => $count, 'total' => $total]);
+		DI::logger()->notice('Removal done', ['count' => $count, 'total' => $total]);
 
 		self::fixPhotoContacts();
 		self::deleteDuplicates();
@@ -52,29 +52,29 @@ class RemoveUnusedAvatars
 
 	private static function fixPhotoContacts()
 	{
-		$total = 0;
-		$deleted = 0;
+		$total    = 0;
+		$deleted  = 0;
 		$updated1 = 0;
 		$updated2 = 0;
-		Logger::notice('Starting contact fix');
+		DI::logger()->notice('Starting contact fix');
 		$photos = DBA::select('photo', [], ["`uid` = ? AND `contact-id` IN (SELECT `id` FROM `contact` WHERE `uid` != ?) AND `contact-id` != ? AND `scale` IN (?, ?, ?)", 0, 0, 0, 4, 5, 6]);
 		while ($photo = DBA::fetch($photos)) {
 			$total++;
 			$photo_contact = Contact::getById($photo['contact-id']);
-			$resource = Photo::ridFromURI($photo_contact['photo']);
+			$resource      = Photo::ridFromURI($photo_contact['photo']);
 			if ($photo['resource-id'] == $resource) {
 				$contact = DBA::selectFirst('contact', [], ['nurl' => $photo_contact['nurl'], 'uid' => 0]);
 				if (!empty($contact['photo']) && ($contact['photo'] == $photo_contact['photo'])) {
-					Logger::notice('Photo updated to public user', ['id' => $photo['id'], 'contact-id' => $contact['id']]);
+					DI::logger()->notice('Photo updated to public user', ['id' => $photo['id'], 'contact-id' => $contact['id']]);
 					DBA::update('photo', ['contact-id' => $contact['id']], ['id' => $photo['id']]);
 					$updated1++;
 				}
 			} else {
-				$updated = false;
+				$updated  = false;
 				$contacts = DBA::select('contact', [], ['nurl' => $photo_contact['nurl']]);
 				while ($contact = DBA::fetch($contacts)) {
 					if ($photo['resource-id'] == Photo::ridFromURI($contact['photo'])) {
-						Logger::notice('Photo updated to given user', ['id' => $photo['id'], 'contact-id' => $contact['id'], 'uid' => $contact['uid']]);
+						DI::logger()->notice('Photo updated to given user', ['id' => $photo['id'], 'contact-id' => $contact['id'], 'uid' => $contact['uid']]);
 						DBA::update('photo', ['contact-id' => $contact['id'], 'uid' => $contact['uid']], ['id' => $photo['id']]);
 						$updated = true;
 						$updated2++;
@@ -82,36 +82,36 @@ class RemoveUnusedAvatars
 				}
 				DBA::close($contacts);
 				if (!$updated) {
-					Logger::notice('Photo deleted', ['id' => $photo['id']]);
+					DI::logger()->notice('Photo deleted', ['id' => $photo['id']]);
 					Photo::delete(['id' => $photo['id']]);
 					$deleted++;
 				}
 			}
 		}
 		DBA::close($photos);
-		Logger::notice('Contact fix done', ['total' => $total, 'updated1' => $updated1, 'updated2' => $updated2, 'deleted' => $deleted]);
+		DI::logger()->notice('Contact fix done', ['total' => $total, 'updated1' => $updated1, 'updated2' => $updated2, 'deleted' => $deleted]);
 	}
 
 	private static function deleteDuplicates()
 	{
 		$size = [4 => 'photo', 5 => 'thumb', 6 => 'micro'];
 
-		$total = 0;
+		$total   = 0;
 		$deleted = 0;
-		Logger::notice('Starting duplicate removal');
+		DI::logger()->notice('Starting duplicate removal');
 		$photos = DBA::p("SELECT `photo`.`id`, `photo`.`uid`, `photo`.`scale`, `photo`.`album`, `photo`.`contact-id`, `photo`.`resource-id`, `contact`.`photo`, `contact`.`thumb`, `contact`.`micro` FROM `photo` INNER JOIN `contact` ON `contact`.`id` = `photo`.`contact-id` and `photo`.`contact-id` != ? AND `photo`.`scale` IN (?, ?, ?)", 0, 4, 5, 6);
 		while ($photo = DBA::fetch($photos)) {
 			$resource = Photo::ridFromURI($photo[$size[$photo['scale']]]);
 			if ($resource != $photo['resource-id'] && !empty($resource)) {
 				$total++;
 				if (DBA::exists('photo', ['resource-id' => $resource, 'scale' => $photo['scale']])) {
-					Logger::notice('Photo deleted', ['id' => $photo['id']]);
+					DI::logger()->notice('Photo deleted', ['id' => $photo['id']]);
 					Photo::delete(['id' => $photo['id']]);
 					$deleted++;
 				}
 			}
 		}
 		DBA::close($photos);
-		Logger::notice('Duplicate removal done', ['total' => $total, 'deleted' => $deleted]);
+		DI::logger()->notice('Duplicate removal done', ['total' => $total, 'deleted' => $deleted]);
 	}
 }

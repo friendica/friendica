@@ -11,7 +11,6 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Text\Markdown;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -83,7 +82,7 @@ class Receiver
 	{
 		$activity = json_decode($body, true);
 		if (empty($activity)) {
-			Logger::warning('Invalid body.');
+			DI::logger()->warning('Invalid body.');
 			return;
 		}
 
@@ -94,7 +93,7 @@ class Receiver
 		$apcontact = APContact::getByURL($actor);
 
 		if (empty($apcontact)) {
-			Logger::notice('Unable to retrieve AP contact for actor - message is discarded', ['actor' => $actor]);
+			DI::logger()->notice('Unable to retrieve AP contact for actor - message is discarded', ['actor' => $actor]);
 			return;
 		} elseif (APContact::isRelay($apcontact) && self::isRelayPost($ldactivity)) {
 			self::processRelayPost($ldactivity, $actor);
@@ -105,52 +104,52 @@ class Receiver
 
 		$sig_contact = HTTPSignature::getKeyIdContact($header);
 		if (APContact::isRelay($sig_contact) && self::isRelayPost($ldactivity)) {
-			Logger::info('Message from a relay', ['url' => $sig_contact['url']]);
+			DI::logger()->info('Message from a relay', ['url' => $sig_contact['url']]);
 			self::processRelayPost($ldactivity, $sig_contact['url']);
 			return;
 		}
 
 		$http_signer = HTTPSignature::getSigner($body, $header);
 		if ($http_signer === false) {
-			Logger::notice('Invalid HTTP signature, message will not be trusted.', ['uid' => $uid, 'actor' => $actor, 'header' => $header, 'body' => $body]);
+			DI::logger()->notice('Invalid HTTP signature, message will not be trusted.', ['uid' => $uid, 'actor' => $actor, 'header' => $header, 'body' => $body]);
 			$signer = [];
 		} elseif (empty($http_signer)) {
-			Logger::info('Signer is a tombstone. The message will be discarded, the signer account is deleted.');
+			DI::logger()->info('Signer is a tombstone. The message will be discarded, the signer account is deleted.');
 			return;
 		} else {
-			Logger::info('Valid HTTP signature', ['signer' => $http_signer]);
+			DI::logger()->info('Valid HTTP signature', ['signer' => $http_signer]);
 			$signer = [$http_signer];
 		}
 
-		Logger::info('Message for user ' . $uid . ' is from actor ' . $actor);
+		DI::logger()->info('Message for user ' . $uid . ' is from actor ' . $actor);
 
 		if ($http_signer === false) {
 			$trust_source = false;
 		} elseif (LDSignature::isSigned($activity)) {
 			$ld_signer = LDSignature::getSigner($activity);
 			if (empty($ld_signer)) {
-				Logger::info('Invalid JSON-LD signature from ' . $actor);
+				DI::logger()->info('Invalid JSON-LD signature from ' . $actor);
 			} elseif ($ld_signer != $http_signer) {
 				$signer[] = $ld_signer;
 			}
 			if (!empty($ld_signer && ($actor == $http_signer))) {
-				Logger::info('The HTTP and the JSON-LD signature belong to ' . $ld_signer);
+				DI::logger()->info('The HTTP and the JSON-LD signature belong to ' . $ld_signer);
 				$trust_source = true;
 			} elseif (!empty($ld_signer)) {
-				Logger::info('JSON-LD signature is signed by ' . $ld_signer);
+				DI::logger()->info('JSON-LD signature is signed by ' . $ld_signer);
 				$trust_source = true;
 			} elseif ($actor == $http_signer) {
-				Logger::info('Bad JSON-LD signature, but HTTP signer fits the actor.');
+				DI::logger()->info('Bad JSON-LD signature, but HTTP signer fits the actor.');
 				$trust_source = true;
 			} else {
-				Logger::info('Invalid JSON-LD signature and the HTTP signer is different.');
+				DI::logger()->info('Invalid JSON-LD signature and the HTTP signer is different.');
 				$trust_source = false;
 			}
 		} elseif ($actor == $http_signer) {
-			Logger::info('Trusting post without JSON-LD signature, The actor fits the HTTP signer.');
+			DI::logger()->info('Trusting post without JSON-LD signature, The actor fits the HTTP signer.');
 			$trust_source = true;
 		} else {
-			Logger::info('No JSON-LD signature, different actor.');
+			DI::logger()->info('No JSON-LD signature, different actor.');
 			$trust_source = false;
 		}
 
@@ -196,7 +195,7 @@ class Receiver
 	{
 		$type = JsonLD::fetchElement($activity, '@type');
 		if (!$type) {
-			Logger::notice('Empty type', ['activity' => $activity, 'actor' => $actor]);
+			DI::logger()->notice('Empty type', ['activity' => $activity, 'actor' => $actor]);
 			return;
 		}
 
@@ -204,43 +203,43 @@ class Receiver
 
 		$object_id = JsonLD::fetchElement($activity, 'as:object', '@id');
 		if (empty($object_id)) {
-			Logger::notice('No object id found', ['type' => $type, 'object_type' => $object_type, 'actor' => $actor, 'activity' => $activity]);
+			DI::logger()->notice('No object id found', ['type' => $type, 'object_type' => $object_type, 'actor' => $actor, 'activity' => $activity]);
 			return;
 		}
 
 		$contact = Contact::getByURL($actor);
 		if (empty($contact)) {
-			Logger::info('Relay contact not found', ['actor' => $actor]);
+			DI::logger()->info('Relay contact not found', ['actor' => $actor]);
 			return;
 		}
 
 		if (!in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND])) {
-			Logger::notice('Relay is no sharer', ['actor' => $actor]);
+			DI::logger()->notice('Relay is no sharer', ['actor' => $actor]);
 			return;
 		}
 
-		Logger::debug('Process post from relay server', ['type' => $type, 'object_type' => $object_type, 'object_id' => $object_id, 'actor' => $actor]);
+		DI::logger()->debug('Process post from relay server', ['type' => $type, 'object_type' => $object_type, 'object_id' => $object_id, 'actor' => $actor]);
 
 		$item_id = Item::searchByLink($object_id);
 		if ($item_id) {
-			Logger::info('Relayed message already exists', ['id' => $object_id, 'item' => $item_id, 'actor' => $actor]);
+			DI::logger()->info('Relayed message already exists', ['id' => $object_id, 'item' => $item_id, 'actor' => $actor]);
 			return;
 		}
 
 		if (!DI::config()->get('system', 'decoupled_receiver')) {
 			$id = Processor::fetchMissingActivity($object_id, [], $actor, self::COMPLETION_RELAY);
 			if (!empty($id)) {
-				Logger::notice('Relayed message is fetched', ['result' => $id, 'id' => $object_id, 'actor' => $actor]);
+				DI::logger()->notice('Relayed message is fetched', ['result' => $id, 'id' => $object_id, 'actor' => $actor]);
 			} else {
-				Logger::notice('Relayed message had not been fetched', ['id' => $object_id, 'actor' => $actor, 'activity' => $activity]);
+				DI::logger()->notice('Relayed message had not been fetched', ['id' => $object_id, 'actor' => $actor, 'activity' => $activity]);
 			}
 		} elseif (!Fetch::hasWorker($object_id)) {
-			Logger::notice('Fetching is done by worker.', ['id' => $object_id]);
+			DI::logger()->notice('Fetching is done by worker.', ['id' => $object_id]);
 			Fetch::add($object_id);
 			$wid = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $object_id, [], $actor, self::COMPLETION_RELAY);
 			Fetch::setWorkerId($object_id, $wid);
 		} else {
-			Logger::debug('Activity will already be fetched via a worker.', ['url' => $object_id]);
+			DI::logger()->debug('Activity will already be fetched via a worker.', ['url' => $object_id]);
 		}
 	}
 
@@ -334,25 +333,25 @@ class Receiver
 				$fetched_type = JsonLD::fetchElement($object, '@type');
 
 				if (($fetched_id == $id) && !empty($fetched_type) && ($fetched_type == $type)) {
-					Logger::info('Activity had been fetched successfully', ['id' => $id]);
+					DI::logger()->info('Activity had been fetched successfully', ['id' => $id]);
 					$trust_source = true;
 					$activity     = $object;
 				} elseif (($fetched_id == $object_id) && !empty($fetched_type) && ($fetched_type == $object_type)) {
-					Logger::info('Fetched data is the object instead of the activity', ['id' => $id]);
+					DI::logger()->info('Fetched data is the object instead of the activity', ['id' => $id]);
 					$trust_source = true;
 					unset($object['@context']);
 					$activity['as:object'] = $object;
 				} else {
-					Logger::info('Activity id is not equal', ['id' => $id, 'fetched' => $fetched_id]);
+					DI::logger()->info('Activity id is not equal', ['id' => $id, 'fetched' => $fetched_id]);
 				}
 			} else {
-				Logger::info('Activity could not been fetched', ['id' => $id]);
+				DI::logger()->info('Activity could not been fetched', ['id' => $id]);
 			}
 		}
 
 		$actor = JsonLD::fetchElement($activity, 'as:actor', '@id');
 		if (empty($actor)) {
-			Logger::info('Empty actor', ['activity' => $activity]);
+			DI::logger()->info('Empty actor', ['activity' => $activity]);
 			return [];
 		}
 
@@ -388,12 +387,12 @@ class Receiver
 
 		$object_id = JsonLD::fetchElement($activity, 'as:object', '@id');
 		if (empty($object_id)) {
-			Logger::info('No object found');
+			DI::logger()->info('No object found');
 			return [];
 		}
 
 		if (!is_string($object_id)) {
-			Logger::info('Invalid object id', ['object' => $object_id]);
+			DI::logger()->info('Invalid object id', ['object' => $object_id]);
 			return [];
 		}
 
@@ -424,7 +423,7 @@ class Receiver
 			// We can receive "#emojiReaction" when fetching content from Hubzilla systems
 			$object_data = self::fetchObject($object_id, $activity['as:object'], $trust_source, $fetch_uid);
 			if (empty($object_data)) {
-				Logger::info("Object data couldn't be processed");
+				DI::logger()->info("Object data couldn't be processed");
 				return [];
 			}
 
@@ -498,7 +497,7 @@ class Receiver
 		$account  = Contact::selectFirstAccount(['platform'], ['nurl' => Strings::normaliseLink($actor)]);
 		$platform = $account['platform'] ?? '';
 
-		Logger::info('Processing', ['type' => $object_data['type'], 'object_type' => $object_data['object_type'], 'id' => $object_data['id'], 'actor' => $actor, 'platform' => $platform]);
+		DI::logger()->info('Processing', ['type' => $object_data['type'], 'object_type' => $object_data['object_type'], 'id' => $object_data['id'], 'actor' => $actor, 'platform' => $platform]);
 
 		return $object_data;
 	}
@@ -571,7 +570,7 @@ class Receiver
 		}
 
 		$object_data['directmessage'] = true;
-		Logger::debug('Got Misskey Chat');
+		DI::logger()->debug('Got Misskey Chat');
 		return $object_data;
 	}
 
@@ -612,23 +611,23 @@ class Receiver
 	{
 		$type = JsonLD::fetchElement($activity, '@type');
 		if (!$type) {
-			Logger::info('Empty type', ['activity' => $activity]);
+			DI::logger()->info('Empty type', ['activity' => $activity]);
 			return true;
 		}
 
 		if (!DI::config()->get('system', 'process_view') && ($type == 'as:View')) {
-			Logger::info('View activities are ignored.', ['signer' => $signer, 'http_signer' => $http_signer]);
+			DI::logger()->info('View activities are ignored.', ['signer' => $signer, 'http_signer' => $http_signer]);
 			return true;
 		}
 
 		if (!JsonLD::fetchElement($activity, 'as:object', '@id')) {
-			Logger::info('Empty object', ['activity' => $activity]);
+			DI::logger()->info('Empty object', ['activity' => $activity]);
 			return true;
 		}
 
 		$actor = JsonLD::fetchElement($activity, 'as:actor', '@id');
 		if ($actor === null || $actor === '') {
-			Logger::info('Empty actor', ['activity' => $activity]);
+			DI::logger()->info('Empty actor', ['activity' => $activity]);
 			return true;
 		}
 
@@ -641,7 +640,7 @@ class Receiver
 
 			if (!empty($published) && $object_id !== null && in_array($type, ['as:Create', 'as:Update']) && in_array($object_type, self::CONTENT_TYPES)
 				&& ($push || ($completion != self::COMPLETION_MANUAL)) && DI::contentItem()->isTooOld($published) && !Post::exists(['uri' => $object_id])) {
-				Logger::debug('Activity is too old. It will not be processed', ['push' => $push, 'completion' => $completion, 'type' => $type,  'object-type' => $object_type, 'published' => $published, 'id' => $id, 'object-id' => $object_id]);
+				DI::logger()->debug('Activity is too old. It will not be processed', ['push' => $push, 'completion' => $completion, 'type' => $type,  'object-type' => $object_type, 'published' => $published, 'id' => $id, 'object-id' => $object_id]);
 				return true;
 			}
 		} else {
@@ -665,22 +664,22 @@ class Receiver
 		if (($type == 'as:Announce') && !empty($object_type) && !in_array($object_type, self::CONTENT_TYPES) && self::isGroup($actor)) {
 			$object_object_type = JsonLD::fetchElement($activity['as:object']['as:object'] ?? [], '@type');
 			if (in_array($object_type, ['as:Create']) && in_array($object_object_type, self::CONTENT_TYPES)) {
-				Logger::debug('Replace "create" activity with inner object', ['type' => $object_type, 'object_type' => $object_object_type]);
+				DI::logger()->debug('Replace "create" activity with inner object', ['type' => $object_type, 'object_type' => $object_object_type]);
 				$activity['as:object'] = $activity['as:object']['as:object'];
 			} elseif (in_array($object_type, array_merge(self::ACTIVITY_TYPES, ['as:Delete', 'as:Undo', 'as:Update']))) {
-				Logger::debug('Change announced activity to activity', ['type' => $object_type]);
+				DI::logger()->debug('Change announced activity to activity', ['type' => $object_type]);
 				$original_actor = $actor;
 				$type           = $object_type;
 				$activity       = $activity['as:object'];
 			} else {
-				Logger::info('Unhandled announced activity', ['type' => $object_type, 'object_type' => $object_object_type]);
+				DI::logger()->info('Unhandled announced activity', ['type' => $object_type, 'object_type' => $object_object_type]);
 			}
 		}
 
 		// $trust_source is called by reference and is set to true if the content was retrieved successfully
 		$object_data = self::prepareObjectData($activity, $uid, $push, $trust_source, $original_actor);
 		if (empty($object_data)) {
-			Logger::info('No object data found', ['activity' => $activity]);
+			DI::logger()->info('No object data found', ['activity' => $activity]);
 			return true;
 		}
 
@@ -712,13 +711,13 @@ class Receiver
 
 		if (($type == 'as:Create') && $trust_source && !in_array($completion, [self::COMPLETION_MANUAL, self::COMPLETION_ANNOUNCE])) {
 			if (self::hasArrived($object_data['object_id'])) {
-				Logger::info('The activity already arrived.', ['id' => $object_data['object_id']]);
+				DI::logger()->info('The activity already arrived.', ['id' => $object_data['object_id']]);
 				return true;
 			}
 			self::addArrivedId($object_data['object_id']);
 
 			if (Queue::exists($object_data['object_id'], $type)) {
-				Logger::info('The activity is already added.', ['id' => $object_data['object_id']]);
+				DI::logger()->info('The activity is already added.', ['id' => $object_data['object_id']]);
 				return true;
 			}
 		} elseif (($type == 'as:Create') && $trust_source && !self::hasArrived($object_data['object_id'])) {
@@ -735,7 +734,7 @@ class Receiver
 		}
 
 		if (!$trust_source) {
-			Logger::info('Activity trust could not be achieved.', ['id' => $object_data['object_id'], 'type' => $type, 'signer' => $signer, 'actor' => $actor, 'attributedTo' => $attributed_to]);
+			DI::logger()->info('Activity trust could not be achieved.', ['id' => $object_data['object_id'], 'type' => $type, 'signer' => $signer, 'actor' => $actor, 'attributedTo' => $attributed_to]);
 			return true;
 		}
 
@@ -743,11 +742,11 @@ class Receiver
 			if (Queue::isProcessable($object_data['entry-id'])) {
 				// We delay by 5 seconds to allow to accumulate all receivers
 				$delayed = date(DateTimeFormat::MYSQL, time() + 5);
-				Logger::debug('Initiate processing', ['id' => $object_data['entry-id'], 'uri' => $object_data['object_id']]);
+				DI::logger()->debug('Initiate processing', ['id' => $object_data['entry-id'], 'uri' => $object_data['object_id']]);
 				$wid = Worker::add(['priority' => Worker::PRIORITY_HIGH, 'delayed' => $delayed], 'ProcessQueue', $object_data['entry-id']);
 				Queue::setWorkerId($object_data['entry-id'], $wid);
 			} else {
-				Logger::debug('Other queue entries need to be processed first.', ['id' => $object_data['entry-id']]);
+				DI::logger()->debug('Other queue entries need to be processed first.', ['id' => $object_data['entry-id']]);
 			}
 			return false;
 		}
@@ -829,15 +828,15 @@ class Receiver
 				if (in_array($object_data['object_type'], self::CONTENT_TYPES)) {
 					if (!Processor::alreadyKnown($object_data['object_id'], '')) {
 						if (ActivityPub\Processor::fetchMissingActivity($object_data['object_id'], [], $object_data['actor'], self::COMPLETION_ANNOUNCE, $uid)) {
-							Logger::debug('Created announced id', ['uid' => $uid, 'id' => $object_data['object_id']]);
+							DI::logger()->debug('Created announced id', ['uid' => $uid, 'id' => $object_data['object_id']]);
 							Queue::remove($object_data);
 						} else {
-							Logger::debug('Announced id was not created', ['uid' => $uid, 'id' => $object_data['object_id']]);
+							DI::logger()->debug('Announced id was not created', ['uid' => $uid, 'id' => $object_data['object_id']]);
 							Queue::remove($object_data);
 							return true;
 						}
 					} else {
-						Logger::info('Announced id already exists', ['uid' => $uid, 'id' => $object_data['object_id']]);
+						DI::logger()->info('Announced id already exists', ['uid' => $uid, 'id' => $object_data['object_id']]);
 						Queue::remove($object_data);
 					}
 
@@ -957,7 +956,7 @@ class Receiver
 					if (!empty($object_data['object_actor'])) {
 						ActivityPub\Processor::acceptFollowUser($object_data);
 					} else {
-						Logger::notice('Unhandled "accept follow" message.', ['object_data' => $object_data]);
+						DI::logger()->notice('Unhandled "accept follow" message.', ['object_data' => $object_data]);
 					}
 				} elseif (in_array($object_data['object_type'], self::CONTENT_TYPES)) {
 					ActivityPub\Processor::createActivity($object_data, Activity::ATTEND);
@@ -1047,7 +1046,7 @@ class Receiver
 				break;
 
 			default:
-				Logger::info('Unknown activity: ' . $type . ' ' . $object_data['object_type']);
+				DI::logger()->info('Unknown activity: ' . $type . ' ' . $object_data['object_type']);
 				return false;
 		}
 		return true;
@@ -1085,7 +1084,7 @@ class Receiver
 
 		$tempfile = tempnam(System::getTempPath(), $file);
 		file_put_contents($tempfile, json_encode(['activity' => $activity, 'body' => $body, 'uid' => $uid, 'trust_source' => $trust_source, 'push' => $push, 'signer' => $signer, 'object_data' => $object_data], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-		Logger::notice('Unknown activity stored', ['type' => $type, 'object_type' => $object_data['object_type'], 'object_object_type' => $object_data['object_object_type'] ?? '', 'file' => $tempfile]);
+		DI::logger()->notice('Unknown activity stored', ['type' => $type, 'object_type' => $object_data['object_type'], 'object_object_type' => $object_data['object_object_type'] ?? '', 'file' => $tempfile]);
 	}
 
 	/**
@@ -1135,7 +1134,7 @@ class Receiver
 
 			foreach ($receiver_list as $receiver) {
 				if ($receiver == 'Public') {
-					Logger::warning('Not compacted public collection found', ['activity' => $activity]);
+					DI::logger()->warning('Not compacted public collection found', ['activity' => $activity]);
 					$receiver = ActivityPub::PUBLIC_COLLECTION;
 				}
 				if ($receiver == self::PUBLIC_COLLECTION) {
@@ -1186,9 +1185,9 @@ class Receiver
 			$profile   = APContact::getByURL($actor);
 			$followers = $profile['followers'] ?? '';
 			$isGroup   = ($profile['type'] ?? '') == 'Group';
-			Logger::info('Got actor and followers', ['actor' => $actor, 'followers' => $followers]);
+			DI::logger()->info('Got actor and followers', ['actor' => $actor, 'followers' => $followers]);
 		} else {
-			Logger::info('Empty actor', ['activity' => $activity]);
+			DI::logger()->info('Empty actor', ['activity' => $activity]);
 			$followers = '';
 			$isGroup   = false;
 		}
@@ -1307,11 +1306,11 @@ class Receiver
 		if (empty($receivers) && $fetch_unlisted && Contact::isPlatform($actor, 'birdsitelive')) {
 			$receivers[0]  = ['uid' => 0, 'type' => self::TARGET_GLOBAL];
 			$receivers[-1] = ['uid' => -1, 'type' => self::TARGET_GLOBAL];
-			Logger::notice('Post from "birdsitelive" is set to "unlisted"', ['id' => JsonLD::fetchElement($activity, '@id')]);
+			DI::logger()->notice('Post from "birdsitelive" is set to "unlisted"', ['id' => JsonLD::fetchElement($activity, '@id')]);
 		} elseif (empty($receivers) && in_array($activity_type, ['as:Delete', 'as:Undo'])) {
 			$receivers[0] = ['uid' => 0, 'type' => self::TARGET_GLOBAL];
 		} elseif (empty($receivers)) {
-			Logger::notice('Post has got no receivers', ['fetch_unlisted' => $fetch_unlisted, 'actor' => $actor, 'id' => JsonLD::fetchElement($activity, '@id'), 'type' => $activity_type]);
+			DI::logger()->notice('Post has got no receivers', ['fetch_unlisted' => $fetch_unlisted, 'actor' => $actor, 'id' => JsonLD::fetchElement($activity, '@id'), 'type' => $activity_type]);
 		}
 
 		return $receivers;
@@ -1408,7 +1407,7 @@ class Receiver
 			// Some systems (e.g. GNU Social) don't reply to the "id" field but the "uri" field.
 			$objectId = Item::getURIByLink($object_data['object_id']);
 			if (!empty($objectId) && ($object_data['object_id'] != $objectId)) {
-				Logger::notice('Fix wrong object-id', ['received' => $object_data['object_id'], 'correct' => $objectId]);
+				DI::logger()->notice('Fix wrong object-id', ['received' => $object_data['object_id'], 'correct' => $objectId]);
 				$object_data['object_id'] = $objectId;
 			}
 		}
@@ -1437,37 +1436,37 @@ class Receiver
 			$data = Processor::fetchCachedActivity($object_id, $uid);
 			if (!empty($data)) {
 				$object = JsonLD::compact($data);
-				Logger::info('Fetched content for ' . $object_id);
+				DI::logger()->info('Fetched content for ' . $object_id);
 			} else {
-				Logger::info('Empty content for ' . $object_id . ', check if content is available locally.');
+				DI::logger()->info('Empty content for ' . $object_id . ', check if content is available locally.');
 
 				$item = Post::selectFirst(Item::DELIVER_FIELDLIST, ['uri' => $object_id]);
 				if (!DBA::isResult($item)) {
-					Logger::info('Object with url ' . $object_id . ' was not found locally.');
+					DI::logger()->info('Object with url ' . $object_id . ' was not found locally.');
 					return false;
 				}
-				Logger::info('Using already stored item for url ' . $object_id);
+				DI::logger()->info('Using already stored item for url ' . $object_id);
 				$data   = ActivityPub\Transmitter::createNote($item);
 				$object = JsonLD::compact($data);
 			}
 
 			$id = JsonLD::fetchElement($object, '@id');
 			if (empty($id)) {
-				Logger::info('Empty id');
+				DI::logger()->info('Empty id');
 				return false;
 			}
 
 			if ($id != $object_id) {
-				Logger::info('Fetched id differs from provided id', ['provided' => $object_id, 'fetched' => $id]);
+				DI::logger()->info('Fetched id differs from provided id', ['provided' => $object_id, 'fetched' => $id]);
 				return false;
 			}
 		} else {
-			Logger::info('Using original object for url ' . $object_id);
+			DI::logger()->info('Using original object for url ' . $object_id);
 		}
 
 		$type = JsonLD::fetchElement($object, '@type');
 		if (empty($type)) {
-			Logger::info('Empty type');
+			DI::logger()->info('Empty type');
 			return false;
 		}
 
@@ -1481,7 +1480,7 @@ class Receiver
 			return $object_data;
 		}
 
-		Logger::info('Unhandled object type: ' . $type);
+		DI::logger()->info('Unhandled object type: ' . $type);
 		return false;
 	}
 
@@ -1965,7 +1964,7 @@ class Receiver
 			// Some systems (e.g. GNU Social) don't reply to the "id" field but the "uri" field.
 			$replyToId = Item::getURIByLink($object_data['reply-to-id']);
 			if (!empty($replyToId) && ($object_data['reply-to-id'] != $replyToId)) {
-				Logger::notice('Fix wrong reply-to', ['received' => $object_data['reply-to-id'], 'correct' => $replyToId]);
+				DI::logger()->notice('Fix wrong reply-to', ['received' => $object_data['reply-to-id'], 'correct' => $replyToId]);
 				$object_data['reply-to-id'] = $replyToId;
 			}
 		}

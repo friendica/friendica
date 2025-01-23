@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Module\BaseApi;
@@ -29,7 +28,7 @@ class Favorites extends BaseApi
 
 		// in friendica starred item are private
 		// return favorites only for self
-		Logger::info(BaseApi::LOG_PREFIX . 'for {self}', ['module' => 'api', 'action' => 'favorites']);
+		$this->logger->info(BaseApi::LOG_PREFIX . 'for {self}', ['module' => 'api', 'action' => 'favorites']);
 
 		// params
 		$count            = $this->getRequestValue($request, 'count', 20, 1, 100);

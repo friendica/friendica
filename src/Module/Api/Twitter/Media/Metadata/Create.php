@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter\Media\Metadata;
 
-use Friendica\Core\Logger;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;
@@ -44,7 +43,7 @@ class Create extends BaseApi
 			throw new BadRequestException('No alt text.');
 		}
 
-		Logger::info('Updating metadata', ['media_id' => $data['media_id']]);
+		$this->logger->info('Updating metadata', ['media_id' => $data['media_id']]);
 
 		$condition = ['id' => $data['media_id'], 'uid' => $uid];
 

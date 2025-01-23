@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub\Queue;
 
 class ProcessReplyByUri
@@ -21,8 +21,8 @@ class ProcessReplyByUri
 	 */
 	public static function execute(string $uri)
 	{
-		Logger::info('Start processing queued replies', ['url' => $uri]);
+		DI::logger()->info('Start processing queued replies', ['url' => $uri]);
 		$count = Queue::processReplyByUri($uri);
-		Logger::info('Successfully processed queued replies', ['count' => $count, 'url' => $uri]);
+		DI::logger()->info('Successfully processed queued replies', ['count' => $count, 'url' => $uri]);
 	}
 }

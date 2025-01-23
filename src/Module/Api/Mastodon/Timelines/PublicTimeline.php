@@ -12,7 +12,6 @@ use Friendica\App\BaseURL;
 use Friendica\AppHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -75,7 +74,7 @@ class PublicTimeline extends BaseApi
 		];
 
 		$condition = $this->addPagingConditions($request, $condition);
-		$params = $this->buildOrderAndLimitParams($request);
+		$params    = $this->buildOrderAndLimitParams($request);
 
 		if ($request['local']) {
 			$condition = DBA::mergeConditions($condition, ['origin' => true]);
@@ -109,11 +108,11 @@ class PublicTimeline extends BaseApi
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			try {
-				$status =  DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {
-				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
+				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
 			}
 		}
 

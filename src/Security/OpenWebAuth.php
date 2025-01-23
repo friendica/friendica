@@ -9,7 +9,6 @@ namespace Friendica\Security;
 
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -61,31 +60,31 @@ class OpenWebAuth
 		// Try to find the public contact entry of the visitor.
 		$contact = Contact::getByURL($my_url, null, ['id', 'url', 'gsid']);
 		if (empty($contact)) {
-			Logger::info('No contact record found', ['url' => $my_url]);
+			DI::logger()->info('No contact record found', ['url' => $my_url]);
 			return;
 		}
 
 		if (DI::userSession()->getRemoteUserId() && DI::userSession()->getRemoteUserId() == $contact['id']) {
-			Logger::info('The visitor is already authenticated', ['url' => $my_url]);
+			DI::logger()->info('The visitor is already authenticated', ['url' => $my_url]);
 			return;
 		}
 
 		$gserver = DBA::selectFirst('gserver', ['url', 'authredirect'], ['id' => $contact['gsid']]);
 		if (empty($gserver) || empty($gserver['authredirect'])) {
-			Logger::info('No server record found or magic path not defined for server', ['id' => $contact['gsid'], 'gserver' => $gserver]);
+			DI::logger()->info('No server record found or magic path not defined for server', ['id' => $contact['gsid'], 'gserver' => $gserver]);
 			return;
 		}
 
 		// Avoid endless loops
 		$cachekey = 'zrlInit:' . $my_url;
 		if (DI::cache()->get($cachekey)) {
-			Logger::info('URL ' . $my_url . ' already tried to authenticate.');
+			DI::logger()->info('URL ' . $my_url . ' already tried to authenticate.');
 			return;
 		} else {
 			DI::cache()->set($cachekey, true, Duration::MINUTE);
 		}
 
-		Logger::info('Not authenticated. Invoking reverse magic-auth', ['url' => $my_url]);
+		DI::logger()->info('Not authenticated. Invoking reverse magic-auth', ['url' => $my_url]);
 
 		// Remove the "addr" parameter from the destination. It is later added as separate parameter again.
 		$addr_request = 'addr=' . urlencode($addr);
@@ -97,7 +96,7 @@ class OpenWebAuth
 		if ($gserver['url'] != DI::baseUrl() && !strstr($dest, '/magic')) {
 			$magic_path = $gserver['authredirect'] . '?f=&rev=1&owa=1&dest=' . $dest . '&' . $addr_request;
 
-			Logger::info('Doing magic auth for visitor ' . $my_url . ' to ' . $magic_path);
+			DI::logger()->info('Doing magic auth for visitor ' . $my_url . ' to ' . $magic_path);
 			System::externalRedirect($magic_path);
 		}
 	}
@@ -149,7 +148,7 @@ class OpenWebAuth
 
 		DI::sysmsg()->addInfo(DI::l10n()->t('OpenWebAuth: %1$s welcomes %2$s', DI::baseUrl()->getHost(), $visitor['name']));
 
-		Logger::info('OpenWebAuth: auth success from ' . $visitor['addr']);
+		DI::logger()->info('OpenWebAuth: auth success from ' . $visitor['addr']);
 	}
 
 	/**
@@ -166,7 +165,7 @@ class OpenWebAuth
 		// Try to find the public contact entry of the visitor.
 		$cid = Contact::getIdForURL($handle);
 		if (!$cid) {
-			Logger::info('Handle not found', ['handle' => $handle]);
+			DI::logger()->info('Handle not found', ['handle' => $handle]);
 			return [];
 		}
 
@@ -186,7 +185,7 @@ class OpenWebAuth
 
 		$appHelper->setContactId($visitor['id']);
 
-		Logger::info('Authenticated visitor', ['url' => $visitor['url']]);
+		DI::logger()->info('Authenticated visitor', ['url' => $visitor['url']]);
 
 		return $visitor;
 	}

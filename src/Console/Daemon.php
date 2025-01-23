@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
+use Asika\SimpleConsole\Console;
 use Friendica\App\Mode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
-use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\System;
 use Friendica\Core\Update;
 use Friendica\Core\Worker;
@@ -27,10 +27,8 @@ use RuntimeException;
 /**
  * Console command for interacting with the daemon
  */
-final class Daemon extends AbstractConsole
+final class Daemon extends Console
 {
-	public const LOG_CHANNEL = LogChannel::DAEMON;
-
 	private Mode $mode;
 	private IManageConfigValues $config;
 	private IManageKeyValuePairs $keyValue;
@@ -93,8 +91,6 @@ HELP;
 
 	protected function doExecute()
 	{
-		$this->checkDeprecated('daemon');
-
 		if ($this->mode->isInstall()) {
 			throw new RuntimeException("Friendica isn't properly installed yet");
 		}

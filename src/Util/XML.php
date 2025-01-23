@@ -11,7 +11,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMXPath;
-use Friendica\Core\Logger;
+use Friendica\DI;
 use SimpleXMLElement;
 
 /**
@@ -45,9 +45,9 @@ class XML
 					$root = new SimpleXMLElement('<' . $key . '>' . self::escape($value ?? '') . '</' . $key . '>');
 				}
 
-				$dom = dom_import_simplexml($root)->ownerDocument;
+				$dom               = dom_import_simplexml($root)->ownerDocument;
 				$dom->formatOutput = true;
-				$xml = $dom;
+				$xml               = $dom;
 
 				$xml_text = $dom->saveXML();
 
@@ -154,7 +154,7 @@ class XML
 		$element = $doc->createElement($element, self::escape($value));
 
 		foreach ($attributes as $key => $value) {
-			$attribute = $doc->createAttribute($key);
+			$attribute        = $doc->createAttribute($key);
 			$attribute->value = self::escape($value ?? '');
 			$element->appendChild($attribute);
 		}
@@ -199,7 +199,7 @@ class XML
 			&& (get_class($xml_element) == 'SimpleXMLElement')
 		) {
 			$xml_element_copy = $xml_element;
-			$xml_element = get_object_vars($xml_element);
+			$xml_element      = get_object_vars($xml_element);
 		}
 
 		if (is_array($xml_element)) {
@@ -210,12 +210,12 @@ class XML
 
 			foreach ($xml_element as $key => $value) {
 				$recursion_depth++;
-				$result_array[strtolower($key)]	= self::elementToArray($value, $recursion_depth);
+				$result_array[strtolower($key)] = self::elementToArray($value, $recursion_depth);
 				$recursion_depth--;
 			}
 
 			if ($recursion_depth == 0) {
-				$temp_array = $result_array;
+				$temp_array   = $result_array;
 				$result_array = [
 					strtolower($xml_element_copy->getName()) => $temp_array,
 				];
@@ -256,7 +256,7 @@ class XML
 		}
 
 		if (!function_exists('xml_parser_create')) {
-			Logger::error('Xml::toArray: parser function missing');
+			DI::logger()->error('Xml::toArray: parser function missing');
 			return [];
 		}
 
@@ -272,7 +272,7 @@ class XML
 		}
 
 		if (!$parser) {
-			Logger::warning('Xml::toArray: xml_parser_create: no resource');
+			DI::logger()->warning('Xml::toArray: xml_parser_create: no resource');
 			return [];
 		}
 
@@ -284,9 +284,9 @@ class XML
 		@xml_parser_free($parser);
 
 		if (! $xml_values) {
-			Logger::debug('Xml::toArray: libxml: parse error: ' . $contents);
+			DI::logger()->debug('Xml::toArray: libxml: parse error: ' . $contents);
 			foreach (libxml_get_errors() as $err) {
-				Logger::debug('libxml: parse: ' . $err->code . ' at ' . $err->line . ':' . $err->column . ' : ' . $err->message);
+				DI::logger()->debug('libxml: parse: ' . $err->code . ' at ' . $err->line . ':' . $err->column . ' : ' . $err->message);
 			}
 			libxml_clear_errors();
 			return [];
@@ -306,7 +306,7 @@ class XML
 			$attributes = isset($data['attributes']) ? $data['attributes'] : null;
 			$value      = isset($data['value']) ? $data['value'] : null;
 
-			$result = [];
+			$result          = [];
 			$attributes_data = [];
 
 			if (isset($value)) {
@@ -330,14 +330,14 @@ class XML
 
 			// See tag status and do the needed.
 			if ($namespaces && strpos($tag, ':')) {
-				$namespc = substr($tag, 0, strrpos($tag, ':'));
-				$tag = strtolower(substr($tag, strlen($namespc)+1));
+				$namespc              = substr($tag, 0, strrpos($tag, ':'));
+				$tag                  = strtolower(substr($tag, strlen($namespc) + 1));
 				$result['@namespace'] = $namespc;
 			}
 			$tag = strtolower($tag);
 
 			if ($type == 'open') {   // The starting of the tag '<tag>'
-				$parent[$level-1] = &$current;
+				$parent[$level - 1] = &$current;
 				if (!is_array($current) || (!in_array($tag, array_keys($current)))) { // Insert New tag
 					$current[$tag] = $result;
 					if ($attributes_data) {
@@ -352,7 +352,7 @@ class XML
 						$current[$tag][$repeated_tag_index[$tag . '_' . $level]] = $result;
 						$repeated_tag_index[$tag . '_' . $level]++;
 					} else { // This section will make the value an array if multiple tags with the same name appear together
-						$current[$tag] = [$current[$tag], $result]; // This will combine the existing item and the new item together to make an array
+						$current[$tag]                           = [$current[$tag], $result]; // This will combine the existing item and the new item together to make an array
 						$repeated_tag_index[$tag . '_' . $level] = 2;
 
 						if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
@@ -360,13 +360,13 @@ class XML
 							unset($current[$tag.'_attr']);
 						}
 					}
-					$last_item_index = $repeated_tag_index[$tag . '_' . $level]-1;
-					$current = &$current[$tag][$last_item_index];
+					$last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
+					$current         = &$current[$tag][$last_item_index];
 				}
 			} elseif ($type == 'complete') { // Tags that ends in 1 line '<tag />'
 				//See if the key is already taken.
 				if (!isset($current[$tag])) { //New Key
-					$current[$tag] = $result;
+					$current[$tag]                           = $result;
 					$repeated_tag_index[$tag . '_' . $level] = 1;
 					if ($priority == 'tag' and $attributes_data) {
 						$current[$tag. '_attr'] = $attributes_data;
@@ -382,7 +382,7 @@ class XML
 						}
 						$repeated_tag_index[$tag . '_' . $level]++;
 					} else { // If it is not an array...
-						$current[$tag] = [$current[$tag], $result]; //...Make it an array using the existing value and the new value
+						$current[$tag]                           = [$current[$tag], $result]; //...Make it an array using the existing value and the new value
 						$repeated_tag_index[$tag . '_' . $level] = 1;
 						if ($priority == 'tag' and $get_attributes) {
 							if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
@@ -399,7 +399,7 @@ class XML
 					}
 				}
 			} elseif ($type == 'close') { // End of tag '</tag>'
-				$current = &$parent[$level-1];
+				$current = &$parent[$level - 1];
 			}
 		}
 
@@ -416,7 +416,7 @@ class XML
 	public static function deleteNode(DOMDocument $doc, string $node)
 	{
 		$xpath = new DOMXPath($doc);
-		$list = $xpath->query('//' . $node);
+		$list  = $xpath->query('//' . $node);
 		foreach ($list as $child) {
 			$child->parentNode->removeChild($child);
 		}
@@ -436,11 +436,11 @@ class XML
 		$x = @simplexml_load_string($s);
 		if (!$x) {
 			if (!$suppress_log) {
-				Logger::error('Error(s) while parsing XML string.');
+				DI::logger()->error('Error(s) while parsing XML string.');
 				foreach (libxml_get_errors() as $err) {
-					Logger::info('libxml error', ['code' => $err->code, 'position' => $err->line . ':' . $err->column, 'message' => $err->message]);
+					DI::logger()->info('libxml error', ['code' => $err->code, 'position' => $err->line . ':' . $err->column, 'message' => $err->message]);
 				}
-				Logger::debug('Erroring XML string', ['xml' => $s]);
+				DI::logger()->debug('Erroring XML string', ['xml' => $s]);
 			}
 			libxml_clear_errors();
 		}

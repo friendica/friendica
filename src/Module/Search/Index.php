@@ -15,7 +15,6 @@ use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
@@ -60,12 +59,14 @@ class Index extends BaseSearch
 			// 10 requests are "free", after the 11th only a call per minute is allowed
 
 			$free_crawls = intval(DI::config()->get('system', 'free_crawls'));
-			if ($free_crawls == 0)
+			if ($free_crawls == 0) {
 				$free_crawls = 10;
+			}
 
 			$crawl_permit_period = intval(DI::config()->get('system', 'crawl_permit_period'));
-			if ($crawl_permit_period == 0)
+			if ($crawl_permit_period == 0) {
 				$crawl_permit_period = 10;
+			}
 
 			$remote = $this->remoteAddress;
 			$result = DI::cache()->get('remote_search:' . $remote);
@@ -88,16 +89,16 @@ class Index extends BaseSearch
 
 		$tag = false;
 		if (!empty($_GET['tag'])) {
-			$tag = true;
+			$tag    = true;
 			$search = '#' . trim(rawurldecode($_GET['tag']));
 		}
 
 		// construct a wrapper for the search header
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('content_wrapper.tpl'), [
-			'name' => 'search-header',
-			'$title' => DI::l10n()->t('Search'),
+			'name'        => 'search-header',
+			'$title'      => DI::l10n()->t('Search'),
 			'$title_size' => 3,
-			'$content' => HTML::search($search, 'search-box', false)
+			'$content'    => HTML::search($search, 'search-box', false)
 		]);
 
 		if (!$search) {
@@ -105,7 +106,7 @@ class Index extends BaseSearch
 		}
 
 		if (strpos($search, '#') === 0) {
-			$tag = true;
+			$tag    = true;
 			$search = substr($search, 1);
 		} else {
 			if (strpos($search, '@') === 0 || strpos($search, '!') === 0) {
@@ -134,7 +135,7 @@ class Index extends BaseSearch
 		// Don't perform a fulltext or tag search on search results that look like an URL
 		// Tags don't look like an URL and the fulltext search does only work with natural words
 		if (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST)) {
-			Logger::info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
+			$this->logger->info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
 			DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
 			return $o;
 		}
@@ -147,11 +148,19 @@ class Index extends BaseSearch
 		// No items will be shown if the member has a blocked profile wall.
 
 		if (DI::mode()->isMobile()) {
-			$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile'));
+			$itemsPerPage = DI::pConfig()->get(
+				DI::userSession()->getLocalUserId(),
+				'system',
+				'itemspage_mobile_network',
+				DI::config()->get('system', 'itemspage_network_mobile')
+			);
 		} else {
-			$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-				DI::config()->get('system', 'itemspage_network'));
+			$itemsPerPage = DI::pConfig()->get(
+				DI::userSession()->getLocalUserId(),
+				'system',
+				'itemspage_network',
+				DI::config()->get('system', 'itemspage_network')
+			);
 		}
 
 		$last_uriid = isset($_GET['last_uriid']) ? intval($_GET['last_uriid']) : 0;
@@ -159,20 +168,20 @@ class Index extends BaseSearch
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
 		if ($tag) {
-			Logger::info('Start tag search.', ['q' => $search, 'start' => $pager->getStart(), 'items' => $pager->getItemsPerPage(), 'last' => $last_uriid]);
+			$this->logger->info('Start tag search.', ['q' => $search, 'start' => $pager->getStart(), 'items' => $pager->getItemsPerPage(), 'last' => $last_uriid]);
 			$uriids = Tag::getURIIdListByTag($search, DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage(), $last_uriid);
-			$count = Tag::countByTag($search, DI::userSession()->getLocalUserId());
+			$count  = Tag::countByTag($search, DI::userSession()->getLocalUserId());
 		} else {
-			Logger::info('Start fulltext search.', ['q' => $search]);
+			$this->logger->info('Start fulltext search.', ['q' => $search]);
 			$uriids = Post\Content::getURIIdListBySearch($search, DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage(), $last_uriid);
-			$count = Post\Content::countBySearch($search, DI::userSession()->getLocalUserId());
+			$count  = Post\Content::countBySearch($search, DI::userSession()->getLocalUserId());
 		}
 
 		if (!empty($uriids)) {
 			$condition = ["(`uid` = ? OR (`uid` = ? AND NOT `global`))", 0, DI::userSession()->getLocalUserId()];
 			$condition = DBA::mergeConditions($condition, ['uri-id' => $uriids]);
-			$params = ['order' => ['uri-id' => true]];
-			$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $condition, $params));
+			$params    = ['order' => ['uri-id' => true]];
+			$items     = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $condition, $params));
 		}
 
 		if (empty($items)) {
@@ -197,7 +206,7 @@ class Index extends BaseSearch
 			'$title' => $title
 		]);
 
-		Logger::info('Start Conversation.', ['q' => $search]);
+		$this->logger->info('Start Conversation.', ['q' => $search]);
 
 		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 

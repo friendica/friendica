@@ -9,7 +9,6 @@ namespace Friendica\Worker;
 
 use Friendica\Core\Addon;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -30,12 +29,12 @@ class Cron
 		if ($last) {
 			$next = $last + ($poll_interval * 60);
 			if ($next > time()) {
-				Logger::notice('cron interval not reached');
+				DI::logger()->notice('cron interval not reached');
 				return;
 			}
 		}
 
-		Logger::notice('start');
+		DI::logger()->notice('start');
 
 		// Ensure to have a .htaccess file.
 		// this is a precaution for systems that update automatically
@@ -151,7 +150,7 @@ class Cron
 			DI::keyValue()->set('last_cron_daily', time());
 		}
 
-		Logger::notice('end');
+		DI::logger()->notice('end');
 
 		DI::keyValue()->set('last_cron', time());
 	}
@@ -163,7 +162,7 @@ class Cron
 	 */
 	private static function deleteSleepingProcesses()
 	{
-		Logger::info('Looking for sleeping processes');
+		DI::logger()->info('Looking for sleeping processes');
 
 		DBA::deleteSleepingProcesses();
 	}

@@ -7,7 +7,6 @@
 
 namespace Friendica\Core\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -32,7 +31,7 @@ class Cron
 	 */
 	public static function run()
 	{
-		Logger::info('Add cron entries');
+		DI::logger()->info('Add cron entries');
 
 		// Check for spooled items
 		Worker::add(['priority' => Worker::PRIORITY_HIGH, 'force_priority' => true], 'SpoolPost');
@@ -99,7 +98,7 @@ class Cron
 				// How long is the process already running?
 				$duration = (time() - strtotime($entry["executed"])) / 60;
 				if ($duration > $max_duration) {
-					Logger::warning('Worker process took too much time - killed', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
+					DI::logger()->warning('Worker process took too much time - killed', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
 					posix_kill($entry["pid"], SIGTERM);
 
 					// We killed the stale process.
@@ -113,10 +112,13 @@ class Cron
 					} elseif ($entry['priority'] != Worker::PRIORITY_CRITICAL) {
 						$new_priority = Worker::PRIORITY_NEGLIGIBLE;
 					}
-					DBA::update('workerqueue', ['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0], ['id' => $entry["id"]]
+					DBA::update(
+						'workerqueue',
+						['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
+						['id'       => $entry["id"]]
 					);
 				} else {
-					Logger::info('Process runtime is okay', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
+					DI::logger()->info('Process runtime is okay', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
 				}
 			}
 		}
@@ -156,12 +158,12 @@ class Cron
 		$deliveries = DBA::p("SELECT `item-uri`.`uri` AS `inbox`, MAX(`gsid`) AS `gsid`, MAX(`shared`) AS `shared`, MAX(`failed`) AS `failed` FROM `post-delivery` INNER JOIN `item-uri` ON `item-uri`.`id` = `post-delivery`.`inbox-id` LEFT JOIN `inbox-status` ON `inbox-status`.`url` = `item-uri`.`uri` GROUP BY `inbox` ORDER BY RAND()");
 		while ($delivery = DBA::fetch($deliveries)) {
 			if ($delivery['failed'] > 0) {
-				Logger::info('Removing failed deliveries', ['inbox' => $delivery['inbox'], 'failed' => $delivery['failed']]);
+				DI::logger()->info('Removing failed deliveries', ['inbox' => $delivery['inbox'], 'failed' => $delivery['failed']]);
 				Post\Delivery::removeFailed($delivery['inbox']);
 			}
 			if (($delivery['failed'] == 0) && $delivery['shared'] && !empty($delivery['gsid']) && GServer::isReachableById($delivery['gsid'])) {
 				$result = ActivityPub\Delivery::deliver($delivery['inbox']);
-				Logger::info('Directly deliver inbox', ['inbox' => $delivery['inbox'], 'result' => $result['success']]);
+				DI::logger()->info('Directly deliver inbox', ['inbox' => $delivery['inbox'], 'result' => $result['success']]);
 				continue;
 			} elseif ($delivery['failed'] < 3) {
 				$priority = Worker::PRIORITY_HIGH;
@@ -174,7 +176,7 @@ class Cron
 			}
 
 			if (Worker::add(['priority' => $priority, 'force_priority' => true], 'APDelivery', '', 0, $delivery['inbox'], 0)) {
-				Logger::info('Priority for APDelivery worker adjusted', ['inbox' => $delivery['inbox'], 'failed' => $delivery['failed'], 'priority' => $priority]);
+				DI::logger()->info('Priority for APDelivery worker adjusted', ['inbox' => $delivery['inbox'], 'failed' => $delivery['failed'], 'priority' => $priority]);
 			}
 		}
 
@@ -182,9 +184,9 @@ class Cron
 
 		// Optimizing this table only last seconds
 		if (DI::config()->get('system', 'optimize_tables')) {
-			Logger::info('Optimize start');
+			DI::logger()->info('Optimize start');
 			DBA::optimizeTable('post-delivery');
-			Logger::info('Optimize end');
+			DI::logger()->info('Optimize end');
 		}
 	}
 
@@ -195,7 +197,7 @@ class Cron
 	{
 		foreach(DI::deliveryQueueItemRepo()->selectAggregateByServerId() as $delivery) {
 			if ($delivery->failed > 0) {
-				Logger::info('Removing failed deliveries', ['gsid' => $delivery->targetServerId, 'failed' => $delivery->failed]);
+				DI::logger()->info('Removing failed deliveries', ['gsid' => $delivery->targetServerId, 'failed' => $delivery->failed]);
 				DI::deliveryQueueItemRepo()->removeFailedByServerId($delivery->targetServerId, DI::config()->get('system', 'worker_defer_limit'));
 			}
 
@@ -210,15 +212,15 @@ class Cron
 			}
 
 			if (Worker::add(['priority' => $priority, 'force_priority' => true], 'BulkDelivery', $delivery->targetServerId)) {
-				Logger::info('Priority for BulkDelivery worker adjusted', ['gsid' => $delivery->targetServerId, 'failed' => $delivery->failed, 'priority' => $priority]);
+				DI::logger()->info('Priority for BulkDelivery worker adjusted', ['gsid' => $delivery->targetServerId, 'failed' => $delivery->failed, 'priority' => $priority]);
 			}
 		}
 
 		// Optimizing this table only last seconds
 		if (DI::config()->get('system', 'optimize_tables')) {
-			Logger::info('Optimize start');
+			DI::logger()->info('Optimize start');
 			DI::deliveryQueueItemRepo()->optimizeStorage();
-			Logger::info('Optimize end');
+			DI::logger()->info('Optimize end');
 		}
 	}
 
@@ -237,7 +239,7 @@ class Cron
 				'datetime'   => $contact['created'],
 				'hash'       => Strings::getRandomHex()
 			];
-			Logger::notice('Adding missing intro', ['fields' => $fields]);
+			DI::logger()->notice('Adding missing intro', ['fields' => $fields]);
 			DBA::insert('intro', $fields);
 		}
 	}

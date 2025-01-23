@@ -8,8 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\BaseModule;
-use Friendica\Core\Logger;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -39,18 +37,18 @@ class Objects extends BaseModule
 		$itemuri = DBA::selectFirst('item-uri', ['id'], ['guid' => $this->parameters['guid']]);
 
 		if (DBA::isResult($itemuri)) {
-			Logger::info('Provided GUID found.', ['guid' => $this->parameters['guid'], 'uri-id' => $itemuri['id']]);
+			$this->logger->info('Provided GUID found.', ['guid' => $this->parameters['guid'], 'uri-id' => $itemuri['id']]);
 		} else {
 			// The item URI does not always contain the GUID. This means that we have to search the URL instead
-			$url = DI::baseUrl() . '/' . DI::args()->getQueryString();
-			$nurl = Strings::normaliseLink($url);
+			$url     = DI::baseUrl() . '/' . DI::args()->getQueryString();
+			$nurl    = Strings::normaliseLink($url);
 			$ssl_url = str_replace('http://', 'https://', $nurl);
 
 			$itemuri = DBA::selectFirst('item-uri', ['guid', 'id'], ['uri' => [$url, $nurl, $ssl_url]]);
 			if (DBA::isResult($itemuri)) {
-				Logger::info('URL found.', ['url' => $url, 'guid' => $itemuri['guid'], 'uri-id' => $itemuri['id']]);
+				$this->logger->info('URL found.', ['url' => $url, 'guid' => $itemuri['guid'], 'uri-id' => $itemuri['id']]);
 			} else {
-				Logger::info('URL not found.', ['url' => $url]);
+				$this->logger->info('URL not found.', ['url' => $url]);
 				throw new HTTPException\NotFoundException();
 			}
 		}
@@ -65,7 +63,7 @@ class Objects extends BaseModule
 		if (!$validated) {
 			$requester = HTTPSignature::getSigner('', $_SERVER);
 			if (!empty($requester)) {
-				$receivers = Item::enumeratePermissions($item, false);
+				$receivers   = Item::enumeratePermissions($item, false);
 				$receivers[] = $item['contact-id'];
 
 				$validated = in_array(Contact::getIdForURL($requester, $item['uid']), $receivers);
@@ -98,16 +96,18 @@ class Objects extends BaseModule
 
 			$data = ['@context' => ActivityPub::CONTEXT];
 			$data = array_merge($data, $activity['object']);
-		} elseif (empty($this->parameters['activity']) || in_array($this->parameters['activity'],
+		} elseif (empty($this->parameters['activity']) || in_array(
+			$this->parameters['activity'],
 			['Create', 'Announce', 'Update', 'Like', 'Dislike', 'Accept', 'Reject',
-			'TentativeAccept', 'Follow', 'Add'])) {
+				'TentativeAccept', 'Follow', 'Add']
+		)) {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item['id']);
 			if (empty($data)) {
 				throw new HTTPException\NotFoundException();
 			}
 			if (!empty($this->parameters['activity']) && ($this->parameters['activity'] != 'Create')) {
 				$data['type'] = $this->parameters['activity'];
-				$data['id'] = str_replace('/Create', '/' . $this->parameters['activity'], $data['id']);
+				$data['id']   = str_replace('/Create', '/' . $this->parameters['activity'], $data['id']);
 			}
 		} else {
 			throw new HTTPException\NotFoundException();

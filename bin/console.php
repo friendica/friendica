@@ -19,4 +19,4 @@ $container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
 $app = \Friendica\App::fromContainer($container);
 
-$app->processConsole($_SERVER['argv'] ?? []);
+$app->processConsole($_SERVER);

@@ -7,7 +7,6 @@
 
 namespace Friendica\Protocol;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\DI;
@@ -48,28 +47,28 @@ use Friendica\Util\JsonLD;
 class ActivityPub
 {
 	const PUBLIC_COLLECTION = 'https://www.w3.org/ns/activitystreams#Public';
-	const CONTEXT = [
+	const CONTEXT           = [
 		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
 		[
-			'ostatus' => 'http://ostatus.org#',
-			'vcard' => 'http://www.w3.org/2006/vcard/ns#',
-			'dfrn' => 'http://purl.org/macgirvin/dfrn/1.0/',
+			'ostatus'  => 'http://ostatus.org#',
+			'vcard'    => 'http://www.w3.org/2006/vcard/ns#',
+			'dfrn'     => 'http://purl.org/macgirvin/dfrn/1.0/',
 			'diaspora' => 'https://diasporafoundation.org/ns/',
-			'litepub' => 'http://litepub.social/ns#',
-			'toot' => 'http://joinmastodon.org/ns#',
+			'litepub'  => 'http://litepub.social/ns#',
+			'toot'     => 'http://joinmastodon.org/ns#',
 			'featured' => [
-				"@id" => "toot:featured",
+				"@id"   => "toot:featured",
 				"@type" => "@id",
 			],
-			'schema' => 'http://schema.org#',
+			'schema'                    => 'http://schema.org#',
 			'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
-			'sensitive' => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
-			'quoteUrl' => 'as:quoteUrl',
-			'conversation' => 'ostatus:conversation',
-			'directMessage' => 'litepub:directMessage',
-			'discoverable' => 'toot:discoverable',
-			'PropertyValue' => 'schema:PropertyValue',
-			'value' => 'schema:value',
+			'sensitive'                 => 'as:sensitive', 'Hashtag' => 'as:Hashtag',
+			'quoteUrl'                  => 'as:quoteUrl',
+			'conversation'              => 'ostatus:conversation',
+			'directMessage'             => 'litepub:directMessage',
+			'discoverable'              => 'toot:discoverable',
+			'PropertyValue'             => 'schema:PropertyValue',
+			'value'                     => 'schema:value',
 		]
 	];
 	const ACCOUNT_TYPES = ['Person', 'Organization', 'Service', 'Group', 'Application', 'Tombstone'];
@@ -87,12 +86,12 @@ class ActivityPub
 	{
 		header('Vary: Accept', false);
 		if (stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/activity+json') || stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/ld+json')) {
-			Logger::debug('Is AP request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Is AP request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 			return true;
 		}
 
 		if (stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
-			Logger::debug('Is JSON request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Is JSON request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 			return true;
 		}
 
@@ -143,35 +142,35 @@ class ActivityPub
 			return [];
 		}
 
-		$profile = ['network' => Protocol::ACTIVITYPUB];
-		$profile['nick'] = $apcontact['nick'];
-		$profile['name'] = $apcontact['name'];
-		$profile['guid'] = $apcontact['uuid'];
-		$profile['url'] = $apcontact['url'];
-		$profile['addr'] = $apcontact['addr'];
-		$profile['alias'] = $apcontact['alias'];
-		$profile['following'] = $apcontact['following'];
-		$profile['followers'] = $apcontact['followers'];
-		$profile['inbox'] = $apcontact['inbox'];
-		$profile['outbox'] = $apcontact['outbox'];
-		$profile['sharedinbox'] = $apcontact['sharedinbox'];
-		$profile['photo'] = $apcontact['photo'];
-		$profile['header'] = $apcontact['header'];
+		$profile                 = ['network' => Protocol::ACTIVITYPUB];
+		$profile['nick']         = $apcontact['nick'];
+		$profile['name']         = $apcontact['name'];
+		$profile['guid']         = $apcontact['uuid'];
+		$profile['url']          = $apcontact['url'];
+		$profile['addr']         = $apcontact['addr'];
+		$profile['alias']        = $apcontact['alias'];
+		$profile['following']    = $apcontact['following'];
+		$profile['followers']    = $apcontact['followers'];
+		$profile['inbox']        = $apcontact['inbox'];
+		$profile['outbox']       = $apcontact['outbox'];
+		$profile['sharedinbox']  = $apcontact['sharedinbox'];
+		$profile['photo']        = $apcontact['photo'];
+		$profile['header']       = $apcontact['header'];
 		$profile['account-type'] = self::getAccountType($apcontact);
-		$profile['community'] = ($profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
+		$profile['community']    = ($profile['account-type'] == User::ACCOUNT_TYPE_COMMUNITY);
 		// $profile['keywords']
 		// $profile['location']
-		$profile['about'] = $apcontact['about'];
-		$profile['xmpp'] = $apcontact['xmpp'];
-		$profile['matrix'] = $apcontact['matrix'];
-		$profile['batch'] = $apcontact['sharedinbox'];
-		$profile['notify'] = $apcontact['inbox'];
-		$profile['poll'] = $apcontact['outbox'];
-		$profile['pubkey'] = $apcontact['pubkey'];
-		$profile['subscribe'] = $apcontact['subscribe'];
+		$profile['about']            = $apcontact['about'];
+		$profile['xmpp']             = $apcontact['xmpp'];
+		$profile['matrix']           = $apcontact['matrix'];
+		$profile['batch']            = $apcontact['sharedinbox'];
+		$profile['notify']           = $apcontact['inbox'];
+		$profile['poll']             = $apcontact['outbox'];
+		$profile['pubkey']           = $apcontact['pubkey'];
+		$profile['subscribe']        = $apcontact['subscribe'];
 		$profile['manually-approve'] = $apcontact['manually-approve'];
-		$profile['baseurl'] = $apcontact['baseurl'];
-		$profile['gsid'] = $apcontact['gsid'];
+		$profile['baseurl']          = $apcontact['baseurl'];
+		$profile['gsid']             = $apcontact['gsid'];
 
 		if (!is_null($apcontact['discoverable'])) {
 			$profile['hide'] = !$apcontact['discoverable'];
@@ -232,7 +231,7 @@ class ActivityPub
 		$start_timestamp = $start_timestamp ?: time();
 
 		if ((time() - $start_timestamp) > 60) {
-			Logger::info('Fetch time limit reached', ['url' => $url, 'uid' => $uid]);
+			DI::logger()->info('Fetch time limit reached', ['url' => $url, 'uid' => $uid]);
 			return [];
 		}
 
@@ -284,31 +283,31 @@ class ActivityPub
 
 		$signer = HTTPSignature::getSigner('', $_SERVER);
 		if (!$signer) {
-			Logger::debug('No signer or invalid signature', ['uid' => $uid, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'called_by' => $called_by]);
+			DI::logger()->debug('No signer or invalid signature', ['uid' => $uid, 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '', 'called_by' => $called_by]);
 			return false;
 		}
 
 		$apcontact = APContact::getByURL($signer);
 		if (empty($apcontact)) {
-			Logger::info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
+			DI::logger()->info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
 			return false;
 		}
 
 		if (empty($apcontact['gsid']) || empty($apcontact['baseurl'])) {
-			Logger::debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
+			DI::logger()->debug('No server found', ['uid' => $uid, 'signer' => $signer, 'called_by' => $called_by]);
 			return false;
 		}
 
 		$contact = Contact::getByURL($signer, false, ['id', 'baseurl', 'gsid']);
 		if (!empty($contact) && Contact\User::isBlocked($contact['id'], $uid)) {
-			Logger::info('Requesting contact is blocked', ['uid' => $uid, 'id' => $contact['id'], 'signer' => $signer, 'baseurl' => $contact['baseurl'], 'called_by' => $called_by]);
+			DI::logger()->info('Requesting contact is blocked', ['uid' => $uid, 'id' => $contact['id'], 'signer' => $signer, 'baseurl' => $contact['baseurl'], 'called_by' => $called_by]);
 			return false;
 		}
 
 		$limited = DI::config()->get('system', 'limited_servers');
 		if (!empty($limited)) {
 			$servers = explode(',', str_replace(' ', '', $limited));
-			$host = parse_url($apcontact['baseurl'], PHP_URL_HOST);
+			$host    = parse_url($apcontact['baseurl'], PHP_URL_HOST);
 			if (!empty($host) && in_array($host, $servers)) {
 				return false;
 			}
@@ -318,7 +317,7 @@ class ActivityPub
 			return false;
 		}
 
-		Logger::debug('Server is an accepted requester', ['uid' => $uid, 'id' => $apcontact['gsid'], 'url' => $apcontact['baseurl'], 'signer' => $signer, 'called_by' => $called_by]);
+		DI::logger()->debug('Server is an accepted requester', ['uid' => $uid, 'id' => $apcontact['gsid'], 'url' => $apcontact['baseurl'], 'signer' => $signer, 'called_by' => $called_by]);
 
 		return true;
 	}

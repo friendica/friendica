@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -54,27 +53,27 @@ class Search extends BaseApi
 		$result = ['accounts' => [], 'statuses' => [], 'hashtags' => []];
 
 		if (empty($request['type']) || ($request['type'] == 'accounts')) {
-			$result['accounts'] = self::searchAccounts($uid, $request['q'], $request['resolve'], $limit, $request['offset'], $request['following']);
+			$result['accounts'] = $this->searchAccounts($uid, $request['q'], $request['resolve'], $limit, $request['offset'], $request['following']);
 
 			if (!is_array($result['accounts'])) {
 				// Curbing the search if we got an exact result
-				$request['type'] = 'accounts';
+				$request['type']    = 'accounts';
 				$result['accounts'] = [$result['accounts']];
 			}
 		}
 
 		if (empty($request['type']) || ($request['type'] == 'statuses')) {
-			$result['statuses'] = self::searchStatuses($uid, $request['q'], $request['account_id'], $request['max_id'], $request['min_id'], $limit, $request['offset']);
+			$result['statuses'] = $this->searchStatuses($uid, $request['q'], $request['account_id'], $request['max_id'], $request['min_id'], $limit, $request['offset']);
 
 			if (!is_array($result['statuses'])) {
 				// Curbing the search if we got an exact result
-				$request['type'] = 'statuses';
+				$request['type']    = 'statuses';
 				$result['statuses'] = [$result['statuses']];
 			}
 		}
 
 		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (strpos($request['q'], '@') == false)) {
-			$result['hashtags'] = self::searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $this->parameters['version']);
+			$result['hashtags'] = $this->searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $this->parameters['version']);
 		}
 
 		$this->jsonExit($result);
@@ -92,7 +91,7 @@ class Search extends BaseApi
 	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	private static function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
+	private function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
 	{
 		if (($offset == 0) && (strrpos($q, '@') > 0 || Network::isValidHttpUrl($q))
 			&& $id = Contact::getIdForURL($q, 0, $resolve ? null : false)
@@ -121,7 +120,7 @@ class Search extends BaseApi
 	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 * @throws \ImagickException
 	 */
-	private static function searchStatuses(int $uid, string $q, string $account_id, int $max_id, int $min_id, int $limit, int $offset)
+	private function searchStatuses(int $uid, string $q, string $account_id, int $max_id, int $min_id, int $limit, int $offset)
 	{
 		if (Network::isValidHttpUrl($q)) {
 			// Unique post search, any offset greater than 0 should return empty result
@@ -144,9 +143,9 @@ class Search extends BaseApi
 				substr($q, 1), 0, $uid, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, $uid, 0];
 			$table = 'tag-search-view';
 		} else {
-			$q = Post\Engagement::escapeKeywords($q);
+			$q         = Post\Engagement::escapeKeywords($q);
 			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND (NOT `restricted` OR `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ?))", $q, $uid];
-			$table = SearchIndex::getSearchTable();
+			$table     = SearchIndex::getSearchTable();
 		}
 
 		if (!empty($account_id)) {
@@ -173,7 +172,7 @@ class Search extends BaseApi
 			try {
 				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
 			} catch (\Exception $exception) {
-				Logger::info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
+				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}
 		}
 		DBA::close($items);
@@ -186,7 +185,7 @@ class Search extends BaseApi
 		return $statuses;
 	}
 
-	private static function searchHashtags(string $q, bool $exclude_unreviewed, int $limit, int $offset, int $version): array
+	private function searchHashtags(string $q, bool $exclude_unreviewed, int $limit, int $offset, int $version): array
 	{
 		$q = ltrim($q, '#');
 

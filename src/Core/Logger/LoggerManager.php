@@ -21,6 +21,8 @@ use Psr\Log\NullLogger;
 
 /**
  * Manager for the core logging instances
+ *
+ * @internal
  */
 final class LoggerManager
 {

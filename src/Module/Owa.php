@@ -8,7 +8,6 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\OpenWebAuthToken;
@@ -60,10 +59,10 @@ class Owa extends BaseModule
 							$verified = HTTPSignature::verifyMagic($contact['pubkey']);
 
 							if ($verified && $verified['header_signed'] && $verified['header_valid']) {
-								Logger::debug('OWA header', ['addr' => $contact['addr'], 'data' => $verified]);
+								$this->logger->debug('OWA header', ['addr' => $contact['addr'], 'data' => $verified]);
 
 								$ret['success'] = true;
-								$token = Strings::getRandomHex(32);
+								$token          = Strings::getRandomHex(32);
 
 								// Store the generated token in the database.
 								OpenWebAuthToken::create('owt', 0, $token, $contact['addr']);
@@ -77,10 +76,10 @@ class Owa extends BaseModule
 								openssl_public_encrypt($token, $result, $contact['pubkey']);
 								$ret['encrypted_token'] = Strings::base64UrlEncode($result);
 							} else {
-								Logger::info('OWA fail', ['id' => $contact['id'], 'addr' => $contact['addr'], 'url' => $contact['url']]);
+								$this->logger->info('OWA fail', ['id' => $contact['id'], 'addr' => $contact['addr'], 'url' => $contact['url']]);
 							}
 						} else {
-							Logger::info('Contact not found', ['handle' => $handle]);
+							$this->logger->info('Contact not found', ['handle' => $handle]);
 						}
 					}
 				}

@@ -7,13 +7,11 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
-use Friendica\Object\Api\Mastodon\Notification;
 use Minishlink\WebPush\VAPID;
 
 class Subscription
@@ -133,7 +131,7 @@ class Subscription
 
 		$subscriptions = DBA::select('subscription', [], ['uid' => $notification->uid, $type => true]);
 		while ($subscription = DBA::fetch($subscriptions)) {
-			Logger::info('Push notification', ['id' => $subscription['id'], 'uid' => $subscription['uid'], 'type' => $type]);
+			DI::logger()->info('Push notification', ['id' => $subscription['id'], 'uid' => $subscription['uid'], 'type' => $type]);
 			Worker::add(Worker::PRIORITY_HIGH, 'PushSubscription', $subscription['id'], $notification->id);
 		}
 		DBA::close($subscriptions);

@@ -7,9 +7,9 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\User;
@@ -29,7 +29,7 @@ class ExpireAndRemoveUsers
 
 		// Ensure to never remove the user with uid=0
 		DBA::update('user', ['verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false,
-			'account_expires_on' => DBA::NULL_DATETIME], ['uid' => 0]);
+			'account_expires_on'           => DBA::NULL_DATETIME], ['uid' => 0]);
 
 		// Remove any freshly expired account
 		$users = DBA::select('user', ['uid'], ['account_expired' => true, 'account_removed' => false]);
@@ -45,21 +45,21 @@ class ExpireAndRemoveUsers
 		while ($user = DBA::fetch($users)) {
 			$pcid = Contact::getPublicIdByUserId($user['uid']);
 
-			Logger::info('Removing user - start', ['uid' => $user['uid'], 'pcid' => $pcid]);
+			DI::logger()->info('Removing user - start', ['uid' => $user['uid'], 'pcid' => $pcid]);
 			// We have to delete photo entries by hand because otherwise the photo data won't be deleted
 			$result = Photo::delete(['uid' => $user['uid']]);
 			if ($result) {
-				Logger::debug('Deleted user photos', ['result' => $result, 'rows' => DBA::affectedRows()]);
+				DI::logger()->debug('Deleted user photos', ['result' => $result, 'rows' => DBA::affectedRows()]);
 			} else {
-				Logger::warning('Error deleting user photos', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+				DI::logger()->warning('Error deleting user photos', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 			}
 
 			if (!empty($pcid)) {
 				$result = DBA::delete('post-tag', ['cid' => $pcid]);
 				if ($result) {
-					Logger::debug('Deleted post-tag entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
+					DI::logger()->debug('Deleted post-tag entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
 				} else {
-					Logger::warning('Error deleting post-tag entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+					DI::logger()->warning('Error deleting post-tag entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 				}
 
 				$tables = ['post', 'post-user', 'post-thread', 'post-thread-user'];
@@ -73,9 +73,9 @@ class ExpireAndRemoveUsers
 					foreach (['owner-id', 'author-id', 'causer-id'] as $field) {
 						$result = DBA::delete($table, [$field => $pcid]);
 						if ($result) {
-							Logger::debug('Deleted entries', ['table' => $table, 'field' => $field, 'result' => $result, 'rows' => DBA::affectedRows()]);
+							DI::logger()->debug('Deleted entries', ['table' => $table, 'field' => $field, 'result' => $result, 'rows' => DBA::affectedRows()]);
 						} else {
-							Logger::warning('Error deleting entries', ['table' => $table, 'field' => $field, 'errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+							DI::logger()->warning('Error deleting entries', ['table' => $table, 'field' => $field, 'errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 						}
 					}
 				}
@@ -86,18 +86,18 @@ class ExpireAndRemoveUsers
 			if (DBA::isResult($self)) {
 				$result = DBA::delete('contact', ['nurl' => $self['nurl'], 'self' => false]);
 				if ($result) {
-					Logger::debug('Deleted the user contact for other users', ['result' => $result, 'rows' => DBA::affectedRows()]);
+					DI::logger()->debug('Deleted the user contact for other users', ['result' => $result, 'rows' => DBA::affectedRows()]);
 				} else {
-					Logger::warning('Error deleting the user contact for other users', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+					DI::logger()->warning('Error deleting the user contact for other users', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 				}
 			}
 
 			// Delete all contacts of this user
 			$result = DBA::delete('contact', ['uid' => $user['uid']]);
 			if ($result) {
-				Logger::debug('Deleted user contacts', ['result' => $result, 'rows' => DBA::affectedRows()]);
+				DI::logger()->debug('Deleted user contacts', ['result' => $result, 'rows' => DBA::affectedRows()]);
 			} else {
-				Logger::warning('Error deleting user contacts', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+				DI::logger()->warning('Error deleting user contacts', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 			}
 
 			// These tables contain the permissionset which will also be deleted when a user is deleted.
@@ -107,33 +107,33 @@ class ExpireAndRemoveUsers
 			if (DBStructure::existsTable('item')) {
 				$result = DBA::delete('item', ['uid' => $user['uid']]);
 				if ($result) {
-					Logger::debug('Deleted user items', ['result' => $result, 'rows' => DBA::affectedRows()]);
+					DI::logger()->debug('Deleted user items', ['result' => $result, 'rows' => DBA::affectedRows()]);
 				} else {
-					Logger::warning('Error deleting user items', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+					DI::logger()->warning('Error deleting user items', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 				}
 			}
 			$result = DBA::delete('post-user', ['uid' => $user['uid']]);
 			if ($result) {
-				Logger::debug('Deleted post-user entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
+				DI::logger()->debug('Deleted post-user entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
 			} else {
-				Logger::warning('Error deleting post-user entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+				DI::logger()->warning('Error deleting post-user entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 			}
 
 			$result = DBA::delete('profile_field', ['uid' => $user['uid']]);
 			if ($result) {
-				Logger::debug('Deleted profile_field entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
+				DI::logger()->debug('Deleted profile_field entries', ['result' => $result, 'rows' => DBA::affectedRows()]);
 			} else {
-				Logger::warning('Error deleting profile_field entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+				DI::logger()->warning('Error deleting profile_field entries', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 			}
 
 			$result = DBA::delete('user', ['uid' => $user['uid']]);
 			if ($result) {
-				Logger::debug('Deleted user record', ['result' => $result, 'rows' => DBA::affectedRows()]);
+				DI::logger()->debug('Deleted user record', ['result' => $result, 'rows' => DBA::affectedRows()]);
 			} else {
-				Logger::warning('Error deleting user record', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
+				DI::logger()->warning('Error deleting user record', ['errno' => DBA::errorNo(), 'errmsg' => DBA::errorMessage()]);
 			}
 
-			Logger::info('Removing user - done', ['uid' => $user['uid']]);
+			DI::logger()->info('Removing user - done', ['uid' => $user['uid']]);
 		}
 		DBA::close($users);
 	}

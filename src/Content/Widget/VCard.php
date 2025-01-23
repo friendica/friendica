@@ -9,7 +9,6 @@ namespace Friendica\Content\Widget;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -34,17 +33,17 @@ class VCard
 	public static function getHTML(array $contact, bool $hide_mention = false, bool $hide_follow = false): string
 	{
 		if (!isset($contact['network']) || !isset($contact['id'])) {
-			Logger::warning('Incomplete contact', ['contact' => $contact]);
+			DI::logger()->warning('Incomplete contact', ['contact' => $contact]);
 		}
 
 		$contact_url = Contact::getProfileLink($contact);
 
 		if ($contact['network'] != '') {
-			$network_link   = Strings::formatNetworkName($contact['network'], $contact_url);
-			$network_svg    = ContactSelector::networkToSVG($contact['network'], $contact['gsid'], '', DI::userSession()->getLocalUserId());
+			$network_link = Strings::formatNetworkName($contact['network'], $contact_url);
+			$network_svg  = ContactSelector::networkToSVG($contact['network'], $contact['gsid'], '', DI::userSession()->getLocalUserId());
 		} else {
-			$network_link   = '';
-			$network_svg    = '';
+			$network_link = '';
+			$network_svg  = '';
 		}
 
 		$follow_link      = '';
@@ -54,7 +53,7 @@ class VCard
 		$mention_link     = '';
 		$showgroup_link   = '';
 
-		$photo   = Contact::getPhoto($contact);
+		$photo = Contact::getPhoto($contact);
 
 		if (DI::userSession()->getLocalUserId()) {
 			if (Contact\User::isIsBlocked($contact['id'], DI::userSession()->getLocalUserId())) {
@@ -69,8 +68,8 @@ class VCard
 			} else {
 				$pcontact = Contact::selectFirst([], ['uid' => DI::userSession()->getLocalUserId(), 'uri-id' => $contact['uri-id'], 'deleted' => false]);
 
-				$id      = $pcontact['id'] ?? $contact['id'];
-				$rel     = $pcontact['rel'] ?? Contact::NOTHING;
+				$id      = $pcontact['id']      ?? $contact['id'];
+				$rel     = $pcontact['rel']     ?? Contact::NOTHING;
 				$pending = $pcontact['pending'] ?? false;
 
 				if (!empty($pcontact) && in_array($pcontact['network'], [Protocol::MAIL, Protocol::FEED])) {
@@ -92,8 +91,8 @@ class VCard
 
 			if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
 				if (!$hide_mention) {
-					$mention_label  = DI::l10n()->t('Post to group');
-					$mention_link   = 'compose/0?body=!' . $contact['addr'];
+					$mention_label = DI::l10n()->t('Post to group');
+					$mention_link  = 'compose/0?body=!' . $contact['addr'];
 				}
 				$showgroup_link = 'contact/' . $id . '/conversations';
 			} elseif (!$hide_mention) {

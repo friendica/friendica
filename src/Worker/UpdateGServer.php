@@ -7,15 +7,13 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\GServer;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
-use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\UriInterface;
 
 class UpdateGServer
 {
@@ -62,7 +60,7 @@ class UpdateGServer
 		}
 
 		$ret = GServer::check($filtered, '', true, $only_nodeinfo);
-		Logger::info('Updated gserver', ['url' => $filtered, 'result' => $ret]);
+		DI::logger()->info('Updated gserver', ['url' => $filtered, 'result' => $ret]);
 	}
 
 	/**

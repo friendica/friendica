@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub\Queue;
 
 class ProcessQueue
@@ -21,8 +21,8 @@ class ProcessQueue
 	 */
 	public static function execute(int $id)
 	{
-		Logger::info('Start processing queue entry', ['id' => $id]);
+		DI::logger()->info('Start processing queue entry', ['id' => $id]);
 		$result = Queue::process($id);
-		Logger::info('Successfully processed queue entry', ['result' => $result, 'id' => $id]);
+		DI::logger()->info('Successfully processed queue entry', ['result' => $result, 'id' => $id]);
 	}
 }

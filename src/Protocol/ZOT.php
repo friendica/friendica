@@ -9,7 +9,6 @@ namespace Friendica\Protocol;
 
 use Friendica\App;
 use Friendica\Core\Addon;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Module;
 use Friendica\Module\Register;
@@ -30,7 +29,7 @@ class ZOT
 	public static function isRequest(): bool
 	{
 		if (stristr($_SERVER['HTTP_ACCEPT'] ?? '', 'application/x-zot+json')) {
-			Logger::debug('Is ZOT request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
+			DI::logger()->debug('Is ZOT request', ['accept' => $_SERVER['HTTP_ACCEPT'], 'agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']);
 			return true;
 		}
 

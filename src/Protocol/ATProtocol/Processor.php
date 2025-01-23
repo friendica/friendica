@@ -170,7 +170,7 @@ class Processor
 					}
 				}
 				$item['source'] = json_encode($post);
-				$item = $this->addMedia($post->thread->post->embed, $item, 0);
+				$item           = $this->addMedia($post->thread->post->embed, $item, 0);
 			}
 
 			$id = Item::insert($item);
@@ -353,6 +353,10 @@ class Processor
 			'plink'         => $contact['alias'] . '/post/' . $data->commit->rkey,
 			'source'        => json_encode($data),
 		];
+
+		if ((time() - strtotime($item['created'])) > 600) {
+			$item['received'] = $item['created'];
+		}
 
 		if ($this->postExists($item['uri'], [$uid])) {
 			$this->logger->info('Post already exists for user', ['uri' => $item['uri'], 'uid' => $uid]);
@@ -543,7 +547,7 @@ class Processor
 						'preview'     => $image->thumb,
 						'description' => $image->alt,
 						'height'      => $image->aspectRatio->height ?? null,
-						'width'       => $image->aspectRatio->width ?? null,
+						'width'       => $image->aspectRatio->width  ?? null,
 					];
 					Post\Media::insert($media);
 				}

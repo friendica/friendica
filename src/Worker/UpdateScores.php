@@ -7,19 +7,19 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact\Relation;
 use Friendica\Model\Post;
 
 /**
- * Update the interaction scores 
+ * Update the interaction scores
  */
 class UpdateScores
 {
 	public static function execute($param = '', $hook_function = '')
 	{
-		Logger::notice('Start score update');
+		DI::logger()->notice('Start score update');
 
 		$users = DBA::select('user', ['uid'], ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `uid` > ?", 0]);
 		while ($user = DBA::fetch($users)) {
@@ -27,7 +27,7 @@ class UpdateScores
 		}
 		DBA::close($users);
 
-		Logger::notice('Score update done');
+		DI::logger()->notice('Score update done');
 
 		Post\Engagement::expire();
 

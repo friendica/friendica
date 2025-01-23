@@ -71,7 +71,7 @@ class Worker
 
 		// At first check the maximum load. We shouldn't continue with a high load
 		if (DI::system()->isMaxLoadReached()) {
-			Logger::notice('Pre check: maximum load reached, quitting.');
+			DI::logger()->notice('Pre check: maximum load reached, quitting.');
 			return;
 		}
 
@@ -109,7 +109,7 @@ class Worker
 			foreach ($r as $entry) {
 				// The work will be done
 				if (!self::execute($entry)) {
-					Logger::warning('Process execution failed, quitting.', ['entry' => $entry]);
+					DI::logger()->warning('Process execution failed, quitting.', ['entry' => $entry]);
 					return;
 				}
 
@@ -131,14 +131,14 @@ class Worker
 				if (DI::lock()->acquire(self::LOCK_WORKER, 0)) {
 					// Count active workers and compare them with a maximum value that depends on the load
 					if (self::tooMuchWorkers()) {
-						Logger::info('Active worker limit reached, quitting.');
+						DI::logger()->info('Active worker limit reached, quitting.');
 						DI::lock()->release(self::LOCK_WORKER);
 						return;
 					}
 
 					// Check free memory
 					if (DI::system()->isMinMemoryReached()) {
-						Logger::warning('Memory limit reached, quitting.');
+						DI::logger()->warning('Memory limit reached, quitting.');
 						DI::lock()->release(self::LOCK_WORKER);
 						return;
 					}
@@ -149,7 +149,7 @@ class Worker
 
 			// Quit the worker once every cron interval
 			if (time() > ($starttime + (DI::config()->get('system', 'cron_interval') * 60)) && !self::systemLimitReached()) {
-				Logger::info('Process lifetime reached, respawning.');
+				DI::logger()->info('Process lifetime reached, respawning.');
 				self::unclaimProcess($process);
 				if (Worker\Daemon::isMode()) {
 					Worker\IPC::SetJobState(true);
@@ -164,7 +164,7 @@ class Worker
 		if (Worker\Daemon::isMode()) {
 			Worker\IPC::SetJobState(false);
 		}
-		Logger::info("Couldn't select a workerqueue entry, quitting process", ['pid' => getmypid()]);
+		DI::logger()->info("Couldn't select a workerqueue entry, quitting process", ['pid' => getmypid()]);
 	}
 
 	/**
@@ -178,25 +178,25 @@ class Worker
 	{
 		// Count active workers and compare them with a maximum value that depends on the load
 		if (self::tooMuchWorkers()) {
-			Logger::info('Active worker limit reached, quitting.');
+			DI::logger()->info('Active worker limit reached, quitting.');
 			return false;
 		}
 
 		// Do we have too few memory?
 		if (DI::system()->isMinMemoryReached()) {
-			Logger::warning('Memory limit reached, quitting.');
+			DI::logger()->warning('Memory limit reached, quitting.');
 			return false;
 		}
 
 		// Possibly there are too much database connections
 		if (self::maxConnectionsReached()) {
-			Logger::warning('Maximum connections reached, quitting.');
+			DI::logger()->warning('Maximum connections reached, quitting.');
 			return false;
 		}
 
 		// Possibly there are too much database processes that block the system
 		if (DI::system()->isMaxProcessesReached()) {
-			Logger::warning('Maximum processes reached, quitting.');
+			DI::logger()->warning('Maximum processes reached, quitting.');
 			return false;
 		}
 
@@ -322,19 +322,19 @@ class Worker
 
 		// Quit when in maintenance
 		if (DI::config()->get('system', 'maintenance', false)) {
-			Logger::notice('Maintenance mode - quit process', ['pid' => $mypid]);
+			DI::logger()->notice('Maintenance mode - quit process', ['pid' => $mypid]);
 			return false;
 		}
 
 		// Constantly check the number of parallel database processes
 		if (DI::system()->isMaxProcessesReached()) {
-			Logger::warning('Max processes reached for process', ['pid' => $mypid]);
+			DI::logger()->warning('Max processes reached for process', ['pid' => $mypid]);
 			return false;
 		}
 
 		// Constantly check the number of available database connections to let the frontend be accessible at any time
 		if (self::maxConnectionsReached()) {
-			Logger::warning('Max connection reached for process', ['pid' => $mypid]);
+			DI::logger()->warning('Max connection reached for process', ['pid' => $mypid]);
 			return false;
 		}
 
@@ -348,7 +348,7 @@ class Worker
 		}
 
 		if (empty($argv)) {
-			Logger::warning('Parameter is empty', ['queue' => $queue]);
+			DI::logger()->warning('Parameter is empty', ['queue' => $queue]);
 			return false;
 		}
 
@@ -387,7 +387,7 @@ class Worker
 		}
 
 		if (!self::validateInclude($include)) {
-			Logger::warning('Include file is not valid', ['file' => $argv[0]]);
+			DI::logger()->warning('Include file is not valid', ['file' => $argv[0]]);
 			$stamp = (float)microtime(true);
 			DBA::delete('workerqueue', ['id' => $queue['id']]);
 			self::$db_duration = (microtime(true) - $stamp);
@@ -424,7 +424,7 @@ class Worker
 			self::$db_duration = (microtime(true) - $stamp);
 			self::$db_duration_write += (microtime(true) - $stamp);
 		} else {
-			Logger::warning('Function does not exist', ['function' => $funcname]);
+			DI::logger()->warning('Function does not exist', ['function' => $funcname]);
 			$stamp = (float)microtime(true);
 			DBA::delete('workerqueue', ['id' => $queue['id']]);
 			self::$db_duration = (microtime(true) - $stamp);
@@ -477,7 +477,7 @@ class Worker
 	{
 		$cooldown = DI::config()->get('system', 'worker_cooldown', 0);
 		if ($cooldown > 0) {
-			Logger::debug('Wait for cooldown.', ['cooldown' => $cooldown]);
+			DI::logger()->debug('Wait for cooldown.', ['cooldown' => $cooldown]);
 			if ($cooldown < 1) {
 				usleep($cooldown * 1000000);
 			} else {
@@ -501,7 +501,7 @@ class Worker
 		while ($load = System::getLoadAvg($processes_cooldown != 0)) {
 			if (($load_cooldown > 0) && ($load['average1'] > $load_cooldown)) {
 				if (!$sleeping) {
-					Logger::info('Load induced pre execution cooldown.', ['max' => $load_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
+					DI::logger()->info('Load induced pre execution cooldown.', ['max' => $load_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
 					$sleeping = true;
 				}
 				sleep(1);
@@ -509,7 +509,7 @@ class Worker
 			}
 			if (($processes_cooldown > 0) && ($load['scheduled'] > $processes_cooldown)) {
 				if (!$sleeping) {
-					Logger::info('Process induced pre execution cooldown.', ['max' => $processes_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
+					DI::logger()->info('Process induced pre execution cooldown.', ['max' => $processes_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
 					$sleeping = true;
 				}
 				sleep(1);
@@ -519,7 +519,7 @@ class Worker
 		}
 
 		if ($sleeping) {
-			Logger::info('Cooldown ended.', ['max-load' => $load_cooldown, 'max-processes' => $processes_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
+			DI::logger()->info('Cooldown ended.', ['max-load' => $load_cooldown, 'max-processes' => $processes_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
 		}
 	}
 
@@ -677,12 +677,12 @@ class Worker
 		// If $max is set we will use the processlist to determine the current number of connections
 		// The processlist only shows entries of the current user
 		if ($max != 0) {
-			Logger::info('Connection usage (user values)', ['working' => $used, 'sleeping' => $sleep, 'max' => $max]);
+			DI::logger()->info('Connection usage (user values)', ['working' => $used, 'sleeping' => $sleep, 'max' => $max]);
 
 			$level = ($used / $max) * 100;
 
 			if ($level >= $maxlevel) {
-				Logger::warning('Maximum level (' . $maxlevel . '%) of user connections reached: ' . $used .'/' . $max);
+				DI::logger()->warning('Maximum level (' . $maxlevel . '%) of user connections reached: ' . $used .'/' . $max);
 				return true;
 			}
 		}
@@ -705,14 +705,14 @@ class Worker
 		if ($used == 0) {
 			return false;
 		}
-		Logger::info('Connection usage (system values)', ['working' => $used, 'sleeping' => $sleep, 'max' => $max]);
+		DI::logger()->info('Connection usage (system values)', ['working' => $used, 'sleeping' => $sleep, 'max' => $max]);
 
 		$level = $used / $max * 100;
 
 		if ($level < $maxlevel) {
 			return false;
 		}
-		Logger::warning('Maximum level (' . $level . '%) of system connections reached: ' . $used . '/' . $max);
+		DI::logger()->warning('Maximum level (' . $level . '%) of system connections reached: ' . $used . '/' . $max);
 		return true;
 	}
 
@@ -815,16 +815,16 @@ class Worker
 				$high_running = self::processWithPriorityActive($top_priority);
 
 				if (!$high_running && ($top_priority > self::PRIORITY_UNDEFINED) && ($top_priority < self::PRIORITY_NEGLIGIBLE)) {
-					Logger::info('Jobs with a higher priority are waiting but none is executed. Open a fastlane.', ['priority' => $top_priority]);
+					DI::logger()->info('Jobs with a higher priority are waiting but none is executed. Open a fastlane.', ['priority' => $top_priority]);
 					$queues = $active + 1;
 				}
 			}
 
-			Logger::info('Load: ' . $load . '/' . $maxsysload . ' - processes: ' . $deferred . '/' . $active . '/' . $waiting_processes . $processlist . ' - maximum: ' . $queues . '/' . $maxqueues);
+			DI::logger()->info('Load: ' . $load . '/' . $maxsysload . ' - processes: ' . $deferred . '/' . $active . '/' . $waiting_processes . $processlist . ' - maximum: ' . $queues . '/' . $maxqueues);
 
 			// Are there fewer workers running as possible? Then fork a new one.
 			if (!DI::config()->get('system', 'worker_dont_fork', false) && ($queues > ($active + 1)) && self::entriesExists() && !self::systemLimitReached()) {
-				Logger::info('There are fewer workers as possible, fork a new worker.', ['active' => $active, 'queues' => $queues]);
+				DI::logger()->info('There are fewer workers as possible, fork a new worker.', ['active' => $active, 'queues' => $queues]);
 				if (Worker\Daemon::isMode()) {
 					Worker\IPC::SetJobState(true);
 				} else {
@@ -840,10 +840,10 @@ class Worker
 					&& !DBA::exists('workerqueue', ["`done` AND `executed` > ?", DateTimeFormat::utc('now - ' . $max_idletime . ' second')])
 				) {
 					DI::cache()->set(self::LAST_CHECK, time(), Duration::HOUR);
-					Logger::info('The last worker execution had been too long ago.', ['last' => $last_check, 'last-check' => $last_date, 'seconds' => $max_idletime, 'load' => $load, 'max_load' => $maxsysload, 'active_worker' => $active, 'max_worker' => $maxqueues]);
+					DI::logger()->info('The last worker execution had been too long ago.', ['last' => $last_check, 'last-check' => $last_date, 'seconds' => $max_idletime, 'load' => $load, 'max_load' => $maxsysload, 'active_worker' => $active, 'max_worker' => $maxqueues]);
 					return false;
 				} elseif ($max_idletime > 0) {
-					Logger::debug('Maximum idletime not reached.', ['last' => $last_check, 'last-check' => $last_date, 'seconds' => $max_idletime, 'load' => $load, 'max_load' => $maxsysload, 'active_worker' => $active, 'max_worker' => $maxqueues]);
+					DI::logger()->debug('Maximum idletime not reached.', ['last' => $last_check, 'last-check' => $last_date, 'seconds' => $max_idletime, 'load' => $load, 'max_load' => $maxsysload, 'active_worker' => $active, 'max_worker' => $maxqueues]);
 				}
 			}
 		}
@@ -924,7 +924,7 @@ class Worker
 	{
 		$priority = self::nextPriority();
 		if (empty($priority)) {
-			Logger::info('No tasks found');
+			DI::logger()->info('No tasks found');
 			return [];
 		}
 
@@ -948,7 +948,7 @@ class Worker
 		}
 		DBA::close($tasks);
 
-		Logger::info('Found:', ['priority' => $priority, 'id' => $ids]);
+		DI::logger()->info('Found:', ['priority' => $priority, 'id' => $ids]);
 		return $ids;
 	}
 
@@ -987,7 +987,7 @@ class Worker
 
 		foreach ($priorities as $priority) {
 			if (!empty($waiting[$priority]) && empty($running[$priority])) {
-				Logger::info('No running worker found with priority {priority} - assigning it.', ['priority' => $priority]);
+				DI::logger()->info('No running worker found with priority {priority} - assigning it.', ['priority' => $priority]);
 				return $priority;
 			}
 		}
@@ -1009,14 +1009,14 @@ class Worker
 		$i = 0;
 		foreach ($running as $priority => $workers) {
 			if ($workers < $limit[$i++]) {
-				Logger::info('Priority {priority} has got {workers} workers out of a limit of {limit}', ['priority' => $priority, 'workers' => $workers, 'limit' => $limit[$i - 1]]);
+				DI::logger()->info('Priority {priority} has got {workers} workers out of a limit of {limit}', ['priority' => $priority, 'workers' => $workers, 'limit' => $limit[$i - 1]]);
 				return $priority;
 			}
 		}
 
 		if (!empty($waiting)) {
 			$priority = array_keys($waiting)[0];
-			Logger::info('No underassigned priority found, now taking the highest priority.', ['priority' => $priority]);
+			DI::logger()->info('No underassigned priority found, now taking the highest priority.', ['priority' => $priority]);
 			return $priority;
 		}
 
@@ -1090,7 +1090,7 @@ class Worker
 
 		$stamp = (float)microtime(true);
 		foreach ($worker as $worker_pid => $worker_ids) {
-			Logger::info('Set queue entry', ['pid' => $worker_pid, 'ids' => $worker_ids]);
+			DI::logger()->info('Set queue entry', ['pid' => $worker_pid, 'ids' => $worker_ids]);
 			DBA::update(
 				'workerqueue',
 				['executed' => DateTimeFormat::utcNow(), 'pid' => $worker_pid],
@@ -1155,7 +1155,7 @@ class Worker
 	private static function forkProcess(bool $do_cron)
 	{
 		if (DI::system()->isMinMemoryReached()) {
-			Logger::warning('Memory limit reached - quitting');
+			DI::logger()->warning('Memory limit reached - quitting');
 			return;
 		}
 
@@ -1165,21 +1165,21 @@ class Worker
 		$pid = pcntl_fork();
 		if ($pid == -1) {
 			DBA::connect();
-			Logger::warning('Could not spawn worker');
+			DI::logger()->warning('Could not spawn worker');
 			return;
 		} elseif ($pid) {
 			// The parent process continues here
 			DBA::connect();
 
 			Worker\IPC::SetJobState(true, $pid);
-			Logger::info('Spawned new worker', ['pid' => $pid]);
+			DI::logger()->info('Spawned new worker', ['pid' => $pid]);
 
 			$cycles = 0;
 			while (Worker\IPC::JobsExists($pid) && (++$cycles < 100)) {
 				usleep(10000);
 			}
 
-			Logger::info('Spawned worker is ready', ['pid' => $pid, 'wait_cycles' => $cycles]);
+			DI::logger()->info('Spawned worker is ready', ['pid' => $pid, 'wait_cycles' => $cycles]);
 			return;
 		}
 
@@ -1194,7 +1194,7 @@ class Worker
 			usleep(10000);
 		}
 
-		Logger::info('Worker spawned', ['pid' => $process->pid, 'wait_cycles' => $cycles]);
+		DI::logger()->info('Worker spawned', ['pid' => $process->pid, 'wait_cycles' => $cycles]);
 
 		self::processQueue($do_cron, $process);
 
@@ -1202,7 +1202,7 @@ class Worker
 
 		Worker\IPC::SetJobState(false, $process->pid);
 		DI::process()->delete($process);
-		Logger::info('Worker ended', ['pid' => $process->pid]);
+		DI::logger()->info('Worker ended', ['pid' => $process->pid]);
 		exit();
 	}
 
@@ -1292,7 +1292,7 @@ class Worker
 		$added      = 0;
 
 		if (!is_int($priority) || !in_array($priority, self::PRIORITIES)) {
-			Logger::warning('Invalid priority', ['priority' => $priority, 'command' => $command]);
+			DI::logger()->warning('Invalid priority', ['priority' => $priority, 'command' => $command]);
 			$priority = self::PRIORITY_MEDIUM;
 		}
 
@@ -1377,7 +1377,7 @@ class Worker
 				$new_retrial = $retrial;
 			}
 		}
-		Logger::notice('New retrial for task', ['id' => $queue['id'], 'created' => $queue['created'], 'old' => $queue['retrial'], 'new' => $new_retrial]);
+		DI::logger()->notice('New retrial for task', ['id' => $queue['id'], 'created' => $queue['created'], 'old' => $queue['retrial'], 'new' => $new_retrial]);
 		return $new_retrial;
 	}
 
@@ -1419,7 +1419,7 @@ class Worker
 		$new_retrial = self::getNextRetrial($queue, $max_level);
 
 		if ($new_retrial > $max_level) {
-			Logger::notice('The task exceeded the maximum retry count', ['id' => $id, 'created' => $queue['created'], 'old_prio' => $queue['priority'], 'old_retrial' => $queue['retrial'], 'max_level' => $max_level, 'retrial' => $new_retrial]);
+			DI::logger()->notice('The task exceeded the maximum retry count', ['id' => $id, 'created' => $queue['created'], 'old_prio' => $queue['priority'], 'old_retrial' => $queue['retrial'], 'max_level' => $max_level, 'retrial' => $new_retrial]);
 			return false;
 		}
 
@@ -1435,7 +1435,7 @@ class Worker
 			$priority = self::PRIORITY_NEGLIGIBLE;
 		}
 
-		Logger::info('Deferred task', ['id' => $id, 'retrial' => $new_retrial, 'created' => $queue['created'], 'next_execution' => $next, 'old_prio' => $queue['priority'], 'new_prio' => $priority]);
+		DI::logger()->info('Deferred task', ['id' => $id, 'retrial' => $new_retrial, 'created' => $queue['created'], 'next_execution' => $next, 'old_prio' => $queue['priority'], 'new_prio' => $priority]);
 
 		$stamp  = (float)microtime(true);
 		$fields = ['retrial' => $new_retrial, 'next_try' => $next, 'executed' => DBA::NULL_DATETIME, 'pid' => 0, 'priority' => $priority];
@@ -1458,7 +1458,7 @@ class Worker
 		$start = strtotime(DI::config()->get('system', 'maintenance_start')) % 86400;
 		$end   = strtotime(DI::config()->get('system', 'maintenance_end')) % 86400;
 
-		Logger::info('Maintenance window', ['start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
+		DI::logger()->info('Maintenance window', ['start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
 
 		if ($check_last_execution) {
 			// Calculate the window duration
@@ -1467,7 +1467,7 @@ class Worker
 			// Quit when the last cron execution had been after the previous window
 			$last_cron = DI::keyValue()->get('last_cron_daily');
 			if ($last_cron + $duration > time()) {
-				Logger::info('The Daily cron had been executed recently', ['last' => date(DateTimeFormat::MYSQL, $last_cron), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
+				DI::logger()->info('The Daily cron had been executed recently', ['last' => date(DateTimeFormat::MYSQL, $last_cron), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
 				return false;
 			}
 		}
@@ -1483,9 +1483,9 @@ class Worker
 		}
 
 		if ($execute) {
-			Logger::info('We are inside the maintenance window', ['current' => date('H:i:s', $current), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
+			DI::logger()->info('We are inside the maintenance window', ['current' => date('H:i:s', $current), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
 		} else {
-			Logger::info('We are outside the maintenance window', ['current' => date('H:i:s', $current), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
+			DI::logger()->info('We are outside the maintenance window', ['current' => date('H:i:s', $current), 'start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
 		}
 
 		return $execute;

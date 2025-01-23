@@ -9,7 +9,6 @@ namespace Friendica\Worker;
 
 use DOMDocument;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
@@ -41,12 +40,12 @@ class CheckRelMeProfileLink
 	 */
 	public static function execute(int $uid)
 	{
-		Logger::notice('Verifying the homepage', ['uid' => $uid]);
+		DI::logger()->notice('Verifying the homepage', ['uid' => $uid]);
 		Profile::update(['homepage_verified' => false], $uid);
 
 		$owner = User::getOwnerDataById($uid);
 		if (empty($owner['homepage'])) {
-			Logger::notice('The user has no homepage link.', ['uid' => $uid]);
+			DI::logger()->notice('The user has no homepage link.', ['uid' => $uid]);
 			return;
 		}
 
@@ -54,31 +53,31 @@ class CheckRelMeProfileLink
 		try {
 			$curlResult = DI::httpClient()->get($owner['homepage'], HttpClientAccept::HTML, [HttpClientOptions::TIMEOUT => $xrd_timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER]);
 		} catch (\Throwable $th) {
-			Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return;
 		}
 		if (!$curlResult->isSuccess()) {
-			Logger::notice('Could not cURL the homepage URL', ['owner homepage' => $owner['homepage']]);
+			DI::logger()->notice('Could not cURL the homepage URL', ['owner homepage' => $owner['homepage']]);
 			return;
 		}
 
 		$content = $curlResult->getBodyString();
 		if (!$content) {
-			Logger::notice('Empty body of the fetched homepage link). Cannot verify the relation to profile of UID %s.', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
+			DI::logger()->notice('Empty body of the fetched homepage link). Cannot verify the relation to profile of UID %s.', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
 			return;
 		}
 
 		$doc = new DOMDocument();
 		if (!@$doc->loadHTML($content)) {
-			Logger::notice('Could not parse the content');
+			DI::logger()->notice('Could not parse the content');
 			return;
 		}
 
 		if (HTML::checkRelMeLink($doc, new Uri($owner['url']))) {
 			Profile::update(['homepage_verified' => true], $uid);
-			Logger::notice('Homepage URL verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
+			DI::logger()->notice('Homepage URL verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
 		} else {
-			Logger::notice('Homepage URL could not be verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
+			DI::logger()->notice('Homepage URL could not be verified', ['uid' => $uid, 'owner homepage' => $owner['homepage']]);
 		}
 	}
 }

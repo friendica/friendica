@@ -11,6 +11,8 @@ namespace Friendica\Core;
 
 /**
  * Dependency Injection Container
+ *
+ * @internal
  */
 interface Container
 {

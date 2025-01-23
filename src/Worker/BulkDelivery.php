@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Model\GServer;
@@ -24,7 +23,7 @@ class BulkDelivery
 		foreach ($deliveryQueueItems as $deliveryQueueItem) {
 			if (!$server_failure && ProtocolDelivery::deliver($deliveryQueueItem->command, $deliveryQueueItem->postUriId, $deliveryQueueItem->targetContactId, $deliveryQueueItem->senderUserId)) {
 				DI::deliveryQueueItemRepo()->remove($deliveryQueueItem);
-				Logger::debug('Delivery successful', $deliveryQueueItem->toArray());
+				DI::logger()->debug('Delivery successful', $deliveryQueueItem->toArray());
 			} else {
 				DI::deliveryQueueItemRepo()->incrementFailed($deliveryQueueItem);
 				$delivery_failure = true;
@@ -32,7 +31,7 @@ class BulkDelivery
 				if (!$server_failure) {
 					$server_failure = !GServer::isReachableById($gsid);
 				}
-				Logger::debug('Delivery failed', ['server_failure' => $server_failure, 'post' => $deliveryQueueItem]);
+				DI::logger()->debug('Delivery failed', ['server_failure' => $server_failure, 'post' => $deliveryQueueItem]);
 			}
 		}
 

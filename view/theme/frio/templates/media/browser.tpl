@@ -40,7 +40,7 @@
 				<ul role="menu">
 					{{foreach $folders as $folder}}
 					<li role="presentation">
-						<button type="button" data-folder="{{$folder}}" role="menuitem">{{$folder}}</button>
+						<button class="btn btn-default" type="button" data-folder="{{$folder}}" role="menuitem">{{$folder}}</button>
 					</li>
 					{{/foreach}}
 				</ul>

@@ -6,7 +6,7 @@
  *
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
- * @deprecated 2025.02 use bin/console.php daemon instead
+ * @deprecated 2025.02 use `bin/console.php daemon` instead
  */
 
 /**
@@ -24,11 +24,15 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+fwrite(STDOUT, '`bin/daemon.php` is deprecated since 2024.02 and will be removed in 5 months, please use `bin/console.php daemon` instead.' . \PHP_EOL);
+
+// BC: Add console command as second argument
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "daemon");
+$_SERVER['argv'] = $argv;
 
 $container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
 $app = \Friendica\App::fromContainer($container);
 
-$app->processConsole($argv);
+$app->processConsole($_SERVER);

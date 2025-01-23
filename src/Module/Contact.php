@@ -12,7 +12,6 @@ use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Widget;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
@@ -32,11 +31,11 @@ use Friendica\Worker\UpdateContact;
 class Contact extends BaseModule
 {
 	const TAB_CONVERSATIONS = 1;
-	const TAB_POSTS = 2;
-	const TAB_PROFILE = 3;
-	const TAB_CONTACTS = 4;
-	const TAB_ADVANCED = 5;
-	const TAB_MEDIA = 6;
+	const TAB_POSTS         = 2;
+	const TAB_PROFILE       = 3;
+	const TAB_CONTACTS      = 4;
+	const TAB_ADVANCED      = 5;
+	const TAB_MEDIA         = 6;
 
 	private static function batchActions()
 	{
@@ -121,7 +120,7 @@ class Contact extends BaseModule
 		try {
 			UpdateContact::add(Worker::PRIORITY_HIGH, $contact_id);
 		} catch (\InvalidArgumentException $e) {
-			Logger::notice($e->getMessage(), ['contact' => $contact]);
+			DI::logger()->notice($e->getMessage(), ['contact' => $contact]);
 		}
 	}
 
@@ -169,11 +168,11 @@ class Contact extends BaseModule
 		}
 
 		$search = trim($_GET['search'] ?? '');
-		$nets   = trim($_GET['nets']   ?? '');
-		$rel    = trim($_GET['rel']    ?? '');
+		$nets   = trim($_GET['nets'] ?? '');
+		$rel    = trim($_GET['rel'] ?? '');
 		$circle = trim($_GET['circle'] ?? '');
 
-		$accounttype = $_GET['accounttype'] ?? '';
+		$accounttype   = $_GET['accounttype'] ?? '';
 		$accounttypeid = User::getAccountTypeByString($accounttype);
 
 		$page = DI::page();
@@ -183,7 +182,7 @@ class Contact extends BaseModule
 		$page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
 		$page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput-typeahead.css'));
 
-		$vcard_widget = '';
+		$vcard_widget      = '';
 		$findpeople_widget = Widget::findPeople();
 		if (isset($_GET['add'])) {
 			$follow_widget = Widget::follow($_GET['add']);
@@ -249,10 +248,10 @@ class Contact extends BaseModule
 			$sql_values[] = $accounttypeid;
 		}
 
-		$searching = false;
+		$searching  = false;
 		$search_hdr = null;
 		if ($search) {
-			$searching = true;
+			$searching  = true;
 			$search_hdr = $search;
 			$search_txt = preg_quote(trim($search, ' @!'));
 			$sql_extra .= " AND (`name` REGEXP ? OR `url` REGEXP ? OR `nick` REGEXP ? OR `addr` REGEXP ? OR `alias` REGEXP ?)";
@@ -314,80 +313,80 @@ class Contact extends BaseModule
 		$stmt = DBA::select('contact', [], $condition, ['order' => ['name'], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
 
 		while ($contact = DBA::fetch($stmt)) {
-			$contact['blocked'] = Model\Contact\User::isBlocked($contact['id'], DI::userSession()->getLocalUserId());
+			$contact['blocked']  = Model\Contact\User::isBlocked($contact['id'], DI::userSession()->getLocalUserId());
 			$contact['readonly'] = Model\Contact\User::isIgnored($contact['id'], DI::userSession()->getLocalUserId());
-			$contacts[] = self::getContactTemplateVars($contact);
+			$contacts[]          = self::getContactTemplateVars($contact);
 		}
 		DBA::close($stmt);
 
 		$tabs = [
 			[
-				'label' => DI::l10n()->t('All Contacts'),
-				'url'   => 'contact',
-				'sel'   => !$type ? 'active' : '',
-				'title' => DI::l10n()->t('Show all contacts'),
-				'id'    => 'showall-tab',
+				'label'     => DI::l10n()->t('All Contacts'),
+				'url'       => 'contact',
+				'sel'       => !$type ? 'active' : '',
+				'title'     => DI::l10n()->t('Show all contacts'),
+				'id'        => 'showall-tab',
 				'accesskey' => 'l',
 			],
 			[
-				'label' => DI::l10n()->t('Pending'),
-				'url'   => 'contact/pending',
-				'sel'   => $type == 'pending' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show pending contacts'),
-				'id'    => 'showpending-tab',
+				'label'     => DI::l10n()->t('Pending'),
+				'url'       => 'contact/pending',
+				'sel'       => $type == 'pending' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show pending contacts'),
+				'id'        => 'showpending-tab',
 				'accesskey' => 'p',
 			],
 			[
-				'label' => DI::l10n()->t('Blocked'),
-				'url'   => 'contact/blocked',
-				'sel'   => $type == 'blocked' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show blocked contacts'),
-				'id'    => 'showblocked-tab',
+				'label'     => DI::l10n()->t('Blocked'),
+				'url'       => 'contact/blocked',
+				'sel'       => $type == 'blocked' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show blocked contacts'),
+				'id'        => 'showblocked-tab',
 				'accesskey' => 'b',
 			],
 			[
-				'label' => DI::l10n()->t('Ignored'),
-				'url'   => 'contact/ignored',
-				'sel'   => $type == 'ignored' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show ignored contacts'),
-				'id'    => 'showignored-tab',
+				'label'     => DI::l10n()->t('Ignored'),
+				'url'       => 'contact/ignored',
+				'sel'       => $type == 'ignored' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show ignored contacts'),
+				'id'        => 'showignored-tab',
 				'accesskey' => 'i',
 			],
 			[
-				'label' => DI::l10n()->t('Collapsed'),
-				'url'   => 'contact/collapsed',
-				'sel'   => $type == 'collapsed' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show collapsed contacts'),
-				'id'    => 'showcollapsed-tab',
+				'label'     => DI::l10n()->t('Collapsed'),
+				'url'       => 'contact/collapsed',
+				'sel'       => $type == 'collapsed' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show collapsed contacts'),
+				'id'        => 'showcollapsed-tab',
 				'accesskey' => 'c',
 			],
 			[
-				'label' => DI::l10n()->t('Archived'),
-				'url'   => 'contact/archived',
-				'sel'   => $type == 'archived' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show archived contacts'),
-				'id'    => 'showarchived-tab',
+				'label'     => DI::l10n()->t('Archived'),
+				'url'       => 'contact/archived',
+				'sel'       => $type == 'archived' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show archived contacts'),
+				'id'        => 'showarchived-tab',
 				'accesskey' => 'y',
 			],
 			[
-				'label' => DI::l10n()->t('Hidden'),
-				'url'   => 'contact/hidden',
-				'sel'   => $type == 'hidden' ? 'active' : '',
-				'title' => DI::l10n()->t('Only show hidden contacts'),
-				'id'    => 'showhidden-tab',
+				'label'     => DI::l10n()->t('Hidden'),
+				'url'       => 'contact/hidden',
+				'sel'       => $type == 'hidden' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only show hidden contacts'),
+				'id'        => 'showhidden-tab',
 				'accesskey' => 'h',
 			],
 			[
-				'label' => DI::l10n()->t('Circles'),
-				'url'   => 'circle',
-				'sel'   => '',
-				'title' => DI::l10n()->t('Organize your contact circles'),
-				'id'    => 'contactcircles-tab',
+				'label'     => DI::l10n()->t('Circles'),
+				'url'       => 'circle',
+				'sel'       => '',
+				'title'     => DI::l10n()->t('Organize your contact circles'),
+				'id'        => 'contactcircles-tab',
 				'accesskey' => 'e',
 			],
 		];
 
-		$tabs_tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
+		$tabs_tpl  = Renderer::getMarkupTemplate('common_tabs.tpl');
 		$tabs_html = Renderer::replaceMacros($tabs_tpl, ['$tabs' => $tabs]);
 
 		switch ($rel) {
@@ -432,26 +431,26 @@ class Contact extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('contacts-template.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$header'     => $header,
-			'$tabs'       => $tabs_html,
-			'$total'      => $total,
-			'$search'     => $search_hdr,
-			'$desc'       => DI::l10n()->t('Search your contacts'),
-			'$finding'    => $searching ? DI::l10n()->t('Results for: %s', $search) : '',
-			'$submit'     => DI::l10n()->t('Find'),
-			'$cmd'        => DI::args()->getCommand(),
-			'$parameter'  => http_build_query($request),
-			'$contacts'   => $contacts,
-			'$form_security_token'  => BaseModule::getFormSecurityToken('contact_batch_actions'),
-			'multiselect' => 1,
-			'$batch_actions' => [
-				'contacts_batch_update'    => DI::l10n()->t('Update'),
-				'contacts_batch_block'     => DI::l10n()->t('Block') . '/' . DI::l10n()->t('Unblock'),
-				'contacts_batch_ignore'    => DI::l10n()->t('Ignore') . '/' . DI::l10n()->t('Unignore'),
-				'contacts_batch_collapse'  => DI::l10n()->t('Collapse') . '/' . DI::l10n()->t('Uncollapse'),
+			'$header'              => $header,
+			'$tabs'                => $tabs_html,
+			'$total'               => $total,
+			'$search'              => $search_hdr,
+			'$desc'                => DI::l10n()->t('Search your contacts'),
+			'$finding'             => $searching ? DI::l10n()->t('Results for: %s', $search) : '',
+			'$submit'              => DI::l10n()->t('Find'),
+			'$cmd'                 => DI::args()->getCommand(),
+			'$parameter'           => http_build_query($request),
+			'$contacts'            => $contacts,
+			'$form_security_token' => BaseModule::getFormSecurityToken('contact_batch_actions'),
+			'multiselect'          => 1,
+			'$batch_actions'       => [
+				'contacts_batch_update'   => DI::l10n()->t('Update'),
+				'contacts_batch_block'    => DI::l10n()->t('Block') . '/' . DI::l10n()->t('Unblock'),
+				'contacts_batch_ignore'   => DI::l10n()->t('Ignore') . '/' . DI::l10n()->t('Unignore'),
+				'contacts_batch_collapse' => DI::l10n()->t('Collapse') . '/' . DI::l10n()->t('Uncollapse'),
 			],
 			'$h_batch_actions' => DI::l10n()->t('Batch Actions'),
-			'$paginate'   => $pager->renderFull($total),
+			'$paginate'        => $pager->renderFull($total),
 		]);
 
 		return $o;
@@ -471,7 +470,7 @@ class Contact extends BaseModule
 	 */
 	public static function getTabsHTML(array $contact, int $active_tab)
 	{
-		$cid = $pcid = $contact['id'];
+		$cid  = $pcid = $contact['id'];
 		$data = Model\Contact::getPublicAndUserContactID($contact['id'], DI::userSession()->getLocalUserId());
 		if (!empty($data['user']) && ($contact['id'] == $data['public'])) {
 			$cid = $data['user'];
@@ -482,54 +481,54 @@ class Contact extends BaseModule
 		// tabs
 		$tabs = [
 			[
-				'label' => DI::l10n()->t('Profile'),
-				'url'   => 'contact/' . $cid,
-				'sel'   => (($active_tab == self::TAB_PROFILE) ? 'active' : ''),
-				'title' => DI::l10n()->t('Profile Details'),
-				'id'    => 'profile-tab',
+				'label'     => DI::l10n()->t('Profile'),
+				'url'       => 'contact/' . $cid,
+				'sel'       => (($active_tab == self::TAB_PROFILE) ? 'active' : ''),
+				'title'     => DI::l10n()->t('Profile Details'),
+				'id'        => 'profile-tab',
 				'accesskey' => 'o',
 			],
 			[
-				'label' => DI::l10n()->t('Conversations'),
-				'url'   => 'contact/' . $pcid . '/conversations',
-				'sel'   => (($active_tab == self::TAB_CONVERSATIONS) ? 'active' : ''),
-				'title' => DI::l10n()->t('Conversations started by this contact'),
-				'id'    => 'status-tab',
+				'label'     => DI::l10n()->t('Conversations'),
+				'url'       => 'contact/' . $pcid . '/conversations',
+				'sel'       => (($active_tab == self::TAB_CONVERSATIONS) ? 'active' : ''),
+				'title'     => DI::l10n()->t('Conversations started by this contact'),
+				'id'        => 'status-tab',
 				'accesskey' => 'm',
 			],
 			[
-				'label' => DI::l10n()->t('Posts and Comments'),
-				'url'   => 'contact/' . $pcid . '/posts',
-				'sel'   => (($active_tab == self::TAB_POSTS) ? 'active' : ''),
-				'title' => DI::l10n()->t('Individual Posts and Replies'),
-				'id'    => 'posts-tab',
+				'label'     => DI::l10n()->t('Posts and Comments'),
+				'url'       => 'contact/' . $pcid . '/posts',
+				'sel'       => (($active_tab == self::TAB_POSTS) ? 'active' : ''),
+				'title'     => DI::l10n()->t('Individual Posts and Replies'),
+				'id'        => 'posts-tab',
 				'accesskey' => 'p',
 			],
 			[
-				'label' => DI::l10n()->t('Media'),
-				'url'   => 'contact/' . $pcid . '/media',
-				'sel'   => (($active_tab == self::TAB_MEDIA) ? 'active' : ''),
-				'title' => DI::l10n()->t('Posts containing media objects'),
-				'id'    => 'media-tab',
+				'label'     => DI::l10n()->t('Media'),
+				'url'       => 'contact/' . $pcid . '/media',
+				'sel'       => (($active_tab == self::TAB_MEDIA) ? 'active' : ''),
+				'title'     => DI::l10n()->t('Posts containing media objects'),
+				'id'        => 'media-tab',
 				'accesskey' => 'd',
 			],
 			[
-				'label' => DI::l10n()->t('Contacts'),
-				'url'   => 'contact/' . $pcid . '/contacts',
-				'sel'   => (($active_tab == self::TAB_CONTACTS) ? 'active' : ''),
-				'title' => DI::l10n()->t('View all known contacts'),
-				'id'    => 'contacts-tab',
+				'label'     => DI::l10n()->t('Contacts'),
+				'url'       => 'contact/' . $pcid . '/contacts',
+				'sel'       => (($active_tab == self::TAB_CONTACTS) ? 'active' : ''),
+				'title'     => DI::l10n()->t('View all known contacts'),
+				'id'        => 'contacts-tab',
 				'accesskey' => 't'
 			],
 		];
 
 		if (!empty($contact['network']) && in_array($contact['network'], [Protocol::FEED, Protocol::MAIL]) && ($cid != $pcid)) {
 			$tabs[] = [
-				'label' => DI::l10n()->t('Advanced'),
-				'url'   => 'contact/' . $cid . '/advanced/',
-				'sel'   => (($active_tab == self::TAB_ADVANCED) ? 'active' : ''),
-				'title' => DI::l10n()->t('Advanced Contact Settings'),
-				'id'    => 'advanced-tab',
+				'label'     => DI::l10n()->t('Advanced'),
+				'url'       => 'contact/' . $cid . '/advanced/',
+				'sel'       => (($active_tab == self::TAB_ADVANCED) ? 'active' : ''),
+				'title'     => DI::l10n()->t('Advanced Contact Settings'),
+				'id'        => 'advanced-tab',
 				'accesskey' => 'r'
 			];
 		}
@@ -567,11 +566,11 @@ class Contact extends BaseModule
 					$alt_text = DI::l10n()->t('Mutual Friendship');
 					break;
 
-				case Model\Contact::FOLLOWER;
+				case Model\Contact::FOLLOWER:
 					$alt_text = DI::l10n()->t('is a fan of yours');
 					break;
 
-				case Model\Contact::SHARING;
+				case Model\Contact::SHARING:
 					$alt_text = DI::l10n()->t('you are a fan of');
 					break;
 

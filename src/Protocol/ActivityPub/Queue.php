@@ -7,7 +7,6 @@
 
 namespace Friendica\Protocol\ActivityPub;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -129,7 +128,7 @@ class Queue
 			return;
 		}
 
-		Logger::debug('Delete inbox-entry', ['id' => $entry['id']]);
+		DI::logger()->debug('Delete inbox-entry', ['id' => $entry['id']]);
 
 		DBA::delete('inbox-entry', ['id' => $entry['id']]);
 
@@ -187,23 +186,23 @@ class Queue
 		}
 
 		if (!self::isProcessable($id)) {
-			Logger::debug('Other queue entries need to be processed first.', ['id' => $id]);
+			DI::logger()->debug('Other queue entries need to be processed first.', ['id' => $id]);
 			return false;
 		}
 
 		if (!empty($entry['wid'])) {
 			$worker = DI::appHelper()->getQueue();
-			$wid = $worker['id'] ?? 0;
+			$wid    = $worker['id'] ?? 0;
 			if ($entry['wid'] != $wid) {
 				$workerqueue = DBA::selectFirst('workerqueue', ['pid'], ['id' => $entry['wid'], 'done' => false]);
 				if (!empty($workerqueue['pid']) && posix_kill($workerqueue['pid'], 0)) {
-					Logger::notice('Entry is already processed via another process.', ['current' => $wid, 'processor' => $entry['wid']]);
+					DI::logger()->notice('Entry is already processed via another process.', ['current' => $wid, 'processor' => $entry['wid']]);
 					return false;
 				}
 			}
 		}
 
-		Logger::debug('Processing queue entry', ['id' => $entry['id'], 'type' => $entry['type'], 'object-type' => $entry['object-type'], 'uri' => $entry['object-id'], 'in-reply-to' => $entry['in-reply-to-id']]);
+		DI::logger()->debug('Processing queue entry', ['id' => $entry['id'], 'type' => $entry['type'], 'object-type' => $entry['object-type'], 'uri' => $entry['object-id'], 'in-reply-to' => $entry['in-reply-to-id']]);
 
 		$activity = json_decode($entry['activity'], true);
 		$type     = $entry['type'];
@@ -259,16 +258,16 @@ class Queue
 			if (!$entry['trust'] || !self::isProcessable($entry['id'])) {
 				continue;
 			}
-			Logger::debug('Process leftover entry', $entry);
+			DI::logger()->debug('Process leftover entry', $entry);
 			self::process($entry['id'], false);
 		}
 		DBA::close($entries);
 
 		// Optimizing this table only last seconds
 		if (DI::config()->get('system', 'optimize_tables')) {
-			Logger::info('Optimize start');
+			DI::logger()->info('Optimize start');
 			DBA::optimizeTable('inbox-entry');
-			Logger::info('Optimize end');
+			DI::logger()->info('Optimize end');
 		}
 	}
 
@@ -316,22 +315,22 @@ class Queue
 			if (!Processor::alreadyKnown($entry['in-reply-to-id'], '')) {
 				// This entry belongs to some other entry that need to be fetched first
 				if (Fetch::hasWorker($entry['in-reply-to-id'])) {
-					Logger::debug('Fetching of the activity is already queued', ['id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
+					DI::logger()->debug('Fetching of the activity is already queued', ['id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
 					self::retrial($id);
 					return false;
 				}
 				Fetch::add($entry['in-reply-to-id']);
 				$activity = json_decode($entry['activity'], true);
 				if (in_array($entry['in-reply-to-id'], $activity['children'] ?? [])) {
-					Logger::notice('reply-to-id is already in the list of children', ['id' => $entry['in-reply-to-id'], 'children' => $activity['children'], 'depth' => count($activity['children'])]);
+					DI::logger()->notice('reply-to-id is already in the list of children', ['id' => $entry['in-reply-to-id'], 'children' => $activity['children'], 'depth' => count($activity['children'])]);
 					self::retrial($id);
 					return false;
 				}
 				$activity['recursion-depth'] = 0;
-				$activity['callstack'] = Processor::addToCallstack($activity['callstack'] ?? []);
-				$wid = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $entry['in-reply-to-id'], $activity, '', Receiver::COMPLETION_ASYNC);
+				$activity['callstack']       = Processor::addToCallstack($activity['callstack'] ?? []);
+				$wid                         = Worker::add(Worker::PRIORITY_HIGH, 'FetchMissingActivity', $entry['in-reply-to-id'], $activity, '', Receiver::COMPLETION_ASYNC);
 				Fetch::setWorkerId($entry['in-reply-to-id'], $wid);
-				Logger::debug('Fetch missing activity', ['wid' => $wid, 'id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
+				DI::logger()->debug('Fetch missing activity', ['wid' => $wid, 'id' => $entry['activity-id'], 'reply-to-id' => $entry['in-reply-to-id']]);
 				self::retrial($id);
 				return false;
 			}
@@ -349,7 +348,7 @@ class Queue
 	 */
 	public static function processReplyByUri(string $uri, array $parent = []): int
 	{
-		$count = 0;
+		$count   = 0;
 		$entries = DBA::select('inbox-entry', ['id'], ["`in-reply-to-id` = ? AND `object-id` != ?", $uri, $uri]);
 		while ($entry = DBA::fetch($entries)) {
 			$count += 1;

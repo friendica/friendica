@@ -7,7 +7,6 @@
 
 namespace Friendica\Model;
 
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -32,7 +31,7 @@ class ItemURI
 		$itemuri = DBA::selectFirst('item-uri', ['id', 'guid'], ['uri' => $fields['uri']]);
 		if (!DBA::isResult($itemuri)) {
 			// This shouldn't happen
-			Logger::warning('Item-uri not found', $fields);
+			DI::logger()->warning('Item-uri not found', $fields);
 			return null;
 		}
 

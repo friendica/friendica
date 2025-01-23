@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Protocol\ActivityPub;
@@ -26,18 +25,18 @@ class FetchMissingActivity
 	 */
 	public static function execute(string $url, array $child = [], string $relay_actor = '', int $completion = Receiver::COMPLETION_MANUAL)
 	{
-		Logger::info('Start fetching missing activity', ['url' => $url]);
+		DI::logger()->info('Start fetching missing activity', ['url' => $url]);
 		if (ActivityPub\Processor::alreadyKnown($url, $child['id'] ?? '')) {
-			Logger::info('Activity is already known.', ['url' => $url]);
+			DI::logger()->info('Activity is already known.', ['url' => $url]);
 			return;
 		}
 		$result = ActivityPub\Processor::fetchMissingActivity($url, $child, $relay_actor, $completion);
 		if ($result) {
-			Logger::info('Successfully fetched missing activity', ['url' => $url]);
+			DI::logger()->info('Successfully fetched missing activity', ['url' => $url]);
 		} elseif (is_null($result)) {
-			Logger::info('Permament error, activity could not be fetched', ['url' => $url]);
+			DI::logger()->info('Permament error, activity could not be fetched', ['url' => $url]);
 		} elseif (!Worker::defer(self::WORKER_DEFER_LIMIT)) {
-			Logger::info('Defer limit reached, activity could not be fetched', ['url' => $url]);
+			DI::logger()->info('Defer limit reached, activity could not be fetched', ['url' => $url]);
 
 			// recursively delete all entries that belong to this worker task
 			$queue = DI::appHelper()->getQueue();
@@ -45,7 +44,7 @@ class FetchMissingActivity
 				Queue::deleteByWorkerId($queue['id']);
 			}
 		} else {
-			Logger::info('Fetching deferred', ['url' => $url]);
+			DI::logger()->info('Fetching deferred', ['url' => $url]);
 		}
 	}
 }

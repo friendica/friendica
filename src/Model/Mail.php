@@ -8,7 +8,6 @@
 namespace Friendica\Model;
 
 use Friendica\Core\ACL;
-use Friendica\Core\Logger;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -58,7 +57,7 @@ class Mail
 
 		if (DBA::exists('mail', ['uri' => $msg['uri'], 'uid' => $msg['uid']])) {
 			DBA::unlock();
-			Logger::info('duplicate message already delivered.');
+			DI::logger()->info('duplicate message already delivered.');
 			return false;
 		}
 
@@ -94,7 +93,7 @@ class Mail
 
 			DI::notify()->createFromArray($notif_params);
 
-			Logger::info('Mail is processed, notification was sent.', ['id' => $msg['id'], 'uri' => $msg['uri']]);
+			DI::logger()->info('Mail is processed, notification was sent.', ['id' => $msg['id'], 'uri' => $msg['uri']]);
 		}
 
 		return $msg['id'];
@@ -138,15 +137,15 @@ class Mail
 		Photo::setPermissionFromBody($body, $sender_uid, $me['id'], '<' . $contact['id'] . '>', '', '', '');
 
 		$guid = System::createUUID();
-		$uri = Item::newURI($guid);
+		$uri  = Item::newURI($guid);
 
 		$convid = 0;
-		$reply = false;
+		$reply  = false;
 
 		// look for any existing conversation structure
 
 		if (strlen($replyto)) {
-			$reply = true;
+			$reply     = true;
 			$condition = ["`uid` = ? AND (`uri` = ? OR `parent-uri` = ?)",
 				$sender_uid, $replyto, $replyto];
 			$mail = DBA::selectFirst('mail', ['convid'], $condition);
@@ -159,18 +158,18 @@ class Mail
 		if (!$convid) {
 			// create a new conversation
 			$conv_guid = System::createUUID();
-			$convuri = $contact['addr'] . ':' . $conv_guid;
+			$convuri   = $contact['addr'] . ':' . $conv_guid;
 
 			$fields = ['uid' => $sender_uid, 'guid' => $conv_guid, 'creator' => $me['addr'],
-				'created' => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
-				'subject' => $subject, 'recips' => $contact['addr'] . ';' . $me['addr']];
+				'created'       => DateTimeFormat::utcNow(), 'updated' => DateTimeFormat::utcNow(),
+				'subject'       => $subject, 'recips' => $contact['addr'] . ';' . $me['addr']];
 			if (DBA::insert('conv', $fields)) {
 				$convid = DBA::lastInsertId();
 			}
 		}
 
 		if (!$convid) {
-			Logger::warning('conversation not found.');
+			DI::logger()->warning('conversation not found.');
 			return -4;
 		}
 
@@ -180,21 +179,21 @@ class Mail
 
 		$post_id = self::insert(
 			[
-				'uid' => $sender_uid,
-				'guid' => $guid,
-				'convid' => $convid,
-				'from-name' => $me['name'],
+				'uid'        => $sender_uid,
+				'guid'       => $guid,
+				'convid'     => $convid,
+				'from-name'  => $me['name'],
 				'from-photo' => $me['thumb'],
-				'from-url' => $me['url'],
+				'from-url'   => $me['url'],
 				'contact-id' => $recipient,
-				'title' => $subject,
-				'body' => $body,
-				'seen' => 1,
-				'reply' => $reply,
-				'replied' => 0,
-				'uri' => $uri,
+				'title'      => $subject,
+				'body'       => $body,
+				'seen'       => 1,
+				'reply'      => $reply,
+				'replied'    => 0,
+				'uri'        => $uri,
 				'parent-uri' => $replyto,
-				'created' => DateTimeFormat::utcNow()
+				'created'    => DateTimeFormat::utcNow()
 			],
 			false
 		);

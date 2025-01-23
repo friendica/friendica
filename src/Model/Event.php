@@ -10,7 +10,6 @@ namespace Friendica\Model;
 use Friendica\Content\Feature;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -30,7 +29,6 @@ use Friendica\Util\XML;
  */
 class Event
 {
-
 	public static function getHTML(array $event, bool $simple = false, int $uriid = 0): string
 	{
 		if (empty($event)) {
@@ -219,7 +217,7 @@ class Event
 		}
 
 		DBA::delete('event', ['id' => $event_id]);
-		Logger::info("Deleted event", ['id' => $event_id]);
+		DI::logger()->info("Deleted event", ['id' => $event_id]);
 	}
 
 	/**
@@ -233,28 +231,28 @@ class Event
 	 */
 	public static function store(array $arr): int
 	{
-		$guid = $arr['guid'] ?? '' ?: System::createUUID();
-		$uri  = $arr['uri']  ?? '' ?: Item::newURI($guid);
+		$guid  = $arr['guid'] ?? '' ?: System::createUUID();
+		$uri   = $arr['uri']  ?? '' ?: Item::newURI($guid);
 		$event = [
-			'id'        => intval($arr['id']        ?? 0),
-			'uid'       => intval($arr['uid']       ?? 0),
-			'cid'       => intval($arr['cid']       ?? 0),
+			'id'        => intval($arr['id'] ?? 0),
+			'uid'       => intval($arr['uid'] ?? 0),
+			'cid'       => intval($arr['cid'] ?? 0),
 			'guid'      => $guid,
 			'uri'       => $uri,
 			'uri-id'    => ItemURI::insert(['uri' => $uri, 'guid' => $guid]),
-			'type'      => ($arr['type']      ?? '') ?: 'event',
-			'summary'   =>  $arr['summary']   ?? '',
-			'desc'      =>  $arr['desc']      ?? '',
-			'location'  =>  $arr['location']  ?? '',
-			'allow_cid' =>  $arr['allow_cid'] ?? '',
-			'allow_gid' =>  $arr['allow_gid'] ?? '',
-			'deny_cid'  =>  $arr['deny_cid']  ?? '',
-			'deny_gid'  =>  $arr['deny_gid']  ?? '',
+			'type'      => ($arr['type'] ?? '') ?: 'event',
+			'summary'   => $arr['summary']   ?? '',
+			'desc'      => $arr['desc']      ?? '',
+			'location'  => $arr['location']  ?? '',
+			'allow_cid' => $arr['allow_cid'] ?? '',
+			'allow_gid' => $arr['allow_gid'] ?? '',
+			'deny_cid'  => $arr['deny_cid']  ?? '',
+			'deny_gid'  => $arr['deny_gid']  ?? '',
 			'nofinish'  => intval($arr['nofinish'] ?? (!empty($arr['start']) && empty($arr['finish']))),
 			'created'   => DateTimeFormat::utc(($arr['created'] ?? '') ?: 'now'),
-			'edited'    => DateTimeFormat::utc(($arr['edited']  ?? '') ?: 'now'),
-			'start'     => DateTimeFormat::utc(($arr['start']   ?? '') ?: DBA::NULL_DATETIME),
-			'finish'    => DateTimeFormat::utc(($arr['finish']  ?? '') ?: DBA::NULL_DATETIME),
+			'edited'    => DateTimeFormat::utc(($arr['edited'] ?? '') ?: 'now'),
+			'start'     => DateTimeFormat::utc(($arr['start'] ?? '') ?: DBA::NULL_DATETIME),
+			'finish'    => DateTimeFormat::utc(($arr['finish'] ?? '') ?: DBA::NULL_DATETIME),
 		];
 
 
@@ -358,7 +356,7 @@ class Event
 		$item['body']          = self::getBBCode($event);
 		$item['event-id']      = $event['id'];
 
-		$item['object']  = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
+		$item['object'] = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
 		$item['object'] .= '<content>' . XML::escape(self::getBBCode($event)) . '</content>';
 		$item['object'] .= '</object>' . "\n";
 
@@ -376,13 +374,13 @@ class Event
 			return $item;
 		}
 
-		$item['post-type']     = Item::PT_EVENT;
-		$item['title']         = '';
-		$item['object-type']   = Activity\ObjectType::EVENT;
-		$item['body']          = self::getBBCode($event);
-		$item['event-id']      = $event_id;
+		$item['post-type']   = Item::PT_EVENT;
+		$item['title']       = '';
+		$item['object-type'] = Activity\ObjectType::EVENT;
+		$item['body']        = self::getBBCode($event);
+		$item['event-id']    = $event_id;
 
-		$item['object']  = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
+		$item['object'] = '<object><type>' . XML::escape(Activity\ObjectType::EVENT) . '</type><title></title><id>' . XML::escape($event['uri']) . '</id>';
 		$item['object'] .= '<content>' . XML::escape(self::getBBCode($event)) . '</content>';
 		$item['object'] .= '</object>' . "\n";
 
@@ -399,7 +397,7 @@ class Event
 	{
 		// First day of the week (0 = Sunday).
 		$firstDay    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'first_day_of_week') ?? 0;
-		$defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'defaultView') ?? 'month';
+		$defaultView = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'calendar', 'defaultView')       ?? 'month';
 
 		return [
 			'firstDay'    => $firstDay,
@@ -650,12 +648,12 @@ class Event
 		if (DI::userSession()->getLocalUserId() && DI::userSession()->getLocalUserId() == $event['uid'] && $event['type'] == 'event') {
 			$edit = !$event['cid'] ? ['calendar/event/edit/' . $event['id'], DI::l10n()->t('Edit event'), '', ''] : null;
 			$copy = !$event['cid'] ? ['calendar/event/copy/' . $event['id'], DI::l10n()->t('Duplicate event'), '', ''] : null;
-			$drop =                  ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete event'), '', ''];
+			$drop = ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete event'), '', ''];
 		}
 
 		$title = strip_tags(BBCode::convertForUriId($event['uri-id'], $event['summary']));
 		if (!$title) {
-			[$title, $_trash] = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
+			list($title, $_trash) = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
 		}
 
 		$event['author-link'] = Contact::magicLink($event['author-link']);
@@ -695,7 +693,7 @@ class Event
 		}
 
 		switch ($format) {
-				// Format the exported data as a CSV file.
+			// Format the exported data as a CSV file.
 			case "csv":
 				$o .= '"Subject", "Start Date", "Start Time", "Description", "End Date", "End Time", "Location"' . PHP_EOL;
 
@@ -745,21 +743,21 @@ class Event
 						$tmp = $event['summary'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'SUMMARY:' . $tmp . PHP_EOL;
+						$o .= 'SUMMARY:' . $tmp . PHP_EOL;
 					}
 
 					if ($event['desc']) {
 						$tmp = $event['desc'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'DESCRIPTION:' . $tmp . PHP_EOL;
+						$o .= 'DESCRIPTION:' . $tmp . PHP_EOL;
 					}
 
 					if ($event['location']) {
 						$tmp = $event['location'];
 						$tmp = str_replace(PHP_EOL, PHP_EOL . ' ', $tmp);
 						$tmp = addcslashes($tmp, ',;');
-						$o   .= 'LOCATION:' . $tmp . PHP_EOL;
+						$o .= 'LOCATION:' . $tmp . PHP_EOL;
 					}
 
 					$o .= 'END:VEVENT' . PHP_EOL;
@@ -913,7 +911,7 @@ class Event
 		}
 
 		// Construct the profile link (magic-auth).
-		$author       = [
+		$author = [
 			'uid'     => 0,
 			'id'      => $item['author-id'],
 			'network' => $item['author-network'],

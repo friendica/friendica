@@ -9,7 +9,6 @@ namespace Friendica\Model;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -27,13 +26,13 @@ use Friendica\Util\Strings;
  */
 class Tag
 {
-	const UNKNOWN  = 0;
-	const HASHTAG  = 1;
-	const MENTION  = 2;
+	const UNKNOWN = 0;
+	const HASHTAG = 1;
+	const MENTION = 2;
 	/**
 	 * An implicit mention is a mention in a comment body that is redundant with the threading information.
 	 */
-	const IMPLICIT_MENTION  = 8;
+	const IMPLICIT_MENTION = 8;
 	/**
 	 * An exclusive mention transmits the post only to the target account without transmitting it to the followers, usually a group.
 	 */
@@ -91,7 +90,7 @@ class Tag
 			return;
 		}
 
-		$cid = 0;
+		$cid   = 0;
 		$tagid = 0;
 
 		if (in_array($type, [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION, self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED])) {
@@ -101,11 +100,11 @@ class Tag
 			}
 
 			if ((substr($url, 0, 7) == 'https//') || (substr($url, 0, 6) == 'http//')) {
-				Logger::notice('Wrong scheme in url', ['url' => $url]);
+				DI::logger()->notice('Wrong scheme in url', ['url' => $url]);
 			}
 
 			$cid = Contact::getIdForURL($url, 0, false);
-			Logger::debug('Got id for contact', ['cid' => $cid, 'url' => $url]);
+			DI::logger()->debug('Got id for contact', ['cid' => $cid, 'url' => $url]);
 
 			if (empty($cid)) {
 				$tag = DBA::selectFirst('tag', ['name', 'type'], ['url' => $url]);
@@ -138,17 +137,17 @@ class Tag
 		$fields = ['uri-id' => $uriId, 'type' => $type, 'tid' => $tagid, 'cid' => $cid];
 
 		if (in_array($type, [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION])) {
-			$condition = $fields;
+			$condition         = $fields;
 			$condition['type'] = [self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION];
 			if (DBA::exists('post-tag', $condition)) {
-				Logger::info('Tag already exists', $fields);
+				DI::logger()->info('Tag already exists', $fields);
 				return;
 			}
 		}
 
 		DBA::insert('post-tag', $fields, Database::INSERT_IGNORE);
 
-		Logger::debug('Stored tag/mention', ['uri-id' => $uriId, 'tag-id' => $tagid, 'contact-id' => $cid, 'name' => $name, 'type' => $type]);
+		DI::logger()->debug('Stored tag/mention', ['uri-id' => $uriId, 'tag-id' => $tagid, 'contact-id' => $cid, 'name' => $name, 'type' => $type]);
 	}
 
 	/**
@@ -170,26 +169,26 @@ class Tag
 		if (!empty($tag['type'])) {
 			$target = $tag['type'];
 			if ($target != self::GENERAL_COLLECTION) {
-				Logger::debug('Found existing type', ['type' => $tag['type'], 'url' => $url]);
+				DI::logger()->debug('Found existing type', ['type' => $tag['type'], 'url' => $url]);
 				return $target;
 			}
 		}
 
 		if ($url == ActivityPub::PUBLIC_COLLECTION) {
 			$target = self::PUBLIC_COLLECTION;
-			Logger::debug('Public collection', ['url' => $url]);
+			DI::logger()->debug('Public collection', ['url' => $url]);
 		} else {
 			if (DBA::exists('apcontact', ['followers' => $url])) {
 				$target = self::FOLLOWER_COLLECTION;
-				Logger::debug('Found collection via existing apcontact', ['url' => $url]);
+				DI::logger()->debug('Found collection via existing apcontact', ['url' => $url]);
 			} elseif (Contact::getIdForURL($url, 0, $fetch ? null : false)) {
 				$target = self::ACCOUNT;
-				Logger::debug('URL is an account', ['url' => $url]);
+				DI::logger()->debug('URL is an account', ['url' => $url]);
 			} elseif ($fetch && ($target != self::GENERAL_COLLECTION)) {
 				$content = HTTPSignature::fetch($url);
 				if (!empty($content['type']) && ($content['type'] == 'OrderedCollection')) {
 					$target = self::GENERAL_COLLECTION;
-					Logger::debug('URL is an ordered collection', ['url' => $url]);
+					DI::logger()->debug('URL is an ordered collection', ['url' => $url]);
 				}
 			}
 		}
@@ -199,7 +198,7 @@ class Tag
 		}
 
 		if (empty($target)) {
-			Logger::debug('No type could be detected', ['url' => $url]);
+			DI::logger()->debug('No type could be detected', ['url' => $url]);
 		}
 
 		return $target;
@@ -238,7 +237,7 @@ class Tag
 		// Also log type
 		$fields['type'] = $type;
 
-		Logger::error('No tag id created', $fields);
+		DI::logger()->error('No tag id created', $fields);
 		return 0;
 	}
 
@@ -305,7 +304,7 @@ class Tag
 	 */
 	public static function storeFromArray(array $item, string $tags = null)
 	{
-		Logger::info('Check for tags', ['uri-id' => $item['uri-id'], 'hash' => $tags]);
+		DI::logger()->info('Check for tags', ['uri-id' => $item['uri-id'], 'hash' => $tags]);
 
 		if (is_null($tags)) {
 			$tags = self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
@@ -336,14 +335,14 @@ class Tag
 	 */
 	public static function storeRawTagsFromBody(int $uriId, string $body)
 	{
-		Logger::info('Check for tags', ['uri-id' => $uriId]);
+		DI::logger()->info('Check for tags', ['uri-id' => $uriId]);
 
 		$result = BBCode::getTags($body);
 		if (empty($result)) {
 			return;
 		}
 
-		Logger::info('Found tags', ['uri-id' => $uriId, 'result' => $result]);
+		DI::logger()->info('Found tags', ['uri-id' => $uriId, 'result' => $result]);
 
 		foreach ($result as $tag) {
 			if (substr($tag, 0, 1) != self::TAG_CHARACTER[self::HASHTAG]) {
@@ -397,7 +396,7 @@ class Tag
 			return;
 		}
 
-		Logger::debug('Removing tag/mention', ['uri-id' => $uriId, 'tid' => $tag['tid'], 'name' => $name, 'url' => $url]);
+		DI::logger()->debug('Removing tag/mention', ['uri-id' => $uriId, 'tid' => $tag['tid'], 'name' => $name, 'url' => $url]);
 		DBA::delete('post-tag', ['uri-id' => $uriId, 'type' => $type, 'tid' => $tag['tid'], 'cid' => $tag['cid']]);
 	}
 
@@ -529,9 +528,9 @@ class Tag
 	public static function populateFromItem(array &$item): array
 	{
 		$return = [
-			'tags' => [],
-			'hashtags' => [],
-			'mentions' => [],
+			'tags'              => [],
+			'hashtags'          => [],
+			'mentions'          => [],
 			'implicit_mentions' => [],
 		];
 
@@ -557,7 +556,7 @@ class Tag
 					}
 
 					$return['hashtags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
 					break;
 
 				case self::MENTION:
@@ -568,7 +567,7 @@ class Tag
 						$tag['url'] = Contact::magicLink($tag['url']);
 					}
 					$return['mentions'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
 					break;
 
 				case self::IMPLICIT_MENTION:
@@ -576,7 +575,7 @@ class Tag
 					break;
 
 				default:
-					Logger::warning('Unknown tag type found', $tag);
+					DI::logger()->warning('Unknown tag type found', $tag);
 			}
 		}
 		DBA::close($taglist);
@@ -809,7 +808,7 @@ class Tag
 	 */
 	private static function getUIDListByTag(string $tag): array
 	{
-		$uids = [];
+		$uids     = [];
 		$searches = DBA::select('search', ['uid'], ['term' => $tag]);
 		while ($search = DBA::fetch($searches)) {
 			$uids[] = $search['uid'];
@@ -832,7 +831,7 @@ class Tag
 		foreach (self::getByURIId($uriId, [self::HASHTAG]) as $tag) {
 			foreach (self::getUIDListByTag(self::TAG_CHARACTER[self::HASHTAG] . $tag['name']) as $uid) {
 				$uids[$uid][] = $tag['name'];
-			} 
+			}
 		}
 
 		return $uids;

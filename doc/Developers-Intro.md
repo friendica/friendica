@@ -156,3 +156,97 @@ If you are interested in improving those clients, please contact the developers 
 * iOS: *currently no client*
 * SailfishOS: **Friendiy** [src](https://kirgroup.com/projects/fabrixxm/harbour-friendly) - developed by [Fabio](https://kirgroup.com/profile/fabrixxm/profile)
 * Windows: **Friendica Mobile** for Windows versions [before 8.1](http://windowsphone.com/s?appid=e3257730-c9cf-4935-9620-5261e3505c67) and [Windows 10](https://www.microsoft.com/store/apps/9nblggh0fhmn) - developed by [Gerhard Seeber](http://mozartweg.dyndns.org/friendica/profile/gerhard/profile)
+
+## Backward compatibility
+
+### Backward Compatibility Promise
+
+Friendica can be extended by addons.
+These addons relies on many classes and conventions from Friendica.
+As developers our work on Friendica should not break things in the addons without giving the addon maintainers a chance to fix their addons.
+Our goal is to build trust for the addon maintainers but also allow Friendica developers to move on.
+This is called the Backward Compatibility Promise.
+
+Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
+
+- Classes, interfaces, traits, enums, functions, methods, properties and constants marked as `@internal` or `@private`
+- Extending or modifying a `final` class or method in any way
+- Calling `private` methods (via Reflection)
+- Accessing `private` properties (via Reflection)
+- Accessing `private` methods (via Reflection)
+- Accessing `private` constants (via Reflection)
+- New properties on overridden `protected` methods
+- Possible name collisions with new methods in an extended class (addon developers should prefix their custom methods in the extending classes in an appropriate way)
+- Dropping support for every PHP version that has reached end of life
+
+### Deprecation and removing features
+
+As the development goes by Friendica needs to get rid of old code and concepts.
+This will be done in 3 steps to give addon maintainers a chance to adjust their addons.
+
+**1. Label deprecation**
+
+If we as the Friendica maintainers decide to remove some functions, classes, interface, etc. we start this by adding a `@deprecated` PHPDoc note on the code.
+For instance the class `Friendica\Core\Logger` should be removed, so we add the following note with a possible replacement:
+
+```php
+/**
+ * Logger functions
+ *
+ * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
+ */
+class Logger {/* ... */}
+```
+
+This way addon developers might be notified early by their IDE or other tools that the usage of the class is deprecated.
+In Friendica we can now start to replace all occurrences and usage of this class with the alternative.
+
+The deprecation label COULD be remain over multiple releases.
+As long as the code that is labeled with `@deprecated` is used inside Friendica or the official addon repository, it SHOULD NOT be hard deprecated.
+
+**2. Hard deprecation**
+
+If the deprecated code is no longer used inside Friendica or the official addons it MUST be hard deprecated.
+The code MUST NOT be deleted.
+Starting from the next release, it MUST be stay for at least 5 months.
+Hard deprecated code COULD remain longer than 5 months, depending on when a release appears.
+Addon developer MUST NOT consider that they have more than 5 months to adjust their code.
+
+Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called.
+For instance with the deprecated class `Friendica\Core\Logger` the call of every method should trigger an error:
+
+```php
+/**
+ * Logger functions
+ *
+ * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
+ */
+class Logger {
+	public static function info(string $message, array $context = [])
+	{
+		trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+
+		self::getInstance()->info($message, $context);
+	}
+
+	/* ... */
+}
+```
+
+This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases.
+The addon maintainer now has at least 5 months or at least one release to fix the deprecations.
+
+Please note that the deprecation message contains the release that will be released next.
+In the example the code was hard deprecated with release `2025.05`, so it COULD be removed earliest with the `2025.11` release.
+
+**3. Code Removing**
+
+We promise BC for deprecated code for at least 5 months, starting from the release the deprecation was announced.
+After this time the deprecated code COULD be remove within the next release.
+
+Breaking changes MUST be happen only in a new release but MUST be hard deprecated first.
+The BC promise refers only to releases, respective the `stable` branch.
+Deprecated code on other branches like `develop` or RC branches could be removed earlier.
+This is not a BC break as long as the release will be published 5 months after the hard deprecation.
+
+If a release breaks BC without deprecation or earlier than 5 months, this SHOULD considered as a bug and BC SHOULD be restored in a bugfix release.

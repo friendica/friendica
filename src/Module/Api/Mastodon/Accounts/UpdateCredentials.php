@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
@@ -71,9 +70,9 @@ class UpdateCredentials extends BaseApi
 			$profile['about'] = $request['note'];
 		}
 
-		Logger::debug('Patch data', ['data' => $request, 'files' => $_FILES]);
+		$this->logger->debug('Patch data', ['data' => $request, 'files' => $_FILES]);
 
-		Logger::info('Update profile and user', ['uid' => $uid, 'user' => $user, 'profile' => $profile]);
+		$this->logger->info('Update profile and user', ['uid' => $uid, 'user' => $user, 'profile' => $profile]);
 
 		if (!empty($request['avatar'])) {
 			Photo::uploadAvatar($uid, $request['avatar']);

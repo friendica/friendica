@@ -13,6 +13,8 @@ use Dice\Dice;
 
 /**
  * Wrapper for the Dice class to make some basic setups
+ *
+ * @internal
  */
 final class DiceContainer implements Container
 {

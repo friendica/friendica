@@ -7,7 +7,6 @@
  *
  */
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Network\HTTPException\NotModifiedException;
 
@@ -37,7 +36,7 @@ foreach (['style', $style] as $file) {
 			$modified = $stylemodified;
 		}
 	} else {
-		Logger::warning('Missing CSS file', ['file' => $stylecssfile, 'uid' => $uid]);
+		DI::logger()->warning('Missing CSS file', ['file' => $stylecssfile, 'uid' => $uid]);
 	}
 }
 $modified = gmdate('r', $modified);
@@ -51,8 +50,11 @@ header('Last-Modified: '.$modified);
 
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
-	$cached_etag = str_replace(['"', "-gzip"], ['', ''],
-				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
+	$cached_etag     = str_replace(
+		['"', "-gzip"],
+		['', ''],
+		stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])
+	);
 
 	if (($cached_modified == $modified) && ($cached_etag == $etag)) {
 		throw new NotModifiedException();

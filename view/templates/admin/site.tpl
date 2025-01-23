@@ -112,6 +112,7 @@
 		<h2>{{$portable_contacts}}</h2>
 		{{include file="field_select.tpl" field=$contact_discovery}}
 		{{include file="field_checkbox.tpl" field=$update_active_contacts}}
+		{{include file="field_checkbox.tpl" field=$update_known_contacts}}
 		{{include file="field_checkbox.tpl" field=$synchronize_directory}}
 		{{include file="field_checkbox.tpl" field=$poco_discovery}}
 		{{include file="field_input.tpl" field=$poco_requery_days}}

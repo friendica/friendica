@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\GNUSocial\Statusnet;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Module\BaseApi;
 use Friendica\DI;
@@ -40,7 +39,7 @@ class Conversation extends BaseApi
 			$id = $this->getRequestValue($request, 'id', 0);
 		}
 
-		Logger::info(BaseApi::LOG_PREFIX . '{subaction}', ['module' => 'api', 'action' => 'conversation', 'subaction' => 'show', 'id' => $id]);
+		$this->logger->info(BaseApi::LOG_PREFIX . '{subaction}', ['module' => 'api', 'action' => 'conversation', 'subaction' => 'show', 'id' => $id]);
 
 		// try to fetch the item for the local user - or the public item, if there is no local one
 		$item = Post::selectFirst(['parent-uri-id'], ['uri-id' => $id]);

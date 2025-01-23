@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Core\Hook;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -103,7 +102,7 @@ class Images
 			}
 		}
 
-		Logger::debug('Undetected mimetype', ['mimetype' => $mimetype]);
+		DI::logger()->debug('Undetected mimetype', ['mimetype' => $mimetype]);
 		return 0;
 	}
 
@@ -116,7 +115,7 @@ class Images
 	public static function getExtensionByImageType(int $type): string
 	{
 		if (empty($type)) {
-			Logger::debug('Invalid image type', ['type' => $type]);
+			DI::logger()->debug('Invalid image type', ['type' => $type]);
 			return '';
 		}
 
@@ -201,7 +200,7 @@ class Images
 			return $image['mime'];
 		}
 
-		Logger::debug('Undetected mime type', ['image' => $image, 'size' => strlen($image_data)]);
+		DI::logger()->debug('Undetected mime type', ['image' => $image, 'size' => strlen($image_data)]);
 
 		return '';
 	}
@@ -284,7 +283,7 @@ class Images
 			}
 		}
 
-		Logger::debug('Unhandled extension', ['filename' => $filename, 'extension' => $ext]);
+		DI::logger()->debug('Unhandled extension', ['filename' => $filename, 'extension' => $ext]);
 		return '';
 	}
 
@@ -345,7 +344,7 @@ class Images
 			try {
 				$img_str = DI::httpClient()->fetch($url, HttpClientAccept::IMAGE, 4, '', HttpClientRequest::MEDIAVERIFIER);
 			} catch (\Exception $exception) {
-				Logger::notice('Image is invalid', ['url' => $url, 'exception' => $exception]);
+				DI::logger()->notice('Image is invalid', ['url' => $url, 'exception' => $exception]);
 				return [];
 			}
 		}
@@ -404,19 +403,19 @@ class Images
 			// constrain the width - let the height float.
 
 			if ((($height * 9) / 16) > $width) {
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} elseif ($width > $height) {
 				// else constrain both dimensions
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} else {
-				$dest_width = intval(ceil(($width * $max) / $height));
+				$dest_width  = intval(ceil(($width * $max) / $height));
 				$dest_height = $max;
 			}
 		} else {
 			if ($width > $max) {
-				$dest_width = $max;
+				$dest_width  = $max;
 				$dest_height = intval(ceil(($height * $max) / $width));
 			} else {
 				if ($height > $max) {
@@ -424,14 +423,14 @@ class Images
 					// but width is OK - don't do anything
 
 					if ((($height * 9) / 16) > $width) {
-						$dest_width = $width;
+						$dest_width  = $width;
 						$dest_height = $height;
 					} else {
-						$dest_width = intval(ceil(($width * $max) / $height));
+						$dest_width  = intval(ceil(($width * $max) / $height));
 						$dest_height = $max;
 					}
 				} else {
-					$dest_width = $width;
+					$dest_width  = $width;
 					$dest_height = $height;
 				}
 			}

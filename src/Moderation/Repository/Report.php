@@ -8,8 +8,8 @@
 namespace Friendica\Moderation\Repository;
 
 use Friendica\BaseEntity;
-use Friendica\Core\Logger;
 use Friendica\Database\Database;
+use Friendica\DI;
 use Friendica\Model\Post;
 use Friendica\Moderation\Factory;
 use Friendica\Moderation\Collection;
@@ -73,7 +73,7 @@ final class Report extends \Friendica\BaseRepository
 				if (Post::exists(['uri-id' => $post->uriId])) {
 					$this->db->insert('report-post', ['rid' => $newReportId, 'uri-id' => $post->uriId, 'status' => $post->status]);
 				} else {
-					Logger::notice('Post does not exist', ['uri-id' => $post->uriId, 'report' => $Report]);
+					DI::logger()->notice('Post does not exist', ['uri-id' => $post->uriId, 'report' => $Report]);
 				}
 			}
 

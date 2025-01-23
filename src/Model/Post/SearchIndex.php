@@ -8,7 +8,6 @@
 namespace Friendica\Model\Post;
 
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -74,7 +73,7 @@ class SearchIndex
 			return;
 		}
 		DBA::delete('post-searchindex', ["`created` < ?", $limit]);
-		Logger::notice('Cleared expired searchindex entries', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
+		DI::logger()->notice('Cleared expired searchindex entries', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
 	}
 
 	public static function searchAgeDateLimit(): string

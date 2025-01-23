@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Protocol\ActivityPub\Queue;
 
 class ProcessUnprocessedEntries
@@ -19,8 +19,8 @@ class ProcessUnprocessedEntries
 	 */
 	public static function execute()
 	{
-		Logger::info('Start processing unprocessed entries');
+		DI::logger()->info('Start processing unprocessed entries');
 		Queue::processAll();
-		Logger::info('Successfully processed unprocessed entries');
+		DI::logger()->info('Successfully processed unprocessed entries');
 	}
 }

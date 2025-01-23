@@ -9,7 +9,6 @@ namespace Friendica\Model\Post;
 
 use Friendica\Content\PageInfo;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -67,12 +66,12 @@ class Media
 	public static function insert(array $media, bool $force = false): bool
 	{
 		if (empty($media['url']) || empty($media['uri-id']) || !isset($media['type'])) {
-			Logger::warning('Incomplete media data', ['media' => $media]);
+			DI::logger()->warning('Incomplete media data', ['media' => $media]);
 			return false;
 		}
 
 		if (DBA::exists('post-media', ['uri-id' => $media['uri-id'], 'preview' => $media['url']])) {
-			Logger::info('Media already exists as preview', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+			DI::logger()->info('Media already exists as preview', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
 			return false;
 		}
 
@@ -80,12 +79,12 @@ class Media
 		// and embedded as picture then we only store the picture or replace the document
 		$found = DBA::selectFirst('post-media', ['type'], ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
 		if (!$force && !empty($found) && (!in_array($found['type'], [self::UNKNOWN, self::DOCUMENT]) || ($media['type'] == self::DOCUMENT))) {
-			Logger::info('Media already exists', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'found' => $found['type'], 'new' => $media['type']]);
+			DI::logger()->info('Media already exists', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'found' => $found['type'], 'new' => $media['type']]);
 			return false;
 		}
 
 		if (!ItemURI::exists($media['uri-id'])) {
-			Logger::info('Media referenced URI ID not found', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+			DI::logger()->info('Media referenced URI ID not found', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
 			return false;
 		}
 
@@ -97,7 +96,7 @@ class Media
 		// We are storing as fast as possible to avoid duplicated network requests
 		// when fetching additional information for pictures and other content.
 		$result = DBA::insert('post-media', $media, Database::INSERT_UPDATE);
-		Logger::info('Stored media', ['result' => $result, 'media' => $media]);
+		DI::logger()->info('Stored media', ['result' => $result, 'media' => $media]);
 		$stored = $media;
 
 		$media = self::fetchAdditionalData($media);
@@ -106,9 +105,9 @@ class Media
 
 		if (array_diff_assoc($media, $stored)) {
 			$result = DBA::insert('post-media', $media, Database::INSERT_UPDATE);
-			Logger::info('Updated media', ['result' => $result, 'media' => $media]);
+			DI::logger()->info('Updated media', ['result' => $result, 'media' => $media]);
 		} else {
-			Logger::info('Nothing to update', ['media' => $media]);
+			DI::logger()->info('Nothing to update', ['media' => $media]);
 		}
 		return $result;
 	}
@@ -183,7 +182,7 @@ class Media
 				return $media;
 			}
 			if (empty($media['mimetype']) || empty($media['size'])) {
-				Logger::debug('Unknown local link', ['url' => $media['url']]);
+				DI::logger()->debug('Unknown local link', ['url' => $media['url']]);
 			}
 		}
 
@@ -205,10 +204,10 @@ class Media
 						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
 					}
 				} else {
-					Logger::notice('Could not fetch head', ['media' => $media, 'code' => $curlResult->getReturnCode()]);
+					DI::logger()->notice('Could not fetch head', ['media' => $media, 'code' => $curlResult->getReturnCode()]);
 				}
 			} catch (\Throwable $th) {
-				Logger::notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
+				DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			}
 		}
 
@@ -216,7 +215,7 @@ class Media
 			$media = self::addType($media);
 		}
 
-		Logger::debug('Got type for url', ['type' => $media['type'], 'mimetype' => $media['mimetype'] ?? '', 'url' => $media['url']]);
+		DI::logger()->debug('Got type for url', ['type' => $media['type'], 'mimetype' => $media['mimetype'] ?? '', 'url' => $media['url']]);
 
 		if ($media['type'] == self::IMAGE) {
 			$imagedata = Images::getInfoFromURLCached($media['url'], empty($media['description']));
@@ -228,10 +227,10 @@ class Media
 				$media['blurhash'] = $imagedata['blurhash'] ?? null;
 				if (!empty($imagedata['description']) && empty($media['description'])) {
 					$media['description'] = $imagedata['description'];
-					Logger::debug('Detected text for image', $media);
+					DI::logger()->debug('Detected text for image', $media);
 				}
 			} else {
-				Logger::notice('No image data', ['media' => $media]);
+				DI::logger()->notice('No image data', ['media' => $media]);
 			}
 		}
 
@@ -309,13 +308,13 @@ class Media
 
 		$item = Post::selectFirst([], ['id' => $id, 'network' => Protocol::FEDERATED]);
 		if (empty($item['id'])) {
-			Logger::debug('Not a federated activity', ['id' => $id, 'uri-id' => $media['uri-id'], 'url' => $media['url']]);
+			DI::logger()->debug('Not a federated activity', ['id' => $id, 'uri-id' => $media['uri-id'], 'url' => $media['url']]);
 			$media['type'] = $media['type'] == self::ACTIVITY ? self::JSON : $media['type'];
 			return $media;
 		}
 
 		if ($item['uri-id'] == $media['uri-id']) {
-			Logger::info('Media-Uri-Id is identical to Uri-Id', ['uri-id' => $media['uri-id']]);
+			DI::logger()->info('Media-Uri-Id is identical to Uri-Id', ['uri-id' => $media['uri-id']]);
 			$media['type'] = $media['type'] == self::ACTIVITY ? self::JSON : $media['type'];
 			return $media;
 		}
@@ -324,7 +323,7 @@ class Media
 			!empty($item['plink']) && Strings::compareLink($item['plink'], $media['url']) &&
 			parse_url($item['plink'], PHP_URL_HOST) != parse_url($item['uri'], PHP_URL_HOST)
 		) {
-			Logger::debug('Not a link to an activity', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
+			DI::logger()->debug('Not a link to an activity', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
 			$media['type'] = $media['type'] == self::ACTIVITY ? self::JSON : $media['type'];
 			return $media;
 		}
@@ -357,7 +356,7 @@ class Media
 		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
 
-		Logger::debug('Activity detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
+		DI::logger()->debug('Activity detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
 		return $media;
 	}
 
@@ -399,7 +398,7 @@ class Media
 		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
 
-		Logger::debug('Account detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'uri' => $contact['url']]);
+		DI::logger()->debug('Account detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'uri' => $contact['url']]);
 		return $media;
 	}
 
@@ -415,7 +414,7 @@ class Media
 		if (empty($data['images'][0]['src']) && empty($data['text']) && empty($data['title'])) {
 			if (!empty($media['preview'])) {
 				$media = self::addPreviewData($media);
-				Logger::debug('Detected site data is empty, use suggested media data instead', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'type' => $data['type']]);
+				DI::logger()->debug('Detected site data is empty, use suggested media data instead', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'type' => $data['type']]);
 			}
 		} else {
 			$media['preview']        = $data['images'][0]['src']      ?? null;
@@ -489,7 +488,7 @@ class Media
 	public static function addType(array $data): array
 	{
 		if (empty($data['mimetype'])) {
-			Logger::info('No MimeType provided', ['media' => $data]);
+			DI::logger()->info('No MimeType provided', ['media' => $data]);
 			return $data;
 		}
 
@@ -501,7 +500,7 @@ class Media
 	{
 		$type = explode('/', current(explode(';', $mimeType)));
 		if (count($type) < 2) {
-			Logger::info('Unknown MimeType', ['type' => $type, 'media' => $mimeType]);
+			DI::logger()->info('Unknown MimeType', ['type' => $type, 'media' => $mimeType]);
 			return self::UNKNOWN;
 		}
 
@@ -536,10 +535,10 @@ class Media
 			$type = self::APPLICATION;
 		} else {
 			$type = self::UNKNOWN;
-			Logger::info('Unknown type', ['filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
+			DI::logger()->info('Unknown type', ['filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
 		}
 
-		Logger::debug('Detected type', ['type' => $type, 'filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
+		DI::logger()->debug('Detected type', ['type' => $type, 'filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
 		return $type;
 	}
 
@@ -777,15 +776,15 @@ class Media
 		// Search for pure links
 		if (preg_match_all("/\[url\](https?:.*?)\[\/url\]/ism", $body, $matches)) {
 			foreach ($matches[1] as $url) {
-				Logger::info('Got page url (link without description)', ['uri-id' => $uriid, 'url' => $url]);
+				DI::logger()->info('Got page url (link without description)', ['uri-id' => $uriid, 'url' => $url]);
 				$result = self::insert(['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $url], false);
 				if ($result && !in_array($network, [Protocol::ACTIVITYPUB, Protocol::DIASPORA])) {
 					self::revertHTMLType($uriid, $url, $fullbody);
-					Logger::debug('Revert HTML type', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Revert HTML type', ['uri-id' => $uriid, 'url' => $url]);
 				} elseif ($result) {
-					Logger::debug('Media had been added', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Media had been added', ['uri-id' => $uriid, 'url' => $url]);
 				} else {
-					Logger::debug('Media had not been added', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Media had not been added', ['uri-id' => $uriid, 'url' => $url]);
 				}
 			}
 		}
@@ -793,15 +792,15 @@ class Media
 		// Search for links with descriptions
 		if (preg_match_all("/\[url\=(https?:.*?)\].*?\[\/url\]/ism", $body, $matches)) {
 			foreach ($matches[1] as $url) {
-				Logger::info('Got page url (link with description)', ['uri-id' => $uriid, 'url' => $url]);
+				DI::logger()->info('Got page url (link with description)', ['uri-id' => $uriid, 'url' => $url]);
 				$result = self::insert(['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $url], false);
 				if ($result && !in_array($network, [Protocol::ACTIVITYPUB, Protocol::DIASPORA])) {
 					self::revertHTMLType($uriid, $url, $fullbody);
-					Logger::debug('Revert HTML type', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Revert HTML type', ['uri-id' => $uriid, 'url' => $url]);
 				} elseif ($result) {
-					Logger::debug('Media has been added', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Media has been added', ['uri-id' => $uriid, 'url' => $url]);
 				} else {
-					Logger::debug('Media has not been added', ['uri-id' => $uriid, 'url' => $url]);
+					DI::logger()->debug('Media has not been added', ['uri-id' => $uriid, 'url' => $url]);
 				}
 			}
 		}
@@ -838,7 +837,7 @@ class Media
 			return;
 		}
 
-		Logger::info('Adding attachment data', ['data' => $data]);
+		DI::logger()->info('Adding attachment data', ['data' => $data]);
 		$attachment = [
 			'uri-id'         => $uriid,
 			'type'           => self::HTML,

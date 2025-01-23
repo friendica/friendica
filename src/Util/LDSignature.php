@@ -7,7 +7,7 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\APContact;
 
 /**
@@ -55,7 +55,7 @@ class LDSignature
 		$dhash = self::hash(self::signableData($data));
 
 		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode($data['signature']['signatureValue']), $pubkey);
-		Logger::info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
+		DI::logger()->info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
 
 		if (empty($x)) {
 			return false;
@@ -74,14 +74,14 @@ class LDSignature
 	public static function sign(array $data, array $owner): array
 	{
 		$options = [
-			'type' => 'RsaSignature2017',
-			'nonce' => Strings::getRandomHex(64),
+			'type'    => 'RsaSignature2017',
+			'nonce'   => Strings::getRandomHex(64),
 			'creator' => $owner['url'] . '#main-key',
 			'created' => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
 		];
 
-		$ohash = self::hash(self::signableOptions($options));
-		$dhash = self::hash(self::signableData($data));
+		$ohash                     = self::hash(self::signableOptions($options));
+		$dhash                     = self::hash(self::signableData($data));
 		$options['signatureValue'] = base64_encode(Crypto::rsaSign($ohash . $dhash, $owner['uprvkey']));
 
 		return array_merge($data, ['signature' => $options]);

@@ -7,7 +7,6 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
 use Friendica\DI;
@@ -28,12 +27,12 @@ class History
 
 		$post = Post::selectFirstPost($fields, ['uri-id' => $uri_id]);
 		if (empty($post)) {
-			Logger::warning('Post not found', ['uri-id' => $uri_id]);
+			DI::logger()->warning('Post not found', ['uri-id' => $uri_id]);
 			return;
 		}
 
 		if ($item['edited'] <= $post['edited']) {
-			Logger::info('New edit date is not newer than the old one', ['uri-id' => $uri_id, 'old' => $post['edited'], 'new' => $item['edited']]);
+			DI::logger()->info('New edit date is not newer than the old one', ['uri-id' => $uri_id, 'old' => $post['edited'], 'new' => $item['edited']]);
 			return;
 		}
 
@@ -49,9 +48,9 @@ class History
 
 		if ($update) {
 			DBA::insert('post-history', $post, Database::INSERT_IGNORE);
-			Logger::info('Added history', ['uri-id' => $uri_id, 'edited' => $post['edited']]);
+			DI::logger()->info('Added history', ['uri-id' => $uri_id, 'edited' => $post['edited']]);
 		} else {
-			Logger::info('No content fields had been changed', ['uri-id' => $uri_id, 'edited' => $post['edited']]);
+			DI::logger()->info('No content fields had been changed', ['uri-id' => $uri_id, 'edited' => $post['edited']]);
 		}
 	}
 }

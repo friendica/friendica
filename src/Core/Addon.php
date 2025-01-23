@@ -40,12 +40,12 @@ class Addon
 	public static function getAvailableList(): array
 	{
 		$addons = [];
-		$files = glob('addon/*/');
+		$files  = glob('addon/*/');
 		if (is_array($files)) {
 			foreach ($files as $file) {
 				if (is_dir($file)) {
 					list($tmp, $addon) = array_map('trim', explode('/', $file));
-					$info = self::getInfo($addon);
+					$info              = self::getInfo($addon);
 
 					if (DI::config()->get('system', 'show_unsupported_addons')
 						|| strtolower($info['status']) != 'unsupported'
@@ -70,7 +70,7 @@ class Addon
 	public static function getAdminList(): array
 	{
 		$addons_admin = [];
-		$addons = array_filter(DI::config()->get('addons') ?? []);
+		$addons       = array_filter(DI::config()->get('addons') ?? []);
 
 		ksort($addons);
 		foreach ($addons as $name => $data) {
@@ -79,8 +79,8 @@ class Addon
 			}
 
 			$addons_admin[$name] = [
-				'url' => 'admin/addons/' . $name,
-				'name' => $name,
+				'url'   => 'admin/addons/' . $name,
+				'name'  => $name,
 				'class' => 'addon'
 			];
 		}
@@ -117,7 +117,7 @@ class Addon
 	{
 		$addon = Strings::sanitizeFilePathItem($addon);
 
-		Logger::debug("Addon {addon}: {action}", ['action' => 'uninstall', 'addon' => $addon]);
+		DI::logger()->debug("Addon {addon}: {action}", ['action' => 'uninstall', 'addon' => $addon]);
 		DI::config()->delete('addons', $addon);
 
 		@include_once('addon/' . $addon . '/' . $addon . '.php');
@@ -150,7 +150,7 @@ class Addon
 			return false;
 		}
 
-		Logger::debug("Addon {addon}: {action}", ['action' => 'install', 'addon' => $addon]);
+		DI::logger()->debug("Addon {addon}: {action}", ['action' => 'install', 'addon' => $addon]);
 		$t = @filemtime($addon_file_path);
 		@include_once($addon_file_path);
 		if (function_exists($addon . '_install')) {
@@ -160,7 +160,7 @@ class Addon
 
 		DI::config()->set('addons', $addon, [
 			'last_update' => $t,
-			'admin' => function_exists($addon . '_addon_admin'),
+			'admin'       => function_exists($addon . '_addon_admin'),
 		]);
 
 		if (!self::isEnabled($addon)) {
@@ -182,14 +182,14 @@ class Addon
 		$addons = array_filter(DI::config()->get('addons') ?? []);
 
 		foreach ($addons as $name => $data) {
-			$addonname = Strings::sanitizeFilePathItem(trim($name));
+			$addonname       = Strings::sanitizeFilePathItem(trim($name));
 			$addon_file_path = 'addon/' . $addonname . '/' . $addonname . '.php';
 			if (file_exists($addon_file_path) && $data['last_update'] == filemtime($addon_file_path)) {
 				// Addon unmodified, skipping
 				continue;
 			}
 
-			Logger::debug("Addon {addon}: {action}", ['action' => 'reload', 'addon' => $name]);
+			DI::logger()->debug("Addon {addon}: {action}", ['action' => 'reload', 'addon' => $name]);
 
 			self::uninstall($name);
 			self::install($name);
@@ -218,12 +218,12 @@ class Addon
 		$addon = Strings::sanitizeFilePathItem($addon);
 
 		$info = [
-			'name' => $addon,
+			'name'        => $addon,
 			'description' => "",
-			'author' => [],
-			'maintainer' => [],
-			'version' => "",
-			'status' => ""
+			'author'      => [],
+			'maintainer'  => [],
+			'version'     => "",
+			'status'      => ""
 		];
 
 		if (!is_file("addon/$addon/$addon.php")) {
@@ -247,7 +247,7 @@ class Addon
 					}
 
 					list($type, $v) = $addon_info;
-					$type = strtolower($type);
+					$type           = strtolower($type);
 					if ($type == "author" || $type == "maintainer") {
 						$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 						if ($r) {
@@ -302,7 +302,7 @@ class Addon
 	public static function getVisibleList(): array
 	{
 		$visible_addons = [];
-		$addons = array_filter(DI::config()->get('addons') ?? []);
+		$addons         = array_filter(DI::config()->get('addons') ?? []);
 
 		foreach ($addons as $name => $data) {
 			$visible_addons[] = $name;

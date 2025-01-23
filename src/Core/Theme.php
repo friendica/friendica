@@ -20,7 +20,7 @@ class Theme
 	{
 		$allowed_themes_str = DI::config()->get('system', 'allowed_themes');
 		$allowed_themes_raw = explode(',', str_replace(' ', '', $allowed_themes_str));
-		$allowed_themes = [];
+		$allowed_themes     = [];
 		if (count($allowed_themes_raw)) {
 			foreach ($allowed_themes_raw as $theme) {
 				$theme = Strings::sanitizeFilePathItem(trim($theme));
@@ -58,14 +58,14 @@ class Theme
 		$theme = Strings::sanitizeFilePathItem($theme);
 
 		$info = [
-			'name' => $theme,
-			'description' => "",
-			'author' => [],
-			'maintainer' => [],
-			'version' => "",
-			'credits' => "",
+			'name'         => $theme,
+			'description'  => "",
+			'author'       => [],
+			'maintainer'   => [],
+			'version'      => "",
+			'credits'      => "",
 			'experimental' => file_exists("view/theme/$theme/experimental"),
-			'unsupported' => file_exists("view/theme/$theme/unsupported")
+			'unsupported'  => file_exists("view/theme/$theme/unsupported")
 		];
 
 		if (!is_file("view/theme/$theme/theme.php")) {
@@ -84,7 +84,7 @@ class Theme
 				$comment_line = trim($comment_line, "\t\n\r */");
 				if (strpos($comment_line, ':') !== false) {
 					list($key, $value) = array_map("trim", explode(":", $comment_line, 2));
-					$key = strtolower($key);
+					$key               = strtolower($key);
 					if ($key == "author") {
 						$result = preg_match("|([^<]+)<([^>]+)>|", $value, $matches);
 						if ($result) {
@@ -153,7 +153,7 @@ class Theme
 		}
 
 		$allowed_themes = Theme::getAllowedList();
-		$key = array_search($theme, $allowed_themes);
+		$key            = array_search($theme, $allowed_themes);
 		if ($key !== false) {
 			unset($allowed_themes[$key]);
 			Theme::setAllowedList($allowed_themes);
@@ -185,13 +185,13 @@ class Theme
 				$func();
 			}
 
-			$allowed_themes = Theme::getAllowedList();
+			$allowed_themes   = Theme::getAllowedList();
 			$allowed_themes[] = $theme;
 			Theme::setAllowedList($allowed_themes);
 
 			return true;
 		} catch (\Exception $e) {
-			Logger::error('Theme installation failed', ['theme' => $theme, 'error' => $e->getMessage()]);
+			DI::logger()->error('Theme installation failed', ['theme' => $theme, 'error' => $e->getMessage()]);
 			return false;
 		}
 	}
@@ -267,7 +267,7 @@ class Theme
 	{
 		$theme = Strings::sanitizeFilePathItem($theme);
 
-		$appHelper = DI::appHelper();
+		$appHelper  = DI::appHelper();
 		$base_theme = $appHelper->getThemeInfoValue('extends') ?? '';
 
 		if (file_exists("view/theme/$theme/config.php")) {

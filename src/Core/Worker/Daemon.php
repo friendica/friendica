@@ -8,7 +8,6 @@
 namespace Friendica\Core\Worker;
 
 use Friendica\App\Mode;
-use Friendica\Core\Logger;
 use Friendica\DI;
 
 /**
@@ -98,11 +97,11 @@ class Daemon
 
 		$pid = intval(file_get_contents($pidfile));
 		if (posix_kill($pid, 0)) {
-			Logger::info('Daemon process is running', ['pid' => $pid]);
+			DI::logger()->info('Daemon process is running', ['pid' => $pid]);
 			return;
 		}
 
-		Logger::warning('Daemon process is not running', ['pid' => $pid]);
+		DI::logger()->warning('Daemon process is not running', ['pid' => $pid]);
 
 		self::spawn();
 	}
@@ -114,8 +113,8 @@ class Daemon
 	 */
 	private static function spawn()
 	{
-		Logger::notice('Starting new daemon process');
+		DI::logger()->notice('Starting new daemon process');
 		DI::system()->run('bin/console.php', ['start']);
-		Logger::notice('New daemon process started');
+		DI::logger()->notice('New daemon process started');
 	}
 }

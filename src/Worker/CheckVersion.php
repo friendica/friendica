@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -22,7 +21,7 @@ class CheckVersion
 {
 	public static function execute()
 	{
-		Logger::notice('checkversion: start');
+		DI::logger()->notice('checkversion: start');
 
 		$checkurl = DI::config()->get('system', 'check_new_version_url', 'none');
 
@@ -38,15 +37,15 @@ class CheckVersion
 				// don't check
 				return;
 		}
-		Logger::info("Checking VERSION from: ".$checked_url);
+		DI::logger()->info("Checking VERSION from: ".$checked_url);
 
 		// fetch the VERSION file
 		$gitversion = DBA::escape(trim(DI::httpClient()->fetch($checked_url, HttpClientAccept::TEXT)));
-		Logger::notice("Upstream VERSION is: ".$gitversion);
+		DI::logger()->notice("Upstream VERSION is: ".$gitversion);
 
 		DI::keyValue()->set('git_friendica_version', $gitversion);
 
-		Logger::notice('checkversion: end');
+		DI::logger()->notice('checkversion: end');
 
 		return;
 	}

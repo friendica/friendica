@@ -8,7 +8,6 @@
 namespace Friendica\Util;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Logger;
 use Friendica\DI;
 use GuzzleHttp\Psr7\Uri;
 
@@ -38,7 +37,8 @@ class Proxy
 	/**
 	 * Private constructor
 	 */
-	private function __construct () {
+	private function __construct()
+	{
 		// No instances from utilities classes
 	}
 

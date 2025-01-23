@@ -7,8 +7,6 @@
 
 namespace Friendica\Module\Api\Twitter\Media;
 
-use Friendica\Core\Logger;
-use Friendica\DI;
 use Friendica\Model\Photo;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;
@@ -49,7 +47,7 @@ class Upload extends BaseApi
 			"friendica_preview_url" => $media["preview"]
 		];
 
-		Logger::info('Media uploaded', ['return' => $returndata]);
+		$this->logger->info('Media uploaded', ['return' => $returndata]);
 
 		$this->response->addFormattedContent('media', ['media' => $returndata], $this->parameters['extension'] ?? null);
 	}

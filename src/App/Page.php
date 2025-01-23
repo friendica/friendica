@@ -15,12 +15,12 @@ use Friendica\AppHelper;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
+use Friendica\DI;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
@@ -106,7 +106,7 @@ class Page implements ArrayAccess
 		$load      = number_format(System::currentLoad(), 2);
 		$runtime   = number_format(microtime(true) - $this->timestamp, 3);
 		if ($runtime > $config->get('system', 'runtime_loglimit')) {
-			Logger::debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
+			DI::logger()->debug('Runtime', ['method' => $this->method, 'module' => $this->module, 'runtime' => $runtime, 'load' => $load, 'origin' => $origin, 'signature' => $signature, 'request' => $_SERVER['REQUEST_URI'] ?? '']);
 		}
 	}
 

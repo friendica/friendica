@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\GServer;
@@ -38,17 +37,17 @@ class UpdateServerDirectory
 	{
 		$result = DI::httpClient()->fetch($gserver['poco'] . '?fields=urls', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
 		if (empty($result)) {
-			Logger::info('Empty result', ['url' => $gserver['url']]);
+			DI::logger()->info('Empty result', ['url' => $gserver['url']]);
 			return;
 		}
 
 		$contacts = json_decode($result, true);
 		if (empty($contacts['entry'])) {
-			Logger::info('No contacts', ['url' => $gserver['url']]);
+			DI::logger()->info('No contacts', ['url' => $gserver['url']]);
 			return;
 		}
 
-		Logger::info('PoCo discovery started', ['poco' => $gserver['poco']]);
+		DI::logger()->info('PoCo discovery started', ['poco' => $gserver['poco']]);
 
 		$urls = [];
 		foreach (array_column($contacts['entry'], 'urls') as $url_entries) {
@@ -64,24 +63,24 @@ class UpdateServerDirectory
 
 		$result = Contact::addByUrls($urls);
 
-		Logger::info('PoCo discovery ended', ['count' => $result['count'], 'added' => $result['added'], 'updated' => $result['updated'], 'unchanged' => $result['unchanged'], 'poco' => $gserver['poco']]);
+		DI::logger()->info('PoCo discovery ended', ['count' => $result['count'], 'added' => $result['added'], 'updated' => $result['updated'], 'unchanged' => $result['unchanged'], 'poco' => $gserver['poco']]);
 	}
 
 	private static function discoverMastodonDirectory(array $gserver)
 	{
 		$result = DI::httpClient()->fetch($gserver['url'] . '/api/v1/directory?order=new&local=true&limit=200&offset=0', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
 		if (empty($result)) {
-			Logger::info('Empty result', ['url' => $gserver['url']]);
+			DI::logger()->info('Empty result', ['url' => $gserver['url']]);
 			return;
 		}
 
 		$accounts = json_decode($result, true);
 		if (!is_array($accounts)) {
-			Logger::info('No contacts', ['url' => $gserver['url']]);
+			DI::logger()->info('No contacts', ['url' => $gserver['url']]);
 			return;
 		}
 
-		Logger::info('Account discovery started', ['url' => $gserver['url']]);
+		DI::logger()->info('Account discovery started', ['url' => $gserver['url']]);
 
 		$urls = [];
 		foreach ($accounts as $account) {
@@ -92,6 +91,6 @@ class UpdateServerDirectory
 
 		$result = Contact::addByUrls($urls);
 
-		Logger::info('Account discovery ended', ['count' => $result['count'], 'added' => $result['added'], 'updated' => $result['updated'], 'unchanged' => $result['unchanged'], 'url' => $gserver['url']]);
+		DI::logger()->info('Account discovery ended', ['count' => $result['count'], 'added' => $result['added'], 'updated' => $result['updated'], 'unchanged' => $result['unchanged'], 'url' => $gserver['url']]);
 	}
 }

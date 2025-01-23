@@ -8,7 +8,6 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Logger;
 use Friendica\Core\Search;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -21,7 +20,7 @@ class SearchDirectory
 	public static function execute($search)
 	{
 		if (!DI::config()->get('system', 'poco_local_search')) {
-			Logger::info('Local search is not enabled');
+			DI::logger()->info('Local search is not enabled');
 			return;
 		}
 
@@ -29,7 +28,7 @@ class SearchDirectory
 		if (!is_null($data)) {
 			// Only search for the same item every 24 hours
 			if (time() < $data + (60 * 60 * 24)) {
-				Logger::info('Already searched this in the last 24 hours', ['search' => $search]);
+				DI::logger()->info('Already searched this in the last 24 hours', ['search' => $search]);
 				return;
 			}
 		}

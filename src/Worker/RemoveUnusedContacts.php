@@ -8,7 +8,6 @@
 namespace Friendica\Worker;
 
 use Friendica\Contact\Avatar;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -27,21 +26,21 @@ class RemoveUnusedContacts
 	{
 		$loop = 0;
 		while (self::removeContacts(++$loop)) {
-			Logger::info('In removal', ['loop' => $loop]);
+			DI::logger()->info('In removal', ['loop' => $loop]);
 		}
 
-		Logger::notice('Remove apcontact entries with no related contact');
+		DI::logger()->notice('Remove apcontact entries with no related contact');
 		DBA::delete('apcontact', ["`uri-id` NOT IN (SELECT `uri-id` FROM `contact`) AND `updated` < ?", DateTimeFormat::utc('now - 30 days')]);
-		Logger::notice('Removed apcontact entries with no related contact', ['count' => DBA::affectedRows()]);
+		DI::logger()->notice('Removed apcontact entries with no related contact', ['count' => DBA::affectedRows()]);
 
-		Logger::notice('Remove diaspora-contact entries with no related contact');
+		DI::logger()->notice('Remove diaspora-contact entries with no related contact');
 		DBA::delete('diaspora-contact', ["`uri-id` NOT IN (SELECT `uri-id` FROM `contact`) AND `updated` < ?", DateTimeFormat::utc('now - 30 days')]);
-		Logger::notice('Removed diaspora-contact entries with no related contact', ['count' => DBA::affectedRows()]);
+		DI::logger()->notice('Removed diaspora-contact entries with no related contact', ['count' => DBA::affectedRows()]);
 	}
 
 	public static function removeContacts(int $loop): bool
 	{
-		Logger::notice('Starting removal', ['loop' => $loop]);
+		DI::logger()->notice('Starting removal', ['loop' => $loop]);
 
 		$condition = [
 			"`id` != ? AND `uid` = ? AND NOT `self` AND NOT `uri-id` IN (SELECT `uri-id` FROM `contact` WHERE `uid` != ?)
@@ -64,12 +63,12 @@ class RemoveUnusedContacts
 				"(NOT `network` IN (?, ?, ?, ?, ?, ?) OR `archive`)",
 				Protocol::DFRN, Protocol::DIASPORA, Protocol::OSTATUS, Protocol::FEED, Protocol::MAIL, Protocol::ACTIVITYPUB
 			];
-			
+
 			$condition = DBA::mergeConditions($condition2, $condition);
 		}
 
 		$contacts = DBA::select('contact', ['id', 'uid', 'photo', 'thumb', 'micro'], $condition, ['limit' => 1000]);
-		$count = 0;
+		$count    = 0;
 		while ($contact = DBA::fetch($contacts)) {
 			++$count;
 			Photo::delete(['uid' => $contact['uid'], 'contact-id' => $contact['id']]);
@@ -102,7 +101,7 @@ class RemoveUnusedContacts
 			Contact::deleteById($contact['id']);
 		}
 		DBA::close($contacts);
-		Logger::notice('Removal done', ['count' => $count]);
+		DI::logger()->notice('Removal done', ['count' => $count]);
 		return ($count == 1000 && Worker::isInMaintenanceWindow());
 	}
 }

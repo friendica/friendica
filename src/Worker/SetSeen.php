@@ -7,7 +7,7 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Logger;
+use Friendica\DI;
 use Friendica\Model\Item;
 
 /**
@@ -18,6 +18,6 @@ class SetSeen
 	public static function execute(int $uid)
 	{
 		$ret = Item::update(['unseen' => false], ['unseen' => true, 'uid' => $uid]);
-		Logger::debug('Set seen', ['uid' => $uid, 'ret' => $ret]);
+		DI::logger()->debug('Set seen', ['uid' => $uid, 'ret' => $ret]);
 	}
 }

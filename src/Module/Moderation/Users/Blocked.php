@@ -48,40 +48,7 @@ class Blocked extends BaseUsers
 	{
 		parent::content();
 
-		$action = (string) $this->parameters['action'] ?? '';
-		$uid    = (int) $this->parameters['uid'] ?? 0;
-
-		if ($uid === 0) {
-			$this->systemMessages->addNotice($this->t('User not found'));
-			$this->baseUrl->redirect('moderation/users');
-		}
-
-		$user = User::getById($uid, ['username', 'blocked']);
-		if (!is_array($user)) {
-			$this->systemMessages->addNotice($this->t('User not found'));
-			$this->baseUrl->redirect('moderation/users');
-		}
-
-		switch ($action) {
-			case 'delete':
-				if ($this->session->getLocalUserId() != $uid) {
-					self::checkFormSecurityTokenRedirectOnError('/moderation/users/blocked', 'moderation_users_blocked', 't');
-					// delete user
-					User::remove($uid);
-
-					$this->systemMessages->addNotice($this->t('User "%s" deleted', $user['username']));
-				} else {
-					$this->systemMessages->addNotice($this->t('You can\'t remove yourself'));
-				}
-				$this->baseUrl->redirect('moderation/users/blocked');
-				break;
-			case 'unblock':
-				self::checkFormSecurityTokenRedirectOnError('/moderation/users/blocked', 'moderation_users_blocked', 't');
-				User::block($uid, false);
-				$this->systemMessages->addNotice($this->t('User "%s" unblocked', $user['username']));
-				$this->baseUrl->redirect('moderation/users/blocked');
-				break;
-		}
+		$this->processGetActions();
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 100);
 
@@ -144,5 +111,48 @@ class Blocked extends BaseUsers
 			'$count' => $count,
 			'$pager' => $pager->renderFull($count)
 		]);
+	}
+
+	/**
+	 * @return void
+	 * @throws \Friendica\Network\HTTPException\FoundException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \Friendica\Network\HTTPException\MovedPermanentlyException
+	 * @throws \Friendica\Network\HTTPException\NotFoundException
+	 * @throws \Friendica\Network\HTTPException\TemporaryRedirectException
+	 */
+	private function processGetActions(): void
+	{
+		$action = (string)$this->parameters['action'] ?? '';
+		$uid = (int)$this->parameters['uid'] ?? 0;
+
+		if ($uid === 0) {
+			return;
+		}
+
+		$user = User::getById($uid, ['username']);
+		if (!$user) {
+			$this->systemMessages->addNotice($this->t('User not found'));
+			$this->baseUrl->redirect('moderation/users');
+		}
+
+		switch ($action) {
+			case 'delete':
+				if ($this->session->getLocalUserId() != $uid) {
+					self::checkFormSecurityTokenRedirectOnError('/moderation/users/blocked', 'moderation_users_blocked', 't');
+					// delete user
+					User::remove($uid);
+
+					$this->systemMessages->addNotice($this->t('User "%s" deleted', $user['username']));
+				} else {
+					$this->systemMessages->addNotice($this->t('You can\'t remove yourself'));
+				}
+				$this->baseUrl->redirect('moderation/users/blocked');
+			case 'unblock':
+				self::checkFormSecurityTokenRedirectOnError('/moderation/users/blocked', 'moderation_users_blocked', 't');
+				User::block($uid, false);
+				$this->systemMessages->addNotice($this->t('User "%s" unblocked', $user['username']));
+				$this->baseUrl->redirect('moderation/users/blocked');
+		}
 	}
 }

@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\OAuth;
 
-use Friendica\Core\Logger;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
 use Friendica\Security\OAuth;
@@ -36,18 +35,18 @@ class Authorize extends BaseApi
 		], $request);
 
 		if ($request['response_type'] != 'code') {
-			Logger::warning('Unsupported or missing response type', ['request' => $request]);
+			$this->logger->warning('Unsupported or missing response type', ['request' => $request]);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($this->t('Unsupported or missing response type')));
 		}
 
 		if (empty($request['client_id']) || empty($request['redirect_uri'])) {
-			Logger::warning('Incomplete request data', ['request' => $request]);
+			$this->logger->warning('Incomplete request data', ['request' => $request]);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($this->t('Incomplete request data')));
 		}
 
 		$application = OAuth::getApplication($request['client_id'], $request['client_secret'], $request['redirect_uri']);
 		if (empty($application)) {
-			Logger::warning('An application could not be fetched.', ['request' => $request]);
+			$this->logger->warning('An application could not be fetched.', ['request' => $request]);
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
@@ -59,14 +58,14 @@ class Authorize extends BaseApi
 
 		$uid = DI::userSession()->getLocalUserId();
 		if (empty($uid)) {
-			Logger::info('Redirect to login');
+			$this->logger->info('Redirect to login');
 			DI::appHelper()->redirect('login?' . http_build_query(['return_authorize' => $redirect]));
 		} else {
-			Logger::info('Already logged in user', ['uid' => $uid]);
+			$this->logger->info('Already logged in user', ['uid' => $uid]);
 		}
 
 		if (!OAuth::existsTokenForUser($application, $uid) && !DI::session()->get('oauth_acknowledge')) {
-			Logger::info('Redirect to acknowledge');
+			$this->logger->info('Redirect to acknowledge');
 			DI::appHelper()->redirect('oauth/acknowledge?' . http_build_query(['return_authorize' => $redirect, 'application' => $application['name']]));
 		}
 
