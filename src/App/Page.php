@@ -14,7 +14,6 @@ use Friendica\App;
 use Friendica\AppHelper;
 use Friendica\Content\Nav;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
@@ -22,12 +21,14 @@ use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\DI;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Utils;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -70,6 +71,8 @@ class Page implements ArrayAccess
 	 */
 	private $basePath;
 
+	private EventDispatcherInterface $eventDispatcher;
+
 	private $timestamp = 0;
 	private $method    = '';
 	private $module    = '';
@@ -78,10 +81,11 @@ class Page implements ArrayAccess
 	/**
 	 * @param string $basepath The Page basepath
 	 */
-	public function __construct(string $basepath)
+	public function __construct(string $basepath, EventDispatcherInterface $eventDispatcher)
 	{
-		$this->timestamp = microtime(true);
-		$this->basePath  = $basepath;
+		$this->timestamp       = microtime(true);
+		$this->basePath        = $basepath;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	public function setLogging(string $method, string $module, string $command)
@@ -229,7 +233,10 @@ class Page implements ArrayAccess
 			$touch_icon = 'images/friendica-192.png';
 		}
 
-		Hook::callAll('head', $this->page['htmlhead']);
+		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
+			HtmlFilterEvent::HEAD,
+			$this->page['htmlhead']
+		))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
@@ -351,7 +358,10 @@ class Page implements ArrayAccess
 			]);
 		}
 
-		Hook::callAll('footer', $this->page['footer']);
+		$this->page['footer'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
+			HtmlFilterEvent::FOOTER,
+			$this->page['footer']
+		))->getHtml();
 
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
@@ -375,7 +385,10 @@ class Page implements ArrayAccess
 	{
 		// initialise content region
 		if ($mode->isNormal()) {
-			Hook::callAll('page_content_top', $this->page['content']);
+			$this->page['content'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
+				HtmlFilterEvent::PAGE_CONTENT_TOP,
+				$this->page['content']
+			))->getHtml();
 		}
 
 		$this->page['content'] .= (string)$response->getBody();
@@ -473,7 +486,10 @@ class Page implements ArrayAccess
 		$profiler->set(microtime(true) - $timestamp, 'aftermath');
 
 		if (!$mode->isAjax()) {
-			Hook::callAll('page_end', $this->page['content']);
+			$this->page['content'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
+				HtmlFilterEvent::PAGE_END,
+				$this->page['content']
+			))->getHtml();
 		}
 
 		// Add the navigation (menu) template

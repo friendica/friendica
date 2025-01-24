@@ -23,10 +23,6 @@ use Friendica\Core\Container;
 use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Database\Definition\DbaDefinition;
-use Friendica\Database\Definition\ViewDefinition;
-use Friendica\Module\Maintenance;
-use Friendica\Security\Authentication;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\DiceContainer;
 use Friendica\Core\L10n;
@@ -35,9 +31,15 @@ use Friendica\Core\Logger\Handler\ErrorHandler;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\System;
 use Friendica\Core\Update;
+use Friendica\Database\Definition\DbaDefinition;
+use Friendica\Database\Definition\ViewDefinition;
+use Friendica\Event\Event;
+use Friendica\EventSubscriber\HookEventBridge;
+use Friendica\Module\Maintenance;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ATProtocol\DID;
+use Friendica\Security\Authentication;
 use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
 use Friendica\Util\BasePath;
@@ -45,6 +47,7 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -153,6 +156,8 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->registerEventDispatcher();
+
 		$this->requestId = $this->container->create(Request::class)->getRequestId();
 		$this->auth      = $this->container->create(Authentication::class);
 		$this->config    = $this->container->create(IManageConfigValues::class);
@@ -178,6 +183,7 @@ class App
 		$this->registerTemplateEngine();
 
 		$this->runFrontend(
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
@@ -201,6 +207,8 @@ class App
 		$this->setupLegacyServiceLocator();
 
 		$this->registerErrorHandler();
+
+		$this->registerEventDispatcher();
 
 		$this->load(
 			$serverParams,
@@ -229,6 +237,8 @@ class App
 		$this->setupLegacyServiceLocator();
 
 		$this->registerErrorHandler();
+
+		$this->registerEventDispatcher();
 
 		$this->load(
 			$serverParams,
@@ -299,6 +309,16 @@ class App
 	private function registerErrorHandler(): void
 	{
 		ErrorHandler::register($this->container->create(LoggerInterface::class));
+	}
+
+	private function registerEventDispatcher(): void
+	{
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = $this->container->create(EventDispatcherInterface::class);
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
 	}
 
 	private function registerTemplateEngine(): void
@@ -385,6 +405,7 @@ class App
 	 * @throws \ImagickException
 	 */
 	private function runFrontend(
+		EventDispatcherInterface $eventDispatcher,
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
@@ -424,7 +445,8 @@ class App
 					$serverVars['REQUEST_METHOD'] === 'GET') {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
-				Core\Hook::callAll('init_1');
+
+				$eventDispatcher->dispatch(new Event(Event::INIT));
 			}
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);

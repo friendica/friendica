@@ -182,6 +182,9 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 				['create', [], Dice::CHAIN_CALL],
 			],
 		],
+		\Psr\EventDispatcher\EventDispatcherInterface::class => [
+			'instanceOf' => \Friendica\Event\EventDispatcher::class,
+		],
 		\Friendica\Core\Logger\Capability\IHaveCallIntrospections::class => [
 			'instanceOf' => \Friendica\Core\Logger\Util\Introspection::class,
 			'constructParams' => [

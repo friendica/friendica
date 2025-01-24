@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Util;
 
@@ -16,48 +16,48 @@ class BasePathTest extends TestCase
 {
 	public static function getDataPaths(): array
 	{
-		$basePath = dirname(__DIR__, 3);
+		$basePath   = dirname(__DIR__, 3);
 		$configPath = $basePath . DIRECTORY_SEPARATOR . 'config';
 
 		return [
 			'fullPath' => [
-				'server' => [],
-				'baseDir' => $configPath,
+				'server'   => [],
+				'baseDir'  => $configPath,
 				'expected' => $configPath,
 			],
 			'relative' => [
-				'server' => [],
-				'baseDir' => 'config',
+				'server'   => [],
+				'baseDir'  => 'config',
 				'expected' => $configPath,
 			],
 			'document_root' => [
 				'server' => [
 					'DOCUMENT_ROOT' => $configPath,
 				],
-				'baseDir' => '/noooop',
+				'baseDir'  => '/noooop',
 				'expected' => $configPath,
 			],
 			'pwd' => [
 				'server' => [
 					'PWD' => $configPath,
 				],
-				'baseDir' => '/noooop',
+				'baseDir'  => '/noooop',
 				'expected' => $configPath,
 			],
 			'no_overwrite' => [
 				'server' => [
 					'DOCUMENT_ROOT' => $basePath,
-					'PWD' => $basePath,
+					'PWD'           => $basePath,
 				],
-				'baseDir' => 'config',
+				'baseDir'  => 'config',
 				'expected' => $configPath,
 			],
 			'no_overwrite_if_invalid' => [
 				'server' => [
 					'DOCUMENT_ROOT' => '/nopopop',
-					'PWD' => $configPath,
+					'PWD'           => $configPath,
 				],
-				'baseDir' => '/noatgawe22fafa',
+				'baseDir'  => '/noatgawe22fafa',
 				'expected' => $configPath,
 			]
 		];
