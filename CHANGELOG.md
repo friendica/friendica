@@ -13,7 +13,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 ### Changed
 
-- **BREAKNG**: The class `Friendica\App` was completely refactored and marked as internal, work with `Friendica\AppHelper` instead.
+- **BREAKING**: The class `Friendica\App` was completely refactored and marked as internal, work with `Friendica\AppHelper` instead.
 
 ### Deprecated
 
@@ -24,7 +24,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 ### Removed
 
-- **BREAKNG**: `Friendica\DI::app()` was removed, use `Friendica\DI::appHelper()` instead.
+- **BREAKING**: `Friendica\DI::app()` was removed, use `Friendica\DI::appHelper()` instead.
 
 ## [Version 2024.12-1](https://github.com/friendica/friendica/compare/2024.12...2024.12-1) - 2025-01-01
 
