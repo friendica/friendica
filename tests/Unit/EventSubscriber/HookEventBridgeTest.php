@@ -12,19 +12,10 @@ namespace Friendica\Test\Unit\EventSubscriber;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\EventSubscriber\HookEventBridge;
-use Friendica\EventSubscriber\StaticEventSubscriber;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase
 {
-	public function testCorrectImplementation(): void
-	{
-		$this->assertTrue(
-			is_subclass_of(HookEventBridge::class, StaticEventSubscriber::class, true),
-			HookEventBridge::class . ' does not implement ' . StaticEventSubscriber::class
-		);
-	}
-
 	public function testGetStaticSubscribedEventsReturnsStaticMethods(): void
 	{
 		$expected = [

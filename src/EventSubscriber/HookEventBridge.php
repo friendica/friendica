@@ -19,7 +19,7 @@ use Friendica\Event\NamedEvent;
  *
  * @internal Provides BC
  */
-final class HookEventBridge implements StaticEventSubscriber
+final class HookEventBridge
 {
 	/**
 	 * This allows us to mock the Hook call in tests.
