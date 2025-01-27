@@ -11,6 +11,8 @@ namespace Friendica\Event;
 
 /**
  * Allow Event listener to modify HTML.
+ *
+ * @internal
  */
 final class HtmlFilterEvent implements NamedEvent
 {

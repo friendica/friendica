@@ -16,6 +16,8 @@ use Friendica\Event\NamedEvent;
 
 /**
  * Bridge between the EventDispatcher and the Hook class.
+ *
+ * @internal Provides BC
  */
 final class HookEventBridge implements StaticEventSubscriber
 {

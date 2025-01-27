@@ -11,6 +11,8 @@ namespace Friendica\EventSubscriber;
 
 /**
  * Define events that should be reacted to.
+ *
+ * @internal
  */
 interface StaticEventSubscriber
 {

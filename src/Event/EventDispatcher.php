@@ -13,6 +13,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 /**
  * Modified Event Dispatcher.
+ *
+ * @internal
  */
 final class EventDispatcher extends SymfonyEventDispatcher
 {
