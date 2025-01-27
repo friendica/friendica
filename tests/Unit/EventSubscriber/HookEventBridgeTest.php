@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\EventSubscriber;
 
+use Friendica\Core\Config\Util\ConfigFileManager;
+use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\EventSubscriber\HookEventBridge;
@@ -20,6 +22,7 @@ class HookEventBridgeTest extends TestCase
 	{
 		$expected = [
 			Event::INIT                       => 'onNamedEvent',
+			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
@@ -70,6 +73,36 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onNamedEvent($event);
+	}
+
+	public static function getConfigLoadedEventData(): array
+	{
+		return [
+			['test', 'test'],
+			[ConfigLoadedEvent::CONFIG_LOADED, 'load_config'],
+		];
+	}
+
+	/**
+	 * @dataProvider getConfigLoadedEventData
+	 */
+	public function testOnConfigLoadedEventCallsHookWithCorrectValue($name, $expected): void
+	{
+		$config = $this->createStub(ConfigFileManager::class);
+
+		$event = new ConfigLoadedEvent($name, $config);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+		$reflectionProperty->setAccessible(true);
+
+		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected, $config) {
+			$this->assertSame($expected, $name);
+			$this->assertSame($config, $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onConfigLoadedEvent($event);
 	}
 
 	public static function getHtmlFilterEventData(): array

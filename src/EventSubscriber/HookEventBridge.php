@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\EventSubscriber;
 
 use Friendica\Core\Hook;
+use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\NamedEvent;
@@ -33,6 +34,7 @@ final class HookEventBridge
 	 */
 	private static array $eventMapper = [
 		Event::INIT                       => 'init_1',
+		ConfigLoadedEvent::CONFIG_LOADED  => 'load_config',
 		HtmlFilterEvent::HEAD             => 'head',
 		HtmlFilterEvent::FOOTER           => 'footer',
 		HtmlFilterEvent::PAGE_CONTENT_TOP => 'page_content_top',
@@ -46,6 +48,7 @@ final class HookEventBridge
 	{
 		return [
 			Event::INIT                       => 'onNamedEvent',
+			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
@@ -73,10 +76,19 @@ final class HookEventBridge
 		);
 	}
 
+	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
+	{
+		$name = $event->getName();
+
+		$name = static::$eventMapper[$name] ?? $name;
+
+		static::callHook($name, $event->getConfig());
+	}
+
 	/**
 	 * @param string|array $data
 	 *
-	 * @return string|array
+	 * @return string|array|object
 	 */
 	private static function callHook(string $name, $data)
 	{
