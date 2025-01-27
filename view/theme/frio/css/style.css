@@ -1806,7 +1806,8 @@ blockquote.shared_content {
 }
 
 /* wall items contact info */
-.media .media-body h4.media-heading {
+.media .media-body h1.media-heading,
+.media .media-body h2.media-heading {
 	font-size: 14px;
 	font-weight: 500;
 	color: $font_color_darker;
@@ -1814,11 +1815,11 @@ blockquote.shared_content {
 .media .contact-info-comment {
 	display: table-cell;
 }
-.media .contact-info-xs h5,
 .media .contact-info-comment {
 	margin: 0 0 5px;
 }
 .media-heading {
+	font-size: 14px;
 	margin: 0px;
 }
 .wall-item-name,
@@ -2604,7 +2605,7 @@ ul.viewcontact_wrapper > li {
 .contact-entry-checkbox {
 	margin-top: -20px;
 }
-.contact-wrapper .media-body .contact-entry-name h4.media-heading a {
+.contact-wrapper .media-body .contact-entry-name h1.media-heading a {
 	font-weight: bold !important;
 	color: $link_color;
 	font-size: 15px !important;
@@ -2706,10 +2707,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #circle-update-wrapper .shortmode .contact-entry-desc {
 	font-size: 12px !important;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
+#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading {
 	margin: 0;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
+#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading a {
 	font-size: 13px !important;
 	white-space: nowrap;
 }

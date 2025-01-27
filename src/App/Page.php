@@ -366,6 +366,7 @@ class Page implements ArrayAccess
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
 			'$footerScripts' => array_unique($this->footerScripts),
+			'$close'         => $l10n->t('Close'),
 		]) . $this->page['footer'];
 	}
 

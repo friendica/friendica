@@ -10,6 +10,7 @@ namespace Friendica\Model\Contact;
 use Exception;
 use Friendica\Content\Widget;
 use Friendica\Core\Protocol;
+use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -22,6 +23,7 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
+use Friendica\Worker\AddContact;
 
 /**
  * This class provides relationship information based on the `contact-relation` table.
@@ -162,20 +164,22 @@ class Relation
 		$following_counter = 0;
 
 		DI::logger()->info('Discover contacts', ['id' => $target, 'url' => $url, 'contacts' => count($contacts)]);
-		foreach ($contacts as $contact) {
-			$actor = Contact::getIdForURL($contact);
-			if (!empty($actor)) {
-				if (in_array($contact, $followers)) {
-					$fields = ['cid' => $target, 'relation-cid' => $actor, 'follows' => true, 'follow-updated' => DateTimeFormat::utcNow()];
+		foreach ($contacts as $contact_url) {
+			$contact = Contact::getByURL($contact_url, false, ['id']);
+			if (!empty($contact['id'])) {
+				if (in_array($contact_url, $followers)) {
+					$fields = ['cid' => $target, 'relation-cid' => $contact['id'], 'follows' => true, 'follow-updated' => DateTimeFormat::utcNow()];
 					DBA::insert('contact-relation', $fields, Database::INSERT_UPDATE);
 					$follower_counter++;
 				}
 
-				if (in_array($contact, $followings)) {
-					$fields = ['cid' => $actor, 'relation-cid' => $target, 'follows' => true, 'follow-updated' => DateTimeFormat::utcNow()];
+				if (in_array($contact_url, $followings)) {
+					$fields = ['cid' => $contact['id'], 'relation-cid' => $target, 'follows' => true, 'follow-updated' => DateTimeFormat::utcNow()];
 					DBA::insert('contact-relation', $fields, Database::INSERT_UPDATE);
 					$following_counter++;
 				}
+			} else {
+				AddContact::add(Worker::PRIORITY_LOW, 0, $contact_url);
 			}
 		}
 

@@ -3809,7 +3809,8 @@ CREATE VIEW `pending-view` AS SELECT
 	`contact`.`nick` AS `nick`
 	FROM `register`
 			INNER JOIN `contact` ON `register`.`uid` = `contact`.`uid`
-			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`;
+			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`
+			WHERE `register`.`uid` != 0;
 
 --
 -- VIEW tag-search-view

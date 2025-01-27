@@ -6,7 +6,7 @@
   *}}
 {{if $delivery.queue_count >= -1 && $delivery.queue_count !== '' && $delivery.queue_count !== null}}
 <span class="delivery">
-	&bull;
+	<span aria-hidden="true">&bull;</span>
 	{{if $delivery.queue_count == 0}}
 		<i class="fa fa-hourglass-o" aria-hidden="true" title="{{$delivery.notifier_pending}}"></i>
 		<span class="sr-only">{{$delivery.notifier_pending}}</span>

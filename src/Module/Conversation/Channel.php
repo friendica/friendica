@@ -95,7 +95,7 @@ class Channel extends Timeline
 			$tabs = array_merge($tabs, $this->getTabArray($this->community->getTimelines(true), 'channel'));
 
 			$tab_tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-			$o .= Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs]);
+			$o .= Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs, '$more' => $this->l10n->t('More')]);
 
 			Nav::setSelected('channel');
 
@@ -163,7 +163,7 @@ class Channel extends Timeline
 			throw new HTTPException\BadRequestException($this->l10n->t('Channel not available.'));
 		}
 
-		$this->maxId = $request['last_created'] ?? $this->maxId;
+		$this->maxId = $request['last_created']  ?? $this->maxId;
 		$this->minId = $request['first_created'] ?? $this->minId;
 	}
 }

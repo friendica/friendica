@@ -192,9 +192,9 @@ class Network extends Timeline
 
 			$x = [
 				'lockstate' => $this->circleId || $this->network || ACL::getLockstateForUserId($this->session->getLocalUserId()) ? 'lock' : 'unlock',
-				'acl' => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), true, $default_permissions),
-				'bang' => (($this->circleId || $this->network) ? '!' : ''),
-				'content' => '',
+				'acl'       => ACL::getFullSelectorHTML($this->page, $this->session->getLocalUserId(), true, $default_permissions),
+				'bang'      => (($this->circleId || $this->network) ? '!' : ''),
+				'content'   => '',
 			];
 
 			$o .= $this->conversation->statusEditor($x);
@@ -236,7 +236,7 @@ class Network extends Timeline
 			$pager = new BoundariesPager(
 				$this->l10n,
 				$this->args->getQueryString(),
-				$items[0][$this->order] ?? null,
+				$items[0][$this->order]                 ?? null,
 				$items[count($items) - 1][$this->order] ?? null,
 				$this->itemsPerPage
 			);
@@ -292,7 +292,7 @@ class Network extends Timeline
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->l10n->t('More')]);
 	}
 
 	protected function parseRequest(array $request)
@@ -313,23 +313,23 @@ class Network extends Timeline
 
 		if (!empty($request['star'])) {
 			$this->selectedTab = NetworkEntity::STAR;
-			$this->star = true;
+			$this->star        = true;
 		} else {
 			$this->star = $this->selectedTab == NetworkEntity::STAR;
 		}
 
 		if (!empty($request['mention'])) {
 			$this->selectedTab = NetworkEntity::MENTION;
-			$this->mention = true;
+			$this->mention     = true;
 		} else {
 			$this->mention = $this->selectedTab == NetworkEntity::MENTION;
 		}
 
 		if (!empty($request['order'])) {
 			$this->selectedTab = $request['order'];
-			$this->order = $request['order'];
-			$this->star = false;
-			$this->mention = false;
+			$this->order       = $request['order'];
+			$this->star        = false;
+			$this->mention     = false;
 		} elseif (in_array($this->selectedTab, [NetworkEntity::RECEIVED, NetworkEntity::STAR]) || $this->community->isTimeline($this->selectedTab)) {
 			$this->order = 'received';
 		} elseif (($this->selectedTab == NetworkEntity::CREATED) || $this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId())) {
@@ -344,7 +344,8 @@ class Network extends Timeline
 		// since otherwise the feed will optically jump, when some already visible thread has been updated.
 		if ($this->update && ($this->selectedTab == NetworkEntity::COMMENTED)) {
 			$this->order = 'received';
-			$request['last_received']  = $request['last_commented'] ?? null;
+
+			$request['last_received']  = $request['last_commented']  ?? null;
 			$request['first_received'] = $request['first_commented'] ?? null;
 		}
 
@@ -361,7 +362,7 @@ class Network extends Timeline
 		$this->network = $request['nets'] ?? '';
 
 		$this->dateFrom = $this->parameters['from'] ?? '';
-		$this->dateTo = $this->parameters['to'] ?? '';
+		$this->dateTo   = $this->parameters['to']   ?? '';
 
 		$this->setMaxMinByOrder($request);
 
