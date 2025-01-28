@@ -14,7 +14,7 @@ namespace Friendica\Event;
  *
  * @internal
  */
-final class Event implements NamedEvent
+class Event implements NamedEvent
 {
 	/**
 	 * Friendica is initialized.

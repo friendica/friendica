@@ -14,7 +14,7 @@ namespace Friendica\Event;
  *
  * @internal
  */
-final class HtmlFilterEvent implements NamedEvent
+final class HtmlFilterEvent extends Event
 {
 	public const HEAD = 'friendica.html.head';
 
@@ -24,19 +24,13 @@ final class HtmlFilterEvent implements NamedEvent
 
 	public const PAGE_END = 'friendica.html.page_end';
 
-	private string $name;
-
 	private string $html;
 
 	public function __construct(string $name, string $html)
 	{
-		$this->name = $name;
-		$this->html = $html;
-	}
+		parent::__construct($name);
 
-	public function getName(): string
-	{
-		return $this->name;
+		$this->html = $html;
 	}
 
 	public function getHtml(): string

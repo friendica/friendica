@@ -16,23 +16,17 @@ use Friendica\Core\Config\Util\ConfigFileManager;
  *
  * @internal
  */
-final class ConfigLoadedEvent implements NamedEvent
+final class ConfigLoadedEvent extends Event
 {
 	public const CONFIG_LOADED = 'friendica.config_loaded';
-
-	private string $name;
 
 	private ConfigFileManager $config;
 
 	public function __construct(string $name, ConfigFileManager $config)
 	{
-		$this->name   = $name;
-		$this->config = $config;
-	}
+		parent::__construct($name);
 
-	public function getName(): string
-	{
-		return $this->name;
+		$this->config = $config;
 	}
 
 	public function getConfig(): ConfigFileManager
