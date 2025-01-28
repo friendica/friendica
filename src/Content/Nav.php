@@ -15,6 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
@@ -22,6 +23,7 @@ use Friendica\Module\Home;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
 use Friendica\Security\OpenWebAuth;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class Nav
 {
@@ -63,14 +65,17 @@ class Nav
 	/** @var Router */
 	private $router;
 
-	public function __construct(BaseURL $baseUrl, L10n $l10n, IHandleUserSessions $session, Database $database, IManageConfigValues $config, Router $router)
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(BaseURL $baseUrl, L10n $l10n, IHandleUserSessions $session, Database $database, IManageConfigValues $config, Router $router, EventDispatcherInterface $eventDispatcher)
 	{
-		$this->baseUrl  = $baseUrl;
-		$this->l10n     = $l10n;
-		$this->session  = $session;
-		$this->database = $database;
-		$this->config   = $config;
-		$this->router   = $router;
+		$this->baseUrl         = $baseUrl;
+		$this->l10n            = $l10n;
+		$this->session         = $session;
+		$this->database        = $database;
+		$this->config          = $config;
+		$this->router          = $router;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -150,7 +155,7 @@ class Nav
 		) {
 			$arr = ['app_menu' => $appMenu];
 
-			Hook::callAll('app_menu', $arr);
+			$arr = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr))->getArray();
 
 			$appMenu = $arr['app_menu'];
 		}

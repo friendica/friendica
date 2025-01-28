@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\EventSubscriber;
 
 use Friendica\Core\Hook;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
@@ -35,6 +36,7 @@ final class HookEventBridge
 	private static array $eventMapper = [
 		Event::INIT                       => 'init_1',
 		ConfigLoadedEvent::CONFIG_LOADED  => 'load_config',
+		ArrayFilterEvent::APP_MENU        => 'app_menu',
 		HtmlFilterEvent::HEAD             => 'head',
 		HtmlFilterEvent::FOOTER           => 'footer',
 		HtmlFilterEvent::PAGE_CONTENT_TOP => 'page_content_top',
@@ -49,6 +51,7 @@ final class HookEventBridge
 		return [
 			Event::INIT                       => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
+			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
@@ -64,6 +67,13 @@ final class HookEventBridge
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
 	{
 		static::callHook($event->getName(), $event->getConfig());
+	}
+
+	public static function onArrayFilterEvent(ArrayFilterEvent $event): void
+	{
+		$event->setArray(
+			static::callHook($event->getName(), $event->getArray())
+		);
 	}
 
 	public static function onHtmlFilterEvent(HtmlFilterEvent $event): void
