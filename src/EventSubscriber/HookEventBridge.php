@@ -58,31 +58,19 @@ final class HookEventBridge
 
 	public static function onNamedEvent(NamedEvent $event): void
 	{
-		$name = $event->getName();
-
-		$name = static::$eventMapper[$name] ?? $name;
-
-		static::callHook($name, '');
-	}
-
-	public static function onHtmlFilterEvent(HtmlFilterEvent $event): void
-	{
-		$name = $event->getName();
-
-		$name = static::$eventMapper[$name] ?? $name;
-
-		$event->setHtml(
-			static::callHook($name, $event->getHtml())
-		);
+		static::callHook($event->getName(), '');
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
 	{
-		$name = $event->getName();
+		static::callHook($event->getName(), $event->getConfig());
+	}
 
-		$name = static::$eventMapper[$name] ?? $name;
-
-		static::callHook($name, $event->getConfig());
+	public static function onHtmlFilterEvent(HtmlFilterEvent $event): void
+	{
+		$event->setHtml(
+			static::callHook($event->getName(), $event->getHtml())
+		);
 	}
 
 	/**
@@ -92,6 +80,9 @@ final class HookEventBridge
 	 */
 	private static function callHook(string $name, $data)
 	{
+		// If possible, map the event name to the legacy Hook name
+		$name = static::$eventMapper[$name] ?? $name;
+
 		// Little hack to allow mocking the Hook call in tests.
 		if (static::$mockedCallHook instanceof \Closure) {
 			return (static::$mockedCallHook)->__invoke($name, $data);
