@@ -6,7 +6,7 @@
   *}}
 {{if $direction.direction > 0}}
 <span class="direction">
-	&bull;
+	<span aria-hidden="true">&bull;</span>
 	{{if $direction.direction == 1}}
 		<i class="fa fa-inbox" aria-hidden="true" title="{{$direction.title}}"></i>
 	{{elseif $direction.direction == 2}}

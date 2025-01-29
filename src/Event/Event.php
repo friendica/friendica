@@ -11,8 +11,10 @@ namespace Friendica\Event;
 
 /**
  * One-way Event to inform listener about something happend.
+ *
+ * @internal
  */
-final class Event implements NamedEvent
+class Event implements NamedEvent
 {
 	/**
 	 * Friendica is initialized.

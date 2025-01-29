@@ -3357,6 +3357,16 @@ class Contact
 				'writable' => 1,
 			]);
 
+			if (!$contact_id) {
+				DI::logger()->warning('Contact had not been added', ['url' => $url, 'uid' => $importer['uid']]);
+				$contact_record = DBA::selectFirst('contact', ['id'], ['nurl' => Strings::normaliseLink($url), 'uid' => $importer['uid']]);
+				if (empty($contact_record['id'])) {
+					DI::logger()->error('Contact had not been found', ['url' => $url, 'uid' => $importer['uid']]);
+					return null;
+				}
+				$contact_id = $contact_record['id'];
+			}
+
 			// Ensure to always have the correct network type, independent from the connection request method
 			self::updateFromProbe($contact_id);
 

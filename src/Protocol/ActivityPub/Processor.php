@@ -215,7 +215,7 @@ class Processor
 	 */
 	public static function updateItem(array $activity)
 	{
-		$item = Post::selectFirst(['uri', 'uri-id', 'thr-parent', 'gravity', 'post-type', 'private'], ['uri' => $activity['id']]);
+		$item = Post::selectFirst(['uri', 'uri-id', 'guid', 'thr-parent', 'gravity', 'post-type', 'private'], ['uri' => $activity['id']]);
 		if (!DBA::isResult($item)) {
 			DI::logger()->notice('No existing item, item will be created', ['uri' => $activity['id']]);
 			$item = self::createItem($activity, false);

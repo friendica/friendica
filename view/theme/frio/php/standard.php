@@ -16,22 +16,34 @@ $frio = 'view/theme/frio';
 <!DOCTYPE html>
 <html>
 <head>
-	<title><?php if(!empty($page['title'])) echo $page['title'] ?></title>
+	<title><?php if(!empty($page['title'])) {
+		echo $page['title'];
+	} ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
 	<script type="text/javascript">var baseurl="<?php echo DI::baseUrl() ?>";</script>
 	<script type="text/javascript">var frio="<?php echo $frio; ?>";</script>
-	<?php if(!empty($page['htmlhead'])) echo $page['htmlhead']; ?>
+	<?php if(!empty($page['htmlhead'])) {
+		echo $page['htmlhead'];
+	} ?>
 </head>
 <body id="top">
-<?php if($_SERVER['REQUEST_URI'] == '/'){header('Location: /login');} ?>
-<a href="#content" class="sr-only sr-only-focusable"><?php echo DI::l10n()->t('Skip to main content'); ?></a>
+<?php if($_SERVER['REQUEST_URI'] == '/') {
+	header('Location: /login');
+} ?>
+<a href="<?php echo DI::args()->getCommand(); ?>/#content" class="sr-only sr-only-focusable"><?php echo DI::l10n()->t('Skip to main content'); ?></a>
 <?php
 	if(!empty($page['nav'])) {
-	echo	str_replace('~config.sitename~', DI::config()->get('config','sitename'),
-			str_replace('~system.banner~', DI::config()->get('system','banner'),
-			$page['nav']
-	));};
+		echo	str_replace(
+			'~config.sitename~',
+			DI::config()->get('config', 'sitename'),
+			str_replace(
+				'~system.banner~',
+				DI::config()->get('system', 'banner'),
+				$page['nav']
+			)
+		);
+	};
 ?>
 	<main>
 
@@ -40,16 +52,26 @@ $frio = 'view/theme/frio';
 <?php
 					echo '
 					<aside class="col-lg-3 col-md-3 hidden-sm hidden-xs">
-						'; if(!empty($page['aside'])) echo $page['aside']; echo'
-						'; if(!empty($page['right_aside'])) echo $page['right_aside']; echo'
-						'; include('includes/photo_side.php'); echo'
+						';
+if(!empty($page['aside'])) {
+	echo $page['aside'];
+} echo'
+						';
+if(!empty($page['right_aside'])) {
+	echo $page['right_aside'];
+} echo'
+						';
+include('includes/photo_side.php');
+echo'
 					</aside>
 
 					<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" id="content">
 						<section class="sectiontop">
 								<div class="panel ' . DI::args()->get(0, 'generic') . '-content-wrapper">
 									<div class="panel-body">';
-										if(!empty($page['content'])) echo $page['content']; echo'
+if(!empty($page['content'])) {
+	echo $page['content'];
+} echo'
 										<div id="pause"></div> <!-- The pause/resume Ajax indicator -->
 									</div>
 								</div>
@@ -114,7 +136,7 @@ $('nav').bind('nav-update', function(e,data)
 	<div class="modal-dialog modal-full-screen">
 		<div class="modal-content">
 			<div id="modal-header" class="modal-header">
-				<button id="modal-close" type="button" class="close" data-dismiss="modal">
+				<button id="modal-close" type="button" class="close" data-dismiss="modal" title="<?php echo DI::l10n()->t('Close'); ?>">
 					&times;
 				</button>
 				<h4 id="modal-title" class="modal-title"></h4>

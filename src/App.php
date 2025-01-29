@@ -33,6 +33,7 @@ use Friendica\Core\System;
 use Friendica\Core\Update;
 use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
+use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\EventSubscriber\HookEventBridge;
 use Friendica\Module\Maintenance;
@@ -181,6 +182,7 @@ class App
 			$this->mode,
 			$this->config,
 			$this->profiler,
+			$this->container->create(EventDispatcherInterface::class),
 			$this->appHelper,
 		);
 
@@ -221,6 +223,7 @@ class App
 			$this->container->create(Mode::class),
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
 		);
 
@@ -251,6 +254,7 @@ class App
 			$this->container->create(Mode::class),
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
 		);
 
@@ -365,6 +369,7 @@ class App
 		Mode $mode,
 		IManageConfigValues $config,
 		Profiler $profiler,
+		EventDispatcherInterface $eventDispatcher,
 		AppHelper $appHelper
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
@@ -388,7 +393,8 @@ class App
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
 			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
-			Core\Hook::callAll('load_config', $loader);
+
+			$eventDispatcher->dispatch(new ConfigLoadedEvent(ConfigLoadedEvent::CONFIG_LOADED, $loader));
 
 			// Hooks are now working, reload the whole definitions with hook enabled
 			$dbaDefinition->load(true);

@@ -1763,7 +1763,8 @@ return [
 		],
 		"query" => "FROM `register`
 			INNER JOIN `contact` ON `register`.`uid` = `contact`.`uid`
-			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`"
+			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`
+			WHERE `register`.`uid` != 0"
 	],
 	"tag-search-view" => [
 		"fields" => [

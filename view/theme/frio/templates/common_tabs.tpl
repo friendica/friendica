@@ -27,7 +27,7 @@
 			<ul class="tabs tabs-extended" role="menu">
 				<li role="presentation" class="dropdown flex-target">
 					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools" data-toggle="dropdown"
-						aria-expanded="false">
+						aria-expanded="false" title="{{$more}}">
 						<i class="fa fa-chevron-down" aria-hidden="true"></i>
 					</button>
 				</li>
@@ -59,7 +59,7 @@
 			<ul class="tabs tabs-extended">
 				<li class="dropdown">
 					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools-xs"
-						data-toggle="dropdown" aria-expanded="false">
+						data-toggle="dropdown" aria-expanded="false" title="{{$more}}">
 						<i class="fa fa-chevron-down" aria-hidden="true"></i>
 					</button>
 					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuTools">

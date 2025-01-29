@@ -498,8 +498,10 @@ class Post
 		}
 
 		$languages = [];
+		$language  = '';
 		if (!empty($item['language'])) {
 			$languages = DI::l10n()->t('Languages');
+			$language  = array_key_first(json_decode($item['language'], true));
 		}
 
 		if (in_array($item['private'], [Item::PUBLIC, Item::UNLISTED]) && in_array($item['network'], Protocol::FEDERATED)) {
@@ -579,6 +581,7 @@ class Post
 			'tagger'                 => $tagger,
 			'filer'                  => $filer,
 			'language'               => $languages,
+			'lang'                   => $language,
 			'searchtext'             => DI::l10n()->t('Search Text'),
 			'drop'                   => $drop,
 			'block'                  => $block,

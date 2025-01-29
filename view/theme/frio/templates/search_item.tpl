@@ -45,7 +45,7 @@
 						<span class="wall-item-network" title="{{$item.app}}">{{$item.network_name}}</span>
 					{{/if}}
 				</div>
-				<h4 class="media-heading">
+				<h2 class="media-heading">
 					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card">
 						<span class="wall-item-name {{$item.sparkle}}">{{$item.name}}</span>
 					</a>
@@ -69,7 +69,7 @@
 									<time class="time" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
 								</a>
 								{{if $item.pinned}}
-									&bull; <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
+									<span aria-hidden="true">&bull;</span> <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
 									<span class="sr-only">{{$item.pinned}}</span>
 								{{/if}}
 							</small>
@@ -82,7 +82,7 @@
 						{{/if}}
 					</div>
 				{{* @todo $item.created have to be inserted *}}
-				</h4>
+				</h2>
 			</div>
 
 			{{* contact info header for smartphones *}}
@@ -113,7 +113,7 @@
 			{{* item content *}}
 			<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">
 				{{if $item.title}}
-				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h4 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h4><br /></span>
+				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h2 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h2><br /></span>
 				{{/if}}
 
 				<div class="wall-item-body" id="wall-item-body-{{$item.id}}" dir="auto">{{$item.body_html nofilter}}</div>

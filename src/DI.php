@@ -782,4 +782,13 @@ abstract class DI
 	{
 		return self::$dice->create(Content\Post\Repository\PostMedia::class);
 	}
+
+	/**
+	 * @internal The EventDispatcher should never called outside of the core, like in addons or themes
+	 * @deprecated 2025.02 Use constructor injection instead
+	 */
+	public static function eventDispatcher(): \Psr\EventDispatcher\EventDispatcherInterface
+	{
+		return self::$dice->create(\Psr\EventDispatcher\EventDispatcherInterface::class);
+	}
 }

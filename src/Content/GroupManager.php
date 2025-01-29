@@ -108,8 +108,6 @@ class GroupManager
 
 		$entries = [];
 
-		$contacts = [];
-
 		foreach ($contacts as $contact) {
 			$entry = [
 				'url'          => 'contact/' . $contact['id'] . '/conversations',

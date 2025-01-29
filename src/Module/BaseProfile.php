@@ -31,35 +31,35 @@ class BaseProfile extends BaseModule
 
 		$tabs = [
 			[
-				'label' => DI::l10n()->t('Profile'),
-				'url'   => $baseProfileUrl . '/profile',
-				'sel'   => $current == 'profile' ? 'active' : '',
-				'title' => DI::l10n()->t('Profile Details'),
-				'id'    => 'profile-tab',
+				'label'     => DI::l10n()->t('Profile'),
+				'url'       => $baseProfileUrl . '/profile',
+				'sel'       => $current == 'profile' ? 'active' : '',
+				'title'     => DI::l10n()->t('Profile Details'),
+				'id'        => 'profile-tab',
 				'accesskey' => 'r',
 			],
 			[
-				'label' => DI::l10n()->t('Conversations'),
-				'url'   => $baseProfileUrl . '/conversations',
-				'sel'   => $current == 'status' ? 'active' : '',
-				'title' => DI::l10n()->t('Conversations started'),
-				'id'    => 'status-tab',
+				'label'     => DI::l10n()->t('Conversations'),
+				'url'       => $baseProfileUrl . '/conversations',
+				'sel'       => $current == 'status' ? 'active' : '',
+				'title'     => DI::l10n()->t('Conversations started'),
+				'id'        => 'status-tab',
 				'accesskey' => 'm',
 			],
 			[
-				'label' => DI::l10n()->t('Photos'),
-				'url'   => $baseProfileUrl . '/photos',
-				'sel'   => $current == 'photos' ? 'active' : '',
-				'title' => DI::l10n()->t('Photo Albums'),
-				'id'    => 'photo-tab',
+				'label'     => DI::l10n()->t('Photos'),
+				'url'       => $baseProfileUrl . '/photos',
+				'sel'       => $current == 'photos' ? 'active' : '',
+				'title'     => DI::l10n()->t('Photo Albums'),
+				'id'        => 'photo-tab',
 				'accesskey' => 'h',
 			],
 			[
-				'label' => DI::l10n()->t('Media'),
-				'url'   => $baseProfileUrl . '/media',
-				'sel'   => $current == 'media' ? 'active' : '',
-				'title' => DI::l10n()->t('Media'),
-				'id'    => 'media-tab',
+				'label'     => DI::l10n()->t('Media'),
+				'url'       => $baseProfileUrl . '/media',
+				'sel'       => $current == 'media' ? 'active' : '',
+				'title'     => DI::l10n()->t('Media'),
+				'id'        => 'media-tab',
 				'accesskey' => 'd',
 			],
 		];
@@ -67,22 +67,22 @@ class BaseProfile extends BaseModule
 		// the calendar link for the full-featured events calendar
 		if ($is_owner) {
 			$tabs[] = [
-				'label' => DI::l10n()->t('Calendar'),
-				'url'   => DI::baseUrl() . '/calendar',
-				'sel'   => $current == 'calendar' ? 'active' : '',
-				'title' => DI::l10n()->t('Calendar'),
-				'id'    => 'calendar-tab',
+				'label'     => DI::l10n()->t('Calendar'),
+				'url'       => DI::baseUrl() . '/calendar',
+				'sel'       => $current == 'calendar' ? 'active' : '',
+				'title'     => DI::l10n()->t('Calendar'),
+				'id'        => 'calendar-tab',
 				'accesskey' => 'c',
 			];
 		} else {
 			$owner = User::getByNickname($nickname, ['uid']);
 			if(DI::userSession()->isAuthenticated() || $owner && Feature::isEnabled($owner['uid'], Feature::PUBLIC_CALENDAR)) {
 				$tabs[] = [
-					'label' => DI::l10n()->t('Calendar'),
-					'url'   => DI::baseUrl() . '/calendar/show/' . $nickname,
-					'sel'   => $current == 'calendar' ? 'active' : '',
-					'title' => DI::l10n()->t('Calendar'),
-					'id'    => 'calendar-tab',
+					'label'     => DI::l10n()->t('Calendar'),
+					'url'       => DI::baseUrl() . '/calendar/show/' . $nickname,
+					'sel'       => $current == 'calendar' ? 'active' : '',
+					'title'     => DI::l10n()->t('Calendar'),
+					'id'        => 'calendar-tab',
 					'accesskey' => 'c',
 				];
 			}
@@ -90,30 +90,30 @@ class BaseProfile extends BaseModule
 
 		if ($is_owner) {
 			$tabs[] = [
-				'label' => DI::l10n()->t('Personal Notes'),
-				'url'   => DI::baseUrl() . '/notes',
-				'sel'   => $current == 'notes' ? 'active' : '',
-				'title' => DI::l10n()->t('Only You Can See This'),
-				'id'    => 'notes-tab',
+				'label'     => DI::l10n()->t('Personal Notes'),
+				'url'       => DI::baseUrl() . '/notes',
+				'sel'       => $current == 'notes' ? 'active' : '',
+				'title'     => DI::l10n()->t('Only You Can See This'),
+				'id'        => 'notes-tab',
 				'accesskey' => 't',
 			];
 			$tabs[] = [
-				'label' => DI::l10n()->t('Scheduled Posts'),
-				'url'   => $baseProfileUrl . '/schedule',
-				'sel'   => $current == 'schedule' ? 'active' : '',
-				'title' => DI::l10n()->t('Posts that are scheduled for publishing'),
-				'id'    => 'schedule-tab',
+				'label'     => DI::l10n()->t('Scheduled Posts'),
+				'url'       => $baseProfileUrl . '/schedule',
+				'sel'       => $current == 'schedule' ? 'active' : '',
+				'title'     => DI::l10n()->t('Posts that are scheduled for publishing'),
+				'id'        => 'schedule-tab',
 				'accesskey' => 'o',
 			];
 		}
 
 		if (!$hide_friends) {
 			$tabs[] = [
-				'label' => DI::l10n()->t('Contacts'),
-				'url'   => $baseProfileUrl . '/contacts',
-				'sel'   => $current == 'contacts' ? 'active' : '',
-				'title' => DI::l10n()->t('Contacts'),
-				'id'    => 'viewcontacts-tab',
+				'label'     => DI::l10n()->t('Contacts'),
+				'url'       => $baseProfileUrl . '/contacts',
+				'sel'       => $current == 'contacts' ? 'active' : '',
+				'title'     => DI::l10n()->t('Contacts'),
+				'id'        => 'viewcontacts-tab',
 				'accesskey' => 'k',
 			];
 		}
@@ -134,6 +134,6 @@ class BaseProfile extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		return Renderer::replaceMacros($tpl, ['$tabs' => $arr['tabs']]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $arr['tabs'], '$more' => DI::l10n()->t('More')]);
 	}
 }

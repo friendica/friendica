@@ -11,6 +11,8 @@ namespace Friendica\Event;
 
 /**
  * Interface for named events.
+ *
+ * @internal
  */
 interface NamedEvent
 {

@@ -233,10 +233,9 @@ class Page implements ArrayAccess
 			$touch_icon = 'images/friendica-192.png';
 		}
 
-		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
-			HtmlFilterEvent::HEAD,
-			$this->page['htmlhead']
-		))->getHtml();
+		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::HEAD, $this->page['htmlhead'])
+		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
@@ -358,14 +357,14 @@ class Page implements ArrayAccess
 			]);
 		}
 
-		$this->page['footer'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
-			HtmlFilterEvent::FOOTER,
-			$this->page['footer']
-		))->getHtml();
+		$this->page['footer'] = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::FOOTER, $this->page['footer'])
+		)->getHtml();
 
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
 			'$footerScripts' => array_unique($this->footerScripts),
+			'$close'         => $l10n->t('Close'),
 		]) . $this->page['footer'];
 	}
 
@@ -385,10 +384,9 @@ class Page implements ArrayAccess
 	{
 		// initialise content region
 		if ($mode->isNormal()) {
-			$this->page['content'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
-				HtmlFilterEvent::PAGE_CONTENT_TOP,
-				$this->page['content']
-			))->getHtml();
+			$this->page['content'] = $this->eventDispatcher->dispatch(
+				new HtmlFilterEvent(HtmlFilterEvent::PAGE_CONTENT_TOP, $this->page['content'])
+			)->getHtml();
 		}
 
 		$this->page['content'] .= (string)$response->getBody();
@@ -486,10 +484,9 @@ class Page implements ArrayAccess
 		$profiler->set(microtime(true) - $timestamp, 'aftermath');
 
 		if (!$mode->isAjax()) {
-			$this->page['content'] = $this->eventDispatcher->dispatch(new HtmlFilterEvent(
-				HtmlFilterEvent::PAGE_END,
-				$this->page['content']
-			))->getHtml();
+			$this->page['content'] = $this->eventDispatcher->dispatch(
+				new HtmlFilterEvent(HtmlFilterEvent::PAGE_END, $this->page['content'])
+			)->getHtml();
 		}
 
 		// Add the navigation (menu) template
