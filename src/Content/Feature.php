@@ -7,7 +7,6 @@
 
 namespace Friendica\Content;
 
-use Friendica\Core\Hook;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 
@@ -95,8 +94,9 @@ class Feature
 	 */
 	public static function get($filtered = true)
 	{
-		$l10n   = DI::l10n();
-		$config = DI::config();
+		$l10n            = DI::l10n();
+		$config          = DI::config();
+		$eventDispatcher = DI::eventDispatcher();
 
 		$arr = [
 			// General
@@ -170,7 +170,10 @@ class Feature
 			}
 		}
 
-		Hook::callAll('get', $arr);
+		$arr = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_GET, $arr)
+		)->getArray();
+
 		return $arr;
 	}
 }

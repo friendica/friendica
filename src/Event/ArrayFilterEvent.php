@@ -22,6 +22,8 @@ final class ArrayFilterEvent extends Event
 
 	public const FEATURE_ENABLED = 'friendica.data.feature_enabled';
 
+	public const FEATURE_GET = 'friendica.data.feature_get';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

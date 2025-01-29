@@ -27,6 +27,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO        => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_ENABLED => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_GET     => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER      => 'onHtmlFilterEvent',
@@ -117,6 +118,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::APP_MENU, 'app_menu'],
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
+			[ArrayFilterEvent::FEATURE_GET, 'get'],
 		];
 	}
 
