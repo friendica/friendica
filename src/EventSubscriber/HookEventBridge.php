@@ -38,6 +38,7 @@ final class HookEventBridge
 		ConfigLoadedEvent::CONFIG_LOADED  => 'load_config',
 		ArrayFilterEvent::APP_MENU        => 'app_menu',
 		ArrayFilterEvent::NAV_INFO        => 'nav_info',
+		ArrayFilterEvent::FEATURE_ENABLED => 'isEnabled',
 		HtmlFilterEvent::HEAD             => 'head',
 		HtmlFilterEvent::FOOTER           => 'footer',
 		HtmlFilterEvent::PAGE_HEADER      => 'page_header',
@@ -55,6 +56,7 @@ final class HookEventBridge
 			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
 			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO        => 'onArrayFilterEvent',
+			ArrayFilterEvent::FEATURE_ENABLED => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER      => 'onHtmlFilterEvent',
@@ -88,7 +90,7 @@ final class HookEventBridge
 	}
 
 	/**
-	 * @param string|array $data
+	 * @param string|array|object $data
 	 *
 	 * @return string|array|object
 	 */

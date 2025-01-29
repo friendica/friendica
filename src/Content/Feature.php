@@ -9,6 +9,7 @@ namespace Friendica\Content;
 
 use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 
 class Feature
 {
@@ -41,15 +42,23 @@ class Feature
 	 */
 	public static function isEnabled(int $uid, $feature): bool
 	{
-		if (!DI::config()->get('feature_lock', $feature, false)) {
-			$enabled = DI::config()->get('feature', $feature) ?? self::getDefault($feature);
-			$enabled = DI::pConfig()->get($uid, 'feature', $feature) ?? $enabled;
+		$config          = DI::config();
+		$pConfig         = DI::pConfig();
+		$eventDispatcher = DI::eventDispatcher();
+
+		if (!$config->get('feature_lock', $feature, false)) {
+			$enabled = $config->get('feature', $feature) ?? self::getDefault($feature);
+			$enabled = $pConfig->get($uid, 'feature', $feature) ?? $enabled;
 		} else {
 			$enabled = true;
 		}
 
 		$arr = ['uid' => $uid, 'feature' => $feature, 'enabled' => $enabled];
-		Hook::callAll('isEnabled', $arr);
+
+		$arr = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_ENABLED, $arr)
+		)->getArray();
+
 		return (bool)$arr['enabled'];
 	}
 

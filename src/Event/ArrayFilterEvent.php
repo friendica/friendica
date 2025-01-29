@@ -20,6 +20,8 @@ final class ArrayFilterEvent extends Event
 
 	public const NAV_INFO = 'friendica.data.nav_info';
 
+	public const FEATURE_ENABLED = 'friendica.data.feature_enabled';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)
