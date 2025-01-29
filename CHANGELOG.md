@@ -5,7 +5,7 @@ All notable changes to the **Friendica Core** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project [promises Backward Compatibility](doc/Developers-Intro.md#backward-compatibility).
 
-## [Version 2025.02 (unreleased)](https://github.com/friendica/friendica/compare/2024.12-1...develop)
+## [Version 2025.02](https://github.com/friendica/friendica/compare/2024.12-1...develop) - (unreleased)
 
 ### Added
 
