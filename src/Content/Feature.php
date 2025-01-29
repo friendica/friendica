@@ -46,7 +46,7 @@ class Feature
 		$eventDispatcher = DI::eventDispatcher();
 
 		if (!$config->get('feature_lock', $feature, false)) {
-			$enabled = $config->get('feature', $feature) ?? self::getDefault($feature);
+			$enabled = $config->get('feature', $feature)        ?? self::getDefault($feature);
 			$enabled = $pConfig->get($uid, 'feature', $feature) ?? $enabled;
 		} else {
 			$enabled = true;
@@ -155,7 +155,7 @@ class Feature
 			foreach ($arr as $k => $x) {
 				$has_items = false;
 				$kquantity = count($arr[$k]);
-				for ($y = 0; $y < $kquantity; $y ++) {
+				for ($y = 0; $y < $kquantity; $y++) {
 					if (is_array($arr[$k][$y])) {
 						if ($arr[$k][$y][4] === false) {
 							$has_items = true;

@@ -106,16 +106,16 @@ class Nav
 		$tpl = Renderer::getMarkupTemplate('nav.tpl');
 
 		$nav .= Renderer::replaceMacros($tpl, [
-			'$sitelocation' => $nav_info['sitelocation'],
-			'$nav'          => $nav_info['nav'],
-			'$banner'       => $nav_info['banner'],
+			'$sitelocation'       => $nav_info['sitelocation'],
+			'$nav'                => $nav_info['nav'],
+			'$banner'             => $nav_info['banner'],
 			'$emptynotifications' => $this->l10n->t('Nothing new here'),
-			'$userinfo'     => $nav_info['userinfo'],
-			'$sel'          => self::$selected,
-			'$apps'         => $this->getAppMenu(),
-			'$home'         => $this->l10n->t('Go back'),
-			'$clear_notifs' => $this->l10n->t('Clear notifications'),
-			'$search_hint'  => $this->l10n->t('@name, !group, #tags, content')
+			'$userinfo'           => $nav_info['userinfo'],
+			'$sel'                => self::$selected,
+			'$apps'               => $this->getAppMenu(),
+			'$home'               => $this->l10n->t('Go back'),
+			'$clear_notifs'       => $this->l10n->t('Clear notifications'),
+			'$search_hint'        => $this->l10n->t('@name, !group, #tags, content')
 		]);
 
 		$nav = $this->eventDispatcher->dispatch(
@@ -229,7 +229,7 @@ class Nav
 			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes')];
 
 			// user info
-			$contact = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
+			$contact  = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
 			$userinfo = [
 				'icon' => Contact::getMicro($contact),
 				'name' => $contact['name'],
@@ -304,16 +304,16 @@ class Nav
 
 			// Don't show notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
-				$nav['introductions'] = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
-				$nav['notifications'] = ['notifications',	$this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
-				$nav['notifications']['all'] = ['notifications/system', $this->l10n->t('See all notifications'), '', ''];
+				$nav['introductions']         = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
+				$nav['notifications']         = ['notifications',	$this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
+				$nav['notifications']['all']  = ['notifications/system', $this->l10n->t('See all notifications'), '', ''];
 				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as seen'), '', $this->l10n->t('Mark all system notifications as seen')];
 			}
 
-			$nav['messages'] = ['message', $this->l10n->t('Messages'), '', $this->l10n->t('Private mail')];
-			$nav['messages']['inbox'] = ['message', $this->l10n->t('Inbox'), '', $this->l10n->t('Inbox')];
+			$nav['messages']           = ['message', $this->l10n->t('Messages'), '', $this->l10n->t('Private mail')];
+			$nav['messages']['inbox']  = ['message', $this->l10n->t('Inbox'), '', $this->l10n->t('Inbox')];
 			$nav['messages']['outbox'] = ['message/sent', $this->l10n->t('Outbox'), '', $this->l10n->t('Outbox')];
-			$nav['messages']['new'] = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
+			$nav['messages']['new']    = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
 			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
 				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other pages')];
