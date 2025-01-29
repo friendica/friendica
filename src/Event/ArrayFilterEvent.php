@@ -18,6 +18,8 @@ final class ArrayFilterEvent extends Event
 {
 	public const APP_MENU = 'friendica.data.app_menu';
 
+	public const NAV_INFO = 'friendica.data.nav_info';
+
 	private array $array;
 
 	public function __construct(string $name, array $array)

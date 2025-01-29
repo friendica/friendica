@@ -10,12 +10,12 @@ namespace Friendica\Content;
 use Friendica\App\BaseURL;
 use Friendica\App\Router;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
@@ -118,7 +118,9 @@ class Nav
 			'$search_hint'  => $this->l10n->t('@name, !group, #tags, content')
 		]);
 
-		Hook::callAll('page_header', $nav);
+		$nav = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::PAGE_HEADER, $nav)
+		)->getHtml();
 
 		return $nav;
 	}
@@ -155,9 +157,11 @@ class Nav
 		) {
 			$arr = ['app_menu' => $appMenu];
 
-			$arr = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr))->getArray();
+			$arr = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr)
+			)->getArray();
 
-			$appMenu = $arr['app_menu'];
+			$appMenu = $arr['app_menu'] ?? [];
 		}
 
 		return $appMenu;
@@ -341,7 +345,9 @@ class Nav
 			'userinfo'     => $userinfo,
 		];
 
-		Hook::callAll('nav_info', $nav_info);
+		$nav_info = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NAV_INFO, $nav_info)
+		)->getArray();
 
 		return $nav_info;
 	}

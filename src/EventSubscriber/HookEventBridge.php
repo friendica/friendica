@@ -24,7 +24,7 @@ use Friendica\Event\NamedEvent;
 final class HookEventBridge
 {
 	/**
-	 * This allows us to mock the Hook call in tests.
+	 * @internal This allows us to mock the Hook call in tests.
 	 *
 	 * @var \Closure|null
 	 */
@@ -37,8 +37,10 @@ final class HookEventBridge
 		Event::INIT                       => 'init_1',
 		ConfigLoadedEvent::CONFIG_LOADED  => 'load_config',
 		ArrayFilterEvent::APP_MENU        => 'app_menu',
+		ArrayFilterEvent::NAV_INFO        => 'nav_info',
 		HtmlFilterEvent::HEAD             => 'head',
 		HtmlFilterEvent::FOOTER           => 'footer',
+		HtmlFilterEvent::PAGE_HEADER      => 'page_header',
 		HtmlFilterEvent::PAGE_CONTENT_TOP => 'page_content_top',
 		HtmlFilterEvent::PAGE_END         => 'page_end',
 	];
@@ -52,8 +54,10 @@ final class HookEventBridge
 			Event::INIT                       => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED  => 'onConfigLoadedEvent',
 			ArrayFilterEvent::APP_MENU        => 'onArrayFilterEvent',
+			ArrayFilterEvent::NAV_INFO        => 'onArrayFilterEvent',
 			HtmlFilterEvent::HEAD             => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER           => 'onHtmlFilterEvent',
+			HtmlFilterEvent::PAGE_HEADER      => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_CONTENT_TOP => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_END         => 'onHtmlFilterEvent',
 		];
