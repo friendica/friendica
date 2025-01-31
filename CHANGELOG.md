@@ -25,6 +25,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 ### Removed
 
 - **BREAKING**: `Friendica\DI::app()` was removed, use `Friendica\DI::appHelper()` instead.
+- **BREAKING**: `Friendica\Core\Logger::enableWorker()` and `Friendica\Core\Logger::disableWorker()` were removed.
 
 ## [Version 2024.12-1](https://github.com/friendica/friendica/compare/2024.12...2024.12-1) - 2025-01-01
 
