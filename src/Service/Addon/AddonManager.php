@@ -13,6 +13,8 @@ use Psr\Container\ContainerInterface;
 
 /**
  * Manager for all addons.
+ *
+ * @internal
  */
 final class AddonManager
 {

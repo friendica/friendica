@@ -14,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Factory for all addons.
+ *
+ * @internal
  */
 final class AddonFactory implements AddonLoader
 {

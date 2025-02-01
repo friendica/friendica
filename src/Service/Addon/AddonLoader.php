@@ -11,6 +11,8 @@ namespace Friendica\Service\Addon;
 
 /**
  * Interface for an addon loader.
+ *
+ * @internal
  */
 interface AddonLoader
 {
