@@ -140,8 +140,6 @@ class App
 	private function __construct(Container $container)
 	{
 		$this->container = $container;
-
-		$this->addonManager = $this->container->create(AddonManager::class);
 	}
 
 	/**
@@ -285,6 +283,8 @@ class App
 		}
 
 		$config = $this->container->create(IManageConfigValues::class);
+
+		$this->addonManager = $this->container->create(AddonManager::class);
 
 		$this->addonManager->bootstrapAddons($config->get('addons') ?? []);
 

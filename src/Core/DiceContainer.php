@@ -61,9 +61,11 @@ final class DiceContainer implements Container
 	}
 
 	/**
-	 * @internal Only used to inject Dice into DI class
+	 * Only used to inject Dice into DI class
 	 *
 	 * @see \Friendica\DI
+	 *
+	 * @internal
 	 *
 	 * @deprecated
 	 */
