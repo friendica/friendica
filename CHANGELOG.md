@@ -15,6 +15,11 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 - **BREAKING**: The class `Friendica\App` was completely refactored and marked as internal, work with `Friendica\AppHelper` instead.
 
+### Fixed
+
+- The command `bin/console.php addon list enabled` shows a list of enabled addons instead of all addons, by @Art4 in [#14687](https://github.com/friendica/friendica/pull/14687).
+- The command `bin/console.php addon list disabled` shows a list of disabled addons instead of an empty list, by @Art4 in [#14687](https://github.com/friendica/friendica/pull/14687).
+
 ### Deprecated
 
 - `bin/daemon.php` is deprecated in favor of `bin/console daemon` by @nupplaphil in [#14642](https://github.com/friendica/friendica/pull/14642)
