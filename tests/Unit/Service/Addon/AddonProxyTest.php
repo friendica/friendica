@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Addon;
+namespace Friendica\Test\Unit\Service\Addon;
 
 use Friendica\Addon\AddonBootstrap;
 use Friendica\Addon\DependencyProvider;
