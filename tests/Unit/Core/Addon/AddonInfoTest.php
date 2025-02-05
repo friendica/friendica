@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Core;
+namespace Friendica\Test\Unit\Core\Addon;
 
 use Friendica\Core\Addon\AddonInfo;
 use PHPUnit\Framework\TestCase;
