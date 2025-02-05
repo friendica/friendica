@@ -2790,7 +2790,7 @@ class Diaspora
 	 */
 	public static function encodePrivateData(string $msg, array $user, array $contact, string $prvkey, string $pubkey): string
 	{
-		DI::logger()->debug('Message: ' . $msg);
+		DI::logger()->debug('Diaspora message', ['msg' => $msg]);
 
 		// without a public key nothing will work
 		if (!$pubkey) {

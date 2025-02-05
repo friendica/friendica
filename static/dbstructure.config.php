@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1576);
+	define('DB_UPDATE_VERSION', 1577);
 }
 
 return [
@@ -1604,7 +1604,7 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"uid_uri-id" => ["UNIQUE", "uid", "uri-id"],
-			"uri-id" => ["uri-id"],
+			"uri-id_origin_deleted" => ["uri-id", "origin", "deleted"],
 			"parent-uri-id" => ["parent-uri-id"],
 			"thr-parent-id" => ["thr-parent-id"],
 			"external-id" => ["external-id"],

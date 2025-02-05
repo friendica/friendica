@@ -15,10 +15,10 @@
 					<i class="fa fa-angle-down" aria-hidden="true"></i>&nbsp;{{$l10n.profile_action}}
 				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="profile-edit-links-dropdown">
-					<li role="presentation"><a role="menuitem" href="{{$profpiclink}}" id="profile-photo_upload-link"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profpic}}</a></li>
-					<li role="presentation"><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profile_photo}}</button></li>
-					<li role="presentation" class="divider"></li>
-					<li role="presentation"><a role="menuitem" href="profile/{{$nickname}}/profile" id="profile-edit-view-link">{{$l10n.viewprof}}</a></li>
+					<li><a role="menuitem" href="{{$profpiclink}}" id="profile-photo_upload-link"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profpic}}</a></li>
+					<li><button role="menuitem" type="button" class="btn-link" id="profile-photo_upload-link-new" onclick="openClose('profile-photo-upload-section');"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;{{$l10n.profile_photo}}</button></li>
+					<li class="divider"></li>
+					<li><a role="menuitem" href="profile/{{$nickname}}/profile" id="profile-edit-view-link">{{$l10n.viewprof}}</a></li>
 				</ul>
 			</li>
 		</ul>

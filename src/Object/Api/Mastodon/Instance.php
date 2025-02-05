@@ -24,40 +24,24 @@ use Friendica\Object\Api\Mastodon\InstanceV2\Configuration;
  */
 class Instance extends BaseDataTransferObject
 {
-	/** @var string (URL) */
-	protected $uri;
-	/** @var string */
-	protected $title;
-	/** @var string */
-	protected $short_description;
-	/** @var string */
-	protected $description;
-	/** @var string */
-	protected $email;
-	/** @var string */
-	protected $version;
-	/** @var array */
-	protected $urls;
-	/** @var Stats */
-	protected $stats;
-	/** @var string|null This is meant as a server banner, default Mastodon "thumbnail" is 1600×620px */
-	protected $thumbnail = null;
-	/** @var array */
-	protected $languages;
-	/** @var int */
-	protected $max_toot_chars;
-	/** @var bool */
-	protected $registrations;
-	/** @var bool */
-	protected $approval_required;
-	/** @var bool */
-	protected $invites_enabled;
-	/** @var Configuration  */
-	protected $configuration;
-	/** @var Account|null */
-	protected $contact_account = null;
-	/** @var array */
-	protected $rules = [];
+	protected string $uri;
+	protected string $title;
+	protected string $short_description;
+	protected string $description;
+	protected string $email;
+	protected string $version;
+	protected array $urls;
+	protected Stats $stats;
+	/** This is meant as a server banner, default Mastodon "thumbnail" is 1600×620px */
+	protected ?string $thumbnail = null;
+	protected array $languages;
+	protected int $max_toot_chars;
+	protected bool $registrations;
+	protected bool $approval_required;
+	protected bool $invites_enabled;
+	protected Configuration $configuration;
+	protected ?Account $contact_account = null;
+	protected array $rules              = [];
 
 	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database, Configuration $configuration, ?Account $contact_account, array $rules)
 	{
@@ -77,7 +61,7 @@ class Instance extends BaseDataTransferObject
 		$this->approval_required = ($register_policy === Register::APPROVE);
 		$this->invites_enabled   = false;
 		$this->configuration     = $configuration;
-		$this->contact_account   = $contact_account ?? [];
+		$this->contact_account   = $contact_account;
 		$this->rules             = $rules;
 	}
 }

@@ -123,8 +123,8 @@ class Blocked extends BaseUsers
 	 */
 	private function processGetActions(): void
 	{
-		$action = (string)$this->parameters['action'] ?? '';
-		$uid = (int)$this->parameters['uid'] ?? 0;
+		$action = (string) ($this->parameters['action'] ?? '');
+		$uid    = (int) ($this->parameters['uid'] ?? 0);
 
 		if ($uid === 0) {
 			return;
@@ -148,6 +148,7 @@ class Blocked extends BaseUsers
 					$this->systemMessages->addNotice($this->t('You can\'t remove yourself'));
 				}
 				$this->baseUrl->redirect('moderation/users/blocked');
+				// no break
 			case 'unblock':
 				self::checkFormSecurityTokenRedirectOnError('/moderation/users/blocked', 'moderation_users_blocked', 't');
 				User::block($uid, false);

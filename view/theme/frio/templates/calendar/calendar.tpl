@@ -27,16 +27,16 @@
 						<i class="fa fa-angle-down" aria-hidden="true"></i> {{$view}}
 					</button>
 					<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="event-calendar-views">
-						<li role="presentation">
+						<li>
 							<button role="menuitem" type="button" class="btn-link" onclick="changeView('changeView', 'month');$('#events-calendar').fullCalendar('option', {contentHeight: '', aspectRatio: 1});">{{$month}}</button>
 						</li>
-						<li role="presentation">
+						<li>
 							<button role="menuitem" type="button" class="btn-link" onclick="changeView('changeView', 'agendaWeek');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$week}}</button>
 						</li>
-						<li role="presentation">
+						<li>
 							<button role="menuitem" type="button" class="btn-link" onclick="changeView('changeView', 'agendaDay');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$day}}</button>
 						</li>
-						<li role="presentation">
+						<li>
 							<button role="menuitem" type="button" class="btn-link" onclick="changeView('changeView', 'listMonth');$('#events-calendar').fullCalendar('option', 'contentHeight', 'auto');">{{$list}}</button>
 						</li>
 					</ul>

@@ -31,19 +31,18 @@ $frio = 'view/theme/frio';
 <?php if($_SERVER['REQUEST_URI'] == '/') {
 	header('Location: /login');
 } ?>
-<a href="<?php echo DI::args()->getCommand(); ?>/#content" class="sr-only sr-only-focusable"><?php echo DI::l10n()->t('Skip to main content'); ?></a>
 <?php
-	if(!empty($page['nav'])) {
-		echo	str_replace(
-			'~config.sitename~',
-			DI::config()->get('config', 'sitename'),
-			str_replace(
-				'~system.banner~',
-				DI::config()->get('system', 'banner'),
-				$page['nav']
-			)
-		);
-	};
+if(!empty($page['nav'])) {
+	echo	str_replace(
+		'~config.sitename~',
+		DI::config()->get('config', 'sitename'),
+		str_replace(
+			'~system.banner~',
+			DI::config()->get('system', 'banner'),
+			$page['nav']
+		)
+	);
+};
 ?>
 	<main>
 
@@ -65,7 +64,7 @@ include('includes/photo_side.php');
 echo'
 					</aside>
 
-					<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" id="content">
+					<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" id="content" tabindex="0">
 						<section class="sectiontop">
 								<div class="panel ' . DI::args()->get(0, 'generic') . '-content-wrapper">
 									<div class="panel-body">';

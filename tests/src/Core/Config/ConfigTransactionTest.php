@@ -9,16 +9,11 @@ namespace Friendica\Test\src\Core\Config;
 
 use Friendica\Core\Config\Capability\ISetConfigValuesTransactionally;
 use Friendica\Core\Config\Model\DatabaseConfig;
-use Friendica\Core\Config\Model\ReadOnlyFileConfig;
 use Friendica\Core\Config\Model\ConfigTransaction;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Database\Database;
-use Friendica\Test\DatabaseTestCase;
 use Friendica\Test\FixtureTestCase;
-use Friendica\Test\MockedTest;
-use Friendica\Test\Util\Database\StaticDatabase;
-use Friendica\Test\Util\VFSTrait;
 use Mockery\Exception\InvalidCountException;
 
 class ConfigTransactionTest extends FixtureTestCase
@@ -30,7 +25,12 @@ class ConfigTransactionTest extends FixtureTestCase
 	{
 		parent::setUp();
 
-		$this->configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
+		$this->configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static'
+		);
 	}
 
 	public function dataTests(): array
@@ -96,7 +96,7 @@ class ConfigTransactionTest extends FixtureTestCase
 	{
 		$this->configFileManager = \Mockery::spy(ConfigFileManager::class);
 
-		$config = new DatabaseConfig($this->dice->create(Database::class), new Cache());
+		$config            = new DatabaseConfig($this->dice->create(Database::class), new Cache());
 		$configTransaction = new ConfigTransaction($config);
 
 		// commit empty transaction

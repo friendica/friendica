@@ -18,6 +18,9 @@ class Addon
 {
 	/**
 	 * The addon sub-directory
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonPath()` instead
+	 *
 	 * @var string
 	 */
 	const DIRECTORY = 'addon';
@@ -33,6 +36,8 @@ class Addon
 	 * Returns the list of available addons with their current status and info.
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAvailableAddons()` instead
 	 *
 	 * @return array
 	 * @throws \Exception
@@ -64,6 +69,8 @@ class Addon
 	 * Returns a list of addons that can be configured at the node level.
 	 * The list is formatted for display in the admin panel aside.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddonsWithAdminSettings()` instead
+	 *
 	 * @return array
 	 * @throws \Exception
 	 */
@@ -88,7 +95,6 @@ class Addon
 		return $addons_admin;
 	}
 
-
 	/**
 	 * Synchronize addons:
 	 *
@@ -100,6 +106,7 @@ class Addon
 	 * Then go through the config list and if we have a addon that isn't installed,
 	 * call the install procedure and add it to the database.
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::loadAddons()` instead
 	 */
 	public static function loadAddons()
 	{
@@ -108,6 +115,8 @@ class Addon
 
 	/**
 	 * uninstalls an addon.
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::uninstallAddon()` instead
 	 *
 	 * @param string $addon name of the addon
 	 * @return void
@@ -134,6 +143,8 @@ class Addon
 
 	/**
 	 * installs an addon.
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::installAddon()` instead
 	 *
 	 * @param string $addon name of the addon
 	 * @return bool
@@ -173,6 +184,8 @@ class Addon
 	/**
 	 * reload all updated addons
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::reloadAddons()` instead
+	 *
 	 * @return void
 	 * @throws \Exception
 	 *
@@ -209,6 +222,9 @@ class Addon
 	 *   * Maintainer: Jess <email>
 	 *   *
 	 *   *\endcode
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonInfo()` instead
+	 *
 	 * @param string $addon the name of the addon
 	 * @return array with the addon information
 	 * @throws \Exception
@@ -275,6 +291,8 @@ class Addon
 	/**
 	 * Checks if the provided addon is enabled
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::isAddonEnabled()` instead
+	 *
 	 * @param string $addon
 	 * @return boolean
 	 */
@@ -286,6 +304,8 @@ class Addon
 	/**
 	 * Returns a list of the enabled addon names
 	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddons()` instead
+	 *
 	 * @return array
 	 */
 	public static function getEnabledList(): array
@@ -295,6 +315,8 @@ class Addon
 
 	/**
 	 * Returns the list of non-hidden enabled addon names
+	 *
+	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getVisibleEnabledAddons()` instead
 	 *
 	 * @return array
 	 * @throws \Exception

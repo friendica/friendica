@@ -59,17 +59,17 @@ as the value of $top_child_total (this is done at the end of this file)
 <span class="created" style="display: none;">{{$item.created_date}}</span>
 <span class="uriid" style="display: none;">{{$item.uriid}}</span>
 {{/if}}
-	<div class="media {{$item.shiny}}">
+	<article class="media {{$item.shiny}}" aria-posinset="{{$item.id}}" aria-setsize="-1">
 	{{if $item.parentguid}}
 		<span class="visible-sm-inline visible-xs wall-item-responses time">
 			<i class="fa fa-reply" aria-hidden="true"></i> <a id="btn-{{$item.id}}" class="" href="javascript:;" onclick="scrollToItem('item-' + '{{$item.parentguid}}');">{{$item.inreplyto}}</a>
-			{{if $item.reshared}}<i class="hidden-xs">&#x2022;</i>{{/if}}
+			{{if $item.reshared}}<i class="hidden-xs "aria-hidden="true">&#x2022;</i>{{/if}}
 		</span>
 	{{else}}
 		{{if $item.thread_level!=1 && $item.isunknown}}
 		<span class="visible-sm-inline visible-xs wall-item-responses time">
 			<i title="{{$item.isunknown_label}}" aria-label="{{$item.isunknown_label}}">{{$item.isunknown}}</i>
-			{{if $item.reshared}}<i class="hidden-xs">&#x2022;</i>{{/if}}
+			{{if $item.reshared}}<i class="hidden-xs" aria-hidden="true">&#x2022;</i>{{/if}}
 		</span>
 		{{/if}}
 	{{/if}}
@@ -80,14 +80,14 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{* The avatar picture and the photo-menu *}}
 		<div class="dropdown pull-left"><!-- Dropdown -->
 			{{if $item.thread_level==1}}
-			<div class="hidden-sm hidden-xs contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card">
+			<div class="hidden-sm hidden-xs contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card" aria-hidden="true">
 				<a class="userinfo click-card u-url" id="wall-item-photo-menu-{{$item.id}}" href="{{$item.profile_url}}">
 					<div class="contact-photo-image-wrapper">
 						<img src="{{$item.thumb}}" class="contact-photo media-object {{$item.sparkle}} p-name u-photo" id="wall-item-photo-{{$item.id}}" alt="{{$item.name}}"  loading="lazy"/>
 					</div>
 				</a>
 			</div>
-			<div class="hidden-lg hidden-md contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}}">
+			<div class="hidden-lg hidden-md contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}}" aria-hidden="true">
 				<a class="userinfo click-card u-url" id="wall-item-photo-menu-xs-{{$item.id}}" href="{{$item.profile_url}}">
 					<div class="contact-photo-image-wrapper">
 						<img src="{{$item.thumb}}" class="contact-photo-xs media-object {{$item.sparkle}}" id="wall-item-photo-xs-{{$item.id}}" alt="{{$item.name}}"  loading="lazy"/>
@@ -108,7 +108,7 @@ as the value of $top_child_total (this is done at the end of this file)
 
 			{{* The avatar picture for comments *}}
 			{{if $item.thread_level!=1}}
-			<div class="contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card">
+			<div class="contact-photo-wrapper mframe{{if $item.owner_url}} wwfrom{{/if}} p-author h-card" aria-hidden="true">
 				<a class="userinfo click-card u-url" id="wall-item-photo-menu-{{$item.id}}" href="{{$item.profile_url}}">
 					<div class="contact-photo-image-wrapper">
 						<img src="{{$item.thumb}}" class="contact-photo-xs media-object {{$item.sparkle}} p-name u-photo" id="wall-item-photo-comment-{{$item.id}}" alt="{{$item.name}}" loading="lazy"/>
@@ -152,30 +152,28 @@ as the value of $top_child_total (this is done at the end of this file)
 
 				<div class="additional-info text-muted">
 					<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
-						<small>
-							<a href="{{$item.plink.orig}}">
-								<time class="time dt-published" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
-							</a>
-							{{if $item.owner_self}}
-								{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
-							{{/if}}
-							{{if $item.direction}}
-								{{include file="sub/direction.tpl" direction=$item.direction}}
-							{{/if}}
-							{{if $item.pinned}}
-								<span aria-hidden="true">&bull;</span> <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
-								<span class="sr-only">{{$item.pinned}}</span>
-							{{/if}}
-							{{if $item.connector}}
-								<span aria-hidden="true">&bull;</span>
-								<small><i class="fa fa-plug" title="{{$item.connector}}" aria-hidden="true"></i></small>
-							{{else}}
-								<span aria-hidden="true">&bull;</span>
-								<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
-									<small><i class="fa {{if $item.private == 1}}fa-lock{{elseif $item.private == 0}}fa-globe{{else}}fa-low-vision{{/if}}" aria-hidden="true"></i></small>
-								</span>
-							{{/if}}
-						</small>
+						<a href="{{$item.plink.orig}}">
+							<time class="time dt-published" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
+						</a>
+						{{if $item.owner_self}}
+							{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
+						{{/if}}
+						{{if $item.direction}}
+							{{include file="sub/direction.tpl" direction=$item.direction}}
+						{{/if}}
+						{{if $item.pinned}}
+							<span aria-hidden="true">&bull;</span> <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
+							<span class="sr-only">{{$item.pinned}}</span>
+						{{/if}}
+						{{if $item.connector}}
+							<span aria-hidden="true">&bull;</span>
+							<i class="fa fa-plug" title="{{$item.connector}}" aria-hidden="true"></i>
+						{{else}}
+							<span aria-hidden="true">&bull;</span>
+							<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
+								<i class="fa {{if $item.private == 1}}fa-lock{{elseif $item.private == 0}}fa-globe{{else}}fa-low-vision{{/if}}" aria-hidden="true"></i>
+							</span>
+						{{/if}}
 					</div>
 
 					{{if $item.location_html}}
@@ -205,7 +203,7 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{/if}}
 							{{if $item.connector}}
 								<span aria-hidden="true">&bull;</span>
-								<small><i class="fa fa-plug" title="{{$item.connector}}" aria-hidden="true"></i></small>
+								<i class="fa fa-plug" title="{{$item.connector}}"></i>
 							{{else}}
 								<span aria-hidden="true">&bull;</span>
 								<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
@@ -227,13 +225,13 @@ as the value of $top_child_total (this is done at the end of this file)
 					{{if $item.parentguid}}
 						<span class="hidden-xs hidden-sm">
 							<a id="btn-{{$item.id}}" class="time" href="javascript:;" onclick="scrollToItem('item-' + '{{$item.parentguid}}');"><i class="fa fa-reply" aria-hidden="true"></i> {{$item.inreplyto}}</a>
-							<i class="hidden-xs">&#x2022;</i>
+							<i class="hidden-xs" aria-hidden="true">&#x2022;</i>
 						</span>
 					{{else}}
 						{{if $item.isunknown}}
 							<span class="hidden-xs hidden-sm time">
 								<i title="{{$item.isunknown_label}}" aria-label="{{$item.isunknown_label}}">{{$item.isunknown}}</i>
-								<i class="hidden-xs">&#x2022;</i>
+								<i class="hidden-xs" aria-hidden="true">&#x2022;</i>
 							</span>
 						{{/if}}
 					{{/if}}
@@ -249,11 +247,11 @@ as the value of $top_child_total (this is done at the end of this file)
 					{{/if}}
 					{{if $item.connector}}
 						<span aria-hidden="true">&bull;</span>
-						<small><i class="fa fa-plug" title="{{$item.connector}}" aria-hidden="true"></i></small>
+						<i class="fa fa-plug" title="{{$item.connector}}"></i>
 					{{else}}
 						<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 							<span aria-hidden="true">&bull;</span>
-							<small><i class="fa {{if $item.private == 1}}fa-lock{{elseif $item.private == 0}}fa-globe{{else}}fa-low-vision{{/if}}" aria-hidden="true"></i></small>
+							<i class="fa {{if $item.private == 1}}fa-lock{{elseif $item.private == 0}}fa-globe{{else}}fa-low-vision{{/if}}" aria-hidden="true"></i>
 						</span>
 					{{/if}}
 				</small>
@@ -268,20 +266,20 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{if $item.thread_level==1}}<span aria-hidden="true"><hr /></span>{{/if}}
 
 		{{* item content *}}
-		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">
+		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}">
 			{{if $item.title}}
 			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3><br /></span>
 			{{/if}}
 			{{if $item.summary}}
 			<summary class="wall-item-summary" id="wall-item-summary-{{$item.id}}">{{$item.summary}}</summary>
 			{{/if}}
-			<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" id="wall-item-body-{{$item.id}}" dir="auto" lang="{{$item.lang}}">{{$item.body_html nofilter}}</div>
+			<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" id="wall-item-body-{{$item.id}}" dir="auto">{{$item.body_html nofilter}}</div>
 		</div>
 
 		<!-- TODO -->
 		<div class="wall-item-bottom">
 			<div class="wall-item-links"></div>
-			<div class="wall-item-tags">
+			<div class="wall-item-tags" lang="{{$item.lang}}">
 		{{if !$item.suppress_tags}}
 			{{foreach $item.hashtags as $tag}}
 				<span class="tag label btn-info sm">{{$tag nofilter}} <i class="fa fa-bolt" aria-hidden="true"></i></span>
@@ -456,7 +454,7 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{/if}}
 
 				{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread) && ($item.ignore || ($item.drop && $item.drop.dropping))}}
-				<li role="separator" class="divider"></li>
+				<li class="divider"><hr></li>
 				{{/if}}
 
 				{{if $item.ignore}}
@@ -502,7 +500,7 @@ as the value of $top_child_total (this is done at the end of this file)
 			</ul>
 		</span>
 		{{if $item.drop.pagedrop}}
-		<span class="pull-right checkbox">
+		<span class="pull-right checkbox" aria-hidden="true">
 			{{if $item.drop}}
 				<input type="checkbox" title="{{$item.drop.select}}" name="itemselected[]" id="checkbox-{{$item.id}}" class="item-select" value="{{$item.id}}" />
 				<label for="checkbox-{{$item.id}}"></label>
@@ -637,7 +635,7 @@ as the value of $top_child_total (this is done at the end of this file)
 							</li>
 
 							{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread) && ($item.ignore || ($item.drop && $item.drop.dropping))}}
-								<li role="separator" class="divider"></li>
+								<li class="divider"><hr></li>
 							{{/if}}
 
 							{{if $item.ignore}}
@@ -716,7 +714,7 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{if $item.thread_level!=1}}
 		</div><!--./media-body from for comments-->
 		{{/if}}
-	</div>
+	</article>
 	{{foreach $item.children as $child}}
 		{{include file="{{$item.template}}" item=$child}}
 	{{/foreach}}

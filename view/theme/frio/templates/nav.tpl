@@ -9,29 +9,29 @@
 	<header>
 		{{* {{$langselector}} *}}
 
-		<div id="site-location">{{$sitelocation}}</div>
+		<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 		<div id="banner" class="hidden-sm hidden-xs">
 			{{* show on remote/visitor connections another logo which symbols that fact*}}
 			{{if $nav.remote}}
-				<a href="{{$baseurl}}">
+				<a href="{{$baseurl}}" aria-hidden="true">
 					<div id="remote-logo-img" aria-label="{{$home}}"></div>
 				</a>
 			{{else}}
 				{{* #logo-img is the placeholder to insert a mask (friendica logo) into this div
 				For Firefox we have to call the paths of the mask (look at the bottom of this file).
 				Because for FF we need relative paths we apply them with js after the page is loaded (look at theme.js *}}
-				<a href="{{$baseurl}}">
+				<a href="{{$baseurl}}" aria-hidden="true">
 					<div id="logo-img" aria-label="{{$home}}"></div>
 				</a>
 			{{/if}}
 		</div>
 	</header>
-	<nav id="topbar-first" class="topbar">
+	<nav id="topbar-first" class="topbar" role="menubar">
 		<div class="container">
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
 				<!-- div for navbar width-->
 				<!-- Brand and toggle get grouped for better mobile display -->
-				<div class="topbar-nav" role="navigation">
+				<nav class="topbar-nav">
 
 					{{* Buttons for the mobile view *}}
 					<button type="button" class="navbar-toggle offcanvas-right-toggle pull-right"
@@ -51,7 +51,13 @@
 					</button>
 
 					{{* Left section of the NavBar with navigation shortcuts/icons *}}
-					<ul class="nav navbar-left" role="menubar">
+					<ul class="nav navbar-left">
+						<li class="sr-only">
+							<button class="sr-only" onclick="document.getElementById('content').scrollIntoView(); document.getElementById('content').focus();">{{$skip}}</button>
+						</li>
+						<li class="sr-only">
+							<a class="sr-only" href="{{$baseurl}}">{{$home}}</a>
+						</li>
 						{{if $nav.network}}
 							<li class="nav-segment">
 								<a accesskey="n" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
@@ -115,7 +121,7 @@
 
 						{{* The notifications dropdown *}}
 						{{if $nav.notifications}}
-							<li id="nav-notification" class="nav-segment dropdown" role="presentation">
+							<li id="nav-notification" class="nav-segment dropdown">
 								<button id="nav-notifications-menu-btn" class="btn-link dropdown-toggle" data-toggle="dropdown"
 									type="button" aria-haspopup="true" aria-expanded="false"
 									aria-controls="nav-notifications-menu">
@@ -126,7 +132,7 @@
 								<ul id="nav-notifications-menu" class="dropdown-menu menu-popup" role="menu"
 									aria-labelledby="nav-notifications-menu-btn">
 									{{* the following list entry must have the id "nav-notifications-mark-all". Without it this isn't visible. ....strange behavior :-/ *}}
-									<li role="presentation" id="nav-notifications-mark-all" class="dropdown-header">
+									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
 										{{$nav.notifications.1}}
 										<div class="dropdown-header-link">
@@ -138,7 +144,7 @@
 
 									</li>
 
-									<li role="presentation">
+									<li>
 										<p role="menuitem" class="text-muted"><i>{{$emptynotifications}}</i></p>
 									</li>
 								</ul>
@@ -146,7 +152,7 @@
 						{{/if}}
 
 					</ul>
-				</div>
+				</nav>
 
 				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
 				<div class="topbar-actions pull-right">
@@ -188,20 +194,20 @@
 									{{if $nav.remote}}
 										{{if $nav.sitename}}
 											<li id="nav-sitename" role="menuitem">{{$nav.sitename}}</li>
-											<li role="presentation" class="divider"></li>
+											<li class="divider"><hr></li>
 										{{/if}}
 									{{/if}}
 									{{foreach $nav.usermenu as $usermenu}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
 												{{$usermenu.1}}
 											</a>
 										</li>
 									{{/foreach}}
-									<li role="presentation" class="divider"></li>
+									<li class="divider"><hr></li>
 									{{if $nav.notifications}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}">
 												<i class="fa fa-bell fa-fw" aria-hidden="true"></i>
 												{{$nav.notifications.1}}
@@ -209,7 +215,7 @@
 										</li>
 									{{/if}}
 									{{if $nav.messages}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem"
 												class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}"
 												href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">
@@ -219,9 +225,9 @@
 											</a>
 										</li>
 									{{/if}}
-									<li role="presentation" class="divider"></li>
+									<li class="divider"><hr></li>
 									{{if $nav.contacts}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-menu-contacts-link"
 												class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
 												title="{{$nav.contacts.3}}">
@@ -231,7 +237,7 @@
 										</li>
 									{{/if}}
 									{{if $nav.delegation}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-delegation-link"
 												class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
 												href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">
@@ -239,24 +245,24 @@
 											</a>
 										</li>
 									{{/if}}
-									<li role="presentation">
+									<li>
 										<a role="menuitem" id="nav-directory-link" class="nav-link {{$nav.directory.2}}"
 											href="{{$nav.directory.0}}" title="{{$nav.directory.3}}">
 											<i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>{{$nav.directory.1}}
 										</a>
 									</li>
-									<li role="presentation" class="divider"></li>
+									<li class="divider"><hr></li>
 									{{if $nav.apps}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-apps-link" class="nav-link {{$nav.apps.2}}"
 												href="{{$nav.apps.0}}" title="{{$nav.apps.3}}">
 												<i class="fa fa-puzzle-piece fa-fw" aria-hidden="true"></i> {{$nav.apps.1}}
 											</a>
 										</li>
-										<li role="presentation" class="divider"></li>
+										<li class="divider"><hr></li>
 									{{/if}}
 									{{if $nav.help}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-help-link" class="nav-link {{$nav.help.2}}"
 												href="{{$nav.help.0}}" title="{{$nav.help.3}}">
 												<i class="fa fa-question-circle fa-fw" aria-hidden="true"></i> {{$nav.help.1}}
@@ -264,7 +270,7 @@
 										</li>
 									{{/if}}
 									{{if $nav.settings}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-settings-link" class="nav-link {{$nav.settings.2}}"
 												href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">
 												<i class="fa fa-cog fa-fw" aria-hidden="true"></i> {{$nav.settings.1}}
@@ -272,7 +278,7 @@
 										</li>
 									{{/if}}
 									{{if $nav.admin}}
-										<li role="presentation">
+										<li>
 											<a accesskey="a" role="menuitem" id="nav-admin-link"
 												class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}"
 												title="{{$nav.admin.3}}"><i class="fa fa-user-secret fa-fw" aria-hidden="true"></i>
@@ -281,7 +287,7 @@
 										</li>
 									{{/if}}
 									{{if $nav.moderation}}
-										<li role="presentation">
+										<li>
 											<a accesskey="m" role="menuitem" id="nav-moderation-link"
 												class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}"
 												title="{{$nav.moderation.3}}"><i class="fa fa-gavel fa-fw" aria-hidden="true"></i>
@@ -289,24 +295,24 @@
 											</a>
 										</li>
 									{{/if}}
-									<li role="presentation" class="divider"></li>
-									<li role="presentation">
+									<li class="divider"><hr></li>
+									<li>
 										<a role="menuitem" id="nav-about-link" class="nav-link {{$nav.about.2}}"
 											href="{{$nav.about.0}}" title="{{$nav.about.3}}">
 											<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
 										</a>
 									</li>
 									{{if $nav.tos}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-tos-link" class="nav-link {{$nav.tos.2}}"
 												href="{{$nav.tos.0}}" title="{{$nav.tos.3}}"><i class="fa fa-file-text"
 													aria-hidden="true"></i> {{$nav.tos.1}}
 											</a>
 										</li>
 									{{/if}}
-									<li role="presentation" class="divider"></li>
+									<li class="divider"><hr></li>
 									{{if $nav.logout}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-logout-link"
 												class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}"
 												title="{{$nav.logout.3}}"><i class="fa fa fa-sign-out fa-fw" aria-hidden="true"></i>
@@ -314,7 +320,7 @@
 											</a>
 										</li>
 									{{else}}
-										<li role="presentation">
+										<li>
 											<a role="menuitem" id="nav-login-link"
 												class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}"
 												title="{{$nav.login.3}}"><i class="fa fa-power-off fa-fw" aria-hidden="true"></i>
@@ -343,23 +349,23 @@
 									<li role="menuitem" class="nav-sitename list-group-item">{{$nav.sitename}}</li>
 								{{/if}}
 							{{/if}}
-							<li role="presentation" class="list-group-item">
+							<li class="list-group-item">
 								<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
 									style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;">
 								{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}){{/if}}
 							</li>
 							{{foreach $nav.usermenu as $usermenu}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem" class="{{$usermenu.2}}"
 										href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}
 									</a>
 								</li>
 							{{/foreach}}
 							{{if $nav.notifications || $nav.contacts || $nav.messages || $nav.delegation}}
-								<li role="presentation" class="divider"></li>
+								<li class="divider"><hr></li>
 							{{/if}}
 							{{if $nav.notifications}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										href="{{$nav.notifications.all.0}}" title="{{$nav.notifications.1}}"><i
 											class="fa fa-bell fa-fw" aria-hidden="true"></i> {{$nav.notifications.1}}
@@ -367,7 +373,7 @@
 								</li>
 							{{/if}}
 							{{if $nav.contacts}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
 										title="{{$nav.contacts.3}}"><i class="fa fa-users fa-fw" aria-hidden="true"></i>
@@ -376,7 +382,7 @@
 								</li>
 							{{/if}}
 							{{if $nav.messages}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.messages.2}} {{$sel.messages}}" href="{{$nav.messages.0}}"
 										title="{{$nav.messages.3}}"><i class="fa fa-envelope fa-fw" aria-hidden="true"></i>
@@ -385,7 +391,7 @@
 								</li>
 							{{/if}}
 							{{if $nav.delegation}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
 										href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}"><i class="fa fa-flag fa-fw"
@@ -394,10 +400,10 @@
 								</li>
 							{{/if}}
 							{{if $nav.settings || $nav.admin || $nav.logout}}
-								<li role="presentation" class="divider"></li>
+								<li class="divider"><hr></li>
 							{{/if}}
 							{{if $nav.settings}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}"
 										title="{{$nav.settings.3}}"><i class="fa fa-cog fa-fw" aria-hidden="true"></i>
 										{{$nav.settings.1}}
@@ -405,7 +411,7 @@
 								</li>
 							{{/if}}
 							{{if $nav.admin}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}"><i
 											class="fa fa-user-secret fa-fw" aria-hidden="true"></i>
@@ -414,7 +420,7 @@
 								</li>
 							{{/if}}
 							{{if $nav.moderation}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}"><i
 											class="fa fa-gavel fa-fw" aria-hidden="true"></i>
@@ -422,16 +428,16 @@
 									</a>
 								</li>
 							{{/if}}
-							<li role="presentation" class="divider"></li>
-							<li role="presentation" class="list-group-item">
+							<li class="divider"><hr></li>
+							<li class="list-group-item">
 								<a role="menuitem" class="nav-link {{$nav.about.2}}"
 								   href="{{$nav.about.0}}" title="{{$nav.about.3}}">
 									<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
 								</a>
 							</li>
-							<li role="presentation" class="divider"></li>
+							<li class="divider"><hr></li>
 							{{if $nav.logout}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}"><i
 											class="fa fa fa-sign-out fa-fw" aria-hidden="true"></i>
@@ -439,7 +445,7 @@
 									</a>
 								</li>
 							{{else}}
-								<li role="presentation" class="list-group-item">
+								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}"
 										title="{{$nav.login.3}}"><i class="fa fa-power-off fa-fw" aria-hidden="true"></i>
@@ -473,13 +479,13 @@
 			</div>
 			<div class="pull-right">
 				<ul class="nav navbar-nav navbar-right">
-					<li role="presentation">
+					<li>
 						<a href="login?mode=none" id="nav-login" data-toggle="tooltip" aria-label="{{$nav.login.3}}"
 							title="{{$nav.login.3}}">
 							<i class="fa fa-sign-in fa-fw" aria-hidden="true"></i>
 						</a>
 					</li>
-					<li role="presentation">
+					<li>
 						<a href="{{$nav.about.0}}" id="nav-about" data-toggle="tooltip" aria-label="{{$nav.about.3}}"
 							title="{{$nav.about.3}}">
 							<i class="fa fa-info fa-fw" aria-hidden="true"></i>

@@ -113,7 +113,8 @@ class Nav
 			'$userinfo'           => $nav_info['userinfo'],
 			'$sel'                => self::$selected,
 			'$apps'               => $this->getAppMenu(),
-			'$home'               => $this->l10n->t('Go back'),
+			'$home'               => $this->l10n->t('Home'),
+			'$skip'               => $this->l10n->t('Skip to main content'),
 			'$clear_notifs'       => $this->l10n->t('Clear notifications'),
 			'$search_hint'        => $this->l10n->t('@name, !group, #tags, content')
 		]);

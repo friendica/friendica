@@ -42,6 +42,18 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 				[Dice::INSTANCE => Dice::SELF],
 			],
 		],
+		\Friendica\Core\Addon\AddonHelper::class => [
+			'instanceOf' => \Friendica\Core\Addon\AddonProxy::class,
+			'constructParams' => [
+				$basepath . '/addon',
+			],
+		],
+		\Friendica\Service\Addon\AddonLoader::class => [
+			'instanceOf' => \Friendica\Service\Addon\AddonFactory::class,
+			'constructParams' => [
+				$basepath . '/addon',
+			],
+		],
 		\Friendica\Util\BasePath::class => [
 			'constructParams' => [
 				$basepath,
@@ -81,6 +93,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'call' => [
 				['createConfigFileManager', [
 					$basepath,
+					$basepath . '/addon',
 					$serverVars,
 				], Dice::CHAIN_CALL],
 			],
@@ -184,12 +197,6 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Psr\EventDispatcher\EventDispatcherInterface::class => [
 			'instanceOf' => \Friendica\Event\EventDispatcher::class,
-		],
-		\Friendica\Service\Addon\AddonLoader::class => [
-			'instanceOf' => \Friendica\Service\Addon\AddonFactory::class,
-			'constructParams' => [
-				$basepath . '/addon',
-			],
 		],
 		\Friendica\Core\Logger\Capability\IHaveCallIntrospections::class => [
 			'instanceOf' => \Friendica\Core\Logger\Util\Introspection::class,

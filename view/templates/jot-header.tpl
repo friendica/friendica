@@ -199,37 +199,42 @@ function enableOnUser(){
 	}
 
 	function itemFiler(id) {
+		const bordercolor = $("input").css("border-color");
 
-		var bordercolor = $("input").css("border-color");
-
-		$.get('filer/', function(data){
-			$.colorbox({html:data});
-			$("#id_term").keypress(function(){
-				$(this).css("border-color",bordercolor);
+		$.get('filer/', function (data) {
+			$.colorbox({html: data});
+			$("#id_term").keypress(function () {
+				$(this).css("border-color", bordercolor);
 			})
-			$("#select_term").change(function(){
-				$("#id_term").css("border-color",bordercolor);
+			$("#select_term").change(function () {
+				$("#id_term").css("border-color", bordercolor);
 			})
 
-			$("#filer_save").click(function(e){
+			$("#filer_save").click(function (e) {
 				e.preventDefault();
-				reply = $("#id_term").val();
-				if(reply && reply.length) {
+				const reply = $("#id_term").val();
+				if (reply && reply.length) {
 					commentBusy = true;
+					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply, NavUpdate);
-//					if(timer) clearTimeout(timer);
-//					timer = setTimeout(NavUpdate,3000);
-					liking = 1;
-					force_update = true;
-					$.colorbox.close();
+					$.get('filer/' + id + '?term=' + reply)
+						.done(function () {
+							$.colorbox.close();
+							resetFormModifiedFlag();
+						})
+						.always(function () {
+							liking = 1;
+							force_update = true;
+							update_item = id;
+							NavUpdate();
+						});
 				} else {
-					$("#id_term").css("border-color","#FF0000");
+					$("#id_term").css("border-color", "#FF0000");
 				}
+
 				return false;
 			});
 		});
-
 	}
 
 	function jotClearLocation() {

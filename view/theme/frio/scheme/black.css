@@ -113,6 +113,9 @@ main .nav-tabs > li.active > a:hover {
 	background-color: rgba(238, 238, 238, $contentbg_transp);
 }
 
+.modal-header {
+	border-color: $link_color;
+}
 .modal-content {
 	background-color: $background_color;
 }

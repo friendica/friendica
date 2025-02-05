@@ -11,7 +11,7 @@ namespace Friendica\Console;
 
 use Asika\SimpleConsole\Console;
 use Friendica\App\Mode;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
@@ -29,6 +29,7 @@ final class JetstreamDaemon extends Console
 	private IManageKeyValuePairs $keyValue;
 	private SysDaemon $daemon;
 	private Jetstream $jetstream;
+	private AddonHelper $addonHelper;
 
 	/**
 	 * @param Mode                 $mode
@@ -38,15 +39,16 @@ final class JetstreamDaemon extends Console
 	 * @param Jetstream            $jetstream
 	 * @param array|null           $argv
 	 */
-	public function __construct(Mode $mode, IManageConfigValues $config, IManageKeyValuePairs $keyValue, SysDaemon $daemon, Jetstream $jetstream, array $argv = null)
+	public function __construct(Mode $mode, IManageConfigValues $config, IManageKeyValuePairs $keyValue, SysDaemon $daemon, Jetstream $jetstream, AddonHelper $addonHelper, array $argv = null)
 	{
 		parent::__construct($argv);
 
-		$this->mode      = $mode;
-		$this->config    = $config;
-		$this->keyValue  = $keyValue;
-		$this->jetstream = $jetstream;
-		$this->daemon    = $daemon;
+		$this->mode        = $mode;
+		$this->config      = $config;
+		$this->keyValue    = $keyValue;
+		$this->jetstream   = $jetstream;
+		$this->daemon      = $daemon;
+		$this->addonHelper = $addonHelper;
 	}
 
 	protected function getHelp(): string
@@ -95,10 +97,10 @@ HELP;
 			);
 		}
 
-		Addon::loadAddons();
+		$this->addonHelper->loadAddons();
 		Hook::loadHooks();
 
-		if (!Addon::isEnabled('bluesky')) {
+		if (!$this->addonHelper->isAddonEnabled('bluesky')) {
 			throw new RuntimeException("Bluesky has to be enabled.\n");
 		}
 

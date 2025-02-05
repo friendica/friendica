@@ -310,7 +310,7 @@ class Delivery
 			$atom = DFRN::entries($msgitems, $owner);
 		}
 
-		DI::logger()->debug('Notifier entry: ' . $contact['url'] . ' ' . ($target_item_id ?? 'relocation') . ' entry: ' . $atom);
+		DI::logger()->debug('Notifier entry', ['url' => $contact['url'], 'target_item_id' => ($target_item_id ?? 'relocation'), 'entry' => $atom]);
 
 		$protocol = Post\DeliveryData::DFRN;
 

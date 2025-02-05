@@ -44,7 +44,7 @@ trait FixtureTestTrait
 			->addRules(include __DIR__ . '/../static/dependencies.config.php')
 			->addRule(ConfigFileManager::class, [
 				'instanceOf' => Config::class,
-				'call'       => [['createConfigFileManager', [$this->root->url(), $server,], Dice::CHAIN_CALL]]])
+				'call'       => [['createConfigFileManager', [$this->root->url(), $this->root->url() . '/addon', $server,], Dice::CHAIN_CALL]]])
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
 			->addRule(Arguments::class, [

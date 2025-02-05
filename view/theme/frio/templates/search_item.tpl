@@ -111,13 +111,13 @@
 			<hr />
 
 			{{* item content *}}
-			<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}">
+			<article class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}" aria-posinset="{{$item.id}}" aria-setsize="-1">
 				{{if $item.title}}
-				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h2 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h2><br /></span>
+				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h3><br /></span>
 				{{/if}}
 
 				<div class="wall-item-body" id="wall-item-body-{{$item.id}}" dir="auto">{{$item.body_html nofilter}}</div>
-			</div>
+			</article>
 
 			<!-- TODO -->
 			<div class="wall-item-bottom">
@@ -155,14 +155,14 @@
 					<button type="button" class="btn btn-defaultbutton-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});"></button>
 						{{/if}}
 						{{if $item.vote.like AND $item.vote.dislike}}
-					<span role="presentation" class="separator">•</span>
+					<span class="separator"aria-hidden="true">•</span>
 						{{/if}}
 
 						{{if $item.vote.dislike}}
 					<button type="button" class="btn btn-defaultbutton-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});"></button>
 						{{/if}}
 						{{if ($item.vote.like OR $item.vote.dislike) AND $item.comment_html}}
-					<span role="presentation" class="separator">•</span>
+					<span class="separator"aria-hidden="true">•</span>
 						{{/if}}
 					{{/if}}
 
@@ -175,7 +175,7 @@
 					{{if $item.vote}}
 						{{if $item.vote.share}}
 							{{if $item.vote.like OR $item.vote.dislike OR $item.comment_html}}
-					<span role="presentation" class="separator">•</span>
+					<span class="separator"aria-hidden="true">•</span>
 							{{/if}}
 					<button type="button" class="btn btn-default" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}});"><i class="fa fa-retweet" aria-hidden="true"></i></button>
 						{{/if}}
@@ -183,7 +183,7 @@
 
 				{{* Put additional actions in a dropdown menu *}}
 				{{if $item.menu && ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread || $item.ignore || $item.drop.dropping || $item.browsershare)}}
-					<span role="presentation" class="separator"></span>
+					<span class="separator"></span>
 					<span class="more-links btn-group{{if $item.thread_level> 1}} dropup{{/if}}">
 						<button type="button" class="btn-link dropdown-toggle" data-toggle="dropdown" id="dropdownMenuOptions-{{$item.id}}" aria-haspopup="true" aria-expanded="false" title="{{$item.menu}}"><i class="fa fa-ellipsis-h" aria-hidden="true"></i>&nbsp;{{$item.menu}}</button>
 						<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenuOptions-{{$item.id}}">
@@ -242,7 +242,7 @@
 						{{/if}}
 
 						{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread) && ($item.ignore || $item.drop.dropping)}}
-							<li role="separator" class="divider"></li>
+							<li class="divider"><hr></li>
 						{{/if}}
 
 						{{if $item.ignore}}

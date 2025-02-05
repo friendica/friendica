@@ -740,6 +740,7 @@ nav.navbar .nav > li > button:focus {
 #topbar-first #nav-notifications-menu a {
 	color: $font_color_darker;
 	padding: 0;
+	word-break: break-word;
 }
 #topbar-first #nav-notifications-menu li.notif-entry {
 	color: $font_color_darker;
@@ -2707,10 +2708,10 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #circle-update-wrapper .shortmode .contact-entry-desc {
 	font-size: 12px !important;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading {
 	margin: 0;
 }
-#circle-update-wrapper .shortmode .contact-entry-desc h1.media-heading a {
+#circle-update-wrapper .shortmode .contact-entry-desc h4.media-heading a {
 	font-size: 13px !important;
 	white-space: nowrap;
 }
@@ -3669,9 +3670,8 @@ section .profile-match-wrapper {
 }
 
 .qq-upload-drop-area {
-	background: white !important;
+	background: inherit !important;
 	float: none;
-	border: none;
 	-webkit-box-shadow: none;
 	box-shadow: none;
 	-moz-box-shadow: none;
@@ -3686,7 +3686,7 @@ section .profile-match-wrapper {
 	width: 100% !important;
 	display: block !important;
 	position: relative !important;
-	border: black 1px dashed !important;
+	border: $font_color_darker 1px dashed !important;
 	margin-bottom: 5px !important;
 	margin-top: 15px !important;
 }

@@ -72,7 +72,6 @@ venv/
 /.idea
 
 #ignore addons directory
-/addons
 /addon
 
 #ignore base .htaccess

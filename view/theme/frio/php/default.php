@@ -68,7 +68,6 @@ echo '<meta name="theme-color" content="' . $nav_bg . '" />';
 	</head>
 
 	<body id="top" class="mod-<?php echo $page['module'] . " " . $is_singleuser_class . " " . $view_mode_class;?>">
-		<a href="<?php echo DI::args()->getCommand(); ?>/#content" class="sr-only sr-only-focusable"><?php echo DI::l10n()->t('Skip to main content'); ?></a>
 <?php
 	if (!empty($page['nav']) && !$minimal) {
 		echo str_replace(
@@ -115,7 +114,7 @@ if ($minimal) {
 						echo '
 					</aside>
 
-					<div class="col-lg-7 col-md-7 col-sm-12 col-xs-12" id="content">
+					<div class="col-lg-7 col-md-7 col-sm-12 col-xs-12" id="content" tabindex="0">
 						<section class="sectiontop ';
 						echo $page['section'] ?? '';
 						echo '-content-wrapper">';

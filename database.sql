@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1576
+-- DB_UPDATE_VERSION 1577
 -- ------------------------------------------
 
 
@@ -1609,7 +1609,7 @@ CREATE TABLE IF NOT EXISTS `post-user` (
 	`psid` int unsigned COMMENT 'ID of the permission set of this post',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_uri-id` (`uid`,`uri-id`),
-	 INDEX `uri-id` (`uri-id`),
+	 INDEX `uri-id_origin_deleted` (`uri-id`,`origin`,`deleted`),
 	 INDEX `parent-uri-id` (`parent-uri-id`),
 	 INDEX `thr-parent-id` (`thr-parent-id`),
 	 INDEX `external-id` (`external-id`),

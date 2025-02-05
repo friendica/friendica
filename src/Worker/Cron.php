@@ -7,7 +7,6 @@
 
 namespace Friendica\Worker;
 
-use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
@@ -145,7 +144,7 @@ class Cron
 			// Update "blocked" status of servers
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
 
-			Addon::reload();
+			DI::addonHelper()->reloadAddons();
 
 			DI::keyValue()->set('last_cron_daily', time());
 		}

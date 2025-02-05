@@ -208,7 +208,7 @@ class Display extends BaseSettings
 
 		$allowed_themes = Theme::getAllowedList();
 
-		$themes = [];
+		$themes        = [];
 		$mobile_themes = ['---' => $this->t('No special theme for mobile devices')];
 		foreach ($allowed_themes as $theme) {
 			$is_experimental = file_exists('view/theme/' . $theme . '/experimental');
@@ -233,8 +233,8 @@ class Display extends BaseSettings
 		$theme_selected        = $user['theme'] ?: $default_theme;
 		$mobile_theme_selected = $this->session->get('mobile-theme', $default_mobile_theme);
 
-		$itemspage_network = intval($this->pConfig->get($uid, 'system', 'itemspage_network'));
-		$itemspage_network = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : $this->config->get('system', 'itemspage_network'));
+		$itemspage_network        = intval($this->pConfig->get($uid, 'system', 'itemspage_network'));
+		$itemspage_network        = (($itemspage_network > 0 && $itemspage_network < 101) ? $itemspage_network : $this->config->get('system', 'itemspage_network'));
 		$itemspage_mobile_network = intval($this->pConfig->get($uid, 'system', 'itemspage_mobile_network'));
 		$itemspage_mobile_network = (($itemspage_mobile_network > 0 && $itemspage_mobile_network < 101) ? $itemspage_mobile_network : $this->config->get('system', 'itemspage_network_mobile'));
 
@@ -244,18 +244,18 @@ class Display extends BaseSettings
 		}
 
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
-		$infinite_scroll        =  $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
+		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
-		$display_resharer       =  $this->pConfig->get($uid, 'system', 'display_resharer', false);
-		$stay_local             =  $this->pConfig->get($uid, 'system', 'stay_local', false);
-		$show_page_drop         =  $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-		$display_eventlist      =  $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
+		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', false);
+		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
 
-		$hide_empty_descriptions =  $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
-		$hide_custom_emojis      =  $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
-		$platform_icon_style     =  $this->pConfig->get($uid, 'accessibility', 'platform_icon_style', ContactSelector::SVG_COLOR_BLACK);
-		$platform_icon_styles = [
+		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
+		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
+		$platform_icon_style     = $this->pConfig->get($uid, 'accessibility', 'platform_icon_style', ContactSelector::SVG_COLOR_BLACK);
+		$platform_icon_styles    = [
 			ContactSelector::SVG_DISABLED    => $this->t('Disabled'),
 			ContactSelector::SVG_COLOR_BLACK => $this->t('Color/Black'),
 			ContactSelector::SVG_BLACK       => $this->t('Black'),
@@ -263,7 +263,7 @@ class Display extends BaseSettings
 			ContactSelector::SVG_WHITE       => $this->t('White'),
 		];
 
-		$preview_mode  =  $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
+		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
 		$preview_modes = [
 			BBCode::PREVIEW_NONE     => $this->t('No preview'),
 			BBCode::PREVIEW_NO_IMAGE => $this->t('No image'),
@@ -273,16 +273,16 @@ class Display extends BaseSettings
 
 		$bookmarked_timelines = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
 		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
-		$channel_languages = User::getWantedLanguages($uid);
-		$languages         = $this->l10n->getLanguageCodes(true);
+		$channel_languages    = User::getWantedLanguages($uid);
+		$languages            = $this->l10n->getLanguageCodes(true);
 
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
 			$timelines[] = [
-				'label'        => $timeline->label,
-				'description'  => $timeline->description,
-				'enable'       => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
-				'bookmark'     => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
+				'label'       => $timeline->label,
+				'description' => $timeline->description,
+				'enable'      => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
+				'bookmark'    => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
 			];
 		}
 
@@ -326,14 +326,14 @@ class Display extends BaseSettings
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'	    => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
-			'$mobile_theme'	=> ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
+			'$theme'        => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
+			'$mobile_theme' => ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
 			'$ajaxint'                  => ['browser_update', $this->t('Update browser every xx seconds'), $browser_update, $this->t('Minimum of 10 seconds. Enter -1 to disable it.')],
-			'$enable_smile'	            => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
+			'$enable_smile'             => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
@@ -353,7 +353,7 @@ class Display extends BaseSettings
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 
-			'$channel_languages' => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all languages that you want to see in your channels.'), $languages, 'multiple'],
+			'$channel_languages' => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
 			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],

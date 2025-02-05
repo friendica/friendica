@@ -18,15 +18,15 @@
 </script>
 
 {{foreach $subpages as $page}}
-<div class="widget">
+<nav class="widget">
 	<h3>{{$page.0}}</h3>
-	<ul role="menu">
+	<ul>
 		{{foreach $page.1 as $item}}
-		<li role="menuitem" class="{{$item.2}}">
+		<li class="{{$item.2}}">
 			<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}"{{/if}}>
 				{{$item.1}}
 				{{if $name == "users"}}
-				 <span id="pending-update" class="badge pull-right"></span>
+				<span id="pending-update" class="badge pull-right"></span>
 				{{/if}}
 			</a>
 		</li>
@@ -42,11 +42,11 @@
 		</li>
 	</ul>
 	{{/if}}
-</div>
+</nav>
 {{/foreach}}
 
 {{if $admin.addons_admin}}
-<div class="widget">
+<nav class="widget">
 	<h3>{{$plugadmtxt}}</h3>
 	<ul role="menu">
 		{{foreach $admin.addons_admin as $name => $item}}
@@ -57,6 +57,6 @@
 		</li>
 		{{/foreach}}
 	</ul>
-</div>
+</nav>
 {{/if}}
 

@@ -32,7 +32,12 @@ class DatabaseTest extends FixtureTestCase
 		parent::setUp();
 
 		$this->configCache       = new Cache();
-		$this->configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
+		$this->configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static'
+		);
 	}
 
 	/**
@@ -87,7 +92,7 @@ class DatabaseTest extends FixtureTestCase
 
 		self::assertTrue($db->update('gserver', ['active-week-users' => 0, 'registered-users' => 0], ['nurl' => 'http://friendica.local']));
 
-		$fields = ["`registered-users` = `registered-users` + 1"];
+		$fields   = ["`registered-users` = `registered-users` + 1"];
 		$fields[] = "`active-week-users` = `active-week-users` + 2";
 
 		self::assertTrue($db->update('gserver', $fields, ['nurl' => 'http://friendica.local']));

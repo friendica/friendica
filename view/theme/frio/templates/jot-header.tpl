@@ -296,33 +296,45 @@
 	}
 
 	function itemFiler(id) {
-		var bordercolor = $("input").css("border-color");
+		var modal = $('#modal').modal();
 
-		$.get('filer/', function(data){
-			$.colorbox({html:data});
-			$("#id_term").keypress(function(){
-				$(this).css("border-color",bordercolor);
-			})
-			$("#select_term").change(function(){
-				$("#id_term").css("border-color",bordercolor);
-			})
+		$.get('filer/', function (data) {
+			modal
+				.find('#modal-body')
+				.append(data);
 
-			$("#filer_save").click(function(e){
+			modal
+				.find('#modal-header h4')
+				.append("{{$fileas}}");
+
+			// Ensure focus after the modal is fully visible
+			modal.on('shown.bs.modal', function () {
+				$('#id_term').trigger('focus');
+			});
+
+			$("#filer_save").click(function (e) {
 				e.preventDefault();
-				reply = $("#id_term").val();
-				if(reply && reply.length) {
+				const term = $("#id_term").val();
+				if (term && term.length) {
 					commentBusy = true;
+					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply, NavUpdate);
-//					if(timer) clearTimeout(timer);
-//					timer = setTimeout(NavUpdate,3000);
-					liking = 1;
-					force_update = true;
-					$.colorbox.close();
-					formModified = true; // Mark the form as modified
+					$.get('filer/' + id + '?term=' + term)
+						.done(function () {
+							$('#modal-body').empty();
+							$('#modal').modal('hide');
+							resetFormModifiedFlag();
+						})
+						.always(function () {
+							liking = 1;
+							force_update = true;
+							update_item = id;
+							NavUpdate();
+						});
 				} else {
-					$("#id_term").css("border-color","#FF0000");
+					$("#id_term").css("border-color", "#FF0000");
 				}
+
 				return false;
 			});
 		});

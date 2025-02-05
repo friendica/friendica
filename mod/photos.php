@@ -11,7 +11,6 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\ACL;
-use Friendica\Core\Addon;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -1067,6 +1066,7 @@ function photos_content()
 			$cmnt_tpl    = Renderer::getMarkupTemplate('comment_item.tpl');
 			$tpl         = Renderer::getMarkupTemplate('photo_item.tpl');
 			$return_path = DI::args()->getCommand();
+			$addonHelper = DI::addonHelper();
 
 			if (!DBA::isResult($items)) {
 				if (($can_post || Security::canWriteToUserWall($owner_uid))) {
@@ -1075,7 +1075,7 @@ function photos_content()
 					 * This should be better if done by a hook
 					 */
 					$qcomment = null;
-					if (Addon::isEnabled('qcomment')) {
+					if ($addonHelper->isAddonEnabled('qcomment')) {
 						$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 						$qcomment = $words ? explode("\n", $words) : [];
 					}
@@ -1131,7 +1131,7 @@ function photos_content()
 					 * This should be better if done by a hook
 					 */
 					$qcomment = null;
-					if (Addon::isEnabled('qcomment')) {
+					if ($addonHelper->isAddonEnabled('qcomment')) {
 						$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 						$qcomment = $words ? explode("\n", $words) : [];
 					}
@@ -1211,7 +1211,7 @@ function photos_content()
 						 * This should be better if done by a hook
 						 */
 						$qcomment = null;
-						if (Addon::isEnabled('qcomment')) {
+						if ($addonHelper->isAddonEnabled('qcomment')) {
 							$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 							$qcomment = $words ? explode("\n", $words) : [];
 						}

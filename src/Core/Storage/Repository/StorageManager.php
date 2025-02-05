@@ -8,7 +8,6 @@
 namespace Friendica\Core\Storage\Repository;
 
 use Exception;
-use Friendica\Core\Addon;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
@@ -20,6 +19,7 @@ use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Database\Database;
 use Friendica\Core\Storage\Type;
+use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Psr\Log\LoggerInterface;
 
@@ -84,7 +84,7 @@ class StorageManager
 		/// @fixme Loading the addons & hooks here is really bad practice, but solves https://github.com/friendica/friendica/issues/11178
 		/// clean solution = Making Addon & Hook dynamic and load them inside the constructor, so there's no custom load logic necessary anymore
 		if ($includeAddon) {
-			Addon::loadAddons();
+			DI::addonHelper()->loadAddons();
 			Hook::loadHooks();
 		}
 
@@ -138,7 +138,7 @@ class StorageManager
 			// Try the filesystem backend
 			case Type\Filesystem::getName():
 				return new Type\FilesystemConfig($this->config, $this->l10n);
-			// try the database backend
+				// try the database backend
 			case Type\Database::getName():
 				return false;
 			default:
@@ -185,11 +185,11 @@ class StorageManager
 					$storageConfig                 = new Type\FilesystemConfig($this->config, $this->l10n);
 					$this->backendInstances[$name] = new Type\Filesystem($storageConfig->getStoragePath());
 					break;
-				// try the database backend
+					// try the database backend
 				case Type\Database::getName():
 					$this->backendInstances[$name] = new Type\Database($this->dba);
 					break;
-				// at least, try if there's an addon for the backend
+					// at least, try if there's an addon for the backend
 				case Type\SystemResource::getName():
 					$this->backendInstances[$name] = new Type\SystemResource();
 					break;
@@ -228,11 +228,13 @@ class StorageManager
 	 */
 	public function isValidBackend(string $name = null, array $validBackends = null): bool
 	{
-		$validBackends = $validBackends ?? array_merge($this->validBackends,
-				[
-					Type\SystemResource::getName(),
-					Type\ExternalResource::getName(),
-				]);
+		$validBackends = $validBackends ?? array_merge(
+			$this->validBackends,
+			[
+				Type\SystemResource::getName(),
+				Type\ExternalResource::getName(),
+			]
+		);
 		return in_array($name, $validBackends);
 	}
 

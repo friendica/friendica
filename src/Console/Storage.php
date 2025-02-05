@@ -42,17 +42,17 @@ console storage - manage storage backend and stored data
 Synopsis
     bin/console storage [-h|--help|-?] [-v]
         Show this help
-    
+
     bin/console storage list
         List available storage backends
-    
+
     bin/console storage clear
         Remove the contact avatar cache data
-    
+
     bin/console storage set <name>
         Set current storage backend
             name        storage backend to use. see "list".
-    
+
     bin/console storage move [table] [-n 5000]
         Move stored data to current storage backend.
             table       one of "photo" or "attach". default to both
@@ -96,7 +96,7 @@ HELP;
 
 	protected function doList()
 	{
-		$rowfmt = ' %-3s | %-20s';
+		$rowfmt  = ' %-3s | %-20s';
 		$current = $this->storageManager->getBackend();
 		$this->out(sprintf($rowfmt, 'Sel', 'Name'));
 		$this->out('-----------------------');
@@ -104,7 +104,7 @@ HELP;
 		foreach ($this->storageManager->listBackends() as $name) {
 			$issel = ' ';
 			if ($current && $current::getName() == $name) {
-				$issel = '*';
+				$issel       = '*';
 				$isregisterd = true;
 			};
 			$this->out(sprintf($rowfmt, $issel, $name));
@@ -176,7 +176,7 @@ HELP;
 		}
 
 		$current = $this->storageManager->getBackend();
-		$total = 0;
+		$total   = 0;
 
 		if (is_null($current)) {
 			throw new StorageException(sprintf("Cannot move to legacy storage. Please select a storage backend."));
@@ -192,5 +192,7 @@ HELP;
 		} while ($moved);
 
 		$this->out(sprintf(date('[Y-m-d H:i:s] ') . 'Moved %d files total', $total));
+
+		return 0;
 	}
 }

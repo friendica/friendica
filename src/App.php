@@ -17,9 +17,11 @@ use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Container;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
@@ -35,7 +37,6 @@ use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
-use Friendica\EventSubscriber\HookEventBridge;
 use Friendica\Module\Maintenance;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
@@ -175,6 +176,8 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
+		$addonHelper = $this->container->create(AddonHelper::class);
+
 		$this->load(
 			$request->getServerParams(),
 			$this->container->create(DbaDefinition::class),
@@ -184,6 +187,7 @@ class App
 			$this->profiler,
 			$this->container->create(EventDispatcherInterface::class),
 			$this->appHelper,
+			$addonHelper,
 		);
 
 		$this->registerTemplateEngine();
@@ -193,6 +197,7 @@ class App
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
+			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
 			$request
@@ -225,6 +230,7 @@ class App
 			$this->container->create(Profiler::class),
 			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		$this->registerTemplateEngine();
@@ -256,6 +262,7 @@ class App
 			$this->container->create(Profiler::class),
 			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		/** @var BasePath */
@@ -370,7 +377,8 @@ class App
 		IManageConfigValues $config,
 		Profiler $profiler,
 		EventDispatcherInterface $eventDispatcher,
-		AppHelper $appHelper
+		AppHelper $appHelper,
+		AddonHelper $addonHelper
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -392,7 +400,7 @@ class App
 
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
+			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $addonHelper->getAddonPath(), $serverParams);
 
 			$eventDispatcher->dispatch(new ConfigLoadedEvent(ConfigLoadedEvent::CONFIG_LOADED, $loader));
 
@@ -444,6 +452,7 @@ class App
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
+		AddonHelper $addonHelper,
 		ModuleHTTPException $httpException,
 		float $start_time,
 		ServerRequestInterface $request
@@ -532,11 +541,11 @@ class App
 			// but we need "view" module for stylesheet
 			if ($this->mode->isInstall() && $moduleName !== 'install') {
 				$this->baseURL->redirect('install');
-			} else {
-				Core\Update::check($this->appHelper->getBasePath(), false);
-				Core\Addon::loadAddons();
-				Core\Hook::loadHooks();
 			}
+
+			Core\Update::check($this->appHelper->getBasePath(), false);
+			$addonHelper->loadAddons();
+			Core\Hook::loadHooks();
 
 			// Compatibility with Hubzilla
 			if ($moduleName == 'rpost') {

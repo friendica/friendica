@@ -8,6 +8,7 @@
 namespace Friendica;
 
 use Dice\Dice;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Logger\Capability\ICheckLoggerSettings;
 use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Logger\Util\LoggerSettingsCheck;
@@ -280,6 +281,11 @@ abstract class DI
 		return self::$dice->create(Core\Storage\Repository\StorageManager::class);
 	}
 
+	public static function addonHelper(): AddonHelper
+	{
+		return self::$dice->create(AddonHelper::class);
+	}
+
 	/**
 	 * @return \Friendica\Core\System
 	 */
@@ -332,9 +338,16 @@ abstract class DI
 	 */
 	public static function workerLogger()
 	{
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.02 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
+
 		return self::$dice->create(Core\Logger\Type\WorkerLogger::class);
 	}
 
+	/**
+	 * @internal Only for use in Friendica\Core\Worker class
+	 *
+	 * @see Friendica\Core\Worker::execFunction()
+	 */
 	public static function loggerManager(): LoggerManager
 	{
 		return self::$dice->create(LoggerManager::class);
