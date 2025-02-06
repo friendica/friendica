@@ -1,6 +1,7 @@
 # Changelog
 
 All notable changes to the **Friendica Core** will be documented in this file.
+As an Addon maintainer or Friendica Developer you can inform yourself about all deprecations or breaking changes.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project [promises Backward Compatibility](doc/Developers-Intro.md#backward-compatibility).
@@ -10,6 +11,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 ### Added
 
 - New interface `Friendica\AppHelper` as replacement for `Friendica\App` added.
+- New method `Friendica\DI::appHelper()` was added to get the implementation of the `AppHelper`.
 
 ### Changed
 
