@@ -12,6 +12,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 - New interface `Friendica\AppHelper` as replacement for `Friendica\App` added.
 - New method `Friendica\DI::appHelper()` was added to get the implementation of the `AppHelper`.
+- New interface `Friendica\Core\Logger\Factory\LoggerFactory` added so addons can provide a custom `Psr\Log\LoggerInterface` implementation.
 
 ### Changed
 
