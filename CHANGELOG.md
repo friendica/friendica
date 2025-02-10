@@ -10,13 +10,19 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 ### Added
 
+- New composer script `bin/composer.phar run install:prod` to install all dependencies except the dev-libraries, but with autoloader optimization for production servers.
 - New interface `Friendica\AppHelper` as replacement for `Friendica\App` added.
-- New method `Friendica\DI::appHelper()` was added to get the implementation of the `AppHelper`.
+- New method `Friendica\DI::appHelper()` added to get the implementation of the `AppHelper`.
+- New interface `Friendica\Core\Addon\AddonHelper` added as replacement for the `Friendica\Core\Addon` class.
+- New method `Friendica\DI::addonHelper()` added to get the implementation of the `Friendica\Core\Addon\AddonHelper`.
+- New class `Friendica\Core\Addon\AddonInfo` added as an value object for the header information about an addon.
 - New interface `Friendica\Core\Logger\Factory\LoggerFactory` added so addons can provide a custom `Psr\Log\LoggerInterface` implementation.
 
 ### Changed
 
 - **BREAKING**: The class `Friendica\App` was completely refactored and marked as internal, work with `Friendica\AppHelper` instead.
+- The `bin/composer.phar install` command no longer optimizes the autoloader file to avoid various problems when adding/removing classes in dev. Run `bin/composer.phar install -o` if you want autoloader optimization.
+- Downgrade shebang from `bin/bash` to `bin/sh` in `bin/console`.
 
 ### Fixed
 
