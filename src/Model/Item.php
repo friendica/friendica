@@ -581,52 +581,6 @@ class Item
 	}
 
 	/**
-	 * Check if the item array is a duplicate
-	 *
-	 * @param array $item Item record
-	 * @return boolean is it a duplicate?
-	 */
-	private static function isDuplicate(array $item): bool
-	{
-		// Checking if there is already an item with the same guid
-		$condition = ['guid' => $item['guid'], 'network' => $item['network'], 'uid' => $item['uid']];
-		if (Post::exists($condition)) {
-			DI::logger()->notice('Found already existing item', $condition);
-			return true;
-		}
-
-		$condition = [
-			'uri-id'  => $item['uri-id'], 'uid' => $item['uid'],
-			'network' => [$item['network'], Protocol::DFRN]
-		];
-		if (Post::exists($condition)) {
-			DI::logger()->notice('duplicated item with the same uri found.', $condition);
-			return true;
-		}
-
-		// On Friendica and Diaspora the GUID is unique
-		if (in_array($item['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
-			$condition = ['guid' => $item['guid'], 'uid' => $item['uid']];
-			if (Post::exists($condition)) {
-				DI::logger()->notice('duplicated item with the same guid found.', $condition);
-				return true;
-			}
-		}
-
-		/*
-		 * Check for already added items.
-		 * There is a timing issue here that sometimes creates double postings.
-		 * An unique index would help - but the limitations of MySQL (maximum size of index values) prevent this.
-		 */
-		if (($item['uid'] == 0) && Post::exists(['uri-id' => $item['uri-id'], 'uid' => 0])) {
-			DI::logger()->notice('Global item already stored.', ['uri-id' => $item['uri-id'], 'network' => $item['network']]);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check if the item array is valid
 	 *
 	 * @param array $item Item record
@@ -695,42 +649,6 @@ class Item
 	}
 
 	/**
-	 * Return the id of the given item array if it has been stored before
-	 *
-	 * @param array $item Item record
-	 * @return integer Item id or zero on error
-	 */
-	private static function getDuplicateID(array $item): int
-	{
-		if (empty($item['network']) || in_array($item['network'], Protocol::FEDERATED)) {
-			$condition = [
-				'`uri-id` = ? AND `uid` = ? AND `network` IN (?, ?, ?)',
-				$item['uri-id'],
-				$item['uid'],
-				Protocol::ACTIVITYPUB,
-				Protocol::DIASPORA,
-				Protocol::DFRN
-			];
-			$existing = Post::selectFirst(['id', 'network'], $condition);
-			if (DBA::isResult($existing)) {
-				// We only log the entries with a different user id than 0. Otherwise we would have too many false positives
-				if ($item['uid'] != 0) {
-					DI::logger()->notice('Item already existed for user', [
-						'uri-id'           => $item['uri-id'],
-						'uid'              => $item['uid'],
-						'network'          => $item['network'],
-						'existing_id'      => $existing['id'],
-						'existing_network' => $existing['network']
-					]);
-				}
-
-				return $existing['id'];
-			}
-		}
-		return 0;
-	}
-
-	/**
 	 * Fetch the uri-id of the parent for the given uri-id
 	 *
 	 * @param integer $uriid
@@ -751,106 +669,6 @@ class Item
 	}
 
 	/**
-	 * Fetch top-level parent data for the given item array
-	 *
-	 * @param array $item
-	 * @return array item array with parent data
-	 * @throws \Exception
-	 */
-	private static function getTopLevelParent(array $item): array
-	{
-		$fields = [
-			'uid', 'uri', 'parent-uri', 'id', 'deleted',
-			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
-			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
-			'wall', 'private', 'origin', 'author-id'
-		];
-		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $item['uid']];
-		$params    = ['order' => ['id' => false]];
-		$parent    = Post::selectFirst($fields, $condition, $params);
-
-		if (!DBA::isResult($parent) && Post::exists(['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => 0])) {
-			$stored = Item::storeForUserByUriId($item['thr-parent-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			if (!$stored && ($item['thr-parent-id'] != $item['parent-uri-id'])) {
-				$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			}
-			if ($stored) {
-				DI::logger()->info('Stored thread parent item for user', ['uri-id' => $item['thr-parent-id'], 'uid' => $item['uid'], 'stored' => $stored]);
-				$parent = Post::selectFirst($fields, $condition, $params);
-			}
-		}
-
-		if (!DBA::isResult($parent)) {
-			DI::logger()->notice('item parent was not found - ignoring item', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
-			return [];
-		}
-
-		if (self::hasRestrictions($item, $parent['author-id'], $parent['restrictions'])) {
-			DI::logger()->notice('Restrictions apply - ignoring item', ['restrictions' => $parent['restrictions'], 'verb' => $parent['verb'], 'uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'uid' => $item['uid']]);
-			return [];
-		}
-
-		if ($parent['uri-id'] == $parent['parent-uri-id']) {
-			return $parent;
-		}
-
-		$condition = [
-			'uri-id'        => $parent['parent-uri-id'],
-			'parent-uri-id' => $parent['parent-uri-id'],
-			'uid'           => $parent['uid']
-		];
-		$params          = ['order' => ['id' => false]];
-		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
-
-		if (!DBA::isResult($toplevel_parent) && $item['origin']) {
-			$stored = Item::storeForUserByUriId($item['parent-uri-id'], $item['uid'], ['post-reason' => Item::PR_COMPLETION]);
-			DI::logger()->info('Stored parent item for user', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid'], 'stored' => $stored]);
-			$toplevel_parent = Post::selectFirst($fields, $condition, $params);
-		}
-
-		if (!DBA::isResult($toplevel_parent)) {
-			DI::logger()->notice('item top level parent was not found - ignoring item', ['parent-uri-id' => $parent['parent-uri-id'], 'uid' => $parent['uid']]);
-			return [];
-		}
-
-		return $toplevel_parent;
-	}
-
-	/**
-	 * Get the gravity for the given item array
-	 *
-	 * @param array $item
-	 * @return integer gravity
-	 */
-	private static function getGravity(array $item): int
-	{
-		$activity = DI::activity();
-
-		if (isset($item['gravity'])) {
-			return intval($item['gravity']);
-		} elseif ($item['parent-uri-id'] === $item['uri-id']) {
-			return self::GRAVITY_PARENT;
-		} elseif ($activity->match($item['verb'], Activity::POST)) {
-			return self::GRAVITY_COMMENT;
-		} elseif ($activity->match($item['verb'], Activity::FOLLOW)) {
-			return self::GRAVITY_ACTIVITY;
-		} elseif ($activity->match($item['verb'], Activity::ANNOUNCE)) {
-			return self::GRAVITY_ACTIVITY;
-		}
-
-		DI::logger()->info('Unknown gravity for verb', ['verb' => $item['verb']]);
-		return self::GRAVITY_UNKNOWN;   // Should not happen
-	}
-
-	private static function prepareOriginPost(array $item): array
-	{
-		$item = DI::contentItem()->initializePost($item);
-		$item = DI::contentItem()->finalizePost($item, false);
-
-		return $item;
-	}
-
-	/**
 	 * Inserts item record
 	 *
 	 * @param array $item Item array to be inserted
@@ -860,6 +678,14 @@ class Item
 	 */
 	public static function insert(array $item, int $notify = 0, bool $post_local = true): int
 	{
+		$itemHelper = new ItemHelper(
+			DI::contentItem(),
+			DI::activity(),
+			DI::logger(),
+			DI::dba(),
+			DI::baseUrl(),
+		);
+
 		$orig_item = $item;
 
 		$priority = Worker::PRIORITY_HIGH;
@@ -868,7 +694,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
-			$item = self::prepareOriginPost($item);
+			$item = $itemHelper->prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
 				$priority = $notify;
@@ -881,23 +707,7 @@ class Item
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
 
-		$uid = intval($item['uid']);
-
-		$item['guid'] = self::guid($item, $notify);
-		$item['uri']  = substr(trim($item['uri'] ?? '') ?: self::newURI($item['guid']), 0, 255);
-
-		// Store URI data
-		$item['uri-id'] = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);
-
-		// Backward compatibility: parent-uri used to be the direct parent uri.
-		// If it is provided without a thr-parent, it probably is the old behavior.
-		if (empty($item['thr-parent']) || empty($item['parent-uri'])) {
-			$item['thr-parent'] = trim($item['thr-parent'] ?? $item['parent-uri'] ?? $item['uri']);
-			$item['parent-uri'] = $item['thr-parent'];
-		}
-
-		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
-		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
+		$item = $itemHelper->prepareItemData($item, (bool) $notify);
 
 		// Store conversation data
 		$source = $item['source'] ?? '';
@@ -910,14 +720,14 @@ class Item
 		 * We have to check several networks since Friendica posts could be repeated
 		 * via Diaspora.
 		 */
-		$duplicate = self::getDuplicateID($item);
+		$duplicate = $itemHelper->getDuplicateID($item);
 		if ($duplicate) {
 			return $duplicate;
 		}
 
 		// Additional duplicate checks
 		/// @todo Check why the first duplication check returns the item number and the second a 0
-		if (self::isDuplicate($item)) {
+		if ($itemHelper->isDuplicate($item)) {
 			return 0;
 		}
 
@@ -927,44 +737,7 @@ class Item
 
 		$defined_permissions = isset($item['allow_cid']) && isset($item['allow_gid']) && isset($item['deny_cid']) && isset($item['deny_gid']) && isset($item['private']);
 
-		$item['wall']          = intval($item['wall'] ?? 0);
-		$item['extid']         = trim($item['extid'] ?? '');
-		$item['author-name']   = trim($item['author-name'] ?? '');
-		$item['author-link']   = trim($item['author-link'] ?? '');
-		$item['author-avatar'] = trim($item['author-avatar'] ?? '');
-		$item['owner-name']    = trim($item['owner-name'] ?? '');
-		$item['owner-link']    = trim($item['owner-link'] ?? '');
-		$item['owner-avatar']  = trim($item['owner-avatar'] ?? '');
-		$item['received']      = (isset($item['received'])  ? DateTimeFormat::utc($item['received'])  : DateTimeFormat::utcNow());
-		$item['created']       = (isset($item['created'])   ? DateTimeFormat::utc($item['created'])   : $item['received']);
-		$item['edited']        = (isset($item['edited'])    ? DateTimeFormat::utc($item['edited'])    : $item['created']);
-		$item['changed']       = (isset($item['changed'])   ? DateTimeFormat::utc($item['changed'])   : $item['created']);
-		$item['commented']     = (isset($item['commented']) ? DateTimeFormat::utc($item['commented']) : $item['created']);
-		$item['title']         = substr(trim($item['title'] ?? ''), 0, 255);
-		$item['location']      = trim($item['location'] ?? '');
-		$item['coord']         = trim($item['coord'] ?? '');
-		$item['visible']       = (isset($item['visible']) ? intval($item['visible']) : 1);
-		$item['deleted']       = 0;
-		$item['verb']          = trim($item['verb'] ?? '');
-		$item['object-type']   = trim($item['object-type'] ?? '');
-		$item['object']        = trim($item['object'] ?? '');
-		$item['target-type']   = trim($item['target-type'] ?? '');
-		$item['target']        = trim($item['target'] ?? '');
-		$item['plink']         = substr(trim($item['plink'] ?? ''), 0, 255);
-		$item['allow_cid']     = trim($item['allow_cid'] ?? '');
-		$item['allow_gid']     = trim($item['allow_gid'] ?? '');
-		$item['deny_cid']      = trim($item['deny_cid'] ?? '');
-		$item['deny_gid']      = trim($item['deny_gid'] ?? '');
-		$item['private']       = intval($item['private'] ?? self::PUBLIC);
-		$item['body']          = trim($item['body'] ?? '');
-		$item['raw-body']      = trim($item['raw-body'] ?? $item['body']);
-		$item['app']           = trim($item['app'] ?? '');
-		$item['origin']        = intval($item['origin'] ?? 0);
-		$item['postopts']      = trim($item['postopts'] ?? '');
-		$item['resource-id']   = trim($item['resource-id'] ?? '');
-		$item['event-id']      = intval($item['event-id'] ?? 0);
-		$item['inform']        = trim($item['inform'] ?? '');
-		$item['file']          = trim($item['file'] ?? '');
+		$uid = intval($item['uid']);
 
 		// Communities aren't working with the Diaspora protocol
 		if (($uid != 0) && ($item['network'] == Protocol::DIASPORA)) {
@@ -975,33 +748,7 @@ class Item
 			}
 		}
 
-		// Items cannot be stored before they happen ...
-		if ($item['created'] > DateTimeFormat::utcNow()) {
-			$item['created'] = DateTimeFormat::utcNow();
-		}
-
-		// We haven't invented time travel by now.
-		if ($item['edited'] > DateTimeFormat::utcNow()) {
-			$item['edited'] = DateTimeFormat::utcNow();
-		}
-
-		$item['plink'] = ($item['plink'] ?? '') ?: DI::baseUrl() . '/display/' . urlencode($item['guid']);
-
-		$item['gravity'] = self::getGravity($item);
-
-		$default = [
-			'url'   => $item['author-link'], 'name' => $item['author-name'],
-			'photo' => $item['author-avatar'], 'network' => $item['network']
-		];
-		$item['author-id'] = ($item['author-id'] ?? 0) ?: Contact::getIdForURL($item['author-link'], 0, null, $default);
-
-		$default = [
-			'url'   => $item['owner-link'], 'name' => $item['owner-name'],
-			'photo' => $item['owner-avatar'], 'network' => $item['network']
-		];
-		$item['owner-id'] = ($item['owner-id'] ?? 0) ?: Contact::getIdForURL($item['owner-link'], 0, null, $default);
-
-		$item['post-reason'] = self::getPostReason($item);
+		$item = $itemHelper->validateItemData($item);
 
 		// Ensure that there is an avatar cache
 		Contact::checkAvatarCache($item['author-id']);
@@ -1022,55 +769,14 @@ class Item
 		}
 
 		if ($item['gravity'] !== self::GRAVITY_PARENT) {
-			$toplevel_parent = self::getTopLevelParent($item);
+			$toplevel_parent = $itemHelper->getTopLevelParent($item);
 			if (empty($toplevel_parent)) {
 				return 0;
 			}
 
-			$parent_id             = $toplevel_parent['id'];
-			$item['parent-uri']    = $toplevel_parent['uri'];
-			$item['parent-uri-id'] = $toplevel_parent['uri-id'];
-			$item['deleted']       = $toplevel_parent['deleted'];
-			$item['wall']          = $toplevel_parent['wall'];
-
-			// Reshares have to keep their permissions to allow groups to work
-			if (!$defined_permissions && (!$item['origin'] || ($item['verb'] != Activity::ANNOUNCE))) {
-				// Don't store the permissions on pure AP posts
-				$store_permissions = ($item['network'] != Protocol::ACTIVITYPUB) || $item['origin'] || !empty($item['diaspora_signed_text']);
-				$item['allow_cid'] = $store_permissions ? $toplevel_parent['allow_cid'] : '';
-				$item['allow_gid'] = $store_permissions ? $toplevel_parent['allow_gid'] : '';
-				$item['deny_cid']  = $store_permissions ? $toplevel_parent['deny_cid'] : '';
-				$item['deny_gid']  = $store_permissions ? $toplevel_parent['deny_gid'] : '';
-			}
-
+			$parent_id     = (int) $toplevel_parent['id'];
+			$item          = $itemHelper->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
-
-			// Don't federate received participation messages
-			if ($item['verb'] != Activity::FOLLOW) {
-				$item['wall'] = $toplevel_parent['wall'];
-			} else {
-				$item['wall'] = false;
-				// Participations are technical messages, so they are set to "seen" automatically
-				$item['unseen'] = false;
-			}
-
-			/*
-			 * If the parent is private, force privacy for the entire conversation
-			 * This differs from the above settings as it subtly allows comments from
-			 * email correspondents to be private even if the overall thread is not.
-			 */
-			if (!$defined_permissions && $toplevel_parent['private']) {
-				$item['private'] = $toplevel_parent['private'];
-			}
-
-			// If its a post that originated here then tag the thread as "mention"
-			if ($item['origin'] && $item['uid']) {
-				DBA::update('post-thread-user', ['mention' => true], ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
-				DI::logger()->info('tagged thread as mention', ['parent' => $parent_id, 'parent-uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
-			}
-
-			// Update the contact relations
-			Contact\Relation::store($toplevel_parent['author-id'], $item['author-id'], $item['created']);
 		} else {
 			$parent_id     = 0;
 			$parent_origin = $item['origin'];
@@ -1344,6 +1050,11 @@ class Item
 
 		DI::logger()->notice('created item', ['post-id' => $post_user_id, 'uid' => $item['uid'], 'network' => $item['network'], 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
 
+		return self::handleCreatedItem($orig_item, $post_user_id, $uid, $notify, $copy_permissions, $parent_origin, $priority, $notify_type, $inserted, $source);
+	}
+
+	private static function handleCreatedItem(array $orig_item, int $post_user_id, int $uid, int $notify, bool $copy_permissions, $parent_origin, int $priority, string $notify_type, bool $inserted, $source): int
+	{
 		$posted_item = Post::selectFirst(self::ITEM_FIELDLIST, ['post-user-id' => $post_user_id]);
 		if (!DBA::isResult($posted_item)) {
 			// On failure store the data into a spool file so that the "SpoolPost" worker can try again later.
@@ -1482,33 +1193,6 @@ class Item
 		}
 
 		return $post_user_id;
-	}
-
-	private static function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
-	{
-		if (empty($restrictions) || ($author_id == $item['author-id'])) {
-			return false;
-		}
-
-		// We only have to apply restrictions if the post originates from our server or is federated.
-		// Every other time we can trust the remote system.
-		if (!in_array($item['network'], Protocol::FEDERATED) && !$item['origin']) {
-			return false;
-		}
-
-		if (($restrictions & self::CANT_REPLY) && ($item['verb'] == Activity::POST)) {
-			return true;
-		}
-
-		if (($restrictions & self::CANT_ANNOUNCE) && ($item['verb'] == Activity::ANNOUNCE)) {
-			return true;
-		}
-
-		if (($restrictions & self::CANT_LIKE) && in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::ATTEND, Activity::ATTENDMAYBE, Activity::ATTENDNO])) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private static function reshareChannelPost(int $uri_id, int $reshare_id = 0)
@@ -1890,7 +1574,7 @@ class Item
 	 *
 	 * @param int $uriid
 	 * @param int $uid
-	 * @return int
+	 * @return int|null
 	 */
 	private static function GetOriginUidForUriId(int $uriid, int $uid)
 	{
@@ -3498,6 +3182,10 @@ class Item
 		}
 
 		if (!empty($shared_item['uri-id'])) {
+			if (!$s) {
+				DI::logger()->notice('Unexpected empty item HTML', ['item' => $item]);
+			}
+
 			$s = self::replacePlatformIcon($s, $shared_item, $uid);
 		}
 
@@ -3574,6 +3262,10 @@ class Item
 	 */
 	private static function replacePlatformIcon(string $html, array $item, int $uid): string
 	{
+		if ($html === '') {
+			return $html;
+		}
+
 		$dom = new \DOMDocument();
 		if (!@$dom->loadHTML($html)) {
 			return $html;

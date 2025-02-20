@@ -246,7 +246,6 @@ $a->strings['and %d other people'] = 'と他 %d 人';
 $a->strings['Visible to <strong>everybody</strong>'] = '<strong>すべての人</strong> が閲覧可能です';
 $a->strings['Please enter a image/video/audio/webpage URL:'] = '画像/動画/音声/ウェブページのURLを入力してください:';
 $a->strings['Tag term:'] = '用語のタグ付け:';
-$a->strings['Save to Folder:'] = '保存先のフォルダ:';
 $a->strings['Where are you right now?'] = 'どこにいますか？:';
 $a->strings['Delete item(s)?'] = 'これ(ら)の項目を削除しますか？';
 $a->strings['New Post'] = '新しい投稿';
@@ -332,7 +331,7 @@ $a->strings['Ignore'] = '無視';
 $a->strings['Languages'] = '言語';
 $a->strings['Connect/Follow'] = 'つながる/フォローする';
 $a->strings['Nothing new here'] = 'ここに新しいものはありません';
-$a->strings['Go back'] = '戻る';
+$a->strings['Home'] = 'ホーム';
 $a->strings['Clear notifications'] = 'クリア通知';
 $a->strings['Logout'] = 'ログアウト';
 $a->strings['End this session'] = 'このセッションを終了';
@@ -345,7 +344,6 @@ $a->strings['Your photos'] = 'あなたの写真';
 $a->strings['Calendar'] = 'カレンダー';
 $a->strings['Personal notes'] = '個人メモ';
 $a->strings['Your personal notes'] = 'あなたの個人的なメモ';
-$a->strings['Home'] = 'ホーム';
 $a->strings['Home Page'] = 'ホームページ';
 $a->strings['Register'] = '登録';
 $a->strings['Create an account'] = 'アカウントを作成する';
@@ -961,6 +959,7 @@ $a->strings['Item Source'] = '項目ソース';
 $a->strings['Profile Details'] = 'プロフィールの詳細';
 $a->strings['Only You Can See This'] = 'これしか見えない';
 $a->strings['Tips for New Members'] = '新会員のためのヒント';
+$a->strings['More'] = '更に';
 $a->strings['People Search - %s'] = '人を検索- %s';
 $a->strings['No matches'] = '一致する項目がありません';
 $a->strings['Account'] = 'アカウント';
@@ -1307,8 +1306,6 @@ $a->strings['You can\'t remove yourself'] = '自分を削除することはで�
 $a->strings['%s user deleted'] = [
 	0 => '%sユーザーが削除されました',
 ];
-$a->strings['User "%s" deleted'] = 'ユーザー"%s"が削除されました';
-$a->strings['User "%s" blocked'] = 'ユーザー"%s"がブロックされました';
 $a->strings['Register date'] = '登録日';
 $a->strings['Last login'] = '前回のログイン';
 $a->strings['User blocked'] = 'ユーザーがブロックされました';
@@ -1324,6 +1321,8 @@ $a->strings['The user {0} will be deleted!\n\nEverything this user has posted on
 このユーザーがこのサイトに投稿したものはすべて完全に削除されます！
 
 よろしいですか？';
+$a->strings['User "%s" deleted'] = 'ユーザー"%s"が削除されました';
+$a->strings['User "%s" blocked'] = 'ユーザー"%s"がブロックされました';
 $a->strings['%s user unblocked'] = [
 	0 => '%sユーザーのブロックを解除しました',
 ];
@@ -1420,7 +1419,6 @@ $a->strings['Note for the admin'] = '管理者への注意';
 $a->strings['Leave a message for the admin, why you want to join this node'] = 'このノードに参加する理由、管理者へのメッセージを残す';
 $a->strings['Membership on this site is by invitation only.'] = 'このサイトのメンバーシップは招待のみです。';
 $a->strings['Your invitation code: '] = '招待コード：';
-$a->strings['Your Email Address: (Initial information will be send there, so this has to be an existing address.)'] = 'あなたのメールアドレス：（初回の情報はそこに送信されますので、これは既存のアドレスでなければなりません。）';
 $a->strings['Please repeat your e-mail address:'] = 'メールアドレスを再入力してください。';
 $a->strings['New Password:'] = '新しいパスワード：';
 $a->strings['Leave empty for an auto generated password.'] = '自動生成されたパスワードの場合は空のままにします。';
@@ -1620,8 +1618,6 @@ $a->strings['Mobile Theme:'] = 'モバイルテーマ：';
 $a->strings['Number of items to display per page:'] = 'ページごとに表示する項目の数：';
 $a->strings['Maximum of 100 items'] = '最大100項目';
 $a->strings['Number of items to display per page when viewed from mobile device:'] = 'モバイルデバイスから表示したときにページごとに表示する項目の数：';
-$a->strings['Update browser every xx seconds'] = 'xx秒ごとにブラウザーを更新する';
-$a->strings['Minimum of 10 seconds. Enter -1 to disable it.'] = '10秒以上。 -1を入力して無効にします。';
 $a->strings['Infinite scroll'] = '無限スクロール';
 $a->strings['Automatic fetch new items when reaching the page end.'] = 'ページの最後に到達したとき、新規項目を自動取得する';
 $a->strings['Beginning of week:'] = '週の始まり：';
@@ -1743,6 +1739,7 @@ $a->strings['Export all'] = 'すべてエクスポート';
 $a->strings['Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)'] = 'アカウント情報、コンタクト、すべてのアイテムをjsonとしてエクスポートします。非常に大きなファイルになる可能性があり、時間がかかる可能性があります。これを使用して、アカウントの完全バックアップを作成します（写真はエクスポートされません）';
 $a->strings['Export Contacts to CSV'] = '連絡先をCSV形式でエクスポート';
 $a->strings['Export the list of the accounts you are following as CSV file. Compatible to e.g. Mastodon.'] = 'フォローしているアカウントのリストをCSVファイルとしてエクスポートします。 マストドンなどに対応します。';
+$a->strings['Go back'] = '戻る';
 $a->strings['At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name (pen name), an username (nickname) and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.'] = '登録時、およびユーザーアカウントとコンタクト間の通信を提供するために、ユーザーは表示名（ペンネーム）、ユーザー名（ニックネーム）、および有効な電子メールアドレスを提供する必要があります。
 他のプロフィールの詳細が表示されていなくても、ページの訪問者はアカウントのプロフィールページで名前にアクセスできます。
 電子メールアドレスは、インタラクションに関するユーザー通知の送信にのみ使用されますが、表示されることはありません。
@@ -1857,7 +1854,6 @@ $a->strings['via'] = '投稿先:';
 $a->strings['Wall-to-Wall'] = '壁間';
 $a->strings['via Wall-To-Wall:'] = 'Wall-to-Wall経由：';
 $a->strings['Reply to %s'] = '%sへの返信';
-$a->strings['More'] = '更に';
 $a->strings['Notifier task is pending'] = '通知タスクは保留中です';
 $a->strings['Delivery to remote servers is pending'] = 'リモートサーバーへの配信は保留中です';
 $a->strings['Delivery to remote servers is underway'] = 'リモートサーバーへの配信が進行中です';

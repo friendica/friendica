@@ -7,7 +7,6 @@
 
 namespace Friendica\Core\Config\Util;
 
-use Friendica\Core\Addon;
 use Friendica\Core\Config\Exception\ConfigFileException;
 use Friendica\Core\Config\ValueObject\Cache;
 
@@ -46,6 +45,7 @@ class ConfigFileManager
 	 * @var string
 	 */
 	private $baseDir;
+	private string $addonDir;
 	/**
 	 * @var string
 	 */
@@ -65,9 +65,10 @@ class ConfigFileManager
 	 * @param string $configDir
 	 * @param string $staticDir
 	 */
-	public function __construct(string $baseDir, string $configDir, string $staticDir, array $server = [])
+	public function __construct(string $baseDir, string $addonDir, string $configDir, string $staticDir, array $server = [])
 	{
 		$this->baseDir   = $baseDir;
+		$this->addonDir  = $addonDir;
 		$this->configDir = $configDir;
 		$this->staticDir = $staticDir;
 		$this->server    = $server;
@@ -122,7 +123,7 @@ class ConfigFileManager
 
 		if (file_exists($configName)) {
 			return $this->loadConfigFile($configName);
-		} else if (file_exists($iniName)) {
+		} elseif (file_exists($iniName)) {
 			return $this->loadINIConfigFile($iniName);
 		} else {
 			return [];
@@ -160,17 +161,16 @@ class ConfigFileManager
 	 */
 	public function loadAddonConfig(string $name): array
 	{
-		$filepath = $this->baseDir . DIRECTORY_SEPARATOR .   // /var/www/html/
-					Addon::DIRECTORY . DIRECTORY_SEPARATOR . // addon/
-					$name . DIRECTORY_SEPARATOR .            // openstreetmap/
-					'config' . DIRECTORY_SEPARATOR .         // config/
-					$name . ".config.php";                   // openstreetmap.config.php
+		$filepath = $this->addonDir . DIRECTORY_SEPARATOR . // /var/www/html/addon/
+					$name . DIRECTORY_SEPARATOR .           // openstreetmap/
+					'config' . DIRECTORY_SEPARATOR .        // config/
+					$name . ".config.php";                  // openstreetmap.config.php
 
-		if (file_exists($filepath)) {
-			return $this->loadConfigFile($filepath);
-		} else {
+		if (!file_exists($filepath)) {
 			return [];
 		}
+
+		return $this->loadConfigFile($filepath);
 	}
 
 	/**

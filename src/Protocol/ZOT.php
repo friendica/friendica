@@ -8,7 +8,6 @@
 namespace Friendica\Protocol;
 
 use Friendica\App;
-use Friendica\Core\Addon;
 use Friendica\DI;
 use Friendica\Module;
 use Friendica\Module\Register;
@@ -43,6 +42,11 @@ class ZOT
 	 */
 	public static function getSiteInfo(): array
 	{
+		$baseUrl     = (string) DI::baseUrl();
+		$keyValue    = DI::keyValue();
+		$addonHelper = DI::addonHelper();
+		$config      = DI::config();
+
 		$policies = [
 			Module\Register::OPEN    => 'open',
 			Module\Register::APPROVE => 'approve',
@@ -50,14 +54,14 @@ class ZOT
 		];
 
 		return [
-			'url'             => (string)DI::baseUrl(),
-			'openWebAuth'     => (string)DI::baseUrl() . '/owa',
-			'authRedirect'    => (string)DI::baseUrl() . '/magic',
+			'url'             => $baseUrl,
+			'openWebAuth'     => $baseUrl . '/owa',
+			'authRedirect'    => $baseUrl . '/magic',
 			'register_policy' => $policies[Register::getPolicy()],
-			'accounts'        => DI::keyValue()->get('nodeinfo_total_users'),
-			'plugins'         => Addon::getVisibleList(),
-			'sitename'        => DI::config()->get('config', 'sitename'),
-			'about'           => DI::config()->get('config', 'info'),
+			'accounts'        => $keyValue->get('nodeinfo_total_users'),
+			'plugins'         => $addonHelper->getVisibleEnabledAddons(),
+			'sitename'        => $config->get('config', 'sitename'),
+			'about'           => $config->get('config', 'info'),
 			'project'         => App::PLATFORM,
 			'version'         => App::VERSION,
 		];

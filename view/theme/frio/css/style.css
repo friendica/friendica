@@ -740,6 +740,7 @@ nav.navbar .nav > li > button:focus {
 #topbar-first #nav-notifications-menu a {
 	color: $font_color_darker;
 	padding: 0;
+	word-break: break-word;
 }
 #topbar-first #nav-notifications-menu li.notif-entry {
 	color: $font_color_darker;
@@ -1806,19 +1807,24 @@ blockquote.shared_content {
 }
 
 /* wall items contact info */
-.media .media-body h4.media-heading {
+.media .media-body h1.media-heading,
+.media .media-body h2.media-heading {
 	font-size: 14px;
 	font-weight: 500;
 	color: $font_color_darker;
 }
+.contact-info h1.media-heading {
+	font-size: 15px;
+	font-weight: 700;
+}
 .media .contact-info-comment {
 	display: table-cell;
 }
-.media .contact-info-xs h5,
 .media .contact-info-comment {
 	margin: 0 0 5px;
 }
 .media-heading {
+	font-size: 14px;
 	margin: 0px;
 }
 .wall-item-name,
@@ -2604,7 +2610,7 @@ ul.viewcontact_wrapper > li {
 .contact-entry-checkbox {
 	margin-top: -20px;
 }
-.contact-wrapper .media-body .contact-entry-name h4.media-heading a {
+.contact-wrapper .media-body .contact-entry-name h1.media-heading a {
 	font-weight: bold !important;
 	color: $link_color;
 	font-size: 15px !important;
@@ -3118,15 +3124,22 @@ details.profile-jot-net[open] summary:before {
 .fakelink > h3:before {
 	padding-right: 10px;
 }
-.widget.fakelink > h3:before {
+span.widget > .fakelink > h3:before {
 	font-family: ForkAwesome;
 	content: "\f0da"; /* Right Plain Pointer */
+	margin-left: 4px;
 }
-.widget > .fakelink > h3:before,
+div.widget > .fakelink > h3:before,
 #sidebar-circle-header > .fakelink > h3:before,
 #sidebar-group-header > .fakelink > h3:before {
 	font-family: ForkAwesome;
 	content: "\f0d7"; /* Bottom Plain Pointer */
+}
+
+.widget button.fakelink {
+	border-style: none;
+	background-color: transparent;
+	padding: 0px;
 }
 
 h3.connector {
@@ -3668,9 +3681,8 @@ section .profile-match-wrapper {
 }
 
 .qq-upload-drop-area {
-	background: white !important;
+	background: inherit !important;
 	float: none;
-	border: none;
 	-webkit-box-shadow: none;
 	box-shadow: none;
 	-moz-box-shadow: none;
@@ -3685,7 +3697,7 @@ section .profile-match-wrapper {
 	width: 100% !important;
 	display: block !important;
 	position: relative !important;
-	border: black 1px dashed !important;
+	border: $font_color_darker 1px dashed !important;
 	margin-bottom: 5px !important;
 	margin-top: 15px !important;
 }

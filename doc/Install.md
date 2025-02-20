@@ -76,14 +76,6 @@ This makes the software much easier to update.
 The Linux commands to clone the repository into a directory "mywebsite" would be
 
     git clone https://github.com/friendica/friendica.git -b stable mywebsite
-    cd mywebsite
-    bin/composer.phar install --no-dev
-
-Make sure the folder *view/smarty3* exists and is writable by the webserver user, in this case *www-data*
-
-    mkdir -p view/smarty3
-    chown www-data:www-data view/smarty3
-    chmod 775 view/smarty3
 
 Get the addons by going into your website folder.
 
@@ -91,12 +83,22 @@ Get the addons by going into your website folder.
 
 Clone the addon repository (separately):
 
-    git clone https://github.com/friendica/friendica-addons.git -b stable addon
+	git clone https://github.com/friendica/friendica-addons.git -b stable addon
+
+Install the dependencies:
+
+    bin/composer.phar run install:prod
+
+Make sure the folder *view/smarty3* exists and is writable by the webserver user, in this case *www-data*
+
+    mkdir -p view/smarty3
+    chown www-data:www-data view/smarty3
+    chmod 775 view/smarty3
 
 If you want to use the development version of Friendica you can switch to the develop branch in the repository by running
 
     git checkout develop
-    bin/composer.phar install
+    bin/composer.phar run install:prod
     cd addon
     git checkout develop
 

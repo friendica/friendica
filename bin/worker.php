@@ -21,7 +21,7 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-fwrite(STDOUT, '`bin/worker.php` is deprecated since 2024.02 and will be removed in 5 months, please use `bin/console.php worker` instead.' . \PHP_EOL);
+fwrite(STDOUT, '`bin/worker.php` is deprecated since 2025.02 and will be removed in 5 months, please use `bin/console.php worker` instead.' . \PHP_EOL);
 
 // BC: Add console command as second argument
 $argv = $_SERVER['argv'] ?? [];

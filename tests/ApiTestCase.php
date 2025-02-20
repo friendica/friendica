@@ -8,7 +8,7 @@
 namespace Friendica\Test;
 
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\DI;
@@ -124,7 +124,7 @@ abstract class ApiTestCase extends FixtureTestCase
 		file_put_contents(
 			$tmpFile,
 			base64_decode(
-			// Empty 1x1 px PNG image
+				// Empty 1x1 px PNG image
 				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
 			)
 		);
@@ -201,7 +201,7 @@ abstract class ApiTestCase extends FixtureTestCase
 			'plugin_admin' => function_exists($addon . '_addon_admin'),
 		]);
 
-		Addon::loadAddons();
+		$this->dice->create(AddonHelper::class)->loadAddons();
 		Hook::loadHooks();
 	}
 }

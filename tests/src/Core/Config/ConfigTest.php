@@ -16,7 +16,6 @@ use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Test\DatabaseTestCase;
 use Friendica\Test\Util\CreateDatabaseTrait;
 use Friendica\Test\Util\VFSTrait;
-use org\bovigo\vfs\vfsStream;
 
 class ConfigTest extends DatabaseTestCase
 {
@@ -55,8 +54,13 @@ class ConfigTest extends DatabaseTestCase
 
 		parent::setUp();
 
-		$this->configCache = new Cache();
-		$this->configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/');
+		$this->configCache       = new Cache();
+		$this->configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static'
+		);
 	}
 
 	/**
@@ -94,7 +98,7 @@ class ConfigTest extends DatabaseTestCase
 				'key1' => 'value1a',
 				'key4' => 'value4',
 			],
-			'other'  => [
+			'other' => [
 				'key5' => 'value5',
 				'key6' => 'value6',
 			],
@@ -108,18 +112,18 @@ class ConfigTest extends DatabaseTestCase
 					'config',
 					'other'
 				],
-				'load'         => [
+				'load' => [
 					'system',
 				],
 			],
-			'other'  => [
+			'other' => [
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
 					'other'
 				],
-				'load'         => [
+				'load' => [
 					'other',
 				],
 			],
@@ -130,18 +134,18 @@ class ConfigTest extends DatabaseTestCase
 					'config',
 					'other'
 				],
-				'load'         => [
+				'load' => [
 					'config',
 				],
 			],
-			'all'    => [
+			'all' => [
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
 					'other'
 				],
-				'load'         => [
+				'load' => [
 					'system',
 					'config',
 					'other'
@@ -173,7 +177,7 @@ class ConfigTest extends DatabaseTestCase
 	 */
 	public function testSetUp(array $data)
 	{
-		$this->loadDirectFixture($this->configToDbArray($data) , $this->getDbInstance());
+		$this->loadDirectFixture($this->configToDbArray($data), $this->getDbInstance());
 
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -209,13 +213,13 @@ class ConfigTest extends DatabaseTestCase
 	{
 		return [
 			'config' => [
-				'data1'  => [
+				'data1' => [
 					'config' => [
 						'key1' => 'value1',
 						'key2' => 'value2',
 					],
 				],
-				'data2'  => [
+				'data2' => [
 					'config' => [
 						'key1' => 'overwritten!',
 						'key3' => 'value3',
@@ -230,19 +234,19 @@ class ConfigTest extends DatabaseTestCase
 					],
 				],
 			],
-			'other'  => [
-				'data1'  => [
+			'other' => [
+				'data1' => [
 					'config' => [
 						'key12' => 'data4',
 						'key45' => 7,
 					],
-					'other'  => [
+					'other' => [
 						'key1' => 'value1',
 						'key2' => 'value2',
 					],
 				],
-				'data2'  => [
-					'other'  => [
+				'data2' => [
+					'other' => [
 						'key1' => 'overwritten!',
 						'key3' => 'value3',
 					],
@@ -252,7 +256,7 @@ class ConfigTest extends DatabaseTestCase
 					]
 				],
 				'expect' => [
-					'other'  => [
+					'other' => [
 						// load should overwrite values everytime!
 						'key1' => 'overwritten!',
 						'key2' => 'value2',
@@ -399,26 +403,26 @@ class ConfigTest extends DatabaseTestCase
 	public function dataTestCat()
 	{
 		return [
-			'test_with_hashmap'     => [
-				'data'      => [
+			'test_with_hashmap' => [
+				'data' => [
 					'test_with_hashmap' => [
 						'notifyall' => [
 							'last_update' => 1671051565,
 							'admin'       => true,
 						],
-						'blockbot'  => [
+						'blockbot' => [
 							'last_update' => 1658952852,
 							'admin'       => true,
 						],
 					],
-					'config'            => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'            => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -428,14 +432,14 @@ class ConfigTest extends DatabaseTestCase
 						'last_update' => 1671051565,
 						'admin'       => true,
 					],
-					'blockbot'  => [
+					'blockbot' => [
 						'last_update' => 1658952852,
 						'admin'       => true,
 					],
 				],
 			],
-			'test_with_keys'        => [
-				'data'      => [
+			'test_with_keys' => [
+				'data' => [
 					'test_with_keys' => [
 						[
 							'last_update' => 1671051565,
@@ -446,14 +450,14 @@ class ConfigTest extends DatabaseTestCase
 							'admin'       => true,
 						],
 					],
-					'config'            => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'            => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -470,7 +474,7 @@ class ConfigTest extends DatabaseTestCase
 				],
 			],
 			'test_with_inner_array' => [
-				'data'      => [
+				'data' => [
 					'test_with_inner_array' => [
 						'notifyall' => [
 							'last_update' => 1671051565,
@@ -479,19 +483,19 @@ class ConfigTest extends DatabaseTestCase
 								'no'  => 1.5,
 							],
 						],
-						'blogbot'   => [
+						'blogbot' => [
 							'last_update' => 1658952852,
 							'admin'       => true,
 						],
 					],
-					'config'                => [
+					'config' => [
 						'register_policy' => 2,
 						'register_text'   => '',
 						'sitename'        => 'Friendica Social Network23',
 						'hostname'        => 'friendica.local',
 						'private_addons'  => false,
 					],
-					'system'                => [
+					'system' => [
 						'dbclean_expire_conversation' => 90,
 					],
 				],
@@ -504,7 +508,7 @@ class ConfigTest extends DatabaseTestCase
 							'no'  => 1.5,
 						],
 					],
-					'blogbot'   => [
+					'blogbot' => [
 						'last_update' => 1658952852,
 						'admin'       => true,
 					],
@@ -519,7 +523,7 @@ class ConfigTest extends DatabaseTestCase
 	public function testGetCategory(array $data, string $category, array $assertion)
 	{
 		$this->configCache = new Cache($data);
-		$config = new ReadOnlyFileConfig($this->configCache);
+		$config            = new ReadOnlyFileConfig($this->configCache);
 
 		self::assertEquals($assertion, $config->get($category));
 	}
@@ -528,15 +532,15 @@ class ConfigTest extends DatabaseTestCase
 	{
 		return [
 			'default' => [
-				'value' => ['test' => ['array']],
+				'value'     => ['test' => ['array']],
 				'assertion' => ['test' => ['array']],
 			],
 			'issue-12803' => [
-				'value' => 's:48:"s:40:"s:32:"https://punkrock-underground.com";";";',
+				'value'     => 's:48:"s:40:"s:32:"https://punkrock-underground.com";";";',
 				'assertion' => 'https://punkrock-underground.com',
 			],
 			'double-serialized-array' => [
-				'value' => 's:53:"a:1:{s:9:"testArray";a:1:{s:4:"with";s:7:"entries";}}";',
+				'value'     => 's:53:"a:1:{s:9:"testArray";a:1:{s:4:"with";s:7:"entries";}}";',
 				'assertion' => ['testArray' => ['with' => 'entries']],
 			],
 		];
@@ -558,33 +562,33 @@ class ConfigTest extends DatabaseTestCase
 		$data = [
 			'config' => [
 				'admin_email' => 'value1',
-				'timezone' => 'value2',
-				'language' => 'value3',
-				'sitename' => 'value',
+				'timezone'    => 'value2',
+				'language'    => 'value3',
+				'sitename'    => 'value',
 			],
 			'system' => [
-				'url' => 'value1a',
+				'url'       => 'value1a',
 				'debugging' => true,
-				'logfile' => 'value4',
-				'loglevel' => 'notice',
-				'proflier' => true,
+				'logfile'   => 'value4',
+				'loglevel'  => 'notice',
+				'proflier'  => true,
 			],
-			'proxy'  => [
+			'proxy' => [
 				'trusted_proxies' => 'value5',
 			],
 		];
 
 		return [
 			'empty' => [
-				'data'   => $data,
-				'server' => [],
+				'data'           => $data,
+				'server'         => [],
 				'assertDisabled' => [],
 			],
 			'mixed' => [
 				'data'   => $data,
 				'server' => [
 					'FRIENDICA_ADMIN_MAIL' => 'test@friendica.local',
-					'FRIENDICA_DEBUGGING' => true,
+					'FRIENDICA_DEBUGGING'  => true,
 				],
 				'assertDisabled' => [
 					'config' => [
@@ -608,7 +612,13 @@ class ConfigTest extends DatabaseTestCase
 		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'env.config.php', true);
 		$this->loadDirectFixture($this->configToDbArray($data), $this->getDbInstance());
 
-		$configFileManager = new ConfigFileManager($this->root->url(), $this->root->url() . '/config/', $this->root->url() . '/static/', $server);
+		$configFileManager = new ConfigFileManager(
+			$this->root->url(),
+			$this->root->url() . '/addon',
+			$this->root->url() . '/config',
+			$this->root->url() . '/static',
+			$server
+		);
 		$configFileManager->setupCache($this->configCache);
 		$config = new DatabaseConfig($this->getDbInstance(), $this->configCache);
 

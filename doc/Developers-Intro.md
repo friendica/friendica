@@ -62,7 +62,7 @@ If you want to have git automatically update the dependencies with composer, you
     }
     # `composer install` if the `composer.lock` file gets changed
     # to update all the php dependencies
-    check_run composer.lock "bin/composer.phar install --no-dev"
+    check_run composer.lock "bin/composer.phar install"
 
 just place it into `.git/hooks/post-merge` and make it executable.
 
@@ -210,9 +210,9 @@ If the deprecated code is no longer used inside Friendica or the official addons
 The code MUST NOT be deleted.
 Starting from the next release, it MUST be stay for at least 5 months.
 Hard deprecated code COULD remain longer than 5 months, depending on when a release appears.
-Addon developer MUST NOT consider that they have more than 5 months to adjust their code.
+Addon developer SHOULD NOT consider that they have more than 5 months to adjust their code.
 
-Hard deprecation code means that the code triggers an `E_USER_DEPRECATION` error if it is called.
+Hard deprecation code means that the code triggers a muted `E_USER_DEPRECATION` error if it is called.
 For instance with the deprecated class `Friendica\Core\Logger` the call of every method should trigger an error:
 
 ```php
@@ -224,7 +224,7 @@ For instance with the deprecated class `Friendica\Core\Logger` the call of every
 class Logger {
 	public static function info(string $message, array $context = [])
 	{
-		trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.05 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->info($message, $context);
 	}
@@ -233,7 +233,7 @@ class Logger {
 }
 ```
 
-This way the maintainer or users of addons will be notified that the addon will stop working in one of the next releases.
+This way the maintainer or users of addons will be notified in the logs that the addon will stop working in one of the next releases.
 The addon maintainer now has at least 5 months or at least one release to fix the deprecations.
 
 Please note that the deprecation message contains the release that will be released next.

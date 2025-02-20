@@ -40,14 +40,18 @@ class Emailer
 	/** @var string */
 	private $siteEmailName;
 
-	public function __construct(IManageConfigValues $config, IManagePersonalConfigValues $pConfig, BaseURL $baseURL, LoggerInterface $logger,
-	                            L10n $defaultLang)
-	{
-		$this->config      = $config;
-		$this->pConfig     = $pConfig;
-		$this->logger      = $logger;
-		$this->baseUrl     = $baseURL;
-		$this->l10n        = $defaultLang;
+	public function __construct(
+		IManageConfigValues $config,
+		IManagePersonalConfigValues $pConfig,
+		BaseURL $baseURL,
+		LoggerInterface $logger,
+		L10n $defaultLang
+	) {
+		$this->config  = $config;
+		$this->pConfig = $pConfig;
+		$this->logger  = $logger;
+		$this->baseUrl = $baseURL;
+		$this->l10n    = $defaultLang;
 
 		$this->siteEmailAddress = $this->config->get('config', 'sender_email');
 		if (empty($this->siteEmailAddress)) {
@@ -89,8 +93,14 @@ class Emailer
 	 */
 	public function newSystemMail()
 	{
-		return new SystemMailBuilder($this->l10n, $this->baseUrl, $this->config, $this->logger,
-			$this->getSiteEmailAddress(), $this->getSiteEmailName());
+		return new SystemMailBuilder(
+			$this->l10n,
+			$this->baseUrl,
+			$this->config,
+			$this->logger,
+			$this->getSiteEmailAddress(),
+			$this->getSiteEmailName()
+		);
 	}
 
 	/**
@@ -100,8 +110,14 @@ class Emailer
 	 */
 	public function newNotifyMail()
 	{
-		return new NotifyMailBuilder($this->l10n, $this->baseUrl, $this->config, $this->logger,
-			$this->getSiteEmailAddress(), $this->getSiteEmailName());
+		return new NotifyMailBuilder(
+			$this->l10n,
+			$this->baseUrl,
+			$this->config,
+			$this->logger,
+			$this->getSiteEmailAddress(),
+			$this->getSiteEmailName()
+		);
 	}
 
 	/**
@@ -143,9 +159,9 @@ class Emailer
 
 		// generate a mime boundary
 		$mimeBoundary = rand(0, 9) . '-'
-		                . rand(100000000, 999999999) . '-'
-		                . rand(100000000, 999999999) . '=:'
-		                . rand(10000, 99999);
+						. rand(100000000, 999999999) . '-'
+						. rand(100000000, 999999999) . '=:'
+						. rand(10000, 99999);
 
 		$messageHeader = $email->getAdditionalMailHeaderString();
 		if ($countMessageId === 0) {
@@ -163,9 +179,9 @@ class Emailer
 		$textBody             = chunk_split(base64_encode($email->getMessage(true)));
 		$htmlBody             = chunk_split(base64_encode($email->getMessage()));
 		$multipartMessageBody = "--" . $mimeBoundary . "\n" .                    // plain text section
-		                        "Content-Type: text/plain; charset=UTF-8\n" .
-		                        "Content-Transfer-Encoding: base64\n\n" .
-		                        $textBody . "\n";
+								"Content-Type: text/plain; charset=UTF-8\n" .
+								"Content-Transfer-Encoding: base64\n\n" .
+								$textBody . "\n";
 
 		if (!$email_textonly && !is_null($email->getMessage())) {
 			$multipartMessageBody .=
@@ -207,8 +223,7 @@ class Emailer
 			$hookdata['parameters']
 		);
 
-		$this->logger->debug('header ' . 'To: ' . $email->getToAddress() . '\n' . $messageHeader);
-		$this->logger->debug('return value ' . (($res) ? 'true' : 'false'));
+		$this->logger->debug('Email message header', ['To' => $email->getToAddress(), 'messageHeader' => $messageHeader, 'return' => ($res) ? 'true' : 'false']);
 
 		return $res;
 	}

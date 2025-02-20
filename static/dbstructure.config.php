@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1576);
+	define('DB_UPDATE_VERSION', 1579);
 }
 
 return [
@@ -85,12 +85,14 @@ return [
 			"blocked" => ["type" => "boolean", "comment" => "Server is blocked"],
 			"failed" => ["type" => "boolean", "comment" => "Connection failed"],
 			"next_contact" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Next connection request"],
+			"redirect-gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id"], "comment" => "Target Gserver id in case of a redirect"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"nurl" => ["UNIQUE", "nurl(190)"],
 			"next_contact" => ["next_contact"],
 			"network" => ["network"],
+			"redirect-gsid" => ["redirect-gsid"],
 		]
 	],
 	"user" => [
@@ -1604,7 +1606,7 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"uid_uri-id" => ["UNIQUE", "uid", "uri-id"],
-			"uri-id" => ["uri-id"],
+			"uri-id_origin_deleted" => ["uri-id", "origin", "deleted"],
 			"parent-uri-id" => ["parent-uri-id"],
 			"thr-parent-id" => ["thr-parent-id"],
 			"external-id" => ["external-id"],

@@ -1,14 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 
 # SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
 #
 # SPDX-License-Identifier: CC0-1.0
 
-dir=$(cd "${0%[/\\]*}" > /dev/null; pwd)
+dir=$(cd "$(dirname "$0")" > /dev/null 2>&1; pwd)
 
-if [[ -d /proc/cygdrive && $(which php) == $(readlink -n /proc/cygdrive)/* ]]; then
+if [ -d /proc/cygdrive ] && [ "$(which php)" = "$(readlink -n /proc/cygdrive)/*" ]; then
    # We are in Cygwin using Windows php, so the path must be translated
-   dir=$(cygpath -m "$dir");
+   dir=$(cygpath -m "$dir")
 fi
 
 php "${dir}/console.php" "$@"

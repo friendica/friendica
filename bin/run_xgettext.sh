@@ -1,13 +1,20 @@
-#!/bin/bash
+#!/bin/sh
 
 # SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
 #
 # SPDX-License-Identifier: CC0-1.0
 
-set -eo pipefail
+set -e
 
-function resolve {
-	if [ "$(uname)" == "Darwin" ]
+# Custom function to handle pipefail behavior
+pipefail() {
+    local cmd="$1"
+    shift
+    { eval "$cmd"; } || exit 1
+}
+
+resolve() {
+	if [ "$(uname)" = "Darwin" ]
 	then
 		realpath "$1"
 	else
@@ -17,26 +24,26 @@ function resolve {
 
 FULLPATH=$(dirname "$(resolve "$0")")
 
-if [ "$1" == "--help" ] || [ "$1" == "-h" ]
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]
 then
 	echo "$(basename "$(resolve "$0")") [options]"
 	echo
 	echo "-a | --addon <name>	extract strings from addon 'name'"
-	echo "-s | --single				single addon mode: extract string from current folder"
+	echo "-s | --single			single addon mode: extract string from current folder"
 	exit
 fi
 
 MODE='default'
 ADDONNAME=
-if [ "$1" == "--addon" ] || [ "$1" == "-a" ]
+if [ "$1" = "--addon" ] || [ "$1" = "-a" ]
 then
 	MODE='addon'
-	if [ -z "$2" ]; then echo -e "ERROR: missing addon name\n\nrun_xgettext.sh -a <addonname>"; exit 1; fi
+	if [ -z "$2" ]; then echo "ERROR: missing addon name\n\nrun_xgettext.sh -a <addonname>"; exit 1; fi
 	ADDONNAME=$2
 	if [ ! -d "$FULLPATH/../addon/$ADDONNAME" ]; then echo "ERROR: addon '$ADDONNAME' not found"; exit 2; fi
 fi
 
-if [ "$1" == "--single" ] || [ "$1" == "-s" ]
+if [ "$1" = "--single" ] || [ "$1" = "-s" ]
 then
 	MODE='single'
 fi
@@ -70,7 +77,6 @@ case "$MODE" in
 	;;
 esac
 
-
 KEYWORDS="-k -kt -ktt:1,2"
 
 echo "Extract strings to $OUTFILE.."
@@ -79,13 +85,13 @@ echo "Extract strings to $OUTFILE.."
 # shellcheck disable=SC2086  # $FINDOPTS is meant to be split
 find_result=$(find "$FINDSTARTDIR" $FINDOPTS -name "*.php" -type f | LC_ALL=C sort -s)
 
-total_files=$(wc -l <<< "${find_result}")
+total_files=$(echo "${find_result}" | wc -l)
 
 count=1
 for file in $find_result
 do
-	echo -ne "                                            \r"
-	echo -ne "Reading file $count/$total_files..."
+	printf "                                            \r"
+	printf "Reading file %d/%d..." "$count" "$total_files"
 
 	# On Windows, find still outputs the name of pruned folders
 	if [ ! -d "$file" ]
@@ -94,9 +100,8 @@ do
 		xgettext $KEYWORDS --no-wrap -j -o "$OUTFILE" --from-code=UTF-8 "$file" || exit 1
 		sed -i.bkp "s/CHARSET/UTF-8/g" "$OUTFILE"
 	fi
-	(( count++ ))
+	count=$((count + 1))
 done
-echo -ne "\n"
 
 echo "Interpolate metadata.."
 
@@ -119,7 +124,7 @@ case "$MODE" in
 	;;
 esac
 
-if [ "" != "$1" ] && [ "$MODE" == "default" ]
+if [ -n "$1" ] && [ "$MODE" = "default" ]
 then
 	UPDATEFILE="$(resolve "${FULLPATH}/$1")"
 	echo "Merging new strings to $UPDATEFILE.."

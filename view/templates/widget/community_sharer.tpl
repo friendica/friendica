@@ -4,18 +4,22 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<span id="sidebar-community-no-sharer-inflated" class="widget inflated fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');">
-	<h3>{{$title}}</h3>
-</span>
-<div id="sidebar-community-no-sharer" class="widget">
-	<span class="fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');">
-		<h3>{{$title}}</h3>
+<nav>
+	<span id="sidebar-community-no-sharer-inflated" class="widget inflated fakelink">
+		<button class="fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');" aria-expanded="false">
+			<h3>{{$title}}</h3>
+		</button>
 	</span>
-	<ul class="sidebar-community-no-sharer-ul">
-		<li role="menuitem" class="sidebar-community-no-sharer-li{{if !$no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_all}}">{{$all}}</a></li>
-		<li role="menuitem" class="sidebar-community-no-sharer-li{{if $no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_no_sharer}}">{{$no_sharer_label}}</a></li>
-	</ul>
-</div>
+	<div id="sidebar-community-no-sharer" class="widget">
+		<button class="fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');" aria-expanded="true">
+			<h3>{{$title}}</h3>
+		</button>
+		<ul class="sidebar-community-no-sharer-ul">
+			<li class="sidebar-community-no-sharer-li{{if !$no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_all}}">{{$all}}</a></li>
+			<li class="sidebar-community-no-sharer-li{{if $no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_no_sharer}}">{{$no_sharer_label}}</a></li>
+		</ul>
+	</div>
+</nav>
 <script>
-initWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');
+	initWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');
 </script>

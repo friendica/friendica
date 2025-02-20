@@ -17,16 +17,14 @@ use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Content\Nav;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Container;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Core\Logger\LoggerManager;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Database\Definition\DbaDefinition;
-use Friendica\Database\Definition\ViewDefinition;
-use Friendica\Module\Maintenance;
-use Friendica\Security\Authentication;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\DiceContainer;
 use Friendica\Core\L10n;
@@ -35,9 +33,15 @@ use Friendica\Core\Logger\Handler\ErrorHandler;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\System;
 use Friendica\Core\Update;
+use Friendica\Database\Definition\DbaDefinition;
+use Friendica\Database\Definition\ViewDefinition;
+use Friendica\Event\ConfigLoadedEvent;
+use Friendica\Event\Event;
+use Friendica\Module\Maintenance;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ATProtocol\DID;
+use Friendica\Security\Authentication;
 use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
 use Friendica\Util\BasePath;
@@ -45,6 +49,7 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -153,6 +158,8 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->registerEventDispatcher();
+
 		$this->requestId = $this->container->create(Request::class)->getRequestId();
 		$this->auth      = $this->container->create(Authentication::class);
 		$this->config    = $this->container->create(IManageConfigValues::class);
@@ -165,6 +172,8 @@ class App
 		$this->session   = $this->container->create(IHandleUserSessions::class);
 		$this->appHelper = $this->container->create(AppHelper::class);
 
+		$addonHelper = $this->container->create(AddonHelper::class);
+
 		$this->load(
 			$request->getServerParams(),
 			$this->container->create(DbaDefinition::class),
@@ -172,15 +181,19 @@ class App
 			$this->mode,
 			$this->config,
 			$this->profiler,
+			$this->container->create(EventDispatcherInterface::class),
 			$this->appHelper,
+			$addonHelper,
 		);
 
 		$this->registerTemplateEngine();
 
 		$this->runFrontend(
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(IManagePersonalConfigValues::class),
 			$this->container->create(Page::class),
 			$this->container->create(Nav::class),
+			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
 			$request
@@ -202,6 +215,8 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->registerEventDispatcher();
+
 		$this->load(
 			$serverParams,
 			$this->container->create(DbaDefinition::class),
@@ -209,7 +224,9 @@ class App
 			$this->container->create(Mode::class),
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		$this->registerTemplateEngine();
@@ -230,6 +247,8 @@ class App
 
 		$this->registerErrorHandler();
 
+		$this->registerEventDispatcher();
+
 		$this->load(
 			$serverParams,
 			$this->container->create(DbaDefinition::class),
@@ -237,7 +256,9 @@ class App
 			$this->container->create(Mode::class),
 			$this->container->create(IManageConfigValues::class),
 			$this->container->create(Profiler::class),
+			$this->container->create(EventDispatcherInterface::class),
 			$this->container->create(AppHelper::class),
+			$this->container->create(AddonHelper::class),
 		);
 
 		/** @var BasePath */
@@ -301,6 +322,16 @@ class App
 		ErrorHandler::register($this->container->create(LoggerInterface::class));
 	}
 
+	private function registerEventDispatcher(): void
+	{
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = $this->container->create(EventDispatcherInterface::class);
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+	}
+
 	private function registerTemplateEngine(): void
 	{
 		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
@@ -316,7 +347,9 @@ class App
 		Mode $mode,
 		IManageConfigValues $config,
 		Profiler $profiler,
-		AppHelper $appHelper
+		EventDispatcherInterface $eventDispatcher,
+		AppHelper $appHelper,
+		AddonHelper $addonHelper
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -338,8 +371,9 @@ class App
 
 		if ($mode->has(Mode::DBAVAILABLE)) {
 			Core\Hook::loadHooks();
-			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $serverParams);
-			Core\Hook::callAll('load_config', $loader);
+			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $addonHelper->getAddonPath(), $serverParams);
+
+			$eventDispatcher->dispatch(new ConfigLoadedEvent(ConfigLoadedEvent::CONFIG_LOADED, $loader));
 
 			// Hooks are now working, reload the whole definitions with hook enabled
 			$dbaDefinition->load(true);
@@ -385,9 +419,11 @@ class App
 	 * @throws \ImagickException
 	 */
 	private function runFrontend(
+		EventDispatcherInterface $eventDispatcher,
 		IManagePersonalConfigValues $pconfig,
 		Page $page,
 		Nav $nav,
+		AddonHelper $addonHelper,
 		ModuleHTTPException $httpException,
 		float $start_time,
 		ServerRequestInterface $request
@@ -424,7 +460,8 @@ class App
 					$serverVars['REQUEST_METHOD'] === 'GET') {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
-				Core\Hook::callAll('init_1');
+
+				$eventDispatcher->dispatch(new Event(Event::INIT));
 			}
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);
@@ -475,11 +512,11 @@ class App
 			// but we need "view" module for stylesheet
 			if ($this->mode->isInstall() && $moduleName !== 'install') {
 				$this->baseURL->redirect('install');
-			} else {
-				Core\Update::check($this->appHelper->getBasePath(), false);
-				Core\Addon::loadAddons();
-				Core\Hook::loadHooks();
 			}
+
+			Core\Update::check($this->appHelper->getBasePath(), false);
+			$addonHelper->loadAddons();
+			Core\Hook::loadHooks();
 
 			// Compatibility with Hubzilla
 			if ($moduleName == 'rpost') {
@@ -536,7 +573,15 @@ class App
 
 			// Processes data from GET requests
 			$httpinput = $httpInput->process();
-			$input     = array_merge($httpinput['variables'], $httpinput['files'], $request);
+
+			if (!is_array($httpinput['variables'])) {
+				$httpinput['variables'] = [];
+			}
+			if (!is_array($httpinput['files'])) {
+				$httpinput['files'] = [];
+			}
+
+			$input = array_merge($httpinput['variables'], $httpinput['files'], $request);
 
 			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);

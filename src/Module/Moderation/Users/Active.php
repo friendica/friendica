@@ -124,8 +124,8 @@ class Active extends BaseUsers
 	 */
 	private function processGetActions(): void
 	{
-		$action = (string)$this->parameters['action'] ?? '';
-		$uid = (int)$this->parameters['uid'] ?? 0;
+		$action = (string) ($this->parameters['action'] ?? '');
+		$uid    = (int) ($this->parameters['uid'] ?? 0);
 
 		if ($uid === 0) {
 			return;
@@ -150,6 +150,7 @@ class Active extends BaseUsers
 				}
 
 				$this->baseUrl->redirect('moderation/users/active');
+				// no break
 			case 'block':
 				self::checkFormSecurityTokenRedirectOnError('moderation/users/active', 'moderation_users_active', 't');
 				User::block($uid);

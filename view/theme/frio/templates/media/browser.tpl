@@ -16,7 +16,7 @@
 		{{* The breadcrumb navigation *}}
 		<ol class="path breadcrumb" aria-label="Breadcrumb" role="menu">
 		{{foreach $path as $folder => $name}}
-			<li role="presentation">
+			<li>
 				<button type="button" class="btn btn-link" data-folder="{{$folder}}" role="menuitem">{{$name}}</button>
 			</li>
 		{{/foreach}}
@@ -36,15 +36,15 @@
 
 			{{* List of photo albums *}}
 			{{if $folders }}
-			<div class="folders media-left" role="navigation" aria-label="Album Navigation">
+			<nav class="folders media-left" aria-label="Album Navigation">
 				<ul role="menu">
 					{{foreach $folders as $folder}}
-					<li role="presentation">
-						<button class="btn btn-default" type="button" data-folder="{{$folder}}" role="menuitem">{{$folder}}</button>
+					<li>
+						<button type="button" data-folder="{{$folder}}" role="menuitem">{{$folder}}</button>
 					</li>
 					{{/foreach}}
 				</ul>
-			</div>
+			</nav>
 			{{/if}}
 
 			{{* The main content (images or files) *}}

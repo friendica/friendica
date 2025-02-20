@@ -218,7 +218,7 @@ function eventHoverBodyTemplate() {
 // The template for presenting the event location in the event hover-card
 function eventHoverLocationTemplate() {
 	var template =
-		'<span role="presentation" aria-hidden="true"> · </span>\
+		'<span aria-hidden="true"> · </span>\
 			<span class="event-card-location"> {0}</span></div>';
 	return template;
 }

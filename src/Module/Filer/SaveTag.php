@@ -56,7 +56,7 @@ class SaveTag extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate("filer_dialog.tpl");
 		echo Renderer::replaceMacros($tpl, [
-			'$field' => ['term', $this->t("Save to Folder:"), '', '', $filetags, $this->t('- select -')],
+			'$field'  => ['term', $this->t("Folder:"), '', '', $filetags, $this->t('- select -')],
 			'$submit' => $this->t('Save'),
 		]);
 

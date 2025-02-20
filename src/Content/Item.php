@@ -607,7 +607,7 @@ class Item
 		} else {
 			$owner_avatar  = $item['owner-id'];
 			$owner_updated = $item['owner-updated'];
-			$owner_thumb   = $item['owner-avatar'];
+			$owner_thumb   = $item['owner-avatar'] ?? '';
 		}
 
 		if (empty($owner_thumb) || Photo::isPhotoURI($owner_thumb)) {

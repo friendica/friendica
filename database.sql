@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1576
+-- DB_UPDATE_VERSION 1579
 -- ------------------------------------------
 
 
@@ -41,10 +41,13 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`blocked` boolean COMMENT 'Server is blocked',
 	`failed` boolean COMMENT 'Connection failed',
 	`next_contact` datetime DEFAULT '0001-01-01 00:00:00' COMMENT 'Next connection request',
+	`redirect-gsid` int unsigned COMMENT 'Target Gserver id in case of a redirect',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `next_contact` (`next_contact`),
-	 INDEX `network` (`network`)
+	 INDEX `network` (`network`),
+	 INDEX `redirect-gsid` (`redirect-gsid`),
+	FOREIGN KEY (`redirect-gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Global servers';
 
 --
@@ -1609,7 +1612,7 @@ CREATE TABLE IF NOT EXISTS `post-user` (
 	`psid` int unsigned COMMENT 'ID of the permission set of this post',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uid_uri-id` (`uid`,`uri-id`),
-	 INDEX `uri-id` (`uri-id`),
+	 INDEX `uri-id_origin_deleted` (`uri-id`,`origin`,`deleted`),
 	 INDEX `parent-uri-id` (`parent-uri-id`),
 	 INDEX `thr-parent-id` (`thr-parent-id`),
 	 INDEX `external-id` (`external-id`),
@@ -3809,7 +3812,8 @@ CREATE VIEW `pending-view` AS SELECT
 	`contact`.`nick` AS `nick`
 	FROM `register`
 			INNER JOIN `contact` ON `register`.`uid` = `contact`.`uid`
-			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`;
+			INNER JOIN `user` ON `register`.`uid` = `user`.`uid`
+			WHERE `register`.`uid` != 0;
 
 --
 -- VIEW tag-search-view

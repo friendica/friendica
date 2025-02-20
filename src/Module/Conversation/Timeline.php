@@ -150,20 +150,20 @@ class Timeline extends BaseModule
 	{
 		switch ($this->order) {
 			case 'received':
-				$this->maxId = $request['last_received'] ?? $this->maxId;
+				$this->maxId = $request['last_received']  ?? $this->maxId;
 				$this->minId = $request['first_received'] ?? $this->minId;
 				break;
 			case 'created':
-				$this->maxId = $request['last_created'] ?? $this->maxId;
+				$this->maxId = $request['last_created']  ?? $this->maxId;
 				$this->minId = $request['first_created'] ?? $this->minId;
 				break;
 			case 'uri-id':
-				$this->maxId = $request['last_uriid'] ?? $this->maxId;
+				$this->maxId = $request['last_uriid']  ?? $this->maxId;
 				$this->minId = $request['first_uriid'] ?? $this->minId;
 				break;
 			default:
 				$this->order = 'commented';
-				$this->maxId = $request['last_commented'] ?? $this->maxId;
+				$this->maxId = $request['last_commented']  ?? $this->maxId;
 				$this->minId = $request['first_commented'] ?? $this->minId;
 		}
 	}
@@ -256,8 +256,8 @@ class Timeline extends BaseModule
 
 			while (count($selected_items) < $total && ++$count < 50 && count($items) > 0) {
 				$maxposts = round((count($items) / $total) * $maxpostperauthor);
-				$minId = $items[array_key_first($items)][$this->order];
-				$maxId = $items[array_key_last($items)][$this->order];
+				$minId    = $items[array_key_first($items)][$this->order];
+				$maxId    = $items[array_key_last($items)][$this->order];
 
 				foreach ($items as $item) {
 					if (!in_array($item['owner-id'], $reduced)) {
@@ -373,9 +373,9 @@ class Timeline extends BaseModule
 		} elseif (is_numeric($this->selectedTab) && !empty($channel = $this->channelRepository->selectById($this->selectedTab, $uid))) {
 			$condition = $this->getUserChannelConditions($channel, $uid);
 			if (in_array($channel->circle, [-3, -4, -5])) {
-				$table = SearchIndex::getSearchView();
-				$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
-				$orders = ['-3' => 'created', '-4' => 'received', '-5' => 'commented'];
+				$table       = SearchIndex::getSearchView();
+				$condition   = DBA::mergeConditions($condition, ['uid' => $uid]);
+				$orders      = ['-3' => 'created', '-4' => 'received', '-5' => 'commented'];
 				$this->order = $orders[$channel->circle];
 			}
 		}
@@ -421,10 +421,10 @@ class Timeline extends BaseModule
 			}
 		}
 
-		$items = [];
-		$fields = ['uri-id', 'owner-id', 'comments', 'activities'];
+		$items    = [];
+		$fields   = ['uri-id', 'owner-id', 'comments', 'activities'];
 		$fields[] = $this->order;
-		$result = $this->database->select($table, $fields, $condition, $params);
+		$result   = $this->database->select($table, $fields, $condition, $params);
 		if ($this->database->errorNo()) {
 			throw new \Exception($this->database->errorMessage(), $this->database->errorNo());
 		}
@@ -691,16 +691,19 @@ class Timeline extends BaseModule
 		$items = $this->selectItems();
 		$key   = '';
 
+		$maxpostperauthor = 0;
 		if ($this->selectedTab == Community::LOCAL) {
 			$maxpostperauthor = (int)$this->config->get('system', 'max_author_posts_community_page');
-			$key = 'author-id';
+			$key              = 'author-id';
 		} elseif ($this->selectedTab == Community::GLOBAL) {
 			$maxpostperauthor = (int)$this->config->get('system', 'max_server_posts_community_page');
-			$key = 'author-gsid';
-		} else {
+			$key              = 'author-gsid';
+		}
+
+		if ($maxpostperauthor === 0) {
 			$this->setItemsSeenByCondition([
-				'unseen' => true,
-				'uid' => $this->session->getLocalUserId(),
+				'unseen'        => true,
+				'uid'           => $this->session->getLocalUserId(),
 				'parent-uri-id' => array_column($items, 'uri-id')
 			]);
 
@@ -713,8 +716,8 @@ class Timeline extends BaseModule
 
 		while (count($selected_items) < $this->itemsPerPage && ++$count < 50 && count($items) > 0) {
 			$maxposts = round((count($items) / $this->itemsPerPage) * $maxpostperauthor);
-			$minId = $items[array_key_first($items)]['received'];
-			$maxId = $items[array_key_last($items)]['received'];
+			$minId    = $items[array_key_first($items)]['received'];
+			$maxId    = $items[array_key_last($items)]['received'];
 
 			foreach ($items as $item) {
 				$author_posts[$item[$key]][$item['uri-id']] = $item['received'];
@@ -799,7 +802,7 @@ class Timeline extends BaseModule
 		}
 
 		$items = [];
-		if ($this->selectedTab ==  Community::LOCAL) {
+		if ($this->selectedTab == Community::LOCAL) {
 			$result = Post::selectOriginThread(['uri-id', 'received', 'author-id', 'author-gsid'], $condition, $params);
 		} else {
 			$result = Post::selectThreadForUser($this->session->getLocalUserId() ?: 0, ['uri-id', 'received', 'author-id', 'author-gsid'], $condition, $params);

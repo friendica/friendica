@@ -9,6 +9,8 @@ namespace Friendica\Protocol;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
+use DOMNodeList;
 use DOMXPath;
 use Friendica\App;
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
@@ -67,12 +69,12 @@ class Feed
 			return [];
 		}
 
+		$basepath = '';
+
 		if (!empty($contact['poll'])) {
-			$basepath = $contact['poll'];
+			$basepath = (string) $contact['poll'];
 		} elseif (!empty($contact['url'])) {
-			$basepath = $contact['url'];
-		} else {
-			$basepath = '';
+			$basepath = (string) $contact['url'];
 		}
 
 		$doc = new DOMDocument();
@@ -287,6 +289,77 @@ class Feed
 			$total_items = $max_items;
 		}
 
+		$postings = self::importOlderEntries($entries, $total_items, $header, $author, $contact, $importer, $xpath, $atomns, $basepath, $dryRun);
+
+		if (!empty($postings)) {
+			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
+			$total       = count($postings);
+			if ($total > 1) {
+				// Posts shouldn't be delayed more than a day
+				$interval = min(1440, self::getPollInterval($contact));
+				$delay    = max(round(($interval * 60) / $total), 60 * $min_posting);
+				DI::logger()->info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
+			} else {
+				$delay = 0;
+			}
+
+			$post_delay = 0;
+
+			foreach ($postings as $posting) {
+				if ($delay > 0) {
+					$publish_time = time() + $post_delay;
+					$post_delay += $delay;
+				} else {
+					$publish_time = time();
+				}
+
+				$last_publish = DI::pConfig()->get($posting['item']['uid'], 'system', 'last_publish', 0, true);
+				$next_publish = max($last_publish + (60 * $min_posting), time());
+				if ($publish_time < $next_publish) {
+					$publish_time = $next_publish;
+				}
+				$publish_at = date(DateTimeFormat::MYSQL, $publish_time);
+
+				if (Post\Delayed::add($posting['item']['uri'], $posting['item'], $posting['notify'], Post\Delayed::PREPARED, $publish_at, $posting['taglist'], $posting['attachments'])) {
+					DI::pConfig()->set($posting['item']['uid'], 'system', 'last_publish', $publish_time);
+				}
+			}
+		}
+
+		if (!$dryRun && DI::config()->get('system', 'adjust_poll_frequency')) {
+			self::adjustPollFrequency($contact, $creation_dates);
+		}
+
+		return ['header' => $author, 'items' => $items];
+	}
+
+	private static function getTitleFromItemOrEntry(array $item, DOMXPath $xpath, string $atomns, ?DOMNode $entry): string
+	{
+		$title = (string) $item['title'];
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'rss:title/text()', $entry);
+		}
+
+		if (empty($title)) {
+			$title = XML::getFirstNodeValue($xpath, 'itunes:title/text()', $entry);
+		}
+
+		$title = trim(html_entity_decode($title, ENT_QUOTES, 'UTF-8'));
+
+		return $title;
+	}
+
+	private static function importOlderEntries(DOMNodeList $entries, int $total_items, array $header, array $author, array $contact, array $importer, DOMXPath $xpath, string $atomns, string $basepath, bool $dryRun): array
+	{
 		$postings = [];
 
 		// Importing older entries first
@@ -386,23 +459,7 @@ class Feed
 				}
 			}
 
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'rss:title/text()', $entry);
-			}
-
-			if (empty($item['title'])) {
-				$item['title'] = XML::getFirstNodeValue($xpath, 'itunes:title/text()', $entry);
-			}
-
-			$item['title'] = trim(html_entity_decode($item['title'], ENT_QUOTES, 'UTF-8'));
+			$item['title'] = self::getTitleFromItemOrEntry($item, $xpath, $atomns, $entry);
 
 			$published = XML::getFirstNodeValue($xpath, $atomns . ':published/text()', $entry);
 
@@ -705,46 +762,7 @@ class Feed
 			}
 		}
 
-		if (!empty($postings)) {
-			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
-			$total       = count($postings);
-			if ($total > 1) {
-				// Posts shouldn't be delayed more than a day
-				$interval = min(1440, self::getPollInterval($contact));
-				$delay    = max(round(($interval * 60) / $total), 60 * $min_posting);
-				DI::logger()->info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
-			} else {
-				$delay = 0;
-			}
-
-			$post_delay = 0;
-
-			foreach ($postings as $posting) {
-				if ($delay > 0) {
-					$publish_time = time() + $post_delay;
-					$post_delay += $delay;
-				} else {
-					$publish_time = time();
-				}
-
-				$last_publish = DI::pConfig()->get($posting['item']['uid'], 'system', 'last_publish', 0, true);
-				$next_publish = max($last_publish + (60 * $min_posting), time());
-				if ($publish_time < $next_publish) {
-					$publish_time = $next_publish;
-				}
-				$publish_at = date(DateTimeFormat::MYSQL, $publish_time);
-
-				if (Post\Delayed::add($posting['item']['uri'], $posting['item'], $posting['notify'], Post\Delayed::PREPARED, $publish_at, $posting['taglist'], $posting['attachments'])) {
-					DI::pConfig()->set($posting['item']['uid'], 'system', 'last_publish', $publish_time);
-				}
-			}
-		}
-
-		if (!$dryRun && DI::config()->get('system', 'adjust_poll_frequency')) {
-			self::adjustPollFrequency($contact, $creation_dates);
-		}
-
-		return ['header' => $author, 'items' => $items];
+		return $postings;
 	}
 
 	/**

@@ -19,7 +19,7 @@
 	</p>
 
 	{{* We include the aclModal directly into the template since we cant use frio's default modal *}}
-	<div class="modal" id="profile-field-acl-{{$profile_field.id}}">
+	<div id="profile-field-acl-{{$profile_field.id}}" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">

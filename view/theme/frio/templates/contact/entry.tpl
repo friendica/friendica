@@ -34,11 +34,11 @@
 				<ul class="contact-photo-menu menu-popup dropdown-menu hidden-lg hidden-md hidden-sm" id="contact-photo-menu-{{$contact.id}}" role="menu" aria-labelledby="contact-photo-menu-{{$contact.id}}">
 					{{foreach $contact.photo_menu as $c}}
 					{{if $c.2}}
-					<li role="presentation"><a role="menuitem" target="redir" href="{{$c.1}}">{{$c.0}}</a></li>
+					<li><a role="menuitem" target="redir" href="{{$c.1}}">{{$c.0}}</a></li>
 					{{elseif $c.3}}
-					<li role="presentation"><button role="menuitem" type="button" class="btn-link" onclick="addToModal('{{$c.1}}')">{{$c.0}}</button></li>
+					<li><button role="menuitem" type="button" class="btn-link" onclick="addToModal('{{$c.1}}')">{{$c.0}}</button></li>
 					{{else}}
-					<li role="presentation"><a role="menuitem" href="{{$c.1}}">{{$c.0}}</a></li>
+					<li><a role="menuitem" href="{{$c.1}}">{{$c.0}}</a></li>
 					{{/if}}
 					{{/foreach}}
 				</ul>

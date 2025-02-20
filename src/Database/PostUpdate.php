@@ -650,7 +650,7 @@ class PostUpdate
 
 			DBA::update(
 				'contact',
-				['gsid' => GServer::getID($contact['baseurl'], true), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
+				['gsid' => GServer::getRealID($contact['baseurl'], true), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
 				['id'   => $contact['id']]
 			);
 
@@ -705,7 +705,7 @@ class PostUpdate
 
 			DBA::update(
 				'apcontact',
-				['gsid' => GServer::getID($apcontact['baseurl'], true), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
+				['gsid' => GServer::getRealID($apcontact['baseurl'], true), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
 				['url'  => $apcontact['url']]
 			);
 
@@ -1243,7 +1243,7 @@ class PostUpdate
 
 			DBA::update(
 				'contact',
-				['gsid' => GServer::getID($server, true), 'baseurl' => GServer::cleanURL($server)],
+				['gsid' => GServer::getRealID($server, true), 'baseurl' => GServer::cleanURL($server)],
 				['id'   => $contact['id']]
 			);
 

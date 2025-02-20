@@ -167,7 +167,7 @@ class Contact
 	public static function insert(array $fields, int $duplicate_mode = Database::INSERT_DEFAULT): int
 	{
 		if (!empty($fields['baseurl']) && empty($fields['gsid'])) {
-			$fields['gsid'] = GServer::getID($fields['baseurl'], true);
+			$fields['gsid'] = GServer::getRealID($fields['baseurl'], true);
 		}
 
 		$fields['uri-id'] = ItemURI::getIdByURI($fields['url']);
@@ -913,7 +913,7 @@ class Contact
 		$fields['unsearchable']     = !$profile['net-publish'];
 		$fields['manually-approve'] = in_array($user['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP, User::PAGE_FLAGS_COMM_MAN]);
 		$fields['baseurl']          = DI::baseUrl();
-		$fields['gsid']             = GServer::getID($fields['baseurl'], true);
+		$fields['gsid']             = GServer::getRealID($fields['baseurl'], true);
 
 		$update = false;
 

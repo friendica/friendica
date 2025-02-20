@@ -135,8 +135,8 @@ class Index extends BaseUsers
 	 */
 	private function processGetActions(): void
 	{
-		$action = (string) $this->parameters['action'] ?? '';
-		$uid = (int) $this->parameters['uid'] ?? 0;
+		$action = (string) ($this->parameters['action'] ?? '');
+		$uid    = (int) ($this->parameters['uid'] ?? 0);
 
 		if ($uid === 0) {
 			return;
@@ -161,11 +161,13 @@ class Index extends BaseUsers
 				}
 
 				$this->baseUrl->redirect('moderation/users');
+				// no break
 			case 'block':
 				self::checkFormSecurityTokenRedirectOnError('moderation/users', 'moderation_users', 't');
 				User::block($uid);
 				$this->systemMessages->addNotice($this->t('User "%s" blocked', $user['username']));
 				$this->baseUrl->redirect('moderation/users');
+				// no break
 			case 'unblock':
 				self::checkFormSecurityTokenRedirectOnError('moderation/users', 'moderation_users', 't');
 				User::block($uid, false);

@@ -1583,7 +1583,7 @@ class BBCode
 		// Check for headers
 
 		if ($simple_html == self::INTERNAL) {
-			//Ensure to always start with <h4> if possible
+			//Ensure to always start with <h3> if possible
 			$heading_count = 0;
 			for ($level = 6; $level > 0; $level--) {
 				if (preg_match("(\[h$level\].*?\[\/h$level\])ism", $text)) {
@@ -1591,7 +1591,7 @@ class BBCode
 				}
 			}
 			if ($heading_count > 0) {
-				$heading = min($heading_count + 3, 6);
+				$heading = min($heading_count + 2, 6);
 				for ($level = 6; $level > 0; $level--) {
 					if (preg_match("(\[h$level\].*?\[\/h$level\])ism", $text)) {
 						$text = preg_replace("(\[h$level\](.*?)\[\/h$level\])ism", "</p><h$heading>$1</h$heading><p>", $text);

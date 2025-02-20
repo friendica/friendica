@@ -14,7 +14,7 @@ If you installed Friendica in the ``path/to/friendica`` folder:
    * ``.htaccess`` if using Apache web server
 
     The following items only need to be copied if they are located inside your friendica path:
-   * your storage folder as set in **Admin -> Site -> File Upload -> Storage base path** 
+   * your storage folder as set in **Admin -> Site -> File Upload -> Storage base path**
    * your item cache as set in **Admin -> Site -> Performance -> Path to item cache**
    * your temp folder as set in **Admin -> Site -> Advanced -> Temp path**
 3. Rename the ``path/to/friendica`` folder to ``path/to/friendica_old``.
@@ -30,7 +30,7 @@ You can get the latest changes at any time with
 
     cd path/to/friendica
     git pull
-    bin/composer.phar install --no-dev
+    bin/composer.phar run install:prod
 
 The addon tree has to be updated separately like so:
 
@@ -89,7 +89,7 @@ Some of the updates include the use of foreign keys now that will bump into issu
 ```
 Error 1452 occurred during database update:
 Cannot add or update a child row: a foreign key constraint fails (`friendica`.`#sql-10ea6_5a6d`, CONSTRAINT `#sql-10ea6_5a6d_ibfk_1` FOREIGN KEY (`contact-id`) REFERENCES `contact` (`id`))
-ALTER TABLE `thread` ADD FOREIGN KEY (`iid`) REFERENCES `item` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE; 
+ALTER TABLE `thread` ADD FOREIGN KEY (`iid`) REFERENCES `item` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE;
 ```
 
 All current known fixes for possible items that can go wrong are as below.

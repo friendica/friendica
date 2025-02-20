@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# The phpmd check is just triggered for PRs and pushes to non-stable branches of Friendica
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+
+steps:
+  restore_cache:
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: "{{ .Repo.Name }}_php${PHP_MAJOR_VERSION}_{{ arch }}_{{ os }}"
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - /tmp/drone-cache:/tmp/cache
+
+  composer_install:
+    image: friendicaci/php8.3:php8.3.3
+    commands:
+      - mkdir addon # create empty addon folder to appease composer
+      - export COMPOSER_HOME=.composer
+      - ./bin/composer.phar install --prefer-dist
+
+  rebuild_cache:
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      rebuild: true
+      cache_key: "{{ .Repo.Name }}_php${PHP_MAJOR_VERSION}_{{ arch }}_{{ os }}"
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - /tmp/drone-cache:/tmp/cache
+
+  phpmd:
+    image: friendicaci/php8.3:php8.3.3
+    commands:
+      - ./bin/composer.phar run phpmd

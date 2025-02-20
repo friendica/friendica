@@ -37,20 +37,20 @@
 	<div class="media-body">
 
 		{{* the header with the comment author name *}}
-		<div role="heading " class="contact-info-comment">
+		<div class="contact-info-comment">
 			<h5 class="media-heading">
 				<a href="{{$profile_url}}" title="View {{$name}}'s profile" class="wall-item-name-link userinfo hover-card"><span class="btn-link">{{$name}}</span></a>
 			</h5>
 		</div>
 
 		{{* comment content *}}
-		<div class="wall-item-content" id="wall-item-content-{{$id}}">
+		<article class="wall-item-content" id="wall-item-content-{{$id}}">
 			{{if $title}}
 			<div class="wall-item-title" id="wall-item-title-{{$id}}">{{$title}}</div>
 			{{/if}}
 
 			<div class="wall-item-body {{if !$title}}p-name{{/if}}" id="wall-item-body-{{$id}}" dir="auto">{{$body}}</div>
-		</div>
+		</article>
 
 		<div class="wall-item-wrapper-end clear"></div>
 		<div class="wall-item-comment-separator"></div>

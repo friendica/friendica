@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<div id="follow-sidebar" class="widget">
+<nav id="follow-sidebar" class="widget">
 	<h3>{{$connect}}</h3>
 
 	<form action="contact/follow" method="post">
@@ -15,5 +15,4 @@
 			<button id="side-follow-submit" class="btn btn-default btn-sm form-button-search" type="submit">{{$follow}}</button>
 		</div>
 	</form>
-</div>
-
+</nav>

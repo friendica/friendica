@@ -99,7 +99,7 @@ abstract class BaseUsers extends BaseModeration
 		Hook::callAll('moderation_users_tabs', $tabs_arr);
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs_arr['tabs']]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs_arr['tabs'], '$more' => $this->t('More')]);
 	}
 
 	protected function setupUserCallback(): \Closure

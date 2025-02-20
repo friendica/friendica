@@ -8,7 +8,6 @@
 {{if $mode == display}}<script type="text/javascript" src="view/theme/frio/js/mod_display.js?v={{$VERSION}}"></script>{{/if}}
 {{$live_update nofilter}}
 {{foreach $threads as $thread}}
-<hr class="sr-only" />
 <div id="tread-wrapper-{{$thread.uriid}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}} {{$thread.toplevel}} {{$thread.network}} {{if $thread.thread_level==1}}panel-default panel{{/if}} {{if $thread.thread_level!=1}}comment-wrapper{{/if}}" style="{{if $item.thread_level>2}}margin-left: -15px; margin-right:-16px; margin-bottom:-16px;{{/if}}"><!-- panel -->
 
 		{{* {{if $thread.type == tag}}
