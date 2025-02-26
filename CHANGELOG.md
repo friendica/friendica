@@ -21,6 +21,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 ### Changed
 
 - **BREAKING**: The class `Friendica\App` was completely refactored and marked as internal, work with `Friendica\AppHelper` instead.
+- **BREAKING**: The `contact_block_end` hook provides a HTML string instead of an array.
 - The `bin/composer.phar install` command no longer optimizes the autoloader file to avoid various problems when adding/removing classes in dev. Run `bin/composer.phar install -o` if you want autoloader optimization.
 - Downgrade shebang from `bin/bash` to `bin/sh` in `bin/console`.
 
@@ -28,6 +29,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 
 - The command `bin/console.php addon list enabled` shows a list of enabled addons instead of all addons, by @Art4 in [#14687](https://github.com/friendica/friendica/pull/14687).
 - The command `bin/console.php addon list disabled` shows a list of disabled addons instead of an empty list, by @Art4 in [#14687](https://github.com/friendica/friendica/pull/14687).
+- The `contact_block_end` hook has been fixed and can now change the content of the contact widget.
 
 ### Deprecated
 
