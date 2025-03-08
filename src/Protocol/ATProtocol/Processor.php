@@ -425,6 +425,10 @@ class Processor
 		}
 
 		$account = Contact::selectFirstAccountUser(['pid'], ['id' => $contact['id']]);
+		if (empty($account)) {
+			$this->logger->notice('Account-User record not found', ['id' => $contact['id']]);
+			return [];
+		}
 
 		$item['owner-id'] = $item['author-id'] = $account['pid'];
 		$item['uri-id']   = ItemURI::getIdByURI($uri);
