@@ -335,7 +335,7 @@ class Feed
 
 	private static function getTitleFromItemOrEntry(array $item, DOMXPath $xpath, string $atomns, ?DOMNode $entry): string
 	{
-		$title = (string) $item['title'];
+		$title = (string) ($item['title'] ?? '');
 
 		if (empty($title)) {
 			$title = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
