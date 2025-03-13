@@ -359,10 +359,10 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('register_account', $uid);
     Hook::callAll('remove_user', $user);
-    
+
 ### src/Content/ContactBlock.php
 
-    Hook::callAll('contact_block_end', $arr);
+    Hook::callAll('contact_block_end', $text);
 
 ### src/Content/Text/BBCode.php
 

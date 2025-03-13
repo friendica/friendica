@@ -22,6 +22,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -825,6 +826,8 @@ class Item
 			$item['private'] = self::PRIVATE;
 		}
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		if ($notify && $post_local) {
 			$item['edit']   = false;
 			$item['parent'] = $parent_id;
@@ -843,7 +846,9 @@ class Item
 				$dummy_session = false;
 			}
 
-			Hook::callAll('post_local', $item);
+			$item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $item)
+			)->getArray();
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
@@ -943,7 +948,9 @@ class Item
 		}
 
 		if (empty($item['event-id'])) {
-			unset($item['event-id']);
+			if (array_key_exists('event-id', $item)) {
+				unset($item['event-id']);
+			}
 
 			$ev = Event::fromBBCode($item['body']);
 			if ((!empty($ev['desc']) || !empty($ev['summary'])) && !empty($ev['start'])) {
@@ -2694,9 +2701,6 @@ class Item
 	 * @return bool
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
-	 * @hook  'post_local_end'
-	 *            array $arr
-	 *            'post_id' => ID of posted item
 	 */
 	public static function performActivity(int $item_id, string $verb, int $uid, string $allow_cid = null, string $allow_gid = null, string $deny_cid = null, string $deny_gid = null): bool
 	{

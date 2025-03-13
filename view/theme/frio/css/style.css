@@ -629,6 +629,14 @@ nav.navbar .nav > li > button:focus {
 	text-align: center;
 	z-index: 1;
 }
+/* Workaround for Safari bug where the notification icon jumps on the next line */
+#topbar-first .topbar-nav .nav > li + li {
+	margin-left: 1px;
+}
+#topbar-first .topbar-nav .nav > li + li > a {
+	margin-left: -1px;
+}
+/* End workaround */
 #topbar-first .topbar-nav .nav-segment {
 	position: relative;
 	text-align: left;

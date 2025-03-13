@@ -155,6 +155,46 @@ class Contact
 	}
 
 	/**
+	 * Fetch data from the "account-user-view" for a given contact id. Creates missing data if needed.
+	 * @param int   $id     Contact id
+	 * @param array $fields selected fields
+	 * @return array|bool
+	 */
+	public static function selectAccountUserById(int $id, array $fields = [])
+	{
+		$data = self::selectFirstAccountUser($fields, ['id' => $id]);
+		if (!empty($data) || !self::createPublicContactFromUserContact($id)) {
+			return $data;
+		}
+
+		return self::selectFirstAccountUser($fields, ['id' => $id]);
+	}
+
+	/**
+	 * Add missing public contact for a given user contact.
+	 * @param int $cid ID of the user contact
+	 * @return bool true if the public user had been created
+	 */
+	public static function createPublicContactFromUserContact(int $cid): bool
+	{
+		$fields = [
+			'created', 'updated', 'network', 'name', 'nick', 'location', 'about', 'keywords', 'xmpp',
+			'matrix', 'avatar', 'blurhash', 'header', 'url', 'nurl', 'uri-id', 'addr', 'alias', 'pubkey',
+			'batch', 'notify', 'poll', 'subscribe', 'last-update', 'next-update', 'success_update',
+			'failure_update', 'failed', 'term-date', 'last-item', 'last-discovery', 'local-data',
+			'readonly', 'contact-type', 'manually-approve', 'archive', 'unsearchable', 'sensitive',
+			'baseurl', 'gsid', 'bd', 'photo', 'thumb', 'micro', 'name-date', 'uri-date', 'avatar-date',
+			'request', 'confirm', 'poco', 'writable', 'forum', 'prv', 'bdyear'
+		];
+		$contact = self::selectFirst($fields, ['id' => $cid]);
+		if (empty($contact)) {
+			return false;
+		}
+		$contact['uid'] = 0;
+		return (bool)self::insert($contact);
+	}
+
+	/**
 	 * Insert a row into the contact table
 	 * Important: You can't use DBA::lastInsertId() after this call since it will be set to 0.
 	 *

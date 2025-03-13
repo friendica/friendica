@@ -170,6 +170,7 @@ This is called the Backward Compatibility Promise.
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
 
 - Classes, interfaces, traits, enums, functions, methods, properties and constants marked as `@internal` or `@private`
+- Extending or modifying any non-abstract class or method in any way
 - Extending or modifying a `final` class or method in any way
 - Calling `private` methods (via Reflection)
 - Accessing `private` properties (via Reflection)

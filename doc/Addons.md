@@ -661,7 +661,7 @@ Called when a custom storage is used (e.g. webdav_storage)
 
 Hook data:
 - **name** (input): the name of the used storage backend
-- **data['storage']** (output): the storage instance to use (**must** implement `\Friendica\Core\Storage\IWritableStorage`) 
+- **data['storage']** (output): the storage instance to use (**must** implement `\Friendica\Core\Storage\IWritableStorage`)
 
 ### storage_config
 
@@ -876,7 +876,7 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
 ### src/Content/ContactBlock.php
 
-    Hook::callAll('contact_block_end', $arr);
+    Hook::callAll('contact_block_end', $text);
 
 ### src/Content/Text/BBCode.php
 

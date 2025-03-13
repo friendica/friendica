@@ -405,7 +405,7 @@ class User
 	 */
 	public static function getIdForContactId(int $cid): int
 	{
-		$account = Contact::selectFirstAccountUser(['pid', 'self', 'uid'], ['id' => $cid]);
+		$account = Contact::selectAccountUserById($cid, ['pid', 'self', 'uid']);
 		if (empty($account['pid'])) {
 			return 0;
 		}

@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1579
+-- DB_UPDATE_VERSION 1580
 -- ------------------------------------------
 
 
@@ -1441,6 +1441,9 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	`publisher-url` varbinary(383) COMMENT 'URL of the publisher of the media',
 	`publisher-name` varchar(255) COMMENT 'Name of the publisher of the media',
 	`publisher-image` varbinary(383) COMMENT 'Image of the publisher of the media',
+	`language` char(3) COMMENT 'Language information about this media in the ISO 639 format',
+	`published` datetime COMMENT 'Publification date of this media',
+	`modified` datetime COMMENT 'Modification date of this media',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-id-url` (`uri-id`,`url`(512)),
 	 INDEX `uri-id-id` (`uri-id`,`id`),

@@ -363,7 +363,7 @@ class Processor
 			return [];
 		}
 
-		$account          = Contact::selectFirstAccountUser(['pid'], ['id' => $contact['id']]);
+		$account          = Contact::selectAccountUserById($contact['id'], ['pid']);
 		$item['owner-id'] = $item['author-id'] = $account['pid'];
 		$item['uri-id']   = ItemURI::getIdByURI($item['uri']);
 
@@ -424,7 +424,7 @@ class Processor
 			return [];
 		}
 
-		$account = Contact::selectFirstAccountUser(['pid'], ['id' => $contact['id']]);
+		$account = Contact::selectAccountUserById($contact['id'], ['pid']);
 
 		$item['owner-id'] = $item['author-id'] = $account['pid'];
 		$item['uri-id']   = ItemURI::getIdByURI($uri);

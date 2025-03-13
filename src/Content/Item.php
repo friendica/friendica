@@ -12,7 +12,6 @@ use Friendica\AppHelper;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -20,6 +19,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
@@ -43,6 +43,7 @@ use Friendica\Util\Proxy;
 use Friendica\Util\XML;
 use GuzzleHttp\Psr7\Uri;
 use ImagickException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A content helper class for displaying items
@@ -69,19 +70,21 @@ class Item
 	private $emailer;
 	/** @var AppHelper */
 	private $appHelper;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, BaseURL $baseURL, Emailer $emailer, AppHelper $appHelper)
+	public function __construct(Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, BaseURL $baseURL, Emailer $emailer, AppHelper $appHelper, EventDispatcherInterface $eventDispatcher)
 	{
-		$this->profiler     = $profiler;
-		$this->activity     = $activity;
-		$this->l10n         = $l10n;
-		$this->userSession  = $userSession;
-		$this->bbCodeVideo  = $bbCodeVideo;
-		$this->aclFormatter = $aclFormatter;
-		$this->baseURL      = $baseURL;
-		$this->pConfig      = $pConfig;
-		$this->emailer      = $emailer;
-		$this->appHelper    = $appHelper;
+		$this->profiler        = $profiler;
+		$this->activity        = $activity;
+		$this->l10n            = $l10n;
+		$this->userSession     = $userSession;
+		$this->bbCodeVideo     = $bbCodeVideo;
+		$this->aclFormatter    = $aclFormatter;
+		$this->baseURL         = $baseURL;
+		$this->pConfig         = $pConfig;
+		$this->emailer         = $emailer;
+		$this->appHelper       = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -445,7 +448,9 @@ class Item
 
 		$args = ['item' => $item, 'menu' => $menu];
 
-		Hook::callAll('item_photo_menu', $args);
+		$args = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ITEM_PHOTO_MENU, $args),
+		)->getArray();
 
 		$menu = $args['menu'];
 
@@ -1006,7 +1011,9 @@ class Item
 			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id']);
 		}
 
-		Hook::callAll('post_local_end', $post);
+		$post = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+		)->getArray();
 
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);
 

@@ -83,6 +83,8 @@ return [
 
 ## Addons
 
+> ⚠️ Since Friendica 2025.02 the strategy hooks for addons are deprecated, please use PHP hooks instead.
+
 The hook logic is useful for decoupling the Friendica core logic, but its primary goal is to modularize Friendica in creating addons.
 
 Therefor you can either use the interfaces directly as shown above, or you can place your own `hooks.config.php` file inside a `static` directory directly under your addon core directory.

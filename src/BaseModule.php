@@ -512,7 +512,7 @@ abstract class BaseModule implements ICanHandleRequests
 	 * @throws HTTPException\InternalServerErrorException
 	 * @see json_encode()
 	 */
-	public function jsonExit($content, string $content_type = 'application/json', int $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+	public function jsonExit($content, string $content_type = 'application/json; charset=utf-8', int $options = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
 	{
 		$this->httpExit(json_encode($content, $options), ICanCreateResponses::TYPE_JSON, $content_type);
 	}

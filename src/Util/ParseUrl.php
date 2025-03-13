@@ -296,6 +296,17 @@ class ParseUrl
 
 		$xpath = new DOMXPath($doc);
 
+		$list = $xpath->query('//html[@lang]');
+		foreach ($list as $node) {
+			if ($node->attributes->length) {
+				foreach ($node->attributes as $attribute) {
+					if ($attribute->name == 'lang') {
+						$siteinfo['language'] = $attribute->value;
+					}
+				}
+			}
+		}
+
 		$list = $xpath->query('//meta[@content]');
 		foreach ($list as $node) {
 			$meta_tag = [];
@@ -493,6 +504,10 @@ class ParseUrl
 			if ($pos > self::MIN_DESC_COUNT) {
 				$siteinfo['text'] = mb_substr($siteinfo['text'], 0, $pos + 1);
 			}
+		}
+
+		if (!empty($siteinfo['language'])) {
+			$siteinfo['language'] = explode('_', str_replace('-', '_', $siteinfo['language']))[0];
 		}
 
 		DI::logger()->info('Siteinfo fetched', ['url' => $url, 'siteinfo' => $siteinfo]);

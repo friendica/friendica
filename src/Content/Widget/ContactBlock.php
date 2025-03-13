@@ -8,11 +8,11 @@
 namespace Friendica\Content\Widget;
 
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 
@@ -26,7 +26,6 @@ class ContactBlock
 	/**
 	 * Get HTML for contact block
 	 *
-	 * @hook contact_block_end (contacts=>array, output=>string)
 	 * @return string Formatted HTML code or empty string
 	 */
 	public static function getHTML(array $profile, int $visitor_uid = null): string
@@ -93,7 +92,7 @@ class ContactBlock
 
 				if (DBA::isResult($contacts_stmt)) {
 					$contacts_title = DI::l10n()->tt('%d Contact', '%d Contacts', $total);
-					$micropro = [];
+					$micropro       = [];
 
 					while ($contact = DBA::fetch($contacts_stmt)) {
 						$contacts[] = $contact;
@@ -106,16 +105,18 @@ class ContactBlock
 		}
 
 		$tpl = Renderer::getMarkupTemplate('widget/contacts.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$contacts' => $contacts_title,
-			'$nickname' => $profile['nickname'],
+		$o   = Renderer::replaceMacros($tpl, [
+			'$contacts'     => $contacts_title,
+			'$nickname'     => $profile['nickname'],
 			'$viewcontacts' => DI::l10n()->t('View Contacts'),
-			'$micropro' => $micropro,
+			'$micropro'     => $micropro,
 		]);
 
-		$arr = ['contacts' => $contacts, 'output' => $o];
+		$eventDispatcher = DI::eventDispatcher();
 
-		Hook::callAll('contact_block_end', $arr);
+		$o = $eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::CONTACT_BLOCK_END, $o),
+		)->getHtml();
 
 		return $o;
 	}

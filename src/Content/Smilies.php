@@ -8,8 +8,8 @@
 namespace Friendica\Content;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Util\Strings;
 
 /**
@@ -93,48 +93,53 @@ class Smilies
 
 		];
 
-		$baseUrl = (string)DI::baseUrl();
+		$baseUrl = (string) DI::baseUrl();
 
 		$icons = [
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-heart.gif" alt="&lt;3" title="&lt;3" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-brokenheart.gif" alt="&lt;/3" title="&lt;/3" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-brokenheart.gif" alt="&lt;\\3" title="&lt;\\3" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-smile.gif" alt=":-)" title=":-)" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-wink.gif" alt=";-)" title=";-)" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-frown.gif" alt=":-(" title=":-(" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-tongue-out.gif" alt=":-P" title=":-P" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-tongue-out.gif" alt=":-p" title=":-P" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-\" title=":-\" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-\" title=":-\" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-x" title=":-x" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-X" title=":-X" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-laughing.gif" alt=":-D" title=":-D"  />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt="8-|" title="8-|" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt="8-O" title="8-O" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt=":-O" title="8-O" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-thumbsup.gif" alt="\\o/" title="\\o/" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="o.O" title="o.O" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="O.o" title="O.o" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="o_O" title="o_O" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="O_o" title="O_o" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-cry.gif" alt=":\'(" title=":\'("/>',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-foot-in-mouth.gif" alt=":-!" title=":-!" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-undecided.gif" alt=":-/" title=":-/" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-embarrassed.gif" alt=":-[" title=":-[" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-cool.gif" alt="8-)" title="8-)" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/beer_mug.gif" alt=":beer" title=":beer" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/beer_mug.gif" alt=":homebrew" title=":homebrew" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/coffee.gif" alt=":coffee" title=":coffee" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/smiley-facepalm.gif" alt=":facepalm" title=":facepalm" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/like.gif" alt=":like" title=":like" />',
-		'<img class="smiley" src="' . $baseUrl . '/images/dislike.gif" alt=":dislike" title=":dislike" />',
-		'<a href="https://friendi.ca">~friendica <img class="smiley" width="16" height="16" src="' . $baseUrl . '/images/friendica.svg" alt="~friendica" title="~friendica" /></a>',
-		'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#" title="red#" />matrix</a>',
-		'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>'
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-heart.gif" alt="&lt;3" title="&lt;3" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-brokenheart.gif" alt="&lt;/3" title="&lt;/3" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-brokenheart.gif" alt="&lt;\\3" title="&lt;\\3" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-smile.gif" alt=":-)" title=":-)" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-wink.gif" alt=";-)" title=";-)" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-frown.gif" alt=":-(" title=":-(" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-tongue-out.gif" alt=":-P" title=":-P" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-tongue-out.gif" alt=":-p" title=":-P" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-\" title=":-\" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-\" title=":-\" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-x" title=":-x" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-kiss.gif" alt=":-X" title=":-X" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-laughing.gif" alt=":-D" title=":-D"  />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt="8-|" title="8-|" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt="8-O" title="8-O" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-surprised.gif" alt=":-O" title="8-O" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-thumbsup.gif" alt="\\o/" title="\\o/" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="o.O" title="o.O" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="O.o" title="O.o" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="o_O" title="o_O" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-Oo.gif" alt="O_o" title="O_o" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-cry.gif" alt=":\'(" title=":\'("/>',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-foot-in-mouth.gif" alt=":-!" title=":-!" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-undecided.gif" alt=":-/" title=":-/" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-embarrassed.gif" alt=":-[" title=":-[" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-cool.gif" alt="8-)" title="8-)" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/beer_mug.gif" alt=":beer" title=":beer" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/beer_mug.gif" alt=":homebrew" title=":homebrew" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/coffee.gif" alt=":coffee" title=":coffee" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/smiley-facepalm.gif" alt=":facepalm" title=":facepalm" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/like.gif" alt=":like" title=":like" />',
+			'<img class="smiley" src="' . $baseUrl . '/images/dislike.gif" alt=":dislike" title=":dislike" />',
+			'<a href="https://friendi.ca">~friendica <img class="smiley" width="16" height="16" src="' . $baseUrl . '/images/friendica.svg" alt="~friendica" title="~friendica" /></a>',
+			'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#" title="red#" />matrix</a>',
+			'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>'
 		];
 
+		$eventDispatcher = DI::eventDispatcher();
+
 		$params = ['texts' => $texts, 'icons' => $icons];
-		Hook::callAll('smilie', $params);
+
+		$params = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::SMILEY_LIST, $params),
+		)->getArray();
 
 		return $params;
 	}
@@ -155,12 +160,12 @@ class Smilies
 				if (strpos($text, '[nosmile]') !== false || self::noSmilies()) {
 					return $text;
 				}
-				$smilies = self::getList();
+				$smilies    = self::getList();
 				$normalized = [];
 				return self::performForEachWordMatch(
 					array_combine($smilies['texts'], $smilies['icons']),
 					$text,
-					function (string $name, string $image) use($normalized, &$emojis) {
+					function (string $name, string $image) use ($normalized, &$emojis) {
 						if (array_key_exists($name, $normalized)) {
 							return $normalized[$name];
 						}
@@ -176,9 +181,9 @@ class Smilies
 									$norm = 'smiley' . count($normalized);
 								}
 							}
-							$shortcode = ':' . $norm . ':';
+							$shortcode         = ':' . $norm . ':';
 							$normalized[$name] = $shortcode;
-							$emojis[$norm] = $url;
+							$emojis[$norm]     = $url;
 							return $shortcode;
 						} else {
 							$normalized[$name] = $image;
@@ -205,7 +210,7 @@ class Smilies
 	{
 		$ord1_bitset = 0;
 		$ord2_bitset = 0;
-		$prefixes = [];
+		$prefixes    = [];
 		foreach ($words as $word => $_) {
 			if (strlen($word) < 2) {
 				continue;
@@ -225,7 +230,7 @@ class Smilies
 		}
 
 		$slength = strlen($subject);
-		$result = '';
+		$result  = '';
 		// $processed is used to delay string concatenation since appending a char every loop is inefficient.
 		$processed = 0;
 		// Find possible starting points for smilies.
@@ -311,7 +316,8 @@ class Smilies
 		return $s;
 	}
 
-	private static function noSmilies(): bool {
+	private static function noSmilies(): bool
+	{
 		return (intval(DI::config()->get('system', 'no_smilies')) ||
 				(DI::userSession()->getLocalUserId() &&
 				 intval(DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'no_smilies'))));
@@ -339,7 +345,7 @@ class Smilies
 
 		if ($no_images) {
 			$cleaned = ['texts' => [], 'icons' => []];
-			$icons = $smilies['icons'];
+			$icons   = $smilies['icons'];
 			foreach ($icons as $key => $icon) {
 				if (!strstr($icon, '<img ')) {
 					$cleaned['texts'][] = $smilies['texts'][$key];

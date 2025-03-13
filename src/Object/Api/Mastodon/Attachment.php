@@ -27,6 +27,8 @@ class Attachment extends BaseDataTransferObject
 	/** @var string */
 	protected $remote_url;
 	/** @var string */
+	protected $preview_remote_url;
+	/** @var string */
 	protected $text_url;
 	/** @var string */
 	protected $description;
@@ -52,7 +54,6 @@ class Attachment extends BaseDataTransferObject
 		$this->url         = $url;
 		$this->preview_url = $preview;
 		$this->remote_url  = $remote;
-		$this->text_url    = $this->remote_url ?? $this->url;
 		$this->description = $attachment['description'];
 		$this->blurhash    = $attachment['blurhash'];
 		if ($type === 'image') {

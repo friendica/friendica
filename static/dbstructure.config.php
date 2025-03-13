@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1579);
+	define('DB_UPDATE_VERSION', 1580);
 }
 
 return [
@@ -1447,6 +1447,9 @@ return [
 			"publisher-url" => ["type" => "varbinary(383)", "comment" => "URL of the publisher of the media"],
 			"publisher-name" => ["type" => "varchar(255)", "comment" => "Name of the publisher of the media"],
 			"publisher-image" => ["type" => "varbinary(383)", "comment" => "Image of the publisher of the media"],
+			"language" => ["type" => "char(3)", "comment" => "Language information about this media in the ISO 639 format"],
+			"published" => ["type" => "datetime", "comment" => "Publification date of this media"],
+			"modified" => ["type" => "datetime", "comment" => "Modification date of this media"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],

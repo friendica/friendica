@@ -12,11 +12,11 @@ use Friendica\App\BaseURL;
 use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Contact\Introduction\Repository\Introduction;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\Event;
 use Friendica\Model\Notification;
 use Friendica\Model\User;
 use Friendica\Module\Response;
@@ -25,6 +25,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Security\Authentication;
 use Friendica\Util;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,18 +47,20 @@ class Delegation extends BaseModule
 	private $intro;
 	/** @var AppHelper */
 	private $appHelper;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(AppHelper $appHelper, Introduction $intro, Notify $notify, SystemMessages $systemMessages, Authentication $auth, Database $db, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Util\Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(EventDispatcherInterface $eventDispatcher, AppHelper $appHelper, Introduction $intro, Notify $notify, SystemMessages $systemMessages, Authentication $auth, Database $db, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Util\Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session        = $session;
-		$this->db             = $db;
-		$this->auth           = $auth;
-		$this->systemMessages = $systemMessages;
-		$this->notify         = $notify;
-		$this->intro          = $intro;
-		$this->appHelper      = $appHelper;
+		$this->session         = $session;
+		$this->db              = $db;
+		$this->auth            = $auth;
+		$this->systemMessages  = $systemMessages;
+		$this->notify          = $notify;
+		$this->intro           = $intro;
+		$this->appHelper       = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -128,8 +131,9 @@ class Delegation extends BaseModule
 			$this->session->setSubManagedUserId($original_id);
 		}
 
-		$ret = [];
-		Hook::callAll('home_init', $ret);
+		$this->eventDispatcher->dispatch(
+			new Event(Event::HOME_INIT)
+		);
 
 		$this->systemMessages->addNotice($this->t('You are now logged in as %s', $user['username']));
 

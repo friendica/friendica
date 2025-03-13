@@ -335,7 +335,7 @@ class Feed
 
 	private static function getTitleFromItemOrEntry(array $item, DOMXPath $xpath, string $atomns, ?DOMNode $entry): string
 	{
-		$title = (string) $item['title'];
+		$title = (string) ($item['title'] ?? '');
 
 		if (empty($title)) {
 			$title = XML::getFirstNodeValue($xpath, $atomns . ':title/text()', $entry);
@@ -1040,34 +1040,44 @@ class Feed
 		$authorid   = Contact::getIdForURL($owner['url']);
 
 		$condition = [
-			"`uid` = ? AND `received` > ? AND NOT `deleted` AND `gravity` IN (?, ?)
-			AND `private` != ? AND `visible` AND `wall` AND `parent-network` IN (?, ?, ?)",
+			"`uid` = ? AND `received` > ? AND NOT `deleted`
+			AND ((`gravity` IN (?, ?) AND `wall`) OR (`gravity` = ? AND `verb` = ?))
+			AND `origin` AND `private` != ? AND `visible` AND `parent-network` IN (?, ?, ?)
+			AND `author-id` = ?",
 			$owner['uid'], $check_date, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT,
-			Item::PRIVATE, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA
+			Item::GRAVITY_ACTIVITY, Activity::ANNOUNCE,
+			Item::PRIVATE, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA,
+			$authorid
 		];
 
 		if ($filter === 'comments') {
-			$condition[0] .= " AND `gravity` = ? ";
-			$condition[] = Item::GRAVITY_COMMENT;
-		}
-
-		if ($owner['account-type'] != User::ACCOUNT_TYPE_COMMUNITY) {
-			$condition[0] .= " AND `contact-id` = ? AND `author-id` = ?";
-			$condition[] = $owner['id'];
-			$condition[] = $authorid;
+			$condition = DBA::mergeConditions($condition, ['gravity' => Item::GRAVITY_COMMENT]);
+		} elseif ($filter === 'posts') {
+			$condition = DBA::mergeConditions($condition, ['gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_ACTIVITY]]);
 		}
 
 		$params = ['order' => ['received' => true], 'limit' => $max_items];
 
-		if ($filter === 'posts') {
-			$ret = Post::selectOriginThread(Item::DELIVER_FIELDLIST, $condition, $params);
-		} else {
-			$ret = Post::selectOrigin(Item::DELIVER_FIELDLIST, $condition, $params);
-		}
+		$ret = Post::selectOrigin(Item::DELIVER_FIELDLIST, $condition, $params);
 
 		$items = Post::toArray($ret);
 
-		$doc               = new DOMDocument('1.0', 'utf-8');
+		$reshares = [];
+		foreach ($items as $index => $item) {
+			if ($item['verb'] == Activity::ANNOUNCE) {
+				$reshares[$item['thr-parent-id']] = $index;
+			}
+		}
+
+		if (!empty($reshares)) {
+			$posts = Post::selectToArray(Item::DELIVER_FIELDLIST, ['uri-id' => array_keys($reshares), 'uid' => $owner['uid']]);
+			foreach ($posts as $post) {
+				$items[$reshares[$post['uri-id']]] = $post;
+			}
+		}
+
+		$doc = new DOMDocument('1.0', 'utf-8');
+
 		$doc->formatOutput = true;
 
 		$root = self::addHeader($doc, $owner, $filter);

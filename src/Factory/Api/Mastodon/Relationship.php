@@ -38,7 +38,8 @@ class Relationship extends BaseFactory
 			$pcid,
 			$contact,
 			Contact\User::isBlocked($cid, $uid),
-			Contact\User::isIgnored($cid, $uid)
+			Contact\User::isIgnored($cid, $uid),
+			Contact\User::isIsBlocked($cid, $uid),
 		);
 	}
 }

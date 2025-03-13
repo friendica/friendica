@@ -42,4 +42,13 @@ class Tag extends BaseDataTransferObject
 		$this->history   = $history;
 		$this->following = $following;
 	}
+
+	public function toArray(): array
+	{
+		if (empty($this->history)) {
+			unset($this->history);
+		}
+
+		return parent::toArray();
+	}
 }

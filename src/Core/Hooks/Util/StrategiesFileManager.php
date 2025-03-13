@@ -21,8 +21,8 @@ class StrategiesFileManager
 	 * -> it's an empty string to cover empty/missing config values
 	 */
 	const STRATEGY_DEFAULT_KEY = '';
-	const STATIC_DIR  = 'static';
-	const CONFIG_NAME = 'strategies';
+	const STATIC_DIR           = 'static';
+	const CONFIG_NAME          = 'strategies';
 
 	/** @var ICanLoadAddons */
 	protected $addonLoader;
@@ -81,6 +81,9 @@ class StrategiesFileManager
 			throw new HookConfigException(sprintf('Error loading config file %s.', $configFile));
 		}
 
+		/**
+		 * @deprecated 2025.02 Providing strategies via addons is deprecated and will be removed in 5 months.
+		 */
 		$this->config = array_merge_recursive($config, $this->addonLoader->getActiveAddonConfig(static::CONFIG_NAME));
 	}
 }

@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Protocol\ActivityPub;
 
 use Friendica\Core\Hook;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\DI;
 use Friendica\Model\Post;
 use Friendica\Protocol\ActivityPub\Transmitter;
@@ -21,11 +22,18 @@ class TransmitterTest extends FixtureTestCase
 
 		DI::config()->set('system', 'no_smilies', false);
 
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+
 		Hook::register('smilie', 'tests/Util/SmileyWhitespaceAddon.php', 'add_test_unicode_smilies');
 		Hook::loadHooks();
 	}
 
-	public function testEmojiPost()
+	public function testEmojiPost(): void
 	{
 		$post = Post::selectFirst([], ['id' => 14]);
 		$this->assertNotNull($post);

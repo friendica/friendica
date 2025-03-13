@@ -46,15 +46,19 @@ class Relationship extends BaseDataTransferObject
 	protected $blocking = false;
 	/** @var bool */
 	protected $domain_blocking = false;
+	/** @var bool */
+	protected $blocked_by = false;
+	/**
+	 * Unsupported
+	 * @var array
+	 */
+	protected $languages = [];
 	/**
 	 * Unsupported
 	 * @var bool
 	 */
-	protected $blocked_by = false;
-	/**
-	 * Unsupported
-	 * @var string
-	 */
+	protected $requested_by = false;
+	/** @var string */
 	protected $note = '';
 
 	/**
@@ -63,7 +67,7 @@ class Relationship extends BaseDataTransferObject
 	 * @param bool  $blocked "true" if user is blocked
 	 * @param bool  $muted "true" if user is muted
 	 */
-	public function __construct(int $contactId, array $contactRecord, bool $blocked = false, bool $muted = false)
+	public function __construct(int $contactId, array $contactRecord, bool $blocked = false, bool $muted = false, bool $isBlocked = false)
 	{
 		$this->id                   = (string)$contactId;
 		$this->following            = false;
@@ -86,6 +90,7 @@ class Relationship extends BaseDataTransferObject
 			$this->muting      = (bool)($contactRecord['readonly'] ?? false) || $muted;
 			$this->notifying   = (bool)$contactRecord['notify_new_posts'] ?? false;
 			$this->blocking    = (bool)($contactRecord['blocked'] ?? false) || $blocked;
+			$this->blocked_by  = $isBlocked;
 			$this->note        = $contactRecord['info'];
 		}
 
