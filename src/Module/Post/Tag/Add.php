@@ -8,11 +8,11 @@
 namespace Friendica\Module\Post\Tag;
 
 use Friendica\App;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -22,6 +22,7 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\Delivery;
 use Friendica\Util\Profiler;
 use Friendica\Util\XML;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -31,12 +32,14 @@ class Add extends \Friendica\BaseModule
 {
 	/** @var IHandleUserSessions */
 	private $session;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(IHandleUserSessions $session, EventDispatcherInterface $eventDispatcher, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session = $session;
+		$this->session         = $session;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -149,7 +152,10 @@ EOT;
 		Tag::store($item['uri-id'], Tag::HASHTAG, $term);
 
 		$post['id'] = $post_id;
-		Hook::callAll('post_local_end', $post);
+
+		$post = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+		)->getArray();
 
 		$post = Post::selectFirst(['uri-id', 'uid'], ['id' => $post_id]);
 

@@ -906,15 +906,15 @@ class Processor
 			if ($id) {
 				$shared_item          = Post::selectFirst(['uri-id'], ['id' => $id]);
 				$item['quote-uri-id'] = $shared_item['uri-id'];
-				DI::logger()->debug('Quote is found', ['guid' => $item['guid'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+				DI::logger()->debug('Quote is found', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
 			} elseif ($uri_id = ItemURI::getIdByURI($activity['quote-url'], false)) {
-				DI::logger()->info('Quote was not fetched but the uri-id existed', ['guid' => $item['guid'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
+				DI::logger()->info('Quote was not fetched but the uri-id existed', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $uri_id]);
 				$item['quote-uri-id'] = $uri_id;
 			} elseif (Queue::exists($activity['quote-url'], 'as:Create')) {
 				$item['quote-uri-id'] = ItemURI::getIdByURI($activity['quote-url']);
-				DI::logger()->info('Quote is queued but not processed yet', ['guid' => $item['guid'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
+				DI::logger()->info('Quote is queued but not processed yet', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url'], 'quote-uri-id' => $item['quote-uri-id']]);
 			} else {
-				DI::logger()->notice('Quote was not fetched', ['guid' => $item['guid'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
+				DI::logger()->notice('Quote was not fetched', ['uri' => $item['uri'], 'uri-id' => $item['uri-id'], 'quote' => $activity['quote-url']]);
 			}
 		}
 

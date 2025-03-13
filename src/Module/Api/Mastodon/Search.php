@@ -50,6 +50,10 @@ class Search extends BaseApi
 
 		$limit = min($request['limit'], 40);
 
+		if (Network::isValidHttpUrl($request['q']) && ($request['offset'] == 0)) {
+			$this->searchLinks($uid, $request['q'], $request['type']);
+		}
+
 		$result = ['accounts' => [], 'statuses' => [], 'hashtags' => []];
 
 		if (empty($request['type']) || ($request['type'] == 'accounts')) {
@@ -80,6 +84,43 @@ class Search extends BaseApi
 	}
 
 	/**
+	 * Search for links (either accounts or statuses). Return an empty result otherwise
+	 *
+	 * @param integer $uid  User id
+	 * @param string  $q    Search term (HTTP link)
+	 * @param string  $type Search type (or empty if not provided)
+	 */
+	private function searchLinks(int $uid, string $q, string $type)
+	{
+		$result = ['accounts' => [], 'statuses' => [], 'hashtags' => []];
+
+		$data = ['uri-id' => -1, 'type' => Post\Media::UNKNOWN, 'url' => $q];
+		$data = Post\Media::fetchAdditionalData($data);
+
+		if ((empty($type) || ($type == 'statuses')) && in_array($data['type'], [Post\Media::HTML, Post\Media::ACTIVITY, Post\Media::UNKNOWN])) {
+			$q = Network::convertToIdn($q);
+			// If the user-specific search failed, we search and probe a public post
+			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
+			if ($item_id && $item = Post::selectFirst(['uri-id'], ['id' => $item_id])) {
+				$result['statuses'] = [DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes())];
+				$this->jsonExit($result);
+			}
+		}
+
+		if ((empty($type) || ($type == 'accounts')) && in_array($data['type'], [Post\Media::HTML, Post\Media::ACCOUNT, Post\Media::UNKNOWN])) {
+			$id = Contact::getIdForURL($q, 0, false);
+			if ($id) {
+				$result['accounts'] = [DI::mstdnAccount()->createFromContactId($id, $uid)];
+				$this->jsonExit($result);
+			}
+		}
+
+		if (in_array($data['type'], [Post\Media::HTML, Post\Media::TEXT, Post\Media::ACCOUNT, Post\Media::ACTIVITY, Post\Media::UNKNOWN])) {
+			$this->jsonExit($result);
+		}
+	}
+
+	/**
 	 * @param int    $uid
 	 * @param string $q
 	 * @param bool   $resolve
@@ -93,9 +134,7 @@ class Search extends BaseApi
 	 */
 	private function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
 	{
-		if (($offset == 0) && (strrpos($q, '@') > 0 || Network::isValidHttpUrl($q))
-			&& $id = Contact::getIdForURL($q, 0, $resolve ? null : false)
-		) {
+		if (($offset == 0) && (strrpos($q, '@') > 0) && $id = Contact::getIdForURL($q, 0, $resolve ? null : false)) {
 			return DI::mstdnAccount()->createFromContactId($id, $uid);
 		}
 
@@ -122,19 +161,6 @@ class Search extends BaseApi
 	 */
 	private function searchStatuses(int $uid, string $q, string $account_id, int $max_id, int $min_id, int $limit, int $offset)
 	{
-		if (Network::isValidHttpUrl($q)) {
-			// Unique post search, any offset greater than 0 should return empty result
-			if ($offset > 0) {
-				return [];
-			}
-			$q = Network::convertToIdn($q);
-			// If the user-specific search failed, we search and probe a public post
-			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
-			if ($item_id && $item = Post::selectFirst(['uri-id'], ['id' => $item_id])) {
-				return DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes());
-			}
-		}
-
 		$params = ['order' => ['uri-id' => true], 'limit' => [$offset, $limit]];
 
 		if (substr($q, 0, 1) == '#') {

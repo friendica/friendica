@@ -798,32 +798,54 @@ class Transmitter
 		}
 
 		if (!empty($item['quote-uri-id']) && in_array($item['private'], [Item::PUBLIC, Item::UNLISTED])) {
-			$quoted  = Post::selectFirst(['author-link'], ['uri-id' => $item['quote-uri-id']]);
-			$profile = APContact::getByURL($quoted['author-link'], false);
-			if (!empty($profile)) {
-				$data['cc'][] = $profile['url'];
+			$quoted = Post::selectFirst(['author-link'], ['uri-id' => $item['quote-uri-id']]);
+			if (!empty($quoted['author-link'])) {
+				$profile = APContact::getByURL($quoted['author-link'], false);
+				if (!empty($profile)) {
+					$data['cc'][] = $profile['url'];
+				}
 			}
 		}
 
+		$data = self::filterReceiverData($data, $item['author-link']);
+
+		$receivers = ['to' => array_values($data['to']), 'cc' => array_values($data['cc']), 'bto' => array_values($data['bto']), 'bcc' => array_values($data['bcc']), 'audience' => array_values($data['audience'])];
+
+		if (!$blindcopy) {
+			unset($receivers['bto']);
+			unset($receivers['bcc']);
+		}
+
+		if (!$blindcopy && count($receivers['audience']) == 1) {
+			$receivers['audience'] = $receivers['audience'][0];
+		} elseif (!$receivers['audience']) {
+			unset($receivers['audience']);
+		}
+
+		return $receivers;
+	}
+
+	private static function filterReceiverData(array $data, string $author_link): array
+	{
 		$data['to']       = array_unique($data['to']);
 		$data['cc']       = array_unique($data['cc']);
 		$data['bto']      = array_unique($data['bto']);
 		$data['bcc']      = array_unique($data['bcc']);
 		$data['audience'] = array_unique($data['audience']);
 
-		if (($key = array_search($item['author-link'], $data['to'])) !== false) {
+		if (($key = array_search($author_link, $data['to'])) !== false) {
 			unset($data['to'][$key]);
 		}
 
-		if (($key = array_search($item['author-link'], $data['cc'])) !== false) {
+		if (($key = array_search($author_link, $data['cc'])) !== false) {
 			unset($data['cc'][$key]);
 		}
 
-		if (($key = array_search($item['author-link'], $data['bto'])) !== false) {
+		if (($key = array_search($author_link, $data['bto'])) !== false) {
 			unset($data['bto'][$key]);
 		}
 
-		if (($key = array_search($item['author-link'], $data['bcc'])) !== false) {
+		if (($key = array_search($author_link, $data['bcc'])) !== false) {
 			unset($data['bcc'][$key]);
 		}
 
@@ -857,20 +879,7 @@ class Transmitter
 			}
 		}
 
-		$receivers = ['to' => array_values($data['to']), 'cc' => array_values($data['cc']), 'bto' => array_values($data['bto']), 'bcc' => array_values($data['bcc']), 'audience' => array_values($data['audience'])];
-
-		if (!$blindcopy) {
-			unset($receivers['bto']);
-			unset($receivers['bcc']);
-		}
-
-		if (!$blindcopy && count($receivers['audience']) == 1) {
-			$receivers['audience'] = $receivers['audience'][0];
-		} elseif (!$receivers['audience']) {
-			unset($receivers['audience']);
-		}
-
-		return $receivers;
+		return $data;
 	}
 
 	/**

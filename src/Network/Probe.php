@@ -147,7 +147,7 @@ class Probe
 					$newdata['baseurl'] = $data['networks'][$network]['baseurl'];
 				}
 				if (!empty($newdata['baseurl'])) {
-					$newdata['gsid'] = $data['networks'][$network]['gsid'] = GServer::getID($newdata['baseurl']);
+					$newdata['gsid'] = $data['networks'][$network]['gsid'] = GServer::getRealID($newdata['baseurl']);
 				} else {
 					$newdata['gsid'] = $data['networks'][$network]['gsid'] = null;
 				}
@@ -436,7 +436,7 @@ class Probe
 		}
 
 		if (!empty($data['baseurl']) && empty($data['gsid'])) {
-			$data['gsid'] = GServer::getID($data['baseurl']);
+			$data['gsid'] = GServer::getRealID($data['baseurl']);
 		}
 
 		// Ensure that local connections always are DFRN
@@ -2164,7 +2164,7 @@ class Probe
 			$split_name = Diaspora::splitName($owner['name']);
 
 			if (empty($owner['gsid'])) {
-				$owner['gsid'] = GServer::getID($approfile['generator']['url']);
+				$owner['gsid'] = GServer::getRealID($approfile['generator']['url']);
 			}
 
 			$data = [

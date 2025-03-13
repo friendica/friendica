@@ -11,6 +11,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Event\Event;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
@@ -32,13 +33,13 @@ class Home extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$basePath = DI::appHelper()->getBasePath();
-		$config = DI::config();
+		$basePath        = DI::appHelper()->getBasePath();
+		$config          = DI::config();
+		$eventDispatcher = DI::eventDispatcher();
 
-		// currently no returned data is used
-		$ret = [];
-
-		Hook::callAll('home_init', $ret);
+		$eventDispatcher->dispatch(
+			new Event(Event::HOME_INIT)
+		);
 
 		if (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserNickname())) {
 			DI::baseUrl()->redirect('network');
@@ -48,11 +49,11 @@ class Home extends BaseModule
 			DI::baseUrl()->redirect('/profile/' . $config->get('system', 'singleuser'));
 		}
 
-		$customHome = '';
+		$customHome    = '';
 		$defaultHeader = ($config->get('config', 'sitename') ? DI::l10n()->t('Welcome to %s', $config->get('config', 'sitename')) : '');
 
 		$homeFilePath = $basePath . '/home.html';
-		$cssFilePath = $basePath . '/home.css';
+		$cssFilePath  = $basePath . '/home.css';
 
 		if (file_exists($homeFilePath)) {
 			$customHome = $homeFilePath;

@@ -11,11 +11,9 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\App\Page;
-use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Core\ACL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
@@ -23,6 +21,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -42,6 +42,7 @@ use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use ImagickException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Conversation
@@ -75,8 +76,6 @@ class Conversation
 	private $baseURL;
 	/** @var IManageConfigValues */
 	private $config;
-	/** @var AppHelper */
-	private $appHelper;
 	/** @var Page */
 	private $page;
 	/** @var Mode */
@@ -85,23 +84,24 @@ class Conversation
 	private $session;
 	/** @var UserGServerRepository */
 	private $userGServer;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, AppHelper $appHelper, IHandleUserSessions $session)
+	public function __construct(UserGServerRepository $userGServer, LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, Item $item, Arguments $args, BaseURL $baseURL, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, Mode $mode, EventDispatcherInterface $eventDispatcher, IHandleUserSessions $session)
 	{
-		$this->activity    = $activity;
-		$this->item        = $item;
-		$this->config      = $config;
-		$this->mode        = $mode;
-		$this->baseURL     = $baseURL;
-		$this->profiler    = $profiler;
-		$this->logger      = $logger;
-		$this->l10n        = $l10n;
-		$this->args        = $args;
-		$this->pConfig     = $pConfig;
-		$this->page        = $page;
-		$this->appHelper   = $appHelper;
-		$this->session     = $session;
-		$this->userGServer = $userGServer;
+		$this->activity        = $activity;
+		$this->item            = $item;
+		$this->config          = $config;
+		$this->mode            = $mode;
+		$this->baseURL         = $baseURL;
+		$this->profiler        = $profiler;
+		$this->logger          = $logger;
+		$this->l10n            = $l10n;
+		$this->args            = $args;
+		$this->pConfig         = $pConfig;
+		$this->page            = $page;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->session         = $session;
+		$this->userGServer     = $userGServer;
 	}
 
 	/**
@@ -332,8 +332,9 @@ class Conversation
 			'$is_mobile' => $this->mode->isMobile(),
 		]);
 
-		$jotplugins = '';
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		if ($this->config->get('system', 'set_creation_date')) {
 			$created_at = Temporal::getDateTimeField(
@@ -563,7 +564,10 @@ class Conversation
 		}
 
 		$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => $preview];
-		Hook::callAll('conversation_start', $cb);
+
+		$cb = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
+		)->getArray();
 
 		$items = $cb['items'];
 
@@ -653,10 +657,6 @@ class Conversation
 				if (!$this->item->isVisibleActivity($item)) {
 					continue;
 				}
-
-				/// @todo Check if this call is needed or not
-				$arr = ['item' => $item];
-				Hook::callAll('display_item', $arr);
 
 				$item['pagedrop'] = $pagedrop;
 
@@ -1471,7 +1471,11 @@ class Conversation
 			}
 
 			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			Hook::callAll('render_location', $locate);
+
+			$locate = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
+			)->getArray();
+
 			$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
 
 			$this->item->localize($item);
@@ -1567,7 +1571,10 @@ class Conversation
 			];
 
 			$arr = ['item' => $item, 'output' => $tmp_item];
-			Hook::callAll('display_item', $arr);
+
+			$arr = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
+			)->getArray();
 
 			$threads[] = [
 				'id'      => $item['id'],

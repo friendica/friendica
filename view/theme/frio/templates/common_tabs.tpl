@@ -4,7 +4,7 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-	<div class="tabbar-wrapper" role="menubar" >
+<nav class="tabbar-wrapper" role="menubar">
 	{{* Tab navigation bar for tablets and computer *}}
 	<ul class="tabbar list-inline visible-lg visible-md visible-sm hidden-xs">
 		{{* The normal tabbar *}}
@@ -12,22 +12,22 @@
 			<ul class="tabs flex-nav">
 				{{foreach $tabs as $tab}}
 					<li id="{{$tab.id}}" {{if $tab.sel}} class="{{$tab.sel}}" {{/if}}>
-						<a role="menuitem" class="tabbar-wrapper__link" href="{{$tab.url}}" {{if $tab.accesskey}}accesskey="{{$tab.accesskey}}" {{/if}}
-							{{if $tab.title}} title="{{$tab.title}}" {{/if}}>
-							{{$tab.label}}
-						</a>
-					</li>
+						<a role="menuitem" class="tabbar-wrapper__link" href="{{$tab.url}}"
+							{{if $tab.accesskey}}accesskey="{{$tab.accesskey}}" {{/if}} {{if $tab.title}}
+						title="{{$tab.title}}" {{/if}}>
+						{{$tab.label}}
+					</a>
+				</li>
 				{{/foreach}}
 			</ul>
 		</li>
 
 		{{* The extended dropdown menu - this would be shown if the tab menu points
-			doesn't fit in the available space. This is done through flexMenu.js *}}
+		  doesn't fit in the available space. This is done through flexMenu.js *}}
 		<li class="pull-right">
 			<ul class="tabs tabs-extended" role="menu">
 				<li class="dropdown flex-target">
-					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools" data-toggle="dropdown"
-						aria-expanded="false" title="{{$more}}">
+					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools" data-toggle="dropdown" aria-expanded="false" title="{{$more}}">
 						<i class="fa fa-chevron-down" aria-hidden="true"></i>
 					</button>
 				</li>
@@ -58,8 +58,7 @@
 		<li>
 			<ul class="tabs tabs-extended">
 				<li class="dropdown">
-					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools-xs"
-						data-toggle="dropdown" aria-expanded="false" title="{{$more}}">
+					<button type="button" class="btn-link dropdown-toggle" id="dropdownMenuTools-xs" data-toggle="dropdown" aria-expanded="false" title="{{$more}}">
 						<i class="fa fa-chevron-down" aria-hidden="true"></i>
 					</button>
 					<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenuTools">
@@ -75,4 +74,4 @@
 			</ul>
 		</li>
 	</ul>
-</div>
+</nav>

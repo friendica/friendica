@@ -103,13 +103,7 @@ class Display extends BaseSettings
 		$show_page_drop          = (bool)$request['show_page_drop'];
 		$display_eventlist       = (bool)$request['display_eventlist'];
 		$preview_mode            = (int)$request['preview_mode'];
-		$browser_update          = (int)$request['browser_update'];
-		if ($browser_update != -1) {
-			$browser_update = $browser_update * 1000;
-			if ($browser_update < 10000) {
-				$browser_update = 10000;
-			}
-		}
+		$update_content          = (int)$request['update_content'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -144,7 +138,7 @@ class Display extends BaseSettings
 
 		$this->pConfig->set($uid, 'system', 'itemspage_network', $itemspage_network);
 		$this->pConfig->set($uid, 'system', 'itemspage_mobile_network', $itemspage_mobile_network);
-		$this->pConfig->set($uid, 'system', 'update_interval', $browser_update);
+		$this->pConfig->set($uid, 'system', 'update_content', $update_content);
 		$this->pConfig->set($uid, 'system', 'no_smilies', !$enable_smile);
 		$this->pConfig->set($uid, 'system', 'infinite_scroll', $infinite_scroll);
 		$this->pConfig->set($uid, 'system', 'no_smart_threading', !$enable_smart_threading);
@@ -238,11 +232,7 @@ class Display extends BaseSettings
 		$itemspage_mobile_network = intval($this->pConfig->get($uid, 'system', 'itemspage_mobile_network'));
 		$itemspage_mobile_network = (($itemspage_mobile_network > 0 && $itemspage_mobile_network < 101) ? $itemspage_mobile_network : $this->config->get('system', 'itemspage_network_mobile'));
 
-		$browser_update = intval($this->pConfig->get($uid, 'system', 'update_interval'));
-		if ($browser_update != -1) {
-			$browser_update = (($browser_update == 0) ? 40 : $browser_update / 1000); // default if not set: 40 seconds
-		}
-
+		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
 		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
@@ -332,7 +322,7 @@ class Display extends BaseSettings
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
-			'$ajaxint'                  => ['browser_update', $this->t('Update browser every xx seconds'), $browser_update, $this->t('Minimum of 10 seconds. Enter -1 to disable it.')],
+			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
 			'$enable_smile'             => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],

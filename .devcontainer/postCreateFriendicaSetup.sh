@@ -7,7 +7,7 @@ echo ">>> Friendica Setup"
 
 FRIENDICA_PHP_PATH=$(which php)
 export FRIENDICA_PHP_PATH
-  
+
 envsubst < $workspaceFolder/.devcontainer/include/autoinstall.config.php > /tmp/autoinstall.config.php
 cp $workspaceFolder/.devcontainer/include/00apcu.config.php $workspaceFolder/config/00apcu.config.php
 cp $workspaceFolder/.devcontainer/include/01redis.config.php $workspaceFolder/config/01redis.config.php
@@ -19,7 +19,7 @@ cd $DocumentRoot
 # copy the .htaccess-dist file to .htaccess so that rewrite rules work
 cp $DocumentRoot/.htaccess-dist $DocumentRoot/.htaccess
 
-bin/composer.phar --no-dev install
+bin/composer.phar install
 
 # install friendica
 bin/console autoinstall -f /tmp/autoinstall.config.php

@@ -64,6 +64,8 @@ class Status extends BaseDataTransferObject
 	protected $pinned = false;
 	/** @var string */
 	protected $content;
+	/** @var array */
+	protected $filtered = [];
 	/** @var Status|null */
 	protected $reblog = null;
 	/** @var Status|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
@@ -95,10 +97,10 @@ class Status extends BaseDataTransferObject
 	 */
 	public function __construct(array $item, Account $account, Counts $counts, UserAttributes $userAttributes, bool $sensitive, Application $application, array $mentions, array $tags, Card $card, array $attachments, array $in_reply, array $reblog, FriendicaExtension $friendica, array $quote = null, array $poll = null, array $emojis = null)
 	{
-		$reblogged          = !empty($reblog);
-		$this->id           = (string)$item['uri-id'];
-		$this->created_at   = DateTimeFormat::utc($item['created'], DateTimeFormat::JSON);
-		$this->edited_at    = DateTimeFormat::utc($item['edited'], DateTimeFormat::JSON);
+		$reblogged        = !empty($reblog);
+		$this->id         = (string)$item['uri-id'];
+		$this->created_at = DateTimeFormat::utc($item['created'], DateTimeFormat::JSON);
+		$this->edited_at  = DateTimeFormat::utc($item['edited'], DateTimeFormat::JSON);
 
 		if ($item['gravity'] == Item::GRAVITY_COMMENT) {
 			$this->in_reply_to_id         = (string)$item['thr-parent-id'];
@@ -109,7 +111,7 @@ class Status extends BaseDataTransferObject
 		$this->sensitive    = $sensitive;
 		$this->spoiler_text = $item['title'] ?: $item['content-warning'] ?: '';
 
-		$visibility = ['public', 'private', 'unlisted'];
+		$visibility       = ['public', 'private', 'unlisted'];
 		$this->visibility = $visibility[$item['private']];
 
 		$languages = json_decode($item['language'] ?? '', true);
@@ -120,28 +122,28 @@ class Status extends BaseDataTransferObject
 			$this->language = null;
 		}
 
-		$this->uri = $item['uri'];
-		$this->url = $item['plink'] ?? null;
-		$this->replies_count = $reblogged ? 0 : $counts->replies;
-		$this->reblogs_count = $reblogged ? 0 : $counts->reblogs;
-		$this->favourites_count = $reblogged ? 0 : $counts->favourites;
-		$this->favourited = $userAttributes->favourited;
-		$this->reblogged = $userAttributes->reblogged;
-		$this->muted = $userAttributes->muted;
-		$this->bookmarked = $userAttributes->bookmarked;
-		$this->pinned = $userAttributes->pinned;
-		$this->content = $reblogged ? '' : BBCode::convertForUriId($item['uri-id'], BBCode::setMentionsToNicknames($item['raw-body'] ?? $item['body']), BBCode::MASTODON_API);
-		$this->reblog = $reblog;
-		$this->quote = $quote;
-		$this->application = $application->toArray();
-		$this->account = $account->toArray();
+		$this->uri               = $item['uri'];
+		$this->url               = $item['plink'] ?? null;
+		$this->replies_count     = $reblogged ? 0 : $counts->replies;
+		$this->reblogs_count     = $reblogged ? 0 : $counts->reblogs;
+		$this->favourites_count  = $reblogged ? 0 : $counts->favourites;
+		$this->favourited        = $userAttributes->favourited;
+		$this->reblogged         = $userAttributes->reblogged;
+		$this->muted             = $userAttributes->muted;
+		$this->bookmarked        = $userAttributes->bookmarked;
+		$this->pinned            = $userAttributes->pinned;
+		$this->content           = $reblogged ? '' : BBCode::convertForUriId($item['uri-id'], BBCode::setMentionsToNicknames($item['raw-body'] ?? $item['body']), BBCode::MASTODON_API);
+		$this->reblog            = $reblog;
+		$this->quote             = $quote;
+		$this->application       = $application->toArray();
+		$this->account           = $account->toArray();
 		$this->media_attachments = $reblogged ? [] : $attachments;
-		$this->mentions = $reblogged ? [] : $mentions;
-		$this->tags = $reblogged ? [] : $tags;
-		$this->emojis = $reblogged ? [] : ($emojis ?: []);
-		$this->card = $reblogged ? null : ($card->toArray() ?: null);
-		$this->poll = $reblogged ? null : $poll;
-		$this->friendica = $reblogged ? null : $friendica;
+		$this->mentions          = $reblogged ? [] : $mentions;
+		$this->tags              = $reblogged ? [] : $tags;
+		$this->emojis            = $reblogged ? [] : ($emojis ?: []);
+		$this->card              = $reblogged ? null : ($card->toArray() ?: null);
+		$this->poll              = $reblogged ? null : $poll;
+		$this->friendica         = $reblogged ? null : $friendica;
 	}
 
 	/**

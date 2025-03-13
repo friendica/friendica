@@ -13,11 +13,11 @@ use DOMXPath;
 use Exception;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
@@ -53,7 +53,7 @@ class OEmbed
 
 		$cache_key = 'oembed:' . $appHelper->getThemeInfoValue('videowidth') . ':' . $embedurl;
 
-		$condition = ['url' => Strings::normaliseLink($embedurl), 'maxwidth' => $appHelper->getThemeInfoValue('videowidth')];
+		$condition     = ['url' => Strings::normaliseLink($embedurl), 'maxwidth' => $appHelper->getThemeInfoValue('videowidth')];
 		$oembed_record = DBA::selectFirst('oembed', ['content'], $condition);
 		if (DBA::isResult($oembed_record)) {
 			$json_string = $oembed_record['content'];
@@ -64,7 +64,7 @@ class OEmbed
 		// These media files should now be caught in bbcode.php
 		// left here as a fallback in case this is called from another source
 		$noexts = ['mp3', 'mp4', 'ogg', 'ogv', 'oga', 'ogm', 'webm'];
-		$ext = pathinfo(strtolower($embedurl), PATHINFO_EXTENSION);
+		$ext    = pathinfo(strtolower($embedurl), PATHINFO_EXTENSION);
 
 		$oembed = new \Friendica\Object\OEmbed($embedurl);
 
@@ -81,15 +81,17 @@ class OEmbed
 					if (@$dom->loadHTML($html_text)) {
 						$xpath = new DOMXPath($dom);
 						foreach (
-							$xpath->query("//link[@type='application/json+oembed'] | //link[@type='text/json+oembed']")
-							as $link)
-						{
+							$xpath->query("//link[@type='application/json+oembed'] | //link[@type='text/json+oembed']") as $link
+						) {
 							/** @var DOMElement $link */
 							$href = $link->getAttributeNode('href')->nodeValue;
 							// Both Youtube and Vimeo output OEmbed endpoint URL with HTTP
 							// but their OEmbed endpoint is only accessible by HTTPS ¯\_(ツ)_/¯
-							$href = str_replace(['http://www.youtube.com/', 'http://player.vimeo.com/'],
-								['https://www.youtube.com/', 'https://player.vimeo.com/'], $href);
+							$href = str_replace(
+								['http://www.youtube.com/', 'http://player.vimeo.com/'],
+								['https://www.youtube.com/', 'https://player.vimeo.com/'],
+								$href
+							);
 							$result = DI::httpClient()->get($href . '&maxwidth=' . $appHelper->getThemeInfoValue('videowidth'), HttpClientAccept::DEFAULT, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
 							if ($result->isSuccess()) {
 								$json_string = $result->getBodyString();
@@ -110,10 +112,10 @@ class OEmbed
 
 			if (!empty($oembed->type) && $oembed->type != 'error') {
 				DBA::insert('oembed', [
-					'url' => Strings::normaliseLink($embedurl),
+					'url'      => Strings::normaliseLink($embedurl),
 					'maxwidth' => $appHelper->getThemeInfoValue('videowidth'),
-					'content' => $json_string,
-					'created' => DateTimeFormat::utcNow()
+					'content'  => $json_string,
+					'created'  => DateTimeFormat::utcNow()
 				], Database::INSERT_UPDATE);
 				$cache_ttl = Duration::DAY;
 			} else {
@@ -141,8 +143,8 @@ class OEmbed
 
 			if ($oembed->type == 'photo') {
 				if (!empty($data['images'])) {
-					$oembed->url = $data['images'][0]['src'];
-					$oembed->width = $data['images'][0]['width'];
+					$oembed->url    = $data['images'][0]['src'];
+					$oembed->width  = $data['images'][0]['width'];
 					$oembed->height = $data['images'][0]['height'];
 				} else {
 					$oembed->type = 'link';
@@ -175,14 +177,23 @@ class OEmbed
 		}
 
 		if (!empty($data['images']) && ($oembed->type != 'photo')) {
-			$oembed->thumbnail_url = $data['images'][0]['src'];
-			$oembed->thumbnail_width = $data['images'][0]['width'];
+			$oembed->thumbnail_url    = $data['images'][0]['src'];
+			$oembed->thumbnail_width  = $data['images'][0]['width'];
 			$oembed->thumbnail_height = $data['images'][0]['height'];
 		}
 
-		Hook::callAll('oembed_fetch_url', $embedurl);
+		$eventDispatcher = DI::eventDispatcher();
 
-		return $oembed;
+		$oembed_data = [
+			'url'  => $embedurl,
+			'data' => $oembed,
+		];
+
+		$oembed_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, $oembed_data),
+		)->getArray();
+
+		return $oembed_data['data'];
 	}
 
 	/**
@@ -204,15 +215,15 @@ class OEmbed
 					// make sure we don't attempt divide by zero, fallback is a 1:1 ratio
 					$tr = (($th) ? $tw / $th : 1);
 
-					$th = 120;
-					$tw = $th * $tr;
+					$th  = 120;
+					$tw  = $th * $tr;
 					$tpl = Renderer::getMarkupTemplate('oembed_video.tpl');
 					$ret .= Renderer::replaceMacros($tpl, [
-						'$embedurl' => $oembed->embed_url,
+						'$embedurl'    => $oembed->embed_url,
 						'$escapedhtml' => base64_encode($oembed->html),
-						'$tw' => $tw,
-						'$th' => $th,
-						'$turl' => BBCode::proxyUrl($oembed->thumbnail_url, BBCode::INTERNAL, $uriid, Proxy::SIZE_SMALL),
+						'$tw'          => $tw,
+						'$th'          => $th,
+						'$turl'        => BBCode::proxyUrl($oembed->thumbnail_url, BBCode::INTERNAL, $uriid, Proxy::SIZE_SMALL),
 					]);
 				} else {
 					$ret .= Proxy::proxifyHtml($oembed->html, $uriid);
@@ -274,12 +285,11 @@ class OEmbed
 				}
 			}
 		} elseif (!strpos($oembed->html, $oembed->embed_url)) {
-			// add <a> for html2bbcode conversion
+			// add <a> for html to bbcode conversion
 			$ret .= '<a href="' . $oembed->embed_url . '" rel="oembed">' . $oembed->title . '</a>';
 		}
 
 		$ret .= '</div>';
-$test = Proxy::proxifyHtml($ret, $uriid);
 
 		return str_replace("\n", "", $ret);
 	}

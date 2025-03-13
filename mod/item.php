@@ -18,12 +18,12 @@
 
 use Friendica\Content\Conversation;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -43,7 +43,11 @@ function item_post()
 		item_drop($uid, $_REQUEST['dropitems']);
 	}
 
-	Hook::callAll('post_local_start', $_REQUEST);
+	$eventDispatcher = DI::eventDispatcher();
+
+	$_REQUEST = $eventDispatcher->dispatch(
+		new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_START, $_REQUEST)
+	)->getArray();
 
 	$return_path = $_REQUEST['return'] ?? '';
 	$preview     = intval($_REQUEST['preview'] ?? 0);
@@ -275,7 +279,11 @@ function item_process(array $post, array $request, bool $preview, string $return
 		System::jsonExit(['preview' => $o]);
 	}
 
-	Hook::callAll('post_local', $post);
+	$eventDispatcher = DI::eventDispatcher();
+
+	$post = $eventDispatcher->dispatch(
+		new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $post)
+	)->getArray();
 
 	unset($post['edit']);
 	unset($post['self']);

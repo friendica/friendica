@@ -15,10 +15,10 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\User;
@@ -27,6 +27,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Crypto;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -44,18 +45,22 @@ class Edit extends BaseModule
 	protected $mode;
 	/** @var AppHelper */
 	protected $appHelper;
+
+	private EventDispatcherInterface $eventDispatcher;
+
 	/** @var bool */
 	protected $isModal = false;
 
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, Page $page, Mode $mode, AppHelper $appHelper, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, Page $page, Mode $mode, AppHelper $appHelper, EventDispatcherInterface $eventDispatcher, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session     = $session;
-		$this->sysMessages = $sysMessages;
-		$this->page        = $page;
-		$this->mode        = $mode;
-		$this->appHelper   = $appHelper;
+		$this->session         = $session;
+		$this->sysMessages     = $sysMessages;
+		$this->page            = $page;
+		$this->mode            = $mode;
+		$this->appHelper       = $appHelper;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 
@@ -107,11 +112,11 @@ class Edit extends BaseModule
 		}
 
 		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item         = Post\Media::addHTMLAttachmentToItem($item);
 
-		$jotplugins = '';
-
-		Hook::callAll('jot_tool', $jotplugins);
+		$jotplugins = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
+		)->getHtml();
 
 		$output .= Renderer::replaceMacros(Renderer::getMarkupTemplate('jot.tpl'), [
 			'$is_edit'             => true,

@@ -15,10 +15,10 @@ use Friendica\Content\Item;
 use Friendica\Content\OEmbed;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Smilies;
-use Friendica\Core\Hook;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Post;
@@ -1297,7 +1297,15 @@ class BBCode
 
 		DI::profiler()->startRecording('rendering');
 
-		Hook::callAll('bbcode', $text);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$text_data = ['bbcode2html' => $text];
+
+		$text_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_HTML_START, $text_data),
+		)->getArray();
+
+		$text = $text_data['bbcode2html'] ?? $text;
 
 		$ev = Event::fromBBCode($text);
 
@@ -2375,9 +2383,18 @@ class BBCode
 			);
 		}
 
-		Hook::callAll('bb2diaspora', $text);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$text_data = ['bbcode2markdown' => $text];
+
+		$text_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, $text_data),
+		)->getArray();
+
+		$text = $text_data['bbcode2markdown'] ?? $text;
 
 		DI::profiler()->stopRecording();
+
 		return $text;
 	}
 

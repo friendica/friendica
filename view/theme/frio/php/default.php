@@ -30,7 +30,7 @@ $view_mode_class     = (DI::mode()->isMobile() || DI::mode()->isMobile()) ? 'mob
 $is_singleuser       = DI::config()->get('system', 'singleuser');
 $is_singleuser_class = $is_singleuser ? "is-singleuser" : "is-not-singleuser";
 ?>
-<html>
+<html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 	<head>
 		<title><?php if (!empty($page['title'])) {
 			echo $page['title'];

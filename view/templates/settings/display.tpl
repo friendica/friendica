@@ -18,8 +18,8 @@
 	{{/if}}
 
 	{{include file="field_input.tpl" field=$itemspage_mobile_network}}
-	{{include file="field_input.tpl" field=$ajaxint}}
 	{{include file="field_checkbox.tpl" field=$enable_smile}}
+	{{include file="field_checkbox.tpl" field=$update_content}}
 	{{include file="field_checkbox.tpl" field=$infinite_scroll}}
 	{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
 	{{include file="field_checkbox.tpl" field=$enable_dislike}}

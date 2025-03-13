@@ -131,6 +131,32 @@ class GServer
 		return self::getID($url, true);
 	}
 
+
+	/**
+	 * Get the real ID for the given server URL, follows redirects.
+	 *
+	 * @param string $url
+	 * @param boolean $no_check Don't check if the server hadn't been found
+	 *
+	 * @return int|null gserver id or NULL on empty URL or failed check
+	 */
+	public static function getRealID(string $url, bool $no_check = false): ?int
+	{
+		$gsid = self::getID($url, $no_check);
+		if (empty($gsid)) {
+			return $gsid;
+		}
+
+		$gserver = DBA::selectFirst('gserver', ['redirect-gsid'], ['id' => $gsid]);
+		if (!empty($gserver['redirect-gsid'])) {
+			$redirect = DBA::selectFirst('gserver', ['failed'], ['id' => $gserver['redirect-gsid']]);
+			if (isset($redirect['failed']) && !$redirect['failed']) {
+				return $gserver['redirect-gsid'];
+			}
+		}
+		return $gsid;
+	}
+
 	/**
 	 * Retrieves all the servers which base domain are matching the provided domain pattern
 	 *
@@ -569,8 +595,13 @@ class GServer
 			(((parse_url($url, PHP_URL_HOST) != parse_url($valid_url, PHP_URL_HOST)) || (parse_url($url, PHP_URL_PATH) != parse_url($valid_url, PHP_URL_PATH))) && empty(parse_url($valid_url, PHP_URL_PATH)))) {
 				DI::logger()->debug('Found redirect. Mark old entry as failure', ['old' => $url, 'new' => $valid_url]);
 				self::setFailureByUrl($url);
-				if (!self::getID($valid_url, true) && !Network::isUrlBlocked($valid_url)) {
+				$target_id = self::getID($valid_url, true);
+				if (!$target_id && !Network::isUrlBlocked($valid_url)) {
 					self::detect($valid_url, $network, $only_nodeinfo);
+					$target_id = self::getID($valid_url, true);
+				}
+				if ($target_id) {
+					self::update(['redirect-gsid' => $target_id], ['nurl' => Strings::normaliseLink($url)]);
 				}
 				return false;
 			}
@@ -817,6 +848,25 @@ class GServer
 		}
 
 		// Count the number of known contacts from this server
+		self::countNumberOfKnownContacts((int) $id, $serverdata);
+
+		if (in_array($serverdata['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
+			self::discoverRelay($url);
+		}
+
+		if (!empty($systemactor)) {
+			$contact = Contact::getByURL($systemactor, true, ['gsid', 'baseurl', 'id', 'network', 'url', 'name']);
+			DI::logger()->debug('Fetched system actor', ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Count the number of known contacts from this server
+	 */
+	private static function countNumberOfKnownContacts(int $id, array $serverdata): void
+	{
 		if (!empty($id) && !in_array($serverdata['network'], [Protocol::PHANTOM, Protocol::FEED])) {
 			$apcontacts = DBA::count('apcontact', ['gsid' => $id]);
 			$contacts   = DBA::count('contact', ['uid' => 0, 'gsid' => $id, 'failed' => false]);
@@ -842,17 +892,6 @@ class GServer
 				}
 			}
 		}
-
-		if (in_array($serverdata['network'], [Protocol::DFRN, Protocol::DIASPORA])) {
-			self::discoverRelay($url);
-		}
-
-		if (!empty($systemactor)) {
-			$contact = Contact::getByURL($systemactor, true, ['gsid', 'baseurl', 'id', 'network', 'url', 'name']);
-			DI::logger()->debug('Fetched system actor', ['url' => $url, 'gsid' => $id, 'contact' => $contact]);
-		}
-
-		return $ret;
 	}
 
 	/**

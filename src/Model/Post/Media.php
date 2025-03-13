@@ -362,6 +362,13 @@ class Media
 		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
 
+		if (!empty($item['language'])) {
+			$media['language'] = array_key_first(json_decode($item['language'], true));
+		}
+
+		$media['published'] = $item['created'];
+		$media['modified']  = $item['changed'];
+
 		DI::logger()->debug('Activity detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
 		return $media;
 	}
@@ -403,6 +410,9 @@ class Media
 		$media['publisher-url']   = $gserver['url']       ?? null;
 		$media['publisher-name']  = $gserver['site_name'] ?? null;
 		$media['publisher-image'] = null;
+		$media['language']        = null;
+		$media['published']       = $contact['created'];
+		$media['modified']        = $contact['updated'];
 
 		DI::logger()->debug('Account detected', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'uri' => $contact['url']]);
 		return $media;
@@ -439,6 +449,9 @@ class Media
 		$media['publisher-url']   = $data['publisher_url']  ?? null;
 		$media['publisher-name']  = $data['publisher_name'] ?? null;
 		$media['publisher-image'] = $data['publisher_img']  ?? null;
+		$media['language']        = $data['language']       ?? null;
+		$media['published']       = $data['published']      ?? null;
+		$media['modified']        = $data['modified']       ?? null;
 
 		return $media;
 	}

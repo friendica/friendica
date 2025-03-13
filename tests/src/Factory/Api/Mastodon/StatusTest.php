@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Factory\Api\Mastodon;
 
 use Friendica\Core\Hook;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\DI;
 use Friendica\Model\Post;
 use Friendica\Test\FixtureTestCase;
@@ -21,13 +22,21 @@ class StatusTest extends FixtureTestCase
 		parent::setUp();
 
 		DI::config()->set('system', 'no_smilies', false);
+
 		$this->status = DI::mstdnStatus();
+
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
 
 		Hook::register('smilie', 'tests/Util/SmileyWhitespaceAddon.php', 'add_test_unicode_smilies');
 		Hook::loadHooks();
 	}
 
-	public function testSimpleStatus()
+	public function testSimpleStatus(): void
 	{
 		$post = Post::selectFirst([], ['id' => 13]);
 		$this->assertNotNull($post);
@@ -35,7 +44,7 @@ class StatusTest extends FixtureTestCase
 		$this->assertNotNull($result);
 	}
 
-	public function testSimpleEmojiStatus()
+	public function testSimpleEmojiStatus(): void
 	{
 		$post = Post::selectFirst([], ['id' => 14]);
 		$this->assertNotNull($post);

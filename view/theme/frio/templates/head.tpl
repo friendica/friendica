@@ -112,7 +112,7 @@
 	<script type="text/javascript" src="view/asset/dompurify/dist/purify.min.js?v={{$VERSION}}">
 	</script>
 	<script type="text/javascript">
-		const updateInterval = {{$update_interval}};
+		const updateContent = {{$update_content}};
 		const localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
 	</script>
 	<script type="text/javascript" src="view/js/main.js?v={{$VERSION}}"></script>

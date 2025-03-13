@@ -142,7 +142,7 @@ class Actor
 
 			if (!empty($fields['baseurl'])) {
 				GServer::check($fields['baseurl'], Protocol::BLUESKY);
-				$fields['gsid'] = GServer::getID($fields['baseurl'], true);
+				$fields['gsid'] = GServer::getRealID($fields['baseurl'], true);
 			}
 
 			foreach ($directory->verificationMethod as $method) {

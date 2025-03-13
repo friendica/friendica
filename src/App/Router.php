@@ -19,6 +19,7 @@ use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\CollectRoutesEvent;
 use Friendica\LegacyModule;
 use Friendica\Module\HTTPException\MethodNotAllowed;
 use Friendica\Module\HTTPException\PageNotFound;
@@ -28,6 +29,7 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Router\FriendicaGroupCountBased;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -84,6 +86,8 @@ class Router
 	/** @var LoggerInterface */
 	private $logger;
 
+	private EventDispatcherInterface $eventDispatcher;
+
 	private AddonHelper $addonHelper;
 
 	/** @var bool */
@@ -110,7 +114,7 @@ class Router
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, AddonHelper $addonHelper, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
+	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, AddonHelper $addonHelper, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
 	{
 		$this->baseRoutesFilepath = $baseRoutesFilepath;
 		$this->l10n               = $l10n;
@@ -120,6 +124,7 @@ class Router
 		$this->config             = $config;
 		$this->server             = $server;
 		$this->logger             = $logger;
+		$this->eventDispatcher    = $eventDispatcher;
 		$this->addonHelper        = $addonHelper;
 		$this->isLocalUser        = !empty($userSession->getLocalUserId());
 
@@ -148,10 +153,12 @@ class Router
 
 		$this->addRoutes($routeCollector, $routes);
 
-		$this->routeCollector = $routeCollector;
-
 		// Add routes from addons
-		Hook::callAll('route_collection', $this->routeCollector);
+		$routeCollector = $this->eventDispatcher->dispatch(
+			new CollectRoutesEvent(CollectRoutesEvent::COLLECT_ROUTES, $routeCollector),
+		)->getRouteCollector();
+
+		$this->routeCollector = $routeCollector;
 
 		return $this;
 	}

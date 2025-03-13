@@ -45,7 +45,7 @@ Indexes
 ------------
 
 | Name                  | Fields                  |
-|-----------------------| ----------------------- |
+| --------------------- | ----------------------- |
 | PRIMARY               | id                      |
 | uid_uri-id            | UNIQUE, uid, uri-id     |
 | uri-id_origin_deleted | uri-id, origin, deleted |

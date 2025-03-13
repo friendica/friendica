@@ -87,7 +87,7 @@ Clone the addon repository (separately):
 
 Install the dependencies:
 
-    bin/composer.phar install --no-dev
+    bin/composer.phar run install:prod
 
 Make sure the folder *view/smarty3* exists and is writable by the webserver user, in this case *www-data*
 
@@ -98,7 +98,7 @@ Make sure the folder *view/smarty3* exists and is writable by the webserver user
 If you want to use the development version of Friendica you can switch to the develop branch in the repository by running
 
     git checkout develop
-    bin/composer.phar install
+    bin/composer.phar run install:prod
     cd addon
     git checkout develop
 

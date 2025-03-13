@@ -241,7 +241,7 @@ class User
 		$system['thumb']  = Contact::getDefaultAvatar($system, Proxy::SIZE_THUMB);
 		$system['micro']  = Contact::getDefaultAvatar($system, Proxy::SIZE_MICRO);
 		$system['nurl']   = Strings::normaliseLink($system['url']);
-		$system['gsid']   = GServer::getID($system['baseurl']);
+		$system['gsid']   = GServer::getRealID($system['baseurl']);
 
 		Contact::insert($system);
 	}
@@ -405,7 +405,7 @@ class User
 	 */
 	public static function getIdForContactId(int $cid): int
 	{
-		$account = Contact::selectFirstAccountUser(['pid', 'self', 'uid'], ['id' => $cid]);
+		$account = Contact::selectAccountUserById($cid, ['pid', 'self', 'uid']);
 		if (empty($account['pid'])) {
 			return 0;
 		}

@@ -602,7 +602,15 @@ class App
 
 			// Processes data from GET requests
 			$httpinput = $httpInput->process();
-			$input     = array_merge($httpinput['variables'], $httpinput['files'], $request);
+
+			if (!is_array($httpinput['variables'])) {
+				$httpinput['variables'] = [];
+			}
+			if (!is_array($httpinput['files'])) {
+				$httpinput['files'] = [];
+			}
+
+			$input = array_merge($httpinput['variables'], $httpinput['files'], $request);
 
 			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);

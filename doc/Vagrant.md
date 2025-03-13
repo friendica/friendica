@@ -18,7 +18,7 @@ What you need to do:
 Please use an up-to-date vagrant version from https://www.vagrantup.com/downloads.html.
 2. Git clone your Friendica repository.
 Inside, you'll find a `Vagrantfile` and some scripts in the `bin/dev` folder.
-Pull the PHP requirements with `bin/composer install`.
+Pull the PHP requirements with `bin/composer.phar install`.
 3. Run `vagrant up` from inside the friendica clone.
 This will start the virtual machine.
 Be patient: When it runs for the first time, it downloads a Debian Server image and installs Friendica.
@@ -60,7 +60,7 @@ Trouble Shooting
 If you see a version mis-match for the _VirtualBox Guest Additions_ between host and guest during the initial setup of the Vagrant VM, you will need to install an addon to Vagrant (ref. [Stack Overflow](https://stackoverflow.com/a/38010683)).
 Stop the Vagrant VM and run the following command:
 
-	$> vagrant plugin install vagrant-vbguest 
+	$> vagrant plugin install vagrant-vbguest
 
 On the next Vagrant up, the version problem should be fixed.
 

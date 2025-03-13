@@ -187,7 +187,7 @@ as the value of $top_child_total (this is done at the end of this file)
 
 			{{* contact info header for smartphones *}}
 			<div class="contact-info-xs hidden-lg hidden-md"><!-- <= For smartphone (responsive) -->
-				<h2 class="media-heading">
+				<h1 class="media-heading">
 					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card"><span>{{$item.name}}</span></a>
 					<p class="text-muted">
 						<small>
@@ -203,7 +203,9 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{/if}}
 							{{if $item.connector}}
 								<span aria-hidden="true">&bull;</span>
-								<i class="fa fa-plug" title="{{$item.connector}}"></i>
+								<span title="{{$item.connector}}">
+									<i class="fa fa-plug" aria-hidden="true"></i>
+								</span>
 							{{else}}
 								<span aria-hidden="true">&bull;</span>
 								<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
@@ -212,7 +214,7 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{/if}}
 						</small>
 					</p>
-				</h2>
+				</h1>
 			</div>
 		{{else}} {{* End of if $item.thread_level == 1 *}}
 			{{* contact info header for comments *}}
@@ -246,8 +248,10 @@ as the value of $top_child_total (this is done at the end of this file)
 						{{include file="sub/direction.tpl" direction=$item.direction}}
 					{{/if}}
 					{{if $item.connector}}
-						<span aria-hidden="true">&bull;</span>
-						<i class="fa fa-plug" title="{{$item.connector}}"></i>
+						<span title="{{$item.connector}}">
+							<span aria-hidden="true">&bull;</span>
+							<i class="fa fa-plug" aria-hidden="true"></i>
+						</span>
 					{{else}}
 						<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 							<span aria-hidden="true">&bull;</span>

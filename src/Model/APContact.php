@@ -162,6 +162,8 @@ class APContact
 			DI::cache()->set($cachekey, System::callstack(20), Duration::FIVE_MINUTES);
 		}
 
+		$local_owner = [];
+
 		if (DI::baseUrl()->isLocalUrl($url) && ($local_uid = User::getIdForURL($url))) {
 			try {
 				$data        = Transmitter::getProfile($local_uid);
@@ -205,6 +207,15 @@ class APContact
 			return $fetched_contact;
 		}
 
+		return self::compactProfile($apcontact, $compacted, $url, $fetched_contact, $webfinger, $local_owner);
+	}
+
+	/**
+	 * @param array|bool $fetched_contact
+	 * @param array|bool $local_owner
+	 */
+	private static function compactProfile(array $apcontact, array $compacted, string $url, $fetched_contact, bool $webfinger, $local_owner): array
+	{
 		$apcontact['url']       = $compacted['@id'];
 		$apcontact['uuid']      = JsonLD::fetchElement($compacted, 'diaspora:guid', '@value');
 		$apcontact['type']      = str_replace('as:', '', JsonLD::fetchElement($compacted, '@type'));
@@ -415,7 +426,7 @@ class APContact
 		}
 
 		if (!empty($apcontact['baseurl']) && empty($fetched_contact['gsid'])) {
-			$apcontact['gsid'] = GServer::getID($apcontact['baseurl']);
+			$apcontact['gsid'] = GServer::getRealID($apcontact['baseurl']);
 		} elseif (!empty($fetched_contact['gsid'])) {
 			$apcontact['gsid'] = $fetched_contact['gsid'];
 		} else {

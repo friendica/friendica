@@ -7,8 +7,8 @@
 
 namespace Friendica\Content;
 
-use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
@@ -90,7 +90,11 @@ class PageInfo
 	 */
 	public static function getFooterFromData(array $data, bool $no_photos = false): string
 	{
-		Hook::callAll('page_info_data', $data);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PAGE_INFO, $data),
+		)->getArray();
 
 		if (empty($data['type'])) {
 			return '';

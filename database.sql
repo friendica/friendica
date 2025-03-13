@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1577
+-- DB_UPDATE_VERSION 1580
 -- ------------------------------------------
 
 
@@ -41,10 +41,13 @@ CREATE TABLE IF NOT EXISTS `gserver` (
 	`blocked` boolean COMMENT 'Server is blocked',
 	`failed` boolean COMMENT 'Connection failed',
 	`next_contact` datetime DEFAULT '0001-01-01 00:00:00' COMMENT 'Next connection request',
+	`redirect-gsid` int unsigned COMMENT 'Target Gserver id in case of a redirect',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `nurl` (`nurl`(190)),
 	 INDEX `next_contact` (`next_contact`),
-	 INDEX `network` (`network`)
+	 INDEX `network` (`network`),
+	 INDEX `redirect-gsid` (`redirect-gsid`),
+	FOREIGN KEY (`redirect-gsid`) REFERENCES `gserver` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Global servers';
 
 --
@@ -1438,6 +1441,9 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	`publisher-url` varbinary(383) COMMENT 'URL of the publisher of the media',
 	`publisher-name` varchar(255) COMMENT 'Name of the publisher of the media',
 	`publisher-image` varbinary(383) COMMENT 'Image of the publisher of the media',
+	`language` char(3) COMMENT 'Language information about this media in the ISO 639 format',
+	`published` datetime COMMENT 'Publification date of this media',
+	`modified` datetime COMMENT 'Modification date of this media',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-id-url` (`uri-id`,`url`(512)),
 	 INDEX `uri-id-id` (`uri-id`,`id`),

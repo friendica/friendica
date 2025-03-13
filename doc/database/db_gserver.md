@@ -41,16 +41,24 @@ Fields
 | blocked               | Server is blocked                                              | boolean          | YES  |     | NULL                |                |
 | failed                | Connection failed                                              | boolean          | YES  |     | NULL                |                |
 | next_contact          | Next connection request                                        | datetime         | YES  |     | 0001-01-01 00:00:00 |                |
+| redirect-gsid         | Target Gserver id in case of a redirect                        | int unsigned     | YES  |     | NULL                |                |
 
 Indexes
 ------------
 
-| Name         | Fields            |
-| ------------ | ----------------- |
-| PRIMARY      | id                |
-| nurl         | UNIQUE, nurl(190) |
-| next_contact | next_contact      |
-| network      | network           |
+| Name          | Fields            |
+| ------------- | ----------------- |
+| PRIMARY       | id                |
+| nurl          | UNIQUE, nurl(190) |
+| next_contact  | next_contact      |
+| network       | network           |
+| redirect-gsid | redirect-gsid     |
 
+Foreign Keys
+------------
+
+| Field | Target Table | Target Field |
+|-------|--------------|--------------|
+| redirect-gsid | [gserver](help/database/db_gserver) | id |
 
 Return to [database documentation](help/database)

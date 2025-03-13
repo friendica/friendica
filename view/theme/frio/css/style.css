@@ -629,6 +629,14 @@ nav.navbar .nav > li > button:focus {
 	text-align: center;
 	z-index: 1;
 }
+/* Workaround for Safari bug where the notification icon jumps on the next line */
+#topbar-first .topbar-nav .nav > li + li {
+	margin-left: 1px;
+}
+#topbar-first .topbar-nav .nav > li + li > a {
+	margin-left: -1px;
+}
+/* End workaround */
 #topbar-first .topbar-nav .nav-segment {
 	position: relative;
 	text-align: left;
@@ -1812,6 +1820,10 @@ blockquote.shared_content {
 	font-size: 14px;
 	font-weight: 500;
 	color: $font_color_darker;
+}
+.contact-info h1.media-heading {
+	font-size: 15px;
+	font-weight: 700;
 }
 .media .contact-info-comment {
 	display: table-cell;
@@ -3120,15 +3132,22 @@ details.profile-jot-net[open] summary:before {
 .fakelink > h3:before {
 	padding-right: 10px;
 }
-.widget.fakelink > h3:before {
+span.widget > .fakelink > h3:before {
 	font-family: ForkAwesome;
 	content: "\f0da"; /* Right Plain Pointer */
+	margin-left: 4px;
 }
-.widget > .fakelink > h3:before,
+div.widget > .fakelink > h3:before,
 #sidebar-circle-header > .fakelink > h3:before,
 #sidebar-group-header > .fakelink > h3:before {
 	font-family: ForkAwesome;
 	content: "\f0d7"; /* Bottom Plain Pointer */
+}
+
+.widget button.fakelink {
+	border-style: none;
+	background-color: transparent;
+	padding: 0px;
 }
 
 h3.connector {

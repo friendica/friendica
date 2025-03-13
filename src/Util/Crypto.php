@@ -299,12 +299,19 @@ class Crypto
 	 * Creates cryptographic secure random digits
 	 *
 	 * @param string $digits The count of digits
-	 * @return int The random Digits
+	 * @return string The random Digits
 	 *
 	 * @throws \Exception In case 'random_int' isn't usable
 	 */
-	public static function randomDigits($digits)
+	public static function randomDigits($digits): string
 	{
-		return random_int(0, 10 ** $digits - 1);
+		$rn = '';
+
+		// generating cryptographically secure pseudo-random integers
+		for ($i = 0; $i < $digits; $i++) {
+			$rn .= random_int(0, 9);
+		}
+
+		return $rn;
 	}
 }

@@ -9,6 +9,7 @@ namespace Friendica\Test\src\Content;
 
 use Friendica\Content\Smilies;
 use Friendica\Core\Hook;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Test\FixtureTestCase;
@@ -21,22 +22,29 @@ class SmiliesTest extends FixtureTestCase
 
 		DI::config()->set('system', 'no_smilies', false);
 
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+
 		Hook::register('smilie', 'tests/Util/SmileyWhitespaceAddon.php', 'add_test_unicode_smilies');
 		Hook::loadHooks();
 	}
 
-	public function dataLinks()
+	public function dataLinks(): array
 	{
 		return [
 			/** @see https://github.com/friendica/friendica/pull/6933 */
 			'bug-6933-1' => [
-				'data' => '<code>/</code>',
-				'smilies' => ['texts' => [], 'icons' => []],
+				'data'     => '<code>/</code>',
+				'smilies'  => ['texts' => [], 'icons' => []],
 				'expected' => '<code>/</code>',
 			],
 			'bug-6933-2' => [
-				'data' => '<code>code</code>',
-				'smilies' => ['texts' => [], 'icons' => []],
+				'data'     => '<code>code</code>',
+				'smilies'  => ['texts' => [], 'icons' => []],
 				'expected' => '<code>code</code>',
 			],
 		];
@@ -53,7 +61,7 @@ class SmiliesTest extends FixtureTestCase
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testReplaceFromArray(string $text, array $smilies, string $expected)
+	public function testReplaceFromArray(string $text, array $smilies, string $expected): void
 	{
 		$output = Smilies::replaceFromArray($text, $smilies);
 		self::assertEquals($expected, $output);
@@ -64,141 +72,137 @@ class SmiliesTest extends FixtureTestCase
 		return [
 			'emoji' => [
 				'expected' => true,
-				'body' => '👀',
+				'body'     => '👀',
 			],
 			'emojis' => [
 				'expected' => true,
-				'body' => '👀🤷',
+				'body'     => '👀🤷',
 			],
 			'emoji+whitespace' => [
 				'expected' => true,
-				'body' => ' 👀 ',
+				'body'     => ' 👀 ',
 			],
 			'empty' => [
 				'expected' => false,
-				'body' => '',
+				'body'     => '',
 			],
 			'whitespace' => [
 				'expected' => false,
-				'body' => '
+				'body'     => '
 				',
 			],
 			'emoji+ASCII' => [
 				'expected' => false,
-				'body' => '🤷a',
+				'body'     => '🤷a',
 			],
 			'HTML entity whitespace' => [
 				'expected' => false,
-				'body' => '&nbsp;',
+				'body'     => '&nbsp;',
 			],
 			'HTML entity else' => [
 				'expected' => false,
-				'body' => '&deg;',
+				'body'     => '&deg;',
 			],
 			'emojis+HTML whitespace' => [
 				'expected' => true,
-				'body' => '👀&nbsp;🤷',
+				'body'     => '👀&nbsp;🤷',
 			],
 			'emojis+HTML else' => [
 				'expected' => false,
-				'body' => '👀&lt;🤷',
+				'body'     => '👀&lt;🤷',
 			],
 			'zwj' => [
 				'expected' => true,
-				'body' => '👨‍👨‍👧‍',
+				'body'     => '👨‍👨‍👧‍',
 			],
 			'zwj+whitespace' => [
 				'expected' => true,
-				'body' => ' 👨‍👨‍👧‍ ',
+				'body'     => ' 👨‍👨‍👧‍ ',
 			],
 			'zwj+HTML whitespace' => [
 				'expected' => true,
-				'body' => '&nbsp;👨‍👨‍👧‍&nbsp;',
+				'body'     => '&nbsp;👨‍👨‍👧‍&nbsp;',
 			],
 		];
 	}
 
 	/**
 	 * @dataProvider dataIsEmojiPost
-	 *
-	 * @param bool   $expected
-	 * @param string $body
-	 * @return void
 	 */
-	public function testIsEmojiPost(bool $expected, string $body)
+	public function testIsEmojiPost(bool $expected, string $body): void
 	{
 		$this->assertEquals($expected, Smilies::isEmojiPost($body));
 	}
-
 
 	public function dataReplace(): array
 	{
 		$data = [
 			'simple-1' => [
 				'expected' => 'alt=":-p"',
-				'body' => ':-p',
+				'body'     => ':-p',
 			],
-			'simple-1' => [
+			'simple-2' => [
 				'expected' => 'alt=":-p"',
-				'body' => ' :-p ',
+				'body'     => ' :-p ',
 			],
 			'word-boundary-1' => [
 				'expected' => ':-pppp',
-				'body' => ':-pppp',
+				'body'     => ':-pppp',
 			],
 			'word-boundary-2' => [
 				'expected' => '~friendicaca',
-				'body' => '~friendicaca',
+				'body'     => '~friendicaca',
 			],
 			'symbol-boundary-1' => [
 				'expected' => 'alt=":-p"',
-				'body' => '(:-p)',
+				'body'     => '(:-p)',
 			],
 			'hearts-1' => [
 				'expected' => '❤ (❤) ❤',
-				'body' => '&lt;3 (&lt;3) &lt;3',
+				'body'     => '&lt;3 (&lt;3) &lt;3',
 			],
 			'hearts-8' => [
 				'expected' => '(❤❤❤❤❤❤❤❤)',
-				'body' => '(&lt;33333333)',
+				'body'     => '(&lt;33333333)',
 			],
 			'no-hearts-1' => [
 				'expected' => '(&lt;30)',
-				'body' => '(&lt;30)',
+				'body'     => '(&lt;30)',
 			],
 			'no-hearts-2' => [
 				'expected' => '(3&lt;33)',
-				'body' => '(3&lt;33)',
+				'body'     => '(3&lt;33)',
 			],
 			'space' => [
 				'expected' => 'alt="smiley-heart"',
-				'body' => ':smiley heart 333:',
+				'body'     => ':smiley heart 333:',
 			],
 			'substitution-1' => [
 				'expected' => '&#x1F525;',
-				'body' => '⽕',
+				'body'     => '⽕',
 			],
 			'substitution-2' => [
 				'expected' => '&#x1F917;',
-				'body' => ':hugging face:',
+				'body'     => ':hugging face:',
 			],
 			'substitution-3' => [
 				'expected' => '&#x1F92D;',
-				'body' => ':face with hand over mouth:',
+				'body'     => ':face with hand over mouth:',
 			],
 			'mixed' => [
 				'expected' => '&#x1F525; &#x1F92D; invalid:hugging face: &#x1F917;',
-				'body' => '⽕ :face with hand over mouth: invalid:hugging face: :hugging face:',
+				'body'     => '⽕ :face with hand over mouth: invalid:hugging face: :hugging face:',
 			],
 		];
+
 		foreach ([':-[', ':-D', 'o.O'] as $emoji) {
 			foreach (['A', '_', ':', '-'] as $prefix) {
 				foreach (['', ' ', 'A', ':', '-'] as $suffix) {
 					$no_smile = ($prefix !== '' && ctype_alnum($prefix)) || ($suffix !== '' && ctype_alnum($suffix));
-					$s = $prefix . $emoji . $suffix;
-					$data[] = [
+					$s        = $prefix . $emoji . $suffix;
+					$data[]   = [
 						'expected' => $no_smile ? $s : 'alt="' . $emoji . '"',
-						'body' => $s,
+						'body'     => $s,
 					];
 				}
 			}
@@ -208,11 +212,8 @@ class SmiliesTest extends FixtureTestCase
 
 	/**
 	 * @dataProvider dataReplace
-	 *
-	 * @param string $expected
-	 * @param string $body
 	 */
-	public function testReplace(string $expected, string $body)
+	public function testReplace(string $expected, string $body): void
 	{
 		$result = Smilies::replace($body);
 		$this->assertStringContainsString($expected, $result);
@@ -222,58 +223,58 @@ class SmiliesTest extends FixtureTestCase
 	{
 		return [
 			'symbols' => [
-				'expected' => ['p', 'heart', 'embarrassed', 'kiss'],
-				'body' => ':-p &lt;3 ":-[:-"',
+				'expected'   => ['p', 'heart', 'embarrassed', 'kiss'],
+				'body'       => ':-p &lt;3 ":-[:-"',
 				'normalized' => ':p: :heart: ":embarrassed::kiss:',
 			],
 			'single-smiley' => [
-				'expected' => ['like'],
-				'body' => ':like',
+				'expected'   => ['like'],
+				'body'       => ':like',
 				'normalized' => ':like:',
 			],
 			'multiple-smilies' => [
-				'expected' => ['like', 'dislike'],
-				'body' => ':like :dislike',
+				'expected'   => ['like', 'dislike'],
+				'body'       => ':like :dislike',
 				'normalized' => ':like: :dislike:',
 			],
 			'nosmile' => [
-				'expected' => [],
-				'body' => '[nosmile] :like :like',
+				'expected'   => [],
+				'body'       => '[nosmile] :like :like',
 				'normalized' => '[nosmile] :like :like'
 			],
 			'in-code' => [
-				'expected' => [],
-				'body' => '[code]:like :like :like[/code]',
+				'expected'   => [],
+				'body'       => '[code]:like :like :like[/code]',
 				'normalized' => '[code]:like :like :like[/code]'
 			],
 			'~friendica' => [
-				'expected' => ['friendica'],
-				'body' => '~friendica',
+				'expected'   => ['friendica'],
+				'body'       => '~friendica',
 				'normalized' => ':friendica:'
 			],
 			'space' => [
-				'expected' => ['smileyheart333'],
-				'body' => ':smiley heart 333:',
+				'expected'   => ['smileyheart333'],
+				'body'       => ':smiley heart 333:',
 				'normalized' => ':smileyheart333:'
 			],
 			'substitution-1' => [
-				'expected' => [],
-				'body' => '⽕',
+				'expected'   => [],
+				'body'       => '⽕',
 				'normalized' => '&#x1F525;',
 			],
 			'substitution-2' => [
-				'expected' => [],
-				'body' => ':hugging face:',
+				'expected'   => [],
+				'body'       => ':hugging face:',
 				'normalized' => '&#x1F917;',
 			],
 			'substitution-3' => [
-				'expected' => [],
-				'body' => ':face with hand over mouth:',
+				'expected'   => [],
+				'body'       => ':face with hand over mouth:',
 				'normalized' => '&#x1F92D;',
 			],
 			'mixed' => [
-				'expected' => [],
-				'body' => '⽕ :face with hand over mouth: invalid:hugging face: :hugging face:',
+				'expected'   => [],
+				'body'       => '⽕ :face with hand over mouth: invalid:hugging face: :hugging face:',
 				'normalized' => '&#x1F525; &#x1F92D; invalid:hugging face: &#x1F917;',
 			],
 		];
@@ -281,15 +282,11 @@ class SmiliesTest extends FixtureTestCase
 
 	/**
 	 * @dataProvider dataExtractUsedSmilies
-	 *
-	 * @param array  $expected
-	 * @param string $body
-	 * @param stirng $normalized
 	 */
-	public function testExtractUsedSmilies(array $expected, string $body, string $normalized)
+	public function testExtractUsedSmilies(array $expected, string $body, string $normalized): void
 	{
 		$extracted = Smilies::extractUsedSmilies($body, $converted);
-		$expected = array_fill_keys($expected, true);
+		$expected  = array_fill_keys($expected, true);
 		$this->assertEquals($normalized, $converted);
 		foreach (array_keys($extracted) as $shortcode) {
 			$this->assertArrayHasKey($shortcode, $expected);

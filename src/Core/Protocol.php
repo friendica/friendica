@@ -9,6 +9,7 @@ namespace Friendica\Core;
 
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
@@ -76,7 +77,12 @@ class Protocol
 			'protocol' => $protocol,
 			'result'   => null
 		];
-		Hook::callAll('support_follow', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'] === true;
 	}
@@ -98,7 +104,12 @@ class Protocol
 			'protocol' => $protocol,
 			'result'   => null
 		];
-		Hook::callAll('support_revoke_follow', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'] === true;
 	}
@@ -311,7 +322,12 @@ class Protocol
 			'protocol' => $protocol,
 			'result'   => null
 		];
-		Hook::callAll('support_probe', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'] === true;
 	}

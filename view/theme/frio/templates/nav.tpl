@@ -31,7 +31,7 @@
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
 				<!-- div for navbar width-->
 				<!-- Brand and toggle get grouped for better mobile display -->
-				<nav class="topbar-nav">
+				<div class="topbar-nav">
 
 					{{* Buttons for the mobile view *}}
 					<button type="button" class="navbar-toggle offcanvas-right-toggle pull-right"
@@ -152,7 +152,7 @@
 						{{/if}}
 
 					</ul>
-				</nav>
+				</div>
 
 				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
 				<div class="topbar-actions pull-right">

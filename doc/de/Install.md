@@ -59,7 +59,7 @@ Der Linux-Code, mit dem man die Dateien direkt in ein Verzeichnis wie "meinewebs
 
     git clone https://github.com/friendica/friendica.git -b stable mywebsite
     cd mywebsite
-    bin/composer.phar install
+    bin/composer.phar run install:prod
 
 Stelle sicher, dass der Ordner *view/smarty3* existiert and von dem Webserver-Benutzer beschreibbar ist
 
@@ -85,7 +85,7 @@ Wenn du die Entwickler Version von Friendica verwenden möchtest kannst du auf d
 Dies tust du mit den folgenden Befehlen
 
     git checkout develop
-    bin/composer.phar install
+    bin/composer.phar run install:prod
     cd addon
     git checkout develop
 

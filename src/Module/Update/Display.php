@@ -45,19 +45,16 @@ class Display extends DisplayModule
 		$parentUriId = $item['parent-uri-id'];
 
 		if (empty($force)) {
-			$browserUpdate = intval($this->pConfig->get($profileUid, 'system', 'update_interval') ?? 40000);
-			if ($browserUpdate >= 1000) {
-				$updateDate = date(DateTimeFormat::MYSQL, time() - ($browserUpdate * 2 / 1000));
+			if ($this->pConfig->get($profileUid, 'system', 'update_content')) {
+				$updateDate = date(DateTimeFormat::MYSQL, time() - 120);
 				if (!Post::exists([
 					"`parent-uri-id` = ? AND `uid` IN (?, ?) AND `received` > ?",
 					$parentUriId, 0,
 					$profileUid, $updateDate])) {
-					$this->logger->debug('No updated content. Ending process',
-						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
+					$this->logger->debug('No updated content. Ending process', ['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
 					return '';
 				} else {
-					$this->logger->debug('Updated content found.',
-						['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
+					$this->logger->debug('Updated content found.', ['uri-id' => $uriId, 'uid' => $profileUid, 'updated' => $updateDate]);
 				}
 			}
 		} else {

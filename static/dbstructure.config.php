@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1577);
+	define('DB_UPDATE_VERSION', 1580);
 }
 
 return [
@@ -85,12 +85,14 @@ return [
 			"blocked" => ["type" => "boolean", "comment" => "Server is blocked"],
 			"failed" => ["type" => "boolean", "comment" => "Connection failed"],
 			"next_contact" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Next connection request"],
+			"redirect-gsid" => ["type" => "int unsigned", "foreign" => ["gserver" => "id"], "comment" => "Target Gserver id in case of a redirect"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"nurl" => ["UNIQUE", "nurl(190)"],
 			"next_contact" => ["next_contact"],
 			"network" => ["network"],
+			"redirect-gsid" => ["redirect-gsid"],
 		]
 	],
 	"user" => [
@@ -1445,6 +1447,9 @@ return [
 			"publisher-url" => ["type" => "varbinary(383)", "comment" => "URL of the publisher of the media"],
 			"publisher-name" => ["type" => "varchar(255)", "comment" => "Name of the publisher of the media"],
 			"publisher-image" => ["type" => "varbinary(383)", "comment" => "Image of the publisher of the media"],
+			"language" => ["type" => "char(3)", "comment" => "Language information about this media in the ISO 639 format"],
+			"published" => ["type" => "datetime", "comment" => "Publification date of this media"],
+			"modified" => ["type" => "datetime", "comment" => "Modification date of this media"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],

@@ -62,7 +62,7 @@ If you want to have git automatically update the dependencies with composer, you
     }
     # `composer install` if the `composer.lock` file gets changed
     # to update all the php dependencies
-    check_run composer.lock "bin/composer.phar install --no-dev"
+    check_run composer.lock "bin/composer.phar install"
 
 just place it into `.git/hooks/post-merge` and make it executable.
 
@@ -170,6 +170,7 @@ This is called the Backward Compatibility Promise.
 Inspired by the [Symonfy BC promise](https://symfony.com/doc/current/contributing/code/bc.html) we promise BC for every class, interface, trait, enum, function, constant, etc., but with the exception of:
 
 - Classes, interfaces, traits, enums, functions, methods, properties and constants marked as `@internal` or `@private`
+- Extending or modifying any non-abstract class or method in any way
 - Extending or modifying a `final` class or method in any way
 - Calling `private` methods (via Reflection)
 - Accessing `private` properties (via Reflection)

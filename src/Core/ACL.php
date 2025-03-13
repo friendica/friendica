@@ -11,6 +11,7 @@ use Exception;
 use Friendica\App\Page;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
@@ -52,7 +53,7 @@ class ACL
 		$contacts = self::getValidMessageRecipientsForUser(DI::userSession()->getLocalUserId());
 
 		$tpl = Renderer::getMarkupTemplate('acl/message_recipient.tpl');
-		$o = Renderer::replaceMacros($tpl, [
+		$o   = Renderer::replaceMacros($tpl, [
 			'$contacts'      => $contacts,
 			'$contacts_json' => json_encode($contacts),
 			'$selected'      => $selected,
@@ -95,9 +96,9 @@ class ACL
 		$selfPublicContactId = Contact::getPublicIdByUserId($localUserId);
 
 		$tpl = Renderer::getMarkupTemplate('acl/self_only.tpl');
-		$o = Renderer::replaceMacros($tpl, [
+		$o   = Renderer::replaceMacros($tpl, [
 			'$selfPublicContactId' => $selfPublicContactId,
-			'$explanation' => $explanation,
+			'$explanation'         => $explanation,
 		]);
 
 		return $o;
@@ -117,8 +118,8 @@ class ACL
 		return [
 			'allow_cid' => Contact::pruneUnavailable($aclFormatter->expand($user['allow_cid'] ?? '')),
 			'allow_gid' => $aclFormatter->expand($user['allow_gid'] ?? ''),
-			'deny_cid'  => $aclFormatter->expand($user['deny_cid']  ?? ''),
-			'deny_gid'  => $aclFormatter->expand($user['deny_gid']  ?? ''),
+			'deny_cid'  => $aclFormatter->expand($user['deny_cid'] ?? ''),
+			'deny_gid'  => $aclFormatter->expand($user['deny_gid'] ?? ''),
 		];
 	}
 
@@ -132,31 +133,33 @@ class ACL
 	 */
 	public static function getContactListByUserId(int $user_id, array $condition = [])
 	{
-		$fields = ['id', 'name', 'addr', 'micro'];
-		$params = ['order' => ['name']];
+		$fields       = ['id', 'name', 'addr', 'micro'];
+		$params       = ['order' => ['name']];
 		$acl_contacts = Contact::selectToArray(
 			$fields,
 			array_merge([
-				'uid' => $user_id,
-				'self' => false,
+				'uid'     => $user_id,
+				'self'    => false,
 				'blocked' => false,
 				'archive' => false,
 				'deleted' => false,
 				'pending' => false,
 				'network' => Protocol::FEDERATED,
-				'rel' => [Contact::FOLLOWER, Contact::FRIEND]
+				'rel'     => [Contact::FOLLOWER, Contact::FRIEND]
 			], $condition),
 			$params
 		);
 
-		$acl_yourself = Contact::selectFirst($fields, ['uid' => $user_id, 'self' => true]);
+		$acl_yourself         = Contact::selectFirst($fields, ['uid' => $user_id, 'self' => true]);
 		$acl_yourself['name'] = DI::l10n()->t('Yourself');
 
 		$acl_contacts[] = $acl_yourself;
 
-		$acl_groups = Contact::selectToArray($fields,
-			['uid' => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
-			'network' => Protocol::FEDERATED, 'pending' => false, 'contact-type' => Contact::TYPE_COMMUNITY], $params
+		$acl_groups = Contact::selectToArray(
+			$fields,
+			['uid'     => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
+				'network' => Protocol::FEDERATED, 'pending' => false, 'contact-type' => Contact::TYPE_COMMUNITY],
+			$params
 		);
 
 		$acl_contacts = array_merge($acl_groups, $acl_contacts);
@@ -178,27 +181,27 @@ class ACL
 	{
 		$acl_circles = [
 			[
-				'id' => Circle::FOLLOWERS,
-				'name' => DI::l10n()->t('Followers'),
-				'addr' => '',
+				'id'    => Circle::FOLLOWERS,
+				'name'  => DI::l10n()->t('Followers'),
+				'addr'  => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'circle',
+				'type'  => 'circle',
 			],
 			[
-				'id' => Circle::MUTUALS,
-				'name' => DI::l10n()->t('Mutuals'),
-				'addr' => '',
+				'id'    => Circle::MUTUALS,
+				'name'  => DI::l10n()->t('Mutuals'),
+				'addr'  => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'circle',
+				'type'  => 'circle',
 			]
 		];
 		foreach (Circle::getByUserId($user_id) as $circle) {
 			$acl_circles[] = [
-				'id' => $circle['id'],
-				'name' => $circle['name'],
-				'addr' => '',
+				'id'    => $circle['id'],
+				'name'  => $circle['name'],
+				'addr'  => '',
 				'micro' => 'images/twopeople.png',
-				'type' => 'circle',
+				'type'  => 'circle',
 			];
 		}
 
@@ -275,7 +278,7 @@ class ACL
 				$mailacct = DBA::selectFirst('mailacct', ['pubmail'], ['`uid` = ? AND `server` != ""', $user['uid']]);
 				if (DBA::isResult($mailacct)) {
 					$jotnets_fields[] = [
-						'type' => 'checkbox',
+						'type'  => 'checkbox',
 						'field' => [
 							'pubmail_enable',
 							DI::l10n()->t('Post to Email'),
@@ -285,7 +288,12 @@ class ACL
 
 				}
 			}
-			Hook::callAll('jot_networks', $jotnets_fields);
+
+			$eventDispatcher = DI::eventDispatcher();
+
+			$jotnets_fields = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::JOT_NETWORKS, $jotnets_fields),
+			)->getArray();
 		}
 
 		$acl_contacts = self::getContactListByUserId($user['uid'], $condition);
@@ -304,28 +312,28 @@ class ACL
 		];
 
 		$tpl = Renderer::getMarkupTemplate('acl/full_selector.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$public_title'   => DI::l10n()->t('Public'),
-			'$public_desc'    => DI::l10n()->t('This content will be shown to all your followers and can be seen in the community pages and by anyone with its link.'),
-			'$custom_title'   => DI::l10n()->t('Limited/Private'),
-			'$custom_desc'    => DI::l10n()->t('This content will be shown only to the people in the first box, to the exception of the people mentioned in the second box. It won\'t appear anywhere public.') . DI::l10n()->t('Start typing the name of a contact or a circle to show a filtered list. You can also mention the special circles "Followers" and "Mutuals".'),
-			'$allow_label'    => DI::l10n()->t('Show to:'),
-			'$deny_label'     => DI::l10n()->t('Except to:'),
-			'$emailcc'        => DI::l10n()->t('CC: email addresses'),
-			'$emtitle'        => DI::l10n()->t('Example: bob@example.com, mary@example.com'),
+		$o   = Renderer::replaceMacros($tpl, [
+			'$public_title'    => DI::l10n()->t('Public'),
+			'$public_desc'     => DI::l10n()->t('This content will be shown to all your followers and can be seen in the community pages and by anyone with its link.'),
+			'$custom_title'    => DI::l10n()->t('Limited/Private'),
+			'$custom_desc'     => DI::l10n()->t('This content will be shown only to the people in the first box, to the exception of the people mentioned in the second box. It won\'t appear anywhere public.') . DI::l10n()->t('Start typing the name of a contact or a circle to show a filtered list. You can also mention the special circles "Followers" and "Mutuals".'),
+			'$allow_label'     => DI::l10n()->t('Show to:'),
+			'$deny_label'      => DI::l10n()->t('Except to:'),
+			'$emailcc'         => DI::l10n()->t('CC: email addresses'),
+			'$emtitle'         => DI::l10n()->t('Example: bob@example.com, mary@example.com'),
 			'$jotnets_summary' => DI::l10n()->t('Connectors'),
-			'$visibility'     => $visibility,
-			'$acl_contacts'   => json_encode($acl_contacts),
-			'$acl_circles'    => json_encode($acl_circles),
-			'$acl_list'       => json_encode($acl_list),
-			'$contact_allow'  => implode(',', $default_permissions['allow_cid']),
-			'$circle_allow'   => implode(',', $default_permissions['allow_gid']),
-			'$contact_deny'   => implode(',', $default_permissions['deny_cid']),
-			'$circle_deny'    => implode(',', $default_permissions['deny_gid']),
-			'$for_federation' => $for_federation,
-			'$jotnets_fields' => $jotnets_fields,
-			'$input_names'    => $input_names,
-			'$input_group_id' => $input_group_id,
+			'$visibility'      => $visibility,
+			'$acl_contacts'    => json_encode($acl_contacts),
+			'$acl_circles'     => json_encode($acl_circles),
+			'$acl_list'        => json_encode($acl_list),
+			'$contact_allow'   => implode(',', $default_permissions['allow_cid']),
+			'$circle_allow'    => implode(',', $default_permissions['allow_gid']),
+			'$contact_deny'    => implode(',', $default_permissions['deny_cid']),
+			'$circle_deny'     => implode(',', $default_permissions['deny_gid']),
+			'$for_federation'  => $for_federation,
+			'$jotnets_fields'  => $jotnets_fields,
+			'$input_names'     => $input_names,
+			'$input_group_id'  => $input_group_id,
 		]);
 
 		return $o;

@@ -63,8 +63,8 @@ class Application extends BaseDataTransferObject
 			unset($application['redirect_uri']);
 		}
 
-		if (empty($application['website'])) {
-			unset($application['website']);
+		if (empty($application['vapid_key'])) {
+			unset($application['vapid_key']);
 		}
 
 		return $application;

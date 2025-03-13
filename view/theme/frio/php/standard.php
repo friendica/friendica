@@ -14,7 +14,7 @@ $frio = 'view/theme/frio';
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 <head>
 	<title><?php if(!empty($page['title'])) {
 		echo $page['title'];
@@ -109,7 +109,7 @@ if(!empty($page['content'])) {
 
 <script>
 var pagetitle = null;
-$('nav').bind('nav-update', function(e,data)
+$('#topbar-first').bind('nav-update', function(e,data)
 {
 	if (pagetitle==null) pagetitle = document.title;
 	var count = $(data).find('notif').attr('count');
