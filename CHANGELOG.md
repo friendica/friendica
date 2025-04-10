@@ -24,6 +24,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 - **BREAKING**: The `contact_block_end` hook provides a HTML string instead of an array.
 - The `bin/composer.phar install` command no longer optimizes the autoloader file to avoid various problems when adding/removing classes in dev. Run `bin/composer.phar install -o` if you want autoloader optimization.
 - Downgrade shebang from `bin/bash` to `bin/sh` in `bin/console`.
+- Uncaught exceptions are logged as CRITICAL instead as ERROR.
 
 ### Fixed
 
