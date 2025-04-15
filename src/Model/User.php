@@ -1793,9 +1793,15 @@ class User
 
 		Hook::callAll('remove_user', $user);
 
+		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.
-		DBA::insert('userd', ['username' => $user['nickname']]);
+		try {
+			$userDeletedRepository->insertByUsername($user['nickname']);
+		} catch (\Throwable $th) {
+			DI::logger()->error('Error while inserting username of deleted user.', ['username' => $user['nickname'], 'exception' => $th]);
+		}
 
 		// Remove all personal settings, especially connector settings
 		DBA::delete('pconfig', ['uid' => $uid]);
