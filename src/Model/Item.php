@@ -1090,9 +1090,9 @@ class Item
 		}
 
 		if ($update_commented) {
-			$fields = ['commented' => DateTimeFormat::utcNow(), 'changed' => DateTimeFormat::utcNow()];
+			$fields = ['commented' => $posted_item['received'], 'changed' => $posted_item['received']];
 		} else {
-			$fields = ['changed' => DateTimeFormat::utcNow()];
+			$fields = ['changed' => $posted_item['received']];
 		}
 
 		Post::update($fields, ['uri-id' => $posted_item['parent-uri-id'], 'uid' => $posted_item['uid']]);

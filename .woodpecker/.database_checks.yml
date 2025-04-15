@@ -5,7 +5,7 @@
 matrix:
   include:
     - PHP_MAJOR_VERSION: 8.2
-      PHP_VERSION: 8.2.16
+      PHP_VERSION: 8.2.28
 
 when:
   branch:

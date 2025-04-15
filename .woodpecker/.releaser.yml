@@ -35,7 +35,7 @@ steps:
     volumes:
       - /tmp/drone-cache:/tmp/cache
   composer_install:
-    image: friendicaci/php8.2:php8.2.16
+    image: friendicaci/php8.2:php8.2.28
     commands:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
