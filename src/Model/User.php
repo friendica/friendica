@@ -266,10 +266,12 @@ class User
 			return $system_actor_name;
 		}
 
+		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+
 		// List of possible actor names
 		$possible_accounts = ['friendica', 'actor', 'system', 'internal'];
 		foreach ($possible_accounts as $name) {
-			if (!DBA::exists('user', ['nickname' => $name]) && !DBA::exists('userd', ['username' => $name])) {
+			if (!DBA::exists('user', ['nickname' => $name]) && !$userDeletedRepository->existsByUsername($name)) {
 				DI::config()->set('system', 'actor_name', $name);
 				return $name;
 			}
@@ -1295,10 +1297,12 @@ class User
 			throw new Exception(DI::l10n()->t('Your nickname can only contain a-z, 0-9 and _.'));
 		}
 
+		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+
 		// Check existing and deleted accounts for this nickname.
 		if (
 			DBA::exists('user', ['nickname' => $nickname])
-			|| DBA::exists('userd', ['username' => $nickname])
+			|| $userDeletedRepository->existsByUsername($nickname)
 		) {
 			throw new Exception(DI::l10n()->t('Nickname is already registered. Please choose another.'));
 		}
