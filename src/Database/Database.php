@@ -69,7 +69,7 @@ class Database
 	private $affected_rows = 0;
 	protected $in_transaction = false;
 	protected $in_retrial = false;
-	protected $testmode = false;
+	private bool $throwExceptionsOnErrors = false;
 	private $relation = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
@@ -205,9 +205,9 @@ class Database
 		return $this->connected;
 	}
 
-	public function setTestmode(bool $test)
+	public function throwExceptionsOnErrors(bool $throwExceptions): void
 	{
-		$this->testmode = $test;
+		$this->throwExceptionsOnErrors = $throwExceptions;
 	}
 
 	/**
@@ -672,7 +672,7 @@ class Database
 			$error   = $this->error;
 			$errorno = $this->errorno;
 
-			if ($this->testmode) {
+			if ($this->throwExceptionsOnErrors) {
 				throw new DatabaseException($error, $errorno, $this->replaceParameters($sql, $args));
 			}
 
@@ -779,7 +779,7 @@ class Database
 			$error   = $this->error;
 			$errorno = $this->errorno;
 
-			if ($this->testmode) {
+			if ($this->throwExceptionsOnErrors) {
 				throw new DatabaseException($error, $errorno, $this->replaceParameters($sql, $params));
 			}
 

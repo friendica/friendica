@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Database\Repository;
 
-use Exception;
 use Friendica\Database\Database;
+use Friendica\Database\DatabaseException;
 use Friendica\Database\Repository\UserDeletedRepository;
 use PHPUnit\Framework\TestCase;
 
 class UserDeletedRepositoryTest extends TestCase
 {
-	public function testInsertByUsernameReturnsFalse(): void
+	public function testInsertByUsernameCallsDatabase(): void
 	{
 		$database = $this->createMock(Database::class);
 		$database->expects($this->once())->method('insert')->willReturnMap([
@@ -31,14 +31,14 @@ class UserDeletedRepositoryTest extends TestCase
 	public function testInsertByUsernameThrowsException(): void
 	{
 		$database = $this->createMock(Database::class);
-		$database->expects($this->once())->method('insert')->willReturnMap([
-			['userd', ['username' => 'test'], 0, false],
-		]);
+		$database->expects($this->exactly(2))->method('throwExceptionsOnErrors');
+		$database->expects($this->once())->method('insert')->willThrowException(
+			new DatabaseException('An error occured.', 0, 'SQL query')
+		);
 
 		$repo = new UserDeletedRepository($database);
 
-		$this->expectException(Exception::class);
-		$this->expectExceptionMessage('Error while inserting username `test` as deleted user.');
+		$this->expectException(DatabaseException::class);
 
 		$repo->insertByUsername('test');
 	}

@@ -28,14 +28,16 @@ final class UserDeletedRepository
 	/**
 	 * Insert a deleted user by username.
 	 *
-	 * @throws \Exception If the username could not be inserted
+	 * @throws DatabaseException If the username could not be inserted
 	 */
 	public function insertByUsername(string $username): void
 	{
-		$result = $this->database->insert('userd', ['username' => $username]);
+		$this->database->throwExceptionsOnErrors(true);
 
-		if ($result === false) {
-			throw new Exception(sprintf('Error while inserting username `%s` as deleted user.', $username));
+		try {
+			$this->database->insert('userd', ['username' => $username]);
+		} finally {
+			$this->database->throwExceptionsOnErrors(false);
 		}
 	}
 
