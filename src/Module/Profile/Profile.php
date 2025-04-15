@@ -24,6 +24,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Database\Repository\UserDeletedRepository;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\Tag;
@@ -46,6 +47,7 @@ class Profile extends BaseProfile
 {
 	/** @var Database */
 	private $database;
+	private UserDeletedRepository $userDeletedRepository;
 	/** @var AppHelper */
 	private $appHelper;
 	/** @var IHandleUserSessions */
@@ -57,11 +59,27 @@ class Profile extends BaseProfile
 	/** @var ProfileField */
 	private $profileField;
 
-	public function __construct(ProfileField $profileField, Page $page, IManageConfigValues $config, IHandleUserSessions $session, AppHelper $appHelper, Database $database, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ProfileField $profileField,
+		Page $page,
+		IManageConfigValues $config,
+		IHandleUserSessions $session,
+		AppHelper $appHelper,
+		Database $database,
+		UserDeletedRepository $userDeletedRepository,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database     = $database;
+		$this->userDeletedRepository = $userDeletedRepository;
 		$this->appHelper    = $appHelper;
 		$this->session      = $session;
 		$this->config       = $config;
@@ -84,7 +102,7 @@ class Profile extends BaseProfile
 				}
 			}
 
-			if ($this->database->exists('userd', ['username' => $this->parameters['nickname']])) {
+			if ($this->userDeletedRepository->existsByUsername($this->parameters['nickname'])) {
 				// Known deleted user
 				$data = ActivityPub\Transmitter::getDeletedUser($this->parameters['nickname']);
 

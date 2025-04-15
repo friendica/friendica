@@ -7,7 +7,8 @@
 
 namespace Friendica\Module\User;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -19,6 +20,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
+use Friendica\Database\Repository\UserDeletedRepository;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
@@ -47,20 +49,38 @@ class Import extends \Friendica\BaseModule
 	/** @var Database */
 	private $database;
 
+	private UserDeletedRepository $userDeletedRepository;
+
 	/** @var PermissionSet */
 	private $permissionSet;
 
 	/** @var UserSession */
 	private $session;
 
-	public function __construct(UserSession $session, PermissionSet $permissionSet, IManagePersonalConfigValues $pconfig, Database $database, SystemMessages $systemMessages, IManageConfigValues $config, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		UserSession $session,
+		PermissionSet $permissionSet,
+		IManagePersonalConfigValues $pconfig,
+		Database $database,
+		UserDeletedRepository $userDeletedRepository,
+		SystemMessages $systemMessages,
+		IManageConfigValues $config,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->config         = $config;
 		$this->pconfig        = $pconfig;
 		$this->systemMessages = $systemMessages;
 		$this->database       = $database;
+		$this->userDeletedRepository = $userDeletedRepository;
 		$this->permissionSet  = $permissionSet;
 		$this->session        = $session;
 	}
@@ -213,7 +233,7 @@ class Import extends \Friendica\BaseModule
 		// check for username
 		// check if username matches deleted account
 		if ($this->database->exists('user', ['nickname' => $account['user']['nickname']])
-			|| $this->database->exists('userd', ['username' => $account['user']['nickname']])) {
+			|| $this->userDeletedRepository->existsByUsername($account['user']['nickname'])) {
 			$this->systemMessages->addNotice($this->t("User '%s' already exists on this server!", $account['user']['nickname']));
 			return;
 		}
