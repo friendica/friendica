@@ -11,6 +11,7 @@ namespace Friendica\Database\Repository;
 
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
+use Friendica\Database\Entity\CacheEntity;
 use Throwable;
 
 /**
@@ -67,6 +68,44 @@ final class CacheRepository
 		} finally {
 			$this->database->throwExceptionsOnErrors($throw);
 		}
+	}
+
+	/**
+	 * @throws DatabaseException
+	 *
+	 * @return CacheEntity|null
+	 */
+	public function findOneByKeyValidUntil(string $key, string $expires)
+	{
+		$throw = $this->database->throwExceptionsOnErrors(true);
+
+		try {
+			$cacheArray = $this->database->selectFirst(
+				'cache',
+				['v'],
+				['`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, $expires]
+			);
+
+			if (!$this->database->isResult($cacheArray)) {
+				return null;
+			}
+		} catch (Throwable $th) {
+			if (! $th instanceof DatabaseException) {
+				$th = new DatabaseException(sprintf('Cannot get cache entry with key `%s`', $key), 0, '', $th);
+			}
+
+			throw $th;
+		} finally {
+			$this->database->throwExceptionsOnErrors($throw);
+		}
+
+		try {
+			$entity = CacheEntity::createFromArray($cacheArray);
+		} catch (Throwable $th) {
+			return null;
+		}
+
+		return $entity;
 	}
 
 	private function getAllKeys(string $expires, ?string $prefix = null): array
