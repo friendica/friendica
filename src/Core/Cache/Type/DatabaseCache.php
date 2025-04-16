@@ -11,6 +11,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
 use Friendica\Database\Database;
+use Friendica\Database\Repository\CacheRepository;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -25,11 +26,15 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	 */
 	private $dba;
 
+	private CacheRepository $cacheRepo;
+
 	public function __construct(string $hostname, Database $dba)
 	{
 		parent::__construct($hostname);
 
 		$this->dba = $dba;
+
+		$this->cacheRepo = new CacheRepository($dba);
 	}
 
 	/**
@@ -41,27 +46,14 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	{
 		try {
 			if (empty($prefix)) {
-				$where = ['`expires` >= ?', DateTimeFormat::utcNow()];
+				$keys = $this->cacheRepo->getAllKeysValidUntil(DateTimeFormat::utcNow());
 			} else {
-				$where = ['`expires` >= ? AND `k` LIKE CONCAT(?, \'%\')', DateTimeFormat::utcNow(), $prefix];
+				$keys = $this->cacheRepo->getAllKeysValidUntilWithPrefix(DateTimeFormat::utcNow(), $prefix);
 			}
-
-			$stmt = $this->dba->select('cache', ['k'], $where);
 		} catch (\Exception $exception) {
 			throw new CachePersistenceException(sprintf('Cannot fetch all keys with prefix %s', $prefix), $exception);
 		}
 
-		try {
-			$keys = [];
-			while ($key = $this->dba->fetch($stmt)) {
-				array_push($keys, $key['k']);
-			}
-		} catch (\Exception $exception) {
-			$this->dba->close($stmt);
-			throw new CachePersistenceException(sprintf('Cannot fetch all keys with prefix %s', $prefix), $exception);
-		}
-
-		$this->dba->close($stmt);
 		return $keys;
 	}
 
