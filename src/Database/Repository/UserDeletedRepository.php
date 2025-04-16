@@ -32,12 +32,12 @@ final class UserDeletedRepository
 	 */
 	public function insertByUsername(string $username): void
 	{
-		$this->database->throwExceptionsOnErrors(true);
+		$throw = $this->database->throwExceptionsOnErrors(true);
 
 		try {
 			$this->database->insert('userd', ['username' => $username]);
 		} finally {
-			$this->database->throwExceptionsOnErrors(false);
+			$this->database->throwExceptionsOnErrors($throw);
 		}
 	}
 

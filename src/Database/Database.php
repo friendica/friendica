@@ -205,9 +205,18 @@ class Database
 		return $this->connected;
 	}
 
-	public function throwExceptionsOnErrors(bool $throwExceptions): void
+	/**
+	 * Should errors throwns as exceptions?
+	 *
+	 * @return bool returns the previous value
+	 */
+	public function throwExceptionsOnErrors(bool $throwExceptions): bool
 	{
+		$prev = $this->throwExceptionsOnErrors;
+
 		$this->throwExceptionsOnErrors = $throwExceptions;
+
+		return $prev;
 	}
 
 	/**
