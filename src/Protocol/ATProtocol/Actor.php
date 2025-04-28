@@ -117,7 +117,7 @@ class Actor
 		$name = $profile->displayName ?? $nick;
 
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $nick,
+			'alias'   => ATProtocol::WEB . '/profile/' . $profile->did,
 			'name'    => $name ?: $nick,
 			'nick'    => $nick,
 			'addr'    => $nick,

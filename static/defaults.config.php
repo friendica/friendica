@@ -334,7 +334,8 @@ return [
 		'lock_driver' => '',
 
 		// logger_config (String)
-		// Sets the logging adapter of Friendica globally (monolog, syslog, stream)
+		// Sets the logging adapter of Friendica globally (syslog, stream)
+		// @deprecated 2025.02 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
 		'logger_config' => 'stream',
 
 		// syslog_flags (Integer)

@@ -171,11 +171,24 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Logger\LoggerManager::class => [
 			'substitutions' => [
-				\Friendica\Core\Logger\Factory\LoggerFactory::class => \Friendica\Core\Logger\Factory\LegacyLoggerFactory::class,
+				\Friendica\Core\Logger\Factory\LoggerFactory::class => \Friendica\Core\Logger\Factory\DelegatingLoggerFactory::class,
 			],
 		],
 		\Friendica\Core\Logger\Factory\LoggerFactory::class => [
-			'instanceOf' => \Friendica\Core\Logger\Factory\LegacyLoggerFactory::class,
+			'instanceOf' => \Friendica\Core\Logger\Factory\DelegatingLoggerFactory::class,
+			'call' => [
+				['registerFactory', ['stream', [Dice::INSTANCE => '$StreamLoggerFactory']]],
+				['registerFactory', ['syslog', [Dice::INSTANCE => '$SyslogLoggerFactory']]],
+			],
+		],
+		'$StreamLoggerFactory' => [
+			'instanceOf' => \Friendica\Core\Logger\Factory\StreamLoggerFactory::class,
+			'substitutions' => [
+				\Friendica\Core\Logger\Util\FileSystemUtil::class => \Friendica\Core\Logger\Util\FileSystem::class,
+			],
+		],
+		'$SyslogLoggerFactory' => [
+			'instanceOf' => \Friendica\Core\Logger\Factory\SyslogLoggerFactory::class,
 		],
 		\Friendica\Core\Logger\Type\SyslogLogger::class => [
 			'instanceOf' => \Friendica\Core\Logger\Factory\SyslogLogger::class,

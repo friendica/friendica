@@ -12,7 +12,7 @@ use Friendica\Core\Logger\Exception\LoggerUnusableException;
 /**
  * Util class for filesystem manipulation for Logger classes
  */
-class FileSystem
+class FileSystem implements FileSystemUtil
 {
 	/**
 	 * @var string a error message
@@ -31,7 +31,7 @@ class FileSystem
 	public function createDir(string $file): string
 	{
 		$dirname = null;
-		$pos = strpos($file, '://');
+		$pos     = strpos($file, '://');
 
 		if (!$pos) {
 			$dirname = realpath(dirname($file));

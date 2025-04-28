@@ -1729,7 +1729,7 @@ class Probe
 		$data = [
 			'network' => Protocol::BLUESKY,
 			'url'     => $profile->did,
-			'alias'   => ATProtocol::WEB . '/profile/' . $nick,
+			'alias'   => ATProtocol::WEB . '/profile/' . $profile->did,
 			'name'    => $name ?: $nick,
 			'nick'    => $nick,
 			'addr'    => $nick,
