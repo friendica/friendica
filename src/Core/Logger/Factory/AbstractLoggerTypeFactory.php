@@ -12,6 +12,8 @@ use Psr\Log\LogLevel;
 
 /**
  * Abstract class for creating logger types, which includes common necessary logic/content
+ *
+ * @deprecated 2025.02 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
  */
 abstract class AbstractLoggerTypeFactory
 {
@@ -25,6 +27,8 @@ abstract class AbstractLoggerTypeFactory
 	 */
 	public function __construct(IHaveCallIntrospections $introspection, string $channel)
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+
 		$this->channel       = $channel;
 		$this->introspection = $introspection;
 	}
@@ -44,21 +48,21 @@ abstract class AbstractLoggerTypeFactory
 			// legacy WARNING
 			case "0":
 				return LogLevel::ERROR;
-			// legacy INFO
+				// legacy INFO
 			case "1":
 				return LogLevel::WARNING;
-			// legacy TRACE
+				// legacy TRACE
 			case "2":
 				return LogLevel::NOTICE;
-			// legacy DEBUG
+				// legacy DEBUG
 			case "3":
 				return LogLevel::INFO;
-			// legacy DATA
+				// legacy DATA
 			case "4":
-			// legacy ALL
+				// legacy ALL
 			case "5":
 				return LogLevel::DEBUG;
-			// default if nothing set
+				// default if nothing set
 			default:
 				return $level;
 		}

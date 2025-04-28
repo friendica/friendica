@@ -20,6 +20,8 @@ use Psr\Log\NullLogger;
 /**
  * The logger factory for the StreamLogger instance
  *
+ * @deprecated 2025.02 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
+ * @see StreamLoggerFactory
  * @see StreamLoggerClass
  */
 class StreamLogger extends AbstractLoggerTypeFactory
@@ -38,6 +40,8 @@ class StreamLogger extends AbstractLoggerTypeFactory
 	 */
 	public function create(IManageConfigValues $config, string $logfile = null, string $channel = null): LoggerInterface
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+
 		$fileSystem = new FileSystem();
 
 		$logfile = $logfile ?? $config->get('system', 'logfile');

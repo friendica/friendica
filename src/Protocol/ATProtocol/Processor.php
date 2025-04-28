@@ -72,7 +72,7 @@ class Processor
 	public function processIdentity(stdClass $data)
 	{
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->handle,
+			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->did,
 			'nick'    => $data->identity->handle,
 			'addr'    => $data->identity->handle,
 			'updated' => DateTimeFormat::utc($data->identity->time, DateTimeFormat::MYSQL),
