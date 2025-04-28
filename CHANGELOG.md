@@ -38,7 +38,11 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 - `bin/jetstream.php` is deprecated in favor of `bin/console jetstream` by @nupplaphil in [#14655](https://github.com/friendica/friendica/pull/14655)
 - `bin/worker.php` is deprecated in favor of `bin/console worker` by @nupplaphil in [#14659](https://github.com/friendica/friendica/pull/14659)
 - Providing strategies via `strategies.config.php` file in addons is deprecated and will stop working in 5 months, please use PHP hooks instead and remove the `strategies.config.php` file in your addon.
-- `Friendica\Core\Logger` is deprecated, use constructor injection or `Friendica\Di::logger()` instead.
+- Class `Friendica\Core\Logger` is deprecated, use constructor injection or `Friendica\Di::logger()` instead.
+- Class `Friendica\Core\Logger\Factory\AbstractLoggerTypeFactory` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
+- Class `Friendica\Core\Logger\Factory\Logger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
+- Class `Friendica\Core\Logger\Factory\StreamLogger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
+- Class `Friendica\Core\Logger\Factory\SyslogLogger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
 
 ### Removed
 
