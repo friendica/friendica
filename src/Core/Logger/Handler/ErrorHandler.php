@@ -208,7 +208,7 @@ class ErrorHandler
 	 */
 	private function handleException(Throwable $e): void
 	{
-		$level = LogLevel::ERROR;
+		$level = LogLevel::CRITICAL;
 		foreach ($this->uncaughtExceptionLevelMap as $class => $candidate) {
 			if ($e instanceof $class) {
 				$level = $candidate;

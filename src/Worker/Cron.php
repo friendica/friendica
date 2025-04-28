@@ -121,6 +121,9 @@ class Cron
 
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateAllSuggestions');
 
+			// add missing public contacts and account-user entries
+			Worker::add(Worker::PRIORITY_LOW, 'FixContacts');
+
 			if (DI::config()->get('system', 'optimize_tables')) {
 				Worker::add(Worker::PRIORITY_LOW, 'OptimizeTables');
 			}

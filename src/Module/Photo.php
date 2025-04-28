@@ -130,6 +130,7 @@ class Photo extends BaseApi
 
 			$photo = MPhoto::getPhoto($photoid, $scale, self::getCurrentUserID());
 			if ($photo === false) {
+				$this->logger->notice('Photo was not loaded', ['parameters' => $this->parameters, 'id' => $photoid]);
 				throw new HTTPException\NotFoundException(DI::l10n()->t('The Photo with id %s is not available.', $photoid));
 			}
 		}
@@ -137,6 +138,7 @@ class Photo extends BaseApi
 		$fetch = microtime(true) - $stamp;
 
 		if ($photo === false) {
+			$this->logger->notice('Photo was not loaded', ['parameters' => $this->parameters]);
 			throw new HTTPException\NotFoundException();
 		}
 
@@ -151,6 +153,7 @@ class Photo extends BaseApi
 			$mimetype = $photo['type'];
 		}
 		if (empty($imgdata) && empty($photo['blurhash'])) {
+			$this->logger->notice('Image data was not loaded', ['parameters' => $this->parameters, 'class' => $photo['backend-class'], 'ref' => $photo['backend-ref']]);
 			throw new HTTPException\NotFoundException();
 		}
 
@@ -317,7 +320,11 @@ class Photo extends BaseApi
 						$photo = MPhoto::selectFirst([], ['scale' => $scale, 'uid' => $contact['uid'], 'profile' => 1]);
 						if (!empty($photo)) {
 							return $photo;
+						} else {
+							$this->logger->notice('Profile photo was not loaded', ['scale' => $scale, 'uid' => $contact['uid']]);
 						}
+					} else {
+						$this->logger->notice('Local Contact was not found', ['url' => $contact['nurl']]);
 					}
 				}
 
@@ -333,6 +340,7 @@ class Photo extends BaseApi
 						if (!empty($photo)) {
 							return $photo;
 						} else {
+							$this->logger->notice('Photo was not loaded', ['resource-id' => $resourceid]);
 							$url = $contact['avatar'];
 						}
 					} else {
@@ -340,6 +348,8 @@ class Photo extends BaseApi
 					}
 				} elseif (!empty($contact['avatar'])) {
 					$url = $contact['avatar'];
+				} else {
+					$url = '';
 				}
 
 				// If it is a local link, we save resources by just redirecting to it.
@@ -380,8 +390,6 @@ class Photo extends BaseApi
 						$this->logger->debug('Expected Content-Type', ['mime' => $mimetext, 'url' => $url]);
 					}
 				}
-
-				$url = '';
 
 				if (empty($mimetext) && !empty($contact['blurhash'])) {
 					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));

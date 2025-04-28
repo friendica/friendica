@@ -205,13 +205,25 @@ final class ItemHelper
 		$item['file']          = trim($item['file'] ?? '');
 
 		// Items cannot be stored before they happen ...
-		if ($item['created'] > DateTimeFormat::utcNow()) {
-			$item['created'] = DateTimeFormat::utcNow();
+		if ($item['received'] > DateTimeFormat::utcNow()) {
+			$item['received'] = DateTimeFormat::utcNow();
+		}
+
+		if ($item['created'] > $item['received']) {
+			$item['created'] = $item['received'];
 		}
 
 		// We haven't invented time travel by now.
-		if ($item['edited'] > DateTimeFormat::utcNow()) {
-			$item['edited'] = DateTimeFormat::utcNow();
+		if ($item['edited'] > $item['received'] ) {
+			$item['edited'] = $item['received'] ;
+		}
+
+		if ($item['changed'] > $item['received'] ) {
+			$item['changed'] = $item['received'] ;
+		}
+
+		if ($item['commented'] > $item['received'] ) {
+			$item['commented'] = $item['received'] ;
 		}
 
 		$item['plink'] = ($item['plink'] ?? '') ?: $this->baseUrl . '/display/' . urlencode($item['guid']);

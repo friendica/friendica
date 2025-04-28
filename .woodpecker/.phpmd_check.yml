@@ -8,6 +8,10 @@ when:
     exclude: [ stable ]
   event: [ pull_request, push ]
 
+# This forces PHP Unit executions at the "opensocial" labeled location (because of access issues with git.friendi.ca)
+labels:
+  location: opensocial
+
 steps:
   restore_cache:
     image: meltwater/drone-cache:dev
@@ -22,7 +26,7 @@ steps:
       - /tmp/drone-cache:/tmp/cache
 
   composer_install:
-    image: friendicaci/php8.3:php8.3.3
+    image: friendicaci/php8.3:php8.3.17
     commands:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
@@ -41,6 +45,6 @@ steps:
       - /tmp/drone-cache:/tmp/cache
 
   phpmd:
-    image: friendicaci/php8.3:php8.3.3
+    image: friendicaci/php8.3:php8.3.17
     commands:
       - ./bin/composer.phar run phpmd

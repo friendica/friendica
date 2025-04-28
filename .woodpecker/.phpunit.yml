@@ -9,11 +9,13 @@ matrix:
     - PHP_MAJOR_VERSION: 8.0
       PHP_VERSION: 8.0.30
     - PHP_MAJOR_VERSION: 8.1
-      PHP_VERSION: 8.1.27
+      PHP_VERSION: 8.1.31
     - PHP_MAJOR_VERSION: 8.2
-      PHP_VERSION: 8.2.16
+      PHP_VERSION: 8.2.28
     - PHP_MAJOR_VERSION: 8.3
-      PHP_VERSION: 8.3.3
+      PHP_VERSION: 8.3.17
+    - PHP_MAJOR_VERSION: 8.4
+      PHP_VERSION: 8.4.5
 
 # This forces PHP Unit executions at the "opensocial" labeled location (because of much more power...)
 labels:
@@ -24,7 +26,19 @@ when:
     exclude: [ stable ]
   event: [ pull_request, push ]
 
+skip_clone: true
+
 steps:
+  clone:
+    image: alpine/git
+    commands:
+      - git config --global user.email "no-reply@friendi.ca"
+      - git config --global user.name "Friendica"
+      - git config --global --add safe.directory $CI_WORKSPACE
+      - git clone $CI_REPO_CLONE_URL .
+      - git checkout $CI_COMMIT_BRANCH
+      - git fetch origin $CI_COMMIT_REF
+      - git merge $CI_COMMIT_SHA
   php-lint:
     image: php:${PHP_MAJOR_VERSION}
     commands:
@@ -94,7 +108,7 @@ steps:
     when:
       matrix:
         PHP_MAJOR_VERSION: 8.2
-        PHP_VERSION: 8.2.16
+        PHP_VERSION: 8.2.28
       repo:
         - friendica/friendica
     commands:

@@ -61,7 +61,7 @@
 						{{if $nav.network}}
 							<li class="nav-segment">
 								<a accesskey="n" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
-									data-toggle="tooltip" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}"><i
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}"><i
 										class="fa fa-lg fa-th fa-fw" aria-hidden="true"></i><span id="net-update"
 										class="nav-network-badge badge nav-notification"></span></a>
 							</li>
@@ -70,14 +70,14 @@
 						{{if $nav.channel}}
 							<li class="nav-segment">
 								<a accesskey="l" class="nav-menu {{$sel.channel}}" href="{{$nav.channel.0}}"
-									data-toggle="tooltip" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
 										class="fa fa-lg fa-newspaper-o fa-fw" aria-hidden="true"></i></a>
 							</li>
 						{{/if}}
 
 						{{if $nav.home}}
 							<li class="nav-segment">
-								<a accesskey="p" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip"
+								<a accesskey="p" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.home.3}}" title="{{$nav.home.3}}"><i class="fa fa-lg fa-home fa-fw"
 										aria-hidden="true"></i><span id="home-update"
 										class="nav-home-badge badge nav-notification"></span></a>
@@ -87,14 +87,14 @@
 						{{if $nav.community}}
 							<li class="nav-segment">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
-									data-toggle="tooltip" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
 										class="fa fa-lg fa-bullseye fa-fw" aria-hidden="true"></i></a>
 							</li>
 						{{/if}}
 
 						{{if $nav.messages}}
 							<li class="nav-segment hidden-xs">
-								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip"
+								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
 									class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg fa-fw"
 										aria-hidden="true"></i><span id="mail-update"
@@ -104,7 +104,7 @@
 
 						{{if $nav.calendar}}
 							<li class="nav-segment hidden-xs">
-								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip"
+								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.1}}" class="nav-menu"><i
 										class="fa fa-lg fa-calendar fa-fw"></i></a>
 							</li>
@@ -112,7 +112,7 @@
 
 						{{if $nav.contacts}}
 							<li class="nav-segment hidden-xs">
-								<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}" data-toggle="tooltip"
+								<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
 									class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}"><i
 										class="fa fa-users fa-lg fa-fw"></i></a>
@@ -503,7 +503,7 @@
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
 				<input id="nav-search-input-field-mobile" class="form-control form-search" type="text" name="q"
-					data-toggle="tooltip" title="{{$search_hint}}" placeholder="{{$nav.search.1}}">
+					data-toggle="tooltip"  data-viewport="#topbar-first" title="{{$search_hint}}" placeholder="{{$nav.search.1}}">
 				<button class="btn btn-default btn-sm form-button-search" type="submit">{{$nav.search.1}}</button>
 			</div>
 		</form>
