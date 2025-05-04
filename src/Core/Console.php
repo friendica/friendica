@@ -71,6 +71,7 @@ Commands:
 	serverblock            Manage blocked servers
 	storage                Manage storage backend
 	relay                  Manage ActivityPub relay servers
+	auth_ejabberd          Daemon that communicates with the ejabberd server
 
 Options:
 	-h|--help|-? Show help information
@@ -83,6 +84,7 @@ HELP;
 		'addon'                             => Friendica\Console\Addon::class,
 		'archivecontact'                    => Friendica\Console\ArchiveContact::class,
 		'autoinstall'                       => Friendica\Console\AutomaticInstallation::class,
+		'auth_ejabberd'                     => Friendica\Console\AuthEJabberd::class,
 		'cache'                             => Friendica\Console\Cache::class,
 		'clearavatarcache'                  => Friendica\Console\ClearAvatarCache::class,
 		'config'                            => Friendica\Console\Config::class,

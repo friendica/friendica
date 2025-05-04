@@ -17,7 +17,7 @@
  *
  * Installation:
  *
- * 	- Change it's owner to whichever user is running the server, ie. ejabberd
+ * 	- Change its owner to whichever user is running the server, ie. ejabberd
  * 	  $ chown ejabberd:ejabberd /path/to/friendica/bin/auth_ejabberd.php
  *
  * 	- Change the access mode so it is readable only to the user ejabberd and has exec
@@ -48,8 +48,13 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// BC: Add console command as second argument
+$argv = $_SERVER['argv'] ?? [];
+array_splice($argv, 1, 0, "auth_ejabberd");
+$_SERVER['argv'] = $argv;
+
 $container = \Friendica\Core\DiceContainer::fromBasePath(dirname(__DIR__));
 
 $app = \Friendica\App::fromContainer($container);
 
-$app->processEjabberd($_SERVER);
+$app->processConsole($_SERVER);
