@@ -41,6 +41,7 @@ Commands:
 	jetstream              Interact with the Jetstream daemon
 	worker                 Start worker process
 	fedibuzzrelay          Interact with the FediBuzz relay daemon
+	auth_ejabberd          Daemon that communicates with the ejabberd server
 
 	node management
 		archivecontact         Archive a contact when you know that it isn't existing anymore
@@ -85,6 +86,7 @@ HELP;
 		'addon'                             => Friendica\Console\Addon::class,
 		'archivecontact'                    => Friendica\Console\ArchiveContact::class,
 		'autoinstall'                       => Friendica\Console\AutomaticInstallation::class,
+		'auth_ejabberd'                     => Friendica\Console\AuthEJabberd::class,
 		'cache'                             => Friendica\Console\Cache::class,
 		'clearavatarcache'                  => Friendica\Console\ClearAvatarCache::class,
 		'config'                            => Friendica\Console\Config::class,
