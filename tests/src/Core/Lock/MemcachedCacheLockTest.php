@@ -8,10 +8,11 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Exception;
+use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Type\MemcachedCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Lock\Type\CacheLock;
-use Friendica\Test\LockTestCase;
+use Friendica\Test\CacheLockTestCase;
 use Mockery;
 use Psr\Log\NullLogger;
 
@@ -19,9 +20,12 @@ use Psr\Log\NullLogger;
  * @requires extension memcached
  * @group MEMCACHED
  */
-class MemcachedCacheLockTest extends LockTestCase
+class MemcachedCacheLockTest extends CacheLockTestCase
 {
-	protected function getInstance()
+	private MemcachedCache $cache;
+	private CacheLock $lock;
+
+	protected function setUp(): void
 	{
 		$configMock = Mockery::mock(IManageConfigValues::class);
 
@@ -35,16 +39,24 @@ class MemcachedCacheLockTest extends LockTestCase
 
 		$logger = new NullLogger();
 
-		$lock = null;
-
 		try {
-			$cache = new MemcachedCache($host, $configMock, $logger);
-			$lock = new CacheLock($cache);
+			$this->cache = new MemcachedCache($host, $configMock, $logger);
+			$this->lock  = new CacheLock($this->cache);
 		} catch (Exception $e) {
 			static::markTestSkipped('Memcached is not available');
 		}
 
-		return $lock;
+		parent::setUp();
+	}
+
+	protected function getInstance(): CacheLock
+	{
+		return $this->lock;
+	}
+
+	protected function getCache(): ICanCacheInMemory
+	{
+		return $this->cache;
 	}
 
 	/**

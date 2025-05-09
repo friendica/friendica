@@ -8,19 +8,20 @@
 namespace Friendica\Test\src\Core\Lock;
 
 use Exception;
+use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Type\RedisCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Lock\Type\CacheLock;
-use Friendica\Test\LockTestCase;
+use Friendica\Test\CacheLockTestCase;
 use Mockery;
 
 /**
  * @requires extension redis
  * @group REDIS
  */
-class RedisCacheLockTest extends LockTestCase
+class RedisCacheLockTest extends CacheLockTestCase
 {
-	protected function getInstance()
+	protected function setUp(): void
 	{
 		$configMock = Mockery::mock(IManageConfigValues::class);
 
@@ -45,15 +46,23 @@ class RedisCacheLockTest extends LockTestCase
 			->with('system', 'redis_password')
 			->andReturn(null);
 
-		$lock = null;
-
 		try {
-			$cache = new RedisCache($host, $configMock);
-			$lock = new CacheLock($cache);
+			$this->cache = new RedisCache($host, $configMock);
+			$this->lock  = new CacheLock($this->cache);
 		} catch (Exception $e) {
 			static::markTestSkipped('Redis is not available. Error: ' . $e->getMessage());
 		}
 
-		return $lock;
+		parent::setUp();
+	}
+
+	protected function getInstance(): CAcheLock
+	{
+		return $this->lock;
+	}
+
+	protected function getCache(): ICanCacheInMemory
+	{
+		return $this->cache;
 	}
 }

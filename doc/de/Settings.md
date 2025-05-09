@@ -410,7 +410,7 @@ Wir raten allerdings dringen davon ab, da es die Interoperabilität mit anderen 
 Mal angenommen, du hast ein Unterverzeichnis tests und willst Friendica in ein weiteres Unterverzeichnis installieren, dann lautet die Konfiguration hierfür:
 
 	'system' => [
-		'urlpath' => 'tests/friendica',
+		'url' => 'https://example.com/tests/friendica',
 	],
 
 ## Weitere Ausnahmen

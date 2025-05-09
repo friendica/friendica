@@ -5,16 +5,23 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Core\Cache;
+namespace Core\Cache;
 
 use Friendica\Core\Cache\Type\ArrayCache;
+use Friendica\Core\Cache\Type\ProfilerCacheDecorator;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Test\MemoryCacheTestCase;
+use Friendica\Util\Profiler;
 
-class ArrayCacheTest extends MemoryCacheTestCase
+class ProfilerCacheDecoratorTest extends MemoryCacheTestCase
 {
 	protected function getInstance()
 	{
-		$this->cache = new ArrayCache('localhost');
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')->with('system', 'profiler')->once()->andReturn(false);
+		$config->shouldReceive('get')->with('rendertime', 'callstack')->once()->andReturn(false);
+
+		$this->cache = new ProfilerCacheDecorator(new ArrayCache('localhost'), new Profiler($config));
 		return $this->cache;
 	}
 
@@ -40,5 +47,10 @@ class ArrayCacheTest extends MemoryCacheTestCase
 	public function testGetStats()
 	{
 		self::assertEmpty($this->cache->getStats());
+	}
+
+	public function testGetName()
+	{
+		self::assertStringEndsWith(' (with profiler)', $this->instance->getName());
 	}
 }

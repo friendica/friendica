@@ -166,4 +166,14 @@ class ProfilerCacheDecorator implements ICanCache, ICanCacheInMemory
 	{
 		return $this->cache->getName() . ' (with profiler)';
 	}
+
+	/** {@inheritDoc} */
+	public function getStats(): array
+	{
+		if ($this->cache instanceof ICanCacheInMemory) {
+			return $this->cache->getStats();
+		} else {
+			return [];
+		}
+	}
 }

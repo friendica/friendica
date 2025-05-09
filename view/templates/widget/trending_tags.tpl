@@ -27,7 +27,7 @@
 			<div style="text-align: left; margin-top: 10px;">
 				<a href="#" onclick="toggleTags(event)" role="button" aria-expanded="false" aria-controls="more-tags" style="text-decoration: none; color: inherit; cursor: pointer; display: inline-flex; align-items: center; font-weight: bold;">
 					<i id="caret-icon" class="fa fa-caret-right" aria-hidden="true" style="margin-right: 5px;"></i>
-					<span id="link-text">Show More</span>
+					<span id="link-text">{{$showmore}}</span>
 				</a>
 			</div>
 			<ul id="more-tags" style="display:none; list-style-type: none; padding: 0; margin: 0;">
@@ -53,12 +53,12 @@
 
 		if (moreTags.style.display === 'none') {
 			moreTags.style.display = 'block';
-			linkText.textContent = 'Show Less';
+			linkText.textContent = '{{$showless}}';
 			link.setAttribute('aria-expanded', 'true');
 			caretIcon.className = 'fa fa-caret-down';
 		} else {
 			moreTags.style.display = 'none';
-			linkText.textContent = 'Show More';
+			linkText.textContent = '{{$showmore}}';
 			link.setAttribute('aria-expanded', 'false');
 			caretIcon.className = 'fa fa-caret-right';
 		}

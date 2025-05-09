@@ -7,26 +7,39 @@
 
 namespace Friendica\Test\src\Core\Lock;
 
+use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Type\APCuCache;
+use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Lock\Type\CacheLock;
-use Friendica\Test\LockTestCase;
+use Friendica\Test\CacheLockTestCase;
 
 /**
  * @group APCU
  */
-class APCuCacheLockTest extends LockTestCase
+class APCuCacheLockTest extends CacheLockTestCase
 {
+	private APCuCache $cache;
+	private ICanLock $lock;
+
 	protected function setUp(): void
 	{
 		if (!APCuCache::isAvailable()) {
 			static::markTestSkipped('APCu is not available');
 		}
 
+		$this->cache = new APCuCache('localhost');
+		$this->lock  = new CacheLock($this->cache);
+
 		parent::setUp();
 	}
 
-	protected function getInstance()
+	protected function getInstance(): CacheLock
 	{
-		return new CacheLock(new APCuCache('localhost'));
+		return $this->lock;
+	}
+
+	protected function getCache(): ICanCacheInMemory
+	{
+		return $this->cache;
 	}
 }

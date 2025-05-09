@@ -78,15 +78,3 @@ The following will compress */var/log/friendica* (assuming this is the location 
 		daily
 		rotate 2
 	}
-
-### Zabbix
-
-To monitor the health status of your Friendica installation, you can use for example a tool like Zabbix. Please define 'stats_key' in your local.config.php in the 'system' section to be able to access the statistics page at /stats?key=your-defined-stats_key
-
-The statistics contain data about the worker performance, the last cron call, number of reports, inbound and outbound packets, posts and comments.
-
-### Prometheus
-
-To use [prometheus](https://prometheus.io) for gathering metrics, use the [Friendica exporter](https://git.friendi.ca/friendica/friendica-exporter).
-
-You can find the installation instructions here: https://git.friendi.ca/friendica/friendica-exporter#installation

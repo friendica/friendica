@@ -8,8 +8,10 @@
 namespace Friendica\Module;
 
 use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
-use Friendica\Core\Addon;
+use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\L10n;
@@ -23,13 +25,27 @@ class Statistics extends BaseModule
 	protected $config;
 	/** @var IManageKeyValuePairs */
 	protected $keyValue;
+	private AddonHelper $addonHelper;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, IManageConfigValues $config, IManageKeyValuePairs $keyValue, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		IManageConfigValues $config,
+		IManageKeyValuePairs $keyValue,
+		AddonHelper $addonHelper,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config   = $config;
-		$this->keyValue = $keyValue;
+		$this->config      = $config;
+		$this->keyValue    = $keyValue;
+		$this->addonHelper = $addonHelper;
+
 		if (!$this->config->get("system", "nodeinfo")) {
 			throw new NotFoundException();
 		}
@@ -37,22 +53,21 @@ class Statistics extends BaseModule
 
 	protected function rawContent(array $request = [])
 	{
-		$registration_open =
-			Register::getPolicy() !== Register::CLOSED
+		$registration_open = Register::getPolicy() !== Register::CLOSED
 			&& !$this->config->get('config', 'invitation_only');
 
 		/// @todo mark the "service" addons and load them dynamically here
 		$services = [
-			'appnet'      => Addon::isEnabled('appnet'),
-			'bluesky'     => Addon::isEnabled('bluesky'),
-			'dreamwidth'  => Addon::isEnabled('dreamwidth'),
-			'gnusocial'   => Addon::isEnabled('gnusocial'),
-			'libertree'   => Addon::isEnabled('libertree'),
-			'livejournal' => Addon::isEnabled('livejournal'),
-			'pumpio'      => Addon::isEnabled('pumpio'),
-			'twitter'     => Addon::isEnabled('twitter'),
-			'tumblr'      => Addon::isEnabled('tumblr'),
-			'wordpress'   => Addon::isEnabled('wordpress'),
+			'appnet'      => $this->addonHelper->isAddonEnabled('appnet'),
+			'bluesky'     => $this->addonHelper->isAddonEnabled('bluesky'),
+			'dreamwidth'  => $this->addonHelper->isAddonEnabled('dreamwidth'),
+			'gnusocial'   => $this->addonHelper->isAddonEnabled('gnusocial'),
+			'libertree'   => $this->addonHelper->isAddonEnabled('libertree'),
+			'livejournal' => $this->addonHelper->isAddonEnabled('livejournal'),
+			'pumpio'      => $this->addonHelper->isAddonEnabled('pumpio'),
+			'twitter'     => $this->addonHelper->isAddonEnabled('twitter'),
+			'tumblr'      => $this->addonHelper->isAddonEnabled('tumblr'),
+			'wordpress'   => $this->addonHelper->isAddonEnabled('wordpress'),
 		];
 
 		$statistics = array_merge([
