@@ -53,4 +53,11 @@ interface ICanCacheInMemory extends ICanCache
 	 * @throws CachePersistenceException In case the underlying cache driver has errors during persistence
 	 */
 	public function compareDelete(string $key, $value): bool;
+
+	/**
+	 * Returns some basic statistics of the used Cache instance
+	 *
+	 * @return array Returns an associative array of statistics
+	 */
+	public function getStats(): array;
 }

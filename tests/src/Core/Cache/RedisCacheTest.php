@@ -57,4 +57,21 @@ class RedisCacheTest extends MemoryCacheTestCase
 		$this->cache->clear(false);
 		parent::tearDown();
 	}
+
+	/**
+	 * @small
+	 */
+	public function testStats()
+	{
+		$stats = $this->instance->getStats();
+
+		self::assertNotNull($stats['version']);
+		self::assertIsNumeric($stats['hits']);
+		self::assertIsNumeric($stats['misses']);
+		self::assertIsNumeric($stats['evictions']);
+		self::assertIsNumeric($stats['entries']);
+		self::assertIsNumeric($stats['used_memory']);
+		self::assertGreaterThan(0, $stats['connected_clients']);
+		self::assertGreaterThan(0, $stats['uptime']);
+	}
 }

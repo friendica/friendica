@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b77bf714197f04022a5feb001bf07852",
+    "content-hash": "32af97f73ec49df2a6cfe98f11bc1d60",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -5440,6 +5440,71 @@
                 }
             ],
             "time": "2024-02-10T21:37:25+00:00"
+        },
+        {
+            "name": "php-mock/php-mock-mockery",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-mock/php-mock-mockery.git",
+                "reference": "291994acdc26daf1e3c659cfbe58b01eeb180b7f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-mock/php-mock-mockery/zipball/291994acdc26daf1e3c659cfbe58b01eeb180b7f",
+                "reference": "291994acdc26daf1e3c659cfbe58b01eeb180b7f",
+                "shasum": ""
+            },
+            "require": {
+                "mockery/mockery": "^1",
+                "php": ">=5.6",
+                "php-mock/php-mock-integration": "^2.2.1 || ^3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4|^5|^8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "phpmock\\mockery\\": "classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "WTFPL"
+            ],
+            "authors": [
+                {
+                    "name": "Markus Malkusch",
+                    "email": "markus@malkusch.de",
+                    "homepage": "http://markus.malkusch.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Mock built-in PHP functions (e.g. time()) with Mockery. This package relies on PHP's namespace fallback policy. No further extension is needed.",
+            "homepage": "https://github.com/php-mock/php-mock-mockery",
+            "keywords": [
+                "BDD",
+                "TDD",
+                "function",
+                "mock",
+                "mockery",
+                "stub",
+                "test",
+                "test double",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/php-mock/php-mock-mockery/issues",
+                "source": "https://github.com/php-mock/php-mock-mockery/tree/1.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/michalbundyra",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-03-08T19:46:20+00:00"
         },
         {
             "name": "php-mock/php-mock-phpunit",

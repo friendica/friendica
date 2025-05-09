@@ -642,7 +642,8 @@ return [
 		],
 	],
 
-	'/stats' => [Module\Stats::class, [R::GET]],
+	'/stats'         => [Module\Stats::class, [R::GET]],
+	'/stats/caching' => [Module\StatsCaching::class, [R::GET]],
 
 	'/network' => [
 		'[/{content}]'                => [Module\Conversation\Network::class, [R::GET]],

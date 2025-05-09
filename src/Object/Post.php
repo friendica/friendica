@@ -9,7 +9,6 @@ namespace Friendica\Object;
 
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Feature;
-use Friendica\Core\Addon;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -1118,12 +1117,14 @@ class Post
 		$conv        = $this->getThread();
 
 		if ($conv->isWritable() && $this->isWritable()) {
+			$addonHelper = DI::addonHelper();
+
 			/*
 			 * Hmmm, code depending on the presence of a particular addon?
 			 * This should be better if done by a hook
 			 */
 			$qcomment = null;
-			if (Addon::isEnabled('qcomment')) {
+			if ($addonHelper->isAddonEnabled('qcomment')) {
 				$words    = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'qcomment', 'words');
 				$qcomment = $words ? explode("\n", $words) : [];
 			}

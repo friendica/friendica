@@ -8,21 +8,17 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Lock\Capability\ICanLock;
-use Friendica\Test\MockedTestCase;
 
 abstract class LockTestCase extends MockedTestCase
 {
 	/**
-	 * @var int Start time of the mock (used for time operations)
+	 * Start time of the mock (used for time operations)
 	 */
-	protected $startTime = 1417011228;
+	protected int $startTime = 1417011228;
+	protected ICanLock $instance;
 
-	/**
-	 * @var ICanLock
-	 */
-	protected $instance;
+	abstract protected function getInstance(): ICanLock;
 
-	abstract protected function getInstance();
 
 	protected function setUp(): void
 	{
@@ -205,4 +201,6 @@ abstract class LockTestCase extends MockedTestCase
 		self::assertFalse($this->instance->isLocked('wrongLock'));
 		self::assertFalse($this->instance->release('wrongLock'));
 	}
+
+
 }

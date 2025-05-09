@@ -198,7 +198,7 @@ class Page implements ArrayAccess
 	) {
 		// Default title: current module called
 		if (empty($this->page['title']) && $args->getModuleName()) {
-			$this->page['title'] = ucfirst($args->getModuleName());
+			$this->page['title'] = $l10n->t(ucfirst($args->getModuleName()));
 		}
 
 		// Prepend the sitename to the page title

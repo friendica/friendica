@@ -218,7 +218,6 @@ All options will be saved in the `config/local.config.php` and are overruling th
 -	`-U|--dbuser <username>` The username of the mysql/mariadb database login (env `MYSQL_USER` or `MYSQL_USERNAME`)
 -	`-P|--dbpass <password>` The password of the mysql/mariadb database login (env `MYSQL_PASSWORD`)
 -	`-d|--dbdata <database>` The name of the mysql/mariadb database (env `MYSQL_DATABASE`)
--	`-u|--urlpath <url_path>` The URL path of Friendica - f.e. '/friendica' (env `FRIENDICA_URL_PATH`)
 -	`-b|--phppath <php_path>` The path of the PHP binary (env `FRIENDICA_PHP_PATH`)
 -	`-A|--admin <mail>` The admin email address of Friendica (env `FRIENDICA_ADMIN_MAIL`)
 -	`-T|--tz <timezone>` The timezone of Friendica (env `FRIENDICA_TZ`)

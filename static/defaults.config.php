@@ -126,6 +126,11 @@ return [
 		// Display "Emoji Only" posts in big.
 		'big_emojis' => true,
 
+		// basepath (String)
+		// Absolute file path to your Friendica install
+		// Examples: /var/www, /home/user/friendica...
+		'basepath' => '',
+
 		// bulk_delivery (Boolean)
 		// Delivers AP messages in a bulk (experimental)
 		'bulk_delivery' => false,
@@ -576,6 +581,12 @@ return [
 		// transmit_pending_events (Boolean)
 		// Transmit pending events upon accepted contact request for groups
 		'transmit_pending_events' => false,
+
+		// url (String)
+		// The absolute URL used to access your Friendica node. It should include the scheme, the domain name, and the
+		// sub-folder if any. Used by command-line processes to send correct links to your Friendica server.
+		// Example: https://example.com/friendica
+		'url' => '',
 
 		// username_min_length (Integer)
 		// The minimum character length a username can be.
