@@ -43,6 +43,7 @@ and this project [promises Backward Compatibility](doc/Developers-Intro.md#backw
 - Class `Friendica\Core\Logger\Factory\Logger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
 - Class `Friendica\Core\Logger\Factory\StreamLogger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
 - Class `Friendica\Core\Logger\Factory\SyslogLogger` is deprecated and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.
+- The method `\Friendica\BaseRepository::_selectOne()` is deprecated, use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead.
 
 ### Removed
 
