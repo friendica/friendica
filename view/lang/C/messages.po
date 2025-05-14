@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-17 09:29+0200\n"
+"POT-Creation-Date: 2025-07-20 16:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2476,8 +2476,9 @@ msgstr ""
 
 #: src/Content/Widget/VCard.php:111 src/Model/Event.php:68
 #: src/Model/Event.php:95 src/Model/Event.php:462 src/Model/Event.php:950
-#: src/Model/Profile.php:351 src/Module/Contact/Profile.php:449
-#: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:180
+#: src/Model/Profile.php:351 src/Module/Calendar/Event/Form.php:227
+#: src/Module/Contact/Profile.php:449 src/Module/Directory.php:133
+#: src/Module/Notifications/Introductions.php:180
 #: src/Module/Profile/Profile.php:235
 msgid "Location:"
 msgstr ""
@@ -5889,10 +5890,6 @@ msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:225
 msgid "Description (BBCode allowed)"
-msgstr ""
-
-#: src/Module/Calendar/Event/Form.php:227
-msgid "Location (BBCode not allowed)"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:230
