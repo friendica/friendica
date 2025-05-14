@@ -132,34 +132,8 @@
 					</li>
 					*}}
 					<li>
-						<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="loc">
-							<i class="fa fa-link"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="loc">
-							<i class="fa fa-video-camera"></i>
-						</button>
-					</li>
-
-					<li>
-						<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="loc">
-							<i class="fa fa-underline"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="loc">
-							<i class="fa fa-italic"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="loc">
-							<i class="fa fa-bold"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="loc">
-							<i class="fa fa-quote-left"></i>
+						<button type="button" class="btn-link icon map" style="cursor: pointer;" title="{{$edmap}}" data-role="insert-formatting" data-comment=" " data-bbcode="map" data-id="loc">
+							<i class="fa fa-map-marker"></i>
 						</button>
 					</li>
 				</ul>

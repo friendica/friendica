@@ -224,7 +224,7 @@ class Form extends BaseModule
 			'$t_orig'      => $t_orig,
 			'$d_text'      => $this->t('Description (BBCode allowed)'),
 			'$d_orig'      => $d_orig,
-			'$l_text'      => $this->t('Location (BBCode not allowed)'),
+			'$l_text'      => $this->t('Location:'),
 			'$l_orig'      => $l_orig,
 			'$summary'     => ['summary', $this->t('Title (BBCode not allowed)'), $t_orig, '', '*'],
 			'$sh_text'     => $this->t('Share this event'),
