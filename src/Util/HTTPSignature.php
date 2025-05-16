@@ -7,6 +7,7 @@
 
 namespace Friendica\Util;
 
+use Exception;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -213,7 +214,7 @@ class HTTPSignature
 
 		$headers = [];
 		foreach ($matches as $match) {
-			$headers[$match[1]] = trim($match[2] ?: $match[3], '"');
+			$headers[$match[1]] = trim((string) $match[2], '"');
 		}
 
 		// if the header is encrypted, decrypt with (default) site private key and continue
@@ -247,7 +248,7 @@ class HTTPSignature
 	private static function decryptSigheader(array $headers, string $prvkey): string
 	{
 		if (!empty($headers['iv']) && !empty($headers['key']) && !empty($headers['data'])) {
-			return Crypto::unencapsulate($headers, $prvkey);
+			return (string) Crypto::unencapsulate($headers, $prvkey);
 		}
 
 		return '';
@@ -537,14 +538,12 @@ class HTTPSignature
 
 		if (!empty($uid)) {
 			$owner = User::getOwnerDataById($uid);
-			if (!$owner) {
-				return;
-			}
 		} else {
 			$owner = User::getSystemAccount();
-			if (!$owner) {
-				return;
-			}
+		}
+
+		if (!$owner) {
+			throw new Exception('Could not find owner for uid ' . $uid);
 		}
 
 		if (!empty($owner['uprvkey'])) {

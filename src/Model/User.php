@@ -13,7 +13,6 @@ use ErrorException;
 use Exception;
 use Friendica\App;
 use Friendica\Content\Pager;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Search;
@@ -21,6 +20,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Module;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -760,12 +760,16 @@ class User
 			'user_record'   => null
 		];
 
-		/*
+		$eventDispatcher = DI::eventDispatcher();
+
+		/**
 		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
 		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
 		 * and later addons should not interfere with an earlier one that succeeded.
 		 */
-		Hook::callAll('authenticate', $addon_auth);
+		$addon_auth = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_AUTHENTICATE, $addon_auth),
+		)->getArray();
 
 		if ($addon_auth['authenticated'] && $addon_auth['user_record']) {
 			return $addon_auth['user_record']['uid'];
@@ -1464,11 +1468,20 @@ class User
 			Contact::updateSelfFromUserID($uid, true);
 		}
 
-		Hook::callAll('register_account', $uid);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
+			'uid' => $uid,
+		];
+
+		$eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, $hook_data),
+		);
 
 		self::setRegisterMethodByUserCount();
 
 		$return['user'] = $user;
+
 		return $return;
 	}
 
@@ -1791,7 +1804,17 @@ class User
 			throw new \RuntimeException(DI::l10n()->t("User with delegates can't be removed, please remove delegate users first"));
 		}
 
-		Hook::callAll('remove_user', $user);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
+			'user' => $user,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, $hook_data),
+		)->getArray();
+
+		$user = $hook_data['user'] ?? $user;
 
 		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
 

@@ -250,7 +250,7 @@ class Receiver
 	 * @param string  $object_id Object ID of the provided object
 	 * @param integer $uid       User ID
 	 *
-	 * @return string with object type or NULL
+	 * @return string|null string with object type or NULL
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */

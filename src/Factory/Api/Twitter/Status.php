@@ -39,7 +39,7 @@ class Status extends BaseFactory
 	private $mention;
 	/** @var Activities entity */
 	private $activities;
-	/** @var Activities entity */
+	/** @var Attachment entity */
 	private $attachment;
 	/** @var ContentItem */
 	private $contentItem;
@@ -111,7 +111,7 @@ class Status extends BaseFactory
 	 */
 	private function createFromArray(array $item, int $uid, bool $include_entities): \Friendica\Object\Api\Twitter\Status
 	{
-		$item = Post\Media::addHTMLAttachmentToItem($item);
+		$item   = Post\Media::addHTMLAttachmentToItem($item);
 		$author = $this->twitterUser->createFromContactId($item['author-id'], $uid, true);
 
 		if (!empty($item['causer-id']) && ($item['post-reason'] == Item::PR_ANNOUNCEMENT)) {
@@ -165,7 +165,7 @@ class Status extends BaseFactory
 			$urls     = $this->url->createFromUriId($item['uri-id']);
 			$mentions = $this->mention->createFromUriId($item['uri-id']);
 		} else {
-			$attachments = $this->attachment->createFromUriId($item['uri-id'], $text);
+			$attachments = $this->attachment->createFromUriId($item['uri-id']);
 		}
 
 		$friendica_activities = $this->activities->createFromUriId($item['uri-id'], $uid);
@@ -180,7 +180,7 @@ class Status extends BaseFactory
 				$urls     = array_merge($urls, $this->url->createFromUriId($shared_uri_id));
 				$mentions = array_merge($mentions, $this->mention->createFromUriId($shared_uri_id));
 			} else {
-				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id, $text));
+				$attachments = array_merge($attachments, $this->attachment->createFromUriId($shared_uri_id));
 			}
 		}
 
@@ -203,6 +203,6 @@ class Status extends BaseFactory
 			$entities = [];
 		}
 
-		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments,  $friendica_comments, $liked);
+		return new \Friendica\Object\Api\Twitter\Status($text, $statusnetHtml, $friendicaHtml, $item, $author, $owner, $retweeted, $quoted, $geo, $friendica_activities, $entities, $attachments, $friendica_comments, $liked);
 	}
 }

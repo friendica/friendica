@@ -31,7 +31,6 @@ use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\ACL;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
@@ -39,6 +38,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\Post;
@@ -49,6 +49,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Network extends Timeline
@@ -59,9 +60,9 @@ class Network extends Timeline
 	protected $dateFrom;
 	/** @var string */
 	protected $dateTo;
-	/** @var int */
+	/** @var bool */
 	protected $star;
-	/** @var int */
+	/** @var bool */
 	protected $mention;
 
 	/** @var AppHelper */
@@ -90,12 +91,55 @@ class Network extends Timeline
 	protected $community;
 	/** @var NetworkFactory */
 	protected $networkFactory;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(UserDefinedChannelFactory $userDefinedChannel, NetworkFactory $network, CommunityFactory $community, ChannelFactory $channelFactory, UserDefinedChannel $channel, AppHelper $appHelper, TimelineFactory $timeline, SystemMessages $systemMessages, Mode $mode, Conversation $conversation, Page $page, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		parent::__construct($channel, $mode, $session, $database, $pConfig, $config, $cache, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	public function __construct(
+		UserDefinedChannelFactory $userDefinedChannel,
+		NetworkFactory $network,
+		CommunityFactory $community,
+		ChannelFactory $channelFactory,
+		UserDefinedChannel $channel,
+		AppHelper $appHelper,
+		EventDispatcherInterface $eventDispatcher,
+		TimelineFactory $timeline,
+		SystemMessages $systemMessages,
+		Mode $mode,
+		Conversation $conversation,
+		Page $page,
+		IHandleUserSessions $session,
+		Database $database,
+		IManagePersonalConfigValues $pConfig,
+		IManageConfigValues $config,
+		ICanCache $cache,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
+		parent::__construct(
+			$channel,
+			$mode,
+			$session,
+			$database,
+			$pConfig,
+			$config,
+			$cache,
+			$l10n,
+			$baseUrl,
+			$args,
+			$logger,
+			$profiler,
+			$response,
+			$server,
+			$parameters,
+		);
 
 		$this->appHelper          = $appHelper;
+		$this->eventDispatcher    = $eventDispatcher;
 		$this->timeline           = $timeline;
 		$this->systemMessages     = $systemMessages;
 		$this->conversation       = $conversation;
@@ -116,8 +160,13 @@ class Network extends Timeline
 
 		$module = 'network';
 
-		$arr = ['query' => $this->args->getQueryString()];
-		Hook::callAll('network_content_init', $arr);
+		$hook_data = [
+			'query' => $this->args->getQueryString(),
+		];
+
+		$this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data)
+		);
 
 		$o = '';
 
@@ -275,19 +324,24 @@ class Network extends Timeline
 			$tabs = array_merge($tabs, $this->getTabArray($this->community->getTimelines(true), 'network', 'channel'));
 		}
 
-		$arr = ['tabs' => $tabs];
-		Hook::callAll('network_tabs', $arr);
+		$hook_data = [
+			'tabs' => $tabs,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data)
+		)->getArray();
 
 		if (!empty($network_timelines)) {
 			$tabs = [];
 
-			foreach ($arr['tabs'] as $tab) {
+			foreach ($hook_data['tabs'] as $tab) {
 				if (in_array($tab['code'], $network_timelines)) {
 					$tabs[] = $tab;
 				}
 			}
 		} else {
-			$tabs = $arr['tabs'];
+			$tabs = $hook_data['tabs'];
 		}
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');

@@ -29,9 +29,9 @@ class DirectMessage extends BaseDataTransferObject
 	protected $sender_screen_name = null;
 	/** @var string */
 	protected $recipient_screen_name = null;
-	/** @var User */
+	/** @var array */
 	protected $sender;
-	/** @var User */
+	/** @var array */
 	protected $recipient;
 	/** @var string|null */
 	protected $title;

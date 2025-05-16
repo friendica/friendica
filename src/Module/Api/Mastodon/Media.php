@@ -13,6 +13,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
+use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Strings;
 
 /**
@@ -43,12 +44,13 @@ class Media extends BaseApi
 
 		if (in_array($type, [Post\Media::IMAGE, Post\Media::UNKNOWN, Post\Media::APPLICATION])) {
 			$media = Photo::upload($uid, $request['file'], '', null, null, '', '', $request['description']);
-			if (!empty($media)) {
-				$this->logger->info('Uploaded photo', ['media' => $media]);
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
-			} elseif ($type == Post\Media::IMAGE) {
-				$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
+
+			if (empty($media)) {
+				$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity('Error while uploading media.'));
 			}
+
+			$this->logger->info('Uploaded photo', ['media' => $media]);
+			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($media['id']));
 		}
 
 		$tempFileName = $request['file']['tmp_name'];
@@ -97,14 +99,24 @@ class Media extends BaseApi
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $this->parameters['id'], 'uid' => $uid]);
 		if (empty($photo['resource-id'])) {
 			$media = Post\Media::getById($this->parameters['id']);
+
 			if (empty($media['uri-id'])) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
+
 			if (!Post::exists(['uri-id' => $media['uri-id'], 'uid' => $uid, 'origin' => true])) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
+
 			Post\Media::updateById(['description' => $request['description']], $this->parameters['id']);
-			$this->jsonExit(DI::mstdnAttachment()->createFromId($this->parameters['id']));
+
+			try {
+				$attachment = DI::mstdnAttachment()->createFromId($this->parameters['id'] . '1');
+			} catch (InternalServerErrorException $th) {
+				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+			}
+
+			$this->jsonExit($attachment);
 		}
 
 		Photo::update(['desc' => $request['description']], ['resource-id' => $photo['resource-id']]);

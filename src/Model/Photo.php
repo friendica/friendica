@@ -244,7 +244,7 @@ class Photo
 	 *
 	 * @param array $photo Photo data. Needs at least 'id', 'type', 'backend-class', 'backend-ref'
 	 *
-	 * @return \Friendica\Object\Image|null Image object or null on error
+	 * @return string|null Image data as string or null on error
 	 */
 	public static function getImageDataForPhoto(array $photo)
 	{
@@ -254,7 +254,7 @@ class Photo
 
 		try {
 			$backendClass = DI::storageManager()->getByName($photo['backend-class'] ?? '');
-			/// @todo refactoring this returning, because the storage returns a "string" which is casted in different ways - a check "instanceof Image" will fail!
+
 			return $backendClass->get($photo['backend-ref'] ?? '');
 		} catch (InvalidClassStorageException $storageException) {
 			try {
@@ -834,10 +834,9 @@ class Photo
 	 * - Sharing a post with a group will create a photo that only the group can see.
 	 * - Sharing a photo again that been shared non public before doesn't alter the permissions.
 	 *
-	 * @return string
 	 * @throws \Exception
 	 */
-	public static function setPermissionFromBody($body, $uid, $original_contact_id, $str_contact_allow, $str_circle_allow, $str_contact_deny, $str_circle_deny)
+	public static function setPermissionFromBody($body, $uid, $original_contact_id, $str_contact_allow, $str_circle_allow, $str_contact_deny, $str_circle_deny): bool
 	{
 		// Simplify image codes
 		$img_body = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $body);

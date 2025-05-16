@@ -18,7 +18,7 @@ use Friendica\Util\Network;
  */
 class Relationship extends BaseDataTransferObject
 {
-	/** @var int */
+	/** @var string */
 	protected $id;
 	/** @var bool */
 	protected $following = false;
@@ -93,7 +93,5 @@ class Relationship extends BaseDataTransferObject
 			$this->blocked_by  = $isBlocked;
 			$this->note        = $contactRecord['info'];
 		}
-
-		return $this;
 	}
 }

@@ -209,7 +209,7 @@ class Strings
 	{
 		// If this method is called for an infinite (== unlimited) amount of bytes:
 		if ($bytes == INF) {
-			return INF;
+			return 'INF';
 		}
 
 		$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
@@ -509,7 +509,7 @@ class Strings
 			function ($matches) use ($blocks) {
 				$return = $matches[0];
 				if (isset($blocks[intval($matches[1])])) {
-					$return = $blocks[$matches[1]];
+					$return = $blocks[intval($matches[1])];
 				}
 				return $return;
 			},

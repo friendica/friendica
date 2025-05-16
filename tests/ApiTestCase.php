@@ -11,6 +11,7 @@ use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
+use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\DI;
 use Friendica\Module\Special\HTTPException;
 use Friendica\Security\Authentication;
@@ -158,6 +159,13 @@ abstract class ApiTestCase extends FixtureTestCase
 			->addRule(Authentication::class, ['instanceOf' => AuthenticationDouble::class, 'shared' => true])
 		;
 		DI::init($this->dice);
+
+		/** @var \Friendica\Event\EventDispatcher */
+		$eventDispatcher = DI::eventDispatcher();
+
+		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
+			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
 
 		$this->httpExceptionMock = $this->dice->create(HTTPException::class);
 

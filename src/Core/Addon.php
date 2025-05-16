@@ -8,7 +8,6 @@
 namespace Friendica\Core;
 
 use Friendica\DI;
-use Friendica\Model\Contact;
 use Friendica\Util\Strings;
 
 /**
@@ -267,12 +266,6 @@ class Addon
 					if ($type == "author" || $type == "maintainer") {
 						$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);
 						if ($r) {
-							if (!empty($m[2]) && empty(parse_url($m[2], PHP_URL_SCHEME))) {
-								$contact = Contact::getByURL($m[2], false);
-								if (!empty($contact['url'])) {
-									$m[2] = $contact['url'];
-								}
-							}
 							$info[$type][] = ['name' => $m[1], 'link' => $m[2]];
 						} else {
 							$info[$type][] = ['name' => $v];

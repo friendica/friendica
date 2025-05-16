@@ -56,7 +56,7 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, array $argv = null)
+	public function __construct(Mode $appMode, ?array $argv = null)
 	{
 		parent::__construct($argv);
 
@@ -84,13 +84,13 @@ HELP;
 
 		switch ($command) {
 			case 'add':
-				return $this->addContact();
+				return ($this->addContact()) ? 0 : 1;
 			case 'remove':
-				return $this->removeContact();
+				return ($this->removeContact()) ? 0 : 1;
 			case 'search':
-				return $this->searchContact();
+				return ($this->searchContact()) ? 0 : 1;
 			case 'terminate':
-				return $this->terminateContact();
+				return ($this->terminateContact()) ? 0 : 1;
 			default:
 				throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.');
 		}
@@ -206,7 +206,7 @@ HELP;
 	/**
 	 * Marks a contact for removal
 	 */
-	private function removeContact()
+	private function removeContact(): bool
 	{
 		$cid = $this->getArgument(1);
 		if (empty($cid)) {
@@ -218,6 +218,8 @@ HELP;
 		}
 
 		ContactModel::remove($cid);
+
+		return true;
 	}
 
 	/**

@@ -62,37 +62,37 @@ class Notification extends BaseDataTransferObject
 	/** @var string Message (Plaintext) */
 	protected $msg_plain;
 
-	public function __construct(Notify $Notify)
+	public function __construct(Notify $notify)
 	{
-		$this->id         = $Notify->id;
-		$this->type       = $Notify->type;
-		$this->name       = $Notify->name;
-		$this->url        = $Notify->url->__toString();
-		$this->photo      = $Notify->photo->__toString();
-		$this->date       = DateTimeFormat::local($Notify->date->format(DateTimeFormat::MYSQL));
-		$this->msg        = $Notify->msg;
-		$this->uid        = $Notify->uid;
-		$this->link       = $Notify->link->__toString();
-		$this->iid        = $Notify->itemId;
-		$this->parent     = $Notify->parent;
-		$this->seen       = $Notify->seen;
-		$this->verb       = $Notify->verb;
-		$this->otype      = $Notify->otype;
-		$this->name_cache = $Notify->name_cache;
-		$this->msg_cache  = $Notify->msg_cache;
-		$this->timestamp  = $Notify->date->format('U');
+		$this->id         = $notify->id;
+		$this->type       = $notify->type;
+		$this->name       = $notify->name;
+		$this->url        = $notify->url->__toString();
+		$this->photo      = $notify->photo->__toString();
+		$this->date       = DateTimeFormat::local($notify->date->format(DateTimeFormat::MYSQL));
+		$this->msg        = $notify->msg;
+		$this->uid        = $notify->uid;
+		$this->link       = $notify->link->__toString();
+		$this->iid        = $notify->itemId;
+		$this->parent     = $notify->parent;
+		$this->seen       = $notify->seen;
+		$this->verb       = $notify->verb;
+		$this->otype      = $notify->otype;
+		$this->name_cache = $notify->name_cache;
+		$this->msg_cache  = $notify->msg_cache;
+		$this->timestamp  = (int) $notify->date->format('U');
 		$this->date_rel   = Temporal::getRelativeDate($this->date);
 
 		try {
-			$this->msg_html  = BBCode::convertForUriId($Notify->uriId, $this->msg, BBCode::EXTERNAL);
+			$this->msg_html = BBCode::convertForUriId($notify->uriId, $this->msg, BBCode::EXTERNAL);
 		} catch (\Exception $e) {
-			$this->msg_html  = '';
+			$this->msg_html = '';
 		}
 
 		try {
 			$this->msg_plain = explode("\n", trim(HTML::toPlaintext($this->msg_html, 0)))[0];
 		} catch (\Exception $e) {
-			$this->msg_plain  = '';
+			$this->msg_plain = '';
 		}
 	}
 }

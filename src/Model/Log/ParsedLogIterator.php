@@ -21,7 +21,7 @@ class ParsedLogIterator implements \Iterator
 	/** @var ReversedFileReader */
 	private $reader;
 
-	/** @var ParsedLogLine current iterator value*/
+	/** @var ParsedLogLine|null current iterator value*/
 	private $value = null;
 
 	/** @var int max number of lines to read */

@@ -7,30 +7,33 @@
 
 namespace Friendica\Module\Settings\Profile;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\Core\ACL;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
-use Friendica\Profile\ProfileField;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
+use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
+use Friendica\Profile\ProfileField;
 use Friendica\Security\PermissionSet;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
-use Friendica\Core\Worker;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Index extends BaseSettings
@@ -47,9 +50,27 @@ class Index extends BaseSettings
 	private $permissionSetFactory;
 	/** @var ACLFormatter */
 	private $aclFormatter;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(ACLFormatter $aclFormatter, PermissionSet\Factory\PermissionSet $permissionSetFactory, PermissionSet\Repository\PermissionSet $permissionSetRepo, SystemMessages $systemMessages, ProfileField\Factory\ProfileField $profileFieldFactory, ProfileField\Repository\ProfileField $profileFieldRepo, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ACLFormatter $aclFormatter,
+		PermissionSet\Factory\PermissionSet $permissionSetFactory,
+		PermissionSet\Repository\PermissionSet $permissionSetRepo,
+		SystemMessages $systemMessages,
+		ProfileField\Factory\ProfileField $profileFieldFactory,
+		ProfileField\Repository\ProfileField $profileFieldRepo,
+		EventDispatcherInterface $eventDispatcher,
+		IHandleUserSessions $session,
+		Page $page,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->profileFieldRepo     = $profileFieldRepo;
@@ -58,6 +79,7 @@ class Index extends BaseSettings
 		$this->permissionSetRepo    = $permissionSetRepo;
 		$this->permissionSetFactory = $permissionSetFactory;
 		$this->aclFormatter         = $aclFormatter;
+		$this->eventDispatcher      = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -73,7 +95,9 @@ class Index extends BaseSettings
 
 		self::checkFormSecurityTokenRedirectOnError('/settings/profile', 'settings_profile');
 
-		Hook::callAll('profile_post', $request);
+		$request = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_POST, $request),
+		)->getArray();
 
 		$dob = trim($request['dob'] ?? '');
 
@@ -87,7 +111,7 @@ class Index extends BaseSettings
 
 			if (strpos($dob, '0000-') === 0 || strpos($dob, '0001-') === 0) {
 				$ignore_year = true;
-				$dob = substr($dob, 5);
+				$dob         = substr($dob, 5);
 			}
 
 			if ($ignore_year) {
@@ -221,7 +245,7 @@ class Index extends BaseSettings
 					$this->session->getLocalUserId(),
 					false,
 					['allow_cid' => []],
-					['network' => Protocol::DFRN],
+					['network'   => Protocol::DFRN],
 					'profile_field[new]'
 				),
 			],
@@ -254,7 +278,8 @@ class Index extends BaseSettings
 				'miscellaneous_section'     => $this->t('Miscellaneous'),
 				'custom_fields_section'     => $this->t('Custom Profile Fields'),
 				'profile_photo'             => $this->t('Upload Profile Photo'),
-				'custom_fields_description' => $this->t('<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
+				'custom_fields_description' => $this->t(
+					'<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
 				<p>You can use BBCodes in the field values.</p>
 				<p>Reorder by dragging the field title.</p>
 				<p>Empty the label field to remove a custom field.</p>
@@ -288,8 +313,16 @@ class Index extends BaseSettings
 			'$custom_fields' => $custom_fields,
 		]);
 
-		$arr = ['profile' => $owner, 'entry' => $o];
-		Hook::callAll('profile_edit', $arr);
+		$hook_data = [
+			'profile' => $owner,
+			'entry'   => $o,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_FORM, $hook_data),
+		)->getArray();
+
+		$o = $hook_data['entry'] ?? $o;
 
 		return $o;
 	}

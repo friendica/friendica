@@ -170,9 +170,8 @@ class Delayed
 	 * @param array  $attachments
 	 * @param int    $preparation_mode
 	 * @param string $uri
-	 * @return bool
 	 */
-	public static function publish(array $item, int $notify = 0, array $taglist = [], array $attachments = [], int $preparation_mode = self::PREPARED, string $uri = '')
+	public static function publish(array $item, int $notify = 0, array $taglist = [], array $attachments = [], int $preparation_mode = self::PREPARED, string $uri = ''): int
 	{
 		if (!empty($attachments)) {
 			$item['attachments'] = $attachments;

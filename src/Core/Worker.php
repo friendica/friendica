@@ -13,6 +13,7 @@ use Friendica\Core\Logger\Type\WorkerLogger;
 use Friendica\Core\Worker\Entity\Process;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -271,12 +272,13 @@ class Worker
 	 *
 	 * @param integer $priority The priority that should be checked
 	 *
-	 * @return integer Is there a process running with that priority?
+	 * @return bool Is there a process running with that priority?
 	 * @throws \Exception
 	 */
-	private static function processWithPriorityActive(int $priority): int
+	private static function processWithPriorityActive(int $priority): bool
 	{
 		$condition = ["`priority` <= ? AND `pid` != 0 AND NOT `done`", $priority];
+
 		return DBA::exists('workerqueue', $condition);
 	}
 
@@ -955,7 +957,7 @@ class Worker
 	/**
 	 * Returns the priority of the next workerqueue job
 	 *
-	 * @return string|bool priority or FALSE on failure
+	 * @return int|false priority or FALSE on failure
 	 * @throws \Exception
 	 */
 	private static function nextPriority()
@@ -1237,10 +1239,6 @@ class Worker
 	 * @return int '0' if worker queue entry already existed or there had been an error, otherwise the ID of the worker task
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @note $cmd and string args are surrounded with ''
-	 *
-	 * @hooks 'proc_run'
-	 *    array $arr
-	 *
 	 */
 	public static function add(...$args)
 	{
@@ -1250,7 +1248,12 @@ class Worker
 
 		$arr = ['args' => $args, 'run_cmd' => true];
 
-		Hook::callAll('proc_run', $arr);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$arr = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ADD_WORKER_TASK, $arr),
+		)->getArray();
+
 		if (!$arr['run_cmd'] || !count($args)) {
 			return 1;
 		}

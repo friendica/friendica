@@ -78,9 +78,16 @@ steps:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     when:
       matrix:
-        PHP_MAJOR_VERSION: 8.2
+        PHP_MAJOR_VERSION: 8.3
     commands:
       - bin/composer.phar run phpstan;
+  phpstan-addons:
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    when:
+      matrix:
+        PHP_MAJOR_VERSION: 8.3
+    commands:
+      - bin/composer.phar run phpstan-addons;
   test:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     environment:

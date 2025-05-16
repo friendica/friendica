@@ -1011,9 +1011,15 @@ class Item
 			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id']);
 		}
 
-		$post = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+		$hook_data = [
+			'item' => $post,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data)
 		)->getArray();
+
+		$post = $hook_data['item'] ?? $post;
 
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);
 

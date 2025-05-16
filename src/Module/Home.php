@@ -8,10 +8,10 @@
 namespace Friendica\Module;
 
 use Friendica\BaseModule;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Event\Event;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
@@ -66,7 +66,10 @@ class Home extends BaseModule
 		$login = Login::form(DI::args()->getQueryString(), Register::getPolicy() !== Register::CLOSED);
 
 		$content = '';
-		Hook::callAll('home_content', $content);
+
+		$content = $eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::MOD_HOME_CONTENT, $content),
+		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('home.tpl');
 		return Renderer::replaceMacros($tpl, [

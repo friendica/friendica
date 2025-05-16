@@ -14,7 +14,7 @@ use Friendica\Core\Renderer;
 use Psr\Http\Message\UriInterface;
 
 /**
- * @property-read string $type
+ * @property-read int $type
  * @property-read string $name
  * @property-read UriInterface $url
  * @property-read UriInterface $photo
@@ -33,7 +33,8 @@ use Psr\Http\Message\UriInterface;
  * @property-read int|null $parentUriId
  * @property-read int|null $id
  *
- * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Entity\Notification instead
+ * @deprecated 2022.05 Use \Friendica\Navigation\Notifications\Entity\Notification instead
+ * @see \Friendica\Navigation\Notifications\Entity\Notification
  */
 class Notify extends BaseEntity
 {

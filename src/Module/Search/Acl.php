@@ -7,22 +7,23 @@
 
 namespace Friendica\Module\Search;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -44,13 +45,26 @@ class Acl extends BaseModule
 	private $session;
 	/** @var Database */
 	private $database;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Database $database, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		Database $database,
+		IHandleUserSessions $session,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session  = $session;
-		$this->database = $database;
+		$this->session         = $session;
+		$this->database        = $database;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -61,7 +75,7 @@ class Acl extends BaseModule
 	protected function rawContent(array $request = [])
 	{
 		if (!$this->session->getLocalUserId()) {
-			throw new HTTPException\UnauthorizedException($this->t('You must be logged in to use this module.'));
+			throw new UnauthorizedException($this->t('You must be logged in to use this module.'));
 		}
 
 		$type = $request['type'] ?? self::TYPE_MENTION_CONTACT_CIRCLE;
@@ -104,9 +118,9 @@ class Acl extends BaseModule
 
 	private function regularContactSearch(array $request, string $type): array
 	{
-		$start   = $request['start'] ?? 0;
-		$count   = $request['count'] ?? 100;
-		$search  = $request['search'] ?? '';
+		$start   = $request['start']        ?? 0;
+		$count   = $request['count']        ?? 100;
+		$search  = $request['search']       ?? '';
 		$conv_id = $request['conversation'] ?? null;
 
 		// For use with jquery.textcomplete for private mail completion
@@ -124,9 +138,9 @@ class Acl extends BaseModule
 		$condition_circle = ["`uid` = ? AND NOT `deleted`", $this->session->getLocalUserId()];
 
 		if ($search != '') {
-			$sql_extra        = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
-			$condition        = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
-			                                                     '%' . $search . '%', '%' . $search . '%', '%' . $search . '%']);
+			$sql_extra = "AND `name` LIKE '%%" . $this->database->escape($search) . "%%'";
+			$condition = DBA::mergeConditions($condition, ["(`attag` LIKE ? OR `name` LIKE ? OR `nick` LIKE ?)",
+				'%' . $search . '%', '%' . $search . '%', '%' . $search . '%']);
 			$condition_circle = DBA::mergeConditions($condition_circle, ["`name` LIKE ?", '%' . $search . '%']);
 		}
 
@@ -142,21 +156,27 @@ class Acl extends BaseModule
 		switch ($type) {
 			case self::TYPE_MENTION_CONTACT_CIRCLE:
 			case self::TYPE_MENTION_CONTACT:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked`",
-					]);
+					]
+				);
 				break;
 
 			case self::TYPE_MENTION_GROUP:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked` AND (NOT `ap-posting-restricted` OR `ap-posting-restricted` IS NULL) AND `contact-type` = ?", Contact::TYPE_COMMUNITY
-					]);
+					]
+				);
 				break;
 
 			case self::TYPE_PRIVATE_MESSAGE:
-				$condition = DBA::mergeConditions($condition,
+				$condition = DBA::mergeConditions(
+					$condition,
 					["NOT `self` AND NOT `blocked` AND `network` IN (?, ?, ?)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA
-					]);
+					]
+				);
 				break;
 		}
 
@@ -170,7 +190,8 @@ class Acl extends BaseModule
 		if ($type == self::TYPE_MENTION_CONTACT_CIRCLE || $type == self::TYPE_MENTION_CIRCLE) {
 			/// @todo We should cache this query.
 			// This can be done when we can delete cache entries via wildcard
-			$circles = $this->database->toArray($this->database->p("SELECT `circle`.`id`, `circle`.`name`, GROUP_CONCAT(DISTINCT `circle_member`.`contact-id` SEPARATOR ',') AS uids
+			$circles = $this->database->toArray($this->database->p(
+				"SELECT `circle`.`id`, `circle`.`name`, GROUP_CONCAT(DISTINCT `circle_member`.`contact-id` SEPARATOR ',') AS uids
 				FROM `group` AS `circle`
 				INNER JOIN `group_member` AS `circle_member` ON `circle_member`.`gid` = `circle`.`id`
 				WHERE NOT `circle`.`deleted` AND `circle`.`uid` = ?
@@ -280,7 +301,7 @@ class Acl extends BaseModule
 			$resultTotal += count($unknown_contacts);
 		}
 
-		$results = [
+		$hook_data = [
 			'tot'      => $resultTotal,
 			'start'    => $start,
 			'count'    => $count,
@@ -291,13 +312,15 @@ class Acl extends BaseModule
 			'search'   => $search,
 		];
 
-		Hook::callAll('acl_lookup_end', $results);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACL_LOOKUP_END, $hook_data),
+		)->getArray();
 
 		$o = [
-			'tot'   => $results['tot'],
-			'start' => $results['start'],
-			'count' => $results['count'],
-			'items' => $results['items'],
+			'tot'   => $hook_data['tot'],
+			'start' => $hook_data['start'],
+			'count' => $hook_data['count'],
+			'items' => $hook_data['items'],
 		];
 
 		$this->logger->info('ACL {action} - {subaction} - done', ['module' => 'acl', 'action' => 'content', 'subaction' => 'search', 'search' => $search, 'type' => $type, 'conversation' => $conv_id]);

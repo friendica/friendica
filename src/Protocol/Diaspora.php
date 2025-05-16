@@ -337,7 +337,7 @@ class Diaspora
 	 * @param string $xml      urldecoded Diaspora salmon
 	 * @param string $privKey  The private key of the importer
 	 *
-	 * @return array
+	 * @return array|false array with decoded data or false on error
 	 * 'message' -> decoded Diaspora XML message
 	 * 'author' -> author diaspora handle
 	 * 'key' -> author public key (converted to pkcs#8)
@@ -1051,7 +1051,7 @@ class Diaspora
 	 * @param string $server The url of the server
 	 * @param int    $level  Endless loop prevention
 	 *
-	 * @return array
+	 * @return array|false The message as array or false on error
 	 *      'message' => The message XML
 	 *      'author' => The author handle
 	 *      'key' => The public key of the author
@@ -2795,7 +2795,7 @@ class Diaspora
 		// without a public key nothing will work
 		if (!$pubkey) {
 			DI::logger()->notice('pubkey missing: contact id: ' . $contact['id']);
-			return false;
+			return '';
 		}
 
 		$aes_key   = random_bytes(32);
@@ -2809,7 +2809,7 @@ class Diaspora
 
 		$encrypted_key_bundle = '';
 		if (!@openssl_public_encrypt($json, $encrypted_key_bundle, $pubkey)) {
-			return false;
+			return '';
 		}
 
 		$json_object = json_encode(

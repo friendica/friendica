@@ -13,14 +13,15 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
 use Friendica\Navigation\Notifications\Collection;
-use Friendica\Navigation\Notifications\Entity;
+use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
+use Friendica\Navigation\Notifications\Entity\Notify as NotifyEntity;
 use Friendica\Navigation\Notifications\Exception;
 use Friendica\Navigation\Notifications\Factory;
 use Friendica\Network\HTTPException;
@@ -28,10 +29,11 @@ use Friendica\Object\Api\Mastodon\Notification;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Emailer;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Repository\Notification instead
+ * @deprecated 2022.05 Use `\Friendica\Navigation\Notifications\Repository\Notification` instead
  */
 class Notify extends BaseRepository
 {
@@ -56,30 +58,41 @@ class Notify extends BaseRepository
 	/** @var Factory\Notification */
 	protected $notification;
 
+	private EventDispatcherInterface $eventDispatcher;
+
 	protected static $table_name = 'notify';
 
-	public function __construct(Database $database, LoggerInterface $logger, L10n $l10n, BaseURL $baseUrl, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Emailer $emailer, Factory\Notification $notification, Factory\Notify $factory = null)
-	{
-		$this->l10n         = $l10n;
-		$this->baseUrl      = $baseUrl;
-		$this->config       = $config;
-		$this->pConfig      = $pConfig;
-		$this->emailer      = $emailer;
-		$this->notification = $notification;
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		IManageConfigValues $config,
+		IManagePersonalConfigValues $pConfig,
+		Emailer $emailer,
+		Factory\Notification $notification,
+		EventDispatcherInterface $eventDispatcher,
+		Factory\Notify $factory = null
+	) {
+		$this->l10n            = $l10n;
+		$this->baseUrl         = $baseUrl;
+		$this->config          = $config;
+		$this->pConfig         = $pConfig;
+		$this->emailer         = $emailer;
+		$this->notification    = $notification;
+		$this->eventDispatcher = $eventDispatcher;
 
 		parent::__construct($database, $logger, $factory ?? new Factory\Notify($logger));
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 */
-	private function selectOne(array $condition, array $params = []): Entity\Notify
+	private function selectOne(array $condition, array $params = []): NotifyEntity
 	{
-		return parent::_selectOne($condition, $params);
+		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	private function select(array $condition, array $params = []): Collection\Notifies
@@ -104,10 +117,9 @@ class Notify extends BaseRepository
 	/**
 	 * @param int $id
 	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 */
-	public function selectOneById(int $id): Entity\Notify
+	public function selectOneById(int $id): NotifyEntity
 	{
 		return $this->selectOne(['id' => $id]);
 	}
@@ -139,14 +151,11 @@ class Notify extends BaseRepository
 	}
 
 	/**
-	 * @param Entity\Notify $Notify
-	 *
-	 * @return Entity\Notify
 	 * @throws HTTPException\NotFoundException
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws Exception\NotificationCreationInterceptedException
 	 */
-	public function save(Entity\Notify $Notify): Entity\Notify
+	public function save(NotifyEntity $Notify): NotifyEntity
 	{
 		$fields = [
 			'type'          => $Notify->type,
@@ -171,7 +180,10 @@ class Notify extends BaseRepository
 			$this->db->update(self::$table_name, $fields, ['id' => $Notify->id]);
 		} else {
 			$fields['date'] = DateTimeFormat::utcNow();
-			Hook::callAll('enotify_store', $fields);
+
+			$fields = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_STORE, $fields),
+			)->getArray();
 
 			$this->db->insert(self::$table_name, $fields);
 
@@ -181,7 +193,7 @@ class Notify extends BaseRepository
 		return $Notify;
 	}
 
-	public function setAllSeenForRelatedNotify(Entity\Notify $Notify): bool
+	public function setAllSeenForRelatedNotify(NotifyEntity $Notify): bool
 	{
 		$condition = [
 			'(`link` = ? OR (`parent` != 0 AND `parent` = ? AND `otype` = ?)) AND `uid` = ?',
@@ -549,7 +561,7 @@ class Notify extends BaseRepository
 
 		$subject .= " (".$nickname."@".$hostname.")";
 
-		$h = [
+		$hook_data = [
 			'params'    => $params,
 			'subject'   => $subject,
 			'preamble'  => $preamble,
@@ -561,18 +573,20 @@ class Notify extends BaseRepository
 			'itemlink'  => $itemlink
 		];
 
-		Hook::callAll('enotify', $h);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY, $hook_data),
+		)->getArray();
 
-		$subject = $h['subject'];
+		$subject = $hook_data['subject'];
 
-		$preamble  = $h['preamble'];
-		$epreamble = $h['epreamble'];
+		$preamble  = $hook_data['preamble'];
+		$epreamble = $hook_data['epreamble'];
 
-		$body = $h['body'];
+		$body = $hook_data['body'];
 
-		$tsitelink = $h['tsitelink'];
-		$hsitelink = $h['hsitelink'];
-		$itemlink  = $h['itemlink'];
+		$tsitelink = $hook_data['tsitelink'];
+		$hsitelink = $hook_data['hsitelink'];
+		$itemlink  = $hook_data['itemlink'];
 
 		$notify_id = 0;
 
@@ -620,7 +634,7 @@ class Notify extends BaseRepository
 				}
 			}
 
-			$datarray = [
+			$hook_data = [
 				'preamble'     => $preamble,
 				'type'         => $params['type'],
 				'parent'       => $parent_id,
@@ -637,31 +651,33 @@ class Notify extends BaseRepository
 				'headers'      => $emailBuilder->getHeaders(),
 			];
 
-			Hook::callAll('enotify_mail', $datarray);
+			$hook_data = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_MAIL, $hook_data),
+			)->getArray();
 
 			$emailBuilder
-				->withHeaders($datarray['headers'])
+				->withHeaders($hook_data['headers'])
 				->withRecipient($params['to_email'])
 				->forUser([
-					'uid'      => $datarray['uid'],
+					'uid'      => $hook_data['uid'],
 					'language' => $params['language'],
 				])
-				->withNotification($datarray['subject'], $datarray['preamble'], $datarray['title'], $datarray['body'])
-				->withSiteLink($datarray['tsitelink'], $datarray['hsitelink'])
-				->withItemLink($datarray['itemlink']);
+				->withNotification($hook_data['subject'], $hook_data['preamble'], $hook_data['title'], $hook_data['body'])
+				->withSiteLink($hook_data['tsitelink'], $hook_data['hsitelink'])
+				->withItemLink($hook_data['itemlink']);
 
 			// If a photo is present, add it to the email
-			if (!empty($datarray['source_photo'])) {
+			if (!empty($hook_data['source_photo'])) {
 				$emailBuilder->withPhoto(
-					$datarray['source_photo'],
-					$datarray['source_link'] ?? $sitelink,
-					$datarray['source_name'] ?? $sitename
+					$hook_data['source_photo'],
+					$hook_data['source_link'] ?? $sitelink,
+					$hook_data['source_name'] ?? $sitename
 				);
 			}
 
 			$email = $emailBuilder->build();
 
-			$this->logger->debug('Send mail', $datarray);
+			$this->logger->debug('Send mail', $hook_data);
 
 			// use the Emailer class to send the message
 			return $this->emailer->send($email);
@@ -670,7 +686,7 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function shouldShowOnDesktop(Entity\Notification $Notification, string $type = null): bool
+	public function shouldShowOnDesktop(NotificationEntity $Notification, string $type = null): bool
 	{
 		if (is_null($type)) {
 			$type = NotificationFactory::getType($Notification);
@@ -702,7 +718,7 @@ class Notify extends BaseRepository
 		return false;
 	}
 
-	public function createFromNotification(Entity\Notification $Notification): bool
+	public function createFromNotification(NotificationEntity $Notification): bool
 	{
 		$this->logger->info('Start', ['uid' => $Notification->uid, 'id' => $Notification->id, 'type' => $Notification->type]);
 

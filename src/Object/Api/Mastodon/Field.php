@@ -20,12 +20,12 @@ class Field extends BaseDataTransferObject
 	protected $name;
 	/** @var string (HTML) */
 	protected $value;
-	/** @var string (Datetime)*/
+	/** @var string|null (Datetime)*/
 	protected $verified_at;
 
 	public function __construct(string $name, string $value)
 	{
-		$this->name = $name;
+		$this->name  = $name;
 		$this->value = $value;
 		// Link verification unsupported
 		$this->verified_at = null;

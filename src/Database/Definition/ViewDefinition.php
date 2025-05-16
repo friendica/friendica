@@ -8,7 +8,8 @@
 namespace Friendica\Database\Definition;
 
 use Exception;
-use Friendica\Core\Hook;
+use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 
 /**
  * Stores the whole View definitions
@@ -62,12 +63,16 @@ class ViewDefinition
 	{
 		$definition = require $this->configFile;
 
-		if (!$definition) {
+		if (!is_array($definition)) {
 			throw new Exception('Corrupted database structure config file static/dbstructure.config.php');
 		}
 
 		if ($withAddonStructure) {
-			Hook::callAll('dbview_definition', $definition);
+			$eventDispatcher = DI::eventDispatcher();
+
+			$definition = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DB_VIEW_DEFINITION, $definition),
+			)->getArray();
 		}
 
 		$this->definition = $definition;

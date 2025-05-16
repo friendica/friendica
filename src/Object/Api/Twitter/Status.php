@@ -45,11 +45,11 @@ class Status extends BaseDataTransferObject
 	protected $geo;
 	/** @var bool */
 	protected $favorited = false;
-	/** @var User */
+	/** @var array */
 	protected $user;
-	/** @var User */
+	/** @var array */
 	protected $friendica_author;
-	/** @var User */
+	/** @var array */
 	protected $friendica_owner;
 	/** @var bool */
 	protected $friendica_private;
@@ -67,9 +67,9 @@ class Status extends BaseDataTransferObject
 	protected $friendica_html;
 	/** @var int */
 	protected $friendica_comments;
-	/** @var Status|null */
+	/** @var array|null */
 	protected $retweeted_status = null;
-	/** @var Status|null */
+	/** @var array|null */
 	protected $quoted_status = null;
 	/** @var array */
 	protected $attachments;

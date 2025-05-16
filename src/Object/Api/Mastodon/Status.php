@@ -30,7 +30,7 @@ class Status extends BaseDataTransferObject
 	protected $edited_at;
 	/** @var string|null */
 	protected $in_reply_to_id = null;
-	/** @var Status|null - Fedilab extension, see issue https://github.com/friendica/friendica/issues/12672 */
+	/** @var Status[]|null - Fedilab extension, see issue https://github.com/friendica/friendica/issues/12672 */
 	protected $in_reply_to_status = null;
 	/** @var string|null */
 	protected $in_reply_to_account_id = null;
@@ -66,25 +66,25 @@ class Status extends BaseDataTransferObject
 	protected $content;
 	/** @var array */
 	protected $filtered = [];
-	/** @var Status|null */
+	/** @var Status[]|null */
 	protected $reblog = null;
-	/** @var Status|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
+	/** @var Status[]|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
 	protected $quote = null;
-	/** @var Application */
+	/** @var array */
 	protected $application = null;
-	/** @var Account */
+	/** @var array */
 	protected $account;
-	/** @var Attachment */
+	/** @var Attachment[] */
 	protected $media_attachments = [];
-	/** @var Mention */
+	/** @var Mention[] */
 	protected $mentions = [];
-	/** @var Tag */
+	/** @var Tag[] */
 	protected $tags = [];
 	/** @var Emoji[] */
 	protected $emojis = [];
-	/** @var Card|null */
+	/** @var array|null */
 	protected $card = null;
-	/** @var Poll|null */
+	/** @var array|null */
 	protected $poll = null;
 	/** @var FriendicaExtension */
 	protected $friendica;

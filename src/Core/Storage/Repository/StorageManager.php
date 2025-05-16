@@ -20,7 +20,9 @@ use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Database\Database;
 use Friendica\Core\Storage\Type;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -55,6 +57,7 @@ class StorageManager
 	private $config;
 	/** @var LoggerInterface */
 	private $logger;
+	private EventDispatcherInterface $eventDispatcher;
 	/** @var L10n */
 	private $l10n;
 
@@ -71,13 +74,14 @@ class StorageManager
 	 * @throws InvalidClassStorageException in case the active backend class is invalid
 	 * @throws StorageException in case of unexpected errors during the active backend class loading
 	 */
-	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, L10n $l10n, bool $includeAddon = true)
+	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, L10n $l10n, bool $includeAddon = true)
 	{
-		$this->dba           = $dba;
-		$this->config        = $config;
-		$this->logger        = $logger;
-		$this->l10n          = $l10n;
-		$this->validBackends = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
+		$this->dba             = $dba;
+		$this->config          = $config;
+		$this->logger          = $logger;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->l10n            = $l10n;
+		$this->validBackends   = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
 
 		$currentName = $this->config->get('storage', 'name');
 
@@ -146,8 +150,12 @@ class StorageManager
 					'name'           => $name,
 					'storage_config' => null,
 				];
+
 				try {
-					Hook::callAll('storage_config', $data);
+					$data = $this->eventDispatcher->dispatch(
+						new ArrayFilterEvent(ArrayFilterEvent::STORAGE_CONFIG, $data),
+					)->getArray();
+
 					if (!($data['storage_config'] ?? null) instanceof ICanConfigureStorage) {
 						throw new InvalidClassStorageException(sprintf('Configuration for backend %s was not found', $name));
 					}
@@ -201,8 +209,12 @@ class StorageManager
 						'name'    => $name,
 						'storage' => null,
 					];
+
 					try {
-						Hook::callAll('storage_instance', $data);
+						$data = $this->eventDispatcher->dispatch(
+							new ArrayFilterEvent(ArrayFilterEvent::STORAGE_INSTANCE, $data),
+						)->getArray();
+
 						if (!($data['storage'] ?? null) instanceof ICanReadFromStorage) {
 							throw new InvalidClassStorageException(sprintf('Backend %s was not found', $name));
 						}

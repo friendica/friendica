@@ -184,7 +184,7 @@ class XML
 	 * @param integer $recursion_depth recursion counter for internal use - default 0
 	 *                                 internal use, recursion counter
 	 *
-	 * @return array | string The array from the xml element or the string
+	 * @return array|string|null The array from the xml element or the string
 	 */
 	public static function elementToArray($xml_element, int &$recursion_depth = 0)
 	{

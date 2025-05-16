@@ -44,10 +44,11 @@ class Ownership extends BaseApi
 		$this->checkAllowedScope(BaseApi::SCOPE_READ);
 		$uid = BaseApi::getCurrentUserID();
 
-		$circles = $this->dba->select('group', [], ['deleted' => false, 'uid' => $uid, 'cid' => null]);
+		$circles = $this->dba->selectToArray('group', [], ['deleted' => false, 'uid' => $uid, 'cid' => null]);
 
 		// loop through all circles
 		$lists = [];
+
 		foreach ($circles as $circle) {
 			$lists[] = $this->friendicaCircle->createFromId($circle['id']);
 		}

@@ -17,7 +17,6 @@ use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -25,6 +24,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Database\Repository\UserDeletedRepository;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\Tag;
@@ -41,6 +41,7 @@ use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Profile extends BaseProfile
@@ -58,6 +59,7 @@ class Profile extends BaseProfile
 	private $page;
 	/** @var ProfileField */
 	private $profileField;
+	private EventDispatcherInterface $eventDispatcher;
 
 	public function __construct(
 		ProfileField $profileField,
@@ -67,6 +69,7 @@ class Profile extends BaseProfile
 		AppHelper $appHelper,
 		Database $database,
 		UserDeletedRepository $userDeletedRepository,
+		EventDispatcherInterface $eventDispatcher,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -78,13 +81,14 @@ class Profile extends BaseProfile
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database     = $database;
+		$this->database              = $database;
 		$this->userDeletedRepository = $userDeletedRepository;
-		$this->appHelper    = $appHelper;
-		$this->session      = $session;
-		$this->config       = $config;
-		$this->page         = $page;
-		$this->profileField = $profileField;
+		$this->appHelper             = $appHelper;
+		$this->session               = $session;
+		$this->config                = $config;
+		$this->page                  = $page;
+		$this->profileField          = $profileField;
+		$this->eventDispatcher       = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -273,7 +277,7 @@ class Profile extends BaseProfile
 		}
 
 		$tpl = Renderer::getMarkupTemplate('profile/profile.tpl');
-		$o   .= Renderer::replaceMacros($tpl, [
+		$o .= Renderer::replaceMacros($tpl, [
 			'$title'                 => $this->t('Profile'),
 			'$yourself'              => $this->t('Yourself'),
 			'$view_as_contacts'      => $view_as_contacts,
@@ -293,14 +297,16 @@ class Profile extends BaseProfile
 				'title' => '',
 				'label' => $this->t('Edit profile')
 			],
-			'$viewas_link'           => [
+			'$viewas_link' => [
 				'url'   => $this->args->getQueryString() . '#viewas',
 				'title' => '',
 				'label' => $this->t('View as')
 			],
 		]);
 
-		Hook::callAll('profile_advanced', $o);
+		$o = $this->eventDispatcher->dispatch(
+			new HTmlFilterEvent(HtmlFilterEvent::MOD_PROFILE_CONTENT, $o),
+		)->getHtml();
 
 		return $o;
 	}
@@ -360,7 +366,7 @@ class Profile extends BaseProfile
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/" title="' . $this->t('%s\'s posts', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/comments" title="' . $this->t('%s\'s comments', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/activity" title="' . $this->t('%s\'s timeline', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
-		$uri      = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
+		$uri = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
 		$htmlhead .= '<link rel="lrdd" type="application/xrd+xml" href="' . $this->baseUrl . '/xrd/?uri=' . $uri . '" />' . "\n";
 		header('Link: <' . $this->baseUrl . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);
 

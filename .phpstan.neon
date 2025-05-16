@@ -3,10 +3,9 @@
 # SPDX-License-Identifier: CC0-1.0
 
 parameters:
-    level: 2
+    level: 3
 
     paths:
-        - addon/
         - bin/auth_ejabberd.php
         - bin/console.php
         - bin/daemon.php
@@ -14,13 +13,6 @@ parameters:
         - bin/worker.php
         - index.php
         - src/
-
-    excludePaths:
-        analyse:
-            - addon/*/lang/*
-            - addon/*/vendor/*
-            - addon/convert/UnitConvertor.php
-            - addon/pumpio/oauth/*
 
     scanDirectories:
         - mod
@@ -46,27 +38,3 @@ parameters:
             # Ignore missing IMAP\Connection class in PHP <= 8.0
             message: '(^Parameter .+ has invalid type IMAP\\Connection\.$)'
             path: src
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^.+ an unknown class SMTP\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Property .+ has unknown class SMTP as its type\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Method .+ has invalid return type SMTP\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Instantiated class SMTP not found\.$)'
-            path: addon/mailstream/phpmailer

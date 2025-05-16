@@ -7,11 +7,10 @@
 
 namespace Friendica\Content\Post\Repository;
 
-use Friendica\BaseCollection;
 use Friendica\BaseRepository;
-use Friendica\Content\Post\Collection;
-use Friendica\Content\Post\Entity;
-use Friendica\Content\Post\Factory;
+use Friendica\Content\Post\Collection\PostMedias as PostMediasCollection;
+use Friendica\Content\Post\Entity\PostMedia as PostMediaEntity;
+use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
 use Friendica\Database\Database;
 use Friendica\Model\Post;
 use Friendica\Util\Strings;
@@ -21,16 +20,19 @@ class PostMedia extends BaseRepository
 {
 	protected static $table_name = 'post-media';
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\PostMedia $factory)
+	/** @var PostMediaFactory */
+	protected $factory;
+
+	public function __construct(Database $database, LoggerInterface $logger, PostMediaFactory $factory)
 	{
 		parent::__construct($database, $logger, $factory);
 	}
 
-	protected function _select(array $condition, array $params = []): BaseCollection
+	protected function _select(array $condition, array $params = []): PostMediasCollection
 	{
 		$rows = $this->db->selectToArray(static::$table_name, [], $condition, $params);
 
-		$Entities = new Collection\PostMedias();
+		$Entities = new PostMediasCollection();
 		foreach ($rows as $fields) {
 			try {
 				$Entities[] = $this->factory->createFromTableRow($fields);
@@ -42,17 +44,19 @@ class PostMedia extends BaseRepository
 		return $Entities;
 	}
 
-	public function selectOneById(int $postMediaId): Entity\PostMedia
+	public function selectOneById(int $postMediaId): PostMediaEntity
 	{
-		return $this->_selectOne(['id' => $postMediaId]);
+		$fields = $this->_selectFirstRowAsArray(['id' => $postMediaId]);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
-	public function selectByUriId(int $uriId): Collection\PostMedias
+	public function selectByUriId(int $uriId): PostMediasCollection
 	{
 		return $this->_select(["`uri-id` = ? AND `type` != ?", $uriId, Post\Media::UNKNOWN]);
 	}
 
-	public function save(Entity\PostMedia $PostMedia): Entity\PostMedia
+	public function save(PostMediaEntity $PostMedia): PostMediaEntity
 	{
 		$fields = [
 			'uri-id'          => $PostMedia->uriId,
@@ -97,14 +101,14 @@ class PostMedia extends BaseRepository
 	 * @param int    $uri_id URI id
 	 * @param array  $links list of links that shouldn't be added
 	 * @param bool   $has_media
-	 * @return Collection\PostMedias[] Three collections in "visual", "link" and "additional" keys
+	 * @return PostMediasCollection[] Three collections in "visual", "link" and "additional" keys
 	 */
 	public function splitAttachments(int $uri_id, array $links = [], bool $has_media = true): array
 	{
 		$attachments = [
-			'visual'     => new Collection\PostMedias(),
-			'link'       => new Collection\PostMedias(),
-			'additional' => new Collection\PostMedias(),
+			'visual'     => new PostMediasCollection(),
+			'link'       => new PostMediasCollection(),
+			'additional' => new PostMediasCollection(),
 		];
 
 		if (!$has_media) {
@@ -137,7 +141,7 @@ class PostMedia extends BaseRepository
 
 			// Currently these two types are ignored here.
 			// Posts are added differently and contacts are not displayed as attachments.
-			if (in_array($PostMedia->type, [Entity\PostMedia::TYPE_ACCOUNT, Entity\PostMedia::TYPE_ACTIVITY])) {
+			if (in_array($PostMedia->type, [PostMediaEntity::TYPE_ACCOUNT, PostMediaEntity::TYPE_ACTIVITY])) {
 				continue;
 			}
 
@@ -148,22 +152,22 @@ class PostMedia extends BaseRepository
 			//$PostMedia->filetype = $filetype;
 			//$PostMedia->subtype = $subtype;
 
-			if ($PostMedia->type == Entity\PostMedia::TYPE_HTML || ($PostMedia->mimetype->type == 'text' && $PostMedia->mimetype->subtype == 'html')) {
+			if ($PostMedia->type == PostMediaEntity::TYPE_HTML || ($PostMedia->mimetype->type == 'text' && $PostMedia->mimetype->subtype == 'html')) {
 				$attachments['link'][] = $PostMedia;
 				continue;
 			}
 
 			if (
-				in_array($PostMedia->type, [Entity\PostMedia::TYPE_AUDIO, Entity\PostMedia::TYPE_IMAGE, Entity\PostMedia::TYPE_HLS]) ||
+				in_array($PostMedia->type, [PostMediaEntity::TYPE_AUDIO, PostMediaEntity::TYPE_IMAGE, PostMediaEntity::TYPE_HLS]) ||
 				in_array($PostMedia->mimetype->type, ['audio', 'image'])
 			) {
 				$attachments['visual'][] = $PostMedia;
-			} elseif (($PostMedia->type == Entity\PostMedia::TYPE_VIDEO) || ($PostMedia->mimetype->type == 'video')) {
+			} elseif (($PostMedia->type == PostMediaEntity::TYPE_VIDEO) || ($PostMedia->mimetype->type == 'video')) {
 				if (!empty($PostMedia->height)) {
 					// Peertube videos are delivered in many different resolutions. We pick a moderate one.
 					// Since only Peertube provides a "height" parameter, this wouldn't be executed
 					// when someone for example on Mastodon was sharing multiple videos in a single post.
-					$heights[$PostMedia->height] = (string)$PostMedia->url;
+					$heights[$PostMedia->height]     = (string)$PostMedia->url;
 					$video[(string) $PostMedia->url] = $PostMedia;
 				} else {
 					$attachments['visual'][] = $PostMedia;

@@ -8,28 +8,27 @@
 namespace Friendica\User\Settings\Repository;
 
 use Exception;
-use Friendica\BaseCollection;
-use Friendica\BaseEntity;
+use Friendica\BaseRepository;
 use Friendica\Content\Pager;
 use Friendica\Database\Database;
 use Friendica\Federation\Repository\GServer;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
-use Friendica\User\Settings\Collection;
-use Friendica\User\Settings\Entity;
-use Friendica\User\Settings\Factory;
+use Friendica\User\Settings\Collection\UserGServers as UserGServersCollection;
+use Friendica\User\Settings\Entity\UserGServer as UserGServerEntity;
+use Friendica\User\Settings\Factory\UserGServer as UserGServerFactory;
 use Psr\Log\LoggerInterface;
 
-class UserGServer extends \Friendica\BaseRepository
+class UserGServer extends BaseRepository
 {
 	protected static $table_name = 'user-gserver';
 
-	/** @var Factory\UserGServer */
+	/** @var UserGServerFactory */
 	protected $factory;
 	/** @var GServer */
 	protected $gserverRepository;
 
-	public function __construct(GServer $gserverRepository, Database $database, LoggerInterface $logger, Factory\UserGServer $factory)
+	public function __construct(GServer $gserverRepository, Database $database, LoggerInterface $logger, UserGServerFactory $factory)
 	{
 		parent::__construct($database, $logger, $factory);
 
@@ -39,12 +38,9 @@ class UserGServer extends \Friendica\BaseRepository
 	/**
 	 * Returns an existing UserGServer entity or create one on the fly
 	 *
-	 * @param int  $uid
-	 * @param int  $gsid
 	 * @param bool $hydrate Populate the related GServer entity
-	 * @return Entity\UserGServer
 	 */
-	public function getOneByUserAndServer(int $uid, int $gsid, bool $hydrate = true): Entity\UserGServer
+	public function getOneByUserAndServer(int $uid, int $gsid, bool $hydrate = true): UserGServerEntity
 	{
 		try {
 			return $this->selectOneByUserAndServer($uid, $gsid, $hydrate);
@@ -54,18 +50,15 @@ class UserGServer extends \Friendica\BaseRepository
 	}
 
 	/**
-	 * @param int  $uid
-	 * @param int  $gsid
 	 * @param bool $hydrate Populate the related GServer entity
-	 * @return Entity\UserGServer
 	 * @throws NotFoundException
 	 */
-	public function selectOneByUserAndServer(int $uid, int $gsid, bool $hydrate = true): Entity\UserGServer
+	public function selectOneByUserAndServer(int $uid, int $gsid, bool $hydrate = true): UserGServerEntity
 	{
 		return $this->_selectOne(['uid' => $uid, 'gsid' => $gsid], [], $hydrate);
 	}
 
-	public function save(Entity\UserGServer $userGServer): Entity\UserGServer
+	public function save(UserGServerEntity $userGServer): UserGServerEntity
 	{
 		$fields = [
 			'uid'     => $userGServer->uid,
@@ -78,7 +71,7 @@ class UserGServer extends \Friendica\BaseRepository
 		return $userGServer;
 	}
 
-	public function selectByUserWithPagination(int $uid, Pager $pager): Collection\UserGServers
+	public function selectByUserWithPagination(int $uid, Pager $pager): UserGServersCollection
 	{
 		return $this->_select(['uid' => $uid], ['limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
 	}
@@ -94,20 +87,18 @@ class UserGServer extends \Friendica\BaseRepository
 	}
 
 	/**
-	 * @param Entity\UserGServer $userGServer
-	 * @return bool
 	 * @throws InternalServerErrorException in case the underlying storage cannot delete the record
 	 */
-	public function delete(Entity\UserGServer $userGServer): bool
+	public function delete(UserGServerEntity $userGServer): bool
 	{
 		try {
 			return $this->db->delete(self::$table_name, ['uid' => $userGServer->uid, 'gsid' => $userGServer->gsid]);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			throw new InternalServerErrorException('Cannot delete the UserGServer', $exception);
 		}
 	}
 
-	protected function _selectOne(array $condition, array $params = [], bool $hydrate = true): BaseEntity
+	protected function _selectOne(array $condition, array $params = [], bool $hydrate = true): UserGServerEntity
 	{
 		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
 		if (!$this->db->isResult($fields)) {
@@ -118,16 +109,13 @@ class UserGServer extends \Friendica\BaseRepository
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 * @return Collection\UserGServers
 	 * @throws Exception
 	 */
-	protected function _select(array $condition, array $params = [], bool $hydrate = true): BaseCollection
+	protected function _select(array $condition, array $params = [], bool $hydrate = true): UserGServersCollection
 	{
 		$rows = $this->db->selectToArray(static::$table_name, [], $condition, $params);
 
-		$Entities = new Collection\UserGServers();
+		$Entities = new UserGServersCollection();
 		foreach ($rows as $fields) {
 			$Entities[] = $this->factory->createFromTableRow($fields, $hydrate ? $this->gserverRepository->selectOneById($fields['gsid']) : null);
 		}
@@ -135,7 +123,7 @@ class UserGServer extends \Friendica\BaseRepository
 		return $Entities;
 	}
 
-	public function listIgnoredByUser(int $uid): Collection\UserGServers
+	public function listIgnoredByUser(int $uid): UserGServersCollection
 	{
 		return $this->_select(['uid' => $uid, 'ignored' => 1], [], false);
 	}

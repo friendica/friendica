@@ -848,17 +848,17 @@ class Processor
 		return $class;
 	}
 
-	public function fetchUriId(string $uri, int $uid): string
+	public function fetchUriId(string $uri, int $uid): int
 	{
 		$reply = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		$reply = Post::selectFirst(['uri-id'], ['extid' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		return 0;
 	}

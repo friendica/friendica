@@ -7,12 +7,14 @@
 
 namespace Friendica\Moderation\Repository;
 
-use Friendica\BaseEntity;
 use Friendica\Database\Database;
-use Friendica\DI;
 use Friendica\Model\Post;
-use Friendica\Moderation\Factory;
-use Friendica\Moderation\Collection;
+use Friendica\Moderation\Collection\Report\Posts as PostsCollection;
+use Friendica\Moderation\Collection\Report\Rules as RulesCollection;
+use Friendica\Moderation\Entity\Report as ReportEntity;
+use Friendica\Moderation\Factory\Report as ReportFactory;
+use Friendica\Moderation\Factory\Report\Post as PostFactory;
+use Friendica\Moderation\Factory\Report\Rule as RuleFactory;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
@@ -21,14 +23,14 @@ final class Report extends \Friendica\BaseRepository
 {
 	protected static $table_name = 'report';
 
-	/** @var Factory\Report */
+	/** @var ReportFactory */
 	protected $factory;
-	/** @var Factory\Report\Post */
+	/** @var PostFactory */
 	protected $postFactory;
-	/** @var Factory\Report\Rule */
+	/** @var RuleFactory */
 	protected $ruleFactory;
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\Report $factory, Factory\Report\Post $postFactory, Factory\Report\Rule $ruleFactory)
+	public function __construct(Database $database, LoggerInterface $logger, ReportFactory $factory, PostFactory $postFactory, RuleFactory $ruleFactory)
 	{
 		parent::__construct($database, $logger, $factory);
 
@@ -37,12 +39,12 @@ final class Report extends \Friendica\BaseRepository
 		$this->ruleFactory = $ruleFactory;
 	}
 
-	public function selectOneById(int $lastInsertId): \Friendica\Moderation\Entity\Report
+	public function selectOneById(int $lastInsertId): ReportEntity
 	{
 		return $this->_selectOne(['id' => $lastInsertId]);
 	}
 
-	public function save(\Friendica\Moderation\Entity\Report $Report): \Friendica\Moderation\Entity\Report
+	public function save(ReportEntity $Report): ReportEntity
 	{
 		$fields = [
 			'reporter-id'     => $Report->reporterCid,
@@ -73,7 +75,7 @@ final class Report extends \Friendica\BaseRepository
 				if (Post::exists(['uri-id' => $post->uriId])) {
 					$this->db->insert('report-post', ['rid' => $newReportId, 'uri-id' => $post->uriId, 'status' => $post->status]);
 				} else {
-					DI::logger()->notice('Post does not exist', ['uri-id' => $post->uriId, 'report' => $Report]);
+					$this->logger->notice('Post does not exist', ['uri-id' => $post->uriId, 'report' => $Report]);
 				}
 			}
 
@@ -87,15 +89,18 @@ final class Report extends \Friendica\BaseRepository
 		return $Report;
 	}
 
-	protected function _selectOne(array $condition, array $params = []): BaseEntity
+	/**
+	 * @throws NotFoundException
+	 */
+	protected function _selectOne(array $condition, array $params = []): ReportEntity
 	{
 		$fields = $this->db->selectFirst(self::$table_name, [], $condition, $params);
 		if (!$this->db->isResult($fields)) {
 			throw new NotFoundException();
 		}
 
-		$reportPosts = new Collection\Report\Posts(array_map([$this->postFactory, 'createFromTableRow'], $this->db->selectToArray('report-post', ['uri-id', 'status'], ['rid' => $condition['id'] ?? 0])));
-		$reportRules = new Collection\Report\Rules(array_map([$this->ruleFactory, 'createFromTableRow'], $this->db->selectToArray('report-rule', ['line-id', 'text'], ['rid' => $condition['id'] ?? 0])));
+		$reportPosts = new PostsCollection(array_map([$this->postFactory, 'createFromTableRow'], $this->db->selectToArray('report-post', ['uri-id', 'status'], ['rid' => $condition['id'] ?? 0])));
+		$reportRules = new RulesCollection(array_map([$this->ruleFactory, 'createFromTableRow'], $this->db->selectToArray('report-rule', ['line-id', 'text'], ['rid' => $condition['id'] ?? 0])));
 
 		return $this->factory->createFromTableRow($fields, $reportPosts, $reportRules);
 	}

@@ -48,7 +48,7 @@ class Post
 	private $parent   = null;
 
 	/**
-	 * @var Thread
+	 * @var Thread|null
 	 */
 	private $thread       = null;
 	private $redirect_url = null;
@@ -70,7 +70,7 @@ class Post
 		$this->setTemplate('wall');
 		$this->toplevel = $this->getId() == $this->getDataValue('parent');
 
-		if (!empty(DI::userSession()->getUserIDForVisitorContactID($this->getDataValue('contact-id')))) {
+		if (DI::userSession()->getUserIDForVisitorContactID($this->getDataValue('contact-id')) !== 0) {
 			$this->visiting = true;
 		}
 
@@ -824,7 +824,7 @@ class Post
 	 * Get a child by its ID
 	 *
 	 * @param integer $id The child id
-	 * @return Thread|null Thread or NULL if not found
+	 * @return Post|null Post or NULL if not found
 	 */
 	public function getChild(int $id)
 	{

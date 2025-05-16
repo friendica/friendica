@@ -11,11 +11,11 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\AppHelper;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\BaseModeration;
@@ -24,6 +24,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class BaseUsers extends BaseModeration
@@ -31,11 +32,28 @@ abstract class BaseUsers extends BaseModeration
 	/** @var Database */
 	protected $database;
 
-	public function __construct(Database $database, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		Page $page,
+		AppHelper $appHelper,
+		SystemMessages $systemMessages,
+		IHandleUserSessions $session,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database = $database;
+		$this->database        = $database;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -95,11 +113,21 @@ abstract class BaseUsers extends BaseModeration
 				'accesskey' => 'd',
 			],
 		];
-		$tabs_arr = ['tabs' => $tabs, 'selectedTab' => $selectedTab];
-		Hook::callAll('moderation_users_tabs', $tabs_arr);
+
+		$hook_data = [
+			'tabs'        => $tabs,
+			'selectedTab' => $selectedTab,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::MODERATION_USERS_TABS, $hook_data),
+		)->getArray();
+
+		$tabs = $hook_data['tabs'] ?? $tabs;
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
-		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs_arr['tabs'], '$more' => $this->t('More')]);
+
+		return Renderer::replaceMacros($tpl, ['$tabs' => $tabs, '$more' => $this->t('More')]);
 	}
 
 	protected function setupUserCallback(): \Closure

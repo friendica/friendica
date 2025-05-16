@@ -11,10 +11,10 @@ use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Widget;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
@@ -39,7 +39,7 @@ class Directory extends BaseModule
 			DI::page()['aside'] .= Widget::follow();
 		}
 
-		$output = '';
+		$output  = '';
 		$entries = [];
 
 		Nav::setSelected('directory');
@@ -47,7 +47,7 @@ class Directory extends BaseModule
 		$search = trim(rawurldecode($_REQUEST['search'] ?? ''));
 
 		$gDirPath = '';
-		$dirURL = Search::getGlobalDirectory();
+		$dirURL   = Search::getGlobalDirectory();
 		if (strlen($dirURL)) {
 			$gDirPath = OpenWebAuth::getZrlUrl($dirURL, true);
 		}
@@ -161,13 +161,22 @@ class Directory extends BaseModule
 
 		];
 
-		$hook = ['contact' => $contact, 'entry' => $entry];
+		$eventDispatcher = DI::eventDispatcher();
 
-		Hook::callAll('directory_item', $hook);
+		$hook_data = [
+			'contact' => $contact,
+			'entry'   => $entry,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::DIRECTORY_ITEM, $hook_data),
+		)->getArray();
+
+		$entry = $hook_data['entry'] ?? $entry;
 
 		unset($profile);
 		unset($location);
 
-		return $hook['entry'];
+		return $entry;
 	}
 }

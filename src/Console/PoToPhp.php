@@ -134,7 +134,7 @@ HELP;
 		);
 
 		$fnname = 'string_plural_select_' . $lang;
-		$out = 'if(! function_exists("' . $fnname . '")) {' . "\n";
+		$out    = 'if(! function_exists("' . $fnname . '")) {' . "\n";
 		$out .= 'function ' . $fnname . '($n){' . "\n";
 		$out .= '	$n = intval($n);' . "\n";
 		$out .= '	' . $return . "\n";
@@ -175,11 +175,11 @@ HELP;
 	 * @param string $string
 	 * @param array|string $node
 	 */
-	private static function parse(string $string, &$node = [])
+	private static function parse(string $string, &$node)
 	{
 		// Removes extra outward parentheses
 		if (strpos($string, '(') === 0 && strrpos($string, ')') === strlen($string) - 1) {
-			$string = substr($string, 1, -1);
+			$string = (string) substr($string, 1, -1);
 		}
 
 		$q = strpos($string, '?');
@@ -192,13 +192,13 @@ HELP;
 
 		if ($q === false || $s < $q) {
 			list($then, $else) = explode(':', $string, 2);
-			$node['then'] = $then;
-			$parsedElse = [];
+			$node['then']      = $then;
+			$parsedElse        = [];
 			self::parse($else, $parsedElse);
 			$node['else'] = $parsedElse;
 		} else {
 			list($if, $thenelse) = explode('?', $string, 2);
-			$node['if'] = $if;
+			$node['if']          = $if;
 			self::parse($thenelse, $node);
 		}
 	}
@@ -214,7 +214,7 @@ HELP;
 	private static function render($tree): string
 	{
 		if (is_array($tree)) {
-			$if = trim($tree['if']);
+			$if   = trim($tree['if']);
 			$then = trim($tree['then']);
 			$else = self::render($tree['else']);
 

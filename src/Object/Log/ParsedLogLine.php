@@ -29,7 +29,7 @@ class ParsedLogLine
 	/** @var string */
 	public $message = null;
 
-	/** @var string */
+	/** @var string|null */
 	public $data = null;
 
 	/** @var string */
