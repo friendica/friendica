@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Database\Repository;
+namespace Friendica\Test\Unit\Repository;
 
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
-use Friendica\Database\Repository\CacheRepository;
+use Friendica\Repository\CacheRepository;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 

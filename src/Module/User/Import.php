@@ -20,7 +20,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
-use Friendica\Database\Repository\UserDeletedRepository;
+use Friendica\Database\Repository\DeletedUserRepository;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
@@ -49,7 +49,7 @@ class Import extends \Friendica\BaseModule
 	/** @var Database */
 	private $database;
 
-	private UserDeletedRepository $userDeletedRepository;
+	private DeletedUserRepository $deletedUserRepository;
 
 	/** @var PermissionSet */
 	private $permissionSet;
@@ -62,7 +62,7 @@ class Import extends \Friendica\BaseModule
 		PermissionSet $permissionSet,
 		IManagePersonalConfigValues $pconfig,
 		Database $database,
-		UserDeletedRepository $userDeletedRepository,
+		DeletedUserRepository $deletedUserRepository,
 		SystemMessages $systemMessages,
 		IManageConfigValues $config,
 		L10n $l10n,
@@ -80,7 +80,7 @@ class Import extends \Friendica\BaseModule
 		$this->pconfig        = $pconfig;
 		$this->systemMessages = $systemMessages;
 		$this->database       = $database;
-		$this->userDeletedRepository = $userDeletedRepository;
+		$this->deletedUserRepository = $deletedUserRepository;
 		$this->permissionSet  = $permissionSet;
 		$this->session        = $session;
 	}
@@ -233,7 +233,7 @@ class Import extends \Friendica\BaseModule
 		// check for username
 		// check if username matches deleted account
 		if ($this->database->exists('user', ['nickname' => $account['user']['nickname']])
-			|| $this->userDeletedRepository->existsByUsername($account['user']['nickname'])) {
+			|| $this->deletedUserRepository->existsByUsername($account['user']['nickname'])) {
 			$this->systemMessages->addNotice($this->t("User '%s' already exists on this server!", $account['user']['nickname']));
 			return;
 		}

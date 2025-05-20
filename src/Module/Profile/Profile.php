@@ -23,7 +23,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Database\Repository\UserDeletedRepository;
+use Friendica\Database\Repository\DeletedUserRepository;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
@@ -48,7 +48,7 @@ class Profile extends BaseProfile
 {
 	/** @var Database */
 	private $database;
-	private UserDeletedRepository $userDeletedRepository;
+	private DeletedUserRepository $deletedUserRepository;
 	/** @var AppHelper */
 	private $appHelper;
 	/** @var IHandleUserSessions */
@@ -68,7 +68,7 @@ class Profile extends BaseProfile
 		IHandleUserSessions $session,
 		AppHelper $appHelper,
 		Database $database,
-		UserDeletedRepository $userDeletedRepository,
+		DeletedUserRepository $deletedUserRepository,
 		EventDispatcherInterface $eventDispatcher,
 		L10n $l10n,
 		BaseURL $baseUrl,
@@ -82,7 +82,7 @@ class Profile extends BaseProfile
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->database              = $database;
-		$this->userDeletedRepository = $userDeletedRepository;
+		$this->deletedUserRepository = $deletedUserRepository;
 		$this->appHelper             = $appHelper;
 		$this->session               = $session;
 		$this->config                = $config;
@@ -106,7 +106,7 @@ class Profile extends BaseProfile
 				}
 			}
 
-			if ($this->userDeletedRepository->existsByUsername($this->parameters['nickname'])) {
+			if ($this->deletedUserRepository->existsByUsername($this->parameters['nickname'])) {
 				// Known deleted user
 				$data = ActivityPub\Transmitter::getDeletedUser($this->parameters['nickname']);
 

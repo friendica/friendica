@@ -7,16 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Database\Repository;
+namespace Friendica\Repository;
 
 use Exception;
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
+use Friendica\Database\Repository\DeletedUserRepository;
 
 /**
  * Repository for deleted users
  */
-final class UserDeletedRepository
+final class UserdRepository implements DeletedUserRepository
 {
 	private Database $database;
 

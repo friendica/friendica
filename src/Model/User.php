@@ -266,7 +266,7 @@ class User
 			return $system_actor_name;
 		}
 
-		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
 
 		// List of possible actor names
 		$possible_accounts = ['friendica', 'actor', 'system', 'internal'];
@@ -1301,7 +1301,7 @@ class User
 			throw new Exception(DI::l10n()->t('Your nickname can only contain a-z, 0-9 and _.'));
 		}
 
-		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
 
 		// Check existing and deleted accounts for this nickname.
 		if (
@@ -1816,7 +1816,7 @@ class User
 
 		$user = $hook_data['user'] ?? $user;
 
-		$userDeletedRepository = DI::databaseService()->getUserDeletedRepository();
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
 
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.

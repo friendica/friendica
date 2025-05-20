@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace Friendica\Database;
 
 use Friendica\Database\Database;
-use Friendica\Database\Repository\UserDeletedRepository;
+use Friendica\Database\Repository\DeletedUserRepository;
+use Friendica\Repository\UserdRepository;
 
 final class DatabaseService
 {
@@ -21,8 +22,8 @@ final class DatabaseService
 		$this->database = $database;
 	}
 
-	public function getUserDeletedRepository(): UserDeletedRepository
+	public function getDeletedUserRepository(): DeletedUserRepository
 	{
-		return new UserDeletedRepository($this->database);
+		return new UserdRepository($this->database);
 	}
 }

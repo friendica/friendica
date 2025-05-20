@@ -11,7 +11,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
 use Friendica\Database\Database;
-use Friendica\Database\Repository\CacheRepository;
+use Friendica\Repository\CacheRepository;
 use Friendica\Util\DateTimeFormat;
 
 /**
