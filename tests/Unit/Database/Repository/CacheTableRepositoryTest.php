@@ -7,15 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Repository;
+namespace Friendica\Test\Unit\Database\Repository;
 
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
-use Friendica\Repository\CacheRepository;
+use Friendica\Database\Repository\CacheTableRepository;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
-class CacheRepositoryTest extends TestCase
+class CacheTableRepositoryTest extends TestCase
 {
 	public function testGetAllKeysValidUntilReturnsArray(): void
 	{
@@ -32,7 +32,7 @@ class CacheRepositoryTest extends TestCase
 			false
 		);
 
-		$repo = new CacheRepository($database);
+		$repo = new CacheTableRepository($database);
 
 		$this->assertSame(
 			[
@@ -49,7 +49,7 @@ class CacheRepositoryTest extends TestCase
 		$database = $this->createStub(Database::class);
 		$database->method('select')->willThrowException($this->createStub(Throwable::class));
 
-		$repo = new CacheRepository($database);
+		$repo = new CacheTableRepository($database);
 
 		$this->expectException(DatabaseException::class);
 
@@ -71,7 +71,7 @@ class CacheRepositoryTest extends TestCase
 			false
 		);
 
-		$repo = new CacheRepository($database);
+		$repo = new CacheTableRepository($database);
 
 		$this->assertSame(
 			[
@@ -88,7 +88,7 @@ class CacheRepositoryTest extends TestCase
 		$database = $this->createStub(Database::class);
 		$database->method('select')->willThrowException($this->createStub(Throwable::class));
 
-		$repo = new CacheRepository($database);
+		$repo = new CacheTableRepository($database);
 
 		$this->expectException(DatabaseException::class);
 

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Database\Repository;
+namespace Friendica\Repository;
 
 use Exception;
 use Friendica\Database\DatabaseException;

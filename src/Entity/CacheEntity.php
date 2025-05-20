@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Database\Entity;
+namespace Friendica\Entity;
 
 /**
- * Entity for a row in the cache table
+ * Entity for a cache entry
  */
 interface CacheEntity
 {

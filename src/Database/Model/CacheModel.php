@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Model;
+namespace Friendica\Database\Model;
 
 use Exception;
 use Friendica\Database\DBA;
-use Friendica\Database\Entity\CacheEntity;
+use Friendica\Entity\CacheEntity;
 
 /**
  * Model for a row in the cache table

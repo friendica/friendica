@@ -7,19 +7,19 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Repository;
+namespace Friendica\Test\Unit\Database\Repository;
 
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
-use Friendica\Database\Repository\DeletedUserRepository;
-use Friendica\Repository\UserdRepository;
+use Friendica\Database\Repository\UserdTableRepository;
+use Friendica\Repository\DeletedUserRepository;
 use PHPUnit\Framework\TestCase;
 
-class UserdRepositoryTest extends TestCase
+class UserdTableRepositoryTest extends TestCase
 {
 	public function testImplementationOfInterfaces(): void
 	{
-		$repo = new UserdRepository($this->createMock(Database::class));
+		$repo = new UserdTableRepository($this->createMock(Database::class));
 
 		$this->assertInstanceOf(DeletedUserRepository::class, $repo);
 	}
@@ -31,7 +31,7 @@ class UserdRepositoryTest extends TestCase
 			['userd', ['username' => 'test'], 0, true],
 		]);
 
-		$repo = new UserdRepository($database);
+		$repo = new UserdTableRepository($database);
 
 		$repo->insertByUsername('test');
 	}
@@ -44,7 +44,7 @@ class UserdRepositoryTest extends TestCase
 			new DatabaseException('An error occured.', 0, 'SQL query')
 		);
 
-		$repo = new UserdRepository($database);
+		$repo = new UserdTableRepository($database);
 
 		$this->expectException(DatabaseException::class);
 
@@ -58,7 +58,7 @@ class UserdRepositoryTest extends TestCase
 			['userd', ['username' => 'test'], true],
 		]);
 
-		$repo = new UserdRepository($database);
+		$repo = new UserdTableRepository($database);
 
 		$this->assertTrue($repo->existsByUsername('test'));
 	}
@@ -70,7 +70,7 @@ class UserdRepositoryTest extends TestCase
 			['userd', ['username' => 'test'], false],
 		]);
 
-		$repo = new UserdRepository($database);
+		$repo = new UserdTableRepository($database);
 
 		$this->assertFalse($repo->existsByUsername('test'));
 	}
