@@ -35,7 +35,7 @@ class Browser extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session   = $session;
+		$this->session = $session;
 		$this->appHelper = $appHelper;
 	}
 
@@ -55,15 +55,16 @@ class Browser extends BaseModule
 
 		$fileArray = array_map([$this, 'map_files'], $files);
 
-		$tpl    = Renderer::getMarkupTemplate('media/browser.tpl');
+		$tpl = Renderer::getMarkupTemplate('media/browser.tpl');
+
 		$output = Renderer::replaceMacros($tpl, [
-			'$type'     => 'attachment',
-			'$path'     => ['' => $this->t('Files')],
-			'$folders'  => false,
-			'$files'    => $fileArray,
-			'$cancel'   => $this->t('Cancel'),
+			'$type' => 'attachment',
+			'$path' => ['' => $this->t('Files')],
+			'$folders' => false,
+			'$files' => $fileArray,
+			'$cancel' => $this->t('Cancel'),
 			'$nickname' => $this->session->getLocalUserNickname(),
-			'$upload'   => $this->t('Upload'),
+			'$upload' => $this->t('Upload'),
 		]);
 
 		if (empty($request['mode'])) {
@@ -76,12 +77,16 @@ class Browser extends BaseModule
 	protected function map_files(array $record): array
 	{
 		list($m1, $m2) = explode('/', $record['filetype']);
-		$filetype      = file_exists(sprintf('images/icons/%s.png', $m1) ? $m1 : 'text');
+		$filetype = file_exists('images/icons/' . $m1 . '.png') ? $m1 : 'text';
+		$iconUrl = sprintf('%s/images/icon/16/%s.png', $this->baseUrl, $filetype);
+		$fileUrl = sprintf('%s/attach/%s', $this->baseUrl, $record['id']);
 
+		// Erstellen Sie ein Array mit den notwendigen Informationen
 		return [
-			sprintf('%s/attach/%s', $this->baseUrl, $record['id']),
-			$record['filename'],
-			sprintf('%s/images/icon/16/%s.png', $this->baseUrl, $filetype),
+			$fileUrl, // $f.0
+			$record['filename'], // $f.1
+			$iconUrl, // $f.2
+			$record['filename'] // $f.3
 		];
 	}
 }
