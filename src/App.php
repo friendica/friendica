@@ -202,7 +202,7 @@ class App
 	/**
 	 * @internal
 	 */
-	public function processConsole(array $serverParams): void
+	public function processConsole(array $serverParams, bool $testmode = false): void
 	{
 		$argv = $serverParams['argv'] ?? [];
 
@@ -229,6 +229,10 @@ class App
 		);
 
 		$this->registerTemplateEngine();
+
+		if ($testmode) {
+			return;
+		}
 
 		(\Friendica\Core\Console::create($this->container, $argv))->execute();
 	}
@@ -293,15 +297,17 @@ class App
 	{
 		$command = strtolower($argv[1] ?? '');
 
-		if ($command === 'daemon' || $command === 'jetstream') {
+		if ($command === 'daemon') {
 			return LogChannel::DAEMON;
+		}
+
+		if ($command === 'jetstream') {
+			return LogChannel::JETSTREAM;
 		}
 
 		if ($command === 'worker') {
 			return LogChannel::WORKER;
 		}
-
-		// @TODO Add support for jetstream
 
 		return LogChannel::CONSOLE;
 	}
@@ -456,11 +462,13 @@ class App
 
 			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
-				if ($this->config->get('system', 'force_ssl') &&
+				if (
+					$this->config->get('system', 'force_ssl') &&
 					(empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off') &&
 					(empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http') &&
 					!empty($serverVars['REQUEST_METHOD']) &&
-					$serverVars['REQUEST_METHOD'] === 'GET') {
+					$serverVars['REQUEST_METHOD'] === 'GET'
+				) {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 
@@ -481,7 +489,8 @@ class App
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
 				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '') &&
-					strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
+					strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false
+				) {
 					$this->auth->setUnauthenticatedVisitor($queryVars['zrl']);
 					OpenWebAuth::zrlInit();
 				} else {
@@ -652,8 +661,8 @@ class App
 		@file_put_contents(
 			$logfile,
 			DateTimeFormat::utcNow() . "\t" . round($duration, 3) . "\t" .
-			$this->requestId . "\t" . $code . "\t" .
-			$request . "\t" . $agent . "\n",
+				$this->requestId . "\t" . $code . "\t" .
+				$request . "\t" . $agent . "\n",
 			FILE_APPEND
 		);
 	}

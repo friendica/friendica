@@ -12,13 +12,13 @@ use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
- * A Logger for specific worker tasks, which adds a worker id to it.
+ * A Logger for specific jetstream tasks, which adds a jetstream id to it.
  * Uses the decorator pattern (https://en.wikipedia.org/wiki/Decorator_pattern)
  */
-class WorkerLogger implements LoggerInterface
+class JetstreamLogger implements LoggerInterface
 {
-	/** @var int Length of the unique worker id */
-	const WORKER_ID_LENGTH = 7;
+	/** @var int Length of the unique jetstream id */
+	const JETSTREAM_ID_LENGTH = 7;
 
 	/**
 	 * @var LoggerInterface The original Logger instance
@@ -26,17 +26,12 @@ class WorkerLogger implements LoggerInterface
 	private $logger;
 
 	/**
-	 * @var string the current worker ID
+	 * @var string the current jetstream ID
 	 */
-	private $workerId;
+	private $jetstreamId;
 
 	/**
-	 * @var string The called function name
-	 */
-	private $functionName;
-
-	/**
-	 * @param LoggerInterface $logger       The logger for worker entries
+	 * @param LoggerInterface $logger       The logger for jetstream tasks
 	 *
 	 * @throws LoggerException
 	 */
@@ -44,58 +39,44 @@ class WorkerLogger implements LoggerInterface
 	{
 		$this->logger = $logger;
 		try {
-			$this->workerId = Strings::getRandomHex(self::WORKER_ID_LENGTH);
+			$this->jetstreamId = Strings::getRandomHex(self::JETSTREAM_ID_LENGTH);
 		} catch (\Exception $exception) {
 			throw new LoggerException('Cannot generate random Hex.', $exception);
 		}
 	}
 
 	/**
-	 * Sets the function name for additional logging
-	 *
-	 * @param string $functionName
-	 *
-	 * @throws LoggerException
-	 */
-	public function setFunctionName(?string $functionName)
-	{
-		$this->functionName = $functionName;
-		try {
-			$this->workerId = Strings::getRandomHex(self::WORKER_ID_LENGTH);
-		} catch (\Exception $exception) {
-			throw new LoggerException('Cannot generate random Hex.', $exception);
-		}
-	}
-
-	public function getFunctionName(): ?string
-	{
-		return $this->functionName;
-	}
-
-	/**
-	 * Adds the worker context for each log entry
+	 * Adds the jetstream context for each log entry
 	 *
 	 * @param array $context
 	 */
 	private function addContext(array &$context)
 	{
-		$context['worker_id']  = $this->workerId;
-		$context['worker_cmd'] = $this->functionName;
+		$context['jetstream_id'] = $this->jetstreamId;
 	}
 
 	/**
-	 * Returns the worker ID
+	 * Returns the jetstream ID
 	 *
 	 * @return string
 	 */
-	public function getWorkerId(): string
+	public function getJetstreamId(): string
 	{
-		return $this->workerId;
+		return $this->jetstreamId;
 	}
 
-	public function setWorkerId(string $workerId): void
+	public function setJetstreamId(string $jetstreamId): void
 	{
-		$this->workerId = $workerId;
+		$this->jetstreamId = $jetstreamId;
+	}
+
+	public function initJetstreamId(): void
+	{
+		try {
+			$this->jetstreamId = Strings::getRandomHex(self::JETSTREAM_ID_LENGTH);
+		} catch (\Exception $exception) {
+			throw new LoggerException('Cannot generate random Hex.', $exception);
+		}
 	}
 
 	/**

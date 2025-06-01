@@ -12,6 +12,7 @@ namespace Friendica\Core\Logger;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\Logger\Factory\LoggerFactory;
+use Friendica\Core\Logger\Type\JetstreamLogger;
 use Friendica\Core\Logger\Type\ProfilerLogger;
 use Friendica\Core\Logger\Type\WorkerLogger;
 use Friendica\Util\Profiler;
@@ -66,6 +67,11 @@ final class LoggerManager
 		self::$logger     = null;
 	}
 
+	public function getLogChannel(): string
+	{
+		return self::$logChannel;
+	}
+
 	/**
 	 * (Creates and) Returns the logger instance
 	 */
@@ -76,6 +82,11 @@ final class LoggerManager
 		}
 
 		return self::$logger;
+	}
+
+	public function setLogger(LoggerInterface $logger): void
+	{
+		self::$logger = $logger;
 	}
 
 	private function createLogger(): LoggerInterface
@@ -96,6 +107,10 @@ final class LoggerManager
 		// Decorate Logger as WorkerLogger for BC
 		if (self::$logChannel === LogChannel::WORKER) {
 			$logger = new WorkerLogger($logger);
+		}
+
+		if (self::$logChannel === LogChannel::JETSTREAM) {
+			$logger = new JetstreamLogger($logger);
 		}
 
 		return $logger;

@@ -82,7 +82,7 @@ class Worker
 		// Kill stale processes every 5 minutes
 		$last_cleanup = DI::keyValue()->get('worker_last_cleaned') ?? 0;
 		if (time() > ($last_cleanup + 300)) {
-			DI::keyValue()->set( 'worker_last_cleaned', time());
+			DI::keyValue()->set('worker_last_cleaned', time());
 			Worker\Cron::killStaleWorkers();
 		}
 
@@ -399,7 +399,7 @@ class Worker
 
 		require_once $include;
 
-		$funcname = str_replace('.php', '', basename($argv[0])) .'_run';
+		$funcname = str_replace('.php', '', basename($argv[0])) . '_run';
 
 		if (function_exists($funcname)) {
 			// We constantly update the "executed" date every minute to avoid being killed too soon
@@ -541,7 +541,19 @@ class Worker
 
 		self::coolDown();
 
-		DI::loggerManager()->changeLogChannel(LogChannel::WORKER);
+		$loggerManager = DI::loggerManager();
+
+		$previousLogger  = $loggerManager->getLogger();
+		$previousChannel = $loggerManager->getLogChannel();
+		if ($previousLogger instanceof WorkerLogger) {
+			$previousId       = $previousLogger->getWorkerId();
+			$previousFunction = $previousLogger->getFunctionName();
+		} else {
+			$previousId       = null;
+			$previousFunction = null;
+		}
+
+		$loggerManager->changeLogChannel(LogChannel::WORKER);
 
 		$logger = DI::logger();
 
@@ -624,6 +636,14 @@ class Worker
 
 		DI::logger()->info('Process done.', ['function' => $funcname, 'priority' => $queue['priority'], 'retrial' => $queue['retrial'], 'id' => $queue['id'], 'duration' => round($duration, 3)]);
 
+		$loggerManager->changeLogChannel($previousChannel);
+		$loggerManager->setLogger($previousLogger);
+
+		if ($previousLogger instanceof WorkerLogger) {
+			$previousLogger->setWorkerId($previousId);
+			$previousLogger->setFunctionName($previousFunction);
+		}
+
 		DI::profiler()->saveLog(DI::logger(), 'ID ' . $queue['id'] . ': ' . $funcname);
 	}
 
@@ -684,7 +704,7 @@ class Worker
 			$level = ($used / $max) * 100;
 
 			if ($level >= $maxlevel) {
-				DI::logger()->warning('Maximum level (' . $maxlevel . '%) of user connections reached: ' . $used .'/' . $max);
+				DI::logger()->warning('Maximum level (' . $maxlevel . '%) of user connections reached: ' . $used . '/' . $max);
 				return true;
 			}
 		}
@@ -765,7 +785,7 @@ class Worker
 					self::$db_duration_stat += (microtime(true) - $stamp);
 					$jobs_per_minute[$interval] = number_format($jobs / $interval, 0);
 				}
-				$processlist = ' - jpm: '.implode('/', $jobs_per_minute);
+				$processlist = ' - jpm: ' . implode('/', $jobs_per_minute);
 			}
 
 			// Create a list of queue entries grouped by their priority
@@ -810,7 +830,7 @@ class Worker
 
 			$listitem[0] = '0:' . max(0, $idle_workers);
 
-			$processlist .= ' ('.implode(', ', $listitem).')';
+			$processlist .= ' (' . implode(', ', $listitem) . ')';
 
 			if (DI::config()->get('system', 'worker_fastlane', false) && ($queues > 0) && ($active >= $queues) && self::entriesExists()) {
 				$top_priority = self::highestPriority();
@@ -1305,8 +1325,13 @@ class Worker
 		}
 
 		if (empty($queue)) {
-			if (!DBA::insert('workerqueue', ['command' => $command, 'parameter' => $parameters, 'created' => $created,
-				'priority'                                => $priority, 'next_try' => $delayed])) {
+			if (!DBA::insert('workerqueue', [
+				'command'   => $command,
+				'parameter' => $parameters,
+				'created'   => $created,
+				'priority'  => $priority,
+				'next_try'  => $delayed
+			])) {
 				return 0;
 			}
 			$added = DBA::lastInsertId();
