@@ -415,7 +415,7 @@ class Conversation
 
 			//jot nav tab (used in some themes)
 			'$message' => $this->l10n->t('Message'),
-			'$browser' => $this->l10n->t('Browser'),
+			'$browser' => $this->l10n->t('Add media'),
 
 			'$compose_link_title'  => $this->l10n->t('Open Compose page'),
 			'$always_open_compose' => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose', false),

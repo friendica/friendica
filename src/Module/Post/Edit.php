@@ -175,7 +175,7 @@ class Edit extends BaseModule
 
 			//jot nav tab (used in some themes)
 			'$message'      => $this->t('Message'),
-			'$browser'      => $this->t('Browser'),
+			'$browser'      => $this->t('Add media'),
 			'$shortpermset' => $this->t('Permissions'),
 
 			'$compose_link_title' => $this->t('Open Compose page'),
