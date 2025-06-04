@@ -126,7 +126,7 @@ class Contacts extends Module\BaseProfile
 				$title = $this->tt('Following (%s)', 'Following (%s)', $total);
 				break;
 			case 'mutuals':
-				$title = $this->tt('Mutual friend (%s)', 'Mutual friends (%s)', $total);
+				$title = $this->tt('Friend (%s)', 'Friends (%s)', $total);
 				$desc  = $this->t(
 					'These contacts both follow and are followed by <strong>%s</strong>.',
 					htmlentities($profile['name'], ENT_COMPAT, 'UTF-8')

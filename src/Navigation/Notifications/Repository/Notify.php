@@ -383,11 +383,11 @@ class Notify extends BaseRepository
 				switch ($params['verb']) {
 					case Activity::FRIEND:
 						// someone started to share with user (mostly OStatus)
-						$subject = $l10n->t('%s A new person is sharing with you', $subjectPrefix);
+						$subject = $l10n->t('%s You have a new friend', $subjectPrefix);
 
-						$preamble  = $l10n->t('%1$s is sharing with you at %2$s', $params['source_name'], $sitename);
+						$preamble  = $l10n->t('%1$s is your friend at %2$s', $params['source_name'], $sitename);
 						$epreamble = $l10n->t(
-							'%1$s is sharing with you at %2$s',
+							'%1$s is your friend at %2$s',
 							'[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]',
 							$sitename
 						);
@@ -442,7 +442,7 @@ class Notify extends BaseRepository
 						'[url=' . $params['source_link'] . ']' . $params['source_name'] . '[/url]'
 					);
 
-					$body = $l10n->t('You are now mutual friends and may exchange status updates, photos, and email without restriction.');
+					$body = $l10n->t('You are now friends and may exchange status updates, photos, and email without restriction.');
 
 					$sitelink  = $l10n->t('Please visit %s if you wish to make any changes to this relationship.');
 					$tsitelink = sprintf($sitelink, $siteurl);

@@ -402,7 +402,7 @@ class Contact extends BaseModule
 				$header = DI::l10n()->t('Following');
 				break;
 			case 'mutuals':
-				$header = DI::l10n()->t('Mutual friends');
+				$header = DI::l10n()->t('Friends');
 				break;
 			case 'nothing':
 				$header = DI::l10n()->t('No relationship');
@@ -573,15 +573,15 @@ class Contact extends BaseModule
 		if (!empty($contact['uid']) && !empty($contact['rel']) && DI::userSession()->getLocalUserId() == $contact['uid']) {
 			switch ($contact['rel']) {
 				case Model\Contact::FRIEND:
-					$alt_text = DI::l10n()->t('Mutual Friendship');
+					$alt_text = DI::l10n()->t('Friend');
 					break;
 
 				case Model\Contact::FOLLOWER:
-					$alt_text = DI::l10n()->t('is a fan of yours');
+					$alt_text = DI::l10n()->t('Follows you');
 					break;
 
 				case Model\Contact::SHARING:
-					$alt_text = DI::l10n()->t('you are a fan of');
+					$alt_text = DI::l10n()->t('You follow');
 					break;
 
 				default:

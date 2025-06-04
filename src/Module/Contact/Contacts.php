@@ -106,7 +106,7 @@ class Contacts extends BaseModule
 				break;
 			case 'mutuals':
 				$friends = Model\Contact\Relation::listMutuals($cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title   = $this->tt('Mutual friend (%s)', 'Mutual friends (%s)', $total);
+				$title   = $this->tt('Friend (%s)', 'Friends (%s)', $total);
 				$desc    = $this->t(
 					'These contacts both follow and are followed by <strong>%s</strong>.',
 					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')

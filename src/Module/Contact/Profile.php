@@ -284,13 +284,13 @@ class Profile extends BaseModule
 
 		switch ($localRelationship->rel) {
 			case ContactModel::FRIEND:
-				$relation_text = $this->t('You are mutual friends with %s', $contact['name']);
+				$relation_text = $this->t('Connection type: Friend');
 				break;
 			case ContactModel::FOLLOWER:
-				$relation_text = $this->t('You are sharing with %s', $contact['name']);
+				$relation_text = $this->t('Connection type: Follows you');
 				break;
 			case ContactModel::SHARING:
-				$relation_text = $this->t('%s is sharing with you', $contact['name']);
+				$relation_text = $this->t('Connection type: You follow');
 				break;
 			default:
 				$relation_text = '';
