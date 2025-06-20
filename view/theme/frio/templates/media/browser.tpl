@@ -59,9 +59,7 @@
 					{{/foreach}}
 				</div>
 			</div>
-			</div>
-			</div>
-
+		</div>
 	</div>
 
 	{{* This part contains the content loader icon which is visible when new content is loaded *}}
