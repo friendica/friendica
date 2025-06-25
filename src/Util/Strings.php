@@ -395,8 +395,7 @@ class Strings
 	{
 		return 'https?://                   # http or https protocol
   (?:
-	[^/\s\xA0`!()\[\]{};:\'",<>?«»“”‘’.]    # Domain can\'t start with a .
-	[^/\s\xA0`!()\[\]{};:\'",<>?«»“”‘’]*    # Domain can\'t end with a .
+	[^/\s\xA0`!()\[\]{};:\'",<>?«»“”‘’.]+
 	\.
 	[^/\s\xA0`!()\[\]{};:\'".,<>?«»“”‘’]+/? # Followed by a slash
   )
