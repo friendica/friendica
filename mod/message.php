@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -36,7 +37,7 @@ function message_init()
 		'accesskey' => 'm',
 	];
 
-	$tpl = Renderer::getMarkupTemplate('message_side.tpl');
+	$tpl                = Renderer::getMarkupTemplate('message_side.tpl');
 	DI::page()['aside'] = Renderer::replaceMacros($tpl, [
 		'$tabs' => $tabs,
 		'$new'  => $new,
@@ -61,7 +62,7 @@ function message_post()
 	$body      = !empty($_REQUEST['body'])      ? Strings::escapeHtml(trim($_REQUEST['body'])) : '';
 	$recipient = !empty($_REQUEST['recipient']) ? intval($_REQUEST['recipient'])               : 0;
 
-	$ret = Mail::send($sender_id, $recipient, $body, $subject, $replyto);
+	$ret     = Mail::send($sender_id, $recipient, $body, $subject, $replyto);
 	$norecip = false;
 
 	switch ($ret) {
@@ -131,7 +132,7 @@ function message_content()
 		$cmd = DI::args()->getArgv()[1];
 		if ($cmd === 'drop') {
 			$message = DBA::selectFirst('mail', ['convid'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
-			if(!DBA::isResult($message)){
+			if (!DBA::isResult($message)) {
 				DI::sysmsg()->addNotice(DI::l10n()->t('Conversation not found.'));
 				DI::baseUrl()->redirect('message');
 			}
@@ -141,7 +142,7 @@ function message_content()
 			}
 
 			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => DI::userSession()->getLocalUserId()]);
-			if(!DBA::isResult($conversation)){
+			if (!DBA::isResult($conversation)) {
 				DI::baseUrl()->redirect('message');
 			}
 
@@ -165,7 +166,7 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl' => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
 		]);
 
 		$recipientId = DI::args()->getArgv()[2] ?? null;
@@ -178,7 +179,7 @@ function message_content()
 			'$to'          => DI::l10n()->t('To:'),
 			'$subject'     => DI::l10n()->t('Subject:'),
 			'$subjtxt'     => $_REQUEST['subject'] ?? '',
-			'$text'        => $_REQUEST['body'] ?? '',
+			'$text'        => $_REQUEST['body']    ?? '',
 			'$readonly'    => '',
 			'$yourmessage' => DI::l10n()->t('Your message:'),
 			'$select'      => $select,
@@ -207,7 +208,7 @@ function message_content()
 		$r = get_messages(DI::userSession()->getLocalUserId(), $pager->getStart(), $pager->getItemsPerPage());
 
 		if (!DBA::isResult($r)) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('No messages.'));
+			$o .= DI::l10n()->t('You have no messages.');
 			return $o;
 		}
 
@@ -222,7 +223,8 @@ function message_content()
 
 		$o .= $header;
 
-		$message = DBA::fetchFirst("
+		$message = DBA::fetchFirst(
+			"
 			SELECT `mail`.*, `contact`.`name`, `contact`.`url`, `contact`.`thumb`
 			FROM `mail`
 			LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
@@ -241,11 +243,12 @@ function message_content()
 
 			if ($message['convid']) {
 				$sql_extra = "AND (`mail`.`parent-uri` = ? OR `mail`.`convid` = ?)";
-				$params[] = $message['convid'];
+				$params[]  = $message['convid'];
 			} else {
 				$sql_extra = "AND `mail`.`parent-uri` = ?";
 			}
-			$messages_stmt = DBA::p("
+			$messages_stmt = DBA::p(
+				"
 				SELECT `mail`.*, `contact`.`name`, `contact`.`url`, `contact`.`thumb`
 				FROM `mail`
 				LEFT JOIN `contact` ON `mail`.`contact-id` = `contact`.`id`
@@ -270,11 +273,11 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl' => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
 		]);
 
-		$mails = [];
-		$seen = 0;
+		$mails   = [];
+		$seen    = 0;
 		$unknown = false;
 
 		foreach ($messages as $message) {
@@ -284,18 +287,18 @@ function message_content()
 
 			if ($message['from-url'] == $myprofile) {
 				$from_url = $myprofile;
-				$sparkle = '';
+				$sparkle  = '';
 			} else {
 				$from_url = Contact::magicLink($message['from-url']);
-				$sparkle = ' sparkle';
+				$sparkle  = ' sparkle';
 			}
 
 			$from_name_e = $message['from-name'];
-			$subject_e = $message['title'];
-			$body_e = BBCode::convertForUriId($message['uri-id'], $message['body']);
-			$to_name_e = $message['name'];
+			$subject_e   = $message['title'];
+			$body_e      = BBCode::convertForUriId($message['uri-id'], $message['body']);
+			$to_name_e   = $message['name'];
 
-			$contact = Contact::getByURL($message['from-url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
+			$contact    = Contact::getByURL($message['from-url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
 			$from_photo = Contact::getThumb($contact);
 
 			$mails[] = [
@@ -320,7 +323,7 @@ function message_content()
 		$parent = '<input type="hidden" name="replyto" value="' . $message['parent-uri'] . '" />';
 
 		$tpl = Renderer::getMarkupTemplate('mail_display.tpl');
-		$o = Renderer::replaceMacros($tpl, [
+		$o   = Renderer::replaceMacros($tpl, [
 			'$thread_id'      => DI::args()->getArgv()[1],
 			'$thread_subject' => $message['title'],
 			'$thread_seen'    => $seen,
@@ -329,19 +332,19 @@ function message_content()
 			'$unknown_text'   => DI::l10n()->t("No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."),
 			'$mails'          => $mails,
 			// reply
-			'$header'         => DI::l10n()->t('Send Reply'),
-			'$to'             => DI::l10n()->t('To:'),
-			'$subject'        => DI::l10n()->t('Subject:'),
-			'$subjtxt'        => $message['title'],
-			'$readonly'       => ' readonly="readonly" style="background: #BBBBBB;" ',
-			'$yourmessage'    => DI::l10n()->t('Your message:'),
-			'$text'           => '',
-			'$select'         => $select,
-			'$parent'         => $parent,
-			'$upload'         => DI::l10n()->t('Upload photo'),
-			'$insert'         => DI::l10n()->t('Insert web link'),
-			'$submit'         => DI::l10n()->t('Submit'),
-			'$wait'           => DI::l10n()->t('Please wait')
+			'$header'      => DI::l10n()->t('Send Reply'),
+			'$to'          => DI::l10n()->t('To:'),
+			'$subject'     => DI::l10n()->t('Subject:'),
+			'$subjtxt'     => $message['title'],
+			'$readonly'    => ' readonly="readonly" style="background: #BBBBBB;" ',
+			'$yourmessage' => DI::l10n()->t('Your message:'),
+			'$text'        => '',
+			'$select'      => $select,
+			'$parent'      => $parent,
+			'$upload'      => DI::l10n()->t('Upload photo'),
+			'$insert'      => DI::l10n()->t('Insert web link'),
+			'$submit'      => DI::l10n()->t('Submit'),
+			'$wait'        => DI::l10n()->t('Please wait')
 		]);
 
 		return $o;
@@ -396,13 +399,12 @@ function get_messages(int $uid, int $start, int $limit): array
 		LEFT JOIN `contact` c ON m.`contact-id` = c.`id`
 		WHERE m.`uid` = ?
 		ORDER BY m2.`mailcreated` DESC
-		LIMIT ?, ?'
-		, $uid, $uid, $start, $limit));
+		LIMIT ?, ?', $uid, $uid, $start, $limit));
 }
 
 function render_messages(array $msg, string $t): string
 {
-	$tpl = Renderer::getMarkupTemplate($t);
+	$tpl  = Renderer::getMarkupTemplate($t);
 	$rslt = '';
 
 	$myprofile = DI::baseUrl() . '/profile/' . DI::userSession()->getLocalUserNickname();
@@ -416,7 +418,7 @@ function render_messages(array $msg, string $t): string
 			$participants = DI::l10n()->t("%s and You", $rr['from-name']);
 		}
 
-		$body_e = $rr['body'];
+		$body_e    = $rr['body'];
 		$to_name_e = $rr['name'];
 
 		if (is_null($rr['url'])) {
@@ -424,7 +426,7 @@ function render_messages(array $msg, string $t): string
 			continue;
 		}
 
-		$contact = Contact::getByURL($rr['url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
+		$contact    = Contact::getByURL($rr['url'], false, ['thumb', 'addr', 'id', 'avatar', 'url']);
 		$from_photo = Contact::getThumb($contact);
 
 		$rslt .= Renderer::replaceMacros($tpl, [

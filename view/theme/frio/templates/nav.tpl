@@ -164,7 +164,7 @@
 								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 									<div class="form-group form-group-search">
 										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-											type="text" name="q" data-toggle="tooltip" title="{{$search_hint}}"
+											type="text" name="q" data-toggle="tooltip" data-viewport="#topbar-first" title="{{$search_hint}}"
 											placeholder="{{$nav.search.1}}">
 										<button class="btn btn-default btn-sm form-button-search"
 											type="submit">{{$nav.search.1}}</button>

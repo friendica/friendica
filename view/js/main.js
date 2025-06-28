@@ -512,7 +512,7 @@ function NavUpdate() {
 					var update_url = 'ping_network?ping=1';
 					$.get(update_url, function(net) {
 						updateCounter('net', net);
-					});			
+					});
 				}
 
 				if ($('#live-photos').length) {

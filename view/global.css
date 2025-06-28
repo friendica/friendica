@@ -806,10 +806,24 @@ summary.wall-item-summary {
 /* Margin to create space between the icon and the text */
 .notif-image {
     	margin-right: 10px;
+}
 
 /* Styles to ensure the text wraps properly after 70 characters */
 .notif-text {
     	display: inline-block;
     	max-width: 70ch;
     	overflow-wrap: break-word;
+}
+
+/* Add alt tag indicators to the relevant images */
+a:has(img.has-alt-description)::after {
+	background: lightgray;
+	border-radius: 4px;
+	color: black;
+	content: "ALT";
+	font-weight: bold;
+	padding: 3px 8px;
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
 }

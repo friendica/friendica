@@ -136,7 +136,9 @@ class Index extends BaseSearch
 		// Tags don't look like an URL and the fulltext search does only work with natural words
 		if (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST)) {
 			$this->logger->info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
-			DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
+			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => DI::l10n()->t('No results.')
+			]);
 			return $o;
 		}
 
@@ -186,7 +188,9 @@ class Index extends BaseSearch
 
 		if (empty($items)) {
 			if (empty($last_uriid)) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
+				$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+					'$title' => DI::l10n()->t('No results.')
+				]);
 			}
 			return $o;
 		}

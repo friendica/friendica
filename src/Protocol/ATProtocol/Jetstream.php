@@ -38,6 +38,23 @@ use stdClass;
  */
 class Jetstream
 {
+	/** 
+	 * Maximum drift values in seconds for the threads completion.
+	 * If the drift is higher than this value, only a few posts in a thread will be fetched.
+	 */
+	const MAX_DRIFT_THREAD_COMPLETION = 30;
+	/**
+	 * Maximum drift values in seconds for the DID cap.
+	 * If the drift is higher than this value, the number of DIDs will be capped.
+	 */
+	const MAX_DRIFT_DID_CAP           = 60;
+	/**
+	 * Maximum drift values in seconds for creating posts.
+	 * If the drift is higher than this value, posts and reshares will not be created.
+	 * The other collections will still be processed.
+	 */
+	const MAX_DRIFT_CREATE_POSTS      = 1200;
+
 	private $uids   = [];
 	private $self   = [];
 	private $capped = false;
@@ -84,6 +101,8 @@ class Jetstream
 		$timeout_limit = 10;
 		$timestamp     = $this->keyValue->get('jetstream_timestamp') ?? 0;
 		$cursor        = '';
+		$this->logger->notice('Start listening');
+
 		while (true) {
 			if ($timestamp) {
 				$cursor = '&cursor=' . $timestamp;
@@ -97,7 +116,7 @@ class Jetstream
 				$this->client->setTimeout($timeout);
 				$this->client->setLogger($this->logger);
 			} catch (\WebSocket\ConnectionException $e) {
-				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 				echo "Connection wasn't established.\n";
 				exit(1);
 			}
@@ -105,7 +124,8 @@ class Jetstream
 			$last_timeout = time();
 			while (true) {
 				try {
-					$message = @$this->client->receive();
+					$message = $this->client->receive();
+
 					if (empty($message)) {
 						$this->logger->notice('Empty message received');
 						break;
@@ -128,8 +148,9 @@ class Jetstream
 							break;
 						}
 						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
+						break;
 					} else {
-						$this->logger->error('Error', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+						$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 						break;
 					}
 				}
@@ -138,9 +159,10 @@ class Jetstream
 			try {
 				$this->client->close();
 			} catch (\WebSocket\ConnectionException $e) {
-				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 			}
 		}
+		$this->logger->notice('Stop listening');
 	}
 
 	/**
@@ -236,7 +258,7 @@ class Jetstream
 		try {
 			$this->client->send(json_encode($update));
 		} catch (\WebSocket\ConnectionException $e) {
-			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 		}
 	}
 
@@ -357,7 +379,7 @@ class Jetstream
 		$drift = max(0, round(time() - $data->time_us / 1000000));
 		$this->keyValue->set('jetstream_drift', $drift);
 
-		if ($drift > 60 && !$this->capped) {
+		if ($drift > self::MAX_DRIFT_DID_CAP && !$this->capped) {
 			$this->capped = true;
 			$this->setOptions();
 			$this->logger->notice('Drift is too high, dids will be capped');
@@ -384,7 +406,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+				}
 				break;
 
 			default:
@@ -408,7 +432,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+				}
 				break;
 
 			default:

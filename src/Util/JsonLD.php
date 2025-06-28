@@ -286,7 +286,7 @@ class JsonLD
 	 * @param $type
 	 * @param $type_value
 	 *
-	 * @return string|null fetched element
+	 * @return mixed|null fetched element. If the element is not found, null is returned.
 	 */
 	public static function fetchElement($array, $element, $key = '@id', $type = null, $type_value = null)
 	{

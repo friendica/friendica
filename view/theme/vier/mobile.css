@@ -21,7 +21,7 @@ section {
   padding: 5px;
 }
 
-body, section, nav .nav-menu, div.pager, ul.tabs {
+body, section, nav#topbar-first .nav-menu, div.pager, ul.tabs {
   font-size: 16px;
 }
 
@@ -29,7 +29,7 @@ body, section, nav .nav-menu, div.pager, ul.tabs {
   font-size: 13px;
 }
 
-nav {
+nav#topbar-first {
   min-width: 100%;
 }
 
@@ -41,7 +41,7 @@ nav {
   padding-top: 25px; */
 }
 
-nav ul {
+nav#topbar-first ul {
     margin-left: 0px;
 }
 
@@ -111,7 +111,7 @@ nav ul {
   .wall-item-container .wall-item-content .type-link img.attachment-image, .type-link img.attachment-image, .type-video img.attachment-image {
     max-width: 200px;
   }
-  /* fix img width in threaded view - maybe there exists a better possibility to do this 
+  /* fix img width in threaded view - maybe there exists a better possibility to do this
     maybe this needs also to be done for tablet view*/
   .children .wall-item-container .wall-item-item .wall-item-content img {
     max-width: 100%;
@@ -124,9 +124,9 @@ nav ul {
     max-width: 100%;
   }
 
-  
+
   /* the top-nav notification menu */
-  nav #nav-notifications-linkmenu .menu-popup {
+  nav#topbar-first #nav-notifications-linkmenu .menu-popup {
 	position: fixed;
 	left: 10px;
 	right: 10px;
@@ -136,7 +136,7 @@ nav ul {
 	max-width: none;
 	max-height: none;
   }
-  
+
 
 }
 
@@ -228,7 +228,7 @@ aside.show {
     margin: 0 1em 1em 0;
 }
 #profile-jot-submit-wrapper > div#profile-jot-perms { margin: 0; }
- 
+
 /* ACL window */
 #profile-jot-acl-wrapper, #profile-jot-acl-wrapper * { box-sizing: border-box; }
 #acl-wrapper { width: 100%; float: none; }
@@ -246,7 +246,7 @@ aside.show {
   -moz-flex-flow: column;
   -ms-flex-flow: column;
   flex-flow: column;
-  
+
   -webkit-flex: 1 100%;
   -moz-flex: 1 100%;
   -ms-flex: 1 100%;

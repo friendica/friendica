@@ -14,6 +14,9 @@ use Friendica\Core\Logger\Factory\LoggerFactory;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @deprecated 2025.02 Use implementation of `\Friendica\Core\Addon\AddonHelper` instead.
+ */
 class AddonLoader implements ICanLoadAddons
 {
 	const STATIC_PATH = 'static';
@@ -24,13 +27,19 @@ class AddonLoader implements ICanLoadAddons
 
 	public function __construct(string $basePath, IManageConfigValues $config)
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+
 		$this->basePath = $basePath;
 		$this->config   = $config;
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * @deprecated 2025.02 Use `\Friendica\Core\Addon\AddonHelper::getAddonDependencyConfig()` instead.
+	 */
 	public function getActiveAddonConfig(string $configName): array
 	{
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use `\Friendica\Core\Addon\AddonHelper::getAddonDependencyConfig()` instead.', E_USER_DEPRECATED);
+
 		$addons       = array_keys(array_filter($this->config->get('addons') ?? []));
 		$returnConfig = [];
 

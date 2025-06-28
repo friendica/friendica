@@ -6,14 +6,16 @@
   *}}
 
 <div id="contact-block">
-	<h3 class="contact-block-h4 pull-left">{{$contacts}}</h3>
-
 {{if $micropro}}
-	<a class="pull-right widget-action faded-icon" id="contact-block-view-contacts" href="profile/{{$nickname}}/contacts">
-		<i class="fa fa-eye" aria-hidden="true"></i>
+	<a id="contact-block-view-contacts" href="profile/{{$nickname}}/contacts">
+		<h3 class="contact-block-h4">{{$contacts}}</h3>
 		<span class="sr-only">{{$viewcontacts}}</span>
 	</a>
+{{else}}
+	<h3 class="contact-block-h4">{{$contacts}}</h3>
+{{/if}}
 
+{{if $micropro}}
 	<div class='contact-block-content'>
 	{{foreach $micropro as $m}}
 		{{$m nofilter}}

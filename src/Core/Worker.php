@@ -521,7 +521,7 @@ class Worker
 		}
 
 		if ($sleeping) {
-			DI::logger()->info('Cooldown ended.', ['max-load' => $load_cooldown, 'max-processes' => $processes_cooldown, 'load' => $load, 'called-by' => System::callstack(1)]);
+			DI::logger()->info('Cooldown ended.', ['max-load' => $load_cooldown, 'max-processes' => $processes_cooldown, 'load' => $load ?? [], 'called-by' => System::callstack(1)]);
 		}
 	}
 
