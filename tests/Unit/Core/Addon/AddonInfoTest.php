@@ -14,19 +14,111 @@ use PHPUnit\Framework\TestCase;
 
 class AddonInfoTest extends TestCase
 {
+	public function testFromStringCreatesObject(): void
+	{
+		$this->assertInstanceOf(AddonInfo::class, AddonInfo::fromString('addonId', ''));
+	}
+
+	public static function getStringData(): array
+	{
+		return [
+			'minimal' => [
+				'test',
+				'',
+				['id' => 'test'],
+			],
+			'without-author' => [
+				'test',
+				<<<TEXT
+				/**
+				 * Name: Test Addon
+				 * Description: adds awesome features to friendica
+				 * Version: 100.4.50-beta.5
+				 * Maintainer: Robin
+				 * Status: beta
+				 * Ignore: The "ignore" key is unsupported and will be ignored
+				 */
+				TEXT,
+				[
+					'id'          => 'test',
+					'name'        => 'Test Addon',
+					'description' => 'adds awesome features to friendica',
+
+					'maintainers' => [
+						['name' => 'Robin'],
+					],
+					'version' => '100.4.50-beta.5',
+					'status'  => 'beta',
+				],
+			],
+			'without-maintainer' => [
+				'test',
+				<<<TEXT
+				/*
+				 * Name: Test Addon
+				 * Description: adds awesome features to friendica
+				 * Version: 100.4.50-beta.5
+				 * Author: Sam
+				 * Status: beta
+				 * Ignore: The "ignore" key is unsupported and will be ignored
+				 */
+				TEXT,
+				[
+					'id'          => 'test',
+					'name'        => 'Test Addon',
+					'description' => 'adds awesome features to friendica',
+					'authors'     => [
+						['name' => 'Sam'],
+					],
+					'version' => '100.4.50-beta.5',
+					'status'  => 'beta',
+				],
+			],
+			'complete' => [
+				'test',
+				<<<TEXT
+				/*
+				 * Name: Test Addon
+				 * Description: adds awesome features to friendica
+				 * Version: 100.4.50-beta.5
+				 * Author: Sam
+				 * Author: Sam With Mail <mail@example.org>
+				 * Maintainer: Robin
+				 * Maintainer: Robin With Profile <https://example.org/profile/robin>
+				 * Status: beta
+				 * Ignore: The "ignore" key is unsupported and will be ignored
+				 */
+				TEXT,
+				[
+					'id'          => 'test',
+					'name'        => 'Test Addon',
+					'description' => 'adds awesome features to friendica',
+					'authors'     => [
+						['name' => 'Sam'],
+						['name' => 'Sam With Mail', 'link' => 'mail@example.org'],
+					],
+					'maintainers' => [
+						['name' => 'Robin'],
+						['name' => 'Robin With Profile', 'link' => 'https://example.org/profile/robin'],
+					],
+					'version' => '100.4.50-beta.5',
+					'status'  => 'beta',
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider getStringData
+	 */
+	public function testFromStringReturnsCorrectValues(string $addonId, string $raw, array $expected): void
+	{
+		$this->assertAddonInfoData($expected, AddonInfo::fromString($addonId, $raw));
+	}
+
 	public function testFromArrayCreatesObject(): void
 	{
-		$data = [
-			'id'          => '',
-			'name'        => '',
-			'description' => '',
-			'authors'     => [],
-			'maintainers' => [],
-			'version'     => '',
-			'status'      => '',
-		];
-
-		$this->assertInstanceOf(AddonInfo::class, AddonInfo::fromArray($data));
+		$this->assertInstanceOf(AddonInfo::class, AddonInfo::fromArray([]));
 	}
 
 	public function testGetterReturningCorrectValues(): void
@@ -41,15 +133,34 @@ class AddonInfoTest extends TestCase
 			'status'      => 'In Development',
 		];
 
-		$info = AddonInfo::fromArray($data);
+		$this->assertAddonInfoData($data, AddonInfo::fromArray($data));
+	}
 
-		$this->assertSame($data['id'], $info->getId());
-		$this->assertSame($data['name'], $info->getName());
-		$this->assertSame($data['description'], $info->getDescription());
-		$this->assertSame($data['description'], $info->getDescription());
-		$this->assertSame($data['authors'], $info->getAuthors());
-		$this->assertSame($data['maintainers'], $info->getMaintainers());
-		$this->assertSame($data['version'], $info->getVersion());
-		$this->assertSame($data['status'], $info->getStatus());
+	private function assertAddonInfoData(array $expected, AddonInfo $info): void
+	{
+		$expected = array_merge(
+			[
+				'id'          => '',
+				'name'        => '',
+				'description' => '',
+				'authors'     => [],
+				'maintainers' => [],
+				'version'     => '',
+				'status'      => '',
+			],
+			$expected
+		);
+
+		$data = [
+			'id'          => $info->getId(),
+			'name'        => $info->getName(),
+			'description' => $info->getDescription(),
+			'authors'     => $info->getAuthors(),
+			'maintainers' => $info->getMaintainers(),
+			'version'     => $info->getVersion(),
+			'status'      => $info->getStatus(),
+		];
+
+		$this->assertSame($expected, $data);
 	}
 }

@@ -92,5 +92,7 @@ HELP;
 		CoreWorker::unclaimProcess($process);
 
 		$this->processRepo->delete($process);
+
+		return;
 	}
 }

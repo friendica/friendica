@@ -8,7 +8,7 @@
 namespace Friendica\Network;
 
 use DOMDocument;
-use DomXPath;
+use DOMXPath;
 use Exception;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Hook;
@@ -1273,7 +1273,7 @@ class Probe
 			return [];
 		}
 
-		$xpath = new DomXPath($doc);
+		$xpath = new DOMXPath($doc);
 
 		$vcards = $xpath->query("//div[contains(concat(' ', @class, ' '), ' vcard ')]");
 		if (!is_object($vcards)) {

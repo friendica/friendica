@@ -1,5 +1,5 @@
 -- ------------------------------------------
--- Friendica 2025.02-dev (Interrupted Fern)
+-- Friendica 2025.07-rc (Interrupted Fern)
 -- DB_UPDATE_VERSION 1580
 -- ------------------------------------------
 

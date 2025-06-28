@@ -572,6 +572,11 @@ nav.navbar {
 	}
 }
 
+button#main-menu {
+	align-items: center;
+	display: flex;
+	gap: 5px;
+}
 #topbar-first .navbar-toggle {
 	margin-top: 5px;
 	margin-bottom: 0;
@@ -602,7 +607,6 @@ nav.navbar .nav > li > button:focus {
 	margin-left: 20px;
 }
 #topbar-first .nav > .account img {
-	margin-left: 10px;
 	height: 32px;
 	width: 32px;
 	border-radius: 3px;
@@ -784,7 +788,6 @@ nav.navbar .nav > li > button:focus {
 /* The Top Nav Bar user menu */
 #topbar-first .account .user-title {
 	text-align: right;
-	margin-top: 7px;
 }
 #topbar-first .account .user-title span {
 	color: $nav_icon_color;
@@ -2460,7 +2463,7 @@ input[type="range"].form-control {
 
 .form-group-search .form-button-search {
 	position: absolute;
-	top: 4px;
+	top: 2px;
 	right: 4px;
 	border-radius: 30px;
 }

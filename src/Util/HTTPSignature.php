@@ -592,7 +592,7 @@ class HTTPSignature
 			return [];
 		}
 
-		$sig_block = self::parseSigHeader($http_headers['HTTP_SIGNATURE']);
+		$sig_block = self::parseSigheader($http_headers['HTTP_SIGNATURE']);
 
 		if (empty($sig_block['keyId'])) {
 			DI::logger()->debug('No keyId', ['sig_block' => $sig_block]);
@@ -652,7 +652,7 @@ class HTTPSignature
 			}
 		}
 
-		$sig_block = self::parseSigHeader($http_headers['HTTP_SIGNATURE']);
+		$sig_block = self::parseSigheader($http_headers['HTTP_SIGNATURE']);
 
 		// Add fields from the signature block to the header. See issue 8845
 		if (!empty($sig_block['created']) && empty($headers['(created)'])) {

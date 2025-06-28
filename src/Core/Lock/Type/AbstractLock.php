@@ -28,7 +28,7 @@ abstract class AbstractLock implements ICanLock
 	 */
 	protected function hasAcquiredLock(string $key): bool
 	{
-		return isset($this->acquireLock[$key]) && $this->acquiredLocks[$key] === true;
+		return isset($this->acquiredLocks[$key]) && $this->acquiredLocks[$key] === true;
 	}
 
 	/**

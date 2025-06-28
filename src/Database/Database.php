@@ -1722,19 +1722,35 @@ class Database
 	 */
 	public function processlist(): array
 	{
+		$database = trim($this->config->get('database', 'database'));
+
 		$ret  = $this->p('SHOW PROCESSLIST');
 		$data = $this->toArray($ret);
 
 		$processes = 0;
+		$max_time  = 0;
+		$max_query = '';
 		$states    = [];
 		foreach ($data as $process) {
-			$state = trim($process['State']);
+			if ($process['db'] != $database) {
+				continue;
+			}
 
 			// Filter out all non blocking processes
-			if (!in_array($state, ['', 'init', 'statistics', 'updating'])) {
-				++$states[$state];
-				++$processes;
+			$state = trim($process['State']);
+			if (in_array($state, ['', 'init', 'statistics', 'updating'])) {
+				continue;
 			}
+
+			if ($process['Time'] > $max_time) {
+				$max_time  = $process['Time'];
+				$max_query = $process['Info'];
+			}
+			if (!isset($states[$state])) {
+				$states[$state] = 0;
+			}
+			++$states[$state];
+			++$processes;
 		}
 
 		$statelist = '';
@@ -1744,7 +1760,7 @@ class Database
 			}
 			$statelist .= $state . ': ' . $usage;
 		}
-		return (['list' => $statelist, 'amount' => $processes]);
+		return (['list' => $statelist, 'amount' => $processes, 'states' => $states, 'max_time' => $max_time, 'max_query' => $max_query]);
 	}
 
 	/**

@@ -33,38 +33,39 @@ header #banner a:hover {
   color: #737373;
 }
 
-nav {
+nav#topbar-first {
    background: #eeeeee;
 }
 
-nav .icon {
+nav#topbar-first .icon {
   color: #737373;
 }
 
-nav a:active,
-nav a:visited,
-nav a:link,
-nav a:hover .icon,
-nav a {
+nav#topbar-first a:active,
+nav#topbar-first a:visited,
+nav#topbar-first a:link,
+nav#topbar-first a:hover .icon,
+nav#topbar-first a {
   color: #737373;
 }
 
-nav #nav-search-box #nav-search-text {
+nav#topbar-first #nav-search-box #nav-search-text {
   border-radius: 5px;
 }
 
-nav .nav-menu.selected {
+nav#topbar-first .nav-menu.selected {
   border-bottom: 3px solid #737373;
 }
 
-nav .nav-menu-icon.selected {
+nav#topbar-first .nav-menu-icon.selected {
   background-color: #eeeeee;
 }
 
-nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-linkmenu.selected .icon.s22.notify {
+nav#topbar-first #nav-notifications-linkmenu.on .icon.s22.notify, nav#topbar-first #nav-notifications-linkmenu.selected .icon.s22.notify {
   color: #737373;
 }
 
+nav#topbar-first ul.menu-popup,
 ul.menu-popup {
   border: 1px solid #364e59;
   border-radius: 5px;

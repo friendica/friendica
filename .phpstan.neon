@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
 parameters:
     level: 3
 
@@ -23,6 +26,10 @@ parameters:
     dynamicConstantNames:
         - DB_UPDATE_VERSION
 
+    # See all rules at https://github.com/phpstan/phpstan-strict-rules/blob/2.0.x/rules.neon
+    strictRules:
+        allRules: false
+
     ignoreErrors:
         -
             # Ignore missing GdImage class in PHP <= 7.4
@@ -38,3 +45,17 @@ parameters:
             # Ignore missing IMAP\Connection class in PHP <= 8.0
             message: '(^Parameter .+ has invalid type IMAP\\Connection\.$)'
             path: src
+
+        -
+            # #Fixme: Ignore type mismatch of BaseRepository::$factory in child classes
+            message: '#^PHPDoc type Friendica\\.+ of property Friendica\\.+\:\:\$factory is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateFromTableRow of overridden property Friendica\\BaseRepository\:\:\$factory\.$#'
+            identifier: property.phpDocType
+            count: 13
+            path: src
+
+        -
+            # #Fixme: Ignore type mismatch of BaseModule::$response in BaseApi module
+            message: '#^PHPDoc type Friendica\\Module\\Api\\ApiResponse of property Friendica\\Module\\BaseApi\:\:\$response is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateResponses of overridden property Friendica\\BaseModule\:\:\$response\.$#'
+            identifier: property.phpDocType
+            count: 1
+            path: src/Module/BaseApi.php

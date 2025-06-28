@@ -133,7 +133,7 @@ class Actor
 		}
 
 		$directory = $this->atprotocol->get(ATProtocol::DIRECTORY . '/' . $profile->did);
-		if (!empty($directory)) {
+		if (!empty($directory->service)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {
 					$fields['baseurl'] = $service->serviceEndpoint;

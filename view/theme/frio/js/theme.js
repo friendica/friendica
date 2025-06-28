@@ -174,9 +174,8 @@ $(document).ready(function () {
 
 		// temporary workaround to avoid 'undefined' being displayed (issue #9789)
 		// https://github.com/friendica/friendica/issues/9789
-		// TODO: find a way to localize this string
 		if (typeof searchText === "undefined") {
-			searchText = "No results";
+			searchText = "";
 		}
 		// insert the plain text in a <h4> heading and give it a class
 		var newText = '<h4 class="search-heading">' + searchText + "</h4>";

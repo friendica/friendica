@@ -39,11 +39,10 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'instanceOf' => \Friendica\Core\Addon\Model\AddonLoader::class,
 			'constructParams' => [
 				$basepath,
-				[Dice::INSTANCE => Dice::SELF],
 			],
 		],
 		\Friendica\Core\Addon\AddonHelper::class => [
-			'instanceOf' => \Friendica\Core\Addon\AddonProxy::class,
+			'instanceOf' => \Friendica\Core\Addon\AddonManagerHelper::class,
 			'constructParams' => [
 				$basepath . '/addon',
 			],

@@ -644,15 +644,18 @@ class Receiver
 				return true;
 			}
 		} else {
-			$attributed_to = '';
+			$attributed_to = null;
 		}
 
 		// Test the provided signatures against the actor and "attributedTo"
 		if ($trust_source) {
-			if ($attributed_to !== false && $attributed_to !== '') {
+			if (!is_null($attributed_to)) {
 				$trust_source = (in_array($actor, $signer) && in_array($attributed_to, $signer));
 			} else {
 				$trust_source = in_array($actor, $signer);
+			}
+			if (!$trust_source) {
+				DI::logger()->info('Actor missmatch. Activity trust could not be achieved.', ['type' => $type, 'signer' => $signer, 'actor' => $actor, 'attributedTo' => $attributed_to]);
 			}
 		}
 

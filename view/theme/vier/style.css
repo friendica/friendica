@@ -340,7 +340,11 @@ a:hover {
 	vertical-align: baseline;
 	outline-offset: 0;
 }
-
+button.fakelink {
+	background: none;
+	text-align: left;
+	border: none;
+}
 pre code {
 	font-family: Courier, monospace;
 	white-space: pre;
@@ -595,8 +599,8 @@ header #banner #logo-img {
 header #banner #logo-text {
 	font-size: 22px;
 }
-/* nav */
-nav {
+/* nav#topbar-first */
+nav#topbar-first {
 	min-width: 1000px;
 	width: 100%;
 	height: 32px;
@@ -620,15 +624,15 @@ nav {
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
 }
 
-nav .icon {
+nav#topbar-first .icon {
 	color: #ccc;
 	padding:0;
 }
 
-nav a:active,
-nav a:visited,
-nav a:link,
-nav a {
+nav#topbar-first a:active,
+nav#topbar-first a:visited,
+nav#topbar-first a:link,
+nav#topbar-first a {
 	text-decoration: none;
 	outline: none;
 	color: #ccc;
@@ -637,11 +641,11 @@ nav a {
 	cursor: pointer;
 }
 
-nav a:hover .icon {
+nav#topbar-first a:hover .icon {
 	color: #fff;
 }
 
-nav a:hover {
+nav#topbar-first a:hover {
 	text-decoration: none;
 	outline: none;
 	color: #fff;
@@ -649,22 +653,22 @@ nav a:hover {
 	padding-top: 8px;
 }
 
-nav ul {
+nav#topbar-first ul {
 	margin: 0px;
 	padding: 0px 10px;
 }
-nav ul li {
+nav#topbar-first ul li {
 	list-style: none;
 	margin: 0px;
 	/* padding: 1px 1px 3px 1px; */
 	float: left;
 }
-nav ul li .menu-popup {
+nav#topbar-first ul li .menu-popup {
 	left: 0px;
 	right: auto;
 }
 
-nav #nav-search-box #nav-search-text {
+nav#topbar-first #nav-search-box #nav-search-text {
 	/*background-image:  url('icons/lupe.png');
 	background-repeat:no-repeat; */
 	padding-left:0px;
@@ -680,7 +684,7 @@ nav #nav-search-box #nav-search-text {
 	background-color: #eee;
 }
 
-nav .nav-menu-icon {
+nav#topbar-first .nav-menu-icon {
 	position: relative;
 	height: 22px;
 	padding: 5px;
@@ -689,32 +693,32 @@ nav .nav-menu-icon {
 	-webkit-border-radius: 5px 5px 0 0;
 	border-radius: 5px 5px 0 0;
 }
-nav .nav-menu-icon.selected {
+nav#topbar-first .nav-menu-icon.selected {
 	background-color: #364e59;
 }
-nav .nav-menu img,
-nav .nav-menu-icon img {
+nav#topbar-first .nav-menu img,
+nav#topbar-first .nav-menu-icon img {
 	width: 22px;
 	height: 22px;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
 }
-nav .nav-menu img {
+nav#topbar-first .nav-menu img {
 	margin-top: -3px;
 	margin-right: 4px;
 }
 
-nav .nav-menu > a > .nav-notification,
-nav .nav-menu-icon > a > .nav-notification {
+nav#topbar-first .nav-menu > a > .nav-notification,
+nav#topbar-first .nav-menu-icon > a > .nav-notification {
 	position: absolute;
 	top: 3px;
 	right: -5px;
 }
-nav .nav-menu-label {
+nav#topbar-first .nav-menu-label {
 	margin: 3px 5px 0px;
 }
-nav .nav-menu {
+nav#topbar-first .nav-menu {
 	position: relative;
 	height: 16px;
 	padding: 5px;
@@ -726,16 +730,16 @@ nav .nav-menu {
 	color: #ccc;
 	font-weight: bold;
 }
-/*nav .nav-menu.selected a {
+/*nav#topbar-first .nav-menu.selected a {
 	color: white;
 }*/
 
-nav .nav-menu.selected {
+nav#topbar-first .nav-menu.selected {
 	border-bottom: 3px solid #9eabb0;
 	/* background-color: #364E59; */
 }
 
-nav .nav-menu:hover {
+nav#topbar-first .nav-menu:hover {
 	/* color: #fff !important; */
 	color: #fff;
 	/* text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.5); */
@@ -759,7 +763,7 @@ nav .nav-menu:hover {
 	margin-right: -20px;
 }
 
-nav .nav-notification {
+nav#topbar-first .nav-notification {
 	display: none;
 	background-color: #F80;
 	-moz-border-radius: 5px 5px 5px 5px;
@@ -771,78 +775,79 @@ nav .nav-notification {
 	text-align: center;
 	color: white;
 }
-nav .nav-notification.show {
+nav#topbar-first .nav-notification.show {
 	display: inline-block;
 }
 
-nav #nav-help-link,
-nav #nav-search-link,
-nav #nav-directory-link,
-nav #nav-apps-link,
-nav #nav-apps-link,
-nav #nav-login-link,
-nav #nav-logout-link,
-nav #nav-messages-linkmenu,
-nav #nav-notifications-linkmenu,
-nav #nav-site-linkmenu,
-nav #nav-contacts-linkmenu,
-nav #nav-user-linklabel {
+nav#topbar-first #nav-help-link,
+nav#topbar-first #nav-search-link,
+nav#topbar-first #nav-directory-link,
+nav#topbar-first #nav-apps-link,
+nav#topbar-first #nav-apps-link,
+nav#topbar-first #nav-login-link,
+nav#topbar-first #nav-logout-link,
+nav#topbar-first #nav-messages-linkmenu,
+nav#topbar-first #nav-notifications-linkmenu,
+nav#topbar-first #nav-site-linkmenu,
+nav#topbar-first #nav-contacts-linkmenu,
+nav#topbar-first #nav-user-linklabel {
 	float: right;
 }
-nav #nav-user-linklabel {
+nav#topbar-first #nav-user-linklabel {
 	padding-left: 0px;
 	margin-top: 0px;
 }
-nav #nav-help-link .menu-popup,
-nav #nav-search-link .menu-popup,
-nav #nav-directory-link .menu-popup,
-nav #nav-apps-link .menu-popup,
-nav #nav-notifications-linkmenu .menu-popup,
-nav #nav-contacts-linkmenu .menu-popup,
-nav #nav-site-linkmenu .menu-popup {
+nav#topbar-first #nav-help-link .menu-popup,
+nav#topbar-first #nav-search-link .menu-popup,
+nav#topbar-first #nav-directory-link .menu-popup,
+nav#topbar-first #nav-apps-link .menu-popup,
+nav#topbar-first #nav-notifications-linkmenu .menu-popup,
+nav#topbar-first #nav-user-linkmenu .menu-popup,
+nav#topbar-first #nav-contacts-linkmenu .menu-popup,
+nav#topbar-first #nav-site-linkmenu .menu-popup {
 	right: 0px;
 	left: auto;
 }
-nav #nav-site-linkmenu {
+nav#topbar-first #nav-site-linkmenu {
 	margin-left: 0px;
 	margin-right: 0px;
 }
 .contact-entry-photo:hover .contact-photo-menu,
 .contact-photo-wrapper:hover .menu-popup,
-nav #nav-user-linklabel:hover #nav-user-menu,
-nav #nav-user-linkmenu:hover #nav-user-menu,
-nav #nav-apps-link:hover #nav-apps-menu,
-nav #nav-site-linkmenu:hover #nav-site-menu,
-nav #nav-notifications-linkmenu:hover #nav-notifications-menu,
+nav#topbar-first #nav-user-linklabel:hover #nav-user-menu,
+nav#topbar-first #nav-user-linkmenu:hover #nav-user-menu,
+nav#topbar-first #nav-apps-link:hover #nav-apps-menu,
+nav#topbar-first #nav-site-linkmenu:hover #nav-site-menu,
+nav#topbar-first #nav-notifications-linkmenu:hover #nav-notifications-menu,
 #contact-edit-actions:hover #contact-actions-menu {
 	display:block;
 	visibility:visible;
 	opacity:1;
 }
-nav #nav-notifications-linkmenu {
+nav#topbar-first #nav-notifications-linkmenu {
 	margin-left: 0px;
 	margin-right: 5px;
 }
-nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-linkmenu.selected .icon.s22.notify {
+nav#topbar-first #nav-notifications-linkmenu.on .icon.s22.notify, nav#topbar-first #nav-notifications-linkmenu.selected .icon.s22.notify {
 	color: white;
 }
-nav #nav-messages-linkmenu.selected,
-nav #nav-user-linklabel.selected,
-nav #nav-apps-link.selected {
+nav#topbar-first #nav-messages-linkmenu.selected,
+nav#topbar-first #nav-user-linklabel.selected,
+nav#topbar-first #nav-apps-link.selected {
 	background-color: #364e59;
 	border-bottom-style: none;
 }
 
-nav #nav-notifications-linkmenu.on .icon-bell:before {
+nav#topbar-first #nav-notifications-linkmenu.on .icon-bell:before {
 	content: "\f0f3";
 }
 
-/* nav #nav-community-link {*/
-nav ul {
+/* nav#topbar-first #nav-community-link {*/
+nav#topbar-first ul {
 	margin-left: 210px;
 }
 
-nav #nav-user-linkmenu {
+nav#topbar-first #nav-user-linkmenu {
 	float: right;
 	padding-left: 0px;
 	padding-right: 0px;
@@ -869,6 +874,7 @@ nav #nav-user-linkmenu {
 	background: none repeat scroll 0 0 #EEE;
 }
 
+nav#topbar-first ul.menu-popup,
 ul.menu-popup {
 	visibility:hidden;
 	opacity:0;
@@ -876,7 +882,7 @@ ul.menu-popup {
 	transition:all 0.2s ease-in-out;
 	/* display: none; */
 	position: absolute;
-	width: 13em;
+	min-width: 13em;
 	background: #ffffff;
 	color: #2d2d2d;
 	margin: 0px;
@@ -885,32 +891,40 @@ ul.menu-popup {
 	border: 3px solid #364e59;
 	z-index: 100000;
 	box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
+	font-weight: normal;
+	font-size: 13px;
 }
+nav#topbar-first ul.menu-popup a,
 ul.menu-popup a {
 	display: block;
 	color: #2d2d2d;
 	padding: 5px 10px;
 	text-decoration: none;
 }
+nav#topbar-first ul.menu-popup a:hover,
 ul.menu-popup a:hover {
 	/* background-color: #bdcdd4; */
 	background-color: #e5e5e5;
 }
+nav#topbar-first ul.menu-popup .menu-sep,
 ul.menu-popup .menu-sep {
 	border-top: 1px solid #9eabb0;
 }
+nav#topbar-first ul.menu-popup li,
 ul.menu-popup li {
 	float: none;
 	overflow: auto;
 	height: auto;
 	display: block;
 }
+nav#topbar-first ul.menu-popup li img,
 ul.menu-popup li img {
 	float: left;
 	width: 16px;
 	height: 16px;
 	padding-right: 5px;
 }
+nav#topbar-first ul.menu-popup .empty,
 ul.menu-popup .empty {
 	padding: 5px;
 	text-align: center;
@@ -929,7 +943,7 @@ ul.menu-popup .empty {
 	color: #2d2d2d;
 	max-height: 150px;
 }
-nav .acpopup {
+nav#topbar-first .acpopup {
 	top: 31px !important;
 	margin-left: -23px
 }
