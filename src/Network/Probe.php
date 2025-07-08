@@ -734,7 +734,7 @@ class Probe
 		$parts = parse_url($uri);
 		if (empty($parts['scheme']) && empty($parts['host']) && (empty($parts['path']) || strpos($parts['path'], '@') === false)) {
 			DI::logger()->info('URI was not detectable, probe for AT Protocol now', ['uri' => $uri]);
-			return self::atProtocol($uri);
+			return DI::atProtocol($uri);
 		}
 
 		// If the URI starts with "mailto:" then jump directly to the mail detection
@@ -758,7 +758,7 @@ class Probe
 		}
 
 		if (empty($data)) {
-			$data = self::atProtocol($uri);
+			$data = DI::atProtocol($uri);
 			if (!empty($data)) {
 				return $data;
 			}
