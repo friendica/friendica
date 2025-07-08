@@ -427,7 +427,7 @@ div.wall-item-content-wrapper.shiny {
 	margin-bottom: 25px;
 }
 
-#label-register-name, #label-register-email, #label-register-nickname, #label-register-openid {
+#label-register-openid {
 	float: left;
 	width: 350px;
 	margin-top: 10px;
@@ -810,20 +810,11 @@ input#dfrn-url {
 	margin-left: 20px;
 }
 
-#profile-publish-yes-reg,
-#profile-publish-no-reg {
+#profile-publish-reg {
 	float: left;
 	margin-bottom: 10px;
 }
 
-#profile-publish-yes-label-reg,
-#profile-publish-no-label-reg {
-	margin-left: 350px;
-	float: left;
-	width: 50px;
-}
-
-#profile-publish-break-reg,
 #profile-publish-end-reg {
 	clear: both;
 }

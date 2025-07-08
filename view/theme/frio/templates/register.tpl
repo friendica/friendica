@@ -17,13 +17,14 @@
 
 		{{if $explicit_content}} <p id="register-explicit-content">{{$explicit_content_note}}</p> {{/if}}
 
-		{{if $oidlabel}}
-		<div id="register-openid-wrapper" class="form-group">
-			<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label>
-			<input type="text" maxlength="60" size="32" name="openid_url" class="openid form-control" id="register-openid" value="{{$openid}}">
-			<span class="help-block" id="openid_url_tip">{{$fillwith}}&nbsp;{{$fillext}}</span>
-		</div>
-		<div id="register-openid-end"></div>
+		<h4>Normal registration</h4>
+
+		{{if !$additional}}
+			<div id="register-email-wrapper" class="form-group">
+				<input type="text" placeholder="{{$addrlabel}}" maxlength="60" size="32" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
+				<small>{{$addrdesc}}</small>
+			</div>
+			<div id="register-email-end"></div>
 		{{/if}}
 
 		{{if $invitations}}
@@ -36,25 +37,11 @@
 		{{/if}}
 
 		<div id="register-name-wrapper" class="form-group">
-			<label for="register-name" id="label-register-name">{{$namelabel}}</label>
-			<input type="text" maxlength="60" size="32" name="username" id="register-name" class="form-control" value="{{$username}}" required>
+			<input type="text" placeholder="{{$namelabel}}"maxlength="60" size="32" name="username" id="register-name" class="form-control" value="{{$username}}" required>
+			<small class="help-block" id="name_tip">{{$namedesc nofilter}}</small>
 		</div>
 		<div id="register-name-end"></div>
 
-
-		{{if !$additional}}
-			<div id="register-email-wrapper" class="form-group">
-				<label for="register-email" id="label-register-email">{{$addrlabel}}</label>
-				<input type="text" maxlength="60" size="32" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
-			</div>
-			<div id="register-email-end"></div>
-
-			<div id="register-repeat-wrapper" class="form-group">
-				<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-				<input type="text" maxlength="60" size="32" name="repeat" id="register-repeat" class="form-control" value="" required>
-			</div>
-			<div id="register-repeat-end"></div>
-		{{/if}}
 
 		{{if $ask_password}}
 		{{include file="field_password.tpl" field=$password1}}
@@ -62,9 +49,8 @@
 		{{/if}}
 
 		<div id="register-nickname-wrapper" class="form-group">
-			<label for="register-nickname" id="label-register-nickname">{{$nicklabel}}</label>
-			<input type="text" maxlength="60" size="32" name="nickname" id="register-nickname" class="form-control" value="{{$nickname}}" required>
-			<span class="help-block" id="nickname_tip">{{$nickdesc nofilter}}</span>
+			<input type="text" placeholder="{{$nicklabel}}" maxlength="60" size="32" name="nickname" id="register-nickname" class="form-control" value="{{$nickname}}" required>
+			<small class="help-block" id="nickname_tip">{{$nickdesc nofilter}}</small>
 		</div>
 		<div id="register-nickname-end"></div>
 
@@ -78,7 +64,17 @@
 		{{include file="field_textarea.tpl" field=$permonlybox}}
 		{{/if}}
 
-		{{$publish nofilter}}
+		{{if $oidlabel}}
+		<h4>{{$openid_title}}</h4>
+
+		<div id="register-openid-wrapper" class="form-group">
+			<span class="help-block" id="openid_url_tip">{{$fillwith}}&nbsp;{{$fillext}}</span>
+			<input type="text" placeholder="{{$oidlabel}}"maxlength="60" size="32" name="openid_url" class="openid form-control" id="register-openid" value="{{$openid}}">
+		</div>
+		<div id="register-openid-end"></div>
+		{{/if}}
+
+		<hr>
 
 		{{if $showtoslink}}
 		<p><a href="{{$baseurl}}/tos">{{$tostext}}</a></p>
@@ -90,15 +86,19 @@
 		{{/for}}
 		{{/if}}
 
-		<div id="register-submit-wrapper" class="pull-right">
+		{{$publish nofilter}}
+
+		<div id="register-submit-wrapper">
 			<button type="submit" name="submit" id="register-submit-button" class="btn btn-primary" value="{{$regbutt}}">{{$regbutt}}</button>
 		</div>
 		<div id="register-submit-end" class="clear"></div>
 
 		{{if !$additional}}
-			<h3>{{$importh}}</h3>
+		  <hr>
+			<h4>{{$importh}}</h4>
+			<p>{{$importdesc}}</p>
 			<div id ="import-profile">
-				<a href="user/import">{{$importt}}</a>
+				<a class="btn btn-secondary" href="user/import">{{$importt}}</a>
 			</div>
 		{{/if}}
 	</form>

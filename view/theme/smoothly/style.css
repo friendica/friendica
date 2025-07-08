@@ -937,7 +937,7 @@ li.widget-list {
 }
 
 #sidebar-new-circle,
-#sidebar-edit-circles, 
+#sidebar-edit-circles,
 #sidebar-new-group {
 	padding: 7px;
 	width: 165px;
@@ -3320,9 +3320,6 @@ margin-left: 0px;
 	margin-top: 10px;
 }
 
-#label-register-name,
-#label-register-email,
-#label-register-nickname,
 #label-register-openid {
 	float: left;
 	width: 350px;

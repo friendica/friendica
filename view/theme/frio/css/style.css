@@ -3445,13 +3445,25 @@ li.addon {
 /* Register Page */
 #register-openid-wrapper,
 #register-name-wrapper,
-#register-invite-wrapper,
-#profile-publish-wrapper {
-	margin-top: 20px;
+#register-email-wrapper,
+#register-nickname-wrapper,
+#profile-publish-wrapper,
+#register-invite-wrapper {
+	margin-top: 25px;
 }
-#register-openid-end,
-#register-nickname-end {
-	margin-top: 40px;
+
+#register-form h3 {
+	margin-top: 0;
+}
+
+#register-form h4, #register-form hr {
+	margin-top: 25px;
+}
+
+#register-submit-button {
+	margin-top: 20px;
+	padding: 15px;
+	width: 100%;
 }
 
 /*

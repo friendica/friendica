@@ -1193,6 +1193,7 @@ class User
 		$verified   = !empty($data['verified']);
 		$language   = !empty($data['language'])   ? trim($data['language'])   : 'en';
 
+		// 1 = include in local directory
 		$netpublish = $publish = !empty($data['profile_publish_reg']);
 
 		if ($password1 != $confirm) {

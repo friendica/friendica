@@ -6,6 +6,8 @@
   *}}
 <h3>{{$regtitle}}</h3>
 
+<h4 style="margin-top: 25px">Normal registration</h4>
+
 <form action="register" method="post" id="register-form">
 
 	<input type="hidden" name="photo" value="{{$photo}}" />
@@ -14,16 +16,6 @@
 	{{if $registertext != ""}}<div class="error-message">{{$registertext nofilter}} </div>{{/if}}
 
 	{{if $explicit_content}} <p id="register-explicit-content">{{$explicit_content_note}}</p> {{/if}}
-
-	<p id="register-fill-desc">{{$fillwith}}</p>
-	<p id="register-fill-ext">{{$fillext}}</p>
-
-{{if $oidlabel}}
-	<div id="register-openid-wrapper">
-	<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label><input type="text" maxlength="60" size="32" name="openid_url" class="openid" id="register-openid" value="{{$openid}}">
-	</div>
-	<div id="register-openid-end"></div>
-{{/if}}
 
 {{if $invitations}}
 	<p id="register-invite-desc">{{$invite_desc nofilter}}</p>
@@ -47,12 +39,6 @@
 			<input type="text" maxlength="60" size="32" name="field1" id="register-email" value="{{$email}}" required>
 		</div>
 		<div id="register-email-end"></div>
-
-		<div id="register-repeat-wrapper">
-			<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-			<input type="text" maxlength="60" size="32" name="repeat" id="register-repeat" value="" required>
-		</div>
-		<div id="register-repeat-end"></div>
 	{{/if}}
 
 {{if $ask_password}}
@@ -78,7 +64,17 @@
 	{{include file="field_textarea.tpl" field=$permonlybox}}
 {{/if}}
 
-	{{$publish nofilter}}
+{{if $oidlabel}}
+
+	<h4 style="margin-top: 45px">{{$openid_title}}</h4>
+
+	<p id="register-fill-desc">{{$fillwith}}</p>
+	<p id="register-fill-ext">{{$fillext}}</p>
+	<div id="register-openid-wrapper">
+	<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label><input type="text" maxlength="60" size="32" name="openid_url" class="openid" id="register-openid" value="{{$openid}}">
+	</div>
+	<div style="margin-top: 20px;" id="register-openid-end"></div>
+{{/if}}
 
 {{if $showtoslink}}
 	<p><a href="{{$baseurl}}/tos">{{$tostext}}</a></p>
@@ -90,15 +86,21 @@
 	{{/for}}
 {{/if}}
 
+<hr>
+
+	{{$publish nofilter}}
+
 	<div id="register-submit-wrapper">
 		<input type="submit" name="submit" id="register-submit-button" value="{{$regbutt}}" />
 	</div>
 	<div id="register-submit-end"></div>
 
 	{{if !$additional}}
-		<h3>{{$importh}}</h3>
+		<hr>
+		<h4>{{$importh}}</h4>
+		<p>{{$importdesc}}</p>
 		<div id ="import-profile">
-			<a href="user/import">{{$importt}}</a>
+			<a class="btn btn-secondary" href="user/import">{{$importt}}</a>
 		</div>
 	{{/if}}
 </form>
