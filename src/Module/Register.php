@@ -120,9 +120,9 @@ class Register extends BaseModule
 			$fillext  = '';
 			$oidlabel = '';
 		} else {
-			$fillwith = DI::l10n()->t('You may (optionally) fill in this form via OpenID by supplying your OpenID and clicking "Register".');
-			$fillext  = DI::l10n()->t('If you are not familiar with OpenID, please leave that field blank and fill in the rest of the items.');
-			$oidlabel = DI::l10n()->t('Your OpenID (optional): ');
+			$fillwith = DI::l10n()->t('You may fill out this form via OpenID by supplying your OpenID and clicking "Create Account".');
+			$fillext  = DI::l10n()->t('If you are unfamiliar with OpenID, leave the field blank and fill out the rest of the form.');
+			$oidlabel = DI::l10n()->t('Your OpenID (optional)');
 		}
 
 		if (DI::config()->get('system', 'publish_all')) {
@@ -130,12 +130,8 @@ class Register extends BaseModule
 		} else {
 			$publish_tpl     = Renderer::getMarkupTemplate('profile/publish.tpl');
 			$profile_publish = Renderer::replaceMacros($publish_tpl, [
-				'$instance'     => 'reg',
-				'$pubdesc'      => DI::l10n()->t('Include your profile in member directory?'),
-				'$yes_selected' => '',
-				'$no_selected'  => ' checked="checked"',
-				'$str_yes'      => DI::l10n()->t('Yes'),
-				'$str_no'       => DI::l10n()->t('No'),
+				'$instance' => 'reg',
+				'$pubdesc'  => DI::l10n()->t('Include your account in the member directory'),
 			]);
 		}
 
@@ -222,14 +218,17 @@ class Register extends BaseModule
 			'$fillext'               => $fillext,
 			'$oidlabel'              => $oidlabel,
 			'$openid'                => $openid_url,
-			'$namelabel'             => DI::l10n()->t('Your Display Name (as you would like it to be displayed on this system):'),
-			'$addrlabel'             => DI::l10n()->t('Your Email Address (initial information will be sent there, so this must be a valid address):'),
-			'$addrlabel2'            => DI::l10n()->t('Please repeat your e-mail address:'),
+			'$openid_title'          => DI::l10n()->t('Optional: Fill out via OpenID'),
+			'$namelabel'             => DI::l10n()->t('Choose a display name'),
+			'$namedesc'              => DI::l10n()->t('This is your primary, most visible name on Friendica.'),
+			'$addrlabel'             => DI::l10n()->t('Your email address'),
+			'$addrdesc'              => DI::l10n()->t('Information about your registration will be sent here, so it must be valid.'),
 			'$ask_password'          => $ask_password,
 			'$password1'             => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
 			'$password2'             => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
-			'$nickdesc'              => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
-			'$nicklabel'             => DI::l10n()->t('Choose a nickname: '),
+			'$nickdesc'              => DI::l10n()->t('This becomes part of your handle/address in the fediverse, which will be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
+			'$nickdesc2'             => DI::l10n()->t('Nicknames must begin with a letter. <strong>Nicknames cannot be changed.</strong>'),
+			'$nicklabel'             => DI::l10n()->t('Choose a nickname'),
 			'$photo'                 => $photo,
 			'$publish'               => $profile_publish,
 			'$regbutt'               => $regbutton_label,
@@ -237,8 +236,9 @@ class Register extends BaseModule
 			'$email'                 => $email,
 			'$nickname'              => $nickname,
 			'$sitename'              => DI::baseUrl()->getHost(),
-			'$importh'               => DI::l10n()->t('Import'),
-			'$importt'               => DI::l10n()->t('Import your profile to this friendica instance'),
+			'$importh'               => DI::l10n()->t('Import an existing Friendica account'),
+			'$importdesc'            => DI::l10n()->t('If you already have an account on another Friendica instance, instead of creating a new one, you can import it to this instance.'),
+			'$importt'               => DI::l10n()->t('Import account'),
 			'$showtoslink'           => DI::config()->get('system', 'tosdisplay'),
 			'$tostext'               => DI::l10n()->t('Terms of Service'),
 			'$showprivstatement'     => DI::config()->get('system', 'tosprivstatement'),
@@ -247,7 +247,7 @@ class Register extends BaseModule
 			'$explicit_content'      => DI::config()->get('system', 'explicit_content', false),
 			'$explicit_content_note' => DI::l10n()->t('Note: This node explicitly contains adult content'),
 			'$additional'            => !empty(DI::userSession()->getLocalUserId()),
-			'$parent_password'       => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter the password of the parent account to legitimize your request.')],
+			'$parent_password'       => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter your existing password to confirm.'), '', '', '', DI::l10n()->t('Your existing password')],
 			'$acct_type'             => $acct_type,
 
 		]);
@@ -342,17 +342,10 @@ class Register extends BaseModule
 			$verified = 1;
 
 			$post['password1'] = $post['confirm'] = $post['parent_password'];
-			$post['repeat']    = $post['email'] = $user['email'];
+			$post['email']     = $user['email'];
 		} else {
 			// Overwriting the "tar pit" field with the real one
 			$post['email'] = $post['field1'];
-		}
-
-		if ($post['email'] != $post['repeat']) {
-			$this->logger->info('Mail mismatch', $post);
-			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter the identical mail address in the second field.'));
-
-			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 		}
 
 		//Check if nickname contains only US-ASCII and do not start with a digit
