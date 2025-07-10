@@ -6,7 +6,7 @@ As an Addon maintainer or Friendica Developer you can inform yourself about all 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project [promises Backward Compatibility](doc/Developers-Intro.md#backward-compatibility).
 
-## [Version 2025.02](https://github.com/friendica/friendica/compare/2024.12-1...develop) - (unreleased)
+## [Version 2025.07](https://github.com/friendica/friendica/compare/2024.12-1...develop) - (unreleased)
 
 ### Added
 
