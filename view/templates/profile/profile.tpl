@@ -71,7 +71,7 @@
 	<dl id="aprofile-homepage" class="row {{$basic_fields.homepage.class|default:'aprofile'}}">
 		<hr class="profile-separator">
 		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.homepage.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.homepage.value nofilter}}</dd>
+		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.homepage.value nofilter}}{{if $profile.homepage_verified}} <span title="{{$homepage_verified}}">✔</span>{{/if}}</dd>
 	</dl>
 {{/if}}
 
