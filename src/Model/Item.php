@@ -3374,6 +3374,7 @@ class Item
 						'$image'               => $PostMedia,
 						'$allocated_height'    => $PostMedia->getAllocatedHeight(),
 						'$allocated_max_width' => ($PostMedia->previewWidth ?? $PostMedia->width) . 'px',
+						'$alt_text_title'      => DI::l10n()->t('Alt text'),
 					]);
 				}, $s);
 			} else {

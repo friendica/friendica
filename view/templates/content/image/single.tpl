@@ -10,7 +10,7 @@
 <figure>
 	<img src="{{$image->url}}" alt="{{$image->description}}" title="{{$image->description}}" {{if $image->description}}class="has-alt-description"{{else}}class="empty-description"{{/if}} loading="lazy">
 	{{if $image->description}}
-	<figcaption>{{$image->description}}</figcaption>
-    {{/if}}
+		<figcaption>{{$image->description}}</figcaption>
+	{{/if}}
 </figure>
 {{/if}}

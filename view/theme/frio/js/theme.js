@@ -157,6 +157,17 @@ $(document).ready(function () {
 		},
 	});
 
+	// initialize the Bootstrap popovers
+	$body.popover({
+		selector: '[data-toggle="popover"]',
+		trigger: "hover click",
+		placement: "top",
+		delay: {
+			show: 100,
+			hide: 100,
+		},
+	});
+
 	// initialize the bootstrap-select
 	$(".selectpicker").selectpicker();
 

@@ -816,17 +816,21 @@ summary.wall-item-summary {
 }
 
 /* Add alt tag indicators to the relevant images */
-a:has(img.has-alt-description)::after {
+.alt-tag-button {
 	background: rgba(0, 0, 0, 0.69);
+	border: none;
 	border-radius: 4px;
 	color: #eee;
-	content: "ALT";
 	font-size: 12px;
 	font-weight: bold;
 	padding: 4px 5px;
 	position: absolute;
 	bottom: 8px;
 	right: 8px;
+}
+
+.alt-tag-button:hover {
+	background: rgba(120, 120, 120, 1.00);
 }
 
 #change-profile-picture {
