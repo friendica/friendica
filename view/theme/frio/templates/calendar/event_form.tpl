@@ -74,7 +74,7 @@
 
 			{{* The textarea for the event description *}}
 			<div class="form-group">
-				<div id="event-desc-text"><b>{{$d_text}}</b>:</div>
+				<div id="event-desc-text"><b>{{$d_text}}</b></div>
 				<textarea id="comment-edit-text-desc" class="form-control text-autosize" name="desc" rows="8" dir="auto">{{$d_orig}}</textarea>
 				<ul id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list nav nav-pills hidden-xs pull-left">
 					{{* commented out because it isn't implemented yet
