@@ -155,7 +155,7 @@
 		// disable finish date input if it isn't available
 		enableDisableFinishDate();
 		// load bbcode autocomplete for the description textarea
-		$('#comment-edit-text-desc, #comment-edit-text-loc').bbco_autocomplete('bbcode');
+		$('#comment-edit-text-desc').bbco_autocomplete('bbcode');
 
 		// initiale autosize for the textareas
 		autosize($("textarea.text-autosize"));

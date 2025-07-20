@@ -985,16 +985,10 @@ class Event
 		$found = preg_match("/([\d]+[\.]{1}[\d]+ *, *[\d]+[\.]{1}[\d]+)/ism", $s, $match);
 		if (intval($found) > 0 && array_key_exists(1, $match)) {
 			$location['coordinates'] = $match[1];
-			// Remove the map bbcode from the location name.
-			//$location['name'] = str_replace($match[0], "", $s);
 		} else {
 			// Map tag with location name - e.g. Paris
 			$location['address'] = $location['name'];
-			// Remove the map bbcode from the location name.
-			//$location['name'] = str_replace($match[0], "", $s);
 		}
-
-		//$location['name'] = BBCode::toPlaintext($location['name'], false);
 
 		// Construct the map HTML.
 		if (isset($location['address'])) {
