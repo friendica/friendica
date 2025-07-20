@@ -96,12 +96,10 @@ class Event
 				. strip_tags(BBCode::convertForUriId($uriid, $event['location'], $simple))
 				. '</span></div>' . "\r\n";
 
-			// Include a map of the location if the [map] BBCode is used.
-			if (strpos($event['location'], "[map") !== false) {
-				$map = Map::byLocation($event['location'], $simple);
-				if ($map !== $event['location']) {
-					$o .= $map;
-				}
+			// Include a map of the location.
+			$map = Map::byLocation($event['location'], $simple);
+			if ($map !== $event['location']) {
+				$o .= $map;
 			}
 		}
 
@@ -661,6 +659,10 @@ class Event
 			list($title, $_trash) = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
 		}
 
+		if ($event['location']) {
+			$event['location'] = strip_tags(BBCode::toPlaintext($event['location'], false));
+		}
+
 		$event['author-link'] = Contact::magicLink($event['author-link']);
 
 		return [
@@ -977,27 +979,22 @@ class Event
 			return [];
 		}
 
-		$location = ['name' => $s];
+		$location = ['name' => BBCode::toPlaintext($s, false)];
 
-		// Map tag with location name - e.g. [map]Paris[/map].
-		if (strpos($s, '[/map]') !== false) {
-			$found = preg_match("/\[map\](.*?)\[\/map\]/ism", $s, $match);
-			if (intval($found) > 0 && array_key_exists(1, $match)) {
-				$location['address'] = $match[1];
-				// Remove the map bbcode from the location name.
-				$location['name'] = str_replace($match[0], "", $s);
-			}
-			// Map tag with coordinates - e.g. [map=48.864716,2.349014].
-		} elseif (strpos($s, '[map=') !== false) {
-			$found = preg_match("/\[map=(.*?)\]/ism", $s, $match);
-			if (intval($found) > 0 && array_key_exists(1, $match)) {
-				$location['coordinates'] = $match[1];
-				// Remove the map bbcode from the location name.
-				$location['name'] = str_replace($match[0], "", $s);
-			}
+		// Map tag with coordinates - e.g. 48.864716,2.349014
+		$found = preg_match("/([\d]+[\.]{1}[\d]+ *, *[\d]+[\.]{1}[\d]+)/ism", $s, $match);
+		if (intval($found) > 0 && array_key_exists(1, $match)) {
+			$location['coordinates'] = $match[1];
+			// Remove the map bbcode from the location name.
+			//$location['name'] = str_replace($match[0], "", $s);
+		} else {
+			// Map tag with location name - e.g. Paris
+			$location['address'] = $location['name'];
+			// Remove the map bbcode from the location name.
+			//$location['name'] = str_replace($match[0], "", $s);
 		}
 
-		$location['name'] = BBCode::toPlaintext($location['name'], false);
+		//$location['name'] = BBCode::toPlaintext($location['name'], false);
 
 		// Construct the map HTML.
 		if (isset($location['address'])) {
