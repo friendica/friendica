@@ -10,7 +10,7 @@
 {{if !$is_child_user}}
 	<h3>{{$l10n.account_header}}</h3>
 	<div id="add-account-desc" class="add-account-desc"><p>{{$l10n.account_desc}}</p></div>
-	<p><a href="register">{{$l10n.add_account}}</a></p>
+	<p><a class="btn btn-primary" href="register">{{$l10n.add_account}}</a></p>
 {{/if}}
 
 {{if $parent_user}}
@@ -22,7 +22,7 @@
             {{include file="field_select.tpl" field=$parent_user}}
             {{include file="field_password.tpl" field=$parent_password}}
 			<div class="submit">
-				<button type="submit" name="delegate" value="{{$l10n.submit}}">{{$l10n.submit}}</button>
+				<button class="btn btn-primary" type="submit" name="delegate" value="{{$l10n.submit}}">{{$l10n.submit}}</button>
 			</div>
 		</form>
 	</div>
