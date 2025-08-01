@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-17 09:29+0200\n"
+"POT-Creation-Date: 2025-07-20 17:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgid "Item not found."
 msgstr ""
 
 #: mod/item.php:461 mod/message.php:55 mod/message.php:101 mod/notes.php:34
-#: mod/photos.php:131 mod/photos.php:623 src/Model/Event.php:511
+#: mod/photos.php:131 mod/photos.php:623 src/Model/Event.php:509
 #: src/Module/Attach.php:40 src/Module/BaseApi.php:90
 #: src/Module/BaseNotifications.php:83 src/Module/BaseSettings.php:38
 #: src/Module/Calendar/Event/API.php:75 src/Module/Calendar/Event/Form.php:70
@@ -292,7 +292,7 @@ msgstr ""
 #: mod/message.php:190 mod/message.php:346 mod/photos.php:658
 #: mod/photos.php:778 mod/photos.php:1055 mod/photos.php:1097
 #: mod/photos.php:1153 mod/photos.php:1233
-#: src/Module/Calendar/Event/Form.php:236 src/Module/Contact/Advanced.php:118
+#: src/Module/Calendar/Event/Form.php:238 src/Module/Contact/Advanced.php:118
 #: src/Module/Contact/Profile.php:407
 #: src/Module/Debug/ActivityPubConversion.php:128
 #: src/Module/Debug/Babel.php:279 src/Module/Debug/Localtime.php:50
@@ -378,7 +378,7 @@ msgid "Save"
 msgstr ""
 
 #: mod/photos.php:50 mod/photos.php:113 mod/photos.php:533
-#: src/Model/Event.php:503 src/Model/Profile.php:211
+#: src/Model/Event.php:501 src/Model/Profile.php:211
 #: src/Module/Calendar/Export.php:60 src/Module/Calendar/Show.php:63
 #: src/Module/Feed.php:52 src/Module/HCard.php:37
 #: src/Module/Profile/Common.php:50 src/Module/Profile/Common.php:59
@@ -470,7 +470,7 @@ msgid "Do not show a status post for this upload"
 msgstr ""
 
 #: mod/photos.php:690 mod/photos.php:1051 src/Content/Conversation.php:395
-#: src/Module/Calendar/Event/Form.php:239 src/Module/Post/Edit.php:179
+#: src/Module/Calendar/Event/Form.php:241 src/Module/Post/Edit.php:179
 msgid "Permissions"
 msgstr ""
 
@@ -601,7 +601,7 @@ msgid "Comment"
 msgstr ""
 
 #: mod/photos.php:1098 mod/photos.php:1154 mod/photos.php:1234
-#: src/Content/Conversation.php:407 src/Module/Calendar/Event/Form.php:234
+#: src/Content/Conversation.php:407 src/Module/Calendar/Event/Form.php:236
 #: src/Module/Item/Compose.php:200 src/Module/Post/Edit.php:161
 #: src/Object/Post.php:1172
 msgid "Preview"
@@ -2475,7 +2475,7 @@ msgid "Matrix:"
 msgstr ""
 
 #: src/Content/Widget/VCard.php:111 src/Model/Event.php:68
-#: src/Model/Event.php:95 src/Model/Event.php:462 src/Model/Event.php:950
+#: src/Model/Event.php:95 src/Model/Event.php:460 src/Model/Event.php:952
 #: src/Model/Profile.php:351 src/Module/Contact/Profile.php:449
 #: src/Module/Directory.php:133 src/Module/Notifications/Introductions.php:180
 #: src/Module/Profile/Profile.php:235
@@ -2846,142 +2846,142 @@ msgstr ""
 msgid "%s (%s)"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:421
+#: src/Core/L10n.php:512 src/Model/Event.php:419
 #: src/Module/Settings/Display.php:282
 msgid "Monday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:422
+#: src/Core/L10n.php:512 src/Model/Event.php:420
 #: src/Module/Settings/Display.php:283
 msgid "Tuesday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:423
+#: src/Core/L10n.php:512 src/Model/Event.php:421
 #: src/Module/Settings/Display.php:284
 msgid "Wednesday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:424
+#: src/Core/L10n.php:512 src/Model/Event.php:422
 #: src/Module/Settings/Display.php:285
 msgid "Thursday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:425
+#: src/Core/L10n.php:512 src/Model/Event.php:423
 #: src/Module/Settings/Display.php:286
 msgid "Friday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:426
+#: src/Core/L10n.php:512 src/Model/Event.php:424
 #: src/Module/Settings/Display.php:287
 msgid "Saturday"
 msgstr ""
 
-#: src/Core/L10n.php:512 src/Model/Event.php:420
+#: src/Core/L10n.php:512 src/Model/Event.php:418
 #: src/Module/Settings/Display.php:281
 msgid "Sunday"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:441
+#: src/Core/L10n.php:518 src/Model/Event.php:439
 msgid "January"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:442
+#: src/Core/L10n.php:518 src/Model/Event.php:440
 msgid "February"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:443
+#: src/Core/L10n.php:518 src/Model/Event.php:441
 msgid "March"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:444
+#: src/Core/L10n.php:518 src/Model/Event.php:442
 msgid "April"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Core/L10n.php:541 src/Model/Event.php:432
+#: src/Core/L10n.php:518 src/Core/L10n.php:541 src/Model/Event.php:430
 msgid "May"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:445
+#: src/Core/L10n.php:518 src/Model/Event.php:443
 msgid "June"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:446
+#: src/Core/L10n.php:518 src/Model/Event.php:444
 msgid "July"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:447
+#: src/Core/L10n.php:518 src/Model/Event.php:445
 msgid "August"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:448
+#: src/Core/L10n.php:518 src/Model/Event.php:446
 msgid "September"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:449
+#: src/Core/L10n.php:518 src/Model/Event.php:447
 msgid "October"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:450
+#: src/Core/L10n.php:518 src/Model/Event.php:448
 msgid "November"
 msgstr ""
 
-#: src/Core/L10n.php:518 src/Model/Event.php:451
+#: src/Core/L10n.php:518 src/Model/Event.php:449
 msgid "December"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:413
+#: src/Core/L10n.php:535 src/Model/Event.php:411
 msgid "Mon"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:414
+#: src/Core/L10n.php:535 src/Model/Event.php:412
 msgid "Tue"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:415
+#: src/Core/L10n.php:535 src/Model/Event.php:413
 msgid "Wed"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:416
+#: src/Core/L10n.php:535 src/Model/Event.php:414
 msgid "Thu"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:417
+#: src/Core/L10n.php:535 src/Model/Event.php:415
 msgid "Fri"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:418
+#: src/Core/L10n.php:535 src/Model/Event.php:416
 msgid "Sat"
 msgstr ""
 
-#: src/Core/L10n.php:535 src/Model/Event.php:412
+#: src/Core/L10n.php:535 src/Model/Event.php:410
 msgid "Sun"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:428
+#: src/Core/L10n.php:541 src/Model/Event.php:426
 msgid "Jan"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:429
+#: src/Core/L10n.php:541 src/Model/Event.php:427
 msgid "Feb"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:430
+#: src/Core/L10n.php:541 src/Model/Event.php:428
 msgid "Mar"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:431
+#: src/Core/L10n.php:541 src/Model/Event.php:429
 msgid "Apr"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:433
+#: src/Core/L10n.php:541 src/Model/Event.php:431
 msgid "Jun"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:434
+#: src/Core/L10n.php:541 src/Model/Event.php:432
 msgid "Jul"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:435
+#: src/Core/L10n.php:541 src/Model/Event.php:433
 msgid "Aug"
 msgstr ""
 
@@ -2989,15 +2989,15 @@ msgstr ""
 msgid "Sep"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:437
+#: src/Core/L10n.php:541 src/Model/Event.php:435
 msgid "Oct"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:438
+#: src/Core/L10n.php:541 src/Model/Event.php:436
 msgid "Nov"
 msgstr ""
 
-#: src/Core/L10n.php:541 src/Model/Event.php:439
+#: src/Core/L10n.php:541 src/Model/Event.php:437
 msgid "Dec"
 msgstr ""
 
@@ -3282,99 +3282,99 @@ msgstr ""
 msgid "l F d, Y \\@ g:i A \\G\\M\\TP (e)"
 msgstr ""
 
-#: src/Model/Event.php:61 src/Model/Event.php:78 src/Model/Event.php:460
-#: src/Model/Event.php:932
+#: src/Model/Event.php:61 src/Model/Event.php:78 src/Model/Event.php:458
+#: src/Model/Event.php:934
 msgid "Starts:"
 msgstr ""
 
-#: src/Model/Event.php:64 src/Model/Event.php:84 src/Model/Event.php:461
-#: src/Model/Event.php:936
+#: src/Model/Event.php:64 src/Model/Event.php:84 src/Model/Event.php:459
+#: src/Model/Event.php:938
 msgid "Finishes:"
 msgstr ""
 
-#: src/Model/Event.php:410
+#: src/Model/Event.php:408
 msgid "all-day"
 msgstr ""
 
-#: src/Model/Event.php:436
+#: src/Model/Event.php:434
 msgid "Sept"
 msgstr ""
 
-#: src/Model/Event.php:453 src/Module/Calendar/Show.php:117
+#: src/Model/Event.php:451 src/Module/Calendar/Show.php:117
 #: src/Util/Temporal.php:333
 msgid "today"
 msgstr ""
 
-#: src/Model/Event.php:454 src/Module/Calendar/Show.php:118
+#: src/Model/Event.php:452 src/Module/Calendar/Show.php:118
 #: src/Module/Settings/Display.php:292 src/Util/Temporal.php:343
 msgid "month"
 msgstr ""
 
-#: src/Model/Event.php:455 src/Module/Calendar/Show.php:119
+#: src/Model/Event.php:453 src/Module/Calendar/Show.php:119
 #: src/Module/Settings/Display.php:293 src/Util/Temporal.php:344
 msgid "week"
 msgstr ""
 
-#: src/Model/Event.php:456 src/Module/Calendar/Show.php:120
+#: src/Model/Event.php:454 src/Module/Calendar/Show.php:120
 #: src/Module/Settings/Display.php:294 src/Util/Temporal.php:345
 msgid "day"
 msgstr ""
 
-#: src/Model/Event.php:458
+#: src/Model/Event.php:456
 msgid "No events to display"
 msgstr ""
 
-#: src/Model/Event.php:507 src/Module/Feed.php:56
+#: src/Model/Event.php:505 src/Module/Feed.php:56
 #: src/Module/Update/Profile.php:42
 msgid "Access to this profile has been restricted."
 msgstr ""
 
-#: src/Model/Event.php:548 src/Module/Calendar/Event/Show.php:52
+#: src/Model/Event.php:546 src/Module/Calendar/Event/Show.php:52
 msgid "Event not found."
 msgstr ""
 
-#: src/Model/Event.php:627
+#: src/Model/Event.php:625
 msgid "l, F j"
 msgstr ""
 
-#: src/Model/Event.php:654
+#: src/Model/Event.php:652
 msgid "Edit event"
 msgstr ""
 
-#: src/Model/Event.php:655
+#: src/Model/Event.php:653
 msgid "Duplicate event"
 msgstr ""
 
-#: src/Model/Event.php:656
+#: src/Model/Event.php:654
 msgid "Delete event"
 msgstr ""
 
-#: src/Model/Event.php:886 src/Module/Debug/Localtime.php:24
+#: src/Model/Event.php:888 src/Module/Debug/Localtime.php:24
 msgid "l F d, Y \\@ g:i A"
 msgstr ""
 
-#: src/Model/Event.php:887
+#: src/Model/Event.php:889
 msgid "D g:i A"
 msgstr ""
 
-#: src/Model/Event.php:888
+#: src/Model/Event.php:890
 msgid "g:i A"
 msgstr ""
 
-#: src/Model/Event.php:951 src/Model/Event.php:953
+#: src/Model/Event.php:953 src/Model/Event.php:955
 msgid "Show map"
 msgstr ""
 
-#: src/Model/Event.php:952
+#: src/Model/Event.php:954
 msgid "Hide map"
 msgstr ""
 
-#: src/Model/Event.php:1045
+#: src/Model/Event.php:1036
 #, php-format
 msgid "%s's birthday"
 msgstr ""
 
-#: src/Model/Event.php:1046
+#: src/Model/Event.php:1037
 #, php-format
 msgid "Happy Birthday %s"
 msgstr ""
@@ -4198,7 +4198,7 @@ msgstr ""
 msgid "Click to view details"
 msgstr ""
 
-#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:193
+#: src/Module/Admin/Logs/View.php:84 src/Module/Calendar/Event/Form.php:195
 msgid "Event details"
 msgstr ""
 
@@ -4375,7 +4375,7 @@ msgstr ""
 msgid "Policies"
 msgstr ""
 
-#: src/Module/Admin/Site.php:454 src/Module/Calendar/Event/Form.php:238
+#: src/Module/Admin/Site.php:454 src/Module/Calendar/Event/Form.php:240
 #: src/Module/Contact.php:529 src/Module/Profile/Profile.php:290
 msgid "Advanced"
 msgstr ""
@@ -5840,17 +5840,17 @@ msgstr ""
 msgid "Event title and start time are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:194
+#: src/Module/Calendar/Event/Form.php:196
 msgid "Starting date and Title are required."
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:195
-#: src/Module/Calendar/Event/Form.php:200
+#: src/Module/Calendar/Event/Form.php:197
+#: src/Module/Calendar/Event/Form.php:202
 msgid "Event Starts:"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:195
-#: src/Module/Calendar/Event/Form.php:223 src/Module/Debug/Probe.php:45
+#: src/Module/Calendar/Event/Form.php:197
+#: src/Module/Calendar/Event/Form.php:225 src/Module/Debug/Probe.php:45
 #: src/Module/Install.php:186 src/Module/Install.php:212
 #: src/Module/Install.php:217 src/Module/Install.php:231
 #: src/Module/Install.php:240 src/Module/Install.php:245
@@ -5872,35 +5872,35 @@ msgstr ""
 msgid "Required"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:209
-#: src/Module/Calendar/Event/Form.php:233
+#: src/Module/Calendar/Event/Form.php:211
+#: src/Module/Calendar/Event/Form.php:235
 msgid "Finish date/time is not known or not relevant"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:211
-#: src/Module/Calendar/Event/Form.php:216
+#: src/Module/Calendar/Event/Form.php:213
+#: src/Module/Calendar/Event/Form.php:218
 msgid "Event Finishes:"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:223
-#: src/Module/Calendar/Event/Form.php:229
+#: src/Module/Calendar/Event/Form.php:225
+#: src/Module/Calendar/Event/Form.php:231
 msgid "Title (BBCode not allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:225
+#: src/Module/Calendar/Event/Form.php:227
 msgid "Description (BBCode allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:227
+#: src/Module/Calendar/Event/Form.php:229
 msgid "Location (BBCode not allowed)"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:230
-#: src/Module/Calendar/Event/Form.php:231
+#: src/Module/Calendar/Event/Form.php:232
+#: src/Module/Calendar/Event/Form.php:233
 msgid "Share this event"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:237 src/Module/Profile/Profile.php:289
+#: src/Module/Calendar/Event/Form.php:239 src/Module/Profile/Profile.php:289
 msgid "Basic"
 msgstr ""
 

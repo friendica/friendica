@@ -131,37 +131,6 @@
 						</button>
 					</li>
 					*}}
-					<li>
-						<button type="button" class="btn-link icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="loc">
-							<i class="fa fa-link"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bb-video" style="cursor: pointer;" title="{{$edvideo}}" data-role="insert-formatting" data-comment=" " data-bbcode="video" data-id="loc">
-							<i class="fa fa-video-camera"></i>
-						</button>
-					</li>
-
-					<li>
-						<button type="button" class="btn-link icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="loc">
-							<i class="fa fa-underline"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon italic" style="cursor: pointer;" title="{{$editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="loc">
-							<i class="fa fa-italic"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon bold" style="cursor: pointer;"  title="{{$edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="loc">
-							<i class="fa fa-bold"></i>
-						</button>
-					</li>
-					<li>
-						<button type="button" class="btn-link icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="loc">
-							<i class="fa fa-quote-left"></i>
-						</button>
-					</li>
 				</ul>
 				<div class="clear"></div>
 			</div>
@@ -186,7 +155,7 @@
 		// disable finish date input if it isn't available
 		enableDisableFinishDate();
 		// load bbcode autocomplete for the description textarea
-		$('#comment-edit-text-desc, #comment-edit-text-loc').bbco_autocomplete('bbcode');
+		$('#comment-edit-text-desc').bbco_autocomplete('bbcode');
 
 		// initiale autosize for the textareas
 		autosize($("textarea.text-autosize"));
