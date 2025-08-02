@@ -168,14 +168,15 @@ class Edit extends BaseModule
 			'$rand_num'            => Crypto::randomDigits(12),
 
 			// Formatting button labels
-			'$edbold'   => $this->t('Bold'),
-			'$editalic' => $this->t('Italic'),
-			'$eduline'  => $this->t('Underline'),
-			'$edquote'  => $this->t('Quote'),
-			'$edemojis' => $this->t('Add emojis'),
-			'$edcode'   => $this->t('Code'),
-			'$edurl'    => $this->t('Link'),
-			'$edattach' => $this->t('Link or Media'),
+			'$edbold'      => $this->t('Bold'),
+			'$editalic'    => $this->t('Italic'),
+			'$eduline'     => $this->t('Underline'),
+			'$edquote'     => $this->t('Quote'),
+			'$edemojis'    => $this->t('Add emojis'),
+			'$contentwarn' => $this->t('Content Warning'),
+			'$edcode'      => $this->t('Code'),
+			'$edurl'       => $this->t('Link'),
+			'$edattach'    => $this->t('Link or Media'),
 
 			//jot nav tab (used in some themes)
 			'$message'      => $this->t('Message'),
