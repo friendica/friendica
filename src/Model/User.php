@@ -116,6 +116,59 @@ class User
 	private static $owner;
 
 	/**
+	 * Sends a welcome e-mail to the specified user
+	 *
+	 * @param array $user
+	 * @param string $password
+	 * @param string $preamble
+	 *
+	 * @return NULL|boolean from notification() and email() inherited
+	 * @throws HTTPException\InternalServerErrorException
+	 */
+	private static function sendWelcomeEmail(array $user, string $password, string $preamble)
+	{
+		$body = DI::l10n()->t( <<<'EOT'
+			The login details are as follows:
+
+			Site Location: 1$s
+			Login Name: %2$s
+			Password: %3$s
+
+			You may change your password from your account "Settings" page after logging
+			in.
+
+			Please take a few moments to review the other account settings on that page.
+
+			You may also wish to add some basic information to your default profile
+			(on the "Profiles" page) so that other people can easily find you.
+
+			We recommend adding a profile picture, adding some profile "keywords" (very useful
+			in making new friends) - and perhaps what country you live in; if you do not wish
+			to be more specific than that.
+
+			We fully respect your right to privacy, and none of these items are necessary.
+			If you are new and do not know anybody here, they may help
+			you to make some new and interesting friends.
+
+			If you ever want to delete your account, you can do so at %5$s
+
+			Thank you and welcome to %4$s.
+			EOT);
+
+		$body = sprintf($body, DI::baseUrl(), $user['nickname'], $password, DI::config()->get('config', 'sitename'), DI::baseUrl() . "/settings/removeme");
+
+		$subject = DI::l10n()->t('Registration details for %s', DI::config()->get('config', 'sitename'));
+
+		$email = DI::emailer()
+			->newSystemMail()
+			->withMessage($subject, $preamble, $body)
+			->forUser($user)
+			->withRecipient($user['email'])
+			->build();
+		return DI::emailer()->send($email);
+	}
+
+	/**
 	 * Returns the numeric account type by their string
 	 *
 	 * @param string $accounttype as string constant
@@ -1645,6 +1698,7 @@ class User
 	 * @param string $nick   The user's nick name
 	 * @param string $lang   The user's language (default is english)
 	 * @param string $avatar URL to an image to use as avatar (default is to prompt user at first login)
+	 *
 	 * @return bool True, if the user was created successfully
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws ErrorException
@@ -1669,46 +1723,13 @@ class User
 		]);
 
 		$user     = $result['user'];
-		$preamble = Strings::deindent(DI::l10n()->t('
-		Dear %1$s,
-			the administrator of %2$s has set up an account for you.'));
-		$body = Strings::deindent(DI::l10n()->t('
-		The login details are as follows:
+		$preamble = DI::l10n()->t(<<<'EOT'
+			Dear %1$s,
+			The administrator of %2$s has set up an account for you.
+			EOT);
+		$preamble = sprintf($user['username'], DI::config()->get('config', 'sitename'));
 
-		Site Location:	%1$s
-		Login Name:		%2$s
-		Password:		%3$s
-
-		You may change your password from your account "Settings" page after logging
-		in.
-
-		Please take a few moments to review the other account settings on that page.
-
-		You may also wish to add some basic information to your default profile
-		(on the "Profiles" page) so that other people can easily find you.
-
-		We recommend adding a profile photo, adding some profile "keywords"
-		(very useful in making new friends) - and perhaps what country you live in;
-		if you do not wish to be more specific than that.
-
-		We fully respect your right to privacy, and none of these items are necessary.
-		If you are new and do not know anybody here, they may help
-		you to make some new and interesting friends.
-
-		If you ever want to delete your account, you can do so at %1$s/settings/removeme
-
-		Thank you and welcome to %4$s.'));
-
-		$preamble = sprintf($preamble, $user['username'], DI::config()->get('config', 'sitename'));
-		$body     = sprintf($body, DI::baseUrl(), $user['nickname'], $result['password'], DI::config()->get('config', 'sitename'));
-
-		$email = DI::emailer()
-			->newSystemMail()
-			->withMessage(DI::l10n()->t('Registration details for %s', DI::config()->get('config', 'sitename')), $preamble, $body)
-			->forUser($user)
-			->withRecipient($user['email'])
-			->build();
-		return DI::emailer()->send($email);
+		return self::sendWelcomeEmail($user, $result['password'], $preamble);
 	}
 
 	/**
@@ -1718,35 +1739,31 @@ class User
 	 * @param string $sitename
 	 * @param string $siteurl
 	 * @param string $password Plaintext password
+	 *
 	 * @return NULL|boolean from notification() and email() inherited
 	 * @throws HTTPException\InternalServerErrorException
 	 */
 	public static function sendRegisterPendingEmail(array $user, string $sitename, string $siteurl, string $password)
 	{
-		$body = Strings::deindent(DI::l10n()->t(
-			'
+		$body = DI::l10n()->t(<<<'EOT'
 			Dear %1$s,
-				Thank you for registering at %2$s. Your account is pending for approval by the administrator.
+			Thank you for registering at %2$s. Your account is pending for approval by the administrator.
 
 			Your login details are as follows:
 
-			Site Location:	%3$s
-			Login Name:		%4$s
-			Password:		%5$s
-		',
-			$user['username'],
-			$sitename,
-			$siteurl,
-			$user['nickname'],
-			$password,
-		));
+			Site Location:  %3$s
+			Login Name:     %4$s
+			Password:       %5$s
+			EOT);
+
+		$body = sprintf($body, $user['username'], $sitename, $siteurl, $user['nickname'], $password);
 
 		$email = DI::emailer()
-			->newSystemMail()
-			->withMessage(DI::l10n()->t('Registration at %s', $sitename), $body)
-			->forUser($user)
-			->withRecipient($user['email'])
-			->build();
+				->newSystemMail()
+				->withMessage(DI::l10n()->t('Registration at %s', $sitename), $body)
+				->forUser($user)
+				->withRecipient($user['email'])
+				->build();
 		return DI::emailer()->send($email);
 	}
 
@@ -1766,55 +1783,14 @@ class User
 	 */
 	public static function sendRegisterOpenEmail(L10n $l10n, array $user, string $sitename, string $siteurl, string $password)
 	{
-		$preamble = Strings::deindent($l10n->t(
-			'
-				Dear %1$s,
-				Thank you for registering at %2$s. Your account has been created.
-			',
-			$user['username'],
-			$sitename,
-		));
-		$body = Strings::deindent($l10n->t(
-			'
-			The login details are as follows:
+		$preamble = $l10n->t(<<<'EOT'
+			Dear %1$s,
+			Thank you for registering at %2$s. Your account has been created.
+			EOT);
 
-			Site Location:	%3$s
-			Login Name:		%1$s
-			Password:		%5$s
+		$preamble = sprintf($preamble, $user['username'], $sitename);
 
-			You may change your password from your account "Settings" page after logging
-			in.
-
-			Please take a few moments to review the other account settings on that page.
-
-			You may also wish to add some basic information to your default profile
-			' . "\x28" . 'on the "Profiles" page' . "\x29" . ' so that other people can easily find you.
-
-			We recommend adding a profile photo, adding some profile "keywords" ' . "\x28" . 'very useful
-			in making new friends' . "\x29" . ' - and perhaps what country you live in; if you do not wish
-			to be more specific than that.
-
-			We fully respect your right to privacy, and none of these items are necessary.
-			If you are new and do not know anybody here, they may help
-			you to make some new and interesting friends.
-
-			If you ever want to delete your account, you can do so at %3$s/settings/removeme
-
-			Thank you and welcome to %2$s.',
-			$user['nickname'],
-			$sitename,
-			$siteurl,
-			$user['username'],
-			$password,
-		));
-
-		$email = DI::emailer()
-			->newSystemMail()
-			->withMessage(DI::l10n()->t('Registration details for %s', $sitename), $preamble, $body)
-			->forUser($user)
-			->withRecipient($user['email'])
-			->build();
-		return DI::emailer()->send($email);
+		return self::sendWelcomeEmail($user, $password, $preamble);
 	}
 
 	/**
