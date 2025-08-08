@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-10 10:12+0200\n"
+"POT-Creation-Date: 2026-05-10 10:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,7 +63,7 @@ msgstr ""
 #: src/Module/Profile/Common.php:63 src/Module/Profile/Contacts.php:66
 #: src/Module/Profile/Photos.php:97 src/Module/Profile/Schedule.php:27
 #: src/Module/Profile/Schedule.php:44 src/Module/Register.php:74
-#: src/Module/Register.php:276 src/Module/Register.php:315
+#: src/Module/Register.php:277 src/Module/Register.php:316
 #: src/Module/Search/Directory.php:23 src/Module/Settings/Account.php:34
 #: src/Module/Settings/Account.php:337 src/Module/Settings/Channels.php:54
 #: src/Module/Settings/Channels.php:135
@@ -235,7 +235,7 @@ msgstr[1] ""
 #: src/Module/Profile/Contacts.php:52 src/Module/Profile/Contacts.php:60
 #: src/Module/Profile/Conversations.php:81 src/Module/Profile/Media.php:58
 #: src/Module/Profile/Photos.php:88 src/Module/Profile/RemoteFollow.php:57
-#: src/Module/Register.php:337
+#: src/Module/Register.php:338
 msgid "User not found."
 msgstr ""
 
@@ -592,7 +592,7 @@ msgstr ""
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:442 src/Content/Widget.php:265 src/Model/User.php:1428
+#: src/BaseModule.php:442 src/Content/Widget.php:265 src/Model/User.php:1442
 #: src/Module/Contact.php:405
 msgid "Friends"
 msgstr ""
@@ -751,7 +751,7 @@ msgstr ""
 msgid "Enter user nickname: "
 msgstr ""
 
-#: src/Console/User.php:168 src/Model/User.php:879
+#: src/Console/User.php:168 src/Model/User.php:900
 #: src/Module/Api/Twitter/ContactEndpoint.php:62
 #: src/Module/Moderation/Users/Active.php:136
 #: src/Module/Moderation/Users/Blocked.php:135
@@ -866,7 +866,7 @@ msgstr ""
 #: src/Content/ContactSelector.php:122
 #: src/Module/Moderation/Users/Active.php:82
 #: src/Module/Moderation/Users/Blocked.php:82
-#: src/Module/Moderation/Users/Create.php:59
+#: src/Module/Moderation/Users/Create.php:63
 #: src/Module/Moderation/Users/Deleted.php:69
 #: src/Module/Moderation/Users/Index.php:89
 #: src/Module/Moderation/Users/Index.php:109
@@ -1553,7 +1553,7 @@ msgstr ""
 
 #: src/Content/Feature.php:128 src/Content/GroupManager.php:132
 #: src/Content/Nav.php:275 src/Content/Text/HTML.php:884
-#: src/Content/Widget.php:564 src/Model/User.php:1442
+#: src/Content/Widget.php:564 src/Model/User.php:1456
 msgid "Groups"
 msgstr ""
 
@@ -1883,7 +1883,7 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
-#: src/Content/Nav.php:252 src/Module/Register.php:216
+#: src/Content/Nav.php:252 src/Module/Register.php:219
 #: src/Module/Security/Login.php:127
 msgid "Create an account"
 msgstr ""
@@ -1960,7 +1960,7 @@ msgid "Information about this friendica instance"
 msgstr ""
 
 #: src/Content/Nav.php:298 src/Module/Admin/Tos.php:64
-#: src/Module/BaseAdmin.php:80 src/Module/Register.php:240
+#: src/Module/BaseAdmin.php:80 src/Module/Register.php:241
 #: src/Module/Tos.php:87
 msgid "Terms of Service"
 msgstr ""
@@ -2061,7 +2061,7 @@ msgstr ""
 #: src/Module/Moderation/Reports.php:125 src/Module/Moderation/Summary.php:64
 #: src/Module/Moderation/Users/Active.php:89
 #: src/Module/Moderation/Users/Blocked.php:89
-#: src/Module/Moderation/Users/Create.php:47
+#: src/Module/Moderation/Users/Create.php:51
 #: src/Module/Moderation/Users/Deleted.php:66
 #: src/Module/Moderation/Users/Index.php:96
 msgid "Moderation"
@@ -3432,135 +3432,139 @@ msgstr ""
 msgid "Responsible account: %s"
 msgstr ""
 
-#: src/Model/User.php:238 src/Model/User.php:1362
+#: src/Model/User.php:238 src/Model/User.php:1376
 msgid "SERIOUS ERROR: Generation of security keys failed."
 msgstr ""
 
-#: src/Model/User.php:781 src/Model/User.php:818
+#: src/Model/User.php:386
+msgid "Nickname cannot start with a digit."
+msgstr ""
+
+#: src/Model/User.php:388
+msgid "Nicknames may only contain latin letters, numbers and underscores."
+msgstr ""
+
+#: src/Model/User.php:393 src/Model/User.php:1416
+msgid "Nickname is already registered. Please choose another."
+msgstr ""
+
+#: src/Model/User.php:802 src/Model/User.php:839
 msgid "Login failed"
 msgstr ""
 
-#: src/Model/User.php:851
+#: src/Model/User.php:872
 msgid "Not enough information to authenticate"
 msgstr ""
 
-#: src/Model/User.php:978
+#: src/Model/User.php:999
 msgid "Password can't be empty"
 msgstr ""
 
-#: src/Model/User.php:1020
+#: src/Model/User.php:1041
 msgid "Empty passwords are not allowed."
 msgstr ""
 
-#: src/Model/User.php:1024
+#: src/Model/User.php:1045
 msgid "The new password has been exposed in a public data dump, please choose another."
 msgstr ""
 
-#: src/Model/User.php:1028
+#: src/Model/User.php:1049
 msgid "The password length is limited to 72 characters."
 msgstr ""
 
-#: src/Model/User.php:1032
+#: src/Model/User.php:1053
 msgid "The password can't contain white spaces nor accentuated letters"
 msgstr ""
 
-#: src/Model/User.php:1242
+#: src/Model/User.php:1263
 msgid "Passwords do not match. Password unchanged."
 msgstr ""
 
-#: src/Model/User.php:1251
+#: src/Model/User.php:1272
 msgid "An invitation is required."
 msgstr ""
 
-#: src/Model/User.php:1255
+#: src/Model/User.php:1276
 msgid "Invitation could not be verified."
 msgstr ""
 
-#: src/Model/User.php:1263
+#: src/Model/User.php:1284
 msgid "Invalid OpenID url"
 msgstr ""
 
-#: src/Model/User.php:1277 src/Security/Authentication.php:235
+#: src/Model/User.php:1298 src/Security/Authentication.php:235
 msgid "We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID."
 msgstr ""
 
-#: src/Model/User.php:1277 src/Security/Authentication.php:235
+#: src/Model/User.php:1298 src/Security/Authentication.php:235
 msgid "The error message was:"
 msgstr ""
 
-#: src/Model/User.php:1283
+#: src/Model/User.php:1304
 msgid "Please enter the required information."
 msgstr ""
 
-#: src/Model/User.php:1297
+#: src/Model/User.php:1318
 #, php-format
 msgid "system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values."
 msgstr ""
 
-#: src/Model/User.php:1304
+#: src/Model/User.php:1325
 #, php-format
 msgid "Username should be at least %s character."
 msgid_plural "Username should be at least %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1308
+#: src/Model/User.php:1329
 #, php-format
 msgid "Username should be at most %s character."
 msgid_plural "Username should be at most %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1316
+#: src/Model/User.php:1337
 msgid "That doesn't appear to be your full (First Last) name."
 msgstr ""
 
-#: src/Model/User.php:1321
+#: src/Model/User.php:1342
 msgid "Your email domain is not among those allowed on this site."
 msgstr ""
 
-#: src/Model/User.php:1325
+#: src/Model/User.php:1346
 msgid "Not a valid email address."
 msgstr ""
 
-#: src/Model/User.php:1328
+#: src/Model/User.php:1349
 msgid "The nickname was blocked from registration by the nodes admin."
 msgstr ""
 
-#: src/Model/User.php:1332 src/Model/User.php:1338
+#: src/Model/User.php:1353 src/Model/User.php:1359
 #: src/Module/User/Import.php:231
 msgid "Cannot use that email."
 msgstr ""
 
-#: src/Model/User.php:1344
-msgid "Your nickname can only contain a-z, 0-9 and _."
-msgstr ""
-
-#: src/Model/User.php:1352 src/Model/User.php:1402
-msgid "Nickname is already registered. Please choose another."
-msgstr ""
-
-#: src/Model/User.php:1389 src/Model/User.php:1393
+#: src/Model/User.php:1403 src/Model/User.php:1407
 msgid "An error occurred during registration. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1416
+#: src/Model/User.php:1430
 msgid "An error occurred creating your default profile. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1423
+#: src/Model/User.php:1437
 msgid "An error occurred creating your self contact. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1432
+#: src/Model/User.php:1446
 msgid "An error occurred creating your default contact circle. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1480
+#: src/Model/User.php:1494
 msgid "Profile Photos"
 msgstr ""
 
-#: src/Model/User.php:1678
+#: src/Model/User.php:1692
 #, php-format
 msgid ""
 "\n"
@@ -3568,7 +3572,7 @@ msgid ""
 "\t\t\tthe administrator of %2$s has set up an account for you."
 msgstr ""
 
-#: src/Model/User.php:1681
+#: src/Model/User.php:1695
 #, php-format
 msgid ""
 "\n"
@@ -3599,12 +3603,12 @@ msgid ""
 "\t\tThank you and welcome to %4$s."
 msgstr ""
 
-#: src/Model/User.php:1713 src/Model/User.php:1819
+#: src/Model/User.php:1727 src/Model/User.php:1833
 #, php-format
 msgid "Registration details for %s"
 msgstr ""
 
-#: src/Model/User.php:1733
+#: src/Model/User.php:1747
 #, php-format
 msgid ""
 "\n"
@@ -3619,12 +3623,12 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: src/Model/User.php:1752
+#: src/Model/User.php:1766
 #, php-format
 msgid "Registration at %s"
 msgstr ""
 
-#: src/Model/User.php:1776
+#: src/Model/User.php:1790
 #, php-format
 msgid ""
 "\n"
@@ -3633,7 +3637,7 @@ msgid ""
 "\t\t\t"
 msgstr ""
 
-#: src/Model/User.php:1784
+#: src/Model/User.php:1798
 #, php-format
 msgid ""
 "\n"
@@ -3664,7 +3668,7 @@ msgid ""
 "\t\t\tThank you and welcome to %2$s."
 msgstr ""
 
-#: src/Model/User.php:1846
+#: src/Model/User.php:1860
 msgid "User with delegates can't be removed, please remove delegate users first"
 msgstr ""
 
@@ -5755,7 +5759,7 @@ msgstr ""
 #: src/Module/Moderation/Blocklist/Server/Index.php:76
 #: src/Module/Moderation/Blocklist/Server/Index.php:104
 #: src/Module/Moderation/Blocklist/Server/Index.php:105
-#: src/Module/Moderation/Item/Delete.php:53 src/Module/Register.php:212
+#: src/Module/Moderation/Item/Delete.php:53 src/Module/Register.php:215
 #: src/Module/Security/TwoFactor/Verify.php:87
 #: src/Module/Settings/Channels.php:184 src/Module/Settings/Channels.php:210
 #: src/Module/Settings/TwoFactor/Index.php:147
@@ -8254,20 +8258,29 @@ msgstr ""
 msgid "User \"%s\" unblocked"
 msgstr ""
 
-#: src/Module/Moderation/Users/Create.php:48
-#: src/Module/Moderation/Users/Create.php:50
+#: src/Module/Moderation/Users/Create.php:45 src/Module/Register.php:208
+msgid "Nicknames must start with a letter, and may contain latin letters, numbers and underscores"
+msgstr ""
+
+#: src/Module/Moderation/Users/Create.php:46 src/Module/Register.php:209
+#, php-format
+msgid "Your profile address on this site will then be \"<strong>nickname@%s</strong>\"."
+msgstr ""
+
+#: src/Module/Moderation/Users/Create.php:52
+#: src/Module/Moderation/Users/Create.php:54
 msgid "Create user"
 msgstr ""
 
-#: src/Module/Moderation/Users/Create.php:49
+#: src/Module/Moderation/Users/Create.php:53
 msgid "Type in the details for the new user to be created."
 msgstr ""
 
-#: src/Module/Moderation/Users/Create.php:57
+#: src/Module/Moderation/Users/Create.php:61
 msgid "Display name"
 msgstr ""
 
-#: src/Module/Moderation/Users/Create.php:58
+#: src/Module/Moderation/Users/Create.php:62
 msgid "Nickname"
 msgstr ""
 
@@ -8871,132 +8884,119 @@ msgstr ""
 msgid "You can change the account type later. (<a href=\""
 msgstr ""
 
-#: src/Module/Register.php:212
+#: src/Module/Register.php:215
 msgid "Note for the admin"
 msgstr ""
 
-#: src/Module/Register.php:212
+#: src/Module/Register.php:215
 msgid "Leave a message for the admin, why you want to join this node"
 msgstr ""
 
-#: src/Module/Register.php:213
+#: src/Module/Register.php:216
 msgid "Membership on this site is by invitation only."
 msgstr ""
 
-#: src/Module/Register.php:214
+#: src/Module/Register.php:217
 msgid "Your invitation code: "
 msgstr ""
 
-#: src/Module/Register.php:222
+#: src/Module/Register.php:225
 msgid "Your Display Name (as you would like it to be displayed on this system):"
 msgstr ""
 
-#: src/Module/Register.php:223
+#: src/Module/Register.php:226
 msgid "Your Email Address (initial information will be sent there, so this must be a valid address):"
 msgstr ""
 
-#: src/Module/Register.php:224
+#: src/Module/Register.php:227
 msgid "Please repeat your e-mail address:"
 msgstr ""
 
-#: src/Module/Register.php:226 src/Module/Security/PasswordTooLong.php:86
+#: src/Module/Register.php:229 src/Module/Security/PasswordTooLong.php:86
 #: src/Module/Settings/Account.php:513
 msgid "New Password:"
 msgstr ""
 
-#: src/Module/Register.php:226
+#: src/Module/Register.php:229
 msgid "Leave empty for an auto generated password."
 msgstr ""
 
-#: src/Module/Register.php:227 src/Module/Security/PasswordTooLong.php:87
+#: src/Module/Register.php:230 src/Module/Security/PasswordTooLong.php:87
 #: src/Module/Settings/Account.php:514
 msgid "Confirm:"
 msgstr ""
 
-#: src/Module/Register.php:228
-#, php-format
-msgid "Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be \"<strong>nickname@%s</strong>\"."
-msgstr ""
-
-#: src/Module/Register.php:229
+#: src/Module/Register.php:231
 msgid "Choose a nickname: "
 msgstr ""
 
-#: src/Module/Register.php:237 src/Module/User/Import.php:106
+#: src/Module/Register.php:238 src/Module/User/Import.php:106
 msgid "Import"
 msgstr ""
 
-#: src/Module/Register.php:238
+#: src/Module/Register.php:239
 msgid "Import your profile to this friendica instance"
 msgstr ""
 
-#: src/Module/Register.php:245
+#: src/Module/Register.php:246
 msgid "Note: This node explicitly contains adult content"
 msgstr ""
 
-#: src/Module/Register.php:247 src/Module/Settings/Delegation.php:167
+#: src/Module/Register.php:248 src/Module/Settings/Delegation.php:167
 msgid "Parent Password:"
 msgstr ""
 
-#: src/Module/Register.php:247 src/Module/Settings/Delegation.php:167
+#: src/Module/Register.php:248 src/Module/Settings/Delegation.php:167
 msgid "Please enter the password of the parent account to legitimize your request."
 msgstr ""
 
-#: src/Module/Register.php:282
+#: src/Module/Register.php:283
 msgid "Password doesn't match."
 msgstr ""
 
-#: src/Module/Register.php:288
+#: src/Module/Register.php:289
 msgid "Please enter your password."
 msgstr ""
 
-#: src/Module/Register.php:330
+#: src/Module/Register.php:331
 msgid "You have entered too much information."
 msgstr ""
 
-#: src/Module/Register.php:353
+#: src/Module/Register.php:354
 msgid "Please enter the identical mail address in the second field."
 msgstr ""
 
-#: src/Module/Register.php:361
-msgid "Nickname cannot start with a digit."
-msgstr ""
-
-#: src/Module/Register.php:363
-msgid "Nickname can only contain US-ASCII characters."
-msgstr ""
-
-#: src/Module/Register.php:435
+#: src/Module/Register.php:433
 msgid "The additional account was created."
 msgstr ""
 
-#: src/Module/Register.php:460
+#: src/Module/Register.php:458
 msgid "Registration successful. Please check your email for further instructions."
 msgstr ""
 
-#: src/Module/Register.php:468
+#: src/Module/Register.php:466
 #, php-format
 msgid "Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login."
 msgstr ""
 
-#: src/Module/Register.php:475
+#: src/Module/Register.php:473
 msgid "Registration successful."
 msgstr ""
 
-#: src/Module/Register.php:484 src/Module/Register.php:491
-#: src/Module/Register.php:501
+#: src/Module/Register.php:482 src/Module/Register.php:489
+#: src/Module/Register.php:499
 msgid "Your registration can not be processed."
 msgstr ""
 
-#: src/Module/Register.php:490
+#: src/Module/Register.php:488
 msgid "You have to leave a request note for the admin."
 msgstr ""
 
-#: src/Module/Register.php:500
+#: src/Module/Register.php:498
 msgid "An internal error occured."
 msgstr ""
 
-#: src/Module/Register.php:522
+#: src/Module/Register.php:520
 msgid "Your registration is pending approval by the site owner."
 msgstr ""
 

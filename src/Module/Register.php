@@ -204,6 +204,9 @@ class Register extends BaseModule
 		)->getArray();
 
 		$tpl = $hook_data['template'] ?? $tpl;
+		# Keep these in sync with the descriptions in Module/Moderation/Users/Create.php
+		$nickdesc1 = DI::l10n()->t('Nicknames must start with a letter, and may contain latin letters, numbers and underscores');
+		$nickdesc2 = DI::l10n()->t('Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost());
 
 		$o = Renderer::replaceMacros($tpl, [
 			'$notices'               => $notices,
@@ -225,14 +228,12 @@ class Register extends BaseModule
 			'$ask_password'          => $ask_password,
 			'$password1'             => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
 			'$password2'             => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
-			'$nickdesc'              => DI::l10n()->t('Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost()),
-			'$nicklabel'             => DI::l10n()->t('Choose a nickname: '),
+			'$nickname_input'        => ['nickname', DI::l10n()->t('Choose a nickname: '), $nickname, $nickdesc1 . "<br>" . $nickdesc2, true],
 			'$photo'                 => $photo,
 			'$publish'               => $profile_publish,
 			'$regbutt'               => $regbutton_label,
 			'$username'              => $username,
 			'$email'                 => $email,
-			'$nickname'              => $nickname,
 			'$sitename'              => DI::baseUrl()->getHost(),
 			'$importh'               => DI::l10n()->t('Import'),
 			'$importt'               => DI::l10n()->t('Import your profile to this friendica instance'),
@@ -356,12 +357,9 @@ class Register extends BaseModule
 		}
 
 		//Check if nickname contains only US-ASCII and do not start with a digit
-		if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $arr['nickname'])) {
-			if (is_numeric(substr($arr['nickname'], 0, 1))) {
-				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname cannot start with a digit."));
-			} else {
-				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname can only contain US-ASCII characters."));
-			}
+		$nickname_validation = Model\User::validateNickname($arr['nickname']);
+		if ($nickname_validation[0] != 0) {
+			DI::sysmsg()->addNotice($nickname_validation[1]);
 			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 			return;

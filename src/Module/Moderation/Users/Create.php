@@ -41,6 +41,10 @@ class Create extends BaseUsers
 	{
 		parent::content();
 
+		# Keep these in sync with the descriptions in Module/Register.php
+		$nickdesc1 = $this->t('Nicknames must start with a letter, and may contain latin letters, numbers and underscores');
+		$nickdesc2 = $this->t('Your profile address on this site will then be "<strong>nickname@%s</strong>".', DI::baseUrl()->getHost());
+
 		$t = Renderer::getMarkupTemplate('moderation/users/create.tpl');
 		return self::getTabsHTML('all') . Renderer::replaceMacros($t, [
 			// strings //
@@ -55,7 +59,7 @@ class Create extends BaseUsers
 			'$query_string' => $this->args->getQueryString(),
 
 			'$newusername'     => ['new_user_name', '', '', '', true, 'autofocus', '', $this->t('Display name')],
-			'$newusernickname' => ['new_user_nickname', '', '', '', true, '', '', $this->t('Nickname')],
+			'$newusernickname' => ['new_user_nickname', '', '', $nickdesc1 . "<br>" . $nickdesc2, true, '', '', $this->t('Nickname')],
 			'$newuseremail'    => ['new_user_email', '', '', '', true, 'email', '', $this->t('Email')],
 		]);
 	}

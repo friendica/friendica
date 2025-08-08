@@ -604,6 +604,11 @@ img.invalid-src:after { vertical-align: top;}
   word-wrap: break-word;
 }
 
+form input:user-invalid {
+	border: red 1px solid!important;
+	background: #ffeeee;
+}
+
 #register-explicit-content {
   font-weight: bold;
 }

@@ -376,6 +376,27 @@ class User
 	}
 
 	/**
+	 * Validate if a nickname follows the requirements
+	 *
+	 * @return array
+	 */
+	public static function validateNickname(string $nickname): array
+	{
+		if (is_numeric(substr($nickname, 0, 1))) {
+			return [1, DI::l10n()->t('Nickname cannot start with a digit.')];
+		} elseif (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $nickname)) {
+			return [2, DI::l10n()->t('Nicknames may only contain latin letters, numbers and underscores.')];
+		} elseif ( // Check existing and deleted accounts for this nickname.
+			DBA::exists('user', ['nickname' => $nickname])
+			|| DBA::exists('userd', ['username' => $nickname])
+		) {
+			return [3, DI::l10n()->t('Nickname is already registered. Please choose another.')];
+		} else { // Nickname is valid
+			return [0, ""];
+		}
+	}
+
+	/**
 	 * Set static settings for community user accounts
 	 *
 	 * @param integer $uid
@@ -1340,16 +1361,9 @@ class User
 
 		$nickname = $data['nickname'] = strtolower($nickname);
 
-		if (!preg_match('/^[a-z0-9][a-z0-9_]*$/', $nickname)) {
-			throw new Exception(DI::l10n()->t('Your nickname can only contain a-z, 0-9 and _.'));
-		}
-
-		// Check existing and deleted accounts for this nickname.
-		if (
-			DBA::exists('user', ['nickname' => $nickname])
-			|| DBA::exists('userd', ['username' => $nickname])
-		) {
-			throw new Exception(DI::l10n()->t('Nickname is already registered. Please choose another.'));
+		$nickname_validation = self::validateNickname($nickname);
+		if ($nickname_validation[0] != 0) {
+			throw new Exception($nickname_validation[1]);
 		}
 
 		$new_password         = strlen($password) ? $password : self::generateNewPassword();

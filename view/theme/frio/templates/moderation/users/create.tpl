@@ -11,9 +11,8 @@
 
 	<form action="{{$baseurl}}/{{$query_string}}" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-
 		{{include file="field_input.tpl" field=$newusername label=false}}
-		{{include file="field_input.tpl" field=$newusernickname label=false}}
+		{{include file="field_nickname.tpl" field=$newusernickname label=false}}
 		{{include file="field_input.tpl" field=$newuseremail label=false}}
 		<p>
 			<button type="submit" class="btn btn-primary">{{$submit}}</button>

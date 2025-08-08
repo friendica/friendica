@@ -68,13 +68,7 @@
 	{{include file="field_password.tpl" field=$password2}}
 {{/if}}
 
-	<p id="register-nickname-desc">{{$nickdesc nofilter}}</p>
-
-	<div id="register-nickname-wrapper">
-		<label for="register-nickname" id="label-register-nickname">{{$nicklabel}}</label>
-		<input type="text" maxlength="60" name="nickname" id="register-nickname" value="{{$nickname}}" required><div id="register-sitename">@{{$sitename}}</div>
-	</div>
-	<div id="register-nickname-end"></div>
+	{{include file="field_nickname.tpl" field=$nickname_input}}
 
 	<input type="input" id=tarpit" name="email" style="display: none;" placeholder="Don't enter anything here"/>
 

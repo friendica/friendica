@@ -38,8 +38,8 @@ This is the only bit of personal information that has to be accurate.
 
 A nickname is used to generate web addresses for many of your personal pages, and is also treated like an email address when establishing communications with others.
 Due to the way that the nickname is used, it has some limitations.
-It must contain only US-ASCII text characters and numbers, and must also start with a text character.
-It also must be unique on this system.
+It must contain only latin letters, numbers and underscores and must also start with a letter.
+It must also be unique on the server.
 This is used in many places to identify your account, and once set it cannot be changed.
 
 ### Directory Publishing
