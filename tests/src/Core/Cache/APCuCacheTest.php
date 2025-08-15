@@ -35,4 +35,18 @@ class APCuCacheTest extends MemoryCacheTestCase
 		$this->cache->clear(false);
 		parent::tearDown();
 	}
+
+	/**
+	 * @small
+	 */
+	public function testStats()
+	{
+		$stats = $this->instance->getStats();
+
+		self::assertNotNull($stats['entries']);
+		self::assertNotNull($stats['used_memory']);
+		self::assertNotNull($stats['hits']);
+		self::assertNotNull($stats['misses']);
+		self::assertNotNull($stats['avail_mem']);
+	}
 }

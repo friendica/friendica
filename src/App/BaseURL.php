@@ -17,8 +17,7 @@ use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * A class which checks and contains the basic
- * environment for the BaseURL (url, urlpath, ssl_policy, hostname, scheme)
+ * A class which checks and contains the basic environment for the BaseURL (url)
  */
 class BaseURL extends Uri implements UriInterface
 {
@@ -43,8 +42,7 @@ class BaseURL extends Uri implements UriInterface
 		/* Relative script path to the web server root
 		 * Not all of those $_SERVER properties can be present, so we do by inverse priority order
 		 */
-		$relativeScriptPath =
-			($server['REDIRECT_URL'] ?? '') ?:
+		$relativeScriptPath = ($server['REDIRECT_URL'] ?? '') ?:
 				($server['REDIRECT_URI'] ?? '') ?:
 					($server['REDIRECT_SCRIPT_URL'] ?? '') ?:
 						($server['SCRIPT_URL'] ?? '') ?:

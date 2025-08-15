@@ -607,64 +607,64 @@ class DFRN
 	 * @param string      $element  Element name for the activity
 	 * @param string      $activity activity value
 	 * @param int         $uriid    Uri-Id of the post
-	 * @return DOMElement XML activity object
+	 * @return DOMElement|false XML activity object or false on error
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @todo  Find proper type-hints
 	 */
 	private static function createActivity(DOMDocument $doc, string $element, string $activity, int $uriid)
 	{
-		if ($activity) {
-			$entry = $doc->createElement($element);
-
-			$r = XML::parseString($activity);
-			if (!$r) {
-				return false;
-			}
-
-			if ($r->type) {
-				XML::addElement($doc, $entry, "activity:object-type", $r->type);
-			}
-
-			if ($r->id) {
-				XML::addElement($doc, $entry, "id", $r->id);
-			}
-
-			if ($r->title) {
-				XML::addElement($doc, $entry, "title", $r->title);
-			}
-
-			if ($r->link) {
-				if (substr($r->link, 0, 1) == '<') {
-					if (strstr($r->link, '&') && (! strstr($r->link, '&amp;'))) {
-						$r->link = str_replace('&', '&amp;', $r->link);
-					}
-
-					$r->link = preg_replace('/\<link(.*?)\"\>/', '<link$1"/>', $r->link);
-
-					// XML does need a single element as root element so we add a dummy element here
-					$data = XML::parseString("<dummy>" . $r->link . "</dummy>");
-					if (is_object($data)) {
-						foreach ($data->link as $link) {
-							$attributes = [];
-							foreach ($link->attributes() as $parameter => $value) {
-								$attributes[$parameter] = $value;
-							}
-							XML::addElement($doc, $entry, "link", "", $attributes);
-						}
-					}
-				} else {
-					$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $r->link];
-					XML::addElement($doc, $entry, "link", "", $attributes);
-				}
-			}
-			if ($r->content) {
-				XML::addElement($doc, $entry, "content", BBCode::convertForUriId($uriid, $r->content, BBCode::EXTERNAL), ["type" => "html"]);
-			}
-
-			return $entry;
+		if (!$activity) {
+			return false;
 		}
 
-		return false;
+		$entry = $doc->createElement($element);
+
+		$r = XML::parseString($activity);
+		if (!$r) {
+			return false;
+		}
+
+		if ($r->type) {
+			XML::addElement($doc, $entry, "activity:object-type", $r->type);
+		}
+
+		if ($r->id) {
+			XML::addElement($doc, $entry, "id", $r->id);
+		}
+
+		if ($r->title) {
+			XML::addElement($doc, $entry, "title", $r->title);
+		}
+
+		if ($r->link) {
+			if (substr($r->link, 0, 1) == '<') {
+				if (strstr($r->link, '&') && (! strstr($r->link, '&amp;'))) {
+					$r->link = str_replace('&', '&amp;', $r->link);
+				}
+
+				$r->link = preg_replace('/\<link(.*?)\"\>/', '<link$1"/>', $r->link);
+
+				// XML does need a single element as root element so we add a dummy element here
+				$data = XML::parseString("<dummy>" . $r->link . "</dummy>");
+				if (is_object($data)) {
+					foreach ($data->link as $link) {
+						$attributes = [];
+						foreach ($link->attributes() as $parameter => $value) {
+							$attributes[$parameter] = $value;
+						}
+						XML::addElement($doc, $entry, "link", "", $attributes);
+					}
+				}
+			} else {
+				$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $r->link];
+				XML::addElement($doc, $entry, "link", "", $attributes);
+			}
+		}
+		if ($r->content) {
+			XML::addElement($doc, $entry, "content", BBCode::convertForUriId($uriid, $r->content, BBCode::EXTERNAL), ["type" => "html"]);
+		}
+
+		return $entry;
 	}
 
 	/**
@@ -1925,7 +1925,7 @@ class DFRN
 		// Check if the message is wanted
 		if (!self::isSolicitedMessage($item, $importer)) {
 			DBA::delete('item-uri', ['uri' => $item['uri']]);
-			return 403;
+			return;
 		}
 
 		// Get the type of the item (Top level post, reply or remote reply)
@@ -2051,7 +2051,7 @@ class DFRN
 					Item::distribute($posted_id);
 				}
 
-				return true;
+				return;
 			}
 		} else { // $entrytype == self::TOP_LEVEL
 			if (($item['uid'] != 0) && !Contact::isSharing($item['owner-id'], $item['uid']) && !Contact::isSharing($item['author-id'], $item['uid'])) {
@@ -2099,7 +2099,7 @@ class DFRN
 		}
 
 		if (!$uri || !$importer['id']) {
-			return false;
+			return;
 		}
 
 		$condition = ['uri' => $uri, 'uid' => $importer['importer_uid']];

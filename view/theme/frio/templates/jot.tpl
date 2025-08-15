@@ -26,14 +26,6 @@
 						{{$message}}
 					</a>
 				</li>
-				{{if $acl}}
-				<li>
-					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper">
-						<i class="fa fa-shield" aria-hidden="true"></i>
-						{{$shortpermset}}
-					</a>
-				</li>
-				{{/if}}
 				{{if $preview}}
 				<li>
 					<a href="#jot-preview-content" class="jot-preview-lnk jot-nav-lnk" id="jot-preview-lnk" role="tab" aria-controls="jot-preview-content">
@@ -48,6 +40,16 @@
 						{{$browser}}
 					</a>
 				</li>
+				{{if $acl}}
+				<li>
+					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper">
+						<i class="fa fa-shield" aria-hidden="true"></i>
+						{{$shortpermset}}
+					</a>
+				</li>
+				{{/if}}
+
+
 			</ul>
 
 			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
@@ -119,6 +121,7 @@
 						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
 						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="fa fa-map-marker" aria-hidden="true"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="fa fa-eye"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="fa fa-code"></i></button></li>
 						<!-- TODO: waiting for a better placement
 						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->

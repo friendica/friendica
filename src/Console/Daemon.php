@@ -114,7 +114,7 @@ HELP;
 		$pidfile = $this->config->get('system', 'pidfile');
 
 		$daemonMode = $this->getArgument(0);
-		$foreground = $this->getOption(['f', 'foreground']) ?? false;
+		$foreground = (bool) $this->getOption(['f', 'foreground']) ?? false;
 
 		if (empty($daemonMode)) {
 			throw new CommandArgsException("Please use either 'start', 'stop' or 'status'");

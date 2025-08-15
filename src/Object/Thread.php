@@ -77,8 +77,7 @@ class Thread
 				break;
 			default:
 				DI::logger()->info('[ERROR] Conversation::setMode : Unhandled mode ('. $mode .').');
-				return false;
-				break;
+				return;
 		}
 		$this->mode = $mode;
 	}

@@ -60,17 +60,17 @@ class Database
 	protected $syslock = null;
 
 	protected $server_info = '';
-	/** @var PDO|mysqli */
+	/** @var PDO|mysqli|null */
 	protected $connection;
-	protected $driver = '';
+	protected $driver               = '';
 	protected $pdo_emulate_prepares = false;
-	private $error = '';
-	private $errorno = 0;
-	private $affected_rows = 0;
-	protected $in_transaction = false;
-	protected $in_retrial = false;
-	protected $testmode = false;
-	private $relation = [];
+	private $error                  = '';
+	private $errorno                = 0;
+	private $affected_rows          = 0;
+	protected $in_transaction       = false;
+	protected $in_retrial           = false;
+	protected $testmode             = false;
+	private $relation               = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -86,7 +86,7 @@ class Database
 		$this->viewDefinition = $viewDefinition;
 
 		// Use dummy values - necessary for the first factory call of the logger itself
-		$this->logger = new NullLogger();
+		$this->logger   = new NullLogger();
 		$this->profiler = new Profiler($config);
 
 		$this->connect();
@@ -253,7 +253,7 @@ class Database
 	/**
 	 * Return the database object.
 	 *
-	 * @return PDO|mysqli
+	 * @return PDO|mysqli|null
 	 */
 	public function getConnection()
 	{
@@ -474,7 +474,7 @@ class Database
 	 *
 	 * @param string $sql SQL statement
 	 *
-	 * @return bool|object statement object or result object
+	 * @return bool|mysqli_result|mysqli_stmt|object|PDOStatement statement object or result object
 	 * @throws \Exception
 	 */
 	public function p(string $sql)
@@ -630,7 +630,7 @@ class Database
 					} elseif (is_string($args[$param])) {
 						$param_types .= 's';
 					} elseif (is_object($args[$param]) && method_exists($args[$param], '__toString')) {
-						$param_types  .= 's';
+						$param_types .= 's';
 						$args[$param] = (string)$args[$param];
 					} else {
 						$param_types .= 'b';
@@ -677,9 +677,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $args),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $args),
 			]);
 
 			// On a lost connection we try to reconnect - but only once.
@@ -784,9 +784,9 @@ class Database
 			}
 
 			$this->logger->error('DB Error', [
-				'code'      => $errorno,
-				'error'     => $error,
-				'params'    => $this->replaceParameters($sql, $params),
+				'code'   => $errorno,
+				'error'  => $error,
+				'params' => $this->replaceParameters($sql, $params),
 			]);
 
 			// On a lost connection we simply quit.
@@ -1335,7 +1335,7 @@ class Database
 			return true;
 		}
 
-		$fields = $this->castFields($table, $fields);
+		$fields        = $this->castFields($table, $fields);
 		$direct_fields = [];
 
 		foreach ($fields as $key => $value) {
@@ -1722,19 +1722,35 @@ class Database
 	 */
 	public function processlist(): array
 	{
+		$database = trim($this->config->get('database', 'database'));
+
 		$ret  = $this->p('SHOW PROCESSLIST');
 		$data = $this->toArray($ret);
 
 		$processes = 0;
+		$max_time  = 0;
+		$max_query = '';
 		$states    = [];
 		foreach ($data as $process) {
-			$state = trim($process['State']);
+			if ($process['db'] != $database) {
+				continue;
+			}
 
 			// Filter out all non blocking processes
-			if (!in_array($state, ['', 'init', 'statistics', 'updating'])) {
-				++$states[$state];
-				++$processes;
+			$state = trim($process['State']);
+			if (in_array($state, ['', 'init', 'statistics', 'updating'])) {
+				continue;
 			}
+
+			if ($process['Time'] > $max_time) {
+				$max_time  = $process['Time'];
+				$max_query = $process['Info'];
+			}
+			if (!isset($states[$state])) {
+				$states[$state] = 0;
+			}
+			++$states[$state];
+			++$processes;
 		}
 
 		$statelist = '';
@@ -1744,7 +1760,7 @@ class Database
 			}
 			$statelist .= $state . ': ' . $usage;
 		}
-		return (['list' => $statelist, 'amount' => $processes]);
+		return (['list' => $statelist, 'amount' => $processes, 'states' => $states, 'max_time' => $max_time, 'max_query' => $max_query]);
 	}
 
 	/**

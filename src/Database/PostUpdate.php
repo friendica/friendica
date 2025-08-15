@@ -193,7 +193,7 @@ class PostUpdate
 			Contact::removeDuplicates($contact['nurl'], $contact['uid']);
 		}
 
-		DBA::close($contact);
+		DBA::close($contacts);
 		DI::keyValue()->set('post_update_version', 1322);
 
 		DI::logger()->info('Done');

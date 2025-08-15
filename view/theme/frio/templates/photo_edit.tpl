@@ -11,7 +11,7 @@
 	<input type="hidden" name="origaname" value="{{$album.2}}" />
 
 	{{include file="field_input.tpl" field=$album}}
-	{{include file="field_input.tpl" field=$caption}}
+	{{include file="field_textarea.tpl" field=$caption}}
 	{{include file="field_input.tpl" field=$tags}}
 
 	{{include file="field_radio.tpl" field=$rotate_none}}

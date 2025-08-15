@@ -1022,7 +1022,7 @@ function photos_content()
 				}
 			}
 			$tags = ['title' => DI::l10n()->t('Tags: '), 'tags' => $tag_arr];
-			if ($cmd === 'edit') {
+			if ($cmd === 'edit' && !empty($tag_arr)) {
 				$tags['removeanyurl'] = 'post/' . $link_item['id'] . '/tag/remove?return=' . urlencode(DI::args()->getCommand());
 				$tags['removetitle']  = DI::l10n()->t('[Select tags to remove]');
 			}

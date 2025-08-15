@@ -11,12 +11,13 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Util;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class ParseUrl extends BaseModule
@@ -24,11 +25,14 @@ class ParseUrl extends BaseModule
 	/** @var IHandleUserSessions */
 	protected $userSession;
 
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, $server, array $parameters = [])
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, EventDispatcherInterface $eventDispatcher, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->userSession = $userSession;
+		$this->userSession     = $userSession;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -37,10 +41,10 @@ class ParseUrl extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		$format = '';
-		$title = '';
+		$format      = '';
+		$title       = '';
 		$description = '';
-		$ret = ['success' => false, 'contentType' => ''];
+		$ret         = ['success' => false, 'contentType' => ''];
 
 		if (!empty($_GET['binurl']) && Util\Strings::isHex($_GET['binurl'])) {
 			$url = trim(hex2bin($_GET['binurl']));
@@ -80,15 +84,21 @@ class ParseUrl extends BaseModule
 			}
 		}
 
-		$arr = ['url' => $url, 'format' => $format, 'text' => null];
+		$hook_data = [
+			'url'    => $url,
+			'format' => $format,
+			'text'   => null,
+		];
 
-		Hook::callAll('parse_link', $arr);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PARSE_LINK, $hook_data),
+		)->getArray();
 
-		if ($arr['text']) {
+		if ($hook_data['text']) {
 			if ($format == 'json') {
-				$this->jsonExit($arr['text']);
+				$this->jsonExit($hook_data['text']);
 			} else {
-				$this->httpExit($arr['text']);
+				$this->httpExit($hook_data['text']);
 			}
 		}
 
@@ -109,14 +119,14 @@ class ParseUrl extends BaseModule
 				}
 
 				$ret['contentType'] = $content_type;
-				$ret['data'] = ['url' => $url];
-				$ret['success'] = true;
+				$ret['data']        = ['url' => $url];
+				$ret['success']     = true;
 			} else {
 				unset($siteinfo['keywords']);
 
-				$ret['data'] = $siteinfo;
+				$ret['data']        = $siteinfo;
 				$ret['contentType'] = 'attachment';
-				$ret['success'] = true;
+				$ret['success']     = true;
 			}
 
 			$this->jsonExit($ret);

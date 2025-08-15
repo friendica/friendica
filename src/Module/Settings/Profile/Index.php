@@ -7,30 +7,33 @@
 
 namespace Friendica\Module\Settings\Profile;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\Core\ACL;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Core\Worker;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
-use Friendica\Navigation\SystemMessages;
-use Friendica\Profile\ProfileField;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Security\Login;
+use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
+use Friendica\Profile\ProfileField;
 use Friendica\Security\PermissionSet;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
-use Friendica\Core\Worker;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Index extends BaseSettings
@@ -47,9 +50,27 @@ class Index extends BaseSettings
 	private $permissionSetFactory;
 	/** @var ACLFormatter */
 	private $aclFormatter;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(ACLFormatter $aclFormatter, PermissionSet\Factory\PermissionSet $permissionSetFactory, PermissionSet\Repository\PermissionSet $permissionSetRepo, SystemMessages $systemMessages, ProfileField\Factory\ProfileField $profileFieldFactory, ProfileField\Repository\ProfileField $profileFieldRepo, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		ACLFormatter $aclFormatter,
+		PermissionSet\Factory\PermissionSet $permissionSetFactory,
+		PermissionSet\Repository\PermissionSet $permissionSetRepo,
+		SystemMessages $systemMessages,
+		ProfileField\Factory\ProfileField $profileFieldFactory,
+		ProfileField\Repository\ProfileField $profileFieldRepo,
+		EventDispatcherInterface $eventDispatcher,
+		IHandleUserSessions $session,
+		Page $page,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->profileFieldRepo     = $profileFieldRepo;
@@ -58,6 +79,7 @@ class Index extends BaseSettings
 		$this->permissionSetRepo    = $permissionSetRepo;
 		$this->permissionSetFactory = $permissionSetFactory;
 		$this->aclFormatter         = $aclFormatter;
+		$this->eventDispatcher      = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -73,9 +95,11 @@ class Index extends BaseSettings
 
 		self::checkFormSecurityTokenRedirectOnError('/settings/profile', 'settings_profile');
 
-		Hook::callAll('profile_post', $request);
+		$request = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_POST, $request),
+		)->getArray();
 
-		$dob = trim($request['dob'] ?? '');
+		$dob = $this->cleanInput($request['dob'] ?? '');
 
 		if ($dob && !in_array($dob, ['0000-00-00', DBA::NULL_DATE])) {
 			$y = substr($dob, 0, 4);
@@ -87,7 +111,7 @@ class Index extends BaseSettings
 
 			if (strpos($dob, '0000-') === 0 || strpos($dob, '0001-') === 0) {
 				$ignore_year = true;
-				$dob = substr($dob, 5);
+				$dob         = substr($dob, 5);
 			}
 
 			if ($ignore_year) {
@@ -97,18 +121,18 @@ class Index extends BaseSettings
 			}
 		}
 
-		$username = trim($request['username'] ?? '');
+		$username = $this->cleanInputText($request['username'] ?? '');
 		if (!$username) {
 			$this->systemMessages->addNotice($this->t('Display Name is required.'));
 			return;
 		}
 
-		$about        = trim($request['about']);
-		$address      = trim($request['address']);
-		$locality     = trim($request['locality']);
-		$region       = trim($request['region']);
-		$postal_code  = trim($request['postal_code']);
-		$country_name = trim($request['country_name']);
+		$about        = $this->cleanInputText($request['about']);
+		$address      = $this->cleanInputText($request['address']);
+		$locality     = $this->cleanInputText($request['locality']);
+		$region       = $this->cleanInputText($request['region']);
+		$postal_code  = $this->cleanInputText($request['postal_code']);
+		$country_name = $this->cleanInputText($request['country_name']);
 		$pub_keywords = self::cleanKeywords(trim($request['pub_keywords']));
 		$prv_keywords = self::cleanKeywords(trim($request['prv_keywords']));
 		$xmpp         = $this->cleanInput(trim($request['xmpp']));
@@ -221,7 +245,7 @@ class Index extends BaseSettings
 					$this->session->getLocalUserId(),
 					false,
 					['allow_cid' => []],
-					['network' => Protocol::DFRN],
+					['network'   => Protocol::DFRN],
 					'profile_field[new]'
 				),
 			],
@@ -245,7 +269,7 @@ class Index extends BaseSettings
 			'$l10n' => [
 				'profile_action'            => $this->t('Profile Actions'),
 				'banner'                    => $this->t('Edit Profile Details'),
-				'submit'                    => $this->t('Submit'),
+				'submit'                    => $this->t('Save Settings'),
 				'profpic'                   => $this->t('Change Profile Photo'),
 				'viewprof'                  => $this->t('View Profile'),
 				'personal_section'          => $this->t('Personal'),
@@ -254,7 +278,8 @@ class Index extends BaseSettings
 				'miscellaneous_section'     => $this->t('Miscellaneous'),
 				'custom_fields_section'     => $this->t('Custom Profile Fields'),
 				'profile_photo'             => $this->t('Upload Profile Photo'),
-				'custom_fields_description' => $this->t('<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
+				'custom_fields_description' => $this->t(
+					'<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
 				<p>You can use BBCodes in the field values.</p>
 				<p>Reorder by dragging the field title.</p>
 				<p>Empty the label field to remove a custom field.</p>
@@ -288,8 +313,16 @@ class Index extends BaseSettings
 			'$custom_fields' => $custom_fields,
 		]);
 
-		$arr = ['profile' => $owner, 'entry' => $o];
-		Hook::callAll('profile_edit', $arr);
+		$hook_data = [
+			'profile' => $owner,
+			'entry'   => $o,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_FORM, $hook_data),
+		)->getArray();
+
+		$o = $hook_data['entry'] ?? $o;
 
 		return $o;
 	}
@@ -344,9 +377,14 @@ class Index extends BaseSettings
 		return $profileFields;
 	}
 
+	private function cleanInputText(string $input): string
+	{
+		return trim(strip_tags($input));
+	}
+
 	private function cleanInput(string $input): string
 	{
-		return str_replace(['<', '>', '"', ' '], '', $input);
+		return str_replace(['<', '>', '"', "'", ' '], '', $input);
 	}
 
 	private static function cleanKeywords($keywords): string
@@ -356,7 +394,7 @@ class Index extends BaseSettings
 
 		$cleaned = [];
 		foreach ($keywords as $keyword) {
-			$keyword = trim($keyword);
+			$keyword = trim(str_replace(['<', '>', '"', "'"], '', $keyword));
 			$keyword = trim($keyword, '#');
 			if ($keyword != '') {
 				$cleaned[] = $keyword;

@@ -129,7 +129,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 					],
 					'system' => [
 						'basepath'         => '',
-						'urlpath'          => '',
 						'url'              => 'http://friendica.local',
 						'ssl_policy'       => 0,
 						'default_timezone' => '',
@@ -152,7 +151,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'          => 'test/it',
 						'url'              => 'http://friendica.local/test/it',
 						'basepath'         => '',
 						'ssl_policy'       => '2',
@@ -176,7 +174,6 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 						'admin_email' => 'admin@philipp.info',
 					],
 					'system' => [
-						'urlpath'          => 'test/it',
 						'url'              => 'https://friendica.local/test/it',
 						'basepath'         => '',
 						'ssl_policy'       => '1',
@@ -352,7 +349,6 @@ FIN;
 		self::assertConfigEntry('system', 'default_timezone', $assertion, ($default) ? Installer::DEFAULT_TZ : null);
 		self::assertConfigEntry('system', 'language', $assertion, ($default) ? Installer::DEFAULT_LANG : null);
 		self::assertConfigEntry('system', 'url', $assertion);
-		self::assertConfigEntry('system', 'urlpath', $assertion);
 		self::assertConfigEntry('system', 'ssl_policy', $assertion, ($default) ? App\BaseURL::DEFAULT_SSL_SCHEME : null);
 		self::assertConfigEntry('system', 'basepath', ($realBasepath) ? $this->root->url() : $assertion);
 	}
@@ -446,7 +442,6 @@ return [
 	],
 	'system' => [
 		'basepath' => '{$conf('system', 'basepath')}',
-		'urlpath' => '{$conf('system', 'urlpath')}',
 		'url' => '{$conf('system', 'url')}',
 		'ssl_policy' => '{$conf('system', 'ssl_policy')}',
 		'default_timezone' => '{$conf('system', 'default_timezone')}',
@@ -604,7 +599,7 @@ CONF;
 		self::assertStuckDB($txt);
 		self::assertTrue($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php'));
 
-		self::assertConfig(['config' => ['hostname' => 'friendica.local'], 'system' => ['url' => 'http://friendica.local', 'ssl_policy' => 0, 'urlpath' => '']], false, true, false, true);
+		self::assertConfig(['config' => ['hostname' => 'friendica.local'], 'system' => ['url' => 'http://friendica.local', 'ssl_policy' => 0]], false, true, false, true);
 	}
 
 	public function testGetHelp()

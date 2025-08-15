@@ -33,4 +33,12 @@ class ArrayCacheTest extends MemoryCacheTestCase
 		self::markTestSkipped("Array Cache doesn't support TTL");
 		return true;
 	}
+
+	/**
+	 * @small
+	 */
+	public function testGetStats()
+	{
+		self::assertEmpty($this->cache->getStats());
+	}
 }

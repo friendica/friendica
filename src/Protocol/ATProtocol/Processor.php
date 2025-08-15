@@ -151,7 +151,7 @@ class Processor
 
 			if (!empty($root)) {
 				$item['parent-uri'] = $root;
-				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, false, Conversation::PARCEL_JETSTREAM);
+				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, !$dont_fetch, Conversation::PARCEL_JETSTREAM);
 				$item['gravity']    = Item::GRAVITY_COMMENT;
 			} else {
 				$item['gravity'] = Item::GRAVITY_PARENT;
@@ -201,7 +201,7 @@ class Processor
 			$item['gravity']    = Item::GRAVITY_ACTIVITY;
 			$item['body']       = $item['verb'] = Activity::ANNOUNCE;
 			$item['thr-parent'] = $this->getUri($data->commit->record->subject);
-			$item['thr-parent'] = $this->fetchMissingPost($item['thr-parent'], 0, Item::PR_FETCHED, $item['contact-id'], 0, $item['thr-parent'], false, Conversation::PARCEL_JETSTREAM);
+			$item['thr-parent'] = $this->fetchMissingPost($item['thr-parent'], 0, Item::PR_FETCHED, $item['contact-id'], 0, $item['thr-parent'], !$dont_fetch, Conversation::PARCEL_JETSTREAM);
 
 			$id = Item::insert($item);
 
@@ -327,7 +327,7 @@ class Processor
 
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
 	{
-		$contact = $this->actor->getContactByDID($data->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($data->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $data->did, 'uid' => $uid]);
 			return [];
@@ -392,7 +392,7 @@ class Processor
 		if (empty($post->author) || empty($post->cid) || empty($parts->rkey)) {
 			return [];
 		}
-		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0);
+		$contact = $this->actor->getContactByDID($post->author->did, $uid, 0, true);
 		if (empty($contact)) {
 			$this->logger->info('Contact not found for user', ['did' => $post->author->did, 'uid' => $uid]);
 			return [];
@@ -506,13 +506,10 @@ class Processor
 						break;
 
 					case 'app.bsky.richtext.facet#mention':
-						$contact = Contact::getByURL($feature->did, null, ['id']);
-						if (!empty($contact['id'])) {
-							$url = $this->baseURL . '/contact/' . $contact['id'];
-							if (substr($linktext, 0, 1) == '@') {
-								$prefix .= '@';
-								$linktext = substr($linktext, 1);
-							}
+						$url = $feature->did;
+						if (substr($linktext, 0, 1) == '@') {
+							$prefix .= '@';
+							$linktext = substr($linktext, 1);
 						}
 						break;
 
@@ -697,14 +694,14 @@ class Processor
 		return $restrict ? Item::CANT_REPLY : null;
 	}
 
-	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $always_fetch = false, int $Protocol = Conversation::PARCEL_JETSTREAM): string
+	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $complete_thread = false, int $Protocol = Conversation::PARCEL_JETSTREAM): string
 	{
 		$timestamp = microtime(true);
 		$stamp     = Strings::getRandomHex(30);
 		$this->logger->debug('Fetch missing post', ['uri' => $uri, 'stamp' => $stamp]);
 
 		$fetched_uri = $this->getPostUri($uri, $uid);
-		if (!$always_fetch && !empty($fetched_uri)) {
+		if (!$complete_thread && !empty($fetched_uri)) {
 			return $fetched_uri;
 		}
 
@@ -738,13 +735,13 @@ class Processor
 			$causer = Contact::getPublicContactId($causer, $uid);
 		}
 
-		if (!empty($data->thread->parent)) {
+		if (!empty($data->thread->parent) && $complete_thread) {
 			$parents = $this->fetchParents($data->thread->parent, $uid);
 
 			if (!empty($parents)) {
 				if ($data->thread->post->record->reply->root->uri != $parents[0]->uri) {
 					$parent_uri = $this->getUri($data->thread->post->record->reply->root);
-					$this->fetchMissingPost($parent_uri, $uid, $post_reason, $causer, $level, $data->thread->post->record->reply->root->uri, false, $Protocol);
+					$this->fetchMissingPost($parent_uri, $uid, $post_reason, $causer, $level, $data->thread->post->record->reply->root->uri, $complete_thread, $Protocol);
 				}
 			}
 
@@ -754,7 +751,7 @@ class Processor
 			}
 		}
 
-		$uri = $this->processThread($data->thread, $uid, $post_reason, $causer, $level, $Protocol);
+		$uri = $this->processThread($data->thread, $uid, $post_reason, $causer, $level, $Protocol, $complete_thread);
 		if (microtime(true) - $timestamp > 2) {
 			$this->logger->debug('Fetched and processed post', ['duration' => round(microtime(true) - $timestamp, 3), 'uri' => $uri, 'stamp' => $stamp]);
 		}
@@ -774,7 +771,7 @@ class Processor
 		return $parents;
 	}
 
-	private function processThread(stdClass $thread, int $uid, int $post_reason, int $causer, int $level, int $protocol): string
+	private function processThread(stdClass $thread, int $uid, int $post_reason, int $causer, int $level, int $protocol, bool $complete_thread): string
 	{
 		if (empty($thread->post)) {
 			$this->logger->info('Invalid post', ['post' => $thread]);
@@ -797,9 +794,11 @@ class Processor
 			$uri = $fetched_uri;
 		}
 
-		foreach ($thread->replies ?? [] as $reply) {
-			$reply_uri = $this->processThread($reply, $uid, Item::PR_FETCHED, $causer, $level, $protocol);
-			$this->logger->debug('Reply has been processed', ['uri' => $uri, 'reply' => $reply_uri]);
+		if ($complete_thread) {
+			foreach ($thread->replies ?? [] as $reply) {
+				$reply_uri = $this->processThread($reply, $uid, Item::PR_FETCHED, $causer, $level, $protocol, $complete_thread);
+				$this->logger->debug('Reply has been processed', ['uri' => $uri, 'reply' => $reply_uri]);
+			}
 		}
 
 		return $uri;
@@ -848,17 +847,17 @@ class Processor
 		return $class;
 	}
 
-	public function fetchUriId(string $uri, int $uid): string
+	public function fetchUriId(string $uri, int $uid): int
 	{
 		$reply = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		$reply = Post::selectFirst(['uri-id'], ['extid' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		return 0;
 	}

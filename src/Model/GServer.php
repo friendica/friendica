@@ -2200,8 +2200,6 @@ class GServer
 	 * Converts input value to a boolean value
 	 *
 	 * @param string|integer $val
-	 *
-	 * @return boolean
 	 */
 	private static function toBoolean($val): bool
 	{
@@ -2211,7 +2209,7 @@ class GServer
 			return false;
 		}
 
-		return $val;
+		return (bool) $val;
 	}
 
 	/**

@@ -55,7 +55,7 @@ class HTML
 
 		$xpath = new DOMXPath($doc);
 
-		/** @var \DOMNode[] $list */
+		/** @var \DOMNodeList<\DOMNode>|false $list */
 		$list = $xpath->query("//" . $tag);
 		foreach ($list as $node) {
 			$attr = [];
@@ -689,7 +689,7 @@ class HTML
 	public static function toMarkdown(string $html): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$converter = new HtmlConverter(['hard_break' => true]);
+		$converter = new HtmlConverter(['hard_break' => true, 'strip_tags' => true]);
 		$markdown  = $converter->convert($html);
 
 		DI::profiler()->stopRecording();
@@ -1018,7 +1018,7 @@ class HTML
 	 */
 	public static function checkRelMeLink(DOMDocument $doc, UriInterface $meUrl): bool
 	{
-		$xpath = new \DOMXpath($doc);
+		$xpath = new \DOMXPath($doc);
 
 		// This expression checks that "me" is among the space-delimited values of the "rel" attribute.
 		// And that the href attribute contains exactly the provided URL

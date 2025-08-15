@@ -15,8 +15,8 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Post\UserNotification;
 use Friendica\Model\Verb;
-use Friendica\Navigation\Notifications\Collection;
-use Friendica\Navigation\Notifications\Entity;
+use Friendica\Navigation\Notifications\Collection\Notifications as NotificationsCollection;
+use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
 use Friendica\Navigation\Notifications\Factory;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Protocol\Activity;
@@ -41,19 +41,18 @@ class Notification extends BaseRepository
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 * @return Entity\Notification
 	 * @throws NotFoundException
 	 */
-	private function selectOne(array $condition, array $params = []): Entity\Notification
+	private function selectOne(array $condition, array $params = []): NotificationEntity
 	{
-		return parent::_selectOne($condition, $params);
+		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
-	private function select(array $condition, array $params = []): Collection\Notifications
+	private function select(array $condition, array $params = []): NotificationsCollection
 	{
-		return new Collection\Notifications(parent::_select($condition, $params)->getArrayCopy());
+		return new NotificationsCollection(parent::_select($condition, $params)->getArrayCopy());
 	}
 
 	public function countForUser($uid, array $condition, array $params = []): int
@@ -71,23 +70,21 @@ class Notification extends BaseRepository
 	}
 
 	/**
-	 * @param int $id
-	 * @return Entity\Notification
 	 * @throws NotFoundException
 	 */
-	public function selectOneById(int $id): Entity\Notification
+	public function selectOneById(int $id): NotificationEntity
 	{
 		return $this->selectOne(['id' => $id]);
 	}
 
-	public function selectOneForUser(int $uid, array $condition, array $params = []): Entity\Notification
+	public function selectOneForUser(int $uid, array $condition, array $params = []): NotificationEntity
 	{
 		$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 
 		return $this->selectOne($condition, $params);
 	}
 
-	public function selectForUser(int $uid, array $condition = [], array $params = []): Collection\Notifications
+	public function selectForUser(int $uid, array $condition = [], array $params = []): NotificationsCollection
 	{
 		$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
 
@@ -98,12 +95,9 @@ class Notification extends BaseRepository
 	/**
 	 * Returns only the most recent notifications for the same conversation or contact
 	 *
-	 * @param int $uid
-	 *
-	 * @return Collection\Notifications
 	 * @throws Exception
 	 */
-	public function selectDetailedForUser(int $uid): Collection\Notifications
+	public function selectDetailedForUser(int $uid): NotificationsCollection
 	{
 		$notify_type = $this->pconfig->get($uid, 'system', 'notify_type');
 		if (!is_null($notify_type)) {
@@ -113,11 +107,11 @@ class Notification extends BaseRepository
 		}
 
 		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
-			$condition = DBA::mergeConditions($condition, ['NOT `vid` IN (?, ?)', Verb::getID(\Friendica\Protocol\Activity::LIKE), Verb::getID(\Friendica\Protocol\Activity::DISLIKE)]);
+			$condition = DBA::mergeConditions($condition, ['NOT `vid` IN (?, ?)', Verb::getID(Activity::LIKE), Verb::getID(Activity::DISLIKE)]);
 		}
 
 		if (!$this->pconfig->get($uid, 'system', 'notify_announce')) {
-			$condition = DBA::mergeConditions($condition, ['`vid` != ?', Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE)]);
+			$condition = DBA::mergeConditions($condition, ['`vid` != ?', Verb::getID(Activity::ANNOUNCE)]);
 		}
 
 		return $this->selectForUser($uid, $condition, ['limit' => 50, 'order' => ['id' => true]]);
@@ -126,33 +120,30 @@ class Notification extends BaseRepository
 	/**
 	 * Returns only the most recent notifications for the same conversation or contact
 	 *
-	 * @param int $uid
-	 *
-	 * @return Collection\Notifications
 	 * @throws Exception
 	 */
-	public function selectDigestForUser(int $uid): Collection\Notifications
+	public function selectDigestForUser(int $uid): NotificationsCollection
 	{
 		$values = [$uid];
 
 		$type_condition = '';
-		$notify_type = $this->pconfig->get($uid, 'system', 'notify_type');
+		$notify_type    = $this->pconfig->get($uid, 'system', 'notify_type');
 		if (!is_null($notify_type)) {
 			$type_condition = 'AND `type` & ? != 0';
-			$values[] = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW;
+			$values[]       = $notify_type | UserNotification::TYPE_SHARED | UserNotification::TYPE_FOLLOW;
 		}
 
 		$like_condition = '';
 		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
 			$like_condition = 'AND NOT `vid` IN (?, ?)';
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::LIKE);
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::DISLIKE);
+			$values[]       = Verb::getID(Activity::LIKE);
+			$values[]       = Verb::getID(Activity::DISLIKE);
 		}
 
 		$announce_condition = '';
 		if (!$this->pconfig->get($uid, 'system', 'notify_announce')) {
 			$announce_condition = 'AND vid != ?';
-			$values[] = Verb::getID(\Friendica\Protocol\Activity::ANNOUNCE);
+			$values[]           = Verb::getID(Activity::ANNOUNCE);
 		}
 
 		$rows = $this->db->p("
@@ -171,15 +162,20 @@ class Notification extends BaseRepository
 		LIMIT 50
 		", ...$values);
 
-		$Entities = new Collection\Notifications();
-		foreach ($rows as $fields) {
-			$Entities[] = $this->factory->createFromTableRow($fields);
+		$entities = new NotificationsCollection();
+
+		if (!is_iterable($rows)) {
+			return $entities;
 		}
 
-		return $Entities;
+		foreach ($rows as $fields) {
+			$entities[] = $this->factory->createFromTableRow($fields);
+		}
+
+		return $entities;
 	}
 
-	public function selectAllForUser(int $uid): Collection\Notifications
+	public function selectAllForUser(int $uid): NotificationsCollection
 	{
 		return $this->selectForUser($uid);
 	}
@@ -199,7 +195,7 @@ class Notification extends BaseRepository
 	{
 		$BaseCollection = parent::_selectByBoundaries($condition, $params, $min_id, $max_id, $limit);
 
-		return new Collection\Notifications($BaseCollection->getArrayCopy(), $BaseCollection->getTotalCount());
+		return new NotificationsCollection($BaseCollection->getArrayCopy(), $BaseCollection->getTotalCount());
 	}
 
 	public function setAllSeenForUser(int $uid, array $condition = []): bool
@@ -217,11 +213,9 @@ class Notification extends BaseRepository
 	}
 
 	/**
-	 * @param Entity\Notification $Notification
-	 * @return Entity\Notification
 	 * @throws Exception
 	 */
-	public function save(Entity\Notification $Notification): Entity\Notification
+	public function save(NotificationEntity $Notification): NotificationEntity
 	{
 		$fields = [
 			'uid'           => $Notification->uid,
@@ -259,12 +253,12 @@ class Notification extends BaseRepository
 	public function deleteForItem(int $itemUriId): bool
 	{
 		$conditionTarget = [
-			'vid' => Verb::getID(Activity::POST),
+			'vid'           => Verb::getID(Activity::POST),
 			'target-uri-id' => $itemUriId,
 		];
 
 		$conditionParent = [
-			'vid' => Verb::getID(Activity::POST),
+			'vid'           => Verb::getID(Activity::POST),
 			'parent-uri-id' => $itemUriId,
 		];
 

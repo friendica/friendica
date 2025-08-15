@@ -14,8 +14,6 @@ use Friendica\Content\Post\Collection\PostMedias;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\Hook;
-use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -450,66 +448,6 @@ class Item
 	}
 
 	/**
-	 * Get guid from given item record
-	 *
-	 * @param array $item Item record
-	 * @param bool $notify Whether to notify (?)
-	 * @return string Guid
-	 */
-	public static function guid(array $item, bool $notify): string
-	{
-		if (!empty($item['guid'])) {
-			return trim($item['guid']);
-		}
-
-		if ($notify) {
-			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
-			// We add the hash of our own host because our host is the original creator of the post.
-			$prefix_host = DI::baseUrl()->getHost();
-		} else {
-			$prefix_host = '';
-
-			// We are only storing the post so we create a GUID from the original hostname.
-			if (!empty($item['author-link'])) {
-				$parsed = parse_url($item['author-link']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			if (empty($prefix_host) && !empty($item['plink'])) {
-				$parsed = parse_url($item['plink']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			if (empty($prefix_host) && !empty($item['uri'])) {
-				$parsed = parse_url($item['uri']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			// Is it in the format data@host.tld? - Used for mail contacts
-			if (empty($prefix_host) && !empty($item['author-link']) && strstr($item['author-link'], '@')) {
-				$mailparts   = explode('@', $item['author-link']);
-				$prefix_host = array_pop($mailparts);
-			}
-		}
-
-		if (!empty($item['plink'])) {
-			$guid = self::guidFromUri($item['plink'], $prefix_host);
-		} elseif (!empty($item['uri'])) {
-			$guid = self::guidFromUri($item['uri'], $prefix_host);
-		} else {
-			$guid = System::createUUID(hash('crc32', $prefix_host));
-		}
-
-		return $guid;
-	}
-
-	/**
 	 * Returns contact id from given item record
 	 *
 	 * @param array $item Item record
@@ -672,7 +610,7 @@ class Item
 	/**
 	 * Inserts item record
 	 *
-	 * @param array $item Item array to be inserted
+	 * @param array<string,mixed> $item Item array to be inserted
 	 * @param int   $notify Notification (type?)
 	 * @param bool  $post_local (???)
 	 * @return int Zero means error, otherwise primary key (id) is being returned
@@ -695,6 +633,7 @@ class Item
 
 		// If it is a posting where users should get notifications, then define it as wall posting
 		if ($notify) {
+			/** @var array<string,mixed> */
 			$item = $itemHelper->prepareOriginPost($item);
 
 			if (is_int($notify) && in_array($notify, Worker::PRIORITIES)) {
@@ -708,6 +647,7 @@ class Item
 			$item['network'] = trim(($item['network'] ?? '') ?: Protocol::PHANTOM);
 		}
 
+		/** @var array<string,mixed> */
 		$item = $itemHelper->prepareItemData($item, (bool) $notify);
 
 		// Store conversation data
@@ -749,6 +689,7 @@ class Item
 			}
 		}
 
+		/** @var array<string,mixed> */
 		$item = $itemHelper->validateItemData($item);
 
 		// Ensure that there is an avatar cache
@@ -846,16 +787,26 @@ class Item
 				$dummy_session = false;
 			}
 
-			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL, $item)
+			$hook_data = [
+				'item' => $item,
+			];
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
 			)->getArray();
+
+			/** @var array<string,mixed> */
+			$item = $hook_data['item'] ?? $item;
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
-			Hook::callAll('post_remote', $item);
+			/** @var array<string,mixed> */
+			$item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item)
+			)->getArray();
 		}
 
 		if (!empty($item['cancel'])) {
@@ -1112,7 +1063,11 @@ class Item
 				DI::contentItem()->copyPermissions($posted_item['thr-parent-id'], $posted_item['uri-id'], $posted_item['parent-uri-id']);
 			}
 		} else {
-			Hook::callAll('post_remote_end', $posted_item);
+			$eventDispatcher = DI::eventDispatcher();
+
+			$posted_item = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE_END, $posted_item)
+			)->getArray();
 		}
 
 		if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
@@ -1854,7 +1809,7 @@ class Item
 			}
 		}
 
-		$languages = self::getLanguageArray($content, 3, $item['uri-id'], $item['author-id'], $transmitted);
+		$languages = DI::contentItem()->getLanguageArray($content, 3, $item['uri-id'], $item['author-id'], $transmitted);
 
 		if (!empty($transmitted)) {
 			$languages = array_merge($transmitted, $languages);
@@ -1862,185 +1817,6 @@ class Item
 		}
 
 		return json_encode($languages);
-	}
-
-	/**
-	 * Get a language array from a given text
-	 *
-	 * @param string  $body
-	 * @param integer $count
-	 * @param integer $uri_id
-	 * @param integer $author_id
-	 * @param array   $default
-	 * @return array
-	 */
-	public static function getLanguageArray(string $body, int $count, int $uri_id = 0, int $author_id = 0, array $default = []): array
-	{
-		$default = $default ?: [L10n::UNDETERMINED_LANGUAGE => 1];
-
-		$searchtext = BBCode::toSearchText($body, $uri_id);
-
-		if ((count(explode(' ', $searchtext)) < 10) && (mb_strlen($searchtext) < 30) && $author_id) {
-			$author = Contact::selectFirst(['about'], ['id' => $author_id]);
-			if (!empty($author['about'])) {
-				$about = BBCode::toSearchText($author['about'], 0);
-				DI::logger()->debug('About field added', ['author' => $author_id, 'body' => $searchtext, 'about' => $about]);
-				$searchtext .= ' ' . $about;
-			}
-		}
-
-		if (empty($searchtext)) {
-			return $default;
-		}
-
-		$ld = new Language(DI::l10n()->getDetectableLanguages());
-
-		$result = [];
-
-		foreach (self::splitByBlocks($searchtext) as $block) {
-			$languages = $ld->detect($block)->close() ?: [];
-
-			$data = [
-				'text'      => $block,
-				'detected'  => $languages,
-				'uri-id'    => $uri_id,
-				'author-id' => $author_id,
-			];
-			Hook::callAll('detect_languages', $data);
-
-			foreach ($data['detected'] as $language => $quality) {
-				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
-			}
-		}
-
-		$result = self::compactLanguages($result);
-		if (empty($result)) {
-			return $default;
-		}
-
-		arsort($result);
-		return array_slice($result, 0, $count);
-	}
-
-	/**
-	 * Concert the language code in the detection result to ISO 639-1.
-	 * On duplicates the system uses the higher quality value.
-	 *
-	 * @param array $result
-	 * @return array
-	 */
-	private static function compactLanguages(array $result): array
-	{
-		$languages = [];
-		foreach ($result as $language => $quality) {
-			if ($quality == 0) {
-				continue;
-			}
-			$code = DI::l10n()->toISO6391($language);
-			if (empty($languages[$code]) || ($languages[$code] < $quality)) {
-				$languages[$code] = $quality;
-			}
-		}
-		return $languages;
-	}
-
-	/**
-	 * Split a string into different unicode blocks
-	 * Currently the text is split into the latin and the non latin part.
-	 *
-	 * @param string $body
-	 * @return array
-	 */
-	private static function splitByBlocks(string $body): array
-	{
-		if (!class_exists('IntlChar')) {
-			return [$body];
-		}
-
-		$blocks         = [];
-		$previous_block = 0;
-
-		for ($i = 0; $i < mb_strlen($body); $i++) {
-			$character = mb_substr($body, $i, 1);
-			$previous  = ($i > 0) ? mb_substr($body, $i - 1, 1) : '';
-			$next      = ($i < mb_strlen($body)) ? mb_substr($body, $i + 1, 1) : '';
-
-			if (!\IntlChar::isalpha($character)) {
-				if (($previous != '') && (\IntlChar::isalpha($previous))) {
-					$previous_block = self::getBlockCode($previous);
-				}
-
-				$block          = (($next != '') && \IntlChar::isalpha($next)) ? self::getBlockCode($next) : $previous_block;
-				$blocks[$block] = ($blocks[$block] ?? '') . $character;
-			} else {
-				$block          = self::getBlockCode($character);
-				$blocks[$block] = ($blocks[$block] ?? '') . $character;
-			}
-		}
-
-		foreach (array_keys($blocks) as $key) {
-			$blocks[$key] = trim($blocks[$key]);
-			if (empty($blocks[$key])) {
-				unset($blocks[$key]);
-			}
-		}
-
-		return array_values($blocks);
-	}
-
-	/**
-	 * returns the block code for the given character
-	 *
-	 * @param string $character
-	 * @return integer 0 = no alpha character (blank, signs, emojis, ...), 1 = latin character, 2 = character in every other language
-	 */
-	private static function getBlockCode(string $character): int
-	{
-		if (!\IntlChar::isalpha($character)) {
-			return 0;
-		}
-		return self::isLatin($character) ? 1 : 2;
-	}
-
-	/**
-	 * Checks if the given character is in one of the latin code blocks
-	 *
-	 * @param string $character
-	 * @return boolean
-	 */
-	private static function isLatin(string $character): bool
-	{
-		return in_array(\IntlChar::getBlockCode($character), [
-			\IntlChar::BLOCK_CODE_BASIC_LATIN, \IntlChar::BLOCK_CODE_LATIN_1_SUPPLEMENT,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_A, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_B,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_C, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_D,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL
-		]);
-	}
-
-	public static function getLanguageMessage(array $item): string
-	{
-		$iso639 = new \Matriphe\ISO639\ISO639();
-
-		$used_languages = '';
-		foreach (json_decode($item['language'], true) as $language => $reliability) {
-			$code = DI::l10n()->toISO6391($language);
-
-			if ($code == L10n::UNDETERMINED_LANGUAGE) {
-				$native = $language = DI::l10n()->t('Undetermined');
-			} else {
-				$native   = $iso639->nativeByCode1($code);
-				$language = $iso639->languageByCode1($code);
-			}
-
-			if ($native != $language) {
-				$used_languages .= DI::l10n()->t('%s (%s - %s): %s', $native, $language, $code, number_format($reliability, 5)) . "\n";
-			} else {
-				$used_languages .= DI::l10n()->t('%s (%s): %s', $native, $code, number_format($reliability, 5)) . "\n";
-			}
-		}
-		$used_languages = DI::l10n()->t("Detected languages in this post:\n%s", $used_languages);
-		return $used_languages;
 	}
 
 	/**
@@ -2274,9 +2050,16 @@ class Item
 				return true;
 			}
 
-			$arr = ['item' => $item, 'user' => $owner];
+			$eventDispatcher = DI::eventDispatcher();
 
-			Hook::callAll('tagged', $arr);
+			$arr = [
+				'item' => $item,
+				'user' => $owner,
+			];
+
+			$eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::ITEM_TAGGED, $arr),
+			);
 		} else {
 			if (Tag::isMentioned($item['parent-uri-id'], $owner['url'])) {
 				DI::logger()->info('Mention found in parent tag.', ['uri' => $item['uri'], 'uid' => $uid, 'id' => $item_id, 'uri-id' => $item['uri-id'], 'guid' => $item['guid']]);
@@ -2310,10 +2093,6 @@ class Item
 	 */
 	private static function autoReshare(array $item)
 	{
-		if ($item['gravity'] != self::GRAVITY_PARENT) {
-			return;
-		}
-
 		$ucid = Contact::getUserContactId($item['author-id'], $item['uid']);
 		if (!$ucid || ($ucid != $item['contact-id'])) {
 			return;
@@ -2331,9 +2110,26 @@ class Item
 			return;
 		}
 
-		DI::logger()->info('Automatically reshare item', ['uid' => $item['uid'], 'id' => $item['id'], 'guid' => $item['guid'], 'uri-id' => $item['uri-id']]);
+		if ($item['gravity'] == self::GRAVITY_PARENT) {
+			$id     = $item['id'];
+			$guid   = $item['guid'];
+			$uri_id = $item['uri-id'];
+		} elseif ($item['gravity'] == self::GRAVITY_ACTIVITY && $item['verb'] == Activity::ANNOUNCE) {
+			$post = Post::selectFirst(['id', 'guid', 'uri-id'], ['uri-id' => $item['parent-uri-id'], 'uid' => [0, $item['uid']]]);
+			if (!DBA::isResult($post)) {
+				DI::logger()->warning('No parent post found for reshare', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
+				return;
+			}
+			$id     = $post['id'];
+			$guid   = $post['guid'];
+			$uri_id = $post['uri-id'];
+		} else {
+			return;
+		}
 
-		self::performActivity($item['id'], 'announce', $item['uid']);
+		DI::logger()->info('Automatically reshare item', ['gravity' => $item['gravity'], 'uid' => $item['uid'], 'id' => $id, 'guid' => $guid, 'uri-id' => $uri_id]);
+
+		self::performActivity($id, 'announce', $item['uid']);
 	}
 
 	public static function isRemoteSelf(array $contact, array &$datarray): bool
@@ -3020,8 +2816,18 @@ class Item
 			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
 			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
 
-			$hook_data = ['item' => $item, 'rendered-html' => $item['rendered-html'], 'rendered-hash' => $item['rendered-hash']];
-			Hook::callAll('put_item_in_cache', $hook_data);
+			$hook_data = [
+				'rendered-html' => $item['rendered-html'],
+				'rendered-hash' => $item['rendered-hash'],
+				'item'          => $item,
+			];
+
+			$eventDispatcher = DI::eventDispatcher();
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
+			)->getArray();
+
 			$item['rendered-html'] = $hook_data['rendered-html'];
 			$item['rendered-hash'] = $hook_data['rendered-hash'];
 			unset($hook_data);
@@ -3052,16 +2858,22 @@ class Item
 	 * @return string item body html
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
-	 * @hook  prepare_body_init item array before any work
-	 * @hook  prepare_body_content_filter ('item'=>item array, 'filter_reasons'=>string array) before first bbcode to html
-	 * @hook  prepare_body ('item'=>item array, 'html'=>body string, 'is_preview'=>boolean, 'filter_reasons'=>string array) after first bbcode to html
-	 * @hook  prepare_body_final ('item'=>item array, 'html'=>body string) after attach icons and blockquote special case handling (spoiler, author)
 	 */
 	public static function prepareBody(array &$item, bool $attach = false, bool $is_preview = false, bool $only_cache = false): string
 	{
-		$appHelper = DI::appHelper();
-		$uid       = DI::userSession()->getLocalUserId();
-		Hook::callAll('prepare_body_init', $item);
+		$appHelper       = DI::appHelper();
+		$uid             = DI::userSession()->getLocalUserId();
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
+			'item' => $item,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, $hook_data),
+		)->getArray();
+
+		$item = $hook_data['item'] ?? $item;
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
@@ -3180,7 +2992,11 @@ class Item
 				'item'           => $item,
 				'filter_reasons' => $filter_reasons
 			];
-			Hook::callAll('prepare_body_content_filter', $hook_data);
+
+			$hook_data = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
+			)->getArray();
+
 			$filter_reasons = $hook_data['filter_reasons'];
 			unset($hook_data);
 		}
@@ -3199,7 +3015,11 @@ class Item
 			'preview'        => $is_preview,
 			'filter_reasons' => $filter_reasons
 		];
-		Hook::callAll('prepare_body', $hook_data);
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST, $hook_data),
+		)->getArray();
+
 		$s = $hook_data['html'];
 
 		unset($hook_data);
@@ -3251,9 +3071,16 @@ class Item
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
-		$hook_data = ['item' => $item, 'html' => $s];
-		Hook::callAll('prepare_body_final', $hook_data);
-		return $hook_data['html'];
+		$hook_data = [
+			'item' => $item,
+			'html' => $s,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_END, $hook_data),
+		)->getArray();
+
+		return (string) $hook_data['html'] ?? $s;
 	}
 
 	/**
@@ -3271,7 +3098,7 @@ class Item
 		}
 
 		$dom = new \DOMDocument();
-		if (!@$dom->loadHTML($html)) {
+		if (empty($html) || !@$dom->loadHTML($html)) {
 			return $html;
 		}
 
@@ -3902,17 +3729,21 @@ class Item
 			return 0;
 		}
 
-		$hookData = [
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = [
 			'uri'     => $uri,
 			'uid'     => $uid,
 			'item_id' => null,
 		];
 
-		Hook::callAll('item_by_link', $hookData);
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data)
+		)->getArray();
 
-		if (isset($hookData['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hookData['item_id']]);
-			return is_numeric($hookData['item_id']) ? $hookData['item_id'] : 0;
+		if (isset($hook_data['item_id'])) {
+			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
+			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
 		}
 
 		if (!$mimetype) {

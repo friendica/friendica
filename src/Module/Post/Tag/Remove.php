@@ -54,7 +54,7 @@ class Remove extends \Friendica\BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$returnUrl = hex2bin($request['return'] ?? '');
+		$returnUrl = $request['return'] ?? '';
 
 		if (!$this->session->getLocalUserId()) {
 			$this->baseUrl->redirect($returnUrl);
@@ -80,7 +80,7 @@ class Remove extends \Friendica\BaseModule
 		if ($tag_text === '') {
 			$this->baseUrl->redirect($returnUrl);
 		}
-		
+
 		$tags = explode(',', $tag_text);
 
 		$tag_checkboxes = array_map(function ($tag_text) {
@@ -97,7 +97,7 @@ class Remove extends \Friendica\BaseModule
 			],
 
 			'$item_id'        => $item_id,
-			'$return'         => $returnUrl,
+			'$return'         => urlencode($returnUrl),
 			'$tag_checkboxes' => $tag_checkboxes,
 		]);
 	}

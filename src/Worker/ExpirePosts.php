@@ -34,6 +34,13 @@ class ExpirePosts
 			return;
 		}
 
+		$processlist = DBA::processlist();
+		if ($processlist['max_time'] > 60) {
+			DI::logger()->warning('Processlist shows a long running query, task will be deferred.', ['time' => $processlist['max_time'], 'query' => $processlist['max_query']]);
+			Worker::defer();
+			return;
+		}
+
 		DI::logger()->notice('Expire posts - Delete expired origin posts');
 		self::deleteExpiredOriginPosts();
 
@@ -133,7 +140,7 @@ class ExpirePosts
 		DI::logger()->notice('Adding missing entries');
 
 		$rows      = 0;
-		$userposts = DBA::select('post-user', [], ["`uri-id` not in (select `uri-id` from `post`)"]);
+		$userposts = DBA::p("SELECT `post-user`.* FROM `post-user` LEFT JOIN `post` ON `post`.`uri-id` = `post-user`.`uri-id` WHERE `post`.`uri-id` IS NULL");
 		while ($fields = DBA::fetch($userposts)) {
 			$post_fields = DI::dbaDefinition()->truncateFieldsForTable('post', $fields);
 			DBA::insert('post', $post_fields, Database::INSERT_IGNORE);

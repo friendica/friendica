@@ -198,11 +198,11 @@ class Page implements ArrayAccess
 	) {
 		// Default title: current module called
 		if (empty($this->page['title']) && $args->getModuleName()) {
-			$this->page['title'] = ucfirst($args->getModuleName());
+			$this->page['title'] = $l10n->t(ucfirst($args->getModuleName()));
 		}
 
-		// Prepend the sitename to the page title
-		$this->page['title'] = $config->get('config', 'sitename', '') . (!empty($this->page['title']) ? ' | ' . $this->page['title'] : '');
+		// Append the sitename to the page title
+		$this->page['title'] = (!empty($this->page['title']) ? $this->page['title'] . ' | ' : '') . $config->get('config', 'sitename', '');
 
 		if (!empty(Renderer::$theme['stylesheet'])) {
 			$stylesheet = Renderer::$theme['stylesheet'];

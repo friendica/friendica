@@ -157,10 +157,10 @@ class Pager
 				'text'  => $this->l10n->t('newer'),
 				'class' => 'previous' . ($this->getPage() == 1 ? ' disabled' : '')
 			],
-			'next'  => [
+			'next' => [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() + 1)),
 				'text'  => $this->l10n->t('older'),
-				'class' =>  'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
+				'class' => 'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
 			]
 		];
 
@@ -208,15 +208,15 @@ class Pager
 				'class' => $this->getPage() == 1 ? 'disabled' : ''
 			];
 
-			$numpages = $totalItemCount / $this->getItemsPerPage();
+			$numpages = (int) ceil($totalItemCount / $this->getItemsPerPage());
 
 			$numstart = 1;
-			$numstop = $numpages;
+			$numstop  = $numpages;
 
 			// Limit the number of displayed page number buttons.
 			if ($numpages > 8) {
-				$numstart = (($this->getPage() > 4) ? ($this->getPage() - 4) : 1);
-				$numstop = (($this->getPage() > ($numpages - 7)) ? $numpages : ($numstart + 8));
+				$numstart = ($this->getPage() > 4) ? ($this->getPage() - 4) : 1;
+				$numstop  = ($this->getPage() > ($numpages - 7)) ? $numpages : ($numstart + 8);
 			}
 
 			$pages = [];
@@ -237,25 +237,9 @@ class Pager
 				}
 			}
 
-			if (($totalItemCount % $this->getItemsPerPage()) != 0) {
-				if ($i == $this->getPage()) {
-					$pages[$i] = [
-						'url'   => '#',
-						'text'  => $i,
-						'class' => 'current active'
-					];
-				} else {
-					$pages[$i] = [
-						'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . $i),
-						'text'  => $i,
-						'class' => 'n'
-					];
-				}
-			}
-
 			$data['pages'] = $pages;
 
-			$lastpage = (($numpages > intval($numpages)) ? intval($numpages)+1 : $numpages);
+			$lastpage = (($numpages > intval($numpages)) ? intval($numpages) + 1 : $numpages);
 
 			$data['next'] = [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() + 1)),

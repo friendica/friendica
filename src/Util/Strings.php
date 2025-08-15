@@ -209,7 +209,7 @@ class Strings
 	{
 		// If this method is called for an infinite (== unlimited) amount of bytes:
 		if ($bytes == INF) {
-			return INF;
+			return 'INF';
 		}
 
 		$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
@@ -509,7 +509,7 @@ class Strings
 			function ($matches) use ($blocks) {
 				$return = $matches[0];
 				if (isset($blocks[intval($matches[1])])) {
-					$return = $blocks[$matches[1]];
+					$return = $blocks[intval($matches[1])];
 				}
 				return $return;
 			},
@@ -609,5 +609,25 @@ class Strings
 	public static function getTagArrayByString(string $tag_list): array
 	{
 		return explode(',', self::cleanTags($tag_list));
+	}
+
+	/**
+	 * Convert the first character of a string to uppercase.
+	 * Handles the missing base function mb_ucfirst() gracefully.
+	 *
+	 * @param string $string
+	 * @return string String with first character in uppercase
+	 */
+	public static function ucFirst(string $string): string
+	{
+		if (function_exists('mb_ucfirst')) {
+			return mb_ucfirst($string);
+		}
+
+		if (function_exists('mb_substr') && function_exists('mb_strtoupper')) {
+			return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+		}
+
+		return ucfirst($string);
 	}
 }

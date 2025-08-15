@@ -41,7 +41,6 @@ class Photo extends BaseFactory
 	 * @param int    $scale
 	 * @param int    $uid
 	 * @param string $type
-	 * @return Array
 	 */
 	public function createFromId(string $photo_id, int $scale = null, int $uid, string $type = 'json', bool $with_posts = true): array
 	{
@@ -66,7 +65,7 @@ class Photo extends BaseFactory
 		$data['id']       = $data['resource-id'];
 
 		if (is_int($scale)) {
-			$data['data'] = base64_encode(ModelPhoto::getImageDataForPhoto($data));
+			$data['data'] = base64_encode(ModelPhoto::getImageDataForPhoto($data) ?? '');
 		}
 
 		if ($type == 'xml') {

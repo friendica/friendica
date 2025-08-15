@@ -7,6 +7,7 @@
 
 namespace Friendica\Module\Admin\Addons;
 
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Module\BaseAdmin;
@@ -57,7 +58,12 @@ class Index extends BaseAdmin
 		$addons = [];
 
 		foreach ($addonHelper->getAvailableAddons() as $addonId) {
-			$addonInfo = $addonHelper->getAddonInfo($addonId);
+			try {
+				$addonInfo = $addonHelper->getAddonInfo($addonId);
+			} catch (InvalidAddonException $th) {
+				$this->logger->error('Invalid addon found: ' . $addonId, ['exception' => $th]);
+				continue;
+			}
 
 			$info = [
 				'name'        => $addonInfo->getName(),

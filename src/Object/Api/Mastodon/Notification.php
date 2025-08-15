@@ -44,9 +44,9 @@ class Notification extends BaseDataTransferObject
 	protected $created_at;
 	/** @var bool */
 	protected $dismissed;
-	/** @var Account */
+	/** @var array */
 	protected $account;
-	/** @var Status|null */
+	/** @var array|null */
 	protected $status = null;
 
 	/**

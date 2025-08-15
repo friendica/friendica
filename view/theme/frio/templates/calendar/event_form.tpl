@@ -187,8 +187,5 @@
 		enableDisableFinishDate();
 		// load bbcode autocomplete for the description textarea
 		$('#comment-edit-text-desc, #comment-edit-text-loc').bbco_autocomplete('bbcode');
-
-		// initiale autosize for the textareas
-		autosize($("textarea.text-autosize"));
 	});
 </script>

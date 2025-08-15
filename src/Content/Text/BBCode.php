@@ -913,13 +913,18 @@ class BBCode
 			default:
 				$text = ($is_quote_share ? "\n" : '');
 
-				$contact = Contact::getByURL($attributes['profile'], false, ['network']);
+				$contact = Contact::getByURL($attributes['profile'], false, ['network', 'url', 'alias']);
 				$network = $contact['network'] ?? Protocol::PHANTOM;
+				if (!empty($contact)) {
+					$profile = Contact::getProfileLink($contact);
+				} else {
+					$profile = $attributes['profile'];
+				}
 
 				$gsid = ContactSelector::getServerIdForProfile($attributes['profile']);
 				$tpl  = Renderer::getMarkupTemplate('shared_content.tpl');
 				$text .= self::SHARED_ANCHOR . Renderer::replaceMacros($tpl, [
-					'$profile'      => $attributes['profile'],
+					'$profile'      => $profile,
 					'$avatar'       => $attributes['avatar'],
 					'$author'       => $attributes['author'],
 					'$link'         => $attributes['link'],
@@ -1205,13 +1210,13 @@ class BBCode
 	 */
 	private static function normalizeVideoLinks(string $text): string
 	{
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/www.youtube.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/youtu.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-
-		$text = preg_replace("/\[vimeo\]https?:\/\/player.vimeo.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
 
 		return $text;
 	}
@@ -1832,7 +1837,7 @@ class BBCode
 		);
 
 		$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="width: $1px;" alt="" class="empty-description">', $text);
-		$text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="zrl" src="$3" style="width: $1px;" alt="" class="empty-description">', $text);
+		$text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="empty-description zrl" src="$3" style="width: $1px;" alt="">', $text);
 
 		$text = preg_replace_callback(
 			"/\[[iz]mg\=(.*?)\](.*?)\[\/[iz]mg\]/ism",
@@ -1984,12 +1989,25 @@ class BBCode
 				'<a href="$2" class="mention hashtag" rel="tag">$1<span>$3</span></a>',
 				$text
 			);
-		} elseif (in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::TWITTER_API])) {
+		} elseif (in_array($simple_html, [self::EXTERNAL, self::TWITTER_API])) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
 				'<bdi>$1<a href="$2" class="userinfo mention" title="$3">$3</a></bdi>',
 				$text
 			);
+		} elseif ($simple_html == self::INTERNAL) {
+			if (preg_match_all("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", $text, $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					$contact = Contact::getByURL($match[2], false, ['network', 'url', 'alias']);
+					if (!empty($contact)) {
+						$url = Contact::getProfileLink($contact);
+					} else {
+						$url = $match[2];
+					}
+					$text = str_replace($match[0], '<bdi>' . $match[1] . '<a href="' . $url . '" class="userinfo mention" title="' . $match[3] . '">' . $match[3] . '</a></bdi>', $text);
+				}
+
+			}
 		} elseif ($simple_html == self::MASTODON_API) {
 			$text = preg_replace(
 				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",

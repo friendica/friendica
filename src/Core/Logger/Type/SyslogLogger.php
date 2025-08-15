@@ -29,7 +29,7 @@ class SyslogLogger extends AbstractLogger
 
 	/**
 	 * Translates LogLevel log levels to syslog log priorities.
-	 * @var array
+	 * @var array<string,int>
 	 */
 	public const logLevels = [
 		LogLevel::DEBUG     => LOG_DEBUG,
@@ -60,39 +60,33 @@ class SyslogLogger extends AbstractLogger
 	/**
 	 * Indicates what logging options will be used when generating a log message
 	 * @see http://php.net/manual/en/function.openlog.php#refsect1-function.openlog-parameters
-	 *
-	 * @var int
 	 */
-	private $logOpts;
+	private int $logOpts;
 
 	/**
 	 * Used to specify what type of program is logging the message
 	 * @see http://php.net/manual/en/function.openlog.php#refsect1-function.openlog-parameters
-	 *
-	 * @var int
 	 */
-	private $logFacility;
+	private int $logFacility;
 
 	/**
 	 * The minimum loglevel at which this logger will be triggered
-	 * @var int
 	 */
-	private $logLevel;
+	private int $logLevel;
 
 	/**
 	 * A error message of the current operation
-	 * @var string
 	 */
-	private $errorMessage;
+	private string $errorMessage;
 
 	/**
 	 * {@inheritdoc}
 	 *
-	 * @param string $logLevel    The minimum loglevel at which this logger will be triggered
-	 * @param string $logOptions
-	 * @param string $logFacility
+	 * @param int $logLevel    The minimum loglevel at which this logger will be triggered
+	 * @param int $logOptions
+	 * @param int $logFacility
 	 */
-	public function __construct(string $channel, IHaveCallIntrospections $introspection, string $logLevel, string $logOptions, string $logFacility)
+	public function __construct(string $channel, IHaveCallIntrospections $introspection, int $logLevel, int $logOptions, int $logFacility)
 	{
 		parent::__construct($channel, $introspection);
 
@@ -166,7 +160,7 @@ class SyslogLogger extends AbstractLogger
 		restore_error_handler();
 
 		if (!$opened) {
-			throw new LoggerException(sprintf('Can\'t open syslog for ident "%s" and facility "%s": ' . $this->errorMessage, $this->channel, $this->logFacility));
+			throw new LoggerException(sprintf('Can\'t open syslog for ident "%s" and facility "%s": ' . $this->errorMessage, $this->channel, (string) $this->logFacility));
 		}
 
 		$this->syslogWrapper($priority, $message);
@@ -215,7 +209,7 @@ class SyslogLogger extends AbstractLogger
 		restore_error_handler();
 
 		if (!$written) {
-			throw new LoggerException(sprintf('Can\'t write into syslog for ident "%s" and facility "%s": ' . $this->errorMessage, $this->channel, $this->logFacility));
+			throw new LoggerException(sprintf('Can\'t write into syslog for ident "%s" and facility "%s": ' . $this->errorMessage, $this->channel, (string) $this->logFacility));
 		}
 	}
 }

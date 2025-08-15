@@ -80,7 +80,7 @@ class Database implements ICanWriteToStorage
 				throw new StorageException(sprintf('Database storage failed to update %s', $reference), 500, new Exception($this->dba->errorMessage(), $this->dba->errorNo()));
 			}
 
-			return $this->dba->lastInsertId();
+			return (string) $this->dba->lastInsertId();
 		}
 	}
 

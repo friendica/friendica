@@ -444,7 +444,7 @@ class L10n
 	 * @param bool $international If set to true, additionally the international language name is returned as well.
 	 * @return array
 	 */
-	public function getLanguageCodes(bool $international = false): array
+	public function getLanguageCodes(bool $international = false, bool $sentence_start_capitalization = false): array
 	{
 		$iso639 = new \Matriphe\ISO639\ISO639();
 
@@ -453,8 +453,11 @@ class L10n
 		$languages = [self::UNDETERMINED_LANGUAGE => $this->t('Undetermined')];
 
 		foreach ($this->getDetectableLanguages() as $code) {
-			$code     = $this->toISO6391($code);
-			$native   = $iso639->nativeByCode1($code);
+			$code   = $this->toISO6391($code);
+			$native = $iso639->nativeByCode1($code);
+			if ($sentence_start_capitalization) {
+				$native = Strings::ucFirst($native);
+			}
 			$language = $iso639->languageByCode1($code);
 			if ($native != $language && $international) {
 				$languages[$code] = $this->t('%s (%s)', $native, $language);

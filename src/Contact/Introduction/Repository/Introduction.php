@@ -10,9 +10,9 @@ namespace Friendica\Contact\Introduction\Repository;
 use Friendica\BaseRepository;
 use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
 use Friendica\Contact\Introduction\Exception\IntroductionPersistenceException;
-use Friendica\Contact\Introduction\Collection;
-use Friendica\Contact\Introduction\Entity;
-use Friendica\Contact\Introduction\Factory;
+use Friendica\Contact\Introduction\Collection\Introductions as IntroductionsCollection;
+use Friendica\Contact\Introduction\Entity\Introduction as IntroductionEntity;
+use Friendica\Contact\Introduction\Factory\Introduction as IntroductionFactory;
 use Friendica\Database\Database;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\DateTimeFormat;
@@ -20,37 +20,30 @@ use Psr\Log\LoggerInterface;
 
 class Introduction extends BaseRepository
 {
-	/** @var Factory\Introduction */
+	/** @var IntroductionFactory */
 	protected $factory;
 
 	protected static $table_name = 'intro';
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\Introduction $factory)
+	public function __construct(Database $database, LoggerInterface $logger, IntroductionFactory $factory)
 	{
 		parent::__construct($database, $logger, $factory);
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 *
-	 * @return Entity\Introduction
-	 *
 	 * @throws NotFoundException the underlying exception if there's no Introduction with the given conditions
 	 */
-	private function selectOne(array $condition, array $params = []): Entity\Introduction
+	private function selectOne(array $condition, array $params = []): IntroductionEntity
 	{
-		return parent::_selectOne($condition, $params);
+		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	/**
 	 * Converts a given Introduction into a DB compatible row array
-	 *
-	 * @param Entity\Introduction $introduction
-	 *
-	 * @return array
 	 */
-	protected function convertToTableRow(Entity\Introduction $introduction): array
+	protected function convertToTableRow(IntroductionEntity $introduction): array
 	{
 		return [
 			'uid'         => $introduction->uid,
@@ -65,14 +58,9 @@ class Introduction extends BaseRepository
 	}
 
 	/**
-	 * @param int $id
-	 * @param int $uid
-	 *
-	 * @return Entity\Introduction
-	 *
 	 * @throws IntroductionNotFoundException in case there is no Introduction with this id
 	 */
-	public function selectOneById(int $id, int $uid): Entity\Introduction
+	public function selectOneById(int $id, int $uid): IntroductionEntity
 	{
 		try {
 			return $this->selectOne(['id' => $id, 'uid' => $uid]);
@@ -88,33 +76,30 @@ class Introduction extends BaseRepository
 	 * @param int|null $min_id
 	 * @param int|null $max_id
 	 * @param int      $limit
-	 *
-	 * @return Collection\Introductions
 	 */
-	public function selectForUser(int $uid, int $min_id = null, int $max_id = null, int $limit = self::LIMIT): Collection\Introductions
+	public function selectForUser(int $uid, ?int $min_id = null, ?int $max_id = null, int $limit = self::LIMIT): IntroductionsCollection
 	{
 		try {
 			$BaseCollection = parent::_selectByBoundaries(
 				['`uid` = ? AND NOT `ignore`',$uid],
 				['order' => ['id' => 'DESC']],
-				$min_id, $max_id, $limit);
+				$min_id,
+				$max_id,
+				$limit
+			);
 		} catch (\Exception $e) {
 			throw new IntroductionPersistenceException(sprintf('Cannot select Introductions for used %d', $uid), $e);
 		}
 
-		return new Collection\Introductions($BaseCollection->getArrayCopy(), $BaseCollection->getTotalCount());
+		return new IntroductionsCollection($BaseCollection->getArrayCopy(), $BaseCollection->getTotalCount());
 	}
 
 	/**
 	 * Selects the introduction for a given contact
 	 *
-	 * @param int $cid
-	 *
-	 * @return Entity\Introduction
-	 *
 	 * @throws IntroductionNotFoundException in case there is not Introduction for this contact
 	 */
-	public function selectForContact(int $cid): Entity\Introduction
+	public function selectForContact(int $cid): IntroductionEntity
 	{
 		try {
 			return $this->selectOne(['contact-id' => $cid]);
@@ -150,13 +135,9 @@ class Introduction extends BaseRepository
 	}
 
 	/**
-	 * @param Entity\Introduction $introduction
-	 *
-	 * @return bool
-	 *
 	 * @throws IntroductionPersistenceException in case the underlying storage cannot delete the Introduction
 	 */
-	public function delete(Entity\Introduction $introduction): bool
+	public function delete(IntroductionEntity $introduction): bool
 	{
 		if (!$introduction->id) {
 			return false;
@@ -170,13 +151,9 @@ class Introduction extends BaseRepository
 	}
 
 	/**
-	 * @param Entity\Introduction $introduction
-	 *
-	 * @return Entity\Introduction
-	 *
 	 * @throws IntroductionPersistenceException In case the underlying storage cannot save the Introduction
 	 */
-	public function save(Entity\Introduction $introduction): Entity\Introduction
+	public function save(IntroductionEntity $introduction): IntroductionEntity
 	{
 		try {
 			$fields = $this->convertToTableRow($introduction);

@@ -43,14 +43,10 @@ steps:
       - apt-get update -q
       - DEBIAN_FRONTEND=noninteractive apt-get install -q -y git
       - if [ ! -z "$${CI_COMMIT_PULL_REQUEST}" ]; then
-          git fetch --no-tags origin ${CI_COMMIT_TARGET_BRANCH};
-          CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB $(git merge-base FETCH_HEAD origin/${CI_COMMIT_TARGET_BRANCH})..${CI_COMMIT_SHA})";
+          git fetch --no-tags --unshallow origin ${CI_COMMIT_TARGET_BRANCH}:refs/remotes/origin/${CI_COMMIT_TARGET_BRANCH};
+          CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB $(git merge-base ${CI_COMMIT_SHA} origin/${CI_COMMIT_TARGET_BRANCH})..${CI_COMMIT_SHA})";
         else
           CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB ${CI_COMMIT_SHA})";
         fi
-      - if ! echo "$${CHANGED_FILES}" | grep -qE "^(\\.php-cs-fixer(\\.dist)?\\.php|composer\\.lock)$"; then
-          EXTRA_ARGS=$(printf -- '--path-mode=intersection\n--\n%s' "$${CHANGED_FILES}");
-        else
-          EXTRA_ARGS='';
-        fi
+      - EXTRA_ARGS="--path-mode=intersection -- $${CHANGED_FILES}";
       - ./bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php -v --diff --using-cache=no $${EXTRA_ARGS}

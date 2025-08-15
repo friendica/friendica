@@ -100,7 +100,7 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 	/** {@inheritDoc} */
 	public function getReturnCode(): string
 	{
-		return $this->getStatusCode();
+		return (string) $this->getStatusCode();
 	}
 
 	/** {@inheritDoc} */

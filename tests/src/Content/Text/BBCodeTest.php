@@ -73,51 +73,51 @@ class BBCodeTest extends FixtureTestCase
 			],
 			'no-protocol' => [
 				'data'       => 'example.com/path',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-protocol' => [
 				'data'       => 'ftp://example.com',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-domain-without-path' => [
 				'data'       => 'http://example',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-domain-with-path' => [
 				'data'       => 'http://example/path',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-domain-start' => [
 				'data'       => "http://\nexample.com",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-domain-end' => [
 				'data'       => "http://example\n.com",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-tld' => [
 				'data'       => "http://example.\ncom",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-end' => [
 				'data'       => "http://example.com\ntest",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6901' => [
 				'data'       => "http://example.com<ul>",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-7150' => [
 				'data'       => html_entity_decode('http://example.com&nbsp;', ENT_QUOTES, 'UTF-8'),
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-7271-query-string-brackets' => [
 				'data'       => 'https://example.com/search?q=square+brackets+[url]',
-				'assertHTML' => true
+				'assertHTML' => true,
 			],
 			'bug-7271-path-brackets' => [
 				'data'       => 'http://example.com/path/to/file[3].html',
-				'assertHTML' => true
+				'assertHTML' => true,
 			],
 		];
 	}
@@ -215,19 +215,19 @@ class BBCodeTest extends FixtureTestCase
 			],
 			'bug-9611-purify-xss-nobb' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[nobb]<span onmouseover="alert(0)">dare to move your mouse here</span>[/nobb]'
+				'text'         => '[nobb]<span onmouseover="alert(0)">dare to move your mouse here</span>[/nobb]',
 			],
 			'bug-9611-purify-xss-noparse' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[noparse]<span onmouseover="alert(0)">dare to move your mouse here</span>[/noparse]'
+				'text'         => '[noparse]<span onmouseover="alert(0)">dare to move your mouse here</span>[/noparse]',
 			],
 			'bug-9611-purify-xss-attributes' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[color="onmouseover=alert(0) style="]dare to move your mouse here[/color]'
+				'text'         => '[color="onmouseover=alert(0) style="]dare to move your mouse here[/color]',
 			],
 			'bug-9611-purify-attributes-correct' => [
 				'expectedHTML' => '<span style="color:#FFFFFF;">dare to move your mouse here</span>',
-				'text'         => '[color=FFFFFF]dare to move your mouse here[/color]'
+				'text'         => '[color=FFFFFF]dare to move your mouse here[/color]',
 			],
 			'bug-9639-span-classes' => [
 				'expectedHTML' => '<span class="arbitrary classes">Test</span>',
@@ -308,11 +308,16 @@ Karl Marx - Die ursprüngliche Akkumulation
 			],
 			'bug-12701-quotes' => [
 				'expected' => '[![abc"fgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png)](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
-				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abc"fgh[/img][/url]'
+				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abc"fgh[/img][/url]',
 			],
 			'bug-12701-no-quotes' => [
 				'expected' => '[![abcfgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png "abcfgh")](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
-				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]'
+				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]',
+			],
+			/** @see https://github.com/friendica/friendica/pull/14908 */
+			'task-14908-strip-tags' => [
+				'expected' => 'Norddeutscher Bürger !\[Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)\](/rscamo/……)',
+				'text'     => '[class=postbox-ocean]Norddeutscher Bürger ![Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)](/rscamo/……)[/class]',
 			],
 		];
 	}
@@ -345,7 +350,7 @@ Karl Marx - Die ursprüngliche Akkumulation
 			'bug-10692-start-line' => [
 				'#[url=https://friendica.local/search?tag=L160]L160[/url]',
 				'#L160',
-			]
+			],
 		];
 	}
 
@@ -358,6 +363,62 @@ Karl Marx - Die ursprüngliche Akkumulation
 	public function testExpandTags(string $expected, string $text)
 	{
 		$actual = BBCode::expandTags($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataExpandVideoLinks(): array
+	{
+		return [
+			/** @see https://github.com/friendica/friendica/pull/14940 */
+			'task-14940-youtube-watch-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-watch-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-shorts-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/shorts/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-shorts-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/shorts/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-embed-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/embed/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-embed-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/embed/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-mobile' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://m.youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-vimeo' => [
+				'expectedBBCode' => '[url=https://vimeo.com/2345345]https://vimeo.com/2345345[/url]',
+				'text'           => '[vimeo]https://vimeo.com/2345345[/vimeo]',
+			],
+			'task-14940-player-vimeo' => [
+				'expectedBBCode' => '[url=https://vimeo.com/2345345]https://vimeo.com/2345345[/url]',
+				'text'           => '[vimeo]https://player.vimeo.com/video/2345345[/vimeo]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataExpandVideoLinks
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testExpandVideoLinks(string $expected, string $text)
+	{
+		$actual = BBCode::expandVideoLinks($text);
 
 		self::assertEquals($expected, $actual);
 	}
@@ -612,6 +673,29 @@ Lucas: For the right price, yes.[/share]',
 	public function testFetchShareAttributes(array $expected, string $text)
 	{
 		$actual = BBCode::fetchShareAttributes($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataProfileLink(): array
+	{
+		return [
+			'mention' => [
+				'expected' => 'Test 1: <bdi>@<a href="https://domain.tld/~remotecontact" class="userinfo mention" title="Remote contact">Remote contact</a></bdi>',
+				'text'     => 'Test 1: @[url=https://domain.tld/profile/remotecontact]Remote contact[/url]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataProfileLink
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testProfileLink(string $expected, string $text)
+	{
+		$actual = BBCode::convertForUriId(0, $text);
 
 		self::assertEquals($expected, $actual);
 	}

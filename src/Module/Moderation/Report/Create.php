@@ -26,7 +26,6 @@ use Friendica\Moderation\Entity\Report;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -221,11 +220,19 @@ class Create extends BaseModule
 			}
 
 			if (DI::mode()->isMobile()) {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-					DI::config()->get('system', 'itemspage_network_mobile'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_mobile_network',
+					DI::config()->get('system', 'itemspage_network_mobile')
+				);
 			} else {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-					DI::config()->get('system', 'itemspage_network'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_network',
+					DI::config()->get('system', 'itemspage_network')
+				);
 			}
 
 			$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
@@ -260,6 +267,11 @@ class Create extends BaseModule
 		$contact = Contact::getById($request['cid'], ['url']);
 
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/summary.tpl');
+
+		$forward_translation = $this->t('Would you like to forward this report to the remote server?');
+		// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
+		$forward_translation = $this->t('Would you ike to forward this report to the remote server?');
+
 		return Renderer::replaceMacros($tpl, [
 			'$l10n' => [
 				'title'                => $this->t('Create Moderation Report'),
@@ -280,7 +292,7 @@ class Create extends BaseModule
 			'$block'    => ['contact_action', $this->t('Block contact'), self::CONTACT_ACTION_BLOCK, $this->t("Their posts won't appear in your Network page anymore, but their replies can appear in forum threads, with their content collapsed by default. They cannot follow you but still can have access to your public posts by other means.")],
 
 			'$display_forward' => !$this->baseUrl->isLocalUrl($contact['url']),
-			'$forward'         => ['report_forward', $this->t('Forward report'), self::CONTACT_ACTION_BLOCK, $this->t('Would you ike to forward this report to the remote server?')],
+			'$forward'         => ['report_forward', $this->t('Forward report'), self::CONTACT_ACTION_BLOCK, $forward_translation],
 
 			'$summary' => $this->getAside($request),
 		]);
@@ -294,12 +306,18 @@ class Create extends BaseModule
 		}
 
 		switch ($request['category'] ?? 0) {
-			case Report::CATEGORY_SPAM:      $category = $this->t('Spam'); break;
-			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content'); break;
-			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety'); break;
-			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior'); break;
-			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation'); break;
-			case Report::CATEGORY_OTHER:     $category = $this->t('Other'); break;
+			case Report::CATEGORY_SPAM:      $category = $this->t('Spam');
+				break;
+			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content');
+				break;
+			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety');
+				break;
+			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior');
+				break;
+			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation');
+				break;
+			case Report::CATEGORY_OTHER:     $category = $this->t('Other');
+				break;
 
 			default: $category = '';
 		}

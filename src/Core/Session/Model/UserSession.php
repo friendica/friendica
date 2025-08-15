@@ -101,7 +101,7 @@ class UserSession implements IHandleUserSessions
 	public function getUserIDForVisitorContactID(int $cid): int
 	{
 		if (empty($this->session->get('remote'))) {
-			return false;
+			return 0;
 		}
 
 		return array_search($cid, $this->session->get('remote'));
@@ -142,7 +142,7 @@ class UserSession implements IHandleUserSessions
 	{
 		return !$this->session->get('authenticated', false);
 	}
-	
+
 	/** {@inheritDoc} */
 	public function setVisitorsContacts(string $my_url)
 	{

@@ -7,59 +7,54 @@
 
 namespace Friendica\Contact\LocalRelationship\Repository;
 
-use Friendica\Contact\LocalRelationship\Entity;
-use Friendica\Contact\LocalRelationship\Exception;
-use Friendica\Contact\LocalRelationship\Factory;
+use Exception;
+use Friendica\BaseRepository;
+use Friendica\Contact\LocalRelationship\Entity\LocalRelationship as LocalRelationshipEntity;
+use Friendica\Contact\LocalRelationship\Exception\LocalRelationshipPersistenceException;
+use Friendica\Contact\LocalRelationship\Factory\LocalRelationship as LocalRelationshipFactory;
 use Friendica\Database\Database;
-use Friendica\Network\HTTPException;
+use Friendica\Network\HTTPException\NotFoundException;
 use Psr\Log\LoggerInterface;
 
-class LocalRelationship extends \Friendica\BaseRepository
+class LocalRelationship extends BaseRepository
 {
 	protected static $table_name = 'user-contact';
 
-	/** @var Factory\LocalRelationship */
+	/** @var LocalRelationshipFactory */
 	protected $factory;
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\LocalRelationship $factory)
+	public function __construct(Database $database, LoggerInterface $logger, LocalRelationshipFactory $factory)
 	{
 		parent::__construct($database, $logger, $factory);
 	}
 
 	/**
-	 * @param int $uid
-	 * @param int $cid
-	 * @return Entity\LocalRelationship
-	 * @throws HTTPException\NotFoundException
+	 * @throws NotFoundException
 	 */
-	public function selectForUserContact(int $uid, int $cid): Entity\LocalRelationship
+	public function selectForUserContact(int $uid, int $cid): LocalRelationshipEntity
 	{
-		return $this->_selectOne(['uid' => $uid, 'cid' => $cid]);
+		$fields = $this->_selectFirstRowAsArray(['uid' => $uid, 'cid' => $cid]);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	/**
 	 * Returns the existing local relationship between a user and a public contact or a default
 	 * relationship if it doesn't.
 	 *
-	 * @param int $uid
-	 * @param int $cid
-	 * @return Entity\LocalRelationship
-	 * @throws HTTPException\NotFoundException
+	 * @throws NotFoundException
 	 */
-	public function getForUserContact(int $uid, int $cid): Entity\LocalRelationship
+	public function getForUserContact(int $uid, int $cid): LocalRelationshipEntity
 	{
 		try {
 			return $this->selectForUserContact($uid, $cid);
-		} catch (HTTPException\NotFoundException $e) {
+		} catch (NotFoundException $e) {
 			return $this->factory->createFromTableRow(['uid' => $uid, 'cid' => $cid]);
 		}
 	}
 
 	/**
-	 * @param int $uid
-	 * @param int $cid
-	 * @return bool
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function existsForUserContact(int $uid, int $cid): bool
 	{
@@ -68,12 +63,8 @@ class LocalRelationship extends \Friendica\BaseRepository
 
 	/**
 	 * Converts a given local relationship into a DB compatible row array
-	 *
-	 * @param Entity\LocalRelationship $localRelationship
-	 *
-	 * @return array
 	 */
-	protected function convertToTableRow(Entity\LocalRelationship $localRelationship): array
+	protected function convertToTableRow(LocalRelationshipEntity $localRelationship): array
 	{
 		return [
 			'uid'                       => $localRelationship->userId,
@@ -97,13 +88,9 @@ class LocalRelationship extends \Friendica\BaseRepository
 	}
 
 	/**
-	 * @param Entity\LocalRelationship $localRelationship
-	 *
-	 * @return Entity\LocalRelationship
-	 *
-	 * @throws Exception\LocalRelationshipPersistenceException In case the underlying storage cannot save the LocalRelationship
+	 * @throws LocalRelationshipPersistenceException In case the underlying storage cannot save the LocalRelationship
 	 */
-	public function save(Entity\LocalRelationship $localRelationship): Entity\LocalRelationship
+	public function save(LocalRelationshipEntity $localRelationship): LocalRelationshipEntity
 	{
 		try {
 			$fields = $this->convertToTableRow($localRelationship);
@@ -111,8 +98,8 @@ class LocalRelationship extends \Friendica\BaseRepository
 			$this->db->insert(self::$table_name, $fields, Database::INSERT_UPDATE);
 
 			return $localRelationship;
-		} catch (\Exception $exception) {
-			throw new Exception\LocalRelationshipPersistenceException(sprintf('Cannot insert/update the local relationship %d for user %d', $localRelationship->contactId, $localRelationship->userId), $exception);
+		} catch (Exception $exception) {
+			throw new LocalRelationshipPersistenceException(sprintf('Cannot insert/update the local relationship %d for user %d', $localRelationship->contactId, $localRelationship->userId), $exception);
 		}
 	}
 }

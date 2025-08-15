@@ -225,19 +225,18 @@ class Crypto
 	}
 
 	/**
-	 *
 	 * Ported from Hubzilla: https://framagit.org/hubzilla/core/blob/master/include/crypto.php
 	 *
 	 * @param array $data ['iv' => $iv, 'key' => $key, 'alg' => $alg, 'data' => $data]
 	 * @param string $prvkey The private key used for decryption.
 	 *
-	 * @return string|boolean The decrypted string or false on failure.
+	 * @return string|false The decrypted string or false on failure.
 	 * @throws \Exception
 	 */
 	public static function unencapsulate(array $data, $prvkey)
 	{
 		if (!$data) {
-			return;
+			return false;
 		}
 
 		$alg = $data['alg'] ?? 'aes256cbc';

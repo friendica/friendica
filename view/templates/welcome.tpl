@@ -12,8 +12,8 @@
 		<h4>{{$started nofilter}}</h4>
 		<ul>
 			<li>
-				<a target="newmember" href="help/Quick-Start-guide">{{$quickstart_link}}</a><br />
-				{{$quickstart_txt nofilter}}
+				<a target="newmember" href="help/Quick-Start-guide">{{$walkthrough_link}}</a><br />
+				{{$walkthrough_txt nofilter}}
 			</li>
 		</ul>
 		<h4>{{$settings nofilter}}</h4>

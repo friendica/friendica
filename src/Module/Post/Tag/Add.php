@@ -153,9 +153,15 @@ EOT;
 
 		$post['id'] = $post_id;
 
-		$post = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::POST_LOCAL_END, $post)
+		$hook_data = [
+			'item' => $post,
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data)
 		)->getArray();
+
+		$post = $hook_data['item'] ?? $post;
 
 		$post = Post::selectFirst(['uri-id', 'uid'], ['id' => $post_id]);
 

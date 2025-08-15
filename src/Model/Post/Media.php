@@ -25,6 +25,7 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ATProtocol;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
@@ -204,6 +205,12 @@ class Media
 					if (empty($media['size'])) {
 						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
 					}
+					if (empty($media['modified']) && !empty($curlResult->getHeader('Last-Modified')[0])) {
+						$media['modified'] = DateTimeFormat::utc($curlResult->getHeader('Last-Modified')[0]);
+						if (empty($media['published'])) {
+							$media['published'] = $media['modified'];
+						}
+					}
 				} else {
 					DI::logger()->notice('Could not fetch head', ['media' => $media, 'code' => $curlResult->getReturnCode()]);
 				}
@@ -243,7 +250,7 @@ class Media
 			$media = self::addAccount($media);
 		}
 
-		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || self::isFederatedServer($media['url'])) {
+		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || (self::isFederatedServer($media['url']) && !in_array($media['type'], [self::HLS, self::AUDIO, self::VIDEO]))) {
 			$media = self::addActivity($media);
 		}
 
@@ -251,6 +258,9 @@ class Media
 			$media = self::addPage($media);
 		}
 
+		if (empty($media['name'])) {
+			$media['name'] = basename(parse_url($media['url'], PHP_URL_PATH));
+		}
 		return $media;
 	}
 
@@ -542,7 +552,7 @@ class Media
 			$type = self::TEXT;
 		} elseif (($filetype == 'application') && ($subtype == 'x-bittorrent')) {
 			$type = self::TORRENT;
-		} elseif (($filetype == 'application') && ($subtype == 'vnd.apple.mpegurl')) {
+		} elseif (($filetype == 'application') && in_array($subtype, ['vnd.apple.mpegurl', 'x-mpegurl'])) {
 			$type = self::HLS;
 		} elseif (($filetype == 'application') && ($subtype == 'activity+json')) {
 			$type = self::ACTIVITY;

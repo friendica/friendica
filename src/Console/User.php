@@ -106,21 +106,21 @@ HELP;
 			case 'password':
 				return $this->password();
 			case 'add':
-				return $this->addUser();
+				return ($this->addUser()) ? 0 : 1;
 			case 'allow':
-				return $this->pendingUser(true);
+				return ($this->pendingUser(true)) ? 0 : 1;
 			case 'deny':
-				return $this->pendingUser(false);
+				return ($this->pendingUser(false)) ? 0 : 1;
 			case 'block':
-				return $this->blockUser(true);
+				return ($this->blockUser(true)) ? 0 : 1;
 			case 'unblock':
-				return $this->blockUser(false);
+				return ($this->blockUser(false)) ? 0 : 1;
 			case 'delete':
-				return $this->deleteUser();
+				return ($this->deleteUser()) ? 0 : 1;
 			case 'list':
-				return $this->listUser();
+				return ($this->listUser()) ? 0 : 1;
 			case 'search':
-				return $this->searchUser();
+				return ($this->searchUser()) ? 0 : 1;
 			case 'config':
 				return ($this->configUser()) ? 0 : 1;
 			default:
@@ -178,7 +178,7 @@ HELP;
 	 *
 	 * @throws \Exception
 	 */
-	private function password()
+	private function password(): int
 	{
 		$user = $this->getUserByNick(1);
 
@@ -212,7 +212,7 @@ HELP;
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private function addUser()
+	private function addUser(): bool
 	{
 		$name   = $this->getArgument(1);
 		$nick   = $this->getArgument(2);

@@ -45,25 +45,25 @@ class Security
 				return true;
 			} elseif ($verified === 1) {
 				return false;
+			}
+
+			$user = User::getById($owner);
+			if (!$user || $user['blockwall']) {
+				$verified = 1;
+				return false;
+			}
+
+			$contact = Contact::getById($cid);
+			if (!is_array($contact) || $contact['blocked'] || $contact['readonly'] || $contact['pending']) {
+				$verified = 1;
+				return false;
+			}
+
+			if (in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) || ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY)) {
+				$verified = 2;
+				return true;
 			} else {
-				$user = User::getById($owner);
-				if (!$user || $user['blockwall']) {
-					$verified = 1;
-					return false;
-				}
-
-				$contact = Contact::getById($cid);
-				if ($contact || $contact['blocked'] || $contact['readonly'] || $contact['pending']) {
-					$verified = 1;
-					return false;
-				}
-
-				if (in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND]) || ($user['page-flags'] == User::PAGE_FLAGS_COMMUNITY)) {
-					$verified = 2;
-					return true;
-				} else {
-					$verified = 1;
-				}
+				$verified = 1;
 			}
 		}
 
@@ -79,42 +79,34 @@ class Security
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, bool $accessible = false)
 	{
-		$local_user = DI::userSession()->getLocalUserId();
+		$local_user     = DI::userSession()->getLocalUserId();
 		$remote_contact = DI::userSession()->getRemoteContactID($owner_id);
-		$acc_sql = '';
+		$acc_sql        = '';
 
 		if ($accessible) {
 			$acc_sql = ' OR `accessible`';
 		}
 
-		/*
-		 * Construct permissions
-		 *
-		 * default permissions - anonymous user
-		 */
+		// Construct permissions: default permissions - anonymous user
 		$sql = " AND (allow_cid = ''
 			 AND allow_gid = ''
 			 AND deny_cid  = ''
 			 AND deny_gid  = ''" . $acc_sql . ") ";
 
-		/*
-		 * Profile owner - everything is visible
-		 */
 		if ($local_user && $local_user == $owner_id) {
+			// Profile owner - everything is visible
 			$sql = '';
-		/*
-		 * Authenticated visitor. Load the circles the visitor belongs to.
-		 */
 		} elseif ($remote_contact) {
+			// Authenticated visitor. Load the circles the visitor belongs to.
 			$circleIds = '<<>>'; // should be impossible to match
 
 			foreach (Circle::getIdsByContactId($remote_contact) as $circleId) {
-				$circleIds .= '|<' . intval($circleId) . '>';
+				$circleIds .= '|<' . $circleId . '>';
 			}
 
 			$sql = sprintf(
-				" AND (NOT (deny_cid REGEXP '<%d>' OR deny_gid REGEXP '%s')
-				  AND (allow_cid REGEXP '<%d>' OR allow_gid REGEXP '%s'
+				" AND (NOT (CAST(deny_cid AS BINARY) REGEXP BINARY '<%d>' OR CAST(deny_gid AS BINARY) REGEXP BINARY '%s')
+				  AND (CAST(allow_cid AS BINARY) REGEXP BINARY '<%d>' OR CAST(allow_gid AS BINARY) REGEXP BINARY '%s'
 				  OR (allow_cid = '' AND allow_gid = ''))" . $acc_sql . ") ",
 				intval($remote_contact),
 				DBA::escape($circleIds),

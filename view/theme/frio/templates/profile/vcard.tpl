@@ -5,18 +5,13 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="vcard h-card widget">
-
 	<div id="profile-photo-wrapper">
-		<a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" /></a>
-		<div class="tool visible-lg visible-md">
-			{{if $profile.edit}}
-				<div class="action">
-					<a class="" href="{{$profile.edit.0}}" title="{{$profile.edit.3}}"><i
-							class="fa fa-pencil-square-o"></i></a>
-				</div>
+		<a class="vcard-anchor" href="{{$picture_dest_url}}" style="position: relative;">
+			<img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" />
+			{{if $change_profile_picture_text }}
+				<div id="change-profile-picture">{{$change_profile_picture_text}}</div>
 			{{/if}}
-		</div>
-
+		</a>
 	</div>
 
 	{{* The short information which will appended to the second navbar by scrollspy *}}

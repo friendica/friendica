@@ -17,7 +17,6 @@ return [
 		'temppath' => '/tmp/friendica.local',
 		'theme' => 'frio',
 		'url' => 'https://friendica.local',
-		'urlpath' => '',
 		'build' => 1508,
 		'maintenance' => false,
 		'dbupdate' => 1,

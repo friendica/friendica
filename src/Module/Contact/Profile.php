@@ -7,31 +7,37 @@
 
 namespace Friendica\Module\Contact;
 
-use Friendica\App;
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\BaseModule;
-use Friendica\Contact\LocalRelationship;
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship as LocalRelationshipEntity;
+use Friendica\Contact\LocalRelationship\Repository\LocalRelationship as LocalRelationshipRepository;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Circle;
-use Friendica\Model\Contact;
-use Friendica\Module;
+use Friendica\Model\Contact as ContactModel;
+use Friendica\Model\Contact\User as UserContact;
+use Friendica\Module\Contact as ContactModule;
 use Friendica\Module\Response;
+use Friendica\Module\Security\Login;
 use Friendica\Navigation\SystemMessages;
-use Friendica\Network\HTTPException;
-use Friendica\User\Settings;
+use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\User\Settings\Repository\UserGServer as UserGServerRepository;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,9 +45,9 @@ use Psr\Log\LoggerInterface;
  */
 class Profile extends BaseModule
 {
-	/** @var LocalRelationship\Repository\LocalRelationship */
+	/** @var LocalRelationshipRepository */
 	private $localRelationship;
-	/** @var App\Page */
+	/** @var Page */
 	private $page;
 	/** @var IManageConfigValues */
 	private $config;
@@ -51,11 +57,28 @@ class Profile extends BaseModule
 	private $systemMessages;
 	/** @var Database */
 	private $db;
-	/** @var Settings\Repository\UserGServer */
+	/** @var UserGServerRepository */
 	private $userGServer;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Settings\Repository\UserGServer $userGServer, Database $db, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, LocalRelationship\Repository\LocalRelationship $localRelationship, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Page $page, IManageConfigValues $config, array $server, array $parameters = [])
-	{
+	public function __construct(
+		UserGServerRepository $userGServer,
+		EventDispatcherInterface $eventDispatcher,
+		Database $db,
+		SystemMessages $systemMessages,
+		IHandleUserSessions $session,
+		L10n $l10n,
+		LocalRelationshipRepository $localRelationship,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		Page $page,
+		IManageConfigValues $config,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->localRelationship = $localRelationship;
@@ -65,6 +88,7 @@ class Profile extends BaseModule
 		$this->systemMessages    = $systemMessages;
 		$this->db                = $db;
 		$this->userGServer       = $userGServer;
+		$this->eventDispatcher   = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -77,12 +101,14 @@ class Profile extends BaseModule
 
 		// Backward compatibility: The update still needs a user-specific contact ID
 		// Change to user-contact table check by version 2022.03
-		$ucid = Contact::getUserContactId($contact_id, $this->session->getLocalUserId());
+		$ucid = ContactModel::getUserContactId($contact_id, $this->session->getLocalUserId());
 		if (!$ucid || !$this->db->exists('contact', ['id' => $ucid, 'deleted' => false])) {
 			return;
 		}
 
-		Hook::callAll('contact_edit_post', $request);
+		$request = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::EDIT_CONTACT_POST, $request),
+		)->getArray();
 
 		$fields = [];
 
@@ -120,14 +146,14 @@ class Profile extends BaseModule
 		}
 
 		if (isset($request['channel_frequency'])) {
-			Contact\User::setChannelFrequency($ucid, $this->session->getLocalUserId(), $request['channel_frequency']);
+			UserContact::setChannelFrequency($ucid, $this->session->getLocalUserId(), $request['channel_frequency']);
 		}
 
 		if (isset($request['channel_only'])) {
-			Contact\User::setChannelOnly($ucid, $this->session->getLocalUserId(), $request['channel_only']);
+			UserContact::setChannelOnly($ucid, $this->session->getLocalUserId(), $request['channel_only']);
 		}
 
-		if (!Contact::update($fields, ['id' => $ucid, 'uid' => $this->session->getLocalUserId()])) {
+		if (!ContactModel::update($fields, ['id' => $ucid, 'uid' => $this->session->getLocalUserId()])) {
 			$this->systemMessages->addNotice($this->t('Failed to update contact record.'));
 		}
 		$this->baseUrl->redirect('contact/' . $contact_id);
@@ -136,43 +162,43 @@ class Profile extends BaseModule
 	protected function content(array $request = []): string
 	{
 		if (!$this->session->getLocalUserId()) {
-			return Module\Security\Login::form($_SERVER['REQUEST_URI']);
+			return Login::form($_SERVER['REQUEST_URI']);
 		}
 
 		// Backward compatibility: Ensure to use the public contact when the user contact is provided
 		// Remove by version 2022.03
-		$data = Contact::getPublicAndUserContactID(intval($this->parameters['id']), $this->session->getLocalUserId());
+		$data = ContactModel::getPublicAndUserContactID(intval($this->parameters['id']), $this->session->getLocalUserId());
 		if (empty($data)) {
-			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
+			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
-		$contact = Contact::getById($data['public']);
+		$contact = ContactModel::getById($data['public']);
 		if (!$this->db->isResult($contact)) {
-			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
+			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
 		// Fetch the protocol from the user's contact.
 		if ($data['user']) {
-			$usercontact = Contact::getById($data['user'], ['network', 'protocol']);
+			$usercontact = ContactModel::getById($data['user'], ['network', 'protocol']);
 			if ($this->db->isResult($usercontact)) {
 				$contact['network']  = $usercontact['network'];
 				$contact['protocol'] = $usercontact['protocol'];
 			}
 		}
 
-		if (empty($contact['network']) && Contact::isLocal($contact['url']) ) {
+		if (empty($contact['network']) && ContactModel::isLocal($contact['url']) ) {
 			$contact['network']  = Protocol::DFRN;
 			$contact['protocol'] = Protocol::ACTIVITYPUB;
 		}
 
 		// Don't display contacts that are about to be deleted
 		if ($contact['deleted'] || $contact['network'] == Protocol::PHANTOM) {
-			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
+			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
 		$localRelationship = $this->localRelationship->getForUserContact($this->session->getLocalUserId(), $contact['id']);
 
-		if ($localRelationship->rel === Contact::SELF) {
+		if ($localRelationship->rel === ContactModel::SELF) {
 			$this->baseUrl->redirect('profile/' . $contact['nick'] . '/profile');
 		}
 
@@ -180,8 +206,8 @@ class Profile extends BaseModule
 			self::checkFormSecurityTokenRedirectOnError('contact/' . $contact['id'], 'contact_action', 't');
 
 			$cmd = $this->parameters['action'];
-			if ($cmd === 'update' && $localRelationship->rel !== Contact::NOTHING) {
-				Module\Contact::updateContactFromPoll($contact['id']);
+			if ($cmd === 'update' && $localRelationship->rel !== ContactModel::NOTHING) {
+				ContactModule::updateContactFromPoll($contact['id']);
 			}
 
 			if ($cmd === 'updateprofile') {
@@ -191,12 +217,12 @@ class Profile extends BaseModule
 			if ($cmd === 'block') {
 				if ($localRelationship->blocked) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setBlocked($contact['id'], $this->session->getLocalUserId(), false);
+					UserContact::setBlocked($contact['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been unblocked');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setBlocked($contact['id'], $this->session->getLocalUserId(), true);
+					UserContact::setBlocked($contact['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been blocked');
 				}
 
@@ -207,12 +233,12 @@ class Profile extends BaseModule
 			if ($cmd === 'ignore') {
 				if ($localRelationship->ignored) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setIgnored($contact['id'], $this->session->getLocalUserId(), false);
+					UserContact::setIgnored($contact['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been unignored');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setIgnored($contact['id'], $this->session->getLocalUserId(), true);
+					UserContact::setIgnored($contact['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been ignored');
 				}
 
@@ -223,12 +249,12 @@ class Profile extends BaseModule
 			if ($cmd === 'collapse') {
 				if ($localRelationship->collapsed) {
 					// @TODO Backward compatibility, replace with $localRelationship->unblock()
-					Contact\User::setCollapsed($contact['id'], $this->session->getLocalUserId(), false);
+					UserContact::setCollapsed($contact['id'], $this->session->getLocalUserId(), false);
 
 					$message = $this->t('Contact has been uncollapsed');
 				} else {
 					// @TODO Backward compatibility, replace with $localRelationship->block()
-					Contact\User::setCollapsed($contact['id'], $this->session->getLocalUserId(), true);
+					UserContact::setCollapsed($contact['id'], $this->session->getLocalUserId(), true);
 					$message = $this->t('Contact has been collapsed');
 				}
 
@@ -239,10 +265,10 @@ class Profile extends BaseModule
 			$this->baseUrl->redirect('contact/' . $contact['id']);
 		}
 
-		$vcard_widget  = Widget\VCard::getHTML($contact);
+		$vcard_widget   = Widget\VCard::getHTML($contact);
 		$circles_widget = '';
 
-		if (!in_array($localRelationship->rel, [Contact::NOTHING, Contact::SELF])) {
+		if (!in_array($localRelationship->rel, [ContactModel::NOTHING, ContactModel::SELF])) {
 			$circles_widget = Circle::sidebarWidget('contact', 'circle', 'full', 'everyone', $data['user']);
 		}
 
@@ -257,9 +283,15 @@ class Profile extends BaseModule
 		]);
 
 		switch ($localRelationship->rel) {
-			case Contact::FRIEND:   $relation_text = $this->t('You are mutual friends with %s', $contact['name']); break;
-			case Contact::FOLLOWER:	$relation_text = $this->t('You are sharing with %s', $contact['name']); break;
-			case Contact::SHARING:  $relation_text = $this->t('%s is sharing with you', $contact['name']); break;
+			case ContactModel::FRIEND:
+				$relation_text = $this->t('You are mutual friends with %s', $contact['name']);
+				break;
+			case ContactModel::FOLLOWER:
+				$relation_text = $this->t('You are sharing with %s', $contact['name']);
+				break;
+			case ContactModel::SHARING:
+				$relation_text = $this->t('%s is sharing with you', $contact['name']);
+				break;
 			default:
 				$relation_text = '';
 		}
@@ -268,7 +300,7 @@ class Profile extends BaseModule
 			$relation_text = '';
 		}
 
-		$url = Contact::magicLinkByContact($contact);
+		$url = ContactModel::magicLinkByContact($contact);
 		if (strpos($url, 'contact/redir/') === 0) {
 			$sparkle = ' class="sparkle" ';
 		} else {
@@ -282,8 +314,7 @@ class Profile extends BaseModule
 			$this->logger->notice('Empty gsid for contact', ['contact' => $contact]);
 		}
 
-		$serverIgnored =
-			$contact['gsid'] &&
+		$serverIgnored = $contact['gsid'] &&
 			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid']) ?
 				$this->t('This contact is on a server you ignored.')
 				: '';
@@ -300,7 +331,7 @@ class Profile extends BaseModule
 		$nettype = $this->t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact['protocol'], $contact['gsid']));
 
 		// tabs
-		$tab_str = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_PROFILE);
+		$tab_str = ContactModule::getTabsHTML($contact, ContactModule::TAB_PROFILE);
 
 		$lost_contact = (($contact['archive'] && $contact['term-date'] > DBA::NULL_DATETIME && $contact['term-date'] < DateTimeFormat::utcNow()) ? $this->t('Communications lost with this contact!') : '');
 
@@ -312,10 +343,10 @@ class Profile extends BaseModule
 				$localRelationship->fetchFurtherInformation,
 				$this->t('Fetch information like preview pictures, title and teaser from the feed item. You can activate this if the feed doesn\'t contain much text. Keywords are taken from the meta header in the feed item and are posted as hash tags.'),
 				[
-					LocalRelationship\Entity\LocalRelationship::FFI_NONE        => $this->t('Disabled'),
-					LocalRelationship\Entity\LocalRelationship::FFI_INFORMATION => $this->t('Fetch information'),
-					LocalRelationship\Entity\LocalRelationship::FFI_KEYWORD     => $this->t('Fetch keywords'),
-					LocalRelationship\Entity\LocalRelationship::FFI_BOTH        => $this->t('Fetch information and keywords')
+					LocalRelationshipEntity::FFI_NONE        => $this->t('Disabled'),
+					LocalRelationshipEntity::FFI_INFORMATION => $this->t('Fetch information'),
+					LocalRelationshipEntity::FFI_KEYWORD     => $this->t('Fetch keywords'),
+					LocalRelationshipEntity::FFI_BOTH        => $this->t('Fetch information and keywords')
 				]
 			];
 		}
@@ -346,8 +377,8 @@ class Profile extends BaseModule
 			];
 		}
 
-		$channel_frequency = Contact\User::getChannelFrequency($contact['id'], $this->session->getLocalUserId());
-		$channel_only      = Contact\User::getChannelOnly($contact['id'], $this->session->getLocalUserId());
+		$channel_frequency = UserContact::getChannelFrequency($contact['id'], $this->session->getLocalUserId());
+		$channel_only      = UserContact::getChannelOnly($contact['id'], $this->session->getLocalUserId());
 
 		$poll_interval = null;
 		if ((($contact['network'] == Protocol::FEED) && !$this->config->get('system', 'adjust_poll_frequency')) || ($contact['network'] == Protocol::MAIL)) {
@@ -356,12 +387,12 @@ class Profile extends BaseModule
 
 		$contact_actions = $this->getContactActions($contact, $localRelationship);
 
-		if (Contact\User::isIsBlocked($contact['id'], $this->session->getLocalUserId())) {
+		if (UserContact::isIsBlocked($contact['id'], $this->session->getLocalUserId())) {
 			$relation_text = $this->t('%s has blocked you', $contact['name'] ?: $contact['nick']);
 			unset($contact_actions['follow']);
 		}
 
-		if ($localRelationship->rel !== Contact::NOTHING) {
+		if ($localRelationship->rel !== ContactModel::NOTHING) {
 			$lbl_info1              = $this->t('Contact Information / Notes');
 			$contact_settings_label = $this->t('Contact Settings');
 		} else {
@@ -407,13 +438,13 @@ class Profile extends BaseModule
 			'$notify_new_posts'          => ['notify_new_posts', $this->t('Notification for new posts'), ($localRelationship->notifyNewPosts), $this->t('Send a notification of every new post of this contact')],
 			'$fetch_further_information' => $fetch_further_information,
 			'$ffi_keyword_denylist'      => ['ffi_keyword_denylist', $this->t('Keyword Deny List'), $localRelationship->ffiKeywordDenylist, $this->t('Comma separated list of keywords that should not be converted to hashtags, when "Fetch information and keywords" is selected')],
-			'$photo'                     => Contact::getPhoto($contact),
+			'$photo'                     => ContactModel::getPhoto($contact),
 			'$name'                      => $contact['name'],
 			'$sparkle'                   => $sparkle,
 			'$url'                       => $url,
 			'$profileurllabel'           => $this->t('Profile URL'),
 			'$profileurl'                => $contact['url'],
-			'$account_type'              => Contact::getAccountType($contact['contact-type']),
+			'$account_type'              => ContactModel::getAccountType($contact['contact-type']),
 			'$location'                  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['location']),
 			'$location_label'            => $this->t('Location:'),
 			'$xmpp'                      => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['xmpp']),
@@ -440,18 +471,23 @@ class Profile extends BaseModule
 			'$channel_settings_label' => $this->t('Channel Settings'),
 			'$frequency_label'        => $this->t('Frequency of this contact in relevant channels'),
 			'$frequency_description'  => $this->t("Depending on the type of the channel not all posts from this contact are displayed. By default, posts need to have a minimum amount of interactions (comments, likes) to show in your channels. On the other hand there can be contacts who flood the channel, so you might want to see only some of their posts. Or you don't want to see their content at all, but you don't want to block or hide the contact completely."),
-			'$frequency_default'      => ['channel_frequency', $this->t('Default frequency'), Contact\User::FREQUENCY_DEFAULT, $this->t('Posts by this contact are displayed in the "for you" channel if you interact often with this contact or if a post reached some level of interaction.'), $channel_frequency == Contact\User::FREQUENCY_DEFAULT],
-			'$frequency_always'       => ['channel_frequency', $this->t('Display all posts of this contact'), Contact\User::FREQUENCY_ALWAYS, $this->t('All posts from this contact will appear on the "for you" channel'), $channel_frequency == Contact\User::FREQUENCY_ALWAYS],
-			'$frequency_reduced'      => ['channel_frequency', $this->t('Display only few posts'), Contact\User::FREQUENCY_REDUCED, $this->t('When a contact creates a lot of posts in a short period, this setting reduces the number of displayed posts in every channel.'), $channel_frequency == Contact\User::FREQUENCY_REDUCED],
-			'$frequency_never'        => ['channel_frequency', $this->t('Never display posts'), Contact\User::FREQUENCY_NEVER, $this->t('Posts from this contact will never be displayed in any channel'), $channel_frequency == Contact\User::FREQUENCY_NEVER],
+			'$frequency_default'      => ['channel_frequency', $this->t('Default frequency'), UserContact::FREQUENCY_DEFAULT, $this->t('Posts by this contact are displayed in the "for you" channel if you interact often with this contact or if a post reached some level of interaction.'), $channel_frequency == UserContact::FREQUENCY_DEFAULT],
+			'$frequency_always'       => ['channel_frequency', $this->t('Display all posts of this contact'), UserContact::FREQUENCY_ALWAYS, $this->t('All posts from this contact will appear on the "for you" channel'), $channel_frequency == UserContact::FREQUENCY_ALWAYS],
+			'$frequency_reduced'      => ['channel_frequency', $this->t('Display only few posts'), UserContact::FREQUENCY_REDUCED, $this->t('When a contact creates a lot of posts in a short period, this setting reduces the number of displayed posts in every channel.'), $channel_frequency == UserContact::FREQUENCY_REDUCED],
+			'$frequency_never'        => ['channel_frequency', $this->t('Never display posts'), UserContact::FREQUENCY_NEVER, $this->t('Posts from this contact will never be displayed in any channel'), $channel_frequency == UserContact::FREQUENCY_NEVER],
 			'$channel_only'           => ['channel_only', $this->t('Channel Only'), $channel_only, $this->t('If enabled, posts from this contact will only appear in channels and network streams in circles, but not in the general network stream.')],
 		]);
 
-		$arr = ['contact' => $contact, 'output' => $o];
+		$hook_data = [
+			'contact' => $contact,
+			'output'  => $o,
+		];
 
-		Hook::callAll('contact_edit', $arr);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::EDIT_CONTACT_FORM, $hook_data),
+		)->getArray();
 
-		return $arr['output'];
+		return $hook_data['output'] ?? $o;
 	}
 
 	/**
@@ -460,18 +496,18 @@ class Profile extends BaseModule
 	 * This includes actions like e.g. 'block', 'hide', 'delete' and others
 	 *
 	 * @param array                    $contact           Public contact row
-	 * @param LocalRelationship\Entity\LocalRelationship $localRelationship
+	 *
 	 * @return array with contact related actions
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 */
-	private function getContactActions(array $contact, LocalRelationship\Entity\LocalRelationship $localRelationship): array
+	private function getContactActions(array $contact, LocalRelationshipEntity $localRelationship): array
 	{
 		$poll_enabled    = in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::FEED, Protocol::MAIL]);
 		$contact_actions = [];
 
 		$formSecurityToken = self::getFormSecurityToken('contact_action');
 
-		if ($localRelationship->rel & Contact::SHARING) {
+		if ($localRelationship->rel & ContactModel::SHARING) {
 			$contact_actions['unfollow'] = [
 				'label' => $this->t('Unfollow'),
 				'url'   => 'contact/unfollow?url=' . urlencode($contact['url']) . '&auto=1',
@@ -544,7 +580,7 @@ class Profile extends BaseModule
 			'id'    => 'toggle-collapse',
 		];
 
-		if (Protocol::supportsRevokeFollow($contact['network']) && in_array($localRelationship->rel, [Contact::FOLLOWER, Contact::FRIEND])) {
+		if (Protocol::supportsRevokeFollow($contact['network']) && in_array($localRelationship->rel, [ContactModel::FOLLOWER, ContactModel::FRIEND])) {
 			$contact_actions['revoke_follow'] = [
 				'label' => $this->t('Revoke Follow'),
 				'url'   => 'contact/' . $contact['id'] . '/revoke',
@@ -562,7 +598,7 @@ class Profile extends BaseModule
 	 *
 	 * @param int $contact_id Id of the contact with uid != 0
 	 * @return void
-	 * @throws HTTPException\InternalServerErrorException
+	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
 	private function updateContactFromProbe(int $contact_id)
@@ -572,6 +608,6 @@ class Profile extends BaseModule
 		}
 
 		// Update the entry in the contact table
-		Contact::updateFromProbe($contact_id);
+		ContactModel::updateFromProbe($contact_id);
 	}
 }

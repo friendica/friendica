@@ -23,6 +23,7 @@ use Friendica\Module\Response;
 use Friendica\Profile\ProfileField\Repository\ProfileField;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,26 +57,47 @@ class Index extends BaseModule
 	private $pConfig;
 	/** @var Mode */
 	private $mode;
+	private EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(Mode $mode, IManagePersonalConfigValues $pConfig, Conversation $conversation, DateTimeFormat $dateTimeFormat, ProfileField $profileField, Page $page, IManageConfigValues $config, IHandleUserSessions $session, AppHelper $appHelper, Database $database, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		Mode $mode,
+		IManagePersonalConfigValues $pConfig,
+		Conversation $conversation,
+		DateTimeFormat $dateTimeFormat,
+		ProfileField $profileField,
+		Page $page,
+		IManageConfigValues $config,
+		IHandleUserSessions $session,
+		AppHelper $appHelper,
+		Database $database,
+		EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database       = $database;
-		$this->appHelper      = $appHelper;
-		$this->session        = $session;
-		$this->config         = $config;
-		$this->page           = $page;
-		$this->profileField   = $profileField;
-		$this->dateTimeFormat = $dateTimeFormat;
-		$this->conversation   = $conversation;
-		$this->pConfig        = $pConfig;
-		$this->mode           = $mode;
+		$this->database        = $database;
+		$this->appHelper       = $appHelper;
+		$this->session         = $session;
+		$this->config          = $config;
+		$this->page            = $page;
+		$this->profileField    = $profileField;
+		$this->dateTimeFormat  = $dateTimeFormat;
+		$this->conversation    = $conversation;
+		$this->pConfig         = $pConfig;
+		$this->mode            = $mode;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
 	{
-		(new Profile($this->profileField, $this->page, $this->config, $this->session, $this->appHelper, $this->database, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->rawContent();
+		(new Profile($this->profileField, $this->page, $this->config, $this->session, $this->appHelper, $this->database, $this->eventDispatcher, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->rawContent();
 	}
 
 	protected function content(array $request = []): string

@@ -183,7 +183,12 @@ class Protocol
 			'uid'     => $owner['uid'],
 			'result'  => null,
 		];
-		Hook::callAll('unfollow', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::UNFOLLOW_CONTACT, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'];
 	}
@@ -218,7 +223,12 @@ class Protocol
 			'uid'     => $owner['uid'],
 			'result'  => null,
 		];
-		Hook::callAll('revoke_follow', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'];
 	}
@@ -256,7 +266,12 @@ class Protocol
 			'uid'     => $uid,
 			'result'  => null,
 		];
-		Hook::callAll('block', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::BLOCK_CONTACT, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'];
 	}
@@ -295,7 +310,12 @@ class Protocol
 			'uid'     => $uid,
 			'result'  => null,
 		];
-		Hook::callAll('unblock', $hook_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::UNBLOCK_CONTACT, $hook_data),
+		)->getArray();
 
 		return $hook_data['result'];
 	}

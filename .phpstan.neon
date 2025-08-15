@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
 parameters:
-    level: 2
+    level: 3
 
     paths:
-        - addon/
         - bin/auth_ejabberd.php
         - bin/console.php
         - bin/daemon.php
@@ -14,13 +16,6 @@ parameters:
         - bin/worker.php
         - index.php
         - src/
-
-    excludePaths:
-        analyse:
-            - addon/*/lang/*
-            - addon/*/vendor/*
-            - addon/convert/UnitConvertor.php
-            - addon/pumpio/oauth/*
 
     scanDirectories:
         - mod
@@ -30,6 +25,10 @@ parameters:
 
     dynamicConstantNames:
         - DB_UPDATE_VERSION
+
+    # See all rules at https://github.com/phpstan/phpstan-strict-rules/blob/2.0.x/rules.neon
+    strictRules:
+        allRules: false
 
     ignoreErrors:
         -
@@ -48,25 +47,15 @@ parameters:
             path: src
 
         -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^.+ an unknown class SMTP\.$)'
-            path: addon/mailstream/phpmailer
+            # #Fixme: Ignore type mismatch of BaseRepository::$factory in child classes
+            message: '#^PHPDoc type Friendica\\.+ of property Friendica\\.+\:\:\$factory is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateFromTableRow of overridden property Friendica\\BaseRepository\:\:\$factory\.$#'
+            identifier: property.phpDocType
+            count: 13
+            path: src
 
         -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Property .+ has unknown class SMTP as its type\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Method .+ has invalid return type SMTP\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Instantiated class SMTP not found\.$)'
-            path: addon/mailstream/phpmailer
+            # #Fixme: Ignore type mismatch of BaseModule::$response in BaseApi module
+            message: '#^PHPDoc type Friendica\\Module\\Api\\ApiResponse of property Friendica\\Module\\BaseApi\:\:\$response is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateResponses of overridden property Friendica\\BaseModule\:\:\$response\.$#'
+            identifier: property.phpDocType
+            count: 1
+            path: src/Module/BaseApi.php

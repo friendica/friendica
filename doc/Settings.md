@@ -419,7 +419,7 @@ We strongly discourage you from doing so, as this will break federation to other
 Say you have a subdirectory for tests and put Friendica into a further subdirectory, the config would be:
 
 	'system' => [
-		'urlpath' => 'tests/friendica',
+		'url' => 'https://example.com/tests/friendica',
 	],
 
 ## Other exceptions

@@ -12,18 +12,19 @@ use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Proxy;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -41,13 +42,16 @@ class Register extends BaseModule
 	/** @var IHandleUserSessions */
 	private $session;
 
-	public function __construct(IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, array $server, array $parameters = [])
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(IHandleUserSessions $session, EventDispatcherInterface $eventDispatcher, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->tos = new Tos($l10n, $baseUrl, $args, $logger, $profiler, $response, $config, $server, $parameters);
 
-		$this->session = $session;
+		$this->session         = $session;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -129,11 +133,15 @@ class Register extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('register.tpl');
 
-		$arr = ['template' => $tpl];
+		$hook_data = [
+			'template' => $tpl,
+		];
 
-		Hook::callAll('register_form', $arr);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_FORM, $hook_data),
+		)->getArray();
 
-		$tpl = $arr['template'];
+		$tpl = $hook_data['template'] ?? $tpl;
 
 		$o = Renderer::replaceMacros($tpl, [
 			'$invitations'           => DI::config()->get('system', 'invitation_only'),
@@ -190,8 +198,13 @@ class Register extends BaseModule
 	{
 		BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
 
-		$arr = ['post' => $_POST];
-		Hook::callAll('register_post', $arr);
+		$arr = [
+			'post' => $_POST,
+		];
+
+		$arr = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_POST, $arr),
+		)->getArray();
 
 		$additional_account = false;
 

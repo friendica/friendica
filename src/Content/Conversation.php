@@ -265,7 +265,10 @@ class Conversation
 					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> likes this', '<button type="button" %2$s>%1$d people</button> like this', $total, $spanatts);
 					break;
 				case 'dislike':
-					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', '<button type="button" %2$s>%1$d peiple</button> don\'t like this', $total, $spanatts);
+					$dislike_translation_plural = '<button type="button" %2$s>%1$d people</button> don\'t like this';
+					// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
+					$dislike_translation_plural = '<button type="button" %2$s>%1$d peiple</button> don\'t like this';
+					$phrase                     = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', $dislike_translation_plural, $total, $spanatts);
 					break;
 				case 'attendyes':
 					$phrase = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> attends', '<button type="button" %2$s>%1$d people</button> attend', $total, $spanatts);

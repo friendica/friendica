@@ -257,6 +257,7 @@ class ConfigFileManager
 
 		// map the legacy configuration structure to the current structure
 		foreach ($htConfigCategories as $htConfigCategory) {
+			/** @phpstan-ignore-next-line $a->config could be modified after `include $fullName` */
 			if (is_array($a->config[$htConfigCategory])) {
 				$keys = array_keys($a->config[$htConfigCategory]);
 

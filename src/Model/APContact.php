@@ -618,6 +618,13 @@ class APContact
 			return true;
 		}
 
+		if (($apcontact['type'] == 'Application') && !empty($apcontact['gsid'])) {
+			$gserver = DBA::selectFirst('gserver', ['platform'], ['id' => $apcontact['gsid']]);
+			if ($gserver['platform'] ?? '' == 'peertube') {
+				return true;
+			}
+		}
+
 		return false;
 	}
 }

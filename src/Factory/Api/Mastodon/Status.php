@@ -16,6 +16,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
@@ -28,6 +29,7 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\ACLFormatter;
 use ImagickException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Status extends BaseFactory
@@ -52,8 +54,10 @@ class Status extends BaseFactory
 	private $contentItem;
 	/** @var ACLFormatter */
 	private $aclFormatter;
+	private EventDispatcherInterface $eventDispatcher;
 
 	public function __construct(
+		EventDispatcherInterface $eventDispatcher,
 		LoggerInterface $logger,
 		Database $dba,
 		Account $mstdnAccountFactory,
@@ -77,6 +81,7 @@ class Status extends BaseFactory
 		$this->mstdnPollFactory       = $mstdnPollFactory;
 		$this->contentItem            = $contentItem;
 		$this->aclFormatter           = $aclFormatter;
+		$this->eventDispatcher        = $eventDispatcher;
 	}
 
 	/**
@@ -94,7 +99,7 @@ class Status extends BaseFactory
 	{
 		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
-			'delivery_queue_count', 'delivery_queue_done','delivery_queue_failed', 'allow_cid', 'deny_cid', 'allow_gid', 'deny_gid', 'sensitive'];
+			'delivery_queue_count', 'delivery_queue_done','delivery_queue_failed', 'allow_cid', 'deny_cid', 'allow_gid', 'deny_gid', 'sensitive', 'postopts'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uriId, 'uid' => [0, $uid]], ['order' => ['uid' => true]]);
 		if (!$item) {
 			$mail = DBA::selectFirst('mail', ['id'], ['uri-id' => $uriId, 'uid' => $uid]);
@@ -217,6 +222,25 @@ class Status extends BaseFactory
 
 		if ($platform == '') {
 			$platform = ContactSelector::networkToName($item['network'], $item['network'], $item['author-gsid']);
+		}
+
+
+		$hook_data = [
+			'item'           => $item,
+			'uid'            => $uid,
+			'filter_reasons' => [],
+		];
+
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
+		)->getArray();
+
+		$filter_reasons = $hook_data['filter_reasons'];
+		unset($hook_data);
+		if (!empty($filter_reasons)) {
+			$sensitive = true;
+			$item['content-warning'] .= ', ' . implode(', ', $filter_reasons);
+			$item['content-warning'] = trim($item['content-warning'], ', ');
 		}
 
 		$application = new \Friendica\Object\Api\Mastodon\Application($item['app'] ?: $platform);

@@ -243,14 +243,11 @@ class JsonLD
 
 		return json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 	}
+
 	/**
 	 * Fetches an element array from a JSON array
 	 *
-	 * @param $array
-	 * @param $element
-	 * @param $key
-	 *
-	 * @return array fetched element
+	 * @return array|null fetched element or null
 	 */
 	public static function fetchElementArray($array, $element, $key = null, $type = null, $type_value = null)
 	{
@@ -289,7 +286,7 @@ class JsonLD
 	 * @param $type
 	 * @param $type_value
 	 *
-	 * @return string|null fetched element
+	 * @return mixed|null fetched element. If the element is not found, null is returned.
 	 */
 	public static function fetchElement($array, $element, $key = '@id', $type = null, $type_value = null)
 	{

@@ -13,11 +13,11 @@ use Friendica\Model\Notification;
 return [
 	'gserver' => [
 		[
-			'url' => 'https://friendica.local',
-			'nurl' => 'http://friendica.local',
-			'register_policy' => 0,
+			'url'              => 'https://friendica.local',
+			'nurl'             => 'http://friendica.local',
+			'register_policy'  => 0,
 			'registered-users' => 0,
-			'network' => 'unkn',
+			'network'          => 'unkn',
 		],
 	],
 	// Base test config to avoid notice messages
@@ -87,6 +87,11 @@ return [
 			'id'   => 46,
 			'uri'  => 'https://friendica.local/profile/mutualcontact',
 			'guid' => '46',
+		],
+		[
+			'id'   => 49,
+			'uri'  => 'https://domain.tld/profile/remotecontact',
+			'guid' => '49',
 		],
 		[
 			'id'   => 100,
@@ -213,6 +218,23 @@ return [
 			'rel'      => Contact::FOLLOWER,
 			'network'  => Protocol::DFRN,
 			'location' => 'DFRN',
+		],
+		[
+			'id'       => 49,
+			'uid'      => 0,
+			'uri-id'   => 43,
+			'name'     => 'Remote user',
+			'nick'     => 'remotecontact',
+			'self'     => 0,
+			'nurl'     => 'http://domain.tld/profile/remotecontact',
+			'url'      => 'https://domain.tld/profile/remotecontact',
+			'alias'    => 'https://domain.tld/~remotecontact',
+			'about'    => 'User used in tests',
+			'pending'  => 0,
+			'blocked'  => 0,
+			'rel'      => Contact::FOLLOWER,
+			'network'  => Protocol::ACTIVITYPUB,
+			'location' => 'AP',
 		],
 	],
 	'apcontact' => [
@@ -343,7 +365,7 @@ return [
 						'suscipit aut facilis ut inventore omnis exercitationem quo magnam ' .
 						'consequatur maxime aut illum soluta quaerat natus unde aspernatur ' .
 						'et sed beatae nihil ullam temporibus corporis ratione blanditiis',
-			'plink'  => 'https://friendica.local/display/6',
+			'plink' => 'https://friendica.local/display/6',
 		],
 		[
 			'uri-id' => 100,
@@ -912,8 +934,8 @@ return [
 	],
 	'profile' => [
 		[
-			'id'  => 1,
-			'uid' => 42,
+			'id'       => 1,
+			'uid'      => 42,
 			'locality' => 'DFRN',
 		],
 	],
@@ -933,18 +955,18 @@ return [
 	],
 	'group_member' => [
 		[
-			'id' => 1,
-			'gid' => 1,
+			'id'         => 1,
+			'gid'        => 1,
 			'contact-id' => 43,
 		],
 		[
-			'id' => 2,
-			'gid' => 1,
+			'id'         => 2,
+			'gid'        => 1,
 			'contact-id' => 43,
 		],
 		[
-			'id' => 3,
-			'gid' => 2,
+			'id'         => 3,
+			'gid'        => 2,
 			'contact-id' => 43,
 		],
 	],

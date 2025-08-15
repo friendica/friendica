@@ -8,11 +8,11 @@
 namespace Friendica\Core\Worker\Repository;
 
 use Friendica\BaseRepository;
+use Friendica\Core\Worker\Entity\Process as ProcessEntity;
 use Friendica\Core\Worker\Exception\ProcessPersistenceException;
+use Friendica\Core\Worker\Factory\Process as ProcessFactory;
 use Friendica\Database\Database;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Core\Worker\Factory;
-use Friendica\Core\Worker\Entity;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,13 +24,13 @@ class Process extends BaseRepository
 
 	protected static $table_name = 'process';
 
-	/** @var Factory\Process */
+	/** @var ProcessFactory */
 	protected $factory;
 
 	/** @var string */
 	private $currentHost;
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\Process $factory, array $server)
+	public function __construct(Database $database, LoggerInterface $logger, ProcessFactory $factory, array $server)
 	{
 		parent::__construct($database, $logger, $factory);
 
@@ -39,13 +39,8 @@ class Process extends BaseRepository
 
 	/**
 	 * Starts and Returns the process for a given PID at the current host
-	 *
-	 * @param int    $pid
-	 * @param string $command
-	 *
-	 * @return Entity\Process
 	 */
-	public function create(int $pid, string $command): Entity\Process
+	public function create(int $pid, string $command): ProcessEntity
 	{
 		// Cleanup inactive process
 		$this->deleteInactive();
@@ -64,7 +59,9 @@ class Process extends BaseRepository
 				}
 			}
 
-			$result = $this->_selectOne(['pid' => $pid, 'hostname' => $this->currentHost]);
+			$fields = $this->_selectFirstRowAsArray(['pid' => $pid, 'hostname' => $this->currentHost]);
+
+			$result = $this->factory->createFromTableRow($fields);
 
 			$this->db->commit();
 
@@ -74,7 +71,7 @@ class Process extends BaseRepository
 		}
 	}
 
-	public function delete(Entity\Process $process)
+	public function delete(ProcessEntity $process)
 	{
 		try {
 			if (!$this->db->delete(static::$table_name, [

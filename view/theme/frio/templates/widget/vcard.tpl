@@ -8,9 +8,11 @@
 
 	<div id="profile-photo-wrapper">
 		{{if $url}}
-		<a href="{{$url}}"><img class="photo u-photo" src="{{$photo}}" alt="{{$contact.name}}" /></a>
+			<a href="{{$url}}">
+				<img class="photo u-photo" src="{{$photo}}" alt="{{$contact.name}}" />
+			</a>
 		{{else}}
-		<img class="photo u-photo" src="{{$photo}}" alt="{{$contact.name}}" />
+			<img class="photo u-photo" src="{{$photo}}" alt="{{$contact.name}}" />
 		{{/if}}
 	</div>
 

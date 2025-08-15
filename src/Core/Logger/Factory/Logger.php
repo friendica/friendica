@@ -19,7 +19,7 @@ use Throwable;
 /**
  * The logger factory for the core logging instances
  *
- * @deprecated 2025.02 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
+ * @deprecated 2025.07 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
  */
 class Logger
 {
@@ -28,7 +28,7 @@ class Logger
 
 	public function __construct(string $channel = LogChannel::DEFAULT)
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
 
 		$this->channel = $channel;
 	}

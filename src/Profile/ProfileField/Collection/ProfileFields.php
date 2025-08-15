@@ -8,31 +8,33 @@
 namespace Friendica\Profile\ProfileField\Collection;
 
 use Friendica\BaseCollection;
-use Friendica\Profile\ProfileField\Entity;
+use Friendica\Profile\ProfileField\Entity\ProfileField as ProfileFieldEntity;
 
 class ProfileFields extends BaseCollection
 {
-	public function current(): Entity\ProfileField
+	public function current(): ProfileFieldEntity
 	{
 		return parent::current();
 	}
 
-	/**
-	 * @param callable $callback
-	 * @return ProfileFields (as an extended form of BaseCollection)
-	 */
-	public function map(callable $callback): BaseCollection
+	public function map(callable $callback): ProfileFields
 	{
-		return parent::map($callback);
+		$profileFields = parent::map($callback);
+
+		if (!$profileFields instanceof ProfileFields) {
+			// Show the possible error explicitly
+			throw new \Exception(sprintf(
+				'BaseCollection::map() should return instance of %s, but returns %s instead.',
+				ProfileFields::class,
+				get_class($profileFields),
+			));
+		}
+
+		return $profileFields;
 	}
 
-	/**
-	 * @param callable|null $callback
-	 * @param int           $flag
-	 * @return ProfileFields as an extended version of BaseCollection
-	 */
-	public function filter(callable $callback = null, int $flag = 0): BaseCollection
+	public function filter(?callable $callback = null, int $flag = 0): ProfileFields
 	{
-		return parent::filter($callback, $flag);
+		return new self(array_filter($this->getArrayCopy(), $callback, $flag));
 	}
 }

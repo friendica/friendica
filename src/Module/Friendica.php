@@ -13,16 +13,17 @@ use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\PostUpdate;
+use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -32,6 +33,7 @@ use Psr\Log\LoggerInterface;
 class Friendica extends BaseModule
 {
 	private AddonHelper $addonHelper;
+	private EventDispatcherInterface $eventDispatcher;
 	/** @var IManageConfigValues */
 	private $config;
 	/** @var IManageKeyValuePairs */
@@ -39,14 +41,28 @@ class Friendica extends BaseModule
 	/** @var IHandleUserSessions */
 	private $session;
 
-	public function __construct(AddonHelper $addonHelper, IHandleUserSessions $session, IManageKeyValuePairs $keyValue, IManageConfigValues $config, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		AddonHelper $addonHelper,
+		EventDispatcherInterface $eventDispatcher,
+		IHandleUserSessions $session,
+		IManageKeyValuePairs $keyValue,
+		IManageConfigValues $config,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config      = $config;
-		$this->keyValue    = $keyValue;
-		$this->session     = $session;
-		$this->addonHelper = $addonHelper;
+		$this->config          = $config;
+		$this->keyValue        = $keyValue;
+		$this->session         = $session;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->addonHelper     = $addonHelper;
 	}
 
 	protected function content(array $request = []): string
@@ -99,7 +115,9 @@ class Friendica extends BaseModule
 
 		$hooked = '';
 
-		Hook::callAll('about_hook', $hooked);
+		$hooked = $this->eventDispatcher->dispatch(
+			new HtmlFilterEvent(HtmlFilterEvent::MOD_ABOUT_CONTENT, $hooked),
+		)->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('friendica.tpl');
 

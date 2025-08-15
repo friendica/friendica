@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Addon\Exception\AddonInvalidConfigFileException;
+
 /**
  * Some functions to handle addons
  */
@@ -55,14 +57,27 @@ interface AddonHelper
 	public function loadAddons(): void;
 
 	/**
-	 * Reload (uninstall and install) all updated addons.
+	 * Reload (uninstall and install) all installed and modified addons.
 	 */
 	public function reloadAddons(): void;
 
 	/**
 	 * Get the comment block of an addon as value object.
+	 *
+	 * @throws \Friendica\Core\Addon\Exception\InvalidAddonException if there is an error with the addon file
 	 */
 	public function getAddonInfo(string $addonId): AddonInfo;
+
+	/**
+	 * Returns a dependency config array for a given addon
+	 *
+	 * This will load a potential config-file from the static directory, like `addon/{addonId}/static/dependencies.config.php`
+	 *
+	 * @throws AddonInvalidConfigFileException If the config file doesn't return an array
+	 *
+	 * @return array the config as array or empty array if no config file was found
+	 */
+	public function getAddonDependencyConfig(string $addonId): array;
 
 	/**
 	 * Checks if the provided addon is enabled

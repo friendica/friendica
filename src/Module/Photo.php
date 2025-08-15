@@ -308,7 +308,9 @@ class Photo extends BaseApi
 
 				// For local users directly use the photo record that is marked as the profile
 				if (DI::baseUrl()->isLocalUrl($contact['url'])) {
-					$contact = Contact::selectFirst($fields, ['nurl' => $contact['nurl'], 'self' => true]);
+					$nurl    = $contact['nurl'];
+					$contact = Contact::selectFirst($fields, ['nurl' => $nurl, 'self' => true]);
+
 					if (!empty($contact)) {
 						if ($customsize <= Proxy::PIXEL_MICRO) {
 							$scale = 6;
@@ -324,7 +326,7 @@ class Photo extends BaseApi
 							$this->logger->notice('Profile photo was not loaded', ['scale' => $scale, 'uid' => $contact['uid']]);
 						}
 					} else {
-						$this->logger->notice('Local Contact was not found', ['url' => $contact['nurl']]);
+						$this->logger->notice('Local Contact was not found', ['url' => $nurl]);
 					}
 				}
 

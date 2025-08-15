@@ -35,7 +35,7 @@ class ScheduledStatus extends BaseDataTransferObject
 		'in_reply_to_id' => null,
 		'application_id' => ''
 	];
-	/** @var Attachment */
+	/** @var array */
 	protected $media_attachments = [];
 
 	/**

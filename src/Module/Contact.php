@@ -254,7 +254,9 @@ class Contact extends BaseModule
 			$searching  = true;
 			$search_hdr = $search;
 			$search_txt = preg_quote(trim($search, ' @!'));
-			$sql_extra .= " AND (`name` REGEXP ? OR `url` REGEXP ? OR `nick` REGEXP ? OR `addr` REGEXP ? OR `alias` REGEXP ?)";
+			$sql_extra .= " AND (CAST(`name` AS BINARY) REGEXP BINARY ? OR CAST(`url` AS BINARY) REGEXP BINARY ?";
+			$sql_extra .= " OR  CAST(`nick` AS BINARY) REGEXP BINARY ? OR  CAST(`addr` AS BINARY) REGEXP BINARY ?";
+			$sql_extra .= " OR  CAST(`alias` AS BINARY) REGEXP BINARY ?)";
 			$sql_values[] = $search_txt;
 			$sql_values[] = $search_txt;
 			$sql_values[] = $search_txt;

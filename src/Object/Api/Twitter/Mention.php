@@ -7,7 +7,6 @@
 
 namespace Friendica\Object\Api\Twitter;
 
-use Friendica\App\BaseURL;
 use Friendica\BaseDataTransferObject;
 
 /**
@@ -37,7 +36,7 @@ class Mention extends BaseDataTransferObject
 	 */
 	public function __construct(array $tag, array $contact, array $indices)
 	{
-		$this->id          = (string)($contact['id'] ?? 0);
+		$this->id          = (int)($contact['id'] ?? 0);
 		$this->id_str      = (string)($contact['id'] ?? 0);
 		$this->indices     = $indices;
 		$this->name        = $tag['name'];

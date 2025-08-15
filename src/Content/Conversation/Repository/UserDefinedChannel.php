@@ -7,10 +7,10 @@
 
 namespace Friendica\Content\Conversation\Repository;
 
-use Friendica\BaseCollection;
+use Friendica\BaseRepository;
 use Friendica\Content\Conversation\Collection\UserDefinedChannels;
-use Friendica\Content\Conversation\Entity;
-use Friendica\Content\Conversation\Factory;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
+use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -21,13 +21,16 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Psr\Log\LoggerInterface;
 
-class UserDefinedChannel extends \Friendica\BaseRepository
+class UserDefinedChannel extends BaseRepository
 {
 	protected static $table_name = 'channel';
 
+	/** @var UserDefinedChannelFactory */
+	protected $factory;
+
 	private IManageConfigValues $config;
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\UserDefinedChannel $factory, IManageConfigValues $config)
+	public function __construct(Database $database, LoggerInterface $logger, UserDefinedChannelFactory $factory, IManageConfigValues $config)
 	{
 		parent::__construct($database, $logger, $factory);
 
@@ -40,7 +43,7 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 	 * @return UserDefinedChannels
 	 * @throws \Exception
 	 */
-	protected function _select(array $condition, array $params = []): BaseCollection
+	protected function _select(array $condition, array $params = []): UserDefinedChannels
 	{
 		$rows = $this->db->selectToArray(static::$table_name, [], $condition, $params);
 
@@ -62,12 +65,13 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 	 *
 	 * @param int $id  The id of the user defined channel
 	 * @param int $uid The user that this channel belongs to. (Not part of the primary key)
-	 * @return Entity\UserDefinedChannel
 	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 */
-	public function selectById(int $id, int $uid): Entity\UserDefinedChannel
+	public function selectById(int $id, int $uid): UserDefinedChannelEntity
 	{
-		return $this->_selectOne(['id' => $id, 'uid' => $uid]);
+		$fields = $this->_selectFirstRowAsArray(['id' => $id, 'uid' => $uid]);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	/**
@@ -106,7 +110,7 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 		return $this->_select(['uid' => $uid]);
 	}
 
-	public function save(Entity\UserDefinedChannel $Channel): Entity\UserDefinedChannel
+	public function save(UserDefinedChannelEntity $Channel): UserDefinedChannelEntity
 	{
 		$fields = [
 			'label'            => $Channel->label,
@@ -165,14 +169,14 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 		$uids = array_column($users, 'uid');
 
 		$usercondition = ['uid' => $uids];
-		$condition = DBA::mergeConditions($usercondition, ["`languages` != ? AND `include-tags` = ? AND `full-text-search` = ? AND `circle` = ?", '', '', '', 0]);
+		$condition     = DBA::mergeConditions($usercondition, ["`languages` != ? AND `include-tags` = ? AND `full-text-search` = ? AND `circle` = ?", '', '', '', 0]);
 		foreach ($this->select($condition) as $channel) {
 			if (!empty($channel->languages) && in_array($language, $channel->languages)) {
 				return true;
 			}
 		}
 
-		$search = '';
+		$search    = '';
 		$condition = DBA::mergeConditions($usercondition, ["`full-text-search` != ? AND `circle` = ? AND `valid`", '', 0]);
 		foreach ($this->select($condition) as $channel) {
 			$search .= '(' . $channel->fullTextSearch . ') ';
@@ -197,7 +201,7 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 	{
 		$condition = $this->getUserCondition();
 		$condition = DBA::mergeConditions($condition, ["`account-type` IN (?, ?) AND `uid` != ?", User::ACCOUNT_TYPE_RELAY, User::ACCOUNT_TYPE_COMMUNITY, 0]);
-		$users = $this->db->selectToArray('user', ['uid'], $condition);
+		$users     = $this->db->selectToArray('user', ['uid'], $condition);
 		if (empty($users)) {
 			return [];
 		}
@@ -210,7 +214,7 @@ class UserDefinedChannel extends \Friendica\BaseRepository
 		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $searchtext);
 
 		$filteredChannels = $this->select(['uid' => array_column($users, 'uid'), 'publish' => true, 'valid' => true])->filter(
-			function (Entity\UserDefinedChannel $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
+			function (UserDefinedChannelEntity $channel) use ($owner_id, $reshare_id, $language, $tags, $media_type, $disposableFullTextSearch, $searchtext) {
 				static $uids = [];
 
 				// Filter out channels from already picked users

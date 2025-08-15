@@ -192,7 +192,7 @@ span.connector {
   border-radius: 4px;
 }
 .shared_header > .metadata {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
 }
 .shared_header > .metadata > p {
   margin: 0;
@@ -793,23 +793,60 @@ figure.img-allocated-height img{
 summary.wall-item-summary {
 	font-weight: bold;
 	font-style: oblique;
-  padding-bottom: 5px;
+	padding-bottom: 5px;
 }
 
 /* css instructions notification.tpl */
 /* Flexbox layout to align the icon and text in a single line */
 .notif-item a {
-    	display: flex;
-    	align-items: flex-start;
+	display: flex;
+	align-items: flex-start;
 }
 
 /* Margin to create space between the icon and the text */
 .notif-image {
-    	margin-right: 10px;
+	margin-right: 10px;
+}
 
 /* Styles to ensure the text wraps properly after 70 characters */
 .notif-text {
-    	display: inline-block;
-    	max-width: 70ch;
-    	overflow-wrap: break-word;
+	display: inline-block;
+	max-width: 70ch;
+	overflow-wrap: break-word;
+}
+
+/* Add alt tag indicators to the relevant images */
+a:has(img.has-alt-description)::after {
+	background: rgba(0, 0, 0, 0.69);
+	border-radius: 4px;
+	color: #eee;
+	content: "ALT";
+	font-size: 12px;
+	font-weight: bold;
+	padding: 4px 5px;
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+}
+
+#change-profile-picture {
+	background-color: rgba(0, 0, 0, 0.5);
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	opacity: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+  width: 100%;
+}
+
+.vcard-anchor {
+	display: inline-block;
+}
+
+#change-profile-picture:hover {
+	opacity: 1;
 }

@@ -124,13 +124,23 @@ class Database extends AbstractSessionHandler
 	}
 
 	#[\ReturnTypeWillChange]
-	public function gc($max_lifetime): bool
+	/**
+	 * @return int|false
+	 */
+	public function gc($max_lifetime)
 	{
 		try {
-			return $this->dba->delete('session', ["`expire` < ?", time()]);
+			$result = $this->dba->delete('session', ["`expire` < ?", time()]);
 		} catch (\Exception $exception) {
 			$this->logger->warning('Cannot use garbage collector.', ['exception' => $exception]);
 			return false;
 		}
+
+		if ($result !== false) {
+			// TODO: DBA::delete() returns true, but we need to return the number of deleted rows as interger
+			$result = 0;
+		}
+
+		return $result;
 	}
 }

@@ -217,7 +217,7 @@ class Update
 										->set('system', 'maintenance', false)
 										->delete('system', 'maintenance_reason')
 										->commit();
-							return $r;
+							return 'Pre update failed';
 						} else {
 							DI::logger()->notice('Pre update executed.', ['version' => $version]);
 						}
@@ -262,7 +262,7 @@ class Update
 										->set('system', 'maintenance', false)
 										->delete('system', 'maintenance_reason')
 										->commit();
-							return $r;
+							return 'Post update failed';
 						} else {
 							DI::config()->set('system', 'build', $version);
 							DI::logger()->notice('Post update executed.', ['version' => $version]);

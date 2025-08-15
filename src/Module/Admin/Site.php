@@ -41,13 +41,13 @@ class Site extends BaseAdmin
 			return;
 		}
 
-		$sitename         = (!empty($_POST['sitename'])         ? trim($_POST['sitename'])      : '');
+		$sitename         = (!empty($_POST['sitename'])         ? strip_tags(trim($_POST['sitename'])) : '');
 		$sender_email     = (!empty($_POST['sender_email'])     ? trim($_POST['sender_email'])  : '');
 		$banner           = (!empty($_POST['banner'])           ? trim($_POST['banner'])                             : false);
 		$email_banner     = (!empty($_POST['email_banner'])     ? trim($_POST['email_banner'])                       : false);
 		$shortcut_icon    = (!empty($_POST['shortcut_icon'])    ? trim($_POST['shortcut_icon']) : '');
 		$touch_icon       = (!empty($_POST['touch_icon'])       ? trim($_POST['touch_icon'])    : '');
-		$additional_info  = (!empty($_POST['additional_info'])  ? trim($_POST['additional_info'])                    : '');
+		$additional_info  = (!empty($_POST['additional_info'])  ? strip_tags(trim($_POST['additional_info']))        : '');
 		$language         = (!empty($_POST['language'])         ? trim($_POST['language'])      : '');
 		$theme            = (!empty($_POST['theme'])            ? trim($_POST['theme'])         : '');
 		$theme_mobile     = (!empty($_POST['theme_mobile'])     ? trim($_POST['theme_mobile'])  : '');
@@ -57,7 +57,7 @@ class Site extends BaseAdmin
 		$jpegimagequality = (!empty($_POST['jpegimagequality']) ? intval(trim($_POST['jpegimagequality']))           : 100);
 
 		$register_policy      = (!empty($_POST['register_policy'])         ? intval(trim($_POST['register_policy']))             : 0);
-		$max_registered_users = (!empty($_POST['max_registered_users'])     ? intval(trim($_POST['max_registered_users']))         : 0);
+		$max_registered_users = (!empty($_POST['max_registered_users'])    ? intval(trim($_POST['max_registered_users']))         : 0);
 		$daily_registrations  = (!empty($_POST['max_daily_registrations']) ? intval(trim($_POST['max_daily_registrations']))     : 0);
 		$abandon_days         = (!empty($_POST['abandon_days'])            ? intval(trim($_POST['abandon_days']))                : 0);
 

@@ -9,10 +9,10 @@ namespace Friendica\Model\Post;
 
 use BadMethodCallException;
 use Exception;
-use Friendica\Core\Hook;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -396,7 +396,12 @@ class UserNotification
 		$profiles = [$owner['nurl']];
 
 		$notification_data = ['uid' => $uid, 'profiles' => []];
-		Hook::callAll('check_item_notification', $notification_data);
+
+		$eventDispatcher = DI::eventDispatcher();
+
+		$notification_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, $notification_data),
+		)->getArray();
 
 		// Normalize the connector profiles
 		foreach ($notification_data['profiles'] as $profile) {

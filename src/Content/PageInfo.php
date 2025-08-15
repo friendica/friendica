@@ -92,6 +92,7 @@ class PageInfo
 	{
 		$eventDispatcher = DI::eventDispatcher();
 
+		/** @var array<string,mixed> */
 		$data = $eventDispatcher->dispatch(
 			new ArrayFilterEvent(ArrayFilterEvent::PAGE_INFO, $data),
 		)->getArray();

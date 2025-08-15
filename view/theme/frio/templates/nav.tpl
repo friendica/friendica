@@ -164,10 +164,11 @@
 								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 									<div class="form-group form-group-search">
 										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-											type="text" name="q" data-toggle="tooltip" title="{{$search_hint}}"
-											placeholder="{{$nav.search.1}}">
-										<button class="btn btn-default btn-sm form-button-search"
-											type="submit">{{$nav.search.1}}</button>
+											type="search" name="q" placeholder="{{$search_placeholder}}">
+										<button class="btn btn-primary btn-md form-button-search" type="submit">
+											<i class="fa fa-search" aria-hidden="true"></i>
+											<span class="sr-only">{{$nav.search.1}}</span>
+										</button>
 									</div>
 								</form>
 							</li>
@@ -201,6 +202,20 @@
 										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
+
+												{{if $usermenu.0|str_ends_with:$nickname}}
+													<i class="fa fa-commenting"></i>
+												{{elseif $usermenu.0|str_ends_with:"/profile"}}
+													<i class="fa fa-user"></i>
+												{{elseif $usermenu.0|str_ends_with:"/photos"}}
+													<i class="fa fa-picture-o"></i>
+												{{elseif $usermenu.0|str_ends_with:"/media"}}
+													<i class="fa fa-edit"></i>
+												{{elseif $usermenu.0|str_ends_with:"calendar/"}}
+													<i class="fa fa-calendar"></i>
+												{{elseif $usermenu.0|str_ends_with:"notes/"}}
+													<i class="fa fa-book"></i>
+												{{/if}}
 												{{$usermenu.1}}
 											</a>
 										</li>
@@ -502,9 +517,12 @@
 	<div class="col-xs-12">
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
-				<input id="nav-search-input-field-mobile" class="form-control form-search" type="text" name="q"
-					data-toggle="tooltip"  data-viewport="#topbar-first" title="{{$search_hint}}" placeholder="{{$nav.search.1}}">
-				<button class="btn btn-default btn-sm form-button-search" type="submit">{{$nav.search.1}}</button>
+				<input id="nav-search-input-field-mobile" class="form-control form-search" type="search" name="q"
+					placeholder="{{$search_placeholder}}">
+				<button class="btn btn-primary btn-sm form-button-search" type="submit">
+					<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
+					<span class="sr-only">{{$nav.search.1}}</span>
+				</button>
 			</div>
 		</form>
 	</div>

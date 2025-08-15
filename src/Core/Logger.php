@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Logger functions
  *
- * @deprecated 2025.02 Use constructor injection or `DI::logger()` instead
+ * @deprecated 2025.07 Use constructor injection or `DI::logger()` instead
  */
 class Logger
 {
@@ -34,7 +34,7 @@ class Logger
 	 */
 	public static function emergency(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->emergency($message, $context);
 	}
@@ -53,7 +53,7 @@ class Logger
 	 */
 	public static function alert(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->alert($message, $context);
 	}
@@ -71,7 +71,7 @@ class Logger
 	 */
 	public static function critical(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->critical($message, $context);
 	}
@@ -88,7 +88,7 @@ class Logger
 	 */
 	public static function error(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->error($message, $context);
 	}
@@ -107,7 +107,7 @@ class Logger
 	 */
 	public static function warning(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->warning($message, $context);
 	}
@@ -123,7 +123,7 @@ class Logger
 	 */
 	public static function notice(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->notice($message, $context);
 	}
@@ -142,7 +142,7 @@ class Logger
 	 */
 	public static function info(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->info($message, $context);
 	}
@@ -158,7 +158,7 @@ class Logger
 	 */
 	public static function debug(string $message, array $context = [])
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use constructor injection or `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		self::getInstance()->debug($message, $context);
 	}

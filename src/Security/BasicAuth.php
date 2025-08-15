@@ -11,6 +11,7 @@ use Exception;
 use Friendica\Core\Hook;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
 
@@ -136,12 +137,16 @@ class BasicAuth
 			'user_record'   => null,
 		];
 
-		/*
-		* An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
-		* Addons should never set 'authenticated' except to indicate success - as hooks may be chained
-		* and later addons should not interfere with an earlier one that succeeded.
-		*/
-		Hook::callAll('authenticate', $addon_auth);
+		$eventDispatcher = DI::eventDispatcher();
+
+		/**
+		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
+		 * and later addons should not interfere with an earlier one that succeeded.
+		 */
+		$addon_auth = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_AUTHENTICATE, $addon_auth),
+		)->getArray();
 
 		if ($addon_auth['authenticated'] && !empty($addon_auth['user_record'])) {
 			$record = $addon_auth['user_record'];

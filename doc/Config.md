@@ -43,7 +43,7 @@ Some examples of common known configuration files:
 Addons can define their own default configuration values in `addon/[addon]/config/[addon].config.php` which is loaded when the addon is activated.
 
 If needed, an alternative `config` path can be used by using the `FRIENDICA_CONFIG_DIR` environment variable (full path required!).
-This is useful in case of hardening the system by separating configuration from program binaries. 
+This is useful in case of hardening the system by separating configuration from program binaries.
 
 ### Static Configuration location
 
@@ -158,16 +158,6 @@ $a->config['register_policy'] = REGISTER_CLOSED;
 ],
 </pre></td>
         </tr>
-		<tr>
-			<td><pre>
-$a->path = "value";
-</pre></td>
-			<td><pre>
-'system' => [
-	'urlpath' => 'value',
-],
-</pre></td>
-		</tr>
 		<tr>
 			<td><pre>
 $default_timezone = "value";
@@ -313,7 +303,7 @@ Enabling the admin panel for an account, and thus making the account holder admi
     'config' => [
         'admin_email' => 'someone@example.com',
     ]
-    
+
 
 Where you have to match the email address used for the account with the one you enter to the `config/local.config.php` file.
 If more than one account should be able to access the admin panel, separate the email addresses with a comma.

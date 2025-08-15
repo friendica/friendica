@@ -73,6 +73,13 @@ video {
 blockquote {
 	font-size: inherit;
 }
+textarea.text-autosize {
+	/* The JS autoresizing lib autosize appears to lock vertical resizing because I guess it may conflict with it.
+	 * This leaves horizontal resizing but that generally is less useful and it frequently breaks the layout.
+	 * So fully disable resizing for textareas until we replace this lib with CSS field-sizing
+	 * */
+	resize: none;
+}
 .clear {
 	clear: both;
 }
@@ -160,6 +167,11 @@ details summary {
 	/* prevent page scroll when the aside is opened **/
 	body.aside-out {
 		overflow: hidden;
+	}
+	/* More space for the search field */
+	#topbar-first .container {
+		padding-left: 0;
+		padding-right: 0;
 	}
 }
 /*
@@ -572,6 +584,11 @@ nav.navbar {
 	}
 }
 
+button#main-menu {
+	align-items: center;
+	display: flex;
+	gap: 5px;
+}
 #topbar-first .navbar-toggle {
 	margin-top: 5px;
 	margin-bottom: 0;
@@ -602,7 +619,6 @@ nav.navbar .nav > li > button:focus {
 	margin-left: 20px;
 }
 #topbar-first .nav > .account img {
-	margin-left: 10px;
 	height: 32px;
 	width: 32px;
 	border-radius: 3px;
@@ -784,7 +800,6 @@ nav.navbar .nav > li > button:focus {
 /* The Top Nav Bar user menu */
 #topbar-first .account .user-title {
 	text-align: right;
-	margin-top: 7px;
 }
 #topbar-first .account .user-title span {
 	color: $nav_icon_color;
@@ -851,10 +866,6 @@ nav.navbar .nav > li > button:focus {
 	max-height: calc(100vh - 55px);
 	overflow-y: auto;
 }
-#topbar-first #search-box .navbar-form {
-	margin: 0px;
-	padding: 12px 12px;
-}
 #search-mobile {
 	position: fixed;
 	top: 90px;
@@ -870,17 +881,26 @@ nav.navbar .nav > li > button:focus {
 	min-height: 0;
 	border-radius: 0;
 }
+
 #search-mobile .navbar-form {
 	margin: 0;
 }
-#topbar-first #search-box .form-search {
-	height: 25px;
-	font-size: 13px;
-	background-position: 8px 4px;
+
+#search-mobile .form-button-search {
+	padding: 4px 15px;
+	top: 2px;
 }
-#topbar-first #search-box .btn {
-	font-size: 10px;
-	padding: 1px 8px;
+
+#search-mobile .form-button-search .fa {
+	font-size: 1.6em;
+}
+
+#nav-search-input-field {
+	width: 296px;
+}
+
+#nav-search-input-field::placeholder {
+	font-size: 13px;
 }
 
 /* second topbar */
@@ -1215,6 +1235,7 @@ aside .vcard .profile-header {
 aside .vcard .fn {
 	font-weight: bold;
 	padding: 5px 0px 5px 0px;
+	text-align: center;
 }
 aside .vcard .p-addr {
 	font-style: italic;
@@ -1222,6 +1243,7 @@ aside .vcard .p-addr {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	padding-bottom: 2px;
+	text-align: center;
 }
 aside .vcard .title {
 	margin-top: 10px;
@@ -1402,6 +1424,9 @@ aside #circle-sidebar li .circle-edit-tool:first-child {
 	width: 75px;
 	border-radius: 4px;
 }
+.contact-block-h4 {
+	display: inline-block;
+}
 
 /* Tag cloud widget */
 .tagblock.widget > .tag-cloud {
@@ -1471,7 +1496,6 @@ section #jotOpen {
 #jot-text-wrap textarea {
 	min-height: 100px;
 	overflow-y: auto !important;
-	overflow-y: overlay !important;
 }
 #jot-text-wrap .preview textarea {
 	width: 100%;
@@ -1832,7 +1856,6 @@ blockquote.shared_content {
 	margin: 0 0 5px;
 }
 .media-heading {
-	font-size: 14px;
 	margin: 0px;
 }
 .wall-item-name,
@@ -2448,22 +2471,32 @@ input[type="range"].form-control {
 /* Search form */
 .form-control.form-search {
 	border-radius: 30px;
-	background-image: url(img/icon_search16x16.png);
-	background-repeat: no-repeat;
-	background-position: 10px 8px;
-	padding-left: 34px;
 }
 .form-group-search {
 	position: relative;
 	width: 100%;
 }
 
-.form-group-search .form-button-search {
-	position: absolute;
-	top: 4px;
-	right: 4px;
-	border-radius: 30px;
+#search-box .fa-search {
+	font-size: 1.4em;
 }
+
+/* Both desktop and mobile - multiple search fields */
+.form-group-search .form-button-search {
+	border-radius: 30px;
+	padding: 3px 10px;
+	position: absolute;
+	right: 4px;
+	top: 2px;
+}
+#search-box .form-button-search {
+	top: 1px;
+}
+
+#search-box .navbar-form {
+	margin-right: -15px;
+}
+
 .search-input.form-control.form-search {
 	width: 100%;
 }
@@ -2618,7 +2651,7 @@ ul.viewcontact_wrapper > li {
 .contact-entry-checkbox {
 	margin-top: -20px;
 }
-.contact-wrapper .media-body .contact-entry-name h1.media-heading a {
+.contact-wrapper .media-body .contact-entry-name h4.media-heading a {
 	font-weight: bold !important;
 	color: $link_color;
 	font-size: 15px !important;
@@ -2760,8 +2793,8 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 .mail-thread #prvmail-message-label > label {
 	display: none;
 }
-.mail-thread #prvmail-message-label textarea {
-	max-height: 120px;
+.mail-thread #prvmail-message-label textarea, #comment-edit-text-input {
+	min-height: 120px;
 }
 .mail-conv-wrapper {
 	padding: 15px 0;
@@ -3714,6 +3747,7 @@ section .profile-match-wrapper {
  * The different views of js fullcalendar
  */
 #fc-header {
+	display: flex;
 	margin-top: 20px;
 	margin-bottom: 10px;
 }
@@ -3733,6 +3767,8 @@ section .profile-match-wrapper {
 	color: inherit;
 }
 #event-calendar-title {
+	flex: 1;
+	text-align: center;
 	vertical-align: middle;
 }
 #event-calendar-views {

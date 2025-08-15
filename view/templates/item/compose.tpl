@@ -56,6 +56,9 @@
 					<button type="button" class="btn btn-sm template-icon bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="14">
 						<i class="fa fa-eye"></i>
 					</button>
+					<button type="button" class="btn btn-sm template-icon code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="4">
+						<i class="fa fa-code"></i>
+					</button>
 				</span>
 			</p>
 			<div id="dropzone-{{$id}}" class="dropzone">
@@ -63,38 +66,37 @@
 					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
 				</p>
 			</div>
-			<p class="comment-edit-submit-wrapper">
-{{if $type == 'post'}}
-				<span class="form-inline">
-					<button type="button" name="permissions" class="btn btn-sm template-icon" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissions()" style="margin-right: 10px;" tabindex="5">
-						<i class="fa fa-ellipsis-h"></i> {{$l10n.toggle_permissions}}
-					</button>
-					<input type="text" name="location" class="form-control" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6"/>
-                    			<button type="button" class="btn btn-sm template-icon" id="profile-location"
-						data-title-set="{{$l10n.location_set}}"
-						data-title-disabled="{{$l10n.location_disabled}}"
-						data-title-unavailable="{{$l10n.location_unavailable}}"
-						data-title-clear="{{$l10n.location_clear}}"
-						title="{{$l10n.location_set}}"
-						tabindex="7">
-						<i class="fa fa-map-marker" aria-hidden="true"></i>
-					</button>
-				</span>
-{{/if}}
-				<span id="profile-rotator-wrapper">
-					<img id="profile-rotator" src="images/rotator.gif" alt="{{$l10n.wait}}" title="{{$l10n.wait}}" style="display: none;" />
-				</span>
-				<span id="character-counter" class="grey text-info"></span>
-				<button type="button" class="btn btn-default" onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}" tabindex="8"><i class="fa fa-eye"></i> {{$l10n.preview}}</button>
-				<button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-envelope"></i> {{$l10n.submit}}</button>
-			</p>
+			<p class="comment-edit-submit-wrapper clearfix">
+				{{if $type == 'post'}}
+					<span class="pull-left">
+						<button type="button" name="permissions" class="btn btn-sm template-icon" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissions()" style="margin-right: 10px;" tabindex="5">
+							<i class="fa fa-ellipsis-h"></i> {{$l10n.toggle_permissions}}
+						</button>
+						<input type="text" name="location" class="form-control d-inline-block" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6" style="width: auto; display: inline-block;" />
+						<button type="button" class="btn btn-sm template-icon" id="profile-location"
+							data-title-set="{{$l10n.location_set}}"
+							data-title-disabled="{{$l10n.location_disabled}}"
+							data-title-unavailable="{{$l10n.location_unavailable}}"
+							data-title-clear="{{$l10n.location_clear}}"
+							title="{{$l10n.location_set}}"
+							tabindex="7">
+							<i class="fa fa-map-marker" aria-hidden="true"></i>
+						</button>
+					</span>
+				{{/if}}
+		<span class="pull-right">
+			<span role="presentation" id="profile-rotator-wrapper">
+				<img role="presentation" id="profile-rotator" src="images/rotator.gif" alt="{{$l10n.wait}}" title="{{$l10n.wait}}" style="display: none;" />
+			</span>
+			<span role="presentation" id="character-counter" class="grey text-info"></span>
+			<button type="button" class="btn btn-default" onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}" tabindex="8"><i class="fa fa-eye"></i> {{$l10n.preview}}</button>
+			<button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-envelope"></i> {{$l10n.submit}}</button>
+		</span>
+		</p>
 
 			<div id="comment-edit-preview-{{$id}}" class="comment-edit-preview" style="display:none;"></div>
 
 			<div id="permissions-section" style="display: none;">
-			<script>
-				dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
-			</script>
 {{if $type == 'post'}}
 			<h3>{{$l10n.visibility_title}}</h3>
 			{{$acl_selector nofilter}}
@@ -116,6 +118,8 @@
     </div>
 </div>
 <script>
+	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
+
 	document.addEventListener("DOMContentLoaded", function() {
 		var textareas = document.querySelectorAll(".expandable-textarea");
 

@@ -114,10 +114,10 @@ class Receiver
 			DI::logger()->notice('Invalid HTTP signature, message will not be trusted.', ['uid' => $uid, 'actor' => $actor, 'header' => $header, 'body' => $body]);
 			$signer = [];
 		} elseif (empty($http_signer)) {
-			DI::logger()->info('Signer is a tombstone. The message will be discarded, the signer account is deleted.');
+			DI::logger()->info('Signer is a tombstone. The message will be discarded, the signer account is deleted.', ['uid' => $uid, 'actor' => $actor]);
 			return;
 		} else {
-			DI::logger()->info('Valid HTTP signature', ['signer' => $http_signer]);
+			DI::logger()->info('Valid HTTP signature', ['uid' => $uid, 'actor' => $actor, 'signer' => $http_signer]);
 			$signer = [$http_signer];
 		}
 
@@ -250,7 +250,7 @@ class Receiver
 	 * @param string  $object_id Object ID of the provided object
 	 * @param integer $uid       User ID
 	 *
-	 * @return string with object type or NULL
+	 * @return string|null string with object type or NULL
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
@@ -644,15 +644,18 @@ class Receiver
 				return true;
 			}
 		} else {
-			$attributed_to = '';
+			$attributed_to = null;
 		}
 
 		// Test the provided signatures against the actor and "attributedTo"
 		if ($trust_source) {
-			if ($attributed_to !== false && $attributed_to !== '') {
+			if (!is_null($attributed_to)) {
 				$trust_source = (in_array($actor, $signer) && in_array($attributed_to, $signer));
 			} else {
 				$trust_source = in_array($actor, $signer);
+			}
+			if (!$trust_source) {
+				DI::logger()->info('Actor missmatch. Activity trust could not be achieved.', ['type' => $type, 'signer' => $signer, 'actor' => $actor, 'attributedTo' => $attributed_to]);
 			}
 		}
 
@@ -835,6 +838,9 @@ class Receiver
 							Queue::remove($object_data);
 							return true;
 						}
+					} elseif (Queue::exists($object_data['object_id'], 'as:Create')) {
+						DI::logger()->info('Announced id will now be processed.', ['uid' => $uid, 'id' => $object_data['object_id']]);
+						Queue::processByUri($object_data['object_id'], 'as:Create');
 					} else {
 						DI::logger()->info('Announced id already exists', ['uid' => $uid, 'id' => $object_data['object_id']]);
 						Queue::remove($object_data);
@@ -1670,6 +1676,11 @@ class Receiver
 					];
 					break;
 				default:
+					if (!empty($attachment['as:icon'])) {
+						$icon = JsonLD::fetchElement($attachment['as:icon'], 'as:url', '@id');
+					} else {
+						$icon = null;
+					}
 					$attachlist[] = [
 						'type'      => str_replace('as:', '', JsonLD::fetchElement($attachment, '@type')),
 						'mediaType' => JsonLD::fetchElement($attachment, 'as:mediaType', '@value'),
@@ -1677,7 +1688,7 @@ class Receiver
 						'url'       => JsonLD::fetchElement($attachment, 'as:url', '@id') ?? JsonLD::fetchElement($attachment, 'as:href', '@id'),
 						'height'    => JsonLD::fetchElement($attachment, 'as:height', '@value'),
 						'width'     => JsonLD::fetchElement($attachment, 'as:width', '@value'),
-						'image'     => JsonLD::fetchElement($attachment, 'as:image', '@id')
+						'image'     => JsonLD::fetchElement($attachment, 'as:image', '@id') ?? $icon,
 					];
 			}
 		}
@@ -1742,6 +1753,33 @@ class Receiver
 		}
 
 		return $question;
+	}
+
+	/**
+	 * Process the icon of an object
+	 *
+	 * @param array $object The object to process
+	 *
+	 * @return string|null The icon URL or null if not found
+	 */
+	private static function processIcon(array $object): ?string
+	{
+		if (empty($object['as:icon'])) {
+			return null;
+		}
+
+		$icon     = null;
+		$width    = 0;
+		$previous = 0;
+		foreach (JsonLD::fetchElementArray($object, 'as:icon') as $element) {
+			$width = (int)JsonLD::fetchElement($element, 'as:width', '@value');
+			if ($previous < $width) {
+				$icon     = JsonLD::fetchElement($element, 'as:url', '@id');
+				$previous = $width;
+			}
+		}
+
+		return $icon;
 	}
 
 	/**
@@ -1820,10 +1858,11 @@ class Receiver
 	 * This is the case with audio and video posts.
 	 * Then the links are added as attachments
 	 *
-	 * @param array $urls The object URL list
+	 * @param array       $urls The object URL list
+	 * @param string|null $icon The icon URL to use for the attachments
 	 * @return array an array of attachments
 	 */
-	private static function processAttachmentUrls(array $urls): array
+	private static function processAttachmentUrls(array $urls, ?string $icon): array
 	{
 		$attachments = [];
 		foreach ($urls as $key => $url) {
@@ -1849,7 +1888,7 @@ class Receiver
 			$filetype = strtolower(substr($mediatype, 0, strpos($mediatype, '/')));
 
 			if ($filetype == 'audio') {
-				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => null, 'size' => null, 'name' => ''];
+				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => null, 'size' => null, 'name' => '', 'image' => $icon];
 			} elseif ($filetype == 'video') {
 				$height = (int)JsonLD::fetchElement($url, 'as:height', '@value');
 				// PeerTube audio-only track
@@ -1859,7 +1898,7 @@ class Receiver
 
 				$size = (int)JsonLD::fetchElement($url, 'pt:size', '@value');
 
-				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'size' => $size, 'name' => ''];
+				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'size' => $size, 'name' => '', 'image' => $icon];
 			} elseif (in_array($mediatype, ['application/x-bittorrent', 'application/x-bittorrent;x-scheme-handler/magnet'])) {
 				$height = (int)JsonLD::fetchElement($url, 'as:height', '@value');
 
@@ -1870,8 +1909,10 @@ class Receiver
 
 				$attachments[$mediatype] = ['type' => $mediatype, 'mediaType' => $mediatype, 'url' => $href, 'height' => $height, 'size' => null, 'name' => ''];
 			} elseif ($mediatype == 'application/x-mpegURL') {
-				// PeerTube exception, actual video link is in the tags of this URL element
-				$attachments = array_merge($attachments, self::processAttachmentUrls($url['as:tag']));
+				// PeerTube uses HLS streams for video. We prefer HLS streams over the video file itself.
+				// But we still store the video file as an attachment to be used by the API which currently does not support HLS streams.
+				$attachments   = array_merge($attachments, self::processAttachmentUrls($url['as:tag'], $icon));
+				$attachments[] = ['type' => $filetype, 'mediaType' => $mediatype, 'url' => $href, 'height' => null, 'size' => null, 'name' => '', 'image' => $icon];
 			}
 		}
 
@@ -2041,7 +2082,7 @@ class Receiver
 
 		if (in_array($object_data['object_type'], ['as:Audio', 'as:Video'])) {
 			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? []) ?: $object_data['alternate-url'];
-			$object_data['attachments']   = array_merge($object_data['attachments'], self::processAttachmentUrls($object['as:url'] ?? []));
+			$object_data['attachments']   = array_merge($object_data['attachments'], self::processAttachmentUrls($object['as:url'] ?? [], self::processIcon($object)));
 		}
 
 		$object_data['can-comment'] = JsonLD::fetchElement($object, 'pt:commentsEnabled', '@value');
@@ -2065,7 +2106,7 @@ class Receiver
 		}
 
 		foreach ($object_data['tags'] as $tag) {
-			if (HTTPSignature::isValidContentType($tag['mediaType'] ?? '', $tag['href'])) {
+			if (HTTPSignature::isValidContentType($tag['mediaType'] ?? '', $tag['href'] ?? '')) {
 				$object_data['quote-url'] = $tag['href'];
 			}
 		}

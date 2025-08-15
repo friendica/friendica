@@ -42,6 +42,7 @@ class FriendicaSmarty extends Smarty
 		$this->registerPlugin('modifier', 'is_string', function ($value) {
 			return is_string($value);
 		});
+		$this->registerPlugin("modifier", "str_ends_with", "str_ends_with");
 
 		/*
 		 * Enable sub-directory splitting for reducing directory descriptor

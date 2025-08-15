@@ -7,8 +7,8 @@
 
 namespace Friendica\Util;
 
-use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -302,7 +302,11 @@ class Network
 		$avatar['url']     = '';
 		$avatar['success'] = false;
 
-		Hook::callAll('avatar_lookup', $avatar);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$avatar = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::AVATAR_LOOKUP, $avatar),
+		)->getArray();
 
 		if (! $avatar['success']) {
 			$avatar['url'] = DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO;

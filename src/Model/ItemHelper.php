@@ -58,7 +58,7 @@ final class ItemHelper
 
 	public function prepareItemData(array $item, bool $notify): array
 	{
-		$item['guid'] = Item::guid($item, $notify);
+		$item['guid'] = $this->itemContent->guid($item, $notify);
 		$item['uri']  = substr(trim($item['uri'] ?? '') ?: Item::newURI($item['guid']), 0, 255);
 
 		// Store URI data

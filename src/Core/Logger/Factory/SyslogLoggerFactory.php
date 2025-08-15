@@ -48,8 +48,8 @@ final class SyslogLoggerFactory implements LoggerFactory
 	 */
 	public function createLogger(string $logLevel, string $logChannel): LoggerInterface
 	{
-		$logOpts     = (string) $this->config->get('system', 'syslog_flags')    ?? SyslogLogger::DEFAULT_FLAGS;
-		$logFacility = (string) $this->config->get('system', 'syslog_facility') ?? SyslogLogger::DEFAULT_FACILITY;
+		$logOpts     = (int) $this->config->get('system', 'syslog_flags')    ?? SyslogLogger::DEFAULT_FLAGS;
+		$logFacility = (int) $this->config->get('system', 'syslog_facility') ?? SyslogLogger::DEFAULT_FACILITY;
 
 		if (!array_key_exists($logLevel, SyslogLogger::logLevels)) {
 			throw new LogLevelException(sprintf('The log level "%s" is not supported by "%s".', $logLevel, SyslogLogger::class));
@@ -58,7 +58,7 @@ final class SyslogLoggerFactory implements LoggerFactory
 		return new SyslogLogger(
 			$logChannel,
 			$this->introspection,
-			(string) SyslogLogger::logLevels[$logLevel],
+			SyslogLogger::logLevels[$logLevel],
 			$logOpts,
 			$logFacility
 		);

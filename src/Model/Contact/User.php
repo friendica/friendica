@@ -30,9 +30,8 @@ class User
 	 * Insert a user-contact for a given contact array
 	 *
 	 * @param array $contact
-	 * @return void
 	 */
-	public static function insertForContactArray(array $contact)
+	public static function insertForContactArray(array $contact): bool
 	{
 		if (empty($contact['uid'])) {
 			// We don't create entries for the public user - by now
@@ -339,7 +338,7 @@ class User
 	{
 		$pcid = Contact::getPublicContactId($cid, $uid);
 		if (!$pcid) {
-			return false;
+			return self::FREQUENCY_DEFAULT;
 		}
 
 		$public_contact = DBA::selectFirst('user-contact', ['channel-frequency'], ['cid' => $pcid, 'uid' => $uid]);

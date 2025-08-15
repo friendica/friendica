@@ -8,11 +8,11 @@
 namespace Friendica\Contact\FriendSuggest\Repository;
 
 use Friendica\BaseRepository;
-use Friendica\Contact\FriendSuggest\Collection;
+use Friendica\Contact\FriendSuggest\Collection\FriendSuggests as FriendSuggestsCollection;
 use Friendica\Contact\FriendSuggest\Entity\FriendSuggest as FriendSuggestEntity;
 use Friendica\Contact\FriendSuggest\Exception\FriendSuggestNotFoundException;
 use Friendica\Contact\FriendSuggest\Exception\FriendSuggestPersistenceException;
-use Friendica\Contact\FriendSuggest\Factory;
+use Friendica\Contact\FriendSuggest\Factory\FriendSuggest as FriendSuggestFactory;
 use Friendica\Database\Database;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\DateTimeFormat;
@@ -20,12 +20,12 @@ use Psr\Log\LoggerInterface;
 
 class FriendSuggest extends BaseRepository
 {
-	/** @var Factory\FriendSuggest */
+	/** @var FriendSuggestFactory */
 	protected $factory;
 
 	protected static $table_name = 'fsuggest';
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\FriendSuggest $factory)
+	public function __construct(Database $database, LoggerInterface $logger, FriendSuggestFactory $factory)
 	{
 		parent::__construct($database, $logger, $factory);
 	}
@@ -49,20 +49,17 @@ class FriendSuggest extends BaseRepository
 	 */
 	private function selectOne(array $condition, array $params = []): FriendSuggestEntity
 	{
-		return parent::_selectOne($condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
+
+		return $this->factory->createFromTableRow($fields);
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 *
-	 * @return Collection\FriendSuggests
-	 *
 	 * @throws \Exception
 	 */
-	private function select(array $condition, array $params = []): Collection\FriendSuggests
+	private function select(array $condition, array $params = []): FriendSuggestsCollection
 	{
-		return new Collection\FriendSuggests(parent::_select($condition, $params)->getArrayCopy());
+		return new FriendSuggestsCollection(parent::_select($condition, $params)->getArrayCopy());
 	}
 
 	/**
@@ -78,13 +75,9 @@ class FriendSuggest extends BaseRepository
 	}
 
 	/**
-	 * @param int $cid
-	 *
-	 * @return Collection\FriendSuggests
-	 *
 	 * @throws FriendSuggestPersistenceException In case the underlying storage cannot select the suggestion
 	 */
-	public function selectForContact(int $cid): Collection\FriendSuggests
+	public function selectForContact(int $cid): FriendSuggestsCollection
 	{
 		try {
 			return $this->select(['cid' => $cid]);
@@ -114,13 +107,9 @@ class FriendSuggest extends BaseRepository
 	}
 
 	/**
-	 * @param Collection\FriendSuggests $fsuggests
-	 *
-	 * @return bool
-	 *
 	 * @throws FriendSuggestNotFoundException in case the underlying storage cannot delete the suggestion
 	 */
-	public function delete(Collection\FriendSuggests $fsuggests): bool
+	public function delete(FriendSuggestsCollection $fsuggests): bool
 	{
 		try {
 			$ids = $fsuggests->column('id');

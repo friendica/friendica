@@ -452,19 +452,17 @@ class System
 
 	/**
 	 * Returns the current Load of the System
-	 *
-	 * @return integer
 	 */
-	public static function currentLoad()
+	public static function currentLoad(): float
 	{
 		if (!function_exists('sys_getloadavg')) {
-			return false;
+			return (float) 0;
 		}
 
 		$load_arr = sys_getloadavg();
 
 		if (!is_array($load_arr)) {
-			return false;
+			return (float) 0;
 		}
 
 		return round(max($load_arr[0], $load_arr[1]), 2);

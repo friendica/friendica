@@ -219,9 +219,10 @@ class Search extends BaseApi
 
 		$condition = ["`id` IN (SELECT `tid` FROM `post-tag` WHERE `type` = ?) AND `name` LIKE ?", Tag::HASHTAG, $q . '%'];
 
-		$tags = DBA::select('tag', ['name'], $condition, $params);
+		$tags = DBA::selectToArray('tag', ['name'], $condition, $params);
 
 		$hashtags = [];
+
 		foreach ($tags as $tag) {
 			if ($version == 1) {
 				$hashtags[] = $tag['name'];

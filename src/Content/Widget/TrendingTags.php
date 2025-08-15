@@ -35,10 +35,13 @@ class TrendingTags
 		}
 
 		$tpl = Renderer::getMarkupTemplate('widget/trending_tags.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$title' => DI::l10n()->tt('Trending Tags (last %d hour)', 'Trending Tags (last %d hours)', $period),
-			'$more'  => DI::l10n()->t('More Trending Tags'),
-			'$tags'  => $tags,
+		$o   = Renderer::replaceMacros($tpl, [
+			'$title'    => DI::l10n()->t('Trending Tags'),
+			'$subtitle' => DI::l10n()->tt('(%d hour)', '(%d hours)', $period),
+			'$more'     => DI::l10n()->t('More Trending Tags'),
+			'$showmore' => DI::l10n()->t('Show More'),
+			'$showless' => DI::l10n()->t('Show Less'),
+			'$tags'     => $tags,
 		]);
 
 		return $o;
