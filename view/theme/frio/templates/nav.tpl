@@ -144,9 +144,12 @@
 
 									</li>
 
-									<li>
-										<p role="menuitem" class="text-muted"><i>{{$emptynotifications}}</i></p>
-									</li>
+						<li id="nav-notifications-loading" class="loading">
+							<p role="menuitem" class="text-muted"><i>{{$loadingnotifications}}</i></p>
+						</li>
+						<li id="nav-notifications-empty" class="empty" style="display: none;">
+							<p role="menuitem" class="text-muted"><i>{{$emptynotifications}}</i></p>
+						</li>
 								</ul>
 							</li>
 						{{/if}}
