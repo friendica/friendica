@@ -252,6 +252,14 @@ $(function() {
 	/* Initially show loading state and hide empty state*/
 	$("#nav-notifications-loading").show();
 	$("#nav-notifications-empty").hide();
+	
+	/* Also ensure loading is visible by default when notifications menu is opened*/
+	$(document).on('click', '#nav-notifications-linkmenu', function() {
+		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
+			$("#nav-notifications-loading").show();
+			$("#nav-notifications-empty").hide();
+		}
+	});
 
 	/* enable perfect-scrollbars for different elements */
 	$('#nav-notifications-menu, aside').perfectScrollbar();
