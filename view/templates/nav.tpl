@@ -64,8 +64,8 @@
 				<ul id="nav-notifications-menu" class="menu-popup">
 					<li id="nav-notifications-see-all"><a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a></li>
 					<li id="nav-notifications-mark-all"><a href="#" onclick="notificationMarkAll(); return false;">{{$nav.notifications.mark.3}}</a></li>
-					<li id="nav-notifications-loading" class="loading">{{$loadingnotifications}}</li>
-					<li id="nav-notifications-empty" class="empty" style="display: none;">{{$emptynotifications}}</li>
+				<li id="nav-notifications-loading" class="loading"><span style="display: block; text-align: center;"><i class="fa fa-spinner fa-pulse" aria-hidden="true"></i> {{$loadingnotifications}}</span></li>
+				<li id="nav-notifications-empty" class="empty" style="display: none; text-align: center;"><i>{{$emptynotifications}}</i></li>
 				</ul>
 		{{/if}}		
 
