@@ -249,17 +249,16 @@ $(function() {
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
 	
-	/* Initially show loading state and hide empty state*/
-	$(document).ready(function() {
-		$("#nav-notifications-loading").show();
-		$("#nav-notifications-empty").hide();
-	});
-	
-	/* Also ensure loading is visible by default when notifications menu is opened*/
+	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
 	$(document).on('click', '#nav-notifications-linkmenu, #nav-notifications-menu-btn', function() {
 		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
-			$("#nav-notifications-loading").show();
-			$("#nav-notifications-empty").hide();
+			// Only show loading if we haven't loaded notifications yet
+			var menu = $("#nav-notifications-menu");
+			var hasNotifications = menu.find('.notification-link, .contact-notification-link').length > 0;
+			if (!hasNotifications) {
+				$("#nav-notifications-loading").show();
+				$("#nav-notifications-empty").hide();
+			}
 		}
 	});
 
