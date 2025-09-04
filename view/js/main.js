@@ -248,6 +248,10 @@ $(function() {
 	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
+	
+	/* Initially show loading state and hide empty state*/
+	$("#nav-notifications-loading").show();
+	$("#nav-notifications-empty").hide();
 
 	/* enable perfect-scrollbars for different elements */
 	$('#nav-notifications-menu, aside').perfectScrollbar();
@@ -303,9 +307,13 @@ $(function() {
 			$(".group-"+fid+" .notify").addClass("show").text(fcount);
 		});
 
+		// Hide loading state when we receive notification data
+		$("#nav-notifications-loading").hide();
+		
 		if (data.notifications.length == 0) {
-			$("#nav-notifications-menu").html(notifications_empty);
+			$("#nav-notifications-empty").show();
 		} else {
+			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
 			nnm.html(notifications_all + notifications_mark);
 

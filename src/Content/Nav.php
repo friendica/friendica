@@ -110,6 +110,7 @@ class Nav
 			'$nav'                => $nav_info['nav'],
 			'$banner'             => $nav_info['banner'],
 			'$emptynotifications' => $this->l10n->t('Nothing new here'),
+			'$loadingnotifications' => $this->l10n->t('Loading...'),
 			'$userinfo'           => $nav_info['userinfo'],
 			'$nickname'           => $this->session->getLocalUserNickname(),
 			'$sel'                => self::$selected,
