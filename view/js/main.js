@@ -325,7 +325,19 @@ $(function() {
 		} else {
 			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
+			// Preserve the loading and empty state elements when rebuilding the menu
+			var loadingElement = nnm.find("#nav-notifications-loading");
+			var emptyElement = nnm.find("#nav-notifications-empty");
+			
 			nnm.html(notifications_all + notifications_mark);
+			
+			// Re-add the loading and empty elements if they existed
+			if (loadingElement.length > 0) {
+				nnm.append(loadingElement);
+			}
+			if (emptyElement.length > 0) {
+				nnm.append(emptyElement);
+			}
 
 			var lastItemStorageKey = "notification-lastitem:" + localUser;
 			var notification_lastitem = parseInt(localStorage.getItem(lastItemStorageKey));
