@@ -256,7 +256,7 @@ $(function() {
 	});
 	
 	/* Also ensure loading is visible by default when notifications menu is opened*/
-	$(document).on('click', '#nav-notifications-linkmenu', function() {
+	$(document).on('click', '#nav-notifications-linkmenu, #nav-notifications-menu-btn', function() {
 		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
 			$("#nav-notifications-loading").show();
 			$("#nav-notifications-empty").hide();
