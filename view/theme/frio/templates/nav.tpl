@@ -144,7 +144,7 @@
 
 									</li>
 
-			<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555;">
+			<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555; padding-left: 10px;">
 				{{$loadingnotifications}}
 			</li>
 			<li id="nav-notifications-empty" class="empty" style="display: none;">
