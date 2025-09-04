@@ -250,8 +250,10 @@ $(function() {
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
 	
 	/* Initially show loading state and hide empty state*/
-	$("#nav-notifications-loading").show();
-	$("#nav-notifications-empty").hide();
+	$(document).ready(function() {
+		$("#nav-notifications-loading").show();
+		$("#nav-notifications-empty").hide();
+	});
 	
 	/* Also ensure loading is visible by default when notifications menu is opened*/
 	$(document).on('click', '#nav-notifications-linkmenu', function() {
@@ -265,7 +267,7 @@ $(function() {
 	$('#nav-notifications-menu, aside').perfectScrollbar();
 
 	/* nav update event  */
-	$('#topbar-first').bind('nav-update', function(e, data) {
+	$(document).bind('nav-update', function(e, data) {
 		var invalid = data.invalid || 0;
 		if (invalid == 1) {
 			window.location.href=window.location.href
@@ -512,8 +514,8 @@ function NavUpdate() {
 		var pingCmd = 'ping';
 		$.get(pingCmd, function(data) {
 			if (data.result) {
-				// send nav-update event
-				$('#topbar-first').trigger('nav-update', data.result);
+		// send nav-update event
+		$(document).trigger('nav-update', data.result);
 
 				// start live update
 				['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
