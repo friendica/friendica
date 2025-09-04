@@ -144,9 +144,9 @@
 
 									</li>
 
-					<li id="nav-notifications-loading" class="loading">
-						<p role="menuitem" class="text-center"><i class="fa fa-spinner fa-pulse" aria-hidden="true"></i> {{$loadingnotifications}}</p>
-					</li>
+			<li id="nav-notifications-loading" class="loading">
+				<p role="menuitem" class="text-center">{{$loadingnotifications}}</p>
+			</li>
 					<li id="nav-notifications-empty" class="empty" style="display: none;">
 						<p role="menuitem" class="text-muted text-center"><i>{{$emptynotifications}}</i></p>
 					</li>
