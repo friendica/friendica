@@ -266,7 +266,7 @@ $(function() {
 	$('#nav-notifications-menu, aside').perfectScrollbar();
 
 	/* nav update event  */
-	$(document).bind('nav-update', function(e, data) {
+	$('#topbar-first').bind('nav-update', function(e, data) {
 		var invalid = data.invalid || 0;
 		if (invalid == 1) {
 			window.location.href=window.location.href
