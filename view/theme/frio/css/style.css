@@ -1931,6 +1931,7 @@ blockquote.shared_content {
 }
 .wall-item-content img {
 	object-fit: contain;
+	max-width: 100%;
 }
 .wall-item-body > img,
 .wall-item-body > a > img {
