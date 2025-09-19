@@ -137,7 +137,7 @@ steps:
     depends_on:
       - ejabberd
     commands:
-      - sleep 2
+      - sleep 10
       - set -e
       - (apk add --no-cache curl) || (apt-get update && apt-get install -y curl)
       - php ./bin/console user add ciuser CI ciuser@example.test en || true
@@ -165,6 +165,7 @@ steps:
 #      - e2e_check_password
       - ejabberd
     commands:
+      - sleep 10
       - set -e
       - (apk add --no-cache curl coreutils) || (apt-get update && apt-get install -y curl coreutils)
       - php ./bin/console lock set "ex_auth_host:xmpp.test" || true
