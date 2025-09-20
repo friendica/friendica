@@ -7,19 +7,31 @@
 .justified-gallery {
   width: 100%;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  height: auto!important;
+  max-height: 100%;
 }
 .justified-gallery > a,
 .justified-gallery > div,
 .justified-gallery > figure {
-  position: absolute;
+  height: 180px !important;
+  width: 180px !important;
+ /* These three can probably be removed? */
+  position: relative;
+  top: auto !important;
+  left: auto !important;
+  border: 1px solid #ccc;
   display: inline-block;
   overflow: hidden;
   /* background: #888888; To have gray placeholders while the gallery is loading with waitThumbnailsLoad = false */
   filter: "alpha(opacity=10)";
   opacity: 0.1;
   margin: 0;
-  padding: 0;
+  border-radius: 8px;
+  margin: 4px !important;
 }
 .justified-gallery > a > img,
 .justified-gallery > div > img,
@@ -84,6 +96,13 @@
   -moz-transition: opacity 500ms ease-in;
   -o-transition: opacity 500ms ease-in;
   transition: opacity 500ms ease-in;
+  width: 100% !important;
+  height:  100% !important;
+  margin: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  object-fit: contain;
+  object-position: center;
 }
 .justified-gallery > .jg-filtered {
   display: none;

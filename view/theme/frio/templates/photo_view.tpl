@@ -11,38 +11,39 @@
 
 <div id="photo-view-{{$id}}" class="generic-page-wrapper">
 	<div class="pull-left" id="photo-edit-link-wrap">
-		<a class="page-action faded-icon" id="photo-album-link" href="{{$album.0}}" title="{{$album.1}}" data-toggle="tooltip">
-			<i class="fa fa-folder-open"></i>&nbsp;{{$album.1}}
+		<a class="page-action faded-icon" id="photo-album-link" href="{{$album.0}}">
+			<i class="fa fa-folder-open"></i>
+			{{$album.1}}
 		</a>
 	</div>
 	<div class="pull-right" id="photo-edit-link-wrap">
 {{if $tools}}
 	{{if $tools.view}}
-		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}" data-toggle="tooltip">
+		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}">
 			<i class="page-action fa fa-mail-reply"></i>
 			 {{$back_to_viewing_text}}
 		</a>
 	{{/if}}
 	{{if $tools.edit}}
-		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.edit.0}}" data-toggle="tooltip">
+		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.edit.0}}">
 			 <i class="page-action fa fa-pencil"></i>
 			 {{$edit_text}}
 		</a>
 	{{/if}}
 	{{if $tools.delete}}
-		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.delete.0}}" data-toggle="tooltip">
+		<a id="photo-delete-link" class="btn btn-primary" href="{{$tools.delete.0}}">
 			<i class="page-action fa fa-trash"></i>
 			{{$delete_text}}
 		</a>
 	{{/if}}
 	{{if $tools.profile}}
-		<a id="photo-toprofile-link" class="btn btn-primary" href="{{$tools.profile.0}}" data-toggle="tooltip">
+		<a id="photo-toprofile-link" class="btn btn-primary" href="{{$tools.profile.0}}">
 			<i class="page-action fa fa-user"></i>
 			{{$use_as_profile_picture_text}}
 		</a>
 	{{/if}}
 	{{if $tools.lock}}
-		<a id="photo-lock-link" onclick="lockview(event, 'photo', {{$id}});" title="{{$tools.lock}}" data-toggle="tooltip">
+		<a id="photo-lock-link" onclick="lockview(event, 'photo', {{$id}});" title="{{$tools.lock}}">
 			<i class="page-action fa fa-lg fa-lock faded-icon"></i>
 		</a>
 	{{/if}}
