@@ -353,8 +353,14 @@ class Conversation
 
 		$tpl = Renderer::getMarkupTemplate('jot.tpl');
 
+		if ($_SERVER["REQUEST_URI"] === "/notes") {
+			$post_btn_text = $this->l10n->t('New note');
+		} else {
+			$post_btn_text = $this->l10n->t('New Post');
+		}
+
 		$o .= Renderer::replaceMacros($tpl, [
-			'$new_post'            => $this->l10n->t('New Post'),
+			'$post_btn_text'       => $post_btn_text,
 			'$return_path'         => $this->args->getQueryString(),
 			'$action'              => 'item',
 			'$share'               => ($x['button'] ?? '') ?: $this->l10n->t('Share'),
