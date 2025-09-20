@@ -419,7 +419,7 @@ class Photos extends \Friendica\Module\BaseProfile
 				'$title'    => $this->t('Photo Albums'),
 				'$recent'   => $this->t('Recent Photos'),
 				'$albums'   => $albums,
-				'$upload'   => [$this->t('Upload New Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
+				'$upload'   => [$this->t('Upload Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
 				'$can_post' => $this->session->getLocalUserId() && $this->owner['uid'] == $this->session->getLocalUserId(),
 			]);
 		}
@@ -439,7 +439,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		$o .= Renderer::replaceMacros($tpl, [
 			'$title'      => $this->t('Recent Photos'),
 			'$can_post'   => $is_owner,
-			'$upload'     => [$this->t('Upload New Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
+			'$upload'     => [$this->t('Upload Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
 			'$photos'     => $photos,
 			'$paginate'   => $pager->renderFull($total),
 			'upload_text' => $this->t('Upload Photos'),

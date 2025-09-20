@@ -88,7 +88,7 @@ function photos_init()
 				'$title'    => DI::l10n()->t('Photo Albums'),
 				'$recent'   => DI::l10n()->t('Recent Photos'),
 				'$albums'   => $ret['albums'],
-				'$upload'   => [DI::l10n()->t('Upload New Photos'), 'photos/' . $owner['nickname'] . '/upload'],
+				'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $owner['nickname'] . '/upload'],
 				'$can_post' => $can_post
 			]);
 		}
@@ -782,7 +782,7 @@ function photos_content()
 			}
 		} elseif ($can_post) {
 			$edit = [DI::l10n()->t('Edit Album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/edit'];
-			$drop = [DI::l10n()->t('Drop Album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/drop'];
+			$drop = [DI::l10n()->t('Delete album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/drop'];
 		}
 
 		if ($order_field === 'created') {
@@ -824,7 +824,7 @@ function photos_content()
 			'$photos'   => $photos,
 			'$album'    => $album,
 			'$can_post' => $can_post,
-			'$upload'   => [DI::l10n()->t('Upload New Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
+			'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
 			'$order'    => $order,
 			'$edit'     => $edit,
 			'$drop'     => $drop,
