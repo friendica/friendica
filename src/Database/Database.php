@@ -538,8 +538,8 @@ class Database
 
 		switch ($this->driver) {
 			case self::PDO:
-				// If there are no arguments we use "query"
-				if (count($args) == 0) {
+				// If there are no placeholders or no arguments we use "query"
+				if (substr_count($sql, '?') == 0 || count($args) == 0) {
 					if (!$retval = $this->connection->query($this->replaceParameters($sql, $args))) {
 						$errorInfo     = $this->connection->errorInfo();
 						$this->error   = (string)$errorInfo[2];
