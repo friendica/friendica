@@ -564,16 +564,18 @@ class Database
 					break;
 				}
 
-				foreach (array_keys($args) as $param) {
-					$data_type = PDO::PARAM_STR;
-					if (is_int($args[$param])) {
-						$data_type = PDO::PARAM_INT;
-					} elseif ($args[$param] !== null) {
-						$args[$param] = (string)$args[$param];
-					}
-
-					$stmt->bindParam($param, $args[$param], $data_type);
+			$param_index = 1;
+			foreach ($args as $value) {
+				$data_type = PDO::PARAM_STR;
+				if (is_int($value)) {
+					$data_type = PDO::PARAM_INT;
+				} elseif ($value !== null) {
+					$value = (string)$value;
 				}
+
+				$stmt->bindValue($param_index, $value, $data_type);
+				$param_index++;
+			}
 
 				if (!$stmt->execute()) {
 					$errorInfo     = $stmt->errorInfo();
