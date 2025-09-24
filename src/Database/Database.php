@@ -500,10 +500,6 @@ class Database
 			return false;
 		}
 
-		if ((substr_count($sql, '?') != count($args)) && (count($args) > 0)) {
-			// Question: Should we continue or stop the query here?
-			$this->logger->warning('Query parameters mismatch.', ['query' => $sql, 'args' => $args]);
-		}
 
 		$sql = DBA::cleanQuery($sql);
 
