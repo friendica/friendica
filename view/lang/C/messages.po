@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-24 22:11+0200\n"
+"POT-Creation-Date: 2025-09-25 10:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6668,11 +6668,7 @@ msgstr ""
 msgid "Disconnect/Unfollow"
 msgstr ""
 
-#: src/Module/Contact/Unfollow.php:161
-msgid "Contact was successfully unfollowed"
-msgstr ""
-
-#: src/Module/Contact/Unfollow.php:164
+#: src/Module/Contact/Unfollow.php:163
 msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
@@ -8319,10 +8315,6 @@ msgid "Subscriber"
 msgstr ""
 
 #: src/Module/Notifications/Introductions.php:209
-msgid "No introductions."
-msgstr ""
-
-#: src/Module/Notifications/Introductions.php:210
 #: src/Module/Notifications/Notifications.php:127
 #, php-format
 msgid "No more %s notifications."

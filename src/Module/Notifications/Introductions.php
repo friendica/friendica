@@ -80,7 +80,7 @@ class Introductions extends BaseNotifications
 
 		$notificationResult = $this->getNotifications();
 		$notifications      = $notificationResult['notifications'] ?? [];
-		$notificationHeader = $notificationResult['header'] ?? '';
+		$notificationHeader = $notificationResult['header']        ?? '';
 
 		$notificationSuggestions = Renderer::getMarkupTemplate('notifications/suggestions.tpl');
 		$notificationTemplate    = Renderer::getMarkupTemplate('notifications/intros.tpl');
@@ -129,14 +129,14 @@ class Introductions extends BaseNotifications
 					]);
 					break;
 
-				// Normal connection requests
+					// Normal connection requests
 				default:
 					if ($Introduction->getNetwork() === Protocol::DFRN) {
 						$lbl_knowyou = $this->t('Claims to be known to you: ');
 						$knowyou     = ($Introduction->getKnowYou() ? $this->t('Yes') : $this->t('No'));
 					} else {
 						$lbl_knowyou = '';
-						$knowyou = '';
+						$knowyou     = '';
 					}
 
 					$convertedName = BBCode::toPlaintext($Introduction->getName(), false);
@@ -145,7 +145,7 @@ class Introductions extends BaseNotifications
 					$helptext2 = $this->t('Accepting %s as a friend allows %s to subscribe to your posts, and you will also receive updates from them in your news feed.', $convertedName, $convertedName);
 					$helptext3 = $this->t('Accepting %s as a subscriber allows them to subscribe to your posts, but you will not receive updates from them in your news feed.', $convertedName);
 
-					$friend = ['duplex', $this->t('Friend'), '1', $helptext2, true];
+					$friend   = ['duplex', $this->t('Friend'), '1', $helptext2, true];
 					$follower = ['duplex', $this->t('Subscriber'), '0', $helptext3, false];
 
 					$action = 'follow_confirm';
@@ -206,7 +206,6 @@ class Introductions extends BaseNotifications
 		}
 
 		if (count($notifications['notifications']) == 0) {
-			DI::sysmsg()->addNotice($this->t('No introductions.'));
 			$notificationNoContent = $this->t('No more %s notifications.', $notifications['ident']);
 		}
 

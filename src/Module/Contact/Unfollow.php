@@ -158,13 +158,12 @@ class Unfollow extends \Friendica\BaseModule
 
 		try {
 			Contact::unfollow($contact);
-			$notice_message = $this->t('Contact was successfully unfollowed');
 		} catch (\Exception $e) {
 			$this->logger->error($e->getMessage(), ['contact' => $contact]);
 			$notice_message = $this->t('Unable to unfollow this contact, please contact your administrator');
+			$this->systemMessages->addNotice($notice_message);
 		}
 
-		$this->systemMessages->addNotice($notice_message);
 		$this->baseUrl->redirect($return_path);
 	}
 }

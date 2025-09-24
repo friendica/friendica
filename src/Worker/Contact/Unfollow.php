@@ -45,7 +45,7 @@ class Unfollow
 		$result = Protocol::unfollow($contact, $owner);
 		if ($result === false) {
 			if (!Worker::defer(self::WORKER_DEFER_LIMIT)) {
-				Contact::removeSharer($contact);	
+				Contact::removeSharer($contact);
 			}
 		} else {
 			Contact::removeSharer($contact);
