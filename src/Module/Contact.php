@@ -510,7 +510,7 @@ class Contact extends BaseModule
 				'accesskey' => 'p',
 			],
 			[
-				'label'     => DI::l10n()->t('Media'),
+				'label'     => DI::l10n()->t('Media posts'),
 				'url'       => 'contact/' . $pcid . '/media',
 				'sel'       => (($active_tab == self::TAB_MEDIA) ? 'active' : ''),
 				'title'     => DI::l10n()->t('Posts containing media objects'),

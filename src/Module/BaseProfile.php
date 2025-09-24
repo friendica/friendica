@@ -55,10 +55,10 @@ class BaseProfile extends BaseModule
 				'accesskey' => 'h',
 			],
 			[
-				'label'     => DI::l10n()->t('Media'),
+				'label'     => DI::l10n()->t('Media posts'),
 				'url'       => $baseProfileUrl . '/media',
 				'sel'       => $current == 'media' ? 'active' : '',
-				'title'     => DI::l10n()->t('Media'),
+				'title'     => DI::l10n()->t('Media posts'),
 				'id'        => 'media-tab',
 				'accesskey' => 'd',
 			],

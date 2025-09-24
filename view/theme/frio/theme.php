@@ -220,7 +220,7 @@ function frio_remote_nav(array &$nav_info)
 			// @TODO Switch with the new routes by version 2023.12
 			//$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/photos', DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/photos/' . $remoteUser['nick'], DI::l10n()->t('Photos'), '', DI::l10n()->t('Your photos')];
-			$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/media', DI::l10n()->t('Media'), '', DI::l10n()->t('Your postings with media')];
+			$nav_info['nav']['usermenu'][] = [$server_url . '/profile/' . $remoteUser['nick'] . '/media', DI::l10n()->t('Media posts'), '', DI::l10n()->t('Your postings with media')];
 			$nav_info['nav']['usermenu'][] = [$server_url . '/calendar/', DI::l10n()->t('Calendar'), '', DI::l10n()->t('Your calendar')];
 
 			// navbar links
