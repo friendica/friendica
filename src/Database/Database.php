@@ -552,7 +552,6 @@ class Database
 					break;
 				}
 
-				/** @var mysqli_stmt|PDOStatement $stmt */
 				$stmt = $this->connection->prepare($sql);
 
 				if (!$stmt) {
@@ -561,6 +560,22 @@ class Database
 					$this->errorno = (int)$errorInfo[1];
 					$retval        = false;
 					$is_error      = true;
+					break;
+				}
+
+				// Additional safety check: ensure parameter count matches placeholder count
+				$placeholder_count = substr_count($sql, '?');
+				if (count($args) != $placeholder_count) {
+					// Fall back to direct query with parameter replacement for safety
+					if (!$retval = $this->connection->query($this->replaceParameters($sql, $args))) {
+						$errorInfo     = $this->connection->errorInfo();
+						$this->error   = (string)$errorInfo[2];
+						$this->errorno = (int)$errorInfo[1];
+						$retval        = false;
+						$is_error      = true;
+					} else {
+						$this->affected_rows = $retval->rowCount();
+					}
 					break;
 				}
 
