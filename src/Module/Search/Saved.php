@@ -15,6 +15,7 @@ use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 class Saved extends BaseModule
@@ -34,7 +35,7 @@ class Saved extends BaseModule
 		$action = $this->args->get(2, 'none');
 		$search = trim(rawurldecode($_GET['term'] ?? ''));
 
-		if (!empty($_GET['return_url'])) {
+		if (!empty($_GET['return_url']) && Strings::isHex($_GET['return_url'])) {
 			$return_url = hex2bin($_GET['return_url']);
 		} else {
 			$return_url = Search::getSearchPath($search);

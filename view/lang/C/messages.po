@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2025.07-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-21 16:10+0200\n"
+"POT-Creation-Date: 2025-09-24 22:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -380,9 +380,10 @@ msgstr ""
 msgid "Recent Photos"
 msgstr ""
 
-#: mod/photos.php:91 mod/photos.php:827 src/Module/Profile/Photos.php:422
-#: src/Module/Profile/Photos.php:442
-msgid "Upload New Photos"
+#: mod/photos.php:91 mod/photos.php:682 mod/photos.php:827
+#: src/Module/Profile/Photos.php:422 src/Module/Profile/Photos.php:442
+#: src/Module/Profile/Photos.php:445
+msgid "Upload Photos"
 msgstr ""
 
 #: mod/photos.php:103 src/Module/BaseSettings.php:60
@@ -456,10 +457,6 @@ msgstr ""
 msgid "The maximum accepted image size is %s"
 msgstr ""
 
-#: mod/photos.php:682 src/Module/Profile/Photos.php:445
-msgid "Upload Photos"
-msgstr ""
-
 #: mod/photos.php:686 mod/photos.php:775
 msgid "New album name: "
 msgstr ""
@@ -500,7 +497,7 @@ msgid "Edit Album"
 msgstr ""
 
 #: mod/photos.php:785
-msgid "Drop Album"
+msgid "Delete album"
 msgstr ""
 
 #: mod/photos.php:789

@@ -201,24 +201,6 @@ function string2bb(element) {
  * jQuery plugin 'editor_autocomplete'
  */
 (function( $ ) {
-	let textcompleteObjects = [];
-
-	// jQuery wrapper for yuku/old-textcomplete
-	// uses a local object directory to avoid recreating Textcomplete objects
-	$.fn.textcomplete = function (strategies, options) {
-		return this.each(function () {
-			let $this = $(this);
-			if (!($this.data('textcompleteId') in textcompleteObjects)) {
-				let editor = new Textcomplete.editors.Textarea($this.get(0));
-
-				$this.data('textcompleteId', textcompleteObjects.length);
-				textcompleteObjects.push(new Textcomplete(editor, options));
-			}
-
-			textcompleteObjects[$this.data('textcompleteId')].register(strategies);
-		});
-	};
-
 	/**
 	 * This function should be called immediately after $.textcomplete() to prevent the escape key press to propagate
 	 * after the autocompletion dropdown has closed.
@@ -298,7 +280,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([contacts, groups, smilies, tags], {dropdown: {className:'acpopup'}});
+		this.textcomplete([contacts, groups, smilies, tags], {dropdown: {className:'acpopup'}, debounce: 250});
 		this.fixTextcompleteEscape();
 
 		return this;
@@ -333,7 +315,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete', 'off');
-		this.textcomplete([contacts, community, tags], {dropdown: {className:'acpopup', maxCount:100}});
+		this.textcomplete([contacts, community, tags], {dropdown: {className:'acpopup', maxCount:100}, debounce: 250});
 		this.fixTextcompleteEscape();
 		this.on('textComplete:select', function(e, value, strategy) { submit_form(this); });
 
@@ -354,7 +336,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([names], {dropdown: {className:'acpopup'}});
+		this.textcomplete([names], {dropdown: {className:'acpopup'}, debounce: 250});
 		this.fixTextcompleteEscape();
 
 		if(autosubmit) {
@@ -404,7 +386,7 @@ function string2bb(element) {
 		};
 
 		this.attr('autocomplete','off');
-		this.textcomplete([bbco], {dropdown: {className:'acpopup'}});
+		this.textcomplete([bbco], {dropdown: {className:'acpopup'}, debounce: 250});
 		this.fixTextcompleteEscape();
 
 		this.on('textComplete:select', function(e, value, strategy) { value; });

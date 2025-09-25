@@ -94,7 +94,7 @@
 	</script>
 	<script type="text/javascript" src="view/js/jquery.textinputs.js?v={{$VERSION}}"></script>
 	<script type="text/javascript"
-		src="view/asset/textcomplete/dist/textcomplete.min.js?v={{$VERSION}}"></script>
+		src="view/asset/jquery-textcomplete/dist/jquery.textcomplete.min.js?v={{$VERSION}}"></script>
 	<script type="text/javascript" src="view/js/autocomplete.js?v={{$VERSION}}"></script>
 	<script type="text/javascript"
 		src="view/asset/jquery-colorbox/jquery.colorbox-min.js?v={{$VERSION}}"></script>

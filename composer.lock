@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cde600fe59554df5ae77122068ec36e",
+    "content-hash": "39c8e3e8401fb77909d35391c4dddf89",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -2081,18 +2081,6 @@
             ]
         },
         {
-            "name": "npm-asset/eventemitter3",
-            "version": "2.0.3",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-2.0.3.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
             "name": "npm-asset/fork-awesome",
             "version": "1.2.0",
             "dist": {
@@ -2197,6 +2185,18 @@
             "type": "npm-asset"
         },
         {
+            "name": "npm-asset/jquery-textcomplete",
+            "version": "1.8.5",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/jquery-textcomplete/-/jquery-textcomplete-1.8.5.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "npm-asset/moment",
             "version": "2.30.1",
             "dist": {
@@ -2233,35 +2233,6 @@
             ]
         },
         {
-            "name": "npm-asset/textarea-caret",
-            "version": "3.1.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/textarea-caret/-/textarea-caret-3.1.0.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/textcomplete",
-            "version": "0.18.2",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/textcomplete/-/textcomplete-0.18.2.tgz"
-            },
-            "require": {
-                "npm-asset/eventemitter3": ">=2.0.3,<3.0.0",
-                "npm-asset/textarea-caret": ">=3.0.1,<4.0.0",
-                "npm-asset/undate": ">=0.2.3,<0.3.0"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
             "name": "npm-asset/typeahead.js",
             "version": "0.11.1",
             "dist": {
@@ -2272,18 +2243,6 @@
                 "npm-asset/jquery": ">=1.7"
             },
             "type": "npm-asset"
-        },
-        {
-            "name": "npm-asset/undate",
-            "version": "0.2.4",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/undate/-/undate-0.2.4.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
         },
         {
             "name": "nyholm/psr7",

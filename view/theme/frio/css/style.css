@@ -214,6 +214,14 @@ details summary {
 	display: none;
 }
 
+#confirm-message {
+	margin-bottom: 30px;
+}
+
+#confirm-form .settings-submit-wrapper {
+	margin-bottom: 0;
+}
+
 /*
 * Overwriting and Extend Bootstrap
 */
@@ -2809,6 +2817,9 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 }
 
 /* photos */
+.photo-album-edit-name, #photo-album-edit-submit {
+	display: inline-block;
+}
 #photo-album-edit-name-label {
 	width: 100%;
 }
@@ -2827,7 +2838,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	margin-top: 15px;
 }
 
-#photo-toprofile-link, .photo-back-link {
+#photo-toprofile-link, .photo-back-link, #album-drop-link {
 	margin-right: 25px;
 }
 
