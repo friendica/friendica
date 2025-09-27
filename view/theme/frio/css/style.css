@@ -2254,6 +2254,10 @@ nav .acpopup {
 img.acpopup-img {
 	border-radius: 4px;
 }
+/* Position the BBCode selector above the post/composer/JOT modal */
+.textcomplete-dropdown {
+	z-index: 1055!important;
+}
 
 /* The wall-item thread levels */
 .wall-item-container.thread_level_3,
