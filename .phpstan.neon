@@ -8,6 +8,10 @@ includes:
 parameters:
     level: 3
 
+    parallel:
+    	maximumNumberOfProcesses: 8
+    	processTimeout: 900.0
+
     paths:
         - bin/auth_ejabberd.php
         - bin/console.php

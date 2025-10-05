@@ -5,6 +5,10 @@
 parameters:
     level: 3
 
+    parallel:
+    	maximumNumberOfProcesses: 8
+    	processTimeout: 900.0
+
     paths:
         - addon/
 
