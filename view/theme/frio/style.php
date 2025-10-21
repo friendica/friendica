@@ -53,22 +53,26 @@ if (DI::mode()->has(\Friendica\App\Mode::MAINTENANCEDISABLED)) {
 	$login_bg_color   = DI::config()->get('frio', 'login_bg_color')   ?: $login_bg_color;
 	$modified         = DI::config()->get('frio', 'css_modified')     ?: $modified;
 
-	// Get the UID of the profile owner.
-	$uid = $_REQUEST['puid'] ?? 0;
-	if ($uid) {
-		DI::pConfig()->load($uid, 'frio');
+	if (DI::userSession()->getLocalUserId()) {
+		// Get the UID of the profile owner.
+		$uid = $_REQUEST['puid'] ?? 0;
+		if ($uid) {
+			DI::pConfig()->load($uid, 'frio');
 
-		// Only override display settings that have actually been set
-		$scheme           = frio_scheme_get_current_for_user($uid);
-		$scheme_accent    = DI::pConfig()->get($uid, 'frio', 'scheme_accent')    ?: $scheme_accent;
-		$nav_bg           = DI::pConfig()->get($uid, 'frio', 'nav_bg')           ?: $nav_bg;
-		$nav_icon_color   = DI::pConfig()->get($uid, 'frio', 'nav_icon_color')   ?: $nav_icon_color;
-		$link_color       = DI::pConfig()->get($uid, 'frio', 'link_color')       ?: $link_color;
-		$background_color = DI::pConfig()->get($uid, 'frio', 'background_color') ?: $background_color;
-		$contentbg_transp = DI::pConfig()->get($uid, 'frio', 'contentbg_transp') ?? $contentbg_transp;
-		$background_image = DI::pConfig()->get($uid, 'frio', 'background_image') ?: $background_image;
-		$bg_image_option  = DI::pConfig()->get($uid, 'frio', 'bg_image_option')  ?: $bg_image_option;
-		$modified         = DI::pConfig()->get($uid, 'frio', 'css_modified')     ?: $modified;
+			// Only override display settings that have actually been set
+			$scheme           = frio_scheme_get_current_for_user($uid);
+			$scheme_accent    = DI::pConfig()->get($uid, 'frio', 'scheme_accent')    ?: $scheme_accent;
+			$nav_bg           = DI::pConfig()->get($uid, 'frio', 'nav_bg')           ?: $nav_bg;
+			$nav_icon_color   = DI::pConfig()->get($uid, 'frio', 'nav_icon_color')   ?: $nav_icon_color;
+			$link_color       = DI::pConfig()->get($uid, 'frio', 'link_color')       ?: $link_color;
+			$background_color = DI::pConfig()->get($uid, 'frio', 'background_color') ?: $background_color;
+			$contentbg_transp = DI::pConfig()->get($uid, 'frio', 'contentbg_transp') ?? $contentbg_transp;
+			$background_image = DI::pConfig()->get($uid, 'frio', 'background_image') ?: $background_image;
+			$bg_image_option  = DI::pConfig()->get($uid, 'frio', 'bg_image_option')  ?: $bg_image_option;
+			$modified         = DI::pConfig()->get($uid, 'frio', 'css_modified')     ?: $modified;
+		}
+	} else {
+		$uid = 0;
 	}
 }
 
